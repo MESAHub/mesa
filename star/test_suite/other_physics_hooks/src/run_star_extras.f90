@@ -210,29 +210,29 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle
+         integer, intent(in) :: handle  ! eos handle
 
          integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
+         real(dp), intent(in) :: T, log10T  ! the temperature
 
          ! OUTPUT
          ! this routine must provide a fraction (in [0,1]) of the 'other' eos to use
          ! the remaining fraction (1-frac) will be provided by the standard MESA eos
-         real(dp), intent(out) :: frac ! fraction of other_eos to use
-         real(dp), intent(out) :: dfrac_dlogRho ! its partial derivative at constant T
+         real(dp), intent(out) :: frac  ! fraction of other_eos to use
+         real(dp), intent(out) :: dfrac_dlogRho  ! its partial derivative at constant T
          real(dp), intent(out) :: dfrac_dlogT   ! its partial derivative at constant Rho
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! this would use other_eos_component everywhere
          frac = 1d0
@@ -255,19 +255,19 @@
 
          ! INPUT
 
-         integer, intent(in) :: handle ! eos handle
+         integer, intent(in) :: handle  ! eos handle
          integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-         real(dp), intent(in) :: T, log10T ! the temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
+         real(dp), intent(in) :: T, log10T  ! the temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (num_eos_d_dxa_results, species)
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! one must provide a complete set of EOS results
          ierr = -1
@@ -288,19 +288,19 @@
 
          ! INPUT
 
-         integer, intent(in) :: handle ! eos handle
+         integer, intent(in) :: handle  ! eos handle
          integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-         real(dp), intent(in) :: T, log10T ! the temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
+         real(dp), intent(in) :: T, log10T  ! the temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (num_eos_d_dxa_results, species)
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! one can modify the existing eos results
          res(i_lnPgas) = res(i_lnPgas) + 0
@@ -319,20 +319,20 @@
          use kap_lib
 
          ! INPUT
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: id  ! star id if available; 0 otherwise
+         integer, intent(in) :: k  ! cell number or 0 if not for a particular cell
+         integer, intent(in) :: handle  ! from alloc_kap_handle
          integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: log10_rho ! density
-         real(dp), intent(in) :: log10_T ! temperature
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: log10_rho  ! density
+         real(dp), intent(in) :: log10_T  ! temperature
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
          real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
@@ -340,11 +340,11 @@
 
          ! OUTPUT
          real(dp), intent(out) :: kap_fracs(num_kap_fracs)
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: kap  ! opacity
+         real(dp), intent(out) :: dln_kap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
-         real(dp), intent(out) :: dln_kap_dxa(:) ! partial derivative w.r.t. to species
-         integer, intent(out) :: ierr ! 0 means AOK.
+         real(dp), intent(out) :: dln_kap_dxa(:)  ! partial derivative w.r.t. to species
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          call kap_get( &
             handle, species, chem_id, net_iso, xa, log10_rho, log10_T, &
@@ -358,9 +358,8 @@
       subroutine my_screening(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
          use rates_def
 
-         implicit none
 
-         type (Screen_Info) :: sc ! See rates_def
+         type (Screen_Info) :: sc  ! See rates_def
          ! This contains lots of useful things like temperature, density etc as well as some precomputed
          ! terms that are useful for screening calculations. The derived type is set in do_screen_set_context (screen.f90)
          real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
@@ -380,11 +379,10 @@
       subroutine my_rate_get(ir, temp, tf, raw_rate, ierr)
          use rates_def
          use rates_lib
-         implicit none
 
-         integer :: ir ! Rate id
+         integer :: ir  ! Rate id
          real(dp),intent(in) ::    temp      !< Temperature
-         type (T_Factors) :: tf !< Various temperature factors
+         type (T_Factors) :: tf  !< Various temperature factors
          real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
          integer, intent(out) ::   ierr
 

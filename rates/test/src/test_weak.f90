@@ -76,31 +76,31 @@ module test_weak
       d_eta_dlnT = 0
       d_eta_dlnRho = 0
 
-      if (.false.) then ! TESTING
-         logT =     7.5904236599874348D+00
-         logRho =     1.0657946486820271D+00
-         ye =     8.2724691280321605D-01
-         eta =    -5.3262903257381922D+00
-         d_eta_dlnT =    -1.5299344982339016D+00
-         d_eta_dlnRho =     9.9482489248846617D-01
-      else if (.true.) then ! TESTING
+      if (.false.) then  ! TESTING
+         logT = 7.5904236599874348D+00
+         logRho = 1.0657946486820271D+00
+         ye = 8.2724691280321605D-01
+         eta = -5.3262903257381922D+00
+         d_eta_dlnT = -1.5299344982339016D+00
+         d_eta_dlnRho = 9.9482489248846617D-01
+      else if (.true.) then  ! TESTING
          logT =  log10(9.0d8)
          ye =    0.5d0
          logRho =  log10(4.5d5)
          eta =    10d0
 
          ! call for cell          565
-         ! logT =    8.3534130765231005
-         ! logRho =    2.4507395003327828
-         ! T =    225638433.79026267
-         ! Rho =    282.31860559981624
-         ! abar =    4.0424973056746829
-         ! zbar =    2.0238390731055702
-         ! z2bar =    4.2987387813744071
-         ! ye =   0.50064079703023978
-         ! eta =   -5.3287260155378711
-         ! d_eta_dlnT=   -1.5713400060794886
-         ! d_eta_dlnRho =    1.0016532307086357
+         ! logT = 8.3534130765231005
+         ! logRho = 2.4507395003327828
+         ! T = 225638433.79026267
+         ! Rho = 282.31860559981624
+         ! abar = 4.0424973056746829
+         ! zbar = 2.0238390731055702
+         ! z2bar = 4.2987387813744071
+         ! ye = 0.50064079703023978
+         ! eta = -5.3287260155378711
+         ! d_eta_dlnT= -1.5713400060794886
+         ! d_eta_dlnRho = 1.0016532307086357
 
       else
          logT = 7.5d0
@@ -212,7 +212,7 @@ module test_weak
 
       write(*,*) 'done'
 
-      if (.false.) then ! dfridr tests for partials
+      if (.false.) then  ! dfridr tests for partials
 
          do i=1, num_weak_reactions
 
@@ -240,7 +240,7 @@ module test_weak
                dvardx_0, dvardx, err, xdum
          if (doing_d_dlnd) then
             write(*,*) 'doing dlnd'
-         else ! doing d_dlnT
+         else  ! doing d_dlnT
             write(*,*) 'doing dlnT'
          end if
          write(*,*) 'test net'
@@ -306,6 +306,4 @@ module test_weak
 
    end subroutine do_test_weak
 
-
 end module test_weak
-

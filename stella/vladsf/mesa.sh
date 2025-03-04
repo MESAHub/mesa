@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "terminal output in mesa_log.*"
 echo "opacity table 1"

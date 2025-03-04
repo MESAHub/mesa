@@ -1,3 +1,4 @@
+---
 #
 # file information
 #
@@ -23,7 +24,7 @@ output: AESOPUS_AGSS09.h5
 
 #
 # assumed abundance pattern information
-# 
+#
 
 Zsun: 0.01337
 C_div_Z_sun: 1.768914E-01

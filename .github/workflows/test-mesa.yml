@@ -1,3 +1,4 @@
+---
 name: Test Mesa
 
 on: [workflow_dispatch, release]
@@ -33,7 +34,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: MESAHub/mesa_test
-          path: mesa_test # Store in $GITHUB_WORKSPACE/mesa_test
+          path: mesa_test  # Store in $GITHUB_WORKSPACE/mesa_test
 
       - name: Install mesa_test
         run: |

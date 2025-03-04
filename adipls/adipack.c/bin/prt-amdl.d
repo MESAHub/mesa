@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/prt-amdl.d.x
 
 if [ $# -eq 0 ]

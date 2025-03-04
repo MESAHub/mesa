@@ -58,13 +58,13 @@
       subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
          use star_def
          integer, intent(in) :: id
-         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z ! surface values (cgs)
+         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z  ! surface values (cgs)
          ! NOTE: surface is outermost cell. not necessarily at photosphere.
          ! NOTE: don't assume that vars are set at this point.
          ! so if you want values other than those given as args,
          ! you should use values from s% xh(:,:) and s% xa(:,:) only.
          ! rather than things like s% Teff or s% lnT(:) which have not been set yet.
-         real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+         real(dp), intent(out) :: w  ! wind in units of Msun/year (value is >= 0)
          integer, intent(out) :: ierr
 
          integer :: h1, he4
@@ -146,9 +146,9 @@
                end if
             end if
 
-            if (alfa > 0) then ! eval hot side wind (eqn 24)
-               vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
+            if (alfa > 0) then  ! eval hot side wind (eqn 24)
+               vinf_div_vesc = 2.6d0  ! this is the hot side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.697d0 &
                   + 2.194d0*log10(L1/Lsun/1d5) &
@@ -162,9 +162,9 @@
                w1 = 0
             end if
 
-            if (alfa < 1) then ! eval cool side wind (eqn 25)
-               vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
+            if (alfa < 1) then  ! eval cool side wind (eqn 25)
+               vinf_div_vesc = 1.3d0  ! this is the cool side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.688d0 &
                   + 2.210d0*log10(L1/Lsun/1d5) &

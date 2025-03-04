@@ -25,8 +25,8 @@
 
          real(dp), allocatable :: output_values(:,:,:)
 
-         Z = 0.018
-         X = 0.72
+         Z = 0.018d0
+         X = 0.72d0
 
          !..set the sample size
          lgT_points = 300
@@ -47,12 +47,12 @@
          lgRho_max = 5.5d0
 
          ! table full range
-         lgT_max = 8.2
-         lgT_min = 2.1
-         lgQ_min = -10
-         lgQ_max = 5.69
-         lgRho_min = -9 ! lgQ_min + 2*lgT_min - 12
-         lgRho_max = 8 ! lgQ_max + 2*lgT_max - 12
+         lgT_max = 8.2d0
+         lgT_min = 2.1d0
+         lgQ_min = -10d0
+         lgQ_max = 5.69d0
+         lgRho_min = -9d0  ! lgQ_min + 2*lgT_min - 12
+         lgRho_max = 8d0  ! lgQ_max + 2*lgT_max - 12
 
          ! test
          lgT_max = 7.5d0

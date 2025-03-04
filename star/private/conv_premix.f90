@@ -63,7 +63,7 @@ module conv_premix
      real(dp)              :: vp_b = 0._dp               ! Penetration velocity at bot boundary
      real(dp)              :: dt_t = 0._dp               ! Clock for top boundary
      real(dp)              :: dt_b = 0._dp               ! Clock for bottom boundary
-     integer               :: burn_type = BURN_TYPE_NONE ! Type of burning in zone
+     integer               :: burn_type = BURN_TYPE_NONE  ! Type of burning in zone
      logical               :: sel_t = .FALSE.            ! Flag to select top boundary for modification
      logical               :: sel_b = .FALSE.            ! Flag to select bot boundary for modification
      logical               :: split_retreat = .FALSE.    ! Flag to indicate the zone has split, or the trailing bdy retreated
@@ -1061,7 +1061,7 @@ contains
     type(star_info), pointer       :: s
     type(zone_info), intent(inout) :: zi
 
-    real(dp), parameter :: EPS_THRESHOLD = 1._dp ! Threshold eps for a zone to be classified as burning
+    real(dp), parameter :: EPS_THRESHOLD = 1._dp  ! Threshold eps for a zone to be classified as burning
 
     integer  :: iso_h1
     integer  :: iso_he4

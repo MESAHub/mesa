@@ -59,7 +59,7 @@
          include 'formats'
 
          ierr = 0
-         call do_read_star_job('inlist', ierr) ! this does alloc_star
+         call do_read_star_job('inlist', ierr)  ! this does alloc_star
          ! and saves the id in id_from_read_star_job
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
@@ -148,8 +148,8 @@
          real(dp), pointer :: simplex(:,:), f(:)
          real(dp) :: f_final
          integer :: lrpar, lipar
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          integer :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars
          integer :: seed, i, j, k, num_samples
@@ -240,7 +240,7 @@
 
          if (.not. scale_simplex_params) then
             call set_xs
-         else ! values are scaled to -1..1 with first at 0
+         else  ! values are scaled to -1..1 with first at 0
             x_lower(1:nvar) = -1
             x_upper(1:nvar) = 1
             x_first(1:nvar) = 0
@@ -322,7 +322,7 @@
          contains
 
 
-         subroutine set_xs ! x_first, x_lower, x_upper
+         subroutine set_xs  ! x_first, x_lower, x_upper
             if (vary_Y) then
                x_first(i_Y) = first_Y
                x_lower(i_Y) = min_Y
@@ -385,7 +385,7 @@
             max_i = 0
             do j=1,nvar+1
                i = index(j)
-               if (i > max_i) max_i = i ! max sample restored
+               if (i > max_i) max_i = i  ! max sample restored
                write(*,3) 'restore simplex', j, i
                f(j) = sample_chi2(i)
                write(*,3) 'chi2', j, i, f(j)
@@ -470,10 +470,10 @@
             n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
 
@@ -823,7 +823,7 @@
          simplex_using_revised_max_yr_dt = .false.
          simplex_revised_max_yr_dt = s% max_years_for_timestep
 
-         okay_to_restart = .false. ! only allow restart on 1st call to run1_star
+         okay_to_restart = .false.  ! only allow restart on 1st call to run1_star
 
          eval1 = best_chi2
 
@@ -1187,10 +1187,10 @@
          if (.not. include_Rcz_in_chi2) then
             Rcz = 0
          else
-            do i = 1, s% nz-1 ! locate bottom of solar convective zone
+            do i = 1, s% nz-1  ! locate bottom of solar convective zone
                if (s% mixing_type(i+1) /= convective_mixing &
                      .and. s% mixing_type(i) == convective_mixing) then
-                  if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
+                  if (s% r(i+1) > 0.25d0*Rsun .and. s% r(i) < 0.9d0*Rsun) then
                      Rcz = s% r(i)/Rsun
                      exit
                   end if
@@ -1598,7 +1598,7 @@
          end subroutine setup_solar_data_for_calc_rms
 
 
-         real(dp) function calc_current_rms(s, nz) ! dR weighted
+         real(dp) function calc_current_rms(s, nz)  ! dR weighted
             use interp_1d_lib
             use interp_1d_def
             type (star_info), pointer :: s
@@ -1608,7 +1608,7 @@
             real(dp), target :: calc_rms_f1_ary(4*nz)
             real(dp), pointer :: calc_rms_f1(:), calc_rms_f(:,:)
             real(dp) :: sumy2, sumdr, dr, y2, cs
-            real(dp), parameter :: min_R = 0.094, max_R = 0.94
+            real(dp), parameter :: min_R = 0.094d0, max_R = 0.94d0
             real(dp), target :: pm_work_ary(nz*pm_work_size)
             real(dp), pointer :: pm_work(:)
             integer :: k, i, ierr
@@ -1884,7 +1884,7 @@
          use utils_lib
          integer, intent(out) :: ierr
          ierr = 0
-         max_num_samples = 1.5*max_num_samples + 200
+         max_num_samples = 1.5d0*max_num_samples + 200
 
          call realloc_double(sample_chi2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_age,max_num_samples,ierr); if (ierr /= 0) return

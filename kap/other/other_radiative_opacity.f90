@@ -44,17 +44,17 @@
             use const_def, only: dp
 
             ! INPUT
-            integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
-            real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
-            real(dp), intent(in) :: logRho ! density
-            real(dp), intent(in) :: logT ! temperature
+            integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
+            real(dp), intent(in) :: X, Z, XC, XN, XO, XNe  ! composition
+            real(dp), intent(in) :: logRho  ! density
+            real(dp), intent(in) :: logT  ! temperature
 
             ! OUTPUT
             real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
-            real(dp), intent(out) :: kap ! opacity
-            real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+            real(dp), intent(out) :: kap  ! opacity
+            real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
             real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-            integer, intent(out) :: ierr ! 0 means AOK.
+            integer, intent(out) :: ierr  ! 0 means AOK.
 
             write(*,*) 'no implementation for other_radiative_opacity'
             ierr = -1

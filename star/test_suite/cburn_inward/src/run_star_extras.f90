@@ -94,7 +94,7 @@
 
          select case (s% x_integer_ctrl(1))
 
-         case(2) ! inlist_cburn_inward
+         case(2)  ! inlist_cburn_inward
 
             ! Information for testhub
             testhub_extras_names(1) = 'ign_mass'
@@ -199,7 +199,7 @@
          ! Store initial flame location
          select case (s% x_integer_ctrl(1))
 
-         case(2) ! inlist_cburn_inward
+         case(2)  ! inlist_cburn_inward
             flame_cell = -1
             ! Check to see if carbon has ignited
              do k=s%nz, 1, -1
@@ -236,7 +236,6 @@
          use net_def
          use chem_def
          use chem_lib
-         implicit none
          type (star_info), pointer,intent(in) :: s
          integer,intent(in) :: k
          real(dp) :: neAbun,naAbun,mgAbun,heAbun
@@ -247,7 +246,7 @@
             if(s%m(k)/Msun < s%co_core_mass)THEN
                netEng = star_get_profile_output(s,'net_nuclear_energy',k)
 
-               if(netEng >= 0.0)THEN
+               if(netEng >= 0.0d0)THEN
                   neAbun = s%xa(s%net_iso(chem_get_iso_id('ne20')),k)
                   naAbun = s%xa(s%net_iso(chem_get_iso_id('na23')),k)
                   mgAbun = s%xa(s%net_iso(chem_get_iso_id('mg24')),k)

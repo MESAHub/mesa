@@ -79,7 +79,7 @@ contains
     include 'formats'
 
     ierr = 0
-    if (s% op_mono_n > 0) return ! already setup
+    if (s% op_mono_n > 0) return  ! already setup
 
     if (check_if_need) then
        if (s% high_logT_op_mono_full_off < 0d0 .or. &
@@ -142,7 +142,7 @@ contains
     type(auto_diff_real_2var_order1) :: frac
 
     if (s% op_mono_method == 'mombarg' .and. k < 2) then
-       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+       beta = 0d0  ! don't use 'mombarg' op mono method for atmospheres
     else
        frac = frac_op_mono(s, s% lnd(k)/ln10, s% lnT(k)/ln10)
     end if
@@ -197,13 +197,13 @@ contains
        alfa = 1d0
     else if (log10_T <= high_full_on .and. log10_T >= low_full_on) then
        alfa = 0d0
-    else if (log10_T > high_full_on) then ! between high_on and high_off
+    else if (log10_T > high_full_on) then  ! between high_on and high_off
        if (high_full_off - high_full_on > 1d-10) then
           alfa = (log10_T - high_full_on) / (high_full_off - high_full_on)
        else
           alfa = 1d0
        end if
-    else ! between low_off and low_on
+    else  ! between low_off and low_on
        if (low_full_on - low_full_off > 1d-10) then
           alfa = (log10_T - low_full_on) / (low_full_off - low_full_on)
        else
@@ -326,7 +326,7 @@ contains
     end if
 
     if (s% op_mono_method == 'mombarg' .and. k < 2) then
-       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+       beta = 0d0  ! don't use 'mombarg' op mono method for atmospheres
     else
        beta = frac_op_mono(s, logRho, logT)
     end if
@@ -346,7 +346,7 @@ contains
 
          if (associated(s% op_mono_umesh1)) then
 
-            thread_num = utils_OMP_GET_THREAD_NUM() ! in range 0 to op_mono_n-1
+            thread_num = utils_OMP_GET_THREAD_NUM()  ! in range 0 to op_mono_n-1
             if (thread_num < 0) then
                write(*,3) 'thread_num < 0', thread_num, s% op_mono_n
                ierr = -1
@@ -431,7 +431,7 @@ contains
 
       else if (s% op_mono_method == 'mombarg') then
          fk = 0
-         if (logT > 3.5 .and. logT < 8.0) then
+         if (logT > 3.5d0 .and. logT < 8.0d0) then
             do i=1, s% species
                e_name = chem_isos% name(s% chem_id(i))
                if (e_name == 'h1')  fk(1)  =  xa(i)/ chem_isos% W(s% chem_id(i))

@@ -68,7 +68,7 @@ module run_star_extras
          call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
             need_to_write_LINA_data = len_trim(s% x_character_ctrl(10)) > 0
-         else ! it is a restart
+         else  ! it is a restart
             need_to_write_LINA_data = .false.
          end if
       end subroutine extras_startup
@@ -181,7 +181,7 @@ module run_star_extras
          names(i) = 'max_v_div_cs'; vals(i) = 0; i=i+1
          names(i) = 'delta_R'; vals(i) = s% rsp_DeltaR; i=i+1
          names(i) = 'delta_Teff'; vals(i) = 0; i=i+1
-         names(i) = 'delta_logL'; vals(i) = s% rsp_DeltaMag/2.5; i=i+1
+         names(i) = 'delta_logL'; vals(i) = s% rsp_DeltaMag/2.5d0; i=i+1
          names(i) = 'delta_Mag'; vals(i) = 0; i=i+1
       end subroutine data_for_extra_history_columns
 

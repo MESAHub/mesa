@@ -98,8 +98,8 @@
 
          mass_conv_core = s% mass_conv_core
 
-         if ((mass_conv_core .lt. min_mass_conv_core) &
-              .or. (mass_conv_core .gt. max_mass_conv_core)) then
+         if ((mass_conv_core < min_mass_conv_core) &
+              .or. (mass_conv_core > max_mass_conv_core)) then
             write(*,*) 'bad value for mass_conv_core at termination'
             write(*,*) 'min allowed value', min_mass_conv_core
             write(*,*) 'mass_conv_core', mass_conv_core

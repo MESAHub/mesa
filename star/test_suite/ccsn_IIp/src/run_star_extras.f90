@@ -31,57 +31,57 @@
 
       implicit none
 
-      integer, parameter :: X_VEL_FRAC_C = 1 ! fraction of c to limit v_center to
-      integer, parameter :: X_STOP_M = 2 ! stop_m
+      integer, parameter :: X_VEL_FRAC_C = 1  ! fraction of c to limit v_center to
+      integer, parameter :: X_STOP_M = 2  ! stop_m
 
-      integer, parameter :: X_STOP_M_FRAC_HE = 7 !for setting stop_m in part2, fraction of He layer.
+      integer, parameter :: X_STOP_M_FRAC_HE = 7  !for setting stop_m in part2, fraction of He layer.
 
-      integer, parameter :: X_NI_MASS = 12 ! Amount of Ni mass to add Msun
+      integer, parameter :: X_NI_MASS = 12  ! Amount of Ni mass to add Msun
 
-      integer, parameter :: X_RTI_DAYS_OFF = 14 ! days afterwhich to turn off rti if >0
-      integer, parameter :: X_MASS_BELOW_SURF = 16 ! mass below surface for stop_m Msun
+      integer, parameter :: X_RTI_DAYS_OFF = 14  ! days afterwhich to turn off rti if >0
+      integer, parameter :: X_MASS_BELOW_SURF = 16  ! mass below surface for stop_m Msun
 
-      integer, parameter :: X_CSM_MDOT = 18 ! mass of csm to add if >0 - part 5 only
-      integer, parameter :: X_CSM_MASS = 19 ! mass of csm to add if >0 - part 5 only
+      integer, parameter :: X_CSM_MDOT = 18  ! mass of csm to add if >0 - part 5 only
+      integer, parameter :: X_CSM_MASS = 19  ! mass of csm to add if >0 - part 5 only
 
-      integer, parameter :: X_MLT_ALPHA = 21 ! use this mlta_alpha when h1>x_ctrl(X_MLT_H_LIM)
-      integer, parameter :: X_MLT_OTHER = 22 ! else use this mlt alpha
-      integer, parameter :: X_MLT_H_LIM = 23 ! h limit to switch mlt alpha's
+      integer, parameter :: X_MLT_ALPHA = 21  ! use this mlta_alpha when h1>x_ctrl(X_MLT_H_LIM)
+      integer, parameter :: X_MLT_OTHER = 22  ! else use this mlt alpha
+      integer, parameter :: X_MLT_H_LIM = 23  ! h limit to switch mlt alpha's
 
       integer, parameter :: X_CSM_RHO0 = 28
       integer, parameter :: X_CSM_T0 = 29
 
-      integer, parameter :: X_DELTA_LGL_AGE = 32 ! when to change delta_lgL options
-      integer, parameter :: X_DELTA_LGL_LIM = 33 ! s% delta_lgL_limit
-      integer, parameter :: X_DELTA_LGL_HARD_LIM = 34 ! s% delta_lgL_hard_limit
+      integer, parameter :: X_DELTA_LGL_AGE = 32  ! when to change delta_lgL options
+      integer, parameter :: X_DELTA_LGL_LIM = 33  ! s% delta_lgL_limit
+      integer, parameter :: X_DELTA_LGL_HARD_LIM = 34  ! s% delta_lgL_hard_limit
 
-      integer, parameter :: X_NI_MASS_START = 35 ! where to put Ni above M_center
-      integer, parameter :: X_NI_MASS_END = 36 ! where to stop putting Ni56 above he core
+      integer, parameter :: X_NI_MASS_START = 35  ! where to put Ni above M_center
+      integer, parameter :: X_NI_MASS_END = 36  ! where to stop putting Ni56 above he core
 
-      integer, parameter :: X_STELLA_MIN_CNTR_U = 37 !min center velocity for stella.
+      integer, parameter :: X_STELLA_MIN_CNTR_U = 37  !min center velocity for stella.
 
-      integer, parameter :: X_SMOOTH_XA_1_START = 45 ! boxcar smooth start mass above M_center
-      integer, parameter :: X_SMOOTH_XA_1_END = 46 ! boxcar smooth end mass above he core
-      integer, parameter :: X_SMOOTH_XA_1_BOXCAR_MASS = 47 ! boxcar smooth boxcar size
+      integer, parameter :: X_SMOOTH_XA_1_START = 45  ! boxcar smooth start mass above M_center
+      integer, parameter :: X_SMOOTH_XA_1_END = 46  ! boxcar smooth end mass above he core
+      integer, parameter :: X_SMOOTH_XA_1_BOXCAR_MASS = 47  ! boxcar smooth boxcar size
 
-      integer, parameter :: X_SMOOTH_XA_2_START = 48 ! boxcar smooth start mass above M_center
-      integer, parameter :: X_SMOOTH_XA_2_END = 49 ! boxcar smooth end mass above he core
-      integer, parameter :: X_SMOOTH_XA_2_BOXCAR_MASS = 50 ! boxcar smooth boxcar size
+      integer, parameter :: X_SMOOTH_XA_2_START = 48  ! boxcar smooth start mass above M_center
+      integer, parameter :: X_SMOOTH_XA_2_END = 49  ! boxcar smooth end mass above he core
+      integer, parameter :: X_SMOOTH_XA_2_BOXCAR_MASS = 50  ! boxcar smooth boxcar size
 
-      integer, parameter :: X_MAGNETAR_L_CNTR = 55 ! L_center - Magnetar is only enabled if this is greater than 0
-      integer, parameter :: X_MAGNETAR_START_UP = 56 ! start ramping up magnetar at this time in days
-      integer, parameter :: X_MAGNETAR_END_UP = 57 ! stop ramping up magnetar at this time  in days
-      integer, parameter :: X_MAGNETAR_START_DOWN = 58 ! start ramping down magnetar at this time  in days
-      integer, parameter :: X_MAGNETAR_END_DOWN = 59 ! stop ramping down magnetar at this time  in days
+      integer, parameter :: X_MAGNETAR_L_CNTR = 55  ! L_center - Magnetar is only enabled if this is greater than 0
+      integer, parameter :: X_MAGNETAR_START_UP = 56  ! start ramping up magnetar at this time in days
+      integer, parameter :: X_MAGNETAR_END_UP = 57  ! stop ramping up magnetar at this time  in days
+      integer, parameter :: X_MAGNETAR_START_DOWN = 58  ! start ramping down magnetar at this time  in days
+      integer, parameter :: X_MAGNETAR_END_DOWN = 59  ! stop ramping down magnetar at this time  in days
 
       integer, parameter :: X_FORCE_STOP_M = 98
       integer, parameter :: X_DEFAULT_STOP_M = 99
 
-      integer, parameter :: I_INLIST_PART = 1 ! inlist part number
-      integer, parameter :: I_SMOOTH_XA_1_NUM_ITERS = 3 ! boxcar smooth num iters
-      integer, parameter :: I_SMOOTH_XA_2_NUM_ITERS = 4 ! boxcar smooth num iters
+      integer, parameter :: I_INLIST_PART = 1  ! inlist part number
+      integer, parameter :: I_SMOOTH_XA_1_NUM_ITERS = 3  ! boxcar smooth num iters
+      integer, parameter :: I_SMOOTH_XA_2_NUM_ITERS = 4  ! boxcar smooth num iters
 
-      integer, parameter :: L_V_CNTR = 1 ! Whether to allow v_center to change
+      integer, parameter :: L_V_CNTR = 1  ! Whether to allow v_center to change
 
       integer, parameter :: INLIST_INFALL=-1, INLIST_END_INFALL=-2, INLIST_EDEP=-3
       integer, parameter :: INLIST_SHOCK_PART1=1, INLIST_SHOCK_PART2=2, INLIST_SHOCK_PART3=3
@@ -97,8 +97,8 @@
          initial_nico, initial_M_center, initial_he_core_mass, initial_mass, &
          start_m, stop_m
 
-      real(dp), parameter :: h1_limit = 0.1 ! We use this to check that RTI mixing worked
-      real(dp) :: max_mass_h ! Mass co-ordinate where h1< h1_limit
+      real(dp), parameter :: h1_limit = 0.1d0  ! We use this to check that RTI mixing worked
+      real(dp) :: max_mass_h  ! Mass co-ordinate where h1< h1_limit
 
       contains
 
@@ -167,8 +167,8 @@
       subroutine low_density_wind_routine(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
          use star_def
          integer, intent(in) :: id
-         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z ! surface values (cgs)
-         real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z  ! surface values (cgs)
+         real(dp), intent(out) :: w  ! wind in units of Msun/year (value is >= 0)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: msum, lgrho_limit, lnd_limit
@@ -180,7 +180,7 @@
          if (ierr /= 0) return
          i_lnd = s% i_lnd
          if (i_lnd <= 0) return
-         lgrho_limit = -14.5d0 ! remove material from surface with density below this
+         lgrho_limit = -14.5d0  ! remove material from surface with density below this
          lnd_limit = ln10*lgrho_limit
          msum = 0d0
          do k=1, s% nz
@@ -216,7 +216,7 @@
          end if
          nz = s% nz
          species = s% species
-         do k=1,nz ! fixup abundances before revise
+         do k=1,nz  ! fixup abundances before revise
             do j=1,species
                s% xa(j,k) = max(0d0, min(1d0, s% xa(j,k)))
             end do
@@ -246,7 +246,7 @@
          write(*,1) 'max_m min_m he_core_mass new_ni', &
             max_m/Msun, min_m/Msun, s% he_core_mass, new_ni
          if (max_m > 0d0) then
-            do k=1,nz ! replace ni56 + co56 by o16
+            do k=1,nz  ! replace ni56 + co56 by o16
                s% xa(i_o16,k) = s% xa(i_o16,k) + s% xa(i_ni56,k) + s% xa(i_co56,k)
                s% xa(i_co56,k) = 0d0
                s% xa(i_ni56,k) = 0d0
@@ -255,7 +255,7 @@
             if (min_m < 0) then
                min_m = max_m - new_ni*Msun
                mp1 = s% m(1)
-               do k=1,nz ! add ni56 from max_m to min_m
+               do k=1,nz  ! add ni56 from max_m to min_m
                   m00 = mp1
                   mp1 = m00 - s% dm(k)
                   if (mp1 >= max_m) cycle
@@ -272,7 +272,7 @@
                      s% xa(i_ni56,k) = 1d0 - sum(s% xa(1:species,k))
                   end if
                end do
-            else ! min_m >= 0
+            else  ! min_m >= 0
                min_m = max(min_m, s% M_center)
                if (min_m >= max_m) then
                   write(*,1) 'min_m >= max_m', min_m/Msun, max_m/Msun, s% M_center/Msun
@@ -281,7 +281,7 @@
                new_ni_frac = new_ni*Msun/(max_m - min_m)
                write(*,1) 'new_ni_frac min_m/Msun max_m/Msun', new_ni_frac, min_m/Msun, max_m/Msun
                mp1 = s% m(1)
-               do k=1,nz ! add ni56 from max_m to min_m
+               do k=1,nz  ! add ni56 from max_m to min_m
                   m00 = mp1
                   mp1 = m00 - s% dm(k)
                   if (m00 <= min_m) exit
@@ -340,7 +340,7 @@
             end do
          end if
 
-         do k=1,nz ! replace co56 by ni56
+         do k=1,nz  ! replace co56 by ni56
             s% xa(i_ni56,k) = s% xa(i_ni56,k) + s% xa(i_co56,k)
             s% xa(i_co56,k) = 0d0
          end do
@@ -429,7 +429,7 @@
             max_mass_h = -1
 
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_EDEP) then
-               if (s% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
+               if (s% total_mass_for_inject_extra_ergs_sec > 0) then  ! doing edep
                   if (s% v_flag) then
                      do k=1,s% nz
                         s% xh(s% i_v,k) = 0d0
@@ -453,7 +453,7 @@
             end if
 
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART5 .and. &
-                s% x_ctrl(X_CSM_MASS) > 0) call add_csm ! part 5, add csm
+                s% x_ctrl(X_CSM_MASS) > 0) call add_csm  ! part 5, add csm
 
             if (s% x_ctrl(X_SMOOTH_XA_1_BOXCAR_MASS) > 0d0 .and. s% x_integer_ctrl(I_SMOOTH_XA_1_NUM_ITERS) > 0) then
                min_mass = s% x_ctrl(X_SMOOTH_XA_1_START) + s% M_center/Msun
@@ -482,10 +482,10 @@
             end if
 
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART1) &
-               s% cumulative_energy_error = 0d0 ! set to 0 at start of part1
+               s% cumulative_energy_error = 0d0  ! set to 0 at start of part1
 
             start_m = s% shock_mass
-            if (start_m == 0d0) then ! use max v
+            if (start_m == 0d0) then  ! use max v
                k_max_v = maxloc(s% u(1:s% nz),dim=1)
                start_m = s% m(k_max_v)/Msun
                if (start_m < 2d0*s% M_center/Msun) then
@@ -521,7 +521,7 @@
                end select
             end if
 
-         end if ! not restart
+         end if  ! not restart
 
          write(*,1) 's% x_ctrl(X_MASS_BELOW_SURF)', s% x_ctrl(X_MASS_BELOW_SURF)
          write(*,1) 's% star_mass', s% star_mass
@@ -646,7 +646,7 @@
                   T0 = s% T(kk)
                end if
                L0 = s% L(1)
-               windv = csm_mdot/(4*pi*r0*r0*rho0) ! mdot velocity
+               windv = csm_mdot/(4*pi*r0*r0*rho0)  ! mdot velocity
                !windv = sqrt(2*s% cgrav(kk)*s% m(kk)/r0) ! escape velocity
                write(*,1) 'old log(r(1)/Rsun), R/Rsun', log10(s% r(1)/Rsun), s% r(1)/Rsun
                write(*,2) 'rho0, T0, r0, csm mass, csm v', &
@@ -673,7 +673,7 @@
                do k = kk-1, 1, -1
                   r = s% r(k+1) + 0.5d0*(s% r(k+1) - s% r(k+2))
                   f = r0/r; f = f*f
-                  rho = rho0*f ! rho proportional to 1/r^2
+                  rho = rho0*f  ! rho proportional to 1/r^2
                   dV = dm/rho
                   r = s% r(k+1)
                   r = pow(dV/(4d0*pi/3d0) + r*r*r, 1d0/3d0)
@@ -685,13 +685,13 @@
                   s% xh(s% i_lnd,k) = s% lnd(k)
 
 
-                  s% u(k) = windv !* r/r0
+                  s% u(k) = windv  !* r/r0
 
 
                   s% xh(s% i_u,k) = s% u(k)
 
 
-                  if (.true.) then ! set T to give P for HSE
+                  if (.true.) then  ! set T to give P for HSE
                      r = s% r(k+1)
                      P_hse = s% Peos(k+1) - &
                         s% cgrav(k+1)*s% m(k+1)*(s% dm(k+1)+s% dm(k))/(8*pi*r*r*r*r)
@@ -708,7 +708,7 @@
                      if (ierr /= 0) return
                      s% lnT(k) = logT_result*ln10
                      s% T(k) = exp(s% lnT(k))
-                     if (.false. .and. s% T(k) > s% T(k+1)) then ! can happen at base
+                     if (.false. .and. s% T(k) > s% T(k+1)) then  ! can happen at base
                         s% T(k) = s% T(k+1)
                         s% lnT(k) = s% lnT(k+1)
                      end if
@@ -718,7 +718,7 @@
                   end if
                   s% xh(s% i_lnT,k) = s% lnT(k)
 
-                  if (.true.) then ! set to black body L
+                  if (.true.) then  ! set to black body L
                      s% L(k) = atm_L(s% T(k), s% r(k))
                   else
                      s% L(k) = L0
@@ -768,7 +768,7 @@
             logical,parameter :: dbg=.false.
 
             ! This is to check that RTI worked
-            ! Find outer most location where H1<0.1 then later we will check if this has changed
+            ! Find outer most location where H1<0.1d0 then later we will check if this has changed
             h1_mass = -1
 
             if(dbg) write(*,*) "max_mass_h", max_mass_h/msun
@@ -869,7 +869,7 @@
             names(1) = 'du'
             vals(1,1) = 0
             do k=2,s% nz
-               vals(k,1) = 0 ! s% xtra1_array(k)
+               vals(k,1) = 0  ! s% xtra1_array(k)
             end do
             return
          end if
@@ -892,7 +892,7 @@
          if (ierr /= 0) return
 
          if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART1 .and. s% model_number >= 1000) &
-            s% max_timestep = 0 ! turn off limit
+            s% max_timestep = 0  ! turn off limit
 
          age_days = s% star_age*365.25d0
 

@@ -163,7 +163,7 @@
 
          if (check_op_split_burn .and. &
              s% doing_struct_burn_mix .and. &
-             s% T_start(k) >= s% op_split_burn_min_T) then ! leave this to do_burn
+             s% T_start(k) >= s% op_split_burn_min_T) then  ! leave this to do_burn
             return
          end if
 
@@ -222,14 +222,14 @@
              ! set solver_test_partials_equ_name = ''
              i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
              i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
-             s% solver_test_partials_var = i_var ! index in vars
-             if (i_var > s% nvar_hydro) then ! index in xa for sink
+             s% solver_test_partials_var = i_var  ! index in vars
+             if (i_var > s% nvar_hydro) then  ! index in xa for sink
                 s% solver_test_partials_dx_sink = i_var_sink - s% nvar_hydro
              else
                 s% solver_test_partials_dx_sink = 0
              end if
-             net_test_partials_i = i_var - s% nvar_hydro ! index in xa for var
-             net_test_partials_iother = i_var_sink - s% nvar_hydro ! index in xa for var
+             net_test_partials_i = i_var - s% nvar_hydro  ! index in xa for var
+             net_test_partials_iother = i_var_sink - s% nvar_hydro  ! index in xa for var
          end if
 
          if (s% use_other_net_get) then
@@ -433,7 +433,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
 
-         integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
+         integer, pointer :: reaction_id(:)  ! maps net reaction number to reaction id
          integer :: i, j, ierr, species, num_reactions
          real(dp) :: log10_Rho, log10_T
          real(dp), pointer :: v(:)
@@ -696,7 +696,7 @@
 
 
       subroutine net_tables(s, ierr)
-         use net_lib ! setup net
+         use net_lib  ! setup net
          use rates_lib
          use rates_def, only: rates_reaction_id_max, rates_other_rate_get
          type (star_info), pointer :: s

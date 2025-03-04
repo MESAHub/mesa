@@ -37,7 +37,6 @@
 
 
       subroutine production_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -84,7 +83,6 @@
          use chem_def
          use net_def
          use const_def, only: Msun
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -101,10 +99,10 @@
          include 'formats'
          ierr = 0
 
-         colors(:) = (/ &
+         colors(:) = [ &
                clr_Gold, clr_LightSkyBlue, clr_Crimson, clr_Goldenrod, clr_MediumSlateBlue, &
                clr_Coral, clr_LightSkyGreen, clr_DarkGray, clr_Lilac, &
-               clr_Tan, clr_IndianRed, clr_Teal, clr_Silver, clr_BrightBlue /)
+               clr_Tan, clr_IndianRed, clr_Teal, clr_Silver, clr_BrightBlue ]
 
          chScale = txt_scale
 
@@ -317,7 +315,7 @@
                         !Not the first isotope of an element
                         if(last_x>0)then
                            !Then draw a line between isotopes of same element
-                           call pgline(2,(/last_x,A*1.0/),(/last_y,real(scaled_abun(j)*1.0)/))
+                           call pgline(2,[last_x,A*1.0],[last_y,real(scaled_abun(j)*1.0)])
                         end if
 
                         !Save last x,y pair we saw

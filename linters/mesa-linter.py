@@ -105,6 +105,6 @@ if __name__ == "__main__":
     s = False
     if "-s" in files:
         s = True
-        files = [i for i in files if not ("-s" in i)]
+        files = [i for i in files if "-s" not in i]
     for f in files:
         search(f, allchecks, s)

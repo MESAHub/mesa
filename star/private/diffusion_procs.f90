@@ -67,14 +67,14 @@
 
          ierr = 0
          nsmooth_x_in_fixup = 0
-         max_lnT_for_smooth = ln10*99 ! max_logT_for_smooth  -- always on for now.
+         max_lnT_for_smooth = ln10*99  ! max_logT_for_smooth  -- always on for now.
          bad_j = 0
          bad_k = 0
          bad_X = 0d0
          bad_sum = 0d0
          bad_Xsum = 0d0
 
-         dbg = .false. ! total_num_iters == 21
+         dbg = .false.  ! total_num_iters == 21
 
          ! set mass(j,k) using cell_dm and X
          ! note that can have bad X's, so can have bad masses too.
@@ -182,13 +182,13 @@
                   sum1 = sum_mass(k1)
                   ! find dm s.t. xnew = (m0+dm)/(sum0+dm) = (m1-dm)/(sum1-dm)
                   dm = (m0*sum1 - m1*sum0)/(m0 + m1 - sum0 - sum1)
-                  if (dm > 0) then ! moving mass from k1
+                  if (dm > 0) then  ! moving mass from k1
                      dm = min(dm,0.99999d0*sum1)
-                  else ! moving mass from k
+                  else  ! moving mass from k
                      dm = -min(-dm,0.99999d0*sum0)
                   end if
                   mass(j,k) = m0 + dm
-                  sum_mass(k) = sum(mass(1:nc,k)) ! sum0 + dm
+                  sum_mass(k) = sum(mass(1:nc,k))  ! sum0 + dm
                   if (sum_mass(k) < 0d0) then
                      write(*,2) 'sum_mass(k)', k, sum_mass(k)
                      write(*,1) 'sum0', sum0
@@ -199,7 +199,7 @@
                      call mesa_error(__FILE__,__LINE__,'fixup extremes')
                   end if
                   mass(j,k1) = m1 - dm
-                  sum_mass(k1) = sum(mass(1:nc,k1)) ! sum1 - dm
+                  sum_mass(k1) = sum(mass(1:nc,k1))  ! sum1 - dm
                   if (sum_mass(k1) < 0d0) then
                      write(*,2) 'sum_mass(k1)', k1, sum_mass(k1)
                      write(*,1) 'sum0', sum0
@@ -268,7 +268,7 @@
                   k_lo = max(k_lo-1,nzlo)
                end do
 
-               dm = -mass(j,k) ! dm > 0
+               dm = -mass(j,k)  ! dm > 0
                mass(j,k) = 0d0
                ! remove dm from neighbors
                source_mass = sum_m + dm
@@ -423,7 +423,7 @@
                      dm = (sum_00*xavg - m_00)/(1d0 - xavg)
                      if (dm >= 0d0) then
                         dm = min(dm, 0.999d0*(m_m1 + m_p1))
-                     else ! dm < 0
+                     else  ! dm < 0
                         dm = -min(-dm, 0.999d0*m_00)
                      end if
 
@@ -432,7 +432,7 @@
                         write(*,3) 'mass00', j, k, mass(j,k), m_00, dm
                         call mesa_error(__FILE__,__LINE__,'fixup 5')
                      end if
-                     sum_00 = sum(mass(1:nc,k)) ! sum_00 + dm
+                     sum_00 = sum(mass(1:nc,k))  ! sum_00 + dm
                      if (sum_00 < 0d0 .or. is_bad_num(sum_00)) then
                         write(*,3) 'sum_00', j, k, sum_00
                         write(*,3) 'dm', j, k, dm
@@ -469,7 +469,7 @@
                         write(*,3) 'm_m1 - dm_m1', j, k, m_m1 - dm_m1
                         call mesa_error(__FILE__,__LINE__,'fixup 6')
                      end if
-                     sum_m1 = sum(mass(1:nc,k-1)) ! sum_m1 - dm_m1
+                     sum_m1 = sum(mass(1:nc,k-1))  ! sum_m1 - dm_m1
                      sum_mass(k-1) = sum_m1
                      if (sum_m1 < 0d0 .or. is_bad_num(sum_m1)) then
                         write(*,2) 'sum_m1', j, k, sum_m1, dm_m1
@@ -493,7 +493,7 @@
                         write(*,3) 'm_p1 - dm_p1', j, k, m_p1 - dm_p1
                         call mesa_error(__FILE__,__LINE__,'fixup 7')
                      end if
-                     sum_p1 = sum(mass(1:nc,k+1)) ! sum_p1 - dm_p1
+                     sum_p1 = sum(mass(1:nc,k+1))  ! sum_p1 - dm_p1
                      sum_mass(k+1) = sum_p1
                      if (sum_p1 < 0d0 .or. is_bad_num(sum_p1)) then
                         write(*,2) 'sum_p1', j, k, sum_p1, dm_p1
@@ -575,8 +575,8 @@
                   dX_dm(j,k) = 0d0
                else
                   dX_dm(j,k) = slope
-                  xface_00 = x00 + slope*dm_half ! value at face(k)
-                  xface_p1 = x00 - slope*dm_half ! value at face(k+1)
+                  xface_00 = x00 + slope*dm_half  ! value at face(k)
+                  xface_p1 = x00 - slope*dm_half  ! value at face(k+1)
                   if (xface_00 > 1d0 .or. xface_00 < 0d0 .or. &
                         (xm1 - xface_00)*(xface_00 - x00) < 0 .or. &
                       xface_p1 > 1d0 .or. xface_p1 < 0d0 .or. &
@@ -608,8 +608,8 @@
                   dX_dm(j,k) = 0d0
                else
                   dX_dm(j,k) = slope
-                  xface_00 = x00 + slope*dm_half ! value at face(k)
-                  xface_p1 = x00 - slope*dm_half ! value at face(k+1)
+                  xface_00 = x00 + slope*dm_half  ! value at face(k)
+                  xface_p1 = x00 - slope*dm_half  ! value at face(k+1)
                   if (xface_00 > 1d0 .or. xface_00 < 0d0 .or. &
                         (x00 - xface_p1)*(xface_p1 - xp1) < 0) then
                      dX_dm(j,k) = 0d0
@@ -635,8 +635,8 @@
                   dX_dm(j,k) = 0d0
                else
                   dX_dm(j,k) = slope
-                  xface_00 = x00 + slope*dm_half ! value at face(k)
-                  xface_p1 = x00 - slope*dm_half ! value at face(k+1)
+                  xface_00 = x00 + slope*dm_half  ! value at face(k)
+                  xface_p1 = x00 - slope*dm_half  ! value at face(k+1)
                   if (xface_p1 > 1d0 .or. xface_p1 < 0d0 .or. &
                         (xm1 - xface_00)*(xface_00 - x00) < 0) then
                      dX_dm(j,k) = 0d0
@@ -657,18 +657,18 @@
          else
             j = minloc(dX_dm(1:nc,k),dim=1)
          end if
-         dX_dm(j,k) = 0d0 ! remove from sum
+         dX_dm(j,k) = 0d0  ! remove from sum
          dX_dm(j,k) = -sum(dX_dm(1:nc,k))
 
          ! recheck for valid values at faces
          do j=1,nc
             x00 = mass(j,k)/dm_00
             slope = dX_dm(j,k)
-            xface_00 = x00 + slope*dm_half ! value at face(k)
-            xface_p1 = x00 - slope*dm_half ! value at face(k+1)
+            xface_00 = x00 + slope*dm_half  ! value at face(k)
+            xface_p1 = x00 - slope*dm_half  ! value at face(k+1)
             if (xface_00 > 1d0 .or. xface_00 < 0d0 .or. &
                 xface_p1 > 1d0 .or. xface_p1 < 0d0) then
-               if (dbg) then ! .and. abs(slope) > 1d-10) then
+               if (dbg) then  ! .and. abs(slope) > 1d-10) then
                   write(*,3) 'give up on dX_dm', j, k
                   write(*,1) 'slope', slope
                   write(*,1) 'dm_half', dm_half
@@ -837,7 +837,7 @@
                end if
 
                ! go to next source cell
-               k_source = k_source + 1 ! okay to allow k_source > nzhi; see integrate_mass
+               k_source = k_source + 1  ! okay to allow k_source > nzhi; see integrate_mass
                source_cell_mass = sum_mass(min(nzhi,k_source))
                remaining_source_mass = source_cell_mass
 
@@ -952,7 +952,7 @@
 
             include 'formats'
 
-            if (k_source > nzhi) then ! reuse last source cell
+            if (k_source > nzhi) then  ! reuse last source cell
                k = nzhi
                slope = 0d0
             else
@@ -1250,7 +1250,7 @@
 
          include 'formats'
 
-         blend_fac =  (/(1._dp - FLOAT(i)/31._dp, i=1,31)/)
+         blend_fac =  [(1._dp - FLOAT(i)/31._dp, i=1,31)]
          ierr = 0
 
          kmax = kmax_rad_accel
@@ -1282,7 +1282,7 @@
         fk = 0
           do i=1, s% species
              e_name = chem_isos% name(s% chem_id(i))
-                if (e_name == 'h1')  fk(1)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1)) !s% xa(i,kmax)/ chem_isos% W(s% chem_id(i))
+                if (e_name == 'h1')  fk(1)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))  !s% xa(i,kmax)/ chem_isos% W(s% chem_id(i))
                 if (e_name == 'he4') fk(2)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
                 if (e_name == 'c12') fk(3)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
                 if (e_name == 'n14') fk(4)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
@@ -1370,7 +1370,7 @@
 
          k = nzlo
          do j = 1, m
-            rad_accel_face(j,k) = rad_accel_face(j,k+1) ! for plotting
+            rad_accel_face(j,k) = rad_accel_face(j,k+1)  ! for plotting
          end do
          !write(*,*) 'grad done'
       end subroutine calc_g_rad_mombarg
@@ -1385,7 +1385,7 @@
          type (star_info), pointer :: s
 
          integer, intent(in) :: k, nc, kk, j
-         integer, dimension(:), intent(in) :: iZ(:) ! (nc)
+         integer, dimension(:), intent(in) :: iZ(:)  ! (nc)
          real(dp), intent(in) :: T, rho, L, r, blend
          real(dp), dimension(:), intent(in) :: X, A
          real(dp), dimension(:,:), intent(in) :: X_c
@@ -1405,7 +1405,7 @@
          include 'formats'
 
          ierr = 0
-         iZ_rad2 = (/1,2,6,7,8,10,11,12,13,14,16,18,20,24,25,26,28/)
+         iZ_rad2 = [1,2,6,7,8,10,11,12,13,14,16,18,20,24,25,26,28]
 
          if (dbg) write(*,*) 'call op_mono_get_radacc'
 
@@ -1443,7 +1443,7 @@
             log10_g_rad(i) = 1d0
          end do
 
-         if (ierr == 101) then ! logRho out of range
+         if (ierr == 101) then  ! logRho out of range
             ierr = 0
             write(*,2) 'op_mono_get_radacc bad logT logRho', k, logT, logRho
             return
@@ -1451,7 +1451,7 @@
 
          if (ierr /= 0) stop 'set1_g_rad'  !return
 
-         do ii = 1, 17 !kk
+         do ii = 1, 17  !kk
             do i = 1, nc
                if (iZ(i) == iZ_rad2(ii)) then
                   log10_g_rad(i) = lgrad(ii)
@@ -1587,7 +1587,7 @@
 
          k = nzlo
          do j = 1, m
-            rad_accel_face(j,k) = rad_accel_face(j,k+1) ! for plotting
+            rad_accel_face(j,k) = rad_accel_face(j,k+1)  ! for plotting
          end do
 
       end subroutine calc_g_rad_hu
@@ -1604,8 +1604,8 @@
 
          integer, intent(in) :: k, nc, kk, class_chem_id(:), net_iso(:), &
             min_Z_for_radaccel, max_Z_for_radaccel
-         integer, dimension(:), intent(in) :: iZ(:) ! (nc)
-         integer, dimension(:), intent(in) :: iZ_rad(:) ! (kk)
+         integer, dimension(:), intent(in) :: iZ(:)  ! (nc)
+         integer, dimension(:), intent(in) :: iZ_rad(:)  ! (kk)
          real(dp), intent(in) :: T, rho, L, r
          real(dp), dimension(:), intent(in) :: A, X, op_mono_factors
          logical, intent(in) :: screening
@@ -1641,7 +1641,7 @@
             end if
          end do
          do i=1,nc
-            fa(i) = fa(i)/tot ! number fractions
+            fa(i) = fa(i)/tot  ! number fractions
          end do
 
          logT = log10(T)
@@ -1666,7 +1666,7 @@
             log10_g_rad(i) = 1d0
          end do
 
-         if (ierr == 101) then ! logRho out of range
+         if (ierr == 101) then  ! logRho out of range
             ierr = 0
             write(*,2) 'op_mono_get_radacc bad logT logRho', k, logT, logRho
             return
@@ -1691,7 +1691,7 @@
             log10_g_rad, g_rad, &
             rad_accel_face, kmax_rad_accel)
          integer, intent(in) :: nzlo, nzhi, nc, m, kmax_rad_accel
-         real(dp), intent(in) :: A(:) ! (nc)
+         real(dp), intent(in) :: A(:)  ! (nc)
          real(dp), dimension(:,:), intent(in) :: &
             X_init, X, log10_g_rad, g_rad
          real(dp), dimension(:,:), intent(inout) :: rad_accel_face
@@ -1709,7 +1709,7 @@
 
          k = nzlo
          do j = 1, m
-            rad_accel_face(j,k) = rad_accel_face(j,k+1) ! for plotting
+            rad_accel_face(j,k) = rad_accel_face(j,k+1)  ! for plotting
          end do
 
       end subroutine update_rad_accel_face
@@ -1718,10 +1718,10 @@
       subroutine set_new_xa( &
             nz, nzlo, nzhi, species, nc, m, class, X_init, X, cell_dm, xa)
          integer, intent(in) :: nz, nzlo, nzhi, species, nc, m, class(:)
-         real(dp), intent(in) :: X_init(:,:) ! (nc,nz)
-         real(dp), intent(in) :: X(:,:) ! (m,nz)
-         real(dp), intent(in) :: cell_dm(:) ! (nz)
-         real(dp), intent(inout) :: xa(:,:) ! (species,nz)
+         real(dp), intent(in) :: X_init(:,:)  ! (nc,nz)
+         real(dp), intent(in) :: X(:,:)  ! (m,nz)
+         real(dp), intent(in) :: cell_dm(:)  ! (nz)
+         real(dp), intent(inout) :: xa(:,:)  ! (species,nz)
          integer :: j, k, i
          real(dp) :: tmp
          include 'formats'

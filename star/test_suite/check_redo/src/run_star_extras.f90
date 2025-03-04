@@ -69,7 +69,7 @@
          if (.not. restart) then
             done_redo = .false.
             doing_restart = .false.
-         else ! it is a restart
+         else  ! it is a restart
             done_redo = .true.
             doing_restart = .true.
          end if

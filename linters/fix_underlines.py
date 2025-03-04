@@ -22,7 +22,6 @@ DEFAULTS_FILES = (
 
 
 def fix_underlines(filename):
-
     path = os.path.join(MESA_DIR, filename)
 
     with open(path, "r") as f:

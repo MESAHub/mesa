@@ -86,7 +86,7 @@
 
          if (s% x_logical_ctrl(1)) then
             do k = 1, s% nz
-               if (s% T(k) .gt. 1e8) exit
+               if (s% T(k) > 1d8) exit
             end do
 
             open(newunit=iounit, file='inlist_nzhi')

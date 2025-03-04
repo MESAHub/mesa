@@ -186,7 +186,7 @@ contains
 
        if (err < 1._dp) exit iterate_loop
 
-       kap = kap_prev + 0.5_dp*(kap - kap_prev) ! under correct
+       kap = kap_prev + 0.5_dp*(kap - kap_prev)  ! under correct
 
        ! Re-evaluate atmosphere data
 
@@ -320,7 +320,7 @@ contains
 
     ! Sanity check
 
-    if (dlogtau <= 0.) then
+    if (dlogtau <= 0._dp) then
        write(*,*) 'atm: Invalid dlogtau in build_T_tau_uniform:', dlogtau
        call mesa_error(__FILE__,__LINE__)
     end if
@@ -563,12 +563,12 @@ contains
 
       ! Store data
 
-      atm_structure_sgl(atm_xm) = 0._dp ! We assume negligible mass in the atmosphere
+      atm_structure_sgl(atm_xm) = 0._dp  ! We assume negligible mass in the atmosphere
       atm_structure_sgl(atm_delta_r) = delta_r
       atm_structure_sgl(atm_lnP) = lnP
       atm_structure_sgl(atm_lnd) = lnRho
       atm_structure_sgl(atm_lnT) = lnT
-      atm_structure_sgl(atm_gradT) = gradr ! by assumption, atm is radiative
+      atm_structure_sgl(atm_gradT) = gradr  ! by assumption, atm is radiative
       atm_structure_sgl(atm_kap) = kap
       atm_structure_sgl(atm_gamma1) = res(i_gamma1)
       atm_structure_sgl(atm_grada) = res(i_grad_ad)

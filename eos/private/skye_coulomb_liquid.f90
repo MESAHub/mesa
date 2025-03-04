@@ -60,7 +60,7 @@ module skye_coulomb_liquid
          real(dp), parameter :: Q4 = 22.7d0
          real(dp), parameter :: Q3 = (0.25d0 - Q1 / Q2) * Q4
 
-         eta = TPT / sqrt(3d0) ! Note that this is the BK19 definition of eta. PC typically use eta = TPT.
+         eta = TPT / sqrt(3d0)  ! Note that this is the BK19 definition of eta. PC typically use eta = TPT.
 
          F = Q1 * eta - Q1 * Q2 * log(1d0 + eta / Q2) + 0.5d0 * Q3 * log(1d0 + pow2(eta) / Q4)
    end function quantum_ocp_liquid_free_energy_correction
@@ -133,15 +133,15 @@ module skye_coulomb_liquid
       end if
 
       GAMImean=GAME*Z53
-      if (RS.lt.TINY) then ! OCP
+      if (RS<TINY) then  ! OCP
          Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
       else
          Dif0=Z321-sqrt((Z2mean+Zmean)*(Z2mean+Zmean)*(Z2mean+Zmean)/Zmean)
       endif
       DifR=Dif0/Z52
-      DifFDH=Dif0*GAME*sqrt(GAME/3d0) ! F_DH - F_LM(DH)
+      DifFDH=Dif0*GAME*sqrt(GAME/3d0)  ! F_DH - F_LM(DH)
       D=Z2mean/(Zmean*Zmean)
-      if (abs(D-1.d0).lt.TINY) then ! no correction
+      if (abs(D-1.d0)<TINY) then  ! no correction
          FMIX=0d0
          return
       endif

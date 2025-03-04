@@ -4335,7 +4335,7 @@
       ! ~~~~~~~~~~~~~~~~
 
       ! Error tolerance for iterations and integrations when
-      ! ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'iterated'`` or
+      ! ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'iterated'`` or
       ! ``'varying'``.
 
       ! ::
@@ -4347,7 +4347,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of iterations for the opacity when
-      ! ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'iterated'``.
+      ! ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'iterated'``.
 
       ! ::
 
@@ -4358,7 +4358,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of steps for integrating the hydrostatic equilibrium
-      ! equation when ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'varying'``.
+      ! equation when ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'varying'``.
 
       ! ::
 
@@ -4434,7 +4434,7 @@
       ! atm_irradiated_errtol
       ! ~~~~~~~~~~~~~~~~~~~~~
 
-      ! Error tolerance for iterations when ``atm_option`` = ``'irradiated_grey'
+      ! Error tolerance for iterations when ``atm_option`` = ``'irradiated_grey'``
       ! and ``atm_irradiated_opacity`` = ``'iterated'``.
 
       ! ::
@@ -4446,7 +4446,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of iterations for the opacity when ``atm_option`` =
-      ! ``'irradiated_grey' and ``atm_irradiated_opacity`` = ``'iterated'``.
+      ! ``'irradiated_grey'`` and ``atm_irradiated_opacity`` = ``'iterated'``.
 
       ! ::
 
@@ -7672,13 +7672,26 @@
     delta_nu_sun = 134.91d0 ! μHz
     astero_Teff_sun = 5772d0 ! kelvin
 
+      ! delta_Pg_traditional
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! uHz. if <=0, use nu_max from scaled solar value
+      ! For calculating the asymptotic g-mode period spacing ``delta_Pg``
+
+      ! if ``delta_Pg_traditional`` = ``.true.``, then calculate the
+      ! asymptotic gravity mode period space by directly integrating
+      ! N2 over the entire stellar model.
+
+      ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
+      ! Bildsten et al. (2012): //ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract
+
+      ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
+      ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
 
       ! ::
 
+    delta_Pg_traditional = .true.
     delta_Pg_mode_freq = 0d0
 
 
@@ -8226,11 +8239,11 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
 
-      ! Hydrodynamic drag
-      ! =================
+! Hydrodynamic drag
+! =================
 
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
@@ -8262,7 +8275,7 @@
     use_drag_energy = .true.
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
-    
+
 
       ! v_drag_factor
       ! ~~~~~~~~~~~~~
@@ -8288,9 +8301,11 @@
     q_for_v_drag_full_on = 0.96d0
 
 
-      ! Rayleigh-Taylor Instability
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Rayleigh-Taylor Instability: hydro drag terms
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       ! for hydro comparison tests (e.g., Sedov)
+
       ! RTI_A
       ! ~~~~~
       ! RTI_B

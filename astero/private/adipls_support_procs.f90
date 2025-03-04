@@ -46,7 +46,7 @@
          common/csumma/ csummm
 
          integer :: icobs_st, nobs_st
-         real(dp) :: obs_st(10,100000) ! huge 2nd dimension to satisfy bounds checking
+         real(dp) :: obs_st(10,100000)  ! huge 2nd dimension to satisfy bounds checking
 
          integer :: ierr, new_el, new_order, new_em, n
          real(dp) :: new_inertia, new_cyclic_freq

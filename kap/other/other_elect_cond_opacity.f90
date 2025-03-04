@@ -41,14 +41,14 @@
             zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             use const_def, only: dp
-            integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
-            real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
-            real(dp), intent(in) :: logRho ! the density
-            real(dp), intent(in) :: logT ! the temperature
-            real(dp), intent(out) :: kap ! electron conduction opacity
-            real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+            integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
+            real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
+            real(dp), intent(in) :: logRho  ! the density
+            real(dp), intent(in) :: logT  ! the temperature
+            real(dp), intent(out) :: kap  ! electron conduction opacity
+            real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
             real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-            integer, intent(out) :: ierr ! 0 means AOK.
+            integer, intent(out) :: ierr  ! 0 means AOK.
 
             write(*,*) 'no implementation for other_elect_cond_opacity'
             ierr = -1

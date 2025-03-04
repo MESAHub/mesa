@@ -591,7 +591,7 @@ contains
           rho = s%rho(k)
        endif
 
-       cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k) ! gm^2/sec
+       cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k)  ! gm^2/sec
 
        s%cdc(k) = cdc
        s%D_mix(k) = D(k)

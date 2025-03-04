@@ -1,6 +1,7 @@
       ! block tridiagonal
       subroutine decsolblk(iop,caller_id,nvar,nz,lblk,dblk,ublk,brhs,ipiv,lrd,rpar_decsol,lid,ipar_decsol,ierr)
          use const_def, only: dp
+         implicit none
          integer, intent(in) :: caller_id, nvar, nz, iop, lrd, lid
          integer, pointer, intent(inout) :: ipiv(:) ! =(nvar,nz)
          real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)

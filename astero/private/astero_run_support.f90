@@ -58,7 +58,7 @@
          include 'formats'
 
          ierr = 0
-         call do_read_star_job('inlist', ierr) ! this does alloc_star
+         call do_read_star_job('inlist', ierr)  ! this does alloc_star
          ! and saves the id in id_from_read_star_job
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
@@ -235,7 +235,7 @@
          s% astero_using_revised_max_yr_dt = .false.
          s% astero_revised_max_yr_dt = s% max_years_for_timestep
 
-         okay_to_restart = .false. ! only allow restart on 1st call to run1_star
+         okay_to_restart = .false.  ! only allow restart on 1st call to run1_star
 
          eval1 = best_chi2
 
@@ -303,7 +303,7 @@
          write(*,*) 'reading ' // trim(filename_for_parameters)
          write(*,2) 'max_num_from_file', max_num_from_file
 
-         read(iounit,*) ! skip 1st line
+         read(iounit,*)  ! skip 1st line
 
          do while (sample_number < max_num_from_file .or. max_num_from_file < 0)
 
@@ -536,8 +536,8 @@
 
       subroutine bobyqa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(*)
-         double precision, intent(out) :: f
+         real(dp), intent(in) :: x(*)
+         real(dp), intent(out) :: f
 
          character(len=256) :: filename
          integer :: ierr
@@ -561,8 +561,8 @@
 
       subroutine newuoa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(*)
-         double precision, intent(out) :: f
+         real(dp), intent(in) :: x(*)
+         real(dp), intent(out) :: f
 
          character(len=256) :: filename
          integer :: ierr
@@ -586,8 +586,8 @@
 
       subroutine bobyqa_or_newuoa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(*)
-         double precision, intent(out) :: f
+         real(dp), intent(in) :: x(*)
+         real(dp), intent(out) :: f
          integer :: ierr, prev_sample_number, i
          include 'formats'
 
@@ -608,12 +608,12 @@
             call mesa_error(__FILE__,__LINE__,'bobyqa_fun')
          end if
          if (sample_number == prev_sample_number) then
-            if (sample_number <= 0) then ! failed on 1st try
+            if (sample_number <= 0) then  ! failed on 1st try
                write(*,*) 'failed to find chi^2 on 1st try'
                write(*,*) 'must give "first" values that yield a chi^2 result'
                call mesa_error(__FILE__,__LINE__)
             end if
-            return ! failed to get new chi^2
+            return  ! failed to get new chi^2
          end if
 
          call save_best_for_sample(sample_number, 0)
@@ -715,10 +715,10 @@
             n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
 
@@ -820,8 +820,8 @@
          real(dp), pointer :: simplex(:,:), f(:)
          real(dp) :: f_final
          integer :: lrpar, lipar
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          integer :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars
          integer :: i, num_samples
@@ -852,7 +852,7 @@
 
          if (.not. scale_simplex_params) then
             call set_xs
-         else ! values are scaled to -1..1 with first at 0
+         else  ! values are scaled to -1..1 with first at 0
             x_lower(1:nvar) = -1
             x_upper(1:nvar) = 1
             x_first(1:nvar) = 0
@@ -904,7 +904,7 @@
          contains
 
 
-         subroutine set_xs ! x_first, x_lower, x_upper
+         subroutine set_xs  ! x_first, x_lower, x_upper
 
             do i = 1, max_parameters
                if (vary_param(i)) then
@@ -936,7 +936,7 @@
             max_i = 0
             do j=1,nvar+1
                i = index(j)
-               if (i > max_i) max_i = i ! max sample restored
+               if (i > max_i) max_i = i  ! max sample restored
                write(*,3) 'restore simplex', j, i
                f(j) = sample_chi2(i)
                write(*,3) 'chi2', j, i, f(j)

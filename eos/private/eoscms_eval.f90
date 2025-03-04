@@ -184,7 +184,7 @@ contains
       real(dp) :: alfa, beta, dbeta_dX, dalfa_dX, xx(4), y(4), a(3), dX
       rq => eos_handles(handle)
 
-      if(rq% CMS_use_fixed_composition)then !do fixed composition (one table only)
+      if(rq% CMS_use_fixed_composition)then  !do fixed composition (one table only)
 
          if(rq% CMS_fixed_composition_index < 0 .or. rq% CMS_fixed_composition_index > 10)then
             write(*,*) 'invalid value for CMS_fixed_composition_index.  See eos.defaults.'
@@ -205,7 +205,7 @@ contains
          d_dxa = 0
 
 
-      else !do full composition
+      else  !do full composition
          !locate X values in the tables such that Xvals(iX) <= X < Xvals(iX+1)
          if (X <= CMS_Xvals(1)) then
             iX = 1
@@ -233,7 +233,7 @@ contains
                return
             endif
             XX(1:4) = CMS_Xvals(iX-1:iX+2)
-            dX=X-CMS_Xvals(iX) ! assumes fixed dX spacing
+            dX=X-CMS_Xvals(iX)  ! assumes fixed dX spacing
             do i=1,nv
                !result
                y(1:4) = [res1(i), res2(i), res3(i), res4(i)]
@@ -250,7 +250,7 @@ contains
                call interp_4pt_pm(XX,y,a)
                d_dlnd(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
             enddo
-         else !linear interpolation in X
+         else  !linear interpolation in X
             call eval_eosCMS_fixed_X(iX  ,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
             call eval_eosCMS_fixed_X(iX+1,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
             if(ierr/=0) then
@@ -269,12 +269,12 @@ contains
 
          ! composition derivatives
          do i=1,species
-            select case(chem_isos% Z(chem_id(i))) ! charge
-            case (1) ! X
+            select case(chem_isos% Z(chem_id(i)))  ! charge
+            case (1)  ! X
                d_dxa(:,i) = d_dX
-            case (2) ! Y
+            case (2)  ! Y
                d_dxa(:,i) = 0
-            case default ! Z
+            case default  ! Z
                d_dxa(:,i) = 0
             end select
          end do
@@ -588,7 +588,7 @@ contains
          return
       endif
 
-      read(io,*) !header
+      read(io,*)  !header
       read(io,'(a)') message
       call str_to_vector(message, vec, n, ierr)
       if(ierr/=0) return
@@ -628,8 +628,8 @@ contains
          return
       endif
 
-      read(io,*) !header
-      read(io,*) !header
+      read(io,*)  !header
+      read(io,*)  !header
 
       allocate(c% tbl1(sz_per_eos_point * nv * c% num_logRhos * c% num_logTs))
       tbl(1:sz_per_eos_point, 1:nv, 1:c% num_logTs, 1:c% num_logRhos) => &

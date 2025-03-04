@@ -34,21 +34,21 @@
 
 
       subroutine do_integrate_values(init_x, nx, f1, nv, x, vals, ierr)
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)
             ! strictly monotonic in same way as init_x
-         real(dp), intent(inout) :: vals(:) ! (nv)
+         real(dp), intent(inout) :: vals(:)  ! (nv)
             ! for i > 1, vals(i) = integral of interpolating poly from x(i-1) to x(i)
             ! vals(1) = 0
-         integer, intent(out) :: ierr ! 0 means aok
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real(dp) :: xk_old, xkp1_old, xk_new, xk_prev, sum
          logical :: increasing
-         real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          increasing = (init_x(1) < init_x(nx))
@@ -117,20 +117,20 @@
 
 
       subroutine do_interp_values(init_x, nx, f1, nv, x, vals, ierr)
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         real(dp), intent(inout) :: vals(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real(dp) :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
 
          ierr = 0
 
@@ -154,7 +154,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -184,20 +184,20 @@
       end subroutine do_interp_values
 
       subroutine do_interp_values_autodiff(init_x, nx, f1, nv, x, vals, ierr)
-         type(auto_diff_real_2var_order1), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         type(auto_diff_real_2var_order1), intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         type(auto_diff_real_2var_order1), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         type(auto_diff_real_2var_order1), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         type(auto_diff_real_2var_order1), intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         type(auto_diff_real_2var_order1), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         type(auto_diff_real_2var_order1), intent(inout) :: vals(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         type(auto_diff_real_2var_order1), intent(inout) :: vals(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          type(auto_diff_real_2var_order1) :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
 
          ierr = 0
 
@@ -223,7 +223,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -253,21 +253,21 @@
       end subroutine do_interp_values_autodiff
 
       subroutine do_interp_values_and_slopes(init_x, nx, f1, nv, x, vals, slopes, ierr)
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals(:) ! (nv)
-         real(dp), intent(inout) :: slopes(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         real(dp), intent(inout) :: vals(:)  ! (nv)
+         real(dp), intent(inout) :: slopes(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real(dp) :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -291,7 +291,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -328,21 +328,21 @@
 
       subroutine do_interp2_values_and_slopes( &
             init_x, nx, f1_1, f1_2, nv, x, vals_1, slopes_1, vals_2, slopes_2, ierr)
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1_1(:), f1_2(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1_1(:), f1_2(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals_1(:), vals_2(:) ! (nv)
-         real(dp), intent(inout) :: slopes_1(:), slopes_2(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         real(dp), intent(inout) :: vals_1(:), vals_2(:)  ! (nv)
+         real(dp), intent(inout) :: slopes_1(:), slopes_2(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real(dp) :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         real(dp), pointer :: f_1(:,:), f_2(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f_1(:,:), f_2(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f_1(1:4,1:nx) => f1_1(1:4*nx)
          f_2(1:4,1:nx) => f1_2(1:4*nx)
 
@@ -369,7 +369,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -413,21 +413,21 @@
       subroutine do_interp3_values_and_slopes( &
             init_x, nx, f1_1, f1_2, f1_3, nv, x, &
             vals_1, slopes_1, vals_2, slopes_2, vals_3, slopes_3, ierr)
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1_1(:), f1_2(:), f1_3(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1_1(:), f1_2(:), f1_3(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals_1(:), vals_2(:), vals_3(:) ! (nv)
-         real(dp), intent(inout) :: slopes_1(:), slopes_2(:), slopes_3(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         real(dp), intent(inout) :: vals_1(:), vals_2(:), vals_3(:)  ! (nv)
+         real(dp), intent(inout) :: slopes_1(:), slopes_2(:), slopes_3(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real(dp) :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         real(dp), pointer :: f_1(:,:), f_2(:,:), f_3(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f_1(:,:), f_2(:,:), f_3(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f_1(1:4,1:nx) => f1_1(1:4*nx)
          f_2(1:4,1:nx) => f1_2(1:4*nx)
          f_3(1:4,1:nx) => f1_3(1:4*nx)
@@ -457,7 +457,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -507,17 +507,17 @@
             vals_1, slopes_1, vals_2, slopes_2, vals_3, slopes_3, &
             vals_4, slopes_4, vals_5, slopes_5, vals_6, slopes_6, &
             ierr)
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
          real(dp), intent(in), pointer, dimension(:) :: f1_1, f1_2, f1_3, f1_4, f1_5, f1_6
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
          real(dp), intent(inout), dimension(:) :: &
             vals_1, slopes_1, vals_2, slopes_2, vals_3, slopes_3, &
             vals_4, slopes_4, vals_5, slopes_5, vals_6, slopes_6
-         integer, intent(out) :: ierr ! 0 means aok
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real(dp) :: xk_old, xkp1_old, xk_new, delta
@@ -555,7 +555,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then

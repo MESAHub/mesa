@@ -347,7 +347,7 @@
          end if
 
          if (.not. s% get_delta_nu_from_scaled_solar) then
-            s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
+            s% delta_nu = 1d6/(2*s% photosphere_acoustic_r)  ! microHz
          else
             s% delta_nu = &
                s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
@@ -363,7 +363,11 @@
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
          if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
-         call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
+         if ( .not. s% delta_Pg_traditional) then
+            call get_delta_Pg_bildsten2012(s, nu_for_delta_Pg, s% delta_Pg)
+         else
+            call get_delta_Pg_traditional(s, s% delta_Pg)
+         end if
 
          if (s% rsp_flag) return
 
@@ -759,12 +763,12 @@
          real(dp) :: prev_m, prev_x, cur_m, cur_x
          ierr = 0
          bzm_1 = null_zone; bzm_2 = null_zone; bzm_3 = null_zone; bzm_4 = null_zone
-         burn_zone = 0 ! haven't entered the zone yet
+         burn_zone = 0  ! haven't entered the zone yet
          if (i_start /= s% nz) then
             i = i_start+1
             prev_m = s% m(i)
             prev_x = s% eps_nuc(i)
-         else ! keep the compiler happy
+         else  ! keep the compiler happy
             prev_m = 0
             prev_x = 0
          end if
@@ -774,22 +778,22 @@
             select case (burn_zone)
                case (0)
                   if ( cur_x > burn_min2 ) then
-                     if ( i == s% nz ) then ! use star center as start of zone
+                     if ( i == s% nz ) then  ! use star center as start of zone
                         bzm_2 = 0d0
-                     else ! interpolate to estimate where rate reached burn_min1
+                     else  ! interpolate to estimate where rate reached burn_min1
                         bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      end if
                      bzm_1 = bzm_2
                      burn_zone = 2
                   elseif ( cur_x > burn_min1 ) then
-                     if ( i == s% nz ) then ! use star center as start of zone
+                     if ( i == s% nz ) then  ! use star center as start of zone
                         bzm_1 = 0d0
-                     else ! interpolate to estimate where rate reached burn_min1
+                     else  ! interpolate to estimate where rate reached burn_min1
                         bzm_1 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      end if
                      burn_zone = 1
                   end if
-               case (1) ! in the initial eps > burn_min1 region
+               case (1)  ! in the initial eps > burn_min1 region
                   if ( cur_x > burn_min2 ) then
                      bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 2
@@ -798,7 +802,7 @@
                      i_start = i
                      return
                   end if
-               case (2) ! in the initial eps > burn_min2 region
+               case (2)  ! in the initial eps > burn_min2 region
                   if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      bzm_3 = bzm_4
@@ -809,7 +813,7 @@
                      bzm_3 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 3
                   end if
-               case (3) ! in the final eps > burn_min1 region
+               case (3)  ! in the final eps > burn_min1 region
                   if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
@@ -1221,8 +1225,8 @@
          else
             jm1 = maxloc(s% xa(:,k-1), dim=1)
             j00 = maxloc(s% xa(:,k), dim=1)
-            qm1 = s% q(k-1) - 0.5d0*s% dq(k-1) ! center of k-1
-            q00 = s% q(k) - 0.5d0*s% dq(k) ! center of k
+            qm1 = s% q(k-1) - 0.5d0*s% dq(k-1)  ! center of k-1
+            q00 = s% q(k) - 0.5d0*s% dq(k)  ! center of k
             dm1 = s% xa(j00,k-1) - s% xa(jm1,k-1)
             d00 = s% xa(j00,k) - s% xa(jm1,k)
             if (dm1*d00 > 0d0) then

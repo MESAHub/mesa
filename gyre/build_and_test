@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 rm -rf gyre
 tar xf gyre-7.2.1.tar.gz

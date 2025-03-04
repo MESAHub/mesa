@@ -37,7 +37,6 @@
 
 
       subroutine mode_propagation_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -114,13 +113,13 @@
 
          nz = s% nz
 
-         colors(:) = (/ &
+         colors(:) = [ &
                clr_MediumSlateBlue, clr_Goldenrod, clr_LightSkyBlue, clr_Lilac, &
                clr_Coral, clr_Crimson, clr_LightSkyGreen, clr_DarkGray, &
                clr_Tan, clr_IndianRed, clr_Gold, &
                clr_Teal, clr_Silver, clr_BrightBlue, clr_FireBrick, &
                clr_RoyalPurple, clr_SlateGray, clr_LightSteelBlue, &
-               clr_Gray, clr_RoyalBlue /)
+               clr_Gray, clr_RoyalBlue ]
 
          chScale = txt_scale
 
@@ -196,9 +195,9 @@
             cnt = mode_propagation_line_legend(cnt,'S\dl=3\u')
             cnt = mode_propagation_line_legend(cnt,'2\(2723)\(2139)\dmax\u')
             cnt = mode_propagation_line_legend(cnt,'\(2139)\dmax\u')
-            call pgsls(4) ! dotted
+            call pgsls(4)  ! dotted
             cnt = mode_propagation_line_legend(cnt,'\(2139)\dmax\uobs')
-            call pgsls(1) ! solid
+            call pgsls(1)  ! solid
             cnt = mode_propagation_line_legend(cnt,'0.5\(2723)\(2139)\dmax\u')
             call pgunsa
 
@@ -233,10 +232,10 @@
             cnt = mode_propagation_line(cnt, temp_vec)
             temp_vec(1:nz) = lg_nu_max
             cnt = mode_propagation_line(cnt, temp_vec)
-            call pgsls(4) ! dotted
+            call pgsls(4)  ! dotted
                temp_vec(1:nz) = lg_nu_max_obs
                cnt = mode_propagation_line(cnt, temp_vec)
-            call pgsls(1) ! solid
+            call pgsls(1)  ! solid
             temp_vec(1:nz) = lg_0pt5_nu_max
             cnt = mode_propagation_line(cnt, temp_vec)
             call pgslw(lw_sav)
@@ -244,7 +243,7 @@
             if (.not. panel_flag) then
                call pgsci(1)
                call show_xaxis_name(s,xaxis_name,ierr)
-               if (ierr == 0) then ! show mix regions at bottom of plot
+               if (ierr == 0) then  ! show mix regions at bottom of plot
                   call pgslw(10)
                   call show_mix_regions_on_xaxis( &
                      s,ymin+ybot,ymax,grid_min,grid_max,xvec)

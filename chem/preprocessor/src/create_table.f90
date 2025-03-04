@@ -1,6 +1,9 @@
 program create_table
    use chem_support
    use iso_fortran_env, only : error_unit
+
+   implicit none
+
    character(len=64) :: inlist_fname
    integer :: ios
 

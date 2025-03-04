@@ -105,7 +105,7 @@
          eps_nuc_MeV = 0d0
 
          if (just_dydt) then
-            jmax = 1 ! =  i_rate
+            jmax = 1  ! =  i_rate
          else
             jmax = num_rvs
          end if
@@ -129,7 +129,7 @@
             icat_f = reaction_categories(ir)
 
             if (i < num_reactions) then
-               r_i = i+1 ! reactions are ordered so reverse immediately follows forward
+               r_i = i+1  ! reactions are ordered so reverse immediately follows forward
                r_ir = reaction_id(r_i)
                icat_r = reaction_categories(r_ir)
             else
@@ -217,7 +217,7 @@
 
          contains
 
-         subroutine get_general_1_to_1_derivs(i,ierr) ! e.g., 2 c12 -> mg24, 3 he4 -> c12
+         subroutine get_general_1_to_1_derivs(i,ierr)  ! e.g., 2 c12 -> mg24, 3 he4 -> c12
             integer, intent(in) :: i
             integer, intent(out) :: ierr
 
@@ -337,8 +337,8 @@
                deriv_flgs(r_i) = .true.
             end if
 
-            d1 = d_ysf_dy1*n% rate_screened(i) ! d(rate_f)/d(y1)
-            d2 = d_ysr_dy2*n% rate_screened(r_i) ! d(rate_r)/d(y2)
+            d1 = d_ysf_dy1*n% rate_screened(i)  ! d(rate_f)/d(y1)
+            d2 = d_ysr_dy2*n% rate_screened(r_i)  ! d(rate_r)/d(y2)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) - Q*d2
@@ -351,7 +351,7 @@
 
          end subroutine get_general_1_to_1_derivs
 
-         subroutine get_general_2_to_1_derivs(i,ierr) ! e.g., r_he4_si28_to_o16_o16
+         subroutine get_general_2_to_1_derivs(i,ierr)  ! e.g., r_he4_si28_to_o16_o16
             integer, intent(in) :: i
             integer, intent(out) :: ierr
 
@@ -504,9 +504,9 @@
                deriv_flgs(r_i) = .true.
             end if
 
-            d1 = d_ysf_dy1*n% rate_screened(i) ! d(rate_f)/d(y1)
-            d2 = d_ysf_dy2*n% rate_screened(i) ! d(rate_f)/d(y2)
-            d3 = d_ysr_dy3*n% rate_screened(r_i) ! d(rate_r)/d(y3)
+            d1 = d_ysf_dy1*n% rate_screened(i)  ! d(rate_f)/d(y1)
+            d2 = d_ysf_dy2*n% rate_screened(i)  ! d(rate_f)/d(y2)
+            d3 = d_ysr_dy3*n% rate_screened(r_i)  ! d(rate_r)/d(y3)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
@@ -527,7 +527,7 @@
             n% d_dydt_dy(i3,i2) = n% d_dydt_dy(i3,i2) + c3*d2
             n% d_dydt_dy(i3,i3) = n% d_dydt_dy(i3,i3) - c3*d3
 
-            if (.false. .and. reaction_name(ir) == 'r_he4_si28_to_o16_o16') then ! .and. &
+            if (.false. .and. reaction_name(ir) == 'r_he4_si28_to_o16_o16') then  ! .and. &
                   !y1 > 1d-20 .and. y2 > 1d-20 .and. y3 > 1d-20) then
                write(*,'(A)')
                write(*,2) trim(reaction_name(ir))
@@ -755,10 +755,10 @@
                deriv_flgs(r_i) = .true.
             end if
 
-            d1 = d_ysf_dy1*n% rate_screened(i) ! d(rate_f)/d(y1)
-            d2 = d_ysf_dy2*n% rate_screened(i) ! d(rate_f)/d(y2)
-            d3 = d_ysr_dy3*n% rate_screened(r_i) ! d(rate_r)/d(y3)
-            d4 = d_ysr_dy4*n% rate_screened(r_i) ! d(rate_r)/d(y4)
+            d1 = d_ysf_dy1*n% rate_screened(i)  ! d(rate_f)/d(y1)
+            d2 = d_ysf_dy2*n% rate_screened(i)  ! d(rate_f)/d(y2)
+            d3 = d_ysr_dy3*n% rate_screened(r_i)  ! d(rate_r)/d(y3)
+            d4 = d_ysr_dy4*n% rate_screened(r_i)  ! d(rate_r)/d(y4)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
@@ -898,10 +898,10 @@
             e_f = n% rate_screened(i)
             e_r = n% rate_screened(r_i)
 
-            d1 = y2*e_f ! d(rate_f)/d(y1)
-            d2 = y1*e_f ! d(rate_f)/d(y2)
-            d3 = y4*e_r ! d(rate_r)/d(y3)
-            d4 = y3*e_r ! d(rate_r)/d(y4)
+            d1 = y2*e_f  ! d(rate_f)/d(y1)
+            d2 = y1*e_f  ! d(rate_f)/d(y2)
+            d3 = y4*e_r  ! d(rate_r)/d(y3)
+            d4 = y3*e_r  ! d(rate_r)/d(y4)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
@@ -1037,9 +1037,9 @@
             e_f = n% rate_screened(i)
             e_r = n% rate_screened(r_i)
 
-            d1 = y2*e_f ! d(rate_f)/d(y1)
-            d2 = y1*e_f ! d(rate_f)/d(y2)
-            d3 = e_r ! d(rate_r)/d(y3)
+            d1 = y2*e_f  ! d(rate_f)/d(y1)
+            d2 = y1*e_f  ! d(rate_f)/d(y2)
+            d3 = e_r  ! d(rate_r)/d(y3)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
@@ -1138,7 +1138,7 @@
             n% screened_rate(i) = 0d0
             n% eps_nuc_rate(i) = 0d0
             n% eps_neu_rate(i) = 0d0
-            return ! skip aux reactions
+            return  ! skip aux reactions
          end if
 
 
@@ -1162,12 +1162,12 @@
          ! These rates are setup in update_special_rates
          select case(ir)
 
-            case(ir_he4_he4_he4_to_c12) ! triple alpha
+            case(ir_he4_he4_he4_to_c12)  ! triple alpha
                if (g% use_3a_fl87) then
                   return
             end if
 
-            case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
+            case(irn14ag_lite)  ! n14 + 1.5 alpha => ne20
                return
 
          end select
@@ -1278,12 +1278,12 @@
                r = n% y(i1)
                idr1 = i1
                dr1 = 1
-            else if (cin1 == 3 .and. in1 /= ih1) then ! 3 he4
+            else if (cin1 == 3 .and. in1 /= ih1) then  ! 3 he4
                !write(*,'(/,a)') '1/6*r  reaction name <' // trim(reaction_Name(ir)) // '>'
                r = (1d0/6d0)*n% y(i1)*n% y(i1)*n% y(i1)
                idr1 = i1
                dr1 = 0.5d0*n% y(i1)*n% y(i1)
-            else ! 2 body
+            else  ! 2 body
                !write(*,'(/,a)') '1/2*r  reaction name <' // trim(reaction_Name(ir)) // '>'
                !write(*,'(i3,3x,99e20.10)') i, n% rate_raw(i), n% rate_screened(i)
                r=  0.5d0*n% y(i1)*n% y(i1)
@@ -1501,7 +1501,7 @@
                   write(*,*) trim(trim(reaction_Name(ir)))
                   call mesa_error(__FILE__,__LINE__,'derivs')
                end if
-               if (g% weaklib_ids(weak_id) > 0) then ! > 0 means included in weaklib
+               if (g% weaklib_ids(weak_id) > 0) then  ! > 0 means included in weaklib
 
                   n% rate_screened(i) = n% lambda(weak_id)
                   n% rate_screened_dT(i) = n % dlambda_dlnT(weak_id) / temp
@@ -1518,7 +1518,7 @@
                   done = .true.
                end if
             end if
-            if (.not. done) then ! weak reaction not in weaklib
+            if (.not. done) then  ! weak reaction not in weaklib
 
                if (.false. .and. trim(reaction_Name(ir)) == 'r_o15_wk_n15') then
                   write(*,'(A)')
@@ -1538,7 +1538,7 @@
 
             end if
 
-         else ! all non 1->1 reactions
+         else  ! all non 1->1 reactions
 
             call do_in_out( &
                  n, dydt, eps_nuc_MeV, i, r, &
@@ -1730,7 +1730,7 @@
 
          ir = reaction_id(i)
 
-         if (reaction_outputs(1,ir) == 0) return ! skip aux reactions
+         if (reaction_outputs(1,ir) == 0) return  ! skip aux reactions
 
          if (dbg) &
             write(*,'(/,a,2i6)') ' reaction name <' // trim(reaction_Name(ir)) // '>', i, ir
@@ -1752,14 +1752,14 @@
 
          select case(ir)
 
-         case(ir_he4_he4_he4_to_c12) ! triple alpha
+         case(ir_he4_he4_he4_to_c12)  ! triple alpha
             if (g% use_3a_fl87) then
-               call do_FL_3alf(i) ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+               call do_FL_3alf(i)  ! Fushiki and Lamb, Apj, 317, 368-388, 1987
                return
          end if
 
 
-            case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
+            case(irn14ag_lite)  ! n14 + 1.5 alpha => ne20
                n14 = itab(in14)
                ne20 = itab(ine20)
                r = n% y(n14) * n% y(he4)
@@ -1789,7 +1789,7 @@
          contains
 
 
-         subroutine do_FL_3alf(i) ! Fushiki and Lamb, Apj, 317, 368-388, 1987
+         subroutine do_FL_3alf(i)  ! Fushiki and Lamb, Apj, 317, 368-388, 1987
             use rates_lib, only: eval_FL_epsnuc_3alf
             integer, intent(in) :: i
             integer :: he4, c12

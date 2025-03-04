@@ -206,19 +206,19 @@
          end if
 
          freq_color(0) = clr_Teal
-         freq_shape(0) = 0840 ! circle
+         freq_shape(0) = 0840  ! circle
 
          freq_color(1) = clr_Crimson
-         freq_shape(1) = 0842 ! triangle
+         freq_shape(1) = 0842  ! triangle
 
          freq_color(2) = clr_BrightBlue
-         freq_shape(2) = 0841 ! square
+         freq_shape(2) = 0841  ! square
 
          freq_color(3) = clr_Coral
-         freq_shape(3) = 0843 ! diamond
+         freq_shape(3) = 0843  ! diamond
 
          model_color = clr_Silver
-         model_shape = 0828 ! bullet
+         model_shape = 0828  ! bullet
 
 
          x_obs = xmin + dx/2
@@ -488,16 +488,16 @@
          call pgslw(1)
 
          r01_color = clr_Teal
-         r01_shape = 0840 ! circle
+         r01_shape = 0840  ! circle
 
          r10_color = clr_Crimson
-         r10_shape = 0842 ! triangle
+         r10_shape = 0842  ! triangle
 
          r02_color = clr_BrightBlue
-         r02_shape = 0841 ! square
+         r02_shape = 0841  ! square
 
          model_color = clr_Silver
-         model_shape = 0828 ! bullet
+         model_shape = 0828  ! bullet
 
          ! label
          y_obs = ymin + dy*0.06
@@ -639,7 +639,7 @@
             name = file_prefix
          end if
 
-         extension = 'png' ! s% file_extension
+         extension = 'png'  ! s% file_extension
          name = trim(name) // '_sample' // trim(num_str) // '.' // trim(extension)
 
          write(*,'(a)') 'write plot to file ' // trim(name)

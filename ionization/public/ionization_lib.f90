@@ -39,7 +39,7 @@
          use ion_tables_load, only: Init_ion_tables
          use mod_ionization, only: do_init_ionization
          character(len=*), intent(in) :: file_prefix, Z1_suffix
-         character(len=*), intent(in) :: ionization_cache_dir ! '' means use default
+         character(len=*), intent(in) :: ionization_cache_dir  ! '' means use default
          logical, intent(in) :: use_cache
          integer, intent(out) :: ierr
          ierr = 0
@@ -55,15 +55,15 @@
       subroutine eval_ionization(Z, X, Rho, log10Rho, T, log10T, res, ierr)
          use ionization_def, only: num_ion_vals
          use ion_tables_eval, only: Get_ion_Results
-         real(dp), intent(in) :: Z ! metals mass fraction
-         real(dp), intent(in) :: X ! hydrogen mass fraction
-         real(dp), intent(in) :: Rho, log10Rho ! the density
+         real(dp), intent(in) :: Z  ! metals mass fraction
+         real(dp), intent(in) :: X  ! hydrogen mass fraction
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
             ! provide both if you have them.
             ! else pass one and set the other to = arg_not_provided
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: T, log10T  ! the temperature
             ! provide both if you have them.
             ! else pass one and set the other to = arg_not_provided
-         real(dp), intent(inout) :: res(num_ion_vals) ! see ionization_def
+         real(dp), intent(inout) :: res(num_ion_vals)  ! see ionization_def
          integer, intent(out) :: ierr
          call Get_ion_Results(Z, X, Rho, log10Rho, T, log10T, res, ierr)
       end subroutine eval_ionization
@@ -71,7 +71,7 @@
       ! EXPERIMENTAL
       real(dp) function eval_charge_of_Fe56_in_He4(log10_ne, log10_T, ierr)
          use mod_ionization, only: charge_of_Fe56_in_He4
-         real(dp), intent(in) :: log10_ne ! ne=avo*rho*free_e
+         real(dp), intent(in) :: log10_ne  ! ne=avo*rho*free_e
          real(dp), intent(in) :: log10_T
          integer, intent(out) :: ierr
          eval_charge_of_Fe56_in_He4 = charge_of_Fe56_in_He4(log10_ne, log10_T, ierr)

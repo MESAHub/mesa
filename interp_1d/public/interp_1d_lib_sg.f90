@@ -33,26 +33,26 @@
       subroutine interpolate_vector_sg( &
                n_old, x_old, n_new, x_new, v_old, v_new, interp_vec_sg, nwork, work1, str, ierr)
          integer, intent(in) :: n_old, n_new
-         real, intent(in) :: x_old(:) ! (n_old)
-         real, intent(in) :: v_old(:) ! (n_old)
-         real, intent(in) :: x_new(:) ! (n_new)
-         real, intent(inout) :: v_new(:) ! (n_new)
+         real, intent(in) :: x_old(:)  ! (n_old)
+         real, intent(in) :: v_old(:)  ! (n_old)
+         real, intent(in) :: x_new(:)  ! (n_new)
+         real, intent(inout) :: v_new(:)  ! (n_new)
          interface
-            subroutine interp_vec_sg(x, nx, f1, nwork, work1, str, ierr) ! make cubic interpolant
+            subroutine interp_vec_sg(x, nx, f1, nwork, work1, str, ierr)  ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
                implicit none
                integer, intent(in) :: nx       ! length of x vector
-               real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-               real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+               real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+               real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
                integer, intent(in) :: nwork
                real, intent(inout), pointer :: work1(:)
-               character (len=*) :: str ! for debugging
+               character (len=*) :: str  ! for debugging
                integer, intent(out) :: ierr
             end subroutine interp_vec_sg
          end interface
          integer, intent(in) :: nwork
-         real, intent(inout), pointer :: work1(:) ! =(:,:) ! (n_old, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(inout), pointer :: work1(:)  ! =(:,:) ! (n_old, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          real, pointer :: f1(:), f(:,:)
          integer :: k
@@ -61,7 +61,7 @@
          if (ierr /= 0) return
          f(1:4,1:n_old) => f1(1:4*n_old)
          forall (k=1:n_old) f(1,k) = v_old(k)
-         call interp_vec_sg(x_old, n_old, f1, nwork, work1, str, ierr) ! make interpolant
+         call interp_vec_sg(x_old, n_old, f1, nwork, work1, str, ierr)  ! make interpolant
          if (ierr /= 0) then
             deallocate(f1)
             return
@@ -76,12 +76,12 @@
                n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)
          use interp_1d_def, only: pm_work_size
          integer, intent(in) :: n_old, n_new
-         real, intent(in) :: x_old(:) ! (n_old)
-         real, intent(in) :: v_old(:) ! (n_old)
-         real, intent(in) :: x_new(:) ! (n_new)
-         real, intent(inout) :: v_new(:) ! (n_new)
-         real, intent(inout), pointer :: work1(:) ! =(:,:) ! (n_old, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: x_old(:)  ! (n_old)
+         real, intent(in) :: v_old(:)  ! (n_old)
+         real, intent(in) :: x_new(:)  ! (n_new)
+         real, intent(inout) :: v_new(:)  ! (n_new)
+         real, intent(inout), pointer :: work1(:)  ! =(:,:) ! (n_old, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          real, pointer :: f1(:), f(:,:)
          integer :: k
@@ -90,7 +90,7 @@
          if (ierr /= 0) return
          f(1:4,1:n_old) => f1(1:4*n_old)
          forall (k=1:n_old) f(1,k) = v_old(k)
-         call interp_pm_sg(x_old, n_old, f1, pm_work_size, work1, str, ierr) ! make interpolant
+         call interp_pm_sg(x_old, n_old, f1, pm_work_size, work1, str, ierr)  ! make interpolant
          if (ierr /= 0) then
             deallocate(f1)
             return
@@ -105,11 +105,11 @@
          ! 4 points in, 1 point out
          ! piecewise monotonic cubic interpolation
          use interp_1d_def, only: pm_work_size
-         real, intent(in) :: pdqm1, pdq00, pdqp1 ! spacing between input points
+         real, intent(in) :: pdqm1, pdq00, pdqp1  ! spacing between input points
          real, intent(in) :: ndq00
-         real, intent(in) :: pfm1, pf00, pfp1, pfp2 ! values at input points
-         real, intent(out) :: nf00 ! new value at ndq00
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: pfm1, pf00, pfp1, pfp2  ! values at input points
+         real, intent(out) :: nf00  ! new value at ndq00
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          integer, parameter :: n_old=4, n_new=1
          real :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
@@ -136,11 +136,11 @@
          ! 3 points in, 1 point out
          ! piecewise monotonic quadratic interpolation
          use interp_1d_def, only: pm_work_size
-         real, intent(in) :: pdqm1, pdq00 ! spacing between input points
-         real, intent(in) :: ndqm1 ! new spacing to nk
-         real, intent(in) :: pfm1, pf00, pfp1 ! values at pkm1, pk, pkp1
-         real, intent(out) :: nf00 ! new value at ndq00
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: pdqm1, pdq00  ! spacing between input points
+         real, intent(in) :: ndqm1  ! new spacing to nk
+         real, intent(in) :: pfm1, pf00, pfp1  ! values at pkm1, pk, pkp1
+         real, intent(out) :: nf00  ! new value at ndq00
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          integer, parameter :: n_old=3, n_new=1
          real :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
@@ -165,11 +165,11 @@
          ! 3 points in, 2 points out
          ! piecewise monotonic quadratic interpolation
          use interp_1d_def, only: pm_work_size
-         real, intent(in) :: pdqm1, pdq00 ! previous spacing to pk and pkp1
-         real, intent(in) :: ndqm1, ndq00 ! new spacing to nk and nk+1
-         real, intent(in) :: pfm1, pf00, pfp1 ! previous values at pkm1, pk, pkp1
-         real, intent(out) :: nf00, nfp1 ! new values at nk, nk+1
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: pdqm1, pdq00  ! previous spacing to pk and pkp1
+         real, intent(in) :: ndqm1, ndq00  ! new spacing to nk and nk+1
+         real, intent(in) :: pfm1, pf00, pfp1  ! previous values at pkm1, pk, pkp1
+         real, intent(out) :: nf00, nfp1  ! new values at nk, nk+1
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          integer, parameter :: n_old=3, n_new=2
          real :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
@@ -201,15 +201,15 @@
       subroutine interp_values_sg(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real, intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real, intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real, intent(inout) :: vals(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         real, intent(inout) :: vals(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp_values_sg(init_x, nx, f1, nv, x, vals, ierr)
       end subroutine interp_values_sg
 
@@ -217,12 +217,12 @@
       subroutine interp_value_sg(init_x, nx, f1, xval, val, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
          real, intent(in) :: xval  ! location where want interpolated values
          real, intent(out) :: val
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
          integer, parameter :: nv = 1
          real :: x(nv), vals(nv)
          x(1) = xval
@@ -234,16 +234,16 @@
       subroutine interp_values_and_slopes_sg(init_x, nx, f1, nv, x, vals, slopes, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals and slopes vectors
-         real, intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals and slopes vectors
+         real, intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real, intent(inout) :: vals(:) ! (nv)
-         real, intent(inout) :: slopes(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         real, intent(inout) :: vals(:)  ! (nv)
+         real, intent(inout) :: slopes(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp_values_and_slopes_sg(init_x, nx, f1, nv, x, vals, slopes, ierr)
       end subroutine interp_values_and_slopes_sg
 
@@ -251,12 +251,12 @@
       subroutine interp_value_and_slope_sg(init_x, nx, f1, xval, val, slope, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
          real, intent(in) :: xval  ! location where want interpolated values
          real, intent(out) :: val, slope
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
          integer, parameter :: nv = 1
          real :: x(nv), vals(nv), slopes(nv)
          x(1) = xval
@@ -269,17 +269,17 @@
       subroutine integrate_values_sg(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly increasing
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real, intent(in) :: x(:) ! (nv)
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly increasing
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real, intent(in) :: x(:)  ! (nv)
             ! strictly monotonic in same way as init_x
             ! NOTE: no extrapolation allowed -- x's must be within range of init_x's
-         real, intent(inout) :: vals(:) ! (nv)
+         real, intent(inout) :: vals(:)  ! (nv)
             ! for i > 1, vals(i) = integral of interpolating poly from x(i-1) to x(i)
             ! vals(1) = 0
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
 
          call do_integrate_values_sg(init_x, nx, f1, nv, x, vals, ierr)
 
@@ -303,11 +303,11 @@
          use interp_1d_def
          use interp_1d_pm_sg
          integer, intent(in) :: nx       ! length of x vector (>= 2)
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx,nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx,nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub_sg(x, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm_sg
@@ -319,11 +319,11 @@
          use interp_1d_def
          use interp_1d_pm_sg
          integer, intent(in) :: nx       ! length of x vector (>= 2)
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx,nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx,nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub_sg(x, nx, f1, .true., nwork, work1, str, ierr)
       end subroutine interp_pm_slopes_only_sg
@@ -361,10 +361,10 @@
          use interp_1d_pm_sg
          real, intent(in) :: dx    ! grid spacing
          integer, intent(in) :: nx     ! length of vector (>= 2)
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub_uniform_sg(dx, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm_on_uniform_grid_sg
@@ -384,12 +384,12 @@
          use interp_1d_def
          use interp_1d_mp_sg
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real, intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: which ! average, quartic, or super_bee
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which  ! average, quartic, or super_bee
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_sg(x, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_sg
@@ -400,11 +400,11 @@
          use interp_1d_def
          use interp_1d_mp_sg
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_sg(x, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_sg
@@ -415,11 +415,11 @@
          use interp_1d_def
          use interp_1d_mp_sg
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_sg(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_sg
@@ -430,11 +430,11 @@
          use interp_1d_def
          use interp_1d_mp_sg
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_sg(x, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_sg
@@ -444,13 +444,13 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
-         real, intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: which ! average, quartic, or super_bee
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which  ! average, quartic, or super_bee
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_sg(dx, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_on_uniform_grid_sg
@@ -460,12 +460,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
-         real, intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_sg(dx, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_on_uniform_grid_sg
@@ -475,12 +475,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
-         real, intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_sg(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_on_uniform_grid_sg
@@ -490,12 +490,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
-         real, intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real, intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real, intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_sg(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_on_uniform_grid_sg

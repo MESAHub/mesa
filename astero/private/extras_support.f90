@@ -556,7 +556,7 @@
             if (.not. have_all_l0_freqs()) then
                write(*,'(a65,i6)') 'failed to find all required l=0 frequencies', &
                   s% model_number
-               model_freq_corr(0,:) = model_freq(0,:) ! for plotting
+               model_freq_corr(0,:) = model_freq(0,:)  ! for plotting
                return
             end if
             call get_freq_corr(s, .true., ierr)
@@ -1006,7 +1006,7 @@
          call star_astero_procs% extras_startup(id, restart, ierr)
          if (.not. restart) then
             call alloc_extra_info(s)
-         else ! it is a restart
+         else  ! it is a restart
             call unpack_extra_info(s)
          end if
       end subroutine astero_extras_startup

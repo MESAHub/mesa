@@ -68,7 +68,7 @@ contains
     coefficient_filename = trim(mesa_data_dir) // '/star_data/gravity_darkening_coefficients.data'
 
     open(newunit=io,file=trim(coefficient_filename),status='old',action='read')
-    read(io,*) !skip header
+    read(io,*)  !skip header
     do i=1,ndim
        do j=1,ndim
           read(io,*) dummy(1:4)

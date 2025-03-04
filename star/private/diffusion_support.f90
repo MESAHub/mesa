@@ -35,7 +35,7 @@
 
 
       real(dp), parameter :: Xlim = 1d-14
-      real(dp), parameter :: tiny_mass = 1d3 ! a kilogram
+      real(dp), parameter :: tiny_mass = 1d3  ! a kilogram
       real(dp), parameter :: tinyX = 1d-50
       real(dp), parameter :: smallX = 1d-20
 
@@ -155,7 +155,7 @@
                ! Electric Field from Iben & MacDonald solve.
                E_field_face(k) = &
                     boltzm*T_face(k)*dlnT_dr_face(k)*e_at(k) + &
-                    amu*(s% grav(k))*e_ap(k) ! + e_ar(k) should be the radiation term, skipping for now
+                    amu*(s% grav(k))*e_ap(k)  ! + e_ar(k) should be the radiation term, skipping for now
                do j=1,nc
                   E_field_face(k) = E_field_face(k) + &
                        boltzm*T_face(k)*e_ax(j,k)*(dC_dr_face(j)&
@@ -168,10 +168,10 @@
                ! Electric and gravitational field from Thoul solve.
                E_field_face(k) = &
                     e_ap(k)*dlnP_dr_face(k) + &
-                    e_at(k)*dlnT_dr_face(k) ! + e_ar(k)*......  skipping the radiation term for now
+                    e_at(k)*dlnT_dr_face(k)  ! + e_ar(k)*......  skipping the radiation term for now
                g_field_face(k) = &
                     g_ap(k)*dlnP_dr_face(k) + &
-                    g_at(k)*dlnT_dr_face(k) ! + g_ar(k)*......  skipping the radiation term for now
+                    g_at(k)*dlnT_dr_face(k)  ! + g_ar(k)*......  skipping the radiation term for now
                do j=1,nc
                   if (C_face(j) < 1d-20) cycle
                   E_field_face(k) = E_field_face(k) + &
@@ -231,7 +231,7 @@
             sum_dm = sum_dm + cell_dm(k)
          end do
 
-         do j=1,nc ! not used, but copy just for sake of plotting
+         do j=1,nc  ! not used, but copy just for sake of plotting
             D_self_face(j,nzlo) = D_self_face(j,nzlo+1)
             v_advection_face(j,nzlo) = v_advection_face(j,nzlo+1)
             v_total_face(j,nzlo) = v_total_face(j,nzlo+1)
@@ -277,10 +277,10 @@
          logical, intent(in) :: use_cgs_solver, rad
          real(dp), intent(in) :: eta, eta_on, eta_off
          real(dp), intent(inout), dimension(:) :: &
-            v_advection_face, vlnP_face, vlnT_face, v_rad_face ! (nc)
+            v_advection_face, vlnP_face, vlnT_face, v_rad_face  ! (nc)
          real(dp), intent(out) :: e_ap, e_at, e_ar, g_ap, g_at, g_ar
-         real(dp), intent(inout) :: e_ax(:), g_ax(:) ! (m)
-         real(dp), intent(inout) :: sigma_lnC(:,:) ! (nc,nc)
+         real(dp), intent(inout) :: e_ax(:), g_ax(:)  ! (m)
+         real(dp), intent(inout) :: sigma_lnC(:,:)  ! (nc,nc)
          integer, intent(out) :: ierr
 
          real(dp), dimension(m) :: AP, AT, AR
@@ -322,13 +322,13 @@
             d_dr_factor, dlnRho_dr_face, C_face, X_face, Z_face, C_div_X_face, &
             dC_dr_face, dlnne_dr_face)
          integer, intent(in) :: k, nc, m, nz, nzlo, nzhi
-         real(dp), dimension(:,:), intent(in) :: C, X, Z ! (m,nz)
-         real(dp), intent(in) :: A(:) ! (m) atomic number
+         real(dp), dimension(:,:), intent(in) :: C, X, Z  ! (m,nz)
+         real(dp), intent(in) :: A(:)  ! (m) atomic number
          real(dp), intent(in) :: alfa_face(:), d_dr_factor, dlnRho_dr_face
          real(dp), intent(in) :: tiny_C
-         real(dp), dimension(:), intent(out) :: C_face, Z_face, dC_dr_face ! (m)
+         real(dp), dimension(:), intent(out) :: C_face, Z_face, dC_dr_face  ! (m)
          real(dp), intent(out) :: dlnne_dr_face
-         real(dp), dimension(:,:), intent(out) :: X_face, C_div_X_face ! (m,nz)
+         real(dp), dimension(:,:), intent(out) :: X_face, C_div_X_face  ! (m,nz)
          integer :: j
          real(dp) :: tmp, tmp1, tmp2, dlntmp_dr_face, alfa, beta
 
@@ -378,9 +378,9 @@
          integer, intent(in) :: k, nc, m
          real(dp), intent(in) :: rho, T
          logical, intent(in) :: pure_Coulomb
-         real(dp), intent(in), dimension(:) :: A, X, Z, C ! (m)
+         real(dp), intent(in), dimension(:) :: A, X, Z, C  ! (m)
          real(dp), intent(inout), dimension(:,:) :: &
-            kappa_st, Zdiff, Zdiff1, Zdiff2 ! (m,m)
+            kappa_st, Zdiff, Zdiff1, Zdiff2  ! (m,m)
 
          integer :: i, j
          real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda, alfa, Gamlo, Gamhi
@@ -390,11 +390,11 @@
          real(dp) :: Ddiff_Caplan(nc)
 
          do i = 1, nc
-            charge(i) = max(1d0, Z(i)) ! assume some ionization
+            charge(i) = max(1d0, Z(i))  ! assume some ionization
          end do
          charge(m) = Z(m)
 
-         if (.not. pure_Coulomb) then ! use Paquette coeffs
+         if (.not. pure_Coulomb) then  ! use Paquette coeffs
             ! Get number densities (per cm^3)
             do i = 1, nc
                na(i) = rho*X(i)/(A(i)*amu)
@@ -410,7 +410,7 @@
             if(.not. s% diffusion_use_paquette .and. .not. s% use_other_diffusion_coefficients) then
                Gamma = s% gam(k)
                Gamlo = 3d0
-               Gamhi = 10d0 ! for blending over from Stanton & Murillo coeffs to CBF coeffs at high Gamma
+               Gamhi = 10d0  ! for blending over from Stanton & Murillo coeffs to CBF coeffs at high Gamma
                if(Gamma < Gamlo .or. .not. s% diffusion_use_caplan) then
                   call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)
                   ! This must get called after Paquette because it doesn't calculate
@@ -418,11 +418,11 @@
                   ! and changing all the ion-ion terms (1:nc), so after calling this
                   ! routine we have all ion-ion coefficients from Stanton&Murillo and
                   ! all ion-electron coefficients from Paquette&al.
-               else if(Gamma >= Gamlo .and. Gamma <= Gamhi) then ! blend
+               else if(Gamma >= Gamlo .and. Gamma <= Gamhi) then  ! blend
                   alfa = (Gamhi - Gamma)/(Gamhi - Gamlo)
-                  Kdiff2(:,:) = Kdiff(:,:) ! need to initialize so that (m,m) entries are set
-                  call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM) ! alfa = 1
-                  call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff2) ! alfa = 0
+                  Kdiff2(:,:) = Kdiff(:,:)  ! need to initialize so that (m,m) entries are set
+                  call get_SM_coeffs(nc,m,rho,T,A,charge,na,Kdiff,Zdiff,Zdiff1,Zdiff2,kappa_SM)  ! alfa = 1
+                  call get_CBF_coeffs(nc,m,rho,T,A,charge,na,Gamma,Ddiff_Caplan,Kdiff2)  ! alfa = 0
                   Kdiff(:,:) = alfa*Kdiff(:,:) + (1d0-alfa)*Kdiff2(:,:)
                else
                   ! use Caplan, Bauer, & Freeman coefficients at moderate to strong coupling
@@ -495,14 +495,14 @@
          integer, intent(in) :: k, m
          real(dp), intent(in) :: sfmin, rho, T
          real(dp), intent(in) :: eta, eta_on, eta_off
-         real(dp), intent(in), dimension(:) :: A, X, Z, C, rad_accel ! (m)
+         real(dp), intent(in), dimension(:) :: A, X, Z, C, rad_accel  ! (m)
          logical, intent(in) :: use_cgs_solver, rad
          real(dp), dimension(:,:), intent(in) :: &
-            kappa_st, Zdiff, Zdiff1, Zdiff2 ! (m,m)
-         real(dp), dimension(:), intent(out) :: AP, AT, AR ! (m)
-         real(dp), intent(inout) :: AX(:,:) ! (m,m)
-         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:) ! (m)
-         real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:) ! (m)
+            kappa_st, Zdiff, Zdiff1, Zdiff2  ! (m,m)
+         real(dp), dimension(:), intent(out) :: AP, AT, AR  ! (m)
+         real(dp), intent(inout) :: AX(:,:)  ! (m,m)
+         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)  ! (m)
+         real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:)  ! (m)
          integer, intent(out) :: ierr
 
          integer :: i, j
@@ -523,12 +523,12 @@
          end do
          charge(m) = Z(m)
 
-         if(use_cgs_solver) then ! Use the cgs solver
+         if(use_cgs_solver) then  ! Use the cgs solver
             ! Get number densities using info contained in X,A,Z,rho
             nd(1:m) = 0d0
             do i=1,m-1
                nd(i) = rho*X(i)/(A(i)*amu)
-               nd(m) = nd(m) + nd(i)*charge(i) ! Electron Number Density satisfies charge neutrality
+               nd(m) = nd(m) + nd(i)*charge(i)  ! Electron Number Density satisfies charge neutrality
             end do
 
             Kdiff(:,:) = kappa_st(:,:)*(1.41D-25*pow(T,-1.5D0)*nd(m)*nd(m))
@@ -544,8 +544,8 @@
                     e_ap,e_at,e_ar,e_ax,ierr)
             else
                ! Call both and do a linear blend of all coefficients.
-               alfa = (eta - eta_on)/(eta_off - eta_on) ! alfa = 1 means no thermal diffusion.
-               beta = 1d0 - alfa ! beta = 1 means full thermal diffusion.
+               alfa = (eta - eta_on)/(eta_off - eta_on)  ! alfa = 1 means no thermal diffusion.
+               beta = 1d0 - alfa  ! beta = 1 means full thermal diffusion.
 
                call solve_burgers_cgs_no_thermal(m+1,m,A,charge,nd,rad_accel,rad, &
                     Kdiff,AP1,AT1,AR1,AX1, &
@@ -601,7 +601,7 @@
                end do
                call mesa_error(__FILE__,__LINE__,'get1_gradient_coeffs')
             end if
-         else ! Use the Thoul solver
+         else  ! Use the Thoul solver
             call do1_solve_thoul_hu( &
                2*m+2, m, sfmin, A, charge, X, C, rad_accel, rad, &
                kappa_st, Zdiff, Zdiff1, Zdiff2, &
@@ -632,7 +632,7 @@
             vgt, vlnP, vlnT, vrad, sigma_lnC)
          integer, intent(in) :: k, nc, m, nzlo, nzhi
          real(dp), intent(in), dimension(:) :: AP, AT, AR, r_mid
-         real(dp), intent(in) :: AX(:,:) ! (m,m)
+         real(dp), intent(in) :: AX(:,:)  ! (m,m)
          real(dp), intent(in) :: rho, T, limit_coeff, v_advection_max, &
             Vlimit_dm_full_on, Vlimit_dm_full_off, Vlimit, xm_face, dt
          real(dp), intent(in) :: dlnP_dr, dlnT_dr, dlnRho_dr, grav, dlnne_dr
@@ -640,7 +640,7 @@
          real(dp), intent(in) :: diffusion_factor(:)
          logical, intent(in) :: use_cgs_solver
          real(dp), intent(inout), dimension(:) :: vgt, vlnP, vlnT, vrad
-         real(dp), intent(inout) :: sigma_lnC(:,:) ! (nc,nc)
+         real(dp), intent(inout) :: sigma_lnC(:,:)  ! (nc,nc)
 
          integer :: i, j, im
          real(dp) :: coef, coef_vrad, dv_im, dr, T2pt5, &
@@ -667,14 +667,14 @@
             vmax_limit = vcross*Vlimit
             alfa = 1d0
             beta = 0d0
-         else ! combine
+         else  ! combine
             alfa = (xm_face - Vlimit_dm_full_off)/&
                         (Vlimit_dm_full_on - Vlimit_dm_full_off)
-            beta = 1d0 - alfa ! fraction of normal v when it is > vmax
-            vmax_limit = vcross*Vlimit/alfa ! Want to scale to no limit at alfa = 0
+            beta = 1d0 - alfa  ! fraction of normal v when it is > vmax
+            vmax_limit = vcross*Vlimit/alfa  ! Want to scale to no limit at alfa = 0
          end if
 
-         if(use_cgs_solver) then ! Converts coefficients to velocities
+         if(use_cgs_solver) then  ! Converts coefficients to velocities
             ! assuming cgs routine.
             do i=1,nc
                do j=1,nc
@@ -682,7 +682,7 @@
                end do
                vlnP(i) = AP(i)*amu*grav*diffusion_factor(i)*limit_coeff
                vlnT(i) = AT(i)*boltzm*T*dlnT_dr*diffusion_factor(i)*limit_coeff
-               vrad(i) = AR(i)*diffusion_factor(i)*limit_coeff ! AR already contains all constants.
+               vrad(i) = AR(i)*diffusion_factor(i)*limit_coeff  ! AR already contains all constants.
                vgt(i) = vlnP(i) + vlnT(i) + vrad(i)
             end do
 
@@ -693,7 +693,7 @@
                if (X_face(i) < 1d-15) vgt(i) = 0d0
             end do
 
-         else ! converts coefficients to velocities assuming Thoul.
+         else  ! converts coefficients to velocities assuming Thoul.
             tau0 = 6d13*secyer
             T2pt5 = pow(T/T_unit,2.5d0)
             coef = limit_coeff*Rsun*T2pt5/(rho/rho_unit)*(Rsun/tau0)
@@ -760,13 +760,13 @@
             dm_bar, C_div_X_face, GT_face, D_self_face, SIG_face)
          integer, intent(in) :: k, nc, m
          real(dp), intent(in) :: &
-            v_advection_max, SIG_factor, GT_factor, v_advection_face(:) ! (nc)
-         real(dp), intent(in) :: sigma_lnC_face(:,:) ! (nc,nc)
+            v_advection_max, SIG_factor, GT_factor, v_advection_face(:)  ! (nc)
+         real(dp), intent(in) :: sigma_lnC_face(:,:)  ! (nc,nc)
          real(dp), intent(in) :: four_pi_r2_rho_face, dm_bar
-         real(dp), intent(in), dimension(:) :: C_div_X_face ! (m)
-         real(dp), intent(inout) :: GT_face(:) ! (nc)
-         real(dp), intent(inout) :: D_self_face(:) ! (nc)
-         real(dp), intent(inout) :: SIG_face(:,:) ! (nc,nc)
+         real(dp), intent(in), dimension(:) :: C_div_X_face  ! (m)
+         real(dp), intent(inout) :: GT_face(:)  ! (nc)
+         real(dp), intent(inout) :: D_self_face(:)  ! (nc)
+         real(dp), intent(inout) :: SIG_face(:,:)  ! (nc,nc)
 
          integer :: i, j
          real(dp) :: c
@@ -846,16 +846,16 @@
 
          integer, intent(in) :: m,n
          real(dp), intent(in) :: sfmin
-         real(dp), intent(in), dimension(:) :: A, Z, X, C, rad_accel ! (m)
+         real(dp), intent(in), dimension(:) :: A, Z, X, C, rad_accel  ! (m)
          logical, intent(in) :: rad
          real(dp), intent(in), dimension(:,:) :: &
-            kappa_st, Zdiff, Zdiff1, Zdiff2 ! (m,m)
+            kappa_st, Zdiff, Zdiff1, Zdiff2  ! (m,m)
 !           kappa_st from the resistance coefficient Kdiff with eq (37) Thoul&al.
 !           Zdiff, Zdiff1, Zdiff2 = arrays of resistance coefficients,
-         real(dp), intent(inout), dimension(:) :: ap, at, ar ! (m)
-         real(dp), intent(inout) :: ax(:,:) ! (m,m)
-         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:) ! (m)
-         real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:) ! (m)
+         real(dp), intent(inout), dimension(:) :: ap, at, ar  ! (m)
+         real(dp), intent(inout) :: ax(:,:)  ! (m,m)
+         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)  ! (m)
+         real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:)  ! (m)
          integer, intent(out) :: ierr
 
          integer :: i, j, l, indx(n)
@@ -909,7 +909,7 @@
                beta(i) = 0d0
             end if
             do j=1,m
-               if (j /= m) then ! HH: Include He gradient
+               if (j /= m) then  ! HH: Include He gradient
                   gamma(i,j) = -c(j)/cc
                   if (j == i) gamma(i,j) = gamma(i,j) + 1d0
                   gamma(i,j) = gamma(i,j)*c(i)/cc
@@ -1076,11 +1076,11 @@
         !                          2 conservation equations.
 
         integer, intent(in) :: m,n
-        real(dp), intent(in), dimension(:) :: A, Z, nd, rad_accel ! (m)
+        real(dp), intent(in), dimension(:) :: A, Z, nd, rad_accel  ! (m)
         logical, intent(in) :: rad
-        real(dp), intent(in), dimension(:,:) :: Kdiff ! (m,m)
-        real(dp), intent(inout), dimension(:) :: ap, at, ar ! (m)
-        real(dp), intent(inout) :: ax(:,:) ! (m,m)
+        real(dp), intent(in), dimension(:,:) :: Kdiff  ! (m,m)
+        real(dp), intent(inout), dimension(:) :: ap, at, ar  ! (m)
+        real(dp), intent(inout) :: ax(:,:)  ! (m,m)
         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)
         integer, intent(out) :: ierr
 
@@ -1242,12 +1242,12 @@
         ! (which is much better when things are degenerate).
 
         integer, intent(in) :: m,n
-        real(dp), intent(in), dimension(:) :: A, Z, nd, rad_accel ! (m)
+        real(dp), intent(in), dimension(:) :: A, Z, nd, rad_accel  ! (m)
         logical, intent(in) :: rad
-        real(dp), intent(in), dimension(:,:) :: Kdiff ! (m,m)
-        real(dp), intent(in), dimension(:,:) :: zdiff, zdiff1, zdiff2 ! (m,m)
-        real(dp), intent(inout), dimension(:) :: ap, at, ar ! (m)
-        real(dp), intent(inout) :: ax(:,:) ! (m,m)
+        real(dp), intent(in), dimension(:,:) :: Kdiff  ! (m,m)
+        real(dp), intent(in), dimension(:,:) :: zdiff, zdiff1, zdiff2  ! (m,m)
+        real(dp), intent(inout), dimension(:) :: ap, at, ar  ! (m)
+        real(dp), intent(inout) :: ax(:,:)  ! (m,m)
         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)
         integer, intent(out) :: ierr
 
@@ -1276,7 +1276,7 @@
         ! This makes the comparisons for checking the subdiagonals easier, as well
         ! as indexing of the coefficients.
         rightshift = m
-        downshift = m-1 ! Because electron momentum equation dropped.
+        downshift = m-1  ! Because electron momentum equation dropped.
 
         ! Assign the RHS Matrix multiplying the unknown quantities.
         ! Assuming gravity is a known, so there are m unknown
@@ -1319,7 +1319,7 @@
         end do
 
         ! Terms corresponding to the energy equations.
-        do i = 1,m ! All these entries get shifted lower into the i+downshift position.
+        do i = 1,m  ! All these entries get shifted lower into the i+downshift position.
 
            ! Terms that multiply the diffusion velocities.
            do j = 1,m
@@ -1338,8 +1338,8 @@
            do j = 1,m
               ! Shift these entries to be in the lower-right half of the matrix.
               if (j == i) then
-                 delta(i+downshift,j+rightshift) = -0.4d0*Kdiff(i,j)*zdiff2(i,j) ! 1st term on RHS of eqn (90) in MESA3
-                 do l=1,m ! second line of eqn (90) in MESA3
+                 delta(i+downshift,j+rightshift) = -0.4d0*Kdiff(i,j)*zdiff2(i,j)  ! 1st term on RHS of eqn (90) in MESA3
+                 do l=1,m  ! second line of eqn (90) in MESA3
                     if (l /= j) then
                        delta(i+downshift,j+rightshift) = delta(i+downshift,j+rightshift) - &
                             Kdiff(i,l)* &
@@ -1349,7 +1349,7 @@
                             )
                     end if
                  end do
-              else ! third line of eqn (90) in MESA3
+              else  ! third line of eqn (90) in MESA3
                  delta(i+downshift,j+rightshift) = Kdiff(i,j)* &
                       ( 3d0 + zdiff1(i,j) - 0.8d0*zdiff2(i,j) )* &
                       A(i)*A(j)/pow2(A(i)+A(j))
@@ -1467,17 +1467,17 @@
       subroutine get_SM_coeffs(nc,m,rho,T,A,Z,nd,Kdiff,zdiff,zdiff1,zdiff2,kappa)
         integer, intent(in) :: nc, m
         real(dp), intent(in) :: rho, T
-        real(dp), dimension(:), intent(in) :: A, Z, nd ! m
-        real(dp), intent(out) :: kappa ! ion separation relative to electron screening length.
-        real(dp), dimension(:,:), intent(inout) :: Kdiff,zdiff,zdiff1,zdiff2 ! (m,m) but electron entries shouldn't be used.
+        real(dp), dimension(:), intent(in) :: A, Z, nd  ! m
+        real(dp), intent(out) :: kappa  ! ion separation relative to electron screening length.
+        real(dp), dimension(:,:), intent(inout) :: Kdiff,zdiff,zdiff1,zdiff2  ! (m,m) but electron entries shouldn't be used.
         ! Only the ion terms are modified by this routine right now.
 
         real(dp), dimension(nc,nc) :: g_plasma, mu
-        real(dp), dimension(nc,nc,2,3) :: Keff, Omega ! Indexed by all species and different orders
+        real(dp), dimension(nc,nc,2,3) :: Keff, Omega  ! Indexed by all species and different orders
         ! Fitting coefficients from Stanton & Murillo
         real(dp), dimension(2,3) :: a1,a2,a3,a4,a5,b0,b1,b2,b3,b4
-        real(dp) :: lambda ! The screening length
-        integer :: i,j,facmo,no,mo ! Last two are used for different orders of collisions.
+        real(dp) :: lambda  ! The screening length
+        integer :: i,j,facmo,no,mo  ! Last two are used for different orders of collisions.
 
         real(dp) :: lgp, gp1, gp2, gp3, gp4, gp5, kbT32, tmp
 
@@ -1564,15 +1564,15 @@
               gp3 = pow3(gp1)
               gp4 = pow4(gp1)
               gp5 = pow5(gp1)
-              if( g_plasma(i,j) < 0d0) then ! Don't calculate for attractive potentials, set to 0
+              if( g_plasma(i,j) < 0d0) then  ! Don't calculate for attractive potentials, set to 0
                  Keff(i,j,:,:) = 0d0
-              else if( g_plasma(i,j) < 1d0) then ! Use eqn C23 for weakly coupled
+              else if( g_plasma(i,j) < 1d0) then  ! Use eqn C23 for weakly coupled
                  do no=1,2
-                    do mo=1,3 ! Implementing the (m-1)! term with a simple if statement.
+                    do mo=1,3  ! Implementing the (m-1)! term with a simple if statement.
                        if(mo == 3) then
-                          facmo = 2 ! (3-1)!
+                          facmo = 2  ! (3-1)!
                        else
-                          facmo = 1 ! (1-1)! and (2-1)!
+                          facmo = 1  ! (1-1)! and (2-1)!
                        end if
                        Keff(i,j,no,mo) = (-1d0*no/4d0)*facmo*safe_log( &
                             a1(no,mo)*gp1 &
@@ -1582,7 +1582,7 @@
                             + a5(no,mo)*gp5)
                     end do
                  end do
-              else ! Use eqn C24 for strongly coupled
+              else  ! Use eqn C24 for strongly coupled
                  do no=1,2
                     do mo=1,3
                        Keff(i,j,no,mo) = &
@@ -1598,7 +1598,7 @@
         kBT32 = pow(boltzm*T,1.5d0)
         do i=1,nc
            do j=1,nc
-              mu(i,j) = amu*A(i)*A(j)/(A(i) + A(j)) ! Reduced mass for collision
+              mu(i,j) = amu*A(i)*A(j)/(A(i) + A(j))  ! Reduced mass for collision
               tmp = sqrt(2d0*pi/(mu(i,j))) * (pow2(Z(i)*Z(j)*qe*qe)/kBT32)
               do no=1,2
                  do mo=1,3
@@ -1631,15 +1631,15 @@
       subroutine lam_SM(nc,m,rho,T,Z,nd,lam_eff,kappa)
         integer, intent(in) :: nc, m
         real(dp), intent(in) :: rho, T
-        real(dp), dimension(:), intent(in) :: Z, nd ! m. charges, number densities of all species
+        real(dp), dimension(:), intent(in) :: Z, nd  ! m. charges, number densities of all species
         real(dp), intent(out) :: lam_eff
-        real(dp), intent(out) :: kappa ! ion separation relative to electron screening length.
+        real(dp), intent(out) :: kappa  ! ion separation relative to electron screening length.
 
         real(dp) :: tiny_n, ne, EF, lam_e, lam_sum, rhotot, ni_tot
-        real(dp), dimension(nc) :: ai, gam_is, lam_i ! ion sphere radius, coupling, screening for each type of ion
+        real(dp), dimension(nc) :: ai, gam_is, lam_i  ! ion sphere radius, coupling, screening for each type of ion
         integer :: i
 
-        tiny_n = 1d-20 ! g/cc
+        tiny_n = 1d-20  ! g/cc
         ne = nd(m)
         ! Electron Fermi energy
         EF = (hbar*hbar*pow(3d0*pi*pi*ne,2d0/3d0))/(2d0*me)
@@ -1656,7 +1656,7 @@
         rhotot = 0d0
         do i = 1,nc
            ! rhotot is a CHARGE density. Just trying to follow the notation of SM eq (34)
-           rhotot = rhotot + Z(i)*qe*nd(i) ! = qe*ne?
+           rhotot = rhotot + Z(i)*qe*nd(i)  ! = qe*ne?
         end do
         do i = 1,nc
            ai(i) = pow(Z(i)*qe/(four_thirds_pi*rhotot), one_third)
@@ -1667,14 +1667,14 @@
            ! so just set these screening lengths to be huge and they won't
            ! contribute anything to overall screening length.
            if(nd(i) < tiny_n) then
-              lam_i(i) = 1d99 ! cm. This won't contribute to any screening.
+              lam_i(i) = 1d99  ! cm. This won't contribute to any screening.
            else
               lam_i(i) = sqrt(boltzm*T/( pi4*pow2(Z(i)*qe)*nd(i) ))
            end if
         end do
 
-        lam_sum = 1d0/pow2(lam_e) ! The electron part of the screening length.
-        do i = 1,nc ! Sum over all the ions.
+        lam_sum = 1d0/pow2(lam_e)  ! The electron part of the screening length.
+        do i = 1,nc  ! Sum over all the ions.
            lam_sum = lam_sum + pow( pow2(lam_i(i))*(1d0+3d0*gam_is(i)), -1d0)
         end do
         lam_eff = pow(lam_sum,-0.5d0)
@@ -1684,18 +1684,18 @@
       subroutine get_CBF_coeffs(nc,m,rho,T,A,Z,nd,Gamma,Ddiff,Kdiff)
         integer, intent(in) :: nc, m
         real(dp), intent(in) :: rho, T, Gamma
-        real(dp), dimension(:), intent(in) :: A, Z, nd ! m
-        real(dp), dimension(:), intent(out) :: Ddiff ! nc
-        real(dp), dimension(:,:), intent(inout) :: Kdiff ! (m,m), but only touch (nc,nc)
+        real(dp), dimension(:), intent(in) :: A, Z, nd  ! m
+        real(dp), dimension(:), intent(out) :: Ddiff  ! nc
+        real(dp), dimension(:,:), intent(inout) :: Kdiff  ! (m,m), but only touch (nc,nc)
 
         real(dp) :: kappa, DstarOCP, omegap, ai, lam_e, Docp
         real(dp) :: Abar, Zbar, ni_sum, Zp6bar, Kfac
         integer :: i, j
 
-        ni_sum = sum(nd(1:nc)) ! total ion number density (excludes electron entry m)
+        ni_sum = sum(nd(1:nc))  ! total ion number density (excludes electron entry m)
         Abar = sum(A(1:nc)*nd(1:nc))/ni_sum
         Zbar = sum(Z(1:nc)*nd(1:nc))/ni_sum
-        Zp6bar = 0d0 ! average of Z^0.6, needed for constructing Kij
+        Zp6bar = 0d0  ! average of Z^0.6, needed for constructing Kij
         do j = 1,nc
            Zp6bar = Zp6bar + pow(Z(j),0.6d0)*nd(j)/ni_sum
         end do
@@ -1706,7 +1706,7 @@
 
         ! Calculate Dstar using fit of Eqn (5)
         call get_Dstar_OCP(Gamma,kappa,DstarOCP)
-        Docp = DstarOCP*ai*ai*omegap ! convert from dimensionless to cgs units
+        Docp = DstarOCP*ai*ai*omegap  ! convert from dimensionless to cgs units
 
         ! Eqn (11)
         do j = 1,nc
@@ -1757,15 +1757,15 @@
       subroutine kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
         integer, intent(in) :: nc, m
         real(dp), intent(in) :: rho, T, Abar, Zbar
-        real(dp), dimension(:), intent(in) :: nd ! m. number densities of all species
+        real(dp), dimension(:), intent(in) :: nd  ! m. number densities of all species
         real(dp), intent(out) :: omegap, ai, lam_e
-        real(dp), intent(out) :: kappa ! ion separation relative to electron screening length.
+        real(dp), intent(out) :: kappa  ! ion separation relative to electron screening length.
 
         real(dp) :: tiny_n, ne, EF, kF, lam_e_SM, lam_e_rel, ni_tot
         integer :: i
 
-        tiny_n = 1d-20 ! g/cc
-        ne = nd(m) ! electron number density
+        tiny_n = 1d-20  ! g/cc
+        ne = nd(m)  ! electron number density
         ! Electron Fermi energy
         EF = (hbar*hbar*pow(3d0*pi*pi*ne,2d0/3d0))/(2d0*me)
         ! Electron screening length accounting for degeneracy correction
@@ -1773,10 +1773,10 @@
 
         if (rho < 1d6) then
            lam_e = lam_e_SM
-        else ! calculate and use relativistic screening length if rho > 1d6
-           kF = pow(3d0*pi*pi*ne,one_third) ! electron Fermi momentum
-           lam_e_rel = 1d0/(2d0*kF*sqrt(fine/pi)) ! fine = fine structure constant ~1/137
-           lam_e = min(lam_e_SM,lam_e_rel) ! min for continuity
+        else  ! calculate and use relativistic screening length if rho > 1d6
+           kF = pow(3d0*pi*pi*ne,one_third)  ! electron Fermi momentum
+           lam_e_rel = 1d0/(2d0*kF*sqrt(fine/pi))  ! fine = fine structure constant ~1/137
+           lam_e = min(lam_e_SM,lam_e_rel)  ! min for continuity
         end if
 
         ! Compute kappa
@@ -1784,7 +1784,7 @@
         do i = 1,nc
            ni_tot = ni_tot + nd(i)
         end do
-        omegap = sqrt(pi4*ni_tot*Zbar*Zbar*qe*qe/(Abar*amu)) ! plasma frequency
+        omegap = sqrt(pi4*ni_tot*Zbar*Zbar*qe*qe/(Abar*amu))  ! plasma frequency
         ai = pow(3d0/(pi4*ni_tot),one_third)
         kappa = ai/lam_e
 

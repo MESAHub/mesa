@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -o pipefail
 
@@ -30,7 +30,7 @@ function check_okay {
 }
 
 function do_one_parallel {
-	cd $1
+	cd "$1" || exit
 	check_okay
 	echo
 	pwd
@@ -55,7 +55,7 @@ function do_one_parallel {
 }
 
 function do_one {
-	cd $1
+	cd "$1" || exit
 	check_okay
 	echo
 	pwd
@@ -120,7 +120,7 @@ then
         # empirically on lustre filesystems the LFS files don't immediately appear
         # if requested, sleep for a bit before proceeding and doing the check
         if [ -n "${MESA_GIT_LFS_SLEEP}" ]; then
-            sleep ${MESA_GIT_LFS_SLEEP}
+            sleep "${MESA_GIT_LFS_SLEEP}"
         fi
 
         # check that each LFS file has a full copy on disk
@@ -298,7 +298,7 @@ then
 fi
 
 function do_input_data {
-	cd $1
+	cd "$1" || exit
 	check_okay
 	echo
 	pwd

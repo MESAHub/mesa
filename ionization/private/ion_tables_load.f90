@@ -38,7 +38,7 @@
       subroutine Init_ion_tables(file_prefix, Z1_suffix, use_cache, ierr)
          character(*), intent(in) :: file_prefix, Z1_suffix
          logical, intent(in) :: use_cache
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          if (ion_root_is_initialized) return
          ion_file_prefix = file_prefix
@@ -416,7 +416,7 @@
          real(dp) :: logQs(ion_num_logQs)              ! x vector, strict ascending
          real(dp) :: logTs(ion_num_logTs)                    ! y vector, strict ascending
          real(dp) :: Ts(ion_num_logTs)
-         real(dp), allocatable, target :: f1_ary(:) ! data & spline coefficients
+         real(dp), allocatable, target :: f1_ary(:)  ! data & spline coefficients
          real(dp), pointer :: f1(:), f(:,:,:)
          integer :: ibcxmin                   ! bc flag for x=xmin
          real(dp) :: bcxmin(ion_num_logTs)    ! bc data vs. y at x=xmin
@@ -486,7 +486,7 @@
          character (*), intent(in) :: cache_filename
          integer, intent(out) :: ios
 
-         integer :: io_unit ! use this for file access
+         integer :: io_unit  ! use this for file access
 
          real(dp) :: X_in, Z_in, logT_min_in, logT_max_in, del_logT_in, &
                logQ_min_in, logQ_max_in, del_logQ_in

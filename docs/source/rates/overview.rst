@@ -32,7 +32,7 @@ For each isotope pair, the tables have:
   * positron emission rate
   * electron capture rate
   * total neutrino energy loss rate
- 
+
   * electron emission rate
   * positron capture rate
   * total anti-neutrino energy loss rate

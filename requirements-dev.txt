@@ -1,0 +1,4 @@
+fortitude-lint
+fprettify
+ruff
+sphinx-lint

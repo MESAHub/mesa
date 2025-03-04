@@ -9,7 +9,7 @@ The test checks the functionality of rotation in a 15 Msun, Z=0.02 metallicity m
 
 This test case has three parts.
 
-* Part 1 (``inlist_zams``) creates a 15 Msun pre-main-sequence model and evolves it to the main sequence. 
+* Part 1 (``inlist_zams``) creates a 15 Msun pre-main-sequence model and evolves it to the main sequence.
 
 * Part 2 (``inlist_to_he_burn``) turns on rotation nnd continues the evolution for 500 steps (for test case purposes), ending approximately at core hydrogen depletion.
 
@@ -62,10 +62,8 @@ pgstar commands used for the plots above:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    !file_device = 'png'            ! png
-   !file_extension = 'png'
 
    file_device = 'vcps'          ! postscript
-   file_extension = 'ps'
 
     pgstar_interval = 10
     file_digits = 8

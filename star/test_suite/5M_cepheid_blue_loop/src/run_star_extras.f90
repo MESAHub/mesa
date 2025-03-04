@@ -70,7 +70,7 @@
             have_crossed_red_edge = .false.
             have_crossed_blue_edge = .false.
             call alloc_extra_info(s)
-         else ! it is a restart
+         else  ! it is a restart
             call unpack_extra_info(s)
          end if
       end subroutine extras_startup
