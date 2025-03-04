@@ -23,11 +23,11 @@
       double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1)
       double precision :: br(n), bi(n), alphn, betan
-      
+
       ! LOCALS
       integer :: i, j, k, jm1, mm, imle, ib, hint
       double precision :: abno, alp, bet, sumr, sumi, sums, bb, ffma
-     
+
       ierr = 0
       goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
@@ -325,13 +325,13 @@
       complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
       real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
-      
+
       double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
-      
+
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1)
-      
+
       double precision :: br(n), bi(n), alphn, betan
-      
+
 
 
       goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
