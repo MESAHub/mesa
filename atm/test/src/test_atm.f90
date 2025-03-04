@@ -4,6 +4,8 @@ program test_atm
    use test_atm_support, only: do_test_atm, &
                                test_verbosely, cgrav, eos_handle, kap_handle
 
+   implicit none
+
    logical :: test_verbosely_in
    real(dp) :: cgrav_in
    integer :: eos_handle_in, kap_handle_in
