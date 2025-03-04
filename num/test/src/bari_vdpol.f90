@@ -24,7 +24,6 @@ subroutine vdpol_init(neqn, y, yprime, consis)
    y(1) = 2d0
    y(2) = 0d0
 
-   return
 end subroutine vdpol_init
 
 subroutine vdpol_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
@@ -34,7 +33,6 @@ subroutine vdpol_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
    f(1) = y(2)
    f(2) = ((1 - y(1)*y(1))*y(2) - y(1))/1.0d-3
 
-   return
 end subroutine vdpol_feval
 
 subroutine vdpol_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
@@ -46,15 +44,15 @@ subroutine vdpol_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
    dfdy(2, 1) = (-2.0d0*y(1)*y(2) - 1d0)/1.0d-3
    dfdy(2, 2) = (1d0 - y(1)*y(1))/1.0d-3
 
-   return
 end subroutine vdpol_jeval
 
 subroutine vdpol_solut(neqn, t, y)
    integer :: neqn
    double precision, intent(in) :: t
    double precision, intent(out) :: y(neqn)
+
    ! note -- this is for stiffness param = 1d-3
    y(1) = 1.7632345401889102d+00
    y(2) = -8.3568868191466206d-01
-   return
+
 end subroutine vdpol_solut

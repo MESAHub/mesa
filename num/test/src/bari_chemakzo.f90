@@ -41,7 +41,6 @@ subroutine chemakzo_prob(fullnm, problm, type, neqn, ndisc, t, numjac, mljac, mu
       ind(i) = 0
    end do
 
-   return
 end subroutine chemakzo_prob
 !-----------------------------------------------------------------------
 subroutine chemakzo_init(neqn, y, yprime, consis)
@@ -66,7 +65,6 @@ subroutine chemakzo_init(neqn, y, yprime, consis)
 
    call chemakzo_feval(neqn, 0d0, y, y, yprime, ierr, rpar, ipar)
 
-   return
 end subroutine chemakzo_init
 !-----------------------------------------------------------------------
 subroutine chemakzo_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
@@ -99,7 +97,6 @@ subroutine chemakzo_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
    f(5) = (r2 - r3) + r5
    f(6) = ks*y(1)*y(4) - y(6)
 
-   return
 end subroutine chemakzo_feval
 !-----------------------------------------------------------------------
 subroutine chemakzo_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
@@ -164,7 +161,6 @@ subroutine chemakzo_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
    dfdy(6, 4) = ks*y(1)
    dfdy(6, 6) = -1d0
 
-   return
 end subroutine chemakzo_jeval
 !-----------------------------------------------------------------------
 subroutine chemakzo_meval(ldim, neqn, t, yprime, dfddy, ierr, rpar, ipar)
@@ -180,7 +176,6 @@ subroutine chemakzo_meval(ldim, neqn, t, yprime, dfddy, ierr, rpar, ipar)
 
    dfddy(1, neqn) = 0d0
 
-   return
 end subroutine chemakzo_meval
 !-----------------------------------------------------------------------
 subroutine chemakzo_solut(neqn, t, y)
@@ -214,5 +209,4 @@ subroutine chemakzo_solut(neqn, t, y)
    y(5) = 0.1708010885264404d-1
    y(6) = 0.4873531310307455d-2
 
-   return
 end subroutine chemakzo_solut

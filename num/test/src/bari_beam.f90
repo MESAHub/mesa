@@ -29,28 +29,27 @@ subroutine beam_init(neqn, y, yprime, consis)
       y(i) = 0d0
    end do
 
-   return
 end subroutine beam_init
 ! ----------------------------------------------------------------------
 subroutine beam_feval(nvar, t, th, df, ierr, rpar, ipar)
    use const_def, only: dp
    use math_lib
-   IMPLICIT real(dp) (A - H, O - Z)
+   implicit real(dp) (A - H, O - Z)
    integer :: ierr, nvar, i, ipar(*)
    integer, parameter :: N = 40, NN = 2*N, NSQ = N*N, NQUATR = NSQ*NSQ
    real(dp) :: rpar(*), an, deltas
-   DIMENSION DF(NN), TH(150), U(150), V(150), W(150)
-   DIMENSION ALPHA(150), BETA(150), STH(150), CTH(150)
+   dimension DF(NN), TH(150), U(150), V(150), W(150)
+   dimension ALPHA(150), BETA(150), STH(150), CTH(150)
 ! --- SET DEFAULT VALUES
    if (nvar /= nn) stop 'bad nvar for beam_feval'
    AN = N
    DELTAS = 1.0D+0/AN
 ! ----- CALCUL DES TH(I) ET DES SIN ET COS -------------
-   DO I = 2, N
+   do I = 2, N
       THDIFF = TH(I) - TH(I - 1)
       STH(I) = sin(THDIFF)
       CTH(I) = cos(THDIFF)
-   END DO
+   end do
 ! -------- CALCUL DU COTE DROIT DU SYSTEME LINEAIRE -----
    IF (T > 3.14159265358979324D0) THEN
 ! --------- CASE T GREATER PI ------------
@@ -61,11 +60,11 @@ subroutine beam_feval(nvar, t, th, df, ierr, rpar, ipar)
       DO I = 2, N - 1
          TERM1 = (TH(I - 1) - 2.D0*TH(I) + TH(I + 1))*NQUATR
          V(I) = TERM1
-      END DO
+      end do
 ! ----------- I=N -------------
       TERM1 = (TH(N - 1) - TH(N))*NQUATR
       V(N) = TERM1
-   ELSE
+   else
 ! --------- CASE T LESS EQUAL PI ------------
       FABS = 1.5D0*sin(T)*sin(T)
       FX = -FABS
@@ -79,50 +78,49 @@ subroutine beam_feval(nvar, t, th, df, ierr, rpar, ipar)
          TERM1 = (TH(I - 1) - 2.D0*TH(I) + TH(I + 1))*NQUATR
          TERM2 = NSQ*(FY*cos(TH(I)) - FX*sin(TH(I)))
          V(I) = TERM1 + TERM2
-      END DO
+      end do
 ! ----------- I=N -------------
       TERM1 = (TH(N - 1) - TH(N))*NQUATR
       TERM2 = NSQ*(FY*cos(TH(N)) - FX*sin(TH(N)))
       V(N) = TERM1 + TERM2
-   END IF
+   end if
 ! -------- COMPUTE PRODUCT DV=W ------------
    W(1) = STH(2)*V(2)
    DO I = 2, N - 1
       W(I) = -STH(I)*V(I - 1) + STH(I + 1)*V(I + 1)
-   END DO
+   end do
    W(N) = -STH(N)*V(N - 1)
 ! -------- TERME 3 -----------------
    DO I = 1, N
       W(I) = W(I) + TH(N + I)*TH(N + I)
-   END DO
+   end do
 ! ------- SOLVE SYSTEM CW=W ---------
    ALPHA(1) = 1.D0
    DO I = 2, N
       ALPHA(I) = 2.D0
       BETA(I - 1) = -CTH(I)
-   END DO
+   end do
    ALPHA(N) = 3.D0
    DO I = N - 1, 1, -1
       Q = BETA(I)/ALPHA(I + 1)
       W(I) = W(I) - W(I + 1)*Q
       ALPHA(I) = ALPHA(I) - BETA(I)*Q
-   END DO
+   end do
    W(1) = W(1)/ALPHA(1)
    DO I = 2, N
       W(I) = (W(I) - BETA(I - 1)*W(I - 1))/ALPHA(I)
-   END DO
+   end do
 ! -------- COMPUTE U=CV+DW ---------
    U(1) = V(1) - CTH(2)*V(2) + STH(2)*W(2)
    DO I = 2, N - 1
       U(I) = 2.D0*V(I) - CTH(I)*V(I - 1) - CTH(I + 1)*V(I + 1) - STH(I)*W(I - 1) + STH(I + 1)*W(I + 1)
-   END DO
+   end do
    U(N) = 3.D0*V(N) - CTH(N)*V(N - 1) - STH(N)*W(N - 1)
 ! -------- PUT  DERIVATIVES IN RIGHT PLACE -------------
    DO I = 1, N
       DF(I) = TH(N + I)
       DF(N + I) = U(I)
-   END DO
-   RETURN
+   end do
 end subroutine beam_feval
 ! ----------------------------------------------------------------------
 subroutine beam_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
@@ -132,8 +130,6 @@ subroutine beam_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
 !
 !     dummy subroutine
 !
-
-   return
 end subroutine beam_jeval
 ! ----------------------------------------------------------------------
 subroutine beam_solut(neqn, t, y)
@@ -229,5 +225,4 @@ subroutine beam_solut(neqn, t, y)
    y(79) = 0.1186637618908127D+001
    y(80) = 0.1186724615113034D+001
 
-   return
 end subroutine beam_solut

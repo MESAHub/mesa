@@ -29,7 +29,6 @@ subroutine medakzo_init(neqn, y, yprime, consis)
       y(2*j) = 1d0
    end do
 
-   return
 end subroutine medakzo_init
 !-----------------------------------------------------------------------
 subroutine medakzo_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
@@ -54,10 +53,10 @@ subroutine medakzo_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
    else
       phi = 0d0
    end if
-!
+
    f(1) = (phi - 2d0*y(1) + y(3))*beta/dzeta2 + alpha*(y(3) - phi)/(2d0*dzeta) - k*y(1)*y(2)
    f(2) = -k*y(1)*y(2)
-!
+
    do j = 2, N - 1
       i = 2*j - 1
       zeta = j*dzeta
@@ -69,11 +68,10 @@ subroutine medakzo_feval(neqn, t, y, yprime, f, ierr, rpar, ipar)
       i = 2*j
       f(i) = -k*y(i)*y(i - 1)
    end do
-!
+
    f(2*N - 1) = -k*y(2*N - 1)*y(2*N)
    f(2*N) = -k*y(2*N - 1)*y(2*N)
 
-   return
 end subroutine medakzo_feval
 !-----------------------------------------------------------------------
 subroutine medakzo_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
@@ -83,7 +81,7 @@ subroutine medakzo_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
    integer :: N, i, j
    double precision :: zeta, dzeta, dzeta2, alpha, beta, k, c, dum, bz
    parameter(k=100d0, c=4d0)
-!
+
    do j = 1, neqn
       do i = 1, 5
          dfdy(i, j) = 0d0
@@ -102,7 +100,7 @@ subroutine medakzo_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
    dfdy(2, 2) = -k*y(1)
    dfdy(4, 1) = -k*y(2)
    dfdy(3, 2) = -k*y(1)
-!
+
    do j = 2, N - 1
       i = 2*j - 1
       zeta = j*dzeta
@@ -118,13 +116,12 @@ subroutine medakzo_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
       dfdy(4, i - 1) = -k*y(i)
       dfdy(3, i) = -k*y(i - 1)
    end do
-!
+
    dfdy(3, 2*N - 1) = -k*y(2*N)
    dfdy(2, 2*N) = -k*y(2*N - 1)
    dfdy(4, 2*N - 1) = -k*y(2*N)
    dfdy(3, 2*N) = -k*y(2*N - 1)
 
-   return
 end subroutine medakzo_jeval
 !-----------------------------------------------------------------------
 subroutine medakzo_solut(neqn, t, y)
@@ -550,5 +547,4 @@ subroutine medakzo_solut(neqn, t, y)
    y(399) = 0.0000000000000000d+000
    y(400) = 0.1000000000000000d+001
 
-   return
 end subroutine medakzo_solut
