@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
   release:
   push:
+    branches: ["master"]
   pull_request:
     types: [opened, synchronize, reopened, closed]
 

@@ -26,6 +26,7 @@
       module mod_random
       use const_def, only: dp
 
+      implicit none
 
       contains
 
