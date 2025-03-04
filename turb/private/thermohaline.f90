@@ -105,9 +105,11 @@ contains
          return
       end if
 
-      ! Check for thermohaline instability
+      ! Check for thermohaline instability (this check is skipped for
+      ! the Kippenhahn prescription, because r > 1 still causes mixing
+      ! in that case)
 
-      if (th_info%r > 1._dp) then
+      if (th_info%r > 1._dp .AND. thermohaline_option /= 'Kippenhahn') then
          th_info%mixing_type = no_mixing
          return
       end if
@@ -144,7 +146,7 @@ contains
 
          th_info%D_thrm = 0._dp
          ierr = -1
-         write(*,*) 'unknown for MLT thermohaline_option' // trim(thermohaline_option)
+         write(*,*) 'unknown thermohaline_option' // trim(thermohaline_option)
 
       end select
 
