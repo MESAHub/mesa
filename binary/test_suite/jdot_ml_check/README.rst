@@ -19,14 +19,14 @@ This test case has 1 part. Click to see a larger version of a plot.
    error in separation    7.0519985646485173D-05
 
 
-|br|
+
 Binary period and separation history:
 
 .. image:: ../../../binary/test_suite/jdot_ml_check/docs/grid_000891.svg
    :width: 100%
 
 
-|br|
+
 Abundance and power profiles of star 1 at termination:
 
 .. image:: ../../../binary/test_suite/jdot_ml_check/docs/profile_s1_000891.svg
@@ -34,7 +34,7 @@ Abundance and power profiles of star 1 at termination:
 
 
 
-|br|
+
 pgstar commands used for the binary and star1 plots above:
 
 .. code-block:: console

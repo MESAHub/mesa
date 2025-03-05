@@ -14,7 +14,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plot above:
 
 .. code-block:: console

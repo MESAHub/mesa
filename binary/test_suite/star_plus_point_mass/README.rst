@@ -11,28 +11,28 @@ This test case has 1 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_project``) loads a pre-built 5 Msun zero-age main sequence model as the donor and a 10 Msun point mass as the companion. The binary system has an initial period of 1 day, and is evolved until the central hydrogen mass fraction of the donor drops below 1e-2. Compare the evolutions bewlow with those in :ref:`star_plus_point_mass_explicit_mdot`.
 
 
-|br|
+
 Binary period versus model number:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass/docs/track1_000310.svg
    :width: 100%
 
 
-|br|
+
 Binary separation versus model number:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass/docs/track2_000310.svg
    :width: 100%
 
 
-|br|
+
 Kippenhang diagram of the mass losing donar:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass/docs/kipp_000310.svg
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plots above:
 
 .. code-block:: console

@@ -196,7 +196,6 @@ and you should see a pgstar window appear on your screen:
 .. image:: grid4_000322.svg
    :width: 100%
 
-|br| |br|
 
 Explore Physics Variations
 --------------------------
@@ -229,9 +228,9 @@ Change the nuclear reaction network
 ``new_net_name`` = ``pp_and_cno_extras.net`` (this test suite case), ``basic.net`` (default), ``approx21.net``, and ``mesa_49.net``.
 
 1) Are all the reported values still within their tolerances at the end of a run?
-|br|
+
 2) Are the results for the growth of the convective core mass, HR diagram, and final hydrogen profile the same?
-|br|
+
 3) Why are the results the same or different?
 
 

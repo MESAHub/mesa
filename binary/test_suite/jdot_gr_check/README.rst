@@ -21,14 +21,12 @@ This test case has 1 part. Click to see a larger version of a plot.
   terminate due to beginning of RLO
 
 
-|br|
 Binary period and separation history:
 
 .. image:: ../../../binary/test_suite/jdot_gr_check/docs/grid_000232.svg
    :width: 100%
 
 
-|br|
 pgstar commands used for the plot above:
 
 .. code-block:: console
