@@ -31,29 +31,26 @@
 
       implicit none
 
-
       !..various numerical constants
 
       real(dp), parameter :: con1   = 1.0d0/5.9302d0
 
       !..cv and ca are the vector and axial currents.
 
-      real(dp), parameter :: cv     = 0.5d0 + 2.0d0 * weinberg_theta
-      real(dp), parameter :: cvp    = 1.0d0 - cv
-      real(dp), parameter :: ca     = 0.5d0
-      real(dp), parameter :: cap    = 1.0d0 - ca
-      real(dp), parameter :: tfac1  = cv*cv + ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp+cap*cap)
-      real(dp), parameter :: tfac2  = cv*cv - ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp - cap*cap)
-      real(dp), parameter :: tfac3  = tfac2/tfac1
-      real(dp), parameter :: tfac4  = 0.5d0 * tfac1
-      real(dp), parameter :: tfac5  = 0.5d0 * tfac2
-      real(dp), parameter :: tfac6  = cv*cv + 1.5d0*ca*ca + (num_neu_fam - 1.0d0)*(cvp*cvp + 1.5d0*cap*cap)
+      real(dp), parameter :: cv    = 0.5d0 + 2.0d0 * weinberg_theta
+      real(dp), parameter :: cvp   = 1.0d0 - cv
+      real(dp), parameter :: ca    = 0.5d0
+      real(dp), parameter :: cap   = 1.0d0 - ca
+      real(dp), parameter :: tfac1 = cv*cv + ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp+cap*cap)
+      real(dp), parameter :: tfac2 = cv*cv - ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp - cap*cap)
+      real(dp), parameter :: tfac3 = tfac2/tfac1
+      real(dp), parameter :: tfac4 = 0.5d0 * tfac1
+      real(dp), parameter :: tfac5 = 0.5d0 * tfac2
+      real(dp), parameter :: tfac6 = cv*cv + 1.5d0*ca*ca + (num_neu_fam - 1.0d0)*(cvp*cvp + 1.5d0*cap*cap)
 
-
-
-      real(dp), parameter :: fac1   = 5.0d0 * pi / 3.0d0
-      real(dp), parameter :: fac2   = 10.0d0 * pi
-      real(dp), parameter :: fac3   = pi / 5.0d0
+      real(dp), parameter :: fac1 = 5.0d0 * pi / 3.0d0
+      real(dp), parameter :: fac2 = 10.0d0 * pi
+      real(dp), parameter :: fac3 = pi / 5.0d0
 
 
       type t8s
@@ -79,8 +76,9 @@
 !..maximum error is 4.19d-9.   reference: antia apjs 84,101 1993
 
 !..declare
-      integer          :: i,m1,k1,m2,k2
-      real(dp) :: f,an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
+      real(dp), intent(in) :: f
+      integer :: i,m1,k1,m2,k2
+      real(dp) :: an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
 
 
 !..load the coefficients of the expansion
@@ -126,10 +124,6 @@
       end function ifermi12
 
 
-
-
-
-
       real(dp) function zfermim12(x)
 
 !..this routine applies a rational function expansion to get the fermi-dirac
@@ -137,8 +131,9 @@
 !..reference: antia apjs 84,101 1993
 
 !..declare
-      integer          :: i,m1,k1,m2,k2
-      real(dp) :: x,an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
+      real(dp), intent(in) :: x
+      integer :: i,m1,k1,m2,k2
+      real(dp) :: an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
 
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /-0.5d0, 7, 7, 11, 11/
@@ -175,7 +170,6 @@
             den = den*xx + b1(i)
          enddo
          zfermim12 = xx * rn/den
-!..
       else
          xx = 1.0d0/(x*x)
          rn = xx + a2(m2)
@@ -190,7 +184,6 @@
       end if
 
       end function zfermim12
-
 
 
       subroutine neutrinos(T, logT, Rho, logRho, abar, zbar, log10_Tlim,  &
@@ -922,7 +915,6 @@
          fbremdz = xdendz
 
 
-
    !..equation 5.9
          a0    = 230.0d0 + 6.7d5*t8% t8m2 + 7.66d9*t8% t8m5
          f0    = (-2.0d0*6.7d5*t8% t8m3 - 5.0d0*7.66d9*t8% t8m6)*1.0d-8
@@ -975,7 +967,6 @@
          gbremdd = xnumdd + xdendd
          gbremda = xnumda + xdenda
          gbremdz = xnumdz + xdendz
-
 
 
    !..equation 5.1
@@ -1566,7 +1557,6 @@
          end if
 
 
-
    !..equation 4.1 and 4.5
          splas   = (ft + fl) * fxy
          splasdt = (ftdt + fldt)*fxy + (ft+fl)*fxydt
@@ -1607,7 +1597,6 @@
 
 
       end subroutine plas_neu
-
 
 
       subroutine pair_neu(spair,spairdt,spairdd,spairda,spairdz, input)
@@ -1730,6 +1719,3 @@
 
 
       end module mod_neu
-
-
-

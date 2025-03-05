@@ -91,7 +91,7 @@ contains
 
       Pgas = exp(res(i_lnPgas))
 
-      ! the indices for the results are defined in eos_def.f
+      ! the indices for the results are defined in eos_def.f90
       write (*, '(A)')
       write (*, fmt1) 'temperature', T
       write (*, fmt1) 'density', Rho
@@ -116,7 +116,7 @@ contains
          Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
          res, d_dlnd, d_dlnT, d_dxa, ierr)
 
-      ! the indices for the results are defined in eos_def.f
+      ! the indices for the results are defined in eos_def.f90
       write (*, '(A)')
       write (*, fmt1) 'temperature', T
       write (*, fmt1) 'Pgas', Pgas
