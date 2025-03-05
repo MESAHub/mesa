@@ -455,6 +455,8 @@
                val = safe_log10(L_rad/s% L(k))
             case (p_log_Lrad_div_Ledd)
                val = safe_log10(get_Lrad_div_Ledd(s,k))
+            case (p_Lrad_div_Ledd)
+               val = get_Lrad_div_Ledd(s,k)
 
             case (p_log_g)
                val = safe_log10(s% grav(k))
