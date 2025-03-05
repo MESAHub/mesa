@@ -102,12 +102,14 @@ module turb
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
-      type(auto_diff_real_star_order1) :: L, grav, Lambda, Gamma
+      type(auto_diff_real_star_order1) :: L, grav, Lambda, Gamma, Lrad_div_Ledd
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2  ! Threshold in logY for separating multiple solutions.
       type(auto_diff_real_tdc) :: Zub, Zlb
+!      type(auto_diff_real_star_order1) :: current_gradr, L_rad, L_Edd, gradr_new_real
+
       include 'formats'
 
       ! Do a call to MLT
@@ -146,13 +148,25 @@ module turb
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
 
 !  current_gradr = grada + Y_face
-!  grav_val = cgrav * m / (r%val**2)
-!  L_rad = 64d0 * pi * boltz_sigma * T%val**4 * grav_val * r%val**2 * current_gradr / (3d0 * P%val * opacity%val)
-!  L_Edd = 4d0 * pi * clight * cgrav * m / (opacity%val)
-!  if (L_rad > L_Edd) then
-!     gradr_new = (3d0 * P%val * opacity%val * L_Edd) / (64d0 * pi * boltz_sigma * T%val**4 * grav_val * r%val**2)
+!  L_rad = 64d0 * pi * boltz_sigma * pow4(T) * grav_val * pow2(r) * current_gradr / (3d0 * P * opacity)
+  !L_Edd = 4d0 * pi * clight * cgrav * m / (opacity)
+!Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
+!  if (L > L_Edd) then
+!     gradr_new = (3d0 * P * opacity * L_Edd) / (64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(rval))
 !     Y_face = gradr_new - grada
 !  end if
+
+!
+!! Cap conv_vel at max_conv_vel_div_csound*cs
+!     if (conv_vel%val > max_conv_vel) then
+!        conv_vel = max_conv_vel
+!        ! if max_conv_vel = csound,
+!        ! L = L0 * (gradL + Y) + c0 * Af * Y_env
+!        ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
+!        ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
+!        Y_face = unconvert(info%L - info%L0 * info%gradL) / (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
+!     end if
+
 
       ! Unpack output
       gradT = Y_face + gradL

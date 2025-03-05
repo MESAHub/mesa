@@ -20,7 +20,7 @@
       
       ! turn on hydrodynamics
       change_v_flag = .true.
-      new_v_flag = .true.
+      new_v_flag = .false.
 
       ! Can be adopted to avoid issues with surface for high Z or during advanced burning
       !relax_to_this_tau_factor = 1.5d6
@@ -61,8 +61,12 @@
 / ! end of kap namelist
 
 &controls
+delta_lg_star_mass_limit = 1d-2
 
-!mlt_Pturb_factor = 1d1
+use_other_wind = .true.
+x_ctrl(18) = 1.0e0 !fudge factor / efficiency factor for eruptive mass loss other_wind model
+!min_wind = 1e-8
+!mlt_Pturb_factor = 1d0
 
 ! wind
       ! Dutch scaling factor set in inlist_mass_Z_wind_rotation      
@@ -77,7 +81,7 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 2 ! easy to lower with mass loss!ideally 1.5 is most physical
+      Pextra_factor = 1 ! easy to lower with mass loss!ideally 1.5 is most physical
       ! if you run into issues, you can increase Pextra 
       ! extra pressure helps stabilize the atmosphere during core He burning +
      
@@ -105,7 +109,7 @@
       alpha_TDC_DAMPR = 0d0 ! 0d0 is default for mlt limit
 
 
-      use_other_alpha_mlt = .true. ! implemented in run_star_extras
+      use_other_alpha_mlt = .false. ! implemented in run_star_extras
       x_ctrl(21) = 3.0 ! alpha_H
       x_ctrl(22) = 1.5 ! alpha_other
       x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
@@ -127,7 +131,7 @@
 ! typically only necessary at higher metallicities 1/5 solar +
 
       ! superadiabatic reduction, implicit, new
-      use_superad_reduction = .true.
+      use_superad_reduction = .false.
       superad_reduction_Gamma_limit = 0.5d0 !default is 0.5d0
       superad_reduction_Gamma_limit_scale = 5d0
       superad_reduction_Gamma_inv_scale = 5d0
@@ -323,7 +327,7 @@
       max_abs_rel_run_E_err = 1d-2
 
       energy_eqn_option = 'dedt'
-      max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run     
+      max_tries_for_implicit_wind = 10!0 ! Recommend 10 for a production run     
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .false.

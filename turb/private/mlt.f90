@@ -76,6 +76,12 @@ contains
          Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
          f, f0, f1, f2, radiative_conductivity, convective_conductivity
+
+!! --- New local variables for radiative luminosity check ---
+!type(auto_diff_real_star_order1) :: current_gradr, gradr_new
+!type(auto_diff_real_star_order1) :: L_rad, L_Edd
+!real(dp) :: L_rad_val, L_Edd_val
+
       include 'formats'
       if (gradr > gradL) then
          ! Convection zone
@@ -127,6 +133,28 @@ contains
 
          ! 'B' param  C&G 14.81
          Bcubed = (pow2(A)/a0)*(gradr - gradL)
+
+!! --- NEW BLOCK: Limit the radiative luminosity ---
+!  ! We now want to check that the radiative flux does not exceed the Eddington limit.
+!  ! Compute current radiative gradient:
+!  current_gradr = gradr  ! In MLT, gradr is the radiative gradient input
+!  ! Compute L_rad via diffusion:
+!  ! L_rad = 64 * pi * boltz_sigma * T^4 * grav * r^2 * current_gradr / (3 * P * opacity)
+!  L_rad = (64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * current_gradr) / (convert(3d0) * P * opacity)
+!  ! For the Eddington luminosity, use:
+!  ! L_Edd = 4 * pi * clight * cgrav * m / opacity
+!  L_Edd = (4d0 * pi * clight * convert(cgrav * m)) / opacity
+!
+!  ! Compare the underlying values:
+!  L_rad_val = L_rad%val
+!  L_Edd_val = L_Edd%val
+!  if (L_rad_val > L_Edd_val) then
+!     ! Compute new radiative gradient gradr_new that would yield L_rad = L_Edd:
+!     gradr_new = (convert(3d0) * P * opacity * L_Edd) / (64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
+!     ! Replace gradr with gradr_new.
+!     gradr = gradr_new
+!  end if
+!  ! --- End NEW block ---
 
          ! now solve cubic equation for convective efficiency, Gamma
          ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82,

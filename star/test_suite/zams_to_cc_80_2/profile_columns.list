@@ -410,14 +410,14 @@
 !# Energetics
    total_energy ! specific total energy of cell (ergs/g). internal+potential+kinetic+rotation.
    !cell_specific_IE
-   !cell_specific_KE
+   cell_specific_KE
    !cell_IE_div_IE_plus_KE
    !cell_KE_div_IE_plus_KE
 
    !cell_ie_div_star_ie
    !cell_internal_energy_fraction
    !cell_internal_energy_fraction_start
-   !cell_specific_PE
+   cell_specific_PE
 
    !log_cell_ie_div_star_ie
    !log_cell_specific_IE

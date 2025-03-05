@@ -306,7 +306,7 @@
              if (ierr /= 0) return
              p_turb_over_ptopHp = 0d0
              p_turb = 0d0
-			 Hpidxarr = minloc(abs(s% Pgas(sc_top:s% nz)-(s% Pgas(sc_top)*eulernum)))
+			 Hpidxarr = minloc(abs(s% Pgas(sc_top:s% nz)-(s% Pgas(sc_top)*2.71828d0)))
 			 Hpidx = Hpidxarr(1)+sc_top
 			 !write(*,*) 'Pgas at top', s% Pgas(sc_top)
 			 !write(*,*) 'Pgas at top div e', s% Pgas(sc_top)*2.71828d0
@@ -409,7 +409,7 @@
              integer, intent(out) :: ierr
 			 integer :: Hpidxarr(1)
 			 integer :: Hpidx
-             real(dp) :: v_max, v_aver, b_eq, b_max, rho_aver, rho_v_max
+             real(dp) :: v_max, v_aver, b_eq, b_max, rho_aver, rho_v_max, pi
              integer :: n, k, sc_top, sc_bottom, i_v_max
              include 'formats'
 
@@ -417,7 +417,7 @@
              call star_ptr(id, s, ierr)
              if (ierr /= 0) return
 
-             !pi = 3.1415
+             pi = 3.1415
              v_max = 0d0
              v_aver = 0d0
              rho_aver = 0d0
@@ -427,7 +427,7 @@
              i_v_max = 0
              rho_v_max = 0d0
              ! Calculate Max and average V_conv in Conv region (average in dr, see Eq. 6 in Cantiello et al. 2009)
-			 Hpidxarr = minloc(abs(s% Pgas(sc_top:s% nz)-(s% Pgas(sc_top)*eulernum)))
+			 Hpidxarr = minloc(abs(s% Pgas(sc_top:s% nz)-(s% Pgas(sc_top)*2.71828d0)))
 			 Hpidx = Hpidxarr(1)+sc_top
 
              if ( sc_top > 0 ) then
@@ -544,9 +544,10 @@
 			
 			
             subroutine get_F0(rho, radius, bruntN2, F0)
-                 real(dp) ::  F0, rho, radius, bruntN2
+                 real(dp) ::  F0, rho, radius, bruntN2, pi
+                 pi = 3.1415
                  ! F0 = 0.5d0 * rho * (bruntN2**0.5)/(2d0*pi) * radius**3d0 * (1/turnover)**2d0
-                 F0 = (1d0/2d0) * rho * (sqrt(bruntN2))/(2d0*pi) * radius**3d0
+                 F0 = 0.5d0 * rho * (bruntN2**0.5)/(2d0*pi) * radius**3d0
             end subroutine get_F0
 			
 			
@@ -575,188 +576,8 @@
 		        r = sum((y(1+1:n-0) + y(1+0:n-1))*(x(1+1:n-0) - x(1+0:n-1)))/2
 		      end associate
 		    end function
-!
-!
-!subroutine get_mloss_forwind(id, ierr, testsize, mdot_erupt)
-!   ! Same arguments as original
-!   type(star_info), pointer :: s
-!   integer, intent(in)       :: testsize, id
-!   integer, intent(out)      :: ierr
-!   integer                  :: taucritidxarr(1)
-!   integer                  :: taucritidx
-!   integer                  :: i, mlost_loc
-!
-!   real(dp) :: mlost_final, tdyn_final, masslossres, mdot_erupt
-!   real(dp) :: denom, frac
-!
-!   ! Arrays as before
-!   real(dp), dimension(testsize) :: t_dyn_test, L_excess_test, E_excess_test
-!   real(dp), dimension(testsize) :: masked, masked2, E_diff
-!   real(dp), dimension(testsize) :: E_excess_final, E_binding_final, M_above, Mloss
-!   !
-!   ! Here we add a small array for the local critical tau criterion
-!   real(dp), dimension(testsize) :: ccrit
-!
-!   include 'formats'  ! your same include
-!
-!   ierr = 0
-!   call star_ptr(id, s, ierr)
-!   if (ierr /= 0) return
-!
-!   ! ------------------------------
-!   ! 1) Find index for "critical optical depth" as before
-!   ! ------------------------------
-!   taucritidxarr = minloc( abs( s%tau(1:s%nz) - ( clight / ( s%csound(1:s%nz) ) ) ) )
-!   taucritidx     = taucritidxarr(1)
-!
-!   ! ------------------------------
-!   ! 2) Build local array ccrit(i) = clight / csound(i)
-!   !    so we can do partial-zone checks easily.
-!   ! ------------------------------
-!   do i = 1, s%nz
-!      ccrit(i) = clight / s%csound(i)
-!   end do
-!
-!   ! ------------------------------
-!   ! 3) Initialize arrays
-!   ! ------------------------------
-!   do i = 1, s%nz
-!      t_dyn_test(i)    = 0d0
-!      L_excess_test(i) = 0d0
-!      E_excess_test(i) = 0d0
-!   end do
-!
-!   ! ------------------------------
-!   ! 4) Calculate dynamical time, L_excess, E_excess
-!   ! ------------------------------
-!   t_dyn_test(1:s%nz) = sqrt( (s%r(1:s%nz)**3) / (standard_cgrav * s%m(1:s%nz)) )
-!
-!   L_excess_test(1:s%nz) = (s%L(1:s%nz)) - (s%L_conv(1:s%nz))  &
-!&                 - ( pi4 * clight * s%cgrav(1:s%nz) * s%m_grav(1:s%nz) / (s%opacity(1:s%nz)) )
-!
-!   E_excess_test(1:s%nz) = L_excess_test(1:s%nz) * t_dyn_test(1:s%nz)
-!
-!   ! ------------------------------
-!   ! 5) Mask out negative E_excess -> masked2
-!   ! ------------------------------
-!   where (E_excess_test < 0d0)
-!      masked2 = 0d0
-!   elsewhere
-!      masked2 = E_excess_test
-!   end where
-!
-!   ! ------------------------------
-!   ! 6) Mask out zones where tau(i) > ccrit(i)
-!   !    i.e. tau above the threshold => no contribution
-!   ! ------------------------------
-!   where ( s%tau(1:s%nz) > ccrit(1:s%nz) )
-!      masked = 0d0
-!   elsewhere
-!      masked = masked2
-!   end where
-!
-!   ! ======================================================
-!   ! 7) PARTIAL-ZONE STEP:
-!   !    If there is a crossing inside a zone, linearly
-!   !    interpolate so that only 'frac' of that zone is kept.
-!   !    This avoids an abrupt 0 vs. entire zone flip.
-!   ! ======================================================
-!   do i = 1, s%nz-1
-!
-!      ! Check if there's a sign change in [tau(i)-ccrit(i)] vs.
-!      ! [tau(i+1)-ccrit(i+1)] => crossing of tau_crit in the interior
-!      if ( ( s%tau(i)   - ccrit(i) ) *  &
-!&                 ( s%tau(i+1) - ccrit(i+1) ) < 0d0 ) then
-!
-!         ! denom = [ (tau(i) - ccrit(i)) - (tau(i+1) - ccrit(i+1)) ]
-!         denom = ( s%tau(i)   - ccrit(i) ) -  &
-!&                     ( s%tau(i+1) - ccrit(i+1) )
-!
-!         frac  = 0d0
-!         if ( abs(denom) > 1d-30 ) then
-!            ! Simple linear interpolation fraction
-!            frac = ( s%tau(i) - ccrit(i) ) / denom
-!         end if
-!
-!         ! Clamp fraction to [0, 1]
-!         if (frac < 0d0) frac = 0d0
-!         if (frac > 1d0) frac = 1d0
-!
-!         ! We can decide which zone gets the partial coverage.
-!         ! Typically we want the shallower zone i+1 to keep only '1-frac'
-!         ! or 'frac', depending on how tau is laid out.  A simpler approach:
-!         ! If masked(i+1) was originally nonzero, multiply by frac.
-!         ! This is a minimal addition: just partial coverage
-!         masked(i+1) = masked(i+1) * frac
-!         ! Optionally, if you want partial coverage in zone i:
-!         !   masked(i)   = masked(i)   * (1d0 - frac)
-!         ! But the simplest fix is just to scale i+1, so you do
-!         ! not get the entire zone i+1 turned on abruptly.
-!
-!      end if
-!   end do
-!
-!   ! ------------------------------------------------
-!   ! 8) Integrate "excess" from surface to critical tau
-!   !    using your same "integrate(...)" approach
-!   ! ------------------------------------------------
-!   do i = 1, s%nz-1
-!      E_excess_final(s%nz+1 - i) = -1d0 * integrate( &
-!&                    s%m(s%nz-i:s%nz), masked(s%nz-i:s%nz) )  &
-!&               / abs( s%m(s%nz+1 - i) - s%m(taucritidx) )
-!   end do
-!
-!   ! ------------------------------------------------
-!   ! 9) Compute binding E, mass above, same as original
-!   ! ------------------------------------------------
-!   do i = 1, s%nz-1
-!      E_binding_final(i) = SUM( standard_cgrav*s%m(1:i)*s%dm(1:i) / s%r(1:i) )
-!      M_above(i)         = ( s%m(1) - s%m(i) ) / Msun
-!   end do
-!
-!   ! Patch up first/last array elements
-!   E_excess_final(1)      = E_excess_final(2)
-!   E_binding_final(s%nz)  = E_binding_final(s%nz-1)
-!   M_above(s%nz)          = ( s%m(1) - s%m(s%nz) ) / Msun
-!
-!   ! ------------------------------------------------
-!   ! 10) E_diff = E_excess - E_binding
-!   ! ------------------------------------------------
-!   E_diff = E_excess_final - E_binding_final
-!
-!   ! ------------------------------------------------
-!   ! 11) Mloss definition: if E_diff>0 => M_above, else 0
-!   ! ------------------------------------------------
-!   where ( E_diff > 0d0 )
-!      Mloss = M_above
-!   elsewhere
-!      Mloss = 0d0
-!   end where
-!
-!   ! Force zero at the critical index
-!   Mloss(taucritidx) = 0d0
-!
-!   ! ------------------------------------------------
-!   ! 12) Final mass lost is max of Mloss
-!   ! ------------------------------------------------
-!   mlost_loc   = MAXLOC(Mloss, DIM=1)
-!   mlost_final = MAXVAL(Mloss)
-!
-!   tdyn_final  = t_dyn_test(mlost_loc) / secyer  ! [years]
-!   masslossres = mlost_final / tdyn_final        ! Msun/yr
-!   mdot_erupt  = masslossres
-!
-!   ! Store some extras
-!   s%xtra(7)  = M_above(taucritidx)
-!   s%xtra(8)  = mlost_final
-!   s%xtra(9)  = tdyn_final
-!   s%xtra(10) = mlost_loc
-!
-!end subroutine get_mloss_forwind
 
-
-
-
+			
             subroutine get_mloss_forwind(id,ierr, testsize,mdot_erupt)
 				 type (star_info), pointer :: s
 				 integer, intent(in) :: testsize, id
@@ -767,85 +588,85 @@
 				 real(dp) :: mlost_final, tdyn_final, masslossres, tdyn_final_alt, masslossres_alt, mdot_erupt
                  real(dp), dimension(testsize) ::  t_dyn_test, L_excess_test, E_excess_test, E_excess_pos, masked, masked2, E_diff, E_excess_final, E_binding_final, E_diff_masked, M_above, mdot_loss, Mloss
 				 include 'formats'
-
+				 
                  ierr = 0
                  call star_ptr(id, s, ierr)
                  if (ierr /= 0) return
-
+				 
 				 !Find the index at which critical optical depth occurs
 				 taucritidxarr = minloc(abs(s% tau(1:s% nz)-(clight/(s% csound(1:s% nz)))))
 				 taucritidx = taucritidxarr(1)
-
+				 
 				 !Initialize arrays
 				 do i  =1,s% nz
 				    t_dyn_test(i) = 0d0
 					L_excess_test(i) = 0d0
 					E_excess_test(i) = 0d0
 				 end do
-
-				 !Calculate dynamical time, excess Luminosity, and excess Energy.
-				 t_dyn_test = sqrt((s% r(1:s% nz))**3/(standard_cgrav*s% m(1:s% nz)))
-				 L_excess_test = s% xtra1_array(1:s%nz) !(s% L(1:s% nz)) - s% L_conv(1:s% nz) - (pi4*clight*s% cgrav(1:s% nz)*s% m_grav(1:s% nz)/(s% opacity(1:s% nz)))
+                 
+				 !Calculate dynamical time, excess Luminosity, and excess Energy. 
+				 t_dyn_test = ((s% r(1:s% nz))**3/(6.674e-8*s% m(1:s% nz)))**(1.0/2.0)
+				 L_excess_test = (s% L(1:s% nz)) - s% L_conv(1:s% nz) - (pi4*clight*s% cgrav(1:s% nz)*s% m_grav(1:s% nz)/(s% opacity(1:s% nz)))
 				 E_excess_test = L_excess_test*t_dyn_test
-
+				 
 				 !Mask out negative excess Energy
 				 where (E_excess_test < 0)
 					 masked2 = 0
 				elsewhere
 					masked2 = E_excess_test
 				end where
-
+				
 				!Mask out where tau < critical tau
 				where ((s% tau(1:s% nz)) > (clight/(s% csound(1:s% nz))))
-					masked = 0
-				elsewhere
+					masked = 0 
+				elsewhere 
 					masked = masked2
 				end where
-
-				!Calculate total excess energy from surface to critical tau
+				
+				!Calculate total excess energy from surface to critical tau 
 				do i  =1,s% nz-1
 					E_excess_final(s% nz+1-i) = -1*integrate(s% m(s% nz-i:s% nz), masked(s% nz-i:s% nz))/ABS(s% m(s% nz+1-i)-s% m(taucritidx)) !mass method
 				end do
-
+				
 				!Find binding energy, mass above
 				do i = 1, s% nz-1
-					E_binding_final(i) = SUM(standard_cgrav*s% m(1:i)*s% dm(1:i)/s% r(1:i)) !still right way, surface first
-					M_above(i) = (s% m(1) - s% m(i))/Msun
+					E_binding_final(i) = SUM(6.674e-8*s% m(1:i)*s% dm(1:i)/s% r(1:i)) !still right way, surface first
+					M_above(i) = (s% m(1) - s% m(i))/1.9884098706980504d33
 				end do
-
+				
 				!Patch up first element of arrays
 				E_excess_final(1) = E_excess_final(2)
 				E_binding_final(s% nz) = E_binding_final(s% nz-1)
-				M_above(s% nz) = (s% m(1) - s% m(s% nz))/Msun
-
+				M_above(s% nz) = (s% m(1) - s% m(s% nz))/1.9884098706980504d33
+				
 				!Define energy difference between excess (due to local supereddington L) and binding
 				E_diff = E_excess_final-E_binding_final
-
+				
 				!Define total lost mass. Hack-like filtering for where E_diff < 0.
 			 	where (E_diff > 0)
 				 	Mloss = M_above
 				elsewhere
 					Mloss = 0d0
 				end where
-
+				
 				Mloss(taucritidx) = 0d0
-
+				
 				!Find indices
 				mlost_loc = MAXLOC(Mloss, DIM=1) !E_diff < 0 was set to 0d0 earlier, so can use max() now. Location at first E_diff > 0 location more shallow than critical tau.
 				mlost_final = MAXVAL(Mloss) !Final mass lost
-
-				tdyn_final = t_dyn_test(mlost_loc)/secyer!3.17098d-8 !years
+				
+				tdyn_final = t_dyn_test(mlost_loc)*3.17098d-8 !years
 
 				masslossres = mlost_final/tdyn_final !Msun/yr
-
+				
 			 	mdot_erupt = masslossres
-
+			
 			 s% xtra(7) = M_above(taucritidx)
 			 s% xtra(8) = mlost_final
 			 s% xtra(9) = tdyn_final
 			 s% xtra(10) = mlost_loc
-
-
+			 
+			
             end subroutine get_mloss_forwind
 			
 			
@@ -886,15 +707,10 @@
 			   
                T_high = 11000
                T_low = 10000
-			   T_decin = 4000
                if (s% Dutch_scaling_factor == 0) then
                   wind = 0
                else if (T1 <= T_low) then
-				   if (T1 > T_decin) then
-				  	 call eval_lowT_Dutch(wind)
-				   else
-					 call eval_decin_wind(wind)
-				 end if 
+                  call eval_lowT_Dutch(wind)
                else if (T1 >= T_high) then
                   call eval_highT_Dutch(wind)
                else ! transition
@@ -1406,7 +1222,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 138+5
+         how_many_extra_history_columns = 138
       end function how_many_extra_history_columns
       
       
@@ -1458,25 +1274,6 @@
          real(dp) :: F0
          real(dp) :: HI_p_turb_over_p, HeI_p_turb_over_p, HeII_p_turb_over_p, FeCZ_p_turb_over_p, HI_p_turb_over_ptopHp
 		 real(dp) :: mdot_erupt, mdot_dutch
-
-         !! now NEW columns
-         !! ============ NEW PHOTON TIRING COLUMNS ============
-         !integer :: iNew1, iNew2, iNew3, iNew4
-         !real(dp) :: kap, ledd, gamma_o, Lo, Mstar, Rstar, cgrav, mm, leftoverL
-         !
-
-         integer :: iNew1, iNew2, iNew3, iNew4,iNew_ex,iNew_bind, iNew_lum, iNew_m,iNew_mdot
-         integer :: nz, k_stop
-         real(dp) :: cum_excess, cum_bind, mass_accum, photon_tiring_mdot_cgs,photon_tiring_mdot_msunyr
-         real(dp) :: dt_sum, avg_excess, avg_bind, avg_dt
-         real(dp) :: dtLoc, L_excess_loc
-         real(dp) :: DeltaM, tiring_m, leftover_lum
-         ! for safety:
-         real(dp) :: Mbase, Rbase, Lbase, cgrav, Mdot_tot
-         real(dp) :: numerator
-         real(dp) :: totmass_cgs, dt_yrs, dt_cgs
-         real(dp) :: Mdot_cgs, Lrad_avg, cum_L, avg_Lrad
-
 		 
 		 integer, intent(out) :: ierr
          integer ::  i, j, k, m, num_conv_regions, sc1_top, sc2_top, sc3_top, sc4_top
@@ -2065,13 +1862,13 @@
 		
 		gamidx = gamidxarr(1)
 		
-		Hpidxtotarr = minloc(abs(s% Pgas(1:s% nz)-(s% Pgas(1)*eulernum)))
+		Hpidxtotarr = minloc(abs(s% Pgas(1:s% nz)-(s% Pgas(1)*2.71828d0)))
 		Hpidxtot = Hpidxtotarr(1)
 		
 		
 		call get_mloss_forwind(id, ierr, s% nz, mdot_erupt)
 		
-		t_dyn_test = ((s% r(1))**3/(standard_cgrav*s% m(1)))**(1.0/2.0)
+		t_dyn_test = ((s% r(1))**3/(6.674e-8*s% m(1)))**(1.0/2.0)
 		L_excess_test = (s% L(1)) - (pi4*clight*s% cgrav(1)*s% m_grav(1)/(s% opacity(1)))
 		E_excess_test = L_excess_test*t_dyn_test
 		
@@ -2144,177 +1941,6 @@
 		write(*,*) 'mlost_loc', s% xtra(10)
 
 	
-!
-!! ============ NEW PHOTON TIRING COLUMNS =============
-!!
-!! We'll store:
-!!  (1) photon_tiring_mdot : an approximate max Mdot = (1 - 1/Gamma_o)* (R * L / GM )
-!!  (2) l_obs_approx       : leftover luminosity ~ L / (1 + m * Gamma_o ) or your chosen formula
-!!  (3) mdot_total_applied : s%xtra(3)  (the total wind used)
-!!  (4) mdot_erupt_only    : s%xtra(5)  (the eruptive piece from "get_mloss_forwind")
-!
-!iNew1 = 139
-!iNew2 = 140
-!iNew3 = 141
-!iNew4 = 142
-!
-!kap    = s% opacity(1)
-!cgrav  = standard_cgrav
-!Mstar  = s% m(1)
-!Rstar  = s% r(1)
-!Lo     = s% L(1)
-!ledd   = 4d0*pi*cgrav*Mstar*clight / kap
-!gamma_o= Lo / ledd
-!
-!if (gamma_o <= 1d0) then
-!   vals(iNew1) = 0d0
-!else
-!   vals(iNew1) = (1d0 - 1d0/gamma_o)*( Rstar * Lo /( cgrav * Mstar ) )
-!endif
-!names(iNew1) = 'mdot_tiring_lim'
-!
-!mm = (abs(s% star_mdot)*cgrav*Mstar)/( Rstar*Lo )
-!leftoverL = Lo/(1d0 + mm*gamma_o)
-!vals(iNew2) = leftoverL
-!names(iNew2) = 'Lobs_tiring'
-!
-!vals(iNew3)  = s% xtra(3)
-!names(iNew3) = 'mdot_total_applied'
-!
-!vals(iNew4)  = s% xtra(5)
-!names(iNew4) = 'mdot_erupt_only'
-!
-!! done
-
-
-! ============================
-! NEW PHOTON‐TIRING COLUMNS FOR MULTI‐LAYER LOGIC
-! now we also compute a "photon_tiring_mdot"
-! ============================
-
-! Suppose we store them in columns #139..#143:
- iNew_m   = 139
-iNew_lum = 140
-iNew_ex  = 141
-iNew_bind= 142
- iNew_mdot= 143
-
-nz = s% nz
-
-! same accumulators as "other_adjust_mdot" logic
-cum_excess = 0d0
-cum_bind   = 0d0
-mass_accum = 0d0
-dt_sum     = 0d0
-cum_L = 0d0
-k_stop     = -1
-
-! loop from surface k=1 inward until tau >= c/csound
-do k = 1, nz
-   if ( s%tau(k) >= clight/s%csound(k) ) then
-      k_stop = k
-      exit
-   end if
-
-! Stop integrating if tau drops below the critical value
-if (s%tau(k) >= clight/s%csound(k) ) exit
-
-   ! local dynamical time
-   dtLoc = sqrt( (s%r(k)**3) / (standard_cgrav * s%m(k)) )
-
-   ! your “(L_rad - L_edd)” or whichever we store in xtra1_array:
-   L_excess_loc = s% xtra1_array(k)
-   if (L_excess_loc < 0d0) L_excess_loc = 0d0
-
-   cum_excess = cum_excess + L_excess_loc * s% dm(k) !  * dtLoc
-   cum_L = cum_L + (s% L(k) - s% L_conv(k)) * s% dm(k) !  * dtLoc
-   cum_bind   = cum_bind   - (standard_cgrav * s% m(k)/s% r(k)) * s% dm(k)
-   mass_accum = mass_accum + s% dm(k)
-   dt_sum     = dt_sum     + dtLoc * s% dm(k)
-end do
-
-if (mass_accum > 0d0) then
-   avg_excess = cum_excess/mass_accum  ! [erg]![erg/g]
-   avg_Lrad = cum_L/mass_accum  ! [erg]![erg/g]
-   avg_bind   = cum_bind  /mass_accum  ! [erg]![erg/g] negative
-   avg_dt     = dt_sum   /mass_accum   ! [seconds]
-else
-   avg_excess = 0d0
-   avg_bind   = 0d0
-   avg_dt     = 0d0
-end if
-
-! define how much mass is ejected (just like your eruptive scheme)
-if (avg_excess > abs(avg_bind)) then
-   if (k_stop>0) then
-      DeltaM = (s%m(1) - s%m(k_stop))/Msun
-   else
-      DeltaM = 0d0
-   end if
-else
-   DeltaM = 0d0
-end if
-
-! Compute an approximate luminosity driving the multi‐layer
-! i.e. from the integrated/averaged "excess" energy
-totmass_cgs = mass_accum           ! in grams
-!dt_cgs      = max(avg_dt, 1d-30)   ! seconds
-Lbase       = avg_Lrad ! avg_excess / s% dt(k)! we want the actual average L excess !dt_cgs !  [erg/s]   !* totmass_cgs / dt_cgs  ! [erg/s]
-
-! pick a “base” radius & mass from the location k_stop
-if(k_stop>0 .and. k_stop<=nz) then
-   Mbase = s% m(k_stop)  ! g
-   Rbase = s% r(k_stop)  ! cm
-else
-   Mbase = 1d0
-   Rbase = 1d0
-end if
-
-!  star_mdot is Msun/yr => for the star’s ACTUAL Mdot in run
-Mdot_tot = abs(s% star_mdot)  ! Msun/yr
-Mdot_cgs = Mdot_tot * Msun / secyer  ! g/s
-
-! define photon‐tiring param for multi‐layer approach:
-!   m_multi = [Mdot( actual ) * (G Mbase / Rbase)] / Lbase
-numerator = Mdot_cgs * (standard_cgrav*Mbase) / Rbase  ! erg/s
-!numerator = Mdot_cgs * (standard_cgrav*s% m(1)) / s%r(1)  ! erg/s
-
-if(Lbase>1d0) then
-   tiring_m = numerator / Lbase
-   leftover_lum = Lbase - numerator
-else
-   ! fallback => no net reservoir
-   tiring_m = -1d0
-   leftover_lum = -1d0
-end if
-
-write (*,*) 'Lbase', Lbase
-
-! now define the “photon‐tiring mass‐loss rate” => the max Mdot if entire Lbase is used
-if (Lbase>1d0) then
-   photon_tiring_mdot_cgs = Lbase / ( standard_cgrav*Mbase / Rbase )  ! g/s
-!   photon_tiring_mdot_cgs = Lbase / ( standard_cgrav*s% m(1) / s% r(1) )  ! g/s
-   photon_tiring_mdot_msunyr = photon_tiring_mdot_cgs / Msun * secyer
-else
-   photon_tiring_mdot_msunyr = 0d0
-end if
-
-! store them in new columns
-vals(iNew_m)     = tiring_m
-names(iNew_m)    = 'm_tiring_multi'
-
-vals(iNew_lum)   = leftover_lum
-names(iNew_lum)  = 'leftover_lum_multi'
-
-vals(iNew_ex)    = avg_excess
-names(iNew_ex)   = 'avg_excess_multi'
-
-vals(iNew_bind)  = avg_bind
-names(iNew_bind) = 'avg_bind_multi'
-
-vals(iNew_mdot)  = photon_tiring_mdot_msunyr
-names(iNew_mdot) = 'mdot_tiring_multi'
-
       end subroutine data_for_extra_history_columns
 
       
@@ -2350,8 +1976,6 @@ names(iNew_mdot) = 'mdot_tiring_multi'
 		 names(4) = "Ledd_electron"
 		 names(5) = "Gamma_opacity"
 		 names(6) = "Gamma_electron"
-         names(7) = 'pseudoMach'
-
 		 !names(7) = 'opacity_test'
          do k=1,s% nz
          vals(k,1) = 4d0*crad/3d0*pow4(s% T(k))/s% Peos(k)*s%gradT(k)
@@ -2361,7 +1985,7 @@ names(iNew_mdot) = 'mdot_tiring_multi'
 		 vals(k,5) = s% L(k) / vals(k,3)
 		 vals(k,6) = s% L(k) / vals(k,4)
 		 ! vals(k,7) = pi4*clight*s% cgrav(k)*s% m_grav(k)/(*Lsun)
-         vals(k,7)  = s% xtra1_array(k)
+		 
          end do
          
       end subroutine data_for_extra_profile_columns

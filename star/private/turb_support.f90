@@ -199,12 +199,13 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, pseudoMach, Psi, opacity, gradr
-      real(dp) :: conv_vel_start, scale
+      real(dp) :: conv_vel_start, scale, eta_edd, eta_factor
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit, mu
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
-         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled
+         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, L_excess, e_bind, delta_Mdot, &
+         t_dyn, L_rad
 
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -222,11 +223,26 @@ contains
          gradL = grada
       end if
 
-      !mu = 0d0
+      ! Initialize variables for mass loss
+      L_excess = 0d0 ! ultimately L_excess = max(L_rad - Ledd,0)
+      L_rad = 0d0
+      delta_Mdot = 0d0
+      if (k > 0) then
+         t_dyn = sqrt(pow3(r)/(cgrav * s% dm(k))) ! local dynamical time
+         e_bind = (cgrav * s% dm(k))/r ! binding energy per unit mass
+         s% xtra1_array(k) = 0d0
+      else
+         t_dyn = 1d0!1d99
+         e_bind = 1d0!1d99
+      end if
+      ! L_excess set by L_rad_div_Ledd*eta_edd ! factor for sclaing
+      eta_edd = 1d0!1d0
+      eta_factor = 1d0!1d0 ! fraction of excess to convert to ml.
+
       if (k > 0) then
          mu = s% mu(k)
       else
-         mu = 0.5d0 ! pure H.
+         mu = 0.5d0 ! pure H. as a fallback when k < 1.
       end if
       pseudoMach = (L / (4d0 * pi * crad * pow2(r) * pow4(T))) * sqrt(mu * mp / (T * boltzm)) ! s%mu(k) *
       pseudoMach = max(pseudoMach,1d-10)
@@ -239,8 +255,8 @@ contains
       end if
 
       opacity = opacity_in
-gradr = gradr_in
-gradr_scaled = 0d0
+      gradr = gradr_in
+      gradr_scaled = 0d0
 
       ! Initialize with no mixing
       mixing_type = no_mixing
@@ -304,82 +320,91 @@ gradr_scaled = 0d0
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
-            if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'ierr from set_TDC'
-               return
-            end if
+         if (ierr /= 0) then
+            if (s% report_ierr) write(*,*) 'ierr from set_TDC'
+            return
+         end if
 
-         ! Experimental method to lower superadiabaticity. Call TDC again with an artificially reduced
-         ! gradr if the resulting gradT would lead to the radiative luminosity approaching the Eddington
-         ! limit, or when a density inversion is expected to happen.
-         ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess
-if (s% use_superad_reduction) then
-   !call set_superad_reduction
-!   write(*,*) 'gradr_scaled before', gradr_scaled %val, 'gradr_scaled after', gradr%val /Psi%val
-!   write(*,*) 'k', k, gradr_scaled %val
-!   write (*,*) 'Gamma_factor', Gamma_factor%val
-   if (T <1d7 .and. (conv_vel%val > 0d0  .or. conv_vel_start > 0d0)) then
-!do
-!   if (Psi < gradL/gradr) then
-!!   Psi = Psi * 1.005d0
-!   Psi = (gradL / gradr + 1d-4)
-!   end if
-Psi = max(Psi, gradL/gradr + 1d-4)
-Psi = min(Psi,1d0)
+         ! Experimental method to lower superadiabaticity derived from 3D turbulence models in athena++, see Willium Schultz MLT.
+         ! Call TDC again with an artificially reduced opacity and gradr, with an option to drive ml when Lr exceeds Eddington limit.
+         ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess and superad_reduction
+         if (.true.) then
+            ! first call
+            if (T <1d7) then
 
-!end do
-gradr_scaled = blend_gradr(T, gradr_in, Psi) !gradr* Psi!max(Psi,gradL%val/gradr%val)
-opacity = blend_gradr(T, opacity_in, Psi)
-if (k /= 0) s% superad_reduction_factor(k) = Psi %val
+               if (k>0) then
+                  s% xtra1_array(k) = delta_Mdot %val
+               end if
 
-      call set_TDC(&
-         conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-         mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
-      s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
-      if (ierr /= 0) then
-         if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
-         return
-      end if
-   end if
+               Psi = max(Psi, gradL/gradr + 1d-4)
+               Psi = min(Psi,1d0)
 
-!
-!         if (s% use_superad_reduction) then
-!            call set_superad_reduction
-!            if (Gamma_factor > 1d0) then
-!               call set_TDC(&
-!                  conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-!                  mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-!                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
-!               s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
-!               if (ierr /= 0) then
-!                  if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
-!                  return
-!               end if
-!            end if
-!         end if
+               
+               gradr_scaled = blend_gradr(T, gradr_in, Psi) !gradr* Psi!max(Psi,gradL%val/gradr%val)
+               opacity = blend_gradr(T, opacity_in, Psi)
+
+               if (k /= 0) s% superad_reduction_factor(k) = Psi %val
+               call set_TDC(&
+                  conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+                  mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+               s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
+                  return
+               end if
+
+               if (k>0) then
+                  Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
+   !               if (Lrad_div_Ledd >= 1d0) then
+   !                  write(*,*) "Lrad_div_Ledd", Lrad_div_Ledd %val
+   !               end if
+                  L_rad = 64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradT / (3d0 * P * opacity_in)
+                  L_excess = L_rad*(1d0 - eta_edd/Lrad_div_Ledd) ! (L_rad - eta_edd*Ledd) ! lower value toggles ML
+                  L_excess = max(L_excess,0d0) ! don't have excess if L_excess is negative.
+                  ! mass loss is given by eta_factor*delta_Mdot, where 0.1, is 10% of excess to ml.
+                  !delta_Mdot = eta_factor*L_excess/e_bind ! assume delta_M/ delta_t,timestep = delta_Mdot
+                  !delta_Mdot = delta_M!/t_dyn!*min(1d0/s% dt,1d0/t_dyn %val)
+                  !delta_Mdot = max(0d0,delta_Mdot)
+                  s% xtra1_array(k) = pseudoMach %val!L_excess %val !* t_dyn %val!delta_Mdot %val
+               end if
+               ! extra call to set gradr back to original value in zones that were actually supposed to be radiatve.
+               ! call once more with original gradr. inthe futurue we should check the first time not the second time, if the zone was already convective. so
+               ! only one additional call needs to be made.
+               if  (conv_vel%val< 0d0) then
+
+                  Psi = 1d0
+
+                  if (k /= 0) s% superad_reduction_factor(k) = Psi %val
+
+                  call set_TDC(&
+                     conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+                     mixing_type, scale, chiT, chiRho, gradr_in, r, P, T, rho, dV, Cp, opacity_in, &
+                     scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+                  s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
+                  if (ierr /= 0) then
+                     if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
+                     return
+                  end if
+               end if ! end: (conv_vel%val< 0d0  .and. conv_vel_start > 0d0)
+            end if ! end : (T <1d7 .and. (conv_vel%val> 0d0  .or. conv_vel_start > 0d0))
+         end if !end: envelope_turbulence
 
 
-! extra call to set gradr back to original value in zones that were actually supposed to be radiatve.
-! call once more with original gradr. inthe futurue we should check the first time not the second time, if the zone was already convective. so
-! only one additional call needs to be made.
-         if  (conv_vel%val< 0d0  .and. conv_vel_start > 0d0) then
-
-         Psi = 1d0
-
-         if (k /= 0) s% superad_reduction_factor(k) = Psi %val
-
-            call set_TDC(&
-               conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-               mixing_type, scale, chiT, chiRho, gradr_in, r, P, T, rho, dV, Cp, opacity_in, &
-               scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
-            s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
-            if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
-               return
+         if (s% use_superad_reduction) then
+            call set_superad_reduction
+            if (Gamma_factor > 1d0) then
+               call set_TDC(&
+                  conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+                  mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity_in, &
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+               s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
+                  return
+               end if
             end if
          end if
-   end if
 
       ! if using mlt.
       else if (gradr_in > gradL) then
@@ -400,34 +425,60 @@ if (k /= 0) s% superad_reduction_factor(k) = Psi %val
          ! limit, or when a density inversion is expected to happen.
          ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess
          if (s% use_superad_reduction) then
-            !call set_superad_reduction
-!write(*,*) 'gradr_scaled before', gradr_scaled %val, 'gradr_scaled after', gradr%val *Psi%val
-!   write(*,*) 'k', k, gradr_scaled %val
-!write (*,*) 'Gamma_factor', Gamma_factor%val
-            if (T <1d7 .and. (conv_vel%val> 0d0  .or. conv_vel_start > 0d0)) then
-!   do
-!   if (Psi < gradL/gradr) then
-!      !Psi = Psi * 1.005d0
-!   Psi = (gradL / gradr + 1d-4)
-!   end if
-Psi = max(Psi, gradL/gradr + 1d-4)
-Psi = min(Psi,1d0)
-!end do
-gradr_scaled = blend_gradr(T, gradr_in, Psi)!gradr* Psi!max(Psi,gradL%val/gradr%val)
-opacity = blend_gradr(T, opacity_in, Psi)
-if (k /= 0) s% superad_reduction_factor(k) = Psi %val
-
+            call set_superad_reduction
+            if (Gamma_factor > 1d0) then
                call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
-                              chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                              chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity_in, &
                               gradr_scaled, grada, gradL, &
                               Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
                   return
                end if
+            end if
+         end if
 
+         if (.true.) then ! toggle for envelope turbulence.
+            if (T <1d7 ) then
 
+!               write (*,*) 'delta_Mdot', delta_Mdot%val*secyer/Msun
+               if (k>0) then
+               s% xtra1_array(k) = delta_Mdot %val
+               end if
 
+               Psi = max(Psi, gradL/gradr + 1d-4)
+               Psi = min(Psi,1d0)
+               !end do
+               gradr_scaled = blend_gradr(T, gradr_in, Psi)!gradr* Psi!max(Psi,gradL%val/gradr%val)
+               opacity = blend_gradr(T, opacity_in, Psi)
+
+               if (k /= 0) s% superad_reduction_factor(k) = Psi %val
+               ! first call
+               call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
+                              chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                              gradr_scaled, grada, gradL, &
+                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
+                  return
+               end if
+
+               if (k>0) then
+                  Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
+   !               if (Lrad_div_Ledd >= 1d0) then
+   !                  write(*,*) "Lrad_div_Ledd", Lrad_div_Ledd %val
+   !               end if
+
+                  L_rad = 64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradT / (3d0 * P * opacity_in)
+                  L_excess = L_rad*(1d0 - eta_edd/Lrad_div_Ledd) ! (L_rad - eta_edd*Ledd) ! lower value toggles ML
+                  L_excess = max(L_excess,0d0) ! don't have excess if L_excess is negative.
+                  ! mass loss is given by eta_factor*delta_Mdot, where 0.1, is 10% of excess to ml.
+                  !delta_Mdot = eta_factor*L_excess/e_bind ! assume delta_M/ delta_t,timestep = delta_Mdot
+                  !delta_Mdot = delta_M!/t_dyn!*min(1d0/s% dt,1d0/t_dyn %val)
+                  !delta_Mdot = max(0d0,delta_Mdot)
+                  s% xtra1_array(k) = pseudoMach %val!L_excess %val! * t_dyn %val !delta_Mdot %val
+               end if
                ! extra call to set gradr back to original value in zones that were actually supposed to be radiatve.
                ! call once more with original gradr. inthe futurue we should check the first time not the second time, if the zone was already convective. so
                ! only one additional call needs to be made.
@@ -445,15 +496,11 @@ if (k /= 0) s% superad_reduction_factor(k) = Psi %val
                      if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
                      return
                   end if
-               end if
+               end if ! end : (conv_vel%val< 0d0)
+            end if ! end : (T <1d7 .and. (conv_vel%val> 0d0  .or. conv_vel_start > 0d0))
+         end if ! end envelope_turbulence
 
-            end if
-         end if
-
-
-
-
-      end if
+      end if ! end main loop: else if (gradr_in > gradL)
 
       ! If we're not convecting, try thermohaline and semiconvection.
       if (mixing_type == no_mixing) then
