@@ -494,7 +494,7 @@
 
 
          ! Write cache file to temporary storage that is local to the run,
-         ! then at the end move the file atomicly to the final cache location
+         ! then at the end move the file atomically to the final cache location
          call reaction_filename(reaction_id(i), cache_suffix, which, cache_filename, temp_cache_filename, ierr)
          if (ierr /= 0) return
 

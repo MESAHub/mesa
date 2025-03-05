@@ -257,7 +257,7 @@
          ! here is a relative limit
          limit_num_chi2_too_big = 50
          chi2_relative_increase_limit = 100.
-         ! if limit_num_chi2_too_big consequtive chi2s
+         ! if limit_num_chi2_too_big consecutive chi2s
          ! are > chi2_relative_increase_limit times the best chi2 for the run,
          ! or a chi2 component exceeds its corresponding limit,
          ! or chi2 can't be evaluated,

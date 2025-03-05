@@ -498,10 +498,10 @@
               ldmas=nm1
               ijob=5
           end if
-! ------ bandwith of "mas" not larger than bandwith of "jac"
+! ------ bandwidth of "mas" not larger than bandwidth of "jac"
           if (mlmas.gt.mljac.or.mumas.gt.mujac) then
               if (lout > 0) then
-                  write(lout,*) 'bandwith of "mas" must not be larger than bandwith of "jac"'
+                  write(lout,*) 'bandwidth of "mas" must not be larger than bandwidth of "jac"'
                   write(lout,*) 'mlmas', mlmas
                   write(lout,*) 'mljac', mljac
                   write(lout,*) 'mumas', mumas 
@@ -1258,7 +1258,7 @@
        rc(2,1) = (-2.d0)/g
        
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
        ros_newf(1) = .true.
        ros_newf(2) = .true.
 !~~~> m_i = coefficients for new step solution
@@ -1323,7 +1323,7 @@
       rd(3,2) = e32
       
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
       ros_newf(1) = .true.
       ros_newf(2) = .true.
       ros_newf(3) = .true.
@@ -1394,7 +1394,7 @@
       rc(3,2) = -1.73205080756887734d0
       
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
       ros_newf(1) = .true.
       ros_newf(2) = .true.
       ros_newf(3) = .false.
@@ -1465,7 +1465,7 @@
       rc(4,3) = -1.416993298352020d0
       
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
       ros_newf(1)  = .true.
       ros_newf(2)  = .true.
       ros_newf(3)  = .true.
@@ -1546,7 +1546,7 @@
       rc(4,3) =-(8.0d+00/3.0d+00) 
                
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
       ros_newf(1)  = .true.
       ros_newf(2)  = .false.
       ros_newf(3)  = .true.
@@ -1668,7 +1668,7 @@
        ros_e(6) = 1.0d+00
 
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
        ros_newf(1) = .true.
        ros_newf(2) = .true.
        ros_newf(3) = .true.
@@ -1784,7 +1784,7 @@
        ros_e(6) = 1.0d+00
 
 !~~~> does the stage i require a new function evaluation (ros_newf(i)=true)
-!   or does it re-use the function evaluation from stage i-1 (ros_newf(i)=false)
+!   or does it reuse the function evaluation from stage i-1 (ros_newf(i)=false)
        ros_newf(1) = .true.
        ros_newf(2) = .true.
        ros_newf(3) = .true.

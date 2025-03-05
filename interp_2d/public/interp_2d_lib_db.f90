@@ -79,7 +79,7 @@ contains  ! the procedure interface for the library
 ! ***********************************************************************
 ! ***********************************************************************
 
-! cubic shepard method for bivariate interpolation of scattered data.
+! cubic Shepard method for bivariate interpolation of scattered data.
 ! from acm algorithm 790., acm trans. math. software (25) 1999, 70-73.
 ! robert j. renka
 ! dept. of computer science

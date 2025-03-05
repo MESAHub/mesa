@@ -1191,8 +1191,8 @@ C   Given a set of N nodes and the data structure defined in
 C Subroutine STORE2_sg, this subroutine uses the cell method to
 C find the closest unmarked node NP to a specified point P.
 C NP is then marked by setting LNEXT(NP) to -LNEXT(NP).  (A
-C node is marked if and only if the corresponding LNEXT ele-
-C ment is negative.  The absolute values of LNEXT elements,
+C node is marked if and only if the corresponding LNEXT element
+C is negative.  The absolute values of LNEXT elements,
 C however, must be preserved.)  Thus, the closest M nodes to
 C P may be determined by a sequence of M calls to this rou-
 C tine.  Note that if the nearest neighbor to node K is to

@@ -3733,7 +3733,7 @@ contains
 !!   ARGUMENTS
 !!       nz - atomic number from 1 to 30 (integer)
 !!      ne - number of electrons from 1 to iz (integer)
-!!      npts - the number of points in frequences and sigma.
+!!      npts - the number of points in frequencies and sigma.
 !!      fr(npts) - contains the frequency grid at which the cross sections should be computed
 !!
 !!   Output
@@ -3791,18 +3791,18 @@ contains
 ! ***         do is=6,nout
 ! ***         is=3
 
-! ***    some preperations to choose between fits
+! ***    some preparations to choose between fits
 
             if (e > ph1(1, nz, ne, is)) then
 
 ! ***      if current energy is higher than ionization threshold then
 ! ***      define shell numbers for which "old" (VernerYakovlev-95)
-! ***      fits are to be aplied
+! ***      fits are to be applied
 
                nint = ninn(ne)
 
 ! ***      also we should to specify an energy separating "outer" and
-! ***      "new" fits, because first ones are appliable only for low energies.
+! ***      "new" fits, because first ones are applicable only for low energies.
 
                if (nz == 15 .or. nz == 17 .or. nz == 19 .or. (nz > 20 .and. nz /= 26)) then
                   einn = 0.d+00
@@ -3842,7 +3842,7 @@ contains
                                                                             .and. (is == 6)) .or. ((nz == 20) .and. (is == 6))) then
                      s = 0
 
-! ***        after all this checkings we can finally use the "new" fit
+! ***        after all this checking we can finally use the "new" fit
 
                   else
                      p1 = -ph2(4, nz, ne)

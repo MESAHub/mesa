@@ -45,7 +45,7 @@
       real(dp) :: logT_max
 
 
-            integer, parameter :: version_number = 51 ! update this to force rebuiding of caches
+            integer, parameter :: version_number = 51 ! update this to force rebuilding of caches
             ! update min_version in eosDT_load_tables to force rebuild of data files
 
       integer :: ix, io_unit, ios, info, irad

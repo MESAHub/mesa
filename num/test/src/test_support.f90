@@ -103,7 +103,7 @@
          real(dp) :: y1, y3  ! f(x1) and f(x3)
          integer :: imax  ! max number of iterations for search
          real(dp) :: epsx, epsy
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer :: ierr
          real(dp), parameter :: expected_root = 0.74800611d0

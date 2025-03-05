@@ -183,7 +183,7 @@
       rhotab(ir)=log(rho); -- here we use natural log, unlike petfict!
       if(ir==1)then;
          rho=1.d+01*rho;
-          -- save boundary nodes in the tables for ficticious values
+          -- save boundary nodes in the tables for fictitious values
       elseif(ir==@Ntab)then;
          rho=rho/1.d+01;
       endif;
@@ -207,7 +207,7 @@
         Tptab(itp)=log(temp);
         if(itp==1)then;
            temp=1.d+01**(3.4d0+0.2d0*itp);
-           -- save boundary nodes in the tables for ficticious values
+           -- save boundary nodes in the tables for fictitious values
         elseif(itp==@Ntab)then;
            temp=1.d+01**(3.4d0+0.2d0*(@Ntab-2));
         endif;

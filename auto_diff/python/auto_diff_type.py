@@ -149,7 +149,7 @@ class AutoDiffType:
         Construct a routine for assigning an integer to this type.
         """
 
-        # Sanitize function name in case the other type is a real(dp). Note similiar special case handling will be needed for quad precision.
+        # Sanitize function name in case the other type is a real(dp). Note similar special case handling will be needed for quad precision.
         routine_name = "assign_from_int"
         routine_arguments = [
             ("this", self.declare_name(ref="*"), "out"),

@@ -1080,7 +1080,7 @@
           IF ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
      +        (IYDI.GT.0.AND.IYDI.LT.NYD)) THEN
 * Retrieves the z and partial derivative values at the other three
-* vertexes of the rectangle.
+* vertices of the rectangle.
               IF (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0

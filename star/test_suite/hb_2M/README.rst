@@ -155,7 +155,7 @@ This is in particular true when using the mixing controls we choose to use in th
    :start-after: &controls
    :end-before: initial_mass
 
-The ``ìnitial_mass`` and ``ìnitial_z`` controls are not used when loading a saved model, but are reported in output as the inital values.
+The ``ìnitial_mass`` and ``ìnitial_z`` controls are not used when loading a saved model, but are reported in output as the initial values.
 Again we specify that we use the Type 2 opacities with a base metallicity of 0.02.
 We use the same mixing controls as for the PMS-to-TAMS part of the evolution.
 
@@ -194,7 +194,7 @@ The ``ìnlist_hb_2M`` inlist contains the controls to evolve the star from the Z
 &star_job
 ---------
 
-We start from the ZACHeB model calculated previously. We save the final model as ``final.mod``. We set the inital age to zero so that the age of the final model will give us the lifetime of the star on the CHeB. We also set the initial model number to zero.
+We start from the ZACHeB model calculated previously. We save the final model as ``final.mod``. We set the initial age to zero so that the age of the final model will give us the lifetime of the star on the CHeB. We also set the initial model number to zero.
 Again, we use our own  ``history_columns_list`` file.
 We use the same metal fraction, opacity tables, and nuclear reactions network as in our previous steps of evolution.
 
@@ -207,7 +207,7 @@ We use the same metal fraction, opacity tables, and nuclear reactions network as
 
 As before, we use the dedt form of the energy equation for good energy conservation.
 
-We use the same mass, initial_z, opacities, and mixing controls as previously. Note that here, in order to prevent the occurence of breathing pulses at the end of the CHeB evolution, we use the control ``predictive_avoid_reversal(1)='he4'`` (see `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__)..
+We use the same mass, initial_z, opacities, and mixing controls as previously. Note that here, in order to prevent the occurrence of breathing pulses at the end of the CHeB evolution, we use the control ``predictive_avoid_reversal(1)='he4'`` (see `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__)..
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_hb_2M
    :start-after: controls
@@ -265,11 +265,4 @@ Comparing results obtained with CPM and Predictive mixing
 =========================================================
 
 In the figure below we show the evolution of the convective core boundary and of the central helium abundance along the CHeB, using the CPM and the Predictive schemes.
-
-
-
-
-
-
-
 

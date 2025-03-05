@@ -147,7 +147,7 @@
             endif
           end do
 
-          ! Redistribute residual J_dot (only to gridpoints that can accomodate more torque)
+          ! Redistribute residual J_dot (only to gridpoints that can accommodate more torque)
           ! j number of cells that can not take anymore torque ()
           do k = 1, s% nz
             if (abs(s% extra_jdot(k)) < abs(s% j_rot(k)/ s% dt)) then

@@ -1749,7 +1749,7 @@ contains
          a(1, 1) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
          write (*, 2) 'dfdx hh', 1, a(1, 1), hh
          err = big
-         ! succesive columns in the neville tableu will go to smaller stepsizes
+         ! successive columns in the neville tableu will go to smaller stepsizes
          ! and higher orders of extrapolation
          do i = 2, ntab
             hh = hh/con

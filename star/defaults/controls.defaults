@@ -1793,7 +1793,7 @@
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
+      ! stop if at least ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
 
       ! ::
 
@@ -1812,7 +1812,7 @@
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
+      ! stop if at least ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
 
       ! ::
 

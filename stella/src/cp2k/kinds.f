@@ -54,7 +54,7 @@ MODULE kinds
 CONTAINS
 
 ! *****************************************************************************
-!> \brief Print informations about the used data types.
+!> \brief Print information about the used data types.
 !> \par History
 !>      Adapted by JGH for Cp2k
 !> \author Matthias Krack

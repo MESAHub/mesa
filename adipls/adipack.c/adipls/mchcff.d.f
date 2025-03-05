@@ -1,6 +1,6 @@
       subroutine mchcff(ds,c,is,js,isetsl,err)
 c
-c  computs matching coefficients c from almost singular
+c  computes matching coefficients c from almost singular
 c  matrix ds.
 c  if isetsl .ne. 1 equation is and variable js are eliminated.
 c  otherwise all possibilities are tested, and the one minimizing

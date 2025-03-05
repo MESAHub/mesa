@@ -23,7 +23,7 @@ To hide a number of false positives, due to internal gfortran issues, one can al
 
  valgrind --leak-check=full --error-limit=no --suppressions=mesa.supp ./test_memory
 
-Other usefull valgrind options:
+Other useful valgrind options:
 
 .. code-block:: console
 

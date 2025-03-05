@@ -2140,7 +2140,7 @@
       end subroutine EXCOR7
 
 ! ======================  AUXILIARY SUBROUTINES   ==================== *
-      subroutine FERINV7(F,N,X,XDF,XDFF)  ! Inverse Fermi intergals
+      subroutine FERINV7(F,N,X,XDF,XDFF)  ! Inverse Fermi integrals
 !                                                       Version 24.05.07
 ! X_q(f)=F^{-1}_q(f) : H.M.Antia 93 ApJS 84, 101
 ! q=N-1/2=-1/2,1/2,3/2,5/2 (N=0,1,2,3)

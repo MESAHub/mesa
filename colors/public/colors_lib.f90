@@ -44,7 +44,7 @@
 
       ! Routines get_bc will return the coefficients from interpolating over log Teff, log g, [M/H]
       ! even though the tables are defined as Teff, log g, [M/H]. get_abs_mag routines return
-      ! data thats been turned into an absolute magnitude. A color can be computed by taking the difference between
+      ! data that's been turned into an absolute magnitude. A color can be computed by taking the difference between
       ! two get_bc or two get_abs_mag calls.
 
       ! Names for the filters should be unique across all data files (left to the user to enforce this).

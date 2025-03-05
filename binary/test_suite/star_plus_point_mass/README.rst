@@ -19,7 +19,7 @@ Binary period versus model number:
 
 
 |br|
-Binary seperation versus model number:
+Binary separation versus model number:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass/docs/track2_000310.svg
    :width: 100%
@@ -82,7 +82,7 @@ pgstar commands used for the plots above:
   History_Track2_xname = 'model_number'
   History_Track2_yname = 'binary_separation'
   History_Track2_xaxis_label = 'Model Number'
-  History_Track2_yaxis_label = 'Binary Seperation (R\d\(2281)\u)'
+  History_Track2_yaxis_label = 'Binary Separation (R\d\(2281)\u)'
   History_Track2_reverse_xaxis = .false.
   History_Track2_reverse_yaxis = .false.
 
@@ -128,8 +128,3 @@ pgstar commands used for the plots above:
 
 Last-Updated: 10Jul2021 (MESA 094ff71) by fxt.
 
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

@@ -4,18 +4,18 @@
 wd_he_shell_ignition
 ********************
 
-This test case checks the ignition of a helium layer in an accreting in a 0.96 Msun carbon-oxygen white dwarf model.
+This test case checks the ignition of a helium layer in an accreting in a 0.96 |Msun| carbon-oxygen white dwarf model.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_he_shell_ignition``) loads 'co_wd_0.96M.mod', a 0.96 Msun carbon-oxygen white dwarf with a helium layer and then a hydrogen layer. The model is from a 6 Msun ZAMS progenitor with :ref:`make_co_wd` in r13718.  Pure helum then acceretes onto the hydrogen surface at a rate of 1e-9 Msun/yr. The helium layer ignites as teh total mass approches 1.36 Msun, and the run terminates when the helium burning luminosity first exceeds 1e11 Lsun:
+* Part 1 (``inlist_he_shell_ignition``) loads 'co_wd_0.96M.mod', a 0.96 |Msun| carbon-oxygen white dwarf with a helium layer and then a hydrogen layer. The model is from a 6 |Msun| ZAMS progenitor with :ref:`make_co_wd` in r13718. Pure helium then accretes onto the hydrogen surface at a rate of 1e-9 |Msun|/yr. The helium layer ignites as the total mass approachess 1.36 |Msun|, and the run terminates when the helium burning luminosity first exceeds 1e11 |Lsun||:
 
 
 .. image:: ../../../star/test_suite/wd_he_shell_ignition/docs/track1_000922.svg
    :width: 100%
 
 |br|
-The initial hydrogen burns as its pushed deeper into the model by accreretion. The initial helium layer and the accreted helium
+The initial hydrogen burns as its pushed deeper into the model by accretion. The initial helium layer and the accreted helium
 thus merge to form a single helium layer. This single helium layer ignites at it is pushed to higher densities and temperatures
 by the continued accretion:
 
@@ -23,7 +23,7 @@ by the continued accretion:
    :width: 100%
 
 |br|
-Temperature and desnity profile at ignition:
+Temperature and density profile at ignition:
 
 .. image:: ../../../star/test_suite/wd_he_shell_ignition/docs/trho_000922.svg
    :width: 100%
@@ -153,9 +153,3 @@ pgstar commands used for the plots above:
 
 
 Last-Updated: 07Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

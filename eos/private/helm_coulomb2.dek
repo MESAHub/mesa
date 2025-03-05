@@ -1,12 +1,12 @@
 
-!..this code fragment implments coulomb corrections
+!..this code fragment implements coulomb corrections
 !..see yakovlev & shalybkov 1989, uniform background corrections 
 
 !..input:
 !..den  = density g/cc
 !..temp = temperature k
-!..abar = avarage atomic weight
-!..zbar = avarge charge
+!..abar = average atomic weight
+!..zbar = average charge
 !..pion and all its derivatives = ion pressure through common block
 !..xne and all its derivatives = electron number density through common block
 

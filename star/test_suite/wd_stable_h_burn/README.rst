@@ -171,9 +171,3 @@ pgstar commands used for the plots above:
 
 
 Last-Updated: 08Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

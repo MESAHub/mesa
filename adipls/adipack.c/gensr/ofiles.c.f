@@ -13,7 +13,7 @@ c
 c  19/8/87: modified for HP9000 by taking out action option
 c     in s/r openf.
 c
-c  21/8/87: modified for HP9000 by replacing multiple occurences
+c  21/8/87: modified for HP9000 by replacing multiple occurrences
 c     of /dev/null by scratch files, since the HP9000, unfortunately,
 c     does not allow several unit numbers to be associated with
 c     /dev/null

@@ -520,9 +520,3 @@ The `MESA Marketplace <http://mesastar.org>`__ will remain in use as an aggregat
 portal, and we request users to inform us of new uploads so that they
 are highlighted there as well.
 
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

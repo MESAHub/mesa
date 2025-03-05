@@ -278,8 +278,3 @@ pgstar commands used for the star2 plot above:
 
 Last-Updated: 11Jul2021 (MESA 094ff71) by fxt.
 
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>
