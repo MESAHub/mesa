@@ -132,7 +132,7 @@ Past Developers
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
 * `Josiah Schwab <https://yoshiyahu.org/>`__
-* `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__`
+* `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 
 Other Code Contributors
 -----------------------
