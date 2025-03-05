@@ -1,4 +1,4 @@
-fortitude-lint
-fprettify
-ruff
-sphinx-lint
+fortitude-lint>=0.7.0
+fprettify>=0.3.7
+ruff>=0.9.9
+sphinx-lint>=1.0.0
