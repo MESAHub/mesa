@@ -148,6 +148,7 @@
 
          subroutine other_tidal_deformation_switch_function_interface(id, k, omega_in, f_switch, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: id, k
             real(dp), intent(in) :: omega_in
             real(dp), intent(out) :: f_switch

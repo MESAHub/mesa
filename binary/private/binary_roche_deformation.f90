@@ -186,7 +186,7 @@ contains
 
       type (star_info), pointer :: s
       type (binary_info), pointer :: b
-      integer :: j, this_star=0, other_star=0
+      integer :: j, this_star, other_star
       real(dp) :: r_roche, lq, m1, m2, a, ar
 
       include 'formats'
@@ -201,6 +201,9 @@ contains
       if (ierr /= 0) return
       call binary_ptr(s% binary_id, b, ierr)
       if (ierr /= 0) return
+
+      this_star = 0
+      other_star = 0
       call assign_stars(id, this_star, other_star, ierr)
       if (ierr /= 0) return
 
@@ -235,7 +238,7 @@ contains
       type (auto_diff_real_star_order1), intent(out) :: i_rot
       type (star_info), pointer :: s
       type (binary_info), pointer :: b
-      integer :: ierr, j, this_star=0, other_star=0
+      integer :: ierr, j, this_star, other_star
       real(dp) :: r_roche, a, m1, m2, ar, lq, eval, d_eval_d_ar
 
       ierr = 0
@@ -243,6 +246,9 @@ contains
       if (ierr /= 0) return
       call binary_ptr(s% binary_id, b, ierr)
       if (ierr /= 0) return
+
+      this_star = 0
+      other_star = 0
       call assign_stars(id, this_star, other_star, ierr)
       if (ierr /= 0) return
 
