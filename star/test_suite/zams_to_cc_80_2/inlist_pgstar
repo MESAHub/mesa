@@ -134,8 +134,8 @@
    Profile_Panels3_yaxis_name(2) = 'Power'
    Profile_Panels3_yaxis_name(3) = 'Mixing'
    
-   Profile_Panels3_xaxis_name = 'mass'
-   Profile_Panels3_xaxis_reversed = .false.
+   Profile_Panels3_xaxis_name = 'zone'
+   Profile_Panels3_xaxis_reversed = .true.
    !Profile_Panels3_xmin = 400d0 ! only used if /= -101d0
    !Profile_Panels3_xmax = 600d0 ! 10 ! only used if /= -101d0
    
@@ -170,16 +170,16 @@
    Profile_Panels1_title = ''
    
    Profile_Panels1_xaxis_name = 'logtau'
-    Profile_Panels1_xmax = 8d0
+    Profile_Panels1_xmax = 6d0
     Profile_Panels1_xmin = -2d0
    
    Profile_Panels1_num_panels = 3
    
    Profile_Panels1_yaxis_name(1) = 'pseudoMach'
-   Profile_Panels1_other_yaxis_name(1) = 'log_Lrad_div_Ledd'
+   Profile_Panels1_other_yaxis_name(1) = 'log_Lrad_div_Ledd'!'log_Lrad_div_Ledd'
    !Profile_Panels1_yaxis_name(1) = 'velocity'
-   Profile_Panels1_other_ymin(1) = -0.01d0 ! only used if /= -101d0
-   Profile_Panels1_other_ymax(1) = 0.01d0 ! only used if /= -101d0
+   !Profile_Panels1_other_ymin(1) = -0.01d0 ! only used if /= -101d0
+   !Profile_Panels1_other_ymax(1) = 0.01d0 ! only used if /= -101d0
    !Profile_Panels1_ymin(1) = 0d0 ! only used if /= -101d0
    !Profile_Panels1_ymax(1) = 1d0 ! only used if /= -101d0
    
@@ -188,11 +188,11 @@
    !Profile_Panels1_other_yaxis_name(2) = 'Gamma_tot_max' ! 'vel_km_per_s'
    Profile_Panels1_other_yaxis_name(2) = 'opacity' 
    
-   Profile_Panels1_yaxis_name(3) = 'luminosity'
-   Profile_Panels1_other_yaxis_name(3) = 'logRho' ! 'mass'
-   !Profile_Panels1_yaxis_log(3) = .true.
-   !Profile_Panels1_other_yaxis_log(3) = .true.
-   !Profile_Panels1_other_ymin(3) = -10d0 ! only used if /= -101d0
+   Profile_Panels1_yaxis_name(3) = 'prad'
+   Profile_Panels1_other_yaxis_name(3) = 'mlt_Pturb'!'pgas' ! 'mass'
+   Profile_Panels1_yaxis_log(3) = .true.
+   Profile_Panels1_other_yaxis_log(3) = .true.
+   Profile_Panels1_other_ymin(3) = -5d0 ! only used if /= -101d0
    
    show_TRho_Profile_kap_regions = .false.
    show_TRho_Profile_gamma1_4_3rd = .true.

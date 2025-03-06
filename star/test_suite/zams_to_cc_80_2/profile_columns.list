@@ -144,8 +144,8 @@
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
 
    pressure ! total pressure at center of zone (pgas + prad)
-   !prad ! radiation pressure at center of zone
-   !pgas ! gas pressure at center of zone (electrons and ions)
+   prad ! radiation pressure at center of zone
+   pgas ! gas pressure at center of zone (electrons and ions)
    logPgas ! log10(pgas)
    pgas_div_ptotal ! pgas/pressure
 
@@ -441,7 +441,7 @@
 !# Convection
    mlt_mixing_length ! mixing length for mlt (cm)
    !mlt_mixing_type ! value returned by mlt
-   !mlt_Pturb
+   mlt_Pturb
    !alpha_mlt
 
    conv_vel ! convection velocity (cm/sec)

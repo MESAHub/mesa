@@ -66,7 +66,7 @@ delta_lg_star_mass_limit = 1d-2
 use_other_wind = .true.
 x_ctrl(18) = 1.0e0 !fudge factor / efficiency factor for eruptive mass loss other_wind model
 !min_wind = 1e-8
-!mlt_Pturb_factor = 1d0
+mlt_Pturb_factor = 1d0
 
 ! wind
       ! Dutch scaling factor set in inlist_mass_Z_wind_rotation      

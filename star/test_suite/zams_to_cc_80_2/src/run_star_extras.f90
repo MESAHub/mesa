@@ -785,7 +785,7 @@
 
 				 !Calculate dynamical time, excess Luminosity, and excess Energy.
 				 t_dyn_test = sqrt((s% r(1:s% nz))**3/(standard_cgrav*s% m(1:s% nz)))
-				 L_excess_test = s% xtra1_array(1:s%nz) !(s% L(1:s% nz)) - s% L_conv(1:s% nz) - (pi4*clight*s% cgrav(1:s% nz)*s% m_grav(1:s% nz)/(s% opacity(1:s% nz)))
+				 L_excess_test = (s% L(1:s% nz)) - s% L_conv(1:s% nz) - (pi4*clight*s% cgrav(1:s% nz)*s% m_grav(1:s% nz)/(s% opacity(1:s% nz))) ! s% xtra1_array(1:s%nz) !
 				 E_excess_test = L_excess_test*t_dyn_test
 
 				 !Mask out negative excess Energy

@@ -176,7 +176,7 @@ contains
 
       Psi = 1d0 + (A * tanh(B * log10(M) + C) + D)
       Psi = Psi / (1d0 + exp((-log10(M) + F1A)/F1B))
-      !Psi = Psi / (1d0 + exp((log10(M) + F2A)/F2B))
+      Psi = Psi / (1d0 + exp((log10(M) + F2A)/F2B))
    end function Will_Psi
 
 
