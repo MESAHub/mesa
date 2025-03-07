@@ -713,7 +713,7 @@
 
       integer, parameter :: p_flux_limit_R = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT + 1
       integer, parameter :: p_flux_limit_lambda = p_flux_limit_R + 1
-      
+
       integer, parameter :: p_col_id_max = p_flux_limit_lambda
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)

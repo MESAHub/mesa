@@ -152,7 +152,7 @@
 
          s% flux_limit_R(1:nz) = 0
          s% flux_limit_lambda(1:nz) = 0
-         
+
          if (s% RSP_flag) then
             call RSP_setup_part1(s, restart, ierr)
             if (ierr /= 0) then

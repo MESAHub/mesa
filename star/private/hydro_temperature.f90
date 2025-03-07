@@ -131,7 +131,7 @@
 
             ! calculate d_P_rad given the flux limiter
             d_P_rad_expected_ad = d_P_rad_expected_ad / flxLambda
-         end if 
+         end if
 
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale
