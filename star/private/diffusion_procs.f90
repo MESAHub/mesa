@@ -26,7 +26,7 @@
 
       module diffusion_procs
 
-      use const_def
+      use const_def, only: dp, ln10
       use chem_def
       use diffusion_support
 
@@ -1162,7 +1162,7 @@
           else
             write(*,*) 'Invalid argument for op_mono_method.'
             stop
-         endif
+         end if
 
          if (dbg) write(*,*) 'done calc_g_rad'
 
@@ -1278,7 +1278,7 @@
           k2 = kmax
         else
           k2 = INT((kmax - (nzlo+1))/ ngp * j + (nzlo))
-        endif
+        end if
         fk = 0
           do i=1, s% species
              e_name = chem_isos% name(s% chem_id(i))
@@ -1315,8 +1315,8 @@
             call call_compute_gamma_grid_mombarg(j, fk, ierr)
             !write(*,*) 'Done precomputing gamma grid.'
             fk_gam_old(j,:) = fk
-          endif
-        enddo
+          end if
+        end do
 
 !! PARALLEL DO PRIVATE(i,k,thread_num,op_err,j,alfa,beta,X_face,umesh,ff,ta,rs,sz,offset) SCHEDULE(guided)
 !$OMP PARALLEL DO PRIVATE(i,k,op_err,j,alfa,beta,X_face,blend,dk) SCHEDULE(guided)
@@ -1350,7 +1350,7 @@
               else
                    j = 2
                    blend = 0d0
-               endif
+               end if
 
                call set1_g_rad_mombarg( &
                   s, k, nc, j, blend, iZ, kk, T_face(k), rho_face(k), &

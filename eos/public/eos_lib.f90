@@ -428,7 +428,7 @@
          if ((rho <= 0) .or. (energy <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call Get_eos_gamma_DE_Results( &
             rq, abar, energy, log10E, rho, log10Rho, gamma, &
             T, log10T, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
@@ -463,7 +463,7 @@
          if ((P <= 0) .or. (T <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call eos_gamma_PT_get_rho_energy( &
             abar, P, T, gamma, rho, energy, ierr)
          log10Rho = log10(rho)
@@ -502,7 +502,7 @@
          if ((rho <= 0) .or. (T <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call eos_gamma_DT_get_P_energy( &
             abar, rho, T, gamma, P, energy, ierr)
          if (ierr /= 0) return

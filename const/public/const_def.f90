@@ -33,8 +33,10 @@ module const_def
    integer, parameter :: qp = selected_real_kind(p=30)
 
    ! integer precision options
-   integer, parameter :: i4 = selected_int_kind(9)
-   integer, parameter :: i8 = selected_int_kind(14)
+   integer, parameter :: i1 = selected_int_kind(2)   ! 8 bits
+   integer, parameter :: i2 = selected_int_kind(4)   ! 16 bits
+   integer, parameter :: i4 = selected_int_kind(9)   ! 32 bits
+   integer, parameter :: i8 = selected_int_kind(18)  ! 64 bits
 
    integer, parameter :: strlen = 256  ! for character (len=strlen)
 

@@ -25,7 +25,7 @@
 
       module interp_1d_mp_autodiff  ! high accuracy monotonicity preserving algorithms
 
-      use const_lib, only: dp
+      use const_def, only: dp
       use auto_diff
 
       implicit none

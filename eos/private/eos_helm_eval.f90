@@ -323,7 +323,7 @@
                coulomb_temp_cut, coulomb_den_cut, &
                include_radiation, include_elec_pos, &
                res, off_table, ierr)
-         use const_def
+         use const_def, only: dp
          use helm
 
          type (EoS_General_Info), pointer :: rq

@@ -27,7 +27,7 @@
       module turb_info
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, no_mixing, convective_mixing, crystallized, phase_separation_mixing
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -542,7 +542,7 @@
          if (.not. ((nzlo==1).and.(nzhi==s%nz))) then
             write(*,*) 'nzlo != 1 or nzhi != nz'
             call mesa_error(__FILE__,__LINE__)
-         endif
+         end if
          ierr = 0
          dbg = .false.
          bot_Hp = 0; bot_r = 0; top_Hp = 0; top_r = 0; dr = 0

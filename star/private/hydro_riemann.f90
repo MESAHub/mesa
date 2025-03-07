@@ -26,7 +26,7 @@
       module hydro_riemann
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff

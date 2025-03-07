@@ -23,7 +23,7 @@
 
       module binary_lib
 
-      use const_def
+      use const_def, only: dp
 
       implicit none
 

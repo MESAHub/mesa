@@ -27,7 +27,7 @@
       module hydro_momentum
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, secyer
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use star_utils, only: em1, e00, ep1

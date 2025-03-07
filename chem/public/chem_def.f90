@@ -827,7 +827,7 @@
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + solx(j)
-        enddo
+        end do
         sum = 1.0d0 - sum
         solx(1) = solx(1) + sum
 
@@ -835,14 +835,14 @@
         do j=1,solsiz
            if (izsol(j) >= 3) then
               sum  = sum + solx(j)
-           endif
-        enddo
+           end if
+        end do
         zsol = sum
 
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + dble(izsol(j))/dble(iasol(j))*solx(j)
-        enddo
+        end do
         yesol = sum
 
         nullify(Xsol_names_dict)

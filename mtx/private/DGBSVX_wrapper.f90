@@ -1,6 +1,6 @@
     module DGBSVX_wrapper
 
-      use const_def
+      use const_def, only: dp
       use pre_conditioners
 
       implicit none

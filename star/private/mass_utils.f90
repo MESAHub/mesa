@@ -4,7 +4,7 @@
 
       module mass_utils
 
-      use const_def
+      use const_def, only: dp, qp
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
 

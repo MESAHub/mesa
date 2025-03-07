@@ -755,7 +755,7 @@
 
       subroutine get_HELM_alfa( &
             rq, logRho, logT, alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
-         use const_def
+         use const_def, only: dp
          use eos_blend
          use auto_diff
          type (EoS_General_Info), pointer :: rq
@@ -816,7 +816,7 @@
             rq, dbg, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
+         use const_def, only: dp
          use auto_diff
          type (EoS_General_Info), pointer :: rq
          logical, intent(in) :: dbg
@@ -956,7 +956,7 @@
                blend_cut = 1d0
             else
                blend_cut = max(blend_logRho_cut, blend_logQ_cut)
-            endif
+            end if
          elseif (blend_logT_cut == 1) then
             blend_cut = 1d0
          else
@@ -966,7 +966,7 @@
                blend_cut = 1d0
             else
                blend_cut = max(blend_logT_cut, blend_logQ_cut)
-            endif
+            end if
          end if
 
          ! combine all blends
@@ -2312,7 +2312,7 @@
                logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
-         use const_def
+         use const_def, only: dp
 
          integer, intent(in) :: handle
 
@@ -2371,7 +2371,7 @@
                xacc, yacc, ntry, &
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
-         use const_def
+         use const_def, only: dp
          use chem_def, only: num_chem_isos
          use num_lib, only: safe_root_with_guess
          integer, intent(in) :: handle

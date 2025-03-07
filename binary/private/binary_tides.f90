@@ -24,7 +24,7 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, pi, pi4, secyer, rsun, msun, one_third, standard_cgrav, convective_mixing
       use utils_lib
       use math_lib
       use binary_def

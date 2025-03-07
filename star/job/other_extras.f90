@@ -26,7 +26,7 @@
    module other_extras
       use star_def
       use star_lib
-      use const_def
+      use const_def, only: dp
       use utils_lib
 
       implicit none

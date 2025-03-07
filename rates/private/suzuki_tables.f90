@@ -1,6 +1,6 @@
 module suzuki_tables
 
-  use const_def
+  use const_def, only: dp, mesa_data_dir
   use math_lib
   use utils_lib, only: mesa_error, is_bad, set_nan
   use rates_def
@@ -91,7 +91,6 @@ contains
   subroutine interpolate_suzuki_table(table, T9, lYeRho, &
        lambda, dlambda_dlnT, dlambda_dlnRho, &
        Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
-    use const_def, only : dp
     class(suzuki_rate_table), intent(inout) :: table
     real(dp), intent(in) :: T9, lYeRho
     real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
@@ -227,7 +226,7 @@ contains
        Qneu = 0d0
        dQneu_dlnT = 0d0
        dQneu_dlnRho = 0d0
-    endif
+    end if
 
   contains
 

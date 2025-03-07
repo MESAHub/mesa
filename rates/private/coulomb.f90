@@ -25,7 +25,7 @@
 
 module coulomb
 
-  use const_def
+  use const_def, only: dp, one_third
   use rates_def
   use math_lib
   use utils_lib, only: is_bad

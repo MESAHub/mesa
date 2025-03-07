@@ -26,7 +26,7 @@
 
       module binary_utils
 
-      use const_def
+      use const_def, only: dp, pi, one_third, standard_cgrav, msun
       use math_lib
       use star_lib
       use star_def

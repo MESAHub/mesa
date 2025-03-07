@@ -26,7 +26,7 @@
       module set_flags
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use utils_lib, only: is_bad
       use alloc
 

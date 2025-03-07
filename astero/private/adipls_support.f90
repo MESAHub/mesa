@@ -23,10 +23,10 @@
 
       module adipls_support
 
+      use const_def, only: dp, pi, four_thirds_pi, pi4
       use astero_def
       use star_lib
       use star_def
-      use const_def
       use utils_lib
 
 

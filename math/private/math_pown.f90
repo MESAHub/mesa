@@ -25,15 +25,9 @@
 
 module math_pown
 
-  ! Uses
-
-  use const_lib, only: dp
-
-  ! No implicit typing
+  use const_def, only: dp
 
   implicit none
-
-  ! Generic interfaces
 
   interface powm1
      module procedure powm1_
@@ -67,20 +61,9 @@ module math_pown
      module procedure pow8_
   end interface pow8
 
-  ! Access specifiers
-
   private
 
-  public :: powm1
-  public :: pow2
-  public :: pow3
-  public :: pow4
-  public :: pow5
-  public :: pow6
-  public :: pow7
-  public :: pow8
-
-  ! Procedures
+  public :: powm1, pow2, pow3, pow4, pow5, pow6, pow7, pow8
 
 contains
 
@@ -93,7 +76,6 @@ contains
 
   end function powm1_
 
-  !****
 
   elemental function pow2_ (x) result (pow2_x)
 
@@ -104,7 +86,6 @@ contains
 
   end function pow2_
 
-  !****
 
   elemental function pow3_ (x) result (pow3_x)
 
@@ -115,7 +96,6 @@ contains
 
   end function pow3_
 
-  !****
 
   elemental function pow4_ (x) result (pow4_x)
 
@@ -126,7 +106,6 @@ contains
 
   end function pow4_
 
-  !****
 
   elemental function pow5_ (x) result (pow5_x)
 
@@ -137,7 +116,6 @@ contains
 
   end function pow5_
 
-  !****
 
   elemental function pow6_ (x) result (pow6_x)
 
@@ -148,7 +126,6 @@ contains
 
   end function pow6_
 
-  !****
 
   elemental function pow7_ (x) result (pow7_x)
 
@@ -159,7 +136,6 @@ contains
 
   end function pow7_
 
-  !****
 
   elemental function pow8_ (x) result (pow8_x)
 

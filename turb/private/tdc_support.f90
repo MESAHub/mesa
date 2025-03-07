@@ -26,7 +26,7 @@
 
 module tdc_support
 
-use const_def
+use const_def, only: dp, pi, sqrt_2_div_3, boltz_sigma
 use num_lib
 use utils_lib
 use auto_diff

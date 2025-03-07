@@ -31,13 +31,13 @@
       use star_utils
       use num_lib, only: find0
 
-      use const_def, only: avo, kerg, pi, clight, crad, Rsun, Lsun, Msun, &
-         secyer, ln10, mev_amu, ev2erg, two_thirds
+      use const_def, only: avo, kerg, pi, amu, clight, crad, Rsun, Lsun, Msun, &
+         secday, secyer, ln10, mev_amu, ev2erg, two_thirds, &
+         no_mixing, convective_mixing, semiconvective_mixing
 
       implicit none
 
       contains
-
 
       subroutine set_min_gamma1(s)
          type (star_info), pointer :: s
@@ -751,7 +751,6 @@
 
       subroutine find_epsnuc_zone( &
             s, i_start, bzm_1, bzm_2, bzm_3, bzm_4, burn_min1, burn_min2, ierr)
-         use const_def, only:Msun
          type (star_info), pointer :: s
          integer, intent(inout) :: i_start
          real(dp), intent(out) :: bzm_1, bzm_2, bzm_3, bzm_4

@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module mod_neu
-      use const_def
+      use const_def, only: dp, pi, ln10, weinberg_theta, num_neu_fam, iln10, one_third, two_thirds, one_sixth, arg_not_provided
       use neu_def
       use math_lib
       use utils_lib, only: mesa_error
@@ -101,11 +101,11 @@
          rn  = f + a1(m1)
          do i=m1-1,1,-1
             rn  = rn*f + a1(i)
-         enddo
+         end do
          den = b1(k1+1)
          do i=k1,1,-1
             den = den*f + b1(i)
-         enddo
+         end do
          ifermi12 = log(f * rn/den)
 
       else
@@ -113,11 +113,11 @@
          rn = ff + a2(m2)
          do i=m2-1,1,-1
             rn = rn*ff + a2(i)
-         enddo
+         end do
          den = b2(k2+1)
          do i=k2,1,-1
             den = den*ff + b2(i)
-         enddo
+         end do
          ifermi12 = rn/(den*ff)
       end if
 
@@ -164,22 +164,22 @@
          rn = xx + a1(m1)
          do i=m1-1,1,-1
             rn = rn*xx + a1(i)
-         enddo
+         end do
          den = b1(k1+1)
          do i=k1,1,-1
             den = den*xx + b1(i)
-         enddo
+         end do
          zfermim12 = xx * rn/den
       else
          xx = 1.0d0/(x*x)
          rn = xx + a2(m2)
          do i=m2-1,1,-1
             rn = rn*xx + a2(i)
-         enddo
+         end do
          den = b2(k2+1)
          do i=k2,1,-1
             den = den*xx + b2(i)
-         enddo
+         end do
          zfermim12 = sqrt(x)*rn/den
       end if
 

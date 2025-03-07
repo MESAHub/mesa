@@ -26,7 +26,7 @@
       module eps_grav
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use chem_def, only: chem_isos
       use utils_lib, only: mesa_error, is_bad
       use auto_diff

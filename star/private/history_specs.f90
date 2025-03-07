@@ -27,7 +27,7 @@
 
       use star_private_def
       use star_history_def
-      use const_def
+      use const_def, only: dp
       use chem_def
       use num_lib, only: linear_interp, find0
 

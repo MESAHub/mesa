@@ -25,23 +25,15 @@
 
 module math_io
 
-  ! Uses
-
-  use const_lib, only: dp
-
-  ! No implicit typing
+  use const_def, only: dp
 
   implicit none
-
-  ! Access specifiers
 
   private
 
   public :: str_to_vector
   public :: str_to_double
   public :: double_to_str
-
-  ! Procedures
 
 contains
 
@@ -94,7 +86,6 @@ contains
 
   end subroutine str_to_vector
 
-  !****
 
   subroutine str_to_double (str, x, ierr)
 
@@ -106,7 +97,6 @@ contains
 
   end subroutine str_to_double
 
-  !****
 
   subroutine double_to_str (x, str)
 

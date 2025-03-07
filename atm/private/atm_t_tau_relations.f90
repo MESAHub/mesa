@@ -26,25 +26,17 @@
 
 module atm_T_tau_relations
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, iln10, two_thirds
   use math_lib
   use utils_lib, only: mesa_error
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
   public :: get_T_tau_base
   public :: eval_T_tau
   public :: eval_T_tau_dq_dtau
-
-  ! Procedures
 
 contains
 
@@ -78,13 +70,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine get_T_tau_base
 
-  !****
 
   subroutine eval_T_tau (id, tau, Teff, lnT, ierr)
 
@@ -118,13 +107,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine eval_T_tau
 
-  !****
 
   subroutine eval_Eddington (tau, Teff, lnT)
 
@@ -142,13 +128,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_Eddington
 
-  !****
 
   subroutine eval_solar_Hopf (tau, Teff, lnT)
 
@@ -181,13 +164,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_solar_Hopf
 
-  !****
 
   subroutine eval_Krishna_Swamy (tau, Teff, lnT)
 
@@ -217,13 +197,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_Krishna_Swamy
 
-  !****
 
   subroutine eval_Trampedach_solar (tau, Teff, lnT)
 
@@ -256,13 +233,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_Trampedach_solar
 
-  !****
 
   subroutine eval_T_tau_dq_dtau (id, tau, dq_dtau, ierr)
 
@@ -299,13 +273,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine eval_T_tau_dq_dtau
 
-  !****
 
   subroutine eval_Eddington_dq_dtau (tau, dq_dtau)
 
@@ -316,13 +287,10 @@ contains
 
     dq_dtau = 0.0_dp
 
-    ! Finish
-
     return
 
   end subroutine eval_Eddington_dq_dtau
 
-  !****
 
   subroutine eval_solar_Hopf_dq_dtau (tau, dq_dtau)
 
@@ -348,13 +316,10 @@ contains
 
     dq_dtau = - Q2*Q3*e1 - Q4*Q5*e2
 
-    ! Finish
-
     return
 
   end subroutine eval_solar_Hopf_dq_dtau
 
-  !****
 
   subroutine eval_Krishna_Swamy_dq_dtau (tau, dq_dtau)
 
@@ -377,13 +342,10 @@ contains
 
     dq_dtau = - Q2*Q3*e1 - Q4*Q5*e2
 
-    ! Finish
-
     return
 
   end subroutine eval_Krishna_Swamy_dq_dtau
 
-  !****
 
   subroutine eval_Trampedach_solar_dq_dtau (tau, dq_dtau)
 
@@ -405,8 +367,6 @@ contains
     x = log10(tau)
 
     dq_dtau = (c1 + exp((x-a)/v))/(1._dp + exp((x-b)/w))/tau*iln10
-
-    ! Finish
 
     return
 

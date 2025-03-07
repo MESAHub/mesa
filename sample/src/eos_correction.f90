@@ -25,7 +25,8 @@ program eos_correction
    use eos_lib
    use chem_def
    use chem_lib
-   use const_lib
+   use const_def, only: dp, amu, clight, me
+   use const_lib, only: const_init
    use math_lib
 
    implicit none

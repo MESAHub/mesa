@@ -71,6 +71,7 @@ contains
 
       use num_lib, only : safe_root_with_guess
       use math_lib, only : pow
+      use const_def, only : dp, pi
 
       type (binary_info), pointer :: b
       integer, intent(in) :: device_id

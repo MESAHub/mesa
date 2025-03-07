@@ -16,7 +16,7 @@ module ideal
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-      use const_def
+      use const_def, only: dp
       use eos_blend
       type (EoS_General_Info), pointer :: rq
       real(dp), intent(in) :: logRho, logT, Z, abar, zbar

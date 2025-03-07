@@ -25,7 +25,7 @@
 
    module kap_ctrls_io
 
-   use const_def
+   use const_def, only: dp, max_extra_inlists
    use kap_def
    use math_lib
 
@@ -301,7 +301,7 @@
             write(0,*) ' num_kap_Zs = ', num_kap_Zs
             ierr = -1
             return
-         endif
+         end if
 
          num_kap_Xs(kap_user) = user_num_kap_Xs
          kap_Xs(:, kap_user) = user_kap_Xs
@@ -370,7 +370,7 @@
             write(0,*) ' num_kap_lowT_Zs = ', num_kap_lowT_Zs
             ierr = -1
             return
-         endif
+         end if
 
          num_kap_lowT_Xs(kap_lowT_user) = user_num_kap_lowT_Xs
          kap_lowT_Xs(:, kap_lowT_user) = user_kap_lowT_Xs
@@ -409,7 +409,7 @@
       if (ierr /= 0) then
          write(*,*) 'failed to open ' // trim(filename)
          return
-      endif
+      end if
       call get_kap_ptr(handle,rq,ierr)
       if (ierr /= 0) then
          close(iounit)

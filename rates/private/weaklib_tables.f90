@@ -26,7 +26,7 @@
 
 module weaklib_tables
 
-  use const_def
+  use const_def, only: dp, ln10
   use math_lib
   use utils_lib, only: mesa_error, is_bad
   use rates_def
@@ -191,7 +191,6 @@ contains
   subroutine interpolate_weaklib_table(table, T9, lYeRho, &
        lambda, dlambda_dlnT, dlambda_dlnRho, &
        Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
-    use const_def, only : dp
     class(weaklib_rate_table), intent(inout) :: table
     real(dp), intent(in) :: T9, lYeRho
     real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
@@ -221,7 +220,7 @@ contains
        call setup_for_bicubic_interpolations
     else
        call setup_for_linear_interp
-    endif
+    end if
 
     if (weak_bicubic) then
 

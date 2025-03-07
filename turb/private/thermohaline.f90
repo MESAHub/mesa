@@ -25,7 +25,7 @@
 
 module thermohaline
 
-   use const_def
+   use const_def, only: dp, one_third, pi, qe, amu, boltzm, crad, clight
    use num_lib
    use utils_lib
    use auto_diff

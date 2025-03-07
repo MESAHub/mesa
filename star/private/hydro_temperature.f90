@@ -27,7 +27,7 @@
       module hydro_temperature
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support

@@ -408,7 +408,7 @@
          use_al26_isomers = .false.
          do i = 1, size(Z)
            if (A(i) == 26 .and. Z(i) == 13) count_isomer = count_isomer + 1
-         enddo
+         end do
          if (count_isomer > 1) use_al26_isomers = .true.
 
          count_isomer = 1
@@ -444,7 +444,7 @@
          use_al26_isomers = .false.
          do i = 1, size(Z)
            if (A(i) == 26 .and. Z(i) == 13) count_isomer = count_isomer + 1
-         enddo
+         end do
          if (count_isomer > 1) use_al26_isomers = .true.
 
          count_isomer = 1

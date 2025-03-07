@@ -25,7 +25,7 @@
 
  module ctrls_io
 
- use const_def
+ use const_def, only: dp
  use star_private_def
 
  implicit none
@@ -555,7 +555,7 @@
  if (ierr /= 0) then
     write(*,*) 'failed to open ' // trim(filename)
     return
- endif
+ end if
 
  call set_controls_for_writing(s, ierr)
  if (ierr /= 0) then

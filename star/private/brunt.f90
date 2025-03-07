@@ -26,7 +26,7 @@
       module brunt
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi4, crad
       use utils_lib
 
       implicit none

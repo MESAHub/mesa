@@ -1,5 +1,5 @@
 module skye
-      use const_def, only: dp
+      use const_def, only: dp, crad, kerg, mp
       use math_lib
       use auto_diff
       use eos_def
@@ -7,7 +7,6 @@ module skye
       implicit none
 
       logical, parameter :: dbg = .false.
-      !logical, parameter :: dbg = .true.
 
 
       private
@@ -19,7 +18,7 @@ module skye
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
+         use const_def, only: dp
          use eos_blend
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -103,7 +102,6 @@ module skye
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
          use eos_blend
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -265,7 +263,6 @@ module skye
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
          use eos_def
-         use const_def, only: dp
          use utils_lib, only: is_bad
          use chem_def, only: chem_isos
          use ion_offset, only: compute_ion_offset

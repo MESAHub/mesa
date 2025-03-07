@@ -27,7 +27,7 @@
 
       use star_private_def
       use utils_lib, only: is_bad
-      use const_def
+      use const_def, only: dp, msun, secyer, ln10, four_thirds_pi
       use num_def
 
       implicit none

@@ -26,7 +26,7 @@
 
       module eosDE_eval
       use eos_def
-      use const_def
+      use const_def, only: dp, avo, kerg, ln10
       use math_lib
 
       implicit none

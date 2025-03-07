@@ -26,7 +26,7 @@
       module read_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, secyer
 
       implicit none
 
@@ -982,6 +982,5 @@
          end do token_loop
 
       end subroutine get_chem_col_names
-
 
       end module read_model

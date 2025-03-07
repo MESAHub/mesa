@@ -26,14 +26,12 @@
       module remove_shells
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi4, ln10, boltz_sigma, avo, kerg, msun
       use utils_lib
 
       implicit none
 
-
       contains
-
 
       subroutine do_remove_center_at_cell_k(id, k, ierr)
          integer, intent(in) :: id, k

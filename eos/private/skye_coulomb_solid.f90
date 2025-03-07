@@ -2,7 +2,7 @@ module skye_coulomb_solid
    use math_lib
    use math_def
    use auto_diff
-   use const_def
+   use const_def, only: dp, pi, fine, eulernum
 
    implicit none
 

@@ -25,7 +25,7 @@
 
    module eos_ctrls_io
 
-   use const_def
+   use const_def, only: dp, max_extra_inlists
    use eos_def
    use math_lib
    use utils_lib, only: mesa_error
@@ -499,7 +499,7 @@
       if (ierr /= 0) then
          write(*,*) 'failed to open ' // trim(filename)
          return
-      endif
+      end if
       call get_eos_ptr(handle,rq,ierr)
       if (ierr /= 0) then
          close(iounit)
@@ -701,4 +701,3 @@
 
 
    end module eos_ctrls_io
-

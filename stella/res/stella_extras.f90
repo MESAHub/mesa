@@ -3,8 +3,8 @@ program main
    use interp_2d_lib_db, only: interp_mkbicub_db, interp_evbicub_db
    use interp_1d_lib, only: interp_pm, interp_value
    use interp_1d_def, only: pm_work_size
-   use const_def
-   use const_lib
+   use const_def, only: dp
+   use const_lib, only: const_init
    use colors_def
    use colors_lib
    use math_lib

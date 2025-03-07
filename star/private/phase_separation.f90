@@ -27,7 +27,7 @@
       module phase_separation
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
 
       implicit none
 
@@ -398,9 +398,7 @@
         if (ierr /= 0) then
            write(*,*) 'phase_separation: failed in call to set_mlt_vars during update_model_'
            stop
-        endif
-
-        ! Finish
+        end if
 
         return
 

@@ -26,25 +26,17 @@
 
 module atm_T_tau_uniform
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, pi, ln10, clight, crad
   use math_lib
   use utils_lib, only: mesa_error
   use utils_lib, only: is_bad
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
   public :: eval_T_tau_uniform
   public :: build_T_tau_uniform
-
-  ! Procedures
 
 contains
 
@@ -247,15 +239,12 @@ contains
        dlnP_dlnkap = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine eval_T_tau_uniform
 
-  !****
 
   ! Build atmosphere structure data from T-tau relation with uniform
   ! opacity
@@ -433,11 +422,8 @@ contains
 
       f(1) = -tau/(kap*rho)
 
-      ! Finish
-
     end subroutine build_fcn
 
-    !****
 
     subroutine build_solout( &
          nr, xold, x, n, y, rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, irtrn)
@@ -493,13 +479,10 @@ contains
 
       atm_structure(:,atm_structure_num_pts) = atm_structure_sgl
 
-      ! Finish
-
       return
 
     end subroutine build_solout
 
-    !***
 
     subroutine build_data(lntau, delta_r, atm_structure_sgl, ierr)
 
@@ -587,7 +570,6 @@ contains
 
   end subroutine build_T_tau_uniform
 
-  !****
 
   ! Evaluate atmosphere data
 
@@ -719,9 +701,7 @@ contains
        dlnT_dlnM = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
+    end if
 
     return
 

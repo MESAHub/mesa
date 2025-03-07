@@ -27,7 +27,14 @@
 
       use star_private_def
       use star_profile_def
-      use const_def
+      use const_def, only: dp, qe, kerg, avo, amu, boltz_sigma, secday, secyer, standard_cgrav, &
+         convective_mixing, &
+         overshoot_mixing, &
+         semiconvective_mixing, &
+         thermohaline_mixing, &
+         minimum_mixing, &
+         anonymous_mixing, &
+         leftover_convective_mixing
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
@@ -2404,7 +2411,7 @@
                pt = v(k)
             else
                pt = (v(k)*s% dq(k-1) + v(k-1)*s% dq(k))/(s% dq(k-1) + s% dq(k))
-            endif
+            end if
          end function pt
 
 
@@ -2420,7 +2427,7 @@
                else
                   if_rot = 0
                end if
-            endif
+            end if
          end function if_rot
 
 
@@ -2436,7 +2443,7 @@
                else
                   if_rot_ad = 0
                end if
-            endif
+            end if
          end function if_rot_ad
 
       end subroutine getval_for_profile

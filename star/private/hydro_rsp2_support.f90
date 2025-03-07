@@ -26,7 +26,7 @@
       module hydro_rsp2_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support

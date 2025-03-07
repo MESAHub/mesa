@@ -25,6 +25,7 @@
 
    module binary_wind
 
+   use const_def, only: dp, standard_cgrav
    use star_lib
    use star_def
    use math_lib
@@ -117,7 +118,7 @@
       end if
 
       ! orbital speed Hurley et al 2002 eq. 8
-      v_orb = sqrt(standard_cgrav * (b% m(1) + b% m(2)) / b% separation)  !cm/s
+      v_orb = sqrt(standard_cgrav * (b% m(1) + b% m(2)) / b% separation)  ! cm/s
 
       ! windspeed from Hurley et al 2002 eq. 9
       v_wind = sqrt(2d0 * beta *  standard_cgrav * b% m(s_i) / b% r(s_i))

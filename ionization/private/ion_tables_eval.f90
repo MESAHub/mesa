@@ -26,7 +26,7 @@
 
       module ion_tables_eval
 
-      use const_def, only: dp, one_sixth
+      use const_def, only: dp, one_sixth, arg_not_provided
       use ionization_def
       use math_lib
       use utils_lib, only: mesa_error
@@ -44,7 +44,7 @@
       subroutine Get_ion_Results(&
                Z_in, X_in, arho, alogrho, atemp, alogtemp, &
                res, ierr)
-         use const_def
+         use const_def, only: dp
          use utils_lib, only: is_bad
          use ion_tables_load, only: Load_ion_Table
 

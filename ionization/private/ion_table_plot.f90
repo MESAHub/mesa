@@ -1,6 +1,6 @@
       module ion_table_plot
 
-      use const_def
+      use const_def, only: dp
       use ion_tables_eval
       use math_lib
       use utils_lib, only: mesa_error, mkdir

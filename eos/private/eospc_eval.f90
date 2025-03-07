@@ -27,7 +27,7 @@
       module eospc_eval
       use eos_def
       use auto_diff
-      use const_def, only: avo, crad, ln10, arg_not_provided, amu, kerg, dp, qp
+      use const_def, only: dp, qe, qp, avo, crad, ln10, arg_not_provided, amu, kerg, one_third, four_thirds_pi
       use utils_lib, only: is_bad, mesa_error
       use math_lib
 
@@ -41,7 +41,7 @@
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
+         use const_def, only: dp
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logRho, logT, Z, abar, zbar
          real(dp), intent(out) :: alfa, d_alfa_dlogT, d_alfa_dlogRho

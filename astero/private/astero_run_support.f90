@@ -24,7 +24,7 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp
       use astero_support
 
       implicit none
@@ -770,7 +770,7 @@
             write(*,*) 'chi2 < simplex_chi2_tol; stopping further iteration'
             ierr = -1
             return
-         endif
+         end if
 
       end function simplex_f
 

@@ -23,20 +23,16 @@
 !
 ! ***********************************************************************
 
-
 module math_def
 
-   ! Uses
-   use const_def
-
-   ! No implicit typing
+   use const_def, only: dp
 
    implicit none
 
    integer, parameter :: max_precomp_ints = 1000
 
    type precomp_int
-      real(dp) :: z2,z3,z4,z5,z6,z7,z8
+      real(dp) :: z2, z3, z4, z5, z6, z7, z8
 
       real(dp) :: z1_3, z2_3, z4_3, z5_3, z7_3
       real(dp) :: zm1_3, zm2_3, zm4_3, zm5_3, zm7_3
@@ -54,10 +50,6 @@ module math_def
 
    end type precomp_int
 
-
-   type(precomp_int),dimension(max_precomp_ints) :: pre_z  ! Set in the math_lib
-
-
-
+   type(precomp_int), dimension(max_precomp_ints) :: pre_z  ! Set in the math_lib
 
 end module math_def

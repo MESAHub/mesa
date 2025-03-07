@@ -76,7 +76,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-        enddo
+        end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -110,7 +110,7 @@
       else if (logT_min > logT_face .and. logRho_min > logRho_face) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
       !write(*,*) 'ii, jj min', ii_min, jj_min, logT_min, XC, logRho_min, logRho_cell
 
       offset1 = 0
@@ -137,10 +137,10 @@
                   !write(*,*) ite_i, jne_i, ii, jj, i_grid(ii,jj), ',',logT_grid(ii,jj),&
                   !',', logRho_grid(ii,jj)
                   missing_point(ii,jj) = 0
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
       if (SUM(missing_point) > 0) then
         retry = .true.
         if (SUM(missing_point(2:4,1:3)) == 0) then
@@ -170,9 +170,9 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
 
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
@@ -182,9 +182,9 @@
                     imin, imax, log_amu_mix_cell
         ierr = 1
         return
-      endif
+      end if
       tries = tries + 1
-      enddo
+      end do
       !write(*,*) 'Points for interpolation selected', k
 
       !!! Compute the monochromatic cross-section for the local mixture.
@@ -195,9 +195,9 @@
             ik = i_grid(ii,jj)  !+ 1648*(ke-1)
             do m=1,nptot
               sig_mix_cell(ii,jj,m) = dot_product(fk,sig(:,ik,m))
-            enddo
-          enddo
-      enddo
+            end do
+          end do
+      end do
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
       sig_Ross = 0d0
@@ -207,9 +207,9 @@
            do m=1, nptot-1
                 !sig_Ross(ii,jj) = sig_Ross(ii,jj) + (1/sig_mix_cell(ii,jj,m) + 1/sig_mix_cell(ii,jj,m+1))/2.0d0 * dv
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
-           enddo
-        enddo
-      enddo
+           end do
+        end do
+      end do
 
       lkap_Ross =  log10_bohr_radius_sqr - log_amu_mix_cell - log10(sig_Ross)
 
@@ -217,8 +217,8 @@
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_face,logRho_face)
 
@@ -233,11 +233,11 @@
             gam = 0
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,ik,m)/ sig_mix_cell(ii,jj,m)) +(eumesh(ke,ik,m+1)/ sig_mix_cell(ii,jj,m+1)))
-            enddo
+            end do
            gamma_k(ii,jj,ke) = gam/2.0d0 * dv
-          enddo
-        enddo
-      enddo
+          end do
+        end do
+      end do
 
       deallocate(sig_mix_cell,sig_int)
 
@@ -251,11 +251,11 @@
          do jj = 1, 4
             do ii = 1, 4
                call gaml_interpolators(ke)% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lgamm(ii,jj,ke))
-            enddo
-         enddo
+            end do
+         end do
 
         lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face)  !cell
-      enddo
+      end do
       lgamm_cell(1) = -30.
       lgamm_cell(2) = -30.
       !write(*,*) 'lgamm_cell computed'!, ke, lgamm_cell(ke)
@@ -323,7 +323,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-        enddo
+        end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -338,8 +338,8 @@
           do i=1,1648
               do m=1,nptot
               sig_mix_cell(i,m) = dot_product(fk,sig(:,i,m))
-              enddo
-          enddo
+              end do
+          end do
 !$OMP END PARALLEL DO
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
@@ -349,8 +349,8 @@
               sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
-              enddo
-        enddo
+              end do
+        end do
 !$OMP END PARALLEL DO
 
 
@@ -364,10 +364,10 @@
             gam = 0d0
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,i,m)/ sig_mix_cell(i,m))+(eumesh(ke,i,m+1)/ sig_mix_cell(i,m+1)))
-            enddo
+            end do
            gamma_k(ke,i) = gam/2.0d0 * dv
-          enddo
-        enddo
+          end do
+        end do
 !$OMP END PARALLEL DO
 
         where (gamma_k < 0.0d0)
@@ -459,7 +459,7 @@
       else if (logT_min > logT_face .and. logRho_min > logRho_face) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
 
 
       offset1 = 0
@@ -484,10 +484,10 @@
                   i_grid(ii,jj) = i
                   missing_point(ii,jj) = 0
 
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
 
       if (SUM(missing_point) > 0) then
         retry = .true.
@@ -516,9 +516,9 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
        do_difficult_point = .false.
@@ -540,10 +540,10 @@
                   logRho_grid(ii,jj) = logRho(i)
                   i_grid(ii,jj) = i
 
-                endif
-              enddo
-             enddo
-            enddo
+                end if
+              end do
+             end do
+            end do
             retry = .false.
         else
 
@@ -552,28 +552,28 @@
                     missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
-        endif
-      endif
+        end if
+      end if
       tries = tries + 1
-      enddo
+      end do
 
       do jj=1,4
         do ii=1,4
           ik = i_grid(ii,jj)
           do ke=3,nel
             lgamm(ii,jj,ke) = lgamm_pcg(ke,ik)
-          enddo
+          end do
           lkap_Ross(ii,jj) = lkap_face_pcg(ik)
-        enddo
-      enddo
+        end do
+      end do
 
 
       call rossl_interpolator% initialize()
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_face,logRho_face)
 
@@ -582,11 +582,11 @@
          do jj = 1, 4
             do ii = 1, 4
                call gaml_interpolators(ke)% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lgamm(ii,jj,ke))
-            enddo
-         enddo
+            end do
+         end do
 
         lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face)  !cell
-      enddo
+      end do
       lgamm_cell(1) = -30d0
       lgamm_cell(2) = -30d0
 
@@ -655,7 +655,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-        enddo
+        end do
 
 
       amu_mix_cell = dot_product(fk,amamu)
@@ -691,7 +691,7 @@
       else if (logT_min > logT_cntr .and. logRho_min > logRho_cntr) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
 
       offset1 = 0
       offset2 = 0
@@ -715,10 +715,10 @@
                   i_grid(ii,jj) = i
 
                   missing_point(ii,jj) = 0
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
 
       if (SUM(missing_point) > 0) then
         retry = .true.
@@ -747,9 +747,9 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
 
 
 
@@ -759,9 +759,9 @@
                     missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
         ierr = 1
         return
-      endif
+      end if
       tries = tries + 1
-      enddo
+      end do
 
 
       !!! Compute the monochromatic cross-section for the local mixture.
@@ -774,9 +774,9 @@
               ik = i_grid(ii,jj)
               do m=1,nptot
                  sig_mix_cell(ii,jj,m) = dot_product(fk,sig(:,ik,m))
-              enddo
-        enddo
-      enddo
+              end do
+        end do
+      end do
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
       sig_Ross = 0d0
@@ -785,9 +785,9 @@
               sig_int = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2.0d0 * dv  !(1:nptot-1) inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
-              enddo
-        enddo
-      enddo
+              end do
+        end do
+      end do
 
       lkap_Ross =  log10_bohr_radius_sqr - log_amu_mix_cell - log10(sig_Ross)
 
@@ -796,8 +796,8 @@
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_cntr,logRho_cntr)
       dlnkap_rad_dlnT = rossl_interpolator% evaluate_deriv(logT_cntr,logRho_cntr, .true., .false.)
@@ -856,7 +856,7 @@
       epa_mix_cell = 0d0
       do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-      enddo
+      end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -871,8 +871,8 @@
           do i=1,1648
               do m=1,nptot
               sig_mix_cell(i,m) = dot_product(fk,sig(:,i,m))
-              enddo
-          enddo
+              end do
+          end do
 !$OMP END PARALLEL DO
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
@@ -882,8 +882,8 @@
               sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
-              enddo
-        enddo
+              end do
+        end do
 !$OMP END PARALLEL DO
 
       deallocate(sig_mix_cell,sig_int)
@@ -946,7 +946,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(:,i))
-        enddo
+        end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -982,7 +982,7 @@
       else if (logT_min > logT_cntr .and. logRho_min > logRho_cntr) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
 
 
       offset1 = 0
@@ -1007,10 +1007,10 @@
                   i_grid(ii,jj) = i
                   missing_point(ii,jj) = 0
 
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
 
       if (SUM(missing_point) > 0) then
         retry = .true.
@@ -1039,10 +1039,10 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
+          end if
 
-        endif
-      endif
+        end if
+      end if
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
         do_difficult_point = .false.
@@ -1063,10 +1063,10 @@
                    logT_grid(ii,jj) = logT(i)
                    logRho_grid(ii,jj) = logRho(i)
                    i_grid(ii,jj) = i
-                 endif
-               enddo
-              enddo
-             enddo
+                 end if
+               end do
+              end do
+             end do
              retry = .false.
          else
         write(*,*) 'Cannot find points for interpolation compute_kappa_fast', &
@@ -1075,24 +1075,24 @@
         ierr = 1
         return
         !stop
-        endif
-      endif
+        end if
+      end if
       tries = tries + 1
-      enddo
+      end do
 
       do jj=1,4
         do ii=1,4
           ik = i_grid(ii,jj)
           lkap_Ross(ii,jj) = lkap_ross_pcg(ik)
-        enddo
-      enddo
+        end do
+      end do
 
       call rossl_interpolator% initialize()
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_cntr,logRho_cntr)
       dlnkap_rad_dlnT = rossl_interpolator% evaluate_deriv(logT_cntr, logRho_cntr, .true., .false.)
@@ -1122,8 +1122,8 @@
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_grid(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_cntr,logRho_cntr)
       dlnkap_rad_dlnT = rossl_interpolator% evaluate_deriv(logT_cntr,logRho_cntr, .true., .false.)
