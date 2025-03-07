@@ -8251,7 +8251,6 @@
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
 
 
-
 ! Hydrodynamic drag
 ! =================
 
