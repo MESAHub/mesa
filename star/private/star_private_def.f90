@@ -31,7 +31,6 @@
 
       implicit none
 
-
       real(dp), parameter :: del_cntr_rho = 1d0
       real(dp), parameter :: min_cntr_rho = 3d0
       real(dp), parameter :: no_he_ignition_limit = 0.75d0
@@ -394,7 +393,6 @@
       end function how_many_allocated_star_ids
 
 
-
       subroutine free_star(s)
          type (star_info), pointer :: s
          star_handles(s% id)% in_use = .false.
@@ -413,7 +411,6 @@
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
-         use iso_fortran_env
          use colors_lib, only : colors_init
          use kap_lib, only: kap_init
          use eos_lib, only: eos_init
@@ -438,7 +435,7 @@
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
-         integer , intent(in):: color_num_colors(:)
+         integer, intent(in) :: color_num_colors(:)
          real(dp), intent(in) :: reaclib_min_T9_in
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          integer, intent(out) :: ierr
@@ -553,7 +550,7 @@
 
          write(*,'(1x,a,1x,a)') 'version_number', trim(version_number)
 
-         !here we store useful information about the compiler and SDK
+         ! here we store useful information about the compiler and SDK
          call get_compiler_version(compiler_name,compiler_version_name)
          call get_mesasdk_version(mesasdk_version_name,ierr)
          call date_and_time(date=date)
@@ -561,4 +558,3 @@
       end subroutine stardata_init
 
       end module star_private_def
-

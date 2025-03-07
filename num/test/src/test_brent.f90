@@ -529,7 +529,7 @@
         real(dp) fz
         real(dp) machep
         real(dp) t
-        character ( len = *  ) title
+        character(len=*) title
         real(dp) z
         real(dp) dfdx
 
@@ -549,11 +549,11 @@
         ierr = 0
         fa = f ( a, dfdx, lrpar, rpar, lipar, ipar, ierr )
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-        fb = f ( b, dfdx, lrpar, rpar, lipar, ipar, ierr )
+        fb = f ( b, dfdx, lrpar, rpar, lipar, ipar, ierr)
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-        z = brent_safe_zero ( a, b, machep, t, 0d0, f, fa, fb, lrpar, rpar, lipar, ipar, ierr )
+        z = brent_safe_zero ( a, b, machep, t, 0d0, f, fa, fb, lrpar, rpar, lipar, ipar, ierr)
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-        fz = f ( z, dfdx, lrpar, rpar, lipar, ipar, ierr )
+        fz = f ( z, dfdx, lrpar, rpar, lipar, ipar, ierr)
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
         if (abs(fz) < 1d-14) return

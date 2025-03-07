@@ -29,14 +29,14 @@ module const_def
 
    ! real number precision options: single, double, quad
    integer, parameter :: sp = selected_real_kind(p=5)
-   integer, parameter :: dp = selected_real_kind(p=15)
-   integer, parameter :: qp = selected_real_kind(p=30)
+   integer, parameter :: dp = selected_real_kind(p=15)  ! real32
+   integer, parameter :: qp = selected_real_kind(p=30)  ! real64
 
    ! integer precision options
-   integer, parameter :: i1 = selected_int_kind(2)   ! 8 bits
-   integer, parameter :: i2 = selected_int_kind(4)   ! 16 bits
-   integer, parameter :: i4 = selected_int_kind(9)   ! 32 bits
-   integer, parameter :: i8 = selected_int_kind(18)  ! 64 bits
+   integer, parameter :: i1 = selected_int_kind(2)   ! int8
+   integer, parameter :: i2 = selected_int_kind(4)   ! int16
+   integer, parameter :: i4 = selected_int_kind(9)   ! int32
+   integer, parameter :: i8 = selected_int_kind(18)  ! int64
 
    integer, parameter :: strlen = 256  ! for character (len=strlen)
 

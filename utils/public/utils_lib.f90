@@ -86,14 +86,13 @@ contains
 
 
   subroutine get_mesasdk_version(version, ierr)
-    use iso_fortran_env
     character(len=*), intent(out) :: version
     integer, intent(out) :: ierr
     character(len=strlen) :: mesasdk_root, filename
     integer :: unit, root_len, name_len
 
     ierr = 0
-    version = 'unknown'  !set here in case there is a problem below
+    version = 'unknown'  ! set here in case there is a problem below
 
     call get_environment_variable(name='MESASDK_VERSION', value=version, length=name_len, status=ierr)
     if (ierr /= 0) then
