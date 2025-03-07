@@ -26,7 +26,7 @@
       module pgstar_summary_burn
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use pgstar_support
       use star_pgstar
 
@@ -37,7 +37,6 @@
 
 
       subroutine summary_burn_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -246,10 +245,10 @@
                end do
                if (i == 0) exit
                if (dbg) write(*,2) 'place ' // category_name(docat(i)), i, eps_max
-               xnuc_cat(i) = -1e10 ! mark as done
+               xnuc_cat(i) = -1e10  ! mark as done
                eps_max = -100
                eps_k(i) = 0
-               do k = 1, nz ! if limit this to grid_min:grid_max, locations jump around too much
+               do k = 1, nz  ! if limit this to grid_min:grid_max, locations jump around too much
                   eps = s% eps_nuc_categories(docat(i),k)
                   if(eps > eps_max) then
                      eps_max = eps
@@ -261,15 +260,15 @@
                   xpos_nuc(i) = xvec(k)
                   if (xpos_nuc(i) < xmin .or. xpos_nuc(i) > xmax) cycle
                   cnt = 0
-                  do j = 1, num_cat ! compare location to ones already placed
+                  do j = 1, num_cat  ! compare location to ones already placed
                      if (j == i) cycle
-                     if (xnuc_cat(j) > -1) cycle ! haven't done this one yet
+                     if (xnuc_cat(j) > -1) cycle  ! haven't done this one yet
                      if (abs(xpos_nuc(i) - xpos_nuc(j)) < 0.1*dx) then
                         cnt = cnt + 1
                         if (dbg) write(*,*) 'conflicts with ' // category_name(docat(j))
                      end if
                   end do
-                  if (cnt < 3) then ! only show 3 max
+                  if (cnt < 3) then  ! only show 3 max
                      str = category_name(docat(i))
                      if (str(1:5) == 'burn_') then
                         str = str(6:len_trim(str))
@@ -295,7 +294,7 @@
             call pgsci(1)
             ierr = 0
             call show_xaxis_name(s,xaxis_name,ierr)
-            if (ierr == 0) then ! show mix regions at bottom of plot
+            if (ierr == 0) then  ! show mix regions at bottom of plot
                call pgslw(10)
                call show_mix_regions_on_xaxis( &
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)

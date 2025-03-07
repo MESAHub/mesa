@@ -25,7 +25,7 @@
 
 module pgbinary_ctrls_io
 
-   use const_def
+   use const_def, only: dp
    use binary_private_def
 
    implicit none
@@ -35,7 +35,6 @@ module pgbinary_ctrls_io
    namelist /pgbinary/ &
 
       file_device, &
-      file_extension, &
       file_digits, &
       pgbinary_interval, &
       pause, &
@@ -1454,7 +1453,6 @@ contains
       pg => b% pg
 
       pg% file_device = file_device
-      pg% file_extension = file_extension
       pg% file_digits = file_digits
       pg% pgbinary_interval = pgbinary_interval
       pg% pause = pause

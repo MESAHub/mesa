@@ -139,7 +139,7 @@
          integer, intent(out) :: ierr
          logical, intent(in) :: restart
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -155,7 +155,7 @@
 
          extras_binary_start_step = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -167,7 +167,7 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_check_model = keep_going
@@ -187,7 +187,7 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_finish_step = keep_going
@@ -199,7 +199,7 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 

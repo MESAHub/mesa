@@ -26,25 +26,17 @@
 
 module atm_table
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, ln10
   use math_lib
   use utils_lib, only: mesa_error
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
   public :: eval_table
   public :: get_table_alfa_beta
   public :: get_table_base
-
-  ! Procedures
 
 contains
 
@@ -189,7 +181,7 @@ contains
        dlnT_dlnM = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
+    end if
 
     if (dbg .or. is_bad(lnP) .or. is_bad(lnT)) then
        write(*,*) 'eval_table'
@@ -203,13 +195,10 @@ contains
        !if (is_bad(lnP) .or. is_bad(lnT)) call mesa_error(__FILE__,__LINE__,'eval_table')
     end if
 
-    ! Finish
-
     return
 
   end subroutine eval_table
 
-  !****
 
   subroutine get_table_alfa_beta( &
        L, Teff, R, M, cgrav, id, alfa, beta, ierr)
@@ -370,7 +359,7 @@ contains
           iregion = blend_corner_out
        else if (logg > logg3) then
           iregion = blend_in_y
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_corner_out
        end if
@@ -380,7 +369,7 @@ contains
           iregion = blend_in_x
        else if (logg > logg3) then
           iregion = pure_table
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_in_x
        end if
@@ -391,11 +380,11 @@ contains
           iregion = blend_corner_out
        else if (logg > logg3) then
           iregion = blend_in_y
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_corner_out
        end if
-    else ! logTeff <= logTeff4
+    else  ! logTeff <= logTeff4
        iregion = pure_grey
     end if
 
@@ -422,13 +411,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine get_table_alfa_beta
 
-  !****
 
   subroutine get_table_base (id, tau_base, ierr)
 
@@ -461,8 +447,6 @@ contains
        write(*,*) 'Invalid id in get_table_base:', id
        call mesa_error(__FILE__,__LINE__)
     end select
-
-    ! Finish
 
     return
 

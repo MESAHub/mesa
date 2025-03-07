@@ -26,7 +26,7 @@
       module pgstar_mixing_Ds
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, rayleigh_taylor_mixing, minimum_mixing
       use pgstar_support
       use pgstar_trho_profile
       use star_pgstar
@@ -38,7 +38,6 @@
 
 
       subroutine Mixing_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -128,7 +127,6 @@
             panel_flag, xaxis_numeric_labels_flag, ierr)
 
          use utils_lib
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: device_id

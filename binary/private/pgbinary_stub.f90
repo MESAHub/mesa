@@ -26,7 +26,7 @@
 module pgbinary
 
    use binary_def
-   use const_def
+   use const_def, only: dp
    use chem_def, only : category_name
    use rates_def, only : i_rate
 
@@ -36,7 +36,7 @@ module pgbinary
 contains
 
    ! pgbinary interface
-   subroutine start_new_run_for_pgbinary(b, ierr) ! reset logs
+   subroutine start_new_run_for_pgbinary(b, ierr)  ! reset logs
       use binary_def, only : binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
@@ -105,7 +105,7 @@ contains
    end subroutine do_show_pgbinary_annotations
 
 
-   subroutine do_start_new_run_for_pgbinary(b, ierr) ! reset logs
+   subroutine do_start_new_run_for_pgbinary(b, ierr)  ! reset logs
       use utils_lib
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr

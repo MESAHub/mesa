@@ -275,7 +275,7 @@ c
       if(l.gt.lw21) go to 60
 c
 c  windowing in order, frequency and dimensionless squared
-c  squared frquency 
+c  squared frequency 
 c
    11 if(nw1.le.nw2.and.(nord.lt.nw1.or.nord.gt.nw2)) go to 10
       if(frqw1.le.frqw2.and.(frq.lt.frqw1.or.frq.gt.frqw2)) go to 10

@@ -3,6 +3,8 @@ program test_auto_diff
    use auto_diff
    use const_def
 
+   implicit none
+
    call do_test_auto_diff_1var_order1()
    call do_test_auto_diff_2var_order1()
    call do_test_auto_diff_star_order1()
@@ -21,7 +23,7 @@ program test_auto_diff
    end subroutine header
 
    subroutine should_print0(affix, a, z)
-      character(len=*), intent(in) :: affix ! to insert ' approximately'
+      character(len=*), intent(in) :: affix  ! to insert ' approximately'
       real(dp), intent(in) :: a, z
 
       write(*,'(2(a),1(1pd26.16),a,99(1pd26.16))') &
@@ -30,7 +32,7 @@ program test_auto_diff
    end subroutine should_print0
 
    subroutine should_print1(affix, a, b, z)
-      character(len=*), intent(in) :: affix ! to insert ' approximately'
+      character(len=*), intent(in) :: affix  ! to insert ' approximately'
       real(dp), intent(in) :: a, b
       type(auto_diff_real_1var_order1), intent(in) :: z
 
@@ -41,9 +43,9 @@ program test_auto_diff
 
 
    subroutine should_print2(affix, a, b, c, z)
-      character(len=*), intent(in) :: affix ! to insert ' approximately'
+      character(len=*), intent(in) :: affix  ! to insert ' approximately'
       real(dp), intent(in) :: a, b, c
-      type(auto_diff_real_2var_order1) :: z
+      type(auto_diff_real_2var_order1), intent(in) :: z
       write(*,'(2(a),3(1pd26.16),a,99(1pd26.16))') &
          ' Should print', affix, a, b, c, '  :  ', z
       write(*,'(a)') ''

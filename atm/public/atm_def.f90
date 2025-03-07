@@ -26,15 +26,9 @@
 
 module atm_def
 
-  ! Uses
-
   use const_def, only: dp
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameter definitions
 
   ! T-tau relations
 
@@ -57,8 +51,8 @@ module atm_def
 
   ! Atmosphere structure info
 
-  integer, parameter :: atm_xm = 1 ! mass of atm exterior to this point (g)
-  integer, parameter :: atm_delta_r = atm_xm+1 ! radial distance above base of envelope (cm)
+  integer, parameter :: atm_xm = 1  ! mass of atm exterior to this point (g)
+  integer, parameter :: atm_delta_r = atm_xm+1  ! radial distance above base of envelope (cm)
   integer, parameter :: atm_lnP = atm_delta_r+1
   integer, parameter :: atm_lnd = atm_lnP+1
   integer, parameter :: atm_lnT = atm_lnd+1
@@ -102,8 +96,6 @@ module atm_def
      logical, pointer           :: have_atm_table(:)
   end type Atm_Info
 
-  ! Module variables
-
   ! Atmosphere tables
 
   type (Atm_Info), target, save :: &
@@ -117,8 +109,6 @@ module atm_def
   real(dp) :: atm_test_partials_L_lo, atm_test_partials_L_hi
   real(dp) :: atm_test_partials_R_lo, atm_test_partials_R_hi
   real(dp) :: atm_test_partials_M_lo, atm_test_partials_M_hi
-
-  ! Interfaces
 
   abstract interface
 
@@ -161,4 +151,3 @@ module atm_def
   end interface
 
 end module atm_def
-

@@ -39,13 +39,13 @@
       contains
 
       subroutine FL_epsnuc_3alf(T, Rho, Y, UE, r, drdT, drdRho)
-         real(dp), intent(in) :: T ! temperature
-         real(dp), intent(in) :: Rho ! density
-         real(dp), intent(in) :: Y ! helium mass fraction
-         real(dp), intent(in) :: UE ! electron molecular weight
-         real(dp), intent(out) :: r ! rate in ergs/g/sec
-         real(dp), intent(out) :: drdT ! partial wrt temperature
-         real(dp), intent(out) :: drdRho ! partial wrt density
+         real(dp), intent(in) :: T  ! temperature
+         real(dp), intent(in) :: Rho  ! density
+         real(dp), intent(in) :: Y  ! helium mass fraction
+         real(dp), intent(in) :: UE  ! electron molecular weight
+         real(dp), intent(out) :: r  ! rate in ergs/g/sec
+         real(dp), intent(out) :: drdT  ! partial wrt temperature
+         real(dp), intent(out) :: drdRho  ! partial wrt density
 
 
          real(dp) :: T6, R6, R6T, R6T13, R6T16, T62, T612, T623, T653, T632, T613, U, AF
@@ -114,7 +114,7 @@
          U32 = U*sqrt(U)
          U52 = U*U32
 
-         if (U < 1) then ! strong screening regime, eqn 4.8a in F&L
+         if (U < 1) then  ! strong screening regime, eqn 4.8a in F&L
 
             A1 = pow2(1d0-4.222D-2*T623) + 2.643D-5*T653
             dA1dT = -2d0*4.222d-2*dT623dT*(1d0 - 4.222D-2*T623) + 2.643D-5*dT653dT
@@ -152,7 +152,7 @@
                B1=B1+F1
                dB1dT = dB1dT + dF1dT
 
-            endif
+            end if
 
             if (1.836D4 > R6T) then
 
@@ -165,7 +165,7 @@
                B2=B2+F2
                dB2dT = dB2dT + dF2dT
 
-            endif
+            end if
 
             G1=B1*exp(60.492D0*R6T13/T6)
             dG1dT = G1*(dB1dT/B1 - 60.492D0*R6T13*dT6dT/(T6*T6))
@@ -175,7 +175,7 @@
             dG2dT = G2*(dB2dT/B2 - 106.35D0*R6T13*dT6dT/(T6*T6))
             dG2dRho=0
 
-         else ! pycnonuclear regime, eqn 4.8b in F&L
+         else  ! pycnonuclear regime, eqn 4.8b in F&L
 
             AF=1d0/U32 + 1d0
             dAFdT = -1.5d0 * dUdT/U52
@@ -220,7 +220,7 @@
 
                G1=B1; dG1dRho = dB1dRho; dG1dT = dB1dT
 
-            endif
+            end if
 
             if (1.836D4 > R6T) then
 
@@ -243,11 +243,11 @@
 
                G2=B2; dG2dRho = dB2dRho; dG2dT = dB2dT
 
-            endif
+            end if
 
-         endif
+         end if
 
-         r=5.120D29*G1*G2*Y*Y*Y*R6*R6 ! ergs/g/sec, eqn 4.7 in F&L
+         r=5.120D29*G1*G2*Y*Y*Y*R6*R6  ! ergs/g/sec, eqn 4.7 in F&L
 
          if (r < 1d-99 .or. G1 < 1d-99 .or. G2 < 1d-99) then
             drdT = 0

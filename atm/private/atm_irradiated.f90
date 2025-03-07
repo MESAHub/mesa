@@ -26,22 +26,14 @@
 
 module atm_irradiated
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp
   use math_lib
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
   public :: eval_irradiated
-
-  ! Procedures
 
 contains
 
@@ -107,7 +99,7 @@ contains
     if (L <= 0._dp .OR. R <= 0._dp .OR. M <= 0._dp) then
        ierr = -1
        return
-    endif
+    end if
 
     ! Evaluate the 'interior' temperature & gravity
 
@@ -158,7 +150,7 @@ contains
 
        if (err < 1._dp) exit iterate_loop
 
-       kap = kap_prev + 0.5_dp*(kap - kap_prev) ! under correct
+       kap = kap_prev + 0.5_dp*(kap - kap_prev)  ! under correct
 
        ! Re-evaluate atmosphere data
 
@@ -191,7 +183,7 @@ contains
 
        dlnT_dlnkap = 0._dp
 
-    endif
+    end if
 
     ! Set the effective temperature. This is equal to T_int, because
     ! irradiation has no effect on the *net* flux emerging from the
@@ -199,13 +191,10 @@ contains
 
     ! Teff = T_int
 
-    ! Finish
-
     return
 
   end subroutine eval_irradiated
 
-  !****
 
   ! Evaluate atmosphere data
 
@@ -273,7 +262,7 @@ contains
        gamma_eff = gamma
     else
        gamma_eff = kap_v/kap
-    endif
+    end if
 
     x = gamma_eff*tau
 
@@ -323,7 +312,7 @@ contains
           dlnx_dlnkap = 1._dp
        else
           dlnx_dlnkap = 0._dp
-       endif
+       end if
 
        dlnT_dL = (dlnT_dlnT_int*dlnT_int_dlnL + &
                   dlnT_dlntau*dlntau_dlnL + &
@@ -345,9 +334,7 @@ contains
        dlnT_dlnM = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
+    end if
 
     return
 

@@ -26,7 +26,7 @@
       module do_one_utils
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, secday, dayyer
       use utils_lib, only: is_bad
 
       implicit none
@@ -269,7 +269,7 @@
 
          include 'formats'
 
-         age = s% star_age ! in years
+         age = s% star_age  ! in years
          if (trim(s% terminal_show_age_units) == 'seconds' .or. &
              trim(s% terminal_show_age_units) == 'secs') then
             age = age*secyer
@@ -277,7 +277,7 @@
             age = age*dayyer
          end if
 
-         time_step = s% time_step ! in years
+         time_step = s% time_step  ! in years
          if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
              trim(s% terminal_show_timestep_units) == 'secs') then
             time_step = time_step*secyer
@@ -345,15 +345,15 @@
             id_str, model, &
             s% log_max_temperature, &   ! fmt1
             s% Teff, &   ! fmt2
-            safe_log10(sum_LH), & ! fmt3
+            safe_log10(sum_LH), &  ! fmt3
             safe_log10(sum_Lnuc), &
             s% star_mass, &
             s% star_mass - max(s% he_core_mass, s% co_core_mass), &
-            s% center_h1, & ! fmt4
+            s% center_h1, &  ! fmt4
             s% center_n14, &
             s% surface_he3 + s% surface_he4, &
             s% eta(s% nz), &
-            s% nz, & ! fmt5
+            s% nz, &  ! fmt5
             s% num_retries
 
          tmp = max(0d0, min(1d0, 1 - (s% surface_h1 + s% surface_he3 + s% surface_he4)))
@@ -533,7 +533,7 @@
                  .and. .not. s% doing_first_model_of_run) then
                write(*,'(A)')
                call write_terminal_header(s)
-            endif
+            end if
          end if
          if (write_terminal) call do_terminal_summary(s)
          if (write_history) s% need_to_update_history_now = .true.
@@ -650,8 +650,8 @@
 
          log_surface_gravity = safe_log10(s%grav(1))
          log_surface_temperature = s% lnT(1) / ln10
-         log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
-         log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
+         log_surface_density = s% lnd(1)/ln10  ! log10(density at surface)
+         log_surface_pressure = s% lnPeos(1)/ln10  ! log10(eos pressure at surface)
 
          center_gamma = center_value(s, s% gam)
 
@@ -663,7 +663,7 @@
          if (s% L_phot > 0d0) then
             Lnuc_div_L = s% L_nuc_burn_total / s% L_phot
             if (.not. s% get_delta_nu_from_scaled_solar) then
-               delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
+               delta_nu = 1d6/(2*s% photosphere_acoustic_r)  ! microHz
             else
                delta_nu = &
                   s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
@@ -692,7 +692,7 @@
          min_logQ = 100
          do k = 1, s% nz
             logQ = s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
-            if (s% lnT(k)/ln10 < 5.5d0) then ! only worry about lower T cases
+            if (s% lnT(k)/ln10 < 5.5d0) then  ! only worry about lower T cases
                if (logQ > max_logQ) max_logQ = logQ
             end if
             if (logQ < min_logQ) min_logQ = logQ
@@ -1262,7 +1262,7 @@
 
          end if
 
-         if (s% u_flag .or. s% v_flag) then ! Things that depend on hydro related quantities
+         if (s% u_flag .or. s% v_flag) then  ! Things that depend on hydro related quantities
             if (s% shock_mass >= s% shock_mass_upper_limit .and. s% shock_mass_upper_limit > 0) then
                call compare_to_target('shock_mass >= shock_mass_upper_limit', &
                   s% shock_mass, s% shock_mass_upper_limit, t_shock_mass_upper_limit)
@@ -1452,7 +1452,7 @@
          end subroutine compare_to_target
 
 
-         real(dp) function get_species_mass(str) ! Msun
+         real(dp) function get_species_mass(str)  ! Msun
             use chem_lib, only: chem_get_iso_id
             character(len=*), intent(in) :: str
             integer :: id, j

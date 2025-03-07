@@ -64,7 +64,7 @@
       end subroutine extras_controls
 
 
-      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
+      subroutine set_constraint_value(id, name, val, ierr)  ! called from star_astero code
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
          real(dp), intent(out) :: val
@@ -92,10 +92,10 @@
       end subroutine set_constraint_value
 
 
-      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+      subroutine set_param(id, name, val, ierr)  ! called from star_astero code
          !use astero_search_data, only: vary_param1
          integer, intent(in) :: id
-         character(len=strlen), intent(in) :: name ! which of param's will be set
+         character(len=strlen), intent(in) :: name  ! which of param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -346,7 +346,7 @@
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depending on which
-         ! condition was triggered.  MESA provides 9 customizeable
+         ! condition was triggered.  MESA provides 9 customizable
          ! termination codes, named t_xtra1 .. t_xtra9.  You can
          ! customize the messages that will be printed upon exit by
          ! setting the corresponding termination_code_str value.

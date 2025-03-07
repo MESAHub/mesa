@@ -57,7 +57,7 @@ contains
       use const_def, only: dp
       integer, intent(in) :: id, k, nc, m
       real(dp), intent(in) :: rho, T, charge(m), na(m)
-      real(dp), intent(in), dimension(:) :: A, X, Z, C ! (m)
+      real(dp), intent(in), dimension(:) :: A, X, Z, C  ! (m)
       real(dp), intent(inout), dimension(m, m) :: &
          Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath
    end subroutine null_other_diffusion_coefficients

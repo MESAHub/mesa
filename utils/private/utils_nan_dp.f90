@@ -25,26 +25,18 @@
 
 module utils_nan_dp
 
-  ! Uses
-
   use const_def, only : dp
 
   use ISO_FORTRAN_ENV
   use ISO_C_BINDING
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameters
 
   integer, parameter :: FRAC_BITS_64 = 52
   integer, parameter :: EXPN_BITS_64 = 11
 
   integer(INT64), parameter :: QNAN_64 = INT(z'7ff8000000000001', INT64)
   integer(INT64), parameter :: SNAN_64 = INT(z'7ff0000000000001', INT64)
-
-  ! Interfaces
 
   interface is_nan
      module procedure is_nan_dp
@@ -66,16 +58,12 @@ module utils_nan_dp
      module procedure set_nan_dp_4d
   end interface set_nan
 
-  ! Access specifiers
-
   private
 
   public :: is_nan
   public :: is_inf
   public :: is_bad
   public :: set_nan
-
-  ! Procedures
 
 contains
 
@@ -106,15 +94,12 @@ contains
 
     if (PRESENT(signal)) then
        is_nan = is_nan .AND. (BTEST(frac, FRAC_BITS_64-1) .EQV. .NOT. signal)
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end function is_nan_dp
 
-  !****
 
   elemental function is_inf_dp (x) result (is_inf)
 
@@ -140,13 +125,10 @@ contains
 
     is_inf = expn == MASKR(EXPN_BITS_64, INT64) .AND. frac == 0_INT64
 
-    ! Finish
-
     return
 
   end function is_inf_dp
 
-  !****
 
   elemental function is_bad_dp (x) result (is_bad)
 
@@ -157,13 +139,10 @@ contains
 
     is_bad = is_nan(x) .OR. is_inf(x)
 
-    ! Finish
-
     return
 
   end function is_bad_dp
 
-  !****
 
   subroutine set_nan_dp_0d (x, signal)
 
@@ -181,18 +160,15 @@ contains
           ix = SNAN_64
        else
           ix = QNAN_64
-       endif
+       end if
     else
        ix = SNAN_64
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_dp_0d
 
-  !****
 
   subroutine set_nan_dp_1d (x, signal)
 
@@ -210,18 +186,15 @@ contains
           ix = SNAN_64
        else
           ix = QNAN_64
-       endif
+       end if
     else
        ix = SNAN_64
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_dp_1d
 
-  !****
 
   subroutine set_nan_dp_2d (x, signal)
 
@@ -239,18 +212,15 @@ contains
           ix = SNAN_64
        else
           ix = QNAN_64
-       endif
+       end if
     else
        ix = SNAN_64
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_dp_2d
 
-  !****
 
   subroutine set_nan_dp_3d (x, signal)
 
@@ -268,18 +238,15 @@ contains
           ix = SNAN_64
        else
           ix = QNAN_64
-       endif
+       end if
     else
        ix = SNAN_64
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_dp_3d
 
-  !****
 
   subroutine set_nan_dp_4d (x, signal)
 
@@ -297,12 +264,10 @@ contains
           ix = SNAN_64
        else
           ix = QNAN_64
-       endif
+       end if
     else
        ix = SNAN_64
-    endif
-
-    ! Finish
+    end if
 
     return
 

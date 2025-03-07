@@ -26,13 +26,14 @@
       module mod_random
       use const_def, only: dp
 
+      implicit none
 
       contains
 
 
       subroutine get_seed ( seed )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! GET_SEED returns a seed for the random number generator.
       !
@@ -61,12 +62,12 @@
       !
         implicit none
 
-        integer ( kind = 4 ) seed
-        real ( kind = 8 ) temp
-        character ( len = 10 ) time
-        character ( len = 8 ) today
-        integer ( kind = 4 ) values(8)
-        character ( len = 5 ) zone
+        integer ( kind = 4 ) :: seed
+        real ( kind = 8 ) :: temp
+        character ( len = 10 ) :: time
+        character ( len = 8 ) :: today
+        integer ( kind = 4 ) :: values(8)
+        character ( len = 5 ) :: zone
 
         call date_and_time ( today, time, zone, values )
 
@@ -106,7 +107,7 @@
 
       function i4_uniform ( a, b, seed )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! I4_UNIFORM returns a scaled pseudorandom I4.
       !
@@ -169,14 +170,14 @@
       !
         implicit none
 
-        integer ( kind = 4 ) a
-        integer ( kind = 4 ) b
+        integer ( kind = 4 ) :: a
+        integer ( kind = 4 ) :: b
         integer ( kind = 4 ), parameter :: i4_huge = 2147483647
-        integer ( kind = 4 ) i4_uniform
-        integer ( kind = 4 ) k
-        real ( kind = 4 ) r
-        integer ( kind = 4 ) seed
-        integer ( kind = 4 ) value
+        integer ( kind = 4 ) :: i4_uniform
+        integer ( kind = 4 ) :: k
+        real ( kind = 4 ) :: r
+        integer ( kind = 4 ) :: seed
+        integer ( kind = 4 ) :: value
 
         if ( seed == 0 ) then
           write ( *, '(a)' ) ' '
@@ -215,7 +216,7 @@
 
       subroutine perm_uniform ( n, base, seed, p )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! PERM_UNIFORM selects a random permutation of N objects.
       !
@@ -253,14 +254,14 @@
       !
         implicit none
 
-        integer ( kind = 4 ) n
+        integer ( kind = 4 ) :: n
 
-        integer ( kind = 4 ) base
-        integer ( kind = 4 ) i
-        integer ( kind = 4 ) j
-        integer ( kind = 4 ) k
-        integer ( kind = 4 ) p(n)
-        integer ( kind = 4 ) seed
+        integer ( kind = 4 ) :: base
+        integer ( kind = 4 ) :: i
+        integer ( kind = 4 ) :: j
+        integer ( kind = 4 ) :: k
+        integer ( kind = 4 ) :: p(n)
+        integer ( kind = 4 ) :: seed
 
         do i = 1, n
           p(i) = ( i - 1 ) + base
@@ -280,7 +281,7 @@
 
       function r8_uniform_01 ( seed )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! R8_UNIFORM_01 returns a unit pseudorandom R8.
       !
@@ -353,9 +354,9 @@
       !
         implicit none
 
-        integer ( kind = 4 ) k
-        real ( kind = 8 ) r8_uniform_01
-        integer ( kind = 4 ) seed
+        integer ( kind = 4 ) :: k
+        real ( kind = 8 ) :: r8_uniform_01
+        integer ( kind = 4 ) :: seed
 
         if ( seed == 0 ) then
           write ( *, '(a)' ) ' '

@@ -26,7 +26,7 @@
       module neu
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use utils_lib
 
       implicit none
@@ -62,11 +62,11 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
 
-         real(dp) :: loss(num_neu_rvs) ! total from all sources
+         real(dp) :: loss(num_neu_rvs)  ! total from all sources
          real(dp) :: sources(num_neu_types, num_neu_rvs)
          real(dp) :: log10_rho, log10_T
          real(dp), parameter :: log10_Tlim = 7.5d0
-         logical :: flags(num_neu_types) ! true if should include the type of loss
+         logical :: flags(num_neu_types)  ! true if should include the type of loss
 
          include 'formats'
 

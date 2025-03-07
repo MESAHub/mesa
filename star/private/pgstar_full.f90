@@ -26,7 +26,7 @@
 module pgstar
 
    use star_private_def
-   use const_def
+   use const_def, only: dp
    use chem_def, only : category_name
    use rates_def, only : i_rate
    use pgstar_support
@@ -69,7 +69,7 @@ contains
    end subroutine do_show_pgstar_annotations
 
 
-   subroutine do_start_new_run_for_pgstar(s, ierr) ! reset logs
+   subroutine do_start_new_run_for_pgstar(s, ierr)  ! reset logs
       use utils_lib
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -1290,7 +1290,7 @@ contains
       integer, intent(out) :: ierr
 
       integer(8) :: time0, time1, clock_rate
-      logical :: pause
+      logical :: do_pause
 
       include 'formats'
 
@@ -1308,15 +1308,15 @@ contains
       if (failed('save_text_data')) return
 
       if (s% pg% pause_interval > 0) then
-         pause = (mod(s% model_number, s% pg% pause_interval) == 0)
+         do_pause = (mod(s% model_number, s% pg% pause_interval) == 0)
       else
-         pause = s% pg% pause
+         do_pause = s% pg% pause
       end if
 
-      if (pause .and. s% pg% pgstar_interval > 0) &
-         pause = (mod(s% model_number, s% pg% pgstar_interval) == 0)
+      if (do_pause .and. s% pg% pgstar_interval > 0) &
+         do_pause = (mod(s% model_number, s% pg% pgstar_interval) == 0)
 
-      if (pause) then
+      if (do_pause) then
          write(*, '(A)')
          write(*, *) 'model_number', s% model_number
          write(*, *) 'PGSTAR: paused -- hit RETURN to continue'
@@ -1556,7 +1556,7 @@ contains
       if (ierr /= 0) then
          if (dbg) write(*, *) 'failed read pg_star history ' // trim(fname)
       else
-         do ! keep reading until reach end of file so take care of restarts
+         do  ! keep reading until reach end of file so take care of restarts
             allocate(pg)
             allocate(pg% vals(n))
             read(iounit, iostat = ierr) pg% age, pg% step, pg% vals(1:n)

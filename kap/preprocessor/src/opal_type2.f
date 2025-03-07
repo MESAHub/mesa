@@ -166,7 +166,7 @@ c     case  X=0.  The set of 60 data tables in (xxc,xxo) for a given Z that have
 c     been provided for X=0 should be placed in a file called 'codataa'.  This file
 c     will be read from unit 2 in the subroutine readco.  In this special case the
 c     set of routines provided should be compiled with the parameter mx=1 (there are
-c     4 occurances).  (NOTE: The version of the code described above, intended
+c     4 occurrences).  (NOTE: The version of the code described above, intended
 c     for X> 0, also  handles this case, but takes more storage space since mx=5).
 c          If you want to work with a single value of X which is not zero, i.e.,
 c     X=0.03, 0.1, 0.35, or 0.70, then compile the code with mx=1 but change the statement
@@ -457,7 +457,7 @@ c
         xx(i)=log10(0.005+xa(i))
         if(xa(i) .eq. 0.0) mxzero=i
         enddo
-c  ... this is the first time throught this m. Calculate the decadic
+c  ... this is the first time through this m. Calculate the decadic
 c      log of the perimeter points shifted by Z+0.001(to avoid divergence 
 c      at origin); m refers to xa(m); the hydrogen table value.
 c
@@ -600,7 +600,7 @@ c
       write(*,*) 'z', z, 'xh', xh, 'xxc', xxc, 'xxo', xxo, 'xxco', xxco, 'sum', z+xh+xxco
       xxc=xxci   ! restores input value; required if stop replaced 
 c                  with a return
-      xxo=xxoi   ! restores imput value
+      xxo=xxoi   ! restores input value
       call mesa_error(__FILE__,__LINE__)
    62 opact = 10.0
       !write(*,*) 'interpolation failed'
@@ -1821,7 +1821,7 @@ C
 C
 C  THE SUBROUTINES SPLINE AND SPLINT ARE ADAPTED FROM THOSE GIVE BY
 C  W.H. Press, S.A. Teulolsky, W.T. Vettering and B.P. Flannery,
-C  "Numerical Recipes in FORTRAN", 2nd edn., 1992, C.U.P.
+C  "Numerical Recipes in FORTRAN", 2nd ed., 1992, C.U.P.
 C  OTHER REFERENCES ARE MADE TO METHODS DESCRIBED IN THAT BOOK.
 C
       PARAMETER(IP=100,IPR=20)

@@ -26,7 +26,7 @@
 
 module binary_photos
 
-   use const_def
+   use const_def, only: dp
    use math_lib
    use star_lib
    use star_def
@@ -141,7 +141,7 @@ contains
          write(iounit) len_history_col_spec
          write(iounit) b% binary_history_column_spec(1:len_history_col_spec)
       else
-         write(iounit) 0 ! len_log_col_spec
+         write(iounit) 0  ! len_log_col_spec
       end if
       write(iounit)  &
          b% number_of_binary_history_columns, b% model_number_of_binary_history_values, &

@@ -188,7 +188,7 @@
                if (cid1 > 0 .and. cid2 > 0) then
                   i1 = g% net_iso(cid1)
                   i2 = g% net_iso(cid2)
-                  if (i1 == 0 .or. i2 == 0) then ! not in current net
+                  if (i1 == 0 .or. i2 == 0) then  ! not in current net
                      if (g% doing_approx21 .and. &
                               .not. (cid1 == ico55 .or. cid1 == ico57 .or. &
                                      cid2 == ico55 .or. cid2 == ico57 .or. &
@@ -226,8 +226,8 @@
             logical, intent(in) :: init
             integer, intent(in) :: jscr
             type (Screen_Info) :: sc
-            integer, intent(in) :: i1, i2 ! chem id's for the isotopes
-            integer, intent(in) :: i ! rate number
+            integer, intent(in) :: i1, i2  ! chem id's for the isotopes
+            integer, intent(in) :: i  ! rate number
             integer, intent(in) :: ir
             integer, intent(out) :: ierr
             real(dp) :: sc1a, sc1adt, sc1add, a1, z1, a2, z2
@@ -254,8 +254,8 @@
             logical, intent(in) :: init
             integer, intent(in) :: jscr
             type (Screen_Info) :: sc
-            integer, intent(in) :: i1_in, i2_in, i3_in ! chem id's for the isotopes
-            integer, intent(in) :: i ! rate number
+            integer, intent(in) :: i1_in, i2_in, i3_in  ! chem id's for the isotopes
+            integer, intent(in) :: i  ! rate number
             integer, intent(in) :: ir
             integer, intent(out) :: ierr
             integer :: i1, i2, i3, ii
@@ -273,7 +273,7 @@
             a3 = chem_isos% Z_plus_N(i3)
             z3 = dble(chem_isos% Z(i3))
             if (z2 == 0) then
-               if (z1 == 0) return ! n + n + A
+               if (z1 == 0) return  ! n + n + A
                ! have A + n + B
                ! swap 1 and 2 so have n + A + B
                ii = i2; i2 = i1; i1 = ii
@@ -282,7 +282,7 @@
                a2 = chem_isos% Z_plus_N(i2)
                z2 = dble(chem_isos% Z(i2))
             end if
-            if (z3 == 0) then ! have A + B + n
+            if (z3 == 0) then  ! have A + B + n
                ! swap 1 and 3 so have n + A + B
                ii = i1; i1 = i3; i3 = ii
                a1 = chem_isos% Z_plus_N(i1)
@@ -296,9 +296,9 @@
             if (z1 == 0) then
                if (init) return
                call set_rate_screening(i, sc2, sc2dt, sc2dd)
-               return ! n + (A + B)
+               return  ! n + (A + B)
             end if
-            i2 = 0 ! 0 for cid to disable caching
+            i2 = 0  ! 0 for cid to disable caching
             a2 = a2 + a3
             z2 = z2 + z3
             call screening_pair( &
@@ -529,7 +529,7 @@
             pg_raw_rate = rate_raw(irpg)
             pa_raw_rate = rate_raw(irpa)
 
-            if (pg_raw_rate + pa_raw_rate < 1d-99) then ! avoid divide by 0
+            if (pg_raw_rate + pa_raw_rate < 1d-99) then  ! avoid divide by 0
                pg_raw_rate = 1; pa_raw_rate = 1
             end if
 

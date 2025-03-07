@@ -71,6 +71,7 @@ contains
 
       use num_lib, only : safe_root_with_guess
       use math_lib, only : pow
+      use const_def, only : dp, pi
 
       type (binary_info), pointer :: b
       integer, intent(in) :: device_id
@@ -85,8 +86,8 @@ contains
          thetas, r1s, r2s, x1s, x2s, y1s, y2s, rs, phis, &
          x1s_RL, x2s_RL, y1s_RL, y2s_RL
       real :: a1, a2, e, x1max, x2max, xmax
-      integer, pointer :: ipar(:) ! (lipar)
-      real(dp), pointer :: rpar(:) ! (lrpar)
+      integer, pointer :: ipar(:)  ! (lipar)
+      real(dp), pointer :: rpar(:)  ! (lrpar)
       real(dp) :: cosp, q, this_psi, xl1
 
       include 'formats'
@@ -139,10 +140,10 @@ contains
                phis(i) = (i - 0.5) * pi / num_points
                cosp = cos(phis(i))
                rs(i) = safe_root_with_guess(f, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-                  1d-3, 1d0 - 1d-3, & ! left, right bracket
-                  roche(1d-3, cosp), roche(1d0 - 1d-3, cosp), & ! f(left, right bracket)
-                  50, 100, 1d-6, 1d-8, & ! i_next, imax, x_tol, y_tol
-                  0, rpar, 0, ipar, & ! func_params
+                  1d-3, 1d0 - 1d-3, &  ! left, right bracket
+                  roche(1d-3, cosp), roche(1d0 - 1d-3, cosp), &  ! f(left, right bracket)
+                  50, 100, 1d-6, 1d-8, &  ! i_next, imax, x_tol, y_tol
+                  0, rpar, 0, ipar, &  ! func_params
                   ierr)
 
                x1s_RL(i) = rs(i) * cosp
@@ -178,10 +179,10 @@ contains
                phis(i) = (i - 0.5) * pi / num_points
                cosp = cos(phis(i))
                rs(i) = safe_root_with_guess(f, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-                  1d-3, 1d0 - 1d-3, & ! left, right bracket
-                  roche(1d-3, cosp), roche(1d0 - 1d-3, cosp), & ! f(left, right bracket)
-                  25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
-                  0, rpar, 0, ipar, & ! func_params
+                  1d-3, 1d0 - 1d-3, &  ! left, right bracket
+                  roche(1d-3, cosp), roche(1d0 - 1d-3, cosp), &  ! f(left, right bracket)
+                  25, 50, 1d-4, 1d-6, &  ! i_next, imax, x_tol, y_tol
+                  0, rpar, 0, ipar, &  ! func_params
                   ierr)
 
                x2s_RL(i) = rs(i) * cosp
@@ -286,8 +287,8 @@ contains
          real(dp), intent(in) :: r
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
 
          f = roche(r, cosp) - this_psi

@@ -54,7 +54,6 @@ contains
     use auto_diff
     ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT
@@ -72,7 +71,7 @@ contains
     type(auto_diff_real_2var_order1) :: c2, c3
 
     ! check that assumptions are met
-    if (zeta.gt.-beta) stop "ECAPTURE:  zeta > -beta"
+    if (zeta>-beta) stop "ECAPTURE:  zeta > -beta"
 
     y = zeta+eta
 
@@ -101,7 +100,6 @@ contains
 
     ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT
@@ -119,7 +117,7 @@ contains
     type(auto_diff_real_2var_order1) :: c0, c1, c2, c3, c4
 
     ! check that assumptions are met
-    if (zeta.lt.beta) stop "ECAPTURE:  zeta < beta"
+    if (zeta<beta) stop "ECAPTURE:  zeta < beta"
 
 
     y = zeta-eta

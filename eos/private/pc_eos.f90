@@ -102,7 +102,7 @@
 ! 10.12.14 - slight cleaning of the text (no effect on the results)
 ! 28.05.15 - an accidental error in Wigner-Kirkwood entropy correction
 !   is fixed (it was in the line "Stot=Stot+FWK*DENSI" since 20.05.13).
-!***********************************************************************
+! ***********************************************************************
 !                           MAIN program:               Version 02.06.09
 ! This driving routine allows one to compile and run this code "as is".
 ! In practice, however, one usually needs to link subroutines from this
@@ -130,16 +130,16 @@
 ! C%C        if (AY(IX).le.0.) goto 2
 ! C%C         NMIX=IX
 ! C%C        if (dabs(XSUM-1.d0).lt.EPS) goto 2
-! C%C      enddo
+! C%C      end do
 ! C%C    2 continue
 ! C%C      if (NMIX.eq.0) then
 ! C%C         print*,'There must be at least one set of positive (x,Z,A).'
 ! C%C        goto 3
-! C%C      endif
+! C%C      end if
 ! C%C      write(*,114)
 ! C%C      do IX=1,NMIX
 ! C%C         write(*,113) IX,AZion(IX),ACMI(IX),AY(IX)
-! C%C      enddo
+! C%C      end do
 ! C%C    9 continue
 ! C%C      write(*,'('' Input T (K) (<0 to stop): ''$)')
 ! C%C      read*,T
@@ -265,30 +265,30 @@
       type(auto_diff_real_2var_order1) :: X, X1, X2, RZ, DeltaG
 
       real(dp), parameter :: TINY=1.d-7
-      real(dp), parameter :: AUM=1822.888d0 ! a.m.u./m_e
-      real(dp), parameter :: GAMIMELT=175.d0 ! OCP value of Gamma_i for melting (not used, replaced by GAMIlo/hi)
-      real(dp), parameter :: RSIMELT=140.d0 ! ion density parameter of quantum melting
-      real(dp), parameter :: RAD=2.5568570411948021d-07 ! Radiation constant (=4\sigma/c) (in a.u.)
+      real(dp), parameter :: AUM=1822.888d0  ! a.m.u./m_e
+      real(dp), parameter :: GAMIMELT=175.d0  ! OCP value of Gamma_i for melting (not used, replaced by GAMIlo/hi)
+      real(dp), parameter :: RSIMELT=140.d0  ! ion density parameter of quantum melting
+      real(dp), parameter :: RAD=2.5568570411948021d-07  ! Radiation constant (=4\sigma/c) (in a.u.)
 
 
       ierr = 0
       Y=0.d0
       do IX=1,NMIX
          Y=Y+AY(IX)
-      enddo
-      if (abs(Y-1.d0).gt.TINY) then
+      end do
+      if (abs(Y-1.d0)>TINY) then
         do IX=1,NMIX
            AY(IX)=AY(IX)/Y
-        enddo
+        end do
 !         print*,'MELANGE9: partial densities (and derivatives)',
 !     *    ' are rescaled by factor',1./Y
-      endif
+      end if
       Zmean=0d0
       Z2mean=0d0
       Z52=0d0
       Z53=0d0
       Z73=0d0
-      Z321=0d0 ! corr.26.12.09
+      Z321=0d0  ! corr.26.12.09
       CMImean=0d0
       do IX=1,NMIX
          if (AY(IX) < TINY) cycle
@@ -298,15 +298,15 @@
          Z53=Z53+AY(IX)*pow5(Z13)
          Z73=Z73+AY(IX)*pow7(Z13)
          Z52=Z52+AY(IX)*pow5(sqrt(AZion(IX)))
-         Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0)) ! 26.12.09
+         Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0))  ! 26.12.09
          CMImean=CMImean+AY(IX)*ACMI(IX)
-      enddo
+      end do
 ! (0) Photons:
       UINTRAD=RAD*TEMP*TEMP*TEMP*TEMP
       PRESSRAD=UINTRAD/3d0
 !      CVRAD=4.*UINTRAD/TEMP
 ! (1) ideal electron gas (including relativity and degeneracy)  -----  *
-      DENS=RHO/11.20587d0*Zmean/CMImean ! number density of electrons [au]
+      DENS=RHO/11.20587d0*Zmean/CMImean  ! number density of electrons [au]
       call CHEMFIT(DENS,TEMP,CHI)
 
 ! NB: CHI can be used as true input instead of RHO or DENS
@@ -315,44 +315,44 @@
         DlnDH,DlnDT,DlnDHH,DlnDTT,DlnDHT)
 ! NB: at this point DENS is redefined (the difference can be ~0.1%)
       DTE=DENS*TEMP
-      PRESSE=PEid*DTE ! P_e [a.u.]
-      UINTE=UEid*DTE ! U_e / V [a.u.]
+      PRESSE=PEid*DTE  ! P_e [a.u.]
+      UINTE=UEid*DTE  ! U_e / V [a.u.]
 ! (2) non-ideal Coulomb EIP  ----------------------------------------  *
-      RS=pow(0.75d0/PI/DENS,1d0/3d0) ! r_s - electron density parameter
-      RSI=RS*CMImean*Z73*AUM ! R_S - ion density parameter
-      GAME=1d0/RS/TEMP ! electron Coulomb parameter Gamma_e
+      RS=pow(0.75d0/PI/DENS,1d0/3d0)  ! r_s - electron density parameter
+      RSI=RS*CMImean*Z73*AUM  ! R_S - ion density parameter
+      GAME=1d0/RS/TEMP  ! electron Coulomb parameter Gamma_e
       GAMImean=Z53*GAME   ! effective Gamma_i - ion Coulomb parameter
-      if (RSI.lt.RSIMELT) then ! doesn't happen in "typical" wd cases
-         LIQSOL=0 ! liquid regime
-      else if (GAMImean.lt.GAMIlo) then
-         LIQSOL=0 ! liquid regime
-      else if (GAMImean.gt.GAMIhi) then
-         LIQSOL=1 ! solid regime
-      else ! blend of liquid and solid
+      if (RSI<RSIMELT) then  ! doesn't happen in "typical" wd cases
+         LIQSOL=0  ! liquid regime
+      else if (GAMImean<GAMIlo) then
+         LIQSOL=0  ! liquid regime
+      else if (GAMImean>GAMIhi) then
+         LIQSOL=1  ! solid regime
+      else  ! blend of liquid and solid
          LIQSOL=-1
-         alfa = (GAMImean - GAMIlo)/(GAMIhi - GAMIlo) ! 1 for solid, 0 for liquid
+         alfa = (GAMImean - GAMIlo)/(GAMIhi - GAMIlo)  ! 1 for solid, 0 for liquid
          beta = 1d0 - alfa
-      endif
+      end if
 ! Calculate partial thermodynamic quantities and combine them together:
       UINT=UINTE
       PRESS=PRESSE
       CVtot=CVE*DENS
       Stot=SEid*DENS
-      PDLT=PRESSE*CHITE ! d P_e[a.u.] / d ln T
-      PDLR=PRESSE*CHIRE ! d P_e[a.u.] / d ln\rho
-      DENSI=DENS/Zmean ! number density of all ions
-      PRESSI=DENSI*TEMP ! ideal-ions total pressure (normalization)
+      PDLT=PRESSE*CHITE  ! d P_e[a.u.] / d ln T
+      PDLR=PRESSE*CHIRE  ! d P_e[a.u.] / d ln\rho
+      DENSI=DENS/Zmean  ! number density of all ions
+      PRESSI=DENSI*TEMP  ! ideal-ions total pressure (normalization)
       TPT2=0d0
-      CTP=4.d0*PI/AUM/(TEMP*TEMP) ! common coefficient for TPT2.10.12.14
+      CTP=4.d0*PI/AUM/(TEMP*TEMP)  ! common coefficient for TPT2.10.12.14
 ! Add Coulomb+xc nonideal contributions, and ideal free energy:
       do IX=1,NMIX
-         if (AY(IX).lt.TINY) cycle ! skip this species
+         if (AY(IX)<TINY) cycle  ! skip this species
          Zion=AZion(IX)
-         if (Zion.eq.0d0) cycle ! skip neutrons
+         if (Zion==0d0) cycle  ! skip neutrons
          CMI=ACMI(IX)
-         GAMI=pow(Zion,5d0/3d0)*GAME ! Gamma_i for given ion species
-         DNI=DENSI*AY(IX) ! number density of ions of given type
-         PRI=DNI*TEMP ! = ideal-ions partial pressure (normalization)
+         GAMI=pow(Zion,5d0/3d0)*GAME  ! Gamma_i for given ion species
+         DNI=DENSI*AY(IX)  ! number density of ions of given type
+         PRI=DNI*TEMP  ! = ideal-ions partial pressure (normalization)
          if (LIQSOL == 0 .or. LIQSOL == 1) then
             call EOSFI8(LIQSOL,CMI,Zion,RS,GAMI, &
                FC1,UC1,PC1,SC1,CV1,PDT1,PDR1, &
@@ -383,20 +383,20 @@
             PDR2 = alfa*PDR2_1 + beta*PDR2_0
          end if
 ! First-order TD functions:
-         UINT=UINT+UC2*PRI ! internal energy density (e+i+Coul.)
-         Stot=Stot+DNI*(SC2-log(AY(IX))) !entropy per unit volume[a.u.]
-         PRESS=PRESS+PC2*PRI ! pressure (e+i+Coul.) [a.u.]
+         UINT=UINT+UC2*PRI  ! internal energy density (e+i+Coul.)
+         Stot=Stot+DNI*(SC2-log(AY(IX)))  !entropy per unit volume[a.u.]
+         PRESS=PRESS+PC2*PRI  ! pressure (e+i+Coul.) [a.u.]
 ! Second-order functions (they take into account compositional changes):
-         CVtot=CVtot+DNI*CV2 ! C_V (e+i+Coul.)/ V (optim.10.12.14)
-         PDLT=PDLT+PRI*PDT2 ! d P / d ln T
-         PDLR=PDLR+PRI*PDR2 ! d P / d ln\rho
-         TPT2=TPT2+CTP*DNI/ACMI(IX)*AZion(IX)**2 ! opt.10.12.14
-      enddo ! next IX
+         CVtot=CVtot+DNI*CV2  ! C_V (e+i+Coul.)/ V (optim.10.12.14)
+         PDLT=PDLT+PRI*PDT2  ! d P / d ln T
+         PDLR=PDLR+PRI*PDR2  ! d P / d ln\rho
+         TPT2=TPT2+CTP*DNI/ACMI(IX)*AZion(IX)**2  ! opt.10.12.14
+      end do  ! next IX
 ! Wigner-Kirkwood perturbative correction for liquid:
-      TPT=sqrt(TPT2) ! effective T_p/T - ion quantum parameter
+      TPT=sqrt(TPT2)  ! effective T_p/T - ion quantum parameter
 ! (in the case of a mixture, this estimate is crude)
-      if (LIQSOL.eq.0) then
-         FWK=TPT2/24.d0 ! Wigner-Kirkwood (quantum diffr.) term
+      if (LIQSOL==0) then
+         FWK=TPT2/24.d0  ! Wigner-Kirkwood (quantum diffr.) term
          ! MESA doesn't warn/error when this term gets large because
          ! it is not clear that we are better off falling back to HELM
          !
@@ -404,42 +404,42 @@
          !    print*,'MELANGE9: strong quantum effects in liquid!'
          !    ierr = -1
          !    return
-         ! endif
+         ! end if
          UWK=2.d0*FWK
          UINT=UINT+UWK*PRESSI
-         Stot=Stot+FWK*DENSI ! corrected 28.05.15
+         Stot=Stot+FWK*DENSI  ! corrected 28.05.15
          PRESS=PRESS+FWK*PRESSI
-         CVtot=CVtot-UWK*DENSI ! corrected by JWS 17.04.20
+         CVtot=CVtot-UWK*DENSI  ! corrected by JWS 17.04.20
          PDLT=PDLT-FWK*PRESSI
          PDLR=PDLR+UWK*PRESSI
-      endif
+      end if
 ! Corrections to the linear mixing rule:
-      if (LIQSOL.eq.0) then ! liquid phase
+      if (LIQSOL==0) then  ! liquid phase
          call CORMIX(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321, &
            FMIX,UMIX,PMIX,CVMIX,PDTMIX,PDRMIX)
-      else ! solid phase (only Madelung contribution) [22.12.12]
+      else  ! solid phase (only Madelung contribution) [22.12.12]
         FMIX=0d0
         do I=1,NMIX
-           if (AY(I).lt.TINY) cycle
+           if (AY(I)<TINY) cycle
           do J=I+1,NMIX
-             if (AY(J).lt.TINY) cycle
+             if (AY(J)<TINY) cycle
              RZ=AZion(J)/AZion(I)
              X2=AY(J)/(AY(I)+AY(J))
              X1=dim(1.d0,X2)
-             if (X2.lt.TINY) cycle
+             if (X2<TINY) cycle
              X=X2/RZ+(1.d0-1.d0/RZ)*pow(X2, RZ)
-             GAMI=pow(AZion(I),5d0/3d0)*GAME ! Gamma_i corrected 14.05.13
+             GAMI=pow(AZion(I),5d0/3d0)*GAME  ! Gamma_i corrected 14.05.13
              DeltaG=.012d0*(1.d0-1.d0/pow2(RZ))*(X1+X2*pow(RZ,5d0/3d0))
              DeltaG=DeltaG*X/X2*dim(1.d0,X)/X1
              FMIX=FMIX+AY(I)*AY(J)*GAMI*DeltaG
-          enddo
-        enddo
+          end do
+        end do
          UMIX=FMIX
          PMIX=FMIX/3.d0
          CVMIX=0d0
          PDTMIX=0d0
          PDRMIX=FMIX/2.25d0
-      endif
+      end if
       UINT=UINT+UMIX*PRESSI
       Stot=Stot+DENSI*(UMIX-FMIX)
       PRESS=PRESS+PMIX*PRESSI
@@ -447,17 +447,17 @@
       PDLT=PDLT+PRESSI*PDTMIX
       PDLR=PDLR+PRESSI*PDRMIX
 ! First-order:
-      PRADnkT=PRESSRAD/PRESSI ! radiative pressure / n_i k T
+      PRADnkT=PRESSRAD/PRESSI  ! radiative pressure / n_i k T
 !      CVtot=CVtot+CVRAD
 !      Stot=Stot+CVRAD/3.
-      PnkT=PRESS/PRESSI ! P / n_i k T
-      UNkT=UINT/PRESSI ! U / N_i k T
+      PnkT=PRESS/PRESSI  ! P / n_i k T
+      UNkT=UINT/PRESSI  ! U / N_i k T
 !      UNkT=UNkT+UINTRAD/PRESSI
-      SNk=Stot/DENSI ! S / N_i k
+      SNk=Stot/DENSI  ! S / N_i k
 ! Second-order:
-      CV=CVtot/DENSI ! C_V per ion
-      CHIR=PDLR/PRESS ! d ln P / d ln\rho
-      CHIT=PDLT/PRESS ! d ln P / d ln T
+      CV=CVtot/DENSI  ! C_V per ion
+      CHIR=PDLR/PRESS  ! d ln P / d ln\rho
+      CHIT=PDLT/PRESS  ! d ln P / d ln T
 !      CHIT=CHIT+4.*PRESSRAD/PRESS ! d ln P / d ln T
       return
       end subroutine MELANGE9
@@ -506,43 +506,43 @@
       type(auto_diff_real_2var_order1) :: FC0, UC0, PC0, SC0, CV0, PDT0, PDR0
 
       real(dp), parameter :: TINY=1.d-20
-      real(dp), parameter :: AUM=1822.888d0 ! a.m.u/m_e
+      real(dp), parameter :: AUM=1822.888d0  ! a.m.u/m_e
 
       ierr = 0
-      if (LIQSOL.ne.1.and.LIQSOL.ne.0) then
+      if (LIQSOL/=1.and.LIQSOL/=0) then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'EOSFI8: invalid LIQSOL')
       end if
-      if (CMI.le..1d0)  then
+      if (CMI<=.1d0)  then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'EOSFI8: too small CMI')
       end if
-      if (Zion.le..1d0)  then
+      if (Zion<=.1d0)  then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'EOSFI8: too small Zion')
       end if
-      if (RS.le..0d0)  then
+      if (RS<=.0d0)  then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'EOSFI8: invalid RS')
       end if
-      if (GAMI.le..0d0)  then
+      if (GAMI<=.0d0)  then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'EOSFI8: invalid GAMI')
       end if
       GAME=GAMI/pow(Zion,5d0/3d0)
-      call EXCOR7(RS,GAME,FXC,UXC,PXC,CVXC,SXC,PDTXC,PDRXC) ! "ee"("xc")
+      call EXCOR7(RS,GAME,FXC,UXC,PXC,CVXC,SXC,PDTXC,PDRXC)  ! "ee"("xc")
 ! Calculate "ii" part:
-      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
+      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0)  ! auxiliary coefficient
       TPT=GAMI/sqrt(RS)*COTPT              ! T_p/T
       FidION=1.5d0*log(TPT*TPT/GAMI)-1.323515d0
 ! 1.3235=1+0.5*ln(6/pi); FidION = F_{id.ion gas}/(N_i kT), but without
 ! the term x_i ln x_i = -S_{mix}/(N_i k).
-      if (LIQSOL.eq.0) then                 ! liquid
+      if (LIQSOL==0) then                 ! liquid
          call FITION9(GAMI, &
            FION,UION,PION,CVii,PDTii,PDRii)
          FItot=FION+FidION
@@ -554,24 +554,24 @@
          PDRi=PDRii+1.d0
       else                                  ! solid
          call FHARM12(GAMI,TPT, &
-           Fharm,Uharm,Pharm,CVharm,Sharm,PDTharm,PDRharm) ! harm."ii"
-         call ANHARM8(GAMI,TPT,Fah,Uah,Pah,CVah,PDTah,PDRah) ! anharm.
+           Fharm,Uharm,Pharm,CVharm,Sharm,PDTharm,PDRharm)  ! harm."ii"
+         call ANHARM8(GAMI,TPT,Fah,Uah,Pah,CVah,PDTah,PDRah)  ! anharm.
          FItot=Fharm+Fah
          FION=FItot-FidION
          UItot=Uharm+Uah
-         UION=UItot-1.5d0 ! minus 1.5=ideal-gas, in order to get "ii"
+         UION=UItot-1.5d0  ! minus 1.5=ideal-gas, in order to get "ii"
          PItot=Pharm+Pah
-         PION=PItot-1.d0 ! minus 1=ideal-gas
+         PION=PItot-1.d0  ! minus 1=ideal-gas
          PDTi=PDTharm+PDTah
          PDRi=PDRharm+PDRah
-         PDTii=PDTi-1.d0 ! minus 1=ideal-gas
-         PDRii=PDRi-1.d0 ! minus 1=ideal-gas
+         PDTii=PDTi-1.d0  ! minus 1=ideal-gas
+         PDRii=PDRi-1.d0  ! minus 1=ideal-gas
          CVItot=CVharm+CVah
          SCItot=Sharm+Uah-Fah
-         CVii=CVItot-1.5d0 ! minus 1.5=ideal-gas
-      endif
+         CVii=CVItot-1.5d0  ! minus 1.5=ideal-gas
+      end if
 ! Calculate "ie" part:
-      if (LIQSOL.eq.1) then
+      if (LIQSOL==1) then
          call FSCRsol8(RS,GAMI,Zion,TPT, &
            FSCR,USCR,PSCR,S_SCR,CVSCR,PDTSCR,PDRSCR,ierr)
          if (ierr /= 0) return
@@ -580,7 +580,7 @@
            FSCR,USCR,PSCR,CVSCR,PDTSCR,PDRSCR,ierr)
          if (ierr /= 0) return
          S_SCR=USCR-FSCR
-      endif
+      end if
 ! Total excess quantities ("ii"+"ie"+"ee", per ion):
       FC0=FSCR+Zion*FXC
       UC0=USCR+Zion*UXC
@@ -634,7 +634,7 @@
       real(dp), parameter :: G1=170.0d0
       real(dp), parameter :: C2=-8.4d-5
       real(dp), parameter :: G2=.0037d0
-      real(dp), parameter :: SQ32=.8660254038d0 ! SQ32=sqrt(3)/2
+      real(dp), parameter :: SQ32=.8660254038d0  ! SQ32=sqrt(3)/2
 
       real(dp) :: &
          xFION, dFION_dlnGAMI, &
@@ -665,10 +665,10 @@
             + A3*(1.d0-GAMI)/pow2(1.d0+GAMI)) &
             - GAMI*GAMI*(C1*G1/pow2(G1+GAMI)+C2*(G2-GAMI*GAMI)/pow2(G2+GAMI*GAMI))
          PION=UION/3.0d0
-         PDRii=(4.0d0*UION-CVii)/9.0d0 ! p_{ii} + d p_{ii} / d ln\rho
-         PDTii=CVii/3.0d0 ! p_{ii} + d p_{ii} / d ln T
+         PDRii=(4.0d0*UION-CVii)/9.0d0  ! p_{ii} + d p_{ii} / d ln\rho
+         PDTii=CVii/3.0d0  ! p_{ii} + d p_{ii} / d ln T
 
-      endif
+      end if
 
       if (use_FITION9_table .or. debug_FITION9_table) then
          ierr = 0
@@ -695,7 +695,7 @@
          if (.not. check1(PDTii, xPDTii, 'PDTii')) return
          if (.not. check1(PDRii, xPDRii, 'PDRii')) return
 
-      endif
+      end if
 
 
       if (use_FITION9_table .and. .not. skip) then
@@ -760,7 +760,7 @@
       end subroutine FITION9
 
       subroutine FSCRliq8(RS,GAME,Zion, &
-           FSCR,USCR,PSCR,CVSCR,PDTSCR,PDRSCR,ierr) ! fit to the el.-ion scr.
+           FSCR,USCR,PSCR,CVSCR,PDTSCR,PDRSCR,ierr)  ! fit to the el.-ion scr.
 !                                                       Version 11.09.08
 !                                                       cleaned 16.06.09
 ! Stems from FSCRliq7 v. 09.06.07. Included a check for RS=0.
@@ -807,12 +807,12 @@
       logical, parameter :: debug_FSCRliq8_table = .false.
 
       ierr = 0
-      if (RS.lt.0d0) then
+      if (RS<0d0) then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'FSCRliq8: RS < 0')
       end if
-      if (RS.lt.TINY) then
+      if (RS<TINY) then
          FSCR=0.d0
          USCR=0.d0
          PSCR=0.d0
@@ -820,7 +820,7 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
+      end if
 
       if (use_FSCRliq8_table .or. debug_FSCRliq8_table) then
          ierr = 0
@@ -834,7 +834,7 @@
          if (ierr /= 0) return
       else
          skip = .true.
-      endif
+      end if
 
       if (.not. use_FSCRliq8_table .or. debug_FSCRliq8_table .or. skip) then
 
@@ -842,12 +842,12 @@
          SQR=sqrt(RS)
          SQZ1=sqrt(1d0+Zion)
          SQZ=sqrt(Zion)
-         CDH0=Zion/1.73205d0 ! 1.73205=sqrt(3.)
+         CDH0=Zion/1.73205d0  ! 1.73205=sqrt(3.)
          CDH=CDH0*(SQZ1*SQZ1*SQZ1-SQZ*SQZ*SQZ-1d0)
          SQG=sqrt(GAME)
          ZLN=log(Zion)
-         Z13=exp(ZLN/3.d0) ! Zion**(1./3.)
-         X=XRS/RS ! relativity parameter
+         Z13=exp(ZLN/3.d0)  ! Zion**(1./3.)
+         X=XRS/RS  ! relativity parameter
          CTF=Zion*Zion*.2513d0*(Z13-1d0+.2d0/sqrt(Z13))
          ! Thomas-Fermi constant; .2513=(18/175)(12/\pi)^{2/3}
          P01=1.11d0*exp(0.475d0*ZLN)
@@ -927,7 +927,7 @@
          FDX=FX*GAME
          FG=(UP*DNDG/DN-UPDG)/DN
          FDG=FG*GAME-UP/DN
-         FDGDH=SQG*DNDG/(DN*DN) ! d FDG / d CDH
+         FDGDH=SQG*DNDG/(DN*DN)  ! d FDG / d CDH
          FDXX=((UP*DNDXX+2d0*(UPDX*DNDX-UP*DNDX*DNDX/DN))/DN-UPDXX)/DN*GAME
          FDGG=2d0*FG+GAME*((2d0*DNDG*(UPDG-UP*DNDG/DN)+UP*DNDGG)/DN-UPDGG)/DN
          FDXG=FX+GAME*FXDG
@@ -937,7 +937,7 @@
          PDTSCR=-GAME*GAME*(X*FXDG+FDGG)/3.d0
          PDRSCR=(12d0*PSCR+X*X*FDXX+2d0*X*GAME*FDXG+GAME*GAME*FDGG)/9d0
 
-      endif
+      end if
 
       if (debug_FSCRliq8_table .and. .not. skip) then
 
@@ -948,7 +948,7 @@
          if (.not. check1(PDTSCR, xPDTSCR, 'PDTSCR')) return
          if (.not. check1(PDRSCR, xPDRSCR, 'PDRSCR')) return
 
-      endif
+      end if
 
       if (use_FSCRliq8_table .and. .not. skip) then
 
@@ -1063,12 +1063,12 @@
 
 !      data AP/1.1857,.663,17.1,40./,PX/.212/ ! for fcc lattice
       ierr = 0
-      if (RS.lt.0d0) then
+      if (RS<0d0) then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'FSCRsol8: RS < 0')
       end if
-      if (RS.lt.TINY) then
+      if (RS<TINY) then
          FSCR=0.d0
          USCR=0.d0
          PSCR=0.d0
@@ -1077,14 +1077,14 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
-      XSR=0.0140047d0/RS ! relativity parameter
+      end if
+      XSR=0.0140047d0/RS  ! relativity parameter
       Z13=pow(Zion,1d0/3d0)
       P1=0.00352d0*(1d0-AP(1)/pow(Zion,0.267d0)+0.27d0/Zion)
       P2=1d0+2.25d0/Z13* &
            (1d0+AP(2)*pow5(Zion)+0.222d0*pow6(Zion))/(1d0+0.222d0*pow6(Zion))
       ZLN=log(Zion)
-      Finf=sqrt(P2/(XSR*XSR)+1d0)*Z13*Z13*P1 ! The TF limit
+      Finf=sqrt(P2/(XSR*XSR)+1d0)*Z13*Z13*P1  ! The TF limit
       FinfX=-P2/((P2+XSR*XSR)*XSR)
       FinfDX=Finf*FinfX
       FinfDXX=FinfDX*FinfX-FinfDX*(P2+3d0*XSR*XSR)/((P2+XSR*XSR)*XSR)
@@ -1099,7 +1099,7 @@
       Q1DX=Q1*Q1X
       Q1DXX=Q1DX*Q1X+Q1*Q1XDX
 ! New quantum factor, in order to suppress CVSCR at TPT >> 1
-      if (TPT.lt.6d0/PX) then
+      if (TPT<6d0/PX) then
          Y0=(PX*TPT)*(PX*TPT)
          Y0DX=Y0/XSR
          Y0DG=2d0*Y0/GAMI
@@ -1149,7 +1149,7 @@
          SUPDXX=-0.5d0*SUPDX/XSR
          SUPDGG=0d0
          SUPDXG=SUPDX/GAMI
-      endif
+      end if
       GR3=pow(GAMI/SUP,R3)
       GR3X=-R3*SUPDX/SUP
       GR3DX=GR3*GR3X
@@ -1198,7 +1198,7 @@
       type(auto_diff_real_2var_order1) :: CN, SUPGN, ACN, PN
       type(auto_diff_real_2var_order1) :: B1
 
-      B1 = 0.12d0 ! coeff.at \eta^2/\Gamma at T=0
+      B1 = 0.12d0  ! coeff.at \eta^2/\Gamma at T=0
 
       ! Farouki & Hamaguchi'93
       AA(1) = 10.9d0
@@ -1206,12 +1206,12 @@
       AA(3) = 1.765d5
 
 
-      CK=B1/AA(1) ! fit coefficient
+      CK=B1/AA(1)  ! fit coefficient
       TPT2=TPT*TPT
       TPT4=TPT2*TPT2
-      TQ=B1*TPT2/GAMI ! quantum dependence
+      TQ=B1*TPT2/GAMI  ! quantum dependence
       TK2=CK*TPT2
-      SUP=exp(-TK2) ! suppress.factor of class.anharmonicity
+      SUP=exp(-TK2)  ! suppress.factor of class.anharmonicity
       Fah=0.d0
       Uah=0.d0
       Pah=0.d0
@@ -1221,7 +1221,7 @@
       SUPGN=SUP
       do N=1,NM
          CN=1d0*N
-         SUPGN=SUPGN/GAMI ! SUP/Gamma^n
+         SUPGN=SUPGN/GAMI  ! SUP/Gamma^n
          ACN=AA(N)
          Fah=Fah-ACN/CN*SUPGN
          Uah=Uah+(ACN*(1d0+2d0*TK2/CN))*SUPGN
@@ -1231,7 +1231,7 @@
             + 4d0*AA(N)*CK*CK/CN*TPT4)*SUPGN
          PDTah=PDTah+(PN*(1d0+CN+2d0*TK2)-2d0/CN*AA(N)*TK2)*SUPGN
          PDRah=PDRah+(PN*(1d0-CN/3d0-TK2)+AA(N)/CN*TK2)*SUPGN
-      enddo
+      end do
       Fah=Fah-TQ
       Uah=Uah-TQ
       Pah=Pah-TQ/1.5d0
@@ -1256,11 +1256,11 @@
       type(auto_diff_real_2var_order1) :: Fth,Uth,Sth,U0,E0
       type(auto_diff_real_2var_order1) :: F,U,U1
 
-      real(dp), parameter :: CM = .895929256d0 ! Madelung
+      real(dp), parameter :: CM = .895929256d0  ! Madelung
 
       call HLfit12(TPT,F,U,CVth,Sth,U1,1)
-      U0=-CM*GAMI ! perfect lattice
-      E0=1.5d0*U1*TPT ! zero-point energy
+      U0=-CM*GAMI  ! perfect lattice
+      E0=1.5d0*U1*TPT  ! zero-point energy
       Uth=U+E0
       Fth=F+E0
       Uharm=U0+Uth
@@ -1285,7 +1285,7 @@
 !   CV and S (normalized to Nk) in the HL model,
 !   U1 - the 1st phonon moment,
 
-      type(auto_diff_real_2var_order1) :: eta ! can be modified, not sure if this is an intended side-effect
+      type(auto_diff_real_2var_order1) :: eta  ! can be modified, not sure if this is an intended side-effect
       type(auto_diff_real_2var_order1), intent(out) :: F, U, CV, S, U1
       integer, intent(in) :: LATTICE
 
@@ -1301,8 +1301,8 @@
       EPS=1.d-5
       TINY=1.d-99
 
-      if (LATTICE.eq.1) then ! bcc lattice
-         CLM=-2.49389d0 ! 3*ln<\omega/\omega_p>
+      if (LATTICE==1) then  ! bcc lattice
+         CLM=-2.49389d0  ! 3*ln<\omega/\omega_p>
          U1=0.5113875d0
          ALPHA=0.265764d0
          BETA=0.334547d0
@@ -1321,7 +1321,7 @@
          B7=2.19749d-6
          C9=0.004757014d0
          C11=0.0047770935d0
-      elseif (LATTICE.eq.2) then ! fcc lattice
+      elseif (LATTICE==2) then  ! fcc lattice
          CLM=-2.45373d0
          U1=0.513194d0
          ALPHA=0.257591d0
@@ -1343,13 +1343,13 @@
          C11=0.00437506d0
       else
          call mesa_error(__FILE__,__LINE__,'HLfit: unknown lattice type')
-      endif
-      if (eta.gt.1d0/EPS) then ! asymptote of Eq.(13) of BPY'01
+      end if
+      if (eta>1d0/EPS) then  ! asymptote of Eq.(13) of BPY'01
          U=3d0/(C11*eta*eta*eta)
          F=-U/3d0
          CV=4d0*U
-      else if (eta.lt.EPS) then ! Eq.(17) of BPY'01
-         if (eta.lt.TINY) eta = TINY !call mesa_error(__FILE__,__LINE__,'HLfit8: eta is too small')
+      else if (eta<EPS) then  ! Eq.(17) of BPY'01
+         if (eta<TINY) eta = TINY  !call mesa_error(__FILE__,__LINE__,'HLfit8: eta is too small')
          F=3d0*log(eta)+CLM-1.5d0*U1*eta+eta*eta/24.d0
          U=3d0-1.5d0*U1*eta+eta*eta/12d0
          CV=3d0-eta*eta/12d0
@@ -1366,7 +1366,7 @@
          EA=exp(-ALPHA*eta)
          EB=exp(-BETA*eta)
          EG=exp(-GAMMA*eta)
-         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN ! F_{thermal}/NT
+         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN  ! F_{thermal}/NT
 
          !UP1=A1+2d0*A2*eta+3.*A3*eta**2+4.*A4*eta**3+6d0*A6*eta**5+8.*A8*eta**7
          UP1=A1+eta*(2d0*A2+eta*(3.d0*A3+eta*(4.d0*A4+eta*eta*(6d0*A6+eta*eta*8d0*A8))))
@@ -1381,10 +1381,10 @@
          DN2=2d0*B2+eta*eta*(12d0*B4+eta*(20d0*B5+eta*(30d0*B6+eta*(42d0*B7+eta*eta*(72d0*B9+eta*eta*110d0*B11)))))
 
          U=ALPHA*EA/(1.d0-EA)+BETA*EB/(1.d0-EB)+GAMMA*EG/(1.d0-EG) &
-            - (UP1*DN-DN1*UP)/(DN*DN) ! int.en./NT/eta
+            - (UP1*DN-DN1*UP)/(DN*DN)  ! int.en./NT/eta
          CV=ALPHA*ALPHA*EA/((1.d0-EA)*(1.d0-EA))+BETA*BETA*EB/((1.d0-EB)*(1.d0-EB)) &
             + GAMMA*GAMMA*EG/((1.d0-EG)*(1.d0-EG)) &
-            + ((UP2*DN-DN2*UP)*DN-2d0*(UP1*DN-DN1*UP)*DN1)/(DN*DN*DN) ! cV/eta^2
+            + ((UP2*DN-DN2*UP)*DN-2d0*(UP1*DN-DN1*UP)*DN1)/(DN*DN*DN)  ! cV/eta^2
          U=U*eta
          CV=CV*eta*eta
       end if
@@ -1420,15 +1420,15 @@
       TINY=1.d-9
 
       GAMImean=GAME*Z53
-      if (RS.lt.TINY) then ! OCP
+      if (RS<TINY) then  ! OCP
          Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
       else
          Dif0=Z321-sqrt((Z2mean+Zmean)*(Z2mean+Zmean)*(Z2mean+Zmean)/Zmean)
-      endif
+      end if
       DifR=Dif0/Z52
-      DifFDH=Dif0*GAME*sqrt(GAME/3d0) ! F_DH - F_LM(DH)
+      DifFDH=Dif0*GAME*sqrt(GAME/3d0)  ! F_DH - F_LM(DH)
       D=Z2mean/(Zmean*Zmean)
-      if (abs(D-1.d0).lt.TINY) then ! no correction
+      if (abs(D-1.d0)<TINY) then  ! no correction
          FMIX=0d0
          UMIX=0d0
          PMIX=0d0
@@ -1436,7 +1436,7 @@
          PDTMIX=0d0
          PDRMIX=0d0
          return
-      endif
+      end if
       P3=pow(D,-0.2d0)
       D0=(2.6d0*DifR+14d0*DifR*DifR*DifR)/(1.d0-P3)
       GP=D0*pow(GAMImean,P3)
@@ -1448,8 +1448,8 @@
       G=1.5d0-P3*GP/(1d0+GP)-R*P3*GQ/(1d0+GQ)
       UMIX=FMIX*G
       PMIX=UMIX/3.d0
-      GDG=-P3*P3*(GP/((1.d0+GP)*(1.d0+GP))+R*GQ/((1.d0+GQ)*(1.d0+GQ))) ! d G /d ln Gamma
-      UDG=UMIX*G+FMIX*GDG ! d u_mix /d ln Gamma
+      GDG=-P3*P3*(GP/((1.d0+GP)*(1.d0+GP))+R*GQ/((1.d0+GQ)*(1.d0+GQ)))  ! d G /d ln Gamma
+      UDG=UMIX*G+FMIX*GDG  ! d u_mix /d ln Gamma
       CVMIX=UMIX-UDG
       PDTMIX=PMIX-UDG/3d0
       PDRMIX=PMIX+UDG/9d0
@@ -1502,11 +1502,11 @@
       XSCAL2=XMAX/DCHI2
 
       X2=(CHI-CHI2)*XSCAL2
-      if (X2.lt.-XMAX) then
+      if (X2<-XMAX) then
          call ELECT11a(TEMP,CHI, &
            DENS,FEid,PEid,UEid,SEid,CVE,CHITE,CHIRE,&
            DlnDH,DlnDT,DlnDHH,DlnDTT,DlnDHT)
-      elseif (X2.gt.XMAX) then
+      elseif (X2>XMAX) then
          call ELECT11b(TEMP,CHI, &
            DENS,FEid,PEid,UEid,SEid,CVE,CHITE,CHIRE,&
            DlnDH,DlnDT,DlnDHH,DlnDTT,DlnDHT)
@@ -1531,7 +1531,7 @@
          DlnDHH=DlnDHHa*FP+DlnDHHb*FM
          DlnDHT=DlnDHTa*FP+DlnDHTb*FM
          DlnDTT=DlnDTTa*FP+DlnDTTb*FM
-      endif
+      end if
       return
       end subroutine ELECT11
 
@@ -1560,15 +1560,15 @@
       BOHR=137.036d0
       PI2=PI*PI
       BOHR2=BOHR*BOHR
-      BOHR3=BOHR2*BOHR !cleaned 15/6
+      BOHR3=BOHR2*BOHR  !cleaned 15/6
 
-      TEMR=TEMP/BOHR2 ! T in rel.units (=T/mc^2)
+      TEMR=TEMP/BOHR2  ! T in rel.units (=T/mc^2)
       call BLIN9(TEMR,CHI, &
         W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT, &
         W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT, &
         W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT, &
         W0XXX,W0XTT,W0XXT)
-      TPI=TEMR*sqrt(2.d0*TEMR)/PI2 ! common pre-factor
+      TPI=TEMR*sqrt(2.d0*TEMR)/PI2  ! common pre-factor
       DENR=TPI*(W1*TEMR+W0)
       PR=TEMR*TPI/3.d0*(W2*TEMR+2d0*W1)
       U=TEMR*TPI*(W2*TEMR+W1)
@@ -1576,27 +1576,27 @@
       PEid=PR/(DENR*TEMR)
       UEid=U/(DENR*TEMR)
       FEid=CHI-PEid
-      DENS=DENR*BOHR3 ! converts from rel.units to a.u.
+      DENS=DENR*BOHR3  ! converts from rel.units to a.u.
       SEid=UEid-FEid
 ! derivatives over T at constant chi:
-      dndT=TPI*(1.5d0*W0/TEMR+2.5d0*W1+W0DT+TEMR*W1DT) ! (d n_e/dT)_\chi
-      dPdT=TPI/3.d0*(5.d0*W1+2d0*TEMR*W1DT+3.5d0*TEMR*W2+TEMR*TEMR*W2DT)!dP/dT
-      dUdT=TPI*(2.5d0*W1+TEMR*W1DT+3.5d0*TEMR*W2+TEMR*TEMR*W2DT)!dU/dT_\chi
+      dndT=TPI*(1.5d0*W0/TEMR+2.5d0*W1+W0DT+TEMR*W1DT)  ! (d n_e/dT)_\chi
+      dPdT=TPI/3.d0*(5.d0*W1+2d0*TEMR*W1DT+3.5d0*TEMR*W2+TEMR*TEMR*W2DT)  !dP/dT
+      dUdT=TPI*(2.5d0*W1+TEMR*W1DT+3.5d0*TEMR*W2+TEMR*TEMR*W2DT)  !dU/dT_\chi
 ! derivatives over chi at constant T:
-      dndH=TPI*(W0DX+TEMR*W1DX) ! (d n_e/d\chi)_T
-      dndHH=TPI*(W0DXX+TEMR*W1DXX) ! (d^2 n_e/d\chi)_T
+      dndH=TPI*(W0DX+TEMR*W1DX)  ! (d n_e/d\chi)_T
+      dndHH=TPI*(W0DXX+TEMR*W1DXX)  ! (d^2 n_e/d\chi)_T
       dndTT=TPI*(0.75d0*W0/pow2(TEMR)+3d0*W0DT/TEMR+W0DTT+3.75d0*W1/TEMR+5d0*W1DT+TEMR*W1DTT)
       dndHT=TPI*(1.5d0*W0DX/TEMR+W0DXT+2.5d0*W1DX+TEMR*W1DXT)
-      DlnDH=dndH/DENR ! (d ln n_e/d\chi)_T
-      DlnDT=dndT*TEMR/DENR ! (d ln n_e/d ln T)_\chi
-      DlnDHH=dndHH/DENR-pow2(DlnDH) ! (d^2 ln n_e/d\chi^2)_T
-      DlnDTT=pow2(TEMR)/DENR*dndTT+DlnDT-pow2(DlnDT) ! d^2 ln n_e/d ln T^2
-      DlnDHT=TEMR/DENR*(dndHT-dndT*DlnDH) ! d^2 ln n_e/d\chi d ln T
-      dPdH=TPI/3d0*TEMR*(2d0*W1DX+TEMR*W2DX) ! (d P_e/d\chi)_T
-      dUdH=TPI*TEMR*(W1DX+TEMR*W2DX) ! (d U_e/d\chi)_T
+      DlnDH=dndH/DENR  ! (d ln n_e/d\chi)_T
+      DlnDT=dndT*TEMR/DENR  ! (d ln n_e/d ln T)_\chi
+      DlnDHH=dndHH/DENR-pow2(DlnDH)  ! (d^2 ln n_e/d\chi^2)_T
+      DlnDTT=pow2(TEMR)/DENR*dndTT+DlnDT-pow2(DlnDT)  ! d^2 ln n_e/d ln T^2
+      DlnDHT=TEMR/DENR*(dndHT-dndT*DlnDH)  ! d^2 ln n_e/d\chi d ln T
+      dPdH=TPI/3d0*TEMR*(2d0*W1DX+TEMR*W2DX)  ! (d P_e/d\chi)_T
+      dUdH=TPI*TEMR*(W1DX+TEMR*W2DX)  ! (d U_e/d\chi)_T
       CVE=(dUdT-dUdH*dndT/dndH)/DENR
       CHITE=TEMR/PR*(dPdT-dPdH*dndT/dndH)
-      CHIRE=DENR/PR*dPdH/dndH ! (dndH*TEMR*PEid) ! DENS/PRE*dPdH/dndH
+      CHIRE=DENR/PR*dPdH/dndH  ! (dndH*TEMR*PEid) ! DENS/PRE*dPdH/dndH
       return
       end subroutine ELECT11a
 
@@ -1622,54 +1622,54 @@
       BOHR=137.036d0
       PI2=PI*PI
       BOHR2=BOHR*BOHR
-      BOHR3=BOHR2*BOHR !cleaned 15/6
+      BOHR3=BOHR2*BOHR  !cleaned 15/6
 
-      TEMR=TEMP/BOHR2 ! T in rel.units (=T/mc^2)
-      EF=CHI*TEMR ! Fermi energy in mc^2 - zeroth approx. = CMU1
+      TEMR=TEMP/BOHR2  ! T in rel.units (=T/mc^2)
+      EF=CHI*TEMR  ! Fermi energy in mc^2 - zeroth approx. = CMU1
       DeltaEF=PI2*TEMR*TEMR/6.d0*(1.d0+2.d0*EF*(2.d0+EF)) &
-             /(EF*(1.d0+EF)*(2.d0+EF)) ! corr. [page 125, equiv.Eq.(6) of PC'10]]
-      EF=EF+DeltaEF ! corrected Fermi energy (14.02.09)
-      G=1.d0+EF ! electron Lorentz-factor
-      if (EF.gt.1.d-5) then ! relativistic expansion (Yak.&Shal.'89)
-        PF=sqrt(G*G-1.d0) ! Fermi momentum [rel.un.=mc]
-        F=(PF*(1d0+2.d0*PF*PF)*G-PF*PF*PF/0.375d0-log(PF+G))/8.d0/PI2!F/V
-        DF=-TEMR*TEMR*PF*G/6.d0 ! thermal correction to F/V
-        P=(PF*G*(PF*PF/1.5d0-1.d0)+log(PF+G))/8.d0/PI2 ! P(T=0)
-        DelP=TEMR*TEMR*PF*(PF*PF+2.d0)/G/18.d0 ! thermal correction to P
+             /(EF*(1.d0+EF)*(2.d0+EF))  ! corr. [page 125, equiv.Eq.(6) of PC'10]]
+      EF=EF+DeltaEF  ! corrected Fermi energy (14.02.09)
+      G=1.d0+EF  ! electron Lorentz-factor
+      if (EF>1.d-5) then  ! relativistic expansion (Yak.&Shal.'89)
+        PF=sqrt(G*G-1.d0)  ! Fermi momentum [rel.un.=mc]
+        F=(PF*(1d0+2.d0*PF*PF)*G-PF*PF*PF/0.375d0-log(PF+G))/8.d0/PI2  !F/V
+        DF=-TEMR*TEMR*PF*G/6.d0  ! thermal correction to F/V
+        P=(PF*G*(PF*PF/1.5d0-1.d0)+log(PF+G))/8.d0/PI2  ! P(T=0)
+        DelP=TEMR*TEMR*PF*(PF*PF+2.d0)/G/18.d0  ! thermal correction to P
         CVE=PI2*TEMR*G/(PF*PF)
-      else ! nonrelativistic limit
+      else  ! nonrelativistic limit
         PF=sqrt(2.d0*EF)
         F=pow5(PF)*0.1d0/PI2
         DF=-TEMR*TEMR*PF/6.d0
         P=F/1.5d0
         DelP=TEMR*TEMR*PF/9.d0
         CVE=PI2*TEMR/EF/2.d0
-      endif
+      end if
       F=F+DF
       P=P+DelP
-      S=-2.d0*DF ! entropy per unit volume [rel.un.]
+      S=-2.d0*DF  ! entropy per unit volume [rel.un.]
       U=F+S
       CHIRE=pow5(PF)/(9.d0*PI2*P*G)
       CHITE=2.d0*DelP/P
-      DENR=PF*PF*PF/3.d0/PI2 ! n_e [rel.un.=\Compton^{-3}]
-      DENS=DENR*BOHR3 ! conversion to a.u.(=\Bohr_radius^{-3})
+      DENR=PF*PF*PF/3.d0/PI2  ! n_e [rel.un.=\Compton^{-3}]
+      DENS=DENR*BOHR3  ! conversion to a.u.(=\Bohr_radius^{-3})
 ! derivatives over chi at constant T and T at constant chi:
-      TPI=TEMR*sqrt(2.d0*TEMR)/PI2 ! common pre-factor
+      TPI=TEMR*sqrt(2.d0*TEMR)/PI2  ! common pre-factor
       call SOMMERF(TEMR,CHI, &
         W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT, &
         W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT, &
         W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,&
         W0XXX,W0XTT,W0XXT)
-      dndH=TPI*(W0DX+TEMR*W1DX) ! (d n_e/d\chi)_T
-      dndT=TPI*(1.5d0*W0/TEMR+2.5d0*W1+W0DT+TEMR*W1DT) ! (d n_e/dT)_\chi
-      dndHH=TPI*(W0DXX+TEMR*W1DXX) ! (d^2 n_e/d\chi)_T
+      dndH=TPI*(W0DX+TEMR*W1DX)  ! (d n_e/d\chi)_T
+      dndT=TPI*(1.5d0*W0/TEMR+2.5d0*W1+W0DT+TEMR*W1DT)  ! (d n_e/dT)_\chi
+      dndHH=TPI*(W0DXX+TEMR*W1DXX)  ! (d^2 n_e/d\chi)_T
       dndTT=TPI*(0.75d0*W0/pow2(TEMR)+3d0*W0DT/TEMR+W0DTT+3.75d0*W1/TEMR+5d0*W1DT+TEMR*W1DTT)
       dndHT=TPI*(1.5d0*W0DX/TEMR+W0DXT+2.5d0*W1DX+TEMR*W1DXT)
-      DlnDH=dndH/DENR ! (d ln n_e/d\chi)_T
-      DlnDT=dndT*TEMR/DENR ! (d ln n_e/d ln T)_\chi
-      DlnDHH=dndHH/DENR-pow2(DlnDH) ! (d^2 ln n_e/d\chi^2)_T
-      DlnDTT=pow2(TEMR)/DENR*dndTT+DlnDT-pow2(DlnDT) ! d^2 ln n_e/d ln T^2
-      DlnDHT=TEMR/DENR*(dndHT-dndT*DlnDH) ! d^2 ln n_e/d\chi d ln T
+      DlnDH=dndH/DENR  ! (d ln n_e/d\chi)_T
+      DlnDT=dndT*TEMR/DENR  ! (d ln n_e/d ln T)_\chi
+      DlnDHH=dndHH/DENR-pow2(DlnDH)  ! (d^2 ln n_e/d\chi^2)_T
+      DlnDTT=pow2(TEMR)/DENR*dndTT+DlnDT-pow2(DlnDT)  ! d^2 ln n_e/d ln T^2
+      DlnDHT=TEMR/DENR*(dndHT-dndT*DlnDH)  ! d^2 ln n_e/d\chi d ln T
       DT=DENR*TEMR
       PEid=P/DT
       UEid=U/DT
@@ -1708,9 +1708,9 @@
       type(auto_diff_real_2var_order1) :: CMU, CMU1, PIT26, CN0, CN1, CN2
       type(auto_diff_real_2var_order1) :: CJ00,CJ10,CJ20,CJ01,CJ11,CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
 
-      if (CHI.lt..5d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: non-degenerate (small CHI)')
-      if (TEMR.le.0.d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: T < 0')
-      CMU1=CHI*TEMR ! chemical potential in rel.units
+      if (CHI<.5d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: non-degenerate (small CHI)')
+      if (TEMR<=0.d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: T < 0')
+      CMU1=CHI*TEMR  ! chemical potential in rel.units
       CMU=1.d0+CMU1
       call SUBFERMJ(CMU1, &
         CJ00,CJ10,CJ20, &
@@ -1723,10 +1723,10 @@
       CN0=sqrt(.5d0/TEMR)/TEMR
       CN1=CN0/TEMR
       CN2=CN1/TEMR
-      W0=CN0*(CJ00+PIT26*CJ02) ! +CN0*PITAU4*CJ04
-      W1=CN1*(CJ10+PIT26*CJ12) ! +CN1*PITAU4*CJ14
-      W2=CN2*(CJ20+PIT26*CJ22) ! +CN2*PITAU4*CJ24
-      W0DX=CN0*TEMR*(CJ01+PIT26*CJ03) ! +CN0*PITAU4*CJ05
+      W0=CN0*(CJ00+PIT26*CJ02)  ! +CN0*PITAU4*CJ04
+      W1=CN1*(CJ10+PIT26*CJ12)  ! +CN1*PITAU4*CJ14
+      W2=CN2*(CJ20+PIT26*CJ22)  ! +CN2*PITAU4*CJ24
+      W0DX=CN0*TEMR*(CJ01+PIT26*CJ03)  ! +CN0*PITAU4*CJ05
       W1DX=CN0*(CJ11+PIT26*CJ13)
       W2DX=CN1*(CJ21+PIT26*CJ23)
       W0DT=CN1*(CMU1*CJ01-1.5d0*CJ00+PIT26*(CMU1*CJ03+.5d0*CJ02))
@@ -1762,28 +1762,28 @@
 
       type(auto_diff_real_2var_order1) :: X0, X3, X5, CL, CMU
 
-      if (CMU1.le.0.d0) call mesa_error(__FILE__,__LINE__,'SUBFERMJ: small CHI')
+      if (CMU1<=0.d0) call mesa_error(__FILE__,__LINE__,'SUBFERMJ: small CHI')
       CMU=1.d0+CMU1
       X0=sqrt(CMU1*(2.d0+CMU1))
       X3=pow3(X0)
       X5=pow5(X0)
-      if (X0.lt.1d-4) then
+      if (X0<1d-4) then
          CJ00=X3/3.d0
          CJ10=0.1d0*X5
          CJ20=pow7(X0)/28.d0
       else
          CL=log(X0+CMU)
-         CJ00=0.5d0*(X0*CMU-CL) ! J_{1/2}^0
-         CJ10=X3/3d0-CJ00 ! J_{3/2}^0
-         CJ20=(0.75d0*CMU-2d0)/3d0*X3+1.25d0*CJ00 ! J_{5/2}^0
-      endif
-      CJ01=X0 ! J_{1/2}^1
-      CJ11=CJ01*CMU1 ! J_{3/2}^1
-      CJ21=CJ11*CMU1 ! J_{5/2}^1
-      CJ02=CMU/X0 ! J_{1/2}^2
-      CJ12=CMU1/X0*(3.d0+2.d0*CMU1) ! J_{3/2}^2
-      CJ22=pow2(CMU1)/X0*(5.d0+3.d0*CMU1) ! J_{5/2}^2
-      CJ03=-1.d0/X3 ! J_{1/2}^3
+         CJ00=0.5d0*(X0*CMU-CL)  ! J_{1/2}^0
+         CJ10=X3/3d0-CJ00  ! J_{3/2}^0
+         CJ20=(0.75d0*CMU-2d0)/3d0*X3+1.25d0*CJ00  ! J_{5/2}^0
+      end if
+      CJ01=X0  ! J_{1/2}^1
+      CJ11=CJ01*CMU1  ! J_{3/2}^1
+      CJ21=CJ11*CMU1  ! J_{5/2}^1
+      CJ02=CMU/X0  ! J_{1/2}^2
+      CJ12=CMU1/X0*(3.d0+2.d0*CMU1)  ! J_{3/2}^2
+      CJ22=pow2(CMU1)/X0*(5.d0+3.d0*CMU1)  ! J_{5/2}^2
+      CJ03=-1.d0/X3  ! J_{1/2}^3
       CJ13=CMU1/X3*(2.d0*pow2(CMU1)+6.d0*CMU1+3.d0)
       CJ23=pow2(CMU1)/X3*(6.d0*pow2(CMU1)+2.d1*CMU1+1.5d1)
       CJ04=3.d0*CMU/X5
@@ -1804,17 +1804,17 @@
       type(auto_diff_real_2var_order1) :: XMAX  ! not sure if this side-effect is desired
       type(auto_diff_real_2var_order1), intent(out) :: FP, FM
 
-      if (XMAX.lt.3.d0) XMAX = 3d0 !call mesa_error(__FILE__,__LINE__,'FERMI: XMAX')
-      if (X.gt.XMAX) then
+      if (XMAX<3.d0) XMAX = 3d0  !call mesa_error(__FILE__,__LINE__,'FERMI: XMAX')
+      if (X>XMAX) then
          FP=0.d0
          FM=1.d0
-      elseif (X.lt.-XMAX) then
+      elseif (X<-XMAX) then
          FP=1.d0
          FM=0.d0
       else
          FP=1.d0/(exp(X)+1.d0)
          FM=1.d0-FP
-      endif
+      end if
       return
       end subroutine FERMI10
 
@@ -1886,23 +1886,23 @@
          if (ierr /= 0) return
       else
          skip = .true.
-      endif
+      end if
 
       if (.not. use_EXCOR7_table .or. debug_EXCOR7_table .or. skip) then
 
-         THETA=0.543d0*RS/GAME ! non-relativistic degeneracy parameter
+         THETA=0.543d0*RS/GAME  ! non-relativistic degeneracy parameter
          SQTH=sqrt(THETA)
          THETA2=THETA*THETA
          THETA3=THETA2*THETA
          THETA4=THETA3*THETA
-         if (THETA.gt..04d0) then
+         if (THETA>.04d0) then
             CHT1=cosh(1.d0/THETA)
             SHT1=sinh(1.d0/THETA)
             CHT2=cosh(1.d0/SQTH)
             SHT2=sinh(1.d0/SQTH)
-            T1=SHT1/CHT1 ! dtanh(1.d0/THETA)
-            T2=SHT2/CHT2 ! dtanh(1./sqrt(THETA))
-            T1DH=-1.d0/((THETA*CHT1)*(THETA*CHT1)) ! d T1 / d\theta
+            T1=SHT1/CHT1  ! dtanh(1.d0/THETA)
+            T2=SHT2/CHT2  ! dtanh(1./sqrt(THETA))
+            T1DH=-1.d0/((THETA*CHT1)*(THETA*CHT1))  ! d T1 / d\theta
             T1DHH=2.d0/pow3(THETA*CHT1)*(CHT1-SHT1/THETA)
             T2DH=-0.5d0*SQTH/((THETA*CHT2)*(THETA*CHT2))
             T2DHH=(0.75d0*SQTH*CHT2-0.5d0*SHT2)/pow3(THETA*CHT2)
@@ -1913,14 +1913,14 @@
             T2DH=0.d0
             T1DHH=0.d0
             T2DHH=0.d0
-         endif
+         end if
          A0=0.75d0+3.04363d0*THETA2-0.09227d0*THETA3+1.7035d0*THETA4
          A0DH=6.08726d0*THETA-0.27681d0*THETA2+6.814d0*THETA3
          A0DHH=6.08726d0-0.55362d0*THETA+20.442d0*THETA2
          A1=1d0+8.31051d0*THETA2+5.1105d0*THETA4
          A1DH=16.62102d0*THETA+20.442d0*THETA3
          A1DHH=16.62102d0+61.326d0*THETA2
-         A=0.610887d0*A0/A1*T1 ! HF fit of Perrot and Dharma-wardana
+         A=0.610887d0*A0/A1*T1  ! HF fit of Perrot and Dharma-wardana
          AH=A0DH/A0-A1DH/A1+T1DH/T1
          ADH=A*AH
          ADHH=ADH*AH+A*(A0DHH/A0-pow2(A0DH/A0)-A1DHH/A1+pow2(A1DH/A1) &
@@ -1970,7 +1970,7 @@
          S1H=CDH/C-EDH/E
          S1DH=S1*S1H
          S1DHH=S1DH*S1H+S1*(CDHH/C-pow2(CDH/C)-EDHH/E+pow2(EDH/E))
-         S1DG=-C/E ! => S1DGG=0
+         S1DG=-C/E  ! => S1DGG=0
          S1DHG=S1DG*(CDH/C-EDH/E)
          B2=B-C*D/E
          B2DH=BDH-(CDH*D+C*DDH)/E+C*D*EDH/(E*E)
@@ -2050,15 +2050,15 @@
          PXC=(GAME*FXCDG-2d0*THETA*FXCDH)/3.d0
          UXC=GAME*FXCDG-THETA*FXCDH
          SXC=(GAME*S2DG-S2+GAME*S3DG-S3+S4A*S4B*(GAME*S4CDG-S4C))-THETA*FXCDH
-         if (abs(SXC).lt.1.d-9*abs(THETA*FXCDH)) SXC=0.d0 ! accuracy loss
+         if (abs(SXC)<1.d-9*abs(THETA*FXCDH)) SXC=0.d0  ! accuracy loss
          CVXC=2d0*THETA*(GAME*FXCDHG-FXCDH)-THETA*THETA*FXCDHH-GAME*GAME*FXCDGG
-         if (abs(CVXC).lt.1.d-9*abs(GAME*GAME*FXCDGG)) CVXC=0.d0 ! accuracy
+         if (abs(CVXC)<1.d-9*abs(GAME*GAME*FXCDGG)) CVXC=0.d0  ! accuracy
          PDLH=THETA*(GAME*FXCDHG-2d0*FXCDH-2d0*THETA*FXCDHH)/3.d0
          PDLG=GAME*(FXCDG+GAME*FXCDGG-2d0*THETA*FXCDHG)/3.d0
          PDRXC=PXC+(PDLG-2d0*PDLH)/3.d0
          PDTXC=GAME*(THETA*FXCDHG-GAME*FXCDGG/3.d0)-THETA*(FXCDH/0.75d0+THETA*FXCDHH/1.5d0)
 
-      endif
+      end if
 
 
       if (debug_EXCOR7_table .and. .not. skip) then
@@ -2071,7 +2071,7 @@
          if (.not. check1(PDTXC, xPDTXC, 'PDTXC')) return
          if (.not. check1(PDRXC, xPDRXC, 'PDRXC')) return
 
-      endif
+      end if
 
       if (use_EXCOR7_table .and. .not. skip) then
 
@@ -2140,7 +2140,7 @@
       end subroutine EXCOR7
 
 ! ======================  AUXILIARY SUBROUTINES   ==================== *
-      subroutine FERINV7(F,N,X,XDF,XDFF) ! Inverse Fermi intergals
+      subroutine FERINV7(F,N,X,XDF,XDFF)  ! Inverse Fermi integrals
 !                                                       Version 24.05.07
 ! X_q(f)=F^{-1}_q(f) : H.M.Antia 93 ApJS 84, 101
 ! q=N-1/2=-1/2,1/2,3/2,5/2 (N=0,1,2,3)
@@ -2151,7 +2151,7 @@
 ! jump at f=4:
 !         for XDF: 6.e-7, 5.4e-7, 9.6e-8, 3.1e-7
 !       for XDFF: 4.7e-5, 4.8e-5, 2.3e-6, 1.5e-6
-      type(auto_diff_real_2var_order1) :: F ! can be modified, not sure if this is an intended side-effect
+      type(auto_diff_real_2var_order1) :: F  ! can be modified, not sure if this is an intended side-effect
       integer, intent(in) :: N
       type(auto_diff_real_2var_order1), intent(out) :: X, XDF, XDFF
       integer :: I
@@ -2160,75 +2160,75 @@
 
       ! The next four are really parameters but there isn't a clean way to initialize them
       ! at declaration time. - Adam Jermyn 4/2/2020
-      real(dp) :: A(0:5,0:3) ! read only after initialization
-      real(dp) :: B(0:6,0:3) ! read only after initialization
-      real(dp) :: C(0:6,0:3) ! read only after initialization
-      real(dp) :: D(0:6,0:3) ! read only after initialization
+      real(dp) :: A(0:5,0:3)  ! read only after initialization
+      real(dp) :: B(0:6,0:3)  ! read only after initialization
+      real(dp) :: C(0:6,0:3)  ! read only after initialization
+      real(dp) :: D(0:6,0:3)  ! read only after initialization
 
-      integer, parameter :: LA(0:3) = (/5,4,3,2/)
-      integer, parameter :: LB(0:3) = (/6,3,4,3/)
-      integer, parameter :: LD(0:3) = (/6,5,5,6/)
+      integer, parameter :: LA(0:3) = [5,4,3,2]
+      integer, parameter :: LB(0:3) = [6,3,4,3]
+      integer, parameter :: LD(0:3) = [6,5,5,6]
 
-         A(0:5,0) = (/ &
+         A(0:5,0) = [ &
             -1.570044577033d4,1.001958278442d4,-2.805343454951d3, &
-                  4.121170498099d2,-3.174780572961d1,1.d0/) ! X_{-1/2}
-         A(0:5,1) = (/ &
+                  4.121170498099d2,-3.174780572961d1,1.d0]  ! X_{-1/2}
+         A(0:5,1) = [ &
             1.999266880833d4,5.702479099336d3,6.610132843877d2, &
-                  3.818838129486d1,1.d0,0d0/) ! X_{1/2}
-         A(0:5,2) = (/ &
+                  3.818838129486d1,1.d0,0d0]  ! X_{1/2}
+         A(0:5,2) = [ &
             1.715627994191d2,1.125926232897d2,2.056296753055d1, &
-                  1.d0,0d0,0d0/)
-         A(0:5,3) = (/ &
-            2.138969250409d2,3.539903493971d1,1.d0,0d0,0d0,0d0/) ! X_{5/2}
-         B(0:6,0) = (/ &
+                  1.d0,0d0,0d0]
+         A(0:5,3) = [ &
+            2.138969250409d2,3.539903493971d1,1.d0,0d0,0d0,0d0]  ! X_{5/2}
+         B(0:6,0) = [ &
             -2.782831558471d4,2.886114034012d4,-1.274243093149d4, &
                   3.063252215963d3,-4.225615045074d2,3.168918168284d1, &
-                  -1.008561571363d0/) ! X_{-1/2}
-         B(0:6,1) = (/ &
+                  -1.008561571363d0]  ! X_{-1/2}
+         B(0:6,1) = [ &
             1.771804140488d4,-2.014785161019d3,9.130355392717d1, &
-                  -1.670718177489d0,0d0,0d0,0d0/) ! X_{1/2}
-         B(0:6,2) = (/ &
+                  -1.670718177489d0,0d0,0d0,0d0]  ! X_{1/2}
+         B(0:6,2) = [ &
             2.280653583157d2,1.193456203021d2,1.16774311354d1, &
-                  -3.226808804038d-1,3.519268762788d-3,0d0,0d0/) ! X_{3/2}
-         B(0:6,3) = (/ &
+                  -3.226808804038d-1,3.519268762788d-3,0d0,0d0]  ! X_{3/2}
+         B(0:6,3) = [ &
             7.10854551271d2,9.873746988121d1,1.067755522895d0, &
-                  -1.182798726503d-2,0d0,0d0,0d0/) ! X_{5/2}
-         C(0:6,0) = (/ &
+                  -1.182798726503d-2,0d0,0d0,0d0]  ! X_{5/2}
+         C(0:6,0) = [ &
             2.206779160034d-8,-1.437701234283d-6,6.103116850636d-5, &
             -1.169411057416d-3,1.814141021608d-2,-9.588603457639d-2, &
-            1.d0/)
-         C(0:6,1) = (/ &
+            1.d0]
+         C(0:6,1) = [ &
              -1.277060388085d-2,7.187946804945d-2,-4.262314235106d-1, &
             4.997559426872d-1,-1.285579118012d0,-3.930805454272d-1, &
-            1.d0/)
-         C(0:6,2) = (/ &
+            1.d0]
+         C(0:6,2) = [ &
              -6.321828169799d-3,-2.183147266896d-2,-1.05756279932d-1, &
              -4.657944387545d-1,-5.951932864088d-1,3.6844711771d-1, &
-            1.d0/)
-         C(0:6,3) = (/ &
+            1.d0]
+         C(0:6,3) = [ &
            -3.312041011227d-2,1.315763372315d-1,-4.820942898296d-1, &
              5.099038074944d-1,5.49561349863d-1,-1.498867562255d0, &
-            1.d0/)
-         D(0:6,0) = (/ &
+            1.d0]
+         D(0:6,0) = [ &
              8.827116613576d-8,-5.750804196059d-6,2.429627688357d-4, &
              -4.601959491394d-3,6.932122275919d-2,-3.217372489776d-1, &
-             3.124344749296d0/) ! X_{-1/2}
-         D(0:6,1) = (/ &
+             3.124344749296d0]  ! X_{-1/2}
+         D(0:6,1) = [ &
           -9.745794806288d-3,5.485432756838d-2,-3.29946624326d-1, &
              4.077841975923d-1,-1.145531476975d0,-6.067091689181d-2, &
-            0d0/)
-         D(0:6,2) = (/ &
+            0d0]
+         D(0:6,2) = [ &
           -4.381942605018d-3,-1.5132365041d-2,-7.850001283886d-2, &
            -3.407561772612d-1,-5.074812565486d-1,-1.387107009074d-1, &
-            0d0/)
-         D(0:6,3) = (/ &
+            0d0]
+         D(0:6,3) = [ &
           -2.315515517515d-2,9.198776585252d-2,-3.835879295548d-1, &
              5.415026856351d-1,-3.847241692193d-1,3.739781456585d-2, &
-             -3.008504449098d-2/) ! X_{5/2}
+             -3.008504449098d-2]  ! X_{5/2}
 
-      if (N.lt.0d0 .or.N.gt.3d0) call mesa_error(__FILE__,__LINE__,'FERINV7: Invalid subscript')
-      if (F.le.0.d0) F = 1d-99 !call mesa_error(__FILE__,__LINE__,'FERINV7: Non-positive argument')
-      if (F.lt.4.d0) then
+      if (N<0d0 .or.N>3d0) call mesa_error(__FILE__,__LINE__,'FERINV7: Invalid subscript')
+      if (F<=0.d0) F = 1d-99  !call mesa_error(__FILE__,__LINE__,'FERINV7: Non-positive argument')
+      if (F<4.d0) then
          T=F
          UP=0.d0
          UP1=0.d0
@@ -2238,22 +2238,22 @@
          DOWN2=0.d0
          do I=LA(N),0,-1
             UP=UP*T+A(I,N)
-           if (I.ge.1) UP1=UP1*T+A(I,N)*I
-           if (I.ge.2) UP2=UP2*T+A(I,N)*I*(I-1)
-         enddo
+           if (I>=1) UP1=UP1*T+A(I,N)*I
+           if (I>=2) UP2=UP2*T+A(I,N)*I*(I-1)
+         end do
          do I=LB(N),0,-1
             DOWN=DOWN*T+B(I,N)
-           if (I.ge.1) DOWN1=DOWN1*T+B(I,N)*I
-           if (I.ge.2) DOWN2=DOWN2*T+B(I,N)*I*(I-1)
-         enddo
+           if (I>=1) DOWN1=DOWN1*T+B(I,N)*I
+           if (I>=2) DOWN2=DOWN2*T+B(I,N)*I*(I-1)
+         end do
          X=log(T*UP/DOWN)
          XDF=1.d0/T+UP1/UP-DOWN1/DOWN
          XDFF=-1.d0/(T*T)+UP2/UP-pow2(UP1/UP)-DOWN2/DOWN+pow2(DOWN1/DOWN)
       else
-         P=-1.d0/(.5d0+N) ! = -1/(1+\nu) = power index
-         T=pow(F,P) ! t - argument of the rational fraction
-         T1=P*T/F ! dt/df
-         T2=P*(P-1.d0)*T/(F*F) ! d^2 t / df^2
+         P=-1.d0/(.5d0+N)  ! = -1/(1+\nu) = power index
+         T=pow(F,P)  ! t - argument of the rational fraction
+         T1=P*T/F  ! dt/df
+         T2=P*(P-1.d0)*T/(F*F)  ! d^2 t / df^2
          UP=0.d0
          UP1=0.d0
          UP2=0.d0
@@ -2262,22 +2262,22 @@
          DOWN2=0.d0
          do I=6,0,-1
             UP=UP*T+C(I,N)
-           if (I.ge.1) UP1=UP1*T+C(I,N)*I
-           if (I.ge.2) UP2=UP2*T+C(I,N)*I*(I-1)
-         enddo
+           if (I>=1) UP1=UP1*T+C(I,N)*I
+           if (I>=2) UP2=UP2*T+C(I,N)*I*(I-1)
+         end do
          do I=LD(N),0,-1
             DOWN=DOWN*T+D(I,N)
-           if (I.ge.1) DOWN1=DOWN1*T+D(I,N)*I
-           if (I.ge.2) DOWN2=DOWN2*T+D(I,N)*I*(I-1)
-         enddo
+           if (I>=1) DOWN1=DOWN1*T+D(I,N)*I
+           if (I>=2) DOWN2=DOWN2*T+D(I,N)*I*(I-1)
+         end do
          R=UP/DOWN
-         R1=(UP1-UP*DOWN1/DOWN)/DOWN ! dR/dt
+         R1=(UP1-UP*DOWN1/DOWN)/DOWN  ! dR/dt
          R2=(UP2-(2.0d0*UP1*DOWN1+UP*DOWN2)/DOWN+2.d0*UP*pow2(DOWN1/DOWN))/DOWN
          X=R/T
          RT=(R1-R/T)/T
          XDF=T1*RT
          XDFF=T2*RT+T1*T1*(R2-2d0*RT)/T
-      endif
+      end if
       return
       end subroutine FERINV7
 
@@ -2329,14 +2329,14 @@
 
       X1=(CHI-CHI1)*XSCAL1
       X2=(CHI-CHI2)*XSCAL2
-      if (X1.lt.-XMAX) then
+      if (X1<-XMAX) then
          call BLIN9a(TEMP,CHI, &
            W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT, &
            W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT, &
            W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT, &
            W0XXX,W0XTT,W0XXT)
-      elseif (X2.lt.XMAX) then ! match two fits
-        if (X1.lt.XMAX) then ! match fits "a" and "b"
+      elseif (X2<XMAX) then  ! match two fits
+        if (X1<XMAX) then  ! match fits "a" and "b"
            call FERMI10(X1,XMAX,FP,FM)
            call BLIN9a(TEMP,CHI, &
              W0a,W0DXa,W0DTa,W0DXXa,W0DTTa,W0DXTa, &
@@ -2348,7 +2348,7 @@
              W1b,W1DXb,W1DTb,W1DXXb,W1DTTb,W1DXTb, &
              W2b,W2DXb,W2DTb,W2DXXb,W2DTTb,W2DXTb, &
              W0XXXb,W0XTTb,W0XXTb)
-        else ! match fits "b" and "c"
+        else  ! match fits "b" and "c"
            call FERMI10(X2,XMAX,FP,FM)
            call BLIN9b(TEMP,CHI, &
              W0a,W0DXa,W0DTa,W0DXXa,W0DTTa,W0DXTa, &
@@ -2360,35 +2360,35 @@
              W1b,W1DXb,W1DTb,W1DXXb,W1DTTb,W1DXTb, &
              W2b,W2DXb,W2DTb,W2DXXb,W2DTTb,W2DXTb, &
              W0XXXb,W0XTTb,W0XXTb)
-        endif
+        end if
          W0=W0a*FP+W0b*FM
-         W0DX=W0DXa*FP+W0DXb*FM !! +(W0a-W0b)*F1
+         W0DX=W0DXa*FP+W0DXb*FM  !! +(W0a-W0b)*F1
          W0DT=W0DTa*FP+W0DTb*FM
-         W0DXX=W0DXXa*FP+W0DXXb*FM !! +2.d0*(W0DXa-W0DXb)*F1+(W0a-W0b)*F2
+         W0DXX=W0DXXa*FP+W0DXXb*FM  !! +2.d0*(W0DXa-W0DXb)*F1+(W0a-W0b)*F2
          W0DTT=W0DTTa*FP+W0DTTb*FM
-         W0DXT=W0DXTa*FP+W0DXTb*FM !! +(W0DTa-W0DTb)*F1
-         W0XXX=W0XXXa*FP+W0XXXb*FM !! +3.d0*(W0DXXa-W0DXXb)*F1+3.d0*(W0DXa-W0DXb)*F2+(W0a-W0b)*F3
-         W0XTT=W0XTTa*FP+W0XTTb*FM !! +(W0DTTa-W0DTTb)*F1
-         W0XXT=W0XXTa*FP+W0XXTb*FM !! +2.d0*(W0DXTa-W0DXTb)*F1+(W0DTa-W0DTb)*F2
+         W0DXT=W0DXTa*FP+W0DXTb*FM  !! +(W0DTa-W0DTb)*F1
+         W0XXX=W0XXXa*FP+W0XXXb*FM  !! +3.d0*(W0DXXa-W0DXXb)*F1+3.d0*(W0DXa-W0DXb)*F2+(W0a-W0b)*F3
+         W0XTT=W0XTTa*FP+W0XTTb*FM  !! +(W0DTTa-W0DTTb)*F1
+         W0XXT=W0XXTa*FP+W0XXTb*FM  !! +2.d0*(W0DXTa-W0DXTb)*F1+(W0DTa-W0DTb)*F2
          W1=W1a*FP+W1b*FM
-         W1DX=W1DXa*FP+W1DXb*FM !! +(W1a-W1b)*F1
+         W1DX=W1DXa*FP+W1DXb*FM  !! +(W1a-W1b)*F1
          W1DT=W1DTa*FP+W1DTb*FM
-         W1DXX=W1DXXa*FP+W1DXXb*FM !! +2.d0*(W1DXa-W1DXb)*F1+(W1a-W1b)*F2
+         W1DXX=W1DXXa*FP+W1DXXb*FM  !! +2.d0*(W1DXa-W1DXb)*F1+(W1a-W1b)*F2
          W1DTT=W1DTTa*FP+W1DTTb*FM
-         W1DXT=W1DXTa*FP+W1DXTb*FM !! +(W1DTa-W1DTb)*F1
+         W1DXT=W1DXTa*FP+W1DXTb*FM  !! +(W1DTa-W1DTb)*F1
          W2=W2a*FP+W2b*FM
-         W2DX=W2DXa*FP+W2DXb*FM !! +(W2a-W2b)*F1
+         W2DX=W2DXa*FP+W2DXb*FM  !! +(W2a-W2b)*F1
          W2DT=W2DTa*FP+W2DTb*FM
-         W2DXX=W2DXXa*FP+W2DXXb*FM !! +2.d0*(W2DXa-W2DXb)*F1+(W2a-W2b)*F2
+         W2DXX=W2DXXa*FP+W2DXXb*FM  !! +2.d0*(W2DXa-W2DXb)*F1+(W2a-W2b)*F2
          W2DTT=W2DTTa*FP+W2DTTb*FM
-         W2DXT=W2DXTa*FP+W2DXTb*FM !!
+         W2DXT=W2DXTa*FP+W2DXTb*FM  !!
       else
          call BLIN9c(TEMP,CHI, &
            W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT, &
            W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT, &
            W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT, &
            W0XXX,W0XTT,W0XXT)
-      endif
+      end if
       return
       end subroutine BLIN9
 
@@ -2412,34 +2412,34 @@
 
       ! The next three are really parameters but there isn't a clean way to initialize them
       ! at declaration time. - Adam Jermyn 4/2/2020
-      real(dp) :: AC(5,0:2) ! read only after initialization
-      real(dp) :: AU(5,0:2) ! read only after initialization
-      real(dp) :: AA(5,0:2) ! read only after initialization
+      real(dp) :: AC(5,0:2)  ! read only after initialization
+      real(dp) :: AU(5,0:2)  ! read only after initialization
+      real(dp) :: AA(5,0:2)  ! read only after initialization
 
-      AC(1:5,0) = (/ &
+      AC(1:5,0) = [ &
          0.37045057d0, .41258437d0, &
-           9.777982d-2, 5.3734153d-3, 3.8746281d-5/) ! c_i^0
-      AC(1:5,1) = (/ &
+           9.777982d-2, 5.3734153d-3, 3.8746281d-5]  ! c_i^0
+      AC(1:5,1) = [ &
            .39603109d0, .69468795d0,  &
-           .22322760d0, 1.5262934d-2, 1.3081939d-4/) ! c_i^1
-      AC(1:5,2) = (/ &
+           .22322760d0, 1.5262934d-2, 1.3081939d-4]  ! c_i^1
+      AC(1:5,2) = [ &
            .76934619d0, 1.7891437d0,  &
-           .70754974d0, 5.6755672d-2, 5.5571480d-4/) ! c_i^2
-      AU(1:5,0) = (/ &
+           .70754974d0, 5.6755672d-2, 5.5571480d-4]  ! c_i^2
+      AU(1:5,0) = [ &
          0.43139881d0, 1.7597537d0,  &
-           4.1044654d0, 7.7467038d0, 13.457678d0/) ! \chi_i^0
-      AU(1:5,1) = (/ &
+           4.1044654d0, 7.7467038d0, 13.457678d0]  ! \chi_i^0
+      AU(1:5,1) = [ &
            .81763176d0, 2.4723339d0,  &
-           5.1160061d0, 9.0441465d0, 15.049882d0/) ! \chi_i^1
-      AU(1:5,2) = (/ &
+           5.1160061d0, 9.0441465d0, 15.049882d0]  ! \chi_i^1
+      AU(1:5,2) = [ &
            1.2558461d0, 3.2070406d0,  &
-           6.1239082d0, 10.316126d0, 16.597079d0/) ! \chi_i^2
+           6.1239082d0, 10.316126d0, 16.597079d0]  ! \chi_i^2
 
      do J=0,2
         do I=1,5
            AA(I,J)=exp(-AU(I,J))
-        enddo
-     enddo
+        end do
+     end do
 
         do K=0,2
            W=0.d0
@@ -2454,7 +2454,7 @@
              ECHI=exp(-CHI)
             do I=1,5
                SQ=sqrt(1.d0+AU(I,K)*TEMP/2.d0)
-               DN=AA(I,K)+ECHI ! e^{-\chi_i}+e^{-\chi})
+               DN=AA(I,K)+ECHI  ! e^{-\chi_i}+e^{-\chi})
                W=W+AC(I,K)*SQ/DN
                WDX=WDX+AC(I,K)*SQ/(DN*DN)
                WDT=WDT+AC(I,K)*AU(I,K)/(SQ*DN)
@@ -2465,7 +2465,7 @@
                  (ECHI*ECHI-4.d0*ECHI*AA(I,K)+AA(I,K)*AA(I,K))/(DN*DN*DN*DN)
                WDXTT=WDXTT-AC(I,K)*AU(I,K)*AU(I,K)/(DN*DN*SQ*SQ*SQ)
                WDXXT=WDXXT+AC(I,K)*AU(I,K)*(ECHI-AA(I,K))/(SQ*DN*DN*DN)
-            enddo
+            end do
              WDX=WDX*ECHI
              WDT=0.25d0*WDT
              WDXX=WDXX*ECHI
@@ -2474,7 +2474,7 @@
              WDXXX=WDXXX*ECHI
              WDXTT=0.0625d0*WDXTT*ECHI
              WDXXT=0.25d0*WDXXT*ECHI
-          if (K.eq.0) then
+          if (K==0) then
              W0=W
              W0DX=WDX
              W0DT=WDT
@@ -2484,7 +2484,7 @@
              W0XXX=WDXXX
              W0XTT=WDXTT
              W0XXT=WDXXT
-          elseif (K.eq.1) then
+          elseif (K==1) then
              W1=W
              W1DX=WDX
              W1DT=WDT
@@ -2498,8 +2498,8 @@
              W2DXX=WDXX
              W2DTT=WDTT
              W2DXT=WDXT
-          endif
-        enddo ! next K
+          end if
+        end do  ! next K
       return
       end subroutine BLIN9a
 
@@ -2511,7 +2511,7 @@
 !                                                       Version 19.01.10
 ! Second part of BILN9: intermediate CHI. Stems from BLIN8 v.24.12.08
       type(auto_diff_real_2var_order1), intent(in) :: TEMP
-      type(auto_diff_real_2var_order1) :: CHI ! can be modified, not sure if this is an intended side-effect
+      type(auto_diff_real_2var_order1) :: CHI  ! can be modified, not sure if this is an intended side-effect
       type(auto_diff_real_2var_order1), intent(out) :: W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT
       type(auto_diff_real_2var_order1), intent(out) :: W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT
       type(auto_diff_real_2var_order1), intent(out) :: W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT
@@ -2526,20 +2526,20 @@
 
       integer :: I, J, K
       real(dp), parameter :: AX(5) = &
-         (/7.265351d-2, .2694608d0,  &
-              .533122d0, .7868801d0, .9569313d0/) ! x_i
+         [7.265351d-2, .2694608d0,  &
+              .533122d0, .7868801d0, .9569313d0]  ! x_i
       real(dp), parameter :: AXI(5) = &
-         (/.26356032d0, 1.4134031d0,  &
-               3.5964258d0, 7.0858100d0, 12.640801d0/) ! \xi_i
+         [.26356032d0, 1.4134031d0,  &
+               3.5964258d0, 7.0858100d0, 12.640801d0]  ! \xi_i
       real(dp), parameter :: AH(5) = &
-         (/3.818735d-2, .1256732d0,  &
-              .1986308d0, .1976334d0, .1065420d0/) ! H_i
+         [3.818735d-2, .1256732d0,  &
+              .1986308d0, .1976334d0, .1065420d0]  ! H_i
       real(dp), parameter :: AV(5) = &
-         (/.29505869d0, .32064856d0, 7.3915570d-2,  &
-              3.6087389d-3, 2.3369894d-5/) ! \bar{V}_i
+         [.29505869d0, .32064856d0, 7.3915570d-2,  &
+              3.6087389d-3, 2.3369894d-5]  ! \bar{V}_i
       real(dp), parameter :: EPS=1.d-3
 
-      if (CHI.lt.EPS) CHI = EPS !call mesa_error(__FILE__,__LINE__,'BLIN9b: CHI is too small')
+      if (CHI<EPS) CHI = EPS  !call mesa_error(__FILE__,__LINE__,'BLIN9b: CHI is too small')
         do K=0,2
            W=0.d0
            WDX=0.d0
@@ -2600,8 +2600,8 @@
                WDXXX=WDXXX+AH(I)*pow(AX(I),K)*HDXXX+AV(I)*VDXXX
                WDXTT=WDXTT+AH(I)*pow(AX(I),K)*HDXTT+AV(I)*VDXTT
                WDXXT=WDXXT+AH(I)*pow(AX(I),K)*HDXXT+AV(I)*VDXXT
-            enddo
-          if (K.eq.0) then
+            end do
+          if (K==0) then
              W0=W
              W0DX=WDX
              W0DT=WDT
@@ -2611,7 +2611,7 @@
              W0XXX=WDXXX
              W0XTT=WDXTT
              W0XXT=WDXXT
-          elseif (K.eq.1) then
+          elseif (K==1) then
              W1=W
              W1DX=WDX
              W1DT=WDT
@@ -2625,8 +2625,8 @@
              W2DXX=WDXX
              W2DTT=WDTT
              W2DXT=WDXT
-          endif
-        enddo ! next K
+          end if
+        end do  ! next K
       return
       end subroutine BLIN9b
 
@@ -2662,9 +2662,9 @@
       type(auto_diff_real_2var_order1) :: FJ2, FJ2DX, FJ2DT, FJ2DXX, FJ2DXT, FJ2DTT
 
       integer :: J, K
-      real(dp), parameter :: PI26=PI*PI/6.
+      real(dp), parameter :: PI26=PI*PI/6.d0
 
-      if (CHI*TEMP.lt..1d0) then
+      if (CHI*TEMP<.1d0) then
         do K=0,2
            W=0.d0
            WDX=0.d0
@@ -2675,10 +2675,10 @@
            WDXXX=0.d0
            WDXTT=0.d0
            WDXXT=0.d0
-            do J=0,4 ! for nonrel.Fermi integrals from k+1/2 to k+4.5
-               CNU=K+J+0.5d0 ! nonrelativistic Fermi integral index \nu
-               CHINU=pow(CHI,1d0*(K+J))*sqrt(CHI) ! \chi^\nu
-               F=CHINU*(CHI/(CNU+1.d0)+PI26*CNU/CHI & ! nonrel.Fermi
+            do J=0,4  ! for nonrel.Fermi integrals from k+1/2 to k+4.5
+               CNU=K+J+0.5d0  ! nonrelativistic Fermi integral index \nu
+               CHINU=pow(CHI,1d0*(K+J))*sqrt(CHI)  ! \chi^\nu
+               F=CHINU*(CHI/(CNU+1.d0)+PI26*CNU/CHI &  ! nonrel.Fermi
                   + .7d0*PI26*PI26*CNU*(CNU-1.d0)*(CNU-2.d0)/pow3(CHI))
                FDX=CHINU*(1d0+PI26*CNU*(CNU-1.d0)/pow2(CHI) &
                   +.7d0*PI26*PI26*CNU*(CNU-1.d0)*(CNU-2.d0)*(CNU-3.d0)/pow4(CHI))
@@ -2687,14 +2687,14 @@
                FDXXX=CHINU/pow2(CHI)*CNU*(CNU-1.d0)* &
                   (1.d0+PI26*(CNU-2.d0)*(CNU-3.d0)/pow2(CHI) &
                   +.7d0*PI26*PI26*(CNU-2.d0)*(CNU-3.d0)*(CNU-4.d0)*(CNU-5.d0)/pow4(CHI))
-              if (J.eq.0) then
+              if (J==0) then
                  W=F
                  WDX=FDX
                  WDXX=FDXX
                  WDXXX=FDXXX
-              elseif (J.eq.1) then
+              elseif (J==1) then
                  C=.25d0*TEMP
-                 W=W+C*F ! Fermi-Dirac, expressed through Fermi
+                 W=W+C*F  ! Fermi-Dirac, expressed through Fermi
                  WDX=WDX+C*FDX
                  WDXX=WDXX+C*FDXX
                  WDT=F/4.d0
@@ -2714,9 +2714,9 @@
                  WDXXX=WDXXX+C*FDXXX
                  WDXTT=WDXTT+C*(1d0*J)*(1d0*(J-1))/pow2(TEMP)*FDX
                  WDXXT=WDXXT+C*(1d0*J)/TEMP*FDXX
-              endif
-            enddo ! next J
-          if (K.eq.0) then
+              end if
+            end do  ! next J
+          if (K==0) then
              W0=W
              W0DX=WDX
              W0DT=WDT
@@ -2726,7 +2726,7 @@
              W0XXX=WDXXX
              W0XTT=WDXTT
              W0XXT=WDXXT
-          elseif (K.eq.1) then
+          elseif (K==1) then
              W1=W
              W1DX=WDX
              W1DT=WDT
@@ -2740,10 +2740,10 @@
              W2DXX=WDXX
              W2DTT=WDTT
              W2DXT=WDXT
-          endif
-        enddo ! next K
+          end if
+        end do  ! next K
 !   ----------------------------------------------------------------   *
-      else ! CHI > 14, CHI*TEMP > 0.1: general high-\chi expansion
+      else  ! CHI > 14, CHI*TEMP > 0.1: general high-\chi expansion
          D=1.d0+CHI*TEMP/2.d0
          R=sqrt(CHI*D)
          RX=.5d0/CHI+.25d0*TEMP/D
@@ -2778,7 +2778,7 @@
            AMDTT(K)=AMDT(K)*FMT+AM(K)*FMTT
            AMDXT(K)=AMDX(K)*FMT+AM(K)*(CKM*(1.d0-CKM*CHI*TEMP) &
               - .25d0/D+.125d0*CHI*TEMP/(D*D))
-          if (K.eq.0) then
+          if (K==0) then
              FMXXX=(2d0*K-1d0)/pow3(CHI)+2.d0*pow3(FMX1)-8.d0*pow3(FMX2)
              AMDXXX=AMDXX(K)*FMX+2.d0*AMDX(K)*FMXX+AM(K)*FMXXX
              FMT1DX=CKM-TEMP*CHI*CKM*CKM
@@ -2790,8 +2790,8 @@
              FMX2DT=.25d0/D*(1.d0-.5d0*CHI*TEMP/D)
              FMXXT=4.d0*FMX2*FMX2DT-2.d0*FMX1*FMX1DT
              AMDXXT=AMDXT(K)*FMX+AMDX(K)*FMXT+AMDT(K)*FMXX+AM(K)*FMXXT
-          endif
-        enddo
+          end if
+        end do
            SQ2T=sqrt(2.d0*TEMP)
            SQ2T3=SQ2T*SQ2T*SQ2T
            A=1.d0+CHI*TEMP+SQ2T*R
@@ -2860,7 +2860,7 @@
          W2DXX=FJ2DXX+PI26*AMDXX(2)
          W2DTT=FJ2DTT+PI26*AMDTT(2)
          W2DXT=FJ2DXT+PI26*AMDXT(2)
-      endif
+      end if
       return
       end subroutine BLIN9c
 
@@ -2875,8 +2875,8 @@
 
       type(auto_diff_real_2var_order1) :: DENR,TEMR,CMU1,CMUDENR,CMUDT,CMUDTT
 
-      DENR=DENS/2.5733806d6 ! n_e in rel.un.=\lambda_{Compton}^{-3}
-      TEMR=TEMP/1.8778865d4 ! T in rel.un.=(mc^2/k)=5.93e9 K
+      DENR=DENS/2.5733806d6  ! n_e in rel.un.=\lambda_{Compton}^{-3}
+      TEMR=TEMP/1.8778865d4  ! T in rel.un.=(mc^2/k)=5.93e9 K
       call CHEMFIT7(DENR,TEMR,CHI,CMU1,0,CMUDENR,CMUDT,CMUDTT)
       return
       end subroutine CHEMFIT
@@ -2916,64 +2916,64 @@
       real(dp), parameter :: PARF=5.535d0
       real(dp), parameter :: PARG=0.698d0
 
-      PF0=pow(29.6088132d0*DENR,1d0/3d0) ! Classical Fermi momentum
-      if (PF0.gt.1.d-4) then
-         TF=sqrt(1.d0+PF0*PF0)-1.d0 ! Fermi temperature
+      PF0=pow(29.6088132d0*DENR,1d0/3d0)  ! Classical Fermi momentum
+      if (PF0>1.d-4) then
+         TF=sqrt(1.d0+PF0*PF0)-1.d0  ! Fermi temperature
       else
          TF=.5d0*PF0*PF0
-      endif
+      end if
       THETA=TEMR/TF
       THETA32=THETA*sqrt(THETA)
       Q2=12.d0+8.d0/THETA32
-      T1=exp(-THETA) ! former ('96) 1/T
+      T1=exp(-THETA)  ! former ('96) 1/T
       U3=T1*T1+PARA
       THETAC=pow(THETA,PARC)
       THETAG=pow(THETA,PARG)
       D3=PARB*THETAC*T1*T1+PARF*THETAG
-      Q3=1.365568127d0-U3/D3 ! 1.365...=2/\pi^{1/3}
-      if (THETA.gt.1.d-5) then
+      Q3=1.365568127d0-U3/D3  ! 1.365...=2/\pi^{1/3}
+      if (THETA>1.d-5) then
          Q1=1.5d0*T1/(1.d0-T1)
       else
          Q1=1.5d0/THETA
-      endif
+      end if
       SQT=sqrt(TEMR)
       G=(1.d0+Q2*TEMR*Q3+Q1*SQT)*TEMR
       H=(1.d0+.5d0*TEMR/THETA)*(1.d0+Q2*TEMR)
       CT=1.d0+G/H
       F=(2d0/3d0)/THETA32
       call FERINV7(F,1,X,XDF,XDFF)
-      CHI=X & ! non-relativistic result
-         - 1.5d0*log(CT) ! Relativistic fit
-      CMU1=TEMR*CHI ! Fit to chemical potential w/o mc^2
-      if (KDERIV.eq.0) then ! DISMISS DERIVATIVES
+      CHI=X &  ! non-relativistic result
+         - 1.5d0*log(CT)  ! Relativistic fit
+      CMU1=TEMR*CHI  ! Fit to chemical potential w/o mc^2
+      if (KDERIV==0) then  ! DISMISS DERIVATIVES
          CMUDENR=0.d0
          CMUDT=0.d0
          CMUDTT=0.d0
          return
-      endif
+      end if
 ! CALCULATE DERIVATIVES:
 ! 1: derivatives of CHI over THETA and T
 ! (a): Non-relativistic result:
       THETA52=THETA32*THETA
-      CHIDY=-XDF/THETA52 ! d\chi/d\theta
-      CHIDYY=(XDFF/pow4(THETA)-2.5d0*CHIDY)/THETA ! d^2\chi/d\theta^2
+      CHIDY=-XDF/THETA52  ! d\chi/d\theta
+      CHIDYY=(XDFF/pow4(THETA)-2.5d0*CHIDY)/THETA  ! d^2\chi/d\theta^2
 ! (b): Relativistic corrections:
-      if (THETA.gt.1.d-5) then
+      if (THETA>1.d-5) then
          Q1D=-Q1/(1.d0-T1)
          Q1DD=-Q1D*(1.d0+T1)/(1.d0-T1)
       else
          Q1D=-1.5d0/pow2(THETA)
          Q1DD=-2.d0*Q1D/THETA
-      endif
-      Q2D=-12.d0/THETA52 ! d q_2 / d \theta
-      Q2DD=30.d0/(THETA52*THETA) ! d^2 q_2 / d \theta^2
+      end if
+      Q2D=-12.d0/THETA52  ! d q_2 / d \theta
+      Q2DD=30.d0/(THETA52*THETA)  ! d^2 q_2 / d \theta^2
       U3D=-2.d0*T1*T1
       D3D=PARF*PARG*THETAG/THETA+PARB*T1*T1*THETAC*(PARC/THETA-2.d0)
       D3DD=PARF*PARG*(PARG-1.d0)*THETAG/pow2(THETA) &
          + PARB*T1*T1*THETAC*(PARC*(PARC-1.d0)/pow2(THETA)-4.d0*PARC/THETA+4.d0)
       Q3D=(D3D*U3/D3-U3D)/D3
       Q3DD=(2.d0*U3D+(2.d0*U3D*D3D+U3*D3DD)/D3-2.d0*U3*pow2(D3D/D3))/D3
-      GDY=TEMR*(Q1D*SQT+(Q2D*Q3+Q2*Q3D)*TEMR) ! dG/d\theta
+      GDY=TEMR*(Q1D*SQT+(Q2D*Q3+Q2*Q3D)*TEMR)  ! dG/d\theta
       GDT=1.d0+1.5d0*Q1*SQT+2.d0*Q2*Q3*TEMR
       GDYY=TEMR*(Q1DD*SQT+(Q2DD*Q3+2.d0*Q2D*Q3D+Q2*Q3DD)*TEMR)
       GDTT=.75d0*Q1/SQT+2.d0*Q2*Q3

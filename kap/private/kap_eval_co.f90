@@ -38,17 +38,17 @@
                rq, Zbase, X, dXC, dXO, Rho, logRho, T, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
-         use const_def
+         use const_def, only: dp
 
          ! INPUT
          type (Kap_General_Info), pointer :: rq
          real(dp), intent(in) :: Zbase, X, dXC, dXO
-         real(dp), intent(inout) :: Rho, logRho ! can be modified to clip to table boundaries
+         real(dp), intent(inout) :: Rho, logRho  ! can be modified to clip to table boundaries
          real(dp), intent(inout) :: T, logT
 
          ! OUTPUT
          real(dp), intent(out) :: logKap, dlnkap_dlnRho, dlnkap_dlnT
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          integer :: iz, use_iz, num_Zs, CO_option
          real(dp) :: Z0, Z1,log10_Zbase, log10_Z0, log10_Z1
@@ -73,7 +73,7 @@
          end if
 
          if (num_Zs == 1 .or. &
-               Zbase >= kap_co_z_tables(CO_option)% ar(num_Zs)% Zbase) then ! use the largest Zbase
+               Zbase >= kap_co_z_tables(CO_option)% ar(num_Zs)% Zbase) then  ! use the largest Zbase
             if (dbg) write(*,*) 'use the largest Zbase', &
                num_kap_CO_Zs(CO_option), kap_co_z_tables(CO_option)% ar(num_Zs)% Zbase
             call Get_Kap_for_CO_X( &
@@ -82,7 +82,7 @@
             return
          end if
 
-         if (Zbase <= kap_co_z_tables(CO_option)% ar(1)% Zbase) then ! use the smallest Zbase
+         if (Zbase <= kap_co_z_tables(CO_option)% ar(1)% Zbase) then  ! use the smallest Zbase
             if (dbg) then
                write(*,*) 'use the smallest Zbase'
                write(*,*) 'Zbase', Zbase
@@ -101,7 +101,7 @@
          Z0 = kap_co_z_tables(CO_option)% ar(iz)% Zbase
          Z1 = kap_co_z_tables(CO_option)% ar(iz+1)% Zbase
 
-         if (Zbase <= Z0) then ! use the Z0 table
+         if (Zbase <= Z0) then  ! use the Z0 table
             if (dbg) write(*,*) 'use the Z0 table', Z0
             call Get_Kap_for_CO_X( &
                rq, dXC, dXO, iz, X, logRho, logT, &
@@ -109,7 +109,7 @@
             return
          end if
 
-         if (Zbase >= Z1) then ! use the Z1 table
+         if (Zbase >= Z1) then  ! use the Z1 table
             if (dbg) write(*,*) 'use the Z1 table', Z1
             call Get_Kap_for_CO_X( &
                rq, dXC, dXO, iz+1, X, logRho, logT, &
@@ -121,7 +121,7 @@
             log10_Z0 = kap_co_z_tables(CO_option)% ar(iz)% log10_Zbase
             log10_Z1 = kap_co_z_tables(CO_option)% ar(iz+1)% log10_Zbase
             log10_Zbase = log10(dble(Zbase))
-            if (log10_Z1 - log10_Zbase > log10_Zbase - log10_Z0) then ! use the Z0 table
+            if (log10_Z1 - log10_Zbase > log10_Zbase - log10_Z0) then  ! use the Z0 table
                use_iz = iz
             else
                use_iz = iz+1
@@ -149,7 +149,7 @@
                if (dbg) write(*,*) 'failed in Get_Kap_for_CO_Z_cubic'
                return
             end if
-         else ! linear
+         else  ! linear
             if (dbg) write(*,*) 'call Get_Kap_for_CO_Z_linear'
             call Get_Kap_for_CO_Z_linear(rq, iz, Zbase, Z0, Z1, X, dXC, dXO, logRho, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -330,7 +330,7 @@
          if (dbg) write(*,*) 'logK1', logK1
 
          ! Z0 result in logK0, Z1 result in logK1
-         beta = (Z - Z1) / (Z0 - Z1) ! beta -> 1 as Z -> Z0
+         beta = (Z - Z1) / (Z0 - Z1)  ! beta -> 1 as Z -> Z0
          alfa = 1d0 - beta
          logKap = beta*logK0 + alfa*logK1
          dlnkap_dlnRho = beta*dlogK0_dlogRho + alfa*dlogK1_dlogRho
@@ -374,7 +374,7 @@
             end if
          end if
 
-         if (X >= x_tables(num_Xs)% X) then ! use the last X
+         if (X >= x_tables(num_Xs)% X) then  ! use the last X
             if (dbg) write(*,*) 'use the last X'
             call Get_Kap_for_dXCO( &
                rq, iz, x_tables, dXC, dXO, num_Xs, &
@@ -382,7 +382,7 @@
             return
          end if
 
-         if (X <= x_tables(1)% X) then ! use the first X
+         if (X <= x_tables(1)% X) then  ! use the first X
             if (dbg) write(*,*) 'use the first X'
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, 1, &
@@ -414,14 +414,14 @@
             return
          end if
 
-         if (X0 >= X) then ! use the X0 table
+         if (X0 >= X) then  ! use the X0 table
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, ix, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
 
-         if (X1 <= X) then ! use the X1 table
+         if (X1 <= X) then  ! use the X1 table
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, ix+1, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
@@ -432,7 +432,7 @@
             call Get_Kap_for_CO_X_cubic( &
                   rq, iz, ix, dXC, dXO, x_tables, X, logRho, logT, &
                   logK, dlogK_dlogRho, dlogK_dlogT, ierr)
-         else ! linear
+         else  ! linear
             call Get_Kap_for_CO_X_linear( &
                   rq, iz, ix, dXC, dXO, x_tables, X, X0, X1, logRho, logT, &
                   logK, dlogK_dlogRho, dlogK_dlogT, ierr)
@@ -600,7 +600,7 @@
          if (ierr /= 0) return
 
          ! X0 result in logK0, X1 result in logK1
-         beta = (X - X1) / (X0 - X1) ! beta -> 1 as X -> X0
+         beta = (X - X1) / (X0 - X1)  ! beta -> 1 as X -> X0
          alfa = 1d0 - beta
 
          logK = beta*logK0 + alfa*logK1
@@ -624,7 +624,7 @@
          real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
          integer, intent(out) :: ierr
 
-         type (Kap_CO_Table), dimension(:), pointer :: co_tables ! stored by table number
+         type (Kap_CO_Table), dimension(:), pointer :: co_tables  ! stored by table number
          real(dp) :: dXC, dXO, fac, dXCO_max, Z, dXC_lookup, dXO_lookup
          integer :: num_CO_tables, num_dXC_gt_dXO, i1, i2, i3, i4
          real(dp) :: alfa, beta
@@ -645,7 +645,7 @@
          dXC = max(0.0_dp, dXC_in)
          dXO = max(0.0_dp, dXO_in)
 
-         if (x_tables(ix)% not_loaded_yet) then ! avoid doing critical section if possible
+         if (x_tables(ix)% not_loaded_yet) then  ! avoid doing critical section if possible
 !$omp critical (load_co_table)
             if (x_tables(ix)% not_loaded_yet) then
                call load_one_CO(rq,kap_co_z_tables(rq% kap_CO_option)% ar,iz,ix,read_later,ierr)
@@ -681,11 +681,11 @@
          call Find_CO_Tables(rq, x_tables, ix, x_tables(ix)% CO_table_numbers,  &
                      x_tables(ix)% next_dXO_table, x_tables(ix)% next_dXC_table,  &
                      co_tables, num_CO_tables, num_dXC_gt_dXO, &
-                     dXCO_max, dXC, dXO, dXC_lookup, dXO_lookup, i1, i2, i3, i4,ierr)
+                     dXCO_max, dXC, dXO, dXC_lookup, dXO_lookup, i1, i2, i3, i4, ierr)
          if (ierr /= 0) then
             write(*,*) 'kap failed in Find_CO_Tables'
             return
-         endif
+         end if
 
          if (i1 > 0 .and. i2 <= 0 .and. i3 <= 0 .and. i4 <= 0) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i1, logRho, logT,  &
@@ -739,7 +739,7 @@
             if (ierr /= 0) return
             dXC4_lookup = co_tables(i4)% dXC_lookup
             dXO4_lookup = co_tables(i4)% dXO_lookup
-         else ! copy i3 results
+         else  ! copy i3 results
             logK4 = logK3
             dlogK4_dlogRho = dlogK3_dlogRho
             dlogK4_dlogT = dlogK3_dlogT
@@ -747,7 +747,7 @@
             dXO4_lookup = dXO3_lookup
          end if
 
-         if (dXC >= dXO) then ! use values on lines i1-i3 and i2-i4 at dXO
+         if (dXC >= dXO) then  ! use values on lines i1-i3 and i2-i4 at dXO
 
             call Get_Kap_at_dXO(dXO_lookup, &
                            dXC2_lookup, dXO2_lookup, logK2, dlogK2_dlogRho, dlogK2_dlogT,  &
@@ -764,7 +764,7 @@
                alfa = (dXC_lookup - dXC_2_4_lookup) / (dXC_1_3_lookup - dXC_2_4_lookup)
             end if
 
-         else ! use values on lines i1-i3 and i2-i4 at dXC
+         else  ! use values on lines i1-i3 and i2-i4 at dXC
 
             call Get_Kap_at_dXC(dXC_lookup, &
                            dXC2_lookup, dXO2_lookup, logK2, dlogK2_dlogRho, dlogK2_dlogT,  &
@@ -995,7 +995,7 @@
             return
          end if
 
-         if (on_midline(i1)) then ! middle triangle
+         if (on_midline(i1)) then  ! middle triangle
             if (dXC >= dXO) then
                i2 = next_dXC_table(i1)
                i3 = next_dXO_table(i1)
@@ -1013,7 +1013,7 @@
             if (i3 <= 0) then
                if (on_diagonal(i1)) then
                   i3 = num_CO_tables
-                  if (i2 > 0) then ! bail -- just use i1
+                  if (i2 > 0) then  ! bail -- just use i1
                      i2 = -1; i3 = -1; i4 = -1; return
                   end if
                else
@@ -1023,7 +1023,7 @@
 
             if (.not. on_diagonal(i3)) then
                i4 = next_dXC_table(i3)
-               if (.not. on_diagonal(i4)) then ! bail -- just use i1
+               if (.not. on_diagonal(i4)) then  ! bail -- just use i1
                   i2 = -1; i3 = -1; i4 = -1; return
                end if
             end if
@@ -1041,28 +1041,28 @@
                      (dXO_lookup-dXO4_lookup)/(dXO2_lookup-dXO4_lookup)) return
             ! else we're in the dXC > dXO triangle
             i1 = i2; i2 = next_dXC_table(i1)
-            if (.not. on_diagonal(i2)) then ! bail -- just use i1
+            if (.not. on_diagonal(i2)) then  ! bail -- just use i1
                i2 = -1; i3 = -1; i4 = -1; return
             end if
             i3 = i4; i4 = -1
 
-         else ! dXC < dXO
+         else  ! dXC < dXO
 
             ! reverse roles of dXC and dXO
 
-            if (i3 <= 0) then ! must be in one of the triangles
+            if (i3 <= 0) then  ! must be in one of the triangles
                if (on_diagonal(i1)) then
                   i3 = num_dXC_gt_dXO
                else
                   i3 = num_CO_tables
-                  if (i2 > 0) then ! bail -- just use i1
+                  if (i2 > 0) then  ! bail -- just use i1
                      i2 = -1; i3 = -1; i4 = -1; return
                   end if
                end if
             end if
             if (.not. on_diagonal(i3)) then
                i4 = next_dXO_table(i3)
-               if (.not. on_diagonal(i4)) then ! bail -- just use i1
+               if (.not. on_diagonal(i4)) then  ! bail -- just use i1
                   i2 = -1; i3 = -1; i4 = -1; return
                end if
             end if
@@ -1078,7 +1078,7 @@
                      (dXC_lookup-dXC4_lookup)/(dXC2_lookup-dXC4_lookup)) return
             ! else we're in the dXC < dXO triangle
             i1 = i2; i2 = next_dXO_table(i1)
-            if (.not. on_diagonal(i2)) then ! bail -- just use i1
+            if (.not. on_diagonal(i2)) then  ! bail -- just use i1
                i2 = -1; i3 = -1; i4 = -1; return
             end if
             i3 = num_CO_tables; i4 = -1

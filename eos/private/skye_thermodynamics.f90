@@ -102,6 +102,7 @@ module skye_thermodynamics
    !! @param d_dlnT The derivative of the EOS return vector with respect to lnT.
    subroutine pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele, abar, zbar, &
                                           phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT, ierr)
+      use const_def, only: dp, crad, avo
       use eos_def
       type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele
       type(auto_diff_real_2var_order3), intent(in) :: phase, latent_ddlnT, latent_ddlnRho

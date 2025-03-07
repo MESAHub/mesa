@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  get input from file in $1
 #  input lines are marked with a '#' or a '@' at the end
 grep -E '# *$|@ *$' "$1" | sed -e 's/ *[#,@] *$//'

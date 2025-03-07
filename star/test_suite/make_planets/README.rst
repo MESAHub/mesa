@@ -34,19 +34,17 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 10
 
  TRho_Profile_win_flag = .true.
  TRho_Profile_win_width = 12
- TRho_Profile_win_aspect_ratio = 0.75 
+ TRho_Profile_win_aspect_ratio = 0.75
  TRho_Profile_txt_scale = 1.0
- TRho_Profile_title = 'make_planets'      
-         
+ TRho_Profile_title = 'make_planets'
+
  show_TRho_Profile_legend = .true.
  TRho_Profile_legend_coord = 0.07
  TRho_Profile_legend_fjust = 0.0
@@ -56,7 +54,7 @@ pgstar commands used for the plots above:
   show_TRho_Profile_eos_regions = .true.
   show_TRho_Profile_degeneracy_line = .false.
   show_TRho_Profile_Pgas_Prad_line = .false.
-      
+
   TRho_Profile_xmin = -6.0
   TRho_Profile_xmax = 1.2
   TRho_Profile_ymin = 3.0
@@ -72,7 +70,7 @@ pgstar commands used for the plots above:
   profile_mass_point_str(1) = '  q=0.25'
   profile_mass_point_str_clr(1) = 1
   profile_mass_point_str_scale(1) = 0.8
-         
+
   profile_mass_point_q(2) = 0.5
   profile_mass_point_color_index(2) = 1
   profile_mass_point_symbol(2) = -6
@@ -80,7 +78,7 @@ pgstar commands used for the plots above:
   profile_mass_point_str(2) = '  q=0.5'
   profile_mass_point_str_clr(2) = 1
   profile_mass_point_str_scale(2) = 0.8
-         
+
   profile_mass_point_q(3) = 0.75
   profile_mass_point_color_index(3) = 1
   profile_mass_point_symbol(3) = -6

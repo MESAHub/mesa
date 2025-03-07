@@ -26,7 +26,8 @@
 module pgstar_support
 
    use star_private_def
-   use const_def
+   use const_def, only: dp, secday, secyer, mesa_data_dir, &
+      overshoot_mixing, rotation_mixing, thermohaline_mixing, semiconvective_mixing, leftover_convective_mixing, convective_mixing, no_mixing
    use rates_def, only : i_rate
    use utils_lib
    use star_pgstar
@@ -152,7 +153,7 @@ contains
             call pgslct(p% id_win)
             call pgclos
             p% id_win = 0
-         endif
+         end if
       else if (p% win_flag .and. (.not. p% do_win)) then
          if (p% id_win == 0) &
             call open_device(s, p, .false., '/xwin', p% id_win, ierr)
@@ -203,6 +204,7 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
+      character (len = 32) :: file_extension
       write(fstring, '( "(i",i2.2,".",i2.2,")" )') s% pg% file_digits, s% pg% file_digits
       write(num_str, fstring) s% model_number
       if (len_trim(dir) > 0) then
@@ -210,7 +212,12 @@ contains
       else
          name = prefix
       end if
-      name = trim(name) // trim(num_str) // '.' // trim(s% pg% file_extension)
+      if (s%pg%file_device=='vcps') then
+         file_extension = 'ps'
+      else
+         file_extension = s%pg%file_device  ! e.g.: png, ps
+      end if
+      name = trim(name) // trim(num_str) // '.' // trim(file_extension)
    end subroutine create_file_name
 
 
@@ -357,7 +364,6 @@ contains
    ! remaining routines for setting colours in PGPLOT
    ! by X11 name
    subroutine Set_Colours(white_on_black_flag, ierr)
-      implicit none
       logical, intent(in) :: white_on_black_flag
       integer, intent(out) :: ierr
       integer :: index, i, k
@@ -452,107 +458,107 @@ contains
       clr_minimum = clr_Coral
       clr_anonymous = clr_Tan
 
-      colormap(1:3, 1) = (/ 0.0, 0.0, 1.0 /)
-      colormap(1:3, 2) = (/ 0.0196078431372549, 0.0196078431372549, 1.0 /)
-      colormap(1:3, 3) = (/ 0.0352941176470588, 0.0352941176470588, 1.0 /)
-      colormap(1:3, 4) = (/ 0.0588235294117647, 0.0588235294117647, 1.0 /)
-      colormap(1:3, 5) = (/ 0.0705882352941176, 0.0705882352941176, 1.0 /)
-      colormap(1:3, 6) = (/ 0.0941176470588235, 0.0941176470588235, 1.0 /)
-      colormap(1:3, 7) = (/ 0.105882352941176, 0.105882352941176, 1.0 /)
-      colormap(1:3, 8) = (/ 0.129411764705882, 0.129411764705882, 1.0 /)
-      colormap(1:3, 9) = (/ 0.141176470588235, 0.141176470588235, 1.0 /)
-      colormap(1:3, 10) = (/ 0.164705882352941, 0.164705882352941, 1.0 /)
-      colormap(1:3, 11) = (/ 0.184313725490196, 0.184313725490196, 1.0 /)
-      colormap(1:3, 12) = (/ 0.2, 0.2, 1.0 /)
-      colormap(1:3, 13) = (/ 0.219607843137255, 0.219607843137255, 1.0 /)
-      colormap(1:3, 14) = (/ 0.235294117647059, 0.235294117647059, 1.0 /)
-      colormap(1:3, 15) = (/ 0.254901960784314, 0.254901960784314, 1.0 /)
-      colormap(1:3, 16) = (/ 0.270588235294118, 0.270588235294118, 1.0 /)
-      colormap(1:3, 17) = (/ 0.294117647058824, 0.294117647058824, 1.0 /)
-      colormap(1:3, 18) = (/ 0.305882352941176, 0.305882352941176, 1.0 /)
-      colormap(1:3, 19) = (/ 0.329411764705882, 0.329411764705882, 1.0 /)
-      colormap(1:3, 20) = (/ 0.341176470588235, 0.341176470588235, 1.0 /)
-      colormap(1:3, 21) = (/ 0.364705882352941, 0.364705882352941, 1.0 /)
-      colormap(1:3, 22) = (/ 0.384313725490196, 0.384313725490196, 1.0 /)
-      colormap(1:3, 23) = (/ 0.4, 0.4, 1.0 /)
-      colormap(1:3, 24) = (/ 0.419607843137255, 0.419607843137255, 1.0 /)
-      colormap(1:3, 25) = (/ 0.435294117647059, 0.435294117647059, 1.0 /)
-      colormap(1:3, 26) = (/ 0.454901960784314, 0.454901960784314, 1.0 /)
-      colormap(1:3, 27) = (/ 0.470588235294118, 0.470588235294118, 1.0 /)
-      colormap(1:3, 28) = (/ 0.490196078431373, 0.490196078431373, 1.0 /)
-      colormap(1:3, 29) = (/ 0.505882352941176, 0.505882352941176, 1.0 /)
-      colormap(1:3, 30) = (/ 0.529411764705882, 0.529411764705882, 1.0 /)
-      colormap(1:3, 31) = (/ 0.549019607843137, 0.549019607843137, 1.0 /)
-      colormap(1:3, 32) = (/ 0.564705882352941, 0.564705882352941, 1.0 /)
-      colormap(1:3, 33) = (/ 0.584313725490196, 0.584313725490196, 1.0 /)
-      colormap(1:3, 34) = (/ 0.6, 0.6, 1.0 /)
-      colormap(1:3, 35) = (/ 0.619607843137255, 0.619607843137255, 1.0 /)
-      colormap(1:3, 36) = (/ 0.635294117647059, 0.635294117647059, 1.0 /)
-      colormap(1:3, 37) = (/ 0.654901960784314, 0.654901960784314, 1.0 /)
-      colormap(1:3, 38) = (/ 0.670588235294118, 0.670588235294118, 1.0 /)
-      colormap(1:3, 39) = (/ 0.690196078431373, 0.690196078431373, 1.0 /)
-      colormap(1:3, 40) = (/ 0.705882352941177, 0.705882352941177, 1.0 /)
-      colormap(1:3, 41) = (/ 0.725490196078431, 0.725490196078431, 1.0 /)
-      colormap(1:3, 42) = (/ 0.749019607843137, 0.749019607843137, 1.0 /)
-      colormap(1:3, 43) = (/ 0.764705882352941, 0.764705882352941, 1.0 /)
-      colormap(1:3, 44) = (/ 0.784313725490196, 0.784313725490196, 1.0 /)
-      colormap(1:3, 45) = (/ 0.8, 0.8, 1.0 /)
-      colormap(1:3, 46) = (/ 0.831372549019608, 0.831372549019608, 1.0 /)
-      colormap(1:3, 47) = (/ 0.854901960784314, 0.854901960784314, 1.0 /)
-      colormap(1:3, 48) = (/ 0.890196078431372, 0.890196078431372, 1.0 /)
-      colormap(1:3, 49) = (/ 0.913725490196078, 0.913725490196078, 1.0 /)
-      colormap(1:3, 50) = (/ 0.949019607843137, 0.949019607843137, 1.0 /)
-      colormap(1:3, 51) = (/ 1.0, 0.972549019607843, 0.972549019607843 /)
-      colormap(1:3, 52) = (/ 1.0, 0.949019607843137, 0.949019607843137 /)
-      colormap(1:3, 53) = (/ 1.0, 0.913725490196078, 0.913725490196078 /)
-      colormap(1:3, 54) = (/ 1.0, 0.890196078431372, 0.890196078431372 /)
-      colormap(1:3, 55) = (/ 1.0, 0.854901960784314, 0.854901960784314 /)
-      colormap(1:3, 56) = (/ 1.0, 0.831372549019608, 0.831372549019608 /)
-      colormap(1:3, 57) = (/ 1.0, 0.8, 0.8 /)
-      colormap(1:3, 58) = (/ 1.0, 0.784313725490196, 0.784313725490196 /)
-      colormap(1:3, 59) = (/ 1.0, 0.764705882352941, 0.764705882352941 /)
-      colormap(1:3, 60) = (/ 1.0, 0.749019607843137, 0.749019607843137 /)
-      colormap(1:3, 61) = (/ 1.0, 0.725490196078431, 0.725490196078431 /)
-      colormap(1:3, 62) = (/ 1.0, 0.705882352941177, 0.705882352941177 /)
-      colormap(1:3, 63) = (/ 1.0, 0.690196078431373, 0.690196078431373 /)
-      colormap(1:3, 64) = (/ 1.0, 0.670588235294118, 0.670588235294118 /)
-      colormap(1:3, 65) = (/ 1.0, 0.654901960784314, 0.654901960784314 /)
-      colormap(1:3, 66) = (/ 1.0, 0.635294117647059, 0.635294117647059 /)
-      colormap(1:3, 67) = (/ 1.0, 0.619607843137255, 0.619607843137255 /)
-      colormap(1:3, 68) = (/ 1.0, 0.6, 0.6 /)
-      colormap(1:3, 69) = (/ 1.0, 0.584313725490196, 0.584313725490196 /)
-      colormap(1:3, 70) = (/ 1.0, 0.564705882352941, 0.564705882352941 /)
-      colormap(1:3, 71) = (/ 1.0, 0.541176470588235, 0.541176470588235 /)
-      colormap(1:3, 72) = (/ 1.0, 0.529411764705882, 0.529411764705882 /)
-      colormap(1:3, 73) = (/ 1.0, 0.505882352941176, 0.505882352941176 /)
-      colormap(1:3, 74) = (/ 1.0, 0.490196078431373, 0.490196078431373 /)
-      colormap(1:3, 75) = (/ 1.0, 0.470588235294118, 0.470588235294118 /)
-      colormap(1:3, 76) = (/ 1.0, 0.454901960784314, 0.454901960784314 /)
-      colormap(1:3, 77) = (/ 1.0, 0.435294117647059, 0.435294117647059 /)
-      colormap(1:3, 78) = (/ 1.0, 0.419607843137255, 0.419607843137255 /)
-      colormap(1:3, 79) = (/ 1.0, 0.4, 0.4 /)
-      colormap(1:3, 80) = (/ 1.0, 0.384313725490196, 0.384313725490196 /)
-      colormap(1:3, 81) = (/ 1.0, 0.364705882352941, 0.364705882352941 /)
-      colormap(1:3, 82) = (/ 1.0, 0.341176470588235, 0.341176470588235 /)
-      colormap(1:3, 83) = (/ 1.0, 0.329411764705882, 0.329411764705882 /)
-      colormap(1:3, 84) = (/ 1.0, 0.305882352941176, 0.305882352941176 /)
-      colormap(1:3, 85) = (/ 1.0, 0.294117647058824, 0.294117647058824 /)
-      colormap(1:3, 86) = (/ 1.0, 0.270588235294118, 0.270588235294118 /)
-      colormap(1:3, 87) = (/ 1.0, 0.254901960784314, 0.254901960784314 /)
-      colormap(1:3, 88) = (/ 1.0, 0.235294117647059, 0.235294117647059 /)
-      colormap(1:3, 89) = (/ 1.0, 0.219607843137255, 0.219607843137255 /)
-      colormap(1:3, 90) = (/ 1.0, 0.2, 0.2 /)
-      colormap(1:3, 91) = (/ 1.0, 0.176470588235294, 0.176470588235294 /)
-      colormap(1:3, 92) = (/ 1.0, 0.164705882352941, 0.164705882352941 /)
-      colormap(1:3, 93) = (/ 1.0, 0.141176470588235, 0.141176470588235 /)
-      colormap(1:3, 94) = (/ 1.0, 0.129411764705882, 0.129411764705882 /)
-      colormap(1:3, 95) = (/ 1.0, 0.105882352941176, 0.105882352941176 /)
-      colormap(1:3, 96) = (/ 1.0, 0.0941176470588235, 0.0941176470588235 /)
-      colormap(1:3, 97) = (/ 1.0, 0.0705882352941176, 0.0705882352941176 /)
-      colormap(1:3, 98) = (/ 1.0, 0.0588235294117647, 0.0588235294117647 /)
-      colormap(1:3, 99) = (/ 1.0, 0.0352941176470588, 0.0352941176470588 /)
-      colormap(1:3, 100) = (/ 1.0, 0.0196078431372549, 0.0196078431372549 /)
-      colormap(1:3, 101) = (/ 1.0, 0.0, 0.0 /)
+      colormap(1:3, 1) = [ 0.0, 0.0, 1.0 ]
+      colormap(1:3, 2) = [ 0.0196078431372549, 0.0196078431372549, 1.0 ]
+      colormap(1:3, 3) = [ 0.0352941176470588, 0.0352941176470588, 1.0 ]
+      colormap(1:3, 4) = [ 0.0588235294117647, 0.0588235294117647, 1.0 ]
+      colormap(1:3, 5) = [ 0.0705882352941176, 0.0705882352941176, 1.0 ]
+      colormap(1:3, 6) = [ 0.0941176470588235, 0.0941176470588235, 1.0 ]
+      colormap(1:3, 7) = [ 0.105882352941176, 0.105882352941176, 1.0 ]
+      colormap(1:3, 8) = [ 0.129411764705882, 0.129411764705882, 1.0 ]
+      colormap(1:3, 9) = [ 0.141176470588235, 0.141176470588235, 1.0 ]
+      colormap(1:3, 10) = [ 0.164705882352941, 0.164705882352941, 1.0 ]
+      colormap(1:3, 11) = [ 0.184313725490196, 0.184313725490196, 1.0 ]
+      colormap(1:3, 12) = [ 0.2, 0.2, 1.0 ]
+      colormap(1:3, 13) = [ 0.219607843137255, 0.219607843137255, 1.0 ]
+      colormap(1:3, 14) = [ 0.235294117647059, 0.235294117647059, 1.0 ]
+      colormap(1:3, 15) = [ 0.254901960784314, 0.254901960784314, 1.0 ]
+      colormap(1:3, 16) = [ 0.270588235294118, 0.270588235294118, 1.0 ]
+      colormap(1:3, 17) = [ 0.294117647058824, 0.294117647058824, 1.0 ]
+      colormap(1:3, 18) = [ 0.305882352941176, 0.305882352941176, 1.0 ]
+      colormap(1:3, 19) = [ 0.329411764705882, 0.329411764705882, 1.0 ]
+      colormap(1:3, 20) = [ 0.341176470588235, 0.341176470588235, 1.0 ]
+      colormap(1:3, 21) = [ 0.364705882352941, 0.364705882352941, 1.0 ]
+      colormap(1:3, 22) = [ 0.384313725490196, 0.384313725490196, 1.0 ]
+      colormap(1:3, 23) = [ 0.4, 0.4, 1.0 ]
+      colormap(1:3, 24) = [ 0.419607843137255, 0.419607843137255, 1.0 ]
+      colormap(1:3, 25) = [ 0.435294117647059, 0.435294117647059, 1.0 ]
+      colormap(1:3, 26) = [ 0.454901960784314, 0.454901960784314, 1.0 ]
+      colormap(1:3, 27) = [ 0.470588235294118, 0.470588235294118, 1.0 ]
+      colormap(1:3, 28) = [ 0.490196078431373, 0.490196078431373, 1.0 ]
+      colormap(1:3, 29) = [ 0.505882352941176, 0.505882352941176, 1.0 ]
+      colormap(1:3, 30) = [ 0.529411764705882, 0.529411764705882, 1.0 ]
+      colormap(1:3, 31) = [ 0.549019607843137, 0.549019607843137, 1.0 ]
+      colormap(1:3, 32) = [ 0.564705882352941, 0.564705882352941, 1.0 ]
+      colormap(1:3, 33) = [ 0.584313725490196, 0.584313725490196, 1.0 ]
+      colormap(1:3, 34) = [ 0.6, 0.6, 1.0 ]
+      colormap(1:3, 35) = [ 0.619607843137255, 0.619607843137255, 1.0 ]
+      colormap(1:3, 36) = [ 0.635294117647059, 0.635294117647059, 1.0 ]
+      colormap(1:3, 37) = [ 0.654901960784314, 0.654901960784314, 1.0 ]
+      colormap(1:3, 38) = [ 0.670588235294118, 0.670588235294118, 1.0 ]
+      colormap(1:3, 39) = [ 0.690196078431373, 0.690196078431373, 1.0 ]
+      colormap(1:3, 40) = [ 0.705882352941177, 0.705882352941177, 1.0 ]
+      colormap(1:3, 41) = [ 0.725490196078431, 0.725490196078431, 1.0 ]
+      colormap(1:3, 42) = [ 0.749019607843137, 0.749019607843137, 1.0 ]
+      colormap(1:3, 43) = [ 0.764705882352941, 0.764705882352941, 1.0 ]
+      colormap(1:3, 44) = [ 0.784313725490196, 0.784313725490196, 1.0 ]
+      colormap(1:3, 45) = [ 0.8, 0.8, 1.0 ]
+      colormap(1:3, 46) = [ 0.831372549019608, 0.831372549019608, 1.0 ]
+      colormap(1:3, 47) = [ 0.854901960784314, 0.854901960784314, 1.0 ]
+      colormap(1:3, 48) = [ 0.890196078431372, 0.890196078431372, 1.0 ]
+      colormap(1:3, 49) = [ 0.913725490196078, 0.913725490196078, 1.0 ]
+      colormap(1:3, 50) = [ 0.949019607843137, 0.949019607843137, 1.0 ]
+      colormap(1:3, 51) = [ 1.0, 0.972549019607843, 0.972549019607843 ]
+      colormap(1:3, 52) = [ 1.0, 0.949019607843137, 0.949019607843137 ]
+      colormap(1:3, 53) = [ 1.0, 0.913725490196078, 0.913725490196078 ]
+      colormap(1:3, 54) = [ 1.0, 0.890196078431372, 0.890196078431372 ]
+      colormap(1:3, 55) = [ 1.0, 0.854901960784314, 0.854901960784314 ]
+      colormap(1:3, 56) = [ 1.0, 0.831372549019608, 0.831372549019608 ]
+      colormap(1:3, 57) = [ 1.0, 0.8, 0.8 ]
+      colormap(1:3, 58) = [ 1.0, 0.784313725490196, 0.784313725490196 ]
+      colormap(1:3, 59) = [ 1.0, 0.764705882352941, 0.764705882352941 ]
+      colormap(1:3, 60) = [ 1.0, 0.749019607843137, 0.749019607843137 ]
+      colormap(1:3, 61) = [ 1.0, 0.725490196078431, 0.725490196078431 ]
+      colormap(1:3, 62) = [ 1.0, 0.705882352941177, 0.705882352941177 ]
+      colormap(1:3, 63) = [ 1.0, 0.690196078431373, 0.690196078431373 ]
+      colormap(1:3, 64) = [ 1.0, 0.670588235294118, 0.670588235294118 ]
+      colormap(1:3, 65) = [ 1.0, 0.654901960784314, 0.654901960784314 ]
+      colormap(1:3, 66) = [ 1.0, 0.635294117647059, 0.635294117647059 ]
+      colormap(1:3, 67) = [ 1.0, 0.619607843137255, 0.619607843137255 ]
+      colormap(1:3, 68) = [ 1.0, 0.6, 0.6 ]
+      colormap(1:3, 69) = [ 1.0, 0.584313725490196, 0.584313725490196 ]
+      colormap(1:3, 70) = [ 1.0, 0.564705882352941, 0.564705882352941 ]
+      colormap(1:3, 71) = [ 1.0, 0.541176470588235, 0.541176470588235 ]
+      colormap(1:3, 72) = [ 1.0, 0.529411764705882, 0.529411764705882 ]
+      colormap(1:3, 73) = [ 1.0, 0.505882352941176, 0.505882352941176 ]
+      colormap(1:3, 74) = [ 1.0, 0.490196078431373, 0.490196078431373 ]
+      colormap(1:3, 75) = [ 1.0, 0.470588235294118, 0.470588235294118 ]
+      colormap(1:3, 76) = [ 1.0, 0.454901960784314, 0.454901960784314 ]
+      colormap(1:3, 77) = [ 1.0, 0.435294117647059, 0.435294117647059 ]
+      colormap(1:3, 78) = [ 1.0, 0.419607843137255, 0.419607843137255 ]
+      colormap(1:3, 79) = [ 1.0, 0.4, 0.4 ]
+      colormap(1:3, 80) = [ 1.0, 0.384313725490196, 0.384313725490196 ]
+      colormap(1:3, 81) = [ 1.0, 0.364705882352941, 0.364705882352941 ]
+      colormap(1:3, 82) = [ 1.0, 0.341176470588235, 0.341176470588235 ]
+      colormap(1:3, 83) = [ 1.0, 0.329411764705882, 0.329411764705882 ]
+      colormap(1:3, 84) = [ 1.0, 0.305882352941176, 0.305882352941176 ]
+      colormap(1:3, 85) = [ 1.0, 0.294117647058824, 0.294117647058824 ]
+      colormap(1:3, 86) = [ 1.0, 0.270588235294118, 0.270588235294118 ]
+      colormap(1:3, 87) = [ 1.0, 0.254901960784314, 0.254901960784314 ]
+      colormap(1:3, 88) = [ 1.0, 0.235294117647059, 0.235294117647059 ]
+      colormap(1:3, 89) = [ 1.0, 0.219607843137255, 0.219607843137255 ]
+      colormap(1:3, 90) = [ 1.0, 0.2, 0.2 ]
+      colormap(1:3, 91) = [ 1.0, 0.176470588235294, 0.176470588235294 ]
+      colormap(1:3, 92) = [ 1.0, 0.164705882352941, 0.164705882352941 ]
+      colormap(1:3, 93) = [ 1.0, 0.141176470588235, 0.141176470588235 ]
+      colormap(1:3, 94) = [ 1.0, 0.129411764705882, 0.129411764705882 ]
+      colormap(1:3, 95) = [ 1.0, 0.105882352941176, 0.105882352941176 ]
+      colormap(1:3, 96) = [ 1.0, 0.0941176470588235, 0.0941176470588235 ]
+      colormap(1:3, 97) = [ 1.0, 0.0705882352941176, 0.0705882352941176 ]
+      colormap(1:3, 98) = [ 1.0, 0.0588235294117647, 0.0588235294117647 ]
+      colormap(1:3, 99) = [ 1.0, 0.0352941176470588, 0.0352941176470588 ]
+      colormap(1:3, 100) = [ 1.0, 0.0196078431372549, 0.0196078431372549 ]
+      colormap(1:3, 101) = [ 1.0, 0.0, 0.0 ]
 
       colormap_offset = index - 1
       !write(*,2) 'colormap_offset', colormap_offset
@@ -611,7 +617,7 @@ contains
          write(*, '(a,i4,a,i3,a,i3)') "Set_Pgplot_Colour: requested index of ", index, &
             " not in ", low, " to ", hi
          return
-      endif
+      end if
 
       do i = 1, nrgbcolours
          if (colournames(i) == name) exit
@@ -696,9 +702,8 @@ contains
 
    subroutine read_TRho_data(fname, logTs, logRhos, ierr)
       use utils_lib
-      use const_def, only : mesa_data_dir
       character (len = *), intent(in) :: fname
-      real, dimension(:), allocatable :: logTs, logRhos ! will allocate
+      real, dimension(:), allocatable :: logTs, logRhos  ! will allocate
       integer, intent(out) :: ierr
 
       character (len = strlen) :: filename
@@ -871,7 +876,7 @@ contains
       include 'formats'
       numpts = 0
       pg => s% pg% pgstar_hist
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) return
          if (pg% step <= step_max .or. step_max <= 0) numpts = numpts + 1
@@ -883,7 +888,7 @@ contains
    logical function get1_hist_yvec(s, step_min, step_max, n, name, vec)
       use utils_lib, only : integer_dict_lookup
       type (star_info), pointer :: s
-      integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
+      integer, intent(in) :: step_min, step_max, n  ! n = count_hist_points
       character (len = *) :: name
       real, dimension(:), allocatable :: vec
       integer :: i, cnt, ierr
@@ -903,12 +908,12 @@ contains
          end if
       end do
       call integer_dict_lookup(s% history_names_dict, key_name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) then ! didn't find it
+      if (ierr /= 0 .or. i <= 0) then  ! didn't find it
          get1_hist_yvec = .false.
          return
       end if
       call get_hist_points(s, step_min, step_max, n, i, vec, ierr)
-      if (ierr /= 0) then ! didn't get them
+      if (ierr /= 0) then  ! didn't get them
          get1_hist_yvec = .false.
          return
       end if
@@ -928,7 +933,7 @@ contains
       if (numpts == 0) return
       pg => s% pg% pgstar_hist
       i = numpts
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) then
             ierr = -1
             return
@@ -977,7 +982,7 @@ contains
       i = numpts
       vec = 0
       ierr = 0
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) then
             ! this will not happen if have correct numpts
@@ -1025,7 +1030,7 @@ contains
       end if
       ! search in from surface
       do k = 1, nz - 1
-         cs = s% csound(k) ! cell center
+         cs = s% csound(k)  ! cell center
          if (v(k + 1) >= cs .and. v(k) < cs) then
             found_shock = .true.
             exit
@@ -1034,7 +1039,7 @@ contains
       if (.not. found_shock) then
          ! search out from center
          do k = nz - 1, 1, -1
-            cs = s% csound(k) ! cell center
+            cs = s% csound(k)  ! cell center
             if (v(k + 1) >= -cs .and. v(k) < -cs) then
                found_shock = .true.
                exit
@@ -1127,32 +1132,32 @@ contains
          xright = xmax; xleft = xmin
       end if
 
-      if (xvec(1) < xvec(nz)) then ! increasing xs
+      if (xvec(1) < xvec(nz)) then  ! increasing xs
          grid_max = nz
-         do k = nz - 1, 1, -1 ! in decreasing order
-            if (xvec(k) < xmax) then ! this is the first one < xmax
+         do k = nz - 1, 1, -1  ! in decreasing order
+            if (xvec(k) < xmax) then  ! this is the first one < xmax
                grid_max = k + 1
                exit
             end if
          end do
          grid_min = 1
          do k = grid_max, 1, -1
-            if (xvec(k) <= xmin) then ! this is the first one <= xmin
+            if (xvec(k) <= xmin) then  ! this is the first one <= xmin
                grid_min = k
                exit
             end if
          end do
-      else ! decreasing
+      else  ! decreasing
          grid_min = 1
-         do k = 2, nz ! in decreasing order
-            if (xvec(k) < xmax) then ! this is the first one < xmax
+         do k = 2, nz  ! in decreasing order
+            if (xvec(k) < xmax) then  ! this is the first one < xmax
                grid_min = k - 1
                exit
             end if
          end do
          grid_max = nz
          do k = grid_min, nz
-            if (xvec(k) <= xmin) then ! this is the first one <= xmin
+            if (xvec(k) <= xmin) then  ! this is the first one <= xmin
                grid_max = k
                exit
             end if
@@ -1236,7 +1241,7 @@ contains
          ymax = ymax + max(1.0, ymargin) / 2
       end if
 
-      if (ymin == ymax) then ! round off problems
+      if (ymin == ymax) then  ! round off problems
          dy = 1e-6 * abs(ymax)
          ymin = ymin - dy
          ymax = ymax + dy
@@ -1488,14 +1493,14 @@ contains
       inside = (s% mixing_type(grid_min) == mixing_type)
       first = grid_min
       call pgsci(clr)
-      do k = grid_min, grid_max ! 2,s% nz
+      do k = grid_min, grid_max  ! 2,s% nz
          if (.not. inside) then
-            if (s% mixing_type(k) == mixing_type) then ! starting
+            if (s% mixing_type(k) == mixing_type) then  ! starting
                inside = .true.
                first = k
             end if
-         else ! inside
-            if (s% mixing_type(k) /= mixing_type) then ! ending
+         else  ! inside
+            if (s% mixing_type(k) /= mixing_type) then  ! ending
                last = k - 1
                call pgmove(xvec(first), ybot)
                call pgdraw(xvec(last), ybot)
@@ -1623,12 +1628,12 @@ contains
          if (inside) first = 1
          do k = 2, s% nz
             if (.not. inside) then
-               if (s% eps_nuc(k) > eps) then ! starting
+               if (s% eps_nuc(k) > eps) then  ! starting
                   inside = .true.
                   first = k
                end if
-            else ! inside
-               if (s% eps_nuc(k) <= eps) then ! ending
+            else  ! inside
+               if (s% eps_nuc(k) <= eps) then  ! ending
                   last = k - 1
                   call pgline(k - first, xvec(first:last), yvec(first:last))
                   inside = .false.
@@ -1684,12 +1689,12 @@ contains
          do_show_mixing_section = .false.
          do k = 2, s% nz
             if (.not. inside) then
-               if (s% mixing_type(k) == mixing_type) then ! starting
+               if (s% mixing_type(k) == mixing_type) then  ! starting
                   inside = .true.
                   first = k
                end if
-            else ! inside
-               if (s% mixing_type(k) /= mixing_type) then ! ending
+            else  ! inside
+               if (s% mixing_type(k) /= mixing_type) then  ! ending
                   last = k - 1
                   call pgline(k - first, xvec(first:last), yvec(first:last))
                   do_show_mixing_section = .true.

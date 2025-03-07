@@ -26,7 +26,7 @@
 
 module tdc_support
 
-use const_def
+use const_def, only: dp, pi, sqrt_2_div_3, boltz_sigma
 use num_lib
 use utils_lib
 use auto_diff
@@ -216,7 +216,7 @@ contains
       integer :: iter
 
       ! Set up
-      lower_bound_Z = lower_bound_Z_in!lower_bound_Z_in
+      lower_bound_Z = lower_bound_Z_in  !lower_bound_Z_in
       lower_bound_Z%d1val1 = 1d0
       upper_bound_Z = upper_bound_Z_in
       upper_bound_Z%d1val1 = 1d0
@@ -348,7 +348,7 @@ contains
 
       Y = set_Y(.false., upper_bound_Z)
       call compute_Q(info, Y, Q, Af)
-      if (Af > 0) then ! d(Af)/dZ < 0, so if Af(upper_bound_Z) > 0 there's no solution in this interval.
+      if (Af > 0) then  ! d(Af)/dZ < 0, so if Af(upper_bound_Z) > 0 there's no solution in this interval.
          ierr = 1
          return
       end if
@@ -374,7 +374,7 @@ contains
          ! Y < 0 so increasing Y means decreasing Z.
          ! d(Af)/dY > 0 so d(Af)/dZ < 0.
 
-         if (Af > 0d0) then ! Means we are at too-low Z.
+         if (Af > 0d0) then  ! Means we are at too-low Z.
             lower_bound_Z = Z
          else
             upper_bound_Z = Z
@@ -564,13 +564,13 @@ contains
    function eval_Af(dt, A0, xi0, xi1, xi2) result(Af)
       real(dp), intent(in) :: dt
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
-      type(auto_diff_real_tdc) :: Af ! output
+      type(auto_diff_real_tdc) :: Af  ! output
       type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
 
-      if (J2 > 0d0) then ! Hyperbolic branch
-         J = sqrt(abs(J2)) ! Only compute once we know J2 is not 0
+      if (J2 > 0d0) then  ! Hyperbolic branch
+         J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
          Jt4 = 0.25d0 * dt * J
          num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
@@ -578,7 +578,7 @@ contains
          if (Af < 0d0) then
             Af = -Af
          end if
-      else if (J2 < 0d0) then ! Trigonometric branch
+      else if (J2 < 0d0) then  ! Trigonometric branch
          J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
          Jt4 = 0.25d0 * dt * J
 
@@ -607,7 +607,7 @@ contains
          else
             Af = 0d0
          end if
-      else ! if (J2 == 0d0) then
+      else  ! if (J2 == 0d0) then
          Af = A0
       end if
 

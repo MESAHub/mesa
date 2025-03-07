@@ -31,7 +31,7 @@
 
       real(dp), parameter :: &
          lam_max = 1d99, &
-         ln1_max = 227.955924206411d0 ! log(lam_max)
+         ln1_max = 227.955924206411d0  ! log(lam_max)
 
 
       contains
@@ -92,8 +92,8 @@
       subroutine compute_some_lambdas( &
             num_lambdas, lo, hi, T9, rates, ln_lambda, lambda, dlambda_dlnT)
          use utils_lib, only: is_bad
-         use const_def
-         integer, intent(in) :: num_lambdas, lo, hi ! range of rates to do
+         use const_def, only: dp, one_third, two_thirds, four_thirds, five_thirds
+         integer, intent(in) :: num_lambdas, lo, hi  ! range of rates to do
          real(dp), intent(in) :: T9
          type(reaction_data), intent(in) :: rates
          real(dp), dimension(:), intent(out) :: ln_lambda, lambda, dlambda_dlnT
@@ -134,7 +134,7 @@
             ln1 = dot_product(T9fac(:), rates% coefficients(:,i))
             if (ln1 > ln1_max) then
                ln_lambda(j) = ln1_max
-               lambda(j) = lam_max ! == exp(ln1_max)
+               lambda(j) = lam_max  ! == exp(ln1_max)
                dlambda_dlnT(j) = 0
             else
                ln_lambda(j) = ln1
@@ -154,7 +154,7 @@
          use utils_lib, only: is_bad
          use chem_def, only: Tpart, npart
          use chem_lib, only: get_partition_fcn_indx
-         integer, intent(in) :: num_lambdas, lo, hi ! range of rates to do
+         integer, intent(in) :: num_lambdas, lo, hi  ! range of rates to do
          real(dp), intent(in) :: T9
          type(reaction_data), intent(in) :: rates
          real(dp), dimension(:), intent(in) :: ln_lambda, lambda, dlambda_dlnT
@@ -210,7 +210,7 @@
 
             else
                ln1 = ln1_max
-               fac1 = lam_max ! == exp(ln1_max)
+               fac1 = lam_max  ! == exp(ln1_max)
                dln1_dlnT = 0
                dfac1_dlnT = 0
             end if
@@ -233,8 +233,8 @@
          ! there may be several following that one having the same handle.
          ! returns 0 if handle doesn't match any of the reactions
          use utils_lib, only: integer_dict_lookup
-         character(len=*), intent(in) :: handle ! as in rates% reaction_handle
-         type (integer_dict), pointer :: rates_dict ! from create_reaclib_rates_dict
+         character(len=*), intent(in) :: handle  ! as in rates% reaction_handle
+         type (integer_dict), pointer :: rates_dict  ! from create_reaclib_rates_dict
          integer :: ierr
          ierr = 0
          call integer_dict_lookup(rates_dict, handle, indx, ierr)
@@ -243,7 +243,7 @@
 
 
       subroutine do_reaclib_indices_for_reaction(handle, rates, lo, hi, ierr)
-         character(len=*), intent(in) :: handle ! as in rates% reaction_handle
+         character(len=*), intent(in) :: handle  ! as in rates% reaction_handle
          type(reaction_data), intent(in) :: rates
          integer, intent(out) :: lo, hi
          integer, intent(out) :: ierr
@@ -278,7 +278,7 @@
             lambda, dlambda_dlnT, &
             rlambda, drlambda_dlnT, &
             ierr)
-         integer, intent(in) :: lo, hi ! from reaclib_indices_for_reaction
+         integer, intent(in) :: lo, hi  ! from reaclib_indices_for_reaction
          real(dp), intent(in) :: T9
          type(reaction_data), intent(in) :: rates
          type(nuclide_data), intent(in) :: nuclides

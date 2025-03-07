@@ -76,9 +76,9 @@ contains
       type(table), intent(out) :: t
       integer :: io, i, j
       open(newunit=io, file=trim(t% filename))
-      read(io,*) !header
+      read(io,*)  !header
       do i=1,NT
-         read(io,*) ! sub-header
+         read(io,*)  ! sub-header
          do j = 1, NP
             read(io,'(0p10e15.6)') t% data(j,i)% logT, t% data(j,i)% logP, t% data(j,i)% logRho, &
                t% data(j,i)% logU, t% data(j,i)% logS, t% data(j,i)% dlnRho_dlnT_constP, &
@@ -97,7 +97,7 @@ contains
    subroutine write_one(tab)
       type(table), intent(in) :: tab
       integer :: io, i, j
-      real(dp) :: chiRho, chiT !U, P, T, S, rho, dE_dP_constT, dE_dT_constP, cp, cv, lnfree_e, mu
+      real(dp) :: chiRho, chiT  !U, P, T, S, rho, dE_dP_constT, dE_dT_constP, cp, cv, lnfree_e, mu
 
       open(newunit=io,file=trim(tab% filename), action='write')
       !write(io,'(a)') '#log T [K]        log P [GPa]   log rho [g/cc]  log U [MJ/kg] log S [MJ/kg/K]' &

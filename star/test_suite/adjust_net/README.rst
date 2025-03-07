@@ -38,10 +38,8 @@ pgstar commands used for the plots above:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -73,7 +71,7 @@ pgstar commands used for the plots above:
 
     History_Track1_win_flag = .true.
     History_Track1_win_width = 12
-    History_Track1_title = 'adjust_net'                                                                                                                                                                                   
+    History_Track1_title = 'adjust_net'
     History_Track1_xname = 'model_number'
     History_Track1_xaxis_label = 'model number'
 

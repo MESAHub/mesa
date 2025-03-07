@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module net_burn_const_density
-      use const_def
+      use const_def, only: dp, ln10, Qconv
       use math_lib
       use chem_def
       use net_def
@@ -36,14 +36,11 @@
 
       implicit none
 
-
       !logical, parameter :: use_ludcmp = .true.
       logical, parameter :: use_ludcmp = .false.
 
       !logical, parameter :: show_mesa_rates = .true.
       logical, parameter :: show_mesa_rates = .false.
-
-
 
 
       contains
@@ -101,7 +98,7 @@
          use net_approx21, only: approx21_nrat
 
          integer, intent(in) :: net_handle, eos_handle, species, nvar, num_reactions
-         real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (species)
+         real(dp), intent(in) :: t_start, t_end, starting_x(:)  ! (species)
          real(dp), intent(in) :: starting_log10T, log10Rho
          interface
             include 'burner_const_density_get_eos_info.inc'
@@ -467,7 +464,7 @@
                do j = 1, species
                   f(j) = dxdt(j)/aion(j)
                end do
-               f(nvar) = eps_nuc/(Cv*T) ! dlnT_dt
+               f(nvar) = eps_nuc/(Cv*T)  ! dlnT_dt
                !f(nvar) = 0d0 ! TESTING
             end if
 
@@ -482,13 +479,13 @@
                      end if
                   end do
                   !dfdy(j,nvar) = T*d_dxdt_dT(j) ! d_dxdt_dlnT
-                  dfdy(j,nvar) = 0d0 ! TESTING
+                  dfdy(j,nvar) = 0d0  ! TESTING
                   !if (j /= 22) dfdy(j,nvar) = 0d0 ! TESTING
                   !if (j==5 .or. j==13 .or. j==14 .or. j==19 .or. j==20 .or. j==22) dfdy(j,nvar) = 0d0 ! TESTING
                   !if (j== 11) dfdy(j,nvar) = 0d0 ! TESTING
                end do
                do j = 1,species
-                  dfdy(nvar,j) = d_eps_nuc_dx(j)/(Cv*T) ! d_lnT_dx(j)
+                  dfdy(nvar,j) = d_eps_nuc_dx(j)/(Cv*T)  ! d_lnT_dx(j)
                   !dfdy(nvar,j) = 0d0 ! TESTING
                end do
                dfdy(nvar,nvar) = &

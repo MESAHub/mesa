@@ -26,7 +26,7 @@
    module other_extras
       use star_def
       use star_lib
-      use const_def
+      use const_def, only: dp
       use utils_lib
 
       implicit none
@@ -47,7 +47,7 @@
          integer, intent(out) :: ierr
          logical, intent(in) :: restart
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 
@@ -62,7 +62,7 @@
          integer, intent(in) :: id
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_extras_check_model = keep_going
@@ -79,7 +79,7 @@
          integer, intent(in) :: id
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_extras_start_step = keep_going
@@ -96,7 +96,7 @@
          integer, intent(in) :: id
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_extras_finish_step = keep_going
@@ -111,7 +111,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 
@@ -125,7 +125,7 @@
          type (star_info), pointer :: s
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_how_many_extra_history_columns=0
@@ -143,7 +143,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 
@@ -157,7 +157,7 @@
          type (star_info), pointer :: s
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_how_many_extra_profile_columns=0
@@ -175,7 +175,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 

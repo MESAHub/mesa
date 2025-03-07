@@ -113,7 +113,7 @@
 
          ! Check accretion of angular momentum
          if (s% model_number > 1 .and. s% mstar_dot > 0) then
-            if (.false.) then ! off for now
+            if (.false.) then  ! off for now
                write(*,*) "Total accreted J should be:", s% accreted_material_j*s% mstar_dot*s% dt
                write(*,*) "Current J, old J, delta J:", s% total_angular_momentum, &
                    s% total_angular_momentum_old, &
@@ -151,8 +151,8 @@
          end if
 
          ! if you want to check multiple conditions, it can be useful
-         ! to set a different termination code depenending on which
-         ! condition was triggered.  MESA provides 9 customizeable
+         ! to set a different termination code depending on which
+         ! condition was triggered.  MESA provides 9 customizable
          ! termination codes, named t_xtra1 .. t_xtra9.  You can
          ! customize the messages that will be printed upon exit by
          ! setting the corresponding termination_code_str value.

@@ -25,21 +25,14 @@
 
 module pulse_saio
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, lsun, rsun, clight, crad
   use utils_lib
   use atm_def
   use atm_support
-
   use pulse_utils
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -108,7 +101,7 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     nn = nn_env + nn_atm
 
@@ -156,7 +149,7 @@ contains
           call store_saio_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -169,8 +162,6 @@ contains
     if (ASSOCIATED(s%atm_structure)) then
        deallocate(s%atm_structure)
     end if
-
-    ! Finish
 
     return
 
@@ -236,13 +227,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_saio_data_atm
 
-    !****
 
     subroutine store_saio_data_env (j, k, k_a, k_b)
 
@@ -293,7 +281,7 @@ contains
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
         kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)/kap
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)/kap
-        nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
+        nabla = s%gradT(k)  ! Not quite right; gradT can be discontinuous
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         X = eval_face(s%dq, s%X, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
         Y = eval_face(s%dq, s%Y, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
@@ -307,15 +295,12 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_saio_data_env
 
   end subroutine get_saio_data
 
-  !****
 
   subroutine write_saio_data (id, filename, global_data, point_data, ierr)
 
@@ -361,8 +346,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

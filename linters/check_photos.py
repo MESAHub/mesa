@@ -120,7 +120,6 @@ def get_star_data_set_input_variables():
     input_vars = []
 
     for line in lines:
-
         # first, lose white space
         line = line.strip()
 
@@ -171,7 +170,6 @@ def check_in_out():
 
 
 def check_step_input():
-
     sd_vars = get_star_data_set_input_variables()
     pi_vars = get_photo_in_variables()
 
@@ -180,7 +178,6 @@ def check_step_input():
 
 
 if __name__ == "__main__":
-
     print("=== Photo In/Out Comparison ===")
     check_in_out()
     print()

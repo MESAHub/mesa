@@ -47,7 +47,7 @@
       ! this allows you to make small modifications to the existing
       ! eos results without having to provide a full replacement eos.
 
-      use const_def
+      use const_def, only: dp
 
       implicit none
 
@@ -62,29 +62,29 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
+         real(dp), intent(in) :: T, log10T  ! the temperature
 
          ! OUTPUT
          ! this routine must provide a fraction (in [0,1]) of the 'other' eos to use
          ! the remaining fraction (1-frac) will be provided by the standard MESA eos
-         real(dp), intent(out) :: frac ! fraction of other_eos to use
-         real(dp), intent(out) :: dfrac_dlogRho ! its partial derivative at constant T
+         real(dp), intent(out) :: frac  ! fraction of other_eos to use
+         real(dp), intent(out) :: dfrac_dlogRho  ! its partial derivative at constant T
          real(dp), intent(out) :: dfrac_dlogT   ! its partial derivative at constant Rho
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! default implementation uses other_eos_component everywhere
          frac = 1d0
@@ -103,33 +103,33 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
+         real(dp), intent(in) :: T, log10T  ! the temperature
 
          ! OUTPUT
 
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
          ! partial derivatives of the basic results wrt lnd and lnT
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          ! d_dlnRho(i) = d(res(i))/dlnd|T
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          ! d_dlnT(i) = d(res(i))/dlnT|Rho
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_basic_results, species)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_basic_results, species)
          ! d_dxa(i,j) = d(res(i))/dxa(j)|T,Rho
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          res = 0
          d_dlnRho_const_T = 0
@@ -151,33 +151,33 @@
          ! INPUT
          use chem_def, only: num_chem_isos
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
+         real(dp), intent(in) :: T, log10T  ! the temperature
 
          ! OUTPUT
 
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
          ! partial derivatives of the basic results wrt lnd and lnT
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          ! d_dlnRho(i) = d(res(i))/dlnd|T
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          ! d_dlnT(i) = d(res(i))/dlnT|Rho
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_basic_results, species)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_basic_results, species)
          ! d_dxa(i,j) = d(res(i))/dxa(j)|T,Rho
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! default implementation does not modify results
 

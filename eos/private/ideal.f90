@@ -16,7 +16,7 @@ module ideal
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-      use const_def
+      use const_def, only: dp
       use eos_blend
       type (EoS_General_Info), pointer :: rq
       real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -99,7 +99,6 @@ module ideal
       use skye_thermodynamics
       use auto_diff
 
-      implicit none
       integer :: j
       integer, intent(in) :: species
       integer, pointer :: chem_id(:)
@@ -181,7 +180,7 @@ module ideal
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
       if(ierr/=0) return
 
-      res(i_mu) = abar ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
+      res(i_mu) = abar  ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
 
    end subroutine ideal_eos
 

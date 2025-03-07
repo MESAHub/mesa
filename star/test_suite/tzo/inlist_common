@@ -90,7 +90,7 @@
    ! Winds
 
    cool_wind_RGB_scheme = 'van Loon'
-   cool_wind_AGB_scheme = 'van Loon' ! Switch is based on H1 in core which is not usefull here
+   cool_wind_AGB_scheme = 'van Loon' ! Switch is based on H1 in core which is not useful here
    Dutch_wind_lowT_scheme = 'other'
    hot_wind_scheme = 'Vink'
    !x_ctrl(24) = 1.0

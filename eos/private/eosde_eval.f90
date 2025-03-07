@@ -26,7 +26,7 @@
 
       module eosDE_eval
       use eos_def
-      use const_def
+      use const_def, only: dp, avo, kerg, ln10
       use math_lib
 
       implicit none
@@ -66,9 +66,9 @@
          T = (gamma - 1d0)*energy/avo_k_div_abar
          log10T = log10(T)
 
-         res(i_Cv) = avo_k_div_abar/(gamma - 1) ! energy/T
+         res(i_Cv) = avo_k_div_abar/(gamma - 1)  ! energy/T
 
-         entropy = res(i_Cv)*log(P/pow(rho,gamma)) + 1d9 ! offset to keep it > 0
+         entropy = res(i_Cv)*log(P/pow(rho,gamma)) + 1d9  ! offset to keep it > 0
 
          if (is_bad(entropy) .or. entropy <= 0d0) then
             if (.false.) then
@@ -89,13 +89,13 @@
             entropy = 1d-99
          end if
 
-         res(i_lnPgas) = log(P) ! treat P as Pgas
+         res(i_lnPgas) = log(P)  ! treat P as Pgas
          res(i_lnE) = log10E*ln10
          res(i_lnS) = log(entropy)
          res(i_Cp) = gamma*res(i_Cv)
-         res(i_grad_ad) = (gamma - 1d0)/gamma ! dlnT_dlnP|S
-         res(i_chiRho) = 1d0 ! dlnP_dlnRho|T
-         res(i_chiT) = 1d0 ! dlnP_dlnT|Rho
+         res(i_grad_ad) = (gamma - 1d0)/gamma  ! dlnT_dlnP|S
+         res(i_chiRho) = 1d0  ! dlnP_dlnRho|T
+         res(i_chiT) = 1d0  ! dlnP_dlnT|Rho
          res(i_dE_dRho) = 0d0
          res(i_dS_dT) = 0d0
          res(i_dS_dRho) = 0d0

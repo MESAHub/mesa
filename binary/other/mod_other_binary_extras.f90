@@ -36,7 +36,7 @@
       integer function null_extras_binary_startup(binary_id,restart,ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -44,7 +44,7 @@
 
          null_extras_binary_startup = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -53,14 +53,14 @@
       integer function null_extras_binary_start_step(binary_id,ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
 
          null_extras_binary_start_step = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -70,12 +70,12 @@
       integer function null_extras_binary_check_model(binary_id)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          null_extras_binary_check_model = keep_going
@@ -88,12 +88,12 @@
       integer function null_extras_binary_finish_step(binary_id)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          null_extras_binary_finish_step = keep_going
@@ -104,12 +104,12 @@
 
       subroutine null_extras_binary_after_evolve(binary_id, ierr)
          use binary_def, only : binary_info, binary_ptr
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -117,12 +117,12 @@
 
       integer function null_how_many_extra_binary_history_columns(binary_id)
          use binary_def, only : binary_info, binary_ptr
-         use const_def
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          type (binary_info), pointer :: b
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          null_how_many_extra_binary_history_columns=0
@@ -133,7 +133,7 @@
 
       subroutine null_data_for_extra_binary_history_columns(binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
-         use const_def
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          integer, intent(in) :: n
          character (len=maxlen_binary_history_column_name) :: extra_names(n)
@@ -141,7 +141,7 @@
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -151,7 +151,7 @@
 
 
       integer function null_how_many_extra_binary_history_header_items(binary_id)
-         use const_def
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          null_how_many_extra_binary_history_header_items = 0
       end function null_how_many_extra_binary_history_header_items
@@ -159,7 +159,7 @@
       subroutine null_data_for_extra_binary_history_header_items( &
            binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id, n
          character (len=maxlen_binary_history_column_name) :: extra_names(n)

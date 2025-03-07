@@ -26,7 +26,7 @@
       module create_initial_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, arg_not_provided, two_thirds, four_thirds_pi
       use chem_def
 
       implicit none
@@ -155,8 +155,8 @@
             mass_correction, sumx)
 
          G = standard_cgrav
-         Tmin = 0.d0 ! sets surface isotherm
-         eps = s% initial_model_eps ! integration accuracy
+         Tmin = 0.d0  ! sets surface isotherm
+         eps = s% initial_model_eps  ! integration accuracy
          R_try = R   ! used to set grid spacing near the center
 
          ! init guess
@@ -215,7 +215,7 @@
 
          end do
 
-         s% nz = cs% nz - 1 ! skip center point
+         s% nz = cs% nz - 1  ! skip center point
          call allocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             return
@@ -233,7 +233,7 @@
          i_lum = s% i_lum
 
          do k=1, s% nz
-            i = s% nz - k + 2 ! skip center point
+            i = s% nz - k + 2  ! skip center point
             call store_rho_in_xh(s, k, cs% rhog(i))
             call store_T_in_xh(s, k, cs% Tg(i))
             call store_r_in_xh(s, k, cs% rg(i))
@@ -309,7 +309,7 @@
          m1 = four_thirds_pi * rhoc * r1*r1*r1
          P = Pc - two_thirds*pi * G*rhoc*rhoc*r1*r1
          intdmT1=m1*Tc
-         y=(/r1,m1,intdmT1/)
+         y=[r1,m1,intdmT1]
          call get_TRho_from_PS(cs,P,S,T,rho)
 
          ! record first point off center
@@ -359,11 +359,11 @@
             if (T<150.d0) then
                print *,"temp too low in integration"
                stop
-            endif
+            end if
 
             if (tau < 2.d0/3.d0) then
                exitnow=.true.
-            endif
+            end if
 
             if (exitnow) exit
 
@@ -459,7 +459,7 @@
          if(ierr/=0) then
             write(*,*) 'kap_get failed'
             stop
-         endif
+         end if
 
       end subroutine get_kap_from_rhoT
 
@@ -498,7 +498,7 @@
          if (ierr /=0) then
             print *,"failure in eosPT_get_T"
             stop
-         endif
+         end if
          T = exp10(logT_result)
 
     ! don't let T get below min temp. use to make a surface isotherm.

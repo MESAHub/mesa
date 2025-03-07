@@ -20,16 +20,12 @@
 !
 ! ***********************************************************************
 
-      program test_net
+program test_net
 
-      use mod_test_net, only: test
+   use mod_test_net, only: test
 
-      implicit none
+   implicit none
 
-      call test(.false.)
+   call test(.false.)
 
-      end program test_net
-
-
-
-
+end program test_net

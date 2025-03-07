@@ -25,7 +25,7 @@
 
       module pgstar_ctrls_io
 
-      use const_def
+      use const_def, only: dp
       use star_private_def
       use star_pgstar
 
@@ -36,7 +36,6 @@
       namelist /pgstar/ &
 
             file_device, &
-            file_extension, &
             file_digits, &
             pgstar_interval, &
             pause, &
@@ -3154,7 +3153,6 @@
          ierr = 0
 
          s% pg% file_device = file_device
-         s% pg% file_extension = file_extension
          s% pg% file_digits = file_digits
          s% pg% pgstar_interval = pgstar_interval
          s% pg% pause = pause

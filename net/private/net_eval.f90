@@ -25,7 +25,7 @@
 
       module net_eval
 
-      use const_def
+      use const_def, only: dp, Qconv, arg_not_provided
       use math_lib
       use chem_def
       use chem_lib, only: get_mass_excess
@@ -70,14 +70,14 @@
          real(dp), intent(in)  :: rho, logrho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
-         real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
+         real(dp), intent(in)  :: z2bar  ! mean charge squared per nucleus
          real(dp), intent(in)  :: ye
-         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho ! eta and derivatives
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho  ! eta and derivatives
          real(dp), intent(in) :: rate_factors(:)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         real(dp), intent(out) :: eps_nuc ! ergs/gram/second from burning
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
+         real(dp), intent(out) :: eps_nuc  ! ergs/gram/second from burning
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(inout) :: d_eps_nuc_dx(:)
@@ -88,8 +88,8 @@
          real(dp), intent(inout) :: eps_nuc_categories(:)
          real(dp), intent(out) :: eps_neu_total
          integer, intent(in) :: screening_mode
-         real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null
-         logical, pointer :: from_weaklib(:) ! ignore if null
+         real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs  ! ignore if null
+         logical, pointer :: from_weaklib(:)  ! ignore if null
          logical, intent(in) :: symbolic
          integer, intent(out) :: ierr
 
@@ -151,7 +151,7 @@
          n% d_eta_dlnRho = d_eta_dlnRho
          n% rate_factors = rate_factors
 
-         if (n% logT < rattab_tlo) then ! clip to table so can eval beta decays
+         if (n% logT < rattab_tlo) then  ! clip to table so can eval beta decays
             n% logT = rattab_tlo
             n% temp = rattab_temp_lo
          end if
@@ -273,7 +273,7 @@
 
          ! convert the eps_nuc_categories
          do i=1,num_categories
-            n% eps_nuc_categories(i) = Qconv*n% eps_nuc_categories(i)
+            n% eps_nuc_categories(i) = Qconv * n% eps_nuc_categories(i)
          end do
 
          ! store the results
@@ -318,7 +318,7 @@
                                     dxdt, d_dxdt_dT, d_dxdt_dRho, d_dxdt_dx,&
                                     eps_nuc_categories)
          type(net_info) :: n
-         real(dp), intent(out) :: eps_nuc ! ergs/gram/second from burning
+         real(dp), intent(out) :: eps_nuc  ! ergs/gram/second from burning
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(out) :: d_eps_nuc_dx(:)
@@ -512,7 +512,7 @@
             n% reaction_Qs(irfe54prot_to_ni56), &
             n% reaction_Qs(irhe4_breakup), &
             n% reaction_Qs(irhe4_rebuild), &
-            eps_total, eps_neu_total, & ! Dont use n% here as we call this for both eps_neu and eps_neu_dt and drho
+            eps_total, eps_neu_total, &  ! Dont use n% here as we call this for both eps_neu and eps_neu_dt and drho
             do_eps_nuc_categories, n% eps_nuc_categories, &
             .false., plus_co56, ierr)
 
@@ -786,7 +786,7 @@
                call mesa_error(__FILE__,__LINE__,'set_molar_abundances')
             end if
             n% y(i) = min(1d0, max(n% x(i), 0d0)) / chem_isos% Z_plus_N(ci)
-         enddo
+         end do
 
 
 
@@ -811,7 +811,7 @@
 
       subroutine do_clean_up_fractions(nzlo, nzhi, species, nz, xa, max_sum_abs, xsum_tol, ierr)
          integer, intent(in) :: nzlo, nzhi, species, nz
-         real(dp), intent(inout) :: xa(:,:) ! (species, nz)
+         real(dp), intent(inout) :: xa(:,:)  ! (species, nz)
          real(dp), intent(in) :: max_sum_abs, xsum_tol
          integer, intent(out) :: ierr
          integer :: k, op_err
@@ -833,14 +833,14 @@
       subroutine do_clean1(species, xa, k, max_sum_abs, xsum_tol, ierr)
          use utils_lib
          integer, intent(in) :: species, k
-         real(dp), intent(inout) :: xa(:) ! (species)
+         real(dp), intent(inout) :: xa(:)  ! (species)
          real(dp), intent(in) :: max_sum_abs, xsum_tol
          integer, intent(out) :: ierr
          integer :: j
          real(dp) :: xsum
          real(dp), parameter :: tiny_x = 1d-99
          character (len=256) :: message
-         if (max_sum_abs > 1) then ! check for crazy values
+         if (max_sum_abs > 1) then  ! check for crazy values
             xsum = sum(abs(xa(1: species)))
             if (is_bad(xsum) .or. xsum > max_sum_abs) then
                ierr = -1

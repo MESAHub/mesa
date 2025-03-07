@@ -61,8 +61,8 @@ contains
    subroutine calc_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                  semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                  gradL_composition_term, &
-                                 gradT, Y_face, conv_vel, D, mixing_type, ierr) ! Langer 1983 & 1985
-      use const_def
+                                 gradT, Y_face, conv_vel, D, mixing_type, ierr)  ! Langer 1983 & 1985
+      use const_def, only: dp, pi, clight, crad, semiconvective_mixing
       use num_lib
       use utils_lib
       use auto_diff
@@ -81,7 +81,7 @@ contains
 
       ! Pre-compute common pieces
       radiative_conductivity = &
-         (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho) ! erg / (K cm sec)
+         (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho)  ! erg / (K cm sec)
       D = alpha_semiconvection*radiative_conductivity/(6d0*Cp*rho) &
             *(gradr - grada)/(gradL - gradr)
       if (D%val <= 0) return

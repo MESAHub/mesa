@@ -423,8 +423,8 @@
          use ionization_lib, only: ionization_init
          use atm_lib
          use chem_lib
-         use const_lib
-         use const_def, only: mesa_data_dir
+         use const_def, only: dp, mesa_data_dir
+         use const_lib, only: const_init
          use utils_lib
          use star_history_def, only: history_column_names_init
          use star_profile_def, only: profile_column_names_init

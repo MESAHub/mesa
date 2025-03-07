@@ -26,7 +26,7 @@
       module adjust_mesh
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use adjust_mesh_support
 
       implicit none
@@ -75,7 +75,7 @@
 
          real(dp), parameter :: max_sum_abs = 10d0
          real(dp), parameter :: xsum_tol = 1d-2
-         real(dp), parameter :: h_cntr_limit = 0.5d0 ! for pre-MS decision
+         real(dp), parameter :: h_cntr_limit = 0.5d0  ! for pre-MS decision
 
          include 'formats'
 
@@ -94,7 +94,7 @@
             return
          end if
 
-         if (s% remesh_max_allowed_logT < 1d2) then ! check it
+         if (s% remesh_max_allowed_logT < 1d2) then  ! check it
             if (maxval(s% lnT(1:s% nz))/ln10 > s% remesh_max_allowed_logT) then
                if (dbg_remesh) write(*,2) &
                   's% remesh_max_allowed_logT', s% model_number, s% remesh_max_allowed_logT
@@ -321,7 +321,7 @@
             c = prv
          end if
 
-         prv = s ! this makes copies of pointers and scalars
+         prv = s  ! this makes copies of pointers and scalars
 
          if (dbg_remesh .or. dbg) write(*,*) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)
@@ -553,7 +553,7 @@
                   end if
                else if (k == nz_new) then
                   new_type = split_type
-               else ! k_old < nz_old .and. k < nz .and. xq_new(k) == xq_old(k_old)
+               else  ! k_old < nz_old .and. k < nz .and. xq_new(k) == xq_old(k_old)
                   if (xq_new(k+1) == xq_old(k_old+1)) then
                      new_type = unchanged_type
                   else if (xq_new(k+1) > xq_old(k_old+1)) then

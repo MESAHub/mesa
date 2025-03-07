@@ -45,7 +45,7 @@
       real(dp), public, save ::logT_grid_old(nzm,4,4), logRho_grid_old(nzm,4,4), fk_pcg(17), fk_grad_pcg(ngp,17)
       real(dp), public, save :: lkap_grid_old(nzm,4,4), logT_cntr_old(nzm), logRho_cntr_old(nzm)
       logical :: initialize_fk_old = .true.
-      contains ! the procedure interface for the library
+      contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
 
@@ -58,8 +58,8 @@
       subroutine kap_init(use_cache, kap_cache_dir, ierr)
          use kap_def, only : kap_def_init, kap_use_cache, kap_is_initialized
          logical, intent(in) :: use_cache
-         character (len=*), intent(in) :: kap_cache_dir ! blank means use default
-         integer, intent(out) :: ierr ! 0 means AOK.
+         character (len=*), intent(in) :: kap_cache_dir  ! blank means use default
+         integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          if (kap_is_initialized) return
          call kap_def_init(kap_cache_dir)
@@ -78,7 +78,7 @@
       ! after kap_init has finished, you can allocate a "handle".
 
       integer function alloc_kap_handle(ierr) result(handle)
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          character (len=0) :: inlist
          handle = alloc_kap_handle_using_inlist(inlist, ierr)
       end function alloc_kap_handle
@@ -86,13 +86,13 @@
       integer function alloc_kap_handle_using_inlist(inlist,ierr) result(handle)
          use kap_def, only:do_alloc_kap,kap_is_initialized
          use kap_ctrls_io, only:read_namelist
-         character (len=*), intent(in) :: inlist ! empty means just use defaults.
-         integer, intent(out) :: ierr ! 0 means AOK.
+         character (len=*), intent(in) :: inlist  ! empty means just use defaults.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          handle = do_alloc_kap(ierr)
          if (ierr /= 0) return
          call read_namelist(handle, inlist, ierr)
@@ -111,13 +111,13 @@
 
       subroutine kap_ptr(handle,rq,ierr)
          use kap_def,only:Kap_General_Info,get_kap_ptr,kap_is_initialized
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: handle  ! from alloc_kap_handle
          type (Kap_General_Info), pointer :: rq
          integer, intent(out):: ierr
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call get_kap_ptr(handle,rq,ierr)
       end subroutine kap_ptr
 
@@ -175,13 +175,13 @@
          use kap_def, only : kap_is_initialized, Kap_General_Info, num_kap_fracs, i_frac_Type2
          use kap_eval, only : Get_kap_Results
          ! INPUT
-         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
+         integer, intent(in) :: handle  ! from alloc_kap_handle; in star, pass s% kap_handle
          integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: logRho ! density
-         real(dp), intent(in) :: logT ! temperature
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: logRho  ! density
+         real(dp), intent(in) :: logT  ! temperature
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
          ! free_e := total combined number per nucleon of free electrons and positrons
          real(dp), intent(in)  :: eta, d_eta_dlnRho, d_eta_dlnT
@@ -189,11 +189,11 @@
 
          ! OUTPUT
          real(dp), intent(out) :: kap_fracs(num_kap_fracs)
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: kap  ! opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         real(dp), intent(out) :: dlnkap_dxa(:) ! partial derivative w.r.t. species
-         integer, intent(out) :: ierr ! 0 means AOK.
+         real(dp), intent(out) :: dlnkap_dxa(:)  ! partial derivative w.r.t. species
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          type (Kap_General_Info), pointer :: rq
 
@@ -205,7 +205,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          call kap_ptr(handle,rq,ierr)
          if (ierr /= 0) return
@@ -246,21 +246,21 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use condint, only: do_electron_conduction
          use kap_def, only : kap_is_initialized, Kap_General_Info
-         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
-         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
-         real(dp), intent(in) :: logRho ! the density
-         real(dp), intent(in) :: logT ! the temperature
-         real(dp), intent(out) :: kap ! electron conduction opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         integer, intent(in) :: handle  ! from alloc_kap_handle; in star, pass s% kap_handle
+         real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho  ! the density
+         real(dp), intent(in) :: logT  ! the temperature
+         real(dp), intent(out) :: kap  ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          type (Kap_General_Info), pointer :: rq
 
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          ierr = 0
 
          call kap_ptr(handle,rq,ierr)
@@ -280,22 +280,22 @@
          kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_eval, only: Compton_Opacity
          use kap_def, only : kap_is_initialized, Kap_General_Info
-         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
          real(dp), intent(in) :: Rho, T
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
          real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho
             ! eta := electron degeneracy parameter from eos
-         real(dp), intent(out) :: kap ! electron conduction opacity
+         real(dp), intent(out) :: kap  ! electron conduction opacity
          real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          type (Kap_General_Info), pointer :: rq
 
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          ierr = 0
 
          call kap_ptr(handle,rq,ierr)
@@ -318,24 +318,24 @@
          use kap_def, only : kap_is_initialized, Kap_General_Info
 
          ! INPUT
-         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
-         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
-         real(dp), intent(in) :: logRho ! density
-         real(dp), intent(in) :: logT ! temperature
+         integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
+         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe  ! composition
+         real(dp), intent(in) :: logRho  ! density
+         real(dp), intent(in) :: logT  ! temperature
 
          ! OUTPUT
          real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: kap  ! opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          type (Kap_General_Info), pointer :: rq
 
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          ierr = 0
 
          call kap_ptr(handle,rq,ierr)
@@ -357,16 +357,16 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
          use kap_eval, only: combine_rad_with_conduction
-         integer, intent(in) :: handle ! from alloc_kap_handle; in star, pass s% kap_handle
-         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
-         real(dp), intent(in) :: logRho ! the density
-         real(dp), intent(in) :: logT ! the temperature
+         integer, intent(in) :: handle  ! from alloc_kap_handle; in star, pass s% kap_handle
+         real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho  ! the density
+         real(dp), intent(in) :: logT  ! the temperature
          ! args for op_mono_get_kap
          logical, intent(in) :: use_op_mono_alt_get_kap
          integer, intent(in) :: nel
-         integer, intent(in) :: izzp(:) ! (nel)
-         real(dp), intent(in) :: fap(:) ! (nel) number fractions of elements
-         real(dp), intent(in) :: fac(:) ! (nel) scale factors for element opacity
+         integer, intent(in) :: izzp(:)  ! (nel)
+         real(dp), intent(in) :: fap(:)  ! (nel) number fractions of elements
+         real(dp), intent(in) :: fac(:)  ! (nel) scale factors for element opacity
          logical, intent(in) :: screening
          ! work arrays
          real, pointer :: umesh(:), semesh(:), ff(:,:,:,:), rs(:,:,:)
@@ -375,10 +375,10 @@
             ! ff(nptot, ipe, 4, 4)
             ! rs(nptot, 4, 4)
          ! output
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: kap  ! opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          real(dp) :: g1, kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp) :: Rho, T
@@ -388,7 +388,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call kap_ptr(handle,rq,ierr)
          if (ierr /= 0) return
 
@@ -431,7 +431,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call op_dload(op_mono_data_path, op_mono_data_cache_filename, ierr)
       end subroutine load_op_mono_data
 
@@ -493,8 +493,8 @@
          use op_eval, only: eval_op_radacc
          integer, intent(in) :: kk, nel
          integer, intent(in) :: izk(kk), izzp(nel)
-         real(dp), intent(in) :: fap(:) ! (nel) number fractions of elements
-         real(dp), intent(in) :: fac(:) ! (nel) scale factors for element opacity
+         real(dp), intent(in) :: fap(:)  ! (nel) number fractions of elements
+         real(dp), intent(in) :: fac(:)  ! (nel) scale factors for element opacity
          real(dp), intent(in) :: flux, fltp
          real(dp), intent(in) :: flrhop
          logical, intent(in) :: screening
@@ -512,7 +512,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call eval_op_radacc( &
             kk, izk, nel, izzp, fap, fac, flux, fltp, flrhop, screening, &
             g1, grl1, &
@@ -544,8 +544,8 @@
          use op_eval, only: eval_op_ev
          integer, intent(in) :: nel
          integer, intent(in) :: izzp(nel)
-         real(dp), intent(in) :: fap(:) ! (nel) number fractions of elements
-         real(dp), intent(in) :: fac(:) ! (nel) scale factors for element opacity
+         real(dp), intent(in) :: fap(:)  ! (nel) number fractions of elements
+         real(dp), intent(in) :: fac(:)  ! (nel) scale factors for element opacity
          real(dp), intent(in) :: fltp, flrhop
          logical, intent(in) :: screening
          real(dp), intent(inout) :: g1, gx1, gy1
@@ -560,7 +560,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call eval_op_ev( &
             nel, izzp, fap, fac, fltp, flrhop, screening, &
             g1, gx1, gy1, &
@@ -589,11 +589,10 @@
             umesh, semesh, ff, rs, ierr)
          use kap_def
          use op_eval, only: eval_alt_op
-         implicit none
          integer, intent(in) :: nel
          integer, intent(in) :: izzp(nel)
-         real(dp), intent(in) :: fap(:) ! (nel) number fractions of elements
-         real(dp), intent(in) :: fac(:) ! (nel) scale factors for element opacity
+         real(dp), intent(in) :: fap(:)  ! (nel) number fractions of elements
+         real(dp), intent(in) :: fac(:)  ! (nel) scale factors for element opacity
          real(dp), intent(in) :: fltp, flrhop
          logical, intent(in) :: screening
          real(dp), intent(out) :: g1, gx1, gy1
@@ -607,7 +606,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call eval_alt_op( &
             nel, izzp, fap, fac, fltp, flrhop, screening, &
             g1, gx1, gy1, &
@@ -621,9 +620,9 @@
          use chem_def, only: chem_isos
          use kap_def
          integer, intent(in) :: species, chem_id(:)
-         real(dp), intent(in) :: X(:) ! mass fractions (assumed baryonic)
-         real(dp), intent(in) :: min_X_to_include ! skip iso if X < this
-         real(dp), intent(in) :: chem_factors(:) ! (species)
+         real(dp), intent(in) :: X(:)  ! mass fractions (assumed baryonic)
+         real(dp), intent(in) :: min_X_to_include  ! skip iso if X < this
+         real(dp), intent(in) :: chem_factors(:)  ! (species)
          integer, intent(out) :: nel
          integer, intent(inout) :: izzp(:)
          real(dp), intent(inout) :: fap(:)
@@ -637,7 +636,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          nel = 0
          izzp(:) = 0
@@ -678,7 +677,7 @@
          end if
 
          do j=1,nel
-            fap(j) = fap(j)/tot ! number fractions
+            fap(j) = fap(j)/tot  ! number fractions
          end do
 
       end subroutine get_op_mono_args
@@ -687,7 +686,7 @@
       subroutine kap_get_control_namelist(handle, name, val, ierr)
          use kap_def
          use kap_ctrls_io, only: get_kap_controls
-         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
          character(len=*),intent(in) :: name
          character(len=*),intent(out) :: val
          integer, intent(out) :: ierr
@@ -702,7 +701,7 @@
       subroutine kap_set_control_namelist(handle, name, val, ierr)
          use kap_def
          use kap_ctrls_io, only: set_kap_controls
-         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+         integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
          character(len=*),intent(in) :: name
          character(len=*),intent(in) :: val
          integer, intent(out) :: ierr
@@ -752,7 +751,7 @@
                   fk_grad_pcg(j,:), logT_face, logRho_face, l, r, &
                   lgrad, ierr,&
                   ite,jne,epatom,amamu,logT_pcg(j,:),logRho_pcg(j,:),lgamm_pcg(j,:,:),lkap_face_pcg(j,:))
-        endif
+        end if
       end subroutine call_compute_grad_mombarg
 
       subroutine call_compute_gamma_grid_mombarg(j, fk, ierr)
@@ -782,48 +781,48 @@
         use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
         img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
 
-        integer, intent(in) :: handle ! from alloc_kap_handle
+        integer, intent(in) :: handle  ! from alloc_kap_handle
         integer, intent(in) :: k
         real(dp), intent(in) :: fk(:)
         real(dp), intent(in) :: logT_cntr, logRho_cntr
-        real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+        real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
         integer, intent(inout) :: ierr
         real(dp), intent(out) :: log_kap_rad_cell, kap, dlnkap_dlnT, dlnkap_dlnRho
 
         integer ::  eid(17), ke
-        real(dp) :: dlnkap_rad_dlnT, dlnkap_rad_dlnRho, kap_rad, delta, delta2!,fk(17),fk_norm_fac
+        real(dp) :: dlnkap_rad_dlnT, dlnkap_rad_dlnRho, kap_rad, delta, delta2  !,fk(17),fk_norm_fac
         type (Kap_General_Info), pointer :: rq
 
         ierr = 0
         if (.not. kap_is_initialized) then
            ierr=-1
            return
-        endif
+        end if
         call kap_ptr(handle,rq,ierr)
         if (ierr /= 0) return
 
 
-        eid = (/ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
-        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 /)
+        eid = [ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
+        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 ]
 
         if (initialize_fk_old) then
         fk_old = 0
         initialize_fk_old = .false.
-        endif
+        end if
 
 
-        delta  = MAXVAL(ABS(fk - fk_pcg)/fk_pcg, MASK=fk_pcg.gt.0 )
-        delta2 = MAXVAL(ABS(fk - fk_old(k,:))/fk_old(k,:), MASK=fk_old(k,:).gt.0 )
+        delta  = MAXVAL(ABS(fk - fk_pcg)/fk_pcg, MASK=fk_pcg>0 )
+        delta2 = MAXVAL(ABS(fk - fk_old(k,:))/fk_old(k,:), MASK=fk_old(k,:)>0 )
         if (SUM(fk_old(k,:)) == 0) then
           delta2 = 1d99
-        endif
+        end if
 
 
 
         if (delta > 1d-4) then
-          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01 &
-          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1) then
+          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01d0 &
+          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1d0) then
             call compute_kappa(k,&
               fk, logT_cntr, logRho_cntr, &
               log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
@@ -838,14 +837,14 @@
                 log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
                 logT_grid_old(k,:,:),logRho_grid_old(k,:,:),&
                 lkap_grid_old(k,:,:))
-          endif
+          end if
         else
           call compute_kappa_fast(k,&
               fk_pcg, logT_cntr, logRho_cntr, &
               log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
               ite,jne,epatom,amamu,sig,lkap_ross_pcg)
 
-        endif
+        end if
 
         if (ierr == 1) return
 

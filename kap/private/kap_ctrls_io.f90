@@ -25,7 +25,7 @@
 
    module kap_ctrls_io
 
-   use const_def
+   use const_def, only: dp, max_extra_inlists
    use kap_def
    use math_lib
 
@@ -142,7 +142,7 @@
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
       character (len=*), intent(in) :: inlist
-      integer, intent(out) :: ierr ! 0 means AOK.
+      integer, intent(out) :: ierr  ! 0 means AOK.
       type (Kap_General_Info), pointer :: rq
       include 'formats'
       call get_kap_ptr(handle,rq,ierr)
@@ -175,7 +175,7 @@
             action='read', delim='quote', status='old', iostat=ierr)
          if (ierr /= 0) then
             if (level == 1) then
-               ierr = 0 ! no inlist file so just use defaults
+               ierr = 0  ! no inlist file so just use defaults
                call store_controls(rq, ierr)
             else
                write(*, *) 'Failed to open kap namelist file ', trim(filename)
@@ -184,7 +184,7 @@
          end if
          read(unit, nml=kap, iostat=ierr)
          close(unit)
-         if (ierr == IOSTAT_END) then ! end-of-file means didn't find an &kap namelist
+         if (ierr == IOSTAT_END) then  ! end-of-file means didn't find an &kap namelist
             ierr = 0
             write(*, *) 'WARNING: Failed to find kap namelist in file: ', trim(filename)
             call store_controls(rq, ierr)
@@ -301,7 +301,7 @@
             write(0,*) ' num_kap_Zs = ', num_kap_Zs
             ierr = -1
             return
-         endif
+         end if
 
          num_kap_Xs(kap_user) = user_num_kap_Xs
          kap_Xs(:, kap_user) = user_kap_Xs
@@ -370,7 +370,7 @@
             write(0,*) ' num_kap_lowT_Zs = ', num_kap_lowT_Zs
             ierr = -1
             return
-         endif
+         end if
 
          num_kap_lowT_Xs(kap_lowT_user) = user_num_kap_lowT_Xs
          kap_lowT_Xs(:, kap_lowT_user) = user_kap_lowT_Xs
@@ -409,7 +409,7 @@
       if (ierr /= 0) then
          write(*,*) 'failed to open ' // trim(filename)
          return
-      endif
+      end if
       call get_kap_ptr(handle,rq,ierr)
       if (ierr /= 0) then
          close(iounit)
@@ -490,7 +490,7 @@
          read(iounit,'(A)',iostat=iostat) str
          ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1)  ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do

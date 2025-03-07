@@ -4,7 +4,7 @@
 
       module accurate_sum_auto_diff_star_order1
 
-      use const_def
+      use const_def, only: dp
       use auto_diff
 
       implicit none
@@ -87,10 +87,10 @@
       ! accuracy.
       subroutine neumaier_sum(sum, compensator, summand)
          ! Inputs
-         type(auto_diff_real_star_order1) sum, compensator, summand
+         type(auto_diff_real_star_order1) :: sum, compensator, summand
 
          ! Intermediates
-         type(auto_diff_real_star_order1) provisional
+         type(auto_diff_real_star_order1) :: provisional
 
          provisional = sum + summand
          if (abs(sum) >= abs(summand)) then

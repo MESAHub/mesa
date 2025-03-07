@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # if not set elsewhere, we're testing star
 if [ -z "$MESA_TEST_MOD" ];then

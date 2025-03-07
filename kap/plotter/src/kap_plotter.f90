@@ -208,25 +208,25 @@ program kap_plotter
    end if
 
 
-   if (nT .gt. 1) then
+   if (nT > 1) then
       logT_step = delta_logT / (nT-1d0)
    else
       logT_step = 0
    end if
 
-   if (nRho .gt. 1) then
+   if (nRho > 1) then
       logRho_step = delta_logRho / (nRho-1d0)
    else
       logRho_step = 0
    end if
 
-   if (nX .gt. 1) then
+   if (nX > 1) then
       X_step = delta_X / (nX-1d0)
    else
       X_step = 0
    end if
 
-   if (nZ .gt. 1) then
+   if (nZ > 1) then
       Z_step = delta_Z / (nZ-1d0)
    else
       Z_step = 0
@@ -242,8 +242,8 @@ program kap_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')
@@ -328,10 +328,14 @@ program kap_plotter
                res1 = dlnkap_dlnT
             end if
          else
-            res1 = log(kap)
+            if (is_nan(kap) .OR. kap <= 0) then
+               call set_nan(res1)
+            else
+               res1 = log(kap)
+            end if
          end if
 
-         if (doing_dfridr) then
+         if (doing_dfridr .and. is_nan(kap)) then
             var = log(kap)
             if (doing_d_dlnd) then
                dvardx_0 = dlnkap_dlnRho
@@ -346,8 +350,11 @@ program kap_plotter
             res1 = log10(abs(xdum))
          end if
 
-
-         write(iounit,*) kval, jval, res1
+         if (is_nan(kap)) then
+            write(iounit,*) kval, jval, "NaN"
+         else
+            write(iounit,*) kval, jval, res1
+         end if
       end do
    end do
 
@@ -478,8 +485,8 @@ contains
 
       xa = 0d0
       xa(h1) = X
-      xa(c12) = 0.5*Z
-      xa(o16) = 0.5*Z
+      xa(c12) = 0.5d0*Z
+      xa(o16) = 0.5d0*Z
       xa(fe56) = 0.0
       xa(he4) = 1d0 - xa(h1) - xa(c12) - xa(o16) - xa(fe56)
 

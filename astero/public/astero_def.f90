@@ -26,7 +26,7 @@
       module astero_def
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, strlen
       use math_lib
       use utils_lib
       use star_pgstar
@@ -111,7 +111,7 @@
 
       ! spectro (non-seismic) constraints
       integer, parameter :: max_constraints = 100
-      integer :: num_constraints ! how many are actually used
+      integer :: num_constraints  ! how many are actually used
 
       logical :: include_constraint_in_chi2_spectro(max_constraints)
       real(dp) :: constraint_target(max_constraints)
@@ -122,7 +122,7 @@
 
       real(dp) :: Z_div_X_solar
 
-      integer, parameter :: max_nl = 1000 ! increase this if necessary
+      integer, parameter :: max_nl = 1000  ! increase this if necessary
 
       ! observed modes to match to model
       integer  :: nl(0:3)
@@ -138,10 +138,10 @@
       real(dp) :: min_age_for_chi2, max_age_for_chi2
 
       character (len=256) :: newuoa_output_filename
-      real(dp) :: newuoa_rhoend ! search control for newuoa
+      real(dp) :: newuoa_rhoend  ! search control for newuoa
 
       character (len=256) :: bobyqa_output_filename
-      real(dp) :: bobyqa_rhoend ! search control for bobyqa
+      real(dp) :: bobyqa_rhoend  ! search control for bobyqa
 
       character (len=256) :: simplex_output_filename
       integer :: simplex_itermax, &
@@ -270,10 +270,10 @@
       logical :: do_redistribute_mesh
       ! note: number of zones for redistribute is set in the redistrb.c input file
 
-      integer :: iscan_factor(0:3) ! iscan for adipls = this factor times expected number of modes
+      integer :: iscan_factor(0:3)  ! iscan for adipls = this factor times expected number of modes
       real(dp) :: nu_lower_factor, nu_upper_factor
          ! frequency range for adipls is set from observed frequencies times these
-      integer :: & ! misc adipls parameters
+      integer :: &  ! misc adipls parameters
          adipls_irotkr, adipls_nprtkr, adipls_igm1kr, adipls_npgmkr
 
       logical, dimension(max_extra_inlists) :: read_extra_astero_search_inlist
@@ -627,7 +627,7 @@
             use const_def, only: dp, strlen
             implicit none
             integer, intent(in) :: id
-            character(len=strlen), intent(in) :: name ! which param to set
+            character(len=strlen), intent(in) :: name  ! which param to set
             real(dp), intent(in) :: val
             integer, intent(out) :: ierr
          end subroutine set_param_interface
@@ -698,7 +698,7 @@
          if (.not. associated(growth_rate)) allocate(growth_rate(n))
          if (.not. associated(inertia)) allocate(inertia(n))
 
-         if (num_results >= size(el,dim=1)) then ! enlarge
+         if (num_results >= size(el,dim=1)) then  ! enlarge
             call realloc_integer(el,n,ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
             call realloc_integer(order,n,ierr)
@@ -1057,7 +1057,7 @@
          ! column numbers
          write(fmt,'(a)') '(99' // trim(astero_results_int_format) // ')'
 
-         k = 17 + num_constraints + num_parameters ! fixed columns
+         k = 17 + num_constraints + num_parameters  ! fixed columns
 
          if (chi2_seismo_fraction > 0) then
 
@@ -1079,7 +1079,7 @@
             write(iounit, fmt, advance='no') i
          end do
 
-         write(iounit, '(a)') ! end of column numbers line
+         write(iounit, '(a)')  ! end of column numbers line
 
          ! column names
          write(fmt,'(a)') '(99' // trim(astero_results_txt_format) // ')'
@@ -1162,7 +1162,7 @@
             write(iounit, astero_results_txt_format, advance='no') 'step_type'
          end if
 
-         write(iounit, '(a)') ! end of column names line
+         write(iounit, '(a)')  ! end of column names line
 
       end subroutine show_sample_header
 
@@ -1251,7 +1251,7 @@
             write(iounit, astero_results_txt_format, advance='no') trim(info_str)
          end if
 
-         write(iounit, '(a)') ! end of line
+         write(iounit, '(a)')  ! end of line
 
          contains
 
@@ -1279,8 +1279,8 @@
          ! sort results by increasing sample_chi2
          call set_sample_index_by_chi2
 
-         do j = 1, 3 ! line number
-            i = 1 ! column number, incremented after each column is written
+         do j = 1, 3  ! line number
+            i = 1  ! column number, incremented after each column is written
 
             call write_int('samples', sample_number)
 
@@ -1295,10 +1295,10 @@
             call write_txt('date', date)
             call write_txt('search_type', search_type)
 
-            write(iounit, '(a)') ! new line
+            write(iounit, '(a)')  ! new line
          end do
 
-         write(iounit, '(a)') ! blank line between header and sample data
+         write(iounit, '(a)')  ! blank line between header and sample data
 
          call show_sample_header(iounit)
          do j = 1, sample_number

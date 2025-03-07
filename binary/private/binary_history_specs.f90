@@ -26,7 +26,7 @@
 
 module binary_history_specs
 
-   use const_def
+   use const_def, only: dp
    use star_lib
    use star_def
    use math_lib
@@ -73,11 +73,11 @@ contains
       filename = history_columns_file
       if (len_trim(filename) == 0) filename = 'binary_history_columns.list'
       open(newunit = iounit, file = trim(filename), action = 'read', status = 'old', iostat = ierr)
-      if (ierr /= 0) then ! if don't find that file, look in binary/defaults
+      if (ierr /= 0) then  ! if don't find that file, look in binary/defaults
          filename = trim(mesa_dir) // '/binary/defaults/' // trim(filename)
          ierr = 0
          open(newunit = iounit, file = trim(filename), action = 'read', status = 'old', iostat = ierr)
-         if (ierr /= 0) then ! fail
+         if (ierr /= 0) then  ! fail
             write(*, *) 'failed to open ' // trim(history_columns_file)
             return
          end if
@@ -233,7 +233,7 @@ contains
       if (associated(b% binary_history_column_spec)) &
          old_binary_history_column_spec => b% binary_history_column_spec
       nullify(b% binary_history_column_spec)
-      capacity = 100 ! will increase if needed
+      capacity = 100  ! will increase if needed
       allocate(b% binary_history_column_spec(capacity), stat = ierr)
       if (ierr /= 0) return
       b% binary_history_column_spec(:) = 0

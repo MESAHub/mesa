@@ -102,12 +102,12 @@ contains
 
     ! first, translate the density, temperature, etc into appropriate units
 
-    kT = 1d3 * keV * T9 ! in MeV
+    kT = 1d3 * keV * T9  ! in MeV
     kT% d1val1 = kT% val
     kT% d1val2 = 0d0
 
-    mec2 = me * clight*clight / mev_to_ergs ! in MeV
-    beta = mec2/kT ! dimesionless
+    mec2 = me * clight*clight / mev_to_ergs  ! in MeV
+    beta = mec2/kT  ! dimesionless
 
     ! the chemical potentials from the equation of state are kinetic
     ! so add in the rest mass terms
@@ -117,19 +117,19 @@ contains
     eta% d1val2 = d_etak_dlnRho + beta % d1val2
 
     ! only evaluate this for really degenerate stuff
-    if (eta .lt. 2*beta) return
+    if (eta < 2*beta) return
 
     ! also need chemical potential in MeV
     mue = eta * kT
 
-    do i = 1, n ! loop over reactions
+    do i = 1, n  ! loop over reactions
 
        ! if there's not a weak reaction index, don't bother
        ir = ids(i)
        if (ir <= 0) then
           if (dbg) write(*,'(a,i3)') "No weak reaction for ", ir
           cycle
-       endif
+       end if
 
        ! get reactant names & ids
        ecapture_lhs = weak_lhs_nuclide_name(ir)
@@ -144,7 +144,7 @@ contains
           if (dbg) write(*,*) key, "is not a reaction included in ecapture module"
           ierr = 0
           cycle
-       endif
+       end if
        if (dbg) write(*,*) key, "is a reaction included in ecapture module"
 
        call integer_dict_lookup(ecapture_transitions_offset_dict, key, offset, ierr)
@@ -286,14 +286,14 @@ contains
           ! convert to rates
           ln2ft = ln2 * exp10(-logft(j))
           ! protect against 0s
-          if ((Ie_ad .gt. 0) .and. (Je_ad .gt. 0)) then
+          if ((Ie_ad > 0) .and. (Je_ad > 0)) then
              lambda_ad = lambda_ad + Ie_ad * ln2ft * Pj(j)
              neutrino_ad = neutrino_ad + mec2 * Je_ad * ln2ft * Pj(j)
           end if
 
        end do
 
-       if (lambda_ad .gt. 1d-30) then
+       if (lambda_ad > 1d-30) then
           Qneu_ad = neutrino_ad / lambda_ad
        else
           Qneu_ad = 0d0

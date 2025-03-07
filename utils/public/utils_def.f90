@@ -29,7 +29,6 @@
       integer, parameter :: min_io_unit = 29
       integer, parameter :: max_io_unit = 99
 
-
       integer, parameter :: eof_token = 1
       integer, parameter :: string_token = 2
       integer, parameter :: name_token = 3
@@ -67,8 +66,4 @@
       end type ihash_entry
 
 
-
-
-
       end module utils_def
-

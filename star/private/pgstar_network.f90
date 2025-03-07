@@ -26,7 +26,7 @@
       module pgstar_network
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use pgstar_support
       use star_pgstar
 
@@ -36,7 +36,6 @@
       contains
 
       subroutine network_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -83,7 +82,6 @@
          use chem_def
          use net_def
          use const_def, only: Msun
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -221,7 +219,7 @@
 
                !Plot box centered on the (N,Z)
                call pgsci(1)
-               call pgline(5,(/n-step,n+step,n+step,n-step,n-step/),(/z-step,z-step,z+step,z+step,z-step/))
+               call pgline(5,[n-step,n+step,n+step,n-step,n-step],[z-step,z-step,z+step,z+step,z-step])
             end do
 
             call pgunsa

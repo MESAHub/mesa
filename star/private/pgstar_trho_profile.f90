@@ -26,7 +26,7 @@
       module pgstar_trho_profile
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, msun
       use pgstar_support
       use star_pgstar
 
@@ -88,7 +88,7 @@
             do k=1,nz
                xvec(k) = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
             end do
-         else ! log rho
+         else  ! log rho
             do k=1,nz
                xvec(k) = s% lnd(k)/ln10
             end do
@@ -238,8 +238,8 @@
             call pgsls(Line_Type_Dash)
             call pgline(size(psi4_logT), psi4_logRho, psi4_logT)
             call pgsls(Line_Type_Solid)
-            xpos = -0.2 ! 1.9 ! psi4_logRho(1)
-            ypos = 4 ! 5.9 ! psi4_logT(1)-dy*0.04
+            xpos = -0.2  ! 1.9 ! psi4_logRho(1)
+            ypos = 4  ! 5.9 ! psi4_logT(1)-dy*0.04
             if (inside(xpos, ypos)) call pgptxt(xpos, ypos, 0.0, 0.5, '\ge\dF\u/kT\(0248)4')
             call pgunsa
          end subroutine do_degeneracy_line
@@ -339,8 +339,8 @@
 
             logT1 = s% eos_rq% logT_min_for_all_Skye
             logT2 = s% eos_rq% logT_min_for_any_Skye
-            logT3 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
-            logT4 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
+            logT3 = 0  ! s% eos_rq% logT_min_FreeEOS_lo
+            logT4 = 0  ! s% eos_rq% logT_min_FreeEOS_lo
 
             logRho1 = s% eos_rq% logRho_min_for_all_Skye
             logRho2 = s% eos_rq% logRho_min_for_any_Skye
@@ -429,8 +429,8 @@
             call pgmove(lgRho1, lgT1)
             call pgdraw(lgRho2, lgT2)
             call pgsls(Line_Type_Solid)
-            xpos = -4 ! lgRho1-dx*0.065
-            ypos = 6.5 ! lgT1-dy*0.025
+            xpos = -4  ! lgRho1-dx*0.065
+            ypos = 6.5  ! lgT1-dy*0.025
             if (inside(xpos, ypos)) call pgptxt(xpos, ypos, 0.0, 0.0, 'P\drad\u\(0248)P\dgas\u')
             call pgunsa
          end subroutine do_Pgas_Prad_line

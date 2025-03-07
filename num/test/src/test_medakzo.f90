@@ -5,6 +5,7 @@ module test_medakzo
    use mtx_def
    use test_int_support, only: i_nfcn, i_njac
    use utils_lib, only: mesa_error
+   use bari_medakzo, only: medakzo_feval, medakzo_jeval, medakzo_init, medakzo_solut
 
    implicit none
 
@@ -13,11 +14,11 @@ module test_medakzo
 contains
 
    subroutine medakzo_feval_for_blk_dble(neqn, t, y, yprime, f, ierr, rpar, ipar)
-      integer neqn, ierr, ipar(:)
-      double precision t, y(:), yprime(:), f(:), rpar(:)
+      integer :: neqn, ierr, ipar(:)
+      double precision :: t, y(:), yprime(:), f(:), rpar(:)
 
-      integer N, i, j
-      double precision zeta, dzeta, dzeta2, k, c, phi, alpha, beta, gama, dum
+      integer :: N, i, j
+      double precision :: zeta, dzeta, dzeta2, k, c, phi, alpha, beta, gama, dum
       parameter(k=100d0, c=4d0)
 
       include 'formats'
@@ -29,7 +30,7 @@ contains
       alpha = 2d0*(dzeta - 1d0)*dum/c
       beta = dum*dum
 
-      if (t .le. 5d0) then
+      if (t <= 5d0) then
          phi = 2d0
       else
          phi = 0d0
@@ -57,11 +58,11 @@ contains
    end subroutine medakzo_feval_for_blk_dble
 
    subroutine medakzo_jeval_for_blk_dble(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
-      integer ldim, neqn, ierr, ipar(:)
-      double precision t, y(:), yprime(:), dfdy(:, :), rpar(:)
+      integer :: ldim, neqn, ierr, ipar(:)
+      double precision :: t, y(:), yprime(:), dfdy(:, :), rpar(:)
 
-      integer N, i, j
-      double precision zeta, dzeta, dzeta2, alpha, beta, k, c, dum, bz
+      integer :: N, i, j
+      double precision :: zeta, dzeta, dzeta2, alpha, beta, k, c, dum, bz
       parameter(k=100d0, c=4d0)
 
       do j = 1, neqn
@@ -111,10 +112,10 @@ contains
       use const_def, only: dp
       integer, intent(in) :: n, caller_id, nvar, nz, lrpar, lipar
       real(dp), intent(in) :: x, h
-      real(dp), intent(inout), pointer :: y(:) ! (n)
-      real(dp), intent(inout), pointer :: f(:) ! (n) ! dy/dx
-      integer, intent(inout), pointer :: ipar(:) ! (lipar)
-      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      real(dp), intent(inout), pointer :: y(:)  ! (n)
+      real(dp), intent(inout), pointer :: f(:)  ! (n) ! dy/dx
+      integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
       integer, intent(out) :: ierr
       real(dp), target :: yprime_ary(n)
       real(dp), pointer :: yprime(:)
@@ -127,10 +128,10 @@ contains
    subroutine medakzo_derivs(n, x, h, vars, dvars_dx, lrpar, rpar, lipar, ipar, ierr)
       integer, intent(in) :: n, lrpar, lipar
       real(dp), intent(in) :: x, h
-      real(dp), intent(inout) :: vars(:) ! (n)
-      real(dp), intent(inout) :: dvars_dx(:) ! (n)
-      integer, intent(inout), pointer :: ipar(:) ! (lipar)
-      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      real(dp), intent(inout) :: vars(:)  ! (n)
+      real(dp), intent(inout) :: dvars_dx(:)  ! (n)
+      integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
       real(dp) :: yprime(n)
       integer, intent(out) :: ierr
       include 'formats'
@@ -143,15 +144,15 @@ contains
       use const_def, only: dp
       integer, intent(in) :: n, caller_id, nvar, nz, lrpar, lipar
       real(dp), intent(in) :: x, h
-      real(dp), intent(inout), pointer :: y(:) ! (n)
-      real(dp), intent(inout), pointer :: f(:) ! (n) ! dy/dx
-      real(dp), dimension(:), pointer, intent(inout) :: lblk1, dblk1, ublk1 ! =(nvar,nvar,nz)
-      integer, intent(inout), pointer :: ipar(:) ! (lipar)
-      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      real(dp), intent(inout), pointer :: y(:)  ! (n)
+      real(dp), intent(inout), pointer :: f(:)  ! (n) ! dy/dx
+      real(dp), dimension(:), pointer, intent(inout) :: lblk1, dblk1, ublk1  ! =(nvar,nvar,nz)
+      integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
       integer, intent(out) :: ierr
 
-      real(dp), dimension(:, :, :), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-      integer, parameter :: ld_dfdy = 5 ! for medakzo
+      real(dp), dimension(:, :, :), pointer :: lblk, dblk, ublk  ! =(nvar,nvar,nz)
+      integer, parameter :: ld_dfdy = 5  ! for medakzo
       real(dp), target :: dfdy1(ld_dfdy*n)
       real(dp), pointer :: dfdy(:, :)
       !real(dp), pointer :: banded(:,:,:)
@@ -172,11 +173,11 @@ contains
       ! convert from banded to block tridiagonal
       ! lblk(:,:,1) is not used; ublk(:,:,nz) is not used.
       k = 1
-      dblk(1, 1, k) = dfdy(3, 1) ! partial of f(1,k) wrt var(1,k)    dfdy(3,i)
-      dblk(1, 2, k) = dfdy(2, 2) ! partial of f(1,k) wrt var(2,k)    dfdy(2,i+1)
-      dblk(2, 1, k) = dfdy(4, 1) ! partial of f(2,k) wrt var(1,k)    dfdy(4,i)
-      dblk(2, 2, k) = dfdy(3, 2) ! partial of f(2,k) wrt var(2,k)    dfdy(3,i+1)
-      ublk(1, 1, k) = dfdy(1, 3) ! partial of f(1,k) wrt var(1,k+1)  dfdy(1,i+2)
+      dblk(1, 1, k) = dfdy(3, 1)  ! partial of f(1,k) wrt var(1,k)    dfdy(3,i)
+      dblk(1, 2, k) = dfdy(2, 2)  ! partial of f(1,k) wrt var(2,k)    dfdy(2,i+1)
+      dblk(2, 1, k) = dfdy(4, 1)  ! partial of f(2,k) wrt var(1,k)    dfdy(4,i)
+      dblk(2, 2, k) = dfdy(3, 2)  ! partial of f(2,k) wrt var(2,k)    dfdy(3,i+1)
+      ublk(1, 1, k) = dfdy(1, 3)  ! partial of f(1,k) wrt var(1,k+1)  dfdy(1,i+2)
 
 !dfdy(1,i+2) partial of f(1,k) wrt var(1,k+1)
 !dfdy(2,i+1) partial of f(1,k) wrt var(2,k)
@@ -188,28 +189,28 @@ contains
       do k = 2, nz - 1
          i = 2*k - 1
          ! set lblk
-         lblk(1, 1, k) = dfdy(5, i - 2) ! partial of f(1,k) wrt var(1,k-1)
-         lblk(1, 2, k) = 0 ! partial of f(1,k) wrt var(2,k-1)
-         lblk(2, 1, k) = 0 ! partial of f(2,k) wrt var(1,k-1)
-         lblk(2, 2, k) = 0 ! partial of f(2,k) wrt var(2,k-1)
+         lblk(1, 1, k) = dfdy(5, i - 2)  ! partial of f(1,k) wrt var(1,k-1)
+         lblk(1, 2, k) = 0  ! partial of f(1,k) wrt var(2,k-1)
+         lblk(2, 1, k) = 0  ! partial of f(2,k) wrt var(1,k-1)
+         lblk(2, 2, k) = 0  ! partial of f(2,k) wrt var(2,k-1)
          ! set dblk
          dblk(1, 1, k) = dfdy(3, i)   ! partial of f(1,k) wrt var(1,k)  dfdy(3,i)
-         dblk(1, 2, k) = dfdy(2, i + 1) ! partial of f(1,k) wrt var(2,k)  dfdy(2,i+1)
+         dblk(1, 2, k) = dfdy(2, i + 1)  ! partial of f(1,k) wrt var(2,k)  dfdy(2,i+1)
          dblk(2, 1, k) = dfdy(4, i)   ! partial of f(2,k) wrt var(1,k)  dfdy(4,i)
-         dblk(2, 2, k) = dfdy(3, i + 1) ! partial of f(2,k) wrt var(2,k)  dfdy(3,i+1)
+         dblk(2, 2, k) = dfdy(3, i + 1)  ! partial of f(2,k) wrt var(2,k)  dfdy(3,i+1)
          ! set ublk
-         ublk(1, 1, k) = dfdy(1, i + 2) ! partial of f(1,k) wrt var(1,k+1)   dfdy(1,i+2)
-         ublk(2, 1, k) = 0 ! partial of f(2,k) wrt var(1,k+1)
-         ublk(1, 2, k) = 0 ! partial of f(1,k) wrt var(2,k+1)
-         ublk(2, 2, k) = 0 ! partial of f(2,k) wrt var(2,k+1)
+         ublk(1, 1, k) = dfdy(1, i + 2)  ! partial of f(1,k) wrt var(1,k+1)   dfdy(1,i+2)
+         ublk(2, 1, k) = 0  ! partial of f(2,k) wrt var(1,k+1)
+         ublk(1, 2, k) = 0  ! partial of f(1,k) wrt var(2,k+1)
+         ublk(2, 2, k) = 0  ! partial of f(2,k) wrt var(2,k+1)
       end do
 
       k = nz
       i = 2*k - 1
       dblk(1, 1, k) = dfdy(3, i)   ! partial of f(1,k) wrt var(1,k)
-      dblk(1, 2, k) = dfdy(2, i + 1) ! partial of f(1,k) wrt var(2,k)
+      dblk(1, 2, k) = dfdy(2, i + 1)  ! partial of f(1,k) wrt var(2,k)
       dblk(2, 1, k) = dfdy(4, i)   ! partial of f(2,k) wrt var(1,k)
-      dblk(2, 2, k) = dfdy(3, i + 1) ! partial of f(2,k) wrt var(2,k)
+      dblk(2, 2, k) = dfdy(3, i + 1)  ! partial of f(2,k) wrt var(2,k)
 
    end subroutine medakzo_jac_blk_dble
 
@@ -218,8 +219,8 @@ contains
       real(dp), intent(in) :: x, h
       real(dp), intent(inout) :: y(:)
       real(dp), intent(inout) :: f(:), dfdy(:, :)
-      integer, intent(inout), pointer :: ipar(:) ! (lipar)
-      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
       real(dp) :: yprime(n)
       integer, intent(out) :: ierr
       include 'formats'
@@ -237,14 +238,14 @@ contains
       use test_int_support, only: ipar_sparse_format
       integer, intent(in) :: n, nzmax, lrpar, lipar
       real(dp), intent(in) :: x, h
-      real(dp), intent(inout) :: y(:) ! (n)
-      real(dp), intent(inout) :: f(:) ! (n) ! dy/dx
-      integer, intent(inout) :: ia(:) ! (n+1)
-      integer, intent(inout) :: ja(:) ! (nzmax)
-      real(dp), intent(inout) :: values(:) ! (nzmax)
-      integer, intent(inout), pointer :: ipar(:) ! (lipar)
-      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-      integer, intent(out) :: ierr ! nonzero means terminate integration
+      real(dp), intent(inout) :: y(:)  ! (n)
+      real(dp), intent(inout) :: f(:)  ! (n) ! dy/dx
+      integer, intent(inout) :: ia(:)  ! (n+1)
+      integer, intent(inout) :: ja(:)  ! (nzmax)
+      real(dp), intent(inout) :: values(:)  ! (nzmax)
+      integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+      integer, intent(out) :: ierr  ! nonzero means terminate integration
 
       real(dp) :: dfdy(n, n)
       integer :: ld_dfdy, nz
@@ -266,7 +267,7 @@ contains
       logical, intent(in) :: numerical_jacobian, show_all, quiet
 
       integer, parameter :: nvar = 2, nz = 200
-      integer, parameter :: n = nvar*nz ! the number of variables in the "medakzo" system of ODEs
+      integer, parameter :: n = nvar*nz  ! the number of variables in the "medakzo" system of ODEs
       real(dp), target :: y_ary(n), yprime(n), yexact(n)
       real(dp), pointer :: y(:)
       integer, parameter :: lrpar = 1, lipar = 3, iout = 1
@@ -279,8 +280,8 @@ contains
       real(dp), pointer :: rpar(:)
       integer, pointer :: ipar(:)
       integer :: caller_id, nvar_blk_dble, nz_blk_dble
-      real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-      real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+      real(dp), dimension(:), pointer :: lblk, dblk, ublk  ! =(nvar,nvar,nz)
+      real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk  ! =(nvar,nvar,nz)
       logical, parameter :: dbg = .false.
 
       include 'formats'
@@ -305,10 +306,10 @@ contains
          t(2) = 20d0
       end if
 
-      itol = 0 ! scalar tolerances
+      itol = 0  ! scalar tolerances
       rtol = 1d-6
       atol = 1d-6
-      h0 = 1d-9 ! initial step size
+      h0 = 1d-9  ! initial step size
 
       matrix_type_spec = banded_matrix_type
       mljac = 2
@@ -376,19 +377,19 @@ contains
       ! rwork and iwork hold info for
       integer, intent(in) :: nr, n, lrpar, lipar
       real(dp), intent(in) :: xold, x
-      real(dp), intent(inout) :: y(:) ! (n)
+      real(dp), intent(inout) :: y(:)  ! (n)
       real(dp), intent(inout), target :: rwork(*)
       integer, intent(inout), target :: iwork(*)
-      integer, intent(inout), pointer :: ipar(:) ! (lipar)
-      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
       interface
          ! this subroutine can be called from your solout routine.
          ! it computes interpolated values for y components during the just completed step.
          real(dp) function interp_y(i, s, rwork, iwork, ierr)
             use const_def, only: dp
             implicit none
-            integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-            real(dp), intent(in) :: s ! interpolation x value (between xold and x).
+            integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+            real(dp), intent(in) :: s  ! interpolation x value (between xold and x).
             real(dp), intent(inout), target :: rwork(*)
             integer, intent(inout), target :: iwork(*)
             integer, intent(out) :: ierr

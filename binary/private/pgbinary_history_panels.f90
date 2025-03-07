@@ -26,7 +26,7 @@
 module pgbinary_history_panels
 
    use binary_private_def
-   use const_def
+   use const_def, only: dp
    use pgbinary_support
 
    implicit none
@@ -848,11 +848,11 @@ contains
                   return
                end if
                read(iounit, *) num_pts
-               ishape = b% pg% History_Panel_points_marker ! 5
+               ishape = b% pg% History_Panel_points_marker  ! 5
                call pgsave
-               call pgsci(b% pg% History_Panel_points_ci) !1)
-               call pgslw(b% pg% History_Panel_points_lw) !2)
-               call pgsch(b% pg% History_Panel_points_ch) !1.0)
+               call pgsci(b% pg% History_Panel_points_ci)  !1)
+               call pgslw(b% pg% History_Panel_points_lw)  !2)
+               call pgsch(b% pg% History_Panel_points_ch)  !1.0)
                do k = 1, num_pts
                   if (b% pg% History_Panel_points_error_bars) then
                      read(iounit, *) xpt, ypt, errpt

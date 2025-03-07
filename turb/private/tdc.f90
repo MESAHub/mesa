@@ -26,7 +26,7 @@
 
 module tdc
 
-use const_def
+use const_def, only: dp, sqrt_2_div_3
 use num_lib
 use utils_lib
 use auto_diff
@@ -179,7 +179,7 @@ contains
                   Y1 = set_Y(.false., Z1)
                   if (info%report) write(*,*) 'Bisected dQdZ, found root, ',Y1%val
                   call compute_Q(info, Y1, Q, Af)
-                  if (Q < 0) then ! Means there are no roots with Af > 0.
+                  if (Q < 0) then  ! Means there are no roots with Af > 0.
                      if (info%report) write(*,*) 'Root has Q<0, Q=',Q%val,'Y=',radY%val
                      Y = radY
                   else
@@ -201,11 +201,11 @@ contains
                else
                   if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
                   call compute_Q(info, Y0, Q, Af)
-                  if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
+                  if (Q > 0) then  ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
                      call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
                      Y = convert(Y_face)
                      if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
-                  else ! Means there's no root in [Y0,0] so the only root is radY.
+                  else  ! Means there's no root in [Y0,0] so the only root is radY.
                      if (info%report) write(*,*) 'Q(Y0) < 0, Y=',radY%val
                      Y = radY
                   end if
@@ -265,7 +265,7 @@ contains
       if (ierr /= 0) return
 
       ! Set up Z from bisection search
-      Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
+      Z%d1val1 = 1d0  ! Set derivative dZ/dZ=1 for Newton iterations.
       if (info%report) write(*,*) 'Z from bisection search', Z%val
       if (info%report) write(*,*) 'lower_bound_Z, upper_bound_Z',lower_bound_Z%val,upper_bound_Z%val
 
@@ -275,7 +275,7 @@ contains
       ! Initialize starting values for TDC Newton iterations.
       dQdz = 0d0
       converged = .false.
-      have_derivatives = .false. ! Tracks if we've done at least one Newton iteration.
+      have_derivatives = .false.  ! Tracks if we've done at least one Newton iteration.
                                  ! Need to do this before returning to endow Y with partials
                                  ! with respect to the structure variables.
       do iter = 1, max_iter
@@ -345,7 +345,7 @@ contains
 
          if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
             Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, correction%val
-         Z_new%d1val1 = 1d0 ! Ensures that dZ/dZ = 1.
+         Z_new%d1val1 = 1d0  ! Ensures that dZ/dZ = 1.
          Z = Z_new
 
          Y = set_Y(Y_is_positive,Z)

@@ -77,7 +77,7 @@ contains
     use_suzuki_tables = .false.
     ! this checks the weaklib tables
     ! they are extremely sparsely sampled
-    ! so these are bad esimates of the rates
+    ! so these are bad estimates of the rates
     ! they are shown for comparison purposes
     call do_test_special_weak(.false.)
 

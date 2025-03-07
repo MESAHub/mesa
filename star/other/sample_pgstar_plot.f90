@@ -70,7 +70,7 @@ contains
       integer, intent(in) :: id
       integer, intent(out) :: ierr
 
-      integer, parameter :: num_Other_plots = 1 ! can have up to max_num_Other_plots
+      integer, parameter :: num_Other_plots = 1  ! can have up to max_num_Other_plots
       integer :: i, plot_id
       type(pgstar_win_file_data), pointer :: p
       type(star_info), pointer :: s
@@ -107,27 +107,27 @@ contains
       my_win_flag = .false.
 
       my_win_width = 7
-      my_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+      my_win_aspect_ratio = 0.62  ! aspect_ratio = height/width
 
-      my_xaxis_by = 'mass' ! same choices as for main window xaxis_by
-      my_xmin = -101 ! only used if > -100
-      my_xmax = -101 ! only used if > -100
+      my_xaxis_by = 'mass'  ! same choices as for main window xaxis_by
+      my_xmin = -101  ! only used if > -100
+      my_xmax = -101  ! only used if > -100
 
-      my_ymin_left = -101 ! only used if > -100
-      my_ymax_left = -101 ! only used if > -100
-      my_dymin_left = -101 ! only used if > -100
+      my_ymin_left = -101  ! only used if > -100
+      my_ymax_left = -101  ! only used if > -100
+      my_dymin_left = -101  ! only used if > -100
 
-      my_ymin_right = -101 ! only used if > -100
-      my_ymax_right = -101 ! only used if > -100
-      my_dymin_right = -101 ! only used if > -100
+      my_ymin_right = -101  ! only used if > -100
+      my_ymax_right = -101  ! only used if > -100
+      my_dymin_right = -101  ! only used if > -100
 
       ! file output
       my_file_flag = .false.
       my_file_dir = 'pgstar_out'
       my_file_prefix = 'profile'
-      my_file_interval = 5 ! output when mod(model_number,my_file_interval)==0
-      my_file_width = -1 ! negative means use same value as for window
-      my_file_aspect_ratio = -1 ! negative means use same value as for window
+      my_file_interval = 5  ! output when mod(model_number,my_file_interval)==0
+      my_file_width = -1  ! negative means use same value as for window
+      my_file_aspect_ratio = -1  ! negative means use same value as for window
 
    end subroutine set_my_namelist_defaults
 
@@ -200,7 +200,7 @@ contains
                          winxmin, winxmax, winymin, winymax, label_scale, ierr)
 
       use utils_lib
-      use const_def
+      use const_def, only: dp, ln10
 
       type(star_info), pointer :: s
       integer, intent(in) :: device_id
@@ -426,4 +426,3 @@ end module sample_pgstar_plot
 !
 !
 !/ ! end of my_pgstar namelist
-

@@ -26,7 +26,7 @@
 
       module binary_timestep
 
-      use const_def
+      use const_def, only: dp, msun, secyer
       use math_lib
       use star_lib
       use star_def
@@ -36,7 +36,7 @@
 
       contains
 
-      subroutine set_star_timesteps(b) ! sets the smallest next timestep for all stars
+      subroutine set_star_timesteps(b)  ! sets the smallest next timestep for all stars
          type (binary_info), pointer :: b
          integer :: i, l
          real(dp) :: dt_min
@@ -287,7 +287,7 @@
             call mesa_error(__FILE__,__LINE__,'Something wrong in binary timestep')
          end if
 
-         if (set_dt < 1d-7) set_dt = 1d-7 ! there's a limit to everything
+         if (set_dt < 1d-7) set_dt = 1d-7  ! there's a limit to everything
 
          b% max_timestep = exp10(b% dt_softening_factor*log10(b% max_timestep) + &
              (1-b% dt_softening_factor)*log10(set_dt*secyer))

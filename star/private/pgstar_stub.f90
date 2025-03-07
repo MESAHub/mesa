@@ -26,7 +26,7 @@
       module pgstar
 
       use star_def
-      use const_def
+      use const_def, only: dp
       use star_pgstar
 
       implicit none

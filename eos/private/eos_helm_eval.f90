@@ -226,7 +226,7 @@
          res(i_dS_dRho) = helm_res(h_dsd)
          mu = abar/(1 + zbar)
          res(i_mu) = mu
-         free_e = max(1d-99, helm_res(h_xne))/(avo*Rho) ! assuming complete ionization
+         free_e = max(1d-99, helm_res(h_xne))/(avo*Rho)  ! assuming complete ionization
          res(i_lnfree_e) = log(free_e)
          res(i_gamma1) = helm_res(h_gam1)
          res(i_gamma3) = helm_res(h_gam3)
@@ -323,7 +323,7 @@
                coulomb_temp_cut, coulomb_den_cut, &
                include_radiation, include_elec_pos, &
                res, off_table, ierr)
-         use const_def
+         use const_def, only: dp
          use helm
 
          type (EoS_General_Info), pointer :: rq
@@ -332,9 +332,9 @@
          real(dp), intent(in) :: atemp, alogtemp
          real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
          logical, intent(in) :: include_radiation, include_elec_pos
-         real(dp), intent(inout) :: res(:) ! (num_helm_results)
+         real(dp), intent(inout) :: res(:)  ! (num_helm_results)
          logical, intent(out) :: off_table
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          real(dp) :: Rho, logRho, T, logT, dse, dpe, dsp
 

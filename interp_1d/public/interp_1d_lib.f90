@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module interp_1d_lib
-      use const_lib, only: dp
+      use const_def, only: dp
       use auto_diff
 
       implicit none
@@ -35,27 +35,27 @@
       subroutine interpolate_vector( &
                n_old, x_old, n_new, x_new, v_old, v_new, interp_vec, nwork, work1, str, ierr)
          integer, intent(in) :: n_old, n_new
-         real(dp), intent(in) :: x_old(:) !(n_old)
-         real(dp), intent(in) :: v_old(:) !(n_old)
-         real(dp), intent(in) :: x_new(:) !(n_new)
-         real(dp), intent(inout) :: v_new(:) ! (n_new)
+         real(dp), intent(in) :: x_old(:)  !(n_old)
+         real(dp), intent(in) :: v_old(:)  !(n_old)
+         real(dp), intent(in) :: x_new(:)  !(n_new)
+         real(dp), intent(inout) :: v_new(:)  ! (n_new)
          interface
-            subroutine interp_vec(x, nx, f1, nwork, work1, str, ierr) ! make cubic interpolant
+            subroutine interp_vec(x, nx, f1, nwork, work1, str, ierr)  ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
-               use const_lib, only: dp
+               use const_def, only: dp
                implicit none
                integer, intent(in) :: nx       ! length of x vector
-               real(dp), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-               real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+               real(dp), intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+               real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
                integer, intent(in) :: nwork
-               real(dp), intent(inout), pointer :: work1(:) ! =(n_old, nwork)
-               character (len=*) :: str ! for debugging
+               real(dp), intent(inout), pointer :: work1(:)  ! =(n_old, nwork)
+               character (len=*) :: str  ! for debugging
                integer, intent(out) :: ierr
             end subroutine interp_vec
          end interface
          integer, intent(in) :: nwork
-         real(dp), intent(inout), pointer :: work1(:) ! =(n_old, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(inout), pointer :: work1(:)  ! =(n_old, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          real(dp), pointer :: f1(:), f(:,:)
          integer :: k
@@ -66,7 +66,7 @@
          do k=1,n_old
             f(1,k) = v_old(k)
          end do
-         call interp_vec(x_old, n_old, f1, nwork, work1, str, ierr) ! make interpolant
+         call interp_vec(x_old, n_old, f1, nwork, work1, str, ierr)  ! make interpolant
          if (ierr /= 0) then
             deallocate(f1)
             return
@@ -79,28 +79,28 @@
       subroutine interpolate_vector_autodiff( &
                n_old, x_old, n_new, x_new, v_old, v_new, interp_vec_autodiff, nwork, work1, str, ierr)
          integer, intent(in) :: n_old, n_new
-         type(auto_diff_real_2var_order1), intent(in) :: x_old(:) !(n_old)
-         type(auto_diff_real_2var_order1), intent(in) :: v_old(:) !(n_old)
-         type(auto_diff_real_2var_order1), intent(in) :: x_new(:) !(n_new)
-         type(auto_diff_real_2var_order1), intent(inout) :: v_new(:) ! (n_new)
+         type(auto_diff_real_2var_order1), intent(in) :: x_old(:)  !(n_old)
+         type(auto_diff_real_2var_order1), intent(in) :: v_old(:)  !(n_old)
+         type(auto_diff_real_2var_order1), intent(in) :: x_new(:)  !(n_new)
+         type(auto_diff_real_2var_order1), intent(inout) :: v_new(:)  ! (n_new)
          interface
-            subroutine interp_vec_autodiff(x, nx, f1, nwork, work1, str, ierr) ! make cubic interpolant
+            subroutine interp_vec_autodiff(x, nx, f1, nwork, work1, str, ierr)  ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
-               use const_lib, only: dp
+               use const_def, only: dp
                use auto_diff
                implicit none
                integer, intent(in) :: nx       ! length of x vector
-               type(auto_diff_real_2var_order1), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-               type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+               type(auto_diff_real_2var_order1), intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+               type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
                integer, intent(in) :: nwork
-               type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(n_old, nwork)
-               character (len=*) :: str ! for debugging
+               type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(n_old, nwork)
+               character (len=*) :: str  ! for debugging
                integer, intent(out) :: ierr
              end subroutine interp_vec_autodiff
          end interface
          integer, intent(in) :: nwork
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(n_old, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(n_old, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          type(auto_diff_real_2var_order1), pointer :: f1(:), f(:,:)
          integer :: k
@@ -111,7 +111,7 @@
          do k=1,n_old
             f(1,k) = v_old(k)
          end do
-         call interp_vec_autodiff(x_old, n_old, f1, nwork, work1, str, ierr) ! make interpolant
+         call interp_vec_autodiff(x_old, n_old, f1, nwork, work1, str, ierr)  ! make interpolant
          if (ierr /= 0) then
             deallocate(f1)
             return
@@ -125,12 +125,12 @@
                n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)
          use interp_1d_def, only: pm_work_size
          integer, intent(in) :: n_old, n_new
-         real(dp), intent(in) :: x_old(:) !(n_old)
-         real(dp), intent(in) :: v_old(:) !(n_old)
-         real(dp), intent(in) :: x_new(:) !(n_new)
-         real(dp), intent(inout) :: v_new(:) ! (n_new)
-         real(dp), intent(inout), pointer :: work1(:) ! =(n_old, pm_work_size)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: x_old(:)  !(n_old)
+         real(dp), intent(in) :: v_old(:)  !(n_old)
+         real(dp), intent(in) :: x_new(:)  !(n_new)
+         real(dp), intent(inout) :: v_new(:)  ! (n_new)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(n_old, pm_work_size)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          real(dp), pointer :: f1(:), f(:,:)
          integer :: k
@@ -141,7 +141,7 @@
          do k=1,n_old
             f(1,k) = v_old(k)
          end do
-         call interp_pm(x_old, n_old, f1, pm_work_size, work1, str, ierr) ! make interpolant
+         call interp_pm(x_old, n_old, f1, pm_work_size, work1, str, ierr)  ! make interpolant
          if (ierr /= 0) then
             deallocate(f1)
             return
@@ -155,11 +155,11 @@
          ! 4 points in, 1 point out
          ! piecewise monotonic cubic interpolation
          use interp_1d_def, only: pm_work_size
-         real(dp), intent(in) :: pdqm1, pdq00, pdqp1 ! spacing between input points
+         real(dp), intent(in) :: pdqm1, pdq00, pdqp1  ! spacing between input points
          real(dp), intent(in) :: ndq00
-         real(dp), intent(in) :: pfm1, pf00, pfp1, pfp2 ! previous values
-         real(dp), intent(out) :: nf00 ! new value at nk
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: pfm1, pf00, pfp1, pfp2  ! previous values
+         real(dp), intent(out) :: nf00  ! new value at nk
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          integer, parameter :: n_old=4, n_new=1
          real(dp) :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
@@ -186,11 +186,11 @@
          ! 3 points in, 1 point out
          ! piecewise monotonic quadratic interpolation
          use interp_1d_def, only: pm_work_size
-         real(dp), intent(in) :: pdqm1, pdq00 ! spacing between input points
-         real(dp), intent(in) :: ndqm1 ! new spacing to nk
-         real(dp), intent(in) :: pfm1, pf00, pfp1 ! previous values at pkm1, pk, pkp1
-         real(dp), intent(out) :: nf00 ! new value at nk
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: pdqm1, pdq00  ! spacing between input points
+         real(dp), intent(in) :: ndqm1  ! new spacing to nk
+         real(dp), intent(in) :: pfm1, pf00, pfp1  ! previous values at pkm1, pk, pkp1
+         real(dp), intent(out) :: nf00  ! new value at nk
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          integer, parameter :: n_old=3, n_new=1
          real(dp) :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
@@ -215,11 +215,11 @@
          ! 3 points in, 2 points out
          ! piecewise monotonic quadratic interpolation
          use interp_1d_def, only: pm_work_size
-         real(dp), intent(in) :: pdqm1, pdq00 ! previous spacing to pk and pkp1
-         real(dp), intent(in) :: ndqm1, ndq00 ! new spacing to nk and nk+1
-         real(dp), intent(in) :: pfm1, pf00, pfp1 ! previous values at pkm1, pk, pkp1
-         real(dp), intent(out) :: nf00, nfp1 ! new values at nk, nk+1
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: pdqm1, pdq00  ! previous spacing to pk and pkp1
+         real(dp), intent(in) :: ndqm1, ndq00  ! new spacing to nk and nk+1
+         real(dp), intent(in) :: pfm1, pf00, pfp1  ! previous values at pkm1, pk, pkp1
+         real(dp), intent(out) :: nf00, nfp1  ! new values at nk, nk+1
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          integer, parameter :: n_old=3, n_new=2
          real(dp) :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
@@ -251,30 +251,30 @@
       subroutine interp_values(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         real(dp), intent(inout) :: vals(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp_values(init_x, nx, f1, nv, x, vals, ierr)
       end subroutine interp_values
 
       subroutine interp_values_autodiff(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc
-         type(auto_diff_real_2var_order1), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         type(auto_diff_real_2var_order1), intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         type(auto_diff_real_2var_order1), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         type(auto_diff_real_2var_order1), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         type(auto_diff_real_2var_order1), intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         type(auto_diff_real_2var_order1), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         type(auto_diff_real_2var_order1), intent(inout) :: vals(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         type(auto_diff_real_2var_order1), intent(inout) :: vals(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp_values_autodiff(init_x, nx, f1, nv, x, vals, ierr)
       end subroutine interp_values_autodiff
 
@@ -282,12 +282,12 @@
       subroutine interp_value(init_x, nx, f1, xval, val, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
          real(dp), intent(in) :: xval  ! location where want interpolated value
          real(dp), intent(out) :: val
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
          integer, parameter :: nv = 1
          real(dp) :: x(nv), vals(nv)
          x(1) = xval
@@ -299,16 +299,16 @@
       subroutine interp_values_and_slopes(init_x, nx, f1, nv, x, vals, slopes, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals and slopes vectors
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals and slopes vectors
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals(:) ! (nv)
-         real(dp), intent(inout) :: slopes(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         real(dp), intent(inout) :: vals(:)  ! (nv)
+         real(dp), intent(inout) :: slopes(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp_values_and_slopes(init_x, nx, f1, nv, x, vals, slopes, ierr)
       end subroutine interp_values_and_slopes
 
@@ -316,12 +316,12 @@
       subroutine interp_value_and_slope(init_x, nx, f1, xval, val, slope, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
          real(dp), intent(in) :: xval  ! location where want interpolated values
          real(dp), intent(out) :: val, slope
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
          integer, parameter :: nv = 1
          real(dp) :: x(nv), vals(nv), slopes(nv)
          x(1) = xval
@@ -335,16 +335,16 @@
             init_x, nx, f1_1, f1_2, nv, x, vals_1, slopes_1, vals_2, slopes_2, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1_1(:), f1_2(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals and slopes vectors
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1_1(:), f1_2(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals and slopes vectors
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals_1(:), vals_2(:) ! (nv)
-         real(dp), intent(inout) :: slopes_1(:), slopes_2(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         real(dp), intent(inout) :: vals_1(:), vals_2(:)  ! (nv)
+         real(dp), intent(inout) :: slopes_1(:), slopes_2(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp2_values_and_slopes( &
             init_x, nx, f1_1, f1_2, nv, x, vals_1, slopes_1, vals_2, slopes_2, ierr)
       end subroutine interp2_values_and_slopes
@@ -353,12 +353,12 @@
       subroutine interp2_value_and_slope(init_x, nx, f1_1, f1_2, xval, val_1, slope_1, val_2, slope_2, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1_1(:), f1_2(:) ! =(4,nx)  ! data & interpolation coefficients
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1_1(:), f1_2(:)  ! =(4,nx)  ! data & interpolation coefficients
          real(dp), intent(in) :: xval  ! location where want interpolated values
          real(dp), intent(out) :: val_1, slope_1, val_2, slope_2
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
          integer, parameter :: nv = 1
          real(dp) :: x(nv), vals_1(nv), slopes_1(nv), vals_2(nv), slopes_2(nv)
          x(1) = xval
@@ -376,16 +376,16 @@
             vals_1, slopes_1, vals_2, slopes_2, vals_3, slopes_3, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1_1(:), f1_2(:), f1_3(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals and slopes vectors
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1_1(:), f1_2(:), f1_3(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals and slopes vectors
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real(dp), intent(inout) :: vals_1(:), vals_2(:), vals_3(:) ! (nv)
-         real(dp), intent(inout) :: slopes_1(:), slopes_2(:), slopes_3(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means AOK
+         real(dp), intent(inout) :: vals_1(:), vals_2(:), vals_3(:)  ! (nv)
+         real(dp), intent(inout) :: slopes_1(:), slopes_2(:), slopes_3(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means AOK
          call do_interp3_values_and_slopes( &
             init_x, nx, f1_1, f1_2, f1_3, nv, x, &
             vals_1, slopes_1, vals_2, slopes_2, vals_3, slopes_3, ierr)
@@ -397,12 +397,12 @@
             val_1, slope_1, val_2, slope_2, val_3, slope_3, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1_1(:), f1_2(:), f1_3(:) ! =(4,nx)  ! data & interpolation coefficients
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1_1(:), f1_2(:), f1_3(:)  ! =(4,nx)  ! data & interpolation coefficients
          real(dp), intent(in) :: xval  ! location where want interpolated values
          real(dp), intent(out) :: val_1, slope_1, val_2, slope_2, val_3, slope_3
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
          integer, parameter :: nv = 1
          real(dp) :: x(nv), vals_1(nv), slopes_1(nv), vals_2(nv), slopes_2(nv), vals_3(nv), slopes_3(nv)
          x(1) = xval
@@ -424,17 +424,17 @@
             vals_4, slopes_4, vals_5, slopes_5, vals_6, slopes_6, &
             ierr)
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
          real(dp), intent(in), pointer, dimension(:) :: f1_1, f1_2, f1_3, f1_4, f1_5, f1_6
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
          real(dp), intent(inout), dimension(:) :: &
             vals_1, slopes_1, vals_2, slopes_2, vals_3, slopes_3, &
             vals_4, slopes_4, vals_5, slopes_5, vals_6, slopes_6
-         integer, intent(out) :: ierr ! 0 means aok
+         integer, intent(out) :: ierr  ! 0 means aok
          ierr = 0
          call do_interp6_values_and_slopes( &
             init_x, nx, f1_1, f1_2, f1_3, f1_4, f1_5, f1_6, nv, x, &
@@ -450,13 +450,13 @@
             val_4, slope_4, val_5, slope_5, val_6, slope_6, &
             ierr)
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
          real(dp), intent(in), pointer, dimension(:) :: f1_1, f1_2, f1_3, f1_4, f1_5, f1_6
          real(dp), intent(in) :: xval  ! location where want interpolated values
          real(dp), intent(out) :: val_1, slope_1, val_2, slope_2, val_3, slope_3, &
             val_4, slope_4, val_5, slope_5, val_6, slope_6
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
 
          integer, parameter :: nv = 1
          real(dp), dimension(nv) :: x, &
@@ -481,17 +481,17 @@
       subroutine integrate_values(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc
-         real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly increasing
-         integer, intent(in) :: nx ! length of init_x vector
-         real(dp), intent(in), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real(dp), intent(in) :: x(:) ! (nv)
+         real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly increasing
+         integer, intent(in) :: nx  ! length of init_x vector
+         real(dp), intent(in), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real(dp), intent(in) :: x(:)  ! (nv)
             ! strictly monotonic in same way as init_x
             ! NOTE: no extrapolation allowed -- x's must be within range of init_x's
-         real(dp), intent(inout) :: vals(:) ! (nv)
+         real(dp), intent(inout) :: vals(:)  ! (nv)
             ! for i > 1, vals(i) = integral of interpolating poly from x(i-1) to x(i)
             ! vals(1) = 0
-         integer, intent(out) :: ierr ! 0 means AOK
+         integer, intent(out) :: ierr  ! 0 means AOK
 
          call do_integrate_values(init_x, nx, f1, nv, x, vals, ierr)
 
@@ -510,28 +510,28 @@
       !        Astron. Astrophys., (239) 1990, 443-450.
 
 
-      subroutine interp_pm(x, nx, f1, nwork, work1, str, ierr) ! make piecewise monotonic cubic interpolant
+      subroutine interp_pm(x, nx, f1, nwork, work1, str, ierr)  ! make piecewise monotonic cubic interpolant
          use interp_1d_def
          use interp_1d_pm
          integer, intent(in) :: nx       ! length of x vector (>= 2)
-         real(dp), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub(x, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm
 
-      subroutine interp_pm_autodiff(x, nx, f1, nwork, work1, str, ierr) ! make piecewise monotonic cubic interpolant
+      subroutine interp_pm_autodiff(x, nx, f1, nwork, work1, str, ierr)  ! make piecewise monotonic cubic interpolant
          use interp_1d_def
          use interp_1d_pm_autodiff
          integer, intent(in) :: nx       ! length of x vector (>= 2)
-         type(auto_diff_real_2var_order1), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub_autodiff(x, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm_autodiff
@@ -542,11 +542,11 @@
          use interp_1d_def
          use interp_1d_pm
          integer, intent(in) :: nx       ! length of x vector (>= 2)
-         real(dp), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub(x, nx, f1, .true., nwork, work1, str, ierr)
       end subroutine interp_pm_slopes_only
@@ -584,10 +584,10 @@
          use interp_1d_pm
          real(dp), intent(in) :: dx    ! grid spacing
          integer, intent(in) :: nx     ! length of vector (>= 2)
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call mk_pmcub_uniform(dx, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm_on_uniform_grid
@@ -607,12 +607,12 @@
          use interp_1d_def
          use interp_1d_mp
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real(dp), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: which ! average, quartic, or super_bee
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which  ! average, quartic, or super_bee
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3(x, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3
@@ -623,11 +623,11 @@
          use interp_1d_def
          use interp_1d_mp
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real(dp), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3(x, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a
@@ -638,11 +638,11 @@
          use interp_1d_def
          use interp_1d_mp
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real(dp), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3(x, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q
@@ -653,11 +653,11 @@
          use interp_1d_def
          use interp_1d_mp
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         real(dp), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b
@@ -667,13 +667,13 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp
-         real(dp), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: which ! average, quartic, or super_bee
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which  ! average, quartic, or super_bee
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid(dx, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_on_uniform_grid
@@ -683,12 +683,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp
-         real(dp), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid(dx, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_on_uniform_grid
@@ -698,12 +698,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp
-         real(dp), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_on_uniform_grid
@@ -713,12 +713,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp
-         real(dp), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         real(dp), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_on_uniform_grid
@@ -729,12 +729,12 @@
          use interp_1d_def
          use interp_1d_mp_autodiff
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: which ! average, quartic, or super_bee
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which  ! average, quartic, or super_bee
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_autodiff(x, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_autodiff
@@ -745,11 +745,11 @@
          use interp_1d_def
          use interp_1d_mp_autodiff
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_autodiff(x, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_autodiff
@@ -760,11 +760,11 @@
          use interp_1d_def
          use interp_1d_mp_autodiff
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_autodiff(x, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_autodiff
@@ -775,11 +775,11 @@
          use interp_1d_def
          use interp_1d_mp_autodiff
          integer, intent(in) :: nx       ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_autodiff(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_autodiff
@@ -789,13 +789,13 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_autodiff
-         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: which ! average, quartic, or super_bee
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which  ! average, quartic, or super_bee
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_autodiff(dx, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_on_uniform_grid_autodiff
@@ -805,12 +805,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_autodiff
-         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_autodiff(dx, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_on_uniform_grid_autodiff
@@ -820,12 +820,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_autodiff
-         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_autodiff(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_on_uniform_grid_autodiff
@@ -835,12 +835,12 @@
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
          use interp_1d_mp_autodiff
-         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
-         integer, intent(in) :: nx ! length of x vector (>= 4)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         type(auto_diff_real_2var_order1), intent(in) :: dx  ! the grid spacing
+         integer, intent(in) :: nx  ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork  ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
          call m3_on_uniform_grid_autodiff(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_on_uniform_grid_autodiff

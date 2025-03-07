@@ -7,7 +7,7 @@ General steps
 -------------
 
 - Pick someone to be a release manager
-- Pick a release date 
+- Pick a release date
 - Pick a RC1 (release candidate) date which should be ~1 month before the release
 
 Prior to generating a release
@@ -101,7 +101,7 @@ This script will also make zip archive, which can be used for local testing to m
 .. note::
     Once the script has generated the new release branch, update the changelog headings from "Changes in main" to "Changes in rXX.YY.Z" etc,
     and delete the note near the top of the changelog about changes in ``main`` relative to the most recent release.
-    
+
 The release script does not push any changes to Github. Once you are ready to push the release branch, this must be done manually with a ``git push``. (This is a separate step from pushing the tag in the next step.)
 
 
@@ -176,7 +176,7 @@ needs fixes to simply push a new release, and flag the current release as not wo
 
 New readthedocs version
 -----------------------
- 
+
 First gain access to the readthedocs account (that is currently accessible by Rich, Evan, Joey, Earl, Meridith, and Philip). Then:
 
 - Go to the ``Versions`` page

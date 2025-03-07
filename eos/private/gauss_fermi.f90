@@ -77,11 +77,11 @@ contains
 
 !   definition of xi:
       eta1=sg*(eta-d)
-      if (eta1.le.5.d1) then
+      if (eta1<=5.d1) then
         xi=log(1.d0+exp(eta1))/sg
       else
         xi=eta-d
-      endif
+      end if
       xi2=xi*xi
 
 !   definition of the x_i:
@@ -153,7 +153,7 @@ contains
       dxst  = sqrt(1.0d0 + 0.5d0*x*theta)
 
 !   avoid overflow in the exponentials at large x
-      if ((x-eta) .lt. 1.0d2) then
+      if ((x-eta) < 1.0d2) then
        factor  = exp(x-eta)
        denom   = factor + 1.0d0
        fd      = xdk * dxst / denom
@@ -167,7 +167,7 @@ contains
        fdeta    = fd
        denom2   = 4.0d0 * dxst
        fdtheta  = xdkp1/denom2 * factor
-      endif
+      end if
 
       return
    end subroutine fdfunc1
@@ -195,7 +195,7 @@ contains
       dxst  = sqrt(1.0d0 + 0.5d0 * xsq * theta)
 
 !   avoid an overflow in the denominator at large x:
-      if ((xsq-eta) .lt. 1.d2) then
+      if ((xsq-eta) < 1.d2) then
        factor  = exp(xsq - eta)
        denom   = factor + 1.0d0
        fd      = 2.0d0 * xdk * dxst/denom
@@ -209,7 +209,7 @@ contains
        fdeta   = fd
        denom2  = 4.0d0 * dxst
        fdtheta = 2.0d0 * xdkp1/denom2 * factor
-      endif
+      end if
 
       return
    end subroutine fdfunc2
@@ -229,7 +229,14 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j, n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(5),xg(5)
@@ -276,7 +283,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -298,7 +305,14 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(10),xg(10)
@@ -358,7 +372,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -380,7 +394,14 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(20),xg(20)
@@ -459,7 +480,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -481,7 +502,14 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(40),xg(40)
@@ -601,7 +629,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -621,7 +649,14 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(10),xg(10),fval,dfval,ddfval
@@ -674,7 +709,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b
@@ -694,7 +729,14 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(20),xg(20),fval,dfval,ddfval
@@ -767,7 +809,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b
@@ -787,7 +829,14 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(40),xg(40),fval,dfval,ddfval
@@ -901,7 +950,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b
@@ -921,7 +970,14 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            implicit none
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(80),xg(80),fval,dfval,ddfval
@@ -1114,7 +1170,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b

@@ -284,7 +284,7 @@
          ! here is a relative limit
          chi2_relative_increase_limit = 2.0d0
          limit_num_chi2_too_big = 20
-         ! if limit_num_chi2_too_big consequtive chi2s
+         ! if limit_num_chi2_too_big consecutive chi2s
          ! are > chi2_relative_increase_limit times the best chi2 for the run,
          ! then stop the run.
          

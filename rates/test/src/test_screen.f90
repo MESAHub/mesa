@@ -38,7 +38,7 @@ module test_screen
    subroutine do_test_screen
       use chem_def
       use chem_lib
-      use const_lib
+      use const_lib, only: dp, const_init
       use math_lib
 
       integer, parameter :: num_isos = 8, max_z_to_cache = 12
@@ -48,7 +48,7 @@ module test_screen
             dabar_dx(num_isos), dzbar_dx(num_isos), temp, den, logT, logRho, &
             sc1a, sc1adt, sc1add, xh, xhe, dmc_dx(num_isos), iso_z158(num_isos)
       type (Screen_Info) :: sc
-      real(dp) :: zs13, zhat, zhat2, lzav, aznut, zs13inv, mass_correction!approx_abar, approx_zbar
+      real(dp) :: zs13, zhat, zhat2, lzav, aznut, zs13inv, mass_correction  !approx_abar, approx_zbar
       integer :: i
       integer :: h1, he3, he4, c12, n14, o16, ne20, mg24
       character (len=32) :: my_mesa_dir

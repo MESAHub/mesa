@@ -27,7 +27,7 @@
 module turb_support
 
 use star_private_def
-use const_def
+use const_def, only: dp, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -60,7 +60,7 @@ contains
       end if
    end function check_if_must_fall_back_to_MLT
 
-   subroutine get_gradT(s, MLT_option, & ! used to create models
+   subroutine get_gradT(s, MLT_option, &  ! used to create models
          r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -202,7 +202,7 @@ contains
       Lambda = mixing_length_alpha*scale_height
       grav = cgrav*m/pow2(r)
       if (s% use_Ledoux_criterion) then
-         gradL = grada + gradL_composition_term ! Ledoux temperature gradient
+         gradL = grada + gradL_composition_term  ! Ledoux temperature gradient
       else
          gradL = grada
       end if

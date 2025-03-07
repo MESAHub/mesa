@@ -26,7 +26,7 @@
 
       module ion_tables_eval
 
-      use const_def, only: dp, one_sixth
+      use const_def, only: dp, one_sixth, arg_not_provided
       use ionization_def
       use math_lib
       use utils_lib, only: mesa_error
@@ -44,19 +44,19 @@
       subroutine Get_ion_Results(&
                Z_in, X_in, arho, alogrho, atemp, alogtemp, &
                res, ierr)
-         use const_def
+         use const_def, only: dp
          use utils_lib, only: is_bad
          use ion_tables_load, only: Load_ion_Table
 
          ! INPUT
 
-         real(dp), intent(in) :: Z_in ! the desired Z
-         real(dp), intent(in) :: X_in ! the desired X
+         real(dp), intent(in) :: Z_in  ! the desired Z
+         real(dp), intent(in) :: X_in  ! the desired X
 
-         real(dp), intent(in) :: arho, alogrho ! the density
+         real(dp), intent(in) :: arho, alogrho  ! the density
             ! provide both if you have them.  else pass one and set the other to = arg_not_provided
 
-         real(dp), intent(in) :: atemp, alogtemp ! the temperature
+         real(dp), intent(in) :: atemp, alogtemp  ! the temperature
             ! provide both if you have them.  else pass one and set the other to = arg_not_provided
 
 
@@ -81,7 +81,7 @@
             lnE, energy, dlnE_dlnRho, dlnE_dlnT, &
             lnS, entropy, dlnS_dlnRho, dlnS_dlnT, &
             d_alfa_dlogT, d_alfa_dlogRho, d_beta_dlogT, d_beta_dlogRho
-         real(dp), parameter :: dZ_transition = 0.01d0 ! must be > 0
+         real(dp), parameter :: dZ_transition = 0.01d0  ! must be > 0
          real(dp), parameter :: logT_margin = 0.1d0
          real(dp), parameter :: tiny = 1d-20
 
@@ -226,7 +226,7 @@
             Z1 = ion_Zs(iz1)
             Z2 = ion_Zs(iz2)
             alfa = (Z - Z1) / (Z2 - Z1)
-            alfa = (1 - cospi(alfa))/2 ! smooth the transitions
+            alfa = (1 - cospi(alfa))/2  ! smooth the transitions
             beta = 1 - alfa
             call Get_ion_for_X(iz1, X, Rho, logRho, T, logT, res_zx(:, 1), ierr)
             if (ierr /= 0) return
@@ -242,7 +242,7 @@
 
 
       subroutine Get_ion_for_X(iz, X, Rho, logRho, T, logT,res, ierr)
-         integer, intent(in) :: iz ! the index in ion_Zs
+         integer, intent(in) :: iz  ! the index in ion_Zs
          real(dp), intent(in) :: X, Rho, logRho, T, logT
          real(dp), intent(inout) :: res(num_ion_vals)
          integer, intent(out) :: ierr
@@ -252,7 +252,7 @@
          character (len=256) :: message
          integer :: ix, ix_lo, ix_hi, j, num_Xs
          real(dp), parameter :: tiny = 1d-6
-         logical, parameter :: dbg_for_X = dbg ! .or. .true.
+         logical, parameter :: dbg_for_X = dbg  ! .or. .true.
 
          ierr = 0
 
@@ -481,44 +481,44 @@
 
          ierr = 0
          hx=x1-x0
-         hxi=1.0/hx
+         hxi=1.0d0/hx
          hx2=hx*hx
 
          xp=(xget-x0)*hxi
-         xpi=1.0-xp
+         xpi=1.0d0-xp
          xp2=xp*xp
          xpi2=xpi*xpi
 
-         ax=xp2*(3.0-2.0*xp)
-         axbar=1.0-ax
+         ax=xp2*(3.0d0-2.0d0*xp)
+         axbar=1.0d0-ax
 
          bx=-xp2*xpi
          bxbar=xpi2*xp
 
-         cx=xp*(xp2-1.0)
-         cxi=xpi*(xpi2-1.0)
-         cxd=3.0*xp2-1.0
-         cxdi=-3.0*xpi2+1.0
+         cx=xp*(xp2-1.0d0)
+         cxi=xpi*(xpi2-1.0d0)
+         cxd=3.0d0*xp2-1.0d0
+         cxdi=-3.0d0*xpi2+1.0d0
 
          hy=y1-y0
-         hyi=1.0/hy
+         hyi=1.0d0/hy
          hy2=hy*hy
 
          yp=(yget-y0)*hyi
-         ypi=1.0-yp
+         ypi=1.0d0-yp
          yp2=yp*yp
          ypi2=ypi*ypi
 
-         ay=yp2*(3.0-2.0*yp)
-         aybar=1.0-ay
+         ay=yp2*(3.0d0-2.0d0*yp)
+         aybar=1.0d0-ay
 
          by=-yp2*ypi
          bybar=ypi2*yp
 
-         cy=yp*(yp2-1.0)
-         cyi=ypi*(ypi2-1.0)
-         cyd=3.0*yp2-1.0
-         cydi=-3.0*ypi2+1.0
+         cy=yp*(yp2-1.0d0)
+         cyi=ypi*(ypi2-1.0d0)
+         cyd=3.0d0*yp2-1.0d0
+         cydi=-3.0d0*ypi2+1.0d0
 
          sixth_hx2 = one_sixth*hx2
          sixth_hy2 = one_sixth*hy2

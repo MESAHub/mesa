@@ -80,7 +80,7 @@
          include 'formats'
 
          select case (s% x_integer_ctrl(1))
-         case(2) ! inlist_adjust_net
+         case(2)  ! inlist_adjust_net
             if (s% species == 62) then
                write(*,'(a,i3)') 'finished with expected number of species', s% species
             else

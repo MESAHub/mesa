@@ -2,14 +2,13 @@ module skye_coulomb
    use math_lib
    use math_def
    use auto_diff
-   use const_def, only: dp, PI, rbohr, qe, amu, me
+   use const_def, only: dp, pi, rbohr, qe, amu, me, boltzm, five_thirds, kerg
    use skye_coulomb_solid
    use skye_coulomb_liquid
 
    implicit none
 
    logical, parameter :: dbg = .false.
-   !logical, parameter :: dbg = .true.
 
    private
 
@@ -65,11 +64,11 @@ module skye_coulomb
          Z53=Z53+AY(IX)*pow(AZION(IX), five_thirds)
          Z52=Z52+AY(IX)*pow5(sqrt(AZion(IX)))
          Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0))
-      enddo
+      end do
 
-      DENS = xnefer * pow3(rbohr) ! DENS = (electrons per cubic bohr)
-      RS = pow(3d0 / (4d0 * PI * DENS),1d0/3d0) ! r_s - electron density parameter
-      GAME = qe * qe / (rbohr * boltzm * temp * RS) ! electron Coulomb parameter Gamma_e
+      DENS = xnefer * pow3(rbohr)  ! DENS = (electrons per cubic bohr)
+      RS = pow(3d0 / (4d0 * PI * DENS),1d0/3d0)  ! r_s - electron density parameter
+      GAME = qe * qe / (rbohr * boltzm * temp * RS)  ! electron Coulomb parameter Gamma_e
 
       ! Electron exchange-correlation free energy
       F_phase_independent = Zmean * EXCOR7(RS,GAME)
@@ -153,7 +152,7 @@ module skye_coulomb
       dF_blur = dF_blur - dF
 
       ! Latent entropy
-      latent_S = -(differentiate_1(dF_blur)) ! S = -dF/dT
+      latent_S = -(differentiate_1(dF_blur))  ! S = -dF/dT
 
       ! T dS/dlnT = T^2 dS/dT
       latent_ddlnT = differentiate_1(latent_S) *  pow2(temp)
@@ -222,26 +221,26 @@ module skye_coulomb
 
       ! Composition loop
       do i=1,nmix
-         if (AY(i) > TINY .and. AZion(i) /= 0d0) then ! skip low-abundance species and neutrons
+         if (AY(i) > TINY .and. AZion(i) /= 0d0) then  ! skip low-abundance species and neutrons
 
             ! Add up non-ideal corrections
             f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i), min_gamma_for_solid, max_gamma_for_liquid)
             if (LIQSOL == 0) then
-               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
+               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS)  ! screening corrections
             else
-               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
+               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS)  ! screening corrections
             end if
             dF = dF + AY(i) * f
 
          end if
-      enddo
+      end do
 
       ! Corrections to the linear mixing rule:
-      if (LIQSOL == 0) then ! liquid phase
+      if (LIQSOL == 0) then  ! liquid phase
          FMIX = liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321)
-      else ! solid phase (only Madelung contribution) [22.12.12]
+      else  ! solid phase (only Madelung contribution) [22.12.12]
          FMIX = solid_mixing_rule_correction(Skye_solid_mixing_rule, NMIX, AY, AZion, GAME)
-      endif
+      end if
       dF = dF + FMIX
 
    end function nonideal_corrections_phase
@@ -270,8 +269,8 @@ module skye_coulomb
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-      GAMI = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
-      COTPT=sqrt(3d0 * me_in_amu / CMI)/pre_z(int(Zion))%z7_6 ! auxiliary coefficient
+      GAMI = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp * RS)  ! ion Coulomb parameter Gamma_i
+      COTPT=sqrt(3d0 * me_in_amu / CMI)/pre_z(int(Zion))%z7_6  ! auxiliary coefficient
       TPT=GAMI*COTPT/sqrt(RS)                   ! T_p/T
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
@@ -300,7 +299,7 @@ module skye_coulomb
          temp_boundary%d1val1 = 1d0
 
          ! Compute new (differentiable) Gamma and TPT at the boundary
-         g = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp_boundary * RS) ! ion Coulomb parameter Gamma_i
+         g = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp_boundary * RS)  ! ion Coulomb parameter Gamma_i
          tp=g*COTPT/sqrt(RS)                  ! T_p/T
 
          ! Compute boundary free energy
@@ -367,9 +366,9 @@ module skye_coulomb
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
       else
-         F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
-         F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
-      endif
+         F = ocp_solid_harmonic_free_energy(GAMI,TPT)  ! harmonic classical and quantum ion-ion corrections
+         F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT)  ! anharmonic classical and quantum ion-ion corrections
+      end if
 
    end function ocp_free_energy
 
@@ -399,26 +398,26 @@ module skye_coulomb
       ! Output
       type(auto_diff_real_2var_order3) :: FXC
 
-      THETA=0.543d0*RS/GAME ! non-relativistic degeneracy parameter
+      THETA=0.543d0*RS/GAME  ! non-relativistic degeneracy parameter
       SQTH=sqrt(THETA)
       THETA2=THETA*THETA
       THETA3=THETA2*THETA
       THETA4=THETA3*THETA
-      if (THETA.gt..007d0) then
+      if (THETA>.007d0) then
          CHT1=cosh(1.d0/THETA)
          SHT1=sinh(1.d0/THETA)
          CHT2=cosh(1.d0/SQTH)
          SHT2=sinh(1.d0/SQTH)
-         T1=SHT1/CHT1 ! dtanh(1.d0/THETA)
-         T2=SHT2/CHT2 ! dtanh(1./sqrt(THETA))
+         T1=SHT1/CHT1  ! dtanh(1.d0/THETA)
+         T2=SHT2/CHT2  ! dtanh(1./sqrt(THETA))
       else
          T1=1.d0
          T2=1.d0
-      endif
+      end if
 
       A0=0.75d0+3.04363d0*THETA2-0.09227d0*THETA3+1.7035d0*THETA4
       A1=1d0+8.31051d0*THETA2+5.1105d0*THETA4
-      A=0.610887d0*A0/A1*T1 ! HF fit of Perrot and Dharma-wardana
+      A=0.610887d0*A0/A1*T1  ! HF fit of Perrot and Dharma-wardana
 
       B0=0.341308d0+12.070873d0*THETA2+1.148889d0*THETA4
       B1=1d0+10.495346d0*THETA2+1.326623d0*THETA4

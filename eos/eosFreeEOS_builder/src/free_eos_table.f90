@@ -43,7 +43,7 @@ module free_eos_table
    integer, parameter :: i_dse = i_dsp + 1
    integer, parameter :: num_results = i_dse
 
-   integer, parameter :: kif = 2 !for P(Rho,T)
+   integer, parameter :: kif = 2  !for P(Rho,T)
 
    !for MESA
    integer, parameter ::   h1 =  1
@@ -81,17 +81,17 @@ contains
       integer, intent(in) :: eos_version
       integer :: my_ifopt, my_ifmod, my_ifion
       select case (eos_version)
-      case (1) !EOS1 could also try EOS1a with ifion=-1
+      case (1)  !EOS1 could also try EOS1a with ifion=-1
          my_ifopt = 3; my_ifmod = 1; my_ifion = -2
-      case (2) !EOS2
+      case (2)  !EOS2
          my_ifopt = 2; my_ifmod = 1; my_ifion = -1
-      case (3) !EOS3
+      case (3)  !EOS3
          my_ifopt = 1; my_ifmod = 1; my_ifion =  0
-      case (4) !EOS4
+      case (4)  !EOS4
          my_ifopt = 1; my_ifmod=101; my_ifion =  0
-      case (5) !EOS1a
+      case (5)  !EOS1a
          my_ifopt = 3; my_ifmod = 1; my_ifion = -1
-      case default !default to EOS4
+      case default  !default to EOS4
          my_ifopt = 1; my_ifmod=101; my_ifion =  0
       end select
       call free_eos_set_options(my_ifopt,my_ifmod,my_ifion)
@@ -104,7 +104,6 @@ contains
    end subroutine free_eos_set_options
 
    subroutine free_eos_eval(logRho,logT,mass_frac,result)
-      implicit none
       real(dp), intent(inout) :: logRho
       real(dp), intent(in)  :: logT,mass_frac(Neps)
       real(dp), intent(out) :: result(num_results)
@@ -137,7 +136,7 @@ contains
 
       chiRho = pressure(2)
       chiT   = pressure(3)
-      Prad  = radiation_pressure(T) !mesa/eos function
+      Prad  = radiation_pressure(T)  !mesa/eos function
 
       if(entropy(1) < 0._dp) then
          if(debug) write(*,*) 'T, Rho, S', T, Rho, entropy(1)
@@ -149,7 +148,7 @@ contains
 
       dpe = (rho/p)*energy(2) + chiT - 1._dp         !good
       dse = T*(entropy(3)/energy(3)) - 1._dp         !good
-      dsp = -rho*rho*(dS_dRho_constT/dP_dT_constRho) - 1._dp !good
+      dsp = -rho*rho*(dS_dRho_constT/dP_dT_constRho) - 1._dp  !good
 
       result(i_lnPgas) = log10(P - Prad)
       result(i_lnE)    = log10(energy(1))
@@ -158,10 +157,10 @@ contains
       result(i_chiRho) = chiRho
       result(i_chiT)   = chiT
       result(i_Cp)     = Cp
-      result(i_Cv)     = energy(3)/T !(1/T)*dE/dlnT
-      result(i_dE_dRho)= energy(2)/Rho !(1/Rho)*dE/dlnRho
-      result(i_dS_dT)  = entropy(3)/T !(1/T)*dS/dlnT
-      result(i_dS_dRho)= entropy(2)/Rho !(1/Rho)*dS/dlnRho
+      result(i_Cv)     = energy(3)/T  !(1/T)*dE/dlnT
+      result(i_dE_dRho)= energy(2)/Rho  !(1/Rho)*dE/dlnRho
+      result(i_dS_dT)  = entropy(3)/T  !(1/T)*dS/dlnT
+      result(i_dS_dRho)= entropy(2)/Rho  !(1/Rho)*dS/dlnRho
       result(i_mu)     = 1_dp/xmu1
       result(i_lnfree_e)= log(xmu3)
       result(i_gamma1) = gamma1
@@ -271,7 +270,7 @@ contains
       !now, read namelist
       open(newunit=io_unit,file='inlist',action='read',delim='quote',status='old',iostat=ierr)
       if(ierr/=0) stop 'free_eos_table: problem opening inlist file'
-      read(io_unit, nml=eos_table, iostat=ierr) !'
+      read(io_unit, nml=eos_table, iostat=ierr)  !'
       if(ierr/=0) stop 'free_eos_table: problem reading inlist file'
       close(io_unit)
 
@@ -289,19 +288,19 @@ contains
    subroutine set_mass_fractions
       character(len=2) :: element
       integer :: io_unit
-      mass_frac(1) = 1d0 !H
-      mass_frac(2) = 1d0 !He
+      mass_frac(1) = 1d0  !H
+      mass_frac(2) = 1d0  !He
       open(newunit=io_unit,file=trim(mass_list),action='read',status='old',iostat=ierr)
       if(ierr/=0) then
          write(*,*) 'free_eos_table: problem opening mass fractions list: ', trim(mass_list)
          stop
       endif
-      read(io_unit,*,iostat=ierr) !header line
+      read(io_unit,*,iostat=ierr)  !header line
       if(ierr/=0) then
          write(*,*) 'free_eos_table: problem reading mass fractions list: ', trim(mass_list)
          stop
       endif
-      do i=3,Neps !read mass fractions of C - Ni
+      do i=3,Neps  !read mass fractions of C - Ni
          read(io_unit,*,iostat=ierr) element, mass_frac(i)
          if(ierr/=0) then
             write(*,*) 'free_eos_table: problem reading mass fractions list: ', trim(mass_list)
@@ -443,7 +442,7 @@ contains
       !..allocate and load the eos tables
       character (len=256) :: eos_file_prefix, my_mesa_dir
       integer :: info
-      double precision :: logT_all_HELM, logT_all_OPAL
+      real(dp) :: logT_all_HELM, logT_all_OPAL
       logical :: use_cache
 
       eos_file_prefix = 'mesa'
@@ -531,7 +530,7 @@ contains
          res, d_dlnRho_const_T, d_dlnT_const_Rho
       real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results,neps)
       logical :: off_table
-      real(dp), parameter :: logRho_min = -32.23619130191664_dp !-14 * ln10
+      real(dp), parameter :: logRho_min = -32.23619130191664_dp  !-14 * ln10
       integer :: ierr
 
       T = exp(logT)
@@ -547,7 +546,7 @@ contains
          res, d_dlnRho_const_T, d_dlnT_const_Rho, &
          d_dxa_const_TRho, ierr)
 
-      if (ierr/=0) then !bail to HELM
+      if (ierr/=0) then  !bail to HELM
 
          logRho = max(logRho_min, logRho0)
          Rho = exp(logRho)

@@ -26,7 +26,7 @@
       module pgstar_HR
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use pgstar_support
       use star_pgstar
 
@@ -117,17 +117,17 @@
             call pgsls(Line_Type_Solid)
             call pgslw(s% pg% pgstar_lw)
             call pgsci(clr_Silver)
-            call pgmove(5.1, 4.3) ! DOV
+            call pgmove(5.1, 4.3)  ! DOV
             call pgdraw(4.8, 0.3)
             call pgdraw(4.95, 0.9)
             call pgdraw(5.38, 4.2)
             call pgdraw(5.1, 4.3)
-            call pgmove(4.42, -0.7) ! DBV
+            call pgmove(4.42, -0.7)  ! DBV
             call pgdraw(4.34, -1.2)
             call pgdraw(4.38, -1.7)
             call pgdraw(4.45, -1.4)
             call pgdraw(4.42, -0.7)
-            call pgmove(4.03, -2.4) ! DAV
+            call pgmove(4.03, -2.4)  ! DAV
             call pgdraw(4.03, -3.4)
             call pgdraw(4.1, -3.2)
             call pgdraw(4.1, -2.2)

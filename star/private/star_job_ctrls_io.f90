@@ -1739,7 +1739,7 @@
             read(iounit,'(A)',iostat=iostat) str
             ind = index(trim(str),trim(upper_name))
             if( ind /= 0 ) then
-               val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
+               val = str(ind+len_trim(upper_name):len_trim(str)-1)  ! Remove final comma and starting =
                do i=1,len(val)
                   if(val(i:i)=='"') val(i:i) = ' '
                end do
@@ -1780,4 +1780,3 @@
 
 
       end module star_job_ctrls_io
-

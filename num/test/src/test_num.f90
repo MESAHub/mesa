@@ -164,7 +164,7 @@
       decsol = lapack
       if (show_all) then
          do i=1,num_solvers
-               if (i <= ros3pl_solver) cycle ! beam is too hard for these
+               if (i <= ros3pl_solver) cycle  ! beam is too hard for these
             call do_test_beam(i,decsol,.true.,show_all,quiet)
          end do
       end if

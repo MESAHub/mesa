@@ -26,7 +26,7 @@
 module pgbinary_hist_track
 
    use binary_private_def
-   use const_def
+   use const_def, only: dp
    use pgbinary_support
 
    implicit none

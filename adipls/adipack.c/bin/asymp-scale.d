@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/auxprg/asymp-scale.d.x
 if [ $# -eq 0 ]
 then

@@ -26,7 +26,7 @@
 
       module binary_jdot
 
-      use const_def
+      use const_def, only: dp, pi, clight, standard_cgrav, rsun, convective_mixing
       use star_lib
       use star_def
       use math_lib

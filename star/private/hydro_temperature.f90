@@ -27,7 +27,7 @@
       module hydro_temperature
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -90,7 +90,7 @@
          if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
                .and. s% mixing_type(k) == convective_mixing .and. s% gradr(k) > 0d0 &
                .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5) then
-            Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k) ! C&G 14.109
+            Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k)  ! C&G 14.109
          else
             Lrad_ad = L_ad
          end if
@@ -287,7 +287,7 @@
          dT = Tm1 - T00
          alfa = s% dm(k-1)/(s% dm(k-1) + s% dm(k))
          Tpoint = alfa*T00 + (1d0 - alfa)*Tm1
-         lnTdiff = dT/Tpoint ! use this in place of lnT(k-1)-lnT(k)
+         lnTdiff = dT/Tpoint  ! use this in place of lnT(k-1)-lnT(k)
          delm = (s% dm(k) + s% dm(k-1))/2
 
          resid = delm*dlnTdm - lnTdiff
@@ -318,7 +318,7 @@
 
 
       ! only used for dlnT_dm equation
-      subroutine eval_dlnPdm_qhse(s, k, & ! calculate the expected dlnPdm for HSE
+      subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
             dlnPdm_qhse, Ppoint, ierr)
          use hydro_momentum, only: expected_HSE_grav_term
          type (star_info), pointer :: s
@@ -352,7 +352,7 @@
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if
 
-         dlnPdm_qhse = grav/(area*Ppoint) ! note that expected_HSE_grav_term is negative
+         dlnPdm_qhse = grav/(area*Ppoint)  ! note that expected_HSE_grav_term is negative
 
          if (is_bad(dlnPdm_qhse%val)) then
             ierr = -1

@@ -66,7 +66,7 @@ contains
             SUM = SUM + Y(I, J)
          end do
          SUM = SUM/DBLE(N)
-         IF (IW .GT. 0) SUM = SUM + 1.0D0/DBLE(I*I - 2*I)
+         IF (IW > 0) SUM = SUM + 1.0D0/DBLE(I*I - 2*I)
          IW = -IW
          F = F + SUM*SUM
       end do

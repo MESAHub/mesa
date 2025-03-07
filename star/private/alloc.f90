@@ -281,7 +281,7 @@
 
             deallocate(s%other_star_info)
 
-         endif
+         end if
 
          call dealloc_history(s)
 
@@ -475,7 +475,7 @@
          include 'formats'
 
          ierr = 0
-         null_str = '' ! avoid bogus compiler warnings 'array subscript 1 is above array bounds'
+         null_str = ''  ! avoid bogus compiler warnings 'array subscript 1 is above array bounds'
 
 
          species = s% species
@@ -497,12 +497,12 @@
          if (action == do_copy_pointers_and_resize) then
             if (associated(c_in)) then
                c => c_in
-            else ! nothing to copy, so switch to allocate
+            else  ! nothing to copy, so switch to allocate
                action = do_allocate
             end if
          end if
 
-         do ! just so can exit on failure
+         do  ! just so can exit on failure
 
             if (action /= do_fill_arrays_with_NaNs) then
                ! these arrays must not be filled with NaNs
@@ -2379,7 +2379,7 @@
             s% i_dlnR_dt = s% i_lnR
             s% i_dv_dt = s% i_v
             s% i_du_dt = s% i_u
-         else ! HSE is included in dv_dt, so drop dlnR_dt
+         else  ! HSE is included in dv_dt, so drop dlnR_dt
             s% i_equL = s% i_lnd
             s% i_dv_dt = s% i_lnT
             s% i_dlnE_dt = s% i_lum
@@ -2447,7 +2447,7 @@
 
          include 'formats'
 
-         if (s% nvar_hydro == 0) return ! not ready to set chem names yet
+         if (s% nvar_hydro == 0) return  ! not ready to set chem names yet
 
          old_size = size(s% nameofvar,dim=1)
          if (old_size < s% nvar_total) then
@@ -2553,7 +2553,7 @@
 
          if (crit) then
 !$omp critical (alloc_work_array1)
-            num_calls = num_calls + 1 ! not safe, but just for info
+            num_calls = num_calls + 1  ! not safe, but just for info
             do i = 1, num_work_arrays
                if (get1(i)) then
                   okay = .true.
@@ -3093,22 +3093,22 @@
                deallocate(work_pointers(i)%p)
                nullify(work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_int_work_arrays
             if (associated(int_work_pointers(i)%p)) then
                deallocate(int_work_pointers(i)%p)
                nullify(int_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_logical_work_arrays
             if (associated(logical_work_pointers(i)%p)) then
                deallocate(logical_work_pointers(i)%p)
                nullify(logical_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
 
       end subroutine free_work_arrays
 

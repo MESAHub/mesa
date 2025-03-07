@@ -52,30 +52,30 @@
       !    Output, real ( kind = 8 ) GLOMIN, the value F(X).
       !
 
-        real    ( kind = 8 ) a0
-        real    ( kind = 8 ) a2
-        real    ( kind = 8 ) a3
-        real    ( kind = 8 ) d0
-        real    ( kind = 8 ) d1
-        real    ( kind = 8 ) d2
-        real    ( kind = 8 ) h
-        integer ( kind = 4 ) k, iter
-        real    ( kind = 8 ) m2
-        real    ( kind = 8 ) p
-        real    ( kind = 8 ) q
-        real    ( kind = 8 ) qs
-        real    ( kind = 8 ) r
-        real    ( kind = 8 ) s
-        real    ( kind = 8 ) sc
-        real    ( kind = 8 ) y
-        real    ( kind = 8 ) y0
-        real    ( kind = 8 ) y1
-        real    ( kind = 8 ) y2
-        real    ( kind = 8 ) y3
-        real    ( kind = 8 ) yb
-        real    ( kind = 8 ) z0
-        real    ( kind = 8 ) z1
-        real    ( kind = 8 ) z2
+        real    ( kind = 8 ) :: a0
+        real    ( kind = 8 ) :: a2
+        real    ( kind = 8 ) :: a3
+        real    ( kind = 8 ) :: d0
+        real    ( kind = 8 ) :: d1
+        real    ( kind = 8 ) :: d2
+        real    ( kind = 8 ) :: h
+        integer ( kind = 4 ) :: k, iter
+        real    ( kind = 8 ) :: m2
+        real    ( kind = 8 ) :: p
+        real    ( kind = 8 ) :: q
+        real    ( kind = 8 ) :: qs
+        real    ( kind = 8 ) :: r
+        real    ( kind = 8 ) :: s
+        real    ( kind = 8 ) :: sc
+        real    ( kind = 8 ) :: y
+        real    ( kind = 8 ) :: y0
+        real    ( kind = 8 ) :: y1
+        real    ( kind = 8 ) :: y2
+        real    ( kind = 8 ) :: y3
+        real    ( kind = 8 ) :: yb
+        real    ( kind = 8 ) :: z0
+        real    ( kind = 8 ) :: z1
+        real    ( kind = 8 ) :: z2
 
         ierr = 0
         a0 = b
@@ -273,7 +273,7 @@
       real(dp), intent(out) :: x
       integer, intent(out) :: ierr
 
-   !*****************************************************************************80
+   ! *****************************************************************************80
    !
    !! LOCAL_MIN seeks a local minimum of a function F(X) in an interval [A,B].
    !
@@ -339,25 +339,25 @@
    !    Output, real ( kind = 8 ) LOCAL_MIN, the value F(X).
    !
 
-     real ( kind = 8 ) c
-     real ( kind = 8 ) d
-     real ( kind = 8 ) e
-     real ( kind = 8 ) fu
-     real ( kind = 8 ) fv
-     real ( kind = 8 ) fw
-     real ( kind = 8 ) fx
-     real ( kind = 8 ) m
-     real ( kind = 8 ) p
-     real ( kind = 8 ) q
-     real ( kind = 8 ) r
-     real ( kind = 8 ) sa
-     real ( kind = 8 ) sb
-     real ( kind = 8 ) t2
-     real ( kind = 8 ) tol
-     real ( kind = 8 ) u
-     real ( kind = 8 ) v
-     real ( kind = 8 ) w
-     integer ( kind = 4 ) iter
+     real ( kind = 8 ) :: c
+     real ( kind = 8 ) :: d
+     real ( kind = 8 ) :: e
+     real ( kind = 8 ) :: fu
+     real ( kind = 8 ) :: fv
+     real ( kind = 8 ) :: fw
+     real ( kind = 8 ) :: fx
+     real ( kind = 8 ) :: m
+     real ( kind = 8 ) :: p
+     real ( kind = 8 ) :: q
+     real ( kind = 8 ) :: r
+     real ( kind = 8 ) :: sa
+     real ( kind = 8 ) :: sb
+     real ( kind = 8 ) :: t2
+     real ( kind = 8 ) :: tol
+     real ( kind = 8 ) :: u
+     real ( kind = 8 ) :: v
+     real ( kind = 8 ) :: w
+     integer ( kind = 4 ) :: iter
 
      ierr = 0
 
@@ -514,7 +514,7 @@
 
    real(dp) function eval_brent_safe_zero ( a, b, machep, t, epsy, f, fa_in, fb_in, lrpar, rpar, lipar, ipar, ierr )
 
-   !*****************************************************************************80
+   ! *****************************************************************************80
    !
    !! seeks the root of a function F(X) in an interval [A,B].
    !
@@ -566,35 +566,34 @@
    !    Output, real ( kind = 8 ) ZERO, the estimated value of a zero of
    !    the function F.
    !
-     implicit none
 
      interface
 #include "num_root_fcn.dek"
      end interface
      integer, intent(in) :: lipar, lrpar
-     integer, intent(inout), pointer :: ipar(:) ! (lipar)
-     real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+     integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+     real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
      integer, intent(out) :: ierr
 
-     real ( kind = 8 ) a
-     real ( kind = 8 ) b
-     real ( kind = 8 ) c
-     real ( kind = 8 ) d
-     real ( kind = 8 ) e
-     real ( kind = 8 ) fa, fa_in
-     real ( kind = 8 ) fb, fb_in
-     real ( kind = 8 ) fc
-     real ( kind = 8 ) m
-     real ( kind = 8 ) machep
-     real ( kind = 8 ) p
-     real ( kind = 8 ) q
-     real ( kind = 8 ) r
-     real ( kind = 8 ) s
-     real ( kind = 8 ) sa
-     real ( kind = 8 ) sb
-     real ( kind = 8 ) t, epsy
-     real ( kind = 8 ) tol
-     real ( kind = 8 ) dfdx
+     real ( kind = 8 ) :: a
+     real ( kind = 8 ) :: b
+     real ( kind = 8 ) :: c
+     real ( kind = 8 ) :: d
+     real ( kind = 8 ) :: e
+     real ( kind = 8 ) :: fa, fa_in
+     real ( kind = 8 ) :: fb, fb_in
+     real ( kind = 8 ) :: fc
+     real ( kind = 8 ) :: m
+     real ( kind = 8 ) :: machep
+     real ( kind = 8 ) :: p
+     real ( kind = 8 ) :: q
+     real ( kind = 8 ) :: r
+     real ( kind = 8 ) :: s
+     real ( kind = 8 ) :: sa
+     real ( kind = 8 ) :: sb
+     real ( kind = 8 ) :: t, epsy
+     real ( kind = 8 ) :: tol
+     real ( kind = 8 ) :: dfdx
 
      ierr = 0
 

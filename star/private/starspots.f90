@@ -26,7 +26,7 @@
 module starspots
 
    use star_private_def
-   use const_def
+   use const_def, only: dp, pi4, boltz_sigma, cgas
    use utils_lib
 
    implicit none
@@ -58,7 +58,7 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradr_spot
 
       real(dp) :: mu_ideal_gas, R2, Teff_local, PB_i
-      type(auto_diff_real_star_order1) :: xspot_of_r ! xspot4
+      type(auto_diff_real_star_order1) :: xspot_of_r  ! xspot4
 
       if (.not. s%doing_relax .and. .not. s%doing_first_model_of_run) then
          mu_ideal_gas = s%mu(1)  !1.00794d0 ! for hydrogen, 1 gram per mole

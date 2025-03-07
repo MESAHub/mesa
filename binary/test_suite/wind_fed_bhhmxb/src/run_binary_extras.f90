@@ -124,12 +124,12 @@
          integer, intent(out) :: ierr
          logical, intent(in) :: restart
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          if (.not. restart) then
-            b% lxtra(lx_tested_super_edd) = .false. ! this is used to verify that the system has a super edd phase
-            b% lxtra(lx_tested_sub_edd) = .false. ! this is used to verify that the system has a sub edd phase
+            b% lxtra(lx_tested_super_edd) = .false.  ! this is used to verify that the system has a super edd phase
+            b% lxtra(lx_tested_sub_edd) = .false.  ! this is used to verify that the system has a sub edd phase
          end if
 
          call test_suite_startup(b, restart, ierr)
@@ -144,7 +144,7 @@
 
          extras_binary_start_step = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -156,7 +156,7 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_check_model = keep_going
@@ -171,12 +171,12 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          real(dp) :: frac_error
-         real(dp) :: actual_mtransfer_rate !actual rate of mass falling into the BH
-         real(dp) :: expected_mdot_system !rate of mass loss from vicinity of BH (includes rest mass energy from radiation)
-         real(dp) :: expected_mdot_wind !rate of mass loss from the system as a wind from donor
+         real(dp) :: actual_mtransfer_rate  !actual rate of mass falling into the BH
+         real(dp) :: expected_mdot_system  !rate of mass loss from vicinity of BH (includes rest mass energy from radiation)
+         real(dp) :: expected_mdot_wind  !rate of mass loss from the system as a wind from donor
          real(dp) :: donor_wind_mdot
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_finish_step = keep_going
@@ -213,7 +213,7 @@
          donor_wind_mdot = b% s_donor% mstar_dot - b% mtransfer_rate
          frac_error = abs((b% mdot_wind_transfer(b% d_i)-donor_wind_mdot*b% wind_xfer_fraction(b% d_i)) &
             /b% mdot_wind_transfer(b% d_i))
-         if (frac_error > 1e-10) then ! there's a loss of precision when adding wind and mtransfer_rate, so test is not that strigent
+         if (frac_error > 1e-10) then  ! there's a loss of precision when adding wind and mtransfer_rate, so test is not that strigent
                write(*,*) "ERROR: unexpected difference in expected wind mdot", &
                   b% mdot_wind_transfer(b% d_i), donor_wind_mdot*b% wind_xfer_fraction(b% d_i), frac_error
                stop
@@ -233,7 +233,7 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 

@@ -26,7 +26,7 @@
       module evolve
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, secyer, secday
       use star_utils
 
       implicit none
@@ -316,11 +316,11 @@
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
          s% rotational_mdot_boost = 0d0
-         s% phase_sep_mixing_mass = -1d0 ! must be negative at start of step
-         s% L_for_BB_outer_BC = -1 ! mark as not set
-         s% need_to_setvars = .true. ! always start fresh
-         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
-         s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
+         s% phase_sep_mixing_mass = -1d0  ! must be negative at start of step
+         s% L_for_BB_outer_BC = -1  ! mark as not set
+         s% need_to_setvars = .true.  ! always start fresh
+         s% okay_to_set_mixing_info = .true.  ! set false by element diffusion
+         s% okay_to_set_mlt_vc = .false.  ! don't change mlt_vc until have set mlt_vc_old
 
          if (s% timestep_hold > s% model_number + 10000) then
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -375,7 +375,7 @@
 
          call system_clock(s% system_clock_at_start_of_step, clock_rate)
 
-         if (first_try) then ! i.e., not a redo or retry
+         if (first_try) then  ! i.e., not a redo or retry
             s% have_new_generation = .false.
             do_step_part1 = prepare_for_new_step(s)
             if (do_step_part1 /= keep_going) then
@@ -408,7 +408,7 @@
             return
          end if
 
-         call set_start_of_step_info(s, 'after prepare_for_new_try', ierr) ! does set_vars_if_needed
+         call set_start_of_step_info(s, 'after prepare_for_new_try', ierr)  ! does set_vars_if_needed
          if (failed('set_start_of_step_info')) return
 
          if (.not. s% have_new_cz_bdy_info) then
@@ -489,7 +489,7 @@
             s% total_step_retries = s% total_step_retries + 1
             if (s% doing_relax) &
                s% total_relax_step_retries = s% total_relax_step_retries + 1
-         else ! keep_going or terminate both count as finished
+         else  ! keep_going or terminate both count as finished
             s% total_steps_finished = s% total_steps_finished + 1
             if (s% doing_relax) &
                s% total_relax_steps_finished = s% total_relax_steps_finished + 1
@@ -570,7 +570,7 @@
             s% star_age = s% time/secyer
             s% okay_to_set_mixing_info = .true.
 
-            if (s% v_center /= 0d0) then ! adjust R_center
+            if (s% v_center /= 0d0) then  ! adjust R_center
                s% R_center = s% R_center_old + dt*s% v_center
                if (s% R_center < 0d0) then
                   write(*,2) 's% R_center', s% model_number, s% R_center
@@ -616,7 +616,7 @@
                   if (failed('do_conv_premix')) return
                   call set_vars_if_needed(s, dt, 'after do_conv_premix', ierr)
                   if (failed('set_vars_if_needed after do_conv_premix')) return
-                  do k=1,s% nz ! for use by energy equation
+                  do k=1,s% nz  ! for use by energy equation
                      s% eps_pre_mix(k) = (s% eps_pre_mix(k) - s% energy(k)) / dt
                   end do
                end if
@@ -631,14 +631,14 @@
                   s% crystal_core_boundary_mass = -1d0
                end if
 
-               s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
+               s% okay_to_set_mixing_info = .false.  ! no mixing changes in set_vars after this point
 
                if (s% do_element_diffusion) then
                   call do_element_diffusion(s, dt, ierr)
                   if (failed('do_element_diffusion')) return
                   call set_vars_if_needed(s, dt, 'after element diffusion', ierr)
                   if (failed('set_vars_if_needed after element diffusion')) return
-                  call finish_element_diffusion(s,dt) ! calculates eps_diffusion from energy changes
+                  call finish_element_diffusion(s,dt)  ! calculates eps_diffusion from energy changes
                   if (.false.) then
                      write(*,1) 'dt*dm*eps_diffusion/total_energy_old', &
                         dt*dot_product(s% dm(1:s% nz), s% eps_diffusion(1:s% nz))/s% total_energy_old
@@ -674,7 +674,7 @@
             end if
 
             skip_global_corr_coeff_limit = (first_try .or. &
-                s% model_number_for_last_retry /= s% model_number) ! last alternative is for redo's
+                s% model_number_for_last_retry /= s% model_number)  ! last alternative is for redo's
 
             s% doing_struct_burn_mix = .true.
             do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
@@ -691,7 +691,7 @@
 
          end do implicit_mdot_loop
 
-         s% solver_iter = 0 ! to indicate that no longer doing solver iterations
+         s% solver_iter = 0  ! to indicate that no longer doing solver iterations
 
          if (.not. s% RSP_flag) then
             call set_final_vars(s, dt, ierr)
@@ -713,7 +713,7 @@
             end if
          end if
 
-         call set_luminosity_by_category(s) ! final values for use in selecting timestep
+         call set_luminosity_by_category(s)  ! final values for use in selecting timestep
          call set_power_info(s)
 
          s% total_angular_momentum = total_angular_momentum(s)
@@ -810,7 +810,7 @@
                implicit_mdot = s% mstar_dot
                if (abs(explicit_mdot - implicit_mdot) > &
                      abs(implicit_mdot)*iwind_tolerance) then
-                  call set_current_to_old(s) ! preparing for redo
+                  call set_current_to_old(s)  ! preparing for redo
                   s% mstar_dot = explicit_mdot + &
                      iwind_lambda*(implicit_mdot - explicit_mdot)
                   explicit_mdot = s% mstar_dot
@@ -820,7 +820,7 @@
                   select_mdot_action = cycle_loop
                   return
                end if
-               iwind_max_redo_cnt = iwind_redo_cnt ! done with implicit wind
+               iwind_max_redo_cnt = iwind_redo_cnt  ! done with implicit wind
             end if
 
             if (.not. s% rotation_flag) then
@@ -907,7 +907,7 @@
 
             mdot_redo_cnt = mdot_redo_cnt + 1
 
-            if (mdot_redo_cnt == 1) then ! this is the 1st correction to mdot
+            if (mdot_redo_cnt == 1) then  ! this is the 1st correction to mdot
 
                call set_current_to_old(s)
                do_step_part2 = prepare_for_new_try(s)
@@ -946,7 +946,7 @@
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
                write(*,'(A)')
-               select_mdot_action = exit_loop ! in bounds so accept it
+               select_mdot_action = exit_loop  ! in bounds so accept it
                return
             end if
 
@@ -975,7 +975,7 @@
                return
             end if
 
-            if (w_div_w_crit >= surf_omega_div_omega_crit_limit) then ! wind too small
+            if (w_div_w_crit >= surf_omega_div_omega_crit_limit) then  ! wind too small
                !write(*,*) "entering too small wind mdot"
                if (.not. have_too_small_wind_mdot) then
                   !write(*,*) "setting too small wind mdot"
@@ -985,7 +985,7 @@
                   !write(*,*) "changing too small wind mdot"
                   too_small_wind_mdot = wind_mdot
                end if
-            else if (w_div_w_crit < surf_omega_div_omega_crit_limit) then ! wind too large
+            else if (w_div_w_crit < surf_omega_div_omega_crit_limit) then  ! wind too large
                !write(*,*) "entering too large wind mdot"
                if (.not. have_too_large_wind_mdot) then
                   !write(*,*) "setting too large wind mdot"
@@ -1016,16 +1016,16 @@
                      log10(abs(too_small_wind_mdot)/(Msun/secyer))
                end if
 
-            else ! still have wind too small so boost it again
+            else  ! still have wind too small so boost it again
                if (have_too_small_wind_mdot) then
                   if (mod(mdot_redo_cnt,2) == 1) then
                      boost = s% implicit_mdot_boost
                      ! increase mass loss
                      mstar_dot_nxt = mstar_dot - boost*abs_mstar_delta
                   else
-                     if (mstar_dot < 0) then ! increase mass loss
+                     if (mstar_dot < 0) then  ! increase mass loss
                         mstar_dot_nxt = mstar_dot*s% mdot_revise_factor
-                     else ! decrease mass gain
+                     else  ! decrease mass gain
                         mstar_dot_nxt = mstar_dot/s% mdot_revise_factor
                      end if
                   end if
@@ -1035,9 +1035,9 @@
                      ! decrease mass loss
                      mstar_dot_nxt = mstar_dot + boost*abs_mstar_delta
                   else
-                     if (mstar_dot < 0) then ! decrease mass loss
+                     if (mstar_dot < 0) then  ! decrease mass loss
                         mstar_dot_nxt = mstar_dot/s% mdot_revise_factor
-                     else ! increase mass gain
+                     else  ! increase mass gain
                         mstar_dot_nxt = mstar_dot*s% mdot_revise_factor
                      end if
                   end if
@@ -1054,7 +1054,7 @@
                   log10(abs(s% mstar_dot)/(Msun/secyer))
             end if
 
-            select_mdot_action = cycle_loop ! cycle
+            select_mdot_action = cycle_loop  ! cycle
 
          end function select_mdot_action
 
@@ -1147,7 +1147,7 @@
                   s% total_rotational_kinetic_energy_end, &
                   s% total_turbulent_energy_end, &
                   s% total_energy_end, total_radiation)
-               if (s% RSP_just_set_velocities) then ! reset everything when 1st set velocities
+               if (s% RSP_just_set_velocities) then  ! reset everything when 1st set velocities
                   s% total_internal_energy_old = s% total_internal_energy_end
                   s% total_gravitational_energy_old = s% total_gravitational_energy_end
                   s% total_radial_kinetic_energy_old = s% total_radial_kinetic_energy_end
@@ -1315,7 +1315,7 @@
 
             phase1_total_energy_from_mdot = &
                  s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
-               + s% mdot_adiabatic_surface ! ??
+               + s% mdot_adiabatic_surface  ! ??
 
             phase1_sources_and_sinks = &
                  phase1_total_energy_from_mdot &
@@ -1473,7 +1473,7 @@
                   sum_cell_terms = &
                      - sum_cell_dL + sum_cell_sources + sum_cell_others - sum_cell_work &
                      - sum_cell_detrb - sum_cell_dke - sum_cell_dpe - sum_cell_de
-                  sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
+                  sum_cell_terms = -sum_cell_terms  ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
 
                   expected_sum_cell_others = &
@@ -1665,12 +1665,12 @@
             extra = s% inject_uniform_extra_heat
             do k=nz,1,-1
                q00 = s% q(k)
-               if (qp1 >= qmin .and. q00 <= qmax) then ! all inside of region
+               if (qp1 >= qmin .and. q00 <= qmax) then  ! all inside of region
                   s% extra_heat(k) = s% extra_heat(k) + extra
                else
                   qtop = min(q00, qmax)
                   qbot = max(qp1, qmin)
-                  if (qtop > qbot) then ! overlaps region
+                  if (qtop > qbot) then  ! overlaps region
                      s% extra_heat(k) = s% extra_heat(k) + extra*(qtop - qbot)/s% dq(k)
                   end if
                end if
@@ -1681,7 +1681,7 @@
             kap_gamma = s% nonlocal_NiCo_kap_gamma
             do k1=1,nz
                tau_gamma_sum = 0
-               do k=k1,1,-1 ! move eps_nuc outward from k1 to extra_heat at k
+               do k=k1,1,-1  ! move eps_nuc outward from k1 to extra_heat at k
                   tau_gamma_sum = tau_gamma_sum + &
                      kap_gamma*s% dm(k)/(pi4*s% rmid(k)*s% rmid(k))
                   if (tau_gamma_sum >= s% dtau_gamma_NiCo_decay_heat) then
@@ -1735,12 +1735,12 @@
          end if
          do k=nz,1,-1
             q00 = s% q(k)
-            if (qp1 >= qmin .and. q00 <= qmax) then ! all inside of region
+            if (qp1 >= qmin .and. q00 <= qmax) then  ! all inside of region
                s% extra_heat(k) = s% extra_heat(k) + extra
             else
                qtop = min(q00, qmax)
                qbot = max(qp1, qmin)
-               if (qtop > qbot) then ! overlaps region
+               if (qtop > qbot) then  ! overlaps region
                   s% extra_heat(k) = s% extra_heat(k) + extra*(qtop - qbot)/s% dq(k)
                end if
             end if
@@ -1861,7 +1861,7 @@
             if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
          end if
 
-         if (.not. s% RSP_flag) then ! store mesh info for following step eps_mdot
+         if (.not. s% RSP_flag) then  ! store mesh info for following step eps_mdot
             do k=1, s% nz
                s% prev_mesh_xa(:,k) = s% xa(:,k)
                s% prev_mesh_xh(:,k) = s% xh(:,k)
@@ -1888,14 +1888,14 @@
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)
                if (failed('set_start_of_step_info ierr')) return
-               prepare_for_new_step = do_mesh(s) ! sets s% need_to_setvars = .true. if changes anything
+               prepare_for_new_step = do_mesh(s)  ! sets s% need_to_setvars = .true. if changes anything
                if (prepare_for_new_step /= keep_going) return
             end if
          end if
 
          call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
          if (failed('set_vars_if_needed ierr')) return
-         call set_phot_info(s) ! this sets Teff and other stuff
+         call set_phot_info(s)  ! this sets Teff and other stuff
 
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
@@ -1978,11 +1978,11 @@
          s% need_to_setvars = .true.
          if (s% doing_timing) call start_time(s, time0, total)
          if (s% use_split_merge_amr) then
-            do_mesh = remesh_split_merge(s) ! sets s% need_to_setvars = .true. if changes anything
+            do_mesh = remesh_split_merge(s)  ! sets s% need_to_setvars = .true. if changes anything
             if (do_mesh /= keep_going .and. s% report_ierr) &
                write(*, *) 'do_mesh: remesh_split_merge failed'
          else if (.not. s% rsp_flag) then
-            do_mesh = remesh(s) ! sets s% need_to_setvars = .true. if changes anything
+            do_mesh = remesh(s)  ! sets s% need_to_setvars = .true. if changes anything
             if (do_mesh /= keep_going .and. s% report_ierr) &
                write(*, *) 'do_mesh: remesh failed'
          end if
@@ -2367,7 +2367,7 @@
 
          call check(3)
 
-         s% screening_mode_value = -1 ! force a new lookup for next step
+         s% screening_mode_value = -1  ! force a new lookup for next step
          s% doing_first_model_of_run = .false.
 
          contains

@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
    module mod_integrate
-      use const_def
+      use const_def, only: dp
       use math_lib
       use num_def
       use utils_lib, only: mesa_error
@@ -35,11 +35,11 @@
 
       recursive function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(res)
          procedure(integrand) :: func
-         real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
-         real(dp), intent(in) :: args(:) ! Extra args passed to func
-         real(dp), intent(in) :: atol, rtol ! Absolute and relative tolerances
-         integer, intent(in) :: max_steps ! Max number of sub-steps
-         integer, intent(inout) :: ierr ! Error code
+         real(dp),intent(in) :: minx,maxx  ! Min and max values to integrate over
+         real(dp), intent(in) :: args(:)  ! Extra args passed to func
+         real(dp), intent(in) :: atol, rtol  ! Absolute and relative tolerances
+         integer, intent(in) :: max_steps  ! Max number of sub-steps
+         integer, intent(inout) :: ierr  ! Error code
          real(dp) :: res
 
          real(dp) :: val1, val2
@@ -88,8 +88,8 @@
       real(dp) function simp38(func, minx, maxx, args, ierr)
          ! Simpsons 3/8 rule
          procedure(integrand) :: func
-         real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
-         real(dp), intent(in) :: args(:) ! Extra args passed to func
+         real(dp),intent(in) :: minx,maxx  ! Min and max values to integrate over
+         real(dp), intent(in) :: args(:)  ! Extra args passed to func
          integer, intent(inout) :: ierr
 
          real(dp) :: x

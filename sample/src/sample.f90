@@ -25,7 +25,8 @@ program sample_eos
    use eos_lib
    use chem_def
    use chem_lib
-   use const_lib
+   use const_def, only: dp, ln10
+   use const_lib, only: const_init
    use math_lib
 
    implicit none
@@ -53,7 +54,7 @@ contains
 
       ierr = 0
 
-      my_mesa_dir = '..' ! if empty string, uses environment variable MESA_DIR
+      my_mesa_dir = '..'  ! if empty string, uses environment variable MESA_DIR
       call const_init(my_mesa_dir, ierr)
       if (ierr /= 0) then
          write (*, *) 'const_init failed'
@@ -91,7 +92,7 @@ contains
 
       Pgas = exp(res(i_lnPgas))
 
-      ! the indices for the results are defined in eos_def.f
+      ! the indices for the results are defined in eos_def.f90
       write (*, '(A)')
       write (*, fmt1) 'temperature', T
       write (*, fmt1) 'density', Rho
@@ -116,7 +117,7 @@ contains
          Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
          res, d_dlnd, d_dlnT, d_dxa, ierr)
 
-      ! the indices for the results are defined in eos_def.f
+      ! the indices for the results are defined in eos_def.f90
       write (*, '(A)')
       write (*, fmt1) 'temperature', T
       write (*, fmt1) 'Pgas', Pgas

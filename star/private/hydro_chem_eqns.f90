@@ -27,7 +27,7 @@
       module hydro_chem_eqns
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use utils_lib
 
       implicit none
@@ -110,7 +110,7 @@
          sum_dx_burning = 0
          sum_dx_mixing = 0
 
-         do j=1,species ! composition equation for species j in cell k
+         do j=1,species  ! composition equation for species j in cell k
 
             !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
             test_partials = .false.

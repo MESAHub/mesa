@@ -953,7 +953,7 @@
       ! ``relax_Z = .true.`` gradually changes average Z, reconverging at each step.
       ! ``change_Z = .true.`` simply changes abundances; doesn't reconverge the model.
       ! note: ``relax_dlnZ`` in the controls inlist determines the rate of change
-      ! note: ``initial_zfracs`` are not adjusted when using these controls, 
+      ! note: ``initial_zfracs`` are not adjusted when using these controls,
       ! except if ``set_uniform_initial_composition = .true.``, and manually setting abundances.
 
       ! ::
@@ -1455,7 +1455,7 @@
       ! ~~~~~~~~~~~~
 
       ! RTI variables
-      ! ``RTI_flag`` is true if we are doing Rayleigh Taylor Instabilities
+      ! ``RTI_flag`` is true if we are doing Rayleigh-Taylor Instabilities
 
       ! ::
 
@@ -1751,7 +1751,7 @@
 
       ! if ``relax_omega`` true, relax to value of ``new_omega``. applies when do ./rn or ./re
       ! ``relax_initial_omega`` only applies at start of run, not for restarts.
-      ! ``near_zams_relax``+omega applies when "near zams".
+      ! ``near_zams_relax`` omega applies when "near zams".
       ! The working definition of "near zams" is
       ! ``L_nuc_burn_total/L_phot >= Lnuc_div_L_zams_limit``
       ! ``Lnuc_div_L_zams_limit`` is in the controls part of the inlist.
@@ -2376,7 +2376,7 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! For switching reaction networks.
-      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`. 
+      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`.
 
       ! ::
 
@@ -2888,7 +2888,7 @@
       !     For a filter named filter1 history output will be bc_filter1 for bolometric corrections
       !     and abs_mag_filter1 for absolute magnitude
 
-      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code 
+      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code
 
       ! ::
 

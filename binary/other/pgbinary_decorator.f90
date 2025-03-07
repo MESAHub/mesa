@@ -43,7 +43,7 @@ contains
    ! plot_num: If a plot has multiple sub-panels, then this tells you which panel is being called
    subroutine null_pgbinary_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
       use binary_def
-      use const_def
+      use const_def, only: dp
       integer, intent(in) :: id
       !Not doubles
       real, intent(in) :: xmin, xmax, ymin, ymax

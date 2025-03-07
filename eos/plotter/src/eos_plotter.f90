@@ -116,7 +116,7 @@ program eos_plotter
    open(newunit=iounit, file='eos_plotter.dat')
 
    ! check i_var
-   if ((i_var .lt. 0) .or. (i_var .gt. num_eos_basic_results)) then
+   if ((i_var < 0) .or. (i_var > num_eos_basic_results)) then
       call mesa_error(__FILE__,__LINE__,'invalid value of i_var')
    else
 
@@ -149,7 +149,7 @@ program eos_plotter
                write(iounit,*) 'dsp'
             end if
          else
-            if (i_eos_other .ge. 0) then
+            if (i_eos_other >= 0) then
                write(*,*) 'plotting difference of ' // eosDT_result_names(i_var)
                write(iounit,*) 'difference of ' // eosDT_result_names(i_var)
             else
@@ -231,25 +231,25 @@ program eos_plotter
    end if
 
 
-   if (nT .gt. 1) then
+   if (nT > 1) then
       logT_step = delta_logT / (nT-1d0)
    else
       logT_step = 0
    end if
 
-   if (nRho .gt. 1) then
+   if (nRho > 1) then
       logRho_step = delta_logRho / (nRho-1d0)
    else
       logRho_step = 0
    end if
 
-   if (nX .gt. 1) then
+   if (nX > 1) then
       X_step = delta_X / (nX-1d0)
    else
       X_step = 0
    end if
 
-   if (nZ .gt. 1) then
+   if (nZ > 1) then
       Z_step = delta_Z / (nZ-1d0)
    else
       Z_step = 0
@@ -265,8 +265,8 @@ program eos_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')
@@ -316,7 +316,7 @@ program eos_plotter
             call mesa_error(__FILE__,__LINE__)
          end if
 
-         if (i_eos_other .ge. 0) then
+         if (i_eos_other >= 0) then
             ! get a set of results for given temperature and density
             call eos_call(&
                handle, i_eos_other, species, chem_id, net_iso, xa, &
@@ -331,7 +331,7 @@ program eos_plotter
          end if
 
 
-         if (i_var .gt. 0) then
+         if (i_var > 0) then
 
             ! return that part of the EOS results
             if (doing_partial) then
@@ -341,7 +341,7 @@ program eos_plotter
                   res1 = d_dlnT(i_var)
                end if
             else
-               if (i_eos_other .ge. 0) then
+               if (i_eos_other >= 0) then
                   ! doing comparison
                   res1 = res(i_var) - res_other(i_var)
                else
@@ -501,8 +501,8 @@ contains
 
       xa = 0d0
       xa(h1) = X
-      xa(c12) = 0.5*Z
-      xa(o16) = 0.5*Z
+      xa(c12) = 0.5d0*Z
+      xa(o16) = 0.5d0*Z
       xa(fe56) = 0.0
       xa(he4) = 1d0 - xa(h1) - xa(c12) - xa(o16) - xa(fe56)
 
@@ -543,16 +543,16 @@ contains
          use eos_lib
          use chem_lib, only: basic_composition_info
          integer, intent(in) :: handle, i_eos, species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: Rho, logRho ! the density
-         real(dp), intent(in) :: T, logT ! the temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, logRho  ! the density
+         real(dp), intent(in) :: T, logT  ! the temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_d_dxa_results,species)
+         integer, intent(out) :: ierr  ! 0 means AOK.
          type (EoS_General_Info), pointer :: rq
          real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)
@@ -587,16 +587,16 @@ contains
       real(dp), dimension(num_eos_basic_results) :: res
       integer :: i
 
-      if (i_eos_other .gt. 0) then
+      if (i_eos_other > 0) then
          ! check for blends including i_eos_other
          i = i_frac + i_eos_other - 1
-         in_eos_blend = ((res(i) .gt. 0) .and. (res(i) .lt. 1))
+         in_eos_blend = ((res(i) > 0) .and. (res(i) < 1))
       else
          ! check for all blends
          in_eos_blend = .false.
          do i = i_frac, i_frac+num_eos_frac_results-1
             in_eos_blend = in_eos_blend .or. &
-               ((res(i) .gt. 0) .and. (res(i) .lt. 1))
+               ((res(i) > 0) .and. (res(i) < 1))
          end do
       end if
 

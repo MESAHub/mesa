@@ -26,7 +26,7 @@
       module binary_do_one_utils
 
       use binary_def
-      use const_def
+      use const_def, only: dp, pi, msun, rsun, secyer, standard_cgrav
       use math_lib
 
       implicit none

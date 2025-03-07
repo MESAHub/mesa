@@ -26,7 +26,7 @@
       module pgstar_dynamo
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use pgstar_support
       use star_pgstar
 
@@ -37,7 +37,6 @@
 
 
       subroutine Dynamo_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -112,7 +111,6 @@
             panel_flag, xaxis_numeric_labels_flag, ierr)
 
          use utils_lib
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: device_id
@@ -301,7 +299,7 @@
             call pgslw(lw_sav)
 
 
-            if (.not. panel_flag) then ! show mix regions at bottom of plot
+            if (.not. panel_flag) then  ! show mix regions at bottom of plot
                ybot = -0.05
                call pgswin(xleft, xright, ybot, 0.85)
                call pgslw(10)

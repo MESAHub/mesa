@@ -27,9 +27,9 @@
       integer, pointer :: ip1(:) ! (nm1)
       real(dp), pointer :: e1_1D(:) ! =(lde1,nm1)
       real(dp), pointer :: ak(:)
-      
+
       !write(*,*) 'decsol_done ijob', ijob
-      
+
 
       ier = 0
       if (nvar > 0) then
@@ -37,7 +37,7 @@
      &      2,caller_id,nvar,nz,lblk,dblk,ublk,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
          return
       end if
-      
+
       goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
 ! -----------------------------------------------------------

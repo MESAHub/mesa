@@ -16,14 +16,14 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(in) :: imax ! max number of iterations for search
          real(dp), intent(in) :: epsx, epsy 
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
          safe_root_with_brackets = do_safe_root_with_brackets(
      >      f, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)         
       end function safe_root_with_brackets
 
-      ! sometimes you can suppy a good initial guess and df/dx for Newton,
+      ! sometimes you can supply a good initial guess and df/dx for Newton,
       ! so you'd like to try a few cycles of Newton before looking for brackets.
       ! can provide brackets if you have them.
       real(dp) function safe_root_with_guess(
@@ -46,7 +46,7 @@
             ! max number of initial Newton iterations before switch to standard safe_root
          integer, intent(in) :: imax ! max number of iterations for search
          real(dp), intent(in) :: epsx, epsy 
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
 !         safe_root_with_guess = safe_root_with_initial_guess(
@@ -96,7 +96,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(in) :: imax ! max number of iterations for search
          real(dp), intent(in) :: epsx, epsy 
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr         
          safe_root = do_safe_root(
@@ -121,7 +121,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(in) :: imax ! max number of iterations for search
          real(dp), intent(in) :: epsx, epsy 
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
          safe_root_with_initial_guess = do_safe_root(
@@ -144,7 +144,7 @@
             ! max number of initial Newton iterations before switch to standard safe_root
          integer, intent(in) :: imax ! max number of iterations for search
          real(dp), intent(in) :: epsx, epsy 
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
          real(dp) :: x1, x3, y1, y3

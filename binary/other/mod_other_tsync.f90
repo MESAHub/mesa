@@ -130,12 +130,12 @@
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : star_info, star_ptr
          integer, intent(in) :: id
-         character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
-         real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
+         character (len=strlen), intent(in) :: sync_type  ! synchronization timescale
+         real(dp), intent(in) :: Ftid  ! efficiency of tidal synchronization. (time scale / Ftid ).
+         real(dp), intent(in) :: qratio  ! mass_other_star/mass_this_star
          real(dp), intent(in) :: m
          real(dp), intent(in) :: r_phot
-         real(dp), intent(in) :: osep ! orbital separation (cm)
+         real(dp), intent(in) :: osep  ! orbital separation (cm)
          real(dp), intent(out) :: t_sync
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b

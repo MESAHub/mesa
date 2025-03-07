@@ -4,7 +4,7 @@
 
       module mass_utils
 
-      use const_def
+      use const_def, only: dp, qp
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
 
@@ -31,11 +31,11 @@
       real(qp) function reconstruct_m(dm, nz, j)
          ! Inputs
          real(qp), dimension(:) :: dm
-         integer nz, j
+         integer :: nz, j
 
          ! Intermediates
-         real(qp) sum, compensator
-         integer l
+         real(qp) :: sum, compensator
+         integer :: l
 
          sum = 0.0
          compensator = 0.0
@@ -52,11 +52,11 @@
       real(qp) function reconstruct_xm(dm, nz, j)
          ! Inputs
          real(qp), dimension(:) :: dm
-         integer nz, j
+         integer :: nz, j
 
          ! Intermediates
-         real(qp) sum, compensator
-         integer l
+         real(qp) :: sum, compensator
+         integer :: l
 
          sum = 0.0
          compensator = 0.0
@@ -103,12 +103,12 @@
       real(qp) function accurate_mass_difference(dm1, dm2, j, k, nz)
          ! Inputs
          real(qp), dimension(:) :: dm1, dm2
-         integer j, k, nz
+         integer :: j, k, nz
 
          ! Intermediates
-         type(accurate_real) sum
-         real(qp) summand
-         integer l
+         type(accurate_real) :: sum
+         real(qp) :: summand
+         integer :: l
 
          sum % sum = 0.0
          sum % compensator = 0.0
@@ -180,12 +180,12 @@
          real(qp), dimension(:) :: dm1, dm2
          real(qp), dimension(:) :: mesh_intersects
          integer, dimension(:,:) :: ranges
-         integer nz
+         integer :: nz
 
          ! Intermediates
-         integer side
+         integer :: side
          real(qp), dimension(:), allocatable :: remainders1, remainders2
-         type(accurate_real) diff, dBottom, dTop, dBottomTop, dTopBottom
+         type(accurate_real) :: diff, dBottom, dTop, dBottomTop, dTopBottom
          integer :: i, j, k, counter
 
          allocate(remainders1(nz), remainders2(nz))
@@ -335,7 +335,7 @@
       ! last (i_max(j)) initial cells whose overlap with j is non-zero.
       subroutine find_i_ranges(nz, ranges, i_min, i_max)
          ! Inputs
-         integer nz
+         integer :: nz
          integer, dimension(:,:) :: ranges
          integer, dimension(0:nz) :: i_min, i_max
 
@@ -371,8 +371,8 @@
       ! cell j, at which point the two sums are added together.
       subroutine prepare_pass_fraction(nz, delta_m, dm, mesh_intersects, ranges, i_min, i_max, pf)
          ! Inputs
-         integer nz
-         real(qp) delta_m
+         integer :: nz
+         real(qp) :: delta_m
          real(qp), dimension(:) :: dm, mesh_intersects
          integer, dimension(:,:) :: ranges
          integer, dimension(0:nz) :: i_min, i_max
@@ -416,7 +416,7 @@
          do j=0,nz
             do l=i_min(j), i_max(j)
                if (j > 0) then
-                  pf(j)%arr(l) = pf(j)%arr(l) / dm(max(1,j)) ! bp: get rid of bogus compiler warning
+                  pf(j)%arr(l) = pf(j)%arr(l) / dm(max(1,j))  ! bp: get rid of bogus compiler warning
                else
                   pf(j)%arr(l) = -pf(j)%arr(l) / delta_m
                end if
@@ -435,11 +435,11 @@
          type(non_rect_array), dimension(0:) :: pf
 
          if (i >= i_min(j) .and. i <= i_max(j)) then
-            compute_pass_fraction = pf(j) % arr(i) ! In the pre-computed portion
+            compute_pass_fraction = pf(j) % arr(i)  ! In the pre-computed portion
          else if (i > max(j,i_max(j)) .or. i < min(j,i_min(j))) then
-            compute_pass_fraction = 0 ! Outside of the flow
+            compute_pass_fraction = 0  ! Outside of the flow
          else
-            compute_pass_fraction = 1 ! In the flow but not pre-computed
+            compute_pass_fraction = 1  ! In the flow but not pre-computed
          end if
 
       end function compute_pass_fraction
@@ -449,7 +449,7 @@
       ! is equivalent to enumerating all (i,j) with pass_fraction(i,j) > 0.
       subroutine find_j_ranges(nz, ranges, mass_flux, j_min, j_max)
          ! Inputs
-         integer nz
+         integer :: nz
          integer, dimension(:,:) :: ranges
          integer, dimension(:) :: j_min, j_max
          real(qp), dimension(:) :: mass_flux
@@ -531,8 +531,8 @@
 
          ! Inputs
          integer, intent(in) :: nz, nvars
-         real(dp), intent(in), dimension(:,:) :: vals_old ! (cell index, variable index)
-         real(dp), intent(in), dimension(:) :: vals_outside ! (variable index)
+         real(dp), intent(in), dimension(:,:) :: vals_old  ! (cell index, variable index)
+         real(dp), intent(in), dimension(:) :: vals_outside  ! (variable index)
          real(qp), intent(in), dimension(:) :: dm_new, dm_old
 
          ! Intermediates

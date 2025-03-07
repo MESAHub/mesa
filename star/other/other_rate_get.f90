@@ -49,11 +49,10 @@ contains
    subroutine default_other_rate_get(ir, temp, tf, raw_rate, ierr)
       use rates_def
       use rates_lib
-      implicit none
 
-      integer :: ir ! Rate id
+      integer :: ir  ! Rate id
       real(dp), intent(in) ::    temp      !< Temperature
-      type(T_Factors) :: tf !< Various temperature factors
+      type(T_Factors) :: tf  !< Various temperature factors
       real(dp), intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
       integer, intent(out) ::   ierr
 

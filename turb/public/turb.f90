@@ -1,5 +1,5 @@
 module turb
-   use const_def
+   use const_def, only: dp, pi, boltz_sigma, sqrt_2_div_3, crad, clight, no_mixing, convective_mixing, thermohaline_mixing
    use num_lib
    use utils_lib
    use auto_diff
@@ -106,7 +106,7 @@ module turb
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
-      real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
+      real(dp), parameter :: eps = 1d-2  ! Threshold in logY for separating multiple solutions.
       type(auto_diff_real_tdc) :: Zub, Zlb
       include 'formats'
 
@@ -130,7 +130,7 @@ module turb
       info%gradL = convert(gradL)
       info%grada = convert(grada)
       info%c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity)) ! assumes QHSE for dP/dm
+      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%T = T
       info%rho = rho

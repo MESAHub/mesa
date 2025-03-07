@@ -27,7 +27,7 @@
       module phase_separation
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
 
       implicit none
 
@@ -97,7 +97,7 @@
          ! Check that we're still in C/O or O/Ne dominated material as appropriate,
          ! otherwise skip phase separation
          if(components == 'CO'.and. XO + XC < 0.9d0) return
-         if(components == 'ONe'.and. XNe + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
+         if(components == 'ONe'.and. XNe + XO < 0.8d0) return  ! O/Ne mixtures tend to have more byproducts of burning mixed in
 
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
@@ -259,7 +259,7 @@
                  ! stable against further mixing, so exit loop
                  exit
               end if
-           else ! simpler calculation based on mu gradient
+           else  ! simpler calculation based on mu gradient
               if(s% mu(ktop) >= s% mu(ktop-1)) then
                  ! stable against further mixing, so exit loop
                  exit
@@ -274,9 +274,9 @@
       end subroutine mix_outward
 
       real(dp) function blouin_delta_xo(Xin)
-        real(dp), intent(in) :: Xin ! mass fraction
-        real(dp) :: Xnew ! mass fraction
-        real(dp) :: xo, dxo ! number fractions
+        real(dp), intent(in) :: Xin  ! mass fraction
+        real(dp) :: Xnew  ! mass fraction
+        real(dp) :: xo, dxo  ! number fractions
         real(dp) :: a0, a1, a2, a3, a4, a5
 
         ! Convert input mass fraction to number fraction, assuming C/O mixture
@@ -306,9 +306,9 @@
       end function blouin_delta_xo
 
       real(dp) function blouin_delta_xne(Xin)
-        real(dp), intent(in) :: Xin ! mass fraction
-        real(dp) :: Xnew ! mass fraction
-        real(dp) :: xne, dxne ! number fractions
+        real(dp), intent(in) :: Xin  ! mass fraction
+        real(dp) :: Xnew  ! mass fraction
+        real(dp) :: xne, dxne  ! number fractions
         real(dp) :: a0, a1, a2, a3, a4, a5
 
         ! Convert input mass fraction to number fraction, assuming O/Ne mixture
@@ -382,7 +382,7 @@
            if(.not. s% calculate_Brunt_B) then
               stop "phase separation requires s% calculate_Brunt_B = .true."
            end if
-           call do_brunt_B(s, kc_t, kc_b, ierr) ! for unsmoothed_brunt_B
+           call do_brunt_B(s, kc_t, kc_b, ierr)  ! for unsmoothed_brunt_B
            if (ierr /= 0) then
               write(*,*) 'phase_separation: error from call to do_brunt_B'
               stop
@@ -398,9 +398,7 @@
         if (ierr /= 0) then
            write(*,*) 'phase_separation: failed in call to set_mlt_vars during update_model_'
            stop
-        endif
-
-        ! Finish
+        end if
 
         return
 

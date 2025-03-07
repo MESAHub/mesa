@@ -43,7 +43,7 @@ contains
        k% Zbase = kapCN_Z(iZ)
        k% fC = kapCN_fC(:,iZ)
        k% fN = kapCN_fN(:,iZ)
-    enddo
+    end do
 
     call read_kapCN_tables(ierr)
 
@@ -73,22 +73,22 @@ contains
     if(debug) write(*,*) '   parameter file = ', trim(filename)
 
     open(newunit=io,file=trim(filename))
-    read(io,*) !skip first line
-    do i=num_kapCN_Zs,1,-1 !read backwards into array so Z is increasing
+    read(io,*)  !skip first line
+    do i=num_kapCN_Zs,1,-1  !read backwards into array so Z is increasing
        read(io,'(f7.5,11f9.1)') kapCN_Z(i), kapCN_fC(:,i), kapCN_fN(:,i)
-    enddo
+    end do
     close(io)
 
     do i=1,num_kapCN_Zs
        write(tmp_Z,'(1p,1e6.1e1)') kapCN_Z(i)
        string_Z(i) = tmp_Z(1:1) // tmp_Z(4:6)
-    enddo
+    end do
 
     kCN(:)% filename = prefix // string_Z // trim(suffix)
 
     do i=1,num_kapCN_Zs
        call read_one_kapCN_table(i,ierr)
-    enddo
+    end do
 
     kapCN_min_logR = minval(kapCN_logR)
     kapCN_max_logR = maxval(kapCN_logR)
@@ -141,46 +141,46 @@ contains
           do i=1,kapCN_num_tbl
              allocate(k% t(i)% kap(4*kapCN_tbl_size))
              read(io) k% t(i)% kap
-          enddo
+          end do
           close(io)
           !table is now fully loaded
           k% not_loaded_yet = .false.
           return
-       endif
-    endif
+       end if
+    end if
 
     !no cache file, so read ascii file
     open(newunit=io,file=trim(ascii_file),iostat=ierr)
     if(ierr/=0) write(*,*) &
          ' read_one_kapCN_table: problem opening ascii file for read'
     do i=1,4
-       read(io,*) !skip header
-    enddo
+       read(io,*)  !skip header
+    end do
     read(io,'(6x,a10)') my_Z
     if(debug) write(*,*) ' has Z = ', my_Z, ' Zbase = ', k% Zbase
 
     do i=1,14
        read(io,*)
-    enddo
+    end do
 
     do i=1,kapCN_num_tbl
        read(io,*) j, k% t(i)% x, y, k% t(i)% z, c_div_o, &
             k% t(i)% fc, k% t(i)% fn, k% t(i)% falpha
-    enddo
+    end do
 
-    read(io,*) !last line of #'s
+    read(io,*)  !last line of #'s
 
     do i=1,kapCN_num_tbl
        do j=1,14
-          read(io,*) !skip individual headers
-       enddo
+          read(io,*)  !skip individual headers
+       end do
        read(io,'(5x,17f7.3)') logR
        do j=1,kapCN_num_logT
           read(io,'(f5.3,17f7.3)') logT(j), table(:,j)
-       enddo
+       end do
        allocate(k% t(i)% kap(4*kapCN_tbl_size))
        k% t(i)% kap(1:4*kapCN_tbl_size:4) = reshape(table,[kapCN_tbl_size])
-    enddo
+    end do
 
     close(io)
 
@@ -210,7 +210,7 @@ contains
     write(io) k% t(:)% falpha
     do i=1,kapCN_num_tbl
        write(io) k% t(i)% kap
-    enddo
+    end do
     close(io)
 
   end subroutine read_one_kapCN_table
@@ -238,13 +238,13 @@ contains
        write(*,*) ' kapCN is not initialized; call kapCN_init()'
        ierr=-99
        return
-    endif
+    end if
 
     if(outside_R_and_T_bounds(logR,logT))then
        !write(*,*) 'kapCN_interp: logR, logT outside of table bounds'
        ierr=-1
        return
-    endif
+    end if
 
     Z_ary => kapCN_Z
     my_Z = max(min(Z,Z_ary(num_kapCN_Zs)),Z_ary(1))
@@ -255,12 +255,12 @@ contains
     if(Z==Z_ary(iZ))then
        call kapCN_interp_fixedZ(iZ,X,fC,fN,logR,logT,result)
        return
-    endif
+    end if
 
     !else do the full Z interpolation
     do i=1,nZ
        call kapCN_interp_fixedZ(iZ+i-2,X,fC,fN,logR,logT,res(:,i))
-    enddo
+    end do
 
     nullify(work1)
     allocate(work1(nZ*pm_work_size))
@@ -278,7 +278,7 @@ contains
             interp_pm, pm_work_size, &
             work1, junk, ierr )
        result(i)=v_new(1)
-    enddo
+    end do
 
     deallocate(work1, logz_ary)
 
@@ -338,9 +338,9 @@ contains
              nhi = nlo+2
              call kapCN_interp_RT(iZ,tbl,logR,logT,res,ierr)
              result = result + wfN(i)*wX(j)*wfC(n)*res
-          enddo
-       enddo
-    enddo
+          end do
+       end do
+    end do
 
     if(debug) write(*,'(1p9e12.4)') my_X, my_fC, my_fN, result
 
@@ -360,8 +360,8 @@ contains
          b(i)=1d0
          do j=1,n
             if(j/=i) b(i)=b(i)*(x-a(j))/(a(i)-a(j))
-         enddo
-      enddo
+         end do
+      end do
     end subroutine interp
 
   end subroutine kapCN_interp_fixedZ
@@ -412,7 +412,7 @@ contains
        kappa = -1d0
        dlnkap_dlnRho = 0d0
        dlnkap_dlnT = 0d0
-    endif
+    end if
 
   end subroutine kapCN_get
 

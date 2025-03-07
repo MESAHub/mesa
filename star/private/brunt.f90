@@ -26,7 +26,7 @@
       module brunt
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi4, crad
       use utils_lib
 
       implicit none
@@ -156,7 +156,7 @@
             return
          end if
 
-         do k=1,nz ! clip B and calculate N^2 from B
+         do k=1,nz  ! clip B and calculate N^2 from B
             if (abs(s% brunt_B(k)) < s% min_magnitude_brunt_B .or. &
                   s% gradT(k) == 0 .or. is_bad(s% gradT_sub_grada(k))) then
                s% brunt_B(k) = 0

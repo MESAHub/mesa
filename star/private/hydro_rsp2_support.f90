@@ -26,7 +26,7 @@
       module hydro_rsp2_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
@@ -55,18 +55,18 @@
          real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1
          real(dp), allocatable, dimension(:) :: &
             xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
-         real(dp), pointer :: work1(:) ! =(nz_old+1, pm_work_size)
+         real(dp), pointer :: work1(:)  ! =(nz_old+1, pm_work_size)
          include 'formats'
          ierr = 0
          nz_old = s% nz
          nz = s% RSP2_nz
-         if (nz == nz_old) return ! assume have already done remesh for RSP2
+         if (nz == nz_old) return  ! assume have already done remesh for RSP2
          if (nz > nz_old) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 cannot increase nz')
          call setvars(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in setvars')
          old_L1 = s% L(1)
          old_r1 = s% r(1)
-         call set_phot_info(s) ! sets Teff
+         call set_phot_info(s)  ! sets Teff
          call get_PT_surf(P_surf, T_surf, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in get_PT_surf')
          allocate(&
@@ -139,9 +139,9 @@
             logical, parameter :: skip_partials = .true.
             include 'formats'
             ierr = 0
-            call set_phot_info(s) ! sets s% Teff
+            call set_phot_info(s)  ! sets s% Teff
             Teff = s% Teff
-            call get_atm_PT( & ! this uses s% opacity(1)
+            call get_atm_PT( &  ! this uses s% opacity(1)
                  s, s% tau_factor*s% tau_base, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                  Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                  lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
@@ -195,7 +195,7 @@
             end do
          end subroutine find_xm_anchor
 
-         subroutine set_xm_new ! sets xm, dm, m, dq, q
+         subroutine set_xm_new  ! sets xm, dm, m, dq, q
             integer :: nz_outer, k
             real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx
             include 'formats'
@@ -364,7 +364,7 @@
                   dm_face = 0.5d0*(s% dm(k-1) + s% dm(k))
                end if
                P_00 = P_m1 + s% cgrav(k)*s% m(k)*dm_face/(4d0*pi*pow4(s% r(k)))
-               logP = log10(P_00) ! value for QHSE
+               logP = log10(P_00)  ! value for QHSE
                s% lnPeos(k) = logP/ln10
                s% Peos(k) = P_00
                logRho = s% lnd(k)/ln10
@@ -396,8 +396,8 @@
                !   logP, logT - logT_guess, logT, logT_guess, logRho
                P_m1 = P_00
 
-               if (k == 1) then ! get opacity and recheck surf BCs
-                 call get_kap( & ! assume zbar is set
+               if (k == 1) then  ! get opacity and recheck surf BCs
+                 call get_kap( &  ! assume zbar is set
                      s, k, s% zbar(k), s% xa(:,k), logRho, logT, &
                      res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
                      res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
@@ -408,7 +408,7 @@
                      call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                   end if
                   old_kap = s% opacity(1)
-                  s% opacity(1) = kap ! for use by atm surf PT
+                  s% opacity(1) = kap  ! for use by atm surf PT
                   call get_PT_surf(new_P_surf, new_T_surf, ierr)
                   if (ierr /= 0) then
                      write(*,2) 'get_PT_surf failed', k

@@ -25,15 +25,15 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, strlen
       use binary_pgbinary
 
    implicit none
 
-      real(dp) :: initial_binary_period ! (seconds)
-      real(dp) :: min_binary_period ! (seconds)
+      real(dp) :: initial_binary_period  ! (seconds)
+      real(dp) :: min_binary_period  ! (seconds)
 
-      real(dp) :: initial_mass(2) ! (msun)
+      real(dp) :: initial_mass(2)  ! (msun)
 
       integer, parameter :: maxlen_binary_history_column_name = 80
       integer, parameter :: binary_num_xtra_vals = 30
@@ -49,7 +49,7 @@
       integer, parameter :: b_Tlim_dm = b_Tlim_ecc + 1
       integer, parameter :: b_numTlim = b_Tlim_dm
 
-      character (len=24) :: binary_dt_why_str(b_numTlim) ! indicates the reason for the timestep choice
+      character (len=24) :: binary_dt_why_str(b_numTlim)  ! indicates the reason for the timestep choice
 
       !interfaces for procedure pointers
       abstract interface
@@ -233,7 +233,7 @@
 
       type binary_info
          !binary id
-         integer :: binary_id ! unique identifier for each binary_info instance
+         integer :: binary_id  ! unique identifier for each binary_info instance
          logical :: in_use
 
          integer :: extra_binary_terminal_iounit
@@ -246,7 +246,7 @@
       end type binary_info
 
       logical :: have_initialized_binary_handles = .false.
-      integer, parameter :: max_binary_handles = 10 ! this can be increased as necessary
+      integer, parameter :: max_binary_handles = 10  ! this can be increased as necessary
       type (binary_info), target, save :: binary_handles(max_binary_handles)
          ! gfortran seems to require "save" here.  at least it did once upon a time.
 

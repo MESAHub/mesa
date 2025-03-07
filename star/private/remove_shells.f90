@@ -26,14 +26,12 @@
       module remove_shells
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi4, ln10, boltz_sigma, avo, kerg, msun
       use utils_lib
 
       implicit none
 
-
       contains
-
 
       subroutine do_remove_center_at_cell_k(id, k, ierr)
          integer, intent(in) :: id, k
@@ -192,13 +190,13 @@
                else
                   call do_remove_inner_fraction_q(id, s% q(k), ierr)
                end if
-               if (ierr == 0) then ! adjust ni+co in center zone
+               if (ierr == 0) then  ! adjust ni+co in center zone
                   nz = s% nz
                   mtotal = dot_product(s% dm(1:nz), &
                      s% xa(co56,1:nz) + s% xa(ni56,1:nz))/Msun
                   write(*,1) 'mtotal after remove', mtotal
                   write(*,2) 'nz after remove', nz
-                  dm56 = x - mtotal ! change Ni+Co in nz by this much
+                  dm56 = x - mtotal  ! change Ni+Co in nz by this much
                   x56_old = s% xa(co56,nz) + s% xa(ni56,nz)
                   dm56_old = s% dm(nz)*x56_old/Msun
                   if (x56_old <= 0d0) then
@@ -270,7 +268,7 @@
 
          ! check to see how far extend fallback above innermost cell
          k0 = nz
-         if (s% job% fallback_check_total_energy) then ! remove_bound_inner_region
+         if (s% job% fallback_check_total_energy) then  ! remove_bound_inner_region
             ! integrate total energy outward looking for sign going negative.
             ! if find, then continue until reach minimum integral and cut there.
             sum_total_energy = 0d0
@@ -306,7 +304,7 @@
             end do
             if (sum_total_energy >= 0d0) then
                !write(*,1) 'no bound inner region', sum_total_energy
-               return ! no bound inner region
+               return  ! no bound inner region
             end if
             do k=k0-1,1,-1
                ie = s% energy(k)*s% dm(k)
@@ -316,7 +314,7 @@
                rC = 0.5d0*(rR + rL)
                m_cntr = s% m(k) - 0.5d0*s% dm(k)
                pe = -s% cgrav(k)*m_cntr*s% dm(k)/rC
-               if (ie + ke + pe > 0d0) then ! now back to unbound cell
+               if (ie + ke + pe > 0d0) then  ! now back to unbound cell
                   k0 = k+1
                   !write(*,2) 'top', k0, ie + ke + pe
                   exit
@@ -471,10 +469,10 @@
                ierr = -1
                return
             end if
-            if (v > v_infall) exit ! not falling fast enough
+            if (v > v_infall) exit  ! not falling fast enough
             k_infall = k
          end do
-         if (k_infall == 0) return ! no infall
+         if (k_infall == 0) return  ! no infall
          call do_remove_inner_fraction_q(id, s% q(k_infall), ierr)
          write(*,1) 'new inner boundary mass', s% m_center/Msun
       end subroutine do_remove_center_by_infall_kms
@@ -664,7 +662,7 @@
          end if
          call set_qs(s, s% nz, s% q, s% dq, ierr)
          if (ierr /= 0) return
-         s% generations = 1 ! memory leak, but hopefully not necessary to fix
+         s% generations = 1  ! memory leak, but hopefully not necessary to fix
             ! assuming remove center is a rare operation
          call prune_star_info_arrays(s, ierr)
          if (ierr /= 0) return
@@ -783,7 +781,7 @@
          end if
          v_max = 1d5*v_surf_km_s
          if (v(1) < v_max) return
-         do k=2,3 ! s% nz
+         do k=2,3  ! s% nz
             if (v(k) < v_max) exit
             write(*,2) 'v', k-1, v(k-1)/1d5, v_surf_km_s
          end do
@@ -815,7 +813,7 @@
          end if
          !write(*,1) 'v(1)/cs', v(1)/s% csound(1), v_surf_div_cs
          if (v(1) < s% csound(1)*v_surf_div_cs) return
-         do k=2,30 ! s% nz
+         do k=2,30  ! s% nz
             if (v(k) < s% csound(k)*v_surf_div_cs) exit
             write(*,2) 'v/cs', k-1, v(k-1)/s% csound(k-1)
          end do
@@ -1040,7 +1038,7 @@
             c = prv
          end if
 
-         prv = s ! this makes copies of pointers and scalars
+         prv = s  ! this makes copies of pointers and scalars
 
          nz = nz_old - skip
          s% nz = nz
@@ -1276,7 +1274,7 @@
 
          s% prev_mesh_nz = 0
 
-         call change_net(id, .true., 'basic.net', ierr) ! TODO:need to allow specification of different net
+         call change_net(id, .true., 'basic.net', ierr)  ! TODO:need to allow specification of different net
          if (dbg) write(*,*) "check change_net ierr", ierr
          if (ierr /= 0) return
          call load_zams_model(id, ierr)

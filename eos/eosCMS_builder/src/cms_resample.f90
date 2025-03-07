@@ -39,7 +39,7 @@ program cms_resample
    integer, parameter :: version = 1
    integer, parameter :: NT = 121
    integer, parameter :: NP = 441
-   integer, parameter :: NRho = 281 ! -8 <= logRho <= +6 by 0.05
+   integer, parameter :: NRho = 281  ! -8 <= logRho <= +6 by 0.05
    integer :: ierr, i, j, io
 
    character(len=256) :: input, output
@@ -60,7 +60,7 @@ program cms_resample
    real(dp) :: new_logT, new_logRho, new_logP, new_logU, new_logS, new_dlnS_dlnT, new_dlnS_dlnP
    real(dp) :: new_dlnRho_dlnT, new_dlnRho_dlnP, new_grad_ad, dU_dP_T, dU_dT_P, dS_dRho, mu, dP_dT
    real(dp) :: dS_dT, dU_dRho, Cv, Cp, gamma1, gamma3, eta, P, U, S, T, Rho, chiRho, chiT, lnfree_e
-   real(dp) :: dS_dP_T, dS_dT_P, dse, dsp, dpe !for consistency check
+   real(dp) :: dS_dP_T, dS_dT_P, dse, dsp, dpe  !for consistency check
 
    ierr=0
 
@@ -76,7 +76,7 @@ program cms_resample
 
    open(newunit=io,file=trim(input),action='read',status='old',iostat=ierr)
    read(io,'(2x,f5.3)') H_mass_fraction
-   read(io,*) !header
+   read(io,*)  !header
    do i=1,NT
       do j=1,NP
          read(io,'(1p99e15.6)') logT(j,i), logP(j,i), logRho(j,i), logU(j,i), logS(j,i), &
@@ -117,10 +117,10 @@ program cms_resample
          Rho = exp10(new_logRho)
 
          !CMS eqn 5
-         chiRho = 1.0_dp / new_dlnRho_dlnP ! dlnP/dlnRho at const T
-         chiT   = -new_dlnRho_dlnT / new_dlnRho_dlnP !dlnP/dlnT at const Rho
-         Cp = S * new_dlnS_dlnT ! at const P
-         Cv = Cp - (P*chiT*chiT)/(Rho*T*chiRho) ! at const Rho (V)
+         chiRho = 1.0_dp / new_dlnRho_dlnP  ! dlnP/dlnRho at const T
+         chiT   = -new_dlnRho_dlnT / new_dlnRho_dlnP  !dlnP/dlnT at const Rho
+         Cp = S * new_dlnS_dlnT  ! at const P
+         Cv = Cp - (P*chiT*chiT)/(Rho*T*chiRho)  ! at const Rho (V)
 
          dU_dP_T = new_dlnRho_dlnP/Rho + T*S*new_dlnS_dlnP/P
          dU_dT_P = (P/(rho*T))*new_dlnRho_dlnT + S*new_dlnS_dlnT
@@ -133,7 +133,7 @@ program cms_resample
          mu = 4.0_dp / (6.0_dp*H_mass_fraction + He_mass_fraction + 2.0_dp)
          lnfree_e = log(0.5_dp*(1.0_dp + H_mass_fraction))
 
-         dS_dT = (S/T)*new_dlnS_dlnP * chiT !dS/dT_|Rho
+         dS_dT = (S/T)*new_dlnS_dlnP * chiT  !dS/dT_|Rho
          dS_dRho = new_dlnS_dlnT / new_dlnRho_dlnT * (S/Rho)
 
          !gamma3 = (P*chiT)/(rho*T*Cv) + 1.0_dp
@@ -148,7 +148,7 @@ program cms_resample
          !dpe
          dse = T*(dS_dT/Cv) - 1.0_dp
          dsp = -rho*rho*(dS_dRho/dP_dT) - 1.0_dp
-         dpe = 0.0_dp !not avaiable as yet...
+         dpe = 0.0_dp  ! not available as yet...
 
          write(io,'(1p99e15.6)') new_logT, new_logRho, new_logP, new_logU, new_logS, &
             chiRho, chiT, Cp, Cv, dU_dRho, dS_dT, dS_dRho, mu, lnfree_e, gamma1, gamma3, &

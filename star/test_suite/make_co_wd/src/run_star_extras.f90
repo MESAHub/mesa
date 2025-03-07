@@ -192,7 +192,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% x_integer_ctrl(1) == 2) then ! part2
+         if (s% x_integer_ctrl(1) == 2) then  ! part2
             H_env_limit = s% x_ctrl(1)
             if (.not. (s% lxtra(1) .or. s% lxtra(2))) then
                ! find mass coordinate for cut

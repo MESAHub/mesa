@@ -44,7 +44,7 @@ contains
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
 
-      k = 0 ! The cell to remove down to.
+      k = 0  ! The cell to remove down to.
    end subroutine default_other_remove_surface
 
 end module other_remove_surface
