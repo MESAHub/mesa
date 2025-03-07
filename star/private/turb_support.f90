@@ -201,17 +201,20 @@ contains
       beta = Pg / P
       Lambda = mixing_length_alpha*scale_height
       grav = cgrav*m/pow2(r)
+      max_conv_vel = 1d99
       if (s% use_Ledoux_criterion) then
          gradL = grada + gradL_composition_term  ! Ledoux temperature gradient
       else
          gradL = grada
       end if
 
-      ! maximum convection velocity allowed, not available for TDC
-      if (associated(s% csound_face)) then
-         max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
-      else
-         max_conv_vel = 1.0d99
+      ! maximum convection velocity.
+      if (associated(s% csound_face) .and. associated(s% q)) then
+         if (s% q(k) <= max_conv_vel_div_csound_maxq) then
+             max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
+         else
+            max_conv_vel = 1d99
+         end if
       end if
 
 
