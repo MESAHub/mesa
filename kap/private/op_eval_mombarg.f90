@@ -1,7 +1,6 @@
       module op_eval_mombarg
 
       use const_def, only: dp, pi
-      !use crlibm_lib
 
       implicit none
 

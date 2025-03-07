@@ -22,7 +22,7 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
 c FORTRAN 90 module for calculation of radiative accelerations,
 c based on the Opacity Project (OP) code "OPserver".
 c See CHANGES_HU for changes made to the original code.
@@ -34,12 +34,10 @@ c
       use const_def, only: dp
       use math_lib
       use kap_def, only: kap_test_partials, kap_test_partials_val, kap_test_partials_dval_dx
-      
+
       logical, parameter :: dbg = .false.
 
       contains
-
-
 
 
 c HH: Based on "op_ax.f"
@@ -48,7 +46,7 @@ c          iz1(kk) = charge of element to calculate g_rad for
 c          nel = number of elements in mixture
 c          izzp(nel) = charge of elements
 c          fap(nel) = number fractions of elements
-c          fac(nel) = scale factors for element opacity   
+c          fac(nel) = scale factors for element opacity
 c          flux = local radiative flux (Lrad/4*pi*r^2)
 c          fltp = log T
 c          flrhop = log rho
@@ -56,15 +54,15 @@ c          screening   if true, use screening corrections
 c Output: g1 = log kappa
 c         gx1 = d(log kappa)/d(log T)
 c         gy1 = d(log kappa)/d(log rho)
-c         gp1(kk) = d(log kappa)/d(log xi) 
+c         gp1(kk) = d(log kappa)/d(log xi)
 c         grl1(kk) = log grad
-c         fx1(kk) = d(log grad)/d(log T) 
+c         fx1(kk) = d(log grad)/d(log T)
 c         fy1(kk) = d(log grad)/d(log rho)
 c         grlp1(kk) = d(log grad)/d(log xi)
 c         meanZ(nel) = average ionic charge of elements
-c         zetx1(nel) = d(meanZ)/d(log T) 
+c         zetx1(nel) = d(meanZ)/d(log T)
 c         zety1(nel) = d(meanZ)/d(log rho)
-c         ierr = 0 for correct use 
+c         ierr = 0 for correct use
       subroutine eval_op_radacc(
      > kk, izk, nel, izzp, fap, fac, flux, fltp, flrhop, screening,
      : g1, grl1,
@@ -84,23 +82,23 @@ c         ierr = 0 for correct use
          ! umesh(nptot)
          ! semesh(nptot)
          ! ff(nptot, ipe, 4, 4)
-         ! ta(nptot, nrad, 4, 4), 
+         ! ta(nptot, nrad, 4, 4),
          ! rs(nptot, 4, 4)
       integer,intent(out) :: ierr
-c local variables      
+c local variables
       integer :: n, i, k2, i3, ntot, jhmin, jhmax
       integer :: ih(4), jh(4), ilab(4), kzz(nrad), nkz(ipe), izz(ipe), iz1(nrad)
       real :: const, gx, gy, flt, flrho, flmu, dscat, dv, xi, flne,
      : epa, eta, ux, uy, g
       real :: uf(0:100), rion(28,4,4), rossl(4,4), flr(4,4),
-     : rr(28, ipe, 4, 4), fa(ipe), 
-     : gaml(4, 4, nrad), f(nrad), am1(nrad), 
+     : rr(28, ipe, 4, 4), fa(ipe),
+     : gaml(4, 4, nrad), f(nrad), am1(nrad),
      : fmu1(nrad)
 c
 c  Initialisations
       include 'formats'
-      
-      ierr = 0      
+
+      ierr = 0
       if(nel.le.0.or.nel.gt.ipe) then
          write(6,*)'OP - NUMBER OF ELEMENTS OUT OF RANGE:', nel
          ierr = 1
@@ -108,19 +106,19 @@ c  Initialisations
       endif
 
       if (dbg) write(*,*) 'start eval_op_radacc'
-      
+
 
 
 c  Get i3 for mesh type q='m'
-      i3=2      
-c      
+      i3=2
+c
 c HH: k2 loops over elements for which to calculate grad.
       do k2 = 1, kk
          do n = 1, ipe
             if(izk(k2).eq.kz(n)) then
                iz1(k2) = izk(k2)
                exit
-            endif   
+            endif
             if(n.eq.ipe) then
                write(6,*) 'OP - SELECTED ELEMENT CANNOT BE TREATED: Z = ', izk(k2)
                write(6,*) 'OP supports C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni'
@@ -129,7 +127,7 @@ c HH: k2 loops over elements for which to calculate grad.
             endif
          enddo
       enddo
-c      
+c
       outer: do i = 1, nel
          inner: do n = 1, ipe
             if(izzp(i).eq.kz(n)) then
@@ -148,12 +146,12 @@ c
          return
       enddo outer
 c
-c Calculate mean atomic weight (flmu) and 
+c Calculate mean atomic weight (flmu) and
 c array kzz indicating elements for which to calculate g_rad
       if (dbg) write(*,*) 'call abund'
-      call abund(nel, izz, kk, iz1, fa,     !input variables 
+      call abund(nel, izz, kk, iz1, fa,     !input variables
      :   kzz, flmu, am1, fmu1, nkz)         !output variables
-c           
+c
 c  Other initialisations
 c       dv = interval in frequency variable v
 c       ntot=number of frequency points
@@ -177,12 +175,12 @@ c       xi=interpolation variable
 c       log10(T)=flt=0.025*(ite(1)+xi+3)
 c       ilab(i) is temperature label
       if (dbg) write(*,*) 'call xindex'
-      call xindex(flt, ilab, xi, ih, i3, ierr) 
+      call xindex(flt, ilab, xi, ih, i3, ierr)
       if (ierr /= 0) then
          write(*,*) "xindex errored in radacc"
          return
       endif
-c      
+c
 c     Get density indices
 c       Let jne(j) be density index used  in mono files
 c       Put jne(j)=2*jh(j)
@@ -192,7 +190,7 @@ c       Get extreme range for jh
       call jrange(ih, jhmin, jhmax, i3)
 c
 c     Get electron density flne=log10(Ne) for specified mass density flrho
-c       Also:  UY=0.25*[d log10(rho)]/[d log10(Ne)] 
+c       Also:  UY=0.25*[d log10(rho)]/[d log10(Ne)]
 c              epa=electrons per atom
       if (dbg) write(*,*) 'call findne'
       call findne(ilab, fa, nel, nkz, jhmin, jhmax, ih, flrho, flt, xi,
@@ -207,11 +205,11 @@ c       Interpolation variable eta
 c       log10(Ne)=flne=0.25*(jne(1)+eta+3)
       if (dbg) write(*,*) 'call yindex'
       call yindex(jhmin, jhmax, flne, jh, i3, eta)
-c        
+c
 c     Get ux=0.025*[d log10(rho)]/[d log10(T)]
       if (dbg) write(*,*) 'call findux'
       call findux(flr, xi, eta, ux)
-            
+
 c    rossl(i,j)=log10(Rosseland mean) on mesh points (i,j)
 c     Get new mono opacities, ff(n,k,i,j)
       if (dbg) write(*,*) 'call rd'
@@ -222,8 +220,8 @@ c     Get rs = weighted sum of monochromatic opacity cross sections
       if (dbg) write(*,*) 'call mix'
       call mix(kk, kzz, ntot, nel, fa, ff, rr, rs, rion)
 c
-c     Screening corrections      
-      if (screening) then      
+c     Screening corrections
+      if (screening) then
 c        Get Boercker scattering correction
          if (dbg) write(*,*) 'call scatt'
          call scatt(ih, jh, rion, uf, rs, umesh, semesh, dscat, ntot, epa, ierr)
@@ -231,9 +229,9 @@ c        Get Boercker scattering correction
 c        Get correction for Debye screening
          if (dbg) write(*,*) 'call screen1'
          call screen1(ih, jh, rion, umesh, ntot, epa, rs)
-      endif               
-c      
-c     Get rossl, array of log10(Rosseland mean in cgs)    
+      endif
+c
+c     Get rossl, array of log10(Rosseland mean in cgs)
       if (dbg) write(*,*) 'call ross'
       call ross(kk, flmu, fmu1, dv, ntot, rs, rossl, gaml, ta)
 c
@@ -242,13 +240,13 @@ c     g=log10(ross, cgs)
       if (dbg) write(*,*) 'call interp'
       call interp(nel, kk, rossl, gaml, xi, eta, g, i3, f)
       if (dbg) write(*,*) 'done interp'
-c      
+c
 c Write grad in terms of local radiative flux instead of (Teff, r/R*):
       const = 13.30295d0 + log10(flux) ! = -log10(c) - log10(amu) + log10(flux)
-      do k2 = 1, kk 
-         grl1(k2) = const + flmu - log10(dble(am1(k2))) + f(k2) + g    ! log g_rad 
+      do k2 = 1, kk
+         grl1(k2) = const + flmu - log10(dble(am1(k2))) + f(k2) + g    ! log g_rad
       enddo   !k2
-c      
+c
       g1 = g                ! log kappa
 
 c
@@ -257,20 +255,20 @@ c
 c
       end subroutine eval_op_radacc
 c***********************************************************************
-c HH: Based on "op_mx.f", opacity calculations to be used for stellar evolution calculations 
+c HH: Based on "op_mx.f", opacity calculations to be used for stellar evolution calculations
 c Input:   nel = number of elements in mixture
 c          izzp(nel) = charge of elements
 c          fap(nel) = number fractions of elements
-c          fac(nel) = scale factors for element opacity   
+c          fac(nel) = scale factors for element opacity
 c          fltp = log (temperature)
-c          flrhop = log (mass density) 
+c          flrhop = log (mass density)
 c          screening   if true, use screening corrections
 c Output: g1 = log kappa
 c         gx1 = d(log kappa)/d(log T)
 c         gy1 = d(log kappa)/d(log rho)
-c         ierr = 0 for correct use 
+c         ierr = 0 for correct use
       subroutine eval_op_ev(
-     >         nel, izzp, fap, fac, fltp, flrhop, screening, g1, gx1, gy1, 
+     >         nel, izzp, fap, fac, fltp, flrhop, screening, g1, gx1, gy1,
      >         umesh, semesh, ff, rs, ierr)
       use op_ev
       use op_load, only: msh
@@ -289,26 +287,26 @@ c         ierr = 0 for correct use
          ! rs(nptot, 4, 4)
          ! s(nptot, nrad, 4, 4)
       integer,intent(out) :: ierr
-c local variables      
+c local variables
       integer :: n, i, i3, jhmin, jhmax, ntot
-      integer :: ih(4), jh(4), ilab(4), izz(ipe), nkz(ipe) 
+      integer :: ih(4), jh(4), ilab(4), izz(ipe), nkz(ipe)
       real :: flt, flrho, flmu, flne, dv, dscat, const, gx, gy, g,
      : eta, epa, xi, ux, uy
-      real :: uf(0:100), rion(28, 1:4, 1:4), rossl(4, 4), flr(4, 4), 
+      real :: uf(0:100), rion(28, 1:4, 1:4), rossl(4, 4), flr(4, 4),
      : fa(ipe), rr(28, ipe, 4, 4),
      : fmu1(nrad)
 c
 c  Initialisations
-      ierr=0      
+      ierr=0
       if(nel.le.0.or.nel.gt.ipe) then
          write(6,*)'OP - NUMBER OF ELEMENTS OUT OF RANGE:',nel
          ierr=1
          return
       endif
-c      
+c
 c  Get i3 for mesh type q='m'
       i3=2
-c      
+c
         outer: do i=1,nel
           inner: do n=1,ipe
             if(izzp(i).eq.kz(n)) then
@@ -328,9 +326,9 @@ c
           return
        enddo outer
 
-c Calculate mean atomic weight (flmu) 
+c Calculate mean atomic weight (flmu)
       call abund(nel, izz, fa, flmu, fmu1, nkz)
-c          
+c
 c  Other initialisations
 c       dv = interval in frequency variable v
 c       ntot=number of frequency points
@@ -351,21 +349,21 @@ c       Use ih(i), i=1 to 4
 c       xi=interpolation variable
 c       log10(T)=flt=0.025*(ite(1)+xi+3)
 c       ilab(i) is temperature label
-      call xindex(flt, ilab, xi, ih, i3, ierr) 
+      call xindex(flt, ilab, xi, ih, i3, ierr)
       if (ierr /= 0) then
          write(*,*) "eval_op_ev failed in xindex"
          return
       endif
-c      
+c
 c     Get density indices
 c       Let jne(j) be density index used  in mono files
 c       Put jne(j)=2*jh(j)
 c       Use jh(j), j=1 to 4
 c       Get extreme range for jh
-      call jrange(ih, jhmin, jhmax, i3)   
+      call jrange(ih, jhmin, jhmax, i3)
 c
 c     Get electron density flne=log10(Ne) for specified mass density flrho
-c       Also:  UY=0.25*[d log10(rho)]/[d log10(Ne)] 
+c       Also:  UY=0.25*[d log10(rho)]/[d log10(Ne)]
 c              epa=electrons per atom
       call findne(ilab, fa, nel, nkz, jhmin, jhmax, ih, flrho, flt,
      + xi, flne, flmu, flr, epa, uy, i3, ierr)
@@ -378,18 +376,18 @@ c     Get density indices jh(j), j=1 to 4,
 c       Interpolation variable eta
 c       log10(Ne)=flne=0.25*(jne(1)+eta+3)
       call yindex(jhmin, jhmax, flne, jh, i3, eta)
-c        
+c
 c     Get ux=0.025*[d log10(rho)]/[d log10(T)]
       call findux(flr, xi, eta, ux)
-            
+
 c    rossl(i,j)=log10(Rosseland mean) on mesh points (i,j)
 c     Get new mono opacities, ff(n,k,i,j)
       call rd(nel, nkz, izz, ilab, jh, ntot, ff, rr, i3, umesh, fac)
 
 c     Up-date mixture
-      call mix(ntot, nel, fa, ff, rs, rr, rion)  
+      call mix(ntot, nel, fa, ff, rs, rr, rion)
 c
-      if(screening) then 
+      if(screening) then
 c        Get Boercker scattering correction
          call scatt(ih, jh, rion, uf, rs, umesh, semesh, dscat, ntot, epa, ierr)
          if (ierr /= 0) then
@@ -398,19 +396,19 @@ c        Get Boercker scattering correction
          endif
 c        Get correction for Debye screening
          call screen1(ih, jh, rion, umesh, ntot, epa, rs)
-      endif     
-c      
+      endif
+c
 c     Get rossl, array of log10(Rosseland mean in cgs)
       call ross(flmu, fmu1, dv, ntot, rs, rossl)
-c      
+c
 c     Interpolate to required flt, flrho
 c     g=log10(ross, cgs)
-      call interp(nel, rossl, xi, eta, 
+      call interp(nel, rossl, xi, eta,
      : g, i3, ux, uy, gx, gy)
-c            
+c
       g1 = g                ! log kappa
       gx1 = gx              ! dlogkappa/dt
-      gy1 = gy              ! dlogkappa/drho   
+      gy1 = gy              ! dlogkappa/drho
 c
       return
 c
@@ -422,14 +420,14 @@ c Special care is taken to ensure smoothness of opacity derivatives
 c Input:   nel = number of elements in mixture
 c          izzp(nel) = charge of elements
 c          fap(nel) = number fractions of elements
-c          fac(nel) = scale factors for element opacity   
+c          fac(nel) = scale factors for element opacity
 c          fltp = log (temperature)
-c          flrhop = log (mass density) 
+c          flrhop = log (mass density)
 c          screening   if true, use screening corrections
 c Output: g1 = log kappa
 c         gx1 = d(log kappa)/d(log T)
 c         gy1 = d(log kappa)/d(log rho)
-c         ierr = 0 for correct use 
+c         ierr = 0 for correct use
       subroutine eval_alt_op(
      >         nel, izzp, fap, fac, fltp, flrhop, screening, g1, gx1, gy1,
      >         umesh, semesh, ff, rs, ierr)
@@ -449,25 +447,25 @@ c         ierr = 0 for correct use
          ! ff(nptot, ipe, 0:5, 0:5)
          ! rs(nptot, 0:5, 0:5)
       integer,intent(out) :: ierr
-c local variables      
+c local variables
       integer :: n, i, i3, jhmin, jhmax, ntot
-      integer :: ih(0:5), jh(0:5), ilab(0:5), izz(ipe), nkz(ipe) 
+      integer :: ih(0:5), jh(0:5), ilab(0:5), izz(ipe), nkz(ipe)
       real :: flt, flrho, flmu, flne, dv, dscat, const, gx, gy, g,
      : eta, epa, xi, ux, uy
-      real :: uf(0:100), rion(28, 0:5, 0:5), rossl(0:5, 0:5), flr(4, 4), 
+      real :: uf(0:100), rion(28, 0:5, 0:5), rossl(0:5, 0:5), flr(4, 4),
      : fa(ipe), rr(28, ipe, 0:5, 0:5)
 c
 c  Initialisations
-      ierr=0      
+      ierr=0
       if(nel.le.0.or.nel.gt.ipe) then
          write(6,*)'OP - NUMBER OF ELEMENTS OUT OF RANGE:',nel
          ierr=1
          return
       endif
-c      
+c
 c  Get i3 for mesh type q='m'
       i3=2
-c      
+c
         outer: do i=1,nel
           inner: do n=1,ipe
             if(izzp(i).eq.kz(n)) then
@@ -487,9 +485,9 @@ c
           return
        enddo outer
 
-c Calculate mean atomic weight (flmu) 
+c Calculate mean atomic weight (flmu)
       call abund(nel, izz, fa, flmu, nkz)
-c          
+c
 c  Other initialisations
 c       dv = interval in frequency variable v
 c       ntot=number of frequency points
@@ -510,18 +508,18 @@ c       Use ih(i), i=1 to 4
 c       xi=interpolation variable
 c       log10(T)=flt=0.025*(ite(1)+xi+3)
 c       ilab(i) is temperature label
-      call xindex(flt, ilab, xi, ih, i3, ierr) 
+      call xindex(flt, ilab, xi, ih, i3, ierr)
       if (ierr /= 0) return
-c      
+c
 c     Get density indices
 c       Let jne(j) be density index used  in mono files
 c       Put jne(j)=2*jh(j)
 c       Use jh(j), j=1 to 4
 c       Get extreme range for jh
-      call jrange(ih, jhmin, jhmax, i3)   
+      call jrange(ih, jhmin, jhmax, i3)
 c
 c     Get electron density flne=log10(Ne) for specified mass density flrho
-c       Also:  UY=0.25*[d log10(rho)]/[d log10(Ne)] 
+c       Also:  UY=0.25*[d log10(rho)]/[d log10(Ne)]
 c              epa=electrons per atom
       call findne(ilab, fa, nel, nkz, jhmin, jhmax, ih, flrho, flt,
      + xi, flne, flmu, flr, epa, uy, i3, ierr)
@@ -531,40 +529,39 @@ c     Get density indices jh(j), j=1 to 4,
 c       Interpolation variable eta
 c       log10(Ne)=flne=0.25*(jne(1)+eta+3)
       call yindex(jhmin, jhmax, flne, jh, i3, eta)
-c        
+c
 c     Get ux=0.025*[d log10(rho)]/[d log10(T)]
       call findux(flr, xi, eta, ux)
-            
+
 c    rossl(i,j)=log10(Rosseland mean) on mesh points (i,j)
 c     Get new mono opacities, ff(n,k,i,j)
       call rd(nel, nkz, izz, ilab, jh, ntot, ff, rr, i3, umesh, fac)
 
 c     Up-date mixture
-      call mix(ntot, nel, fa, ff, rs, rr, rion)  
+      call mix(ntot, nel, fa, ff, rs, rr, rion)
 c
-      if(screening) then 
+      if(screening) then
 c        Get Boercker scattering correction
          call scatt(ih, jh, rion, uf, rs, umesh, semesh, dscat, ntot, epa, ierr)
          if (ierr /= 0) return
 c        Get correction for Debye screening
          call screen1(ih, jh, rion, umesh, ntot, epa, rs)
-      endif     
-c      
+      endif
+c
 c     Get rossl, array of log10(Rosseland mean in cgs)
       call ross(flmu, dv, ntot, rs, rossl)
-c      
+c
 c     Interpolate to required flt, flrho
 c     g=log10(ross, cgs)
       call interp(nel, rossl, xi, eta, g, i3, ux, uy, gx, gy)
-c      
+c
       g1 = g                ! log kappa
       gx1 = gx              ! dlogkappa/dt
-      gy1 = gy              ! dlogkappa/drho   
-c        
+      gy1 = gy              ! dlogkappa/drho
+c
       return
 c
       end subroutine eval_alt_op
 c***********************************************************************
-
 
       end module op_eval
