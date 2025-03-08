@@ -22,7 +22,7 @@ SRCS = \
    op_ev.f \
    op_osc.f \
    op_radacc.f \
-   op_eval.f \
+   op_eval.f90 \
    op_eval_mombarg.f90 \
    kap_eval_support.f90 \
    condint.f90 \
@@ -83,22 +83,6 @@ COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(MOD_INCLUDES)
 COMPILE_CMD = $(COMPILE)
 
 COMPILE_LEGACY_NOCHECKS = $(filter-out -std=f2008, $(COMPILE_NO_CHECKS))
-
-op_eval.o : op_eval.f
-ifneq ($(QUIET),)
-	@echo COMPILE_NO_CHECKS $<
-	@$(COMPILE_NO_CHECKS) $(FCfixed) $<
-else
-	$(COMPILE_NO_CHECKS) $(FCfixed) $<
-endif
-
-conduction.o : conduction.f
-ifneq ($(QUIET),)
-	@echo COMPILE_NO_CHECKS $<
-	@$(COMPILE_NO_CHECKS) $(FCfree) $<
-else
-	$(COMPILE_NO_CHECKS) $(FCfree) $<
-endif
 
 op_load.o op_common.o op_ev.o op_osc.o op_radacc.o : %.o : %.f
 ifneq ($(QUIET),)

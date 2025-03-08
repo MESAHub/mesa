@@ -28,7 +28,6 @@
       use math_lib
       use op_def
       use const_def
-    !  use op_load, only: nptot, ipe
 
       logical, parameter :: dbg = .false.
 
