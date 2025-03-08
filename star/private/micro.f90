@@ -653,6 +653,12 @@ contains
        s% d_opacity_dlnT(k) = 0
     end if
 
+    if (s% opacity(k) < s% opacity_min .and. s% opacity_min > 0) then
+       s% opacity(k) = s% opacity_min
+       s% d_opacity_dlnd(k) = 0
+       s% d_opacity_dlnT(k) = 0
+    end if
+
     if (is_bad_num(s% opacity(k))) then
        if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)

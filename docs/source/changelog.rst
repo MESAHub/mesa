@@ -42,6 +42,14 @@ Previous MESA versions exclusively adopted the latter.
 By user request, a radiation diffusion flux limiter has been reintroduced with the 
 control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_form_of_T_gradient_eqn``.
 
+By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced 
+allowing users to limit the convective velocity to some fraction of the local sound speed using the
+controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
+
+By user request, and motivated by the underestimation of line opacities from expanding material by the `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables, 
+see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_. An optional control for an opacity floor, ``opacity_min``, has
+been introduced.
+
 .. _Bug Fixes main:
 
 Bug Fixes
@@ -290,7 +298,7 @@ shmesa
 ~~~~~~
 
 We have introduced a new set of command line utilities for interacting with MESA.
-See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__.
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_.
 
 These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full
 ``run_star_extras.f90`` template (``shmesa extras``).

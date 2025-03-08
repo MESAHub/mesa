@@ -92,10 +92,10 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
       use tdc
       use tdc_support
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
       logical, intent(in) :: report
@@ -106,7 +106,7 @@ module turb
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
-      real(dp), parameter :: eps = 1d-2  ! Threshold in logY for separating multiple solutions.
+      real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
       type(auto_diff_real_tdc) :: Zub, Zlb
       include 'formats'
 
@@ -117,7 +117,8 @@ module turb
       call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                     Gamma, gradT, Y_face, conv_vel, D, mixing_type,1d99, ierr)
+
 
       ! Pack TDC info
       info%report = report
@@ -144,6 +145,16 @@ module turb
       Zub = upper_bound_Z
       Zlb = lower_bound_Z
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
+
+      ! Cap conv_vel at max_conv_vel_div_csound*cs
+      if (conv_vel%val > max_conv_vel) then
+         conv_vel = max_conv_vel
+         ! if max_conv_vel = csound,
+         ! L = L0 * (gradL + Y) + c0 * Af * Y_env
+         ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
+         ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
+         Y_face = unconvert(info%L - info%L0 * info%gradL) / (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
+      end if
 
       ! Unpack output
       gradT = Y_face + gradL
@@ -225,18 +236,20 @@ module turb
    subroutine set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
       use mlt
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
-      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
+      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
+
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
       call calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
    end subroutine set_MLT
 
 end module turb
