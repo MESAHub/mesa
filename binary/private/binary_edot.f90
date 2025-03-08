@@ -25,7 +25,7 @@
 
     module binary_edot
 
-    use const_def
+    use const_def, only: dp
     use star_lib
     use star_def
     use binary_def

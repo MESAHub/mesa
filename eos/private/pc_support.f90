@@ -733,7 +733,7 @@
                tbl2(j,iQ,i) = vec(1+j)
             end do
 
-         enddo
+         end do
 
          if(iQ == fq% nlnRS) exit
          read(io_unit,*,iostat=ierr)

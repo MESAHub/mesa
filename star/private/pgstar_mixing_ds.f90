@@ -26,7 +26,7 @@
       module pgstar_mixing_Ds
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, rayleigh_taylor_mixing, minimum_mixing
       use pgstar_support
       use pgstar_trho_profile
       use star_pgstar

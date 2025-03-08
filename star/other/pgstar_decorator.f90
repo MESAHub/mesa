@@ -41,7 +41,7 @@ contains
    ! plot_num: If a plot has multiple sub-panels, then this tells you which panel is being called
    subroutine null_pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
       use star_def
-      use const_def
+      use const_def, only: dp
       integer, intent(in) :: id
       !Not doubles
       real, intent(in) :: xmin, xmax, ymin, ymax
@@ -53,7 +53,7 @@ contains
 ! Example function to add squares and some text to the abundance plot
 !      subroutine Abundance_pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
 !         use star_def
-!         use const_def
+!         use const_def, only: dp
 !         integer, intent(in) :: id
 !         !Not dp
 !         real,intent(in) :: xmin, xmax, ymin, ymax

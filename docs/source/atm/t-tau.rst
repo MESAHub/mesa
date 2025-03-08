@@ -8,7 +8,7 @@ relation, as follows:
 
 .. list-table:: The ``atm_T_tau_relation`` control
    :widths: 25 75
-	    
+
    * - Value
      - Meaning
 
@@ -24,7 +24,7 @@ relation, as follows:
    * - ``'Krishna_Swamy'``
      - Use the approximate Hopf function given by Krishna-Swamy
        (1966, ApJ, 145, 174).
-    
+
 For the selected :math:`T(\tau)` relation, the pressure structure of
 the atmosphere is obtained by integrating the equation of hydrostatic
 equilibrium

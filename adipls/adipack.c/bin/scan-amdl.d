@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/scan-amdl.d.x
 if [ $# -eq 0 ] || [ "$1" == "-help" ]
 then

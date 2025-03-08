@@ -152,7 +152,7 @@
                B1=B1+F1
                dB1dT = dB1dT + dF1dT
 
-            endif
+            end if
 
             if (1.836D4 > R6T) then
 
@@ -165,7 +165,7 @@
                B2=B2+F2
                dB2dT = dB2dT + dF2dT
 
-            endif
+            end if
 
             G1=B1*exp(60.492D0*R6T13/T6)
             dG1dT = G1*(dB1dT/B1 - 60.492D0*R6T13*dT6dT/(T6*T6))
@@ -220,7 +220,7 @@
 
                G1=B1; dG1dRho = dB1dRho; dG1dT = dB1dT
 
-            endif
+            end if
 
             if (1.836D4 > R6T) then
 
@@ -243,9 +243,9 @@
 
                G2=B2; dG2dRho = dB2dRho; dG2dT = dB2dT
 
-            endif
+            end if
 
-         endif
+         end if
 
          r=5.120D29*G1*G2*Y*Y*Y*R6*R6  ! ergs/g/sec, eqn 4.7 in F&L
 

@@ -6,7 +6,7 @@ timing
 
 This test checks the counter and timing routines with a 1.5 Msun, Z=0.02 metallicity model.
 
-This test case has 2 part2. 
+This test case has 2 part2.
 
 * Part 1 (``inlist_zams``) builds a 1.5 Msun, Z=0.02 metallicity and evolves it to the zero-age main sequence.
 

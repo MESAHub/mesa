@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 do_one(){
     ln -sf inlists/inlist_$1 inlist_equations

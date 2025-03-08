@@ -4,7 +4,7 @@ c*************************************************************************
       subroutine esac_hhe (xh,t6,r,iorder,irad,filename,results_out,pgas_out,prad_out,info)
 c..... The purpose of this subroutine is to interpolate 
 c      the equation of state and its derivatives in X, T6, density
-c        izi=0 recalulate table indices to use; =1 keep previous
+c        izi=0 recalculate table indices to use; =1 keep previous
 
 c        xh=hydrogen mass fraction
 c        ztab is metal fraction of the EOS5_data_H-He tables you are using.
@@ -14,7 +14,7 @@ c        r=rho=Rho=density(g/cm**3)
 c..... to use esac insert common/eeos_hhe/ esact,eos(mv) in the calling routine.
 c      This common contains the interpolated EOS values for the EOS
 c
-c..... eos(i) are obtained from a quadradic interpolation at
+c..... eos(i) are obtained from a quadratic interpolation at
 c      fixed T6 at three values of Rho; followed by quadratic
 c      interpolation along T6. Results smoothed by mixing
 c      overlapping quadratics.

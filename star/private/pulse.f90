@@ -25,8 +25,6 @@
 
 module pulse
 
-  ! Uses
-
   use star_def
   use utils_lib
 
@@ -38,11 +36,7 @@ module pulse
   use pulse_saio
   use pulse_gr1d
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -94,13 +88,10 @@ contains
     call write_pulse_data(id, data_format, filename, global_data, point_data, ierr)
     if (ierr /= 0) return
 
-    ! Finish
-
     return
 
   end subroutine export_pulse_data
 
-  !****
 
   subroutine get_pulse_data (id, data_format, &
        add_center_point, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
@@ -158,13 +149,10 @@ contains
        call s%other_edit_pulse_data(s%id, data_format, global_data, point_data, ierr)
     end if
 
-    ! Finish
-
     return
 
   end subroutine get_pulse_data
 
-  !****
 
   subroutine write_pulse_data (id, data_format, filename, global_data, point_data, ierr)
 
@@ -196,8 +184,6 @@ contains
        write(*,*) 'unknown format in write_pulse_data: '//TRIM(data_format)
        ierr = -1
     end select
-
-    ! Finish
 
     return
 

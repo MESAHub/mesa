@@ -1,3 +1,4 @@
+---
 #
 # file information
 #
@@ -14,7 +15,7 @@ output: AESOPUS_GS98_RCrB.h5
 
 #
 # assumed abundance pattern information
-# 
+#
 
 Zsun: 0.01696
 C_div_Z_sun: 1.709837E-01

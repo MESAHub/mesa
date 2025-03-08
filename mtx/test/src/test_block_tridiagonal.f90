@@ -127,7 +127,7 @@ module test_block_tri_dble
 
             include 'formats'
 
-            iop = 0 ! factor A
+            iop = 0  ! factor A
             call decsolblk( &
                iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
             if (ierr /= 0) then

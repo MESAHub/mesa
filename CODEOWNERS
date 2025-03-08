@@ -23,7 +23,7 @@ kap/ @fxt44 @Debraheem
 linters/
 turb/
 math/ @rhdtownsend
-mtx/  @mjoyceGR
+mtx/ @mjoyceGR
 net/ @fxt44 @Debraheem
 neu/ @fxt44 @Debraheem
 num/
@@ -55,14 +55,14 @@ star/test_suite/accreted_material_j @orlox
 star/test_suite/adjust_net
 star/test_suite/c13_pocket @fxt44
 star/test_suite/carbon_kh
-star/test_suite/cburn_inward 
+star/test_suite/cburn_inward
 star/test_suite/ccsn_IIp @fxt44 @aurimontem
 star/test_suite/check_redo @fxt44
 star/test_suite/check_pulse_atm @warrickball
 star/test_suite/conductive_flame @fxt44
 star/test_suite/conserve_angular_momentum @orlox
 star/test_suite/conv_core_cpm
-star/test_suite/custom_colors 
+star/test_suite/custom_colors
 star/test_suite/custom_rates @fxt44
 star/test_suite/high_rot_darkening @orlox
 star/test_suite/dev_ppisn
@@ -84,7 +84,7 @@ star/test_suite/low_z @aarondotter
 star/test_suite/magnetic_braking
 star/test_suite/make_brown_dwarf @fxt44
 star/test_suite/make_co_wd @wmwolf @evbauer @fxt44
-star/test_suite/make_env 
+star/test_suite/make_env
 star/test_suite/make_he_wd @fxt44
 star/test_suite/make_metals @fxt44
 star/test_suite/make_o_ne_wd @fxt44
@@ -112,7 +112,7 @@ star/test_suite/rsp_gyre @rsmolec
 star/test_suite/rsp_RR_Lyrae @rsmolec
 star/test_suite/rsp_save_and_load_file @rsmolec
 star/test_suite/rsp_Type_II_Cepheid @rsmolec
-star/test_suite/semiconvection  @annethoul
+star/test_suite/semiconvection @annethoul
 star/test_suite/simplex_solar_calibration @mjoyceGR
 star/test_suite/test_case_template @fxt44
 star/test_suite/test_memory

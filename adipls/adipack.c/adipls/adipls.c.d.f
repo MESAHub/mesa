@@ -488,7 +488,7 @@ c  test for skipping to continuing run with parameter setting
 c
       if(i_paramset.eq.1.and.init_paramset.ne.0) go to 10000
 c
-c  as initilization zero all elements in csummm
+c  as initialization zero all elements in csummm
 c
       call zero(csummm,50)
 c

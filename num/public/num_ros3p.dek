@@ -105,10 +105,10 @@
             ! choices are compressed_column_sparse or compressed_row_sparse
          integer, intent(in) :: mljac
             ! if mljac=n: jacobian is a full matrix.
-            ! if 0<=mljac<n: mljac is the lower bandwith of jacobian matrix
+            ! if 0<=mljac<n: mljac is the lower bandwidth of jacobian matrix
                ! (>= number of non-zero diagonals below the main diagonal).
          integer, intent(in) :: mujac
-            ! upper bandwith of jacobian matrix (need not be defined if mljac=n)
+            ! upper bandwidth of jacobian matrix (need not be defined if mljac=n)
                ! (>= number of non-zero diagonals above the main diagonal).
          interface ! subroutine for computing the partials of f(x, y) wrt x
             ! this routine is only called if idfx=1 and ifcn=1;
@@ -136,10 +136,10 @@
          integer, intent(in) :: mlmas
             ! if mlmas=n: M is a full matrix. the linear
             !  algebra is done by full-matrix gauss-elimination.
-            ! if 0<=mlmas<n: mlmas is the lower bandwith of M
+            ! if 0<=mlmas<n: mlmas is the lower bandwidth of M
                ! (>= number of non-zero diagonals below the main diagonal).
          integer, intent(in) :: mumas
-            ! upper bandwith of M (need not be defined if mlmas=n)
+            ! upper bandwidth of M (need not be defined if mlmas=n)
                ! (>= number of non-zero diagonals above the main diagonal).
          
          interface ! subroutine called after each successful step
@@ -225,7 +225,7 @@
          ! iwork(10) the value of m2.  default m2=m1.
 
          ! NOTE: if m1 > 0, ros3p only considers the first m2 variables in estimating the local error.
-         ! i.e., it doesn't try to estimate the error in the auxillary variables.
+         ! i.e., it doesn't try to estimate the error in the auxiliary variables.
 
          ! work(1)   uround, the rounding unit, default 1.d-16.
 

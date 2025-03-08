@@ -26,14 +26,12 @@
       use astero_def
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, Rsun, standard_cgrav
       use math_lib
       use utils_lib
       use auto_diff
 
       implicit none
-
-
 
       contains
 
@@ -111,7 +109,7 @@
                return
             end if
 
-            R = Rsun*s% photosphere_r
+            R = Rsun * s% photosphere_r
             G = standard_cgrav
             M = s% m_grav(1)
             sig_fac = (2*pi)*(2*pi)*R*R*R/(G*M)
@@ -444,7 +442,7 @@
                i0 = i + ratios_l0_first
                i1 = i + ratios_l1_first
                dnu = l1(i1) - l1(i1-1)
-               df = 0.25*dnu
+               df = 0.25d0*dnu
                f0 = l0(i0)
                fmin = f0 - df
                fmax = f0 + df
@@ -573,7 +571,7 @@
             seq_i = i
             seq_n = 1
             do j = seq_i, nl-1  ! j is in series; try to add j+1
-               if (l_obs(j+1) - l_obs(j) > 1.5*delta_nu) then  ! end of series
+               if (l_obs(j+1) - l_obs(j) > 1.5d0*delta_nu) then  ! end of series
                   if (seq_n > max_seq_n) then
                      max_seq_i = seq_i
                      max_seq_n = seq_n
@@ -659,12 +657,12 @@
             ! set l0_n_obs(i) to order of freq_target(0,i)
             range = freq_target(0,nl(0)) - freq_target(0,1)
             norders = int(range/delta_nu + 0.5d0) + 1
-            nmax = (nu_max/delta_nu)*(delta_nu_sun/nu_max_sun)*22.6 - 1.6
+            nmax = (nu_max/delta_nu)*(delta_nu_sun/nu_max_sun)*22.6d0 - 1.6d0
             l0_n_obs(1) = int(nmax - (norders-1)/2)
             if (dbg) write(*,3) 'l0_n_obs(i)', 1, l0_n_obs(1), freq_target(0,1)
             do i=2,norders
                l0_n_obs(i) = l0_n_obs(1) + &
-                  int((freq_target(0,i) - freq_target(0,1))/delta_nu + 0.5)
+                  int((freq_target(0,i) - freq_target(0,1))/delta_nu + 0.5d0)
                if (dbg) write(*,3) 'l0_n_obs(i)', i, l0_n_obs(i), freq_target(0,i)
             end do
             if (dbg) then
@@ -1294,7 +1292,7 @@
             call get_kjeldsen_freq_corr
          else if (correction_scheme == 'cubic') then
             call get_cubic_freq_corr(radial_only)
-            surf_coef1 = a3*pow3(5000.*s%nu_max/s% nu_max_sun)
+            surf_coef1 = a3*pow3(5000.0d0*s%nu_max/s% nu_max_sun)
             surf_coef2 = 0
 
             if (save_next_best_at_higher_frequency) &
@@ -1304,8 +1302,8 @@
             call get_cubic_freq_corr(radial_only)
          else if (correction_scheme == 'combined') then
             call get_combined_freq_corr(radial_only)
-            surf_coef1 = a3*pow3(5000.*s%nu_max/s% nu_max_sun)
-            surf_coef2 = a1/(5000.*s%nu_max/s% nu_max_sun)
+            surf_coef1 = a3*pow3(5000.0d0*s%nu_max/s% nu_max_sun)
+            surf_coef2 = a1/(5000.0d0*s%nu_max/s% nu_max_sun)
 
             if (save_next_best_at_higher_frequency) &
                call get_combined_freq_corr_alt_up(radial_only)

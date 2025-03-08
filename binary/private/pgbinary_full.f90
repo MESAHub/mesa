@@ -26,7 +26,7 @@
 module pgbinary
 
    use binary_def
-   use const_def
+   use const_def, only: dp
    use chem_def, only : category_name
    use rates_def, only : i_rate
    use pgbinary_support

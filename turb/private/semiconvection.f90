@@ -62,7 +62,7 @@ contains
                                  semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                  gradL_composition_term, &
                                  gradT, Y_face, conv_vel, D, mixing_type, ierr)  ! Langer 1983 & 1985
-      use const_def
+      use const_def, only: dp, pi, clight, crad, semiconvective_mixing
       use num_lib
       use utils_lib
       use auto_diff

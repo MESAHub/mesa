@@ -26,7 +26,7 @@
       module adjust_mesh
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use adjust_mesh_support
 
       implicit none

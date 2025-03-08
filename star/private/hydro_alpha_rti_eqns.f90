@@ -27,7 +27,7 @@
       module hydro_alpha_rti_eqns
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use auto_diff_support
 
       implicit none

@@ -26,7 +26,7 @@
 
       module nuclide_set_mod
       use chem_def
-      use const_def
+      use const_def, only: dp
 
       implicit none
 

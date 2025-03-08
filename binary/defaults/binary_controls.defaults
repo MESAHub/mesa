@@ -607,7 +607,7 @@
 
 ! Tolerance for which a solution is considered valid. For the Ritter and Kolb
 ! schemes if we call mdot the mass transfer rate used for the step, and mdot_end
-! the one computed at the end of it, a solution is valid if :: 
+! the one computed at the end of it, a solution is valid if ::
 
 !     abs((mdot-mdot_end)/mdot_end) < b% implicit_scheme_tolerance
 
@@ -1004,7 +1004,7 @@
 ! do_j_accretion
 ! ~~~~~~~~~~~~~~
 
-! If true, compute accretion of angular momentum following A.3.3 of 
+! If true, compute accretion of angular momentum following A.3.3 of
 ! de Mink et al. 2013, ApJ, 764, 166. Otherwise, incoming  material is
 ! assumed to have the specific angular momentum of the surface of the accretor.
 
@@ -1074,7 +1074,7 @@
 ! do_initial_orbit_sync_*
 ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-! Relax rotation of star to orbital period at the beggining of evolution.
+! Relax rotation of star to orbital period at the beginning of evolution.
 ! "\_1" refers to first star, "\_2" to the second one.
 
 ! ::
@@ -1210,7 +1210,7 @@
 ! col_depth_for_eps_extra
 ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-! Energy from irradiation will be deposited in the outer 
+! Energy from irradiation will be deposited in the outer
 ! ``4*Pi*R^2*col_depth_for_eps_extra`` grams of the star.
 
 ! ::

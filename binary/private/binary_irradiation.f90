@@ -26,7 +26,7 @@
 
       module binary_irradiation
 
-      use const_def
+      use const_def, only: dp, pi, lsun
       use star_lib
       use star_def
       use math_lib, only: safe_log10, pow2

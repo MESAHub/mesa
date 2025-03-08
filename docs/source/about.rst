@@ -109,9 +109,8 @@ Developers
 * `Earl Bellinger <https://earlbellinger.com/>`__
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
-* Matthias Fabry
-* Ebraheem Farag
-* Eoin Farrell
+* `Matthias Fabry <https://github.com/matthiasfabry>`__
+* `Ebraheem Farag <https://github.com/Debraheem>`__
 * `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * `Pablo Marchant <https://orlox.github.io/>`__
@@ -119,7 +118,7 @@ Developers
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
-* Anne Thoul
+* `Anne Thoul <https://www.linkedin.com/in/anne-thoul-b8279853>`__
 * `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
@@ -133,6 +132,7 @@ Past Developers
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
 * `Josiah Schwab <https://yoshiyahu.org/>`__
+* `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 
 Other Code Contributors
 -----------------------

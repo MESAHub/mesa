@@ -1,25 +1,25 @@
 import re
 
 # regex to strip leading comment
-STRIP = re.compile(r'^\s*\!\s?')
+STRIP = re.compile(r"^\s*\!\s?")
 
 # files that should be stripped
 DEFAULTS_FILES = (
-    'reference/astero_search',
-    'reference/astero_pgstar',
-    'eos/defaults',
-    'kap/defaults',
-    'reference/binary_job',
-    'reference/binary_controls',
-    'reference/pgbinary',
-    'reference/star_job',
-    'reference/controls',
-    'reference/pgstar',
-    'reference/format',
-    'reference/star_job_dev',
-    'reference/controls_dev',
-    'reference/eos',
-    'reference/kap'
+    "reference/astero_search",
+    "reference/astero_pgstar",
+    "eos/defaults",
+    "kap/defaults",
+    "reference/binary_job",
+    "reference/binary_controls",
+    "reference/pgbinary",
+    "reference/star_job",
+    "reference/controls",
+    "reference/pgstar",
+    "reference/format",
+    "reference/star_job_dev",
+    "reference/controls_dev",
+    "reference/eos",
+    "reference/kap",
 )
 
 
@@ -29,9 +29,9 @@ def defaults2rst(app, docname, source):
     """
     if docname in DEFAULTS_FILES:
         src = source[0]
-        lines = src.split('\n')
-        rst_lines = [STRIP.sub('', line) for line in lines]
-        source[0] = '\n'.join(rst_lines)
+        lines = src.split("\n")
+        rst_lines = [STRIP.sub("", line) for line in lines]
+        source[0] = "\n".join(rst_lines)
     return
 
 

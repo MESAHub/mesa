@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module net_burn_const_density
-      use const_def
+      use const_def, only: dp, ln10, Qconv
       use math_lib
       use chem_def
       use net_def

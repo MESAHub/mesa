@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module utils_dict
-      use utils_def
+      use utils_def, only: maxlen_key_string, integer_dict, hash_entry
 
       implicit none
 

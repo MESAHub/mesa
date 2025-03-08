@@ -14,7 +14,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plot above:
 
 .. code-block:: console
@@ -188,15 +188,10 @@ pgstar commands used for the plot above:
  Grid1_file_prefix = 'grid_'
  Grid1_file_interval = 10000
  Grid1_file_width = -1
- Grid1_file_aspect_ratio = -1         
+ Grid1_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 
 
 Last-Updated: 15Jul2021 (MESA 094ff71) by fxt.
 
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

@@ -549,7 +549,7 @@
             !   EGRV = EGRV - s% cgrav(k) * (s%m(k)-0.5d0*s%dm(k))*s%dm(k)/(0.5d0*(s%r(k)+s%r_center))
             !end if
 
-         enddo
+         end do
          if (s% RSP_hydro_only) then
             total_radiation = 0d0
          else
@@ -3347,7 +3347,7 @@
             write(*,5) 'dLt_in_dw_00', k, i, iter, s% model_number, dLt_in_dw_00
             write(*,5) 'dXP_00_dw_00', k, i, iter, s% model_number, dXP_00_dw_00
             write(*,5) 'dEq_dw_00(I)', k, i, iter, s% model_number, dEq_dw_00(I)
-         endif
+         end if
 
          !HD(i_T_dr_in2,IT) !
          !HD(i_T_dr_in,IT) ! ok

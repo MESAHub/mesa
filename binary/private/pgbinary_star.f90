@@ -25,7 +25,7 @@
 
 module pgbinary_star
 
-   use const_def
+   use const_def, only: dp, msun
    use binary_def
    use pgbinary_support
 

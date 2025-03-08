@@ -27,7 +27,7 @@
       module hydro_chem_eqns
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use utils_lib
 
       implicit none

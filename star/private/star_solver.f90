@@ -390,7 +390,7 @@
                         .not. s% doing_first_model_of_run) then
                      call oops('avg corr too large')
                      exit iter_loop
-                  endif
+                  end if
                end if
 
                ! shrink the correction if it is too large

@@ -26,7 +26,7 @@
       module pgstar_trho_profile
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, msun
       use pgstar_support
       use star_pgstar
 

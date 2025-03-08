@@ -3,7 +3,7 @@
     -- EDDington factors by direct Integration.
     -- Formal solution of radiation equation in spherical geometry
     -- with account of Doppler shift in frequency bins.
-    -- Subroutine named Feau since formely it used the
+    -- Subroutine named Feau since formerly it used the
     -- Feautrier Method.
     -- Momentarily steady case, but applied for Edtm=T - smoothing
     -- Eddington factors in time.

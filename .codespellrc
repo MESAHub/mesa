@@ -1,0 +1,3 @@
+[codespell]
+skip = _typos.toml,forum,gyre,photos,star,binary,restart_photo,build,*.mod,*.smod,*.data,*.net,*.xz,*.pdf,*.ps,*.zip,*.tar,*.gz,*.txz,*.tbz,*.mesa,*.png,*.jpg,*.h5,*.dvi,*.pyc,*.ssm,*.o
+ignore-words-list = inout,highT,dum,TEMR,nd,pres,PRESSE,radY,delt,indx,fO,nam,ACN,AMOUT,LASTR,UE,PARMS,thi,daa,Nin,stopp,SHS,nin,filess,idel,FASE,ETHE,ETO,TE,Shal,Coul,coul,NINTY,iif,amout,accreting,dne,IST,ALO,Numer,ans,Ane,EDN,SECNDS,Termo,WTH,matA,alog,Xwindows,parms,PARM,Shepard,reduct,thet,amde,aas,aks,arry,ist,relativ,accpt,Puls,contro,implct,Ser,TABE,bu,combin,appen

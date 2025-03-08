@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
    module mod_integrate
-      use const_def
+      use const_def, only: dp
       use math_lib
       use num_def
       use utils_lib, only: mesa_error

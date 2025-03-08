@@ -1,6 +1,6 @@
 
       ! single step of 4th order Runge-Kutta
-      
+
       subroutine rk4(n, y, dydx, x, h, yout, derivs, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
@@ -49,4 +49,4 @@
          do i=1,n
             yout(i) = y(i) + (dydx(i) + dyt(i) + 2d0*dym(i))*h/6
          end do
-      end subroutine rk4   
+      end subroutine rk4

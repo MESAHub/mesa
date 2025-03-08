@@ -606,7 +606,7 @@ IMPLICIT REAL*8(A-H,O-Z);
 --     WRITE(@Wres,'(A,1P,10E12.4)')' THICK TPRAD PTH ETH PTTH ETTH DPE: ',
   --      WTH,PTH,ETH,PTTH,ETTH,DPE;
        WRITE(@Wres,'(A,I4,2X,10L2,A,1P,2E12.4)') ' km Lth: ',
-          Km,(LTHICK(L,Km),L=1,10),' TprTh DPE:',WTh,DPE;
+          Km,(LTHICK(L,Km),L=1,10),' TprTh DPE:',WTH,DPE;
     endif;
 %PA_Pre.F_Burn.A=LE:
 %PA_Pre_swdet:

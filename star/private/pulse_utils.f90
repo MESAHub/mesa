@@ -25,18 +25,12 @@
 
 module pulse_utils
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp
   use num_lib
   use star_utils
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -49,8 +43,6 @@ module pulse_utils
   public :: eval_center_X
   public :: eval_center_rho
   public :: eval_center_d2
-
-  ! Procedures
 
 contains
 
@@ -88,7 +80,7 @@ contains
           grad_mu(k) = log(s%mu(s%nz)/s%mu(s%nz-1))/log(s%Peos(s%nz)/s%Peos(s%nz-1))
        else
           grad_mu(k) = 0d0
-       endif
+       end if
 
        ! Set up the mask marking faces which will have a double point
 
@@ -104,13 +96,13 @@ contains
 
           mask(i(n_mk+1:)) = .false.
 
-       endif
+       end if
 
     else
 
        mask = .false.
 
-    endif
+    end if
 
     ! Use the mask to set up the index ranges
 
@@ -134,7 +126,7 @@ contains
           if (dbg) then
              write(*, 100) k, grad_mu(k)
 100          format('placing double point at k=', I6, 1X, '(grad_mu=', 1PE10.3, ')')
-          endif
+          end if
 
        end if
 
@@ -142,13 +134,11 @@ contains
 
     k_b(sg) = s%nz
 
-    ! Finish
 
     return
 
   end subroutine set_segment_indices
 
-  !****
 
   real(dp) function eval_face (dq, v, k, k_a, k_b, v_lo, v_hi) result (v_face)
 
@@ -186,7 +176,7 @@ contains
           v_face = v(k_b) + dq(k_b)*(v(k_b) - v(k_b-1))/(dq(k_b) + dq(k_b-1))
        else
           v_face = interp_val_to_pt(v(k_a:k_b), k-k_a+1, k_b-k_a+1, dq(k_a:k_b), 'pulse_utils : eval_face')
-       endif
+       end if
 
     end if
 
@@ -194,19 +184,17 @@ contains
 
     if (PRESENT(v_lo)) then
        v_face = MAX(v_face, v_lo)
-    endif
+    end if
 
     if (PRESENT(v_hi)) then
        v_face = MIN(v_face, v_hi)
     end if
 
-    ! Finish
 
     return
 
   end function eval_face
 
-  !****
 
   real(dp) function eval_face_X (s, i, k, k_a, k_b) result (X_face)
 
@@ -244,7 +232,7 @@ contains
              X_face = s%xa(i,k_b) + s%dq(k_b)*(s%xa(i,k_b) - s%xa(i,k_b-1))/(s%dq(k_b) + s%dq(k_b-1))
           else
              X_face = interp_val_to_pt(s%xa(i,k_a:k_b), k-k_a+1, k_b-k_a+1, s%dq(k_a:k_b), 'pulse_utils : eval_face_X')
-          endif
+          end if
 
        end if
 
@@ -256,15 +244,13 @@ contains
 
        X_face = 0d0
 
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end function eval_face_X
 
-  !****
 
   real(dp) function eval_face_A_ast (s, k, k_a, k_b) result (A_ast_face)
 
@@ -309,17 +295,15 @@ contains
 
           A_ast_face = s%brunt_N2(k)*s%r(k)/s%grav(k)
 
-       endif
+       end if
 
     end if
 
-    ! Finish
 
     return
 
   end function eval_face_A_ast
 
-  !****
 
   real(dp) function eval_face_rho (s, k, k_a, k_b) result (rho_face)
 
@@ -365,19 +349,17 @@ contains
           dm = 0.5d0*(s%dm(k) + s%dm(k-1))
           dlnr = (s%rmid(k-1) - s%rmid(k))/r
 
-       endif
+       end if
 
        rho_face = dm/(pi4*r*r*r*dlnr)
 
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end function eval_face_rho
 
-  !****
 
   real(dp) function eval_center (r, v, k_a, k_b, v_lo, v_hi) result (v_center)
 
@@ -417,25 +399,23 @@ contains
 
        v_center = (v_1*r_2*r_2 - v_2*r_1*r_1)/(r_2*r_2 - r_1*r_1)
 
-    endif
+    end if
 
     ! Apply limits
 
     if (PRESENT(v_lo)) then
        v_center = MAX(v_center, v_lo)
-    endif
+    end if
 
     if (PRESENT(v_hi)) then
        v_center = MIN(v_center, v_hi)
     end if
 
-    ! Finish
 
     return
 
   end function eval_center
 
-  !****
 
   real(dp) function eval_center_X (s, i, k_a, k_b) result (X_center)
 
@@ -475,7 +455,7 @@ contains
 
           X_center = (X_1*r_2*r_2 - X_2*r_1*r_1)/(r_2*r_2 - r_1*r_1)
 
-       endif
+       end if
 
        ! Apply limits
 
@@ -485,15 +465,13 @@ contains
 
        X_center = 0d0
 
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end function eval_center_X
 
-  !****
 
   real(dp) function eval_center_rho (s, k_b) result (rho_center)
 
@@ -514,13 +492,11 @@ contains
 
     rho_center = 3d0*(5d0*M_1/(pi*r_1*r_1*r_1) - 4d0*rho_1)/8d0
 
-    ! Finish
 
     return
 
   end function eval_center_rho
 
-  !****
 
   real(dp) function eval_center_d2 (r, v, k_a, k_b) result (d2v_center)
 
@@ -558,9 +534,7 @@ contains
 
        d2v_center = 2d0*(v_2 - v_1)/(r_2*r_2 - r_1*r_1)
 
-    endif
-
-    ! Finish
+    end if
 
     return
 

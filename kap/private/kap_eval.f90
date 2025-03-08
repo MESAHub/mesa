@@ -26,7 +26,7 @@
       module kap_eval
       use utils_lib, only: is_bad, mesa_error
       use kap_def
-      use const_def, only: dp, ln10, sige
+      use const_def, only: dp, ln10, sige, me, kev, kerg, amu, clight
       use math_lib
 
       implicit none
@@ -40,7 +40,6 @@
            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
            eta, d_eta_dlnRho, d_eta_dlnT, &
            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-         use const_def
          use utils_lib, only: is_bad
          use auto_diff
 
@@ -132,7 +131,7 @@
             blend_logR = (logR_Compton_blend_hi - logR_auto) / (logR_Compton_blend_hi - logR_Compton_blend_lo)
          else
             blend_logR = 0d0
-         endif
+         end if
          ! quintic smoothing
          blend_logR = -blend_logR*blend_logR*blend_logR*(-10d0 + blend_logR*(15d0 - 6d0*blend_logR))
 
@@ -540,7 +539,7 @@
            XN = 0d0
            XO = 0d0
            XNe = 0d0
-        endif
+        end if
 
 
         dXC = 0d0
@@ -798,7 +797,6 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use eos_lib
          use eos_def
-         use const_def
          use auto_diff
 
          type (Kap_General_Info), pointer :: rq

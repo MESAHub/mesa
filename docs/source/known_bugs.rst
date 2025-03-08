@@ -5,9 +5,9 @@
 Known bugs
 **********
 
-This page lists a number of known bugs or issues in released versions of MESA. Where possible 
+This page lists a number of known bugs or issues in released versions of MESA. Where possible
 we will also list work arounds, but for some bugs the only option will be to update to
-a newer version of MESA. Note this list is NOT comprehensive, users should check this first if they have an 
+a newer version of MESA. Note this list is NOT comprehensive, users should check this first if they have an
 issue but it may not be complete.
 
 r23.05.1
@@ -26,7 +26,8 @@ in this grid of models will impact the central H abundance for initial masses be
 This bug affects versions r15140 through r23.05.1, and will be fixed in the next release.
 For current MESA releases impacted by this bug, the following steps provide a workaround with a patched ZAMS file:
 
-- Download this updated ZAMS model file: :download:`zams_z2m2_y28_patched.data <https://github.com/MESAHub/mesa/raw/main/docs/source/assets/zams_z2m2_y28_patched.data>`
+- Download this updated ZAMS model file:
+  `zams_z2m2_y28_patched.data <https://github.com/MESAHub/mesa/raw/main/docs/source/assets/zams_z2m2_y28_patched.data>`__
 - Copy the file into ``$MESA_DIR/data/star_data/zams_models``
 - Use the following setting in the ``&controls`` section of your inlists for models where
   you want to use the patched ZAMS file:
@@ -41,13 +42,13 @@ r22.11.1
 Rates
 -----
 
-There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
-This causes an excessive amount of C12 to be burnt during core helium burning. 
+There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1.
+This causes an excessive amount of C12 to be burnt during core helium burning.
 We strongly recommend that users update to the latest MESA.
 
 See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_
 
-There is a bug in the rate selection code that certain endothermic weak reactions are not added to the nuclear network. These are 
+There is a bug in the rate selection code that certain endothermic weak reactions are not added to the nuclear network. These are
 r_be10_wk-minus_b10, r_ni66_wk-minus_cu66, and r_h3_wk-minus_he3. Other weak reactions with heavier parents may also be affected.
 
 A separate issue also meant we are missing the rate r_he4_ap_li7 as the reverse rate of r_li7_pa_he4.
@@ -91,9 +92,9 @@ Sometimes MESA will crash with an error similar to this:
 .. code-block:: shell
 
     s%top_conv_bdy(i)= F
-    D(k)   0.0000000000000000    
-    s%D_mix(k-1)   1.1101956346180402    
-    s%overshoot_D_min   100.00000000000000    
+    D(k)   0.0000000000000000
+    s%D_mix(k-1)   1.1101956346180402
+    s%overshoot_D_min   100.00000000000000
     Invalid location for overshoot boundary: cz_bdy_dq, dq= -0.13040604669743103        1.4532774141478022E-003
             0 terminate reason: nonzero_ierr
 
@@ -129,11 +130,11 @@ each MESA run, you may also find that changing the number of OMP threads also fi
 
 See `gh-360 <https://github.com/MESAHub/mesa/issues/360>`_
 
-  
+
 Atmosphere in pulse data
 ------------------------
 
-The control ``add_atmosphere_to_pulse_data`` does not work properly with an Eddington atmosphere (the default), and also crashes if ``atm_T_tau_opacity = 'varying'`` is set. 
+The control ``add_atmosphere_to_pulse_data`` does not work properly with an Eddington atmosphere (the default), and also crashes if ``atm_T_tau_opacity = 'varying'`` is set.
 
 See `gh-375 <https://github.com/MESAHub/mesa/issues/375>`_
 
@@ -145,7 +146,7 @@ If you get an error:
 
 .. code-block:: shell
 
-    bad filter name: 
+    bad filter name:
 
 First check that the name matches in your history_columns .list file and your color file. Next check for non-printing characters history_columns.list in the filter name. This can bee checked with:
 

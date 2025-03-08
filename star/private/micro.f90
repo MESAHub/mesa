@@ -25,23 +25,14 @@
 
 module micro
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
   use star_utils, only: foreach_cell
   use utils_lib, only: is_bad
 
-  ! No implicit typing
-
   implicit none
 
-  ! Parameters
-
   logical, parameter :: dbg = .false.
-
-
-  ! Access specifiers
 
   private
 
@@ -123,7 +114,7 @@ contains
        if (.not. skip_kap .and. s% op_mono_method == 'hu') then
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
-       endif
+       end if
        if (.not. skip_kap .and. s% op_mono_method == 'mombarg' .and. &
             s% high_logT_op_mono_full_on - s% low_logT_op_mono_full_on > 0  ) then
           fk = 0
@@ -163,8 +154,8 @@ contains
              call call_compute_kappa_grid_mombarg(fk, ierr)
              !write(*,*) 'Finished computing grid for core mixture.'
              fk_pcg_old = fk
-          endif
-       endif
+          end if
+       end if
 
        if (s% use_other_opacity_factor) then
           call s% other_opacity_factor(s% id, ierr)
@@ -254,7 +245,6 @@ contains
 
   end subroutine set_micro_vars
 
-  !****
 
   subroutine do_eos(s,nzlo,nzhi,ierr)
 
@@ -272,7 +262,6 @@ contains
 
   end subroutine do_eos
 
-  !****
 
   subroutine set_eos_with_mask (s,nzlo,nzhi,mask,ierr)
 
@@ -295,7 +284,7 @@ contains
           lerr(k) = ierr /= 0
        else
           lerr(k) = .FALSE.
-       endif
+       end if
     end do
     !$OMP END PARALLEL DO
 
@@ -303,15 +292,13 @@ contains
        ierr = 1
     else
        ierr = 0
-    endif
+    end if
 
   end subroutine set_eos_with_mask
 
-  !****
 
   subroutine do_eos_for_cell(s,k,ierr)
 
-    use const_def
     use chem_def
     use chem_lib
     use eos_def
@@ -433,7 +420,6 @@ contains
 
   end subroutine do_eos_for_cell
 
-  !****
 
   subroutine store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -566,11 +552,9 @@ contains
 
   end subroutine store_eos_for_cell
 
-  !****
 
   subroutine do_kap_for_cell(s,k,ierr)
 
-    use const_def,only:ln10
     use net_def,only:net_general_info
     use rates_def, only:i_rate
     use chem_def
@@ -771,7 +755,6 @@ contains
 
   end subroutine do_kap_for_cell
 
-  !****
 
   subroutine shutdown_microphys
     use eos_lib, only: eos_shutdown

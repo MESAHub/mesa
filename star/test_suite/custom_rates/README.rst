@@ -75,12 +75,12 @@ pgstar commands used for the first 7 plots:
      Abundance_legend_max_cnt = 0
      Abundance_legend_txt_scale_factor = 0.6
 
-     Abundance_xaxis_name = 'mass' 
+     Abundance_xaxis_name = 'mass'
      Abundance_xaxis_reversed = .false.
-     Abundance_xmin = 0.0 
-     Abundance_xmax = -101d0 
+     Abundance_xmin = 0.0
+     Abundance_xmax = -101d0
 
-     Abundance_log_mass_frac_min = -3.0 
+     Abundance_log_mass_frac_min = -3.0
      Abundance_log_mass_frac_max =  0.3
 
  ! for the NCO flash parts
@@ -94,7 +94,7 @@ pgstar commands used for the first 7 plots:
      Abundance_file_prefix = 'abund_'
      Abundance_file_interval = 100000  ! output when mod(model_number,file_interval)==0
      Abundance_file_width = 12        ! (inches) negative means use same value as for window
-      
+
 
       TRho_win_flag = .true.
       TRho_win_width = 12

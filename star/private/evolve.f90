@@ -26,7 +26,7 @@
       module evolve
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, secyer, secday
       use star_utils
 
       implicit none

@@ -93,7 +93,6 @@ def match_columns(filename, comments=True):
 
 
 def update(default, test_suite, special_cases=None, debug=False):
-
     # Load default file:
     with open(default) as f:
         lines = f.readlines()

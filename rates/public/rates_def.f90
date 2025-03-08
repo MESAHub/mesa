@@ -1026,7 +1026,7 @@
                if (ASSOCIATED(weak_reactions_tables(i)%t)) deallocate(weak_reactions_tables(i)%t)
             end do
             deallocate(weak_reactions_tables)
-         endif
+         end if
 
          if (ASSOCIATED(weak_lhs_nuclide_id)) deallocate(weak_lhs_nuclide_id)
          if (ASSOCIATED(weak_rhs_nuclide_id)) deallocate(weak_rhs_nuclide_id)

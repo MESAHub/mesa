@@ -1,4 +1,4 @@
-      
+
       integer function solver_option(which_solver_option, ierr)
          use num_def
          character (len=*), intent(in) :: which_solver_option
@@ -21,10 +21,10 @@
          else
             ierr = -1
             solver_option = -1
-         end if 
+         end if
       end function solver_option
-      
-      
+
+
       subroutine solver_option_str(which_solver_option, solver_option, ierr)
          use num_def
          integer, intent(in) :: which_solver_option
@@ -48,5 +48,5 @@
          else
             ierr = -1
             solver_option = ''
-         end if 
+         end if
       end subroutine solver_option_str

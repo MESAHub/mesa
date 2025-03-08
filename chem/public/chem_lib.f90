@@ -408,7 +408,7 @@
          use_al26_isomers = .false.
          do i = 1, size(Z)
            if (A(i) == 26 .and. Z(i) == 13) count_isomer = count_isomer + 1
-         enddo
+         end do
          if (count_isomer > 1) use_al26_isomers = .true.
 
          count_isomer = 1
@@ -444,7 +444,7 @@
          use_al26_isomers = .false.
          do i = 1, size(Z)
            if (A(i) == 26 .and. Z(i) == 13) count_isomer = count_isomer + 1
-         enddo
+         end do
          if (count_isomer > 1) use_al26_isomers = .true.
 
          count_isomer = 1
@@ -604,7 +604,7 @@
       ! return the abundances of the stable isotopes where the unstable ones
       ! have decayed to the stable versions.
       ! Code from Frank Timmes "decay.zip"
-      ! Note this makes some asumptions, firstly that isotopes can only decay to one
+      ! Note this makes some assumptions, firstly that isotopes can only decay to one
       ! output (thus there are no branches), also we assume an infinite timescale
       ! for decay. If you need a high precision output I suggest you use a one zone
       ! burn model rather than this.

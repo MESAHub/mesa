@@ -26,7 +26,7 @@ HR_logT_max = 3.85
 HR_logL_min = 0.1
 HR_logL_max = 1.0
 plt.figure()
-plt.plot(hr_opal[:,0], hr_opal[:,1], label="OPAL.dat", color="tab:orange")
+plt.plot(hr_opal[:, 0], hr_opal[:, 1], label="OPAL.dat", color="tab:orange")
 plt.plot(history.log_Teff, history.log_L, label="MESA", color="tab:blue")
 plt.plot(history.log_Teff[-1], history.log_L[-1], "ro")
 plt.xlabel(r"$\log_{10}(T_{\rm eff})$")

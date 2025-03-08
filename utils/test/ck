@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ./rn >& tmp.txt; then
     diff -b tmp.txt test_output

@@ -25,26 +25,18 @@
 
 module utils_nan_sp
 
-  ! Uses
-
   use const_def, only : sp
 
   use ISO_FORTRAN_ENV
   use ISO_C_BINDING
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameters
 
   integer, parameter :: FRAC_BITS_32 = 23
   integer, parameter :: EXPN_BITS_32 = 8
 
   integer(INT32), parameter :: QNAN_32 = INT(z'7fc00001', INT32)
   integer(INT32), parameter :: SNAN_32 = INT(z'7f800001', INT32)
-
-  ! Interfaces
 
   interface is_nan
      module procedure is_nan_sp
@@ -66,16 +58,12 @@ module utils_nan_sp
      module procedure set_nan_sp_4d
   end interface set_nan
 
-  ! Access specifiers
-
   private
 
   public :: is_nan
   public :: is_inf
   public :: is_bad
   public :: set_nan
-
-  ! Procedures
 
 contains
 
@@ -106,15 +94,13 @@ contains
 
     if (PRESENT(signal)) then
        is_nan = is_nan .AND. (BTEST(frac, FRAC_BITS_32-1) .EQV. .NOT. signal)
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end function is_nan_sp
 
-  !****
 
   elemental function is_inf_sp (x) result (is_inf)
 
@@ -140,13 +126,11 @@ contains
 
     is_inf = expn == MASKR(EXPN_BITS_32, INT32) .AND. frac == 0_INT32
 
-    ! Finish
 
     return
 
   end function is_inf_sp
 
-  !****
 
   elemental function is_bad_sp (x) result (is_bad)
 
@@ -157,13 +141,11 @@ contains
 
     is_bad = is_nan(x) .OR. is_inf(x)
 
-    ! Finish
 
     return
 
   end function is_bad_sp
 
-  !****
 
   subroutine set_nan_sp_0d (x, signal)
 
@@ -181,14 +163,13 @@ contains
           ix = SNAN_32
        else
           ix = QNAN_32
-       endif
+       end if
     else
        ix = SNAN_32
-    endif
+    end if
 
   end subroutine set_nan_sp_0d
 
-  !****
 
   subroutine set_nan_sp_1d (x, signal)
 
@@ -206,18 +187,16 @@ contains
           ix = SNAN_32
        else
           ix = QNAN_32
-       endif
+       end if
     else
        ix = SNAN_32
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end subroutine set_nan_sp_1d
 
-  !****
 
   subroutine set_nan_sp_2d (x, signal)
 
@@ -235,18 +214,16 @@ contains
           ix = SNAN_32
        else
           ix = QNAN_32
-       endif
+       end if
     else
        ix = SNAN_32
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end subroutine set_nan_sp_2d
 
-  !****
 
   subroutine set_nan_sp_3d (x, signal)
 
@@ -264,18 +241,16 @@ contains
           ix = SNAN_32
        else
           ix = QNAN_32
-       endif
+       end if
     else
        ix = SNAN_32
-    endif
+    end if
 
-    ! Finish
 
     return
 
   end subroutine set_nan_sp_3d
 
-  !****
 
   subroutine set_nan_sp_4d (x, signal)
 
@@ -293,12 +268,11 @@ contains
           ix = SNAN_32
        else
           ix = QNAN_32
-       endif
+       end if
     else
        ix = SNAN_32
-    endif
+    end if
 
-    ! Finish
 
     return
 

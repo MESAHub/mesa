@@ -19,7 +19,7 @@ Radiative Opacities
 The radiative opacity is the Rosseland mean opacity.  The opacity
 depends on the temperature, density, and composition.  A set of
 opacity tables consists of a collection of individual opacity tables,
-each at a different composition.  Each individual table is 
+each at a different composition.  Each individual table is
 tabulated in :math:`\log T` and in :math:`\log R \equiv \log \rho - 3
 \log T + 18` (cgs).
 
@@ -34,7 +34,7 @@ processes.
 
 
 .. note::
-   
+
    The value of the option :ref:`kap/defaults:Zbase` provides the reference
    metallicity necessary to calculate element variations (e.g., carbon
    and oxygen enhancement) from the composition of a cell.  The
@@ -64,7 +64,7 @@ region :math:`0.0 \leq X \leq 1-Z` and
 :math:`0.0\leq Z \leq 0.2`. The set of tables to be used are
 selected by the option :ref:`kap/defaults:kap_file_prefix`.
 
-A direct comparison between the Type 1 format of OPAL/OP tables and 
+A direct comparison between the Type 1 format of OPAL/OP tables and
 the OPLIB tables are shown in the figure below
 taken from Figure 1 in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_. Further comparisons
 between OP/OPAL/OPLIB can be found in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
@@ -135,7 +135,7 @@ compositions, and the resulting opacities linearly interpolated.
 (Note that this means that the interpolation in :math:`Z` occurs at
 fixed :math:`X` and :math:`f_{\rm CO}`, but not at fixed :math:`f_{\rm
 C}` or :math:`f_{\rm N}`.)
-   
+
 ------------------
 Compton Scattering
 ------------------
@@ -181,9 +181,9 @@ degeneracy, the additional correction formulae of |B20| are applied.
 
 .. |OPAL| replace:: Iglesias & Rogers `1993 <https://ui.adsabs.harvard.edu/abs/1993ApJ...412..752I/abstract>`__, `1996 <https://ui.adsabs.harvard.edu/abs/1996ApJ...464..943I/abstract>`__
 
-.. |OP| replace:: `Seaton 2005 <https://ui.adsabs.harvard.edu/abs/2005MNRAS.362L...1S/abstract>`__  
+.. |OP| replace:: `Seaton 2005 <https://ui.adsabs.harvard.edu/abs/2005MNRAS.362L...1S/abstract>`__
 
-.. |OPLIB| replace:: `Colgan 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`__                                      
+.. |OPLIB| replace:: `Colgan 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`__
 
 .. |Cassisi| replace:: `Cassisi et al. (2007) <https://ui.adsabs.harvard.edu/abs/2007ApJ...661.1094C/abstract>`__
 

@@ -25,22 +25,16 @@
 
 module pulse_fgong
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, rsun, four_thirds, no_mixing, standard_cgrav
   use utils_lib
   use chem_def
   use atm_def
   use eos_def, only: i_Gamma1, i_lnPgas, i_chiRho, i_chiT
   use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
-
   use atm_support
   use eos_support
-
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
@@ -49,8 +43,6 @@ module pulse_fgong
 
   integer, parameter :: ICONST = 15
   integer, parameter :: IVAR = 40
-
-  ! Access specifiers
 
   private
 
@@ -167,13 +159,13 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Store global data
 
@@ -196,11 +188,11 @@ contains
        rho_c = eval_center_rho(s, k_b(n_sg))
     else
        rho_c = eval_center(s%rmid, s%rho, k_a(n_sg), k_b(n_sg))
-    endif
+    end if
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
-    P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+    P_c = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(11) = r_outer**2*d2P_dr2_c/P_c
     global_data(12) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
     global_data(13) = s%star_age
@@ -240,7 +232,7 @@ contains
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -259,8 +251,6 @@ contains
 
     deallocate(dres_dxa)
     deallocate(xa)
-
-    ! Finish
 
     return
 
@@ -391,13 +381,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
 
@@ -524,13 +511,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j, k_a, k_b)
 
@@ -649,15 +633,12 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_ctr
 
   end subroutine get_fgong_data
 
-  !****
 
   subroutine write_fgong_data (id, filename, global_data, point_data, ierr)
 
@@ -728,8 +709,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

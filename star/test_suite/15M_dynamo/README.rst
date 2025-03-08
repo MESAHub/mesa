@@ -9,7 +9,7 @@ The test checks the functionality of rotation in a 15 Msun, Z=0.02 metallicity m
 
 This test case has three parts.
 
-* Part 1 (``inlist_zams``) creates a 15 Msun pre-main-sequence model and evolves it to the main sequence. 
+* Part 1 (``inlist_zams``) creates a 15 Msun pre-main-sequence model and evolves it to the main sequence.
 
 * Part 2 (``inlist_to_he_burn``) turns on rotation nnd continues the evolution for 500 steps (for test case purposes), ending approximately at core hydrogen depletion.
 
@@ -44,7 +44,7 @@ At this ending point the abundances, power, and dynamo profiles as a function of
 Click to see a larger view of a plot.
 Helium has begun to deplete in the core (top panel), where the triple-alpha reaction is dominating the energy generation rate (second panel).
 Hydrogen burning by the CNO cycles dominates the energy generation in the hydrogen shell (second panel).
-Convection is occuring in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
+Convection is occurringg in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
 Spruit-Taylor magnetic diffusion is the dominant mixing processes in the radiative region between these
 two convective regions (third panel).
 The radial and azimuthal components of the magnetic field

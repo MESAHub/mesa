@@ -107,7 +107,7 @@
                do i = 1, s% nz-1  ! locate bottom of solar convective zone
                   if (s% mixing_type(i+1) /= convective_mixing &
                         .and. s% mixing_type(i) == convective_mixing) then
-                     if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
+                     if (s% r(i+1) > 0.25d0*Rsun .and. s% r(i) < 0.9d0*Rsun) then
                         val = s% r(i)/Rsun
                         exit
                      end if
@@ -277,8 +277,8 @@
          end if
 
          ! if you want to check multiple conditions, it can be useful
-         ! to set a different termination code depenending on which
-         ! condition was triggered.  MESA provides 9 customizeable
+         ! to set a different termination code depending on which
+         ! condition was triggered.  MESA provides 9 customizable
          ! termination codes, named t_xtra1 .. t_xtra9.  You can
          ! customize the messages that will be printed upon exit by
          ! setting the corresponding termination_code_str value.

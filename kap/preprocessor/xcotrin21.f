@@ -1596,7 +1596,7 @@ C
 C
 C  THE SUBROUTINES SPLINE AND SPLINT ARE ADAPTED FROM THOSE GIVE BY
 C  W.H. Press, S.A. Teulolsky, W.T. Vettering and B.P. Flannery,
-C  "Numerical Recipes in FORTRAN", 2nd edn., 1992, C.U.P.
+C  "Numerical Recipes in FORTRAN", 2nd ed., 1992, C.U.P.
 C  OTHER REFERENCES ARE MADE TO METHODS DESCRIBED IN THAT BOOK.
 C
       PARAMETER(IP=100,IPR=20)

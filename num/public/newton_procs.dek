@@ -136,8 +136,8 @@
       ! equ(i) has the residual for equation i, i.e., the difference between
       ! the left and right hand sides of the equation.  So the goal
       ! of the solver is to find an approximate solution that makes the
-      ! magnitude of the residuals acceptibly small.
-      ! after the primaries and secondaries have been evaluted, 
+      ! magnitude of the residuals acceptably small.
+      ! after the primaries and secondaries have been evaluated, 
       ! by calls on setprimaries and setsecondaries, respectively, 
       ! the eval_equations routine is called to calculate the residuals.
       ! if for some reason, it is impossible to do this, because of

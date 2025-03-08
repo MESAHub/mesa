@@ -26,7 +26,7 @@
       module relax
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, rsun, secyer, one_third, four_thirds_pi
       use utils_lib
 
       implicit none

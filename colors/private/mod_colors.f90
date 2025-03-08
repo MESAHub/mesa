@@ -27,7 +27,7 @@
    module mod_colors
       use colors_def
       use math_lib
-      use const_def
+      use const_def, only: dp, mesa_data_dir
       use utils_lib
 
       implicit none
@@ -234,7 +234,7 @@
                write(*,*) 'Please check that the file exists in your local work directory'
                write(*,*) 'or in ',trim(mesa_data_dir)//'/colors_data/'
                ierr = 1; return
-            endif
+            end if
          end if
 
          ierr = 0

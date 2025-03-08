@@ -36,8 +36,8 @@ TEST = $(TEST_DIR)/tester
 TESTQ = $(TEST_DIR)/test_quietly
 SHOW_RATES = $(TEST_DIR)/show_rates
 
-TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
-SHOW_RATES_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SHOW_RATES_SRCS)))
+TEST_OBJS = $(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(TEST_SRCS)))
+SHOW_RATES_OBJS =  $(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SHOW_RATES_SRCS)))
 
 all : $(TEST) $(TESTQ) $(SHOW_RATES)
 

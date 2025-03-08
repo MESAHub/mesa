@@ -26,7 +26,7 @@
 
       module binary_ce
 
-      use const_def
+      use const_def, only: dp, avo, secyer, boltzm, standard_cgrav, crad, ev2erg, rsun, msun
       use math_lib
       use star_lib
       use star_def
@@ -204,7 +204,6 @@
       end subroutine CE_init
 
       subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
-         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: rlo_mdot
          integer, intent(out) :: ierr

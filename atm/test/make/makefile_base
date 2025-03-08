@@ -12,11 +12,11 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-COMMON_SRCS = test_atm_support.f test_atm_setup.f
+COMMON_SRCS = test_atm_support.f90 test_atm_setup.f90
 
-TEST_SRCS = $(COMMON_SRCS) test_atm.f
+TEST_SRCS = $(COMMON_SRCS) test_atm.f90
 
-TESTQ_SRCS = $(COMMON_SRCS) test_atm_quietly.f
+TESTQ_SRCS = $(COMMON_SRCS) test_atm_quietly.f90
 
 #################################################################
 #
@@ -65,7 +65,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) -O${OPT_LEVEL} $(FCfree) $<
@@ -79,7 +79,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

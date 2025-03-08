@@ -27,7 +27,7 @@
       module adjust_xyz
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use chem_def
       use utils_lib
 

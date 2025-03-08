@@ -22,7 +22,7 @@
 
       module create_FSCRliq8_table
 
-      use const_def
+      use const_def, only: dp
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
@@ -153,7 +153,7 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
+      end if
       SQG=sqrt(GAME)
       SQR=sqrt(RS)
       SQZ1=sqrt(1d0+Zion)

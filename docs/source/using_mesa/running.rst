@@ -68,7 +68,7 @@ There are five sections (technically fortran "namelists") in star inlist files:
 Each definition in a namelist is of the form
 
 .. code-block:: fortran
-   
+
   name = value ! comment
 
 Values are specified using the normal fortran syntax. Blank lines and
@@ -90,7 +90,7 @@ from a pre-main sequence model and then stop the evolution once we reach
 the zero-age main sequence (ZAMS).
 
 .. literalinclude:: ../../../star/work/inlist_project
-  
+
 inlist_pgstar
 ~~~~~~~~~~~~~
 
@@ -176,7 +176,7 @@ stopping conditions,
   ! stop when the star nears ZAMS (Lnuc/L > 0.99)
   Lnuc_div_L_zams_limit = 0.99d0
   stop_near_zams = .true.
-  
+
   ! stop when the center abundance by mass of h1 drops below this limit
   xa_central_lower_limit_species(1) = 'h1'
   xa_central_lower_limit(1) = 1d-3
@@ -250,25 +250,25 @@ do this your inlist might look like:
      ! start a run from a saved model
      load_saved_model = .true.
      load_model_filename = '15M_at_TAMS.mod'
-   
+
      ! display on-screen plots
      pgstar_flag = .true.
-   
+
    / !end of star_job namelist
 
    &eos
      ! eos options
      ! see eos/defaults/eos.defaults
-   
+
    / ! end of eos namelist
-   
-   
+
+
    &kap
      ! kap options
      ! see kap/defaults/kap.defaults
      use_Type2_opacities = .true.
      Zbase = 0.02
-   
+
    / ! end of kap namelist
 
 
@@ -278,18 +278,18 @@ do this your inlist might look like:
      ! options for energy conservation (see MESA V, Section 3)
      energy_eqn_option = 'dedt'
      use_gold_tolerances = .true.
-   
+
      ! configure mass loss on RGB & AGB
      cool_wind_RGB_scheme = 'Dutch'
      cool_wind_AGB_scheme = 'Dutch'
      RGB_to_AGB_wind_switch = 1d-4
      Dutch_scaling_factor = 0.8
-   
+
    / ! end of controls namelist
-   
+
 
 If you want to try this out, save the preceding text as a file named
-``inlist_load`` in your work directory. Make sure your file ends with 
+``inlist_load`` in your work directory. Make sure your file ends with
 a blank new line. Then edit your main inlist
 file so that it will use ``inlist_load`` instead of ``inlist_project``
 everywhere within inlist (i.e., ``extra_star_job_inlist_name(1)`` and

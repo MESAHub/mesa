@@ -97,7 +97,7 @@
          initial_nico, initial_M_center, initial_he_core_mass, initial_mass, &
          start_m, stop_m
 
-      real(dp), parameter :: h1_limit = 0.1  ! We use this to check that RTI mixing worked
+      real(dp), parameter :: h1_limit = 0.1d0  ! We use this to check that RTI mixing worked
       real(dp) :: max_mass_h  ! Mass co-ordinate where h1< h1_limit
 
       contains
@@ -768,7 +768,7 @@
             logical,parameter :: dbg=.false.
 
             ! This is to check that RTI worked
-            ! Find outer most location where H1<0.1 then later we will check if this has changed
+            ! Find outer most location where H1<0.1d0 then later we will check if this has changed
             h1_mass = -1
 
             if(dbg) write(*,*) "max_mass_h", max_mass_h/msun

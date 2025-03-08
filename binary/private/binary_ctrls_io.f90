@@ -25,7 +25,7 @@
 
       module binary_ctrls_io
 
-      use const_def
+      use const_def, only: dp
       use binary_def
 
       implicit none

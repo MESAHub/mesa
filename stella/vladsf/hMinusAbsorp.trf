@@ -3,7 +3,7 @@
 *               
 *              Article: 
 *              Title:
-*                  Continuos absorbtion by the negative hydrogen ion reconsidered
+*                  Continuous absorption by the negative hydrogen ion reconsidered
 *              Author: T.L. John
 *              Link:  http://adsabs.harvard.edu/cgi-bin/nph-bib_query?1988A%26A...193..189J&amp;db_key=AST
 *
@@ -11,7 +11,7 @@
 *            ON ENTRY
 *              T      - temperature ( C )
 *              wLength      - wave length (micrometers)
-*              paramTypeAbsrb      - type of returned coeffiecient: K_bf, K_ff, K_tot
+*              paramTypeAbsrb      - type of returned coefficient: K_bf, K_ff, K_tot
 *                                           = 1,  return K_tot = K_bf + K_ff
 *                                           = 2,  return K_bf
 *                                           = 3,  return K_ff

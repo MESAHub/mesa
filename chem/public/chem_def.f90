@@ -55,7 +55,7 @@
       !AGSS09   m,s          s, with some m
       !L09      m,s,r        r
       !A09_Prz               modified AGSS09 -  he, c, n, o, ne, mg, al, si, s, ar, fe.
-      !MB22     m,s          s, with some m, supplimented with agss09
+      !MB22     m,s          s, with some m, supplemented with agss09
       !AAG21    m,s          s, with some m
 
       ! storage for Lodders (2003) isotopic percentages
@@ -293,8 +293,8 @@
       real(dp), parameter :: AGSS09_ysol = 0.2485d0
       real(dp), parameter :: L09_ysol    = 0.2751d0
       real(dp), parameter :: A09_Prz_ysol = 0.276d0
-      real(dp), parameter :: MB22_photospheric_ysol = 0.2485
-      real(dp), parameter :: AAG21_photospheric_ysol = 0.2485
+      real(dp), parameter :: MB22_photospheric_ysol = 0.2485d0
+      real(dp), parameter :: AAG21_photospheric_ysol = 0.2485d0
 
       character(len=iso_name_length) :: chem_element_main_iso_name(num_chem_elements)
       integer, parameter :: chem_element_name_len = iso_name_length
@@ -827,7 +827,7 @@
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + solx(j)
-        enddo
+        end do
         sum = 1.0d0 - sum
         solx(1) = solx(1) + sum
 
@@ -835,14 +835,14 @@
         do j=1,solsiz
            if (izsol(j) >= 3) then
               sum  = sum + solx(j)
-           endif
-        enddo
+           end if
+        end do
         zsol = sum
 
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + dble(izsol(j))/dble(iasol(j))*solx(j)
-        enddo
+        end do
         yesol = sum
 
         nullify(Xsol_names_dict)
@@ -1737,7 +1737,7 @@
 
     subroutine init_MB22_photospheric_data  ! fraction by mass of total Z
        ! Ekaterina Magg et al. , A&A 661, A140 (2022) photospheric abundance.
-       ! supplimented with Asplund, Grevesse, Sauval, and Scott 2009 abundances
+       ! supplemented with Asplund, Grevesse, Sauval, and Scott 2009 abundances
        integer :: i
        real(dp) :: z_sum
        include 'formats'
@@ -1845,7 +1845,7 @@
 
     subroutine init_AAG21_photospheric_data  ! fraction by mass of total Z
        ! Asplund et al. A&A 653, A141 (2021) photospheric abundance.
-       ! Supplimented with meteoric values
+       ! Supplemented with meteoric values
        integer :: i
        real(dp) :: z_sum
        include 'formats'
@@ -1853,87 +1853,87 @@
        AAG21_photospheric_element_zfrac(:) = -20.0d0
 
     ! first store log abundances from the paper
-         AAG21_photospheric_element_zfrac(e_li) = 0.96  !± 0.013
-         AAG21_photospheric_element_zfrac(e_be) = 1.38  !± 0.09
-         AAG21_photospheric_element_zfrac(e_b ) = 2.70  !± 0.20
-         AAG21_photospheric_element_zfrac(e_c ) = 8.46  !± 0.04
-         AAG21_photospheric_element_zfrac(e_n ) = 7.83  !± 0.07
-         AAG21_photospheric_element_zfrac(e_o ) = 8.69  !± 0.04
-         AAG21_photospheric_element_zfrac(e_f ) = 4.40  !± 0.25
-         AAG21_photospheric_element_zfrac(e_ne) = 8.06  !± 0.05
-         AAG21_photospheric_element_zfrac(e_na) = 6.22  !± 0.03
-         AAG21_photospheric_element_zfrac(e_mg) = 7.55  !± 0.03
-         AAG21_photospheric_element_zfrac(e_al) = 6.43  !± 0.03
-         AAG21_photospheric_element_zfrac(e_si) = 7.51  !± 0.03
-         AAG21_photospheric_element_zfrac(e_p ) = 5.41  !± 0.03
-         AAG21_photospheric_element_zfrac(e_s ) = 7.12  !± 0.03
-         AAG21_photospheric_element_zfrac(e_cl) = 5.31  !± 0.20
-         AAG21_photospheric_element_zfrac(e_ar) = 6.38  !± 0.10
-         AAG21_photospheric_element_zfrac(e_k ) = 5.07  !± 0.03
-         AAG21_photospheric_element_zfrac(e_ca) = 6.30  !± 0.03
-         AAG21_photospheric_element_zfrac(e_sc) = 3.14  !± 0.04
-         AAG21_photospheric_element_zfrac(e_ti) = 4.97  !± 0.05
-         AAG21_photospheric_element_zfrac(e_v ) = 3.90  !± 0.08
-         AAG21_photospheric_element_zfrac(e_cr) = 5.62  !± 0.04
-         AAG21_photospheric_element_zfrac(e_mn) = 5.42  !± 0.06
-         AAG21_photospheric_element_zfrac(e_fe) = 7.46  !± 0.04
-         AAG21_photospheric_element_zfrac(e_co) = 4.94  !± 0.05
-         AAG21_photospheric_element_zfrac(e_ni) = 6.20  !± 0.04
-         AAG21_photospheric_element_zfrac(e_cu) = 4.18  !± 0.05
-         AAG21_photospheric_element_zfrac(e_zn) = 4.56  !± 0.05
-         AAG21_photospheric_element_zfrac(e_ga) = 3.02  !± 0.05
-         AAG21_photospheric_element_zfrac(e_ge) = 3.62  !± 0.10
-         AAG21_photospheric_element_zfrac(e_as) = 2.30  !± 0.04  meteorites
-         AAG21_photospheric_element_zfrac(e_se) = 3.34  !± 0.03  meteorites
-         AAG21_photospheric_element_zfrac(e_br) = 2.54  !± 0.06  meteorites
-         AAG21_photospheric_element_zfrac(e_kr) = 3.12  !± 0.10
-         AAG21_photospheric_element_zfrac(e_rb) = 2.32  !± 0.08
-         AAG21_photospheric_element_zfrac(e_sr) = 2.83  !± 0.06
-         AAG21_photospheric_element_zfrac(e_y ) = 2.21  !± 0.05
-         AAG21_photospheric_element_zfrac(e_zr) = 2.59  !± 0.04
-         AAG21_photospheric_element_zfrac(e_nb) = 1.47  !± 0.06
-         AAG21_photospheric_element_zfrac(e_mo) = 1.88  !± 0.09
-         AAG21_photospheric_element_zfrac(e_Ru) = 1.75  !± 0.08
-         AAG21_photospheric_element_zfrac(e_Rh) = 0.78  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Pd) = 1.57  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Ag) = 0.96  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Cd) = 1.71  !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_In) = 0.80  !± 0.20
-         AAG21_photospheric_element_zfrac(e_Sn) = 2.02  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Sb) = 1.01  !± 0.06 meteorites
-         AAG21_photospheric_element_zfrac(e_Te) = 2.18  !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_I ) = 1.55  !± 0.08 meteorites
-         AAG21_photospheric_element_zfrac(e_Xe) = 2.22  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Cs) = 1.08  !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_Ba) = 2.27  !± 0.05
-         AAG21_photospheric_element_zfrac(e_La) = 1.11  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Ce) = 1.58  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Pr) = 0.75  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Nd) = 1.42  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Sm) = 0.95  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Eu) = 0.52  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Gd) = 1.08  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Tb) = 0.31  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Dy) = 1.10  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Ho) = 0.48  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Er) = 0.93  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Tm) = 0.11  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Yb) = 0.85  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Lu) = 0.10  !± 0.09
-         AAG21_photospheric_element_zfrac(e_Hf) = 0.85  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Ta) = -0.15  !± 0.04 meteorites
-         AAG21_photospheric_element_zfrac(e_W ) = 0.79  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Re) = 0.26  !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Os) = 1.35  !± 0.12
-         AAG21_photospheric_element_zfrac(e_Ir) = 1.32  !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Pt) = 1.61  !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Au) = 0.91  !± 0.12
-         AAG21_photospheric_element_zfrac(e_Hg) = 1.17  !± 0.18 meteorites
-         AAG21_photospheric_element_zfrac(e_Tl) = 0.92  !± 0.17
-         AAG21_photospheric_element_zfrac(e_Pb) = 1.95  !± 0.08
-         AAG21_photospheric_element_zfrac(e_Bi) = 0.65  !± 0.04 meteorites
-         AAG21_photospheric_element_zfrac(e_Th) = 0.03  !± 0.10
-         AAG21_photospheric_element_zfrac(e_U) = -0.54  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_li) = 0.96d0  !± 0.013
+         AAG21_photospheric_element_zfrac(e_be) = 1.38d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_b ) = 2.70d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_c ) = 8.46d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_n ) = 7.83d0  !± 0.07
+         AAG21_photospheric_element_zfrac(e_o ) = 8.69d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_f ) = 4.40d0  !± 0.25
+         AAG21_photospheric_element_zfrac(e_ne) = 8.06d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_na) = 6.22d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_mg) = 7.55d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_al) = 6.43d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_si) = 7.51d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_p ) = 5.41d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_s ) = 7.12d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_cl) = 5.31d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_ar) = 6.38d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_k ) = 5.07d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_ca) = 6.30d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_sc) = 3.14d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_ti) = 4.97d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_v ) = 3.90d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_cr) = 5.62d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_mn) = 5.42d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_fe) = 7.46d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_co) = 4.94d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ni) = 6.20d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_cu) = 4.18d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_zn) = 4.56d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ga) = 3.02d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ge) = 3.62d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_as) = 2.30d0  !± 0.04  meteorites
+         AAG21_photospheric_element_zfrac(e_se) = 3.34d0  !± 0.03  meteorites
+         AAG21_photospheric_element_zfrac(e_br) = 2.54d0  !± 0.06  meteorites
+         AAG21_photospheric_element_zfrac(e_kr) = 3.12d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_rb) = 2.32d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_sr) = 2.83d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_y ) = 2.21d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_zr) = 2.59d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_nb) = 1.47d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_mo) = 1.88d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_Ru) = 1.75d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_Rh) = 0.78d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Pd) = 1.57d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Ag) = 0.96d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Cd) = 1.71d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_In) = 0.80d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_Sn) = 2.02d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Sb) = 1.01d0  !± 0.06 meteorites
+         AAG21_photospheric_element_zfrac(e_Te) = 2.18d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_I ) = 1.55d0  !± 0.08 meteorites
+         AAG21_photospheric_element_zfrac(e_Xe) = 2.22d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Cs) = 1.08d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_Ba) = 2.27d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_La) = 1.11d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Ce) = 1.58d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Pr) = 0.75d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Nd) = 1.42d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Sm) = 0.95d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Eu) = 0.52d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Gd) = 1.08d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Tb) = 0.31d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Dy) = 1.10d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Ho) = 0.48d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Er) = 0.93d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Tm) = 0.11d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Yb) = 0.85d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Lu) = 0.10d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_Hf) = 0.85d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Ta) =-0.15d0  !± 0.04 meteorites
+         AAG21_photospheric_element_zfrac(e_W ) = 0.79d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Re) = 0.26d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Os) = 1.35d0  !± 0.12
+         AAG21_photospheric_element_zfrac(e_Ir) = 1.32d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Pt) = 1.61d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Au) = 0.91d0  !± 0.12
+         AAG21_photospheric_element_zfrac(e_Hg) = 1.17d0  !± 0.18 meteorites
+         AAG21_photospheric_element_zfrac(e_Tl) = 0.92d0  !± 0.17
+         AAG21_photospheric_element_zfrac(e_Pb) = 1.95d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_Bi) = 0.65d0  !± 0.04 meteorites
+         AAG21_photospheric_element_zfrac(e_Th) = 0.03d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_U)  =-0.54d0  !± 0.03 meteorites
 
          ! convert to fraction of Z by mass
          z_sum = 0

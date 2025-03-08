@@ -27,7 +27,7 @@ module history
 
    use star_private_def
    use star_history_def
-   use const_def
+   use const_def, only: dp, secday, secyer, no_mixing, semiconvective_mixing, thermohaline_mixing
    use chem_def
    use history_specs
    use star_utils
@@ -3006,7 +3006,7 @@ contains
             else
                if_rot = 0
             end if
-         endif
+         end if
       end function if_rot
 
 

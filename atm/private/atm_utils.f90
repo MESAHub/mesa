@@ -26,28 +26,18 @@
 
 module atm_utils
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, pi, boltz_sigma, ln10, clight, crad
   use math_lib
-
-  ! No implicit typing
 
   implicit none
 
-  ! Parameter definitions
-
   integer, parameter :: E2_NPAIRS = 571
-
-  ! Module variables
 
   real(dp), target, save  :: E2_x(E2_NPAIRS)
   real(dp), save          :: E2_pairs(2*E2_NPAIRS)
   real(dp), target, save  :: E2_f_ary(4*E2_NPAIRS)
   real(dp), pointer, save :: E2_f1(:), E2_f(:,:)
   logical, save           :: have_E2_interpolant = .false.
-
-  ! Access specifiers
 
   private
 
@@ -56,8 +46,6 @@ module atm_utils
   public :: eval_Teff_g
   public :: eval_Paczynski_gradr
   public :: eval_E2
-
-  ! Procedures
 
 contains
 
@@ -79,7 +67,6 @@ contains
 
   end subroutine init
 
-  !****
 
   subroutine shutdown()
 
@@ -89,7 +76,6 @@ contains
 
   end subroutine shutdown
 
-  !****
 
   subroutine eval_Teff_g(L, R, M, cgrav, Teff, g)
 
@@ -108,7 +94,6 @@ contains
 
   end subroutine eval_Teff_g
 
-  !****
 
   function eval_Paczynski_gradr( &
        T, P, rho, tau, kap, L, M, R, cgrav) result (gradr)
@@ -154,13 +139,9 @@ contains
 
     end if
 
-    ! Finish
-
     return
 
   end function eval_Paczynski_gradr
-
-  !****
 
   subroutine eval_E2(x, E2, dE2_dx, ierr)
 
@@ -195,8 +176,6 @@ contains
     dE2_dx = slope*ln10*E2
 
   end subroutine eval_E2
-
-  !****
 
   subroutine create_E2_interpolant(ierr)
 

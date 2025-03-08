@@ -5,7 +5,7 @@ This page describes two options for installing MESA on Windows.
 
 Option 1: MESA-Docker
 ---------------------
-MESA-Docker provides a pre built version of MESA inside a Docker container. This simplifies the setup as MESA and all 
+MESA-Docker provides a pre built version of MESA inside a Docker container. This simplifies the setup as MESA and all
 its dependencies are already installed.
 
 `MESA-Docker <https://github.com/evbauer/MESA-Docker>`__
@@ -38,11 +38,11 @@ You must have ``VcXsrv`` running before you start a Linux terminal for it to wor
 
     Sometimes VcXsrv is flaky and does not work well. This does not impact your science,
     only whether a pgplot window appears. If VcXsrv does not work you can always set your
-    pgstar inlists to save plots instead of displaying them. Saving works whether you have a 
+    pgstar inlists to save plots instead of displaying them. Saving works whether you have a
     working VcXsrv or not.
 
 Once installed launch ``VcXsrv``. Accept the default choices except that you should select the option
-``Disable access control``. The first time you run VcXsrv you may get a firewall prompt, in which 
+``Disable access control``. The first time you run VcXsrv you may get a firewall prompt, in which
 case you should allow it access to public and private networks.
 
 

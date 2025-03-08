@@ -27,7 +27,7 @@
       module element_diffusion
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi4, amu, qe, secyer, no_mixing, phase_separation_mixing
 
       implicit none
 
@@ -197,7 +197,7 @@
                if (maxloc(s% xa(:,k),dim=1) /= maxloc(s% xa(:,k-1),dim=1) .or. &
                     s% D_mix(k+1) <= min_D_mix) then
                   nzlo=k; exit
-               endif
+               end if
             end do
             nzlo = kk + (nzlo - kk)*4/5  ! back up into the convection zone
          end if

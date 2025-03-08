@@ -33,7 +33,7 @@ evolution step.
    :language: fortran
    :start-at: evolve_loop:
    :end-at: end do evolve_loop
-   :linenos:                  
+   :linenos:
 
 
 Within that loop are calls the routine ``do_evolve_one_step``, which
@@ -45,7 +45,7 @@ rejecting it and repeating the attempt (via a redo or retry).
    :language: fortran
    :start-at: step_loop:
    :end-at: end do step_loop
-   :linenos:                  
+   :linenos:
 
 
 The stellar evolution step itself is triggered via a call to
@@ -59,8 +59,8 @@ In ``star/public``, in the file ``star_lib.f90``, this function is
    :start-at: integer function star_evolve_step
    :end-at: end function star_evolve_step
    :emphasize-lines: 9, 18-20
-   :linenos:                  
-            
+   :linenos:
+
 
 You can see that this splits the step into two parts (part1 and
 part2).  Those are implemented in ``star/private``.
@@ -109,9 +109,9 @@ also added through ``*.inc`` files, but these live in
    will need to add code.
 
 There is far too much contained in ``star_info`` to go through it
-piece by piece, but you should spend some time perusing theses files
+piece by piece, but you should spend some time perusing these files
 to get a feel for what sorts of things go where.
-   
+
 star/private
 ------------
 
