@@ -781,16 +781,6 @@
     burn_min2 = 1000
 
 
-      ! max_conv_vel_div_csound_maxq
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! only consider from center out to this location
-
-      ! ::
-
-    max_conv_vel_div_csound_maxq = 1d0!1
-
-
       ! width_for_limit_conv_vel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3382,8 +3372,17 @@
 
       ! ::
 
-    max_conv_vel_div_csound = 1d0!1d99
+    max_conv_vel_div_csound = 1d99
 
+
+      ! max_conv_vel_div_csound_maxq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! only consider ``max_conv_vel_div_csound`` from center out to this location
+
+      ! ::
+
+    max_conv_vel_div_csound_maxq = 1
 
       ! max_v_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~
