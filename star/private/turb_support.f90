@@ -209,7 +209,7 @@ contains
       end if
 
       ! maximum convection velocity.
-      if (associated(s% csound_face) .and. associated(s% q)) then
+      if (k>=1) then
          if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
              max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
          else
