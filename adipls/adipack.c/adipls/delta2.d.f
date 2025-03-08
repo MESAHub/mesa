@@ -89,7 +89,7 @@ c taken out.
      4  eta(n)*xis(1,n) - xis(2,n)*xi(n)-eta(n)*xis(2,n))*x(n)*x(n)
 
 c
-c 4) Coeffiecient of m^2 from omega1 terms
+c 4) Coefficient of m^2 from omega1 terms
 c
       f4=beta*beta/2.
 
@@ -170,7 +170,7 @@ c total coefficient of m^2
         write(92,'(i5,1p5e12.4)') (n,x(n),xi(n),eta(n),xis(1,n),
      *    xis(2,n),n=1,nn)
       end if
-c asymptotic approxiamtion
+c asymptotic approximation
 
       do n=1,nn
          del2as(n) = 4./(2.*el-1.)/(2.*el+3.)

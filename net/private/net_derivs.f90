@@ -25,7 +25,7 @@
 
       module net_derivs
       use net_def
-      use const_def
+      use const_def, only: dp
       use chem_def
       use net_derivs_support
       use rates_def

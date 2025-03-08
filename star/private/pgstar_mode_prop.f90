@@ -26,7 +26,7 @@
       module pgstar_mode_prop
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, msun, rsun
       use pgstar_support
       use star_pgstar
 
@@ -83,7 +83,6 @@
          use utils_lib
          use chem_def
          use net_def
-         use const_def, only: Msun, Rsun
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id

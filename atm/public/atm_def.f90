@@ -26,15 +26,9 @@
 
 module atm_def
 
-  ! Uses
-
   use const_def, only: dp
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameter definitions
 
   ! T-tau relations
 
@@ -102,8 +96,6 @@ module atm_def
      logical, pointer           :: have_atm_table(:)
   end type Atm_Info
 
-  ! Module variables
-
   ! Atmosphere tables
 
   type (Atm_Info), target, save :: &
@@ -117,8 +109,6 @@ module atm_def
   real(dp) :: atm_test_partials_L_lo, atm_test_partials_L_hi
   real(dp) :: atm_test_partials_R_lo, atm_test_partials_R_hi
   real(dp) :: atm_test_partials_M_lo, atm_test_partials_M_hi
-
-  ! Interfaces
 
   abstract interface
 
@@ -161,4 +151,3 @@ module atm_def
   end interface
 
 end module atm_def
-

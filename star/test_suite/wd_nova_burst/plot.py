@@ -38,12 +38,9 @@ plt.rcParams["savefig.format"] = "svg"
 plt.rcParams["axes.formatter.use_mathtext"] = True
 
 # read in the history data from MESA
-l = mr.MesaLogDir("LOGS")
-h = l.history
-p = l.profile_data()
-
-import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
+logs = mr.MesaLogDir("LOGS")
+h = logs.history
+p = logs.profile_data()
 
 # Create a figure
 fig = plt.figure(figsize=(10, 6))
@@ -102,7 +99,7 @@ ax2.loglog(p.Rho, p.T)
 
 # plot psi4 and hydrogen burn lines
 # preserve limits... shouldn't have to do it like this, but
-# autoscale commands always seem to fail.
+# autoscale commands always seem to fail
 x_left, x_right = ax2.get_xlim()
 y_bottom, y_top = ax2.get_ylim()
 ax2.plot(psi4_xs, psi4_ys, color="lightgrey", ls=":", zorder=-5)
@@ -117,7 +114,7 @@ ax2.set_ylabel(r"Temperature [K]")
 high_burning = np.where(p.eps_nuc > 1e7, True, False)
 mid_burning = np.where((p.eps_nuc > 1e3) & (p.eps_nuc < 1e7), True, False)
 low_burning = np.where((p.eps_nuc > 1) & (p.eps_nuc < 1e3), True, False)
-# temporarily set butt style to round
+# temporarily set cap style to round
 save_capstyle = plt.rcParams["lines.solid_capstyle"]
 plt.rcParams["lines.solid_capstyle"] = "round"
 ax2.plot(

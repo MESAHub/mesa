@@ -4,7 +4,7 @@
 
       module accurate_sum_auto_diff_star_order1
 
-      use const_def
+      use const_def, only: dp
       use auto_diff
 
       implicit none

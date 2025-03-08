@@ -348,7 +348,7 @@ contains
        write(*,*) 'AESOPUS_interp: logR, logT outside of table bounds'
        ierr = -1
        return
-    endif
+    end if
 
     ! restrict to range
     clipped = .false.
@@ -360,13 +360,13 @@ contains
        my_Z = kA% Zs(kA% num_Zs)
        iZ = kA% num_Zs
        clipped = .true.
-    endif
+    end if
 
     ! if clipped in Z, then just need one call
     if (clipped) then
        call AESOPUS_interp_fixedZref(iZ, X, XC, XN, XO, logR, logT, res, ierr)
        return
-    endif
+    end if
 
     my_Z = Zref
 
@@ -379,7 +379,7 @@ contains
        write(*,'(I2, A, I2, A)') nZ, ' values are required; ', kA% num_Zs, ' were provided'
        ierr = -1
        return
-    endif
+    end if
 
     ! binary_search returns iZ between 1 and num_Zs-1
     ! such that Zs(iZ) <= Z < Zs(iZ+1)
@@ -393,7 +393,7 @@ contains
     ! want to call at [iZ-1, iZ, iZ+1]
     do i = 1, nZ
        call AESOPUS_interp_fixedZref(iZ+i-2, X, XC, XN, XO, logR, logT, raw_res(:,i), ierr)
-    enddo
+    end do
 
     nullify(work1)
     allocate(work1(nZ*pm_work_size))
@@ -407,7 +407,7 @@ contains
             interp_pm, pm_work_size, &
             work1, junk, ierr)
        res(i) = v_new(1)
-    enddo
+    end do
 
     deallocate(work1)
 
@@ -538,7 +538,7 @@ contains
          weights(1) = 1d0
          weights(2) = 0d0
          clipped = .true.
-      endif
+      end if
 
       ! find location and calculate linear weights
       if (.not. clipped) then
@@ -546,7 +546,7 @@ contains
          loc = binary_search(len, vec, len/2, val)
          weights(2) = (val - vec(loc)) / (vec(loc+1) - vec(loc))
          weights(1) = 1d0 - weights(2)
-      endif
+      end if
 
     end subroutine clipped_linear_weights
 
@@ -603,7 +603,7 @@ contains
        kap = -1d0
        dlnkap_dlnRho = 0d0
        dlnkap_dlnT = 0d0
-    endif
+    end if
 
   end subroutine AESOPUS_get
 

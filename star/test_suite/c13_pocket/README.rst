@@ -44,7 +44,7 @@ thermal pulse and the :math:`^{13}{\rm C}` pocket is apparent.
 
 .. note::
 
-  When you run parts 0-2, the ``run_star_extras`` file attemps to
+  When you run parts 0-2, the ``run_star_extras`` file attempts to
   automatically do the analysis reported in Table 11 of |MESA I|.
   This can be useful for detailed comparisons between versions.
   Uncomment the parts in ``rn`` and then grep in the output for

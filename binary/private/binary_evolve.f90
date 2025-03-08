@@ -26,7 +26,7 @@
 
       module binary_evolve
 
-      use const_def
+      use const_def, only: dp, pi, msun, rsun, secyer, secday, one_third, standard_cgrav
       use math_lib
       use star_lib
       use star_def
@@ -188,7 +188,7 @@
             b% CE_lambda2 = 0d0
             b% CE_Ebind1 = 0d0
             b% CE_Ebind2 = 0d0
-            b% mtransfer_rate = 0
+            b% mtransfer_rate = 0d0
 
             b% num_tries = 0
 
@@ -453,7 +453,7 @@
             end if
             b% mtransfer_rate = new_mdot
          else
-            b% mtransfer_rate = 0
+            b% mtransfer_rate = 0d0
          end if
          call adjust_irradiation(b)
 

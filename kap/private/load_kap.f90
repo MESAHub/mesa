@@ -301,7 +301,7 @@ contains
        write(*,'(A)')
        write(*,'(A)')
        write(*,'(A)')
-       write(*,*) 'NOTICE: you need to install a new verion of the kap data.'
+       write(*,*) 'NOTICE: you need to install a new version of the kap data.'
        write(*,*) 'Please remove the directory mesa/data/kap_data,'
        write(*,*) 'and rerun the mesa ./install script.'
        write(*,'(A)')

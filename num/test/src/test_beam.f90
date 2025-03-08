@@ -3,6 +3,7 @@
       use num_lib
       use test_int_support, only: i_nfcn, i_njac
       use utils_lib, only: mesa_error
+      use bari_beam, only: beam_feval, beam_jeval, beam_init, beam_solut
 
       implicit none
 

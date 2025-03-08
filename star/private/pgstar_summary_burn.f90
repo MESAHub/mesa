@@ -26,7 +26,7 @@
       module pgstar_summary_burn
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use pgstar_support
       use star_pgstar
 

@@ -884,8 +884,8 @@
          dratdumdd(irhe3ag)  = 0.0d0
          else
          dratdumdy1(irhe3ag) = 0.0d0
-         endif
-         endif
+         end if
+         end if
 
 
    ! beta limit n14(p,g)o15(enu)o16  and o16(p,g)f17(e+nu)17o(p,a)n14
@@ -2694,9 +2694,9 @@
             do j=1,species(plus_co56)
                do i=1,species(plus_co56)
                   d_epstotal_dy(j) = d_epstotal_dy(j) + dfdy(i,j)*mion(i)
-               enddo
+               end do
                d_epstotal_dy(j) = d_epstotal_dy(j) * enuc_conv2
-            enddo
+            end do
 
          end subroutine approx21_dfdT_dfdRho
 

@@ -25,22 +25,15 @@
 
 module pulse_gyre
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, four_thirds, rsun
   use utils_lib
   use atm_def
   use atm_support
   use eps_grav
-
   use pulse_utils
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -129,13 +122,13 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Allocate arrays & set up data pointers
 
@@ -253,7 +246,7 @@ contains
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -277,8 +270,6 @@ contains
     if (ASSOCIATED(s%atm_structure)) then
        deallocate(s%atm_structure)
     end if
-
-    ! Finish
 
     return
 
@@ -325,13 +316,10 @@ contains
          Omega_rot(j) = 0d0
       end if
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
 
@@ -376,13 +364,10 @@ contains
          Omega_rot = 0d0
       end if
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j, k_a, k_b)
 
@@ -431,15 +416,12 @@ contains
       end if
 
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_ctr
 
   end subroutine get_gyre_data
 
-  !****
 
   subroutine write_gyre_data (id, filename, global_data, point_data, ierr)
 
@@ -493,8 +475,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

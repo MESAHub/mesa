@@ -1074,7 +1074,7 @@
 ! do_initial_orbit_sync_*
 ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-! Relax rotation of star to orbital period at the beggining of evolution.
+! Relax rotation of star to orbital period at the beginning of evolution.
 ! "\_1" refers to first star, "\_2" to the second one.
 
 ! ::

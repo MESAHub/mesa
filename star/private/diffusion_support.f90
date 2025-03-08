@@ -26,7 +26,7 @@
 
       module diffusion_support
 
-      use const_def
+      use const_def, only: dp, pi, pi4, me, mp, qe, amu, fine, boltzm, hbar, msun, rsun, secyer, one_third, four_thirds_pi
       use chem_def
       use utils_lib, only: is_bad_num
       use star_private_def
@@ -785,13 +785,13 @@
       end subroutine get1_flow_coeffs
 
 
-!*************************************************************
+! *************************************************************
 ! Original of this routine was written by Anne A. Thoul, at the Institute
 ! for Advanced Study, Princeton, NJ 08540.
 ! See Thoul et al., Ap.J. 421, p. 828 (1994)
 
 ! With modifications by Hali Hu for non Coulomb and rad levitation.
-!*************************************************************
+! *************************************************************
 ! This routine inverses the burgers equations.
 !
 ! The system contains N equations with N unknowns.
@@ -804,7 +804,7 @@
 !                   the electric field E
 !                   the gravitational force g.
 !
-!**************************************************
+! **************************************************
 
 
 ! comments from Anne's original version

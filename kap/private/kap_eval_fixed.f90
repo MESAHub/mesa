@@ -39,7 +39,7 @@
                z_tables, num_Zs, rq, Z, X, Rho, logRho, T, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
-         use const_def
+         use const_def, only: dp, ln10
 
          ! INPUT
          type (Kap_Z_Table), dimension(:), pointer :: z_tables

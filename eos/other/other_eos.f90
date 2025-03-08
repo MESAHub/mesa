@@ -47,7 +47,7 @@
       ! this allows you to make small modifications to the existing
       ! eos results without having to provide a full replacement eos.
 
-      use const_def
+      use const_def, only: dp
 
       implicit none
 

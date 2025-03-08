@@ -26,7 +26,14 @@
 
       module mix_info
 
-      use const_def
+      use const_def, only: dp, ln10, pi4, msun, no_mixing, &
+                           minimum_mixing, &
+                           rayleigh_taylor_mixing, &
+                           convective_mixing, &
+                           semiconvective_mixing, &
+                           overshoot_mixing, &
+                           thermohaline_mixing, &
+                           rotation_mixing
       use num_lib
       use utils_lib
       use star_private_def

@@ -15,7 +15,7 @@ au = 1.496e13
 
 # fiducial parameters
 mp = 1.0  # planet mass in mjup
-rp = 2.0  # inital planet radius in rjup
+rp = 2.0  # initial planet radius in rjup
 mcore = 10.0  # planet core mass in mearth
 rhocore = 10.0  # core density in g/cc
 mp_wo_core = mp - mcore * mearth / mjup  # mass of planet before core put in
@@ -45,7 +45,6 @@ lgmmin = -1.0
 lgmmax = math.log10(80.0)
 imax = 100
 for i in range(1, imax + 1, 1):
-
     mp = math.pow(10.0, lgmmin + (lgmmax - lgmmin) * i / imax)
     mp_wo_core = mp - mcore * mearth / mjup
 

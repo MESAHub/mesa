@@ -331,19 +331,19 @@ contains
     if(rs<0.00001d0)then
        rs0=1d0-rs
        rs=0.00001d0
-    endif
+    end if
     s=(log10(rs)+3d0)/2d0
     fj=0
     if(s/=0)then
        do i=0,10
           fj=c(i)*pow(s,dble(i))+fj
-       enddo
+       end do
     else
        fj=c(0)
-    endif
+    end if
     if(rs0/=0)then
        rs=1d0-rs0
-    endif
+    end if
 
     Vs = 1.46d-2 * Z * fj
 

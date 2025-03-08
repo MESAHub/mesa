@@ -273,7 +273,7 @@
       real(dp), intent(out) :: x
       integer, intent(out) :: ierr
 
-   !*****************************************************************************80
+   ! *****************************************************************************80
    !
    !! LOCAL_MIN seeks a local minimum of a function F(X) in an interval [A,B].
    !
@@ -514,7 +514,7 @@
 
    real(dp) function eval_brent_safe_zero ( a, b, machep, t, epsy, f, fa_in, fb_in, lrpar, rpar, lipar, ipar, ierr )
 
-   !*****************************************************************************80
+   ! *****************************************************************************80
    !
    !! seeks the root of a function F(X) in an interval [A,B].
    !

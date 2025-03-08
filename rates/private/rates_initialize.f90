@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module rates_initialize
-      use const_def
+      use const_def, only: dp, mesa_data_dir, ln2
       use math_lib
       use rates_def
 
@@ -676,7 +676,6 @@
          use utils_lib
          use chem_lib
          use chem_def, only: chem_isos, category_id, category_Name
-         use const_def, only: mesa_data_dir
          character (len=*), intent(in) :: reactionlist_filename
          integer, intent(out) :: ierr
 

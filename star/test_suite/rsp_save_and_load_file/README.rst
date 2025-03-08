@@ -21,7 +21,7 @@ This test case has 2 parts. Click to see a larger version of a plot.
    :width: 100%
 
 
-pgstar commands, in addition to those in ``inlist_rsp_common`` and modifcations to ``how_many_extra_history_columns`` and
+pgstar commands, in addition to those in ``inlist_rsp_common`` and modificationss to ``how_many_extra_history_columns`` and
 ``data_for_extra_history_columns`` in the ``run_star_extras.f90``, used for the plot above:
 
 .. code-block:: console

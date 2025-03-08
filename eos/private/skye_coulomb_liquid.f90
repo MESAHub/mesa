@@ -2,7 +2,7 @@ module skye_coulomb_liquid
    use math_lib
    use math_def
    use auto_diff
-   use const_def
+   use const_def, only: dp, me, amu, fine, pi, ev2erg
 
    implicit none
 
@@ -12,7 +12,7 @@ module skye_coulomb_liquid
 
    !> Calculates the free energy of a classical one-component
    !! plasma in the liquid phase using the fitting form of
-   !! A.Y.Potekhin and G.Chabrier,Phys.Rev.E62,8554(2000)
+   !! A.Y.Potekhin and G.Chabrier, Phys.Rev.E62, 8554 (2000)
    !! fit to the data of DeWitt & Slattery (1999).
    !! This choice ensures consistency with the quantum_ocp_liquid_free_energy_correction
    !! routine, which is based on the fits of Baiko & Yakolev 2019 (who were correcting relative
@@ -137,14 +137,14 @@ module skye_coulomb_liquid
          Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
       else
          Dif0=Z321-sqrt((Z2mean+Zmean)*(Z2mean+Zmean)*(Z2mean+Zmean)/Zmean)
-      endif
+      end if
       DifR=Dif0/Z52
       DifFDH=Dif0*GAME*sqrt(GAME/3d0)  ! F_DH - F_LM(DH)
       D=Z2mean/(Zmean*Zmean)
       if (abs(D-1.d0)<TINY) then  ! no correction
          FMIX=0d0
          return
-      endif
+      end if
       P3=pow(D,-0.2d0)
       D0=(2.6d0*DifR+14d0*DifR*DifR*DifR)/(1.d0-P3)
       GP=D0*pow(GAMImean,P3)

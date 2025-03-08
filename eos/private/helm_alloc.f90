@@ -142,7 +142,7 @@
             h% ddi_sav(i)  = ddi
             h% dd2i_sav(i) = dd2i
             h% dd3i_sav(i) = dd3i
-         enddo
+         end do
       end subroutine setup_td_deltas
 
 
@@ -230,11 +230,11 @@
             do j=1,jmax
                tsav = h% logtlo + (j-1)*h% logtstp
                h% t(j) = exp10(tsav)
-            enddo
+            end do
             do i=1,imax
                dsav = h% logdlo + (i-1)*h% logdstp
                h% d(i) = exp10(dsav)
-            enddo
+            end do
          end if
 
          close(unit=19)
@@ -281,8 +281,8 @@
                   end do
                   write(*,'(A)')
                end if
-            enddo
-          enddo
+            end do
+          end do
 
          !..read the pressure derivative with density table
           do j=1,jmax
@@ -304,8 +304,8 @@
                end do
                write(*,'(A)')
             end if
-           enddo
-          enddo
+           end do
+          end do
 
          !..read the electron chemical potential table
           do j=1,jmax
@@ -327,8 +327,8 @@
                end do
                write(*,'(A)')
             end if
-           enddo
-          enddo
+           end do
+          end do
 
          !..read the number density table
           do j=1,jmax
@@ -350,8 +350,8 @@
                end do
                write(*,'(A)')
             end if
-           enddo
-          enddo
+           end do
+          end do
 
           close(unit=19)
           !..write cachefile

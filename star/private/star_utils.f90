@@ -26,7 +26,7 @@
       module star_utils
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, ln10, clight, crad, msun, rsun, lsun, one_third, four_thirds_pi
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -679,7 +679,7 @@
             write(*,2) 'dq(k+1)', k+1, dq(k+1)
 
             call mesa_error(__FILE__,__LINE__,'interp_val_to_pt')
-         endif
+         end if
          interp_val_to_pt = (v(k)*dq(k-1) + v(k-1)*dq(k))/(dq(k-1) + dq(k))
       end function interp_val_to_pt
 
@@ -710,7 +710,7 @@
                interp_xa_to_pt, str, ierr)
             interp_xa_to_pt = min(1d0,max(0d0,interp_xa_to_pt))
             if (ierr == 0) return
-         endif
+         end if
          interp_xa_to_pt = (xa(j,k)*dq(k-1) + xa(j,k-1)*dq(k))/(dq(k-1) + dq(k))
          interp_xa_to_pt = min(1d0,max(0d0,interp_xa_to_pt))
       end function interp_xa_to_pt
@@ -789,7 +789,47 @@
       end function find_cell_for_mass
 
 
-      subroutine get_delta_Pg(s, nu_max, delta_Pg)
+      subroutine get_delta_Pg_traditional(s, delta_Pg)
+         type (star_info), pointer :: s
+         real(dp), intent(out) :: delta_Pg ! seconds
+         ! g-mode period spacing for l=1
+         real(dp) :: dr, N2, integral, r
+         integer :: k
+         logical, parameter :: dbg = .false.
+         include 'formats'
+         if (dbg) then
+            write(*,2) 's% star_mass', s% model_number, s% star_mass
+            write(*,2) 's% photosphere_r', s% model_number, s% photosphere_r
+            write(*,2) 's% Teff', s% model_number, s% Teff
+         end if
+         delta_Pg = 0._dp
+         if (.not. s% calculate_Brunt_N2) return
+         k = 0
+         r = 0._dp
+         N2 = 0._dp
+         dr = 0._dp
+         integral = 0._dp
+
+         ! we integrate at cell edges.
+         do k = 2, s% nz
+         N2 = s% brunt_N2(k) ! brunt_N2 at cell_face
+         r  = s% r(k) ! r evalulated at cell_face
+         dr = s% rmid(k-1) - s% rmid(k) ! dr evalulated at cell face.
+         if (N2 > 0d0) integral = integral + sqrt(N2)*dr/r
+         end do
+
+         if (dbg) write(*,2) ' integral ', &
+            s% model_number,integral
+
+         if (integral == 0) return
+         delta_Pg = sqrt(2._dp)*pi*pi/integral
+         if (is_bad(delta_Pg)) delta_Pg = 0._dp
+
+         if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
+
+      end subroutine get_delta_Pg_traditional
+
+      subroutine get_delta_Pg_bildsten2012(s, nu_max, delta_Pg)
          type (star_info), pointer :: s
          real(dp), intent(in) :: nu_max  ! microHz
          real(dp), intent(out) :: delta_Pg  ! seconds
@@ -851,7 +891,7 @@
 
          if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
 
-      end subroutine get_delta_Pg
+      end subroutine get_delta_Pg_bildsten2012
 
 
       subroutine set_rmid(s, nzlo, nzhi, ierr)
@@ -2684,13 +2724,13 @@
                  i_b = i-1
                  if (i_b > i_a) call weighed_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
                  in_region = .FALSE.
-              endif
+              end if
 
            else
               if (ABS(dd(i)) >= dd_thresh) then
                  i_a = i
                  in_region = .TRUE.
-              endif
+              end if
 
            end if
 
@@ -2703,9 +2743,7 @@
            i_b = n
            if (i_b > i_a) call weighed_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
 
-        endif
-
-        ! Finish
+        end if
 
         return
 
@@ -3317,9 +3355,9 @@
                l = mod(53*l + 1, 169)
                if (mod(l*m,64) >= 32) x = x + t
                t = 0.5d0 * t
-            enddo
+            end do
             s% rand_u(ii) = x
-         enddo
+         end do
          s% rand_c   = 362436.0d0/16777216.0d0
          s% rand_cd  = 7654321.0d0/16777216.0d0
          s% rand_cm  = 16777213.0d0/16777216.0d0

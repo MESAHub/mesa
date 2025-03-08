@@ -26,7 +26,7 @@
       module auto_diff_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, sqrt_2_div_3
       use auto_diff
 
       implicit none

@@ -27,7 +27,7 @@
 
       use star_private_def
       use star_profile_def
-      use const_def
+      use const_def, only: dp, strlen
       use profile_getval
 
       implicit none

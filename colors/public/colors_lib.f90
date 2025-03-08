@@ -27,7 +27,7 @@
    module colors_lib
       use math_lib
       use colors_def
-      use const_def
+      use const_def, only : dp, strlen, mbolsun, loggsun, Teffsun
       ! library for calculating theoretical estimates of magnitudes and colors
       ! from Teff, L, M, and [M/H].
 
@@ -44,7 +44,7 @@
 
       ! Routines get_bc will return the coefficients from interpolating over log Teff, log g, [M/H]
       ! even though the tables are defined as Teff, log g, [M/H]. get_abs_mag routines return
-      ! data thats been turned into an absolute magnitude. A color can be computed by taking the difference between
+      ! data that's been turned into an absolute magnitude. A color can be computed by taking the difference between
       ! two get_bc or two get_abs_mag calls.
 
       ! Names for the filters should be unique across all data files (left to the user to enforce this).
@@ -72,14 +72,14 @@
 !$OMP critical (color_init)
          if (.not. color_is_initialized) then
             call do_colors_init(num_files,fnames,num_colors,ierr)
-         endif
+         end if
 !$OMP end critical (color_init)
 
          if(ierr/=0)THEN
             ierr=-1
             write(*,*) "colors_init failed"
             return
-         endif
+         end if
 
       end subroutine colors_init
 
@@ -115,7 +115,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          call Eval_Colors(log_Teff, log_g, M_div_h, results,thead,n_colors, ierr)
 
@@ -138,7 +138,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          do i=1,num_thead
             thead=>thead_all(i)%thead
@@ -180,7 +180,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          name=get_bc_name_by_id(id,ierr)
          if(ierr/=0) return
@@ -201,7 +201,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          k=0
          do i=1,num_thead
@@ -230,7 +230,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          k=1
          do i=1,num_thead
@@ -246,7 +246,7 @@
       end function get_bc_name_by_id
 
       real(dp) function get_abs_bolometric_mag(lum)
-         use const_def
+         use const_def, only: dp
          real(dp), intent(in) :: lum  ! Luminsoity in lsun units
 
          get_abs_bolometric_mag = mbolsun - 2.5d0*log10(lum)
@@ -268,7 +268,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          get_abs_mag_by_name=get_abs_bolometric_mag(lum)-&
                               get_bc_by_name(name,log_Teff,log_g, M_div_h,ierr)
@@ -291,7 +291,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          name=get_bc_name_by_id(id,ierr)
          if(ierr/=0) return
@@ -310,7 +310,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          cnt=1
          do i=1,num_thead
@@ -339,7 +339,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          do i=1,num_thead
             thead=>thead_all(i)%thead
@@ -368,7 +368,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          ! Filter dependent terms
          solar_abs_mag=get_abs_mag_by_name(name, safe_log10(Teffsun), loggsun, 0.d0, 1.d0, ierr)
@@ -398,7 +398,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          ! Filter dependent terms
          solar_abs_mag=get_abs_mag_by_id(id, safe_log10(Teffsun), loggsun, 0.d0, 1.d0, ierr)

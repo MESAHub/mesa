@@ -33,6 +33,16 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
+
+For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
+a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide
+between adopting the traditional integral of N2 over the entire stellar model, or the
+methods of (`Bildsten et al. 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_).
+Previous MESA versions exclusively adopted the latter.
+
+By user request, a radiation diffusion flux limiter has been reintroduced with the 
+control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_form_of_T_gradient_eqn``.
+
 By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced 
 allowing users to limit the convective velocity to some fraction of the local sound speed using the
 controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
@@ -46,10 +56,12 @@ been introduced.
 Bug Fixes
 ---------
 
-fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models
-fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
+Fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models
+
+Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
+
 
 Changes in r24.08.1
 ===================
@@ -758,7 +770,7 @@ rates
 The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et al 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..118S/abstract>`_. This is
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10^7 K.
 
-The ability to set the rates preferences has been removed. This added alot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
+The ability to set the rates preferences has been removed. This added a lot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
 From now on we excusivily use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
 from CF88 (if they aren't in REACLIB or NACRE).
 
@@ -766,7 +778,7 @@ Of note is that the default C12(a,g)O16 rate has thus changed from NACRE to that
 
 The options ``set_rates_preferences``, ``new_rates_preference``, and ``set_rate_c1212`` have been removed without replacements.
 
-The options ``set_rate_c12ag``, ``set_rate_n14pg``, and ``set_rate_3a`` have been removed. However, those rates can now be access thorugh a new
+The options ``set_rate_c12ag``, ``set_rate_n14pg``, and ``set_rate_3a`` have been removed. However, those rates can now be access through a new
 rate selection mechanism. In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship a number of MESA provided rate tables. These can be loaded,
 either by the normal mechanism of adding the filename to a ``rates_list`` file, or by using the new option ``filename_of_special_rate``.
 This option sets the filename to load the rate from for the rate specified by ``reaction_for_special_factor``.
@@ -1448,7 +1460,7 @@ The options to create output files suitable for input to STELLA have
 been removed from ``MESA/star`` and the ``star_job`` namelist.  These
 capabilities are now included as part of the ``ccsn_IIp`` test case
 (see ``inlist_stella`` and ``run_star_extras.f90``).  Users desiring
-STELLA-format output should re-use the code from that example.
+STELLA-format output should reuse the code from that example.
 
 This affects the options
 

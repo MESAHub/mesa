@@ -26,7 +26,7 @@
       module read_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, secyer
 
       implicit none
 
@@ -149,6 +149,9 @@
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
          end if
+
+         s% flux_limit_R(1:nz) = 0
+         s% flux_limit_lambda(1:nz) = 0
 
          if (s% RSP_flag) then
             call RSP_setup_part1(s, restart, ierr)
@@ -982,6 +985,5 @@
          end do token_loop
 
       end subroutine get_chem_col_names
-
 
       end module read_model

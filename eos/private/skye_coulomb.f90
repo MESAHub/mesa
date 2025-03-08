@@ -2,14 +2,13 @@ module skye_coulomb
    use math_lib
    use math_def
    use auto_diff
-   use const_def, only: dp, PI, rbohr, qe, amu, me
+   use const_def, only: dp, pi, rbohr, qe, amu, me, boltzm, five_thirds, kerg
    use skye_coulomb_solid
    use skye_coulomb_liquid
 
    implicit none
 
    logical, parameter :: dbg = .false.
-   !logical, parameter :: dbg = .true.
 
    private
 
@@ -65,7 +64,7 @@ module skye_coulomb
          Z53=Z53+AY(IX)*pow(AZION(IX), five_thirds)
          Z52=Z52+AY(IX)*pow5(sqrt(AZion(IX)))
          Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0))
-      enddo
+      end do
 
       DENS = xnefer * pow3(rbohr)  ! DENS = (electrons per cubic bohr)
       RS = pow(3d0 / (4d0 * PI * DENS),1d0/3d0)  ! r_s - electron density parameter
@@ -234,14 +233,14 @@ module skye_coulomb
             dF = dF + AY(i) * f
 
          end if
-      enddo
+      end do
 
       ! Corrections to the linear mixing rule:
       if (LIQSOL == 0) then  ! liquid phase
          FMIX = liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321)
       else  ! solid phase (only Madelung contribution) [22.12.12]
          FMIX = solid_mixing_rule_correction(Skye_solid_mixing_rule, NMIX, AY, AZion, GAME)
-      endif
+      end if
       dF = dF + FMIX
 
    end function nonideal_corrections_phase
@@ -369,7 +368,7 @@ module skye_coulomb
       else
          F = ocp_solid_harmonic_free_energy(GAMI,TPT)  ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT)  ! anharmonic classical and quantum ion-ion corrections
-      endif
+      end if
 
    end function ocp_free_energy
 
@@ -414,7 +413,7 @@ module skye_coulomb
       else
          T1=1.d0
          T2=1.d0
-      endif
+      end if
 
       A0=0.75d0+3.04363d0*THETA2-0.09227d0*THETA3+1.7035d0*THETA4
       A1=1d0+8.31051d0*THETA2+5.1105d0*THETA4

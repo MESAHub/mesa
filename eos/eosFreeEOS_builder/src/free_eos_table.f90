@@ -442,7 +442,7 @@ contains
       !..allocate and load the eos tables
       character (len=256) :: eos_file_prefix, my_mesa_dir
       integer :: info
-      double precision :: logT_all_HELM, logT_all_OPAL
+      real(dp) :: logT_all_HELM, logT_all_OPAL
       logical :: use_cache
 
       eos_file_prefix = 'mesa'

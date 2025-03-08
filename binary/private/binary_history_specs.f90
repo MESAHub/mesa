@@ -26,7 +26,7 @@
 
 module binary_history_specs
 
-   use const_def
+   use const_def, only: dp
    use star_lib
    use star_def
    use math_lib

@@ -26,12 +26,11 @@
       module pgstar_kipp
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, anonymous_mixing, minimum_mixing, rayleigh_taylor_mixing
       use pgstar_support
       use star_pgstar
 
       implicit none
-
 
       contains
 

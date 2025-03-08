@@ -14,8 +14,8 @@ privileges. MESAHub is classified as an educational organization and
 this currently grants us a 100% discount, meaning this costs $0/yr.
 Unsubsidized, it would cost about $1200/yr.
 
-To classify MESAHub as an eduction account requires someone in the MESAHub
-organization to sign up for a eduction plan. This requires that the user has
+To classify MESAHub as an education account requires someone in the MESAHub
+organization to sign up for a education plan. This requires that the user has
 an University ID card with an expiry date (this is important). Steps to get
 access to this:
 
@@ -24,7 +24,7 @@ access to this:
 - It is set up, if you have access to this https://github.com/community/Global-Campus-Teachers repository
 - Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
-If MESAHub gets unsynced from this and is no longer on the eduction plan:
+If MESAHub gets unsynced from this and is no longer on the education plan:
 
 - Goto `Global campus <https://education.github.com/globalcampus/teacher#>`__
 - Find ``Upgrade your academic organizations``

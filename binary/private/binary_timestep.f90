@@ -26,7 +26,7 @@
 
       module binary_timestep
 
-      use const_def
+      use const_def, only: dp, msun, secyer
       use math_lib
       use star_lib
       use star_def

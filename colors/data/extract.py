@@ -1,6 +1,6 @@
 import numpy as np
 
-# Download the photon weigthed values from http://vizier.cfa.harvard.edu/viz-bin/VizieR-3?-source=J/A%2bAS/130/65/lcb98cor
+# Download the photon weighted values from http://vizier.cfa.harvard.edu/viz-bin/VizieR-3?-source=J/A%2bAS/130/65/lcb98cor
 
 file_in = "lcb98cor_download.data"
 file_out = "lcb98cor.dat"

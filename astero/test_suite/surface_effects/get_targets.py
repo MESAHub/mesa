@@ -13,10 +13,10 @@ from scipy.optimize import leastsq
 leastsq_kwargs = {"ftol": 1e-12, "xtol": 1e-12}
 
 
-def get_Qnl(l, mdl, Ek):
+def get_Qnl(ell, mdl, Ek):
     Qnl = np.zeros_like(Ek)
-    Qnl[l == 0] = 1
-    Qnl[l > 0] = Ek[l > 0] / np.interp(mdl[l > 0], mdl[l == 0], Ek[l == 0])
+    Qnl[ell == 0] = 1
+    Qnl[ell > 0] = Ek[ell > 0] / np.interp(mdl[ell > 0], mdl[ell == 0], Ek[ell == 0])
     return Qnl
 
 
@@ -41,7 +41,7 @@ def power_law(l, obs, err, mdl, Ek):
     return leastsq(
         lambda z: (z[0] * mdl ** z[1] + Qnl * (mdl - obs)) / err,
         [-10.0, 3.0],
-        **leastsq_kwargs
+        **leastsq_kwargs,
     )[0]
 
 
@@ -54,7 +54,7 @@ def sonoi(numax, l, obs, err, mdl, Ek):
     return leastsq(
         lambda z: (f_sonoi(mdl, numax, z[0], z[1]) + Qnl * (mdl - obs)) / err,
         [-0.01, 8.0],
-        **leastsq_kwargs
+        **leastsq_kwargs,
     )[0]
 
 

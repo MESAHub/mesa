@@ -428,7 +428,7 @@ Advanced: Investigate the bad cell and equation in detail
 
 .. note::
 
-    We will now pretend we didn't find the bug and re-use this setup
+    We will now pretend we didn't find the bug and reuse this setup
     to illustrate how to dig in at an even deeper level.
 
 MESA equations and structure variables have integer indices.  The full

@@ -11,7 +11,7 @@ YREC (Yale Rotating Evolution Code) SPOTS formalism introduced by
 Compare to Figure 15 in Section 7 of MESA Instrument Paper VI.
 
 
-The impedence of the surface flux due to magnetic pressure from starspots is parameterized
+The impedance of the surface flux due to magnetic pressure from starspots is parameterized
 in the style of an atmospheric boundary modification. As first described by
 `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__,
 the degree of "spottiness" on the stellar surface is characterized using two parameters:

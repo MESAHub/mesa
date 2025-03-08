@@ -5,6 +5,7 @@
       use mtx_def
       use test_int_support, only: i_nfcn, i_njac
       use utils_lib, only: mesa_error
+      use bari_vdpol, only: vdpol_feval, vdpol_jeval, vdpol_init, vdpol_solut
 
       implicit none
 

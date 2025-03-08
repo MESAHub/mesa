@@ -25,14 +25,14 @@
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1), cont(n)
       double precision, pointer, dimension(:) :: z1, z2, z3, f1, f2, f3 ! (n)
       integer, pointer, dimension(:) :: ip1, ip2 ! (nm1)
-      
-      
+
+
       ! LOCALS
       double precision :: s1, s2, s3, abno, sum1, sum2, sum3, sumh, z2i, z3i, ffja, bb
       integer :: i, mm, j, k, jkm, im1, mpi, j1b, j2b, jm1
       real(dp), pointer :: e1(:,:)
       real(dp), pointer, dimension(:) :: p1, p2, p3
-      
+
       e1(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
       p1(1:n) => z1(m1+1:m1+n)
       p2(1:n) => z2(m1+1:m1+n)

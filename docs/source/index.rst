@@ -20,15 +20,15 @@ Check out the full documentation below.
    installation
    using_mesa
    modules
+   reference
+   test_suite
    about
    changelog
+   summer_schools
    code_of_conduct
    contributing
    developing
    faq
    known_bugs
    news
-   reference
-   summer_schools
-   test_suite
 

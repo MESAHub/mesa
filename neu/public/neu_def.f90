@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module neu_def
-      use const_def
+      use const_def, only: dp
       implicit none
 
       real(dp), parameter :: log10Tmin_neu = 7d0, Tmin_neu = 1d7

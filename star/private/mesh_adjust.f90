@@ -26,7 +26,7 @@
 
       module mesh_adjust
 
-      use const_def
+      use const_def, only: dp, ln10, one_third, four_thirds_pi
       use star_private_def
       use chem_def
       use interp_1d_def, only: pm_work_size
@@ -619,11 +619,11 @@
 
          if (s% D_omega_flag) then
             call prune1(s% D_omega, D_omega_old, skip)
-         endif
+         end if
 
          if (s% RTI_flag) then
             call prune1(s% dPdr_dRhodr_info, dPdr_dRhodr_info_old, skip)
-         endif
+         end if
 
          contains
 

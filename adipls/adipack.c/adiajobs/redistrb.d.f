@@ -34,7 +34,7 @@ c  modified 12/11/93, introducing csurf to increase distance
 c  of first point from surface for singular surface
 c
 c  modified 3/12/93, to allow alternative interpolation
-c  (with Numerical Recipies spline routines)
+c  (with Numerical Recipes spline routines)
 c
 c  modified 9/12/93, to use explicitly the logarithmic form
 c  of the stretch function near a singular surfac, when using
@@ -821,7 +821,7 @@ c
       end
       subroutine stcvzb(x,aa,data,nn,iaa,ncb1,npt,eps)
 c
-c  sets mesh point at the botton edge of the convective envelope
+c  sets mesh point at the bottom edge of the convective envelope
 c  for adiabatic oscillation model.
 c  position of edge is found by extrapolation in aa(4,.) from
 c  radiative interior. values of aa(i,.) at this point is

@@ -25,7 +25,7 @@
 
       module net_eval
 
-      use const_def
+      use const_def, only: dp, Qconv, arg_not_provided
       use math_lib
       use chem_def
       use chem_lib, only: get_mass_excess
@@ -273,7 +273,7 @@
 
          ! convert the eps_nuc_categories
          do i=1,num_categories
-            n% eps_nuc_categories(i) = Qconv*n% eps_nuc_categories(i)
+            n% eps_nuc_categories(i) = Qconv * n% eps_nuc_categories(i)
          end do
 
          ! store the results
@@ -786,7 +786,7 @@
                call mesa_error(__FILE__,__LINE__,'set_molar_abundances')
             end if
             n% y(i) = min(1d0, max(n% x(i), 0d0)) / chem_isos% Z_plus_N(ci)
-         enddo
+         end do
 
 
 

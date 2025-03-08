@@ -1,4 +1,4 @@
-_outcom ;
+reset_outcom ;
 _trace '-------' ;
 -- GEAR integrator for ODE with sparse Jacobian and option METH=3
 -- for BRAYTON, GUSTAVSON & HACHTEL method
@@ -88,7 +88,7 @@ SUBROUTINE VTSTIF;
    ERROR   An array of N elements proportional to the estimated one step
              error in each component.
    KFLAG   A completion code with the following meanings:
-             0 the step was succesful
+             0 the step was successful
             -1 the requested error could not be achieved with
                abs(H)=HMIN
             -2 corrector convergence could not be achieved for
@@ -101,14 +101,14 @@ SUBROUTINE VTSTIF;
               0 perform the first step. This value enables the
                 subroutine to initialize itself.
              >0 take a new step continuing from the last.
-                Assumes the last step was succesful and user has not
+                Assumes the last step was successful and user has not
                 changed any parameters.
              <0 repeat the last step with a new value of H and/or
                 EPS and/or METH. This may be either in redoing a step
-                that failed, or in continuing from a succesful step.
+                that failed, or in continuing from a successful step.
              On exit, JSTART is set to NQ, the current order of the
                 method. This is also the order of the maximum derivative
-                available in the Y array. After a succesful step, JSTART
+                available in the Y array. After a successful step, JSTART
                 need not be reset for the next call.
    AJAC    A block used for partial derivatives. It keeps the
              matrix AJAC=1-EL(1)*H*Jacobian & is computed by DIFMAT.
@@ -232,7 +232,7 @@ REAL*8 XMOD,ERREST,ERROLD;
                      -- correction iterates
 %FC:
  -- If the caller change EPSJ or METH , the constants E,EUP,EDN,BND
- -- must be reseted.
+ -- must be reset.
     EPSJ=EPS*SQRT(Real(N));
       IF(METH==MEO) THEN;
         IF(EPSJ^=EPSOLD)THEN;
@@ -269,7 +269,7 @@ REAL*8 XMOD,ERREST,ERROLD;
        _DO I=1,N; FSAVE(I)=Y(I,1) _OD;
        CORRCO=.FALSE.; -- Corrector convergence. It is tested
                        -- by requiring changes relative to YMAX(I)
-                       -- to be less, in Euclidian norm, than BND,
+                       -- to be less, in Euclidean norm, than BND,
                        -- which is dependent on EPSJ.
        _WHILE ^CORRCO & ITER<MAXITE _DO
           <*Cor: Up to MAXITE corrector iterations are taken.
@@ -611,7 +611,7 @@ REAL*8 XMOD,ERREST,ERROLD;
      _OD;
       OLDJAC=.TRUE.;
   _IF D<=E _THEN
-        -- After a succesful step, update the Y array and YMAX.
+        -- After a successful step, update the Y array and YMAX.
         -- Consider changing H if IDOUB==1. Otherwise decrease
         -- IDOUB by 1.
         -- If a change in H is considered, an increase
@@ -670,7 +670,7 @@ REAL*8 XMOD,ERREST,ERROLD;
        _ELSE
           _IF KFLAG<=-MAXFAI _THEN
            <*Z: Control reaches this section if MAXFAI or more
-                failures have occured. It is assumed that the
+                failures have occurred. It is assumed that the
                 derivatives that have accumulated in the Y array
                 have errors of the wrong order.
                 Hence the first derivative is recomputed, and the order
@@ -831,7 +831,7 @@ REAL*8 XMOD,ERREST,ERROLD;
 
 _DO JTST=1,N;      --@VAR
 
-<*ROW: put in IRN(NZ+1:ILAST) all indeces I such that
+<*ROW: put in IRN(NZ+1:ILAST) all indices I such that
                 ICN(I)==JTST *>:
 
      _Do KTST=1,N; --@NAMELEFT,@NAMERIGHT;
@@ -982,7 +982,7 @@ _DEFINE
          Nperturb=1; -- index of perturbation, now  IS perturbation        
          CALL DIFMAT;
          FSAVE(JTST)=OLD;
-         <*ROW: put in IRN(NZ+1:ILAST) all indeces I such that
+         <*ROW: put in IRN(NZ+1:ILAST) all indices I such that
                 ICN(I)==JTST *>;
          _Do KTST=1,N; --@NAMELEFT,@NAMERIGHT;
             @DNAMEDVAR(KTST) = (FSAVE(NYDIM+KTST)-DSAVE(KTST));

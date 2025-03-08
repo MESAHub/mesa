@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function check_okay {
 	if [ $? -ne 0 ]
@@ -9,9 +9,9 @@ function check_okay {
 }
 
 function do_one {
-	cd $1
+	cd "$1" || exit
 	check_okay
-	echo "cleaning" $1
+	echo "cleaning" "$1"
 	./clean
 	check_okay
 	cd ..

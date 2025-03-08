@@ -24,14 +24,13 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, secyer
       use utils_lib
       use astero_support
       use astero_def
       use astero_def
 
       implicit none
-
 
       contains
 
@@ -1237,7 +1236,5 @@
          end subroutine move_flg
 
       end subroutine move_extra_info
-
-
 
       end module extras_support

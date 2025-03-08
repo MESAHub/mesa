@@ -57,12 +57,11 @@ contains
    !! @param D The chemical diffusion coefficient (cm^2/s).
    !! @param mixing_type Set to convective if convection operates (output).
    !! @param ierr Tracks errors (output).
-   subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
-
-      use const_def
+   subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, &
+                     Henyey_MLT_y_param, chiT, chiRho, Cp, grav, Lambda, rho, &
+                     P, T, opacity, gradr, grada, gradL, Gamma, gradT, Y_face, &
+                     conv_vel, D, mixing_type, max_conv_vel, ierr)
+      use const_def, only: dp, clight, convective_mixing, crad, two_13, four_13, one_third
       use num_lib
       use utils_lib
       use auto_diff

@@ -22,25 +22,17 @@
 
 module gyre_support
 
-  ! Uses
-
   use astero_def
   use star_lib
   use star_def
-  use const_def
+  use const_def, only: dp, clight, crad, standard_cgrav, msun, rsun, lsun, mesa_dir
   use utils_lib
 
   use gyre_mesa_m
 
-  ! No implicit typing
-
   implicit none
 
-  ! Module variables
-
   logical, parameter :: GYRE_IS_ENABLED = .true.
-
-  ! Access specifiers
 
   private
 
@@ -52,13 +44,9 @@ module gyre_support
   public :: gyre_call_back
   public :: save_gyre_mode_info
 
-  ! Procedures
-
 contains
 
   subroutine init_gyre (gyre_file, ierr)
-
-    use const_def
 
     character(*), intent(in) :: gyre_file
     integer, intent(out)     :: ierr
@@ -83,13 +71,10 @@ contains
 
     write(*,*) 'done init_gyre'
 
-    ! Finish
-
     return
 
   end subroutine init_gyre
 
-  !****
 
   subroutine do_gyre_get_modes (s, el, store_model, ierr)
 
@@ -133,13 +118,10 @@ contains
        write(*,1) 'time_in_oscillation_code and total', time, total_time_in_oscillation_code
     end if
 
-    ! Finish
-
     return
 
   end subroutine do_gyre_get_modes
 
-  !****
 
   subroutine null_gyre_call_back (md, ipar, rpar, ierr)
     type(mode_t), intent(in) :: md
@@ -149,7 +131,6 @@ contains
     ierr = 0
   end subroutine null_gyre_call_back
 
-  !****
 
   subroutine store_model_for_gyre (s, add_center_point, keep_surface_point, add_atmosphere, ierr)
 
@@ -226,7 +207,6 @@ contains
 
     end if
 
-    ! Finish
 
     return
 
@@ -246,15 +226,11 @@ contains
 
        write(num_string, format_string) s%model_number
 
-       ! Finish
-
        return
 
      end function num_string
 
   end subroutine store_model_for_gyre
-
-  !****
 
   subroutine gyre_call_back(md, ipar, rpar, ierr)
 
@@ -286,13 +262,10 @@ contains
          new_el, new_order, new_em, new_inertia, new_cyclic_freq, new_growth_rate, &
          md, ipar, rpar, ierr)
 
-    ! Finish
-
     return
 
   end subroutine gyre_call_back
 
-  !****
 
   subroutine save_gyre_mode_info( &
        new_el, new_order, new_em, new_inertia, new_cyclic_freq, new_growth_rate, &

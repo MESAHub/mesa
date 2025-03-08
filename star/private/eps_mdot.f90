@@ -5,7 +5,7 @@
       module eps_mdot
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use star_utils
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.

@@ -129,7 +129,7 @@ contains
        if (ir <= 0) then
           if (dbg) write(*,'(a,i3)') "No weak reaction for ", ir
           cycle
-       endif
+       end if
 
        ! get reactant names & ids
        ecapture_lhs = weak_lhs_nuclide_name(ir)
@@ -144,7 +144,7 @@ contains
           if (dbg) write(*,*) key, "is not a reaction included in ecapture module"
           ierr = 0
           cycle
-       endif
+       end if
        if (dbg) write(*,*) key, "is a reaction included in ecapture module"
 
        call integer_dict_lookup(ecapture_transitions_offset_dict, key, offset, ierr)

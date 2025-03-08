@@ -4,7 +4,7 @@
 
       module accurate_sum
 
-      use const_def
+      use const_def, only: qp
 
       implicit none
 

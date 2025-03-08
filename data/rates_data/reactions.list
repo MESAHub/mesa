@@ -8,7 +8,7 @@
 ! the neutrino value for ni56 electron capture comes from the approximation formula given in Fowler, Caughlan, Zimmerman, Annual Review Astro. Astrophys., 1975.12:69-112
 
 ! ye is 1 for electron captures; leave blank otherwise.
-! rho is number of input paticles (1, 2, or 3)
+! rho is number of input particles (1, 2, or 3)
 ! sc1, sc2, and sc3 are for screening
 
 ! this is a fixed format file. fields must be in the correct columns. see subroutine read_reaction_parameters in rates/private/rates_initialize.f90 for details.
@@ -28,7 +28,7 @@
 ! 190 - 203    category
 ! 208 - end    comment 
 
-!        reaction name                            inputs                              ouputs                        Q               Qneu         ye   rho   sc1   sc2   sc3   wk1   wk2              category                    info
+!        reaction name                            inputs                              outputs                       Q               Qneu         ye   rho   sc1   sc2   sc3   wk1   wk2              category                    info
 !                                 ||                                 |   |                                 | |                ||              ||    ||    ||   | |   | |   | |   | |   |     |                      |    |                  
 !234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 !                                                                                                  |                                                                                                   |

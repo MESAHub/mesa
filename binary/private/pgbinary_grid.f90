@@ -26,7 +26,7 @@
 module pgbinary_grid
 
    use binary_def
-   use const_def
+   use const_def, only: dp
    use pgbinary_support
 
    implicit none

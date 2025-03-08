@@ -11,14 +11,14 @@
 # Step 0) Check if you have set the correct environment variables
 ifndef MESA_DIR
 ifndef MESA_DIR_INTENTIONALLY_EMPTY
-$(error MESA_DIR enviroment variable is not set)
+$(error MESA_DIR environment variable is not set)
 endif
 endif
 
 
 ifndef MESASDK_ROOT
 ifndef MESA_DIR_INTENTIONALLY_EMPTY
-$(error MESASDK_ROOT enviroment variable is not set)
+$(error MESASDK_ROOT environment variable is not set)
 endif
 endif
 
@@ -308,7 +308,7 @@ else
 endif
 LOAD_MESA_BINARY = $(LOAD_MESA_BINARY_INT) $(LOAD_MESA_BINARY_EXT)
 
-# Due to slow compile with -ggdb and -O2 we add -fno-var-tracking which speeds things up alot
+# Due to slow compile with -ggdb and -O2 we add -fno-var-tracking which speeds things up a lot
 # At the expense of slightly worse debug information (but no worse than -ggdb -O0 would be, as that implies -fno-var-tracking)
 SLOW_COMPILE = -fno-var-tracking
 

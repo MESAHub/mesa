@@ -55,7 +55,7 @@
       !AGSS09   m,s          s, with some m
       !L09      m,s,r        r
       !A09_Prz               modified AGSS09 -  he, c, n, o, ne, mg, al, si, s, ar, fe.
-      !MB22     m,s          s, with some m, supplimented with agss09
+      !MB22     m,s          s, with some m, supplemented with agss09
       !AAG21    m,s          s, with some m
 
       ! storage for Lodders (2003) isotopic percentages
@@ -827,7 +827,7 @@
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + solx(j)
-        enddo
+        end do
         sum = 1.0d0 - sum
         solx(1) = solx(1) + sum
 
@@ -835,14 +835,14 @@
         do j=1,solsiz
            if (izsol(j) >= 3) then
               sum  = sum + solx(j)
-           endif
-        enddo
+           end if
+        end do
         zsol = sum
 
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + dble(izsol(j))/dble(iasol(j))*solx(j)
-        enddo
+        end do
         yesol = sum
 
         nullify(Xsol_names_dict)
@@ -1737,7 +1737,7 @@
 
     subroutine init_MB22_photospheric_data  ! fraction by mass of total Z
        ! Ekaterina Magg et al. , A&A 661, A140 (2022) photospheric abundance.
-       ! supplimented with Asplund, Grevesse, Sauval, and Scott 2009 abundances
+       ! supplemented with Asplund, Grevesse, Sauval, and Scott 2009 abundances
        integer :: i
        real(dp) :: z_sum
        include 'formats'
@@ -1845,7 +1845,7 @@
 
     subroutine init_AAG21_photospheric_data  ! fraction by mass of total Z
        ! Asplund et al. A&A 653, A141 (2021) photospheric abundance.
-       ! Supplimented with meteoric values
+       ! Supplemented with meteoric values
        integer :: i
        real(dp) :: z_sum
        include 'formats'

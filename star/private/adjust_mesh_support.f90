@@ -26,7 +26,7 @@
       module adjust_mesh_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
 
       implicit none
 
@@ -294,7 +294,7 @@
               coef = coef_start
            else
               coef = coef_start*(1d0 - beta) + beta
-           endif
+           end if
 
          end function blend_coef
 

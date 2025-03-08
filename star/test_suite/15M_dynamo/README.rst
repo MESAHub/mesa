@@ -44,7 +44,7 @@ At this ending point the abundances, power, and dynamo profiles as a function of
 Click to see a larger view of a plot.
 Helium has begun to deplete in the core (top panel), where the triple-alpha reaction is dominating the energy generation rate (second panel).
 Hydrogen burning by the CNO cycles dominates the energy generation in the hydrogen shell (second panel).
-Convection is occuring in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
+Convection is occurringg in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
 Spruit-Taylor magnetic diffusion is the dominant mixing processes in the radiative region between these
 two convective regions (third panel).
 The radial and azimuthal components of the magnetic field

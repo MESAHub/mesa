@@ -38,7 +38,7 @@ contains
 
    subroutine null_other_am_mixing(id, ierr)
       use star_def
-      use const_def
+      use const_def, only: dp
       integer, intent(in) :: id
       integer, intent(out) :: ierr
       ierr = 0

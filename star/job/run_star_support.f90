@@ -29,7 +29,7 @@
       use star_def
       use chem_def
       use chem_lib
-      use const_def
+      use const_def, only: dp, pi, ln10, amu, mp, secyer, kerg, msun, rsun, lsun, mesa_dir, arg_not_provided
       use math_lib
       use eos_lib
       use kap_def
@@ -1509,7 +1509,7 @@
 
 
       subroutine do_report_mass_not_fe56(s)
-         use const_def
+         use const_def, only: dp
          type (star_info), pointer :: s
          integer :: k, fe56
          real(dp) :: sumdq
@@ -1536,7 +1536,7 @@
 
 
       subroutine do_report_cell_for_xm(s)
-         use const_def
+         use const_def, only: dp
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: sumdq, dq
@@ -1941,7 +1941,7 @@
 
 
          subroutine change_net(net_name)
-            use const_def
+            use const_def, only: dp
             character (len=*), intent(in) :: net_name
 
             include 'formats'
@@ -1983,7 +1983,7 @@
 
 
       subroutine do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
-         use const_def
+         use const_def, only: dp
          use rates_def
          use rates_lib
          use utils_lib, only: utils_OMP_GET_MAX_THREADS
@@ -2087,7 +2087,7 @@
          if (max_timestep > 0 .and. max_timestep < s% dt_next) then
             write(*,1) 'max_timestep (seconds)', max_timestep
             s% dt_next = max_timestep
-         endif
+         end if
 
          if (s% job% set_initial_model_number .and. .not. restart) then
             write(*,2) 'set_initial_model_number', s% job% initial_model_number
@@ -3680,7 +3680,7 @@
               call GET_ENVIRONMENT_VARIABLE('MESA_INLIST', inlist_out, STATUS=status)
               if (status /= 0) inlist_out = ''
 
-            endif
+            end if
          end if
 
         if (inlist_out == '') then
@@ -3689,11 +3689,9 @@
               inlist_out = inlist_opt
            else
               inlist_out = 'inlist'
-           endif
+           end if
 
-        endif
-
-        ! Finish
+        end if
 
         return
 

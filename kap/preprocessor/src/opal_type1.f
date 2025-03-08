@@ -126,7 +126,7 @@ c          An interpolation between overlapping quadratics is used to obtain
 c     smoothed results.  A 4x4 grid in logT6 and logR is used to interpolate
 c     in four different 3x3 sub-grids. Linear interpolation between quadratic
 c     fits in these different sub-grids gives smoothed results in both log T6
-c     and Log R directions. Compared to ealier versions of this code, the
+c     and Log R directions. Compared to earlier versions of this code, the
 c     interpolation in Z is in Kappa vs. Z; not log Kappa vs. Z.
 c     The overlapping quadratic procedure produces results that are  smooth,
 c     similar to bicubic spline interpolation, but require storage of only local
@@ -135,7 +135,7 @@ c
 c          The code OPACGN93 performs interpolation in Z, X, T6, and R. It calls
 c     the subroutine OPAC at each Z.  If you are working with a fixed Z, as
 c     listed above, it is more efficient to call OPAC directly. In this case use
-c     izi=0 and the appropiate value of mzin. The  opacity data will be read
+c     izi=0 and the appropriate value of mzin. The  opacity data will be read
 c     from unit 2 in the subroutine readco.  you will need to have the file
 c     GN93hz available on disk.
 c         Each of the individual tables in the GN93hz file cover 70 temperatures
@@ -194,7 +194,7 @@ c     The purpose of this subroutine is to interpolate the data along Z
      . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
      . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
-c      OPACT- opacity obtained from a quadraric interpolation at
+c      OPACT- opacity obtained from a quadratic interpolation at
 c      fixed log T6 at three values of log R; followed by quadratic
 c      interpolation along log T6. Results smoothed bt mixing
 c      overlapping quadratics.
@@ -319,7 +319,7 @@ c
       use utils_lib, only: mesa_error
 c      The purpose of this subroutine is to interpolate log kappa
 c      in in X, T6, R
-c        izi=0 recalulate table indices to use; =1 keep previous
+c        izi=0 recalculate table indices to use; =1 keep previous
 c        mzin=index of za(i) in block data. za(i) are metallicities
 c        t6=T6=temperature in millions of degrees kelvin
 c        r=R=density(g/cm**3)/T6**3
@@ -1120,7 +1120,7 @@ C
 C
 C  THE SUBROUTINES SPLINE AND SPLINT ARE ADAPTED FROM THOSE GIVE BY
 C  W.H. Press, S.A. Teulolsky, W.T. Vettering and B.P. Flannery,
-C  "Numerical Recipes in FORTRAN", 2nd edn., 1992, C.U.P.
+C  "Numerical Recipes in FORTRAN", 2nd ed., 1992, C.U.P.
 C  OTHER REFERENCES ARE MADE TO METHODS DESCRIBED IN THAT BOOK.
 C
       PARAMETER(IP=100,IPR=20)
@@ -1143,7 +1143,7 @@ C     CHECK FIRST VALUE OF T6
       ROSSL(1,j)=xzff(1,j)
       enddo
 
-!        Added 03/03/2016 rjfarmer remove if statement so we allways set U(1)
+!        Added 03/03/2016 rjfarmer remove if statement so we always set U(1)
 !       if (abs(T6-.0056341325) .lt. 1.e-8) then
          U(1)=6.+LOG10(T6)
 !       ENDIF

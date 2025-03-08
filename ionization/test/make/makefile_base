@@ -12,9 +12,9 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-TEST_SRCS = test_ionization_support.f test_ionization.f
+TEST_SRCS = test_ionization_support.f90 test_ionization.f90
 
-TESTQ_SRCS = test_ionization_support.f test_ionization_quietly.f
+TESTQ_SRCS = test_ionization_support.f90 test_ionization_quietly.f90
 
 #################################################################
 #
@@ -63,7 +63,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE
 	@$(TEST_COMPILE) $(FCfree) $<
@@ -77,7 +77,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

@@ -1,6 +1,6 @@
 
       ! single step of 2nd order Runge-Kutta (explicit midpoint rule)
-      
+
       subroutine rk2(n, y, dydx, x, h, yout, derivs, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
@@ -37,4 +37,4 @@
          do i=1,n
             yout(i) = y(i) + h*dyt(i)
          end do
-      end subroutine rk2   
+      end subroutine rk2

@@ -56,7 +56,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
-# html_theme = 'sphinx_book_theme'
+# html_theme = "sphinx_book_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -82,17 +82,35 @@ html_theme_options = {
 
 # sphinx_book_theme options
 # html_theme_options = {
-#    'collapse_navigation': True,
-#    'navigation_depth': 4,
-#    'repository_url': "https://github.com/MESAHub/mesa",
-#    'use_repository_button': True,
-#    'icon_links': [
-#        {
-#            "name": "GitHub",
-#            "url": "https://github.com/MESAHub/mesa",
-#            "icon": "fa-brands fa-github",
-#        },
-#    ],
+#     "path_to_docs": "docs/source",
+#     "collapse_navigation": True,
+#     "navigation_depth": 4,
+#     "repository_url": "https://github.com/MESAHub/mesa",
+#     "use_repository_button": True,
+#     "use_edit_page_button": True,
+#     "use_source_button": True,
+#     "icon_links": [
+#         {
+#             "name": "Official Release Version",
+#             "url": "https://zenodo.org/records/13353788",
+#             "icon": "fa-solid fa-star",
+#         },
+#         {
+#             "name": "MESA SDK",
+#             "url": "http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk",
+#             "icon": "fa-solid fa-gears",
+#         },
+#         {
+#             "name": "Mailing List",
+#             "url": "https://lists.mesastar.org/mailman/listinfo/mesa-users",
+#             "icon": "fa-solid fa-envelope",
+#         },
+#         {
+#             "name": "GitHub",
+#             "url": "https://github.com/MESAHub/mesa",
+#             "icon": "fa-brands fa-github",
+#         },
+#     ],
 # }
 
 # sphinx_tags options

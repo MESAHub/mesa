@@ -1,5 +1,5 @@
 module turb
-   use const_def
+   use const_def, only: dp, pi, boltz_sigma, sqrt_2_div_3, crad, clight, no_mixing, convective_mixing, thermohaline_mixing
    use num_lib
    use utils_lib
    use auto_diff

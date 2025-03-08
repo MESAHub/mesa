@@ -281,7 +281,7 @@
 
             deallocate(s%other_star_info)
 
-         endif
+         end if
 
          call dealloc_history(s)
 
@@ -765,6 +765,11 @@
             if (failed('tau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
+
+            call do1(s% flux_limit_R, c% flux_limit_R)
+            if (failed('flux_limit_R')) exit
+            call do1(s% flux_limit_lambda, c% flux_limit_lambda)
+            if (failed('flux_limit_lambda')) exit
 
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit
@@ -3088,22 +3093,22 @@
                deallocate(work_pointers(i)%p)
                nullify(work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_int_work_arrays
             if (associated(int_work_pointers(i)%p)) then
                deallocate(int_work_pointers(i)%p)
                nullify(int_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_logical_work_arrays
             if (associated(logical_work_pointers(i)%p)) then
                deallocate(logical_work_pointers(i)%p)
                nullify(logical_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
 
       end subroutine free_work_arrays
 

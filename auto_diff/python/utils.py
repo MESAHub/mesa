@@ -1,7 +1,4 @@
-from sympy import symbols, Function, preorder_traversal, Integer, Rational, Pow
-from sympy import diff as diff_sym
-from sympy import DiracDelta, Pow, Integer, symbols, Rational, Float, srepr
-import re
+from sympy import symbols, Function, preorder_traversal, Integer, Rational, Float, Pow
 from collections.abc import Iterable
 
 tab = "   "

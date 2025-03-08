@@ -77,9 +77,7 @@
 
       implicit none
 
-
       contains
-
 
 
       ! allocate data structures for a star and returns a handle.
