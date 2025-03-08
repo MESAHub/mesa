@@ -39,6 +39,9 @@ between adopting the traditional integral of N2 over the entire stellar model, o
 methods of (`Bildsten et al. 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_).
 Previous MESA versions exclusively adopted the latter.
 
+By user request, a radiation diffusion flux limiter has been reintroduced with the 
+control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_form_of_T_gradient_eqn``.
+
 .. _Bug Fixes main:
 
 Bug Fixes
