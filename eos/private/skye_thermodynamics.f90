@@ -77,7 +77,7 @@ module skye_thermodynamics
       cp = cv * gam1 / chid
 
       ! Sound speed
-      cs = clight * sqrt(gam1 / (1d0 + (dens / p) * (e + clight**2)))
+      cs = clight * sqrt(gam1 / (1d0 + (dens / p) * (e + clight*clight)))
    end subroutine compute_derived_quantities
 
    !> Computes thermodynamic quantities from Skye and packs them into the EOS return vectors.

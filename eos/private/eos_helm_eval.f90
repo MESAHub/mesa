@@ -98,12 +98,12 @@
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_HELM) = 1.0
+         res(i_frac_HELM) = 1.0d0
 
       end subroutine get_helm_for_eosdt
 

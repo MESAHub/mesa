@@ -32,9 +32,7 @@
 
       implicit none
 
-      contains  ! the procedure interface for the library
-      ! client programs should only call these routines.
-
+      contains
 
       subroutine eos_init( &
             eosDT_cache_dir, use_cache, info)
@@ -108,7 +106,6 @@
       end function Radiation_Energy
 
 
-
       ! eos evaluation
 
       ! you can call these routines after you've allocated a handle.
@@ -171,9 +168,7 @@
          ! INPUT
 
          integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
-
          integer, intent(in) :: which_eos  ! see eos_def: i_eos_<component>
-
          integer, intent(in) :: species  ! number of species
          integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
@@ -904,7 +899,6 @@
          call get_eos_ptr(handle,rq,ierr)
          if(ierr/=0) return
          call get_eos_controls(rq, name, val, ierr)
-
       end subroutine eos_get_control_namelist
 
       subroutine eos_set_control_namelist(handle, name, val, ierr)
@@ -919,7 +913,6 @@
          call get_eos_ptr(handle,rq,ierr)
          if(ierr/=0) return
          call set_eos_controls(rq, name, val, ierr)
-
       end subroutine eos_set_control_namelist
 
 

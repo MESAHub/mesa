@@ -73,7 +73,7 @@ module op_def
    integer, dimension(17, 91, 25), save :: ne1p, ne2p, np, kp1, kp2, kp3, npp
    real, dimension(-1:28, 28, 91, 25), save :: fionp
    real, allocatable, dimension(:), save :: yy2, yx
-   INTEGER, allocatable, dimension(:), save :: nx
+   integer, allocatable, dimension(:), save :: nx
 
    integer, parameter :: op_cache_version = 1
 
