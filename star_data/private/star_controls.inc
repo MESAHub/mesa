@@ -825,6 +825,7 @@
 
          logical :: use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
+            use_flux_limiting_with_dPrad_dm_form, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
             no_dedt_form_during_relax, &
             include_P_in_velocity_time_centering, &
