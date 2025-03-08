@@ -406,7 +406,7 @@
                 k = k-1 ! loop outwards
                 end do
                 ! k is now the outer index of the fe core
-                s% fe_core_infall = minval(s%v(k:nz))
+                s% fe_core_infall = - minval(s%v(k:nz))
             end if
 
             non_fe_core_mass = s% he_core_mass
