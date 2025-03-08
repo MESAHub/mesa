@@ -92,12 +92,12 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, Eq_div_w, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1), intent(in) :: &
-         chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
+         chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w
       logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
@@ -139,6 +139,7 @@ module turb
       info%kap = opacity
       info%Hp = scale_height
       info%Gamma = Gamma
+      info%Eq_div_w = Eq_div_w
 
       ! Get solution
       Zub = upper_bound_Z
