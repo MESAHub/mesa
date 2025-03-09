@@ -26,7 +26,7 @@
       module num_lib
       ! various numerical routines
       
-      use const_def
+      use const_def, only: dp, qp, iln10
       use math_lib
       use num_def
       use mod_integrate
@@ -325,7 +325,6 @@
 
 
       subroutine null_fcn(n, x, h, y, f, lrpar, rpar, lipar, ipar, ierr)
-         use const_def, only: dp
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x, h
          real(dp), intent(inout) :: y(:) ! (n) 
@@ -339,7 +338,6 @@
 
 
       subroutine null_fcn_blk_dble(n, caller_id, nvar, nz, x, h, y, f, lrpar, rpar, lipar, ipar, ierr)
-         use const_def, only: dp
          integer, intent(in) :: n, caller_id, nvar, nz, lrpar, lipar
          real(dp), intent(in) :: x, h
          real(dp), intent(inout), pointer :: y(:) 
@@ -366,7 +364,6 @@
 
 
       subroutine null_jac_blk_dble(n, caller_id, nvar, nz, x, h, y, f, lblk, dblk, ublk, lrpar, rpar, lipar, ipar, ierr)
-         use const_def, only: dp
          integer, intent(in) :: n, caller_id, nvar, nz, lrpar, lipar
          real(dp), intent(in) :: x, h
          real(dp), intent(inout), pointer :: y(:) ! (n)
@@ -415,6 +412,7 @@
          interface
             real(dp) function interp_y(i, s, rwork, iwork, ierr)
                use const_def, only: dp
+               implicit none
                integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
                real(dp), intent(in) :: s ! interpolation x value (between xold and x).
                real(dp), intent(inout), target :: rwork(*)
@@ -673,12 +671,8 @@
          real(dp), intent(in) :: atol,rtol ! Absoulate and relative tolerances
          integer, intent(in) :: max_steps ! Max number of sub-steps
          integer, intent(inout) :: ierr ! Error code
-
          ierr = 0
-
          integrate = integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr)
-
       end function integrate
 
       end module num_lib
-
