@@ -22,4 +22,4 @@ program test_gyre
    use test_gyre_mod
    implicit none
    call do_test
-end program
+end program test_gyre
