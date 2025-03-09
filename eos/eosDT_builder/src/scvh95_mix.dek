@@ -1,20 +1,20 @@
 !..common block communication
-      integer          nt,np
-      
-      parameter        (nt=63, np=99)  
+      integer :: nt,np
+
+      parameter        (nt=63, np=99)
          ! nt is number of different temperatures; np is number of different pressures
 !     high res version from Lorne Nelson
 !      parameter        (nt=621, np=751)
-      
-      
-      integer          npoint(nt)
+
+
+      integer :: npoint(nt)
 
 !..primary thermodynamic variables
-      double precision tlog(nt),plog(np)
+      double precision :: tlog(nt),plog(np)
       common /zinp/    tlog,plog,npoint
 
 !..for hydrogen
-      double precision compv1_h(4,nt,np),compv2_h(4,nt,np),
+      double precision :: compv1_h(4,nt,np),compv2_h(4,nt,np),
      1                 denlog_h(4,nt,np),slog_h(4,nt,np),
      2                 ulog_h(4,nt,np),dddt_tab_h(4,nt,np),
      3                 dddp_tab_h(4,nt,np),dsdt_tab_h(4,nt,np),
@@ -27,7 +27,7 @@
 
 
 !..for helium
-      double precision compv1_he(4,nt,np),compv2_he(4,nt,np),
+      double precision :: compv1_he(4,nt,np),compv2_he(4,nt,np),
      1                 denlog_he(4,nt,np),slog_he(4,nt,np),
      2                 ulog_he(4,nt,np),dddt_tab_he(4,nt,np),
      3                 dddp_tab_he(4,nt,np),dsdt_tab_he(4,nt,np),

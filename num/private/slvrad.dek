@@ -244,7 +244,7 @@
          z2(im1)=z2(im1)+s2*alphn-s3*betan
          z3(im1)=z3(im1)+s3*alphn+s2*betan
       end do
-      if (ijob.eq.14) goto 45
+      if (ijob==14) goto 45
       goto 48
 !
 ! -----------------------------------------------------------

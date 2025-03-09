@@ -1,10 +1,10 @@
-      
+
       ! uses alternating bisection and inverse parabolic interpolation.
-      ! does not require derivatives of the function, 
+      ! does not require derivatives of the function,
       ! but will use them if they are available.
       ! if you can make an initial guess, use solout_root_with_initial_guess.
       real(dp) function solout_root(
-     >      f, x1, x3, y1, y3, imax, epsx, epsy, 
+     >      f, x1, x3, y1, y3, imax, epsx, epsy,
      >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
          use mod_solout_root, only: do_solout_root
          use const_def, only: arg_not_provided
@@ -25,18 +25,18 @@
             include 'num_interp_y.dek'
          end interface
          integer, intent(in) :: imax ! max number of iterations for search
-         real(dp), intent(in) :: epsx, epsy 
+         real(dp), intent(in) :: epsx, epsy
          ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
          solout_root = do_solout_root(
-     >      f, arg_not_provided, x1, x3, y1, y3, imax, epsx, epsy, 
-     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)         
+     >      f, arg_not_provided, x1, x3, y1, y3, imax, epsx, epsy,
+     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
       end function solout_root
 
-      
+
       real(dp) function solout_root_with_initial_guess(
-     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, 
+     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy,
      >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
          use mod_solout_root, only:do_solout_root
          use const_def, only: dp
@@ -57,20 +57,20 @@
             include 'num_interp_y.dek'
          end interface
          integer, intent(in) :: imax ! max number of iterations for search
-         real(dp), intent(in) :: epsx, epsy 
+         real(dp), intent(in) :: epsx, epsy
          ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
          solout_root_with_initial_guess = do_solout_root(
-     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, 
-     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)         
+     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy,
+     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
       end function solout_root_with_initial_guess
 
-      
+
       ! the solout root finders require bracketing values for the root.
       ! if you don't have them, you can use this routine to do a (not too dumb) search.
       subroutine look_for_solout_brackets(
-     >         x, dx, x1, x3, f, y1, y3, imax, 
+     >         x, dx, x1, x3, f, y1, y3, imax,
      >         rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
          use mod_solout_root, only: do_solout_brackets
          use const_def, only: dp
@@ -89,8 +89,8 @@
          interface
             include 'num_interp_y.dek'
          end interface
-         integer, intent(out) :: ierr        
+         integer, intent(out) :: ierr
          call do_solout_brackets(
-     >            x, dx, x1, x3, f, y1, y3, imax, 
-     >            rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)      
+     >            x, dx, x1, x3, f, y1, y3, imax,
+     >            rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
       end subroutine look_for_solout_brackets

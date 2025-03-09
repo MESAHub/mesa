@@ -14,6 +14,7 @@
          interface
             subroutine derivs(n, x, y, dydx, lrpar, rpar, lipar, ipar, ierr)
                use const_def, only: dp
+               implicit none
                integer, intent(in) :: n
                real(dp), intent(in) :: x
                real(dp), dimension(:), intent(inout) :: y

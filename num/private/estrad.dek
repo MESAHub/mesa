@@ -258,7 +258,7 @@
       end do
       err=max(sqrt(err/n),1.d-10)
 !
-      if (err.lt.1.d0) return
+      if (err<1.d0) return
       if (first.or.reject) then
           do i=1,n
              cont(i)=y(i)+cont(i)

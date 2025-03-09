@@ -9,6 +9,7 @@
          interface
             function func(delta_x) result(val)
               use const_def, only: dp
+              implicit none
               real(dp), intent(in) :: delta_x
               real(dp) :: val
             end function func

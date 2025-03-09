@@ -38,6 +38,7 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
@@ -107,6 +108,7 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
@@ -202,7 +204,7 @@
    !
    !  Licensing:
    !
-   !    This code is distributed under the GNU LGPL license. 
+   !    This code is distributed under the GNU LGPL license.
    !
    !  Modified:
    !
@@ -223,7 +225,7 @@
    !
    !  Parameters:
    !
-   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of 
+   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of
    !    sign interval.
    !
    !    Input, real ( kind = 8 ) MACHEP, an estimate for the relative machine

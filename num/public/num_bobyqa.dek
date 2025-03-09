@@ -38,7 +38,7 @@
          end interface
          call do_BOBYQA(n,npt,x,xl,xu,rhobeg,rhoend,iprint,maxfun,w,calfun,max_valid_value)
       end subroutine bobyqa
-      
+
 
 !     This subroutine seeks the least value of a function of many variables,
 !     by applying a trust region method that forms quadratic models by
@@ -94,7 +94,7 @@
 !   method of the paper "The NEWUOA software for unconstrained minimization
 !   without derivatives", in Large-Scale Nonlinear Optimization, editors G. Di
 !   Pillo and M. Roma, Springer (2006), pages 255-297.
-!   
+!
 !        In addition to providing CALFUN, an initial vector of variables and
 !   the lower and upper bounds, the user has to set the values of the parameters
 !   RHOBEG, RHOEND and NPT. After scaling the individual variables if necessary,
