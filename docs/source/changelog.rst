@@ -39,14 +39,14 @@ between adopting the traditional integral of N2 over the entire stellar model, o
 methods of (`Bildsten et al. 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_).
 Previous MESA versions exclusively adopted the latter.
 
-By user request, a radiation diffusion flux limiter has been reintroduced with the 
+By user request, a radiation diffusion flux limiter has been reintroduced with the
 control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_form_of_T_gradient_eqn``.
 
-By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced 
+By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced
 allowing users to limit the convective velocity to some fraction of the local sound speed using the
 controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
 
-By user request, and motivated by the underestimation of line opacities from expanding material by the `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables, 
+By user request, and motivated by the underestimation of line opacities from expanding material by the `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
 see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_. An optional control for an opacity floor, ``opacity_min``, has
 been introduced.
 
