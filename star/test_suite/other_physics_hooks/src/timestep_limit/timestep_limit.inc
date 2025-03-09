@@ -1,13 +1,13 @@
 
-      
+
       subroutine read_inlist_other_timestep_limit(ierr)
          integer, intent(out) :: ierr
          character (len=256) :: filename, message
-         integer :: unit         
+         integer :: unit
          filename = 'inlist_other_timestep_limit'
-         
+
          write(*,*) 'read_inlist_other_timestep_limit'
-         
+
          ! set defaults
          delta_lgT_limit = 0.5d0
          delta_lgT_hard_limit = -1
@@ -23,17 +23,17 @@
          if (ierr /= 0) then
             write(*, *) 'Failed to open control namelist file ', trim(filename)
          else
-            read(unit, nml=other_timestep_limit, iostat=ierr)  
+            read(unit, nml=other_timestep_limit, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=other_timestep_limit)
                close(unit)
-            end if  
+            end if
          end if
 
       end subroutine read_inlist_other_timestep_limit
@@ -70,26 +70,26 @@
          set_other_timestep_limit = check_delta_mdot( &
             s, skip_hard_limit, s% dt, dt_limit_ratio)
          if (return_now('check_delta_mdot')) return
-         
+
          !write(*,*) 'check_dlgT_change'
          set_other_timestep_limit = check_dlgT_change( &
             s, skip_hard_limit, dt_limit_ratio)
          if (return_now('check_dlgT_change')) return
 
          contains
-         
+
          logical function return_now(str)
-            character (len=*), intent(in) :: str            
+            character (len=*), intent(in) :: str
             if (set_other_timestep_limit == keep_going) then
                return_now = .false.
                return
-            end if            
+            end if
             write(*, '(a, i8)') &
                'set_other_timestep retry because of timestep limit ' // &
-               trim(str), s% model_number            
-            return_now = .true.            
+               trim(str), s% model_number
+            return_now = .true.
          end function return_now
-         
+
       end function set_other_timestep_limit
 
 
@@ -108,9 +108,9 @@
          check_dlgT_change = check_change_timestep_limit(s% id, max_dlnT/ln10, &
             delta_lgT_limit, delta_lgT_hard_limit, &
             i, 'check_dlgT_change', skip_hard_limit, dt_limit_ratio, relative_excess)
-         
+
          contains
-         
+
          subroutine get_dlgT_info(s, i, max_dlnT)
             use const_def, only:ln10
             type (star_info), pointer :: s
@@ -180,5 +180,5 @@
          dt_limit_ratio = delta_mdot/delta_mdot_limit
          if (dt_limit_ratio <= 1d0) dt_limit_ratio = 0
       end function check_delta_mdot
-      
-      
+
+

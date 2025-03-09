@@ -17,7 +17,7 @@
  DIMENSION Psum(Nstagez,Natom);
  DIMENSION GWL(Nstagez,Natom);
  DIMENSION RGWR(Nstagez,Natom);
- Character*2 Chames(Natom);
+ Character*2 :: Chames(Natom);
  DATA PION/
    1.578025D+00,   0.000000D+00,
    2.853397D+00,   6.315119D+00,

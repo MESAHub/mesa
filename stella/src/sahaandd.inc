@@ -16,7 +16,7 @@
  DIMENSION Psum(Nstage,Natom);
  DIMENSION GWgL(Nstage,Natom);
  DIMENSION GWcL(Nstage,Natom);
- Character*2 Chames(Natom);
+ Character*2 :: Chames(Natom);
  DATA PION/
    1.577633D+00,   0.000000D+00,   0.000000D+00,   0.000000D+00,   0.000000D+00,
    0.000000D+00,   0.000000D+00,   0.000000D+00,   0.000000D+00,   0.000000D+00,
