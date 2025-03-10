@@ -52,18 +52,21 @@
       
       ! Note the filter names are case sensitive and must match what is used in your color
       ! data file
-      bc V
-      bc v_bb
-      bc B
-      bc U
-      abs_mag R
-      abs_mag J
-      abs_mag V
-      abs_mag B
-      abs_mag U
-      
+      !bc H
+      !bc J_bb
+      !bc J
+      !abs_mag H
+      !abs_mag J
+      !abs_mag V
+      !abs_mag B
+      !abs_mag U
+      star_age
+      Teff
+      log_Teff
+      log_L
+      log_R
+      log_g
       !Custom Av values are handled in the run_star_extras
-      
 
 !----------------------------------------------------------------------------------------------
 
@@ -74,3 +77,4 @@
    !## solver iterations
 
       num_iters ! same as num_newton_iterations
+
