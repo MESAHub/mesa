@@ -3,7 +3,7 @@ _define @lbuffer 132
         @space  "' '" ;
 
 /*
-program tst;  
+program tst;
 character*@lbuffer string, wordm(10);
 integer  lwordm(10), nwordm, lm;
 
@@ -36,7 +36,7 @@ return;
 end;
 %_length:
   lstring=len_trim(string);
-  _while lstring > 0 
+  _while lstring > 0
       & string(max(lstring,1):max(lstring,1))==@space _do
         lstring=lstring-1;
   _od;

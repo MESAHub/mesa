@@ -436,7 +436,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             write(*,*) 'okay'
-         enddo
+         end do
 
          ! test decreasing values
          loc = -1
@@ -460,7 +460,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             write(*,*) 'okay'
-         enddo
+         end do
          write(*,*)
 
       end subroutine test_binary_search

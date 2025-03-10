@@ -144,7 +144,7 @@
               residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k)  ! Residual J_dot cm^2/s^2 * g
               s% extra_jdot(k) = - s% j_rot(k)/ s% dt  ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
               j=j+1
-            endif
+            end if
           end do
 
           ! Redistribute residual J_dot (only to gridpoints that can accommodate more torque)
@@ -152,7 +152,7 @@
           do k = 1, s% nz
             if (abs(s% extra_jdot(k)) < abs(s% j_rot(k)/ s% dt)) then
               s% extra_jdot(k) = s% extra_jdot(k) + (residual_jdot / ((s% nz - j) * s% dm_bar(k)))
-            endif
+            end if
           end do
 
           torque = dot_product(s% extra_jdot(1:s% nz),s% dm_bar(1:s% nz))  ! Total applied Torque
@@ -172,7 +172,7 @@
              write(*,1) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
              write(*,1) 'Torque/J_dot (if = 1.0 angular momentum is conserved): ', (torque / j_dot)
           end if
-        endif
+        end if
 
 
       end subroutine magnetic_braking

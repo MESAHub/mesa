@@ -860,15 +860,13 @@
 
       subroutine read_hbcode1(iounit, nrow, ncol, nnzero, values, rowind, colptr, ierr)
 
-      CHARACTER      :: TITLE*72 , KEY*8    , MXTYPE*3 , &
-                     PTRFMT*16, INDFMT*16, VALFMT*20, RHSFMT*20
+      character :: TITLE*72, KEY*8, MXTYPE*3, PTRFMT*16, INDFMT*16, VALFMT*20, RHSFMT*20
 
-      INTEGER        :: TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
-                     iounit, NROW  , NCOL  , NNZERO, NELTVL
+      integer :: TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, iounit, NROW  , NCOL  , NNZERO, NELTVL
 
-      INTEGER, pointer ::        COLPTR (:), ROWIND (:)
+      integer, pointer :: COLPTR (:), ROWIND (:)
 
-      REAL(dp), pointer ::        VALUES (:)
+      real(dp), pointer :: VALUES (:)
       integer, intent(out) :: ierr
 
       integer :: i
@@ -906,15 +904,13 @@
 
       subroutine write_hbcode1(iounit, nrow, ncol, nnzero, values, rowind, colptr, ierr)
 
-      CHARACTER      :: TITLE*72 , KEY*8    , MXTYPE*3 , &
-                     PTRFMT*16, INDFMT*16, use_VALFMT*20, VALFMT*20, RHSFMT*20
+      character :: TITLE*72 , KEY*8, MXTYPE*3, PTRFMT*16, INDFMT*16, use_VALFMT*20, VALFMT*20, RHSFMT*20
 
-      INTEGER        :: TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
-                     iounit, NROW  , NCOL  , NNZERO, NELTVL
+      integer :: TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, iounit, NROW  , NCOL  , NNZERO, NELTVL
 
-      INTEGER        :: COLPTR (*), ROWIND (*), ierr
+      integer :: COLPTR (*), ROWIND (*), ierr
 
-      REAL(dp)         :: VALUES (*)
+      real(dp) :: VALUES (*)
 
       integer :: i
 

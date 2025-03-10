@@ -602,7 +602,7 @@
             write(*,*) 'chi2 < simplex_chi2_tol; stopping further iteration'
             ierr = -1
             return
-         endif
+         end if
 
       end function simplex_f
 

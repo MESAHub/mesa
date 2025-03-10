@@ -191,7 +191,7 @@ contains
     do i = 1, nr
        ids(i) = get_weak_rate_id(weak_lhs(i), weak_rhs(i))
        reaction_ids(i) = 0
-    enddo
+    end do
 
     logT = 8.3d0
     logRho = 9.8d0
@@ -254,7 +254,7 @@ contains
 
     do i = 1, nr
        write(*,'(6X, 2A6, ES26.16)') weak_lhs(i), weak_rhs(i), lambda(i)
-    enddo
+    end do
     write(*,'(A)')
 
     deallocate( &
@@ -301,7 +301,7 @@ contains
        aa(i) = chem_isos% W(chem_id(i))
        ya(i) = xa(i) / aa(i)
        za52(i) = pow(real(chem_isos% Z(chem_id(i)),kind=dp),5.0d0/2.d0)
-    enddo
+    end do
 
     call composition_info( &
          species, chem_id, xa, xh, xhe, xz, abar, zbar, z2bar, z53bar, ye,   &

@@ -3915,7 +3915,7 @@ contains
 !       do i=1, is_max
 !                   call  phfit2( nz, ne, i, e, tmps)
 !                  s = s+tmps
-!           enddo
+!           end do
 
 !       if( e > p_e_max) return ! energy is to high for this fit
 !
@@ -3930,11 +3930,11 @@ contains
 !                     tmpne = tmpne-1
 !                         e_max = p_Emax(nz,tmpne)
 !                         write(*,*)'------- nz=', nz, ' tmpne=', tmpne, ' e_max=', e_max;
-!                 enddo
+!                 end do
 !                   is = ntot(tmpne)
 !                 write(*,*)'FIND: nz=', nz, ' ne=', ne, ' is=', is, ' tmpne=', tmpne;
 !               call  phfit2( nz, ne, is, e, s)
-!       endif
+!       end if
 !       write(*,*) p_Emax;
       s = s*1.e-18  ! *1.e-18 transform from Mb to sm^2
    end subroutine photoCrossVerner

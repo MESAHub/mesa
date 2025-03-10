@@ -251,7 +251,7 @@ contains
     new_el = md% md_p% l
     new_order = md% n_pg
     new_inertia = md% E_norm()
-    new_cyclic_freq = REAL(md% freq('UHZ'))
+    new_cyclic_freq = real(md% freq('UHZ'))
     new_growth_rate = AIMAG(md% freq('RAD_PER_SEC'))
     new_em = 0
 
