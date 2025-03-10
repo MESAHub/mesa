@@ -1,7 +1,7 @@
 !
 ! args
 ! francois hebert, jul 18 2010
-! 
+!
 ! for storing and passing variables through the integrators
 !
 
@@ -51,6 +51,4 @@
 
       end type datastruct
 
-
       end module def_args
-   

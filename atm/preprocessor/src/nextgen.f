@@ -29,12 +29,12 @@
       character(len=64) :: f_output, head_phx
 
       contains
-      
-      
+
+
       subroutine make_nextgen
 
          character (len=256) :: filename
-         
+
          integer, parameter :: ng = 5, nT = 46
 
          integer :: i, iT, j, io, ierr
@@ -45,13 +45,13 @@
          real(dp) :: vals(n)
          real(dp), dimension(ng,nT) :: &
             T, Pgas, Pe, logT, logPgas, logPe, Psum, logPsum
-         
+
          logical, parameter :: write_plot_files = .false.
 
          logical, parameter :: dbg = .false.
-         
+
          head_phx = '#[Z/Z_SOLAR]= 0.00 [A/Fe]= 0.0 GN93'  ! for now
-         
+
          i = 0
          do iT = 21, 40
             i = i+1
@@ -69,13 +69,13 @@
             write(*,*) 'bad i for Ts', i
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          loggs(:) = (/ 3.5d0, 4d0, 4.5d0, 5d0, 5.5d0 /)
          ibound(:) = nT
-         
+
          io = 33
          ierr = 0
-               
+
          do i = 1, ng
             do j = 1, nT
                write(filename,'(a,i2,a,f3.1,a)') &
@@ -91,36 +91,36 @@
             end do
             write(*,*)
          end do
-         
+
          if (write_plot_files) then
-         
+
             open(io,file='plot_nextgen/logT.data',action='write')
             write(io,'(e20.10)') logT(:,:)
             close(io)
-         
+
             open(io,file='plot_nextgen/logPgas.data',action='write')
             write(io,'(e20.10)') logPgas(:,:)
             close(io)
-         
+
             open(io,file='plot_nextgen/logPe.data',action='write')
             write(io,'(e20.10)') logPe(:,:)
             close(io)
-         
+
             open(io,file='plot_nextgen/logPsum.data',action='write')
             write(io,'(e20.10)') logPsum(:,:)
             close(io)
-         
+
             open(io,file='plot_nextgen/Teff.data',action='write')
             write(io,'(e20.10)') T2s(:)*1d2
             close(io)
-         
+
             open(io,file='plot_nextgen/logg.data',action='write')
             write(io,'(e20.10)') loggs(:)
             close(io)
-            
+
          end if
-         
-         
+
+
          !write out combined table
          f_output = 'atm_data/100_Zp00.tbl'
          open(io,file=f_output)
@@ -137,20 +137,20 @@
             write(io,'(1p,20e15.7)') 1d2*T2s(i), T(:,i)
          enddo
          close(io)
-         
-         
-         
+
+
+
          contains
-         
+
          subroutine write_logg_header
             do i=1,ng
                write(io,'("  log g =",f5.2," ")',advance='no') loggs(i)
             end do
             write(io,*)
          end subroutine write_logg_header
-         
+
          subroutine read_nextgen(i,j)
-            integer, intent(in) :: i, j            
+            integer, intent(in) :: i, j
             read(io,*)
             read(io,'(i5)') layers
             if (layers /= n) then
@@ -176,8 +176,8 @@
             Psum(i,j) = Pgas(i,j) + Pe(i,j)
             logPsum(i,j) = log10(Psum(i,j))
          end subroutine read_nextgen
-         
-         
+
+
          subroutine read_vals(skip)
             logical, intent(in) :: skip
             include 'tau100_T2s.dek'
@@ -187,11 +187,11 @@
             end do
             read(io,*) vals(49:50)
          end subroutine read_vals
-         
-                  
+
+
       end subroutine make_nextgen
-         
-      
+
+
       end module nextgen_support
 
 

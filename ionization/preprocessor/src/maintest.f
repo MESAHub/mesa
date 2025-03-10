@@ -2,16 +2,16 @@
 ! maintest
 ! francois hebert, dec 26 2010
 !
-! generate simple file with summary info from a single tfdh calculation.. 
+! generate simple file with summary info from a single tfdh calculation..
 ! with the purpose of comparing to a "reference" file to determine compilation success
 !
-! NOTE: use caution in modifying! you may no longer be able to meaningfully 
+! NOTE: use caution in modifying! you may no longer be able to meaningfully
 ! compare with provided reference file
 !
 
 
       program maintest
-   
+
       use def_args
       use def_type
       use def_const
@@ -43,7 +43,7 @@
       call getarg(1, dir)
 
       testfile = trim(dir) // '/' // 'test_file'
-      
+
       !======================================================================
       !======================================================================
 
@@ -91,7 +91,7 @@
       write (f_unit,*) 'rws    = ', args % rws
       write (f_unit,*) 'nerws  = ', args % nerws
       close(f_unit)
-      
+
       !======================================================================
       !======================================================================
 
@@ -110,19 +110,14 @@
 
          write (f_unit, '(3a20)') 'Z_trace', 'log ne', 'log T'
          write (f_unit, '(3es20.9)') ztr, log10(ne), log10(tmp)
-         write (f_unit, *) '' 
+         write (f_unit, *) ''
 
          write (f_unit, '(4a20)') 'element #', 'X', 'Z', 'A'
          do i=1, ns
             write (f_unit, '(i20,3es20.9)') i, xs(i), zs(i), as(i)
          end do
          write (f_unit, *) ''
-   
+
       end subroutine write_header
-   
+
       end program maintest
-
-
-
-   
-   

@@ -8,7 +8,7 @@
 
 
       program main
-   
+
       use def_args
       use def_type
       use def_const
@@ -27,7 +27,7 @@
       ! 5: do a full ne,T table calculation :: good for lookup interpolation
       !
       integer, parameter :: mode = 1
-   
+
       !======================================================================
       !======================================================================
 
@@ -83,10 +83,10 @@
       !> ztr : the atomic number of the trace species for which we are trying
       !        to calculate the average ionization
       !
-      ! then, the function run_tfdh is called. this will use input values to 
+      ! then, the function run_tfdh is called. this will use input values to
       ! initialize and perform the TFDH calculation
       !
-      
+
       select case (mode)
 
          case (1)
@@ -110,7 +110,7 @@
             as = (/1.0_dp, 4.0_dp/)
 
             return_profile = .true.
-            
+
             write (*,*) 'initialization complete'
 
             !
@@ -201,7 +201,7 @@
             open(unit=f_unit, file=file_mix, status='replace')
             write (f_unit, '(3a20)') 'Z_trace', 'log ne', 'log T'
             write (f_unit, '(3es20.9)') ztr, log10(ne), log10(temp)
-            write (f_unit, *) '' 
+            write (f_unit, *) ''
             write (f_unit, '(3a20)') 'element #', 'Z', 'A'
             write (f_unit, '(i20,3es20.9)') 1, zs(1), as(1)
             write (f_unit, '(i20,3es20.9)') 2, zs(2), as(2)
@@ -227,7 +227,7 @@
 
             write (f_unit, '(7es20.9)') 1.0_dp, 0.0_dp, z_elem1, zs(1), z_elem1, zs(1), z_elem1
             flush(f_unit)
-            
+
             !
             ! then loop to vary mixture of elements 1,2 and compare real value
             ! to interpolation on the pure OCP cases calculated above
@@ -297,7 +297,7 @@
             call write_header(ztr, temp, ne, xs, zs, as)
             write (f_unit, '(3a20)') 'E_cut/kT', 'Z_cut', 'N_bound'
             flush(f_unit)
-            
+
             do, jc=1, nc
                write (*,'(a20,4x,i3,a1,i3)') 'running iteration..', jc, '/', nc
 
@@ -375,15 +375,15 @@
 
                   call run_tfdh(ztr, temp, ne, xs, zs, as, return_profile, args)
 
-                  write (f_unit, '(es20.9)', advance='no') args % znet 
-                  write (g_unit, '(es20.9)', advance='no') args % rex 
+                  write (f_unit, '(es20.9)', advance='no') args % znet
+                  write (g_unit, '(es20.9)', advance='no') args % rex
                end do
                write (f_unit, *) ''; flush (f_unit)
                write (g_unit, *) ''; flush (g_unit)
             end do
             close(f_unit)
             close(g_unit)
-            
+
             write (*,*) 'done'
 
       !======================================================================
@@ -448,7 +448,7 @@
 
                   call run_tfdh(ztr, temp, ne, xs, zs, as, return_profile, args)
 
-                  write (f_unit, '(es20.9)', advance='no') args % znet 
+                  write (f_unit, '(es20.9)', advance='no') args % znet
                end do
                write (f_unit, *) ''; flush(f_unit)
             end do
@@ -487,19 +487,14 @@
 
          write (f_unit, '(3a20)') 'Z_trace', 'log ne', 'log T'
          write (f_unit, '(3es20.9)') ztr, log10(ne), log10(temp)
-         write (f_unit, *) '' 
+         write (f_unit, *) ''
 
          write (f_unit, '(4a20)') 'element #', 'X', 'Z', 'A'
          do i=1, ns
             write (f_unit, '(i20,3es20.9)') i, xs(i), zs(i), as(i)
          end do
          write (f_unit, *) ''
-   
+
       end subroutine write_header
-   
+
       end program main
-
-
-
-   
-   

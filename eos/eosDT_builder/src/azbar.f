@@ -14,7 +14,7 @@ c..charge of nucleus  = zion(1:ionmax)
 c..number of isotopes = ionmax
 c..
 c..output:
-c..molar abundances        = ymass(1:ionmax), 
+c..molar abundances        = ymass(1:ionmax),
 c..mean number of nucleons = abar
 c..mean nucleon charge     = zbar
 

@@ -26,28 +26,28 @@
       use utils_lib, only: mesa_error
 
       implicit none
-      
+
         real, pointer :: ferg_logTs(:), ferg_logRs(:)
         real, pointer :: ferg_logKs(:,:,:), ferg_logKs1(:)
-      
+
       real :: ferg_logT_min, ferg_logT_max, ferg_logR_min, ferg_logR_max, ferg_dlogR
       integer :: ferg_num_logTs, ferg_num_logRs
       real :: logT_for_smooth_lowT
       integer :: num_smooth_lowT
-      
+
       !for AF94 tables
       logical :: AF94_lowT
-                
+
       contains
 
-      
-      
+
+
       subroutine init_ferg(Z, X, data_dir, prefix, Freedman_flag)
          double precision, intent(in) :: Z, X
          character (len=*), intent(in) :: data_dir, prefix
          logical, intent(in) :: Freedman_flag
          character (len=256) :: fname
-         
+
          if (AF94_lowT) then
             ferg_logT_min = 3.0
             ferg_logT_max = 4.1
@@ -74,12 +74,12 @@
          call get_ferg_filename(Z, X, data_dir, prefix, Freedman_flag, fname)
          call read_ferg(fname)
       end subroutine init_ferg
-      
-      
+
+
       subroutine set_ferg_logTs
          integer :: ilgT, cnt
          cnt = 0
-         
+
          if (AF94_lowT) then
             do ilgT = 300, 410, 5
                cnt = cnt+1
@@ -91,7 +91,7 @@
             end if
             return
          end if
-         
+
          do ilgT = 270, 285, 5
             cnt = cnt+1
             ferg_logTs(cnt) = float(ilgT)/100.0
@@ -109,8 +109,8 @@
             call mesa_error(__FILE__,__LINE__)
          end if
       end subroutine set_ferg_logTs !'
-      
-      
+
+
       subroutine set_ferg_logRs
          integer :: i
          if (AF94_lowT) then
@@ -123,18 +123,18 @@
             ferg_logRs(i) = ferg_logR_min + (i-1)*ferg_dlogR
          end do
       end subroutine set_ferg_logRs
-      
-      
+
+
       subroutine read_ferg(fname)
          character (len=*), intent(in) :: fname
-      
+
          integer :: io_logK, i, j, hdr, num_logRs, num_logTs, n1
          real :: logT, lKs(ferg_num_logRs), lRs(ferg_num_logRs), temp_logKs(4, ferg_num_logRs, ferg_num_logTs)
          integer :: ierr                       ! =0 on exit if there is no error.
          character (len=6) :: str
-      
+
          ierr = 0
-         
+
          num_logRs = ferg_num_logRs
          num_logTs = ferg_num_logTs
 
@@ -153,7 +153,7 @@
          else
             hdr = 3
          end if
-   
+
          do i = 1, hdr ! skip header lines
             read(io_logK, *, iostat=ierr)
             if (ierr /= 0) then
@@ -161,7 +161,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          read(io_logK, '(a6,99(f7.3))', iostat=ierr) str, lRs(1:num_logRs)
          if (ierr /= 0) then
             write(*,*) 'read_ferg failed while reading logRs ', trim(fname)
@@ -173,16 +173,16 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          if (AF94_lowT) then
             read(io_logK, *, iostat=ierr)
             read(io_logK, *, iostat=ierr)
             if (ierr/=0) write(*,*) 'read_ferg failed while reading ', trim(fname)
          end if
-                  
+
          do i = num_logTs, 1, -1
             if (AF94_lowT) then
-               read(io_logK, '(f4.2,99f7.3)', iostat=ierr) logT, lKs(1:num_logRs)            
+               read(io_logK, '(f4.2,99f7.3)', iostat=ierr) logT, lKs(1:num_logRs)
             else
                read(io_logK, '(f5.3,1x,99f7.3)', iostat=ierr) logT, lKs(1:num_logRs)
             endif
@@ -191,7 +191,7 @@
                write(*,*) 'i', i
                write(*,*) 'num_logRs', num_logRs
                write(*,*) 'num_logTs', num_logTs
-               write(*,*) 'logT', logT             
+               write(*,*) 'logT', logT
                call mesa_error(__FILE__,__LINE__)
             end if
             ferg_logKs(1, 1:num_logRs, i) = lKs(1:num_logRs)
@@ -200,9 +200,9 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          close(io_logK)
-         
+
          ! smooth logKs for logT < logT_for_smooth_lowT
          do j = 1, num_smooth_lowT
             temp_logKs = ferg_logKs
@@ -222,7 +222,7 @@
                end if
             end do
          end do
-         
+
          call interp_mkbipm_sg( &
             ferg_logRs, num_logRs, ferg_logTs, num_logTs, &
             ferg_logKs1, num_logRs, ierr)
@@ -230,22 +230,22 @@
             write(*,*) 'interp_mkbipm_sg error happened for logKs in read_ferg'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
       end subroutine read_ferg
 
-      
+
       subroutine get_ferg_filename(Z, X, data_dir, prefix, Freedman_flag, fname)
          double precision, intent(in) :: Z, X
          character (len=*),intent(in) :: data_dir, prefix
          logical, intent(in) :: Freedman_flag
-         character (len=*),intent(out) :: fname       
-         character (len=16) :: zstr, xstr       
+         character (len=*),intent(out) :: fname
+         character (len=16) :: zstr, xstr
          integer :: iz, ix
          if (Freedman_flag) then
             iz = 10000
             ix = 70000
          else
-            iz = floor(Z*1d5 + 0.1d0)  
+            iz = floor(Z*1d5 + 0.1d0)
             ix = floor(X*1d5 + 0.1d0)
          end if
          select case (iz)
@@ -342,7 +342,7 @@
                write(*,*) 'get_Xstr: unknown X value for ferg data', X, ix
                call mesa_error(__FILE__,__LINE__)
          end select
-      
+
          !ah, the joys of dealing with opacity tables...
          !AF94 does not have Z=0.06, 0.08 for X>=0.9, it has Z=0.07 instead
          if (AF94_lowT .and. ix >= 90000 .and. (iz == 6000 .or. iz== 8000)) zstr = '07'
@@ -356,21 +356,21 @@
             fname = trim(data_dir) // '/' // trim(prefix) // '.' &
                // trim(xstr) // '.' // trim(zstr) // '.tron'
          end if
-         
+
          !write(*,*) 'read ' // trim(fname)
-                        
+
       end subroutine get_ferg_filename
 
-      
+
       subroutine eval_ferg(z_in, xh_in, t6_in, r_in, logKap, dbg)
          double precision, intent(in) :: z_in, xh_in, t6_in, r_in
          double precision, intent(out) :: logKap
          logical, intent(in) :: dbg
-         
+
          real :: z, xh, t6, r, logT, logR, f
          integer :: ier, i, j
          real :: min_ferg_logT_for_logR_gt_1
-         
+
          integer :: num_logTs, num_logRs
          real :: logR_min, logR_max, logT_min, logT_max, tiny
 
@@ -387,7 +387,7 @@
          else
             min_ferg_logT_for_logR_gt_1 = 3.5
          endif
-      
+
          z = real(z_in); xh = real(xh_in); t6 = real(t6_in); r = real(r_in)
 
          logT = min(ferg_logTs(num_logTs), max(ferg_logTs(1), log10(t6*1e6)))
@@ -400,19 +400,19 @@
          tiny = 1e-6
          logR=min(max(logR, ferg_logRs(1)+tiny), ferg_logRs(num_logRs)-tiny)
          logT=min(max(logT, ferg_logTs(1)+tiny), ferg_logTs(num_logTs)-tiny)
-         
+
          ier = 0
          call interp_evbipm_sg( &
             logR, logT, ferg_logRs, num_logRs, ferg_logTs, num_logTs, &
             ferg_logKs1, num_logRs, f, ier)
-            
+
          if (ier /= 0) then
             write(*,*) 'interp_evbicub_sg error happened in eval_ferg'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          logKap = dble(f)
-         
+
          if (dbg) then
             write(*,*)
             write(*,*) 'eval_ferg'

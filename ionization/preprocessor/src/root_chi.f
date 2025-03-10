@@ -74,11 +74,11 @@
                return
             end if
 
-            if (abs(e) >= tol1 .and. abs(fa) > abs(fb)) then 
+            if (abs(e) >= tol1 .and. abs(fa) > abs(fb)) then
                !attempt inverse quadratic interpolation
-               s = fb/fa 
-               if (a == c) then 
-                  p = 2.0_dp * xm * s 
+               s = fb/fa
+               if (a == c) then
+                  p = 2.0_dp * xm * s
                   q = 1.0_dp - s
                else
                   q = fa/fc
@@ -88,16 +88,16 @@
                end if
 
                !check whether in bounds
-               if (p > 0.0) q = -q 
+               if (p > 0.0) q = -q
                p = abs(p)
                if (2.0_dp*p < min( 3.0_dp*xm*q-abs(tol1*q), abs(e*q) )) then
                   !accept interpolation
                   e = d
-                  d = p/q 
+                  d = p/q
                else
                   !interpolation failed, use bisection
                   d = xm
-                  e = d 
+                  e = d
                end if
             else
                d = xm
@@ -114,8 +114,6 @@
          end do
 
          call alert(1, '(root_chi) reached max_iter steps before convergence')
-
-
 
 
          contains
@@ -166,7 +164,4 @@
 
       end function rootfind_chi
 
-
       end module root_chi
-
-   

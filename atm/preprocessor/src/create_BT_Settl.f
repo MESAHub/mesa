@@ -27,25 +27,25 @@
          use num_lib, only: binary_search
 
          implicit none
-         
+
          logical, parameter :: write_plot_files = .false., verbose = .false.
 
          integer, parameter :: fixed_tau=1, photosphere=2
-         
+
          real(dp) :: tau_base, BT_Settl_M ! tau at base of atm (1, 10, or 100); [M/H]
 
          character(len=256) :: data_dir, output_file1, output_file2, prefix, suffix, BT_Settl_Mstr
-                           
+
          integer :: eos_handle, kap_handle, table_type
 
          contains
-         
-         
+
+
          subroutine build_BT_Settl_tables
 
             integer, parameter :: num_isos = 7, nmet = 5
             integer, pointer :: chem_id(:), net_iso(:)
-            real(dp), pointer :: xa(:)            
+            real(dp), pointer :: xa(:)
             integer :: i, j, k, ierr, i_Teff, i_logg, logg_i_lo, logg_i_hi, &
                io_out1, io_out2, io, ii, jj
             character(len=256) :: filename
@@ -56,9 +56,9 @@
             real(dp) :: X, Y, Z, XC, XN, XO, XNe, XMg, abar, zbar, z2bar
             integer, parameter :: nt_for_CK = 76, max_ng_for_CK = 11
             integer :: ng_for_CK_Teff(nt_for_CK)
-            
+
             include 'formats'
-            
+
             ! set the Teff values
             i = 0
             do j=20,69 !4,69
@@ -85,42 +85,42 @@
                write(*,*) 'error in setting Teff for BT_Settl'
                call mesa_error(__FILE__,__LINE__)
             end if
-            
+
             if(table_type == fixed_tau)then
                write(*,*)
                write(*,*) 'table_type = fixed_tau'
-               write(*,1) 'tau_base', tau_base     
+               write(*,1) 'tau_base', tau_base
             else
                write(*,*)
                write(*,*) 'table_type = photosphere'
             endif
-      
+
             ierr = 0
             io = 33 ! for reading
-            
+
             loggs(1:ng) = (/ &
                -0.5d0, 0.0d0, 0.5d0, 1.0d0, 1.5d0, 2.0d0, 2.5d0, 3.0d0, 3.5d0, 4.0d0, 4.5d0, 5.0d0, 5.5d0 /)
-               
+
             Teffs(1:nT) = BT_Settl_Ts(1:nT)
 
             Pgas = -1d2
             T = -1d2
-            
+
             call read_BT_Settl
-                        
+
             call write_output
-         
+
             if (write_plot_files) call write_plots
-         
+
 
 
             contains
-            
+
             subroutine write_plots
             use math_lib
-               
+
                integer :: i, j, ii, jj
-               
+
                ! rearrange for plotting
                do i=1,ng
                   ii = ng-i+1
@@ -130,21 +130,21 @@
                      logPgas_plot(j,i) = safe_log10(Pgas(i,j))
                   end do
                end do
-         
+
                open(io,file='plot_BT_Settl/logT.data',action='write')
                write(io,'(e20.10)') logT_plot(:,:)
                close(io)
-         
+
                open(io,file='plot_BT_Settl/logPgas.data',action='write')
                write(io,'(e20.10)') logPgas_plot(:,:)
                close(io)
-         
+
                open(io,file='plot_BT_Settl/Teff.data',action='write')
                do j=1,nT
                   write(io,'(e20.10)') Teffs(j)
                end do
                close(io)
-         
+
                open(io,file='plot_BT_Settl/logg.data',action='write')
                do i=1,ng
                   write(io,'(e20.10)') loggs(i)
@@ -152,20 +152,20 @@
                close(io)
 
             end subroutine write_plots
-            
-            
+
+
             subroutine write_output
 
                write(*,*) trim(output_file1)
                io_out1 = 33
-               open(io_out1, file=output_file1)         
-               write(io_out1,'(a15)',advance='no') "#Teff(K)| Pgas@" 
+               open(io_out1, file=output_file1)
+               write(io_out1,'(a15)',advance='no') "#Teff(K)| Pgas@"
 
                if(table_type == fixed_tau)then
                   write(*,*) trim(output_file2)
                   io_out2 = 34
                   open(io_out2, file=output_file2)
-                  write(io_out2,'(a15)',advance='no') "#Teff(K)|    T@" 
+                  write(io_out2,'(a15)',advance='no') "#Teff(K)|    T@"
                endif
 
                do i = 1, ng
@@ -194,8 +194,8 @@
                close(io_out1)
                if(table_type == fixed_tau) close(io_out2)
             end subroutine write_output
-            
-            
+
+
             subroutine read_BT_Settl
                integer :: T2
                character(len=1) :: logg_sign
@@ -223,7 +223,7 @@
                            trim(prefix) // '00', T2, logg_sign, abs(loggs(i)), trim(suffix)
                         if (verbose) write(*,'(a,i1,a,f3.1)') '0', T2, '-', loggs(i)
                      end if
-                     
+
                      open(io,file=trim(filename),action='read',status='old',iostat=ierr)
                      if (ierr /= 0) then
                         if(verbose) write(*,*) 'failed to open ' // trim(filename)
@@ -240,8 +240,8 @@
                   end do
                end do
             end subroutine read_BT_Settl
-         
-         
+
+
             subroutine read_file(i,j,ierr)
                integer, intent(in) :: i, j
                integer, intent(out) :: ierr
@@ -255,7 +255,7 @@
                   call mesa_error(__FILE__,__LINE__)
                end if
                read(io,*) !skip header info
-               
+
                !read tau array
                if(verbose) print *, 'tau'
                call read_vals(.false.,ierr) ! tau
@@ -298,7 +298,7 @@
                   !in a very few cases there is something funny in the temperature profile that
                   !makes it hard for the search to find the right T range for Teff
                   ! experience suggests that the problem areas are near the beginning or end of the array
-                  ! so we try to look again after removing the inner and outer 5 points -- same test is 
+                  ! so we try to look again after removing the inner and outer 5 points -- same test is
                   ! employed above in the tau search, though it does not seem to experience the same problem
                   if(base_layer >= num_layers .or. base_layer <= 1) then
                      !try one quick fix:
@@ -371,8 +371,8 @@
 
 
             end subroutine read_file
-         
-         
+
+
             subroutine read_vals(skip,ierr) !'
                logical, intent(in) :: skip
                integer, intent(out) :: ierr
@@ -386,21 +386,21 @@
                      write(*,'(i4,1p4e20.10)') k, vals(k), vals(k+1), vals(k+2), vals(k+3)
                   enddo
                endif
-            end subroutine read_vals       
-            
+            end subroutine read_vals
+
          end subroutine build_BT_Settl_tables
 
       end module mod_BT_Settl
-      
+
 
       program create_BT_Settl
       use mod_BT_Settl
-      
+
       integer :: ierr, i
       integer, parameter :: num_Zs = 11
       real(dp) :: MH(num_Zs)
-      character(len=8) :: MH_Str(num_Zs) 
-      
+      character(len=8) :: MH_Str(num_Zs)
+
       ierr = 0
 
       MH = (/ -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.3, 0.5 /)
@@ -411,7 +411,7 @@
       call const_init
       call chem_init(data_dir, 'isotopes.data_approx', ierr)
       if (ierr /= 0) stop 'chem_init'
-     
+
       do i=1,num_Zs
 
          write(*,*)
@@ -426,22 +426,22 @@
 
          ! do fixed tau tables
          table_type = fixed_tau
- 
+
          tau_base = 1d2
          output_file1 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_tau100_Pgas.data'
          output_file2 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_tau100_T.data'
          call build_BT_Settl_tables
-      
+
          tau_base = 1d1
          output_file1 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_tau10_Pgas.data'
          output_file2 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_tau10_T.data'
          call build_BT_Settl_tables
-      
+
          tau_base = 1d0
          output_file1 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_tau1_Pgas.data'
          output_file2 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_tau1_T.data'
          call build_BT_Settl_tables
-     
+
          ! do photosphere table
          table_type = photosphere
          output_file1 = 'atm_data/BT_Settl_M' // trim(BT_Settl_Mstr) // '_phot_Pgas.data'

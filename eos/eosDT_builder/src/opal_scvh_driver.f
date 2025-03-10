@@ -25,13 +25,13 @@ c ***********************************************************************
       implicit none
 
       contains
-      
-      
+
+
       subroutine interpolate_opal_scvh(
      >               opal_only, scvh_only, include_radiation, search_for_SCVH,
      >               logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in,
-     >               logPgas, logE, logS, chiRho, chiT, 
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
+     >               logPgas, logE, logS, chiRho, chiT,
+     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >               mu, logNe, gamma1, gamma3, grad_ad, eta, dlnPgas_dlnY,
      >               data_dir,info)
       use scvh_core
@@ -39,9 +39,9 @@ c ***********************************************************************
       implicit none
       logical, intent(in) :: opal_only, scvh_only,search_for_SCVH, include_radiation
       double precision, intent(in) :: logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in
-      double precision, intent(out) ::  
-     >               logPgas, logE, logS, chiRho, chiT, 
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
+      double precision, intent(out) ::
+     >               logPgas, logE, logS, chiRho, chiT,
+     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >               mu, logNe, gamma1, gamma3, grad_ad, eta, dlnPgas_dlnY
       character (len=*), intent(in) ::  data_dir
       integer, intent(out) :: info ! returned = 0 if AOK
@@ -57,12 +57,12 @@ c ***********************************************************************
       call do_opal_scvh(
      >               opal_only, scvh_only,include_radiation, search_for_SCVH,
      >               logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X,Z,
-     >               logPgas, logE, logS, chiRho, chiT, 
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
+     >               logPgas, logE, logS, chiRho, chiT,
+     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >               mu, logNe, gamma1, gamma3, grad_ad, eta,
      >               data_dir,info)
       if (info /= 0) return
-      
+
       dlnPgas_dlnY = 0
 
       end subroutine
@@ -71,8 +71,8 @@ c ***********************************************************************
       subroutine do_opal_scvh(
      >               opal_only, scvh_only, include_radiation, search_for_SCVH,
      >               logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in,
-     >               logPgas, logE, logS, chiRho, chiT, 
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
+     >               logPgas, logE, logS, chiRho, chiT,
+     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >               mu, logNe, gamma1, gamma3, grad_ad, eta,
      >               data_dir,info)
       use scvh_core
@@ -80,9 +80,9 @@ c ***********************************************************************
       implicit none
       logical, intent(in) :: opal_only, scvh_only, search_for_SCVH, include_radiation
       double precision, intent(in) :: logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in
-      double precision, intent(out) ::  
-     >               logPgas, logE, logS, chiRho, chiT, 
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
+      double precision, intent(out) ::
+     >               logPgas, logE, logS, chiRho, chiT,
+     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >               mu, logNe, gamma1, gamma3, grad_ad, eta
       character (len=*), intent(in) ::  data_dir
       integer, intent(out) :: info ! returned = 0 if AOK
@@ -92,7 +92,7 @@ c ***********************************************************************
 
 
       save  ! Why do we need this?
-      
+
 
 !..mixes the opal and scvh equation of state
 !..input:  temp,den,abar,zbar,xmassh1
@@ -101,19 +101,19 @@ c ***********************************************************************
 
       double precision :: logT,logRho,temp,den,abar,zbar,X,Z
 !..for the opal portion
-      double precision 
-     >               logPgas_opal, logE_opal, logS_opal, chiRho_opal, chiT_opal, 
-     >               Cp_opal, Cv_opal, dE_dRho_opal, dS_dT_opal, dS_dRho_opal, 
+      double precision
+     >               logPgas_opal, logE_opal, logS_opal, chiRho_opal, chiT_opal,
+     >               Cp_opal, Cv_opal, dE_dRho_opal, dS_dT_opal, dS_dRho_opal,
      >               mu_opal, gamma1_opal, gamma3_opal, grad_ad_opal, logNe_opal
 
 !..for the scvh portion
-      double precision 
-     >               logPgas_scvh, logE_scvh, logS_scvh, chiRho_scvh, chiT_scvh, 
-     >               Cp_scvh, Cv_scvh, dE_dRho_scvh, dS_dT_scvh, dS_dRho_scvh, 
+      double precision
+     >               logPgas_scvh, logE_scvh, logS_scvh, chiRho_scvh, chiT_scvh,
+     >               Cp_scvh, Cv_scvh, dE_dRho_scvh, dS_dT_scvh, dS_dRho_scvh,
      >               mu_scvh, gamma1_scvh, gamma3_scvh, grad_ad_scvh, logNe_scvh
 
 !..mixed region
-      double precision eta_ele, alfa, beta, kt, theta, fd, fdeta, fdtheta, 
+      double precision eta_ele, alfa, beta, kt, theta, fd, fdeta, fdtheta,
      >      new_eta, ne, coef, f, eta_min, eta_max
       double precision, parameter :: eostol = 1.0d-4
       double precision, parameter :: fpmin = 1.0d-14
@@ -125,7 +125,7 @@ c ***********************************************************************
 
       double precision, parameter :: tiny_eta_ele = -20d0
       double precision :: a
-      
+
 !..some constants
       double precision, parameter ::  CLN = ln10
       double precision ::  logAvo != log10(avo)
@@ -155,17 +155,17 @@ c ***********************************************************************
       double precision, parameter :: logT3 = 4.0d0
       double precision, parameter :: logT4 = 3.4d0
       double precision, parameter :: logT5 = 3.3d0
-      
+
       double precision, parameter :: logRho1 = 2.2d0
       double precision, parameter :: logRho2 = 1.2d0
-      
+
       double precision, parameter :: logRho3 = -2.0d0 !-3.0d0
       double precision, parameter :: logRho4 = -3.8d0 !-3.5d0
       double precision, parameter :: logRho5 = -5.80d0
       double precision, parameter :: logRho6 = -6.8d0 !-6.3d0
-      
+
       include 'formats'
-      
+
       logAvo = log10(avo)
       mecc = me*clight*clight
 
@@ -253,7 +253,7 @@ c ***********************************************************************
       end if
       alfa = 0.5d0 * (1.0d0 - cos(pi * alfa)) ! smooth the transitions
       beta = 1d0 - alfa
-      
+
       if (alfa .ne. 0D0 .or. opal_only) then
          t6 = temp * 1d-6
          r = den
@@ -262,7 +262,7 @@ c ***********************************************************************
          else
             irad = 0
          end if
-         call opal_eos (X, Z, t6, r, num_opal_results, 
+         call opal_eos (X, Z, t6, r, num_opal_results,
      >            irad, opal_results, pgas_out, prad_out, data_dir, info)
          if (info /= 0) then
             return
@@ -277,11 +277,11 @@ c ***********************************************************************
             write(*,*) ' r', r
             stop 1
          end if
-         
+
          pout_opal    = opal_results(1) * 1d12
          dpoutdd_opal = opal_results(6) * pout_opal / den
          dpoutdt_opal = opal_results(7) * pout_opal / temp
-         
+
          if (.false.) then
             write(*,*) 'log10(pout_opal)', log10(pout_opal)
             write(*,*) 'pout_opal', pout_opal
@@ -289,12 +289,12 @@ c ***********************************************************************
             write(*,*) 'opal_results(1)/(t6*r)', opal_results(1)/(t6*r)
             write(*,*)
          end if
-   
+
          eout_opal    = opal_results(2) * 1d12
          ! NOTE: rather than use the opal tabulated value for cv,
          ! it is better to calculate cv from other things.
          deoutdd_opal = opal_results(4) * 1d12
-   
+
          sout_opal    = opal_results(3) * 1d6
          dsoutdd_opal = (deoutdd_opal - pout_opal / den**2) / temp
          dsoutdt_opal = opal_results(5) * 1d6 / temp
@@ -306,7 +306,7 @@ c ***********************************************************************
             write(*,*) 'opal_scvh_driver: Prad >= pout_opal'
             stop 1
          end if
-         
+
          logPgas_opal = log10(pgas_out)
          logE_opal = log10(eout_opal)
          logS_opal = log10(sout_opal)
@@ -336,8 +336,8 @@ c ***********************************************************************
             call interpolate_scvh(
      >               include_radiation, search_for_SCVH,
      >               logT_scvh, logRho_scvh, temp_scvh, den_scvh, X,
-     >               logPgas_scvh, logE_scvh, logS_scvh, chiRho_scvh, chiT_scvh, 
-     >               Cp_scvh, Cv_scvh, dE_dRho_scvh, dS_dT_scvh, dS_dRho_scvh, 
+     >               logPgas_scvh, logE_scvh, logS_scvh, chiRho_scvh, chiT_scvh,
+     >               Cp_scvh, Cv_scvh, dE_dRho_scvh, dS_dT_scvh, dS_dRho_scvh,
      >               mu_scvh, gamma1_scvh, gamma3_scvh, grad_ad_scvh, logNe_scvh,
      >               info)
             if (info == 0) then
@@ -356,7 +356,7 @@ c ***********************************************************************
             end if
             if (info < 0) exit
          end do
-         if (.not. scvh_okay) then 
+         if (.not. scvh_okay) then
             info = -1
             return
 
@@ -369,7 +369,7 @@ c ***********************************************************************
             stop 1
          end if
       end if
-      
+
       if (beta .eq. 0d0) then ! just opal
 
          !write(*,*) 'just opal'
@@ -390,7 +390,7 @@ c ***********************************************************************
          logNe = logNe_opal
 
       else if (alfa .eq. 0d0) then ! just scvh
-         
+
          !write(*,*) 'just scvh'
          logPgas = logPgas_scvh
          logE = logE_scvh
@@ -409,9 +409,9 @@ c ***********************************************************************
          logNe = logNe_scvh
 
       else ! combine alfa * opal + beta * scvh
-         
+
          !write(*,*) 'combine alfa * opal + beta * scvh', alfa, beta
-         
+
          if (.false.) then
             logPgas = alfa*logPgas_opal + beta*logPgas_scvh
             logE = alfa*logE_opal + beta*logE_scvh
@@ -429,19 +429,19 @@ c ***********************************************************************
             grad_ad = alfa*grad_ad_opal + beta*grad_ad_scvh
             logNe = alfa*logNe_opal + beta*logNe_scvh
          else
-         
+
             ! new way
             call blend(
-     >         alfa, beta, den, temp, Prad, 
-     >         logPgas_opal, logPgas_scvh, 
+     >         alfa, beta, den, temp, Prad,
+     >         logPgas_opal, logPgas_scvh,
      >         logS_opal, logS_scvh, dS_dT_opal, dS_dT_scvh, dS_dRho_opal, dS_dRho_scvh,
      >         chiT_opal, chiT_scvh, chiRho_opal, chiRho_scvh, mu_opal, mu_scvh, logNe_opal, logNe_scvh,
      >         logE_opal, logE_scvh, Cv_opal, Cv_scvh, dE_dRho_opal, dE_dRho_scvh,
      >         gamma1_opal, gamma1_scvh, gamma3_opal, gamma3_scvh, grad_ad_opal, grad_ad_scvh,
      >         logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >         mu, gamma1, gamma3, grad_ad, logNe)
-         
-            
+
+
          end if
 
       end if
@@ -524,33 +524,33 @@ c ***********************************************************************
       return
 
       end subroutine
-      
-      
+
+
       subroutine blend(
-     >         alfa, beta, den, temp, Prad, 
-     >         logPgas_1, logPgas_2, 
+     >         alfa, beta, den, temp, Prad,
+     >         logPgas_1, logPgas_2,
      >         logS_1, logS_2, dS_dT_1, dS_dT_2, dS_dRho_1, dS_dRho_2,
      >         chiT_1, chiT_2, chiRho_1, chiRho_2, mu_1, mu_2, logNe_1, logNe_2,
      >         logE_1, logE_2, Cv_1, Cv_2, dE_dRho_1, dE_dRho_2,
      >         gamma1_1, gamma1_2, gamma3_1, gamma3_2, grad_ad_1, grad_ad_2,
      >         logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >         mu, gamma1, gamma3, grad_ad, logNe)
-         double precision, intent(in) :: 
-     >         alfa, beta, den, temp, Prad, 
-     >         logPgas_1, logPgas_2, 
+         double precision, intent(in) ::
+     >         alfa, beta, den, temp, Prad,
+     >         logPgas_1, logPgas_2,
      >         logS_1, logS_2, dS_dT_1, dS_dT_2, dS_dRho_1, dS_dRho_2,
      >         chiT_1, chiT_2, chiRho_1, chiRho_2, mu_1, mu_2, logNe_1, logNe_2,
      >         logE_1, logE_2, Cv_1, Cv_2, dE_dRho_1, dE_dRho_2,
      >         gamma1_1, gamma1_2, gamma3_1, gamma3_2, grad_ad_1, grad_ad_2
-         double precision, intent(out) :: 
+         double precision, intent(out) ::
      >         logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
      >         mu, gamma1, gamma3, grad_ad, logNe
-         double precision :: 
+         double precision ::
      >      Pgas_1, Pgas_2, P_1, P_2, Pgas, P, s_1, s_2, s, dP_dT, dP_dRho,
-     >      e_1, e_2, e, dE_dT, dP_dT_1, dP_dT_2, dP_dRho_1, dP_dRho_2, x   
-         
+     >      e_1, e_2, e, dE_dT, dP_dT_1, dP_dT_2, dP_dRho_1, dP_dRho_2, x
+
          include 'formats'
-         
+
          Pgas_1 = 10**logPgas_1
          Pgas_2 = 10**logPgas_2
          P_1 = Pgas_1 + Prad
@@ -567,24 +567,24 @@ c ***********************************************************************
          e = alfa*e_1 + beta*e_2
          dE_dT = alfa*Cv_1 + beta*Cv_2
          dE_dRho = alfa*dE_dRho_1 + beta*dE_dRho_2
-      
+
          dP_dT_1 = chiT_1*P_1/temp
          dP_dT_2 = chiT_2*P_2/temp
          dP_dRho_1 = chiRho_1*P_1/den
          dP_dRho_2 = chiRho_2*P_2/den
-      
+
          dP_dT = alfa*dP_dT_1 + beta*dP_dT_2
          dP_dRho = alfa*dP_dRho_1 + beta*dP_dRho_2
-               
+
          logPgas = log10(Pgas)
          logE = log10(e)
          logS = log10(s)
          chiRho = dP_dRho*den/P
          chiT = dP_dT*temp/P
          Cv = dE_dT
-         
+
          x = P*chiT/(den*temp*cv)
-         
+
          !x = dP_dT/(dE_dT*den)
          gamma3 = x + 1
          gamma1 = chiT*x + chiRho
@@ -592,9 +592,9 @@ c ***********************************************************************
          Cp = Cv*gamma1/chiRho
          mu = alfa*mu_1 + beta*mu_2
          logNe = alfa*logNe_1 + beta*logNe_2
-         
+
          return
-         
+
          write(*,1) 'alfa', alfa
          write(*,1) 'beta', beta
          write(*,*)
@@ -639,8 +639,7 @@ c ***********************************************************************
          write(*,1) 'grad_ad_1', grad_ad_1
          write(*,*) 'opal_scvh_driver'
          stop 1
-         
+
       end subroutine blend
-      
 
       end module opal_scvh_driver

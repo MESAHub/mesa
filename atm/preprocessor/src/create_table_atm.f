@@ -21,7 +21,7 @@
 ! ***********************************************************************
 
 !     this program creates a base layer of atmosphere boundary conditions
-!     this can be combined with tables created from model atmosphere 
+!     this can be combined with tables created from model atmosphere
 !     structures. the main purposes of the files generated from this
 !     program is to provide a smooth base that covers all values of Teff
 !     and log(g). the model atmosphere grids have limited range of log(g)
@@ -104,7 +104,7 @@ program create_table_atm
 
   do i_Teff = 1, num_Teff
      do i_logg = 1, num_logg
-        R = sqrt ( standard_cgrav*M / 10d0**logg_array(i_logg) )               
+        R = sqrt ( standard_cgrav*M / 10d0**logg_array(i_logg) )
         L = pi*crad*clight * R**2 * Teff_array(i_Teff)**4
         call atm_eval_T_tau_uniform( &
              tau_base, L, R, M, standard_cgrav, 0.2d0*(1 + X), Pextra_factor, &
@@ -112,12 +112,12 @@ program create_table_atm
              Teff, kap, &
              lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
              lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-             ierr)    
+             ierr)
         if (ierr /= 0) then
            Pgas(i_logg, i_Teff) = -1
            T(i_logg, i_Teff) = -1
            write(*,*) 'failed in atm_get_gray_and_kap', logg_array(i_logg), Teff_array(i_Teff)
-        else           
+        else
            T(i_logg, i_Teff) = exp(lnT)
            Pgas(i_logg, i_Teff) = max( 0d0, exp(lnP) - Radiation_Pressure(T(i_logg, i_Teff)) )
         end if
@@ -132,7 +132,7 @@ program create_table_atm
      write(io_out,'(1p,99e15.7)') Teff_array(i_Teff), Pgas(1:num_logg, i_Teff)
   enddo
   !write T
-  write(io_out,'("#Teff(K)|    T@",15("  log g =",f5.2,1x))') logg_array(1:num_logg)           
+  write(io_out,'("#Teff(K)|    T@",15("  log g =",f5.2,1x))') logg_array(1:num_logg)
   do i_Teff = 1, num_Teff
      write(io_out,'(1p,99e15.7)') Teff_array(i_Teff), T(1:num_logg, i_Teff)
   enddo
@@ -156,7 +156,7 @@ contains
     eos_handle = alloc_eos_handle(ierr)
     if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
-    call kap_init(use_cache, ' ', ierr) 
+    call kap_init(use_cache, ' ', ierr)
     if(ierr/=0) call mesa_error(__FILE__,__LINE__)
 
     kap_handle = alloc_kap_handle(ierr)
@@ -215,7 +215,7 @@ contains
        net_iso(chem_id(i)) = i
     end do
     xa(:) = (/ X, Y, xc, xn, xo, xne, xmg /)
-    
+
     call basic_composition_info( &
        num_isos, chem_id, xa, X, Y, Z, &
        abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
@@ -233,7 +233,7 @@ contains
        lnP, lnT, &
        lnRho, res, dres_dlnRho, dres_dlnT, &
        ierr)
-    
+
     use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
     use eos_lib, only: eosPT_get, radiation_pressure
 
@@ -296,7 +296,7 @@ contains
          lnRho/ln10, lnT/ln10, res(i_lnfree_e), dres_dlnRho(i_lnfree_e), dres_dlnT(i_lnfree_e), &
          res(i_eta), dres_dlnRho(i_eta), dres_dlnT(i_eta), &
          kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
-    
+
   end subroutine kap_proc
 
 end program create_table_atm

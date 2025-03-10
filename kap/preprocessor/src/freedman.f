@@ -21,7 +21,7 @@
 ! ***********************************************************************
 
       module freedman
-      
+
       use interp_1d_lib_sg
       use interp_1d_def
       use math_lib
@@ -29,8 +29,8 @@
       use const_def, only: dp
 
       implicit none
-      
-      
+
+
       integer, parameter :: npoints = 736, num_Ts = 42, max_num_Rhos = 18
       real :: logTs(num_Ts)
       real, dimension(max_num_Rhos,num_Ts) :: logRhos, logKappas
@@ -39,9 +39,9 @@
       real, target :: f_ary(4*max_num_Rhos*num_Ts)
       contains
 
-      
-      
-      
+
+
+
       subroutine get_Freedman_fname(data_dir, Z, fname)
          real(dp), intent(in) :: Z
          character (len=*),intent(in) :: data_dir
@@ -70,12 +70,12 @@
       end subroutine get_Freedman_fname
 
 
-      
+
       subroutine init_freedman(freedman_data_dir, Z)
          character (len=*),intent(in) :: freedman_data_dir
          real(dp) :: Z
-      
-         integer :: i, j, k, ierr, io_logK, ii     
+
+         integer :: i, j, k, ierr, io_logK, ii
          real :: T, P, Rho, kap, logT, logT_prev, logRho, logKappa
          real, pointer :: work1(:)
          real, target :: work_ary(max_num_Rhos*pm_work_size)
@@ -99,7 +99,7 @@
             write(*,*) 'init_freedman failed to open ', trim(fname)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          ! skip 2 lines
          do i = 1, 2
             read(io_logK, *, iostat=ierr)
@@ -108,11 +108,11 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          logT_prev = -1
          j = 1
          k = 1
-            
+
          do i = 1, npoints
             read(io_logK, *, iostat=ierr) ii, T, P, Rho, kap
             if (ierr /= 0) then
@@ -154,9 +154,9 @@
             end if
             !write(*,2) 'T Rho kap', i, T, Rho, kap
          end do
-         
+
          close(io_logK)
-         
+
          if (sum(num_logRhos_for_logT) /= npoints) then
             write(*,3) 'init_freedman: bad sum for num logRhos', sum(num_logRhos_for_logT), npoints
             call mesa_error(__FILE__,__LINE__)
@@ -172,15 +172,15 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
        end subroutine init_freedman
 
-      
+
       subroutine eval_freedman (T,rho,logKap,dbg_in)
          real(dp), intent(in) :: T,rho
          real(dp), intent(out) :: logKap
          logical, intent(in) :: dbg_in
-         
+
          real :: logT, logRho
          integer :: ierr, j, i, j_logT
          integer, parameter :: n_old=4, n_new=1
@@ -190,17 +190,17 @@
          logical, parameter :: dbg = .false.
 
          include 'formats'
-         
+
          work1 => work_ary
 
          logT = max(logTs(1),min(logTs(num_Ts),real(log10(T),kind=kind(logT))))
          logRho = log10(rho)
          ierr = 0
-                  
+
          do j = 1, num_Ts-1
-         
+
             if (logT >= logTs(j) .and. logT <= logTs(j+1)) then
-            
+
                j_logT = min(max(1,j-1),num_Ts-3)
                do i = 1, n_old
                   ! interpolate at logRho for logTs(j_logT)
@@ -217,14 +217,14 @@
                   end if
                   x_old(i) = logTs(j_logT)
                   v_old(i) = v_new(1)
-                  
+
                   if (dbg) write(*,2) 'interp: logT logRho logKap', j_logT, logTs(j_logT), logRho, v_new(1)
 
                   j_logT = j_logT + 1
 
-               end do       
-                       
-               ! interpolate logKap at logT    
+               end do
+
+               ! interpolate logKap at logT
                x_new(1) = logT
                call interpolate_vector_sg( &
                   n_old, x_old, n_new, x_new, v_old, v_new, &
@@ -238,15 +238,15 @@
                   call mesa_error(__FILE__,__LINE__)
                end if
                logKap = dble(v_new(1))
-               
+
                if (dbg) write(*,2) 'final: logT logRho logKap', 0, logT, logRho, logKap
                if (dbg) stop
                return
-               
+
             end if
-            
+
             if (dbg) write(*,2) 'skip over logT', j, logTs(j), logT
-            
+
          end do
 
          write(*,1) 'eval_freedman: logT confusion', logT
@@ -254,6 +254,6 @@
 
 
       end subroutine eval_freedman
-      
+
 
       end module freedman

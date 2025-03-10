@@ -1,6 +1,6 @@
-!  
+!
 ! lib_util
-! francois hebert, 10/08/11   
+! francois hebert, 10/08/11
 !
 ! this subroutine contains "utility" routines
 !
@@ -46,6 +46,5 @@
             allocate(array(newsize))
          end if
       end subroutine reallocate_dp
-
 
       end module lib_util

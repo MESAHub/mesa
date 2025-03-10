@@ -1,6 +1,6 @@
-!  
+!
 ! alert
-! francois hebert, 09/09/02   
+! francois hebert, 09/09/02
 !
 ! this subroutine offers a quick and dirty way to print a message to stdout
 ! and either stop, or not, the program

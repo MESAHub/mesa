@@ -116,8 +116,8 @@
                   end if
                end if
             end do
-               
-            ! look for local properties at wigner-seitz radius 
+
+            ! look for local properties at wigner-seitz radius
             if (.not. rws_flag) then
                if (x > rws) then
                   !args%nienc = (nithisstep*(rws-xlast)+nilaststep*(x-rws))/(x-xlast)
@@ -144,7 +144,7 @@
             vlast = y(1)
             nlast = args%neloc
             blast = y(3)
-      
+
             ! check to see that we don't go past bounds of output arrays
             ! if so, we need bigger arrays to hold our data
             if (profile_flag) then
@@ -160,17 +160,17 @@
                   call reallocate_dp(args%qi, args%species * array_length)
                end if
             end if
-      
+
          end do
-   
+
          if (istep == max_iter) call alert(1, '(tfdh) too many steps!')
-   
+
       end subroutine tfdh
 
 
 
       subroutine d_tfdh(x, y, dydx, args)
-   
+
          real (dp), intent(in) :: x
          real (dp), intent(in), dimension(:) :: y
          real (dp), intent(out), dimension(:) :: dydx
@@ -186,7 +186,7 @@
          qi_sum = sum(args%qiloc(:))
          ne_loc = ne_total(args)
          nb_loc = ne_bound(args)
-         
+
          ! dV/dr
          dydx(1) = y(2)
          dydx(2) = - 4.0*pi*qe * x * (qi_sum - ne_loc)
@@ -197,12 +197,7 @@
          args % neloc = ne_loc
          args % nbloc = nb_loc
          args % qitotloc = qi_sum
-      
+
       end subroutine d_tfdh
 
       end module mod_tfdh
-
-
-
-   
-   

@@ -27,7 +27,7 @@
          real (dp), parameter :: tiny = 1.0e-30_dp
 
          integer :: istep
-         real (dp) :: xi, cut, ylast 
+         real (dp) :: xi, cut, ylast
          real (dp) :: x, xinit, xfinal, dx, dxdid, dxnext
          real (dp), dimension(size) :: y, dydx, yscal
 
@@ -48,7 +48,7 @@
          if (xfinal <= xinit) return
 
          do, istep=1, max_iter
-   
+
             call d_fermidirac(x, y, dydx, args)
             yscal(:) = abs(y(:)) + abs(dx*dydx(:)) + tiny
             if ((x+dx-xfinal)*(x+dx-xinit) > 0) dx = xfinal - x
@@ -70,7 +70,7 @@
       end function bound_integral
 
 
-   
+
       subroutine d_fermidirac(x, y, dydx, args)
 
          real (dp), intent(in) :: x
@@ -88,11 +88,4 @@
 
       end subroutine d_fermidirac
 
-
-
       end module mod_bi
-
-
-   
-   
-   

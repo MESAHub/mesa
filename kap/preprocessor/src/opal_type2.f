@@ -22,7 +22,7 @@
 
 
 ! Modified by BP from the OPAL distributed version.
-! 
+!
 ! most importantly, I'm filling in the high logT, high logR part of the tables.
 ! this is done by linearly extrapolating during the read.
 ! With this change, I get reasonable results out to the edges.
@@ -36,7 +36,7 @@
          z = z_in; xh = xh_in
          if (z .ne. readco22_z) itimeco = 0
       end subroutine init_opal_type2
-      
+
 
 c************************************************************************
 
@@ -53,7 +53,7 @@ c************************************************************************
       if (r < 1e-8) r = 1e-8
       if (r > 1e1) r = 1e1
       call opac2 (z,xh,xxc,xxo,t6,r,data_dir)
-      logKap = opact      
+      logKap = opact
       end
 
 c************************************************************************
@@ -116,9 +116,9 @@ c     ismdata=1 in subroutine readco.
 c          The interpolation variables are :
 
 c          xh     The hydrogen mass fraction, X
-c          xxc    The enhanced carbon mass fraction, delta Xc.  
-c                 The total C mass fraction, Xc, is the sum of the initial 
-c                 amount included in the metal mass fraction, Z, and 
+c          xxc    The enhanced carbon mass fraction, delta Xc.
+c                 The total C mass fraction, Xc, is the sum of the initial
+c                 amount included in the metal mass fraction, Z, and
 c                 delta Xc
 c          xxo    The enhanced oxygen mass fraction, delta Xo
 c          t6     The temperature in millions of degrees Kelvin, T6
@@ -133,8 +133,8 @@ c     smoothed results.  A 4x4 grid in logT6 and logR is used to interpolate
 c     in four different 3x3 sub-grids. Linear interpolation between quadratic
 c     fits in these different  sub-grids gives smoothed results in both log T6
 c     and Log R directions. This procedure produces results that are similar
-c     to bicubic spline interpolation, but require storage of only local 
-c     information.  
+c     to bicubic spline interpolation, but require storage of only local
+c     information.
 c         Each of the individual tables in a file Gx**x**z covers 70 temperatures
 c     in the range logT=3.75[T6=0.0056341325]( referred to as temperature 1) to
 c     logT=8.7[T6=501.187] and 19 values of log R in the range -8 (referred to as 1)
@@ -182,21 +182,21 @@ c     codataa.
 c     ***CAUTION***
 c         As a result of the mixing procedure used to calculate the data a few
 c     X=0.0, low T-small R, table values fell outside the range of T and R accessible
-c     from the X=0.35 data directly calculated for this purpose.  These T-R 
+c     from the X=0.35 data directly calculated for this purpose.  These T-R
 c     locations are filled in with 9.99 (or for diagnostic purposes in some cases
 c     larger values.  At the same locations the derivatives are set to 99.9.  When
-c     T-R falls in this region a message is issued by the interpolation code to 
+c     T-R falls in this region a message is issued by the interpolation code to
 c     inform the user of this situation.  Presumable very few users will have
 c     applications that take them into this region.
-c     
+c
 c          Your routine that performs the call to OPAC should include the
 c      statement:
 c
 c         common/type2_e/ opact,dopact,dopacr,dopactd
 c
 c         These variables have the following meanings:
-c        
-c         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)  
+c
+c         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)
 c         DOPACT      Is Dlog(kappa)/Dlog(T6)   ! at constant R
 c         DOPACTD     Is Dlog(kappa)/Dlog(T6)   ! at constant density
 c         DOPACR      Is Dlog(kappa)/Dlog(R),   ! at constant T6
@@ -269,7 +269,7 @@ c
       xxx=log10(0.005+xh)
       slt=log10(t6)
       slr=log10(r)
- 
+
 !..... set X indices
         ilo=2
         ihi=mx
@@ -302,12 +302,12 @@ c
           mf2=1
         endif
 
-      if (itime(1) .ne. 12345678) then 
-      alr(1)=-8.+(nrb-1)*0.5 
-      do i=2,nr  
-        alr(i)=alr(i-1)+0.5  
-      enddo  
-      alt(1)=-2.25+(ntb-1)*0.05  
+      if (itime(1) .ne. 12345678) then
+      alr(1)=-8.+(nrb-1)*0.5
+      do i=2,nr
+        alr(i)=alr(i-1)+0.5
+      enddo
+      alt(1)=-2.25+(ntb-1)*0.05
       do i=ntb+1,46
          alt(i)=alt(i-1)+.05
       enddo
@@ -322,7 +322,7 @@ c
       do i=1,nt
       t6list(i)=10.**alt(i)
       enddo
-      endif   
+      endif
         ilo=2
         ihi=nr
    12     if(ihi-ilo .gt. 1) then
@@ -373,7 +373,7 @@ c-----set-up indices to skip when low T&R data missing for X=0.
 
             if (iadvance .eq. 0) then  ! sfift X index to avoid X=0.
             iadvance=iadvance+1
-            mf=mf+1 
+            mf=mf+1
             mg=mg+1
             mh=mh+1
             mi=mi+1
@@ -403,7 +403,7 @@ c-----set-up indices to skip when low T&R data missing for X=0.
       dopact=99.
       dopacr=99.
       dopactd=99.
-      return  
+      return
       endif
       l2=l1+1
       l3=l2+1
@@ -418,7 +418,7 @@ c-----end of check for missing data
       do 123 m=mf,mf2
        if(mx .ge. 4) then
 !.....  C and O  fractions determined by the ray through the origin that
-c       also passes through the point (Xc,Xo). Specific interpolation 
+c       also passes through the point (Xc,Xo). Specific interpolation
 c       values determined by tabulated X values;i.e. xa(m).  Inter-
 c       polation along the ray gives log (kappa(Xc,Xo)).  (Advantage
 c       of method: keeps indices within table boundaries)
@@ -458,7 +458,7 @@ c
         if(xa(i) .eq. 0.0) mxzero=i
         enddo
 c  ... this is the first time through this m. Calculate the decadic
-c      log of the perimeter points shifted by Z+0.001(to avoid divergence 
+c      log of the perimeter points shifted by Z+0.001(to avoid divergence
 c      at origin); m refers to xa(m); the hydrogen table value.
 c
 c      note that the nc-th elements are sometimes needed!
@@ -501,7 +501,7 @@ c      interpolation.
          !write(*,*) 'slt', slt, 'not in range', alt(1), 'to', alt(nt)
          go to 62
       end if
-      
+
       if((slr .lt. alr (1)).or.(slr .gt. alr(nr))) then
          !write(*,*) 'slr', slr, 'not in range', alr(1), 'to', alr(nr)
          go to 62
@@ -514,7 +514,7 @@ c
          !write(*,*) 'mf2', mf2, 'k3s', k3s
          go to 62
       end if
-      
+
       do i=14,18 ! check for missing entries at right end of row
          if((l3s .gt. i) .and. (k3s .gt. nta(i+1))) then
             !write(*,*) '(l3s .gt. i) .and. (k3s .gt. nta(i+1))'
@@ -556,7 +556,7 @@ c
           call mesa_error(__FILE__,__LINE__)
         endif
       if(z .ne. zz(mf,1)) go to 66
-      xxc=xxci   ! restores input value; necessary if stop replaced 
+      xxc=xxci   ! restores input value; necessary if stop replaced
 c                  with return
       xxo=xxoi   ! restores input value
       is=0
@@ -598,7 +598,7 @@ c
 c
    61 write(*,'(" Mass fractions exceed unity")')
       write(*,*) 'z', z, 'xh', xh, 'xxc', xxc, 'xxo', xxo, 'xxco', xxco, 'sum', z+xh+xxco
-      xxc=xxci   ! restores input value; required if stop replaced 
+      xxc=xxci   ! restores input value; required if stop replaced
 c                  with a return
       xxo=xxoi   ! restores input value
       call mesa_error(__FILE__,__LINE__)
@@ -607,7 +607,7 @@ c                  with a return
       !write(*,*) 't6', t6
       !write(*,*) 'r', r
       xxc=xxci   ! restores input value; required if stop replaced
-c                  with a return 
+c                  with a return
       xxo=xxoi   ! restores input value
       return
    64 write(*,'(" X not equal to zero: To run this case it
@@ -1015,7 +1015,7 @@ c
         endif
       dopactd=dopact-3.*dopacr
 !        if (opact .gt. 1.e+15) then
-!          write(*,'("Interpolation indices out of range; please report conditions.")') 
+!          write(*,'("Interpolation indices out of range; please report conditions.")')
 !          call mesa_error(__FILE__,__LINE__)
 !        endif
       if (opact .gt. 9) then
@@ -1045,18 +1045,18 @@ c************************************************************************
      .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
      . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
-      common/type2_alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)  
+      common/type2_alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_e/ opact,dopact,dopacr,dopacrd
       character(len=250) dumarra
       common/type2_recoin/ itimeco,mxzero,readco_z
 c
       logical line_full
-      
+
         if (itimeco .ne. 12345678) then
         readco_z = z
         do i=1,mx
-          do j=1,mc 
+          do j=1,mc
             do k=1,mo
               do l=1,nt
                 do mq=1,nr
@@ -1067,7 +1067,7 @@ c
           enddo
         enddo
         do i=1,mx
-          do j=1,mc 
+          do j=1,mc
             do l=1,nt
               do mq=1,nr
                 diag(i,j,l,mq)=1.e+35
@@ -1100,7 +1100,7 @@ c
       close (2)
 
       call open_unit2(m,z,dir)
-c     
+c
 c      read header
       do i=1,240
          read(2,'(a)') dumarra(i:i)
@@ -1114,8 +1114,8 @@ c
         read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)')
      x  itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
         xca(m,int)=min(xca(m,int),1.-x(m,int)-zz(m,int)-xoa(m,int))
-        read(2,'(f10.5)') dum,dum,dum        
-        read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)         
+        read(2,'(f10.5)') dum,dum,dum
+        read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)
         read(2,'(f10.5)') dum
           do k=1,ntm
             read(2,fmt='(f4.2)',advance='no') altin
@@ -1141,7 +1141,7 @@ c
                   exit
                end if
             enddo
-            
+
             if (line_full) read(2,'(f10.5)') dum ! advance to next line
 
             do ll=1,nrm   ! modified
@@ -1149,24 +1149,24 @@ c
             enddo
 
           enddo
-         
+
           if (isett6 .ne. 1234567) then
-          do k=1,ntm  
+          do k=1,ntm
             t6arr(k)=t6list(k)
-          enddo  
-          endif  
+          enddo
+          endif
           isett6=1234567
 
        if (ismdata .eq. 0) then
-         if ((nrm .ne. nr) .or. (ntm .ne. nt)) then 
+         if ((nrm .ne. nr) .or. (ntm .ne. nt)) then
            write (*,'("Not set up to smooth data with reduced ",
      x                "T-Rho grid")')
            call mesa_error(__FILE__,__LINE__)
-         endif 
+         endif
         tmax=10.   ! modified
         nset=67    ! 65 in earlier version
         RLS=-8.
-        nsm=1 
+        nsm=1
           RLE=1.0
           nrlow=1
           nrhigh=2*(RLE-RLS)+1
@@ -1209,10 +1209,10 @@ c
         read(2,'(f10.5)') dum
         read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)')
      x  itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
-        read(2,'(f10.5)') dum,dum,dum        
-        read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)         
+        read(2,'(f10.5)') dum,dum,dum
+        read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)
         read(2,'(f10.5)') dum
-         
+
           ! BP extrapolate to fill table
           do k=1,ntm
             read(2,fmt='(f4.2)',advance='no') altin
@@ -1238,7 +1238,7 @@ c
                   exit
                end if
             enddo
-            
+
             if (line_full) read(2,'(f10.5)') dum ! advance to next line
 
             do ll=1,nrm   ! modified
@@ -1269,7 +1269,7 @@ c     smooth final "diago" opacity tables too!
         tmax=10.   ! modified
         nset=67 !65 in earlier version
         RLS=-8.
-        nsm=1 
+        nsm=1
           RLE=1.0
           nrlow=1
           nrhigh=2*(RLE-RLS)+1
@@ -1284,8 +1284,8 @@ c           the X=0  low T data cannot be smoothed
               cof(k,ll)=coff(k,ll)
             endif
 
-          enddo  
-        enddo  
+          enddo
+        enddo
        ll=1
        do kk=nrb,nre
          do k=1,nt
@@ -1295,7 +1295,7 @@ c           the X=0  low T data cannot be smoothed
        enddo
        endif
     6 continue
- 
+
       do i=2,nt
         dfs(i)=1./(alt(i)-alt(i-1))
       enddo
@@ -1309,7 +1309,7 @@ c           the X=0  low T data cannot be smoothed
           dfsx(i)=1./(xx(i)-xx(i-1))
         enddo
       endif
-      
+
       return
       end
 c
@@ -1343,7 +1343,7 @@ c************************************************************************
                write(*,*) 'yy(1)', yy(1)
                write(*,*) 'yy(2)', yy(2)
                write(*,*) 'yy(3)', yy(3)
-               write(*,*) 
+               write(*,*)
                call mesa_error(__FILE__,__LINE__)
           else
              xx12(i)=1./(xx(1)-xx(2))
@@ -1711,7 +1711,7 @@ C
      +  0.0277551020,-0.0416326531,-0.0069387755/
 C
 C
-      DO 20 I=3,nset-2 
+      DO 20 I=3,nset-2
 C
          J=1
          FXY(I,J)=
@@ -1797,7 +1797,7 @@ C     WRITTEN BY MIKE SEATON(obtained june 1993)
 C
 C     OPAL DATA.
 C     ASSUMES FIRST T6=0.006, LAST T6=10.OR 0.04). Depending on position
-C     in the table. 
+C     in the table.
 C     USES RECTANGULAR ARRAY FOR VARIABLES T6 AND LOG10(R)
 C
 C     (1) NSM=NUMBER OF PASSES THROUGH SMOOTHING FILTER.
@@ -1831,7 +1831,7 @@ C
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
       CHARACTER(len=100) HEAD
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
-      common/type2_alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)  
+      common/type2_alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       LOGICAL IERR
 
 C
@@ -1955,4 +1955,3 @@ C
      + ', FLR=',E10.3)
 C
       END
-

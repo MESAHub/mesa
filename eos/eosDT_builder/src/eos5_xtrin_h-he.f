@@ -2,7 +2,7 @@ c     based on EOS5_xtrin_H-He.f from the OPAL release
 
 c*************************************************************************
       subroutine esac_hhe (xh,t6,r,iorder,irad,filename,results_out,pgas_out,prad_out,info)
-c..... The purpose of this subroutine is to interpolate 
+c..... The purpose of this subroutine is to interpolate
 c      the equation of state and its derivatives in X, T6, density
 c        izi=0 recalculate table indices to use; =1 keep previous
 
@@ -19,9 +19,9 @@ c      fixed T6 at three values of Rho; followed by quadratic
 c      interpolation along T6. Results smoothed by mixing
 c      overlapping quadratics.
 c         definitions:
-c     
+c
 c            T6 is the temperature in units of 10**6 K
-c 
+c
 c            rho is the density in grams/cc
 c            R=Rho/T6**3
 
@@ -30,7 +30,7 @@ c            eos(2) is energy in 10**12 ergs/gm. Zero is zero T6
 c            eos(3) is the entropy in units of energy/T6
 c            eos(4) is dE/dRHO at constant T6
 c            eos(5) is the specific heat, dE/dT6 at constant V.
-c            eos(6) is dlogP/dlogRho at constant T6. 
+c            eos(6) is dlogP/dlogRho at constant T6.
 c                   Cox and Guil1 eq 9.82
 c            eos(7) is dlogP/dlogT6 at conxtant Rho.
 c                   Cox and Guil1 eq 9.81
@@ -45,8 +45,8 @@ c            irad  if =0 no radiation correction; if =1 adds radiation
 c            index(i),i=1,10  sets order in which the equation of state
 c            variables are stored in eos(i).  Above order corresponds
 c            to block data statement:
-c                 data (index(i),i=1,10)/1,2,3,4,5,6,7,8,9,10/. 
-c            If you, for example, only want to return gamma1: set iorder=1 
+c                 data (index(i),i=1,10)/1,2,3,4,5,6,7,8,9,10/.
+c            If you, for example, only want to return gamma1: set iorder=1
 c            and set: data (index(i),i=1,10)/8,2,3,4,5,6,7,1,9,10/
 c
 c
@@ -61,7 +61,7 @@ c
       common/lreadco_hhe/itime
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr),  
+      common/aeos_hhe/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -69,10 +69,10 @@ c
       common/eeos_hhe/esact,eos(mv)
       dimension frac(7)
       data aprop/83.14511/
-      
+
       pgas_out = -1
       prad_out = -1
-      
+
       blank=' '
       ztab=0.0
       if (iorder .lt. 1 .or. iorder .gt. mv) then
@@ -109,7 +109,7 @@ c..... read the data files
         if (abs(ztab-z) .gt. 0.00001) then
         write (*,'("requested z=",f10.6," EOS5_data_H-He is for z=",
      x             f10.6)')
-     x    ztab,z      
+     x    ztab,z
         stop
         endif
 
@@ -267,9 +267,9 @@ c     table boundaries.  choose largest allowed size.
    15 continue
       do 124 iv=1,iorder
       do 123 m=mf,mf2
- 
+
       is=0
- 
+
 c__________
       do ir=l1,l1+iq
         do it=k1,k1+ip
@@ -321,7 +321,7 @@ c__________
           is=1
         enddo
    47 continue
-   
+
 
       endif
 
@@ -347,7 +347,7 @@ c
       else
          eos(iri(5))=eos(iri(5))*moles*aprop/tmass
       endif
-      
+
       do j=1,iorder
          results_out(j) = eos(j)
       end do
@@ -386,7 +386,7 @@ c     The purpose of this subroutine is to interpolate in T6 and rho
       parameter (mx=6,mv=12,nr=169,nt=197)
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr),  
+      common/aeos_hhe/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos_hhe/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
@@ -426,7 +426,7 @@ c.....    eos(i) smoothed in left 3x4
           esact=esact*dix+esact2*(1.-dix)
 c       endif   ! moved to loc a
         if(iq .eq. 3) then
- 
+
 c.....     eos(i) in upper-right 3x3.
           esactq2=quadeos(is,iw,slt,q(2),q(3),q(4),t6a(k2),t6a(k3),
      x            t6a(k4))
@@ -443,7 +443,7 @@ c.....        eos(i) smoothed in both log(T6) and log(R)
         endif
         if (esact .gt. 1.e+15) then
           write(*,'("Interpolation indices out of range",
-     x              ";please report conditions.")') 
+     x              ";please report conditions.")')
           stop
         endif
 
@@ -460,7 +460,7 @@ c..... The purpose of this subroutine is to read the data tables
       real moles
       character*1 blank
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr),  
+      common/aeos_hhe/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -477,7 +477,7 @@ c..... The purpose of this subroutine is to read the data tables
 
         if (itimeco .ne. 12345678) then
         do i=1,mx
-          do j=1,mv 
+          do j=1,mv
             do k=1,nt
               do l=1,nr
                 xz(i,j,k,l)=1.e+35
@@ -487,21 +487,21 @@ c..... The purpose of this subroutine is to read the data tables
         enddo
         itimeco=12345678
         endif
- 
+
       close (2)
 !..... read  tables
 !       call system (' gunzip EOS5_data_H-He')
 !       open(2, FILE='EOS5_data_H-He')
-      
+
       write(*,*) 'read ' // trim(filename)
-      
+
        open(2, FILE=trim(filename), IOSTAT=ios)
       if (ios .ne. 0) then
          write(*,*) 'failed to open ', trim(filename)
          stop 1
       end if
- 
- 
+
+
       do 3 m=1,mx
       read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)')
      x  xin(m),zz(m),moles(m),tmass(m)
@@ -535,7 +535,7 @@ c     x      e14.4)') xin(m), rhogr(m,jcs)
          go to 4
       endif
       ! change to read mu_M and logNe as part of xz table
-      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') 
+      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)')
      x t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),
      x (xz(m,index(iv),i,jcs),iv=1,9)
 !     x t6list(jcs,i),amu_M(jcs,i),alogNe(jcs,j),
@@ -548,7 +548,7 @@ c     x      e14.4)') xin(m), rhogr(m,jcs)
     2 continue
       read(2,'(a)') blank
     3 continue
- 
+
       do i=1,nt
          if(t6list(1,i) .eq. 0.0) then
             write(*,'("readcoeos_hhe: Error:",i4,
@@ -582,7 +582,7 @@ c***********************************************************************
       common/eeos_hhe/esact,eos(mv)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
 
-      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, 
+      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/,
      x unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/
      x , sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
@@ -607,7 +607,7 @@ c     rat=rat*1.e+24  !   Convert degrees K to units 10**6 K (T replaced with T6
       molenak=moles*aprop  ! Mb-cc/unit T6
 
 c-----Calculate EOS without radiation correction
-      pt=eos(iri(1)) 
+      pt=eos(iri(1))
       et=eos(iri(2))
       st=eos(iri(3))
       dedrho=eos(iri(4))
@@ -621,7 +621,7 @@ c---- End  no radiation calculation
 
       if (irad .ne. 0) then
 c---- Calculate EOS with radiation calculation
-      pr=4./3.*rat*t6**4   ! Mb 
+      pr=4./3.*rat*t6**4   ! Mb
       er=3.*pr/density   ! Mb-cc/gm
       sr=4./3.*er/t6   ! Mb-cc/(gm-unit T6)
       pt=eos(iri(1))+pr
@@ -665,30 +665,30 @@ c    x  /molenak
       end
 c***********************************************************************
       block data
-      
+
       ! for EOS5_xtrin_H_He
       parameter (mx_hhe=6,mv_hhe=12,nr_hhe=169,nt_hhe=197)
       common/aaeos_hhe/ q_hhe(4),h_hhe(4),xxh_hhe
-      common/aeos_hhe/  xz_hhe(mx_hhe,mv_hhe,nt_hhe,nr_hhe),  
+      common/aeos_hhe/  xz_hhe(mx_hhe,mv_hhe,nt_hhe,nr_hhe),
      . t6list_hhe(nr_hhe,nt_hhe),rho_hhe(nr_hhe),t6a_hhe(nt_hhe),
      . esk_hhe(nt_hhe,nr_hhe),esk2_hhe(nt_hhe,nr_hhe),dfsx_hhe(mx_hhe)
      . ,dfs_hhe(nt_hhe),dfsr_hhe(nr_hhe),m_hhe,mf_hhe,xa_hhe(mx_hhe)
       common/beos_hhe/ iri_hhe(mv_hhe),index_hhe(mv_hhe),
      . nta_hhe(nr_hhe),zz_hhe(mx_hhe)
-      
+
       data (xa_hhe(i),i=1,mx_hhe)/0.0,0.2,0.4,0.6,0.8,1.0/
 
       data (index_hhe(i),i=1,mv_hhe)/1,2,3,4,5,6,7,8,9,10,11,12/
       data (nta_hhe(i),i=1,nr_hhe)/92*197,196,194,190,2*189,3*187,2*159,133,
      x  125,123,122,120,115,113,107,102,95,87,83,74,69,67,62,56,54,52,
      x  51,3*50,2*49,26*48,47,45,43,42,41,39,37,36,35,34,32,31,30,29,
-     x  27,26/ 
+     x  27,26/
 
 
       ! for opal_core
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),  
+      common/aeos/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -699,6 +699,5 @@ c***********************************************************************
      x  133,125,123,122,120,115,113,107,102,2*80,72,68,66,64,62,56,54,
      x  52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,
      x  29,27,26/
-
 
       end

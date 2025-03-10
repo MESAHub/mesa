@@ -22,17 +22,17 @@
       program ckread
       use const_def, only: dp
       implicit none
-! this program reads in a Castelli & Kurucz 2003 atmosphere structure file, input as 
+! this program reads in a Castelli & Kurucz 2003 atmosphere structure file, input as
 ! the first command line argument, and writes out a formatted table of Pgas @ T=Teff
 ! for the full range of Teff and logg covered by the model grid.
-! the program should be executed with both input and output filenames specified on 
-! the command line, followed by tau_base ('phot' or '100').  for example: 
+! the program should be executed with both input and output filenames specified on
+! the command line, followed by tau_base ('phot' or '100').  for example:
 !
 !              ./ckread ap00k2odfnew.dat ap00k2odfnew.tbl
 !                      (structures file)  (output table) phot
 !
 ! the a*k2odfnew.dat atm structure files are provided for convenience in
-! atm_input_data/ck03/ck03_structures.tar.xz 
+! atm_input_data/ck03/ck03_structures.tar.xz
 !
 ! the output files can be used as input to the table_merge program
       integer :: i, j, k, j1, it, npi
@@ -41,7 +41,7 @@
       real(dp) :: teff(nt),logg(nt,maxg),pres(nt,maxg),temp(nt,maxg),t(np),p(np),ft(nint),qt(nint)
       character(len=200) :: input_file, output_file, ctau_base, fname
       logical :: do_phot
-   
+
       ng(1:11) = 11
       ng(12:17)= 10
       ng(18:20)=  9
@@ -55,7 +55,7 @@
       ng(58:65)=  3
       ng(66:75)=  2
       ng(76)   =  1
-   
+
       if ( COMMAND_ARGUMENT_COUNT() /= 2) stop 'usage: ./ckread [input file] [phot or 100]'
 
       call GET_COMMAND_ARGUMENT(1,input_file)
@@ -122,7 +122,7 @@
 
       close(1)
       close(2)
-      
+
       contains
 
       subroutine interp(a,b,x,n)
@@ -130,7 +130,7 @@
       ! {b} are coefficients of the interpolating polynomial returned by interp
       !  x  is the abscissa to be interpolated
       !  n  is the number of points to be used
-      !  the resulting interpolating polynomial has order n-1 
+      !  the resulting interpolating polynomial has order n-1
       implicit none
       integer :: i,j,n
       real(dp) :: a(n),b(n),x

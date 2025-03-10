@@ -1,9 +1,7 @@
-!
 ! root_vex
 ! francois hebert, jul 17 2010
 !
 ! subroutine to converge on the correct central potential value
-!
 
       module root_vex
 
@@ -62,7 +60,4 @@
 
       end subroutine rootfind_vex
 
-
       end module root_vex
-
-   

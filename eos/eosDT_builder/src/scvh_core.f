@@ -22,13 +22,13 @@
 
       module scvh_core
       implicit none
-      
+
       logical,parameter :: dbg = .false.
 
       integer :: num_h_pts,num_he_pts
       double precision,pointer,dimension(:) :: logPs,logTs
       integer,pointer,dimension(:) :: k_for_MIN_logP,k_for_MAX_logP
-      
+
       integer,parameter :: NlogPs = 99,NlogTs = 63
       double precision,parameter :: dlogP = 0.20d0
       double precision,parameter :: logP_min = -0.60d0
@@ -47,13 +47,13 @@
          integer :: iliny ! =1: y grid is "nearly" equally spaced
          character (len=64) :: name
       end type scvh_info
-      
+
       type (scvh_info),target ::
-     >      compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si, 
+     >      compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si,
      >      compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si
-     
-      
-      
+
+
+
       contains
 
 
@@ -71,15 +71,15 @@
 
          allocate(logPs(NlogPs),logTs(NlogTs),k_for_MAX_logP(NlogTs),k_for_MIN_logP(NlogTs),stat=info)
          if (info /= 0) call do_stop('allocate failed in alloc_for_scvh')
-         
+
          call alloc(compv1_h_si,compv1_he_si,'compv1_h_si','compv1_he_si')
          call alloc(compv2_h_si,compv2_he_si,'compv2_h_si','compv2_he_si')
          call alloc(denlog_h_si,denlog_he_si,'denlog_h_si','denlog_he_si')
          call alloc(slog_h_si,slog_he_si,'slog_h_si','slog_he_si')
          call alloc(ulog_h_si,ulog_he_si,'ulog_h_si','ulog_he_si')
-     
+
          contains
-         
+
          subroutine alloc(info_h,info_he,name_h,name_he)
             ! set up the interpolation information
             type (scvh_info) :: info_h,info_he
@@ -109,9 +109,9 @@
          character (len=*),intent(IN) :: data_dir
 
          integer :: j
-         
+
          include 'formats'
-         
+
          ! NOTE: logPs and logTs must be in monotonic increasing order
 
          do j=1,NlogPs
@@ -122,45 +122,45 @@
             logTs(j) = logT_min + (j-1)*dlogT ! store logT values in logTs
          end do
          if (abs(logTs(NlogTs)-logT_max) > 1d-4) call do_stop('read_data_for_scvh expects max logT of 7.06')
-         
+
          call read_file_for_scvh(data_dir,'scvh/h_tab.asc.data',num_h_pts,NlogPs,NlogTs,
      >         compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
          call read_file_for_scvh(data_dir,'scvh/he_tab.asc.data',num_he_pts,NlogPs,NlogTs,
      >         compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
-         
-         
+
+
          if (.false.) then
             call write_file_for_scvh(data_dir,'scvh/h_tab.new.data',num_h_pts,NlogPs,NlogTs,
      >         compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
             call write_file_for_scvh(data_dir,'scvh/he_tab.new.data',num_he_pts,NlogPs,NlogTs,
      >         compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
-         
+
          end if
-         
-         
+
+
          call fill_and_smooth(compv1_h_si)
          call fill_and_smooth(compv2_h_si)
          call fill_and_smooth(denlog_h_si,6d0,-15d0)
          call fill_and_smooth(slog_h_si)
          call fill_and_smooth(ulog_h_si)
-         
+
          call fill_and_smooth(compv1_he_si)
          call fill_and_smooth(compv2_he_si)
          call fill_and_smooth(denlog_he_si,6d0,-15d0)
          call fill_and_smooth(slog_he_si)
          call fill_and_smooth(ulog_he_si)
-         
-         ! do extra smoothing of compv1_he for logT < 4.5 and logP > 11.0 in 
+
+         ! do extra smoothing of compv1_he for logT < 4.5 and logP > 11.0 in
          ! this is where we get problems from the He+ to He++ pressure ionization
          !call extra_smoothing(compv1_he_si,1,logTs(1),4.5d0,10d0,logPs(NlogPs))
-         
+
          !call extra_smoothing(compv1_h_si,1,logTs(1),3.5d0,logPs(1),8d0)
          !call extra_smoothing(compv2_h_si,100,logTs(1),3.5d0,2d0,8d0)
-         
-                  
+
+
          contains
-         
-         
+
+
          subroutine fill_and_smooth(si,val_lr,val_ul)
             type (scvh_info) :: si
             double precision,intent(in),optional :: val_lr,val_ul
@@ -212,42 +212,42 @@
                   end do
                end do
             end do
-            
-            
+
+
             ! smooth the added entries
             do i = 1,20
                do j = 2,NlogTs-1
-               
+
                   kmax = k_for_MAX_logP(j)
                   do k = kmax,NlogPs-1
-                     si% Z(k,j) = 
-     >                  (si% Z(k,j) 
-     >                  + si% Z(k,j-1) 
-     >                  + si% Z(k,j+1) 
-     >                  + si% Z(k-1,j) 
+                     si% Z(k,j) =
+     >                  (si% Z(k,j)
+     >                  + si% Z(k,j-1)
+     >                  + si% Z(k,j+1)
+     >                  + si% Z(k-1,j)
      >                  + si% Z(k+1,j)) / 5
                   end do
                   si% Z(NlogPs,j) = si% Z(NlogPs-1,j)
 
                   kmin = k_for_MIN_logP(j)
                   do k = 2,kmin-1
-                     si% Z(k,j) = 
-     >                  (si% Z(k,j) 
-     >                  + si% Z(k,j-1) 
-     >                  + si% Z(k,j+1) 
-     >                  + si% Z(k-1,j) 
+                     si% Z(k,j) =
+     >                  (si% Z(k,j)
+     >                  + si% Z(k,j-1)
+     >                  + si% Z(k,j+1)
+     >                  + si% Z(k-1,j)
      >                  + si% Z(k+1,j)) / 5
                   end do
                   si% Z(1,j) = si% Z(2,j)
-                  
+
                end do
             end do
-            
+
             si% f(1,:,:) = si% Z(:,:)
 
          end subroutine fill_and_smooth
-         
-         
+
+
          subroutine extra_smoothing(si,n,logT_lo,logT_hi,logP_lo,logP_hi)
             type (scvh_info) :: si
             integer,intent(in) :: n
@@ -260,19 +260,19 @@
                   if (logTs(j) < logT_lo .or. logTs(j) > logT_hi) cycle
                   do k = 2,NlogPs-1
                      if (logPs(k) < logP_lo .or. logPs(k) > logP_hi) cycle
-                     Z(k,j) = 
-     >                  (Z(k,j) 
-     >                  + Z(k,j-1) 
-     >                  + Z(k,j+1) 
-     >                  + Z(k-1,j) 
+                     Z(k,j) =
+     >                  (Z(k,j)
+     >                  + Z(k,j-1)
+     >                  + Z(k,j+1)
+     >                  + Z(k-1,j)
      >                  + Z(k+1,j)) / 5
                   end do
                end do
-            end do                        
-            si% f(1,:,:) = Z(:,:)            
+            end do
+            si% f(1,:,:) = Z(:,:)
          end subroutine extra_smoothing
-                  
-     
+
+
       end subroutine read_data_for_scvh
 
 
@@ -395,7 +395,7 @@
          double precision,intent(in) :: logT,logP,pres
          double precision,intent(out) :: den_h,den_he
          integer,intent(out) :: info
-         double precision :: 
+         double precision ::
      1      ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
      1      ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
      1      xnh,dxnh_dlogT,dxnh_dlogP,
@@ -413,7 +413,7 @@
      >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
      >      logT,logP,pres,info)
       end subroutine interp_densities
-      
+
 
       subroutine interp_vals_bicub(
      1      only_densities,search_for_SCVH,
@@ -425,7 +425,7 @@
      >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
      >      logT,logP,pres,info)
          logical,intent(in) :: only_densities,search_for_SCVH
-         double precision,intent(out) :: 
+         double precision,intent(out) ::
      1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
      1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
      1      xnh,dxnh_dlogT,dxnh_dlogP,
@@ -438,15 +438,15 @@
          integer,parameter :: NIP = 1
          double precision :: XI(NIP),YI(NIP),ZI(NIP),max_logP,d_dlogT,d_dlogP
          integer :: j,jT,kP
-         
-         
+
+
          include 'formats'
 
          info = 0
-         
+
          XI(1) = logP
          YI(1) = logT
-         
+
          jT = locate_logT(logT)
          kP = k_for_max_logP(jT)
          max_logP = logPs(kP)
@@ -458,13 +458,13 @@
          den_h = 10.0**interp_value(num_h_pts,denlog_h_si); if (info /= 0) return
          dddpress_ct_h = d_dlogP
          dddt_cp_h = d_dlogT
-                
+
          den_he = 10.0**interp_value(num_he_pts,denlog_he_si); if (info /= 0) return
          dddpress_ct_he = d_dlogP
          dddt_cp_he = d_dlogT
-         
+
          if (only_densities) return
-         
+
          !..hydrogen section
 
          !..number concentration of h2 molecules
@@ -482,7 +482,7 @@
             dxnh2_dlogT = d_dlogT
          end if
 
-         !..number concentration of neutral h atoms 
+         !..number concentration of neutral h atoms
          xnh = interp_value(num_h_pts,compv2_h_si); if (info /= 0) return
          if (xnh > 1) then
             xnh = 1
@@ -496,7 +496,7 @@
             dxnh_dlogP = d_dlogP
             dxnh_dlogT = d_dlogT
          end if
-         
+
          if (xnh + xnh2 > 1) then
             if (xnh > xnh2) then
                xnh = 1d0 - xnh2
@@ -513,7 +513,7 @@
          entr_h = 10.0**interp_value(num_h_pts,slog_h_si); if (info /= 0) return
          dsdpress_ct_h = d_dlogP
          dsdt_cp_h = d_dlogT
-         
+
          !..internal energy in erg/g
          ener_h = 10.0**interp_value(num_h_pts,ulog_h_si); if (info /= 0) return
 
@@ -549,7 +549,7 @@
             dxnhep_dlogP = d_dlogP
             dxnhep_dlogT = d_dlogT
          end if
-         
+
          if (xnhe + xnhep > 1) then
             if (xnhe > xnhep) then
                xnhe = 1d0 - xnhep
@@ -570,8 +570,8 @@
          !..internal energy in erg/g
          ener_he = 10.0**interp_value(num_he_pts,ulog_he_si); if (info /= 0) return
 
-               
-         
+
+
          contains
 
 
@@ -593,7 +593,7 @@
             integer :: ict(6)                    ! code specifying output desired
             double precision :: fval(6)          ! output data
             include 'formats'
-            
+
             ierr = 0
             if (si% needs_initialization) then
                ibcxmin = 0; bcxmin(:) = 0
@@ -629,10 +629,10 @@
                interp_value = 0
             end if
             si% needs_initialization = .false.
-            
+
          end function interp_value
-      
-      
+
+
       end subroutine interp_vals_bicub
 
 
@@ -660,12 +660,12 @@
       logical,intent(in) :: include_radiation
       logical,intent(in) :: search_for_SCVH
       double precision,intent(inout) :: logT,logRho,T,Rho,xmassh1
-      double precision,intent(out) ::  
+      double precision,intent(out) ::
      >               logPgas,logE,logS,chiRho,chiT,
      >               Cp,Cv,dE_dRho,dS_dT,dS_dRho,
      >               mu,gamma1,gamma3,grad_ad,logNe
       integer,intent(out) :: info ! returned = 0 if AOK
-     
+
       double precision dpressdd,dpressdt,ener,dedd,
      >      xnh,dxnh_dlogT,dxnh_dlogP,
      >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
@@ -673,7 +673,7 @@
      >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
      >      xnhp,xnhepp,P,entr,dsdd,dsdt,xtra,
      >      dxdd,dxdt,Ne,log_free_e,log_free_e0,log_free_e1,kt,theta
-      
+
       double precision xmasshe4,dedt
 
 !..local variables
@@ -722,7 +722,7 @@
      1                  mhe4    = 6.646442d-24,third   = 1.0d0/3.0d0)
 
       logical,parameter :: pure_splines = .true.,DT_flag = .true.
-      
+
       integer,parameter :: lrpar=3,lipar=0
       integer, target :: ipar_array(lipar)
       double precision, target :: rpar_array(lrpar)
@@ -747,7 +747,7 @@
       if (Rho < Rho_min) then
          Rho = Rho_min; logRho = log10(Rho)
       end if
-      
+
       xnh2    = small_value
       xnh     = small_value
       xnhe    = small_value
@@ -828,7 +828,7 @@
          write(*,1) 'scvh: failed in get_values,logRho,logT',logRho,logT
          stop 1
       end if
-      
+
       if (dsdt_cp_h <= 0 .or. dsdt_cp_he <= 0) then ! indicates off table
          info = -1
          return
@@ -878,9 +878,9 @@
      >     xnhe,dxnhe_dlogT,dxnhe_dlogP,
      >     xnhep,dxnhep_dlogT,dxnhep_dlogP,
      >     smix,d_smix_dT,d_smix_dP)
-      
+
       !smix = 0; d_smix_dT = 0; d_smix_dP = 0
-      
+
       ener = xmassh1*ener_h + xmasshe4*ener_he  ! eqn 40
       entr = xmassh1*entr_h + xmasshe4*entr_he + smix ! eqn 41
       if (.false.) then
@@ -922,7 +922,7 @@
       dtdpress_cs_hhe = T * inv_P  * dtdpress_cs_hhe
 
 
-!..form the usual thermodynamic derivatives 
+!..form the usual thermodynamic derivatives
 !..for hydrogen
 
 !..d(P)/ d(den)|t
@@ -992,21 +992,21 @@
          P = P     + prad
          dpressdd = dpressdd_hhe + dpressraddd
          dpressdt = dpressdt_hhe + dpressraddt
-   
+
          ener = ener     + erad
          dedd = dedd_hhe + deraddd
          dedt = dedt_hhe + deraddt
-         
+
          entr = entr     + srad
          dsdd = dsdd_hhe + dsraddd
          dsdt = dsdt_hhe + dsraddt
       else
          dpressdd = dpressdd_hhe
          dpressdt = dpressdt_hhe
-   
+
          dedd = dedd_hhe
          dedt = dedt_hhe
-   
+
          dsdd = dsdd_hhe
          dsdt = dsdt_hhe
       end if
@@ -1015,7 +1015,7 @@
 
       logE = log10(ener)
       logS = log10(entr)
-            
+
       Cv = dedt
       dE_dRho = dedd
       dS_dT = dsdt
@@ -1023,19 +1023,19 @@
 
       chiRho = dpressdd * Rho / P
       chiT = dpressdt * T / P
-      
-      gamma3 = 1 + dpressdt / (Rho * dedt)   
+
+      gamma3 = 1 + dpressdt / (Rho * dedt)
       grad_ad = dtdpress_cs_hhe/(T * inv_P)
       gamma1 = (gamma3 - 1) / grad_ad ! C&G 9.88 & 9.89
-      
+
       Cp = Cv + P * chiT**2 / (Rho * T * chiRho) ! C&G 9.86
-      
+
 
 
       xnhp = max(0d0,min(1d0,1 - (xnh2 + xnh)))
       xnhepp = max(0d0,min(1d0,1 - (xnhep + xnhe)))
       mu = xmassh1 * (xnhp / 2 + xnh + 2 * xnh2) + 4 * (1 - xmassh1) * (xnhepp / 3 + xnhep / 2 + xnhe)
-      
+
       Ne = Rho * avo * (xmassh1 * xnhp + (1 - xmassh1) * (xnhep + 2 * xnhepp) / 4 )
       if (Ne < 1d-99) Ne = 1d-99
       logNe = log10(Ne)
@@ -1051,7 +1051,7 @@
          write(*,1) 'xmassh1',xmassh1
          write(*,*)
       end if
-      
+
 
       if (.false.) then
          write(*,1) 'logT',logT
@@ -1083,9 +1083,9 @@
          write(*,1) 'inv_Rho',inv_Rho
          write(*,*)
       end if
-            
+
       contains
-      
+
       subroutine get_values(only_densities)
          logical,intent(in) :: only_densities
          info = 0
@@ -1099,9 +1099,9 @@
      >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
      >      logT,logP,P,info)
       end subroutine get_values
-      
+
       end subroutine interpolate_scvh
-      
+
 
 
       double precision function fscvh(logP,dfdlogP,lrpar,rpar,lipar,ipar,ierr)
@@ -1113,7 +1113,7 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          double precision, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer,intent(out) :: ierr
-         
+
          double precision :: logT,P,Rho,logRho_new,logRho_target,dddpress,
      1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
      1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
@@ -1163,7 +1163,7 @@
          if (dbg) write(*,1) 'DP/PR',fscvh/dfdlogP/logP
          if (dbg) write(*,1) 'fscvh',fscvh
       end function fscvh
-      
+
 
 
       subroutine entropy_of_mixing(
@@ -1190,7 +1190,7 @@
      >      num,dnum_dP,dnum_dT,
      >      denom,ddenom_dP,ddenom_dT,
      >      gama,dgama_dP,dgama_dT,
-     >      delt,ddelt_dP,ddelt_dT,        
+     >      delt,ddelt_dP,ddelt_dT,
      >      a,da_dP,da_dT,
      >      b1,db1_dT,db1_dP,
      >      b21,db21_dT,db21_dP,
@@ -1205,7 +1205,7 @@
      >      b,db_dT,db_dP
 
          include 'formats'
-         
+
          if (xnh_in > 1d0) then
             xnh = 1d0
             dxnh_dP = 0
@@ -1219,7 +1219,7 @@
             dxnh_dP = 0
             dxnh_dT = 0
          end if
-         
+
          if (xnh2_in > 1d0) then
             xnh2 = 1d0
             dxnh2_dP = 0
@@ -1247,7 +1247,7 @@
             dxnhe_dP = 0
             dxnhe_dT = 0
          end if
-         
+
          if (xnhep_in > 1d0) then
             xnhep = 1d0
             dxnhep_dP = 0
@@ -1261,9 +1261,9 @@
             dxnhep_dP = 0
             dxnhep_dT = 0
          end if
-      
-         beta = (mh1 * (xmasshe4+tiny)) / (mhe4 * (xmassh1 + tiny)) 
-      
+
+         beta = (mh1 * (xmasshe4+tiny)) / (mhe4 * (xmassh1 + tiny))
+
          num = 1.5d0*(1 + xnh + 3*xnh2)
          dnum_dP = 1.5d0*(dxnh_dP + 3*dxnh2_dP)
          dnum_dT = 1.5d0*(dxnh_dT + 3*dxnh2_dT)
@@ -1299,51 +1299,51 @@
             ddelt_dP = dnum_dP/denom - ddenom_dP*delt/denom
             ddelt_dT = dnum_dT/denom - ddenom_dT*delt/denom
          end if
-      
+
          a = xmassh1/mh1*(2/(1 + xnh + 3*xnh2))
          da_dP = -a*(dxnh_dP + 3*dxnh2_dP)/(1 + xnh + 3*xnh2)
          da_dT = -a*(dxnh_dT + 3*dxnh2_dT)/(1 + xnh + 3*xnh2)
-      
+
          b1 = log(1 + beta*gama)
          db1_dT = beta*dgama_dT/(1 + beta*gama)
          db1_dP = beta*dgama_dP/(1 + beta*gama)
-      
+
          b21 = 0.5d0*(1-xnh2-xnh)
          db21_dT = 0.5d0*(-dxnh2_dT-dxnh_dT)
          db21_dP = 0.5d0*(-dxnh2_dP-dxnh_dP)
-      
+
          b22 = log(1 + delt)
          db22_dT = ddelt_dT/(1 + delt)
          db22_dP = ddelt_dP/(1 + delt)
-      
+
          b2 = b21*b22
          db2_dT = db21_dT*b22 + b21*db22_dT
          db2_dP = db21_dP*b22 + b21*db22_dP
-      
+
          b31 = beta*gama
          db31_dT = beta*dgama_dT
          db31_dP = beta*dgama_dP
-      
+
          b32 = log(1 + 1/(beta*gama))
          db32_dT = -dgama_dT/(gama*(1 + beta*gama))
          db32_dP = -dgama_dP/(gama*(1 + beta*gama))
-      
+
          b331 = log(1 + 1/delt)
          db331_dT = -ddelt_dT/(delt*(1 + delt))
          db331_dP = -ddelt_dP/(delt*(1 + delt))
-      
+
          b332 = (2-2*xnhe-xnhep)/3
          db332_dT = (-2*dxnhe_dT-dxnhep_dT)/3
          db332_dP = (-2*dxnhe_dP-dxnhep_dP)/3
-      
+
          b33 = b331*b332
          db33_dT = db331_dT*b332 + b331*db332_dT
          db33_dP = db331_dP*b332 + b331*db332_dP
-      
+
          b3 = b31*(b32 - b33)
          db3_dT = db31_dT*(b32 - b33) + b31*(db32_dT - db33_dT)
          db3_dP = db31_dP*(b32 - b33) + b31*(db32_dP - db33_dP)
-      
+
          b = b1 - b2 + b3
          db_dT = db1_dT - db2_dT + db3_dT
          db_dP = db1_dP - db2_dP + db3_dP
@@ -1351,9 +1351,9 @@
          smix = kerg*a*b
          d_smix_dT = kerg*(a*db_dT + da_dT*b)
          d_smix_dP = kerg*(a*db_dP + da_dP*b)
-         
+
          return
-         
+
          if (P < 1d12) return
          write(*,1) 'T',T
          write(*,1) 'P',P
@@ -1382,7 +1382,7 @@
          !write(*,1) '',
          !write(*,1) '',
          !write(*,1) '',
-         
+
 !   >     ,dxnh_dlogT,dxnh_dlogP,
 !   >     ,dxnh2_dlogT,dxnh2_dlogP,
 !   >     ,dxnhe_dlogT,dxnhe_dlogP,

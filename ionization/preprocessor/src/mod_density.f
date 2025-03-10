@@ -35,7 +35,7 @@
          type (datastruct), intent(inout) :: args
 
          qi_total = sum( args%zs(:)*args%niinf(:) * exp( - args%zs(:)*args%xi ) )
-      
+
       end function qi_total
 
 
@@ -68,18 +68,18 @@
             ne_total = gfdi(1/2.0_dp, chi+xi, tau) + tau * gfdi(3/2.0_dp, chi+xi, tau)
             ne_total = ne_total * C_NE * (tau*C_MCC)**(3/2.0_dp)
          end if
-   
+
       end function ne_total
 
 
       ! total plasma (= at infinity, no potential) electron density
       real (dp) function ne_plasma(chi, tau)
-      
+
          real (dp), intent(in) :: chi, tau
-      
+
          ne_plasma = gfdi(1/2.0_dp, chi, tau) + tau * gfdi(3/2.0_dp, chi, tau)
          ne_plasma = ne_plasma * C_NE * (tau*C_MCC)**(3/2.0_dp)
-      
+
       end function ne_plasma
 
 
@@ -103,11 +103,7 @@
             ne_bound = bound_integral(args)
             ne_bound = ne_bound * C_NE * (tau*C_MCC)**(3/2.0_dp)
          end if
-   
+
       end function ne_bound
 
-
       end module mod_density
-   
-   
-   

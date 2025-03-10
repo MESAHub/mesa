@@ -39,9 +39,9 @@ C NSET = Number of node sets.
 C NFUN = Number of test functions.
 C
       DATA LOUT/6/, NSET/5/, NFUN/10/
-      
+
 C Specify test parameters
-C      
+C
       KS = 2
       KFF = 1
       KFL = 10
@@ -157,10 +157,10 @@ C
   520 FORMAT (///1X,14X,'*** Error in CSHEP2 -- all nodes ',
      .        'are collinear ***')
       END
-      
-      
-      
-      
+
+
+
+
       SUBROUTINE TESTDT_db (K, N,X,Y)
       DOUBLE PRECISION X(100), Y(100)
       INTEGER K, N
@@ -453,7 +453,7 @@ C
       ENDIF
       RETURN
       END
-      
+
       SUBROUTINE TSTFN1_db (K,X,Y,IFLAG, F,FX,FY)
       INTEGER K, IFLAG
       DOUBLE PRECISION X, Y, F, FX, FY
@@ -660,9 +660,9 @@ C
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       RETURN
       END
-      
-      
-      
+
+
+
       SUBROUTINE TSTFN2_db (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
       INTEGER K, IFLAG
       DOUBLE PRECISION X, Y, F, FX, FY, FXX, FXY, FYY
@@ -676,7 +676,7 @@ C                                           renka@cs.unt.edu
 C                                                   10/14/98
 C
 C   This subroutine computes the value and, optionally, the
-C first and/or second partial derivatives of one of ten 
+C first and/or second partial derivatives of one of ten
 C bivariate test functions.  The first six functions were
 C chosen by Richard Franke to test interpolation software.
 C (See the reference below.)  The last four functions repre-
@@ -938,4 +938,3 @@ C
      .             (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
       RETURN
       END
-

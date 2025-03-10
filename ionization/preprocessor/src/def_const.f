@@ -32,14 +32,14 @@
       ! physical constants in cgs
 
       real (dp), parameter :: clight     = 2.99792458e10_dp
-      real (dp), parameter :: ggrav      = 6.6742e-8_dp 
-      real (dp), parameter :: hplanck    = 6.6260693e-27_dp 
+      real (dp), parameter :: ggrav      = 6.6742e-8_dp
+      real (dp), parameter :: hplanck    = 6.6260693e-27_dp
       real (dp), parameter :: hbar       = hplanck / twopi
-      real (dp), parameter :: kb         = 1.3806505e-16_dp 
+      real (dp), parameter :: kb         = 1.3806505e-16_dp
       real (dp), parameter :: mn         = 1.6749286e-24_dp ! neutron mass (g)
       real (dp), parameter :: mp         = 1.6726231e-24_dp ! proton mass (g)
       real (dp), parameter :: me         = 9.1093826e-28_dp ! electron mass (g)
-      real (dp), parameter :: qe         = 4.80320440e-10_dp 
+      real (dp), parameter :: qe         = 4.80320440e-10_dp
 
       real (dp), parameter :: rbohr      = 5.2917721e-9_dp        ! Bohr radius (cm)
       !real (dp), parameter :: rbohr      = hbar*hbar / (me*qe*qe) ! Bohr radius (cm)
@@ -78,6 +78,4 @@
       real (dp), parameter :: sec_yr     = 3.1558149984e7_dp   ! seconds per year
       real (dp), parameter :: sec_gyr    = 3.1558149984e16_dp  ! seconds per gigayear
 
-
       end module def_const
-

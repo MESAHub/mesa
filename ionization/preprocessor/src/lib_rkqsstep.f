@@ -1,7 +1,7 @@
 !
 ! rkqsstep
 ! francois hebert, 09/09/01
-! 
+!
 ! code taken from numerical recipes -- integrates by one step
 !
 ! i have added a new argument, args, meant to be a struct for passing
@@ -119,7 +119,7 @@
          contains
 
 
-      !  
+      !
       ! rkck
       !
       ! takes a single dumb rk step, and returns error estimate
@@ -146,12 +146,12 @@
             real (dp), dimension(size(y)) :: ak2, ak3, ak4, ak5, ak6, ytemp
 
             ! while rkck remains a private subroutine called by rkqs, we know these arrays
-            ! will have the same length. however, this check should be uncommented if rkck  
+            ! will have the same length. however, this check should be uncommented if rkck
             ! becomes a public subroutine!
             !if ( size(y) /= size(dydx) .or. size(dydx) /= size(yout) &
             !  .or. size(yout) /= size(yerr) ) then
             !  call alert(1, '(rkck) different sized vectors in input')
-            !end if  
+            !end if
 
             ! first step
             ytemp = y + dx*b21*dydx
@@ -179,10 +179,9 @@
             yout = y + dx*(c1*dydx + c3*ak3 + c4*ak4 + c6*ak6)
             ! estimate error as difference between fourth and fifth order methods
             yerr = dx * (dc1*dydx + dc3*ak3 + dc4*ak4 + dc5*ak5 + dc6*ak6)
-   
+
          end subroutine rkck
-   
+
       end subroutine rkqs
 
       end module lib_rkqsstep
-

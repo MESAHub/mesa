@@ -34,7 +34,7 @@
 !they provide the best coverage of the Teff-logg plane. C&K tables are layered on
 !top of the Eddington table and then PHOENIX (only at cool Teff) are layered on
 !top of the C&K tables.
-!Three types of tables to work with are: 
+!Three types of tables to work with are:
 !   1. Eddington T-tau to fill in holes   [ T:2,500-50,000K, logg: -0.5 - 5.5 (nT_Ttau=80) ]
 !   2. Castelli & Kurucz model atmosphere [ T:3,500-50,000K, logg:  0.0 - 5.0 (nT_ck  =76) ]
 !   3. PHOENIX model atmosphere           [ T:2,000-10,000K, logg: -0.5 - 5.5 (nT_phx =33) ]
@@ -155,7 +155,7 @@
          enddo
          ibound(j)=i
       enddo
-      
+
       ! fill and smooth so bicubic splines will be happy
       P_all(1,nT_all) = Pfill
       Pinterp_max = 0
@@ -181,7 +181,7 @@
             end do
          end do
       end do
-   
+
       ! smooth
       do i=1,20
          do ii=1,ng
@@ -196,9 +196,9 @@
             end do
          end do
       end do
-         
-      
-      
+
+
+
 
       !write out combined table
       open(4,file=f_output)
@@ -211,10 +211,10 @@
       close(4)
 
       contains
-      
+
       real(dp) function transparency(i,zero)
       integer :: i,zero         !transparency tells what fraction of the data point
-      if(i>=zero) then          !in question to apply to the final table.  if the 
+      if(i>=zero) then          !in question to apply to the final table.  if the
          transparency=0d0       !point is near the edge of the table, it is more
       else if(i == zero-1) then !"transparent" i.e. receives less weight
          transparency=0.25d0
@@ -226,5 +226,5 @@
          transparency=1d0
       endif
       end function transparency
-      
+
       end program table_merge

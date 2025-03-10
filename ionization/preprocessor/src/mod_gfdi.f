@@ -96,9 +96,9 @@
                      end if
                   end if
                end if
-            
+
             end function f_gfdi
-   
+
       end function gfdi
 
       end module mod_gfdi

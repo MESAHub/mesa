@@ -53,7 +53,7 @@
          dlast = 0.0_dp
 
          do, istep=1, max_iter
-      
+
             call d_fasttfdh(x, y, dydx, args)
             yscal(:) = abs(y(:)) + abs(dx*dydx(:)) + tiny
             if ((x+dx-xfinal)*(x+dx-xinit) > 0) dx = xfinal - x
@@ -85,13 +85,13 @@
          end do
 
          call alert(1, '(tfdh_fast) too many steps!')
-   
+
       end function fasttfdh
 
 
 
       subroutine d_fasttfdh(x, y, dydx, args)
-   
+
          real (dp), intent(in) :: x
          real (dp), intent(in), dimension(:) :: y
          real (dp), intent(out), dimension(:) :: dydx
@@ -115,8 +115,3 @@
 
 
       end module mod_fast_tfdh
-
-
-   
-   
-   

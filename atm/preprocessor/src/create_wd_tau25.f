@@ -24,28 +24,28 @@
       use utils_lib, only: mesa_error
 
       implicit none
-      
+
       integer, parameter :: nt = 381, ng = 41
       real(dp), parameter :: min_logg = 5.5d0, max_logg = 9.5d0, dlogg = 0.1d0
       real(dp), parameter :: min_Teff = 2d3, max_Teff = 40d3, dTeff = 100d0
       real(dp), dimension(ng,nt) :: lnT6, lnP15, lnq, lnX
       real(dp) :: Teff(nt), logg(ng), T(ng,nt), Pgas(ng,nt)
-      
+
       contains
-      
-      
+
+
       subroutine build_wd_tau_25_tables
          use const_lib
          character (len=256) :: fname_in, fname_out, line, my_mesa_dir
          integer :: i, j, iounit, ierr, iounit_out, k
          real(dp) :: Prad, Teff_in, logg_in
-         
+
          include 'formats'
 
          my_mesa_dir = '../..'
-         call const_init(my_mesa_dir, ierr)      
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
-         
+         call const_init(my_mesa_dir, ierr)
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+
          do i=1,ng
             logg(i) = min_logg + (i-1)*dlogg
          end do
@@ -55,19 +55,19 @@
             end do
             stop 'bad logg range for wd tau25'
          end if
-         
+
          do i=1,nT
             Teff(i) = min_Teff + (i-1)*dTeff
          end do
          if (abs(max_Teff - Teff(nT)) > 1d-6) then
             stop 'bad Teff range for wd tau25'
          end if
-         
-         
+
+
          ierr = 0
          iounit = 99
          iounit_out = 98
-         
+
          fname_in = 'atm_input_data/wd_atm_tables/boundary_conditions.dat'
          open(iounit,file=trim(fname_in),action='read',status='old',iostat=ierr)
          if (ierr /= 0) then
@@ -81,7 +81,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          k = 19
          do j = 1,ng
             do i=nt,1,-1 ! input has Teff in decreasing order
@@ -99,7 +99,7 @@
          end do
          close(iounit)
 
-         
+
          do i=1,nt
             do j=1,ng
                T(j,i) = exp(lnT6(j,i))*1d6
@@ -111,22 +111,22 @@
                end if
             end do
          end do
-         
-         
+
+
          fname_out = 'atm_data/wd_25.tbl'
          open(iounit_out,file=trim(fname_out),action='write',iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(fname_out)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          fname_in = 'atm_data/wd_tau25_header.txt'
          open(iounit,file=trim(fname_in),action='read',status='old',iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(fname_in)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          do i=1,2
             read(iounit,'(a)',iostat=ierr) line
             if (ierr /= 0) then
@@ -136,7 +136,7 @@
             write(iounit_out,'(a)') line
          end do
 
-         write(iounit_out,'(a15)',advance='no') "#Teff(K)| Pgas@" 
+         write(iounit_out,'(a15)',advance='no') "#Teff(K)| Pgas@"
          do i = 1, ng
             write(iounit_out,fmt='("  log g =",f5.2," ")',advance='no') logg(i)
          end do
@@ -149,7 +149,7 @@
             write(iounit_out,*)
          end do
 
-         write(iounit_out,'(a15)',advance='no') "#Teff(K)|    T@" 
+         write(iounit_out,'(a15)',advance='no') "#Teff(K)|    T@"
          do i = 1, ng
             write(iounit_out,fmt='("  log g =",f5.2," ")',advance='no') logg(i)
          end do
@@ -161,14 +161,14 @@
             end do
             write(iounit_out,*)
          end do
-         
+
          close(iounit_out)
 
       end subroutine build_wd_tau_25_tables
-   
-      
+
+
       end module mod_wd_tau_25
-      
+
 
       program create_wd_tau_25
       use mod_wd_tau_25

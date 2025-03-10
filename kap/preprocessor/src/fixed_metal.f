@@ -25,35 +25,35 @@
       use kap_support
       use math_lib
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
       contains
-      
-      
+
+
       subroutine Do_Test(data_dir, type1_table)
          character (len=*), intent(in) :: data_dir, type1_table
          real(dp) :: Zbase, X, XC, XO, Rho, logRho, T, logT, logK, logR
          integer :: info
          logical, parameter :: co_enhanced = .false.
-         
+
          1 format(a40,1p e26.16)
-         
+
          Zbase = 0.01d0
          X = 0.70d0
          XC = 0d0
          XO = 0d0
-   
+
          call setup( &
             co_enhanced, data_dir, type1_table, Zbase, X, XC, XO)
-         
+
          ! NOTE: you must have a logR that matches the OPAL tables
          logR = -6d0
          logT = 6d0
          logRho = logR + 3*logT - 18
          T = 10**logT
          rho = 10**logRho
-         
+
          write(*,1) 'logR', logR
          write(*,1) 'logT', logT
          write(*,1) 'logRho', logRho
@@ -65,13 +65,13 @@
          call Get_Results( &
             Zbase, X, XC, XO, Rho, logRho, T, logT,  &
             logK, co_enhanced, data_dir, type1_table, .false., info)
-            
+
          write(*,*) 'info', info
          write(*,1) 'logK', logK
          write(*,1) 'kap', 10**logK
          write(*,*)
          stop 'Do_Test'
-         
+
       end subroutine Do_Test
 
 
@@ -119,7 +119,7 @@
                Xs(num_Xs) =  0.97d0
             case (400)            ! Z = 0.04
                Xs(num_Xs) =  0.96d0
-            case (600)            ! Z = 0.06 
+            case (600)            ! Z = 0.06
                num_Xs = max_num_Xs-1
                Xs(num_Xs) = 0.94d0
             case (800)            ! Z = 0.08
@@ -144,10 +144,10 @@
                Z, Xs(ix), output_dir, data_dir, type1_table, header_info, file_prefix, &
                table_version)
          end do
-          
+
       end subroutine Write_Files
-      
-      
+
+
       subroutine Do_Table( &
          Z_in, X, output_dir, data_dir, type1_table, header_info, file_prefix, &
          table_version)
@@ -158,25 +158,25 @@
       integer, parameter :: file_type = 1
       real(dp), parameter :: XC = 0, XO = 0
       logical, parameter :: co_enhanced = .false.
-      
+
       real(dp) :: logR, logT, T, logRho, Rho, logK
       integer :: i, j, io_unit, ios, info
       character (len=256) :: fname
-      
+
       include 'formats'
 
       Z = Z_in
 
       io_unit = 34
-         
+
       call create_fname(Z, X, output_dir, file_prefix, fname)
-      
+
       open(unit=io_unit, file=trim(fname), action='write', status='replace', iostat=ios)
       if (ios /= 0) then
          write(*,*) 'fixed_metal Do_Table failed to open ', trim(fname)
          call mesa_error(__FILE__,__LINE__)
       end if
-   
+
       call setup( &
          co_enhanced, data_dir, type1_table, Z, X, XC, XO)
 
@@ -187,7 +187,7 @@
       write(io_unit,advance='no',fmt='(i8,2x,i10,2(2x,F10.6))') file_type, table_version, X, Z
       write(io_unit,advance='no',fmt='(2x,I10,2(2x,F10.6))') logR_points, logR_min, logR_max
       write(io_unit,fmt='(2x,I10,2(2x,F10.6))') logT_points, logT_min, logT_max
-      
+
       ! data
       write(io_unit,'(/,a)') '   logT                       logR = logRho - 3*logT + 18'
 
@@ -198,9 +198,9 @@
       enddo
       write(io_unit, *)
       write(io_unit, *)
-      
+
       write(*,*) trim(fname)
-         
+
       do i=1, logT_points
          logT = output_logTs(i)
          T = 10 ** logT
@@ -220,34 +220,32 @@
          write(io_unit,*)
       enddo
       write(io_unit,*)
-      
+
       close(io_unit)
-      
+
       end subroutine Do_Table
-      
-      
+
+
       subroutine create_fname(Z, X, output_dir, file_prefix, fname)
          real(dp), intent(in) :: Z, X
          character (len=*), intent(in) :: output_dir, file_prefix
          character (len=*), intent(out) :: fname
          character (len=8) :: zstr, xstr
          integer :: ierr
-         
+
          if (Freedman_flag) then
             call get_output_string(Z,zstr,ierr)
             if (ierr/=0) call mesa_error(__FILE__,__LINE__)
             fname = trim(output_dir) // '/' // trim(file_prefix)// '_z' // &
                trim(zstr) // '.data'
-         else     
+         else
             call get_output_string(Z,zstr,ierr)
             call get_output_string(X,xstr,ierr)
             if (ierr/=0) call mesa_error(__FILE__,__LINE__)
             fname = trim(output_dir) // '/' // trim(file_prefix)// '_z' // &
                trim(zstr) // '_x' // trim(xstr) // '.data'
          end if
-            
-      end subroutine create_fname
-      
-      
-      end module create_fixed_metal_tables  
 
+      end subroutine create_fname
+
+      end module create_fixed_metal_tables

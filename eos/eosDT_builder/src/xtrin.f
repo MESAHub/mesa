@@ -1,5 +1,4 @@
 
-
 c     Calling propram should contain something like following lines.
 c     See subroutine esac for definitions
       parameter (mx=5,mv=10,nr=169,nt=197)
@@ -25,7 +24,7 @@ c                                            if fixedTP='yes'
 
 !..***********************************************************************
       subroutine esac (xh,ztab,t6,r,iorder,irad,filename,info)
-!..... The purpose of this subroutine is to interpolate 
+!..... The purpose of this subroutine is to interpolate
 c      the equation of state and its derivatives in X, T6, density
 
 c        xh=hydrogen mass fraction
@@ -46,7 +45,7 @@ c            eos(2) is energy in 10**12 ergs/gm. Zero is zero T6
 c            eos(3) is the entropy in units of energy/T6
 c            eos(4) is dE/dRHO at constant T6
 c            eos(5) is the specific heat, dE/dT6 at constant V.
-c            eos(6) is dlogP/dlogRho at constant T6. 
+c            eos(6) is dlogP/dlogRho at constant T6.
 c                   Cox and Guil1 eq 9.82
 c            eos(7) is dlogP/dlogT6 at constant Rho.
 c                   Cox and Guil1 eq 9.81
@@ -63,13 +62,13 @@ c            irad  if =0 no radiation correction; if =1 adds radiation
 c            index(i),i=1,mv  sets order in which the equation of state
 c            variables are stored in eos(i).  Above order corresponds
 c            to block data statement:
-c                 data (index(i),i=1,11)/1,2,3,4,5,6,7,8,9,10,11/. 
-c            If you, for example, only want to return gamma1: set iorder=1 
+c                 data (index(i),i=1,11)/1,2,3,4,5,6,7,8,9,10,11/.
+c            If you, for example, only want to return gamma1: set iorder=1
 c            and set: data (index(i),i=1,11)/8,2,3,4,5,6,7,1,9,10,11/
 c
 c
       save
-		integer info ! returned = 0 if AOK
+      integer info ! returned = 0 if AOK
       character (len=256) filename
       real moles
       parameter (mx=5,mv=12,nr=169,nt=197)
@@ -77,7 +76,7 @@ c
       common/lreadco/itime
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),  
+      common/aeos/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -86,7 +85,7 @@ c
       dimension frac(7)
       data aprop/83.14511/
 
-		info = 0
+      info = 0
       blank=' '
       if (iorder .gt. mv ) then
          write (*,*) ' iorder cannot exceed ', mv
@@ -117,10 +116,10 @@ c
         call readcoeos(filename)
         z=zz(1)
         if (ztab .ne. z) then
-        		write (*,'("requested z=",f10.6," EOS5_data is for z=",
+           write (*,'("requested z=",f10.6," EOS5_data is for z=",
      x             f10.6)')
-     x    		ztab,z      
-        		stop 1
+     x       ztab,z
+           stop 1
         endif
 
         if(z+xh-1.e-6 .gt. 1 ) go to 61
@@ -206,7 +205,7 @@ c
         ipu=3
         if (k4 .gt. nt) ipu=2
       if (k3 .eq. 0) then
-      		write (*,'(" ihi,ilo,imd",3i5)')
+         write (*,'(" ihi,ilo,imd",3i5)')
       endif
 
 c     check to determine if interpolation indices fall within
@@ -325,7 +324,7 @@ c     table boundaries.  choose largest allowed size.
              is=1
            enddo
    47 continue
-   
+
 
       endif
 
@@ -352,22 +351,22 @@ c
       return
 
    61 continue
-		info = -61; return
-		write(*,'(" Mass fractions exceed unity (61)")')
+      info = -61; return
+      write(*,'(" Mass fractions exceed unity (61)")')
       stop 1
    62 continue
-		info = -62; return
-		write(*,'(" T6/LogR outside of table range (62)")')
+      info = -62; return
+      write(*,'(" T6/LogR outside of table range (62)")')
       write(*,*) 'T6', t6, 'LogR', log10(r), 'LogT', log10(t6*1d6)
       stop 1
    65 continue
-		info = -65; return
-		write(*,'("T6/log rho in empty region od table (65)")')
+      info = -65; return
+      write(*,'("T6/log rho in empty region od table (65)")')
       write (*,'("xh,t6,r=", 3e12.4)') xh,t6,r
       stop 1
    66 continue
-		info = -66; return
-		write(*,'(" Z does not match Z in EOS5_data* files you are",
+      info = -66; return
+      write(*,'(" Z does not match Z in EOS5_data* files you are",
      . " using (66)")')
       write (*,'("mf,zz(mf)=",i5,e12.4)') mf,zz(mf)
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)')
@@ -383,7 +382,7 @@ c     The purpose of this subroutine is to interpolate in T6 and rho
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),  
+      common/aeos/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
@@ -423,7 +422,7 @@ c
           esact=esact*dix+esact2*(1.-dix)
 c       endif   ! moved to loc a
         if(iq .eq. 3) then
- 
+
 !.....     eos(i) in upper-right 3x3.
           esactq2=quadeos(is,iw,slt,q(2),q(3),q(4),t6a(k2),t6a(k3),
      x            t6a(k4))
@@ -440,7 +439,7 @@ c
         endif
         if (esact .gt. 1.e+15) then
           write(*,'("Interpolation indices out of range",
-     x              ";please report conditions.")') 
+     x              ";please report conditions.")')
           stop 1
         endif
 
@@ -457,7 +456,7 @@ c
       real moles
       character*1 blank
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),  
+      common/aeos/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -474,7 +473,7 @@ c
 
         if (itimeco .ne. 12345678) then
         do i=1,mx
-          do j=1,mv 
+          do j=1,mv
             do k=1,nt
               do l=1,nr
                 xz(i,j,k,l)=1.e+35
@@ -484,19 +483,19 @@ c
         enddo
         itimeco=12345678
         endif
- 
+
       close (2)
 !..... read  tables
 c       call system (' gunzip EOS5_data')
 c       open(2, FILE='EOS5_data')
-		
+
        open(2, FILE=trim(filename), IOSTAT=ios)
       if (ios .ne. 0) then
          write(*,*) 'failed to open ', trim(filename)
          stop 1
       end if
- 
- 
+
+
       do 3 m=1,mx
       read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)')
      x  xin(m),zz(m),moles(m),tmass(m)
@@ -524,7 +523,7 @@ c     x      e14.4)') xin(m), rhogr(m,jcs)
          read (2,'(a)') blank
          go to 4
       endif
-      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') 
+      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)')
      x t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),
      x (xz(m,index(iv),i,jcs),iv=1,9)
     4 continue
@@ -535,7 +534,7 @@ c     x      e14.4)') xin(m), rhogr(m,jcs)
     2 continue
       read(2,'(a)') blank
     3 continue
- 
+
       do i=1,nt
          if(t6list(1,i) .eq. 0.0) then
             write(*,'("READCOEOS: Error:",i4,
@@ -554,7 +553,7 @@ c     x      e14.4)') xin(m), rhogr(m,jcs)
          dfsx(i)=1./(xx(i)-xx(i-1))
       enddo
 c       call system ('gzip EOS5_data')
-      
+
       return
       end
 c
@@ -606,7 +605,7 @@ c
       xc2=fracz*xc
       xn2=fracz*xn
       xo2=fracz*xo
-      xne2=fracz*xne 
+      xne2=fracz*xne
       xh=x/amas(7)
       xhe=(1.-x -z)/amas(6)
       xtot=xh+xhe+xc2+xn2+xo2+xne2
@@ -637,7 +636,7 @@ c
       common/eeos/esact,eos(mv)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
 
-      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, 
+      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/,
      x unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/
      x , sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
@@ -663,7 +662,7 @@ c     rat=rat*1.e+24  !   Convert degrees K to units 10**6 K (T replaced with T6
       molenak=moles*aprop  ! Mb-cc/unit T6
 
 !..---Calculate EOS without radiation correction
-      
+
       pt=eos(iri(1))
       et=eos(iri(2))
       st=eos(iri(3))
@@ -678,7 +677,7 @@ c     rat=rat*1.e+24  !   Convert degrees K to units 10**6 K (T replaced with T6
 
       if (irad .ne. 0) then
 !..-- Calculate EOS with radiation calculation
-      pr=4./3.*rat*t6**4   ! Mb 
+      pr=4./3.*rat*t6**4   ! Mb
       er=3.*pr/density   ! Mb-cc/gm
       sr=4./3.*er/t6   ! Mb-cc/(gm-unit T6)
       pt=eos(iri(1))+pr
@@ -720,12 +719,12 @@ c    x  /molenak
       eos(iri(7))=chitt
       return
       end
-   
+
 !..******************************************************************
       function rhoofp(x,ztab,t6,p,irad)
       parameter (mx=5,mv=10,nr=169,nt=197)
       common/lreadco/itime
-      common/aeos/  xz(mx,mv,nt,nr),  
+      common/aeos/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(10),index(10),nta(nr),zz(mx)
@@ -743,7 +742,7 @@ c--------------------------------------------------------------------
 
       rat=sigmacc
       pr=0.0
-      if(irad .eq. 1) pr=4./3.*rat*t6**4   ! Mb 
+      if(irad .eq. 1) pr=4./3.*rat*t6**4   ! Mb
       pnr=p-pr
 
       if (itime .ne. 12345678) then
@@ -779,7 +778,7 @@ c--------------------------------------------------------------------
           go to 11
           endif
    14     klo=ilo
-      
+
       pmax=xz(mlo,1,klo,nra(klo))*t6*rho(nra(klo))
       pmin=xz(mlo,1,klo,1)*t6*rho(1)
       if((pnr .gt. 1.25*pmax) .or. (pnr .lt. pmin)) then
@@ -787,7 +786,7 @@ c--------------------------------------------------------------------
 c     stop
       write (*,'("pnr, pmax,pmin=",3e14.4)') pnr,pmax,pmin
       endif
-      
+
       rhog1=rho(nra(klo))*pnr/pmax
       call esac (x,ztab,t6,rhog1,1,0)
       p1=eos(1)
@@ -829,12 +828,12 @@ c     stop
         stop
       endif
       end
-   
+
 !..*********************************************************************
       block data
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),  
+      common/aeos/  xz(mx,mv,nt,nr),
      . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
