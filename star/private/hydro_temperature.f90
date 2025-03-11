@@ -27,7 +27,7 @@
       module hydro_temperature
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -58,6 +58,7 @@
          type(auto_diff_real_star_order1) :: L_ad, r_00, area, area2, Lrad_ad, &
             kap_00, kap_m1, kap_face, d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
             P_rad_m1, P_rad_00, d_P_rad_actual_ad, resid
+         type(auto_diff_real_star_order1) :: flxR, flxLambda
 
          integer :: i_equL
          logical :: dbg
@@ -109,9 +110,28 @@
 
          !d_P_rad_expected = d_P_rad_expected*s% gradr_factor(k) !TODO(Pablo): check this
 
-         P_rad_m1 = (crad/3d0)*T4_m1
-         P_rad_00 = (crad/3d0)*T4_00
+         P_rad_m1 = (crad/3._dp)*T4_m1
+         P_rad_00 = (crad/3._dp)*T4_00
          d_P_rad_actual_ad = P_rad_m1 - P_rad_00
+
+         ! enable flux-limited radiation transport derived by Levermore & Pomraning 1981
+         s% flux_limit_R(k) = 0._dp
+         s% flux_limit_lambda(k) =0._dp
+         if (s% use_flux_limiting_with_dPrad_dm_form) then
+            ! calculate the flux ratio R
+            flxR = area * abs(T4_m1 - T4_00) / dm_bar / &
+                  (kap_face * 0.5_dp * (T4_m1 + T4_00))
+
+            s% flux_limit_R(k) = flxR%val
+
+            ! calculate the flux limiter lambda
+            flxLambda = (6._dp + 3._dp*flxR) / (6._dp + (3._dp + flxR)*flxR)
+
+            s% flux_limit_lambda(k) = flxLambda%val
+
+            ! calculate d_P_rad given the flux limiter
+            d_P_rad_expected_ad = d_P_rad_expected_ad / flxLambda
+         end if
 
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale

@@ -646,6 +646,4 @@
 
       end subroutine eos_def_shutdown
 
-
       end module eos_def
-

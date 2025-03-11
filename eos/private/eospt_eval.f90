@@ -26,7 +26,7 @@
 
       module eosPT_eval
       use eos_def
-      use const_def
+      use const_def, only: dp, crad, kerg, mp, ln10, arg_not_provided
       use math_lib
       use utils_lib, only: mesa_error
 
@@ -344,8 +344,6 @@
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
-         use const_def
-
          integer, intent(in) :: handle
 
          real(dp), intent(in) :: Z  ! the metals mass fraction
@@ -409,7 +407,6 @@
                Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
-         use const_def
          use utils_lib, only: is_bad
          use num_lib, only: brent_safe_zero, look_for_brackets
          use chem_def, only: num_chem_isos

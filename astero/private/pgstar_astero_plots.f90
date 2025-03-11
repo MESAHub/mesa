@@ -128,7 +128,7 @@
             id, device_id, xleft, xright, ybot, ytop, subplot, title, txt_scale, ierr)
 
          use utils_lib
-         use const_def
+         use const_def, only: dp
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -400,7 +400,7 @@
             id, device_id, xleft, xright, ybot, ytop, subplot, title, txt_scale, ierr)
 
          use utils_lib
-         use const_def
+         use const_def, only: dp
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -649,7 +649,4 @@
 
 
       end module pgstar_astero_plots
-
-
-
 

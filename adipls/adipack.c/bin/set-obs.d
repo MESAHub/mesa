@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/set-obs.d.x
 #  usage (with arguments) set-obs.d -ltcase-gt -ltinput file-gt [-ltoutput file-gt]
 #  If output file is not given, assumes that -ltinput file-gt contains 

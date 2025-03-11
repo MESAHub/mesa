@@ -102,7 +102,7 @@
 ! 10.12.14 - slight cleaning of the text (no effect on the results)
 ! 28.05.15 - an accidental error in Wigner-Kirkwood entropy correction
 !   is fixed (it was in the line "Stot=Stot+FWK*DENSI" since 20.05.13).
-!***********************************************************************
+! ***********************************************************************
 !                           MAIN program:               Version 02.06.09
 ! This driving routine allows one to compile and run this code "as is".
 ! In practice, however, one usually needs to link subroutines from this
@@ -130,16 +130,16 @@
 ! C%C        if (AY(IX).le.0.) goto 2
 ! C%C         NMIX=IX
 ! C%C        if (dabs(XSUM-1.d0).lt.EPS) goto 2
-! C%C      enddo
+! C%C      end do
 ! C%C    2 continue
 ! C%C      if (NMIX.eq.0) then
 ! C%C         print*,'There must be at least one set of positive (x,Z,A).'
 ! C%C        goto 3
-! C%C      endif
+! C%C      end if
 ! C%C      write(*,114)
 ! C%C      do IX=1,NMIX
 ! C%C         write(*,113) IX,AZion(IX),ACMI(IX),AY(IX)
-! C%C      enddo
+! C%C      end do
 ! C%C    9 continue
 ! C%C      write(*,'('' Input T (K) (<0 to stop): ''$)')
 ! C%C      read*,T
@@ -275,14 +275,14 @@
       Y=0.d0
       do IX=1,NMIX
          Y=Y+AY(IX)
-      enddo
+      end do
       if (abs(Y-1.d0)>TINY) then
         do IX=1,NMIX
            AY(IX)=AY(IX)/Y
-        enddo
+        end do
 !         print*,'MELANGE9: partial densities (and derivatives)',
 !     *    ' are rescaled by factor',1./Y
-      endif
+      end if
       Zmean=0d0
       Z2mean=0d0
       Z52=0d0
@@ -300,7 +300,7 @@
          Z52=Z52+AY(IX)*pow5(sqrt(AZion(IX)))
          Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0))  ! 26.12.09
          CMImean=CMImean+AY(IX)*ACMI(IX)
-      enddo
+      end do
 ! (0) Photons:
       UINTRAD=RAD*TEMP*TEMP*TEMP*TEMP
       PRESSRAD=UINTRAD/3d0
@@ -332,7 +332,7 @@
          LIQSOL=-1
          alfa = (GAMImean - GAMIlo)/(GAMIhi - GAMIlo)  ! 1 for solid, 0 for liquid
          beta = 1d0 - alfa
-      endif
+      end if
 ! Calculate partial thermodynamic quantities and combine them together:
       UINT=UINTE
       PRESS=PRESSE
@@ -391,7 +391,7 @@
          PDLT=PDLT+PRI*PDT2  ! d P / d ln T
          PDLR=PDLR+PRI*PDR2  ! d P / d ln\rho
          TPT2=TPT2+CTP*DNI/ACMI(IX)*AZion(IX)**2  ! opt.10.12.14
-      enddo  ! next IX
+      end do  ! next IX
 ! Wigner-Kirkwood perturbative correction for liquid:
       TPT=sqrt(TPT2)  ! effective T_p/T - ion quantum parameter
 ! (in the case of a mixture, this estimate is crude)
@@ -404,7 +404,7 @@
          !    print*,'MELANGE9: strong quantum effects in liquid!'
          !    ierr = -1
          !    return
-         ! endif
+         ! end if
          UWK=2.d0*FWK
          UINT=UINT+UWK*PRESSI
          Stot=Stot+FWK*DENSI  ! corrected 28.05.15
@@ -412,7 +412,7 @@
          CVtot=CVtot-UWK*DENSI  ! corrected by JWS 17.04.20
          PDLT=PDLT-FWK*PRESSI
          PDLR=PDLR+UWK*PRESSI
-      endif
+      end if
 ! Corrections to the linear mixing rule:
       if (LIQSOL==0) then  ! liquid phase
          call CORMIX(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321, &
@@ -432,14 +432,14 @@
              DeltaG=.012d0*(1.d0-1.d0/pow2(RZ))*(X1+X2*pow(RZ,5d0/3d0))
              DeltaG=DeltaG*X/X2*dim(1.d0,X)/X1
              FMIX=FMIX+AY(I)*AY(J)*GAMI*DeltaG
-          enddo
-        enddo
+          end do
+        end do
          UMIX=FMIX
          PMIX=FMIX/3.d0
          CVMIX=0d0
          PDTMIX=0d0
          PDRMIX=FMIX/2.25d0
-      endif
+      end if
       UINT=UINT+UMIX*PRESSI
       Stot=Stot+DENSI*(UMIX-FMIX)
       PRESS=PRESS+PMIX*PRESSI
@@ -569,7 +569,7 @@
          CVItot=CVharm+CVah
          SCItot=Sharm+Uah-Fah
          CVii=CVItot-1.5d0  ! minus 1.5=ideal-gas
-      endif
+      end if
 ! Calculate "ie" part:
       if (LIQSOL==1) then
          call FSCRsol8(RS,GAMI,Zion,TPT, &
@@ -580,7 +580,7 @@
            FSCR,USCR,PSCR,CVSCR,PDTSCR,PDRSCR,ierr)
          if (ierr /= 0) return
          S_SCR=USCR-FSCR
-      endif
+      end if
 ! Total excess quantities ("ii"+"ie"+"ee", per ion):
       FC0=FSCR+Zion*FXC
       UC0=USCR+Zion*UXC
@@ -668,7 +668,7 @@
          PDRii=(4.0d0*UION-CVii)/9.0d0  ! p_{ii} + d p_{ii} / d ln\rho
          PDTii=CVii/3.0d0  ! p_{ii} + d p_{ii} / d ln T
 
-      endif
+      end if
 
       if (use_FITION9_table .or. debug_FITION9_table) then
          ierr = 0
@@ -695,7 +695,7 @@
          if (.not. check1(PDTii, xPDTii, 'PDTii')) return
          if (.not. check1(PDRii, xPDRii, 'PDRii')) return
 
-      endif
+      end if
 
 
       if (use_FITION9_table .and. .not. skip) then
@@ -820,7 +820,7 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
+      end if
 
       if (use_FSCRliq8_table .or. debug_FSCRliq8_table) then
          ierr = 0
@@ -834,7 +834,7 @@
          if (ierr /= 0) return
       else
          skip = .true.
-      endif
+      end if
 
       if (.not. use_FSCRliq8_table .or. debug_FSCRliq8_table .or. skip) then
 
@@ -937,7 +937,7 @@
          PDTSCR=-GAME*GAME*(X*FXDG+FDGG)/3.d0
          PDRSCR=(12d0*PSCR+X*X*FDXX+2d0*X*GAME*FDXG+GAME*GAME*FDGG)/9d0
 
-      endif
+      end if
 
       if (debug_FSCRliq8_table .and. .not. skip) then
 
@@ -948,7 +948,7 @@
          if (.not. check1(PDTSCR, xPDTSCR, 'PDTSCR')) return
          if (.not. check1(PDRSCR, xPDRSCR, 'PDRSCR')) return
 
-      endif
+      end if
 
       if (use_FSCRliq8_table .and. .not. skip) then
 
@@ -1077,7 +1077,7 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
+      end if
       XSR=0.0140047d0/RS  ! relativity parameter
       Z13=pow(Zion,1d0/3d0)
       P1=0.00352d0*(1d0-AP(1)/pow(Zion,0.267d0)+0.27d0/Zion)
@@ -1149,7 +1149,7 @@
          SUPDXX=-0.5d0*SUPDX/XSR
          SUPDGG=0d0
          SUPDXG=SUPDX/GAMI
-      endif
+      end if
       GR3=pow(GAMI/SUP,R3)
       GR3X=-R3*SUPDX/SUP
       GR3DX=GR3*GR3X
@@ -1231,7 +1231,7 @@
             + 4d0*AA(N)*CK*CK/CN*TPT4)*SUPGN
          PDTah=PDTah+(PN*(1d0+CN+2d0*TK2)-2d0/CN*AA(N)*TK2)*SUPGN
          PDRah=PDRah+(PN*(1d0-CN/3d0-TK2)+AA(N)/CN*TK2)*SUPGN
-      enddo
+      end do
       Fah=Fah-TQ
       Uah=Uah-TQ
       Pah=Pah-TQ/1.5d0
@@ -1343,7 +1343,7 @@
          C11=0.00437506d0
       else
          call mesa_error(__FILE__,__LINE__,'HLfit: unknown lattice type')
-      endif
+      end if
       if (eta>1d0/EPS) then  ! asymptote of Eq.(13) of BPY'01
          U=3d0/(C11*eta*eta*eta)
          F=-U/3d0
@@ -1424,7 +1424,7 @@
          Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
       else
          Dif0=Z321-sqrt((Z2mean+Zmean)*(Z2mean+Zmean)*(Z2mean+Zmean)/Zmean)
-      endif
+      end if
       DifR=Dif0/Z52
       DifFDH=Dif0*GAME*sqrt(GAME/3d0)  ! F_DH - F_LM(DH)
       D=Z2mean/(Zmean*Zmean)
@@ -1436,7 +1436,7 @@
          PDTMIX=0d0
          PDRMIX=0d0
          return
-      endif
+      end if
       P3=pow(D,-0.2d0)
       D0=(2.6d0*DifR+14d0*DifR*DifR*DifR)/(1.d0-P3)
       GP=D0*pow(GAMImean,P3)
@@ -1531,7 +1531,7 @@
          DlnDHH=DlnDHHa*FP+DlnDHHb*FM
          DlnDHT=DlnDHTa*FP+DlnDHTb*FM
          DlnDTT=DlnDTTa*FP+DlnDTTb*FM
-      endif
+      end if
       return
       end subroutine ELECT11
 
@@ -1644,7 +1644,7 @@
         P=F/1.5d0
         DelP=TEMR*TEMR*PF/9.d0
         CVE=PI2*TEMR/EF/2.d0
-      endif
+      end if
       F=F+DF
       P=P+DelP
       S=-2.d0*DF  ! entropy per unit volume [rel.un.]
@@ -1776,7 +1776,7 @@
          CJ00=0.5d0*(X0*CMU-CL)  ! J_{1/2}^0
          CJ10=X3/3d0-CJ00  ! J_{3/2}^0
          CJ20=(0.75d0*CMU-2d0)/3d0*X3+1.25d0*CJ00  ! J_{5/2}^0
-      endif
+      end if
       CJ01=X0  ! J_{1/2}^1
       CJ11=CJ01*CMU1  ! J_{3/2}^1
       CJ21=CJ11*CMU1  ! J_{5/2}^1
@@ -1814,7 +1814,7 @@
       else
          FP=1.d0/(exp(X)+1.d0)
          FM=1.d0-FP
-      endif
+      end if
       return
       end subroutine FERMI10
 
@@ -1886,7 +1886,7 @@
          if (ierr /= 0) return
       else
          skip = .true.
-      endif
+      end if
 
       if (.not. use_EXCOR7_table .or. debug_EXCOR7_table .or. skip) then
 
@@ -1913,7 +1913,7 @@
             T2DH=0.d0
             T1DHH=0.d0
             T2DHH=0.d0
-         endif
+         end if
          A0=0.75d0+3.04363d0*THETA2-0.09227d0*THETA3+1.7035d0*THETA4
          A0DH=6.08726d0*THETA-0.27681d0*THETA2+6.814d0*THETA3
          A0DHH=6.08726d0-0.55362d0*THETA+20.442d0*THETA2
@@ -2058,7 +2058,7 @@
          PDRXC=PXC+(PDLG-2d0*PDLH)/3.d0
          PDTXC=GAME*(THETA*FXCDHG-GAME*FXCDGG/3.d0)-THETA*(FXCDH/0.75d0+THETA*FXCDHH/1.5d0)
 
-      endif
+      end if
 
 
       if (debug_EXCOR7_table .and. .not. skip) then
@@ -2071,7 +2071,7 @@
          if (.not. check1(PDTXC, xPDTXC, 'PDTXC')) return
          if (.not. check1(PDRXC, xPDRXC, 'PDRXC')) return
 
-      endif
+      end if
 
       if (use_EXCOR7_table .and. .not. skip) then
 
@@ -2140,7 +2140,7 @@
       end subroutine EXCOR7
 
 ! ======================  AUXILIARY SUBROUTINES   ==================== *
-      subroutine FERINV7(F,N,X,XDF,XDFF)  ! Inverse Fermi intergals
+      subroutine FERINV7(F,N,X,XDF,XDFF)  ! Inverse Fermi integrals
 !                                                       Version 24.05.07
 ! X_q(f)=F^{-1}_q(f) : H.M.Antia 93 ApJS 84, 101
 ! q=N-1/2=-1/2,1/2,3/2,5/2 (N=0,1,2,3)
@@ -2240,12 +2240,12 @@
             UP=UP*T+A(I,N)
            if (I>=1) UP1=UP1*T+A(I,N)*I
            if (I>=2) UP2=UP2*T+A(I,N)*I*(I-1)
-         enddo
+         end do
          do I=LB(N),0,-1
             DOWN=DOWN*T+B(I,N)
            if (I>=1) DOWN1=DOWN1*T+B(I,N)*I
            if (I>=2) DOWN2=DOWN2*T+B(I,N)*I*(I-1)
-         enddo
+         end do
          X=log(T*UP/DOWN)
          XDF=1.d0/T+UP1/UP-DOWN1/DOWN
          XDFF=-1.d0/(T*T)+UP2/UP-pow2(UP1/UP)-DOWN2/DOWN+pow2(DOWN1/DOWN)
@@ -2264,12 +2264,12 @@
             UP=UP*T+C(I,N)
            if (I>=1) UP1=UP1*T+C(I,N)*I
            if (I>=2) UP2=UP2*T+C(I,N)*I*(I-1)
-         enddo
+         end do
          do I=LD(N),0,-1
             DOWN=DOWN*T+D(I,N)
            if (I>=1) DOWN1=DOWN1*T+D(I,N)*I
            if (I>=2) DOWN2=DOWN2*T+D(I,N)*I*(I-1)
-         enddo
+         end do
          R=UP/DOWN
          R1=(UP1-UP*DOWN1/DOWN)/DOWN  ! dR/dt
          R2=(UP2-(2.0d0*UP1*DOWN1+UP*DOWN2)/DOWN+2.d0*UP*pow2(DOWN1/DOWN))/DOWN
@@ -2277,7 +2277,7 @@
          RT=(R1-R/T)/T
          XDF=T1*RT
          XDFF=T2*RT+T1*T1*(R2-2d0*RT)/T
-      endif
+      end if
       return
       end subroutine FERINV7
 
@@ -2360,7 +2360,7 @@
              W1b,W1DXb,W1DTb,W1DXXb,W1DTTb,W1DXTb, &
              W2b,W2DXb,W2DTb,W2DXXb,W2DTTb,W2DXTb, &
              W0XXXb,W0XTTb,W0XXTb)
-        endif
+        end if
          W0=W0a*FP+W0b*FM
          W0DX=W0DXa*FP+W0DXb*FM  !! +(W0a-W0b)*F1
          W0DT=W0DTa*FP+W0DTb*FM
@@ -2388,7 +2388,7 @@
            W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT, &
            W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT, &
            W0XXX,W0XTT,W0XXT)
-      endif
+      end if
       return
       end subroutine BLIN9
 
@@ -2438,8 +2438,8 @@
      do J=0,2
         do I=1,5
            AA(I,J)=exp(-AU(I,J))
-        enddo
-     enddo
+        end do
+     end do
 
         do K=0,2
            W=0.d0
@@ -2465,7 +2465,7 @@
                  (ECHI*ECHI-4.d0*ECHI*AA(I,K)+AA(I,K)*AA(I,K))/(DN*DN*DN*DN)
                WDXTT=WDXTT-AC(I,K)*AU(I,K)*AU(I,K)/(DN*DN*SQ*SQ*SQ)
                WDXXT=WDXXT+AC(I,K)*AU(I,K)*(ECHI-AA(I,K))/(SQ*DN*DN*DN)
-            enddo
+            end do
              WDX=WDX*ECHI
              WDT=0.25d0*WDT
              WDXX=WDXX*ECHI
@@ -2498,8 +2498,8 @@
              W2DXX=WDXX
              W2DTT=WDTT
              W2DXT=WDXT
-          endif
-        enddo  ! next K
+          end if
+        end do  ! next K
       return
       end subroutine BLIN9a
 
@@ -2600,7 +2600,7 @@
                WDXXX=WDXXX+AH(I)*pow(AX(I),K)*HDXXX+AV(I)*VDXXX
                WDXTT=WDXTT+AH(I)*pow(AX(I),K)*HDXTT+AV(I)*VDXTT
                WDXXT=WDXXT+AH(I)*pow(AX(I),K)*HDXXT+AV(I)*VDXXT
-            enddo
+            end do
           if (K==0) then
              W0=W
              W0DX=WDX
@@ -2625,8 +2625,8 @@
              W2DXX=WDXX
              W2DTT=WDTT
              W2DXT=WDXT
-          endif
-        enddo  ! next K
+          end if
+        end do  ! next K
       return
       end subroutine BLIN9b
 
@@ -2714,8 +2714,8 @@
                  WDXXX=WDXXX+C*FDXXX
                  WDXTT=WDXTT+C*(1d0*J)*(1d0*(J-1))/pow2(TEMP)*FDX
                  WDXXT=WDXXT+C*(1d0*J)/TEMP*FDXX
-              endif
-            enddo  ! next J
+              end if
+            end do  ! next J
           if (K==0) then
              W0=W
              W0DX=WDX
@@ -2740,8 +2740,8 @@
              W2DXX=WDXX
              W2DTT=WDTT
              W2DXT=WDXT
-          endif
-        enddo  ! next K
+          end if
+        end do  ! next K
 !   ----------------------------------------------------------------   *
       else  ! CHI > 14, CHI*TEMP > 0.1: general high-\chi expansion
          D=1.d0+CHI*TEMP/2.d0
@@ -2790,8 +2790,8 @@
              FMX2DT=.25d0/D*(1.d0-.5d0*CHI*TEMP/D)
              FMXXT=4.d0*FMX2*FMX2DT-2.d0*FMX1*FMX1DT
              AMDXXT=AMDXT(K)*FMX+AMDX(K)*FMXT+AMDT(K)*FMXX+AM(K)*FMXXT
-          endif
-        enddo
+          end if
+        end do
            SQ2T=sqrt(2.d0*TEMP)
            SQ2T3=SQ2T*SQ2T*SQ2T
            A=1.d0+CHI*TEMP+SQ2T*R
@@ -2860,7 +2860,7 @@
          W2DXX=FJ2DXX+PI26*AMDXX(2)
          W2DTT=FJ2DTT+PI26*AMDTT(2)
          W2DXT=FJ2DXT+PI26*AMDXT(2)
-      endif
+      end if
       return
       end subroutine BLIN9c
 
@@ -2921,7 +2921,7 @@
          TF=sqrt(1.d0+PF0*PF0)-1.d0  ! Fermi temperature
       else
          TF=.5d0*PF0*PF0
-      endif
+      end if
       THETA=TEMR/TF
       THETA32=THETA*sqrt(THETA)
       Q2=12.d0+8.d0/THETA32
@@ -2935,7 +2935,7 @@
          Q1=1.5d0*T1/(1.d0-T1)
       else
          Q1=1.5d0/THETA
-      endif
+      end if
       SQT=sqrt(TEMR)
       G=(1.d0+Q2*TEMR*Q3+Q1*SQT)*TEMR
       H=(1.d0+.5d0*TEMR/THETA)*(1.d0+Q2*TEMR)
@@ -2950,7 +2950,7 @@
          CMUDT=0.d0
          CMUDTT=0.d0
          return
-      endif
+      end if
 ! CALCULATE DERIVATIVES:
 ! 1: derivatives of CHI over THETA and T
 ! (a): Non-relativistic result:
@@ -2964,7 +2964,7 @@
       else
          Q1D=-1.5d0/pow2(THETA)
          Q1DD=-2.d0*Q1D/THETA
-      endif
+      end if
       Q2D=-12.d0/THETA52  ! d q_2 / d \theta
       Q2DD=30.d0/(THETA52*THETA)  ! d^2 q_2 / d \theta^2
       U3D=-2.d0*T1*T1

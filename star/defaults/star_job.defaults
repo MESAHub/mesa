@@ -1455,7 +1455,7 @@
       ! ~~~~~~~~~~~~
 
       ! RTI variables
-      ! ``RTI_flag`` is true if we are doing Rayleigh Taylor Instabilities
+      ! ``RTI_flag`` is true if we are doing Rayleigh-Taylor Instabilities
 
       ! ::
 

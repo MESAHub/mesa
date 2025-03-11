@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/mer-amde.d.x
 #  with no arguments, prompts
 #  otherwise calling sequence is

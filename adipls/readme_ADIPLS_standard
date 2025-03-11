@@ -4,7 +4,7 @@ Documentation can be found in adipack.c/notes.
 
 If you have already installed mesa including adipls, 
 then the things in adipack.c have been built and tested.
-However, you will need to add a couple of liens to your startup
+However, you will need to add a couple of lines to your startup
 script.  These are needed for the command line operations
 included in ADIPLS.   On my machine they look like this:
 

@@ -105,7 +105,7 @@
                write(*,*) 'and rerunning the mesa ./install script.'
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
-            endif
+            end if
 
             !read first line and (nZ, nT, ng)
             read(iounit,*)            !first line is text, skip it
@@ -135,7 +135,7 @@
                read(iounit,'(a)') ai% table_atm_files(i)
                read(iounit,'(14x,i4)') tmp_version(i)
                read(iounit,1) ai% logZ(i), ai% alphaFe(i), ai% atm_mix(i), ibound(1:ng,i)
-            enddo
+            end do
 
             !read Teff_array
             read(iounit,*)            !text
@@ -156,8 +156,8 @@
                ai% Teff_bound(i) = ai% Teff_array(ibound(i,1))
                do j=2,nZ
                   ai% Teff_bound(i) = min( ai% Teff_bound(i) , ai% Teff_array(ibound(i,j)) )
-               enddo
-            enddo
+               end do
+            end do
 
 
             if (dbg) write(*,*) 'ai% logg_array(:)', ai% logg_array(:)
@@ -247,7 +247,7 @@
             write(*,*) 'get_table_values: table_atm_init required to proceed'
             ierr=-1
             return
-         endif
+         end if
 
          newlogZ(1) = safe_log10(newZ/GN93_Zsol)
 
@@ -307,7 +307,7 @@
                write(*,*) 'get_table_values: Z outside range of atm tables'
                ierr=-1
                return
-            endif
+            end if
          else if (newlogZ(1) < ai% logZ(1)) then
             newlogZ(1) = ai% logZ(1)
          else if (newlogZ(1) > ai% logZ(nZ)) then
@@ -434,7 +434,7 @@
                   end if
                   return
                end if
-            enddo
+            end do
 
             ! now we have val, dval_dTeff, and dval_dlogg in result_2D for each Z
 
@@ -526,7 +526,7 @@
                write(*,*) 'and rerunning the mesa ./install script.'
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
-            endif
+            end if
 
             read(iounit,'(14x,i4)',iostat=ierr) text_file_version
             if (failed(1)) return
@@ -546,7 +546,7 @@
                write(*,'(A)')
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
-            endif
+            end if
 
             ibound_tmp = -1
             read(iounit,1,iostat=ierr) ai% logZ(iZ), ai% alphaFe(iZ), ai% atm_mix(iZ), ibound_tmp(1:ng)
@@ -587,7 +587,7 @@
                do i=1,ng
                   data_tmp(i,j) = vec(i+1)
                end do
-            enddo
+            end do
             ai% Pgas_interp(1,:,:,iZ) = data_tmp(:,:)
 
             if (ai% id /= ATM_TABLE_PHOTOSPHERE) then  ! read T
@@ -607,7 +607,7 @@
                   do i=1,ng
                      data_tmp(i,j) = vec(i+1)
                   end do
-               enddo
+               end do
                ai% T_interp(1,:,:,iZ) = data_tmp(:,:)
             end if
 
@@ -626,8 +626,8 @@
                      write(*,'(a30,i6,e24.12)') 'ai% Teff_array(i)', i, ai% Teff_array(i)
                   end if
                   return
-               endif
-            enddo
+               end if
+            end do
 
             do i=1,ng
                !write(*,*) 'logg', i, logg_tmp(i), ai% logg_array(i)
@@ -638,14 +638,14 @@
                      write(*,'(a30,i6,e24.12)') 'ai% logg_array(i)', i, ai% logg_array(i)
                   end if
                   return
-               endif
-            enddo
+               end if
+            end do
             !stop
 
             !make sure boundaries set earlier are still valid
             do i=1,ng
                ai% Teff_bound(i) = min( ai% Teff_bound(i), Teff_tmp(ibound_tmp(i)) )
-            enddo
+            end do
 
             ! use "not a knot" bc's
             ibcTmin = 0; bcTmin(:) = 0d0

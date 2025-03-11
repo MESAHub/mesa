@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module interp_1d_lib
-      use const_lib, only: dp
+      use const_def, only: dp
       use auto_diff
 
       implicit none
@@ -42,7 +42,7 @@
          interface
             subroutine interp_vec(x, nx, f1, nwork, work1, str, ierr)  ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
-               use const_lib, only: dp
+               use const_def, only: dp
                implicit none
                integer, intent(in) :: nx       ! length of x vector
                real(dp), intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
@@ -86,7 +86,7 @@
          interface
             subroutine interp_vec_autodiff(x, nx, f1, nwork, work1, str, ierr)  ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
-               use const_lib, only: dp
+               use const_def, only: dp
                use auto_diff
                implicit none
                integer, intent(in) :: nx       ! length of x vector

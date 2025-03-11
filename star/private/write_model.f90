@@ -26,7 +26,7 @@
       module write_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, lsun, rsun, four_thirds_pi
       use read_model
 
       implicit none

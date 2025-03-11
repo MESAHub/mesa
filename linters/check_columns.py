@@ -280,7 +280,6 @@ def get_profile_getval(filename="star/private/profile_getval.f90"):
 
 
 def get_profile_def(filename="star/private/star_profile_def.f90"):
-
     # extract column names from star_profile_def.f90
 
     # these lines look like:

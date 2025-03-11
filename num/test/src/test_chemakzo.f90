@@ -3,6 +3,7 @@
       use num_lib
       use test_int_support, only: i_nfcn, i_njac
       use utils_lib, only: mesa_error
+      use bari_chemakzo, only: chemakzo_feval, chemakzo_jeval, chemakzo_init, chemakzo_meval, chemakzo_solut
 
       implicit none
 

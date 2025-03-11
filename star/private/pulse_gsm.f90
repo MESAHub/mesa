@@ -25,16 +25,10 @@
 
 module pulse_gsm
 
-  ! Uses
-
   use star_private_def
   use forum_m, only: hdf5io_t, CREATE_FILE
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -133,8 +127,6 @@ contains
     ! Close the file
 
     call hi%final()
-
-    ! Finish
 
     ierr = 0
 

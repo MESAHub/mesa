@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # uncomment the following line to run all parts of the test
 # MESA_RUN_OPTIONAL=t

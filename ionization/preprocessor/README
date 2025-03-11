@@ -4,7 +4,7 @@
 #  written by Francois Hebert, 2009-2010
 #
 #  this code calculates the charge state
-#   of a ÔheavyÕ nucleus in a dense plasma
+#   of a heavy nucleus in a dense plasma
 #   of lighter, fully-ionized, atoms.
 #  ex: iron in a degenerate helium plasma
 #
@@ -53,7 +53,7 @@ to run:
 
 i have not implemented inlist input for this code, so input is hard-coded 
 in the main.f file which must be recompiled for each run.
-(just re-run the mk script. itÕs quick)
+(just re-run the mk script. itï¿½s quick)
 
 the tfdh code prints the output to files as it runs. in order to keep things 
 clean, i have set it up to take an output directory as command-line argument.

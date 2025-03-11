@@ -644,7 +644,7 @@
             call system_clock(time0)
          else
             time0 = 0
-         endif
+         end if
 
          call eval_net( &
                n, g, rates_only, just_dxdt, num_isos, num_reactions, g% num_wk_reactions, &
@@ -751,7 +751,7 @@
             call system_clock(time0)
          else
             time0 = 0
-         endif
+         end if
 
          call eval_net( &
                n, g, rates_only, just_dxdt, num_isos, num_reactions, g% num_wk_reactions, &
@@ -946,7 +946,7 @@
             call system_clock(time0)
          else
             time0 = 0
-         endif
+         end if
 
          call eval_net( &
             n, g, rates_only, just_dxdt, num_isos, num_reactions, g% num_wk_reactions, &

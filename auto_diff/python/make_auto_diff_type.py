@@ -106,7 +106,6 @@ def make_auto_diff_type(
 
     # Specific Operators
     for op, opname in unary_operators:
-
         function = auto_diff_type.specific_unary_operator_function(opname, op)
         functions.append(str(function))
         functions.append("")

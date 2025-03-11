@@ -40,8 +40,8 @@ contains
        do n = 0, max_order
           self% matrix(self% points_added + 1, column) = logT**m * logRho**n
           column = column + 1
-       enddo
-    enddo
+       end do
+    end do
 
     self% vector(self% points_added + 1) = val
     self% points_added = self% points_added + 1
@@ -56,7 +56,7 @@ contains
     if (self% points_added /= num_points) then
        print *, "Need 16 points for cubic interpolation"
        stop
-    endif
+    end if
 
     matrix_copy = self% matrix
     vector_copy = self% vector
@@ -69,7 +69,7 @@ contains
        write(*,*) "Matrix(:,2)", self% matrix(:,2)
        write(*,*) "Matrix(:,5)", self% matrix(:,5)
        stop
-    endif
+    end if
 
     self% solved = .true.
     self% solution = vector_copy
@@ -85,7 +85,7 @@ contains
 
     if (.not. self% solved) then
        call self% solve_matrix()
-    endif
+    end if
 
     sum = 0
     column = 1
@@ -94,8 +94,8 @@ contains
        do n = 0, max_order
           sum = sum + self% solution(column) * logT**m * logRho**n
           column = column + 1
-       enddo
-    enddo
+       end do
+    end do
 
     evaluate = sum
   end function evaluate
@@ -111,17 +111,17 @@ contains
 
     if (.not. self% solved) then
        call self% solve_matrix()
-    endif
+    end if
 
     if (deriv_logT .and. deriv_logRho) then
        print *, "May choose only one derivative"
        stop
-    endif
+    end if
 
     if (.not. deriv_logT .and. .not. deriv_logRho) then
        print *, "Must choose one derivative"
        stop
-    endif
+    end if
 
     result = 0
     column = 1
@@ -135,8 +135,8 @@ contains
                 product = 0
              else
                 product = product * m * logT**(m-1) * logRho**n
-             endif
-          endif
+             end if
+          end if
 
           if (deriv_logRho) then
              if (n == 0) then
@@ -149,8 +149,8 @@ contains
           product = product * self% solution(column)
           result = result + product
           column = column + 1
-       enddo
-    enddo
+       end do
+    end do
 
     evaluate_deriv = result
   end function evaluate_deriv

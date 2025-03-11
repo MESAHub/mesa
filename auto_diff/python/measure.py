@@ -5,7 +5,6 @@ a simple expression is, we choose to simplify to minimize computational cost.
 """
 
 from sympy import *
-from sympy.abc import x, y
 from utils import substitute_pow, powN
 import numpy as np
 

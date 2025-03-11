@@ -1,4 +1,4 @@
-# This is the makefile for running mesa/star
+# This is the makefile for testing the mesa star package 
 
 MESA_DIR = ../../..
 

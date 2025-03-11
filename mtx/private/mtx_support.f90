@@ -136,7 +136,7 @@
                if (i > j+ml .or. i < j-mu) then
                   ierr = j
                   return
-               endif
+               end if
                ab(ldab-ml+i-j,j) = values(k)
             end do
          end do
@@ -325,7 +325,7 @@
                if (i > j+ml .or. i < j-mu) then
                   ierr = j
                   return
-               endif
+               end if
                ab(ldab-ml+i-j,j) = values(k)
             end do
          end do
@@ -424,7 +424,7 @@
                if (j > n) then
                   ierr = i
                   return
-               endif
+               end if
                a(i,j) = values(k)
             end do
          end do
@@ -446,7 +446,7 @@
                if (j > n) then
                   ierr = i
                   return
-               endif
+               end if
                a(i,j) = values(k)
             end do
          end do
@@ -579,7 +579,7 @@
                if (i > n) then
                   ierr = j
                   return
-               endif
+               end if
                a(i,j) = values(k)
             end do
          end do
@@ -605,7 +605,7 @@
                if (i > n) then
                   ierr = j
                   return
-               endif
+               end if
                a(i,j) = values(k)
             end do
          end do
@@ -898,7 +898,7 @@
           READ (iounit, VALFMT, iostat=ierr ) ( VALUES (I), I = 1, NNZERO )
           if (ierr /= 0) return
 
-      ENDIF
+      end if
 
 
       end subroutine read_hbcode1
@@ -1019,7 +1019,7 @@
 
           WRITE (iounit, use_VALFMT ) ( VALUES (I), I = 1, NNZERO )
 
-      ENDIF
+      end if
 
       return
       end subroutine write_hbcode1

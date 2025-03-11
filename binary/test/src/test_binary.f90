@@ -47,7 +47,9 @@ contains
       b% fj = -1d0
       b% fm = -1d0
       b% fdm = -1d0
+      b% mtransfer_rate = 0d0
       b% s_donor% center_h1 = 0d0
+      b% varcontrol_ms = 0d0
       b% varcontrol_post_ms = 0d0
 
       ! test for rl

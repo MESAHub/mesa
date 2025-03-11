@@ -33,7 +33,7 @@
       use utils_lib
       use chem_def  !, only: nuclide_data, chem_isos
       use chem_lib, only: chem_get_iso_id
-      use const_def, only: dp, ln2
+      use const_def, only: dp, ln2, ln10, me, kerg, clight, pi2
       use math_lib
 
       implicit none
@@ -713,7 +713,7 @@
             term = 1.34d-10 * (tf% T9i12) * bb
          else
             term = 0.0d0
-         endif
+         end if
          fr = term
          rr = 0.0d0
       end subroutine rate_be7em_fxt
@@ -1225,7 +1225,7 @@
       else
 !       term    = 2.6288035d-29
        term    = 0.0d0
-      endif
+      end if
       fr    = term
       rr    = 0.0d0
       end subroutine rate_c12o16_fxt
@@ -1323,7 +1323,7 @@
          else
          !       dd     = 2.6288035d-29
          dd     = 0.0d0
-         endif
+         end if
 
          ! branching ratios from pwnsz data
          b27n = 0.1d0
@@ -3558,7 +3558,6 @@
 
 
       subroutine tfactors(tf, logT_in, temp_in)
-      use const_def, only: ln10
 ! sets various popular temperature factors
 ! this routine must be called before any of the rates are called
 
@@ -4266,7 +4265,6 @@
 
 
       subroutine do_reaclib(tf, a1, a2, a3, a4, a5, a6, a7, term)
-         use const_def
          type (T_Factors) :: tf
          real(dp), intent(in) :: a1, a2, a3, a4, a5, a6, a7
          real(dp), intent(out) :: term
@@ -4342,13 +4340,13 @@
             rfd0(k)=1.d0/((rv(k)-rv(k-1))*(rv(k)-rv(k+1))*(rv(k)-rv(k+2)))
             rfd1(k)=1.d0/((rv(k+1)-rv(k-1))*(rv(k+1)-rv(k))*(rv(k+1)-rv(k+2)))
             rfd2(k)=1.d0/((rv(k+2)-rv(k-1))*(rv(k+2)-rv(k))*(rv(k+2)-rv(k+1)))
-         enddo
+         end do
          do j=2,5
             tfdm(j)=1.d0/((tv(j-1)-tv(j))*(tv(j-1)-tv(j+1))*(tv(j-1)-tv(j+2)))
             tfd0(j)=1.d0/((tv(j)-tv(j-1))*(tv(j)-tv(j+1))*(tv(j)-tv(j+2)))
             tfd1(j)=1.d0/((tv(j+1)-tv(j-1))*(tv(j+1)-tv(j))*(tv(j+1)-tv(j+2)))
             tfd2(j)=1.d0/((tv(j+2)-tv(j-1))*(tv(j+2)-tv(j))*(tv(j+2)-tv(j+1)))
-         enddo
+         end do
       end subroutine mazurek_init
 
       subroutine mazurek(btemp,bden,y56,ye,rn56ec,sn56ec)
@@ -4424,10 +4422,10 @@
        do jd = jp-1,jp+2
         rne(jr,jd) =   dfacm*datn(jr,kp-1,jd) + dfac0*datn(jr,kp,jd)  &
                      + dfac1*datn(jr,kp+1,jd) + dfac2*datn(jr,kp+2,jd)
-       enddo
+       end do
        rnt(jr) =  tfacm*rne(jr,jp-1) + tfac0*rne(jr,jp)  &
                 + tfac1*rne(jr,jp+1) + tfac2*rne(jr,jp+2)
-      enddo
+      end do
 
 !  set the output
       rn56ec = exp10(rnt(1))
@@ -4485,7 +4483,7 @@
           GUESS = 2.0D0*X*X*X*exp(AA)
       ELSE
           GUESS = pow3(Y-1.0D0+(3.0D0-AL92)*X)/3.0D0
-      ENDIF
+      end if
 !
 !     Now multiply by the prefactors .. .
 !
@@ -4498,7 +4496,6 @@
 
 
       subroutine ecapnuc(etakep,temp,rho,rpen,rnep,spen,snep)
-         use const_def
       real(dp), intent(in) :: etakep,temp,rho
       real(dp), intent(out) :: rpen,rnep,spen,snep
 

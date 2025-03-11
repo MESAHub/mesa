@@ -26,7 +26,7 @@
       module pre_ms_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, ln10, clight, standard_cgrav, crad, lsun, msun, rsun, one_third, two_thirds, four_thirds_pi
 
       implicit none
 

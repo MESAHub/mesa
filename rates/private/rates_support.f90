@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module rates_support
-      use const_def, only: dp, use_mesa_temp_cache
+      use const_def, only: dp, use_mesa_temp_cache, missing_value, ln10
       use math_lib
       use rates_def
       use utils_lib, only: mv, switch_str, mesa_error
@@ -40,7 +40,6 @@
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
             ye, logtemp_in, btemp, bden, raw_rate_factor, logttab, &
             rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
-         use const_def, only : missing_value
          integer, intent(in) :: num_reactions, reaction_id(:), nT8s
          real(dp), intent(in) ::  &
             ye, logtemp_in, btemp, bden, raw_rate_factor(:),  &
@@ -148,7 +147,6 @@
          contains
 
          subroutine get_rates_from_table(r1, r2)
-            use const_def, only: ln10
             integer, intent(in) :: r1, r2
 
             integer :: i, k
@@ -190,7 +188,6 @@
       subroutine do_make_rate_tables( &
            num_reactions, cache_suffix, net_reaction_id, &
            rattab, rattab_f1, nT8s, ttab, logttab, ierr)
-         use const_def
          use interp_1d_lib, only: interp_pm, interp_m3q
          use interp_1d_def, only: pm_work_size, mp_work_size
          use utils_lib
@@ -494,7 +491,7 @@
 
 
          ! Write cache file to temporary storage that is local to the run,
-         ! then at the end move the file atomicly to the final cache location
+         ! then at the end move the file atomically to the final cache location
          call reaction_filename(reaction_id(i), cache_suffix, which, cache_filename, temp_cache_filename, ierr)
          if (ierr /= 0) return
 

@@ -41,7 +41,7 @@ contains
        call load_ecapture_states_list(ierr)
        if (ierr /= 0) return
        call load_ecapture_transitions_list(ierr)
-    endif
+    end if
   end subroutine load_ecapture_data
 
 

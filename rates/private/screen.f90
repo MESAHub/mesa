@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module screen
-      use const_def
+      use const_def, only: dp, amu, pi4, one_third, two_thirds, four_thirds, five_thirds
       use rates_def
       use math_lib
 

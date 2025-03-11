@@ -105,11 +105,11 @@
          ! strong rates are zero logT < logTcut_lo
          real(dp) :: logTcut_lo
 
-         ! equilibrium eps_nuc cancelation for ng, pg, pn reactions
+         ! equilibrium eps_nuc cancellation for ng, pg, pn reactions
          ! at high T, these reactions are assumed in equilibrium with their reverses,
          ! so no net eps_nuc from the pair
-         real(dp) :: logT_lo_eps_nuc_cancel  ! no cancelation for logT <= this
-         real(dp) :: logT_hi_eps_nuc_cancel  ! full cancelation for logT >= this
+         real(dp) :: logT_lo_eps_nuc_cancel  ! no cancellation for logT <= this
+         real(dp) :: logT_hi_eps_nuc_cancel  ! full cancellation for logT >= this
 
          real(dp) :: fe56ec_fake_factor, min_T_for_fe56ec_fake_factor
 

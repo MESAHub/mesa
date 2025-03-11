@@ -26,7 +26,7 @@
       module create_initial_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, arg_not_provided, two_thirds, four_thirds_pi
       use chem_def
 
       implicit none
@@ -359,11 +359,11 @@
             if (T<150.d0) then
                print *,"temp too low in integration"
                stop
-            endif
+            end if
 
             if (tau < 2.d0/3.d0) then
                exitnow=.true.
-            endif
+            end if
 
             if (exitnow) exit
 
@@ -459,7 +459,7 @@
          if(ierr/=0) then
             write(*,*) 'kap_get failed'
             stop
-         endif
+         end if
 
       end subroutine get_kap_from_rhoT
 
@@ -498,7 +498,7 @@
          if (ierr /=0) then
             print *,"failure in eosPT_get_T"
             stop
-         endif
+         end if
          T = exp10(logT_result)
 
     ! don't let T get below min temp. use to make a surface isotherm.

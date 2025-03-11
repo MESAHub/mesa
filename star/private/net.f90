@@ -26,7 +26,7 @@
       module net
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4
       use utils_lib, only: is_bad, mesa_error
 
       implicit none

@@ -27,7 +27,14 @@
 
       use star_private_def
       use star_profile_def
-      use const_def
+      use const_def, only: dp, qe, kerg, avo, amu, boltz_sigma, secday, secyer, standard_cgrav, &
+         convective_mixing, &
+         overshoot_mixing, &
+         semiconvective_mixing, &
+         thermohaline_mixing, &
+         minimum_mixing, &
+         anonymous_mixing, &
+         leftover_convective_mixing
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
@@ -420,6 +427,9 @@
             case (p_lum_conv_MLT)
                val = s% L_conv(k)/Lsun
 
+            case(p_Frad_div_cUrad)
+               val = ((s% L(k) - s% L_conv(k)) / (4._dp*pi*pow2(s%r(k)))) &
+                        /(clight * s% Prad(k) *3._dp)
             case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
                val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
             case (p_lum_rad_div_L_Edd)
@@ -767,7 +777,15 @@
                val = (s% Prad(k)/s% Pgas(k))/max(1d-12,s% L(k)/get_Ledd(s,k))
             case (p_pgas_div_p)
                val = s% Pgas(k)/s% Peos(k)
-
+            case (p_flux_limit_R)
+               if (s% use_dPrad_dm_form_of_T_gradient_eqn .and. k > 1) &
+                  val = s% flux_limit_R(k)
+            case (p_flux_limit_lambda)
+               if (s% use_dPrad_dm_form_of_T_gradient_eqn .and. k > 1) then
+                  val = s% flux_limit_lambda(k)
+               else
+                  val = 1d0
+               end if
             case (p_cell_collapse_time)
                if (s% v_flag) then
                   if (k == s% nz) then
@@ -2404,7 +2422,7 @@
                pt = v(k)
             else
                pt = (v(k)*s% dq(k-1) + v(k-1)*s% dq(k))/(s% dq(k-1) + s% dq(k))
-            endif
+            end if
          end function pt
 
 
@@ -2420,7 +2438,7 @@
                else
                   if_rot = 0
                end if
-            endif
+            end if
          end function if_rot
 
 
@@ -2436,7 +2454,7 @@
                else
                   if_rot_ad = 0
                end if
-            endif
+            end if
          end function if_rot_ad
 
       end subroutine getval_for_profile

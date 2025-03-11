@@ -18,18 +18,18 @@ This test case has 2 parts. Click to see a larger version of a plot.
 
 .. image:: ../../../star/test_suite/wd_c_core_ignition/docs/track1_000747.svg
 
-|br|
+
 Central density and temperature evolution:
 
 .. image:: ../../../star/test_suite/wd_c_core_ignition/docs/trhoc_000747.svg
 
-|br|
+
 Convective and burn history
 
 .. image:: ../../../star/test_suite/wd_c_core_ignition/docs/kipp_000747.svg
 
 
-|br|
+
 pgstar commands used for the Part 1 plot above:
 
 .. code-block:: console
@@ -63,7 +63,7 @@ pgstar commands used for the Part 1 plot above:
  / ! end of pgstar namelist
 
 
-|br|
+
 pgstar commands used for the Part 2 plots above:
 
 .. code-block:: console
@@ -138,9 +138,3 @@ pgstar commands used for the Part 2 plots above:
 
 
 Last-Updated: 04Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

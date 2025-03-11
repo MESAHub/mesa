@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cp data/chem_data/isotopes.data ../data/isotopes.data
 

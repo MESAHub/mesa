@@ -7,7 +7,7 @@ from pathlib import Path
 
 MESA_DIR = os.environ["MESA_DIR"]
 
-# Search files for instances on an empty writing usin* as the format i.e write(*,*)
+# Search files for instances on an empty writing using * as the format i.e write(*,*)
 # and replace with calls to write(*,'(A)')
 # This makes writes more portable to ifort
 

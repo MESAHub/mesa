@@ -1,9 +1,8 @@
-      program test_kap
-      use test_kap_support
-      use kap_lib
-      implicit none
+program test_kap
+   use test_kap_support
+   use kap_lib
+   implicit none
 
-      call Do_One(.false.)
+   call Do_One(.false.)
 
-      end program test_kap
-
+end program test_kap

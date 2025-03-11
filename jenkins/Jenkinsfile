@@ -72,7 +72,7 @@ for (int i = 1; i <= ntests; i++) {
 		sh """#!/bin/bash -e
 		  source \$MESASDK_ROOT/bin/mesasdk_init.sh
 
-		  mesa_test test $test
+		  mesa_test test $test --force-logs
 		"""
 	      }
 	    }

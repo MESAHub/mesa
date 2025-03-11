@@ -26,7 +26,7 @@
 
       module binary_mdot
 
-      use const_def
+      use const_def, only: dp, pi, pi4, clight, one_third, kerg, mp
       use math_lib
       use star_lib
       use star_def

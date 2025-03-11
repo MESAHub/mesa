@@ -16,7 +16,7 @@ c              in cs(21).
 c
 c  If ispcpr = 0, the frequency is set in order of priority, depending
 c  on the availability of the relevant quantity: 5, 1, 6
-c  The same order of priority is used if the quantitity selected by
+c  The same order of priority is used if the quantity selected by
 c  another value of ispcpr is not available.
 c
 c  The actual quantity returned is flagged by icobs_st, set when 

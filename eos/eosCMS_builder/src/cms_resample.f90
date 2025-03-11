@@ -148,7 +148,7 @@ program cms_resample
          !dpe
          dse = T*(dS_dT/Cv) - 1.0_dp
          dsp = -rho*rho*(dS_dRho/dP_dT) - 1.0_dp
-         dpe = 0.0_dp  !not avaiable as yet...
+         dpe = 0.0_dp  ! not available as yet...
 
          write(io,'(1p99e15.6)') new_logT, new_logRho, new_logP, new_logU, new_logS, &
             chiRho, chiT, Cp, Cv, dU_dRho, dS_dT, dS_dRho, mu, lnfree_e, gamma1, gamma3, &

@@ -26,7 +26,7 @@
       module solve_omega_mix
 
       use star_private_def
-      use const_def
+      use const_def, only: qp, dp
 
       implicit none
 
@@ -52,8 +52,7 @@
             tol_correction_max, tol_correction_norm
          real(dp) :: total
          real(dp), pointer, dimension(:) :: am_sig_omega, am_sig_j
-         real(qp), pointer, dimension(:) :: &
-            du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del
+         real(qp), pointer, dimension(:) :: du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del
          logical :: okay, recalc_mixing_info_each_substep
          logical, parameter :: dbg = .false.
 

@@ -1500,7 +1500,7 @@ c
       end  
       subroutine stcvzb(x,aa,data,nn,iaa,ncb1) 
 c  
-c  sets mesh point at the botton edge of the convective envelope   
+c  sets mesh point at the bottom edge of the convective envelope   
 c  for adiabatic oscillation model. 
 c  position of edge is found by extrapolation in aa(4,.) from  
 c  radiative interior. values of aa(i,.) at this point is  

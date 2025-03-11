@@ -26,7 +26,7 @@
       module adjust_mesh_split_merge
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, four_thirds_pi
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
       use auto_diff_support

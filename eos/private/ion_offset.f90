@@ -1,12 +1,10 @@
 module ion_offset
-      use const_def
+      use const_def, only: dp, amu, ev2erg
       use math_lib
 
       implicit none
 
       logical, parameter :: dbg = .false.
-      !logical, parameter :: dbg = .true.
-
 
       private
       public :: compute_ion_offset

@@ -102,14 +102,14 @@
       do J=1,NDIM1
          do I=1,NDIM2
             VEL(I,J)=0.d0
-         enddo
-      enddo
+         end do
+      end do
       do I=1,NDIM1
          PERS(I)= 0.d0
          VEL0(I)= 0.d0
          ETO(I) = 0.d0
          !SGR(I) = 0.d0
-      enddo
+      end do
       do I=1,NDIM2
          R(I) = 0.d0
          P(I) = 0.d0
@@ -128,7 +128,7 @@
          Lc(I) = 0.d0
          Lr(I) = 0.d0
          w(I) = 0.d0
-      enddo
+      end do
 
 !     SET STANDARD PARAMETERS
 !     NSEQ = SEQUENCE NUMBER (DUMMY)
@@ -162,7 +162,7 @@
          !TEMP(I)=sqrt(w(I)**2*w(I-1)**2)
          TEMP(I)=(w(I)**2*dm(I)+w(I-1)**2*dm(I-1))/ &
                  (dm(I)+dm(I-1))
-      enddo
+      end do
       do I=1,NZN
          w(I)=TEMP(I)
 !        LINE BELOW MUST BE PRESENT IF MAIN VARIABLE IS E_T
@@ -171,7 +171,7 @@
 !         AND LINE BELOW IS NOT NECESSARY THEN)
          if(w(I)<=EFL02) w(I)=EFL02
          !write(*,*) NZN-I+1, sqrt(w(i))
-      enddo
+      end do
 
       ! NOTE: w(I) now holds Et = w**2
       ! watch out
@@ -188,15 +188,15 @@
       do I=NZN,2,-1
          SS=SS+K(I)*(R(I)-R(I-1))/Vol(I)
          TA(I-1)=SS
-      enddo
+      end do
       II=0; IO=0
       do I=NZN,1,-1
          if(TA(I)>2.d0/3.d0)then
             II=I
             IO=I+1
             goto 77
-         endif
-      enddo
+         end if
+      end do
  77   continue
       if (IO == 0) then
          write(*,*) 'failed to find photosphere'
@@ -212,8 +212,8 @@
             II=I
             IO=I+1
             goto 78
-         endif
-      enddo
+         end if
+      end do
  78   continue
       AA=(T(IO)-T(II))/(TA(IO)-TA(II))
       BB=T(IO)-AA*TA(IO)
@@ -248,7 +248,7 @@
                PERS(I)/86400.d0,ETO(I)
             write(15,'(I3,2X,99e16.5)') I-1, &
                PERS(I)/86400.d0,ETO(I)
-         enddo
+         end do
          close(15)
          s% RSP_have_set_velocities = .true.
       else
@@ -258,7 +258,7 @@
             do j=1,nmodes
                VEL(I,J) = 0d0
             end do
-         enddo
+         end do
       end if
 
  11   continue
@@ -299,7 +299,7 @@
          do I=1,NZN
             s% v(NZN+1-i)=1.0d5*s% RSP_kick_vsurf_km_per_sec* &
               ((1.0d0-AMIX1-AMIX2)*VEL(I,1)+AMIX1*VEL(I,2)+AMIX2*VEL(I,3))
-         enddo
+         end do
       end if
 
       end subroutine do_rsp_build
@@ -475,7 +475,7 @@
             WE=TE**4
             T4_0=WE*0.5d0  ! T4_0=WE*1.0d0/2.d0
             T_0=pow(0.5d0, 0.25d0)*TE  ! T_0= pow(1.0d0/2.d0,0.25d0)*TE
-         endif
+         end if
          RM=sqrt(L/(P4*SIG*WE))
          R_1=RM
          if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
@@ -517,8 +517,8 @@
             if(Lc_0>=L) then
                write(*,*) 'trouble!',I
                stop
-            endif
-         endif
+            end if
+         end if
       end subroutine get_V
 
       subroutine next_dmN
@@ -858,7 +858,7 @@
          T0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE  !0.811194802d0*TE
       else  !     EDDINGTON APPROXIMATION
          T0= pow(0.5d0, 0.25d0)*TE  ! T0= pow(1.0d0/2.d0,0.25d0)*TE
-      endif
+      end if
       if (s% RSP_use_Prad_for_Psurf) then
          Psurf = crad*T0*T0*T0*T0/3d0
       else
@@ -937,7 +937,7 @@
          OMEGA_0=0.d0
          Lc_0=0.d0
          return
-      endif
+      end if
 
 !     PRESSURE SCALE HEIGHT
       HP_0=R_1**2/(G*M_0)*(P_0*V_0+P_1*V_1)/2.d0
@@ -961,7 +961,7 @@
          Lc_0=0.d0
          OMEGA_0=0.d0
          return
-      endif
+      end if
       if(IGR_0>0.d0)then
          if(.true. .or. GAMMAR==0.d0)then   ! gammar breaks Cep 11.5M model  BP
            OMEGA_0=sqrt(ALFA/CEDE*FF*GPF* &
@@ -978,16 +978,16 @@
             if(DELTA<=0.d0) then
                write(*,*) 'CFLUX: Error! : Y>0, but no solution found'
                stop
-            endif
+            end if
             OMEGA_0=(-BB+sqrt(DELTA))/(2.d0*AA)
-         endif
+         end if
          PII=FF*OMEGA_0*GPF
          Lc_0=P4*R_1**2*(T_0/V_0+T_1/V_1)*0.5d0*PII*(ALFAC/ALFAS)
 !                                                 (REPLACES ALFAS BY ALFAC)
       else
          OMEGA_0=0.d0
          Lc_0=0.d0
-      endif
+      end if
       end subroutine CFLUX
 
 

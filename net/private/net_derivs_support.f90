@@ -28,7 +28,7 @@
       use net_def, only: Net_General_Info, Net_Info, net_test_partials, &
          net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i, &
          net_test_partials_iother
-      use const_def
+      use const_def, only: dp, qp, avo, Qconv
       use chem_def
       use rates_def
 

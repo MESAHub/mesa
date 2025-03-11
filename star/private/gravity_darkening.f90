@@ -76,8 +76,8 @@ contains
           if(j==1) omega_grid(i) = dummy(1)
           C_T(1,i,j) = dummy(3)
           C_L(1,i,j) = dummy(4)
-       enddo
-    enddo
+       end do
+    end do
     close(io)
 
     ! construct interpolant for C_T
@@ -111,7 +111,7 @@ contains
        coeff = coeff_eval(1)
     else
        coeff = 1.0d0
-    endif
+    end if
   end function GD_coeff
 
 

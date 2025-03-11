@@ -377,7 +377,7 @@
                   tbl2(j,iQ,i) = vec(1+j)
                end do
 
-            enddo
+            end do
 
             if(iQ == ep% num_logQs) exit
             read(io_unit,*,iostat=info)

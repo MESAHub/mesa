@@ -22,23 +22,23 @@
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
       integer, intent(inout), pointer :: ipar(:) ! (lipar)
       real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-      
+
       double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
       double precision, pointer :: e1_1D(:)
       double precision :: x, scal(n), y0(n), y(n)
       double precision, pointer, dimension(:) :: cont, z1, z2, z3, f1, f2
       double precision :: dd1, dd2, dd3, h, fac1, err
       logical :: first, reject
-      
+
       ! LOCALS
       double precision :: hee1, hee2, hee3, sum, sum1
       integer :: i, mm, j, k, im1
       real(dp), pointer :: e1(:,:)
       real(dp), pointer, dimension(:) :: p1
-      
+
       e1(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
       p1(1:n) => cont(m1+1:m1+n)
-      
+
       ier = 0
       hee1=dd1/h
       hee2=dd2/h
@@ -49,16 +49,16 @@
 !
    1  continue
 ! ------  b=identity, jacobian a full matrix
-      do  i=1,n 
+      do  i=1,n
          f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
          cont(i)=f2(i)+y0(i)
       end do
-      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
       goto 77
 !
    8  continue
 ! ------  b=identity, jacobian a sparse matrix
-      do  i=1,n 
+      do  i=1,n
          f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
          cont(i)=f2(i)+y0(i)
       end do
@@ -67,7 +67,7 @@
 !
   11  continue
 ! ------  b=identity, jacobian a full matrix, second order
-      do i=1,n 
+      do i=1,n
          f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
          cont(i)=f2(i)+y0(i)
       end do
@@ -82,7 +82,7 @@
             end do
          end do
       end do
-      call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
       do i=m1,1,-1
          cont(i)=(cont(i)+cont(m2+i))/fac1
       end do
@@ -90,7 +90,7 @@
 !
    2  continue
 ! ------  b=identity, jacobian a banded matrix
-      do i=1,n 
+      do i=1,n
          f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
          cont(i)=f2(i)+y0(i)
       end do
@@ -99,7 +99,7 @@
 !
   12  continue
 ! ------  b=identity, jacobian a banded matrix, second order
-      do i=1,n 
+      do i=1,n
          f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
          cont(i)=f2(i)+y0(i)
       end do
@@ -133,7 +133,7 @@
          f2(i)=sum
          cont(i)=sum+y0(i)
       end do
-      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
       goto 77
 !
    9  continue
@@ -221,7 +221,7 @@
          f2(i)=sum
          cont(i)=sum+y0(i)
       end do
-      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
       goto 77
 !
   15  continue
@@ -272,7 +272,7 @@
           goto (31,32,31,32,31,32,55,55,33,55,41,42,41,42,41), ijob
 ! ------ full matrix option
   31      continue
-          call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+          call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
           goto 88
 ! ------ full matrix option, second order
  41      continue
@@ -286,7 +286,7 @@
                end do
             end do
          end do
-         call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+         call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
          do i=m1,1,-1
             cont(i)=(cont(i)+cont(m2+i))/fac1
          end do
@@ -318,7 +318,7 @@
           goto 88
 ! -----------------------------------
    88     continue
-          err=0.d0 
+          err=0.d0
           do i=1,nerror
              err=err+(cont(i)/scal(i))**2
           end do

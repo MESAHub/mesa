@@ -2,7 +2,7 @@ c------------------------------------------------------------------------
 c            s u b r o u t i n e     s a h a e q n
 c------------------------------------------------------------------------
 c This routine computes the ionization fraction of an element by solving
-c the Saha-Boltzmann equation. This routine contains data on parition
+c the Saha-Boltzmann equation. This routine contains data on partition
 c functions, mostly in the form of ground configuration statistical weights,
 c and ionization potentials.
 
@@ -33,7 +33,7 @@ c  of the MAXION most abundant and successive ionization stages, starting
 c  with ionization stages FISRTION.
 c (integer) FIRSTION is the ionization stage of the first ion whose fraction
 c  is returned in FRACTION. FIRSTION >= 1, which denotes the neutral atom.
-c (real*8) PARTITION is used to return the assumed parition function
+c (real*8) PARTITION is used to return the assumed partition function
 c for each of the maxion ions.
 
       integer tempflag, z, maxion, firstion

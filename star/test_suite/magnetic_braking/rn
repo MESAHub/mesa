@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # uncomment the following line to skip the optional inlists
 MESA_SKIP_OPTIONAL=t

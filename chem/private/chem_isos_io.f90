@@ -27,7 +27,7 @@
       module chem_isos_io
       use chem_def
       use math_lib
-      use const_def
+      use const_def, only: dp, amu, clight, five_thirds, mev_to_ergs
 
       implicit none
 

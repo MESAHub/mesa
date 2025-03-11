@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call scan-agsm.d
 if [ $# -eq 0 ] || [ $1 == "-help" ]
 then

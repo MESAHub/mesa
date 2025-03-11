@@ -17,7 +17,6 @@ Star 1, with overshooting, reaches the ending age in 80 steps:
 .. image:: ../../../star/test_suite/twin_studies/docs/star1000080.svg
    :width: 100%
 
-|br| |br|
 Star 2, without overshooting, reaches the ending age in 273 steps. Star 2 is further along
 in its evolutionary path as might be expected without the extra fuel provided to the
 core by overshooting:
@@ -49,7 +48,6 @@ for star 1:
 
  / ! end of pgstar namelist
 
-|br|
 and for star 2:
 
 .. code-block:: console
@@ -74,8 +72,3 @@ and for star 2:
 
 
 Last-Updated: 01Jul2021 (MESA 094ff71) by fxt.
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

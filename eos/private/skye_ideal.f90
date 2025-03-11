@@ -1,7 +1,7 @@
 module skye_ideal
    use math_lib
    use auto_diff
-   use const_def
+   use const_def, only: dp, pi, amu, planck_h, avo, crad, kerg
 
    implicit none
 

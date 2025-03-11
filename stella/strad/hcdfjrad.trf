@@ -74,7 +74,7 @@
    <*A: FORM SMALL MATRICES ACcorDING THE RULE:
         A - FOR VALUES OVER ZONE 0 (LEFT)
         B - FOR VALUES OVER ZONE 1 (OWN )
-        C - FOR VALUES OVER ZONE 2 (RIGHT) WITH INDECES  i,j
+        C - FOR VALUES OVER ZONE 2 (RIGHT) WITH INDICES  i,j
         i,j = 0 corresponding to radius
         i,j = 1 corresponding to velocity
         i,j = 2 corresponding to temperature

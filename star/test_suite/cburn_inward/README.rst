@@ -31,7 +31,7 @@ This test case has two parts. Click to see a larger view of a plot.
 
 * Part 1 (``inlist_initial``) creates a 7.5 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to core helium depletion (mass fraction helium < 1e-5.)
 
-* Part 2 (``cburn_inward``) continues the evoluton where an off-center carbon burning front ignites, develops a convective region behind the burning front, and propagates towards the center through oxygen-neon-magnesium rich material.
+* Part 2 (``cburn_inward``) continues the evolutionn where an off-center carbon burning front ignites, develops a convective region behind the burning front, and propagates towards the center through oxygen-neon-magnesium rich material.
 
 .. image:: ../../../star/test_suite/cburn_inward/docs/grid_000170.svg
    :width: 100%

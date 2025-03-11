@@ -26,7 +26,7 @@
 
 module tdc
 
-use const_def
+use const_def, only: dp, sqrt_2_div_3
 use num_lib
 use utils_lib
 use auto_diff

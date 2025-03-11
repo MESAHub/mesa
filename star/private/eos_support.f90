@@ -25,21 +25,14 @@
 
 module eos_support
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, ln10, arg_not_provided
   use star_private_def
   use utils_lib, only : is_bad, mesa_error
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameter definitions
 
   integer, parameter :: MAX_ITER_FOR_SOLVE = 100
 
-  ! Access specifiers
 
   private
 
@@ -52,7 +45,6 @@ module eos_support
   public :: solve_eos_given_PgasT
   public :: solve_eos_given_PgasT_auto
 
-  ! Procedures
 
 contains
 
@@ -117,7 +109,6 @@ contains
 
   end subroutine get_eos
 
-  !****
 
   ! Solve for temperature & eos results data given density & energy
 
@@ -160,7 +151,6 @@ contains
 
   end subroutine solve_eos_given_DE
 
-  !****
 
   ! Solve for temperature & eos results data given density & gas energy
 
@@ -202,7 +192,6 @@ contains
 
   end subroutine solve_eos_given_DEgas
 
-  !****
 
   ! Solve for temperature & eos results data given density & pressure
 
@@ -244,7 +233,6 @@ contains
 
   end subroutine solve_eos_given_DP
 
-  !****
 
   ! Solve for temperature & eos results data for a given density &
   ! entropy
@@ -288,7 +276,6 @@ contains
 
   end subroutine solve_eos_given_DS
 
-  !****
 
   ! Solve for density & eos results data given pressure & temperature
 
@@ -330,7 +317,6 @@ contains
 
   end subroutine solve_eos_given_PT
 
-  !****
 
   ! Solve for density & eos results data given gas pressure &
   ! temperature
@@ -380,7 +366,6 @@ contains
 
   end subroutine solve_eos_given_PgasT
 
-  !****
 
   ! Solve for density & eos results data given gas pressure &
   ! temperature, with logRho_guess calculated automatically via an
@@ -434,6 +419,5 @@ contains
 
   end subroutine solve_eos_given_PgasT_auto
 
-  !****
 
 end module eos_support

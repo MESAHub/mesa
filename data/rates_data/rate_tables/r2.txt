@@ -1,4 +1,4 @@
-# table for experiemental rate
+# table for experimental rate
 #                         
 #    T8     rate             
 

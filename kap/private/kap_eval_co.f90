@@ -38,7 +38,7 @@
                rq, Zbase, X, dXC, dXO, Rho, logRho, T, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
-         use const_def
+         use const_def, only: dp
 
          ! INPUT
          type (Kap_General_Info), pointer :: rq
@@ -681,11 +681,11 @@
          call Find_CO_Tables(rq, x_tables, ix, x_tables(ix)% CO_table_numbers,  &
                      x_tables(ix)% next_dXO_table, x_tables(ix)% next_dXC_table,  &
                      co_tables, num_CO_tables, num_dXC_gt_dXO, &
-                     dXCO_max, dXC, dXO, dXC_lookup, dXO_lookup, i1, i2, i3, i4,ierr)
+                     dXCO_max, dXC, dXO, dXC_lookup, dXO_lookup, i1, i2, i3, i4, ierr)
          if (ierr /= 0) then
             write(*,*) 'kap failed in Find_CO_Tables'
             return
-         endif
+         end if
 
          if (i1 > 0 .and. i2 <= 0 .and. i3 <= 0 .and. i4 <= 0) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i1, logRho, logT,  &

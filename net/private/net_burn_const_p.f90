@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module net_burn_const_P
-      use const_def
+      use const_def, only: dp, ln10
       use chem_def
       use math_lib
       use net_def
@@ -409,7 +409,7 @@
                call system_clock(time0,clock_rate)
             else
                time0 = 0
-            endif
+            end if
 
             call eosPT_get( &
                eos_handle, &

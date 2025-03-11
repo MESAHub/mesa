@@ -25,9 +25,7 @@
 
 module math_lib
 
-  ! Uses
-
-  use const_lib, only: dp, PI
+  use const_def, only: dp, pi
 
   use math_io
   use math_pown
@@ -35,17 +33,9 @@ module math_lib
 
   use IEEE_ARITHMETIC
 
-  ! No implicit typing
-
   implicit none
 
-  ! Parameter definitions
-
   character(LEN=16), parameter :: MATH_BACKEND = 'INTRINSIC'
-
-  ! Interfaces
-
-  ! Generic interfaces
 
   interface safe_sqrt
      module procedure safe_sqrt_
@@ -104,11 +94,7 @@ module math_lib
      module procedure atanpi_
   end interface atanpi
 
-  ! Module variables
-
   real(dp), save :: ln10_m
-
-  ! Access specifiers
 
   private
 
@@ -141,8 +127,6 @@ module math_lib
   public :: str_to_double
   public :: double_to_str
 
-  ! Procedures
-
 contains
 
   subroutine math_init ()
@@ -153,7 +137,6 @@ contains
 
   end subroutine math_init
 
-  !****
 
   elemental function safe_sqrt_ (x) result (sqrt_x)
 
@@ -164,7 +147,6 @@ contains
 
   end function safe_sqrt_
 
-  !****
 
   elemental function safe_log_ (x) result (log_x)
 
@@ -183,7 +165,6 @@ contains
 
   end function safe_log_
 
-  !****
 
   elemental function safe_log10_ (x) result (log10_x)
 
@@ -202,7 +183,6 @@ contains
 
   end function safe_log10_
 
-  !****
 
   elemental function log1p_ (x) result (log1p_x)
 
@@ -213,7 +193,6 @@ contains
 
   end function log1p_
 
-  !****
 
   elemental function log2_ (x) result (log2_x)
 
@@ -224,7 +203,6 @@ contains
 
   end function log2_
 
-  !****
 
   elemental function exp10_ (x) result (exp10_x)
 
@@ -250,11 +228,10 @@ contains
 
        exp10_x = EXP(x*ln10_m)
 
-    endif
+    end if
 
   end function exp10_
 
-  !****
 
   elemental function expm1_ (x) result (expm1_x)
 
@@ -265,7 +242,6 @@ contains
 
   end function expm1_
 
-  !****
 
   elemental function pow_i_ (x, iy) result (pow_x)
 
@@ -277,7 +253,6 @@ contains
 
   end function pow_i_
 
-  !****
 
   elemental function pow_r_ (x, y) result (pow_x)
 
@@ -289,7 +264,6 @@ contains
 
   end function pow_r_
 
-  !****
 
   elemental function cospi_ (x) result (cospi_x)
 
@@ -300,7 +274,6 @@ contains
 
   end function cospi_
 
-  !****
 
   elemental function sinpi_ (x) result (sinpi_x)
 
@@ -311,7 +284,6 @@ contains
 
   end function sinpi_
 
-  !****
 
   elemental function tanpi_ (x) result (tanpi_x)
 
@@ -322,7 +294,6 @@ contains
 
   end function tanpi_
 
-  !****
 
   elemental function acospi_ (x) result (acospi_x)
 
@@ -333,7 +304,6 @@ contains
 
   end function acospi_
 
-  !****
 
   elemental function asinpi_ (x) result (asinpi_x)
 
@@ -344,7 +314,6 @@ contains
 
   end function asinpi_
 
-  !****
 
   elemental function atanpi_ (x) result (atanpi_x)
 
