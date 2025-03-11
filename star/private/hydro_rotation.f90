@@ -763,7 +763,7 @@
          dbg = .false.  ! (s% model_number >= 5)
 
          !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
-         w = aw
+         w = abs(aw)  ! single rotation deformation is symmetric to prograde/retrograde
          w% d1val1 = 1d0
 
          w2 = pow2(w)

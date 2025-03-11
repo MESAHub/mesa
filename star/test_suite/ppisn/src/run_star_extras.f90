@@ -39,6 +39,8 @@
       include "test_suite_extras_def.inc"
 
       logical :: dbg = .false.
+      real(dp), parameter :: log_term_power = 5.626d0
+
 
       logical :: pgstar_flag
       integer :: pgstar_interval, pgstar_file_interval
@@ -341,11 +343,10 @@
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         integer :: j
          real(dp) :: alpha
 
-         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
-            fp_temp, ft_temp
+         type(auto_diff_real_1var_order1) :: A_omega, fp_numerator, ft_numerator, &
+            w, w2, w3, w4, w5, w6, w_log_term, fp_temp, ft_temp
 
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -388,7 +389,7 @@
             if (s% q(k) > 0.999) then
                fp = 1d0
                ft = 1d0
-            else if (s% q(j) > 0.998) then
+            else if (s% q(k) > 0.998) then
                alpha = (1d0 - (s% q(k) - 0.998) / 0.001)
                fp = fp * alpha + 1d0 * (1 - alpha)
                ft = ft * alpha + 1d0 * (1 - alpha)
@@ -397,6 +398,13 @@
 
       end subroutine my_other_eval_fp_ft
 
+      real(dp) function re_from_rpsi_factor(o2, o4, o6)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         ! Fabry+2022, Eq. A.3
+         re_from_rpsi_factor = 1d0 + one_sixth * o2 - 0.005124d0 * o4 + 0.06562d0 * o6
+      end function re_from_rpsi_factor
 
       subroutine my_other_kap_get( &
             id, k, handle, species, chem_id, net_iso, xa, &
