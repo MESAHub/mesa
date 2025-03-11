@@ -33,6 +33,7 @@ module binary_roche_deformation
    use interp_2d_lib_db
    use auto_diff
    use star_def
+   use const_def
    use binary_def
    use binary_utils, only : eval_rlobe
 
@@ -48,7 +49,6 @@ module binary_roche_deformation
 contains
 
    subroutine build_roche_interpolators
-      use const_def, only: mesa_data_dir
       real(dp) :: xtest, ytest, testval
       integer :: ierr
       character(len=strlen) :: upstairs
