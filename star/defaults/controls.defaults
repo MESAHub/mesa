@@ -3382,7 +3382,7 @@
 
       ! ::
 
-    max_conv_vel_div_csound_maxq = 1d99
+    max_conv_vel_div_csound_maxq = -1
 
       ! max_v_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~
