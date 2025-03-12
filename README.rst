@@ -1,4 +1,4 @@
-.. image:: docs/source/mesa-logo2-200.png
+.. image:: docs/source/mesa-logo.png
   :align: center
   :width: 200
   :alt: MESA
