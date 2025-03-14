@@ -2,14 +2,10 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
-do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
-do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
-
-return
-
 # Slow cases
 do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
 do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
+do_one ccsn_IIp "shock has reached target location    1" "shock_part5.mod" auto
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
 do_one c13_pocket "all values are within tolerance" "final.mod" auto
 
@@ -28,6 +24,7 @@ do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 16M_conv_premix "termination code: xa_central_lower_limit" "tams.mod" auto
 do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" auto
+do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one carbon_kh "stop because log_center_density >= log_center_density_upper_limit" "final.mod" auto
