@@ -22,4 +22,4 @@ RUN curl -L https://zenodo.org/records/13768913/files/mesasdk-x86_64-linux-24.7.
     tar xzf - -C /opt/
 ENV MESASDK_ROOT=/opt/mesasdk
 RUN bash $MESASDK_ROOT/bin/mesasdk_init.sh
-RUN gem install mesa_test
+RUN gem install mesa_test -v 1.1.11
