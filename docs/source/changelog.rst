@@ -27,6 +27,9 @@ Removed `file_extension` option because it is redundant with `file_device`. Dele
 New Features
 ------------
 
+Changed the default for ``use_radiation_corrected_transfer_rate =
+.false.``.
+
 ``mesa_reader`` can now be installed with ``pip``.
 
 A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
