@@ -1,0 +1,41 @@
+
+&star_job
+
+/ !end of star_job namelist
+
+
+&controls
+   use_other_wind = .false.
+
+   !use_ODE_var_eqn_pairing = .true.      
+   use_dPrad_dm_form_of_T_gradient_eqn = .false. ! use default
+   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false. ! use eos 
+   use_momentum_outer_BC = .true.
+   
+   use_split_merge_amr = .true.
+
+   max_surface_cell_dq = 1d-12!1d0
+   split_merge_amr_dq_min = 1d-16
+
+   max_mdot_redo_cnt = 0
+
+   restore_mesh_on_retry = .true.
+   num_steps_to_hold_mesh_after_retry = 5
+
+      MLT_option = 'TDC'
+      alpha_TDC_DAMP = 1d0
+      alpha_TDC_DAMPR = 1d0!1d-2! 0d0 for mlt
+      alpha_TDC_PtdVdt = 0d0!1d0!1d0!1d-2!1d0!0d0
+      steps_before_use_TDC = 0
+
+   !v_drag is set in run_star_extras
+   !q_for_v_drag_full_off = 0.98d0
+   !q_for_v_drag_full_on = 0.99d0
+
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

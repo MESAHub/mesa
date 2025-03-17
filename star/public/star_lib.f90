@@ -828,6 +828,15 @@
          call set_j_rot_flag(id, j_rot_flag, ierr)
       end subroutine star_set_j_rot_flag
 
+      subroutine remesh_for_TDC_pulsation(id, ierr)
+         use set_flags, only: set_TDC_to_RSP2_mesh
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call set_TDC_to_RSP2_mesh(id, ierr)
+      end subroutine remesh_for_TDC_pulsation
 
       subroutine star_set_RSP2_flag(id, et_flag, ierr)
          use set_flags, only: set_RSP2_flag

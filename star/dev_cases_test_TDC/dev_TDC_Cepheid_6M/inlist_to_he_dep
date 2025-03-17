@@ -1,0 +1,140 @@
+&kap
+
+/
+
+&eos
+
+/
+
+&star_job
+   create_pre_main_sequence_model = .true.
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'he_dep.mod'
+   required_termination_code_string = 'xa_central_lower_limit'
+
+
+   change_v_flag = .true.
+   new_v_flag = .true.
+
+
+
+
+!relax_to_this_tau_factor = 1d0!1d-4!-1
+!dlogtau_factor = 0.1d0
+!relax_tau_factor = .true.
+
+relax_to_this_tau_factor = 1d-3!-1
+dlogtau_factor = 0.1d0
+relax_tau_factor = .true.
+
+/ !end of star_job namelist
+
+
+&controls
+
+   !max_surface_cell_dq = 1d0 !1d-12
+   !min_dq = 1d-10
+
+!use_zero_Pgas_outer_BC = .true.
+!RSP2_use_Stellingwerf_Lr = .true. ! works with tdc now.
+!RSP2_use_L_eqn_at_surface = .true.
+!RSP2_Lsurf_factor = 0.5d0
+
+!   mlt_make_surface_no_mixing = .true.
+
+
+! add a bit of wind to make surface composition flat.
+
+
+! wind
+      cool_wind_full_on_T = 0.8d4
+      hot_wind_full_on_T = 1.2d4
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5d0  
+      Blocker_scaling_factor = 0.1d0 ! 0.8d0        
+
+
+! we want some drag while hydro is on because
+! we relaxed tau so much.
+!use_drag_energy = .false.
+drag_coefficient = 1d0
+min_q_for_drag = 0.8d0
+
+
+  ! stop when the center mass fraction of h1 drops below this limit
+    xa_central_lower_limit_species(1) = 'he4'
+    xa_central_lower_limit(1) = 0.26d0
+
+  ! relax this or you get tiny timesteps during pre He-ZAMS
+    limit_for_rel_error_in_energy_conservation = -1d0
+    hard_limit_for_rel_error_in_energy_conservation = -1d0
+    max_abs_rel_run_E_err = 1d99
+
+    x_logical_ctrl(12) = .false. ! not in inlist_pulses.
+
+      photo_interval = 100
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+
+   !pause = .true.
+   !pause_interval = 100
+   pgstar_interval = 5  ! 25
+
+! window 1
+
+   Grid1_win_flag = .false.
+   Grid1_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP2'
+
+   !Grid1_file_flag = .true.
+   Grid1_file_dir = 'png1'
+   Grid1_file_prefix = 'grid1'
+   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
+   !Profile_Panels1_xmin = 50 ! -101D0
+   !Profile_Panels1_xmax = 65 ! -101D0
+   
+! window 2
+      
+   Grid2_win_flag = .true.
+   Grid2_title = '6 M\d\(2281)\u Z=0.03 Cepheid RSP2'
+   
+   History_Panels2_xaxis_name='day'
+   History_Panels2_max_width = 40 ! only used if > 0.  causes xmin to move with xmax.
+
+   Grid2_file_flag = .true.
+   file_digits = 7
+   Grid2_file_dir = 'png'
+   Grid2_file_prefix = 'grid2'
+   Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+   
+   !Profile_Panels2_show_grid = .true.
+
+   !Profile_Panels2_xaxis_name = 'logtau'
+   !Profile_Panels2_xaxis_reversed = .true.
+   !Profile_Panels2_xmin = -101d0
+   !Profile_Panels2_xmax = -101D0
+
+   Profile_Panels2_xaxis_name = 'logxm'
+   Profile_Panels2_xaxis_reversed = .true.
+   Profile_Panels2_xmin = -6
+   Profile_Panels2_xmax = -0.1
+
+   Profile_Panels2_xaxis_name = 'zone'
+   Profile_Panels2_xaxis_reversed = .true.
+   Profile_Panels2_xmin = -101
+   Profile_Panels2_xmax = -101
+   
+
+
+
+
+/ ! end of pgstar namelist
