@@ -105,9 +105,9 @@
             !xs = (/1.0_dp/)
             !zs = (/2.0_dp/)
             !as = (/4.0_dp/)
-            xs = (/0.5_dp, 0.5_dp/)
-            zs = (/1.0_dp, 2.0_dp/)
-            as = (/1.0_dp, 4.0_dp/)
+            xs = [0.5_dp, 0.5_dp]
+            zs = [1.0_dp, 2.0_dp]
+            as = [1.0_dp, 4.0_dp]
 
             return_profile = .true.
 
@@ -182,9 +182,9 @@
             call reallocate_dp(xs, ns)
             call reallocate_dp(zs, ns)
             call reallocate_dp(as, ns)
-            xs = (/0.5_dp, 0.5_dp/)
-            zs = (/2.0_dp, 6.0_dp/)
-            as = (/4.0_dp, 12.0_dp/)
+            xs = [0.5_dp, 0.5_dp]
+            zs = [2.0_dp, 6.0_dp]
+            as = [4.0_dp, 12.0_dp]
 
             nx = 25
             tanh_range = 3_dp
@@ -278,9 +278,9 @@
             call reallocate_dp(xs, ns)
             call reallocate_dp(zs, ns)
             call reallocate_dp(as, ns)
-            xs = (/1.0_dp/)
-            zs = (/2.0_dp/)
-            as = (/4.0_dp/)
+            xs = [1.0_dp]
+            zs = [2.0_dp]
+            as = [4.0_dp]
 
             nc = 33
             cut_min = 1e-2_dp
@@ -324,7 +324,7 @@
 
             nt = 1 !5
             call reallocate_dp(t_list, nt)
-            t_list = (/1e7_dp/) !(/1e6_dp, 3e6_dp, 1e7_dp, 3e7_dp, 1e8_dp/)
+            t_list = [1e7_dp] !(/1e6_dp, 3e6_dp, 1e7_dp, 3e7_dp, 1e8_dp/)
 
             nn = 57
             nmin = 1e24_dp
@@ -334,9 +334,9 @@
             call reallocate_dp(xs, ns)
             call reallocate_dp(zs, ns)
             call reallocate_dp(as, ns)
-            xs = (/1.0_dp/)
-            zs = (/6.0_dp/)
-            as = (/12.0_dp/)
+            xs = [1.0_dp]
+            zs = [6.0_dp]
+            as = [12.0_dp]
 
             return_profile = .false.
 
@@ -408,9 +408,9 @@
             call reallocate_dp(xs, ns)
             call reallocate_dp(zs, ns)
             call reallocate_dp(as, ns)
-            xs = (/1.0_dp/)
-            zs = (/2.0_dp/)
-            as = (/4.0_dp/)
+            xs = [1.0_dp]
+            zs = [2.0_dp]
+            as = [4.0_dp]
 
             return_profile = .false.
 

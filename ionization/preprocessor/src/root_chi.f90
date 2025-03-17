@@ -26,14 +26,15 @@
          real (dp), optional, intent(in) :: opt_guess
 
          integer, parameter :: max_iter = 100
-         real (dp), parameter :: eps = epsilon(1.0) ! this may need re-thinking
+         real (dp), parameter :: eps = epsilon(1.0)  ! this may need re-thinking
          real (dp), parameter :: tol = 1.0e-10_dp
 
          integer :: i
-         real (dp) :: guess = 0.0_dp
+         real (dp) :: guess
          real (dp) :: a, b, c, d, e, fa, fb, fc, p, q, r, s
          real (dp) :: tol1, x1, x2, xm
 
+         guess = 0.0_dp
 
          if (present(opt_guess)) guess = opt_guess
 

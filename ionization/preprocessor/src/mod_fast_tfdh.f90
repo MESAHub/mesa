@@ -19,7 +19,6 @@
 
       contains
 
-
       logical function fasttfdh(args)
 
          type(datastruct), intent(inout) :: args
@@ -111,7 +110,5 @@
          dydx(2) = - 4.0*pi*qe * x * (qi_sum - ne_loc)
 
       end subroutine d_fasttfdh
-
-
 
       end module mod_fast_tfdh

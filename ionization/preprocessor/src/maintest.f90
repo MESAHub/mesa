@@ -58,9 +58,9 @@
       call reallocate_dp(xs, ns)
       call reallocate_dp(zs, ns)
       call reallocate_dp(as, ns)
-      xs = (/0.5_dp, 0.5_dp/)
-      zs = (/1.0_dp, 2.0_dp/)
-      as = (/1.0_dp, 4.0_dp/)
+      xs = [0.5_dp, 0.5_dp]
+      zs = [1.0_dp, 2.0_dp]
+      as = [1.0_dp, 4.0_dp]
 
       return_profile = .false.
 
