@@ -30,7 +30,7 @@
       use kap_def, only: kap_test_partials, kap_test_partials_val, kap_test_partials_dval_dx
 
       contains
-!***********************************************************************
+! **********************************************************************
       subroutine abund(nel, izz, fa, flmu, nkz)
       implicit none
       integer, intent(in) :: nel, izz(ipe)
@@ -67,7 +67,7 @@
 
       return
       end subroutine abund
-!**********************************************************************
+! *********************************************************************
       subroutine xindex(flt, ilab, xi, ih, i3, ierr)
       implicit none
       integer, intent(in) :: i3
@@ -82,7 +82,7 @@
       if (flt < 3.5) then
         ierr = 102
         return
-      elseif (flt > 8.) then
+      else if (flt > 8.) then
         ierr = 102
         return
       endif
@@ -99,7 +99,7 @@
 
       return
       end subroutine xindex
-!**********************************************************************
+! *********************************************************************
       subroutine jrange(ih, jhmin, jhmax, i3)
       implicit none
       integer, intent(in) :: ih(0:5), i3
@@ -115,9 +115,8 @@
 
       return
       end subroutine jrange
-!**********************************************************************
-      subroutine findne(ilab, fa, nel, nkz, jhmin, jhmax, ih,
-     + flrho, flt, xi, flne, flmu, flr, epa, uy, i3, ierr)
+! *********************************************************************
+      subroutine findne(ilab, fa, nel, nkz, jhmin, jhmax, ih, flrho, flt, xi, flne, flmu, flr, epa, uy, i3, ierr)
       use op_load, only : solve
       implicit none
       integer, intent(in) :: ilab(0:5), nel, nkz(ipe), jhmin, ih(0:5), i3
@@ -128,17 +127,15 @@
       real, intent(inout) :: flrho
 ! local variables
       integer :: i, j, n, jh, jm, itt, jne, jnn
-      real :: flrmin, flrmax, flr(4,4), uyi(4), efa(0:5, 7:118),
-     : flrh(0:5, 7:118), u(4), flnei(4), y, zeta, efa_temp
+      real :: flrmin, flrmax, flr(4,4), uyi(4), efa(0:5, 7:118), flrh(0:5, 7:118), u(4), flnei(4), y, zeta, efa_temp
 ! declare variables in common block, by default: real (a-h, o-z), integer (i-n)
-!       integer :: ite1, ite2, ite3, jn1, jn2, jne3, ntot, nc, nf, int,
-!      : ne1, ne2, np, kp1, kp2, kp3, npp, mx, nx
+!       integer :: ite1, ite2, ite3, jn1, jn2, jne3, ntot, nc, nf, int, ne1, ne2, np, kp1, kp2, kp3, npp, mx, nx
 !       real :: umin, umax, epatom, oplnck, fion, yy1, yy2, yx
-!       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot,
-!      + nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1(17,91,25),
-!      + ne2(17,91,25),fion(-1:28,28,91,25),np(17,91,25),kp1(17,91,25),
-!      + kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000),
-!      + yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
+!       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot, &
+!        nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1(17,91,25), &
+!        ne2(17,91,25),fion(-1:28,28,91,25),np(17,91,25),kp1(17,91,25), &
+!        kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000), &
+!        yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
 !       save /atomdata/
 !
 !  efa(i,jh)=sum_n epa(i,jh,n)*fa(n)
@@ -227,7 +224,7 @@
   601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range'/
      +  ' Allowed range for flrho is ',e11.3,' to ',e11.3)
       end subroutine findne
-!***********************************************************************
+! **********************************************************************
       subroutine yindex(jhmin, jhmax, flne, jh, i3, eta)
       implicit none
       integer, intent(in) :: jhmin, jhmax, i3
@@ -249,7 +246,7 @@
 
       return
       end subroutine yindex
-!***********************************************************************
+! **********************************************************************
       subroutine findux(flr, xi, eta, ux)
       implicit none
       real, intent(in) :: flr(4, 4), xi, eta
@@ -268,7 +265,7 @@
 
       return
       end subroutine findux
-!**********************************************************************
+! *********************************************************************
       subroutine rd(nel, nkz, izz, ilab, jh, n_tot, ff, rr, i3, umesh, fac)
       implicit none
       integer, intent(in) :: nel, nkz(ipe), izz(ipe), ilab(0:5),
@@ -281,8 +278,7 @@
       integer :: i, j, k, l, m, n, itt, jnn, izp, ne1, ne2, ne, ib, ia
       real :: fion(-1:28), yb, ya, d
 ! declare variables in common block (instead of by default: real (a-h, o-z), integer (i-n))
-!       integer :: ite1, ite2, ite3, jn1, jn2, jne3, ntot, nc, nf, int,
-!      : ne1p, ne2p, np, kp1, kp2, kp3, npp, mx, nx
+!       integer :: ite1, ite2, ite3, jn1, jn2, jne3, ntot, nc, nf, int, ne1p, ne2p, np, kp1, kp2, kp3, npp, mx, nx
 !       real :: umin, umax, epatom, oplnck, fionp, yy1, yy2, yx
 !       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot,
 !      + nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1p(17,91,25),
@@ -336,7 +332,7 @@
       return
 
       end subroutine rd
-!***********************************************************************
+! **********************************************************************
       subroutine ross(flmu, dv, ntot,rs, rossl)
       implicit none
       integer, intent(in) :: ntot
@@ -362,7 +358,7 @@
 
       return
       end subroutine ross
-!***********************************************************************
+! **********************************************************************
       subroutine mix(ntot, nel, fa, ff, rs, rr, rion)
       implicit none
       integer, intent(in) :: ntot, nel
@@ -395,7 +391,7 @@
 
       return
       end subroutine mix
-!***********************************************************************
+! **********************************************************************
       subroutine interp(nel, rossl, xi, eta, g, i3, ux, uy, gx, gy)
       implicit none
       integer, intent(in) :: nel, i3
@@ -406,8 +402,7 @@
       real :: V(4), U(4),  vyi(4)
       real :: x3(3), fx3!, fxxy(0:5, 0:5), fyxy(0:5, 0:5)
 ! pointers and targets
-      real, target :: fx(0:5, 0:5), fy(0:5, 0:5), fxy(0:5, 0:5), fyx(0:5, 0:5),
-     : fxx(0:5, 0:5), fyy(0:5, 0:5), rossl(0:5, 0:5)
+      real, target :: fx(0:5, 0:5), fy(0:5, 0:5), fxy(0:5, 0:5), fyx(0:5, 0:5), fxx(0:5, 0:5), fyy(0:5, 0:5), rossl(0:5, 0:5)
       real, pointer :: f3(:), fin(:, :), finx(:, :), finy(:, :)
 !
 !     interpolation of g (=rosseland mean opacity)
@@ -496,9 +491,9 @@
       gy = 0.5*gy/uy
       gx = (80./real(i3))*(0.5*gx-gy*ux)
 
-      RETURN
+      return
       end subroutine interp
-!**************************************
+! *************************************
       function fint(u,r)
       dimension u(4)
 
@@ -515,7 +510,7 @@
 !
       return
       end function fint
-!***********************************************************************
+! **********************************************************************
       function fintp(u,r)
       dimension u(4)
 
@@ -532,68 +527,68 @@
       return
       end function fintp
 
-!***********************************************************************
-      SUBROUTINE DERIV(f, fx, fy, fxy)
+! **********************************************************************
+      subroutine DERIV(f, fx, fy, fxy)
 
       real, intent(in) :: f(0:5, 0:5)
       real, intent(out) :: fx(0:5, 0:5), fy(0:5, 0:5), fxy(0:5, 0:5)
       real :: C(6)
 
 !  GET FX
-      DO J = 0, 5
+      do J = 0, 5
          L=0
-         DO I = 0, 5
+         do I = 0, 5
             L=L+1
             C(L)=F(I,J)
-      END DO
-         CALL GET(C,L)
+      end do
+         call GET(C,L)
          L=0
-         DO I = 0, 5
+         do I = 0, 5
             L = L + 1
             FX(I, J) = C(L)
-         END DO
-      END DO
+         end do
+      end do
 
 !  GET FY
-      DO I = 0, 5
+      do I = 0, 5
          L=0
-         DO J = 0, 5
+         do J = 0, 5
             L = L + 1
             C(L) = F(I, J)
-         END DO
-         CALL GET(C,L)
+         end do
+         call GET(C,L)
          L=0
-         DO J = 0, 5
+         do J = 0, 5
             L = L + 1
             FY(I,J) = C(L)
-         END DO
-      END DO
+         end do
+      end do
 
 !  GET FXY
-      DO I = 0, 5
+      do I = 0, 5
          L = 0
-         DO J = 0, 5
+         do J = 0, 5
             L = L + 1
             C(L) = FX(I, J)
-         END DO
-         CALL GET(C,L)
+         end do
+         call GET(C,L)
          L=0
-         DO J = 0, 5
+         do J = 0, 5
             L = L + 1
             FXY(I,J) = C(L)
-         END DO
-      END DO
+         end do
+      end do
 
-      RETURN
+      return
 
-      END SUBROUTINE DERIV
-!******************************************************************
+      end subroutine DERIV
+! *****************************************************************
 !
-      SUBROUTINE GET(F,N)
+      subroutine GET(F,N)
 !
 !  SIMPLIFIED CODE FOR SPLINE COEFFICIENTS, FOR CASE OF INTERVALS
 !  OF UNITY.
-!  RETURNS DERIVATIVES OF ORIGINAL F IN LOCATION F
+!  returnS DERIVATIVES OF ORIGINAL F IN LOCATION F
 !
 !  REVISED 5.5.95
 !
@@ -601,16 +596,16 @@
       DIMENSION F(IPI),D(IPI),T(IPI)
 
       if (N <= 0) then
-         WRITE(6,*)' Error in SUBROUTINE GET: N=',N
+         WRITE(6,*)' Error in subroutine GET: N=',N
          STOP
-      elseif (N == 1) then
+      else if (N == 1) then
          F(1)=0.
-         RETURN
-      elseif (N == 2) then
+         return
+      else if (N == 2) then
          F(1)=F(2)-F(1)
          F(2)=F(1)
-         RETURN
-      elseif (N == 3) then
+         return
+      else if (N == 3) then
          FP1=.5*(-3.*F(1)+4.*F(2)-F(3))
          FPN=.5*(F(1)-4.*F(2)+3.*F(3))
       ELSE
@@ -621,27 +616,27 @@
       D(1)=-.5
       T(1)=.5*(-F(1)+F(2)-FP1)
 
-      DO J=2,N-1
+      do J=2,N-1
          D(J)=-1./(4.+D(J-1))
          T(J)=-D(J)*(F(J-1)-2.*F(J)+F(J+1)-T(J-1))
-      END DO
+      end do
 
       D(N)=(FPN+F(N-1)-F(N)-T(N-1))/(2.+D(N-1))
 
-      DO J=N-1,1,-1
+      do J=N-1,1,-1
          D(J)=D(J)*D(J+1)+T(J)
-      END DO
+      end do
 
-      DO J=2,N-1
+      do J=2,N-1
          F(J)=-F(J)+F(J+1)-2.*D(J)-D(J+1)
-      END DO
+      end do
       F(1)=FP1
       F(N)=FPN
 
-      RETURN
-      END SUBROUTINE GET
+      return
+      end subroutine GET
 
-!***********************************************************************
+! **********************************************************************
       subroutine INTERP2(f, fx, fy, fxy, xi, eta, g, gx, gy)
       real, intent(in) :: eta, xi, f(0:5, 0:5), fx(0:5, 0:5), fy(0:5, 0:5), fxy(0:5, 0:5)
       real, intent(out) :: g, gx, gy
@@ -720,10 +715,10 @@
       gy = FFY(U, V)
 !      DGDT=(1./CT)*FFX(U,V)-(3./CN)*FFY(U,V)
 !      DGDRHO=(1./CN)*FFY(U,V)
-      RETURN
+      return
 
-      END SUBROUTINE INTERP2
-!*************************************************************
+      end subroutine INTERP2
+! ************************************************************
 ! This subroutine estimates the partial derivative of a function
 ! as described in the PhD thesis by M.-A. Dupret.
       subroutine deriv3(f, x, fx)
@@ -745,7 +740,7 @@
       endif
 
       end subroutine deriv3
-!***********************************************************************
+! **********************************************************************
       subroutine interp3(f, fx, fy, xi, eta, g)
       real, intent(in) :: eta, xi, f(2:3, 2:3), fx(2:3, 2:3), fy(2:3, 2:3)
       real, intent(out) :: g
@@ -767,37 +762,35 @@
       Py12 = P1(x,2.,3.)*Px2(y,2.,3.)
       Py22 = P2(x,2.,3.)*Px2(y,2.,3.)
 
-      g = f(2,2)*P11 + f(3,2)*P21 + f(2,3)*P12 + f(3,3)*P22
-     : + fx(2,2)*Px11 + fx(3,2)*Px21 + fx(2,3)*Px12 + fx(3,3)*Px22
-     : + fy(2,2)*Py11 + fy(3,2)*Py21 + fy(2,3)*Py12 + fy(3,3)*Py22
+      g = f(2,2)*P11 + f(3,2)*P21 + f(2,3)*P12 + f(3,3)*P22 + fx(2,2)*Px11 + fx(3,2)*Px21 + fx(2,3)*Px12 + fx(3,3)*Px22 + fy(2,2)*Py11 + fy(3,2)*Py21 + fy(2,3)*Py12 + fy(3,3)*Py22
 
       end subroutine interp3
-!***********************************************************************
+! **********************************************************************
       function P1(x, xi, xj)
 
          P1 = (x - xj)*(x - xj) * (2*x - 3*xi + xj)/((xj - xi)*(xj - xi)*(xj - xi))
 
       end function P1
-!***********************************************************************
+! **********************************************************************
       function P2(x, xi, xj)
       real, intent(in) :: x, xi, xj
 
          P2 = -(x - xi)*(x - xi) * (2*x - 3*xj + xi)/((xj - xi)*(xj - xi)*(xj - xi))
 
       end function P2
-!***********************************************************************
+! **********************************************************************
       function Px1(x, xi, xj)
 
          Px1 = (x - xi) * (x - xj)*(x - xj)/((xj - xi)*(xj - xi))
 
       end function Px1
-!***********************************************************************
+! **********************************************************************
       function Px2(x, xi, xj)
 
          Px2 = (x - xi)*(x - xi) * (x - xj)/((xj - xi)*(xj - xi))
 
       end function Px2
-!***********************************************************************
+! **********************************************************************
       subroutine scatt(ih, jh, rion, uf, f, umesh, semesh, dscat, ntot, epa, ierr)
       use op_load, only: BRCKR
       integer, intent(inout) :: ierr
@@ -820,7 +813,7 @@
             do m = 1, 28
               rr(m) = rion(m, i, j)
             end do
-            CALL BRCKR(FT,FNE,RR,28,UF,100,FSCAT,ierr)
+            call BRCKR(FT,FNE,RR,28,UF,100,FSCAT,ierr)
             if (ierr /= 0) return
             do n = 0, 100
               u = uf(n)
@@ -846,7 +839,7 @@
 
       return
       end subroutine scatt
-!***********************************************************************
+! **********************************************************************
       subroutine screen1(ih,jh,rion,umesh,ntot,epa,f)
       use op_load, only: screen2
       dimension uf(0:100), umesh(nptot),
@@ -878,5 +871,5 @@
 
       return
       end subroutine screen1
-!***********************************************************************
+! **********************************************************************
       end module op_osc
