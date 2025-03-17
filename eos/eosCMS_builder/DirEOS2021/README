@@ -40,7 +40,7 @@ The tables for the H/He mixture have been calculated for 3 different values of Y
   This value is the one used in the DUSTY (Chabrier et al. 2000),
   COND (Baraffe et al. 2003) and Phillips et al. (2020) brown dwarf evolution models.
 - TABLEEOS_HHE_Y0297: this corresponds to an 'effective' helium
-  abundance Y'=0.280+Z_sol with Z_sol=0.017. 
+  abundance Y'=0.280+Z_sol with Z_sol=0.017.
   This value is the one used in the BHAC2015 (Baraffe et al. 2015) low-mass star models.
   Indeed, Y=0.28 is the helium abundance needed to recover the correct radius and luminosity
   for the Sun today with these models, with a mixing length l/H_p=1.6.
@@ -63,7 +63,7 @@ A word of caution:
 Due to the spline interpolation procedure, numerical
 oscillations or flaws in the calculations of the various
 thermodynamic quantities are expected. As these problems
-will be revealed, the tables will be corrected accordingly. 
+will be revealed, the tables will be corrected accordingly.
 For a clear identification of the most recent
 version of the tables, these latter will be labeled with
 a '_vx' extension, as a reference to "version x". The date
@@ -78,8 +78,7 @@ README file.
   to avoid unnecessary numerical oscillations due to interpolation procedures, it is strongly advised
   to use the IVL tables in this domain.
 - In contrast, H/He interactions start to play a role in the *brown dwarf* domain (see Fig. 1 of Chabrier et al. 2021).
-  The 2021 tables, which incorporate QMD simulations of Militzer & Hubbard (2013, ApJ, 774, 148), should thus be used in this domain. 
+  The 2021 tables, which incorporate QMD simulations of Militzer & Hubbard (2013, ApJ, 774, 148), should thus be used in this domain.
   However, given the limited temperature-density domain covered by these simulations, it must be kept in mind that
   uncertainties remain in these EOS calculations. Users must be aware of this issue.
   The situation will improve once further simulations will be conducted over a larger domain. See Chabrier et al., 2021, A&A for details.
-        

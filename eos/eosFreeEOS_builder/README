@@ -10,7 +10,7 @@ If eosDT_get fails, then the code reverts to HELM.
 FreeEOS is written by Alan Irwin and distributed under the GPL.
 You need to install your own copy of FreeEOS from the source and
 following the instructions at freeeos.sourceforge.net. The
-FreeEOS build process has been tested and found to work with the 
+FreeEOS build process has been tested and found to work with the
 MESA SDK.
 
 You will need to update the file mesa/eos/eosFreeEOS_builder/make/makefile

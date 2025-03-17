@@ -1,221 +1,217 @@
-C
-C                          CS2TST
-C                         11/20/98
-C
-C   This program computes interpolation errors using the
-C scattered data package CSHEP2D for each of ten test
-C functions and a 33 by 33 uniform grid of interpolation
-C points in the unit square.
-C
-C   This program uses Subroutines TESTDT and TSTFN1 from
-C ACM Algorithm SURVEY to generate a node set and and the
-C test function values.
-C
+!                          CS2TST
+!                         11/20/98
 
+!   This program computes interpolation errors using the
+! scattered data package CSHEP2D for each of ten test
+! functions and a 33 by 33 uniform grid of interpolation
+! points in the unit square.
 
+!   This program uses subroutines TESTDT and TSTFN1 from
+! ACM Algorithm SURVEY to generate a node set and and the
+! test function values.
 
-      SUBROUTINE TEST_RENKA790_SG
-      USE interp_2d_lib_sg
+      subroutine TEST_RENKA790_SG
+      use interp_2d_lib_sg
 
-      INTEGER   NMAX, NRMAX, NI
-      PARAMETER (NMAX=100, NRMAX=10, NI=33)
-C
-C Array storage:
-C
-      REAL X(NMAX), Y(NMAX), W(NMAX), RW(NMAX),
+      integer   NMAX, NRMAX, NI
+      parameter (NMAX=100, NRMAX=10, NI=33)
+
+! Array storage:
+
+      real X(NMAX), Y(NMAX), W(NMAX), RW(NMAX),
      .                 A(9,NMAX), P(NI), FT(NI,NI)
-      INTEGER          LCELL(NRMAX,NRMAX), LNEXT(NMAX)
-C
-      REAL DEL, DUM, DX, DY, ERMAX, ERMEAN, PW,
+      integer          LCELL(NRMAX,NRMAX), LNEXT(NMAX)
+
+      real DEL, DUM, DX, DY, ERMAX, ERMEAN, PW,
      .                 RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
-C      REAL CS2VAL_sg
-      INTEGER          I, IER, J, K, KF, KFF, KFL, KS, LOUT,
+!      real CS2VAL_sg
+      integer          I, IER, J, K, KF, KFF, KFL, KS, LOUT,
      .                 N, NC, NFUN, NP, NR, NSET, NW
-C
-C Data:
-C
-C LOUT = Logical unit number for output.
-C NSET = Number of node sets.
-C NFUN = Number of test functions.
-C
+
+! Data:
+
+! LOUT = Logical unit number for output.
+! NSET = Number of node sets.
+! NFUN = Number of test functions.
+
       DATA LOUT/6/, NSET/5/, NFUN/10/
 
-C Specify test parameters
-C
+! Specify test parameters
+
       KS = 4
       KFF = 1
       KFL = 10
       NC = 17
       NW = 30
       NR =  6
-      CALL TESTDT_sg (KS, N,X,Y)
+      call TESTDT_sg (KS, N,X,Y)
 
-C
-C Set up uniform grid points.
-C
+
+! Set up uniform grid points.
+
       DEL = 1./DBLE(NI-1)
-      DO 5 I = 1,NI
+      do 5 I = 1,NI
         P(I) = DBLE(I-1)*DEL
-    5   CONTINUE
-C
-C Initialize the average SSE/SSM value to zero.
-C
+    5   continue
+
+! Initialize the average SSE/SSM value to zero.
+
       SSA = 0.
-C
-C Print a heading and loop on test functions.
-C
-      WRITE (LOUT,200) KS, N, NI, NC, NW, NR
-      DO 11 KF = KFF,KFL
-C
-C   Compute true function values at the nodes.
-C
-        DO 6 K = 1,N
-          CALL TSTFN1_sg (KF,X(K),Y(K),0, W(K),DUM,DUM)
-    6     CONTINUE
-C
-C   Compute true function values FT on the uniform grid, and
-C     accumulate the sum of values SUM and sum of squared
-C     values SSM.
-C
+
+! Print a heading and loop on test functions.
+
+      write (LOUT,200) KS, N, NI, NC, NW, NR
+      do 11 KF = KFF,KFL
+
+!   Compute true function values at the nodes.
+
+        do 6 K = 1,N
+          call TSTFN1_sg (KF,X(K),Y(K),0, W(K),DUM,DUM)
+    6     continue
+
+!   Compute true function values FT on the uniform grid, and
+!     accumulate the sum of values SUM and sum of squared
+!     values SSM.
+
         SUM = 0.
         SSM = 0.
-        DO 8 I = 1,NI
-          DO 7 J = 1,NI
-            CALL TSTFN1_sg (KF,P(I),P(J),0, FT(I,J),DUM,DUM)
+        do 8 I = 1,NI
+          do 7 J = 1,NI
+            call TSTFN1_sg (KF,P(I),P(J),0, FT(I,J),DUM,DUM)
             SUM = SUM + FT(I,J)
             SSM = SSM + FT(I,J)**2
-    7       CONTINUE
-    8     CONTINUE
-C
-C   Compute the sum of squared deviations from the mean SSM.
-C
+    7       continue
+    8     continue
+
+!   Compute the sum of squared deviations from the mean SSM.
+
         SSM = SSM - SUM*SUM/DBLE(NI*NI)
-C
-C   Compute parameters A and RW defining the interpolant.
-C
-        CALL interp_CSHEP2_sg (N,X,Y,W,NC,NW,NR, LCELL,LNEXT,XMIN,
+
+!   Compute parameters A and RW defining the interpolant.
+
+        call interp_CSHEP2_sg (N,X,Y,W,NC,NW,NR, LCELL,LNEXT,XMIN,
      .               YMIN,DX,DY,RMAX,RW,A,IER)
-        IF (IER .NE. 0) GO TO 21
-C
-C   Compute interpolation errors.
-C
+        if (IER .NE. 0) GO TO 21
+
+!   Compute interpolation errors.
+
         ERMEAN = 0.
         ERMAX = 0.
         SSE = 0.
-        DO 10 I = 1,NI
-          DO 9 J = 1,NI
+        do 10 I = 1,NI
+          do 9 J = 1,NI
             IER = 0
             PW = interp_CS2VAL_sg (P(I),P(J),N,X,Y,W,NR,LCELL,LNEXT,
      .                   XMIN,YMIN,DX,DY,RMAX,RW,A,IER) -
      .           FT(I,J)
-            IF (IER .NE. 0) THEN
-               WRITE(LOUT,*) 'IER nonzero from CS2VAL_sg'
-               STOP 1
-            END IF
+            if (IER .NE. 0) then
+               write(LOUT,*) 'IER nonzero from CS2VAL_sg'
+               stop 1
+            end IF
             ERMEAN = ERMEAN + ABS(PW)
             ERMAX = MAX(ERMAX,ABS(PW))
             SSE = SSE + PW*PW
-    9       CONTINUE
-   10     CONTINUE
+    9       continue
+   10     continue
         NP = NI*NI
         ERMEAN = ERMEAN/DBLE(NP)
         SSE = SSE/SSM
         SSA = SSA + SSE
-        WRITE (LOUT,210) KF, ERMAX, ERMEAN, SSE
-   11   CONTINUE
-C
-C Print the average SSE/SSM value (averaged over the test
-C   functions).
-C
-      RETURN
-C
-C N is outside its valid range.
-C
-   20 WRITE (LOUT,500) N, NMAX
-      STOP 1
-C
-C Error in CSHEP2.
-C
-   21 IF (IER .EQ. 2) WRITE (LOUT,510)
-      IF (IER .EQ. 3) WRITE (LOUT,520)
-      STOP 1
-C
-C Print formats:
-C
-  200 FORMAT ('RENKA790_sg: Node set ',I2,4X,'N =',I4,4X,'NI = ',I2,
+        write (LOUT,210) KF, ERMAX, ERMEAN, SSE
+   11   continue
+
+! Print the average SSE/SSM value (averaged over the test
+!   functions).
+
+      return
+
+! N is outside its valid range.
+
+   20 write (LOUT,500) N, NMAX
+      stop 1
+
+! Error in CSHEP2.
+
+   21 if (IER == 2) write (LOUT,510)
+      if (IER == 3) write (LOUT,520)
+      stop 1
+
+! Print formats:
+
+  200 format ('RENKA790_sg: Node set ',I2,4X,'N =',I4,4X,'NI = ',I2,
      .        4X,'NC = ',I2,4X,'NW = ',I2,4X,'NR = ',I2/
      .        1X,16X,'Function',4X,'Max Error',4X,
      .        'Mean Error',4X,'SSE/SSM')
-  210 FORMAT (1X,19X,I2,9X,F7.4,6X,F8.5,2X,F9.6)
-C
-C Error message formats:
-C
-  500 FORMAT (///1X,10X,'*** Error in data -- N = ',I4,
+  210 format (1X,19X,I2,9X,F7.4,6X,F8.5,2X,F9.6)
+
+! Error message formats:
+
+  500 format (///1X,10X,'*** Error in data -- N = ',I4,
      .        ', Maximum value =',I4,' ***')
-  510 FORMAT (///1X,14X,'*** Error in CSHEP2 -- duplicate ',
+  510 format (///1X,14X,'*** Error in CSHEP2 -- duplicate ',
      .        'nodes encountered ***')
-  520 FORMAT (///1X,14X,'*** Error in CSHEP2 -- all nodes ',
+  520 format (///1X,14X,'*** Error in CSHEP2 -- all nodes ',
      .        'are collinear ***')
-      END
+      end
 
 
 
 
-      SUBROUTINE TESTDT_sg (K, N,X,Y)
+      subroutine TESTDT_sg (K, N,X,Y)
       real X(100), Y(100)
-      INTEGER K, N
-C
+      integer K, N
+
 C***********************************************************
-C
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   03/28/97
-C
-C   This subroutine returns one of five sets of nodes used
-C for testing scattered data fitting methods.  All five sets
-C approximately cover the unit square [0,1] X [0,1]:  the
-C convex hulls of sets 1 and 3 extend slightly outside the
-C square but do not completely cover it, those of sets 2 and
-C 5 coincide with the unit square, and the convex hull of
-C set 4 is a large subset of the unit square.
-C
-C On input:
-C
-C       K = Integer in the range 1 to 5 which determines the
-C           choice of data set as follows:
-C
-C               K = 1 - Franke's 100-node set
-C               K = 2 - Franke's 33-node set
-C               K = 3 - Lawson's 25-node set
-C               K = 4 - Random 100-node set
-C               K = 5 - Gridded 81-node set
-C
-C       X,Y = Arrays of length at least N(K), where
-C             N(1) = 100, N(2) = 33, N(3) = 25,
-C             N(4) = 100, and N(5) = 81.
-C
-C Input parameters are not altered by this routine.
-C
-C On output:
-C
-C       N = Number of nodes in set K, or 0 if K is outside
-C           its valid range.
-C
-C       X,Y = Nodal coordinates of node set K.
-C
-C Subprograms required by TESTDT:  None
-C
+
+!                                            Robert J. Renka
+!                                  Dept. of Computer Science
+!                                       Univ. of North Texas
+!                                           renka@cs.unt.edu
+!                                                   03/28/97
+
+!   This subroutine returns one of five sets of nodes used
+! for testing scattered data fitting methods.  All five sets
+! approximately cover the unit square [0,1] X [0,1]:  the
+! convex hulls of sets 1 and 3 extend slightly outside the
+! square but do not completely cover it, those of sets 2 and
+! 5 coincide with the unit square, and the convex hull of
+! set 4 is a large subset of the unit square.
+
+! On input:
+
+!       K = integer in the range 1 to 5 which determines the
+!           choice of data set as follows:
+
+!               K = 1 - Franke's 100-node set
+!               K = 2 - Franke's 33-node set
+!               K = 3 - Lawson's 25-node set
+!               K = 4 - Random 100-node set
+!               K = 5 - Gridded 81-node set
+
+!       X,Y = Arrays of length at least N(K), where
+!             N(1) = 100, N(2) = 33, N(3) = 25,
+!             N(4) = 100, and N(5) = 81.
+
+! Input parameters are not altered by this routine.
+
+! On output:
+
+!       N = Number of nodes in set K, or 0 if K is outside
+!           its valid range.
+
+!       X,Y = Nodal coordinates of node set K.
+
+! Subprograms required by TESTDT:  None
+
 C***********************************************************
-C
+
       real X1(100), Y1(100),  X2(33), Y2(33),
      .                 X3(25), Y3(25),  X4(100), Y4(100),
      .                 X5(81), Y5(81)
-      INTEGER I
-C
-C Node set 1:  Franke's 100-node set.
-C
+      integer I
+
+! Node set 1:  Franke's 100-node set.
+
       DATA (X1(I),Y1(I), I = 1,20)/
      .      0.0227035, -0.0310206,  0.0539888,  0.1586742,
      .      0.0217008,  0.2576924,  0.0175129,  0.3414014,
@@ -271,9 +267,9 @@ C
      .      1.0129299,  0.4396054,  0.9657040,  0.5044425,
      .      1.0019855,  0.6941519,  1.0359297,  0.7459923,
      .      1.0414677,  0.8682081,  0.9471506,  0.9801409/
-C
-C Node set 2:  Franke's 33-node set.
-C
+
+! Node set 2:  Franke's 33-node set.
+
       DATA (X2(I),Y2(I), I = 1,33)/
      .      0.05,  0.45,  0.00,  0.50,
      .      0.00,  1.00,  0.00,  0.00,
@@ -292,9 +288,9 @@ C
      .      0.90,  0.80,  0.95,  0.90,
      .      1.00,  0.00,  1.00,  0.50,
      .      1.00,  1.00/
-C
-C Node set 3:  Lawson's 25-node set.
-C
+
+! Node set 3:  Lawson's 25-node set.
+
       DATA (X3(I),Y3(I), I = 1,25)/
      .      0.13750,  0.97500,   0.91250,  0.98750,
      .      0.71250,  0.76250,   0.22500,  0.83750,
@@ -309,9 +305,9 @@ C
      .      0.50000,  0.46250,   0.18750,  0.26250,
      .      0.58750,  0.12500,   1.05000, -0.06125,
      .      0.10000,  0.11250/
-C
-C Node set 4:  Random 100-node set.
-C
+
+! Node set 4:  Random 100-node set.
+
       DATA (X4(I),Y4(I), I = 1,20)/
      .      0.0096326,  0.3083158,  0.0216348,  0.2450434,
      .      0.0298360,  0.8613847,  0.0417447,  0.0977864,
@@ -367,9 +363,9 @@ C
      .      0.9347906,  0.3779934,  0.9434519,  0.4010423,
      .      0.9490328,  0.9478657,  0.9569571,  0.7425486,
      .      0.9772067,  0.8883287,  0.9983493,  0.5496750/
-C
-C Node set 5:  9 by 9 uniform grid.
-C
+
+! Node set 5:  9 by 9 uniform grid.
+
       DATA (X5(I),Y5(I), I = 1,20)/
      .      0.125,  0.000,  0.000,  0.125,
      .      0.000,  0.250,  0.000,  0.375,
@@ -415,127 +411,127 @@ C
      .      1.000,  0.500,  1.000,  0.625,
      .      1.000,  0.750,  1.000,  0.875,
      .      1.000,  1.000/
-C
-C Store node set K in (X,Y).
-C
-      IF (K .EQ. 1) THEN
-        DO 1 I = 1,100
+
+! Store node set K in (X,Y).
+
+      if (K == 1) then
+        do 1 I = 1,100
           X(I) = X1(I)
           Y(I) = Y1(I)
-    1     CONTINUE
+    1     continue
         N = 100
-      ELSEIF (K .EQ. 2) THEN
-        DO 2 I = 1,33
+      else if (K == 2) then
+        do 2 I = 1,33
           X(I) = X2(I)
           Y(I) = Y2(I)
-    2     CONTINUE
+    2     continue
         N = 33
-      ELSEIF (K .EQ. 3) THEN
-        DO 3 I = 1,25
+      else if (K == 3) then
+        do 3 I = 1,25
           X(I) = X3(I)
           Y(I) = Y3(I)
-    3     CONTINUE
+    3     continue
         N = 25
-      ELSEIF (K .EQ. 4) THEN
-        DO 4 I = 1,100
+      else if (K == 4) then
+        do 4 I = 1,100
           X(I) = X4(I)
           Y(I) = Y4(I)
-    4     CONTINUE
+    4     continue
         N = 100
-      ELSEIF (K .EQ. 5) THEN
-        DO 5 I = 1,81
+      else if (K == 5) then
+        do 5 I = 1,81
           X(I) = X5(I)
           Y(I) = Y5(I)
-    5     CONTINUE
+    5     continue
         N = 81
       ELSE
         N = 0
-      ENDIF
-      RETURN
-      END
+      end if
+      return
+      end
 
-      SUBROUTINE TSTFN1_sg (K,X,Y,IFLAG, F,FX,FY)
-      INTEGER K, IFLAG
+      subroutine TSTFN1_sg (K,X,Y,IFLAG, F,FX,FY)
+      integer K, IFLAG
       real X, Y, F, FX, FY
-C
+
 C***********************************************************
-C
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   10/14/98
-C
-C   This subroutine computes the value and, optionally, the
-C first partial derivatives of one of ten bivariate test
-C functions.  The first six functions were chosen by Richard
-C Franke to test interpolation software (See the reference
-C below).  The last four functions represent more chal-
-C lenging surface fitting problems.
-C
-C On input:
-C
-C       K = Integer in the range 1 to 10 which determines
-C           the choice of function as follows:
-C
-C               K = 1 - Exponential
-C               K = 2 - Cliff
-C               K = 3 - Saddle
-C               K = 4 - Gentle
-C               K = 5 - Steep
-C               K = 6 - Sphere
-C               K = 7 - Trig
-C               K = 8 - Synergistic Gaussian
-C               K = 9 - Cloverleaf Asymmetric Peak/Valley
-C               K = 10 - Cosine Peak
-C
-C   Note that function 6 is only defined inside a circle of
-C radius 8/9 centered at (.5,.5).  Thus, if (X-.5)**2 +
-C (Y-.5)**2 .GE. 64/81, the value (and partials if IFLAG=1)
-C are set to 0 for this function.  Also, the first partial
-C derivatives of function 10 are not defined at (.5,.5) --
-C again, zeros are returned.
-C
-C       X,Y = Coordinates of the point at which the selected
-C             function is to be evaluated.
-C
-C       IFLAG = Derivative option indicator:
-C               IFLAG = 0 if only a function value is
-C                         required.
-C               IFLAG = 1 if both the function and its first
-C                         partial derivatives are to be
-C                         evaluated.
-C
-C Input parameters are not altered by this routine.
-C
-C On output:
-C
-C       F = Value of function K at (X,Y).
-C
-C       FX,FY = First partial derivatives of function K at
-C               (X,Y) if IFLAG = 1, unaltered otherwise.
-C
-C Intrinsic functions called by TSTFN1:  COS, EXP, SIN,
-C                                          SQRT, TANH
-C
-C Reference:  R. Franke, A Critical Comparison of Some
-C               Methods for Interpolation of Scattered Data,
-C               Naval Postgraduate School Technical Report,
-C               NPS-53-79-003, 1979.
-C
+
+!                                            Robert J. Renka
+!                                  Dept. of Computer Science
+!                                       Univ. of North Texas
+!                                           renka@cs.unt.edu
+!                                                   10/14/98
+
+!   This subroutine computes the value and, optionally, the
+! first partial derivatives of one of ten bivariate test
+! functions.  The first six functions were chosen by Richard
+! Franke to test interpolation software (See the reference
+! below).  The last four functions represent more chal-
+! lenging surface fitting problems.
+
+! On input:
+
+!       K = integer in the range 1 to 10 which determines
+!           the choice of function as follows:
+
+!               K = 1 - Exponential
+!               K = 2 - Cliff
+!               K = 3 - Saddle
+!               K = 4 - Gentle
+!               K = 5 - Steep
+!               K = 6 - Sphere
+!               K = 7 - Trig
+!               K = 8 - Synergistic Gaussian
+!               K = 9 - Cloverleaf Asymmetric Peak/Valley
+!               K = 10 - Cosine Peak
+
+!   Note that function 6 is only defined inside a circle of
+! radius 8/9 centered at (.5,.5).  Thus, if (X-.5)**2 +
+! (Y-.5)**2  >=  64/81, the value (and partials if IFLAG=1)
+! are set to 0 for this function.  Also, the first partial
+! derivatives of function 10 are not defined at (.5,.5) --
+! again, zeros are returned.
+
+!       X,Y = Coordinates of the point at which the selected
+!             function is to be evaluated.
+
+!       IFLAG = Derivative option indicator:
+!               IFLAG = 0 if only a function value is
+!                         required.
+!               IFLAG = 1 if both the function and its first
+!                         partial derivatives are to be
+!                         evaluated.
+
+! Input parameters are not altered by this routine.
+
+! On output:
+
+!       F = Value of function K at (X,Y).
+
+!       FX,FY = First partial derivatives of function K at
+!               (X,Y) if IFLAG = 1, unaltered otherwise.
+
+! Intrinsic functions called by TSTFN1:  COS, EXP, SIN,
+!                                          SQRT, TANH
+
+! Reference:  R. Franke, A Critical Comparison of Some
+!               Methods for Interpolation of Scattered Data,
+!               Naval Postgraduate School Technical Report,
+!               NPS-53-79-003, 1979.
+
 C***********************************************************
-C
+
       real T1, T2, T3, T4
-      IF (K .LT. 1  .OR.  K .GT. 10) RETURN
+      if (K  <  1  .OR.  K  >  10) return
       GO TO (1,2,3,4,5,6,7,8,9,10), K
-C
-C Exponential:
-C
+
+! Exponential:
+
     1 F = .75*EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
      .    .75*EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
      .     .5*EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
      .     .2*EXP(-(9.*X-4.)**2 - (9.*Y-7.)**2)
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T1 = EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
       T2 = EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
       T3 = EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
@@ -544,214 +540,214 @@ C
      .     -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
       FY = -3.375*(9.*Y-2.)*T1 - .675*T2
      .     -2.25*(9.*Y-3.)*T3 + 3.6*(9.*Y-7.)*T4
-      RETURN
-C
-C Cliff:
-C
+      return
+
+! Cliff:
+
     2 F = (TANH(9.0*(Y-X)) + 1.0)/9.0
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T1 = 18.0*(Y-X)
       FX = -4.0/(EXP(T1) + 2.0 + EXP(-T1))
       FY = -FX
-      RETURN
-C
-C Saddle:
-C
+      return
+
+! Saddle:
+
     3 F = (1.25 + COS(5.4*Y))/(6.0 + 6.0*(3.0*X-1.0)**2)
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T1 = 5.4*Y
       T2 = 1.0 + (3.0*X-1.)**2
       FX = -(3.0*X-1.0)*(1.25 + COS(T1))/(T2**2)
       FY = -.9*SIN(T1)/T2
-      RETURN
-C
-C Gentle:
-C
+      return
+
+! Gentle:
+
     4 F = EXP(-5.0625*((X-.5)**2 + (Y-.5)**2))/3.0
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = -3.375*EXP(-5.0625*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
-      RETURN
-C
-C Steep:
-C
+      return
+
+! Steep:
+
     5 F = EXP(-20.25*((X-.5)**2 + (Y-.5)**2))/3.0
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = -13.5*EXP(-20.25*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
-      RETURN
-C
-C Sphere:
-C
+      return
+
+! Sphere:
+
     6 T4 = 64.0 - 81.0*((X-.5)**2 + (Y-.5)**2)
       F = 0.
-      IF (T4 .GE. 0.) F = SQRT(T4)/9.0 - .5
-      IF (IFLAG .NE. 1) RETURN
+      if (T4  >=  0.) F = SQRT(T4)/9.0 - .5
+      if (IFLAG .NE. 1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = 0.
-      IF (T4 .GT. 0.) T3 = -9.0/SQRT(T4)
+      if (T4  >  0.) T3 = -9.0/SQRT(T4)
       FX = T1*T3
       FY = T2*T3
-      RETURN
-C
-C Trig:
-C
+      return
+
+! Trig:
+
     7 F = 2.0*COS(10.0*X)*SIN(10.0*Y) + SIN(10.0*X*Y)
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T1 = 10.0*X
       T2 = 10.0*Y
       T3 = 10.0*COS(10.0*X*Y)
       FX = -20.0*SIN(T1)*SIN(T2) + T3*Y
       FY = 20.0*COS(T1)*COS(T2) + T3*X
-      RETURN
-C
-C Gaussx(1,.5,.1) + Gaussy(.75,.5,.1) + Gaussx(1,.5,.1)*
-C   Gaussy(.75,.5,.1), where Gaussx(a,b,c) is the Gaussian
-C   function of x with amplitude a, center (mean) b, and
-C   width (standard deviation) c.
-C
+      return
+
+! Gaussx(1,.5,.1) + Gaussy(.75,.5,.1) + Gaussx(1,.5,.1)*
+!   Gaussy(.75,.5,.1), where Gaussx(a,b,c) is the Gaussian
+!   function of x with amplitude a, center (mean) b, and
+!   width (standard deviation) c.
+
     8 T1 = 5.0 - 10.0*X
       T2 = 5.0 - 10.0*Y
       T3 = EXP(-.5*T1*T1)
       T4 = EXP(-.5*T2*T2)
       F = T3 + .75*T4*(1.0+T3)
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       FX = T1*T3*(10.0 + 7.5*T4)
       FY = T2*T4*(7.5 + 7.5*T3)
-      RETURN
-C
-C Cloverleaf Asymmetric Hill/Valley:
-C
+      return
+
+! Cloverleaf Asymmetric Hill/Valley:
+
     9 T1 = EXP((10.0 - 20.0*X)/3.0)
       T2 = EXP((10.0 - 20.0*Y)/3.0)
       T3 = 1.0/(1.0 + T1)
       T4 = 1.0/(1.0 + T2)
       F = ((20.0/3.0)**3 * T1*T2)**2 * (T3*T4)**5 *
      .    (T1-2.0*T3)*(T2-2.0*T4)
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       FX = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 *
      .     (2.0*T1-3.0*T3-5.0+12.0*T3*T3)*T2*T2*T4**5 *
      .     (T2-2.0*T4)
       FY = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 *
      .     (2.0*T2-3.0*T4-5.0+12.0*T4*T4)*T2*T2*T4**5 *
      .     (T1-2.0*T3)
-      RETURN
-C
-C Cosine Peak:
-C
+      return
+
+! Cosine Peak:
+
    10 T1 = SQRT( (80.0*X - 40.0)**2 + (90.0*Y - 45.0)**2 )
       T2 = EXP(-.04*T1)
       T3 = COS(.15*T1)
       F = T2*T3
-      IF (IFLAG .NE. 1) RETURN
+      if (IFLAG .NE. 1) return
       T4 = SIN(.15*T1)
       FX = 0.
       FY = 0.
-      IF (T1 .EQ. 0.) RETURN
+      if (T1 == 0.) return
       T4 = SIN(.15*T1)
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
-      RETURN
-      END
+      return
+      end
 
 
 
-      SUBROUTINE TSTFN2_sg (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
-      INTEGER K, IFLAG
+      subroutine TSTFN2_sg (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
+      integer K, IFLAG
       real X, Y, F, FX, FY, FXX, FXY, FYY
-C
+
 C***********************************************************
-C
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   10/14/98
-C
-C   This subroutine computes the value and, optionally, the
-C first and/or second partial derivatives of one of ten
-C bivariate test functions.  The first six functions were
-C chosen by Richard Franke to test interpolation software.
-C (See the reference below.)  The last four functions repre-
-C sent more challenging surface fitting problems.
-C
-C On input:
-C
-C       K = Integer in the range 1 to 10 which determines
-C           the choice of function as follows:
-C
-C               K = 1 - Exponential
-C               K = 2 - Cliff
-C               K = 3 - Saddle
-C               K = 4 - Gentle
-C               K = 5 - Steep
-C               K = 6 - Sphere
-C               K = 7 - Trig
-C               K = 8 - Synergistic Gaussian
-C               K = 9 - Cloverleaf Asymmetric Peak/Valley
-C               K = 10 - Cosine Peak
-C
-C   Note that function 6 is only defined inside a circle of
-C radius 8/9 centered at (.5,.5).  Thus, if (X-.5)**2 +
-C (Y-.5)**2 .GE. 64/81, the value (and partials if IFLAG=1)
-C are set to 0 for this function.  Also, the first partial
-C derivatives of function 10 are not defined at (.5,.5) --
-C again, zeros are returned.
-C
-C       X,Y = Coordinates of the point at which the selected
-C             function is to be evaluated.
-C
-C       IFLAG = Derivative option indicator:
-C               IFLAG = 0 if only a function value is
-C                         required.
-C               IFLAG = 1 if both the function and its first
-C                         partial derivatives are to be
-C                         evaluated.
-C               IFLAG = 2 if the function, its first partial
-C                         derivatives, and its second partial
-C                         derivatives are to be evaluated.
-C
-C Input parameters are not altered by this routine.
-C
-C On output:
-C
-C       F = Value of function K at (X,Y).
-C
-C       FX,FY = First partial derivatives of function K at
-C               (X,Y) if IFLAG >= 1, unaltered otherwise.
-C
-C       FXX,FXY,FYY = Second partial derivatives of function
-C                     K at (X,Y) if IFLAG >= 2, unaltered
-C                     otherwise.
-C
-C Intrinsic functions called by TSTFN2:  COS, EXP, SIN,
-C                                          SQRT, TANH
-C
-C Reference:  R. Franke, A Critical Comparison of Some
-C               Methods for Interpolation of Scattered Data,
-C               Naval Postgraduate School Technical Report,
-C               NPS-53-79-003, 1979.
-C
+
+!                                            Robert J. Renka
+!                                  Dept. of Computer Science
+!                                       Univ. of North Texas
+!                                           renka@cs.unt.edu
+!                                                   10/14/98
+
+!   This subroutine computes the value and, optionally, the
+! first and/or second partial derivatives of one of ten
+! bivariate test functions.  The first six functions were
+! chosen by Richard Franke to test interpolation software.
+! (See the reference below.)  The last four functions repre-
+! sent more challenging surface fitting problems.
+
+! On input:
+
+!       K = integer in the range 1 to 10 which determines
+!           the choice of function as follows:
+
+!               K = 1 - Exponential
+!               K = 2 - Cliff
+!               K = 3 - Saddle
+!               K = 4 - Gentle
+!               K = 5 - Steep
+!               K = 6 - Sphere
+!               K = 7 - Trig
+!               K = 8 - Synergistic Gaussian
+!               K = 9 - Cloverleaf Asymmetric Peak/Valley
+!               K = 10 - Cosine Peak
+
+!   Note that function 6 is only defined inside a circle of
+! radius 8/9 centered at (.5,.5).  Thus, if (X-.5)**2 +
+! (Y-.5)**2  >=  64/81, the value (and partials if IFLAG=1)
+! are set to 0 for this function.  Also, the first partial
+! derivatives of function 10 are not defined at (.5,.5) --
+! again, zeros are returned.
+
+!       X,Y = Coordinates of the point at which the selected
+!             function is to be evaluated.
+
+!       IFLAG = Derivative option indicator:
+!               IFLAG = 0 if only a function value is
+!                         required.
+!               IFLAG = 1 if both the function and its first
+!                         partial derivatives are to be
+!                         evaluated.
+!               IFLAG = 2 if the function, its first partial
+!                         derivatives, and its second partial
+!                         derivatives are to be evaluated.
+
+! Input parameters are not altered by this routine.
+
+! On output:
+
+!       F = Value of function K at (X,Y).
+
+!       FX,FY = First partial derivatives of function K at
+!               (X,Y) if IFLAG >= 1, unaltered otherwise.
+
+!       FXX,FXY,FYY = Second partial derivatives of function
+!                     K at (X,Y) if IFLAG >= 2, unaltered
+!                     otherwise.
+
+! Intrinsic functions called by TSTFN2:  COS, EXP, SIN,
+!                                          SQRT, TANH
+
+! Reference:  R. Franke, A Critical Comparison of Some
+!               Methods for Interpolation of Scattered Data,
+!               Naval Postgraduate School Technical Report,
+!               NPS-53-79-003, 1979.
+
 C***********************************************************
-C
+
       real T1, T2, T3, T4, T5, T6
-      IF (K .LT. 1  .OR.  K .GT. 10) RETURN
+      if (K  <  1  .OR.  K  >  10) return
       GO TO (1,2,3,4,5,6,7,8,9,10), K
-C
-C Exponential:
-C
+
+! Exponential:
+
     1 F = .75*EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
      .    .75*EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
      .     .5*EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
      .     .2*EXP(-(9.*X-4.)**2 - (9.*Y-7.)**2)
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T1 = EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
       T2 = EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
       T3 = EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
@@ -760,7 +756,7 @@ C
      .     -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
       FY = -3.375*(9.*Y-2.)*T1 - .675*T2
      .     -2.25*(9.*Y-3.)*T3 + 3.6*(9.*Y-7.)*T4
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = 15.1875*((9.*X-2.)**2 - 2.)*T1 +
      .      60.75*((9.*X+1.)**2 - 24.5)*T2 +
      .      10.125*((9.*X-7.)**2 - 2.)*T3 -
@@ -773,120 +769,120 @@ C
      .      .6075*T2 +
      .      10.125*((9.*Y-3.)**2 - 2.)*T3 -
      .      64.8*((9.*Y-7.)**2 - .5)*T4
-      RETURN
-C
-C Cliff:
-C
+      return
+
+! Cliff:
+
     2 F = (TANH(9.0*(Y-X)) + 1.0)/9.0
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T1 = 18.0*(Y-X)
       FX = -4.0/(EXP(T1) + 2.0 + EXP(-T1))
       FY = -FX
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = 18.0*TANH(0.5*T1)*FX
       FXY = -FXX
       FYY = FXX
-      RETURN
-C
-C Saddle:
-C
+      return
+
+! Saddle:
+
     3 F = (1.25 + COS(5.4*Y))/(6.0 + 6.0*(3.0*X-1.0)**2)
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T1 = 5.4*Y
       T2 = 1.0 + (3.0*X-1.)**2
       FX = -(3.0*X-1.0)*(1.25 + COS(T1))/(T2**2)
       FY = -.9*SIN(T1)/T2
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = 3.0*(1.25 + COS(T1))*(3.0*T2-4.0)/(T2**3)
       FXY = 5.4*(3.0*X-1.0)*SIN(T1)/(T2**2)
       FYY = -4.86*COS(T1)/T2
-      RETURN
-C
-C Gentle:
-C
+      return
+
+! Gentle:
+
     4 F = EXP(-5.0625*((X-.5)**2 + (Y-.5)**2))/3.0
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = -3.375*EXP(-5.0625*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = (1.0 - 10.125*T1*T1)*T3
       FXY = -10.125*T1*T2*T3
       FYY = (1.0 - 10.125*T2*T2)*T3
-      RETURN
-C
-C Steep:
-C
+      return
+
+! Steep:
+
     5 F = EXP(-20.25*((X-.5)**2 + (Y-.5)**2))/3.0
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = -13.5*EXP(-20.25*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = (1.0 - 40.5*T1*T1)*T3
       FXY = -40.5*T1*T2*T3
       FYY = (1.0 - 40.5*T2*T2)*T3
-      RETURN
-C
-C Sphere:
-C
+      return
+
+! Sphere:
+
     6 T4 = 64.0 - 81.0*((X-.5)**2 + (Y-.5)**2)
       F = 0.
-      IF (T4 .GE. 0.) F = SQRT(T4)/9.0 - .5
-      IF (IFLAG .LT. 1) RETURN
+      if (T4  >=  0.) F = SQRT(T4)/9.0 - .5
+      if (IFLAG  <  1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = 0.
-      IF (T4 .GT. 0.) T3 = -9.0/SQRT(T4)
+      if (T4  >  0.) T3 = -9.0/SQRT(T4)
       FX = T1*T3
       FY = T2*T3
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = (1.0 + FX*FX)*T3
       FXY = FX*FY
       FYY = (1.0 + FY*FY)*T3
-      RETURN
-C
-C Trig:
-C
+      return
+
+! Trig:
+
     7 F = 2.0*COS(10.0*X)*SIN(10.0*Y) + SIN(10.0*X*Y)
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T1 = 10.0*X
       T2 = 10.0*Y
       T3 = 10.0*COS(10.0*X*Y)
       FX = -20.0*SIN(T1)*SIN(T2) + T3*Y
       FY = 20.0*COS(T1)*COS(T2) + T3*X
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       T4 = 100.0*SIN(10.0*X*Y)
       FXX = -200.0*COS(T1)*SIN(T2) - T4*Y*Y
       FXY = -200.0*SIN(T1)*COS(T2) + T3 - T4*X*Y
       FYY = -200.0*COS(T1)*SIN(T2) - T4*X*X
-      RETURN
-C
-C Gaussx(1,.5,.1) + Gaussy(.75,.5,.1) + Gaussx(1,.5,.1)*
-C   Gaussy(.75,.5,.1), where Gaussx(a,b,c) is the Gaussian
-C   function of x with amplitude a, center (mean) b, and
-C   width (standard deviation) c.
-C
+      return
+
+! Gaussx(1,.5,.1) + Gaussy(.75,.5,.1) + Gaussx(1,.5,.1)*
+!   Gaussy(.75,.5,.1), where Gaussx(a,b,c) is the Gaussian
+!   function of x with amplitude a, center (mean) b, and
+!   width (standard deviation) c.
+
     8 T1 = 5.0 - 10.0*X
       T2 = 5.0 - 10.0*Y
       T3 = EXP(-.5*T1*T1)
       T4 = EXP(-.5*T2*T2)
       F = T3 + .75*T4*(1.0+T3)
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       FX = T1*T3*(10.0 + 7.5*T4)
       FY = T2*T4*(7.5 + 7.5*T3)
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = T3*(T1*T1-1.0)*(100.0 + 75.0*T4)
       FXY = 75.0*T1*T2*T3*T4
       FYY = T4*(T2*T2-1.0)*(75.0 + 75.0*T3)
-      RETURN
-C
-C Cloverleaf Asymmetric Hill/Valley:
-C
+      return
+
+! Cloverleaf Asymmetric Hill/Valley:
+
     9 T1 = EXP((10.0 - 20.0*X)/3.0)
       T2 = EXP((10.0 - 20.0*Y)/3.0)
       T3 = 1.0/(1.0 + T1)
@@ -894,13 +890,13 @@ C
       T5 = 20.0/3.0
       F = (T5**3 * T1*T2)**2 * (T3*T4)**5 *
      .    (T1-2.0*T3)*(T2-2.0*T4)
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T6 = (T5*T1*T2)**2 * (T5*T3*T4)**5
       FX = T6 * (T2-2.0*T4) *
      .     ((12.0*T3 - 3.0)*T3 + 2.0*T1 - 5.0)
       FY = T6 * (T1-2.0*T3) *
      .     ((12.0*T4 - 3.0)*T4 + 2.0*T2 - 5.0)
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = T5*T6 * (T2-2.0*T4) *
      .      (((-84.0*T3 + 78.0)*T3 + 23.0)*T3 + 4.0*T1-25.0)
       FXY = T5*T6 *
@@ -908,27 +904,27 @@ C
      .      ((12.0*T3 - 3.0)*T3 + 2.0*T1 - 5.0)
       FYY = T5*T6 * (T1-2.0*T3) *
      .      (((-84.0*T4 + 78.0)*T4 + 23.0)*T4 + 4.0*T2-25.0)
-      RETURN
-C
-C Cosine Peak:
-C
+      return
+
+! Cosine Peak:
+
    10 T1 = SQRT( (80.0*X - 40.0)**2 + (90.0*Y - 45.0)**2 )
       T2 = EXP(-.04*T1)
       T3 = COS(.15*T1)
       F = T2*T3
-      IF (IFLAG .LT. 1) RETURN
+      if (IFLAG  <  1) return
       T4 = SIN(.15*T1)
       FX = 0.
       FY = 0.
-      IF (T1 .EQ. 0.) RETURN
+      if (T1 == 0.) return
       T4 = SIN(.15*T1)
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
-      IF (IFLAG .LT. 2) RETURN
+      if (IFLAG  <  2) return
       FXX = 0.
       FXY = 0.
       FYY = 0.
-      IF (T1 .EQ. 0.) RETURN
+      if (T1 == 0.) return
       T5 = T2/(T1**3)
       FXX = T5*(T1*(76.8*T4 - 133.76*T3)*(80.0*X-40.0)**2 -
      .             (960.0*T4 + 256.0*T3)*(90.0*Y-45.0)**2 )
@@ -936,5 +932,5 @@ C
      .          288.0*T3)*(80.0*X-40.0)*(90.0*Y-45.0)
       FYY = T5*(T1*(97.2*T4 - 169.29*T3)*(90.0*Y-45.0)**2 -
      .             (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
-      RETURN
-      END
+      return
+      end

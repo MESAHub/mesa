@@ -3,7 +3,7 @@ star/other
 The routines in this directory allow you to override/modify many
 physical and numerical aspects of MESA.
 
-In your working copy of run_star_extras, replace 
+In your working copy of run_star_extras, replace
     include 'standard_run_star_extras.inc'
 by the contents of the included file from star/job or mesa/include
 In your work directory, do ./mk and ./rn to check that it is okay.
@@ -49,7 +49,7 @@ point to your routine.
        ! this is the place to set any procedure pointers you want to change
        ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
        s% other_energy => energy_routine
-       
+
        ...
     end subroutine extras_controls
 

@@ -15,8 +15,8 @@ include $(MESA_DIR)/utils/makefile_header
 SRCS = \
    bicub_sg.f \
    bicub_db.f \
-   bipm_db.f \
-   bipm_sg.f \
+   bipm_db.f90 \
+   bipm_sg.f90 \
    akima760_sg.f \
    akima760_db.f \
    renka790_sg.f \
@@ -72,7 +72,7 @@ COMPILE_FIXED = $(COMPILE_NO_CHECKS) $(FCfixed)
 
 COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_FIXED))
 
-renka790_sg.o renka790_db.o bicub_sg.o bicub_db1.o bicub_db.o bicub_db2.o : %.o : %.f
+renka790_sg.o renka790_db.o bicub_sg.o bicub_db.o : %.o : %.f
 ifneq ($(QUIET),)
 	@echo COMPILE_NO_CHECKS $<
 	@$(COMPILE_NO_CHECKS) $(FCfixed) $<

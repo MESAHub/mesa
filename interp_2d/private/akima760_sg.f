@@ -1,4 +1,4 @@
-      SUBROUTINE do_RGBI3P_sg(MD,NXD,NYD,XD,YD,ZD,NIP,XI,YI, ZI,IER, WK)
+      subroutine do_RGBI3P_sg(MD,NXD,NYD,XD,YD,ZD,NIP,XI,YI, ZI,IER, WK)
 *
 * Rectangular-grid bivariate interpolation
 * (a master subroutine of the RGBI3P/RGSF3P_sg subroutine package)
@@ -79,21 +79,21 @@
 *
 * Specification statements
 *     .. Parameters ..
-      INTEGER          NIPIMX
+      integer          NIPIMX
       PARAMETER        (NIPIMX=51)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IER,MD,NIP,NXD,NYD
+      integer          IER,MD,NIP,NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL             WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
+      real             WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
      +                 ZD(NXD,NYD),ZI(NIP)
 *     ..
 *     .. Local Scalars ..
-      INTEGER          IIP,IX,IY,NIPI
+      integer          IIP,IX,IY,NIPI
 *     ..
 *     .. Local Arrays ..
-      INTEGER          INXI(NIPIMX),INYI(NIPIMX)
+      integer          INXI(NIPIMX),INYI(NIPIMX)
 *     ..
 *     .. External Subroutines ..
       EXTERNAL         RGLCTN_sg,RGPD3P_sg,RGPLNL_sg
@@ -103,26 +103,26 @@
 *     ..
 * Preliminary processing
 * Error check
-      IF (NXD.LE.1) GO TO 40
-      IF (NYD.LE.1) GO TO 50
-      DO 10 IX = 2,NXD
-          IF (XD(IX).LE.XD(IX-1)) GO TO 60
-   10 CONTINUE
-      DO 20 IY = 2,NYD
-          IF (YD(IY).LE.YD(IY-1)) GO TO 70
-   20 CONTINUE
-      IF (NIP.LE.0) GO TO 80
+      if (NXD.LE.1) GO TO 40
+      if (NYD.LE.1) GO TO 50
+      do 10 IX = 2,NXD
+          if (XD(IX).LE.XD(IX-1)) GO TO 60
+   10 continue
+      do 20 IY = 2,NYD
+          if (YD(IY).LE.YD(IY-1)) GO TO 70
+   20 continue
+      if (NIP.LE.0) GO TO 80
       IER = 0
 * Calculation
 * Estimates partial derivatives at all input-grid data points
 * (for MD=1).
-      IF (MD.NE.2) THEN
+      if (MD.NE.2) THEN
           CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, WK)
 *         CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
-      END IF
+      end if
 * DO-loop with respect to the output point
 * Processes NIPIMX output points, at most, at a time.
-      DO 30 IIP = 1,NIP,NIPIMX
+      do 30 IIP = 1,NIP,NIPIMX
           NIPI = MIN(NIP- (IIP-1),NIPIMX)
 * Locates the output points.
           CALL RGLCTN_sg(NXD,NYD,XD,YD,NIPI,XI(IIP),YI(IIP), INXI,INYI)
@@ -131,8 +131,8 @@
           CALL RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,
      +                INYI, ZI(IIP))
 *         CALL RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
-   30 CONTINUE
-      RETURN
+   30 continue
+      return
 * Error exit
    40 WRITE (*,FMT=9000)
       IER = 1
@@ -149,7 +149,7 @@
    80 WRITE (*,FMT=9040)
       IER = 5
    90 WRITE (*,FMT=9050) NXD,NYD,NIP
-      RETURN
+      return
 * Format statements for error messages
  9000 FORMAT (1X,/,'*** RGBI3P Error 1: NXD = 1 or less')
  9010 FORMAT (1X,/,'*** RGBI3P Error 2: NYD = 1 or less')
@@ -161,10 +161,10 @@
      +       E11.3)
  9040 FORMAT (1X,/,'*** RGBI3P Error 5: NIP = 0 or less')
  9050 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NIP =',I5,/)
-      END
+      end
 
 
-      SUBROUTINE do_RGSF3P_sg(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
+      subroutine do_RGSF3P_sg(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
 *
 * Rectangular-grid surface fitting
 * (a master subroutine of the RGBI3P/RGSF3P_sg subroutine package)
@@ -250,22 +250,22 @@
 *
 * Specification statements
 *     .. Parameters ..
-      INTEGER          NIPIMX
+      integer          NIPIMX
       PARAMETER        (NIPIMX=51)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IER,MD,NXD,NXI,NYD,NYI
+      integer          IER,MD,NXD,NXI,NYD,NYI
 *     ..
 *     .. Array Arguments ..
-      REAL             WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
+      real             WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
      +                 ZD(NXD,NYD),ZI(NXI,NYI)
 *     ..
 *     .. Local Scalars ..
-      INTEGER          IX,IXI,IY,IYI,NIPI
+      integer          IX,IXI,IY,IYI,NIPI
 *     ..
 *     .. Local Arrays ..
-      REAL             YII(NIPIMX)
-      INTEGER          INXI(NIPIMX),INYI(NIPIMX)
+      real             YII(NIPIMX)
+      integer          INXI(NIPIMX),INYI(NIPIMX)
 *     ..
 *     .. External Subroutines ..
       EXTERNAL         RGLCTN_sg,RGPD3P_sg,RGPLNL_sg
@@ -275,34 +275,34 @@
 *     ..
 * Preliminary processing
 * Error check
-      IF (NXD.LE.1) GO TO 60
-      IF (NYD.LE.1) GO TO 70
-      DO 10 IX = 2,NXD
-          IF (XD(IX).LE.XD(IX-1)) GO TO 80
-   10 CONTINUE
-      DO 20 IY = 2,NYD
-          IF (YD(IY).LE.YD(IY-1)) GO TO 90
-   20 CONTINUE
-      IF (NXI.LE.0) GO TO 100
-      IF (NYI.LE.0) GO TO 110
+      if (NXD.LE.1) GO TO 60
+      if (NYD.LE.1) GO TO 70
+      do 10 IX = 2,NXD
+          if (XD(IX).LE.XD(IX-1)) GO TO 80
+   10 continue
+      do 20 IY = 2,NYD
+          if (YD(IY).LE.YD(IY-1)) GO TO 90
+   20 continue
+      if (NXI.LE.0) GO TO 100
+      if (NYI.LE.0) GO TO 110
       IER = 0
 * Calculation
 * Estimates partial derivatives at all input-grid data points
 * (for MD=1).
-      IF (MD.NE.2) THEN
+      if (MD.NE.2) THEN
           CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, WK)
 *         CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
-      END IF
+      end if
 * Outermost DO-loop with respect to the y coordinate of the output
 * grid points
-      DO 50 IYI = 1,NYI
-          DO 30 IXI = 1,NIPIMX
+      do 50 IYI = 1,NYI
+          do 30 IXI = 1,NIPIMX
               YII(IXI) = YI(IYI)
-   30     CONTINUE
+   30     continue
 * Second DO-loop with respect to the x coordinate of the output
 * grid points
 * Processes NIPIMX output-grid points, at most, at a time.
-          DO 40 IXI = 1,NXI,NIPIMX
+          do 40 IXI = 1,NXI,NIPIMX
               NIPI = MIN(NXI- (IXI-1),NIPIMX)
 * Locates the output-grid points.
               CALL RGLCTN_sg(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
@@ -311,9 +311,9 @@
               CALL RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,
      +                    INYI, ZI(IXI,IYI))
 *             CALL RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
-   40     CONTINUE
-   50 CONTINUE
-      RETURN
+   40     continue
+   50 continue
+      return
 * Error exit
    60 WRITE (*,FMT=9000)
       IER = 1
@@ -333,7 +333,7 @@
   110 WRITE (*,FMT=9050)
       IER = 6
   120 WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
-      RETURN
+      return
 * Format statements for error messages
  9000 FORMAT (1X,/,'*** RGSF3P_sg Error 1: NXD = 1 or less')
  9010 FORMAT (1X,/,'*** RGSF3P_sg Error 2: NYD = 1 or less')
@@ -347,10 +347,10 @@
  9050 FORMAT (1X,/,'*** RGSF3P_sg Error 6: NYI = 0 or less')
  9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,
      +       /)
-      END
+      end
 
 
-      SUBROUTINE RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
+      subroutine RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
 *
 * Partial derivatives of a bivariate function on a rectangular grid
 * (a supporting subroutine of the RGBI3P/RGSF3P_sg subroutine package)
@@ -387,13 +387,13 @@
 *
 * Specification statements
 *     .. Scalar Arguments ..
-      INTEGER          NXD,NYD
+      integer          NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL             PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
+      real             PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
 *     ..
 *     .. Local Scalars ..
-      REAL             B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
+      real             B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
      +                 CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,
      +                 DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,
      +                 DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,
@@ -403,26 +403,26 @@
      +                 SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,
      +                 Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,
      +                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
-      INTEGER          IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,
+      integer          IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,
      +                 JXY,NX0,NY0
 *     ..
 *     .. Local Arrays ..
-      REAL             B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
+      real             B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
      +                 CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),
      +                 YA(3,4),Z0IA(3,4),ZI0A(3,4)
-      INTEGER          IDLT(3,4)
+      integer          IDLT(3,4)
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC        MAX
 *     ..
 *     .. Statement Functions ..
-      REAL             Z2F,Z3F
+      real             Z2F,Z3F
 *     ..
-* Data statements 
+* Data statements
       DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,
      +                 -2,-1,1,2,-1,1,2,3/
 *     ..
-* Statement Function definitions 
+* Statement Function definitions
       Z2F(XX1,XX2,ZZ0,ZZ1) = (ZZ1-ZZ0)*XX2/XX1 + ZZ0
       Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2) = ((ZZ2-ZZ0)* (XX3-XX1)/XX2-
      +                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
@@ -433,8 +433,8 @@
       NX0 = MAX(4,NXD)
       NY0 = MAX(4,NYD)
 * Double DO-loop with respect to the input grid points
-      DO 60 IY0 = 1,NYD
-          DO 50 IX0 = 1,NXD
+      do 60 IY0 = 1,NYD
+          do 50 IX0 = 1,NXD
               X0 = XD(IX0)
               Y0 = YD(IY0)
               Z00 = ZD(IX0,IY0)
@@ -445,33 +445,33 @@
               SMPEI = 0.0
               SMWTI = 0.0
 * DO-loop with respect to the primary estimate
-              DO 10 IPEX = 1,4
+              do 10 IPEX = 1,4
 * Selects necessary grid points in the x direction.
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  IF ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
+                  if ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
      +                (IX1.GT.NX0) .OR. (IX2.GT.NX0) .OR.
      +                (IX3.GT.NX0)) GO TO 10
 * Selects and/or supplements the x and z values.
                   X1 = XD(IX1) - X0
                   Z10 = ZD(IX1,IY0)
-                  IF (NXD.GE.4) THEN
+                  if (NXD.GE.4) THEN
                       X2 = XD(IX2) - X0
                       X3 = XD(IX3) - X0
                       Z20 = ZD(IX2,IY0)
                       Z30 = ZD(IX3,IY0)
-                  ELSE IF (NXD.EQ.3) THEN
+                  else if (NXD.EQ.3) THEN
                       X2 = XD(IX2) - X0
                       Z20 = ZD(IX2,IY0)
                       X3 = 2*XD(3) - XD(2) - X0
                       Z30 = Z3F(X1,X2,X3,Z00,Z10,Z20)
-                  ELSE IF (NXD.EQ.2) THEN
+                  else if (NXD.EQ.2) THEN
                       X2 = 2*XD(2) - XD(1) - X0
                       Z20 = Z2F(X1,X2,Z00,Z10)
                       X3 = 2*XD(1) - XD(2) - X0
                       Z30 = Z2F(X1,X3,Z00,Z10)
-                  END IF
+                  end if
                   DZX10 = (Z10-Z00)/X1
                   DZX20 = (Z20-Z00)/X2
                   DZX30 = (Z30-Z00)/X3
@@ -501,7 +501,7 @@
                   EPSLN = (Z00**2+Z10**2+Z20**2+Z30**2)*1.0E-12
 * Accumulates the weighted primary estimates of zx and their
 * weights.
-                  IF (VOLF.GT.EPSLN) THEN
+                  if (VOLF.GT.EPSLN) THEN
 * - For a finite weight.
                       WT = 1.0/ (VOLF*DISF)
                       SMPEF = SMPEF + WT*PEZX
@@ -510,7 +510,7 @@
 * - For an infinite weight.
                       SMPEI = SMPEI + PEZX
                       SMWTI = SMWTI + 1.0
-                  END IF
+                  end if
 * Saves the necessary values for estimating zxy
                   XA(1,IPEX) = X1
                   XA(2,IPEX) = X2
@@ -525,15 +525,15 @@
                   SXXA(IPEX) = SXX
                   B00XA(IPEX) = B00
                   B10A(IPEX) = B10
-   10         CONTINUE
+   10         continue
 * Calculates the final estimate of zx.
-              IF (SMWTI.LT.0.5) THEN
+              if (SMWTI.LT.0.5) THEN
 * - When no infinite weights exist.
                   ZXDI = SMPEF/SMWTF
               ELSE
 * - When infinite weights exist.
                   ZXDI = SMPEI/SMWTI
-              END IF
+              end if
 * End of Part 1.
 * Part 2.  Estimation of ZYDI
 * Initial setting
@@ -542,33 +542,33 @@
               SMPEI = 0.0
               SMWTI = 0.0
 * DO-loop with respect to the primary estimate
-              DO 20 IPEY = 1,4
+              do 20 IPEY = 1,4
 * Selects necessary grid points in the y direction.
                   IY1 = IY0 + IDLT(1,IPEY)
                   IY2 = IY0 + IDLT(2,IPEY)
                   IY3 = IY0 + IDLT(3,IPEY)
-                  IF ((IY1.LT.1) .OR. (IY2.LT.1) .OR. (IY3.LT.1) .OR.
+                  if ((IY1.LT.1) .OR. (IY2.LT.1) .OR. (IY3.LT.1) .OR.
      +                (IY1.GT.NY0) .OR. (IY2.GT.NY0) .OR.
      +                (IY3.GT.NY0)) GO TO 20
 * Selects and/or supplements the y and z values.
                   Y1 = YD(IY1) - Y0
                   Z01 = ZD(IX0,IY1)
-                  IF (NYD.GE.4) THEN
+                  if (NYD.GE.4) THEN
                       Y2 = YD(IY2) - Y0
                       Y3 = YD(IY3) - Y0
                       Z02 = ZD(IX0,IY2)
                       Z03 = ZD(IX0,IY3)
-                  ELSE IF (NYD.EQ.3) THEN
+                  else if (NYD.EQ.3) THEN
                       Y2 = YD(IY2) - Y0
                       Z02 = ZD(IX0,IY2)
                       Y3 = 2*YD(3) - YD(2) - Y0
                       Z03 = Z3F(Y1,Y2,Y3,Z00,Z01,Z02)
-                  ELSE IF (NYD.EQ.2) THEN
+                  else if (NYD.EQ.2) THEN
                       Y2 = 2*YD(2) - YD(1) - Y0
                       Z02 = Z2F(Y1,Y2,Z00,Z01)
                       Y3 = 2*YD(1) - YD(2) - Y0
                       Z03 = Z2F(Y1,Y3,Z00,Z01)
-                  END IF
+                  end if
                   DZY01 = (Z01-Z00)/Y1
                   DZY02 = (Z02-Z00)/Y2
                   DZY03 = (Z03-Z00)/Y3
@@ -598,7 +598,7 @@
                   EPSLN = (Z00**2+Z01**2+Z02**2+Z03**2)*1.0E-12
 * Accumulates the weighted primary estimates of zy and their
 * weights.
-                  IF (VOLF.GT.EPSLN) THEN
+                  if (VOLF.GT.EPSLN) THEN
 * - For a finite weight.
                       WT = 1.0/ (VOLF*DISF)
                       SMPEF = SMPEF + WT*PEZY
@@ -607,7 +607,7 @@
 * - For an infinite weight.
                       SMPEI = SMPEI + PEZY
                       SMWTI = SMWTI + 1.0
-                  END IF
+                  end if
 * Saves the necessary values for estimating zxy
                   YA(1,IPEY) = Y1
                   YA(2,IPEY) = Y2
@@ -622,15 +622,15 @@
                   SYYA(IPEY) = SYY
                   B00YA(IPEY) = B00
                   B01A(IPEY) = B01
-   20         CONTINUE
+   20         continue
 * Calculates the final estimate of zy.
-              IF (SMWTI.LT.0.5) THEN
+              if (SMWTI.LT.0.5) THEN
 * - When no infinite weights exist.
                   ZYDI = SMPEF/SMWTF
               ELSE
 * - When infinite weights exist.
                   ZYDI = SMPEI/SMWTI
-              END IF
+              end if
 * End of Part 2.
 * Part 3.  Estimation of ZXYDI
 * Initial setting
@@ -640,11 +640,11 @@
               SMWTI = 0.0
 * Outer DO-loops with respect to the primary estimates in the x
 * direction
-              DO 40 IPEX = 1,4
+              do 40 IPEX = 1,4
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  IF ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
+                  if ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
      +                (IX1.GT.NX0) .OR. (IX2.GT.NX0) .OR.
      +                (IX3.GT.NX0)) GO TO 40
 * Retrieves the necessary values for estimating zxy in the x
@@ -664,11 +664,11 @@
                   B10 = B10A(IPEX)
 * Inner DO-loops with respect to the primary estimates in the y
 * direction
-                  DO 30 IPEY = 1,4
+                  do 30 IPEY = 1,4
                       IY1 = IY0 + IDLT(1,IPEY)
                       IY2 = IY0 + IDLT(2,IPEY)
                       IY3 = IY0 + IDLT(3,IPEY)
-                      IF ((IY1.LT.1) .OR. (IY2.LT.1) .OR.
+                      if ((IY1.LT.1) .OR. (IY2.LT.1) .OR.
      +                    (IY3.LT.1) .OR. (IY1.GT.NY0) .OR.
      +                    (IY2.GT.NY0) .OR. (IY3.GT.NY0)) GO TO 30
 * Retrieves the necessary values for estimating zxy in the y
@@ -687,73 +687,73 @@
                       B00Y = B00YA(IPEY)
                       B01 = B01A(IPEY)
 * Selects and/or supplements the z values.
-                      IF (NYD.GE.4) THEN
+                      if (NYD.GE.4) THEN
                           Z11 = ZD(IX1,IY1)
                           Z12 = ZD(IX1,IY2)
                           Z13 = ZD(IX1,IY3)
-                          IF (NXD.GE.4) THEN
+                          if (NXD.GE.4) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z23 = ZD(IX2,IY3)
                               Z31 = ZD(IX3,IY1)
                               Z32 = ZD(IX3,IY2)
                               Z33 = ZD(IX3,IY3)
-                          ELSE IF (NXD.EQ.3) THEN
+                          else if (NXD.EQ.3) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z23 = ZD(IX2,IY3)
                               Z31 = Z3F(X1,X2,X3,Z01,Z11,Z21)
                               Z32 = Z3F(X1,X2,X3,Z02,Z12,Z22)
                               Z33 = Z3F(X1,X2,X3,Z03,Z13,Z23)
-                          ELSE IF (NXD.EQ.2) THEN
+                          else if (NXD.EQ.2) THEN
                               Z21 = Z2F(X1,X2,Z01,Z11)
                               Z22 = Z2F(X1,X2,Z02,Z12)
                               Z23 = Z2F(X1,X2,Z03,Z13)
                               Z31 = Z2F(X1,X3,Z01,Z11)
                               Z32 = Z2F(X1,X3,Z02,Z12)
                               Z33 = Z2F(X1,X3,Z03,Z13)
-                          END IF
-                      ELSE IF (NYD.EQ.3) THEN
+                          end if
+                      else if (NYD.EQ.3) THEN
                           Z11 = ZD(IX1,IY1)
                           Z12 = ZD(IX1,IY2)
                           Z13 = Z3F(Y1,Y2,Y3,Z10,Z11,Z12)
-                          IF (NXD.GE.4) THEN
+                          if (NXD.GE.4) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z31 = ZD(IX3,IY1)
                               Z32 = ZD(IX3,IY2)
-                          ELSE IF (NXD.EQ.3) THEN
+                          else if (NXD.EQ.3) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z31 = Z3F(X1,X2,X3,Z01,Z11,Z21)
                               Z32 = Z3F(X1,X2,X3,Z02,Z12,Z22)
-                          ELSE IF (NXD.EQ.2) THEN
+                          else if (NXD.EQ.2) THEN
                               Z21 = Z2F(X1,X2,Z01,Z11)
                               Z22 = Z2F(X1,X2,Z02,Z12)
                               Z31 = Z2F(X1,X3,Z01,Z11)
                               Z32 = Z2F(X1,X3,Z02,Z12)
-                          END IF
+                          end if
                           Z23 = Z3F(Y1,Y2,Y3,Z20,Z21,Z22)
                           Z33 = Z3F(Y1,Y2,Y3,Z30,Z31,Z32)
-                      ELSE IF (NYD.EQ.2) THEN
+                      else if (NYD.EQ.2) THEN
                           Z11 = ZD(IX1,IY1)
                           Z12 = Z2F(Y1,Y2,Z10,Z11)
                           Z13 = Z2F(Y1,Y3,Z10,Z11)
-                          IF (NXD.GE.4) THEN
+                          if (NXD.GE.4) THEN
                               Z21 = ZD(IX2,IY1)
                               Z31 = ZD(IX3,IY1)
-                          ELSE IF (NXD.EQ.3) THEN
+                          else if (NXD.EQ.3) THEN
                               Z21 = ZD(IX2,IY1)
                               Z31 = Z3F(X1,X2,X3,Z01,Z11,Z21)
-                          ELSE IF (NXD.EQ.2) THEN
+                          else if (NXD.EQ.2) THEN
                               Z21 = Z2F(X1,X2,Z01,Z11)
                               Z31 = Z2F(X1,X3,Z01,Z11)
-                          END IF
+                          end if
                           Z22 = Z2F(Y1,Y2,Z20,Z21)
                           Z23 = Z2F(Y1,Y3,Z20,Z21)
                           Z32 = Z2F(Y1,Y2,Z30,Z31)
                           Z33 = Z2F(Y1,Y3,Z30,Z31)
-                      END IF
+                      end if
 * Calculates the primary estimate of partial derivative zxy as
 * the coefficient of the bicubic polynomial.
                       DZXY11 = (Z11-Z10-Z01+Z00)/ (X1*Y1)
@@ -807,7 +807,7 @@
      +                        1.0E-12
 * Accumulates the weighted primary estimates of zxy and their
 * weights.
-                      IF (VOLF.GT.EPSLN) THEN
+                      if (VOLF.GT.EPSLN) THEN
 * - For a finite weight.
                           WT = 1.0/ (VOLF*DISF)
                           SMPEF = SMPEF + WT*PEZXY
@@ -816,28 +816,28 @@
 * - For an infinite weight.
                           SMPEI = SMPEI + PEZXY
                           SMWTI = SMWTI + 1.0
-                      END IF
-   30             CONTINUE
-   40         CONTINUE
+                      end if
+   30             continue
+   40         continue
 * Calculates the final estimate of zxy.
-              IF (SMWTI.LT.0.5) THEN
+              if (SMWTI.LT.0.5) THEN
 * - When no infinite weights exist.
                   ZXYDI = SMPEF/SMWTF
               ELSE
 * - When infinite weights exist.
                   ZXYDI = SMPEI/SMWTI
-              END IF
+              end if
 * End of Part 3
               PDD(1,IX0,IY0) = ZXDI
               PDD(2,IX0,IY0) = ZYDI
               PDD(3,IX0,IY0) = ZXYDI
-   50     CONTINUE
-   60 CONTINUE
-      RETURN
-      END
+   50     continue
+   60 continue
+      return
+      end
 
 
-      SUBROUTINE RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
+      subroutine RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 *
 * Location of the desired points in a rectangular grid
 * (a supporting subroutine of the RGBI3P/RGSF3P_sg subroutine package)
@@ -880,103 +880,103 @@
 *
 * Specification statements
 *     .. Scalar Arguments ..
-      INTEGER          NIP,NXD,NYD
+      integer          NIP,NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL             XD(NXD),XI(NIP),YD(NYD),YI(NIP)
-      INTEGER          INXI(NIP),INYI(NIP)
+      real             XD(NXD),XI(NIP),YD(NYD),YI(NIP)
+      integer          INXI(NIP),INYI(NIP)
 *     ..
 *     .. Local Scalars ..
-      REAL             XII,YII
-      INTEGER          IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
+      real             XII,YII
+      integer          IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
 *     ..
 * DO-loop with respect to IIP, which is the point number of the
 * output point
-      DO 30 IIP = 1,NIP
+      do 30 IIP = 1,NIP
           XII = XI(IIP)
           YII = YI(IIP)
 * Checks if the x coordinate of the IIPth output point, XII, is
 * in a new interval.  (NINTX is the new-interval flag.)
-          IF (IIP.EQ.1) THEN
+          if (IIP.EQ.1) THEN
               NINTX = 1
           ELSE
               NINTX = 0
-              IF (IXD.EQ.0) THEN
-                  IF (XII.GT.XD(1)) NINTX = 1
-              ELSE IF (IXD.LT.NXD) THEN
-                  IF ((XII.LT.XD(IXD)) .OR.
+              if (IXD.EQ.0) THEN
+                  if (XII.GT.XD(1)) NINTX = 1
+              else if (IXD.LT.NXD) THEN
+                  if ((XII.LT.XD(IXD)) .OR.
      +                (XII.GT.XD(IXD+1))) NINTX = 1
               ELSE
-                  IF (XII.LT.XD(NXD)) NINTX = 1
-              END IF
-          END IF
+                  if (XII.LT.XD(NXD)) NINTX = 1
+              end if
+          end if
 * Locates the output point by binary search if XII is in a new
 * interval.  Determines IXD for which XII lies between XD(IXD)
 * and XD(IXD+1).
-          IF (NINTX.EQ.1) THEN
-              IF (XII.LE.XD(1)) THEN
+          if (NINTX.EQ.1) THEN
+              if (XII.LE.XD(1)) THEN
                   IXD = 0
-              ELSE IF (XII.LT.XD(NXD)) THEN
+              else if (XII.LT.XD(NXD)) THEN
                   IMN = 1
                   IMX = NXD
                   IMD = (IMN+IMX)/2
-   10             IF (XII.GE.XD(IMD)) THEN
+   10             if (XII.GE.XD(IMD)) THEN
                       IMN = IMD
                   ELSE
                       IMX = IMD
-                  END IF
+                  end if
                   IMD = (IMN+IMX)/2
-                  IF (IMD.GT.IMN) GO TO 10
+                  if (IMD.GT.IMN) GO TO 10
                   IXD = IMD
               ELSE
                   IXD = NXD
-              END IF
-          END IF
+              end if
+          end if
           INXI(IIP) = IXD
 * Checks if the y coordinate of the IIPth output point, YII, is
 * in a new interval.  (NINTY is the new-interval flag.)
-          IF (IIP.EQ.1) THEN
+          if (IIP.EQ.1) THEN
               NINTY = 1
           ELSE
               NINTY = 0
-              IF (IYD.EQ.0) THEN
-                  IF (YII.GT.YD(1)) NINTY = 1
-              ELSE IF (IYD.LT.NYD) THEN
-                  IF ((YII.LT.YD(IYD)) .OR.
+              if (IYD.EQ.0) THEN
+                  if (YII.GT.YD(1)) NINTY = 1
+              else if (IYD.LT.NYD) THEN
+                  if ((YII.LT.YD(IYD)) .OR.
      +                (YII.GT.YD(IYD+1))) NINTY = 1
               ELSE
-                  IF (YII.LT.YD(NYD)) NINTY = 1
-              END IF
-          END IF
+                  if (YII.LT.YD(NYD)) NINTY = 1
+              end if
+          end if
 * Locates the output point by binary search if YII is in a new
 * interval.  Determines IYD for which YII lies between YD(IYD)
 * and YD(IYD+1).
-          IF (NINTY.EQ.1) THEN
-              IF (YII.LE.YD(1)) THEN
+          if (NINTY.EQ.1) THEN
+              if (YII.LE.YD(1)) THEN
                   IYD = 0
-              ELSE IF (YII.LT.YD(NYD)) THEN
+              else if (YII.LT.YD(NYD)) THEN
                   IMN = 1
                   IMX = NYD
                   IMD = (IMN+IMX)/2
-   20             IF (YII.GE.YD(IMD)) THEN
+   20             if (YII.GE.YD(IMD)) THEN
                       IMN = IMD
                   ELSE
                       IMX = IMD
-                  END IF
+                  end if
                   IMD = (IMN+IMX)/2
-                  IF (IMD.GT.IMN) GO TO 20
+                  if (IMD.GT.IMN) GO TO 20
                   IYD = IMD
               ELSE
                   IYD = NYD
-              END IF
-          END IF
+              end if
+          end if
           INYI(IIP) = IYD
-   30 CONTINUE
-      RETURN
-      END
+   30 continue
+      return
+      end
 
 
-      SUBROUTINE RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
+      subroutine RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
 *
 * Polynomials for rectangular-grid bivariate interpolation and
 * surface fitting
@@ -1030,42 +1030,42 @@
 *
 * Specification statements
 *     .. Scalar Arguments ..
-      INTEGER          NIP,NXD,NYD
+      integer          NIP,NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL             PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
+      real             PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
      +                 ZD(NXD,NYD),ZI(NIP)
-      INTEGER          INXI(NIP),INYI(NIP)
+      integer          INXI(NIP),INYI(NIP)
 *     ..
 *     .. Local Scalars ..
-      REAL             A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
+      real             A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
      +                 P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,
      +                 Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,
      +                 Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,
      +                 ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,
      +                 ZY10,ZY11,ZY1DX
-      INTEGER          IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
+      integer          IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC        MAX
 *     ..
 * Calculation
 * Outermost DO-loop with respect to the output point
-      DO 10 IIP = 1,NIP
+      do 10 IIP = 1,NIP
           XII = XI(IIP)
           YII = YI(IIP)
-          IF (IIP.EQ.1) THEN
+          if (IIP.EQ.1) THEN
               IXDIPV = -1
               IYDIPV = -1
           ELSE
               IXDIPV = IXDI
               IYDIPV = IYDI
-          END IF
+          end if
           IXDI = INXI(IIP)
           IYDI = INYI(IIP)
 * Retrieves the z and partial derivative values at the origin of
 * the coordinate for the rectangle.
-          IF (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+          if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
               IXD0 = MAX(1,IXDI)
               IYD0 = MAX(1,IYDI)
               X0 = XD(IXD0)
@@ -1074,14 +1074,14 @@
               ZX00 = PDD(1,IXD0,IYD0)
               ZY00 = PDD(2,IXD0,IYD0)
               ZXY00 = PDD(3,IXD0,IYD0)
-          END IF
+          end if
 * Case 1.  When the rectangle is inside the data area in both the
 * x and y directions.
-          IF ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
+          if ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
      +        (IYDI.GT.0.AND.IYDI.LT.NYD)) THEN
 * Retrieves the z and partial derivative values at the other three
 * vertices of the rectangle.
-              IF (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1130,7 +1130,7 @@
                   P31 = (-2.0*ZY0DX+ZXY10+ZXY00)/DXSQ
                   P32 = (-6.0*A+3.0*B+2.0*C-D)/ (DXSQ*DY)
                   P33 = (2.0* (2.0*A-B-C)+D)/ (DXSQ*DYSQ)
-              END IF
+              end if
 * Evaluates the polynomial.
               U = XII - X0
               V = YII - Y0
@@ -1142,11 +1142,11 @@
 * End of Case 1
 * Case 2.  When the rectangle is inside the data area in the x
 * direction but outside in the y direction.
-          ELSE IF ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
+          else if ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
      +             (IYDI.LE.0.OR.IYDI.GE.NYD)) THEN
 * Retrieves the z and partial derivative values at the other
 * vertex of the semi-infinite rectangle.
-              IF (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1165,7 +1165,7 @@
                   P21 = (2.0* (ZY0DX-ZXY00)+ZY0DX-ZXY10)/DX
                   P30 = (-2.0*Z0DX+ZX10+ZX00)/DXSQ
                   P31 = (-2.0*ZY0DX+ZXY10+ZXY00)/DXSQ
-              END IF
+              end if
 * Evaluates the polynomial.
               U = XII - X0
               V = YII - Y0
@@ -1177,11 +1177,11 @@
 * End of Case 2
 * Case 3.  When the rectangle is outside the data area in the x
 * direction but inside in the y direction.
-          ELSE IF ((IXDI.LE.0.OR.IXDI.GE.NXD) .AND.
+          else if ((IXDI.LE.0.OR.IXDI.GE.NXD) .AND.
      +             (IYDI.GT.0.AND.IYDI.LT.NYD)) THEN
 * Retrieves the z and partial derivative values at the other
 * vertex of the semi-infinite rectangle.
-              IF (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
                   IYD1 = IYD0 + 1
                   DY = YD(IYD1) - Y0
                   DYSQ = DY*DY
@@ -1200,7 +1200,7 @@
                   P11 = ZXY00
                   P12 = (2.0* (ZX0DY-ZXY00)+ZX0DY-ZXY01)/DY
                   P13 = (-2.0*ZX0DY+ZXY01+ZXY00)/DYSQ
-              END IF
+              end if
 * Evaluates the polynomial.
               U = XII - X0
               V = YII - Y0
@@ -1210,25 +1210,25 @@
 * End of Case 3
 * Case 4.  When the rectangle is outside the data area in both the
 * x and y direction.
-          ELSE IF ((IXDI.LE.0.OR.IXDI.GE.NXD) .AND.
+          else if ((IXDI.LE.0.OR.IXDI.GE.NXD) .AND.
      +             (IYDI.LE.0.OR.IYDI.GE.NYD)) THEN
 * Calculates the polynomial coefficients.
-              IF (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
                   P00 = Z00
                   P01 = ZY00
                   P10 = ZX00
                   P11 = ZXY00
-              END IF
+              end if
 * Evaluates the polynomial.
               U = XII - X0
               V = YII - Y0
               Q0 = P00 + V*P01
               Q1 = P10 + V*P11
               ZII = Q0 + U*Q1
-          END IF
+          end if
 * End of Case 4
           ZI(IIP) = ZII
-   10 CONTINUE
-      RETURN
-      
-      END
+   10 continue
+      return
+
+      end
