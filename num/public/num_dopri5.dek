@@ -17,14 +17,7 @@
       ! the mesa implementation is thread-safe,
       ! so you can run multiple solutions in parallel.
 
-      subroutine dopri5(
-     &         n, fcn, x, y, xend,
-     &         h, max_step_size, max_steps,
-     &         rtol, atol, itol,
-     &         solout, iout,
-     &         work, lwork, iwork, liwork,
-     &         lrpar, rpar, lipar, ipar,
-     &         lout, idid)
+      subroutine dopri5(n, fcn, x, y, xend, h, max_step_size, max_steps, rtol, atol, itol, solout, iout, work, lwork, iwork, liwork, lrpar, rpar, lipar, ipar, lout, idid)
 
          use mod_dopri5, only:do_dopri5
          use const_def, only: dp
@@ -146,10 +139,7 @@
 
          ! ****************************************************************************
 
-         call do_dopri5(
-     &         n, fcn, x, y, xend, h, max_step_size, max_steps,
-     &         rtol, atol, itol, solout, iout, work, lwork, iwork, liwork,
-     &         lrpar, rpar, lipar, ipar, lout, idid)
+         call do_dopri5(n, fcn, x, y, xend, h, max_step_size, max_steps, rtol, atol, itol, solout, iout, work, lwork, iwork, liwork, lrpar, rpar, lipar, ipar, lout, idid)
 
       end subroutine dopri5
 

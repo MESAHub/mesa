@@ -32,17 +32,17 @@
       ! in Matlab under the name "fminsearch", and in Mathematica as an option for "NMminimize".
       ! our version has lots of bells and whistles and is, of course, superior to the others. ;)  just kidding.
 
-      subroutine NM_simplex(
-     >      n, x_lower, x_upper, x_first, x_final, f_final,
-     >      smplx, f, start_from_given_simplex_and_f,
-     >      fcn, x_atol, x_rtol,
-     >      iter_max, fcn_calls_max,
-     >      centroid_weight_power, enforce_bounds,
-     >      adaptive_random_search, seed,
-     >      alpha, beta, gamma, delta,
-     >      lrpar, rpar, lipar, ipar,
-     >      num_iters, num_fcn_calls,
-     >      num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
+      subroutine NM_simplex( &
+            n, x_lower, x_upper, x_first, x_final, f_final, &
+            smplx, f, start_from_given_simplex_and_f, &
+            fcn, x_atol, x_rtol, &
+            iter_max, fcn_calls_max, &
+            centroid_weight_power, enforce_bounds, &
+            adaptive_random_search, seed, &
+            alpha, beta, gamma, delta, &
+            lrpar, rpar, lipar, ipar, &
+            num_iters, num_fcn_calls, &
+            num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
          use mod_simplex, only: do_simplex
          integer, intent(in) :: n ! number of dimensions
          real(dp), intent(in) :: x_lower(:), x_upper(:), x_first(:) ! (n)
@@ -64,19 +64,17 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          real(dp), intent(out) :: f_final
-         integer, intent(out) ::
-     >      num_iters, num_fcn_calls, ierr,
-     >      num_fcn_calls_for_ars, num_accepted_for_ars
-         call do_simplex(
-     >      n, x_lower, x_upper, x_first, x_final, f_final,
-     >      smplx, f, start_from_given_simplex_and_f,
-     >      fcn, x_atol, x_rtol, iter_max, fcn_calls_max,
-     >      centroid_weight_power, enforce_bounds,
-     >      adaptive_random_search, seed,
-     >      alpha, beta, gamma, delta,
-     >      lrpar, rpar, lipar, ipar,
-     >      num_iters, num_fcn_calls,
-     >      num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
+         integer, intent(out) :: num_iters, num_fcn_calls, ierr, num_fcn_calls_for_ars, num_accepted_for_ars
+         call do_simplex( &
+            n, x_lower, x_upper, x_first, x_final, f_final, &
+            smplx, f, start_from_given_simplex_and_f, &
+            fcn, x_atol, x_rtol, iter_max, fcn_calls_max, &
+            centroid_weight_power, enforce_bounds, &
+            adaptive_random_search, seed, &
+            alpha, beta, gamma, delta, &
+            lrpar, rpar, lipar, ipar, &
+            num_iters, num_fcn_calls, &
+            num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
       end subroutine NM_simplex
 
 

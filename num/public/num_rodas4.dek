@@ -18,21 +18,21 @@
       ! the mesa implementation is thread-safe,
       ! so you can run multiple solutions in parallel.
 
-      subroutine rodas4(
-     >      n, fcn, ifcn, x, y, xend,
-     >      h, max_step_size, max_steps,
-     >      rtol, atol, itol, y_min, y_max,
-     >      jac, ijac, sjac, nzmax, isparse,
-     >      mljac, mujac, dfx, idfx,
-     >      mas, imas, mlmas, mumas,
-     >      solout, iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work, lwork, iwork, liwork,
-     >      lrpar, rpar, lipar, ipar,
-     >      lout, idid)
+      subroutine rodas4( &
+            n, fcn, ifcn, x, y, xend, &
+            h, max_step_size, max_steps, &
+            rtol, atol, itol, y_min, y_max, &
+            jac, ijac, sjac, nzmax, isparse, &
+            mljac, mujac, dfx, idfx, &
+            mas, imas, mlmas, mumas, &
+            solout, iout, &
+            decsol, decsols, decsolblk, &
+            lrd, rpar_decsol, lid, ipar_decsol, &
+            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+            fcn_blk_dble, jac_blk_dble, &
+            work, lwork, iwork, liwork, &
+            lrpar, rpar, lipar, ipar, &
+            lout, idid)
 
          use mod_rosenbrock, only:do_rodas4
          use const_def, only: dp
@@ -269,21 +269,21 @@
 
          ! ****************************************************************************
 
-         call do_rodas4(
-     >      n, fcn, ifcn, x, y, xend,
-     >      h, max_step_size, max_steps,
-     >      rtol, atol, itol, y_min, y_max,
-     >      jac, ijac, sjac, nzmax, isparse,
-     >      mljac, mujac, dfx, idfx,
-     >      mas, imas, mlmas, mumas,
-     >      solout, iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work, lwork, iwork, liwork,
-     >      lrpar, rpar, lipar, ipar,
-     >      lout, idid)
+         call do_rodas4( &
+            n, fcn, ifcn, x, y, xend, &
+            h, max_step_size, max_steps, &
+            rtol, atol, itol, y_min, y_max, &
+            jac, ijac, sjac, nzmax, isparse, &
+            mljac, mujac, dfx, idfx, &
+            mas, imas, mlmas, mumas, &
+            solout, iout, &
+            decsol, decsols, decsolblk, &
+            lrd, rpar_decsol, lid, ipar_decsol, &
+            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+            fcn_blk_dble, jac_blk_dble, &
+            work, lwork, iwork, liwork, &
+            lrpar, rpar, lipar, ipar, &
+            lout, idid)
 
       end subroutine rodas4
 

@@ -25,7 +25,7 @@
 
 ! by M.J.D. Powell (mjdp@cam.ac.uk)
 
-      subroutine bobyqa(n,npt,x,xl,xu,rhobeg,rhoend,iprint,maxfun,w,calfun,max_valid_value)
+      subroutine bobyqa(n, npt, x, xl, xu, rhobeg, rhoend, iprint, maxfun, w, calfun, max_valid_value)
          use mod_bobyqa, only: do_BOBYQA
          use const_def, only: dp
          implicit none
@@ -36,9 +36,8 @@
          interface
             include 'num_bobyqa_proc.dek'
          end interface
-         call do_BOBYQA(n,npt,x,xl,xu,rhobeg,rhoend,iprint,maxfun,w,calfun,max_valid_value)
+         call do_BOBYQA(n, npt, x, xl, xu, rhobeg, rhoend, iprint, maxfun, w, calfun, max_valid_value)
       end subroutine bobyqa
-
 
 !     This subroutine seeks the least value of a function of many variables,
 !     by applying a trust region method that forms quadratic models by
@@ -80,9 +79,6 @@
 !     F to the value of the objective function for the current values of the
 !     variables X(1),X(2),...,X(N), which are generated automatically in a
 !     way that satisfies the bounds given in XL and XU.
-
-
-
 
 !        The name BOBYQA denotes Bounded Optimization BY Quadratic
 !   Approximation, the constraints being lower and upper bounds on every

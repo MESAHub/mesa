@@ -201,9 +201,7 @@
          ! also note that v runs from 1 to n and q must be in the range max(1, v-KU) <= q <= min(n, v+KL)
          ! where n = nvar*nz, KL = number of subdiagonals within the band of A,
          ! and KU = number of superdiagonals.
-      subroutine enter_setmatrix(
-     >        iter, nvar, nz, neqs, x, xold, xscale, xder, need_solver_to_eval_jacobian,
-     >        ldA, A1, idiag, lrpar, rpar, lipar, ipar, ierr)
+      subroutine enter_setmatrix(iter, nvar, nz, neqs, x, xold, xscale, xder, need_solver_to_eval_jacobian, ldA, A1, idiag, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          integer, intent(in) :: iter, nvar, nz, neqs ! (neqs = nvar*nz)
          real(dp), pointer, dimension(:,:) :: x, xold, xscale, xder ! (nvar, nz)

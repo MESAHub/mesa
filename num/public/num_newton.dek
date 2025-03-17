@@ -3,26 +3,18 @@
       ! set_primaries, set_secondaries, and eval_equations
       ! with the new x vector.
 
-      subroutine newton(
-     >         ! primary variables
-     >         nz, nvar, x1, xold1,
-     >         ! matrix info
-     >         matrix_type, mljac, mujac,
-     >         ! matrix routines and their parameters
-     >         decsol, decsolblk,
-     >         lrd, rpar_decsol, lid, ipar_decsol, which_decsol,
-     >         ! tolerances
-     >         tol_correction_norm,
-     >         ! procedure arguments
-     >         set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,
-     >         size_equ, sizeB, inspectB,
-     >         enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
-     >         ! work arrays
-     >         xscale1, equ1, ldy, nsec, y1, work, lwork, iwork, liwork, AF1,
-     >         ! parameters for caller-supplied routines
-     >         lrpar, rpar, lipar, ipar,
-     >         ! results
-     >         convergence_failure, ierr)
+      subroutine newton( &
+               nz, nvar, x1, xold1, &  ! primary variables
+               matrix_type, mljac, mujac, &  ! matrix info
+               decsol, decsolblk, &  ! matrix routines and their parameters
+               lrd, rpar_decsol, lid, ipar_decsol, which_decsol, &
+               tol_correction_norm, &  ! tolerances
+               set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations, &  ! procedure arguments
+               size_equ, sizeB, inspectB, &
+               enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration, &
+               xscale1, equ1, ldy, nsec, y1, work, lwork, iwork, liwork, AF1, &  ! work arrays
+               lrpar, rpar, lipar, ipar, &  ! parameters for caller-supplied routines
+               convergence_failure, ierr) ! ! results
 
          use mod_newton, only: do_newton_wrapper
          use const_def, only: dp
@@ -128,23 +120,22 @@
             include 'newton_procs.dek'
          end interface
 
-         call do_newton_wrapper(
-     >         nz, nvar, x1, xold1,
-     >         matrix_type, mljac, mujac,
-     >         decsol, decsolblk,
-     >         lrd, rpar_decsol, lid, ipar_decsol, which_decsol,
-     >         tol_correction_norm,
-     >         set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,
-     >         size_equ, sizeb, inspectB,
-     >         enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
-     >         xscale1, equ1, ldy, nsec, y1, work, lwork, iwork, liwork, AF1,
-     >         lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+         call do_newton_wrapper( &
+               nz, nvar, x1, xold1, &
+               matrix_type, mljac, mujac, &
+               decsol, decsolblk, &
+               lrd, rpar_decsol, lid, ipar_decsol, which_decsol, &
+               tol_correction_norm, &
+               set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations, &
+               size_equ, sizeb, inspectB, &
+               enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration, &
+               xscale1, equ1, ldy, nsec, y1, work, lwork, iwork, liwork, AF1, &
+               lrpar, rpar, lipar, ipar, convergence_failure, ierr)
 
       end subroutine newton
 
 
-      subroutine newton_work_sizes(
-     >      mljac, mujac, nvar, nz, nsec, matrix_type, lwork, liwork, ierr)
+      subroutine newton_work_sizes(mljac, mujac, nvar, nz, nsec, matrix_type, lwork, liwork, ierr)
          use mod_newton
          ! input args are described above with newton
          integer, intent(in) :: nvar, nz, nsec
@@ -152,8 +143,7 @@
          integer, intent(in) :: mljac, mujac
          integer, intent(out) :: lwork, liwork
          integer, intent(out) :: ierr
-         call get_newton_work_sizes(
-     >      mljac, mujac, nvar, nz, nsec, matrix_type, lwork, liwork, ierr)
+         call get_newton_work_sizes(mljac, mujac, nvar, nz, nsec, matrix_type, lwork, liwork, ierr)
       end subroutine newton_work_sizes
 
 
@@ -199,8 +189,7 @@
       end subroutine default_set_xscale
 
 
-      subroutine default_sizeB(
-     >      iter, nvar, nz, x, B, xscale, max_correction, correction_norm, lrpar, rpar, lipar, ipar, ierr)
+      subroutine default_sizeB(iter, nvar, nz, x, B, xscale, max_correction, correction_norm, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          integer, intent(in) :: iter, nvar, nz
          real(dp), pointer, dimension(:,:) :: x, B, xscale ! (nvar, nz)
@@ -269,9 +258,7 @@
 
 
       ! the default is to have the solver do a numerical jacobian approximation
-      subroutine default_enter_setmatrix(
-     >         iter, nvar, nz, neqs, x, xold, xscale, xder, need_solver_to_eval_jacobian,
-     >         ldA, A1, idiag, lrpar, rpar, lipar, ipar, ierr)
+      subroutine default_enter_setmatrix(iter, nvar, nz, neqs, x, xold, xscale, xder, need_solver_to_eval_jacobian, ldA, A1, idiag, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          integer, intent(in) :: iter, nvar, nz, neqs ! (neqs = nvar*nz)
          real(dp), pointer, dimension(:,:) :: x, xold, xscale, xder ! (nvar, nz)
@@ -290,8 +277,7 @@
       end subroutine default_enter_setmatrix
 
 
-      subroutine default_exit_setmatrix(iter, nvar, nz, neqs,
-     >         dx, ldA, A1, idiag, xscale, lrpar, rpar, lipar, ipar, ierr)
+      subroutine default_exit_setmatrix(iter, nvar, nz, neqs, dx, ldA, A1, idiag, xscale, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          integer, intent(in) :: iter, nvar, nz, neqs
          real(dp), pointer :: dx(:,:) ! (nvar, nz)

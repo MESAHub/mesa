@@ -1,39 +1,18 @@
 
-      subroutine isolve(
-     >      which_solver, n, fcn, x, y, xend,
-     >
-     >      ! step info
-     >      h, max_step_size, max_steps,
-     >
-     >      ! tolerances
-     >      rtol, atol, itol, y_min, y_max,
-     >
-     >      ! jacobian
-     >      jac, ijac, sjac, nzmax, isparse, mljac, mujac,
-     >
-     >      ! mass matrix
-     >      mas, imas, mlmas, mumas,
-     >
-     >      ! step-by-step output
-     >      solout, iout,
-     >
-     >      ! linear algebra routines and parameters
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >
-     >      ! nvar > 0 means use decsolblk
-     >      ! args for bcyclic_dble
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >
-     >      ! work arrays
-     >      work, lwork, iwork, liwork,
-     >
-     >      ! parameters for user supplied routines
-     >      lrpar, rpar, lipar, ipar,
-     >
-     >      ! output iounit and result code
-     >      lout, idid)
+      subroutine isolve( &
+            which_solver, n, fcn, x, y, xend, &
+            h, max_step_size, max_steps, &  ! step info
+            rtol, atol, itol, y_min, y_max, &  ! tolerances
+            jac, ijac, sjac, nzmax, isparse, mljac, mujac, &  ! jacobian
+            mas, imas, mlmas, mumas, &  ! mass matrix
+            solout, iout,  & ! step-by-step output
+            decsol, decsols, decsolblk,  & ! linear algebra routines and parameters
+            lrd, rpar_decsol, lid, ipar_decsol, &
+            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &  ! nvar > 0 means use decsolblk, 
+            fcn_blk_dble, jac_blk_dble, &  ! args for bcyclic_dble
+            work, lwork, iwork, liwork, &  ! work arrays
+            lrpar, rpar, lipar, ipar, &  ! parameters for user supplied routines
+            lout, idid)  ! output iounit and result code
 
          use const_def, only: dp
 
@@ -207,110 +186,110 @@
 
          select case(which_solver)
          case (ros2_solver)
-            call ros2(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call ros2( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case (rose2_solver)
-            call rose2(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call rose2( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case (ros3p_solver)
-            call ros3p(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call ros3p( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case (ros3pl_solver)
-            call ros3pl(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call ros3pl( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case (rodas3_solver)
-            call rodas3(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call rodas3( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case (rodas4_solver)
-            call rodas4(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call rodas4( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case (rodasp_solver)
-            call rodasp(
-     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps,
-     >            rtol, atol, itol, y_min, y_max,
-     >            jac, ijac, sjac, nzmax, isparse,
-     >            mljac, mujac, null_dfx, idfx,
-     >            mas, imas, mlmas, mumas,
-     >            solout, iout,
-     >            decsol, decsols, decsolblk,
-     >            lrd, rpar_decsol, lid, ipar_decsol,
-     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >            fcn_blk_dble, jac_blk_dble,
-     >            work, lwork, iwork, liwork,
-     >            lrpar, rpar, lipar, ipar,
-     >            lout, idid)
+            call rodasp( &
+                  n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, &
+                  rtol, atol, itol, y_min, y_max, &
+                  jac, ijac, sjac, nzmax, isparse, &
+                  mljac, mujac, null_dfx, idfx, &
+                  mas, imas, mlmas, mumas, &
+                  solout, iout, &
+                  decsol, decsols, decsolblk, &
+                  lrd, rpar_decsol, lid, ipar_decsol, &
+                  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
+                  fcn_blk_dble, jac_blk_dble, &
+                  work, lwork, iwork, liwork, &
+                  lrpar, rpar, lipar, ipar, &
+                  lout, idid)
          case default
             idid = isolve_error
          end select
