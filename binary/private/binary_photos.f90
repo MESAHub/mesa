@@ -132,6 +132,8 @@ contains
          b% CE_lambda2, b% CE_lambda2_old, &
          b% CE_Ebind1, b% CE_Ebind1_old, &
          b% CE_Ebind2, b% CE_Ebind2_old, &
+         b% CE_years_detached, b% CE_years_detached_old, &
+         b% generations, &
          b% ixtra(:), b% ixtra_old(:), &
          b% xtra(:), b% xtra_old(:), &
          b% lxtra(:), b% lxtra_old(:)
@@ -253,6 +255,8 @@ contains
          b% CE_lambda2, b% CE_lambda2_old, &
          b% CE_Ebind1, b% CE_Ebind1_old, &
          b% CE_Ebind2, b% CE_Ebind2_old, &
+         b% CE_years_detached, b% CE_years_detached_old, &
+         b% generations, &
          b% ixtra(:), b% ixtra_old(:), &
          b% xtra(:), b% xtra_old(:), &
          b% lxtra(:), b% lxtra_old(:)
