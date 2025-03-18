@@ -405,10 +405,12 @@
                   if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
 
-               if ((mass_sum > s% fe_core_infall_mass*msun) .and. &
-                   (s%m(k_min) <= s%fe_core_mass*msun)) then
-                  s% fe_core_infall = -velocity(k_min)
-               end if
+               k = nz
+               do while (k > 1 .and. s% m(k) <= s% fe_core_mass * Msun)
+                  k = k-1 ! loop outwards
+               end do
+               ! k is now the outer index of the fe core
+               s% fe_core_infall = - minval(s%v(k:nz))
             end if
 
             non_fe_core_mass = s% he_core_mass
