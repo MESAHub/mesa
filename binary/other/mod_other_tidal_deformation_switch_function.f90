@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2025  Matthias Fabry and the MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -23,34 +23,34 @@
 !
 ! ***********************************************************************
 
-module other_eval_fp_ft
+module mod_other_tidal_deformation_switch_function
 
-   ! consult star/other/README for general usage instructions
-   ! control name: use_other_eval_fp_ft = .true.
-   ! procedure pointer: s% other_eval_fp_ft => my_routine
+   ! NOTE: remember to set true:
+   ! use_other_tidal_deformation_function = .true.
+
+   ! you can add your own routine for use instead of the default one.
+   ! the default routine uses the synchronicity parameter to switch from single rotating to tidal corrections.
+   ! When the shell is quite synchronous, f_switch -> 1, when not synchronous, f_switch -> 0. It uses a sigmoid around
+   ! omega/omega_sync = b% f_sync_switch_from_rot_defor to smoothly vary f_switch from 0 to 1.
+
+   use const_def
 
    implicit none
 
-contains
+   contains
 
-   subroutine null_other_eval_fp_ft( &
-      id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
-      use num_lib
-      use star_utils
-      use auto_diff_support
-      use star_def
+   subroutine null_other_tidal_deformation_switch_function(id, k, omega_in, f_switch, ierr)
       integer, intent(in) :: id, k
-      real(dp), intent(in) :: aw, r, rho, xm
-      type(auto_diff_real_star_order1), intent(out) :: fp, ft
-      real(dp), intent(inout) :: r_polar, r_equatorial
-      logical, intent(in) :: report_ierr
+      real(dp), intent(in) :: omega_in
+      real(dp), intent(out) :: f_switch
       integer, intent(out) :: ierr
+      include 'formats'
 
-      write (*, *) 'no implementation for other_eval_fp_ft'
-      ! must set fp, ft, r_polar and r_equatorial
+      write (*, 1) 'no implementation for other_tidal_deformation_function'
+      ! must set f_switch
       ierr = -1
+   end subroutine null_other_tidal_deformation_switch_function
 
-   end subroutine null_other_eval_fp_ft
 
-end module other_eval_fp_ft
+end module mod_other_tidal_deformation_switch_function
 
