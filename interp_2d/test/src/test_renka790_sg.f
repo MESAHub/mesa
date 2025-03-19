@@ -10,7 +10,7 @@
 ! ACM Algorithm SURVEY to generate a node set and and the
 ! test function values.
 
-      subroutine TEST_RENKA790_SG
+      subroutine test_renka_sq
       use interp_2d_lib_sg
 
       integer   NMAX, NRMAX, NI
@@ -44,14 +44,14 @@
       NC = 17
       NW = 30
       NR =  6
-      call TESTDT_sg (KS, N,X,Y)
+      call testdt_sg (KS, N,X,Y)
 
 
 ! Set up uniform grid points.
 
-      DEL = 1./DBLE(NI-1)
+      DEL = 1./dble(NI-1)
       do 5 I = 1,NI
-        P(I) = DBLE(I-1)*DEL
+        P(I) = dble(I-1)*DEL
     5   continue
 
 ! Initialize the average SSE/SSM value to zero.
@@ -85,13 +85,13 @@
 
 !   Compute the sum of squared deviations from the mean SSM.
 
-        SSM = SSM - SUM*SUM/DBLE(NI*NI)
+        SSM = SSM - SUM*SUM/dble(NI*NI)
 
 !   Compute parameters A and RW defining the interpolant.
 
         call interp_CSHEP2_sg (N,X,Y,W,NC,NW,NR, LCELL,LNEXT,XMIN,
      .               YMIN,DX,DY,RMAX,RW,A,IER)
-        if (IER .NE. 0) GO TO 21
+        if (IER /= 0) GO TO 21
 
 !   Compute interpolation errors.
 
@@ -104,7 +104,7 @@
             PW = interp_CS2VAL_sg (P(I),P(J),N,X,Y,W,NR,LCELL,LNEXT,
      .                   XMIN,YMIN,DX,DY,RMAX,RW,A,IER) -
      .           FT(I,J)
-            if (IER .NE. 0) then
+            if (IER /= 0) then
                write(LOUT,*) 'IER nonzero from CS2VAL_sg'
                stop 1
             end IF
@@ -114,7 +114,7 @@
     9       continue
    10     continue
         NP = NI*NI
-        ERMEAN = ERMEAN/DBLE(NP)
+        ERMEAN = ERMEAN/dble(NP)
         SSE = SSE/SSM
         SSA = SSA + SSE
         write (LOUT,210) KF, ERMAX, ERMEAN, SSE
@@ -157,11 +157,11 @@
 
 
 
-      subroutine TESTDT_sg (K, N,X,Y)
+      subroutine testdt_sg (K, N,X,Y)
       real X(100), Y(100)
       integer K, N
 
-C***********************************************************
+! **********************************************************
 
 !                                            Robert J. Renka
 !                                  Dept. of Computer Science
@@ -203,7 +203,7 @@ C***********************************************************
 
 ! Subprograms required by TESTDT:  None
 
-C***********************************************************
+! **********************************************************
 
       real X1(100), Y1(100),  X2(33), Y2(33),
      .                 X3(25), Y3(25),  X4(100), Y4(100),
@@ -454,7 +454,7 @@ C***********************************************************
       integer K, IFLAG
       real X, Y, F, FX, FY
 
-C***********************************************************
+! **********************************************************
 
 !                                            Robert J. Renka
 !                                  Dept. of Computer Science
@@ -519,7 +519,7 @@ C***********************************************************
 !               Naval Postgraduate School Technical Report,
 !               NPS-53-79-003, 1979.
 
-C***********************************************************
+! **********************************************************
 
       real T1, T2, T3, T4
       if (K  <  1  .OR.  K  >  10) return
@@ -527,15 +527,15 @@ C***********************************************************
 
 ! Exponential:
 
-    1 F = .75*EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
-     .    .75*EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
-     .     .5*EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
-     .     .2*EXP(-(9.*X-4.)**2 - (9.*Y-7.)**2)
-      if (IFLAG .NE. 1) return
-      T1 = EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
-      T2 = EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
-      T3 = EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
-      T4 = EXP(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
+     .    .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
+     .     .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
+     .     .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+      if (IFLAG /= 1) return
+      T1 = exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
+      T2 = exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
+      T3 = exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
+      T4 = exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       FX = -3.375*(9.*X-2.)*T1 - (27./98.)*(9.*X+1.)*T2
      .     -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
       FY = -3.375*(9.*Y-2.)*T1 - .675*T2
@@ -544,41 +544,41 @@ C***********************************************************
 
 ! Cliff:
 
-    2 F = (TANH(9.0*(Y-X)) + 1.0)/9.0
-      if (IFLAG .NE. 1) return
+    2 F = (tanh(9.0*(Y-X)) + 1.0)/9.0
+      if (IFLAG /= 1) return
       T1 = 18.0*(Y-X)
-      FX = -4.0/(EXP(T1) + 2.0 + EXP(-T1))
+      FX = -4.0/(exp(T1) + 2.0 + exp(-T1))
       FY = -FX
       return
 
 ! Saddle:
 
-    3 F = (1.25 + COS(5.4*Y))/(6.0 + 6.0*(3.0*X-1.0)**2)
-      if (IFLAG .NE. 1) return
+    3 F = (1.25 + cos(5.4*Y))/(6.0 + 6.0*(3.0*X-1.0)**2)
+      if (IFLAG /= 1) return
       T1 = 5.4*Y
       T2 = 1.0 + (3.0*X-1.)**2
-      FX = -(3.0*X-1.0)*(1.25 + COS(T1))/(T2**2)
-      FY = -.9*SIN(T1)/T2
+      FX = -(3.0*X-1.0)*(1.25 + cos(T1))/(T2**2)
+      FY = -.9*sin(T1)/T2
       return
 
 ! Gentle:
 
-    4 F = EXP(-5.0625*((X-.5)**2 + (Y-.5)**2))/3.0
-      if (IFLAG .NE. 1) return
+    4 F = exp(-5.0625*((X-.5)**2 + (Y-.5)**2))/3.0
+      if (IFLAG /= 1) return
       T1 = X - .5
       T2 = Y - .5
-      T3 = -3.375*EXP(-5.0625*(T1**2 + T2**2))
+      T3 = -3.375*exp(-5.0625*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
       return
 
 ! Steep:
 
-    5 F = EXP(-20.25*((X-.5)**2 + (Y-.5)**2))/3.0
-      if (IFLAG .NE. 1) return
+    5 F = exp(-20.25*((X-.5)**2 + (Y-.5)**2))/3.0
+      if (IFLAG /= 1) return
       T1 = X - .5
       T2 = Y - .5
-      T3 = -13.5*EXP(-20.25*(T1**2 + T2**2))
+      T3 = -13.5*exp(-20.25*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
       return
@@ -587,25 +587,25 @@ C***********************************************************
 
     6 T4 = 64.0 - 81.0*((X-.5)**2 + (Y-.5)**2)
       F = 0.
-      if (T4  >=  0.) F = SQRT(T4)/9.0 - .5
-      if (IFLAG .NE. 1) return
+      if (T4  >=  0.) F = sqrt(T4)/9.0 - .5
+      if (IFLAG /= 1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = 0.
-      if (T4  >  0.) T3 = -9.0/SQRT(T4)
+      if (T4  >  0.) T3 = -9.0/sqrt(T4)
       FX = T1*T3
       FY = T2*T3
       return
 
 ! Trig:
 
-    7 F = 2.0*COS(10.0*X)*SIN(10.0*Y) + SIN(10.0*X*Y)
-      if (IFLAG .NE. 1) return
+    7 F = 2.0*cos(10.0*X)*sin(10.0*Y) + sin(10.0*X*Y)
+      if (IFLAG /= 1) return
       T1 = 10.0*X
       T2 = 10.0*Y
-      T3 = 10.0*COS(10.0*X*Y)
-      FX = -20.0*SIN(T1)*SIN(T2) + T3*Y
-      FY = 20.0*COS(T1)*COS(T2) + T3*X
+      T3 = 10.0*cos(10.0*X*Y)
+      FX = -20.0*sin(T1)*sin(T2) + T3*Y
+      FY = 20.0*cos(T1)*cos(T2) + T3*X
       return
 
 ! Gaussx(1,.5,.1) + Gaussy(.75,.5,.1) + Gaussx(1,.5,.1)*
@@ -615,23 +615,23 @@ C***********************************************************
 
     8 T1 = 5.0 - 10.0*X
       T2 = 5.0 - 10.0*Y
-      T3 = EXP(-.5*T1*T1)
-      T4 = EXP(-.5*T2*T2)
+      T3 = exp(-.5*T1*T1)
+      T4 = exp(-.5*T2*T2)
       F = T3 + .75*T4*(1.0+T3)
-      if (IFLAG .NE. 1) return
+      if (IFLAG /= 1) return
       FX = T1*T3*(10.0 + 7.5*T4)
       FY = T2*T4*(7.5 + 7.5*T3)
       return
 
 ! Cloverleaf Asymmetric Hill/Valley:
 
-    9 T1 = EXP((10.0 - 20.0*X)/3.0)
-      T2 = EXP((10.0 - 20.0*Y)/3.0)
+    9 T1 = exp((10.0 - 20.0*X)/3.0)
+      T2 = exp((10.0 - 20.0*Y)/3.0)
       T3 = 1.0/(1.0 + T1)
       T4 = 1.0/(1.0 + T2)
       F = ((20.0/3.0)**3 * T1*T2)**2 * (T3*T4)**5 *
      .    (T1-2.0*T3)*(T2-2.0*T4)
-      if (IFLAG .NE. 1) return
+      if (IFLAG /= 1) return
       FX = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 *
      .     (2.0*T1-3.0*T3-5.0+12.0*T3*T3)*T2*T2*T4**5 *
      .     (T2-2.0*T4)
@@ -642,16 +642,16 @@ C***********************************************************
 
 ! Cosine Peak:
 
-   10 T1 = SQRT( (80.0*X - 40.0)**2 + (90.0*Y - 45.0)**2 )
-      T2 = EXP(-.04*T1)
-      T3 = COS(.15*T1)
+   10 T1 = sqrt( (80.0*X - 40.0)**2 + (90.0*Y - 45.0)**2 )
+      T2 = exp(-.04*T1)
+      T3 = cos(.15*T1)
       F = T2*T3
-      if (IFLAG .NE. 1) return
-      T4 = SIN(.15*T1)
+      if (IFLAG /= 1) return
+      T4 = sin(.15*T1)
       FX = 0.
       FY = 0.
       if (T1 == 0.) return
-      T4 = SIN(.15*T1)
+      T4 = sin(.15*T1)
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       return
@@ -663,7 +663,7 @@ C***********************************************************
       integer K, IFLAG
       real X, Y, F, FX, FY, FXX, FXY, FYY
 
-C***********************************************************
+! **********************************************************
 
 !                                            Robert J. Renka
 !                                  Dept. of Computer Science
@@ -735,7 +735,7 @@ C***********************************************************
 !               Naval Postgraduate School Technical Report,
 !               NPS-53-79-003, 1979.
 
-C***********************************************************
+! **********************************************************
 
       real T1, T2, T3, T4, T5, T6
       if (K  <  1  .OR.  K  >  10) return
@@ -743,15 +743,15 @@ C***********************************************************
 
 ! Exponential:
 
-    1 F = .75*EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
-     .    .75*EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
-     .     .5*EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
-     .     .2*EXP(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
+     .    .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
+     .     .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
+     .     .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       if (IFLAG  <  1) return
-      T1 = EXP(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
-      T2 = EXP(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
-      T3 = EXP(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
-      T4 = EXP(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+      T1 = exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
+      T2 = exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
+      T3 = exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
+      T4 = exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       FX = -3.375*(9.*X-2.)*T1 - (27./98.)*(9.*X+1.)*T2
      .     -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
       FY = -3.375*(9.*Y-2.)*T1 - .675*T2
@@ -773,38 +773,38 @@ C***********************************************************
 
 ! Cliff:
 
-    2 F = (TANH(9.0*(Y-X)) + 1.0)/9.0
+    2 F = (tanh(9.0*(Y-X)) + 1.0)/9.0
       if (IFLAG  <  1) return
       T1 = 18.0*(Y-X)
-      FX = -4.0/(EXP(T1) + 2.0 + EXP(-T1))
+      FX = -4.0/(exp(T1) + 2.0 + exp(-T1))
       FY = -FX
       if (IFLAG  <  2) return
-      FXX = 18.0*TANH(0.5*T1)*FX
+      FXX = 18.0*tanh(0.5*T1)*FX
       FXY = -FXX
       FYY = FXX
       return
 
 ! Saddle:
 
-    3 F = (1.25 + COS(5.4*Y))/(6.0 + 6.0*(3.0*X-1.0)**2)
+    3 F = (1.25 + cos(5.4*Y))/(6.0 + 6.0*(3.0*X-1.0)**2)
       if (IFLAG  <  1) return
       T1 = 5.4*Y
       T2 = 1.0 + (3.0*X-1.)**2
-      FX = -(3.0*X-1.0)*(1.25 + COS(T1))/(T2**2)
-      FY = -.9*SIN(T1)/T2
+      FX = -(3.0*X-1.0)*(1.25 + cos(T1))/(T2**2)
+      FY = -.9*sin(T1)/T2
       if (IFLAG  <  2) return
-      FXX = 3.0*(1.25 + COS(T1))*(3.0*T2-4.0)/(T2**3)
-      FXY = 5.4*(3.0*X-1.0)*SIN(T1)/(T2**2)
-      FYY = -4.86*COS(T1)/T2
+      FXX = 3.0*(1.25 + cos(T1))*(3.0*T2-4.0)/(T2**3)
+      FXY = 5.4*(3.0*X-1.0)*sin(T1)/(T2**2)
+      FYY = -4.86*cos(T1)/T2
       return
 
 ! Gentle:
 
-    4 F = EXP(-5.0625*((X-.5)**2 + (Y-.5)**2))/3.0
+    4 F = exp(-5.0625*((X-.5)**2 + (Y-.5)**2))/3.0
       if (IFLAG  <  1) return
       T1 = X - .5
       T2 = Y - .5
-      T3 = -3.375*EXP(-5.0625*(T1**2 + T2**2))
+      T3 = -3.375*exp(-5.0625*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
       if (IFLAG  <  2) return
@@ -815,11 +815,11 @@ C***********************************************************
 
 ! Steep:
 
-    5 F = EXP(-20.25*((X-.5)**2 + (Y-.5)**2))/3.0
+    5 F = exp(-20.25*((X-.5)**2 + (Y-.5)**2))/3.0
       if (IFLAG  <  1) return
       T1 = X - .5
       T2 = Y - .5
-      T3 = -13.5*EXP(-20.25*(T1**2 + T2**2))
+      T3 = -13.5*exp(-20.25*(T1**2 + T2**2))
       FX = T1*T3
       FY = T2*T3
       if (IFLAG  <  2) return
@@ -832,12 +832,12 @@ C***********************************************************
 
     6 T4 = 64.0 - 81.0*((X-.5)**2 + (Y-.5)**2)
       F = 0.
-      if (T4  >=  0.) F = SQRT(T4)/9.0 - .5
+      if (T4  >=  0.) F = sqrt(T4)/9.0 - .5
       if (IFLAG  <  1) return
       T1 = X - .5
       T2 = Y - .5
       T3 = 0.
-      if (T4  >  0.) T3 = -9.0/SQRT(T4)
+      if (T4  >  0.) T3 = -9.0/sqrt(T4)
       FX = T1*T3
       FY = T2*T3
       if (IFLAG  <  2) return
@@ -848,18 +848,18 @@ C***********************************************************
 
 ! Trig:
 
-    7 F = 2.0*COS(10.0*X)*SIN(10.0*Y) + SIN(10.0*X*Y)
+    7 F = 2.0*cos(10.0*X)*sin(10.0*Y) + sin(10.0*X*Y)
       if (IFLAG  <  1) return
       T1 = 10.0*X
       T2 = 10.0*Y
-      T3 = 10.0*COS(10.0*X*Y)
-      FX = -20.0*SIN(T1)*SIN(T2) + T3*Y
-      FY = 20.0*COS(T1)*COS(T2) + T3*X
+      T3 = 10.0*cos(10.0*X*Y)
+      FX = -20.0*sin(T1)*sin(T2) + T3*Y
+      FY = 20.0*cos(T1)*cos(T2) + T3*X
       if (IFLAG  <  2) return
-      T4 = 100.0*SIN(10.0*X*Y)
-      FXX = -200.0*COS(T1)*SIN(T2) - T4*Y*Y
-      FXY = -200.0*SIN(T1)*COS(T2) + T3 - T4*X*Y
-      FYY = -200.0*COS(T1)*SIN(T2) - T4*X*X
+      T4 = 100.0*sin(10.0*X*Y)
+      FXX = -200.0*cos(T1)*sin(T2) - T4*Y*Y
+      FXY = -200.0*sin(T1)*cos(T2) + T3 - T4*X*Y
+      FYY = -200.0*cos(T1)*sin(T2) - T4*X*X
       return
 
 ! Gaussx(1,.5,.1) + Gaussy(.75,.5,.1) + Gaussx(1,.5,.1)*
@@ -869,8 +869,8 @@ C***********************************************************
 
     8 T1 = 5.0 - 10.0*X
       T2 = 5.0 - 10.0*Y
-      T3 = EXP(-.5*T1*T1)
-      T4 = EXP(-.5*T2*T2)
+      T3 = exp(-.5*T1*T1)
+      T4 = exp(-.5*T2*T2)
       F = T3 + .75*T4*(1.0+T3)
       if (IFLAG  <  1) return
       FX = T1*T3*(10.0 + 7.5*T4)
@@ -883,8 +883,8 @@ C***********************************************************
 
 ! Cloverleaf Asymmetric Hill/Valley:
 
-    9 T1 = EXP((10.0 - 20.0*X)/3.0)
-      T2 = EXP((10.0 - 20.0*Y)/3.0)
+    9 T1 = exp((10.0 - 20.0*X)/3.0)
+      T2 = exp((10.0 - 20.0*Y)/3.0)
       T3 = 1.0/(1.0 + T1)
       T4 = 1.0/(1.0 + T2)
       T5 = 20.0/3.0
@@ -908,16 +908,16 @@ C***********************************************************
 
 ! Cosine Peak:
 
-   10 T1 = SQRT( (80.0*X - 40.0)**2 + (90.0*Y - 45.0)**2 )
-      T2 = EXP(-.04*T1)
-      T3 = COS(.15*T1)
+   10 T1 = sqrt( (80.0*X - 40.0)**2 + (90.0*Y - 45.0)**2 )
+      T2 = exp(-.04*T1)
+      T3 = cos(.15*T1)
       F = T2*T3
       if (IFLAG  <  1) return
-      T4 = SIN(.15*T1)
+      T4 = sin(.15*T1)
       FX = 0.
       FY = 0.
       if (T1 == 0.) return
-      T4 = SIN(.15*T1)
+      T4 = sin(.15*T1)
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       if (IFLAG  <  2) return
@@ -933,4 +933,4 @@ C***********************************************************
       FYY = T5*(T1*(97.2*T4 - 169.29*T3)*(90.0*Y-45.0)**2 -
      .             (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
       return
-      end
+      end subroutine

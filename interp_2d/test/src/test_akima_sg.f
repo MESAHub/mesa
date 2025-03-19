@@ -1,48 +1,48 @@
-      SUBROUTINE TEST_AKIMA_SG
-      USE interp_2d_lib_sg
+      subroutine test_akima_sg
+      use interp_2d_lib_sg
 *
-* Test for the RGBI3P_sg/RGSF3P_sg subroutine package
+! Test for the RGBI3P_sg/RGSF3P_sg subroutine package
 *
-* Hiroshi Akima
-* U.S. Department of Commerce, NTIA/ITS
-* Version of 1995/08
+! Hiroshi Akima
+! U.S. Department of Commerce, NTIA/ITS
+! Version of 1995/08
 *
-* This program calls the RGBI3P_sg and RGSF3P_sg subroutines.
+! This program calls the RGBI3P_sg and RGSF3P_sg subroutines.
 *
-* This program requires no input data files.
+! This program requires no input data files.
 *
-* This program creates the TPRG3P data file.  All elements of
-* the DZI array in the data file are expected to be zero.
+! This program creates the TPRG3P data file.  All elements of
+! the DZI array in the data file are expected to be zero.
 *
 *
-* Specification statements
-*     .. Parameters ..
-      INTEGER          NXD,NYD,NXI
-      REAL             XIMN,XIMX
-      INTEGER          NYI
-      REAL             YIMN,YIMX
-      PARAMETER        (NXD=9,NYD=11,NXI=19,XIMN=-0.5,XIMX=8.5,NYI=23,
+! Specification statements
+!     .. Parameters ..
+      integer          NXD,NYD,NXI
+      real             XIMN,XIMX
+      integer          NYI
+      real             YIMN,YIMX
+      parameter        (NXD=9,NYD=11,NXI=19,XIMN=-0.5,XIMX=8.5,NYI=23,
      +                 YIMN=-0.5,YIMX=10.5)
-*     ..
-*     .. Local Scalars ..
-      REAL             ANXIM1,ANYIM1,DXI,DYI
-      INTEGER          IER,ISEC,IXD,IXI,IXIMN,IXIMX,IYD,IYDR,IYI,IYIR,
+!     ..
+!     .. Local Scalars ..
+      real             ANXIM1,ANYIM1,DXI,DYI
+      integer          IER,ISEC,IXD,IXI,IXIMN,IXIMX,IYD,IYDR,IYI,IYIR,
      +                 MD,NYDO2
-      CHARACTER(len=9)      NMPR
-      CHARACTER(len=6)      NMWF
-*     ..
-*     .. Local Arrays ..
-      REAL             DZI(NXI,NYI),WK(3,NXD,NYD),XD(NXD),XI(NXI),
+      character(len=9)      NMPR
+      character(len=6)      NMWF
+!     ..
+!     .. Local Arrays ..
+      real             DZI(NXI,NYI),WK(3,NXD,NYD),XD(NXD),XI(NXI),
      +                 YD(NYD),YI(NYI),ZD(NXD,NYD),ZI(NXI,NYI),
      +                 ZIE(NXI,NYI)
-      CHARACTER(len=9)      NMSR(2)
-      CHARACTER(len=20)    LBL(2)
-*     ..
-*     ..
-*     .. Intrinsic Functions ..
-      INTRINSIC        MOD,REAL
-*     ..
-* Data statements
+      character(len=9)      NMSR(2)
+      character(len=20)    LBL(2)
+!     ..
+!     ..
+!     .. Intrinsic Functions ..
+      INTRINSIC        MOD,real
+!     ..
+! Data statements
       DATA             NMPR/'TPRG3P_sg'/,NMWF/'WFRG3P'/,NMSR/'RGBI3P_sg',
      +                 'RGSF3P_sg'/,LBL/'Calculated ZI Values',
      +                 'Differences         '/
@@ -116,121 +116,121 @@
      +                 41.700,39.192,58.284,68.917,74.644,71.333,63.413,
      +                 60.125,66.293,71.400,59.129,47.725,52.451,54.592,
      +                 50.842,48.483,48.639,50.142,51.089,50.200,48.268/
-*     ..
-* Calculation
-* Opens the output file and writes the input data.
+!     ..
+! Calculation
+! Opens the output file and writes the input data.
 !      OPEN (6,FILE=NMWF)
       NYDO2 = NYD/2
-      WRITE (6,FMT=9000) NMPR
-      WRITE (6,FMT=9010) XD
-      DO 10 IYDR = 1,NYD
-          IF (MOD(IYDR-1,NYDO2).LE.1) WRITE (6,FMT='(1X)')
+      write (6,FMT=9000) NMPR
+      write (6,FMT=9010) XD
+      do 10 IYDR = 1,NYD
+          if (MOD(IYDR-1,NYDO2).LE.1) write (6,FMT='(1X)')
           IYD = NYD + 1 - IYDR
-          WRITE (6,FMT=9020) YD(IYD), (ZD(IXD,IYD),IXD=1,NXD)
-   10 CONTINUE
-* Program check for the RGBI3P_sg subroutine
-* - Performs interpolation and calculates the differences.
+          write (6,FMT=9020) YD(IYD), (ZD(IXD,IYD),IXD=1,NXD)
+   10 continue
+! Program check for the RGBI3P_sg subroutine
+! - Performs interpolation and calculates the differences.
       DXI = XIMX - XIMN
       ANXIM1 = NXI - 1
-      DO 20 IXI = 1,NXI
-          XI(IXI) = XIMN + DXI*REAL(IXI-1)/ANXIM1
-   20 CONTINUE
+      do 20 IXI = 1,NXI
+          XI(IXI) = XIMN + DXI*real(IXI-1)/ANXIM1
+   20 continue
       DYI = YIMX - YIMN
       ANYIM1 = NYI - 1
-      DO 30 IYI = 1,NYI
-          YI(IYI) = YIMN + DYI*REAL(IYI-1)/ANYIM1
-   30 CONTINUE
-      DO 50 IYI = 1,NYI
-          DO 40 IXI = 1,NXI
-              IF (IXI.EQ.1 .AND. IYI.EQ.1) THEN
+      do 30 IYI = 1,NYI
+          YI(IYI) = YIMN + DYI*real(IYI-1)/ANYIM1
+   30 continue
+      do 50 IYI = 1,NYI
+          do 40 IXI = 1,NXI
+              if (IXI.EQ.1 .AND. IYI.EQ.1) then
                   MD = 1
-              ELSE
+              else
                   MD = 2
-              END IF
+              end if
               CALL interp_RGBI3P_sg(MD,NXD,NYD,XD,YD,ZD,1,XI(IXI),YI(IYI),
      +                    ZI(IXI,IYI),IER, WK)
-              IF (IER.GT.0) STOP 1
+              if (IER.GT.0) STOP 1
               DZI(IXI,IYI) = ZI(IXI,IYI) - ZIE(IXI,IYI)
-   40     CONTINUE
-   50 CONTINUE
-* - Writes the calculated results.
-      WRITE (6,FMT=9030) NMPR,NMSR(1),LBL(1)
-      DO 70 ISEC = 1,2
-          IF (ISEC.EQ.1) THEN
+   40     continue
+   50 continue
+! - Writes the calculated results.
+      write (6,FMT=9030) NMPR,NMSR(1),LBL(1)
+      do 70 ISEC = 1,2
+          if (ISEC.EQ.1) then
               IXIMN = 1
               IXIMX = 11
-          ELSE
+          else
               IXIMN = 9
               IXIMX = NXI
-          END IF
-          WRITE (6,FMT=9040) (XI(IXI),IXI=IXIMN,IXIMX)
-          DO 60 IYIR = 1,NYI
+          end if
+          write (6,FMT=9040) (XI(IXI),IXI=IXIMN,IXIMX)
+          do 60 IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
-              WRITE (6,FMT=9050) YI(IYI), (ZI(IXI,IYI),IXI=IXIMN,IXIMX)
-   60     CONTINUE
-   70 CONTINUE
-* - Writes the differences.
-      WRITE (6,FMT=9030) NMPR,NMSR(1),LBL(2)
-      DO 90 ISEC = 1,2
-          IF (ISEC.EQ.1) THEN
+              write (6,FMT=9050) YI(IYI), (ZI(IXI,IYI),IXI=IXIMN,IXIMX)
+   60     continue
+   70 continue
+! - Writes the differences.
+      write (6,FMT=9030) NMPR,NMSR(1),LBL(2)
+      do 90 ISEC = 1,2
+          if (ISEC.EQ.1) then
               IXIMN = 1
               IXIMX = 11
-          ELSE
+          else
               IXIMN = 9
               IXIMX = NXI
-          END IF
-          WRITE (6,FMT=9060) (XI(IXI),IXI=IXIMN,IXIMX)
-          DO 80 IYIR = 1,NYI
+          end if
+          write (6,FMT=9060) (XI(IXI),IXI=IXIMN,IXIMX)
+          do 80 IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
-              WRITE (6,FMT=9050) YI(IYI),
+              write (6,FMT=9050) YI(IYI),
      +          (DZI(IXI,IYI),IXI=IXIMN,IXIMX)
-   80     CONTINUE
-   90 CONTINUE
-* Program check for the RGSF3P_sg subroutine
-* - Performs surface fitting and calculates the differences.
+   80     continue
+   90 continue
+! Program check for the RGSF3P_sg subroutine
+! - Performs surface fitting and calculates the differences.
       MD = 1
       CALL interp_RGSF3P_sg(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
-      IF (IER.GT.0) STOP 1
-      DO 110 IYI = 1,NYI
-          DO 100 IXI = 1,NXI
+      if (IER.GT.0) STOP 1
+      do 110 IYI = 1,NYI
+          do 100 IXI = 1,NXI
               DZI(IXI,IYI) = ZI(IXI,IYI) - ZIE(IXI,IYI)
-  100     CONTINUE
-  110 CONTINUE
-* - Writes the calculated results.
-      WRITE (6,FMT=9030) NMPR,NMSR(2),LBL(1)
-      DO 130 ISEC = 1,2
-          IF (ISEC.EQ.1) THEN
+  100     continue
+  110 continue
+! - Writes the calculated results.
+      write (6,FMT=9030) NMPR,NMSR(2),LBL(1)
+      do 130 ISEC = 1,2
+          if (ISEC.EQ.1) then
               IXIMN = 1
               IXIMX = 11
-          ELSE
+          else
               IXIMN = 9
               IXIMX = NXI
-          END IF
-          WRITE (6,FMT=9040) (XI(IXI),IXI=IXIMN,IXIMX)
-          DO 120 IYIR = 1,NYI
+          end if
+          write (6,FMT=9040) (XI(IXI),IXI=IXIMN,IXIMX)
+          do 120 IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
-              WRITE (6,FMT=9050) YI(IYI), (ZI(IXI,IYI),IXI=IXIMN,IXIMX)
-  120     CONTINUE
-  130 CONTINUE
-* - Writes the differences.
-      WRITE (6,FMT=9030) NMPR,NMSR(2),LBL(2)
-      DO 150 ISEC = 1,2
-          IF (ISEC.EQ.1) THEN
+              write (6,FMT=9050) YI(IYI), (ZI(IXI,IYI),IXI=IXIMN,IXIMX)
+  120     continue
+  130 continue
+! - Writes the differences.
+      write (6,FMT=9030) NMPR,NMSR(2),LBL(2)
+      do 150 ISEC = 1,2
+          if (ISEC.EQ.1) then
               IXIMN = 1
               IXIMX = 11
-          ELSE
+          else
               IXIMN = 9
               IXIMX = NXI
-          END IF
-          WRITE (6,FMT=9060) (XI(IXI),IXI=IXIMN,IXIMX)
-          DO 140 IYIR = 1,NYI
+          end if
+          write (6,FMT=9060) (XI(IXI),IXI=IXIMN,IXIMX)
+          do 140 IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
-              WRITE (6,FMT=9050) YI(IYI),
+              write (6,FMT=9050) YI(IYI),
      +          (DZI(IXI,IYI),IXI=IXIMN,IXIMX)
-  140     CONTINUE
-  150 CONTINUE
+  140     continue
+  150 continue
       RETURN
-* Format statements
+! Format statements
  9000 FORMAT (A9,7X,'Original Data',/,/,/,/,35X,'ZD(XD,YD)')
  9010 FORMAT (4X,'YD    XD=',/,7X,F8.1,2 (1X,3F6.1,F7.1),/)
  9020 FORMAT (1X,F6.1,F8.1,2 (1X,3F6.1,F7.1))
@@ -240,5 +240,4 @@
  9050 FORMAT (F5.2,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10)
  9060 FORMAT (1X,/,38X,'DZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,
      +       2F15.10,2F15.10,2F15.10,/)
-      END
-
+      end subroutine
