@@ -30,7 +30,8 @@ SHELL ["/bin/bash", "-c"]
 ENV OMP_NUM_THREADS=4
 
 # set MESA_DIR to be the directory to which you downloaded MESA
-ENV MESA_DIR=.
+WORKDIR /usr/mesa
+ENV MESA_DIR=/usr/mesa
 
 # add shmesa (the MESA command line tool) to your PATH
 ENV PATH=$PATH:$MESA_DIR/scripts/shmesa
@@ -40,7 +41,7 @@ ENV GYRE_DIR=$MESA_DIR/gyre/gyre
 
 # Print info
 RUN echo $MESASDK_ROOT
-RUN echo $MESADIR
+RUN echo $MESA_DIR
 RUN echo $OMP_NUM_THREADS
 RUN echo $PATH
 
