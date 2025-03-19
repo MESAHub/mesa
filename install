@@ -81,7 +81,9 @@ function do_one {
 
 # Block sudo access, this check should come first as if a user blindly types "sudo ./install" then MESA_DIR won't be set
 # So lets catch this error first rather then forcing them to set MESA_DIR under sudo
-if  [ ${EUID:-$(id -u)} -eq 0 ];
+if [ -f /.dockerenv ]; then
+    echo "Running inside a Docker container"
+elif [ ${EUID:-$(id -u)} -eq 0 ];
 then
     echo
     echo "****************************************************************"
