@@ -1,4 +1,11 @@
 FROM ubuntu:focal
+
+# set a directory for the app
+WORKDIR /usr/mesa
+
+# copy mesa files to the container
+COPY . .
+
 # prereqs for MESASDK
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -30,7 +37,6 @@ SHELL ["/bin/bash", "-c"]
 ENV OMP_NUM_THREADS=4
 
 # set MESA_DIR to be the directory to which you downloaded MESA
-WORKDIR /usr/mesa
 ENV MESA_DIR=/usr/mesa
 
 # add shmesa (the MESA command line tool) to your PATH
