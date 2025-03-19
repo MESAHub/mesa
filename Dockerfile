@@ -44,6 +44,8 @@ RUN echo $MESASDK_ROOT
 RUN echo $MESA_DIR
 RUN echo $OMP_NUM_THREADS
 RUN echo $PATH
+RUN pwd
+RUN ls
 
 # Source MESASDK and install MESA
 RUN cd $MESA_DIR && source $MESASDK_ROOT/bin/mesasdk_init.sh && ./install

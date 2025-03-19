@@ -17,7 +17,7 @@ You can build the container by running the following command in the terminal in 
 
 .. code-block:: bash
 
-    docker build -t mesa-docker .
+    docker build --platform linux/amd64 -t mesa-docker .
 
 This command will build the container and tag it with the name ``mesa-docker``.
 
