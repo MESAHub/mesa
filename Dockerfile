@@ -1,5 +1,7 @@
 FROM ubuntu:focal
 
+USER root
+
 # set a directory for the app
 WORKDIR /usr/mesa
 
@@ -44,6 +46,9 @@ ENV PATH=$PATH:$MESA_DIR/scripts/shmesa
 
 # GYRE 
 ENV GYRE_DIR=$MESA_DIR/gyre/gyre
+
+# Set environment variable to indicate we are in a docker container
+ENV IN_DOCKER=true
 
 # Print info
 RUN echo $MESASDK_ROOT

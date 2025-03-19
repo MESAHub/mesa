@@ -24,6 +24,10 @@ This command will build the container and tag it with the name ``mesa-docker``.
 Run with Docker
 ===============
 
+.. code-block:: bash
+
+    docker run mesa-docker
+
 
 Run with Singularity/Apptainer
 ==============================
