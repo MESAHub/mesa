@@ -21,7 +21,7 @@ SRCS = \
    op_common.f \
    op_ev.f90 \
    op_osc.f \
-   op_radacc.f \
+   op_radacc.f90 \
    op_eval.f90 \
    op_eval_mombarg.f90 \
    kap_eval_support.f90 \
@@ -84,7 +84,7 @@ COMPILE_CMD = $(COMPILE)
 
 COMPILE_LEGACY_NOCHECKS = $(filter-out -std=f2008, $(COMPILE_NO_CHECKS))
 
-op_load.o op_common.o op_osc.o op_radacc.o : %.o : %.f
+op_load.o op_common.o op_osc.o: %.o : %.f
 ifneq ($(QUIET),)
 	@echo COMPILE_LEGACY_NOCHECKS $<
 	@$(COMPILE_LEGACY_NOCHECKS) $(FCfixed) $<
