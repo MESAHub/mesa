@@ -286,7 +286,6 @@ contains
       end if
 
 
-
       ! binary data must be initiated after stars, such that masses are available
       ! if using saved models
       call binarydata_init(b, doing_restart)

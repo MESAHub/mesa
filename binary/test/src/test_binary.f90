@@ -27,6 +27,7 @@ contains
       call star_ptr(id, s, ierr)
       b% s_donor => s  ! set donor star
       b% d_i = 1
+      b% a_i = 2
       b% point_mass_i = 1  ! no second star
       b% rl_relative_gap_old(2) = 0d0
       b% rl_relative_gap(2) = 0d0
