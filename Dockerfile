@@ -1,7 +1,15 @@
-FROM ubuntu:focal
+FROM --platform=linux/amd64 ubuntu:focal
 
 # set a directory for the app
 WORKDIR /usr/mesa
+
+# need to set shell to bash for `source` to work as part of MESA install
+SHELL ["/bin/bash", "-c"]
+
+# Support to build on Mac silicon
+RUN DEBIAN_FRONTEND=noninteractive apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install g++-x86-64-linux-gnu libc6-dev-amd64-cross
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y clean
 
 # prereqs for MESASDK
 RUN apt-get update && \
@@ -22,14 +30,13 @@ RUN apt-get update && \
     apt-get autoremove --purge -y && \
     apt-get autoclean -y && \
     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+
 # download MESASDK from Zenodo
 RUN curl -L https://zenodo.org/records/13768913/files/mesasdk-x86_64-linux-24.7.1.tar.gz | \
     tar xzf - -C /opt/
+
 # set environment variable for MESASDK
 ENV MESASDK_ROOT=/opt/mesasdk
-
-# need to set shell to bash for `source` to work as part of MESA install
-SHELL ["/bin/bash", "-c"]
 
 # copy mesa files to the container
 COPY . .
