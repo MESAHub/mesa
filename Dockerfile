@@ -49,10 +49,12 @@ ENV IN_DOCKER=true
 # print info
 RUN echo $MESASDK_ROOT
 RUN echo $MESA_DIR
-RUN echo $OMP_NUM_THREADS
 RUN echo $PATH
 RUN pwd
 RUN ls
+
+# skip architecture check
+RUN touch "${MESASDK_ROOT}/etc/check_arch.done"
 
 # source MESASDK and install MESA
 RUN cd $MESA_DIR && source $MESASDK_ROOT/bin/mesasdk_init.sh && ./install

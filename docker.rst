@@ -43,4 +43,8 @@ You can build the container by running the following command in the terminal in 
 
     docker build --platform linux/arm64 -t mesa-docker .
 
+    XXX docker buildx build -f Dockerfile --platform linux/arm64 -t mesa-docker2 ./
+
 This command will build the container and tag it with the name ``mesa-docker``.
+
+(to remove build cache when experimenting with new Docker builds, do a `docker builder prune`)
