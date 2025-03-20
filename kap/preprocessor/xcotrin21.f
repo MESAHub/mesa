@@ -23,9 +23,9 @@
 !          The interpolation variables are :
 
 !          xh     The hydrogen mass fraction, X
-!          xx!    The enhanced carbon mass fraction, delta Xc.  
-!                 The total C mass fraction, Xc, is the sum of the initial 
-!                 amount included in the metal mass fraction, Z, and 
+!          xx!    The enhanced carbon mass fraction, delta Xc.
+!                 The total C mass fraction, Xc, is the sum of the initial
+!                 amount included in the metal mass fraction, Z, and
 !                 delta Xc
 !          xxo    The enhanced oxygen mass fraction, delta Xo
 !          t6     The temperature in millions of degrees Kelvin, T6
@@ -40,8 +40,8 @@
 !     in four different 3x3 sub-grids. Linear interpolation between quadratic
 !     fits in these different  sub-grids gives smoothed results in both log T6
 !     and Log R directions. This procedure produces results that are similar
-!     to bicubic spline interpolation, but require storage of only local 
-!     information.  
+!     to bicubic spline interpolation, but require storage of only local
+!     information.
 !         Each of the individual tables in a file Gx**x**z covers 70 temperatures
 !     in the range logT=3.75[T6=0.0056341325]( referred to as temperature 1) to
 !     logT=8.7[T6=501.187] and 19 values of log R in the range -8 (referred to as 1)
@@ -89,21 +89,21 @@
 !     ***CAUTION***
 !         As a result of the mixing procedure used to calculate the data a few
 !     X=0.0, low T-small R, table values fell outside the range of T and R accessible
-!     from the X=0.35 data directly calculated for this purpose.  These T-R 
+!     from the X=0.35 data directly calculated for this purpose.  These T-R
 !     locations are filled in with 9.99 (or for diagnostic purposes in some cases
 !     larger values.  At the same locations the derivatives are set to 99.9.  When
-!     T-R falls in this region a message is issued by the interpolation code to 
+!     T-R falls in this region a message is issued by the interpolation code to
 !     inform the user of this situation.  Presumable very few users will have
 !     applications that take them into this region.
-!     
+!
 !          Your routine that performs the call to OPAC should include the
 !      statement:
 
 !         common/e/ opact,dopact,dopacr,dopactd
 
 !         These variables have the following meanings:
-!        
-!         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)  
+!
+!         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)
 !         DOPACT      Is Dlog(kappa)/Dlog(T6)   ! at constant R
 !         DOPACTD     Is Dlog(kappa)/Dlog(T6)   ! at constant density
 !         DOPACR      Is Dlog(kappa)/Dlog(R),   ! at constant T6
@@ -126,20 +126,12 @@
 !      first derivities.
 
       save
-      integer w
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
-      common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
-     . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
+      integer :: w
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
 ! .... OPACT- opacity obtained from a quadraric interpolation at
@@ -174,7 +166,7 @@
       xxx=log10(0.005+xh)
       slt=log10(t6)
       slr=log10(r)
- 
+
 ! .... set X indices
         ilo=2
         ihi=mx
@@ -207,12 +199,12 @@
           mf2=1
         end if
 
-      if (itime(1)  /=  12345678) then 
-      alr(1)=-8.+(nrb-1)*0.5 
-      do i=2,nr  
-        alr(i)=alr(i-1)+0.5  
-      end do  
-      alt(1)=-2.25+(ntb-1)*0.05  
+      if (itime(1)  /=  12345678) then
+      alr(1)=-8.+(nrb-1)*0.5
+      do i=2,nr
+        alr(i)=alr(i-1)+0.5
+      end do
+      alt(1)=-2.25+(ntb-1)*0.05
       do i=ntb+1,46
       alt(i)=alt(i-1)+.05
       end do
@@ -227,7 +219,7 @@
       do i=1,nt
       t6list(i)=10.**alt(i)
       end do
-      end if   
+      end if
         ilo=2
         ihi=nr
    12     if(ihi-ilo  >  1) then
@@ -278,7 +270,7 @@
 
             if (iadvance  ==  0) then  ! sfift X index to avoid X=0.
             iadvance=iadvance+1
-            mf=mf+1 
+            mf=mf+1
             mg=mg+1
             mh=mh+1
             mi=mi+1
@@ -287,11 +279,9 @@
           end if
         end if
       end do
-      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and.
-     x    (slt  <=  alt(kmin))) then
+      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and. (slt  <=  alt(kmin))) then
       k1=kmin
-      if ((co(1,1,1,kmin,l1+1)  <  9.) .and.
-     x   ((slr+.01)  >  alr(l1+1))) then
+      if ((co(1,1,1,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
       l1=l1+1
       kmin=0
       k1=k1in
@@ -302,13 +292,12 @@
       end if
       end if
       if ((slt+.001)  <  alt(k1)) then
-      write (*,'("OPAL data not available for X=", f7.5," logT6=", f7.3,
-     x           " logR=",f7.3)') xh,slt,slr
+      write (*,'("OPAL data not available for X=", f7.5," logT6=", f7.3, " logR=",f7.3)') xh,slt,slr
       opact=30.
       dopact=99.
       dopacr=99.
       dopactd=99.
-      return  
+      return
       end if
       l2=l1+1
       l3=l2+1
@@ -323,7 +312,7 @@
       do 123 m=mf,mf2
        if(mx  >=  4) then
 ! ....  C and O  fractions determined by the ray through the origin that
-!       also passes through the point (Xc,Xo). Specific interpolation 
+!       also passes through the point (Xc,Xo). Specific interpolation
 !       values determined by tabulated X values;i.e. xa(m).  Inter-
 !       polation along the ray gives log (kappa(Xc,Xo)).  (Advantage
 !       of method: keeps indices within table boundaries)
@@ -363,7 +352,7 @@
         if(xa(i)  ==  0.0) mxzero=i
         end do
 ! .... this is the first time through this m. Calculate the decadic
-!      log of the perimeter points shifted by Z+0.001(to avoid divergence 
+!      log of the perimeter points shifted by Z+0.001(to avoid divergence
 !      at origin); m refers to xa(m); the hydrogen table value.
 
 !      note that the nc-th elements are sometimes needed!
@@ -434,12 +423,11 @@
   123 continue
 
         if((zz(mg,1)  /=  zz(mf,1)) .or. (zz(mh,1)  /=  zz(mf,1))) then
-          write(*,'("Z does not match Z in codata* files you are"
-     x    ," using")')
+          write(*,'("Z does not match Z in codata* files you are using")')
           stop
         end if
       if(z  /=  zz(mf,1)) GOTO 66
-      xxc=xxci   ! restores input value; necessary if stop replaced 
+      xxc=xxci   ! restores input value; necessary if stop replaced
 !                  with return
       xxo=xxoi   ! restores input value
       is=0
@@ -450,8 +438,7 @@
            opk(it,ir)=opl(mf,it,ir)
            GOTO 46
          end if
-         opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir)
-     x   ,opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+         opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
          is=1
    46 continue
    45 continue
@@ -462,8 +449,7 @@
        dixr=(xx(mh)-xxx)*dfsx(mh)
       do 47 ir=l1,l1+iq
         do it=k1,k1+ip
-        opk2(it,ir)=quad(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir)
-     x  ,opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
+        opk2(it,ir)=quad(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir),opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
@@ -480,22 +466,20 @@
       return
 
    61 write(*,'(" Mass fractions exceed unity")')
-      xxc=xxci   ! restores input value; required if stop replaced 
+      xxc=xxci   ! restores input value; required if stop replaced
 !                  with a return
       xxo=xxoi   ! restores input value
       stop
    62 write(*,'(" T6/LogR outside of table range")')
       xxc=xxci   ! restores input value; required if stop replaced
-!                  with a return 
+!                  with a return
       xxo=xxoi   ! restores input value
       stop
-   64 write(*,'(" X not equal to zero: To run this case it
-     .is necessary"/ "to recompile with parameter (mx=5)")')
+   64 write(*,'(" X not equal to zero: To run this case it is necessary"/ "to recompile with parameter (mx=5)")')
       stop
    65 write(*,'("Too few R values; NRE+1-NRB < 6")')
       stop
-   66 write(*,'(" Z does not match Z in codata* files you are",
-     . " using")')
+   66 write(*,'(" Z does not match Z in codata* files you are using")')
       stop
       end
 
@@ -505,17 +489,10 @@
 !     ances.
       save
       integer w
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr) ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
        is=0
       if(xxco  <  1.e-6) then
@@ -541,11 +518,9 @@
 !     include boundaries that could later cause division by 0!
       if(xxc  >  xcd(2)-1.e-6) then
       iw=1
-      a(1,m)=quad(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),
-     . diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
+      a(1,m)=quad(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
       iw=iw+1
-      a(2,m)=quad(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir),
-     . diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
+      a(2,m)=quad(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir),diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
          do w=1,2
            b(w)=a(w,m)
          end do
@@ -557,14 +532,11 @@
 !                    interpolation in region c2
 
       iw=1
-      a(1,m)=quad(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),
-     . diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
+      a(1,m)=quad(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
       iw=iw+1
-      a(2,m)=quad(is,iw,cxx,co(m,n(m,2)-2,2,it,ir),co(m,n(m,2)-1,2,it,
-     . ir),diag(m,2,it,ir),cx(n(m,2)-2),cx(n(m,2)-1),cxd(2))
+      a(2,m)=quad(is,iw,cxx,co(m,n(m,2)-2,2,it,ir),co(m,n(m,2)-1,2,it,ir),diag(m,2,it,ir),cx(n(m,2)-2),cx(n(m,2)-1),cxd(2))
       iw=iw+1
-      a(3,m)=quad(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir)
-     .,diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
+      a(3,m)=quad(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir),diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
         do w=1,3
           b(w)=a(w,m)
         end do
@@ -592,14 +564,11 @@
         iw=1
         m1=i-1
         m2=i-2
-        a(1,m)=quad(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2
-     x  ,it,ir),diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
+        a(1,m)=quad(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2,it,ir),diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
         iw=iw+1
-        a(2,m)=quad(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1
-     x  ,it,ir),diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
+        a(2,m)=quad(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1,it,ir),diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
         iw=iw+1
-        a(3,m)=quad(is,iw,cxx,diag(m,m2,it,ir),diag(m,m1,it,ir),
-     x  diag(m,i,it,ir),cxd(m2),cxd(m1),cxd(i))
+        a(3,m)=quad(is,iw,cxx,diag(m,m2,it,ir),diag(m,m1,it,ir),diag(m,i,it,ir),cxd(m2),cxd(m1),cxd(i))
          do w=1,3
            b(w)=a(w,m)
          end do
@@ -630,11 +599,9 @@
 !     include boundaries that could later cause division by 0!
       if(xxo  >  xod(2)-1.e-6) then
       iw=1
-      a(1,m)=quad(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),
-     . diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
+      a(1,m)=quad(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
       iw=iw+1
-      a(2,m)=quad(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),
-     .diago(m,no-3,it,ir),oxd(1),oxd(2),oxd(3))
+      a(2,m)=quad(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),diago(m,no-3,it,ir),oxd(1),oxd(2),oxd(3))
         do w=1,2
           b(w)=a(w,m)
         end do
@@ -646,14 +613,11 @@
 !                    interpolation in region  o2
 
       iw=1
-      a(1,m)=quad(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),
-     . diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
+      a(1,m)=quad(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir), diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
       iw=iw+1
-      a(2,m)=quad(is,iw,oxx,co(m,2,n(m,2)-2,it,ir),co(m,2,n(m,2)-1,it,
-     . ir),diago(m,no-2,it,ir),ox(n(m,2)-2),ox(n(m,2)-1),oxd(2))
+      a(2,m)=quad(is,iw,oxx,co(m,2,n(m,2)-2,it,ir),co(m,2,n(m,2)-1,it, ir),diago(m,no-2,it,ir),ox(n(m,2)-2),ox(n(m,2)-1),oxd(2))
       iw=iw+1
-      a(3,m)=quad(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),
-     .diago(m,nc-3,it,ir),oxd(1),oxd(2),oxd(3))
+      a(3,m)=quad(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),diago(m,nc-3,it,ir),oxd(1),oxd(2),oxd(3))
         do w=1,3
           b(w)=a(w,m)
         end do
@@ -680,14 +644,11 @@
       iw=1
       m2=i-2
       m1=i-1
-      a(1,m)=quad(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-
-     .1,it,ir),diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
+      a(1,m)=quad(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
       iw=iw+1
-      a(2,m)=quad(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,
-     . it,ir),diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
+      a(2,m)=quad(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
       iw=iw+1
-      a(3,m)=quad(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),
-     .diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
+      a(3,m)=quad(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
         do w=1,3
           b(w)=a(w,m)
         end do
@@ -745,8 +706,7 @@
         do jx=j1,j1+2
           iw=iw+1
 !     if i3=n(m,jx), then must replace cx(i3) with cxd(jx)
-          a(iw,m)=quad(is,iw,cxx,co(m,i1,jx,it,ir),co(m,i2,jx,it,ir),
-     x    co(m,i3,jx,it,ir),cx(i1),cx(i2),min(cx(i3),cxd(jx)))
+          a(iw,m)=quad(is,iw,cxx,co(m,i1,jx,it,ir),co(m,i2,jx,it,ir),co(m,i3,jx,it,ir),cx(i1),cx(i2),min(cx(i3),cxd(jx)))
         end do
         do w=1,3
           b(w)=a(w,m)
@@ -764,11 +724,9 @@
         do ix=i1,i1+2
           iw=iw+1
           if(j3 < n(m,ix))then
-            a(iw,m)=quad(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),
-     $      co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
+            a(iw,m)=quad(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
           else
-            a(iw,m)=quad(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),
-     $      diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
+            a(iw,m)=quad(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
           end if
         end do
         do w=1,3
@@ -788,17 +746,10 @@
       subroutine t6rinterp(slr,slt)
 !     The purpose of this subroutine is to interpolate in logT6 and logR
       save
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101), t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
       common/e/ opact,dopact,dopacr,dopactd
@@ -808,12 +759,10 @@
       do kx=k1,k1+ip
           iw=1
         iu=iu+1
-        h(iu)=quad(is,iw,slr,opk(kx,l1),opk(kx,l2),opk(kx,l3),
-     x  alr(l1),alr(l2),alr(l3))
+        h(iu)=quad(is,iw,slr,opk(kx,l1),opk(kx,l2),opk(kx,l3), alr(l1),alr(l2),alr(l3))
           if(iq. eq. 3) then
             iw=2
-            q(iu)=quad(is,iw,slr,opk(kx,l2),opk(kx,l3),opk(kx,l4),
-     x      alr(l2),alr(l3),alr(l4))
+            q(iu)=quad(is,iw,slr,opk(kx,l2),opk(kx,l3),opk(kx,l4),alr(l2),alr(l3),alr(l4))
           end if
         is=1
       end do
@@ -838,7 +787,7 @@
           dopact=dkap1*dix+dkap2*(1.-dix)
           opact=opact*dix+opact2*(1.-dix)
         if(iq  ==  3) then
- 
+
 ! ....    k and Dlog(k)/Dlog(T6) in upper-right 3x3.
           opactq2=quad(is,iw,slt,q(2),q(3),q(4),alt(k2),alt(k3),alt(k4))
           dkapq2=dkap
@@ -851,12 +800,10 @@
       do lx=l1,l1+iq
         iw=1
         iu=iu+1
-        h(iu)=quad(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),
-     x  alt(k1),alt(k2),alt(k3))
+        h(iu)=quad(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),alt(k1),alt(k2),alt(k3))
           if(ip  ==  3) then
             iw=2
-            q(iu)=quad(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),
-     x      alt(k2),alt(k3),alt(k4))
+            q(iu)=quad(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),alt(k2),alt(k3),alt(k4))
           end if
         is=1
       end do
@@ -891,8 +838,7 @@
         end if
       dopactd=dopact-3.*dopacr
         if (opact  >  1.e+15) then
-          write(*,'("Interpolation indices out of range",
-     x              ";please report conditions.")') 
+          write(*,'("Interpolation indices out of range; please report conditions.")')
           stop
         end if
       if (opact  >  9) then
@@ -909,18 +855,11 @@
 ! .... The purpose of this subroutine is to read the data tables
       save
       parameter (ismdata=0)   ! modified
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
-      common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
-     . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
-      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)  
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
+      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/e/ opact,dopact,dopacr,dopacrd
       character*1 dumarra(250)
@@ -928,7 +867,7 @@
 
         if (itimeco  /=  12345678) then
         do i=1,mx
-          do j=1,mc 
+          do j=1,mc
             do k=1,mo
               do l=1,nt
                 do mq=1,nr
@@ -939,7 +878,7 @@
           end do
         end do
         do i=1,mx
-          do j=1,mc 
+          do j=1,mc
             do l=1,nt
               do mq=1,nr
                 diag(i,j,l,mq)=1.e+35
@@ -981,37 +920,35 @@
         int=int+1
 
         read(2,'(f10.5)') dum
-        read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)')
-     x  itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
+        read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)') itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
         xca(m,int)=min(xca(m,int),1.-x(m,int)-zz(m,int)-xoa(m,int))
 
         read(2,'(f10.5)') dum,dum,dum
         read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)
         read(2,'(f10.5)') dum
           do k=1,ntm
-            read(2,'(f4.2,19f7.3)') altin,(cof(k,l), l=1,nrm) 
-            
+            read(2,'(f4.2,19f7.3)') altin,(cof(k,l), l=1,nrm)
+
             do ll=1,nrm   ! modified
               coff(k,ll)=cof(k,ll)
             end do
           end do
           if (isett6  /=  1234567) then
-          do k=1,ntm  
+          do k=1,ntm
             t6arr(k)=t6list(k)
-          end do  
-          end if  
+          end do
+          end if
           isett6=1234567
 
        if (ismdata  ==  0) then
-         if ((nrm  /=  nr) .or. (ntm  /=  nt)) then 
-           write (*,'("Not set up to smooth data with reduced ",
-     x                "T-Rho grid")')
+         if ((nrm  /=  nr) .or. (ntm  /=  nt)) then
+           write (*,'("Not set up to smooth data with reduced T-Rho grid")')
            stop
-         end if  
+         end if
         tmax=10.   ! modified
         nset=67    ! 65 in earlier version
         RLS=-8.
-        nsm=1 
+        nsm=1
           RLE=1.0
           nrlow=1
           nrhigh=2*(RLE-RLS)+1
@@ -1052,8 +989,7 @@
       do 6 j=1,no-1
         int=int+1
         read(2,'(f10.5)') dum
-        read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)')
-     x  itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
+        read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)') itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
         read(2,'(f10.5)') dum,dum,dum
         read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)
         read(2,'(f10.5)') dum
@@ -1069,7 +1005,7 @@
         tmax=10.   ! modified
         nset=67 !65 in earlier version
         RLS=-8.
-        nsm=1 
+        nsm=1
           RLE=1.0
           nrlow=1
           nrhigh=2*(RLE-RLS)+1
@@ -1084,8 +1020,8 @@
               cof(k,ll)=coff(k,ll)
             end if
 
-          end do  
-        end do  
+          end do
+        end do
        ll=1
        do kk=nrb,nre
          do k=1,nt
@@ -1095,7 +1031,7 @@
        end do
        end if
     6 continue
- 
+
       do i=2,nt
         dfs(i)=1./(alt(i)-alt(i-1))
       end do
@@ -1117,8 +1053,7 @@
 ! .... this function performs a quadratic interpolation.
       save
       common/d/dkap
-      common/coquad/ xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30)
-     . ,xx1pxx2(30)
+      common/coquad/ xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3
@@ -1144,25 +1079,14 @@
 
 ! ***********************************************************************
       block data
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
-      common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
-     . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
-      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo) ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
+      common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/recoin/ itimeco,mxzero
       data itime/mx*0/,itimeco/0/
-      data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,
-     . 4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,
-     . 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-     . 7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7/
+      data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7/
       data (xcs(i),i= 1,mc)/ 0.0,0.01,0.03,0.1,0.2,0.4,0.6,1.0/
       data (xos(i),i= 1,mc)/0.0,0.01,0.03,0.1,0.2,0.4,0.6,1.0/
       data (xa(i),i=1,5)/0.0,0.03,0.1,0.35,0.7/
@@ -1175,12 +1099,8 @@
       dimension X(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT end POINTS USING CUBIC FIT
-         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2
-     +   -(Y(2)-Y(1))*(X(3)-X(1))**2)/
-     +   ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
-         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2
-     +   -(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/
-     +   ((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
+         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2-(Y(2)-Y(1))*(X(3)-X(1))**2)/((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
+         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2-(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
@@ -1188,8 +1108,7 @@
         SIG=(X(I)-X(I-1))/(X(I+1)-X(I-1))
         P=SIG*Y2(I-1)+2.
         Y2(I)=(SIG-1.)/P
-        U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))
-     *      /(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
+        U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))/(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
 11    continue
       QN=0.5
       UN=(3./(X(N)-X(N-1)))*(YPN-(Y(N)-Y(N-1))/(X(N)-X(N-1)))
@@ -1217,11 +1136,8 @@
       if (H == 0.) PAUSE 'Bad XA input.'
       A=(XA(KHI)-X)/H
       B=(X-XA(KLO))/H
-      Y=A*YA(KLO)+B*YA(KHI)+
-     *      ((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
-      YP=0.05*  (  (-YA(KLO)+YA(KHI))/H
-     +   +      ( -(3*A**2-1)*Y2A(KLO)
-     +            +(3*B**2-1)*Y2A(KHI) )*H/6. )
+      Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
+      YP=0.05*  (  (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI) )*H/6. )
       return
       end
 ! ********************************************************************
@@ -1472,8 +1388,7 @@
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
       dimension GAM(6)
-      DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,
-     +         +0.1175510204,+0.1665306122,+0.2359183673/
+      DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
       dimension BET(11)
       DATA BET/
      + -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,
@@ -1486,7 +1401,7 @@
      +  0.0277551020,-0.0416326531,-0.0069387755/
 
 
-      do 20 I=3,nset-2 
+      do 20 I=3,nset-2
 
          J=1
          FXY(I,J)=
@@ -1572,7 +1487,7 @@
 
 !     OPAL DATA.
 !     ASSUMES FIRST T6=0.006, LAST T6=10.OR 0.04). Depending on position
-!     in the table. 
+!     in the table.
 !     USES RECTANGULAR ARRAY FOR VARIABLES T6 AND LOG10(R)
 
 !     (1) NSM=NUMBER OF PASSES THROUGH SMOOTHING FILTER.
@@ -1601,12 +1516,11 @@
 
       parameter(IP=100,IPR=20)
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
       CHARACTER*1 HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
-      common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)  
+      common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       logical IERR
 
 
@@ -1726,7 +1640,6 @@ C INTERPOLATE BACK TO OPAL POINTS
  2000 FORMAT(100A1)
  2222 FORMAT(F8.3,20F7.3)
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
- 6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,
-     + ', FLR=',E10.3)
+ 6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
       end

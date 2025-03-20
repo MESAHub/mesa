@@ -3,7 +3,7 @@
 ! ----------------------------------------------------------------------
 
 !          This subroutine contains instructions for using the subroutine
-!     OPACGN93( z, xh, t6, R ) and OPAC(izi,mzin,xh,t6,r). 
+!     OPACGN93( z, xh, t6, R ) and OPAC(izi,mzin,xh,t6,r).
 !          The purpose of these subroutines is to perform 3 or 4 variable
 !     interpolation on log10(kappa).  The opacity tables to be interpolated
 !     are known to have somewhat random numerical errors of a few percent.
@@ -34,13 +34,13 @@
 !                  the table indices to be recalculated.  A value other than 0
 !                  causes the previous indices to be used.
 
-!          mzin    The integer value of i of the Z value to use.  The 
+!          mzin    The integer value of i of the Z value to use.  The
 !                  choices are:
 !                  1=0.0  2=0.0001 3=0.0003 4=0.001 5=0.002 6=0.004 7=0.01
-!                  8=0.02 9=0.03  10=0.04  11=0.06 12=0.08 13=0.1 
+!                  8=0.02 9=0.03  10=0.04  11=0.06 12=0.08 13=0.1
 
 
-!          An interpolation between overlapping quadratics is used to obtain 
+!          An interpolation between overlapping quadratics is used to obtain
 !     smoothed results.  A 4x4 grid in logT6 and logR is used to interpolate
 !     in four different 3x3 sub-grids. Linear interpolation between quadratic
 !     fits in these different sub-grids gives smoothed results in both log T6
@@ -74,21 +74,21 @@
 !     ***CAUTION***
 !         As a result of the mixing procedure used to calculate the data a few
 !     X=0.0, low T-small R, table values fell outside the range of T and R accessible
-!     from the X=0.35 data directly calculated for this purpose.  These T-R 
+!     from the X=0.35 data directly calculated for this purpose.  These T-R
 !     locations are filled in with 9.99 (or for diagnostic purposes in some cases
 !     larger values.  At the same locations the derivatives are set to 99.9.  When
-!     T-R falls in this region a message is issued by the interpolation code to 
+!     T-R falls in this region a message is issued by the interpolation code to
 !     inform the user of this situation.  Presumable very few users will have
 !     applications that take them into this region.
-!     
+!
 !          Your routine that performs the call to OPAC should include the
 !      statement:
 
 !         common/e/ opact,dopact,dopacr,dopactd
 
 !         These variables have the following meanings:
-!        
-!         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)  
+!
+!         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)
 !         DOPACT      Is Dlog(kappa)/Dlog(T6)   at constant R
 !         DOPACR      Is Dlog(kappa)/Dlog(R)    at constant T
 !         DOPACTD     Is Dlog(kappa)/Dlog(T6)   at constant Rho
@@ -101,18 +101,14 @@
 ! ....The purpose of this subroutine is to interpolate the data along Z
       save
       character (len=*) :: filename
-      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
-     . ,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/a/ mzz, xz(mx,mz,nt,nr),  
-     . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
-     . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
 ! .... OPACT- opacity obtained from a quadraric interpolation at
 !      fixed log T6 at three values of log R; followed by quadratic
 !      interpolation along log T6. Results smoothed bt mixing
 !      overlapping quadratics.
 ! .... DOPACT- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
-!              at fixed R  
+!              at fixed R
 ! .... DOPACR- is  Dlog(k)/Dlog(R) smoothed by mixing quadratics.
 ! .... DOPACTD- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
 !               at fixed rho
@@ -133,11 +129,10 @@
       end if
 
       do i=1,mz
-        if(abs(z-za(i))  <  1.e-7 ) then 
+        if(abs(z-za(i))  <  1.e-7 ) then
           izz=i
           call opac (0,izz,xh,t6,r,filename)
-          if (opact  >  9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",
-     x    f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
+          if (opact  >  9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
           return
         end if
       end do
@@ -159,19 +154,18 @@
       m3=i
       m4=i+1
       mfm=m4
-! ....check whether Z is near a table limit 
+! ....check whether Z is near a table limit
       if((z  <=  za(2)+1.e-7) .or. (z  >=  za(mz-1))) mfm=m3
 ! ....  Check if Z+X interpolation sums exceed unity at needed indices.
 !       If so, backup to lower Z indices to perform interpolation.
-!       This should work OK, due to density of Z-grid points and the 
+!       This should work OK, due to density of Z-grid points and the
 !       slow Z variation(except at very small Z)
-      if(xh+za(mfm)  >  1.) mfm=m3 
+      if(xh+za(mfm)  >  1.) mfm=m3
         if(xh+za(mfm)  >  1.) then
             if(m1  <=  1) then
-              write(*,'("special case: X,Z location not covered by"
-     x                 ," logic")')
+              write(*,'("special case: X,Z location not covered by logic")')
               stop
-            end if 
+            end if
           m1=m1-1
           m2=m2-1
           m3=m3-1
@@ -181,8 +175,7 @@
       do iz=m1,mfm
         izz=iz
         call opac(izi,izz,xh,t6,r,filename)
-          if (opact  >  9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",
-     x    f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
+          if (opact  >  9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
         izi=1
         kapz(iz)=10.**opact ! converts logK to K
         dkapdtr(iz)=dopact
@@ -190,13 +183,10 @@
       end do
       is=0
       iw=1
-      kapz1=quad(is,iw,zzl,kapz(m1),kapz(m2),kapz(m3)
-     x ,zza(m1),zza(m2),zza(m3))
+      kapz1=quad(is,iw,zzl,kapz(m1),kapz(m2),kapz(m3),zza(m1),zza(m2),zza(m3))
       is=1
-      dkapz1=quad(is,iw,zzl,dkapdtr(m1),dkapdtr(m2),dkapdtr(m3)
-     x ,zza(m1),zza(m2),zza(m3))
-      dkapz3=quad(is,iw,zzl,dkapdrt(m1),dkapdrt(m2),dkapdrt(m3)
-     x ,zza(m1),zza(m2),zza(m3))
+      dkapz1=quad(is,iw,zzl,dkapdtr(m1),dkapdtr(m2),dkapdtr(m3),zza(m1),zza(m2),zza(m3))
+      dkapz3=quad(is,iw,zzl,dkapdrt(m1),dkapdrt(m2),dkapdrt(m3),zza(m1),zza(m2),zza(m3))
       if (mfm  ==  m3) then
         opact=log10(kapz1)   ! converts K to logK
         dopact=dkapz1
@@ -209,20 +199,17 @@
       end if
       is=0
       iw=2
-      kapz2=quad(is,iw,zzl,kapz(m2),kapz(m3),kapz(m4)
-     x ,zza(m2),zza(m3),zza(m4))
+      kapz2=quad(is,iw,zzl,kapz(m2),kapz(m3),kapz(m4),zza(m2),zza(m3),zza(m4))
       is=1
-      dkapz2=quad(is,iw,zzl,dkapdtr(m2),dkapdtr(m3),dkapdtr(m4)
-     x ,zza(m2),zza(m3),zza(m4))
-      dkapz4=quad(is,iw,zzl,dkapdrt(m2),dkapdrt(m3),dkapdrt(m4)
-     x ,zza(m2),zza(m3),zza(m4))
+      dkapz2=quad(is,iw,zzl,dkapdtr(m2),dkapdtr(m3),dkapdtr(m4),zza(m2),zza(m3),zza(m4))
+      dkapz4=quad(is,iw,zzl,dkapdrt(m2),dkapdrt(m3),dkapdrt(m4),zza(m2),zza(m3),zza(m4))
       dix=(zza(m3)-zzl)*dfsz(m3)
       opact=log10(kapz1*dix+kapz2*(1.-dix))   ! converts K to logK
       dopact=dkapz1*dix+dkapz2*(1.-dix)
       dopacr=dkapz3*dix+dkapz4*(1.-dix)
       dopactd=-3.*dopacr+dopact
       is=0
-      return 
+      return
       end
 ! **********************************************************************
 
@@ -240,15 +227,10 @@
       save
       integer w
       character (len=*) :: filename
-      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
-     . ,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
-     . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
-     . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
-      common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),
-     . zz(mx,mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
@@ -258,7 +240,7 @@
 !      interpolation along log T6. Results smoothed bt mixing
 !      overlapping quadratics.
 ! .... DOPACT- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
-!              at fixed R  
+!              at fixed R
 ! .... DOPACR- is  Dlog(k)/Dlog(R) smoothed by mixing quadratics.
 ! .... DOPACTD- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
 !               at fixed rho
@@ -289,7 +271,7 @@
 ! .... this is the first time through. Calculate the decadic
 !      log of the perimeter points shifted by Z. m refers to
 !      xa(m); the hydrogen table value.
- 
+
 ! .... read the data files
         call readco(filename)
         xamx1=xa(mx-1)
@@ -394,7 +376,7 @@
 
             if (iadvance  ==  0) then
             iadvance=iadvance+1
-            mf=mf+1 
+            mf=mf+1
             mg=mg+1
             mh=mh+1
             mi=mi+1
@@ -403,11 +385,9 @@
           end if
         end if
       end do
-      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and.
-     x    (slt  <=  alt(kmin))) then
+      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and. (slt  <=  alt(kmin))) then
       k1=kmin
-      if ((xz(1,mzz,kmin,l1+1)  <  9.) .and.
-     x   ((slr+.01)  >  alr(l1+1))) then
+      if ((xz(1,mzz,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
       l1=l1+1
       kmin=0
       k1=k1in
@@ -439,13 +419,13 @@
       ip=3
       iq=3
       ntlimit=nta(l3s)
-      if((k3. eq. ntlimit) .or. (iop  ==  0)) then 
+      if((k3. eq. ntlimit) .or. (iop  ==  0)) then
         ip=2
         iq=2
       end if
       if(t6  <=  t6list(2)+1.e-7) ip=2
 
-      if((l3  ==  nre) .or. (iop  ==  0)) then 
+      if((l3  ==  nre) .or. (iop  ==  0)) then
        iq=2
        ip=2
       end if
@@ -462,10 +442,8 @@
         end do
       end do
   123 continue
-      if((zz(mg,mzin)  /=  zz(mf,mzin)) .or.
-     x    (zz(mh,mzin)  /=  zz(mf,mzin))) then
-      write(*,'("Z does not match Z in GN93hz files you are"
-     x ," using")')
+      if((zz(mg,mzin)  /=  zz(mf,mzin)) .or. (zz(mh,mzin)  /=  zz(mf,mzin))) then
+      write(*,'("Z does not match Z in GN93hz files you are using")')
       stop
       end if
       if(z  /=  zz(mf,mzin)) GOTO 66
@@ -478,8 +456,7 @@
         opk(it,ir)=opl(mf,it,ir)
         GOTO 46
         end if
-        opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir)
-     x  ,opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+        opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
         is=1
    46   continue
         end do
@@ -491,8 +468,7 @@
        dixr=(xx(mh)-xxx)*dfsx(mh)
       do 47 ir=l1,l1+iq
         do it=k1,k1+ip
-        opk2(it,ir)=quad(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir)
-     x  ,opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
+        opk2(it,ir)=quad(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir),opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
@@ -517,15 +493,13 @@
 !     write(*,'("slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,
 !    x nta(i+1)",6e12.5,4i5)') slt,alt(1),alt(nt),slr,alr(1),
 !    x alr(nre),l3s,i,k3s,nta(i+1)
-!                  with a return 
+!                  with a return
       stop
-   64 write(*,'(" X not equal to zero: To run this case it
-     .is necessary"/ "to recompile with parameter (mx=1)")')
+   64 write(*,'(" X not equal to zero: To run this case it is necessary"/ "to recompile with parameter (mx=1)")')
       stop
    65 write(*,'("Too few R values; NRE+1-NRB < 6")')
       return
-   66 write(*,'(" Z does not match Z in codata* files you are",
-     . " using")')
+   66 write(*,'(" Z does not match Z in codata* files you are using")')
       stop
       end
 
@@ -533,14 +507,10 @@
       subroutine t6rinterp(slr,slt)
 !     The purpose of this subroutine is to interpolate in logT6 and logR
       save
-      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
-     . ,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
-     . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
-     . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/e/ opact,dopact,dopacr,dopactd
@@ -550,12 +520,10 @@
       do kx=k1,k1+ip
           iw=1
         iu=iu+1
-        h(iu)=quad(is,iw,slr,opk(kx,l1),opk(kx,l2),opk(kx,l3),
-     x  alr(l1),alr(l2),alr(l3))
+        h(iu)=quad(is,iw,slr,opk(kx,l1),opk(kx,l2),opk(kx,l3),alr(l1),alr(l2),alr(l3))
           if(iq. eq. 3) then
             iw=2
-            q(iu)=quad(is,iw,slr,opk(kx,l2),opk(kx,l3),opk(kx,l4),
-     x      alr(l2),alr(l3),alr(l4))
+            q(iu)=quad(is,iw,slr,opk(kx,l2),opk(kx,l3),opk(kx,l4),alr(l2),alr(l3),alr(l4))
           end if
         is=1
       end do
@@ -581,7 +549,7 @@
           opact=opact*dix+opact2*(1.-dix)
         end if
         if(iq  ==  3) then
- 
+
 ! ....    k and Dlog(k)/Dlog(T6) in upper-right 3x3.
           opactq2=quad(is,iw,slt,q(2),q(3),q(4),alt(k2),alt(k3),alt(k4))
           dkapq2=dkap
@@ -593,12 +561,10 @@
       do lx=l1,l1+iq
         iw=1
         iu=iu+1
-        h(iu)=quad(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),
-     x  alt(k1),alt(k2),alt(k3))
+        h(iu)=quad(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),alt(k1),alt(k2),alt(k3))
           if(ip  ==  3) then
             iw=2
-            q(iu)=quad(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),
-     x      alt(k2),alt(k3),alt(k4))
+            q(iu)=quad(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),alt(k2),alt(k3),alt(k4))
           end if
         is=1
       end do
@@ -635,7 +601,7 @@
         end if
       dopactd=dopact-3.*dopacr
         if (opact  >  1.e+15) then
-          write(*,'("Interpolation indices out of range; please report conditions.")') 
+          write(*,'("Interpolation indices out of range; please report conditions.")')
           stop
         end if
           if (opact  >  9.) then
@@ -652,27 +618,22 @@
 ! .... The purpose of this subroutine is to read the data tables
       save
       parameter (ismdata=0)   ! modified
-      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
-     . ,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       character*1 dumarra(250)
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
-     . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
-     . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
-      common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),
-     . zz(mx,mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
-      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)  
+      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
 
 
         if (itimeco  /=  12345678) then
         do i=1,mx
-          do j=1,mz 
+          do j=1,mz
             do k=1,nt
               do l=1,nr
                 xz(i,j,k,l)=1.e+35
@@ -696,8 +657,7 @@
       do 2 i=1,n(m)
 
       read(2,'(f10.5)') dum
-      read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4)')
-     .itab(m,i),x(m,i),y(m,i),zz(m,i)
+      read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4)') itab(m,i),x(m,i),y(m,i),zz(m,i)
       read(2,'(f10.5)') dum,dum,dum
       read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)
       read(2,'(f10.5)') dum
@@ -707,7 +667,7 @@
         if (isett6  /=  1234567) then
         t6listf(k)=10.**alt(k)
         t6arr(k)=t6listf(k)
-        end if 
+        end if
           do ll=1,nrm   ! modified
           xzff(k,ll)=xzf(k,ll)
           end do
@@ -718,7 +678,7 @@
         tmax=10.   ! modified
         nset=65
         RLS=-8.
-        nsm=1 
+        nsm=1
           RLE=1.
           nrlow=1
           nrhigh=2*(RLE-RLS)+1
@@ -749,7 +709,7 @@
 
     2 continue
     3 continue
- 
+
       do 12 i=2,nt
    12 dfs(i)=1./(alt(i)-alt(i-1))
       do 13 i=2,nr
@@ -768,8 +728,7 @@
 ! .... this function performs a quadratic interpolation.
       save
       common/d/dkap
-      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30)
-     . ,xx1pxx2(30)
+      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3
@@ -795,18 +754,12 @@
 
 ! **********************************************************************
       block data
-      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
-     . ,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
-     . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
-     . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
-      common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),
-     . zz(mx,mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       data (xa(i),i=1,mx-1)/0.0,0.1,0.2,0.35,0.5,.7,.8,.9,.95/
-      data (za(i),i=1,mz)/.0,0.0001,.0003,.001,.002,.004,.01,.02,.03,
-     x .04,.06,.08,.1/
+      data (za(i),i=1,mz)/.0,0.0001,.0003,.001,.002,.004,.01,.02,.03, .04,.06,.08,.1/
       data (nta(i),i=1,nrm)/14*70,69,64,60,58,57/
       data (n(i),i=1,mx)/13,13,13,13,13,13,13,13,10,12/
       end
@@ -819,7 +772,7 @@
 
 !     OPAL DATA.
 !     ASSUMES FIRST T6=0.006, LAST T6=10.OR 0.04). Depending on position
-!     in the table. 
+!     in the table.
 !     USES RECTANGULAR ARRAY FOR VARIABLES T6 AND LOG10(R)
 
 !     (1) NSM=NUMBER OF PASSES THROUGH SMOOTHING FILTER.
@@ -847,13 +800,12 @@
 !  OTHER REFERENCES ARE MADE TO METHODS DESCRIBED IN THAT BOOK.
 
       parameter(IP=100,IPR=20)
-      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
-     . ,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
       CHARACTER*1 HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
-      common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)  
+      common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       logical :: IERR
 
 
@@ -973,8 +925,7 @@
  2000 FORMAT(100A1)
  2222 FORMAT(F8.3,20F7.3)
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
- 6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,
-     + ', FLR=',E10.3)
+ 6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
       end
 
@@ -997,8 +948,7 @@
         SIG=(X(I)-X(I-1))/(X(I+1)-X(I-1))
         P=SIG*Y2(I-1)+2.
         Y2(I)=(SIG-1.)/P
-        U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))
-     *      /(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
+        U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1)) /(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
 11    continue
       QN=0.5
       UN=(3./(X(N)-X(N-1)))*(YPN-(Y(N)-Y(N-1))/(X(N)-X(N-1)))
@@ -1026,11 +976,8 @@
       if (H == 0.) PAUSE 'Bad XA input.'
       A=(XA(KHI)-X)/H
       B=(X-XA(KLO))/H
-      Y=A*YA(KLO)+B*YA(KHI)+
-     *      ((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
-      YP=0.05*  (  (-YA(KLO)+YA(KHI))/H
-     +   +      ( -(3*A**2-1)*Y2A(KLO)
-     +            +(3*B**2-1)*Y2A(KHI) )*H/6. )
+      Y=A*YA(KLO)+B*YA(KHI)+ ((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
+      YP=0.05* ( (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO) +(3*B**2-1)*Y2A(KHI) )*H/6. )
       return
       end
 ! ********************************************************************
@@ -1146,22 +1093,13 @@
 
 !  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
 
-      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
-     +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
-     +   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))+S*( B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))+S*( B( 9)+T*(B(10)+T*(B(11)+T*B(12)))  +S*( B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
-      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
-     +   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8))) +S*( 2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))+S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
 
-      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
-     +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
-     +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))+T*( 2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15)))) +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
-      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8))
-     +   +S*(   2*B(10)+T*(4*B(11)+6*T*B(12))
-     +   +S*(   3*B(14)+T*(6*B(15)+9*T*B(16)) ))
+      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8)) +S*( 2*B(10)+T*(4*B(11)+6*T*B(12)) +S*( 3*B(14)+T*(6*B(15)+9*T*B(16)) ))
 
 
       IERR=.false.
@@ -1278,8 +1216,7 @@
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
       dimension GAM(6)
-      DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,
-     +         +0.1175510204,+0.1665306122,+0.2359183673/
+      DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
       dimension BET(11)
       DATA BET/
      + -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,
@@ -1292,7 +1229,7 @@
      +  0.0277551020,-0.0416326531,-0.0069387755/
 
 
-      do 20 I=3,nset-2 
+      do 20 I=3,nset-2
 
          J=1
          FXY(I,J)=

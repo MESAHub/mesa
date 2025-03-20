@@ -59,7 +59,7 @@
       if (NPT < N+2 .OR. NPT > ((N+2)*NP)/2) then
           PRINT 10
    10     FORMAT (/4X,'Return from BOBYQA because NPT is not in the required interval')
-          GO TO 40
+          GOTO 40
       end if
 !
 !     Partition the working space array, so that different parts of it can
@@ -98,7 +98,7 @@
         if (TEMP < RHOBEG+RHOBEG) then
            PRINT 20
    20      FORMAT (/4X,'Return from BOBYQA because one of the differences XU(I)-XL(I)'/6X,' is less than 2*RHOBEG.')
-           GO TO 40
+           GOTO 40
         end if
         JSL=ISL+J-1
         JSU=JSL+N
@@ -496,7 +496,7 @@
                 D(I)=XNEW(I)-XOPT(I)
               end do
               CAUCHY=ZERO
-              GO TO 230
+              GOTO 230
           end if
           if (DENOM <= HALF*VLAG(KNEW)**2) then
               if (NF > NRESC) GOTO 190
@@ -1868,7 +1868,7 @@
           GREDSQ=STEPSQ
           ITERMAX=ITERC+N-NACT
       end if
-      if (GREDSQ*DELSQ <= 1.0D-4*QRED*QRED) GO TO 190
+      if (GREDSQ*DELSQ <= 1.0D-4*QRED*QRED) GOTO 190
 !
 !     Multiply the search direction by the second derivative matrix of Q and
 !     calculate some scalars for the choice of steplength. Then set BLEN to

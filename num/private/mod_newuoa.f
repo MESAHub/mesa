@@ -51,7 +51,7 @@
       if (NPT < N+2 .OR. NPT > ((N+2)*NP)/2) then
           PRINT 10
    10     FORMAT (/4X,'Return from NEWUOA because NPT is not in the required interval')
-          GO TO 20
+          GOTO 20
       end if
       NDIM=NPT+N
       IXB=1

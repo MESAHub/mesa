@@ -28,7 +28,6 @@
 ! With this change, I get reasonable results out to the edges.
 
 
-
       subroutine init_opal_type2(z_in,xh_in)
          double precision, intent(in) :: z_in, xh_in
          real z, xh
@@ -221,19 +220,11 @@
       save
       character (len=*) :: dir
       integer w
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
-      common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
-     . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/type2_d/dkap
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
 !..... OPACT- opacity obtained from a quadraric interpolation at
@@ -248,12 +239,12 @@
 !..... INDEX refers to the index,i, of xc(i) or xo(i); xc(i) and xo(i)
 !      are the abundance grid points.
       iop=1   ! provides smoothed interpolations; iop=0 gives no smoothing
-      if(nr  <  6) go to 65
-      if((xh  >  1.e-6) .and. (mx  < 4)) go to 64
+      if(nr  <  6) GOTO 65
+      if((xh  >  1.e-6) .and. (mx  < 4)) GOTO 64
 
 !..... set-up C/O axis points
       xxco=xxc+xxo
-      if(z+xh+xxco-1.e-6  >  1 ) go to 61
+      if(z+xh+xxco-1.e-6  >  1 ) GOTO 61
       zzz=z+0.001
       xxh=xh
        xxci=xxc
@@ -279,7 +270,7 @@
             else
               ilo=imd
             end if
-          go to 8
+          GOTO 8
         end if
         i=ihi
         mf=i-2
@@ -331,7 +322,7 @@
             else
               ilo=imd
             end if
-          go to 12
+          GOTO 12
           end if
         i=ihi
         l1=i-2
@@ -348,7 +339,7 @@
             else
               ilo=imd
             end if
-          go to 11
+          GOTO 11
           end if
         i=ihi
         k1=i-2
@@ -441,7 +432,7 @@
            if(xcs(i)  >  xhe) then
            xc(i)=xhe
            xo(i)=xhe
-           go to 3
+           GOTO 3
            end if
          end do
     3    continue
@@ -495,12 +486,12 @@ c  ... this is the first time through this m. Calculate the decadic
 
       if((slt  <  alt(1)).or.(slt  >  alt(nt))) then
          !write(*,*) 'slt', slt, 'not in range', alt(1), 'to', alt(nt)
-         go to 62
+         GOTO 62
       end if
 
       if((slr  <  alr (1)).or.(slr  >  alr(nr))) then
          !write(*,*) 'slr', slr, 'not in range', alr(1), 'to', alr(nr)
-         go to 62
+         GOTO 62
       end if
 
       if (m  ==  mf) then  !  calculate table indices
@@ -508,13 +499,13 @@ c  ... this is the first time through this m. Calculate the decadic
       if((mf2  /=  mxzero) .and. (k3s  >  ntm)) then
          !write(*,*) '(mf2  /=  mxzero) .and. (k3s  >  ntm)'
          !write(*,*) 'mf2', mf2, 'k3s', k3s
-         go to 62
+         GOTO 62
       end if
 
       do i=14,18 ! check for missing entries at right end of row
          if((l3s  >  i) .and. (k3s  >  nta(i+1))) then
             !write(*,*) '(l3s  >  i) .and. (k3s  >  nta(i+1))'
-            go to 62
+            GOTO 62
          end if
       end do
       ip=3
@@ -551,7 +542,7 @@ c  ... this is the first time through this m. Calculate the decadic
      x    ," using")')
           call mesa_error(__FILE__,__LINE__)
         end if
-      if(z  /=  zz(mf,1)) go to 66
+      if(z  /=  zz(mf,1)) GOTO 66
       xxc=xxci   ! restores input value; necessary if stop replaced
 !                  with return
       xxo=xxoi   ! restores input value
@@ -561,7 +552,7 @@ c  ... this is the first time through this m. Calculate the decadic
        do 46 it=k1,k1+ip
          if((mx  ==  1) .or. (mf2  ==  1)) then
            opk(it,ir)=opl(mf,it,ir)
-           go to 46
+           GOTO 46
          end if
          opk(it,ir)=quad2(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir)
      x   ,opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
@@ -606,13 +597,11 @@ c  ... this is the first time through this m. Calculate the decadic
 !                  with a return
       xxo=xxoi   ! restores input value
       return
-   64 write(*,'(" X not equal to zero: To run this case it
-     .is necessary"/ "to recompile with parameter (mx=5)")')
+   64 write(*,'(" X not equal to zero: To run this case it is necessary"/ "to recompile with parameter (mx=5)")')
       call mesa_error(__FILE__,__LINE__)
    65 write(*,'("Too few R values; NRE+1-NRB < 6")')
       call mesa_error(__FILE__,__LINE__)
-   66 write(*,'(" Z does not match Z in codata* files you are",
-     . " using")')
+   66 write(*,'(" Z does not match Z in codata* files you are using")')
       call mesa_error(__FILE__,__LINE__)
       end
 
@@ -623,17 +612,10 @@ c  ... this is the first time through this m. Calculate the decadic
 !     ances.
       save
       integer w
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
        is=0
       if(xxco  <  1.e-6) then
@@ -643,7 +625,7 @@ c  ... this is the first time through this m. Calculate the decadic
           end do
         end do
             is=1
-            go to 123
+            GOTO 123
       end if
 !     include boundaries that could later cause division by 0!
       if(xxc  >  xcd(3)-1.e-6) then
@@ -659,30 +641,25 @@ c  ... this is the first time through this m. Calculate the decadic
 !     include boundaries that could later cause division by 0!
       if(xxc  >  xcd(2)-1.e-6) then
       iw=1
-      a(1,m)=quad2(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),
-     . diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
+      a(1,m)=quad2(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
       iw=iw+1
-      a(2,m)=quad2(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir),
-     . diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
+      a(2,m)=quad2(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir),diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
          do w=1,2
            b(w)=a(w,m)
          end do
 !     handle possibility that xodp=0
            opl(m,it,ir)=b(1)+(b(2)-b(1))*fac
       is=1
-      go to 41
+      GOTO 41
       end if
 !                    interpolation in region c2
 
       iw=1
-      a(1,m)=quad2(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),
-     . diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
+      a(1,m)=quad2(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
       iw=iw+1
-      a(2,m)=quad2(is,iw,cxx,co(m,n(m,2)-2,2,it,ir),co(m,n(m,2)-1,2,it,
-     . ir),diag(m,2,it,ir),cx(n(m,2)-2),cx(n(m,2)-1),cxd(2))
+      a(2,m)=quad2(is,iw,cxx,co(m,n(m,2)-2,2,it,ir),co(m,n(m,2)-1,2,it,ir),diag(m,2,it,ir),cx(n(m,2)-2),cx(n(m,2)-1),cxd(2))
       iw=iw+1
-      a(3,m)=quad2(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir)
-     .,diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
+      a(3,m)=quad2(is,iw,cxx,diag(m,1,it,ir),diag(m,2,it,ir),diag(m,3,it,ir),cxd(1),cxd(2),cxd(3))
         do w=1,3
           b(w)=a(w,m)
         end do
@@ -691,7 +668,7 @@ c  ... this is the first time through this m. Calculate the decadic
       is=1
    41 continue
    40 continue
-      if(is  ==  1) go to 123
+      if(is  ==  1) GOTO 123
 !__________
       end if
 
@@ -726,13 +703,13 @@ c  ... this is the first time through this m. Calculate the decadic
         is=1
    43 continue
    42 continue
-      if (is  ==  1) go to 123
+      if (is  ==  1) GOTO 123
         end if
    44 continue
 !__________
       end if
 
-      if (is  ==  1) go to 123
+      if (is  ==  1) GOTO 123
 
 !     include boundaries that could later cause division by 0!
       if(xxo  >  xod(3)-1.e-6) then
@@ -748,30 +725,25 @@ c  ... this is the first time through this m. Calculate the decadic
 !     include boundaries that could later cause division by 0!
       if(xxo  >  xod(2)-1.e-6) then
       iw=1
-      a(1,m)=quad2(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),
-     . diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
+      a(1,m)=quad2(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
       iw=iw+1
-      a(2,m)=quad2(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),
-     .diago(m,no-3,it,ir),oxd(1),oxd(2),oxd(3))
+      a(2,m)=quad2(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),diago(m,no-3,it,ir),oxd(1),oxd(2),oxd(3))
         do w=1,2
           b(w)=a(w,m)
         end do
 !     handle possibility that xcdp=0
       opl(m,it,ir)=b(1)+(b(2)-b(1))*fac
       is=1
-      go to 141
+      GOTO 141
       end if
 !                    interpolation in region  o2
 
       iw=1
-      a(1,m)=quad2(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),
-     . diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
+      a(1,m)=quad2(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
       iw=iw+1
-      a(2,m)=quad2(is,iw,oxx,co(m,2,n(m,2)-2,it,ir),co(m,2,n(m,2)-1,it,
-     . ir),diago(m,no-2,it,ir),ox(n(m,2)-2),ox(n(m,2)-1),oxd(2))
+      a(2,m)=quad2(is,iw,oxx,co(m,2,n(m,2)-2,it,ir),co(m,2,n(m,2)-1,it,ir),diago(m,no-2,it,ir),ox(n(m,2)-2),ox(n(m,2)-1),oxd(2))
       iw=iw+1
-      a(3,m)=quad2(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),
-     .diago(m,nc-3,it,ir),oxd(1),oxd(2),oxd(3))
+      a(3,m)=quad2(is,iw,oxx,diago(m,no-1,it,ir),diago(m,no-2,it,ir),diago(m,nc-3,it,ir),oxd(1),oxd(2),oxd(3))
         do w=1,3
           b(w)=a(w,m)
         end do
@@ -780,7 +752,7 @@ c  ... this is the first time through this m. Calculate the decadic
       is=1
   141 continue
   140 continue
-      if(is  ==  1) go to 123
+      if(is  ==  1) GOTO 123
 !__________
       end if
 
@@ -798,14 +770,11 @@ c  ... this is the first time through this m. Calculate the decadic
       iw=1
       m2=i-2
       m1=i-1
-      a(1,m)=quad2(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-
-     .1,it,ir),diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
+      a(1,m)=quad2(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
       iw=iw+1
-      a(2,m)=quad2(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,
-     . it,ir),diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
+      a(2,m)=quad2(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
       iw=iw+1
-      a(3,m)=quad2(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),
-     .diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
+      a(3,m)=quad2(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
         do w=1,3
           b(w)=a(w,m)
         end do
@@ -814,13 +783,13 @@ c  ... this is the first time through this m. Calculate the decadic
       is=1
   143 continue
   142 continue
-      if (is  ==  1) go to 123
+      if (is  ==  1) GOTO 123
       end if
   144 continue
 !__________
       end if
 
-      if (is  ==  1) go to 123
+      if (is  ==  1) GOTO 123
 
 !.....find index of C grid.
    52 ie=100*xxc+1
@@ -899,7 +868,6 @@ c  ... this is the first time through this m. Calculate the decadic
        end do
       end if
   123 continue
-      return
       end
 
 ! **********************************************************************
@@ -907,17 +875,10 @@ c  ... this is the first time through this m. Calculate the decadic
       use utils_lib, only: mesa_error
 !     The purpose of this subroutine is to interpolate in logT6 and logR
       save
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_d/dkap
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
       common/type2_e/ opact,dopact,dopacr,dopactd
@@ -927,12 +888,10 @@ c  ... this is the first time through this m. Calculate the decadic
       do kx=k1,k1+ip
           iw=1
         iu=iu+1
-        h(iu)=quad2(is,iw,slr,opk(kx,l1),opk(kx,l2),opk(kx,l3),
-     x  alr(l1),alr(l2),alr(l3))
+        h(iu)=quad2(is,iw,slr,opk(kx,l1),opk(kx,l2),opk(kx,l3),alr(l1),alr(l2),alr(l3))
           if(iq. eq. 3) then
             iw=2
-            q(iu)=quad2(is,iw,slr,opk(kx,l2),opk(kx,l3),opk(kx,l4),
-     x      alr(l2),alr(l3),alr(l4))
+            q(iu)=quad2(is,iw,slr,opk(kx,l2),opk(kx,l3),opk(kx,l4),alr(l2),alr(l3),alr(l4))
           end if
         is=1
       end do
@@ -1018,7 +977,6 @@ c  ... this is the first time through this m. Calculate the decadic
       dopactr=99.
       dopactd=99.
       end if
-      return
       end
 
 ! ***********************************************************************
@@ -1028,17 +986,10 @@ c  ... this is the first time through this m. Calculate the decadic
       save
       character (len=*) :: dir
       parameter (ismdata=0)
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
-      common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
-     . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/type2_alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_e/ opact,dopact,dopacr,dopacrd
@@ -1296,7 +1247,6 @@ c  ... this is the first time through this m. Calculate the decadic
         end do
       end if
 
-      return
       end
 
 ! ***********************************************************************
@@ -1305,8 +1255,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !..... this function performs a quadratic interpolation.
       save
       common/type2_d/dkap
-      common/type2_coquad/ xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30)
-     . ,xx1pxx2(30)
+      common/type2_coquad/ xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3
@@ -1346,30 +1295,18 @@ c  ... this is the first time through this m. Calculate the decadic
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       dkap=c2+(x+x)*c3
       quad2=c1+x*(c2+x*c3)
-      return
       end
 
 ! ***********************************************************************
       block data type2
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo)
-     . ,xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx)
-     . ,nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),
-     . t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr)
-     . ,dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm)
-     .,t6listf(ntm),opk2(nt,nr),dfsx(mx)
-      common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),
-     . zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
-      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),
-     . opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
+      common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_recoin/ itimeco,mxzero,readco_z
       data itime/mx*0/,itimeco/0/
-      data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,
-     . 4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,
-     . 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-     . 7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7/
+      data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7/
       data (xcs(i),i= 1,mc)/ 0.0,0.01,0.03,0.1,0.2,0.4,0.6,1.0/
       data (xos(i),i= 1,mc)/0.0,0.01,0.03,0.1,0.2,0.4,0.6,1.0/
       data (xa(i),i=1,5)/0.0,0.03,0.1,0.35,0.7/
@@ -1385,12 +1322,8 @@ c  ... this is the first time through this m. Calculate the decadic
       DIMENSION X(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT END POINTS USING CUBIC FIT
-         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2
-     +   -(Y(2)-Y(1))*(X(3)-X(1))**2)/
-     +   ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
-         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2
-     +   -(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/
-     +   ((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
+         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2-(Y(2)-Y(1))*(X(3)-X(1))**2)/((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
+         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2-(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
@@ -1398,8 +1331,7 @@ c  ... this is the first time through this m. Calculate the decadic
         SIG=(X(I)-X(I-1))/(X(I+1)-X(I-1))
         P=SIG*Y2(I-1)+2.
         Y2(I)=(SIG-1.)/P
-        U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))
-     *      /(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
+        U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))/(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
 11    CONTINUE
       QN=0.5
       UN=(3./(X(N)-X(N-1)))*(YPN-(Y(N)-Y(N-1))/(X(N)-X(N-1)))
@@ -1407,17 +1339,16 @@ c  ... this is the first time through this m. Calculate the decadic
       DO 12 K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
 12    CONTINUE
-      RETURN
-      END
+      end
 ! ********************************************************************
       subroutine SPLINT2(XA,YA,N,Y2A,X,Y,YP)
       use utils_lib, only: mesa_error
       DIMENSION XA(N),YA(N),Y2A(N)
       KLO=1
       KHI=N
-1     IF (KHI-KLO.GT.1) THEN
+1     IF (KHI-KLO > 1) THEN
         K=(KHI+KLO)/2
-        IF(XA(K).GT.X)THEN
+        IF(XA(K) > X)THEN
           KHI=K
         ELSE
           KLO=K
@@ -1425,19 +1356,15 @@ c  ... this is the first time through this m. Calculate the decadic
       GOTO 1
       end if
       H=XA(KHI)-XA(KLO)
-      IF (H.EQ.0.) then
+      if (H == 0.) then
          write(*,*) 'Bad XA input.'
          call mesa_error(__FILE__,__LINE__)
       end if
       A=(XA(KHI)-X)/H
       B=(X-XA(KLO))/H
-      Y=A*YA(KLO)+B*YA(KHI)+
-     *      ((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
-      YP=0.05*  (  (-YA(KLO)+YA(KHI))/H
-     +   +      ( -(3*A**2-1)*Y2A(KLO)
-     +            +(3*B**2-1)*Y2A(KHI) )*H/6. )
-      RETURN
-      END
+      Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
+      YP=0.05*  (  (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI) )*H/6. )
+      end
 ! ********************************************************************
       subroutine FITY2
 
@@ -1470,7 +1397,6 @@ c  ... this is the first time through this m. Calculate the decadic
    20    CONTINUE
    30 CONTINUE
 
-      RETURN
       END
 ! ********************************************************************
       subroutine FITX2
@@ -1525,7 +1451,6 @@ c  ... this is the first time through this m. Calculate the decadic
          D(J)=D(J)*D(J+1)+T(J)
    20 CONTINUE
 
-      RETURN
       END
 
 ! ********************************************************************
@@ -1571,14 +1496,14 @@ c  ... this is the first time through this m. Calculate the decadic
       Y=2*( FLR - RLS )+1
 
       I=0
-      IF(X.LT.2.)THEN
-         IF(X.LT.0.75)THEN
+      IF(X < 2.)THEN
+         IF(X < 0.75)THEN
             IERR=.TRUE.
          ELSE
             I=1
          end if
-      ELSEIF(X.GT.84)THEN
-         IF(X.GT.85.25)THEN
+      ELSEIF(X > 84)THEN
+         IF(X > 85.25)THEN
             IERR=.TRUE.
          ELSE
             I=84
@@ -1588,14 +1513,14 @@ c  ... this is the first time through this m. Calculate the decadic
       end if
       U=X-I
 
-      IF(Y.LT.2.)THEN
-         IF(Y.LT.0.75)THEN
+      IF(Y < 2.)THEN
+         IF(Y < 0.75)THEN
             IERR=.TRUE.
          ELSE
             J=1
          end if
-      ELSEIF(Y.GT.NRL-1)THEN
-         IF(Y.GT.NRL+.25)THEN
+      ELSEIF(Y > NRL-1)THEN
+         IF(Y > NRL+.25)THEN
             IERR=.TRUE.
          ELSE
             J=NRL-1
@@ -1656,8 +1581,6 @@ c  ... this is the first time through this m. Calculate the decadic
       DGDT=20.*FFX(U,V)-6.*FFY(U,V)
       DGDRHO=2.*FFY(U,V)
 
-
-      RETURN
       END
 
 ! ********************************************************************
@@ -1771,7 +1694,6 @@ c  ... this is the first time through this m. Calculate the decadic
    30    CONTINUE
    40 CONTINUE
 
-      RETURN
       END
 
 ! ********************************************************************
@@ -1799,7 +1721,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !     VALUES OF LOG(T) AND LOG(RHO). SEE BELOW FOR FURTHER
 !     EXPLANATION.
 
-!  OUTPUT FOR THE CASE OF NSM.GT.0.
+!  OUTPUT FOR THE CASE OF NSM > 0.
 !     INTERP IS USED TO OBTAIN SMOOTHED DATA INTERPOLATED
 !     BACK TO THE ORIGINAL OPAL MESH. TWO FILES ARE WRITTEN.
 
@@ -1811,8 +1733,7 @@ c  ... this is the first time through this m. Calculate the decadic
 
       parameter(IP=100,IPR=20)
       DIMENSION U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
-      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb
-     . ,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
+      parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
       CHARACTER(len=100) HEAD
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
@@ -1840,9 +1761,9 @@ c  ... this is the first time through this m. Calculate the decadic
       ROSSL(I,j)=coff(I,j)
       end do
          U(I)=6+LOG10(T6)
-         IF(T6.LT.tmax)GOTO 5
+         IF(T6 < tmax)GOTO 5
       N=I
-      IF(N.GT.IP)THEN
+      IF(N > IP)THEN
          print*,' REQUIRE parameter IP OF AT LEAST ',N
          STOP 1
       end if
@@ -1883,7 +1804,7 @@ c  ... this is the first time through this m. Calculate the decadic
 
 
 !  OPTION FOR SMOOTHING
-      IF(NSM.GT.0)THEN
+      IF(NSM > 0)THEN
          DO 35 NS=1,NSM
             call smooth2
    35    CONTINUE
@@ -1906,7 +1827,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !                          ELSE IERR=.FALSE.
 
 ! INTERPOLATE BACK TO OPAL POINTS
-      IF(NSM.GT.0)THEN
+      IF(NSM > 0)THEN
          do l=1,NRL
          coff(1,l)=ROSSL(1,l)
          end do
@@ -1936,7 +1857,6 @@ c  ... this is the first time through this m. Calculate the decadic
  2000 FORMAT(100A1)
  2222 FORMAT(F8.3,20F7.3)
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
- 6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,
-     + ', FLR=',E10.3)
+ 6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
       END

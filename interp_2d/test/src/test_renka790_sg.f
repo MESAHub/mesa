@@ -13,20 +13,17 @@
       subroutine test_renka_sq
       use interp_2d_lib_sg
 
-      integer   NMAX, NRMAX, NI
+      integer :: NMAX, NRMAX, NI
       parameter (NMAX=100, NRMAX=10, NI=33)
 
 ! Array storage:
 
-      real X(NMAX), Y(NMAX), W(NMAX), RW(NMAX),
-     .                 A(9,NMAX), P(NI), FT(NI,NI)
-      integer          LCELL(NRMAX,NRMAX), LNEXT(NMAX)
+      real X(NMAX), Y(NMAX), W(NMAX), RW(NMAX), A(9,NMAX), P(NI), FT(NI,NI)
+      integer :: LCELL(NRMAX,NRMAX), LNEXT(NMAX)
 
-      real DEL, DUM, DX, DY, ERMAX, ERMEAN, PW,
-     .                 RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
+      real DEL, DUM, DX, DY, ERMAX, ERMEAN, PW, RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
 !      real CS2VAL_sg
-      integer          I, IER, J, K, KF, KFF, KFL, KS, LOUT,
-     .                 N, NC, NFUN, NP, NR, NSET, NW
+      integer :: I, IER, J, K, KF, KFF, KFL, KS, LOUT, N, NC, NFUN, NP, NR, NSET, NW
 
 ! Data:
 
@@ -45,7 +42,6 @@
       NW = 30
       NR =  6
       call testdt_sg (KS, N,X,Y)
-
 
 ! Set up uniform grid points.
 
@@ -89,8 +85,7 @@
 
 !   Compute parameters A and RW defining the interpolant.
 
-        call interp_CSHEP2_sg (N,X,Y,W,NC,NW,NR, LCELL,LNEXT,XMIN,
-     .               YMIN,DX,DY,RMAX,RW,A,IER)
+        call interp_CSHEP2_sg (N,X,Y,W,NC,NW,NR, LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
         if (IER /= 0) GO TO 21
 
 !   Compute interpolation errors.
@@ -101,9 +96,7 @@
         do 10 I = 1,NI
           do 9 J = 1,NI
             IER = 0
-            PW = interp_CS2VAL_sg (P(I),P(J),N,X,Y,W,NR,LCELL,LNEXT,
-     .                   XMIN,YMIN,DX,DY,RMAX,RW,A,IER) -
-     .           FT(I,J)
+            PW = interp_CS2VAL_sg (P(I),P(J),N,X,Y,W,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER) - FT(I,J)
             if (IER /= 0) then
                write(LOUT,*) 'IER nonzero from CS2VAL_sg'
                stop 1
@@ -138,20 +131,14 @@
 
 ! Print formats:
 
-  200 format ('RENKA790_sg: Node set ',I2,4X,'N =',I4,4X,'NI = ',I2,
-     .        4X,'NC = ',I2,4X,'NW = ',I2,4X,'NR = ',I2/
-     .        1X,16X,'Function',4X,'Max Error',4X,
-     .        'Mean Error',4X,'SSE/SSM')
+  200 format ('RENKA790_sg: Node set ',I2,4X,'N =',I4,4X,'NI = ',I2, 4X,'NC = ',I2,4X,'NW = ',I2,4X,'NR = ',I2/ 1X,16X,'Function',4X,'Max Error',4X, 'Mean Error',4X,'SSE/SSM')
   210 format (1X,19X,I2,9X,F7.4,6X,F8.5,2X,F9.6)
 
 ! Error message formats:
 
-  500 format (///1X,10X,'*** Error in data -- N = ',I4,
-     .        ', Maximum value =',I4,' ***')
-  510 format (///1X,14X,'*** Error in CSHEP2 -- duplicate ',
-     .        'nodes encountered ***')
-  520 format (///1X,14X,'*** Error in CSHEP2 -- all nodes ',
-     .        'are collinear ***')
+  500 format (///1X,10X,'*** Error in data -- N = ',I4,', Maximum value =',I4,' ***')
+  510 format (///1X,14X,'*** Error in CSHEP2 -- duplicate nodes encountered ***')
+  520 format (///1X,14X,'*** Error in CSHEP2 -- all nodes are collinear ***')
       end
 
 
@@ -205,10 +192,8 @@
 
 ! **********************************************************
 
-      real X1(100), Y1(100),  X2(33), Y2(33),
-     .                 X3(25), Y3(25),  X4(100), Y4(100),
-     .                 X5(81), Y5(81)
-      integer I
+      real :: X1(100), Y1(100),  X2(33), Y2(33), X3(25), Y3(25),  X4(100), Y4(100), X5(81), Y5(81)
+      integer :: I
 
 ! Node set 1:  Franke's 100-node set.
 
@@ -521,25 +506,20 @@
 
 ! **********************************************************
 
-      real T1, T2, T3, T4
+      real :: T1, T2, T3, T4
       if (K  <  1  .OR.  K  >  10) return
       GO TO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
 
-    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
-     .    .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
-     .     .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
-     .     .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) + .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) + .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) - .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       if (IFLAG /= 1) return
       T1 = exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
       T2 = exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
       T3 = exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
       T4 = exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
-      FX = -3.375*(9.*X-2.)*T1 - (27./98.)*(9.*X+1.)*T2
-     .     -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
-      FY = -3.375*(9.*Y-2.)*T1 - .675*T2
-     .     -2.25*(9.*Y-3.)*T3 + 3.6*(9.*Y-7.)*T4
+      FX = -3.375*(9.*X-2.)*T1 - (27./98.)*(9.*X+1.)*T2 -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
+      FY = -3.375*(9.*Y-2.)*T1 - .675*T2 -2.25*(9.*Y-3.)*T3 + 3.6*(9.*Y-7.)*T4
       return
 
 ! Cliff:
@@ -629,15 +609,10 @@
       T2 = exp((10.0 - 20.0*Y)/3.0)
       T3 = 1.0/(1.0 + T1)
       T4 = 1.0/(1.0 + T2)
-      F = ((20.0/3.0)**3 * T1*T2)**2 * (T3*T4)**5 *
-     .    (T1-2.0*T3)*(T2-2.0*T4)
+      F = ((20.0/3.0)**3 * T1*T2)**2 * (T3*T4)**5 * (T1-2.0*T3)*(T2-2.0*T4)
       if (IFLAG /= 1) return
-      FX = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 *
-     .     (2.0*T1-3.0*T3-5.0+12.0*T3*T3)*T2*T2*T4**5 *
-     .     (T2-2.0*T4)
-      FY = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 *
-     .     (2.0*T2-3.0*T4-5.0+12.0*T4*T4)*T2*T2*T4**5 *
-     .     (T1-2.0*T3)
+      FX = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 * (2.0*T1-3.0*T3-5.0+12.0*T3*T3)*T2*T2*T4**5 * (T2-2.0*T4)
+      FY = ((20.0/3.0)*T1)**2 * ((20.0/3.0)*T3)**5 * (2.0*T2-3.0*T4-5.0+12.0*T4*T4)*T2*T2*T4**5 * (T1-2.0*T3)
       return
 
 ! Cosine Peak:
@@ -743,32 +718,18 @@
 
 ! Exponential:
 
-    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) +
-     .    .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) +
-     .     .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) -
-     .     .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) + .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) + .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) - .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       if (IFLAG  <  1) return
       T1 = exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
       T2 = exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
       T3 = exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.)
       T4 = exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
-      FX = -3.375*(9.*X-2.)*T1 - (27./98.)*(9.*X+1.)*T2
-     .     -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
-      FY = -3.375*(9.*Y-2.)*T1 - .675*T2
-     .     -2.25*(9.*Y-3.)*T3 + 3.6*(9.*Y-7.)*T4
+      FX = -3.375*(9.*X-2.)*T1 - (27./98.)*(9.*X+1.)*T2 -2.25*(9.*X-7.)*T3 + 3.6*(9.*X-4.)*T4
+      FY = -3.375*(9.*Y-2.)*T1 - .675*T2 -2.25*(9.*Y-3.)*T3 + 3.6*(9.*Y-7.)*T4
       if (IFLAG  <  2) return
-      FXX = 15.1875*((9.*X-2.)**2 - 2.)*T1 +
-     .      60.75*((9.*X+1.)**2 - 24.5)*T2 +
-     .      10.125*((9.*X-7.)**2 - 2.)*T3 -
-     .      64.8*((9.*X-4.)**2 - .5)*T4
-      FXY = 15.1875*(9.*X-2.)*(9.*Y-2.)*T1 +
-     .      (243./980.)*(9.*X+1.)*T2 +
-     .      10.125*(9.*X-7.)*(9.*Y-3.)*T3 -
-     .      64.8*(9.*X-4.)*(9.*Y-7.)*T4
-      FYY = 15.1875*((9.*Y-2.)**2 - 2.)*T1 +
-     .      .6075*T2 +
-     .      10.125*((9.*Y-3.)**2 - 2.)*T3 -
-     .      64.8*((9.*Y-7.)**2 - .5)*T4
+      FXX = 15.1875*((9.*X-2.)**2 - 2.)*T1 + 60.75*((9.*X+1.)**2 - 24.5)*T2 + 10.125*((9.*X-7.)**2 - 2.)*T3 - 64.8*((9.*X-4.)**2 - .5)*T4
+      FXY = 15.1875*(9.*X-2.)*(9.*Y-2.)*T1 + (243./980.)*(9.*X+1.)*T2 + 10.125*(9.*X-7.)*(9.*Y-3.)*T3 - 64.8*(9.*X-4.)*(9.*Y-7.)*T4
+      FYY = 15.1875*((9.*Y-2.)**2 - 2.)*T1 +  .6075*T2 + 10.125*((9.*Y-3.)**2 - 2.)*T3 - 64.8*((9.*Y-7.)**2 - .5)*T4
       return
 
 ! Cliff:
@@ -888,22 +849,15 @@
       T3 = 1.0/(1.0 + T1)
       T4 = 1.0/(1.0 + T2)
       T5 = 20.0/3.0
-      F = (T5**3 * T1*T2)**2 * (T3*T4)**5 *
-     .    (T1-2.0*T3)*(T2-2.0*T4)
+      F = (T5**3 * T1*T2)**2 * (T3*T4)**5 * (T1-2.0*T3)*(T2-2.0*T4)
       if (IFLAG  <  1) return
       T6 = (T5*T1*T2)**2 * (T5*T3*T4)**5
-      FX = T6 * (T2-2.0*T4) *
-     .     ((12.0*T3 - 3.0)*T3 + 2.0*T1 - 5.0)
-      FY = T6 * (T1-2.0*T3) *
-     .     ((12.0*T4 - 3.0)*T4 + 2.0*T2 - 5.0)
+      FX = T6 * (T2-2.0*T4) * ((12.0*T3 - 3.0)*T3 + 2.0*T1 - 5.0)
+      FY = T6 * (T1-2.0*T3) * ((12.0*T4 - 3.0)*T4 + 2.0*T2 - 5.0)
       if (IFLAG  <  2) return
-      FXX = T5*T6 * (T2-2.0*T4) *
-     .      (((-84.0*T3 + 78.0)*T3 + 23.0)*T3 + 4.0*T1-25.0)
-      FXY = T5*T6 *
-     .      ((12.0*T4 - 3.0)*T4 + 2.0*T2 - 5.0) *
-     .      ((12.0*T3 - 3.0)*T3 + 2.0*T1 - 5.0)
-      FYY = T5*T6 * (T1-2.0*T3) *
-     .      (((-84.0*T4 + 78.0)*T4 + 23.0)*T4 + 4.0*T2-25.0)
+      FXX = T5*T6 * (T2-2.0*T4) * (((-84.0*T3 + 78.0)*T3 + 23.0)*T3 + 4.0*T1-25.0)
+      FXY = T5*T6 * ((12.0*T4 - 3.0)*T4 + 2.0*T2 - 5.0) * ((12.0*T3 - 3.0)*T3 + 2.0*T1 - 5.0)
+      FYY = T5*T6 * (T1-2.0*T3) * (((-84.0*T4 + 78.0)*T4 + 23.0)*T4 + 4.0*T2-25.0)
       return
 
 ! Cosine Peak:
@@ -926,11 +880,8 @@
       FYY = 0.
       if (T1 == 0.) return
       T5 = T2/(T1**3)
-      FXX = T5*(T1*(76.8*T4 - 133.76*T3)*(80.0*X-40.0)**2 -
-     .             (960.0*T4 + 256.0*T3)*(90.0*Y-45.0)**2 )
-      FXY = T5*(T1*(86.4*T4 - 150.48*T3) + 1080.0*T4 +
-     .          288.0*T3)*(80.0*X-40.0)*(90.0*Y-45.0)
-      FYY = T5*(T1*(97.2*T4 - 169.29*T3)*(90.0*Y-45.0)**2 -
-     .             (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
+      FXX = T5*(T1*(76.8*T4 - 133.76*T3)*(80.0*X-40.0)**2 - (960.0*T4 + 256.0*T3)*(90.0*Y-45.0)**2 )
+      FXY = T5*(T1*(86.4*T4 - 150.48*T3) + 1080.0*T4 + 288.0*T3)*(80.0*X-40.0)*(90.0*Y-45.0)
+      FYY = T5*(T1*(97.2*T4 - 169.29*T3)*(90.0*Y-45.0)**2 - (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
       return
       end subroutine

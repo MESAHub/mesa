@@ -1,51 +1,44 @@
       subroutine test_akima_db
       use interp_2d_lib_db
-*
+
 ! Test for the RGBI3P_db/RGSF3P_db subroutine package
-*
+
 ! Hiroshi Akima
 ! U.S. Department of Commerce, NTIA/ITS
 ! Version of 1995/08
-*
+
 ! This program calls the RGBI3P_db and RGSF3P_db subroutines.
-*
+
 ! This program requires no input data files.
-*
+
 ! This program creates the TPRG3P data file.  All elements of
 ! the DZI array in the data file are expected to be zero.
-*
+
 *
 ! Specification statements
 !     .. Parameters ..
-      integer          NXD,NYD,NXI
-      double precision             XIMN,XIMX
-      integer          NYI
-      double precision             YIMN,YIMX
-      parameter        (NXD=9,NYD=11,NXI=19,XIMN=-0.5,XIMX=8.5,NYI=23,
-     +                 YIMN=-0.5,YIMX=10.5)
-!     ..
+      integer :: NXD,NYD,NXI
+      double precision :: XIMN,XIMX
+      integer :: NYI
+      double precision :: YIMN,YIMX
+      parameter (NXD=9,NYD=11,NXI=19,XIMN=-0.5,XIMX=8.5,NYI=23,YIMN=-0.5,YIMX=10.5)
+
 !     .. Local Scalars ..
-      double precision             ANXIM1,ANYIM1,DXI,DYI
-      integer          IER,ISEC,IXD,IXI,IXIMN,IXIMX,IYD,IYDR,IYI,IYIR,
-     +                 MD,NYDO2
-      character(len=9)      NMPR
-      character(len=6)      NMWF
-!     ..
+      double precision :: ANXIM1,ANYIM1,DXI,DYI
+      integer :: IER,ISEC,IXD,IXI,IXIMN,IXIMX,IYD,IYDR,IYI,IYIR,MD,NYDO2
+      character(len=9) :: NMPR
+      character(len=6) :: NMWF
+
 !     .. Local Arrays ..
-      double precision             DZI(NXI,NYI),WK(3,NXD,NYD),XD(NXD),XI(NXI),
-     +                 YD(NYD),YI(NYI),ZD(NXD,NYD),ZI(NXI,NYI),
-     +                 ZIE(NXI,NYI)
-      character(len=9)      NMSR(2)
-      character(len=20)     LBL(2)
-!     ..
-!     ..
+      double precision :: DZI(NXI,NYI),WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),ZD(NXD,NYD),ZI(NXI,NYI),ZIE(NXI,NYI)
+      character(len=9) :: NMSR(2)
+      character(len=20) :: LBL(2)
+
 !     .. Intrinsic Functions ..
       INTRINSIC        MOD,DBLE
-!     ..
+
 ! Data statements
-      DATA             NMPR/'TPRG3P_db'/,NMWF/'WFRG3P'/,NMSR/'RGBI3P_db',
-     +                 'RGSF3P_db'/,LBL/'Calculated ZI Values',
-     +                 'Differences         '/
+      DATA             NMPR/'TPRG3P_db'/,NMWF/'WFRG3P'/,NMSR/'RGBI3P_db','RGSF3P_db'/,LBL/'Calculated ZI Values','Differences         '/
       DATA             XD/0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0/
       DATA             YD/0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0/
       DATA             ZD/9*0.0,9*0.0,9*0.0,3.2,0.7,7*0.0,7.4,4.8,1.4,
@@ -116,47 +109,46 @@
      +                 41.700,39.192,58.284,68.917,74.644,71.333,63.413,
      +                 60.125,66.293,71.400,59.129,47.725,52.451,54.592,
      +                 50.842,48.483,48.639,50.142,51.089,50.200,48.268/
-!     ..
+
 ! Calculation
 ! Opens the output file and writes the input data.
 !      OPEN (6,FILE=NMWF)
       NYDO2 = NYD/2
       write (6,FMT=9000) NMPR
       write (6,FMT=9010) XD
-      do 10 IYDR = 1,NYD
-          if (MOD(IYDR-1,NYDO2).LE.1) write (6,FMT='(1X)')
+      do IYDR = 1,NYD
+          if (MOD(IYDR-1,NYDO2) <= 1) write (6,FMT='(1X)')
           IYD = NYD + 1 - IYDR
           write (6,FMT=9020) YD(IYD), (ZD(IXD,IYD),IXD=1,NXD)
-   10 continue
+      end do
 ! Program check for the RGBI3P_db subroutine
 ! - Performs interpolation and calculates the differences.
       DXI = XIMX - XIMN
       ANXIM1 = NXI - 1
-      do 20 IXI = 1,NXI
+      do IXI = 1,NXI
           XI(IXI) = XIMN + DXI*dble(IXI-1)/ANXIM1
-   20 continue
+      end do
       DYI = YIMX - YIMN
       ANYIM1 = NYI - 1
-      do 30 IYI = 1,NYI
+      do IYI = 1,NYI
           YI(IYI) = YIMN + DYI*dble(IYI-1)/ANYIM1
-   30 continue
-      do 50 IYI = 1,NYI
-          do 40 IXI = 1,NXI
-              if (IXI.EQ.1 .AND. IYI.EQ.1) then
+      end do
+      do IYI = 1,NYI
+          do IXI = 1,NXI
+              if (IXI == 1 .AND. IYI == 1) then
                   MD = 1
               else
                   MD = 2
               end if
-              CALL interp_RGBI3P_db(MD,NXD,NYD,XD,YD,ZD,1,XI(IXI),YI(IYI),
-     +                    ZI(IXI,IYI),IER, WK)
-              if (IER.GT.0) STOP 1
+              CALL interp_RGBI3P_db(MD,NXD,NYD,XD,YD,ZD,1,XI(IXI),YI(IYI),ZI(IXI,IYI),IER, WK)
+              if (IER > 0) STOP 1
               DZI(IXI,IYI) = ZI(IXI,IYI) - ZIE(IXI,IYI)
-   40     continue
-   50 continue
+          end do
+      end do
 ! - Writes the calculated results.
       write (6,FMT=9030) NMPR,NMSR(1),LBL(1)
-      do 70 ISEC = 1,2
-          if (ISEC.EQ.1) then
+      do ISEC = 1,2
+          if (ISEC == 1) then
               IXIMN = 1
               IXIMX = 11
           else
@@ -164,15 +156,15 @@
               IXIMX = NXI
           end if
           write (6,FMT=9040) (XI(IXI),IXI=IXIMN,IXIMX)
-          do 60 IYIR = 1,NYI
+          do IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
               write (6,FMT=9050) YI(IYI), (ZI(IXI,IYI),IXI=IXIMN,IXIMX)
-   60     continue
-   70 continue
+          end do
+       end do
 ! - Writes the differences.
       write (6,FMT=9030) NMPR,NMSR(1),LBL(2)
-      do 90 ISEC = 1,2
-          if (ISEC.EQ.1) then
+      do ISEC = 1,2
+          if (ISEC == 1) then
               IXIMN = 1
               IXIMX = 11
           else
@@ -180,26 +172,25 @@
               IXIMX = NXI
           end if
           write (6,FMT=9060) (XI(IXI),IXI=IXIMN,IXIMX)
-          do 80 IYIR = 1,NYI
+          do IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
-              write (6,FMT=9050) YI(IYI),
-     +          (DZI(IXI,IYI),IXI=IXIMN,IXIMX)
-   80     continue
-   90 continue
+              write (6,FMT=9050) YI(IYI),(DZI(IXI,IYI),IXI=IXIMN,IXIMX)
+          end do
+        end do
 ! Program check for the RGSF3P_db subroutine
 ! - Performs surface fitting and calculates the differences.
       MD = 1
       CALL interp_RGSF3P_db(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
-      if (IER.GT.0) STOP 1
-      do 110 IYI = 1,NYI
-          do 100 IXI = 1,NXI
+      if (IER > 0) STOP 1
+      do IYI = 1,NYI
+          do IXI = 1,NXI
               DZI(IXI,IYI) = ZI(IXI,IYI) - ZIE(IXI,IYI)
-  100     continue
-  110 continue
+          end do
+      end do
 ! - Writes the calculated results.
       write (6,FMT=9030) NMPR,NMSR(2),LBL(1)
-      do 130 ISEC = 1,2
-          if (ISEC.EQ.1) then
+      do ISEC = 1,2
+          if (ISEC == 1) then
               IXIMN = 1
               IXIMX = 11
           else
@@ -207,15 +198,15 @@
               IXIMX = NXI
           end if
           write (6,FMT=9040) (XI(IXI),IXI=IXIMN,IXIMX)
-          do 120 IYIR = 1,NYI
+          do IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
               write (6,FMT=9050) YI(IYI), (ZI(IXI,IYI),IXI=IXIMN,IXIMX)
-  120     continue
-  130 continue
+          end do
+      end do
 ! - Writes the differences.
       write (6,FMT=9030) NMPR,NMSR(2),LBL(2)
-      do 150 ISEC = 1,2
-          if (ISEC.EQ.1) then
+      do ISEC = 1,2
+          if (ISEC == 1) then
               IXIMN = 1
               IXIMX = 11
           else
@@ -223,21 +214,18 @@
               IXIMX = NXI
           end if
           write (6,FMT=9060) (XI(IXI),IXI=IXIMN,IXIMX)
-          do 140 IYIR = 1,NYI
+          do IYIR = 1,NYI
               IYI = NYI + 1 - IYIR
-              write (6,FMT=9050) YI(IYI),
-     +          (DZI(IXI,IYI),IXI=IXIMN,IXIMX)
-  140     continue
-  150 continue
+              write (6,FMT=9050) YI(IYI),(DZI(IXI,IYI),IXI=IXIMN,IXIMX)
+          end do
+        end do
       RETURN
 ! Format statements
  9000 FORMAT (A9,7X,'Original Data',/,/,/,/,35X,'ZD(XD,YD)')
  9010 FORMAT (4X,'YD    XD=',/,7X,F8.1,2 (1X,3F6.1,F7.1),/)
  9020 FORMAT (1X,F6.1,F8.1,2 (1X,3F6.1,F7.1))
  9030 FORMAT (/,A9,3X,'Program Check for ',A9,3X,A20)
- 9040 FORMAT (1X,/,38X,'ZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,
-     +       2F15.10,2F15.10,2F15.10,/)
+ 9040 FORMAT (1X,/,38X,'ZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10,/)
  9050 FORMAT (F5.2,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10)
- 9060 FORMAT (1X,/,38X,'DZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,
-     +       2F15.10,2F15.10,2F15.10,/)
-      end subroutine 
+ 9060 FORMAT (1X,/,38X,'DZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10,/)
+      end subroutine
