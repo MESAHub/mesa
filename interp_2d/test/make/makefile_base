@@ -72,10 +72,10 @@ endif
 
 %.o: %.f90
 ifneq ($(QUIET),)
-	@echo TEST_COMPILE_LEGACY $<
-	@$(TEST_COMPILE_LEGACY) $(FCfree) $<
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
 else
-	$(TEST_COMPILE_LEGACY) $(FCfree) $<
+	$(TEST_COMPILE) $(FCfree) $<
 endif
 
 #################################################################

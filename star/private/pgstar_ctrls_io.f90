@@ -6702,4 +6702,3 @@
       end subroutine set_default_pgstar_controls
 
       end module pgstar_ctrls_io
-
