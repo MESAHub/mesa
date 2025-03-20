@@ -1,12 +1,7 @@
 FROM ubuntu:focal
 
-USER root
-
 # set a directory for the app
 WORKDIR /usr/mesa
-
-# copy mesa files to the container
-COPY . .
 
 # prereqs for MESASDK
 RUN apt-get update && \
@@ -27,16 +22,17 @@ RUN apt-get update && \
     apt-get autoremove --purge -y && \
     apt-get autoclean -y && \
     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-# MESASDK from Zenodo
+# download MESASDK from Zenodo
 RUN curl -L https://zenodo.org/records/13768913/files/mesasdk-x86_64-linux-24.7.1.tar.gz | \
     tar xzf - -C /opt/
+# set environment variable for MESASDK
 ENV MESASDK_ROOT=/opt/mesasdk
 
-# Need to set shell to bash for source to work as part of MESA install
+# need to set shell to bash for `source` to work as part of MESA install
 SHELL ["/bin/bash", "-c"]
 
-# set OMP_NUM_THREADS to be the number of cores on your machine
-ENV OMP_NUM_THREADS=4
+# copy mesa files to the container
+COPY . .
 
 # set MESA_DIR to be the directory to which you downloaded MESA
 ENV MESA_DIR=/usr/mesa
@@ -47,10 +43,10 @@ ENV PATH=$PATH:$MESA_DIR/scripts/shmesa
 # GYRE 
 ENV GYRE_DIR=$MESA_DIR/gyre/gyre
 
-# Set environment variable to indicate we are in a docker container
+# set environment variable to indicate we are in a docker container
 ENV IN_DOCKER=true
 
-# Print info
+# print info
 RUN echo $MESASDK_ROOT
 RUN echo $MESA_DIR
 RUN echo $OMP_NUM_THREADS
@@ -58,6 +54,6 @@ RUN echo $PATH
 RUN pwd
 RUN ls
 
-# Source MESASDK and install MESA
+# source MESASDK and install MESA
 RUN cd $MESA_DIR && source $MESASDK_ROOT/bin/mesasdk_init.sh && ./install
 CMD ["/bin/bash", "-c", "source /opt/mesasdk/bin/mesasdk_init.sh && exec /bin/bash"]
