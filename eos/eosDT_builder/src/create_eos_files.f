@@ -106,12 +106,10 @@
       real(dp) :: abar,zbar,z53bar,X,Z
 
       real(dp) :: logQ, logRho, logT, Rho, T
-      real(dp) :: logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
-     >      mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction
+      real(dp) :: logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction
       character (len=64) :: fname_prefix
 
-            logical :: helm_only = .false., opal_scvh_only = .false.,
-     >                  opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
+            logical :: helm_only = .false., opal_scvh_only = .false., opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
 
       !opal_only = .true.
       scvh_only = .true.
@@ -154,8 +152,7 @@
       if (X < 0.005d0) then
          write(fname,'(a,a,i1,a)') trim(dir), trim(fname_prefix), floor(100d0*Z + 0.5d0), 'z00x.data'
       else if (X < 1) then
-         write(fname,'(a,a,i1,a,i2,a)') trim(dir), trim(fname_prefix),
-     >            floor(100d0*Z + 0.5d0), 'z', floor(100d0*X + 0.5d0), 'x.data'
+         write(fname,'(a,a,i1,a,i2,a)') trim(dir), trim(fname_prefix), floor(100d0*Z + 0.5d0), 'z', floor(100d0*X + 0.5d0), 'x.data'
       else
          fname = trim(dir) // trim(fname_prefix) // '0z100x.data'
       end if
@@ -198,9 +195,7 @@
                               call do_stop('failed in helm_opal_scvh')
                         end if
 
-            write(io_unit,'(f4.2,3(f10.5),7(1pe13.5),1(0pf9.5),4(0pf10.5),2(0pf11.5))')
-     >         logT, logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
-     >         mu, log10(max(1d-99,free_e)), gamma1, gamma3, grad_ad, eta, HELM_fraction
+            write(io_unit,'(f4.2,3(f10.5),7(1pe13.5),1(0pf9.5),4(0pf10.5),2(0pf11.5))') logT, logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, log10(max(1d-99,free_e)), gamma1, gamma3, grad_ad, eta, HELM_fraction
          end do
 
          write(io_unit,*)
@@ -217,4 +212,3 @@
       end subroutine Make_EoS_Files
 
       end
-

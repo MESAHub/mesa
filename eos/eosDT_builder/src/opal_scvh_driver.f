@@ -141,12 +141,10 @@ c ***********************************************************************
       integer        num_opal_results
       parameter      (num_opal_results = 11)
       double precision opal_results(num_opal_results)
-      double precision t6,r,logRho_lo,logRho_hi,
-     >      logRho_scvh,den_scvh,logT_scvh,temp_scvh,logQ_scvh
+      double precision t6,r,logRho_lo,logRho_hi,logRho_scvh,den_scvh,logT_scvh,temp_scvh,logQ_scvh
       logical :: scvh_okay
       integer :: irad
-      double precision :: pout_opal, dpoutdd_opal, dpoutdt_opal, eout_opal, deoutdd_opal,
-     >      sout_opal, dsoutdd_opal, dsoutdt_opal, pgas_out, prad_out
+      double precision :: pout_opal, dpoutdd_opal, dpoutdt_opal, eout_opal, deoutdd_opal, sout_opal, dsoutdd_opal, dsoutdt_opal, pgas_out, prad_out
 
 !..define the interior boundary between opal and scvh
 
@@ -179,7 +177,7 @@ c ***********************************************************************
       Z = Z_in
       Prad = (crad*temp**4)/3
 
-      if (ifirst .eq. 0) then
+      if (ifirst  ==  0) then
          call setup_scvh(data_dir)
          ifirst = 1
       end if
@@ -254,7 +252,7 @@ c ***********************************************************************
       alfa = 0.5d0 * (1.0d0 - cos(pi * alfa)) ! smooth the transitions
       beta = 1d0 - alfa
 
-      if (alfa .ne. 0D0 .or. opal_only) then
+      if (alfa  /=  0D0 .or. opal_only) then
          t6 = temp * 1d-6
          r = den
          if (include_radiation) then
@@ -328,7 +326,7 @@ c ***********************************************************************
 
       end if
 
-      if (beta .ne. 0D0 .or. scvh_only) then
+      if (beta  /=  0D0 .or. scvh_only) then
          logRho_scvh = logRho; den_scvh = den
          logT_scvh = logT; temp_scvh= temp
          scvh_okay = .false.
@@ -370,7 +368,7 @@ c ***********************************************************************
          end if
       end if
 
-      if (beta .eq. 0d0) then ! just opal
+      if (beta  ==  0d0) then ! just opal
 
          !write(*,*) 'just opal'
          logPgas = logPgas_opal
@@ -389,7 +387,7 @@ c ***********************************************************************
          grad_ad = grad_ad_opal
          logNe = logNe_opal
 
-      else if (alfa .eq. 0d0) then ! just scvh
+      else if (alfa  ==  0d0) then ! just scvh
 
          !write(*,*) 'just scvh'
          logPgas = logPgas_scvh

@@ -123,17 +123,13 @@
          end do
          if (abs(logTs(NlogTs)-logT_max) > 1d-4) call do_stop('read_data_for_scvh expects max logT of 7.06')
 
-         call read_file_for_scvh(data_dir,'scvh/h_tab.asc.data',num_h_pts,NlogPs,NlogTs,
-     >         compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
-         call read_file_for_scvh(data_dir,'scvh/he_tab.asc.data',num_he_pts,NlogPs,NlogTs,
-     >         compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
+         call read_file_for_scvh(data_dir,'scvh/h_tab.asc.data',num_h_pts,NlogPs,NlogTs,compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
+         call read_file_for_scvh(data_dir,'scvh/he_tab.asc.data',num_he_pts,NlogPs,NlogTs,compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
 
 
          if (.false.) then
-            call write_file_for_scvh(data_dir,'scvh/h_tab.new.data',num_h_pts,NlogPs,NlogTs,
-     >         compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
-            call write_file_for_scvh(data_dir,'scvh/he_tab.new.data',num_he_pts,NlogPs,NlogTs,
-     >         compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
+            call write_file_for_scvh(data_dir,'scvh/h_tab.new.data',num_h_pts,NlogPs,NlogTs,compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
+            call write_file_for_scvh(data_dir,'scvh/he_tab.new.data',num_he_pts,NlogPs,NlogTs,compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
 
          end if
 
@@ -276,8 +272,7 @@
       end subroutine read_data_for_scvh
 
 
-      subroutine read_file_for_scvh(data_dir,filename,n,np,nt,
-     >      compv1,compv2,denlog,slog,ulog)
+      subroutine read_file_for_scvh(data_dir,filename,n,np,nt,compv1,compv2,denlog,slog,ulog)
          character (len=*) :: data_dir,filename
          integer,intent(in) :: n,np,nt
          type (scvh_info) ::compv1,compv2,denlog,slog,ulog
@@ -327,19 +322,16 @@
                slog% Z(k,i) = c4
                ulog% Z(k,i) = c5
                kk = k
-            enddo
+            end do
             k_for_MAX_logP(i) = kk
-         enddo
+         end do
          close(unit=1)
          write(*,*) 'close ' // trim(filename)
 
       end subroutine read_file_for_scvh
 
 
-
-
-      subroutine write_file_for_scvh(data_dir,filename,n,np,nt,
-     >      compv1,compv2,denlog,slog,ulog)
+      subroutine write_file_for_scvh(data_dir,filename,n,np,nt,compv1,compv2,denlog,slog,ulog)
          character (len=*) :: data_dir,filename
          integer,intent(in) :: n,np,nt
          type (scvh_info) ::compv1,compv2,denlog,slog,ulog
@@ -370,8 +362,8 @@
                c4 = slog% Z(k,i)
                c5 = ulog% Z(k,i)
                write(1,'(f6.2,2(1pe14.5),3(0pf10.4))') logPs(k),c1,c2,c3,c4,c5
-            enddo
-         enddo
+            end do
+         end do
          close(unit=1)
          write(*,*) 'close ' // trim(filename)
 
@@ -612,8 +604,7 @@
                end if
             end if
             ict(1:3) = 1; ict(4:6) = 0
-            call interp_evbicub_db(
-     >            XI(1),YI(1),logPs,NlogPs,logTs,NlogTs,si% ilinx,si% iliny,si% f1,NlogPs,ict,fval,info)
+            call interp_evbicub_db(XI(1),YI(1),logPs,NlogPs,logTs,NlogTs,si% ilinx,si% iliny,si% f1,NlogPs,ict,fval,info)
             interp_value = fval(1)
             d_dlogP = fval(2)
             d_dlogT = fval(3)
@@ -779,7 +770,7 @@
       dsraddd = 0.0
       dsraddt = 0.0
 
-      if (radmult .ne. 0) then
+      if (radmult  /=  0) then
        prad    = asoli3 * T**4
        dpressraddd = 0.0
        dpressraddt = 4.0d0 * prad * inv_T
@@ -1391,8 +1382,4 @@
 
       end subroutine entropy_of_mixing
 
-
-
-
       end module scvh_core
-

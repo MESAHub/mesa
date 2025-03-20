@@ -24,13 +24,10 @@ c ***********************************************************************
       use chem_def
       implicit none
 
-
       character (len=256) :: data_dir
       integer, parameter :: imax = 261, jmax = 101  ! dimensions of our version of helm table
 
-
       contains
-
 
       subroutine setup_eos
          use helm_alloc
@@ -238,7 +235,7 @@ c ***********************************************************************
 
       beta = 1-alfa
 
-      if (beta .ne. 0D0) then
+      if (beta  /=  0D0) then
          call interpolate_opal_scvh(
      >      opal_only, scvh_only, include_radiation, search_for_SCVH,
      >      logT, logRho, temp, den, abar, zbar, X, Z,
@@ -277,7 +274,7 @@ c ***********************************************************************
 
       end if
 
-      if (alfa .ne. 0D0) then
+      if (alfa  /=  0D0) then
          call get_helmeos(include_radiation)
          if (ierr /= 0) then
             write(*,*) 'failed in get_helmeos'
@@ -285,7 +282,7 @@ c ***********************************************************************
          end if
       end if
 
-      if (alfa .eq. 0d0) then ! no HELM
+      if (alfa  ==  0d0) then ! no HELM
 
          logPgas = logPgas_opalscvh
          logE = logE_opalscvh
@@ -304,7 +301,7 @@ c ***********************************************************************
          grad_ad = grad_ad_opalscvh
          eta = eta_opalscvh
 
-      else if (beta .eq. 0d0) then ! pure HELM
+      else if (beta  ==  0d0) then ! pure HELM
 
          logPgas = logPgas_helm
          logE = logE_helm

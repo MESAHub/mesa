@@ -16,7 +16,7 @@
 
    mdot_scheme = "Kolb"
 
-   use_radiation_corrected_transfer_rate = .false.
+   use_radiation_corrected_transfer_rate = .true.
 
    fr = 0.05
    fr_limit = 1d-2
