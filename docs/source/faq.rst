@@ -16,14 +16,10 @@ Say "MAY-sa".
 Can I use the MESA logo in a talk or presentation?
 --------------------------------------------------
 
-Yes. It is available in a variety of sizes for your convenience.
+Yes. It is available as a PNG or SVG image for your convenience.
 
--  :download:`30 pt </assets/logo/mesa_logo2_30pt.png>`
--  :download:`60 pt </assets/logo/mesa_logo2_60pt.png>`
--  :download:`100 pt </assets/logo/mesa_logo2_100pt.png>`
--  :download:`144 pt </assets/logo/mesa_logo2_144pt.png>`
--  :download:`200 pt </assets/logo/mesa_logo2_200pt.png>`
--  :download:`400 pt </assets/logo/mesa_logo2_400pt.png>`
+-  :download:`PNG </assets/logo/mesa-logo.png>`
+-  :download:`SVG </assets/logo/mesa-logo.svg>`
 
 What happens when an instrument paper is being written?
 -------------------------------------------------------
