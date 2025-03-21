@@ -1,6 +1,5 @@
 !     based on EOS5_xtrin.f from the OPAL release
 
-
 !..***********************************************************************
       subroutine opal_eos (xh_in,ztab_in,t6_in,r_in,iorder,irad,results_out,pgas_out,prad_out,data_dir,info)
 !        xh=hydrogen mass fraction
@@ -118,9 +117,7 @@
       common/lreadco/itime
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos/esact,eos(mv)
@@ -158,37 +155,33 @@
         call readcoeos(filename)
         z=zz(1)
         if (ztab  /=  z) then
-              write (*,'("requested z=",f10.6," EOS5_data is for z=",
-     x             f10.6)')
-     x          ztab,z
+              write (*,'("requested z=",f10.6," EOS5_data is for z=",f10.6)') ztab,z
               stop 1
         end if
 
         if (.false.) then ! report grid
         write(*,*) 't6 logT', 1, t6a(1), log10(t6a(1)*1d6)
         do i=2,nt
-           write(*,*) 't6 logT', i, t6a(i), log10(t6a(i)*1d6),
-     >         log10(t6a(i-1)*1d6) - log10(t6a(i)*1d6)
+           write(*,*) 't6 logT', i, t6a(i), log10(t6a(i)*1d6),log10(t6a(i-1)*1d6) - log10(t6a(i)*1d6)
         end do
         write(*,*)
         stop 1
         write(*,*) 'rho logRho', 1, rho(1), log10(rho(1))
         do i=2,nr
-           write(*,*) 'rho logRho', i, rho(i), log10(rho(i)),
-     >         log10(rho(i)*1d6) - log10(rho(i-1)*1d6)
+           write(*,*) 'rho logRho', i, rho(i), log10(rho(i)),log10(rho(i)*1d6) - log10(rho(i-1)*1d6)
         end do
         write(*,*)
         write(*,*)
         end if
 
-        if(z+xh-1.e-6  >  1 ) go to 61
+        if(z+xh-1.e-6  >  1 ) GOTO 61
       end if
 
 
 !..... Determine T6,rho grid points to use in the
 !      interpolation.
-      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) go to 62
-      if((slr  <  rho(1)).or.(slr  >  rho(nr))) go to 62
+      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) GOTO 62
+      if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
 
 
 
@@ -201,7 +194,7 @@
             else
               ilo=imd
             end if
-          go to 8
+          GOTO 8
         end if
         i=ihi
         mf=i-2
@@ -224,14 +217,14 @@
               imd=(ihi+ilo)/2
               if (slr  ==  rho(imd)) then
                  ihi=imd
-                 go to 13
+                 GOTO 13
               end if
                if(slr  <=  rho(imd)) then
                  ihi=imd
                else
                  ilo=imd
                end if
-             go to 12
+             GOTO 12
           end if
    13     i=ihi
         l1=i-2
@@ -247,14 +240,14 @@
           imd=(ihi+ilo)/2
            if (t6  ==  t6list(1,imd)) then
            ilo=imd
-           go to 14
+           GOTO 14
            end if
             if(t6  <=  t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          go to 11
+          GOTO 11
           end if
    14     i=ilo
         k1=i-2
@@ -313,9 +306,9 @@
           l1=l3-3
           l2=l1+1
           l3=l2+1
-          go to 15
+          GOTO 15
         else
-          go to 65
+          GOTO 65
         end if
       end if
       if (sum23  <  1.e+30) ip=3
@@ -341,24 +334,21 @@
          end do
   123 continue
       if((zz(mg)  /=  zz(mf)) .or. (zz(mh)  /=  zz(mf))) then
-        write(*,'("Z does not match Z in EOS5_data files you are"
-     x ," using")')
+        write(*,'("Z does not match Z in EOS5_data files you are using")')
         stop 1
       end if
-      if(z  /=  zz(mf)) go to 66
+      if(z  /=  zz(mf)) GOTO 66
       is=0
       iw=1
       do 45 ir=l1,l1+iq
         do it=k1,k1+ip
           if (mf2  ==  1) then
             esk(it,ir)=epl(mf,it,ir)
-            go to 46
+            GOTO 46
           end if
-          esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir)
-     x      ,epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+          esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir),epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
           if(esk(it,ir)  >  1.e+20) then
-            write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir
-     x         ,l3,k3,iq,ip
+            write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir,l3,k3,iq,ip
             write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mf,mf+2)
           end if
           is=1
@@ -372,18 +362,15 @@
          dixr=(xx(mh)-xh)*dfsx(mh)
          do 47 ir=l1,l1+iq
            do it=k1,k1+ip
-             esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir)
-     x         ,epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
+             esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir),epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
              if(esk(it,ir)  >  1.d+20) then
-             write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir
-     x         ,l3,k3,iq,ip
+             write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir,l3,k3,iq,ip
              write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mg,mg+2)
              end if
              esk(it,ir)=esk(it,ir)*dixr+esk2(it,ir)*(1.-dixr)
              is=1
            end do
    47 continue
-
 
       end if
 
@@ -427,11 +414,9 @@
       stop 1
    66 continue
       info = -66; return
-      write(*,'(" Z does not match Z in EOS5_data* files you are",
-     . " using (66)")')
+      write(*,'(" Z does not match Z in EOS5_data* files you are using (66)")')
       write (*,'("mf,zz(mf)=",i5,e12.4)') mf,zz(mf)
-      write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)')
-     x ip,iq,k3,l3,xh,t6,r,z
+      write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)') ip,iq,k3,l3,xh,t6,r,z
       stop 1
       return
       end
@@ -443,9 +428,7 @@
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos/esact,eos(mv)
 
@@ -455,12 +438,10 @@
       do kx=k1,k1+ip
           iw=1
         iu=iu+1
-        h(iu)=quadeos(is,iw,slr,esk(kx,l1),esk(kx,l2),esk(kx,l3),
-     x  rho(l1),rho(l2),rho(l3))
+        h(iu)=quadeos(is,iw,slr,esk(kx,l1),esk(kx,l2),esk(kx,l3),rho(l1),rho(l2),rho(l3))
           if(iq. eq. 3) then
             iw=2
-            q(iu)=quadeos(is,iw,slr,esk(kx,l2),esk(kx,l3),esk(kx,l4),
-     x      rho(l2),rho(l3),rho(l4))
+            q(iu)=quadeos(is,iw,slr,esk(kx,l2),esk(kx,l3),esk(kx,l4),rho(l2),rho(l3),rho(l4))
           end if
         is=1
       end do
@@ -471,13 +452,11 @@
       esact=quadeos(is,iw,slt,h(1),h(2),h(3),t6a(k1),t6a(k2),t6a(k3))
         if (iq. eq. 3) then
 !.....    eos(i) upper-right 3x3(i=i1+1,i1+3 j=j1,j1+2)
-          esactq=quadeos(is,iw,slt,q(1),q(2),q(3),t6a(k1),t6a(k2),
-     x           t6a(k3))
+          esactq=quadeos(is,iw,slt,q(1),q(2),q(3),t6a(k1),t6a(k2),t6a(k3))
         end if
         if(ip  ==  3) then
 !.....    eos(i) in lower-left 3x3.
-          esact2=quadeos(is,iw,slt,h(2),h(3),h(4),t6a(k2),t6a(k3),
-     x           t6a(k4))
+          esact2=quadeos(is,iw,slt,h(2),h(3),h(4),t6a(k2),t6a(k3),t6a(k4))
 !.....    eos(i) smoothed in left 3x4
           dix=(t6a(k3)-slt)*dfs(k3)
           esact=esact*dix+esact2*(1.-dix)
@@ -485,8 +464,7 @@
         if(iq  ==  3) then
 
 !.....     eos(i) in upper-right 3x3.
-          esactq2=quadeos(is,iw,slt,q(2),q(3),q(4),t6a(k2),t6a(k3),
-     x            t6a(k4))
+          esactq2=quadeos(is,iw,slt,q(2),q(3),q(4),t6a(k2),t6a(k3),t6a(k4))
           esactq=esactq*dix+esactq2*(1.-dix)
         end if
         end if  ! loc a
@@ -499,12 +477,10 @@
             end if
         end if
         if (esact  >  1.e+15) then
-          write(*,'("Interpolation indices out of range",
-     x              ";please report conditions.")')
+          write(*,'("Interpolation indices out of range; please report conditions.")')
           stop 1
         end if
 
-      return
       end
 
 
@@ -517,20 +493,13 @@
       real moles
       character*1 blank
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       common/eeos/esact,eos(mv)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
-      common/eeeeos/moles(mx),xin(mx),tmass(mx),icycuse(mx,nr),
-     x    rhogr(mx,nr),frac(mx,6),
-     x    alogr(nr,nt)
-
-
+      common/eeeeos/moles(mx),xin(mx),tmass(mx),icycuse(mx,nr),rhogr(mx,nr),frac(mx,6),alogr(nr,nt)
 
       blank=' '
-
 
         if (itimeco  /=  12345678) then
         do i=1,mx
@@ -560,36 +529,29 @@
 
 
       do 3 m=1,mx
-      read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)')
-     x  xin(m),zz(m),moles(m),tmass(m)
-      read (2,'(21x,e14.7,4x,e14.7,3x,e11.4,3x,e11.4,3x,e11.4,
-     x 4x,e11.4)') (frac(m,i),i=1,6)
+      read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)') xin(m),zz(m),moles(m),tmass(m)
+      read (2,'(21x,e14.7,4x,e14.7,3x,e11.4,3x,e11.4,3x,e11.4,4x,e11.4)') (frac(m,i),i=1,6)
       read (2,'(a)') blank
       do 2 jcs=1,nr
-      read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs)
-     x  ,dum,dum,rhogr(m,jcs)
+      read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs),dum,dum,rhogr(m,jcs)
       if(numtot  /=  jcs) then
-         write (*,'(" Data file incorrect: numtot,jcs= ",2i5)')
-     x     numtot,jcs
+         write (*,'(" Data file incorrect: numtot,jcs= ",2i5)') numtot,jcs
          stop 1
       end if
       read(2,'(a)') blank
       read(2,'(a)') blank
       if (icycuse(m,jcs)  <  nta(jcs)) then
-!         write (*,'("problem with data files: X=",f6.4," density=",
-!     x      e14.4)') xin(m), rhogr(m,jcs)
+!         write (*,'("problem with data files: X=",f6.4," density=",e14.4)') xin(m), rhogr(m,jcs)
          write (*,*) 'problem with ', filename
          stop 1
       end if
       do  i=1,icycuse(m,jcs)
       if (i  >  nta(jcs)) then
          read (2,'(a)') blank
-         go to 4
+         GOTO 4
       end if
       ! change to read mu_M and logNe as part of xz table
-      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)')
-     x t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),
-     x (xz(m,index(iv),i,jcs),iv=1,9)
+      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),(xz(m,index(iv),i,jcs),iv=1,9)
     4 continue
       end do
       read(2,'(a)') blank
@@ -601,8 +563,7 @@
 
       do i=1,nt
          if(t6list(1,i)  ==  0.0) then
-            write(*,'("READCOEOS: Error:",i4,
-     $           "-th T6 value is zero")') i
+            write(*,'("READCOEOS: Error:",i4,"-th T6 value is zero")') i
             stop 1
          end if
          t6a(i)=t6list(1,i)
@@ -620,15 +581,13 @@
       end do
 !       call system ('gzip EOS5_data')
 
-      return
       end
 
 !..*********************************************************************
       function quadeos(ic,i,x,y1,y2,y3,x1,x2,x3)
 !..... this function performs a quadratic interpolation.
       save
-      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30)
-     . ,xx1pxx2(30)
+      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3
@@ -653,8 +612,7 @@
 !..****************************************************************8
       function gmass(x,z,amoles,eground,fracz,frac)
       dimension anum(6),frac(7), amas(7),eion(7)
-      data (eion(i),i=1,6)/-3394.873554,-1974.86545,-1433.92718,
-     x  -993.326315,-76.1959403,-15.29409/
+      data (eion(i),i=1,6)/-3394.873554,-1974.86545,-1433.92718,-993.326315,-76.1959403,-15.29409/
       data (anum(i),i=1,6)/10.,8.,7.,6.,2.,1./
       xc=0.247137766
       xn=.0620782
@@ -702,9 +660,7 @@
       common/eeos/esact,eos(mv)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
 
-      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/,
-     x unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/
-     x , sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
+      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
 ! Physical constants
 !       Na=6.0221367e+23
@@ -762,8 +718,7 @@
 
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
 !..---Add difference between EOS with and without radiation.  cvtt
 !       calculation is not accurate enough to give accurate results using
 !       eq. 16.16 Landau&Lifshitz (SEE line labeled DIRECT)
@@ -774,8 +729,7 @@
 !..---End EOS calculations with radiation
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
       eos(iri(1))=pt
       eos(iri(2))=et
       eos(iri(3))=st

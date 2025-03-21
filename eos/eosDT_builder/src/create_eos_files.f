@@ -21,35 +21,23 @@
 ! ***********************************************************************
 
       program create_eosDT_files
-            use eos_def
-            use helm
-            use helm_alloc
-            use helm_opal_scvh_driver
-            use const_def
+      use eos_def
+      use helm
+      use helm_alloc
+      use helm_opal_scvh_driver
+      use const_def
       use const_lib
 
       implicit none
 
-
-
-      real(dp) ::
-     >      del_logT = 0.02d0,
-     >      del_logQ = 0.03d0,
-     >      logT_min = 2.1d0,
-     >      logT_rad_max = 8.2d0,
-     >      logT_no_rad_max = 7.7d0,
-     >      logQ_min = -10.09d0,
-     >      logQ_max = 5.69d0,
-     >      logRho_min = -14d0
-
+      real(dp) :: del_logT = 0.02d0, del_logQ = 0.03d0, logT_min = 2.1d0, logT_rad_max = 8.2d0, logT_no_rad_max = 7.7d0, logQ_min = -10.09d0, logQ_max = 5.69d0, logRho_min = -14d0
       real(dp) :: logT_max
 
-
-            integer, parameter :: version_number = 51 ! update this to force rebuilding of caches
-            ! update min_version in eosDT_load_tables to force rebuild of data files
+      integer, parameter :: version_number = 51 ! update this to force rebuilding of caches
+      ! update min_version in eosDT_load_tables to force rebuild of data files
 
       integer :: ix, io_unit, ios, info, irad
-            real(dp) :: whichz
+      real(dp) :: whichz
 
       ! control what is done by saving the Z in whichz.txt and, if necessary, setting the Xs below
 
@@ -83,9 +71,7 @@
 
       call free_helm_table(eos_ht)
 
-
       contains
-
 
       subroutine do_stop(str)
          character (len=*) :: str
@@ -95,7 +81,7 @@
 
 
       subroutine Make_EoS_Files(Z_in, X_in, include_radiation)
-            use helm_opal_scvh_driver
+      use helm_opal_scvh_driver
 
       real(dp), intent(in) :: Z_in, X_in
       logical, intent(in) :: include_radiation
@@ -104,12 +90,11 @@
       integer :: io_unit, i, j, num_logTs, num_logQs, info
 
       real(dp) :: abar,zbar,z53bar,X,Z
-
       real(dp) :: logQ, logRho, logT, Rho, T
       real(dp) :: logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction
       character (len=64) :: fname_prefix
 
-            logical :: helm_only = .false., opal_scvh_only = .false., opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
+      logical :: helm_only = .false., opal_scvh_only = .false., opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
 
       !opal_only = .true.
       scvh_only = .true.
@@ -121,7 +106,7 @@
       call get_composition_info(X, Z, abar, zbar, z53bar)
 
 !..other initialization
-            info = 0
+      info = 0
 
       if (opal_only) then
          fname_prefix = '/eosOPAL_data/mesa-OPAL_0'
@@ -161,22 +146,16 @@
 
       open(unit=io_unit,file=trim(fname))
 
-      write(io_unit,'(99(a14))') 'version', 'X', 'Z', 'num logTs', 'logT min', 'logT max', 'del logT',
-     1            'num logQs', 'logQ min', 'logQ max', 'del logQ'
+      write(io_unit,'(99(a14))') 'version', 'X', 'Z', 'num logTs', 'logT min', 'logT max', 'del logT','num logQs', 'logQ min', 'logQ max', 'del logQ'
 
-      write(io_unit,'(i14,2f14.4,2(i10,4x,3(f14.4)))')
-     >      version_number, X, Z, num_logTs, logT_min, logT_max, del_logT,
-     >            num_logQs, logQ_min, logQ_max, del_logQ
+      write(io_unit,'(i14,2f14.4,2(i10,4x,3(f14.4)))') version_number, X, Z, num_logTs, logT_min, logT_max, del_logT, num_logQs, logQ_min, logQ_max, del_logQ
 
       do i = 1, num_logQs
          logQ = logQ_min + (i-1) * del_logQ
 
          write(io_unit,'(/,7x,a)') 'logQ = logRho - 2*logT + 12'
          write(io_unit,'(2x,f14.6/)') logQ
-         write(io_unit,'(a4,1x,3(a9,1x),7(a12,1x),1(a7,1x),1(a11),3(a9,1x),2(a9,1x))')
-     >            'logT', 'logPgas', 'logE', 'logS', 'chiRho', 'chiT',
-     >            'Cp', 'Cv', 'dE_dRho', 'dS_dT', 'dS_dRho',
-     >            'mu', 'log_free_e', 'gamma1', 'gamma3', 'grad_ad', 'eta', 'HELM'
+         write(io_unit,'(a4,1x,3(a9,1x),7(a12,1x),1(a7,1x),1(a11),3(a9,1x),2(a9,1x))') 'logT', 'logPgas', 'logE', 'logS', 'chiRho', 'chiT','Cp', 'Cv', 'dE_dRho', 'dS_dT', 'dS_dRho','mu', 'log_free_e', 'gamma1', 'gamma3', 'grad_ad', 'eta', 'HELM'
 
          do j = 1, num_logTs
             logT = logT_min + (j-1) * del_logT
@@ -184,11 +163,7 @@
             logRho = max(logRho_min,logQ + 2*logT - 12d0)
             Rho = 10**logRho
             info = 0
-            call helm_opal_scvh(
-     >            helm_only, opal_scvh_only, opal_only, scvh_only, search_for_SCVH,
-     >                        include_radiation, logT, logRho, T, Rho, abar, zbar, z53bar, X, Z,
-     >            logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
-     >            mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction, data_dir, info)
+            call helm_opal_scvh(helm_only, opal_scvh_only, opal_only, scvh_only, search_for_SCVH, include_radiation, logT, logRho, T, Rho, abar, zbar, z53bar, X, Z, logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction, data_dir, info)
                         if (info /= 0) then
                               write(*,*) 'logT', logT
                               write(*,*) 'logRho', logRho

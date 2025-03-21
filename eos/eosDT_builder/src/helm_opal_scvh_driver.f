@@ -1,4 +1,4 @@
-c ***********************************************************************
+! ***********************************************************************
 !
 !   Copyright (C) 2006, 2007, 2008  Bill Paxton, Frank Timmes
 !
@@ -18,7 +18,7 @@ c ***********************************************************************
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-c ***********************************************************************
+! ***********************************************************************
 
       module helm_opal_scvh_driver
       use chem_def
@@ -132,28 +132,20 @@ c ***********************************************************************
          chem_id(i) = img24
          xmass(i) = Z * Zfrac_Mg
 
-         call basic_composition_info(
-     >      ionmax, chem_id, xmass, X, Y, Z,
-     >      abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
+         call basic_composition_info(ionmax, chem_id, xmass, X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
 
       end subroutine get_composition_info
 
 
-      subroutine helm_opal_scvh(
-     >               helm_only, opal_scvh_only, opal_only, scvh_only, search_for_SCVH,
-     >               include_radiation, logT, logRho, temp, den, abar, zbar, z53bar, X, Z,
-     >               logPgas, logE, logS, chiRho, chiT,
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
-     >               mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction,
-     >               data_dir, ierr)
+      subroutine helm_opal_scvh(helm_only, opal_scvh_only, opal_only, scvh_only, search_for_SCVH,include_radiation, logT, logRho, temp, den, abar, zbar, z53bar, X, Z,logPgas, logE, logS, chiRho, chiT,Cp, Cv, dE_dRho, dS_dT, dS_dRho,mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction,data_dir, ierr)
 
-!     >     helm_only, opal_scvh_only, opal_only, scvh_only,
-!     >      include_radiation,logT,logRho,temp,den,abar,zbar,X,Z,
-!     >      pout,dpoutdd,dpoutdt,
-!     >      eout,deoutdd,gamma3,
-!     >      sout,dsoutdd,dsoutdt,
-!     >      xout,dxoutdd,dxoutdt,
-!     >      mu_M_out,logNe_out,eta_ele_out,data_dir,ierr)
+!           helm_only, opal_scvh_only, opal_only, scvh_only, &
+!            include_radiation,logT,logRho,temp,den,abar,zbar,X,Z, &
+!            pout,dpoutdd,dpoutdt, &
+!            eout,deoutdd,gamma3, &
+!            sout,dsoutdd,dsoutdt, &
+!            xout,dxoutdd,dxoutdt, &
+!            mu_M_out,logNe_out,eta_ele_out,data_dir,ierr)
 
       use eos_def
       use helm
@@ -167,13 +159,9 @@ c ***********************************************************************
 
 !..mixes the helmholtz and opal_scvh equation of state
 
-      logical, intent(in) :: helm_only, opal_scvh_only, opal_only,
-     >      scvh_only, search_for_SCVH, include_radiation
+      logical, intent(in) :: helm_only, opal_scvh_only, opal_only,scvh_only, search_for_SCVH, include_radiation
       double precision, intent(in) :: logT,logRho,temp,den,abar,zbar,z53bar,X,Z
-      double precision, intent(out) ::
-     >               logPgas, logE, logS, chiRho, chiT,
-     >               Cp, Cv, dE_dRho, dS_dT, dS_dRho,
-     >               mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction
+      double precision, intent(out) :: logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction
       character (len=*), intent(in) ::  data_dir
       integer, intent(out) :: ierr
 
@@ -183,14 +171,7 @@ c ***********************************************************************
       include "eos_regions_defs.dek"
 
 
-      double precision :: logNe,
-     >   logPgas_helm, logE_helm, logS_helm, chiRho_helm, chiT_helm,
-     >   Cp_helm, Cv_helm, dE_dRho_helm, dS_dT_helm, dS_dRho_helm,
-     >   mu_helm, gamma1_helm, gamma3_helm, grad_ad_helm, logNe_helm, eta_helm,
-     >   logPgas_opalscvh, logE_opalscvh, logS_opalscvh, chiRho_opalscvh, chiT_opalscvh,
-     >   Cp_opalscvh, Cv_opalscvh, dE_dRho_opalscvh, dS_dT_opalscvh, dS_dRho_opalscvh,
-     >   mu_opalscvh, logNe_opalscvh, gamma1_opalscvh, gamma3_opalscvh, grad_ad_opalscvh,
-     >   eta_opalscvh
+      double precision :: logNe,logPgas_helm, logE_helm, logS_helm, chiRho_helm, chiT_helm,Cp_helm, Cv_helm, dE_dRho_helm, dS_dT_helm, dS_dRho_helm,mu_helm, gamma1_helm, gamma3_helm, grad_ad_helm, logNe_helm, eta_helm,logPgas_opalscvh, logE_opalscvh, logS_opalscvh, chiRho_opalscvh, chiT_opalscvh,Cp_opalscvh, Cv_opalscvh, dE_dRho_opalscvh, dS_dT_opalscvh, dS_dRho_opalscvh,mu_opalscvh, logNe_opalscvh, gamma1_opalscvh, gamma3_opalscvh, grad_ad_opalscvh, eta_opalscvh
 
       integer iregion
       double precision :: pa,pb,ea,eb,sa,sb
@@ -207,8 +188,8 @@ c ***********************************************************************
 
 
 !..loading the opal_scvh tables
-      integer          ifirst
-      data             ifirst/0/
+      integer :: ifirst
+      data ifirst/0/
 
 
       double precision :: helm_res(num_helm_results), dlnPgas_dlnY, Pgas, Prad
@@ -236,14 +217,7 @@ c ***********************************************************************
       beta = 1-alfa
 
       if (beta  /=  0D0) then
-         call interpolate_opal_scvh(
-     >      opal_only, scvh_only, include_radiation, search_for_SCVH,
-     >      logT, logRho, temp, den, abar, zbar, X, Z,
-     >      logPgas_opalscvh, logE_opalscvh, logS_opalscvh, chiRho_opalscvh, chiT_opalscvh,
-     >      Cp_opalscvh, Cv_opalscvh, dE_dRho_opalscvh, dS_dT_opalscvh, dS_dRho_opalscvh,
-     >      mu_opalscvh, logNe_opalscvh, gamma1_opalscvh, gamma3_opalscvh, grad_ad_opalscvh,
-     >      eta_opalscvh, dlnPgas_dlnY,
-     >      data_dir, ierr)
+         call interpolate_opal_scvh(opal_only, scvh_only, include_radiation, search_for_SCVH,logT, logRho, temp, den, abar, zbar, X, Z,logPgas_opalscvh, logE_opalscvh, logS_opalscvh, chiRho_opalscvh, chiT_opalscvh,Cp_opalscvh, Cv_opalscvh, dE_dRho_opalscvh, dS_dT_opalscvh, dS_dRho_opalscvh,mu_opalscvh, logNe_opalscvh, gamma1_opalscvh, gamma3_opalscvh, grad_ad_opalscvh,eta_opalscvh, dlnPgas_dlnY,data_dir, ierr)
 
          Pgas = 10d0**logPgas_opalscvh
          Prad = crad*temp**4/3
@@ -251,14 +225,7 @@ c ***********************************************************************
          if (ierr /= 0) then
             if (scvh_only) then ! try opal
                ierr = 0
-               call interpolate_opal_scvh(
-     >            .true., .false., include_radiation, search_for_SCVH,
-     >            logT, logRho, temp, den, abar, zbar, X, Z,
-     >            logPgas_opalscvh, logE_opalscvh, logS_opalscvh, chiRho_opalscvh, chiT_opalscvh,
-     >            Cp_opalscvh, Cv_opalscvh, dE_dRho_opalscvh, dS_dT_opalscvh, dS_dRho_opalscvh,
-     >            mu_opalscvh, logNe_opalscvh, gamma1_opalscvh, gamma3_opalscvh, grad_ad_opalscvh,
-     >            eta_opalscvh, dlnPgas_dlnY,
-     >            data_dir, ierr)
+               call interpolate_opal_scvh(.true., .false., include_radiation, search_for_SCVH,logT, logRho, temp, den, abar, zbar, X, Z,logPgas_opalscvh, logE_opalscvh, logS_opalscvh, chiRho_opalscvh, chiT_opalscvh,Cp_opalscvh, Cv_opalscvh, dE_dRho_opalscvh, dS_dT_opalscvh, dS_dRho_opalscvh,mu_opalscvh, logNe_opalscvh, gamma1_opalscvh, gamma3_opalscvh, grad_ad_opalscvh,eta_opalscvh, dlnPgas_dlnY, data_dir, ierr)
                Pgas = 10d0**logPgas_opalscvh
                Prad = crad*temp**4/3
                call check_results
@@ -341,15 +308,7 @@ c ***********************************************************************
 
          else
 
-            call blend(
-     >         alfa, beta, den, temp, Prad,
-     >         logPgas_helm, logPgas_opalscvh,
-     >         logS_helm, logS_opalscvh, dS_dT_helm, dS_dT_opalscvh, dS_dRho_helm, dS_dRho_opalscvh,
-     >         chiT_helm, chiT_opalscvh, chiRho_helm, chiRho_opalscvh, mu_helm, mu_opalscvh, logNe_helm, logNe_opalscvh,
-     >         logE_helm, logE_opalscvh, Cv_helm, Cv_opalscvh, dE_dRho_helm, dE_dRho_opalscvh,
-     >         gamma1_helm, gamma1_opalscvh, gamma3_helm, gamma3_opalscvh, grad_ad_helm, grad_ad_opalscvh,
-     >         logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,
-     >         mu, gamma1, gamma3, grad_ad, logNe)
+            call blend(   alfa, beta, den, temp, Prad,   logPgas_helm, logPgas_opalscvh,   logS_helm, logS_opalscvh, dS_dT_helm, dS_dT_opalscvh, dS_dRho_helm, dS_dRho_opalscvh,   chiT_helm, chiT_opalscvh, chiRho_helm, chiRho_opalscvh, mu_helm, mu_opalscvh, logNe_helm, logNe_opalscvh,   logE_helm, logE_opalscvh, Cv_helm, Cv_opalscvh, dE_dRho_helm, dE_dRho_opalscvh,   gamma1_helm, gamma1_opalscvh, gamma3_helm, gamma3_opalscvh, grad_ad_helm, grad_ad_opalscvh,   logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho,   mu, gamma1, gamma3, grad_ad, logNe)
 
          end if
 
@@ -361,10 +320,7 @@ c ***********************************************************************
       eta = min(200d0, eta)
       free_e = 10**logNe / (avo * den) ! convert to mean number of free electrons per nucleon
 
-      if (is_bad_num(logPgas) .or. is_bad_num(logE) .or. is_bad_num(logS) .or.
-     >      is_bad_num(chiRho) .or. is_bad_num(chiT) .or. is_bad_num(Cp) .or.
-     >      is_bad_num(gamma1) .or. is_bad_num(gamma3) .or. is_bad_num(grad_ad) .or.
-     >      logPgas < -50d0) then
+      if (is_bad_num(logPgas) .or. is_bad_num(logE) .or. is_bad_num(logS) .or. is_bad_num(chiRho) .or. is_bad_num(chiT) .or. is_bad_num(Cp) .or. is_bad_num(gamma1) .or. is_bad_num(gamma3) .or. is_bad_num(grad_ad) .or. logPgas < -50d0) then
          write(*,1) 'HELM_fraction', HELM_fraction
          write(*,1) 'logT', logT
          write(*,1) 'logRho', logRho
@@ -395,30 +351,7 @@ c ***********************************************************************
 
       subroutine check_results
          include 'formats'
-         if (is_bad_num(logPgas_opalscvh) .or.
-     >       is_bad_num(logE_opalscvh) .or.
-     >       is_bad_num(logS_opalscvh) .or.
-     >       is_bad_num(chiRho_opalscvh) .or.
-     >       is_bad_num(chiT_opalscvh) .or.
-     >       is_bad_num(Cp_opalscvh) .or.
-     >       is_bad_num(Cv_opalscvh) .or.
-     >       is_bad_num(dE_dRho_opalscvh) .or.
-     >       is_bad_num(dS_dT_opalscvh) .or.
-     >       is_bad_num(dS_dRho_opalscvh) .or.
-     >       is_bad_num(mu_opalscvh) .or.
-     >       is_bad_num(logNe_opalscvh) .or.
-     >       is_bad_num(gamma1_opalscvh) .or.
-     >       is_bad_num(gamma3_opalscvh) .or.
-     >       is_bad_num(grad_ad_opalscvh) .or.
-     >       is_bad_num(eta_opalscvh) .or.
-     >       Cv_opalscvh <= 0d0 .or.
-     >       logPgas_opalscvh <= -50d0 .or.
-     >       logE_opalscvh <= -50d0 .or.
-     >       logS_opalscvh <= -50d0 .or.
-     >       logPgas_opalscvh <= -50d0 .or.
-     >       gamma1_opalscvh <= 1d0 .or.
-     >       gamma1_opalscvh >= 2d0 .or.
-     >       grad_ad_opalscvh >= 50d0) then
+         if (is_bad_num(logPgas_opalscvh) .or. is_bad_num(logE_opalscvh) .or. is_bad_num(logS_opalscvh) .or. is_bad_num(chiRho_opalscvh) .or. is_bad_num(chiT_opalscvh) .or. is_bad_num(Cp_opalscvh) .or. is_bad_num(Cv_opalscvh) .or. is_bad_num(dE_dRho_opalscvh) .or. is_bad_num(dS_dT_opalscvh) .or. is_bad_num(dS_dRho_opalscvh) .or. is_bad_num(mu_opalscvh) .or. is_bad_num(logNe_opalscvh) .or. is_bad_num(gamma1_opalscvh) .or. is_bad_num(gamma3_opalscvh) .or. is_bad_num(grad_ad_opalscvh) .or. is_bad_num(eta_opalscvh) .or. Cv_opalscvh <= 0d0 .or. logPgas_opalscvh <= -50d0 .or. logE_opalscvh <= -50d0 .or. logS_opalscvh <= -50d0 .or. logPgas_opalscvh <= -50d0 .or. gamma1_opalscvh <= 1d0 .or. gamma1_opalscvh >= 2d0 .or. grad_ad_opalscvh >= 50d0) then
             ierr = -1
             !write(*,*) 'bail to HELM for logT logRho logQ', logT, logRho, logRho - 2*logT + 12
             if (.false.) then
@@ -452,9 +385,7 @@ c ***********************************************************************
          ! HELM supported a fake ionization mode that no longer exists
          ! it blended between neutral and ionized over logT = [4.5,5.0]
 
-         call helmeos2(temp, logT, den, logRho, abar, zbar,
-     >            1d6, 1d3, helm_res, clip_to_table_boundaries, .true.,
-     >            include_elec_pos, off_table, ierr)
+         call helmeos2(temp, logT, den, logRho, abar, zbar, 1d6, 1d3, helm_res, clip_to_table_boundaries, .true., include_elec_pos, off_table, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in helmeos2'
             write(*,1) 'temp', temp

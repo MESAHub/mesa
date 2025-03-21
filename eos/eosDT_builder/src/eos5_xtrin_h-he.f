@@ -61,9 +61,7 @@
       common/lreadco_hhe/itime
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos_hhe/  xz(mx,mv,nt,nr), t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
       common/bbeos_hhe/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos_hhe/esact,eos(mv)
@@ -107,20 +105,18 @@
         call readcoeos_hhe(filename)
         z=zz(1)
         if (abs(ztab-z)  >  0.00001) then
-        write (*,'("requested z=",f10.6," EOS5_data_H-He is for z=",
-     x             f10.6)')
-     x    ztab,z
+        write (*,'("requested z=",f10.6," EOS5_data_H-He is for z=", f10.6)') ztab,z
         stop
         end if
 
-        if(z+xh-1.e-6  >  1 ) go to 61
+        if(z+xh-1.e-6  >  1 ) GOTO 61
       end if
 
 
 !..... Determine T6,rho grid points to use in the
 !      interpolation.
-      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) go to 62
-      if((slr  <  rho(1)).or.(slr  >  rho(nr))) go to 62
+      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) GOTO 62
+      if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
 
 
 
@@ -134,7 +130,7 @@
             else
               ilo=imd
             end if
-          go to 8
+          GOTO 8
         end if
         i=ihi
         mf=i-2
@@ -157,14 +153,14 @@
           imd=(ihi+ilo)/2
            if (slr  ==  rho(imd)) then
            ihi=imd
-           go to 13
+           GOTO 13
            end if
             if(slr  <=  rho(imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          go to 12
+          GOTO 12
           end if
    13     i=ihi
         l1=i-2
@@ -180,14 +176,14 @@
           imd=(ihi+ilo)/2
            if (t6  ==  t6list(1,imd)) then
            ilo=imd
-           go to 14
+           GOTO 14
            end if
             if(t6  <=  t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          go to 11
+          GOTO 11
           end if
    14     i=ilo
         k1=i-2
@@ -248,9 +244,9 @@
           l1=l3-3
           l2=l1+1
           l3=l2+1
-          go to 15
+          GOTO 15
             else
-          go to 65
+          GOTO 65
         end if
       end if
       if (sum23  <  1.e+30) ip=3
@@ -279,24 +275,21 @@ c__________
       end do
   123 continue
       if((zz(mg)  /=  zz(mf)) .or. (zz(mh)  /=  zz(mf))) then
-        write(*,'("Z does not match Z in EOS5_data_H-He files you are"
-     x ," using")')
+        write(*,'("Z does not match Z in EOS5_data_H-He files you are using")')
         stop
       end if
-      if(z  /=  zz(mf)) go to 66
+      if(z  /=  zz(mf)) GOTO 66
       is=0
       iw=1
       do 45 ir=l1,l1+iq
         do it=k1,k1+ip
           if (mf2  ==  1) then
           esk(it,ir)=epl(mf,it,ir)
-          go to 46
+          GOTO 46
           end if
-          esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir)
-     x    ,epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+          esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir),epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
           if(esk(it,ir)  >  1.e+20) then
-          write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir
-     x    ,l3,k3,iq,ip
+          write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir,l3,k3,iq,ip
           write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mf,mf+2)
           end if
           is=1
@@ -310,11 +303,9 @@ c__________
        dixr=(xx(mh)-xh)*dfsx(mh)
       do 47 ir=l1,l1+iq
         do it=k1,k1+ip
-          esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir)
-     x    ,epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
+          esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir),epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
           if(esk(it,ir)  >  1.e+20) then
-          write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir
-     x    ,l3,k3,iq,ip
+          write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir,l3,k3,iq,ip
           write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mg,mg+2)
           end if
           esk(it,ir)=esk(it,ir)*dixr+esk2(it,ir)*(1.-dixr)
@@ -370,8 +361,7 @@ c__________
       stop 1
    66 continue
       info = -66; return
-      write(*,'(" Z does not match Z in EOS5_data* files you are",
-     . " using (66)")')
+      write(*,'(" Z does not match Z in EOS5_data* files you are using (66)")')
       write (*,'("mf,zz(mf)=",i5,e12.4)') mf,zz(mf)
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)') ip,iq,k3,l3,xh,t6,r,z
       stop 1
@@ -385,9 +375,7 @@ c__________
       parameter (mx=6,mv=12,nr=169,nt=197)
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos_hhe/  xz(mx,mv,nt,nr), t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos_hhe/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos_hhe/esact,eos(mv)
 
@@ -453,20 +441,13 @@ c__________
       real moles
       character*1 blank
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos_hhe/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
       common/eeos_hhe/esact,eos(mv)
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
-      common/eeeeos_hhe/moles(mx),xin(mx),tmass(mx),icycuse(mx,nr),
-     x    amu_M(mx,nr),alogNe(mx,nr),rhogr(mx,nr),frac(mx,6),
-     x    alogr(nr,nt)
-
-
+      common/eeeeos_hhe/moles(mx),xin(mx),tmass(mx),icycuse(mx,nr),amu_M(mx,nr),alogNe(mx,nr),rhogr(mx,nr),frac(mx,6),alogr(nr,nt)
 
       blank=' '
-
 
         if (itimeco  /=  12345678) then
         do i=1,mx
@@ -496,24 +477,19 @@ c__________
 
 
       do 3 m=1,mx
-      read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)')
-     x  xin(m),zz(m),moles(m),tmass(m)
-      read (2,'(21x,e14.7,4x,e14.7,3x,e11.4,3x,e11.4,3x,e11.4,
-     x 4x,e11.4)') (frac(m,i),i=1,6)
+      read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)') xin(m),zz(m),moles(m),tmass(m)
+      read (2,'(21x,e14.7,4x,e14.7,3x,e11.4,3x,e11.4,3x,e11.4,4x,e11.4)') (frac(m,i),i=1,6)
       read (2,'(a)') blank
       do 2 jcs=1,nr
-      read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs)
-     x  ,dum,dum,rhogr(m,jcs)
+      read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs),dum,dum,rhogr(m,jcs)
       if(numtot  /=  jcs) then
-         write (*,'(" Data file incorrect: numtot,jcs= ",2i5)')
-     x     numtot,jcs
+         write (*,'(" Data file incorrect: numtot,jcs= ",2i5)') numtot,jcs
          stop
       end if
       read(2,'(a)') blank
       read(2,'(a)') blank
       if (icycuse(m,jcs)  <  nta(jcs)) then
-!         write (*,'("problem with data files: X=",f6.4," density=",
-!     x      e14.4)') xin(m), rhogr(m,jcs)
+!         write (*,'("problem with data files: X=",f6.4," density=",e14.4)') xin(m), rhogr(m,jcs)
          write (*,*) 'problem with ', filename
          write (*,*) 'm', m
          write (*,*) 'jcs', jcs
@@ -525,14 +501,12 @@ c__________
       do  i=1,icycuse(m,jcs)
       if (i  >  nta(jcs)) then
          read (2,'(a)') blank
-         go to 4
+         GOTO 4
       end if
       ! change to read mu_M and logNe as part of xz table
-      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)')
-     x t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),
-     x (xz(m,index(iv),i,jcs),iv=1,9)
-!     x t6list(jcs,i),amu_M(jcs,i),alogNe(jcs,j),
-!     x (xz(m,index(iv),i,jcs),iv=1,9)
+      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),(xz(m,index(iv),i,jcs),iv=1,9)
+!       t6list(jcs,i),amu_M(jcs,i),alogNe(jcs,j),
+!       (xz(m,index(iv),i,jcs),iv=1,9)
     4 continue
       end do
       read(2,'(a)') blank
@@ -544,8 +518,7 @@ c__________
 
       do i=1,nt
          if(t6list(1,i)  ==  0.0) then
-            write(*,'("readcoeos_hhe: Error:",i4,
-     $           "-th T6 value is zero")') i
+            write(*,'("readcoeos_hhe: Error:",i4,"-th T6 value is zero")') i
             stop
          end if
          t6a(i)=t6list(1,i)
@@ -575,9 +548,7 @@ c__________
       common/eeos_hhe/esact,eos(mv)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
 
-      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/,
-     x unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/
-     x , sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
+      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
 cPhysical constants
 !       Na=6.0221367e+23
@@ -662,35 +633,23 @@ cPhysical constants
       ! for EOS5_xtrin_H_He
       parameter (mx_hhe=6,mv_hhe=12,nr_hhe=169,nt_hhe=197)
       common/aaeos_hhe/ q_hhe(4),h_hhe(4),xxh_hhe
-      common/aeos_hhe/  xz_hhe(mx_hhe,mv_hhe,nt_hhe,nr_hhe),
-     . t6list_hhe(nr_hhe,nt_hhe),rho_hhe(nr_hhe),t6a_hhe(nt_hhe),
-     . esk_hhe(nt_hhe,nr_hhe),esk2_hhe(nt_hhe,nr_hhe),dfsx_hhe(mx_hhe)
-     . ,dfs_hhe(nt_hhe),dfsr_hhe(nr_hhe),m_hhe,mf_hhe,xa_hhe(mx_hhe)
-      common/beos_hhe/ iri_hhe(mv_hhe),index_hhe(mv_hhe),
-     . nta_hhe(nr_hhe),zz_hhe(mx_hhe)
+      common/aeos_hhe/  xz_hhe(mx_hhe,mv_hhe,nt_hhe,nr_hhe),t6list_hhe(nr_hhe,nt_hhe),rho_hhe(nr_hhe),t6a_hhe(nt_hhe),esk_hhe(nt_hhe,nr_hhe),esk2_hhe(nt_hhe,nr_hhe),dfsx_hhe(mx_hhe),dfs_hhe(nt_hhe),dfsr_hhe(nr_hhe),m_hhe,mf_hhe,xa_hhe(mx_hhe)
+      common/beos_hhe/ iri_hhe(mv_hhe),index_hhe(mv_hhe),nta_hhe(nr_hhe),zz_hhe(mx_hhe)
 
       data (xa_hhe(i),i=1,mx_hhe)/0.0,0.2,0.4,0.6,0.8,1.0/
 
       data (index_hhe(i),i=1,mv_hhe)/1,2,3,4,5,6,7,8,9,10,11,12/
-      data (nta_hhe(i),i=1,nr_hhe)/92*197,196,194,190,2*189,3*187,2*159,133,
-     x  125,123,122,120,115,113,107,102,95,87,83,74,69,67,62,56,54,52,
-     x  51,3*50,2*49,26*48,47,45,43,42,41,39,37,36,35,34,32,31,30,29,
-     x  27,26/
+      data (nta_hhe(i),i=1,nr_hhe)/92*197,196,194,190,2*189,3*187,2*159,133,125,123,122,120,115,113,107,102,95,87,83,74,69,67,62,56,54,52,51,3*50,2*49,26*48,47,45,43,42,41,39,37,36,35,34,32,31,30,29,27,26/
 
 
       ! for opal_core
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       data (xa(i),i=1,mx)/0.0,0.2,0.4,0.6,0.8/
 
       data (index(i),i=1,mv)/1,2,3,4,5,6,7,8,9,10,11,12/
-      data (nta(i),i=1,nr)/87*197,7*191,190,2*189,185,179,170,2*149,
-     x  133,125,123,122,120,115,113,107,102,2*80,72,68,66,64,62,56,54,
-     x  52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,
-     x  29,27,26/
+      data (nta(i),i=1,nr)/87*197,7*191,190,2*189,185,179,170,2*149,133,125,123,122,120,115,113,107,102,2*80,72,68,66,64,62,56,54,52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,29,27,26/
 
       end

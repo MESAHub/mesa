@@ -48,14 +48,9 @@
          character (len=64) :: name
       end type scvh_info
 
-      type (scvh_info),target ::
-     >      compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si,
-     >      compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si
-
-
+      type (scvh_info),target ::compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si,compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si
 
       contains
-
 
       subroutine setup_scvh(data_dir)
          character (len=*),intent(IN) :: data_dir
@@ -216,23 +211,13 @@
 
                   kmax = k_for_MAX_logP(j)
                   do k = kmax,NlogPs-1
-                     si% Z(k,j) =
-     >                  (si% Z(k,j)
-     >                  + si% Z(k,j-1)
-     >                  + si% Z(k,j+1)
-     >                  + si% Z(k-1,j)
-     >                  + si% Z(k+1,j)) / 5
+                     si% Z(k,j) = (si% Z(k,j)  + si% Z(k,j-1) + si% Z(k,j+1) + si% Z(k-1,j) + si% Z(k+1,j)) / 5
                   end do
                   si% Z(NlogPs,j) = si% Z(NlogPs-1,j)
 
                   kmin = k_for_MIN_logP(j)
                   do k = 2,kmin-1
-                     si% Z(k,j) =
-     >                  (si% Z(k,j)
-     >                  + si% Z(k,j-1)
-     >                  + si% Z(k,j+1)
-     >                  + si% Z(k-1,j)
-     >                  + si% Z(k+1,j)) / 5
+                     si% Z(k,j) = (si% Z(k,j) + si% Z(k,j-1)  + si% Z(k,j+1)  + si% Z(k-1,j)  + si% Z(k+1,j)) / 5
                   end do
                   si% Z(1,j) = si% Z(2,j)
 
@@ -256,12 +241,7 @@
                   if (logTs(j) < logT_lo .or. logTs(j) > logT_hi) cycle
                   do k = 2,NlogPs-1
                      if (logPs(k) < logP_lo .or. logPs(k) > logP_hi) cycle
-                     Z(k,j) =
-     >                  (Z(k,j)
-     >                  + Z(k,j-1)
-     >                  + Z(k,j+1)
-     >                  + Z(k-1,j)
-     >                  + Z(k+1,j)) / 5
+                     Z(k,j) = (Z(k,j) + Z(k,j-1) + Z(k,j+1) + Z(k-1,j) + Z(k+1,j)) / 5
                   end do
                end do
             end do
@@ -387,43 +367,15 @@
          double precision,intent(in) :: logT,logP,pres
          double precision,intent(out) :: den_h,den_he
          integer,intent(out) :: info
-         double precision ::
-     1      ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP
+         double precision ::ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP
          logical,parameter :: only_densities = .true.,search_for_SCVH = .false.
-         call interp_vals_bicub(
-     1      only_densities,search_for_SCVH,
-     1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
-     >      logT,logP,pres,info)
+         call interp_vals_bicub(only_densities,search_for_SCVH,den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,logT,logP,pres,info)
       end subroutine interp_densities
 
 
-      subroutine interp_vals_bicub(
-     1      only_densities,search_for_SCVH,
-     1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
-     >      logT,logP,pres,info)
+      subroutine interp_vals_bicub(only_densities,search_for_SCVH,den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,logT,logP,pres,info)
          logical,intent(in) :: only_densities,search_for_SCVH
-         double precision,intent(out) ::
-     1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP
+         double precision,intent(out) ::den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP
          double precision,intent(in) :: logT,logP,pres
          integer,intent(out) :: info
 
@@ -562,10 +514,7 @@
          !..internal energy in erg/g
          ener_he = 10.0**interp_value(num_he_pts,ulog_he_si); if (info /= 0) return
 
-
-
          contains
-
 
          double precision function interp_value(n,si)
             use interp_2d_lib_db,only: interp_mkbicub_db,interp_evbicub_db
@@ -592,11 +541,7 @@
                ibcxmax = 0; bcxmax(:) = 0
                ibcymin = 0; bcymin(:) = 0
                ibcymax = 0; bcymax(:) = 0
-               call interp_mkbicub_db(
-     >               logPs,NlogPs,logTs,NlogTs,si% f1,NlogPs,
-     >               ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >               ibcymin,bcymin,ibcymax,bcymax,
-     >               si% ilinx,si% iliny,ierr)
+               call interp_mkbicub_db( logPs,NlogPs,logTs,NlogTs,si% f1,NlogPs, ibcxmin,bcxmin,ibcxmax,bcxmax, ibcymin,bcymin,ibcymax,bcymax, si% ilinx,si% iliny,ierr)
                if (ierr /= 0) then
                   return
                   write(*,*) 'scvh: failed in interp_mkbicub_db ' // si% name
@@ -634,13 +579,7 @@
       end subroutine do_stop
 
 
-      subroutine interpolate_scvh(
-     >               include_radiation,search_for_SCVH,
-     >               logT,logRho,T,Rho,xmassh1,
-     >               logPgas,logE,logS,chiRho,chiT,
-     >               Cp,Cv,dE_dRho,dS_dT,dS_dRho,
-     >               mu,gamma1,gamma3,grad_ad,logNe,
-     >               info)
+      subroutine interpolate_scvh( include_radiation,search_for_SCVH, logT,logRho,T,Rho,xmassh1, logPgas,logE,logS,chiRho,chiT, Cp,Cv,dE_dRho,dS_dT,dS_dRho, mu,gamma1,gamma3,grad_ad,logNe, info)
 
       use num_lib,only: safe_root_without_brackets
       implicit none
@@ -651,19 +590,10 @@
       logical,intent(in) :: include_radiation
       logical,intent(in) :: search_for_SCVH
       double precision,intent(inout) :: logT,logRho,T,Rho,xmassh1
-      double precision,intent(out) ::
-     >               logPgas,logE,logS,chiRho,chiT,
-     >               Cp,Cv,dE_dRho,dS_dT,dS_dRho,
-     >               mu,gamma1,gamma3,grad_ad,logNe
+      double precision,intent(out) :: logPgas,logE,logS,chiRho,chiT, Cp,Cv,dE_dRho,dS_dT,dS_dRho, mu,gamma1,gamma3,grad_ad,logNe
       integer,intent(out) :: info ! returned = 0 if AOK
 
-      double precision dpressdd,dpressdt,ener,dedd,
-     >      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
-     >      xnhp,xnhepp,P,entr,dsdd,dsdt,xtra,
-     >      dxdd,dxdt,Ne,log_free_e,log_free_e0,log_free_e1,kt,theta
+      double precision dpressdd,dpressdt,ener,dedd,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,xnhp,xnhepp,P,entr,dsdd,dsdt,xtra,dxdd,dxdt,Ne,log_free_e,log_free_e0,log_free_e1,kt,theta
 
       double precision xmasshe4,dedt
 
@@ -672,45 +602,38 @@
       double precision prad,erad,srad
 
       double precision logP,inv_Rho,inv_T,inv_P,small_value,Rho_min
-      parameter        (small_value = 1.0d-16)
-      parameter        (Rho_min = 1.0d-10)
+      parameter (small_value = 1.0d-16)
+      parameter (Rho_min = 1.0d-10)
 
 !..for hydrogen
-      double precision den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,
-     >      dsdpress_ct_h,dpressdd_h,dpressdt_h,dedd_h,dedt_h,dsdd_h,dsdt_h
+      double precision den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,dpressdd_h,dpressdt_h,dedd_h,dedt_h,dsdd_h,dsdt_h
 
 
 !..for helium
-      double precision den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,
-     >      dsdpress_ct_he,dpressdd_he,dpressdt_he,dedd_he,dedt_he,dsdd_he,dsdt_he
+      double precision den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,dpressdd_he,dpressdt_he,dedd_he,dedt_he,dsdd_he,dsdt_he
 
 
 !..for the mixture
-      double precision beta,gama,delt,smix,d_smix_dT,d_smix_dP,dddt_cp_hhe,dddpress_ct_hhe,dsdt_cp_hhe,
-     1                 dsdpress_ct_hhe,dtdpress_cs_hhe,dpressdd_hhe,dpressdt_hhe,dedd_hhe,dedt_hhe,dsdd_hhe,dsdt_hhe
+      double precision beta,gama,delt,smix,d_smix_dT,d_smix_dP,dddt_cp_hhe,dddpress_ct_hhe,dsdt_cp_hhe, dsdpress_ct_hhe,dtdpress_cs_hhe,dpressdd_hhe,dpressdt_hhe,dedd_hhe,dedt_hhe,dsdd_hhe,dsdt_hhe
       double precision tiny
       parameter        (tiny = 1.0d-30)
 
 
 !..for the search
-      integer          ii,itmax
-      parameter        (itmax = 200)
+      integer :: ii,itmax
+      parameter (itmax = 200)
       double precision logP_new,pmax,pmin,den_calc,func,denom,eostol
-      parameter        (eostol = 1.0d-9)
+      parameter (eostol = 1.0d-9)
 
 
 !..for the photons
-      integer          radmult
-      parameter        (radmult = 1)
+      integer :: radmult
+      parameter (radmult = 1)
       double precision dpressraddd,dpressraddt,deraddd,deraddt,dsraddd,dsraddt
 
 !..constants
       double precision clight,ssol,asol,asoli3,avo,kerg,xka,mh1,mhe4,third
-      parameter        (clight  = 2.99792458d10,ssol    = 5.67051d-5,
-     1                  asol    = 4.0d0 * ssol / clight,asoli3  = asol/3.0d0,
-     1                  avo     = 6.0221367d23,kerg    = 1.380658d-16,
-     1                  xka     = kerg*avo,mh1     = 1.67357d-24,
-     1                  mhe4    = 6.646442d-24,third   = 1.0d0/3.0d0)
+      parameter (clight  = 2.99792458d10,ssol = 5.67051d-5, asol = 4.0d0 * ssol / clight,asoli3 = asol/3.0d0, avo = 6.0221367d23,kerg    = 1.380658d-16, xka     = kerg*avo,mh1     = 1.67357d-24, mhe4    = 6.646442d-24,third   = 1.0d0/3.0d0)
 
       logical,parameter :: pure_splines = .true.,DT_flag = .true.
 
@@ -719,11 +642,8 @@
       double precision, target :: rpar_array(lrpar)
       integer, pointer :: ipar(:)
       double precision, pointer :: rpar(:)
-      integer          iat,jat,i,j,imax
-      double precision dt,dt2,dti,dt2i,dpress,dpress2,dpressi,dpress2i,xt,xp,mxt,mxp,logRho_new,dlogRho_dlogP,del_logP,under,
-     1                 si0t,si1t,si2t,si0mt,si1mt,si2mt,si0p,si1p,si2p,si0mp,si1mp,si2mp,logRho_test,
-     1                 logP_guess,epslogP,epslogRho,x1,x3,y1,y3,dfdlogP,
-     1                 z,fi_h(36),fi_he(36),w0t,w1t,w2t,w0mt,w1mt,w2mt,w0p,w1p,w2p,w0mp,w1mp,w2mp
+      integer :: iat,jat,i,j,imax
+      double precision dt,dt2,dti,dt2i,dpress,dpress2,dpressi,dpress2i,xt,xp,mxt,mxp,logRho_new,dlogRho_dlogP,del_logP,under, si0t,si1t,si2t,si0mt,si1mt,si2mt,si0p,si1p,si2p,si0mp,si1mp,si2mp,logRho_test, logP_guess,epslogP,epslogRho,x1,x3,y1,y3,dfdlogP, z,fi_h(36),fi_he(36),w0t,w1t,w2t,w0mt,w1mt,w2mt,w0p,w1p,w2p,w0mp,w1mp,w2mp
 
       include 'formats'
       info = 0
@@ -786,16 +706,14 @@
 
 !..find pressure that gives the desired density
 
-      logP_guess = min(logP_max - 0.1d0,
-     >         log10(kerg/mh1) - log10(4/(3+5*xmassh1)) + logRho + logT) ! classical perfect gas value
+      logP_guess = min(logP_max - 0.1d0,   log10(kerg/mh1) - log10(4/(3+5*xmassh1)) + logRho + logT) ! classical perfect gas value
       rpar(1) = logT
       rpar(2) = logRho
       rpar(3) = xmassh1
       imax = 100
       epslogP = 1d-14
       epslogRho = 1d-10
-      logP_new = safe_root_without_brackets(
-     >      fscvh,logP_guess,dlogP,imax/2,imax,epslogP,epslogRho,lrpar,rpar,lipar,ipar,info)
+      logP_new = safe_root_without_brackets(fscvh,logP_guess,dlogP,imax/2,imax,epslogP,epslogRho,lrpar,rpar,lipar,ipar,info)
       if (dbg) write(*,1) 'logP_new',logP_new
       if (info /= 0) then
          info = -2
@@ -862,13 +780,7 @@
          stop 1
       end if
 
-      call entropy_of_mixing(
-     >     xmassh1,xmasshe4,T,P,
-     >     xnh,dxnh_dlogT,dxnh_dlogP,
-     >     xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >     xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >     xnhep,dxnhep_dlogT,dxnhep_dlogP,
-     >     smix,d_smix_dT,d_smix_dP)
+      call entropy_of_mixing(xmassh1,xmasshe4,T,P,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,smix,d_smix_dT,d_smix_dP)
 
       !smix = 0; d_smix_dT = 0; d_smix_dP = 0
 
@@ -896,13 +808,13 @@
 
 !..delog the derivatives
       inv_P = 1.0d0/P
-      dddt_cp_h  = Rho * inv_T     * dddt_cp_h
+      dddt_cp_h  = Rho * inv_T * dddt_cp_h
       dddpress_ct_h  = Rho * inv_P    * dddpress_ct_h
       dsdt_cp_h  = entr_h * inv_T  * dsdt_cp_h
       dsdpress_ct_h  = entr_h * inv_P * dsdpress_ct_h
 
-      dddt_cp_he = Rho * inv_T      * dddt_cp_he
-      dddpress_ct_he = Rho * inv_P     * dddpress_ct_he
+      dddt_cp_he = Rho * inv_T * dddt_cp_he
+      dddpress_ct_he = Rho * inv_P * dddpress_ct_he
       dsdt_cp_he = entr_he * inv_T  * dsdt_cp_he
       dsdpress_ct_he = entr_he * inv_P * dsdpress_ct_he
 
@@ -933,8 +845,6 @@
 
 !..d(ener)/d(temp)|d
       dedt_h = T * dsdt_h
-
-
 
 !..for helium
 !..d(P)/ d(den)|t
@@ -980,15 +890,15 @@
       logPgas = log10(P) ! store this before add prad
 
       if (include_radiation) then
-         P = P     + prad
+         P = P + prad
          dpressdd = dpressdd_hhe + dpressraddd
          dpressdt = dpressdt_hhe + dpressraddt
 
-         ener = ener     + erad
+         ener = ener + erad
          dedd = dedd_hhe + deraddd
          dedt = dedt_hhe + deraddt
 
-         entr = entr     + srad
+         entr = entr + srad
          dsdd = dsdd_hhe + dsraddd
          dsdt = dsdt_hhe + dsraddt
       else
@@ -1020,8 +930,6 @@
       gamma1 = (gamma3 - 1) / grad_ad ! C&G 9.88 & 9.89
 
       Cp = Cv + P * chiT**2 / (Rho * T * chiRho) ! C&G 9.86
-
-
 
       xnhp = max(0d0,min(1d0,1 - (xnh2 + xnh)))
       xnhepp = max(0d0,min(1d0,1 - (xnhep + xnhe)))
@@ -1080,19 +988,10 @@
       subroutine get_values(only_densities)
          logical,intent(in) :: only_densities
          info = 0
-         call interp_vals_bicub(
-     1      only_densities,search_for_SCVH,
-     1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
-     >      logT,logP,P,info)
+         call interp_vals_bicub(only_densities,search_for_SCVH,den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,logT,logP,P,info)
       end subroutine get_values
 
       end subroutine interpolate_scvh
-
 
 
       double precision function fscvh(logP,dfdlogP,lrpar,rpar,lipar,ipar,ierr)
@@ -1105,13 +1004,7 @@
          double precision, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer,intent(out) :: ierr
 
-         double precision :: logT,P,Rho,logRho_new,logRho_target,dddpress,
-     1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP,xmassh1,xmasshe4
+         double precision :: logT,P,Rho,logRho_new,logRho_target,dddpress,den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,xmassh1,xmasshe4
          logical :: only_densities,search_for_SCVH
          include 'formats'
          if (logP < logP_min .or. logP > logP_max) then
@@ -1130,15 +1023,7 @@
          search_for_SCVH = .false.
          if (dbg) write(*,*)
          if (dbg) write(*,1) 'logP guess',logP
-         call interp_vals_bicub(
-     1      only_densities,search_for_SCVH,
-     1      den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,
-     1      den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,
-     1      xnh,dxnh_dlogT,dxnh_dlogP,
-     >      xnh2,dxnh2_dlogT,dxnh2_dlogP,
-     >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
-     >      xnhep,dxnhep_dlogT,dxnhep_dlogP,
-     >      logT,logP,P,ierr)
+         call interp_vals_bicub(only_densities,search_for_SCVH,den_h,ener_h,entr_h,dddt_cp_h,dddpress_ct_h,dsdt_cp_h,dsdpress_ct_h,den_he,ener_he,entr_he,dddt_cp_he,dddpress_ct_he,dsdt_cp_he,dsdpress_ct_he,xnh,dxnh_dlogT,dxnh_dlogP,xnh2,dxnh2_dlogT,dxnh2_dlogP,xnhe,dxnhe_dlogT,dxnhe_dlogP,xnhep,dxnhep_dlogT,dxnhep_dlogP,logT,logP,P,ierr)
          if (ierr /= 0) then
             return
             write(*,*) 'fscvh failed in interp_vals'
@@ -1156,44 +1041,13 @@
       end function fscvh
 
 
-
-      subroutine entropy_of_mixing(
-     >     xmassh1,xmasshe4,T,P,
-     >     xnh_in,dxnh_dlogT,dxnh_dlogP,
-     >     xnh2_in,dxnh2_dlogT,dxnh2_dlogP,
-     >     xnhe_in,dxnhe_dlogT,dxnhe_dlogP,
-     >     xnhep_in,dxnhep_dlogT,dxnhep_dlogP,
-     >     smix,d_smix_dT,d_smix_dP)
+      subroutine entropy_of_mixing(xmassh1,xmasshe4,T,P,xnh_in,dxnh_dlogT,dxnh_dlogP,xnh2_in,dxnh2_dlogT,dxnh2_dlogP,xnhe_in,dxnhe_dlogT,dxnhe_dlogP,xnhep_in,dxnhep_dlogT,dxnhep_dlogP,smix,d_smix_dT,d_smix_dP)
          implicit none
-         double precision,intent(in) :: xmassh1,xmasshe4,T,P,
-     >     xnh_in,dxnh_dlogT,dxnh_dlogP,
-     >     xnh2_in,dxnh2_dlogT,dxnh2_dlogP,
-     >     xnhe_in,dxnhe_dlogT,dxnhe_dlogP,
-     >     xnhep_in,dxnhep_dlogT,dxnhep_dlogP
+         double precision,intent(in) :: xmassh1,xmasshe4,T,P,xnh_in,dxnh_dlogT,dxnh_dlogP,xnh2_in,dxnh2_dlogT,dxnh2_dlogP,xnhe_in,dxnhe_dlogT,dxnhe_dlogP,xnhep_in,dxnhep_dlogT,dxnhep_dlogP
          double precision,intent(out) :: smix,d_smix_dT,d_smix_dP
 
-         double precision,parameter :: tiny = 1d-14,ln10 = 2.30258509299405d0,
-     >      mh1 = 1.67357d-24,mhe4 = 6.646442d-24,kerg = 1.3806504D-16,small = 1d-8
-         double precision ::
-     >      xnh,dxnh_dP,dxnh_dT,xnh2,dxnh2_dP,dxnh2_dT,
-     >      xnhe,dxnhe_dP,dxnhe_dT,xnhep,dxnhep_dP,dxnhep_dT,
-     >      beta,
-     >      num,dnum_dP,dnum_dT,
-     >      denom,ddenom_dP,ddenom_dT,
-     >      gama,dgama_dP,dgama_dT,
-     >      delt,ddelt_dP,ddelt_dT,
-     >      a,da_dP,da_dT,
-     >      b1,db1_dT,db1_dP,
-     >      b21,db21_dT,db21_dP,
-     >      b22,db22_dT,db22_dP,
-     >      b2,db2_dT,db2_dP,
-     >      b31,db31_dT,db31_dP,
-     >      b32,db32_dT,db32_dP,
-     >      b331,db331_dT,db331_dP,
-     >      b332,db332_dT,db332_dP,
-     >      b33,db33_dT,db33_dP,
-     >      b3,db3_dT,db3_dP,
-     >      b,db_dT,db_dP
+         double precision,parameter :: tiny = 1d-14,ln10 = 2.30258509299405d0,mh1 = 1.67357d-24,mhe4 = 6.646442d-24,kerg = 1.3806504D-16,small = 1d-8
+         double precision ::xnh,dxnh_dP,dxnh_dT,xnh2,dxnh2_dP,dxnh2_dT,xnhe,dxnhe_dP,dxnhe_dT,xnhep,dxnhep_dP,dxnhep_dT,beta,num,dnum_dP,dnum_dT,denom,ddenom_dP,ddenom_dT,gama,dgama_dP,dgama_dT,delt,ddelt_dP,ddelt_dT,a,da_dP,da_dT,b1,db1_dT,db1_dP,b21,db21_dT,db21_dP,b22,db22_dT,db22_dP,b2,db2_dT,db2_dP,b31,db31_dT,db31_dP,b32,db32_dT,db32_dP,b331,db331_dT,db331_dP,b332,db332_dT,db332_dP,b33,db33_dT,db33_dP,b3,db3_dT,db3_dP,b,db_dT,db_dP
 
          include 'formats'
 
@@ -1374,10 +1228,10 @@
          !write(*,1) '',
          !write(*,1) '',
 
-!   >     ,dxnh_dlogT,dxnh_dlogP,
-!   >     ,dxnh2_dlogT,dxnh2_dlogP,
-!   >     ,dxnhe_dlogT,dxnhe_dlogP,
-!   >     ,dxnhep_dlogT,dxnhep_dlogP
+!         ,dxnh_dlogT,dxnh_dlogP,
+!         ,dxnh2_dlogT,dxnh2_dlogP,
+!         ,dxnhe_dlogT,dxnhe_dlogP,
+!         ,dxnhep_dlogT,dxnhep_dlogP
          write(*,*)
 
       end subroutine entropy_of_mixing

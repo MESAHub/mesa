@@ -18,7 +18,7 @@
       call esac(x,ztab,t6,r,iorder,irad) ! calc EOS; use r from rhoofp
       write (*,'("eos=",9e14.4)') (eos(j),j=1,9)
 !                                            if fixedTP='yes'
-      go to 1
+      GOTO 1
       stop
       end
 
@@ -76,9 +76,7 @@
       common/lreadco/itime
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos/esact,eos(mv)
@@ -120,14 +118,14 @@
            stop 1
         end if
 
-        if(z+xh-1.e-6  >  1 ) go to 61
+        if(z+xh-1.e-6  >  1 ) GOTO 61
       end if
 
 
 !..... Determine T6,rho grid points to use in the
 !      interpolation.
-      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) go to 62
-      if((slr  <  rho(1)).or.(slr  >  rho(nr))) go to 62
+      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) GOTO 62
+      if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
 
 
         ilo=2
@@ -139,7 +137,7 @@
             else
               ilo=imd
             end if
-          go to 8
+          GOTO 8
         end if
         i=ihi
         mf=i-2
@@ -162,14 +160,14 @@
               imd=(ihi+ilo)/2
               if (slr  ==  rho(imd)) then
                  ihi=imd
-                 go to 13
+                 GOTO 13
               end if
                if(slr  <=  rho(imd)) then
                  ihi=imd
                else
                  ilo=imd
                end if
-             go to 12
+             GOTO 12
           end if
    13     i=ihi
         l1=i-2
@@ -185,14 +183,14 @@
           imd=(ihi+ilo)/2
            if (t6  ==  t6list(1,imd)) then
            ilo=imd
-           go to 14
+           GOTO 14
            end if
             if(t6  <=  t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          go to 11
+          GOTO 11
           end if
    14     i=ilo
         k1=i-2
@@ -251,9 +249,9 @@
           l1=l3-3
           l2=l1+1
           l3=l2+1
-          go to 15
+          GOTO 15
         else
-          go to 65
+          GOTO 65
         end if
       end if
       if (sum23  <  1.e+30) ip=3
@@ -282,14 +280,14 @@
         write(*,'("Z does not match Z in EOS5_data files you are using")')
         stop 1
       end if
-      if(z  /=  zz(mf)) go to 66
+      if(z  /=  zz(mf)) GOTO 66
       is=0
       iw=1
       do 45 ir=l1,l1+iq
         do it=k1,k1+ip
           if (mf2  ==  1) then
             esk(it,ir)=epl(mf,it,ir)
-            go to 46
+            GOTO 46
           end if
           esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir),epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
           if(esk(it,ir)  >  1.e+20) then
@@ -358,8 +356,7 @@
       stop 1
    66 continue
       info = -66; return
-      write(*,'(" Z does not match Z in EOS5_data* files you are",
-     . " using (66)")')
+      write(*,'(" Z does not match Z in EOS5_data* files you are using (66)")')
       write (*,'("mf,zz(mf)=",i5,e12.4)') mf,zz(mf)
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)') ip,iq,k3,l3,xh,t6,r,z
       stop 1
@@ -373,9 +370,7 @@
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos/esact,eos(mv)
 
@@ -441,14 +436,11 @@
       real moles
       character*1 blank
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       common/eeos/esact,eos(mv)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/eeeeos/moles(mx),xin(mx),tmass(mx),icycuse(mx,nr),rhogr(mx,nr),frac(mx,6),alogr(nr,nt)
-
 
 
       blank=' '
@@ -499,7 +491,7 @@
       do  i=1,icycuse(m,jcs)
       if (i  >  nta(jcs)) then
          read (2,'(a)') blank
-         go to 4
+         GOTO 4
       end if
       read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),(xz(m,index(iv),i,jcs),iv=1,9)
     4 continue
@@ -513,8 +505,7 @@
 
       do i=1,nt
          if(t6list(1,i)  ==  0.0) then
-            write(*,'("READCOEOS: Error:",i4,
-     $           "-th T6 value is zero")') i
+            write(*,'("READCOEOS: Error:",i4,"-th T6 value is zero")') i
             stop 1
          end if
          t6a(i)=t6list(1,i)
@@ -537,8 +528,7 @@
       function quadeos(ic,i,x,y1,y2,y3,x1,x2,x3)
 !..... this function performs a quadratic interpolation.
       save
-      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30)
-     . ,xx1pxx2(30)
+      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3
@@ -602,7 +592,6 @@
       gmass=gmass+amas(i)*frac(i-1)
       end do
 
-      return
       end
 !..*********************************************************************
       subroutine radsub (irad,t6,density,moles,tmass)
@@ -611,11 +600,9 @@
       common/eeos/esact,eos(mv)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
 
-      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/,
-     x unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/
-     x , sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
+      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/,unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
-cPhysical constants
+! Physical constants
 !       Na=6.0221367e+23
 !       k =1.380658e-16 !   erg/degree K
 !       Na*k=6.0221367E+23*1.380658e-16 erg/degree K=8.314510E+7 erg/degree K
@@ -699,20 +686,13 @@ cPhysical constants
       function rhoofp(x,ztab,t6,p,irad)
       parameter (mx=5,mv=10,nr=169,nt=197)
       common/lreadco/itime
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(10),index(10),nta(nr),zz(mx)
       common/eeos/esact,eos(mv)
       dimension nra(nt)
       data sigmacc/1.8914785e-3/
 !--------------------------------------------------------------------
-      data (nra(i),i=1,nt)/ 26*169, 168, 2*167, 166, 165, 164,
-     x   2*163, 162, 161, 160, 2*159, 158, 2*130, 129, 2*128,
-     x   2*126, 2*125, 124, 122, 121, 2*120, 2*119, 6*118, 2*117,
-     x   2*116, 2*115, 4*114, 8*113, 22*111, 5*110, 6*109, 2*108,
-     x   5*107, 2*106, 105, 2*104, 8*103, 16*102, 21*100, 9* 99,
-     x   6* 98, 4* 97, 95, 94, 6* 87/
+      data (nra(i),i=1,nt)/ 26*169, 168, 2*167, 166, 165, 164, 2*163, 162, 161, 160, 2*159, 158, 2*130, 129, 2*128, 2*126, 2*125, 124, 122, 121, 2*120, 2*119, 6*118, 2*117, 2*116, 2*115, 4*114, 8*113, 22*111, 5*110, 6*109, 2*108, 5*107, 2*106, 105, 2*104, 8*103, 16*102, 21*100, 9* 99, 6* 98, 4* 97, 95, 94, 6* 87/
 
 
       rat=sigmacc
@@ -733,7 +713,7 @@ cPhysical constants
             else
               ilo=imd
             end if
-          go to 8
+          GOTO 8
         end if
         mlo=ilo
 
@@ -743,14 +723,14 @@ cPhysical constants
           imd=(ihi+ilo)/2
            if (t6  ==  t6list(1,imd)) then
            ilo=imd
-           go to 14
+           GOTO 14
            end if
             if(t6  <=  t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          go to 11
+          GOTO 11
           end if
    14     klo=ilo
 
@@ -792,13 +772,13 @@ cPhysical constants
       if (p3  >  pnr) then
         rhog2=rhog3
         p2=p3
-        if (icount  <  11) go to 1
+        if (icount  <  11) GOTO 1
         write (*,'("No convergence after 10 tries")')
         stop
       else
         rhog1=rhog3
         p1=p3
-        if (icount  <  11) go to 1
+        if (icount  <  11) GOTO 1
         write (*,'("No convergence after 10 tries")')
         stop
       end if
@@ -808,15 +788,10 @@ cPhysical constants
       block data
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),
-     . t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx)
-     . ,dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       data (xa(i),i=1,mx)/0.0,0.2,0.4,0.6,0.8/
 
       data (index(i),i=1,mv)/1,2,3,4,5,6,7,8,9,10,11,12/
-      data (nta(i),i=1,nr)/87*197,7*191,190,2*189,185,179,170,2*149,
-     x  133,125,123,122,120,115,113,107,102,2*80,72,68,66,64,62,56,54,
-     x  52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,
-     x  29,27,26/
+      data (nta(i),i=1,nr)/87*197,7*191,190,2*189,185,179,170,2*149,133,125,123,122,120,115,113,107,102,2*80,72,68,66,64,62,56,54,52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,29,27,26/
       end
