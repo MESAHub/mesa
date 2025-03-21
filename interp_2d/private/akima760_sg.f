@@ -103,15 +103,15 @@
 *     ..
 * Preliminary processing
 * Error check
-      if (NXD.LE.1) GO TO 40
-      if (NYD.LE.1) GO TO 50
+      if (NXD.LE.1) GOTO 40
+      if (NYD.LE.1) GOTO 50
       do 10 IX = 2,NXD
-          if (XD(IX).LE.XD(IX-1)) GO TO 60
+          if (XD(IX).LE.XD(IX-1)) GOTO 60
    10 continue
       do 20 IY = 2,NYD
-          if (YD(IY).LE.YD(IY-1)) GO TO 70
+          if (YD(IY).LE.YD(IY-1)) GOTO 70
    20 continue
-      if (NIP.LE.0) GO TO 80
+      if (NIP.LE.0) GOTO 80
       IER = 0
 * Calculation
 * Estimates partial derivatives at all input-grid data points
@@ -136,16 +136,16 @@
 * Error exit
    40 WRITE (*,FMT=9000)
       IER = 1
-      GO TO 90
+      GOTO 90
    50 WRITE (*,FMT=9010)
       IER = 2
-      GO TO 90
+      GOTO 90
    60 WRITE (*,FMT=9020) IX,XD(IX)
       IER = 3
-      GO TO 90
+      GOTO 90
    70 WRITE (*,FMT=9030) IY,YD(IY)
       IER = 4
-      GO TO 90
+      GOTO 90
    80 WRITE (*,FMT=9040)
       IER = 5
    90 WRITE (*,FMT=9050) NXD,NYD,NIP
@@ -275,16 +275,16 @@
 *     ..
 * Preliminary processing
 * Error check
-      if (NXD.LE.1) GO TO 60
-      if (NYD.LE.1) GO TO 70
+      if (NXD.LE.1) GOTO 60
+      if (NYD.LE.1) GOTO 70
       do 10 IX = 2,NXD
-          if (XD(IX).LE.XD(IX-1)) GO TO 80
+          if (XD(IX).LE.XD(IX-1)) GOTO 80
    10 continue
       do 20 IY = 2,NYD
-          if (YD(IY).LE.YD(IY-1)) GO TO 90
+          if (YD(IY).LE.YD(IY-1)) GOTO 90
    20 continue
-      if (NXI.LE.0) GO TO 100
-      if (NYI.LE.0) GO TO 110
+      if (NXI.LE.0) GOTO 100
+      if (NYI.LE.0) GOTO 110
       IER = 0
 * Calculation
 * Estimates partial derivatives at all input-grid data points
@@ -317,19 +317,19 @@
 * Error exit
    60 WRITE (*,FMT=9000)
       IER = 1
-      GO TO 120
+      GOTO 120
    70 WRITE (*,FMT=9010)
       IER = 2
-      GO TO 120
+      GOTO 120
    80 WRITE (*,FMT=9020) IX,XD(IX)
       IER = 3
-      GO TO 120
+      GOTO 120
    90 WRITE (*,FMT=9030) IY,YD(IY)
       IER = 4
-      GO TO 120
+      GOTO 120
   100 WRITE (*,FMT=9040)
       IER = 5
-      GO TO 120
+      GOTO 120
   110 WRITE (*,FMT=9050)
       IER = 6
   120 WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
@@ -452,7 +452,7 @@
                   IX3 = IX0 + IDLT(3,IPEX)
                   if ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
      +                (IX1.GT.NX0) .OR. (IX2.GT.NX0) .OR.
-     +                (IX3.GT.NX0)) GO TO 10
+     +                (IX3.GT.NX0)) GOTO 10
 * Selects and/or supplements the x and z values.
                   X1 = XD(IX1) - X0
                   Z10 = ZD(IX1,IY0)
@@ -549,7 +549,7 @@
                   IY3 = IY0 + IDLT(3,IPEY)
                   if ((IY1.LT.1) .OR. (IY2.LT.1) .OR. (IY3.LT.1) .OR.
      +                (IY1.GT.NY0) .OR. (IY2.GT.NY0) .OR.
-     +                (IY3.GT.NY0)) GO TO 20
+     +                (IY3.GT.NY0)) GOTO 20
 * Selects and/or supplements the y and z values.
                   Y1 = YD(IY1) - Y0
                   Z01 = ZD(IX0,IY1)
@@ -646,7 +646,7 @@
                   IX3 = IX0 + IDLT(3,IPEX)
                   if ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
      +                (IX1.GT.NX0) .OR. (IX2.GT.NX0) .OR.
-     +                (IX3.GT.NX0)) GO TO 40
+     +                (IX3.GT.NX0)) GOTO 40
 * Retrieves the necessary values for estimating zxy in the x
 * direction.
                   X1 = XA(1,IPEX)
@@ -670,7 +670,7 @@
                       IY3 = IY0 + IDLT(3,IPEY)
                       if ((IY1.LT.1) .OR. (IY2.LT.1) .OR.
      +                    (IY3.LT.1) .OR. (IY1.GT.NY0) .OR.
-     +                    (IY2.GT.NY0) .OR. (IY3.GT.NY0)) GO TO 30
+     +                    (IY2.GT.NY0) .OR. (IY3.GT.NY0)) GOTO 30
 * Retrieves the necessary values for estimating zxy in the y
 * direction.
                       Y1 = YA(1,IPEY)
@@ -926,7 +926,7 @@
                       IMX = IMD
                   end if
                   IMD = (IMN+IMX)/2
-                  if (IMD.GT.IMN) GO TO 10
+                  if (IMD.GT.IMN) GOTO 10
                   IXD = IMD
               ELSE
                   IXD = NXD
@@ -964,7 +964,7 @@
                       IMX = IMD
                   end if
                   IMD = (IMN+IMX)/2
-                  if (IMD.GT.IMN) GO TO 20
+                  if (IMD.GT.IMN) GOTO 20
                   IYD = IMD
               ELSE
                   IYD = NYD

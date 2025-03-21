@@ -230,13 +230,13 @@
       NCWMAX = MAX(NNC,NNW)
       LMAX = MIN(LMX,NN-1)
       if (NNC .LT. 9  .OR.  NNW .LT. 1  .OR.  NCWMAX .GT.
-     .    LMAX  .OR.  NNR .LT. 1) GO TO 21
+     .    LMAX  .OR.  NNR .LT. 1) GOTO 21
 
 ! Create the cell data structure, and initialize RSMX.
 
       CALL STORE2_sg (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,
      .             IERR)
-      if (IERR .NE. 0) GO TO 23
+      if (IERR .NE. 0) GOTO 23
       RSMX = 0.
 
 ! Outer loop on node K:
@@ -262,14 +262,14 @@
 ! Compute NPTS, LNP, RWS, NEQ, RC, and SFS.
 
     1   SUM = SUM + RS
-          if (LNP .EQ. LMAX) GO TO 2
+          if (LNP .EQ. LMAX) GOTO 2
           LNP = LNP + 1
           RSOLD = RS
           CALL GETNP2_sg (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
      .                 DDX,DDY, NP,RS)
-          if (RS .EQ. 0.) GO TO 22
+          if (RS .EQ. 0.) GOTO 22
           NPTS(LNP) = NP
-          if ( (RS-RSOLD)/RS .LT. RTOL ) GO TO 1
+          if ( (RS-RSOLD)/RS .LT. RTOL ) GOTO 1
           if (RWS .EQ. 0.  .AND.  LNP .GT. NNW) RWS = RS
           if (RC .EQ. 0.  .AND.  LNP .GT. NNC) THEN
 
@@ -285,8 +285,8 @@
 
 !   Bottom of loop -- test for termination.
 
-          if (LNP .GT. NCWMAX) GO TO 3
-          GO TO 1
+          if (LNP .GT. NCWMAX) GOTO 3
+          GOTO 1
 
 ! All LMAX nodes are included in NPTS.  RWS and/or RC**2 is
 !   (arbitrarily) taken to be 10 percent larger than the
@@ -323,22 +323,22 @@
           IROW = MIN(I,10)
           CALL SETUP2_sg (XK,YK,FK,X(NP),Y(NP),F(NP),SF,SFS,
      .                 SFC,RC, B(1,IROW))
-          if (I .EQ. 1) GO TO 4
+          if (I .EQ. 1) GOTO 4
           IRM1 = IROW-1
           do 5 J = 1,IRM1
             JP1 = J + 1
             CALL GIVENS_sg (B(J,J),B(J,IROW),C,S)
             CALL ROTATE_sg (10-J,C,S,B(JP1,J),B(JP1,IROW))
     5       continue
-          if (I .LT. NEQ) GO TO 4
+          if (I .LT. NEQ) GOTO 4
 
 ! Test the system for ill-conditioning.
 
         DMIN = MIN( ABS(B(1,1)),ABS(B(2,2)),ABS(B(3,3)),
      .              ABS(B(4,4)),ABS(B(5,5)),ABS(B(6,6)),
      .              ABS(B(7,7)),ABS(B(8,8)),ABS(B(9,9)) )
-        if (DMIN*RC .GE. DTOL) GO TO 11
-        if (NEQ .EQ. LMAX) GO TO 7
+        if (DMIN*RC .GE. DTOL) GOTO 11
+        if (NEQ .EQ. LMAX) GOTO 7
 
 ! Increase RC and add another equation to the system to
 !   improve the conditioning.  The number of NPTS elements
@@ -348,7 +348,7 @@
         NEQ = NEQ + 1
         if (NEQ .EQ. LMAX) THEN
           RC = SQRT(1.1*RS)
-          GO TO 4
+          GOTO 4
         end if
         if (NEQ .LT. LNP) THEN
 
@@ -356,9 +356,9 @@
 
           NP = NPTS(NEQ+1)
           RS = (X(NP)-XK)**2 + (Y(NP)-YK)**2
-          if ( (RS-RSOLD)/RS .LT. RTOL ) GO TO 6
+          if ( (RS-RSOLD)/RS .LT. RTOL ) GOTO 6
           RC = SQRT(RS)
-          GO TO 4
+          GOTO 4
         end if
 
 !   NEQ = LNP.  Add an element to NPTS.
@@ -366,11 +366,11 @@
         LNP = LNP + 1
         CALL GETNP2_sg (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
      .               DDX,DDY, NP,RS)
-        if (NP .EQ. 0) GO TO 22
+        if (NP .EQ. 0) GOTO 22
         NPTS(LNP) = NP
-        if ( (RS-RSOLD)/RS .LT. RTOL ) GO TO 6
+        if ( (RS-RSOLD)/RS .LT. RTOL ) GOTO 6
         RC = SQRT(RS)
-        GO TO 4
+        GOTO 4
 
 ! Stabilize the system by damping third partials -- add
 !   multiples of the first four unit vectors to the first
@@ -394,7 +394,7 @@
 
         DMIN = MIN( ABS(B(5,5)),ABS(B(6,6)),ABS(B(7,7)),
      .              ABS(B(8,8)),ABS(B(9,9)) )
-        if (DMIN*RC .LT. DTOL) GO TO 23
+        if (DMIN*RC .LT. DTOL) GOTO 23
 
 ! Solve the 9 by 9 triangular system for the coefficients.
 
@@ -583,7 +583,7 @@
 ! The following is a test for no cells within the circle
 !   of radius RMAX.
 
-      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GO TO 6
+      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GOTO 6
 
 ! Accumulate weight values in SW and weighted nodal function
 !   values in SWC.  The weights are W(K) = ((R-D)+/(R*D))**3
@@ -597,7 +597,7 @@
       do 4 J = JMIN,JMAX
         do 3 I = IMIN,IMAX
           K = LCELL(I,J)
-          if (K .EQ. 0) GO TO 3
+          if (K .EQ. 0) GOTO 3
 
 ! Inner loop on nodes K.
 
@@ -605,8 +605,8 @@
           DELY = YP - Y(K)
           D = SQRT(DELX*DELX + DELY*DELY)
           R = RW(K)
-          if (D .GE. R) GO TO 2
-          if (D .EQ. 0.) GO TO 5
+          if (D .GE. R) GOTO 2
+          if (D .EQ. 0.) GOTO 5
           W = (1.0/D - 1.0/R)*(1.0/D - 1.0/R)*(1.0/D - 1.0/R)
           SW = SW + W
           SWC = SWC + W*( ( (A(1,K)*DELX+A(2,K)*DELY+
@@ -619,13 +619,13 @@
 
     2     KP = K
           K = LNEXT(KP)
-          if (K .NE. KP) GO TO 1
+          if (K .NE. KP) GOTO 1
     3     continue
     4   continue
 
 ! SW = 0 iff P is not within the radius R(K) for any node K.
 
-      if (SW .EQ. 0.) GO TO 6
+      if (SW .EQ. 0.) GOTO 6
       do_CS2VAL_sg = SWC/SW
       return
 
@@ -764,7 +764,7 @@
       XP = PX
       YP = PY
       if (N .LT. 10  .OR.  NR .LT. 1  .OR.  DX .LE. 0.  .OR.
-     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) GO TO 6
+     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) GOTO 6
 
 ! Set IMIN, IMAX, JMIN, and JMAX to cell indexes defining
 !   the range of the search for nodes whose radii include
@@ -784,7 +784,7 @@
 ! The following is a test for no cells within the circle
 !   of radius RMAX.
 
-      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GO TO 7
+      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GOTO 7
 
 ! C = SWC/SW = Sum(W(K)*C(K))/Sum(W(K)), where the sum is
 !   from K = 1 to N, C(K) is the cubic nodal function value,
@@ -810,7 +810,7 @@
       do 4 J = JMIN,JMAX
         do 3 I = IMIN,IMAX
           K = LCELL(I,J)
-          if (K .EQ. 0) GO TO 3
+          if (K .EQ. 0) GOTO 3
 
 ! Inner loop on nodes K.
 
@@ -818,8 +818,8 @@
           DELY = YP - Y(K)
           D = SQRT(DELX*DELX + DELY*DELY)
           R = RW(K)
-          if (D .GE. R) GO TO 2
-          if (D .EQ. 0.) GO TO 5
+          if (D .GE. R) GOTO 2
+          if (D .EQ. 0.) GOTO 5
           T = (1.0/D - 1.0/R)
           W = T*T*T
           T = -3.0*T*T/(D*D*D)
@@ -845,13 +845,13 @@
 
     2     KP = K
           K = LNEXT(KP)
-          if (K .NE. KP) GO TO 1
+          if (K .NE. KP) GOTO 1
     3     continue
     4   continue
 
 ! SW = 0 iff P is not within the radius R(K) for any node K.
 
-      if (SW .EQ. 0.) GO TO 7
+      if (SW .EQ. 0.) GOTO 7
       C = SWC/SW
       SWS = SW*SW
       CX = (SWCX*SW - SWC*SWX)/SWS
@@ -1017,7 +1017,7 @@
       XP = PX
       YP = PY
       if (N .LT. 10  .OR.  NR .LT. 1  .OR.  DX .LE. 0.  .OR.
-     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) GO TO 6
+     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) GOTO 6
 
 ! Set IMIN, IMAX, JMIN, and JMAX to cell indexes defining
 !   the range of the search for nodes whose radii include
@@ -1037,7 +1037,7 @@
 ! The following is a test for no cells within the circle
 !   of radius RMAX.
 
-      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GO TO 7
+      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GOTO 7
 
 ! C = SWC/SW = Sum(W(K)*C(K))/Sum(W(K)), where the sum is
 !   from K = 1 to N, C(K) is the cubic nodal function value,
@@ -1077,7 +1077,7 @@
       do 4 J = JMIN,JMAX
         do 3 I = IMIN,IMAX
           K = LCELL(I,J)
-          if (K .EQ. 0) GO TO 3
+          if (K .EQ. 0) GOTO 3
 
 ! Inner loop on nodes K.
 
@@ -1087,8 +1087,8 @@
           DYSQ = DELY*DELY
           D = SQRT(DXSQ + DYSQ)
           R = RW(K)
-          if (D .GE. R) GO TO 2
-          if (D .EQ. 0.) GO TO 5
+          if (D .GE. R) GOTO 2
+          if (D .EQ. 0.) GOTO 5
           T1 = (1.0/D - 1.0/R)
           W = T1*T1*T1
           T2 = -3.0*T1*T1/(D*D*D)
@@ -1127,13 +1127,13 @@
 
     2     KP = K
           K = LNEXT(KP)
-          if (K .NE. KP) GO TO 1
+          if (K .NE. KP) GOTO 1
     3     continue
     4   continue
 
 ! SW = 0 iff P is not within the radius R(K) for any node K.
 
-      if (SW .EQ. 0.) GO TO 7
+      if (SW .EQ. 0.) GOTO 7
       C = SWC/SW
       SWS = SW*SW
       CX = (SWCX*SW - SWC*SWX)/SWS
@@ -1288,7 +1288,7 @@
 ! Test for invalid input parameters.
 
       if (NR .LT. 1  .OR.  DX .LE. 0.  .OR.  DY .LE. 0.)
-     .  GO TO 9
+     .  GOTO 9
 
 ! Initialize parameters.
 
@@ -1314,28 +1314,28 @@
 !   those outside the range [IMIN,IMAX] X [JMIN,JMAX].
 
     1 do 6 J = J1,J2
-        if (J .GT. JMAX) GO TO 7
-        if (J .LT. JMIN) GO TO 6
+        if (J .GT. JMAX) GOTO 7
+        if (J .LT. JMIN) GOTO 6
         do 5 I = I1,I2
-          if (I .GT. IMAX) GO TO 6
-          if (I .LT. IMIN) GO TO 5
+          if (I .GT. IMAX) GOTO 6
+          if (I .LT. IMIN) GOTO 5
           if (J .NE. J1  .AND.  J .NE. J2  .AND.  I .NE. I1
-     .        .AND.  I .NE. I2) GO TO 5
+     .        .AND.  I .NE. I2) GOTO 5
 
 ! Search cell (I,J) for unmarked nodes L.
 
           L = LCELL(I,J)
-          if (L .EQ. 0) GO TO 5
+          if (L .EQ. 0) GOTO 5
 
 !   Loop on nodes in cell (I,J).
 
     2     LN = LNEXT(L)
-          if (LN .LT. 0) GO TO 4
+          if (LN .LT. 0) GOTO 4
 
 !   Node L is not marked.
 
           RSQ = (X(L)-XP)**2 + (Y(L)-YP)**2
-          if (.NOT. FIRST) GO TO 3
+          if (.NOT. FIRST) GOTO 3
 
 !   Node L is the first unmarked neighbor of P encountered.
 !     Initialize LMIN to the current candidate for NP, and
@@ -1360,11 +1360,11 @@
           JMAX = INT((DELY+R)/DY) + 1
           if (JMAX .GT. NR) JMAX = NR
           FIRST = .FALSE.
-          GO TO 4
+          GOTO 4
 
 !   Test for node L closer than LMIN to P.
 
-    3     if (RSQ .GE. RSMIN) GO TO 4
+    3     if (RSQ .GE. RSMIN) GOTO 4
 
 !   Update LMIN and RSMIN.
 
@@ -1373,26 +1373,26 @@
 
 !   Test for termination of loop on nodes in cell (I,J).
 
-    4     if (ABS(LN) .EQ. L) GO TO 5
+    4     if (ABS(LN) .EQ. L) GOTO 5
           L = ABS(LN)
-          GO TO 2
+          GOTO 2
     5     continue
     6   continue
 
 ! Test for termination of loop on cell layers.
 
     7 if (I1 .LE. IMIN  .AND.  I2 .GE. IMAX  .AND.
-     .    J1 .LE. JMIN  .AND.  J2 .GE. JMAX) GO TO 8
+     .    J1 .LE. JMIN  .AND.  J2 .GE. JMAX) GOTO 8
       I1 = I1 - 1
       I2 = I2 + 1
       J1 = J1 - 1
       J2 = J2 + 1
-      GO TO 1
+      GOTO 1
 
 ! Unless no unmarked nodes were encountered, LMIN is the
 !   closest unmarked node to P.
 
-    8 if (FIRST) GO TO 9
+    8 if (FIRST) GOTO 9
       NP = LMIN
       DSQ = RSMIN
       LNEXT(LMIN) = -LNEXT(LMIN)
@@ -1465,7 +1465,7 @@
 
       AA = A
       BB = B
-      if (ABS(AA) .LE. ABS(BB)) GO TO 1
+      if (ABS(AA) .LE. ABS(BB)) GOTO 1
 
 ! ABS(A) > ABS(B).
 
@@ -1484,7 +1484,7 @@
 
 ! ABS(A) .LE. ABS(B).
 
-    1 if (BB .EQ. 0.) GO TO 2
+    1 if (BB .EQ. 0.) GOTO 2
       U = BB + BB
       V = AA/U
 
@@ -1634,7 +1634,7 @@
       DXSQ = DX*DX
       DYSQ = DY*DY
       D = SQRT(DXSQ + DYSQ)
-      if (D .LE. 0.  .OR.  D .GE. R) GO TO 1
+      if (D .LE. 0.  .OR.  D .GE. R) GOTO 1
       W = (R-D)/R/D
       W1 = S1*W
       W2 = S2*W
@@ -1769,7 +1769,7 @@
 
       NN = N
       NNR = NR
-      if (NN .LT. 2  .OR.  NNR .LT. 1) GO TO 5
+      if (NN .LT. 2  .OR.  NNR .LT. 1) GOTO 5
 
 ! Compute the dimensions of the rectangle containing the
 !   nodes.
@@ -1793,7 +1793,7 @@
       DELY = (YMX-YMN)/DBLE(NNR)
       DX = DELX
       DY = DELY
-      if (DELX .EQ. 0.  .OR.  DELY .EQ. 0.) GO TO 6
+      if (DELX .EQ. 0.  .OR.  DELY .EQ. 0.) GOTO 6
 
 ! Initialize LCELL.
 

@@ -48,7 +48,7 @@
                amamu(k) = amass(m)
                nkz(k) = m
             goto 1
-            endif
+            end if
          end do
          print*,' k=',k,', izz(k)=',izz(k)
          print*,' kz(m) not found'
@@ -65,7 +65,6 @@
       fmu = fmu*1.660531e-24 ! Convert to cgs
       flmu = log10(dble(fmu))
 
-      return
       end subroutine abund
 ! *********************************************************************
       subroutine xindex(flt, ilab, xi, ih, i3, ierr)
@@ -85,7 +84,7 @@
       else if (flt > 8.) then
         ierr = 102
         return
-      endif
+      end if
 
       x = 40.*flt/real(i3)
       ih2 = x
@@ -97,7 +96,6 @@
       end do
       xi = 2.*(x-ih2) - 1
 
-      return
       end subroutine xindex
 ! *********************************************************************
       subroutine jrange(ih, jhmin, jhmax, i3)
@@ -113,7 +111,6 @@
          jhmax = min(jhmax, je(ih(i)*i3)/i3)
       end do
 
-      return
       end subroutine jrange
 ! *********************************************************************
       subroutine findne(ilab, fa, nel, nkz, jhmin, jhmax, ih, flrho, flt, xi, flne, flmu, flr, epa, uy, i3, ierr)
@@ -161,7 +158,7 @@
             if (efa(i, jh) <= 0.) then
                jm = jh - 1
                goto 3
-            endif
+            end if
          end do
          goto 4
     3    jhmax = MIN(jhmax, jm)
@@ -187,14 +184,14 @@
       if (flrho < flrmin .or. flrho > flrmax) then
          ierr = 101
          return
-      endif
+      end if
 
 !  Interpolations in j for flne
       do jh = jhmin, jhmax
          if (flrh(2,jh) > flrho) then
             jm = jh - 1
             goto 5
-         endif
+         end if
       end do
       print*,' Interpolations in j for flne'
       print*,' Not found, i=',i
@@ -221,8 +218,7 @@
 
       return
 
-  601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range'/
-     +  ' Allowed range for flrho is ',e11.3,' to ',e11.3)
+  601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range'/' Allowed range for flrho is ',e11.3,' to ',e11.3)
       end subroutine findne
 ! **********************************************************************
       subroutine yindex(jhmin, jhmax, flne, jh, i3, eta)
@@ -244,7 +240,6 @@
       end do
       eta = 2.*(y-j)-1
 
-      return
       end subroutine yindex
 ! **********************************************************************
       subroutine findux(flr, xi, eta, ux)
@@ -263,13 +258,11 @@
       end do
       ux = fint(uxj, eta)
 
-      return
       end subroutine findux
 ! *********************************************************************
       subroutine rd(nel, nkz, izz, ilab, jh, n_tot, ff, rr, i3, umesh, fac)
       implicit none
-      integer, intent(in) :: nel, nkz(ipe), izz(ipe), ilab(0:5),
-     >     jh(0:5), n_tot, i3
+      integer, intent(in) :: nel, nkz(ipe), izz(ipe), ilab(0:5),jh(0:5), n_tot, i3
       real, intent(in) :: umesh(nptot)
       real(dp), intent(in) :: fac(nel)
       real, intent(out) :: ff(:,:,0:,0:)  ! (nptot, ipe, 6, 6)
@@ -280,11 +273,7 @@
 ! declare variables in common block (instead of by default: real (a-h, o-z), integer (i-n))
 !       integer :: ite1, ite2, ite3, jn1, jn2, jne3, ntot, nc, nf, int, ne1p, ne2p, np, kp1, kp2, kp3, npp, mx, nx
 !       real :: umin, umax, epatom, oplnck, fionp, yy1, yy2, yx
-!       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot,
-!      + nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1p(17,91,25),
-!      + ne2p(17,91,25),fionp(-1:28,28,91,25),np(17,91,25),kp1(17,91,25),
-!      + kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000),
-!      + yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
+!       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot, nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1p(17,91,25), ne2p(17,91,25),fionp(-1:28,28,91,25),np(17,91,25),kp1(17,91,25), kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000), yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
 !       save /atomdata/
 !
 !  i=temperature index
@@ -329,8 +318,6 @@
          end do !j
       end do !i
 
-      return
-
       end subroutine rd
 ! **********************************************************************
       subroutine ross(flmu, dv, ntot,rs, rossl)
@@ -356,7 +343,6 @@
          end do !j
       end do !i
 
-      return
       end subroutine ross
 ! **********************************************************************
       subroutine mix(ntot, nel, fa, ff, rs, rr, rion)
@@ -389,7 +375,6 @@
          end do
       end do
 
-      return
       end subroutine mix
 ! **********************************************************************
       subroutine interp(nel, rossl, xi, eta, g, i3, ux, uy, gx, gy)
@@ -491,7 +476,6 @@
       gy = 0.5*gy/uy
       gx = (80./real(i3))*(0.5*gx-gy*ux)
 
-      return
       end subroutine interp
 ! *************************************
       function fint(u,r)
@@ -500,11 +484,7 @@
 !  If  P(R) =   u(1)  u(2)  u(3)  u(4)
 !  for   R  =    -3    -1     1     3
 !  then a cubic fit is:
-      P(R)=(
-     +  27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(
-     +  27*(u(3)-u(2))-(u(4)-u(1))   +R*(
-     +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(
-     +  -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
+      P(R)=(     27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(     27*(u(3)-u(2))-(u(4)-u(1))   +R*(     -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(     -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
 !
         fint=p(r)
 !
@@ -517,10 +497,7 @@
 !  If  P(R) =   u(1)  u(2)  u(3)  u(4)
 !  for   R  =    -3    -1     1     3
 !  then a cubic fit to the derivative is:
-      PP(R)=(
-     +  27*(u(3)-u(2))-(u(4)-u(1))   +2.*R*(
-     +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +3.*R*(
-     +  -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
+      PP(R)=(     27*(u(3)-u(2))-(u(4)-u(1))   +2.*R*(     -3*(u(2)+u(3))+3*(u(4)+u(1)) +3.*R*(     -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
 
         fintp=pp(r)
 
@@ -579,8 +556,6 @@
          end do
       end do
 
-      return
-
       end subroutine DERIV
 ! *****************************************************************
 !
@@ -608,10 +583,10 @@
       else if (N == 3) then
          FP1=.5*(-3.*F(1)+4.*F(2)-F(3))
          FPN=.5*(F(1)-4.*F(2)+3.*F(3))
-      ELSE
+      else
          FP1=(-11.*F(1)+18.*F(2)-9.*F(3)+2.*F(4))/6.
          FPN=(11.*F(N)-18.*F(N-1)+9.*F(N-2)-2.*F(N-3))/6.
-      ENDIF
+      end if
 
       D(1)=-.5
       T(1)=.5*(-F(1)+F(2)-FP1)
@@ -633,7 +608,6 @@
       F(1)=FP1
       F(N)=FPN
 
-      return
       end subroutine GET
 
 ! **********************************************************************
@@ -645,18 +619,11 @@
 !
 !  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
 !
-      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
-     +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
-     +   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))      +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))      +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))      +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
-      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
-     +   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))      +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))      +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
 
-      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
-     +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
-     +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))      +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))      +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
       Y = (eta + 5.)/2.
       X = (xi + 5.)/2.
@@ -682,29 +649,13 @@
 
       B(9)=3*(-F(I,J)+F(I+1,J))-2*FX(I,J)-FX(I+1,J)
       B(10)=3*(-FY(I,J)+FY(I+1,J))-2*FXY(I,J)-FXY(I+1,J)
-      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))
-     + +4*FXY(I,J)
-     + +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))
-     + +2*(FXY(I,J+1)+FXY(I+1,J))
-     + +FXY(I+1,J+1)
-      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FX(I,J)+FX(I,J+1))
-     + +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))
-     + +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))
-     + -FXY(I+1,J)-FXY(I+1,J+1)
+      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))    +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))    +4*FXY(I,J)    +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))    +2*(FXY(I,J+1)+FXY(I+1,J))    +FXY(I+1,J+1)
+      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))    +4*(-FX(I,J)+FX(I,J+1))    +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))    +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))    -FXY(I+1,J)-FXY(I+1,J+1)
 
       B(13)=2*(F(I,J)-F(I+1,J))+FX(I,J)+FX(I+1,J)
       B(14)=2*(FY(I,J)-FY(I+1,J))+FXY(I,J)+FXY(I+1,J)
-      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FY(I,J)+FY(I+1,J))
-     + +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))
-     + +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))
-     + -FXY(I+1,J+1)-FXY(I,J+1)
-      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)
-     +    +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))
-     + +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
+      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))    +4*(-FY(I,J)+FY(I+1,J))    +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))    +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))    -FXY(I+1,J+1)-FXY(I,J+1)
+      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))    +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)       +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))    +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
 !
 !  GET G=LOG10(ROSS), DGDT=d LOG10(ROSS)/d LOG10(T),
 !      DGDRHO=d LOG10(ROSS)/d LOG10(RHO)
@@ -715,8 +666,6 @@
       gy = FFY(U, V)
 !      DGDT=(1./CT)*FFX(U,V)-(3./CN)*FFY(U,V)
 !      DGDRHO=(1./CN)*FFY(U,V)
-      return
-
       end subroutine INTERP2
 ! ************************************************************
 ! This subroutine estimates the partial derivative of a function
@@ -737,7 +686,7 @@
       else
          if (abs(x1)<abs(x2)) fx = sign(1.0,x1)*min(abs(x1), abs(x2))
          if (abs(x2)<abs(x1)) fx = sign(1.0,x2)*min(abs(x1), abs(x2))
-      endif
+      end if
 
       end subroutine deriv3
 ! **********************************************************************
@@ -794,9 +743,8 @@
       subroutine scatt(ih, jh, rion, uf, f, umesh, semesh, dscat, ntot, epa, ierr)
       use op_load, only: BRCKR
       integer, intent(inout) :: ierr
-      dimension rion(28, 0:5, 0:5),uf(0:100),f(nptot,0:5,0:5),umesh(nptot),
-     +  semesh(nptot),fscat(0:100),p(nptot),rr(28),ih(0:5),jh(0:5)
-        integer i,j,k,n
+      dimension rion(28, 0:5, 0:5),uf(0:100),f(nptot,0:5,0:5),umesh(nptot),semesh(nptot),fscat(0:100),p(nptot),rr(28),ih(0:5),jh(0:5)
+      integer :: i,j,k,n
 ! HH: always use meshtype q='m'
       ite3=2
       umin=umesh(1)
@@ -837,13 +785,11 @@
          end do
       end do
 
-      return
       end subroutine scatt
 ! **********************************************************************
       subroutine screen1(ih,jh,rion,umesh,ntot,epa,f)
       use op_load, only: screen2
-      dimension uf(0:100), umesh(nptot),
-     +  fscat(0:100), ih(0:5), jh(0:5)
+      dimension uf(0:100), umesh(nptot),fscat(0:100), ih(0:5), jh(0:5)
       real, target :: f(nptot, 0:5, 0:5), rion(28, 0:5, 0:5)
       integer i, j, k, m
       real, pointer :: p(:), rr(:)
@@ -869,7 +815,6 @@
         end do
       end do
 
-      return
       end subroutine screen1
 ! **********************************************************************
       end module op_osc

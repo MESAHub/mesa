@@ -49,7 +49,6 @@
 !            If you, for example, only want to return gamma1: set iorder=1
 !            and set: data (index(i),i=1,10)/8,2,3,4,5,6,7,1,9,10/
 
-
       save
       double precision results_out(iorder), pgas_out, prad_out
       integer :: info ! returned = 0 if AOK
@@ -61,7 +60,7 @@
       common/lreadco_hhe/itime
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr), t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos_hhe/ xz(mx,mv,nt,nr), t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
       common/bbeos_hhe/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos_hhe/esact,eos(mv)
@@ -112,13 +111,10 @@
         if(z+xh-1.e-6  >  1 ) GOTO 61
       end if
 
-
 !..... Determine T6,rho grid points to use in the
 !      interpolation.
       if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) GOTO 62
       if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
-
-
 
 !     if (izi  ==  0) then  ! freeze table indices if not 0
         ilo=2
@@ -266,7 +262,7 @@
 
       is=0
 
-c__________
+!__________
       do ir=l1,l1+iq
         do it=k1,k1+ip
         epl(m,it,ir)=xz(m,iv,it,ir)
@@ -313,7 +309,6 @@ c__________
         end do
    47 continue
 
-
       end if
 
       is=0
@@ -321,7 +316,6 @@ c__________
 !..... completed X interpolation. Now interpolate T6 and rho on a
 !      4x4 grid. (t6a(i),i=i1,i1+3),rho(j),j=j1,j1+3)).Procedure
 !      mixes overlapping quadratics to obtain smoothed derivatives.
-
 
       call t6rinteos_hhe(slr,slt)
       eos(iv)=esact
@@ -431,7 +425,6 @@ c__________
       return
       end
 
-
 ! *********************************************************************
       subroutine readcoeos_hhe(filename)
 !..... The purpose of this subroutine is to read the data tables
@@ -474,7 +467,6 @@ c__________
          write(*,*) 'failed to open ', trim(filename)
          stop 1
       end if
-
 
       do 3 m=1,mx
       read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)') xin(m),zz(m),moles(m),tmass(m)
@@ -538,7 +530,6 @@ c__________
       return
       end
 
-
 ! share quadeos and gmass with the standard xtrin
 
 ! **********************************************************************
@@ -550,7 +541,7 @@ c__________
 
       data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
-cPhysical constants
+! Physical constants
 !       Na=6.0221367e+23
 !       k =1.380658e-16 !   erg/degree K
 !       Na*k=6.0221367E+23*1.380658e-16 erg/degree K=8.314510E+7 erg/degree K
@@ -604,8 +595,7 @@ cPhysical constants
 
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
 !-----Add difference between EOS with and without radiation.  cvtt
 !       calculation is not accurate enough to give accurate results using
 !       eq. 16.16 Landau&Lifshitz (SEE line labeled DIRECT)
@@ -616,8 +606,7 @@ cPhysical constants
 !-----End EOS calculations with radiation
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
       eos(iri(1))=pt
       eos(iri(2))=et
       eos(iri(3))=st
@@ -640,7 +629,6 @@ cPhysical constants
 
       data (index_hhe(i),i=1,mv_hhe)/1,2,3,4,5,6,7,8,9,10,11,12/
       data (nta_hhe(i),i=1,nr_hhe)/92*197,196,194,190,2*189,3*187,2*159,133,125,123,122,120,115,113,107,102,95,87,83,74,69,67,62,56,54,52,51,3*50,2*49,26*48,47,45,43,42,41,39,37,36,35,34,32,31,30,29,27,26/
-
 
       ! for opal_core
       parameter (mx=5,mv=12,nr=169,nt=197)

@@ -21,7 +21,7 @@
       else if(flt>8.) then
         ierr = 102
         return
-      endif
+      end if
 
       x = 40.*flt/real(i3)
       ih2 = x
@@ -33,7 +33,6 @@
       end do
       xi = 2.*(x-ih2) - 1
 
-      return
       end subroutine xindex
 
 ! *********************************************************************
@@ -50,7 +49,6 @@
          jhmax = min(jhmax, je(ih(i)*i3)/i3)
       end do
 
-      return
       end subroutine jrange
 ! *********************************************************************
 
@@ -93,13 +91,13 @@
          end do !jne
       end do !i
 
-! Get range for efa.gt.0
+! Get range for efa > 0
       do i = 1, 4
          do jh = jhmin, jhmax
             if(efa(i, jh) <= 0.)then
                jm = jh - 1
                goto 3
-            endif
+            end if
          end do
          goto 4
     3    jhmax = MIN(jhmax, jm)
@@ -127,14 +125,14 @@
          write(*,*) "Allowed range for logRho is",flrmin," to ",flrmax
          ierr = 101
          return
-      endif
+      end if
 
 !  Interpolations in j for flne
       do jh = jhmin, jhmax
          if(flrh(2,jh) > flrho)then
             jm = jh - 1
             goto 5
-         endif
+         end if
       end do
       print*,' Interpolations in j for flne'
       print*,' Not found, i=',i
@@ -184,7 +182,6 @@
       end do
       eta = 2.*(y-j)-1
 
-      return
       end subroutine yindex
 
 ! **********************************************************************
@@ -204,7 +201,6 @@
       end do
       ux = fint(uxj, eta)
 
-      return
       end subroutine findux
 
 ! *************************************
@@ -218,7 +214,6 @@
 
         fint=p(r)
 
-      return
       end function fint
 ! **********************************************************************
       function fintp(u,r)
@@ -231,7 +226,6 @@
 
         fintp=pp(r)
 
-      return
       end function fintp
 
 ! **********************************************************************
@@ -282,7 +276,6 @@
          end do
       end do
 
-      return
       end subroutine scatt
 ! **********************************************************************
       subroutine screen1(ih,jh,rion,umesh,ntot,epa,f)
@@ -315,7 +308,6 @@
         end do
       end do
 
-      return
       end subroutine screen1
 
       end module op_common

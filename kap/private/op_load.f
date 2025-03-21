@@ -99,7 +99,7 @@
       !if (len(trim(path)) == 0) then
       !   write(6,*) 'Define environmental variable oppath (directory of OP data)'
       !   stop
-      !endif
+      !end if
 
 
       ios = 0
@@ -159,19 +159,19 @@
          write(6,6001)zlab(1),izz,nn,kz(1)
          ierr=1
          goto 1001
-      endif
+      end if
       NTOTP=NF
       if (NTOTP > nptot) then
          write(6,6002)ntotp,nptot
          ierr=2
          goto 1001
-      endif
+      end if
       INT(1)=1
       if (ITTE3 /= ITE3) then
          write(6,6077)ite3,itte3,nn
          ierr=3
          goto 1001
-      endif
+      end if
 !      ITE1=MAX(ITE1,ITTE1)
 !      ITE2=MIN(ITE2,ITTE2)
 !
@@ -205,27 +205,27 @@
             write(6,6077)ite3,ite33,nn
             ierr=4
             goto 1001
-         endif
+         end if
 !         ITE1=MAX(ITE1,ITE11)
 !         ITE2=MIN(ITE2,ITE22)
          if (IZZ /= KZ(N)) then
             write(6,6001)zlab(n),izz,nn,kz(nn)
             ierr=5
             goto 1001
-         endif
+         end if
          NTOTT=NF
          if (NTOTT > NTOTP) then
             write(6,6006)nn,ntott,ntotp
             ierr=6
             goto 1001
-         endif
+         end if
 ! !!        if (UMIN /= UMINN.OR.UMAX /= UMAXX) GOTO 1003  !!
          INT(N)=NTOTP/NTOTT
          if (INT(N)*NTOTT /= NTOTP) then
             WRITE(6,6009)NN,NTOTT,NTOTP
             ierr=7
             goto 1001
-         endif
+         end if
          if (INT(N) /= 1)WRITE(6,6007)N,INT(N)
 !
 !        READ MESH FILES
@@ -253,8 +253,7 @@
 !
 !        OPEN FILES
 !
-         TLAB='.'//NUM(IT/100)//NUM(IT/10-10*(IT/100))//
-     +    NUM(IT-10*(IT/10))
+         TLAB='.'//NUM(IT/100)//NUM(IT/10-10*(IT/100))//       NUM(IT-10*(IT/10))
          do n=1,ipe
 !            if (SKIP(N))GOTO 70
             NN=N
@@ -271,7 +270,7 @@
                ierr = -1
                goto 1001
             end if
-            endif
+            end if
          end do
 !        READ HEADINGS
          NN=1
@@ -285,7 +284,7 @@
               write(6,6099)jne3,jne33,nn
               ierr=9
               goto 1001
-            endif
+            end if
             JNE1=MAX(JNE1,JNE11)
             JNE2=MIN(JNE2,JNE22)
          end do
@@ -303,9 +302,7 @@
 !
 !           START LOOP ON ELEMENTS
 !
-   95        read(IFL(N))JNE,EPATOM(n,itt,jnn),OPLNCK(n,itt,jnn),ORSS,
-     +         NE1P(n,itt,jnn),NE2P(n,itt,jnn),
-     +         (FIONP(NE,n,itt,jnn),NE=NE1P(n,itt,jnn),NE2P(n,itt,jnn))
+   95        read(IFL(N))JNE,EPATOM(n,itt,jnn),OPLNCK(n,itt,jnn),ORSS,            NE1P(n,itt,jnn),NE2P(n,itt,jnn),            (FIONP(NE,n,itt,jnn),NE=NE1P(n,itt,jnn),NE2P(n,itt,jnn))
              read(ifl(n))np(n,itt,jnn)
              if (np(n,itt,jnn) > 0) then
                 read(ifl(n))(nx_temp(k),y_temp(k),k=1,np(n,itt,jnn))
@@ -329,15 +326,15 @@
                read(ifl(n))(yy2(k+ncount2),k=1,ntotp)
                  kp2(n,itt,jnn)=ncount2
                  ncount2=ncount2+ntotp
-             endif
+             end if
                if (n > 2) then
                  read(iflp(n))ja,npp(n,itt,jnn)
                  if (npp(n,itt,jnn) > 0) then
            read(iflp(n))(nx(k+ncount3),yx(k+ncount3),k=1,npp(n,itt,jnn))
                    kp3(n,itt,jnn)=ncount3
                    ncount3=ncount3+npp(n,itt,jnn)
-                 endif
-               endif
+                 end if
+               end if
             end do
           end do
 
@@ -365,9 +362,7 @@
       open(1, file=trim(cache_filename), iostat=ios, action='write', form='unformatted')
       if (ios == 0) then
          write(*,*) 'write ' // trim(cache_filename)
-         write(1) op_cache_version, ntotv,dv,dv1,umesh,
-     >     ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,
-     >     ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
+         write(1) op_cache_version, ntotv,dv,dv1,umesh, ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
          close(1)
       end if
 
@@ -386,23 +381,17 @@
 610   format(10x,'Done IT= ',i3)
 1004  WRITE(6,6004)ZLAB(NN),TLAB
       STOP
-6001  FORMAT(//5X,'*** OP: FILE ',A3,' GIVES IZZ=',I3,
-     + 'NOT EQUAL TO IZ(',I2,')=',I2,' ***')
-6002  FORMAT(//5X,'*** OP: NTOT=',I7,' GREATER THAN nptot=',
-     + I7,' ***')
-6003  FORMAT(//5X,'*** OP: DISCREPANCY BETWEEN DATA ON FILES ',
-     + A3,' AND ',A3,' ***')
+6001  FORMAT(//5X,'*** OP: FILE ',A3,' GIVES IZZ=',I3,    'NOT EQUAL TO IZ(',I2,')=',I2,' ***')
+6002  FORMAT(//5X,'*** OP: NTOT=',I7,' GREATER THAN nptot=',    I7,' ***')
+6003  FORMAT(//5X,'*** OP: DISCREPANCY BETWEEN DATA ON FILES ',    A3,' AND ',A3,' ***')
 6004  FORMAT(//5X,'*** OP: ERROR OPENING FILE ',A3,A6,'  ***')
 6006  FORMAT(//5X,'OP: N=',I2,', NTOTT=',I7,', GREATER THAN NTOT=',I7)
 6007  FORMAT(/5X,'OP: N=',I2,', INT(N)=',I4)
-6009  FORMAT(' OP: N=',I5,', NTOTT=',I10,', NTOT=',I10/
-     + '   NTOT NOT MULTIPLE OF NTOTT')
+6009  FORMAT(' OP: N=',I5,', NTOTT=',I10,', NTOT=',I10/    '   NTOT NOT MULTIPLE OF NTOTT')
 c6012  FORMAT(/10X,'ERROR, SEE WRITE(6,6012)'/
 !     + 10X,'IT=',I3,', JN=',I3,', N=',I3,', JNE=',I3/)
-6077  FORMAT(//5X,'OP: DISCREPANCY IN ITE3'/10X,I5,' READ FROM UNIT 5'/
-     + 10X,I5,' FROM INDEX FILE ELEMENT',I5)
-6099  FORMAT(//5X,'OP: DISCREPANCY IN JNE3'/10X,I5,' READ FOR N=1'/
-     + 10X,I5,' READ FOR N=',I5)
+6077  FORMAT(//5X,'OP: DISCREPANCY IN ITE3'/10X,I5,' READ FROM UNIT 5'/    10X,I5,' FROM INDEX FILE ELEMENT',I5)
+6099  FORMAT(//5X,'OP: DISCREPANCY IN JNE3'/10X,I5,' READ FOR N=1'/    10X,I5,' READ FOR N=',I5)
 
 c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 1010  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
@@ -443,8 +432,8 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             nn=n-1
             ibb=ib-1
             goto 1
-          endif
-        endif
+          end if
+        end if
         in(n)=ib
         aa(n)=(ub-umesh(n))/d
         bb(n)=(umesh(n)-ua)/d
@@ -458,7 +447,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       end do
       itot=ib
 
-        return
       end subroutine IMESH
 
 
@@ -488,8 +476,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
          uf(i) = umin + i*dscat
       end do
 
-      return
-
       end subroutine msh
 
 
@@ -500,16 +486,9 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !  If  P(R) =   u(1)  u(2)  u(3)  u(4)
 !  for   R  =    -3    -1    1     3
 !  then a cubic fit is:
-      P(R)=(
-     +  27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(
-     +  27*(u(3)-u(2))-(u(4)-u(1))   +R*(
-     +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(
-     +  -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
+      P(R)=(     27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(     27*(u(3)-u(2))-(u(4)-u(1))   +R*(     -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(     -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
 !  First derivative is:
-      PP(R)=(
-     +  27*(u(3)-u(2))-(u(4)-u(1))+ 2*R*(
-     +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +3*R*(
-     +  -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
+      PP(R)=(     27*(u(3)-u(2))-(u(4)-u(1))+ 2*R*(     -3*(u(2)+u(3))+3*(u(4)+u(1)) +3*R*(     -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
 
 !      ierr = 0
 !  Find value of z giving P(z)=v
@@ -592,14 +571,12 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             F=D*((G+D*D*D)*LOG(dble(D/(2.+D)))+G+2.6666667)
          end if
          DELTA=.375*R*F/X
-         SF(N)=(1.-R*DELTA-Y*FUNS(W))*
-     +   (1.+U(N)*(C1+U(N)*(C2+U(N)*C3)))   !SAMPSON CORRECTION
+         SF(N)=(1.-R*DELTA-Y*FUNS(W))*      (1.+U(N)*(C1+U(N)*(C2+U(N)*C3)))   !SAMPSON CORRECTION
       end do
 
       return
 
-  600 FORMAT(5X,'NOT CONVERGED IN LOOP 10 OF BRCKR'/
-     +       5X,'T=',1P,E10.2,', FNE=',E10.2)
+  600 FORMAT(5X,'NOT CONVERGED IN LOOP 10 OF BRCKR'/          5X,'T=',1P,E10.2,', FNE=',E10.2)
 
       end subroutine BRCKR
 ! **********************************************************************
@@ -608,15 +585,9 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       if (A <= 0.001) then
          FUNS=1.
       else if (A <= 0.01) then
-         FUNS=(1.+A*(-1.0886+A*(1.06066+A*1.101193)))/
-     +     (1.+A*(0.35355+A*(0.19245+A+0.125)))
+         FUNS=(1.+A*(-1.0886+A*(1.06066+A*1.101193)))/        (1.+A*(0.35355+A*(0.19245+A+0.125)))
       else
-         FUNS=(  1./(1.+0.81230*A)**2+
-     +        0.92007/(1.+0.31754*A)**2+
-     +        0.05683/(1.+0.04307*A)**2 )/
-     +     (  1./(1.+0.65983*A)+
-     +        0.92007/(1.+0.10083*A)+
-     +        0.05683/(1.+0.00186*A)    )
+         FUNS=(  1./(1.+0.81230*A)**2+           0.92007/(1.+0.31754*A)**2+           0.05683/(1.+0.04307*A)**2 )/        (  1./(1.+0.65983*A)+           0.92007/(1.+0.10083*A)+           0.05683/(1.+0.00186*A)    )
       end if
       return
       end FUNCTION FUNS
@@ -627,17 +598,14 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !  ETA=LOG(W)
 !
       if (W <= 2.718282) then
-         FMH=W*(1+W*(-.7070545+W*(-.3394862-W*6.923481E-4))
-     +   /(1.+W*(1.2958546+W*.35469431)))
+         FMH=W*(1+W*(-.7070545+W*(-.3394862-W*6.923481E-4))      /(1.+W*(1.2958546+W*.35469431)))
       else if (W <= 54.59815) then
          X=LOG(dble(W))
-         FMH=(.6652309+X*(.7528360+X*.6494319))
-     +   /(1.+X*(.8975007+X*.1153824))
+         FMH=(.6652309+X*(.7528360+X*.6494319))      /(1.+X*(.8975007+X*.1153824))
       else
          X=LOG(dble(W))
          Y=1./X**2
-         FMH=SQRT(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))
-     +   /(1.+Y*(-10.867628+Y*384.61501)))
+         FMH=SQRT(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))      /(1.+Y*(-10.867628+Y*384.61501)))
       end if
 
       return
@@ -651,10 +619,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !
       integer, intent(inout) :: ierr
       DIMENSION D(2:12)
-      DATA D/
-     +  3.5355339E-01, 5.7549910E-02, 5.7639604E-03, 4.0194942E-04,
-     +  2.0981899E-05, 8.6021311E-07, 2.8647149E-08, 7.9528315E-10,
-     +  1.8774422E-11, 3.8247505E-13, 6.8427624E-15/
+      DATA D/     3.5355339E-01, 5.7549910E-02, 5.7639604E-03, 4.0194942E-04,     2.0981899E-05, 8.6021311E-07, 2.8647149E-08, 7.9528315E-10,     1.8774422E-11, 3.8247505E-13, 6.8427624E-15/
 
       integer n,k
 
@@ -682,7 +647,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             E=LOG(dble(X))
          else
             e=pow(1.5d0*a,2d0/3d0)
-         endif
+         end if
          do k=1,10
             call FDF1F2(E,F1,F2)
             DE=(A-F2)*2./F1
@@ -697,7 +662,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 
       end if
 
-      return
       end subroutine FDETA
 ! **********************************************************************
       subroutine FDF1F2(ETA,F1,F2)
@@ -708,28 +672,19 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !
       if (ETA <= 1) then
          X=exp(dble(ETA))
-         F1=X*(1.772454+X*(-1.2532215+X*(-0.60172359-X*0.0012271551))/
-     +      (1.+X*(1.2958546+X*0.35469431)))
-         F2=X*(0.88622693+X*(-0.31329180+X*(-0.14275695-
-     +      X*0.0010090890))/
-     +      (1.+X*(0.99882853+X*0.19716967)))
+         F1=X*(1.772454+X*(-1.2532215+X*(-0.60172359-X*0.0012271551))/         (1.+X*(1.2958546+X*0.35469431)))
+         F2=X*(0.88622693+X*(-0.31329180+X*(-0.14275695-         X*0.0010090890))/         (1.+X*(0.99882853+X*0.19716967)))
       else if (ETA <= 4) then
          X=ETA
-         F1=(1.17909+X*(1.334367+X*1.151088))/
-     +      (1.+X*(0.8975007+X*0.1153824))
-         F2=(0.6943274+X*(0.4918855+X*0.214556))/
-     +      (1.+X*(-0.0005456214+X*0.003648789))
+         F1=(1.17909+X*(1.334367+X*1.151088))/         (1.+X*(0.8975007+X*0.1153824))
+         F2=(0.6943274+X*(0.4918855+X*0.214556))/         (1.+X*(-0.0005456214+X*0.003648789))
       else
          X=SQRT(ETA)
          Y=1./ETA**2
-         F1=X*(2.+Y*(-0.81495847+Y*(4.0521266-Y*325.43565))/
-     +      (1.+Y*(-10.867628+Y*384.61501)))
-         F2=ETA*X*(0.666666667+Y*(0.822713535+Y*(5.27498049+
-     +      Y*290.433403))/
-     +      (1.+Y*(5.69335697+Y*322.149800)))
+         F1=X*(2.+Y*(-0.81495847+Y*(4.0521266-Y*325.43565))/         (1.+Y*(-10.867628+Y*384.61501)))
+         F2=ETA*X*(0.666666667+Y*(0.822713535+Y*(5.27498049+         Y*290.433403))/         (1.+Y*(5.69335697+Y*322.149800)))
       end if
 
-      return
       end subroutine FDF1F2
 
 
@@ -771,8 +726,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             fkp=sqrt(e+w)
             x1=1.+alp2/(fkp+fk)**2
             x2=1.+alp2/(fkp-fk)**2
-            q=(1./x2-1./x1+LOG(dble(x1/x2)))*
-     +        (fkp*(1.-exp(dble(-twopi*k/fkp))))/(fk*(1.-exp(dble(-twopi*k/fk))))
+            q=(1./x2-1./x1+LOG(dble(x1/x2)))*           (fkp*(1.-exp(dble(-twopi*k/fkp))))/(fk*(1.-exp(dble(-twopi*k/fk))))
               ff=ff+wt(j)*q
           end do
           f(i)=f(i)+crz*ff
@@ -789,7 +743,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
         p(n)=p(n)+f(in(n))/(w*w*w)
       end do
 
-      return
       end subroutine screen2
 
       end module op_load

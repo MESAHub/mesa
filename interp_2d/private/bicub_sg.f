@@ -2723,7 +2723,7 @@
       if((i.lt.1).or.(i.gt.nxm)) then
          i1=1
          i2=nx-1
-         go to 10
+         GOTO 10
       endif
 
       if(x(i).gt.zxget) then
@@ -2732,7 +2732,7 @@
          if((x(i)-zxget).gt.4*dx) then
             i1=1
             i2=i-1
-            go to 10
+            GOTO 10
          else
             i2=i-1
             do ij=i2,1,-1
@@ -2750,7 +2750,7 @@
          if((zxget-x(i+1)).gt.4*dx) then
             i1=i+1
             i2=nxm
-            go to 10
+            GOTO 10
          else
             i2=i+1
             do ij=i2,nxm
@@ -2790,7 +2790,7 @@
          return
       endif
 
-      go to 10
+      GOTO 10
 
       end subroutine zonfind
 
