@@ -29,4 +29,4 @@ subroutine azbar(xmass, aion, zion, ionmax, ymass, abar, zbar)
    end do
    abar = 1.0d0/ytot1
    zbar = zbarxx*abar
-end subroutine azbar
+end

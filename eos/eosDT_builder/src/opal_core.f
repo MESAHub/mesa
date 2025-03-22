@@ -24,13 +24,13 @@
 !            results(9) is gamma2/(gamma2-1). Eqs. 9.88 Cox and Guili
 !            results(10) is mu_M
 !            results(11) is log_Ne
-      integer :: info ! returned = 0 if AOK
-      character (len=256) :: data_dir, filename
+      integer info ! returned = 0 if AOK
+      character (len=256) data_dir, filename
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/eeos/esact,eos(mv)
-      double precision :: xh_in,ztab_in,t6_in,r_in,results_out(iorder),pgas_out,prad_out
-      real :: xh,ztab,t6,r
-      integer :: iorder, irad
+      double precision xh_in,ztab_in,t6_in,r_in,results_out(iorder),pgas_out,prad_out
+      real xh,ztab,t6,r
+      integer iorder, irad
       if (iorder  <  1 .or. iorder  >  mv) then
          write(*,*) 'invalid iorder argument (must be between 1 and ', mv, ')', iorder
          stop 1
@@ -59,7 +59,7 @@
       do j=1,iorder
          results_out(j) = eos(j)
       end do
-      end subroutine opal_eos
+      end
 
 
 !..***********************************************************************
@@ -108,12 +108,12 @@
 
 
       save
-      double precision :: pgas_out, prad_out
-      integer :: info ! returned = 0 if AOK
-      character (len=*) :: filename
-      real :: moles
+      double precision pgas_out, prad_out
+      integer info ! returned = 0 if AOK
+      character (len=*) filename
+      real moles
       parameter (mx=5,mv=12,nr=169,nt=197)
-      character :: blank*1
+      character blank*1
       common/lreadco/itime
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
@@ -182,6 +182,7 @@
 !      interpolation.
       if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) GOTO 62
       if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
+
 
 
         ilo=2
@@ -418,7 +419,7 @@
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)') ip,iq,k3,l3,xh,t6,r,z
       stop 1
       return
-      end subroutine esac
+      end
 
 !..*********************************************************************
       subroutine t6rinteos(slr,slt)
@@ -480,17 +481,17 @@
           stop 1
         end if
 
-      end subroutine t6rinteos
+      end
 
 
 !..********************************************************************
       subroutine readcoeos(filename)
 !..... The purpose of this subroutine is to read the data tables
       save
-      character (len=256) :: filename
+      character (len=256) filename
       parameter (mx=5,mv=12,nr=169,nt=197)
-      real :: moles
-      character*1 :: blank
+      real moles
+      character*1 blank
       common/aaeos/ q(4),h(4),xxh
       common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -580,7 +581,7 @@
       end do
 !       call system ('gzip EOS5_data')
 
-      end subroutine readcoeos
+      end
 
 !..*********************************************************************
       function quadeos(ic,i,x,y1,y2,y3,x1,x2,x3)
@@ -607,7 +608,7 @@
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       quadeos=c1+x*(c2+x*c3)
       return
-      end function quadeos
+      end
 !..****************************************************************8
       function gmass(x,z,amoles,eground,fracz,frac)
       dimension anum(6),frac(7), amas(7),eion(7)
@@ -651,11 +652,11 @@
       end do
 
       return
-      end function gmass
+      end
 !..*********************************************************************
       subroutine radsub (irad,t6,density,moles,tmass)
       parameter (mx=5,mv=12,nr=169,nt=197)
-      real :: moles,k,molenak,Na
+      real moles,k,molenak,Na
       common/eeos/esact,eos(mv)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
 
@@ -737,4 +738,4 @@
       eos(iri(6))=chir
       eos(iri(7))=chitt
 
-      end subroutine radsub
+      end

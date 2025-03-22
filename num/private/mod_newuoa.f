@@ -4,6 +4,7 @@
 
       contains
 
+
       subroutine do_newuoa(N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,CALFUN,max_valid_value)
       implicit real(dp) (A-H,O-Z)
       dimension X(*),W(*)

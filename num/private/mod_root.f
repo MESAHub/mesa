@@ -23,10 +23,12 @@
 !
 ! ***********************************************************************
 
+
       module mod_root
       use const_def, only: dp, arg_not_provided
 
       implicit none
+
 
       contains
 
@@ -167,6 +169,7 @@
          end if
 
       end function do_safe_root_with_guess
+
 
 
       ! safe_root requires bracketing values for the root.

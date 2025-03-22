@@ -170,6 +170,7 @@
       end function do_safe_root_with_guess
 
 
+
       ! safe_root requires bracketing values for the root.
       ! if you don't have them, you can use this routine to do a (not too dumb) search.
       subroutine do_look_for_brackets(x,dx,x1,x3,f,y1,y3,imax,lrpar,rpar,lipar,ipar,ierr)

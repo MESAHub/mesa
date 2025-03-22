@@ -1,6 +1,10 @@
-      subroutine do_CSHEP2_db (N,X,Y,F,NC,NW,NR, LCELL,LNEXT,XMIN, YMIN,DX,DY,RMAX,RW,A,IER)
-      integer :: N, NC, NW, NR, LCELL(NR,NR), LNEXT(N), IER
-      double precision  :: X(N), Y(N), F(N), XMIN, YMIN, DX, DY, RMAX, RW(N), A(9,N)
+
+
+      subroutine do_CSHEP2_db (N,X,Y,F,NC,NW,NR, LCELL,LNEXT,XMIN,
+     .                   YMIN,DX,DY,RMAX,RW,A,IER)
+      integer N, NC, NW, NR, LCELL(NR,NR), LNEXT(N), IER
+      double precision  X(N), Y(N), F(N), XMIN, YMIN, DX,
+     .                  DY, RMAX, RW(N), A(9,N)
 
 ! **********************************************************
 
@@ -54,7 +58,7 @@
 
 ! On input:
 
-!       N = Number of nodes and data values.  N  >=  10.
+!       N = Number of nodes and data values.  N .GE. 10.
 
 !       X,Y = Arrays of length N containing the Cartesian
 !             coordinates of the nodes.
@@ -75,23 +79,23 @@
 !            of influence R(k) which enter into the weights
 !            W(k).  For N sufficiently large, a recommended
 !            value is NW = 30.  In general, NW should be
-!            about 1.5*NC.  1  <=  NW  <=  Min(40,N-1).
+!            about 1.5*NC.  1 .LE. NW .LE. Min(40,N-1).
 
 !       NR = Number of rows and columns in the cell grid de-
 !            fined in Subroutine STORE2_db.  A rectangle con-
 !            taining the nodes is partitioned into cells in
 !            order to increase search efficiency.  NR =
-!            Sqrt(N/3) is recommended.  NR  >=  1.
+!            Sqrt(N/3) is recommended.  NR .GE. 1.
 
 ! The above parameters are not altered by this routine.
 
-!       LCELL = Array of length  >=  NR**2.
+!       LCELL = Array of length .GE. NR**2.
 
-!       LNEXT = Array of length  >=  N.
+!       LNEXT = Array of length .GE. N.
 
-!       RW = Array of length  >=  N.
+!       RW = Array of length .GE. N.
 
-!       A = Array of length  >=  9N.
+!       A = Array of length .GE. 9N.
 
 ! On output:
 
@@ -131,10 +135,15 @@
 
 ! **********************************************************
 
-      integer :: LMX
-      parameter (LMX=40)
-      integer :: I, IERR, IP1, IRM1, IROW, J, JP1, K, LMAX,   LNP, NEQ, NN, NNC, NNR, NNW, NP, NPTS(LMX),   NCWMAX
-      double precision :: B(10,10), C, DDX, DDY, DMIN, DTOL,   FK, RC, RS, RSMX, RSOLD, RTOL, RWS,   S, SF, SFC, SFS, STF, SUM, T, XK,   XMN, YK, YMN
+      integer LMX
+      PARAMETER (LMX=40)
+      integer I, IERR, IP1, IRM1, IROW, J, JP1, K, LMAX,
+     .        LNP, NEQ, NN, NNC, NNR, NNW, NP, NPTS(LMX),
+     .        NCWMAX
+      double precision B(10,10), C, DDX, DDY, DMIN, DTOL,
+     .                 FK, RC, RS, RSMX, RSOLD, RTOL, RWS,
+     .                 S, SF, SFC, SFS, STF, SUM, T, XK,
+     .                 XMN, YK, YMN
 
 !      DATA    RTOL/1.D-5/, DTOL/.01/
       DATA    RTOL/1.D-5/, DTOL/1.D-5/
@@ -151,7 +160,7 @@
 !                zeros are introduced below the diagonal
 ! DTOL =       Tolerance for detecting an ill-conditioned
 !                system.  The system is accepted when
-!                DMIN*RC  >=  DTOL.
+!                DMIN*RC .GE. DTOL.
 ! FK =         Data value at mode K -- F(K)
 ! I =          Index for A, B, and NPTS
 ! IERR =       Error flag for the call to Subroutine STORE2_db
@@ -221,12 +230,14 @@
       NNR = NR
       NCWMAX = MAX(NNC,NNW)
       LMAX = MIN(LMX,NN-1)
-      if (NNC  <  9  .or.  NNW  <  1  .or.  NCWMAX  >      LMAX  .or.  NNR  <  1) GOTO 21
+      if (NNC .LT. 9  .OR.  NNW .LT. 1  .OR.  NCWMAX .GT.
+     .    LMAX  .OR.  NNR .LT. 1) GO TO 21
 
 ! Create the cell data structure, and initialize RSMX.
 
-      call STORE2_db (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,   IERR)
-      if (IERR  /=  0) GOTO 23
+      CALL STORE2_db (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,
+     .             IERR)
+      if (IERR .NE. 0) GO TO 23
       RSMX = 0.
 
 ! Outer loop on node K:
@@ -252,20 +263,21 @@
 ! Compute NPTS, LNP, RWS, NEQ, RC, and SFS.
 
     1   SUM = SUM + RS
-          if (LNP  ==  LMAX) GOTO 2
+          if (LNP .EQ. LMAX) GO TO 2
           LNP = LNP + 1
           RSOLD = RS
-          call GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,   DDX,DDY, NP,RS)
-          if (RS  ==  0.) GOTO 22
+          CALL GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
+     .                 DDX,DDY, NP,RS)
+          if (RS .EQ. 0.) GO TO 22
           NPTS(LNP) = NP
-          if ( (RS-RSOLD)/RS  <  RTOL ) GOTO 1
-          if (RWS  ==  0.  .and.  LNP  >  NNW) RWS = RS
-          if (RC  ==  0.  .and.  LNP  >  NNC) THEN
+          if ( (RS-RSOLD)/RS .LT. RTOL ) GO TO 1
+          if (RWS .EQ. 0.  .AND.  LNP .GT. NNW) RWS = RS
+          if (RC .EQ. 0.  .AND.  LNP .GT. NNC) THEN
 
 !   RC = 0 (not yet computed) and LNP > NC.  RC = Sqrt(RS)
 !     is sufficiently large to (strictly) include NC nodes.
 !     The least squares fit will include NEQ = LNP - 1
-!     equations for 9  <=  NC  <=  NEQ  <  LMAX  <=  N-1.
+!     equations for 9 .LE. NC .LE. NEQ .LT. LMAX .LE. N-1.
 
             NEQ = LNP - 1
             RC = SQRT(RS)
@@ -274,15 +286,15 @@
 
 !   Bottom of loop -- test for termination.
 
-          if (LNP  >  NCWMAX) GOTO 3
-          GOTO 1
+          if (LNP .GT. NCWMAX) GO TO 3
+          GO TO 1
 
 ! All LMAX nodes are included in NPTS.  RWS and/or RC**2 is
 !   (arbitrarily) taken to be 10 percent larger than the
 !   distance RS to the last node included.
 
-    2   if (RWS  ==  0.) RWS = 1.1*RS
-        if (RC  ==  0.) THEN
+    2   if (RWS .EQ. 0.) RWS = 1.1*RS
+        if (RC .EQ. 0.) THEN
           NEQ = LMAX
           RC = SQRT(1.1*RS)
           SFS = DBLE(NEQ)/SUM
@@ -292,7 +304,7 @@
 !   and SFC.
 
     3   RW(K) = SQRT(RWS)
-        if (RWS  >  RSMX) RSMX = RWS
+        if (RWS .GT. RSMX) RSMX = RWS
         SF = SQRT(SFS)
         SFC = SF*SFS
 
@@ -310,21 +322,24 @@
     4     I = I + 1
           NP = NPTS(I)
           IROW = MIN(I,10)
-          call SETUP2_db (XK,YK,FK,X(NP),Y(NP),F(NP),SF,SFS,   SFC,RC, B(1,IROW))
-          if (I  ==  1) GOTO 4
+          CALL SETUP2_db (XK,YK,FK,X(NP),Y(NP),F(NP),SF,SFS,
+     .                 SFC,RC, B(1,IROW))
+          if (I .EQ. 1) GO TO 4
           IRM1 = IROW-1
           do 5 J = 1,IRM1
             JP1 = J + 1
-            call GIVENS_db (B(J,J),B(J,IROW),C,S)
-            call ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,IROW))
+            CALL GIVENS_db (B(J,J),B(J,IROW),C,S)
+            CALL ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,IROW))
     5       continue
-          if (I  <  NEQ) GOTO 4
+          if (I .LT. NEQ) GO TO 4
 
 ! Test the system for ill-conditioning.
 
-        DMIN = MIN( ABS(B(1,1)),ABS(B(2,2)),ABS(B(3,3)),    ABS(B(4,4)),ABS(B(5,5)),ABS(B(6,6)),    ABS(B(7,7)),ABS(B(8,8)),ABS(B(9,9)) )
-        if (DMIN*RC  >=  DTOL) GOTO 11
-        if (NEQ  ==  LMAX) GOTO 7
+        DMIN = MIN( ABS(B(1,1)),ABS(B(2,2)),ABS(B(3,3)),
+     .              ABS(B(4,4)),ABS(B(5,5)),ABS(B(6,6)),
+     .              ABS(B(7,7)),ABS(B(8,8)),ABS(B(9,9)) )
+        if (DMIN*RC .GE. DTOL) GO TO 11
+        if (NEQ .EQ. LMAX) GO TO 7
 
 ! Increase RC and add another equation to the system to
 !   improve the conditioning.  The number of NPTS elements
@@ -332,30 +347,31 @@
 
     6   RSOLD = RS
         NEQ = NEQ + 1
-        if (NEQ  ==  LMAX) THEN
+        if (NEQ .EQ. LMAX) THEN
           RC = SQRT(1.1*RS)
-          GOTO 4
+          GO TO 4
         end if
-        if (NEQ  <  LNP) THEN
+        if (NEQ .LT. LNP) THEN
 
 !   NEQ < LNP.
 
           NP = NPTS(NEQ+1)
           RS = (X(NP)-XK)**2 + (Y(NP)-YK)**2
-          if ( (RS-RSOLD)/RS  <  RTOL ) GOTO 6
+          if ( (RS-RSOLD)/RS .LT. RTOL ) GO TO 6
           RC = SQRT(RS)
-          GOTO 4
+          GO TO 4
         end if
 
 !   NEQ = LNP.  Add an element to NPTS.
 
         LNP = LNP + 1
-        call GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,   DDX,DDY, NP,RS)
-        if (NP  ==  0) GOTO 22
+        CALL GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
+     .               DDX,DDY, NP,RS)
+        if (NP .EQ. 0) GO TO 22
         NPTS(LNP) = NP
-        if ( (RS-RSOLD)/RS  <  RTOL ) GOTO 6
+        if ( (RS-RSOLD)/RS .LT. RTOL ) GO TO 6
         RC = SQRT(RS)
-        GOTO 4
+        GO TO 4
 
 ! Stabilize the system by damping third partials -- add
 !   multiples of the first four unit vectors to the first
@@ -370,28 +386,29 @@
     8       continue
           do 9 J = I,9
             JP1 = J + 1
-            call GIVENS_db (B(J,J),B(J,10),C,S)
-            call ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,10))
+            CALL GIVENS_db (B(J,J),B(J,10),C,S)
+            CALL ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,10))
     9       continue
    10     continue
 
 ! Test the damped system for ill-conditioning.
 
-        DMIN = MIN( ABS(B(5,5)),ABS(B(6,6)),ABS(B(7,7)),    ABS(B(8,8)),ABS(B(9,9)) )
-        if (DMIN*RC  <  DTOL) THEN
-            !write(*,*) 'DMIN*RC  <  DTOL', DMIN*RC  <  DTOL
+        DMIN = MIN( ABS(B(5,5)),ABS(B(6,6)),ABS(B(7,7)),
+     .              ABS(B(8,8)),ABS(B(9,9)) )
+        if (DMIN*RC .LT. DTOL) THEN
+            !write(*,*) 'DMIN*RC .LT. DTOL', DMIN*RC .LT. DTOL
             !write(*,*) 'DMIN', DMIN
             !write(*,*) 'RC', RC
             !write(*,*) 'DTOL', DTOL
             !write(*,*) 'DMIN*RC', DMIN*RC
-            GOTO 23
+            GO TO 23
         end if
 
 ! Solve the 9 by 9 triangular system for the coefficients.
 
    11   do 13 I = 9,1,-1
           T = 0.
-          if (I  /=  9) THEN
+          if (I .NE. 9) THEN
             IP1 = I + 1
             do 12 J = IP1,9
               T = T + B(J,I)*A(J,K)
@@ -453,11 +470,13 @@
       !write(*,*) 'DDX', DDX
       !write(*,*) 'DDY', DDY
       return
-      end subroutine do_CSHEP2_db
+      end
 
-      double precision FUNCTION do_CS2VAL_db (PX,PY,N,X,Y,F,NR,   LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
-      integer :: N, NR, LCELL(NR,NR), LNEXT(N), IER
-      double precision :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN,   DX, DY, RMAX, RW(N), A(9,N)
+      double precision FUNCTION do_CS2VAL_db (PX,PY,N,X,Y,F,NR,
+     .                LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
+      integer N, NR, LCELL(NR,NR), LNEXT(N), IER
+      double precision PX, PY, X(N), Y(N), F(N), XMIN, YMIN,
+     .                 DX, DY, RMAX, RW(N), A(9,N)
 
 ! **********************************************************
 
@@ -481,13 +500,13 @@
 !               which C is to be evaluated.
 
 !       N = Number of nodes and data values defining C.
-!           N  >=  10.
+!           N .GE. 10.
 
 !       X,Y,F = Arrays of length N containing the nodes and
 !               data values interpolated by C.
 
 !       NR = Number of rows and columns in the cell grid.
-!            Refer to Subroutine STORE2_db.  NR  >=  1.
+!            Refer to Subroutine STORE2_db.  NR .GE. 1.
 
 !       LCELL = NR by NR array of nodal indexes associated
 !               with cells.  Refer to Subroutine STORE2_db.
@@ -526,8 +545,8 @@
 
 ! **********************************************************
 
-      integer :: I, IMAX, IMIN, J, JMAX, JMIN, K, KP
-      double precision :: D, DELX, DELY, R, SW, SWC, W, XP, YP
+      integer I, IMAX, IMIN, J, JMAX, JMIN, K, KP
+      double precision D, DELX, DELY, R, SW, SWC, W, XP, YP
 
 ! Local parameters:
 
@@ -555,7 +574,8 @@
       XP = PX
       YP = PY
       IER = -1
-      if (N  <  10  .or.  NR  <  1  .or.  DX  <=  0.  .or.     DY  <=  0.  .or.  RMAX  <  0.) return
+      if (N .LT. 10  .OR.  NR .LT. 1  .OR.  DX .LE. 0.  .OR.
+     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) return
       IER = 0
 
 ! Set IMIN, IMAX, JMIN, and JMAX to cell indexes defining
@@ -566,17 +586,17 @@
 
       IMIN = INT((XP-XMIN-RMAX)/DX) + 1
       IMAX = INT((XP-XMIN+RMAX)/DX) + 1
-      if (IMIN  <  1) IMIN = 1
-      if (IMAX  >  NR) IMAX = NR
+      if (IMIN .LT. 1) IMIN = 1
+      if (IMAX .GT. NR) IMAX = NR
       JMIN = INT((YP-YMIN-RMAX)/DY) + 1
       JMAX = INT((YP-YMIN+RMAX)/DY) + 1
-      if (JMIN  <  1) JMIN = 1
-      if (JMAX  >  NR) JMAX = NR
+      if (JMIN .LT. 1) JMIN = 1
+      if (JMAX .GT. NR) JMAX = NR
 
 ! The following is a test for no cells within the circle
 !   of radius RMAX.
 
-      if (IMIN  >  IMAX  .or.  JMIN  >  JMAX) GOTO 6
+      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GO TO 6
 
 ! Accumulate weight values in SW and weighted nodal function
 !   values in SWC.  The weights are W(K) = ((R-D)+/(R*D))**3
@@ -590,7 +610,7 @@
       do 4 J = JMIN,JMAX
         do 3 I = IMIN,IMAX
           K = LCELL(I,J)
-          if (K  ==  0) GOTO 3
+          if (K .EQ. 0) GO TO 3
 
 ! Inner loop on nodes K.
 
@@ -598,23 +618,27 @@
           DELY = YP - Y(K)
           D = SQRT(DELX*DELX + DELY*DELY)
           R = RW(K)
-          if (D  >=  R) GOTO 2
-          if (D  ==  0.) GOTO 5
+          if (D .GE. R) GO TO 2
+          if (D .EQ. 0.) GO TO 5
           W = (1.0/D - 1.0/R)*(1.0/D - 1.0/R)*(1.0/D - 1.0/R)
           SW = SW + W
-          SWC = SWC + W*( ( (A(1,K)*DELX+A(2,K)*DELY+                        A(5,K))*DELX + (A(3,K)*DELY+                        A(6,K))*DELY + A(8,K) )*DELX +                     ( (A(4,K)*DELY+A(7,K))*DELY +                       A(9,K) )*DELY + F(K) )
+          SWC = SWC + W*( ( (A(1,K)*DELX+A(2,K)*DELY+
+     .                       A(5,K))*DELX + (A(3,K)*DELY+
+     .                       A(6,K))*DELY + A(8,K) )*DELX +
+     .                    ( (A(4,K)*DELY+A(7,K))*DELY +
+     .                      A(9,K) )*DELY + F(K) )
 
 ! Bottom of loop on nodes in cell (I,J).
 
     2     KP = K
           K = LNEXT(KP)
-          if (K  /=  KP) GOTO 1
+          if (K .NE. KP) GO TO 1
     3     continue
     4   continue
 
 ! SW = 0 iff P is not within the radius R(K) for any node K.
 
-      if (SW  ==  0.) GOTO 6
+      if (SW .EQ. 0.) GO TO 6
       do_CS2VAL_db = SWC/SW
       return
 
@@ -627,11 +651,14 @@
 
     6 do_CS2VAL_db = 0.
       return
-      end function do_CS2VAL_db
+      end
 
-      subroutine do_CS2GRD_db (PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,   YMIN,DX,DY,RMAX,RW,A, C,CX,CY,IER)
-      integer :: N, NR, LCELL(NR,NR), LNEXT(N), IER
-      double precision :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN,   DX, DY, RMAX, RW(N), A(9,N), C, CX,   CY
+      subroutine do_CS2GRD_db (PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,
+     .                   YMIN,DX,DY,RMAX,RW,A, C,CX,CY,IER)
+      integer N, NR, LCELL(NR,NR), LNEXT(N), IER
+      double precision PX, PY, X(N), Y(N), F(N), XMIN, YMIN,
+     .                 DX, DY, RMAX, RW(N), A(9,N), C, CX,
+     .                 CY
 
 ! **********************************************************
 
@@ -654,13 +681,13 @@
 !               to be evaluated.
 
 !       N = Number of nodes and data values defining C.
-!           N  >=  10.
+!           N .GE. 10.
 
 !       X,Y,F = Arrays of length N containing the nodes and
 !               data values interpolated by C.
 
 !       NR = Number of rows and columns in the cell grid.
-!            Refer to Subroutine STORE2_db.  NR  >=  1.
+!            Refer to Subroutine STORE2_db.  NR .GE. 1.
 
 !       LCELL = NR by NR array of nodal indexes associated
 !               with cells.  Refer to Subroutine STORE2_db.
@@ -689,11 +716,11 @@
 
 ! On output:
 
-!       C = Value of C at (PX,PY) unless IER  ==  1, in
+!       C = Value of C at (PX,PY) unless IER .EQ. 1, in
 !           which case no values are returned.
 
 !       CX,CY = First partial derivatives of C at (PX,PY)
-!               unless IER  ==  1.
+!               unless IER .EQ. 1.
 
 !       IER = Error indicator:
 !             IER = 0 if no errors were encountered.
@@ -708,8 +735,10 @@
 
 ! **********************************************************
 
-      integer :: I, IMAX, IMIN, J, JMAX, JMIN, K, KP
-      double precision :: CK, CKX, CKY, D, DELX, DELY, R, SW,   SWC, SWCX, SWCY, SWS, SWX, SWY, T, W,   WX, WY, XP, YP
+      integer I, IMAX, IMIN, J, JMAX, JMIN, K, KP
+      double precision CK, CKX, CKY, D, DELX, DELY, R, SW,
+     .                 SWC, SWCX, SWCY, SWS, SWX, SWY, T, W,
+     .                 WX, WY, XP, YP
 
 ! Local parameters:
 
@@ -747,7 +776,8 @@
 
       XP = PX
       YP = PY
-      if (N  <  10  .or.  NR  <  1  .or.  DX  <=  0.  .or.     DY  <=  0.  .or.  RMAX  <  0.) GOTO 6
+      if (N .LT. 10  .OR.  NR .LT. 1  .OR.  DX .LE. 0.  .OR.
+     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) GO TO 6
 
 ! Set IMIN, IMAX, JMIN, and JMAX to cell indexes defining
 !   the range of the search for nodes whose radii include
@@ -757,17 +787,17 @@
 
       IMIN = INT((XP-XMIN-RMAX)/DX) + 1
       IMAX = INT((XP-XMIN+RMAX)/DX) + 1
-      if (IMIN  <  1) IMIN = 1
-      if (IMAX  >  NR) IMAX = NR
+      if (IMIN .LT. 1) IMIN = 1
+      if (IMAX .GT. NR) IMAX = NR
       JMIN = INT((YP-YMIN-RMAX)/DY) + 1
       JMAX = INT((YP-YMIN+RMAX)/DY) + 1
-      if (JMIN  <  1) JMIN = 1
-      if (JMAX  >  NR) JMAX = NR
+      if (JMIN .LT. 1) JMIN = 1
+      if (JMAX .GT. NR) JMAX = NR
 
 ! The following is a test for no cells within the circle
 !   of radius RMAX.
 
-      if (IMIN  >  IMAX  .or.  JMIN  >  JMAX) GOTO 7
+      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GO TO 7
 
 ! C = SWC/SW = Sum(W(K)*C(K))/Sum(W(K)), where the sum is
 !   from K = 1 to N, C(K) is the cubic nodal function value,
@@ -793,7 +823,7 @@
       do 4 J = JMIN,JMAX
         do 3 I = IMIN,IMAX
           K = LCELL(I,J)
-          if (K  ==  0) GOTO 3
+          if (K .EQ. 0) GO TO 3
 
 ! Inner loop on nodes K.
 
@@ -801,18 +831,22 @@
           DELY = YP - Y(K)
           D = SQRT(DELX*DELX + DELY*DELY)
           R = RW(K)
-          if (D  >=  R) GOTO 2
-          if (D  ==  0.) GOTO 5
+          if (D .GE. R) GO TO 2
+          if (D .EQ. 0.) GO TO 5
           T = (1.0/D - 1.0/R)
           W = T*T*T
           T = -3.0*T*T/(D*D*D)
           WX = DELX*T
           WY = DELY*T
           T = A(2,K)*DELX + A(3,K)*DELY + A(6,K)
-          CKY = ( 3.0*A(4,K)*DELY + A(3,K)*DELX +             2.0*A(7,K) )*DELY + T*DELX + A(9,K)
+          CKY = ( 3.0*A(4,K)*DELY + A(3,K)*DELX +
+     .            2.0*A(7,K) )*DELY + T*DELX + A(9,K)
           T = T*DELY + A(8,K)
-          CKX = ( 3.0*A(1,K)*DELX + A(2,K)*DELY +             2.0*A(5,K) )*DELX + T
-          CK = ( (A(1,K)*DELX+A(5,K))*DELX + T )*DELX +          ( (A(4,K)*DELY+A(7,K))*DELY + A(9,K) )*DELY +          F(K)
+          CKX = ( 3.0*A(1,K)*DELX + A(2,K)*DELY +
+     .            2.0*A(5,K) )*DELX + T
+          CK = ( (A(1,K)*DELX+A(5,K))*DELX + T )*DELX +
+     .         ( (A(4,K)*DELY+A(7,K))*DELY + A(9,K) )*DELY +
+     .         F(K)
           SW = SW + W
           SWX = SWX + WX
           SWY = SWY + WY
@@ -824,13 +858,13 @@
 
     2     KP = K
           K = LNEXT(KP)
-          if (K  /=  KP) GOTO 1
+          if (K .NE. KP) GO TO 1
     3     continue
     4   continue
 
 ! SW = 0 iff P is not within the radius R(K) for any node K.
 
-      if (SW  ==  0.) GOTO 7
+      if (SW .EQ. 0.) GO TO 7
       C = SWC/SW
       SWS = SW*SW
       CX = (SWCX*SW - SWC*SWX)/SWS
@@ -852,17 +886,21 @@
       return
 
 ! No cells contain a point within RMAX of P, or
-!   SW = 0 and thus D  >=  RW(K) for all K.
+!   SW = 0 and thus D .GE. RW(K) for all K.
 
     7 C = 0.
       CX = 0.
       CY = 0.
       IER = 2
       return
-      end subroutine do_CS2GRD_db
-      subroutine CS2HES_db (PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,   YMIN,DX,DY,RMAX,RW,A, C,CX,CY,CXX,   CXY,CYY,IER)
-      integer :: N, NR, LCELL(NR,NR), LNEXT(N), IER
-      double precision :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN,   DX, DY, RMAX, RW(N), A(9,N), C, CX,   CY, CXX, CXY, CYY
+      end
+      subroutine CS2HES_db (PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,
+     .                   YMIN,DX,DY,RMAX,RW,A, C,CX,CY,CXX,
+     .                   CXY,CYY,IER)
+      integer N, NR, LCELL(NR,NR), LNEXT(N), IER
+      double precision PX, PY, X(N), Y(N), F(N), XMIN, YMIN,
+     .                 DX, DY, RMAX, RW(N), A(9,N), C, CX,
+     .                 CY, CXX, CXY, CYY
 
 ! **********************************************************
 
@@ -885,13 +923,13 @@
 !               to be evaluated.
 
 !       N = Number of nodes and data values defining C.
-!           N  >=  10.
+!           N .GE. 10.
 
 !       X,Y,F = Arrays of length N containing the nodes and
 !               data values interpolated by C.
 
 !       NR = Number of rows and columns in the cell grid.
-!            Refer to Subroutine STORE2_db.  NR  >=  1.
+!            Refer to Subroutine STORE2_db.  NR .GE. 1.
 
 !       LCELL = NR by NR array of nodal indexes associated
 !               with cells.  Refer to Subroutine STORE2_db.
@@ -920,14 +958,14 @@
 
 ! On output:
 
-!       C = Value of C at (PX,PY) unless IER  ==  1, in
+!       C = Value of C at (PX,PY) unless IER .EQ. 1, in
 !           which case no values are returned.
 
 !       CX,CY = First partial derivatives of C at (PX,PY)
-!               unless IER  ==  1.
+!               unless IER .EQ. 1.
 
 !       CXX,CXY,CYY = Second partial derivatives of C at
-!                     (PX,PY) unless IER  ==  1.
+!                     (PX,PY) unless IER .EQ. 1.
 
 !       IER = Error indicator:
 !             IER = 0 if no errors were encountered.
@@ -942,8 +980,13 @@
 
 ! **********************************************************
 
-      integer :: I, IMAX, IMIN, J, JMAX, JMIN, K, KP
-      double precision :: CK, CKX, CKXX, CKXY, CKY, CKYY, D,   DELX, DELY, DXSQ, DYSQ, R, SW, SWC,   SWCX, SWCXX, SWCXY, SWCY, SWCYY, SWS,   SWX, SWXX, SWXY, SWY, SWYY, T1, T2,   T3, T4, W, WX, WXX, WXY, WY, WYY, XP,   YP, D6
+      integer I, IMAX, IMIN, J, JMAX, JMIN, K, KP
+      double precision CK, CKX, CKXX, CKXY, CKY, CKYY, D,
+     .                 DELX, DELY, DXSQ, DYSQ, R, SW, SWC,
+     .                 SWCX, SWCXX, SWCXY, SWCY, SWCYY, SWS,
+     .                 SWX, SWXX, SWXY, SWY, SWYY, T1, T2,
+     .                 T3, T4, W, WX, WXX, WXY, WY, WYY, XP,
+     .                 YP, D6
 
 ! Local parameters:
 
@@ -986,7 +1029,8 @@
 
       XP = PX
       YP = PY
-      if (N  <  10  .or.  NR  <  1  .or.  DX  <=  0.  .or.     DY  <=  0.  .or.  RMAX  <  0.) GOTO 6
+      if (N .LT. 10  .OR.  NR .LT. 1  .OR.  DX .LE. 0.  .OR.
+     .    DY .LE. 0.  .OR.  RMAX .LT. 0.) GO TO 6
 
 ! Set IMIN, IMAX, JMIN, and JMAX to cell indexes defining
 !   the range of the search for nodes whose radii include
@@ -996,17 +1040,17 @@
 
       IMIN = INT((XP-XMIN-RMAX)/DX) + 1
       IMAX = INT((XP-XMIN+RMAX)/DX) + 1
-      if (IMIN  <  1) IMIN = 1
-      if (IMAX  >  NR) IMAX = NR
+      if (IMIN .LT. 1) IMIN = 1
+      if (IMAX .GT. NR) IMAX = NR
       JMIN = INT((YP-YMIN-RMAX)/DY) + 1
       JMAX = INT((YP-YMIN+RMAX)/DY) + 1
-      if (JMIN  <  1) JMIN = 1
-      if (JMAX  >  NR) JMAX = NR
+      if (JMIN .LT. 1) JMIN = 1
+      if (JMAX .GT. NR) JMAX = NR
 
 ! The following is a test for no cells within the circle
 !   of radius RMAX.
 
-      if (IMIN  >  IMAX  .or.  JMIN  >  JMAX) GOTO 7
+      if (IMIN .GT. IMAX  .OR.  JMIN .GT. JMAX) GO TO 7
 
 ! C = SWC/SW = Sum(W(K)*C(K))/Sum(W(K)), where the sum is
 !   from K = 1 to N, C(K) is the cubic nodal function value,
@@ -1046,7 +1090,7 @@
       do 4 J = JMIN,JMAX
         do 3 I = IMIN,IMAX
           K = LCELL(I,J)
-          if (K  ==  0) GOTO 3
+          if (K .EQ. 0) GO TO 3
 
 ! Inner loop on nodes K.
 
@@ -1056,8 +1100,8 @@
           DYSQ = DELY*DELY
           D = SQRT(DXSQ + DYSQ)
           R = RW(K)
-          if (D  >=  R) GOTO 2
-          if (D  ==  0.) GOTO 5
+          if (D .GE. R) GO TO 2
+          if (D .EQ. 0.) GO TO 5
           T1 = (1.0/D - 1.0/R)
           W = T1*T1*T1
           T2 = -3.0*T1*T1/(D*D*D)
@@ -1072,7 +1116,8 @@
           T2 = T1 + T1 + A(1,K)*DELX
           T3 = A(4,K)*DELY + A(3,K)*DELX + A(7,K)
           T4 = T3 + T3 + A(4,K)*DELY
-          CK = (T1*DELX + A(6,K)*DELY + A(8,K))*DELX +          (T3*DELY + A(9,K))*DELY + F(K)
+          CK = (T1*DELX + A(6,K)*DELY + A(8,K))*DELX +
+     .         (T3*DELY + A(9,K))*DELY + F(K)
           CKX = T2*DELX + (A(3,K)*DELY+A(6,K))*DELY + A(8,K)
           CKY = T4*DELY + (A(2,K)*DELX+A(6,K))*DELX + A(9,K)
           CKXX = T2 + 3.0*A(1,K)*DELX
@@ -1095,13 +1140,13 @@
 
     2     KP = K
           K = LNEXT(KP)
-          if (K  /=  KP) GOTO 1
+          if (K .NE. KP) GO TO 1
     3     continue
     4   continue
 
 ! SW = 0 iff P is not within the radius R(K) for any node K.
 
-      if (SW  ==  0.) GOTO 7
+      if (SW .EQ. 0.) GO TO 7
       C = SWC/SW
       SWS = SW*SW
       CX = (SWCX*SW - SWC*SWX)/SWS
@@ -1129,7 +1174,7 @@
       return
 
 ! No cells contain a point within RMAX of P, or
-!   SW = 0 and thus D  >=  RW(K) for all K.
+!   SW = 0 and thus D .GE. RW(K) for all K.
 
     7 C = 0.
       CX = 0.
@@ -1139,10 +1184,12 @@
       CYY = 0.
       IER = 2
       return
-      end subroutine CS2HES_db
-      subroutine GETNP2_db (PX,PY,X,Y,NR,LCELL,LNEXT,XMIN,YMIN,   DX,DY, NP,DSQ)
-      integer :: NR, LCELL(NR,NR), LNEXT(*), NP
-      double precision :: PX, PY, X(*), Y(*), XMIN, YMIN, DX,   DY, DSQ
+      end
+      subroutine GETNP2_db (PX,PY,X,Y,NR,LCELL,LNEXT,XMIN,YMIN,
+     .                   DX,DY, NP,DSQ)
+      integer NR, LCELL(NR,NR), LNEXT(*), NP
+      double precision PX, PY, X(*), Y(*), XMIN, YMIN, DX,
+     .                 DY, DSQ
 
 ! **********************************************************
 
@@ -1180,11 +1227,11 @@
 !       PX,PY = Cartesian coordinates of the point P whose
 !               nearest unmarked neighbor is to be found.
 
-!       X,Y = Arrays of length N, for N  >=  2, containing
+!       X,Y = Arrays of length N, for N .GE. 2, containing
 !             the Cartesian coordinates of the nodes.
 
 !       NR = Number of rows and columns in the cell grid.
-!            Refer to Subroutine STORE2_db.  NR  >=  1.
+!            Refer to Subroutine STORE2_db.  NR .GE. 1.
 
 !       LCELL = NR by NR array of nodal indexes associated
 !               with cells.  Refer to Subroutine STORE2_db.
@@ -1207,8 +1254,8 @@
 
 !       NP = Index (for X and Y) of the nearest unmarked
 !            node to P, or 0 if all nodes are marked or NR
-!             <  1 or DX  <=  0 or DY  <=  0.  LNEXT(NP)
-!             <  0 if NP  /=  0.
+!            .LT. 1 or DX .LE. 0 or DY .LE. 0.  LNEXT(NP)
+!            .LT. 0 if NP .NE. 0.
 
 !       DSQ = Squared Euclidean distance between P and node
 !             NP, or 0 if NP = 0.
@@ -1219,9 +1266,10 @@
 
 ! **********************************************************
 
-      integer :: I, I0, I1, I2, IMAX, IMIN, J, J0, J1, J2,   JMAX, JMIN, L, LMIN, LN
-      logical :: FIRST
-      double precision :: DELX, DELY, R, RSMIN, RSQ, XP, YP
+      integer I, I0, I1, I2, IMAX, IMIN, J, J0, J1, J2,
+     .        JMAX, JMIN, L, LMIN, LN
+      LOGICAL FIRST
+      double precision DELX, DELY, R, RSMIN, RSQ, XP, YP
 
 ! Local parameters:
 
@@ -1242,7 +1290,7 @@
 !                 the search
 ! L,LN =        Indexes of nodes in cell (I,J)
 ! LMIN =        Current candidate for NP
-! R =   Distance from P to node LMIN
+! R =           Distance from P to node LMIN
 ! RSMIN =       Squared distance from P to node LMIN
 ! RSQ =         Squared distance from P to node L
 ! XP,YP =       Local copy of PX,PY -- coordinates of P
@@ -1252,7 +1300,8 @@
 
 ! Test for invalid input parameters.
 
-      if (NR  <  1  .or.  DX  <=  0.  .or.  DY  <=  0.)   GOTO 9
+      if (NR .LT. 1  .OR.  DX .LE. 0.  .OR.  DY .LE. 0.)
+     .  GO TO 9
 
 ! Initialize parameters.
 
@@ -1264,11 +1313,11 @@
       DELX = XP - XMIN
       DELY = YP - YMIN
       I0 = INT(DELX/DX) + 1
-      if (I0  <  1) I0 = 1
-      if (I0  >  NR) I0 = NR
+      if (I0 .LT. 1) I0 = 1
+      if (I0 .GT. NR) I0 = NR
       J0 = INT(DELY/DY) + 1
-      if (J0  <  1) J0 = 1
-      if (J0  >  NR) J0 = NR
+      if (J0 .LT. 1) J0 = 1
+      if (J0 .GT. NR) J0 = NR
       I1 = I0
       I2 = I0
       J1 = J0
@@ -1278,27 +1327,28 @@
 !   those outside the range [IMIN,IMAX] X [JMIN,JMAX].
 
     1 do 6 J = J1,J2
-        if (J  >  JMAX) GOTO 7
-        if (J  <  JMIN) GOTO 6
+        if (J .GT. JMAX) GO TO 7
+        if (J .LT. JMIN) GO TO 6
         do 5 I = I1,I2
-          if (I  >  IMAX) GOTO 6
-          if (I  <  IMIN) GOTO 5
-          if (J  /=  J1  .and.  J  /=  J2  .and.  I  /=  I1         .and.  I  /=  I2) GOTO 5
+          if (I .GT. IMAX) GO TO 6
+          if (I .LT. IMIN) GO TO 5
+          if (J .NE. J1  .AND.  J .NE. J2  .AND.  I .NE. I1
+     .        .AND.  I .NE. I2) GO TO 5
 
 ! Search cell (I,J) for unmarked nodes L.
 
           L = LCELL(I,J)
-          if (L  ==  0) GOTO 5
+          if (L .EQ. 0) GO TO 5
 
 !   Loop on nodes in cell (I,J).
 
     2     LN = LNEXT(L)
-          if (LN  <  0) GOTO 4
+          if (LN .LT. 0) GO TO 4
 
 !   Node L is not marked.
 
           RSQ = (X(L)-XP)**2 + (Y(L)-YP)**2
-          if (.NOT. FIRST) GOTO 3
+          if (.NOT. FIRST) GO TO 3
 
 !   Node L is the first unmarked neighbor of P encountered.
 !     Initialize LMIN to the current candidate for NP, and
@@ -1315,19 +1365,19 @@
           RSMIN = RSQ
           R = SQRT(RSMIN)
           IMIN = INT((DELX-R)/DX) + 1
-          if (IMIN  <  1) IMIN = 1
+          if (IMIN .LT. 1) IMIN = 1
           IMAX = INT((DELX+R)/DX) + 1
-          if (IMAX  >  NR) IMAX = NR
+          if (IMAX .GT. NR) IMAX = NR
           JMIN = INT((DELY-R)/DY) + 1
-          if (JMIN  <  1) JMIN = 1
+          if (JMIN .LT. 1) JMIN = 1
           JMAX = INT((DELY+R)/DY) + 1
-          if (JMAX  >  NR) JMAX = NR
+          if (JMAX .GT. NR) JMAX = NR
           FIRST = .FALSE.
-          GOTO 4
+          GO TO 4
 
 !   Test for node L closer than LMIN to P.
 
-    3     if (RSQ  >=  RSMIN) GOTO 4
+    3     if (RSQ .GE. RSMIN) GO TO 4
 
 !   Update LMIN and RSMIN.
 
@@ -1336,25 +1386,26 @@
 
 !   Test for termination of loop on nodes in cell (I,J).
 
-    4     if (ABS(LN)  ==  L) GOTO 5
+    4     if (ABS(LN) .EQ. L) GO TO 5
           L = ABS(LN)
-          GOTO 2
+          GO TO 2
     5     continue
     6   continue
 
 ! Test for termination of loop on cell layers.
 
-    7 if (I1  <=  IMIN  .and.  I2  >=  IMAX  .and.     J1  <=  JMIN  .and.  J2  >=  JMAX) GOTO 8
+    7 if (I1 .LE. IMIN  .AND.  I2 .GE. IMAX  .AND.
+     .    J1 .LE. JMIN  .AND.  J2 .GE. JMAX) GO TO 8
       I1 = I1 - 1
       I2 = I2 + 1
       J1 = J1 - 1
       J2 = J2 + 1
-      GOTO 1
+      GO TO 1
 
 ! Unless no unmarked nodes were encountered, LMIN is the
 !   closest unmarked node to P.
 
-    8 if (FIRST) GOTO 9
+    8 if (FIRST) GO TO 9
       NP = LMIN
       DSQ = RSMIN
       LNEXT(LMIN) = -LNEXT(LMIN)
@@ -1365,9 +1416,9 @@
     9 NP = 0
       DSQ = 0.
       return
-      end subroutine GETNP2_db
+      end
       subroutine GIVENS_db ( A,B, C,S)
-      double precision :: A, B, C, S
+      double precision A, B, C, S
 
 ! **********************************************************
 
@@ -1403,7 +1454,7 @@
 !           R = +/-SQRT(A*A + B*B)
 
 !       B = Value Z such that:
-!             C = SQRT(1-Z*Z) and S=Z if ABS(Z)  <=  1, and
+!             C = SQRT(1-Z*Z) and S=Z if ABS(Z) .LE. 1, and
 !             C = 1/Z and S = SQRT(1-C*C) if ABS(Z) > 1.
 
 !       C = +/-(A/R) or 1 if R = 0.
@@ -1416,7 +1467,7 @@
 
 ! **********************************************************
 
-      double precision :: AA, BB, R, U, V
+      double precision AA, BB, R, U, V
 
 ! Local parameters:
 
@@ -1426,7 +1477,7 @@
 
       AA = A
       BB = B
-      if (ABS(AA)  <=  ABS(BB)) GOTO 1
+      if (ABS(AA) .LE. ABS(BB)) GO TO 1
 
 ! ABS(A) > ABS(B).
 
@@ -1443,9 +1494,9 @@
       A = R
       return
 
-! ABS(A)  <=  ABS(B).
+! ABS(A) .LE. ABS(B).
 
-    1 if (BB  ==  0.) GOTO 2
+    1 if (BB .EQ. 0.) GO TO 2
       U = BB + BB
       V = AA/U
 
@@ -1459,7 +1510,7 @@
 !   SIGN(A)*SIGN(B).
 
       B = 1.
-      if (C  /=  0.) B = 1./C
+      if (C .NE. 0.) B = 1./C
       return
 
 ! A = B = 0.
@@ -1467,10 +1518,10 @@
     2 C = 1.
       S = 0.
       return
-      end subroutine GIVENS_db
+      end
       subroutine ROTATE_db (N,C,S, X,Y )
-      integer :: N
-      double precision :: C, S, X(N), Y(N)
+      integer N
+      double precision C, S, X(N), Y(N)
 
 ! **********************************************************
 
@@ -1485,7 +1536,7 @@
 !   This subroutine applies the Givens rotation  (     )  to
 !                                                (-S  C)
 !                    (X(1) ... X(N))
-! the 2 by N matrix  (  ) .
+! the 2 by N matrix  (             ) .
 !                    (Y(1) ... Y(N))
 
 !   This routine is identical to subroutine SROT from the
@@ -1500,7 +1551,7 @@
 
 ! The above parameters are not altered by this routine.
 
-!       X,Y = Arrays of length  >=  N containing the compo-
+!       X,Y = Arrays of length .GE. N containing the compo-
 !             nents of the vectors to be rotated.
 
 ! On output:
@@ -1512,8 +1563,8 @@
 
 ! **********************************************************
 
-      integer :: I
-      double precision :: XI, YI
+      integer I
+      double precision XI, YI
 
       do 1 I = 1,N
         XI = X(I)
@@ -1522,9 +1573,10 @@
         Y(I) = -S*XI + C*YI
     1   continue
       return
-      end subroutine ROTATE_db
+      end
       subroutine SETUP2_db (XK,YK,ZK,XI,YI,ZI,S1,S2,S3,R, ROW)
-      double precision :: XK, YK, ZK, XI, YI, ZI, S1, S2, S3,   R, ROW(10)
+      double precision XK, YK, ZK, XI, YI, ZI, S1, S2, S3,
+     .                 R, ROW(10)
 
 ! **********************************************************
 
@@ -1571,8 +1623,8 @@
 
 ! **********************************************************
 
-      integer :: I
-      double precision :: D, DX, DXSQ, DY, DYSQ, W, W1, W2, W3
+      integer I
+      double precision D, DX, DXSQ, DY, DYSQ, W, W1, W2, W3
 
 ! Local parameters:
 
@@ -1593,7 +1645,7 @@
       DXSQ = DX*DX
       DYSQ = DY*DY
       D = SQRT(DXSQ + DYSQ)
-      if (D  <=  0.  .or.  D  >=  R) GOTO 1
+      if (D .LE. 0.  .OR.  D .GE. R) GO TO 1
       W = (R-D)/R/D
       W1 = S1*W
       W2 = S2*W
@@ -1617,10 +1669,11 @@
         ROW(I) = 0.
     2   continue
       return
-      end subroutine SETUP2_db
-      subroutine STORE2_db (N,X,Y,NR, LCELL,LNEXT,XMIN,YMIN,DX,   DY,IER)
-      integer :: N, NR, LCELL(NR,NR), LNEXT(N), IER
-      double precision :: X(N), Y(N), XMIN, YMIN, DX, DY
+      end
+      subroutine STORE2_db (N,X,Y,NR, LCELL,LNEXT,XMIN,YMIN,DX,
+     .                   DY,IER)
+      integer N, NR, LCELL(NR,NR), LNEXT(N), IER
+      double precision X(N), Y(N), XMIN, YMIN, DX, DY
 
 ! **********************************************************
 
@@ -1647,7 +1700,7 @@
 
 ! On input:
 
-!       N = Number of nodes.  N  >=  2.
+!       N = Number of nodes.  N .GE. 2.
 
 !       X,Y = Arrays of length N containing the Cartesian
 !             coordinates of the nodes.
@@ -1656,13 +1709,13 @@
 !            cell density (average number of nodes per cell)
 !            is D = N/(NR**2).  A recommended value, based
 !            on empirical evidence, is D = 3 -- NR =
-!            Sqrt(N/3).  NR  >=  1.
+!            Sqrt(N/3).  NR .GE. 1.
 
 ! The above parameters are not altered by this routine.
 
-!       LCELL = Array of length  >=  NR**2.
+!       LCELL = Array of length .GE. NR**2.
 
-!       LNEXT = Array of length  >=  N.
+!       LNEXT = Array of length .GE. N.
 
 ! On output:
 
@@ -1673,7 +1726,7 @@
 !               are contained in the cell.  The upper right
 !               corner of cell (I,J) has coordinates (XMIN+
 !               I*DX,YMIN+J*DY).  LCELL is not defined if
-!               IER  /=  0.
+!               IER .NE. 0.
 
 !       LNEXT = Array of next-node indexes such that
 !               LNEXT(K) contains the index of the next node
@@ -1685,7 +1738,7 @@
 !               2, 3, and 5 (and no others), then LCELL(I,J)
 !               = 2, LNEXT(2) = 3, LNEXT(3) = 5, and
 !               LNEXT(5) = 5.  LNEXT is not defined if
-!               IER  /=  0.
+!               IER .NE. 0.
 
 !       XMIN,YMIN = Cartesian coordinates of the lower left
 !                   corner of the rectangle defined by the
@@ -1710,8 +1763,8 @@
 
 ! **********************************************************
 
-      integer :: I, J, K, L, NN, NNR
-      double precision :: DELX, DELY, XMN, XMX, YMN, YMX
+      integer I, J, K, L, NN, NNR
+      double precision DELX, DELY, XMN, XMX, YMN, YMX
 
 ! Local parameters:
 
@@ -1727,10 +1780,10 @@
 
       NN = N
       NNR = NR
-      if (NN  <  2  .or.  NNR  <  1) THEN
+      if (NN .LT. 2  .OR.  NNR .LT. 1) THEN
          !write(*,*) 'NN', NN
          !write(*,*) 'NNR', NNR
-         GOTO 5
+         GO TO 5
       end if
 
 ! Compute the dimensions of the rectangle containing the
@@ -1741,10 +1794,10 @@
       YMN = Y(1)
       YMX = YMN
       do 1 K = 2,NN
-        if (X(K)  <  XMN) XMN = X(K)
-        if (X(K)  >  XMX) XMX = X(K)
-        if (Y(K)  <  YMN) YMN = Y(K)
-        if (Y(K)  >  YMX) YMX = Y(K)
+        if (X(K) .LT. XMN) XMN = X(K)
+        if (X(K) .GT. XMX) XMX = X(K)
+        if (Y(K) .LT. YMN) YMN = Y(K)
+        if (Y(K) .GT. YMX) YMX = Y(K)
     1   continue
       XMIN = XMN
       YMIN = YMN
@@ -1755,14 +1808,14 @@
       DELY = (YMX-YMN)/DBLE(NNR)
       DX = DELX
       DY = DELY
-      if (DELX  ==  0.  .or.  DELY  ==  0.) THEN
+      if (DELX .EQ. 0.  .OR.  DELY .EQ. 0.) THEN
          !write(*,*) 'XMX', XMX
          !write(*,*) 'XMN', XMN
          !write(*,*) 'YMX', YMX
          !write(*,*) 'YMN', YMN
          !write(*,*) 'DELY', DELY
          !write(*,*) 'DELY', DELY
-         GOTO 6
+         GO TO 6
       end if
 
 ! Initialize LCELL.
@@ -1777,12 +1830,12 @@
 
       do 4 K = NN,1,-1
         I = INT((X(K)-XMN)/DELX) + 1
-        if (I  >  NNR) I = NNR
+        if (I .GT. NNR) I = NNR
         J = INT((Y(K)-YMN)/DELY) + 1
-        if (J  >  NNR) J = NNR
+        if (J .GT. NNR) J = NNR
         L = LCELL(I,J)
         LNEXT(K) = L
-        if (L  ==  0) LNEXT(K) = K
+        if (L .EQ. 0) LNEXT(K) = K
         LCELL(I,J) = K
     4   continue
 
@@ -1801,4 +1854,4 @@
 
     6 IER = 2
       return
-      end subroutine STORE2_db
+      end

@@ -469,6 +469,6 @@ contains
 
       end subroutine get_helmeos
 
-   end subroutine helm_opal_scvh
+   end subroutine
 
 end module helm_opal_scvh_driver

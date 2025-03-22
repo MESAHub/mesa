@@ -56,7 +56,7 @@ contains
 
       dlnPgas_dlnY = 0
 
-   end subroutine interpolate_opal_scvh
+   end subroutine
 
    subroutine do_opal_scvh(opal_only, scvh_only, include_radiation, search_for_SCVH, &
                            logT_in, logRho_in, temp_in, den_in, abar_in, zbar_in, X_in, Z_in, &
@@ -488,7 +488,7 @@ contains
 
       return
 
-   end subroutine do_opal_scvh
+   end subroutine
 
    subroutine blend(alfa, beta, den, temp, Prad, logPgas_1, logPgas_2, logS_1, logS_2, &
                     dS_dT_1, dS_dT_2, dS_dRho_1, dS_dRho_2, &

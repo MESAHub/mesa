@@ -22,7 +22,7 @@
 
       subroutine init_opal_type1(z_in,xh_in)
          double precision, intent(in) :: z_in, xh_in
-         real :: z, xh
+         real z, xh
          common/init/itimeco,read_z
          z = z_in; xh = xh_in
          if (z  /=  read_z) itimeco = 0
@@ -77,7 +77,7 @@
 
       return
 
-      end subroutine eval_opal_type1
+      end
 
       subroutine instruct
 !-----VERSION of October 5, 1995-----------------------------------------
@@ -175,7 +175,7 @@
 !         DOPACTD     Is Dlog(kappa)/Dlog(T6)   at constant Rho
 
       dum=0.0
-      end subroutine instruct
+      end
 
 ! ********************************************************************
       subroutine opacgn93 (z,xh,t6,r,filename,OP_file,logK)
@@ -200,7 +200,7 @@
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/eee/m1,zval
-      real :: kapz,kapz1,kapz2
+      real kapz,kapz1,kapz2
       dimension kapz(mz),dkapdtr(mz),dkapdrt(mz)
       logK = 0
       zval=z
@@ -296,7 +296,7 @@
       dopactd=-3.*dopacr+dopact
       is=0
       logK = opact
-      end subroutine opacgn93
+      end
 ! **********************************************************************
 
       subroutine opac (izi,mzin,xh,t6,r,filename,OP_file)
@@ -369,6 +369,7 @@
       end if
 
 
+
       mxend=mx
       xa(mx)=1.-z
       xa(mx-1)=xamx1
@@ -395,6 +396,7 @@
       if(slt  >  alt(nt)) slt = alt(nt)
       if(slr  <  alr (1)) slr = alr(1)
       if(slr  >  alr(nre)) slr = alr(nre)
+
 
 
       if (izi  ==  0) then  ! freeze table indices
@@ -721,7 +723,7 @@
    66 return
       write(*,'(" Z does not match Z in codata* files you are using")')
       call mesa_error(__FILE__,__LINE__)
-      end subroutine opac
+      end
 
 ! **********************************************************************
       subroutine t6rinterp(slr,slt)
@@ -836,7 +838,7 @@
             dopacr=99.
             dopactd=99.
           end if
-      end subroutine t6rinterp
+      end
 
 
 ! *********************************************************************
@@ -847,7 +849,7 @@
       logical :: OP_file
       parameter (ismdata=0)   ! modified
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      character(len=250) :: dumarra
+      character(len=250) dumarra
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
       common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -856,6 +858,7 @@
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
+
 
 
         if (itimeco  /=  12345678) then
@@ -990,7 +993,7 @@
       do i=2,mz
       dfsz(i)=1./(zza(i)-zza(i-1))
       end do
-      end subroutine readco
+      end
 
 ! **********************************************************************
       function quad(ic,i,x,y1,y2,y3,x1,x2,x3)
@@ -1019,7 +1022,7 @@
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       dkap=c2+(x+x)*c3
       quad=c1+x*(c2+x*c3)
-      end function quad
+      end
 
 ! **********************************************************************
       block data
@@ -1072,12 +1075,12 @@
 
       parameter(IP=100,IPR=20)
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      dimensionU(IP),ROSSL(IP,IPR),V(IP),V2(IP)
+      DIMENSION U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      character(len=100) :: HEAD
+      CHARACTER(len=100) HEAD
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
-      logical :: IERR
+      LOGICAL IERR
 
       NRL=2*(RLE-RLS)+1
 
@@ -1132,12 +1135,12 @@
 !        GET FIRST DERIVATIVES AT END POINTS
 
 !        GET SECOND DERIVATIVES FOR SPLINE FIT
-         call SPLINE(U,V,N,V2)
+         CALL SPLINE(U,V,N,V2)
 
 !        INTERPOLATE TO LOG10(T)=FLT, FLT=3.8(0.05)8.0
          DO 30 I=1,nset ! modified
             FLT=3.75+0.05*I
-            call SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
+            CALL SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
    30    CONTINUE
 
    40 CONTINUE
@@ -1146,25 +1149,25 @@
 !  OPTION FOR SMOOTHING
       IF(NSM > 0)THEN
          DO 35 NS=1,NSM
-            call SMOOTH
+            CALL SMOOTH
    35    CONTINUE
-         call FITX
+         CALL FITX
       end if
 
 
 !  GET FY AND FXY
-      call FITY
+      CALL FITY
 
 !  THE ARRAYS F, FX, FY AND FXY ARE NOW STORED
 
 !  CAN NOW DO INTERPOLATIONS USING
-!       call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
+!       CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
 !       INPUT IS FLT=LOG10(T), FLRHO=LOG10(RHO)
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
 !              IERR=.TRUE. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
-!                          else IERR=.FALSE.
+!                          ELSE IERR=.FALSE.
 
 ! INTERPOLATE BACK TO OPAL POINTS
       IF(NSM > 0)THEN
@@ -1177,7 +1180,7 @@
             DO 50 L=nrlow,nrhigh
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
-               call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
+               CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
                IF(IERR)THEN
                end if
                V(L)=G
@@ -1199,16 +1202,20 @@
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
  6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
-      end subroutine opaltab
+      END
 
 ! ********************************************************************
       subroutine SPLINE(X,Y,N,Y2)
       parameter (NMAX=100)
-      dimensionX(N),Y(N),Y2(N),U(NMAX)
+      DIMENSION X(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT END POINTS USING CUBIC FIT
-         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2    -(Y(2)-Y(1))*(X(3)-X(1))**2)/    ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
-         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2    -(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/    ((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
+         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2
+     +   -(Y(2)-Y(1))*(X(3)-X(1))**2)/
+     +   ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
+         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2
+     +   -(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/
+     +   ((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
@@ -1224,17 +1231,17 @@
       DO 12 K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
 12    CONTINUE
-      end subroutine SPLINE
+      END
 ! ********************************************************************
       subroutine SPLINT(XA,YA,N,Y2A,X,Y,YP)
-      dimensionXA(N),YA(N),Y2A(N)
+      DIMENSION XA(N),YA(N),Y2A(N)
       KLO=1
       KHI=N
 1     IF (KHI-KLO > 1) THEN
         K=(KHI+KLO)/2
         IF(XA(K) > X)THEN
           KHI=K
-        else
+        ELSE
           KLO=K
         end if
       GOTO 1
@@ -1245,7 +1252,7 @@
       B=(X-XA(KLO))/H
       Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
       YP=0.05*  (  (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI) )*H/6. )
-      end subroutine SPLINT
+      END
 ! ********************************************************************
       subroutine FITY
 
@@ -1256,7 +1263,7 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
       parameter(IPR=20)
-      dimensionA(IPR),B(IPR),AD(IPR),BD(IPR)
+      DIMENSION A(IPR),B(IPR),AD(IPR),BD(IPR)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
       DO 30 I=1,nset   ! modified
@@ -1265,8 +1272,8 @@
             B(J)=FX(I,J)
    10    CONTINUE
 
-         call GETD(A,NRL,AD,AP1,APN)
-         call GETD(B,NRL,BD,BP1,BPN)
+         CALL GETD(A,NRL,AD,AP1,APN)
+         CALL GETD(B,NRL,BD,BP1,BPN)
 
          FY(I,1)=AP1
          FY(I,NRL)=APN
@@ -1278,7 +1285,7 @@
    20    CONTINUE
    30 CONTINUE
 
-      end subroutine FITY
+      END
 ! ********************************************************************
       subroutine FITX
 
@@ -1287,7 +1294,7 @@
 
 
       parameter(IPR=20)
-      dimensionA(85),D(85)
+      DIMENSION A(85),D(85)
 
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
@@ -1296,7 +1303,7 @@
          DO 10 I=1,nset ! modified
             A(I)=F(I,J)
    10    CONTINUE
-         call GETD(A,nset,D,AP1,APN)  ! modified
+         CALL GETD(A,nset,D,AP1,APN)  ! modified
          FX(1,J)=AP1
          FX(nset,J)=APN   ! modified
          DO 20 I=2,nset-1  ! modified
@@ -1304,7 +1311,7 @@
    20    CONTINUE
    30 CONTINUE
 
-      end subroutine FITX
+      END
 
 ! ***********************************************************************
       subroutine GETD(F,N,D,FP1,FPN)
@@ -1313,7 +1320,7 @@
 !  OF UNITY.
 
 
-      dimensionF(N),D(N),T(85)
+      DIMENSION F(N),D(N),T(85)
 
       FP1=(-11.*F(1)+18.*F(2)-9.*F(3)+2.*F(4))/6.
       FPN=(11.*F(N)-18.*F(N-1)+9.*F(N-2)-2.*F(N-3))/6.
@@ -1332,7 +1339,7 @@
          D(J)=D(J)*D(J+1)+T(J)
    20 CONTINUE
 
-      end subroutine GETD
+      END
 
 ! ********************************************************************
       subroutine INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1344,8 +1351,8 @@
 
       parameter(IPR=20)
       COMMON/CF/ F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      dimensionB(16)
-      logical :: IERR
+      DIMENSION B(16)
+      LOGICAL IERR
 
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
@@ -1356,13 +1363,22 @@
 
 !  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
 
-      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))    +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))    +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))    +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
+     +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
+     +   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
+     +   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
-      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))    +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))    +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
+     +   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
+     +   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
 
-      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))    +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))    +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
+     +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
+     +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
-      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8))    +S*(   2*B(10)+T*(4*B(11)+6*T*B(12))    +S*(   3*B(14)+T*(6*B(15)+9*T*B(16)) ))
+      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8))
+     +   +S*(   2*B(10)+T*(4*B(11)+6*T*B(12))
+     +   +S*(   3*B(14)+T*(6*B(15)+9*T*B(16)) ))
 
 
       IERR=.FALSE.
@@ -1375,16 +1391,16 @@
       IF(X < 2.)THEN
          IF(X < 0.75)THEN
             IERR=.TRUE.
-         else
+         ELSE
             I=1
          end if
-      else IF(X > 84)THEN
+      ELSEIF(X > 84)THEN
          IF(X > 85.25)THEN
             IERR=.TRUE.
-         else
+         ELSE
             I=84
          end if
-      else
+      ELSE
          I=X
       end if
       U=X-I
@@ -1392,16 +1408,16 @@
       IF(Y < 2.)THEN
          IF(Y < 0.75)THEN
             IERR=.TRUE.
-         else
+         ELSE
             J=1
          end if
-      else IF(Y > NRL-1)THEN
+      ELSEIF(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
             IERR=.TRUE.
-         else
+         ELSE
             J=NRL-1
          end if
-      else
+      ELSE
          J=Y
       end if
       V=Y-J
@@ -1410,7 +1426,7 @@
          G=9.999
          DGDT=9.999
          DGDRHO=9.999
-         return
+         RETURN
       end if
 
 
@@ -1427,13 +1443,29 @@
 
       B(9)=3*(-F(I,J)+F(I+1,J))-2*FX(I,J)-FX(I+1,J)
       B(10)=3*(-FY(I,J)+FY(I+1,J))-2*FXY(I,J)-FXY(I+1,J)
-      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))  +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))  +4*FXY(I,J)  +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))  +2*(FXY(I,J+1)+FXY(I+1,J))  +FXY(I+1,J+1)
-      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))  +4*(-FX(I,J)+FX(I,J+1))  +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))  +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))  -FXY(I+1,J)-FXY(I+1,J+1)
+      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
+     + +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))
+     + +4*FXY(I,J)
+     + +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))
+     + +2*(FXY(I,J+1)+FXY(I+1,J))
+     + +FXY(I+1,J+1)
+      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
+     + +4*(-FX(I,J)+FX(I,J+1))
+     + +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))
+     + +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))
+     + -FXY(I+1,J)-FXY(I+1,J+1)
 
       B(13)=2*(F(I,J)-F(I+1,J))+FX(I,J)+FX(I+1,J)
       B(14)=2*(FY(I,J)-FY(I+1,J))+FXY(I,J)+FXY(I+1,J)
-      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))  +4*(-FY(I,J)+FY(I+1,J))  +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))  +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))  -FXY(I+1,J+1)-FXY(I,J+1)
-      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))  +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)     +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))  +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
+      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
+     + +4*(-FY(I,J)+FY(I+1,J))
+     + +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))
+     + +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))
+     + -FXY(I+1,J+1)-FXY(I,J+1)
+      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
+     + +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)
+     +    +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))
+     + +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
 
 !  GET G=LOG10(ROSS), DGDT=d LOG10(ROSS)/d LOG10(T),
 !      DGDRHO=d LOG10(ROSS)/d LOG10(RHO)
@@ -1441,7 +1473,7 @@
       DGDT=20.*FFX(U,V)-6.*FFY(U,V)
       DGDRHO=2.*FFY(U,V)
 
-      end subroutine INTERP
+      END
 
 ! ********************************************************************
       subroutine SMOOTH
@@ -1464,31 +1496,86 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      dimensionGAM(6)
+      DIMENSION GAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
-      dimensionBET(11)
-      DATA BET/  -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
-      dimensionALP(11)
-      DATA ALP/  -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
+      DIMENSION BET(11)
+      DATA BET/
+     + -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,
+     +  0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,
+     +  0.3746938776,+0.1665306122,-0.1110204082/
+      DIMENSION ALP(11)
+      DATA ALP/
+     + -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,
+     +  0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,
+     +  0.0277551020,-0.0416326531,-0.0069387755/
 
 
       DO 20 I=3,nset-2
 
          J=1
-         FXY(I,J)=     ALP(1)*( F(I-2,J  )+F(I+2,J  ) )    +ALP(2)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J+3)+F(I+2,J+3)           +F(I-1,J+4)+F(I+1,J+4) )    +ALP(3)*( F(I-2,J+2)+F(I+2,J+2) )    +ALP(4)*( F(I-2,J+4)+F(I+2,J+4) )    +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )    +ALP(6)*( F(I-1,J+1)+F(I+1,J+1)+F(I-1,J+3)+F(I+1,J+3) )    +ALP(7)*( F(I-1,J+2)+F(I+1,J+2) )    +ALP(8)*  F(I  ,J  )    +ALP(9)*( F(I  ,J+1)+F(I  ,J+3) )    +ALP(10)* F(I  ,J+2) +ALP(11)*F(I  ,J+4)
+         FXY(I,J)=
+     +    ALP(1)*( F(I-2,J  )+F(I+2,J  ) )
+     +   +ALP(2)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J+3)+F(I+2,J+3)
+     +          +F(I-1,J+4)+F(I+1,J+4) )
+     +   +ALP(3)*( F(I-2,J+2)+F(I+2,J+2) )
+     +   +ALP(4)*( F(I-2,J+4)+F(I+2,J+4) )
+     +   +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )
+     +   +ALP(6)*( F(I-1,J+1)+F(I+1,J+1)+F(I-1,J+3)+F(I+1,J+3) )
+     +   +ALP(7)*( F(I-1,J+2)+F(I+1,J+2) )
+     +   +ALP(8)*  F(I  ,J  )
+     +   +ALP(9)*( F(I  ,J+1)+F(I  ,J+3) )
+     +   +ALP(10)* F(I  ,J+2) +ALP(11)*F(I  ,J+4)
 
          J=2
-         FXY(I,J)=     BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )    +BET(2)*( F(I-2,J  )+F(I+2,J  ) )    +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )    +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)             +F(I-1,J+3)+F(I+1,J+3) )    +BET(5)*( F(I-1,J  )+F(I+1,J  ) )    +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )    +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )    +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )    +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
+         FXY(I,J)=
+     +    BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )
+     +   +BET(2)*( F(I-2,J  )+F(I+2,J  ) )
+     +   +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )
+     +   +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)
+     +            +F(I-1,J+3)+F(I+1,J+3) )
+     +   +BET(5)*( F(I-1,J  )+F(I+1,J  ) )
+     +   +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )
+     +   +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )
+     +   +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )
+     +   +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
          DO 10 J=3,NRL-2
-            FXY(I,J)=          GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )         +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)                  +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )         +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )         +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )         +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )         +GAM(6)*  F(I  ,J  )
+            FXY(I,J)=
+     +         GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )
+     +        +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)
+     +                 +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )
+     +        +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )
+     +        +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )
+     +        +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )
+     +        +GAM(6)*  F(I  ,J  )
    10    CONTINUE
 
          J=NRL-1
-         FXY(I,J)=      BET(1)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J-3)+F(I+2,J-3) )     +BET(2)*( F(I-2,J  )+F(I+2,J  ) )     +BET(3)*( F(I-2,J-1)+F(I+2,J-1) )     +BET(4)*( F(I-2,J-2)+F(I+2,J-2)+F(I-1,J+1)+F(I+1,J+1)              +F(I-1,J-3)+F(I+1,J-3) )     +BET(5)*( F(I-1,J  )+F(I+1,J  ) )     +BET(6)*( F(I-1,J-1)+F(I+1,J-1) )     +BET(7)*( F(I-1,J-2)+F(I+1,J-2) )     +BET(8)*( F(I  ,J+1)+F(I  ,J-3) )     +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J-1) +BET(11)*F(I  ,J-2)
+         FXY(I,J)=
+     +     BET(1)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J-3)+F(I+2,J-3) )
+     +    +BET(2)*( F(I-2,J  )+F(I+2,J  ) )
+     +    +BET(3)*( F(I-2,J-1)+F(I+2,J-1) )
+     +    +BET(4)*( F(I-2,J-2)+F(I+2,J-2)+F(I-1,J+1)+F(I+1,J+1)
+     +             +F(I-1,J-3)+F(I+1,J-3) )
+     +    +BET(5)*( F(I-1,J  )+F(I+1,J  ) )
+     +    +BET(6)*( F(I-1,J-1)+F(I+1,J-1) )
+     +    +BET(7)*( F(I-1,J-2)+F(I+1,J-2) )
+     +    +BET(8)*( F(I  ,J+1)+F(I  ,J-3) )
+     +    +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J-1) +BET(11)*F(I  ,J-2)
 
          J=NRL
-         FXY(I,J)=      ALP(1)*( F(I-2,J  )+F(I+2,J  ) )     +ALP(2)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J-3)+F(I+2,J-3)              +F(I-1,J-4)+F(I+1,J-4) )     +ALP(3)*( F(I-2,J-2)+F(I+2,J-2) )     +ALP(4)*( F(I-2,J-4)+F(I+2,J-4) )     +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )     +ALP(6)*( F(I-1,J-1)+F(I+1,J-1)+F(I-1,J-3)+F(I+1,J-3) )     +ALP(7)*( F(I-1,J-2)+F(I+1,J-2) )     +ALP(8)*  F(I  ,J  )     +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )     +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
+         FXY(I,J)=
+     +     ALP(1)*( F(I-2,J  )+F(I+2,J  ) )
+     +    +ALP(2)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J-3)+F(I+2,J-3)
+     +             +F(I-1,J-4)+F(I+1,J-4) )
+     +    +ALP(3)*( F(I-2,J-2)+F(I+2,J-2) )
+     +    +ALP(4)*( F(I-2,J-4)+F(I+2,J-4) )
+     +    +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )
+     +    +ALP(6)*( F(I-1,J-1)+F(I+1,J-1)+F(I-1,J-3)+F(I+1,J-3) )
+     +    +ALP(7)*( F(I-1,J-2)+F(I+1,J-2) )
+     +    +ALP(8)*  F(I  ,J  )
+     +    +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )
+     +    +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
 
    20 CONTINUE
 
@@ -1498,4 +1585,4 @@
    30    CONTINUE
    40 CONTINUE
 
-      end subroutine SMOOTH
+      END
