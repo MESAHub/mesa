@@ -567,8 +567,8 @@
 !
 !  REVISED 5.5.95
 !
-      PARAMETER (IPI=6)
-      DIMENSION F(IPI),D(IPI),T(IPI)
+      parameter (IPI=6)
+      dimensionF(IPI),D(IPI),T(IPI)
 
       if (N <= 0) then
          WRITE(6,*)' Error in subroutine GET: N=',N
@@ -791,7 +791,7 @@
       use op_load, only: screen2
       dimension uf(0:100), umesh(nptot),fscat(0:100), ih(0:5), jh(0:5)
       real, target :: f(nptot, 0:5, 0:5), rion(28, 0:5, 0:5)
-      integer i, j, k, m
+      integer :: i, j, k, m
       real, pointer :: p(:), rr(:)
 
       ite3=2

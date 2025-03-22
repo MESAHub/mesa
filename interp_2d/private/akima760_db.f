@@ -69,30 +69,29 @@
 ! arrays.  Between the call with MD=2 and its preceding call, the
 ! WK array must not be disturbed.
 
-! The constant in the PARAMETER statement below is
+! The constant in the parameter statement below is
 !   NIPIMX = maximum number of output points to be processed
 !            at a time.
 ! The constant value has been selected empirically.
 
 ! This subroutine calls the RGPD3P_db, RGLCTN_db, and RGPLNL_db subroutines.
 
-*
 ! Specification statements
 !     .. Parameters ..
-      integer          NIPIMX
-      PARAMETER        (NIPIMX=51)
+      integer          :: NIPIMX
+      parameter        (NIPIMX=51)
 !     ..
 !     .. Scalar Arguments ..
-      integer          IER,MD,NIP,NXD,NYD
+      integer          :: IER,MD,NIP,NXD,NYD
 !     ..
 !     .. Array Arguments ..
-      double precision             WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),   ZD(NXD,NYD),ZI(NIP)
+      double precision             :: WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),   ZD(NXD,NYD),ZI(NIP)
 !     ..
 !     .. Local Scalars ..
-      integer          IIP,IX,IY,NIPI
+      integer          :: IIP,IX,IY,NIPI
 !     ..
 !     .. Local Arrays ..
-      integer          INXI(NIPIMX),INYI(NIPIMX)
+      integer          :: INXI(NIPIMX),INYI(NIPIMX)
 !     ..
 !     .. External Subroutines ..
       EXTERNAL         RGLCTN_db,RGPD3P_db,RGPLNL_db
@@ -116,19 +115,19 @@
 ! Estimates partial derivatives at all input-grid data points
 ! (for MD=1).
       if (MD /= 2) THEN
-          CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
-!         CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
+          call RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
+!         call RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
       end if
 ! DO-loop with respect to the output point
 ! Processes NIPIMX output points, at most, at a time.
       do 30 IIP = 1,NIP,NIPIMX
           NIPI = MIN(NIP- (IIP-1),NIPIMX)
 ! Locates the output points.
-          CALL RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IIP),YI(IIP), INXI,INYI)
-!         CALL RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
+          call RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IIP),YI(IIP), INXI,INYI)
+!         call RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output points.
-          CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,   INYI, ZI(IIP))
-!         CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
+          call RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,   INYI, ZI(IIP))
+!         call RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
    30 continue
       return
 ! Error exit
@@ -155,7 +154,7 @@
  9030 FORMAT (1X,/,'*** RGBI3P Error 4: Identical YD values or',   ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',   E11.3)
  9040 FORMAT (1X,/,'*** RGBI3P Error 5: NIP = 0 or less')
  9050 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NIP =',I5,/)
-      end
+      end subroutine do_RGBI3P_db
 
 
       subroutine do_RGSF3P_db(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
@@ -234,31 +233,30 @@
 ! arrays.  Between the call with MD=2 and its preceding call, the
 ! WK array must not be disturbed.
 
-! The constant in the PARAMETER statement below is
+! The constant in the parameter statement below is
 !   NIPIMX = maximum number of output points to be processed
 !            at a time.
 ! The constant value has been selected empirically.
 
 ! This subroutine calls the RGPD3P_db, RGLCTN_db, and RGPLNL_db subroutines.
 
-*
 ! Specification statements
 !     .. Parameters ..
-      integer          NIPIMX
-      PARAMETER        (NIPIMX=51)
+      integer          :: NIPIMX
+      parameter        (NIPIMX=51)
 !     ..
 !     .. Scalar Arguments ..
-      integer          IER,MD,NXD,NXI,NYD,NYI
+      integer          :: IER,MD,NXD,NXI,NYD,NYI
 !     ..
 !     .. Array Arguments ..
-      double precision             WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),   ZD(NXD,NYD),ZI(NXI,NYI)
+      double precision             :: WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),   ZD(NXD,NYD),ZI(NXI,NYI)
 !     ..
 !     .. Local Scalars ..
-      integer          IX,IXI,IY,IYI,NIPI
+      integer          :: IX,IXI,IY,IYI,NIPI
 !     ..
 !     .. Local Arrays ..
-      double precision             YII(NIPIMX)
-      integer          INXI(NIPIMX),INYI(NIPIMX)
+      double precision             :: YII(NIPIMX)
+      integer          :: INXI(NIPIMX),INYI(NIPIMX)
 !     ..
 !     .. External Subroutines ..
       EXTERNAL         RGLCTN_db,RGPD3P_db,RGPLNL_db
@@ -283,8 +281,8 @@
 ! Estimates partial derivatives at all input-grid data points
 ! (for MD=1).
       if (MD /= 2) THEN
-          CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
-!         CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
+          call RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
+!         call RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
       end if
 ! Outermost DO-loop with respect to the y coordinate of the output
 ! grid points
@@ -298,11 +296,11 @@
           do 40 IXI = 1,NXI,NIPIMX
               NIPI = MIN(NXI- (IXI-1),NIPIMX)
 ! Locates the output-grid points.
-              CALL RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
-!             CALL RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
+              call RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
+!             call RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output-grid points.
-              CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,   INYI, ZI(IXI,IYI))
-!             CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
+              call RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,   INYI, ZI(IXI,IYI))
+!             call RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
    40     continue
    50 continue
       return
@@ -334,7 +332,7 @@
  9040 FORMAT (1X,/,'*** RGSF3P_db Error 5: NXI = 0 or less')
  9050 FORMAT (1X,/,'*** RGSF3P_db Error 6: NYI = 0 or less')
  9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,   /)
-      end
+      end subroutine do_RGSF3P_db
 
 
       subroutine RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
@@ -371,27 +369,26 @@
 !         where the estimated zx, zy, and zxy values at the
 !         input-grid data points are to be stored.
 
-*
 ! Specification statements
 !     .. Scalar Arguments ..
-      integer          NXD,NYD
+      integer          :: NXD,NYD
 !     ..
 !     .. Array Arguments ..
-      double precision             PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
+      double precision             :: PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
 !     ..
 !     .. Local Scalars ..
-      double precision             B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,   CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,   DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,   DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,   DZXY22,DZXY23,DZXY31,DZXY32,DZXY33,DZY01,DZY02,   DZY03,EPSLN,PEZX,PEZXY,PEZY,SMPEF,SMPEI,SMWTF,   SMWTI,SX,SXX,SXXY,SXXYY,SXY,SXYY,SXYZ,SXZ,SY,SYY,   SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,   Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,   Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
-      integer          IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,   JXY,NX0,NY0
+      double precision             :: B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,   CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,   DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,   DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,   DZXY22,DZXY23,DZXY31,DZXY32,DZXY33,DZY01,DZY02,   DZY03,EPSLN,PEZX,PEZXY,PEZY,SMPEF,SMPEI,SMWTF,   SMWTI,SX,SXX,SXXY,SXXYY,SXY,SXYY,SXYZ,SXZ,SY,SYY,   SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,   Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,   Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
+      integer          :: IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,   JXY,NX0,NY0
 !     ..
 !     .. Local Arrays ..
-      double precision             B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),   CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),   YA(3,4),Z0IA(3,4),ZI0A(3,4)
-      integer          IDLT(3,4)
+      double precision             :: B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),   CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),   YA(3,4),Z0IA(3,4),ZI0A(3,4)
+      integer          :: IDLT(3,4)
 !     ..
 !     .. Intrinsic Functions ..
       INTRINSIC        MAX
 !     ..
 !     .. Statement Functions ..
-      double precision             Z2F,Z3F
+      double precision             :: Z2F,Z3F
 !     ..
 ! Data statements
       DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,   -2,-1,1,2,-1,1,2,3/
@@ -422,7 +419,7 @@
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR. (IX1 > NX0) .OR. (IX2 > NX0) .OR. (IX3 > NX0)) GOTO 10
+                  if ((IX1 < 1) .or. (IX2 < 1) .or. (IX3 < 1) .or. (IX1 > NX0) .or. (IX2 > NX0) .or. (IX3 > NX0)) GOTO 10
 ! Selects and/or supplements the x and z values.
                   X1 = XD(IX1) - X0
                   Z10 = ZD(IX1,IY0)
@@ -476,7 +473,7 @@
                       WT = 1.0/ (VOLF*DISF)
                       SMPEF = SMPEF + WT*PEZX
                       SMWTF = SMWTF + WT
-                  ELSE
+                  else
 ! - For an infinite weight.
                       SMPEI = SMPEI + PEZX
                       SMWTI = SMWTI + 1.0
@@ -500,7 +497,7 @@
               if (SMWTI < 0.5) THEN
 ! - When no infinite weights exist.
                   ZXDI = SMPEF/SMWTF
-              ELSE
+              else
 ! - When infinite weights exist.
                   ZXDI = SMPEI/SMWTI
               end if
@@ -517,7 +514,7 @@
                   IY1 = IY0 + IDLT(1,IPEY)
                   IY2 = IY0 + IDLT(2,IPEY)
                   IY3 = IY0 + IDLT(3,IPEY)
-                  if ((IY1 < 1) .OR. (IY2 < 1) .OR. (IY3 < 1) .OR. (IY1 > NY0) .OR. (IY2 > NY0) .OR. (IY3 > NY0)) GOTO 20
+                  if ((IY1 < 1) .or. (IY2 < 1) .or. (IY3 < 1) .or. (IY1 > NY0) .or. (IY2 > NY0) .or. (IY3 > NY0)) GOTO 20
 ! Selects and/or supplements the y and z values.
                   Y1 = YD(IY1) - Y0
                   Z01 = ZD(IX0,IY1)
@@ -571,7 +568,7 @@
                       WT = 1.0/ (VOLF*DISF)
                       SMPEF = SMPEF + WT*PEZY
                       SMWTF = SMWTF + WT
-                  ELSE
+                  else
 ! - For an infinite weight.
                       SMPEI = SMPEI + PEZY
                       SMWTI = SMWTI + 1.0
@@ -595,7 +592,7 @@
               if (SMWTI < 0.5) THEN
 ! - When no infinite weights exist.
                   ZYDI = SMPEF/SMWTF
-              ELSE
+              else
 ! - When infinite weights exist.
                   ZYDI = SMPEI/SMWTI
               end if
@@ -612,7 +609,7 @@
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR. (IX1 > NX0) .OR. (IX2 > NX0) .OR. (IX3 > NX0)) GOTO 40
+                  if ((IX1 < 1) .or. (IX2 < 1) .or. (IX3 < 1) .or. (IX1 > NX0) .or. (IX2 > NX0) .or. (IX3 > NX0)) GOTO 40
 ! Retrieves the necessary values for estimating zxy in the x
 ! direction.
                   X1 = XA(1,IPEX)
@@ -634,7 +631,7 @@
                       IY1 = IY0 + IDLT(1,IPEY)
                       IY2 = IY0 + IDLT(2,IPEY)
                       IY3 = IY0 + IDLT(3,IPEY)
-                      if ((IY1 < 1) .OR. (IY2 < 1) .OR. (IY3 < 1) .OR. (IY1 > NY0) .OR. (IY2 > NY0) .OR. (IY3 > NY0)) GOTO 30
+                      if ((IY1 < 1) .or. (IY2 < 1) .or. (IY3 < 1) .or. (IY1 > NY0) .or. (IY2 > NY0) .or. (IY3 > NY0)) GOTO 30
 ! Retrieves the necessary values for estimating zxy in the y
 ! direction.
                       Y1 = YA(1,IPEY)
@@ -766,7 +763,7 @@
                           WT = 1.0/ (VOLF*DISF)
                           SMPEF = SMPEF + WT*PEZXY
                           SMWTF = SMWTF + WT
-                      ELSE
+                      else
 ! - For an infinite weight.
                           SMPEI = SMPEI + PEZXY
                           SMWTI = SMWTI + 1.0
@@ -777,7 +774,7 @@
               if (SMWTI < 0.5) THEN
 ! - When no infinite weights exist.
                   ZXYDI = SMPEF/SMWTF
-              ELSE
+              else
 ! - When infinite weights exist.
                   ZXYDI = SMPEI/SMWTI
               end if
@@ -788,7 +785,7 @@
    50     continue
    60 continue
       return
-      end
+      end subroutine RGPD3P_db
 
 
       subroutine RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
@@ -831,18 +828,17 @@
 ! The interval numbers are between 0 and NXD and between 0 and NYD,
 ! respectively.
 
-*
 ! Specification statements
 !     .. Scalar Arguments ..
-      integer          NIP,NXD,NYD
+      integer          :: NIP,NXD,NYD
 !     ..
 !     .. Array Arguments ..
-      double precision             XD(NXD),XI(NIP),YD(NYD),YI(NIP)
-      integer          INXI(NIP),INYI(NIP)
+      double precision             :: XD(NXD),XI(NIP),YD(NYD),YI(NIP)
+      integer          :: INXI(NIP),INYI(NIP)
 !     ..
 !     .. Local Scalars ..
-      double precision             XII,YII
-      integer          IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
+      double precision             :: XII,YII
+      integer          :: IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
 !     ..
 ! DO-loop with respect to IIP, which is the point number of the
 ! output point
@@ -853,13 +849,13 @@
 ! in a new interval.  (NINTX is the new-interval flag.)
           if (IIP == 1) THEN
               NINTX = 1
-          ELSE
+          else
               NINTX = 0
               if (IXD == 0) THEN
                   if (XII > XD(1)) NINTX = 1
               else if (IXD < NXD) THEN
-                  if ((XII < XD(IXD)) .OR. (XII > XD(IXD+1))) NINTX = 1
-              ELSE
+                  if ((XII < XD(IXD)) .or. (XII > XD(IXD+1))) NINTX = 1
+              else
                   if (XII < XD(NXD)) NINTX = 1
               end if
           end if
@@ -875,13 +871,13 @@
                   IMD = (IMN+IMX)/2
    10             if (XII >= XD(IMD)) THEN
                       IMN = IMD
-                  ELSE
+                  else
                       IMX = IMD
                   end if
                   IMD = (IMN+IMX)/2
                   if (IMD > IMN) GOTO 10
                   IXD = IMD
-              ELSE
+              else
                   IXD = NXD
               end if
           end if
@@ -890,13 +886,13 @@
 ! in a new interval.  (NINTY is the new-interval flag.)
           if (IIP == 1) THEN
               NINTY = 1
-          ELSE
+          else
               NINTY = 0
               if (IYD == 0) THEN
                   if (YII > YD(1)) NINTY = 1
               else if (IYD < NYD) THEN
-                  if ((YII < YD(IYD)) .OR. (YII > YD(IYD+1))) NINTY = 1
-              ELSE
+                  if ((YII < YD(IYD)) .or. (YII > YD(IYD+1))) NINTY = 1
+              else
                   if (YII < YD(NYD)) NINTY = 1
               end if
           end if
@@ -912,20 +908,20 @@
                   IMD = (IMN+IMX)/2
    20             if (YII >= YD(IMD)) THEN
                       IMN = IMD
-                  ELSE
+                  else
                       IMX = IMD
                   end if
                   IMD = (IMN+IMX)/2
                   if (IMD > IMN) GOTO 20
                   IYD = IMD
-              ELSE
+              else
                   IYD = NYD
               end if
           end if
           INYI(IIP) = IYD
    30 continue
       return
-      end
+      end subroutine RGLCTN_db
 
 
       subroutine RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
@@ -979,18 +975,17 @@
 !   ZI   = array of dimension NIP, where the interpolated z
 !          values at the output points are to be stored.
 
-*
 ! Specification statements
 !     .. Scalar Arguments ..
-      integer          NIP,NXD,NYD
+      integer          :: NIP,NXD,NYD
 !     ..
 !     .. Array Arguments ..
-      double precision             PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP), ZD(NXD,NYD),ZI(NIP)
-      integer          INXI(NIP),INYI(NIP)
+      double precision             :: PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP), ZD(NXD,NYD),ZI(NIP)
+      integer          :: INXI(NIP),INYI(NIP)
 !     ..
 !     .. Local Scalars ..
-      double precision             A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11, P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,   Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,   Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,   ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,   ZY10,ZY11,ZY1DX
-      integer          IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
+      double precision             :: A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11, P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,   Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,   Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,   ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,   ZY10,ZY11,ZY1DX
+      integer          :: IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
 !     ..
 !     .. Intrinsic Functions ..
       INTRINSIC        MAX
@@ -1003,7 +998,7 @@
           if (IIP == 1) THEN
               IXDIPV = -1
               IYDIPV = -1
-          ELSE
+          else
               IXDIPV = IXDI
               IYDIPV = IYDI
           end if
@@ -1011,7 +1006,7 @@
           IYDI = INYI(IIP)
 ! Retrieves the z and partial derivative values at the origin of
 ! the coordinate for the rectangle.
-          if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
+          if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) THEN
               IXD0 = MAX(1,IXDI)
               IYD0 = MAX(1,IYDI)
               X0 = XD(IXD0)
@@ -1023,10 +1018,10 @@
           end if
 ! Case 1.  When the rectangle is inside the data area in both the
 ! x and y directions.
-          if ((IXDI > 0.AND.IXDI < NXD) .AND. (IYDI > 0.AND.IYDI < NYD)) THEN
+          if ((IXDI > 0.and.IXDI < NXD) .and. (IYDI > 0.and.IYDI < NYD)) THEN
 ! Retrieves the z and partial derivative values at the other three
 ! vertices of the rectangle.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1087,10 +1082,10 @@
 ! End of Case 1
 ! Case 2.  When the rectangle is inside the data area in the x
 ! direction but outside in the y direction.
-          else if ((IXDI > 0.AND.IXDI < NXD) .AND. (IYDI <= 0.OR.IYDI >= NYD)) THEN
+          else if ((IXDI > 0.and.IXDI < NXD) .and. (IYDI <= 0.or.IYDI >= NYD)) THEN
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1121,10 +1116,10 @@
 ! End of Case 2
 ! Case 3.  When the rectangle is outside the data area in the x
 ! direction but inside in the y direction.
-          else if ((IXDI <= 0.OR.IXDI >= NXD) .AND. (IYDI > 0.AND.IYDI < NYD)) THEN
+          else if ((IXDI <= 0.or.IXDI >= NXD) .and. (IYDI > 0.and.IYDI < NYD)) THEN
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) THEN
                   IYD1 = IYD0 + 1
                   DY = YD(IYD1) - Y0
                   DYSQ = DY*DY
@@ -1153,9 +1148,9 @@
 ! End of Case 3
 ! Case 4.  When the rectangle is outside the data area in both the
 ! x and y direction.
-          else if ((IXDI <= 0.OR.IXDI >= NXD) .AND. (IYDI <= 0.OR.IYDI >= NYD)) THEN
+          else if ((IXDI <= 0.or.IXDI >= NXD) .and. (IYDI <= 0.or.IYDI >= NYD)) THEN
 ! Calculates the polynomial coefficients.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) THEN
                   P00 = Z00
                   P01 = ZY00
                   P10 = ZX00
@@ -1172,4 +1167,4 @@
           ZI(IIP) = ZII
    10 continue
       return
-      end
+      end subroutine RGPLNL_db

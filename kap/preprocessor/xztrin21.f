@@ -799,7 +799,7 @@
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER*1 HEAD(100)
+      character*1 HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       logical :: IERR
@@ -1208,7 +1208,7 @@
          FXY(I,J)=       BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )      +BET(2)*( F(I-2,J  )+F(I+2,J  ) )      +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )      +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)               +F(I-1,J+3)+F(I+1,J+3) )      +BET(5)*( F(I-1,J  )+F(I+1,J  ) )      +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )      +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )      +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )      +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
          do 10 J=3,NRL-2
-            FXY(I,J)=            GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )           +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)                    +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )           +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )           +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )           +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )           +GAM(6)*  F(I  ,J  )
+            FXY(I,J)=   GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )           +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)                    +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )           +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )           +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )           +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )           +GAM(6)*  F(I  ,J  )
    10    continue
 
          J=NRL-1

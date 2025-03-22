@@ -56,7 +56,7 @@
 !     Return if the value of NPT is unacceptable.
 !
       NP=N+1
-      if (NPT < N+2 .OR. NPT > ((N+2)*NP)/2) then
+      if (NPT < N+2 .or. NPT > ((N+2)*NP)/2) then
           PRINT 10
    10     FORMAT (/4X,'Return from BOBYQA because NPT is not in the required interval')
           GOTO 40
@@ -129,11 +129,11 @@
 !
 !     Make the call of BOBYQB.
 !
-      CALL BOBYQB (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,W(IXB),
+      call BOBYQB (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,W(IXB),
      1  W(IXP),W(IFV),W(IXO),W(IGO),W(IHQ),W(IPQ),W(IBMAT),W(IZMAT),
      2  NDIM,W(ISL),W(ISU),W(IXN),W(IXA),W(ID),W(IVL),W(IW),CALFUN,
      3  max_valid_value)
-   40 RETURN
+   40 return
       end subroutine do_BOBYQA
 
 
@@ -203,7 +203,7 @@
 !     initial XOPT is set too. The branch to label 720 occurs if MAXFUN is
 !     less than NPT. GOPT will be updated if KOPT is different from KBASE.
 !
-      CALL PRELIM (N,NPT,X,XL,XU,RHOBEG,IPRINT,MAXFUN,XBASE,XPT,
+      call PRELIM (N,NPT,X,XL,XU,RHOBEG,IPRINT,MAXFUN,XBASE,XPT,
      1  FVAL,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,KOPT,CALFUN)
       XOPTSQ=ZERO
       do I=1,N
@@ -261,7 +261,7 @@
 !     of XNEW-XOPT is less than HALF*RHO, however, then there is a branch to
 !     label 650 or 680 with NTRITS=-1, instead of calculating F at XNEW.
 !
-   60 CALL TRSBOX (N,NPT,XPT,XOPT,GOPT,HQ,PQ,SL,SU,DELTA,XNEW,D,
+   60 call TRSBOX (N,NPT,XPT,XOPT,GOPT,HQ,PQ,SL,SU,DELTA,XNEW,D,
      1  W,W(NP),W(NP+N),W(NP+2*N),W(NP+3*N),DSQ,CRVMIN)
       DNORM=DMIN1(DELTA,DSQRT(DSQ))
       if (DNORM < HALF*RHO) then
@@ -277,7 +277,7 @@
 !
           ERRBIG=DMAX1(DIFFA,DIFFB,DIFFC)
           FRHOSQ=0.125D0*RHO*RHO
-          if (CRVMIN > ZERO .AND. ERRBIG > FRHOSQ*CRVMIN) GOTO 650
+          if (CRVMIN > ZERO .and. ERRBIG > FRHOSQ*CRVMIN) GOTO 650
           BDTOL=ERRBIG/RHO
           do J=1,N
             BDTEST=BDTOL
@@ -391,7 +391,7 @@
 !
   190 NFSAV=NF
       KBASE=KOPT
-      CALL RESCUE (N,NPT,XL,XU,IPRINT,MAXFUN,XBASE,XPT,FVAL,
+      call RESCUE (N,NPT,XL,XU,IPRINT,MAXFUN,XBASE,XPT,FVAL,
      1  XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,DELTA,KOPT,
      2  VLAG,W,W(N+NP),W(NDIM+NP),CALFUN)
 !
@@ -429,7 +429,7 @@
 !     being returned in CAUCHY. The choice between these alternatives is
 !     going to be made when the denominator is calculated.
 !
-  210 CALL ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
+  210 call ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
      1  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,W,W(NP),W(NDIM+1))
       do I=1,N
          D(I)=XNEW(I)-XOPT(I)
@@ -490,7 +490,7 @@
 !
       if (NTRITS == 0) then
           DENOM=VLAG(KNEW)**2+ALPHA*BETA
-          if (DENOM < CAUCHY .AND. CAUCHY > ZERO) then
+          if (DENOM < CAUCHY .and. CAUCHY > ZERO) then
               do I=1,N
                 XNEW(I)=XALT(I)
                 D(I)=XNEW(I)-XOPT(I)
@@ -559,7 +559,7 @@
           GOTO 720
       end if
       NF=NF+1
-      CALL CALFUN (N,X,F)
+      call CALFUN (N,X,F)
       if (IPRINT == 3) then
           PRINT 400, NF,F,(X(I),I=1,N)
   400      FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,
@@ -650,7 +650,7 @@
 !     Update BMAT and ZMAT, so that the KNEW-th interpolation point can be
 !     moved. Also update the second derivative terms of the model.
 !
-      CALL UPDATE (N,NPT,BMAT,ZMAT,NDIM,VLAG,BETA,DENOM,KNEW,W)
+      call UPDATE (N,NPT,BMAT,ZMAT,NDIM,VLAG,BETA,DENOM,KNEW,W)
       IH=0
       PQOLD=PQ(KNEW)
       PQ(KNEW)=ZERO
@@ -883,7 +883,7 @@
   740     FORMAT (/4X,'At the return from BOBYQA',5X,'Number of function values =',I6)
           PRINT 710, F,(X(I),I=1,N)
       end if
-      RETURN
+      return
       end subroutine BOBYQB
 
 
@@ -1084,7 +1084,7 @@
         W(I)=ZERO
         TEMPA=DMIN1(XOPT(I)-SL(I),GLAG(I))
         TEMPB=DMAX1(XOPT(I)-SU(I),GLAG(I))
-        if (TEMPA > ZERO .OR. TEMPB < ZERO) then
+        if (TEMPA > ZERO .or. TEMPB < ZERO) then
             W(I)=BIGSTP
             GGFREE=GGFREE+GLAG(I)**2
         end if
@@ -1115,7 +1115,7 @@
                 end if
             end if
           end do
-          if (WFIXSQ > WSQSAV .AND. GGFREE > ZERO) GOTO 120
+          if (WFIXSQ > WSQSAV .and. GGFREE > ZERO) GOTO 120
       end if
 !
 !     Set the remaining free components of W and all components of XALT,
@@ -1150,7 +1150,7 @@
         CURV=CURV+HCOL(K)*TEMP*TEMP
       end do
       if (IFLAG == 1) CURV=-CURV
-      if (CURV > -GW .AND. CURV < -CONST*GW) then
+      if (CURV > -GW .and. CURV < -CONST*GW) then
           SCALE=-GW/CURV
           do I=1,N
              TEMP=XOPT(I)+SCALE*W(I)
@@ -1180,7 +1180,7 @@
           end do
           CAUCHY=CSAVE
       end if
-  200 RETURN
+  200 return
       end subroutine ALTMOV
 
 
@@ -1250,7 +1250,7 @@
       NFX=NF-N
       NF=NF+1
       if (NFM <= 2*N) then
-          if (NFM >= 1 .AND. NFM <= N) then
+          if (NFM >= 1 .and. NFM <= N) then
               STEPA=RHOBEG
               if (SU(NFM) == ZERO) STEPA=-STEPA
               XPT(NF,NFM)=STEPA
@@ -1282,7 +1282,7 @@
         if (XPT(NF,J) == SL(J)) X(J)=XL(J)
         if (XPT(NF,J) == SU(J)) X(J)=XU(J)
       end do
-      CALL CALFUN (N,X,F)
+      call CALFUN (N,X,F)
       if (IPRINT == 3) then
          PRINT 70, NF,F,(X(I),I=1,N)
    70    FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,'    The corresponding X is:'/(2X,5D15.6))
@@ -1302,7 +1302,7 @@
 !     off-diagonal second derivative terms of the initial quadratic model.
 !
       if (NF <= 2*N+1) then
-          if (NF >= 2 .AND. NF <= N+1) then
+          if (NF >= 2 .and. NF <= N+1) then
               GOPT(NFM)=(F-FBEG)/STEPA
               if (NPT < NF+N) then
                   BMAT(1,NFM)=-ONE/STEPA
@@ -1344,8 +1344,8 @@
           TEMP=XPT(NF,IPT)*XPT(NF,JPT)
           HQ(IH)=(FBEG-FVAL(IPT+1)-FVAL(JPT+1)+F)/TEMP
       end if
-      if (NF < NPT .AND. NF < MAXFUN) GOTO 50
-      RETURN
+      if (NF < NPT .and. NF < MAXFUN) GOTO 50
+      return
       end subroutine PRELIM
 
 
@@ -1538,7 +1538,7 @@
 !     branch to label 350 occurs if all the original points are reinstated.
 !     The nonnegative values of W(NDIM+K) are required in the search below.
 !
-          CALL UPDATE (N,NPT,BMAT,ZMAT,NDIM,VLAG,BETA,DENOM,KNEW,W)
+          call UPDATE (N,NPT,BMAT,ZMAT,NDIM,VLAG,BETA,DENOM,KNEW,W)
           if (NREM == 0) GOTO 350
           do K=1,NPT
              W(NDIM+K)=DABS(W(NDIM+K))
@@ -1552,7 +1552,7 @@
   120 DSQMIN=ZERO
       do K=1,NPT
         if (W(NDIM+K) > ZERO) then
-            if (DSQMIN == ZERO .OR. W(NDIM+K) < DSQMIN) then
+            if (DSQMIN == ZERO .or. W(NDIM+K) < DSQMIN) then
                 KNEW=K
                 DSQMIN=W(NDIM+K)
             end if
@@ -1659,7 +1659,7 @@
 !     from the shift of XBASE, the updating of the quadratic model remains to
 !     be done. The following cycle through the new interpolation points begins
 !     by putting the new point in XPT(KPT,.) and by setting PQ(KPT) to zero,
-!     except that a RETURN occurs if MAXFUN prohibits another value of F.
+!     except that a return occurs if MAXFUN prohibits another value of F.
 !
   260 do KPT=1,NPT
         if (PTSID(KPT) == ZERO) CYCLE
@@ -1722,7 +1722,7 @@
             if (XPT(KPT,I) == SU(I)) W(I)=XU(I)
         end do
         NF=NF+1
-        CALL CALFUN (N,W,F)
+        call CALFUN (N,W,F)
         if (IPRINT == 3) then
             PRINT 300, NF,F,(W(I),I=1,N)
   300     FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,'    The corresponding X is:'/(2X,5D15.6))
@@ -1731,7 +1731,7 @@
         if (F < FVAL(KOPT)) KOPT=KPT
         DIFF=F-VQUAD
 !
-!     Update the quadratic model. The RETURN from the subroutine occurs when
+!     Update the quadratic model. The return from the subroutine occurs when
 !     all the new interpolation points are included in the model.
 !
         do I=1,N
@@ -1764,7 +1764,7 @@
         end do
         PTSID(KPT)=ZERO
       end do
-  350 RETURN
+  350 return
       end subroutine RESCUE
 
 
@@ -1923,7 +1923,7 @@
       if (STPLEN > ZERO) then
           ITERC=ITERC+1
           TEMP=SHS/STEPSQ
-          if (IACT == 0 .AND. TEMP > ZERO) then
+          if (IACT == 0 .and. TEMP > ZERO) then
               CRVMIN=DMIN1(CRVMIN,TEMP)
               if (CRVMIN == ONEMIN) CRVMIN=TEMP
           end if
@@ -1950,7 +1950,7 @@
       end if
 !
 !     If STPLEN is less than BLEN, then either apply another conjugate
-!     gradient iteration or RETURN.
+!     gradient iteration or return.
 !
       if (STPLEN < BLEN) then
           if (ITERC == ITERMAX) GOTO 190
@@ -2107,13 +2107,13 @@
         HRED(I)=CTH*HRED(I)+STH*HS(I)
       end do
       QRED=QRED+SDEC
-      if (IACT > 0 .AND. ISAV == IU) then
+      if (IACT > 0 .and. ISAV == IU) then
           NACT=NACT+1
           XBDI(IACT)=XSAV
           GOTO 100
       end if
 !
-!     If SDEC is sufficiently small, then RETURN after setting XNEW to
+!     If SDEC is sufficiently small, then return after setting XNEW to
 !     XOPT+D, giving careful attention to the bounds.
 !
       if (SDEC > 0.01D0*QRED) GOTO 120
@@ -2125,7 +2125,7 @@
         D(I)=XNEW(I)-XOPT(I)
         DSQ=DSQ+D(I)**2
       end do
-      RETURN
+      return
 
 !     The following instructions multiply the current S-vector by the second
 !     derivative matrix of the quadratic model, putting the product in HS.
@@ -2236,7 +2236,7 @@
             if (I > NPT) BMAT(JP,I-NPT)=BMAT(I,J)
         end do
       end do
-      RETURN
+      return
       end subroutine UPDATE
 
       end module mod_bobyqa

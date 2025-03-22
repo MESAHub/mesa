@@ -88,11 +88,11 @@
 ! -------- nrdens   number of dense output components
       nrdens=iwork(5)
       if(nrdens <0.or.nrdens >n)then
-         if (lout >0) write(lout,*)             ' curious input iwork(5)=',iwork(5)
+         if (lout >0) write(lout,*) ' curious input iwork(5)=',iwork(5)
          arret=.true.
       else
          if(nrdens >0.and.iout <2)then
-            if (lout >0) write(lout,*)         ' warning: put iout=2 for dense output '
+            if (lout >0) write(lout,*) ' warning: put iout=2 for dense output '
          end if
          if (nrdens == n) then
             do i=1,nrdens
@@ -106,7 +106,7 @@
       else
          uround=work(1)
          if(uround <= 1.d-35.or.uround >= 1.d0)then
-            if (lout >0) write(lout,*)          ' which machine do you have? your uround was:',work(1)
+            if (lout >0) write(lout,*) ' which machine do you have? your uround was:',work(1)
             arret=.true.
          end if
       end if
@@ -116,7 +116,7 @@
       else
          safe=work(2)
          if(safe >= 1.d0.or.safe <= 1.d-4)then
-            if (lout >0) write(lout,*)            ' curious input for safety factor work(2)=',work(2)
+            if (lout >0) write(lout,*) ' curious input for safety factor work(2)=',work(2)
             arret=.true.
          end if
       end if
@@ -192,7 +192,7 @@
       return
       end subroutine do_dop853
 !
-c
+
 !
 !    ----- ... and here is the core integrator  ----------
 !

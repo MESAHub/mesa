@@ -139,12 +139,12 @@
   500 format (///1X,10X,'*** Error in data -- N = ',I4,', Maximum value =',I4,' ***')
   510 format (///1X,14X,'*** Error in CSHEP2 -- duplicate nodes encountered ***')
   520 format (///1X,14X,'*** Error in CSHEP2 -- all nodes are collinear ***')
-      end subroutine
+      end subroutine test_renka_db
 
 
       subroutine testdt_db (K, N,X,Y)
-      double precision X(100), Y(100)
-      integer K, N
+      double precision :: X(100), Y(100)
+      integer :: K, N
 
 ! **********************************************************
 
@@ -190,8 +190,8 @@
 
 ! **********************************************************
 
-      double precision X1(100), Y1(100),  X2(33), Y2(33), X3(25), Y3(25), X4(100), Y4(100), X5(81), Y5(81)
-      integer I
+      double precision :: X1(100), Y1(100),  X2(33), Y2(33), X3(25), Y3(25), X4(100), Y4(100), X5(81), Y5(81)
+      integer :: I
 
 ! Node set 1:  Franke's 100-node set.
 
@@ -260,11 +260,11 @@
         N = 0
       end if
       return
-      end
+      end subroutine testdt_db
 
       subroutine TSTFN1_db (K,X,Y,IFLAG, F,FX,FY)
-      integer K, IFLAG
-      double precision X, Y, F, FX, FY
+      integer :: K, IFLAG
+      double precision :: X, Y, F, FX, FY
 
 ! **********************************************************
 
@@ -333,8 +333,8 @@
 
 ! **********************************************************
 
-      double precision T1, T2, T3, T4
-      if (K  <  1  .OR.  K  >  10) return
+      double precision :: T1, T2, T3, T4
+      if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
@@ -457,12 +457,12 @@
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       return
-      end
+      end subroutine TSTFN1_db
 
 
       subroutine TSTFN2_db (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
-      integer K, IFLAG
-      double precision X, Y, F, FX, FY, FXX, FXY, FYY
+      integer :: K, IFLAG
+      double precision :: X, Y, F, FX, FY, FXX, FXY, FYY
 
 ! **********************************************************
 
@@ -538,8 +538,8 @@
 
 ! **********************************************************
 
-      double precision T1, T2, T3, T4, T5, T6
-      if (K  <  1  .OR.  K  >  10) return
+      double precision :: T1, T2, T3, T4, T5, T6
+      if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
@@ -710,4 +710,4 @@
       FXY = T5*(T1*(86.4*T4 - 150.48*T3) + 1080.0*T4 + 288.0*T3)*(80.0*X-40.0)*(90.0*Y-45.0)
       FYY = T5*(T1*(97.2*T4 - 169.29*T3)*(90.0*Y-45.0)**2 - (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
       return
-      end subroutine
+      end subroutine TSTFN2_db

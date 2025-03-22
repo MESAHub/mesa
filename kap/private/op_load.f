@@ -217,7 +217,7 @@
             ierr=6
             goto 1001
          end if
-! !!        if (UMIN /= UMINN.OR.UMAX /= UMAXX) GOTO 1003  !!
+! !!        if (UMIN /= UMINN.or.UMAX /= UMAXX) GOTO 1003  !!
          INT(N)=NTOTP/NTOTT
          if (INT(N)*NTOTT /= NTOTP) then
             WRITE(6,6009)NN,NTOTT,NTOTP
@@ -386,12 +386,12 @@
 6006  FORMAT(//5X,'OP: N=',I2,', NTOTT=',I7,', GREATER THAN NTOT=',I7)
 6007  FORMAT(/5X,'OP: N=',I2,', INT(N)=',I4)
 6009  FORMAT(' OP: N=',I5,', NTOTT=',I10,', NTOT=',I10/    '   NTOT NOT MULTIPLE OF NTOTT')
-c6012  FORMAT(/10X,'ERROR, SEE WRITE(6,6012)'/
+!6012  FORMAT(/10X,'ERROR, SEE WRITE(6,6012)'/
 !     + 10X,'IT=',I3,', JN=',I3,', N=',I3,', JNE=',I3/)
 6077  FORMAT(//5X,'OP: DISCREPANCY IN ITE3'/10X,I5,' READ FROM UNIT 5'/    10X,I5,' FROM INDEX FILE ELEMENT',I5)
 6099  FORMAT(//5X,'OP: DISCREPANCY IN JNE3'/10X,I5,' READ FOR N=1'/    10X,I5,' READ FOR N=',I5)
 
-c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
+!8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 1010  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
       stop
 1011  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.mesh'
@@ -401,7 +401,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 ! **********************************************************************
         subroutine IMESH(UMESH,NTOT)
 
-      DIMENSION UMESH(nptot)
+      dimensionUMESH(nptot)
       COMMON/CIMESH/U(100),AA(nptot),BB(nptot),IN(nptot),ITOT,NN
       save /cimesh/
 
@@ -537,8 +537,8 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !         HIGHLY-DEGENERATE CASES.
 !     (2) INCLUDE RELATIVISTIC CORRECTION.
 !
-      PARAMETER (IPZ=28,IPNC=100)
-      DIMENSION RION(IPZ),U(0:IPNC),SF(0:IPNC)
+      parameter (IPZ=28,IPNC=100)
+      dimensionRION(IPZ),U(0:IPNC),SF(0:IPNC)
 
       AUNE=1.48185E-25*FNE
       AUT=3.16668E-6*T
@@ -616,7 +616,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !  MATHS. OF COMP., 21, 30, 1967.
 !
       integer, intent(inout) :: ierr
-      DIMENSION D(2:12)
+      dimensionD(2:12)
       DATA D/     3.5355339E-01, 5.7549910E-02, 5.7639604E-03, 4.0194942E-04,   2.0981899E-05, 8.6021311E-07, 2.8647149E-08, 7.9528315E-10,   1.8774422E-11, 3.8247505E-13, 6.8427624E-15/
 
       integer n,k

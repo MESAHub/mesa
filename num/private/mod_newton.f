@@ -637,7 +637,7 @@
             if (max_correction > tol_max_correction*coeff .or. max_residual > tol_max_residual*coeff) then
                passed_tol_tests = .false.
             else
-               passed_tol_tests =                (correction_norm <= tol_correction_norm*coeff .and.                 residual_norm <= tol_residual_norm*coeff)           .or.                (abs(slope) <= tol_abs_slope_min .and.                 correction_norm*residual_norm <= tol_corr_resid_product*coeff*coeff)
+               passed_tol_tests =      (correction_norm <= tol_correction_norm*coeff .and.                 residual_norm <= tol_residual_norm*coeff)           .or.                (abs(slope) <= tol_abs_slope_min .and.                 correction_norm*residual_norm <= tol_corr_resid_product*coeff*coeff)
             end if
 
             if (.not. passed_tol_tests) then

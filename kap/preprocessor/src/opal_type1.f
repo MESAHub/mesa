@@ -22,7 +22,7 @@
 
       subroutine init_opal_type1(z_in,xh_in)
          double precision, intent(in) :: z_in, xh_in
-         real z, xh
+         real :: z, xh
          common/init/itimeco,read_z
          z = z_in; xh = xh_in
          if (z  /=  read_z) itimeco = 0
@@ -77,7 +77,7 @@
 
       return
 
-      end
+      end subroutine eval_opal_type1
 
       subroutine instruct
 !-----VERSION of October 5, 1995-----------------------------------------
@@ -175,7 +175,7 @@
 !         DOPACTD     Is Dlog(kappa)/Dlog(T6)   at constant Rho
 
       dum=0.0
-      end
+      end subroutine instruct
 
 ! ********************************************************************
       subroutine opacgn93 (z,xh,t6,r,filename,OP_file,logK)
@@ -200,7 +200,7 @@
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/eee/m1,zval
-      real kapz,kapz1,kapz2
+      real :: kapz,kapz1,kapz2
       dimension kapz(mz),dkapdtr(mz),dkapdrt(mz)
       logK = 0
       zval=z
@@ -296,7 +296,7 @@
       dopactd=-3.*dopacr+dopact
       is=0
       logK = opact
-      end
+      end subroutine opacgn93
 ! **********************************************************************
 
       subroutine opac (izi,mzin,xh,t6,r,filename,OP_file)
@@ -721,7 +721,7 @@
    66 return
       write(*,'(" Z does not match Z in codata* files you are using")')
       call mesa_error(__FILE__,__LINE__)
-      end
+      end subroutine opac
 
 ! **********************************************************************
       subroutine t6rinterp(slr,slt)
@@ -836,7 +836,7 @@
             dopacr=99.
             dopactd=99.
           end if
-      end
+      end subroutine t6rinterp
 
 
 ! *********************************************************************
@@ -847,7 +847,7 @@
       logical :: OP_file
       parameter (ismdata=0)   ! modified
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      character(len=250) dumarra
+      character(len=250) :: dumarra
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
       common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -990,7 +990,7 @@
       do i=2,mz
       dfsz(i)=1./(zza(i)-zza(i-1))
       end do
-      end
+      end subroutine readco
 
 ! **********************************************************************
       function quad(ic,i,x,y1,y2,y3,x1,x2,x3)
@@ -1019,7 +1019,7 @@
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       dkap=c2+(x+x)*c3
       quad=c1+x*(c2+x*c3)
-      end
+      end function quad
 
 ! **********************************************************************
       block data
@@ -1072,12 +1072,12 @@
 
       parameter(IP=100,IPR=20)
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      DIMENSION U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
+      dimensionU(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER(len=100) HEAD
+      character(len=100) :: HEAD
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
-      LOGICAL IERR
+      logical :: IERR
 
       NRL=2*(RLE-RLS)+1
 
@@ -1132,12 +1132,12 @@
 !        GET FIRST DERIVATIVES AT END POINTS
 
 !        GET SECOND DERIVATIVES FOR SPLINE FIT
-         CALL SPLINE(U,V,N,V2)
+         call SPLINE(U,V,N,V2)
 
 !        INTERPOLATE TO LOG10(T)=FLT, FLT=3.8(0.05)8.0
          DO 30 I=1,nset ! modified
             FLT=3.75+0.05*I
-            CALL SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
+            call SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
    30    CONTINUE
 
    40 CONTINUE
@@ -1146,25 +1146,25 @@
 !  OPTION FOR SMOOTHING
       IF(NSM > 0)THEN
          DO 35 NS=1,NSM
-            CALL SMOOTH
+            call SMOOTH
    35    CONTINUE
-         CALL FITX
+         call FITX
       end if
 
 
 !  GET FY AND FXY
-      CALL FITY
+      call FITY
 
 !  THE ARRAYS F, FX, FY AND FXY ARE NOW STORED
 
 !  CAN NOW DO INTERPOLATIONS USING
-!       CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
+!       call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
 !       INPUT IS FLT=LOG10(T), FLRHO=LOG10(RHO)
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
 !              IERR=.TRUE. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
-!                          ELSE IERR=.FALSE.
+!                          else IERR=.FALSE.
 
 ! INTERPOLATE BACK TO OPAL POINTS
       IF(NSM > 0)THEN
@@ -1177,7 +1177,7 @@
             DO 50 L=nrlow,nrhigh
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
-               CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
+               call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
                IF(IERR)THEN
                end if
                V(L)=G
@@ -1199,12 +1199,12 @@
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
  6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
-      END
+      end subroutine opaltab
 
 ! ********************************************************************
       subroutine SPLINE(X,Y,N,Y2)
       parameter (NMAX=100)
-      DIMENSION X(N),Y(N),Y2(N),U(NMAX)
+      dimensionX(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT END POINTS USING CUBIC FIT
          YP1=((Y(3)-Y(1))*(X(2)-X(1))**2    -(Y(2)-Y(1))*(X(3)-X(1))**2)/    ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
@@ -1224,17 +1224,17 @@
       DO 12 K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
 12    CONTINUE
-      END
+      end subroutine SPLINE
 ! ********************************************************************
       subroutine SPLINT(XA,YA,N,Y2A,X,Y,YP)
-      DIMENSION XA(N),YA(N),Y2A(N)
+      dimensionXA(N),YA(N),Y2A(N)
       KLO=1
       KHI=N
 1     IF (KHI-KLO > 1) THEN
         K=(KHI+KLO)/2
         IF(XA(K) > X)THEN
           KHI=K
-        ELSE
+        else
           KLO=K
         end if
       GOTO 1
@@ -1245,7 +1245,7 @@
       B=(X-XA(KLO))/H
       Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
       YP=0.05*  (  (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI) )*H/6. )
-      END
+      end subroutine SPLINT
 ! ********************************************************************
       subroutine FITY
 
@@ -1256,7 +1256,7 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
       parameter(IPR=20)
-      DIMENSION A(IPR),B(IPR),AD(IPR),BD(IPR)
+      dimensionA(IPR),B(IPR),AD(IPR),BD(IPR)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
       DO 30 I=1,nset   ! modified
@@ -1265,8 +1265,8 @@
             B(J)=FX(I,J)
    10    CONTINUE
 
-         CALL GETD(A,NRL,AD,AP1,APN)
-         CALL GETD(B,NRL,BD,BP1,BPN)
+         call GETD(A,NRL,AD,AP1,APN)
+         call GETD(B,NRL,BD,BP1,BPN)
 
          FY(I,1)=AP1
          FY(I,NRL)=APN
@@ -1278,7 +1278,7 @@
    20    CONTINUE
    30 CONTINUE
 
-      END
+      end subroutine FITY
 ! ********************************************************************
       subroutine FITX
 
@@ -1287,7 +1287,7 @@
 
 
       parameter(IPR=20)
-      DIMENSION A(85),D(85)
+      dimensionA(85),D(85)
 
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
@@ -1296,7 +1296,7 @@
          DO 10 I=1,nset ! modified
             A(I)=F(I,J)
    10    CONTINUE
-         CALL GETD(A,nset,D,AP1,APN)  ! modified
+         call GETD(A,nset,D,AP1,APN)  ! modified
          FX(1,J)=AP1
          FX(nset,J)=APN   ! modified
          DO 20 I=2,nset-1  ! modified
@@ -1304,7 +1304,7 @@
    20    CONTINUE
    30 CONTINUE
 
-      END
+      end subroutine FITX
 
 ! ***********************************************************************
       subroutine GETD(F,N,D,FP1,FPN)
@@ -1313,7 +1313,7 @@
 !  OF UNITY.
 
 
-      DIMENSION F(N),D(N),T(85)
+      dimensionF(N),D(N),T(85)
 
       FP1=(-11.*F(1)+18.*F(2)-9.*F(3)+2.*F(4))/6.
       FPN=(11.*F(N)-18.*F(N-1)+9.*F(N-2)-2.*F(N-3))/6.
@@ -1332,7 +1332,7 @@
          D(J)=D(J)*D(J+1)+T(J)
    20 CONTINUE
 
-      END
+      end subroutine GETD
 
 ! ********************************************************************
       subroutine INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1344,8 +1344,8 @@
 
       parameter(IPR=20)
       COMMON/CF/ F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      DIMENSION B(16)
-      LOGICAL IERR
+      dimensionB(16)
+      logical :: IERR
 
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
@@ -1375,16 +1375,16 @@
       IF(X < 2.)THEN
          IF(X < 0.75)THEN
             IERR=.TRUE.
-         ELSE
+         else
             I=1
          end if
-      ELSE IF(X > 84)THEN
+      else IF(X > 84)THEN
          IF(X > 85.25)THEN
             IERR=.TRUE.
-         ELSE
+         else
             I=84
          end if
-      ELSE
+      else
          I=X
       end if
       U=X-I
@@ -1392,16 +1392,16 @@
       IF(Y < 2.)THEN
          IF(Y < 0.75)THEN
             IERR=.TRUE.
-         ELSE
+         else
             J=1
          end if
-      ELSE IF(Y > NRL-1)THEN
+      else IF(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
             IERR=.TRUE.
-         ELSE
+         else
             J=NRL-1
          end if
-      ELSE
+      else
          J=Y
       end if
       V=Y-J
@@ -1410,7 +1410,7 @@
          G=9.999
          DGDT=9.999
          DGDRHO=9.999
-         RETURN
+         return
       end if
 
 
@@ -1441,7 +1441,7 @@
       DGDT=20.*FFX(U,V)-6.*FFY(U,V)
       DGDRHO=2.*FFY(U,V)
 
-      END
+      end subroutine INTERP
 
 ! ********************************************************************
       subroutine SMOOTH
@@ -1464,11 +1464,11 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DIMENSION GAM(6)
+      dimensionGAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
-      DIMENSION BET(11)
+      dimensionBET(11)
       DATA BET/  -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
-      DIMENSION ALP(11)
+      dimensionALP(11)
       DATA ALP/  -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
 
 
@@ -1498,4 +1498,4 @@
    30    CONTINUE
    40 CONTINUE
 
-      END
+      end subroutine SMOOTH

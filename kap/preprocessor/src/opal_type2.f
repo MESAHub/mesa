@@ -444,7 +444,7 @@
         xx(i)=log10(0.005+xa(i))
         if(xa(i)  ==  0.0) mxzero=i
         end do
-c  ... this is the first time through this m. Calculate the decadic
+!  ... this is the first time through this m. Calculate the decadic
 !      log of the perimeter points shifted by Z+0.001(to avoid divergence
 !      at origin); m refers to xa(m); the hydrogen table value.
 
@@ -1306,7 +1306,7 @@ c  ... this is the first time through this m. Calculate the decadic
 ! ********************************************************************
       subroutine SPLINE2(X,Y,N,Y2)
       parameter (NMAX=100)
-      DIMENSION X(N),Y(N),Y2(N),U(NMAX)
+      dimensionX(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT END POINTS USING CUBIC FIT
          YP1=((Y(3)-Y(1))*(X(2)-X(1))**2-(Y(2)-Y(1))*(X(3)-X(1))**2)/((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
@@ -1330,14 +1330,14 @@ c  ... this is the first time through this m. Calculate the decadic
 ! ********************************************************************
       subroutine SPLINT2(XA,YA,N,Y2A,X,Y,YP)
       use utils_lib, only: mesa_error
-      DIMENSION XA(N),YA(N),Y2A(N)
+      dimensionXA(N),YA(N),Y2A(N)
       KLO=1
       KHI=N
 1     IF (KHI-KLO > 1) THEN
         K=(KHI+KLO)/2
         IF(XA(K) > X)THEN
           KHI=K
-        ELSE
+        else
           KLO=K
         end if
       GOTO 1
@@ -1362,7 +1362,7 @@ c  ... this is the first time through this m. Calculate the decadic
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
 
       parameter(IPR=20)
-      DIMENSION A(IPR),B(IPR),AD(IPR),BD(IPR)
+      dimensionA(IPR),B(IPR),AD(IPR),BD(IPR)
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
       DO 30 I=1,nset   ! modified
@@ -1393,7 +1393,7 @@ c  ... this is the first time through this m. Calculate the decadic
 
 
       parameter(IPR=20)
-      DIMENSION A(85),D(85)
+      dimensionA(85),D(85)
 
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
@@ -1419,7 +1419,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !  OF UNITY.
 
 
-      DIMENSION F(N),D(N),T(85)
+      dimensionF(N),D(N),T(85)
 
       FP1=(-11.*F(1)+18.*F(2)-9.*F(3)+2.*F(4))/6.
       FPN=(11.*F(N)-18.*F(N-1)+9.*F(N-2)-2.*F(N-3))/6.
@@ -1450,8 +1450,8 @@ c  ... this is the first time through this m. Calculate the decadic
 
       parameter(IPR=20)
       common/type2_CF/ F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      DIMENSION B(16)
-      LOGICAL IERR
+      dimensionB(16)
+      logical IERR
 
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
 
@@ -1479,16 +1479,16 @@ c  ... this is the first time through this m. Calculate the decadic
       IF(X < 2.)THEN
          IF(X < 0.75)THEN
             IERR=.TRUE.
-         ELSE
+         else
             I=1
          end if
-      ELSE IF(X > 84)THEN
+      else IF(X > 84)THEN
          IF(X > 85.25)THEN
             IERR=.TRUE.
-         ELSE
+         else
             I=84
          end if
-      ELSE
+      else
          I=X
       end if
       U=X-I
@@ -1496,16 +1496,16 @@ c  ... this is the first time through this m. Calculate the decadic
       IF(Y < 2.)THEN
          IF(Y < 0.75)THEN
             IERR=.TRUE.
-         ELSE
+         else
             J=1
          end if
-      ELSE IF(Y > NRL-1)THEN
+      else IF(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
             IERR=.TRUE.
-         ELSE
+         else
             J=NRL-1
          end if
-      ELSE
+      else
          J=Y
       end if
       V=Y-J
@@ -1514,7 +1514,7 @@ c  ... this is the first time through this m. Calculate the decadic
          G=9.999
          DGDT=9.999
          DGDRHO=9.999
-         RETURN
+         return
       end if
 
 
@@ -1568,11 +1568,11 @@ c  ... this is the first time through this m. Calculate the decadic
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DIMENSION GAM(6)
+      dimensionGAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,   +0.1175510204,+0.1665306122,+0.2359183673/
-      DIMENSION BET(11)
+      dimensionBET(11)
       DATA BET/  -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
-      DIMENSION ALP(11)
+      dimensionALP(11)
       DATA ALP/  -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
 
 
@@ -1640,13 +1640,13 @@ c  ... this is the first time through this m. Calculate the decadic
 !  OTHER REFERENCES ARE MADE TO METHODS DESCRIBED IN THAT BOOK.
 
       parameter(IP=100,IPR=20)
-      DIMENSION U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
+      dimensionU(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER(len=100) HEAD
+      character(len=100) HEAD
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
-      LOGICAL IERR
+      logical :: IERR
 
 
       NRL=2*(RLE-RLS)+1
@@ -1732,7 +1732,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
 !              IERR=.TRUE. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
-!                          ELSE IERR=.FALSE.
+!                          else IERR=.FALSE.
 
 ! INTERPOLATE BACK TO OPAL POINTS
       IF(NSM > 0)THEN
@@ -1767,4 +1767,4 @@ c  ... this is the first time through this m. Calculate the decadic
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
  6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
-      END
+      end

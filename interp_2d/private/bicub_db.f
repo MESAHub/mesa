@@ -213,13 +213,10 @@
          if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
-! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ',
-!     >         1pe11.4,' to ',1pe11.4)
+! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol))
-!     >      write(6,1012) yget,y(1),y(ny)
-! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ',
-!     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol)) write(6,1012) yget,y(1),y(ny)
+! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -398,7 +395,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=           f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))         +2.d0*dx*( f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))         +1.5d0*dx*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j)))                ))
+               fval(v,iaval)=   f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))         +2.d0*dx*( f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))         +1.5d0*dx*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j)))                ))
             end do
          end if
 
@@ -410,7 +407,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=           f(1,2,i,j)+dy*(2.d0*f(1,3,i,j)+dy*3.d0*f(1,4,i,j))        +dx*(f(2,2,i,j)+dy*(2.d0*f(2,3,i,j)+dy*3.d0*f(2,4,i,j))        +dx*(f(3,2,i,j)+dy*(2.d0*f(3,3,i,j)+dy*3.d0*f(3,4,i,j))        +dx*(f(4,2,i,j)+dy*(2.d0*f(4,3,i,j)+dy*3.d0*f(4,4,i,j))                )))
+               fval(v,iaval)=   f(1,2,i,j)+dy*(2.d0*f(1,3,i,j)+dy*3.d0*f(1,4,i,j))        +dx*(f(2,2,i,j)+dy*(2.d0*f(2,3,i,j)+dy*3.d0*f(2,4,i,j))        +dx*(f(3,2,i,j)+dy*(2.d0*f(3,3,i,j)+dy*3.d0*f(3,4,i,j))        +dx*(f(4,2,i,j)+dy*(2.d0*f(4,3,i,j)+dy*3.d0*f(4,4,i,j))                )))
             end do
          end if
 
@@ -422,7 +419,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                2.d0*(     f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j))))                +6.d0*dx*(     f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
+               fval(v,iaval)=      2.d0*(     f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j))))                +6.d0*dx*(     f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
             end do
          end if
 
@@ -434,7 +431,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                2.d0*f(1,3,i,j)+6.d0*dy*f(1,4,i,j)                +dx*(2.d0*f(2,3,i,j)+6.d0*dy*f(2,4,i,j)                +dx*(2.d0*f(3,3,i,j)+6.d0*dy*f(3,4,i,j)                +dx*(2.d0*f(4,3,i,j)+6.d0*dy*f(4,4,i,j))))
+               fval(v,iaval)=      2.d0*f(1,3,i,j)+6.d0*dy*f(1,4,i,j)                +dx*(2.d0*f(2,3,i,j)+6.d0*dy*f(2,4,i,j)                +dx*(2.d0*f(3,3,i,j)+6.d0*dy*f(3,4,i,j)                +dx*(2.d0*f(4,3,i,j)+6.d0*dy*f(4,4,i,j))))
             end do
          end if
 
@@ -446,7 +443,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=              f(2,2,i,j)+dy*(2.d0*f(2,3,i,j)+dy*3.d0*f(2,4,i,j))   +2.d0*dx*(f(3,2,i,j)+dy*(2.d0*f(3,3,i,j)+dy*3.d0*f(3,4,i,j)) +1.5d0*dx*(f(4,2,i,j)+dy*(2.d0*f(4,3,i,j)+dy*3.d0*f(4,4,i,j))                ))
+               fval(v,iaval)=    f(2,2,i,j)+dy*(2.d0*f(2,3,i,j)+dy*3.d0*f(2,4,i,j))   +2.d0*dx*(f(3,2,i,j)+dy*(2.d0*f(3,3,i,j)+dy*3.d0*f(3,4,i,j)) +1.5d0*dx*(f(4,2,i,j)+dy*(2.d0*f(4,3,i,j)+dy*3.d0*f(4,4,i,j))                ))
             end do
          end if
 
@@ -457,7 +454,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                4.d0*f(3,3,i,j)+12.d0*dy*f(3,4,i,j)                +dx*(12.d0*f(4,3,i,j)+36.d0*dy*f(4,4,i,j))
+               fval(v,iaval)=      4.d0*f(3,3,i,j)+12.d0*dy*f(3,4,i,j)                +dx*(12.d0*f(4,3,i,j)+36.d0*dy*f(4,4,i,j))
             end do
          end if
 
@@ -472,7 +469,7 @@
                i=iv(v)
                j=jv(v)
                dy=dyv(v)
-               fval(v,iaval)=                +6.d0*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
+               fval(v,iaval)=      +6.d0*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
             end do
          end if
 
@@ -484,7 +481,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                2.d0*(  f(3,2,i,j)+dy*(2.d0*f(3,3,i,j)+dy*3.d0*f(3,4,i,j)))                +6.d0*dx*(  f(4,2,i,j)+dy*(2.d0*f(4,3,i,j)+dy*3.d0*f(4,4,i,j)))
+               fval(v,iaval)=      2.d0*(  f(3,2,i,j)+dy*(2.d0*f(3,3,i,j)+dy*3.d0*f(3,4,i,j)))                +6.d0*dx*(  f(4,2,i,j)+dy*(2.d0*f(4,3,i,j)+dy*3.d0*f(4,4,i,j)))
             end do
          end if
 
@@ -496,7 +493,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                (2.d0*f(2,3,i,j)+6.d0*dy*f(2,4,i,j)                +2.d0*dx*(2.d0*f(3,3,i,j)+6.d0*dy*f(3,4,i,j)                +1.5d0*dx*(2.d0*f(4,3,i,j)+6.d0*dy*f(4,4,i,j))                ))
+               fval(v,iaval)=      (2.d0*f(2,3,i,j)+6.d0*dy*f(2,4,i,j)                +2.d0*dx*(2.d0*f(3,3,i,j)+6.d0*dy*f(3,4,i,j)                +1.5d0*dx*(2.d0*f(4,3,i,j)+6.d0*dy*f(4,4,i,j))                ))
             end do
          end if
 
@@ -522,7 +519,7 @@
                i=iv(v)
                j=jv(v)
                dy=dyv(v)
-               fval(v,iaval)=                +6.d0*( f(4,2,i,j)+dy*2.d0*(f(4,3,i,j)+dy*1.5d0*f(4,4,i,j)))
+               fval(v,iaval)=      +6.d0*( f(4,2,i,j)+dy*2.d0*(f(4,3,i,j)+dy*1.5d0*f(4,4,i,j)))
             end do
          end if
 
@@ -534,7 +531,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                4.d0*f(3,3,i,j)+12.d0*dy*f(3,4,i,j)                +dx*(12.d0*f(4,3,i,j)+36.d0*dy*f(4,4,i,j))
+               fval(v,iaval)=      4.d0*f(3,3,i,j)+12.d0*dy*f(3,4,i,j)                +dx*(12.d0*f(4,3,i,j)+36.d0*dy*f(4,4,i,j))
             end do
          end if
 
@@ -545,7 +542,7 @@
                i=iv(v)
                j=jv(v)
                dx=dxv(v)
-               fval(v,iaval)=                6.d0*(f(2,4,i,j)                +2.d0*dx*(f(3,4,i,j)+1.5d0*dx*f(4,4,i,j)))
+               fval(v,iaval)=      6.d0*(f(2,4,i,j)                +2.d0*dx*(f(3,4,i,j)+1.5d0*dx*f(4,4,i,j)))
             end do
          end if
 
@@ -560,7 +557,7 @@
                i=iv(v)
                j=jv(v)
                dy=dyv(v)
-               fval(v,iaval)=                +12.d0*(f(4,3,i,j)+dy*3.d0*f(4,4,i,j))
+               fval(v,iaval)=      +12.d0*(f(4,3,i,j)+dy*3.d0*f(4,4,i,j))
             end do
          end if
 
@@ -571,7 +568,7 @@
                i=iv(v)
                j=jv(v)
                dx=dxv(v)
-               fval(v,iaval)=                12.d0*(f(3,4,i,j)+dx*3.d0*f(4,4,i,j))
+               fval(v,iaval)=      12.d0*(f(3,4,i,j)+dx*3.d0*f(4,4,i,j))
             end do
          end if
 
@@ -584,7 +581,7 @@
          do v=1,ivec
             i=iv(v)
             j=jv(v)
-            fval(v,iaval)=                36.d0*f(4,4,i,j)
+            fval(v,iaval)=      36.d0*f(4,4,i,j)
          end do
       end if
 
@@ -731,7 +728,7 @@
 
       if(nwk < itest) then
          write(6,9901) nwk,itest
- 9901    format(' ?bcspline:  workspace too small:'/            '  user supplied:  nwk=',i6,'; need at least:  ',i6/            '  nwk=4*nx*ny +5*max(nx,ny) will work for any user'/            '  choice of bdy conditions.')
+ 9901    format(' ?bcspline:  workspace too small:'/ '  user supplied:  nwk=',i6,'; need at least:  ',i6/ '  nwk=4*nx*ny +5*max(nx,ny) will work for any user'/            '  choice of bdy conditions.')
          ier=1
       end if
       if(inx < 4) then
@@ -890,14 +887,14 @@
                if(ix < inx) then
                   zcur=fspl(1,2,ix,1)   ! 1st deriv.
                else
-                  zcur=fspl(1,2,jx,1)+zhxn*(fspl(2,2,jx,1)+zhxn*                 (fspl(3,2,jx,1)+zhxn*fspl(4,2,jx,1)))
+                  zcur=fspl(1,2,jx,1)+zhxn*(fspl(2,2,jx,1)+zhxn* (fspl(3,2,jx,1)+zhxn*fspl(4,2,jx,1)))
                end if
                zdiff1=bcthmin(ix)-zcur
             else if(ibcthmin == 2) then
                if(ix < inx) then
                   zcur=2.d0*fspl(1,3,ix,1) ! 2nd deriv.
                else
-                  zcur=2.d0*(fspl(1,3,jx,1)+zhxn*(fspl(2,3,jx,1)+zhxn*                 (fspl(3,3,jx,1)+zhxn*fspl(4,3,jx,1))))
+                  zcur=2.d0*(fspl(1,3,jx,1)+zhxn*(fspl(2,3,jx,1)+zhxn* (fspl(3,3,jx,1)+zhxn*fspl(4,3,jx,1))))
                end if
                zdiff1=bcthmin(ix)-zcur
             else
@@ -1272,7 +1269,7 @@
 !   on output fval= [df/dy] ... elements 2 -- 6 never referenced.
 
 !  ier -- completion code:  0 means OK
-C-------------------
+!-------------------
 !  local:
 
       integer i,j                       ! cell indices
@@ -1293,7 +1290,7 @@ C-------------------
 !  0  <=  yparam  <=  1
 
 !  ** the interface is very similar to herm2ev.for; can use herm2xy **
-C---------------------------------------------------------------------
+!---------------------------------------------------------------------
 
       call herm2xy_db(xget,yget,x,nx,y,ny,ilinx,iliny,   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
       if(ier /= 0) return
@@ -1304,7 +1301,7 @@ C---------------------------------------------------------------------
       return
       end subroutine evbicub_db
 
-C---------------------------------------------------------------------
+!---------------------------------------------------------------------
 !  evaluate C1 cubic Hermite function interpolation -- 2d fcn
 !   --vectorized-- dmc 10 Feb 1999
 
@@ -1339,7 +1336,7 @@ C---------------------------------------------------------------------
 
 !  to use this routine in scalar mode, pass in ivec=ivecd=1
 
-C---------------
+!---------------
 !  Spline evaluation consists of a "mixing" of the interpolant
 !  data using the linear functionals xparam, xpi = 1-xparam,
 !  yparam, ypi = 1-yparam, and the cubic functionals
@@ -1355,7 +1352,7 @@ C---------------
       fin(0:3,1:inf2,1:ny) => f1(1:4*inf2*ny)
 
 
-C---------------
+!---------------
 !   ...in x direction
 
       z36th=sixth*sixth
@@ -1587,19 +1584,19 @@ C---------------
                cyd=3.d0*yp2-1.d0
                cydi=-3.d0*ypi2+1.d0
 
-               sum=hxi(v)*hyi(v)*(     fin(0,i,j)  -fin(0,i,j+1)                -fin(0,i+1,j)+fin(0,i+1,j+1))
+               sum=hxi(v)*hyi(v)*( fin(0,i,j)  -fin(0,i,j+1) -fin(0,i+1,j)+fin(0,i+1,j+1))
 
-               sum=sum+sixth*hx(v)*hyi(v)*(     cxdi*(-fin(1,i,j)  +fin(1,i,j+1))+                cxd*(-fin(1,i+1,j)+fin(1,i+1,j+1)))
+               sum=sum+sixth*hx(v)*hyi(v)*( cxdi*(-fin(1,i,j)  +fin(1,i,j+1))+ cxd*(-fin(1,i+1,j)+fin(1,i+1,j+1)))
 
-               sum=sum+sixth*hxi(v)*hy(v)*(     -(cydi*fin(2,i,j)  +cyd*fin(2,i,j+1))                +(cydi*fin(2,i+1,j)+cyd*fin(2,i+1,j+1)))
+               sum=sum+sixth*hxi(v)*hy(v)*( -(cydi*fin(2,i,j)  +cyd*fin(2,i,j+1)) +(cydi*fin(2,i+1,j)+cyd*fin(2,i+1,j+1)))
 
-               sum=sum+z36th*hx(v)*hy(v)*(     cxdi*(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))+                cxd*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
+               sum=sum+z36th*hx(v)*hy(v)*( cxdi*(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))+ cxd*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
             end do
          end if
 
-C-------------------------------------------------
+!-------------------------------------------------
 
       else if(ict(1) == 3) then
          if(ict(2) == 1) then
@@ -1615,9 +1612,9 @@ C-------------------------------------------------
                cy=yp*(yp2-1.d0)
                cyi=ypi*(ypi2-1.d0)
                hy2=hy(v)*hy(v)
-               sum=hxi(v)*(     -(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))                +(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
+               sum=hxi(v)*( -(ypi*fin(1,i,j)  +yp*fin(1,i,j+1)) +(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
 
-               sum=sum+sixth*hy2*hxi(v)*(     -(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))                +(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
+               sum=sum+sixth*hy2*hxi(v)*( -(cyi*fin(3,i,j)  +cy*fin(3,i,j+1)) +(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
             end do
@@ -1638,9 +1635,9 @@ C-------------------------------------------------
                cyd=3.d0*yp2-1.d0
                cydi=-3.d0*ypi2+1.d0
 
-               sum=hyi(v)*(     xpi*(-fin(1,i,j)  +fin(1,i,j+1))+                xp*(-fin(1,i+1,j) +fin(1,i+1,j+1)))
+               sum=hyi(v)*( xpi*(-fin(1,i,j)  +fin(1,i,j+1))+ xp*(-fin(1,i+1,j) +fin(1,i+1,j+1)))
 
-               sum=sum+sixth*hy(v)*(     xpi*(cydi*fin(3,i,j) +cyd*fin(3,i,j+1))+                xp*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
+               sum=sum+sixth*hy(v)*( xpi*(cydi*fin(3,i,j) +cyd*fin(3,i,j+1))+ xp*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
             end do
@@ -1661,9 +1658,9 @@ C-------------------------------------------------
                yp=yparam(v)
                ypi=1.d0-yp
 
-               sum=hxi(v)*(     -(ypi*fin(2,i,j)  +yp*fin(2,i,j+1))                +(ypi*fin(2,i+1,j)+yp*fin(2,i+1,j+1)))
+               sum=hxi(v)*( -(ypi*fin(2,i,j)  +yp*fin(2,i,j+1)) +(ypi*fin(2,i+1,j)+yp*fin(2,i+1,j+1)))
 
-               sum=sum+sixth*hx(v)*(     cxdi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+                cxd*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
+               sum=sum+sixth*hx(v)*( cxdi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+ cxd*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
             end do
@@ -1685,9 +1682,9 @@ C-------------------------------------------------
                cxi=xpi*(xpi2-1.d0)
                hx2=hx(v)*hx(v)
 
-               sum=hyi(v)*(     xpi*(-fin(2,i,j)  +fin(2,i,j+1))+                xp*(-fin(2,i+1,j) +fin(2,i+1,j+1)))
+               sum=hyi(v)*( xpi*(-fin(2,i,j)  +fin(2,i,j+1))+ xp*(-fin(2,i+1,j) +fin(2,i+1,j+1)))
 
-               sum=sum+sixth*hx2*hyi(v)*(     cxi*(-fin(3,i,j)  +fin(3,i,j+1))+                cx*(-fin(3,i+1,j) +fin(3,i+1,j+1)))
+               sum=sum+sixth*hx2*hyi(v)*( cxi*(-fin(3,i,j)  +fin(3,i,j+1))+ cx*(-fin(3,i+1,j) +fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
             end do
@@ -2993,20 +2990,20 @@ C-------------------------------------------------
       bn=0.d0
       IF(k_bc1 == 1) THEN
         a1=f(2,1)
-      ELSE IF(k_bc1 == 2) THEN
+      else IF(k_bc1 == 2) THEN
         b1=f(3,1)
-      ELSE IF(k_bc1 == 5) THEN
+      else IF(k_bc1 == 5) THEN
         a1=(f(1,2)-f(1,1))/(x(2)-x(1))
-      ELSE IF(k_bc1 == 6) THEN
+      else IF(k_bc1 == 6) THEN
         b1=2.d0*((f(1,3)-f(1,2))/(x(3)-x(2))           -(f(1,2)-f(1,1))/(x(2)-x(1)))/(x(3)-x(1))
       end if
       IF(k_bcn == 1) THEN
         an=f(2,n)
-      ELSE IF(k_bcn == 2) THEN
+      else IF(k_bcn == 2) THEN
         bn=f(3,n)
-      ELSE IF(k_bcn == 5) THEN
+      else IF(k_bcn == 5) THEN
         an=(f(1,n)-f(1,n-1))/(x(n)-x(n-1))
-      ELSE IF(k_bcn == 6) THEN
+      else IF(k_bcn == 6) THEN
         bn=2.d0*((f(1,n)-f(1,n-1))/(x(n)-x(n-1))           -(f(1,n-1)-f(1,n-2))/(x(n-1)-x(n-2)))/(x(n)-x(n-2))
       end if
 !Clear f(2:4,n)
@@ -3021,7 +3018,7 @@ C-------------------------------------------------
         f(2,2)=f(2,1)
         f(3,2)=0.d0
         f(4,2)=0.d0
-      ELSE IF(n > 2) THEN
+      else IF(n > 2) THEN
 !Set up tridiagonal system for A*y=B where y(i) are the second
 !  derivatives at the knots
 !  f(2,i) are the diagonal elements of A
@@ -3052,18 +3049,18 @@ C-------------------------------------------------
           end do
           wk(n-2)=f(4,n-2)
           wk(n-1)=f(4,n-1)
-        ELSE IF(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) THEN
+        else IF(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) THEN
           f(2,1)=2.d0*f(4,1)
           f(3,1)=(f(1,2)-f(1,1))/f(4,1)-a1
-        ELSE IF(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) THEN
+        else IF(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) THEN
           f(2,1)=2.d0*f(4,1)
           f(3,1)=f(4,1)*b1/3.d0
           f(4,1)=0.d0  ! upper diagonal only (dmc: cf elem21)
-        ELSE IF(k_bc1 == 7) THEN
+        else IF(k_bc1 == 7) THEN
           f(2,1)=-f(4,1)
           f(3,1)=f(3,3)/(x(4)-x(2))-f(3,2)/(x(3)-x(1))
           f(3,1)=f(3,1)*f(4,1)*f(4,1)/(x(4)-x(1))
-        ELSE                             ! not a knot:
+        else                             ! not a knot:
           imin=2
           f(2,2)=f(4,1)+2.d0*f(4,2)
           f(3,2)=f(3,2)*f(4,2)/(f(4,1)+f(4,2))
@@ -3072,16 +3069,16 @@ C-------------------------------------------------
         IF(k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) THEN
           f(2,n)=2.d0*f(4,n-1)
           f(3,n)=-(f(1,n)-f(1,n-1))/f(4,n-1)+an
-        ELSE IF(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
+        else IF(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
           f(2,n)=2.d0*f(4,n-1)
           f(3,n)=f(4,n-1)*bn/3.d0
 !xxx          f(4,n-1)=0.d0  ! dmc: preserve f(4,n-1) for back subst.
           elemnn1=0.d0  !  lower diagonal only (dmc)
-        ELSE IF(k_bcn == 7) THEN
+        else IF(k_bcn == 7) THEN
           f(2,n)=-f(4,n-1)
           f(3,n)=f(3,n-1)/(x(n)-x(n-2))-f(3,n-2)/(x(n-1)-x(n-3))
           f(3,n)=-f(3,n)*f(4,n-1)*f(4,n-1)/(x(n)-x(n-3))
-        ELSE IF(k_bc1 /= -1) THEN         ! not a knot:
+        else IF(k_bc1 /= -1) THEN         ! not a knot:
           imax=n-1
           f(2,n-1)=2.d0*f(4,n-2)+f(4,n-1)
           f(3,n-1)=f(3,n-1)*f(4,n-2)/(f(4,n-1)+f(4,n-2))
@@ -3120,14 +3117,14 @@ C-------------------------------------------------
             f(3,i)=(f(3,i)-f(4,i)*f(3,i+1)-wk(i)*f(3,n-1))/f(2,i)
           end do
           f(3,n)=f(3,1)
-        ELSE
+        else
 !  Non-periodic BC
 !    Forward elimination
 !    For Not-A-Knot BC the off-diagonal end elements are not equal
           do i=imin+1,imax
             IF((i == n-1).and.(imax == n-1)) THEN
               t=(f(4,i-1)-f(4,i))/f(2,i-1)
-            ELSE
+            else
               if(i == 2) then
                  t=elem21/f(2,i-1)
               else if(i == n) then
@@ -3138,7 +3135,7 @@ C-------------------------------------------------
             end if
             IF((i == imin+1).and.(imin == 2)) THEN
               f(2,i)=f(2,i)-t*(f(4,i-1)-f(4,i-2))
-            ELSE
+            else
               f(2,i)=f(2,i)-t*f(4,i-1)
             end if
             f(3,i)=f(3,i)-t*f(3,i-1)
@@ -3149,7 +3146,7 @@ C-------------------------------------------------
             i=imax-ib
             IF((i == 2).and.(imin == 2)) THEN
               f(3,i)=(f(3,i)-(f(4,i)-f(4,i-1))*f(3,i+1))/f(2,i)
-            ELSE
+            else
               f(3,i)=(f(3,i)-f(4,i)*f(3,i+1))/f(2,i)
             end if
           end do
@@ -3177,7 +3174,7 @@ C-------------------------------------------------
           f(2,n)=f(2,1)
           f(3,n)=f(3,1)
           f(4,n)=f(4,1)
-        ELSE
+        else
            hn=x(n)-x(n-1)
            f(2,n)=f(2,n-1)+hn*(f(3,n-1)+0.5d0*hn*f(4,n-1))
            f(3,n)=f(3,n-1)+hn*f(4,n-1)

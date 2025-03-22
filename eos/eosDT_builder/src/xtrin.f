@@ -2,7 +2,7 @@
 !     Calling propram should contain something like following lines.
 !     See subroutine esac for definitions
       parameter (mx=5,mv=10,nr=169,nt=197)
-      character*3 fixedTP
+      character*3 :: fixedTP
       data fixedTP/'no'/  ! 'yes' for fixed T6,P; 'no' for fixed T6,rho
       common/eeos/esact,eos(mv)
     1 continue
@@ -69,7 +69,7 @@
 
       save
       integer :: info ! returned = 0 if AOK
-      character (len=256) filename
+      character (len=256) :: filename
       real :: moles
       parameter (mx=5,mv=12,nr=169,nt=197)
       character :: blank*1
@@ -361,7 +361,7 @@
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)') ip,iq,k3,l3,xh,t6,r,z
       stop 1
       return
-      end
+      end subroutine esac
 
 !..*********************************************************************
       subroutine t6rinteos(slr,slt)
@@ -424,17 +424,17 @@
         end if
 
       return
-      end
+      end subroutine t6rinteos
 
 
 !..********************************************************************
       subroutine readcoeos(filename)
 !..... The purpose of this subroutine is to read the data tables
       save
-      character (len=256) filename
+      character (len=256) :: filename
       parameter (mx=5,mv=12,nr=169,nt=197)
-      real moles
-      character*1 blank
+      real :: moles
+      character*1 :: blank
       common/aaeos/ q(4),h(4),xxh
       common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -522,7 +522,7 @@
 !       call system ('gzip EOS5_data')
 
       return
-      end
+      end subroutine readcoeos
 
 !..*********************************************************************
       function quadeos(ic,i,x,y1,y2,y3,x1,x2,x3)
@@ -549,7 +549,7 @@
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       quadeos=c1+x*(c2+x*c3)
       return
-      end
+      end function quadeos
 !..****************************************************************8
       function gmass(x,z,amoles,eground,fracz,frac)
       dimension anum(6),frac(7), amas(7),eion(7)
@@ -592,11 +592,11 @@
       gmass=gmass+amas(i)*frac(i-1)
       end do
 
-      end
+      end function gmass
 !..*********************************************************************
       subroutine radsub (irad,t6,density,moles,tmass)
       parameter (mx=5,mv=12,nr=169,nt=197)
-      real moles,k,molenak,Na
+      real :: moles,k,molenak,Na
       common/eeos/esact,eos(mv)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
 
@@ -678,7 +678,7 @@
       eos(iri(6))=chir
       eos(iri(7))=chitt
       return
-      end
+      end subroutine radsub
 
 !..******************************************************************
       function rhoofp(x,ztab,t6,p,irad)
@@ -780,7 +780,7 @@
         write (*,'("No convergence after 10 tries")')
         stop
       end if
-      end
+      end function rhoofp
 
 !..*********************************************************************
       block data

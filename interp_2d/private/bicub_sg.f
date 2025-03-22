@@ -39,13 +39,13 @@
 
       subroutine bcspeval(xget,yget,iselect,fval,    x,nx,y,ny,ilinx,iliny,f,inf3,ier)
 
-      integer iselect(6)
-      integer ilinx,iliny,nx,ny,inf3,ier
+      integer :: iselect(6)
+      integer :: ilinx,iliny,nx,ny,inf3,ier
 
-      real xget,yget
-      real fval(6)
+      real :: xget,yget
+      real :: fval(6)
       !real x(nx),y(ny),f(4,4,inf3,ny)
-      real x(:),y(:),f(:,:,:,:)
+      real :: x(:),y(:),f(:,:,:,:)
 
 !  modification -- dmc 11 Jan 1999 -- remove SAVE stmts; break routine
 !    into these parts:
@@ -135,8 +135,8 @@
 !-------------------------------------------------------------------
 !  local
 
-      real dx,dy
-      integer ia(1), ja(1)
+      real :: dx,dy
+      integer :: ia(1), ja(1)
 
 !--------------------------
 
@@ -145,7 +145,7 @@
       call bcspevxy(xget,yget,x,nx,y,ny,ilinx,iliny,   0,0,dx,dy,ier)
       if(ier /= 0) return
 
-      call bcspevfn(iselect,1,1,fval,ia,ja,   (/dx/),(/dy/),f,inf3,ny)
+      call bcspevfn(iselect,1,1,fval,ia,ja,   [dx],[dy],f,inf3,ny)
 
       return
       end subroutine bcspeval
@@ -159,26 +159,26 @@
 
       subroutine bcspevxy(xget,yget,x,nx,y,ny,ilinx,iliny,   i,j,dx,dy,ier)
 
-      integer nx,ny                     ! array dimensions
+      integer :: nx,ny                     ! array dimensions
 
-      real xget,yget                    ! target point
+      real :: xget,yget                    ! target point
       !real x(nx),y(ny)                  ! indep. coords.
-      real x(:),y(:)                  ! indep. coords.
+      real :: x(:),y(:)                  ! indep. coords.
 
-      integer ilinx                     ! =1:  assume x evenly spaced
-      integer iliny                     ! =1:  assume y evenly spaced
+      integer :: ilinx                     ! =1:  assume x evenly spaced
+      integer :: iliny                     ! =1:  assume y evenly spaced
 
 !  output of bcspevxy
 
-      integer i,j                       ! index to cell containing target pt
-      real dx,dy                        ! displacement of target pt w/in cell
+      integer :: i,j                       ! index to cell containing target pt
+      real :: dx,dy                        ! displacement of target pt w/in cell
                                         ! dx=x-x(i)  dy=y-y(j)
 
-      integer ier                       ! return ier /= 0 on error
+      integer :: ier                       ! return ier /= 0 on error
 
 !------------------------------------
-      real zxget, zyget, zxtol, zytol
-      integer nxm, nym, ii, jj
+      real :: zxget, zyget, zxtol, zytol
+      integer :: nxm, nym, ii, jj
 
       ier=0
 
@@ -286,8 +286,8 @@
       subroutine bcspevfn(ict,ivec,ivd,fval,iv,jv,dxv,dyv,f,inf3,ny)
 
 !  input:
-      integer ny
-      integer ict(6)                    ! selector:
+      integer :: ny
+      integer :: ict(6)                    ! selector:
 !        ict(1)=1 for f      (don't evaluate f if ict(1)=0)
 !        ict(2)=1 for df/dx   ""
 !        ict(3)=1 for df/dy   ""
@@ -320,13 +320,13 @@
 !     if ict(1)=6 -- want 6th derivatives
 !          d6f/dx3dy3 -- one value is returned.
 
-      integer ivec,ivd                  ! vector dimensioning
+      integer :: ivec,ivd                  ! vector dimensioning
 
 !    ivec-- number of vector pts (spline values to look up)
 !    ivd -- 1st dimension of fval,  >= ivec
 
 ! output:
-      real fval(ivd,6)                 ! output array
+      real :: fval(ivd,6)                 ! output array
 
 !    v = index to element in vector;
 !  fval(v,1) = first item requested by ict(...),
@@ -335,11 +335,11 @@
 !  input:
       !integer iv(ivec),jv(ivec)         ! grid cell indices -- vectors
       !real dxv(ivec),dyv(ivec)          ! displacements w/in cell -- vectors
-      integer iv(:),jv(:)         ! grid cell indices -- vectors
-      real dxv(:),dyv(:)          ! displacements w/in cell -- vectors
+      integer :: iv(:),jv(:)         ! grid cell indices -- vectors
+      real :: dxv(:),dyv(:)          ! displacements w/in cell -- vectors
 
-      integer inf3                      ! 3rd dimension of f --  >=  nx
-      real f(:,:,:,:) ! (4,4,inf3,ny)               ! bicubic fcn spline coeffs array
+      integer :: inf3                      ! 3rd dimension of f --  >=  nx
+      real :: f(:,:,:,:) ! (4,4,inf3,ny)               ! bicubic fcn spline coeffs array
 
 !  usage example:
 
@@ -373,9 +373,9 @@
 !-------------------------------------------------------------------
 !  local:
 
-      integer v                         ! vector element index
-      integer iaval, i, j
-      real dx, dy
+      integer :: v                         ! vector element index
+      integer :: iaval, i, j
+      real :: dx, dy
 
 !  OK can now do evaluations
 
@@ -402,7 +402,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=           f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))         +2.0*dx*( f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))         +1.5*dx*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j)))                ))
+               fval(v,iaval)=   f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))         +2.0*dx*( f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))         +1.5*dx*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j)))                ))
             end do
          end if
 
@@ -414,7 +414,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=           f(1,2,i,j)+dy*(2.0*f(1,3,i,j)+dy*3.0*f(1,4,i,j))        +dx*(f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))        +dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j))        +dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))                )))
+               fval(v,iaval)=   f(1,2,i,j)+dy*(2.0*f(1,3,i,j)+dy*3.0*f(1,4,i,j))        +dx*(f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))        +dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j))        +dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))                )))
             end do
          end if
 
@@ -438,7 +438,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                2.0*f(1,3,i,j)+6.0*dy*f(1,4,i,j)                +dx*(2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)                +dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)                +dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))))
+               fval(v,iaval)=      2.0*f(1,3,i,j)+6.0*dy*f(1,4,i,j)                +dx*(2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)                +dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)                +dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))))
             end do
          end if
 
@@ -450,7 +450,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=              f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))   +2.*dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j)) +1.5*dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))                ))
+               fval(v,iaval)=    f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))   +2.*dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j)) +1.5*dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))                ))
             end do
          end if
 
@@ -461,7 +461,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)                +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
+               fval(v,iaval)=      4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)                +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
             end do
          end if
 
@@ -476,7 +476,7 @@
                i=iv(v)
                j=jv(v)
                dy=dyv(v)
-               fval(v,iaval)=                +6.0*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
+               fval(v,iaval)=      +6.0*( f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
             end do
          end if
 
@@ -488,7 +488,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                2.0*(  f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j)))                +6.0*dx*(  f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j)))
+               fval(v,iaval)=      2.0*(  f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j)))                +6.0*dx*(  f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j)))
             end do
          end if
 
@@ -500,7 +500,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                (2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)                +2.0*dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)                +1.5*dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))                ))
+               fval(v,iaval)=      (2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)                +2.0*dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)                +1.5*dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))                ))
             end do
          end if
 
@@ -526,7 +526,7 @@
                i=iv(v)
                j=jv(v)
                dy=dyv(v)
-               fval(v,iaval)=                +6.0*( f(4,2,i,j)+dy*2.0*(f(4,3,i,j)+dy*1.5*f(4,4,i,j)))
+               fval(v,iaval)=      +6.0*( f(4,2,i,j)+dy*2.0*(f(4,3,i,j)+dy*1.5*f(4,4,i,j)))
             end do
          end if
 
@@ -538,7 +538,7 @@
                j=jv(v)
                dx=dxv(v)
                dy=dyv(v)
-               fval(v,iaval)=                4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)                +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
+               fval(v,iaval)=      4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)                +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
             end do
          end if
 
@@ -549,7 +549,7 @@
                i=iv(v)
                j=jv(v)
                dx=dxv(v)
-               fval(v,iaval)=                6.0*(f(2,4,i,j)                +2.0*dx*(f(3,4,i,j)+1.5*dx*f(4,4,i,j)))
+               fval(v,iaval)=      6.0*(f(2,4,i,j)                +2.0*dx*(f(3,4,i,j)+1.5*dx*f(4,4,i,j)))
             end do
          end if
 
@@ -564,7 +564,7 @@
                i=iv(v)
                j=jv(v)
                dy=dyv(v)
-               fval(v,iaval)=                +12.0*(f(4,3,i,j)+dy*3.0*f(4,4,i,j))
+               fval(v,iaval)=      +12.0*(f(4,3,i,j)+dy*3.0*f(4,4,i,j))
             end do
          end if
 
@@ -575,7 +575,7 @@
                i=iv(v)
                j=jv(v)
                dx=dxv(v)
-               fval(v,iaval)=                12.0*(f(3,4,i,j)+dx*3.0*f(4,4,i,j))
+               fval(v,iaval)=      12.0*(f(3,4,i,j)+dx*3.0*f(4,4,i,j))
             end do
          end if
 
@@ -588,7 +588,7 @@
          do v=1,ivec
             i=iv(v)
             j=jv(v)
-            fval(v,iaval)=                36.0*f(4,4,i,j)
+            fval(v,iaval)=      36.0*f(4,4,i,j)
          end do
       end if
 
@@ -605,16 +605,16 @@
 
       subroutine cspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,   wk,iwk,ilinx,ier)
 
-      integer nx, iwk
-      real x(nx)                        ! x axis (in)
-      real fspl(4,nx)                   ! spline data (in/out)
-      integer ibcxmin                   ! x(1) BC flag (in, see comments)
-      real bcxmin                       ! x(1) BC data (in, see comments)
-      integer ibcxmax                   ! x(nx) BC flag (in, see comments)
-      real bcxmax                       ! x(nx) BC data (in, see comments)
-      real wk(iwk)                      ! workspace of size at least nx
-      integer ilinx                     ! even spacing flag (out)
-      integer ier                       ! output, =0 means OK
+      integer :: nx, iwk
+      real :: x(nx)                        ! x axis (in)
+      real :: fspl(4,nx)                   ! spline data (in/out)
+      integer :: ibcxmin                   ! x(1) BC flag (in, see comments)
+      real :: bcxmin                       ! x(1) BC data (in, see comments)
+      integer :: ibcxmax                   ! x(nx) BC flag (in, see comments)
+      real :: bcxmax                       ! x(nx) BC data (in, see comments)
+      real :: wk(iwk)                      ! workspace of size at least nx
+      integer :: ilinx                     ! even spacing flag (out)
+      integer :: ier                       ! output, =0 means OK
 
 !  ** note wk(...) array is not used unless ibcxmin=-1 (periodic spline
 !  evaluation)
@@ -773,14 +773,14 @@
 !  input arguments:
 !  ================
 
-      integer nx,ny                     ! grid sizes
-      real xget,yget                    ! target of this interpolation
-      real x(nx)                        ! ordered x grid
-      real y(ny)                        ! ordered y grid
-      integer ilinx                     ! ilinx=1 => assume x evenly spaced
-      integer iliny                     ! iliny=1 => assume y evenly spaced
+      integer :: nx,ny                     ! grid sizes
+      real :: xget,yget                    ! target of this interpolation
+      real :: x(nx)                        ! ordered x grid
+      real :: y(ny)                        ! ordered y grid
+      integer :: ilinx                     ! ilinx=1 => assume x evenly spaced
+      integer :: iliny                     ! iliny=1 => assume y evenly spaced
 
-      integer inf2
+      integer :: inf2
       real, pointer :: f1(:) ! =(0:3,inf2,ny)  interpolant data (cf "evbicub")
 
 !       f 2nd dimension inf2 must be  >=  nx
@@ -794,7 +794,7 @@
 !      (these are spline coefficients selected for continuous 2-
 !      diffentiability, see mkbicub[w].for)
 
-      integer ict(6)                    ! code specifying output desired
+      integer :: ict(6)                    ! code specifying output desired
 
 !  ict(1)=1 -- return f  (0, don't)
 !  ict(2)=1 -- return df/dx  (0, don't)
@@ -828,8 +828,8 @@
 ! output arguments:
 ! =================
 
-      real fval(6)                      ! output data
-      integer ier                       ! error code =0 ==> no error
+      real :: fval(6)                      ! output data
+      integer :: ier                       ! error code =0 ==> no error
 
 !  fval(1) receives the first output (depends on ict(...) spec)
 !  fval(2) receives the second output (depends on ict(...) spec)
@@ -855,19 +855,19 @@
 !-------------------
 !  local:
 
-      integer i,j                       ! cell indices
+      integer :: i,j                       ! cell indices
 
 !  normalized displacement from (x(i),y(j)) corner of cell.
 !    xparam=0 @x(i)  xparam=1 @x(i+1)
 !    yparam=0 @y(j)  yparam=1 @y(j+1)
 
-      real xparam,yparam
+      real :: xparam,yparam
 
 !  cell dimensions and
 !  inverse cell dimensions hxi = 1/(x(i+1)-x(i)), hyi = 1/(y(j+1)-y(j))
 
-      real hx,hy
-      real hxi,hyi
+      real :: hx,hy
+      real :: hxi,hyi
 
 !  0  <=  xparam  <=  1
 !  0  <=  yparam  <=  1
@@ -878,7 +878,7 @@
       call herm2xy(xget,yget,x,nx,y,ny,ilinx,iliny,   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
       if(ier /= 0) return
 
-      call fvbicub(ict,1,1,   fval,(/i/),(/j/),(/xparam/),(/yparam/),   (/hx/),(/hxi/),(/hy/),(/hyi/),f1,inf2,ny)
+      call fvbicub(ict,1,1,   fval,[i],[j],[xparam],[yparam],   [hx],[hxi],[hy],[hyi],f1,inf2,ny)
 
       return
       end subroutine evbicub
@@ -891,23 +891,23 @@
 
       subroutine fvbicub(ict,ivec,ivecd,   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,   f1,inf2,ny)
 
-      integer ny
-      integer ict(6)                    ! requested output control
-      integer ivec                      ! vector length
-      integer ivecd                     ! vector dimension (1st dim of fval)
+      integer :: ny
+      integer :: ict(6)                    ! requested output control
+      integer :: ivec                      ! vector length
+      integer :: ivecd                     ! vector dimension (1st dim of fval)
 
-      integer ii(ivec),jj(ivec)         ! target cells (i,j)
-      real xparam(ivec),yparam(ivec)
+      integer :: ii(ivec),jj(ivec)         ! target cells (i,j)
+      real :: xparam(ivec),yparam(ivec)
                           ! normalized displacements from (i,j) corners
 
-      real hx(ivec),hy(ivec)            ! grid spacing, and
-      real hxi(ivec),hyi(ivec)          ! inverse grid spacing 1/(x(i+1)-x(i))
+      real :: hx(ivec),hy(ivec)            ! grid spacing, and
+      real :: hxi(ivec),hyi(ivec)          ! inverse grid spacing 1/(x(i+1)-x(i))
                                         ! & 1/(y(j+1)-y(j))
 
-      integer inf2
+      integer :: inf2
       real, pointer :: f1(:) ! =(0:3,inf2,ny)  interpolant data (cf "evbicub")
 
-      real fval(ivecd,6)                ! output returned
+      real :: fval(ivecd,6)                ! output returned
 
 !  for detailed description of fin, ict and fval see subroutine
 !  evbicub comments.  Note ict is not vectorized; the same output
@@ -927,9 +927,9 @@
 !  xparam**3-xparam, xpi**3-xpi, yparam**3-yparam, ypi**3-ypi ...
 !  and their derivatives as needed.
 
-      integer v,z36th,iadr,i,j
-      real sum,xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
-      real cx,cy,cyd,cxi,cyi,cydi,hx2,hy2,cxd,cxdi
+      integer :: v,z36th,iadr,i,j
+      real :: sum,xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
+      real :: cx,cy,cyd,cxi,cyi,cydi,hx2,hy2,cxd,cxdi
 
       real, parameter :: sixth = 0.166666666666666667
 
@@ -1405,38 +1405,38 @@
 !  input of herm2xy
 !  ================
 
-      integer nx,ny                     ! array dimensions
+      integer :: nx,ny                     ! array dimensions
 
-      real xget,yget                    ! target point
-      real x(:) ! (nx)                  ! indep. coords., strict ascending
-      real y(:) ! (ny)                  ! indep. coords., strict ascending
+      real :: xget,yget                    ! target point
+      real :: x(:) ! (nx)                  ! indep. coords., strict ascending
+      real :: y(:) ! (ny)                  ! indep. coords., strict ascending
 
-      integer ilinx                     ! =1:  x evenly spaced
-      integer iliny                     ! =1:  y evenly spaced
+      integer :: ilinx                     ! =1:  x evenly spaced
+      integer :: iliny                     ! =1:  y evenly spaced
 
 !  output of herm2xy
 !  =================
-      integer i,j                       ! index to cell containing target pt
+      integer :: i,j                       ! index to cell containing target pt
 !          on exit:  1 <= i <= nx-1   1 <= j <= ny-1
 
 !  normalized position w/in (i,j) cell (btw 0 and 1):
 
-      real xparam                       ! (xget-x(i))/(x(i+1)-x(i))
-      real yparam                       ! (yget-y(j))/(y(j+1)-y(j))
+      real :: xparam                       ! (xget-x(i))/(x(i+1)-x(i))
+      real :: yparam                       ! (yget-y(j))/(y(j+1)-y(j))
 
 !  grid spacing
 
-      real hx                           ! hx = x(i+1)-x(i)
-      real hy                           ! hy = y(j+1)-y(j)
+      real :: hx                           ! hx = x(i+1)-x(i)
+      real :: hy                           ! hy = y(j+1)-y(j)
 
 !  inverse grid spacing:
 
-      real hxi                          ! 1/hx = 1/(x(i+1)-x(i))
-      real hyi                          ! 1/hy = 1/(y(j+1)-y(j))
+      real :: hxi                          ! 1/hx = 1/(x(i+1)-x(i))
+      real :: hyi                          ! 1/hy = 1/(y(j+1)-y(j))
 
-      integer ier                       ! return ier /= 0 on error
-      real zxget,zyget,zxtol,zytol
-      integer nxm,nym,ii,jj
+      integer :: ier                       ! return ier /= 0 on error
+      real :: zxget,zyget,zxtol,zytol
+      integer :: nxm,nym,ii,jj
 
 !------------------------------------
 
@@ -1548,22 +1548,22 @@
 
       subroutine herm2fcn(ict,ivec,ivecd,   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,   fin,inf2,ny)
 
-      integer ny, inf2
-      integer ict(4)                    ! requested output control
-      integer ivec                      ! vector length
-      integer ivecd                     ! vector dimension (1st dim of fval)
+      integer :: ny, inf2
+      integer :: ict(4)                    ! requested output control
+      integer :: ivec                      ! vector length
+      integer :: ivecd                     ! vector dimension (1st dim of fval)
 
-      integer ii(ivec),jj(ivec)         ! target cells (i,j)
-      real xparam(ivec),yparam(ivec)
+      integer :: ii(ivec),jj(ivec)         ! target cells (i,j)
+      real :: xparam(ivec),yparam(ivec)
                           ! normalized displacements from (i,j) corners
 
-      real hx(ivec),hy(ivec)            ! grid spacing, and
-      real hxi(ivec),hyi(ivec)          ! inverse grid spacing 1/(x(i+1)-x(i))
+      real :: hx(ivec),hy(ivec)            ! grid spacing, and
+      real :: hxi(ivec),hyi(ivec)          ! inverse grid spacing 1/(x(i+1)-x(i))
                                         ! & 1/(y(j+1)-y(j))
 
-      real fin(0:3,inf2,ny)             ! interpolant data (cf "herm2ev")
+      real :: fin(0:3,inf2,ny)             ! interpolant data (cf "herm2ev")
 
-      real fval(ivecd,4)                ! output returned
+      real :: fval(ivecd,4)                ! output returned
 
 !  for detailed description of fin, ict and fval see subroutine
 !  herm2ev comments.  Note ict is not vectorized; the same output
@@ -1593,11 +1593,11 @@
 !     b(x)=x**3-x**2         b'(x)=3*x**2-2*x
 !     bbar(x)=x**3-2*x**2+x  bbar'(x)=3*x**2-4*x+1
 
-      real sum
-      integer v,iadr,i,j
-      real xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
-      real ax,bx,axbar,bxbar,ay,by,aybar,bybar
-      real axp,axbarp,bxp,bxbarp,ayp,aybarp,bybarp,byp
+      real :: sum
+      integer :: v,iadr,i,j
+      real :: xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
+      real :: ax,bx,axbar,bxbar,ay,by,aybar,bybar
+      real :: axp,axbarp,bxp,bxbarp,ayp,aybarp,bybarp,byp
 
       do v=1,ivec
          i=ii(v)
@@ -1718,14 +1718,14 @@
 
 !  check that spline routine ibc flag is in range
 
-      integer ibc                       ! input -- flag value
-      character*(*) slbl                ! input -- subroutine name
-      character*(*) xlbl                ! input -- axis label
+      integer :: ibc                       ! input -- flag value
+      character*(*) :: slbl                ! input -- subroutine name
+      character*(*) :: xlbl                ! input -- axis label
 
-      integer imin                      ! input -- min allowed value
-      integer imax                      ! input -- max allowed value
+      integer :: imin                      ! input -- min allowed value
+      integer :: imax                      ! input -- max allowed value
 
-      integer ier                       ! output -- set =1 if error detected
+      integer :: ier                       ! output -- set =1 if error detected
 
 !----------------------
 
@@ -1752,12 +1752,12 @@
       implicit NONE
 
 !  input:
-      integer nx                        ! length of x vector
-      integer ny                        ! length of y vector
-      real x(:) ! (nx)                        ! x vector, strict ascending
-      real y(:) ! (ny)                        ! y vector, strict ascending
+      integer :: nx                        ! length of x vector
+      integer :: ny                        ! length of y vector
+      real :: x(:) ! (nx)                        ! x vector, strict ascending
+      real :: y(:) ! (ny)                        ! y vector, strict ascending
 
-      integer nf2                       ! 2nd dimension of f, nf2 >= nx
+      integer :: nf2                       ! 2nd dimension of f, nf2 >= nx
 !  input/output:
       real, pointer :: f1(:) ! =(4,nf2,ny)                  ! data & spline coefficients
 
@@ -1792,15 +1792,15 @@
 !  (b) all boundary conditions are satisfied.
 
 !  input bdy condition data:
-      integer ibcxmin                   ! bc flag for x=xmin
-      real bcxmin(:) ! (ny)                   ! bc data vs. y at x=xmin
-      integer ibcxmax                   ! bc flag for x=xmax
-      real bcxmax(:) ! (ny)                   ! bc data vs. y at x=xmax
+      integer :: ibcxmin                   ! bc flag for x=xmin
+      real :: bcxmin(:) ! (ny)                   ! bc data vs. y at x=xmin
+      integer :: ibcxmax                   ! bc flag for x=xmax
+      real :: bcxmax(:) ! (ny)                   ! bc data vs. y at x=xmax
 
-      integer ibcymin                   ! bc flag for y=ymin
-      real bcymin(:) ! (nx)                   ! bc data vs. x at y=ymin
-      integer ibcymax                   ! bc flag for y=ymax
-      real bcymax(:) ! (nx)                   ! bc data vs. x at y=ymax
+      integer :: ibcymin                   ! bc flag for y=ymin
+      real :: bcymin(:) ! (nx)                   ! bc data vs. x at y=ymin
+      integer :: ibcymax                   ! bc flag for y=ymax
+      real :: bcymax(:) ! (nx)                   ! bc data vs. x at y=ymax
 
 !  with interpretation:
 !   ibcxmin -- indicator for boundary condition at x(1):
@@ -1828,12 +1828,12 @@
 
 !  output linear grid flags and completion code (ier=0 is normal):
 
-      integer ilinx                     ! =1: x grid is "nearly" equally spaced
-      integer iliny                     ! =1: y grid is "nearly" equally spaced
+      integer :: ilinx                     ! =1: x grid is "nearly" equally spaced
+      integer :: iliny                     ! =1: y grid is "nearly" equally spaced
 !  ilinx and iliny are set to zero if corresponding grids are not equally
 !  spaced
 
-      integer ier                       ! =0 on exit if there is no error.
+      integer :: ier                       ! =0 on exit if there is no error.
 
 !  if there is an error, ier is set and a message is output on unit 6.
 !  these are considered programming errors in the calling routine.
@@ -1846,15 +1846,15 @@
 !    invalid boundary condition flag
 
 !-----------------------
-      integer ierx,iery
+      integer :: ierx,iery
 
       real, dimension(:,:), allocatable :: fwk
       real :: zbcmin,zbcmax
-      integer ix,iy,ibcmin,ibcmax
+      integer :: ix,iy,ibcmin,ibcmax
 
       real, dimension(:,:,:), allocatable :: fcorr
-      integer iflg2
-      real zdiff(2),hy
+      integer :: iflg2
+      real :: zdiff(2),hy
 
       real, pointer :: f(:,:,:)
       f(1:4,1:nf2,1:ny) => f1(1:4*nf2*ny)
@@ -2040,11 +2040,11 @@
 !  (2nd edition) chapter 3, section on cubic splines.
 
 !  input:
-      integer nx                        ! no. of data points
-      real x(:) ! (nx)                        ! x axis data, strict ascending order
+      integer :: nx                        ! no. of data points
+      real :: x(:) ! (nx)                        ! x axis data, strict ascending order
 
 !  input/output:
-      real fspl(:,:) ! (2,nx)                   ! f(1,*):  data in; f(2,*):  coeffs out
+      real :: fspl(:,:) ! (2,nx)                   ! f(1,*):  data in; f(2,*):  coeffs out
 
 !     f(1,j) = f(x(j))  on input (unchanged on output)
 !     f(2,j) = f''(x(j)) (of interpolating spline) (on output).
@@ -2053,11 +2053,11 @@
 
 !  input:
 
-      integer ibcxmin                   ! b.c. flag @ x=xmin=x(1)
-      real bcxmin                       ! b.c. data @xmin
+      integer :: ibcxmin                   ! b.c. flag @ x=xmin=x(1)
+      real :: bcxmin                       ! b.c. data @xmin
 
-      integer ibcxmax                   ! b.c. flag @ x=xmax=x(nx)
-      real bcxmax                       ! b.c. data @xmax
+      integer :: ibcxmax                   ! b.c. flag @ x=xmax=x(nx)
+      real :: bcxmax                       ! b.c. data @xmax
 
 !  ibcxmin=-1 -- periodic boundary condition
 !                (bcxmin,ibcxmax,bcxmax are ignored)
@@ -2103,7 +2103,7 @@
 
 !  output:
 
-      integer ilinx                     ! =1: hint, x axis is ~evenly spaced
+      integer :: ilinx                     ! =1: hint, x axis is ~evenly spaced
 
 !  let dx[avg] = (x(nx)-x(1))/(nx-1)
 !  let dx[j] = x(j+1)-x(j), for all j satisfying 1 <= j < nx
@@ -2115,7 +2115,7 @@
 
 !  if the even spacing condition is not satisfied, ilinx=2 is returned.
 
-      integer ier                       ! exit code, 0=OK
+      integer :: ier                       ! exit code, 0=OK
 
 !  an error code is returned if the x axis is not strict ascending,
 !  or if nx < 4, or if an invalid boundary condition specification was
@@ -2134,7 +2134,7 @@
 
       real, dimension(:,:), allocatable :: fspl4 ! traditional 4-spline
       real, dimension(:), allocatable :: wk ! cspline workspace
-      integer i,inwk
+      integer :: i,inwk
 
 !------------------------------------
 
@@ -2174,18 +2174,18 @@
 !  check if a grid is strictly ascending and if it is evenly spaced
 !  to w/in ztol
 
-      integer inx
-      real x(:) ! (inx)                       ! input -- grid to check
+      integer :: inx
+      real :: x(:) ! (inx)                       ! input -- grid to check
 
-      integer ilinx                     ! output -- =1 if evenly spaced =2 O.W.
+      integer :: ilinx                     ! output -- =1 if evenly spaced =2 O.W.
 
-      real ztol                         ! input -- spacing check tolerance
+      real :: ztol                         ! input -- spacing check tolerance
 
-      integer ier                       ! output -- =0 if OK
+      integer :: ier                       ! output -- =0 if OK
 
 !  ier=1 is returned if x(1...inx) is NOT STRICTLY ASCENDING...
-      real dxavg,zeps,zdiffx,zdiff
-      integer ix
+      real :: dxavg,zeps,zdiffx,zdiff
+      integer :: ix
 
 !-------------------------------
 
@@ -2289,12 +2289,12 @@
 !***********************************************************************
       IMPLICIT NONE
 !Declaration of input variables
-      integer        k_bc1,   k_bcn,   n
-      real           x(*),   wk(*),   f(4,*)
+      integer        :: k_bc1,   k_bcn,   n
+      real           :: x(*),   wk(*),   f(4,*)
 !Declaration in local variables
-      integer        i,   ib,   imax,   imin
-      real           a1,    an,   b1,    bn,   q,   t,   hn
-      real           elem21,   elemnn1    ! (dmc)
+      integer        :: i,   ib,   imax,   imin
+      real           :: a1,    an,   b1,    bn,   q,   t,   hn
+      real           :: elem21,   elemnn1    ! (dmc)
 
 !Set default range
       imin=1
@@ -2306,20 +2306,20 @@
       bn=0.0
       IF(k_bc1 == 1) THEN
         a1=f(2,1)
-      ELSE IF(k_bc1 == 2) THEN
+      else IF(k_bc1 == 2) THEN
         b1=f(3,1)
-      ELSE IF(k_bc1 == 5) THEN
+      else IF(k_bc1 == 5) THEN
         a1=(f(1,2)-f(1,1))/(x(2)-x(1))
-      ELSE IF(k_bc1 == 6) THEN
+      else IF(k_bc1 == 6) THEN
         b1=2.0*((f(1,3)-f(1,2))/(x(3)-x(2))           -(f(1,2)-f(1,1))/(x(2)-x(1)))/(x(3)-x(1))
       end if
       IF(k_bcn == 1) THEN
         an=f(2,n)
-      ELSE IF(k_bcn == 2) THEN
+      else IF(k_bcn == 2) THEN
         bn=f(3,n)
-      ELSE IF(k_bcn == 5) THEN
+      else IF(k_bcn == 5) THEN
         an=(f(1,n)-f(1,n-1))/(x(n)-x(n-1))
-      ELSE IF(k_bcn == 6) THEN
+      else IF(k_bcn == 6) THEN
         bn=2.0*((f(1,n)-f(1,n-1))/(x(n)-x(n-1))           -(f(1,n-1)-f(1,n-2))/(x(n-1)-x(n-2)))/(x(n)-x(n-2))
       end if
 !Clear f(2:4,n)
@@ -2334,7 +2334,7 @@
         f(2,2)=f(2,1)
         f(3,2)=0.0
         f(4,2)=0.0
-      ELSE IF(n > 2) THEN
+      else IF(n > 2) THEN
 !Set up tridiagonal system for A*y=B where y(i) are the second
 !  derivatives at the knots
 !  f(2,i) are the diagonal elements of A
@@ -2365,18 +2365,18 @@
           end do
           wk(n-2)=f(4,n-2)
           wk(n-1)=f(4,n-1)
-        ELSE IF(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) THEN
+        else IF(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) THEN
           f(2,1)=2.0*f(4,1)
           f(3,1)=(f(1,2)-f(1,1))/f(4,1)-a1
-        ELSE IF(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) THEN
+        else IF(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) THEN
           f(2,1)=2.0*f(4,1)
           f(3,1)=f(4,1)*b1/3.0
           f(4,1)=0.0  ! upper diagonal only (dmc: cf elem21)
-        ELSE IF(k_bc1 == 7) THEN
+        else IF(k_bc1 == 7) THEN
           f(2,1)=-f(4,1)
           f(3,1)=f(3,3)/(x(4)-x(2))-f(3,2)/(x(3)-x(1))
           f(3,1)=f(3,1)*f(4,1)**2/(x(4)-x(1))
-        ELSE                             ! not a knot:
+        else                             ! not a knot:
           imin=2
           f(2,2)=f(4,1)+2.0*f(4,2)
           f(3,2)=f(3,2)*f(4,2)/(f(4,1)+f(4,2))
@@ -2385,16 +2385,16 @@
         IF(k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) THEN
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=-(f(1,n)-f(1,n-1))/f(4,n-1)+an
-        ELSE IF(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
+        else IF(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=f(4,n-1)*bn/3.0
 !xxx          f(4,n-1)=0.0  ! dmc: preserve f(4,n-1) for back subst.
           elemnn1=0.0  !  lower diagonal only (dmc)
-        ELSE IF(k_bcn == 7) THEN
+        else IF(k_bcn == 7) THEN
           f(2,n)=-f(4,n-1)
           f(3,n)=f(3,n-1)/(x(n)-x(n-2))-f(3,n-2)/(x(n-1)-x(n-3))
           f(3,n)=-f(3,n)*f(4,n-1)**2/(x(n)-x(n-3))
-        ELSE IF(k_bc1 /= -1) THEN         ! not a knot:
+        else IF(k_bc1 /= -1) THEN         ! not a knot:
           imax=n-1
           f(2,n-1)=2.0*f(4,n-2)+f(4,n-1)
           f(3,n-1)=f(3,n-1)*f(4,n-2)/(f(4,n-1)+f(4,n-2))
@@ -2433,14 +2433,14 @@
             f(3,i)=(f(3,i)-f(4,i)*f(3,i+1)-wk(i)*f(3,n-1))/f(2,i)
           end do
           f(3,n)=f(3,1)
-        ELSE
+        else
 !  Non-periodic BC
 !    Forward elimination
 !    For Not-A-Knot BC the off-diagonal end elements are not equal
           do i=imin+1,imax
             IF((i == n-1).and.(imax == n-1)) THEN
               t=(f(4,i-1)-f(4,i))/f(2,i-1)
-            ELSE
+            else
               if(i == 2) then
                  t=elem21/f(2,i-1)
               else if(i == n) then
@@ -2451,7 +2451,7 @@
             end if
             IF((i == imin+1).and.(imin == 2)) THEN
               f(2,i)=f(2,i)-t*(f(4,i-1)-f(4,i-2))
-            ELSE
+            else
               f(2,i)=f(2,i)-t*f(4,i-1)
             end if
             f(3,i)=f(3,i)-t*f(3,i-1)
@@ -2464,7 +2464,7 @@
                f(3,i) = 0.0 ! protect against overflow
             else IF((i == 2).and.(imin == 2)) THEN
               f(3,i)=(f(3,i)-(f(4,i)-f(4,i-1))*f(3,i+1))/f(2,i)
-            ELSE
+            else
               f(3,i)=(f(3,i)-f(4,i)*f(3,i+1))/f(2,i)
             end if
           end do
@@ -2492,7 +2492,7 @@
           f(2,n)=f(2,1)
           f(3,n)=f(3,1)
           f(4,n)=f(4,1)
-        ELSE
+        else
            hn=x(n)-x(n-1)
            f(2,n)=f(2,n-1)+hn*(f(3,n-1)+0.5*hn*f(4,n-1))
            f(3,n)=f(3,n-1)+hn*f(4,n-1)
@@ -2510,11 +2510,11 @@
 
       subroutine zonfind(x,nx,zxget,i)
 
-      integer nx
-      real zxget
-      real x(:) ! (nx)
-      integer i,nxm,i1,i2,ij,ii
-      real dx
+      integer :: nx
+      real :: zxget
+      real :: x(:) ! (nx)
+      integer :: i,nxm,i1,i2,ij,ii
+      real :: dx
 
 !  find index i such that x(i) <= zxget <= x(i+1)
 
