@@ -142,8 +142,6 @@
       end subroutine
 
 
-
-
       subroutine testdt_db (K, N,X,Y)
       double precision X(100), Y(100)
       integer K, N
@@ -460,7 +458,6 @@
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       return
       end
-
 
 
       subroutine TSTFN2_db (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)

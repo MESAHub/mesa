@@ -658,8 +658,7 @@
 
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6) /molenak
 !..---Add difference between EOS with and without radiation.  cvtt
 !       calculation is not accurate enough to give accurate results using
 !       eq. 16.16 Landau&Lifshitz (SEE line labeled DIRECT)
@@ -670,8 +669,7 @@
 !..---End EOS calculations with radiation
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
       eos(iri(1))=pt
       eos(iri(2))=et
       eos(iri(3))=st

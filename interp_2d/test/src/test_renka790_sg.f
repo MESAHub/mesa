@@ -142,7 +142,6 @@
       end
 
 
-
       subroutine testdt_sg (K, N,X,Y)
       real X(100), Y(100)
       integer K, N
@@ -459,7 +458,6 @@
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       return
       end
-
 
 
       subroutine TSTFN2_sg (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)

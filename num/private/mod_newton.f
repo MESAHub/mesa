@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module mod_newton
 
       use const_def, only: dp, qp
@@ -37,17 +36,7 @@
 
       contains
 
-      subroutine do_newton_wrapper(
-     >   nz, nvar, x, xold,
-     >   matrix_type, mljac, mujac,
-     >   decsol, decsolblk,
-     >   lrd, rpar_decsol, lid, ipar_decsol, which_decsol,
-     >   tol_correction_norm,
-     >   set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,
-     >   size_equ, sizeb, inspectB,
-     >   enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
-     >   xscale, equ, ldy, nsec, y, work, lwork, iwork, liwork, AF,
-     >   lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+      subroutine do_newton_wrapper( nz, nvar, x, xold, matrix_type, mljac, mujac, decsol, decsolblk, lrd, rpar_decsol, lid, ipar_decsol, which_decsol, tol_correction_norm, set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations, size_equ, sizeb, inspectB, enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration, xscale, equ, ldy, nsec, y, work, lwork, iwork, liwork, AF, lrpar, rpar, lipar, ipar, convergence_failure, ierr)
 
          ! the primary variables
          integer, intent(in) :: nz ! number of zones
@@ -204,17 +193,7 @@
 
          if (do_test_timing) call system_clock(test_time0,clock_rate)
 
-         call do_newton(
-     >      nz, nvar, x, xold, AF_copy, ldAF, neqns,
-     >      matrix_type, mljac, mujac,
-     >      decsol, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      tol_correction_norm,
-     >      set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,
-     >      size_equ, sizeb, inspectB,
-     >      enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
-     >      xscale, equ, ldy, nsec, y, work, lwork, iwork, liwork,
-     >      lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+         call do_newton( nz, nvar, x, xold, AF_copy, ldAF, neqns,    matrix_type, mljac, mujac,    decsol, decsolblk,    lrd, rpar_decsol, lid, ipar_decsol,    tol_correction_norm,    set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,    size_equ, sizeb, inspectB,    enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,    xscale, equ, ldy, nsec, y, work, lwork, iwork, liwork,    lrpar, rpar, lipar, ipar, convergence_failure, ierr)
 
          if (do_test_timing) then
             call system_clock(test_time1,clock_rate)
@@ -272,18 +251,7 @@
       end subroutine do_newton_wrapper
 
 
-      subroutine do_newton(
-     >   nz, nvar, x1, xold1, AF1, ldAF, neq,
-     >   matrix_type, mljac, mujac,
-     >   decsol, decsolblk,
-     >   lrd, rpar_decsol, lid, ipar_decsol,
-     >   tol_correction_norm,
-     >   set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,
-     >   size_equ, sizeb, inspectB,
-     >   enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
-     >   xscale1, equ1, ldy, nsec, y_in1,
-     >   work, lwork, iwork, liwork,
-     >   lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+      subroutine do_newton( nz, nvar, x1, xold1, AF1, ldAF, neq,   matrix_type, mljac, mujac,   decsol, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   tol_correction_norm,   set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations,   size_equ, sizeb, inspectB,   enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,   xscale1, equ1, ldy, nsec, y_in1,   work, lwork, iwork, liwork,   lrpar, rpar, lipar, ipar, convergence_failure, ierr)
 
          integer, intent(in) :: nz, nvar, mljac, mujac, ldy, nsec, ldAF, neq
 
@@ -340,16 +308,8 @@
          integer, dimension(:), pointer :: ipiv_blk1
 
          ! locals
-         real(dp)  ::
-     >      coeff, f, slope, residual_norm, max_residual, corr_norm_min, resid_norm_min, correction_factor,
-     >      residual_norm_save, corr_norm_min_save, resid_norm_min_save, correction_factor_save,
-     >      correction_norm, max_correction,
-     >      tol_max_correction, tol_residual_norm, tol_abs_slope_min, tol_corr_resid_product,
-     >      min_corr_coeff, tol_max_residual, max_corr_min, max_resid_min
-         integer :: iiter, max_tries, ndiag, zone, idiag, tiny_corr_cnt, ldA, i, k, info,
-     >      last_jac_iter, max_iterations_for_jacobian, force_iter_value,
-     >      max_iter_for_enforce_resid_tol, max_iter_for_resid_tol2, max_iter_for_resid_tol3,
-     >      caller_id
+         real(dp)  ::       coeff, f, slope, residual_norm, max_residual, corr_norm_min, resid_norm_min, correction_factor,    residual_norm_save, corr_norm_min_save, resid_norm_min_save, correction_factor_save,    correction_norm, max_correction,    tol_max_correction, tol_residual_norm, tol_abs_slope_min, tol_corr_resid_product,    min_corr_coeff, tol_max_residual, max_corr_min, max_resid_min
+         integer :: iiter, max_tries, ndiag, zone, idiag, tiny_corr_cnt, ldA, i, k, info,    last_jac_iter, max_iterations_for_jacobian, force_iter_value,    max_iter_for_enforce_resid_tol, max_iter_for_resid_tol2, max_iter_for_resid_tol3,    caller_id
          integer(8) :: time0, time1, clock_rate
          character (len=256) :: err_msg
          logical :: first_try, dbg_msg, passed_tol_tests, overlay_AF, do_mtx_timing, doing_extra
@@ -456,30 +416,25 @@
 
          call xdomain(iiter, nvar, nz, x, dx, xold, lrpar, rpar, lipar, ipar, ierr)
          if (ierr /= 0) then
-            if (dbg_msg)
-     >         write(*, *) 'newton failure: xdomain returned ierr', ierr
+            if (dbg_msg)          write(*, *) 'newton failure: xdomain returned ierr', ierr
             convergence_failure = .true.
             return
          end if
          call set_xscale(nvar, nz, xold, xscale, lrpar, rpar, lipar, ipar, ierr) ! set xscale
          if (ierr /= 0) then
-            if (dbg_msg)
-     >         write(*, *) 'newton failure: set_xscale returned ierr', ierr
+            if (dbg_msg)          write(*, *) 'newton failure: set_xscale returned ierr', ierr
             convergence_failure = .true.
             return
          end if
          call setequ(nvar, nz, x, equ, lrpar, rpar, lipar, ipar, ierr)
          if (ierr /= 0) then
-            if (dbg_msg)
-     >         write(*, *) 'newton failure: setequ returned ierr', ierr
+            if (dbg_msg)          write(*, *) 'newton failure: setequ returned ierr', ierr
             convergence_failure = .true.
             return
          end if
-         call size_equ(
-     >      iiter, nvar, nz, equ, residual_norm, max_residual, lrpar, rpar, lipar, ipar, ierr)
+         call size_equ(  iiter, nvar, nz, equ, residual_norm, max_residual, lrpar, rpar, lipar, ipar, ierr)
          if (ierr /= 0) then
-            if (dbg_msg)
-     >         write(*, *) 'newton failure: size_equ returned ierr', ierr
+            if (dbg_msg)          write(*, *) 'newton failure: size_equ returned ierr', ierr
             convergence_failure = .true.
             return
          end if
@@ -682,12 +637,7 @@
             if (max_correction > tol_max_correction*coeff .or. max_residual > tol_max_residual*coeff) then
                passed_tol_tests = .false.
             else
-               passed_tol_tests =
-     >               (correction_norm <= tol_correction_norm*coeff .and.
-     >                residual_norm <= tol_residual_norm*coeff)
-     >          .or.
-     >               (abs(slope) <= tol_abs_slope_min .and.
-     >                correction_norm*residual_norm <= tol_corr_resid_product*coeff*coeff)
+               passed_tol_tests =                (correction_norm <= tol_correction_norm*coeff .and.                 residual_norm <= tol_residual_norm*coeff)           .or.                (abs(slope) <= tol_abs_slope_min .and.                 correction_norm*residual_norm <= tol_corr_resid_product*coeff*coeff)
             end if
 
             if (.not. passed_tol_tests) then
@@ -702,28 +652,19 @@
                   if (coeff < min(min_corr_coeff,correction_factor)) then
                      call oops('coeff too small')
                      exit
-                  else if (correction_norm > tol_correction_norm*coeff
-     >                  .and. (correction_norm > work(r_corr_norm_jump_limit)*corr_norm_min)
-     >                  .and. (.not. first_try)) then
+                  else if (correction_norm > tol_correction_norm*coeff                   .and. (correction_norm > work(r_corr_norm_jump_limit)*corr_norm_min)                   .and. (.not. first_try)) then
                      call oops('avg correction jumped')
                      exit
-                  else if (residual_norm > tol_residual_norm*coeff
-     >                  .and. (residual_norm > work(r_resid_norm_jump_limit)*resid_norm_min)
-     >                  .and. (.not. first_try)) then
+                  else if (residual_norm > tol_residual_norm*coeff                   .and. (residual_norm > work(r_resid_norm_jump_limit)*resid_norm_min)                   .and. (.not. first_try)) then
                      call oops('avg residual jumped')
                      exit
-                  else if (max_correction > tol_max_correction*coeff
-     >                  .and. (max_correction > work(r_max_corr_jump_limit)*max_corr_min)
-     >                  .and. (.not. first_try)) then
+                  else if (max_correction > tol_max_correction*coeff                   .and. (max_correction > work(r_max_corr_jump_limit)*max_corr_min)                   .and. (.not. first_try)) then
                      call oops('max correction jumped')
                      exit
-                  else if (residual_norm > tol_residual_norm*coeff
-     >                  .and. (max_residual > work(r_max_resid_jump_limit)*max_resid_min)
-     >                  .and. (.not. first_try)) then
+                  else if (residual_norm > tol_residual_norm*coeff                   .and. (max_residual > work(r_max_resid_jump_limit)*max_resid_min)                   .and. (.not. first_try)) then
                      call oops('max residual jumped')
                      exit
-                  else if (tiny_corr_cnt >= iwork(i_tiny_min_corr_coeff)
-     >                  .and. min_corr_coeff < 1) then
+                  else if (tiny_corr_cnt >= iwork(i_tiny_min_corr_coeff)                   .and. min_corr_coeff < 1) then
                      call oops('tiny corrections')
                      exit
                   end if
@@ -1112,26 +1053,14 @@
             info = 0; info_solve=0; info_dealloc=0
             trans = 'N'
             if (matrix_type == block_tridiag_dble_matrix_type) then
-               call decsolblk(
-     >            1, caller_id, nvar, nz, lblkF1, dblkF1, ublkF1, B1, ipiv_blk1,
-     >            lrd, rpar_decsol, lid, ipar_decsol, info_solve)
-               call decsolblk(
-     >            2, caller_id, nvar, nz, lblkF1, dblkF1, ublkF1, B1, ipiv_blk1,
-     >            lrd, rpar_decsol, lid, ipar_decsol, info_dealloc)
+               call decsolblk(  1, caller_id, nvar, nz, lblkF1, dblkF1, ublkF1, B1, ipiv_blk1,   lrd, rpar_decsol, lid, ipar_decsol, info_solve)
+               call decsolblk(  2, caller_id, nvar, nz, lblkF1, dblkF1, ublkF1, B1, ipiv_blk1,   lrd, rpar_decsol, lid, ipar_decsol, info_dealloc)
             else if (matrix_type == square_matrix_type) then
-               call decsol(
-     >            1, n, n, AF1, n, n, B1, ipiv1,
-     >            lrd, rpar_decsol, lid, ipar_decsol, info_solve)
-               call decsol(
-     >            2, n, n, AF1, n, n, B1, ipiv1,
-     >            lrd, rpar_decsol, lid, ipar_decsol, info_dealloc)
+               call decsol(  1, n, n, AF1, n, n, B1, ipiv1,   lrd, rpar_decsol, lid, ipar_decsol, info_solve)
+               call decsol(  2, n, n, AF1, n, n, B1, ipiv1,   lrd, rpar_decsol, lid, ipar_decsol, info_dealloc)
             else ! banded_matrix_type
-               call decsol(
-     >            1, n, ldafb, AF1, mljac, mujac, B1, ipiv1,
-     >            lrd, rpar_decsol, lid, ipar_decsol, info_solve)
-               call decsol(
-     >            2, n, ldafb, AF1, mljac, mujac, B1, ipiv1,
-     >            lrd, rpar_decsol, lid, ipar_decsol, info_dealloc)
+               call decsol(  1, n, ldafb, AF1, mljac, mujac, B1, ipiv1,   lrd, rpar_decsol, lid, ipar_decsol, info_solve)
+               call decsol(  2, n, ldafb, AF1, mljac, mujac, B1, ipiv1,   lrd, rpar_decsol, lid, ipar_decsol, info_dealloc)
             end if
             if (info_solve /= 0 .or. info_dealloc /= 0) info = -1
          end subroutine solve_mtx
@@ -1149,9 +1078,7 @@
             logical :: need_solver_to_eval_jacobian
             include 'formats'
             need_solver_to_eval_jacobian = .true.
-            call enter_setmatrix(iiter,
-     >                  nvar, nz, neq, x, xold, xscale, xder, need_solver_to_eval_jacobian,
-     >                  size(A,dim=1), A1, idiag, lrpar, rpar, lipar, ipar, ierr)
+            call enter_setmatrix(iiter,   nvar, nz, neq, x, xold, xscale, xder, need_solver_to_eval_jacobian,   size(A,dim=1), A1, idiag, lrpar, rpar, lipar, ipar, ierr)
             do_enter_setmatrix = need_solver_to_eval_jacobian
          end function do_enter_setmatrix
 
@@ -1180,8 +1107,7 @@
             if (.not. need_solver_to_eval_jacobian) return
 
             if (matrix_type == block_tridiag_dble_matrix_type) then
-               write(*,'(a)') 'sorry: newton numerical jacobian does ' //
-     >               'not support numerical block triangular jacobians.'
+               write(*,'(a)') 'sorry: newton numerical jacobian does ' //                'not support numerical block triangular jacobians.'
                write(*,*) 'requested matrix_type', matrix_type
                write(*,*) 'try using a banded matrix instead'
                ierr = -1
@@ -1309,9 +1235,7 @@
                      if (dxdd(ivar,zone) == dxsave(ivar,zone)) then
                         ! can happen if the xdomain routine changed dx in a bad way.
                         ierr = -1
-                        write(*, '(a, i5, 99e20.10)')
-     >                     'failed trying to create numerical derivative for variable ',
-     >                     j, dxsave(ivar,zone), xsave(ivar,zone), xder(ivar,zone)
+                        write(*, '(a, i5, 99e20.10)')                      'failed trying to create numerical derivative for variable ',    j, dxsave(ivar,zone), xsave(ivar,zone), xder(ivar,zone)
                         if (nsec > 0) call mesa_error(__FILE__,__LINE__) !  y = y1
                         call cleanup_after_setmatrix
                         call failed_in_setmatrix(j, lrpar, rpar, lipar, ipar, ierr)
@@ -1370,17 +1294,7 @@
             if (.not. dbg_msg) return
 
     1       format(i6, 2x, i3, 2x, a, f8.4, 6(2x, a, 1x, e10.3), 2x, a, f6.2, 2x, a)
-            write(*,1)
-     >         iwork(i_model_number), iiter,
-     >         'coeff', coeff,
-     >         'slope', slope,
-     >         'f', f,
-     >         'avg resid', residual_norm,
-     >         'max resid', max_residual,
-     >         'avg corr', correction_norm,
-     >         'max corr', max_correction,
-     >         'lg dt/yr', log10(max(1d-99,work(r_dt)/secyer)),
-     >         trim(msg)
+            write(*,1)          iwork(i_model_number), iiter,   'coeff', coeff,   'slope', slope,   'f', f,   'avg resid', residual_norm,   'max resid', max_residual,   'avg corr', correction_norm,   'max corr', max_correction,   'lg dt/yr', log10(max(1d-99,work(r_dt)/secyer)),   trim(msg)
          end subroutine write_msg
 
 
@@ -1487,9 +1401,7 @@
 
             if (i-1 > lwork) then
                ierr = -1
-               write(*,
-     >                  '(a, i6, a, 99i6)') 'newton: lwork is too small.  must be at least', i-1,
-     >                  '   but is only ', lwork, neq, ndiag, ldAF, nsec
+               write(*,   '(a, i6, a, 99i6)') 'newton: lwork is too small.  must be at least', i-1,   '   but is only ', lwork, neq, ndiag, ldAF, nsec
                return
             end if
 
@@ -1497,9 +1409,7 @@
             ipiv1(1:neq) => iwork(i:i+neq-1); i = i+neq
             if (i-1 > liwork) then
                ierr = -1
-               write(*, '(a, i6, a, i6)')
-     >                  'newton: liwork is too small.  must be at least', i,
-     >                  '   but is only ', liwork
+               write(*, '(a, i6, a, i6)')                   'newton: liwork is too small.  must be at least', i,   '   but is only ', liwork
                return
             end if
 

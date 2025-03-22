@@ -369,7 +369,6 @@
       end if
 
 
-
       mxend=mx
       xa(mx)=1.-z
       xa(mx-1)=xamx1
@@ -396,7 +395,6 @@
       if(slt  >  alt(nt)) slt = alt(nt)
       if(slr  <  alr (1)) slr = alr(1)
       if(slr  >  alr(nre)) slr = alr(nre)
-
 
 
       if (izi  ==  0) then  ! freeze table indices
@@ -860,7 +858,6 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
 
-
         if (itimeco  /=  12345678) then
            do i=1,mx
              !write(*,*) 'n(i)', i, n(i), xa(i)
@@ -1210,12 +1207,8 @@
       DIMENSION X(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT END POINTS USING CUBIC FIT
-         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2
-     +   -(Y(2)-Y(1))*(X(3)-X(1))**2)/
-     +   ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
-         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2
-     +   -(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/
-     +   ((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
+         YP1=((Y(3)-Y(1))*(X(2)-X(1))**2    -(Y(2)-Y(1))*(X(3)-X(1))**2)/    ((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
+         YPN=((Y(N-2)-Y(N))*(X(N-1)-X(N))**2    -(Y(N-1)-Y(N))*(X(N-2)-X(N))**2)/    ((X(N-2)-X(N))*(X(N-1)-X(N))*(X(N-1)-X(N-2)))
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
@@ -1363,22 +1356,13 @@
 
 !  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
 
-      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
-     +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
-     +   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))    +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))    +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))    +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
-      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
-     +   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))    +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))    +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
 
-      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
-     +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
-     +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))    +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))    +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
-      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8))
-     +   +S*(   2*B(10)+T*(4*B(11)+6*T*B(12))
-     +   +S*(   3*B(14)+T*(6*B(15)+9*T*B(16)) ))
+      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8))    +S*(   2*B(10)+T*(4*B(11)+6*T*B(12))    +S*(   3*B(14)+T*(6*B(15)+9*T*B(16)) ))
 
 
       IERR=.FALSE.
@@ -1394,7 +1378,7 @@
          ELSE
             I=1
          end if
-      ELSEIF(X > 84)THEN
+      ELSE IF(X > 84)THEN
          IF(X > 85.25)THEN
             IERR=.TRUE.
          ELSE
@@ -1411,7 +1395,7 @@
          ELSE
             J=1
          end if
-      ELSEIF(Y > NRL-1)THEN
+      ELSE IF(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
             IERR=.TRUE.
          ELSE
@@ -1443,29 +1427,13 @@
 
       B(9)=3*(-F(I,J)+F(I+1,J))-2*FX(I,J)-FX(I+1,J)
       B(10)=3*(-FY(I,J)+FY(I+1,J))-2*FXY(I,J)-FXY(I+1,J)
-      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))
-     + +4*FXY(I,J)
-     + +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))
-     + +2*(FXY(I,J+1)+FXY(I+1,J))
-     + +FXY(I+1,J+1)
-      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FX(I,J)+FX(I,J+1))
-     + +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))
-     + +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))
-     + -FXY(I+1,J)-FXY(I+1,J+1)
+      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))  +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))  +4*FXY(I,J)  +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))  +2*(FXY(I,J+1)+FXY(I+1,J))  +FXY(I+1,J+1)
+      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))  +4*(-FX(I,J)+FX(I,J+1))  +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))  +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))  -FXY(I+1,J)-FXY(I+1,J+1)
 
       B(13)=2*(F(I,J)-F(I+1,J))+FX(I,J)+FX(I+1,J)
       B(14)=2*(FY(I,J)-FY(I+1,J))+FXY(I,J)+FXY(I+1,J)
-      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FY(I,J)+FY(I+1,J))
-     + +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))
-     + +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))
-     + -FXY(I+1,J+1)-FXY(I,J+1)
-      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)
-     +    +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))
-     + +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
+      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))  +4*(-FY(I,J)+FY(I+1,J))  +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))  +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))  -FXY(I+1,J+1)-FXY(I,J+1)
+      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))  +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)     +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))  +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
 
 !  GET G=LOG10(ROSS), DGDT=d LOG10(ROSS)/d LOG10(T),
 !      DGDRHO=d LOG10(ROSS)/d LOG10(RHO)
@@ -1499,83 +1467,28 @@
       DIMENSION GAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
       DIMENSION BET(11)
-      DATA BET/
-     + -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,
-     +  0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,
-     +  0.3746938776,+0.1665306122,-0.1110204082/
+      DATA BET/  -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
       DIMENSION ALP(11)
-      DATA ALP/
-     + -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,
-     +  0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,
-     +  0.0277551020,-0.0416326531,-0.0069387755/
+      DATA ALP/  -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
 
 
       DO 20 I=3,nset-2
 
          J=1
-         FXY(I,J)=
-     +    ALP(1)*( F(I-2,J  )+F(I+2,J  ) )
-     +   +ALP(2)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J+3)+F(I+2,J+3)
-     +          +F(I-1,J+4)+F(I+1,J+4) )
-     +   +ALP(3)*( F(I-2,J+2)+F(I+2,J+2) )
-     +   +ALP(4)*( F(I-2,J+4)+F(I+2,J+4) )
-     +   +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +   +ALP(6)*( F(I-1,J+1)+F(I+1,J+1)+F(I-1,J+3)+F(I+1,J+3) )
-     +   +ALP(7)*( F(I-1,J+2)+F(I+1,J+2) )
-     +   +ALP(8)*  F(I  ,J  )
-     +   +ALP(9)*( F(I  ,J+1)+F(I  ,J+3) )
-     +   +ALP(10)* F(I  ,J+2) +ALP(11)*F(I  ,J+4)
+         FXY(I,J)=     ALP(1)*( F(I-2,J  )+F(I+2,J  ) )    +ALP(2)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J+3)+F(I+2,J+3)           +F(I-1,J+4)+F(I+1,J+4) )    +ALP(3)*( F(I-2,J+2)+F(I+2,J+2) )    +ALP(4)*( F(I-2,J+4)+F(I+2,J+4) )    +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )    +ALP(6)*( F(I-1,J+1)+F(I+1,J+1)+F(I-1,J+3)+F(I+1,J+3) )    +ALP(7)*( F(I-1,J+2)+F(I+1,J+2) )    +ALP(8)*  F(I  ,J  )    +ALP(9)*( F(I  ,J+1)+F(I  ,J+3) )    +ALP(10)* F(I  ,J+2) +ALP(11)*F(I  ,J+4)
 
          J=2
-         FXY(I,J)=
-     +    BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )
-     +   +BET(2)*( F(I-2,J  )+F(I+2,J  ) )
-     +   +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )
-     +   +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)
-     +            +F(I-1,J+3)+F(I+1,J+3) )
-     +   +BET(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +   +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )
-     +   +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )
-     +   +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )
-     +   +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
+         FXY(I,J)=     BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )    +BET(2)*( F(I-2,J  )+F(I+2,J  ) )    +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )    +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)             +F(I-1,J+3)+F(I+1,J+3) )    +BET(5)*( F(I-1,J  )+F(I+1,J  ) )    +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )    +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )    +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )    +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
          DO 10 J=3,NRL-2
-            FXY(I,J)=
-     +         GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )
-     +        +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)
-     +                 +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )
-     +        +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )
-     +        +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )
-     +        +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )
-     +        +GAM(6)*  F(I  ,J  )
+            FXY(I,J)=          GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )         +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)                  +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )         +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )         +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )         +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )         +GAM(6)*  F(I  ,J  )
    10    CONTINUE
 
          J=NRL-1
-         FXY(I,J)=
-     +     BET(1)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J-3)+F(I+2,J-3) )
-     +    +BET(2)*( F(I-2,J  )+F(I+2,J  ) )
-     +    +BET(3)*( F(I-2,J-1)+F(I+2,J-1) )
-     +    +BET(4)*( F(I-2,J-2)+F(I+2,J-2)+F(I-1,J+1)+F(I+1,J+1)
-     +             +F(I-1,J-3)+F(I+1,J-3) )
-     +    +BET(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +    +BET(6)*( F(I-1,J-1)+F(I+1,J-1) )
-     +    +BET(7)*( F(I-1,J-2)+F(I+1,J-2) )
-     +    +BET(8)*( F(I  ,J+1)+F(I  ,J-3) )
-     +    +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J-1) +BET(11)*F(I  ,J-2)
+         FXY(I,J)=      BET(1)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J-3)+F(I+2,J-3) )     +BET(2)*( F(I-2,J  )+F(I+2,J  ) )     +BET(3)*( F(I-2,J-1)+F(I+2,J-1) )     +BET(4)*( F(I-2,J-2)+F(I+2,J-2)+F(I-1,J+1)+F(I+1,J+1)              +F(I-1,J-3)+F(I+1,J-3) )     +BET(5)*( F(I-1,J  )+F(I+1,J  ) )     +BET(6)*( F(I-1,J-1)+F(I+1,J-1) )     +BET(7)*( F(I-1,J-2)+F(I+1,J-2) )     +BET(8)*( F(I  ,J+1)+F(I  ,J-3) )     +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J-1) +BET(11)*F(I  ,J-2)
 
          J=NRL
-         FXY(I,J)=
-     +     ALP(1)*( F(I-2,J  )+F(I+2,J  ) )
-     +    +ALP(2)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J-3)+F(I+2,J-3)
-     +             +F(I-1,J-4)+F(I+1,J-4) )
-     +    +ALP(3)*( F(I-2,J-2)+F(I+2,J-2) )
-     +    +ALP(4)*( F(I-2,J-4)+F(I+2,J-4) )
-     +    +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +    +ALP(6)*( F(I-1,J-1)+F(I+1,J-1)+F(I-1,J-3)+F(I+1,J-3) )
-     +    +ALP(7)*( F(I-1,J-2)+F(I+1,J-2) )
-     +    +ALP(8)*  F(I  ,J  )
-     +    +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )
-     +    +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
+         FXY(I,J)=      ALP(1)*( F(I-2,J  )+F(I+2,J  ) )     +ALP(2)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J-3)+F(I+2,J-3)              +F(I-1,J-4)+F(I+1,J-4) )     +ALP(3)*( F(I-2,J-2)+F(I+2,J-2) )     +ALP(4)*( F(I-2,J-4)+F(I+2,J-4) )     +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )     +ALP(6)*( F(I-1,J-1)+F(I+1,J-1)+F(I-1,J-3)+F(I+1,J-3) )     +ALP(7)*( F(I-1,J-2)+F(I+1,J-2) )     +ALP(8)*  F(I  ,J  )     +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )     +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
 
    20 CONTINUE
 

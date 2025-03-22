@@ -541,11 +541,10 @@
               GOTO 720
           end if
       end if
-!
+
 !     Put the variables for the next calculation of the objective function
 !       in XNEW, with any adjustments for the bounds.
-!
-!
+
 !     Calculate the value of the objective function at XBASE+XNEW, unless
 !       the limit on the number of calculations of F has been reached.
 !

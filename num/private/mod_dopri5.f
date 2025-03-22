@@ -30,10 +30,7 @@
 
       contains
 
-      subroutine do_dopri5(
-     &         n,fcn,x,y,xend,h,max_step_size,max_steps,
-     &         rtol,atol,itol,solout,iout,work,lwork,iwork,liwork,
-     &         lrpar,rpar,lipar,ipar,lout,idid)
+      subroutine do_dopri5( n,fcn,x,y,xend,h,max_step_size,max_steps,   rtol,atol,itol,solout,iout,work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,lout,idid)
 ! *** *** *** *** *** *** *** *** *** *** *** *** ***
 !         declarations
 ! *** *** *** *** *** *** *** *** *** *** *** *** ***
@@ -75,8 +72,7 @@
       else
          nmax=max_steps
          if (nmax <= 0 ) then
-            if (lout > 0) write(lout,*)
-     &          ' wrong input max_steps=',max_steps
+            if (lout > 0) write(lout,*)            ' wrong input max_steps=',max_steps
             arret=.true.
          end if
       end if
@@ -86,8 +82,7 @@
       else
          meth=iwork(2)
          if (meth <= 0.or.meth >= 4 ) then
-            if (lout > 0) write(lout,*)
-     &          ' curious input iwork(2)=',iwork(2)
+            if (lout > 0) write(lout,*)            ' curious input iwork(2)=',iwork(2)
             arret=.true.
          end if
       end if
@@ -98,13 +93,11 @@
 ! -------- nrdens   number of dense output components
       nrdens=iwork(5)
       if (nrdens < 0.or.nrdens > n ) then
-         if (lout > 0) write(lout,*)
-     &           ' curious input iwork(5)=',iwork(5)
+         if (lout > 0) write(lout,*)             ' curious input iwork(5)=',iwork(5)
          arret=.true.
       else
             if (nrdens > 0.and.iout < 2 ) then
-               if (lout > 0) write(lout,*)
-     &      ' warning: put iout=2 for dense output '
+               if (lout > 0) write(lout,*)        ' warning: put iout=2 for dense output '
             end if
             if (nrdens == n) then
                 do i=1,nrdens
@@ -118,8 +111,7 @@
       else
          uround=work(1)
          if (uround <= 1.d-35.or.uround >= 1.d0 ) then
-            if (lout > 0) write(lout,*)
-     &        ' which machine do you have? your uround was:',work(1)
+            if (lout > 0) write(lout,*)          ' which machine do you have? your uround was:',work(1)
             arret=.true.
          end if
       end if
@@ -129,8 +121,7 @@
       else
          safe=work(2)
          if (safe >= 1.d0.or.safe <= 1.d-4 ) then
-            if (lout > 0) write(lout,*)
-     &          ' curious input for safety factor work(2)=',work(2)
+            if (lout > 0) write(lout,*)            ' curious input for safety factor work(2)=',work(2)
             arret=.true.
          end if
       end if
@@ -154,8 +145,7 @@
          else
             beta=work(5)
             if (beta > 0.2d0 ) then
-               if (lout > 0) write(lout,*)
-     &          ' curious input for beta: work(5)=',work(5)
+               if (lout > 0) write(lout,*)            ' curious input for beta: work(5)=',work(5)
             arret=.true.
          end if
          end if
@@ -179,15 +169,13 @@
 ! ------ total storage requirement -----------
       istore=ieys+(3+5*nrdens)-1
       if (istore > lwork ) then
-        if (lout > 0) write(lout,*)
-     &   ' insufficient storage for work, min. lwork=',istore
+        if (lout > 0) write(lout,*)     ' insufficient storage for work, min. lwork=',istore
         arret=.true.
       end if
       icomp=21
       istore=icomp+nrdens-1
       if (istore > liwork ) then
-        if (lout > 0) write(lout,*)
-     &   ' insufficient storage for iwork, min. liwork=',istore
+        if (lout > 0) write(lout,*)     ' insufficient storage for iwork, min. liwork=',istore
         arret=.true.
       end if
 ! ------ when a fail has occurred, we return with idid=-1
@@ -196,11 +184,7 @@
          return
       end if
 ! -------- call to core integrator ------------
-      call dopcor(n,fcn,x,y,xend,hmax,h,rtol,atol,itol,lout,
-     &   solout,iout,idid,nmax,uround,meth,nstiff,safe,beta,fac1,fac2,
-     &   work(iey1),work(iek1),work(iek2),work(iek3),work(iek4),
-     &   work(iek5),work(iek6),work(ieys),work(ieco),iwork(icomp),
-     &   nrdens,lrpar,rpar,lipar,ipar,nfcn,nstep,naccpt,nrejct)
+      call dopcor(n,fcn,x,y,xend,hmax,h,rtol,atol,itol,lout,   solout,iout,idid,nmax,uround,meth,nstiff,safe,beta,fac1,fac2,   work(iey1),work(iek1),work(iek2),work(iek3),work(iek4),   work(iek5),work(iek6),work(ieys),work(ieco),iwork(icomp),   nrdens,lrpar,rpar,lipar,ipar,nfcn,nstep,naccpt,nrejct)
       work(7)=h
       iwork(17)=nfcn
       iwork(18)=nstep
@@ -214,10 +198,7 @@ c
 !
 !    ----- ... and here is the core integrator  ----------
 !
-      subroutine dopcor(n,fcn,x,y,xend,hmax,h,rtol,atol,itol,lout,
-     &   solout,iout,idid,nmax,uround,meth,nstiff,safe,beta,fac1,fac2,
-     &   y1,k1,k2,k3,k4,k5,k6,ysti,rwork,icomp,nrd,lrpar,rpar,lipar,ipar,
-     &   nfcn,nstep,naccpt,nrejct)
+      subroutine dopcor(n,fcn,x,y,xend,hmax,h,rtol,atol,itol,lout,   solout,iout,idid,nmax,uround,meth,nstiff,safe,beta,fac1,fac2,   y1,k1,k2,k3,k4,k5,k6,ysti,rwork,icomp,nrd,lrpar,rpar,lipar,ipar,   nfcn,nstep,naccpt,nrejct)
 ! ----------------------------------------------------------
 !    core integrator for dopri5
 !    parameters same as in dopri5 with workspace added
@@ -257,10 +238,7 @@ c
 ! *** *** *** *** *** *** ***
 !    initializations
 ! *** *** *** *** *** *** ***
-      if (meth == 1) call cdopri(c2,c3,c4,c5,e1,e3,e4,e5,e6,e7,
-     &                    a21,a31,a32,a41,a42,a43,a51,a52,a53,a54,
-     &                    a61,a62,a63,a64,a65,a71,a73,a74,a75,a76,
-     &                    d1,d3,d4,d5,d6,d7)
+      if (meth == 1) call cdopri(c2,c3,c4,c5,e1,e3,e4,e5,e6,e7,    a21,a31,a32,a41,a42,a43,a51,a52,a53,a54,    a61,a62,a63,a64,a65,a71,a73,a74,a75,a76,    d1,d3,d4,d5,d6,d7)
       facold=1.d-4
       expo1=0.2d0-beta*0.75d0
       facc1=1.d0/fac1
@@ -277,8 +255,7 @@ c
       if (ierr /= 0) then; idid=-5; return; end if
       hmax=abs(hmax)
       iord=5
-      if (h == 0.d0) h=hinit(n,fcn,x,y,xend,posneg,k1,k2,k3,iord,
-     &                       hmax,atol,rtol,itol,lrpar,rpar,lipar,ipar,ierr)
+      if (h == 0.d0) h=hinit(n,fcn,x,y,xend,posneg,k1,k2,k3,iord,   hmax,atol,rtol,itol,lrpar,rpar,lipar,ipar,ierr)
       if (ierr /= 0) then; idid=-5; return; end if
       nfcn=nfcn+2
       reject=.false.
@@ -354,8 +331,7 @@ c
       if (iout >= 2) then
             do j=1,nrd
                i=icomp(j)
-               cont(4*nrd+j)=h*(d1*k1(i)+d3*k3(i)+d4*k4(i)+d5*k5(i)
-     &                      +d6*k6(i)+d7*k2(i))
+               cont(4*nrd+j)=h*(d1*k1(i)+d3*k3(i)+d4*k4(i)+d5*k5(i)                        +d6*k6(i)+d7*k2(i))
             end do
       end if
       do i=1,n
@@ -400,8 +376,7 @@ c
                nonsti=0
                iasti=iasti+1
                if (iasti == 15) then
-                  if (lout > 0) write (lout,*)
-     &               ' the problem seems to become stiff at x = ',x
+                  if (lout > 0) write (lout,*)                 ' the problem seems to become stiff at x = ',x
                   if (lout < 0) goto 76
                end if
             else
@@ -466,8 +441,7 @@ c
       return
   78  continue
       if (lout > 0) write(lout,979)x
-      if (lout > 0) write(lout,*)
-     &     ' more than nmax =',nmax,'steps are needed'
+      if (lout > 0) write(lout,*)       ' more than nmax =',nmax,'steps are needed'
       idid=-2
       return
   79  continue
@@ -477,8 +451,7 @@ c
       return
       end subroutine dopcor
 !
-      real(dp) function hinit(n,fcn,x,y,xend,posneg,f0,f1,y1,iord,
-     &                        hmax,atol,rtol,itol,lrpar,rpar,lipar,ipar,ierr)
+      real(dp) function hinit(n,fcn,x,y,xend,posneg,f0,f1,y1,iord,   hmax,atol,rtol,itol,lrpar,rpar,lipar,ipar,ierr)
 ! ----------------------------------------------------------
 ! ----  computation of an initial step size guess
 ! ----------------------------------------------------------
@@ -556,7 +529,6 @@ c
       hinit=sign(h,posneg)
       return
       end function hinit
-!
 
       real(dp) function contd5(ii,x,rwork,iwork,ierr)
 ! ----------------------------------------------------------
@@ -597,15 +569,11 @@ c
       ierr=0
       theta=(x-xold)/h
       theta1=1.d0-theta
-      contd5=con(i)+theta*(con(nd+i)+theta1*(con(2*nd+i)+theta*
-     &           (con(3*nd+i)+theta1*con(4*nd+i))))
+      contd5=con(i)+theta*(con(nd+i)+theta1*(con(2*nd+i)+theta*(con(3*nd+i)+theta1*con(4*nd+i))))
       end function contd5
 !
 
-      subroutine cdopri(c2,c3,c4,c5,e1,e3,e4,e5,e6,e7,
-     &                    a21,a31,a32,a41,a42,a43,a51,a52,a53,a54,
-     &                    a61,a62,a63,a64,a65,a71,a73,a74,a75,a76,
-     &                    d1,d3,d4,d5,d6,d7)
+      subroutine cdopri(c2,c3,c4,c5,e1,e3,e4,e5,e6,e7, a21,a31,a32,a41,a42,a43,a51,a52,a53,a54, a61,a62,a63,a64,a65,a71,a73,a74,a75,a76, d1,d3,d4,d5,d6,d7)
 ! ----------------------------------------------------------
 !     runge-kutta coefficients of dormand and prince (1980)
 ! ----------------------------------------------------------

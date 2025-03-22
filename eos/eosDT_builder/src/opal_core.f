@@ -184,7 +184,6 @@
       if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
 
 
-
         ilo=2
         ihi=mx
     8   if(ihi-ilo  >  1) then

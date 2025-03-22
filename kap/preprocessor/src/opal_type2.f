@@ -538,11 +538,10 @@ c  ... this is the first time through this m. Calculate the decadic
           write(*,*) 'zz(mf,1)', zz(mf,1)
           write(*,*) 'zz(mh,1)', zz(mh,1)
           write(*,*) 'zz(mf,1)', zz(mf,1)
-          write(*,'("Z does not match Z in codata* files you are"
-     x    ," using")')
+          write(*,'("Z does not match Z in codata* files you are using")')
           call mesa_error(__FILE__,__LINE__)
         end if
-      if(z  /=  zz(mf,1)) GOTO 66
+      if(z /= zz(mf,1)) GOTO 66
       xxc=xxci   ! restores input value; necessary if stop replaced
 !                  with return
       xxo=xxoi   ! restores input value
@@ -554,8 +553,7 @@ c  ... this is the first time through this m. Calculate the decadic
            opk(it,ir)=opl(mf,it,ir)
            GOTO 46
          end if
-         opk(it,ir)=quad2(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir)
-     x   ,opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+         opk(it,ir)=quad2(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
          is=1
    46 continue
    45 continue
@@ -566,8 +564,7 @@ c  ... this is the first time through this m. Calculate the decadic
        dixr=(xx(mh)-xxx)*dfsx(mh)
       do 47 ir=l1,l1+iq
         do it=k1,k1+ip
-        opk2(it,ir)=quad2(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir)
-     x  ,opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
+        opk2(it,ir)=quad2(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir),opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
@@ -679,22 +676,18 @@ c  ... this is the first time through this m. Calculate the decadic
 !__________
       do 44 i=4,nc-1
 !     do not go beyond middle (where c3-c6 overlaps o3-o6), and
-        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and.
-     $        (xcd(i-1)  >  xc(i-1))) then
+        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and. (xcd(i-1)  >  xc(i-1))) then
       do 42 ir=l1,l1+iq
       do 43 it=k1,k1+ip
         oxdp=log10(zzz+xodp)
         iw=1
         m1=i-1
         m2=i-2
-        a(1,m)=quad2(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2
-     x  ,it,ir),diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
+        a(1,m)=quad2(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2,it,ir),diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
         iw=iw+1
-        a(2,m)=quad2(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1
-     x  ,it,ir),diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
+        a(2,m)=quad2(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1,it,ir),diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
         iw=iw+1
-        a(3,m)=quad2(is,iw,cxx,diag(m,m2,it,ir),diag(m,m1,it,ir),
-     x  diag(m,i,it,ir),cxd(m2),cxd(m1),cxd(i))
+        a(3,m)=quad2(is,iw,cxx,diag(m,m2,it,ir),diag(m,m1,it,ir),diag(m,i,it,ir),cxd(m2),cxd(m1),cxd(i))
          do w=1,3
            b(w)=a(w,m)
          end do
@@ -824,16 +817,14 @@ c  ... this is the first time through this m. Calculate the decadic
         end if
 
 !     lower-O part of grid: interpolate C before O
-      if(j3 < no .and. i3 <= n(m,j3) .and.
-     $       (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
+      if(j3 < no .and. i3 <= n(m,j3) .and. (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
       do 20 ir=l1,l1+iq
       do 21 it=k1,k1+ip
       iw=0
         do jx=j1,j1+2
           iw=iw+1
 !     if i3=n(m,jx), then must replace cx(i3) with cxd(jx)
-          a(iw,m)=quad2(is,iw,cxx,co(m,i1,jx,it,ir),co(m,i2,jx,it,ir),
-     x    co(m,i3,jx,it,ir),cx(i1),cx(i2),min(cx(i3),cxd(jx)))
+          a(iw,m)=quad2(is,iw,cxx,co(m,i1,jx,it,ir),co(m,i2,jx,it,ir),co(m,i3,jx,it,ir),cx(i1),cx(i2),min(cx(i3),cxd(jx)))
         end do
         do w=1,3
           b(w)=a(w,m)
@@ -851,11 +842,9 @@ c  ... this is the first time through this m. Calculate the decadic
         do ix=i1,i1+2
           iw=iw+1
           if(j3 < n(m,ix))then
-            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),
-     $      co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
+            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
           else
-            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),
-     $      diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
+            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
           end if
         end do
         do w=1,3
@@ -1190,8 +1179,6 @@ c  ... this is the first time through this m. Calculate the decadic
           end do
 
 
-
-
 !         do k=1,ntm
 !           read (2,'(f4.2,19f7.3)') dum, (cof(k,l), l=1,nrm)
 !     set up to smooth final "diago" opacity tables
@@ -1475,18 +1462,11 @@ c  ... this is the first time through this m. Calculate the decadic
 
 !  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
 
-      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
-     +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
-     +   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+      FF(S,T)= B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4))) +S*( B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8))) +S*( B( 9)+T*(B(10)+T*(B(11)+T*B(12))) +S*( B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
-      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
-     +   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+      FFX(S,T)= B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8))) +S*( 2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12)))) +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
 
-      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
-     +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
-     +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+      FFY(S,T)= B( 2)+S*(B( 6)+S*(B(10)+S*B(14))) +T*( 2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15)))) +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
 
       IERR=.FALSE.
@@ -1502,7 +1482,7 @@ c  ... this is the first time through this m. Calculate the decadic
          ELSE
             I=1
          end if
-      ELSEIF(X > 84)THEN
+      ELSE IF(X > 84)THEN
          IF(X > 85.25)THEN
             IERR=.TRUE.
          ELSE
@@ -1519,7 +1499,7 @@ c  ... this is the first time through this m. Calculate the decadic
          ELSE
             J=1
          end if
-      ELSEIF(Y > NRL-1)THEN
+      ELSE IF(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
             IERR=.TRUE.
          ELSE
@@ -1551,29 +1531,13 @@ c  ... this is the first time through this m. Calculate the decadic
 
       B(9)=3*(-F(I,J)+F(I+1,J))-2*FX(I,J)-FX(I+1,J)
       B(10)=3*(-FY(I,J)+FY(I+1,J))-2*FXY(I,J)-FXY(I+1,J)
-      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))
-     + +4*FXY(I,J)
-     + +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))
-     + +2*(FXY(I,J+1)+FXY(I+1,J))
-     + +FXY(I+1,J+1)
-      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FX(I,J)+FX(I,J+1))
-     + +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))
-     + +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))
-     + -FXY(I+1,J)-FXY(I+1,J+1)
+      B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))  +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))  +4*FXY(I,J)  +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))  +2*(FXY(I,J+1)+FXY(I+1,J))  +FXY(I+1,J+1)
+      B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))  +4*(-FX(I,J)+FX(I,J+1))  +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))  +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))  -FXY(I+1,J)-FXY(I+1,J+1)
 
       B(13)=2*(F(I,J)-F(I+1,J))+FX(I,J)+FX(I+1,J)
       B(14)=2*(FY(I,J)-FY(I+1,J))+FXY(I,J)+FXY(I+1,J)
-      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FY(I,J)+FY(I+1,J))
-     + +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))
-     + +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))
-     + -FXY(I+1,J+1)-FXY(I,J+1)
-      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)
-     +    +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))
-     + +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
+      B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))  +4*(-FY(I,J)+FY(I+1,J))  +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))  +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))  -FXY(I+1,J+1)-FXY(I,J+1)
+      B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))  +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)     +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))  +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
 
 !  GET G=LOG10(ROSS), DGDT=d LOG10(ROSS)/d LOG10(T),
 !      DGDRHO=d LOG10(ROSS)/d LOG10(RHO)
@@ -1605,86 +1569,30 @@ c  ... this is the first time through this m. Calculate the decadic
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
       DIMENSION GAM(6)
-      DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,
-     +         +0.1175510204,+0.1665306122,+0.2359183673/
+      DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,   +0.1175510204,+0.1665306122,+0.2359183673/
       DIMENSION BET(11)
-      DATA BET/
-     + -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,
-     +  0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,
-     +  0.3746938776,+0.1665306122,-0.1110204082/
+      DATA BET/  -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
       DIMENSION ALP(11)
-      DATA ALP/
-     + -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,
-     +  0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,
-     +  0.0277551020,-0.0416326531,-0.0069387755/
+      DATA ALP/  -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
 
 
       DO 20 I=3,nset-2
 
          J=1
-         FXY(I,J)=
-     +    ALP(1)*( F(I-2,J  )+F(I+2,J  ) )
-     +   +ALP(2)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J+3)+F(I+2,J+3)
-     +          +F(I-1,J+4)+F(I+1,J+4) )
-     +   +ALP(3)*( F(I-2,J+2)+F(I+2,J+2) )
-     +   +ALP(4)*( F(I-2,J+4)+F(I+2,J+4) )
-     +   +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +   +ALP(6)*( F(I-1,J+1)+F(I+1,J+1)+F(I-1,J+3)+F(I+1,J+3) )
-     +   +ALP(7)*( F(I-1,J+2)+F(I+1,J+2) )
-     +   +ALP(8)*  F(I  ,J  )
-     +   +ALP(9)*( F(I  ,J+1)+F(I  ,J+3) )
-     +   +ALP(10)* F(I  ,J+2) +ALP(11)*F(I  ,J+4)
+         FXY(I,J)=     ALP(1)*( F(I-2,J  )+F(I+2,J  ) )    +ALP(2)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J+3)+F(I+2,J+3)           +F(I-1,J+4)+F(I+1,J+4) )    +ALP(3)*( F(I-2,J+2)+F(I+2,J+2) )    +ALP(4)*( F(I-2,J+4)+F(I+2,J+4) )    +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )    +ALP(6)*( F(I-1,J+1)+F(I+1,J+1)+F(I-1,J+3)+F(I+1,J+3) )    +ALP(7)*( F(I-1,J+2)+F(I+1,J+2) )    +ALP(8)*  F(I  ,J  )    +ALP(9)*( F(I  ,J+1)+F(I  ,J+3) )    +ALP(10)* F(I  ,J+2) +ALP(11)*F(I  ,J+4)
 
          J=2
-         FXY(I,J)=
-     +    BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )
-     +   +BET(2)*( F(I-2,J  )+F(I+2,J  ) )
-     +   +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )
-     +   +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)
-     +            +F(I-1,J+3)+F(I+1,J+3) )
-     +   +BET(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +   +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )
-     +   +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )
-     +   +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )
-     +   +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
+         FXY(I,J)=     BET(1)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J+3)+F(I+2,J+3) )    +BET(2)*( F(I-2,J  )+F(I+2,J  ) )    +BET(3)*( F(I-2,J+1)+F(I+2,J+1) )    +BET(4)*( F(I-2,J+2)+F(I+2,J+2)+F(I-1,J-1)+F(I+1,J-1)             +F(I-1,J+3)+F(I+1,J+3) )    +BET(5)*( F(I-1,J  )+F(I+1,J  ) )    +BET(6)*( F(I-1,J+1)+F(I+1,J+1) )    +BET(7)*( F(I-1,J+2)+F(I+1,J+2) )    +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )    +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
          DO 10 J=3,NRL-2
-            FXY(I,J)=
-     +         GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )
-     +        +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)
-     +                 +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )
-     +        +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )
-     +        +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )
-     +        +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )
-     +        +GAM(6)*  F(I  ,J  )
+            FXY(I,J)=          GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )         +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)                  +F(I+1,J-2)+F(I+1,J+2)+F(I+2,J-1)+F(I+2,J+1) )         +GAM(3)*( F(I-2,J  )+F(I+2,J  )+F(I  ,J-2)+F(I  ,J+2) )         +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )         +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )         +GAM(6)*  F(I  ,J  )
    10    CONTINUE
 
          J=NRL-1
-         FXY(I,J)=
-     +     BET(1)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J-3)+F(I+2,J-3) )
-     +    +BET(2)*( F(I-2,J  )+F(I+2,J  ) )
-     +    +BET(3)*( F(I-2,J-1)+F(I+2,J-1) )
-     +    +BET(4)*( F(I-2,J-2)+F(I+2,J-2)+F(I-1,J+1)+F(I+1,J+1)
-     +             +F(I-1,J-3)+F(I+1,J-3) )
-     +    +BET(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +    +BET(6)*( F(I-1,J-1)+F(I+1,J-1) )
-     +    +BET(7)*( F(I-1,J-2)+F(I+1,J-2) )
-     +    +BET(8)*( F(I  ,J+1)+F(I  ,J-3) )
-     +    +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J-1) +BET(11)*F(I  ,J-2)
+         FXY(I,J)=      BET(1)*( F(I-2,J+1)+F(I+2,J+1)+F(I-2,J-3)+F(I+2,J-3) )     +BET(2)*( F(I-2,J  )+F(I+2,J  ) )     +BET(3)*( F(I-2,J-1)+F(I+2,J-1) )     +BET(4)*( F(I-2,J-2)+F(I+2,J-2)+F(I-1,J+1)+F(I+1,J+1)              +F(I-1,J-3)+F(I+1,J-3) )     +BET(5)*( F(I-1,J  )+F(I+1,J  ) )     +BET(6)*( F(I-1,J-1)+F(I+1,J-1) )     +BET(7)*( F(I-1,J-2)+F(I+1,J-2) )     +BET(8)*( F(I  ,J+1)+F(I  ,J-3) )     +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J-1) +BET(11)*F(I  ,J-2)
 
          J=NRL
-         FXY(I,J)=
-     +     ALP(1)*( F(I-2,J  )+F(I+2,J  ) )
-     +    +ALP(2)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J-3)+F(I+2,J-3)
-     +             +F(I-1,J-4)+F(I+1,J-4) )
-     +    +ALP(3)*( F(I-2,J-2)+F(I+2,J-2) )
-     +    +ALP(4)*( F(I-2,J-4)+F(I+2,J-4) )
-     +    +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )
-     +    +ALP(6)*( F(I-1,J-1)+F(I+1,J-1)+F(I-1,J-3)+F(I+1,J-3) )
-     +    +ALP(7)*( F(I-1,J-2)+F(I+1,J-2) )
-     +    +ALP(8)*  F(I  ,J  )
-     +    +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )
-     +    +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
+         FXY(I,J)=      ALP(1)*( F(I-2,J  )+F(I+2,J  ) )     +ALP(2)*( F(I-2,J-1)+F(I+2,J-1)+F(I-2,J-3)+F(I+2,J-3)              +F(I-1,J-4)+F(I+1,J-4) )     +ALP(3)*( F(I-2,J-2)+F(I+2,J-2) )     +ALP(4)*( F(I-2,J-4)+F(I+2,J-4) )     +ALP(5)*( F(I-1,J  )+F(I+1,J  ) )     +ALP(6)*( F(I-1,J-1)+F(I+1,J-1)+F(I-1,J-3)+F(I+1,J-3) )     +ALP(7)*( F(I-1,J-2)+F(I+1,J-2) )     +ALP(8)*  F(I  ,J  )     +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )     +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
 
    20 CONTINUE
 

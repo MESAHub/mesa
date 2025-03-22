@@ -556,8 +556,7 @@
 ! _________
       do 44 i=4,nc-1
 !     do not go beyond middle (where c3-c6 overlaps o3-o6), and
-        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and.
-     $        (xcd(i-1)  >  xc(i-1))) then
+        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and.         (xcd(i-1)  >  xc(i-1))) then
       do 42 ir=l1,l1+iq
       do 43 it=k1,k1+ip
         oxdp=log10(zzz+xodp)
@@ -636,8 +635,7 @@
 ! _________
       do 144 i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
-      if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and.
-     $     (xod(i-1)  >  xo(i-1)-1.e-6)) then
+      if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and.      (xod(i-1)  >  xo(i-1)-1.e-6)) then
       do 142 ir=l1,l1+iq
       do 143 it=k1,k1+ip
       cxdp=log10(zzz+xcdp)
@@ -698,8 +696,7 @@
         end if
 
 !     lower-O part of grid: interpolate C before O
-      if(j3 < no .and. i3 <= n(m,j3) .and.
-     $       (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
+      if(j3 < no .and. i3 <= n(m,j3) .and.        (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
       do 20 ir=l1,l1+iq
       do 21 it=k1,k1+ip
       iw=0
@@ -1365,9 +1362,9 @@
       dimension GAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
       dimension BET(11)
-      DATA BET/    -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,     0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,     0.3746938776,+0.1665306122,-0.1110204082/
+      DATA BET/    -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
       dimension ALP(11)
-      DATA ALP/    -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,     0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,     0.0277551020,-0.0416326531,-0.0069387755/
+      DATA ALP/    -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
 
 
       do 20 I=3,nset-2

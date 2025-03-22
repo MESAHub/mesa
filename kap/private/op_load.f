@@ -34,14 +34,12 @@
       use op_def
       logical :: have_loaded_op = .false.
 
-
       contains
 ! *****************************************************************
       subroutine op_dload(path, cache_filename, ierr)
         implicit none
       character (len=*), intent(in) :: path, cache_filename
       integer, intent(out) :: ierr
-
 
       real :: am,amm,delp,dpack
       integer :: ios,it,ite11,ite22,ite33,itt,itte1,itte2,itte3,izz,jne,ite
@@ -302,7 +300,7 @@
 !
 !           START LOOP ON ELEMENTS
 !
-   95        read(IFL(N))JNE,EPATOM(n,itt,jnn),OPLNCK(n,itt,jnn),ORSS,            NE1P(n,itt,jnn),NE2P(n,itt,jnn),            (FIONP(NE,n,itt,jnn),NE=NE1P(n,itt,jnn),NE2P(n,itt,jnn))
+   95        read(IFL(N))JNE,EPATOM(n,itt,jnn),OPLNCK(n,itt,jnn),ORSS,   NE1P(n,itt,jnn),NE2P(n,itt,jnn),   (FIONP(NE,n,itt,jnn),NE=NE1P(n,itt,jnn),NE2P(n,itt,jnn))
              read(ifl(n))np(n,itt,jnn)
              if (np(n,itt,jnn) > 0) then
                 read(ifl(n))(nx_temp(k),y_temp(k),k=1,np(n,itt,jnn))
@@ -381,9 +379,9 @@
 610   format(10x,'Done IT= ',i3)
 1004  WRITE(6,6004)ZLAB(NN),TLAB
       STOP
-6001  FORMAT(//5X,'*** OP: FILE ',A3,' GIVES IZZ=',I3,    'NOT EQUAL TO IZ(',I2,')=',I2,' ***')
-6002  FORMAT(//5X,'*** OP: NTOT=',I7,' GREATER THAN nptot=',    I7,' ***')
-6003  FORMAT(//5X,'*** OP: DISCREPANCY BETWEEN DATA ON FILES ',    A3,' AND ',A3,' ***')
+6001  FORMAT(//5X,'*** OP: FILE ',A3,' GIVES IZZ=',I3,   'NOT EQUAL TO IZ(',I2,')=',I2,' ***')
+6002  FORMAT(//5X,'*** OP: NTOT=',I7,' GREATER THAN nptot=',   I7,' ***')
+6003  FORMAT(//5X,'*** OP: DISCREPANCY BETWEEN DATA ON FILES ',   A3,' AND ',A3,' ***')
 6004  FORMAT(//5X,'*** OP: ERROR OPENING FILE ',A3,A6,'  ***')
 6006  FORMAT(//5X,'OP: N=',I2,', NTOTT=',I7,', GREATER THAN NTOT=',I7)
 6007  FORMAT(/5X,'OP: N=',I2,', INT(N)=',I4)
@@ -619,7 +617,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !
       integer, intent(inout) :: ierr
       DIMENSION D(2:12)
-      DATA D/     3.5355339E-01, 5.7549910E-02, 5.7639604E-03, 4.0194942E-04,     2.0981899E-05, 8.6021311E-07, 2.8647149E-08, 7.9528315E-10,     1.8774422E-11, 3.8247505E-13, 6.8427624E-15/
+      DATA D/     3.5355339E-01, 5.7549910E-02, 5.7639604E-03, 4.0194942E-04,   2.0981899E-05, 8.6021311E-07, 2.8647149E-08, 7.9528315E-10,   1.8774422E-11, 3.8247505E-13, 6.8427624E-15/
 
       integer n,k
 

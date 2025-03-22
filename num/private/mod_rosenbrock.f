@@ -25,22 +25,17 @@
 
 ! Ernst Hairer's copyright for rodas can be found at the end of this file.
 
-
       module mod_rosenbrock
       use mod_dc_decsol
       use utils_lib
       use const_def, only: dp
       use math_lib
 
-
       logical, parameter :: dbg = .false.
-
       integer, parameter :: ns_max = 8 ! current max allowed value for number of stages
          ! okay to increase this if necessary.
 
-
       contains
-
 
       subroutine null_mas(n,am,lmas,lrpar,rpar,lipar,ipar)
          integer, intent(in) :: n, lmas, lrpar, lipar
@@ -51,276 +46,63 @@
       end subroutine null_mas
 
 
-      subroutine do_ros2(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_ros2(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 2 ! number of stages
-         call do_rodas(
-     >      ns,contro3,ros2_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro3,ros2_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_ros2
 
 
-      subroutine do_rose2(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_rose2(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 3 ! number of stages
-         call do_rodas(
-     >      ns,contro3,rose2_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro3,rose2_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_rose2
 
 
-      subroutine do_ros3p(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_ros3p(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 3 ! number of stages
-         call do_rodas(
-     >      ns,contro3,ros3p_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro3,ros3p_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_ros3p
 
 
-      subroutine do_ros3pl(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_ros3pl(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 4 ! number of stages
-         call do_rodas(
-     >      ns,contro3,ros3pl_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro3,ros3pl_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_ros3pl
 
 
-
-
-
-      subroutine do_rodas3(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_rodas3(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 4 ! number of stages
-         call do_rodas(
-     >      ns,contro3,rodas3_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro3,rodas3_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_rodas3
 
 
-      subroutine do_rodas4(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_rodas4(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 6 ! number of stages
-         call do_rodas(
-     >      ns,contro4,rodas4_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro4,rodas4_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_rodas4
 
 
-      subroutine do_rodasp(
-     >      n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_rodasp(   n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
 #include "rodas_args.dek"
          integer, parameter :: ns = 6 ! number of stages
-         call do_rodas(
-     >      ns,contro4,rodasp_coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+         call do_rodas(   ns,contro4,rodasp_coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
       end subroutine do_rodasp
 
 
-      subroutine do_rodas(
-     >      ns,contro,coeffs,n,fcn,ifcn,x,y,xend,
-     >      h,max_step_size,max_steps,
-     >      rtol,atol,itol,y_min,y_max,
-     >      jac,ijac,sjac,nzmax,isparse,
-     >      mljac_in,mujac_in,dfx,idfx,
-     >      mas,imas,mlmas,mumas,
-     >      solout,iout,
-     >      decsol, decsols, decsolblk,
-     >      lrd, rpar_decsol, lid, ipar_decsol,
-     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     >      fcn_blk_dble, jac_blk_dble,
-     >      work,lwork,iwork,liwork,
-     >      lrpar,rpar,lipar,ipar,
-     >      lout,idid)
+      subroutine do_rodas(   ns,contro,coeffs,n,fcn,ifcn,x,y,xend,   h,max_step_size,max_steps,   rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac_in,mujac_in,dfx,idfx,   mas,imas,mlmas,mumas,   solout,iout,   decsol, decsols, decsolblk,   lrd, rpar_decsol, lid, ipar_decsol,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   work,lwork,iwork,liwork,   lrpar,rpar,lipar,ipar,   lout,idid)
          implicit real(dp) (a-h,o-z)
          integer, intent(in) :: ns ! number of stages
          interface
@@ -332,12 +114,10 @@
                integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
             end function contro
-            subroutine coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+            subroutine coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
                use const_def, only: dp
                integer, intent(in) :: ns
-               real(dp), intent(inout) ::
-     >               ros_m(ns), ros_e(ns), ros_d(ns,ns), ra(ns,ns), rc(ns,ns), rd(ns,ns)
+               real(dp), intent(inout) ::                 ros_m(ns), ros_e(ns), ros_d(ns,ns), ra(ns,ns), rc(ns,ns), rd(ns,ns)
                real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
                integer, intent(out) :: ros_elo
                logical, intent(out) :: no_aux_in_error, ros_newf(ns)
@@ -521,17 +301,13 @@
       end if
       ldmas2=max(1,ldmas)
 
-      call calculate_work_sizes(
-     >      n, ns_max, ldjac, nm1, ldmas, lde, nzmax,
-     >      needed_lwork, needed_liwork, ieynew, iedy1, iedy, ieak, iefx, iecon,
-     >      iejac, iemas, iee, iesj, iesa, ieip, ieia, ieja)
+      call calculate_work_sizes(   n, ns_max, ldjac, nm1, ldmas, lde, nzmax,   needed_lwork, needed_liwork, ieynew, iedy1, iedy, ieak, iefx, iecon,   iejac, iemas, iee, iesj, iesa, ieip, ieia, ieja)
 
       if(needed_lwork > lwork)then
          ierr = 0
          call realloc_double(work,needed_lwork,ierr)
          if (ierr /= 0) then
-            write(lout,*)
-     >         ' insufficient storage for work, min. lwork=',needed_lwork
+            write(lout,*)           ' insufficient storage for work, min. lwork=',needed_lwork
             arret=.true.
          end if
       end if
@@ -540,8 +316,7 @@
          ierr = 0
          call realloc_integer(iwork,needed_liwork,ierr)
          if (ierr /= 0) then
-            write(lout,*)
-     >         ' insufficient storage for iwork, min. liwork=',needed_liwork
+            write(lout,*)           ' insufficient storage for iwork, min. liwork=',needed_liwork
             arret=.true.
          end if
       end if
@@ -560,20 +335,7 @@
       p5(1:n) => work(iedy:iedy+n-1) ! dy
 
       ip1(1:nm1) => iwork(ieip:ieip+nm1-1)
-      call roscor(
-     &   ns,contro,coeffs,n,fcn,x,y,xend,hmax,h,rtol,atol,itol,y_min,y_max,
-     &   jac,ijac,sjac,nzmax,isparse,
-     &   mljac,mujac,dfx,idfx,mas,mlmas,mumas,solout,iout,idid,nmax,
-     &   uround,meth,ijob,fac1,fac2,safe,autnms,implct,jband,pred,ldjac,
-     &   lde,ldmas2,p3,p4,p5,p1,
-     &   work(iefx:lwork),work(iejac:lwork),p2,work(iemas:lwork),
-     &   ip1,work(iecon:lwork),
-     &   decsol,decsols,decsolblk,
-     &   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     &   fcn_blk_dble, jac_blk_dble,
-     &   iwork(ieia:liwork),iwork(ieja:liwork),
-     &   work(iesj:lwork),work(iesa:lwork),lrd,rpar_decsol,lid,ipar_decsol,m1,m2,nm1,nerror,
-     &   nfcn,njac,nstep,naccpt,nrejct,ndec,nsol,lout,lrpar,rpar,lipar,ipar)
+      call roscor(     ns,contro,coeffs,n,fcn,x,y,xend,hmax,h,rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,   mljac,mujac,dfx,idfx,mas,mlmas,mumas,solout,iout,idid,nmax,   uround,meth,ijob,fac1,fac2,safe,autnms,implct,jband,pred,ldjac,   lde,ldmas2,p3,p4,p5,p1,   work(iefx:lwork),work(iejac:lwork),p2,work(iemas:lwork),   ip1,work(iecon:lwork),   decsol,decsols,decsolblk,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   iwork(ieia:liwork),iwork(ieja:liwork),   work(iesj:lwork),work(iesa:lwork),lrd,rpar_decsol,lid,ipar_decsol,m1,m2,nm1,nerror,   nfcn,njac,nstep,naccpt,nrejct,ndec,nsol,lout,lrpar,rpar,lipar,ipar)
       iwork(14)=nfcn
       iwork(15)=njac
       iwork(16)=nstep
@@ -584,19 +346,11 @@
 ! ----------- return -----------
       return
       end subroutine do_rodas
-!
 
 
-
-
-      subroutine calculate_work_sizes(
-     >      n, ns_max, ldjac, nm1, ldmas, lde, nzmax,
-     >      lwork, liwork, ieynew, iedy1, iedy, ieak, iefx, iecon,
-     >      iejac, iemas, iee, iesj, iesa, ieip, ieia, ieja)
+      subroutine calculate_work_sizes(   n, ns_max, ldjac, nm1, ldmas, lde, nzmax,   lwork, liwork, ieynew, iedy1, iedy, ieak, iefx, iecon,   iejac, iemas, iee, iesj, iesa, ieip, ieia, ieja)
          integer, intent(in) :: n, ns_max, ldjac, nm1, ldmas, lde, nzmax
-         integer, intent(out) ::
-     >      lwork, liwork, ieynew, iedy1, iedy, ieak, iefx, iecon,
-     >      iejac, iemas, iee, iesj, iesa, ieip, ieia, ieja
+         integer, intent(out) ::        lwork, liwork, ieynew, iedy1, iedy, ieak, iefx, iecon,   iejac, iemas, iee, iesj, iesa, ieip, ieia, ieja
          ieynew=21
          iedy1=ieynew+n
          iedy=iedy1+n
@@ -616,25 +370,9 @@
       end subroutine calculate_work_sizes
 
 
-
-
-
-
-!
-!
 !  ----- ... and here is the core integrator  ----------
 !
-      subroutine roscor(
-     &  ns,contro,coeffs,n,fcn,x,y,xend,hmax,h,rtol,atol,itol,y_min,y_max,
-     &  jac,ijac,sjac,nzmax,isparse,mljac,mujac,dfx,idfx,mas,mlmas,mumas,
-     &  solout,iout,idid,nmax,uround,meth,ijob,fac1,fac2,safe,autnms,implct,banded,
-     &  pred,ldjac,lde,ldmas,ynew,dy1,dy,ak1,fx,fjac,e1,fmas,ip,rwork,
-     &  decsol,decsols,decsolblk,
-     &  caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     &  fcn_blk_dble, jac_blk_dble,
-     &  ia,ja,sparse_jac,sa,
-     &  lrd,rpar_decsol,lid,ipar_decsol,m1,m2,nm1,nerror,
-     &  nfcn,njac,nstep,naccpt,nrejct,ndec,nsol,lout,lrpar,rpar,lipar,ipar)
+      subroutine roscor(    ns,contro,coeffs,n,fcn,x,y,xend,hmax,h,rtol,atol,itol,y_min,y_max,   jac,ijac,sjac,nzmax,isparse,mljac,mujac,dfx,idfx,mas,mlmas,mumas,   solout,iout,idid,nmax,uround,meth,ijob,fac1,fac2,safe,autnms,implct,banded,   pred,ldjac,lde,ldmas,ynew,dy1,dy,ak1,fx,fjac,e1,fmas,ip,rwork,   decsol,decsols,decsolblk,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   fcn_blk_dble, jac_blk_dble,   ia,ja,sparse_jac,sa,   lrd,rpar_decsol,lid,ipar_decsol,m1,m2,nm1,nerror,   nfcn,njac,nstep,naccpt,nrejct,ndec,nsol,lout,lrpar,rpar,lipar,ipar)
 ! ----------------------------------------------------------
 !     core integrator for rodas4
 !     parameters same as in rodas4 with workspace added
@@ -642,8 +380,7 @@
 !         declarations
 ! ----------------------------------------------------------
       implicit real(dp) (a-h,o-z)
-      integer :: n, itol, ijac, isparse, mljac, mujac, idfx, mlmas, mumas, iout, idid, nmax, meth, ijob,
-     &           ldjac, lde, ldmas, m1, m2, nm1, nerror, nfcn, njac, nstep, naccpt, nrejct, ndec, nsol, lout
+      integer :: n, itol, ijac, isparse, mljac, mujac, idfx, mlmas, mumas, iout, idid, nmax, meth, ijob,   ldjac, lde, ldmas, m1, m2, nm1, nerror, nfcn, njac, nstep, naccpt, nrejct, ndec, nsol, lout
        interface
          real(dp) function contro(i,x,rwork,iwork,ierr)
             use const_def, only: dp
@@ -653,8 +390,7 @@
             integer, intent(inout), target :: iwork(*)
             integer, intent(out) :: ierr
          end function contro
-         subroutine coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+         subroutine coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
             use const_def, only: dp
             implicit none
             integer, intent(in) :: ns
@@ -740,8 +476,7 @@
 ! ------- compute mass matrix for implicit case ----------
       if (implct) call mas (nm1,fmas,ldmas,lrpar,rpar,lipar,ipar)
 ! ------ set the parameters of the method -----
-      call coeffs(ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                     ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      call coeffs(ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
       gamma = ros_gamma(1)
       if (ns >=3) then
          rd32 = rd(3,2)
@@ -811,7 +546,7 @@
             call fcn_blk_dble(n,caller_id,nvar,nz,x,h,y,dy1,lrpar,rpar,lipar,ipar,ierr)
          else
             call fcn(n,x,h,y,dy1,lrpar,rpar,lipar,ipar,ierr)
-         endif
+         end if
          if (ierr /= 0) goto 180
          nfcn=nfcn+1
 ! --- compute jacobian matrix numerically
@@ -833,7 +568,7 @@
                      call fcn_blk_dble(n,caller_id,nvar,nz,x,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
                   else
                      call fcn(n,x,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
-                  endif
+                  end if
 
                   if (ierr /= 0) goto 180
                   j=k+(mm-1)*m2
@@ -862,7 +597,7 @@
                   call fcn_blk_dble(n,caller_id,nvar,nz,x,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
                else
                   call fcn(n,x,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
-               endif
+               end if
 
                if (ierr /= 0) goto 180
                do j=m1+1,n
@@ -880,7 +615,7 @@
                call jac_blk_dble(n,caller_id,nvar,nz,x,h,y,dy1,uf_lblk,uf_dblk,uf_ublk,lrpar,rpar,lipar,ipar,ierr)
             else
                call jac(n,x,h,y,dy1,fjac,ldjac,lrpar,rpar,lipar,ipar,ierr)
-            endif
+            end if
 
             if (dbg) write(*,11) 'jac dy1(:)', dy1(1:min(4,n))
          else
@@ -898,7 +633,7 @@
                call fcn_blk_dble(n,caller_id,nvar,nz,xdelt,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
             else
                call fcn(n,xdelt,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
-            endif
+            end if
 
             if (ierr /= 0) goto 180
             do j=1,n
@@ -918,19 +653,9 @@
 ! *** *** *** *** *** *** ***
       fac=1.d0/(h*gamma)
       if (need_free) then
-         call decsol_done(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,
-     &            m1,m2,nm1,fac,e1,lde,ip,ak1,ier,ijob,implct,ip,
-     &            mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
-     &            decsol,decsols,decsolblk,
-     &            caller_id, nvar, nz, lblk, dblk, ublk,
-     &            sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
+         call decsol_done(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,   m1,m2,nm1,fac,e1,lde,ip,ak1,ier,ijob,implct,ip,   mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,   decsol,decsols,decsolblk,   caller_id, nvar, nz, lblk, dblk, ublk,   sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
       end if
-      call decomr(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,
-     &            m1,m2,nm1,fac,e1,lde,ip,ak1,ier,ijob,implct,ip,
-     &            mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
-     &            decsol,decsols,decsolblk,
-     &            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     &            sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
+      call decomr(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,   m1,m2,nm1,fac,e1,lde,ip,ak1,ier,ijob,implct,ip,   mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,   decsol,decsols,decsolblk,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
       need_free = .true.
       if (ier /= 0) goto 80
       if (dbg .and. .false.) then
@@ -976,8 +701,7 @@
                do j=1,n
                   ynew(j) = y(j) + sum(ra(is,1:is-1)*ak(j,1:is-1))
                   if (ynew(j) < y_min .or. ynew(j) > y_max) then
-                     if (dbg) write(*,*) 'stage ynew(j) < y_min .or. ynew(j) > y_max',
-     >                     is, j, ynew(j), y(j), sum(ra(is,1:is-1)*ak(j,1:is-1))
+                     if (dbg) write(*,*) 'stage ynew(j) < y_min .or. ynew(j) > y_max',   is, j, ynew(j), y(j), sum(ra(is,1:is-1)*ak(j,1:is-1))
                      goto 82
                   end if
                end do
@@ -987,7 +711,7 @@
                   call fcn_blk_dble(n,caller_id,nvar,nz,x+ros_alpha(is)*h,h,ynew,dy,lrpar,rpar,lipar,ipar,ierr)
                else
                   call fcn(n,x+ros_alpha(is)*h,h,ynew,dy,lrpar,rpar,lipar,ipar,ierr)
-               endif
+               end if
 
                if (dbg) write(*,11) 'fcn dy(:)', dy(1:min(4,n))
                if (ierr /= 0) goto 81
@@ -1004,12 +728,7 @@
             not_stage1 = .true.
          end if
          p1(1:n) => ak1(1+(is-1)*n:n*is)
-         call slvrod(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
-     &      m1,m2,nm1,fac,e1,lde,ip,dy,p1,fx,cont,hd(is),ijob,not_stage1,
-     &      mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
-     &      decsol,decsols,decsolblk,
-     &      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
-     &      nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol,ierr)
+         call slvrod(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,   m1,m2,nm1,fac,e1,lde,ip,dy,p1,fx,cont,hd(is),ijob,not_stage1,   mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,   decsol,decsols,decsolblk,   caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,   nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol,ierr)
          if (ierr /= 0) goto 81
          if (dbg) write(*,11) 'ak(:,is)', ak(1,is), ak(2,is), ak(min(3,n),is), ak(min(4,n),is)
          if (dbg) write(*,*)
@@ -1071,7 +790,6 @@
 ! --- we require .2<=hnew/h<=6.
       eloi = 1d0/ros_elo ! inverse of estimated local order
       fac=max(fac2,min(fac1,pow(err,eloi)/safe))
-
 
 
       if (minval(ynew(1:n)) < y_min) then
@@ -1211,12 +929,7 @@
 
       if (need_free) then
          p1(1:n) => ak(1:n,1)
-         call decsol_done(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,
-     &            m1,m2,nm1,fac,e1,lde,ip,p1,ier,ijob,implct,ip,
-     &            mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
-     &            decsol,decsols,decsolblk,
-     &            caller_id, nvar, nz, lblk, dblk, ublk,
-     &            sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
+         call decsol_done(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,   m1,m2,nm1,fac,e1,lde,ip,p1,ier,ijob,implct,ip,   mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,   decsol,decsols,decsolblk,   caller_id, nvar, nz, lblk, dblk, ublk,   sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
       end if
 
       return
@@ -1224,8 +937,7 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine ros2_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine ros2_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 
 !       Rosenbrock Method "ROS2"
 !       CWI, MAS-R9717
@@ -1281,8 +993,7 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine rose2_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine rose2_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 
 !       Rosenbrock Method "ROSE2"
 !       Shampine & Reichelt, SIAM J Sci. Comput., 18, (1997) 1-22.
@@ -1356,8 +1067,7 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine ros3p_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &               ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine ros3p_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 !       Rosenbrock Method "ROS3P"
@@ -1422,10 +1132,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine ros3pl_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &               ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine ros3pl_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ! --- a stiffly-stable method for parabolic equations; 4 stages, order 3, 3 function evaluations.
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1508,8 +1216,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine rodas3_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine rodas3_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ! --- a stiffly-stable method; 4 stages, order 3, 3 function evaluations.
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1578,8 +1285,7 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine rodas4_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                 ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine rodas4_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,   ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !     stiffly-stable rosenbrock method of order 4, with 6 stages
 !
@@ -1592,8 +1298,7 @@
 
       implicit none
       integer, intent(in) :: ns
-      real(dp), intent(inout) ::
-     >      ros_m(ns), ros_e(ns), ros_d(ns,ns), ra(ns,ns), rc(ns,ns), rd(ns,ns)
+      real(dp), intent(inout) ::        ros_m(ns), ros_e(ns), ros_d(ns,ns), ra(ns,ns), rc(ns,ns), rd(ns,ns)
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
@@ -1696,8 +1401,7 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      subroutine rodasp_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                 ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+      subroutine rodasp_coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !     stiffly-stable rosenbrock method of order 4, with 6 stages
 !     for parabolic equations (G.Steinbach,1993).
@@ -1811,7 +1515,6 @@
       end subroutine rodasp_coeffs
 
 
-
       ! continuous output routines
 
 
@@ -1862,7 +1565,6 @@
       end function contro4
 
       end module mod_rosenbrock
-
 
 ! copyright (c) 2004, ernst hairer
 

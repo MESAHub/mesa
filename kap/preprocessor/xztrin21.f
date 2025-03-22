@@ -299,7 +299,6 @@
       if((slr  <  alr (1)).or.(slr  >  alr(nre))) GOTO 62
 
 
-
       if (izi  ==  0) then  ! freeze table indices
         ilo=2
         ihi=mx
@@ -490,9 +489,7 @@
 !                  with a return
       stop
    62 write(*,'(" T6/LogR outside of table range")')
-!     write(*,'("slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,
-!    x nta(i+1)",6e12.5,4i5)') slt,alt(1),alt(nt),slr,alr(1),
-!    x alr(nre),l3s,i,k3s,nta(i+1)
+!     write(*,'("slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,nta(i+1)",6e12.5,4i5)') slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,nta(i+1)
 !                  with a return
       stop
    64 write(*,'(" X not equal to zero: To run this case it is necessary"/ "to recompile with parameter (mx=1)")')
@@ -628,7 +625,6 @@
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
-
 
 
         if (itimeco  /=  12345678) then
@@ -1198,9 +1194,9 @@
       dimension GAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,+0.1175510204,+0.1665306122,+0.2359183673/
       dimension BET(11)
-      DATA BET/    -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,     0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,     0.3746938776,+0.1665306122,-0.1110204082/
+      DATA BET/    -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,   0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,   0.3746938776,+0.1665306122,-0.1110204082/
       dimension ALP(11)
-      DATA ALP/    -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,     0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,     0.0277551020,-0.0416326531,-0.0069387755/
+      DATA ALP/    -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,   0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,   0.0277551020,-0.0416326531,-0.0069387755/
 
 
       do 20 I=3,nset-2
