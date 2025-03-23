@@ -504,16 +504,16 @@ contains
          include 'num_root_fcn.dek'  ! f provides function values
       end interface
 
-      real(dp) a
-      real(dp) b
-      real(dp) fa
-      real(dp) fb
-      real(dp) fz
-      real(dp) machep
-      real(dp) t
-      character(len=*) title
-      real(dp) z
-      real(dp) dfdx
+      real(dp) :: a
+      real(dp) :: b
+      real(dp) :: fa
+      real(dp) :: fb
+      real(dp) :: fz
+      real(dp) :: machep
+      real(dp) :: t
+      character(len=*) :: title
+      real(dp) :: z
+      real(dp) :: dfdx
 
       integer, parameter :: lrpar = 0, lipar = 0
       integer :: ierr
