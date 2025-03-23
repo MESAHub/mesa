@@ -161,7 +161,8 @@ program test_turb
    end subroutine compare_TDC_and_Cox_MLT
 
    subroutine check_TDC()
-      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
+      real(dp) :: mixing_length_alpha, conv_vel_start
+      real(dp) :: alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D

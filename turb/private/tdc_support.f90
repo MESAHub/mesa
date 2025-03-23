@@ -277,7 +277,8 @@ contains
          ! We only ever call this when Y < 0.
          ! In this regime, dQ/dZ can take on either sign, and has at most one stationary point.
 
-         if (info%report) write(*,*) 'Bisecting dQdZ. Z, dQdZ, Z_lb, dQdZ_lb, Z_ub, dQdZ_ub', Z%val, dQdZ%val, lower_bound_Z%val, dQdZ_lb%val, upper_bound_Z%val, dQdZ_ub%val
+         if (info%report) write(*,*) 'Bisecting dQdZ. Z, dQdZ, Z_lb, dQdZ_lb, Z_ub, dQdZ_ub', &
+                                      Z%val, dQdZ%val, lower_bound_Z%val, dQdZ_lb%val, upper_bound_Z%val, dQdZ_ub%val
 
          if (dQdZ > 0d0 .and. dQdZ_ub > 0d0) then
             upper_bound_Z = Z

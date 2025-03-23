@@ -1623,7 +1623,8 @@ module auto_diff_real_2var_order2_module
       binary%d1val1 = q0*q4
       binary%d1val2 = q0*q5
       binary%d2val1 = q6*(q7*y%d2val1 + x%val*(2.0_dp*x%d1val1*y%d1val1 + x%d2val1*y%val) - y%val*pow2(x%d1val1) + pow2(q4))
-      binary%d1val1_d1val2 = (-q1*x%d1val2 + q4*q5 + q7*y%d1val1_d1val2 + x%val*(x%d1val1*y%d1val2 + x%d1val1_d1val2*y%val + x%d1val2*y%d1val1))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
+      binary%d1val1_d1val2 = (-q1*x%d1val2 + q4*q5 + q7*y%d1val1_d1val2 + x%val*(x%d1val1*y%d1val2 + x%d1val1_d1val2*y%val &
+                              + x%d1val2*y%d1val1))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
       binary%d2val2 = q6*(q7*y%d2val2 + x%val*(2.0_dp*x%d1val2*y%d1val2 + x%d2val2*y%val) - y%val*pow2(x%d1val2) + pow2(q5))
    end function pow_self
 

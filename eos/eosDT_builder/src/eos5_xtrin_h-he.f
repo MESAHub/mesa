@@ -266,7 +266,7 @@
 
       is=0
 
-c__________
+!__________
       do ir=l1,l1+iq
         do it=k1,k1+ip
         epl(m,it,ir)=xz(m,iv,it,ir)
@@ -375,7 +375,7 @@ c__________
       parameter (mx=6,mv=12,nr=169,nt=197)
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
-      common/aeos_hhe/  xz(mx,mv,nt,nr), t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos_hhe/ xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos_hhe/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos_hhe/esact,eos(mv)
 
@@ -488,7 +488,7 @@ c__________
       end if
       read(2,'(a)') blank
       read(2,'(a)') blank
-      if (icycuse(m,jcs)  <  nta(jcs)) then
+      if (icycuse(m,jcs) < nta(jcs)) then
 !         write (*,'("problem with data files: X=",f6.4," density=",e14.4)') xin(m), rhogr(m,jcs)
          write (*,*) 'problem with ', filename
          write (*,*) 'm', m
@@ -504,7 +504,8 @@ c__________
          GOTO 4
       end if
       ! change to read mu_M and logNe as part of xz table
-      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),(xz(m,index(iv),i,jcs),iv=1,9)
+      read (2,'(f11.6,1x,f6.4,e11.4,2e13.6,2e11.3,5f10.6)') 
+     <         t6list(jcs,i),(xz(m,index(iv),i,jcs),iv=10,11),(xz(m,index(iv),i,jcs),iv=1,9)
 !       t6list(jcs,i),amu_M(jcs,i),alogNe(jcs,j),
 !       (xz(m,index(iv),i,jcs),iv=1,9)
     4 continue
@@ -548,7 +549,8 @@ c__________
       common/eeos_hhe/esact,eos(mv)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
 
-      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, unitfold/0.965296/, c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
+      data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, unitfold/0.965296/, 
+     <     c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
 cPhysical constants
 !       Na=6.0221367e+23
@@ -633,13 +635,17 @@ cPhysical constants
       ! for EOS5_xtrin_H_He
       parameter (mx_hhe=6,mv_hhe=12,nr_hhe=169,nt_hhe=197)
       common/aaeos_hhe/ q_hhe(4),h_hhe(4),xxh_hhe
-      common/aeos_hhe/  xz_hhe(mx_hhe,mv_hhe,nt_hhe,nr_hhe),t6list_hhe(nr_hhe,nt_hhe),rho_hhe(nr_hhe),t6a_hhe(nt_hhe),esk_hhe(nt_hhe,nr_hhe),esk2_hhe(nt_hhe,nr_hhe),dfsx_hhe(mx_hhe),dfs_hhe(nt_hhe),dfsr_hhe(nr_hhe),m_hhe,mf_hhe,xa_hhe(mx_hhe)
+      common/aeos_hhe/  xz_hhe(mx_hhe,mv_hhe,nt_hhe,nr_hhe),t6list_hhe(nr_hhe,nt_hhe),rho_hhe(nr_hhe),
+     <                  t6a_hhe(nt_hhe),esk_hhe(nt_hhe,nr_hhe),esk2_hhe(nt_hhe,nr_hhe),
+     <                  dfsx_hhe(mx_hhe),dfs_hhe(nt_hhe),dfsr_hhe(nr_hhe),m_hhe,mf_hhe,xa_hhe(mx_hhe)
       common/beos_hhe/ iri_hhe(mv_hhe),index_hhe(mv_hhe),nta_hhe(nr_hhe),zz_hhe(mx_hhe)
 
       data (xa_hhe(i),i=1,mx_hhe)/0.0,0.2,0.4,0.6,0.8,1.0/
 
       data (index_hhe(i),i=1,mv_hhe)/1,2,3,4,5,6,7,8,9,10,11,12/
-      data (nta_hhe(i),i=1,nr_hhe)/92*197,196,194,190,2*189,3*187,2*159,133,125,123,122,120,115,113,107,102,95,87,83,74,69,67,62,56,54,52,51,3*50,2*49,26*48,47,45,43,42,41,39,37,36,35,34,32,31,30,29,27,26/
+      data (nta_hhe(i),i=1,nr_hhe)/92*197,196,194,190,2*189,3*187,2*159,133,125,123,122,120,115,113,
+     <                             107,102,95,87,83,74,69,67,62,56,54,52,51,
+     <                             3*50,2*49,26*48,47,45,43,42,41,39,37,36,35,34,32,31,30,29,27,26/
 
 
       ! for opal_core
@@ -650,6 +656,7 @@ cPhysical constants
       data (xa(i),i=1,mx)/0.0,0.2,0.4,0.6,0.8/
 
       data (index(i),i=1,mv)/1,2,3,4,5,6,7,8,9,10,11,12/
-      data (nta(i),i=1,nr)/87*197,7*191,190,2*189,185,179,170,2*149,133,125,123,122,120,115,113,107,102,2*80,72,68,66,64,62,56,54,52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,29,27,26/
+      data (nta(i),i=1,nr)/87*197,7*191,190,2*189,185,179,170,2*149,133,125,123,122,120,115,113,107,102,
+     <                     2*80,72,68,66,64,62,56,54,52,51,2*50,49,47,2*45,43,42,28*40,39,37,36,35,34,32,31,30,29,27,26/
 
       end

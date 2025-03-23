@@ -232,7 +232,8 @@
 
          do l = 1, 3
             do i = 1, nl(l)
-               test_freq(l,i) = model_freq(l,i) + target_s0*nu_max*(1d0-1d0/(1d0+pow(model_freq(l,i)/nu_max, target_s1)))*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
+               test_freq(l,i) = model_freq(l,i) + &
+                                target_s0*nu_max*(1d0-1d0/(1d0+pow(model_freq(l,i)/nu_max, target_s1)))*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
             end do
          end do
 

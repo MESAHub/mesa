@@ -95,7 +95,8 @@ module turb
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
       use tdc
       use tdc_support
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt
+      real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
       logical, intent(in) :: report
@@ -153,7 +154,8 @@ module turb
          ! L = L0 * (gradL + Y) + c0 * Af * Y_env
          ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
          ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
-         Y_face = unconvert(info%L - info%L0 * info%gradL) / (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
+         Y_face = unconvert(info%L - info%L0 * info%gradL) / &
+            (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
       end if
 
       ! Unpack output
@@ -211,7 +213,9 @@ module turb
 
    !> Calculates the outputs of convective mixing length theory.
    !!
-   !! @param MLT_option A string specifying which MLT option to use. Currently supported are Cox, Henyey, ML1, ML2, Mihalas. Note that 'TDC' is also a valid input and will return the Cox result. This is for use when falling back from TDC -> MLT, as Cox is the most-similar prescription to TDC.
+   !! @param MLT_option A string specifying which MLT option to use. Currently supported are Cox, Henyey, ML1, ML2, Mihalas.
+   !!                   Note that 'TDC' is also a valid input and will return the Cox result.
+   !!                   This is for use when falling back from TDC -> MLT, as Cox is the most-similar prescription to TDC.
    !! @param mixing_length_alpha The mixing length parameter.
    !! @param Henyey_MLT_nu_param The nu parameter in Henyey's MLT prescription.
    !! @param Henyey_MLT_y_param The y parameter in Henyey's MLT prescription.
