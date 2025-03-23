@@ -103,20 +103,20 @@
 !     ..
 ! Preliminary processing
 ! Error check
-      if (NXD.LE.1) GOTO 40
-      if (NYD.LE.1) GOTO 50
+      if (NXD <= 1) GOTO 40
+      if (NYD <= 1) GOTO 50
       do 10 IX = 2,NXD
-          if (XD(IX).LE.XD(IX-1)) GOTO 60
+          if (XD(IX) <= XD(IX-1)) GOTO 60
    10 continue
       do 20 IY = 2,NYD
-          if (YD(IY).LE.YD(IY-1)) GOTO 70
+          if (YD(IY) <= YD(IY-1)) GOTO 70
    20 continue
-      if (NIP.LE.0) GOTO 80
+      if (NIP <= 0) GOTO 80
       IER = 0
 ! Calculation
 ! Estimates partial derivatives at all input-grid data points
 ! (for MD=1).
-      if (MD.NE.2) THEN
+      if (MD /= 2) THEN
           CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, WK)
 !         CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
       end if
@@ -275,21 +275,21 @@
 !     ..
 ! Preliminary processing
 ! Error check
-      if (NXD.LE.1) GOTO 60
-      if (NYD.LE.1) GOTO 70
+      if (NXD <= 1) GOTO 60
+      if (NYD <= 1) GOTO 70
       do 10 IX = 2,NXD
-          if (XD(IX).LE.XD(IX-1)) GOTO 80
+          if (XD(IX) <= XD(IX-1)) GOTO 80
    10 continue
       do 20 IY = 2,NYD
-          if (YD(IY).LE.YD(IY-1)) GOTO 90
+          if (YD(IY) <= YD(IY-1)) GOTO 90
    20 continue
-      if (NXI.LE.0) GOTO 100
-      if (NYI.LE.0) GOTO 110
+      if (NXI <= 0) GOTO 100
+      if (NYI <= 0) GOTO 110
       IER = 0
 ! Calculation
 ! Estimates partial derivatives at all input-grid data points
 ! (for MD=1).
-      if (MD.NE.2) THEN
+      if (MD /= 2) THEN
           CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, WK)
 !         CALL RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
       end if
@@ -450,23 +450,23 @@
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  if ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
-     +                (IX1.GT.NX0) .OR. (IX2.GT.NX0) .OR.
-     +                (IX3.GT.NX0)) GOTO 10
+                  if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR.
+     +                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
+     +                (IX3 > NX0)) GOTO 10
 ! Selects and/or supplements the x and z values.
                   X1 = XD(IX1) - X0
                   Z10 = ZD(IX1,IY0)
-                  if (NXD.GE.4) THEN
+                  if (NXD >= 4) THEN
                       X2 = XD(IX2) - X0
                       X3 = XD(IX3) - X0
                       Z20 = ZD(IX2,IY0)
                       Z30 = ZD(IX3,IY0)
-                  else if (NXD.EQ.3) THEN
+                  else if (NXD == 3) THEN
                       X2 = XD(IX2) - X0
                       Z20 = ZD(IX2,IY0)
                       X3 = 2*XD(3) - XD(2) - X0
                       Z30 = Z3F(X1,X2,X3,Z00,Z10,Z20)
-                  else if (NXD.EQ.2) THEN
+                  else if (NXD == 2) THEN
                       X2 = 2*XD(2) - XD(1) - X0
                       Z20 = Z2F(X1,X2,Z00,Z10)
                       X3 = 2*XD(1) - XD(2) - X0
@@ -501,7 +501,7 @@
                   EPSLN = (Z00**2+Z10**2+Z20**2+Z30**2)*1.0E-12
 ! Accumulates the weighted primary estimates of zx and their
 ! weights.
-                  if (VOLF.GT.EPSLN) THEN
+                  if (VOLF > EPSLN) THEN
 ! - For a finite weight.
                       WT = 1.0/ (VOLF*DISF)
                       SMPEF = SMPEF + WT*PEZX
@@ -527,7 +527,7 @@
                   B10A(IPEX) = B10
    10         continue
 ! Calculates the final estimate of zx.
-              if (SMWTI.LT.0.5) THEN
+              if (SMWTI < 0.5) THEN
 ! - When no infinite weights exist.
                   ZXDI = SMPEF/SMWTF
               ELSE
@@ -547,23 +547,23 @@
                   IY1 = IY0 + IDLT(1,IPEY)
                   IY2 = IY0 + IDLT(2,IPEY)
                   IY3 = IY0 + IDLT(3,IPEY)
-                  if ((IY1.LT.1) .OR. (IY2.LT.1) .OR. (IY3.LT.1) .OR.
-     +                (IY1.GT.NY0) .OR. (IY2.GT.NY0) .OR.
-     +                (IY3.GT.NY0)) GOTO 20
+                  if ((IY1 < 1) .OR. (IY2 < 1) .OR. (IY3 < 1) .OR.
+     +                (IY1 > NY0) .OR. (IY2 > NY0) .OR.
+     +                (IY3 > NY0)) GOTO 20
 ! Selects and/or supplements the y and z values.
                   Y1 = YD(IY1) - Y0
                   Z01 = ZD(IX0,IY1)
-                  if (NYD.GE.4) THEN
+                  if (NYD >= 4) THEN
                       Y2 = YD(IY2) - Y0
                       Y3 = YD(IY3) - Y0
                       Z02 = ZD(IX0,IY2)
                       Z03 = ZD(IX0,IY3)
-                  else if (NYD.EQ.3) THEN
+                  else if (NYD == 3) THEN
                       Y2 = YD(IY2) - Y0
                       Z02 = ZD(IX0,IY2)
                       Y3 = 2*YD(3) - YD(2) - Y0
                       Z03 = Z3F(Y1,Y2,Y3,Z00,Z01,Z02)
-                  else if (NYD.EQ.2) THEN
+                  else if (NYD == 2) THEN
                       Y2 = 2*YD(2) - YD(1) - Y0
                       Z02 = Z2F(Y1,Y2,Z00,Z01)
                       Y3 = 2*YD(1) - YD(2) - Y0
@@ -598,7 +598,7 @@
                   EPSLN = (Z00**2+Z01**2+Z02**2+Z03**2)*1.0E-12
 ! Accumulates the weighted primary estimates of zy and their
 ! weights.
-                  if (VOLF.GT.EPSLN) THEN
+                  if (VOLF > EPSLN) THEN
 ! - For a finite weight.
                       WT = 1.0/ (VOLF*DISF)
                       SMPEF = SMPEF + WT*PEZY
@@ -624,7 +624,7 @@
                   B01A(IPEY) = B01
    20         continue
 ! Calculates the final estimate of zy.
-              if (SMWTI.LT.0.5) THEN
+              if (SMWTI < 0.5) THEN
 ! - When no infinite weights exist.
                   ZYDI = SMPEF/SMWTF
               ELSE
@@ -644,9 +644,9 @@
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  if ((IX1.LT.1) .OR. (IX2.LT.1) .OR. (IX3.LT.1) .OR.
-     +                (IX1.GT.NX0) .OR. (IX2.GT.NX0) .OR.
-     +                (IX3.GT.NX0)) GOTO 40
+                  if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR.
+     +                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
+     +                (IX3 > NX0)) GOTO 40
 ! Retrieves the necessary values for estimating zxy in the x
 ! direction.
                   X1 = XA(1,IPEX)
@@ -668,9 +668,9 @@
                       IY1 = IY0 + IDLT(1,IPEY)
                       IY2 = IY0 + IDLT(2,IPEY)
                       IY3 = IY0 + IDLT(3,IPEY)
-                      if ((IY1.LT.1) .OR. (IY2.LT.1) .OR.
-     +                    (IY3.LT.1) .OR. (IY1.GT.NY0) .OR.
-     +                    (IY2.GT.NY0) .OR. (IY3.GT.NY0)) GOTO 30
+                      if ((IY1 < 1) .OR. (IY2 < 1) .OR.
+     +                    (IY3 < 1) .OR. (IY1 > NY0) .OR.
+     +                    (IY2 > NY0) .OR. (IY3 > NY0)) GOTO 30
 ! Retrieves the necessary values for estimating zxy in the y
 ! direction.
                       Y1 = YA(1,IPEY)
@@ -687,25 +687,25 @@
                       B00Y = B00YA(IPEY)
                       B01 = B01A(IPEY)
 ! Selects and/or supplements the z values.
-                      if (NYD.GE.4) THEN
+                      if (NYD >= 4) THEN
                           Z11 = ZD(IX1,IY1)
                           Z12 = ZD(IX1,IY2)
                           Z13 = ZD(IX1,IY3)
-                          if (NXD.GE.4) THEN
+                          if (NXD >= 4) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z23 = ZD(IX2,IY3)
                               Z31 = ZD(IX3,IY1)
                               Z32 = ZD(IX3,IY2)
                               Z33 = ZD(IX3,IY3)
-                          else if (NXD.EQ.3) THEN
+                          else if (NXD == 3) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z23 = ZD(IX2,IY3)
                               Z31 = Z3F(X1,X2,X3,Z01,Z11,Z21)
                               Z32 = Z3F(X1,X2,X3,Z02,Z12,Z22)
                               Z33 = Z3F(X1,X2,X3,Z03,Z13,Z23)
-                          else if (NXD.EQ.2) THEN
+                          else if (NXD == 2) THEN
                               Z21 = Z2F(X1,X2,Z01,Z11)
                               Z22 = Z2F(X1,X2,Z02,Z12)
                               Z23 = Z2F(X1,X2,Z03,Z13)
@@ -713,21 +713,21 @@
                               Z32 = Z2F(X1,X3,Z02,Z12)
                               Z33 = Z2F(X1,X3,Z03,Z13)
                           end if
-                      else if (NYD.EQ.3) THEN
+                      else if (NYD == 3) THEN
                           Z11 = ZD(IX1,IY1)
                           Z12 = ZD(IX1,IY2)
                           Z13 = Z3F(Y1,Y2,Y3,Z10,Z11,Z12)
-                          if (NXD.GE.4) THEN
+                          if (NXD >= 4) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z31 = ZD(IX3,IY1)
                               Z32 = ZD(IX3,IY2)
-                          else if (NXD.EQ.3) THEN
+                          else if (NXD == 3) THEN
                               Z21 = ZD(IX2,IY1)
                               Z22 = ZD(IX2,IY2)
                               Z31 = Z3F(X1,X2,X3,Z01,Z11,Z21)
                               Z32 = Z3F(X1,X2,X3,Z02,Z12,Z22)
-                          else if (NXD.EQ.2) THEN
+                          else if (NXD == 2) THEN
                               Z21 = Z2F(X1,X2,Z01,Z11)
                               Z22 = Z2F(X1,X2,Z02,Z12)
                               Z31 = Z2F(X1,X3,Z01,Z11)
@@ -735,17 +735,17 @@
                           end if
                           Z23 = Z3F(Y1,Y2,Y3,Z20,Z21,Z22)
                           Z33 = Z3F(Y1,Y2,Y3,Z30,Z31,Z32)
-                      else if (NYD.EQ.2) THEN
+                      else if (NYD == 2) THEN
                           Z11 = ZD(IX1,IY1)
                           Z12 = Z2F(Y1,Y2,Z10,Z11)
                           Z13 = Z2F(Y1,Y3,Z10,Z11)
-                          if (NXD.GE.4) THEN
+                          if (NXD >= 4) THEN
                               Z21 = ZD(IX2,IY1)
                               Z31 = ZD(IX3,IY1)
-                          else if (NXD.EQ.3) THEN
+                          else if (NXD == 3) THEN
                               Z21 = ZD(IX2,IY1)
                               Z31 = Z3F(X1,X2,X3,Z01,Z11,Z21)
-                          else if (NXD.EQ.2) THEN
+                          else if (NXD == 2) THEN
                               Z21 = Z2F(X1,X2,Z01,Z11)
                               Z31 = Z2F(X1,X3,Z01,Z11)
                           end if
@@ -807,7 +807,7 @@
      +                        1.0E-12
 ! Accumulates the weighted primary estimates of zxy and their
 ! weights.
-                      if (VOLF.GT.EPSLN) THEN
+                      if (VOLF > EPSLN) THEN
 ! - For a finite weight.
                           WT = 1.0/ (VOLF*DISF)
                           SMPEF = SMPEF + WT*PEZXY
@@ -820,7 +820,7 @@
    30             continue
    40         continue
 ! Calculates the final estimate of zxy.
-              if (SMWTI.LT.0.5) THEN
+              if (SMWTI < 0.5) THEN
 ! - When no infinite weights exist.
                   ZXYDI = SMPEF/SMWTF
               ELSE
@@ -897,36 +897,36 @@
           YII = YI(IIP)
 ! Checks if the x coordinate of the IIPth output point, XII, is
 ! in a new interval.  (NINTX is the new-interval flag.)
-          if (IIP.EQ.1) THEN
+          if (IIP == 1) THEN
               NINTX = 1
           ELSE
               NINTX = 0
-              if (IXD.EQ.0) THEN
-                  if (XII.GT.XD(1)) NINTX = 1
-              else if (IXD.LT.NXD) THEN
-                  if ((XII.LT.XD(IXD)) .OR.
-     +                (XII.GT.XD(IXD+1))) NINTX = 1
+              if (IXD == 0) THEN
+                  if (XII > XD(1)) NINTX = 1
+              else if (IXD < NXD) THEN
+                  if ((XII < XD(IXD)) .OR.
+     +                (XII > XD(IXD+1))) NINTX = 1
               ELSE
-                  if (XII.LT.XD(NXD)) NINTX = 1
+                  if (XII < XD(NXD)) NINTX = 1
               end if
           end if
 ! Locates the output point by binary search if XII is in a new
 ! interval.  Determines IXD for which XII lies between XD(IXD)
 ! and XD(IXD+1).
-          if (NINTX.EQ.1) THEN
-              if (XII.LE.XD(1)) THEN
+          if (NINTX == 1) THEN
+              if (XII <= XD(1)) THEN
                   IXD = 0
-              else if (XII.LT.XD(NXD)) THEN
+              else if (XII < XD(NXD)) THEN
                   IMN = 1
                   IMX = NXD
                   IMD = (IMN+IMX)/2
-   10             if (XII.GE.XD(IMD)) THEN
+   10             if (XII >= XD(IMD)) THEN
                       IMN = IMD
                   ELSE
                       IMX = IMD
                   end if
                   IMD = (IMN+IMX)/2
-                  if (IMD.GT.IMN) GOTO 10
+                  if (IMD > IMN) GOTO 10
                   IXD = IMD
               ELSE
                   IXD = NXD
@@ -935,36 +935,36 @@
           INXI(IIP) = IXD
 ! Checks if the y coordinate of the IIPth output point, YII, is
 ! in a new interval.  (NINTY is the new-interval flag.)
-          if (IIP.EQ.1) THEN
+          if (IIP == 1) THEN
               NINTY = 1
           ELSE
               NINTY = 0
-              if (IYD.EQ.0) THEN
-                  if (YII.GT.YD(1)) NINTY = 1
-              else if (IYD.LT.NYD) THEN
-                  if ((YII.LT.YD(IYD)) .OR.
-     +                (YII.GT.YD(IYD+1))) NINTY = 1
+              if (IYD == 0) THEN
+                  if (YII > YD(1)) NINTY = 1
+              else if (IYD < NYD) THEN
+                  if ((YII < YD(IYD)) .OR.
+     +                (YII > YD(IYD+1))) NINTY = 1
               ELSE
-                  if (YII.LT.YD(NYD)) NINTY = 1
+                  if (YII < YD(NYD)) NINTY = 1
               end if
           end if
 ! Locates the output point by binary search if YII is in a new
 ! interval.  Determines IYD for which YII lies between YD(IYD)
 ! and YD(IYD+1).
-          if (NINTY.EQ.1) THEN
-              if (YII.LE.YD(1)) THEN
+          if (NINTY == 1) THEN
+              if (YII <= YD(1)) THEN
                   IYD = 0
-              else if (YII.LT.YD(NYD)) THEN
+              else if (YII < YD(NYD)) THEN
                   IMN = 1
                   IMX = NYD
                   IMD = (IMN+IMX)/2
-   20             if (YII.GE.YD(IMD)) THEN
+   20             if (YII >= YD(IMD)) THEN
                       IMN = IMD
                   ELSE
                       IMX = IMD
                   end if
                   IMD = (IMN+IMX)/2
-                  if (IMD.GT.IMN) GOTO 20
+                  if (IMD > IMN) GOTO 20
                   IYD = IMD
               ELSE
                   IYD = NYD
@@ -1054,7 +1054,7 @@
       do 10 IIP = 1,NIP
           XII = XI(IIP)
           YII = YI(IIP)
-          if (IIP.EQ.1) THEN
+          if (IIP == 1) THEN
               IXDIPV = -1
               IYDIPV = -1
           ELSE
@@ -1065,7 +1065,7 @@
           IYDI = INYI(IIP)
 ! Retrieves the z and partial derivative values at the origin of
 ! the coordinate for the rectangle.
-          if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+          if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
               IXD0 = MAX(1,IXDI)
               IYD0 = MAX(1,IYDI)
               X0 = XD(IXD0)
@@ -1077,11 +1077,11 @@
           end if
 ! Case 1.  When the rectangle is inside the data area in both the
 ! x and y directions.
-          if ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
-     +        (IYDI.GT.0.AND.IYDI.LT.NYD)) THEN
+          if ((IXDI > 0.AND.IXDI < NXD) .AND.
+     +        (IYDI > 0.AND.IYDI < NYD)) THEN
 ! Retrieves the z and partial derivative values at the other three
 ! vertices of the rectangle.
-              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1142,11 +1142,11 @@
 ! End of Case 1
 ! Case 2.  When the rectangle is inside the data area in the x
 ! direction but outside in the y direction.
-          else if ((IXDI.GT.0.AND.IXDI.LT.NXD) .AND.
-     +             (IYDI.LE.0.OR.IYDI.GE.NYD)) THEN
+          else if ((IXDI > 0.AND.IXDI < NXD) .AND.
+     +             (IYDI <= 0.OR.IYDI >= NYD)) THEN
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
-              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1177,11 +1177,11 @@
 ! End of Case 2
 ! Case 3.  When the rectangle is outside the data area in the x
 ! direction but inside in the y direction.
-          else if ((IXDI.LE.0.OR.IXDI.GE.NXD) .AND.
-     +             (IYDI.GT.0.AND.IYDI.LT.NYD)) THEN
+          else if ((IXDI <= 0.OR.IXDI >= NXD) .AND.
+     +             (IYDI > 0.AND.IYDI < NYD)) THEN
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
-              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
                   IYD1 = IYD0 + 1
                   DY = YD(IYD1) - Y0
                   DYSQ = DY*DY
@@ -1210,10 +1210,10 @@
 ! End of Case 3
 ! Case 4.  When the rectangle is outside the data area in both the
 ! x and y direction.
-          else if ((IXDI.LE.0.OR.IXDI.GE.NXD) .AND.
-     +             (IYDI.LE.0.OR.IYDI.GE.NYD)) THEN
+          else if ((IXDI <= 0.OR.IXDI >= NXD) .AND.
+     +             (IYDI <= 0.OR.IYDI >= NYD)) THEN
 ! Calculates the polynomial coefficients.
-              if (IXDI.NE.IXDIPV .OR. IYDI.NE.IYDIPV) THEN
+              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
                   P00 = Z00
                   P01 = ZY00
                   P10 = ZX00

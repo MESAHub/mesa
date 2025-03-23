@@ -795,8 +795,6 @@ c
       return
       end function hinit
 
-
-
       real(dp) function contd8(ii,x,rwork,iwork,ierr)
 ! ----------------------------------------------------------
 !     this function can be used for continuous output in connection

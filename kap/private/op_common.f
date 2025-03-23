@@ -21,7 +21,7 @@
       else if(flt>8.) then
         ierr = 102
         return
-      endif
+      end if
 
       x = 40.*flt/real(i3)
       ih2 = x
@@ -93,13 +93,13 @@
          end do !jne
       end do !i
 
-! Get range for efa.gt.0
+! Get range for efa > 0
       do i = 1, 4
          do jh = jhmin, jhmax
             if(efa(i, jh) <= 0.)then
                jm = jh - 1
                GOTO 3
-            endif
+            end if
          end do
          GOTO 4
     3    jhmax = MIN(jhmax, jm)
@@ -127,14 +127,14 @@
          write(*,*) "Allowed range for logRho is",flrmin," to ",flrmax
          ierr = 101
          return
-      endif
+      end if
 
 !  Interpolations in j for flne
       do jh = jhmin, jhmax
          if(flrh(2,jh) > flrho)then
             jm = jh - 1
             GOTO 5
-         endif
+         end if
       end do
       print*,' Interpolations in j for flne'
       print*,' Not found, i=',i
@@ -214,7 +214,8 @@
 !  If  P(R) =   u(1)  u(2)  u(3)  u(4)
 !  for   R  =    -3    -1     1     3
 !  then a cubic fit is:
-      P(R)=(27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(27*(u(3)-u(2))-(u(4)-u(1))   +R*(-3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(-3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
+      P(R)=(27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(27*(u(3)-u(2))-(u(4)-u(1))
+     &      + R*(-3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(-3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
 
         fint=p(r)
 
@@ -227,7 +228,7 @@
 !  If  P(R) =   u(1)  u(2)  u(3)  u(4)
 !  for   R  =    -3    -1     1     3
 !  then a cubic fit to the derivative is:
-      PP(R)=(27*(u(3)-u(2))-(u(4)-u(1))   +2.*R*(-3*(u(2)+u(3))+3*(u(4)+u(1)) +3.*R*(-3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
+      PP(R)=(27*(u(3)-u(2))-(u(4)-u(1))  +2.*R*(-3*(u(2)+u(3))+3*(u(4)+u(1)) +3.*R*(-3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
 
         fintp=pp(r)
 

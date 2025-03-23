@@ -99,14 +99,15 @@
       !if (len(trim(path)) == 0) then
       !   write(6,*) 'Define environmental variable oppath (directory of OP data)'
       !   stop
-      !endif
+      !end if
 
 
       ios = 0
       open(1,file=trim(cache_filename),action='read',status='old',iostat=ios,form='unformatted')
       if (ios == 0) then
          write(*,*) 'reading OP cache file ' // trim(cache_filename)
-         read(1,iostat=ios) cache_version,ntotv,dv,dv1,umesh,ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck,ne1p,ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
+         read(1,iostat=ios) cache_version,ntotv,dv,dv1,umesh,ite1,ite2,ite3,jn1,jn2,jne3,
+     &                      umin,umax,ntotp,nc,nf,int,epatom,oplnck,ne1p,ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
          write(*,*) 'done reading OP cache file'
          close(1)
          if (cache_version /= op_cache_version) then
@@ -159,19 +160,19 @@
          write(6,6001)zlab(1),izz,nn,kz(1)
          ierr=1
          GOTO 1001
-      endif
+      end if
       NTOTP=NF
       if (NTOTP > nptot) then
          write(6,6002)ntotp,nptot
          ierr=2
          GOTO 1001
-      endif
+      end if
       INT(1)=1
       if (ITTE3 /= ITE3) then
          write(6,6077)ite3,itte3,nn
          ierr=3
          GOTO 1001
-      endif
+      end if
 !      ITE1=MAX(ITE1,ITTE1)
 !      ITE2=MIN(ITE2,ITTE2)
 !
@@ -205,27 +206,27 @@
             write(6,6077)ite3,ite33,nn
             ierr=4
             GOTO 1001
-         endif
+         end if
 !         ITE1=MAX(ITE1,ITE11)
 !         ITE2=MIN(ITE2,ITE22)
          if (IZZ /= KZ(N)) then
             write(6,6001)zlab(n),izz,nn,kz(nn)
             ierr=5
             GOTO 1001
-         endif
+         end if
          NTOTT=NF
          if (NTOTT > NTOTP) then
             write(6,6006)nn,ntott,ntotp
             ierr=6
             GOTO 1001
-         endif
+         end if
 ! !!        if (UMIN /= UMINN.OR.UMAX /= UMAXX) GOTO 1003  !!
          INT(N)=NTOTP/NTOTT
          if (INT(N)*NTOTT /= NTOTP) then
             WRITE(6,6009)NN,NTOTT,NTOTP
             ierr=7
             GOTO 1001
-         endif
+         end if
          if (INT(N) /= 1)WRITE(6,6007)N,INT(N)
 !
 !        READ MESH FILES
@@ -271,7 +272,7 @@
                ierr = -1
                GOTO 1001
             end if
-            endif
+            end if
          end do
 !        READ HEADINGS
          NN=1
@@ -285,7 +286,7 @@
               write(6,6099)jne3,jne33,nn
               ierr=9
               GOTO 1001
-            endif
+            end if
             JNE1=MAX(JNE1,JNE11)
             JNE2=MIN(JNE2,JNE22)
          end do
@@ -329,15 +330,15 @@
                read(ifl(n))(yy2(k+ncount2),k=1,ntotp)
                  kp2(n,itt,jnn)=ncount2
                  ncount2=ncount2+ntotp
-             endif
+             end if
                if (n > 2) then
                  read(iflp(n))ja,npp(n,itt,jnn)
                  if (npp(n,itt,jnn) > 0) then
            read(iflp(n))(nx(k+ncount3),yx(k+ncount3),k=1,npp(n,itt,jnn))
                    kp3(n,itt,jnn)=ncount3
                    ncount3=ncount3+npp(n,itt,jnn)
-                 endif
-               endif
+                 end if
+               end if
             end do
           end do
 
@@ -366,8 +367,8 @@
       if (ios == 0) then
          write(*,*) 'write ' // trim(cache_filename)
          write(1) op_cache_version, ntotv,dv,dv1,umesh,
-     >     ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,
-     >     ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
+     &     ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,
+     &     ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
          close(1)
       end if
 
@@ -443,8 +444,8 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             nn=n-1
             ibb=ib-1
             GOTO 1
-          endif
-        endif
+          end if
+        end if
         in(n)=ib
         aa(n)=(ub-umesh(n))/d
         bb(n)=(umesh(n)-ua)/d
@@ -682,7 +683,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             E=LOG(dble(X))
          else
             e=pow(1.5d0*a,2d0/3d0)
-         endif
+         end if
          do k=1,10
             call FDF1F2(E,F1,F2)
             DE=(A-F2)*2./F1

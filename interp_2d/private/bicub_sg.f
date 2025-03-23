@@ -38,7 +38,7 @@
 !  bcspeval -- eval bicubic spline function and/or derivatives
 
       subroutine bcspeval(xget,yget,iselect,fval,
-     >                    x,nx,y,ny,ilinx,iliny,f,inf3,ier)
+     &                    x,nx,y,ny,ilinx,iliny,f,inf3,ier)
 
       integer iselect(6)
       integer ilinx,iliny,nx,ny,inf3,ier
@@ -60,8 +60,8 @@
 
 !  input:
 !     (xget,yget)   location where interpolated value is desired
-!                   x(1).le.xget.le.x(nx) expected
-!                   y(1).le.yget.le.y(ny) expected
+!                   x(1) <= xget <= x(nx) expected
+!                   y(1) <= yget <= y(ny) expected
 
 !     iselect       select desired output
 
@@ -144,11 +144,11 @@
       ia(1) = 0
       ja(1) = 0
       call bcspevxy(xget,yget,x,nx,y,ny,ilinx,iliny,
-     >   0,0,dx,dy,ier)
-      if(ier.ne.0) return
+     &   0,0,dx,dy,ier)
+      if(ier /= 0) return
 
       call bcspevfn(iselect,1,1,fval,ia,ja,
-     >   (/dx/),(/dy/),f,inf3,ny)
+     &   (/dx/),(/dy/),f,inf3,ny)
 
       return
       end subroutine bcspeval
@@ -161,7 +161,7 @@
 !  this is the "first part" of bcspeval, see comments, above.
 
       subroutine bcspevxy(xget,yget,x,nx,y,ny,ilinx,iliny,
-     >   i,j,dx,dy,ier)
+     &   i,j,dx,dy,ier)
 
       integer nx,ny                     ! array dimensions
 
@@ -178,7 +178,7 @@
       real dx,dy                        ! displacement of target pt w/in cell
                                         ! dx=x-x(i)  dy=y-y(j)
 
-      integer ier                       ! return ier.ne.0 on error
+      integer ier                       ! return ier /= 0 on error
 
 !------------------------------------
       real zxget, zyget, zxtol, zytol
@@ -191,91 +191,91 @@
       zxget=xget
       zyget=yget
 
-      if((xget.lt.x(1)).or.(xget.gt.x(nx))) then
+      if((xget < x(1)).or.(xget > x(nx))) then
          zxtol=4.0e-7*max(abs(x(1)),abs(x(nx)))
-         if((xget.lt.x(1)-zxtol).or.(xget.gt.x(nx)+zxtol)) then
+         if((xget < x(1)-zxtol).or.(xget > x(nx)+zxtol)) then
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
 ! 1001       format(' ?bcspeval:  xget=',1pe11.4,' out of range ',
 !     >         1pe11.4,' to ',1pe11.4)
          else
-!            if((xget.lt.x(1)-0.5*zxtol).or.
-!     >         (xget.gt.x(nx)+0.5*zxtol))
+!            if((xget < x(1)-0.5*zxtol).or.
+!     >         (xget > x(nx)+0.5*zxtol))
 !     >      write(6,1011) xget,x(1),x(nx)
 ! 1011       format(' %bcspeval:  xget=',1pe15.8,' beyond range ',
 !     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
-            if(xget.lt.x(1)) then
+            if(xget < x(1)) then
                zxget=x(1)
             else
                zxget=x(nx)
-            endif
-         endif
-      endif
-      if((yget.lt.y(1)).or.(yget.gt.y(ny))) then
+            end if
+         end if
+      end if
+      if((yget < y(1)).or.(yget > y(ny))) then
          zytol=4.0e-7*max(abs(y(1)),abs(y(ny)))
-         if((yget.lt.y(1)-zytol).or.(yget.gt.y(ny)+zytol)) then
+         if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
 ! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ',
 !     >         1pe11.4,' to ',1pe11.4)
          else
-!         if((yget.lt.y(1)-0.5*zytol).or.(yget.gt.y(ny)+0.5*zytol))
+!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol))
 !     >      write(6,1012) yget,y(1),y(ny)
 ! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ',
 !     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
-            if(yget.lt.y(1)) then
+            if(yget < y(1)) then
                zyget=y(1)
             else
                zyget=y(ny)
-            endif
-         endif
-      endif
-      if(ier.ne.0) return
+            end if
+         end if
+      end if
+      if(ier /= 0) return
 
 !  now find interval in which target point lies..
 
       nxm=nx-1
       nym=ny-1
 
-      if(ilinx.eq.1) then
+      if(ilinx == 1) then
          ii=1+nxm*(zxget-x(1))/(x(nx)-x(1))
          i=min(nxm, ii)
-         if(zxget.lt.x(i)) then
+         if(zxget < x(i)) then
             i=i-1
-         else if(zxget.gt.x(i+1)) then
+         else if(zxget > x(i+1)) then
             i=i+1
-         endif
+         end if
       else
-         if((1.le.i).and.(i.lt.nxm)) then
-            if((x(i).le.zxget).and.(zxget.le.x(i+1))) then
+         if((1 <= i).and.(i < nxm)) then
+            if((x(i) <= zxget).and.(zxget <= x(i+1))) then
                continue  ! already have the zone
             else
                call zonfind(x,nx,zxget,i)
-            endif
+            end if
          else
             call zonfind(x,nx,zxget,i)
-         endif
-      endif
+         end if
+      end if
 
-      if(iliny.eq.1) then
+      if(iliny == 1) then
          jj=1+nym*(zyget-y(1))/(y(ny)-y(1))
          j=min(nym, jj)
-         if(zyget.lt.y(j)) then
+         if(zyget < y(j)) then
             j=j-1
-         else if(zyget.gt.y(j+1)) then
+         else if(zyget > y(j+1)) then
             j=j+1
-         endif
+         end if
       else
-         if((1.le.j).and.(j.lt.nym)) then
-            if((y(j).le.zyget).and.(zyget.le.y(j+1))) then
+         if((1 <= j).and.(j < nym)) then
+            if((y(j) <= zyget).and.(zyget <= y(j+1))) then
                continue  ! already have the zone
             else
                call zonfind(y,ny,zyget,j)
-            endif
+            end if
          else
             call zonfind(y,ny,zyget,j)
-         endif
-      endif
+         end if
+      end if
 
       dx=zxget-x(i)
       dy=zyget-y(j)
@@ -327,7 +327,7 @@
       integer ivec,ivd                  ! vector dimensioning
 
 !    ivec-- number of vector pts (spline values to look up)
-!    ivd -- 1st dimension of fval, .ge.ivec
+!    ivd -- 1st dimension of fval,  >= ivec
 
 ! output:
       real fval(ivd,6)                 ! output array
@@ -342,7 +342,7 @@
       integer iv(:),jv(:)         ! grid cell indices -- vectors
       real dxv(:),dyv(:)          ! displacements w/in cell -- vectors
 
-      integer inf3                      ! 3rd dimension of f -- .ge. nx
+      integer inf3                      ! 3rd dimension of f --  >=  nx
       real f(:,:,:,:) ! (4,4,inf3,ny)               ! bicubic fcn spline coeffs array
 
 !  usage example:
@@ -371,7 +371,7 @@
 !      ...
 !      do iv=1,ivec
 !        ...                    ! find indices and displacements
-!      enddo
+!      end do
 !      call bcspevfn(ict,ivec,ivd,fval,iv,jv,dxv,dyv,fspline,nx,ny)
 
 !-------------------------------------------------------------------
@@ -385,8 +385,8 @@
 
       iaval=0  ! fval addressing
 
-      if(ict(1).le.2) then
-         if((ict(1).gt.0).or.(ict(1).eq.-1)) then
+      if(ict(1) <= 2) then
+         if((ict(1) > 0).or.(ict(1) == -1)) then
 !  evaluate f
             iaval=iaval+1
             do v=1,ivec
@@ -395,14 +395,14 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >       f(1,1,i,j)+dy*(f(1,2,i,j)+dy*(f(1,3,i,j)+dy*f(1,4,i,j)))
-     >  +dx*(f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))
-     >  +dx*(f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))
-     >  +dx*(f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))))
-            enddo
-         endif
+     &       f(1,1,i,j)+dy*(f(1,2,i,j)+dy*(f(1,3,i,j)+dy*f(1,4,i,j)))
+     &  +dx*(f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))
+     &  +dx*(f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))
+     &  +dx*(f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))))
+            end do
+         end if
 
-         if((ict(2).gt.0).and.(ict(1).ne.-1)) then
+         if((ict(2) > 0).and.(ict(1) /= -1)) then
 !  evaluate df/dx
             iaval=iaval+1
             do v=1,ivec
@@ -411,16 +411,16 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >         f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))
-     >       +2.0*dx*(
-     >         f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))
-     >       +1.5*dx*(
-     >         f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j)))
-     >              ))
-            enddo
-         endif
+     &         f(2,1,i,j)+dy*(f(2,2,i,j)+dy*(f(2,3,i,j)+dy*f(2,4,i,j)))
+     &       +2.0*dx*(
+     &         f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j)))
+     &       +1.5*dx*(
+     &         f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j)))
+     &              ))
+            end do
+         end if
 
-         if((ict(3).gt.0).and.(ict(1).ne.-1)) then
+         if((ict(3) > 0).and.(ict(1) /= -1)) then
 !  evaluate df/dy
             iaval=iaval+1
             do v=1,ivec
@@ -429,15 +429,15 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >         f(1,2,i,j)+dy*(2.0*f(1,3,i,j)+dy*3.0*f(1,4,i,j))
-     >      +dx*(f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))
-     >      +dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j))
-     >      +dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))
-     >              )))
-            enddo
-         endif
+     &         f(1,2,i,j)+dy*(2.0*f(1,3,i,j)+dy*3.0*f(1,4,i,j))
+     &      +dx*(f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))
+     &      +dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j))
+     &      +dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))
+     &              )))
+            end do
+         end if
 
-         if((ict(4).gt.0).or.(ict(1).eq.-1)) then
+         if((ict(4) > 0).or.(ict(1) == -1)) then
 !  evaluate d2f/dx2
             iaval=iaval+1
             do v=1,ivec
@@ -446,14 +446,14 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >        2.0*(
-     >         f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j))))
-     >       +6.0*dx*(
-     >         f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
-            enddo
-         endif
+     &        2.0*(
+     &         f(3,1,i,j)+dy*(f(3,2,i,j)+dy*(f(3,3,i,j)+dy*f(3,4,i,j))))
+     &       +6.0*dx*(
+     &         f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
+            end do
+         end if
 
-         if((ict(5).gt.0).or.(ict(1).eq.-1)) then
+         if((ict(5) > 0).or.(ict(1) == -1)) then
 !  evaluate d2f/dy2
             iaval=iaval+1
             do v=1,ivec
@@ -462,14 +462,14 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              2.0*f(1,3,i,j)+6.0*dy*f(1,4,i,j)
-     >              +dx*(2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)
-     >              +dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)
-     >              +dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))))
-            enddo
-         endif
+     &              2.0*f(1,3,i,j)+6.0*dy*f(1,4,i,j)
+     &              +dx*(2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)
+     &              +dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)
+     &              +dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))))
+            end do
+         end if
 
-         if((ict(6).gt.0).and.(ict(1).ne.-1)) then
+         if((ict(6) > 0).and.(ict(1) /= -1)) then
 !  evaluate d2f/dxdy
             iaval=iaval+1
             do v=1,ivec
@@ -478,14 +478,14 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >            f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))
-     > +2.*dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j))
-     >+1.5*dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))
-     >              ))
-            enddo
-         endif
+     &            f(2,2,i,j)+dy*(2.0*f(2,3,i,j)+dy*3.0*f(2,4,i,j))
+     & +2.*dx*(f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j))
+     &+1.5*dx*(f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j))
+     &              ))
+            end do
+         end if
 
-         if(ict(1).eq.-1) then
+         if(ict(1) == -1) then
             iaval=iaval+1
             do v=1,ivec
                i=iv(v)
@@ -493,16 +493,16 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)
-     >              +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
-            enddo
-         endif
+     &              4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)
+     &              +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
+            end do
+         end if
 
 !-----------------------------------
 !  access to 3rd derivatives
 
-      else if(ict(1).eq.3) then
-         if(ict(2).eq.1) then
+      else if(ict(1) == 3) then
+         if(ict(2) == 1) then
 !  evaluate d3f/dx3 (not continuous)
             iaval=iaval+1
             do v=1,ivec
@@ -510,12 +510,12 @@
                j=jv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              +6.0*(
-     >         f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
-            enddo
-         endif
+     &              +6.0*(
+     &         f(4,1,i,j)+dy*(f(4,2,i,j)+dy*(f(4,3,i,j)+dy*f(4,4,i,j))))
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 !  evaluate d3f/dx2dy
             iaval=iaval+1
             do v=1,ivec
@@ -524,14 +524,14 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              2.0*(
-     >           f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j)))
-     >              +6.0*dx*(
-     >           f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j)))
-            enddo
-         endif
+     &              2.0*(
+     &           f(3,2,i,j)+dy*(2.0*f(3,3,i,j)+dy*3.0*f(3,4,i,j)))
+     &              +6.0*dx*(
+     &           f(4,2,i,j)+dy*(2.0*f(4,3,i,j)+dy*3.0*f(4,4,i,j)))
+            end do
+         end if
 
-         if(ict(4).eq.1) then
+         if(ict(4) == 1) then
 !  evaluate d3f/dxdy2
             iaval=iaval+1
             do v=1,ivec
@@ -540,14 +540,14 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              (2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)
-     >              +2.0*dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)
-     >              +1.5*dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))
-     >              ))
-            enddo
-         endif
+     &              (2.0*f(2,3,i,j)+6.0*dy*f(2,4,i,j)
+     &              +2.0*dx*(2.0*f(3,3,i,j)+6.0*dy*f(3,4,i,j)
+     &              +1.5*dx*(2.0*f(4,3,i,j)+6.0*dy*f(4,4,i,j))
+     &              ))
+            end do
+         end if
 
-         if(ict(5).eq.1) then
+         if(ict(5) == 1) then
 !  evaluate d3f/dy3 (not continuous)
             iaval=iaval+1
             do v=1,ivec
@@ -555,15 +555,15 @@
                j=jv(v)
                dx=dxv(v)
                fval(v,iaval)=6.0*(f(1,4,i,j)+
-     >              dx*(f(2,4,i,j)+dx*(f(3,4,i,j)+dx*f(4,4,i,j))))
-            enddo
-         endif
+     &              dx*(f(2,4,i,j)+dx*(f(3,4,i,j)+dx*f(4,4,i,j))))
+            end do
+         end if
 
 !-----------------------------------
 !  access to 4th derivatives
 
-      else if(ict(1).eq.4) then
-         if(ict(2).eq.1) then
+      else if(ict(1) == 4) then
+         if(ict(2) == 1) then
 !  evaluate d4f/dx3dy (not continuous)
             iaval=iaval+1
             do v=1,ivec
@@ -571,12 +571,12 @@
                j=jv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              +6.0*(
-     >         f(4,2,i,j)+dy*2.0*(f(4,3,i,j)+dy*1.5*f(4,4,i,j)))
-            enddo
-         endif
+     &              +6.0*(
+     &         f(4,2,i,j)+dy*2.0*(f(4,3,i,j)+dy*1.5*f(4,4,i,j)))
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 !  evaluate d4f/dx2dy2
             iaval=iaval+1
             do v=1,ivec
@@ -585,12 +585,12 @@
                dx=dxv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)
-     >              +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
-            enddo
-         endif
+     &              4.0*f(3,3,i,j)+12.0*dy*f(3,4,i,j)
+     &              +dx*(12.0*f(4,3,i,j)+36.0*dy*f(4,4,i,j))
+            end do
+         end if
 
-         if(ict(4).eq.1) then
+         if(ict(4) == 1) then
 !  evaluate d4f/dxdy3 (not continuous)
             iaval=iaval+1
             do v=1,ivec
@@ -598,16 +598,16 @@
                j=jv(v)
                dx=dxv(v)
                fval(v,iaval)=
-     >              6.0*(f(2,4,i,j)
-     >              +2.0*dx*(f(3,4,i,j)+1.5*dx*f(4,4,i,j)))
-            enddo
-         endif
+     &              6.0*(f(2,4,i,j)
+     &              +2.0*dx*(f(3,4,i,j)+1.5*dx*f(4,4,i,j)))
+            end do
+         end if
 
 !-----------------------------------
 !  access to 5th derivatives
 
-      else if(ict(1).eq.5) then
-         if(ict(2).eq.1) then
+      else if(ict(1) == 5) then
+         if(ict(2) == 1) then
 !  evaluate d5f/dx3dy2 (not continuous)
             iaval=iaval+1
             do v=1,ivec
@@ -615,11 +615,11 @@
                j=jv(v)
                dy=dyv(v)
                fval(v,iaval)=
-     >              +12.0*(f(4,3,i,j)+dy*3.0*f(4,4,i,j))
-            enddo
-         endif
+     &              +12.0*(f(4,3,i,j)+dy*3.0*f(4,4,i,j))
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 !  evaluate d5f/dx3dy2 (not continuous)
             iaval=iaval+1
             do v=1,ivec
@@ -627,23 +627,23 @@
                j=jv(v)
                dx=dxv(v)
                fval(v,iaval)=
-     >              12.0*(f(3,4,i,j)+dx*3.0*f(4,4,i,j))
-            enddo
-         endif
+     &              12.0*(f(3,4,i,j)+dx*3.0*f(4,4,i,j))
+            end do
+         end if
 
 !-----------------------------------
 !  access to 6th derivatives
 
-      else if(ict(1).eq.6) then
+      else if(ict(1) == 6) then
 !  evaluate d6f/dx3dy3 (not continuous)
          iaval=iaval+1
          do v=1,ivec
             i=iv(v)
             j=jv(v)
             fval(v,iaval)=
-     >              36.0*f(4,4,i,j)
-         enddo
-      endif
+     &              36.0*f(4,4,i,j)
+         end do
+      end if
 
       return
       end subroutine bcspevfn
@@ -657,7 +657,7 @@
 !    new BC options added.
 
       subroutine cspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >   wk,iwk,ilinx,ier)
+     &   wk,iwk,ilinx,ier)
 
       integer nx, iwk
       real x(nx)                        ! x axis (in)
@@ -678,7 +678,7 @@
 !  or directly by inline code.
 
 !  the input x axis x(1...nx) must be strictly ascending, i.e.
-!  x(i+1).gt.x(i) is required for i=1 to nx-1.  This is checked and
+!  x(i+1) > x(i) is required for i=1 to nx-1.  This is checked and
 !  ier=1 is set and the routine exits if the test is not satisfied.
 
 !  on output, ilinx=1 is set if, to a reasonably close tolerance,
@@ -697,7 +697,7 @@
 
 !  the formula for evaluation of s(x) is:
 
-!     let dx = x-x(i), where x(i).le.x.le.x(i+1).  Then,
+!     let dx = x-x(i), where x(i) <= x <= x(i+1).  Then,
 !     s(x)=fspl(1,i) + dx*(fspl(2,i) +dx*(fspl(3,i) + dx*fspl(4,i)))
 
 !  ==>boundary conditions.  Complete specification of a 1d spline
@@ -762,61 +762,61 @@
 !  error checks
 
       ier = 0
-      if(nx.lt.4) then
+      if(nx < 4) then
          write(6,'('' ?cspline:  at least 4 x points required.'')')
          ier=1
-      endif
+      end if
       call ibc_ck(ibcxmin,'cspline','xmin',-1,7,ier)
-      if(ibcxmin.ge.0) call ibc_ck(ibcxmax,'cspline','xmax',0,7,ier)
+      if(ibcxmin >= 0) call ibc_ck(ibcxmax,'cspline','xmax',0,7,ier)
 
 !  x axis check
 
       call splinck(x,nx,ilinx,1.0e-3,ierx)
-      if(ierx.ne.0) ier=2
+      if(ierx /= 0) ier=2
 
-      if(ier.eq.2) then
+      if(ier == 2) then
          write(6,'('' ?cspline:  x axis not strict ascending'')')
-      endif
+      end if
 
-      if(ibcxmin.eq.-1) then
+      if(ibcxmin == -1) then
          inum=nx
-         if(iwk.lt.inum) then
+         if(iwk < inum) then
             write(6,1009) inum,iwk,nx
  1009       format(
-     >      ' ?cspline:  workspace too small.  need:  ',i6,' got:  ',i6/
-     >      '  (need = nx, nx=',i6)
+     &      ' ?cspline:  workspace too small.  need:  ',i6,' got:  ',i6/
+     &      '  (need = nx, nx=',i6)
             ier=3
-         endif
-      endif
+         end if
+      end if
 
-      if(ier.ne.0) return
+      if(ier /= 0) return
 
 !  OK -- evaluate spline
 
-      if(ibcxmin.eq.1) then
+      if(ibcxmin == 1) then
          fspl(2,1)=bcxmin
-      else if(ibcxmin.eq.2) then
+      else if(ibcxmin == 2) then
          fspl(3,1)=bcxmin
-      endif
+      end if
 
-      if(ibcxmax.eq.1) then
+      if(ibcxmax == 1) then
          fspl(2,nx)=bcxmax
-      else if(ibcxmax.eq.2) then
+      else if(ibcxmax == 2) then
          fspl(3,nx)=bcxmax
-      endif
+      end if
 
       call v_spline(ibcxmin,ibcxmax,nx,x,fspl,wk)
 
       do i=1,nx
          fspl(3,i)=half*fspl(3,i)
          fspl(4,i)=sixth*fspl(4,i)
-      enddo
+      end do
 
       return
       end subroutine cspline
 
       subroutine evbicub(xget,yget,x,nx,y,ny,ilinx,iliny,
-     >                   f1,inf2,ict,fval,ier)
+     &                   f1,inf2,ict,fval,ier)
 
 !  use mkbicub to set up spline coefficients!
 
@@ -840,7 +840,7 @@
       integer inf2
       real, pointer :: f1(:) ! =(0:3,inf2,ny)  interpolant data (cf "evbicub")
 
-!       f 2nd dimension inf2 must be .ge. nx
+!       f 2nd dimension inf2 must be  >=  nx
 !       contents of f:
 
 !  f(0,i,j) = f @ x(i),y(j)
@@ -926,19 +926,19 @@
       real hx,hy
       real hxi,hyi
 
-!  0 .le. xparam .le. 1
-!  0 .le. yparam .le. 1
+!  0  <=  xparam  <=  1
+!  0  <=  yparam  <=  1
 
 !  ** the interface is very similar to herm2ev.for; can use herm2xy **
 !---------------------------------------------------------------------
 
       call herm2xy(xget,yget,x,nx,y,ny,ilinx,iliny,
-     >   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
-      if(ier.ne.0) return
+     &   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
+      if(ier /= 0) return
 
       call fvbicub(ict,1,1,
-     >   fval,(/i/),(/j/),(/xparam/),(/yparam/),
-     >   (/hx/),(/hxi/),(/hy/),(/hyi/),f1,inf2,ny)
+     &   fval,(/i/),(/j/),(/xparam/),(/yparam/),
+     &   (/hx/),(/hxi/),(/hy/),(/hyi/),f1,inf2,ny)
 
       return
       end subroutine evbicub
@@ -950,8 +950,8 @@
 !  use mkbicub to set up spline coefficients!
 
       subroutine fvbicub(ict,ivec,ivecd,
-     >   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
-     >   f1,inf2,ny)
+     &   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
+     &   f1,inf2,ny)
 
       integer ny
       integer ict(6)                    ! requested output control
@@ -1005,11 +1005,11 @@
       z36th=sixth*sixth
       iadr=0
 
-      if(ict(1).le.2) then
+      if(ict(1) <= 2) then
 
 !  get desired values:
 
-         if(ict(1).eq.1) then
+         if(ict(1) == 1) then
 
 !  function value:
 
@@ -1041,25 +1041,25 @@
                hy2=hy(v)*hy(v)
 
                sum=xpi*(ypi*fin(0,i,j)  +yp*fin(0,i,j+1))+
-     >              xp*(ypi*fin(0,i+1,j)+yp*fin(0,i+1,j+1))
+     &              xp*(ypi*fin(0,i+1,j)+yp*fin(0,i+1,j+1))
 
                sum=sum+sixth*hx2*(
-     >              cxi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))+
-     >              cx*(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
+     &              cxi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))+
+     &              cx*(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
 
                sum=sum+sixth*hy2*(
-     >              xpi*(cyi*fin(2,i,j)  +cy*fin(2,i,j+1))+
-     >              xp*(cyi*fin(2,i+1,j)+cy*fin(2,i+1,j+1)))
+     &              xpi*(cyi*fin(2,i,j)  +cy*fin(2,i,j+1))+
+     &              xp*(cyi*fin(2,i+1,j)+cy*fin(2,i+1,j+1)))
 
                sum=sum+z36th*hx2*hy2*(
-     >              cxi*(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))+
-     >              cx*(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
+     &              cxi*(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))+
+     &              cx*(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(2).eq.1) then
+         if(ict(2) == 1) then
 
 !  df/dx:
 
@@ -1090,26 +1090,26 @@
                hy2=hy(v)*hy(v)
 
                sum=hxi(v)*(
-     >              -(ypi*fin(0,i,j)  +yp*fin(0,i,j+1))
-     >              +(ypi*fin(0,i+1,j)+yp*fin(0,i+1,j+1)))
+     &              -(ypi*fin(0,i,j)  +yp*fin(0,i,j+1))
+     &              +(ypi*fin(0,i+1,j)+yp*fin(0,i+1,j+1)))
 
                sum=sum+sixth*hx(v)*(
-     >              cxdi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))+
-     >              cxd*(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
+     &              cxdi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))+
+     &              cxd*(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
 
                sum=sum+sixth*hxi(v)*hy2*(
-     >              -(cyi*fin(2,i,j)  +cy*fin(2,i,j+1))
-     >              +(cyi*fin(2,i+1,j)+cy*fin(2,i+1,j+1)))
+     &              -(cyi*fin(2,i,j)  +cy*fin(2,i,j+1))
+     &              +(cyi*fin(2,i+1,j)+cy*fin(2,i+1,j+1)))
 
                sum=sum+z36th*hx(v)*hy2*(
-     >              cxdi*(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))+
-     >              cxd*(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
+     &              cxdi*(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))+
+     &              cxd*(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 
 !  df/dy:
 
@@ -1140,26 +1140,26 @@
                cydi=-3.0*ypi2+1.0
 
                sum=hyi(v)*(
-     >              xpi*(-fin(0,i,j)  +fin(0,i,j+1))+
-     >              xp*(-fin(0,i+1,j)+fin(0,i+1,j+1)))
+     &              xpi*(-fin(0,i,j)  +fin(0,i,j+1))+
+     &              xp*(-fin(0,i+1,j)+fin(0,i+1,j+1)))
 
                sum=sum+sixth*hx2*hyi(v)*(
-     >              cxi*(-fin(1,i,j)  +fin(1,i,j+1))+
-     >              cx*(-fin(1,i+1,j)+fin(1,i+1,j+1)))
+     &              cxi*(-fin(1,i,j)  +fin(1,i,j+1))+
+     &              cx*(-fin(1,i+1,j)+fin(1,i+1,j+1)))
 
                sum=sum+sixth*hy(v)*(
-     >              xpi*(cydi*fin(2,i,j)  +cyd*fin(2,i,j+1))+
-     >              xp*(cydi*fin(2,i+1,j)+cyd*fin(2,i+1,j+1)))
+     &              xpi*(cydi*fin(2,i,j)  +cyd*fin(2,i,j+1))+
+     &              xp*(cydi*fin(2,i+1,j)+cyd*fin(2,i+1,j+1)))
 
                sum=sum+z36th*hx2*hy(v)*(
-     >              cxi*(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))+
-     >              cx*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
+     &              cxi*(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))+
+     &              cx*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(4).eq.1) then
+         if(ict(4) == 1) then
 
 !  d2f/dx2:
 
@@ -1185,18 +1185,18 @@
                hy2=hy(v)*hy(v)
 
                sum=(
-     >              xpi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))+
-     >              xp*(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
+     &              xpi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))+
+     &              xp*(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
 
                sum=sum+sixth*hy2*(
-     >              xpi*(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))+
-     >              xp*(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
+     &              xpi*(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))+
+     &              xp*(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(5).eq.1) then
+         if(ict(5) == 1) then
 
 !  d2f/dy2:
 
@@ -1222,18 +1222,18 @@
                ypi=1.0-yp
 
                sum=(
-     >              xpi*(ypi*fin(2,i,j)  +yp*fin(2,i,j+1))+
-     >              xp*(ypi*fin(2,i+1,j)+yp*fin(2,i+1,j+1)))
+     &              xpi*(ypi*fin(2,i,j)  +yp*fin(2,i,j+1))+
+     &              xp*(ypi*fin(2,i+1,j)+yp*fin(2,i+1,j+1)))
 
                sum=sum+sixth*hx2*(
-     >              cxi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+
-     >              cx*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
+     &              cxi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+
+     &              cx*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(6).eq.1) then
+         if(ict(6) == 1) then
 
 !  d2f/dxdy:
 
@@ -1263,29 +1263,29 @@
                cydi=-3.0*ypi2+1.0
 
                sum=hxi(v)*hyi(v)*(
-     >              fin(0,i,j)  -fin(0,i,j+1)
-     >              -fin(0,i+1,j)+fin(0,i+1,j+1))
+     &              fin(0,i,j)  -fin(0,i,j+1)
+     &              -fin(0,i+1,j)+fin(0,i+1,j+1))
 
                sum=sum+sixth*hx(v)*hyi(v)*(
-     >              cxdi*(-fin(1,i,j)  +fin(1,i,j+1))+
-     >              cxd*(-fin(1,i+1,j)+fin(1,i+1,j+1)))
+     &              cxdi*(-fin(1,i,j)  +fin(1,i,j+1))+
+     &              cxd*(-fin(1,i+1,j)+fin(1,i+1,j+1)))
 
                sum=sum+sixth*hxi(v)*hy(v)*(
-     >              -(cydi*fin(2,i,j)  +cyd*fin(2,i,j+1))
-     >              +(cydi*fin(2,i+1,j)+cyd*fin(2,i+1,j+1)))
+     &              -(cydi*fin(2,i,j)  +cyd*fin(2,i,j+1))
+     &              +(cydi*fin(2,i+1,j)+cyd*fin(2,i+1,j+1)))
 
                sum=sum+z36th*hx(v)*hy(v)*(
-     >              cxdi*(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))+
-     >              cxd*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
+     &              cxdi*(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))+
+     &              cxd*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
 !-------------------------------------------------
 
-      else if(ict(1).eq.3) then
-         if(ict(2).eq.1) then
+      else if(ict(1) == 3) then
+         if(ict(2) == 1) then
 !  evaluate d3f/dx3 (not continuous)
             iadr=iadr+1
             do v=1,ivec
@@ -1299,18 +1299,18 @@
                cyi=ypi*(ypi2-1.0)
                hy2=hy(v)*hy(v)
                sum=hxi(v)*(
-     >              -(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))
-     >              +(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
+     &              -(ypi*fin(1,i,j)  +yp*fin(1,i,j+1))
+     &              +(ypi*fin(1,i+1,j)+yp*fin(1,i+1,j+1)))
 
                sum=sum+sixth*hy2*hxi(v)*(
-     >              -(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))
-     >              +(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
+     &              -(cyi*fin(3,i,j)  +cy*fin(3,i,j+1))
+     &              +(cyi*fin(3,i+1,j)+cy*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 !  evaluate d3f/dx2dy
             iadr=iadr+1
             do v=1,ivec
@@ -1326,18 +1326,18 @@
                cydi=-3.0*ypi2+1.0
 
                sum=hyi(v)*(
-     >              xpi*(-fin(1,i,j)  +fin(1,i,j+1))+
-     >              xp*(-fin(1,i+1,j) +fin(1,i+1,j+1)))
+     &              xpi*(-fin(1,i,j)  +fin(1,i,j+1))+
+     &              xp*(-fin(1,i+1,j) +fin(1,i+1,j+1)))
 
                sum=sum+sixth*hy(v)*(
-     >              xpi*(cydi*fin(3,i,j) +cyd*fin(3,i,j+1))+
-     >              xp*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
+     &              xpi*(cydi*fin(3,i,j) +cyd*fin(3,i,j+1))+
+     &              xp*(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(4).eq.1) then
+         if(ict(4) == 1) then
 !  evaluate d3f/dxdy2
             iadr=iadr+1
             do v=1,ivec
@@ -1353,18 +1353,18 @@
                ypi=1.0-yp
 
                sum=hxi(v)*(
-     >              -(ypi*fin(2,i,j)  +yp*fin(2,i,j+1))
-     >              +(ypi*fin(2,i+1,j)+yp*fin(2,i+1,j+1)))
+     &              -(ypi*fin(2,i,j)  +yp*fin(2,i,j+1))
+     &              +(ypi*fin(2,i+1,j)+yp*fin(2,i+1,j+1)))
 
                sum=sum+sixth*hx(v)*(
-     >              cxdi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+
-     >              cxd*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
+     &              cxdi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+
+     &              cxd*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(5).eq.1) then
+         if(ict(5) == 1) then
 !  evaluate d3f/dy3 (not continuous)
             iadr=iadr+1
             do v=1,ivec
@@ -1381,22 +1381,22 @@
                hx2=hx(v)*hx(v)
 
                sum=hyi(v)*(
-     >              xpi*(-fin(2,i,j)  +fin(2,i,j+1))+
-     >              xp*(-fin(2,i+1,j) +fin(2,i+1,j+1)))
+     &              xpi*(-fin(2,i,j)  +fin(2,i,j+1))+
+     &              xp*(-fin(2,i+1,j) +fin(2,i+1,j+1)))
 
                sum=sum+sixth*hx2*hyi(v)*(
-     >              cxi*(-fin(3,i,j)  +fin(3,i,j+1))+
-     >              cx*(-fin(3,i+1,j) +fin(3,i+1,j+1)))
+     &              cxi*(-fin(3,i,j)  +fin(3,i,j+1))+
+     &              cx*(-fin(3,i+1,j) +fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
 !-----------------------------------
 !  access to 4th derivatives
 
-      else if(ict(1).eq.4) then
-         if(ict(2).eq.1) then
+      else if(ict(1) == 4) then
+         if(ict(2) == 1) then
 !  evaluate d4f/dx3dy (not continuous)
             iadr=iadr+1
             do v=1,ivec
@@ -1410,18 +1410,18 @@
                cydi=-3.0*ypi2+1.0
 
                sum=hxi(v)*hyi(v)*(
-     >              +( fin(1,i,j)  -fin(1,i,j+1))
-     >              +(-fin(1,i+1,j)+fin(1,i+1,j+1)))
+     &              +( fin(1,i,j)  -fin(1,i,j+1))
+     &              +(-fin(1,i+1,j)+fin(1,i+1,j+1)))
 
                sum=sum+sixth*hy(v)*hxi(v)*(
-     >              -(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))
-     >              +(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
+     &              -(cydi*fin(3,i,j)  +cyd*fin(3,i,j+1))
+     &              +(cydi*fin(3,i+1,j)+cyd*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 !  evaluate d4f/dx2dy2
             iadr=iadr+1
             do v=1,ivec
@@ -1434,13 +1434,13 @@
                ypi=1.0-yp
 
                sum=xpi*(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))+
-     >              xp*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1))
+     &              xp*(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(4).eq.1) then
+         if(ict(4) == 1) then
 !  evaluate d4f/dxdy3 (not continuous)
             iadr=iadr+1
             do v=1,ivec
@@ -1456,22 +1456,22 @@
                cxdi=-3.0*xpi2+1.0
 
                sum=hyi(v)*hxi(v)*(
-     >              +( fin(2,i,j)  -fin(2,i,j+1))
-     >              +(-fin(2,i+1,j)+fin(2,i+1,j+1)))
+     &              +( fin(2,i,j)  -fin(2,i,j+1))
+     &              +(-fin(2,i+1,j)+fin(2,i+1,j+1)))
 
                sum=sum+sixth*hx(v)*hyi(v)*(
-     >              cxdi*(-fin(3,i,j)  +fin(3,i,j+1))+
-     >              cxd*(-fin(3,i+1,j) +fin(3,i+1,j+1)))
+     &              cxdi*(-fin(3,i,j)  +fin(3,i,j+1))+
+     &              cxd*(-fin(3,i+1,j) +fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
 !-----------------------------------
 !  access to 5th derivatives
 
-      else if(ict(1).eq.5) then
-         if(ict(2).eq.1) then
+      else if(ict(1) == 5) then
+         if(ict(2) == 1) then
 !  evaluate d5f/dx3dy2 (not continuous)
             iadr=iadr+1
             do v=1,ivec
@@ -1482,14 +1482,14 @@
                ypi=1.0-yp
 
                sum=hxi(v)*(
-     >              -(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))
-     >              +(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
+     &              -(ypi*fin(3,i,j)  +yp*fin(3,i,j+1))
+     &              +(ypi*fin(3,i+1,j)+yp*fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 !  evaluate d5f/dx2dy3 (not continuous)
             iadr=iadr+1
             do v=1,ivec
@@ -1500,33 +1500,31 @@
                xpi=1.0-xp
 
                sum=hyi(v)*(
-     >              xpi*(-fin(3,i,j)  +fin(3,i,j+1))+
-     >              xp*(-fin(3,i+1,j)+fin(3,i+1,j+1)))
+     &              xpi*(-fin(3,i,j)  +fin(3,i,j+1))+
+     &              xp*(-fin(3,i+1,j)+fin(3,i+1,j+1)))
 
                fval(v,iadr)=sum
-            enddo
-         endif
+            end do
+         end if
 
 !-----------------------------------
 !  access to 6th derivatives
 
-      else if(ict(1).eq.6) then
+      else if(ict(1) == 6) then
 !  evaluate d6f/dx3dy3 (not continuous)
          iadr=iadr+1
          do v=1,ivec
             i=ii(v)
             j=jj(v)
             sum=hxi(v)*hyi(v)*(
-     >              +( fin(3,i,j)  -fin(3,i,j+1))
-     >              +(-fin(3,i+1,j)+fin(3,i+1,j+1)))
+     &              +( fin(3,i,j)  -fin(3,i,j+1))
+     &              +(-fin(3,i+1,j)+fin(3,i+1,j+1)))
             fval(v,iadr)=sum
-         enddo
-      endif
+         end do
+      end if
 
       return
       end subroutine fvbicub
-
-
 
 
 !---------------------------------------------------------------------
@@ -1535,7 +1533,7 @@
 !  this is the "first part" of herm2ev, see comments, above.
 
       subroutine herm2xy(xget,yget,x,nx,y,ny,ilinx,iliny,
-     >   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
+     &   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
 
 !  input of herm2xy
 !  ================
@@ -1552,7 +1550,7 @@
 !  output of herm2xy
 !  =================
       integer i,j                       ! index to cell containing target pt
-!          on exit:  1.le.i.le.nx-1   1.le.j.le.ny-1
+!          on exit:  1 <= i <= nx-1   1 <= j <= ny-1
 
 !  normalized position w/in (i,j) cell (btw 0 and 1):
 
@@ -1569,7 +1567,7 @@
       real hxi                          ! 1/hx = 1/(x(i+1)-x(i))
       real hyi                          ! 1/hy = 1/(y(j+1)-y(j))
 
-      integer ier                       ! return ier.ne.0 on error
+      integer ier                       ! return ier /= 0 on error
       real zxget,zyget,zxtol,zytol
       integer nxm,nym,ii,jj
 
@@ -1581,92 +1579,92 @@
 
       zxget=xget
       zyget=yget
-      if((xget.lt.x(1)).or.(xget.gt.x(nx))) then
+      if((xget < x(1)).or.(xget > x(nx))) then
          zxtol=4.0e-7*max(abs(x(1)),abs(x(nx)))
-         if((xget.lt.x(1)-zxtol).or.(xget.gt.x(nx)+zxtol)) then
+         if((xget < x(1)-zxtol).or.(xget > x(nx)+zxtol)) then
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
 ! 1001       format(' ?herm2ev:  xget=',1pe11.4,' out of range ',
 !     >         1pe11.4,' to ',1pe11.4)
          else
-!            if((xget.lt.x(1)-0.5*zxtol).or.
-!     >         (xget.gt.x(nx)+0.5*zxtol))
+!            if((xget < x(1)-0.5*zxtol).or.
+!     >         (xget > x(nx)+0.5*zxtol))
 !     >      write(6,1011) xget,x(1),x(nx)
 ! 1011       format(' %herm2ev:  xget=',1pe15.8,' beyond range ',
 !     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
-            if(xget.lt.x(1)) then
+            if(xget < x(1)) then
                zxget=x(1)
             else
                zxget=x(nx)
-            endif
-         endif
-      endif
-      if((yget.lt.y(1)).or.(yget.gt.y(ny))) then
+            end if
+         end if
+      end if
+      if((yget < y(1)).or.(yget > y(ny))) then
          zytol=4.0e-7*max(abs(y(1)),abs(y(ny)))
-         if((yget.lt.y(1)-zytol).or.(yget.gt.y(ny)+zytol)) then
+         if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
 ! 1002       format(' ?herm2ev:  yget=',1pe11.4,' out of range ',
 !     >         1pe11.4,' to ',1pe11.4)
          else
-!            if((yget.lt.y(1)-0.5*zytol).or.
-!     >         (yget.gt.y(ny)+0.5*zytol))
+!            if((yget < y(1)-0.5*zytol).or.
+!     >         (yget > y(ny)+0.5*zytol))
 !     >      write(6,1012) yget,y(1),y(ny)
 ! 1012       format(' %herm2ev:  yget=',1pe15.8,' beyond range ',
 !     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
-            if(yget.lt.y(1)) then
+            if(yget < y(1)) then
                zyget=y(1)
             else
                zyget=y(ny)
-            endif
-         endif
-      endif
-      if(ier.ne.0) return
+            end if
+         end if
+      end if
+      if(ier /= 0) return
 
 !  now find interval in which target point lies..
 
       nxm=nx-1
       nym=ny-1
 
-      if(ilinx.eq.1) then
+      if(ilinx == 1) then
          ii=1+nxm*(zxget-x(1))/(x(nx)-x(1))
          i=min(nxm, ii)
-         if(zxget.lt.x(i)) then
+         if(zxget < x(i)) then
             i=i-1
-         else if(zxget.gt.x(i+1)) then
+         else if(zxget > x(i+1)) then
             i=i+1
-         endif
+         end if
       else
-         if((1.le.i).and.(i.lt.nxm)) then
-            if((x(i).le.zxget).and.(zxget.le.x(i+1))) then
+         if((1 <= i).and.(i < nxm)) then
+            if((x(i) <= zxget).and.(zxget <= x(i+1))) then
                continue  ! already have the zone
             else
                call zonfind(x,nx,zxget,i)
-            endif
+            end if
          else
             call zonfind(x,nx,zxget,i)
-         endif
-      endif
+         end if
+      end if
 
-      if(iliny.eq.1) then
+      if(iliny == 1) then
          jj=1+nym*(zyget-y(1))/(y(ny)-y(1))
          j=min(nym, jj)
-         if(zyget.lt.y(j)) then
+         if(zyget < y(j)) then
             j=j-1
-         else if(zyget.gt.y(j+1)) then
+         else if(zyget > y(j+1)) then
             j=j+1
-         endif
+         end if
       else
-         if((1.le.j).and.(j.lt.nym)) then
-            if((y(j).le.zyget).and.(zyget.le.y(j+1))) then
+         if((1 <= j).and.(j < nym)) then
+            if((y(j) <= zyget).and.(zyget <= y(j+1))) then
                continue  ! already have the zone
             else
                call zonfind(y,ny,zyget,j)
-            endif
+            end if
          else
             call zonfind(y,ny,zyget,j)
-         endif
-      endif
+         end if
+      end if
 
       hx=(x(i+1)-x(i))
       hy=(y(j+1)-y(j))
@@ -1680,11 +1678,9 @@
       return
       end subroutine herm2xy
 
-
-
       subroutine herm2fcn(ict,ivec,ivecd,
-     >   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
-     >   fin,inf2,ny)
+     &   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
+     &   fin,inf2,ny)
 
       integer ny, inf2
       integer ict(4)                    ! requested output control
@@ -1779,110 +1775,108 @@
 
 !  get desired values:
 
-         if(ict(1).eq.1) then
+         if(ict(1) == 1) then
 
 !  function value:
 
             iadr=iadr+1
             sum=axbar*(aybar*fin(0,i,j)  +ay*fin(0,i,j+1))+
-     >             ax*(aybar*fin(0,i+1,j)+ay*fin(0,i+1,j+1))
+     &             ax*(aybar*fin(0,i+1,j)+ay*fin(0,i+1,j+1))
 
             sum=sum+hx(v)*(
-     >         bxbar*(aybar*fin(1,i,j)  +ay*fin(1,i,j+1))+
-     >            bx*(aybar*fin(1,i+1,j)+ay*fin(1,i+1,j+1)))
+     &         bxbar*(aybar*fin(1,i,j)  +ay*fin(1,i,j+1))+
+     &            bx*(aybar*fin(1,i+1,j)+ay*fin(1,i+1,j+1)))
 
             sum=sum+hy(v)*(
-     >         axbar*(bybar*fin(2,i,j)  +by*fin(2,i,j+1))+
-     >            ax*(bybar*fin(2,i+1,j)+by*fin(2,i+1,j+1)))
+     &         axbar*(bybar*fin(2,i,j)  +by*fin(2,i,j+1))+
+     &            ax*(bybar*fin(2,i+1,j)+by*fin(2,i+1,j+1)))
 
             sum=sum+hx(v)*hy(v)*(
-     >         bxbar*(bybar*fin(3,i,j)  +by*fin(3,i,j+1))+
-     >            bx*(bybar*fin(3,i+1,j)+by*fin(3,i+1,j+1)))
+     &         bxbar*(bybar*fin(3,i,j)  +by*fin(3,i,j+1))+
+     &            bx*(bybar*fin(3,i+1,j)+by*fin(3,i+1,j+1)))
 
             fval(v,iadr)=sum
-         endif
+         end if
 
-         if(ict(2).eq.1) then
+         if(ict(2) == 1) then
 
 !  df/dx:
 
             iadr=iadr+1
 
             sum=hxi(v)*(
-     >         axbarp*(aybar*fin(0,i,j)  +ay*fin(0,i,j+1))+
-     >            axp*(aybar*fin(0,i+1,j)+ay*fin(0,i+1,j+1)))
+     &         axbarp*(aybar*fin(0,i,j)  +ay*fin(0,i,j+1))+
+     &            axp*(aybar*fin(0,i+1,j)+ay*fin(0,i+1,j+1)))
 
             sum=sum+
-     >         bxbarp*(aybar*fin(1,i,j)  +ay*fin(1,i,j+1))+
-     >            bxp*(aybar*fin(1,i+1,j)+ay*fin(1,i+1,j+1))
+     &         bxbarp*(aybar*fin(1,i,j)  +ay*fin(1,i,j+1))+
+     &            bxp*(aybar*fin(1,i+1,j)+ay*fin(1,i+1,j+1))
 
             sum=sum+hxi(v)*hy(v)*(
-     >         axbarp*(bybar*fin(2,i,j)  +by*fin(2,i,j+1))+
-     >            axp*(bybar*fin(2,i+1,j)+by*fin(2,i+1,j+1)))
+     &         axbarp*(bybar*fin(2,i,j)  +by*fin(2,i,j+1))+
+     &            axp*(bybar*fin(2,i+1,j)+by*fin(2,i+1,j+1)))
 
             sum=sum+hy(v)*(
-     >         bxbarp*(bybar*fin(3,i,j)  +by*fin(3,i,j+1))+
-     >            bxp*(bybar*fin(3,i+1,j)+by*fin(3,i+1,j+1)))
+     &         bxbarp*(bybar*fin(3,i,j)  +by*fin(3,i,j+1))+
+     &            bxp*(bybar*fin(3,i+1,j)+by*fin(3,i+1,j+1)))
 
             fval(v,iadr)=sum
-         endif
+         end if
 
-         if(ict(3).eq.1) then
+         if(ict(3) == 1) then
 
 !  df/dy:
 
             iadr=iadr+1
 
             sum=hyi(v)*(
-     >         axbar*(aybarp*fin(0,i,j)  +ayp*fin(0,i,j+1))+
-     >            ax*(aybarp*fin(0,i+1,j)+ayp*fin(0,i+1,j+1)))
+     &         axbar*(aybarp*fin(0,i,j)  +ayp*fin(0,i,j+1))+
+     &            ax*(aybarp*fin(0,i+1,j)+ayp*fin(0,i+1,j+1)))
 
             sum=sum+hx(v)*hyi(v)*(
-     >         bxbar*(aybarp*fin(1,i,j)  +ayp*fin(1,i,j+1))+
-     >            bx*(aybarp*fin(1,i+1,j)+ayp*fin(1,i+1,j+1)))
+     &         bxbar*(aybarp*fin(1,i,j)  +ayp*fin(1,i,j+1))+
+     &            bx*(aybarp*fin(1,i+1,j)+ayp*fin(1,i+1,j+1)))
 
             sum=sum+
-     >         axbar*(bybarp*fin(2,i,j)  +byp*fin(2,i,j+1))+
-     >            ax*(bybarp*fin(2,i+1,j)+byp*fin(2,i+1,j+1))
+     &         axbar*(bybarp*fin(2,i,j)  +byp*fin(2,i,j+1))+
+     &            ax*(bybarp*fin(2,i+1,j)+byp*fin(2,i+1,j+1))
 
             sum=sum+hx(v)*(
-     >         bxbar*(bybarp*fin(3,i,j)  +byp*fin(3,i,j+1))+
-     >            bx*(bybarp*fin(3,i+1,j)+byp*fin(3,i+1,j+1)))
+     &         bxbar*(bybarp*fin(3,i,j)  +byp*fin(3,i,j+1))+
+     &            bx*(bybarp*fin(3,i+1,j)+byp*fin(3,i+1,j+1)))
 
             fval(v,iadr)=sum
-         endif
+         end if
 
-         if(ict(4).eq.1) then
+         if(ict(4) == 1) then
 
 !  d2f/dxdy:
 
             iadr=iadr+1
 
             sum=hxi(v)*hyi(v)*(
-     >         axbarp*(aybarp*fin(0,i,j)  +ayp*fin(0,i,j+1))+
-     >            axp*(aybarp*fin(0,i+1,j)+ayp*fin(0,i+1,j+1)))
+     &         axbarp*(aybarp*fin(0,i,j)  +ayp*fin(0,i,j+1))+
+     &            axp*(aybarp*fin(0,i+1,j)+ayp*fin(0,i+1,j+1)))
 
             sum=sum+hyi(v)*(
-     >         bxbarp*(aybarp*fin(1,i,j)  +ayp*fin(1,i,j+1))+
-     >            bxp*(aybarp*fin(1,i+1,j)+ayp*fin(1,i+1,j+1)))
+     &         bxbarp*(aybarp*fin(1,i,j)  +ayp*fin(1,i,j+1))+
+     &            bxp*(aybarp*fin(1,i+1,j)+ayp*fin(1,i+1,j+1)))
 
             sum=sum+hxi(v)*(
-     >         axbarp*(bybarp*fin(2,i,j)  +byp*fin(2,i,j+1))+
-     >            axp*(bybarp*fin(2,i+1,j)+byp*fin(2,i+1,j+1)))
+     &         axbarp*(bybarp*fin(2,i,j)  +byp*fin(2,i,j+1))+
+     &            axp*(bybarp*fin(2,i+1,j)+byp*fin(2,i+1,j+1)))
 
             sum=sum+
-     >         bxbarp*(bybarp*fin(3,i,j)  +byp*fin(3,i,j+1))+
-     >            bxp*(bybarp*fin(3,i+1,j)+byp*fin(3,i+1,j+1))
+     &         bxbarp*(bybarp*fin(3,i,j)  +byp*fin(3,i,j+1))+
+     &            bxp*(bybarp*fin(3,i+1,j)+byp*fin(3,i+1,j+1))
 
             fval(v,iadr)=sum
-         endif
+         end if
 
-      enddo                             ! vector loop
+      end do                             ! vector loop
 
       return
       end subroutine herm2fcn
-
-
 
 
       subroutine ibc_ck(ibc,slbl,xlbl,imin,imax,ier)
@@ -1900,23 +1894,21 @@
 
 !----------------------
 
-      if((ibc.lt.imin).or.(ibc.gt.imax)) then
+      if((ibc < imin).or.(ibc > imax)) then
          ier=1
 !         write(6,1001) slbl,xlbl,ibc,imin,imax
 ! 1001    format(' ?',a,' -- ibc',a,' = ',i9,' out of range ',
 !     >      i2,' to ',i2)
-      endif
+      end if
 
       return
       end subroutine ibc_ck
 
 
-
-
       subroutine do_mkbicub(x,nx,y,ny,f1,nf2,
-     >   ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >   ibcymin,bcymin,ibcymax,bcymax,
-     >   ilinx,iliny,ier)
+     &   ibcxmin,bcxmin,ibcxmax,bcxmax,
+     &   ibcymin,bcymin,ibcymax,bcymax,
+     &   ilinx,iliny,ier)
 
 !  setup bicubic spline, dynamic allocation of workspace
 !  fortran-90 fixed form source
@@ -1933,7 +1925,7 @@
       real x(:) ! (nx)                        ! x vector, strict ascending
       real y(:) ! (ny)                        ! y vector, strict ascending
 
-      integer nf2                       ! 2nd dimension of f, nf2.ge.nx
+      integer nf2                       ! 2nd dimension of f, nf2 >= nx
 !  input/output:
       real, pointer :: f1(:) ! =(4,nf2,ny)                  ! data & spline coefficients
 
@@ -2017,8 +2009,8 @@
 !  possible errors:
 !    x(...) not strict ascending
 !    y(...) not strict ascending
-!    nx .lt. 4
-!    ny .lt. 4
+!    nx  <  4
+!    ny  <  4
 !    invalid boundary condition flag
 
 !-----------------------
@@ -2040,47 +2032,47 @@
 !  see if 2nd pass is needed due to inhomogeneous d/dy bdy cond.
 
       iflg2=0
-      if(ibcymin.ne.-1) then
-         if((ibcymin.eq.1).or.(ibcymin.eq.2)) then
+      if(ibcymin /= -1) then
+         if((ibcymin == 1).or.(ibcymin == 2)) then
             do ix=1,nx
-               if (bcymin(ix).ne.0.0) iflg2=1
-            enddo
-         endif
-         if((ibcymax.eq.1).or.(ibcymax.eq.2)) then
+               if (bcymin(ix) /= 0.0) iflg2=1
+            end do
+         end if
+         if((ibcymax == 1).or.(ibcymax == 2)) then
             do ix=1,nx
-               if (bcymax(ix).ne.0.0) iflg2=1
-            enddo
-         endif
-      endif
+               if (bcymax(ix) /= 0.0) iflg2=1
+            end do
+         end if
+      end if
 
 !  check boundary condition specifications
 
       ier=0
 
       call ibc_ck(ibcxmin,'bcspline','xmin',-1,7,ier)
-      if(ibcxmin.ge.0) call ibc_ck(ibcxmax,'bcspline','xmax',0,7,ier)
+      if(ibcxmin >= 0) call ibc_ck(ibcxmax,'bcspline','xmax',0,7,ier)
       call ibc_ck(ibcymin,'bcspline','ymin',-1,7,ier)
-      if(ibcymin.ge.0) call ibc_ck(ibcymax,'bcspline','ymax',0,7,ier)
+      if(ibcymin >= 0) call ibc_ck(ibcymax,'bcspline','ymax',0,7,ier)
 
 !  check ilinx & x vector
 
       call splinck(x,nx,ilinx,1.0e-3,ierx)
-      if(ierx.ne.0) ier=2
+      if(ierx /= 0) ier=2
 
-      if(ier.eq.2) then
+      if(ier == 2) then
          write(6,'('' ?bcspline:  x axis not strict ascending'')')
-      endif
+      end if
 
 !  check iliny & y vector
 
       call splinck(y,ny,iliny,1.0e-3,iery)
-      if(iery.ne.0) ier=3
+      if(iery /= 0) ier=3
 
-      if(ier.eq.3) then
+      if(ier == 3) then
          write(6,'('' ?bcspline:  y axis not strict ascending'')')
-      endif
+      end if
 
-      if(ier.ne.0) return
+      if(ier /= 0) return
 
 !------------------------------------
       allocate(fwk(2,max(nx,ny)))
@@ -2091,16 +2083,16 @@
       zbcmax=0
       do iy=1,ny
          fwk(1,1:nx) = f(1,1:nx,iy)
-         if((ibcxmin.eq.1).or.(ibcxmin.eq.2)) zbcmin=bcxmin(iy)
-         if((ibcxmax.eq.1).or.(ibcxmax.eq.2)) zbcmax=bcxmax(iy)
+         if((ibcxmin == 1).or.(ibcxmin == 2)) zbcmin=bcxmin(iy)
+         if((ibcxmax == 1).or.(ibcxmax == 2)) zbcmax=bcxmax(iy)
          call mkspline(x,nx,fwk,
-     >      ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
-         if(ier.ne.0) then
+     &      ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
+         if(ier /= 0) then
             deallocate(fwk)
             return
          end if
          f(2,1:nx,iy)=fwk(2,1:nx)
-      enddo
+      end do
 
 !  evaluate fyy (spline in y direction)
 !  use homogeneous boundary condition; correction done later if necessary
@@ -2111,18 +2103,18 @@
       ibcmax=ibcymax
       do ix=1,nx
          fwk(1,1:ny) = f(1,ix,1:ny)
-         if(iflg2.eq.1) then
-            if((ibcymin.eq.1).or.(ibcymin.eq.2)) ibcmin=0
-            if((ibcymax.eq.1).or.(ibcymax.eq.2)) ibcmax=0
-         endif
+         if(iflg2 == 1) then
+            if((ibcymin == 1).or.(ibcymin == 2)) ibcmin=0
+            if((ibcymax == 1).or.(ibcymax == 2)) ibcmax=0
+         end if
          call mkspline(y,ny,fwk,
-     >      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
-         if(ier.ne.0) then
+     &      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
+         if(ier /= 0) then
             deallocate(fwk)
             return
          end if
          f(3,ix,1:ny)=fwk(2,1:ny)
-      enddo
+      end do
 
 !  evaluate fxxyy (spline fxx in y direction; BC simplified; avg
 !  d2(d2f/dx2)/dy2 and d2(df2/dy2)/dx2
@@ -2133,20 +2125,20 @@
       ibcmax=ibcymax
       do ix=1,nx
          fwk(1,1:ny) = f(2,ix,1:ny)
-         if(iflg2.eq.1) then
-            if((ibcymin.eq.1).or.(ibcymin.eq.2)) ibcmin=0
-            if((ibcymax.eq.1).or.(ibcymax.eq.2)) ibcmax=0
-         endif
+         if(iflg2 == 1) then
+            if((ibcymin == 1).or.(ibcymin == 2)) ibcmin=0
+            if((ibcymax == 1).or.(ibcymax == 2)) ibcmax=0
+         end if
          call mkspline(y,ny,fwk,
-     >      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
-         if(ier.ne.0) then
+     &      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
+         if(ier /= 0) then
             deallocate(fwk)
             return
          end if
          f(4,ix,1:ny)= fwk(2,1:ny)
-      enddo
+      end do
 
-      if(iflg2.eq.1) then
+      if(iflg2 == 1) then
          allocate(fcorr(2,nx,ny))
 
 !  correct for inhomogeneous y boundary condition
@@ -2156,52 +2148,52 @@
             !  requested derivative (1st or 2nd) and the current value
 
             zdiff(1)=0.0
-            if(ibcymin.eq.1) then
+            if(ibcymin == 1) then
                hy=y(2)-y(1)
                zdiff(1)=(f(1,ix,2)-f(1,ix,1))/hy +
-     >            hy*(-2*f(3,ix,1)-f(3,ix,2))/6
+     &            hy*(-2*f(3,ix,1)-f(3,ix,2))/6
                zdiff(1)=bcymin(ix)-zdiff(1)
-            else if(ibcymin.eq.2) then
+            else if(ibcymin == 2) then
                zdiff(1)=bcymin(ix)-f(3,ix,1)
-            endif
+            end if
 
             zdiff(2)=0.0
-            if(ibcymax.eq.1) then
+            if(ibcymax == 1) then
                hy=y(ny)-y(ny-1)
                zdiff(2)=(f(1,ix,ny)-f(1,ix,ny-1))/hy +
-     >            hy*(2*f(3,ix,ny)+f(3,ix,ny-1))/6
+     &            hy*(2*f(3,ix,ny)+f(3,ix,ny-1))/6
                zdiff(2)=bcymax(ix)-zdiff(2)
-            else if(ibcymax.eq.2) then
+            else if(ibcymax == 2) then
                zdiff(2)=bcymax(ix)-f(3,ix,ny)
-            endif
+            end if
 
             fwk(1,1:ny)=0.0  ! values are zero; only BC is not
             call mkspline(y,ny,fwk,ibcymin,zdiff(1),ibcymax,zdiff(2),
-     >         iliny,ier)
-            if(ier.ne.0) then
+     &         iliny,ier)
+            if(ier /= 0) then
                deallocate(fwk,fcorr)
                return
             end if
             fcorr(1,ix,1:ny)=fwk(2,1:ny)  ! fyy-correction
-         enddo
+         end do
 
          zbcmin=0
          zbcmax=0
          do iy=1,ny
             fwk(1,1:nx)=fcorr(1,1:nx,iy)
             call mkspline(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,
-     >         ilinx,ier)
-            if(ier.ne.0) then
+     &         ilinx,ier)
+            if(ier /= 0) then
                deallocate(fwk,fcorr)
                return
             end if
             fcorr(2,1:nx,iy)=fwk(2,1:nx)  ! fxxyy-correction
-         enddo
+         end do
 
          f(3:4,1:nx,1:ny)=f(3:4,1:nx,1:ny)+fcorr(1:2,1:nx,1:ny)
 
          deallocate(fcorr)
-      endif
+      end if
 
 !  correction spline -- f=fxx=zero; fyy & fxxyy are affected
 
@@ -2213,10 +2205,8 @@
       return
       end subroutine do_mkbicub
 
-
-
       subroutine mkspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >   ilinx,ier)
+     &   ilinx,ier)
 
 !  make a 2-coefficient 1d spline
 
@@ -2291,9 +2281,9 @@
       integer ilinx                     ! =1: hint, x axis is ~evenly spaced
 
 !  let dx[avg] = (x(nx)-x(1))/(nx-1)
-!  let dx[j] = x(j+1)-x(j), for all j satisfying 1.le.j.lt.nx
+!  let dx[j] = x(j+1)-x(j), for all j satisfying 1 <= j < nx
 
-!  if for all such j, abs(dx[j]-dx[avg]).le.(1.0e-3*dx[avg]) then
+!  if for all such j, abs(dx[j]-dx[avg]) <= (1.0e-3*dx[avg]) then
 !  ilinx=1 is returned, indicating the data is (at least nearly)
 !  evenly spaced.  Even spacing is useful, for speed of zone lookup,
 !  when evaluating a spline.
@@ -2303,7 +2293,7 @@
       integer ier                       ! exit code, 0=OK
 
 !  an error code is returned if the x axis is not strict ascending,
-!  or if nx.lt.4, or if an invalid boundary condition specification was
+!  or if nx < 4, or if an invalid boundary condition specification was
 !  input.
 
 !------------------------------------
@@ -2330,32 +2320,30 @@
       do i=1,nx
          fspl4(1,i)=fspl(1,i)
          fspl(2,i)=0.0                  ! for now
-      enddo
+      end do
 
       inwk=nx
 
 !  boundary conditions imposed by cspline...
 
       call cspline(x,nx,fspl4,ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >   wk,inwk,ilinx,ier)
+     &   wk,inwk,ilinx,ier)
 
-      if(ier.eq.0) then
+      if(ier == 0) then
 
 !  copy the output -- careful of end point.
 
          do i=1,nx-1
             fspl(2,i)=2.0*fspl4(3,i)
-         enddo
+         end do
          fspl(2,nx)=2.0*fspl4(3,nx-1) +
-     >        (x(nx)-x(nx-1))*6.0*fspl4(4,nx-1)
-      endif
+     &        (x(nx)-x(nx-1))*6.0*fspl4(4,nx-1)
+      end if
 
       deallocate(fspl4,wk)
 
       return
       end subroutine mkspline
-
-
 
       subroutine splinck(x,inx,ilinx,ztol,ier)
 
@@ -2379,25 +2367,23 @@
 
       ier=0
       ilinx=1
-      if(inx.le.1) return
+      if(inx <= 1) return
 
       dxavg=(x(inx)-x(1))/(inx-1)
       zeps=abs(ztol*dxavg)
 
       do ix=2,inx
          zdiffx=(x(ix)-x(ix-1))
-         if(zdiffx.le.0.0) ier=2
+         if(zdiffx <= 0.0) ier=2
          zdiff=zdiffx-dxavg
-         if(abs(zdiff).gt.zeps) then
+         if(abs(zdiff) > zeps) then
             ilinx=2
-         endif
-      enddo
+         end if
+      end do
  10   continue
 
       return
       end subroutine splinck
-
-
 
       subroutine V_SPLINE(k_bc1,k_bcn,n,x,f,wk)
 !***********************************************************************
@@ -2430,7 +2416,7 @@
 !       =6 match second derivative to first 3 points
 !       =7 match third derivative to first 4 points
 !       =else use knot-a-knot
-!  n-number of data points or knots-(n.ge.2)
+!  n-number of data points or knots-(n >= 2)
 !  x(n)-abscissas of the knots in strictly increasing order
 !  f(1,i)-ordinates of the knots
 !  f(2,1)-input value of s'(x1) for k_bc1=1
@@ -2444,17 +2430,17 @@
 !  f(4,i)=s'''(x(i))
 !Comments:
 !  s(x)=f(1,i)+f(2,i)*(x-x(i))+f(3,i)*(x-x(i))**2/2!
-!       +f(4,i)*(x-x(i))**3/3! for x(i).le.x.le.x(i+1)
+!       +f(4,i)*(x-x(i))**3/3! for x(i) <= x <= x(i+1)
 !  W_SPLINE can be used to evaluate the spline and its derivatives
 !  The cubic spline is twice differentiable (C2)
 
 !  bugfixes -- dmc 24 Feb 2004:
 !    (a) fixed logic for not-a-knot:
 !          !    Set f(3,1) for not-a-knot
-!                    IF(k_bc1.le.0.or.k_bc1.gt.7) THEN ...
+!                    IF(k_bc1 <= 0.or.k_bc1 > 7) THEN ...
 !        instead of
 !          !    Set f(3,1) for not-a-knot
-!                    IF(k_bc1.le.0.or.k_bc1.gt.5) THEN ...
+!                    IF(k_bc1 <= 0.or.k_bc1 > 5) THEN ...
 !        and similarly for logic after cmt
 !          !    Set f(3,n) for not-a-knot
 !        as required since k_bc*=6 and k_bc*=7 are NOT not-a-knot BCs.
@@ -2462,8 +2448,8 @@
 !    (b) the BCs to fix 2nd derivative at end points did not work if that
 !        2nd derivative were non-zero.  The reason is that in those cases
 !        the off-diagonal matrix elements nearest the corners are not
-!        symmetric; i.e. elem(1,2).ne.elem(2,1) and
-!        elem(n-1,n).ne.elem(n,n-1) where I use "elem" to refer to
+!        symmetric; i.e. elem(1,2) /= elem(2,1) and
+!        elem(n-1,n) /= elem(n,n-1) where I use "elem" to refer to
 !        the tridiagonal matrix elements.  The correct values for the
 !        elements is:   elem(1,2)=0, elem(2,1)=x(2)-x(1)
 !                       elem(n,n-1)=0, elem(n-1,n)=x(n)-x(n-1)
@@ -2499,23 +2485,23 @@
       b1=0.0
       an=0.0
       bn=0.0
-      IF(k_bc1.eq.1) THEN
+      IF(k_bc1 == 1) THEN
         a1=f(2,1)
-      ELSEIF(k_bc1.eq.2) THEN
+      else if(k_bc1 == 2) THEN
         b1=f(3,1)
-      ELSEIF(k_bc1.eq.5) THEN
+      else if(k_bc1 == 5) THEN
         a1=(f(1,2)-f(1,1))/(x(2)-x(1))
-      ELSEIF(k_bc1.eq.6) THEN
+      else if(k_bc1 == 6) THEN
         b1=2.0*((f(1,3)-f(1,2))/(x(3)-x(2))
      &         -(f(1,2)-f(1,1))/(x(2)-x(1)))/(x(3)-x(1))
       end if
-      IF(k_bcn.eq.1) THEN
+      IF(k_bcn == 1) THEN
         an=f(2,n)
-      ELSEIF(k_bcn.eq.2) THEN
+      else if(k_bcn == 2) THEN
         bn=f(3,n)
-      ELSEIF(k_bcn.eq.5) THEN
+      else if(k_bcn == 5) THEN
         an=(f(1,n)-f(1,n-1))/(x(n)-x(n-1))
-      ELSEIF(k_bcn.eq.6) THEN
+      else if(k_bcn == 6) THEN
         bn=2.0*((f(1,n)-f(1,n-1))/(x(n)-x(n-1))
      &         -(f(1,n-1)-f(1,n-2))/(x(n-1)-x(n-2)))/(x(n)-x(n-2))
       end if
@@ -2523,7 +2509,7 @@
       f(2,n)=0.0
       f(3,n)=0.0
       f(4,n)=0.0
-      IF(n.eq.2) THEN
+      IF(n == 2) THEN
 !Coefficients for n=2
         f(2,1)=(f(1,2)-f(1,1))/(x(2)-x(1))
         f(3,1)=0.0
@@ -2531,7 +2517,7 @@
         f(2,2)=f(2,1)
         f(3,2)=0.0
         f(4,2)=0.0
-      ELSEIF(n.gt.2) THEN
+      else if(n > 2) THEN
 !Set up tridiagonal system for A*y=B where y(i) are the second
 !  derivatives at the knots
 !  f(2,i) are the diagonal elements of A
@@ -2553,7 +2539,7 @@
 
 !  BC's
 !    Left
-        IF(k_bc1.eq.-1) THEN
+        IF(k_bc1 == -1) THEN
           f(2,1)=2.0*(f(4,1)+f(4,n-1))
           f(3,1)=(f(1,2)-f(1,1))/f(4,1)-(f(1,n)-f(1,n-1))/f(4,n-1)
           wk(1)=f(4,n-1)
@@ -2562,14 +2548,14 @@
           end do
           wk(n-2)=f(4,n-2)
           wk(n-1)=f(4,n-1)
-        ELSEIF(k_bc1.eq.1.or.k_bc1.eq.3.or.k_bc1.eq.5) THEN
+        else if(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) THEN
           f(2,1)=2.0*f(4,1)
           f(3,1)=(f(1,2)-f(1,1))/f(4,1)-a1
-        ELSEIF(k_bc1.eq.2.or.k_bc1.eq.4.or.k_bc1.eq.6) THEN
+        else if(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) THEN
           f(2,1)=2.0*f(4,1)
           f(3,1)=f(4,1)*b1/3.0
           f(4,1)=0.0  ! upper diagonal only (dmc: cf elem21)
-        ELSEIF(k_bc1.eq.7) THEN
+        else if(k_bc1 == 7) THEN
           f(2,1)=-f(4,1)
           f(3,1)=f(3,3)/(x(4)-x(2))-f(3,2)/(x(3)-x(1))
           f(3,1)=f(3,1)*f(4,1)**2/(x(4)-x(1))
@@ -2579,29 +2565,29 @@
           f(3,2)=f(3,2)*f(4,2)/(f(4,1)+f(4,2))
         end if
 !    Right
-        IF(k_bcn.eq.1.or.k_bcn.eq.3.or.k_bcn.eq.5) THEN
+        IF(k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) THEN
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=-(f(1,n)-f(1,n-1))/f(4,n-1)+an
-        ELSEIF(k_bcn.eq.2.or.k_bcn.eq.4.or.k_bcn.eq.6) THEN
+        else if(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=f(4,n-1)*bn/3.0
 !xxx          f(4,n-1)=0.0  ! dmc: preserve f(4,n-1) for back subst.
           elemnn1=0.0  !  lower diagonal only (dmc)
-        ELSEIF(k_bcn.eq.7) THEN
+        else if(k_bcn == 7) THEN
           f(2,n)=-f(4,n-1)
           f(3,n)=f(3,n-1)/(x(n)-x(n-2))-f(3,n-2)/(x(n-1)-x(n-3))
           f(3,n)=-f(3,n)*f(4,n-1)**2/(x(n)-x(n-3))
-        ELSEIF(k_bc1.ne.-1) THEN         ! not a knot:
+        else if(k_bc1 /= -1) THEN         ! not a knot:
           imax=n-1
           f(2,n-1)=2.0*f(4,n-2)+f(4,n-1)
           f(3,n-1)=f(3,n-1)*f(4,n-2)/(f(4,n-1)+f(4,n-2))
         end if
 !  Limit solution for only three points in domain
-        IF(n.eq.3) THEN
+        IF(n == 3) THEN
           f(3,1)=0.0
           f(3,n)=0.0
         end if
-        IF(k_bc1.eq.-1) THEN
+        IF(k_bc1 == -1) THEN
 !Solve system of equations for second derivatives at the knots
 !  Periodic BC
 !    Forward elimination
@@ -2635,18 +2621,18 @@
 !    Forward elimination
 !    For Not-A-Knot BC the off-diagonal end elements are not equal
           do i=imin+1,imax
-            IF((i.eq.n-1).and.(imax.eq.n-1)) THEN
+            IF((i == n-1).and.(imax == n-1)) THEN
               t=(f(4,i-1)-f(4,i))/f(2,i-1)
             ELSE
-              if(i.eq.2) then
+              if(i == 2) then
                  t=elem21/f(2,i-1)
-              else if(i.eq.n) then
+              else if(i == n) then
                  t=elemnn1/f(2,i-1)
               else
                  t=f(4,i-1)/f(2,i-1)
-              endif
+              end if
             end if
-            IF((i.eq.imin+1).and.(imin.eq.2)) THEN
+            IF((i == imin+1).and.(imin == 2)) THEN
               f(2,i)=f(2,i)-t*(f(4,i-1)-f(4,i-2))
             ELSE
               f(2,i)=f(2,i)-t*f(4,i-1)
@@ -2659,7 +2645,7 @@
             i=imax-ib
             if (abs(f(3,i)) > 1e20) then
                f(3,i) = 0.0 ! protect against overflow
-            else IF((i.eq.2).and.(imin.eq.2)) THEN
+            else IF((i == 2).and.(imin == 2)) THEN
               f(3,i)=(f(3,i)-(f(4,i)-f(4,i-1))*f(3,i+1))/f(2,i)
             ELSE
               f(3,i)=(f(3,i)-f(4,i)*f(3,i+1))/f(2,i)
@@ -2669,11 +2655,11 @@
           f(4,1)=x(2)-x(1)
           f(4,n-1)=x(n)-x(n-1)
 !    Set f(3,1) for not-a-knot
-          IF(k_bc1.le.0.or.k_bc1.gt.7) THEN
+          IF(k_bc1 <= 0.or.k_bc1 > 7) THEN
             f(3,1)=(f(3,2)*(f(4,1)+f(4,2))-f(3,3)*f(4,1))/f(4,2)
           end if
 !    Set f(3,n) for not-a-knot
-          IF(k_bcn.le.0.or.k_bcn.gt.7) THEN
+          IF(k_bcn <= 0.or.k_bcn > 7) THEN
             f(3,n)=f(3,n-1)+(f(3,n-1)-f(3,n-2))*f(4,n-1)/f(4,n-2)
           end if
         end if
@@ -2681,12 +2667,12 @@
 !Compute polynomial coefficients
         do i=1,n-1
           f(2,i)=
-     >        (f(1,i+1)-f(1,i))/f(4,i)-f(4,i)*(f(3,i+1)+2.0*f(3,i))
+     &        (f(1,i+1)-f(1,i))/f(4,i)-f(4,i)*(f(3,i+1)+2.0*f(3,i))
           f(4,i)=(f(3,i+1)-f(3,i))/f(4,i)
           f(3,i)=6.0*f(3,i)
           f(4,i)=6.0*f(4,i)
         end do
-        IF(k_bc1.eq.-1) THEN
+        IF(k_bc1 == -1) THEN
           f(2,n)=f(2,1)
           f(3,n)=f(3,1)
           f(4,n)=f(4,1)
@@ -2695,9 +2681,9 @@
            f(2,n)=f(2,n-1)+hn*(f(3,n-1)+0.5*hn*f(4,n-1))
            f(3,n)=f(3,n-1)+hn*f(4,n-1)
            f(4,n)=f(4,n-1)
-           IF(k_bcn.eq.1.or.k_bcn.eq.3.or.k_bcn.eq.5) THEN
+           IF(k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) THEN
               f(2,n)=an
-           else if(k_bcn.eq.2.or.k_bcn.eq.4.or.k_bcn.eq.6) THEN
+           else if(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
               f(3,n)=bn
            end if
         end if
@@ -2714,81 +2700,81 @@
       integer i,nxm,i1,i2,ij,ii
       real dx
 
-!  find index i such that x(i).le.zxget.le.x(i+1)
+!  find index i such that x(i) <= zxget <= x(i+1)
 
-!  x(1...nx) is strict increasing and x(1).le.zxget.le.x(nx)
+!  x(1...nx) is strict increasing and x(1) <= zxget <= x(nx)
 !  (this is assumed to already have been checked -- no check here!)
 
       nxm=nx-1
-      if((i.lt.1).or.(i.gt.nxm)) then
+      if((i < 1).or.(i > nxm)) then
          i1=1
          i2=nx-1
          GOTO 10
-      endif
+      end if
 
-      if(x(i).gt.zxget) then
+      if(x(i) > zxget) then
 !  look down
          dx=x(i+1)-x(i)
-         if((x(i)-zxget).gt.4*dx) then
+         if((x(i)-zxget) > 4*dx) then
             i1=1
             i2=i-1
             GOTO 10
          else
             i2=i-1
             do ij=i2,1,-1
-               if((x(ij).le.zxget).and.(zxget.le.x(ij+1))) then
+               if((x(ij) <= zxget).and.(zxget <= x(ij+1))) then
                   i=ij
                   return
-               endif
-            enddo
+               end if
+            end do
             i=1
             return
-         endif
-      else if(x(i+1).lt.zxget) then
+         end if
+      else if(x(i+1) < zxget) then
 !  look up
          dx=x(i+1)-x(i)
-         if((zxget-x(i+1)).gt.4*dx) then
+         if((zxget-x(i+1)) > 4*dx) then
             i1=i+1
             i2=nxm
             GOTO 10
          else
             i2=i+1
             do ij=i2,nxm
-               if((x(ij).le.zxget).and.(zxget.le.x(ij+1))) then
+               if((x(ij) <= zxget).and.(zxget <= x(ij+1))) then
                   i=ij
                   return
-               endif
-            enddo
+               end if
+            end do
             ij=nxm
             return
-         endif
+         end if
       else
 !  already there...
          return
-      endif
+      end if
 
 !---------------------------
 !  binary search
 
  10   continue
 
-      if(i1.eq.i2) then
+      if(i1 == i2) then
 ! found by proc. of elimination
          i=i1
          return
-      endif
+      end if
 
       ii=(i1+i2)/2
 
-      if(zxget.lt.x(ii)) then
+      if(zxget < x(ii)) then
          i2=ii-1
-      else if(zxget.gt.x(ii+1)) then
+      else if(zxget > x(ii+1)) then
          i1=ii+1
       else
 ! found
          i=ii
          return
-      endif
+      end if
 
       GOTO 10
 

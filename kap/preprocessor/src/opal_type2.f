@@ -223,7 +223,9 @@
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+     &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
+     &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/type2_d/dkap
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
@@ -614,7 +616,9 @@
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+     &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
+     &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
        is=0
       if(xxco  <  1.e-6) then
@@ -871,7 +875,9 @@
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+     &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
+     &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_d/dkap
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
       common/type2_e/ opact,dopact,dopacr,dopactd
@@ -981,7 +987,9 @@
       parameter (ismdata=0)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+     &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
+     &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/type2_alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
@@ -1294,12 +1302,17 @@
       block data type2
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr), index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
+      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+     &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
+     &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_recoin/ itimeco,mxzero,readco_z
       data itime/mx*0/,itimeco/0/
-      data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7/
+      data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,
+     &                         5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+     &                         6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+     &                         7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7/
       data (xcs(i),i= 1,mc)/ 0.0,0.01,0.03,0.1,0.2,0.4,0.6,1.0/
       data (xos(i),i= 1,mc)/0.0,0.01,0.03,0.1,0.2,0.4,0.6,1.0/
       data (xa(i),i=1,5)/0.0,0.03,0.1,0.35,0.7/
@@ -1482,7 +1495,7 @@
      +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
 
-      IERR=.FALSE.
+      IERR=.false.
 
       X=20.*(FLT-3.800)+1
       FLR=FLRHO+18.-3.*FLT
@@ -1491,13 +1504,13 @@
       I=0
       IF(X < 2.)THEN
          IF(X < 0.75)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             I=1
          end if
-      ELSEIF(X > 84)THEN
+      else if(X > 84)THEN
          IF(X > 85.25)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             I=84
          end if
@@ -1508,13 +1521,13 @@
 
       IF(Y < 2.)THEN
          IF(Y < 0.75)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             J=1
          end if
-      ELSEIF(Y > NRL-1)THEN
+      else if(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             J=NRL-1
          end if
@@ -1816,8 +1829,8 @@
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
-!              IERR=.TRUE. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
-!                          ELSE IERR=.FALSE.
+!              IERR=.true. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
+!                          ELSE IERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS
       IF(NSM > 0)THEN

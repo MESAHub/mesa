@@ -187,7 +187,8 @@
       character (len=*) :: filename
       logical :: OP_file
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
 !      OPACT- opacity obtained from a quadratic interpolation at
 !      fixed log T6 at three values of log R; followed by quadratic
 !      interpolation along log T6. Results smoothed bt mixing
@@ -317,7 +318,8 @@
       character (len=*) :: filename
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
@@ -731,7 +733,8 @@
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx) ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),
+     &          dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/e/ opact,dopact,dopacr,dopactd
@@ -850,7 +853,8 @@
       character(len=250) dumarra
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
@@ -1026,7 +1030,8 @@
       block data
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       data (xa(i),i=1,mx-1)/0.0,0.1,0.2,0.35,0.5,.7,.8,.9,.95/
       data (za(i),i=1,mz)/.0,0.0001,.0003,.001,.002,.004,.01,.02,.03,.04,.06,.08,.1/
@@ -1164,8 +1169,8 @@
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
-!              IERR=.TRUE. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
-!                          ELSE IERR=.FALSE.
+!              IERR=.true. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
+!                          ELSE IERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS
       IF(NSM > 0)THEN
@@ -1379,7 +1384,7 @@
      +   +S*(   3*B(14)+T*(6*B(15)+9*T*B(16)) ))
 
 
-      IERR=.FALSE.
+      IERR=.false.
 
       X=20.*(FLT-3.800)+1
       FLR=FLRHO+18.-3.*FLT
@@ -1388,13 +1393,13 @@
       I=0
       IF(X < 2.)THEN
          IF(X < 0.75)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             I=1
          end if
-      ELSEIF(X > 84)THEN
+      else if(X > 84)THEN
          IF(X > 85.25)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             I=84
          end if
@@ -1405,13 +1410,13 @@
 
       IF(Y < 2.)THEN
          IF(Y < 0.75)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             J=1
          end if
-      ELSEIF(Y > NRL-1)THEN
+      else if(Y > NRL-1)THEN
          IF(Y > NRL+.25)THEN
-            IERR=.TRUE.
+            IERR=.true.
          ELSE
             J=NRL-1
          end if
@@ -1583,4 +1588,4 @@
    30    CONTINUE
    40 CONTINUE
 
-      END
+      end

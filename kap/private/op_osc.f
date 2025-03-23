@@ -48,7 +48,7 @@
                amamu(k) = amass(m)
                nkz(k) = m
             GOTO 1
-            endif
+            end if
          end do
          print*,' k=',k,', izz(k)=',izz(k)
          print*,' kz(m) not found'
@@ -85,7 +85,7 @@
       else if (flt > 8.) then
         ierr = 102
         return
-      endif
+      end if
 
       x = 40.*flt/real(i3)
       ih2 = x
@@ -161,7 +161,7 @@
             if (efa(i, jh) <= 0.) then
                jm = jh - 1
                GOTO 3
-            endif
+            end if
          end do
          GOTO 4
     3    jhmax = MIN(jhmax, jm)
@@ -187,14 +187,14 @@
       if (flrho < flrmin .or. flrho > flrmax) then
          ierr = 101
          return
-      endif
+      end if
 
 !  Interpolations in j for flne
       do jh = jhmin, jhmax
          if (flrh(2,jh) > flrho) then
             jm = jh - 1
             GOTO 5
-         endif
+         end if
       end do
       print*,' Interpolations in j for flne'
       print*,' Not found, i=',i
@@ -269,7 +269,7 @@
       subroutine rd(nel, nkz, izz, ilab, jh, n_tot, ff, rr, i3, umesh, fac)
       implicit none
       integer, intent(in) :: nel, nkz(ipe), izz(ipe), ilab(0:5),
-     >     jh(0:5), n_tot, i3
+     &     jh(0:5), n_tot, i3
       real, intent(in) :: umesh(nptot)
       real(dp), intent(in) :: fac(nel)
       real, intent(out) :: ff(:,:,0:,0:)  ! (nptot, ipe, 6, 6)
@@ -611,7 +611,7 @@
       ELSE
          FP1=(-11.*F(1)+18.*F(2)-9.*F(3)+2.*F(4))/6.
          FPN=(11.*F(N)-18.*F(N-1)+9.*F(N-2)-2.*F(N-3))/6.
-      ENDIF
+      end if
 
       D(1)=-.5
       T(1)=.5*(-F(1)+F(2)-FP1)
@@ -737,7 +737,7 @@
       else
          if (abs(x1)<abs(x2)) fx = sign(1.0,x1)*min(abs(x1), abs(x2))
          if (abs(x2)<abs(x1)) fx = sign(1.0,x2)*min(abs(x1), abs(x2))
-      endif
+      end if
 
       end subroutine deriv3
 ! **********************************************************************
@@ -762,7 +762,8 @@
       Py12 = P1(x,2.,3.)*Px2(y,2.,3.)
       Py22 = P2(x,2.,3.)*Px2(y,2.,3.)
 
-      g = f(2,2)*P11 + f(3,2)*P21 + f(2,3)*P12 + f(3,3)*P22 + fx(2,2)*Px11 + fx(3,2)*Px21 + fx(2,3)*Px12 + fx(3,3)*Px22 + fy(2,2)*Py11 + fy(3,2)*Py21 + fy(2,3)*Py12 + fy(3,3)*Py22
+      g = f(2,2)*P11 + f(3,2)*P21 + f(2,3)*P12 + f(3,3)*P22 + fx(2,2)*Px11 + fx(3,2)*Px21 + fx(2,3)*Px12 + fx(3,3)*Px22
+     &    + fy(2,2)*Py11 + fy(3,2)*Py21 + fy(2,3)*Py12 + fy(3,3)*Py22
 
       end subroutine interp3
 ! **********************************************************************

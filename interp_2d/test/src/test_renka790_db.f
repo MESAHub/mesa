@@ -21,7 +21,7 @@
       double precision :: X(NMAX), Y(NMAX), W(NMAX), RW(NMAX), A(9,NMAX), P(NI), FT(NI,NI)
       integer :: LCELL(NRMAX,NRMAX), LNEXT(NMAX)
 
-      double precision :: DEL, DUM, DX, DY, ERMAX, ERMEAN, PW, RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
+      double precision :: DEL,DUM,DX,DY,ERMAX,ERMEAN,PW,RMAX,SSA,SSE,SSM,SUM,XMIN,YMIN
 !      double precision CS2VAL_db
       integer :: I, IER, J, K, KF, KFF, KFL, KS, LOUT, N, NC, NFUN, NP, NR, NSET, NW
 
@@ -86,7 +86,7 @@
 !   Compute parameters A and RW defining the interpolant.
 
         call interp_CSHEP2_db (N,X,Y,W,NC,NW,NR, LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
-        if (IER /= 0) GO TO 21
+        if (IER /= 0) GOTO 21
 
 !   Compute interpolation errors.
 
@@ -132,7 +132,7 @@
 ! Print formats:
 
   200 format ('RENKA790_db: Node set ',I2,4X,'N =',I4,4X,'NI = ',I2,4X,'NC = ',I2,4X,'NW = ',I2,4X,'NR = ',I2/1X,16X,
-     >        'Function',4X,'Max Error',4X,'Mean Error',4X,'SSE/SSM')
+     &        'Function',4X,'Max Error',4X,'Mean Error',4X,'SSE/SSM')
   210 format (1X,19X,I2,9X,F7.4,6X,F8.5,2X,F9.6)
 
 ! Error message formats:
@@ -191,7 +191,7 @@
 
 ! **********************************************************
 
-      double precision X1(100), Y1(100),  X2(33), Y2(33), X3(25), Y3(25), X4(100), Y4(100), X5(81), Y5(81)
+      double precision X1(100),Y1(100),X2(33),Y2(33),X3(25),Y3(25),X4(100),Y4(100),X5(81),Y5(81)
       integer I
 
 ! Node set 1:  Franke's 100-node set.
@@ -507,12 +507,12 @@
 
       double precision T1, T2, T3, T4
       if (K  <  1  .OR.  K  >  10) return
-      GO TO (1,2,3,4,5,6,7,8,9,10), K
+      GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
 
-    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) + .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) 
-     >    + .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) - .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) + .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
+     &    + .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) - .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       if (IFLAG /= 1) return
       T1 = exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
       T2 = exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
@@ -714,12 +714,12 @@
 
       double precision T1, T2, T3, T4, T5, T6
       if (K  <  1  .OR.  K  >  10) return
-      GO TO (1,2,3,4,5,6,7,8,9,10), K
+      GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
 
-    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) + .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.) 
-     >    + .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) - .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
+    1 F = .75*exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.) + .75*exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)
+     &    + .5*exp(-((9.*X-7.)**2 + (9.*Y-3.)**2)/4.) - .2*exp(-(9.*X-4.)**2 - (9.*Y-7.)**2)
       if (IFLAG  <  1) return
       T1 = exp(-((9.*X-2.)**2 + (9.*Y-2.)**2)/4.)
       T2 = exp(-((9.*X+1.)**2)/49. - (9.*Y+1.)/10.)

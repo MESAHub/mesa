@@ -102,7 +102,8 @@
       save
       character (len=*) :: filename
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
 ! .... OPACT- opacity obtained from a quadraric interpolation at
 !      fixed log T6 at three values of log R; followed by quadratic
 !      interpolation along log T6. Results smoothed bt mixing
@@ -229,7 +230,8 @@
       character (len=*) :: filename
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
@@ -297,8 +299,6 @@
 !      interpolation.
       if((slt  <  alt(1)).or.(slt  >  alt(nt))) GOTO 62
       if((slr  <  alr (1)).or.(slr  >  alr(nre))) GOTO 62
-
-
 
       if (izi  ==  0) then  ! freeze table indices
         ilo=2
@@ -510,7 +510,8 @@
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/d/dkap
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/e/ opact,dopact,dopacr,dopactd
@@ -622,14 +623,13 @@
       character*1 dumarra(250)
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
-
-
 
         if (itimeco  /=  12345678) then
         do i=1,mx
@@ -756,7 +756,8 @@
       block data
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
+      common/a/ mzz, xz(mx,mz,nt,nr),t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
+     &          dfsx(mx),dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx),alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
       common/b/ itab(mx,mz),nta(nr),x(mx,mz),y(mx,mz),zz(mx,mz)
       data (xa(i),i=1,mx-1)/0.0,0.1,0.2,0.35,0.5,.7,.8,.9,.95/
       data (za(i),i=1,mz)/.0,0.0001,.0003,.001,.002,.004,.01,.02,.03, .04,.06,.08,.1/
@@ -1093,13 +1094,14 @@
 
 !  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
 
-      FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))+S*( B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))+S*( B( 9)+T*(B(10)+T*(B(11)+T*B(12)))  +S*( B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+      FF(S,T)= B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))+S*( B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))+S*( B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
+     &   +S*( B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
-      FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8))) +S*( 2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))+S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+      FFX(S,T)= B(5)+T*(B(6)+T*(B(7)+T*B(8))) +S*(2*(B(9)+T*(B(10)+T*(B(11)+T*B(12))))+S*(3*(B(13)+T*(B(14)+T*(B(15)+T*B(16))))))
 
-      FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))+T*( 2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15)))) +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+      FFY(S,T)= B(2)+S*(B(6)+S*(B(10)+S*B(14)))+T*(2*(B(3)+S*(B(7)+S*(B(11)+S*B(15)))) +T*(3*(B(4)+S*(B(8)+S*(B(12)+S*B(16))))))
 
-      FFXY(S,T)=  B( 6)+T*(2*B( 7)+3*T*B( 8)) +S*( 2*B(10)+T*(4*B(11)+6*T*B(12)) +S*( 3*B(14)+T*(6*B(15)+9*T*B(16)) ))
+      FFXY(S,T)= B(6)+T*(2*B(7)+3*T*B( 8)) +S*(2*B(10)+T*(4*B(11)+6*T*B(12)) +S*(3*B(14)+T*(6*B(15)+9*T*B(16)) ))
 
 
       IERR=.false.
