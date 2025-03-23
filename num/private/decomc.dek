@@ -29,7 +29,7 @@
       double precision :: abno, alp, bet, sumr, sumi, sums, bb, ffma
 
       ierr = 0
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
 ! -----------------------------------------------------------
 !
@@ -217,7 +217,7 @@
             e2i(i,j)=e2i(i,j)+betan*ffma
          end do
       end do
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -256,7 +256,7 @@
             e2i(ib,j)=e2i(ib,j)+betan*ffma
          end do
       end do
-      goto 46
+      GOTO 46
 !
 ! -----------------------------------------------------------
 !
@@ -283,7 +283,7 @@
             e2i(i,j)=betan*fmas(i,j)
          end do
       end do
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -327,14 +327,11 @@
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
 
       double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
-
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1)
-
       double precision :: br(n), bi(n), alphn, betan
 
 
-
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
 ! -----------------------------------------------------------
 !
@@ -391,7 +388,7 @@
 !
   13  continue
 ! ---  b is a banded matrix, jacobian a full matrix, second order
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -404,7 +401,7 @@
 !
   14  continue
 ! ---  b is a banded matrix, jacobian a banded matrix, second order
-      goto 46
+      GOTO 46
 !
 ! -----------------------------------------------------------
 !
@@ -417,7 +414,7 @@
 !
   15  continue
 ! ---  b is a full matrix, jacobian a full matrix, second order
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !

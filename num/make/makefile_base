@@ -16,7 +16,7 @@ SRCS = \
    num_def.f90 \
    mod_dop853.f mod_dopri5.f mod_dc_decsol.f \
    mod_rosenbrock.f mod_brent.f90 mod_qsort.f90 mod_root.f90 mod_solout_root.f90 \
-   mod_random.f90 mod_newton.f mod_bobyqa.f mod_newuoa.f \
+   mod_random.f90 mod_newton.f90 mod_bobyqa.f mod_newuoa.f \
    accurate_sum_auto_diff_star_order1.f90  \
    accurate_sum.f90 mod_simplex.f90 mod_integrate.f90 num_lib.f90 \
 
