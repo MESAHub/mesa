@@ -98,10 +98,10 @@
          do jh = jhmin, jhmax
             if(efa(i, jh) <= 0.)then
                jm = jh - 1
-               goto 3
+               GOTO 3
             endif
          end do
-         goto 4
+         GOTO 4
     3    jhmax = MIN(jhmax, jm)
     4    continue
       end do
@@ -133,7 +133,7 @@
       do jh = jhmin, jhmax
          if(flrh(2,jh) > flrho)then
             jm = jh - 1
-            goto 5
+            GOTO 5
          endif
       end do
       print*,' Interpolations in j for flne'

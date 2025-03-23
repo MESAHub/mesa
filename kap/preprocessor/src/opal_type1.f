@@ -368,8 +368,6 @@
         dfsxmx1=dfsx(mx-1)
       end if
 
-
-
       mxend=mx
       xa(mx)=1.-z
       xa(mx-1)=xamx1
@@ -1175,23 +1173,23 @@
          xzff(1,l)=ROSSL(1,l)
          end do
 
-         DO 70 K=2,N
+         DO K=2,N
             FLT=U(K)
-            DO 50 L=nrlow,nrhigh
+            DO L=nrlow,nrhigh
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
                CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
                IF(IERR)THEN
                end if
                V(L)=G
-   50       CONTINUE
+            end do
             T6=t6arr(K)
             do l=nrlow,nrhigh
             xzff(K,l)=V(l)
 
             end do
 
-   70    CONTINUE
+         end do
       end if
 
 

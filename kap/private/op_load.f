@@ -91,7 +91,7 @@
 
 !$omp critical (critial_do_op_dload)
 
-      if (have_loaded_op) goto 1001
+      if (have_loaded_op) GOTO 1001
 
 
       !path = '../OP4STARS_1.3'
@@ -119,7 +119,7 @@
          if (ios == 0) then
             have_loaded_op = .true.
             call IMESH(UMESH,NTOTV)
-            goto 1001
+            GOTO 1001
          end if
          write(*,*) 'failed in reading cache file'
          write(*,*) 'please delete cache file and try again'
@@ -147,7 +147,7 @@
       if (ios /= 0) then
          write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(1) // '.index'
          ierr = -1
-         goto 1001
+         GOTO 1001
       end if
       read(1,*)IZZ,AMM
       read(1,*)ITTE1,ITTE2,ITTE3
@@ -158,19 +158,19 @@
       if (IZZ /= KZ(1)) then
          write(6,6001)zlab(1),izz,nn,kz(1)
          ierr=1
-         goto 1001
+         GOTO 1001
       endif
       NTOTP=NF
       if (NTOTP > nptot) then
          write(6,6002)ntotp,nptot
          ierr=2
-         goto 1001
+         GOTO 1001
       endif
       INT(1)=1
       if (ITTE3 /= ITE3) then
          write(6,6077)ite3,itte3,nn
          ierr=3
-         goto 1001
+         GOTO 1001
       endif
 !      ITE1=MAX(ITE1,ITTE1)
 !      ITE2=MIN(ITE2,ITTE2)
@@ -180,7 +180,7 @@
       if (ios /= 0) then
          write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(1) // '.mesh'
          ierr = -1
-         goto 1001
+         GOTO 1001
       end if
       read(1)DV,NTOTV,(UMESH(N),N=1,NTOTV)
       umin=umesh(1)
@@ -204,27 +204,27 @@
          if (ITE33 /= ITE3) then
             write(6,6077)ite3,ite33,nn
             ierr=4
-            goto 1001
+            GOTO 1001
          endif
 !         ITE1=MAX(ITE1,ITE11)
 !         ITE2=MIN(ITE2,ITE22)
          if (IZZ /= KZ(N)) then
             write(6,6001)zlab(n),izz,nn,kz(nn)
             ierr=5
-            goto 1001
+            GOTO 1001
          endif
          NTOTT=NF
          if (NTOTT > NTOTP) then
             write(6,6006)nn,ntott,ntotp
             ierr=6
-            goto 1001
+            GOTO 1001
          endif
 ! !!        if (UMIN /= UMINN.OR.UMAX /= UMAXX) GOTO 1003  !!
          INT(N)=NTOTP/NTOTT
          if (INT(N)*NTOTT /= NTOTP) then
             WRITE(6,6009)NN,NTOTT,NTOTP
             ierr=7
-            goto 1001
+            GOTO 1001
          endif
          if (INT(N) /= 1)WRITE(6,6007)N,INT(N)
 !
@@ -234,13 +234,13 @@
          if (ios /= 0) then
             write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(N) // '.mesh'
             ierr = -1
-            goto 1001
+            GOTO 1001
          end if
          read(1)DV
        if (DV /= DV1) then
 !          PRINT*,' OP: N=',N,', DV=',DV,' NOT EQUAL TO DV1=',DV1
             ierr=8
-          goto 1001
+          GOTO 1001
        end if
          CLOSE(1)
       end do
@@ -262,14 +262,14 @@
             if (ios /= 0) then
                write(*,*) 'failed to open ' // trim(path)//'/'//ZLAB(N)//TLAB
                ierr = -1
-               goto 1001
+               GOTO 1001
             end if
             if (n > 2) then
             OPEN(IFLP(N),FILE=trim(path)//'/'//ZLABP(N)//TLAB,FORM='UNFORMATTED',STATUS='OLD',iostat=ios)
             if (ios /= 0) then
                write(*,*) 'failed to open ' // trim(path)//'/'//ZLABP(N)//TLAB
                ierr = -1
-               goto 1001
+               GOTO 1001
             end if
             endif
          end do
@@ -284,7 +284,7 @@
             if (JNE33 /= JNE3) then
               write(6,6099)jne3,jne33,nn
               ierr=9
-              goto 1001
+              GOTO 1001
             endif
             JNE1=MAX(JNE1,JNE11)
             JNE2=MIN(JNE2,JNE22)
@@ -442,7 +442,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
           if (umesh(n) > ub) then
             nn=n-1
             ibb=ib-1
-            goto 1
+            GOTO 1
           endif
         endif
         in(n)=ib
@@ -687,7 +687,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             call FDF1F2(E,F1,F2)
             DE=(A-F2)*2./F1
             E=E+DE
-            if (abs(dE) < 1.e-4*abs(E))goto 21
+            if (abs(dE) < 1.e-4*abs(E))GOTO 21
          end do
 !         print*,' completed loop 20 IN FDETA'
          ierr = 12

@@ -456,12 +456,12 @@ c
             end do
 
           call solout(naccpt+1,xold,x,n,y,rwork,iwork,contd8,lrpar,rpar,lipar,ipar,irtrn)
-          if (irtrn <0) goto 79
+          if (irtrn <0) GOTO 79
       end if
 ! --- basic integration step
    1  continue
-      if (nstep >nmax) goto 78
-      if (0.1d0*abs(h) <= abs(x)*uround)goto 77
+      if (nstep >nmax) GOTO 78
+      if (0.1d0*abs(h) <= abs(x)*uround)GOTO 77
       if ((x+1.01d0*h-xend)*posneg >0.d0) then
          h=xend-x
          last=.true.
@@ -470,68 +470,68 @@ c
 ! --- the twelve stages
       if (irtrn >= 2) then
          call fcn(n,x,h,y,k1,lrpar,rpar,lipar,ipar,ierr)
-         if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+         if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       end if
       do i=1,n
          y1(i)=y(i)+h*a21*k1(i)
       end do
       call fcn(n,x+c2*h,h,y1,k2,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a31*k1(i)+a32*k2(i))
       end do
       call fcn(n,x+c3*h,h,y1,k3,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a41*k1(i)+a43*k3(i))
       end do
       call fcn(n,x+c4*h,h,y1,k4,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a51*k1(i)+a53*k3(i)+a54*k4(i))
       end do
       call fcn(n,x+c5*h,h,y1,k5,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a61*k1(i)+a64*k4(i)+a65*k5(i))
       end do
       call fcn(n,x+c6*h,h,y1,k6,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a71*k1(i)+a74*k4(i)+a75*k5(i)+a76*k6(i))
       end do
       call fcn(n,x+c7*h,h,y1,k7,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a81*k1(i)+a84*k4(i)+a85*k5(i)+a86*k6(i)+a87*k7(i))
       end do
       call fcn(n,x+c8*h,h,y1,k8,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a91*k1(i)+a94*k4(i)+a95*k5(i)+a96*k6(i)+a97*k7(i)
      &        +a98*k8(i))
       end do
       call fcn(n,x+c9*h,h,y1,k9,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a101*k1(i)+a104*k4(i)+a105*k5(i)+a106*k6(i)
      &        +a107*k7(i)+a108*k8(i)+a109*k9(i))
       end do
       call fcn(n,x+c10*h,h,y1,k10,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       do i=1,n
          y1(i)=y(i)+h*(a111*k1(i)+a114*k4(i)+a115*k5(i)+a116*k6(i)
      &        +a117*k7(i)+a118*k8(i)+a119*k9(i)+a1110*k10(i))
       end do
       call fcn(n,x+c11*h,h,y1,k2,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       xph=x+h
       do i=1,n
          y1(i)=y(i)+h*(a121*k1(i)+a124*k4(i)+a125*k5(i)+a126*k6(i)
      &        +a127*k7(i)+a128*k8(i)+a129*k9(i)+a1210*k10(i)+a1211*k2(i))
       end do
       call fcn(n,xph,h,y1,k3,lrpar,rpar,lipar,ipar,ierr)
-      if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+      if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
       nfcn=nfcn+11
       do i=1,n
          k4(i)=b1*k1(i)+b6*k6(i)+b7*k7(i)+b8*k8(i)+b9*k9(i)
@@ -575,7 +575,7 @@ c
          facold=max(err,1.0d-4)
          naccpt=naccpt+1
          call fcn(n,xph,h,k5,k4,lrpar,rpar,lipar,ipar,ierr)
-         if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+         if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
          nfcn=nfcn+1
 ! ------- stiffness detection
          if (mod(naccpt,nstiff) == 0.or.iasti >0) then
@@ -592,7 +592,7 @@ c
                if (iasti == 15) then
                   if (lout >0) write (lout,*)
      &               ' the problem seems to become stiff at x = ',x
-                  if (lout <0) goto 76
+                  if (lout <0) GOTO 76
                end if
             else
                nonsti=nonsti+1
@@ -626,21 +626,21 @@ c
      &            +a1413*k4(i))
             end do
             call fcn(n,x+c14*h,h,y1,k10,lrpar,rpar,lipar,ipar,ierr)
-            if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+            if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
             do i=1,n
                y1(i)=y(i)+h*(a151*k1(i)+a156*k6(i)+a157*k7(i)
      &            +a158*k8(i)+a1511*k2(i)+a1512*k3(i)+a1513*k4(i)
      &            +a1514*k10(i))
             end do
             call fcn(n,x+c15*h,h,y1,k2,lrpar,rpar,lipar,ipar,ierr)
-            if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+            if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
             do i=1,n
                y1(i)=y(i)+h*(a161*k1(i)+a166*k6(i)+a167*k7(i)
      &            +a168*k8(i)+a169*k9(i)+a1613*k4(i)+a1614*k10(i)
      &            +a1615*k2(i))
             end do
             call fcn(n,x+c16*h,h,y1,k3,lrpar,rpar,lipar,ipar,ierr)
-            if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
+            if (ierr /= 0) then; hnew=h/facc1; h=hnew; GOTO 1; end if
             nfcn=nfcn+3
 ! ---     final preparation
             do j=1,nrd
@@ -668,7 +668,7 @@ c
             iwork(1) = nrd
             iwork(2:nrd+1) = icomp(1:nrd)
             call solout(naccpt+1,xold,x,n,y,rwork,iwork,contd8,lrpar,rpar,lipar,ipar,irtrn)
-            if (irtrn <0) goto 79
+            if (irtrn <0) GOTO 79
          end if
 ! ------- normal exit
          if (last) then
@@ -687,7 +687,7 @@ c
          last=.false.
       end if
       h=hnew
-      goto 1
+      GOTO 1
 ! --- fail exit
   76  continue
       idid=-4

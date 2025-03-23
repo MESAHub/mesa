@@ -444,7 +444,7 @@
         xx(i)=log10(0.005+xa(i))
         if(xa(i)  ==  0.0) mxzero=i
         end do
-c  ... this is the first time through this m. Calculate the decadic
+!  ... this is the first time through this m. Calculate the decadic
 !      log of the perimeter points shifted by Z+0.001(to avoid divergence
 !      at origin); m refers to xa(m); the hydrogen table value.
 
@@ -538,8 +538,7 @@ c  ... this is the first time through this m. Calculate the decadic
           write(*,*) 'zz(mf,1)', zz(mf,1)
           write(*,*) 'zz(mh,1)', zz(mh,1)
           write(*,*) 'zz(mf,1)', zz(mf,1)
-          write(*,'("Z does not match Z in codata* files you are"
-     x    ," using")')
+          write(*,'("Z does not match Z in codata* files you are using")')
           call mesa_error(__FILE__,__LINE__)
         end if
       if(z  /=  zz(mf,1)) GOTO 66
@@ -679,8 +678,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !__________
       do 44 i=4,nc-1
 !     do not go beyond middle (where c3-c6 overlaps o3-o6), and
-        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and.
-     $        (xcd(i-1)  >  xc(i-1))) then
+        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and. (xcd(i-1)  >  xc(i-1))) then
       do 42 ir=l1,l1+iq
       do 43 it=k1,k1+ip
         oxdp=log10(zzz+xodp)
@@ -762,8 +760,7 @@ c  ... this is the first time through this m. Calculate the decadic
 !__________
       do 144 i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
-      if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and.
-     $     (xod(i-1)  >  xo(i-1)-1.e-6)) then
+      if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and. (xod(i-1)  >  xo(i-1)-1.e-6)) then
       do 142 ir=l1,l1+iq
       do 143 it=k1,k1+ip
       cxdp=log10(zzz+xcdp)
@@ -824,16 +821,14 @@ c  ... this is the first time through this m. Calculate the decadic
         end if
 
 !     lower-O part of grid: interpolate C before O
-      if(j3 < no .and. i3 <= n(m,j3) .and.
-     $       (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
+      if(j3 < no .and. i3 <= n(m,j3) .and. (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
       do 20 ir=l1,l1+iq
       do 21 it=k1,k1+ip
       iw=0
         do jx=j1,j1+2
           iw=iw+1
 !     if i3=n(m,jx), then must replace cx(i3) with cxd(jx)
-          a(iw,m)=quad2(is,iw,cxx,co(m,i1,jx,it,ir),co(m,i2,jx,it,ir),
-     x    co(m,i3,jx,it,ir),cx(i1),cx(i2),min(cx(i3),cxd(jx)))
+          a(iw,m)=quad2(is,iw,cxx,co(m,i1,jx,it,ir),co(m,i2,jx,it,ir),co(m,i3,jx,it,ir),cx(i1),cx(i2),min(cx(i3),cxd(jx)))
         end do
         do w=1,3
           b(w)=a(w,m)
@@ -851,11 +846,9 @@ c  ... this is the first time through this m. Calculate the decadic
         do ix=i1,i1+2
           iw=iw+1
           if(j3 < n(m,ix))then
-            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),
-     $      co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
+            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
           else
-            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),
-     $      diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
+            a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
           end if
         end do
         do w=1,3

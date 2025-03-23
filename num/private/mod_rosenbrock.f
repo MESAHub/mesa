@@ -785,17 +785,17 @@
           rwork(j) = xold; j=j+1
           rwork(j) = h
           call solout(naccpt,xold,x,n,y,rwork,iwork,contro,lrpar,rpar,lipar,ipar,irtrn)
-          if (irtrn < 0) goto 179
+          if (irtrn < 0) GOTO 179
       end if
 
 ! --- basic integration step
- 1    if (nstep > nmax) goto 178
+ 1    if (nstep > nmax) GOTO 178
       hprev = h
-      if (0.1d0*abs(h) <= abs(x)*uround) goto 177
+      if (0.1d0*abs(h) <= abs(x)*uround) GOTO 177
       if (last) then
           h=hopt
           idid=1
-          goto 191
+          GOTO 191
       end if
       hopt=h
       if ((x+h*1.0001d0-xend)*posneg >= 0.d0) then
@@ -812,7 +812,7 @@
          else
             call fcn(n,x,h,y,dy1,lrpar,rpar,lipar,ipar,ierr)
          endif
-         if (ierr /= 0) goto 180
+         if (ierr /= 0) GOTO 180
          nfcn=nfcn+1
 ! --- compute jacobian matrix numerically
          if (banded) then
@@ -826,7 +826,7 @@
                   ak(j,3)=dsqrt(uround*max(1.d-5,abs(y(j))))
                   y(j)=y(j)+ak(j,3)
                   j=j+md
-                  if (j <= mm*m2) goto 12
+                  if (j <= mm*m2) GOTO 12
 
                   p1(1:n) => ak(1:n,1)
                   if (nvar > 0) then
@@ -835,7 +835,7 @@
                      call fcn(n,x,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
                   endif
 
-                  if (ierr /= 0) goto 180
+                  if (ierr /= 0) GOTO 180
                   j=k+(mm-1)*m2
                   j1=k
                   lbeg=max(1,j1-mujac)+m1
@@ -848,7 +848,7 @@
                   j=j+md
                   j1=j1+md
                   lbeg=lend+1
-                  if (j <= mm*m2) goto 14
+                  if (j <= mm*m2) GOTO 14
                end do
             end do
          else
@@ -864,7 +864,7 @@
                   call fcn(n,x,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
                endif
 
-               if (ierr /= 0) goto 180
+               if (ierr /= 0) GOTO 180
                do j=m1+1,n
                  fjac(j-m1,i)=(ak(j,1)-dy1(j))/delt
                end do
@@ -886,7 +886,7 @@
          else
             call sjac(n,x,h,y,dy1,nzmax,ia,ja,sparse_jac,lrpar,rpar,lipar,ipar,ierr)
          end if
-         if (ierr /= 0) goto 180
+         if (ierr /= 0) GOTO 180
       end if
       if (.not.autnms) then
          if (idfx == 0) then
@@ -900,18 +900,18 @@
                call fcn(n,xdelt,h,y,p1,lrpar,rpar,lipar,ipar,ierr)
             endif
 
-            if (ierr /= 0) goto 180
+            if (ierr /= 0) GOTO 180
             do j=1,n
                fx(j)=(ak(j,1)-dy1(j))/delt
             end do
          else
 ! --- compute analytically the derivative with respect to x
             call dfx(n,x,y,fx,lrpar,rpar,lipar,ipar,ierr)
-            if (ierr /= 0) goto 180
+            if (ierr /= 0) GOTO 180
          end if
       end if
    2  continue
-      if (h <= hprev*1d-30) goto 190
+      if (h <= hprev*1d-30) GOTO 190
       ierr=0
 ! *** *** *** *** *** *** ***
 !  compute the stages
@@ -932,7 +932,7 @@
      &            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
      &            sparse_jac,nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol)
       need_free = .true.
-      if (ier /= 0) goto 80
+      if (ier /= 0) GOTO 80
       if (dbg .and. .false.) then
          write(*,11) 'fac', fac
          write(*,*) 'n', n
@@ -952,7 +952,7 @@
       ndec=ndec+1
 ! --- prepare for the computation of the stages
       if (.not.autnms) hd = h*ros_gamma
-      if (h <= 0d0 .or. is_bad(h)) goto 177
+      if (h <= 0d0 .or. is_bad(h)) GOTO 177
       rhc = rc/h
 
 ! ------------ stages ---------------
@@ -964,7 +964,7 @@
          if (nstep > 30) stop 'rosenbrock nstep > 1'
       end if
 
-      if (is_bad(h)) goto 177
+      if (is_bad(h)) GOTO 177
 
       do is=1,ns
          if (dbg) write(*,*) 'stage', is
@@ -978,7 +978,7 @@
                   if (ynew(j) < y_min .or. ynew(j) > y_max) then
                      if (dbg) write(*,*) 'stage ynew(j) < y_min .or. ynew(j) > y_max',
      >                     is, j, ynew(j), y(j), sum(ra(is,1:is-1)*ak(j,1:is-1))
-                     goto 82
+                     GOTO 82
                   end if
                end do
                if (dbg) write(*,11) 'fcn y(:)', ynew(1:min(4,n))
@@ -990,7 +990,7 @@
                endif
 
                if (dbg) write(*,11) 'fcn dy(:)', dy(1:min(4,n))
-               if (ierr /= 0) goto 81
+               if (ierr /= 0) GOTO 81
                if (rd32 /= 0) dy2(1:n) = dy(1:n)
             end if
             do j=1,n
@@ -1010,7 +1010,7 @@
      &      decsol,decsols,decsolblk,
      &      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,
      &      nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol,ierr)
-         if (ierr /= 0) goto 81
+         if (ierr /= 0) GOTO 81
          if (dbg) write(*,11) 'ak(:,is)', ak(1,is), ak(2,is), ak(min(3,n),is), ak(min(4,n),is)
          if (dbg) write(*,*)
       end do
@@ -1020,7 +1020,7 @@
          ynew(j) = y(j) + sum(ros_m(1:ns)*ak(j,1:ns))
          if (ynew(j) < y_min .or. ynew(j) > y_max) then
             if (dbg) write(*,*) 'new solution ynew(j) < y_min .or. ynew(j) > y_max', j, ynew(j)
-            goto 82
+            GOTO 82
          end if
       end do
       nsol=nsol+ns
@@ -1046,7 +1046,7 @@
       end do
 
       err=sqrt(err/nerror)
-      if (is_bad(err)) goto 81
+      if (is_bad(err)) GOTO 81
 
 
  11    format(a20,2x,99(e26.16,1x))
@@ -1086,7 +1086,7 @@
 
 
       hnew=h/fac
-      if (is_bad(hnew)) goto 81
+      if (is_bad(hnew)) GOTO 81
 
       hopt=hnew
 
@@ -1144,64 +1144,64 @@
             rwork(j) = xold; j=j+1
             rwork(j) = h
             call solout(naccpt,xold,x,n,y,rwork,iwork,contro,lrpar,rpar,lipar,ipar,irtrn)
-            if (irtrn < 0) goto 179
+            if (irtrn < 0) GOTO 179
          end if
          if (abs(hnew) > hmaxn) hnew=posneg*hmaxn
          if (reject) hnew=posneg*min(abs(hnew),abs(h))
          reject=.false.
          h=hnew
-         goto 1
+         GOTO 1
       else
 ! --- step is rejected
          reject=.true.
          last=.false.
          h=hnew
          if (naccpt >= 1) nrejct=nrejct+1
-         goto 2
+         GOTO 2
       end if
 ! --- singular matrix
   80  nsing=nsing+1
-      if (nsing >= 5) goto 176
+      if (nsing >= 5) GOTO 176
       h=h*0.5d0
       reject=.true.
       last=.false.
-      goto 2
+      GOTO 2
 ! --- step rejected
   81  h=h*0.5d0
       reject=.true.
       last=.false.
-      goto 2
+      GOTO 2
 ! --- step rejected for y_min or y_max
   82  h=h*0.1d0
       reject=.true.
       last=.false.
-      goto 2
+      GOTO 2
 ! --- fail exit
  176  continue
       if (lout > 0) write(lout,979)x
       if (lout > 0) write(lout,*) ' matrix is repeatedly singular, ier=',ier
       idid=-4
-      goto 191
+      GOTO 191
  177  continue
       if (lout > 0) write(lout,979)x
       if (lout > 0) write(lout,*) ' step size too small, h=',h
       idid=-3
-      goto 191
+      GOTO 191
  178  continue
       if (lout > 0) write(lout,979)x
       if (lout > 0) write(lout,*) ' more than nmax =',nmax,'steps are needed'
       idid=-2
-      goto 191
+      GOTO 191
 ! --- solout exit
  179  continue
       if (lout > 0) write(lout,979)x
  979  format(' exit at x=',e18.4)
       idid=2
-      goto 191
+      GOTO 191
 ! --- forced exit because of ierr /= 0
  180  continue
       idid=-5
-      goto 191
+      GOTO 191
 ! --- too many reductions in stepsize and still not okay error
  190  continue
       idid=-8
