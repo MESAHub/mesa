@@ -1849,8 +1849,10 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q7*(q0*x%d1val1_d1val2 - q8*x%d1val1 + x%d1val1_d1val2)
       unary%d2val2 = q7*(q0*x%d2val2 - q4*q9 + x%d2val2)
       unary%d3val1 = q10*(-2.0_dp*q11 + q11*q17 - q12*q13 - q13*q16 + q14*x%d3val1 + q5*x%d3val1 + x%d3val1)
-      unary%d2val1_d1val2 = q10*(-q12*q18 + q14*x%d2val1_d1val2 - q15*q19*x%d2val1 - q16*q18 + q17*q3*x%d1val2 - q19*q3 + q5*x%d2val1_d1val2 - q8*x%d2val1 + x%d2val1_d1val2)
-      unary%d1val1_d2val2 = q10*(q14*x%d1val1_d2val2 - q15*q20 + q17*q9*x%d1val1 - q20*x%val - q21*q22 - q21*q9 - q4*x%d1val1*x%d2val2 + q5*x%d1val1_d2val2 + x%d1val1_d2val2)
+      unary%d2val1_d1val2 = q10 * &
+                            (-q12*q18 + q14*x%d2val1_d1val2 - q15*q19*x%d2val1 - q16*q18 + q17*q3*x%d1val2 - q19*q3 + q5*x%d2val1_d1val2 - q8*x%d2val1 + x%d2val1_d1val2)
+      unary%d1val1_d2val2 = q10 * &
+                            (q14*x%d1val1_d2val2 - q15*q20 + q17*q9*x%d1val1 - q20*x%val - q21*q22 - q21*q9 - q4*x%d1val1*x%d2val2 + q5*x%d1val1_d2val2 + x%d1val1_d2val2)
       unary%d3val2 = q10*(-2.0_dp*q23 + q14*x%d3val2 + q17*q23 - q22*q24 - q24*x%d2val2*x%val + q5*x%d3val2 + x%d3val2)
    end function atanpi_self
 
@@ -2809,7 +2811,9 @@ module auto_diff_real_2var_order3_module
       binary%d1val1_d2val2 = q23*(2.0_dp*q1*q18 + q22*q4 + q25*y%d1val1_d2val2 + q29*q6 &
                              + q9*(q27*x%d1val2 + q28*y%d1val2 + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1) &
                              - x%val*(2.0_dp*q15*x%d1val2 + q1*x%d2val2 + q18*y%d1val1 + q28*q5))
-      binary%d3val2 = q23*(3.0_dp*q21*q6 + q24*pow3(x%d1val2) + q25*y%d3val2 - q30*x%val*(q19 + q20) + q9*(3.0_dp*x%d2val2*y%d1val2 + q30*y%d2val2 + x%d3val2*y%val) + pow3(q6))
+      binary%d3val2 = q23 * &
+                      ( 3.0_dp*q21*q6 + q24*pow3(x%d1val2) + q25*y%d3val2 - q30*x%val*(q19 + q20) &
+                       + q9*(3.0_dp*x%d2val2*y%d1val2 + q30*y%d2val2 + x%d3val2*y%val) + pow3(q6))
    end function pow_self
 
    function pow_self_real(x, y) result(unary)

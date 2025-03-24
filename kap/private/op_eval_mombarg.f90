@@ -599,7 +599,8 @@
 
 
       !!! Compute Rossland opacity and derivatives for a single cell.
-      subroutine compute_kappa(k,fk, logT_cntr, logRho_cntr, lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,ite,jne,epatom,amamu,sig,logT_grid,logRho_grid,lkap_Ross)
+      subroutine compute_kappa(k,fk,logT_cntr,logRho_cntr,lkap_ross_cell, &
+                               dlnkap_rad_dlnT,dlnkap_rad_dlnRho,ierr,ite,jne,epatom,amamu,sig,logT_grid,logRho_grid,lkap_Ross)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
       use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg

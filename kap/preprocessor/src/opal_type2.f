@@ -36,7 +36,6 @@
          if (z  /=  readco22_z) itimeco = 0
       end subroutine init_opal_type2
 
-
 ! ***********************************************************************
 
       subroutine eval_opal_type2 (z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap,data_dir)
@@ -222,8 +221,8 @@
       integer w
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,n
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr),diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
@@ -241,12 +240,12 @@
 !..... INDEX refers to the index,i, of xc(i) or xo(i); xc(i) and xo(i)
 !      are the abundance grid points.
       iop=1   ! provides smoothed interpolations; iop=0 gives no smoothing
-      if(nr  <  6) GOTO 65
-      if((xh  >  1.e-6) .and. (mx  < 4)) GOTO 64
+      if(nr < 6) GOTO 65
+      if((xh > 1.e-6) .and. (mx < 4)) GOTO 64
 
 !..... set-up C/O axis points
       xxco=xxc+xxo
-      if(z+xh+xxco-1.e-6  >  1 ) GOTO 61
+      if(z+xh+xxco-1.e-6 > 1 ) GOTO 61
       zzz=z+0.001
       xxh=xh
        xxci=xxc
@@ -543,7 +542,7 @@
           write(*,'("Z does not match Z in codata* files you are using")')
           call mesa_error(__FILE__,__LINE__)
         end if
-      if(z  /=  zz(mf,1)) GOTO 66
+      if(z /= zz(mf,1)) GOTO 66
       xxc=xxci   ! restores input value; necessary if stop replaced
 !                  with return
       xxo=xxoi   ! restores input value
@@ -615,13 +614,13 @@
       integer w
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo)cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr),diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
        is=0
-      if(xxco  <  1.e-6) then
+      if(xxco < 1.e-6) then
         do ir=l1,l1+iq
           do it=k1,k1+ip
             opl(m,it,ir)=co(m,1,1,it,ir)
@@ -631,18 +630,18 @@
             GOTO 123
       end if
 !     include boundaries that could later cause division by 0!
-      if(xxc  >  xcd(3)-1.e-6) then
+      if(xxc > xcd(3)-1.e-6) then
 !__________
       oxdp=log10(zzz+xodp)
 !     handle possibility that xodp=0
       fac=max(min((oxx-ox(1))/max(oxdp-ox(1),1.e-6),1.),0.)
-      do 40 ir=l1,l1+iq
-      do 41 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
 
 !                    interpolation in region c1
 
 !     include boundaries that could later cause division by 0!
-      if(xxc  >  xcd(2)-1.e-6) then
+      if(xxc > xcd(2)-1.e-6) then
       iw=1
       a(1,m)=quad2(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
       iw=iw+1
@@ -653,7 +652,7 @@
 !     handle possibility that xodp=0
            opl(m,it,ir)=b(1)+(b(2)-b(1))*fac
       is=1
-      GOTO 41
+      cycle
       end if
 !                    interpolation in region c2
 
@@ -669,8 +668,8 @@
       iw=iw+1
       opl(m,it,ir)=quad2(is,iw,oxx,b(1),b(2),b(3),ox(1),ox(2),oxdp)
       is=1
-   41 continue
-   40 continue
+      end do
+      end do
       if(is  ==  1) GOTO 123
 !__________
       end if
@@ -828,8 +827,8 @@
 
 !     lower-O part of grid: interpolate C before O
       if(j3 < no .and. i3 <= n(m,j3) .and. (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo)) then
-      do 20 ir=l1,l1+iq
-      do 21 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
       iw=0
         do jx=j1,j1+2
           iw=iw+1
@@ -842,8 +841,8 @@
       iw=iw+1
       opl(m,it,ir)=quad2(is,iw,oxx,b(1),b(2),b(3),ox(j1),ox(j2),ox(j3))
       is=1
-   21 continue
-   20 continue
+      end do
+      end do
 !     else: high-O part of grid: must interpolate O before C
       else
        do ir=l1,l1+iq
@@ -877,7 +876,7 @@
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+      common/type2_a/ co(mx,mc,mo,nt,nr),diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_d/dkap
@@ -989,7 +988,7 @@
       parameter (ismdata=0)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+      common/type2_a/ co(mx,mc,mo,nt,nr),diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
@@ -1027,8 +1026,8 @@
         itimeco=12345678
         end if
 
-      do 20 j=1,nc-1
-       do 21 i=1,nc
+      do j=1,nc-1
+       do i=1,nc
          if(xcd(j)  >=  xc(i)) then
            n(m,j)=i+1
            ! BP
@@ -1041,8 +1040,8 @@
              exit
            end if
          end if
-   21  continue
-   20 continue
+       end do
+      end do
       n(m,nc)=0
 
       close (2)
@@ -1303,8 +1302,8 @@
 ! ***********************************************************************
       block data type2
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
-      common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
+      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_a/ co(mx,mc,mo,nt,nr),diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
@@ -1627,7 +1626,7 @@
      +  0.0277551020,-0.0416326531,-0.0069387755/
 
 
-      DO 20 I=3,nset-2
+      do I=3,nset-2
 
          J=1
          FXY(I,J)=
@@ -1694,7 +1693,7 @@
      +    +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )
      +    +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
 
-   20 CONTINUE
+      end do
 
       do I=3,nset-2   ! modified
          do J=1,NRL

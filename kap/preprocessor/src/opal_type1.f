@@ -669,7 +669,7 @@
 !                  with return
       is=0
       iw=1
-      do 45 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
         if (mf2  ==  1) then
         opk(it,ir)=opl(mf,it,ir)
@@ -679,9 +679,9 @@
         is=1
    46   continue
         end do
-   45 continue
+      end do
 
-      if (mi  ==  mf2) then  ! interpolate between quadratics
+      if (mi == mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xxx)*dfsx(mh)
@@ -1138,12 +1138,12 @@
 !        GET FIRST DERIVATIVES AT END POINTS
 
 !        GET SECOND DERIVATIVES FOR SPLINE FIT
-         CALL SPLINE(U,V,N,V2)
+         call SPLINE(U,V,N,V2)
 
 !        INTERPOLATE TO LOG10(T)=FLT, FLT=3.8(0.05)8.0
          do I=1,nset ! modified
             FLT=3.75+0.05*I
-            CALL SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
+            call SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
          end do
 
       end do
@@ -1151,20 +1151,20 @@
 
 !  OPTION FOR SMOOTHING
       if(NSM > 0) then
-         DO 35 NS=1,NSM
-            CALL SMOOTH
-   35    CONTINUE
-         CALL FITX
+         do NS=1,NSM
+            call SMOOTH
+         end do
+         call FITX
       end if
 
 
 !  GET FY AND FXY
-      CALL FITY
+      call FITY
 
 !  THE ARRAYS F, FX, FY AND FXY ARE NOW STORED
 
 !  CAN NOW DO INTERPOLATIONS USING
-!       CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
+!       call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
 !       INPUT IS FLT=LOG10(T), FLRHO=LOG10(RHO)
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
@@ -1183,7 +1183,7 @@
             DO L=nrlow,nrhigh
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
-               CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
+               call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
                if(IERR) then
                end if
                V(L)=G
@@ -1222,19 +1222,19 @@
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
-      DO 11 I=2,N-1
+      do I=2,N-1
         SIG=(X(I)-X(I-1))/(X(I+1)-X(I-1))
         P=SIG*Y2(I-1)+2.
         Y2(I)=(SIG-1.)/P
         U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))/(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
-11    CONTINUE
+      end do
       QN=0.5
       UN=(3./(X(N)-X(N-1)))*(YPN-(Y(N)-Y(N-1))/(X(N)-X(N-1)))
       Y2(N)=(UN-QN*U(N-1))/(QN*Y2(N-1)+1.)
-      DO 12 K=N-1,1,-1
+      do K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
-12    CONTINUE
-      END
+      end do
+      end
 ! ********************************************************************
       subroutine SPLINT(XA,YA,N,Y2A,X,Y,YP)
       DIMENSION XA(N),YA(N),Y2A(N)
@@ -1269,24 +1269,24 @@
       DIMENSION A(IPR),B(IPR),AD(IPR),BD(IPR)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DO 30 I=1,nset   ! modified
-         DO 10 J=1,NRL
+      do I=1,nset   ! modified
+         do J=1,NRL
             A(J)=F(I,J)
             B(J)=FX(I,J)
-   10    CONTINUE
+         end do
 
-         CALL GETD(A,NRL,AD,AP1,APN)
-         CALL GETD(B,NRL,BD,BP1,BPN)
+         call GETD(A,NRL,AD,AP1,APN)
+         call GETD(B,NRL,BD,BP1,BPN)
 
          FY(I,1)=AP1
          FY(I,NRL)=APN
          FXY(I,1)=BP1
          FXY(I,NRL)=BPN
-         DO 20 J=2,NRL-1
+         do J=2,NRL-1
             FY(I,J)= -A(J)+A(J+1)-2.*AD(J)-AD(J+1)
             FXY(I,J)=-B(J)+B(J+1)-2.*BD(J)-BD(J+1)
-   20    CONTINUE
-   30 CONTINUE
+         end do
+      end do
 
       END
 ! ********************************************************************
@@ -1302,19 +1302,19 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DO 30 J=1,NRL
-         DO 10 I=1,nset ! modified
+      do J=1,NRL
+         do I=1,nset ! modified
             A(I)=F(I,J)
-   10    CONTINUE
-         CALL GETD(A,nset,D,AP1,APN)  ! modified
+         end do
+         call GETD(A,nset,D,AP1,APN)  ! modified
          FX(1,J)=AP1
          FX(nset,J)=APN   ! modified
-         DO 20 I=2,nset-1  ! modified
+         do I=2,nset-1  ! modified
             FX(I,J)=-A(I)+A(I+1)-2.*D(I)-D(I+1)
-   20    CONTINUE
-   30 CONTINUE
+         end do
+      end do
 
-      END
+      end
 
 ! ***********************************************************************
       subroutine GETD(F,N,D,FP1,FPN)
@@ -1331,18 +1331,18 @@
       D(1)=-.5
       T(1)=.5*(-F(1)+F(2)-FP1)
 
-      DO 10 J=2,N-1
+      do J=2,N-1
          D(J)=-1./(4.+D(J-1))
          T(J)=-D(J)*(F(J-1)-2.*F(J)+F(J+1)-T(J-1))
-   10 CONTINUE
+      end do
 
       D(N)=(FPN+F(N-1)-F(N)-T(N-1))/(2.+D(N-1))
 
-      DO 20 J=N-1,1,-1
+      do J=N-1,1,-1
          D(J)=D(J)*D(J+1)+T(J)
-   20 CONTINUE
+      end do
 
-      END
+      end
 
 ! ********************************************************************
       subroutine INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1513,7 +1513,7 @@
      +  0.0277551020,-0.0416326531,-0.0069387755/
 
 
-      DO 20 I=3,nset-2
+      do I=3,nset-2
 
          J=1
          FXY(I,J)=
@@ -1542,7 +1542,7 @@
      +   +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )
      +   +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
-         DO 10 J=3,NRL-2
+         do J=3,NRL-2
             FXY(I,J)=
      +         GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )
      +        +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)
@@ -1551,7 +1551,7 @@
      +        +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )
      +        +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )
      +        +GAM(6)*  F(I  ,J  )
-   10    CONTINUE
+         end do
 
          J=NRL-1
          FXY(I,J)=
@@ -1580,7 +1580,7 @@
      +    +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )
      +    +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
 
-   20 CONTINUE
+      end do
 
       do I=3,nset-2   ! modified
          do J=1,NRL

@@ -233,7 +233,7 @@
 
 ! Create the cell data structure, and initialize RSMX.
 
-      CALL STORE2_db (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,
+      call STORE2_db (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,
      .             IERR)
       if (IERR  /=  0) GOTO 23
       RSMX = 0.
@@ -264,7 +264,7 @@
           if (LNP  ==  LMAX) GOTO 2
           LNP = LNP + 1
           RSOLD = RS
-          CALL GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
+          call GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
      .                 DDX,DDY, NP,RS)
           if (RS  ==  0.) GOTO 22
           NPTS(LNP) = NP
@@ -320,14 +320,14 @@
     4     I = I + 1
           NP = NPTS(I)
           IROW = MIN(I,10)
-          CALL SETUP2_db (XK,YK,FK,X(NP),Y(NP),F(NP),SF,SFS,
+          call SETUP2_db (XK,YK,FK,X(NP),Y(NP),F(NP),SF,SFS,
      .                 SFC,RC, B(1,IROW))
           if (I  ==  1) GOTO 4
           IRM1 = IROW-1
           do 5 J = 1,IRM1
             JP1 = J + 1
-            CALL GIVENS_db (B(J,J),B(J,IROW),C,S)
-            CALL ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,IROW))
+            call GIVENS_db (B(J,J),B(J,IROW),C,S)
+            call ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,IROW))
     5       continue
           if (I  <  NEQ) GOTO 4
 
@@ -363,7 +363,7 @@
 !   NEQ = LNP.  Add an element to NPTS.
 
         LNP = LNP + 1
-        CALL GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
+        call GETNP2_db (XK,YK,X,Y,NNR,LCELL,LNEXT,XMN,YMN,
      .               DDX,DDY, NP,RS)
         if (NP  ==  0) GOTO 22
         NPTS(LNP) = NP
@@ -384,8 +384,8 @@
     8       continue
           do 9 J = I,9
             JP1 = J + 1
-            CALL GIVENS_db (B(J,J),B(J,10),C,S)
-            CALL ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,10))
+            call GIVENS_db (B(J,J),B(J,10),C,S)
+            call ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,10))
     9       continue
    10     continue
 

@@ -117,20 +117,20 @@
 ! Estimates partial derivatives at all input-grid data points
 ! (for MD=1).
       if (MD /= 2) THEN
-          CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
-!         CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
+          call RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
+!         call RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
       end if
 ! DO-loop with respect to the output point
 ! Processes NIPIMX output points, at most, at a time.
       do 30 IIP = 1,NIP,NIPIMX
           NIPI = MIN(NIP- (IIP-1),NIPIMX)
 ! Locates the output points.
-          CALL RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IIP),YI(IIP), INXI,INYI)
-!         CALL RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
+          call RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IIP),YI(IIP), INXI,INYI)
+!         call RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output points.
-          CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,
+          call RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,
      +                INYI, ZI(IIP))
-!         CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
+!         call RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
    30 continue
       return
 ! Error exit
@@ -290,8 +290,8 @@
 ! Estimates partial derivatives at all input-grid data points
 ! (for MD=1).
       if (MD /= 2) THEN
-          CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
-!         CALL RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
+          call RGPD3P_db(NXD,NYD,XD,YD,ZD, WK)
+!         call RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
       end if
 ! Outermost DO-loop with respect to the y coordinate of the output
 ! grid points
@@ -305,12 +305,12 @@
           do 40 IXI = 1,NXI,NIPIMX
               NIPI = MIN(NXI- (IXI-1),NIPIMX)
 ! Locates the output-grid points.
-              CALL RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
-!             CALL RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
+              call RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
+!             call RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output-grid points.
-              CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,
+              call RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,
      +                    INYI, ZI(IXI,IYI))
-!             CALL RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
+!             call RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
    40     continue
    50 continue
       return

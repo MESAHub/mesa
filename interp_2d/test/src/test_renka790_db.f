@@ -46,9 +46,9 @@
 ! Set up uniform grid points.
 
       DEL = 1./dble(NI-1)
-      do 5 I = 1,NI
+      do I = 1,NI
         P(I) = dble(I-1)*DEL
-    5   continue
+      end do
 
 ! Initialize the average SSE/SSM value to zero.
 
@@ -57,13 +57,13 @@
 ! Print a heading and loop on test functions.
 
       write (LOUT,200) KS, N, NI, NC, NW, NR
-      do 11 KF = KFF,KFL
+      do KF = KFF,KFL
 
 !   Compute true function values at the nodes.
 
-        do 6 K = 1,N
+        do K = 1,N
           call TSTFN1_db (KF,X(K),Y(K),0, W(K),DUM,DUM)
-    6     continue
+        end do
 
 !   Compute true function values FT on the uniform grid, and
 !     accumulate the sum of values SUM and sum of squared
@@ -71,13 +71,13 @@
 
         SUM = 0.
         SSM = 0.
-        do 8 I = 1,NI
-          do 7 J = 1,NI
+        do I = 1,NI
+          do J = 1,NI
             call TSTFN1_db (KF,P(I),P(J),0, FT(I,J),DUM,DUM)
             SUM = SUM + FT(I,J)
             SSM = SSM + FT(I,J)**2
-    7       continue
-    8     continue
+          end do
+        end do
 
 !   Compute the sum of squared deviations from the mean SSM.
 
@@ -93,8 +93,8 @@
         ERMEAN = 0.
         ERMAX = 0.
         SSE = 0.
-        do 10 I = 1,NI
-          do 9 J = 1,NI
+        do I = 1,NI
+          do J = 1,NI
             IER = 0
             PW = interp_CS2VAL_db (P(I),P(J),N,X,Y,W,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER) -FT(I,J)
             if (IER /= 0) then
@@ -104,14 +104,14 @@
             ERMEAN = ERMEAN + ABS(PW)
             ERMAX = MAX(ERMAX,ABS(PW))
             SSE = SSE + PW*PW
-    9       continue
-   10     continue
+            end do
+          end do
         NP = NI*NI
         ERMEAN = ERMEAN/dble(NP)
         SSE = SSE/SSM
         SSA = SSA + SSE
         write (LOUT,210) KF, ERMAX, ERMEAN, SSE
-   11   continue
+      end do
 
 ! Print the average SSE/SSM value (averaged over the test
 !   functions).
@@ -399,34 +399,34 @@
 ! Store node set K in (X,Y).
 
       if (K == 1) then
-        do 1 I = 1,100
+        do I = 1,100
           X(I) = X1(I)
           Y(I) = Y1(I)
-    1     continue
+        end do
         N = 100
       else if (K == 2) then
-        do 2 I = 1,33
+        do I = 1,33
           X(I) = X2(I)
           Y(I) = Y2(I)
-    2     continue
+        end do
         N = 33
       else if (K == 3) then
-        do 3 I = 1,25
+        do I = 1,25
           X(I) = X3(I)
           Y(I) = Y3(I)
-    3     continue
+        end do
         N = 25
       else if (K == 4) then
-        do 4 I = 1,100
+        do I = 1,100
           X(I) = X4(I)
           Y(I) = Y4(I)
-    4     continue
+        end do
         N = 100
       else if (K == 5) then
-        do 5 I = 1,81
+        do I = 1,81
           X(I) = X5(I)
           Y(I) = Y5(I)
-    5     continue
+        end do
         N = 81
       else
         N = 0
