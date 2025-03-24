@@ -34,7 +34,7 @@
       character(len=20) :: LBL(2)
 
 !     .. Intrinsic Functions ..
-      INTRINSIC        MOD,DBLE
+      INTRINSIC MOD,DBLE
 
 ! Data statements
       DATA   NMPR/'TPRG3P_db'/,NMWF/'WFRG3P'/,NMSR/'RGBI3P_db','RGSF3P_db'/,LBL/'Calculated ZI Values','Differences         '/
@@ -134,7 +134,7 @@
       end do
       do IYI = 1,NYI
           do IXI = 1,NXI
-              if (IXI == 1 .AND. IYI == 1) then
+              if (IXI == 1 .and. IYI == 1) then
                   MD = 1
               else
                   MD = 2
@@ -179,7 +179,7 @@
 ! Program check for the RGSF3P_db subroutine
 ! - Performs surface fitting and calculates the differences.
       MD = 1
-      CALL interp_RGSF3P_db(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
+      call interp_RGSF3P_db(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
       if (IER > 0) STOP 1
       do IYI = 1,NYI
           do IXI = 1,NXI
@@ -218,7 +218,7 @@
               write (6,FMT=9050) YI(IYI),(DZI(IXI,IYI),IXI=IXIMN,IXIMX)
           end do
         end do
-      RETURN
+      return
 ! Format statements
  9000 FORMAT (A9,7X,'Original Data',/,/,/,/,35X,'ZD(XD,YD)')
  9010 FORMAT (4X,'YD    XD=',/,7X,F8.1,2 (1X,3F6.1,F7.1),/)
@@ -227,4 +227,4 @@
  9040 FORMAT (1X,/,38X,'ZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10,/)
  9050 FORMAT (F5.2,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10)
  9060 FORMAT (1X,/,38X,'DZI(XI,YI)',/,2X,'YI',3X,'XI=',/,5X,3F15.10,2F15.10,2F15.10,2F15.10,2F15.10,/)
-      end subroutine
+      end subroutine test_akima_db

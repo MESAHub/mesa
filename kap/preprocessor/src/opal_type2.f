@@ -412,7 +412,7 @@
 !       polation along the ray gives log (kappa(Xc,Xo)).  (Advantage
 !       of method: keeps indices within table boundaries)
 !      Subtract Z to prevent out-of-range C+O values for small X
-       if(1.-xh-z > 1.e-6)then
+       if(1.-xh-z > 1.e-6) then
           cmod=(1.-xa(m)-z)/(1.-xh-z)
        else
           cmod=0.
@@ -771,9 +771,11 @@
       iw=1
       m2=i-2
       m1=i-1
-      a(1,m)=quad2(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
+      a(1,m)=quad2(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),
+     &             diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
       iw=iw+1
-      a(2,m)=quad2(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
+      a(2,m)=quad2(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),
+     &             diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
       iw=iw+1
       a(3,m)=quad2(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
         do w=1,3
@@ -825,7 +827,7 @@
         end if
 
 !     lower-O part of grid: interpolate C before O
-      if(j3 < no .and. i3 <= n(m,j3) .and. (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
+      if(j3 < no .and. i3 <= n(m,j3) .and. (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo)) then
       do 20 ir=l1,l1+iq
       do 21 it=k1,k1+ip
       iw=0
@@ -849,7 +851,7 @@
         iw=0
         do ix=i1,i1+2
           iw=iw+1
-          if(j3 < n(m,ix))then
+          if(j3 < n(m,ix)) then
             a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),co(m,ix,j3,it,ir),ox(j1),ox(j2),ox(j3))
           else
             a(iw,m)=quad2(is,iw,oxx,co(m,ix,j1,it,ir),co(m,ix,j2,it,ir),diago(m,no-ix,it,ir),ox(j1),ox(j2),oxd(ix))
@@ -874,7 +876,7 @@
       save
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
       common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
@@ -986,7 +988,7 @@
       character (len=*) :: dir
       parameter (ismdata=0)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/type2_aa/ q(4), h(4), xcd(mc),xod(mc), xc(mc),xo(mo),xcs(mc),xos(mo), cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
+      common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
       common/type2_a/ co(mx,mc,mo,nt,nr), diag(mx,mc,nt,nr),
      &                index(101),t6list(nt),alr(nr),n(mx,mc),alt(nt),diago(mx,mo,nt,nr),opk(nt,nr),
      &                dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
@@ -1325,7 +1327,7 @@
 ! ********************************************************************
       subroutine SPLINE2(X,Y,N,Y2)
       parameter (NMAX=100)
-      DIMENSION X(N),Y(N),Y2(N),U(NMAX)
+      dimension X(N),Y(N),Y2(N),U(NMAX)
 
 !     FIRST DERIVATIVES AT END POINTS USING CUBIC FIT
          YP1=((Y(3)-Y(1))*(X(2)-X(1))**2-(Y(2)-Y(1))*(X(3)-X(1))**2)/((X(3)-X(1))*(X(2)-X(1))*(X(2)-X(3)))
@@ -1349,12 +1351,12 @@
 ! ********************************************************************
       subroutine SPLINT2(XA,YA,N,Y2A,X,Y,YP)
       use utils_lib, only: mesa_error
-      DIMENSION XA(N),YA(N),Y2A(N)
+      dimension XA(N),YA(N),Y2A(N)
       KLO=1
       KHI=N
 1     IF (KHI-KLO > 1) THEN
         K=(KHI+KLO)/2
-        IF(XA(K) > X)THEN
+        if(XA(K) > X) then
           KHI=K
         ELSE
           KLO=K
@@ -1381,14 +1383,14 @@
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
 
       parameter(IPR=20)
-      DIMENSION A(IPR),B(IPR),AD(IPR),BD(IPR)
+      dimension A(IPR),B(IPR),AD(IPR),BD(IPR)
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DO 30 I=1,nset   ! modified
-         DO 10 J=1,NRL
+      do I=1,nset   ! modified
+         do J=1,NRL
             A(J)=F(I,J)
             B(J)=FX(I,J)
-   10    CONTINUE
+         end do
 
          call getd2(A,NRL,AD,AP1,APN)
          call getd2(B,NRL,BD,BP1,BPN)
@@ -1397,11 +1399,11 @@
          FY(I,NRL)=APN
          FXY(I,1)=BP1
          FXY(I,NRL)=BPN
-         DO 20 J=2,NRL-1
+         do J=2,NRL-1
             FY(I,J)= -A(J)+A(J+1)-2.*AD(J)-AD(J+1)
             FXY(I,J)=-B(J)+B(J+1)-2.*BD(J)-BD(J+1)
-   20    CONTINUE
-   30 CONTINUE
+         end do
+      end do
 
       END
 ! ********************************************************************
@@ -1412,22 +1414,22 @@
 
 
       parameter(IPR=20)
-      DIMENSION A(85),D(85)
+      dimension A(85),D(85)
 
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DO 30 J=1,NRL
-         DO 10 I=1,nset ! modified
+      do J=1,NRL
+         do I=1,nset ! modified
             A(I)=F(I,J)
-   10    CONTINUE
+         end do
          call getd2(A,nset,D,AP1,APN)  ! modified
          FX(1,J)=AP1
          FX(nset,J)=APN   ! modified
-         DO 20 I=2,nset-1  ! modified
+         do I=2,nset-1  ! modified
             FX(I,J)=-A(I)+A(I+1)-2.*D(I)-D(I+1)
-   20    CONTINUE
-   30 CONTINUE
+         end do
+      end do
 
       END
 
@@ -1438,7 +1440,7 @@
 !  OF UNITY.
 
 
-      DIMENSION F(N),D(N),T(85)
+      dimension F(N),D(N),T(85)
 
       FP1=(-11.*F(1)+18.*F(2)-9.*F(3)+2.*F(4))/6.
       FPN=(11.*F(N)-18.*F(N-1)+9.*F(N-2)-2.*F(N-3))/6.
@@ -1446,16 +1448,16 @@
       D(1)=-.5
       T(1)=.5*(-F(1)+F(2)-FP1)
 
-      DO 10 J=2,N-1
+      do J=2,N-1
          D(J)=-1./(4.+D(J-1))
          T(J)=-D(J)*(F(J-1)-2.*F(J)+F(J+1)-T(J-1))
-   10 CONTINUE
+      end do
 
       D(N)=(FPN+F(N-1)-F(N)-T(N-1))/(2.+D(N-1))
 
-      DO 20 J=N-1,1,-1
+      do J=N-1,1,-1
          D(J)=D(J)*D(J+1)+T(J)
-   20 CONTINUE
+      end do
 
       END
 
@@ -1469,8 +1471,8 @@
 
       parameter(IPR=20)
       common/type2_CF/ F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      DIMENSION B(16)
-      LOGICAL IERR
+      dimension B(16)
+      logical IERR
 
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
 
@@ -1502,14 +1504,14 @@
       Y=2*( FLR - RLS )+1
 
       I=0
-      IF(X < 2.)THEN
-         IF(X < 0.75)THEN
+      if(X < 2.) then
+         if(X < 0.75) then
             IERR=.true.
          ELSE
             I=1
          end if
-      else if(X > 84)THEN
-         IF(X > 85.25)THEN
+      else if(X > 84) then
+         if(X > 85.25) then
             IERR=.true.
          ELSE
             I=84
@@ -1519,14 +1521,14 @@
       end if
       U=X-I
 
-      IF(Y < 2.)THEN
-         IF(Y < 0.75)THEN
+      if(Y < 2.) then
+         if(Y < 0.75) then
             IERR=.true.
          ELSE
             J=1
          end if
-      else if(Y > NRL-1)THEN
-         IF(Y > NRL+.25)THEN
+      else if(Y > NRL-1) then
+         if(Y > NRL+.25) then
             IERR=.true.
          ELSE
             J=NRL-1
@@ -1536,7 +1538,7 @@
       end if
       V=Y-J
 
-      IF(IERR)THEN
+      if(IERR) then
          G=9.999
          DGDT=9.999
          DGDRHO=9.999
@@ -1610,15 +1612,15 @@
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      DIMENSION GAM(6)
+      dimension GAM(6)
       DATA GAM/+0.0073469388,-0.0293877551,-0.0416326531,
      +         +0.1175510204,+0.1665306122,+0.2359183673/
-      DIMENSION BET(11)
+      dimension BET(11)
       DATA BET/
      + -0.0048979592,-0.0661224490,-0.0293877551,+0.0195918367,
      +  0.2644897959,+0.1175510204,-0.0783673469,+0.0277551020,
      +  0.3746938776,+0.1665306122,-0.1110204082/
-      DIMENSION ALP(11)
+      dimension ALP(11)
       DATA ALP/
      + -0.0844897959,-0.0048979592,+0.0073469388,+0.0012244898,
      +  0.3379591837,+0.0195918367,-0.0293877551,+0.4787755102,
@@ -1654,7 +1656,7 @@
      +   +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )
      +   +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
-         DO 10 J=3,NRL-2
+         do J=3,NRL-2
             FXY(I,J)=
      +         GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )
      +        +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)
@@ -1663,7 +1665,7 @@
      +        +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )
      +        +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )
      +        +GAM(6)*  F(I  ,J  )
-   10    CONTINUE
+         end do
 
          J=NRL-1
          FXY(I,J)=
@@ -1694,13 +1696,13 @@
 
    20 CONTINUE
 
-      DO 40 I=3,nset-2   ! modified
-         DO 30 J=1,NRL
+      do I=3,nset-2   ! modified
+         do J=1,NRL
             F(I,J)=FXY(I,J)
-   30    CONTINUE
-   40 CONTINUE
+         end do
+      end do
 
-      END
+      end
 
 ! ********************************************************************
       subroutine opaltab2
@@ -1738,13 +1740,13 @@
 !  OTHER REFERENCES ARE MADE TO METHODS DESCRIBED IN THAT BOOK.
 
       parameter(IP=100,IPR=20)
-      DIMENSION U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
+      dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER(len=100) HEAD
+      character(len=100) HEAD
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
-      LOGICAL IERR
+      logical IERR
 
 
       NRL=2*(RLE-RLS)+1
@@ -1767,9 +1769,9 @@
       ROSSL(I,j)=coff(I,j)
       end do
          U(I)=6+LOG10(T6)
-         IF(T6 < tmax)GOTO 5
+         if(T6 < tmax)GOTO 5
       N=I
-      IF(N > IP)THEN
+      if(N > IP) then
          print*,' REQUIRE parameter IP OF AT LEAST ',N
          STOP 1
       end if
@@ -1789,11 +1791,11 @@
 
 !     FIRST GET F AND FX, INTERPOLATING FROM OPAL T6 TO
 !     INTERVAL OF 0.05 IN LOG10(T).
-      DO 40 J=1,NRL
+      do J=1,NRL
 !        FOR EACH LOG10(R), STORE LOG10(ROSS) IN V(I)
-         DO 20 I=1,N
+         do I=1,N
             V(I)=ROSSL(I,J)
-   20    CONTINUE
+         end do
 
 !        GET FIRST DERIVATIVES AT END POINTS
 
@@ -1801,22 +1803,21 @@
          call spline2(U,V,N,V2)
 
 !        INTERPOLATE TO LOG10(T)=FLT, FLT=3.8(0.05)8.0
-         DO 30 I=1,nset ! modified
+         do I=1,nset ! modified
             FLT=3.75+0.05*I
             call splint2(U,V,N,V2,FLT,F(I,J),FX(I,J))
-   30    CONTINUE
+         end do
 
-   40 CONTINUE
+      end do
 
 
 !  OPTION FOR SMOOTHING
-      IF(NSM > 0)THEN
-         DO 35 NS=1,NSM
+      if(NSM > 0) then
+         do NS=1,NSM
             call smooth2
-   35    CONTINUE
+         end do
          call fitx2
       end if
-
 
 !  GET FY AND FXY
       call fity2
@@ -1833,28 +1834,28 @@
 !                          ELSE IERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS
-      IF(NSM > 0)THEN
+      if(NSM > 0) then
          do l=1,NRL
          coff(1,l)=ROSSL(1,l)
          end do
 
-         DO 70 K=2,N
+         do K=2,N
             FLT=U(K)
-            DO 50 L=nrlow,nrhigh
+            do L=nrlow,nrhigh
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
                call interp2(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
-               IF(IERR)THEN
+               if(IERR) then
                end if
                V(L)=G
-   50       CONTINUE
+            end do
             T6=t6arr(K)
             do l=nrlow,nrhigh
             coff(K,l)=V(l)
 
             end do
 
-   70    CONTINUE
+         end do
       end if
       return
 
@@ -1865,4 +1866,4 @@
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
  6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
-      END
+      end

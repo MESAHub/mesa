@@ -43,7 +43,7 @@
       include 'formats'
 
       dbg = dbg_in
-!      dbg = (abs(Z_in - 0.01d0) < 1d-6 .and. abs(xh_in - 0.7d0) < 1d-6 .and. abs(t6_in - 1d0) < 1d-6 .and. abs(r_in - 1d-6) < 1d-12)
+!      dbg = (abs(Z_in-0.01d0) < 1d-6 .and. abs(xh_in-0.7d0) < 1d-6 .and. abs(t6_in-1d0) < 1d-6 .and. abs(r_in-1d-6) < 1d-12)
 
 
       z = real(z_in)
@@ -383,7 +383,7 @@
           xx(mxend)=log10 (0.005+xa(mxend))
 !         Added 03/03/2016 rjfarmer to fix fpe error
           dfsx(mxend)=0.d0
-          if(xx(mxend) /= xx(mxend-1))then
+          if(xx(mxend) /= xx(mxend-1)) then
             dfsx(mxend)=1./(xx(mxend)-xx(mxend-1))
           end if
         end if
@@ -1107,9 +1107,9 @@
       ROSSL(I,j)=xzff(I,j)
       end do
          U(I)=6+LOG10(T6)
-         IF(T6 < tmax)GOTO 5
+         if(T6 < tmax)GOTO 5
       N=I
-      IF(N > IP)THEN
+      if(N > IP) then
          print*,' REQUIRE parameter IP OF AT LEAST ',N
          STOP
       end if
@@ -1129,11 +1129,11 @@
 
 !     FIRST GET F AND FX, INTERPOLATING FROM OPAL T6 TO
 !     INTERVAL OF 0.05 IN LOG10(T).
-      DO 40 J=1,NRL
+      do J=1,NRL
 !        FOR EACH LOG10(R), STORE LOG10(ROSS) IN V(I)
-         DO 20 I=1,N
+         do I=1,N
             V(I)=ROSSL(I,J)
-   20    CONTINUE
+         end do
 
 !        GET FIRST DERIVATIVES AT END POINTS
 
@@ -1141,16 +1141,16 @@
          CALL SPLINE(U,V,N,V2)
 
 !        INTERPOLATE TO LOG10(T)=FLT, FLT=3.8(0.05)8.0
-         DO 30 I=1,nset ! modified
+         do I=1,nset ! modified
             FLT=3.75+0.05*I
             CALL SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
-   30    CONTINUE
+         end do
 
-   40 CONTINUE
+      end do
 
 
 !  OPTION FOR SMOOTHING
-      IF(NSM > 0)THEN
+      if(NSM > 0) then
          DO 35 NS=1,NSM
             CALL SMOOTH
    35    CONTINUE
@@ -1173,7 +1173,7 @@
 !                          ELSE IERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS
-      IF(NSM > 0)THEN
+      if(NSM > 0) then
          do l=1,NRL
          xzff(1,l)=ROSSL(1,l)
          end do
@@ -1184,7 +1184,7 @@
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
                CALL INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
-               IF(IERR)THEN
+               if(IERR) then
                end if
                V(L)=G
             end do
@@ -1242,7 +1242,7 @@
       KHI=N
 1     IF (KHI-KLO > 1) THEN
         K=(KHI+KLO)/2
-        IF(XA(K) > X)THEN
+        if(XA(K) > X) then
           KHI=K
         ELSE
           KLO=K
@@ -1391,14 +1391,14 @@
       Y=2*( FLR - RLS )+1
 
       I=0
-      IF(X < 2.)THEN
-         IF(X < 0.75)THEN
+      if(X < 2.) then
+         if(X < 0.75) then
             IERR=.true.
          ELSE
             I=1
          end if
-      else if(X > 84)THEN
-         IF(X > 85.25)THEN
+      else if(X > 84) then
+         if(X > 85.25) then
             IERR=.true.
          ELSE
             I=84
@@ -1408,14 +1408,14 @@
       end if
       U=X-I
 
-      IF(Y < 2.)THEN
-         IF(Y < 0.75)THEN
+      if(Y < 2.) then
+         if(Y < 0.75) then
             IERR=.true.
          ELSE
             J=1
          end if
-      else if(Y > NRL-1)THEN
-         IF(Y > NRL+.25)THEN
+      else if(Y > NRL-1) then
+         if(Y > NRL+.25) then
             IERR=.true.
          ELSE
             J=NRL-1
@@ -1425,7 +1425,7 @@
       end if
       V=Y-J
 
-      IF(IERR)THEN
+      if(IERR) then
          G=9.999
          DGDT=9.999
          DGDRHO=9.999
@@ -1582,10 +1582,10 @@
 
    20 CONTINUE
 
-      DO 40 I=3,nset-2   ! modified
-         DO 30 J=1,NRL
+      do I=3,nset-2   ! modified
+         do J=1,NRL
             F(I,J)=FXY(I,J)
-   30    CONTINUE
-   40 CONTINUE
+         end do
+      end do
 
       end
