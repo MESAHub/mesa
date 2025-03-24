@@ -33,7 +33,7 @@
          interface ! subroutine called after each successful step
 #include"num_solout.dek"
          end interface
-         integer, intent(in)  :: iout ! switch for calling the subroutine solout
+         integer, intent(in) :: iout ! switch for calling the subroutine solout
          interface
 #include "mtx_decsol.dek"
 #include "mtx_decsols.dek"
@@ -51,5 +51,5 @@
          integer, intent(in) :: lrpar, lipar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(in)  :: lout
-         integer, intent(out)  :: idid
+         integer, intent(in) :: lout
+         integer, intent(out) :: idid

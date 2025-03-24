@@ -105,12 +105,12 @@
 ! Error check
       if (NXD <= 1) GOTO 40
       if (NYD <= 1) GOTO 50
-      do 10 IX = 2,NXD
+      do IX = 2,NXD
           if (XD(IX) <= XD(IX-1)) GOTO 60
-   10 continue
-      do 20 IY = 2,NYD
+      end do
+      do IY = 2,NYD
           if (YD(IY) <= YD(IY-1)) GOTO 70
-   20 continue
+      end do
       if (NIP <= 0) GOTO 80
       IER = 0
 ! Calculation
@@ -277,12 +277,12 @@
 ! Error check
       if (NXD <= 1) GOTO 60
       if (NYD <= 1) GOTO 70
-      do 10 IX = 2,NXD
+      do IX = 2,NXD
           if (XD(IX) <= XD(IX-1)) GOTO 80
-   10 continue
-      do 20 IY = 2,NYD
+      end do
+      do IY = 2,NYD
           if (YD(IY) <= YD(IY-1)) GOTO 90
-   20 continue
+      end do
       if (NXI <= 0) GOTO 100
       if (NYI <= 0) GOTO 110
       IER = 0
@@ -295,14 +295,14 @@
       end if
 ! Outermost DO-loop with respect to the y coordinate of the output
 ! grid points
-      do 50 IYI = 1,NYI
-          do 30 IXI = 1,NIPIMX
+      do IYI = 1,NYI
+          do IXI = 1,NIPIMX
               YII(IXI) = YI(IYI)
-   30     continue
+          end do
 ! Second DO-loop with respect to the x coordinate of the output
 ! grid points
 ! Processes NIPIMX output-grid points, at most, at a time.
-          do 40 IXI = 1,NXI,NIPIMX
+          do IXI = 1,NXI,NIPIMX
               NIPI = MIN(NXI- (IXI-1),NIPIMX)
 ! Locates the output-grid points.
               call RGLCTN_db(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
@@ -311,8 +311,8 @@
               call RGPLNL_db(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,
      +                    INYI, ZI(IXI,IYI))
 !             call RGPLNL_db(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
-   40     continue
-   50 continue
+          end do
+      end do
       return
 ! Error exit
    60 WRITE (*,FMT=9000)

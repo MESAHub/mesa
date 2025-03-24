@@ -1,5 +1,3 @@
-! ***********************************************************
-!
       subroutine slvrod(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
      &          m1,m2,nm1,fac1,e_1D,lde,ip,dy,ak,fx,ynew,hd,ijob,not_stage1,
      &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
@@ -146,7 +144,7 @@
          return
       end if
 
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,13,15), ijob
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,13,15), ijob
 !
 ! -----------------------------------------------------------
 !
@@ -317,8 +315,8 @@
 !            ak(im1)=ak(im1)+sum
 !         end do
 !      end if
-!      if (ijob == 14) goto 45
-!      goto 48
+!      if (ijob == 14) GOTO 45
+!      GOTO 48
 !
 ! -----------------------------------------------------------
 !
@@ -371,7 +369,7 @@
 !            ak(im1)=ak(im1)+sum
 !         end do
 !      end if
-!      goto 48
+!      GOTO 48
 !
 ! -----------------------------------------------------------
 !
@@ -396,7 +394,3 @@
        write(*,*) 'slvrod: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! slvrod
       end subroutine slvrod
-!
-!    end of subroutine slvrod
-!
-c

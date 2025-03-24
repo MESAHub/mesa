@@ -376,18 +376,18 @@
 !   four equations.
 
     7   STF = 1.0/RC
-        do 10 I = 1,4
+        do I = 1,4
           B(I,10) = STF
           IP1 = I + 1
-          do 8 J = IP1,10
+          do J = IP1,10
             B(J,10) = 0.
-    8       continue
-          do 9 J = I,9
+          end do
+          do J = I,9
             JP1 = J + 1
             call GIVENS_db (B(J,J),B(J,10),C,S)
             call ROTATE_db (10-J,C,S,B(JP1,J),B(JP1,10))
-    9       continue
-   10     continue
+          end do
+         end do
 
 ! Test the damped system for ill-conditioning.
 
