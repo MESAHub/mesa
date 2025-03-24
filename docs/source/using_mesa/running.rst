@@ -272,6 +272,15 @@ do this your inlist might look like:
    / ! end of kap namelist
 
 
+   &colors
+     ! colors options
+     ! see colors/defaults/colors.defaults
+     use_Type2_opacities = .true.
+     Zbase = 0.02
+
+   / ! end of colors namelist
+
+
    &controls
      ! see star/defaults/controls.defaults
 

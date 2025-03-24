@@ -27,6 +27,8 @@ Removed `file_extension` option because it is redundant with `file_device`. Dele
 New Features
 ------------
 
+NEW ``colors`` MODULE!!! TODO: describe HERE
+
 ``mesa_reader`` can now be installed with ``pip``.
 
 A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
