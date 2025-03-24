@@ -1,0 +1,47 @@
+! ======
+! colors
+! ======
+
+
+
+! Color Files
+! ===========
+
+
+      ! color_instrument
+      ! ~~~~~~~~~~~~~~~
+      ! color_vega_sed
+      ! ~~~~~~~~~~~~~~~
+      ! color_make_csv
+      ! ~~~~~~~~~~~~~~~~
+      ! color_atm
+      ! ~~~~~~~~~~~~~~~
+      ! color_z
+      ! ~~~~~~~~~~~~~~~
+      ! color_d
+      ! ~~~~~~~~~~~~~~~~
+
+      !some 
+      !stuff
+      !more of a blurb about the stuff
+
+      ! ::
+
+
+      color_instrument = 'data/filters/GAIA/GAIA'
+      color_vega_sed = 'data/stellar_models/vega_flam.csv'
+      color_make_csv = 'false'    
+
+      !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
+      !Vega SED for Vega photometric system
+      !make csv
+
+
+      color_atm = 'data/stellar_models/Kurucz2003all/'
+      color_z = 0.58d0
+      color_d = 3.0857d17   
+      
+      !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
+      !Metallicity
+      !Stellar distance 'd' (10pc for abs mag...)
+      
