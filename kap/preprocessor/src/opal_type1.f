@@ -892,8 +892,8 @@
       read (2,'(a)') dumarra(i:i)
       end do
 
-      do 3 m=1,mx
-      do 2 i=1,n(m)
+      do m=1,mx
+      do i=1,n(m)
 
       read(2,*)
       read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4)') itab(m,i),x(m,i),y(m,i),zz(m,i)
@@ -964,7 +964,7 @@
  1010  continue
 
       ll=1
-      do 110 kk=1,nre
+      do kk=1,nre
       alr(ll)=alrf(kk)
         do k=1,nt
         t6list(k)=t6listf(k+ntb-1)
@@ -980,20 +980,23 @@
          xz(m,i,k,ll)=xzf(k+ntb-1,kk)
         end if
         end do
-  110 ll=ll+1
+        ll=ll+1
+      end do
 
-    2 continue
-    3 continue
+      end do
+      end do
 
-      do 12 i=2,nt
-   12 dfs(i)=1./(alt(i)-alt(i-1))
-      do 13 i=2,nr
-   13 dfsr(i)=1./(alr(i)-alr(i-1))
+      do i=2,nt
+         dfs(i)=1./(alt(i)-alt(i-1))
+      end do
+      do i=2,nr
+         dfsr(i)=1./(alr(i)-alr(i-1))
+      end do
       do i=2,mx-1
-      dfsx(i)=1./(xx(i)-xx(i-1))
+         dfsx(i)=1./(xx(i)-xx(i-1))
       end do
       do i=2,mz
-      dfsz(i)=1./(zza(i)-zza(i-1))
+         dfsz(i)=1./(zza(i)-zza(i-1))
       end do
       end
 

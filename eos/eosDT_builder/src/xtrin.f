@@ -266,8 +266,8 @@
       end if
 
    15 continue
-      do 124 iv=1,iorder
-      do 123 m=mf,mf2
+      do iv=1,iorder
+      do m=mf,mf2
          is=0
          do ir=l1,l1+iq
            do it=k1,k1+ip
@@ -275,7 +275,7 @@
               is=1
            end do
          end do
-  123 continue
+      end do
       if((zz(mg)  /=  zz(mf)) .or. (zz(mh)  /=  zz(mf))) then
         write(*,'("Z does not match Z in EOS5_data files you are using")')
         stop 1
@@ -283,11 +283,11 @@
       if(z  /=  zz(mf)) GOTO 66
       is=0
       iw=1
-      do 45 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
           if (mf2  ==  1) then
             esk(it,ir)=epl(mf,it,ir)
-            GOTO 46
+            cycle
           end if
           esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir),epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
           if(esk(it,ir)  >  1.e+20) then
@@ -295,9 +295,8 @@
             write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mf,mf+2)
           end if
           is=1
-   46     continue
         end do
-   45 continue
+      end do
 
       if (mi  ==  mf2) then  ! interpolate between quadratics
          is=0
@@ -327,7 +326,7 @@
 
       call t6rinteos(slr,slt)
       eos(iv)=esact
-  124 continue
+      end do
 
       p0=t6*r
       eos(iri(1))=eos(iri(1))*p0   ! interpolated in p/po
@@ -511,18 +510,19 @@
          end if
          t6a(i)=t6list(1,i)
       end do
-      do 12 i=2,nt
-   12 dfs(i)=1./(t6a(i)-t6a(i-1))
+      do i=2,nt
+         dfs(i)=1./(t6a(i)-t6a(i-1))
+      end do
       rho(1)=rhogr(1,1)
-      do 13 i=2,nr
-      rho(i)=rhogr(1,i)
-   13 dfsr(i)=1./(rho(i)-rho(i-1))
+      do i=2,nr
+         rho(i)=rhogr(1,i)
+         dfsr(i)=1./(rho(i)-rho(i-1))
+      end do
       do i=2,mx
          dfsx(i)=1./(xx(i)-xx(i-1))
       end do
 !       call system ('gzip EOS5_data')
 
-      return
       end
 
 !..*********************************************************************

@@ -264,7 +264,7 @@
 !..... set X indices
         ilo=2
         ihi=mx
-    8   if(ihi-ilo  >  1) then
+    8   if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(xh  <=  xa(imd)+1.e-7) then
               ihi=imd
@@ -303,7 +303,7 @@
          alt(i)=alt(i-1)+.05
       end do
       ntd=47
-      if ((ntb +1)  >  47) ntd=ntb+1
+      if ((ntb +1) > 47) ntd=ntb+1
       do i=ntd,68
         alt(i)=alt(i-1)+.1
       end do
@@ -548,30 +548,30 @@
       xxo=xxoi   ! restores input value
       is=0
       iw=1
-      do 45 ir=l1,l1+iq
-       do 46 it=k1,k1+ip
+      do ir=l1,l1+iq
+       do it=k1,k1+ip
          if((mx  ==  1) .or. (mf2  ==  1)) then
            opk(it,ir)=opl(mf,it,ir)
-           GOTO 46
+           cycle
          end if
          opk(it,ir)=quad2(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir)
      x   ,opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
          is=1
-   46 continue
-   45 continue
+      end do
+      end do
 
       if (mi  ==  mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xxx)*dfsx(mh)
-      do 47 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
         opk2(it,ir)=quad2(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir)
      x  ,opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
-   47 continue
+      end do
 !     interpolate X between two overlapping quadratics
       end if
       is=0
@@ -679,11 +679,11 @@
 
       if(nc  >=  5) then
 !__________
-      do 44 i=4,nc-1
+      do i=4,nc-1
 !     do not go beyond middle (where c3-c6 overlaps o3-o6), and
         if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and. (xcd(i-1)  >  xc(i-1))) then
-      do 42 ir=l1,l1+iq
-      do 43 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
         oxdp=log10(zzz+xodp)
         iw=1
         m1=i-1
@@ -702,11 +702,11 @@
         iw=iw+1
         opl(m,it,ir)=quad2(is,iw,oxx,b(1),b(2),b(3),ox(i-2),ox(i-1),oxdp)
         is=1
-   43 continue
-   42 continue
+      end do
+      end do
       if (is  ==  1) GOTO 123
         end if
-   44 continue
+      end do
 !__________
       end if
 
@@ -724,7 +724,7 @@
 !                    interpolation in region  o1
 
 !     include boundaries that could later cause division by 0!
-      if(xxo  >  xod(2)-1.e-6) then
+      if(xxo > xod(2)-1.e-6) then
       iw=1
       a(1,m)=quad2(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
       iw=iw+1
@@ -763,7 +763,7 @@
 !__________
       do 144 i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
-      if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and. (xod(i-1)  >  xo(i-1)-1.e-6)) then
+      if((xxo > xod(i)-1.e-6) .and. (xxc > xc(i-1)-1.e-6) .and. (xod(i-1) > xo(i-1)-1.e-6)) then
       do 142 ir=l1,l1+iq
       do 143 it=k1,k1+ip
       cxdp=log10(zzz+xcdp)
@@ -1054,8 +1054,8 @@
       end do
 
       int=0
-      do 1 j=1,no-1
-      do 2 i=1,n(m,j)
+      do j=1,no-1
+      do i=1,n(m,j)
         int=int+1
         read(2,'(f10.5)') dum
         read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)') itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
@@ -1134,8 +1134,8 @@
           end if
         end do
   110 ll=ll+1
-    2 continue
-    1 continue
+      end do
+      end do
       if(x(m,1)  /=  xa(m)) then
       write(*,'(" X in the codata? file does not match xa(m)")')
       call mesa_error(__FILE__,__LINE__)
@@ -1149,7 +1149,7 @@
        end do
       end do
 
-      do 6 j=1,no-1
+      do j=1,no-1
         int=int+1
         read(2,'(f10.5)') dum
         read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)') itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
@@ -1233,7 +1233,7 @@
        ll=ll+1
        end do
        end if
-    6 continue
+      end do
 
       do i=2,nt
         dfs(i)=1./(alt(i)-alt(i-1))
@@ -1334,18 +1334,18 @@
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
-      DO 11 I=2,N-1
+      do I=2,N-1
         SIG=(X(I)-X(I-1))/(X(I+1)-X(I-1))
         P=SIG*Y2(I-1)+2.
         Y2(I)=(SIG-1.)/P
         U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))/(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
-11    CONTINUE
+      end do
       QN=0.5
       UN=(3./(X(N)-X(N-1)))*(YPN-(Y(N)-Y(N-1))/(X(N)-X(N-1)))
       Y2(N)=(UN-QN*U(N-1))/(QN*Y2(N-1)+1.)
-      DO 12 K=N-1,1,-1
+      do K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
-12    CONTINUE
+      end do
       end
 ! ********************************************************************
       subroutine SPLINT2(XA,YA,N,Y2A,X,Y,YP)
@@ -1370,7 +1370,7 @@
       A=(XA(KHI)-X)/H
       B=(X-XA(KLO))/H
       Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
-      YP=0.05*  (  (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI) )*H/6. )
+      YP=0.05*((-YA(KLO)+YA(KHI))/H + (-(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI))*H/6.)
       end
 ! ********************************************************************
       subroutine FITY2
@@ -1411,7 +1411,6 @@
 !  THIS ROUTINE IS USED ONLY AFTER SMOOTHING.
 !  ITS FUNCTION IS TO RECOMPUTE FX USING SMOOTHED F.
 
-
       parameter(IPR=20)
       dimension A(85),D(85)
 
@@ -1437,7 +1436,6 @@
 
 !  SIMPLIFIED CODE FOR SPLINE COEFFICIENTS, FOR CASE OF INTERVALS
 !  OF UNITY.
-
 
       dimension F(N),D(N),T(85)
 
@@ -1494,7 +1492,6 @@
       FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
      +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
      +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
-
 
       IERR=.false.
 

@@ -234,12 +234,12 @@
 
       call STORE2_sg (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,
      .             IERR)
-      if (IERR  /=  0) GOTO 23
+      if (IERR /= 0) GOTO 23
       RSMX = 0.
 
 ! Outer loop on node K:
 
-      do 16 K = 1,NN
+      do K = 1,NN
         XK = X(K)
         YK = Y(K)
         FK = F(K)
@@ -375,18 +375,18 @@
 !   four equations.
 
     7   STF = 1.0/RC
-        do 10 I = 1,4
+        do I = 1,4
           B(I,10) = STF
           IP1 = I + 1
-          do 8 J = IP1,10
+          do J = IP1,10
             B(J,10) = 0.
-    8       continue
-          do 9 J = I,9
+          end do
+          do J = I,9
             JP1 = J + 1
             call GIVENS_sg (B(J,J),B(J,10),C,S)
             call ROTATE_sg (10-J,C,S,B(JP1,J),B(JP1,10))
-    9       continue
-   10     continue
+          end do
+        end do
 
 ! Test the damped system for ill-conditioning.
 
@@ -396,22 +396,22 @@
 
 ! Solve the 9 by 9 triangular system for the coefficients.
 
-   11   do 13 I = 9,1,-1
+   11   do I = 9,1,-1
           T = 0.
           if (I  /=  9) THEN
             IP1 = I + 1
-            do 12 J = IP1,9
+            do J = IP1,9
               T = T + B(J,I)*A(J,K)
-   12         continue
+            end do
           end if
           A(I,K) = (B(10,I)-T)/B(I,I)
-   13     continue
+        end do
 
 ! Scale the coefficients to adjust for the column scaling.
 
-        do 14 I = 1,4
+        do I = 1,4
           A(I,K) = A(I,K)*SFC
-   14     continue
+        end do
         A(5,K) = A(5,K)*SFS
         A(6,K) = A(6,K)*SFS
         A(7,K) = A(7,K)*SFS
@@ -421,11 +421,11 @@
 ! Unmark K and the elements of NPTS.
 
         LNEXT(K) = -LNEXT(K)
-        do 15 I = 1,LNP
+        do I = 1,LNP
           NP = NPTS(I)
           LNEXT(NP) = -LNEXT(NP)
-   15     continue
-   16   continue
+        end do
+      end do
 
 ! No errors encountered.
 
@@ -1553,12 +1553,12 @@
       integer I
       real XI, YI
 
-      do 1 I = 1,N
+      do I = 1,N
         XI = X(I)
         YI = Y(I)
         X(I) = C*XI + S*YI
         Y(I) = -S*XI + C*YI
-    1   continue
+      end do
       return
       end
       subroutine SETUP2_sg (XK,YK,ZK,XI,YI,ZI,S1,S2,S3,R, ROW)
@@ -1652,11 +1652,12 @@
 ! Nodes K and I coincide or node I is outside of the radius
 !   of influence.  Set ROW to the zero vector.
 
-    1 do 2 I = 1,10
+    1 do I = 1,10
         ROW(I) = 0.
-    2   continue
+      end do
       return
       end
+
       subroutine STORE2_sg (N,X,Y,NR, LCELL,LNEXT,XMIN,YMIN,DX,
      .                   DY,IER)
       integer N, NR, LCELL(NR,NR), LNEXT(N), IER
@@ -1776,12 +1777,12 @@
       XMX = XMN
       YMN = Y(1)
       YMX = YMN
-      do 1 K = 2,NN
+      do K = 2,NN
         if (X(K)  <  XMN) XMN = X(K)
         if (X(K)  >  XMX) XMX = X(K)
         if (Y(K)  <  YMN) YMN = Y(K)
         if (Y(K)  >  YMX) YMX = Y(K)
-    1   continue
+      end do
       XMIN = XMN
       YMIN = YMN
 
@@ -1795,15 +1796,15 @@
 
 ! Initialize LCELL.
 
-      do 3 J = 1,NNR
-        do 2 I = 1,NNR
+      do J = 1,NNR
+        do I = 1,NNR
           LCELL(I,J) = 0
-    2     continue
-    3   continue
+        end do
+      end do
 
 ! Loop on nodes, storing indexes in LCELL and LNEXT.
 
-      do 4 K = NN,1,-1
+      do K = NN,1,-1
         I = INT((X(K)-XMN)/DELX) + 1
         if (I  >  NNR) I = NNR
         J = INT((Y(K)-YMN)/DELY) + 1
@@ -1812,7 +1813,7 @@
         LNEXT(K) = L
         if (L  ==  0) LNEXT(K) = K
         LCELL(I,J) = K
-    4   continue
+      end do
 
 ! No errors encountered.
 

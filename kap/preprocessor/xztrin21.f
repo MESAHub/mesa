@@ -689,8 +689,8 @@
  1010  continue
 
       ll=1
-      do 110 kk=1,nre
-      alr(ll)=alrf(kk)
+      do kk=1,nre
+        alr(ll)=alrf(kk)
         do k=1,nt
         t6list(k)=t6listf(k+ntb-1)
         if(ismdata  ==  0) then
@@ -705,22 +705,24 @@
          xz(m,i,k,ll)=xzf(k+ntb-1,kk)
         end if
         end do
-  110 ll=ll+1
+        ll=ll+1
+      end do
 
       end do
       end do
 
-      do 12 i=2,nt
-   12 dfs(i)=1./(alt(i)-alt(i-1))
-      do 13 i=2,nr
-   13 dfsr(i)=1./(alr(i)-alr(i-1))
+      do i=2,nt
+         dfs(i)=1./(alt(i)-alt(i-1))
+      end do
+      do i=2,nr
+         dfsr(i)=1./(alr(i)-alr(i-1))
+      end do
       do i=2,mx-1
-      dfsx(i)=1./(xx(i)-xx(i-1))
+         dfsx(i)=1./(xx(i)-xx(i-1))
       end do
       do i=2,mz
-      dfsz(i)=1./(zza(i)-zza(i-1))
+         dfsz(i)=1./(zza(i)-zza(i-1))
       end do
-      return
       end
 
 ! **********************************************************************

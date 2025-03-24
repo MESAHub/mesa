@@ -323,8 +323,8 @@
       end if
 
    15 continue
-      do 124 iv=1,iorder
-      do 123 m=mf,mf2
+      do iv=1,iorder
+      do m=mf,mf2
          is=0
          do ir=l1,l1+iq
            do it=k1,k1+ip
@@ -332,7 +332,7 @@
               is=1
            end do
          end do
-  123 continue
+      end do
       if((zz(mg)  /=  zz(mf)) .or. (zz(mh)  /=  zz(mf))) then
         write(*,'("Z does not match Z in EOS5_data files you are using")')
         stop 1
@@ -340,11 +340,11 @@
       if(z  /=  zz(mf)) GOTO 66
       is=0
       iw=1
-      do 45 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
           if (mf2  ==  1) then
             esk(it,ir)=epl(mf,it,ir)
-            GOTO 46
+            cycle
           end if
           esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir),epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
           if(esk(it,ir)  >  1.e+20) then
@@ -352,9 +352,8 @@
             write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mf,mf+2)
           end if
           is=1
-   46     continue
         end do
-   45 continue
+      end do
 
       if (mi  ==  mf2) then  ! interpolate between quadratics
          is=0
@@ -383,7 +382,7 @@
 
       call t6rinteos(slr,slt)
       eos(iv)=esact
-  124 continue
+      end do
 
       p0=t6*r
       eos(iri(1))=eos(iri(1))*p0   ! interpolated in p/po
@@ -528,11 +527,11 @@
       end if
 
 
-      do 3 m=1,mx
+      do m=1,mx
       read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)') xin(m),zz(m),moles(m),tmass(m)
       read (2,'(21x,e14.7,4x,e14.7,3x,e11.4,3x,e11.4,3x,e11.4,4x,e11.4)') (frac(m,i),i=1,6)
       read (2,'(a)') blank
-      do 2 jcs=1,nr
+      do jcs=1,nr
       read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs),dum,dum,rhogr(m,jcs)
       if(numtot  /=  jcs) then
          write (*,'(" Data file incorrect: numtot,jcs= ",2i5)') numtot,jcs
@@ -558,9 +557,9 @@
       read(2,'(a)') blank
       read(2,'(a)') blank
       read(2,'(a)') blank
-    2 continue
+      end do
       read(2,'(a)') blank
-    3 continue
+      end do
 
       do i=1,nt
          if(t6list(1,i)  ==  0.0) then
@@ -569,14 +568,14 @@
          end if
          t6a(i)=t6list(1,i)
       end do
-      do 12 i=2,nt
-      dfs(i)=1./(t6a(i)-t6a(i-1))
-   12 continue
+      do i=2,nt
+         dfs(i)=1./(t6a(i)-t6a(i-1))
+      end do
       rho(1)=rhogr(1,1)
-      do 13 i=2,nr
-      rho(i)=rhogr(1,i)
-      dfsr(i)=1./(rho(i)-rho(i-1))
-   13 continue
+      do i=2,nr
+         rho(i)=rhogr(1,i)
+         dfsr(i)=1./(rho(i)-rho(i-1))
+      end do
       do i=2,mx
          dfsx(i)=1./(xx(i)-xx(i-1))
       end do
