@@ -1,0 +1,10 @@
+High-Mass Star (O-Type, ~50 M☉)
+    Lives a few Myr, evolves into a supernova, possibly a neutron star
+&controls
+    initial_mass = 50.0
+    initial_z = 0.001d0   ! Metal-poor environment
+    max_age = 1d9       ! Can live longer than the age of the universe
+/ ! end of controls namelist
+
+
+
