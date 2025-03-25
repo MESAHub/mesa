@@ -384,6 +384,8 @@ end module mod_BT_Settl
 program create_BT_Settl
    use mod_BT_Settl
 
+   implicit none
+
    integer :: ierr, i
    integer, parameter :: num_Zs = 11
    real(dp) :: MH(num_Zs)

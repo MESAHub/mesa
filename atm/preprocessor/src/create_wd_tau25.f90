@@ -166,5 +166,6 @@ end module mod_wd_tau_25
 
 program create_wd_tau_25
    use mod_wd_tau_25
+   implicit none
    call build_wd_tau_25_tables
 end program create_wd_tau_25

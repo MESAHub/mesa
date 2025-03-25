@@ -188,5 +188,6 @@ end module nextgen_support
 
 program nextgen
    use nextgen_support
+   implicit none
    call make_nextgen
 end program nextgen

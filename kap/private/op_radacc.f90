@@ -29,6 +29,8 @@ module op_radacc
    use op_def
    use const_def
 
+   implicit none
+
    logical, parameter :: dbg = .false.
 
 contains

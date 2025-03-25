@@ -149,5 +149,6 @@ end module plot_support
 
 program plot
    use plot_support
+   implicit none
    call make_plot_files
 end program plot

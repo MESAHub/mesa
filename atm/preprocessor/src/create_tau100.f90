@@ -673,6 +673,8 @@ program create_tau100
 
    use mod_tau100
 
+   implicit none
+
    integer :: ierr
    ierr = 0
 
