@@ -4,6 +4,7 @@
       use op_def
 
       contains
+! **********************************************************************
       subroutine xindex(flt, ilab, xi, ih, i3, ierr)
       implicit none
       integer, intent(in) :: i3
@@ -33,7 +34,6 @@
       end do
       xi = 2.*(x-ih2) - 1
 
-      return
       end subroutine xindex
 
 ! *********************************************************************
@@ -50,7 +50,6 @@
          jhmax = min(jhmax, je(ih(i)*i3)/i3)
       end do
 
-      return
       end subroutine jrange
 ! *********************************************************************
 
@@ -63,7 +62,6 @@
       real, intent(in) :: fa(ipe), flt, xi, flmu
       real,intent(out) :: flne, uy, epa
       real, intent(inout) :: flrho
-! local variables
       integer :: i, j, n, jh, jm, itt, jne, jnn
       real :: flrmin, flrmax, flr(4,4), uyi(4), efa(4, 7:118), flrh(4, 7:118), u(4), flnei(4), y, zeta, efa_temp
 ! declare variables in common block, by default: real (a-h, o-z), integer (i-n)
@@ -98,12 +96,10 @@
          do jh = jhmin, jhmax
             if(efa(i, jh) <= 0.)then
                jm = jh - 1
-               GOTO 3
+               jhmax = min(jhmax, jm)
+               cycle
             end if
          end do
-         GOTO 4
-    3    jhmax = MIN(jhmax, jm)
-    4    continue
       end do
 
 ! Get flrh
@@ -131,15 +127,15 @@
 
 !  Interpolations in j for flne
       do jh = jhmin, jhmax
-         if(flrh(2,jh) > flrho)then
+         if (flrh(2,jh) > flrho) then
             jm = jh - 1
-            GOTO 5
+            cycle
          end if
+         write(*,*) ' Interpolations in j for flne'
+         write(*,*) ' Not found, i=',i
+         stop
       end do
-      print*,' Interpolations in j for flne'
-      print*,' Not found, i=',i
-      stop
-    5 jm=max(jm,jhmin+1)
+      jm=max(jm,jhmin+1)
       jm=min(jm,jhmax-2)
 
       do i = 1, 4
@@ -161,7 +157,7 @@
 
       return
 
-  601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range. Allowed range for flrho is ',e11.3,' to ',e11.3)
+!  601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range. Allowed range for flrho is ',e11.3,' to ',e11.3)
       end subroutine findne
 
 ! **********************************************************************
@@ -171,7 +167,6 @@
       real, intent(in) :: flne
       integer, intent(out) :: jh(4)
       real, intent(out) :: eta
-! local variables
       integer :: j, k
       real :: y
 
@@ -184,7 +179,6 @@
       end do
       eta = 2.*(y-j)-1
 
-      return
       end subroutine yindex
 
 ! **********************************************************************
@@ -192,7 +186,6 @@
       implicit none
       real, intent(in) :: flr(4, 4), xi, eta
       real, intent(out) :: ux
-! local variables
       integer :: i, j
       real :: uxj(4), u(4)
 
@@ -204,7 +197,6 @@
       end do
       ux = fint(uxj, eta)
 
-      return
       end subroutine findux
 
 ! *************************************
@@ -219,7 +211,6 @@
 
         fint=p(r)
 
-      return
       end function fint
 ! **********************************************************************
       function fintp(u,r)
@@ -232,7 +223,6 @@
 
         fintp=pp(r)
 
-      return
       end function fintp
 
 ! **********************************************************************
@@ -283,7 +273,6 @@
          end do
       end do
 
-      return
       end subroutine scatt
 ! **********************************************************************
       subroutine screen1(ih,jh,rion,umesh,ntot,epa,f)
@@ -316,7 +305,6 @@
         end do
       end do
 
-      return
       end subroutine screen1
 
       end module op_common

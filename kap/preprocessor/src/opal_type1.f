@@ -1113,8 +1113,8 @@
          if(T6 < tmax)GOTO 5
       N=I
       if(N > IP) then
-         print*,' REQUIRE parameter IP OF AT LEAST ',N
-         STOP
+         write(*,*) ' REQUIRE parameter IP OF AT LEAST ',N
+         stop
       end if
 
 

@@ -452,13 +452,13 @@
       iw=1
       do ir=l1,l1+iq
         do it=k1,k1+ip
-        if (mf2  ==  1) then
-        opk(it,ir)=opl(mf,it,ir)
-        cycle
-        end if
-        opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
-        is=1
-        end do
+          if (mf2  ==  1) then
+            opk(it,ir)=opl(mf,it,ir)
+            cycle
+          end if
+          opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+          is=1
+          end do
         end do
       end do
 

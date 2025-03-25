@@ -143,7 +143,7 @@
       integer :: i=0
       integer :: j=0
 
-      real(dp) dx,dy
+      real(dp) :: dx, dy
 
 !--------------------------
 

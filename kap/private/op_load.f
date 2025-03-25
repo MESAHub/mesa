@@ -34,7 +34,6 @@
       use op_def
       logical :: have_loaded_op = .false.
 
-
       contains
 ! *****************************************************************
       subroutine op_dload(path, cache_filename, ierr)
@@ -93,14 +92,12 @@
 
       if (have_loaded_op) GOTO 1001
 
-
       !path = '../OP4STARS_1.3'
       !call getenv("oppath", path)
       !if (len(trim(path)) == 0) then
       !   write(6,*) 'Define environmental variable oppath (directory of OP data)'
       !   stop
       !end if
-
 
       ios = 0
       open(1,file=trim(cache_filename),action='read',status='old',iostat=ios,form='unformatted')
@@ -127,7 +124,6 @@
          stop 'op_load'
       end if
 
-
       ite1=140
       ite2=320
       ite3=2
@@ -143,7 +139,7 @@
 !  READ INDEX FILES
 !     FIRST FILE
       NN=1
-!     print*,' Opening '//'./'//zlab(1)//'.index'
+!     write(*,*) ' Opening '//'./'//zlab(1)//'.index'
       OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.index',STATUS='OLD',iostat=ios)
       if (ios /= 0) then
          write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(1) // '.index'
@@ -239,7 +235,7 @@
          end if
          read(1)DV
        if (DV /= DV1) then
-!          PRINT*,' OP: N=',N,', DV=',DV,' NOT EQUAL TO DV1=',DV1
+!          write(*,*) ' OP: N=',N,', DV=',DV,' NOT EQUAL TO DV1=',DV1
             ierr=8
           GOTO 1001
        end if
@@ -406,9 +402,9 @@ c6012  FORMAT(/10X,'ERROR, SEE WRITE(6,6012)'/
      + 10X,I5,' READ FOR N=',I5)
 
 c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
-1010  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
+1010  write(*,*) ' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
       stop
-1011  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.mesh'
+1011  write(*,*) ' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.mesh'
       stop
       end subroutine op_dload
 
@@ -459,7 +455,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       end do
       itot=ib
 
-        return
       end subroutine IMESH
 
 
@@ -488,8 +483,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       do i = 0, 100
          uf(i) = umin + i*dscat
       end do
-
-      return
 
       end subroutine msh
 
@@ -524,10 +517,10 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
          if (abs(d) < 1.e-4) return
       end do
 
-!      print*,' Not converged after 10 iterations in SOLVE'
-!      print*,' v=',v
+!      write(*,*) ' Not converged after 10 iterations in SOLVE'
+!      write(*,*) ' v=',v
 !      do N=1,4
-!         PRINT*,' N, U(N)=',N,U(N)
+!         write(*,*) ' N, U(N)=',N,U(N)
 !      end do
       ierr = 10
       return
@@ -569,7 +562,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       C1=-1.0650E-4*AUT
       C2=+1.4746E-8*AUT**2
       C3=-2.0084E-12*AUT*AUT*AUT
-      V=7.8748*AUNE/(AUT*SQRT(AUT))
+      V=7.8748*AUNE/(AUT*sqrt(AUT))
       call FDETA(V,ETA, ierr)  ! 23.10.93
       W=exp(dble(ETA))         ! 23.10.93
    11 R=FMH(W)/V
@@ -590,7 +583,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             F=2.666667*(1.+D*(.7+D*(.55+.341*D)))
          else
             G=2.*D*(1+D)
-            F=D*((G+D*D*D)*LOG(dble(D/(2.+D)))+G+2.6666667)
+            F=D*((G+D*D*D)*log(dble(D/(2.+D)))+G+2.6666667)
          end if
          DELTA=.375*R*F/X
          SF(N)=(1.-R*DELTA-Y*FUNS(W))*
@@ -604,7 +597,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 
       end subroutine BRCKR
 ! **********************************************************************
-      FUNCTION FUNS(A)
+      function FUNS(A)
 !
       if (A <= 0.001) then
          FUNS=1.
@@ -619,30 +612,29 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
      +        0.92007/(1.+0.10083*A)+
      +        0.05683/(1.+0.00186*A)    )
       end if
-      return
-      end FUNCTION FUNS
+
+      end function FUNS
 ! **********************************************************************
-      FUNCTION FMH(W)
+      function FMH(W)
 !
 !  CALCULATES FD INTEGRAL I_(-1/2)(ETA). INCLUDES FACTOR 1/GAMMA(1/2).
-!  ETA=LOG(W)
+!  ETA=log(W)
 !
       if (W <= 2.718282) then
          FMH=W*(1+W*(-.7070545+W*(-.3394862-W*6.923481E-4))
      +   /(1.+W*(1.2958546+W*.35469431)))
       else if (W <= 54.59815) then
-         X=LOG(dble(W))
+         X=log(dble(W))
          FMH=(.6652309+X*(.7528360+X*.6494319))
      +   /(1.+X*(.8975007+X*.1153824))
       else
-         X=LOG(dble(W))
+         X=log(dble(W))
          Y=1./X**2
-         FMH=SQRT(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))
+         FMH=sqrt(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))
      +   /(1.+Y*(-10.867628+Y*384.61501)))
       end if
 
-      return
-      end FUNCTION FMH
+      end function FMH
 ! **********************************************************************
       subroutine FDETA(X,ETA, ierr)
 !
@@ -672,15 +664,15 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             U=U+SS
             if (ABS(SS) < 1.E-6*U)GOTO 11
          end do
-!         PRINT*,' COMPLETED LOOP 10 IN FDETA'
+!         write(*,*) ' COMPLETED LOOP 10 IN FDETA'
          ierr = 11
          return
 !         STOP
-   11    ETA=LOG(dble(U))
+   11    ETA=log(dble(U))
 
       else
          if (a < 2) then
-            E=LOG(dble(X))
+            E=log(dble(X))
          else
             e=pow(1.5d0*a,2d0/3d0)
          end if
@@ -690,7 +682,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             E=E+DE
             if (abs(dE) < 1.e-4*abs(E))GOTO 21
          end do
-!         print*,' completed loop 20 IN FDETA'
+!         write(*,*) ' completed loop 20 IN FDETA'
          ierr = 12
          return
 !         stop
@@ -698,7 +690,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 
       end if
 
-      return
       end subroutine FDETA
 ! **********************************************************************
       subroutine FDF1F2(ETA,F1,F2)
@@ -721,7 +712,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
          F2=(0.6943274+X*(0.4918855+X*0.214556))/
      +      (1.+X*(-0.0005456214+X*0.003648789))
       else
-         X=SQRT(ETA)
+         X=sqrt(ETA)
          Y=1./ETA**2
          F1=X*(2.+Y*(-0.81495847+Y*(4.0521266-Y*325.43565))/
      +      (1.+Y*(-10.867628+Y*384.61501)))
@@ -730,7 +721,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
      +      (1.+Y*(5.69335697+Y*322.149800)))
       end if
 
-      return
       end subroutine FDF1F2
 
 
@@ -772,7 +762,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             fkp=sqrt(e+w)
             x1=1.+alp2/(fkp+fk)**2
             x2=1.+alp2/(fkp-fk)**2
-            q=(1./x2-1./x1+LOG(dble(x1/x2)))*
+            q=(1./x2-1./x1+log(dble(x1/x2)))*
      +        (fkp*(1.-exp(dble(-twopi*k/fkp))))/(fk*(1.-exp(dble(-twopi*k/fk))))
               ff=ff+wt(j)*q
           end do
@@ -790,7 +780,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
         p(n)=p(n)+f(in(n))/(w*w*w)
       end do
 
-      return
       end subroutine screen2
 
       end module op_load

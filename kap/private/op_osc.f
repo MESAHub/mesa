@@ -37,7 +37,6 @@
       real, intent(in) :: fa(ipe)
       real, intent(out) :: flmu
       integer, intent(out) :: nkz(ipe)
-! local variables
       integer :: k, k1, k2, m
       real :: amamu(ipe), fmu
 
@@ -47,13 +46,12 @@
             if (izz(k) == kz(m)) then
                amamu(k) = amass(m)
                nkz(k) = m
-            GOTO 1
+               cycle
             end if
+            write(*,*) ' k=',k,', izz(k)=',izz(k)
+            write(*,*) ' kz(m) not found'
+            stop
          end do
-         print*,' k=',k,', izz(k)=',izz(k)
-         print*,' kz(m) not found'
-         stop
-    1    continue
       end do
 
 !  Mean atomic weight = fmu
@@ -65,7 +63,6 @@
       fmu = fmu*1.660531e-24 ! Convert to cgs
       flmu = log10(dble(fmu))
 
-      return
       end subroutine abund
 ! *********************************************************************
       subroutine xindex(flt, ilab, xi, ih, i3, ierr)
@@ -97,7 +94,6 @@
       end do
       xi = 2.*(x-ih2) - 1
 
-      return
       end subroutine xindex
 ! *********************************************************************
       subroutine jrange(ih, jhmin, jhmax, i3)
@@ -113,7 +109,6 @@
          jhmax = min(jhmax, je(ih(i)*i3)/i3)
       end do
 
-      return
       end subroutine jrange
 ! *********************************************************************
       subroutine findne(ilab, fa, nel, nkz, jhmin, jhmax, ih, flrho, flt, xi, flne, flmu, flr, epa, uy, i3, ierr)
@@ -125,7 +120,6 @@
       real, intent(in) :: fa(ipe), flt, xi, flmu
       real,intent(out) :: flne, uy, epa
       real, intent(inout) :: flrho
-! local variables
       integer :: i, j, n, jh, jm, itt, jne, jnn
       real :: flrmin, flrmax, flr(4,4), uyi(4), efa(0:5, 7:118), flrh(0:5, 7:118), u(4), flnei(4), y, zeta, efa_temp
 ! declare variables in common block, by default: real (a-h, o-z), integer (i-n)
@@ -160,12 +154,10 @@
          do jh = jhmin, jhmax
             if (efa(i, jh) <= 0.) then
                jm = jh - 1
-               GOTO 3
+               jhmax = min(jhmax, jm)
+               cycle
             end if
          end do
-         GOTO 4
-    3    jhmax = MIN(jhmax, jm)
-    4    continue
       end do
 
 ! Get flrh
@@ -193,13 +185,13 @@
       do jh = jhmin, jhmax
          if (flrh(2,jh) > flrho) then
             jm = jh - 1
-            GOTO 5
+            cycle
          end if
+         write(*,*) ' Interpolations in j for flne'
+         write(*,*) ' Not found, i=',i
+         stop
       end do
-      print*,' Interpolations in j for flne'
-      print*,' Not found, i=',i
-      stop
-    5 jm=max(jm,jhmin+1)
+      jm=max(jm,jhmin+1)
       jm=min(jm,jhmax-2)
 
       do i = 1, 4
@@ -221,9 +213,9 @@
 
       return
 
-  601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range'/
-     +  ' Allowed range for flrho is ',e11.3,' to ',e11.3)
+!  601 format(' For flt=',1p,e11.3,', flrho=',e11.3,' is out of range. Allowed range for flrho is ',e11.3,' to ',e11.3)
       end subroutine findne
+
 ! **********************************************************************
       subroutine yindex(jhmin, jhmax, flne, jh, i3, eta)
       implicit none
@@ -231,7 +223,6 @@
       real, intent(in) :: flne
       integer, intent(out) :: jh(0:5)
       real, intent(out) :: eta
-! local variables
       integer :: j, k
       real :: y
 
@@ -244,14 +235,12 @@
       end do
       eta = 2.*(y-j)-1
 
-      return
       end subroutine yindex
 ! **********************************************************************
       subroutine findux(flr, xi, eta, ux)
       implicit none
       real, intent(in) :: flr(4, 4), xi, eta
       real, intent(out) :: ux
-! local variables
       integer :: i, j
       real :: uxj(4), u(4)
 
@@ -263,7 +252,6 @@
       end do
       ux = fint(uxj, eta)
 
-      return
       end subroutine findux
 ! *********************************************************************
       subroutine rd(nel, nkz, izz, ilab, jh, n_tot, ff, rr, i3, umesh, fac)
@@ -274,7 +262,6 @@
       real(dp), intent(in) :: fac(nel)
       real, intent(out) :: ff(:,:,0:,0:)  ! (nptot, ipe, 6, 6)
       real, intent(out) :: rr(28, ipe, 0:5, 0:5)
-! local variables
       integer :: i, j, k, l, m, n, itt, jnn, izp, ne1, ne2, ne, ib, ia
       real :: fion(-1:28), yb, ya, d
 ! declare variables in common block (instead of by default: real (a-h, o-z), integer (i-n))
@@ -356,7 +343,6 @@
          end do !j
       end do !i
 
-      return
       end subroutine ross
 ! **********************************************************************
       subroutine mix(ntot, nel, fa, ff, rs, rr, rion)
@@ -364,7 +350,6 @@
       integer, intent(in) :: ntot, nel
       real, intent(in) :: ff(nptot, ipe, 0:5, 0:5), fa(ipe), rr(28, 17, 0:5, 0:5)
       real, intent(out) :: rs(nptot, 0:5, 0:5), rion(28, 0:5, 0:5)
-! local variables
       integer :: i, j, k, n, m
       real :: rs_temp, rion_temp
 
@@ -389,7 +374,6 @@
          end do
       end do
 
-      return
       end subroutine mix
 ! **********************************************************************
       subroutine interp(nel, rossl, xi, eta, g, i3, ux, uy, gx, gy)
@@ -397,7 +381,6 @@
       integer, intent(in) :: nel, i3
       real, intent(in) :: ux, uy, xi, eta
       real, intent(out) :: gx, gy, g
-! local variables
       integer :: i, j, l
       real :: V(4), U(4),  vyi(4)
       real :: x3(3), fx3!, fxxy(0:5, 0:5), fyxy(0:5, 0:5)
@@ -491,7 +474,6 @@
       gy = 0.5*gy/uy
       gx = (80./real(i3))*(0.5*gx-gy*ux)
 
-      return
       end subroutine interp
 ! *************************************
       function fint(u,r)
@@ -505,10 +487,9 @@
      +  27*(u(3)-u(2))-(u(4)-u(1))   +R*(
      +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(
      +  -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
-!
+
         fint=p(r)
-!
-      return
+
       end function fint
 ! **********************************************************************
       function fintp(u,r)
@@ -524,7 +505,6 @@
 
         fintp=pp(r)
 
-      return
       end function fintp
 
 ! **********************************************************************
@@ -579,8 +559,6 @@
          end do
       end do
 
-      return
-
       end subroutine DERIV
 ! *****************************************************************
 !
@@ -633,7 +611,6 @@
       F(1)=FP1
       F(N)=FPN
 
-      return
       end subroutine GET
 
 ! **********************************************************************
@@ -643,7 +620,7 @@
       integer :: i , j
       real :: x, y, B(16)
 !
-!  FUNCTION DEFINITIONS FOR CUBIC EXPANSION
+!  function DEFINITIONS FOR CUBIC EXPANSION
 !
       FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
      +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
@@ -715,7 +692,6 @@
       gy = FFY(U, V)
 !      DGDT=(1./CT)*FFX(U,V)-(3./CN)*FFY(U,V)
 !      DGDRHO=(1./CN)*FFY(U,V)
-      return
 
       end subroutine INTERP2
 ! ************************************************************
@@ -797,7 +773,7 @@
       integer, intent(inout) :: ierr
       dimension rion(28, 0:5, 0:5),uf(0:100),f(nptot,0:5,0:5),umesh(nptot),
      +  semesh(nptot),fscat(0:100),p(nptot),rr(28),ih(0:5),jh(0:5)
-        integer i,j,k,n
+      integer::  i,j,k,n
 ! HH: always use meshtype q='m'
       ite3=2
       umin=umesh(1)
@@ -838,13 +814,11 @@
          end do
       end do
 
-      return
       end subroutine scatt
 ! **********************************************************************
       subroutine screen1(ih,jh,rion,umesh,ntot,epa,f)
       use op_load, only: screen2
-      dimension uf(0:100), umesh(nptot),
-     +  fscat(0:100), ih(0:5), jh(0:5)
+      dimension uf(0:100), umesh(nptot),fscat(0:100), ih(0:5), jh(0:5)
       real, target :: f(nptot, 0:5, 0:5), rion(28, 0:5, 0:5)
       integer i, j, k, m
       real, pointer :: p(:), rr(:)
@@ -870,7 +844,6 @@
         end do
       end do
 
-      return
       end subroutine screen1
-! **********************************************************************
+
       end module op_osc
