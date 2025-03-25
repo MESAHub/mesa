@@ -6,8 +6,8 @@ TZO
 
 This test case builds and evolves a Thorne-Zytkow object (TZO) (Farmer et al 2023)
 
-The model stats by building a 20 |Msun| star mid way through the main sequence (inlist_initial). The precise physics do not matter here,
-but having a large convective burning core is necessary for the the TZO formation to proceed smoothly.
+The model starts by building a 20 |Msun| star mid way through the main sequence (inlist_initial). The precise physics do not matter here,
+but having a large convective burning core is necessary for TZO formation to proceed smoothly.
 
 inlist_initial_make then moves the inner boundary to a desired inner mass and radius, assumed for the NS. It is helpful to have some
 assumed energy injection at this point in time (core_avg_eps).
