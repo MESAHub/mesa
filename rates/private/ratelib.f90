@@ -4630,26 +4630,26 @@
               + facv2*f2g + facv1*f1g + facv0*f0
 
 !  for electrons capture onto protons
-      if (iflag == 2) go to 503
-      if (eta > 0d0) go to 505
+      if (iflag == 2) GOTO 503
+      if (eta > 0d0) GOTO 505
       rpen  = ln2*cmk5*t5*rie1/ft
       spen  = ln2*cmk6*t5*temp*rjv1/ft
       spenc = ln2*cmk6*t5*temp*rjv1/ft*c2me
-      go to 504
+      GOTO 504
 505   rpen = ln2*cmk5*t5*rie2/ft
       spen = ln2*cmk6*t5*temp*rjv2/ft
       spenc = ln2*cmk6*t5*temp*rjv2/ft*c2me
 504   continue
       qn = qn2
-      go to 502
+      GOTO 502
 
 !  for positrons capture onto neutrons
-503   if (eta>0d0) go to 507
+503   if (eta>0d0) GOTO 507
       rnep  = ln2*cmk5*t5*rie1/ft
       snep  = ln2*cmk6*t5*temp*rjv1/ft
       snepc = ln2*cmk6*t5*temp*rjv1/ft*c2me
 !      if (rho.lt.1.0d+06) snep=snep+qndeca*xn(9)/mn/tmean
-      go to 506
+      GOTO 506
 507   rnep  = ln2*cmk5*t5*rie2/ft
       snep  = ln2*cmk6*t5*temp*rjv2/ft
       snepc = ln2*cmk6*t5*temp*rjv2/ft*c2me

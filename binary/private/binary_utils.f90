@@ -151,8 +151,8 @@
 
       subroutine set_period_eccentricity(binary_id, period, eccentricity, ierr)
          integer, intent(in) :: binary_id
-         real(dp) :: period  ! in seconds
-         real(dp) :: eccentricity
+         real(dp), intent(in)  :: period  ! in seconds
+         real(dp), intent(in) :: eccentricity
          type (binary_info), pointer :: b
          integer, intent(out) :: ierr
          call binary_ptr(binary_id,b,ierr)
@@ -168,7 +168,7 @@
 
       subroutine set_separation_eccentricity(binary_id, separation, eccentricity, ierr)
          integer, intent(in) :: binary_id
-         real(dp) :: separation  ! in cm
+         real(dp), intent(in) :: separation  ! in cm
          real(dp) :: eccentricity
          type (binary_info), pointer :: b
          integer, intent(out) :: ierr

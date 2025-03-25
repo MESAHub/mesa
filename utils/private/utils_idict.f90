@@ -41,7 +41,7 @@
             end subroutine fcn
          end interface
          type (integer_idict), pointer :: node
-         integer :: ierr
+         integer, intent(out) :: ierr
          ierr = 0
          if (.not. associated(idict)) return
          node => idict

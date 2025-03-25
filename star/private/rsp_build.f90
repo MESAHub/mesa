@@ -194,7 +194,7 @@
          if(TA(I)>2.d0/3.d0)then
             II=I
             IO=I+1
-            goto 77
+            GOTO 77
          end if
       end do
  77   continue
@@ -211,7 +211,7 @@
          if(T(I)>TE)then
             II=I
             IO=I+1
-            goto 78
+            GOTO 78
          end if
       end do
  78   continue
@@ -226,7 +226,7 @@
       GEFF=G*Mass/R(NZN)**2
       MBOL=-2.5d0*dlog10(ELR)+4.79d0
 
-      if(NMODES==0) goto 11  ! jesli masz liczyc tylko static envelope
+      if(NMODES==0) GOTO 11  ! jesli masz liczyc tylko static envelope
 
       if (.not. (s% use_RSP_new_start_scheme .or. s% use_other_RSP_linear_analysis)) then
          if (s% RSP_trace_RSP_build_model) write(*,*) '*** linear analysis ***'

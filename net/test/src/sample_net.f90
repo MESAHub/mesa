@@ -253,7 +253,7 @@ contains
       write (6, 24) 'eps_nuc    =', eps_nuc, 'erg/g/sec'
 
 ! back for more
-      goto 100
+      GOTO 100
 
    end subroutine do1_net_eval
 

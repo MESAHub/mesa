@@ -123,18 +123,18 @@
 ! C%C      do IX=1,MAXY
 ! C%C         write(*,'(''Z, A ('',I2,''): ''$)') IX
 ! C%C         read*,AZion(IX),ACMI(IX)
-! C%C        if (AZion(IX).le.0..or.ACMI(IX).le.0.) goto 2
+! C%C        if (AZion(IX).le.0..or.ACMI(IX).le.0.) GOTO 2
 ! C%C         write(*,'(''x ('',I2,''): ''$)') IX
 ! C%C         read*,AY(IX)
 ! C%C         XSUM=XSUM+AY(IX)
-! C%C        if (AY(IX).le.0.) goto 2
+! C%C        if (AY(IX).le.0.) GOTO 2
 ! C%C         NMIX=IX
-! C%C        if (dabs(XSUM-1.d0).lt.EPS) goto 2
+! C%C        if (dabs(XSUM-1.d0).lt.EPS) GOTO 2
 ! C%C      end do
 ! C%C    2 continue
 ! C%C      if (NMIX.eq.0) then
 ! C%C         print*,'There must be at least one set of positive (x,Z,A).'
-! C%C        goto 3
+! C%C        GOTO 3
 ! C%C      end if
 ! C%C      write(*,114)
 ! C%C      do IX=1,NMIX
@@ -147,7 +147,7 @@
 ! C%C   10 continue
 ! C%C      write(*,'('' Input RHO [g/cc] (<0 to new T): ''$)')
 ! C%C      read*,RHO
-! C%C      if (RHO.le.0.) goto 9
+! C%C      if (RHO.le.0.) GOTO 9
 ! C%C      RHOlg=dlog10(RHO)
 ! C%C      Tlg=dlog10(T)
 ! C%C      T6=10.d0**(Tlg-6.d0)
@@ -178,7 +178,7 @@
 ! LIQSOL = 0 in the liquid state, = 1 in the solid state
 ! C%C      write(*,111) RHO,T6,P,PnkT,CV,CHIT,CHIR,UNkT,SNk,GAMI,TPT,CHI,
 ! C%C     *  LIQSOL
-! C%C      goto 10
+! C%C      GOTO 10
 ! C%C  112 format(/
 ! C%C     *  ' rho [g/cc]     T6 [K]      P [Mbar]   P/(n_i kT)  Cv/(N k)',
 ! C%C     *  '     chi_T       chi_r      U/(N k T)    S/(N k)    Gamma_i',

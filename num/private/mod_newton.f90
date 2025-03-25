@@ -1244,7 +1244,7 @@ contains
                ! since, by definition, they depend only on the primaries of their own zone.
                !do j=1+kk, nz, nskip(ivar)
                !   y(j, 1:nsec)=y2(j, 1:nsec)
-               !enddo
+               !end do
                !end if
 
                ! compute the equations using these primaries and secondaries
@@ -1288,7 +1288,7 @@ contains
                if (nsec > 0) then ! restore the secondaries that correspond to the unmodified primaries
                   !do j=1+kk, nz, nskip(ivar)
                   !   y(j, 1:nsec)=y1(j, 1:nsec)
-                  !enddo
+                  !end do
                end if
 
             end do
