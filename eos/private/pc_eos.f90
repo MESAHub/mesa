@@ -1612,7 +1612,8 @@
       type(auto_diff_real_2var_order1) :: TEMR, EF, DeltaEF, G, PF, F, DF, P, DelP, S, U
       type(auto_diff_real_2var_order1) :: DENR, DT, D1, D2
       type(auto_diff_real_2var_order1) :: TPI, dndH, dndT, dndHH, dndHT, dndTT
-      type(auto_diff_real_2var_order1) :: W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT,W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT,W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,W0XXX,W0XTT,W0XXT
+      type(auto_diff_real_2var_order1) :: W0, W0DX, W0DT, W0DXX, W0DTT, W0DXT, &
+                                          W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT,W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,W0XXX,W0XTT,W0XXT
 
       type(auto_diff_real_2var_order1) :: BOHR
       type(auto_diff_real_2var_order1) :: PI2

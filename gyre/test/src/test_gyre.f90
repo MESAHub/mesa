@@ -48,7 +48,6 @@ contains
 
    end subroutine do_test
 
-
    subroutine user_sub(md, ipar, rpar, retcode)
 
       type(mode_t), intent(in) :: md
@@ -63,7 +62,6 @@ contains
       retcode = 0
 
    end subroutine user_sub
-
 
    subroutine load_model(file, global_data, point_data, version)
 

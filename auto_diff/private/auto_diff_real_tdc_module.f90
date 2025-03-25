@@ -995,7 +995,8 @@ module auto_diff_real_tdc_module
       unary%val = powm1(pi)*atan(x%val)
       unary%d1val1 = q2*x%d1val1
       unary%d1Array(1:33) = q2*x%d1Array(1:33)
-      unary%d1val1_d1Array(1:33) = (-2.0_dp*x%d1Array(1:33)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:33) + x%d1val1_d1Array(1:33))*powm1(2.0_dp*q1 + pi*pow4(x%val) + pi)
+      unary%d1val1_d1Array(1:33) = (-2.0_dp*x%d1Array(1:33)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:33) + x%d1val1_d1Array(1:33)) &
+                                   * powm1(2.0_dp*q1 + pi*pow4(x%val) + pi)
    end function atanpi_self
 
    function asinh_self(x) result(unary)
@@ -1601,7 +1602,9 @@ module auto_diff_real_tdc_module
       binary%val = -0.5_dp*y%val + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       binary%d1val1 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1 + q1*(x%d1val1 - y%d1val1)
       binary%d1Array(1:33) = -0.5_dp*y%d1Array(1:33) + 0.5_dp*x%d1Array(1:33) + q1*(x%d1Array(1:33) - y%d1Array(1:33))
-      binary%d1val1_d1Array(1:33) = -0.5_dp*y%d1val1_d1Array(1:33) + 0.5_dp*x%d1val1_d1Array(1:33) + q1*(x%d1val1_d1Array(1:33) - y%d1val1_d1Array(1:33))
+      binary%d1val1_d1Array(1:33) = -0.5_dp*y%d1val1_d1Array(1:33) &
+                                   + 0.5_dp*x%d1val1_d1Array(1:33) &
+                                   + q1*(x%d1val1_d1Array(1:33) - y%d1val1_d1Array(1:33))
    end function dim_self
 
    function dim_self_real(x, y) result(unary)

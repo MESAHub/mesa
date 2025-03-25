@@ -180,7 +180,8 @@
          if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
 
             ! start values are constants during Newton iters
-            eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
+            eps_grav_start = -s% T_start(k)*s% cp_start(k) &
+                            * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
 
             ! phase transition latent heat
             eps_grav_start = eps_grav_start - (dlnd_dt * s% latent_ddlnRho_start(k) + dlnT_dt * s% latent_ddlnT_start(k))

@@ -16,7 +16,8 @@
       !!! Compute g_rad for a single cell. (Currently not used.)
       subroutine compute_grad(k, fk, logT_face, logRho_face,l, r,lkap_ross_cell, lgrad_cell, ierr,ite,jne,epatom,amamu,sig,eumesh)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -274,7 +275,8 @@
       !!! Compute gamma factors and kappa_Ross for all OP mono data points for a given mixture.
       subroutine compute_gamma_grid(ngp, fk_all,lgamm_pcg, lkap_face_pcg, logT_pcg, logRho_pcg, ierr,ite,jne,epatom,amamu,sig,eumesh)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -296,7 +298,7 @@
       integer :: n, ke, nz, id, m, ik, i, j
 
       !real(dp) :: fk_norm_fac !Local fractional abundance per element and normalization factor.
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       !integer ::  eid(nel)
       real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
@@ -380,7 +382,8 @@
 
 
       !!! Compute g_rad from precomputeds for grid for gamma and kappa_Ross for the entire OP mono data.
-      subroutine compute_grad_fast(k,fk, logT_face, logRho_face, l, r,lgrad_cell, ierr,ite,jne,epatom,amamu,logT_pcg,logRho_pcg,lgamm_pcg,lkap_face_pcg)
+      subroutine compute_grad_fast(k, fk, logT_face, logRho_face, l, r,lgrad_cell, &
+                                   ierr,ite,jne,epatom,amamu,logT_pcg,logRho_pcg,lgamm_pcg,lkap_face_pcg)
 
       use cubic_interpolator, only: interpolator
 
@@ -602,7 +605,8 @@
       subroutine compute_kappa(k,fk,logT_cntr,logRho_cntr,lkap_ross_cell, &
                                dlnkap_rad_dlnT,dlnkap_rad_dlnRho,ierr,ite,jne,epatom,amamu,sig,logT_grid,logRho_grid,lkap_Ross)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -621,7 +625,7 @@
 
       integer :: n, ke, nz, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648), logT(1648)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
       real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
@@ -813,7 +817,8 @@
       !!! Compute the Rossland opacity for the entire OP mono data set given a mixture.
       subroutine compute_kappa_grid(fk,lkap_ross_pcg, ierr,ite,jne,epatom,amamu,sig)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -879,7 +884,8 @@
       sig_Ross = 0
 !$OMP PARALLEL DO PRIVATE(i,m,sig_int) SCHEDULE(guided)
         do i=1,1648
-              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv
+              ! inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
               end do
@@ -897,9 +903,11 @@
 
 
       !!! Routine to compute Rossland opacity from a precomputed grid of the entire OP mono data.
-      subroutine compute_kappa_fast(k,fk, logT_cntr, logRho_cntr,lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,ite,jne,epatom,amamu,sig,lkap_ross_pcg)
+      subroutine compute_kappa_fast(k, fk, logT_cntr, logRho_cntr, lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, &
+                                    ierr,ite,jne,epatom,amamu,sig,lkap_ross_pcg)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use cubic_interpolator, only: interpolator
 
       integer, intent(inout) :: ierr
@@ -1102,7 +1110,8 @@
 
 
       !!! Interpolate Rossland opacity and derivatives from a 4x4 grid computed last time step.
-      subroutine interpolate_kappa(k,logT_cntr, logRho_cntr,lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,logT_grid, logRho_grid, lkap_grid)
+      subroutine interpolate_kappa(k, logT_cntr, logRho_cntr,lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, &
+                                   ierr,logT_grid, logRho_grid, lkap_grid)
 
       use cubic_interpolator, only: interpolator
 

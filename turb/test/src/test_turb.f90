@@ -10,19 +10,18 @@ program test_turb
    call check_TDC()
    call compare_TDC_and_Cox_MLT()
 
-   contains
+contains
 
    subroutine header(text)
       character(len=*), intent(in) :: text
 
-      write(*,'(a)') ' ----------------------------------------------------------------'
-      write(*,'(a)') ' '
-      write(*,'(a)') ' '//text
-      write(*,'(a)') ' '
-      write(*,'(a)') ' ----------------------------------------------------------------'
+      write (*, '(a)') ' ----------------------------------------------------------------'
+      write (*, '(a)') ' '
+      write (*, '(a)') ' '//text
+      write (*, '(a)') ' '
+      write (*, '(a)') ' ----------------------------------------------------------------'
 
    end subroutine header
-
 
    subroutine check_efficient_MLT_scaling()
       type(auto_diff_real_star_order1) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
@@ -46,39 +45,37 @@ program test_turb
       rho = 1d-5
       grav = 1d4
       r = Rsun
-      Cp = 2.5d0 * kerg / mp
-      P = rho * T * kerg / mp
-      Lambda = P / (rho * grav)
+      Cp = 2.5d0*kerg/mp
+      P = rho*T*kerg/mp
+      Lambda = P/(rho*grav)
       opacity = 1d0
       grada = 0.4d0
       gradL = grada
 
       L = 1d5*Lsun
-      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
+      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*grav*pow2(r))
 
       max_conv_vel = 1d99
 
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                        gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+                   chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                   gradr, grada, gradL, &
+                   Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
 
-
-      write(*,1) 'vc at 1d5 Lsun',conv_vel%val
+      write (*, 1) 'vc at 1d5 Lsun', conv_vel%val
 
       L = 1d8*Lsun
-      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
+      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*grav*pow2(r))
 
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                        gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel2, D, mixing_type, max_conv_vel, ierr)
+                   chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                   gradr, grada, gradL, &
+                   Gamma, gradT, Y_face, conv_vel2, D, mixing_type, max_conv_vel, ierr)
 
+      write (*, 1) 'vc at 1d8 Lsun', conv_vel2%val
 
-      write(*,1) 'vc at 1d8 Lsun',conv_vel2%val
-
-      write(*,1) 'Ratio:',conv_vel2%val/conv_vel%val
-      write(*,'(a)') 'Expected ~10 because in the efficient limit vc ~ L^{1/3}'
+      write (*, 1) 'Ratio:', conv_vel2%val/conv_vel%val
+      write (*, '(a)') 'Expected ~10 because in the efficient limit vc ~ L^{1/3}'
    end subroutine check_efficient_MLT_scaling
 
    subroutine compare_TDC_and_Cox_MLT()
@@ -99,7 +96,7 @@ program test_turb
       max_conv_vel = 1d99 ! we don't limit the conv_vel for testing.
 
       ! General
-      mixing_length_alpha=2.0d0
+      mixing_length_alpha = 2.0d0
       chiT = 1d0
       chiRho = 1d0
       T = 1d5
@@ -107,56 +104,52 @@ program test_turb
       r = Rsun
       m = Msun
       cgrav = standard_cgrav
-      grav = m * cgrav / pow2(r)
-      Cp = 2.5d0 * kerg / mp
-      P = rho * T * kerg / mp
-      scale_height = P / (rho * grav)
-      Lambda = mixing_length_alpha * scale_height
+      grav = m*cgrav/pow2(r)
+      Cp = 2.5d0*kerg/mp
+      P = rho*T*kerg/mp
+      scale_height = P/(rho*grav)
+      Lambda = mixing_length_alpha*scale_height
       opacity = 1d0
       grada = 0.4d0
       gradL = grada
 
-      L = 70 * Lsun
-      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
+      L = 70*Lsun
+      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*grav*pow2(r))
 
       ! Adjust L down to get just slightly superadiabatic gradR)
-      L = L * (1d0 + 1d-5) * (grada/gradr)
-      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
-
+      L = L*(1d0 + 1d-5)*(grada/gradr)
+      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*grav*pow2(r))
 
       ! TDC
-      alpha_TDC_DAMP=1.0d0
-      alpha_TDC_DAMPR=0.0d0
-      alpha_TDC_PtdVdt=0.0d0
+      alpha_TDC_DAMP = 1.0d0
+      alpha_TDC_DAMPR = 0.0d0
+      alpha_TDC_PtdVdt = 0.0d0
       dV = 0d0
       conv_vel_start = 0d0  !1d10
       scale = L%val*1d-3
       report = .false.
       dt = 1d40  ! Long time-step so we get into equilibrium
 
-
       ! MLT
       MLT_option = 'Cox'
       Henyey_MLT_nu_param = 0d0
       Henyey_MLT_y_param = 0d0
 
-      write(*,1) 'gradR - gradA',gradr%val-grada%val
+      write (*, 1) 'gradR - gradA', gradr%val - grada%val
 
-      call set_TDC(&
+      call set_TDC( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
          scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
 
-      write(*,1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel% val, dt
+      write (*, 1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel%val, dt
 
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                        gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+                   chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                   gradr, grada, gradL, &
+                   Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
 
-
-      write(*,1) 'MLT: Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel% val, Gamma%val
-
+      write (*, 1) 'MLT: Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel%val, Gamma%val
 
    end subroutine compare_TDC_and_Cox_MLT
 
@@ -179,41 +172,40 @@ program test_turb
 
       conv_vel_start = 52320587.415154047d0
 
-
-      mixing_length_alpha=2.0d0
-      alpha_TDC_DAMP=1.0d0
-      alpha_TDC_DAMPR=0.0d0
-      alpha_TDC_PtdVdt=0.0d0
-      cgrav=6.6743000000000004d-8
-      m=5.8707400456875664d34
-      scale=5.0386519362246294d45
-      L=1.0941528815883500015d0*(-5.0386519362246294d45)
-      r=10314294541.567163d0
-      P=5.0581587249808894d20
-      T=613193666.51783681d0
-      rho=5204.5732574745753d0
-      dV=3.8256494463482604d-7
-      Cp=6628075118.4606590d0
-      opacity=9.0750171231469945d-2
-      scale_height=2638686602.0063782d0
-      gradL=0.25207587267343501d0
-      grada=0.25204697256872738d0
+      mixing_length_alpha = 2.0d0
+      alpha_TDC_DAMP = 1.0d0
+      alpha_TDC_DAMPR = 0.0d0
+      alpha_TDC_PtdVdt = 0.0d0
+      cgrav = 6.6743000000000004d-8
+      m = 5.8707400456875664d34
+      scale = 5.0386519362246294d45
+      L = 1.0941528815883500015d0*(-5.0386519362246294d45)
+      r = 10314294541.567163d0
+      P = 5.0581587249808894d20
+      T = 613193666.51783681d0
+      rho = 5204.5732574745753d0
+      dV = 3.8256494463482604d-7
+      Cp = 6628075118.4606590d0
+      opacity = 9.0750171231469945d-2
+      scale_height = 2638686602.0063782d0
+      gradL = 0.25207587267343501d0
+      grada = 0.25204697256872738d0
       report = .false.
       chiT = 1d0
       chiRho = 1d0
-      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * cgrav * m)
+      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*cgrav*m)
 
-      write(*,*) "####################################"
-      write(*,*) "Running dt test"
+      write (*, *) "####################################"
+      write (*, *) "Running dt test"
 
-      do j=0,30
-         dt = 500d0*pow(1.02d0,j)
-         call set_TDC(&
+      do j = 0, 30
+         dt = 500d0*pow(1.02d0, j)
+         call set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
 
-         write(*,1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel% val
+         write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
          if (report) stop
       end do
 

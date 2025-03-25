@@ -478,4 +478,3 @@ contains
    end subroutine kap_proc
 
 end module test_atm_support
-

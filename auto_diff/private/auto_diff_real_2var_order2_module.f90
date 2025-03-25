@@ -645,7 +645,8 @@ module auto_diff_real_2var_order2_module
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
       binary%d1val2 = x%d1val2*z_d1x + y%d1val2*z_d1y
       binary%d2val1 = 2.0_dp*q0*y%d1val1 + x%d2val1*z_d1x + y%d2val1*z_d1y + z_d2x*pow2(x%d1val1) + z_d2y*pow2(y%d1val1)
-      binary%d1val1_d1val2 = q0*y%d1val2 + q1*y%d1val1 + x%d1val1*x%d1val2*z_d2x + x%d1val1_d1val2*z_d1x + y%d1val1*y%d1val2*z_d2y + y%d1val1_d1val2*z_d1y
+      binary%d1val1_d1val2 = q0*y%d1val2 + q1*y%d1val1 + x%d1val1*x%d1val2*z_d2x &
+                           + x%d1val1_d1val2*z_d1x + y%d1val1*y%d1val2*z_d2y + y%d1val1_d1val2*z_d1y
       binary%d2val2 = 2.0_dp*q1*y%d1val2 + x%d2val2*z_d1x + y%d2val2*z_d1y + z_d2x*pow2(x%d1val2) + z_d2y*pow2(y%d1val2)
    end function make_binary_operator
 

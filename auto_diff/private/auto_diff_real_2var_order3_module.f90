@@ -1621,7 +1621,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = -q3*(q8*x%val - q9)
       unary%d2val2 = q3*(-q10*x%val + q6*x%d2val2)
       unary%d3val1 = q11*(q12*x%d3val1 - q14*pow3(x%d1val1) - q15*x%d1val1*(3.0_dp*x%d2val1*x%val + q4))
-      unary%d2val1_d1val2 = q11*(-q1*x%d1val2*x%val*(q5 - q7) + q6*(2.0_dp*q0*q4*x%d1val2 + q15*x%d2val1_d1val2 - q6*x%d1val1*(q16*x%d1val1_d1val2 + q8)))
+      unary%d2val1_d1val2 = q11*(-q1*x%d1val2*x%val*(q5 - q7) &
+                          + q6*(2.0_dp*q0*q4*x%d1val2 + q15*x%d2val1_d1val2 - q6*x%d1val1*(q16*x%d1val1_d1val2 + q8)))
       unary%d1val1_d2val2 = (-q15*x%d1val1_d2val2 + q16*q9*x%d1val2 + x%d1val1*(-q10*q13 + q6*(q10 + q17)))*powm1(pow5(sqrt(q1)))
       unary%d3val2 = q11*(q12*x%d3val2 - q14*pow3(x%d1val2) - q15*x%d1val2*(3.0_dp*q17 + q10))
    end function acos_self
@@ -1850,9 +1851,11 @@ module auto_diff_real_2var_order3_module
       unary%d2val2 = q7*(q0*x%d2val2 - q4*q9 + x%d2val2)
       unary%d3val1 = q10*(-2.0_dp*q11 + q11*q17 - q12*q13 - q13*q16 + q14*x%d3val1 + q5*x%d3val1 + x%d3val1)
       unary%d2val1_d1val2 = q10 * &
-                            (-q12*q18 + q14*x%d2val1_d1val2 - q15*q19*x%d2val1 - q16*q18 + q17*q3*x%d1val2 - q19*q3 + q5*x%d2val1_d1val2 - q8*x%d2val1 + x%d2val1_d1val2)
+                            (-q12*q18 + q14*x%d2val1_d1val2 - q15*q19*x%d2val1 - q16*q18 &
+                              + q17*q3*x%d1val2 - q19*q3 + q5*x%d2val1_d1val2 - q8*x%d2val1 + x%d2val1_d1val2)
       unary%d1val1_d2val2 = q10 * &
-                            (q14*x%d1val1_d2val2 - q15*q20 + q17*q9*x%d1val1 - q20*x%val - q21*q22 - q21*q9 - q4*x%d1val1*x%d2val2 + q5*x%d1val1_d2val2 + x%d1val1_d2val2)
+                            (q14*x%d1val1_d2val2 - q15*q20 + q17*q9*x%d1val1 - q20*x%val &
+                              - q21*q22 - q21*q9 - q4*x%d1val1*x%d2val2 + q5*x%d1val1_d2val2 + x%d1val1_d2val2)
       unary%d3val2 = q10*(-2.0_dp*q23 + q14*x%d3val2 + q17*q23 - q22*q24 - q24*x%d2val2*x%val + q5*x%d3val2 + x%d3val2)
    end function atanpi_self
 
@@ -2467,8 +2470,10 @@ module auto_diff_real_2var_order3_module
       binary%d1val1_d1val2 = x%d1val1*y%d1val2 + x%d1val1_d1val2*y%val + x%d1val2*y%d1val1 + x%val*y%d1val1_d1val2
       binary%d2val2 = q1*x%d1val2 + x%d2val2*y%val + x%val*y%d2val2
       binary%d3val1 = 3.0_dp*x%d1val1*y%d2val1 + 3.0_dp*x%d2val1*y%d1val1 + x%d3val1*y%val + x%val*y%d3val1
-      binary%d2val1_d1val2 = 2.0_dp*x%d1val1_d1val2*y%d1val1 + q0*y%d1val1_d1val2 + x%d1val2*y%d2val1 + x%d2val1*y%d1val2 + x%d2val1_d1val2*y%val + x%val*y%d2val1_d1val2
-      binary%d1val1_d2val2 = 2.0_dp*x%d1val2*y%d1val1_d1val2 + q1*x%d1val1_d1val2 + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2
+      binary%d2val1_d1val2 = 2.0_dp*x%d1val1_d1val2*y%d1val1 + q0*y%d1val1_d1val2 &
+                             + x%d1val2*y%d2val1 + x%d2val1*y%d1val2 + x%d2val1_d1val2*y%val + x%val*y%d2val1_d1val2
+      binary%d1val1_d2val2 = 2.0_dp*x%d1val2*y%d1val1_d1val2 + q1*x%d1val1_d1val2 &
+                             + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2
       binary%d3val2 = 3.0_dp*x%d1val2*y%d2val2 + 3.0_dp*x%d2val2*y%d1val2 + x%d3val2*y%val + x%val*y%d3val2
    end function mul_self
 
@@ -2601,7 +2606,8 @@ module auto_diff_real_2var_order3_module
                              + 4.0_dp*q3*y%d1val1_d1val2*y%val - q0*q22*x%d1val1 &
                              - q0*x%d1val2*y%d2val1 - q0*x%val*y%d2val1_d1val2 + q12*q4 - q14*q9 + q6*x%d2val1_d1val2 - q8*y%d1val2)
       binary%d1val1_d2val2 = q21*(-6.0_dp*q19*q3 + 2.0_dp*y%val*(q15*q16 + q19*x%d1val1 + q22*q5 + q3*y%d2val2) &
-                             - q0*(q15*x%d1val1_d1val2 + q22*x%d1val2 + x%d1val1*y%d2val2 + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2) + q6*x%d1val1_d2val2)
+                             - q0*(q15*x%d1val1_d1val2 + q22*x%d1val2 + x%d1val1*y%d2val2 + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2) &
+                             + q6*x%d1val1_d2val2)
       binary%d3val2 = q21*(-3.0_dp*q17*y%d1val2 + 3.0_dp*q20*q4 + q6*x%d3val2 - x%val*(-6.0_dp*q18*y%d1val2 + 6.0_dp*pow3(y%d1val2) + q0*y%d3val2))
    end function div_self
 
@@ -2807,7 +2813,8 @@ module auto_diff_real_2var_order3_module
       binary%d2val1_d1val2 = (2.0_dp*q5*q8 + q14*q6 + q25*y%d2val1_d1val2 + q29*q4 &
                              + q9*(q27*x%d1val1 + q28*y%d1val1 + x%d1val2*y%d2val1 &
                              + x%d2val1*y%d1val2 + x%d2val1_d1val2*y%val) &
-                             - x%val*(2.0_dp*q16*x%d1val1 + q1*q28 + q5*x%d2val1 + q8*y%d1val2))*pow(x%val, 10.0_dp + y%val)*powm1(pow(x%val, 13.0_dp))
+                             - x%val*(2.0_dp*q16*x%d1val1 + q1*q28 + q5*x%d2val1 + q8*y%d1val2)) &
+                              * pow(x%val, 10.0_dp + y%val)*powm1(pow(x%val, 13.0_dp))
       binary%d1val1_d2val2 = q23*(2.0_dp*q1*q18 + q22*q4 + q25*y%d1val1_d2val2 + q29*q6 &
                              + q9*(q27*x%d1val2 + q28*y%d1val2 + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1) &
                              - x%val*(2.0_dp*q15*x%d1val2 + q1*x%d2val2 + q18*y%d1val1 + q28*q5))
