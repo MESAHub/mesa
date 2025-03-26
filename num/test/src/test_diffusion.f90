@@ -46,17 +46,17 @@ contains
             if (i > 1) then
                dfdy(3, i - 1) = sig1
             end if
-            dfdy(2, i) = -(sig1 + sig2); 
+            dfdy(2, i) = -(sig1 + sig2)
             if (i < n) then
-               dfdy(1, i + 1) = sig2; 
+               dfdy(1, i + 1) = sig2
             end if
          end if
          if (i == n) then
-            f(i) = sig1*(y(i - 1) - y(i)); 
+            f(i) = sig1*(y(i - 1) - y(i))
          else if (i == 1) then
-            f(i) = -sig2*(y(i) - y(i + 1)); 
+            f(i) = -sig2*(y(i) - y(i + 1))
          else
-            f(i) = sig1*(y(i - 1) - y(i)) - sig2*(y(i) - y(i + 1)); 
+            f(i) = sig1*(y(i - 1) - y(i)) - sig2*(y(i) - y(i + 1))
          end if
       end do
 
@@ -223,13 +223,13 @@ contains
 
       do k = 1, nz
          if (k == 1) then
-            sig_dm(k) = 0; 
+            sig_dm(k) = 0
          else if (5*k <= n) then
-            sig_dm(k) = 0; 
+            sig_dm(k) = 0
          else if (5*k >= 4*n) then
-            sig_dm(k) = 0; 
+            sig_dm(k) = 0
          else
-            sig_dm(k) = sig; 
+            sig_dm(k) = sig
          end if
       end do
 

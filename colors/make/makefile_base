@@ -13,9 +13,9 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   colors_def.f90 \
-   mod_colors.f90 \
-   colors_lib.f90
+	colors_def.f90 \
+	mod_colors.f90 \
+	colors_lib.f90
 
 #################################################################
 #

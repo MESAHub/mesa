@@ -24,7 +24,7 @@
       max_model_number = 1000
       use_gold2_tolerances = .true.
 
-      extra_terminal_output_file = 'log1' 
+      extra_terminal_output_file = 'log1'
       log_directory = 'LOGS1'
 
 
@@ -32,7 +32,7 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
-      
+
       varcontrol_target = 1d-3
 
       use_ledoux_criterion = .true.
@@ -41,12 +41,12 @@
       ! stop when the center mass fraction of h1 drops below this limit
       xa_central_lower_limit_species(1) = 'h1'
       xa_central_lower_limit(1) = 1d-2
-      
+
 
 / ! end of controls namelist
 
 
 &pgstar
-         
+
 
 / ! end of pgstar namelist

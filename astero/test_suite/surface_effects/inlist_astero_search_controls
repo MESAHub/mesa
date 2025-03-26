@@ -2,16 +2,16 @@
 
       chi2_seismo_fraction = 0 ! 0.5d0
       normalize_chi2_spectro = .true.
-   
-      chi2_seismo_delta_nu_fraction = 0d0  
-      chi2_seismo_nu_max_fraction = 0d0    
+
+      chi2_seismo_delta_nu_fraction = 0d0
+      chi2_seismo_nu_max_fraction = 0d0
       chi2_seismo_r_010_fraction = 0d0
       chi2_seismo_r_02_fraction = 0d0
 
       normalize_chi2_seismo_frequencies = .true.
       normalize_chi2_seismo_r_010 = .true.
       normalize_chi2_seismo_r_02 = .true.
-      
+
       trace_chi2_seismo_delta_nu_info = .false. ! if true, output info to terminal
       trace_chi2_seismo_nu_max_info = .false. ! if true, output info to terminal
       trace_chi2_seismo_ratios_info = .false. ! if true, output info to terminal
@@ -206,67 +206,67 @@
          freq_sigma(3,15) = 0.053d0
          freq_sigma(3,16) = 0.075d0
          freq_sigma(3,17) = 0.105d0
-      
+
          ! don't consider models that aren't old enough
             min_age_limit = 1d6
-         
+
          ! don't consider models with L_nuc/L less than this limit
             Lnuc_div_L_limit = 0.95 ! this rules out pre-zams models
 
-         ! don't consider models with chi2_spectroscopic above this limit 
+         ! don't consider models with chi2_spectroscopic above this limit
             chi2_spectroscopic_limit = 1d99
 
-         ! don't consider models with chi2_delta_nu above this limit 
+         ! don't consider models with chi2_delta_nu above this limit
             chi2_delta_nu_limit = 1d99
 
          ! we calculate radial modes only if pass the previous checks
 
-         ! don't consider models with chi2_radial above this limit 
+         ! don't consider models with chi2_radial above this limit
             chi2_radial_limit = 1d99
-         
-      
+
+
       ! adjust max timestep depending on how close to target
-      
+
          ! NOTE: if you set the timestep limits too large you run the risk of missing good chi^2 cases.
          ! but if they are very small, you will spend a lot of runtime calculating lots of frequencies
          ! for lots of models.  There is no standard set of best values for this.
          ! The choice will depend on the stage of evolution and how fast things are changing
-         ! in the general region of the models with good chi2 values.  
+         ! in the general region of the models with good chi2 values.
          ! There is no alternative to trying things and tuning the controls for your problem.
-      
+
          ! these are just default values -- you will probably need to adjust them for your problem.
          max_yrs_dt_when_cold = 1d7 ! when fail Lnuc/L, chi2_spectro, or ch2_delta_nu
          max_yrs_dt_when_warm = 1d5 ! when pass previous but fail chi2_radial; < max_yrs_dt_when_cold
          max_yrs_dt_when_hot = 1d5 ! when pass chi2_radial; < max_yrs_dt_when_warm
-         
+
          max_yrs_dt_chi2_small_limit = 5d4 ! < max_yrs_dt_when_hot
          chi2_limit_for_small_timesteps = 30
-         
+
          max_yrs_dt_chi2_smaller_limit = 5d4 ! < max_yrs_dt_chi2_small_limit
          chi2_limit_for_smaller_timesteps = -1d99 ! < chi2_limit_for_small_timesteps
-         
+
          max_yrs_dt_chi2_smallest_limit = 3d4 ! < max_yrs_dt_chi2_smaller_limit
          chi2_limit_for_smallest_timesteps = -1d99 ! < chi2_limit_for_smaller_timesteps
-      
-      
+
+
       ! only calculate chi^2 if pass all the checks
-      
+
       ! you can stop the run if chi^2 is rising.
-         
+
          ! here is a relative limit
          limit_num_chi2_too_big = 3
          chi2_relative_increase_limit = 2.0
-         
+
          ! and this is an absolute limit
          chi2_search_limit1 = 3.0
          chi2_search_limit2 = 4.0
          ! if best chi2 for the run is <= chi2_search_limit1,
          ! then stop the run if chi2 >= chi2_search_limit2.
-         
-   
+
+
    ! surface corrections
       correction_scheme = 'kjeldsen' ! options are
-      correction_factor = 1 
+      correction_factor = 1
 
       l0_n_obs(1) = 6 ! the observed radial orders (ignored if < 0)
       l0_n_obs(2) = 7
@@ -293,60 +293,60 @@
       l0_n_obs(23) = 28
 
       correction_b = 4.9d0
-            
+
       surf_coef1_name = 'a_div_r'
       surf_coef2_name = 'correction_r'
-      
+
    ! output controls
-   
+
       write_best_model_data_for_each_sample = .true.
       num_digits = 4 ! number of digits in sample number (with leading 0's)
-      sample_results_prefix = 'outputs/sample_' 
+      sample_results_prefix = 'outputs/sample_'
          ! note that you can include a directory in the prefix if desired
       sample_results_postfix = '.data'
-      
+
       write_fgong_for_each_model = .false.
       model_num_digits = 4 ! number of digits in model number (with leading 0's)
-      fgong_prefix = 'fgong_' 
+      fgong_prefix = 'fgong_'
          ! note that you can include a directory in the prefix if desired
       fgong_postfix = '.data'
-      
+
       write_fgong_for_best_model = .false.
       best_model_fgong_filename = 'best.fgong'
-      
+
       write_profile_for_best_model = .false.
       best_model_profile_filename = 'best.profile'
-      
+
       save_model_for_best_model = .false.
       best_model_save_model_filename = 'best.mod'
-      
+
       save_info_for_last_model = .false.
       last_model_save_info_filename = 'last_model.info'
-      
-   
+
+
    ! miscellaneous
-   
+
       ! save all control settings to file
          save_controls = .false. ! dumps &astero_search_controls controls to file
          save_controls_filename = '' ! if empty, uses a default name
 
       ! options for input model to pulsation codes
-         add_atmosphere = .false. 
+         add_atmosphere = .false.
          keep_surface_point = .false.
-         add_center_point = .true. 
-      
+         add_center_point = .true.
+
       ! oscillation analysis
 
          oscillation_code = 'adipls' ! or 'gyre'   <<< lowercase
-         
+
       ! gyre controls
-      
+
          gyre_input_file = 'gyre.in'
 
       ! adipls controls
-         
+
          do_redistribute_mesh = .false.
-            
+
          ! iscan for adipls = the following factor times the given number of observed modes
          iscan_factor(0) = 15
          iscan_factor(1) = 15
@@ -368,25 +368,25 @@
 &astero_pgstar_controls
 
    ! PGSTAR Eschelle plot
-   
+
          !echelle_win_flag = .true.
 
          echelle_win_width = 6
          echelle_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
-         
+
          echelle_xleft = 0.12
          echelle_xright = 0.96
          echelle_ybot = 0.12
          echelle_ytop = 0.90
          echelle_txt_scale = 1.0
-         echelle_title = 'echelle'      
-         
+         echelle_title = 'echelle'
+
          echelle_delta_nu = 0 ! <= 0 means use seismic delta_nu from search inlist
-         
+
          show_echelle_annotation1 = .true.
          show_echelle_annotation2 = .false.
          show_echelle_annotation3 = .false.
-         
+
          ! file output
          !echelle_file_flag = .true.
          echelle_file_dir = 'png'
@@ -400,25 +400,25 @@
 
 
    ! PGSTAR ratios plot
-   
+
          !ratios_win_flag = .true.
 
          ratios_win_width = 3.5
          ratios_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
-         
+
          ratios_xleft = 0.20
          ratios_xright = 0.96
          ratios_ybot = 0.12
          ratios_ytop = 0.90
          ratios_txt_scale = 1.0
-         ratios_title = 'ratios'      
-         
+         ratios_title = 'ratios'
+
          ratios_margin_sig_factor = 1 ! controls horizontal margin in units of max sigma
 
          show_ratios_annotation1 = .true.
          show_ratios_annotation2 = .false.
          show_ratios_annotation3 = .false.
-         
+
          ! file output
          !ratios_file_flag = .true.
          ratios_file_dir = 'png'

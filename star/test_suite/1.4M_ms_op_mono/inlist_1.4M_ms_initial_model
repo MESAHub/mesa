@@ -59,7 +59,7 @@
 
   mixing_length_alpha = 1.84d0
   mlt_option = 'Henyey'
-  
+
    ! H core overshoot calibrated to M67
    overshoot_scheme(1) = 'exponential'
    overshoot_zone_type(1) = 'any'

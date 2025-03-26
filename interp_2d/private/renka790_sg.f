@@ -227,7 +227,7 @@
       NNR = NR
       NCWMAX = MAX(NNC,NNW)
       LMAX = MIN(LMX,NN-1)
-      if (NNC < 9 .OR. NNW < 1 .OR. NCWMAX > 
+      if (NNC < 9 .OR. NNW < 1 .OR. NCWMAX >
      .   LMAX .OR. NNR < 1) GOTO 21
 
 ! Create the cell data structure, and initialize RSMX.

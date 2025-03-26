@@ -13,21 +13,21 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   ionization_def.f90 \
-   ion_tables_load.f90 \
-   ion_tables_eval.f90 \
-   ion_table_plot.f90 \
-   mod_ionization.f90 \
-   ionization_lib.f90
+  ionization_def.f90 \
+  ion_tables_load.f90 \
+  ion_tables_eval.f90 \
+  ion_table_plot.f90 \
+  mod_ionization.f90 \
+  ionization_lib.f90
 
 #################################################################
 #
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = $(LIBS_MESA_NUMERICS)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) -lnet -leos -lkap -lrates -lchem $(LOAD_MESA_NUMERICS)
+  LIBS_OTHER = $(LIBS_MESA_NUMERICS)
+  DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+  LOAD_OTHER = -L$(MESA_LIB_DIR) -lnet -leos -lkap -lrates -lchem $(LOAD_MESA_NUMERICS)
 endif
 
 #################################################################
