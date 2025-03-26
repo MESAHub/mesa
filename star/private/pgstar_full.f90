@@ -34,9 +34,7 @@ module pgstar
 
    implicit none
 
-
 contains
-
 
    subroutine do_create_file_name(s, dir, prefix, name)
       use pgstar_support, only : create_file_name

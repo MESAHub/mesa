@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module mix_info
 
       use const_def, only: dp, ln10, pi4, msun, no_mixing, &
@@ -38,17 +37,19 @@
       use utils_lib
       use star_private_def
 
-
       implicit none
 
       private
-      public :: set_mixing_info, set_RTI_mixing_info, do_smoothing_by_mass, &
-         update_rotation_mixing_info, set_dPdr_dRhodr_info, get_convection_sigmas, &
-         set_dxdt_mix, set_cz_bdy_mass
-
+      public :: set_mixing_info
+      public :: set_RTI_mixing_info
+      public :: do_smoothing_by_mass
+      public :: update_rotation_mixing_info
+      public :: set_dPdr_dRhodr_info
+      public :: get_convection_sigmas
+      public :: set_dxdt_mix
+      public :: set_cz_bdy_mass
 
       contains
-
 
       subroutine set_mixing_info(s, skip_set_cz_bdy_mass, ierr)
          ! set convection variables cdc and conv_vel starting from local MLT results.
@@ -2439,10 +2440,4 @@
 
       end subroutine add_RTI_turbulence
 
-
       end module mix_info
-
-
-
-
-

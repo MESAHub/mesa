@@ -35,7 +35,6 @@ module pulse_saio
   implicit none
 
   private
-
   public :: get_saio_data
   public :: write_saio_data
 

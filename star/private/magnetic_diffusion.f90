@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module magnetic_diffusion
 
       use const_def, only: dp, pi, pi4, clight, boltz_sigma, one_third
@@ -34,7 +33,8 @@
       implicit none
 
       private
-      public :: calc_sige, calc_eta
+      public :: calc_sige
+      public :: calc_eta
 
       contains
 
@@ -139,6 +139,5 @@
          xi= sqrt(3.14159d0/3.0d0)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
          sige3 = 8.630d21*rme/(z*ctmp*xi)
       end function sige3
-
 
       end module magnetic_diffusion

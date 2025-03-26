@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine L_v_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -94,6 +92,4 @@
             null_decorate, ierr)
       end subroutine do_L_v_Plot
 
-
       end module pgstar_l_v
-

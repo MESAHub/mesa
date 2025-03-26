@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
 module tdc_support
 
 use const_def, only: dp, pi, sqrt_2_div_3, boltz_sigma
@@ -34,9 +33,17 @@ use auto_diff
 implicit none
 
 private
-public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search, &
-         convert, unconvert, safe_tanh, tdc_info, &
-         eval_Af, eval_xis, compute_Q
+public :: set_Y
+public :: Q_bisection_search
+public :: dQdZ_bisection_search
+public :: Af_bisection_search
+public :: convert
+public :: unconvert
+public :: safe_tanh
+public :: tdc_info
+public :: eval_Af
+public :: eval_xis
+public :: compute_Q
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.

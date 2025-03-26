@@ -28,6 +28,7 @@
       use star_private_def
       use star_profile_def
       use const_def, only: dp, qe, kerg, avo, amu, boltz_sigma, secday, secyer, standard_cgrav, &
+         clight, four_thirds_pi, ln10, lsun, msun, pi, pi4, rsun, sqrt_2_div_3, one_third, &
          convective_mixing, &
          overshoot_mixing, &
          semiconvective_mixing, &
@@ -41,9 +42,7 @@
 
       implicit none
 
-
       integer, parameter :: idel = 10000
-
       integer, parameter :: add_abundances = idel
       integer, parameter :: add_log_abundances = add_abundances + 1
       integer, parameter :: category_offset = add_log_abundances + 1
@@ -65,12 +64,9 @@
       integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
       integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
       integer, parameter :: extra_offset = eps_neu_rate_offset + idel
-
       integer, parameter :: max_profile_offset = extra_offset + idel
 
-
       contains
-
 
       integer function do1_profile_spec( &
             s, iounit, n, i, string, buffer, report, ierr) result(spec)
@@ -2460,4 +2456,3 @@
       end subroutine getval_for_profile
 
       end module profile_getval
-

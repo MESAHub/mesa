@@ -32,13 +32,15 @@
       implicit none
 
       private
-      public :: set_net, do_net, do1_net, do_micro_change_net, &
-         get_screening_mode, default_set_rate_factors, &
-         default_set_op_mono_factors
-
+      public :: set_net
+      public :: do_net
+      public :: do1_net
+      public :: do_micro_change_net
+      public :: get_screening_mode
+      public :: default_set_rate_factors
+      public :: default_set_op_mono_factors
 
       contains
-
 
       subroutine do_net(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
@@ -815,4 +817,3 @@
       end subroutine save_rates
 
       end module net
-

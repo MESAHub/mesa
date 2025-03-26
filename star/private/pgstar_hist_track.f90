@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine History_Track1_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -841,6 +839,4 @@
 
       end subroutine do_Hist_Track
 
-
       end module pgstar_hist_track
-

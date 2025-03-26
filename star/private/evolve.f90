@@ -26,19 +26,23 @@
       module evolve
 
       use star_private_def
-      use const_def, only: dp, secyer, secday
+      use const_def, only: dp, pi, pi4, msun, lsun, crad, clight, secyer, secday
+      use utils_lib, only: is_bad
       use star_utils
+      use auto_diff_support
 
       implicit none
 
       private
-      public :: do_evolve_step_part1, do_evolve_step_part2, &
-         pick_next_timestep, prepare_to_redo, prepare_to_retry, &
-         finish_step, set_age
-
+      public :: do_evolve_step_part1
+      public :: do_evolve_step_part2
+      public :: pick_next_timestep
+      public :: prepare_to_redo
+      public :: prepare_to_retry
+      public :: finish_step
+      public :: set_age
 
       contains
-
 
       integer function do_evolve_step_part1(id, first_try)
          use alloc, only: fill_star_info_arrays_with_NaNs, &
@@ -1115,8 +1119,6 @@
 
             include 'formats'
 
-
-
 !   phase1 := from end of previous step until start of solver
 !   phase2 := from start of solver to end of step
 !
@@ -1215,8 +1217,6 @@
             !
             ! does not equal the total energy *after* adjust_mass and *before* the Newton iterations.
             ! However it should equal the total energy at the end of the step.
-
-
 
             if (s% rotation_flag .and. &
                   (s% use_other_torque .or. s% use_other_torque_implicit .or. &
@@ -2372,7 +2372,6 @@
 
          contains
 
-
          subroutine check(i)
             integer, intent(in) :: i
             include 'formats'
@@ -2390,7 +2389,6 @@
             prev_num_iounits_in_use = current_num_iounits_in_use
          end subroutine check
 
-
       end function finish_step
 
 
@@ -2407,8 +2405,4 @@
          s% star_age = age
       end subroutine set_age
 
-
-
       end module evolve
-
-

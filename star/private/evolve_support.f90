@@ -33,9 +33,7 @@
       private
       public :: set_current_to_old, new_generation, output, output_to_file
 
-
       contains
-
 
       subroutine new_generation(s, ierr)
          use utils_lib
@@ -310,7 +308,4 @@
 
       end subroutine output_to_file
 
-
       end module evolve_support
-
-

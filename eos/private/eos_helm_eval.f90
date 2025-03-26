@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eos_HELM_eval
@@ -38,7 +37,6 @@
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine get_helm_for_eosdt( &
             handle, dbg, Z, X, abar, zbar, &
@@ -366,6 +364,4 @@
 
       end subroutine Get_HELM_Results
 
-
       end module eos_HELM_eval
-

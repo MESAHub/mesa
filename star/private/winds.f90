@@ -38,7 +38,6 @@
 
       contains
 
-
       subroutine set_mdot(s, L_phot, M_phot, T_phot, ierr)
          use chem_def
          type (star_info), pointer :: s

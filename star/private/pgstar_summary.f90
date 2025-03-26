@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine Text_Summary1_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -451,9 +449,6 @@
 
          end subroutine show_column
 
-
       end subroutine Summary_plot
 
-
       end module pgstar_summary
-

@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine logL_R_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -103,6 +101,4 @@
 
       end subroutine do_logL_R_Plot
 
-
       end module pgstar_logl_r
-

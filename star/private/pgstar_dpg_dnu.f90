@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine dPg_dnu_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -91,11 +89,4 @@
             null_decorate, ierr)
       end subroutine do_dPg_dnu_Plot
 
-
       end module pgstar_dPg_dnu
-
-
-
-
-
-

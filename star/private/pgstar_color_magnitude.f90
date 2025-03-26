@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine Color_Magnitude1_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -929,4 +927,3 @@
       end subroutine do_Color_Magnitude_plot
 
       end module pgstar_Color_Magnitude
-

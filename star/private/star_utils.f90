@@ -33,11 +33,142 @@
 
       implicit none
 
-      private :: mdb
+      private
+      public :: eval_min_cell_collapse_time
+      public :: min_dr_div_cs
+      public :: get_XYZ
+      public :: lookup_nameofvar
+      public :: start_time
+      public :: update_time
+      public :: foreach_cell
+      public :: write_eos_call_info
+      public :: eval_csound
+      public :: eval_current_abundance
+      public :: eval_current_z
+      public :: eval_ledd
+      public :: normalize_dqs
+      public :: set_qs
+      public :: set_m_and_dm
+      public :: set_dm_bar
+      public :: set_rmid
+      public :: get_r_from_xh
+      public :: get_r_and_lnr_from_xh
+      public :: get_t_and_lnt_from_xh
+      public :: get_lnt_from_xh
+      public :: get_lnr_from_xh
+      public :: get_rho_and_lnd_from_xh
+      public :: store_t_in_xh
+      public :: store_r_in_xh
+      public :: store_rho_in_xh
+      public :: store_lnd_in_xh
+      public :: store_lnt_in_xh
+      public :: cell_specific_ke
+      public :: cell_specific_pe
+      public :: get_phot_info
+      public :: init_random
+      public :: rand
+      public :: interp_val_to_pt
+      public :: get_log_concentration
+      public :: get_lconv
+      public :: get_ladv
+      public :: get_lrad_div_ledd
+      public :: get_lrad
+      public :: get_ledd
+      public :: tau_eff
+      public :: get_rho_face_val
+      public :: omega_crit
+      public :: eval_cell_section_total_energy
+      public :: conv_time_scale
+      public :: qhse_time_scale
+      public :: eps_nuc_time_scale
+      public :: cooling_time_scale
+      public :: get_face_values
+      public :: threshold_smoothing
+      public :: save_eqn_residual_info
+      public :: calc_ptrb_ad_tw
+      public :: set_energy_eqn_scal
+      public :: get_scale_height_face_val
+      public :: weighed_smoothing
+      public :: get_kap_face
+      public :: get_rho_face
+      public :: get_chirho_face
+      public :: get_chit_face
+      public :: get_t_face
+      public :: get_peos_face
+      public :: get_cp_face
+      public :: get_grada_face
+      public :: get_gradr_face
+      public :: get_scale_height_face
+      public :: get_tau
+      public :: after_c_burn
+      public :: get_shock_info
+      public :: reset_starting_vectors
+      public :: eval_irradiation_heat
+      public :: set_phot_info
+      public :: set_m_grav_and_grav
+      public :: set_scale_height
+      public :: set_abs_du_div_cs
+      public :: set_conv_time_scales
+      public :: set_rv_info
+      public :: smooth
+      public :: safe_div_val
+      public :: center_avg_x
+      public :: surface_avg_x
+      public :: get_remnant_mass
+      public :: get_ejecta_mass
+      public :: get_phi_joss
+      public :: center_value
+      public :: eval_kh_timescale
+      public :: k_for_q
+      public :: total_angular_momentum
+      public :: reset_epsnuc_vectors
+      public :: yrs_for_init_timestep
+      public :: set_phase_of_evolution
+      public :: get_string_for_model_number
+      public :: e00
+      public :: em1
+      public :: ep1
+      public :: store_partials
+      public :: save_eqn_dxa_partials
+      public :: unpack_residual_partials
+      public :: get_area_info_opt_time_center
+      public :: calc_ptot_ad_tw
+      public :: get_face_weights
+      public :: get_dke_dt_dpe_dt
+      public :: get_pvsc_ad
+      public :: show_matrix
+      public :: no_extra_profile_columns
+      public :: no_data_for_extra_profile_columns
+      public :: total_times
+      public :: current_min_xa_hard_limit
+      public :: current_sum_xa_hard_limit
+      public :: lookup_nameofequ
+      public :: eval_total_energy_integrals
+      public :: set_luminosity_by_category
+      public :: eval_deltam_total_energy_integrals
+      public :: report_xa_bad_nums
+      public :: eval_current_y
+      public :: get_name_for_restart_file
+      public :: eval_integrated_total_energy_profile
+      public :: use_xh_to_set_rho_to_dm_div_dv
+      public :: cell_specific_total_energy
+      public :: store_lnr_in_xh
+      public :: interp_q
+      public :: set_zero_alpha_rti
+      public :: after_he_burn
+      public :: interp_xa_to_pt
+      public :: set_xqs
+      public :: get_tau_at_r
+      public :: smooth_abundances
+      public :: do_boxcar_mixing
+      public :: eval_total_energy_profile
+      public :: get_delta_pg_traditional
+      public :: get_delta_pg_bildsten2012
+      public :: write_to_extra_terminal_output_file
+
       logical, parameter :: mdb = .false.
 
       contains
-
 
       subroutine foreach_cell(s,nzlo,nzhi,use_omp,do1,ierr)
          type (star_info), pointer :: s
@@ -91,8 +222,7 @@
          real(dp), intent(out) :: y_avg, z_avg
          integer, intent(out) :: ierr
          integer :: k, nz,  h1, h2, he3, he4
-         real(dp) :: total_mass_h, total_mass_he, total_mass_z, &
-            cell_mass, total_mass
+         real(dp) :: total_mass_h, total_mass_he, total_mass_z, cell_mass, total_mass
          ierr = 0
          nz = s% nz
          h1 = s% net_iso(ih1)
@@ -3938,6 +4068,5 @@
          s% alpha_RTI(1:s% nz) = 0d0
          s% need_to_setvars = .true.
       end subroutine set_zero_alpha_RTI
-
 
       end module star_utils

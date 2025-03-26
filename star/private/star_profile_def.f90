@@ -1449,7 +1449,4 @@
          do_get_profile_id = value
       end function do_get_profile_id
 
-
-
       end module star_profile_def
-

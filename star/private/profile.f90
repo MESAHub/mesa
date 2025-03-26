@@ -33,17 +33,18 @@
       implicit none
 
       private
-      public :: write_profile_info, set_profile_columns, &
-         get_profile_val, do_save_profiles, &
-         do_get_data_for_profile_columns, do_get_num_standard_profile_columns
+      public :: write_profile_info
+      public :: set_profile_columns
+      public :: get_profile_val
+      public :: do_save_profiles
+      public :: do_get_data_for_profile_columns
+      public :: do_get_num_standard_profile_columns
 
       ! model log priorities
       integer, parameter :: delta_priority = 1
       integer, parameter :: phase_priority = 2
 
-
       contains
-
 
       recursive subroutine add_profile_columns( &
             s, level, capacity, spec, profile_columns_file, report, ierr)
@@ -1189,4 +1190,3 @@
       end subroutine get_model_profile_filename
 
       end module profile
-

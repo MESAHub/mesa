@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module mesh_functions
 
       use star_private_def
@@ -40,7 +39,6 @@
       integer, parameter :: max_allowed_gvals = 50
 
       contains
-
 
       integer function get_net_iso(s, species)
          use chem_lib, only: chem_get_iso_id
@@ -330,8 +328,6 @@
             end if
          end subroutine do1_xa_function
 
-
       end subroutine set_mesh_function_data
-
 
       end module mesh_functions

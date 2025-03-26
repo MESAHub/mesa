@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eosDT_load_tables
@@ -53,10 +52,7 @@
 
       integer, parameter :: file_max_num_logQs = 1000
 
-
-
       contains
-
 
       subroutine request_user_to_reinstall
          write(*,'(A)')
@@ -649,6 +645,5 @@
          close(io_unit)
 
       end subroutine Read_EoS_Cache
-
 
       end module eosDT_load_tables

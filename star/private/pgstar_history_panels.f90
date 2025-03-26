@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine History_Panels1_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -968,9 +966,6 @@
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 
-
       end subroutine do_history_panels_plot
 
-
       end module pgstar_history_panels
-

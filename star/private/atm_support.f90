@@ -32,7 +32,6 @@ module atm_support
   implicit none
 
   private
-
   public :: get_atm_PT
   public :: get_atm_PT_legacy_grey_and_kap
   public :: get_atm_tau_base

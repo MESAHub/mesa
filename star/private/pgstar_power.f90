@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine power_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -284,6 +282,4 @@
 
       end subroutine do_power_panel
 
-
       end module pgstar_power
-

@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
 module atm_utils
@@ -40,7 +39,6 @@ module atm_utils
   logical, save           :: have_E2_interpolant = .false.
 
   private
-
   public :: init
   public :: shutdown
   public :: eval_Teff_g

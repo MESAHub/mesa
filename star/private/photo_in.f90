@@ -34,7 +34,6 @@
 
       contains
 
-
       subroutine read_star_photo(s, fname, ierr)
          use utils_lib, only: integer_dict_define, integer_dict_create_hash
          use rates_def, only: num_rvs
@@ -322,8 +321,6 @@
             failed = .false.
          end function failed
 
-
       end subroutine read_star_photo
-
 
       end module photo_in

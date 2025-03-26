@@ -34,7 +34,6 @@ module predictive_mix
   implicit none
 
   private
-
   public :: add_predictive_mixing
 
 contains

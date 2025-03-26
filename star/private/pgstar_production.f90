@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine production_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id

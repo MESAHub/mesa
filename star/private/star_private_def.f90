@@ -40,9 +40,7 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-
       contains
-
 
       subroutine star_private_def_init
          use num_def

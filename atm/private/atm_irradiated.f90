@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
 module atm_irradiated
@@ -335,8 +334,6 @@ contains
        dlnT_dlnkap = 0._dp
 
     end if
-
-    return
 
   end subroutine eval_data
 

@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module table_atm
@@ -32,13 +31,9 @@
 
       implicit none
 
-
       logical, parameter :: dbg = .false.
 
-
       contains
-
-
 
       !reads in table_summary file from atm_data, initializes logZ, Teff_array,
       ! logg_array, and Teff_bound arrays; sets some flags
@@ -690,8 +685,6 @@
             end if
          end function failed
 
-
       end subroutine get_table_values
-
 
       end module table_atm

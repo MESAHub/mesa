@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eos_initialize
@@ -29,7 +28,6 @@
       implicit none
 
       contains
-
 
       subroutine Init_eos( &
            eosDT_cache_dir_in, &
@@ -79,6 +77,5 @@
          eos_root_is_initialized = .true.
 
       end subroutine Init_eos
-
 
       end module eos_initialize

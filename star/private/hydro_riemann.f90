@@ -47,7 +47,6 @@
       ! "Well-balanced schemes for the Euler equations with gravitation",
       ! J. Comp. Phys., 259 (2014), 199-219.
 
-
       private
       public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
          do_uface_and_Pface
@@ -55,7 +54,6 @@
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
       contains
-
 
       subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, nvar, ierr)
          type (star_info), pointer :: s
@@ -455,6 +453,4 @@
 
       end subroutine do1_uface_and_Pface
 
-
       end module hydro_riemann
-

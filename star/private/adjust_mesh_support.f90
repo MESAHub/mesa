@@ -37,7 +37,6 @@
 
       contains
 
-
       subroutine get_gval_info( &
             s, delta_gval_max, gvals1, nz, &
             num_gvals, gval_names, &
@@ -461,8 +460,4 @@
 
       end subroutine check_validity
 
-
-
       end module adjust_mesh_support
-
-

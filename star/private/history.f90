@@ -27,7 +27,8 @@ module history
 
    use star_private_def
    use star_history_def
-   use const_def, only: dp, secday, secyer, no_mixing, semiconvective_mixing, thermohaline_mixing
+   use const_def, only: dp, pi, pi4, ln10, one_third, msun, rsun, lsun, clight, secday, secyer, &
+                        no_mixing, semiconvective_mixing, thermohaline_mixing
    use chem_def
    use history_specs
    use star_utils
@@ -40,9 +41,7 @@ module history
 
    logical, parameter :: open_close_log = .true.
 
-
 contains
-
 
    subroutine do_get_data_for_history_columns(s, ierr)
       type (star_info), pointer :: s
@@ -3377,4 +3376,3 @@ contains
    end subroutine get_iso_val
 
 end module history
-

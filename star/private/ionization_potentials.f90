@@ -30,13 +30,15 @@
 
       implicit none
 
+      private
+      public :: ionization_tables_okay
+      public :: ip
+      public :: set_ionization_potentials
 
       logical :: ionization_tables_okay = .false.
-
       real(dp) :: ip(30,30)  ! ionization_potentials
 
       contains
-
 
       subroutine set_ionization_potentials  ! data from
          ! Allen, C.W., 1973, "Astrophysical Quantities", 3rd edition, pg 37-38.
@@ -597,6 +599,4 @@
 
       end subroutine set_ionization_potentials
 
-
       end module ionization_potentials
-

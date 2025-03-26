@@ -30,17 +30,17 @@
       use const_def, only: dp, ln10, secyer, msun, lsun, convective_mixing
       use chem_def
 
-
       implicit none
 
       private
-      public :: timestep_controller, check_change, check_integer_limit
+      public :: timestep_controller
+      public :: check_change
+      public :: check_integer_limit
 
       logical, parameter :: dbg_timestep = .false.
       real(dp) :: max_dt
 
       contains
-
 
       integer function timestep_controller(s, max_timestep)
          ! if don't return keep_going, then set result_reason to say why.

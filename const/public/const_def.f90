@@ -21,10 +21,10 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
 module const_def
+
    implicit none
 
    ! real number precision options: single, double, quad

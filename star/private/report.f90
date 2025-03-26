@@ -30,9 +30,8 @@
       use utils_lib
       use star_utils
       use num_lib, only: find0
-
       use const_def, only: avo, kerg, pi, amu, clight, crad, Rsun, Lsun, Msun, &
-         secday, secyer, ln10, mev_amu, ev2erg, two_thirds, &
+         secday, secyer, ln10, mev_amu, ev2erg, one_third, two_thirds, four_thirds_pi, &
          no_mixing, convective_mixing, semiconvective_mixing
 
       implicit none
@@ -1408,6 +1407,5 @@
          end do
          s% num_mixing_regions = n
       end subroutine get_mixing_regions
-
 
       end module report

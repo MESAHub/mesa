@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module hydro_temperature
 
       use star_private_def
@@ -35,11 +34,11 @@
       implicit none
 
       private
-      public :: do1_alt_dlnT_dm_eqn, do1_gradT_eqn, do1_dlnT_dm_eqn
+      public :: do1_alt_dlnT_dm_eqn
+      public :: do1_gradT_eqn
+      public :: do1_dlnT_dm_eqn
 
       contains
-
-
 
       ! just relate L_rad to T gradient.
       ! d_P_rad/dm = -<opacity_face>*L_rad/(clight*area^2) -- see, e.g., K&W (5.12)
@@ -373,4 +372,3 @@
       end subroutine eval_dlnPdm_qhse
 
       end module hydro_temperature
-

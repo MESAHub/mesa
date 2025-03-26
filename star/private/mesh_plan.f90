@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module mesh_plan
 
       use const_def, only: dp, convective_mixing
@@ -39,9 +38,7 @@
       logical, parameter :: plan_dbg = .false.
       integer, parameter :: kdbg = -1
 
-
       contains
-
 
       subroutine do_mesh_plan( &
             s, nz_old, max_allowed_nz, okay_to_merge, D_mix, &
@@ -1251,6 +1248,5 @@
             return
          end if
       end function round_off_xq
-
 
       end module mesh_plan

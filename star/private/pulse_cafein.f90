@@ -34,12 +34,11 @@ module pulse_cafein
 
   implicit none
 
-  integer, parameter :: NCOL = 35
-
   private
-
   public :: get_cafein_data
   public :: write_cafein_data
+
+  integer, parameter :: NCOL = 35
 
 contains
 

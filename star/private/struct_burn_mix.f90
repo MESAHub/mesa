@@ -36,7 +36,6 @@
 
       contains
 
-
       integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
          use mix_info, only: get_convection_sigmas
          use rates_def, only: num_rvs

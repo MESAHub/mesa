@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eospc_eval
@@ -33,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine Get_PC_alfa( &
             rq, logRho, logT, Z, abar, zbar, &
@@ -371,6 +368,4 @@
 
       end subroutine Get_PC_Results
 
-
       end module eospc_eval
-

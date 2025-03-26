@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module diffusion_support
@@ -33,12 +32,15 @@
 
       implicit none
 
+      private
+      public :: tiny_mass
+      public :: smallx
+      public :: get_matrix_coeffs
 
       real(dp), parameter :: Xlim = 1d-14
       real(dp), parameter :: tiny_mass = 1d3  ! a kilogram
       real(dp), parameter :: tinyX = 1d-50
       real(dp), parameter :: smallX = 1d-20
-
 
       contains
 
@@ -113,7 +115,6 @@
 
 
 !$OMP PARALLEL DO PRIVATE(k, j, i, total_diffusion_factor, op_err, C_face, Z_face, dC_dr_face, dlnne_dr_face, tmp) SCHEDULE(dynamic,2)
-
          do k = nzlo+1, nzhi
 
             ! Total diffusion scaling factor is product of
@@ -193,7 +194,6 @@
             end do
 
          end do
-
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) return
@@ -1808,4 +1808,3 @@
       end function bitsafe_erf_fit
 
       end module diffusion_support
-

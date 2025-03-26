@@ -31,7 +31,6 @@ module pulse_gsm
   implicit none
 
   private
-
   public :: write_gsm_data
 
 contains

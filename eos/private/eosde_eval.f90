@@ -21,19 +21,17 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eosDE_eval
-      use eos_def
+
+         use eos_def
       use const_def, only: dp, avo, kerg, ln10
       use math_lib
 
       implicit none
 
-
       contains
-
 
       subroutine Get_eos_gamma_DE_Results( &
             rq, abar, energy, log10E, rho, log10Rho, gamma, &
@@ -118,6 +116,4 @@
 
       end subroutine Get_eos_gamma_DE_Results
 
-
       end module eosDE_eval
-

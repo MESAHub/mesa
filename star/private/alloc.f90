@@ -47,7 +47,6 @@
       logical, parameter :: quad_array_debug = .false.
       logical, parameter :: quad_array_trace = .false.
 
-
       ! working storage
 
       type work_array_pointer
@@ -81,9 +80,7 @@
       integer :: num_calls, num_returns
       integer :: num_allocs, num_deallocs
 
-
       contains
-
 
       subroutine init_alloc
          integer :: i
@@ -3217,6 +3214,5 @@
          character (len=*), intent(in) :: str
          call do_return_work_array(s, .false., ptr, str)
       end subroutine non_crit_return_work_array
-
 
       end module alloc

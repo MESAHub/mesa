@@ -21,10 +21,12 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
+
 module lodders_mod
+
    use const_def, only : dp, mesa_data_dir
+
    implicit none
 
    contains
@@ -104,6 +106,7 @@ module lodders_mod
          return
       end if
       percent = lodders03_tab6% isotopic_percent(indx)
+
    end function get_lodders03_isotopic_abundance
 
 end module lodders_mod

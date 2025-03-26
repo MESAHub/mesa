@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module element_diffusion
 
       use star_private_def
@@ -36,9 +35,7 @@
 
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine do_element_diffusion(s, dt_in, ierr)
          ! return ierr /= 0 if cannot satisfy accuracy requirements
@@ -589,15 +586,3 @@
       end subroutine finish_element_diffusion
 
       end module element_diffusion
-
-
-
-
-
-
-
-
-
-
-
-

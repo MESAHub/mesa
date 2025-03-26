@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine abundance_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -405,9 +403,6 @@
             abundance_line_legend = cnt + 1
          end function abundance_line_legend
 
-
       end subroutine do_abundance_panel
 
-
       end module pgstar_abundance
-

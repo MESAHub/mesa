@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module ionization_def
@@ -188,6 +187,4 @@
          ion_result_names(ion_ifneut_Fe) = 'fneut_Fe'
       end subroutine ion_def_init
 
-
       end module ionization_def
-

@@ -34,7 +34,6 @@
 
       contains
 
-
       subroutine set_v_flag(id, v_flag, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: v_flag
@@ -776,7 +775,4 @@
 
       end subroutine set_rotation_flag
 
-
       end module set_flags
-
-

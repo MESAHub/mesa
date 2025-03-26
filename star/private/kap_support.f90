@@ -32,7 +32,6 @@ module kap_support
   implicit none
 
   private
-
   public :: prepare_kap
   public :: setup_for_op_mono
   public :: fraction_of_op_mono

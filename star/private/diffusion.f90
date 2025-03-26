@@ -21,12 +21,11 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module diffusion
 
-      use const_def, only: dp
+      use const_def, only: dp, amu, me, msun
       use chem_def
       use star_private_def
       use diffusion_support
@@ -34,12 +33,15 @@
 
       implicit none
 
+      private
+      public :: do_solve_diffusion
+      public :: set_diffusion_classes
+      public :: diffusion_min_nc
+
       integer, parameter :: diffusion_min_nc = 4  ! minimum number of classes
       logical, parameter :: use_dcoeff_dX = .true.
 
-
       contains
-
 
       subroutine do_solve_diffusion( &
             s, nz, species, nc, m, class, class_chem_id, net_iso, chem_id, &
@@ -2050,7 +2052,5 @@
          end function limiter
 
       end function adjust_timestep
-
-
 
       end module diffusion

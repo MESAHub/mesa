@@ -31,6 +31,7 @@
       use num_def
       use mtx_def
       use mtx_lib, only: block_multiply_xa
+      use utils_lib, only: is_bad
       use solver_support
 
       implicit none
@@ -38,9 +39,7 @@
       private
       public :: solver
 
-
       contains
-
 
       subroutine solver( &
             s, nvar, skip_global_corr_coeff_limit, &

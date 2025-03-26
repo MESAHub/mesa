@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module phase_separation
 
       use star_private_def
@@ -31,14 +30,14 @@
 
       implicit none
 
+      private
+      public :: do_phase_separation
+
       logical, parameter :: dbg = .false.
 
       ! offset to higher phase than 0.5 to avoid interference
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
-
-      private
-      public :: do_phase_separation
 
       contains
 
@@ -405,6 +404,3 @@
       end subroutine update_model_
 
       end module phase_separation
-
-
-

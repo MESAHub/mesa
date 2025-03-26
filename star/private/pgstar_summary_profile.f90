@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine summary_profile_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -309,9 +307,6 @@
             summary_profile_line_legend = cnt + 1
          end function summary_profile_line_legend
 
-
       end subroutine do_summary_profile_panel
 
-
       end module pgstar_summary_profile
-

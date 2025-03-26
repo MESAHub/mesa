@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
 module atm_T_tau_uniform
@@ -34,7 +33,6 @@ module atm_T_tau_uniform
   implicit none
 
   private
-
   public :: eval_T_tau_uniform
   public :: build_T_tau_uniform
 

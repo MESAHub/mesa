@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eosdt_support
@@ -35,7 +34,6 @@
       integer, parameter :: sz = sz_per_eos_point
 
       contains
-
 
       subroutine Do_EoS_Interpolations( &
              nvlo, nvhi, n, nx, x, ny, y, fin1, i, j, &
@@ -246,6 +244,4 @@
 
       end subroutine Do_Blend
 
-
       end module eosdt_support
-

@@ -30,11 +30,12 @@
 
       implicit none
 
+      private
+      public :: get_zams_model
 
-      integer :: min_when_created = 20081212
+      integer, parameter :: min_when_created = 20081212
 
       contains
-
 
       subroutine get_revised_mass(s, fullname, ierr)
          use read_model, only: do_read_saved_model
@@ -470,6 +471,4 @@
 
       end subroutine get1_mass
 
-
       end module init_model
-

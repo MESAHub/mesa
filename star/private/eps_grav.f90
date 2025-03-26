@@ -38,7 +38,6 @@
 
       contains
 
-
       subroutine eval_eps_grav_and_partials(s, k, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -412,4 +411,3 @@
       end subroutine zero_eps_grav_and_partials
 
       end module eps_grav
-

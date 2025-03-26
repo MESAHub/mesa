@@ -26,7 +26,7 @@
       module adjust_mesh
 
       use star_private_def
-      use const_def, only: dp
+      use const_def, only: dp, lsun
       use adjust_mesh_support
 
       implicit none
@@ -36,9 +36,7 @@
 
       logical, parameter :: dbg_remesh = .false.
 
-
       contains
-
 
       ! makes new mesh and sets new values for xh and xa.
       integer function remesh(s)
@@ -703,10 +701,6 @@
             call mesa_error(__FILE__,__LINE__,'debugging: end_dump remesh')
          end subroutine end_dump
 
-
       end function remesh
 
-
       end module adjust_mesh
-
-

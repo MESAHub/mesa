@@ -73,10 +73,7 @@
 
       !integer, parameter :: next_available_offset = burning_offset + idel
 
-
       contains
-
-
 
       recursive subroutine add_history_columns( &
             s, level, capacity, spec, history_columns_file, report, ierr)
@@ -787,6 +784,4 @@
 
       end subroutine set_history_columns
 
-
       end module history_specs
-

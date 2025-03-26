@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module mesh_adjust
 
       use const_def, only: dp, ln10, one_third, four_thirds_pi
@@ -47,9 +46,7 @@
 
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine do_mesh_adjust( &
             s, nz, nz_old, xh_old, xa_old, &
@@ -2894,7 +2891,4 @@
 
       end subroutine adjust1_etrb
 
-
-
       end module mesh_adjust
-

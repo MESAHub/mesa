@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module adjust_mass
 
       use star_private_def
@@ -33,10 +32,10 @@
       implicit none
 
       private
-      public :: do_adjust_mass, compute_prev_mesh_dm
+      public :: do_adjust_mass
+      public :: compute_prev_mesh_dm
 
       logical, parameter :: dbg_adjm = .false.
-
 
       contains
 

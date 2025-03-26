@@ -34,7 +34,6 @@
 
       contains
 
-
       subroutine Kipp_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
@@ -814,10 +813,6 @@
             call pgdraw(xval, top)
          end subroutine draw1
 
-
       end subroutine do_Kipp_Plot
 
-
-
       end module pgstar_kipp
-

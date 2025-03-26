@@ -34,9 +34,7 @@
       private
       public :: do_write_model
 
-
       contains
-
 
       subroutine do_write_model(id, filename, ierr)
          use utils_lib

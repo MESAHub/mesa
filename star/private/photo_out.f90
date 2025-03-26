@@ -34,7 +34,6 @@
 
       contains
 
-
       subroutine output_star_photo(s,iounit,ierr)
          use rates_def,only:num_rvs
          use rsp_def, only: rsp_photo_out
@@ -181,8 +180,6 @@
             write(iounit) part_number
          end subroutine write_part_number
 
-
       end subroutine output_star_photo
-
 
       end module photo_out

@@ -31,12 +31,20 @@
       implicit none
 
       private
-      public :: alloc_star_data, set_starting_star_data, do_star_init, &
-         do_starlib_shutdown, set_kap_and_eos_handles, load_zams_model, &
-         create_pre_ms_model, create_initial_model, &
-         create_RSP_model, create_RSP2_model, &
-         doing_restart, load_restart_photo, load_saved_model, &
-         do_garbage_collection
+      public :: alloc_star_data
+      public :: set_starting_star_data
+      public :: do_star_init
+      public :: do_starlib_shutdown
+      public :: set_kap_and_eos_handles
+      public :: load_zams_model
+      public :: create_pre_ms_model
+      public :: create_initial_model
+      public :: create_RSP_model
+      public :: create_RSP2_model
+      public :: doing_restart
+      public :: load_restart_photo
+      public :: load_saved_model
+      public :: do_garbage_collection
 
       integer, parameter :: do_create_pre_ms_model = 0
       integer, parameter :: do_load_zams_model = 1
@@ -45,11 +53,9 @@
       integer, parameter :: do_create_RSP_model = 4
       integer, parameter :: do_create_RSP2_model = 5
 
-
       logical :: have_done_starlib_init = .false.
 
       contains
-
 
       subroutine set_kap_and_eos_handles(id, ierr)
          use kap_lib, only: alloc_kap_handle_using_inlist, kap_ptr
@@ -1205,6 +1211,5 @@
                use_cache_for_eos,&
                ierr)
       end subroutine do_garbage_collection
-
 
       end module init

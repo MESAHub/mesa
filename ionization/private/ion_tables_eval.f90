@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module ion_tables_eval
@@ -33,13 +32,9 @@
 
       implicit none
 
-
-
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine Get_ion_Results(&
                Z_in, X_in, arho, alogrho, atemp, alogtemp, &
@@ -584,6 +579,4 @@
 
       end subroutine Do_ion_Interpolations
 
-
       end module ion_tables_eval
-

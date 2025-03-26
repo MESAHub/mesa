@@ -35,7 +35,6 @@
       logical, parameter :: dbg = .false.
       logical, parameter :: do_set_nan = .false.
 
-
       contains
 
       subroutine bcyclic_factor ( &
@@ -967,7 +966,6 @@
       end subroutine dense_solve1
 
 
-
       subroutine bcyclic_deallocate (s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -976,6 +974,5 @@
 
 
       include 'mtx_solve_routines.inc'
-
 
       end module star_bcyclic

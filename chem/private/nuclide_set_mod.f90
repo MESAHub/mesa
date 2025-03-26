@@ -21,10 +21,10 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module nuclide_set_mod
+
       use chem_def
       use const_def, only: dp
 
@@ -114,6 +114,5 @@
          end function compare_lt
 
       end subroutine sort_nuclide_set
-
 
       end module nuclide_set_mod

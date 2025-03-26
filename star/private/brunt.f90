@@ -32,13 +32,12 @@
       implicit none
 
       private
-      public :: do_brunt_B, do_brunt_N2
+      public :: do_brunt_B
+      public :: do_brunt_N2
 
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       ! call this before mlt
       subroutine do_brunt_B(s,nzlo,nzhi,ierr)
@@ -338,6 +337,5 @@
          end if
 
       end subroutine get_brunt_B
-
 
       end module brunt

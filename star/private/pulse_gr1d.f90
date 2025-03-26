@@ -33,7 +33,6 @@ module pulse_gr1d
   implicit none
 
   private
-
   public :: get_gr1d_data
   public :: write_gr1d_data
 

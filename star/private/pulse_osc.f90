@@ -44,7 +44,6 @@ module pulse_osc
   integer, parameter :: IABUND = 14
 
   private
-
   public :: get_osc_data
   public :: write_osc_data
 

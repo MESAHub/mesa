@@ -45,7 +45,6 @@ module pulse_fgong
   integer, parameter :: IVAR = 40
 
   private
-
   public :: get_fgong_data
   public :: write_fgong_data
 

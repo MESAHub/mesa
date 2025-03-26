@@ -39,7 +39,6 @@ module pulse
   implicit none
 
   private
-
   public :: export_pulse_data
   public :: get_pulse_data
   public :: write_pulse_data

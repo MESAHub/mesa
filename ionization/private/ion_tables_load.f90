@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module ion_tables_load
@@ -31,9 +30,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine Init_ion_tables(file_prefix, Z1_suffix, use_cache, ierr)
          character(*), intent(in) :: file_prefix, Z1_suffix
@@ -561,6 +558,5 @@
          close(io_unit)
 
       end subroutine Read_ion_Cache
-
 
       end module ion_tables_load

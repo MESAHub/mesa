@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module hydro_energy
 
       use star_private_def
@@ -39,7 +38,6 @@
       public :: do1_energy_eqn
 
       contains
-
 
       subroutine do1_energy_eqn( &  ! energy conservation
             s, k, do_chem, nvar, ierr)
@@ -845,6 +843,4 @@
 
       end subroutine eval_simple_PdV_work
 
-
       end module hydro_energy
-

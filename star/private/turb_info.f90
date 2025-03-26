@@ -27,7 +27,7 @@
       module turb_info
 
       use star_private_def
-      use const_def, only: dp, ln10, no_mixing, convective_mixing, crystallized, phase_separation_mixing
+      use const_def, only: dp, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -35,16 +35,13 @@
       implicit none
 
       private
-      public :: &
-         set_mlt_vars, &  ! for hydro_vars and conv_premix
-         do1_mlt_2, &  ! for predictive_mix
-         switch_to_radiative, &  ! mix_info
-         check_for_redo_MLT, &  ! for hydro_vars
-         set_gradT_excess_alpha  ! for evolve
-
+      public :: set_mlt_vars  ! for hydro_vars and conv_premix
+      public :: do1_mlt_2  ! for predictive_mix
+      public :: switch_to_radiative  ! mix_info
+      public :: check_for_redo_MLT  ! for hydro_vars
+      public :: set_gradT_excess_alpha  ! for evolve
 
       contains
-
 
       subroutine set_mlt_vars(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time

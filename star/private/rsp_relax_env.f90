@@ -39,7 +39,6 @@
 
       contains
 
-
       subroutine EOP(s,k,T,P,V,E,CP,QQ,SVEL,OP,ierr)
       use rsp_eval_eos_and_kap, only: &
          eval1_mesa_Rho_given_PT, eval1_gamma_PT_getRho
@@ -1338,6 +1337,5 @@
       end if
       return
       end subroutine RELAX_ENV
-
 
       end module rsp_relax_env

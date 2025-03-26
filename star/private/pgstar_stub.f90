@@ -31,9 +31,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine do_create_file_name(s, dir, prefix, name)
          type (star_info), pointer :: s
@@ -193,4 +191,3 @@
       end subroutine shutdown_pgstar
 
       end module pgstar
-

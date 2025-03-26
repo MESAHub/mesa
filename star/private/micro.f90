@@ -32,10 +32,7 @@ module micro
 
   implicit none
 
-  logical, parameter :: dbg = .false.
-
   private
-
   public :: set_micro_vars
   public :: set_eos_with_mask
   public :: do_eos_for_cell
@@ -43,6 +40,7 @@ module micro
   public :: do_kap_for_cell
   public :: shutdown_microphys
 
+  logical, parameter :: dbg = .false.
   logical :: initiaze_kap_grid = .true.
   real(dp), public, save :: fk_pcg_old(17)
 
@@ -770,6 +768,5 @@ contains
     call kap_shutdown
     call net_shutdown
   end subroutine shutdown_microphys
-
 
 end module micro

@@ -32,7 +32,6 @@
 
       implicit none
 
-
       contains
 
       subroutine network_plot(id, device_id, ierr)

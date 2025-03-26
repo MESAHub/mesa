@@ -35,7 +35,6 @@
 
       contains
 
-
       subroutine Profile_Panels1_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
@@ -1011,7 +1010,4 @@
 
       end subroutine Pro_panels_plot
 
-
-
       end module pgstar_profile_panels
-

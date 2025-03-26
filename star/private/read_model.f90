@@ -70,9 +70,7 @@
 
       character (len=100000) :: buf
 
-
       contains
-
 
       subroutine finish_load_model(s, restart, ierr)
          use hydro_vars, only: set_vars

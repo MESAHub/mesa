@@ -31,9 +31,7 @@ module pgstar_grid
 
    implicit none
 
-
 contains
-
 
    subroutine grid1_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
@@ -1023,6 +1021,4 @@ contains
 
    end subroutine Grid_plot
 
-
 end module pgstar_grid
-

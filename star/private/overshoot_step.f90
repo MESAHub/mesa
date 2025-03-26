@@ -31,9 +31,7 @@ module overshoot_step
   implicit none
 
   private
-
   public :: eval_overshoot_step
-
 
 contains
 

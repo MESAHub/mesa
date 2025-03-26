@@ -36,7 +36,6 @@ module pulse_gyre
   implicit none
 
   private
-
   public :: get_gyre_data
   public :: write_gyre_data
 

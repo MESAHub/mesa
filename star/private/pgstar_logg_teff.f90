@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine logg_Teff_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -95,6 +93,4 @@
             null_decorate, ierr)
       end subroutine do_logg_Teff_Plot
 
-
       end module pgstar_logg_Teff
-

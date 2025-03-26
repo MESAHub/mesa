@@ -34,9 +34,7 @@
       private
       public :: mesa_eos_kap, SORT, do_LINA
 
-
       contains
-
 
       subroutine do_LINA(s, L0, NZN, NMODES, VEL, PERS, ETO, &
          M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
@@ -1273,6 +1271,5 @@
         ISORT(I)=RRI
       GOTO 10
       end subroutine SORT
-
 
       end module rsp_lina

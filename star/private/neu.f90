@@ -34,9 +34,7 @@
       private
       public :: do_neu_for_cell, do_clear_neu_for_cell
 
-
       contains
-
 
       subroutine do_clear_neu_for_cell(s,k,ierr)
          type (star_info), pointer :: s
@@ -134,6 +132,4 @@
 
       end subroutine do_neu_for_cell
 
-
       end module neu
-

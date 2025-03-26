@@ -49,7 +49,6 @@
 
       contains
 
-
       subroutine do_rsp_build(s,ierr)
       !use rsp_create_env, only: do_rsp_create_env
       type (star_info), pointer :: s
@@ -989,6 +988,5 @@
          Lc_0=0.d0
       end if
       end subroutine CFLUX
-
 
       end module rsp_build

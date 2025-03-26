@@ -670,10 +670,6 @@
 
          end subroutine create_matrix_and_rhs
 
-
       end function do_solve_omega_mix
 
-
       end module solve_omega_mix
-
-

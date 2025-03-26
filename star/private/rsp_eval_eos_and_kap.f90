@@ -36,7 +36,6 @@
       use rsp_def, only: xa, X, Z, Y, &
          abar, zbar, z53bar, XC, XN, XO, Xne
 
-
       implicit none
 
       integer :: species
@@ -44,7 +43,6 @@
       integer :: eos_handle, kap_handle
 
       contains
-
 
       subroutine restart_rsp_eos_and_kap(s)
          type (star_info), pointer :: s
@@ -1053,7 +1051,4 @@
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
       end subroutine set_T_for_new_energy
 
-
       end module rsp_eval_eos_and_kap
-
-

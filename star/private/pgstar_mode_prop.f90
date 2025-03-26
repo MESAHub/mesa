@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine mode_propagation_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -293,9 +291,6 @@
             mode_propagation_line_legend = cnt + 1
          end function mode_propagation_line_legend
 
-
       end subroutine do_mode_propagation_panel
 
-
       end module pgstar_mode_prop
-

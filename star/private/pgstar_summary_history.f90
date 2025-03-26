@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine summary_history_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -285,9 +283,6 @@
             summary_history_line_legend = cnt + 1
          end function summary_history_line_legend
 
-
       end subroutine do_summary_history_plot
 
-
       end module pgstar_summary_history
-

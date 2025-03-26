@@ -33,11 +33,14 @@
       implicit none
 
       private
-      public :: rsp_setup_part1, rsp_setup_part2, rsp_one_step, &
-         build_rsp_model, rsp_total_energy_integrals, do1_rsp_build
+      public :: rsp_setup_part1
+      public :: rsp_setup_part2
+      public :: rsp_one_step
+      public :: build_rsp_model
+      public :: rsp_total_energy_integrals
+      public :: do1_rsp_build
 
       contains
-
 
       subroutine do1_rsp_build(s,ierr)
          ! call from other_rsp_build_model after changing params.
@@ -1029,6 +1032,4 @@
          end if
       end subroutine check_cycle_completed
 
-
       end module rsp
-

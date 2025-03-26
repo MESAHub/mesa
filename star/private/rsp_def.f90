@@ -142,9 +142,7 @@
       real(dp) :: EFL0, CQ, ZSH, kapE_factor, kapP_factor
       integer :: NZN, IBOTOM
 
-
       contains
-
 
       subroutine init_def(s)
          use const_def, only: standard_cgrav, boltz_sigma, &
@@ -868,6 +866,4 @@
 
       end subroutine copy_results
 
-
       end module rsp_def
-

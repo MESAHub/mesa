@@ -32,7 +32,6 @@ module starspots
    implicit none
 
    private
-
    public :: starspot_tweak_gradr
    public :: starspot_tweak_PT
    public :: starspot_restore_PT
