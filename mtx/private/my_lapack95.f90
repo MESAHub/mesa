@@ -10,7 +10,7 @@
 !
 !   you should have received a copy of the mesa manifesto along with
 !   this software; if not, it is available at the mesa website:
-!   https://http://mesastar.org/
+!   https://mesastar.org/
 !
 !   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of

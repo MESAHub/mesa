@@ -10,7 +10,7 @@
 !
 !   You should hare receired a copy of the MESA MANIFESTO along with
 !   this software; if not, it is arailable at the mesa website:
-!   https://http://mesastar.org/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without eren the implied warranty of
