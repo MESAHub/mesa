@@ -3063,11 +3063,7 @@
             read_extra_pgstar_inlist, &
             extra_pgstar_inlist_name
 
-
-
-
       contains
-
 
       subroutine read_pgstar(s, filename, ierr)
          use star_private_def

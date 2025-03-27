@@ -975,7 +975,6 @@
          history_column_name(h_total_num_solver_iterations) = 'total_num_solver_iterations'
 
 
-
          history_column_name(h_h1_czb_mass) = 'h1_czb_mass'
          history_column_name(h_surf_c12_minus_o16) = 'surf_c12_minus_o16'
          history_column_name(h_surf_num_c12_div_num_o16) = 'surf_num_c12_div_num_o16'
@@ -1389,8 +1388,4 @@
          do_get_history_id = value
       end function do_get_history_id
 
-
-
-
       end module star_history_def
-

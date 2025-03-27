@@ -28,12 +28,9 @@
       use math_lib
       use rates_def
 
-
       implicit none
 
-
       contains
-
 
       subroutine finish_rates_def_init
          use utils_lib, only: integer_dict_define, integer_dict_create_hash, integer_dict_size
@@ -586,7 +583,6 @@
 
          if (dbg) call mesa_error(__FILE__,__LINE__,'read rates')
          !call check
-
 
 
          contains
@@ -1249,8 +1245,6 @@
       end function get_Qtotal
 
 
-
-
       subroutine init_rates_info(reactionlist_filename, ierr)
          character (len=*), intent(in) :: reactionlist_filename
          integer, intent(out) :: ierr  ! 0 means AOK.
@@ -1431,7 +1425,4 @@
          if (ierr /= 0) return
       end subroutine do_rates_init
 
-
       end module rates_initialize
-
-

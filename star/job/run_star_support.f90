@@ -3721,7 +3721,6 @@
       end subroutine add_fpe_checks
 
 
-
       subroutine multiply_tolerances(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -3793,7 +3792,3 @@
       end subroutine pgstar_env_check
 
       end module run_star_support
-
-
-
-

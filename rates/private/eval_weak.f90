@@ -30,8 +30,8 @@
       use utils_lib, only: mesa_error
       use rates_def
       use suzuki_tables
-      implicit none
 
+      implicit none
 
       contains
 
@@ -349,8 +349,4 @@
 
       end subroutine do_eval_weaklib_reaction_info
 
-
-
-
       end module eval_weak
-

@@ -1617,7 +1617,6 @@
       end subroutine save_eqn_residual_info
 
 
-
       subroutine unpack_residual_partials(s, k, nvar, i_eqn, &
             residual, d_dm1, d_d00, d_dp1)
          use auto_diff
@@ -3756,8 +3755,6 @@
          end if
          tau_qhse = abs_dv/(s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)))
       end function QHSE_time_scale
-
-
 
 
       real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)

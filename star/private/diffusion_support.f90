@@ -822,7 +822,6 @@
    ! For I=N, we get the gravitational force g
 
 
-
       subroutine do1_solve_thoul_hu( &
             n, m, sfmin, a, z, x, c, rad_accel, rad, &
             kappa_st, Zdiff, Zdiff1, Zdiff2, &
@@ -1057,8 +1056,6 @@
          end do
 
       end subroutine do1_solve_thoul_hu
-
-
 
 
       subroutine solve_burgers_cgs_no_thermal( &
@@ -1460,7 +1457,6 @@
         end do
 
       end subroutine solve_burgers_cgs_with_thermal
-
 
 
       ! Calculate coefficients given in Appendix C.3 of Stanton & Murillo, PR E 93, 043203 (2016)

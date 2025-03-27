@@ -24,12 +24,12 @@
 ! ***********************************************************************
 
       module utils_idict
+
       use utils_def, only: integer_idict, ihash_entry
 
       implicit none
 
       contains
-
 
       recursive subroutine do_integer_idict_map(idict, fcn, ierr)
          type (integer_idict), pointer :: idict
@@ -528,6 +528,4 @@
          end if
       end function idict_hashkey
 
-
       end module utils_idict
-

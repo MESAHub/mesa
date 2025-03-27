@@ -3707,8 +3707,6 @@
       end function relax_Z_check_model
 
 
-
-
       subroutine do_relax_Y(id, new_Y, dY, minq, maxq, ierr)
          use star_utils, only: k_for_q, eval_current_y
          integer, intent(in) :: id

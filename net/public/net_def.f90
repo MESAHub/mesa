@@ -29,7 +29,6 @@
 
       implicit none
 
-
       ! reaction_kind array in Net_General_Info
          integer, parameter :: neut_kind = 1  ! involves neut but no prot
          integer, parameter :: prot_kind = neut_kind + 1  ! involves prot and perhaps neut
@@ -51,11 +50,6 @@
          integer, parameter :: general_two_one_kind = general_one_one_kind + 1  ! 2 species in and 1 out
          integer, parameter :: general_two_two_kind = general_two_one_kind + 1  ! 2 species in and 2 out
          integer, parameter :: max_kind = general_two_two_kind
-
-
-
-
-
 
 
       type Net_General_Info  ! things that are constant for the particular net
@@ -634,7 +628,4 @@
          g% logT_hi_eps_nuc_cancel = logT_hi_eps_nuc_cancel
       end subroutine do_net_set_eps_nuc_cancel
 
-
-
       end module net_def
-

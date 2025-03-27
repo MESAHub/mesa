@@ -68,11 +68,7 @@
       character (len=20) :: ion_result_names(num_ion_vals)
 
 
-
-
-
       ! based on scheme for eos tables
-
 
       integer, parameter :: num_ion_Zs = 5
       real(dp), parameter :: ion_Zs(num_ion_Zs) = [ 0.00d0, 0.02d0, 0.04d0, 0.20d0, 1.00d0 ]
@@ -108,8 +104,6 @@
       logical :: ion_is_initialized = .false.
 
 
-
-
       integer, parameter :: table_version = 1
 
       type Ionization_Info
@@ -127,13 +121,7 @@
 
       logical :: table_is_initialized = .false.
 
-
-
-
-
-
       contains
-
 
       subroutine ion_def_init(ionization_cache_dir_in)
          use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir

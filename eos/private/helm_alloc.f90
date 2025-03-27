@@ -21,14 +21,13 @@
 ! ***********************************************************************
 
       module helm_alloc
-      use const_def, only: dp, use_mesa_temp_cache
+
+         use const_def, only: dp, use_mesa_temp_cache
       use math_lib
 
       implicit none
 
-
       contains
-
 
       subroutine alloc_helm_table(h, imax, jmax, ierr)
          ! This routine allocates a Helm_Table and places pointer to it in h.
@@ -404,8 +403,6 @@
       end subroutine read_helm_table
 
 
-
-
       subroutine free_helm_table(h)
          use eos_def
 
@@ -469,9 +466,6 @@
             if (associated(array_ptr)) deallocate(array_ptr)
          end subroutine do_free2
 
-
       end subroutine free_helm_table
-
-
 
       end module helm_alloc

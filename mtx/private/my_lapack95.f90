@@ -24,15 +24,13 @@
 ! ***********************************************************************
 
       module my_lapack95
+
       use const_def, only: dp
       use utils_lib, only: mesa_error
       implicit none
       integer, parameter :: fltp = dp
 
-
-
       contains
-
 
       subroutine my_gemv(m,n,a,lda,x,y)  ! y = y - a*x
          integer :: lda,m,n
@@ -1401,16 +1399,11 @@
                ip = ipiv( ix )
 
 
-
                if (ip == 0) then
 
                   stop 'my_lapack95  ip == 0'
 
-
                end if
-
-
-
 
                if( ip/=i ) then
                   do k = n32, n

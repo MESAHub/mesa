@@ -373,7 +373,6 @@
          ! (IUPAC Technical Report)
 
 
-
       ! temperature values at which partition function is defined
       real(dp), dimension(npart) :: Tpart
 
@@ -524,7 +523,6 @@
 
 
       logical :: chem_has_been_initialized = .false.
-
 
 
       contains
@@ -891,7 +889,6 @@
          end do
 
       end subroutine init_chem_element_names
-
 
 
       subroutine init_chem_element_main_iso_names
@@ -1838,8 +1835,6 @@
          end do
 
       end subroutine init_MB22_photospheric_data
-
-
 
 
     subroutine init_AAG21_photospheric_data  ! fraction by mass of total Z

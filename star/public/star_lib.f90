@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module star_lib  ! this is the procedure interface to mesa/star.
 
       use const_def, only: dp
@@ -74,11 +73,9 @@
            star_eps_nuc_time_scale => eps_nuc_time_scale, &
            star_cooling_time_scale => cooling_time_scale
 
-
       implicit none
 
       contains
-
 
       ! allocate data structures for a star and returns a handle.
       subroutine alloc_star(id, ierr)
@@ -228,7 +225,6 @@
          use init, only: do_starlib_shutdown
          call do_starlib_shutdown
       end subroutine starlib_shutdown
-
 
 
       ! if you want direct access to the star data structure,
@@ -536,8 +532,6 @@
       end subroutine star_age_from_saved_model
 
 
-
-
       ! after you've created a starting model, you're ready to evolve it.
       ! this process is done one step at a time by calling star_evolve_step.
 
@@ -749,7 +743,6 @@
          call do_get_data_for_profile_columns(s, nz, &
             names, vals, is_int, ierr)
       end subroutine get_data_for_profile_columns
-
 
 
       ! you may want to have some data automatically saved and restored along with
@@ -1253,7 +1246,6 @@
       end subroutine set_dt_next
 
 
-
       ! relaxation routines (for "pseudo-evolution" of the model)
 
       subroutine star_relax_mass(id, new_mass, lg_max_abs_mdot, ierr)  ! also resets initial_mass
@@ -1655,7 +1647,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine star_special_test
-
 
 
       ! rotation
@@ -3339,6 +3330,5 @@
          call set_star_job(s, name, val, ierr)
 
       end subroutine star_set_star_job_namelist
-
 
       end module star_lib

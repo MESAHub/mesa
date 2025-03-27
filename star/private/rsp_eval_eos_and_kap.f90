@@ -21,6 +21,7 @@
 ! ***********************************************************************
 
       module rsp_eval_eos_and_kap
+
       use eos_def
       use eos_lib
       use chem_def
@@ -143,11 +144,6 @@
          write(*,1) 'init_for_rsp_eos_and_kap X', X
          write(*,1) 'Y', Y
          write(*,1) 'Z', Z
-
-
-
-
-
 
 
          write(*,1) 'abar', abar

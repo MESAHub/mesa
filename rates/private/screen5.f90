@@ -24,6 +24,7 @@
 ! ***********************************************************************
 
       module screen5
+
       use rates_def
       use const_def, only: ln10, pi, two_13
       use math_lib
@@ -398,11 +399,4 @@
 
       end subroutine fxt_screen5
 
-
-
-
-
-
-
       end module screen5
-

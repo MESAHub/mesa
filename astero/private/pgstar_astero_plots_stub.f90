@@ -30,9 +30,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine astero_pgstar_plots_info(id, ierr)
          integer, intent(in) :: id
@@ -50,9 +48,4 @@
          ierr = 0
       end subroutine write_plot_to_file
 
-
       end module pgstar_astero_plots
-
-
-
-

@@ -34,9 +34,7 @@ module pgbinary_decorator
 
    implicit none
 
-
 contains
-
 
    ! default does nothing
    ! xmin, xmax, ymin, ymax: current plot boundary
@@ -53,7 +51,3 @@ contains
    end subroutine null_pgbinary_decorator
 
 end module pgbinary_decorator
-
-
-
-

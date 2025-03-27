@@ -1136,8 +1136,6 @@
 !   equivalently, error_in_energy_conservation = phase1_energy_error + phase2_energy_error
 
 
-
-
             okay_energy_conservation = .false.
 
             nz = s% nz
@@ -1430,7 +1428,6 @@
                      (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
                   write(*,'(A)')
                   write(*,'(A)')
-
 
 
                   write(*,*) 'for debugging phase2_sources_and_sinks'

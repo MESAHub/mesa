@@ -27,12 +27,14 @@
 
       implicit none
 
+      private
+      public :: eval_OMP_GET_THREAD_NUM
+      public :: eval_OMP_GET_MAX_THREADS
+      public :: eval_OMP_SET_NUM_THREADS
 
       integer :: omp_max_threads = -1
 
-
       contains
-
 
       integer function eval_OMP_GET_THREAD_NUM()
          use omp_lib, only: OMP_GET_THREAD_NUM
@@ -52,6 +54,4 @@
          call OMP_SET_NUM_THREADS(threads)
       end subroutine eval_OMP_SET_NUM_THREADS
 
-
       end module utils_openmp
-

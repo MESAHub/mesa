@@ -297,8 +297,6 @@
          ! for all of these, 0 means "cache entry not yet set -- don't have the information"
 
 
-
-
       ! for tabular evaluation of the raw reaction rates
       real(dp) :: rattab_thi  != 10.301029995664d0 ! log10(highest temp = 2e10)
       real(dp) :: rattab_tlo  != 5.30102999566398d0 ! log10(lowest temp = 2e5)
@@ -637,7 +635,6 @@
          integer :: rates_reaction_id_max
 
 
-
       ! for mazurek's ni56 electron capture rate interpolation
          real(dp) :: tv(7),rv(6),rfdm(4),rfd0(4),rfd1(4),rfd2(4),tfdm(5),tfd0(5),tfd1(5),tfd2(5)
 
@@ -704,14 +701,12 @@
       end type T_Factors
 
 
-
       ! rate results components
 
       integer, parameter :: i_rate = 1
       integer, parameter :: i_rate_dT = 2
       integer, parameter :: i_rate_dRho = 3
       integer, parameter :: num_rvs = 3
-
 
 
       ! screening
@@ -850,7 +845,6 @@
       type (reaction_data), target :: reaclib_rates
 
       character (len=1000) :: rates_dir, rates_cache_dir, rates_temp_cache_dir
-
 
 
       ! coulomb corrections for weak reactions

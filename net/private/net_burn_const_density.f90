@@ -503,13 +503,6 @@
 
          end subroutine jakob_or_derivs
 
-
       end subroutine burn_const_density_1_zone
 
-
-
-
-
-
       end module net_burn_const_density
-

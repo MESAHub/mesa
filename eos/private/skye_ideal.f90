@@ -1,4 +1,30 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010  The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   https://http://mesastar.org/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
 module skye_ideal
+
    use math_lib
    use auto_diff
    use const_def, only: dp, pi, amu, planck_h, avo, crad, kerg
@@ -6,8 +32,10 @@ module skye_ideal
    implicit none
 
    private
-
-   public :: compute_F_rad, compute_F_ideal_ion, compute_xne, compute_ideal_ele
+   public :: compute_F_rad
+   public :: compute_F_ideal_ion
+   public :: compute_xne
+   public :: compute_ideal_ele
 
    real(dp), parameter :: sifac  = planck_h * planck_h * planck_h / (2d0 * pi * amu * sqrt(2d0 * pi * amu))
 
@@ -428,7 +456,6 @@ module skye_ideal
         fi(16) = ht% efdt(iat+1,jat+1)
 
 
-
 !..electron chemical potential etaele
         etaele  = h3(iat,jat,fi, &
                      si0t,   si1t,   si0mt,   si1mt, &
@@ -680,9 +707,6 @@ module skye_ideal
 !      adr_xnefer%d2val1_d1val4 = dxneferdttz
 !      adr_xnefer%d2val2_d1val4 = dxneferdddz
 !      adr_xnefer%d1val1_d1val2_d1val4 = dxneferddtz
-
-
-
 
    end subroutine compute_ideal_ele
 

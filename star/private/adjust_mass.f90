@@ -651,8 +651,6 @@
          end if
 
 
-
-
          okay_to_move_kB_inward = .false.
 
          lnTlim_A = ln10*s% max_logT_for_k_below_const_q
@@ -1629,17 +1627,4 @@
 
       end subroutine set_D_omega
 
-
       end module adjust_mass
-
-
-
-
-
-
-
-
-
-
-
-

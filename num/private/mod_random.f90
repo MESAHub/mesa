@@ -30,7 +30,6 @@
 
       contains
 
-
       subroutine get_seed ( seed )
 
       ! *****************************************************************************80
@@ -378,35 +377,6 @@
       !
         r8_uniform_01 = real ( seed, kind = 8 ) * 4.656612875D-10
 
-        return
       end function r8_uniform_01
 
-
       end module mod_random
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

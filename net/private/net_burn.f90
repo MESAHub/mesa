@@ -43,7 +43,6 @@
       !logical, parameter :: report_ierr = .true.
       logical, parameter :: report_ierr = .false.
 
-
       contains
 
       subroutine get_pointers( &
@@ -475,18 +474,8 @@
                end do
             end if
 
-
          end subroutine jakob_or_derivs
-
-
-
 
       end subroutine burn_1_zone
 
-
-
-
-
-
       end module net_burn
-

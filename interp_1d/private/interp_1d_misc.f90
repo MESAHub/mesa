@@ -32,7 +32,6 @@
 
       contains
 
-
       subroutine do_integrate_values(init_x, nx, f1, nv, x, vals, ierr)
          real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
          integer, intent(in) :: nx  ! length of init_x vector
@@ -322,8 +321,6 @@
 
 
       end subroutine do_interp_values_and_slopes
-
-
 
 
       subroutine do_interp2_values_and_slopes( &
@@ -717,6 +714,5 @@
          z(k) = z(k) + f1(k)
          end do
       end subroutine median_autodiff
-
 
       end module interp_1d_misc

@@ -24,8 +24,6 @@
 ! ***********************************************************************
 
 
-
-
 ! last checked for consistency with Frank's ratlib.f on Sept 18, 2008
 
       module ratelib
@@ -39,10 +37,7 @@
       implicit none
 
       real(dp), parameter :: lowT9_cutoff = 1d-3  ! all non-pp rates except decays go to 0 below this
-
-
-
-      real(dp), parameter :: lowT9pp_cutoff = 1d-5  ! all pp rates except decays go to 0 below this
+      real(dp), parameter :: lowT9pp_cutoff = 1d-5 ! all pp rates except decays go to 0 below this
 
       real(dp)  :: oneth, twoth, fourth, fiveth, elvnth, fivfour, onesix, &
                         fivsix, sevsix, onefif, sixfif, onesev, twosev, foursev
@@ -72,7 +67,6 @@
    ! nacre     C. Angulo et al., Nucl. Phys. A656 (1999)3-187
    ! wk82      wiescher and kettner, ap. j., 263, 891 (1982)
    ! c96       champagne 1996
-
 
 
 ! Hydrogen
@@ -272,7 +266,6 @@
          end if
 
 
-
 ! p(n, g)d
 ! smith, kawano, malany 1992
 
@@ -294,8 +287,6 @@
       rr    = rev * term
 
       end subroutine rate_png_fxt
-
-
 
 
       subroutine rate_ddg_jina(tf, temp, fr, rr)  ! cf88
@@ -357,7 +348,6 @@
 !         d  he3    p  he4                  de04      1.83530d+01
          call jina_reaclib_2_2(ih2, ihe3, ih1, ihe4, tf, fr, rr, 'rate_he3d_jina')
       end subroutine rate_he3d_jina
-
 
 
 ! r33, he3(he3, 2p)he4
@@ -442,7 +432,6 @@
       end subroutine rate_he3he4_nacre
 
 
-
 ! r3a, triple alpha
 
 
@@ -466,7 +455,6 @@
          write(*,'(A)')
          call mesa_error(__FILE__,__LINE__,'rate_tripalf_jina')
       end subroutine rate_tripalf_jina
-
 
 
       subroutine rate_tripalf_reaclib(tf, temp, fr, rr)
@@ -496,7 +484,6 @@
          rev    = 2.00d+20*(tf% t93)*exp(-84.424d0*(tf% t9i))
          rr = fr * rev
       end subroutine rate_tripalf_reaclib
-
 
 
       subroutine rate_tripalf_nacre(tf, temp, fr, rr)
@@ -643,8 +630,6 @@
       end subroutine rate_he3ng_fxt
 
 
-
-
 ! Lithium
 
 
@@ -678,8 +663,6 @@
          fr    = term
          rr    = rev * term
       end subroutine rate_li7pa_nacre
-
-
 
 
       subroutine rate_li7pa_jina(tf, temp, fr, rr)  ! jina reaclib
@@ -765,8 +748,6 @@
       end subroutine rate_be7pg_nacre
 
 
-
-
       subroutine rate_be7pg_jina(tf, temp, fr, rr)  ! jina reaclib   cf88
 !         p  be7   b8                       cf88n     1.37000d-01
          type (T_Factors) :: tf
@@ -803,9 +784,7 @@
       end subroutine rate_be7he3_jina
 
 
-
 ! be9(p,d)be8 => 2a
-
 
 
 ! Boron
@@ -926,8 +905,6 @@
          fr   = term
          rr   = rev * term
       end subroutine rate_c12ag_fxt
-
-
 
 
       subroutine rate_c12ag_nacre(tf, temp, fr, rr)
@@ -1645,8 +1622,6 @@
       end subroutine rate_o14ag_jina
 
 
-
-
 ! ro14gp, o14(g,p)n13
    ! see rn13pg
 
@@ -1769,7 +1744,6 @@
 !       he4  o16 ne20                       nacrr     4.73000d+00
          call jina_reaclib_2_1(ihe4, io16, ine20, tf, fr, rr, 'rate_o16ag_jina')
       end subroutine rate_o16ag_jina
-
 
 
 ! ro16gp, o16(g,p)n15
@@ -1968,7 +1942,6 @@
       end subroutine fowthrsh
 
 
-
 ! o17(a,g)ne21
 
 
@@ -2066,7 +2039,6 @@
 
 ! rf17pa, f17(p,a)o14
    ! see ro14ap
-
 
 
 ! rf17gp, f17(g,p)o16
@@ -2266,7 +2238,6 @@
       end subroutine rate_ne18ag_jina
 
 
-
 ! rne18gp, ne18(g,p)f17
    ! see rf17pg
 
@@ -2374,7 +2345,6 @@
 !       he4 ne20 mg24                       nacrr     9.31600d+00
          call jina_reaclib_2_1(ihe4, ine20, img24, tf, fr, rr, 'rate_ne20ag_jina')
       end subroutine rate_ne20ag_jina
-
 
 
 ! rne20ga, ne20(g,a)o16
@@ -3266,7 +3236,6 @@
    ! see mg51pg
 
 
-
       subroutine rate_fe52ng_jina(tf, temp, fr,  rr)
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
@@ -3373,7 +3342,6 @@
       real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ineut, ife54, ife55, tf, fr, rr, 'rate_fe54ng_jina')
       end subroutine rate_fe54ng_jina
-
 
 
       subroutine rate_fe55ng_jina(tf, temp, fr,  rr)
@@ -3554,7 +3522,6 @@
          call jina_reaclib_2_2( &
             ihe4, img24, ic12, io16, tf, fr, rr, 'rate_he4_mg24_to_c12_o16_jina')
       end subroutine rate_he4_mg24_to_c12_o16_jina
-
 
 
       subroutine tfactors(tf, logT_in, temp_in)
@@ -4262,8 +4229,6 @@
       end subroutine reaclib_rate_and_dlnT
 
 
-
-
       subroutine do_reaclib(tf, a1, a2, a3, a4, a5, a6, a7, term)
          type (T_Factors) :: tf
          real(dp), intent(in) :: a1, a2, a3, a4, a5, a6, a7
@@ -4529,7 +4494,6 @@
                         rho_low_cutoff = 1d-9, eta_low_cutoff = -50d0)
 
 
-
 !  tmean and qndeca are the mean lifetime and decay energy of the neutron
 !  c2me is the constant used to convert the neutrino energy
 !  loss rate from mec2/s (as in the paper) to ergs/particle/sec.
@@ -4659,7 +4623,3 @@
       end subroutine ecapnuc
 
       end module ratelib
-
-
-
-

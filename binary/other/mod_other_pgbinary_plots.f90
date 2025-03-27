@@ -29,14 +29,11 @@ module mod_other_pgbinary_plots
    ! control name: use_other_pgbinary_plots = .true.
    ! procedure pointer: s% other_pgbinary_plots_info => my_routine
 
-
    ! see star/other/sample_pgbinary_plot.f90
 
    implicit none
 
-
 contains
-
 
    ! default does nothing
    subroutine null_other_pgbinary_plots_info(id, ierr)
@@ -46,9 +43,4 @@ contains
       ierr = 0
    end subroutine null_other_pgbinary_plots_info
 
-
 end module mod_other_pgbinary_plots
-
-
-
-

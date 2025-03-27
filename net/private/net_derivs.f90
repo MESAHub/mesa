@@ -36,7 +36,6 @@
 
       contains
 
-
       subroutine get_derivs( &
             n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
             num_reactions, rate_factors, &
@@ -1835,20 +1834,6 @@
 
          end subroutine do_FL_3alf
 
-
       end subroutine update_special_rates
 
       end module net_derivs
-
-
-
-
-
-
-
-
-
-
-
-
-
