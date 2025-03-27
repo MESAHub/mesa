@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -32,13 +31,9 @@
 
       implicit none
 
-
       logical, parameter :: dbg = .false.
 
-
       contains
-
-
 
       !reads in table_summary file from atm_data, initializes logZ, Teff_array,
       ! logg_array, and Teff_bound arrays; sets some flags
@@ -690,8 +685,6 @@
             end if
          end function failed
 
-
       end subroutine get_table_values
-
 
       end module table_atm

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,9 +34,7 @@
       private
       public :: do_neu_for_cell, do_clear_neu_for_cell
 
-
       contains
-
 
       subroutine do_clear_neu_for_cell(s,k,ierr)
          type (star_info), pointer :: s
@@ -134,6 +132,4 @@
 
       end subroutine do_neu_for_cell
 
-
       end module neu
-

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,9 +34,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine eval_net( &
             n, g, rates_only, just_dxdt, &
@@ -738,7 +736,6 @@
       end subroutine get_weaklib_rates
 
 
-
       subroutine get_T_limit_factor( &
             temp, lnT, T_lo, T_hi, lnT_lo, lnT_hi, &
             min_ln_factor, min_factor, &
@@ -789,9 +786,7 @@
          end do
 
 
-
          return      ! let it go even with bad xsum.
-
 
 
 
@@ -860,6 +855,4 @@
          xa(1: species) = xa(1: species)/xsum
       end subroutine do_clean1
 
-
       end module net_eval
-

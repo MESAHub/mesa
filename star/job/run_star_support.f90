@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -3721,7 +3721,6 @@
       end subroutine add_fpe_checks
 
 
-
       subroutine multiply_tolerances(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -3793,7 +3792,3 @@
       end subroutine pgstar_env_check
 
       end module run_star_support
-
-
-
-

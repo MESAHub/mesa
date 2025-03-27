@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Pablo Marchant
+!   Copyright (C) 2013  Pablo Marchant & The MESA Team
 !
 !   this file is part of mesa.
 !
@@ -19,7 +19,6 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
-
 
       module binary_lib
 

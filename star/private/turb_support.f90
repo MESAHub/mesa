@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,11 +23,10 @@
 !
 ! ***********************************************************************
 
-
 module turb_support
 
 use star_private_def
-use const_def, only: dp, no_mixing
+use const_def, only: dp, crad, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -37,7 +36,9 @@ use turb
 implicit none
 
 private
-public :: get_gradT, do1_mlt_eval, Get_results
+public :: get_gradT
+public :: do1_mlt_eval
+public :: Get_results
 
 contains
 
@@ -435,6 +436,5 @@ contains
          end if
       end subroutine set_superad_reduction
    end subroutine Get_results
-
 
 end module turb_support

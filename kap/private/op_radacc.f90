@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,10 +31,17 @@ module op_radacc
 
    implicit none
 
+   private
+   public :: rd
+   public :: abund
+   public :: ross
+   public :: mix
+   public :: interp
+
    logical, parameter :: dbg = .false.
 
 contains
-! **********************************************************************1
+
    subroutine abund(nel, izz, kk, iz1, fa, kzz, flmu, am1, fmu1, nkz)
       implicit none
       integer, intent(in) :: nel, izz(ipe), kk, iz1(nrad)

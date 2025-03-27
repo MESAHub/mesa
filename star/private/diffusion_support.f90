@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -33,12 +32,15 @@
 
       implicit none
 
+      private
+      public :: tiny_mass
+      public :: smallx
+      public :: get_matrix_coeffs
 
       real(dp), parameter :: Xlim = 1d-14
       real(dp), parameter :: tiny_mass = 1d3  ! a kilogram
       real(dp), parameter :: tinyX = 1d-50
       real(dp), parameter :: smallX = 1d-20
-
 
       contains
 
@@ -113,7 +115,6 @@
 
 
 !$OMP PARALLEL DO PRIVATE(k, j, i, total_diffusion_factor, op_err, C_face, Z_face, dC_dr_face, dlnne_dr_face, tmp) SCHEDULE(dynamic,2)
-
          do k = nzlo+1, nzhi
 
             ! Total diffusion scaling factor is product of
@@ -193,7 +194,6 @@
             end do
 
          end do
-
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) return
@@ -822,7 +822,6 @@
    ! For I=N, we get the gravitational force g
 
 
-
       subroutine do1_solve_thoul_hu( &
             n, m, sfmin, a, z, x, c, rad_accel, rad, &
             kappa_st, Zdiff, Zdiff1, Zdiff2, &
@@ -1057,8 +1056,6 @@
          end do
 
       end subroutine do1_solve_thoul_hu
-
-
 
 
       subroutine solve_burgers_cgs_no_thermal( &
@@ -1462,7 +1459,6 @@
       end subroutine solve_burgers_cgs_with_thermal
 
 
-
       ! Calculate coefficients given in Appendix C.3 of Stanton & Murillo, PR E 93, 043203 (2016)
       subroutine get_SM_coeffs(nc,m,rho,T,A,Z,nd,Kdiff,zdiff,zdiff1,zdiff2,kappa)
         integer, intent(in) :: nc, m
@@ -1808,4 +1804,3 @@
       end function bitsafe_erf_fit
 
       end module diffusion_support
-

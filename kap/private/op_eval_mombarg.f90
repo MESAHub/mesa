@@ -1,8 +1,42 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2013-2019  The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   https://mesastar.org/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
       module op_eval_mombarg
 
       use const_def, only: dp, pi
 
       implicit none
+
+      private
+      public :: compute_grad
+      public :: compute_grad_fast
+      public :: compute_gamma_grid
+      public :: compute_kappa
+      public :: compute_kappa_fast
+      public :: interpolate_kappa
+      public :: compute_kappa_grid
 
       real(dp), parameter :: log_c = 10.476820702927927d0  !log10_cr(dble(299792458e2)) c = speed of light
       real(dp), parameter :: log10_bohr_radius_sqr = -16.55280d0

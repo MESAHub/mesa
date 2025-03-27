@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
       module hydro_eqns
 
       use star_private_def
-      use const_def, only: dp, pi, ln10
+      use const_def, only: dp, pi, ln10, two_thirds
       use star_utils, only: em1, e00, ep1
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -37,9 +37,7 @@
       private
       public :: eval_equ
 
-
       contains
-
 
       subroutine eval_equ(s, nvar, ierr)
          type (star_info), pointer :: s
@@ -1164,6 +1162,4 @@
          end do
       end subroutine equ_data_for_extra_profile_columns
 
-
       end module hydro_eqns
-

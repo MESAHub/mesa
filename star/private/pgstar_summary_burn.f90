@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine summary_burn_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -303,12 +301,8 @@
          call show_pgstar_decorator(s%id, s% pg% summary_burn_use_decorator, &
             s% pg% summary_burn_pgstar_decorator, 0, ierr)
 
-
          end subroutine plot
-
 
       end subroutine do_summary_burn_plot
 
-
       end module pgstar_summary_burn
-

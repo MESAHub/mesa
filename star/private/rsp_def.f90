@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -142,9 +142,7 @@
       real(dp) :: EFL0, CQ, ZSH, kapE_factor, kapP_factor
       integer :: NZN, IBOTOM
 
-
       contains
-
 
       subroutine init_def(s)
          use const_def, only: standard_cgrav, boltz_sigma, &
@@ -868,6 +866,4 @@
 
       end subroutine copy_results
 
-
       end module rsp_def
-

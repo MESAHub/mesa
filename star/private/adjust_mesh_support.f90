@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,6 @@
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine get_gval_info( &
             s, delta_gval_max, gvals1, nz, &
@@ -461,8 +460,4 @@
 
       end subroutine check_validity
 
-
-
       end module adjust_mesh_support
-
-

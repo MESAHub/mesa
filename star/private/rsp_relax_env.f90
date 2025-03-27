@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,7 +38,6 @@
       public :: EOP, RELAX_ENV
 
       contains
-
 
       subroutine EOP(s,k,T,P,V,E,CP,QQ,SVEL,OP,ierr)
       use rsp_eval_eos_and_kap, only: &
@@ -1338,6 +1337,5 @@
       end if
       return
       end subroutine RELAX_ENV
-
 
       end module rsp_relax_env

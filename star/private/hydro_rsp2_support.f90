@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
       module hydro_rsp2_support
 
       use star_private_def
-      use const_def, only: dp
+      use const_def, only: dp, ln10, pi, lsun, rsun, msun
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
@@ -39,7 +39,6 @@
       public :: remesh_for_RSP2
 
       contains
-
 
       subroutine remesh_for_RSP2(s,ierr)
          ! uses these controls
@@ -449,6 +448,4 @@
 
       end subroutine remesh_for_RSP2
 
-
       end module hydro_rsp2_support
-

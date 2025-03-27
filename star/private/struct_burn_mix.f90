@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,7 +35,6 @@
       public :: do_struct_burn_mix
 
       contains
-
 
       integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
          use mix_info, only: get_convection_sigmas

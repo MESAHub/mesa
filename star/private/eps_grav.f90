@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,7 +37,6 @@
       public :: eval_eps_grav_and_partials, zero_eps_grav_and_partials
 
       contains
-
 
       subroutine eval_eps_grav_and_partials(s, k, ierr)
          type (star_info), pointer :: s
@@ -412,4 +411,3 @@
       end subroutine zero_eps_grav_and_partials
 
       end module eps_grav
-

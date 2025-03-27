@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,6 @@ module overshoot
   use const_def, only: dp, pi4, no_mixing, overshoot_mixing
   use num_lib
   use star_private_def
-
   use overshoot_utils
   use overshoot_exp
   use overshoot_step
@@ -36,7 +35,6 @@ module overshoot
   implicit none
 
   private
-
   public :: add_overshooting
 
 contains

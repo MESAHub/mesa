@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,9 +30,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine astero_pgstar_plots_info(id, ierr)
          integer, intent(in) :: id
@@ -50,9 +48,4 @@
          ierr = 0
       end subroutine write_plot_to_file
 
-
       end module pgstar_astero_plots
-
-
-
-

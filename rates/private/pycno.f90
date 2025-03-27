@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,18 +23,14 @@
 !
 ! ***********************************************************************
 
-
-
-
-
       module pycno
+
       use rates_def
       use utils_lib
       use const_def, only: dp
       use math_lib
 
       implicit none
-
 
       contains
 
@@ -46,7 +42,6 @@
          real(dp), intent(out) :: r  ! rate in ergs/g/sec
          real(dp), intent(out) :: drdT  ! partial wrt temperature
          real(dp), intent(out) :: drdRho  ! partial wrt density
-
 
          real(dp) :: T6, R6, R6T, R6T13, R6T16, T62, T612, T623, T653, T632, T613, U, AF
          real(dp) :: G1, dG1dRho, dG1dT, G2, dG2dRho, dG2dT
@@ -316,9 +311,4 @@
 
       end subroutine FL_epsnuc_3alf
 
-
       end module pycno
-
-
-
-

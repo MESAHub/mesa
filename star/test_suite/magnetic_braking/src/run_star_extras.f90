@@ -34,11 +34,9 @@
       real(dp) :: t_spindown = 1d100
       real(dp) :: j_tot = 0d0
 
-
       contains
 
       include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -178,8 +176,6 @@
       end subroutine magnetic_braking
 
 
-
-
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -312,7 +308,5 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-
-
 
       end module run_star_extras

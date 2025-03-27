@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine rti_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -483,9 +481,6 @@
 
          end subroutine plot_mass_lines
 
-
       end subroutine do_rti_Plot
 
-
       end module pgstar_rti
-

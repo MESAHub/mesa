@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,16 +35,16 @@ module load_kap
 
   implicit none
 
+  private
+  public :: load_one
+  public :: setup_kap_tables
 
   logical, parameter :: dbg = .false.
-
   logical, parameter :: dbg_cache = .false.
 
 contains
 
-
-  subroutine Setup_Kap_Tables(rq, &
-       use_cache, load_on_demand, ierr)
+  subroutine setup_kap_tables(rq, use_cache, load_on_demand, ierr)
     use const_def, only: mesa_data_dir
     use condint, only: init_potekhin
     type (Kap_General_Info), pointer :: rq
@@ -182,7 +182,7 @@ contains
     end subroutine setup_lowT
 
 
-  end subroutine Setup_Kap_Tables
+  end subroutine setup_kap_tables
 
 
   subroutine load_one(rq, &
@@ -768,6 +768,4 @@ contains
          trim(prefix) // '_z' // trim(zstr) // '_x' // trim(xstr) // '.bin'
   end subroutine create_fname
 
-
 end module load_kap
-

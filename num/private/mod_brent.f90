@@ -510,8 +510,6 @@
    end function eval_local_min
 
 
-
-
    real(dp) function eval_brent_safe_zero ( a, b, machep, t, epsy, f, fa_in, fb_in, lrpar, rpar, lipar, ipar, ierr )
 
    ! *****************************************************************************80
@@ -706,7 +704,4 @@
      return
    end function eval_brent_safe_zero
 
-
-
    end module mod_brent
-

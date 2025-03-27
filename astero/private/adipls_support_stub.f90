@@ -20,7 +20,6 @@
 !
 ! ***********************************************************************
 
-
       module adipls_support
 
       use astero_def
@@ -30,7 +29,6 @@
       use utils_lib
 
       implicit none
-
 
       ! args for adipls
       integer :: i_paramset, ierr_param, i_inout, nn
@@ -52,7 +50,6 @@
       logical, parameter :: ADIPLS_IS_ENABLED = .false.
 
       contains
-
 
       ! this can be called from user run_star_extras check model routine
       subroutine do_adipls_get_one_el_info( &
@@ -269,6 +266,5 @@
          integer :: k
 
       end subroutine show_adipls_results
-
 
       end module adipls_support

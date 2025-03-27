@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,6 +30,10 @@ module kap_aesopus
   use kap_def
 
   implicit none
+
+  private
+  public :: kap_aesopus_init
+  public :: AESOPUS_get
 
   logical, parameter :: debug = .false.
 
@@ -606,6 +610,5 @@ contains
     end if
 
   end subroutine AESOPUS_get
-
 
 end module kap_aesopus

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,6 @@
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine build_pre_ms_model(id, s, nvar_hydro, species, ierr)
          use chem_def
@@ -742,6 +741,4 @@
 
       end subroutine eval_gradT
 
-
       end module pre_ms_model
-

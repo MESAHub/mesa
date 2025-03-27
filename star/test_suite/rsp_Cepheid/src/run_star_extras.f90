@@ -220,8 +220,4 @@ module run_star_extras
          end do
       end subroutine data_for_extra_profile_columns
 
-
-
-
       end module run_star_extras
-

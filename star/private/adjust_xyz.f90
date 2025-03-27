@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module adjust_xyz
 
       use star_private_def
@@ -33,11 +32,27 @@
 
       implicit none
 
+      private
+      public :: change_net
+      public :: change_small_net
+      public :: get_xa_for_standard_metals
+      public :: get_xa_for_accretion
+      public :: set_z
+      public :: set_y
+      public :: set_uniform_composition
+      public :: set_standard_composition
+      public :: set_uniform_xa_from_file
+      public :: set_composition
+      public :: do_change_to_xa_for_accretion
+      public :: set_abundance_ratio
+      public :: do_replace
+      public :: do_set_abundance
+      public :: do_uniform_mix_section
+      public :: do_uniform_mix_envelope_down_to_t
+
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine change_net( &
             id, adjust_abundances_for_new_isos, new_net_name, ierr)
@@ -1456,17 +1471,4 @@
 
       end subroutine do_set_abundance
 
-
       end module adjust_xyz
-
-
-
-
-
-
-
-
-
-
-
-

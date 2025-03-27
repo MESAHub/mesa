@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module hydro_alpha_rti_eqns
 
       use star_private_def
@@ -35,9 +34,7 @@
       private
       public :: do1_dalpha_RTI_dt_eqn
 
-
       contains
-
 
       subroutine do1_dalpha_RTI_dt_eqn(s, k, nvar, ierr)
          use star_utils, only: em1, e00, ep1
@@ -193,7 +190,6 @@
             s% solver_test_partials_val = s% equ(i_dalpha_RTI_dt,k)
          end if
 
-
          if (test_partials) then
             s% solver_test_partials_var = i_alpha_RTI
             s% solver_test_partials_dval_dx = resid%d1val2
@@ -202,6 +198,4 @@
 
       end subroutine do1_dalpha_RTI_dt_eqn
 
-
       end module hydro_alpha_rti_eqns
-

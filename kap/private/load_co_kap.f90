@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,21 +24,26 @@
 ! ***********************************************************************
 
 module load_CO_kap
-  use kap_def
-  use math_lib
-  use const_def, only: dp, use_mesa_temp_cache
-  use utils_lib, only: mesa_error, mv, switch_str
 
-  implicit none
+   use kap_def
+   use math_lib
+   use const_def, only: dp, use_mesa_temp_cache
+   use utils_lib, only: mesa_error, mv, switch_str
 
-  integer, parameter :: min_version = 37
+   implicit none
 
-  logical, parameter :: CO_dbg = .false.
+   private
+   public :: min_version
+   public :: setup_kap_co_tables
+   public :: get_dx_lookup
+   public :: load_one_CO
+
+   integer, parameter :: min_version = 37
+   logical, parameter :: CO_dbg = .false.
 
 contains
 
-
-  subroutine Setup_Kap_CO_Tables(rq, co_z_tables, use_cache, load_on_demand, ierr)
+   subroutine Setup_Kap_CO_Tables(rq, co_z_tables, use_cache, load_on_demand, ierr)
     type (Kap_General_Info), pointer :: rq
     type (Kap_CO_Z_Table), dimension(:), pointer :: co_z_tables
     logical, intent(in) :: use_cache, load_on_demand
@@ -912,4 +917,3 @@ contains
   end subroutine Create_fname
 
 end module load_CO_kap
-

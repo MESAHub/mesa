@@ -37,7 +37,6 @@
 
       include "test_suite_extras.inc"
 
-
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -218,8 +217,4 @@
          end do
       end function extras_finish_step
 
-
-
-
       end module run_star_extras
-

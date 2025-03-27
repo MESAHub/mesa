@@ -17,8 +17,6 @@
 
       contains
 
-
-
       real (dp) function gfdi(order, chi, tau)
 
          real (dp), intent(in) :: order, chi, tau
@@ -73,8 +71,6 @@
             temp = sqrt( chi*(1 + chi*tau/2) )
             gfdi = f_gfdi(k, chi, tau, temp) + pi*pi/6.0_dp * chi**k * (k + 1/2.0_dp + (k+1.0_dp)*chi*tau/2) / temp
          end if
-
-
 
 
          contains

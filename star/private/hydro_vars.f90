@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,15 +33,22 @@
       implicit none
 
       private
-      public :: set_vars_if_needed, set_vars, set_final_vars, update_vars, set_cgrav, &
-         set_hydro_vars, unpack_xh, set_Teff_info_for_eqns, set_Teff, get_surf_PT, set_grads
+      public :: set_vars_if_needed
+      public :: set_vars
+      public :: set_final_vars
+      public :: update_vars
+      public :: set_cgrav
+      public :: set_hydro_vars
+      public :: unpack_xh
+      public :: set_Teff_info_for_eqns
+      public :: set_Teff
+      public :: get_surf_PT
+      public :: set_grads
 
       logical, parameter :: dbg = .false.
       logical, parameter :: trace_setvars = .false.
 
-
       contains
-
 
       subroutine set_vars_if_needed(s, dt, str, ierr)
          type (star_info), pointer :: s
@@ -1147,6 +1154,4 @@
 
       end subroutine set_grads
 
-
       end module hydro_vars
-

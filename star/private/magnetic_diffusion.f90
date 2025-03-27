@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module magnetic_diffusion
 
       use const_def, only: dp, pi, pi4, clight, boltz_sigma, one_third
@@ -34,7 +33,8 @@
       implicit none
 
       private
-      public :: calc_sige, calc_eta
+      public :: calc_sige
+      public :: calc_eta
 
       contains
 
@@ -136,9 +136,8 @@
          rme = 8.5646d-23*t*t*t*xgamma*xgamma*xgamma/pow5(z)  ! rme = rho6/mue
          rm23 = pow(rme,2d0/3d0)
          ctmp = 1d0 + 1.018d0*rm23
-         xi= sqrt(3.14159d0/3.0d0)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
+         xi= sqrt(pi/3.0d0)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
          sige3 = 8.630d21*rme/(z*ctmp*xi)
       end function sige3
-
 
       end module magnetic_diffusion

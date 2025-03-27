@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,9 +34,7 @@
       private
       public :: mesa_eos_kap, SORT, do_LINA
 
-
       contains
-
 
       subroutine do_LINA(s, L0, NZN, NMODES, VEL, PERS, ETO, &
          M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
@@ -1273,6 +1271,5 @@
         ISORT(I)=RRI
       GOTO 10
       end subroutine SORT
-
 
       end module rsp_lina

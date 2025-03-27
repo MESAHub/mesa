@@ -53,7 +53,7 @@ to run:
 
 i have not implemented inlist input for this code, so input is hard-coded
 in the main.f file which must be recompiled for each run.
-(just re-run the mk script. it�s quick)
+(just re-run the mk script. it's quick)
 
 the tfdh code prints the output to files as it runs. in order to keep things
 clean, i have set it up to take an output directory as command-line argument.

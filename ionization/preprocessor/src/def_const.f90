@@ -8,7 +8,7 @@
 
       module def_const
 
-      use def_type, only:dp
+      use def_type, only: dp
 
       implicit none
 

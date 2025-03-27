@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +22,6 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
-
 
       module rotation_mix_info
 
@@ -48,9 +47,7 @@
       integer, parameter :: i_ST = i_GSF + 1
       integer, parameter :: num_instabilities = i_ST
 
-
       contains
-
 
       subroutine set_rotation_mixing_info(s, ierr)
          use star_utils, only: weighed_smoothing
@@ -1375,6 +1372,5 @@
             if (dc(k) < tiny) dc(k) = 0
          end do
       end subroutine zero_if_tiny
-
 
       end module rotation_mix_info

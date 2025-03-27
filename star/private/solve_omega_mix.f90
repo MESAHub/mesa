@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -670,10 +670,6 @@
 
          end subroutine create_matrix_and_rhs
 
-
       end function do_solve_omega_mix
 
-
       end module solve_omega_mix
-
-
