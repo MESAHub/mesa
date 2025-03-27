@@ -1,3 +1,28 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2018-2020  Aaron Dotter & The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   https://http://mesastar.org/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
 ! kapCN by Aaron Dotter
 ! This is a MESA module that reads in and interpolates the low-T
 ! opacities by M.T. Lederer & B. Aringer, 2009, A&A, 494, 403
@@ -14,6 +39,10 @@ module kapcn
 
   implicit none
 
+  private
+  public :: kapcn_init
+  public :: kapCN_get
+
   !local stuff
   logical, parameter :: debug = .false.
   character(len=32), parameter :: kapCN_param_file = 'kR_Z_fCN.data'
@@ -24,7 +53,6 @@ module kapcn
   integer :: ibcx=0, ibcy=0, ilinx=1, iliny=1
   integer :: ict(6) = [ 1, 1, 1, 0, 0, 0 ]
   real(dp), parameter :: bc(kapCN_num_logT) = 0d0
-
 
 contains
 
@@ -415,6 +443,5 @@ contains
     end if
 
   end subroutine kapCN_get
-
 
 end module kapcn

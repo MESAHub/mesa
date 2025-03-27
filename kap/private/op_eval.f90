@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,12 +30,18 @@
 ! Haili Hu 2010
 
 module op_eval
+
    use op_load
    use const_def, only: dp
    use math_lib
    use kap_def, only: kap_test_partials, kap_test_partials_val, kap_test_partials_dval_dx
 
    implicit none
+
+   private
+   public :: eval_op_radacc
+   public :: eval_op_ev
+   public :: eval_alt_op
 
    logical, parameter :: dbg = .false.
 

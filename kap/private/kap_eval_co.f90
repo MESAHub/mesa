@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,8 +31,10 @@
 
       implicit none
 
-      contains
+      private
+      public :: Get1_kap_CO_Results
 
+      contains
 
       subroutine Get1_kap_CO_Results( &
                rq, Zbase, X, dXC, dXO, Rho, logRho, T, logT, &
@@ -1242,6 +1244,4 @@
 
       end subroutine Get_CO_Kap_for_logRho_logT
 
-
       end module kap_eval_co
-

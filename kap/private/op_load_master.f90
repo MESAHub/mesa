@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,6 +28,9 @@ module op_load_master
    use const_def, only: dp
 
    implicit none
+
+   private
+   public :: load_op_master
 
    logical :: loaded_op_master = .false.
 

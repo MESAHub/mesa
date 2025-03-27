@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -33,12 +32,9 @@
       use const_def
       use simplex_search_data
 
-
       implicit none
 
-
       contains
-
 
       subroutine do_run_star_simplex( &
             extras_controls, inlist_simplex_search_controls_fname)
@@ -2617,7 +2613,5 @@
 
 
       end subroutine read1_sample_from_file
-
-
 
       end module simplex_search_run_support

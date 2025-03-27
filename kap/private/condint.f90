@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module condint
 
       use const_def, only: dp, iln10
@@ -32,6 +31,9 @@
 
       implicit none
 
+      private
+      public :: init_potekhin
+      public :: do_electron_conduction
 
       integer, parameter :: num_logTs=29, num_logRhos=71, num_logzs=15
       !!! NB: These parameters must be consistent with the table "condtabl.d"!
@@ -42,9 +44,7 @@
       real(dp), pointer :: f(:,:,:,:)
       integer :: ilinx(num_logzs), iliny(num_logzs)
 
-
       contains
-
 
       subroutine init_potekhin(ierr)
          use kap_def, only: kap_dir
@@ -451,6 +451,5 @@
          end if
 
       end subroutine do_electron_conduction
-
 
       end module condint

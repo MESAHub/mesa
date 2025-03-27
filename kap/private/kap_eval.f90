@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,6 +24,7 @@
 ! ***********************************************************************
 
       module kap_eval
+
       use utils_lib, only: is_bad, mesa_error
       use kap_def
       use const_def, only: dp, ln10, sige, me, kev, kerg, amu, clight
@@ -31,11 +32,15 @@
 
       implicit none
 
+      private
+      public :: get_kap_results
+      public :: combine_rad_with_conduction
+      public :: get_kap_results_blend_t
+      public :: compton_opacity
 
       contains
 
-
-      subroutine Get_kap_Results( &
+      subroutine get_kap_Results( &
            rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
            eta, d_eta_dlnRho, d_eta_dlnT, &
@@ -224,10 +229,10 @@
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
-      end subroutine Get_kap_Results
+      end subroutine get_kap_Results
 
 
-      subroutine Get_kap_Results_blend_T( &
+      subroutine get_kap_Results_blend_T( &
            rq, X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
            frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
@@ -378,10 +383,10 @@
 
         if (dbg) write(*,1) 'Get_kap_blend_logT kap', kap
 
-      end subroutine Get_kap_Results_blend_T
+      end subroutine get_kap_Results_blend_T
 
 
-      subroutine Get_kap_lowT_Results( &
+      subroutine get_kap_lowT_Results( &
            rq, &
            X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -472,10 +477,10 @@
 
         return
 
-      end subroutine Get_kap_lowT_Results
+      end subroutine get_kap_lowT_Results
 
 
-      subroutine Get_kap_highT_Results(rq, &
+      subroutine get_kap_highT_Results(rq, &
            X, Z, XC_in, XN_in, XO_in, XNe_in, logRho_in, logT_in, &
            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
@@ -695,7 +700,7 @@
            dlnkap_dlnT = (alfa*kap_alfa*dlnkap_alfa_dlnT + beta*kap_beta*dlnkap_beta_dlnT) / kap
         end if
 
-      end subroutine Get_kap_highT_Results
+      end subroutine get_kap_highT_Results
 
 
       subroutine combine_rad_with_conduction( &
@@ -871,6 +876,5 @@
          dlnkap_dlnT = T% val * kap_auto% d1val2 / kap
 
       end subroutine Compton_Opacity
-
 
       end module kap_eval
