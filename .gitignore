@@ -104,6 +104,14 @@ test_results.yml
 testhub.yml
 
 
+## gcov
+.htmlcov/
+*.gcov
+*.gcda
+*.gcno
+coverage.info
+
+
 ## Misc
 ._*
 .DS_Store
