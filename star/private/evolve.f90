@@ -26,7 +26,7 @@
       module evolve
 
       use star_private_def
-      use const_def, only: dp, pi, pi4, msun, lsun, crad, clight, secyer, secday
+      use const_def, only: dp, i8, pi, pi4, msun, lsun, crad, clight, secyer, secday
       use utils_lib, only: is_bad
       use star_utils
       use auto_diff_support
@@ -302,7 +302,7 @@
 
          type (star_info), pointer :: s
          integer :: ierr, k, nz
-         integer(8) :: time0, clock_rate
+         integer(i8) :: time0, clock_rate
          real(dp) :: total_radiation
 
          logical, parameter :: dbg = .false.
@@ -530,7 +530,7 @@
          type (star_info), pointer :: s
          integer :: ierr, &
             k, mdot_redo_cnt, max_mdot_redo_cnt, nz
-         integer(8) :: time0, clock_rate
+         integer(i8) :: time0, clock_rate
          logical :: trace, skip_global_corr_coeff_limit, &
             have_too_large_wind_mdot, have_too_small_wind_mdot, &
             ignored_first_step, was_in_implicit_wind_limit
@@ -1965,7 +1965,7 @@
          use adjust_mesh_split_merge, only: remesh_split_merge
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          include 'formats'
          do_mesh = keep_going

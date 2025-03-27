@@ -104,7 +104,7 @@ The installation consists in the following steps:
    enable me to notify you of bugs or updates.
 
 Notes on file formats:
----------------------
+----------------------
 
 The programmes generally operate with binary input and output files.
 The binary format evidently may vary between installations.
@@ -140,7 +140,7 @@ on this file; if the result looks reasonable, your binary format is
 probably consistent with mine.
 
 Compiler warnings:
------------------
+------------------
 
 It is possible that compilation will produce warnings on some systems.
 These should generally be unimportant. A particular cause of warnings
@@ -156,7 +156,7 @@ Please let me know if you suspect that it is a problem in the
 results of computations on your system.
 
 Disclaimer:
-----------
+-----------
 
 There is no guarantee that the package will work as intended,
 although it has been used previously, in a less well-documented
@@ -175,7 +175,7 @@ that are convenient on most machines, even if they cause problems
 in selected cases.
 
 Acknowledgements:
-----------------
+-----------------
 
 I am very grateful to Alan Irwin and Helmut Schlattl for their help
 in testing this version of the package, as well as to Frank Hill for
@@ -186,7 +186,7 @@ Aarhus, October 9 1997                        Joergen Christensen-Dalsgaard
 -------------------------------------------------------------------------
 
 Known potential problems:
-------------------------
+-------------------------
 
 On IBM RS6000, AIX4.1 operating system, and some Linux systems:
 
@@ -204,7 +204,7 @@ On HP-UX:
 ---------------------------------------------------------------------------
 
 Notes on modifications:
-----------------------
+-----------------------
 
 26/4/99: Fixed a number of minor problems. These were mainly related
 	 to unset variables, at points in the programmes which would

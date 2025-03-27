@@ -27,7 +27,7 @@
       module star_solver
 
       use star_private_def
-      use const_def, only: dp
+      use const_def, only: dp, i8
       use num_def
       use mtx_def
       use mtx_lib, only: block_multiply_xa
@@ -143,7 +143,7 @@
          integer :: nz, iter, max_tries, tiny_corr_cnt, i, &
             force_iter_value, iter_for_resid_tol2, iter_for_resid_tol3, &
             max_corr_k, max_corr_j, max_resid_k, max_resid_j
-         integer(8) :: time0
+         integer(i8) :: time0
          character (len=strlen) :: err_msg
          logical :: first_try, dbg_msg, passed_tol_tests, &
             doing_extra, disabled_resid_tests, pass_resid_tests, &

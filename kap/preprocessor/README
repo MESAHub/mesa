@@ -122,4 +122,3 @@ I make plots from that data using the tioga script kap/test/kap.rb
 You can edit the "logK_with_contours" in that to set the range for the colormap.
         z_lower = -6.7
         z_upper = 9
-

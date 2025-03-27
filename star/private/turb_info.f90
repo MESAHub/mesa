@@ -27,7 +27,7 @@
       module turb_info
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
+      use const_def, only: dp, i8, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -49,7 +49,7 @@
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
          integer :: k, op_err
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'

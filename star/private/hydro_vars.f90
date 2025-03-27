@@ -26,7 +26,7 @@
       module hydro_vars
 
       use star_private_def
-      use const_def, only: dp, pi, ln10, boltz_sigma, clight, standard_cgrav, two_thirds, four_thirds, lsun, rsun, no_mixing
+      use const_def, only: dp, i8, pi, ln10, boltz_sigma, clight, standard_cgrav, two_thirds, four_thirds, lsun, rsun, no_mixing
       use chem_def, only: chem_isos
       use utils_lib, only: mesa_error, is_bad
 
@@ -502,7 +502,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, k, T_tau_id
-         integer(8) :: time0
+         integer(i8) :: time0
          logical, parameter :: dbg = .false.
          real(dp) :: total
 

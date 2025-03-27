@@ -26,7 +26,7 @@
       module rsp_step
       use rsp_def
       use star_def, only: star_ptr, star_info
-      use const_def, only: dp, qp, crad
+      use const_def, only: dp, qp, i8, crad
       use utils_lib, only: is_bad
 
       implicit none
@@ -214,7 +214,7 @@
          integer :: &
             i_min, i_max, num_tries, max_retries, max_iters, k, nz, &
             kT_max, kW_max, kE_max, kL_max, iter_for_dfridr, test_partials_k
-         integer(8) :: time0
+         integer(i8) :: time0
          logical :: converged, dbg_msg, trace
          include 'formats'
 
@@ -707,7 +707,7 @@
          integer, intent(in) :: iter,i_min,i_max
          integer, intent(out) :: ierr
          integer :: i, op_err
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          include 'formats'
          ierr = 0

@@ -26,7 +26,7 @@
       module struct_burn_mix
 
       use star_private_def
-      use const_def, only: dp, ln10, secyer, lsun
+      use const_def, only: dp, i8, ln10, secyer, lsun
       use utils_lib, only: is_bad
 
       implicit none
@@ -46,7 +46,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          integer :: nz, nvar, species, ierr, k
-         integer(8) :: time0
+         integer(i8) :: time0
          logical :: do_chem
          real(dp) :: dt, tol_correction_norm, tol_max_correction, total
 
@@ -818,7 +818,7 @@
             k_bad, ierr, max_num_iters_k, nz, op_err, &
             k, num_iters, species, max_num_iters_used, &
             screening_mode, kmin
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total, avg_epsnuc, min_T_for_const_density_solver
          logical :: trace, dbg, skip_burn
          logical, parameter :: burn_dbg = .false.

@@ -25,7 +25,7 @@
 
 module conv_premix
 
-  use const_def, only: dp, msun, convective_mixing
+  use const_def, only: dp, i8, msun, convective_mixing
   use star_private_def
   use chem_def
   use chem_lib
@@ -104,7 +104,7 @@ contains
     integer                      :: i_bdy
     logical                      :: t_bdy
 
-    integer(8)                   :: time0
+    integer(i8)                   :: time0
     real(dp)                     :: total
 
     ierr = 0

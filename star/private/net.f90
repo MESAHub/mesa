@@ -26,7 +26,7 @@
       module net
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4
+      use const_def, only: dp, i8, ln10, pi4
       use utils_lib, only: is_bad, mesa_error
 
       implicit none
@@ -53,7 +53,7 @@
 
          logical, parameter :: use_omp = .true.
          integer :: k, op_err
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          logical, parameter :: only_dlnT = .false.
          logical :: okay, check_op_split_burn

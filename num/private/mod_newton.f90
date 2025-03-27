@@ -25,7 +25,7 @@
 
 module mod_newton
 
-   use const_def, only: dp, qp
+   use const_def, only: dp, qp, i8
    use math_lib
    use utils_lib, only: is_bad, mesa_error
    use num_def
@@ -145,7 +145,7 @@ contains
       ! for sparse
       integer :: n, nzmax, need_lrd, need_lid
 
-      integer(8) :: test_time0, test_time1, clock_rate
+      integer(i8) :: test_time0, test_time1, clock_rate
       logical :: do_test_timing
 
       include 'formats'
@@ -331,7 +331,7 @@ contains
       integer :: iiter, max_tries, ndiag, zone, idiag, tiny_corr_cnt, ldA, i, k, info, &
                  last_jac_iter, max_iterations_for_jacobian, force_iter_value, &
                  max_iter_for_enforce_resid_tol, max_iter_for_resid_tol2, max_iter_for_resid_tol3, caller_id
-      integer(8) :: time0, time1, clock_rate
+      integer(i8) :: time0, time1, clock_rate
       character(len=256) :: err_msg
       logical :: first_try, dbg_msg, passed_tol_tests, overlay_AF, do_mtx_timing, doing_extra
       integer, parameter :: num_tol_msgs = 15

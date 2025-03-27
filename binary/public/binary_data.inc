@@ -320,5 +320,4 @@ logical :: open_new_history_file
 integer :: recent_binary_log_header
 logical :: just_wrote_binary_terminal_header
 
-integer(8) :: system_clock_at_start_of_step
-
+integer(i8) :: system_clock_at_start_of_step

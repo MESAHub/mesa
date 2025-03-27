@@ -26,7 +26,7 @@
       module star_utils
 
       use star_private_def
-      use const_def, only: dp, pi, pi4, ln10, clight, crad, msun, rsun, lsun, one_third, four_thirds_pi
+      use const_def, only: dp, i8, pi, pi4, ln10, clight, crad, msun, rsun, lsun, one_third, four_thirds_pi
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -1871,9 +1871,9 @@
 
       subroutine start_time(s, time0, total_all_before)
          type (star_info), pointer :: s
-         integer(8), intent(out) :: time0
+         integer(i8), intent(out) :: time0
          real(dp), intent(out) :: total_all_before
-         integer(8) :: clock_rate
+         integer(i8) :: clock_rate
          if (.not. s% doing_timing) return
          total_all_before = total_times(s)
          call system_clock(time0,clock_rate)
@@ -1882,11 +1882,11 @@
 
       subroutine update_time(s, time0, total_all_before, total)
          type (star_info), pointer :: s
-         integer(8), intent(in) :: time0
+         integer(i8), intent(in) :: time0
          real(dp), intent(in) :: total_all_before
          real(dp), intent(inout) :: total
          real(dp) :: total_all_after, other_stuff
-         integer(8) :: time1, clock_rate
+         integer(i8) :: time1, clock_rate
          if (.not. s% doing_timing) return
          call system_clock(time1,clock_rate)
          total_all_after = total_times(s)

@@ -1,3 +1,4 @@
+
 ! ***********************************************************************
 !
 !   Copyright (C) 2013-2019  Rich Townsend & The MESA TEAM
@@ -25,7 +26,7 @@ module gyre_support
   use astero_def
   use star_lib
   use star_def
-  use const_def, only: dp, clight, crad, standard_cgrav, msun, rsun, lsun, mesa_dir
+  use const_def, only: dp, i8, clight, crad, standard_cgrav, msun, rsun, lsun, mesa_dir
   use utils_lib
 
   use gyre_mesa_m
@@ -35,7 +36,6 @@ module gyre_support
   logical, parameter :: GYRE_IS_ENABLED = .true.
 
   private
-
   public :: GYRE_IS_ENABLED
   public :: init_gyre
   public :: do_gyre_get_modes
@@ -85,7 +85,7 @@ contains
 
     integer  :: ipar(1)
     real(dp) :: rpar(1)
-    integer(8) :: time0, time1, clock_rate
+    integer(i8) :: time0, time1, clock_rate
     real(dp) :: time
 
     include 'formats'

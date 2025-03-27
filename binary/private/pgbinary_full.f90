@@ -26,7 +26,7 @@
 module pgbinary
 
    use binary_def
-   use const_def, only: dp
+   use const_def, only: dp, i8
    use chem_def, only : category_name
    use rates_def, only : i_rate
    use pgbinary_support
@@ -766,7 +766,7 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer(8) :: time0, time1, clock_rate
+      integer(i8) :: time0, time1, clock_rate
       logical ::do_pause
 
       include 'formats'

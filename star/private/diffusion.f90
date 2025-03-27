@@ -25,7 +25,7 @@
 
       module diffusion
 
-      use const_def, only: dp, amu, me, msun
+      use const_def, only: dp, i8, amu, me, msun
       use chem_def
       use star_private_def
       use diffusion_support
@@ -145,7 +145,7 @@
          integer, pointer :: ipiv1(:)
          integer :: lrd, lid, kmax_rad_accel, min_num_substeps, &
             iter_dbg, j_dbg, k_dbg, k_max
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          integer, pointer :: ipar_decsol(:)
          real(dp), pointer :: rpar_decsol(:)
          real(dp), dimension(species) :: xa_total_before

@@ -11,7 +11,7 @@ H EOS table which is intended only for use in blended tables
 original CMS 2019 H EOS, Paper 2, table when using a pure
 H EOS but when blending the new table should be used. The
 program cms_mixing has been slightly modified and the
-build_data script revamped to make this change.  The original
+build_data script revamped to make this change. The original
 data directory DirEOS2019 has also been replaced with
 DirEOS2021.
 
@@ -37,4 +37,3 @@ There are two parts to building MESA tables with CMS:
 Some things are not provided by CMS: mu, mu_e (ln_free_e), eta.
 
 To re-run the tables, use the build_data script.
-

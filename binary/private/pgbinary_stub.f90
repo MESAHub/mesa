@@ -26,12 +26,11 @@
 module pgbinary
 
    use binary_def
-   use const_def, only: dp
+   use const_def, only: dp, i8
    use chem_def, only : category_name
    use rates_def, only : i_rate
 
    implicit none
-
 
 contains
 
@@ -148,7 +147,7 @@ contains
       integer, intent(out) :: ierr
 
       integer :: i
-      integer(8) :: time0, time1, clock_rate
+      integer(i8) :: time0, time1, clock_rate
       logical :: pause
 
       include 'formats'
