@@ -50,8 +50,8 @@ jobs:
 
       - name: Generate html with lcov
         run: |
-          genhtml --ignore-errors missing  --ignore-errors empty  --filter missing --output-directory .htmlcov  coverage.info
           lcov --gcov-tool gcov --ignore-errors negative,inconsistent --capture --directory . --output-file coverage.info
+          genhtml --ignore-errors missing,missing  --ignore-errors empty,empty  --filter missing --output-directory .htmlcov  coverage.info
         shell: bash
 
       - name: Save the html folder as an artifact
