@@ -22,7 +22,7 @@
 
       module adipls_support
 
-      use const_def, only: dp, pi, four_thirds_pi, pi4
+      use const_def, only: dp, i8, pi, pi4, four_thirds_pi
       use astero_def
       use star_lib
       use star_def
@@ -342,7 +342,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, nn_arg_0
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder

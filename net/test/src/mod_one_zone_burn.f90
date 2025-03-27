@@ -30,7 +30,7 @@ module mod_one_zone_support
    use math_lib
    use net_def
    use net_lib
-   use const_def, only: Qconv, secyer, kerg, avo, ln10
+   use const_def, only: dp, i8, Qconv, secyer, kerg, avo, ln10
    use rates_def
    use utils_lib, only: mesa_error
 
@@ -200,7 +200,7 @@ contains
       integer :: max_order_used
 
       integer :: iout, caller_id, cid, ir
-      integer(8) :: time0, time1, clock_rate
+      integer(i8) :: time0, time1, clock_rate
 
       real(dp) :: ending_temp, ending_rho, ending_lnS, initial_rho, initial_lnS, dt
       real(dp) :: ending_log10T, starting_log10T, avg_eps_nuc, ending_eps_neu_total

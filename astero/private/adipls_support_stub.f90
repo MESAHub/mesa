@@ -25,7 +25,7 @@
       use astero_def
       use star_lib
       use star_def
-      use const_def, only: dp
+      use const_def, only: dp, i8
       use utils_lib
 
       implicit none
@@ -133,7 +133,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, nn_arg_0
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder
@@ -264,7 +264,6 @@
 
       subroutine show_adipls_results
          integer :: k
-
       end subroutine show_adipls_results
 
       end module adipls_support

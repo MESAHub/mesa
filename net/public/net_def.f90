@@ -25,7 +25,7 @@
 
       module net_def
 
-      use const_def, only: dp, qp
+      use const_def, only: dp, qp, i8
 
       implicit none
 
@@ -149,15 +149,15 @@
          ! the following are sums of results from system_clock.
          ! divide by clock_rate to get seconds.
          ! must set all of these to 0 before change doing_timing to true.
-         integer(8) :: clock_net_eval
-         integer(8) :: clock_net_weak_rates
-         integer(8) :: clock_net_rate_tables
-         integer(8) :: clock_net_screen
-         integer(8) :: clock_net_derivs
-         integer(8) :: clock_derivs_select
-         integer(8) :: clock_derivs_setup
-         integer(8) :: clock_derivs_general
-         integer(8) :: clock_net_get
+         integer(i8) :: clock_net_eval
+         integer(i8) :: clock_net_weak_rates
+         integer(i8) :: clock_net_rate_tables
+         integer(i8) :: clock_net_screen
+         integer(i8) :: clock_net_derivs
+         integer(i8) :: clock_derivs_select
+         integer(i8) :: clock_derivs_setup
+         integer(i8) :: clock_derivs_general
+         integer(i8) :: clock_net_get
 
          ! bookkeeping
          integer :: handle

@@ -1287,7 +1287,7 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer(8) :: time0, time1, clock_rate
+      integer(i8) :: time0, time1, clock_rate
       logical :: do_pause
 
       include 'formats'

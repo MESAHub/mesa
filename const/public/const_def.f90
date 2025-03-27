@@ -27,6 +27,8 @@ module const_def
 
    implicit none
 
+   public
+
    ! real number precision options: single, double, quad
    integer, parameter :: sp = selected_real_kind(p=5)
    integer, parameter :: dp = selected_real_kind(p=15)  ! real32

@@ -26,7 +26,7 @@
       module rsp_lina
       use star_def, only: star_info
       use utils_lib, only: is_bad, mesa_error
-      use const_def, only: dp, crad
+      use const_def, only: dp, i8, crad
       use rsp_def
 
       implicit none

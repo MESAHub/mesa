@@ -26,7 +26,7 @@
 module micro
 
   use star_private_def
-  use const_def, only: dp, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
+  use const_def, only: dp, i8, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
   use star_utils, only: foreach_cell
   use utils_lib, only: is_bad
 
@@ -63,7 +63,7 @@ contains
     integer, intent(out) :: ierr
 
     integer :: k, op_err, i
-    integer(8) :: time0
+    integer(i8) :: time0
     real(dp) :: total, alfa, beta
     character(len=4) :: e_name
     real(dp) :: fk(17), delta

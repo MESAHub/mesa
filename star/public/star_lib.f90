@@ -25,7 +25,7 @@
 
       module star_lib  ! this is the procedure interface to mesa/star.
 
-      use const_def, only: dp
+      use const_def, only: dp, i8
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
       use utils_lib, only: mesa_error
 
@@ -549,7 +549,7 @@
             ! false if this is a repeat for a retry
          type (star_info), pointer :: s
          integer :: ierr
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          star_evolve_step = terminate
          ierr = 0

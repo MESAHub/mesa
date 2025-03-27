@@ -25,7 +25,7 @@
 
       module net_eval
 
-      use const_def, only: dp, Qconv, arg_not_provided
+      use const_def, only: dp, i8, Qconv, arg_not_provided
       use math_lib
       use chem_def
       use chem_lib, only: get_mass_excess
@@ -96,7 +96,7 @@
          real(dp) :: eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
          integer :: ci, i, j, ir, weak_id, h1, iwork
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          logical :: doing_timing
 
          logical, parameter :: dbg = .false.
@@ -592,7 +592,7 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: dbg=.false.
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          integer :: i, num, num_reactions
          real(dp) :: f
@@ -691,7 +691,7 @@
 
          integer, intent(out) :: ierr
          integer :: i, j, id, ir
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          include 'formats'
 

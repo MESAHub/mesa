@@ -25,7 +25,7 @@
 
       module mix_info
 
-      use const_def, only: dp, ln10, pi4, msun, no_mixing, &
+      use const_def, only: dp, i8, ln10, pi4, msun, no_mixing, &
                            minimum_mixing, &
                            rayleigh_taylor_mixing, &
                            convective_mixing, &
@@ -71,7 +71,7 @@
 
          logical :: RSP2_or_RSP
 
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
 
          include 'formats'
