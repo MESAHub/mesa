@@ -20,7 +20,6 @@
 !
 ! ***********************************************************************
 
-
       module adipls_support
 
       use const_def, only: dp, pi, four_thirds_pi, pi4
@@ -29,9 +28,7 @@
       use star_def
       use utils_lib
 
-
       implicit none
-
 
       ! args for adipls
       integer, save :: i_paramset, ierr_param, i_inout, nn
@@ -40,11 +37,8 @@
       real(dp), save :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
-
       integer, save :: iounit_dev_null = -1
-
       integer, save :: nn_redist  ! set from redistrb.c input file
-
 
       real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
       integer, save :: nn_arg
@@ -52,9 +46,7 @@
 
       logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
-
       contains
-
 
       ! this can be called from user run_star_extras check model routine
       subroutine do_adipls_get_one_el_info( &
@@ -1079,6 +1071,5 @@
          end do
          write(*,'(A)')
       end subroutine show_adipls_results
-
 
       end module adipls_support

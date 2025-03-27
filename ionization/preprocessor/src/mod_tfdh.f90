@@ -19,8 +19,6 @@
 
       contains
 
-
-
       subroutine tfdh(args, profile_flag)
 
          type(datastruct), intent(inout) :: args
@@ -81,8 +79,6 @@
             call reallocate_dp(args%qitot, firstlength)
             call reallocate_dp(args%qi, args%species*firstlength)
          end if
-
-
 
 
          do, istep=1, max_iter
@@ -166,7 +162,6 @@
          if (istep == max_iter) call alert(1, '(tfdh) too many steps!')
 
       end subroutine tfdh
-
 
 
       subroutine d_tfdh(x, y, dydx, args)
