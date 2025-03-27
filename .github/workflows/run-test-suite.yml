@@ -1,5 +1,5 @@
 ---
-name: Test Mesa
+name: Run Test Suite
 
 on: [workflow_dispatch, release]
 
