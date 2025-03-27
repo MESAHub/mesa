@@ -32,10 +32,10 @@ jobs:
           sudo apt-get -y install lcov
         shell: bash
 
-      - name: Tweak install script to link gcov
+      - name: Tweak makefile script to link gcov
         run: |
           cd $GITHUB_WORKSPACE
-          sed -i 's/FC = gfortran/FC = gfortran -fprofile-arcs -ftest-coverage -lgcov --coverage/' install
+          sed -i 's/FC = gfortran/FC = gfortran -fprofile-arcs -ftest-coverage -lgcov --coverage/' utils/makefile_header
         shell: bash
 
       - name: Install MESA on ${{ runner.os }} with SDK 24.7.1
