@@ -57,7 +57,7 @@ jobs:
       - name: Save the html folder as an artifact
         uses: actions/upload-pages-artifact@v3
         with: 
-          path: './htmlcov/'
+          path: './.htmlcov/'
       
       - name: Deploy to Github Pages
         uses: actions/deploy-pages@v4
