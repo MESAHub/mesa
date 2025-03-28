@@ -4,8 +4,6 @@ name: Code Coverage
 on:
   push:
     branches: ["main"]
-    paths-ignore:
-      - "**/coverage.svg"
   workflow_dispatch:
 
 permissions:
@@ -57,9 +55,11 @@ jobs:
         shell: bash
 
       - name: Make coverage badge 
-        uses: GoogleCloudPlatform/lcov-coverage-badge@v1.0.0
-        with:
-          file: ./coverage.info
+        run: |
+          npm install lcov-badge2
+          lcov-badge2 -o coverage.svg coverage.info
+          mv coverage.svg .htmlcov/coverage.svg
+        shell: bash
 
       - name: Save the html folder as an artifact
         uses: actions/upload-pages-artifact@v3
