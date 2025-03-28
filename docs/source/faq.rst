@@ -27,16 +27,16 @@ What happens when an instrument paper is being written?
 The picture shows the intense authors hard at work making final edits.
 
 .. figure:: /assets/images/paper_session.jpg
-   :alt: Writing the mesa paper
+   :alt: Writing the MESA paper
 
-A late night session working on |MESA I| around Bill's
+A late-night session working on |MESA I| around Bill's
 dining room table with a projector, a makeshift screen, and ample red
 wine (left to right, Frank Timmes, Aaron Dotter, Falk Herwig, Lars
 Bildsten, and Bill Paxton). Photo taken by Bill's patient wife, Kathlyn,
 who deserves a great deal of credit for the existence of MESA.
 
 By |MESA V|, there's a bigger room and a better screen.
-Left-to-right: Aaron Dotter, Jared Goldberg, Lars Bildsten, Radek
+Left to right: Aaron Dotter, Jared Goldberg, Lars Bildsten, Radek
 Smolec, Anne Thoul, Bill Paxton, Adam Jermyn, Josiah Schwab, Frank
 Timmes, Croissants, Rich Townsend, Coffee, and Pablo Marchant. Photo
 taken by Matteo Cantiello.
@@ -670,7 +670,7 @@ Why do I get an error like "Error: Blank required in STOP statement near (1)"?
 
 This sort of error typically occurs when using an older MESA release
 with a newer SDK. To work around this, simply insert the blank space as
-requested. i.e. change ``stop'fixup'`` to ``stop 'fixup'``.
+requested. i.e. change ``stop'fixup'`` to ``stop 'fixup'``.
 
 Why do I get an error like "Error: Array reference at (1) out of bounds (0 < 1) in loop beginning at (2) [-Werror=do-subscript]"?
 ---------------------------------------------------------------------------------------------------------------------------------

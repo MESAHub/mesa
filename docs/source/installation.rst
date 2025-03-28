@@ -13,7 +13,7 @@ Ensure your system meets the minimum hardware requirements
 
 The minimum system requirements for MESA are:
 
--  Mac or Linux operating system
+-  macOS or Linux operating system
 -  64-bit processor
 -  8 GB RAM
 -  20 GB free disk space
@@ -31,8 +31,8 @@ Install the MESA SDK
 
 Before you install MESA, you need to get the prerequisites. The `MESA
 SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
-simplifies this process by providing a prebuilt set of compilers and
-run-time libraries that should make your MESA install go
+simplifies this process by providing a pre-built set of compilers and
+run-time libraries that should make your MESA installation go
 smoothly. Visit the `MESA SDK website
 <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
 the details of setting it up.
