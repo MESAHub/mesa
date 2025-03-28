@@ -57,7 +57,7 @@ jobs:
         shell: bash
 
       - name: Make coverage badge 
-        uses: GoogleCloudPlatform/github-badge-lcov@v1.0.0
+        uses: GoogleCloudPlatform/lcov-coverage-badgev@v1.0.0
         with:
           file: ./coverage.info
 
