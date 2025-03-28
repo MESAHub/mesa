@@ -26,12 +26,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name : Install lcov
+      - name : Install lcov and npm
         run: |
           sudo apt-get -y update
           sudo apt-get -y install lcov
-          sudo apt install nodejs
-          sudo apt install npm 
+          sudo apt-get -y install nodejs
+          sudo apt-get -y install npm 
         shell: bash
 
       - name: Tweak makefile script to link gcov
