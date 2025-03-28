@@ -30,6 +30,7 @@ jobs:
         run: |
           sudo apt-get -y update
           sudo apt-get -y install lcov
+          sudo apt-get -y install genhtml
         shell: bash
 
       - name: Tweak makefile script to link gcov
@@ -55,7 +56,7 @@ jobs:
         shell: bash
 
       - name: Save the html folder as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with: 
           path: './htmlcov/'
       
