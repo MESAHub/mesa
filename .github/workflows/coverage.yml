@@ -54,7 +54,8 @@ jobs:
           genhtml --ignore-errors empty,source --synthesize-missing --output-directory .htmlcov coverage.info
         shell: bash
 
-      - name: Make coverage badge 
+      - name: Make coverage badge
+        uses: actions/setup-node@v4
         run: |
           npm install lcov-badge2
           lcov-badge2 -o coverage.svg coverage.info
