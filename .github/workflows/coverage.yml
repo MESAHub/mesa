@@ -56,10 +56,12 @@ jobs:
         shell: bash
 
       - name: Save the html folder as an artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with: 
           path: './htmlcov/'
       
       - name: Deploy to Github Pages
         uses: actions/deploy-pages@v4
         id: deployment
+        with:
+          name: code-coverage-report
