@@ -55,8 +55,8 @@ jobs:
         shell: bash
 
       - name: Make coverage badge
-        uses: actions/setup-node@v4
         run: |
+          apk add --no-cache npm
           npm install lcov-badge2
           lcov-badge2 -o coverage.svg coverage.info
           mv coverage.svg .htmlcov/coverage.svg
