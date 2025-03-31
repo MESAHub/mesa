@@ -69,6 +69,7 @@ jobs:
           LABEL: 'coverage'
           STATUS: ${{steps.coverage.outputs.coverage}}
           COLOR: green
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Save the html folder as an artifact
         uses: actions/upload-pages-artifact@v3
@@ -78,5 +79,3 @@ jobs:
       - name: Deploy to Github Pages
         uses: actions/deploy-pages@v4
         id: deployment
-        with:
-          name: code-coverage-report
