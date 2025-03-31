@@ -23,6 +23,10 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 .. image:: https://img.shields.io/github/license/MESAHub/mesa
     :alt: GitHub
     :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
+.. image:: https://byob.yarr.is/mesahub/mesa/coverage/shields
+    :title: Coverage
+    :alt: Coverage
+    :target: http://MESAHub.github.io/mesa
 .. image:: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml/badge.svg
     :title: BuildLinux
     :alt: BuildLinux
@@ -31,10 +35,6 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :title: StaticAnalysis
     :alt: StaticAnalysis
     :target: https://github.com/MESAHub/mesa/actions/workflows/static-analysis.yml
-.. image:: https://byob.yarr.is/mesahub/mesa/coverage/shields
-    :title: Coverage
-    :alt: Coverage
-    :target: http://MESAHub.github.io/mesa
 
 |
 
