@@ -55,9 +55,9 @@ jobs:
         shell: bash
 
       - name: Extract coverage percentage
-        id: coverage
+        id: extract
         run: |
-          echo "coverage=$(awk -F'[<>]' '/headerCovTableEntryLo/{gsub("&nbsp;", ""); print $3}' .htmlcov/index.html | tail -n 1)" >> $GITHUB_ENV
+          echo "coverage=$(awk -F'[<>]' '/headerCovTableEntryLo/{gsub("&nbsp;", ""); print $3}' .htmlcov/index.html | tail -n 1)" >> $GITHUB_OUTPUT
         shell: bash
         env:
           GITHUB_ENV: ${{ github.env }}
@@ -67,7 +67,7 @@ jobs:
         with:
           NAME: coverage
           LABEL: 'coverage'
-          STATUS: ${{steps.coverage.outputs.coverage}}
+          STATUS: ${{ steps.extract.outputs.coverage }}
           COLOR: green
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
