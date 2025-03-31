@@ -26,12 +26,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name : Install lcov and npm
+      - name : Install lcov
         run: |
           sudo apt-get -y update
           sudo apt-get -y install lcov
-          sudo apt-get -y install nodejs
-          sudo apt-get -y install npm 
         shell: bash
 
       - name: Tweak makefile script to link gcov
@@ -56,12 +54,21 @@ jobs:
           genhtml --ignore-errors empty,source --synthesize-missing --output-directory .htmlcov coverage.info
         shell: bash
 
-      - name: Make coverage badge
+      - name: Extract coverage percentage
+        id: coverage
         run: |
-          npm install lcov-badge2
-          lcov-badge2 -o coverage.svg coverage.info
-          mv coverage.svg .htmlcov/coverage.svg
+          echo "coverage=$(awk -F'[<>]' '/headerCovTableEntryLo/{gsub("&nbsp;", ""); print $3}' .htmlcov/index.html | tail -n 1)" >> $GITHUB_ENV
         shell: bash
+        env:
+          GITHUB_ENV: ${{ github.env }}
+
+      - name: Make coverage badge
+        uses: RubbaBoy/BYOB@v1.3.0
+        with:
+          NAME: coverage
+          LABEL: 'coverage'
+          STATUS: ${{steps.coverage.outputs.coverage}}
+          COLOR: green
 
       - name: Save the html folder as an artifact
         uses: actions/upload-pages-artifact@v3
