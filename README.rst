@@ -31,10 +31,10 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :title: StaticAnalysis
     :alt: StaticAnalysis
     :target: https://github.com/MESAHub/mesa/actions/workflows/static-analysis.yml
-.. image:: https://byob.yarr.is/mesahub/mesa/coverage
+.. image:: https://byob.yarr.is/mesahub/mesa/coverage/shields
     :title: Coverage
     :alt: Coverage
-    :target: https:/http://mesahub.github.io/mesa
+    :target: http://MESAHub.github.io/mesa
 
 |
 
