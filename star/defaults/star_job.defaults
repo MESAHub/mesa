@@ -2865,54 +2865,6 @@
     extras_llpar = 0
     extras_lpar(:) = .false.
 
-! Color Files
-! ===========
-
-
-      ! color_num_files
-      ! ~~~~~~~~~~~~~~~
-      ! color_file_names
-      ! ~~~~~~~~~~~~~~~~
-      ! color_num_colors
-      ! ~~~~~~~~~~~~~~~~
-
-      !     Filenames for each bolometric correction (BC) table to load
-      !     Must set the number of files to load
-      !     Must be <= ``max_num_color_files`` (defined in ``colors_def.f90``).
-      !     Must set the number of BC's in each file (May be different for each file).
-      !     Must be <= ``max_num_bcs_per_file`` (defined in ``colors_def.f90``).
-      !     Files should be structured as:
-      !     Teff log_g M_div_h filter1 filter2 ....
-      !     where filter1 is the name of the filter (No spaces allowed in name)
-      !     Names must be unique across all files loaded and are case sensitive.
-      !     For a filter named filter1 history output will be bc_filter1 for bolometric corrections
-      !     and abs_mag_filter1 for absolute magnitude
-
-      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code
-
-      ! ::
-
-    color_num_files = -1
-    color_file_names(:) = ''
-    color_num_colors(:) = -1
-
-      ! Default file from Lejeune, Cuisinier, Buser (1998) A&AS 130, 65-75
-      ! Can be replaced if need be.
-      ! The filter names are U B V R I J H K L Lprime M (case sensitive)
-
-      ! ::
-
-    color_num_files = 1
-    color_file_names(1) = 'lcb98cor.dat'
-    color_num_colors(1) = 11
-
-      ! Set of blackbody bolometric corrections in UBVRI
-      ! Can be used at the same time as the lcb98cor.dat file
-      ! Filter names bb_U bb_b bb_V bb_R bb_I
-      ! color_num_files=2
-      ! color_file_names(2)='blackbody_johnson.dat'
-      ! color_num_colors(2)=5
-
 ! misc
 ! ====
 
