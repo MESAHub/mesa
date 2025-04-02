@@ -22,7 +22,7 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
-module colors_controls_io
+module colors_ctrls_io
    use const_def
    use colors_def
    
@@ -199,4 +199,4 @@ contains
 
 
 
-end module colors_controls_io
+end module colors_ctrls_io

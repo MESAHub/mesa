@@ -28,7 +28,7 @@ module mod_colors
   use math_lib
   use const_def
   use utils_lib
-  use colors_controls_io
+  use colors_ctrls_io
 
   implicit none
   private
