@@ -26,32 +26,53 @@ for dir in "${DIRS[@]}"; do
 	fi
 done
 
-# Define remote data file location
-REMOTE_FILE="https://nialljmiller.com/media/bigdata/MESA/testdata.txz"
+
+#!/bin/bash
+#!/bin/bash
+
+# Define remote data file locations
+PRIMARY_REMOTE_FILE="https://nialljmiller.com/media/bigdata/MESA/testdata.txz"
+# Note: Use the raw file URL for GitHub; otherwise, you'll download the HTML page.
+SECONDARY_REMOTE_FILE="https://raw.githubusercontent.com/nialljmiller/custom_colours_test_data/main/testdata.txz"
 LOCAL_FILE="testdata.txz"
 EXTRACTED_FLAG="data/extracted_marker"  # Marker file to track extraction
 
+# Function to validate the archive by listing its contents
+validate_archive() {
+    tar -tJf "$LOCAL_FILE" > /dev/null 2>&1
+}
+
 # Download the file if it doesn't exist locally
 if [ ! -f "$EXTRACTED_FLAG" ]; then
-	if [ ! -f "$LOCAL_FILE" ]; then
-		echo "Downloading test data from $REMOTE_FILE..."
-		curl -L -o "$LOCAL_FILE" "$REMOTE_FILE" || { echo "Download failed"; exit 1; }
-	else
-		echo "Test data file already exists locally. Skipping download."
-	fi
+    if [ ! -f "$LOCAL_FILE" ]; then
+        echo "Attempting to download test data from primary source: $PRIMARY_REMOTE_FILE..."
+        curl -L -o "$LOCAL_FILE" "$PRIMARY_REMOTE_FILE"
+    else
+        echo "Test data file already exists locally. Skipping download."
+    fi
 
-	if [ -f "$LOCAL_FILE" ]; then
-		echo "Extracting test data..."
-		tar -xJf "$LOCAL_FILE" --directory=data --strip-components=1 || { echo "Extraction failed"; exit 1; }
-		touch "$EXTRACTED_FLAG"  # Create marker file
-		rm "$LOCAL_FILE"
-	else
-		echo "Missing test data file. Extraction skipped."
-	fi
-	
+    # Validate the downloaded file
+    if validate_archive; then
+        echo "Primary archive is valid."
+    else
+        echo "Primary archive is invalid. Trying secondary source: $SECONDARY_REMOTE_FILE..."
+        rm -f "$LOCAL_FILE"
+        curl -L -o "$LOCAL_FILE" "$SECONDARY_REMOTE_FILE" || { echo "Secondary download failed. Exiting."; exit 1; }
+        # Validate the secondary archive as well
+        if ! validate_archive; then
+            echo "Secondary archive is invalid. Exiting."
+            exit 1
+        fi
+    fi
+
+    echo "Extracting test data..."
+    tar -xJf "$LOCAL_FILE" --directory=data --strip-components=1 || { echo "Extraction failed"; exit 1; }
+    touch "$EXTRACTED_FLAG"  # Create marker file
+    rm "$LOCAL_FILE"
 else
-	echo "Test data exists"
+    echo "Test data exists"
 fi
+
 
 
 # Proceed to make
