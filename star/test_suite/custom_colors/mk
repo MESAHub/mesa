@@ -28,7 +28,6 @@ done
 
 
 #!/bin/bash
-#!/bin/bash
 
 # Define remote data file locations
 PRIMARY_REMOTE_FILE="https://nialljmiller.com/media/bigdata/MESA/testdata.txz"

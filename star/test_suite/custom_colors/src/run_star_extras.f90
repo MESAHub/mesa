@@ -21,69 +21,80 @@
 !
 ! ***********************************************************************
 
-
-
 module run_star_extras
   use star_lib
   use star_def
   use const_def
   use math_lib
   use auto_diff
+  use colors_def  ! Add this line
   use colors_lib
-  use colors_def, only: colors_controls_type
+  use colors_ctrls_io  ! Add this line
   
   implicit none
   
-  ! Create a local instance of the controls
-  type(colors_controls_type) :: colors
-
-  implicit none
-
-
-!DEFINE ALL GLOCBAL VARIABLE HERE
-
-
+  ! Add a handle for colors
+  integer :: colors_handle = -1
 
   include "test_suite_extras_def.inc"
-
-  ! these routines are called by the standard run_star check_model
+  type (colors_controls_type), pointer :: local_colors_controls => null()  ! these routines are called by the standard run_star check_model
   contains
 
   include "test_suite_extras.inc"
 
 
-  subroutine extras_controls(id, ierr)
-    integer, intent(in) :: id
-    integer, intent(out) :: ierr
-    integer :: ctrl_ierr
-    type (star_info), pointer :: s
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
-       print *, "Extras startup routine"
 
-    ! Initialize the colors_controls from the defaults file
-    call read_colors_controls(colors_controls, ctrl_ierr)
-    if (ctrl_ierr /= 0) then
-        print *, "Error: Failed to read colors controls"
-    end if
-    
-    call process_color_files(id, ierr)
-    s% extras_startup => extras_startup
-    s% extras_check_model => extras_check_model
-    s% extras_finish_step => extras_finish_step
-    s% extras_after_evolve => extras_after_evolve
-    s% how_many_extra_history_columns => how_many_extra_history_columns
-    s% data_for_extra_history_columns => data_for_extra_history_columns
-    s% how_many_extra_profile_columns => how_many_extra_profile_columns
-    s% data_for_extra_profile_columns => data_for_extra_profile_columns
+    subroutine extras_controls(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      integer :: ctrl_ierr
+      type (star_info), pointer :: s
+      
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      print *, "Extras startup routine"
 
-    print *, "Sellar atmosphere:", s% x_character_ctrl(1)
-    print *, "Instrument:", s% x_character_ctrl(2)
+      ! Initialize colors module
+      call init_colors(ierr)
+      if (ierr /= 0) then
+          print *, "Error initializing colors module"
+          return
+      end if
+      
+      ! Allocate a handle
+      colors_handle = alloc_colors_handle(ierr)
+      if (ierr /= 0) then
+          print *, "Error allocating colors handle"
+          return
+      end if
+      
+      ! Get pointer to colors controls
+      call colors_ptr(colors_handle, local_colors_controls, ierr)
+      if (ierr /= 0) then
+          print *, "Error getting colors pointer"
+          return
+      end if
+      
+      ! Rest of the code remains the same
+    end subroutine extras_controls
 
-  end subroutine extras_controls
+    subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
+      ! Earlier part of the function remains the same
 
+      ! Use local_colors_controls instead of global
+      metallicity = local_colors_controls%metallicity
+      d = local_colors_controls%distance
 
+      sed_filepath = local_colors_controls%stellar_atm
+      filter_dir = local_colors_controls%instrument
+      vega_filepath = local_colors_controls%vega_sed
+      make_sed = local_colors_controls%make_csv
+
+      ! Rest of the function remains the same
+    end subroutine data_for_extra_history_columns
+
+  end module run_star_extras
 
 
 
@@ -116,20 +127,28 @@ module run_star_extras
   end subroutine extras_startup
 
 
-  subroutine extras_after_evolve(id, ierr)
-     integer, intent(in) :: id
-     integer, intent(out) :: ierr
-     type (star_info), pointer :: s
-     real(dp) :: dt
-     ierr = 0
-     call star_ptr(id, s, ierr)
-     if (ierr /= 0) return
 
-     write(*,'(a)') 'finished custom colors'
+subroutine extras_after_evolve(id, ierr)
+    integer, intent(in) :: id
+    integer, intent(out) :: ierr
+    type (star_info), pointer :: s
+    real(dp) :: dt
+    
+    ierr = 0
+    call star_ptr(id, s, ierr)
+    if (ierr /= 0) return
 
-     call test_suite_after_evolve(s, ierr)
+    write(*,'(a)') 'finished custom colors'
+    
+    ! Free the colors handle
+    if (colors_handle > 0) then
+        call free_colors_handle(colors_handle)
+        colors_handle = -1
+    end if
 
-  end subroutine extras_after_evolve
+    call test_suite_after_evolve(s, ierr)
+end subroutine extras_after_evolve
+
 
 
   ! returns either keep_going, retry, or terminate.
@@ -293,38 +312,49 @@ module run_star_extras
 
 
 
-  subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
-      ! Populates data for the extra history columns
-      integer, intent(in) :: id, n
-      integer, intent(out) :: ierr
-      character(len=maxlen_history_column_name) :: names(n)
-      real(dp) :: vals(n)
-      type(star_info), pointer :: s
-      integer :: i, num_strings
-      character(len=100), allocatable :: array_of_strings(:)
-      real(dp) :: teff, log_g, metallicity, R, d,  bolometric_magnitude, bolometric_flux
-      character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath
-      real(dp), dimension(:), allocatable :: wavelengths, fluxes, filter_wavelengths, filter_trans
-      logical :: make_sed
+subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
+    ! Populates data for the extra history columns
+    integer, intent(in) :: id, n
+    integer, intent(out) :: ierr
+    character(len=maxlen_history_column_name) :: names(n)
+    real(dp) :: vals(n)
+    type(star_info), pointer :: s
+    type (colors_controls_type), pointer :: local_colors_controls
+    integer :: i, num_strings
+    character(len=100), allocatable :: array_of_strings(:)
+    real(dp) :: teff, log_g, metallicity, R, d, bolometric_magnitude, bolometric_flux
+    character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath
+    real(dp), dimension(:), allocatable :: wavelengths, fluxes, filter_wavelengths, filter_trans
+    logical :: make_sed
 
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
+    ierr = 0
+    call star_ptr(id, s, ierr)
+    if (ierr /= 0) return
+    
 
-      ! Extract input parameters
-      teff = s%T(1)
-      log_g = LOG10(s%grav(1))
-      R = s%R(1)  
-      
-      ! Use the global colors_controls instead of job parameters
-      metallicity = colors% metallicity
-      d = colors% distance
 
-      sed_filepath = colors% stellar_atm
-      filter_dir = colors% instrument
-      vega_filepath = colors% vega_sed
-      make_sed = colors% make_csv
+    ! Ensure local_colors_controls is associated
+    if (.not. associated(local_colors_controls)) then
+        call colors_ptr(colors_handle, local_colors_controls, ierr)
+        if (ierr /= 0) return
+    end if
 
+
+    ! Extract input parameters
+    teff = s%T(1)
+    log_g = LOG10(s%grav(1))
+    R = s%R(1)  
+    
+    ! Use the controls pointer instead of global
+    metallicity = local_colors_controls%metallicity
+    d = local_colors_controls%distance
+
+    sed_filepath = colors_controls%stellar_atm
+    filter_dir = colors_controls%instrument
+    vega_filepath = colors_controls%vega_sed
+    make_sed = colors_controls%make_csv
+
+    ! Rest of the function remains the same...
       ! Read filters from file
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))
