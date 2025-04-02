@@ -92,6 +92,7 @@ contains
       ! Additional validation could go here
       
    end subroutine read_colors_controls
+   
    !************************************
    !****** Set Default Controls ********
    !************************************
@@ -130,9 +131,9 @@ contains
       
    end subroutine write_colors_controls_info
 
-
-
-
+   !*************************************************
+   !********* Read Colors Defaults ************
+   !*************************************************
 
    subroutine read_colors_defaults(filename, ctrl, ierr)
      character(len=*), intent(in) :: filename
@@ -190,13 +191,5 @@ contains
      close(unit)
      ierr = 0
    end subroutine read_colors_defaults
-
-
-
-
-
-
-
-
 
 end module colors_ctrls_io

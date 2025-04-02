@@ -24,43 +24,50 @@
 !
 ! ***********************************************************************
 
-   module colors_lib
-      use math_lib
-      use colors_def
-      use const_def
-      ! library for calculating theoretical estimates of magnitudes and colors
-      ! from Teff, L, M, and [M/H].
 
-      ! Color-magnitude data shipped with MESA is from:
-      ! Lejeune, Cuisinier, Buser (1998) A&AS 130, 65-75.
-      ! However, you add your own bolometric corrections files for mesa to use
+module colors_lib
+  use const_def!, only: dp
+  use colors_def
+  use math_lib
+  implicit none
+  !integer, parameter :: dp = kind(1.0d0)
+  contains
 
-      ! The data interface for the library is defined in colors_def
-      ! Th easiest way to get output is to add the columns to your history_columns.list file
-
-      ! The preferred way for users (in a run_star_extras routine) for accessing the colors data is to
-      ! call either get_by_by_name, get_abs_mag_by_name or get_abs_bolometric_mag. Other routines are there
-      ! to hook into the rest of MESA.
-
-      ! Routines get_bc will return the coefficients from interpolating over log Teff, log g, [M/H]
-      ! even though the tables are defined as Teff, log g, [M/H]. get_abs_mag routines return
-      ! data thats been turned into an absolute magnitude. A color can be computed by taking the difference between
-      ! two get_bc or two get_abs_mag calls.
-
-      ! Names for the filters should be unique across all data files (left to the user to enforce this).
-      ! Name matching is performed in a case sensitive manner.
-      ! The names themselves are not important as far as MESA is concerned, you can name each filter (including the
-      ! ones MESA ships by defaults) by what ever name you want by editing the data file(s) and changing the names in the header.
-      ! MESA does not rely on any particlaur band existing.
-
-      implicit none
-
-
-      contains  ! the procedure interface for the library
-      ! client programs should only call these routines.
-
-
-
+  ! Initialize colors module
+  subroutine colors_init(ierr)
+    integer, intent(out) :: ierr
+    integer :: i
+    
+    ierr = 0
+    if (colors_is_initialized) return
+    
+    ! Initialize all handles
+    do i=1, max_colors_handles
+      colors_handles(i)% handle = i
+      colors_handles(i)% in_use = .false.
+    end do
+    
+    ! Set default values for the global instance
+    call set_default_colors_controls(colors_controls)
+    
+    colors_is_initialized = .true.
+  end subroutine colors_init
+  
+  
+  ! Set default controls (similar to set_default_kap_controls)
+  subroutine set_default_colors_controls(ctrl)
+    type (colors_controls_type), intent(out) :: ctrl
+    
+    ! Set default values
+    ctrl% instrument = 'data/filters/GAIA/GAIA'
+    ctrl% vega_sed = 'data/stellar_models/vega_flam.csv'
+    ctrl% stellar_atm = 'data/stellar_models/Kurucz2003all/'
+    ctrl% metallicity = 0.0d0
+    ctrl% distance = 3.0857d17  ! 10pc for abs mag
+    ctrl% make_csv = .false.
+    ctrl% use_colors = .true.
+  end subroutine set_default_colors_controls
+  
 
    !###########################################################
    !## CUSTOM COLOURS
@@ -1571,25 +1578,6 @@
 
      END SUBROUTINE loadsed
 
-
-
-
-!things needed to make it compile
-
-
-subroutine colors_init(num_files,fnames,num_colors,ierr)
-   integer, intent(in) :: num_files
-   integer, dimension(:), intent(in) :: num_colors
-   character(len=*), dimension(:), intent(in) :: fnames
-   integer, intent(out) :: ierr
-   ierr=0
-end subroutine colors_init
-
-
-
-subroutine colors_shutdown ()
- 
-end subroutine colors_shutdown
 
 
 

@@ -23,13 +23,17 @@
 !
 !
 ! ***********************************************************************
+
+
+
+
 module mod_colors
   use colors_def
   use math_lib
   use const_def
   use utils_lib
   use colors_ctrls_io
-
+  
   implicit none
   private
 
@@ -39,11 +43,20 @@ module mod_colors
 
   subroutine init_colors(ierr)
     integer, intent(out) :: ierr
+    integer :: handle
+    type (colors_controls_type), pointer :: ctrl
     
-    ! Initialize colors by reading controls
-    call read_colors_controls(colors_controls, ierr)
+    ! Initialize colors system
+    call colors_init(ierr)
     if (ierr /= 0) then
       write(*,*) 'Error initializing colors module'
+      return
+    end if
+    
+    ! Initialize the global instance
+    call read_colors_controls(colors_controls, ierr)
+    if (ierr /= 0) then
+      write(*,*) 'Error reading colors controls'
       return
     end if
     
@@ -56,4 +69,3 @@ module mod_colors
   end subroutine shutdown_colors
 
 end module mod_colors
-
