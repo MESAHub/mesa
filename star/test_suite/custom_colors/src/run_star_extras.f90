@@ -23,16 +23,19 @@
 
 
 
-
-
 module run_star_extras
-
   use star_lib
   use star_def
   use const_def
   use math_lib
   use auto_diff
   use colors_lib
+  use colors_def, only: colors_controls_type
+  
+  implicit none
+  
+  ! Create a local instance of the controls
+  type(colors_controls_type) :: colors
 
   implicit none
 
@@ -52,12 +55,19 @@ module run_star_extras
   subroutine extras_controls(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
+    integer :: ctrl_ierr
     type (star_info), pointer :: s
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
        print *, "Extras startup routine"
 
+    ! Initialize the colors_controls from the defaults file
+    call read_colors_controls(colors_controls, ctrl_ierr)
+    if (ctrl_ierr /= 0) then
+        print *, "Error: Failed to read colors controls"
+    end if
+    
     call process_color_files(id, ierr)
     s% extras_startup => extras_startup
     s% extras_check_model => extras_check_model
@@ -307,13 +317,13 @@ module run_star_extras
       R = s%R(1)  
       
       ! Use the global colors_controls instead of job parameters
-      metallicity = colors_controls% metallicity
-      d = colors_controls% distance
+      metallicity = colors% metallicity
+      d = colors% distance
 
-      sed_filepath = colors_controls% stellar_atm
-      filter_dir = colors_controls% instrument
-      vega_filepath = colors_controls% vega_sed
-      make_sed = colors_controls% make_csv
+      sed_filepath = colors% stellar_atm
+      filter_dir = colors% instrument
+      vega_filepath = colors% vega_sed
+      make_sed = colors% make_csv
 
       ! Read filters from file
       if (allocated(array_of_strings)) deallocate(array_of_strings)
