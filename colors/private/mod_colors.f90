@@ -23,17 +23,37 @@
 !
 !
 ! ***********************************************************************
+module mod_colors
+  use colors_def
+  use math_lib
+  use const_def
+  use utils_lib
+  use colors_controls_io
 
-   module mod_colors
-      use colors_def
-      use math_lib
-      use const_def
-      use utils_lib
+  implicit none
+  private
 
-      implicit none
-      private
+  public :: init_colors, shutdown_colors
 
-      contains
+  contains
 
-      end module mod_colors
+  subroutine init_colors(ierr)
+    integer, intent(out) :: ierr
+    
+    ! Initialize colors by reading controls
+    call read_colors_controls(colors_controls, ierr)
+    if (ierr /= 0) then
+      write(*,*) 'Error initializing colors module'
+      return
+    end if
+    
+    ! Output the configuration
+    call write_colors_controls_info(colors_controls, 6) ! 6 is stdout
+  end subroutine init_colors
+  
+  subroutine shutdown_colors()
+    ! Any cleanup needed
+  end subroutine shutdown_colors
+
+end module mod_colors
 
