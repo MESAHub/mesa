@@ -304,14 +304,16 @@ module run_star_extras
       ! Extract input parameters
       teff = s%T(1)
       log_g = LOG10(s%grav(1))
-      R = s%R(1)  ! * 1d3
-      metallicity = s%job%extras_rpar(1)
-      d = s%job%extras_rpar(2)
+      R = s%R(1)  
+      
+      ! Use the global colors_controls instead of job parameters
+      metallicity = colors_controls% metallicity
+      d = colors_controls% distance
 
-      sed_filepath = s%x_character_ctrl(1)
-      filter_dir = s%x_character_ctrl(2)
-      vega_filepath = s%x_character_ctrl(3)
-      make_sed = trim(adjustl(s%x_character_ctrl(4))) == 'true'
+      sed_filepath = colors_controls% stellar_atm
+      filter_dir = colors_controls% instrument
+      vega_filepath = colors_controls% vega_sed
+      make_sed = colors_controls% make_csv
 
       ! Read filters from file
       if (allocated(array_of_strings)) deallocate(array_of_strings)

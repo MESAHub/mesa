@@ -24,10 +24,29 @@
 !
 ! ***********************************************************************
 
-      module colors_def
-      use const_def, only : strlen, dp
-      implicit none
-      integer :: bc_total_num_colors
-      
-      end module colors_def
 
+module colors_def
+use const_def, only : strlen, dp
+implicit none
+integer :: bc_total_num_colors
+
+! Add the controls structure definition
+type :: colors_controls_type
+  ! Paths and filenames
+  character(len=256) :: instrument
+  character(len=256) :: vega_sed
+  character(len=256) :: stellar_atm
+  
+  ! Numeric parameters
+  real(dp) :: metallicity
+  real(dp) :: distance
+  
+  ! Boolean controls
+  logical :: make_csv
+  logical :: use_colors
+end type colors_controls_type
+
+! Global instance of the controls
+type(colors_controls_type) :: colors_controls
+
+end module colors_def
