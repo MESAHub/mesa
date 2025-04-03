@@ -1,1 +1,5 @@
-cd make; make
+cd make
+make 
+echo "Made"
+make install
+echo "installed"

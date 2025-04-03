@@ -25,12 +25,19 @@
 ! ***********************************************************************
 
 
+
+! Add at the top of the file, right after the module declaration and use statements:
+
 module colors_lib
   use const_def!, only: dp
   use colors_def
   use math_lib
   implicit none
   !integer, parameter :: dp = kind(1.0d0)
+  
+  ! Make this function public
+  public :: colors_shutdown
+  
   contains
 
   ! Initialize colors module
@@ -52,6 +59,20 @@ module colors_lib
     
     colors_is_initialized = .true.
   end subroutine colors_init
+  
+  ! Add the missing shutdown function
+  subroutine colors_shutdown()
+    integer :: i
+    
+    ! Free all handles
+    do i = 1, max_colors_handles
+      if (colors_handles(i)% in_use) then
+        colors_handles(i)% in_use = .false.
+      end if
+    end do
+    
+    colors_is_initialized = .false.
+  end subroutine colors_shutdown
   
   
   ! Set default controls (similar to set_default_kap_controls)

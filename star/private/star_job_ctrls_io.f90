@@ -1140,8 +1140,8 @@
          special_rate_factor(:) = 1d0
          filename_of_special_rate(:) = ''
          reaction_for_special_factor(:) = ''
-         color_num_colors(:) = 0
-         color_file_names(:) = ''
+         !color_num_colors(:) = 0
+         !color_file_names(:) = ''
          include 'star_job.defaults'
          include 'star_job_dev.defaults'
       end subroutine set_default_star_job_controls
@@ -1672,9 +1672,9 @@
          filename_of_special_rate = s% job% filename_of_special_rate
 
          reaction_for_special_factor = s% job% reaction_for_special_factor
-         color_num_files = s% job% color_num_files
-         color_file_names = s% job% color_file_names
-         color_num_colors = s% job% color_num_colors
+         !color_num_files = s% job% color_num_files
+         !color_file_names = s% job% color_file_names
+         !color_num_colors = s% job% color_num_colors
 
          warn_run_star_extras = s% job% warn_run_star_extras
          report_garbage_collection = s% job% report_garbage_collection

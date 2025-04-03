@@ -175,8 +175,8 @@
             s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
             s% job% eosDT_cache_dir, &
             s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
-            s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
+            !s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
       end subroutine starlib_init
 
 
@@ -191,8 +191,8 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
+            !color_num_files,color_file_names,color_num_colors,&
          use init, only: do_star_init
          character (len=*), intent(in) :: &
             my_mesa_dir, chem_isotopes_filename, net_reaction_filename, &
@@ -205,9 +205,9 @@
          real(dp), intent(in) :: &
             reaclib_min_T9
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
-         integer, intent(in) :: color_num_files
-         character (len=*), intent(in) :: color_file_names(:)
-         integer , intent(in):: color_num_colors(:)
+         !integer, intent(in) :: color_num_files
+         !character (len=*), intent(in) :: color_file_names(:)
+         !integer , intent(in):: color_num_colors(:)
          integer, intent(out) :: ierr
          call do_star_init( &
             my_mesa_dir, &
@@ -220,8 +220,8 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
+            !color_num_files,color_file_names,color_num_colors,&
       end subroutine do_starlib_init
 
 

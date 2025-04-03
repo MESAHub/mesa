@@ -24,15 +24,13 @@
 !
 ! ***********************************************************************
 
-
-
-
 module mod_colors
   use colors_def
   use math_lib
   use const_def
   use utils_lib
   use colors_ctrls_io
+  use colors_lib, only: colors_init, colors_shutdown
   
   implicit none
   private
@@ -54,10 +52,13 @@ module mod_colors
     end if
     
     ! Initialize the global instance
+    call set_default_colors_controls(colors_controls)
+    
+    ! Try to read from the defaults file
     call read_colors_controls(colors_controls, ierr)
     if (ierr /= 0) then
-      write(*,*) 'Error reading colors controls'
-      return
+      write(*,*) 'Warning: Error reading colors controls, using defaults'
+      ierr = 0 ! Continue with defaults
     end if
     
     ! Output the configuration
@@ -65,7 +66,8 @@ module mod_colors
   end subroutine init_colors
   
   subroutine shutdown_colors()
-    ! Any cleanup needed
+    ! Call the primary shutdown function
+    call colors_shutdown()
   end subroutine shutdown_colors
 
 end module mod_colors
