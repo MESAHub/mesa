@@ -43,10 +43,7 @@ module run_star_extras
   include "test_suite_extras.inc"
 
 
-
-
-
-  subroutine extras_controls(id, ierr)
+subroutine extras_controls(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
     integer :: ctrl_ierr
@@ -78,12 +75,13 @@ module run_star_extras
         return
     end if
     
-    ! Initialize the colors_controls from the defaults file
-    call read_colors_controls(local_colors_controls, ctrl_ierr)
-    if (ctrl_ierr /= 0) then
-        print *, "Error: Failed to read colors controls"
-    end if
+    ! Just use the default values directly - simpler approach
+    call set_default_colors_controls(local_colors_controls)
     
+    ! Copy to global controls for compatibility
+    colors_controls = local_colors_controls
+    
+    ! Do other initialization
     call process_color_files(id, ierr)
     s% extras_startup => extras_startup
     s% extras_check_model => extras_check_model
@@ -93,13 +91,10 @@ module run_star_extras
     s% data_for_extra_history_columns => data_for_extra_history_columns
     s% how_many_extra_profile_columns => how_many_extra_profile_columns
     s% data_for_extra_profile_columns => data_for_extra_profile_columns
-
-    print *, "Stellar atmosphere:", s% x_character_ctrl(1)
-    print *, "Instrument:", s% x_character_ctrl(2)
-  end subroutine extras_controls
-
-
-
+    
+    print *, "Stellar atmosphere:", trim(local_colors_controls% stellar_atm)
+    print *, "Instrument:", trim(local_colors_controls% instrument)
+end subroutine extras_controls
 
 !###########################################################
 !## THINGS I HAVE NOT TOUCHED
@@ -314,7 +309,6 @@ end subroutine extras_after_evolve
   end subroutine read_strings_from_file
 
 
-
 subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
     ! Populates data for the extra history columns
     integer, intent(in) :: id, n
@@ -322,7 +316,6 @@ subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
     character(len=maxlen_history_column_name) :: names(n)
     real(dp) :: vals(n)
     type(star_info), pointer :: s
-    type (colors_controls_type), pointer :: local_colors_controls
     integer :: i, num_strings
     character(len=100), allocatable :: array_of_strings(:)
     real(dp) :: teff, log_g, metallicity, R, d, bolometric_magnitude, bolometric_flux
@@ -339,54 +332,57 @@ subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
     log_g = LOG10(s%grav(1))
     R = s%R(1)  
     
-    ! Use the controls pointer instead of global
-    metallicity = local_colors_controls%metallicity
-    d = local_colors_controls%distance
+    ! Use locally initialized controls rather than global
+    ! Makes sure we're using properly initialized values
+    if (.not. associated(local_colors_controls)) then
+        metallicity = 0.0d0 ! default
+        d = 3.0857d17 ! default (10 pc)
+        sed_filepath = 'data/stellar_models/Kurucz2003all/' ! default
+        filter_dir = 'data/filters/GAIA/GAIA' ! default
+        vega_filepath = 'data/stellar_models/vega_flam.csv' ! default
+        make_sed = .false. ! default
+    else
+        metallicity = local_colors_controls%metallicity
+        d = local_colors_controls%distance
+        sed_filepath = local_colors_controls%stellar_atm
+        filter_dir = local_colors_controls%instrument
+        vega_filepath = local_colors_controls%vega_sed
+        make_sed = local_colors_controls%make_csv
+    end if
 
-    sed_filepath = colors_controls%stellar_atm
-    filter_dir = colors_controls%instrument
-    vega_filepath = colors_controls%vega_sed
-    make_sed = colors_controls%make_csv
+    ! Read filters from file
+    if (allocated(array_of_strings)) deallocate(array_of_strings)
+    allocate(array_of_strings(n))
+    call read_strings_from_file(array_of_strings, num_strings, id)
 
-    ! Rest of the function remains the same...
-      ! Read filters from file
-      if (allocated(array_of_strings)) deallocate(array_of_strings)
-      allocate(array_of_strings(n))
-      call read_strings_from_file(array_of_strings, num_strings, id)
+    ! Compute bolometric values
+    CALL calculatebolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
+    names(1) = "Mag_bol"
+    vals(1) = bolometric_magnitude
+    names(2) = "Flux_bol"
+    vals(2) = bolometric_flux
 
-      !PRINT *, "################################################"
+    ! Populate history columns
+    if (allocated(array_of_strings)) then
+        do i = 3, how_many_extra_history_columns(id)
+            filter_name = "Unknown"
+            if (i <= num_strings + 2) filter_name = trim(remove_dat(array_of_strings(i - 2)))
+            names(i) = filter_name
+            filter_filepath = trim(filter_dir) // "/" // array_of_strings(i - 2)
 
-      ! Compute bolometric values
-      CALL calculatebolometric(teff, log_g, metallicity, R, d,  bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
-      names(1) = "Mag_bol"
-      vals(1) = bolometric_magnitude
-      names(2) = "Flux_bol"
-      vals(2) = bolometric_flux
+            if (teff >= 0 .and. log_g >= 0 .and. metallicity >= 0) then
+                vals(i) = calculatesynthetic(teff, log_g, metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath, vega_filepath, array_of_strings(i - 2), make_sed)
+                if (ierr /= 0) vals(i) = -1.0_dp
+            else
+                vals(i) = -1.0_dp
+                ierr = 1
+            end if
+        end do
+    else
+        ierr = 1  ! Indicate an error if array_of_strings is not allocated
+    end if
 
-      ! Populate history columns
-      if (allocated(array_of_strings)) then
-          do i = 3, how_many_extra_history_columns(id)
-              filter_name = "Unknown"
-              if (i <= num_strings + 2) filter_name = trim(remove_dat(array_of_strings(i - 2)))
-              names(i) = filter_name
-              filter_filepath = trim(filter_dir) // "/" // array_of_strings(i - 2)
-
-              if (teff >= 0 .and. log_g >= 0 .and. metallicity >= 0) then
-                  vals(i) = calculatesynthetic(teff, log_g, metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath, vega_filepath, array_of_strings(i - 2), make_sed)
-                  if (ierr /= 0) vals(i) = -1.0_dp
-              else
-                  vals(i) = -1.0_dp
-                  ierr = 1
-              end if
-              !PRINT *, names(i), vals(i)
-          end do
-      else
-          ierr = 1  ! Indicate an error if array_of_strings is not allocated
-      end if
-
-      if (allocated(array_of_strings)) deallocate(array_of_strings)
-  end subroutine data_for_extra_history_columns
-
-
+    if (allocated(array_of_strings)) deallocate(array_of_strings)
+end subroutine data_for_extra_history_columns
 
 end module run_star_extras

@@ -17,9 +17,9 @@ rm -rf ../data/colors_data
 check_okay
 mkdir ../data/colors_data
 check_okay
-cp data/lcb98cor.dat ../data/colors_data
-cp data/blackbody_johnson.dat ../data/colors_data
-check_okay
+#cp data/lcb98cor.dat ../data/colors_data
+#cp data/blackbody_johnson.dat ../data/colors_data
+#check_okay
 echo "done"
 
 cd ..

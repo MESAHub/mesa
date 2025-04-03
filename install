@@ -327,7 +327,10 @@ if [ ! -r data/colors_data ]
 then
 	do_input_data colors
 fi
-do_one_parallel colors
+#do_one_parallel colors
+cd colors/
+./mk
+cd ../
 
 # get rid of obsolete eos_data directory
 rm -rf data/eos_data
