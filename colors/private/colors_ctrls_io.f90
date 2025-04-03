@@ -25,22 +25,22 @@
 module colors_ctrls_io
    use const_def
    use colors_def
-   
+
    implicit none
-   
+
    ! Module variables
    integer, parameter :: colors_namelist_id = 17  ! Choose a unique ID
-   
+
 contains
 
    !************************************
    !******* Read Colors Controls *******
    !************************************
-   
+
    subroutine read_colors_controls(ctrl, ierr)
       type(colors_controls_type), intent(inout) :: ctrl
       integer, intent(out) :: ierr
-      
+
       ! Local variables for namelist (MUST be declared at the beginning)
       character(len=256) :: color_instrument
       character(len=256) :: color_vega_sed
@@ -49,21 +49,21 @@ contains
       real(dp) :: color_d
       logical :: color_make_csv
       logical :: do_colors
-      
+
       ! Define the namelist
       namelist /colors_controls/ color_instrument, color_vega_sed, color_make_csv, &
                                 color_atm, color_z, color_d, do_colors
-      
+
       ! Set default ierr
       ierr = 0
-      
+
       ! First try to read from the defaults file
       call read_colors_defaults('colors.defaults', ctrl, ierr)
       if (ierr /= 0) then
         ! If fails, fall back to hardcoded defaults
         call set_default_colors_controls(ctrl)
       end if
-      
+
       ! Set namelist variables from ctrl values
       color_instrument = ctrl% instrument
       color_vega_sed = ctrl% vega_sed
@@ -72,14 +72,14 @@ contains
       color_d = ctrl% distance
       color_make_csv = ctrl% make_csv
       do_colors = ctrl% use_colors
-      
+
       ! Read controls from input file
       read(colors_namelist_id, nml=colors_controls, iostat=ierr)
       if (ierr /= 0) then
         write(*,*) 'error reading colors_controls namelist'
         return
       end if
-      
+
       ! Update ctrl from local variables
       ctrl% instrument = color_instrument
       ctrl% vega_sed = color_vega_sed
@@ -88,18 +88,18 @@ contains
       ctrl% distance = color_d
       ctrl% make_csv = color_make_csv
       ctrl% use_colors = do_colors
-      
+
       ! Additional validation could go here
-      
+
    end subroutine read_colors_controls
-   
+
    !************************************
    !****** Set Default Controls ********
    !************************************
-   
+
    subroutine set_default_colors_controls(ctrl)
       type (colors_controls_type), intent(out) :: ctrl
-      
+
       ! Set default values
       ctrl% instrument = 'data/filters/GAIA/GAIA'
       ctrl% vega_sed = 'data/stellar_models/vega_flam.csv'
@@ -108,17 +108,17 @@ contains
       ctrl% distance = 3.0857d17  ! 10pc for abs mag
       ctrl% make_csv = .false.
       ctrl% use_colors = .true.
-      
+
    end subroutine set_default_colors_controls
-   
+
    !*************************************************
    !********* Write Colors Controls Info ************
    !*************************************************
-   
+
    subroutine write_colors_controls_info(ctrl, io)
       type (colors_controls_type), intent(in) :: ctrl
       integer, intent(in) :: io
-      
+
       write(io,'(A)') '================ Colors Controls ================'
       write(io,'(A,A)') ' instrument: ', trim(ctrl% instrument)
       write(io,'(A,A)') ' vega_sed: ', trim(ctrl% vega_sed)
@@ -128,7 +128,7 @@ contains
       write(io,'(A,L1)') ' make_csv: ', ctrl% make_csv
       write(io,'(A,L1)') ' use_colors: ', ctrl% use_colors
       write(io,'(A)') '================================================='
-      
+
    end subroutine write_colors_controls_info
 
    !*************************************************
@@ -139,13 +139,13 @@ contains
      character(len=*), intent(in) :: filename
      type(colors_controls_type), intent(out) :: ctrl
      integer, intent(out) :: ierr
-     
+
      integer :: unit, status
      character(len=256) :: line, key, value
-     
+
      ! Set defaults first
      call set_default_colors_controls(ctrl)
-     
+
      ! Open the defaults file
      unit = 20
      open(unit, file=filename, status='old', action='read', iostat=status)
@@ -154,23 +154,23 @@ contains
        ierr = 1
        return
      end if
-     
+
      ! Read key-value pairs
      do
        read(unit, '(A)', iostat=status) line
        if (status /= 0) exit
-       
+
        ! Skip comments and empty lines
        line = adjustl(line)
        if (line == '' .or. line(1:1) == '!' .or. line(1:1) == '#') cycle
-       
+
        ! Parse key = value
        if (index(line, '=') > 0) then
          key = line(1:index(line, '=')-1)
          value = line(index(line, '=')+1:)
          key = adjustl(trim(key))
          value = adjustl(trim(value))
-         
+
          ! Set the appropriate control value
          if (key == 'color_instrument') then
            ctrl% instrument = value
@@ -187,7 +187,7 @@ contains
          end if
        end if
      end do
-     
+
      close(unit)
      ierr = 0
    end subroutine read_colors_defaults

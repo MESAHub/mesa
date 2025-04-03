@@ -1,9 +1,10 @@
+import csv
+import os
+import re
+import time
+
 import requests
 from bs4 import BeautifulSoup
-import os
-import csv
-import time
-import re
 
 
 def clean_metadata_values(metadata):

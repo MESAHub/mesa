@@ -29,56 +29,56 @@
 ! Add at the top of the file, right after the module declaration and use statements:
 
 module colors_lib
-  use const_def!, only: dp
+  use const_def  !, only: dp
   use colors_def
   use math_lib
   implicit none
   !integer, parameter :: dp = kind(1.0d0)
-  
+
   ! Make this function public
   public :: colors_shutdown
-  
+
   contains
 
   ! Initialize colors module
   subroutine colors_init(ierr)
     integer, intent(out) :: ierr
     integer :: i
-    
+
     ierr = 0
     if (colors_is_initialized) return
-    
+
     ! Initialize all handles
     do i=1, max_colors_handles
       colors_handles(i)% handle = i
       colors_handles(i)% in_use = .false.
     end do
-    
+
     ! Set default values for the global instance
     call set_default_colors_controls(colors_controls)
-    
+
     colors_is_initialized = .true.
   end subroutine colors_init
-  
+
   ! Add the missing shutdown function
   subroutine colors_shutdown()
     integer :: i
-    
+
     ! Free all handles
     do i = 1, max_colors_handles
       if (colors_handles(i)% in_use) then
         colors_handles(i)% in_use = .false.
       end if
     end do
-    
+
     colors_is_initialized = .false.
   end subroutine colors_shutdown
-  
-  
+
+
   ! Set default controls (similar to set_default_kap_controls)
   subroutine set_default_colors_controls(ctrl)
     type (colors_controls_type), intent(out) :: ctrl
-    
+
     ! Set default values
     ctrl% instrument = 'data/filters/GAIA/GAIA'
     ctrl% vega_sed = 'data/stellar_models/vega_flam.csv'
@@ -88,7 +88,7 @@ module colors_lib
     ctrl% make_csv = .false.
     ctrl% use_colors = .true.
   end subroutine set_default_colors_controls
-  
+
 
    !###########################################################
    !## CUSTOM COLOURS
@@ -1254,7 +1254,6 @@ module colors_lib
 
 
    FUNCTION det3(M) RESULT(d)
-     IMPLICIT NONE
      REAL(8), INTENT(IN) :: M(3,3)
      REAL(8) :: d
      d = M(1,1)*(M(2,2)*M(3,3) - M(2,3)*M(3,2)) - &
@@ -1263,7 +1262,6 @@ module colors_lib
    END FUNCTION det3
 
    SUBROUTINE ComputeBarycentrics(P, P0, P1, P2, P3, bary)
-     IMPLICIT NONE
      REAL(8), INTENT(IN) :: P(3), P0(3), P1(3), P2(3), P3(3)
      REAL(8), INTENT(OUT) :: bary(4)
      REAL(8) :: M(3,3), d, d0, d1, d2, d3
@@ -1302,13 +1300,12 @@ module colors_lib
 
    SUBROUTINE findenclosingsimplex(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, &
                                      simplex_indices, bary_weights)
-     IMPLICIT NONE
      INTEGER, PARAMETER :: DP = KIND(1.0D0)
      REAL(8), INTENT(IN) :: teff, log_g, metallicity
      REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
      INTEGER, ALLOCATABLE, INTENT(OUT) :: simplex_indices(:)
      REAL(DP), ALLOCATABLE, INTENT(OUT) :: bary_weights(:)
-     
+
      INTEGER :: i, num_points, j, temp_index, k
      REAL(8), ALLOCATABLE :: dists(:)
      REAL(8), DIMENSION(3) :: P, P0, P1, P2, P3
@@ -1322,10 +1319,10 @@ module colors_lib
 
      ! Set a tolerance appropriate for normalized values (e.g., 1e-3)
      tol = 1.0D-3
-     
+
      num_points = SIZE(lu_teff)
      ALLOCATE(dists(num_points))
-     
+
      ! Compute min and max from the lookup arrays
      teff_min = MINVAL(lu_teff)
      teff_max = MAXVAL(lu_teff)
@@ -1333,13 +1330,13 @@ module colors_lib
      logg_max = MAXVAL(lu_logg)
      meta_min = MINVAL(lu_meta)
      meta_max = MAXVAL(lu_meta)
-     
+
      ! Normalize the query point
      t_norm = (teff - teff_min) / (teff_max - teff_min)
      g_norm = (log_g - logg_min) / (logg_max - logg_min)
      m_norm = (metallicity - meta_min) / (meta_max - meta_min)
      P = [ t_norm, g_norm, m_norm ]
-     
+
      ! Compute distances for each lookup point in normalized space.
      DO i = 1, num_points
        pt(1) = (lu_teff(i) - teff_min) / (teff_max - teff_min)
@@ -1386,7 +1383,7 @@ module colors_lib
      p3t(1) = (lu_teff(simplex_indices(4)) - teff_min) / (teff_max - teff_min)
      p3t(2) = (lu_logg(simplex_indices(4)) - logg_min) / (logg_max - logg_min)
      p3t(3) = (lu_meta(simplex_indices(4)) - meta_min) / (meta_max - meta_min)
-     
+
      P0 = p0t
      P1 = p1t
      P2 = p2t
@@ -1394,7 +1391,7 @@ module colors_lib
 
      ! Compute barycentrics in normalized space
      CALL ComputeBarycentrics(P, P0, P1, P2, P3, bary)
-     
+
      ! If any barycentric is less than -tol, consider the tetrahedron degenerate
      IF ( ANY(bary < -tol) ) THEN
        PRINT *, "Warning: Degenerate tetrahedron. Using inverse-distance weighting fallback."
@@ -1425,7 +1422,6 @@ module colors_lib
    SUBROUTINE constructsed_Robust(teff, log_g, metallicity, R, d,  &
             file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir,  &
             wavelengths, fluxes)
-     IMPLICIT NONE
      INTEGER, PARAMETER :: DP = KIND(1.0D0)
      ! Inputs
      REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
@@ -1494,7 +1490,7 @@ module colors_lib
 
      ! Clean up
      DEALLOCATE(common_wavelengths, interp_flux)
-     
+
    END SUBROUTINE constructsed_Robust
 
 
@@ -1512,7 +1508,7 @@ module colors_lib
 
      ! Load the SED from the file.
      CALL loadsed(TRIM(filename), index, temp_wavelengths, temp_flux)
-     
+
      ! Check that the loaded data arrays have at least 2 points.
      IF (SIZE(temp_wavelengths) < 2 .OR. SIZE(temp_flux) < 2) THEN
        PRINT *, "Error: Loaded SED arrays are too small."
@@ -1522,7 +1518,7 @@ module colors_lib
      ! Allocate flux_out to match the size of the common wavelength grid.
      n = SIZE(common_wavelengths)
      ALLOCATE(flux_out(n))
-     
+
      ! Interpolate the loaded SED onto the common wavelength grid.
      CALL interpolatearray(temp_wavelengths, temp_flux, common_wavelengths, flux_out)
 
@@ -1605,9 +1601,9 @@ module colors_lib
 real(dp) function get_bc_by_name(name,log_Teff,log_g, M_div_h, ierr)
 ! input
 character(len=*),intent(in) :: name
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: log_g ! log_10 of surface gravity
-real(dp), intent(in) :: M_div_h ! [M/H]
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+real(dp), intent(in) :: M_div_h  ! [M/H]
 integer, intent(inout) :: ierr
 integer :: i,j,n_colors
 
@@ -1623,9 +1619,9 @@ end function get_bc_by_name
 real(dp) function get_bc_by_id(id,log_Teff,log_g, M_div_h, ierr)
 ! input
 integer, intent(in) :: id
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: log_g ! log_10 of surface gravity
-real(dp), intent(in) :: M_div_h ! [M/H]
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+real(dp), intent(in) :: M_div_h  ! [M/H]
 integer, intent(inout) :: ierr
 character(len=strlen) :: name
 
@@ -1666,7 +1662,7 @@ end function get_bc_name_by_id
 
 real(dp) function get_abs_bolometric_mag(lum)
 use const_def
-real(dp), intent(in) :: lum ! Luminsoity in lsun units
+real(dp), intent(in) :: lum  ! Luminsoity in lsun units
 
 get_abs_bolometric_mag = -99.9d0
 
@@ -1679,10 +1675,10 @@ end function get_abs_bolometric_mag
 real(dp) function get_abs_mag_by_name(name,log_Teff,log_g, M_div_h,lum, ierr)
 ! input
 character(len=*) :: name
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: M_div_h ! [M/H]
-real(dp), intent(in) :: log_g ! log_10 of surface gravity
-real(dp), intent(in) :: lum ! Luminsoity in lsun units
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: M_div_h  ! [M/H]
+real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+real(dp), intent(in) :: lum  ! Luminsoity in lsun units
 integer, intent(inout) :: ierr
 
 ierr=0
@@ -1697,10 +1693,10 @@ end function get_abs_mag_by_name
 real(dp) function get_abs_mag_by_id(id,log_Teff,log_g, M_div_h,lum, ierr)
 ! input
 integer, intent(in) :: id
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: log_g ! log_10 of surface gravity
-real(dp), intent(in) :: M_div_h ! [M/H]
-real(dp), intent(in) :: lum ! Luminsoity in lsun units
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+real(dp), intent(in) :: M_div_h  ! [M/H]
+real(dp), intent(in) :: lum  ! Luminsoity in lsun units
 integer, intent(inout) :: ierr
 character(len=strlen) :: name
 
@@ -1714,8 +1710,8 @@ end function get_abs_mag_by_id
 
 subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
 ! input
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: M_div_h ! [M/H]
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: M_div_h  ! [M/H]
 ! output
 real(dp),dimension(:), intent(out) :: results
 real(dp), intent(in) :: log_g
@@ -1733,10 +1729,10 @@ end subroutine get_bcs_all
 real(dp) function get_lum_band_by_name(name,log_Teff,log_g, M_div_h, lum, ierr)
 ! input
 character(len=*) :: name
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: M_div_h ! [M/H]
-real(dp), intent(in) :: log_g ! log_10 of surface gravity
-real(dp), intent(in) :: lum ! Total luminsoity in lsun units
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: M_div_h  ! [M/H]
+real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
 real(dp) :: solar_abs_mag, star_abs_mag
 integer, intent(inout) :: ierr
 
@@ -1749,10 +1745,10 @@ end function get_lum_band_by_name
 real(dp) function get_lum_band_by_id(id,log_Teff,log_g, M_div_h, lum, ierr)
 ! input
 integer, intent(in) :: id
-real(dp), intent(in) :: log_Teff ! log10 of surface temp
-real(dp), intent(in) :: log_g ! log_10 of surface gravity
-real(dp), intent(in) :: M_div_h ! [M/H]
-real(dp), intent(in) :: lum ! Total luminsoity in lsun units
+real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+real(dp), intent(in) :: M_div_h  ! [M/H]
+real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
 real(dp) :: solar_abs_mag, star_abs_mag
 integer, intent(inout) :: ierr
 
@@ -1760,6 +1756,33 @@ ierr=0
 get_lum_band_by_id=-99.d0
 
 end function get_lum_band_by_id
+
+
+
+
+
+
+
+subroutine test_suite_startup(s, restart, ierr)
+  use star_def, only: star_info
+  type(star_info), pointer :: s
+  logical, intent(in) :: restart
+  integer, intent(out) :: ierr
+  ierr = 0
+end subroutine test_suite_startup
+
+subroutine test_suite_after_evolve(s, ierr)
+  use star_def, only: star_info
+  type(star_info), pointer :: s
+  integer, intent(out) :: ierr
+  ierr = 0
+end subroutine test_suite_after_evolve
+
+
+
+
+
+
 
    end module colors_lib
 
