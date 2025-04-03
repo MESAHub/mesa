@@ -50,6 +50,8 @@ clean:
 install:
 	@$(CP_IF_NEWER) colors_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) colors_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) colors_ctrls_io.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) mod_colors.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 
 nodeps : $(.DEFAULT_GOAL)
