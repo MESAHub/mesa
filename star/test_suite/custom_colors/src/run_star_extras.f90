@@ -27,9 +27,8 @@ module run_star_extras
   use const_def
   use math_lib
   use auto_diff
-  use colors_def  ! Add this line
+  use colors_def
   use colors_lib
-  use colors_ctrls_io  ! Add this line
   
   implicit none
   
@@ -37,64 +36,68 @@ module run_star_extras
   integer :: colors_handle = -1
 
   include "test_suite_extras_def.inc"
-  type (colors_controls_type), pointer :: local_colors_controls => null()  ! these routines are called by the standard run_star check_model
+  type (colors_controls_type), pointer :: local_colors_controls => null()
+  ! these routines are called by the standard run_star check_model
   contains
 
   include "test_suite_extras.inc"
 
 
 
-    subroutine extras_controls(id, ierr)
-      integer, intent(in) :: id
-      integer, intent(out) :: ierr
-      integer :: ctrl_ierr
-      type (star_info), pointer :: s
-      
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      print *, "Extras startup routine"
 
-      ! Initialize colors module
-      call init_colors(ierr)
-      if (ierr /= 0) then
-          print *, "Error initializing colors module"
-          return
-      end if
-      
-      ! Allocate a handle
-      colors_handle = alloc_colors_handle(ierr)
-      if (ierr /= 0) then
-          print *, "Error allocating colors handle"
-          return
-      end if
-      
-      ! Get pointer to colors controls
-      call colors_ptr(colors_handle, local_colors_controls, ierr)
-      if (ierr /= 0) then
-          print *, "Error getting colors pointer"
-          return
-      end if
-      
-      ! Rest of the code remains the same
-    end subroutine extras_controls
 
-    subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
-      ! Earlier part of the function remains the same
+  subroutine extras_controls(id, ierr)
+    integer, intent(in) :: id
+    integer, intent(out) :: ierr
+    integer :: ctrl_ierr
+    type (star_info), pointer :: s
+    
+    ierr = 0
+    call star_ptr(id, s, ierr)
+    if (ierr /= 0) return
+    print *, "Extras startup routine"
 
-      ! Use local_colors_controls instead of global
-      metallicity = local_colors_controls%metallicity
-      d = local_colors_controls%distance
+    ! Initialize colors module
+    call colors_init(ierr)
+    if (ierr /= 0) then
+        print *, "Error initializing colors module"
+        return
+    end if
+    
+    ! Allocate a handle
+    colors_handle = alloc_colors_handle(ierr)
+    if (ierr /= 0) then
+        print *, "Error allocating colors handle"
+        return
+    end if
+    
+    ! Get pointer to colors controls
+    call colors_ptr(colors_handle, local_colors_controls, ierr)
+    if (ierr /= 0) then
+        print *, "Error getting colors pointer"
+        return
+    end if
+    
+    ! Initialize the colors_controls from the defaults file
+    call read_colors_controls(local_colors_controls, ctrl_ierr)
+    if (ctrl_ierr /= 0) then
+        print *, "Error: Failed to read colors controls"
+    end if
+    
+    call process_color_files(id, ierr)
+    s% extras_startup => extras_startup
+    s% extras_check_model => extras_check_model
+    s% extras_finish_step => extras_finish_step
+    s% extras_after_evolve => extras_after_evolve
+    s% how_many_extra_history_columns => how_many_extra_history_columns
+    s% data_for_extra_history_columns => data_for_extra_history_columns
+    s% how_many_extra_profile_columns => how_many_extra_profile_columns
+    s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
-      sed_filepath = local_colors_controls%stellar_atm
-      filter_dir = local_colors_controls%instrument
-      vega_filepath = local_colors_controls%vega_sed
-      make_sed = local_colors_controls%make_csv
+    print *, "Stellar atmosphere:", s% x_character_ctrl(1)
+    print *, "Instrument:", s% x_character_ctrl(2)
+  end subroutine extras_controls
 
-      ! Rest of the function remains the same
-    end subroutine data_for_extra_history_columns
-
-  end module run_star_extras
 
 
 
@@ -331,15 +334,6 @@ subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
     
-
-
-    ! Ensure local_colors_controls is associated
-    if (.not. associated(local_colors_controls)) then
-        call colors_ptr(colors_handle, local_colors_controls, ierr)
-        if (ierr /= 0) return
-    end if
-
-
     ! Extract input parameters
     teff = s%T(1)
     log_g = LOG10(s%grav(1))
