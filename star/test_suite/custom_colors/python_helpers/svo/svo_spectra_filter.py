@@ -1,8 +1,7 @@
-import os
-import pandas as pd
-import os
-import pandas as pd
 import io  # Import StringIO for reading string data as a CSV
+import os
+
+import pandas as pd
 
 
 def filter_lookup_table(input_file):

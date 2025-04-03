@@ -1,7 +1,7 @@
 import os
-import subprocess
-import shutil
 import re
+import shutil
+import subprocess
 
 # Get the directory where the script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

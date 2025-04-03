@@ -6,10 +6,11 @@
 #         by reading the header of the history file.
 #
 ####################################################
-import numpy as np
 import glob
+
 import matplotlib.pyplot as plt
 import mesa_reader as mr
+import numpy as np
 
 # Locate the history.data file
 f = glob.glob("../LOGS/history.data")[0]

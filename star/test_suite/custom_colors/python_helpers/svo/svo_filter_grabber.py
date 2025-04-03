@@ -1,8 +1,9 @@
 import os
-from astroquery.svo_fps import SvoFps
-from astropy import units as u
-from astropy.table import vstack, unique
+
 import pandas as pd
+from astropy import units as u
+from astropy.table import unique, vstack
+from astroquery.svo_fps import SvoFps
 
 # Set a longer timeout
 SvoFps.TIMEOUT = 300  # Increase timeout to 5 minutes
