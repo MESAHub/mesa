@@ -1569,7 +1569,7 @@
       do K=1,NPT
       SUM=ZERO
       if (K == KOPT) then
-          CONTINUE
+        ! do nothing
       else if (PTSID(K) == ZERO) then
           do J=1,N
              SUM=SUM+W(NPT+J)*XPT(K,J)

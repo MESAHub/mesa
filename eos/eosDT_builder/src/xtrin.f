@@ -302,7 +302,7 @@
          is=0
          iw=1
          dixr=(xx(mh)-xh)*dfsx(mh)
-         do 47 ir=l1,l1+iq
+         do ir=l1,l1+iq
            do it=k1,k1+ip
              esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir),epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
              if(esk(it,ir)  >  1.e+20) then
@@ -312,7 +312,7 @@
              esk(it,ir)=esk(it,ir)*dixr+esk2(it,ir)*(1.-dixr)
              is=1
            end do
-   47 continue
+         end do
 
 
       end if
@@ -470,11 +470,11 @@
       end if
 
 
-      do 3 m=1,mx
+      do m=1,mx
       read (2,'(3x,f6.4,3x,f12.9,11x,f10.7,17x,f10.7)') xin(m),zz(m),moles(m),tmass(m)
       read (2,'(21x,e14.7,4x,e14.7,3x,e11.4,3x,e11.4,3x,e11.4,4x,e11.4)') (frac(m,i),i=1,6)
       read (2,'(a)') blank
-      do 2 jcs=1,nr
+      do jcs=1,nr
       read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs),dum,dum,rhogr(m,jcs)
       if(numtot  /=  jcs) then
          write (*,'(" Data file incorrect: numtot,jcs= ",2i5)') numtot,jcs
@@ -499,9 +499,9 @@
       read(2,'(a)') blank
       read(2,'(a)') blank
       read(2,'(a)') blank
-    2 continue
+      end do
       read(2,'(a)') blank
-    3 continue
+      end do
 
       do i=1,nt
          if(t6list(1,i)  ==  0.0) then

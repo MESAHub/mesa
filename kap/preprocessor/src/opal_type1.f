@@ -685,13 +685,13 @@
       is=0
       iw=1
        dixr=(xx(mh)-xxx)*dfsx(mh)
-      do 47 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
         opk2(it,ir)=quad(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir),opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
-   47 continue
+      end do
 !     interpolate X between two overlapping quadratics
       end if
 

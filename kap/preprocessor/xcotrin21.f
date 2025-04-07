@@ -311,7 +311,7 @@
       k3s=k3+ntb-1
       end if
 ! ----end of check for missing data
-      do 123 m=mf,mf2
+      do m=mf,mf2
        if(mx  >=  4) then
 ! ....  C and O  fractions determined by the ray through the origin that
 !       also passes through the point (Xc,Xo). Specific interpolation
@@ -338,20 +338,19 @@
          xc(i)=xcs(i)
          xo(i)=xos(i)
 !          if(xcs(i)  >=  xhe-1.e-6) then
-           if(xcs(i)  >  xhe) then
-           xc(i)=xhe
-           xo(i)=xhe
-           GOTO 3
+           if(xcs(i) > xhe) then
+            xc(i)=xhe
+            xo(i)=xhe
+            exit
            end if
          end do
-    3    continue
 
-      if(itime(m)  /=  12345678) then
+      if(itime(m) /= 12345678) then
       itime(m)=12345678
       mxzero=0
         do i=1,mx
         xx(i)=log10(0.005+xa(i))
-        if(xa(i)  ==  0.0) mxzero=i
+        if(xa(i) == 0.0) mxzero=i
         end do
 ! .... this is the first time through this m. Calculate the decadic
 !      log of the perimeter points shifted by Z+0.001(to avoid divergence
@@ -422,7 +421,7 @@
       is=0
 
       call cointerp(xxc,xxo)
-  123 continue
+      end do
 
         if((zz(mg,1)  /=  zz(mf,1)) .or. (zz(mh,1)  /=  zz(mf,1))) then
           write(*,'("Z does not match Z in codata* files you are using")')
@@ -434,28 +433,28 @@
       xxo=xxoi   ! restores input value
       is=0
       iw=1
-      do 45 ir=l1,l1+iq
-       do 46 it=k1,k1+ip
+      do ir=l1,l1+iq
+       do it=k1,k1+ip
          if((mx  ==  1) .or. (mf2  ==  1)) then
            opk(it,ir)=opl(mf,it,ir)
-           GOTO 46
+           cycle
          end if
          opk(it,ir)=quad(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
          is=1
-   46 continue
-   45 continue
+        end do
+      end do
 
-      if (mi  ==  mf2) then  ! interpolate between quadratics
+      if (mi == mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xxx)*dfsx(mh)
-      do 47 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
         opk2(it,ir)=quad(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir),opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
-   47 continue
+      end do
 !     interpolate X between two overlapping quadratics
       end if
       is=0
@@ -514,8 +513,8 @@
       oxdp=log10(zzz+xodp)
 !     handle possibility that xodp=0
       fac=max(min((oxx-ox(1))/max(oxdp-ox(1),1.e-6),1.),0.)
-      do 40 ir=l1,l1+iq
-      do 41 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
 
 !                    interpolation in region c1
 
@@ -531,7 +530,7 @@
 !     handle possibility that xodp=0
            opl(m,it,ir)=b(1)+(b(2)-b(1))*fac
       is=1
-      GOTO 41
+        cycle
       end if
 !                    interpolation in region c2
 
@@ -547,23 +546,22 @@
       iw=iw+1
       opl(m,it,ir)=quad(is,iw,oxx,b(1),b(2),b(3),ox(1),ox(2),oxdp)
       is=1
-   41 continue
-   40 continue
-      if(is  ==  1) GOTO 123
+      end do
+      end do
+      if(is == 1) GOTO 123
 ! _________
       end if
 
 !                    interpolation in region c3 to c6
       is=0
 
-      if(nc  >=  5) then
+      if(nc >= 5) then
 ! _________
-      do 44 i=4,nc-1
+      do i=4,nc-1
 !     do not go beyond middle (where c3-c6 overlaps o3-o6), and
-        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and.
-     $        (xcd(i-1)  >  xc(i-1))) then
-      do 42 ir=l1,l1+iq
-      do 43 it=k1,k1+ip
+      if((xxc > xcd(i)-1.e-6) .and. (xxo >   (i-1)-1.e-6) .and. (xcd(i-1) > xc(i-1))) then
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
         oxdp=log10(zzz+xodp)
         iw=1
         m1=i-1
@@ -579,24 +577,24 @@
         iw=iw+1
         opl(m,it,ir)=quad(is,iw,oxx,b(1),b(2),b(3),ox(i-2),ox(i-1),oxdp)
         is=1
-   43 continue
-   42 continue
-      if (is  ==  1) GOTO 123
-        end if
-   44 continue
+      end do
+      end do
+      if (is == 1) GOTO 123
+      end if
+      end do
 ! _________
       end if
 
-      if (is  ==  1) GOTO 123
+      if (is == 1) GOTO 123
 
 !     include boundaries that could later cause division by 0!
-      if(xxo  >  xod(3)-1.e-6) then
+      if(xxo > xod(3)-1.e-6) then
 ! _________
       cxdp=log10(zzz+xcdp)
 !     handle possibility that xcdp=0
       fac=max(min((cxx-cx(1))/max(cxdp-cx(1),1.e-6),1.),0.)
-      do 140 ir=l1,l1+iq
-      do 141 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
 
 !                    interpolation in region  o1
 
@@ -612,7 +610,7 @@
 !     handle possibility that xcdp=0
       opl(m,it,ir)=b(1)+(b(2)-b(1))*fac
       is=1
-      GOTO 141
+      exit
       end if
 !                    interpolation in region  o2
 
@@ -628,22 +626,22 @@
       iw=iw+1
       opl(m,it,ir)=quad(is,iw,cxx,b(1),b(2),b(3),cx(1),cx(2),cxdp)
       is=1
-  141 continue
-  140 continue
+      end do
+      end do
       if(is  ==  1) GOTO 123
 ! _________
       end if
 
 !                    interpolation in region  o3 to o6
       is=0
-      if(no  >=  5) then
+      if(no >= 5) then
 ! _________
-      do 144 i=4,no-1
+      do i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
       if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and.
      $     (xod(i-1)  >  xo(i-1)-1.e-6)) then
-      do 142 ir=l1,l1+iq
-      do 143 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
       cxdp=log10(zzz+xcdp)
       iw=1
       m2=i-2
@@ -659,15 +657,15 @@
       iw=iw+1
       opl(m,it,ir)=quad(is,iw,cxx,b(1),b(2),b(3),cx(m2),cx(m1),cxdp)
       is=1
-  143 continue
-  142 continue
-      if (is  ==  1) GOTO 123
+      end do
+      end do
+      if (is == 1) GOTO 123
       end if
-  144 continue
+      end do
 ! _________
       end if
 
-      if (is  ==  1) GOTO 123
+      if (is == 1) GOTO 123
 
 ! ....find index of C grid.
    52 ie=100*xxc+1
@@ -704,8 +702,8 @@
 !     lower-O part of grid: interpolate C before O
       if(j3 < no .and. i3 <= n(m,j3) .and.
      $       (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
-      do 20 ir=l1,l1+iq
-      do 21 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
       iw=0
         do jx=j1,j1+2
           iw=iw+1
@@ -718,8 +716,8 @@
       iw=iw+1
       opl(m,it,ir)=quad(is,iw,oxx,b(1),b(2),b(3),ox(j1),ox(j2),ox(j3))
       is=1
-   21 continue
-   20 continue
+      end do
+      end do
 !     else: high-O part of grid: must interpolate O before C
       else
        do ir=l1,l1+iq
@@ -897,14 +895,14 @@
         end do
         itimeco=12345678
         end if
-      do 20 j=1,nc-1
-       do 21 i=1,nc
+      do j=1,nc-1
+       do i=1,nc
          if(xcd(j)  >=  xc(i)) then
            n(m,j)=i+1
            if(xcd(j)  <  xc(i)+1.e-6) n(m,j)=i
          end if
-   21  continue
-   20 continue
+        end do
+      end do
       n(m,nc)=0
 
       close (2)
@@ -923,8 +921,8 @@
       read(2,'(a)') (dumarra(i),i=1,240)
 
       int=0
-      do 1 j=1,no-1
-      do 2 i=1,n(m,j)
+      do j=1,no-1
+      do i=1,n(m,j)
         int=int+1
 
         read(2,'(f10.5)') dum
@@ -965,7 +963,7 @@
        end if
 
       ll=1
-      do 110 kk=nrb,nre
+      do kk=nrb,nre
       alr(ll)=alrf(kk)
         do k=1,nt
           if (ismdata  ==  0) then
@@ -978,9 +976,10 @@
             co(m,i,j,k,ll)=coff(k+ntb-1,kk)
           end if
         end do
-  110 ll=ll+1
-    2 continue
-    1 continue
+      ll=ll+1
+      end do
+      end do
+      end do
       if(x(m,1)  /=  xa(m)) then
       write(*,'(" X in the codata? file does not match xa(m)")')
       stop
@@ -994,7 +993,7 @@
        end do
       end do
 
-      do 6 j=1,no-1
+      do j=1,no-1
         int=int+1
         read(2,'(f10.5)') dum
         read (2,'(7x,i3,26x,f6.4,3x,f6.4,3x,f6.4,5x,f6.4,5x,f6.4)') itab(m,int),x(m,int),y(m,int),zz(m,int),xca(m,int),xoa(m,int)
@@ -1038,7 +1037,7 @@
        ll=ll+1
        end do
        end if
-    6 continue
+      end do
 
       do i=2,nt
         dfs(i)=1./(alt(i)-alt(i-1))
@@ -1117,19 +1116,18 @@
 
       Y2(1)=-0.5
       U(1)=(3./(X(2)-X(1)))*((Y(2)-Y(1))/(X(2)-X(1))-YP1)
-      do 11 I=2,N-1
+      do I=2,N-1
         SIG=(X(I)-X(I-1))/(X(I+1)-X(I-1))
         P=SIG*Y2(I-1)+2.
         Y2(I)=(SIG-1.)/P
         U(I)=(6.*((Y(I+1)-Y(I))/(X(I+1)-X(I))-(Y(I)-Y(I-1))/(X(I)-X(I-1)))/(X(I+1)-X(I-1))-SIG*U(I-1))/P
-11    continue
+      end do
       QN=0.5
       UN=(3./(X(N)-X(N-1)))*(YPN-(Y(N)-Y(N-1))/(X(N)-X(N-1)))
       Y2(N)=(UN-QN*U(N-1))/(QN*Y2(N-1)+1.)
-      do 12 K=N-1,1,-1
+      do K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
-12    continue
-      return
+      end do
       end
 ! ********************************************************************
       subroutine SPLINT(XA,YA,N,Y2A,X,Y,YP)
@@ -1166,11 +1164,11 @@
       dimension A(IPR),B(IPR),AD(IPR),BD(IPR)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      do 30 I=1,nset   ! modified
-         do 10 J=1,NRL
+      do I=1,nset   ! modified
+         do J=1,NRL
             A(J)=F(I,J)
             B(J)=FX(I,J)
-   10    continue
+         end do
 
          call GETD(A,NRL,AD,AP1,APN)
          call GETD(B,NRL,BD,BP1,BPN)
@@ -1179,14 +1177,13 @@
          FY(I,NRL)=APN
          FXY(I,1)=BP1
          FXY(I,NRL)=BPN
-         do 20 J=2,NRL-1
+         do J=2,NRL-1
             FY(I,J)= -A(J)+A(J+1)-2.*AD(J)-AD(J+1)
             FXY(I,J)=-B(J)+B(J+1)-2.*BD(J)-BD(J+1)
-   20    continue
-   30 continue
+         end do
+      end do
 
-      return
-      end
+      end subroutine FITY
 ! ********************************************************************
       subroutine FITX
 
@@ -1200,20 +1197,19 @@
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
 
-      do 30 J=1,NRL
-         do 10 I=1,nset ! modified
+      do J=1,NRL
+         do I=1,nset ! modified
             A(I)=F(I,J)
-   10    continue
+         end do
          call GETD(A,nset,D,AP1,APN)  ! modified
          FX(1,J)=AP1
          FX(nset,J)=APN   ! modified
-         do 20 I=2,nset-1  ! modified
+         do I=2,nset-1  ! modified
             FX(I,J)=-A(I)+A(I+1)-2.*D(I)-D(I+1)
-   20    continue
-   30 continue
+         end do
+      end do
 
-      return
-      end
+      end subroutine FITX
 
 ! ***********************************************************************
       subroutine GETD(F,N,D,FP1,FPN)
@@ -1230,19 +1226,18 @@
       D(1)=-.5
       T(1)=.5*(-F(1)+F(2)-FP1)
 
-      do 10 J=2,N-1
+      do J=2,N-1
          D(J)=-1./(4.+D(J-1))
          T(J)=-D(J)*(F(J-1)-2.*F(J)+F(J+1)-T(J-1))
-   10 continue
+      end do
 
       D(N)=(FPN+F(N-1)-F(N)-T(N-1))/(2.+D(N-1))
 
-      do 20 J=N-1,1,-1
+      do J=N-1,1,-1
          D(J)=D(J)*D(J+1)+T(J)
-   20 continue
+      end do
 
-      return
-      end
+      end subroutine GETD
 
 ! ********************************************************************
       subroutine INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1414,7 +1409,7 @@
      +  0.0277551020,-0.0416326531,-0.0069387755/
 
 
-      do 20 I=3,nset-2
+      do I=3,nset-2
 
          J=1
          FXY(I,J)=
@@ -1443,7 +1438,7 @@
      +   +BET(8)*( F(I  ,J-1)+F(I  ,J+3) )
      +   +BET(9)*F(I  ,J  ) +BET(10)*F(I  ,J+1) +BET(11)*F(I  ,J+2)
 
-         do 10 J=3,NRL-2
+         do J=3,NRL-2
             FXY(I,J)=
      +         GAM(1)*( F(I-2,J-2)+F(I-2,J+2)+F(I+2,J-2)+F(I+2,J+2) )
      +        +GAM(2)*( F(I-2,J+1)+F(I-2,J-1)+F(I-1,J-2)+F(I-1,J+2)
@@ -1452,7 +1447,7 @@
      +        +GAM(4)*( F(I-1,J-1)+F(I-1,J+1)+F(I+1,J-1)+F(I+1,J+1) )
      +        +GAM(5)*( F(I-1,J  )+F(I  ,J-1)+F(I  ,J+1)+F(I+1,J  ) )
      +        +GAM(6)*  F(I  ,J  )
-   10    continue
+         end do
 
          J=NRL-1
          FXY(I,J)=
@@ -1481,15 +1476,14 @@
      +    +ALP(9)*( F(I  ,J-1)+F(I  ,J-3) )
      +    +ALP(10)* F(I  ,J-2) +ALP(11)*F(I  ,J-4)
 
-   20 continue
+      end do
 
-      do 40 I=3,nset-2   ! modified
-         do 30 J=1,NRL
+      do I=3,nset-2   ! modified
+         do J=1,NRL
             F(I,J)=FXY(I,J)
-   30    continue
-   40 continue
+         end do
+      end do
 
-      return
       end
 
 ! ********************************************************************
@@ -1579,11 +1573,11 @@
 
 !     FIRST GET F AND FX, INTERPOLATING FROM OPAL T6 TO
 !     INTERVAL OF 0.05 IN LOG10(T).
-      do 40 J=1,NRL
+      do J=1,NRL
 !        FOR EACH LOG10(R), STORE LOG10(ROSS) IN V(I)
-         do 20 I=1,N
+         do I=1,N
             V(I)=ROSSL(I,J)
-   20    continue
+         end do
 
 !        GET FIRST DERIVATIVES AT end POINTS
 
@@ -1591,19 +1585,19 @@
          call SPLINE(U,V,N,V2)
 
 !        INTERPOLATE TO LOG10(T)=FLT, FLT=3.8(0.05)8.0
-         do 30 I=1,nset ! modified
+         do I=1,nset ! modified
             FLT=3.75+0.05*I
             call SPLINT(U,V,N,V2,FLT,F(I,J),FX(I,J))
-   30    continue
+         end do
 
-   40 continue
+      end do
 
 
 !  OPTION FOR SMOOTHING
       if(NSM > 0)then
-         do 35 NS=1,NSM
+         do NS=1,NSM
             call SMOOTH
-   35    continue
+         end do
          call FITX
       end if
 
@@ -1628,23 +1622,23 @@
          coff(1,l)=ROSSL(1,l)
          end do
 
-         do 70 K=2,N
+         do K=2,N
             FLT=U(K)
-            do 50 L=nrlow,nrhigh
+            do L=nrlow,nrhigh
                FLR=RLS+.5*(L-1)
                FLRHO=FLR-18.+3.*FLT
                call INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
                if(IERR)then
                end if
                V(L)=G
-   50       continue
+            end do
             T6=t6arr(K)
             do l=nrlow,nrhigh
             coff(K,l)=V(l)
 
             end do
 
-   70    continue
+         end do
       end if
       return
 

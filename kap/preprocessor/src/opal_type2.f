@@ -403,7 +403,7 @@
       k3s=k3+ntb-1
       end if
 !-----end of check for missing data
-      do 123 m=mf,mf2
+      do m=mf,mf2
        if(mx  >=  4) then
 !.....  C and O  fractions determined by the ray through the origin that
 !       also passes through the point (Xc,Xo). Specific interpolation
@@ -431,19 +431,18 @@
          xo(i)=xos(i)
 !          if(xcs(i)  >=  xhe-1.e-6) then
            if(xcs(i)  >  xhe) then
-           xc(i)=xhe
-           xo(i)=xhe
-           GOTO 3
+            xc(i)=xhe
+            xo(i)=xhe
+            exit
            end if
          end do
-    3    continue
 
       if(itime(m)  /=  12345678) then
       itime(m)=12345678
       mxzero=0
         do i=1,mx
-        xx(i)=log10(0.005+xa(i))
-        if(xa(i)  ==  0.0) mxzero=i
+          xx(i)=log10(0.005+xa(i))
+          if (xa(i)  ==  0.0) mxzero=i
         end do
 !  ... this is the first time through this m. Calculate the decadic
 !      log of the perimeter points shifted by Z+0.001(to avoid divergence
@@ -530,7 +529,7 @@
       is=0
 
       call cointerp(xxc,xxo)
-  123 continue
+      end do
 
         if((zz(mg,1)  /=  zz(mf,1)) .or. (zz(mh,1)  /=  zz(mf,1))) then
           write(*,*) 'xxc', xxc
@@ -554,8 +553,7 @@
            opk(it,ir)=opl(mf,it,ir)
            cycle
          end if
-         opk(it,ir)=quad2(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir)
-     x   ,opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
+         opk(it,ir)=quad2(is,iw,xxx,opl(mf,it,ir),opl(mg,it,ir),opl(mh,it,ir),xx(mf),xx(mg),xx(mh))
          is=1
       end do
       end do
@@ -566,8 +564,7 @@
        dixr=(xx(mh)-xxx)*dfsx(mh)
       do ir=l1,l1+iq
         do it=k1,k1+ip
-        opk2(it,ir)=quad2(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir)
-     x  ,opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
+        opk2(it,ir)=quad2(is,iw,xxx,opl(mg,it,ir),opl(mh,it,ir),opl(mi,it,ir),xx(mg),xx(mh),xx(mi))
         opk(it,ir)=opk(it,ir)*dixr+opk2(it,ir)*(1.-dixr)
         is=1
         end do
@@ -718,8 +715,8 @@
       cxdp=log10(zzz+xcdp)
 !     handle possibility that xcdp=0
       fac=max(min((cxx-cx(1))/max(cxdp-cx(1),1.e-6),1.),0.)
-      do 140 ir=l1,l1+iq
-      do 141 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
 
 !                    interpolation in region  o1
 
@@ -735,7 +732,7 @@
 !     handle possibility that xcdp=0
       opl(m,it,ir)=b(1)+(b(2)-b(1))*fac
       is=1
-      GOTO 141
+      cycle
       end if
 !                    interpolation in region  o2
 
@@ -751,8 +748,8 @@
       iw=iw+1
       opl(m,it,ir)=quad2(is,iw,cxx,b(1),b(2),b(3),cx(1),cx(2),cxdp)
       is=1
-  141 continue
-  140 continue
+      end do
+      end do
       if(is  ==  1) GOTO 123
 !__________
       end if
@@ -761,11 +758,11 @@
       is=0
       if(no  >=  5) then
 !__________
-      do 144 i=4,no-1
+      do i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
       if((xxo > xod(i)-1.e-6) .and. (xxc > xc(i-1)-1.e-6) .and. (xod(i-1) > xo(i-1)-1.e-6)) then
-      do 142 ir=l1,l1+iq
-      do 143 it=k1,k1+ip
+      do ir=l1,l1+iq
+      do it=k1,k1+ip
       cxdp=log10(zzz+xcdp)
       iw=1
       m2=i-2
@@ -783,11 +780,11 @@
       iw=iw+1
       opl(m,it,ir)=quad2(is,iw,cxx,b(1),b(2),b(3),cx(m2),cx(m1),cxdp)
       is=1
-  143 continue
-  142 continue
+      end do
+      end do
       if (is  ==  1) GOTO 123
       end if
-  144 continue
+      end do
 !__________
       end if
 
@@ -1120,22 +1117,23 @@
        end if
 
       ll=1
-      do 110 kk=nrb,nre
-      alr(ll)=alrf(kk)
-        do k=1,nt
-          if (ismdata  ==  0) then
-            if ((m  ==  1) .and. (k  <=  9)) then
-              co(m,i,j,k,ll)=cof(k+ntb-1,kk)
+      do kk=nrb,nre
+        alr(ll)=alrf(kk)
+          do k=1,nt
+            if (ismdata  ==  0) then
+              if ((m  ==  1) .and. (k  <=  9)) then
+                co(m,i,j,k,ll)=cof(k+ntb-1,kk)
+              else
+                co(m,i,j,k,ll)=coff(k+ntb-1,kk)
+              end if
             else
               co(m,i,j,k,ll)=coff(k+ntb-1,kk)
             end if
-          else
-            co(m,i,j,k,ll)=coff(k+ntb-1,kk)
-          end if
-        end do
-  110 ll=ll+1
+          end do
+        ll=ll+1
       end do
-      end do
+      end do ! i
+      end do ! j
       if(x(m,1)  /=  xa(m)) then
       write(*,'(" X in the codata? file does not match xa(m)")')
       call mesa_error(__FILE__,__LINE__)

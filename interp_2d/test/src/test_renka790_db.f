@@ -432,11 +432,11 @@
         N = 0
       end if
       return
-      end
+      end subroutine testdt_db
 
       subroutine TSTFN1_db (K,X,Y,IFLAG, F,FX,FY)
-      integer K, IFLAG
-      double precision X, Y, F, FX, FY
+      integer :: K, IFLAG
+      double precision :: X, Y, F, FX, FY
 
 ! **********************************************************
 
@@ -505,8 +505,8 @@
 
 ! **********************************************************
 
-      double precision T1, T2, T3, T4
-      if (K  <  1  .OR.  K  >  10) return
+      double precision :: T1, T2, T3, T4
+      if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
@@ -630,7 +630,7 @@
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       return
-      end
+      end subroutine TSTFN1_db
 
 
 
@@ -713,7 +713,7 @@
 ! **********************************************************
 
       double precision T1, T2, T3, T4, T5, T6
-      if (K  <  1  .OR.  K  >  10) return
+      if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:

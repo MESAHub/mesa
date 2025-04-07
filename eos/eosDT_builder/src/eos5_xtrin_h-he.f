@@ -281,7 +281,7 @@
       if(z  /=  zz(mf)) GOTO 66
       is=0
       iw=1
-      do 45 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
           if (mf2  ==  1) then
           esk(it,ir)=epl(mf,it,ir)
@@ -295,13 +295,13 @@
           is=1
    46     continue
         end do
-   45 continue
+      end do
 
       if (mi  ==  mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xh)*dfsx(mh)
-      do 47 ir=l1,l1+iq
+      do ir=l1,l1+iq
         do it=k1,k1+ip
           esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir),epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
           if(esk(it,ir)  >  1.e+20) then
@@ -311,7 +311,7 @@
           esk(it,ir)=esk(it,ir)*dixr+esk2(it,ir)*(1.-dixr)
           is=1
         end do
-   47 continue
+      end do
 
 
       end if

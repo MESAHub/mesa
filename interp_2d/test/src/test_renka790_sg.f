@@ -140,7 +140,7 @@
   500 format (///1X,10X,'*** Error in data -- N = ',I4,', Maximum value =',I4,' ***')
   510 format (///1X,14X,'*** Error in CSHEP2 -- duplicate nodes encountered ***')
   520 format (///1X,14X,'*** Error in CSHEP2 -- all nodes are collinear ***')
-      end
+      end subroutine test_renka_sq
 
 
       subroutine testdt_sg (K, N,X,Y)
@@ -432,7 +432,7 @@
         N = 0
       end if
       return
-      end
+      end subroutine testdt_sg
 
       subroutine TSTFN1_sg (K,X,Y,IFLAG, F,FX,FY)
       integer K, IFLAG
@@ -506,7 +506,7 @@
 ! **********************************************************
 
       real :: T1, T2, T3, T4
-      if (K  <  1  .OR.  K  >  10) return
+      if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:
@@ -630,7 +630,7 @@
       FX = -T2*(12.0*T4 + 3.2*T3)*(80.0*X - 40.0)/T1
       FY = -T2*(13.5*T4 + 3.6*T3)*(90.0*Y - 45.0)/T1
       return
-      end
+      end subroutine TSTFN1_sg
 
 
       subroutine TSTFN2_sg (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
@@ -712,7 +712,7 @@
 ! **********************************************************
 
       real T1, T2, T3, T4, T5, T6
-      if (K  <  1  .OR.  K  >  10) return
+      if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
 ! Exponential:

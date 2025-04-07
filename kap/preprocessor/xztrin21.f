@@ -490,9 +490,8 @@
 !                  with a return
       stop
    62 write(*,'(" T6/LogR outside of table range")')
-!     write(*,'("slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,
-!    x nta(i+1)",6e12.5,4i5)') slt,alt(1),alt(nt),slr,alr(1),
-!    x alr(nre),l3s,i,k3s,nta(i+1)
+!     write(*,'("slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s, &
+!                nta(i+1)",6e12.5,4i5)') slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,nta(i+1)
 !                  with a return
       stop
    64 write(*,'(" X not equal to zero: To run this case it is necessary"/ "to recompile with parameter (mx=1)")')
@@ -685,8 +684,6 @@
 
         call opaltab    !modified
        end if
-
- 1010  continue
 
       ll=1
       do kk=1,nre
