@@ -1254,7 +1254,8 @@ module auto_diff_real_tdc_module
       binary%val = x%val*y%val
       binary%d1val1 = x%d1val1*y%val + x%val*y%d1val1
       binary%d1Array(1:33) = x%d1Array(1:33)*y%val + x%val*y%d1Array(1:33)
-      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%d1val1_d1Array(1:33)*y%val + x%val*y%d1val1_d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) &
+                                    + x%d1val1_d1Array(1:33)*y%val + x%val*y%d1val1_d1Array(1:33)
    end function mul_self
 
    function mul_self_real(x, y) result(unary)

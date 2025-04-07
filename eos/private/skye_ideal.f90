@@ -88,7 +88,8 @@ module skye_ideal
 
    end function compute_xne
 
-   subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
+   subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, &
+                                zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
       use helm_polynomials
       use eos_def
       real(dp), intent(in) :: temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye

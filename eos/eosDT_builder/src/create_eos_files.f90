@@ -96,7 +96,8 @@ contains
       real(dp) :: HELM_fraction
       character(len=64) :: fname_prefix
 
-      logical, save :: helm_only = .false., opal_scvh_only = .false., opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
+      logical, save :: helm_only = .false., opal_scvh_only = .false., &
+                       opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
 
       !opal_only = .true.
       scvh_only = .true.

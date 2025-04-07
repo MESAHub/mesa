@@ -86,7 +86,8 @@ module skye_coulomb_liquid
          b = 0.2d0 + 0.078d0 * pre_z(int(Z))% sqlogz
          nu = 1.16d0 + 0.08d0 * pre_z(int(Z))% logz
          cDH = (Z / sqrt(3d0)) * (pre_z(int(Z))% zp1_3_2 - 1d0 - pre_z(int(Z))% z3_2)
-         cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pre_z(int(Z))% z7_3 * (1d0 - pre_z(int(Z))% zm1_3 + 0.2d0 * pre_z(int(Z))% zm1_2)
+         cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pre_z(int(Z))% z7_3 &
+               * (1d0 - pre_z(int(Z))% zm1_3 + 0.2d0 * pre_z(int(Z))% zm1_2)
 
          g = ge * pre_z(int(Z))% z5_3
          COTPT = sqrt(3d0 * me_in_amu / mi) / pre_z(int(Z))% z7_6
@@ -96,7 +97,8 @@ module skye_coulomb_liquid
          gr = sqrt(1d0 + pow2(xr))
          g1 = 1d0 + 0.78d0 * sqrt(ge / z) / (21d0 + ge * pow3(Z / rs))
          g2 = 1d0 + ((Z - 1d0) / 9d0) * (1d0 + 1d0 / (0.001d0 * pre_z(int(Z))% z2 + 2d0 * ge)) * (pow3(rs) / (1d0 + 6d0 * pow2(rs)))
-         h = (1d0 + 0.2d0 * pow2(xr)) / (1d0 + 0.18d0 * xr * pre_z(int(Z))% zm1_4 + 0.37d0 * pre_z(int(Z))% zm1_2 * pow2(xr) + 0.2d0 * pow2(xr))
+         h = (1d0 + 0.2d0 * pow2(xr)) / &
+             (1d0 + 0.18d0 * xr * pre_z(int(Z))% zm1_4 + 0.37d0 * pre_z(int(Z))% zm1_2 * pow2(xr) + 0.2d0 * pow2(xr))
 
          F = -ge * (cDH * sqrt(ge) + cTF * a * pow(ge, nu) * g1 * h) / (1d0 + (b * sqrt(ge) + a * g2 * pow(ge, nu) / rs) / gr)
 

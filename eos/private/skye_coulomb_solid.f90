@@ -213,7 +213,9 @@ module skye_coulomb_solid
       real(dp) :: CR
 
       CR = 0.05d0 * pow2(Rz - 1d0) / ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
-      dG = CR / (1 + (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
+      dG = CR / (1 + &
+           (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) &
+           * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
 
    end function deltaG_Ogata93
 

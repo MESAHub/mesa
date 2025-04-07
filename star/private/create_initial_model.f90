@@ -26,7 +26,8 @@
       module create_initial_model
 
       use star_private_def
-      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, arg_not_provided, two_thirds, four_thirds_pi
+      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, &
+                           arg_not_provided, two_thirds, four_thirds_pi
       use chem_def
 
       implicit none

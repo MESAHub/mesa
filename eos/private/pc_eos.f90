@@ -1707,7 +1707,8 @@
       type(auto_diff_real_2var_order1), intent(out) :: W0XXX,W0XTT,W0XXT
 
       type(auto_diff_real_2var_order1) :: CMU, CMU1, PIT26, CN0, CN1, CN2
-      type(auto_diff_real_2var_order1) :: CJ00,CJ10,CJ20,CJ01,CJ11,CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
+      type(auto_diff_real_2var_order1) :: CJ00,CJ10,CJ20,CJ01,CJ11, &
+                                          CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
 
       if (CHI<.5d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: non-degenerate (small CHI)')
       if (TEMR<=0.d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: T < 0')
@@ -1759,7 +1760,8 @@
 ! Supplement to SOMMERF
 
       type(auto_diff_real_2var_order1), intent(in) :: CMU1
-      type(auto_diff_real_2var_order1), intent(out) :: CJ00,CJ10,CJ20,CJ01,CJ11,CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
+      type(auto_diff_real_2var_order1), intent(out) :: CJ00,CJ10,CJ20,CJ01,CJ11,&
+                                                       CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
 
       type(auto_diff_real_2var_order1) :: X0, X3, X5, CL, CMU
 

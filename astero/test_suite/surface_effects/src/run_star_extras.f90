@@ -204,7 +204,8 @@
 
          do l = 0, 3
             test_freq(l,1:nl(l)) = model_freq(l,1:nl(l)) &
-                                 + (target_b1*powm1(model_freq(l,1:nl(l)))+target_b3*pow3(model_freq(l,1:nl(l))))/model_inertia(l,1:nl(l))
+                                 + (target_b1*powm1(model_freq(l,1:nl(l)))+target_b3*pow3(model_freq(l,1:nl(l)))) &
+                                   / model_inertia(l,1:nl(l))
          end do
 
          call astero_get_combined_all_freq_corr(x0, x1, .false., &
@@ -219,7 +220,8 @@
          do l = 1, 3
             do i = 1, nl(l)
                test_freq(l,i) = model_freq(l,i) &
-                              + target_p0*pow(model_freq(l,i)/nu_max, target_p1)*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
+                              + target_p0*pow(model_freq(l,i)/nu_max, target_p1) &
+                               * astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
             end do
          end do
 

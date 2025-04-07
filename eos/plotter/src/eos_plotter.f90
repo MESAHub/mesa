@@ -395,7 +395,8 @@ program eos_plotter
             else if (i_cons == 2) then
                res1 = T * (exp(res(i_lnS)) * d_dlnT(i_lnS)) / (exp(res(i_lnE)) * d_dlnT(i_lnE)) - 1
             else if (i_cons == 3) then
-               res1 = -T * rho * (exp(res(i_lnS)) * d_dlnd(i_lnS)) / (d_dlnT(i_lnPgas) * exp(res(i_lnPgas)) + (4d0 / 3d0) * crad * pow4(T)) - 1
+               res1 = -T * rho * (exp(res(i_lnS)) * d_dlnd(i_lnS)) &
+                      / (d_dlnT(i_lnPgas) * exp(res(i_lnPgas)) + (4d0 / 3d0) * crad * pow4(T)) - 1
             end if
             res1 = abs(res1)
          end if

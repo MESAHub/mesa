@@ -1377,7 +1377,8 @@
 
             ! provide info about non-conservation due to mass corrections
             if (s% use_mass_corrections) then
-               write(*,2) 'INFO: use_mass_corrections incurred rel_E_err', s% model_number, -total_energy_from_fixed_m_grav/s% total_energy
+               write(*,2) 'INFO: use_mass_corrections incurred rel_E_err', &
+                          s% model_number, -total_energy_from_fixed_m_grav/s% total_energy
             end if
 
             if (s% model_number == s% energy_conservation_dump_model_number &
@@ -1406,7 +1407,8 @@
                   write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
                   write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
                   write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
-                  write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, s% non_epsnuc_energy_change_from_split_burn
+                  write(*,2) 's% non_epsnuc_energy_change_from_split_burn', &
+                              s% model_number, s% non_epsnuc_energy_change_from_split_burn
                   write(*,2) 'phase2 sum cell dt*dm*eps_mdot', s% model_number, phase2_total_energy_from_mdot
                   write(*,2) 'phase1_total_energy_from_mdot', s% model_number, phase1_total_energy_from_mdot
                   write(*,2) 'from_do_adjust_mass_and_eps_mdot', s% model_number, &

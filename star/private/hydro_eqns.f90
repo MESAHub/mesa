@@ -489,7 +489,8 @@
 
                      s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% Peos(k) + &
                         frac_without_dxa * (s% Pgas(k)/s% Peos(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
-                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
+                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. &
+                         j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
                         write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                         write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
                         write(*,2) 's% Peos(k)', k, s% Peos(k)
@@ -511,11 +512,13 @@
                         if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                            if (dxa < dxa_threshold) then
                               if (j == i_var - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                    trim (s% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
                               if (j == i_var_sink - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                    trim (s% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
                            end if

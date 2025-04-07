@@ -636,8 +636,8 @@ contains
              0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, &
              0.04d0, 0.06d0, 0.08d0, 0.100d0 ]
           num_kap_lowT_Xs_for_this_Z(1:num_kap_lowT_Zs(i), i) = [ num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
        end select
     end do
 

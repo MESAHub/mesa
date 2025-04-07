@@ -500,8 +500,10 @@
             write(*,'(A70, F8.3)') '[TestHub] Age at first thermal pulse (Gyr): ', age_1TP / 1d9
             write(*,'(A70, F8.3)') '[TestHub] Core mass at second thermal pulse with 3DUP (Msun): ', mcore_2TP_with_3DUP
             write(*,'(A70, F8.3)') '[TestHub] Following interpulse time (kyr): ', (age_at_TP - age_2TP_with_3DUP) / 1d3
-            write(*,'(A70, F8.3)') '[TestHub] Following pulse-to-pulse core growth (1e-3 Msun): ', (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
-            write(*,'(A70, F8.3)') '[TestHub] Dredge up mass at following pulse (1e-3 Msun): ', (mcore_at_TP - mcore_min_after_TP) / 1d-3
+            write(*,'(A70, F8.3)') '[TestHub] Following pulse-to-pulse core growth (1e-3 Msun): ', &
+                                    (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
+            write(*,'(A70, F8.3)') '[TestHub] Dredge up mass at following pulse (1e-3 Msun): ', &
+                                    (mcore_at_TP - mcore_min_after_TP) / 1d-3
 
             ! put comparison info in TestHub output
             testhub_extras_names(1) = 'mcore_1TP'; testhub_extras_vals(1) = mcore_1TP

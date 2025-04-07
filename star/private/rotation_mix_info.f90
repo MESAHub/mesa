@@ -25,7 +25,8 @@
 
       module rotation_mix_info
 
-      use const_def, only: dp, pi, pi4, qe, clight, crad, boltz_sigma, lsun, msun, rsun, one_third, convective_mixing, overshoot_mixing
+      use const_def, only: dp, pi, pi4, qe, clight, crad, boltz_sigma, lsun, msun, rsun, one_third, &
+                           convective_mixing, overshoot_mixing
       use num_lib
       use utils_lib
       use star_private_def

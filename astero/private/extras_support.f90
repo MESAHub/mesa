@@ -874,7 +874,8 @@
 
          write(format_string,'( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
          write(num_string,format_string) num
-         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) // trim(num_string) // trim(sample_results_postfix)
+         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) &
+                    // trim(num_string) // trim(sample_results_postfix)
          open(unit=iounit, file=trim(filename), action='write', status='replace', iostat=ierr)
          if (ierr == 0) then
             call show_best(iounit)

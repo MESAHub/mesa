@@ -119,7 +119,8 @@
 
          real(dp), dimension(:,:), pointer :: dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), soln=>null()
          real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
-            row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null()
+            row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
+            save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null()
          real(dp), dimension(:,:), pointer :: rhs=>null()
          integer, dimension(:), pointer :: ipiv1=>null()
          real(dp), dimension(:,:), pointer :: ddx=>null(), xder=>null()

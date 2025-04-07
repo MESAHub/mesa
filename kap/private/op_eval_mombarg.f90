@@ -307,7 +307,8 @@
 
 
       !!! Compute gamma factors and kappa_Ross for all OP mono data points for a given mixture.
-      subroutine compute_gamma_grid(ngp, fk_all,lgamm_pcg, lkap_face_pcg, logT_pcg, logRho_pcg, ierr,ite,jne,epatom,amamu,sig,eumesh)
+      subroutine compute_gamma_grid(ngp, fk_all,lgamm_pcg, lkap_face_pcg, &
+                                    logT_pcg, logRho_pcg, ierr,ite,jne,epatom,amamu,sig,eumesh)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
       use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
                           img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58

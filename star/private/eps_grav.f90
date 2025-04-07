@@ -395,7 +395,8 @@
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
             end if
             if (s% stop_for_bad_nums) then
-               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
+               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', &
+                          k, eps_grav_composition_term% val
                call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             return
