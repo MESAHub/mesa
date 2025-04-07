@@ -22,6 +22,7 @@
 
 module helm_opal_scvh_driver
    use chem_def
+   use const_def, only: pi, clight, avo
    implicit none
 
    character(len=256) :: data_dir
@@ -185,15 +186,8 @@ contains
       integer :: iregion
       double precision :: pa, pb, ea, eb, sa, sb
       double precision :: a, b
-      double precision, parameter :: pi = 3.1415926535897932384d0
       logical :: have_called_helm
       double precision, parameter :: helm_min_temp = 1d3
-
-!..some physical constants
-      double precision :: clight
-      parameter(clight=2.99792458d10)
-      double precision :: avo
-      parameter(avo=6.0221367d23)
 
 !..loading the opal_scvh tables
       integer :: ifirst
