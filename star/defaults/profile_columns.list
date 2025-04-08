@@ -500,7 +500,7 @@
    !mlt_Zeta
    !mlt_gradT
    !mlt_log_abs_Y
-   !mlt_vc
+   !mlt_vc    ! convective velocity coming out of mlt
    !log_mlt_vc
    !dvc_dt_TDC_div_g 
 
