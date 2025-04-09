@@ -252,6 +252,7 @@
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
          real(dp) :: thermohaline_mag_B
+         real(dp) :: thermohaline_r_ext
          integer  :: thermohaline_FRG24_safety
          integer  :: thermohaline_FRG24_nks
          integer  :: thermohaline_FRG24_N
