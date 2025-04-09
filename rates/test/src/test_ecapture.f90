@@ -137,7 +137,7 @@ contains
 
    subroutine do_test_special_weak(use_special)
 
-      use const_lib
+      use const_lib, only: const_init
       use utils_lib
       use eos_def
       use eos_lib

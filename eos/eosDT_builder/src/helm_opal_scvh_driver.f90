@@ -33,7 +33,7 @@ contains
    subroutine setup_eos
       use helm_alloc
       use eos_def
-      use const_lib
+      use const_lib, only: const_init
       use chem_lib
       use utils_lib
       use math_lib

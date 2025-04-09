@@ -1,6 +1,6 @@
 program test_neu
    use neu_support
-   use const_lib
+   use const_lib, only: const_init
    use utils_lib, only: mesa_error
    implicit none
 

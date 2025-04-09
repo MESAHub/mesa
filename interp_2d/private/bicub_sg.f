@@ -342,7 +342,7 @@
       integer iv(:),jv(:)         ! grid cell indices -- vectors
       real dxv(:),dyv(:)          ! displacements w/in cell -- vectors
 
-      integer inf3                      ! 3rd dimension of f --  >=  nx
+      integer inf3                      ! 3rd dimension of f -- >= nx
       real f(:,:,:,:) ! (4,4,inf3,ny)               ! bicubic fcn spline coeffs array
 
 !  usage example:
@@ -840,7 +840,7 @@
       integer inf2
       real, pointer :: f1(:) ! =(0:3,inf2,ny)  interpolant data (cf "evbicub")
 
-!       f 2nd dimension inf2 must be  >=  nx
+!       f 2nd dimension inf2 must be >= nx
 !       contents of f:
 
 !  f(0,i,j) = f @ x(i),y(j)
@@ -926,8 +926,8 @@
       real hx,hy
       real hxi,hyi
 
-!  0  <=  xparam  <=  1
-!  0  <=  yparam  <=  1
+!  0 <= xparam <= 1
+!  0 <= yparam <= 1
 
 !  ** the interface is very similar to herm2ev.for; can use herm2xy **
 !---------------------------------------------------------------------
@@ -2462,20 +2462,14 @@
 !        use them occurs in the non-periodic forward elimination loop
 !        only.  DMC 24 Feb 2004.
 !***********************************************************************
-      IMPLICIT NONE
+      implicit none
 !Declaration of input variables
-      integer        k_bc1,                   k_bcn,
-     &               n
-      real           x(*),                    wk(*),
-     &               f(4,*)
+      integer :: k_bc1, k_bcn, n
+      real :: x(*), wk(*), f(4,*)
 !Declaration in local variables
-      integer        i,                       ib,
-     &               imax,                    imin
-      real           a1,                      an,
-     &               b1,                      bn,
-     &               q,                       t,
-     &               hn
-      real           elem21,                  elemnn1    ! (dmc)
+      integer :: i, ib, imax, imin
+      real :: a1, an, b1, bn, q, t, hn
+      real :: elem21, elemnn1  ! (dmc)
 
 !Set default range
       imin=1

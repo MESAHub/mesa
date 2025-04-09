@@ -19,7 +19,9 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
+
 module mod_wd_tau_25
+
    use const_def
    use utils_lib, only: mesa_error
 
@@ -34,7 +36,7 @@ module mod_wd_tau_25
 contains
 
    subroutine build_wd_tau_25_tables
-      use const_lib
+      use const_lib, only: const_init
       character(len=256) :: fname_in, fname_out, line, my_mesa_dir
       integer :: i, j, iounit, ierr, iounit_out, k
       real(dp) :: Prad, Teff_in, logg_in

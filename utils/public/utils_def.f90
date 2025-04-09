@@ -65,5 +65,4 @@
          type (integer_idict), pointer :: ptr
       end type ihash_entry
 
-
       end module utils_def

@@ -23,7 +23,7 @@ module mod_BT_Settl
    use chem_def
    use chem_lib
    use const_def
-   use const_lib
+   use const_lib, only: const_init
    use num_lib, only: binary_search
 
    implicit none

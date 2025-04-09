@@ -33,7 +33,7 @@
          real z, xh
          common/type2_recoin/ itimeco,mxzero,readco22_z
          z = z_in; xh = xh_in
-         if (z  /=  readco22_z) itimeco = 0
+         if (z /= readco22_z) itimeco = 0
       end subroutine init_opal_type2
 
 ! ***********************************************************************
@@ -81,7 +81,7 @@
          if (m == 5) xstr = '70'
          write(fname,'(5A)') trim(dir), '/Gz', trim(zstr), '.x', trim(xstr)
          open(2, FILE=trim(fname), action='read', status='old', iostat=ios)
-         if (ios  /=  0) then
+         if (ios /= 0) then
             write(*,*) 'failed to open ', trim(fname)
             call mesa_error(__FILE__,__LINE__)
          end if
@@ -266,7 +266,7 @@
         ihi=mx
     8   if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
-            if(xh  <=  xa(imd)+1.e-7) then
+            if(xh <= xa(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -280,12 +280,12 @@
         mi=i+1
         mf2=mi
         istep1=1
-        if (mx  >  1) then
+        if (mx > 1) then
         istep1=mx-1
-        if((xh  <=  xa(2)+1.e-7) .or. (xh  >=  xa(istep1)-1.e-7)) mf2=mh
+        if((xh <= xa(2)+1.e-7) .or. (xh >= xa(istep1)-1.e-7)) mf2=mh
         end if
 
-        if ((mx  ==  1) .or. (xh  <  1.e-6)) then
+        if ((mx == 1) .or. (xh < 1.e-6)) then
           mf=1
           mg=1
           mh=1
@@ -293,7 +293,7 @@
           mf2=1
         end if
 
-      if (itime(1)  /=  12345678) then
+      if (itime(1) /= 12345678) then
       alr(1)=-8.+(nrb-1)*0.5
       do i=2,nr
         alr(i)=alr(i-1)+0.5
@@ -316,9 +316,9 @@
       end if
         ilo=2
         ihi=nr
-   12     if(ihi-ilo  >  1) then
+   12     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
-            if(slr  <=  alr(imd)+1.e-7) then
+            if(slr <= alr(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -333,9 +333,9 @@
 
         ilo=2
         ihi=nt
-   11     if(ihi-ilo  >  1) then
+   11     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
-            if(t6  <=  t6list(imd)+1.e-7) then
+            if(t6 <= t6list(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -355,14 +355,14 @@
       k1in=k1
       iadvance=0
       mfin=mf
-      if ((mfin  ==  1) .and. (co(1,1,1,k1,l1)  >  9.)) then! data missing
+      if ((mfin == 1) .and. (co(1,1,1,k1,l1) > 9.)) then! data missing
       do i=1,6
-        if (co(1,1,1,i,l1)  >  9.)  then
-          if (xh  <=  .1) then
+        if (co(1,1,1,i,l1) > 9.)  then
+          if (xh <= .1) then
            kmin=i+1
           else
 
-            if (iadvance  ==  0) then  ! sfift X index to avoid X=0.
+            if (iadvance == 0) then  ! sfift X index to avoid X=0.
             iadvance=iadvance+1
             mf=mf+1
             mg=mg+1
@@ -373,19 +373,19 @@
           end if
         end if
       end do
-      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and. (slt  <=  alt(kmin))) then
+      if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
       k1=kmin
-      if ((co(1,1,1,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
+      if ((co(1,1,1,kmin,l1+1) < 9.) .and. ((slr+.01) > alr(l1+1))) then
       l1=l1+1
       kmin=0
       k1=k1in
       do i=1,6
-      if (co(1,1,1,i,l1)  >  9.) kmin=i+1
+      if (co(1,1,1,i,l1) > 9.) kmin=i+1
       end do
-      if ((kmin  /=  0) .and. (k1in  <  kmin)) k1=kmin
+      if ((kmin /= 0) .and. (k1in < kmin)) k1=kmin
       end if
       end if
-      if ((slt+.001)  <  alt(k1)) then
+      if ((slt+.001) < alt(k1)) then
 !      write (*,'("OPAL data not available for X=", f7.5," logT6=", f7.3, " logR=",f7.3)') xh,slt,slr
       opact=30.
       dopact=99.
@@ -404,7 +404,7 @@
       end if
 !-----end of check for missing data
       do m=mf,mf2
-       if(mx  >=  4) then
+       if(mx >= 4) then
 !.....  C and O  fractions determined by the ray through the origin that
 !       also passes through the point (Xc,Xo). Specific interpolation
 !       values determined by tabulated X values;i.e. xa(m).  Inter-
@@ -429,20 +429,20 @@
          no=i
          xc(i)=xcs(i)
          xo(i)=xos(i)
-!          if(xcs(i)  >=  xhe-1.e-6) then
-           if(xcs(i)  >  xhe) then
+!          if(xcs(i) >= xhe-1.e-6) then
+           if(xcs(i) > xhe) then
             xc(i)=xhe
             xo(i)=xhe
             exit
            end if
          end do
 
-      if(itime(m)  /=  12345678) then
+      if(itime(m) /= 12345678) then
       itime(m)=12345678
       mxzero=0
         do i=1,mx
           xx(i)=log10(0.005+xa(i))
-          if (xa(i)  ==  0.0) mxzero=i
+          if (xa(i) == 0.0) mxzero=i
         end do
 !  ... this is the first time through this m. Calculate the decadic
 !      log of the perimeter points shifted by Z+0.001(to avoid divergence
@@ -484,44 +484,44 @@
 !..... Determine log R and log T6 grid points to use in the
 !      interpolation.
 
-      if((slt  <  alt(1)).or.(slt  >  alt(nt))) then
+      if((slt < alt(1)).or.(slt > alt(nt))) then
          !write(*,*) 'slt', slt, 'not in range', alt(1), 'to', alt(nt)
          GOTO 62
       end if
 
-      if((slr  <  alr (1)).or.(slr  >  alr(nr))) then
+      if((slr < alr (1)).or.(slr > alr(nr))) then
          !write(*,*) 'slr', slr, 'not in range', alr(1), 'to', alr(nr)
          GOTO 62
       end if
 
-      if (m  ==  mf) then  !  calculate table indices
+      if (m == mf) then  !  calculate table indices
 
-      if((mf2  /=  mxzero) .and. (k3s  >  ntm)) then
-         !write(*,*) '(mf2  /=  mxzero) .and. (k3s  >  ntm)'
+      if((mf2 /= mxzero) .and. (k3s > ntm)) then
+         !write(*,*) '(mf2 /= mxzero) .and. (k3s > ntm)'
          !write(*,*) 'mf2', mf2, 'k3s', k3s
          GOTO 62
       end if
 
       do i=14,18 ! check for missing entries at right end of row
-         if((l3s  >  i) .and. (k3s  >  nta(i+1))) then
-            !write(*,*) '(l3s  >  i) .and. (k3s  >  nta(i+1))'
+         if((l3s > i) .and. (k3s > nta(i+1))) then
+            !write(*,*) '(l3s > i) .and. (k3s > nta(i+1))'
             GOTO 62
          end if
       end do
       ip=3
       iq=3
       ntlimit=nta(l3s)
-      if((k3s  ==  ntlimit) .or. (iop  ==  0)) then
+      if((k3s == ntlimit) .or. (iop == 0)) then
         ip=2
         iq=2
       end if
-      if(t6  <=  t6list(2)+1.e-7 .or. iop  ==  0) ip=2
+      if(t6 <= t6list(2)+1.e-7 .or. iop == 0) ip=2
 
-      if((l3  ==  nr) .or. (iop  ==  0)) then ! right edge of full table
+      if((l3 == nr) .or. (iop == 0)) then ! right edge of full table
         iq=2
         ip=2
       end if
-      if(slr  <=  alr(2)+1.e-7 .or. iop  ==  0) iq=2
+      if(slr <= alr(2)+1.e-7 .or. iop == 0) iq=2
       end if
 
       xodp=max(-xxc+xc(nc),0.)
@@ -531,7 +531,7 @@
       call cointerp(xxc,xxo)
       end do
 
-        if((zz(mg,1)  /=  zz(mf,1)) .or. (zz(mh,1)  /=  zz(mf,1))) then
+        if((zz(mg,1) /= zz(mf,1)) .or. (zz(mh,1) /= zz(mf,1))) then
           write(*,*) 'xxc', xxc
           write(*,*) 'xxo', xxo
           write(*,*) 'zz(mg,1)', zz(mg,1)
@@ -549,7 +549,7 @@
       iw=1
       do ir=l1,l1+iq
        do it=k1,k1+ip
-         if((mx  ==  1) .or. (mf2  ==  1)) then
+         if((mx == 1) .or. (mf2 == 1)) then
            opk(it,ir)=opl(mf,it,ir)
            cycle
          end if
@@ -558,7 +558,7 @@
       end do
       end do
 
-      if (mi  ==  mf2) then  ! interpolate between quadratics
+      if (mi == mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xxx)*dfsx(mh)
@@ -667,18 +667,18 @@
       is=1
       end do
       end do
-      if(is  ==  1) GOTO 123
+      if(is == 1) GOTO 123
 !__________
       end if
 
 !                    interpolation in region c3 to c6
       is=0
 
-      if(nc  >=  5) then
+      if(nc >= 5) then
 !__________
       do i=4,nc-1
 !     do not go beyond middle (where c3-c6 overlaps o3-o6), and
-        if((xxc  >  xcd(i)-1.e-6) .and. (xxo  >  xo(i-1)-1.e-6) .and. (xcd(i-1)  >  xc(i-1))) then
+        if((xxc > xcd(i)-1.e-6) .and. (xxo > xo(i-1)-1.e-6) .and. (xcd(i-1) > xc(i-1))) then
       do ir=l1,l1+iq
       do it=k1,k1+ip
         oxdp=log10(zzz+xodp)
@@ -701,16 +701,16 @@
         is=1
       end do
       end do
-      if (is  ==  1) GOTO 123
+      if (is == 1) GOTO 123
         end if
       end do
 !__________
       end if
 
-      if (is  ==  1) GOTO 123
+      if (is == 1) GOTO 123
 
 !     include boundaries that could later cause division by 0!
-      if(xxo  >  xod(3)-1.e-6) then
+      if(xxo > xod(3)-1.e-6) then
 !__________
       cxdp=log10(zzz+xcdp)
 !     handle possibility that xcdp=0
@@ -750,13 +750,13 @@
       is=1
       end do
       end do
-      if(is  ==  1) GOTO 123
+      if(is == 1) GOTO 123
 !__________
       end if
 
 !                    interpolation in region  o3 to o6
       is=0
-      if(no  >=  5) then
+      if(no >= 5) then
 !__________
       do i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
@@ -782,21 +782,21 @@
       is=1
       end do
       end do
-      if (is  ==  1) GOTO 123
+      if (is == 1) GOTO 123
       end if
       end do
 !__________
       end if
 
-      if (is  ==  1) GOTO 123
+      if (is == 1) GOTO 123
 
 !.....find index of C grid.
    52 ie=100*xxc+1
       iei=index(ie)+1
 !     must also allow index = nc, to avoid extrapolation
-      if (iei  >  nc) iei=nc
+      if (iei > nc) iei=nc
 
-        if(iei  >  3) then
+        if(iei > 3) then
           i1=iei-2
           i2=iei-1
           i3=iei
@@ -810,9 +810,9 @@
       ie=100*xxo+1
       iej=index(ie)+1
 !     must also allow index = no, to avoid extrapolation
-      if (iej  >  no) iej=no
+      if (iej > no) iej=no
 
-        if(iej  >  3) then
+        if(iej > 3) then
           j1=iej-2
           j2=iej-1
           j3=iej
@@ -905,7 +905,7 @@
           dkapq1=dkap
           dopactq=0.d0
         end if
-        if(ip  ==  3) then
+        if(ip == 3) then
 !.....    k and Dlog(k)/Dlog(T6) in lower-left 3x3.
           opact2=quad2(is,iw,slt,h(2),h(3),h(4),alt(k2),alt(k3),alt(k4))
           dkap2=dkap
@@ -914,7 +914,7 @@
           dopact=dkap1*dix+dkap2*(1.-dix)
           opact=opact*dix+opact2*(1.-dix)
 
-            if(iq  ==  3) then
+            if(iq == 3) then
 !.....       k and Dlog(k)/Dlog(T6) in upper-right 3x3.
                opactq2=quad2(is,iw,slt,q(2),q(3),q(4),alt(k2),alt(k3),alt(k4))
                dkapq2=dkap
@@ -928,7 +928,7 @@
         iw=1
         iu=iu+1
         h(iu)=quad2(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),alt(k1),alt(k2),alt(k3))
-          if(ip  ==  3) then
+          if(ip == 3) then
             iw=2
             q(iu)=quad2(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),alt(k2),alt(k3),alt(k4))
           end if
@@ -940,12 +940,12 @@
 !..... k and Dlog(k)/Dlog(R) in lower-left 3x3
       opacr=quad2(is,iw,slr,h(1),h(2),h(3),alr(l1),alr(l2),alr(l3))
       dopacr=dkap
-        if(ip  ==  3) then
+        if(ip == 3) then
           opacrq=quad2(is,iw,slr,q(1),q(2),q(3),alr(l1),alr(l2),alr(l3))
 !.....    k and Dlog(k)/Dlog(R) in upper-left 3x3.
           dopacrq=dkap
         end if
-        if(iq  ==  3) then
+        if(iq == 3) then
 !.....    k and Dlog(k)/Dlog(R) in lower-right 3x3.
           opact2=quad2(is,iw,slr,h(2),h(3),h(4),alr(l2),alr(l3),alr(l4))
           dix2=(alr(l3)-slr)*dfsr(l3)
@@ -954,8 +954,8 @@
               dopact=dopact*dix2+dopactq*(1.-dix2)
               opact=opact*dix2+opactq*(1.-dix2)
          end if
-        if(ip  ==  3) then
-         if(iq  ==  3) then
+        if(ip == 3) then
+         if(iq == 3) then
 !.....    k and Dlog(k)/Dlog(R) in upper-right 3x3.
           opacrq=quad2(is,iw,slr,q(2),q(3),q(4),alr(l2),alr(l3),alr(l4))
 !.....        Dlog(k)/Dlog(R) smoothed in both log(T6) and Log(R).
@@ -964,11 +964,11 @@
               dopacr=dopacr*dix+dopacrq*(1.-dix)
         end if
       dopactd=dopact-3.*dopacr
-!        if (opact  >  1.e+15) then
+!        if (opact > 1.e+15) then
 !          write(*,'("Interpolation indices out of range; please report conditions.")')
 !          call mesa_error(__FILE__,__LINE__)
 !        end if
-      if (opact  >  9) then
+      if (opact > 9) then
       opact=30.
       dopact=99.
       dopactr=99.
@@ -997,7 +997,7 @@
 
       logical line_full
 
-        if (itimeco  /=  12345678) then
+        if (itimeco /= 12345678) then
         readco_z = z
         do i=1,mx
           do j=1,mc
@@ -1025,14 +1025,14 @@
 
       do j=1,nc-1
        do i=1,nc
-         if(xcd(j)  >=  xc(i)) then
+         if(xcd(j) >= xc(i)) then
            n(m,j)=i+1
            ! BP
            !   the following line was in the original but causes an off-by-1 bug in a single case
-           !if(xcd(j)  <  xc(i)+1.e-6) n(m,j)=i
+           !if(xcd(j) < xc(i)+1.e-6) n(m,j)=i
            !   the bug only shows up for X=0.35 and Z=0.05
            !   the old version thought it should have 8 tables for dX2=0.0, but there are only 7.
-           if(xcd(j)  <  xc(i)+1.e-6) then
+           if(xcd(j) < xc(i)+1.e-6) then
              n(m,j)=i
              exit
            end if
@@ -1065,8 +1065,8 @@
             line_full = .true.
             do l=1,nrm
                read(2,fmt='(19f7.3)',advance='no',iostat=ioerror) cof(k,l)
-               if (ioerror  /=  0) then ! have reached end of data for this temperature
-                  if (l  <  3) then
+               if (ioerror /= 0) then ! have reached end of data for this temperature
+                  if (l < 3) then
                      write(*,*) 'lost in reading -- expected to find at least 2 entries on this line!'
                      call mesa_error(__FILE__,__LINE__)
                   end if
@@ -1093,15 +1093,15 @@
 
           end do
 
-          if (isett6  /=  1234567) then
+          if (isett6 /= 1234567) then
           do k=1,ntm
             t6arr(k)=t6list(k)
           end do
           end if
           isett6=1234567
 
-       if (ismdata  ==  0) then
-         if ((nrm  /=  nr) .or. (ntm  /=  nt)) then
+       if (ismdata == 0) then
+         if ((nrm /= nr) .or. (ntm /= nt)) then
            write (*,'("Not set up to smooth data with reduced T-Rho grid")')
            call mesa_error(__FILE__,__LINE__)
          end if
@@ -1120,8 +1120,8 @@
       do kk=nrb,nre
         alr(ll)=alrf(kk)
           do k=1,nt
-            if (ismdata  ==  0) then
-              if ((m  ==  1) .and. (k  <=  9)) then
+            if (ismdata == 0) then
+              if ((m == 1) .and. (k <= 9)) then
                 co(m,i,j,k,ll)=cof(k+ntb-1,kk)
               else
                 co(m,i,j,k,ll)=coff(k+ntb-1,kk)
@@ -1134,7 +1134,7 @@
       end do
       end do ! i
       end do ! j
-      if(x(m,1)  /=  xa(m)) then
+      if(x(m,1) /= xa(m)) then
       write(*,'(" X in the codata? file does not match xa(m)")')
       call mesa_error(__FILE__,__LINE__)
       end if
@@ -1161,8 +1161,8 @@
             line_full = .true.
             do l=1,nrm
                read(2,fmt='(19f7.3)',advance='no',iostat=ioerror) cof(k,l)
-               if (ioerror  /=  0) then ! have reached end of data for this temperature
-                  if (l  <  3) then
+               if (ioerror /= 0) then ! have reached end of data for this temperature
+                  if (l < 3) then
                      write(*,*) 'lost in reading -- expected to find at least 2 entries on this line!'
                      call mesa_error(__FILE__,__LINE__)
                   end if
@@ -1190,8 +1190,6 @@
           end do
 
 
-
-
 !         do k=1,ntm
 !           read (2,'(f4.2,19f7.3)') dum, (cof(k,l), l=1,nrm)
 !     set up to smooth final "diago" opacity tables
@@ -1202,7 +1200,7 @@
 
 
 !     smooth final "diago" opacity tables too!
-       if (ismdata  ==  0) then
+       if (ismdata == 0) then
         tmax=10.   ! modified
         nset=67 !65 in earlier version
         RLS=-8.
@@ -1215,7 +1213,7 @@
           do ll=nrlow,nrhigh
 !           Following skip required because, due to missing data,
 !           the X=0  low T data cannot be smoothed
-            if ((m  ==  1) .and. (k  <=  9)) then
+            if ((m == 1) .and. (k <= 9)) then
               cof(k,ll)=cof(k,ll)
             else
               cof(k,ll)=coff(k,ll)
@@ -1240,7 +1238,7 @@
        dfsr(i)=1./(alr(i)-alr(i-1))
       end do
       istep=-1
-      if (mx  >  1 ) then
+      if (mx > 1 ) then
         istep=1
         do i=2,mx,istep
           dfsx(i)=1./(xx(i)-xx(i-1))
@@ -1262,7 +1260,7 @@
       yy(1)=y1
       yy(2)=y2
       yy(3)=y3
-        if(ic  ==  0) then
+        if(ic == 0) then
           if (xx(2) == xx(3)) then
              xx12(i)=1./(xx(1)-xx(2))
              xx13(i)=0
@@ -1402,7 +1400,7 @@
          end do
       end do
 
-      END
+      end
 ! ********************************************************************
       subroutine FITX2
 
@@ -1427,7 +1425,7 @@
          end do
       end do
 
-      END
+      end
 
 ! ***********************************************************************
       subroutine GETD2(F,N,D,FP1,FPN)
@@ -1454,7 +1452,7 @@
          D(J)=D(J)*D(J+1)+T(J)
       end do
 
-      END
+      end
 
 ! ********************************************************************
       subroutine INTERP2(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1532,11 +1530,11 @@
       end if
       V=Y-J
 
-      if(IERR) then
+      if (IERR) then
          G=9.999
          DGDT=9.999
          DGDRHO=9.999
-         RETURN
+          return
       end if
 
 
@@ -1583,7 +1581,7 @@
       DGDT=20.*FFX(U,V)-6.*FFY(U,V)
       DGDRHO=2.*FFY(U,V)
 
-      END
+      end
 
 ! ********************************************************************
       subroutine SMOOTH2
@@ -1752,7 +1750,7 @@
       ROSSL(1,j)=coff(1,j)
       end do
       U(1)=0.d0
-      if( abs(T6 -.0056341325)  <  1.e-8) then
+      if( abs(T6 -.0056341325) < 1.e-8) then
          U(1)=6.+LOG10(T6)
       end if
 !     SET ROSSL UP TO T6=t6arr(nset)
@@ -1825,7 +1823,7 @@
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
 !              IERR=.true. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
-!                          ELSE IERR=.false.
+!                          elseIERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS
       if(NSM > 0) then

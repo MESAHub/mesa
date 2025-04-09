@@ -28,8 +28,8 @@ module test_rates_support
    use rates_def
    use rates_lib
    use chem_lib
-   use const_lib
    use const_def, only: missing_value
+   use const_lib, only: const_init
    use math_lib
    use utils_lib, only: mesa_error
 

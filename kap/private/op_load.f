@@ -41,7 +41,6 @@
       character (len=*), intent(in) :: path, cache_filename
       integer, intent(out) :: ierr
 
-
       real :: am,amm,delp,dpack
       integer :: ios,it,ite11,ite22,ite33,itt,itte1,itte2,itte3,izz,jne,ite
       integer :: jne1,jne22,jne33,jnn,k,n,ncount2,ncount3,ja,jn
@@ -554,7 +553,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !         HIGHLY-DEGENERATE CASES.
 !     (2) INCLUDE RELATIVISTIC CORRECTION.
 !
-      PARAMETER (IPZ=28,IPNC=100)
+      parameter (IPZ=28,IPNC=100)
       DIMENSION RION(IPZ),U(0:IPNC),SF(0:IPNC)
 
       AUNE=1.48185E-25*FNE

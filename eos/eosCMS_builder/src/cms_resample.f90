@@ -29,7 +29,7 @@
 program cms_resample
 
    use const_def
-   use const_lib
+   use const_lib, only: const_init
    use interp_1d_def
    use interp_1d_lib
    use math_lib

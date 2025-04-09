@@ -25,6 +25,7 @@
 
 module test_screen
 
+   use const_def, only: dp
    use rates_lib
    use rates_def
    use utils_lib, only: mesa_error
@@ -36,7 +37,7 @@ contains
    subroutine do_test_screen
       use chem_def
       use chem_lib
-      use const_lib, only: dp, const_init
+      use const_lib, only: const_init
       use math_lib
 
       integer, parameter :: num_isos = 8, max_z_to_cache = 12

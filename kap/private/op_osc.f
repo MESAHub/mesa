@@ -570,7 +570,7 @@
 !
 !  REVISED 5.5.95
 !
-      PARAMETER (IPI=6)
+      parameter (IPI=6)
       DIMENSION F(IPI),D(IPI),T(IPI)
 
       if (N <= 0) then

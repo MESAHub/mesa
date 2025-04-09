@@ -1,6 +1,6 @@
 program test_math
 
-   use const_lib
+   use const_lib, only: const_init
    use utils_lib
    use math_lib
 

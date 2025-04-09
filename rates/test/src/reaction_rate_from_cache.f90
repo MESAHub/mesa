@@ -26,7 +26,7 @@
 program show_rates
 
    use rates_lib
-   use const_lib
+   use const_lib, only: const_init
    use math_lib
    use utils_lib, only: mesa_error
 

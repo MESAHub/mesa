@@ -25,7 +25,7 @@ program sample_kap
    use chem_lib
    use chem_def
    use const_def
-   use const_lib
+   use const_lib, only: const_init
    use math_lib
    use utils_lib, only: mesa_error
 

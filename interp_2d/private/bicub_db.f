@@ -340,7 +340,7 @@
       integer iv(ivec),jv(ivec)         ! grid cell indices -- vectors
       real(dp) dxv(ivec),dyv(ivec)          ! displacements w/in cell -- vectors
 
-      integer inf3                      ! 3rd dimension of f --  >=  nx
+      integer inf3                      ! 3rd dimension of f -- >= nx
       real(dp) f(4,4,inf3,ny)               ! bicubic fcn spline coeffs array
 
 !  usage example:
@@ -666,7 +666,7 @@
 !  points but satisfies a BC which is the difference btw the user spec
 !  and the not-a-knot result; add the coeffs of this into the original.
 
-!  for this more workspace is needed: nwk  >=  4*inx*inth +5*max(inx,inth)
+!  for this more workspace is needed: nwk >= 4*inx*inth +5*max(inx,inth)
 
       subroutine bcspline_db(x,inx,th,inth,fspl,inf3,
      &                    ibcxmin,bcxmin,ibcxmax,bcxmax,
@@ -1271,7 +1271,7 @@
       integer inf2
       real(dp), pointer :: f1(:)
 
-!       f 2nd dimension inf2 must be  >=  nx
+!       f 2nd dimension inf2 must be >= nx
 !       contents of f:
 
 !  f(0,i,j) = f @ x(i),y(j)
@@ -1357,8 +1357,8 @@ C-------------------
       real(dp) hx,hy
       real(dp) hxi,hyi
 
-!  0  <=  xparam  <=  1
-!  0  <=  yparam  <=  1
+!  0 <= xparam <= 1
+!  0 <= yparam <= 1
 
 !  ** the interface is very similar to herm2ev.for; can use herm2xy **
 C---------------------------------------------------------------------
@@ -1975,7 +1975,7 @@ C-------------------------------------------------
 
       real(dp) f(0:3,inf2,ny)               ! function data
 
-!       f 2nd dimension inf2 must be  >=  nx
+!       f 2nd dimension inf2 must be >= nx
 !       contents of f:
 
 !  f(0,i,j) = f @ x(i),y(j)
@@ -2032,8 +2032,8 @@ C-------------------------------------------------
       real(dp) hx,hy
       real(dp) hxi,hyi
 
-!  0  <=  xparam  <=  1
-!  0  <=  yparam  <=  1
+!  0 <= xparam <= 1
+!  0 <= yparam <= 1
 
 !---------------------------------------------------------------------
 
@@ -3198,7 +3198,7 @@ C-------------------------------------------------
 !        use them occurs in the non-periodic forward elimination loop
 !        only.  DMC 24 Feb 2004.
 !***********************************************************************
-      IMPLICIT NONE
+      implicit none
 !Declaration of input variables
       integer        k_bc1,                   k_bcn,
      &               n

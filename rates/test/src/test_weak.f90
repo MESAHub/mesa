@@ -36,7 +36,6 @@ module test_weak
 contains
 
    subroutine do_test_weak
-      use const_lib
       use chem_lib
       use chem_def, only: iso_name_length, chem_isos
       use rates_def, only: Coulomb_Info

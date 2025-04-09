@@ -179,7 +179,7 @@ program make_free_eos_table
    use free_eos_table
    use chem_def
    use chem_lib
-   use const_lib
+   use const_lib, only: const_init
    use utils_lib
 
    implicit none

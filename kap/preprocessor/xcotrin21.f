@@ -174,7 +174,7 @@
         ihi=mx
     8   if(ihi-ilo  >  1) then
           imd=(ihi+ilo)/2
-            if(xh  <=  xa(imd)+1.e-7) then
+            if(xh <= xa(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -190,10 +190,10 @@
         istep1=1
         if (mx  >  1) then
         istep1=mx-1
-        if((xh  <=  xa(2)+1.e-7) .or. (xh  >=  xa(istep1)-1.e-7)) mf2=mh
+        if((xh <= xa(2)+1.e-7) .or. (xh >= xa(istep1)-1.e-7)) mf2=mh
         end if
 
-        if ((mx  ==  1) .or. (xh  <  1.e-6)) then
+        if ((mx == 1) .or. (xh  <  1.e-6)) then
           mf=1
           mg=1
           mh=1
@@ -201,7 +201,7 @@
           mf2=1
         end if
 
-      if (itime(1)  /=  12345678) then
+      if (itime(1) /= 12345678) then
       alr(1)=-8.+(nrb-1)*0.5
       do i=2,nr
         alr(i)=alr(i-1)+0.5
@@ -226,7 +226,7 @@
         ihi=nr
    12     if(ihi-ilo  >  1) then
           imd=(ihi+ilo)/2
-            if(slr  <=  alr(imd)+1.e-7) then
+            if(slr <= alr(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -243,7 +243,7 @@
         ihi=nt
    11     if(ihi-ilo  >  1) then
           imd=(ihi+ilo)/2
-            if(t6  <=  t6list(imd)+1.e-7) then
+            if(t6 <= t6list(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -263,14 +263,14 @@
       k1in=k1
       iadvance=0
       mfin=mf
-      if ((mfin  ==  1) .and. (co(1,1,1,k1,l1)  >  9.)) then! data missing
+      if ((mfin == 1) .and. (co(1,1,1,k1,l1)  >  9.)) then! data missing
       do i=1,6
         if (co(1,1,1,i,l1)  >  9.)  then
           if (xh  <  .1) then
            kmin=i+1
           else
 
-            if (iadvance  ==  0) then  ! sfift X index to avoid X=0.
+            if (iadvance == 0) then  ! sfift X index to avoid X=0.
             iadvance=iadvance+1
             mf=mf+1
             mg=mg+1
@@ -281,7 +281,7 @@
           end if
         end if
       end do
-      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and. (slt  <=  alt(kmin))) then
+      if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
       k1=kmin
       if ((co(1,1,1,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
       l1=l1+1
@@ -290,7 +290,7 @@
       do i=1,6
       if (co(1,1,1,i,l1)  >  9.) kmin=i+1
       end do
-      if ((kmin  /=  0) .and. (k1in  <  kmin)) k1=kmin
+      if ((kmin /= 0) .and. (k1in  <  kmin)) k1=kmin
       end if
       end if
       if ((slt+.001)  <  alt(k1)) then
@@ -312,7 +312,7 @@
       end if
 ! ----end of check for missing data
       do m=mf,mf2
-       if(mx  >=  4) then
+       if(mx >= 4) then
 ! ....  C and O  fractions determined by the ray through the origin that
 !       also passes through the point (Xc,Xo). Specific interpolation
 !       values determined by tabulated X values;i.e. xa(m).  Inter-
@@ -337,7 +337,7 @@
          no=i
          xc(i)=xcs(i)
          xo(i)=xos(i)
-!          if(xcs(i)  >=  xhe-1.e-6) then
+!          if(xcs(i) >= xhe-1.e-6) then
            if(xcs(i) > xhe) then
             xc(i)=xhe
             xo(i)=xhe
@@ -394,26 +394,26 @@
       if((slt  <  alt(1)).or.(slt  >  alt(nt))) GOTO 62
       if((slr  <  alr (1)).or.(slr  >  alr(nr))) GOTO 62
 
-      if (m  ==  mf) then  !  calculate table indices
+      if (m == mf) then  !  calculate table indices
 
-      if((mf2  /=  mxzero) .and. (k3s  >  ntm)) GOTO 62
+      if((mf2 /= mxzero) .and. (k3s  >  ntm)) GOTO 62
         do i=14,18
           if((l3s  >  i) .and. (k3s  >  nta(i+1))) GOTO 62
         end do
       ip=3
       iq=3
       ntlimit=nta(l3s)
-      if((k3s  ==  ntlimit) .or. (iop  ==  0)) then
+      if((k3s == ntlimit) .or. (iop == 0)) then
         ip=2
         iq=2
       end if
-      if(t6  <=  t6list(2)+1.e-7 .or. iop  ==  0) ip=2
+      if(t6 <= t6list(2)+1.e-7 .or. iop == 0) ip=2
 
-      if((l3  ==  nr) .or. (iop  ==  0)) then ! right edge of full table
+      if((l3 == nr) .or. (iop == 0)) then ! right edge of full table
         iq=2
         ip=2
       end if
-      if(slr  <=  alr(2)+1.e-7 .or. iop  ==  0) iq=2
+      if(slr <= alr(2)+1.e-7 .or. iop == 0) iq=2
       end if
 
       xodp=max(-xxc+xc(nc),0.)
@@ -423,11 +423,11 @@
       call cointerp(xxc,xxo)
       end do
 
-        if((zz(mg,1)  /=  zz(mf,1)) .or. (zz(mh,1)  /=  zz(mf,1))) then
+        if((zz(mg,1) /= zz(mf,1)) .or. (zz(mh,1) /= zz(mf,1))) then
           write(*,'("Z does not match Z in codata* files you are using")')
           stop
         end if
-      if(z  /=  zz(mf,1)) GOTO 66
+      if(z /= zz(mf,1)) GOTO 66
       xxc=xxci   ! restores input value; necessary if stop replaced
 !                  with return
       xxo=xxoi   ! restores input value
@@ -435,7 +435,7 @@
       iw=1
       do ir=l1,l1+iq
        do it=k1,k1+ip
-         if((mx  ==  1) .or. (mf2  ==  1)) then
+         if((mx == 1) .or. (mf2 == 1)) then
            opk(it,ir)=opl(mf,it,ir)
            cycle
          end if
@@ -628,7 +628,7 @@
       is=1
       end do
       end do
-      if(is  ==  1) GOTO 123
+      if(is == 1) GOTO 123
 ! _________
       end if
 
@@ -782,7 +782,7 @@
           opactq=quad(is,iw,slt,q(1),q(2),q(3),alt(k1),alt(k2),alt(k3))
           dkapq1=dkap
         end if
-        if(ip  ==  3) then
+        if(ip == 3) then
 ! ....    k and Dlog(k)/Dlog(T6) in lower-left 3x3.
           opact2=quad(is,iw,slt,h(2),h(3),h(4),alt(k2),alt(k3),alt(k4))
           dkap2=dkap
@@ -790,7 +790,7 @@
           dix=(alt(k3)-slt)*dfs(k3)
           dopact=dkap1*dix+dkap2*(1.-dix)
           opact=opact*dix+opact2*(1.-dix)
-        if(iq  ==  3) then
+        if(iq == 3) then
 
 ! ....    k and Dlog(k)/Dlog(T6) in upper-right 3x3.
           opactq2=quad(is,iw,slt,q(2),q(3),q(4),alt(k2),alt(k3),alt(k4))
@@ -805,7 +805,7 @@
         iw=1
         iu=iu+1
         h(iu)=quad(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),alt(k1),alt(k2),alt(k3))
-          if(ip  ==  3) then
+          if(ip == 3) then
             iw=2
             q(iu)=quad(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),alt(k2),alt(k3),alt(k4))
           end if
@@ -817,12 +817,12 @@
 ! .... k and Dlog(k)/Dlog(R) in lower-left 3x3
       opacr=quad(is,iw,slr,h(1),h(2),h(3),alr(l1),alr(l2),alr(l3))
       dopacr=dkap
-        if(ip  ==  3) then
+        if(ip == 3) then
           opacrq=quad(is,iw,slr,q(1),q(2),q(3),alr(l1),alr(l2),alr(l3))
 ! ....    k and Dlog(k)/Dlog(R) in upper-left 3x3.
           dopacrq=dkap
         end if
-        if(iq  ==  3) then
+        if(iq == 3) then
 ! ....    k and Dlog(k)/Dlog(R) in lower-right 3x3.
           opact2=quad(is,iw,slr,h(2),h(3),h(4),alr(l2),alr(l3),alr(l4))
           dix2=(alr(l3)-slr)*dfsr(l3)
@@ -831,8 +831,8 @@
               dopact=dopact*dix2+dopactq*(1.-dix2)
               opact=opact*dix2+opactq*(1.-dix2)
          end if
-        if(ip  ==  3) then
-         if(iq  ==  3) then
+        if(ip == 3) then
+         if(iq == 3) then
 ! ....    k and Dlog(k)/Dlog(R) in upper-right 3x3.
           opacrq=quad(is,iw,slr,q(2),q(3),q(4),alr(l2),alr(l3),alr(l4))
 ! ....        Dlog(k)/Dlog(R) smoothed in both log(T6) and Log(R).
@@ -871,7 +871,7 @@
       character*1 dumarra(250)
       common/recoin/ itimeco,mxzero
 
-        if (itimeco  /=  12345678) then
+        if (itimeco /= 12345678) then
         do i=1,mx
           do j=1,mc
             do k=1,mo
@@ -897,7 +897,7 @@
         end if
       do j=1,nc-1
        do i=1,nc
-         if(xcd(j)  >=  xc(i)) then
+         if(xcd(j) >= xc(i)) then
            n(m,j)=i+1
            if(xcd(j)  <  xc(i)+1.e-6) n(m,j)=i
          end if
@@ -907,15 +907,15 @@
 
       close (2)
 ! .... read X=0.0 tables
-      if(m  ==  1) open(2, FILE='codataa')
+      if(m == 1) open(2, FILE='codataa')
 ! .... read X=0.03 tables
-      if(m  ==  2) open(2, FILE='codatab')
+      if(m == 2) open(2, FILE='codatab')
 ! .... read X=0.10 tables
-      if(m  ==  3) open(2, FILE='codatac')
+      if(m == 3) open(2, FILE='codatac')
 ! .... read X=0.35 tables
-      if(m  ==  4) open(2, FILE='codatad')
+      if(m == 4) open(2, FILE='codatad')
 ! ....read X=0.70 tables
-      if(m  ==  5) open(2, FILE='codatae')
+      if(m == 5) open(2, FILE='codatae')
 
 !      read header
       read(2,'(a)') (dumarra(i),i=1,240)
@@ -939,15 +939,15 @@
               coff(k,ll)=cof(k,ll)
             end do
           end do
-          if (isett6  /=  1234567) then
+          if (isett6 /= 1234567) then
           do k=1,ntm
             t6arr(k)=t6list(k)
           end do
           end if
           isett6=1234567
 
-       if (ismdata  ==  0) then
-         if ((nrm  /=  nr) .or. (ntm  /=  nt)) then
+       if (ismdata == 0) then
+         if ((nrm /= nr) .or. (ntm /= nt)) then
            write (*,'("Not set up to smooth data with reduced T-Rho grid")')
            stop
          end if
@@ -966,8 +966,8 @@
       do kk=nrb,nre
       alr(ll)=alrf(kk)
         do k=1,nt
-          if (ismdata  ==  0) then
-            if ((m  ==  1) .and. (k  <=  9)) then
+          if (ismdata == 0) then
+            if ((m == 1) .and. (k <= 9)) then
               co(m,i,j,k,ll)=cof(k+ntb-1,kk)
             else
               co(m,i,j,k,ll)=coff(k+ntb-1,kk)
@@ -980,7 +980,7 @@
       end do
       end do
       end do
-      if(x(m,1)  /=  xa(m)) then
+      if(x(m,1) /= xa(m)) then
       write(*,'(" X in the codata? file does not match xa(m)")')
       stop
       end if
@@ -1008,7 +1008,7 @@
            end do
         end do
 !     smooth final "diago" opacity tables too!
-       if (ismdata  ==  0) then
+       if (ismdata == 0) then
         tmax=10.   ! modified
         nset=67 !65 in earlier version
         RLS=-8.
@@ -1021,7 +1021,7 @@
           do ll=nrlow,nrhigh
 !           Following skip required because, due to missing data,
 !           the X=0  low T data cannot be smoothed
-            if ((m  ==  1) .and. (k  <=  9)) then
+            if ((m == 1) .and. (k <= 9)) then
               cof(k,ll)=cof(k,ll)
             else
               cof(k,ll)=coff(k,ll)
@@ -1067,7 +1067,7 @@
       yy(1)=y1
       yy(2)=y2
       yy(3)=y3
-        if(ic  ==  0) then
+        if(ic == 0) then
           xx12(i)=1./(xx(1)-xx(2))
           xx13(i)=1./(xx(1)-xx(3))
           xx23(i)=1./(xx(2)-xx(3))
@@ -1525,7 +1525,7 @@
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER*1 HEAD(100)
+      character*1 HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       logical IERR

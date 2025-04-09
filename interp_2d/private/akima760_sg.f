@@ -69,7 +69,7 @@
 ! arrays.  Between the call with MD=2 and its preceding call, the
 ! WK array must not be disturbed.
 !
-! The constant in the PARAMETER statement below is
+! The constant in the parameter statement below is
 !   NIPIMX = maximum number of output points to be processed
 !            at a time.
 ! The constant value has been selected empirically.
@@ -80,7 +80,7 @@
 ! Specification statements
 !     .. Parameters ..
       integer          NIPIMX
-      PARAMETER        (NIPIMX=51)
+      parameter        (NIPIMX=51)
 !     ..
 !     .. Scalar Arguments ..
       integer          IER,MD,NIP,NXD,NYD
@@ -240,7 +240,7 @@
 ! arrays.  Between the call with MD=2 and its preceding call, the
 ! WK array must not be disturbed.
 !
-! The constant in the PARAMETER statement below is
+! The constant in the parameter statement below is
 !   NIPIMX = maximum number of output points to be processed
 !            at a time.
 ! The constant value has been selected empirically.
@@ -251,7 +251,7 @@
 ! Specification statements
 !     .. Parameters ..
       integer          NIPIMX
-      PARAMETER        (NIPIMX=51)
+      parameter        (NIPIMX=51)
 !     ..
 !     .. Scalar Arguments ..
       integer          IER,MD,NXD,NXI,NYD,NYI

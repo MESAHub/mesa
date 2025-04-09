@@ -22,8 +22,8 @@
 
 module kap_support
 
-   use const_lib
    use const_def
+   use const_lib, only: const_init
    use math_lib
    use ferg
    use utils_lib, only: mesa_error
@@ -70,7 +70,6 @@ contains
    subroutine init_preprocessor
       use chem_lib
       use chem_def
-      use const_lib
       use eos_lib
 
       logical :: use_cache

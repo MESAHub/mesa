@@ -120,12 +120,12 @@
       dimension :: kapz(mz),dkapdtr(mz),dkapdrt(mz)
       zval=z
       zzl=z   ! use zzl=log10(.0001+z) for log interpolation
-      if(itime  /=  12345678) then
+      if(itime /= 12345678) then
       do i=1,mz
       zza(i)=za(i)  ! use zza=log10(0.0001+za(i)) for log interpolation
       end do
       end if
-      if(itime  /=  12345678) then
+      if(itime /= 12345678) then
         itime=12345678
       end if
 
@@ -142,7 +142,7 @@
       ihi=mz
     8 if(ihi-ilo  >  1) then
       imd=(ihi+ilo)/2
-      if(z  <=  za(imd)+1.e-7) then
+      if(z <= za(imd)+1.e-7) then
         ihi=imd
       else
         ilo=imd
@@ -156,14 +156,14 @@
       m4=i+1
       mfm=m4
 ! ....check whether Z is near a table limit
-      if((z  <=  za(2)+1.e-7) .or. (z  >=  za(mz-1))) mfm=m3
+      if((z <= za(2)+1.e-7) .or. (z >= za(mz-1))) mfm=m3
 ! ....  Check if Z+X interpolation sums exceed unity at needed indices.
 !       If so, backup to lower Z indices to perform interpolation.
 !       This should work OK, due to density of Z-grid points and the
 !       slow Z variation(except at very small Z)
       if(xh+za(mfm)  >  1.) mfm=m3
         if(xh+za(mfm)  >  1.) then
-            if(m1  <=  1) then
+            if(m1 <= 1) then
               write(*,'("special case: X,Z location not covered by logic")')
               stop
             end if
@@ -188,7 +188,7 @@
       is=1
       dkapz1=quad(is,iw,zzl,dkapdtr(m1),dkapdtr(m2),dkapdtr(m3),zza(m1),zza(m2),zza(m3))
       dkapz3=quad(is,iw,zzl,dkapdrt(m1),dkapdrt(m2),dkapdrt(m3),zza(m1),zza(m2),zza(m3))
-      if (mfm  ==  m3) then
+      if (mfm == m3) then
         opact=log10(kapz1)   ! converts K to logK
         dopact=dkapz1
         dopacr=dkapz3
@@ -254,8 +254,8 @@
 
       if(nre  <  6) GOTO 65
 
-      if((izi  ==  0) .and. (z+xh-1.e-6  >  1 )) GOTO 61
-      if((izi  /=  0) .and. (zval+xh-1.e-6  >  1 )) GOTO 61
+      if((izi == 0) .and. (z+xh-1.e-6  >  1 )) GOTO 61
+      if((izi /= 0) .and. (zval+xh-1.e-6  >  1 )) GOTO 61
       xxh=xh
       xxi=xh
       t6i=t6
@@ -265,7 +265,7 @@
       slt=log10(t6)
       slr=log10(r)
 
-      if(itime  /=  12345678) then
+      if(itime /= 12345678) then
         itime=12345678
         do  i=1,mx
           xx(i)=log10(.005+xa(i))
@@ -289,7 +289,7 @@
           mxend=mx-1
           xa(mxend)=xa(mx)
         end if
-        if (xh  >=  0.8 ) then
+        if (xh >= 0.8 ) then
           xx(mxend)=log10 (0.005+xa(mxend))
           dfsx(mxend)=1./(xx(mxend)-xx(mxend-1))
         end if
@@ -300,12 +300,12 @@
       if((slt < alt(1)).or.(slt > alt(nt))) GOTO 62
       if((slr < alr (1)).or.(slr > alr(nre))) GOTO 62
 
-      if (izi  ==  0) then  ! freeze table indices
+      if (izi == 0) then  ! freeze table indices
         ilo=2
         ihi=mx
     8   if(ihi-ilo  >  1) then
           imd=(ihi+ilo)/2
-            if(xh  <=  xa(imd)+1.e-7) then
+            if(xh <= xa(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -324,13 +324,13 @@
         mi=2
         mf2=1
         end if
-        if((xh  <=  xa(2)+1.e-7) .or. (xh  >=  xa(mx-2)-1.e-7)) mf2=mh
+        if((xh <= xa(2)+1.e-7) .or. (xh >= xa(mx-2)-1.e-7)) mf2=mh
 
         ilo=2
         ihi=nre
    12     if(ihi-ilo  >  1) then
           imd=(ihi+ilo)/2
-            if(slr  <=  alr(imd)+1.e-7) then
+            if(slr <= alr(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -347,7 +347,7 @@
         ihi=nt
    11     if(ihi-ilo  >  1) then
           imd=(ihi+ilo)/2
-            if(t6  <=  t6list(imd)+1.e-7) then
+            if(t6 <= t6list(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -367,14 +367,14 @@
       k1in=k1
       iadvance=0
       mfin=mf
-      if ((mfin  ==  1) .and. (xz(1,mzz,k1,l1)  >  9.)) then   ! no data
+      if ((mfin == 1) .and. (xz(1,mzz,k1,l1)  >  9.)) then   ! no data
       do i=1,6
         if (xz(1,mzz,i,l1)  >  9.)  then
           if (xh  <  .1) then
            kmin=i+1
           else
 
-            if (iadvance  ==  0) then
+            if (iadvance == 0) then
             iadvance=iadvance+1
             mf=mf+1
             mg=mg+1
@@ -385,7 +385,7 @@
           end if
         end if
       end do
-      if ((iadvance  ==  0) .and. (k1  <=  kmin) .and. (slt  <=  alt(kmin))) then
+      if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
       k1=kmin
       if ((xz(1,mzz,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
       l1=l1+1
@@ -394,7 +394,7 @@
       do i=1,6
       if (xz(1,mzz,i,l1)  >  9.) kmin=i+1
       end do
-      if ((kmin  /=  0) .and. (k1in  <  kmin)) k1=kmin
+      if ((kmin /= 0) .and. (k1in  <  kmin)) k1=kmin
       end if
       end if
       if ((slt+.001)  <  alt(k1)) then
@@ -419,18 +419,18 @@
       ip=3
       iq=3
       ntlimit=nta(l3s)
-      if((k3. eq. ntlimit) .or. (iop  ==  0)) then
+      if((k3. eq. ntlimit) .or. (iop == 0)) then
         ip=2
         iq=2
       end if
-      if(t6  <=  t6list(2)+1.e-7) ip=2
+      if(t6 <= t6list(2)+1.e-7) ip=2
 
-      if((l3  ==  nre) .or. (iop  ==  0)) then
+      if((l3 == nre) .or. (iop == 0)) then
        iq=2
        ip=2
       end if
-      if ((l4  <= nr) .and. (xz(m,mzz,k3,l4)  ==  .0)) iq=2
-      if(slr  <=  alr(2)+1.e-7) iq=2
+      if ((l4  <= nr) .and. (xz(m,mzz,k3,l4) == .0)) iq=2
+      if(slr <= alr(2)+1.e-7) iq=2
 
       is=0
 
@@ -442,17 +442,17 @@
         end do
       end do
       end do
-      if((zz(mg,mzin)  /=  zz(mf,mzin)) .or. (zz(mh,mzin)  /=  zz(mf,mzin))) then
+      if((zz(mg,mzin) /= zz(mf,mzin)) .or. (zz(mh,mzin) /= zz(mf,mzin))) then
       write(*,'("Z does not match Z in GN93hz files you are using")')
       stop
       end if
-      if(z  /=  zz(mf,mzin)) GOTO 66
+      if(z /= zz(mf,mzin)) GOTO 66
 !                  with return
       is=0
       iw=1
       do ir=l1,l1+iq
         do it=k1,k1+ip
-          if (mf2  ==  1) then
+          if (mf2 == 1) then
             opk(it,ir)=opl(mf,it,ir)
             cycle
           end if
@@ -462,7 +462,7 @@
         end do
       end do
 
-      if (mi  ==  mf2) then  ! interpolate between quadratics
+      if (mi == mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xxx)*dfsx(mh)
@@ -539,7 +539,7 @@
           opactq=quad(is,iw,slt,q(1),q(2),q(3),alt(k1),alt(k2),alt(k3))
           dkapq1=dkap
         end if
-        if(ip  ==  3) then
+        if(ip == 3) then
 ! ....    k and Dlog(k)/Dlog(T6) in lower-left 3x3.
           opact2=quad(is,iw,slt,h(2),h(3),h(4),alt(k2),alt(k3),alt(k4))
           dkap2=dkap
@@ -548,7 +548,7 @@
           dopact=dkap1*dix+dkap2*(1.-dix)
           opact=opact*dix+opact2*(1.-dix)
         end if
-        if(iq  ==  3) then
+        if(iq == 3) then
 
 ! ....    k and Dlog(k)/Dlog(T6) in upper-right 3x3.
           opactq2=quad(is,iw,slt,q(2),q(3),q(4),alt(k2),alt(k3),alt(k4))
@@ -562,7 +562,7 @@
         iw=1
         iu=iu+1
         h(iu)=quad(is,iw,slt,opk(k1,lx),opk(k2,lx),opk(k3,lx),alt(k1),alt(k2),alt(k3))
-          if(ip  ==  3) then
+          if(ip == 3) then
             iw=2
             q(iu)=quad(is,iw,slt,opk(k2,lx),opk(k3,lx),opk(k4,lx),alt(k2),alt(k3),alt(k4))
           end if
@@ -574,26 +574,26 @@
 ! .... k and Dlog(k)/Dlog(R) in lower-left 3x3
       opacr=quad(is,iw,slr,h(1),h(2),h(3),alr(l1),alr(l2),alr(l3))
       dopacr=dkap
-        if(ip  ==  3) then
+        if(ip == 3) then
           opacrq=quad(is,iw,slr,q(1),q(2),q(3),alr(l1),alr(l2),alr(l3))
 ! ....    k and Dlog(k)/Dlog(R) in upper-left 3x3.
           dkapq3=dkap
         end if
-        if(iq  ==  3) then
+        if(iq == 3) then
 ! ....    k and Dlog(k)/Dlog(R) in lower-right 3x3.
           opact2=quad(is,iw,slr,h(2),h(3),h(4),alr(l2),alr(l3),alr(l4))
           dix2=(alr(l3)-slr)*dfsr(l3)
           dopacr=dopacr*dix2+dkap*(1.-dix2)
-            if(ip  ==  3) then
+            if(ip == 3) then
 ! ....        k and Dlog(k)/Dlog(T6) smoothed in both log(T6) and log(R)
               dopact=dopact*dix2+dopactq*(1.-dix2)
               opact=opact*dix2+opactq*(1-dix2)
             end if
          end if
-        if(ip  ==  3) then
+        if(ip == 3) then
 ! ....    k and Dlog(k)/Dlog(R) in upper-right 3x3.
           opacrq=quad(is,iw,slr,q(2),q(3),q(4),alr(l2),alr(l3),alr(l4))
-            if(iq  ==  3) then
+            if(iq == 3) then
 ! ....        Dlog(k)/Dlog(R) smoothed in both log(T6) and Log(R).
               dopacrq=dkapq3*dix2+dkap*(1.-dix2)
               dopacr=dopacr*dix+dopacrq*(1.-dix)
@@ -630,7 +630,7 @@
       common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
-        if (itimeco  /=  12345678) then
+        if (itimeco /= 12345678) then
         do i=1,mx
           do j=1,mz
             do k=1,nt
@@ -663,7 +663,7 @@
         do k=1,ntm
         read(2,'(f4.2,19f7.3)') alt(k),(xzf(k,l), l=1,nrm)
         alt(k)=alt(k)-6.
-        if (isett6  /=  1234567) then
+        if (isett6 /= 1234567) then
         t6listf(k)=10.**alt(k)
         t6arr(k)=t6listf(k)
         end if
@@ -673,7 +673,7 @@
         end do
         isett6=1234567
 
-       if (ismdata  ==  0) then
+       if (ismdata == 0) then
         tmax=10.   ! modified
         nset=65
         RLS=-8.
@@ -690,10 +690,10 @@
         alr(ll)=alrf(kk)
         do k=1,nt
         t6list(k)=t6listf(k+ntb-1)
-        if(ismdata  ==  0) then
+        if(ismdata == 0) then
 !           Following skip required because, due to missing data,
 !           the X=0  low T data cannot be smoothed
-          if ((m   ==  1) .and. (k  <=  9)) then
+          if ((m  == 1) .and. (k <= 9)) then
             xz(m,i,k,ll)=xzf(k+ntb-1,kk)
           else
             xz(m,i,k,ll)=xzff(k+ntb-1,kk)
@@ -734,7 +734,7 @@
       yy(1)=y1
       yy(2)=y2
       yy(3)=y3
-        if(ic  ==  0) then
+        if(ic == 0) then
           xx12(i)=1./(xx(1)-xx(2))
           xx13(i)=1./(xx(1)-xx(3))
           xx23(i)=1./(xx(2)-xx(3))
@@ -803,7 +803,7 @@
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER*1 HEAD(100)
+      character*1 HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       logical :: IERR

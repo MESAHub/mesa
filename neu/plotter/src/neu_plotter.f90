@@ -2,9 +2,10 @@ program neu_plotter
 
    use neu_def
    use neu_lib
-   use const_lib
+   use const_def, only: dp
+   use const_lib, only: const_init
    use math_lib
-   use num_lib, only : dfridr
+   use num_lib, only: dfridr
 
    implicit none
 

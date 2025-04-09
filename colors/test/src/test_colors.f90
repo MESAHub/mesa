@@ -12,7 +12,7 @@ program test_colors
 contains
 
    subroutine do_test_colors
-      use const_lib
+      use const_lib, only: const_init
 
       character(len=256) :: my_mesa_dir
       integer :: info

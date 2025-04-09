@@ -21,15 +21,12 @@
 ! ***********************************************************************
 
 program test_mtx
-   use const_lib
+   use const_lib, only: const_init
    use math_lib, only: math_init
    use mtx_lib
    use test_mtx_support
-
    use test_square
-
    use test_block_tri_dble, only: do_test_block_tri_dble
-
    use utils_lib, only: mesa_error
 
    implicit none
@@ -51,4 +48,3 @@ program test_mtx
    call test_format_conversion
 
 end program test_mtx
-

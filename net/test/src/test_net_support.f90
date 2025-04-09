@@ -61,7 +61,7 @@ contains
    end subroutine do_test_net
 
    subroutine load_libs
-      use const_lib
+      use const_lib, only: const_init
       use const_def, only: mesa_dir
       use chem_lib
       use rates_lib, only: rates_init, rates_warning_init

@@ -73,12 +73,12 @@
 
       blank=' '
       ztab=0.0
-      if (iorder  <  1 .or. iorder  >  mv) then
+      if (iorder < 1 .or. iorder > mv) then
          write(*,*) 'invalid iorder argument (must be between 1 and ', mv, ')', iorder
          stop 1
       end if
 
-      if ((irad  /=  0) .and. (irad  /=  1)) then
+      if ((irad /= 0) .and. (irad /= 1)) then
          write (*,'(" Irad must be 0 or 1")')
          stop
       end if
@@ -90,11 +90,11 @@
       slt=t6
       slr=r
 
-      if(itime  /=  12345678) then
+      if(itime /= 12345678) then
         itime=12345678
         do i=1,mv
           do j=1,mv
-            if  (index(i)  ==  j) iri(i)=j
+            if  (index(i) == j) iri(i)=j
           end do
         end do
         do  i=1,mx
@@ -104,28 +104,27 @@
 !..... read the data files
         call readcoeos_hhe(filename)
         z=zz(1)
-        if (abs(ztab-z)  >  0.00001) then
+        if (abs(ztab-z) > 0.00001) then
         write (*,'("requested z=",f10.6," EOS5_data_H-He is for z=", f10.6)') ztab,z
         stop
         end if
 
-        if(z+xh-1.e-6  >  1 ) GOTO 61
+        if(z+xh-1.e-6 > 1 ) GOTO 61
       end if
 
 
 !..... Determine T6,rho grid points to use in the
 !      interpolation.
-      if((slt  >  t6a(1)).or.(slt  <  t6a(nt))) GOTO 62
-      if((slr  <  rho(1)).or.(slr  >  rho(nr))) GOTO 62
+      if((slt > t6a(1)).or.(slt < t6a(nt))) GOTO 62
+      if((slr < rho(1)).or.(slr > rho(nr))) GOTO 62
 
 
-
-!     if (izi  ==  0) then  ! freeze table indices if not 0
+!     if (izi == 0) then  ! freeze table indices if not 0
         ilo=2
         ihi=mx
-    8   if(ihi-ilo  >  1) then
+    8   if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
-            if(xh  <=  xa(imd)+1.e-7) then
+            if(xh <= xa(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
@@ -138,24 +137,24 @@
         mh=i
         mi=i+1
         mf2=mi
-        if (xh  <  1.e-6) then
+        if (xh < 1.e-6) then
         mf=1
         mg=1
         mh=1
         mi=2
         mf2=1
         end if
-        if((xh  <=  xa(2)+1.e-7) .or. (xh  >=  xa(mx-2)-1.e-7)) mf2=mh
+        if((xh <= xa(2)+1.e-7) .or. (xh >= xa(mx-2)-1.e-7)) mf2=mh
 
         ilo=2
         ihi=nr
-   12     if(ihi-ilo  >  1) then
+   12     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
-           if (slr  ==  rho(imd)) then
+           if (slr == rho(imd)) then
            ihi=imd
            GOTO 13
            end if
-            if(slr  <=  rho(imd)) then
+            if(slr <= rho(imd)) then
               ihi=imd
             else
               ilo=imd
@@ -168,17 +167,17 @@
         l3=i
         l4=l3+1
         iqu=3
-        if(l4  >  nr) iqu=2
+        if(l4 > nr) iqu=2
 
         ilo=nt
         ihi=2
-   11     if(ilo-ihi  >  1) then
+   11     if(ilo-ihi > 1) then
           imd=(ihi+ilo)/2
-           if (t6  ==  t6list(1,imd)) then
+           if (t6 == t6list(1,imd)) then
            ilo=imd
            GOTO 14
            end if
-            if(t6  <=  t6list(1,imd)) then
+            if(t6 <= t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
@@ -191,8 +190,8 @@
         k3=i
         k4=k3+1
         ipu=3
-        if (k4  >  nt) ipu=2
-      if (k3  ==  0) then
+        if (k4 > nt) ipu=2
+      if (k3 == 0) then
       write (*,'(" ihi,ilo,imd",3i5)')
       end if
 
@@ -215,7 +214,7 @@
             sum2=sum2+xz(m,1,it,ir)
           end do
         end do
-        if (ipu  ==  3) then
+        if (ipu == 3) then
           do ir=l1,l1+2
             do it=k1,k1+ipu
               sum23=sum23+xz(m,1,it,ir)
@@ -224,7 +223,7 @@
         else
           sum23=2.e+30
         end if
-        if (iqu  ==  3) then
+        if (iqu == 3) then
           do ir=l1,l1+3
             do it=k1,k1+ipu
               sum33=sum33+xz(m,1,it,ir)
@@ -236,8 +235,8 @@
       end do
       iq=2
       ip=2
-      if (sum2  >  1.e+30) then
-        if (sum1  <  1.e+25 ) then
+      if (sum2 > 1.e+30) then
+        if (sum1 < 1.e+25 ) then
           k1=k3-3
           k2=k1+1
           k3=k2+1
@@ -249,13 +248,13 @@
           GOTO 65
         end if
       end if
-      if (sum23  <  1.e+30) ip=3
-      if (sum33  <  1.e+30) iq=3
+      if (sum23 < 1.e+30) ip=3
+      if (sum33 < 1.e+30) iq=3
 
-      if(t6  >=  t6list(1,2)+1.e-7) ip=2
-      if(slr  <=  rho(2)+1.e-7) iq=2
+      if(t6 >= t6list(1,2)+1.e-7) ip=2
+      if(slr <= rho(2)+1.e-7) iq=2
 
-      if((l3  ==  nr) .or. (k3  ==  nt)) then
+      if((l3 == nr) .or. (k3 == nt)) then
          iq=2
          ip=2
       end if
@@ -274,21 +273,21 @@
         end do
       end do
       end do
-      if((zz(mg)  /=  zz(mf)) .or. (zz(mh)  /=  zz(mf))) then
+      if((zz(mg) /= zz(mf)) .or. (zz(mh) /= zz(mf))) then
         write(*,'("Z does not match Z in EOS5_data_H-He files you are using")')
         stop
       end if
-      if(z  /=  zz(mf)) GOTO 66
+      if(z /= zz(mf)) GOTO 66
       is=0
       iw=1
       do ir=l1,l1+iq
         do it=k1,k1+ip
-          if (mf2  ==  1) then
+          if (mf2 == 1) then
           esk(it,ir)=epl(mf,it,ir)
           GOTO 46
           end if
           esk(it,ir)=quadeos(is,iw,xh,epl(mf,it,ir),epl(mg,it,ir),epl(mh,it,ir),xx(mf),xx(mg),xx(mh))
-          if(esk(it,ir)  >  1.e+20) then
+          if(esk(it,ir) > 1.e+20) then
           write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir,l3,k3,iq,ip
           write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mf,mf+2)
           end if
@@ -297,14 +296,14 @@
         end do
       end do
 
-      if (mi  ==  mf2) then  ! interpolate between quadratics
+      if (mi == mf2) then  ! interpolate between quadratics
       is=0
       iw=1
        dixr=(xx(mh)-xh)*dfsx(mh)
       do ir=l1,l1+iq
         do it=k1,k1+ip
           esk2(it,ir)=quadeos(is,iw,xh,epl(mg,it,ir),epl(mh,it,ir),epl(mi,it,ir),xx(mg),xx(mh),xx(mi))
-          if(esk(it,ir)  >  1.e+20) then
+          if(esk(it,ir) > 1.e+20) then
           write(*,'(" problem it ir,l3,k3,iq,ip=", 6i5)') it,ir,l3,k3,iq,ip
           write(*,'(3e12.4)')  (epl(ms,it,ir),ms=mg,mg+2)
           end if
@@ -333,7 +332,7 @@
       tmass=gmass(xh,z,moles,eground,fracz,frac)
       pgas_out = eos(iri(1)) * 1d12
       prad_out = 1d12*4d0/3d0*(1.8914785d-3)*t6**4
-      if (irad  ==  1) then
+      if (irad == 1) then
          call radsub_hhe (irad,t6,r,moles,tmass)
       else
          eos(iri(5))=eos(iri(5))*moles*aprop/tmass
@@ -401,14 +400,14 @@
 !.....    eos(i) upper-right 3x3(i=i1+1,i1+3 j=j1,j1+2)
           esactq=quadeos(is,iw,slt,q(1),q(2),q(3),t6a(k1),t6a(k2),t6a(k3))
         end if
-        if(ip  ==  3) then
+        if(ip == 3) then
 !.....    eos(i) in lower-left 3x3.
           esact2=quadeos(is,iw,slt,h(2),h(3),h(4),t6a(k2),t6a(k3),t6a(k4))
 !.....    eos(i) smoothed in left 3x4
           dix=(t6a(k3)-slt)*dfs(k3)
           esact=esact*dix+esact2*(1.-dix)
 !       end if   ! moved to loc a
-        if(iq  ==  3) then
+        if(iq == 3) then
 
 !.....     eos(i) in upper-right 3x3.
           esactq2=quadeos(is,iw,slt,q(2),q(3),q(4),t6a(k2),t6a(k3),t6a(k4))
@@ -416,14 +415,14 @@
         end if
         end if  ! loc a
 
-        if(iq  ==  3) then
+        if(iq == 3) then
           dix2=(rho(l3)-slr)*dfsr(l3)
-            if(ip  ==  3) then
+            if(ip == 3) then
 !.....        eos(i) smoothed in both log(T6) and log(R)
               esact=esact*dix2+esactq*(1-dix2)
             end if
         end if
-        if (esact  >  1.e+15) then
+        if (esact > 1.e+15) then
           write(*,'("Interpolation indices out of range; please report conditions.")')
           stop
         end if
@@ -449,7 +448,7 @@
 
       blank=' '
 
-        if (itimeco  /=  12345678) then
+        if (itimeco /= 12345678) then
         do i=1,mx
           do j=1,mv
             do k=1,nt
@@ -470,7 +469,7 @@
       write(*,*) 'read ' // trim(filename)
 
        open(2, FILE=trim(filename), IOSTAT=ios)
-      if (ios  /=  0) then
+      if (ios /= 0) then
          write(*,*) 'failed to open ', trim(filename)
          stop 1
       end if
@@ -482,7 +481,7 @@
       read (2,'(a)') blank
       do jcs=1,nr
       read (2,'(2i5,2f12.7,17x,e15.7)') numtot,icycuse(m,jcs),dum,dum,rhogr(m,jcs)
-      if(numtot  /=  jcs) then
+      if(numtot /= jcs) then
          write (*,'(" Data file incorrect: numtot,jcs= ",2i5)') numtot,jcs
          stop
       end if
@@ -499,7 +498,7 @@
          stop 1
       end if
       do  i=1,icycuse(m,jcs)
-      if (i  >  nta(jcs)) then
+      if (i > nta(jcs)) then
          read (2,'(a)') blank
          GOTO 4
       end if
@@ -518,7 +517,7 @@
        end do
 
       do i=1,nt
-         if(t6list(1,i)  ==  0.0) then
+         if(t6list(1,i) == 0.0) then
             write(*,'("readcoeos_hhe: Error:",i4,"-th T6 value is zero")') i
             stop
          end if
@@ -584,7 +583,7 @@ cPhysical constants
       gam2pt_norad=gam1t_norad/gam3pt_norad
 !---- End  no radiation calculation
 
-      if (irad  /=  0) then
+      if (irad /= 0) then
 !---- Calculate EOS with radiation calculation
       pr=4./3.*rat*t6**4   ! Mb
       er=3.*pr/density   ! Mb-cc/gm

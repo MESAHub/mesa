@@ -26,7 +26,7 @@ program create_eosDT_files
    use helm_alloc
    use helm_opal_scvh_driver
    use const_def
-   use const_lib
+   use const_lib, only: const_init
 
    implicit none
 

@@ -1358,7 +1358,7 @@ module mod_one_zone_burn
    use net_lib
    use rates_lib, only: rates_init
    use rates_def
-   use const_lib
+   use const_def
    use utils_lib
    use mtx_def
 

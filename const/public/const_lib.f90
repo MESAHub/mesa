@@ -29,6 +29,9 @@ module const_lib
 
    implicit none
 
+   private
+   public :: const_init
+
 contains
 
    subroutine const_init(mesa_dir_init, ierr)

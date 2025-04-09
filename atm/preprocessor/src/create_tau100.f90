@@ -27,7 +27,7 @@ module mod_tau100
    use chem_def
    use chem_lib, only: chem_init, basic_composition_info
    use const_def
-   use const_lib
+   use const_lib, only: const_init
    use eos_def
    use eos_lib
    use kap_lib

@@ -21,7 +21,7 @@ program test_num
    use test_integrate
 
    use const_def
-   use const_lib
+   use const_lib, only: const_init
    use num_def
    use mtx_lib
    use mtx_def

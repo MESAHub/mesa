@@ -27,7 +27,7 @@ module op_radacc
 
    use math_lib
    use op_def
-   use const_def
+   use const_def, only: dp
 
    implicit none
 
