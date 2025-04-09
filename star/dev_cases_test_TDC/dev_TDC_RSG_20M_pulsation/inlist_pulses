@@ -24,9 +24,9 @@
    !change_initial_v_flag = .true.
    !new_v_flag = .true.
 
-relax_to_this_tau_factor = 1d-3!-1
-dlogtau_factor = 0.1d0
-relax_tau_factor = .true.
+!relax_to_this_tau_factor = 1d-3!-1
+!dlogtau_factor = 0.1d0
+!relax_tau_factor = .true.
 
    
     set_initial_dt = .true.
@@ -42,13 +42,13 @@ relax_tau_factor = .true.
 
 
    ! in order for Riemann hydro to be turned on, the following two conditions need to be met
-   x_ctrl(1) = 10d0 ! the integrated gamma1 must be smaller than this (min_gamma_sub_43_for_hydro)
+   x_ctrl(21) = 10d0 ! the integrated gamma1 must be smaller than this (min_gamma_sub_43_for_hydro)
 
 
    read_extra_controls_inlist(1) = .true.
    extra_controls_inlist_name(1)= 'inlist_ppisn'
 
-   x_logical_ctrl(2) = .true. ! flag for in inlist_pulses
+   x_logical_ctrl(22) = .true. ! flag for in inlist_pulses
 
    ! See Farag et al 2022
    set_min_d_mix=.true.

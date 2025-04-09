@@ -60,6 +60,31 @@
 
 &controls
 
+
+      
+! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+      pulse_data_format = 'GYRE'
+      
+      x_logical_ctrl(37) = .false. ! if true, then run GYRE
+
+      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+      x_integer_ctrl(2) = 5 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
+
+      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         ! should match gyre.in mode l
+      x_integer_ctrl(4) = 1 ! order
+      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      x_ctrl(2) = 0.33d+03 ! growth < this (days)
+
+
+
+
+
+
 ! atmosphere
     !  Pextra_factor = 1 
     !  ! need this extra pressure to stabilize the atmosphere during core He burning
@@ -85,7 +110,7 @@
 
 
    fill_arrays_with_nans = .false.
-   report_solver_progress = .true.
+   report_solver_progress = .false.
       report_ierr = .true. ! if true, produce terminal output when have some internal error
 
    max_resid_jump_limit = 1d99
@@ -367,8 +392,6 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
     min_q_for_k_const_mass = 0.98
 
 
-   history_interval = 1
-   max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000
 
    warn_rates_for_high_temp = .false.
 
@@ -381,7 +404,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
    ! after the pulse starts, we estimate the dynamical timescale of the star
    ! (excluding some of the outer layers), and model the dynamical evolution
    ! for at least a fixed number of these timescales before turning off hydro
-   x_ctrl(2) = 2d0 ! velocity in km/s at any zone for which we consider the system to be undergoing a pulse
+   x_ctrl(22) = 2d0 ! velocity in km/s at any zone for which we consider the system to be undergoing a pulse
                     ! time will start counting from this point before switching off hydro
                     ! (max_v_for_pulse)
                     ! NOTE: we only consider the velocities for q < x_ctrl(7)
@@ -408,7 +431,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
    x_ctrl(8) = 11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
    x_ctrl(9) = 3d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
 
-   x_integer_ctrl(1) = 10 ! conditions for relax must be satisfied for this number of consecutive steps
+   x_integer_ctrl(31) = 10 ! conditions for relax must be satisfied for this number of consecutive steps
                            ! before the outer layers are removed
                            ! (num_steps_before_relax)
 
@@ -451,7 +474,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
                     ! (vsurf_for_fixed_bc)
 
 ! remove extended layers
-x_logical_ctrl(2) = .true.
+x_logical_ctrl(22) = .true.
    
 
 
@@ -462,8 +485,9 @@ x_logical_ctrl(2) = .true.
       photo_digits = 8
       photo_interval = 10!50
       profile_interval = 200!50
-      history_interval = 10
+      history_interval = 1!10
       terminal_interval = 1!10
+   max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000
 
 / ! end of controls namelist
 

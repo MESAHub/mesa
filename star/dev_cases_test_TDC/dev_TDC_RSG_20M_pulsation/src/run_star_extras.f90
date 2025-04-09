@@ -30,10 +30,24 @@
       use chem_def
       use utils_lib
       use rates_def, only: i_rate
+      use gyre_mesa_m
+
 
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interp_pm, interp_values, interp_value
       
+
+!gyre
+      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      !x_logical_ctrl(2) = .false. ! output eigenfunction files
+      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      !x_integer_ctrl(4) = 1 ! order
+      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
+
       implicit none
       
       include "test_suite_extras_def.inc"
@@ -121,7 +135,8 @@
       contains
 
       include "test_suite_extras.inc"
-      
+      include 'gyre_in_mesa_extras_finish_step.inc'
+
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -155,7 +170,7 @@
 
          ! store user provided options from the inlist
          min_gamma_sub_43_for_hydro = s% x_ctrl(1)
-         max_v_for_pulse = s% x_ctrl(2)
+         max_v_for_pulse = s% x_ctrl(22)
          q_for_dyn_ts = s% x_ctrl(3)
          num_dyn_ts_for_relax = s% x_ctrl(4)
          q_for_relax_check = s% x_ctrl(5)
@@ -163,8 +178,8 @@
          max_machn_for_relax = s% x_ctrl(7)
          max_Lneu_for_relax = s% x_ctrl(8)
          max_Lnuc_for_relax = s% x_ctrl(9)
-         num_steps_before_relax = s% x_integer_ctrl(1)
-         in_inlist_pulses = s% x_logical_ctrl(2)
+         num_steps_before_relax = s% x_integer_ctrl(31)
+         in_inlist_pulses = s% x_logical_ctrl(22)
          max_dt_before_pulse = s% x_ctrl(10)
          max_Lneu_for_mass_loss = s% x_ctrl(11)
          delta_lgLnuc_limit = s% x_ctrl(12)
@@ -173,7 +188,7 @@
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
          stop_100d_after_pulse = s% x_logical_ctrl(1)
-         remove_extended_layers = s% x_logical_ctrl(2)
+         remove_extended_layers = s% x_logical_ctrl(22)
          max_dt_during_pulse = s% x_ctrl(18)
          vsurf_for_fixed_bc = s% x_ctrl(19)
 
@@ -567,6 +582,23 @@
                if (ierr /= 0) return
             end if
          end if
+
+! Initialize GYRE
+
+call init('gyre.in')
+
+! Set constants
+
+call set_constant('G_GRAVITY', standard_cgrav)
+call set_constant('C_LIGHT', clight)
+call set_constant('A_RADIATION', crad)
+
+call set_constant('M_SUN', Msun)
+call set_constant('R_SUN', Rsun)
+call set_constant('L_SUN', Lsun)
+
+call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+
       end subroutine extras_startup
       
       
@@ -580,6 +612,8 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
+!if (.not. s% x_logical_ctrl(37)) return
+call final()
       end subroutine extras_after_evolve
       
 
@@ -1363,9 +1397,9 @@
             s% atm_option = 'T_tau'
             s% atm_T_tau_relation = 'Eddington'
             s% atm_T_tau_opacity = 'fixed'
-            s% tau_factor = 1d-3!1d0
+            s% tau_factor = 1d0
             s% Pextra_factor = 1d0
-            s% force_tau_factor = 1d-3!1d0
+            s% force_tau_factor = 1d0
             s% delta_lgL_limit = 0.25d0
             !s% delta_lgTeff_limit = 1d-2!0.25d0
             s% delta_lgL_limit_L_min = 1d99!-100
@@ -1521,6 +1555,9 @@
             termination_code_str(t_xtra1) = "Successful test: evolved 100 days past first relax"
             return
          end if
+
+!if (.not. s% x_logical_ctrl(37)) return
+extras_finish_step = gyre_in_mesa_extras_finish_step(id)
 
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
 
