@@ -2264,6 +2264,17 @@
     thermohaline_mag_B = 10
 
 
+      ! thermohaline_mag_B
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Reducted density ratio at which to switch to extrapolation (D_thm ~ 1/R_0) in HG19 and FRG24.
+      ! Should be in the interval [0,1]; setting r_ext = 1 will disable extrapolation
+
+      ! ::
+
+    thermohaline_r_ext = 1.
+
+
       ! thermohaline_FRG24_safety
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 

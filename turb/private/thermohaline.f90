@@ -58,6 +58,7 @@ contains
    !! @param eta Magnetic diffusivity.
    !! @param thermohaline_coeff Free parameter multiplying the thermohaline diffusivity.
    !! @param thermohaline_mag_B Magnetic field strength (guass) for HG19 and FRG24 prescriptions.
+   !! @param thermohaline_r_ext Reduced density ratio at which to switch to extrapolation for HG19 and FRG24 prescriptions.
    !! @param thermohaline_FRG24_safety Safety parameter for choosing approximations in FRG24 prescription.
    !! @param thermohaline_FRG24_nks Number of vertical wavenumbers to search over in FRG24 prescription.
    !! @param thermohaline_FRG24_N Maximal mode index in FRG24 prescription.
@@ -66,7 +67,8 @@ contains
    subroutine get_thermohaline_info(thermohaline_option, &
       grada, gradr, N2_T, T, rho, Cp, opacity, &
       gradL_composition_term, XH1, eta, iso, &
-      thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
+      thermohaline_coeff, thermohaline_mag_B, thermohaline_r_ext, &
+      thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
       th_info, ierr)
 
       character(*), intent(in)     :: thermohaline_option
@@ -83,6 +85,7 @@ contains
       integer, intent(in)          :: iso
       real(dp), intent(in)         :: thermohaline_coeff
       real(dp), intent(in)         :: thermohaline_mag_B
+      real(dp), intent(in)         :: thermohaline_r_ext
       integer, intent(in)          :: thermohaline_FRG24_safety
       integer, intent(in)          :: thermohaline_FRG24_nks
       integer, intent(in)          :: thermohaline_FRG24_N
@@ -96,7 +99,7 @@ contains
       ! Calculate common data
 
       call set_info_coeffs(T, rho, Cp, opacity, iso, XH1, eta, N2_T, thermohaline_mag_B, th_info)
-      call set_info_strat(grada, gradr, gradL_composition_term, th_info)
+      call set_info_strat(grada, gradr, gradL_composition_term, thermohaline_r_ext, th_info)
 
       ! Check for sensible Prandtl number
  
@@ -105,14 +108,19 @@ contains
          return
       end if
 
-      ! Check for thermohaline instability (this check is skipped for
-      ! the Kippenhahn prescription, because r > 1 still causes mixing
-      ! in that case)
+      ! Check for thermohaline instability based on r or r_prime
 
-      if (th_info%r > 1._dp .AND. thermohaline_option /= 'Kippenhahn') then
-         th_info%mixing_type = no_mixing
-         return
-      end if
+      th_info%mixing_type = no_mixing
+
+      select case (thermohaline_option)
+      case ('Kippenhahn')
+      case ('Harrington_Garaud_19')
+         if (th_info%r_prime >= 1._dp) return
+      case ('Fraser_Reifenstein_Garaud_24')
+         if (th_info%r_prime >= 1._dp) return
+      case default
+         if (th_info%r >= 1._dp) return
+      end select
 
       th_info%mixing_type = thermohaline_mixing
 
@@ -266,17 +274,23 @@ contains
 
    !****
 
-   subroutine set_info_strat(grada, gradr, gradL_composition_term, th_info)
+   subroutine set_info_strat(grada, gradr, gradL_composition_term, r_ext, th_info)
 
       real(dp), intent(in)           :: grada
       real(dp), intent(in)           :: gradr
       real(dp), intent(in)           :: gradL_composition_term
+      real(dp), intent(in)           :: r_ext
       type(th_info_t), intent(inout) :: th_info
 
       ! Set stratification coefficients in th_info
 
       th_info%R_0 = (gradr - grada)/gradL_composition_term
       th_info%r = (th_info%R_0 - 1._dp)/(1._dp/th_info%tau - 1._dp)
+
+      th_info%r_prime = MIN(th_info%r, r_ext)
+      th_info%R_0_prime = th_info%r_prime*(1._dp/th_info%tau - 1._dp) + 1._dp
+
+!      print *,'set strat:',th_info%R_0, th_info%r, th_info%R_0_prime, th_info%r_prime, gradL_composition_term
 
    end subroutine set_info_strat
       
@@ -343,12 +357,12 @@ contains
       type(th_info_t), intent(inout) :: th_info
       integer, intent(out)           :: ierr
 
-      real(dp), parameter :: K_B = 1.24
+      real(dp), parameter :: K_B = 1.24_dp
       
       ! Set componets of th_info following Harrington & Garaud, ApJ
       ! Letters, 870:L5 (2019; HG19)
 
-      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
+      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0_prime, th_info%lam_hat, th_info%l2_hat, ierr)
       if (ierr /= 0) return
 
       ! Solve for w_HG19
@@ -368,7 +382,8 @@ contains
       ! Evaluate Nu_C and D_thrm
 
       th_info%Nu_C = Nu_C(th_info%tau, th_info%w, th_info%lam_hat, th_info%l2_hat, K_B)
-      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
+!      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*th_info%R_0_prime/th_info%R_0
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*exp(-(th_info%r - th_info%r_prime))
 
    end subroutine set_info_HG19
 
@@ -390,7 +405,7 @@ contains
       ! Set components of th_info following Fraser, Reifenstein, &
       ! Garaud, ApJ 964:184 (2024; FRG24)
 
-      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
+      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0_prime, th_info%lam_hat, th_info%l2_hat, ierr)
       if (ierr /= 0) return
 
       ! Define grid of vertical wavenumbers. This may evolve. Rich is
@@ -408,13 +423,14 @@ contains
 
       ! Solve for w_FRG24
 
-      call eval_parasite_saturation(th_info%Pr, th_info%tau, th_info%R_0, th_info%H_B, th_info%D_B, &
+      call eval_parasite_saturation(th_info%Pr, th_info%tau, th_info%R_0_prime, th_info%H_B, th_info%D_B, &
          th_info%lam_hat, th_info%l2_hat, k_z, N, safety, th_info%sigma_max, th_info%k_z_max, th_info%w_FRG24, ierr)
       if (ierr /= 0) then
          write(*,*) 'failed in eval_parasite_saturation'
          write(*,*) 'Pr', th_info%Pr
          write(*,*) 'tau', th_info%tau
          write(*,*) 'R_0', th_info%R_0
+         write(*,*) 'R_0', th_info%R_0_prime
          write(*,*) 'H_B', th_info%H_B
          write(*,*) 'D_B', th_info%D_B
          write(*,*) 'l2_hat', th_info%l2_hat
@@ -443,7 +459,7 @@ contains
       ! Evaluate Nu_C and D_thrm
 
       th_info%Nu_C = Nu_C(th_info%tau, th_info%w, th_info%lam_hat, th_info%l2_hat, K_B)
-      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*th_info%R_0_prime/th_info%R_0
 
    end subroutine set_info_FRG24
 

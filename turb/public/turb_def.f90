@@ -37,7 +37,9 @@ module turb_def
       real(dp) :: Pr = 0._dp              ! Prandtl number
       real(dp) :: tau = 0._dp             ! Chemical diffusivity ratio
       real(dp) :: R_0 = 0._dp             ! Density ratio
+      real(dp) :: R_0_prime = 0._dp       ! Modified density ratio (for extrapolation)
       real(dp) :: r = 0._dp               ! Reduced density ratio
+      real(dp) :: r_prime = 0._dp         ! Modified reduced density ratio (for extrapolation)
       real(dp) :: H_B = 0._dp             ! Lorentz force coefficient
       real(dp) :: Pm = 0._dp              ! Magnetic Prandtl number
       real(dp) :: D_B = 0._dp             ! Magnetic diffusivity

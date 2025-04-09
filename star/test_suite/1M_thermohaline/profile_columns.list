@@ -459,7 +459,7 @@
 
    !gradT ! mlt value for required temperature gradient dlnT/dlnP
    
-   !gradr ! dlnT/dlnP required for purely radiative transport
+   gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
    !grad_density ! smoothed dlnRho/dlnP at cell boundary
    
@@ -489,7 +489,7 @@
    !gradT_excess_effect
    !gradT_rel_err
    !gradT_sub_a
-   !grada_face
+   grada_face
    !grada_sub_gradr
    !diff_grads
    !log_diff_grads
@@ -529,8 +529,8 @@
    !log_sig_mix ! sig(k) is mixing flow across face k in (gm sec^1)
          ! sig(k) = D_mix*(4*pi*r(k)**2*rho_face)**2/dmavg
    
-   !dominant_isoA_for_thermohaline
-   !dominant_isoZ_for_thermohaline
+   dominant_isoA_for_thermohaline
+   dominant_isoZ_for_thermohaline
    !gradL_composition_term
    
    mix_type

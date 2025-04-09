@@ -352,8 +352,8 @@ contains
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, N2_T, T, rho, Cp, opacity, &
                gradL_composition_term, XH1, eta, iso, &
-               thermohaline_coeff, &
-               s% thermohaline_mag_B, s% thermohaline_FRG24_safety, s% thermohaline_FRG24_nks, s% thermohaline_FRG24_N, &
+               thermohaline_coeff, s% thermohaline_mag_B, s% thermohaline_r_ext, &
+               s% thermohaline_FRG24_safety, s% thermohaline_FRG24_nks, s% thermohaline_FRG24_N, &
                D, gradT, Y_face, conv_vel, mixing_type, ierr, th_info)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'

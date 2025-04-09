@@ -74,7 +74,8 @@ contains
    !! @param th_results Output, detailed thermohaline results (see thermohaline.f90)
    subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, N2_T, T, rho, Cp, opacity, &
       gradL_composition_term, XH1, eta, iso, &
-      thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
+      thermohaline_coeff, thermohaline_mag_B, thermohaline_r_ext, &
+      thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
       D, gradT, Y_face, conv_vel, mixing_type, ierr, th_info)
 
       use thermohaline
@@ -94,6 +95,7 @@ contains
       integer, intent(in)                           :: iso
       real(dp),intent(in)                           :: thermohaline_coeff
       real(dp), intent(in)                          :: thermohaline_mag_B
+      real(dp), intent(in)                          :: thermohaline_r_ext
       integer, intent(in)                           :: thermohaline_FRG24_safety
       integer, intent(in)                           :: thermohaline_FRG24_nks
       integer, intent(in)                           :: thermohaline_FRG24_N
@@ -110,7 +112,8 @@ contains
       call get_thermohaline_info( &
          thermohaline_option, grada%val, gradr%val, N2_T%val, T%val, rho%val, Cp%val, opacity%val, &
          gradL_composition_term, XH1, eta, iso, &
-         thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
+         thermohaline_coeff, thermohaline_mag_B, thermohaline_r_ext, &
+         thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
          th_info_, ierr)
 
       D = th_info_%D_thrm
