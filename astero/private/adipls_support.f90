@@ -22,7 +22,7 @@
 
       module adipls_support
 
-      use const_def, only: dp, i8, pi, pi4, four_thirds_pi
+      use const_def, only: dp, i8, pi, pi4, four_thirds_pi, Msun, Rsun, Lsun
       use astero_def
       use star_lib
       use star_def
@@ -982,7 +982,6 @@
          real(dp), pointer :: var(:,:)  ! (ivar,nn)
          integer, intent(out) :: ierr
 
-         real(dp), parameter :: Msun = 1.9892d33, Rsun = 6.9598d10, Lsun = 3.8418d33
          integer :: iounit, k, offset
 
          ierr = 0

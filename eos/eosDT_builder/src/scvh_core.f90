@@ -21,6 +21,9 @@
 ! ***********************************************************************
 
 module scvh_core
+
+   use const_def, only: clight, avo, kerg
+
    implicit none
 
    logical, parameter :: dbg = .false.
@@ -637,10 +640,9 @@ contains
       double precision :: dpressraddd, dpressraddt, deraddd, deraddt, dsraddd, dsraddt
 
 !..constants
-      double precision :: clight, ssol, asol, asoli3, avo, kerg, xka, mh1, mhe4, third
-      parameter(clight=2.99792458d10, ssol=5.67051d-5, asol=4.0d0*ssol/clight, &
-                asoli3=asol/3.0d0, avo=6.0221367d23, kerg=1.380658d-16, &
-                xka=kerg*avo, mh1=1.67357d-24, mhe4=6.646442d-24, third=1.0d0/3.0d0)
+      double precision ::  ssol, asol, asoli3, xka, mh1, mhe4
+      parameter(ssol=5.67051d-5, asol=4.0d0*ssol/clight, asoli3=asol/3.0d0, &
+                xka=kerg*avo, mh1=1.67357d-24, mhe4=6.646442d-24)
 
       logical, parameter :: pure_splines = .true., DT_flag = .true.
 

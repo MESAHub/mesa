@@ -33,11 +33,11 @@
 
 module cms
 
-   use const_def, only: dp, ln10
+   use const_def, only: dp, ln10, avo, amu
 
    implicit none
 
-   logical, parameter :: DBG = .false.
+   logical, parameter :: dbg = .false.
    integer, parameter :: NT = 121
    integer, parameter :: NP = 441
 
@@ -157,8 +157,6 @@ contains
       integer, intent(out) :: ierr
       real(dp), parameter :: tol = 1.0E-5_dp
       real(dp), parameter :: kerg = 1.380649D-16
-      real(dp), parameter :: avo =  6.02214076d23
-      real(dp), parameter :: amu = 1.0_dp/avo
 
       real(dp) :: Nx, Ny, Ntot, Abar
       real(dp) :: rhoXY, rhoX, rhoY
