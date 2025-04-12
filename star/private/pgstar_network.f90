@@ -200,7 +200,7 @@
                if(z<ymin .or. z>ymax .or. n<xleft .or.n>xright)CYCLE
 
                if (s% pg% Network_show_element_names) THEN
-                  call pgsci(1)
+                  call pgsci(clr_Foreground)
                   call pgtext(xleft-3.5,z*1.0-0.25,el_name(Z))
                end if
 
@@ -221,7 +221,7 @@
                end if
 
                !Plot box centered on the (N,Z)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call pgline(5,[n-step,n+step,n+step,n-step,n-step],[z-step,z-step,z+step,z+step,z-step])
             end do
 
@@ -277,7 +277,7 @@
             call pgrect(xpts(1),xpts(2),yb,yt)
          end do
 
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          do j=1,5
             text=abun_min+(j-1)*(abun_max-abun_min)/4.0
             write(str,'(F8.3)') text

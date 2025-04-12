@@ -117,7 +117,7 @@
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call show_box_pgstar(s,'BCNST1','BCMNSTV1')
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          if (s% pg% show_TRho_accretion_mesh_borders) then
@@ -283,7 +283,7 @@
             call add_TR_line(1.0, freg_blend_logT2, -8.0, freg_blend_logT2)
             call add_TR_line(1.0, 8.2, -8.0, 8.2)
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call add_TR_line(-8.0, logT_hi, -8.0, logT_max)
             call add_TR_line(-8.0, logT_max, 8.0, logT_max)
             !call add_TR_line(8.0, logT_lo, 8.0, logT_hi)
@@ -300,7 +300,7 @@
             call pgdraw(-8.8,1.88)
 
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_label(-4.9, 2.47, 0.0, 0.5, 'FREEDMAN')
             call show_label(-8.5, 3.3, 0.0, 0.5, 'FERGUSON')
             call show_label(-7.5, 5.1, 0.0, 0.5, 'OPAL/OP')
@@ -310,7 +310,7 @@
             call show_label(0.2, 3.9, 0.0, 1.0, '\(0636)\drad\u = \(0636)\dcond\u')
             call pgsci(clr_Crimson)
             call show_label(3.8, 9.4, 0.0, 0.5, 'e\u-\de\u+\d')
-            call pgsci(1)
+            call pgsci(clr_Foreground)
 
             call show_label(-6.8, 6.9, 0.0, 0.5, 'logR = -8')
             call show_label(5.0, 6.9, 0.0, 0.5, 'logR = 1')
@@ -389,7 +389,7 @@
             call stroke_line(logRho0, logT5, logRho6, logT6)
             call stroke_line(logRho5, logT6, logRho6, logT6)
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_label(1.0, 3.2, 0.0, 0.5, 'HELM')
             call show_label(-7.2, 5.8, 0.0, 0.5, 'FreeEOS')
             call show_label(-1.5, 3.7, 0.0, 0.5, 'OPAL/SCVH')
@@ -483,6 +483,7 @@
       subroutine do_show_Profile_text_info( &
             s, txt_scale, xmin, xmax, ymin, ymax, xfac, dxfac, yfac, dyfac, &
             xaxis_reversed, yaxis_reversed)
+         use pgstar_colors, only: clr_Foreground
          type (star_info), pointer :: s
          real, intent(in) :: txt_scale, xmin, xmax, ymin, ymax, xfac, dxfac, yfac, dyfac
          logical, intent(in) :: xaxis_reversed, yaxis_reversed
@@ -495,7 +496,7 @@
 
          call pgsave
          call pgsch(0.7*txt_scale)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          dxpos = 0
          xpos0 = xmin + xfac*(xmax-xmin)
          dxval = dxfac*(xmax-xmin)

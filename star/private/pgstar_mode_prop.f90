@@ -212,7 +212,7 @@
             ybot = -0.05
             call pgswin(xleft, xright, ymin+ybot, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','BCNSTV')
             else
@@ -239,7 +239,7 @@
             call pgslw(lw_sav)
 
             if (.not. panel_flag) then
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,xaxis_name,ierr)
                if (ierr == 0) then  ! show mix regions at bottom of plot
                   call pgslw(10)
@@ -286,7 +286,7 @@
             call pgslw(lw)
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*0.70)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, name)
             mode_propagation_line_legend = cnt + 1

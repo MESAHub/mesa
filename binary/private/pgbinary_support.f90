@@ -412,9 +412,10 @@ contains
 
 
    subroutine draw_rect()
+      use pgstar_colors, only: clr_Foreground
       real, dimension(5) :: xs, ys
       call pgsave
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       xs = [0.0, 0.0, 1.0, 1.0, 0.0]
       ys = [0.0, 1.0, 1.0, 0.0, 0.0]
       call pgswin(0.0, 1.0, 0.0, 1.0)

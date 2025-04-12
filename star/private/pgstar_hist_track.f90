@@ -734,7 +734,7 @@
          call pgsvp(vp_xleft, vp_xright, vp_ybot, vp_ytop)
          call pgswin(xleft, xright, ybot, ytop)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call show_box_pgstar(s,'BCNST1','BCNSTV1')
 
          if (log_xaxis) then

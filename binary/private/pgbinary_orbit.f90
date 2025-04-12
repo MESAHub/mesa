@@ -215,7 +215,7 @@ contains
       end if
 
       call pgsave
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       call pgscf(1)
       call pgsch(txt_scale)
       call pgslw(b% pg% pgbinary_lw / 2)
@@ -247,7 +247,7 @@ contains
       call pgslw(1)
       call pgmtxt('T', -2.0 - 1.3, 0.05, 0.0, 'Star 2')
 
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       call pgpt1(0.0, 0.0, 5)
       call pgunsa
 

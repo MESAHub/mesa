@@ -185,7 +185,7 @@
                   call show_model_number_pgstar(s)
                   call show_age_pgstar(s)
                end if
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,Dyn_xaxis_name,ierr)
                if (ierr /= 0) return
             end if
@@ -222,7 +222,7 @@
 
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_box_pgstar(s,'','BNSTV')
 
             call pgsci(clr_Teal)
@@ -277,7 +277,7 @@
             call pgswin(xleft, xright, ymin, ymax)
 
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','CMSTV')
             else

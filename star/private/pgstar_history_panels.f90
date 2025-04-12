@@ -853,7 +853,7 @@
                !write(*,1) trim(other_yname), other_ybot, other_ytop
                call pgswin(xleft, xright, other_ybot, other_ytop)
                call pgscf(1)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_box_pgstar(s,'','CMSTV')
                call pgsci(other_y_color)
                if (hist_other_yaxis_log(j)) then
@@ -876,7 +876,7 @@
                !write(*,1) trim(yname), ybot, ytop
                call pgswin(xleft, xright, ybot, ytop)
                call pgscf(1)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                if (j < hist_num_panels) then
                   if (.not. have_other_yaxis) then
                      call show_box_pgstar(s,'BCST1','BCMNSTV1')
@@ -944,7 +944,7 @@
                call pgslw(1)
             end if
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_pgstar_decorator(s%id,use_decorator,pgstar_decorator, j, ierr)
          end do
 

@@ -275,7 +275,7 @@
             if (s% pg% rti_mass_max /= -101d0) ymax = ymax + s% pg% rti_mass_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             ymin_mass_axis = ymin
             ymax_mass_axis = ymax
          end subroutine setup_mass_yaxis
