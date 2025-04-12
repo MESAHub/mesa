@@ -623,6 +623,7 @@
             use_decorator, pgstar_decorator, &
             decorate, ierr)
          use utils_lib
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: &
@@ -813,6 +814,7 @@
 
 
          subroutine show_file_track
+            use pgstar_colors
             integer :: k
             if (len_trim(fname) == 0) return
             if (.not. read_values_from_file(fname, &

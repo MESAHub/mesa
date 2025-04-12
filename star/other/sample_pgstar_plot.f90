@@ -248,6 +248,7 @@ contains
    contains
 
       subroutine plot(ierr)
+         use pgstar_colors
          use rates_def, only: i_rate
          use chem_def, only: ipp, icno
          integer, intent(out) :: ierr

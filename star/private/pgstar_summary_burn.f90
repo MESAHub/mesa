@@ -122,6 +122,7 @@
 
          subroutine plot(ierr)
             use rates_def
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: j, ii, jj, i, cnt, k

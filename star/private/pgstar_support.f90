@@ -56,16 +56,10 @@ module pgstar_support
    real, dimension(:), allocatable :: opal_clip_logT, opal_clip_logRho
    real, dimension(:), allocatable :: scvh_clip_logT, scvh_clip_logRho
 
-   integer :: clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
-      clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-      clr_anonymous, colormap_offset, colormap_last, colormap_size
-   real :: colormap(3, 101)
-
    ! Tioga line types
    integer, parameter :: Line_Type_Solid = 1
    integer, parameter :: Line_Type_Dash = 2
    integer, parameter :: Line_Type_Dot_Dash = 3
-   integer, parameter :: Line_Type_Dash_Dot = Line_Type_Dot_Dash
    integer, parameter :: Line_Type_Dot = 4
 
 contains
@@ -245,6 +239,7 @@ contains
 
 
    subroutine open_device(s, p, is_file, dev, id, ierr)
+      use pgstar_colors, only: set_device_colors
       type (star_info), pointer :: s
       type (pgstar_win_file_data), pointer :: p
       logical, intent(in) :: is_file
@@ -280,7 +275,7 @@ contains
          p% prev_win_width = p% win_width
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
-      call set_device_colors(white_on_black_flag, ierr)
+      call set_device_colors(white_on_black_flag)
    end subroutine open_device
 
 
@@ -360,237 +355,6 @@ contains
       end if
 
    end subroutine read_support_info
-
-
-   ! remaining routines for setting colours in PGPLOT
-   ! by X11 name
-   subroutine set_device_colors(white_on_black_flag, ierr)
-      logical, intent(in) :: white_on_black_flag
-      integer, intent(out) :: ierr
-      integer :: index, i, k
-
-      include 'formats'
-
-      index = 0
-      ierr = 0
-      if (white_on_black_flag) then
-         index = set_index_to_name(index, "black", ierr)
-         if (ierr /= 0) return
-         index = set_index_to_name(index, "white", ierr)
-         if (ierr /= 0) return
-      else
-         index = set_index_to_name(index, "white", ierr)
-         if (ierr /= 0) return
-         index = set_index_to_name(index, "black", ierr)
-         if (ierr /= 0) return
-      end if
-      index = set_index_to_name(index, "red", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "green", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "blue", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "cyan", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "magenta", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "yellow", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "orange", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "lime green", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "green yellow", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "dodger blue", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "magenta4", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "plum", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "sandy brown", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "salmon", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "grey59", ierr)
-      if (ierr /= 0) return
-      index = set_index_to_name(index, "grey30", ierr)
-      if (ierr /= 0) return
-
-      ! Tioga colors
-      index = set_index_to_rgb(index, clr_Black, 0.0, 0.0, 0.0)
-      index = set_index_to_rgb(index, clr_Blue, 0.0, 0.0, 1.0)
-      index = set_index_to_rgb(index, clr_BrightBlue, 0.0, 0.4, 1.0)
-      index = set_index_to_rgb(index, clr_LightSkyBlue, 0.53, 0.808, 0.98)
-      index = set_index_to_rgb(index, clr_LightSkyGreen, 0.125, 0.698, 0.668)
-      index = set_index_to_rgb(index, clr_MediumSpringGreen, 0.0, 0.98, 0.604)
-      index = set_index_to_rgb(index, clr_Goldenrod, 0.855, 0.648, 0.125)
-      index = set_index_to_rgb(index, clr_Lilac, 0.8, 0.6, 1.0)
-      index = set_index_to_rgb(index, clr_Coral, 1.0, 0.498, 0.312)
-      index = set_index_to_rgb(index, clr_FireBrick, 0.698, 0.132, 0.132)
-      index = set_index_to_rgb(index, clr_RoyalPurple, 0.4, 0.0, 0.6)
-      index = set_index_to_rgb(index, clr_Gold, 1.0, 0.844, 0.0)
-      index = set_index_to_rgb(index, clr_Crimson, 0.8, 0.0, 0.2)
-      index = set_index_to_rgb(index, clr_SlateGray, 0.44, 0.5, 0.565)
-      index = set_index_to_rgb(index, clr_SeaGreen, 0.18, 0.545, 0.34)
-      index = set_index_to_rgb(index, clr_Teal, 0.0, 0.5, 0.5)
-      index = set_index_to_rgb(index, clr_LightSteelBlue, 0.69, 0.77, 0.87)
-      index = set_index_to_rgb(index, clr_MediumSlateBlue, 0.484, 0.408, 0.932)
-      index = set_index_to_rgb(index, clr_MediumBlue, 0.0, 0.0, 0.804)
-      index = set_index_to_rgb(index, clr_RoyalBlue, 0.255, 0.41, 0.884)
-      index = set_index_to_rgb(index, clr_LightGray, 0.828, 0.828, 0.828)
-      index = set_index_to_rgb(index, clr_Silver, 0.752, 0.752, 0.752)
-      index = set_index_to_rgb(index, clr_DarkGray, 0.664, 0.664, 0.664)
-      index = set_index_to_rgb(index, clr_Gray, 0.5, 0.5, 0.5)
-      index = set_index_to_rgb(index, clr_IndianRed, 0.804, 0.36, 0.36)
-      index = set_index_to_rgb(index, clr_Tan, 0.824, 0.705, 0.55)
-      index = set_index_to_rgb(index, clr_LightOliveGreen, 0.6, 0.8, 0.6)
-      index = set_index_to_rgb(index, clr_CadetBlue, 0.372, 0.62, 0.628)
-      index = set_index_to_rgb(index, clr_Beige, 0.96, 0.96, 0.864)
-
-      clr_no_mixing = clr_SeaGreen
-      clr_convection = clr_LightSkyBlue
-      clr_leftover_convection = clr_BrightBlue
-      clr_semiconvection = clr_SlateGray
-      clr_thermohaline = clr_Lilac
-      clr_overshoot = clr_Beige
-      clr_rotation = clr_LightSkyGreen
-      clr_rayleigh_taylor = clr_IndianRed
-      clr_minimum = clr_Coral
-      clr_anonymous = clr_Tan
-
-      colormap(1:3, 1) = [ 0.0, 0.0, 1.0 ]
-      colormap(1:3, 2) = [ 0.0196078431372549, 0.0196078431372549, 1.0 ]
-      colormap(1:3, 3) = [ 0.0352941176470588, 0.0352941176470588, 1.0 ]
-      colormap(1:3, 4) = [ 0.0588235294117647, 0.0588235294117647, 1.0 ]
-      colormap(1:3, 5) = [ 0.0705882352941176, 0.0705882352941176, 1.0 ]
-      colormap(1:3, 6) = [ 0.0941176470588235, 0.0941176470588235, 1.0 ]
-      colormap(1:3, 7) = [ 0.105882352941176, 0.105882352941176, 1.0 ]
-      colormap(1:3, 8) = [ 0.129411764705882, 0.129411764705882, 1.0 ]
-      colormap(1:3, 9) = [ 0.141176470588235, 0.141176470588235, 1.0 ]
-      colormap(1:3, 10) = [ 0.164705882352941, 0.164705882352941, 1.0 ]
-      colormap(1:3, 11) = [ 0.184313725490196, 0.184313725490196, 1.0 ]
-      colormap(1:3, 12) = [ 0.2, 0.2, 1.0 ]
-      colormap(1:3, 13) = [ 0.219607843137255, 0.219607843137255, 1.0 ]
-      colormap(1:3, 14) = [ 0.235294117647059, 0.235294117647059, 1.0 ]
-      colormap(1:3, 15) = [ 0.254901960784314, 0.254901960784314, 1.0 ]
-      colormap(1:3, 16) = [ 0.270588235294118, 0.270588235294118, 1.0 ]
-      colormap(1:3, 17) = [ 0.294117647058824, 0.294117647058824, 1.0 ]
-      colormap(1:3, 18) = [ 0.305882352941176, 0.305882352941176, 1.0 ]
-      colormap(1:3, 19) = [ 0.329411764705882, 0.329411764705882, 1.0 ]
-      colormap(1:3, 20) = [ 0.341176470588235, 0.341176470588235, 1.0 ]
-      colormap(1:3, 21) = [ 0.364705882352941, 0.364705882352941, 1.0 ]
-      colormap(1:3, 22) = [ 0.384313725490196, 0.384313725490196, 1.0 ]
-      colormap(1:3, 23) = [ 0.4, 0.4, 1.0 ]
-      colormap(1:3, 24) = [ 0.419607843137255, 0.419607843137255, 1.0 ]
-      colormap(1:3, 25) = [ 0.435294117647059, 0.435294117647059, 1.0 ]
-      colormap(1:3, 26) = [ 0.454901960784314, 0.454901960784314, 1.0 ]
-      colormap(1:3, 27) = [ 0.470588235294118, 0.470588235294118, 1.0 ]
-      colormap(1:3, 28) = [ 0.490196078431373, 0.490196078431373, 1.0 ]
-      colormap(1:3, 29) = [ 0.505882352941176, 0.505882352941176, 1.0 ]
-      colormap(1:3, 30) = [ 0.529411764705882, 0.529411764705882, 1.0 ]
-      colormap(1:3, 31) = [ 0.549019607843137, 0.549019607843137, 1.0 ]
-      colormap(1:3, 32) = [ 0.564705882352941, 0.564705882352941, 1.0 ]
-      colormap(1:3, 33) = [ 0.584313725490196, 0.584313725490196, 1.0 ]
-      colormap(1:3, 34) = [ 0.6, 0.6, 1.0 ]
-      colormap(1:3, 35) = [ 0.619607843137255, 0.619607843137255, 1.0 ]
-      colormap(1:3, 36) = [ 0.635294117647059, 0.635294117647059, 1.0 ]
-      colormap(1:3, 37) = [ 0.654901960784314, 0.654901960784314, 1.0 ]
-      colormap(1:3, 38) = [ 0.670588235294118, 0.670588235294118, 1.0 ]
-      colormap(1:3, 39) = [ 0.690196078431373, 0.690196078431373, 1.0 ]
-      colormap(1:3, 40) = [ 0.705882352941177, 0.705882352941177, 1.0 ]
-      colormap(1:3, 41) = [ 0.725490196078431, 0.725490196078431, 1.0 ]
-      colormap(1:3, 42) = [ 0.749019607843137, 0.749019607843137, 1.0 ]
-      colormap(1:3, 43) = [ 0.764705882352941, 0.764705882352941, 1.0 ]
-      colormap(1:3, 44) = [ 0.784313725490196, 0.784313725490196, 1.0 ]
-      colormap(1:3, 45) = [ 0.8, 0.8, 1.0 ]
-      colormap(1:3, 46) = [ 0.831372549019608, 0.831372549019608, 1.0 ]
-      colormap(1:3, 47) = [ 0.854901960784314, 0.854901960784314, 1.0 ]
-      colormap(1:3, 48) = [ 0.890196078431372, 0.890196078431372, 1.0 ]
-      colormap(1:3, 49) = [ 0.913725490196078, 0.913725490196078, 1.0 ]
-      colormap(1:3, 50) = [ 0.949019607843137, 0.949019607843137, 1.0 ]
-      colormap(1:3, 51) = [ 1.0, 0.972549019607843, 0.972549019607843 ]
-      colormap(1:3, 52) = [ 1.0, 0.949019607843137, 0.949019607843137 ]
-      colormap(1:3, 53) = [ 1.0, 0.913725490196078, 0.913725490196078 ]
-      colormap(1:3, 54) = [ 1.0, 0.890196078431372, 0.890196078431372 ]
-      colormap(1:3, 55) = [ 1.0, 0.854901960784314, 0.854901960784314 ]
-      colormap(1:3, 56) = [ 1.0, 0.831372549019608, 0.831372549019608 ]
-      colormap(1:3, 57) = [ 1.0, 0.8, 0.8 ]
-      colormap(1:3, 58) = [ 1.0, 0.784313725490196, 0.784313725490196 ]
-      colormap(1:3, 59) = [ 1.0, 0.764705882352941, 0.764705882352941 ]
-      colormap(1:3, 60) = [ 1.0, 0.749019607843137, 0.749019607843137 ]
-      colormap(1:3, 61) = [ 1.0, 0.725490196078431, 0.725490196078431 ]
-      colormap(1:3, 62) = [ 1.0, 0.705882352941177, 0.705882352941177 ]
-      colormap(1:3, 63) = [ 1.0, 0.690196078431373, 0.690196078431373 ]
-      colormap(1:3, 64) = [ 1.0, 0.670588235294118, 0.670588235294118 ]
-      colormap(1:3, 65) = [ 1.0, 0.654901960784314, 0.654901960784314 ]
-      colormap(1:3, 66) = [ 1.0, 0.635294117647059, 0.635294117647059 ]
-      colormap(1:3, 67) = [ 1.0, 0.619607843137255, 0.619607843137255 ]
-      colormap(1:3, 68) = [ 1.0, 0.6, 0.6 ]
-      colormap(1:3, 69) = [ 1.0, 0.584313725490196, 0.584313725490196 ]
-      colormap(1:3, 70) = [ 1.0, 0.564705882352941, 0.564705882352941 ]
-      colormap(1:3, 71) = [ 1.0, 0.541176470588235, 0.541176470588235 ]
-      colormap(1:3, 72) = [ 1.0, 0.529411764705882, 0.529411764705882 ]
-      colormap(1:3, 73) = [ 1.0, 0.505882352941176, 0.505882352941176 ]
-      colormap(1:3, 74) = [ 1.0, 0.490196078431373, 0.490196078431373 ]
-      colormap(1:3, 75) = [ 1.0, 0.470588235294118, 0.470588235294118 ]
-      colormap(1:3, 76) = [ 1.0, 0.454901960784314, 0.454901960784314 ]
-      colormap(1:3, 77) = [ 1.0, 0.435294117647059, 0.435294117647059 ]
-      colormap(1:3, 78) = [ 1.0, 0.419607843137255, 0.419607843137255 ]
-      colormap(1:3, 79) = [ 1.0, 0.4, 0.4 ]
-      colormap(1:3, 80) = [ 1.0, 0.384313725490196, 0.384313725490196 ]
-      colormap(1:3, 81) = [ 1.0, 0.364705882352941, 0.364705882352941 ]
-      colormap(1:3, 82) = [ 1.0, 0.341176470588235, 0.341176470588235 ]
-      colormap(1:3, 83) = [ 1.0, 0.329411764705882, 0.329411764705882 ]
-      colormap(1:3, 84) = [ 1.0, 0.305882352941176, 0.305882352941176 ]
-      colormap(1:3, 85) = [ 1.0, 0.294117647058824, 0.294117647058824 ]
-      colormap(1:3, 86) = [ 1.0, 0.270588235294118, 0.270588235294118 ]
-      colormap(1:3, 87) = [ 1.0, 0.254901960784314, 0.254901960784314 ]
-      colormap(1:3, 88) = [ 1.0, 0.235294117647059, 0.235294117647059 ]
-      colormap(1:3, 89) = [ 1.0, 0.219607843137255, 0.219607843137255 ]
-      colormap(1:3, 90) = [ 1.0, 0.2, 0.2 ]
-      colormap(1:3, 91) = [ 1.0, 0.176470588235294, 0.176470588235294 ]
-      colormap(1:3, 92) = [ 1.0, 0.164705882352941, 0.164705882352941 ]
-      colormap(1:3, 93) = [ 1.0, 0.141176470588235, 0.141176470588235 ]
-      colormap(1:3, 94) = [ 1.0, 0.129411764705882, 0.129411764705882 ]
-      colormap(1:3, 95) = [ 1.0, 0.105882352941176, 0.105882352941176 ]
-      colormap(1:3, 96) = [ 1.0, 0.0941176470588235, 0.0941176470588235 ]
-      colormap(1:3, 97) = [ 1.0, 0.0705882352941176, 0.0705882352941176 ]
-      colormap(1:3, 98) = [ 1.0, 0.0588235294117647, 0.0588235294117647 ]
-      colormap(1:3, 99) = [ 1.0, 0.0352941176470588, 0.0352941176470588 ]
-      colormap(1:3, 100) = [ 1.0, 0.0196078431372549, 0.0196078431372549 ]
-      colormap(1:3, 101) = [ 1.0, 0.0, 0.0 ]
-
-      colormap_offset = index - 1
-      !write(*,2) 'colormap_offset', colormap_offset
-      do i = 1, 101, 2
-         !write(*,3) 'colormap clr', i, &
-         !   index, colormap(1,i), colormap(2,i), colormap(3,i)
-         index = set_index_to_rgb(index, k, colormap(1, i), colormap(2, i), colormap(3, i))
-      end do
-      colormap_last = index - 1
-      colormap_size = colormap_last - colormap_offset
-
-   contains
-
-      integer function set_index_to_rgb(index, clr_i, r, g, b)
-         integer :: index, clr_i
-         real :: r, g, b
-         call pgscr(index, r, g, b)
-         clr_i = index
-         set_index_to_rgb = index + 1
-      end function set_index_to_rgb
-
-
-      integer function set_index_to_name(index, name, ierr)
-         integer :: index
-         character (len = *) :: name
-         integer, intent(out) :: ierr
-         call pgscrn(index, name, ierr)
-         set_index_to_name = index + 1
-      end function set_index_to_name
-
-   end subroutine set_device_colors
 
    subroutine read_TRho_data(fname, logTs, logRhos, ierr)
       use utils_lib
@@ -1305,6 +1069,7 @@ contains
 
 
    subroutine show_no_mixing_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1314,6 +1079,7 @@ contains
 
 
    subroutine show_convective_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1324,6 +1090,7 @@ contains
 
 
    subroutine show_leftover_convective_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1334,6 +1101,7 @@ contains
 
 
    subroutine show_semiconvective_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1344,6 +1112,7 @@ contains
 
 
    subroutine show_thermohaline_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1354,6 +1123,7 @@ contains
 
 
    subroutine show_rotation_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1364,6 +1134,7 @@ contains
 
 
    subroutine show_overshoot_section(s, ybot, grid_min, grid_max, xvec)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: ybot
       integer, intent(in) :: grid_min, grid_max
@@ -1412,6 +1183,7 @@ contains
       s, xvec, yvec, txt_scale, xmin, xmax, ymin, ymax, &
       show_legend, legend_coord, legend_disp1, legend_del_disp, legend_fjust, &
       show_mass_pts)
+      use pgstar_colors
       type (star_info), pointer :: s
       real, intent(in) :: xvec(:), yvec(:), txt_scale, xmin, xmax, ymin, ymax, &
          legend_coord, legend_disp1, legend_del_disp, legend_fjust

@@ -62,6 +62,7 @@
       subroutine do_TRho_Profile_plot(s, id, device_id, &
             xleft, xright, ybot, ytop, subplot, title, txt_scale_in, ierr)
          use utils_lib
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id

@@ -611,6 +611,7 @@
             ierr)
          use utils_lib
          use star_def
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id, color_num_panels

@@ -614,6 +614,7 @@
          use net_def
          use net_lib, only: get_net_reaction_table
          use const_def, only: Msun, Rsun
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id, hist_num_panels

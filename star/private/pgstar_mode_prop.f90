@@ -81,6 +81,7 @@
          use utils_lib
          use chem_def
          use net_def
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id

@@ -551,6 +551,7 @@
          use pgstar_mixing_Ds, only: do_Mixing_panel
          use pgstar_mode_prop, only: do_mode_propagation_panel
          use pgstar_summary_profile, only: do_summary_profile_panel
+         use pgstar_colors
          use utils_lib
          use profile_getval, only: get_profile_val, get_profile_id
 

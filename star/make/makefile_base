@@ -17,6 +17,7 @@ ifeq ($(USE_PGSTAR),YES)
       pgstar_decorator.f90 \
       pgstar_ctrls_io.f90 \
       pgstar_support.f90 \
+      pgstar_colors.f90 \
       pgstar_hist_track.f90 \
       pgstar_kipp.f90 \
       pgstar_dpg_dnu.f90 \

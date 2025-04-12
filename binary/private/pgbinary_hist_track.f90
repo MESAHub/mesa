@@ -626,6 +626,7 @@ contains
 
       use utils_lib
       use pgstar_support, only : set_xleft_xright, set_ytop_ybot
+      use pgstar_colors
 
       type (binary_info), pointer :: b
       integer, intent(in) :: &

@@ -189,38 +189,6 @@ module star_pgstar
    integer, parameter :: max_num_rows_Text_Summary = 20
    integer, parameter :: max_num_cols_Text_Summary = 20
    integer, parameter :: max_num_profile_mass_points = 10
-
-   ! some Tioga colors for pgstar
-   integer :: clr_Black
-   integer :: clr_Blue
-   integer :: clr_BrightBlue
-   integer :: clr_Goldenrod
-   integer :: clr_Lilac
-   integer :: clr_Coral
-   integer :: clr_FireBrick
-   integer :: clr_RoyalPurple
-   integer :: clr_Gold
-   integer :: clr_Crimson
-   integer :: clr_SlateGray
-   integer :: clr_Teal
-   integer :: clr_LightSteelBlue
-   integer :: clr_MediumSlateBlue
-   integer :: clr_MediumSpringGreen
-   integer :: clr_MediumBlue
-   integer :: clr_RoyalBlue
-   integer :: clr_LightGray
-   integer :: clr_Silver
-   integer :: clr_DarkGray
-   integer :: clr_Gray
-   integer :: clr_LightSkyBlue
-   integer :: clr_LightSkyGreen
-   integer :: clr_SeaGreen
-   integer :: clr_Tan
-   integer :: clr_IndianRed
-   integer :: clr_LightOliveGreen
-   integer :: clr_CadetBlue
-   integer :: clr_Beige
-
    integer, parameter :: max_num_pgstar_trace_history_values = 20
 
    type pgstar_controls

@@ -164,6 +164,7 @@
          subroutine plot(ierr)
             use pgstar_support, only: show_convective_section, show_semiconvective_section, &
                show_thermohaline_section, show_overshoot_section
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: lw, lw_sav, k

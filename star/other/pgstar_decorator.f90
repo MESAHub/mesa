@@ -54,6 +54,7 @@ contains
 !      subroutine Abundance_pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
 !         use star_def
 !         use const_def, only: dp
+!         use pgstar_colors
 !         integer, intent(in) :: id
 !         !Not dp
 !         real,intent(in) :: xmin, xmax, ymin, ymax

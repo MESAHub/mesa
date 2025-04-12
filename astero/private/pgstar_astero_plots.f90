@@ -127,6 +127,7 @@
 
          use utils_lib
          use const_def, only: dp
+         use pgstar_colors
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -399,6 +400,7 @@
 
          use utils_lib
          use const_def, only: dp
+         use pgstar_colors
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale

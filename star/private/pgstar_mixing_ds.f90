@@ -189,6 +189,7 @@
 
 
          subroutine plot(ierr)
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: lw, lw_sav

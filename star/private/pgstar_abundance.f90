@@ -85,6 +85,7 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id

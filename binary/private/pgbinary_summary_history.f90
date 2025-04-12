@@ -65,6 +65,7 @@ contains
       use chem_def
       use net_def
       use const_def, only : Msun, Rsun
+      use pgstar_colors
 
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id

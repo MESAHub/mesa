@@ -29,8 +29,12 @@
       use const_def, only: dp
       use pgstar_support
       use star_pgstar
+      use pgstar_colors
 
       implicit none
+      private
+
+      public :: network_plot, do_network_plot
 
       contains
 
@@ -183,7 +187,7 @@
             end if
             call show_title_pgstar(s, title)
 
-            mid_map = colormap_size/2
+            mid_map = colormap_length/2
             do i=1,s%species
 
                Z=chem_isos%Z(s%chem_id(i))
@@ -203,11 +207,11 @@
                !Plot colored dots for mass fractions
                if(s% pg% Network_show_mass_fraction) then
                   if(abun>log10_min_abun .and. abun < log10_max_abun)THEN
-                     do j=mid_map,colormap_size
-                        xlow=log10_min_abun+(j-mid_map)*(log10_max_abun-log10_min_abun)/(colormap_size-mid_map)
-                        xhigh=log10_min_abun+(j-mid_map+1)*(log10_max_abun-log10_min_abun)/(colormap_size-mid_map)
+                     do j=mid_map,colormap_length
+                        xlow=log10_min_abun+(j-mid_map)*(log10_max_abun-log10_min_abun)/(colormap_length-mid_map)
+                        xhigh=log10_min_abun+(j-mid_map+1)*(log10_max_abun-log10_min_abun)/(colormap_length-mid_map)
                         if(abun>=xlow .and. abun<xhigh)THEN
-                           clr = colormap_offset + (colormap_size-(j-mid_map))
+                           clr = colormap_offset + (colormap_length-(j-mid_map))
                            call pgsci(clr)
                         end if
                      end do
@@ -252,8 +256,8 @@
          legend_ymin = winymin
          legend_ymax = winymax
 
-         mid_map = colormap_size/2
-         num_cms=colormap_size-mid_map
+         mid_map = colormap_length/2
+         num_cms=colormap_length-mid_map
          dyline = (ymax-ymin)/num_cms
          dx = 0.1
 
@@ -263,9 +267,9 @@
          call pgsave
          call pgsvp(legend_xmin, legend_xmax, legend_ymin, legend_ymax)
          call pgswin(0.0, 1.0, ymin, ymax)
-         do j=mid_map,colormap_size
+         do j=mid_map,colormap_length
             i=j-mid_map
-            clr = colormap_offset + (colormap_size-i+1)
+            clr = colormap_offset + (colormap_length-i+1)
             call pgsci(clr)
             yt = ymin + (i)*dyline
             yb = ymin + (i-1)*dyline
