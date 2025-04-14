@@ -79,7 +79,7 @@ module run_star_extras
      ierr = 0
      call star_ptr(id, s, ierr)
      if (ierr /= 0) return
-     call test_suite_startup(s, restart, ierr)
+     call test_suite_startup(restart, ierr)
   end subroutine extras_startup
 
   subroutine extras_after_evolve(id, ierr)
@@ -100,7 +100,7 @@ module run_star_extras
       nullify(col)
     end if
 
-    call test_suite_after_evolve(s, ierr)
+    call test_suite_after_evolve(ierr)
   end subroutine extras_after_evolve
 
   integer function extras_check_model(id)
