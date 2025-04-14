@@ -32,6 +32,7 @@ module colors_lib
   use const_def  !, only: dp
   use colors_def
   use math_lib
+  use hermite_interp
   implicit none
   !integer, parameter :: dp = kind(1.0d0)
 
@@ -118,8 +119,8 @@ module colors_lib
        !print *, 'teff', lu_teff
        ! Interpolate Spectral Energy Distribution
        !CALL constructsed_Robust(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
-       CALL constructsed(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
-
+       !CALL constructsed(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+       CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
        ! Calculate bolometric flux and magnitude
        CALL calculatebolometricphot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
      END SUBROUTINE calculatebolometric
@@ -1763,17 +1764,17 @@ end function get_lum_band_by_id
 
 
 
-subroutine test_suite_startup(s, restart, ierr)
-  use star_def, only: star_info
-  type(star_info), pointer :: s
+subroutine test_suite_startup(restart, ierr)
+  !use star_def, only: star_info
+  !type(star_info), pointer :: s
   logical, intent(in) :: restart
   integer, intent(out) :: ierr
   ierr = 0
 end subroutine test_suite_startup
 
-subroutine test_suite_after_evolve(s, ierr)
-  use star_def, only: star_info
-  type(star_info), pointer :: s
+subroutine test_suite_after_evolve(ierr)
+  !use star_def, only: star_info
+  !type(star_info), pointer :: s
   integer, intent(out) :: ierr
   ierr = 0
 end subroutine test_suite_after_evolve
