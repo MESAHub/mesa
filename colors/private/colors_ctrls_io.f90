@@ -37,8 +37,8 @@ contains
    !******* Read Colors Controls *******
    !************************************
 
-   subroutine read_colors_controls(ctrl, ierr)
-      type(colors_controls_type), intent(inout) :: ctrl
+   subroutine read_colors_controls(col, ierr)
+      type(colors_controls_type), intent(inout) :: col
       integer, intent(out) :: ierr
 
       ! Local variables for namelist (MUST be declared at the beginning)
@@ -58,20 +58,20 @@ contains
       ierr = 0
 
       ! First try to read from the defaults file
-      call read_colors_defaults('colors.defaults', ctrl, ierr)
+      call read_colors_defaults('colors.defaults', col, ierr)
       if (ierr /= 0) then
         ! If fails, fall back to hardcoded defaults
-        call set_default_colors_controls(ctrl)
+        call set_default_colors_controls(col)
       end if
 
-      ! Set namelist variables from ctrl values
-      color_instrument = ctrl% instrument
-      color_vega_sed = ctrl% vega_sed
-      color_atm = ctrl% stellar_atm
-      color_z = ctrl% metallicity
-      color_d = ctrl% distance
-      color_make_csv = ctrl% make_csv
-      do_colors = ctrl% use_colors
+      ! Set namelist variables from col values
+      color_instrument = col% instrument
+      color_vega_sed = col% vega_sed
+      color_atm = col% stellar_atm
+      color_z = col% metallicity
+      color_d = col% distance
+      color_make_csv = col% make_csv
+      do_colors = col% use_colors
 
       ! Read controls from input file
       read(colors_namelist_id, nml=colors_controls, iostat=ierr)
@@ -80,14 +80,14 @@ contains
         return
       end if
 
-      ! Update ctrl from local variables
-      ctrl% instrument = color_instrument
-      ctrl% vega_sed = color_vega_sed
-      ctrl% stellar_atm = color_atm
-      ctrl% metallicity = color_z
-      ctrl% distance = color_d
-      ctrl% make_csv = color_make_csv
-      ctrl% use_colors = do_colors
+      ! Update col from local variables
+      col% instrument = color_instrument
+      col% vega_sed = color_vega_sed
+      col% stellar_atm = color_atm
+      col% metallicity = color_z
+      col% distance = color_d
+      col% make_csv = color_make_csv
+      col% use_colors = do_colors
 
       ! Additional validation could go here
 
@@ -97,17 +97,17 @@ contains
    !****** Set Default Controls ********
    !************************************
 
-   subroutine set_default_colors_controls(ctrl)
-      type (colors_controls_type), intent(out) :: ctrl
+   subroutine set_default_colors_controls(col)
+      type (colors_controls_type), intent(out) :: col
 
       ! Set default values
-      ctrl% instrument = 'data/filters/GAIA/GAIA'
-      ctrl% vega_sed = 'data/stellar_models/vega_flam.csv'
-      ctrl% stellar_atm = 'data/stellar_models/Kurucz2003all/'
-      ctrl% metallicity = 0.0d0
-      ctrl% distance = 3.0857d17  ! 10pc for abs mag
-      ctrl% make_csv = .false.
-      ctrl% use_colors = .true.
+      col% instrument = 'data/filters/GAIA/GAIA'
+      col% vega_sed = 'data/stellar_models/vega_flam.csv'
+      col% stellar_atm = 'data/stellar_models/Kurucz2003all/'
+      col% metallicity = 0.0d0
+      col% distance = 3.0857d17  ! 10pc for abs mag
+      col% make_csv = .false.
+      col% use_colors = .true.
 
    end subroutine set_default_colors_controls
 
@@ -115,18 +115,18 @@ contains
    !********* Write Colors Controls Info ************
    !*************************************************
 
-   subroutine write_colors_controls_info(ctrl, io)
-      type (colors_controls_type), intent(in) :: ctrl
+   subroutine write_colors_controls_info(col, io)
+      type (colors_controls_type), intent(in) :: col
       integer, intent(in) :: io
 
       write(io,'(A)') '================ Colors Controls ================'
-      write(io,'(A,A)') ' instrument: ', trim(ctrl% instrument)
-      write(io,'(A,A)') ' vega_sed: ', trim(ctrl% vega_sed)
-      write(io,'(A,A)') ' stellar_atm: ', trim(ctrl% stellar_atm)
-      write(io,'(A,1PE26.16)') ' metallicity: ', ctrl% metallicity
-      write(io,'(A,1PE26.16)') ' distance: ', ctrl% distance
-      write(io,'(A,L1)') ' make_csv: ', ctrl% make_csv
-      write(io,'(A,L1)') ' use_colors: ', ctrl% use_colors
+      write(io,'(A,A)') ' instrument: ', trim(col% instrument)
+      write(io,'(A,A)') ' vega_sed: ', trim(col% vega_sed)
+      write(io,'(A,A)') ' stellar_atm: ', trim(col% stellar_atm)
+      write(io,'(A,1PE26.16)') ' metallicity: ', col% metallicity
+      write(io,'(A,1PE26.16)') ' distance: ', col% distance
+      write(io,'(A,L1)') ' make_csv: ', col% make_csv
+      write(io,'(A,L1)') ' use_colors: ', col% use_colors
       write(io,'(A)') '================================================='
 
    end subroutine write_colors_controls_info
@@ -135,16 +135,16 @@ contains
    !********* Read Colors Defaults ************
    !*************************************************
 
-   subroutine read_colors_defaults(filename, ctrl, ierr)
+   subroutine read_colors_defaults(filename, col, ierr)
      character(len=*), intent(in) :: filename
-     type(colors_controls_type), intent(out) :: ctrl
+     type(colors_controls_type), intent(out) :: col
      integer, intent(out) :: ierr
 
      integer :: unit, status
      character(len=256) :: line, key, value
 
      ! Set defaults first
-     call set_default_colors_controls(ctrl)
+     call set_default_colors_controls(col)
 
      ! Open the defaults file
      unit = 20
@@ -173,17 +173,17 @@ contains
 
          ! Set the appropriate control value
          if (key == 'color_instrument') then
-           ctrl% instrument = value
+           col% instrument = value
          else if (key == 'color_vega_sed') then
-           ctrl% vega_sed = value
+           col% vega_sed = value
          else if (key == 'color_atm') then
-           ctrl% stellar_atm = value
+           col% stellar_atm = value
          else if (key == 'color_z') then
-           read(value, *) ctrl% metallicity
+           read(value, *) col% metallicity
          else if (key == 'color_d') then
-           read(value, *) ctrl% distance
+           read(value, *) col% distance
          else if (key == 'color_make_csv') then
-           ctrl% make_csv = (value == 'true' .or. value == 'TRUE')
+           col% make_csv = (value == 'true' .or. value == 'TRUE')
          end if
        end if
      end do

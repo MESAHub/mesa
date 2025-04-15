@@ -70,11 +70,22 @@
     !# Note: Ensure only ONE setup is active at a time!          
     !==============================================================
 
+    color_instrument = 'data/filters/GAIA/GAIA'
+    color_vega_sed = 'data/stellar_models/vega_flam.csv'
+    color_make_csv = 'false'    
+    !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
+    !Vega SED for Vega photometric system
+    !make csv
 
-    x_character_ctrl(1) = 'data/stellar_models/Kurucz2003all/'   !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/
-    x_character_ctrl(2) = 'data/filters/GAIA/GAIA'               !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
-    x_character_ctrl(3) = 'data/stellar_models/vega_flam.csv'    !Vega SED for Vega photometric system
-    x_character_ctrl(4) = 'false'                                !Save csv files of each constructed SED?
+    color_atm = 'data/stellar_models/Kurucz2003all/'
+    color_z = 0.58d0
+    color_d = 3.0857d17   
+  
+    !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
+    !Metallicity
+    !Stellar distance 'd' (10pc for abs mag...)
+
+
 
     num_trace_history_values = 2
     trace_history_value_name(1) = 'rel_E_err'

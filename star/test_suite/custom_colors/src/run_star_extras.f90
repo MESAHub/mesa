@@ -252,11 +252,24 @@ module run_star_extras
 
 
       metallicity = col%metallicity
+      !col%metallicity = s%metallicity
+
+      !col%distance = s%distance
       d = col%distance
+
+      !col%stellar_atm = s%stellar_atm
       sed_filepath = col%stellar_atm
+
+      !col%instrument = s%instrument
       filter_dir = col%instrument
+
+      !col%vega_sed = s%vega_sed
       vega_filepath = col%vega_sed
+
+      !col%make_csv = s%make_csv
       make_sed = col%make_csv
+
+
 
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
