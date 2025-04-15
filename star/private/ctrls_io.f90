@@ -529,9 +529,16 @@
     use_other_screening, use_other_rate_get, use_other_net_derivs, use_other_split_burn, use_other_close_gaps, &
     x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, &
 
+    !colours
+    color_instrument, color_vega_sed, color_make_csv, color_atm, color_z, color_d, &
+
     ! extra files
     read_extra_controls_inlist, extra_controls_inlist_name, &
     save_controls_namelist, controls_namelist_name
+
+
+
+
 
 
  contains
@@ -4119,6 +4126,29 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  steps_before_start_stress_test = s% steps_before_start_stress_test
  stress_test_relax = s% stress_test_relax
 
+
+
+
+
+   color_instrument = s% color_instrument
+                                 !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
+
+   color_vega_sed = s% color_vega_sed
+                                 !Vega SED for Vega photometric system
+
+   color_make_csv = s% color_make_csv
+                                 !make csv
+
+   color_atm = s% color_atm
+                                 !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
+
+   color_z = s% color_z
+                                 !Metallicity
+
+   color_d = s% color_d
+                                 !Stellar distance 'd' (10pc for abs mag...)
+
+   
 
 
  end subroutine set_controls_for_writing

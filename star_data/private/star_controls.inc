@@ -1390,3 +1390,15 @@
          integer :: x_integer_ctrl(num_x_ctrls)
          logical :: x_logical_ctrl(num_x_ctrls)
          character (len=strlen) :: x_character_ctrl(num_x_ctrls)
+
+
+         !colors
+
+         character (len=strlen) :: color_instrument
+         character (len=strlen) :: color_vega_sed
+         logical :: color_make_csv
+
+         character (len=strlen) :: color_atm
+         real(dp) :: color_z
+         real(dp) :: color_d
+

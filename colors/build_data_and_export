@@ -1,25 +1,81 @@
 #!/bin/bash
 
 function check_okay {
-	if [ $? -ne 0 ]
-	then
-		exit 1
-	fi
+    if [ $? -ne 0 ]
+    then
+        echo "Error in colors data build process"
+        exit 1
+    fi
 }
 
-
+# Create necessary directories
 mkdir -p data
+check_okay
 cd data
 check_okay
+
+# Define remote data file locations
+PRIMARY_REMOTE_FILE="https://nialljmiller.com/media/bigdata/MESA/testdata.txz"
+SECONDARY_REMOTE_FILE="https://raw.githubusercontent.com/nialljmiller/custom_colours_test_data/main/testdata.txz"
+LOCAL_FILE="testdata.txz"
+EXTRACTED_FLAG="extracted_marker"  # Marker file to track extraction
+
+# Function to validate the archive by listing its contents
+validate_archive() {
+    tar -tJf "$LOCAL_FILE" > /dev/null 2>&1
+}
+
+# Download the file if it doesn't exist locally or if marker doesn't exist
+if [ ! -f "$EXTRACTED_FLAG" ]; then
+    if [ ! -f "$LOCAL_FILE" ]; then
+        echo "Attempting to download colors test data from primary source..."
+        curl -L -o "$LOCAL_FILE" "$PRIMARY_REMOTE_FILE"
+    else
+        echo "Colors test data file already exists locally. Skipping download."
+    fi
+
+    # Validate the downloaded file
+    if validate_archive; then
+        echo "Primary archive is valid."
+    else
+        echo "Primary archive is invalid. Trying secondary source..."
+        rm -f "$LOCAL_FILE"
+        curl -L -o "$LOCAL_FILE" "$SECONDARY_REMOTE_FILE" || { echo "Secondary download failed. Exiting."; exit 1; }
+        # Validate the secondary archive as well
+        if ! validate_archive; then
+            echo "Secondary archive is invalid. Exiting."
+            exit 1
+        fi
+    fi
+
+    echo "Extracting colors test data..."
+    mkdir -p filters stellar_models
+    tar -xJf "$LOCAL_FILE" --strip-components=1 || { echo "Extraction failed"; exit 1; }
+    touch "$EXTRACTED_FLAG"  # Create marker file
+    rm "$LOCAL_FILE"
+else
+    echo "Colors test data exists"
+fi
+
 cd ..
 
-rm -rf ../data/colors_data
-check_okay
-mkdir ../data/colors_data
-check_okay
-#cp data/lcb98cor.dat ../data/colors_data
-#cp data/blackbody_johnson.dat ../data/colors_data
-#check_okay
-echo "done"
+# Create directory if not exists
+if [ ! -d "../data/colors_data" ]; then
+    mkdir -p ../data/colors_data
+    check_okay
+fi
+
+# Copy necessary files to the MESA data directory
+if [ -d "filters" ]; then
+    cp -r filters ../data/colors_data/
+    check_okay
+fi
+
+if [ -d "stellar_models" ]; then
+    cp -r stellar_models ../data/colors_data/
+    check_okay
+fi
+
+echo "Colors data has been successfully built and exported."
 
 cd ..
