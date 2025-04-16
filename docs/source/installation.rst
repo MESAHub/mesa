@@ -115,7 +115,7 @@ uses export to set variables):
     # add shmesa (the MESA command line tool) to your PATH
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
-Note (Jan 2025): due to some changes in MacOS 15.2/15.3, if you see the error `ld: library 'z' not found` on a Mac and using MESA SDK version <= 24.10.1, you may also need to add:
+Note (Jan 2025): due to some changes in MacOS 15.2/15.3, if you see the error `ld: library 'z' not found` on a Mac, and you are using MESA SDK version <= 24.10.1, you may also need to add:
 
 .. code-block:: bash
 
