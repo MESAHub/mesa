@@ -18,6 +18,7 @@ SRCS = \
    shared_funcs.f90 \
    hermite_interp.f90 \
    knn_interp.f90 \
+   tetra_interp.f90 \
    mod_colors.f90 \
    colors_lib.f90
 
