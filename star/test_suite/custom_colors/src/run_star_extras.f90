@@ -34,14 +34,13 @@ module run_star_extras
         return
     end if
 
-    ! Allocate and initialize the colors pointer "col" (like col%)
+    ! Allocate and initialize the colors pointer "col" (like s%)
     if (associated(col)) then
       deallocate(col)
       nullify(col)
     end if
     allocate(col)
     call set_default_colors_controls(col)
-
     ! Carry on with other initialization routines
     call process_color_files(id, ierr)
     s%extras_startup         => extras_startup
@@ -53,9 +52,6 @@ module run_star_extras
     s%how_many_extra_profile_columns => how_many_extra_profile_columns
     s%data_for_extra_profile_columns => data_for_extra_profile_columns
 
-    ! Use col% just like s%
-    print *, "Stellar atmosphere:", trim(col%stellar_atm)
-    print *, "Instrument:", trim(col%instrument)
   end subroutine extras_controls
 
   subroutine process_color_files(id, ierr)
@@ -68,7 +64,7 @@ module run_star_extras
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
 
-    ! Add any colors file processing you need here, using col% as required.
+    ! Add any colors file processing you need here, using s% as required.
   end subroutine process_color_files
 
   subroutine extras_startup(id, restart, ierr)
@@ -169,24 +165,24 @@ module run_star_extras
           how_many_extra_history_columns = 0
           return
       end if
-
+   write(*,*) 'how_many: color_vega_sed = ', trim(s%color_vega_sed)
       call read_strings_from_file(strings, n, id)
       how_many_extra_history_columns = n + 2
       if (allocated(strings)) deallocate(strings)
   end function how_many_extra_history_columns
 
-  function basename(path) result(base)
-      character(len=*), intent(in) :: path
-      character(len=512) :: base
-      integer :: last_slash
 
-      last_slash = len_trim(path)
-      do while (last_slash > 0 .and. path(last_slash:last_slash) /= '/')
-          last_slash = last_slash - 1
-      end do
-
-      base = path(last_slash+1:)
-  end function basename
+function basename(path) result(name)
+   character(len=*), intent(in) :: path
+   character(len=strlen) :: name
+   integer :: i
+   if (len_trim(path) == 0) then
+      name = ''
+      return
+   end if
+   i = index(path, '/', back=.true.)
+   name = path(i+1:)
+end function
 
   subroutine read_strings_from_file(strings, n, id)
       integer, intent(in) :: id
@@ -202,8 +198,13 @@ module run_star_extras
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
 
-      filename = trim(s%x_character_ctrl(2)) // "/" // &
-      trim(basename(s%x_character_ctrl(2)))
+
+      !s%color_instrument = s%x_character_ctrl(2)
+      write(*,*) 's%color_vega_sed = ', trim(s%color_vega_sed)
+      write(*,*) 's%color_instrument = ', trim(s%color_instrument)
+
+      filename = trim(s%color_instrument) // "/" // &
+      trim(basename(s%color_instrument))
       n = 0
       unit = 10
       open(unit, file=filename, status='old', action='read', iostat=status)
@@ -251,26 +252,16 @@ module run_star_extras
       R      = s%R(1)
 
 
-      metallicity = col%metallicity
-      !col%metallicity = s%metallicity
+      metallicity = s%color_z
+      d = s%color_d
+      sed_filepath = s%color_atm
+      filter_dir = s%color_instrument
+      vega_filepath = s%color_vega_sed
+      make_sed = s%color_make_csv
 
-      !col%distance = s%distance
-      d = col%distance
-
-      !col%stellar_atm = s%stellar_atm
-      sed_filepath = col%stellar_atm
-
-      !col%instrument = s%instrument
-      filter_dir = col%instrument
-
-      !col%vega_sed = s%vega_sed
-      vega_filepath = col%vega_sed
-
-      !col%make_csv = s%make_csv
-      make_sed = col%make_csv
-
-
-
+      ! Use s% just like s%
+      print *, "Stellar atmosphere:", trim(s%color_atm)
+      print *, "Instrument:", trim(s%color_instrument)
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))

@@ -1397,8 +1397,6 @@
          character (len=strlen) :: color_instrument
          character (len=strlen) :: color_vega_sed
          logical :: color_make_csv
-
          character (len=strlen) :: color_atm
          real(dp) :: color_z
          real(dp) :: color_d
-
