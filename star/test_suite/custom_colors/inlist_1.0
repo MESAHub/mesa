@@ -2,8 +2,8 @@
 ! Uses predefined stellar class parameter files.
 
 &star_job
-      create_pre_main_sequence_model = .true.
-      pre_ms_relax_to_start_radiative_core = .true.
+      create_pre_main_sequence_model = .false.
+      pre_ms_relax_to_start_radiative_core = .false.
 
       save_model_when_terminate = .true.
       save_model_filename = 'custom_colors_end.mod'
@@ -70,20 +70,16 @@
     !# Note: Ensure only ONE setup is active at a time!          
     !==============================================================
 
-    color_instrument = 'data/filters/GAIA/GAIA'
-    color_vega_sed = 'data/stellar_models/vega_flam.csv'
-    color_make_csv = 'false'    
-    !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
-    !Vega SED for Vega photometric system
-    !make csv
 
-    color_atm = 'data/stellar_models/Kurucz2003all/'
-    color_z = 0.58d0
-    color_d = 3.0857d17   
   
     !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
     !Metallicity
     !Stellar distance 'd' (10pc for abs mag...)
+
+    x_character_ctrl(1) = '/home/njm/MESA/mesa/colors/data/stellar_models/Kurucz2003all/'   !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/
+    x_character_ctrl(2) = '/home/njm/MESA/mesa/colors/data/filters/GAIA/GAIA'               !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
+    x_character_ctrl(3) = '/home/njm/MESA/mesa/colors/data/stellar_models/vega_flam.csv'    !Vega SED for Vega photometric system
+    x_character_ctrl(4) = 'false'                                !Save csv files of each constructed SED?
 
 
 
@@ -102,7 +98,29 @@
     profile_interval = 100
     history_interval = 5
     terminal_interval = 50
+
+   color_instrument = '/home/njm/MESA/mesa/colors/data/filters/GAIA/GAIA'
+   color_vega_sed = '/home/njm/MESA/mesa/colors/data/stellar_models/vega_flam.csv'
+   color_make_csv = .false.
+   color_atm = '/home/njm/MESA/mesa/colors/data/stellar_models/Kurucz2003all/'
+   color_z = 0.58d0
+   color_d = 3.0857d17
+
+   
 / ! end of controls namelist
+
+
+
+
+&colors_controls
+   color_instrument = '/home/njm/MESA/mesa/colors/data/filters/GAIA/GAIA'
+   color_vega_sed = '/home/njm/MESA/mesa/colors/data/stellar_models/vega_flam.csv'
+   color_make_csv = .false.
+   color_atm = '/home/njm/MESA/mesa/colors/data/stellar_models/Kurucz2003all/'
+   color_z = 0.58d0
+   color_d = 3.0857d17
+/
+
 
 &pgstar
     pgstar_interval = 6
