@@ -297,6 +297,7 @@ end function
           ierr = 1
       end if
 
+
       if (allocated(array_of_strings)) deallocate(array_of_strings)
   end subroutine data_for_extra_history_columns
 
