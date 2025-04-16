@@ -86,31 +86,6 @@ CONTAINS
   END SUBROUTINE constructsed_knn
 
   !---------------------------------------------------------------------------
-  ! Helper function to remove file extension
-  !---------------------------------------------------------------------------
-  FUNCTION remove_dat(path) RESULT(base)
-    ! Extracts the portion of the string before the first dot
-    CHARACTER(LEN=*), INTENT(IN) :: path
-    CHARACTER(LEN=512) :: base
-    INTEGER :: first_dot
-
-    ! Find the position of the first dot
-    first_dot = 0
-    DO WHILE (first_dot < LEN_TRIM(path) .AND. path(first_dot+1:first_dot+1) /= '.')
-      first_dot = first_dot + 1
-    END DO
-
-    ! Check if a dot was found
-    IF (first_dot < LEN_TRIM(path)) THEN
-      ! Extract the part before the dot
-      base = path(:first_dot)
-    ELSE
-      ! No dot found, return the input string
-      base = path
-    END IF
-  END FUNCTION remove_dat
-
-  !---------------------------------------------------------------------------
   ! Identify the four closest stellar models
   !---------------------------------------------------------------------------
   SUBROUTINE getcloseststellarmodels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
