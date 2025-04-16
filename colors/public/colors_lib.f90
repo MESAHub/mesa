@@ -33,6 +33,8 @@ module colors_lib
   use colors_def
   use math_lib
   use hermite_interp
+  use knn_interp
+
   implicit none
   !integer, parameter :: dp = kind(1.0d0)
 
@@ -120,7 +122,8 @@ module colors_lib
        ! Interpolate Spectral Energy Distribution
        !CALL constructsed_Robust(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
        !CALL constructsed(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
-       CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+       !CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+       CALL constructsed_knn(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
        ! Calculate bolometric flux and magnitude
        CALL calculatebolometricphot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
      END SUBROUTINE calculatebolometric
@@ -224,27 +227,6 @@ module colors_lib
 
 
 
-   SUBROUTINE dilute_flux(surface_flux, R, d, calibrated_flux)
-     ! Define the double precision kind if not already defined
-     INTEGER, PARAMETER :: DP = KIND(1.0D0)
-
-     ! Input: surface_flux is an array of flux values at the stellar surface
-     REAL(DP), INTENT(IN)  :: surface_flux(:)
-     REAL(DP), INTENT(IN)  :: R, d  ! R = stellar radius, d = distance (both in the same units, e.g., cm)
-
-     ! Output: calibrated_flux will be the flux observed at Earth
-     REAL(DP), INTENT(OUT) :: calibrated_flux(:)
-
-     ! Check that the output array has the same size as the input
-     IF (SIZE(calibrated_flux) /= SIZE(surface_flux)) THEN
-       PRINT *, "Error in dilute_flux: Output array must have the same size as input array."
-       STOP 1
-     END IF
-
-     ! Apply the dilution factor (R/d)^2 to each element
-     calibrated_flux = surface_flux * ( (R / d)**2 )
-
-   END SUBROUTINE dilute_flux
 
 
 
@@ -1220,39 +1202,6 @@ module colors_lib
 
 
 
-   !****************************
-   !Array Interpolation For SED Construction
-   !****************************
-
-     SUBROUTINE interpolatearray(x_in, y_in, x_out, y_out)
-       REAL(DP), INTENT(IN) :: x_in(:), y_in(:), x_out(:)
-       REAL(DP), INTENT(OUT) :: y_out(:)
-       INTEGER :: i
-
-       ! Validate input sizes
-       IF (SIZE(x_in) < 2 .OR. SIZE(y_in) < 2) THEN
-         PRINT *, "Error: x_in or y_in arrays have fewer than 2 points."
-         STOP
-       END IF
-
-       IF (SIZE(x_in) /= SIZE(y_in)) THEN
-         PRINT *, "Error: x_in and y_in arrays have different sizes."
-         STOP
-       END IF
-
-       IF (SIZE(x_out) <= 0) THEN
-         PRINT *, "Error: x_out array is empty."
-         STOP
-       END IF
-
-       DO i = 1, SIZE(x_out)
-         CALL linearinterpolate(x_in, y_in, x_out(i), y_out(i))
-       END DO
-     END SUBROUTINE interpolatearray
-
-
-
-
 
    FUNCTION det3(M) RESULT(d)
      REAL(8), INTENT(IN) :: M(3,3)
@@ -1526,76 +1475,6 @@ module colors_lib
      ! Clean up temporary arrays.
      DEALLOCATE(temp_wavelengths, temp_flux)
    END SUBROUTINE loadandinterpolatesed
-
-   !****************************
-   !Load SED File
-   !****************************
-
-     SUBROUTINE loadsed(directory, index, wavelengths, flux)
-       CHARACTER(LEN=*), INTENT(IN) :: directory
-       INTEGER, INTENT(IN) :: index
-       REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, flux
-
-       CHARACTER(LEN=512) :: line
-       INTEGER :: unit, n_rows, status, i
-       REAL(DP) :: temp_wavelength, temp_flux
-
-       ! Open the file
-       unit = 20
-       OPEN(unit, FILE=TRIM(directory), STATUS='OLD', ACTION='READ', IOSTAT=status)
-       IF (status /= 0) THEN
-         PRINT *, "Error: Could not open file ", TRIM(directory)
-         STOP
-       END IF
-
-       ! Skip header lines
-       DO
-         READ(unit, '(A)', IOSTAT=status) line
-         IF (status /= 0) THEN
-           PRINT *, "Error: Could not read the file", TRIM(directory)
-           STOP
-         END IF
-         IF (line(1:1) /= "#") EXIT
-       END DO
-
-       ! Count rows in the file
-       n_rows = 0
-       DO
-         READ(unit, '(A)', IOSTAT=status) line
-         IF (status /= 0) EXIT
-         n_rows = n_rows + 1
-       END DO
-
-       ! Allocate arrays
-       ALLOCATE(wavelengths(n_rows))
-       ALLOCATE(flux(n_rows))
-
-       ! Rewind to the first non-comment line
-       REWIND(unit)
-       DO
-         READ(unit, '(A)', IOSTAT=status) line
-         IF (status /= 0) THEN
-           PRINT *, "Error: Could not rewind file", TRIM(directory)
-           STOP
-         END IF
-         IF (line(1:1) /= "#") EXIT
-       END DO
-
-       ! Read and parse data
-       i = 0
-       DO
-         READ(unit, *, IOSTAT=status) temp_wavelength, temp_flux
-         IF (status /= 0) EXIT
-         i = i + 1
-         ! Convert f_lambda to f_nu
-         wavelengths(i) = temp_wavelength
-         flux(i) = temp_flux
-       END DO
-
-       CLOSE(unit)
-
-     END SUBROUTINE loadsed
-
 
 
 
