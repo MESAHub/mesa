@@ -1,3 +1,4 @@
+! Modified run_star_extras.f90
 module run_star_extras
   use star_lib
   use star_def
@@ -9,15 +10,13 @@ module run_star_extras
 
   implicit none
 
-  ! Instead of global colors_handle and local_colors_controls,
-  ! we now use a module-level pointer "col" for the colors controls.
-  type(colors_controls_type), pointer :: col => null()
+  ! Remove the col pointer declaration entirely
 
   include "test_suite_extras_def.inc"
   ! these routines are called by the standard run_star check_model
   contains
 
-  subroutine extras_controls(id, ierr)
+subroutine extras_controls(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
     type (star_info), pointer :: s
@@ -34,15 +33,15 @@ module run_star_extras
         return
     end if
 
-    ! Allocate and initialize the colors pointer "col" (like s%)
-    if (associated(col)) then
-      deallocate(col)
-      nullify(col)
-    end if
-    allocate(col)
-    call set_default_colors_controls(col)
-    ! Carry on with other initialization routines
-    call process_color_files(id, ierr)
+    ! Set the colors parameters directly in star_info
+    s%color_instrument = 'data/filters/GAIA/GAIA'
+    s%color_vega_sed = 'data/stellar_models/vega_flam.csv'
+    s%color_atm = 'data/stellar_models/Kurucz2003all/'
+    s%color_z = 0.0d0
+    s%color_d = 3.0857d17  ! 10pc for abs mag
+    s%color_make_csv = .false.
+
+    ! Register callbacks
     s%extras_startup         => extras_startup
     s%extras_check_model     => extras_check_model
     s%extras_finish_step     => extras_finish_step
@@ -51,20 +50,24 @@ module run_star_extras
     s%data_for_extra_history_columns => data_for_extra_history_columns
     s%how_many_extra_profile_columns => how_many_extra_profile_columns
     s%data_for_extra_profile_columns => data_for_extra_profile_columns
-
-  end subroutine extras_controls
+end subroutine extras_controls
 
   subroutine process_color_files(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
     type(star_info), pointer :: s
-    integer :: i
 
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
 
-    ! Add any colors file processing you need here, using s% as required.
+    ! Debug print statements to check that values are properly loaded from inlist
+    write(*,*) 'DEBUG: color_instrument = ', trim(s%color_instrument)
+    write(*,*) 'DEBUG: color_vega_sed = ', trim(s%color_vega_sed)
+    write(*,*) 'DEBUG: color_atm = ', trim(s%color_atm)
+    write(*,*) 'DEBUG: color_z = ', s%color_z
+    write(*,*) 'DEBUG: color_d = ', s%color_d
+    write(*,*) 'DEBUG: color_make_csv = ', s%color_make_csv
   end subroutine process_color_files
 
   subroutine extras_startup(id, restart, ierr)
@@ -90,15 +93,12 @@ module run_star_extras
 
     write(*,'(a)') 'finished custom colors'
 
-    ! Clean up the colors pointer like you would with s%
-    if (associated(col)) then
-      deallocate(col)
-      nullify(col)
-    end if
+    ! Remove cleanup for col pointer
 
     call test_suite_after_evolve(ierr)
   end subroutine extras_after_evolve
 
+  
   integer function extras_check_model(id)
      integer, intent(in) :: id
      integer :: ierr
