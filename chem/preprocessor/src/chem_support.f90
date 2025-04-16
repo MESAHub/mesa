@@ -1,5 +1,5 @@
 module chem_support
-   use const_def, only: dp
+   use const_def, only: dp, amu, mev_to_ergs, clight
    use const_lib, only: const_init
    use math_lib
    use utils_lib, only: mesa_error
