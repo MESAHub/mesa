@@ -30,9 +30,9 @@ module const_def
    public
 
    ! real number precision options: single, double, quad
-   integer, parameter :: sp = selected_real_kind(p=5)
-   integer, parameter :: dp = selected_real_kind(p=15)  ! real32
-   integer, parameter :: qp = selected_real_kind(p=30)  ! real64
+   integer, parameter :: sp = selected_real_kind(p=5)   ! real32
+   integer, parameter :: dp = selected_real_kind(p=15)  ! real64
+   integer, parameter :: qp = selected_real_kind(p=30)  ! real128
 
    ! integer precision options
    integer, parameter :: i1 = selected_int_kind(2)   ! int8
