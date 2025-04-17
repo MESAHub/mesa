@@ -143,6 +143,13 @@ Other Code Contributors
 * Jonathan Tomshine
 * Michael Zhang
 
+MESA Manifesto
+==============
+
+More information on the original motivation, philosophy, and stewardship
+of MESA can be found in Bill Paxton's original
+:download:`MESA Manifesto </assets/mesa_manifesto.pdf>`.
+
 Acknowledgments
 ===============
 
@@ -151,3 +158,10 @@ under the Software Infrastructure for Sustained Innovation program
 grants (ACI-1339581, ACI-1339600, ACI-1339606) and (ACI-1663684, ACI-
 1663688, ACI-1663696).  We thank the participants of the MESA Summer
 Schools for their willingness to experiment with new capabilities.
+
+MESA development is in-part supported by the
+`Flatiron Institute <https://www.simonsfoundation.org/2025/03/31/flatiron-institute-becomes-new-hub-for-stellar-evolution-software-suite-mesa/>`__
+since mid-2024.
+The institute dedicates the time of a software engineer for the growth
+and software maintenance of MESA,
+and provides opportunities for hack sessions for the developer team.
