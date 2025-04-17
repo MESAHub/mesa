@@ -1,7 +1,5 @@
 """This python file was made exlusively for calulcating bi-cubic splines of LANL ATOMIC OPLIB opacity tables, not OPAL or OP (which contain 9.999 values in different table locations)"""
 
-"""lasted updated by EbF 12-2023"""
-
 from pathlib import Path
 import numpy as np
 import scipy as sp

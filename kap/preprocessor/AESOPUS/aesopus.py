@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import h5py
-import io
 import os
 import sys
 import yaml
