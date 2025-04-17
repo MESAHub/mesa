@@ -21,7 +21,7 @@ The build system exposes several options to control the build process. If you wa
 * **WITH_GYRE**: Whether to build GYRE and include support for GYRE in MESA. Defaults to ``yes`` (any other value will disable GYRE).
 * **WITH_ADIPLS**: Whether to build ADIPLS and include support for ADIPLS in MESA. Defaults to ``yes`` (any other value will disable ADIPLS).
 * **WITH_PGSTAR**: Whether to include support for showing and saving plots with pgplot. Defaults to ``yes`` (any other value will disable pgstar/pgplot).
-* **WITH_FPE_CHECKS**: Whether to enable FPE checks for NaNs, overflows, and division by zero. Defaults to ``yes`` (any other value will disable the checks). Is it recommended to keep this set to ``yes`` at all times, as crashes would indicate bugs in either MESA or user provided code through ``run_star_extras.f90``. This option is available for compatibility with older versions of MESA.
+* **WITH_FPE_CHECKS**: Whether to enable FPE checks for NaNs, overflows, and division by zero. Defaults to ``no`` (set to ``yes`` to enable).
 
 Module build configuration
 ==========================
