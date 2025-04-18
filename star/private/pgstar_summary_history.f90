@@ -26,7 +26,7 @@
       module pgstar_summary_history
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use pgstar_support
       use star_pgstar
 

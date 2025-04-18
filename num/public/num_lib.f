@@ -202,7 +202,7 @@
          ! and then repeatedly using the factored form to solve
          ! A*x=b for various vectors b.
          
-         ! rather than build-in a particular matrix solver, 
+         ! rather than build in a particular matrix solver, 
          ! the mesa versions of the solvers take as arguments
          ! routines to perform these tasks.  the mesa/mtx package
          ! includes several choices for implementations of the

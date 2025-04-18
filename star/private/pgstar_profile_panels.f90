@@ -26,13 +26,12 @@
       module pgstar_profile_panels
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, rsun
       use pgstar_support
       use pgstar_trho_profile
       use star_pgstar
 
       implicit none
-
 
       contains
 

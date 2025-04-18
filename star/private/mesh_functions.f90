@@ -27,7 +27,7 @@
       module mesh_functions
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, msun, rsun, secyer
       use num_lib
       use utils_lib
       use chem_def

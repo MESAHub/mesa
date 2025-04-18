@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # 1st arg: inlist file name
 # 2nd arg: whichz

@@ -25,9 +25,7 @@
 
 module overshoot
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, pi4, no_mixing, overshoot_mixing
   use num_lib
   use star_private_def
 
@@ -35,17 +33,11 @@ module overshoot
   use overshoot_exp
   use overshoot_step
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifers
 
   private
 
   public :: add_overshooting
-
-  ! Procedures
 
 contains
 
@@ -92,9 +84,9 @@ contains
        if (s%conv_bdy_q(i) < s%min_overshoot_q) then
           if (dbg) then
              write(*,*) 'skip since s%conv_bdy_q(i) < min_overshoot_q', i
-          endif
+          end if
           cycle conv_bdy_loop
-       endif
+       end if
 
        ! Skip this boundary if it's at the surface, since we don't
        ! overshoot there
@@ -102,7 +94,7 @@ contains
        if (s%conv_bdy_loc(i) == 1) then
           if (dbg) then
              write(*,*) 'skip since s%conv_bdy_loc(i) == 1', i
-          endif
+          end if
           cycle conv_bdy_loop
        end if
 
@@ -170,7 +162,7 @@ contains
              write(*,*) '  s%overshoot_zone_type=', TRIM(s%overshoot_zone_type(j))
              write(*,*) '  s%overshoot_zone_loc=', TRIM(s%overshoot_zone_loc(j))
              write(*,*) '  s%overshoot_bdy_loc=', TRIM(s%overshoot_bdy_loc(j))
-          endif
+          end if
 
           ! Special-case check for an overshoot scheme of 'none' (this can be used
           ! to turn *off* overshoot for specific boundary configurations)
@@ -205,7 +197,7 @@ contains
              dk = -1
           else
              dk = 1
-          endif
+          end if
 
           face_loop : do k = k_a, k_b, dk
 
@@ -224,9 +216,9 @@ contains
                    if (s%unsmoothed_brunt_B(k+dk) > s%overshoot_brunt_B_max) exit face_loop
                 else
                    if (s%unsmoothed_brunt_B(k) > s%overshoot_brunt_B_max) exit face_loop
-                endif
+                end if
 
-             endif
+             end if
 
              ! Check whether D has dropped below the minimum
 
@@ -263,11 +255,11 @@ contains
                          return
                       end if
                    end if
-                endif
+                end if
 
                 exit face_loop
 
-             endif
+             end if
 
              ! Revise mixing coefficients
 
@@ -276,7 +268,7 @@ contains
                       (s%dq(k-1) + s%dq(k))
              else
                 rho = s%rho(k)
-             endif
+             end if
 
              cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k)  ! gm^2/sec
 
@@ -336,8 +328,6 @@ contains
        end if
 
     end do check_loop
-
-    ! Finish
 
     return
 

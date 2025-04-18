@@ -15,7 +15,7 @@ This test case has 1 parts. Click to see a larger version of a plot.
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plots above:
 
 .. code-block:: console
@@ -171,9 +171,3 @@ pgstar commands used for the plots above:
 
 
 Last-Updated: 08Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

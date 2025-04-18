@@ -108,7 +108,7 @@
       ! for integer control values, you can use x_integer_ctrl
       ! for logical control values, you can use x_logical_ctrl
 
-      use const_def
+      use const_def, only: dp
 
       implicit none
 

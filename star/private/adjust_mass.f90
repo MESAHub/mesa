@@ -27,14 +27,13 @@
       module adjust_mass
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, msun, msun, secyer, one_third, four_thirds_pi
       use utils_lib
 
       implicit none
 
       private
       public :: do_adjust_mass, compute_prev_mesh_dm
-
 
       logical, parameter :: dbg_adjm = .false.
 

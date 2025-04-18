@@ -385,7 +385,7 @@
             write(*,'(I3,2X,99e16.5)') I-1, &
                s% rsp_LINA_periods(I)/86400.d0, &
                s% rsp_LINA_growth_rates(I)
-         enddo
+         end do
 
          s% rsp_period = &
             s% rsp_LINA_periods(s% RSP_mode_for_setting_PERIODLIN + 1)
@@ -537,7 +537,7 @@
                   s% need_to_set_history_names_etc = .true.
                   s% star_history_name = s% RSP_map_history_filename
                   FASE0 = s% time
-               endif
+               end if
                FASE=(s% time-FASE0)/s% rsp_period
                !write(*,4) 'add to map', s% model_number, IP, NPCH2, FASE
                do k=1,NZN,s% RSP_map_zone_interval  ! gnuplot pm3d map
@@ -555,8 +555,8 @@
                      !    s% RSP_w(k)**2,s% egas(k)+s% erad(k),s% csound(k), &
                      !    s% Pt(k),s% Pgas(k)+s% Prad(k),s% Eq(k), &
                      !    s% COUPL(k)
-                  endif
-               enddo
+                  end if
+               end do
                !write(io,*)
             end if
             if(IP==NPCH2 .and. .not. done_writing_map) then
@@ -811,7 +811,7 @@
             WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
                  (THETA*PPQ0(I)+THETA1*s% Pvsc(k))
             PDVWORK=PDVWORK+WORK(i)
-         enddo
+         end do
          s% rsp_GRPDV=PDVWORK/EKDEL
          if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
       end subroutine get_GRPDV
@@ -883,7 +883,7 @@
                WORKQ(I) = WORKQ(I) + dVol*dm*Pvsc_tw
                WORKT(I) = WORKT(I) + dVol*dm*Ptrb_tw
                WORKC(I) = WORKC(I) - dt*dm*s% Eq(k)
-            enddo
+            end do
             if (s% rsp_num_periods == s% RSP_work_period) then
                fname = trim(s% log_directory) // '/' // trim(s% RSP_work_filename)
                write(*,*) 'write work integral data to ' // trim(fname)
@@ -894,7 +894,7 @@
                      I, log10(sum(s% dm(1:k))), &
                      WORK(I)/EKDEL, WORKQ(I)/EKDEL, &
                      WORKT(I)/EKDEL, WORKC(I)/EKDEL
-               enddo
+               end do
                close(78)
             end if
             PDVWORK=0.d0
@@ -905,9 +905,9 @@
                WORKQ(I)=0.d0
                WORKT(I)=0.d0
                WORKC(I)=0.d0
-            enddo
+            end do
             s% rsp_GRPDV=PDVWORK/EKDEL
-         endif
+         end if
 
          ! INITIAL STEP OF PdV:
          if((INSIDE==1.and.IWORK==0).or. &
@@ -920,8 +920,8 @@
                PPQ0(I) = s% Pvsc_start(k)
                PPT0(I) = s% Ptrb_start(k)
                PPC0(I) = s% Chi_start(k)
-            enddo
-         endif
+            end do
+         end if
 
          ! FIRST AND NEXT STEPS of PdV:
          if(IWORK==1)then
@@ -938,8 +938,8 @@
                WORKQ(I)=  WORKQ(I) + dm*dVol*Pvsc_tw
                WORKT(I)=  WORKT(I) + dm*dVol*Ptrb_tw
                WORKC(I)=  WORKC(I) - dt*dm*s% Eq(k)
-            enddo
-         endif
+            end do
+         end if
       end subroutine calculate_work_integrals
 
 
@@ -1026,7 +1026,7 @@
              TT1=T0
              FIRST=1
              ID=0
-         endif
+         end if
       end subroutine check_cycle_completed
 
 

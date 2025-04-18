@@ -61,7 +61,7 @@ contains
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
-      use const_def
+      use const_def, only: dp, clight, convective_mixing, crad, two_13, four_13, one_third
       use num_lib
       use utils_lib
       use auto_diff

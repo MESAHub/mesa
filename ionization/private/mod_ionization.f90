@@ -92,7 +92,7 @@
                write(*,*) 'and rerunning the mesa ./install script.'
                write(*,*)
                call mesa_error(__FILE__,__LINE__)
-            endif
+            end if
          end subroutine openfile
 
 
@@ -209,7 +209,7 @@
             if (.not. table_is_initialized) call do_load(ierr)
 !$omp end critical (ionization_table)
             if (ierr /= 0) return
-         endif
+         end if
 
          ict = 0; ict(1) = 1  ! just the result; no partials
          p => fe_he_ptr

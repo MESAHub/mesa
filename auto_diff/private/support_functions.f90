@@ -1,6 +1,6 @@
 module support_functions
 
-   use const_def
+   use const_def, only: dp
    use math_lib
 
    implicit none

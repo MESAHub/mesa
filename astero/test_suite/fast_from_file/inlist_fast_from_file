@@ -5,7 +5,7 @@
       
       create_pre_main_sequence_model = .true.
       pre_ms_T_c = 9d5
-      pre_ms_relax_num_steps = 50 ! spped
+      pre_ms_relax_num_steps = 50
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

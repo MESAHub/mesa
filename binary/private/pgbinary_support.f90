@@ -26,7 +26,7 @@
 module pgbinary_support
 
    use binary_private_def
-   use const_def
+   use const_def, only: dp, secyer
    use rates_def, only : i_rate
    use utils_lib
    use pgstar_support, only : Set_Colours, do1_pgmtxt, &
@@ -119,7 +119,7 @@ contains
             call pgslct(p% id_win)
             call pgclos
             p% id_win = 0
-         endif
+         end if
       else if (p% win_flag .and. (.not. p% do_win)) then
          if (p% id_win == 0) &
             call open_device(b, p, .false., '/xwin', p% id_win, ierr)

@@ -26,7 +26,7 @@
 
       module diffusion
 
-      use const_def
+      use const_def, only: dp
       use chem_def
       use star_private_def
       use diffusion_support
@@ -183,7 +183,7 @@
             call system_clock(time0,clock_rate)
          else
             time0 = 0
-         endif
+         end if
 
          ierr = 0
          ierr_dealloc = 0
@@ -222,8 +222,8 @@
          do k=nzlo,nzhi
             if (T(k) > T_full_off) then
                nbound=k; exit
-            endif
-         enddo
+            end if
+         end do
          nzlo=nbound
 
          allocate( &

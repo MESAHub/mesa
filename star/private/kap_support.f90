@@ -25,17 +25,11 @@
 
 module kap_support
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, ln10
   use auto_diff
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -44,8 +38,6 @@ module kap_support
   public :: fraction_of_op_mono
   public :: frac_op_mono
   public :: get_kap
-
-  ! Procedures
 
 contains
 
@@ -61,7 +53,6 @@ contains
 
   end subroutine prepare_kap
 
-  !****
 
   subroutine setup_for_op_mono(s, check_if_need, ierr)
 
@@ -132,7 +123,6 @@ contains
 
   end subroutine setup_for_op_mono
 
-  !****
 
   real(dp) function fraction_of_op_mono(s, k) result(beta)
     ! returns the real(dp) value of the blend function for cell k
@@ -151,7 +141,6 @@ contains
 
   end function fraction_of_op_mono
 
-  !****
 
   type(auto_diff_real_2var_order1) function frac_op_mono(s, logRho, logT) result(beta)
     ! returns an auto_diff type: var1 = lnd, var2 = lnT (derivs w.r.t. ln *not* log)
@@ -218,7 +207,6 @@ contains
 
   end function frac_op_mono
 
-  !****
 
   subroutine get_kap( &
        s, k, zbar, xa, logRho, logT, &
@@ -457,7 +445,7 @@ contains
                  fk, logT, logRho, &
                  zbar, lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                  kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
-         endif
+         end if
       else
          write(*,*) 'Invalid argument for op_mono_method.'
          stop

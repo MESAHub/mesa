@@ -200,7 +200,7 @@ contains
                          winxmin, winxmax, winymin, winymax, label_scale, ierr)
 
       use utils_lib
-      use const_def
+      use const_def, only: dp, ln10
 
       type(star_info), pointer :: s
       integer, intent(in) :: device_id
@@ -426,4 +426,3 @@ end module sample_pgstar_plot
 !
 !
 !/ ! end of my_pgstar namelist
-

@@ -27,7 +27,7 @@
       use chem_lib, only: chem_Xsol, basic_composition_info
       use kap_lib
       use kap_def
-      use const_lib
+      use const_def, only: dp, ln10, arg_not_provided
       use utils_lib
       use star_utils, only: &
          store_rho_in_xh, store_lnd_in_xh, get_rho_and_lnd_from_xh, &

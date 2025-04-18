@@ -25,7 +25,7 @@
 
       module pgstar_ctrls_io
 
-      use const_def
+      use const_def, only: dp
       use star_private_def
       use star_pgstar
 

@@ -26,8 +26,6 @@
 
 module atm_lib
 
-  ! Uses
-
   use const_def, only: dp
 
   use atm_utils, only: &
@@ -52,11 +50,7 @@ module atm_lib
   use atm_irradiated, only: &
        atm_eval_irradiated => eval_irradiated
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 

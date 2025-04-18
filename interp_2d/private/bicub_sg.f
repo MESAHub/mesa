@@ -2153,7 +2153,7 @@
 !  correct for inhomogeneous y boundary condition
 !
          do ix=1,nx
-            !  the desired inhomogenous BC is the difference btw the 
+            !  the desired inhomogeneous BC is the difference btw the 
             !  requested derivative (1st or 2nd) and the current value
 
             zdiff(1)=0.0
@@ -2209,7 +2209,7 @@
       deallocate(fwk)
 !------------------------------------
 !
-!  thats all
+!  that's all
 !
       return
       end subroutine do_mkbicub

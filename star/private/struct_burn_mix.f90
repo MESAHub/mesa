@@ -26,7 +26,7 @@
       module struct_burn_mix
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, secyer, lsun
       use utils_lib, only: is_bad
 
       implicit none

@@ -26,7 +26,7 @@
       module hydro_eqns
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, ln10
       use star_utils, only: em1, e00, ep1
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -515,7 +515,7 @@
                               if (j == i_var - s% nvar_hydro) then
                                  write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
-                              endif
+                              end if
                               if (j == i_var_sink - s% nvar_hydro) then
                                  write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
@@ -916,7 +916,7 @@
                     dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
                dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
-            endif
+            end if
 
             dlnP_bc_dP0 = 1/P_bc
             dlnT_bc_dT0 = 1/T_bc

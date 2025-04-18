@@ -72,7 +72,7 @@
       end function ne_total
 
 
-      ! total plasma (= at inifinity, no potential) electron density
+      ! total plasma (= at infinity, no potential) electron density
       real (dp) function ne_plasma(chi, tau)
       
          real (dp), intent(in) :: chi, tau

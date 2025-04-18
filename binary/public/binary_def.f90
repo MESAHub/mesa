@@ -25,7 +25,7 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, strlen
       use binary_pgbinary
 
    implicit none

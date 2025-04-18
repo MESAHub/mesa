@@ -716,14 +716,14 @@ contains
        xstr='bad'
        ierr=-1
        return
-    endif
+    end if
     ierr=0
     write(str,'(f8.6)') X
     k=0
     do i=1,9
        j=index(str,c(i),back=.true.)
        k=max(k,j)
-    enddo
+    end do
     xstr=str(1:max(k,3))
   end subroutine get_output_string
 

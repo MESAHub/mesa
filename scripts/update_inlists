@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mkdir backup_inlists
 cp inlist* backup_inlists

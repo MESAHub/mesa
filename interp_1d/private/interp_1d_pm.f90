@@ -25,7 +25,7 @@
 
       module interp_1d_pm  ! piecewise monotonic algorithms
 
-      use const_lib, only: dp
+      use const_def, only: dp
 
       implicit none
 

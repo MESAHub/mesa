@@ -38,7 +38,7 @@ module test_screen
    subroutine do_test_screen
       use chem_def
       use chem_lib
-      use const_lib
+      use const_lib, only: dp, const_init
       use math_lib
 
       integer, parameter :: num_isos = 8, max_z_to_cache = 12

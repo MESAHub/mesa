@@ -32,9 +32,7 @@
 
       implicit none
 
-      contains  ! the procedure interface for the library
-      ! client programs should only call these routines.
-
+      contains
 
       subroutine eos_init( &
             eosDT_cache_dir, use_cache, info)
@@ -108,7 +106,6 @@
       end function Radiation_Energy
 
 
-
       ! eos evaluation
 
       ! you can call these routines after you've allocated a handle.
@@ -171,9 +168,7 @@
          ! INPUT
 
          integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
-
          integer, intent(in) :: which_eos  ! see eos_def: i_eos_<component>
-
          integer, intent(in) :: species  ! number of species
          integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
@@ -428,7 +423,7 @@
          if ((rho <= 0) .or. (energy <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call Get_eos_gamma_DE_Results( &
             rq, abar, energy, log10E, rho, log10Rho, gamma, &
             T, log10T, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
@@ -463,7 +458,7 @@
          if ((P <= 0) .or. (T <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call eos_gamma_PT_get_rho_energy( &
             abar, P, T, gamma, rho, energy, ierr)
          log10Rho = log10(rho)
@@ -502,7 +497,7 @@
          if ((rho <= 0) .or. (T <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call eos_gamma_DT_get_P_energy( &
             abar, rho, T, gamma, P, energy, ierr)
          if (ierr /= 0) return
@@ -904,7 +899,6 @@
          call get_eos_ptr(handle,rq,ierr)
          if(ierr/=0) return
          call get_eos_controls(rq, name, val, ierr)
-
       end subroutine eos_get_control_namelist
 
       subroutine eos_set_control_namelist(handle, name, val, ierr)
@@ -919,7 +913,6 @@
          call get_eos_ptr(handle,rq,ierr)
          if(ierr/=0) return
          call set_eos_controls(rq, name, val, ierr)
-
       end subroutine eos_set_control_namelist
 
 

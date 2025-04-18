@@ -1,7 +1,7 @@
 subroutine  precompute_some_zs()
     integer :: int_i
     real(dp) :: i
- 
+
       do int_i=1,max_precomp_ints
          i = real(int_i,kind=dp)
 
@@ -48,5 +48,5 @@ subroutine  precompute_some_zs()
          pre_z(int_i)% zm0p267 = pow(i, -0.267d0)
 
       end do
- 
+
  end subroutine  precompute_some_zs

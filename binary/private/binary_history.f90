@@ -28,7 +28,7 @@
 
 module binary_history
 
-   use const_def
+   use const_def, only: dp, pi, lsun, msun, rsun, secyer, secday, two_thirds
    use math_lib
    use binary_def
    use binary_private_def
@@ -63,7 +63,6 @@ contains
 
    subroutine data_for_binary_history_columns(&
       binary_id, n, names, vals, ierr)
-      use const_def, only : dp
       integer, intent(in) :: binary_id, n
       character (len = 80) :: names(n)
       real(dp) :: vals(n)

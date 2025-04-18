@@ -14,7 +14,6 @@ ENABLE_TEST_SUITE_PROF_CHECKS = True
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
-
     def __init__(self, iterable):
         self._values = {}
         self._fold = str.casefold
@@ -166,7 +165,6 @@ def check_io(filename, dt, var):
 
 
 def run_checks(inc_file, defaults_file, io_file, dt, module):
-
     print_section(module)
     cinc = get_inc(inc_file)
 

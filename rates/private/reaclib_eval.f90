@@ -92,7 +92,7 @@
       subroutine compute_some_lambdas( &
             num_lambdas, lo, hi, T9, rates, ln_lambda, lambda, dlambda_dlnT)
          use utils_lib, only: is_bad
-         use const_def
+         use const_def, only: dp, one_third, two_thirds, four_thirds, five_thirds
          integer, intent(in) :: num_lambdas, lo, hi  ! range of rates to do
          real(dp), intent(in) :: T9
          type(reaction_data), intent(in) :: rates

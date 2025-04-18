@@ -148,6 +148,8 @@
    !pgas ! gas pressure at center of zone (electrons and ions)
    !logPgas ! log10(pgas)
    !pgas_div_ptotal ! pgas/pressure
+   !flux_limit_lambda ! flux limiter defined as in Levermore & Pomraning 1981
+   !flux_limit_R ! flux ratio defined as in Levermore & Pomraning 1981
 
    !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
    !mu ! mean molecular weight per gas particle (ions + free electrons)
@@ -454,6 +456,9 @@
    !lum_conv_div_lum_Edd
    !lum_conv_div_L
    !lum_rad_div_L
+   !Frad_div_cUrad ! Frad/(C*Urad), must be < 1 to not violate c.
+   !flux_limit_lambda
+   !flux_limit_R
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
       ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
 

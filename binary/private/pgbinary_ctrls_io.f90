@@ -25,7 +25,7 @@
 
 module pgbinary_ctrls_io
 
-   use const_def
+   use const_def, only: dp
    use binary_private_def
 
    implicit none

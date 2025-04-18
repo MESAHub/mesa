@@ -109,7 +109,7 @@ also added through ``*.inc`` files, but these live in
    will need to add code.
 
 There is far too much contained in ``star_info`` to go through it
-piece by piece, but you should spend some time perusing theses files
+piece by piece, but you should spend some time perusing these files
 to get a feel for what sorts of things go where.
 
 star/private

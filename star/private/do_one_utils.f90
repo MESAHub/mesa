@@ -26,7 +26,7 @@
       module do_one_utils
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, secday, dayyer
       use utils_lib, only: is_bad
 
       implicit none
@@ -533,7 +533,7 @@
                  .and. .not. s% doing_first_model_of_run) then
                write(*,'(A)')
                call write_terminal_header(s)
-            endif
+            end if
          end if
          if (write_terminal) call do_terminal_summary(s)
          if (write_history) s% need_to_update_history_now = .true.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/res-amde.d.x
 #   usage:  res-amde -ltinput file-gt -ltoutput file-gt -ltcase-gt
 if [ $# -eq 0 ]

@@ -26,7 +26,7 @@
 
       module magnetic_diffusion
 
-      use const_def
+      use const_def, only: dp, pi, pi4, clight, boltz_sigma, one_third
       use num_lib
       use math_lib
       use utils_lib
@@ -86,7 +86,7 @@
             sig = (1d0-ffff)*xsig3 + ffff*xsig2
          else
             sig = sige3(zbar,T,gamma)
-         endif
+         end if
 
       end function calc_sige
 

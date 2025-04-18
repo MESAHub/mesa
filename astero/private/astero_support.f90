@@ -26,14 +26,12 @@
       use astero_def
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, Rsun, standard_cgrav
       use math_lib
       use utils_lib
       use auto_diff
 
       implicit none
-
-
 
       contains
 
@@ -111,7 +109,7 @@
                return
             end if
 
-            R = Rsun*s% photosphere_r
+            R = Rsun * s% photosphere_r
             G = standard_cgrav
             M = s% m_grav(1)
             sig_fac = (2*pi)*(2*pi)*R*R*R/(G*M)

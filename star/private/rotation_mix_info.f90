@@ -26,7 +26,7 @@
 
       module rotation_mix_info
 
-      use const_def
+      use const_def, only: dp, pi, pi4, qe, clight, crad, boltz_sigma, lsun, msun, rsun, one_third, convective_mixing, overshoot_mixing
       use num_lib
       use utils_lib
       use star_private_def
@@ -572,7 +572,7 @@
                   H_T(i) = scale_height(i)/gradT(i)  ! -dr/dlnT, scale height of temperature
                else
                   H_T(i) = scale_height(i)
-               endif
+               end if
                if(abs(d_j_rot(i))>0.d0)then
                   Hj(i) = j_rot(i)*dr(i)/d_j_rot(i)
                else

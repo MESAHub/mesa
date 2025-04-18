@@ -24,7 +24,7 @@ module run_binary_support
 
    use star_lib
    use star_def
-   use const_def
+   use const_def, only: dp, secday
    use utils_lib
    use binary_def
    use binary_private_def

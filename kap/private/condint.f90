@@ -26,7 +26,7 @@
 
       module condint
 
-      use const_def, only: dp
+      use const_def, only: dp, iln10
       use math_lib
       use utils_lib, only: mesa_error
 
@@ -97,7 +97,7 @@
                logzs(iz) = 0d0
             else
                logzs(iz) = log10(z)
-            endif
+            end if
             do ir = 1, num_logRhos
                read(1,*,iostat=read_err) logRhos(ir), (f(1,ir,it,iz),it=1,num_logTs)
                if (read_err /= 0) ierr = read_err

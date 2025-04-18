@@ -22,7 +22,7 @@
 
 module binary_pgbinary
 
-   use const_def
+   use const_def, only: dp, strlen
    use star_pgstar
 
    implicit none

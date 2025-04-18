@@ -25,19 +25,12 @@
 
 module pulse_gr1d
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp
   use utils_lib
-
   use pulse_utils
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -91,8 +84,6 @@ contains
 
     end do env_loop
 
-    ! Finish
-
     return
 
   contains
@@ -128,7 +119,7 @@ contains
            end if
         else
            omega = 0d0
-        endif
+        end if
 
         if (k == s% nz) then
            r = 0.5d0*s%r(k)
@@ -139,15 +130,12 @@ contains
         end if
 
       end associate
-      ! Finish
-
       return
 
     end subroutine store_point_data_env
 
   end subroutine get_gr1d_data
 
-  !****
 
   subroutine write_gr1d_data (id, filename, global_data, point_data, ierr)
 
@@ -193,8 +181,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

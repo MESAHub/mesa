@@ -9,7 +9,7 @@ pro read_amde,lun,x,y,n,cs,file=kfile,double=kdouble,diag=kdiag,mcase=mcase, $
 ;  Otherwise full set is assumed
 
 ;  if xtest is set and mcase = 2, test for each new record whether
-;  it is a record containing the mesh or a mdoe record.
+;  it is a record containing the mesh or a model record.
 
 ;  if file is not set, read is from unit lun, which is assumed
 ;  to be open

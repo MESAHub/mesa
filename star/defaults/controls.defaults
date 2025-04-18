@@ -1795,7 +1795,7 @@
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
+      ! stop if at least ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
 
       ! ::
 
@@ -1814,7 +1814,7 @@
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
+      ! stop if at least ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
 
       ! ::
 
@@ -7681,13 +7681,26 @@
     delta_nu_sun = 134.91d0 ! μHz
     astero_Teff_sun = 5772d0 ! kelvin
 
+      ! delta_Pg_traditional
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! uHz. if <=0, use nu_max from scaled solar value
+      ! For calculating the asymptotic g-mode period spacing ``delta_Pg``
+
+      ! if ``delta_Pg_traditional`` = ``.true.``, then calculate the
+      ! asymptotic gravity mode period space by directly integrating
+      ! N2 over the entire stellar model.
+
+      ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
+      ! Bildsten et al. (2012): //ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract
+
+      ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
+      ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
 
       ! ::
 
+    delta_Pg_traditional = .true.
     delta_Pg_mode_freq = 0d0
 
 
@@ -8201,8 +8214,11 @@
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_flux_limiting_with_dPrad_dm_form
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
@@ -8227,6 +8243,11 @@
       !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
       !|         else
       !|            use L_rad = L
+      !|     if (use_flux_limiting_with_dPrad_dm_form)
+      !|         flxR = 4 * pi * r^2 * abs(dT^4/dm) / kap
+      !|         flxLambda = (6 + 3*flxR) / (6 + 3*flxR + flxR^2) (see Levermore & Pomraning 1981)
+      !|         L_rad = L_rad / flxLambda
+      !|
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
 
@@ -8235,11 +8256,12 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
 
-      ! Hydrodynamic drag
-      ! =================
+! Hydrodynamic drag
+! =================
 
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
@@ -8297,9 +8319,11 @@
     q_for_v_drag_full_on = 0.96d0
 
 
-      ! Rayleigh-Taylor Instability
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Rayleigh-Taylor Instability: hydro drag terms
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       ! for hydro comparison tests (e.g., Sedov)
+
       ! RTI_A
       ! ~~~~~
       ! RTI_B

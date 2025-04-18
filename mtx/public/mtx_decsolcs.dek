@@ -10,4 +10,4 @@
          integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
       end subroutine decsolcs
-      
+

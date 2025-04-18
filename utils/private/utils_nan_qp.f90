@@ -25,18 +25,12 @@
 
 module utils_nan_qp
 
-  ! Uses
-
   use const_def, only : qp
 
   use ISO_FORTRAN_ENV
   use ISO_C_BINDING
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameters
 
   integer, parameter :: FRAC_BITS_128_H = 48
   integer, parameter :: FRAC_BITS_128_L = 64
@@ -46,8 +40,6 @@ module utils_nan_qp
   integer(INT64), parameter :: QNAN_128_L = INT(z'0000000000000001', INT64)
   integer(INT64), parameter :: SNAN_128_H = INT(z'7fff000000000000', INT64)
   integer(INT64), parameter :: SNAN_128_L = INT(z'0000000000000001', INT64)
-
-  ! Interfaces
 
   interface is_nan
      module procedure is_nan_qp
@@ -69,16 +61,12 @@ module utils_nan_qp
      module procedure set_nan_qp_4d
   end interface set_nan
 
-  ! Access specifiers
-
   private
 
   public :: is_nan
   public :: is_inf
   public :: is_bad
   public :: set_nan
-
-  ! Procedures
 
 contains
 
@@ -112,15 +100,12 @@ contains
 
     if (PRESENT(signal)) then
        is_nan = is_nan .AND. (BTEST(frac_h, FRAC_BITS_128_H-1) .EQV. .NOT. signal)
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end function is_nan_qp
 
-  !****
 
   elemental function is_inf_qp (x) result (is_inf)
 
@@ -147,13 +132,10 @@ contains
     is_inf = expn == MASKR(EXPN_BITS_128_H, INT64) .AND. &
              (frac_l == 0_INT64 .AND. frac_h == 0_INT64)
 
-    ! Finish
-
     return
 
   end function is_inf_qp
 
-  !****
 
   elemental function is_bad_qp (x) result (is_bad)
 
@@ -164,13 +146,10 @@ contains
 
     is_bad = is_nan(x) .OR. is_inf(x)
 
-    ! Finish
-
     return
 
   end function is_bad_qp
 
-  !****
 
   subroutine set_nan_qp_0d (x, signal)
 
@@ -190,19 +169,16 @@ contains
        else
           ix(1) = QNAN_128_L
           ix(2) = QNAN_128_H
-       endif
+       end if
     else
        ix(1) = SNAN_128_L
        ix(2) = SNAN_128_H
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_qp_0d
 
-  !****
 
   subroutine set_nan_qp_1d (x, signal)
 
@@ -222,19 +198,16 @@ contains
        else
           ix(1,:) = QNAN_128_L
           ix(2,:) = QNAN_128_H
-       endif
+       end if
     else
        ix(1,:) = SNAN_128_L
        ix(2,:) = SNAN_128_H
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_qp_1d
 
-  !****
 
   subroutine set_nan_qp_2d (x, signal)
 
@@ -254,19 +227,16 @@ contains
        else
           ix(1,:,:) = QNAN_128_L
           ix(2,:,:) = QNAN_128_H
-       endif
+       end if
     else
        ix(1,:,:) = SNAN_128_L
        ix(2,:,:) = SNAN_128_H
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_qp_2d
 
-  !****
 
   subroutine set_nan_qp_3d (x, signal)
 
@@ -286,19 +256,16 @@ contains
        else
           ix(1,:,:,:) = QNAN_128_L
           ix(2,:,:,:) = QNAN_128_H
-       endif
+       end if
     else
        ix(1,:,:,:) = SNAN_128_L
        ix(2,:,:,:) = SNAN_128_H
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine set_nan_qp_3d
 
-  !****
 
   subroutine set_nan_qp_4d (x, signal)
 
@@ -318,13 +285,11 @@ contains
        else
           ix(1,:,:,:,:) = QNAN_128_L
           ix(2,:,:,:,:) = QNAN_128_H
-       endif
+       end if
     else
        ix(1,:,:,:,:) = SNAN_128_L
        ix(2,:,:,:,:) = SNAN_128_H
-    endif
-
-    ! Finish
+    end if
 
     return
 

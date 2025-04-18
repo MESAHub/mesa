@@ -23,23 +23,23 @@
 !
 ! ***********************************************************************
 
-      module mtx_def
-      
-      implicit none
-      
-      ! matrix solver options
-      integer, parameter :: lapack = 1
-      integer, parameter :: block_thomas_dble = 2
-      integer, parameter :: block_thomas_refine = 4
-      integer, parameter :: bcyclic_dble = 5
+module mtx_def
 
-      ! sparse matrix formats
-      integer, parameter :: compressed_column_sparse = 0
-      integer, parameter :: compressed_row_sparse = 1
-      
-      ! 0 based formats for internal use only
-      integer, parameter :: compressed_col_sparse_0_based = 2
-      integer, parameter :: compressed_row_sparse_0_based = 3
+   implicit none
 
-      end module mtx_def
+   ! matrix solver options
+   integer, parameter :: lapack = 1
+   integer, parameter :: block_thomas_dble = 2
+   integer, parameter :: block_thomas_refine = 4
+   integer, parameter :: bcyclic_dble = 5
+
+   ! sparse matrix formats
+   integer, parameter :: compressed_column_sparse = 0
+   integer, parameter :: compressed_row_sparse = 1
+
+   ! 0 based formats for internal use only
+   integer, parameter :: compressed_col_sparse_0_based = 2
+   integer, parameter :: compressed_row_sparse_0_based = 3
+
+end module mtx_def
 

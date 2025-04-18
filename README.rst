@@ -68,15 +68,26 @@ the focus of MESA.
 Links
 =====
 
-* `Landing page <https://mesastar.org/>`__ for links to all things MESA.
-* `Code repository <https://github.com/MESAHub/mesa>`__ on GitHub (this page).
+* `Landing Page <https://mesastar.org/>`__ for links to all things MESA.
+* `Code Repository <https://github.com/MESAHub/mesa>`__ on GitHub (this page).
 * `Documentation <https://docs.mesastar.org/>`__ for up-to-date information about installing and running MESA.
-* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA.
-* `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
 * `MESA Users Mailing List <https://lists.mesastar.org/mailman/listinfo/mesa-users>`__ for info about new releases, news items, and requests for help/bug reports.
+* `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
 * `mesa_reader <https://github.com/wmwolf/py_mesa_reader>`__ to interact and plot data from MESA in Python.
-* `MESA Test Hub <https://testhub.mesastar.org/>`__ to view results of regression testing (for Developers).
-* `MESA Jenkins <https://jenkins.flatironinstitute.org/job/mesa/job/main/>`__ to view nightly Jenkins test runs (for Developers).
-* `mesa_test <https://github.com/MESAHub/mesa_test>`__ tool to run the test suite and upload results to the MESA Test Hub (for Developers).
-* `mesa-dev yt channel <https://www.youtube.com/@mesa-dev>`__ youtube channel for recorded dev meetings (for Developers).
+* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA.
 
+
+Download
+========
+
+* `MESA Official Release Version <https://zenodo.org/records/13353788>`__ for the latest release of MESA.
+* `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for: `MacOS (ARM) <https://zenodo.org/records/13769017>`__, `MacOS (Intel) <https://zenodo.org/records/13768941>`__, `Linux (Intel/AMD) <https://zenodo.org/records/13768913>`__.
+
+
+For Developers
+==============
+
+* `MESA Test Hub <https://testhub.mesastar.org/>`__ to view results of regression testing.
+* `MESA Jenkins <https://jenkins.flatironinstitute.org/job/mesa/job/main/>`__ to view nightly Jenkins test runs.
+* `mesa_test <https://github.com/MESAHub/mesa_test>`__ tool to run the test suite and upload results to the MESA Test Hub.
+* `mesa-dev yt channel <https://www.youtube.com/@mesa-dev>`__ youtube channel for recorded dev meetings.

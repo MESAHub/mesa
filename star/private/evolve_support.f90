@@ -26,7 +26,7 @@
       module evolve_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
 
       implicit none
 
@@ -306,7 +306,7 @@
             close(iounit)
          else
             write(*,*) trim(iomsg)
-         endif
+         end if
 
       end subroutine output_to_file
 

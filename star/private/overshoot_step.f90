@@ -25,23 +25,15 @@
 
 module overshoot_step
 
-  ! Uses
-
   use star_private_def
-
   use overshoot_utils
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifers
 
   private
 
   public :: eval_overshoot_step
 
-  ! Procedures
 
 contains
 
@@ -107,8 +99,8 @@ contains
        else
           f = 0._dp
           f0 = 0._dp
-       endif
-    endif
+       end if
+    end if
 
     ! Evaluate convective boundary (_cb) parameters
 
@@ -132,7 +124,7 @@ contains
        k_a = k_ob+1
        k_b = s%nz
        dk = 1
-    endif
+    end if
 
     face_loop : do k = k_a, k_b, dk
 
@@ -144,13 +136,13 @@ contains
           dr = r - r_ob
        else
           dr = r_ob - r
-       endif
+       end if
 
        if (dr < f*Hp_cb) then
           factor = 1._dp
        else
           factor = 0._dp
-       endif
+       end if
 
        ! Store the diffusion coefficient and velocity
 
@@ -165,11 +157,9 @@ contains
        if (D(k) < s%overshoot_D_min) then
           k_b = k
           exit face_loop
-       endif
+       end if
 
     end do face_loop
-
-    ! Finish
 
     ierr = 0
 

@@ -334,7 +334,7 @@
                   call mesa_error(__FILE__,__LINE__)
                end if
                tbl(1,1:num_ion_vals,iQ,i) = vals(1:num_ion_vals)
-            enddo
+            end do
             if(iQ < ion_num_logQs) read(io_unit,*,iostat=info)
             if (failed('skip line')) return
             line_number = line_number + 1

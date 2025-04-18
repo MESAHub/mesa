@@ -26,7 +26,7 @@
       module hydro_vars
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, ln10, boltz_sigma, clight, standard_cgrav, two_thirds, four_thirds, lsun, rsun, no_mixing
       use chem_def, only: chem_isos
       use utils_lib, only: mesa_error, is_bad
 
@@ -837,7 +837,7 @@
             if (.not. skip_partials) then
                dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-            endif
+            end if
 
          else
             ! Evaluate temperature and pressure based on atm_option
@@ -863,7 +863,7 @@
                if (.not. skip_partials) then
                   dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                   dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-               endif
+               end if
 
             case ('fixed_Tsurf')
 
@@ -880,7 +880,7 @@
                if (.not. skip_partials) then
                   dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                   dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-               endif
+               end if
 
             case ('fixed_Psurf')
 
@@ -905,7 +905,7 @@
                   if (.not. skip_partials) then
                      dlnT_dlnR = 0._dp
                      dlnT_dL = 0._dp
-                  endif
+                  end if
                   Teff = s% T(1)
                else
                   Teff = pow(L_surf/(4._dp*pi*R_surf*R_surf*boltz_sigma), 0.25_dp)
@@ -915,13 +915,13 @@
                   if (.not. skip_partials) then
                      dlnT_dlnR = -0.5_dp
                      dlnT_dL = 1._dp/(4._dp*L_surf)
-                  endif
+                  end if
                end if
 
                if (.not. skip_partials) then
                   dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                   dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-               endif
+               end if
 
             case ('fixed_Psurf_and_Tsurf')
 
@@ -934,7 +934,7 @@
                if (.not. skip_partials) then
                   dlnT_dL = 0; dlnT_dlnR = 0; dlnT_dlnM = 0; dlnT_dlnkap = 0
                   dlnP_dL = 0; dlnP_dlnR = 0; dlnP_dlnM = 0; dlnP_dlnkap = 0
-               endif
+               end if
 
             case default
 
@@ -987,7 +987,7 @@
                      dlnP_dlnR = 0._dp
                      dlnP_dlnM = 0._dp
                      dlnP_dlnkap = 0._dp
-                  endif
+                  end if
                else
                   lnP_surf = log(P_surf)
                   if (.not. skip_partials) then
@@ -995,7 +995,7 @@
                      dlnP_dlnR = dlnP_dlnR*P_surf_atm/P_surf
                      dlnP_dlnM = dlnP_dlnM*P_surf_atm/P_surf
                      dlnP_dlnkap = dlnP_dlnkap*P_surf_atm/P_surf
-                  endif
+                  end if
                end if
             end if
          end if
@@ -1011,8 +1011,6 @@
             write(*,*) 'atm_option = ', trim(s% atm_option)
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
          end if
-
-         ! Finish
 
          return
 

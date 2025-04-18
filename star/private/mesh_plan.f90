@@ -26,7 +26,7 @@
 
       module mesh_plan
 
-      use const_def
+      use const_def, only: dp, convective_mixing
       use num_lib
       use utils_lib
       use star_private_def

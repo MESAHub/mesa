@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #./free_eos_table     Z      X   table name
 # Z = 0.00

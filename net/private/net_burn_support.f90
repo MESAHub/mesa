@@ -186,7 +186,7 @@
 
 
 ! back for another iteration or death
-      enddo
+      end do
       ierr = -1
       return
       call mesa_error(__FILE__,__LINE__,'more than max_steps steps required in netint')
@@ -252,15 +252,15 @@
        a(1)  = nseq(1) + 1
        do k=1,kmaxx
         a(k+1) = a(k) + nseq(k+1)
-       enddo
+       end do
 
 ! compute alf(k,q)
        do iq=2,kmaxx
         do k=1,iq-1
          alf(k,iq) = pow(eps1,((a(k+1) - a(iq+1)) / &
                         ((a(iq+1) - a(1) + 1.0d0) * (2*k + 1))))
-        enddo
-       enddo
+        end do
+       end do
        epsold = eps
        nvold  = nvar
 
@@ -268,12 +268,12 @@
        a(1)   = nvar + a(1)
        do k=1,kmaxx
         a(k+1) = a(k) + nseq(k+1)
-       enddo
+       end do
 
 ! determine optimal row number for convergence
        do kopt=2,kmaxx-1
         if (a(kopt+1) > a(kopt)*alf(kopt-1,kopt)) go to 01
-       enddo
+       end do
 01     kmax = kopt
       end if
 
@@ -281,7 +281,7 @@
       h    = htry
       do i=1,nvar
        ysav(i)  = y(i)
-      enddo
+      end do
 
 ! get the dense jacobian in dens_dfdy
       call jakob(x,y,dens_dfdy,nvar,ierr)
@@ -349,7 +349,7 @@
           errmax = dum
           i_errmax = i
          end if
-        enddo
+        end do
 
         errmax   = errmax/eps
         km = k - 1
@@ -407,7 +407,7 @@
         wrkmin = work
         kopt   = kk + 1
        end if
-      enddo
+      end do
 !
 ! check for possible order increase, but not if stepsize was just reduced
       hnext = h/scale
@@ -452,8 +452,8 @@
       do j=1,nvar
        do i=1,nvar
         dmat(i,j) = -h * dens_dfdy(i,j)
-       enddo
-      enddo
+       end do
+      end do
       do i=1,nvar
        dmat(i,i) = 1.0d0 + dmat(i,i)
       end do
@@ -474,7 +474,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-      enddo
+      end do
 
       call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
@@ -491,22 +491,22 @@
                do j=1,nvar
                 do ii=1,nvar
                  if (dens_dfdy(ii,j) /= 0) write(*,3) 'dens_dfdy(ii,j)', ii, j, dens_dfdy(ii,j)
-                enddo
-               enddo
+                end do
+               end do
 
                do ii=1,nvar
                  if (dydx(ii) /= 0) write(*,2) 'dydx(ii)', ii, dydx(ii)
-               enddo
+               end do
 
                do j=1,nvar
                 do ii=1,nvar
                  if (dmat(ii,j) /= 0) write(*,3) 'dmat(ii,j)', ii, j, dmat(ii,j)
-                enddo
-               enddo
+                end do
+               end do
 
                do ii=1,nvar
                  if (yout(ii) /= 0) write(*,2) 'yout(ii)', ii, yout(ii)
-               enddo
+               end do
 
                write(*,*) 'first step: bad ytemp in simpr nstep i ytemp', nstep, i, ytemp(i), del(i), y(i)
                call mesa_error(__FILE__,__LINE__,'simpr')
@@ -514,7 +514,7 @@
             end if
 
          end if
-      enddo
+      end do
 
       x = xs + h
       call derivs(x,ytemp,yout,nvar,ierr)
@@ -549,7 +549,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-       enddo
+       end do
 
        x = x + h
        call derivs(x,ytemp,yout,nvar,ierr)
@@ -557,7 +557,7 @@
          if (dbg) write(*,*) 'derivs failed in simpr general step'
          return
        end if
-      enddo
+      end do
 
 ! take the last step
       do 18 i=1,nvar
@@ -615,17 +615,17 @@
       do j=1,nvar
        dy(j) = yest(j)
        yz(j) = yest(j)
-      enddo
+      end do
 
 ! store first estimate in first column
       if (iest == 1) then
        do j=1,nvar
         qcol(j,1) = yest(j)
-       enddo
+       end do
       else
        do j=1,nvar
         d(j) = yest(j)
-       enddo
+       end do
        do k1=1,iest-1
         delta = 1.0d0/(x(iest-k1) - xest)
         f1    = xest * delta
@@ -639,11 +639,11 @@
          dy(j)      = f1*delta
          d(j)       = f2*delta
          yz(j)      = yz(j) + dy(j)
-        enddo
-       enddo
+        end do
+       end do
        do j=1,nvar
         qcol(j,iest) = dy(j)
-       enddo
+       end do
       end if
       return
       end subroutine net_pzextr

@@ -26,7 +26,7 @@
 
 module binary_photos
 
-   use const_def
+   use const_def, only: dp
    use math_lib
    use star_lib
    use star_def

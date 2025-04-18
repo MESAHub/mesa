@@ -26,7 +26,8 @@
 module pgstar_support
 
    use star_private_def
-   use const_def
+   use const_def, only: dp, secday, secyer, mesa_data_dir, &
+      overshoot_mixing, rotation_mixing, thermohaline_mixing, semiconvective_mixing, leftover_convective_mixing, convective_mixing, no_mixing
    use rates_def, only : i_rate
    use utils_lib
    use star_pgstar
@@ -152,7 +153,7 @@ contains
             call pgslct(p% id_win)
             call pgclos
             p% id_win = 0
-         endif
+         end if
       else if (p% win_flag .and. (.not. p% do_win)) then
          if (p% id_win == 0) &
             call open_device(s, p, .false., '/xwin', p% id_win, ierr)
@@ -616,7 +617,7 @@ contains
          write(*, '(a,i4,a,i3,a,i3)') "Set_Pgplot_Colour: requested index of ", index, &
             " not in ", low, " to ", hi
          return
-      endif
+      end if
 
       do i = 1, nrgbcolours
          if (colournames(i) == name) exit
@@ -701,7 +702,6 @@ contains
 
    subroutine read_TRho_data(fname, logTs, logRhos, ierr)
       use utils_lib
-      use const_def, only : mesa_data_dir
       character (len = *), intent(in) :: fname
       real, dimension(:), allocatable :: logTs, logRhos  ! will allocate
       integer, intent(out) :: ierr

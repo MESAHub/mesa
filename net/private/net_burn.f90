@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module net_burn
-      use const_def
+      use const_def, only: dp, Qconv
       use math_lib
       use chem_def
       use net_def

@@ -1,3 +1,4 @@
+---
 name: Check TestHub results
 
 on:
@@ -25,9 +26,9 @@ jobs:
             TEST_URL="https://testhub.mesastar.org"
           fi
           echo "Fetching test results from: $TEST_URL"
-          
+
           RESPONSE=$(curl -s -o response.json -w "%{http_code}" "$TEST_URL")
-          
+
           if [[ "$RESPONSE" -ne 200 ]]; then
             echo "Test results not found or server error."
             exit 1
@@ -48,7 +49,7 @@ jobs:
           echo "Number of untested tests: $UNTESTED_COUNT"
 
           echo ""
-          
+
           # Check that there are no failing or mixed tests
           if [[ "$FAIL_COUNT" -gt 0 || "$MIXED_COUNT" -gt 0 ]]; then
             echo "Some tests are failing or mixed!"

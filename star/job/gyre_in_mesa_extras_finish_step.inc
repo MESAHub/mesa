@@ -21,11 +21,11 @@
     real(dp), allocatable     :: point_data(:,:)
     integer                   :: ipar(2), step_interval, mode_l
     real(dp)                  :: rpar(1), growth_lim
-    
+
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
-    
+
     gyre_in_mesa_extras_finish_step = terminate
 
     ! Extract parameters
@@ -41,7 +41,7 @@
     else
        call_gyre = .FALSE.
     endif
-    
+
     s% ixtra3_array(1) = 0 ! number of results
 
     ! If necessary, call GYRE
@@ -55,7 +55,7 @@
        end if
 
        call set_model(global_data, point_data, s%gyre_data_schema)
-       
+
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &
              'P (sec)', 'P (day)', 'growth (day)', 'growth', 'cycles to double'
@@ -70,7 +70,7 @@
        ipar(2) = 0 ! num_written
 
        call get_modes(mode_l, process_mode_, ipar, rpar)
-       
+
        s% ixtra3_array(1) = ipar(2)
 
     end if
@@ -93,7 +93,7 @@
       logical               :: write_flag, freq_okay
       type(grid_t)          :: gr
       type (star_info), pointer :: s
-      
+
 
       ierr = 0
       call star_ptr(ipar(1), s, ierr)
@@ -148,7 +148,7 @@
       if (write_flag) then
 
       ! Write the mode radial & horizontal eigenfunctions, together with the differential work
-       
+
          write(filename, 120) 'eigfunc.', model_number, '.', md%n_pg, '.dat'
 120      format(A,I0,A,I0,A)
 

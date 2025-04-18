@@ -80,7 +80,7 @@ but stella itself uses a single thread, so there is no speed up for it on multic
 depending on your processor, you should expect stella to take an hour or so to finish.
 
 the results shown below will not exactly match your results since we have not converted stella
-to use crlibm and follow the required standards we use in mesa to get bit-for-bit indentical
+to use crlibm and follow the required standards we use in mesa to get bit-for-bit identical
 results across various platforms.  you can expect a close match, but even things like the
 total number of steps and the final reported day can be expected to differ by small amounts.
 

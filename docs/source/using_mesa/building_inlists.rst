@@ -83,7 +83,8 @@ For example when evolving a stellar model on the horizontal branch (helium burni
 Energy equation
 ---------------
 
-The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation.
+The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__).
+As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation.
 The dLdm form is currently the default in MESA. If the dEdt form is preferred it has to be specified in the inlist.
 
 .. literalinclude:: inlist_example
@@ -91,10 +92,11 @@ The dLdm form is currently the default in MESA. If the dEdt form is preferred it
    :end-before: ! mass and metallicity
 
 
-Starting model
---------------
+Starting mass and metallicity
+-----------------------------
 
-The main stellar parameters to specify are its initial mass M, metallicity Z, and helium fraction Y. If only M and Z are specified,the helium content is by default Y=0.24 + 2Z.
+The main stellar parameters to specify are its initial mass M, metallicity Z, and helium fraction Y.
+If only M and Z are specified,the helium content is by default Y=0.24 + 2Z.
 
 .. literalinclude:: inlist_example
    :start-after:  ! mass and metallicity
@@ -104,9 +106,6 @@ The main stellar parameters to specify are its initial mass M, metallicity Z, an
 
 When to stop
 ------------
-
-Output
-------
 
 Opacity controls
 ----------------

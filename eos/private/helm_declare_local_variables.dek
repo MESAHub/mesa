@@ -333,7 +333,7 @@
       real(dp) dse,dpe,dsp
 
 
-!..miscelaneous local variables 
+!..miscellaneous local variables 
       integer  :: i,j,k,kend,niter,mode
       real(dp) :: kt,ktinv,x,y,z,ww,xx,yy,zz,zzi,ytot1,ye
       real(dp) :: ratio,fk,dfk

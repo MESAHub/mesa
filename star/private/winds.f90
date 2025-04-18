@@ -27,7 +27,7 @@
       module winds
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, rsun, msun, lsun, clight, crad, pi, pi4, secyer
       use chem_def, only: ih1, ihe4, ic12, ic13, in14, io16
       use utils_lib, only: is_bad
 
@@ -152,13 +152,13 @@
             ierr = -1
             write(*,*) ' *** set_mdot error: hot_wind_full_on_T < cool_wind_full_on_T '
             return
-         endif
+         end if
 
          if(T1 >= s% cool_wind_full_on_T)then  !do hot_wind calculation
             call eval_wind_for_scheme(s% hot_wind_scheme,hot_wind)
          else
             hot_wind = 0d0
-         endif
+         end if
 
          if(T1 <= s% hot_wind_full_on_T)then
             if (center_h1 < 0.01d0 .and. center_he4 < s% RGB_to_AGB_wind_switch) then
@@ -174,7 +174,7 @@
             call eval_wind_for_scheme(scheme, cool_wind)
          else
             cool_wind = 0d0
-         endif
+         end if
 
          !now combine the contributions of hot and cool winds
          if(T1 >= s% hot_wind_full_on_T)then
@@ -188,7 +188,7 @@
             beta = min( (s% hot_wind_full_on_T - T1) / divisor, 1d0)
             alfa = 1d0 - beta
             wind = alfa*hot_wind + beta*cool_wind
-         endif
+         end if
 
          if (wind*Msun/secyer > abs(wind_mdot)) then
             using_wind_scheme_mdot = .true.

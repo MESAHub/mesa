@@ -114,7 +114,7 @@ def get_inc(filename):
     # Remove line continutaion characters
     lines = [i.replace("&", "").strip() for i in lines if i]
 
-    # Remove type defintion (i.e real(dp) :: x) leaves just x
+    # Remove type definition (i.e real(dp) :: x) leaves just x
     # as well as anything that starts with a comment
     # or has a comment embedded in it
     for idl, line in enumerate(lines):

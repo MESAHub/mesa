@@ -26,7 +26,7 @@
 
       module binary_evolve
 
-      use const_def
+      use const_def, only: dp, pi, msun, rsun, secyer, secday, one_third, standard_cgrav
       use math_lib
       use star_lib
       use star_def

@@ -25,16 +25,10 @@
 
 module overshoot_utils
 
-  ! Uses
-
   use num_lib
   use star_private_def
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
@@ -42,8 +36,6 @@ module overshoot_utils
   public :: eval_conv_bdy_r
   public :: eval_conv_bdy_Hp
   public :: eval_over_bdy_params
-
-  ! Procedures
 
 contains
 
@@ -63,21 +55,18 @@ contains
        k = s%conv_bdy_loc(i)
     else
        k = s%conv_bdy_loc(i) - 1
-    endif
+    end if
 
     if (k >= s%nz .OR. k < 1) then
        write(*,*) 'Invalid cell for convective boundary: i, k, nz=', i, k, s%nz
        ierr = -1
        return
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine eval_conv_bdy_k
 
-  !****
 
   subroutine eval_conv_bdy_r (s, i, r, ierr)
 
@@ -117,13 +106,10 @@ contains
 
     end associate
 
-    ! Finish
-
     return
 
   end subroutine eval_conv_bdy_r
 
-  !****
 
   subroutine eval_conv_bdy_Hp (s, i, Hp, ierr)
 
@@ -209,7 +195,7 @@ contains
                 return
              end if
              r_bot = s%r(s%conv_bdy_loc(i-1))
-          endif
+          end if
 
           r_top = s%r(k)
 
@@ -224,11 +210,11 @@ contains
                 write(*,*) 'Double bottom boundary in overshoot; i=', i
                 ierr = -1
                 return
-             endif
+             end if
              r_top = s%r(s%conv_bdy_loc(i+1))
-          endif
+          end if
 
-       endif
+       end if
 
        dr = r_top - r_bot
 
@@ -242,13 +228,10 @@ contains
 
     end if
 
-    ! Finish
-
     return
 
   end subroutine eval_conv_bdy_Hp
 
-  !****
 
   subroutine eval_over_bdy_params (s, i, f0, k, r, D, vc, ierr)
 
@@ -309,7 +292,7 @@ contains
              if (s%r(k+1) <= r) exit search_in_loop
           end do search_in_loop
 
-       endif
+       end if
 
     else
 
@@ -328,9 +311,9 @@ contains
              if (s%r(k) > r) exit search_out_loop
           end do search_out_loop
 
-       endif
+       end if
 
-    endif
+    end if
 
     if (.NOT. (s%r(k+1) <= r .AND. s%r(k) >= r)) then
        write(*,*) 'r_ob not correctly bracketed: r(k+1), r, r(k)=', s%r(k+1), r, s%r(k)
@@ -385,13 +368,11 @@ contains
 
        vc = 0._dp
 
-    endif
+    end if
 
     ! Evaluate the diffusion coefficient
 
     D = vc*lambda/3._dp
-
-    ! Finish
 
     ierr = 0
 

@@ -1243,6 +1243,7 @@
 
 
       subroutine finish_net_def(handle, ierr)
+         use const_def, only: mev2gr
          use rates_def, only: reaction_names_dict
          use utils_lib, only: integer_dict_create_hash, realloc_integer
          use chem_def, only: chem_isos
@@ -1250,11 +1251,10 @@
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
 
-         type (Net_General_Info), pointer  :: g
+         type (Net_General_Info), pointer :: g
          integer :: i
 
          logical, parameter :: dbg = .false.
-         !logical, parameter :: dbg = .true.
 
          include 'formats'
 
