@@ -494,18 +494,18 @@
    !diff_grads
    !log_diff_grads
 
-   !mlt_D
-   !mlt_Gamma
-   !mlt_Y_face
-   !mlt_Zeta
-   !mlt_gradT
-   !mlt_log_abs_Y
-   !mlt_vc    ! convective velocity coming out of mlt
-   !log_mlt_vc
-   !dvc_dt_TDC_div_g 
+   !mlt_D ! The chemical diffusion coefficient (cm^2/s)
+   !mlt_Gamma ! The convective efficiency parameter from the mlt equation, Gamma=(grad-gradE)/(gradE-gradL)
+   !mlt_Y_face ! The superadiabaticity Y = dlnT/dlnP - grada, or dlnT/dlnP - gradL at cell boundary
+   !mlt_Zeta ! convective efficiency as Zeta = (gradr-gradT)/(gradr-grada)
+   !mlt_gradT ! gradT from mlt/TDC.
+   !mlt_log_abs_Y ! log10(abs(Y_face)) 
+   !mlt_vc    ! convective velocity from mlt/TDC in cm/s
+   !log_mlt_vc ! log10(mlt_vc)
+   !dvc_dt_TDC_div_g ! dimensionless ratio of convective velocity to g
 
    !superad_reduction_factor
-   !conv_vel_div_mlt_vc
+   !conv_vel_div_mlt_vc ! conv_vel from any model (RSP included) / mlt_vc, for comparisons 
 
    !log_Lconv
    !log_Lconv_div_L
