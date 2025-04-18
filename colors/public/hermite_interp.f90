@@ -5,7 +5,7 @@
 
 MODULE hermite_interp
   USE const_def, ONLY: dp
-  USE shared_func
+  USE shared_funcs
   IMPLICIT NONE
   
   PRIVATE
