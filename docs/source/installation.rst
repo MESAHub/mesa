@@ -48,7 +48,7 @@ system. There's a template to get you started at
 :file:`$MESA_DIR/utils/makefile_header_non_mesasdk`.
 
 Regardless of whether you use the MESA SDK or ifort, and whether your
-machine runs MacOS or linux, the output of MESA should be bit-for-bit
+machine runs MacOS or Linux, the output of MESA should be bit-for-bit
 identical.  If it's not, this is considered to be a bug. (This has
 been the case since Release 5819 in early January 2014.)
 
@@ -98,11 +98,11 @@ startup file in an existing one).
 Here is an example from a machine that uses bash as its shell (and hence
 uses export to set variables):
 
-.. code-block:: bash
+.. code-block:: shell
 
     # set MESA_DIR to be the directory to which you downloaded MESA
     # The directory shown is only an example and must be modified for your particular system.
-    export MESA_DIR=/Users/jschwab/Software/mesa-r21.12.1
+    export MESA_DIR=/Users/my_username/Software/mesa-r24.08.1
 
     # set OMP_NUM_THREADS to be the number of cores on your machine
     export OMP_NUM_THREADS=2
@@ -115,9 +115,13 @@ uses export to set variables):
     # add shmesa (the MESA command line tool) to your PATH
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
-Note (Jan 2025): due to some changes in MacOS 15.2/15.3, if you see the error `ld: library 'z' not found` on a Mac, and you are using MESA SDK version <= 24.10.1, you may also need to add:
+Note (Jan 2025): due to some changes in MacOS 15.2/15.3,
+if you see the error
+`ld: library 'z' not found`
+on a Mac you may also need to add:
 
-.. code-block:: bash
+
+.. code-block:: shell
 
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 
