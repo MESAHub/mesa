@@ -1,5 +1,5 @@
 
-MODULE shared_func
+MODULE shared_funcs
   USE const_def, ONLY: dp, strlen
   IMPLICIT NONE
   
@@ -557,4 +557,4 @@ CONTAINS
 
 
 
-END MODULE shared_func
+END MODULE shared_funcs

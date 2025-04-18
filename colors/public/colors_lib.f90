@@ -30,7 +30,7 @@ module colors_lib
   use math_lib
   use hermite_interp
   use knn_interp
-  use shared_func
+  use shared_funcs
 
   implicit none
   

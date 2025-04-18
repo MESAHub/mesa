@@ -1,6 +1,5 @@
 module colors_ctrls_io
    use const_def
-   ! Remove the import of star_def
    
    implicit none
    

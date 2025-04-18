@@ -1,4 +1,3 @@
-! Modified run_star_extras.f90
 module run_star_extras
   use star_lib
   use star_def
@@ -10,10 +9,8 @@ module run_star_extras
 
   implicit none
 
-  ! Remove the col pointer declaration entirely
 
   include "test_suite_extras_def.inc"
-  ! these routines are called by the standard run_star check_model
   contains
 
 subroutine extras_controls(id, ierr)
