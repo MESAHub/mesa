@@ -115,11 +115,10 @@ uses export to set variables):
     # add shmesa (the MESA command line tool) to your PATH
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
-Note (Jan 2025): due to some changes in MacOS 15.2/15.3,
+Note: On some versions of macOS (15.2/15.3),
 if you see the error
 `ld: library 'z' not found`
 on a Mac you may also need to add:
-
 
 .. code-block:: shell
 
@@ -129,7 +128,7 @@ If your machine uses csh as its shell, use ``setenv`` instead of ``export``.
 
 One caveat is that if you initialize the MESA SDK in your shell
 profile, you'll always be using the MESA SDK supplied version of gcc
-which may be a compatibility issue if you work with other other codes.
+which may cause compatibility issues if you work with other codes.
 Alternative (unsupported) initialization scripts are available `here
 <https://github.com/jschwab/mesa-init>`__.
 

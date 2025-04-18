@@ -9,8 +9,8 @@ currently developed and supported by a :ref:`globally distributed team
 <about:The MESA Team>`.
 
 Over the past decade, MESA has grown into an international community
-resource. The public availability of MESA has, and will continue,
-to serve education, scientific research, and outreach. We therefore
+resource. The public availability of MESA serves and will continue to serve
+education, scientific research, and outreach. We therefore
 consider it important to re-express the guiding principles for using
 and contributing to MESA. Our goal is to assure the greatest
 usefulness for the largest number of research and educational projects.
@@ -94,6 +94,7 @@ The missions of the MESA Team are:
   goals, e.g., through scientific contributions at relevant conferences,
   identifying science opportunities that match MESA capabilities,
   facilitating and encouraging appropriate scientific collaborative
+  projects.
 
 1st Author Emeritus
 -------------------

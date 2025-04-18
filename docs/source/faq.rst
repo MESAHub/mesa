@@ -526,7 +526,7 @@ previous version of OS X.
 Why do I get the error "stdlib.h: No such file or directory"?
 -------------------------------------------------------------
 
-If yore using macOS 10.14 (Mojave), then this error indicates that you
+If you're using macOS 10.14 (Mojave), then this error indicates that you
 did not install the system headers (see previous FAQ or `the SDK
 website <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Mac_OS_X>`__).
 
