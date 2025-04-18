@@ -4,15 +4,15 @@ About MESA
 
 MESA was primarily developed through the concerted efforts of Bill
 Paxton over a 10 year period with the engagement and deep involvement
-of many theoretical and computational astrophysicists.  MESA is
+of many theoretical and computational astrophysicists. MESA is
 currently developed and supported by a :ref:`globally distributed team
 <about:The MESA Team>`.
 
 Over the past decade, MESA has grown into an international community
-resource.  The public availability of MESA has, and will continue,
-to serve education, scientific research, and outreach.  We therefore
+resource. The public availability of MESA has, and will continue,
+to serve education, scientific research, and outreach. We therefore
 consider it important to re-express the guiding principles for using
-and contributing to MESA.  Our goal is to assure the greatest
+and contributing to MESA. Our goal is to assure the greatest
 usefulness for the largest number of research and educational projects.
 
 Motivation
@@ -43,7 +43,7 @@ Usage
 
 The MESA operating principles are simple: be open in your scientific
 discussions, give credit to all contributors, and be prepared to give
-back to the community of users.  We hope that this creates an
+back to the community of users. We hope that this creates an
 environment where the young are encouraged to become engaged in a
 career-enhancing manner.
 
@@ -95,7 +95,6 @@ The missions of the MESA Team are:
   identifying science opportunities that match MESA capabilities,
   facilitating and encouraging appropriate scientific collaborative
 
-
 1st Author Emeritus
 -------------------
 
@@ -113,7 +112,6 @@ Developers
 * `Ebraheem Farag <https://github.com/Debraheem>`__
 * `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
-* `Pablo Marchant <https://orlox.github.io/>`__
 * `Philip Mocz <https://pmocz.github.io/>`__
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
@@ -129,24 +127,25 @@ Past Developers
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
 * `Aaron Dotter <https://aarondotter.github.io/>`__
 * `Robert Farmer <http://rjfarmer.io/>`__
+* `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
+* `Pablo Marchant <https://orlox.github.io/>`__
 * `Josiah Schwab <https://yoshiyahu.org/>`__
-* `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 
 Other Code Contributors
 -----------------------
 
 * Kent Budge
 * Lorne Nelson
-* Joris Vos
 * Jonathan Tomshine
+* Joris Vos
 * Michael Zhang
 
 MESA Manifesto
 ==============
 
-More information on the original motivation, philosophy, and stewardship
+More information on the motivation, philosophy, and stewardship
 of MESA can be found in Bill Paxton's original
 :download:`MESA Manifesto </assets/mesa_manifesto.pdf>`.
 
@@ -156,7 +155,7 @@ Acknowledgments
 MESA development was supported by the National Science Foundation
 under the Software Infrastructure for Sustained Innovation program
 grants (ACI-1339581, ACI-1339600, ACI-1339606) and (ACI-1663684, ACI-
-1663688, ACI-1663696).  We thank the participants of the MESA Summer
+1663688, ACI-1663696). We thank the participants of the MESA Summer
 Schools for their willingness to experiment with new capabilities.
 
 MESA development is in-part supported by the

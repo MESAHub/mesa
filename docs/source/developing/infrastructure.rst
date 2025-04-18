@@ -131,11 +131,11 @@ Community
 ^^^^^^^^^
 
 The `MESA community <https://zenodo.org/communities/mesa/>`__ on Zenodo
-is controlled by Pablo.
+is controlled by Philip.
 
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Pablo.
+* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Philip.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
-* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Pablo.
+* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Philip.
