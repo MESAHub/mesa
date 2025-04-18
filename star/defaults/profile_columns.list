@@ -498,7 +498,7 @@
    !mlt_Gamma ! The convective efficiency parameter from the mlt equation, Gamma=(grad-gradE)/(gradE-gradL)
    !mlt_Y_face ! The superadiabaticity Y = dlnT/dlnP - grada, or dlnT/dlnP - gradL at cell boundary
    !mlt_Zeta ! convective efficiency as Zeta = (gradr-gradT)/(gradr-grada)
-   !mlt_gradT ! gradT from mlt/TDC.
+   !mlt_gradT ! same as gradT, mlt/TDC value for dlnT/dlnP.
    !mlt_log_abs_Y ! log10(abs(Y_face)) 
    !mlt_vc    ! convective velocity from mlt/TDC in cm/s
    !log_mlt_vc ! log10(mlt_vc)
