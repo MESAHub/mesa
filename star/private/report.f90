@@ -399,7 +399,7 @@
 
             mass_sum = 0d0
             if (s% fe_core_mass > 0) then
-               if (s% check_mass_sum_for_infall) ! if > fe_core_infall_mass of core is infalling, report max infall velocity regardless of its location
+               if (s% check_mass_sum_for_infall) then ! if > fe_core_infall_mass of core is infalling, report max infall velocity regardless of its location
                   do k=1, nz
                      if (s% m(k) > Msun*s% fe_core_mass) cycle
                      if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
