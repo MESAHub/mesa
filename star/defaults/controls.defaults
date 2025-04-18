@@ -5640,7 +5640,7 @@
 
       ! Maximum number of grid points allowed.
       ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
-      ! If nz > max_allowed_nz, MESA will prematurely exit and call this error. 
+      ! If nz > max_allowed_nz, MESA will prematurely exit and call this error.
 
       ! ::
 
