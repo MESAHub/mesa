@@ -27,6 +27,9 @@ Removed `file_extension` option because it is redundant with `file_device`. Dele
 New Features
 ------------
 
+Changed the default for ``use_radiation_corrected_transfer_rate =
+.false.``.
+
 ``mesa_reader`` can now be installed with ``pip``.
 
 A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
@@ -39,17 +42,28 @@ between adopting the traditional integral of N2 over the entire stellar model, o
 methods of (`Bildsten et al. 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_).
 Previous MESA versions exclusively adopted the latter.
 
-By user request, a radiation diffusion flux limiter has been reintroduced with the 
+By user request, a radiation diffusion flux limiter has been reintroduced with the
 control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_form_of_T_gradient_eqn``.
+
+By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced
+allowing users to limit the convective velocity to some fraction of the local sound speed using the
+controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
+
+By user request, and motivated by the underestimation of line opacities from expanding material by the `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
+see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_. An optional control for an opacity floor, ``opacity_min``, has
+been introduced.
 
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
 
-Fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models
+Fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models (variable ``dP`` was supposed to be ``d_P``)
 
 Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
+
+Fixed bug in binary photos. They were not saving the variables: ``CE_years_detached``, ``CE_years_detached_old``, ``generations``.
+
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
 
@@ -290,7 +304,7 @@ shmesa
 ~~~~~~
 
 We have introduced a new set of command line utilities for interacting with MESA.
-See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__.
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_.
 
 These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full
 ``run_star_extras.f90`` template (``shmesa extras``).

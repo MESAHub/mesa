@@ -18,12 +18,13 @@
 ! ----------------------------------------------------------------------
 module bari_beam
 
+   use const_def, only: dp
+
    implicit none
 
 contains
 
    subroutine beam_init(neqn, y, yprime, consis)
-      use const_def, only: dp
       integer :: neqn
       real(dp) :: y(neqn), yprime(neqn)
       logical :: consis
@@ -37,7 +38,6 @@ contains
    end subroutine beam_init
 ! ----------------------------------------------------------------------
    subroutine beam_feval(nvar, t, th, df, ierr, rpar, ipar)
-      use const_def, only: dp
       use math_lib
       implicit real(dp) (A - H, O - Z)
       integer :: ierr, nvar, i, ipar(*)
@@ -129,7 +129,6 @@ contains
    end subroutine beam_feval
 ! ----------------------------------------------------------------------
    subroutine beam_jeval(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
-      use const_def, only: dp
       integer :: ldim, neqn, ierr, ipar(*)
       real(dp) :: t, y(neqn), yprime(neqn), dfdy(ldim, neqn), rpar(*)
 !
@@ -138,7 +137,6 @@ contains
    end subroutine beam_jeval
 ! ----------------------------------------------------------------------
    subroutine beam_solut(neqn, t, y)
-      use const_def, only: dp
       integer :: neqn
       real(dp), intent(in) :: t
       real(dp), intent(out) :: y(neqn)

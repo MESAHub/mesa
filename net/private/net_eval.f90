@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,7 +25,7 @@
 
       module net_eval
 
-      use const_def, only: dp, Qconv, arg_not_provided
+      use const_def, only: dp, i8, Qconv, arg_not_provided
       use math_lib
       use chem_def
       use chem_lib, only: get_mass_excess
@@ -34,9 +34,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine eval_net( &
             n, g, rates_only, just_dxdt, &
@@ -98,7 +96,7 @@
          real(dp) :: eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
          integer :: ci, i, j, ir, weak_id, h1, iwork
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          logical :: doing_timing
 
          logical, parameter :: dbg = .false.
@@ -594,7 +592,7 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: dbg=.false.
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          integer :: i, num, num_reactions
          real(dp) :: f
@@ -693,7 +691,7 @@
 
          integer, intent(out) :: ierr
          integer :: i, j, id, ir
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          include 'formats'
 
@@ -736,7 +734,6 @@
          end if
 
       end subroutine get_weaklib_rates
-
 
 
       subroutine get_T_limit_factor( &
@@ -789,9 +786,7 @@
          end do
 
 
-
          return      ! let it go even with bad xsum.
-
 
 
 
@@ -860,6 +855,4 @@
          xa(1: species) = xa(1: species)/xsum
       end subroutine do_clean1
 
-
       end module net_eval
-

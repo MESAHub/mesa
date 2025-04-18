@@ -1,7 +1,7 @@
 OP4STARS_1.2
 ------------
 2011, Changes on OPserver (v3.3) made by Haili Hu
-------------------------
+-------------------------------------------------
 
 OPserver has been significantly altered for the use in the stellar evolution 
 code STARS, where the chemical abundances are solved simultaneously with the 

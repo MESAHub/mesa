@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,6 @@
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine build_pre_ms_model(id, s, nvar_hydro, species, ierr)
          use chem_def
@@ -242,11 +241,13 @@
 
          mstar1 = rpar(1)
 
+! these pointers are set, but none of these vars are set.
          xh => s% xh
          q => s% q
          dq => s% dq
          nz = s% nz
 
+! this debug statement will cause a backtrace because the above vars are not set.
          if (dbg) then
             write(*,'(A)')
             write(*,*) 'finished pre-MS model'
@@ -740,6 +741,4 @@
 
       end subroutine eval_gradT
 
-
       end module pre_ms_model
-

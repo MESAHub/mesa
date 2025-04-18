@@ -4,7 +4,7 @@
   _INCLUDE zone;  -- Mzon
   _INCLUDE fundrad;  -- Fundamental constants
   _INCLUDE commonEve;  
-   LOGICAL FRST;
+   LOGICAL :: FRST;
  Parameter(Mfreq=@Mfreq);
      -- think about max Nfreq !
    Common/Kmzon/km,kmhap,Jac,FRST;
@@ -20,7 +20,7 @@
 --   PARAMETER (LICN=4*NZ,LIRN=8*NZ/5); -- FOR F01BRF, M28Y12
    PARAMETER (LICN=4*NZ,LIRN=2*NZ); -- FOR F01BRF, M28Y12
              -- maximum LIRN=2*NZ
-   Logical NEEDBR; -- F01BRF or M28Y12 needed
+   Logical :: NEEDBR; -- F01BRF or M28Y12 needed
    COMMON/STJAC/THRMAT,HL,AJAC(LICN),IRN(LIRN),ICN(LICN),WJAC(NYDIM),
                 FSAVE(NYDIM*2),IKEEP(5*NYDIM),IW(8*NYDIM),IDISP(11),
                 NZMOD,NEEDBR;

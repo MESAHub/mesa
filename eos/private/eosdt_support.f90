@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -35,7 +34,6 @@
       integer, parameter :: sz = sz_per_eos_point
 
       contains
-
 
       subroutine Do_EoS_Interpolations( &
              nvlo, nvhi, n, nx, x, ny, y, fin1, i, j, &
@@ -246,6 +244,4 @@
 
       end subroutine Do_Blend
 
-
       end module eosdt_support
-

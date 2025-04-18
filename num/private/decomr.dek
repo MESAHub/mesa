@@ -6,7 +6,7 @@
      &            sparse_jac,nzmax,isparse,ia,ja,sa,
      &            lrd,rpar_decsol,lid,ipar_decsol)
       use mtx_lib,only:find_loc_in_sparse
-      implicit none !real(dp) (a-h,o-z)
+      implicit none
       interface
 #include "mtx_decsol.dek"
 #include "mtx_decsols.dek"
@@ -78,7 +78,7 @@
          return
       end if
 
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
 ! -----------------------------------------------------------
 !
@@ -265,7 +265,7 @@
             e1_2D(i,j)=e1_2D(i,j)+fac1*fmas(i-j+mbdiag,j)
          end do
       end do
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -309,7 +309,7 @@
 
 
 
-      goto 46
+      GOTO 46
 !
 ! -----------------------------------------------------------
 !
@@ -333,7 +333,7 @@
             e1_2D(i,j)=fmas(i,j)*fac1-fjac(i,jm1)
          end do
       end do
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -348,5 +348,3 @@
        write(*,*) 'decomr: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! decomr
       end subroutine decomr
-!
-! ***********************************************************

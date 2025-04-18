@@ -205,7 +205,8 @@ module skye_coulomb
       ! Inputs
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
-      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, min_gamma_for_solid, max_gamma_for_liquid
+      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, &
+                              min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: temp, GAME, RS
       character(len=128), intent(in) :: Skye_solid_mixing_rule
 
@@ -329,7 +330,8 @@ module skye_coulomb
          ! on temp_boundary, which in turn depends on rho. Note that the order of the arguments matters here: above we've
          ! made temperature the first independent variable, so the thing we're substituting for it (temp_boundary) has to be
          ! the first argument here.
-         dF_dlnT = make_binop(temp_boundary, fake_dens, dF_dlnT%val, dF_dlnT%d1val1, dF_dlnT%d1val2, dF_dlnT%d2val1, dF_dlnT%d1val1_d1val2, &
+         dF_dlnT = make_binop(temp_boundary, fake_dens, &
+                     dF_dlnT%val, dF_dlnT%d1val1, dF_dlnT%d1val2, dF_dlnT%d2val1, dF_dlnT%d1val1_d1val2, &
                      dF_dlnT%d2val2, dF_dlnT%d3val1, dF_dlnT%d2val1_d1val2, dF_dlnT%d1val1_d2val2, dF_dlnT%d3val2)
 
          F = make_binop(temp_boundary, fake_dens, F%val, F%d1val1, F%d1val2, F%d2val1, &

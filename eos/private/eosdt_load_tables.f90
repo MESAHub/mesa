@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -53,10 +52,7 @@
 
       integer, parameter :: file_max_num_logQs = 1000
 
-
-
       contains
-
 
       subroutine request_user_to_reinstall
          write(*,'(A)')
@@ -649,6 +645,5 @@
          close(io_unit)
 
       end subroutine Read_EoS_Cache
-
 
       end module eosDT_load_tables

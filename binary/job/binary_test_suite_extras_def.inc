@@ -1,4 +1,4 @@
-integer(8) :: test_suite_time0, test_suite_time1, test_suite_clock_rate
+integer(i8) :: test_suite_time0, test_suite_time1, test_suite_clock_rate
 real(dp) :: test_suite_runtime
 logical :: test_suite_restart_flag
 

@@ -12,19 +12,19 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-CREATE_TABLE_SRCS = create_table_atm.f
+CREATE_TABLE_SRCS = create_table_atm.f90
 
-CREATE_TAU100_SRCS = create_tau100.f $(DEPS_LOCAL) $(DEPS_OTHER)
+CREATE_TAU100_SRCS = create_tau100.f90 $(DEPS_LOCAL) $(DEPS_OTHER)
 
-MAKE_BT_SRCS = create_BT_Settl.f
+MAKE_BT_SRCS = create_BT_Settl.f90
 
-MAKE_WD_SRCS = create_wd_tau25.f
+MAKE_WD_SRCS = create_wd_tau25.f90
 
-PLOT_SRCS = plot.f
+PLOT_SRCS = plot.f90
 
-CKREAD_SRCS = ckread.f
+CKREAD_SRCS = ckread.f90
 
-MERGE_SRCS = table_merge.f
+MERGE_SRCS = table_merge.f90
 
 #################################################################
 #
@@ -54,13 +54,13 @@ PLOT = ../plotter
 CKREAD = ../ckread
 MERGE = ../table_merge
 
-CREATE_TABLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CREATE_TABLE_SRCS)))
-CREATE_TAU100_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CREATE_TAU100_SRCS)))
-MAKE_BT_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MAKE_BT_SRCS)))
-MAKE_WD_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MAKE_WD_SRCS)))
-PLOT_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PLOT_SRCS)))
-CKREAD_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CKREAD_SRCS)))
-MERGE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MERGE_SRCS)))
+CREATE_TABLE_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(CREATE_TABLE_SRCS)))
+CREATE_TAU100_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(CREATE_TAU100_SRCS)))
+MAKE_BT_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(MAKE_BT_SRCS)))
+MAKE_WD_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(MAKE_WD_SRCS)))
+PLOT_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(PLOT_SRCS)))
+CKREAD_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(CKREAD_SRCS)))
+MERGE_OBJS = $(patsubst %.f90,%.o,$(patsubst %.f90,%.o,$(MERGE_SRCS)))
 
 all : $(CREATE_TABLE) $(CREATE_TAU100) $(MAKE_WD) $(PLOT) $(CKREAD) $(MERGE)
 
@@ -100,7 +100,7 @@ nodeps : $(.DEFAULT_GOAL)
 
 INCLUDES = -I$(MESA_DIR)/include
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) -O${OPT_LEVEL} $(FCfree) $(FCchecks) $<
@@ -114,7 +114,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

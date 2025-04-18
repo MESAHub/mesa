@@ -1,8 +1,8 @@
 -- log interpolation in Ron Eastman's tables
 -- only two sets of tables are in the RAM for
 -- two values of dvdr (given by time)
--- im == the number of mixture 
--- km == the number of mass zone must be defined prior to 
+-- im == the number of mixture
+-- km == the number of mass zone must be defined prior to
 -- every call of Happa
 Subroutine Happa;
 Implicit real*8 (A-H,O-Z);
@@ -38,13 +38,13 @@ _Do L=1,NFREQ;
      if (hbal<0.d0 .or. hbab<0.d0 .or. hbal >1.d50 .or. hbab > 1.d50
 --       .or. (nstep >4090 & nstep <=4095 & kmhap==199)
                ) then;
-        write(40,'(2(a,i4),1p,4(a,e12.4))') 
+        write(40,'(2(a,i4),1p,4(a,e12.4))')
                ' kmhap=',kmhap,' L=',L,'  hbal=',hbal,'  hbab=',hbab,
                '  Tp=',Tp,' pl=',pl;
         write(40,*) ' l j i im iis ',  l, j, i, im, iis;
         write(40,*) ' tabs: ', tab00, tab01, tab10, tab11;
      --   stop ' Bad happa !!!';
-     endif; 
+     endif;
      HAPPAL(L)=hbal; -- for ronfsep hbsc... files keep total extintion
      If (Tp<TpDust) Happal(L)=Happal(L)+DustK*(TpDust-Tp)**2*(UR*Urho);
      If ( SCAT ) Then;
@@ -58,19 +58,19 @@ _Od;
 /*
 20:format(f12.3, 2(1x,1pe12.5));
 --       if(nstep >899 & nstep <=901 & kmhap>320)then;
-       if(mod(nstep,50)==0 
+       if(mod(nstep,50)==0
           & (mod(kmhap,100)==0 .or. kmhap>320))then;
          write(40,*)' test happa for step=',nstep,' zone=',kmhap;
          write(*,*)' test happa for step=',nstep,' zone=',kmhap;
          do nf = 1, nfreq;
             wavet=CCL/FREQMN(nf);
-            write(40,20) wavet, pl*Hapabs(nf)/UR, 
+            write(40,20) wavet, pl*Hapabs(nf)/UR,
                    pl*(Happal(nf)-Hapabs(nf))/UR;
   -- happa==(chi/rho)*UR*Urho => chi= Pl*happa/UR
          end do;
-       end if; 
+       end if;
 */
-Return; 
+Return;
 End;
 %_band:
  _select
@@ -99,7 +99,7 @@ _do iis=1,2;
   Fix2=Fun(xx,RhoTab(i),RhoTab(i+1),Tab10,Tab11);
   Fixtsc(iis)=Fun(yy,TpTab(j),TpTab(j+1),Fix1,Fix2); -- given Tp
 _od;
-  hbab=EXP( Fun(tdlog,thaplog1,thaplog2,Fixtab(1),Fixtab(2)) ); 
+  hbab=EXP( Fun(tdlog,thaplog1,thaplog2,Fixtab(1),Fixtab(2)) );
                                                    -- given time
   hbal=EXP( Fun(tdlog,thaplog1,thaplog2,Fixtsc(1),Fixtsc(2)) );
 --  @wterm ' time ', tdlog, thaplog1, thaplog2;

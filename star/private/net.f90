@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,19 +26,21 @@
       module net
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4
+      use const_def, only: dp, i8, ln10, pi4
       use utils_lib, only: is_bad, mesa_error
 
       implicit none
 
       private
-      public :: set_net, do_net, do1_net, do_micro_change_net, &
-         get_screening_mode, default_set_rate_factors, &
-         default_set_op_mono_factors
-
+      public :: set_net
+      public :: do_net
+      public :: do1_net
+      public :: do_micro_change_net
+      public :: get_screening_mode
+      public :: default_set_rate_factors
+      public :: default_set_op_mono_factors
 
       contains
-
 
       subroutine do_net(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
@@ -51,7 +53,7 @@
 
          logical, parameter :: use_omp = .true.
          integer :: k, op_err
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          logical, parameter :: only_dlnT = .false.
          logical :: okay, check_op_split_burn
@@ -815,4 +817,3 @@
       end subroutine save_rates
 
       end module net
-

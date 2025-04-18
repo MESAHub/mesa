@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
       module hydro_rsp2
 
       use star_private_def
-      use const_def, only: dp, boltz_sigma
+      use const_def, only: dp, boltz_sigma, pi, clight, crad, ln10
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
@@ -36,11 +36,16 @@
       implicit none
 
       private
-      public :: &
-         do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
-         compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
-         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_etrb_start_vars, &
-         RSP2_adjust_vars_before_call_solver, get_RSP2_alfa_beta_face_weights
+      public :: do1_rsp2_L_eqn
+      public :: do1_turbulent_energy_eqn
+      public :: do1_rsp2_Hp_eqn
+      public :: compute_Eq_cell
+      public :: compute_Uq_face
+      public :: set_RSP2_vars
+      public :: Hp_face_for_rsp2_val
+      public :: Hp_face_for_rsp2_eqn, set_etrb_start_vars
+      public :: RSP2_adjust_vars_before_call_solver
+      public :: get_RSP2_alfa_beta_face_weights
 
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &  ! Ptrb
@@ -50,7 +55,6 @@
          x_GAMMAR = 2.d0*sqrt(3.d0)  ! DAMPR
 
       contains
-
 
       subroutine set_RSP2_vars(s,ierr)
          type (star_info), pointer :: s
@@ -1187,8 +1191,4 @@
          !$OMP END PARALLEL DO
       end subroutine RSP2_adjust_vars_before_call_solver
 
-
-
-
       end module hydro_rsp2
-

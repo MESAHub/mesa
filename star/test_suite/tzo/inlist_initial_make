@@ -5,7 +5,7 @@
 
       ! save a model at the end of the run
       save_model_when_terminate = .true.
-      save_model_filename = 'tzo.mod'      
+      save_model_filename = 'tzo.mod'
 
       relax_initial_core = .true.
       new_core_mass = 1.4d0
@@ -15,7 +15,7 @@
       core_avg_eps = 1d5
 
       set_initial_age = .true.
-      initial_age = 0     
+      initial_age = 0
 
       set_initial_dt = .true.
       years_for_initial_dt = 1d-8
@@ -31,7 +31,7 @@
       relax_mass = .false.
 
       change_initial_net=.true.
-      new_net_name='approx21.net' 
+      new_net_name='approx21.net'
 
 / ! end of star_job namelist
 

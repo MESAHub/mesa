@@ -25,7 +25,8 @@ program sample_eos
    use eos_lib
    use chem_def
    use chem_lib
-   use const_lib
+   use const_def
+   use const_lib, only: const_init
    use math_lib
 
    implicit none

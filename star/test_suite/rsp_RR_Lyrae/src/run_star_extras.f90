@@ -37,7 +37,6 @@ module run_star_extras
 
       include "test_suite_extras.inc"
 
-
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -202,8 +201,4 @@ module run_star_extras
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
 
-
-
-
       end module run_star_extras
-

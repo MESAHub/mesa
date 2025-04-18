@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,10 +32,18 @@
 
       implicit none
 
+      private
+      public :: force_another_iteration
+      public :: eval_equations
+      public :: set_xscale_info
+      public :: sizequ
+      public :: sizeB
+      public :: inspectb
+      public :: bdomain
+
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine set_xscale_info(s, nvar, ierr)
          type (star_info), pointer :: s
@@ -1542,6 +1550,4 @@
          lnR_start = xh_start(s% i_lnR,1)
       end subroutine edit_dlnR_dt_above_k_below_just_added
 
-
       end module solver_support
-

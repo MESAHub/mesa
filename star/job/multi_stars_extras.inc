@@ -66,14 +66,14 @@
          evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
 
             i = select_youngest_star()
-            if (i == 0) exit ! all done
+            if (i == 0) exit evolve_loop ! all done
 
             call star_ptr(star_ids(i), s, ierr)
             if (failed('star_ptr',ierr)) return
 
             if (s% star_age >= stopping_age) then
                write(*,*) 'stars have reached stopping age'
-               exit
+               exit evolve_loop
             end if
 
             continue_evolve_loop = do_evolve_one_step(s, dbg, ierr)

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,6 @@
       implicit none
 
       contains
-
 
       subroutine do_integrate_values(init_x, nx, f1, nv, x, vals, ierr)
          real(dp), intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
@@ -322,8 +321,6 @@
 
 
       end subroutine do_interp_values_and_slopes
-
-
 
 
       subroutine do_interp2_values_and_slopes( &
@@ -717,6 +714,5 @@
          z(k) = z(k) + f1(k)
          end do
       end subroutine median_autodiff
-
 
       end module interp_1d_misc

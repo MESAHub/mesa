@@ -1,7 +1,6 @@
 
 &star_job
 
-
       read_extra_star_job_inlist(2) = .true.
       extra_star_job_inlist_name(2) = 'inlist_semiconvection'
 

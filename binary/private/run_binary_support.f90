@@ -24,7 +24,7 @@ module run_binary_support
 
    use star_lib
    use star_def
-   use const_def, only: dp, secday
+   use const_def, only: dp, i8, secday
    use utils_lib
    use binary_def
    use binary_private_def
@@ -98,7 +98,7 @@ contains
          result_reason, model_number, iounit, binary_startup, model, num_stars
       type (star_info), pointer :: s
       character (len = 256) :: restart_filename, photo_filename
-      integer(8) :: time0, clock_rate
+      integer(i8) :: time0, clock_rate
       logical :: doing_restart, first_try, continue_evolve_loop, &
           get_history_info, write_history, write_terminal, will_read_pgbinary_inlist
       type (binary_info), pointer :: b
@@ -284,7 +284,6 @@ contains
             end if
          end if
       end if
-
 
 
       ! binary data must be initiated after stars, such that masses are available

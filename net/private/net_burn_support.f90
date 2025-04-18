@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -94,10 +94,10 @@
       epsold = -1d0
       nvold = -1
       nseq = [ 2, 6, 10, 14, 22, 34, 50, 70 ]
-      x      = start
-      h      = sign(stptry,stopp-start)
-      nok    = 0
-      nbad   = 0
+      x    = start
+      h    = sign(stptry,stopp-start)
+      nok  = 0
+      nbad = 0
       ierr = 0
 
       do i=1,nvar
@@ -193,8 +193,6 @@
       end subroutine netint
 
 
-
-
       subroutine stifbs(y,dydx,nvar,x,htry,eps,yscal,hdid,hnext, &
             a,alf,epsold,first,kmax,kopt,nseq,nvold,xnew,scale,red, &
             dens_dfdy,dmat,derivs,jakob,nstp,ierr)
@@ -215,7 +213,7 @@
       real(dp) :: a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
       integer :: kmax,kopt,nseq(stifbs_imax),nvold
       logical :: first
-      integer :: ierr
+      integer, intent(out) :: ierr
 
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
@@ -272,7 +270,7 @@
 
 ! determine optimal row number for convergence
        do kopt=2,kmaxx-1
-        if (a(kopt+1) > a(kopt)*alf(kopt-1,kopt)) go to 01
+        if (a(kopt+1) > a(kopt)*alf(kopt-1,kopt)) GOTO 01
        end do
 01     kmax = kopt
       end if
@@ -298,7 +296,7 @@
       reduct = .false.
 
 ! evaluate the sequence of semi implicit midpoint rules
-02    do 18 k=1,kmax
+02    do k=1,kmax
 
 !       write(6,119) 'xnew x and h',xnew,x,h
 ! 119   format(1x,a,' ',1p3e12.4)
@@ -320,19 +318,15 @@
           derivs,ierr)
        if (ierr /= 0) then
 
-
          h      = h * 0.1d0
-         i_errmax   = 0
+         i_errmax = 0
          reduct = .true.
          ierr = 0
          if (dbg) write(*,*) 'ierr: simpr failed in stifbs'
-         go to 2
-
+         GOTO 2
 
          write(*,*) 'simpr failed in stifbs'
          return
-
-
 
        end if
        xest = (h/nseq(k))*(h/nseq(k))
@@ -360,28 +354,28 @@
        if (k /= 1  .and. (k >= kopt-1  .or. first)) then
 
 ! converged
-        if (errmax < 1.0d0) go to 04
+        if (errmax < 1.0d0) GOTO 04
 
 ! possible step size reductions
         if (k == kmax  .or.  k == kopt + 1) then
          red = safe2/err(km)
-         go to 03
+         GOTO 03
         else if (k == kopt) then
          if (alf(kopt-1,kopt) < err(km)) then
           red = 1.0d0/err(km)
-          go to 03
+          GOTO 03
          end if
         else if (kopt == kmax) then
          if (alf(km,kmax-1) < err(km)) then
           red = alf(km,kmax-1) * safe2/err(km)
-          go to 03
+          GOTO 03
          end if
         else if (alf(km,kopt) < err(km)) then
          red = alf(km,kopt-1)/err(km)
-         go to 03
+         GOTO 03
         end if
        end if
-18    continue
+      end do
 
 ! reduce stepsize by at least redmin and at most redmax
 03    red    = min(red,redmin)
@@ -391,7 +385,7 @@
       if (dbg) write(*,*) 'reduce stepsize', i, errmax, yerr(i), yscal(i), red, h
       i_errmax   = 0
       reduct = .true.
-      go to 2
+      GOTO 2
 
 
 ! successful step; get optimal row for convergence and corresponding stepsize
@@ -526,7 +520,7 @@
 ! use yout as temporary storage; general step
 
       do nn=2,nstep
-       do 15 i=1,nvar
+       do i=1,nvar
         yout(i) = h*yout(i) - del(i)
          if (dbg) then
             if (is_bad(yout(i))) then
@@ -534,7 +528,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-15     continue
+      end do
       call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'my_getrs1 failed in simpr'
@@ -560,7 +554,7 @@
       end do
 
 ! take the last step
-      do 18 i=1,nvar
+      do i=1,nvar
        yout(i) = h * yout(i) - del(i)
          if (dbg) then
             if (is_bad(yout(i))) then
@@ -568,7 +562,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-18    continue
+      end do
       call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          write(*,*) 'my_getrs1 failed in simpr'
@@ -650,8 +644,6 @@
 
 
       include 'mtx_solve_routines.inc'
-
-
 
 
       end module net_burn_support

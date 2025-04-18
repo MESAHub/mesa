@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine abundance_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -405,9 +403,6 @@
             abundance_line_legend = cnt + 1
          end function abundance_line_legend
 
-
       end subroutine do_abundance_panel
 
-
       end module pgstar_abundance
-

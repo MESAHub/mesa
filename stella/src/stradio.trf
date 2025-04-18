@@ -49,9 +49,9 @@ _INCLUDE snrad;
 _INCLUDE abo;
 _INCLUDE stsave;
     _Select
-      _1  mode=='rm' ! mode=='RM' [<*readmodel: read initial static *>]; 
-      _11 mode=='cm' ! mode=='CM' [<*contmodel: read from .prf *>]; 
-      _2  mode=='rc' ! mode=='RC' [<*readcurve : *>]; 
+      _1  mode=='rm' ! mode=='RM' [<*readmodel: read initial static *>];
+      _11 mode=='cm' ! mode=='CM' [<*contmodel: read from .prf *>];
+      _2  mode=='rc' ! mode=='RC' [<*readcurve : *>];
       _3  mode=='wm' ! mode=='WM' [<*writemodel: *>];
       _4  mode=='wc' ! mode=='WC' [<*writecurve: *>];
       _5  mode=='we' ! mode=='WE' [<*writeeve:   *>];

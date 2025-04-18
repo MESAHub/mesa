@@ -218,7 +218,7 @@ _od;
         nnx=nnx+1;
         NFRUS=NFRUSED(Jsave); -- exact number of used (saved) freqs
 --        write(*,'(a,1p,3e11.3)') ' UR,flsave(Mfreq/1,JSAVE): ',
---		UR,flsave(Mfreq,JSAVE),flsave(1,JSAVE);
+--    UR,flsave(Mfreq,JSAVE),flsave(1,JSAVE);
 --        pause;
         Rphtau=UR*flsave(Mfreq,JSAVE);
         <*getttt: obtain in ttt(MFREQ) corrected output flux
@@ -1590,4 +1590,3 @@ _define @NPTSX NPTSI @WLX WLI @FX0 IF0 @TX TI @lband 5 ;@flux; MI=AMAGX;
       VF0 = -13.72;
       RF0 = -13.66;
       IF0 = -14.42;
-

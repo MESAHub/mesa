@@ -78,7 +78,7 @@
          ! arrays, which might contain more than 2^32 elements, this
          ! should be set to 64.
            integer, parameter :: QSORT_STACK_SIZE = 32, QSORT_THRESHOLD = 10
-           type qsort_stack; integer :: low, high; end type
+           type qsort_stack; integer :: low, high; end type qsort_stack
            type(qsort_stack) :: stack(QSORT_STACK_SIZE)
 
            call init()

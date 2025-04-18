@@ -128,7 +128,4 @@ contains
     L_coeff = GD_coeff(omega,inclination,C_L1)
   end function gravity_darkening_L_coeff
 
-
 end module gravity_darkening
-
-

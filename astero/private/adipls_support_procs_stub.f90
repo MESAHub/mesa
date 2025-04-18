@@ -20,9 +20,6 @@
 !
 ! ***********************************************************************
 
-
-
-
       ! routines that are called by adipls
       ! uses adipls_support, so must compile after that
 
@@ -38,8 +35,6 @@
 
          integer :: nn, iy, iaa, ispcpr
          real(dp) :: x(1:nn), y(1:iy,1:nn), aa(1:iaa,1:nn), data(8)
-
-
 
       end subroutine spcout_adi
 

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,6 @@
       public :: output_star_photo
 
       contains
-
 
       subroutine output_star_photo(s,iounit,ierr)
          use rates_def,only:num_rvs
@@ -181,8 +180,6 @@
             write(iounit) part_number
          end subroutine write_part_number
 
-
       end subroutine output_star_photo
-
 
       end module photo_out

@@ -466,7 +466,7 @@ _until kio^=0;
   istold=istim; -- for Strad
     _case istim+1 _of
        if(istim>1 .and. istim <= @ns)then;
-                 thaplog1=stmlog(istim-1); 
+                 thaplog1=stmlog(istim-1);
                  thaplog2=stmlog(istim);
        else;
          write(*,*)' in begrad istim=',istim;
@@ -479,7 +479,7 @@ _until kio^=0;
                      hpbanab1(L,itp,iro,im)=hpbanab2(L,itp,iro,im);
                      hpbansc1(L,itp,iro,im)=hpbansc2(L,itp,iro,im);
          _od_od_od_od
-         thaplog1=stmlog(1); 
+         thaplog1=stmlog(1);
          thaplog2=stmlog(@ns);
                   -- here the values of thaplog are not important
                   -- (if they are not equal), since haptab is the same
@@ -496,11 +496,11 @@ _until kio^=0;
 /*    _2 thaplog1=stmlog(1); thaplog2=stmlog(2)
       _3 thaplog1=stmlog(2); thaplog2=stmlog(3)
       _4 thaplog1=stmlog(3); thaplog2=stmlog(4)
-      _5 thaplog1=stmlog(4); thaplog2=stmlog(5) 
+      _5 thaplog1=stmlog(4); thaplog2=stmlog(5)
        */
 
     _esac
-   
+
      If(istim^=0)then; -- for istim==0 already read
        app=char(ichar('0')+istim); -- istim must be <=9
        Opafile=Opafile(1:Length(Opafile)-1)//app;

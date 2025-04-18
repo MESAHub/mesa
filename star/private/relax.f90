@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,6 +31,34 @@
 
       implicit none
 
+      private
+      public :: do_relax_z
+      public :: do_relax_mass
+      public :: do_relax_to_limit
+      public :: do_relax_mass_scale
+      public :: do_relax_num_steps
+      public :: do_relax_to_radiative_core
+      public :: do_relax_composition
+      public :: do_relax_angular_momentum
+      public :: do_relax_entropy
+      public :: do_relax_core
+      public :: do_relax_m_center
+      public :: do_relax_r_center
+      public :: do_relax_v_center
+      public :: do_relax_l_center
+      public :: do_relax_dxdt_nuc_factor
+      public :: do_relax_eps_nuc_factor
+      public :: do_relax_opacity_max
+      public :: do_relax_max_surf_dq
+      public :: do_relax_to_xaccrete
+      public :: do_relax_y
+      public :: do_relax_tau_factor
+      public :: do_relax_opacity_factor
+      public :: do_relax_tsurf_factor
+      public :: do_relax_uniform_omega
+      public :: do_relax_irradiation
+      public :: do_relax_mass_change
+      public :: do_internal_evolve
 
       real(dp), parameter :: min_dlnz = -12
       real(dp), parameter :: min_z = 1d-12
@@ -42,7 +70,6 @@
       real(dp), pointer :: relax_work_array(:)
 
       contains
-
 
       subroutine do_relax_to_limit(id, restore_at_end, ierr)
          integer, intent(in) :: id
@@ -3680,8 +3707,6 @@
       end function relax_Z_check_model
 
 
-
-
       subroutine do_relax_Y(id, new_Y, dY, minq, maxq, ierr)
          use star_utils, only: k_for_q, eval_current_y
          integer, intent(in) :: id
@@ -4318,7 +4343,4 @@
          write(*,'(A)')
       end subroutine error_check
 
-
       end module relax
-
-

@@ -4,7 +4,7 @@
 # makefile_header_non_mesasdk file as a template.
 
 # NOTE: MESA is no longer supported on 32-bit systems.  This isn't by design;
-# we simply haven't been able to get it to work!  So if you really-really want 
+# we simply haven't been able to get it to work!  So if you really-really want
 # to use an antique 32-bit system for mesa, you'll have to try to make it work yourself.
 # But I think you'd be better off switching to a 64-bit machine.
 
@@ -55,7 +55,7 @@ endif
 
 # step 1) specify your compilers
 
-# NOTE: recent versions of mesa have required reduced optimization 
+# NOTE: recent versions of mesa have required reduced optimization
 # in order to work with ifort; we suggest using gfortran instead of ifort if possible.
 
 FC = gfortran
@@ -78,7 +78,7 @@ LOAD_LAPACK = `mesasdk_lapack_link`
 LOAD_BLAS = `mesasdk_blas_link`
 
 
-# step 4) do you want to use PGPLOT with mesa/star?                                                                                     
+# step 4) do you want to use PGPLOT with mesa/star?
 
 USE_PGSTAR = YES
 LOAD_PGPLOT = `mesasdk_pgplot_link` -lz
@@ -134,7 +134,7 @@ FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
 # For debugging, you may want to try some of these options:
 # -Wall -Wextra -Wimplicit-interface -Wno-unused-function -fPIC -g -fcheck=all,no-array-temps -fbacktrace -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-99999999
 
-# Set the fortran standard to compile against, files that can't be compiled to the standard and are 
+# Set the fortran standard to compile against, files that can't be compiled to the standard and are
 # unfixable should add a statement like:  $(filter-out -std=f2008, $(COMPILE))
 # to filter out the option in their makefile
 FCstandard = -std=f2008 -Wno-error=tabs
@@ -142,13 +142,13 @@ FCstandard = -std=f2008 -Wno-error=tabs
 # set environment variable GFORTRAN_ERROR_BACKTRACE=1
 # -Warray-temporaries
 
-FCimpno = -fimplicit-none  
+FCimpno = -fimplicit-none
 FCchecks = -fbounds-check -Wuninitialized -Warray-bounds
 FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination -Waliasing
 #FCwarn = -Wunused-value -Werror -W -Wno-compare-reals -Wno-unused-parameter
-FCtrapNANs = -ffpe-trap=invalid,overflow,zero 
+FCtrapNANs = -ffpe-trap=invalid,overflow,zero
 # -Wno-unused-parameter
- 
+
 # note: -Werror causes warnings to be treated as errors
 FC_fixed_preprocess = -x f77-cpp-input
 FC_free_preprocess = -x f95-cpp-input
@@ -161,7 +161,7 @@ FCstatic =
 ifeq ($(USE_OPENMP),YES)
 FCopenmp = -fopenmp
 else
-FCopenmp = 
+FCopenmp =
 endif
 
 LIB_TOOL_STATIC = ar crs
@@ -193,14 +193,14 @@ else
    # Static library options
    LIB_TOOL = $(LIB_TOOL_STATIC)
    LIB_SUFFIX = $(LIB_SUFFIX_STATIC)
-   LIB_FLAGS = 
-   LIBS = 
+   LIB_FLAGS =
+   LIBS =
 endif
 
 # Turn on all FPE options
-ifeq ($(MESA_FPE_CHECKS_ON),1) 
+ifeq ($(MESA_FPE_CHECKS_ON),1)
    FCbasic += $(FCtrapNANs) -fbounds-check -finit-derived -Wuninitialized -Warray-bounds -fstack-protector-all -D_FORTIFY_SOURCE=2
-   FCopt = -O0 -ftree-vectorize 
+   FCopt = -O0 -ftree-vectorize
    SKIP_NAN_TRAPS = NO
 endif
 
@@ -287,7 +287,7 @@ LOAD_MESA_STAR_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_STAR))
 ifeq ($(USE_PGSTAR),YES)
    LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
 else
-   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) 
+   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT)
 endif
 LOAD_MESA_STAR = $(LOAD_MESA_STAR_INT) $(LOAD_MESA_STAR_EXT)
 
@@ -304,7 +304,7 @@ LOAD_GYRE = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_GYRE))
 ifeq ($(USE_PGSTAR),YES)
    LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
 else
-   LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT) 
+   LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT)
 endif
 LOAD_MESA_BINARY = $(LOAD_MESA_BINARY_INT) $(LOAD_MESA_BINARY_EXT)
 
@@ -316,7 +316,7 @@ SLOW_COMPILE = -fno-var-tracking
 LOADER = $(FC)
 
 STAR_WORK_OBJS = \
-   run_star_extras.o run_star.o 
+   run_star_extras.o run_star.o
 
 BINARY_WORK_OBJS = \
    run_star_extras.o run_binary_extras.o run_binary.o
@@ -344,4 +344,3 @@ ifneq ($(shell makedepf90 -V | grep sdk2),)
 else
     MAKEDEPF90 = makedepf90 -m %m.mod
 endif
-    

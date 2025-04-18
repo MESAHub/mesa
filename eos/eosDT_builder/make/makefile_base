@@ -14,11 +14,11 @@ FCstandard =
 #
 # SOURCES
 
-SRCS = eos_def.f90 other_eos.f90 gauss_fermi.f90 azbar.f helm_alloc.f90 \
+SRCS = eos_def.f90 other_eos.f90 gauss_fermi.f90 azbar.f90 helm_alloc.f90 \
    helm_polynomials.f90 helm.f90 \
-   eos5_xtrin_h-he.f opal_core.f scvh_core.f \
-   opal_scvh_driver.f helm_opal_scvh_driver.f \
-   create_eos_files.f
+   eos5_xtrin_h-he.f opal_core.f scvh_core.f90 \
+   opal_scvh_driver.f90 helm_opal_scvh_driver.f90 \
+   create_eos_files.f90
 
 #################################################################
 #

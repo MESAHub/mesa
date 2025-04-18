@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,16 +21,18 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
 module const_def
+
    implicit none
 
+   public
+
    ! real number precision options: single, double, quad
-   integer, parameter :: sp = selected_real_kind(p=5)
-   integer, parameter :: dp = selected_real_kind(p=15)  ! real32
-   integer, parameter :: qp = selected_real_kind(p=30)  ! real64
+   integer, parameter :: sp = selected_real_kind(p=5)   ! real32
+   integer, parameter :: dp = selected_real_kind(p=15)  ! real64
+   integer, parameter :: qp = selected_real_kind(p=30)  ! real128
 
    ! integer precision options
    integer, parameter :: i1 = selected_int_kind(2)   ! int8

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -374,7 +373,6 @@
          ! (IUPAC Technical Report)
 
 
-
       ! temperature values at which partition function is defined
       real(dp), dimension(npart) :: Tpart
 
@@ -525,7 +523,6 @@
 
 
       logical :: chem_has_been_initialized = .false.
-
 
 
       contains
@@ -892,7 +889,6 @@
          end do
 
       end subroutine init_chem_element_names
-
 
 
       subroutine init_chem_element_main_iso_names
@@ -1841,8 +1837,6 @@
       end subroutine init_MB22_photospheric_data
 
 
-
-
     subroutine init_AAG21_photospheric_data  ! fraction by mass of total Z
        ! Asplund et al. A&A 653, A141 (2021) photospheric abundance.
        ! Supplemented with meteoric values
@@ -2663,6 +2657,4 @@
 
       end subroutine set_category_names
 
-
       end module chem_def
-

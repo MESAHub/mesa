@@ -134,7 +134,6 @@ star/test_suite/split_burn_big_net
 star/test_suite/zams_to_cc_80 @Debraheem
 star/test_suite/20M_z2m2_high_rotation
 
-
 binary/test_suite/double_bh @orlox
 binary/test_suite/evolve_both_stars @orlox @mjoyceGR
 binary/test_suite/jdot_gr_check @orlox

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,6 @@
       implicit none
 
       contains
-
 
       subroutine set_v_flag(id, v_flag, ierr)
          integer, intent(in) :: id
@@ -776,7 +775,4 @@
 
       end subroutine set_rotation_flag
 
-
       end module set_flags
-
-

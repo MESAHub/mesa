@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,25 +26,43 @@
       module rsp_step
       use rsp_def
       use star_def, only: star_ptr, star_info
-      use const_def, only: dp, qp, crad
+      use const_def, only: dp, qp, i8, crad
       use utils_lib, only: is_bad
 
       implicit none
 
       private
-      public :: calculate_energies, init_HYD, HYD, &
-         turn_off_time_weighting, turn_on_time_weighting, &
-         eval_vars, eval_eqns, calc_equations, save_start_vars, &
-         do1_eos_and_kap, calc_Fr, do1_specific_volume, get_Psurf, &
-         set_f_Edd, calc_Prad, calc_Hp_face, calc_Y_face, &
-         calc_PII_face, calc_Pvsc, calc_Pturb, calc_Chi, calc_Eq, &
-         calc_source_sink, acceleration_eqn, calc_cell_equations, &
-         T_form_of_calc_Fr, calc_Lc, calc_Lt, rsp_set_Teff
+      public :: calculate_energies
+      public :: init_HYD
+      public :: HYD
+      public :: turn_off_time_weighting
+      public :: turn_on_time_weighting
+      public :: eval_vars
+      public :: eval_eqns
+      public :: calc_equations
+      public :: save_start_vars
+      public :: do1_eos_and_kap
+      public :: calc_Fr
+      public :: do1_specific_volume
+      public :: get_Psurf
+      public :: set_f_Edd
+      public :: calc_Prad
+      public :: calc_Hp_face
+      public :: calc_Y_face
+      public :: calc_PII_face
+      public :: calc_Pvsc
+      public :: calc_Pturb
+      public :: calc_Chi
+      public :: calc_Eq
+      public :: calc_source_sink
+      public :: acceleration_eqn
+      public :: calc_cell_equations
+      public :: T_form_of_calc_Fr
+      public :: calc_Lc, calc_Lt
+      public :: rsp_set_Teff
 
       logical, parameter :: call_is_bad = .false.
-
       integer, parameter :: i_var_Vol = 99  ! for remeshing tests with dfridr
-
       integer, parameter :: &
          i_var_T = 2, i_var_w = 3, i_var_er = 4, i_var_Fr = 5, i_var_R = 6, &  ! R must be last
 
@@ -185,9 +203,7 @@
 
       integer :: iter, min_k_for_turbulent_flux
 
-
       contains
-
 
       subroutine HYD(s,ierr)
          use star_utils, only: start_time, update_time
@@ -198,7 +214,7 @@
          integer :: &
             i_min, i_max, num_tries, max_retries, max_iters, k, nz, &
             kT_max, kW_max, kE_max, kL_max, iter_for_dfridr, test_partials_k
-         integer(8) :: time0
+         integer(i8) :: time0
          logical :: converged, dbg_msg, trace
          include 'formats'
 
@@ -691,7 +707,7 @@
          integer, intent(in) :: iter,i_min,i_max
          integer, intent(out) :: ierr
          integer :: i, op_err
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          include 'formats'
          ierr = 0
@@ -3820,6 +3836,5 @@
             write(*,*) 'T_form_of_Fr_eqn', s% solver_test_partials_var
          end if
       end subroutine T_form_of_Fr_eqn
-
 
       end module rsp_step

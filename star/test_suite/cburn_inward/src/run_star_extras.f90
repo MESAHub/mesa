@@ -35,11 +35,9 @@
 
       include "test_suite_extras_def.inc"
 
-
       contains
 
       include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -106,7 +104,6 @@
             testhub_extras_vals(3) = ign_co_core_mass
 
          end select
-
 
 
          call test_suite_after_evolve(s, ierr)
@@ -292,8 +289,4 @@
 
        end subroutine extras_photo_write
 
-
-
-
       end module run_star_extras
-

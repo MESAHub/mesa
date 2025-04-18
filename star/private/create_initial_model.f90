@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,14 +26,14 @@
       module create_initial_model
 
       use star_private_def
-      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, arg_not_provided, two_thirds, four_thirds_pi
+      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, &
+                           arg_not_provided, two_thirds, four_thirds_pi
       use chem_def
 
       implicit none
 
       private
       public :: build_initial_model
-
 
       integer :: eos_handle, kap_handle, species
 
@@ -56,9 +56,7 @@
       type (create_star_info), target, save :: &
          create_star_handles(max_create_star_handles)
 
-
       contains
-
 
       subroutine get_create_star_ptr(id,cs,ierr)
          integer, intent(in) :: id
@@ -506,6 +504,4 @@
 
       end subroutine get_TRho_from_PS
 
-
       end module create_initial_model
-

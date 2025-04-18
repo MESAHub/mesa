@@ -58,7 +58,7 @@
       open(newunit=io_unit,file=trim(fname))
 
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
-      		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
+            'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
 
       write(io_unit,'(2(i10,4x,3(f14.4)),i10)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &

@@ -100,7 +100,7 @@ _Define @TAUPH   0.64D0
     chem=1.d0;
 --    if (Woomix & kadapt==1) then;
     if (Woomix) then;
-	<*mix: read composition of the 2nd mixed model
+  <*mix: read composition of the 2nd mixed model
                 ONLY for Xnimod (used in bgcon) and SampleZ.
                 composition of Equilibrium model defined
                 in %BM from the 1st foreign model*>;
@@ -108,7 +108,7 @@ _Define @TAUPH   0.64D0
     <*sampleabun: define abundance from SampleZ (.) *>;
     <*M: FIRST MODEL (EVEBEG-->BEGCON) *>;
 /*      If (Woomix & kadapt ^= 1) Then;
-	<*mix2: change composition according 2nd mixed model *>;
+  <*mix2: change composition according 2nd mixed model *>;
       Endif;
  */
      If(^Woomix & (Kadapt== 4 ! Kadapt==6 )) then;
@@ -503,7 +503,7 @@ _Od;
                 Nzon,BM1,Rcen,rhoCen;
     _do j = 1, Nzon;
        read(23,*) idum,dum,Radius(j),RHOeve(j),TMPR(j),VELOC(j),
-   	          dum,dum;
+               dum,dum;
       --@wterm'j Radius(j):', j,Radius(j);
     _od
      close(23,status='keep');
@@ -536,13 +536,13 @@ _Od;
 -- what happens at XNifor=1
      restfac=1.d0; -- sb
      XNifor(j) = max(xnifac*XNifor(j),1.d-6);
-	_do k = 1, Natom;
+  _do k = 1, Natom;
             if(k^=Natom-1)then;
                YABUN(k,j) = restfac*YABUN(k,j)/AZ(k);  -- transforming Xabun to Yabun
             else; -- Fe
                YABUN(k,j) = (restfac*YABUN(k,j)+XNifor(j))/AZ(k); -- adding Ni56 to Fe
             endif;
-	_od;
+  _od;
         <*normalize: check the sum of Yabun(k,j)*AZ(k) for all k
                      and normalize it to 1 *>;
     _od;
@@ -551,7 +551,7 @@ _Od;
 --     Radius(1)=Radius(1)/UR;
 --     VELOC(1)=VELOC(1)/(UR/Utime);
 --     Tmpr(1)=TMPR(1)/UTp;
---	expfac = 100.0; -- now in *.eve
+--  expfac = 100.0; -- now in *.eve
       veloc(1)=veloc(2)*Radius(1)/Radius(2);
 --     @wterm' expfac = ',expfac;
     _DO K=Nzon,1,-1;
@@ -863,4 +863,3 @@ _include formod;
     Real*8 PARMS(5),FACTDM;      -- factor of zone redefining
     real*8 myrhom(@zone);
     real*8 totmass(Natom+1); -- Ni in Natom+1
-

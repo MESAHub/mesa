@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,12 +27,14 @@
 
       implicit none
 
+      private
+      public :: eval_OMP_GET_THREAD_NUM
+      public :: eval_OMP_GET_MAX_THREADS
+      public :: eval_OMP_SET_NUM_THREADS
 
       integer :: omp_max_threads = -1
 
-
       contains
-
 
       integer function eval_OMP_GET_THREAD_NUM()
          use omp_lib, only: OMP_GET_THREAD_NUM
@@ -52,6 +54,4 @@
          call OMP_SET_NUM_THREADS(threads)
       end subroutine eval_OMP_SET_NUM_THREADS
 
-
       end module utils_openmp
-

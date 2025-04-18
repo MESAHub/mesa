@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
       module hydro_eqns
 
       use star_private_def
-      use const_def, only: dp, pi, ln10
+      use const_def, only: dp, pi, ln10, two_thirds
       use star_utils, only: em1, e00, ep1
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -37,9 +37,7 @@
       private
       public :: eval_equ
 
-
       contains
-
 
       subroutine eval_equ(s, nvar, ierr)
          type (star_info), pointer :: s
@@ -491,7 +489,8 @@
 
                      s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% Peos(k) + &
                         frac_without_dxa * (s% Pgas(k)/s% Peos(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
-                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
+                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. &
+                         j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
                         write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                         write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
                         write(*,2) 's% Peos(k)', k, s% Peos(k)
@@ -513,11 +512,13 @@
                         if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                            if (dxa < dxa_threshold) then
                               if (j == i_var - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                    trim (s% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
                               if (j == i_var_sink - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                    trim (s% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
                            end if
@@ -1164,6 +1165,4 @@
          end do
       end subroutine equ_data_for_extra_profile_columns
 
-
       end module hydro_eqns
-

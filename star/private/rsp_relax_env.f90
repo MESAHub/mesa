@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -39,7 +39,6 @@
 
       contains
 
-
       subroutine EOP(s,k,T,P,V,E,CP,QQ,SVEL,OP,ierr)
       use rsp_eval_eos_and_kap, only: &
          eval1_mesa_Rho_given_PT, eval1_gamma_PT_getRho
@@ -53,7 +52,7 @@
       data R,A/8.317d7,7.5641d-15/
       data PRECEQ/5.d-13/
 
-      if(P<=0.d0) goto 100  !negative pressure, stop
+      if(P<=0.d0) GOTO 100  !negative pressure, stop
 
       ierr = 0
       Prad = Radiation_Pressure(T)
@@ -97,7 +96,7 @@
         T,V,P1,DPV,DU1,E,DU2,DU3,CP,DU4,DU5,QQ,DU6,DU7,OP &
            ,DU8,DU9,ierr)
       if (ierr /= 0) return
-      if(I>25) goto 2  !no convergence, stop
+      if(I>25) GOTO 2  !no convergence, stop
       F2=P1/P-1.d0
       V=V-F2*P/DPV
       if (is_bad(V)) then
@@ -113,8 +112,8 @@
 
          !write(*,*) 'V', I, V
 
-      if(abs(F2)<PRECEQ) goto 3
-      goto 1
+      if(abs(F2)<PRECEQ) GOTO 3
+      GOTO 1
  3    continue
        if (abs(P - P_test) > 1d-10*P) then
        end if
@@ -322,7 +321,7 @@
  999  continue
 
       IZIP = 0
-      if(IOP==0) goto 100
+      if(IOP==0) GOTO 100
 
 !------ MASS TRICKS ---
 !     dmN = dm(NZN) ! THIS IS NOT WORKING IF FSUB/=1
@@ -330,7 +329,7 @@
 
       TT  = T(NZN-NZT+1)-TH0
 
-      if(IOP==1) goto 24
+      if(IOP==1) GOTO 24
 
       DDT = TT*(dmN-dmNL)/(TT-TNL)
       !if (is_bad(DDT)) then
@@ -353,7 +352,7 @@
 !        APPLY ARTIFICIAL ZONE MASS CHANGE TO ALLOW ITERATIONS
          DDT = -dm(NZN)/100000.d0
          write(*,*) 'ALFA =',ALFA
-         goto 24
+         GOTO 24
       end if
       if(abs(DDT/dmN)<PREC1.and.ICAA==NDIVAA+1)then
          write(*,*) '***** ALFA ITERATION FINISHED *****'
@@ -371,7 +370,7 @@
             ! APPLY ARTIFICIAL ZONE MASS CHANGE TO ALLOW ITERATIONS
             DDT = -dm(NZN)/100000.d0
             write(*,*) 'ALFAP=',ALFAP
-            goto 24
+            GOTO 24
          end if
          if(abs(DDT/dmN)<PREC1.and.ICAP==NDIVAP+1)then
             write(*,*) '***** ALFAP ITERATION FINISHED *****'
@@ -386,7 +385,7 @@
             ! APPLY ARTIFICIAL ZONE MASS CHANGE TO ALLOW ITERATIONS
             DDT = -dm(NZN)/100000.d0
             write(*,*) 'ALFAT =',ALFAT
-            goto 24
+            GOTO 24
          end if
          if(abs(DDT/dmN)<PREC1.and.ICAT==NDIVAT+1)then
             write(*,*) '***** ALFAT ITERATION FINISHED *****'
@@ -403,7 +402,7 @@
             ! APPLY ARTIFICIAL ZONE MASS CHANGE TO ALLOW ITERATIONS
             DDT = -dm(NZN)/100000.d0
             write(*,*) 'ALFAT =',ALFAT
-            goto 24
+            GOTO 24
          end if
          if(abs(DDT/dmN)<PREC1.and.ICAT==NDIVAT+1)then
             write(*,*) '***** ALFAT ITERATION FINISHED *****'
@@ -418,7 +417,7 @@
             ! APPLY ARTIFICIAL ZONE MASS CHANGE TO ALLOW ITERATIONS
             DDT = -dm(NZN)/100000.d0
             write(*,*) 'ALFAP=',ALFAP
-            goto 24
+            GOTO 24
          end if
          if(abs(DDT/dmN)<PREC1.and.ICAP==NDIVAP+1)then
             write(*,*) '***** ALFAP ITERATION FINISHED *****'
@@ -433,17 +432,17 @@
             if (NEGFLU==2)then
                !write(*,*) '*** ENVELOPE IS RELAXED ***'
                ending=.true.
-               goto 100
+               GOTO 100
             end if
             !write(*,*) 'NEGATIVE FLUX IS ON'
             DDT = -dm(NZN)/100000.d0
             NEGFLU=2
-            goto 24
+            GOTO 24
          end if
          !write(*,*) 'NEGATIVE FLUX WITHOUT Z-DERIV. IS ON'
          DDT = -dm(NZN)/100000.d0
          NEGFLU=1
-         goto 24
+         GOTO 24
       end if
 
       !write(*,*) 'abs(DDT/dmN), PREC1', DDT, dmN, abs(DDT/dmN), PREC1
@@ -451,7 +450,7 @@
       if(abs(DDT/dmN)<PREC1) then
          !write(*,*) '*** ENVELOPE IS RELAXED ***'
          ending=.true.
-         goto 100
+         GOTO 100
       end if
 
       if (dmN_cnt >= max_dmN_cnt) then
@@ -476,7 +475,7 @@
             HAHA=1.01d0
             do I=1,100
                POM=1.d0/(NZN-NZT+1)*dlog10(1.d0-SUMM/AONE*(1.d0-HAHA))
-               if(dabs(HAHA-10.d0**POM)<1d-10) goto 22
+               if(dabs(HAHA-10.d0**POM)<1d-10) GOTO 22
                HAHA=10.d0**POM
             end do
             write(*,*) 'NO CONVERGENCE IN RELAX_ENV ITERATION FOR H'
@@ -504,11 +503,11 @@
 
  100  continue
 
-      do 102 II=1,8000
+      do II=1,8000
 
 !     LOOP 1 .. EOS
       !$OMP PARALLEL DO PRIVATE(I,T1,POM,EDFAC,op_err) SCHEDULE(dynamic,2)
-      do 1 I=2,NZN
+      do I=2,NZN
          T1=P43/dm(I)
          Vol(I)=T1*(R(I)**3-R(I-1)**3)
          DVRM(I) = -3.d0*T1*R(I-1)**2
@@ -544,7 +543,7 @@
          dCp_dr_in(I) = CPV(I)*DVRM(I)
          dQQ_dr_00(I)  = QQV(I)*DVR(I)
          dQQ_dr_in(I) = QQV(I)*DVRM(I)
- 1    continue
+      end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) return
 
@@ -1018,7 +1017,7 @@
          DLMRM = DLRM
          DLMT  = DLT
          DLMTP = DLTP
-         if(I==NZN) goto 6
+         if(I==NZN) GOTO 6
 !        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
 !        CALC LUM(I)
          W_00=T(I)**4
@@ -1036,7 +1035,7 @@
          DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
          DLTP=4.d0*(T3/T(I+1))*(W_out*BW/K(I+1)-T2*BK/BW)+DLKP*dK_dT_00(I+1)
          DLT=-4.d0*(T3/T(I))*(W_00*BW/K(I)-T2*BK/BW)+DLK*dK_dT_00(I)
-         goto 7
+         GOTO 7
 !        OUTER LUM BOUNDARY CONDITION
  6       continue
          Lr(I)=L0
@@ -1078,12 +1077,12 @@
          HD(5,IR) = +T1*(-dPtrb_dw_00(I))          !Z(i)
          HD(8,IR) = +T1*(dPtrb_dw_00(I+1))         !Z(i+1)
 
-         if(I==NZN) goto 111
+         if(I==NZN) GOTO 111
          HD(6,IR) = +T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))+ &
                     4.d0*G*M(I)/(R(I)**3)    !X(i)
          HD(7,IR) = +T1*(dP_dT_00(I+1))           !Y(i+1)
          HD(9,IR) = +T1*(dP_dr_00(I+1)+dPtrb_dr_00(I+1))  !X(i+1)
-         goto 112
+         GOTO 112
  111     HD(7,IR)=  0.d0
          HD(9,IR)=  0.d0
          HD(6,IR)= +T1*(-dP_dr_00(I))+4.d0*G*M(I)/(R(I)**3)
@@ -1141,7 +1140,7 @@
 
   5   continue
 
-      if(ending) goto 889
+      if(ending) GOTO 889
 
       do J=1,5     !translate hd into band storage of LAPACK/LINPACK
          do I=1,3*NZN+1
@@ -1190,7 +1189,7 @@
          XX_max_dx = 0
          i_XX_max = 0
          var_XX_max = 0
-      do 14 I=2,NZN
+      do I=2,NZN
          IR = 3+3*(I-1)
          IC = IR-1
          IW = IR-2
@@ -1221,7 +1220,7 @@
          end if
 
          EZH=1.d0/dmax1(1.d0/EZH,XXR,XXT,XXC)
-   14 continue
+      end do
 
       DXXR = 0.d0
       DXXT = 0.d0
@@ -1229,7 +1228,7 @@
       ITROUBT = 0
       ITROUBC = 0
 !     It seems that for BL Her models fixed undercorrection factor works best
-      do 103 I=1,NZN
+      do I=1,NZN
          IW=1+3*(I-1)
          IR=IW+2
          IC=IW+1
@@ -1247,7 +1246,7 @@
             DXXC=dmax1(DXXC,dabs(DX(IC)/Et(I)))
          if(DXXC>DXKC) ITROUBC=I
          if(DXXT>DXKT) ITROUBT=I
- 103  continue
+      end do
       !write(*,*) 'apply corr', II,dabs(DXXC),dabs(DXXR),dabs(DXXT),ITROUBC, &
       !      Et(ITROUBC),EZH
       !call mesa_error(__FILE__,__LINE__,'debug')
@@ -1256,10 +1255,10 @@
          dabs(DXXT)<PRECR) then
          IZIP=1
          IOP=IOP+1
-         goto 999
+         GOTO 999
       end if
 
- 102  continue
+      end do
 
       write(*,'(A)')
       write(*,*) ' NO CONVERGENCE IN RELAX_ENV, ITERATION: ',II
@@ -1338,6 +1337,5 @@
       end if
       return
       end subroutine RELAX_ENV
-
 
       end module rsp_relax_env

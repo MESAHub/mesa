@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,7 +42,6 @@
 
       !logical, parameter :: report_ierr = .true.
       logical, parameter :: report_ierr = .false.
-
 
       contains
 
@@ -475,18 +474,8 @@
                end do
             end if
 
-
          end subroutine jakob_or_derivs
-
-
-
 
       end subroutine burn_1_zone
 
-
-
-
-
-
       end module net_burn
-

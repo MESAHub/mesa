@@ -1,5 +1,5 @@
       integer, parameter :: num_tau100_Ts = 110
-      real(dp), parameter :: tau100_Ts(num_tau100_Ts) = (/ &
+      real(dp), parameter :: tau100_Ts(num_tau100_Ts) = [ &
         100d0, &
         200d0, &
         300d0, &
@@ -109,7 +109,4 @@
       47000d0, &
       48000d0, &
       49000d0, &
-      50000d0  /)
-      
-      
-      
+      50000d0  ]

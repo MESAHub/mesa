@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,10 +25,9 @@
 
       module net_def
 
-      use const_def, only: dp, qp
+      use const_def, only: dp, qp, i8
 
       implicit none
-
 
       ! reaction_kind array in Net_General_Info
          integer, parameter :: neut_kind = 1  ! involves neut but no prot
@@ -51,11 +50,6 @@
          integer, parameter :: general_two_one_kind = general_one_one_kind + 1  ! 2 species in and 1 out
          integer, parameter :: general_two_two_kind = general_two_one_kind + 1  ! 2 species in and 2 out
          integer, parameter :: max_kind = general_two_two_kind
-
-
-
-
-
 
 
       type Net_General_Info  ! things that are constant for the particular net
@@ -155,15 +149,15 @@
          ! the following are sums of results from system_clock.
          ! divide by clock_rate to get seconds.
          ! must set all of these to 0 before change doing_timing to true.
-         integer(8) :: clock_net_eval
-         integer(8) :: clock_net_weak_rates
-         integer(8) :: clock_net_rate_tables
-         integer(8) :: clock_net_screen
-         integer(8) :: clock_net_derivs
-         integer(8) :: clock_derivs_select
-         integer(8) :: clock_derivs_setup
-         integer(8) :: clock_derivs_general
-         integer(8) :: clock_net_get
+         integer(i8) :: clock_net_eval
+         integer(i8) :: clock_net_weak_rates
+         integer(i8) :: clock_net_rate_tables
+         integer(i8) :: clock_net_screen
+         integer(i8) :: clock_net_derivs
+         integer(i8) :: clock_derivs_select
+         integer(i8) :: clock_derivs_setup
+         integer(i8) :: clock_derivs_general
+         integer(i8) :: clock_net_get
 
          ! bookkeeping
          integer :: handle
@@ -634,7 +628,4 @@
          g% logT_hi_eps_nuc_cancel = logT_hi_eps_nuc_cancel
       end subroutine do_net_set_eps_nuc_cancel
 
-
-
       end module net_def
-

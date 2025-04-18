@@ -2,10 +2,10 @@
         prad    = asol * third * temp * temp * temp * temp
 
 !..first derivatives
-        dpraddd = 0.0d0 
+        dpraddd = 0.0d0
         dpraddt = 4.0d0 * prad * tempinv
-        dpradda = 0.0d0 
-        dpraddz = 0.0d0 
+        dpradda = 0.0d0
+        dpraddz = 0.0d0
 
 !..second derivatives
         dpradddd = 0.0d0
@@ -46,7 +46,7 @@
         srad    = (prad*deninv + erad) * tempinv
 
 !..first derivatives
-        dsraddd = ((dpraddd - prad*deninv)*deninv + deraddd) * tempinv 
+        dsraddd = ((dpraddd - prad*deninv)*deninv + deraddd) * tempinv
         dsraddt = (dpraddt*deninv + deraddt - srad)  * tempinv
         dsradda = 0.0d0
         dsraddz = 0.0d0
@@ -54,7 +54,7 @@
 !..second derivatives
         dsradddd = ((dpradddd &
                     - (2.0d0*dpraddd - 2.0d0*prad*deninv)*deninv)*deninv &
-                     + deradddd) * tempinv 
+                     + deradddd) * tempinv
         dsradddt = ((dpradddt - dpraddt*deninv)*deninv &
                     + deradddt - dsraddd) * tempinv
         dsraddda = 0.0d0

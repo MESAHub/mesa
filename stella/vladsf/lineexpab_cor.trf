@@ -120,7 +120,7 @@
 --  ionization stage, IONDENZ(NR,2,IZ) contains the (IONSTG1(NR,IZ)+1)th
 --  ionization stage, etc.
 
--- (integer) NR1 and NR2 are the indices of the first and second zone over 
+-- (integer) NR1 and NR2 are the indices of the first and second zone over
 -- which to compute the opacity.
 
       character*80  linelist, longlist;
@@ -213,7 +213,7 @@
 
       integer ptrinit;
 
-      common /ltelnz/ptrwavln, pelement, pidmvec, pdumvec , ptznucln, ptenrwt, 
+      common /ltelnz/ptrwavln, pelement, pidmvec, pdumvec , ptznucln, ptenrwt,
          ptenrvec, ptgf, ptelow, ptenrndx, ptionstg, ptwlindx,
          ptrlvndx, nlines;
 
@@ -267,7 +267,7 @@
             do ii = 1, 6;
                i =  ionstg1(nr,iz) + ii - 1;
                --! write(*,*)' nr, iz, ionstg1(nr,iz),  ii, i=',
-               --!            nr, iz, ionstg1(nr,iz),  ii, i; 
+               --!            nr, iz, ionstg1(nr,iz),  ii, i;
                idenz(nr+(i-1)*nradii+(iz-1)*31*nradii)
                     = iondenz(nr,ii,iz);
             end do;
@@ -370,7 +370,7 @@
 -- six ionization stages of any element.
 
             wllog = dlog(wl);
-            denmaxln = idenz(1+(i-1)*nradii+(iz-1)*31*nradii)  - el * hckt(1) 
+            denmaxln = idenz(1+(i-1)*nradii+(iz-1)*31*nradii)  - el * hckt(1)
                        - dvdrlog(1);
 
             do nr = 2, nradii;
@@ -399,11 +399,11 @@
                wlo = wl;
                iz = int(code + 0.001);
                i = int(100.d+00 * (code - dble(iz)) + 0.1d+00) + 1;
-               denmaxln = idenz(1+(i-1)*nradii+(iz-1)*31*nradii)  
+               denmaxln = idenz(1+(i-1)*nradii+(iz-1)*31*nradii)
                           - el*hckt(1) - dvdrlog(1);
 
                do nr = 2, nradii;
-                  denmaxln = max(denmaxln, idenz(nr+(i-1)*nradii+(iz-1)*31*nradii)  
+                  denmaxln = max(denmaxln, idenz(nr+(i-1)*nradii+(iz-1)*31*nradii)
                              - el * hckt(nr) - dvdrlog(nr));
                end do;
 
@@ -428,13 +428,13 @@
               ' equals ', nlcount;
          write(7,*);
          write(7,'(a)') ' Lines per ionization stage read and written:';
-     
+
          write(7,'(a)') '    z    i      read   written';
          do iz = 1, 99;
             do i = 1, iz;
                if (linecountr(i+((iz-1)*iz)/2)  .gt. 0) then;
                   write(7,'(1x,i4,1x,i4,1x,i9,1x,i9)') iz, i,
-                       linecountr(i+((iz-1)*iz)/2) , 
+                       linecountr(i+((iz-1)*iz)/2) ,
                        linecountw(i+((iz-1)*iz)/2);
                end if;
             end do;
@@ -956,7 +956,7 @@
        --call vtime(tm1);
       do nr = nr1, nr2;
          do nw = 1, nwave;
---      	    print *,'s>',nw,scatop(nw,nr), lscat(nr+(nw-1)*nradii)
+--            print *,'s>',nw,scatop(nw,nr), lscat(nr+(nw-1)*nradii)
             scatop(nw,nr) = scatop(nw,nr) + lscat(nr+(nw-1)*nradii);
              -- -- nullified in opacity.f
 --            print *,'a>',nw,opacity(nw,nr), lopac(nr+(nw-1)*nradii)

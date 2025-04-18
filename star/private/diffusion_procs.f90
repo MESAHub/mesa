@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,23 +21,29 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module diffusion_procs
 
-      use const_def, only: dp, ln10
+      use const_def, only: dp, ln10, pi4
       use chem_def
-      use diffusion_support
+      use diffusion_support, only: tiny_mass
+      use star_private_def
 
       implicit none
+
+      private
+      public :: fixup
+      public :: set_new_xa
+      public :: update_rad_accel_face
+      public :: get_limit_coeffs
+      public :: setup_struct_info
 
       integer, parameter :: ngp = 2
       real(dp), public, save :: fk_gam_old(ngp,17)
       logical :: initialize_gamma_grid = .true.
 
       contains
-
 
       subroutine fixup( &
             s, nz, nc, m, nzlo, nzhi, total_num_iters, &
@@ -113,7 +119,6 @@
          end if
 
 !$OMP PARALLEL DO PRIVATE(k, op_err) SCHEDULE(dynamic,2)
-
          do k = nzlo, nzhi
             call get1_dX_dm( &
                k, nz, nc, nzlo, nzhi, &
@@ -124,7 +129,6 @@
                ierr = op_err
             end if
          end do
-
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) then
@@ -1744,6 +1748,5 @@
             end do
          end do
       end subroutine set_new_xa
-
 
       end module diffusion_procs

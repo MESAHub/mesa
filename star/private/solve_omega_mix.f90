@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
       module solve_omega_mix
 
       use star_private_def
-      use const_def, only: qp, dp
+      use const_def, only: qp, dp, i8
 
       implicit none
 
@@ -45,7 +45,7 @@
 
          integer :: ierr, nz, k, max_iters_per_substep, &
             max_iters_total, total_num_iters, num_iters
-         integer(8) :: time0
+         integer(i8) :: time0
          integer :: steps_used, max_steps, min_steps
          real(qp) :: remaining_time, total_time, time, dt, &
             J_tot0, J_tot1, max_del, avg_del, &
@@ -670,10 +670,6 @@
 
          end subroutine create_matrix_and_rhs
 
-
       end function do_solve_omega_mix
 
-
       end module solve_omega_mix
-
-

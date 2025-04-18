@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +22,6 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
-
 
       module mesh_plan
 
@@ -39,9 +38,7 @@
       logical, parameter :: plan_dbg = .false.
       integer, parameter :: kdbg = -1
 
-
       contains
-
 
       subroutine do_mesh_plan( &
             s, nz_old, max_allowed_nz, okay_to_merge, D_mix, &
@@ -1251,6 +1248,5 @@
             return
          end if
       end function round_off_xq
-
 
       end module mesh_plan

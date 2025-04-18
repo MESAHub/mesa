@@ -781,16 +781,6 @@
     burn_min2 = 1000
 
 
-      ! max_conv_vel_div_csound_maxq
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! only consider from center out to this location
-
-      ! ::
-
-    max_conv_vel_div_csound_maxq = 1
-
-
       ! width_for_limit_conv_vel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3386,12 +3376,21 @@
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! convective velocities are limited to local sound speed times this factor
+      ! convective velocities are limited to local sound speed times this factor.
 
       ! ::
 
     max_conv_vel_div_csound = 1d99
 
+
+      ! max_conv_vel_div_csound_maxq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! only consider ``max_conv_vel_div_csound`` from center out to this location
+
+      ! ::
+
+    max_conv_vel_div_csound_maxq = -1
 
       ! max_v_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~
@@ -7417,10 +7416,19 @@
     use_starting_composition_for_kap = .false.
 
 
+      ! opacity_min
+      ! ~~~~~~~~~~~
+
+      ! limit minimum opacities to this value (ignore this if value is < 0)
+
+      ! ::
+
+    opacity_min = -1
+
       ! opacity_max
       ! ~~~~~~~~~~~
 
-      ! limit opacities to this value (ignore this is value is < 0)
+      ! limit opacities to this value (ignore this if value is < 0)
 
       ! ::
 

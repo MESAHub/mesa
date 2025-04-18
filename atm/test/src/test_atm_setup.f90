@@ -14,7 +14,7 @@ module test_atm_setup
 contains
 
    subroutine setup
-      use const_lib
+      use const_lib, only: const_init
 
       logical, parameter :: use_cache = .true.
       character(len=256) :: my_mesa_dir

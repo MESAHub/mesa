@@ -1,4 +1,4 @@
-   Logical RadP;
+   Logical :: RadP;
    COMMON/RadP/RadP;
    COMMON/ARG/TP,PL,CHEM,LST,KENTR,JURS;
    COMMON/RESULT/P,Egas,Sgas,ENG,CAPPA,PT,ET,ST,ENGT,CAPT,NZR;

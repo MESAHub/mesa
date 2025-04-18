@@ -8,7 +8,7 @@
 --                   Jacobian in DIFJAC
 --     30 Jan 1997   attempt to correct HapH by exp(-dr*chi) (Tokyo Univ.)
 --     01 Feb 1997   closer to Chetverushkin
---     06 Jun 2009   new diagnostics for radii at Badste 
+--     06 Jun 2009   new diagnostics for radii at Badste
 --
 --     Right-hand side for ODE  for radiative transfer
 --     and Jacobian for STIFF.
@@ -109,7 +109,7 @@
 %D_PhArr:
     _Do K=1,Nzon;
        Ry(K)=Fsave(K);
-       If(K>1)then; 
+       If(K>1)then;
          if(Ry(K)<=Ry(K-1) )then; -- try new smaller step
            Badste=.true.;
 --           @wterm' Difmat Km=',K-1,'  R0=',Ry(K-1),'  u0=',Uy(K-1);
@@ -186,7 +186,7 @@
              [RADP=.FALSE.;PL=PL1; Tp=Tp1;
                _Do i=1, Natom;  Yat(i)=YABUN(I,Km) _OD;
                CHEM=CHEM0(Km);
-               CALL URSOS; 
+               CALL URSOS;
                kmhap=km; CALL HAPPA;
                PTth=Tp*PT;
                KMth=Km;
@@ -240,8 +240,8 @@
               Tp=Tp1;
               CHEM=CHEM0(Km);
               CALL URSOS;
-              kmhap=km;  
-              CALL OPACIT; 
+              kmhap=km;
+              CALL OPACIT;
               CALL HAPPA;
               _DO L=1,NFRUS; hapL1D(L)=hapPAL(L);
                              HAAB1D(L)=hapABS(L)_OD;
@@ -254,9 +254,9 @@
               PL=PL1;
               CHEM=CHEM0(Km);
               Tp=Tp1*(1.D0+DELTA);  --  DISTURB TEMPERATURE
-              CALL URSOS; 
-              kmhap=km; 
-              CALL OPACIT; 
+              CALL URSOS;
+              kmhap=km;
+              CALL OPACIT;
               CALL HAPPA;
               _DO L=1,NFRUS;
                  hapL1T(L)=hapPAL(L);
@@ -337,7 +337,7 @@
 %DENAD:
   <*URS:   *>;
    PTth=Tp*PT;
-   kmhap=km+1; 
+   kmhap=km+1;
    _If Km+1<=Ncnd _Then
       CALL OPACIT;
    _else
@@ -589,7 +589,7 @@
 --DEB:
 --       if(km==273)write(@wres,'(a,2i3,1p,3e12.3)')
 --            ' km,L,DFH(L)=', km,1,DFH(1);
-       
+
        If(Badste)return;
  --    _CALL @DERAT;
        FRST=.FALSE.;
@@ -625,7 +625,7 @@
      '  HEAT COND=',(FL0-FL1)*CDMETI,
      '  HTJ=',TOTW*CKRAD/ET1,
      '  HTH=',TOTWPR*CKRAD/ET1;
-   endif; 
+   endif;
 */
 
 --    IF(Km>Ncnd & Km<Nzon)then;
@@ -633,10 +633,10 @@
 --     if (nstep==320) then;
         LfrDebug=56; -- freq to test
   --   else;
-    --    LfrDebug=57; -- freq to test 
+    --    LfrDebug=57; -- freq to test
 --     endif;
      IF(Km>Ncnd & Km<Ncnd+4)then;
-     WRITE(@wres,'(3(A,I10))') ' LfrDebug=',LfrDebug,' Nperturb=', Nperturb; 
+     WRITE(@wres,'(3(A,I10))') ' LfrDebug=',LfrDebug,' Nperturb=', Nperturb;
      WRITE(@wres,'(4(A,I10),2(A,L5))') ' NSTEP=',NSTEP,' Km=',Km,
        ' Ncnd=',Ncnd,' Nfrus=',Nfrus,
        '  EVJA=',EVALJA,'  LTH(40)=',LTHICK(40,Km);
@@ -680,7 +680,7 @@
          _DO L=1,NFRUS;
             FIMP=FIMP+@FH1*WEIGHT(L)*hapH1(L);
             FLUM=FLUM+@FH1*WEIGHT(L);
-            If(L==LfrDebug & Km<Ncnd+5 ) 
+            If(L==LfrDebug & Km<Ncnd+5 )
             WRITE(@wres,'(A,2I5,1X,6(A,1P,E20.12))')' km, Nperturb =',
                   km,Nperturb,' @FH1=',@FH1;
          _OD;
@@ -721,7 +721,7 @@
             @wterm ' NSTEP, NDebug, L, IK: ', NSTEP, NDebug, L, IK;
             @wterm ' t tfeau trlx ', t, tfeau, trlx;
             @wterm ' tw, ww ', tw, ww;
-            @wterm ' EddJ EddO EddN ', EddJ(IK,L),EddO(IK,L),EddN(IK,L);     
+            @wterm ' EddJ EddO EddN ', EddJ(IK,L),EddO(IK,L),EddN(IK,L);
 --            pause;
           endif;
 */
@@ -733,7 +733,7 @@
         _DO IK=Ncnd+1,NZON;
            EddJ(IK,L)=EddN(IK,L)
         _OD;
-         HEdd(L)=HEdN(L);    
+         HEdd(L)=HEdN(L);
       _od;
-    ENDIF;  
+    ENDIF;
 

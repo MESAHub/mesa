@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,6 +30,38 @@
       use utils_lib
 
       implicit none
+
+      private
+      public :: do_remove_center_at_cell_k
+      public :: do_remove_center_by_temperature
+      public :: do_remove_center_by_radius_cm
+      public :: do_remove_inner_fraction_q
+      public :: do_remove_center_by_he4
+      public :: do_remove_center_by_c12_o16
+      public :: do_remove_center_by_si28
+      public :: do_remove_center_to_reduce_co56_ni56
+      public :: do_remove_center_by_ye
+      public :: do_remove_center_by_entropy
+      public :: do_remove_center_by_infall_kms
+      public :: do_remove_center_at_inner_max_abs_v
+      public :: do_remove_center_by_mass_gm
+      public :: do_remove_fe_core
+      public :: do_zero_inner_v_by_mass_gm
+      public :: do_relax_to_star_cut
+      public :: do_remove_surface_by_v_surf_km_s
+      public :: do_remove_surface_by_v_surf_div_cs
+      public :: do_remove_surface_by_v_surf_div_v_escape
+      public :: do_remove_surface_at_cell_k
+      public :: do_remove_surface_at_he_core_boundary
+      public :: do_remove_surface_by_optical_depth
+      public :: do_remove_surface_by_density
+      public :: do_remove_surface_by_pressure
+      public :: do_remove_surface_by_radius_cm
+      public :: do_remove_surface_by_q
+      public :: do_remove_surface_by_mass_gm
+      public :: do_limit_center_logp
+      public :: do_remove_center_by_logrho
+      public :: do_remove_fallback
 
       contains
 
@@ -1376,6 +1408,5 @@
          s% need_to_setvars = .true.
 
       end subroutine do_relax_to_star_cut
-
 
       end module remove_shells

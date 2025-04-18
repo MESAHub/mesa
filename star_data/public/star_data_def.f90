@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,7 +21,6 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
 module star_data_def
@@ -29,7 +28,7 @@ module star_data_def
    use rates_def, only: rates_reaction_id_max, other_screening_interface, other_rate_get_interface
    use utils_def, only: integer_dict
    use chem_def, only: num_categories, iso_name_length
-   use const_def, only: sp, dp, qp, strlen, max_extra_inlists
+   use const_def, only: sp, dp, qp, i8, strlen, max_extra_inlists
    use rates_def, only: maxlen_reaction_Name
    use eos_def, only: EoS_General_Info
    use kap_def, only: Kap_General_Info
@@ -49,7 +48,7 @@ module star_data_def
          step_loop_timing, after_step_timing, before_step_timing, &
          check_time_start, check_time_end, elapsed_time, &
          check_step_loop_timing, check_after_step_timing, check_before_step_timing
-      integer(8) :: time0, time1, clock_rate, time0_extra, time1_extra, time0_initial
+      integer(i8) :: time0, time1, clock_rate, time0_extra, time1_extra, time0_initial
    end type star_job_controls
 
    type star_info

@@ -236,13 +236,19 @@ contains
 
 ! say the initial conditions
       write (6, 23) 'T     =', T, 'Rho   =', Rho, 'abar  =', abar, 'zbar  =', zbar
-      write (6, 23) 'h1    =', xa(net_iso(ih1)), 'he4   =', xa(net_iso(ihe4)), 'c12   =', xa(net_iso(ic12)), 'n14   =', xa(net_iso(in14))
+      write (6, 23) 'h1    =', xa(net_iso(ih1)), 'he4   =', xa(net_iso(ihe4)), &
+         'c12   =', xa(net_iso(ic12)), 'n14   =', xa(net_iso(in14))
       write (6, 23) 'o16   =', xa(net_iso(io16)), 'ne20  =', xa(net_iso(ine20)), 'mg24  =', xa(net_iso(img24))
 
 ! write out the mass fraction changes
       write (6, '(A)')
-      write (6, 24) 'd(h1)/dt   =', dxdt(net_iso(ih1)), 'd(he4)/dt  =', dxdt(net_iso(ihe4)), 'd(c12)/dt  =', dxdt(net_iso(ic12)), 'd(n14)/dt  =', dxdt(net_iso(in14))
-      write (6, 24) 'd(o16)/dt  =', dxdt(net_iso(io16)), 'd(ne20)/dt =', dxdt(net_iso(ine20)), 'd(mg24)/dt =', dxdt(net_iso(img24))
+      write (6, 24) 'd(h1)/dt   =', dxdt(net_iso(ih1)), &
+         'd(he4)/dt  =', dxdt(net_iso(ihe4)), &
+         'd(c12)/dt  =', dxdt(net_iso(ic12)), &
+         'd(n14)/dt  =', dxdt(net_iso(in14))
+      write (6, 24) 'd(o16)/dt  =', dxdt(net_iso(io16)), &
+         'd(ne20)/dt =', dxdt(net_iso(ine20)), &
+         'd(mg24)/dt =', dxdt(net_iso(img24))
 
 ! check non-conservation
       xsum = dxdt(net_iso(ih1)) + dxdt(net_iso(ihe4)) + dxdt(net_iso(ic12)) + dxdt(net_iso(in14)) &
@@ -253,7 +259,7 @@ contains
       write (6, 24) 'eps_nuc    =', eps_nuc, 'erg/g/sec'
 
 ! back for more
-      goto 100
+      GOTO 100
 
    end subroutine do1_net_eval
 

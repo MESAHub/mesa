@@ -222,6 +222,7 @@ end module mod_test_chem
 
 program test_chem
    use mod_test_chem
+   implicit none
    !call write_element_ids; stop
    call do_test
 end program test_chem

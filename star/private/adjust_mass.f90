@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,20 +23,19 @@
 !
 ! ***********************************************************************
 
-
       module adjust_mass
 
       use star_private_def
-      use const_def, only: dp, ln10, msun, msun, secyer, one_third, four_thirds_pi
+      use const_def, only: dp, i8, ln10, msun, msun, secyer, one_third, four_thirds_pi
       use utils_lib
 
       implicit none
 
       private
-      public :: do_adjust_mass, compute_prev_mesh_dm
+      public :: do_adjust_mass
+      public :: compute_prev_mesh_dm
 
       logical, parameter :: dbg_adjm = .false.
-
 
       contains
 
@@ -198,7 +197,7 @@
          real(dp), pointer :: work(:)
 
          integer :: j, k, l, m, k_const_mass, nz, k_below_just_added, k_newval
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: partial_xa_mass, region_total_mass
          real(dp) :: starting_j_rot_surf
 
@@ -650,8 +649,6 @@
             write(*,1) 'delta_m', delta_m
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
-
-
 
 
          okay_to_move_kB_inward = .false.
@@ -1630,17 +1627,4 @@
 
       end subroutine set_D_omega
 
-
       end module adjust_mass
-
-
-
-
-
-
-
-
-
-
-
-

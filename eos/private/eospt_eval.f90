@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,6 @@
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
 !
 ! ***********************************************************************
 
@@ -32,12 +31,10 @@
 
       implicit none
 
-
       integer, parameter :: doing_get_T = 1
       integer, parameter :: doing_get_Pgas = 2
 
       contains
-
 
       subroutine Get_eosPT_Results(rq, &
                Z_in, X_in, abar, zbar, &
@@ -613,4 +610,3 @@
       end subroutine do_safe_get_Pgas_T
 
       end module eosPT_eval
-

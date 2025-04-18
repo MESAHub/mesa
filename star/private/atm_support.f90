@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,7 +32,6 @@ module atm_support
   implicit none
 
   private
-
   public :: get_atm_PT
   public :: get_atm_PT_legacy_grey_and_kap
   public :: get_atm_tau_base

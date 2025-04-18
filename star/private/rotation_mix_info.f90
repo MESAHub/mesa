@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,10 +23,10 @@
 !
 ! ***********************************************************************
 
-
       module rotation_mix_info
 
-      use const_def, only: dp, pi, pi4, qe, clight, crad, boltz_sigma, lsun, msun, rsun, one_third, convective_mixing, overshoot_mixing
+      use const_def, only: dp, pi, pi4, qe, clight, crad, boltz_sigma, lsun, msun, rsun, one_third, &
+                           convective_mixing, overshoot_mixing
       use num_lib
       use utils_lib
       use star_private_def
@@ -48,9 +48,7 @@
       integer, parameter :: i_ST = i_GSF + 1
       integer, parameter :: num_instabilities = i_ST
 
-
       contains
-
 
       subroutine set_rotation_mixing_info(s, ierr)
          use star_utils, only: weighed_smoothing
@@ -1375,6 +1373,5 @@
             if (dc(k) < tiny) dc(k) = 0
          end do
       end subroutine zero_if_tiny
-
 
       end module rotation_mix_info

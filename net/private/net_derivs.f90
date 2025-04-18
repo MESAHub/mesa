@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,7 +35,6 @@
       real(dp), parameter :: tiny_rate = 1d-50
 
       contains
-
 
       subroutine get_derivs( &
             n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
@@ -1835,20 +1834,6 @@
 
          end subroutine do_FL_3alf
 
-
       end subroutine update_special_rates
 
       end module net_derivs
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,19 +21,17 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module chem_lib
+
       use chem_def, only: chem_has_been_initialized
       use const_def, only: dp
       use math_lib
 
       implicit none
 
-
       contains
-
 
       subroutine chem_init(isotopes_filename, ierr)
          ! uses mesa_data_dir from const_def
@@ -720,9 +718,6 @@
 
          chem_M_div_h = log10(z/x)-log10(zsolar/(1.d0-zsolar-ysolar))
 
-
       end function chem_M_div_h
 
-
       end module chem_lib
-

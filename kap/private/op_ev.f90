@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,6 +24,7 @@
 ! ***********************************************************************
 
 module op_ev
+
    use math_lib
    use op_def
    use utils_lib
@@ -31,6 +32,13 @@ module op_ev
    use kap_def, only: kap_test_partials, kap_test_partials_val, kap_test_partials_dval_dx
 
    implicit none
+
+   private
+   public :: abund
+   public :: rd
+   public :: ross
+   public :: mix
+   public :: interp
 
 contains
 

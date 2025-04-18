@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,7 +27,8 @@ module pgstar_support
 
    use star_private_def
    use const_def, only: dp, secday, secyer, mesa_data_dir, &
-      overshoot_mixing, rotation_mixing, thermohaline_mixing, semiconvective_mixing, leftover_convective_mixing, convective_mixing, no_mixing
+      overshoot_mixing, rotation_mixing, thermohaline_mixing, semiconvective_mixing, &
+      leftover_convective_mixing, convective_mixing, no_mixing
    use rates_def, only : i_rate
    use utils_lib
    use star_pgstar

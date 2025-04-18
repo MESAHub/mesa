@@ -1,0 +1,120 @@
+---
+name: Run Test Suite
+
+on: [workflow_dispatch, release]
+
+jobs:
+  test_mesa:
+    environment: gh-action-testhub
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Print git hash
+        run: |
+          cd $GITHUB_WORKSPACE
+          pwd
+          git branch
+          git log --pretty=format:'%h' -n 1
+        shell: bash
+
+      - name: Install MESA on ${{ runner.os }} with SDK 24.7.1
+        uses: ./.github/actions/install-mesa
+        with:
+          sdk: "24.7.1"
+
+      - name: Checkout mesa_test
+        uses: actions/checkout@v4
+        with:
+          repository: MESAHub/mesa_test
+          path: mesa_test  # Store in $GITHUB_WORKSPACE/mesa_test
+
+      - name: Install mesa_test
+        run: |
+          cd $GITHUB_WORKSPACE/mesa_test
+          sudo gem install mesa_test
+          cd $GITHUB_WORKSPACE
+          mkdir /home/runner/.mesa_test
+        shell: bash
+
+      - name: Create mesa_test config file
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          MESA_TEST_YML=/home/runner/.mesa_test/config.yml
+          echo "---" > $MESA_TEST_YML
+          echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
+          echo "email: ${{ secrets.MESA_TEST_EMAIL }}" >> $MESA_TEST_YML
+          echo "password: ${{ secrets.MESA_TEST_PASSWORD }}" >> $MESA_TEST_YML
+          echo "logs_token: ${{ secrets.MESA_TEST_LOGS_TOKEN }}" >> $MESA_TEST_YML
+          echo "github_protocol: :ssh" >> $MESA_TEST_YML
+          echo "mesa_mirror: $GITHUB_WORKSPACE/mirror" >> $MESA_TEST_YML
+          echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
+          echo "platform: Linux" >> $MESA_TEST_YML
+          echo "platform_version: Ubuntu" >> $MESA_TEST_YML
+        shell: bash
+
+      - name: Check Install
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test submit --empty
+        shell: bash
+
+      - name: Test Problem 13
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 13 --module=star
+        shell: bash
+
+      - name: Test Problem 15
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 15 --module=star
+        shell: bash
+
+      - name: Test Problem 29
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 29 --module=star
+        shell: bash
+
+      - name: Test Problem 41
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 41 --module=star
+        shell: bash

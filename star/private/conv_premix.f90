@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,13 +25,16 @@
 
 module conv_premix
 
-  use const_def, only: dp, msun, convective_mixing
+  use const_def, only: dp, i8, msun, convective_mixing
   use star_private_def
   use chem_def
   use chem_lib
   use num_lib
 
   implicit none
+
+  private
+  public :: do_conv_premix
 
   integer, parameter :: BURN_TYPE_NONE = 1
   integer, parameter :: BURN_TYPE_H = 2
@@ -80,11 +83,6 @@ module conv_premix
      integer               :: kc_b = 0
   end type saved_data
 
-  private
-
-  public :: do_conv_premix
-
-
 contains
 
   subroutine do_conv_premix (s, ierr)
@@ -106,7 +104,7 @@ contains
     integer                      :: i_bdy
     logical                      :: t_bdy
 
-    integer(8)                   :: time0
+    integer(i8)                   :: time0
     real(dp)                     :: total
 
     ierr = 0
@@ -1563,8 +1561,6 @@ contains
     ! explicitly in sd
 
     call update_model_(s, update_mode, kc_t, kc_b)
-
-    return
 
   end subroutine restore_model_
 
