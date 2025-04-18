@@ -42,6 +42,10 @@ Previous MESA versions exclusively adopted the latter.
 By user request, a radiation diffusion flux limiter has been reintroduced with the 
 control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_form_of_T_gradient_eqn``.
 
+The Fe core-collapse infall condition ``fe_core_infall_limit`` has been adjusted, and an additional optional infall condition
+has been introduced. Users can switch between either choice with the new logical control ``check_mass_sum_for_infall``.
+See the ``&controls`` for further details. 
+
 .. _Bug Fixes main:
 
 Bug Fixes

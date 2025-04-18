@@ -400,17 +400,23 @@
 
             mass_sum = 0d0
             if (s% fe_core_mass > 0) then
-               do k=1, nz
-                  if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
-               end do
+               if (s% check_mass_sum_for_infall) ! if > fe_core_infall_mass of core is infalling, report max infall velocity regardless of its location
+                  do k=1, nz
+                     if (s% m(k) > Msun*s% fe_core_mass) cycle
+                     if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
+                  end do
 
-               k = nz
-               do while (k > 1 .and. s% m(k) <= s% fe_core_mass * Msun)
-                  k = k-1 ! loop outwards
-               end do
-               ! k is now the outer index of the fe core
-               s% fe_core_infall = - minval(s%v(k:nz))
+                  if(mass_sum > s% fe_core_infall_mass*msun) then
+                     s% fe_core_infall = -velocity(k_min)
+                  end if
+               else ! look for location of peak infall velocity inside fe_core (not necessarily the maximum)
+                  k = nz
+                  do while (k > 1 .and. s% m(k) <= s% fe_core_mass * Msun)
+                     k = k-1 ! loop outwards
+                  end do
+                  ! k is now the outer index of the fe core
+                  s% fe_core_infall = - minval(s%v(k:nz))
+               end if
             end if
 
             non_fe_core_mass = s% he_core_mass
