@@ -152,8 +152,8 @@
                termination_code_str(t_xtra1) = 'FAIL: A=24 electron captures should have occurred by now'
                s% termination_code = t_xtra1
                return
-            endif
-         endif
+            end if
+         end if
 
          if (s% log_center_temperature > log_center_temperature_limit) then
             extras_check_model = terminate
@@ -163,16 +163,16 @@
             else
                termination_code_str(t_xtra3) = 'PASS: A=20 electron captures have started a thermal runaway in the core'
                s% termination_code = t_xtra3
-            endif
+            end if
             return
-         endif
+         end if
 
          if (s% log_center_density >= log_center_density_upper_limit) then
             extras_check_model = terminate
             termination_code_str(t_xtra4) = 'FAIL: electron captures should have occurred by now'
             s% termination_code = t_xtra4
             return
-         endif
+         end if
 
          return
 

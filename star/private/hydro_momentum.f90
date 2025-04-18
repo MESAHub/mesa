@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module hydro_momentum
 
       use star_private_def
@@ -35,12 +34,12 @@
       implicit none
 
       private
-      public :: do1_momentum_eqn, do_surf_momentum_eqn, do1_radius_eqn, &
-         expected_HSE_grav_term
-
+      public :: do1_momentum_eqn
+      public :: do_surf_momentum_eqn
+      public :: do1_radius_eqn
+      public :: expected_HSE_grav_term
 
       contains
-
 
       subroutine do_surf_momentum_eqn(s, P_surf_ad, nvar, ierr)
          use star_utils, only: store_partials
@@ -602,6 +601,5 @@
             write(*,*) 'do1_radius_eqn', s% solver_test_partials_var
          end if
       end subroutine do1_radius_eqn
-
 
       end module hydro_momentum

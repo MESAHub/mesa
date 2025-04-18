@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,6 @@
       public :: read_star_photo
 
       contains
-
 
       subroutine read_star_photo(s, fname, ierr)
          use utils_lib, only: integer_dict_define, integer_dict_create_hash
@@ -322,8 +321,6 @@
             failed = .false.
          end function failed
 
-
       end subroutine read_star_photo
-
 
       end module photo_in

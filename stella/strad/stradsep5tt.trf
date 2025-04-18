@@ -837,7 +837,7 @@ end;
        if(istim>1 .and. istim <= @ns)then;
 --         Opafile=Opafile(1:len_trim(Opafile)-1)//'2';
                ihp=istim;
-               thaplog1=stmlog(istim-1); 
+               thaplog1=stmlog(istim-1);
                thaplog2=stmlog(istim);
        else;
          write(*,*)' in strad istim=',istim;
@@ -1710,10 +1710,10 @@ end;
 --  _Do K=1,NZON-1;
  _Do K=1,NZON; -- try to use non-zero for the last zone also
       EpsUq=max(EpsUq,DRT*Eps*abs(Uy(K)));
---    EpsUq=max(EpsUq,DRT*Eps*abs(Uy(K)))/dble(NZON); 
+--    EpsUq=max(EpsUq,DRT*Eps*abs(Uy(K)))/dble(NZON);
       -- we continue to apply nonzero QRT_cold even
       -- for positive UU2 since we have no infinite
-      -- accuracy:  Eps is the measure of the Stiff accuracy, 
+      -- accuracy:  Eps is the measure of the Stiff accuracy,
       -- division by NZON could provide for a proportion at homologous expansion
       -- it is better to reduce EpsUq reducing DRT, than hardcoding it here via NZON
       -- EpsUq may give too high artificial pressure if not reduced by DRT

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,19 +21,17 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module chem_isos_io
+
       use chem_def
       use math_lib
       use const_def, only: dp, amu, clight, five_thirds, mev_to_ergs
 
       implicit none
 
-
       contains
-
 
       subroutine do_read_chem_isos(isotopes_filename, ierr)
          use utils_lib
@@ -237,6 +235,5 @@
          if (ierr /= 0) return
 
       end subroutine do_create_nuclides_dict
-
 
       end module chem_isos_io

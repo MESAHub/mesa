@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,9 +30,10 @@
 
       implicit none
 
+      private
+      public :: eval_typical_charge
 
       logical, parameter :: dbg = .false.
-
 
       contains
 
@@ -113,9 +114,4 @@
          end do
       end function get_typical_charge
 
-
-
-
-
       end module mod_typical_charge
-

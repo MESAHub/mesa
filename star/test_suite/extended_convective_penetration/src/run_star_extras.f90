@@ -294,8 +294,8 @@
                 f = 0.0_dp
                 f0 = 0.0_dp
                 f2 = 0.0_dp
-            endif
-        endif
+            end if
+        end if
 
         ! Evaluate convective boundary (_cb) parameters
         call star_eval_conv_bdy_r(s, i, r_cb, ierr)
@@ -319,13 +319,13 @@
             k_a = k_ob+1
             k_b = s%nz
             dk = 1
-        endif
+        end if
 
         if (f > 0.0_dp) then
             r_step = f*Hp_cb
         else
             r_step = 0.0_dp
-        endif
+        end if
 
         face_loop : do k = k_a, k_b, dk
             ! Evaluate the extended convective penetration factor
@@ -334,7 +334,7 @@
                 dr = r - r_ob
             else
                 dr = r_ob - r
-            endif
+            end if
 
             if (dr < r_step .AND. f > 0.0_dp) then  ! step factor
                 factor = 1.0_dp
@@ -343,8 +343,8 @@
                     factor = exp(-2.0_dp*(dr-r_step)/(f2*Hp_cb))
                 else
                     factor = 0.0_dp
-                endif
-            endif
+                end if
+            end if
 
             ! Store the diffusion coefficient and velocity
             D(k) = (D0 + Delta0*D_ob)*factor
@@ -360,7 +360,7 @@
             if (D(k) < s%overshoot_D_min) then
                 k_b = k
                 exit face_loop
-            endif
+            end if
 
         end do face_loop
 
@@ -398,7 +398,7 @@
               write(*,*) 'runstarex_gradT: skip since there are no convective boundaries'
            end if
            return
-        endif
+        end if
 
         do k= s%nz, 1, -1
             if (s%D_mix(k) <= s% min_D_mix) exit

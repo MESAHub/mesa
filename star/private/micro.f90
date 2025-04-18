@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,16 +26,13 @@
 module micro
 
   use star_private_def
-  use const_def, only: dp, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
+  use const_def, only: dp, i8, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
   use star_utils, only: foreach_cell
   use utils_lib, only: is_bad
 
   implicit none
 
-  logical, parameter :: dbg = .false.
-
   private
-
   public :: set_micro_vars
   public :: set_eos_with_mask
   public :: do_eos_for_cell
@@ -43,6 +40,7 @@ module micro
   public :: do_kap_for_cell
   public :: shutdown_microphys
 
+  logical, parameter :: dbg = .false.
   logical :: initiaze_kap_grid = .true.
   real(dp), public, save :: fk_pcg_old(17)
 
@@ -65,7 +63,7 @@ contains
     integer, intent(out) :: ierr
 
     integer :: k, op_err, i
-    integer(8) :: time0
+    integer(i8) :: time0
     real(dp) :: total, alfa, beta
     character(len=4) :: e_name
     real(dp) :: fk(17), delta
@@ -653,6 +651,12 @@ contains
        s% d_opacity_dlnT(k) = 0
     end if
 
+    if (s% opacity(k) < s% opacity_min .and. s% opacity_min > 0) then
+       s% opacity(k) = s% opacity_min
+       s% d_opacity_dlnd(k) = 0
+       s% d_opacity_dlnT(k) = 0
+    end if
+
     if (is_bad_num(s% opacity(k))) then
        if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)
@@ -764,6 +768,5 @@ contains
     call kap_shutdown
     call net_shutdown
   end subroutine shutdown_microphys
-
 
 end module micro

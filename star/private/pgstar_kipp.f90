@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,6 @@
       implicit none
 
       contains
-
 
       subroutine Kipp_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -814,10 +813,6 @@
             call pgdraw(xval, top)
          end subroutine draw1
 
-
       end subroutine do_Kipp_Plot
 
-
-
       end module pgstar_kipp
-

@@ -123,18 +123,18 @@
 ! C%C      do IX=1,MAXY
 ! C%C         write(*,'(''Z, A ('',I2,''): ''$)') IX
 ! C%C         read*,AZion(IX),ACMI(IX)
-! C%C        if (AZion(IX).le.0..or.ACMI(IX).le.0.) goto 2
+! C%C        if (AZion(IX).le.0..or.ACMI(IX).le.0.) GOTO 2
 ! C%C         write(*,'(''x ('',I2,''): ''$)') IX
 ! C%C         read*,AY(IX)
 ! C%C         XSUM=XSUM+AY(IX)
-! C%C        if (AY(IX).le.0.) goto 2
+! C%C        if (AY(IX).le.0.) GOTO 2
 ! C%C         NMIX=IX
-! C%C        if (dabs(XSUM-1.d0).lt.EPS) goto 2
+! C%C        if (dabs(XSUM-1.d0).lt.EPS) GOTO 2
 ! C%C      end do
 ! C%C    2 continue
 ! C%C      if (NMIX.eq.0) then
 ! C%C         print*,'There must be at least one set of positive (x,Z,A).'
-! C%C        goto 3
+! C%C        GOTO 3
 ! C%C      end if
 ! C%C      write(*,114)
 ! C%C      do IX=1,NMIX
@@ -147,7 +147,7 @@
 ! C%C   10 continue
 ! C%C      write(*,'('' Input RHO [g/cc] (<0 to new T): ''$)')
 ! C%C      read*,RHO
-! C%C      if (RHO.le.0.) goto 9
+! C%C      if (RHO.le.0.) GOTO 9
 ! C%C      RHOlg=dlog10(RHO)
 ! C%C      Tlg=dlog10(T)
 ! C%C      T6=10.d0**(Tlg-6.d0)
@@ -178,7 +178,7 @@
 ! LIQSOL = 0 in the liquid state, = 1 in the solid state
 ! C%C      write(*,111) RHO,T6,P,PnkT,CV,CHIT,CHIR,UNkT,SNk,GAMI,TPT,CHI,
 ! C%C     *  LIQSOL
-! C%C      goto 10
+! C%C      GOTO 10
 ! C%C  112 format(/
 ! C%C     *  ' rho [g/cc]     T6 [K]      P [Mbar]   P/(n_i kT)  Cv/(N k)',
 ! C%C     *  '     chi_T       chi_r      U/(N k T)    S/(N k)    Gamma_i',
@@ -1612,7 +1612,8 @@
       type(auto_diff_real_2var_order1) :: TEMR, EF, DeltaEF, G, PF, F, DF, P, DelP, S, U
       type(auto_diff_real_2var_order1) :: DENR, DT, D1, D2
       type(auto_diff_real_2var_order1) :: TPI, dndH, dndT, dndHH, dndHT, dndTT
-      type(auto_diff_real_2var_order1) :: W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT,W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT,W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,W0XXX,W0XTT,W0XXT
+      type(auto_diff_real_2var_order1) :: W0, W0DX, W0DT, W0DXX, W0DTT, W0DXT, &
+                                          W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT,W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,W0XXX,W0XTT,W0XXT
 
       type(auto_diff_real_2var_order1) :: BOHR
       type(auto_diff_real_2var_order1) :: PI2
@@ -1706,7 +1707,8 @@
       type(auto_diff_real_2var_order1), intent(out) :: W0XXX,W0XTT,W0XXT
 
       type(auto_diff_real_2var_order1) :: CMU, CMU1, PIT26, CN0, CN1, CN2
-      type(auto_diff_real_2var_order1) :: CJ00,CJ10,CJ20,CJ01,CJ11,CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
+      type(auto_diff_real_2var_order1) :: CJ00,CJ10,CJ20,CJ01,CJ11, &
+                                          CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
 
       if (CHI<.5d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: non-degenerate (small CHI)')
       if (TEMR<=0.d0) call mesa_error(__FILE__,__LINE__,'SOMMERF: T < 0')
@@ -1758,7 +1760,8 @@
 ! Supplement to SOMMERF
 
       type(auto_diff_real_2var_order1), intent(in) :: CMU1
-      type(auto_diff_real_2var_order1), intent(out) :: CJ00,CJ10,CJ20,CJ01,CJ11,CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
+      type(auto_diff_real_2var_order1), intent(out) :: CJ00,CJ10,CJ20,CJ01,CJ11,&
+                                                       CJ21,CJ02,CJ12,CJ22,CJ03,CJ13,CJ23,CJ04,CJ14,CJ24,CJ05
 
       type(auto_diff_real_2var_order1) :: X0, X3, X5, CL, CMU
 

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,15 +23,16 @@
 !
 ! ***********************************************************************
 
-
       module adjust_net
 
       use star_private_def
 
       implicit none
 
-      contains
+      private
+      public :: check_adjust_net
 
+      contains
 
       subroutine check_adjust_net(s, species, &
             min_x_for_keep, min_x_for_n, min_x_for_add, &
@@ -239,9 +240,7 @@
          s% revised_net_name = s% net_name
          s% need_to_setvars = .true.
 
-
          contains
-
 
          subroutine include_iso(Z,N)
             integer, intent(in) :: Z,N
@@ -251,21 +250,6 @@
             if (N > max_N(Z)) max_N(Z) = N
          end subroutine include_iso
 
-
       end subroutine check_adjust_net
 
-
-
       end module adjust_net
-
-
-
-
-
-
-
-
-
-
-
-

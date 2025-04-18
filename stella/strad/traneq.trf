@@ -25,7 +25,7 @@ Subroutine TranEq;
 --                NSTEP,Km,L,@FJ1,@FJ2,@FH1;
       RETURN;
     ENDIF;
---    If(km==1 & L==LfrDebug  & FRST)THEN; 
+--    If(km==1 & L==LfrDebug  & FRST)THEN;
 --      WRITE(@term,'('' NSTEP Km L FJ(B C) FH(B) '',3I5,1P,3E10.2)')
 --                NSTEP,Km,L,@FJ1,@FJ2,@FH1;
 --    ENDIF;
@@ -104,7 +104,7 @@ Subroutine TranEq;
                                         );
 -- DEB:
    If(Nstep>=NDebug .and. Km>Ncnd .and. Km<Ncnd+3 .and. L==LfrDebug)then;
-      write(@wres,'(3(A,I10))') ' LfrDebug=',LfrDebug,' Nperturb=', Nperturb; 
+      write(@wres,'(3(A,I10))') ' LfrDebug=',LfrDebug,' Nperturb=', Nperturb;
       write(@wres,*)' traneq Km & L DFH(L)=',km,L,DFH(L);
       write(@wres,'(a,1p,e12.3)')' -4.D0*@FH1*U1/R1=',-4.D0*@FH1*U1/R1;
       write(@wres,'(a,1p,e22.12)')' FJ=',CLIGHT*(

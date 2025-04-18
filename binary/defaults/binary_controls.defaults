@@ -493,7 +493,7 @@
 
 ! ::
 
-    use_radiation_corrected_transfer_rate = .true.
+    use_radiation_corrected_transfer_rate = .false.
 
 
 ! initial_bh_spin
@@ -1503,5 +1503,3 @@
     x_integer_ctrl(1:binary_num_x_ctrls) = 0
     x_logical_ctrl(1:binary_num_x_ctrls) = .false.
     x_character_ctrl(1:binary_num_x_ctrls) = ''
-
-

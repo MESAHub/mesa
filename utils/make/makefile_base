@@ -19,17 +19,17 @@ else
 endif
 
 SRCS = \
-   utils_def.f90 \
-   utils_dict.f90 \
-   utils_idict.f90 \
-   utils_lib.f90 \
-   utils_nan.f90 \
-   utils_nan_sp.f90 \
-   utils_nan_dp.f90 \
-   utils_nan_qp.f90 \
-   utils_c_system.c \
-   utils_system.f90 \
-   $(UTILS_OMP).f90 \
+  utils_def.f90 \
+  utils_dict.f90 \
+  utils_idict.f90 \
+  utils_lib.f90 \
+  utils_nan.f90 \
+  utils_nan_sp.f90 \
+  utils_nan_dp.f90 \
+  utils_nan_qp.f90 \
+  utils_c_system.c \
+  utils_system.f90 \
+  $(UTILS_OMP).f90 \
 
 #################################################################
 #
@@ -43,7 +43,7 @@ $(LIB) : $(OBJS)
 ifneq ($(QUIET),)
 	@echo LIB_TOOL $(LIB)
 	@$(LIB_TOOL) $(LIB) $(OBJS)
-else	   
+else	
 	$(LIB_TOOL) $(LIB) $(OBJS)
 endif	
 

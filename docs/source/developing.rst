@@ -20,6 +20,7 @@ Developing MESA
    developing/linters
    developing/plotters
    developing/profiling
+   developing/coverage
    developing/test_suite
    developing/infrastructure
    developing/release

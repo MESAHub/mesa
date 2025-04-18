@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,14 +26,13 @@
 module pulse_utils
 
   use star_private_def
-  use const_def, only: dp
+  use const_def, only: dp, pi, pi4
   use num_lib
   use star_utils
 
   implicit none
 
   private
-
   public :: set_segment_indices
   public :: eval_face
   public :: eval_face_X
@@ -355,9 +354,6 @@ contains
 
     end if
 
-
-    return
-
   end function eval_face_rho
 
 
@@ -410,9 +406,6 @@ contains
     if (PRESENT(v_hi)) then
        v_center = MIN(v_center, v_hi)
     end if
-
-
-    return
 
   end function eval_center
 
@@ -492,9 +485,6 @@ contains
 
     rho_center = 3d0*(5d0*M_1/(pi*r_1*r_1*r_1) - 4d0*rho_1)/8d0
 
-
-    return
-
   end function eval_center_rho
 
 
@@ -535,8 +525,6 @@ contains
        d2v_center = 2d0*(v_2 - v_1)/(r_2*r_2 - r_1*r_1)
 
     end if
-
-    return
 
   end function eval_center_d2
 

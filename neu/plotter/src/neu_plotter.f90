@@ -2,9 +2,10 @@ program neu_plotter
 
    use neu_def
    use neu_lib
-   use const_lib
+   use const_def, only: dp
+   use const_lib, only: const_init
    use math_lib
-   use num_lib, only : dfridr
+   use num_lib, only: dfridr
 
    implicit none
 
@@ -262,20 +263,20 @@ program neu_plotter
                   res1 = Rho * loss(idneu_dRho) / loss(ineu)
                else
                   res1 = Rho * sources(i_var, idneu_dRho) / loss(ineu)
-               endif
+               end if
             else
                if (i_var == 0) then
                   res1 = T * loss(idneu_dT) / loss(ineu)
                else
                   res1 = T * sources(i_var, idneu_dT) / loss(ineu)
-               endif
+               end if
             end if
          else
             if (i_var == 0) then
                res1 = log(loss(ineu))
             else
                res1 = log(sources(i_var, ineu))
-            endif
+            end if
          end if
 
          if (doing_dfridr) then
@@ -283,19 +284,19 @@ program neu_plotter
                res1 = log(loss(ineu))
             else
                res1 = log(sources(i_var, ineu))
-            endif
+            end if
             if (doing_d_dlnd) then
                if (i_var == 0) then
                   dvardx_0 = Rho * loss(idneu_dRho) / loss(ineu)
                else
                   dvardx_0 = Rho * sources(i_var, idneu_dRho) / loss(ineu)
-               endif
+               end if
             else
                if (i_var == 0) then
                   dvardx_0 = T * loss(idneu_dT) / loss(ineu)
                else
                   dvardx_0 = T * sources(i_var, idneu_dT) / loss(ineu)
-               endif
+               end if
             end if
 
             dx_0 = 1d-3
@@ -344,7 +345,7 @@ contains
          val = log(loss(ineu))
       else
          val = log(sources(i_var, ineu))
-      endif
+      end if
 
    end function dfridr_func
 

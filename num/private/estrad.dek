@@ -45,7 +45,7 @@
       hee3=dd3/h
 
       mm=m1/m2
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
    1  continue
 ! ------  b=identity, jacobian a full matrix
@@ -54,7 +54,7 @@
          cont(i)=f2(i)+y0(i)
       end do
       call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
    8  continue
 ! ------  b=identity, jacobian a sparse matrix
@@ -63,7 +63,7 @@
          cont(i)=f2(i)+y0(i)
       end do
       call decsols(1,n,nzmax,ia,ja,sa,cont,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
   11  continue
 ! ------  b=identity, jacobian a full matrix, second order
@@ -86,7 +86,7 @@
       do i=m1,1,-1
          cont(i)=(cont(i)+cont(m2+i))/fac1
       end do
-      goto 77
+      GOTO 77
 !
    2  continue
 ! ------  b=identity, jacobian a banded matrix
@@ -95,7 +95,7 @@
          cont(i)=f2(i)+y0(i)
       end do
       call decsol(1,n,lde1,e1_1D,mle,mue,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
   12  continue
 ! ------  b=identity, jacobian a banded matrix, second order
@@ -118,7 +118,7 @@
       do i=m1,1,-1
          cont(i)=(cont(i)+cont(m2+i))/fac1
       end do
-      goto 77
+      GOTO 77
 !
    3  continue
 ! ------  b is a banded matrix, jacobian a full matrix
@@ -134,7 +134,7 @@
          cont(i)=sum+y0(i)
       end do
       call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
    9  continue
 ! ------  b is a banded matrix, jacobian a sparse matrix
@@ -150,7 +150,7 @@
          cont(i)=sum+y0(i)
       end do
       call decsols(1,n,nzmax,ia,ja,sa,z1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
   13  continue
 ! ------  b is a banded matrix, jacobian a full matrix, second order
@@ -170,7 +170,7 @@
          f2(im1)=sum
          cont(im1)=sum+y0(im1)
       end do
-      goto 48
+      GOTO 48
 !
    4  continue
 ! ------  b is a banded matrix, jacobian a banded matrix
@@ -186,7 +186,7 @@
          cont(i)=sum+y0(i)
       end do
       call decsol(1,n,lde1,e1_1D,mle,mue,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
   14  continue
 ! ------  b is a banded matrix, jacobian a banded matrix, second order
@@ -206,7 +206,7 @@
          f2(im1)=sum
          cont(im1)=sum+y0(im1)
       end do
-      goto 45
+      GOTO 45
 !
    5  continue
 ! ------  b is a full matrix, jacobian a full matrix
@@ -222,7 +222,7 @@
          cont(i)=sum+y0(i)
       end do
       call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 77
+      GOTO 77
 !
   15  continue
 ! ------  b is a banded matrix, jacobian a full matrix, second order
@@ -242,7 +242,7 @@
          f2(im1)=sum
          cont(im1)=sum+y0(im1)
       end do
-      goto 48
+      GOTO 48
 !
    6  continue
 ! ------  b is a full matrix, jacobian a banded matrix
@@ -258,7 +258,7 @@
       end do
       err=max(sqrt(err/n),1.d-10)
 !
-      if (err.lt.1.d0) return
+      if (err<1.d0) return
       if (first.or.reject) then
           do i=1,n
              cont(i)=y(i)+cont(i)
@@ -269,11 +269,11 @@
           do i=1,n
              cont(i)=f1(i)+f2(i)
           end do
-          goto (31,32,31,32,31,32,55,55,33,55,41,42,41,42,41), ijob
+          GOTO (31,32,31,32,31,32,55,55,33,55,41,42,41,42,41), ijob
 ! ------ full matrix option
   31      continue
           call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-          goto 88
+          GOTO 88
 ! ------ full matrix option, second order
  41      continue
          do j=1,m2
@@ -290,11 +290,11 @@
          do i=m1,1,-1
             cont(i)=(cont(i)+cont(m2+i))/fac1
          end do
-         goto 88
+         GOTO 88
 ! ------ banded matrix option
  32      continue
          call decsol(1,n,lde1,e1_1D,mle,mue,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
-         goto 88
+         GOTO 88
 ! ------ banded matrix option, second order
  42      continue
          do j=1,m2
@@ -311,11 +311,11 @@
          do i=m1,1,-1
             cont(i)=(cont(i)+cont(m2+i))/fac1
          end do
-          goto 88
+          GOTO 88
 ! ------ sparse matrix option
   33      continue
           call decsols(1,n,nzmax,ia,ja,sa,cont,lrd,rpar_decsol,lid,ipar_decsol,ier)
-          goto 88
+          GOTO 88
 ! -----------------------------------
    88     continue
           err=0.d0

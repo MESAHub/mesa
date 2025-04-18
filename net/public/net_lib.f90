@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,10 +28,9 @@
       ! the data interface for the library is defined in net_def
 
       use chem_def
-      use const_def, only: dp
+      use const_def, only: dp, i8
 
       implicit none
-
 
       contains  ! the procedure interface for the library
       ! client programs should only call these routines.
@@ -623,7 +622,7 @@
 
          integer, intent(out) :: ierr  ! 0 means okay
 
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          type (Net_General_Info), pointer :: g
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs
          logical, pointer :: from_weaklib(:)  ! ignore if null
@@ -713,7 +712,7 @@
 
          integer, intent(out) :: ierr  ! 0 means okay
 
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          type (Net_General_Info), pointer :: g
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs
          logical, pointer :: from_weaklib(:)  ! ignore if null
@@ -932,7 +931,7 @@
 
          logical, parameter :: rates_only = .false.
          logical, parameter :: symbolic = .false.
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          type (Net_General_Info), pointer :: g
 
          ierr = 0
@@ -1214,6 +1213,4 @@
          call do_clean1(species, xa, 1, max_sum_abs, xsum_tol, ierr)
       end subroutine clean1
 
-
       end module net_lib
-

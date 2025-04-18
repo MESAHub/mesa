@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,6 @@ module overshoot
   use const_def, only: dp, pi4, no_mixing, overshoot_mixing
   use num_lib
   use star_private_def
-
   use overshoot_utils
   use overshoot_exp
   use overshoot_step
@@ -36,7 +35,6 @@ module overshoot
   implicit none
 
   private
-
   public :: add_overshooting
 
 contains
@@ -206,7 +204,8 @@ contains
              if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
 
                 if (.not. s% calculate_Brunt_N2) &
-                   call mesa_error(__FILE__,__LINE__,'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
+                   call mesa_error(__FILE__,__LINE__, &
+                                   'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
 
                 ! (NB: we examine B(k+dk) rather than B(k), as the latter
                 ! would allow the overshoot region to eat into a composition

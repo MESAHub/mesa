@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,12 +21,11 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module diffusion
 
-      use const_def, only: dp
+      use const_def, only: dp, i8, amu, me, msun
       use chem_def
       use star_private_def
       use diffusion_support
@@ -34,12 +33,15 @@
 
       implicit none
 
+      private
+      public :: do_solve_diffusion
+      public :: set_diffusion_classes
+      public :: diffusion_min_nc
+
       integer, parameter :: diffusion_min_nc = 4  ! minimum number of classes
       logical, parameter :: use_dcoeff_dX = .true.
 
-
       contains
-
 
       subroutine do_solve_diffusion( &
             s, nz, species, nc, m, class, class_chem_id, net_iso, chem_id, &
@@ -143,7 +145,7 @@
          integer, pointer :: ipiv1(:)
          integer :: lrd, lid, kmax_rad_accel, min_num_substeps, &
             iter_dbg, j_dbg, k_dbg, k_max
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          integer, pointer :: ipar_decsol(:)
          real(dp), pointer :: rpar_decsol(:)
          real(dp), dimension(species) :: xa_total_before
@@ -2050,7 +2052,5 @@
          end function limiter
 
       end function adjust_timestep
-
-
 
       end module diffusion

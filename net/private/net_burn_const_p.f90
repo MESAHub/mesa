@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module net_burn_const_P
-      use const_def, only: dp, ln10
+      use const_def, only: dp, i8, ln10
       use chem_def
       use math_lib
       use net_def
@@ -336,7 +336,7 @@
             real(dp), target :: eps_nuc_categories(num_categories)
             logical :: rates_only, skip_jacobian
             integer :: screening_mode, i, num_isos
-            integer(8) :: time0, time1, clock_rate
+            integer(i8) :: time0, time1, clock_rate
 
             real(dp) :: xh, Y, z, Cp, rate_limit
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas

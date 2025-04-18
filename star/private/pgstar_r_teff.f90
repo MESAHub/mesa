@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,9 +32,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine R_Teff_Plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -94,6 +92,4 @@
             null_decorate, ierr)
       end subroutine do_R_Teff_Plot
 
-
       end module pgstar_r_teff
-

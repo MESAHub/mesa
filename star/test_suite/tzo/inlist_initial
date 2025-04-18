@@ -15,7 +15,7 @@
    save_model_filename = 'pre_tzo.mod'
 
    change_initial_net=.true.
-   new_net_name='approx21.net' 
+   new_net_name='approx21.net'
 
 / ! end of star_job namelist
 

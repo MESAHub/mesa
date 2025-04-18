@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,11 +23,10 @@
 !
 ! ***********************************************************************
 
-
       module element_diffusion
 
       use star_private_def
-      use const_def, only: dp, pi4, amu, qe, secyer, no_mixing, phase_separation_mixing
+      use const_def, only: dp, i8, pi4, amu, qe, secyer, no_mixing, phase_separation_mixing
 
       implicit none
 
@@ -36,9 +35,7 @@
 
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine do_element_diffusion(s, dt_in, ierr)
          ! return ierr /= 0 if cannot satisfy accuracy requirements
@@ -53,7 +50,7 @@
 
          integer :: i, j, k, kk, nc, m, nzlo, nzhi, nz, species, iounit, &
             steps_used, total_num_iters, total_num_retries, cid
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: s1, s2, dqsum, dt, total, &
             gradT_mid, gradRho_mid, alfa, gradRho_face, chiRho_face, chiT_face
          real(dp) :: Amass, Zcharge, min_D_mix
@@ -589,15 +586,3 @@
       end subroutine finish_element_diffusion
 
       end module element_diffusion
-
-
-
-
-
-
-
-
-
-
-
-

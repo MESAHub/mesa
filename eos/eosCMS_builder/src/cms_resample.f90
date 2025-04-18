@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020  Aaron Dotter
+!   Copyright (C) 2020  Aaron Dotter & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,7 @@
 program cms_resample
 
    use const_def
-   use const_lib
+   use const_lib, only: const_init
    use interp_1d_def
    use interp_1d_lib
    use math_lib
@@ -67,7 +67,7 @@ program cms_resample
    if(command_argument_count()<2)then
       write(*,*) './cms_resample [input] [output]'
       stop
-   endif
+   end if
 
    call get_command_argument(1,input)
    call get_command_argument(2,output)
@@ -82,8 +82,8 @@ program cms_resample
          read(io,'(1p99e15.6)') logT(j,i), logP(j,i), logRho(j,i), logU(j,i), logS(j,i), &
             dlnRho_dlnT_P(j,i), dlnRho_dlnP_T(j,i), dlnS_dlnT_P(j,i), dlnS_dlnP_T(j,i), &
             grad_ad(j,i)
-      enddo
-   enddo
+      end do
+   end do
    close(io)
 
    !set composition variables
@@ -153,8 +153,8 @@ program cms_resample
          write(io,'(1p99e15.6)') new_logT, new_logRho, new_logP, new_logU, new_logS, &
             chiRho, chiT, Cp, Cv, dU_dRho, dS_dT, dS_dRho, mu, lnfree_e, gamma1, gamma3, &
             new_grad_ad, eta, dsp, dse
-      enddo
-   enddo
+      end do
+   end do
    close(io)
 
 contains
@@ -203,9 +203,9 @@ contains
                tmp_dlnS_dlnT(count) = dlnS_dlnT_P(j,iT)
                tmp_dlnS_dlnP(count) = dlnS_dlnP_T(j,iT)
                tmp_grad_ad(count) = grad_ad(j,iT)
-            endif
-         endif
-      enddo
+            end if
+         end if
+      end do
 
       num_pts = count
       allocate(x_old(num_pts), y_old(num_pts))

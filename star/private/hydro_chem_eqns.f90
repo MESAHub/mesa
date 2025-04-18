@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,6 @@
 !
 ! ***********************************************************************
 
-
       module hydro_chem_eqns
 
       use star_private_def
@@ -35,9 +34,7 @@
       private
       public :: do_chem_eqns, do1_chem_eqns
 
-
       contains
-
 
       subroutine do_chem_eqns(s, nvar, ierr)
          type (star_info), pointer :: s
@@ -230,6 +227,4 @@
 
       end subroutine do1_chem_eqns
 
-
       end module hydro_chem_eqns
-

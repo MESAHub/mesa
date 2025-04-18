@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,24 +26,25 @@
       module do_one_utils
 
       use star_private_def
-      use const_def, only: dp, ln10, secday, dayyer
+      use const_def, only: dp, ln10, secday, dayyer, clight, msun, rsun
       use utils_lib, only: is_bad
 
       implicit none
 
       private
-      public :: do_one_check_model, &
-         write_terminal_header, do_bare_bones_check_model, do_check_limits, &
-         do_show_log_description, do_show_terminal_header, do_terminal_summary
+      public :: do_one_check_model
+      public :: write_terminal_header
+      public :: do_bare_bones_check_model
+      public :: do_check_limits
+      public :: do_show_log_description
+      public :: do_show_terminal_header
+      public :: do_terminal_summary
 
       ! model log priorities
       integer, parameter :: delta_priority = 1
       integer, parameter :: phase_priority = 2
 
-
-
       contains
-
 
       logical function model_is_okay(s)
          type (star_info), pointer :: s
@@ -1546,6 +1547,4 @@
 
       end function do_one_check_model
 
-
       end module do_one_utils
-

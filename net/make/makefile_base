@@ -13,18 +13,18 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   net_def.f90 \
-   net_screen.f90 \
-   net_derivs_support.f90 \
-   net_derivs.f90 \
-   net_approx21.f90 \
-   net_burn_support.f90 \
-   net_initialize.f90 \
-   net_eval.f90 \
-   net_burn.f90 \
-   net_burn_const_density.f90 \
-   net_burn_const_p.f90 \
-   net_lib.f90
+  net_def.f90 \
+  net_screen.f90 \
+  net_derivs_support.f90 \
+  net_derivs.f90 \
+  net_approx21.f90 \
+  net_burn_support.f90 \
+  net_initialize.f90 \
+  net_eval.f90 \
+  net_burn.f90 \
+  net_burn_const_density.f90 \
+  net_burn_const_p.f90 \
+  net_lib.f90
 
 #################################################################
 #
@@ -69,10 +69,10 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-#COMPILE = $(COMPILE_NO_OPT) $(FCfree) 
+#COMPILE = $(COMPILE_NO_OPT) $(FCfree)
 
-#COMPILE = $(COMPILE_TO_TEST) $(FCfree) 
-COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) 
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree)
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
 
 COMPILE_CMD = $(COMPILE)
 

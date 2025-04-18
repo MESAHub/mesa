@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -636,8 +636,8 @@ contains
              0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, &
              0.04d0, 0.06d0, 0.08d0, 0.100d0 ]
           num_kap_lowT_Xs_for_this_Z(1:num_kap_lowT_Zs(i), i) = [ num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
        end select
     end do
 
@@ -838,6 +838,4 @@ contains
 
   end subroutine do_Free_Kap_Tables
 
-
 end module kap_def
-

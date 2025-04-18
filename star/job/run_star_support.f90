@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -2833,6 +2833,9 @@
          if (s% opacity_max > 0) &
             write(*,1) 'opacity_max', s% opacity_max
 
+         if (s% opacity_min > 0) &
+            write(*,1) 'opacity_min', s% opacity_min
+
          if (s% job% show_net_reactions_info) then
             write(*,'(a)') ' net reactions '
             call show_net_reactions_and_info(s% net_handle, 6, ierr)
@@ -3718,7 +3721,6 @@
       end subroutine add_fpe_checks
 
 
-
       subroutine multiply_tolerances(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -3790,7 +3792,3 @@
       end subroutine pgstar_env_check
 
       end module run_star_support
-
-
-
-

@@ -22,12 +22,12 @@ ifeq ($(USE_SHARED), YES)
     LIBS_OTHER = utils const
     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
  ifeq ($(USE_CRMATH), YES)
-	LOAD_OTHER = -L$(MESA_LIB_DIR) -lutils -lconst $(LOAD_CRMATH) 
+	LOAD_OTHER = -L$(MESA_LIB_DIR) -lutils -lconst $(LOAD_CRMATH)
 else
 	LOAD_OTHER = -L$(MESA_LIB_DIR) -lutils -lconst
 endif
 endif
-     
+
 #################################################################
 #
 # LIBRARIES

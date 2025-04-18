@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,12 +24,12 @@
 ! ***********************************************************************
 
       module utils_dict
+
       use utils_def, only: maxlen_key_string, integer_dict, hash_entry
 
       implicit none
 
       contains
-
 
       recursive subroutine do_integer_dict_map(dict, fcn, ierr)
          type (integer_dict), pointer :: dict
@@ -525,6 +525,4 @@
          end if
       end function dict_hashkey
 
-
       end module utils_dict
-

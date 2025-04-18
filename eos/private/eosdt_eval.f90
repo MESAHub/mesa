@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,10 +21,10 @@
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
-!
 ! ***********************************************************************
 
       module eosDT_eval
+
       use eos_def
       use const_def, only: avo, crad, ln10, arg_not_provided, mp, kerg, dp, qp
       use utils_lib, only: is_bad, mesa_error
@@ -34,7 +34,6 @@
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
       use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
       use ideal, only: get_ideal_for_eosdt
-
 
       implicit none
 
@@ -2540,6 +2539,5 @@
          end function f
 
       end subroutine do_safe_get_Rho_T
-
 
       end module eosDT_eval

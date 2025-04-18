@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,7 +37,6 @@
       public :: eval_eps_grav_and_partials, zero_eps_grav_and_partials
 
       contains
-
 
       subroutine eval_eps_grav_and_partials(s, k, ierr)
          type (star_info), pointer :: s
@@ -180,7 +179,8 @@
          if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
 
             ! start values are constants during Newton iters
-            eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
+            eps_grav_start = -s% T_start(k)*s% cp_start(k) &
+                            * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
 
             ! phase transition latent heat
             eps_grav_start = eps_grav_start - (dlnd_dt * s% latent_ddlnRho_start(k) + dlnT_dt * s% latent_ddlnT_start(k))
@@ -395,7 +395,8 @@
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
             end if
             if (s% stop_for_bad_nums) then
-               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
+               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', &
+                          k, eps_grav_composition_term% val
                call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             return
@@ -411,4 +412,3 @@
       end subroutine zero_eps_grav_and_partials
 
       end module eps_grav
-

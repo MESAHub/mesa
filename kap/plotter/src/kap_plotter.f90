@@ -6,7 +6,8 @@ program kap_plotter
    use kap_lib
    use chem_def
    use chem_lib
-   use const_lib
+   use const_def
+   use const_lib, only: const_init
    use math_lib
    use utils_lib
    use num_lib, only : dfridr

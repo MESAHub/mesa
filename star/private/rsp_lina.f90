@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
       module rsp_lina
       use star_def, only: star_info
       use utils_lib, only: is_bad, mesa_error
-      use const_def, only: dp, crad
+      use const_def, only: dp, i8, crad
       use rsp_def
 
       implicit none
@@ -34,9 +34,7 @@
       private
       public :: mesa_eos_kap, SORT, do_LINA
 
-
       contains
-
 
       subroutine do_LINA(s, L0, NZN, NMODES, VEL, PERS, ETO, &
          M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
@@ -228,7 +226,7 @@
 !     LOOP 1 .. EOS
 
       !$OMP PARALLEL DO PRIVATE(I,T1,op_err) SCHEDULE(dynamic,2)
-      do 1 I=1,NZN
+      do I=1,NZN
 
          if(Et(I)<=EFL02) Et(I)=EFL02
 
@@ -241,10 +239,10 @@
 
          T1=P43/dm(I)
          DVR(I)=3.d0*T1*R(I)**2
-         if(I==1) goto 2
+         if(I==1) GOTO 2
          DVRM(I)=-3.d0*T1*R(max(1,I-1))**2
              ! bp: max(1,i-1) to prevent bogus warning from gfortran
-         goto 3
+         GOTO 3
  2       DVRM(I)=-3.d0*T1*s% R_center**2
  3       continue
          dP_dr_00(I) =DPV(I)*DVR(I)
@@ -254,13 +252,13 @@
          dQQ_dr_00(I) =QQV(I)*DVR(I)
          dQQ_dr_in(I)=QQV(I)*DVRM(I)
 
- 1    continue
+      end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) return
 
 !     SKIP ALL DERIVATIVE CALCULATIONS IN CASE OF FROZEN-IN
 !     APPROXIMATION OR ALFA=0 (RADIATIVE CASE)
-      if(ALFA==0.d0) goto 999
+      if(ALFA==0.d0) GOTO 999
 
 !     SET E_T (NOW =w) BELOW AND ABOVE BOUNDARIES
       Et(NZN) = 0.d0
@@ -697,7 +695,7 @@
       DFCYP = 0.d0
       DFCZ0 = 0.d0
       DFCZP = 0.d0
-      do 5 I=1,NZN
+      do I=1,NZN
 !        SET LUM(I-1)
          DLMR  = DLR
          DLMRP = DLRP
@@ -712,7 +710,7 @@
          DFCMYP = DFCYP
          DFCMZ0 = DFCZ0
          DFCMZP = DFCZP
-         if(I==NZN) goto 6
+         if(I==NZN) GOTO 6
 !        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
 !        CALC LUM(I)
          W_00=T(I)**4
@@ -737,7 +735,7 @@
          DFCYP=DLCYP(I)
          DFCZ0=DLCZ0(I)
          DFCZP=DLCZP(I)
-         goto 7
+         GOTO 7
 !        OUTER LUM BOUNDARY CONDITION
  6       continue
          DLT = 4.d0*L0/T(I)  !L=4piR^2sigT^4
@@ -840,7 +838,7 @@
             MZ01(I) = 0.d0
          end if
 
-  5    continue
+      end do
 
       do I=1,NZN3
          do J=1,NZN3
@@ -987,7 +985,7 @@
  444     continue
          if(P4*WRx(IMI+J-1)/WIx(IMI+J-1)<-.5d+1)then
             IMI=IMI+1
-            goto 444
+            GOTO 444
          end if
 !        VRRS(J) IS THE MODULI OF THE SUTFACE R-EIGENVECTOR OF THE MODE J
          VRRS(J)=sqrt(VRx(4*NZN-3,ISORTx(IMI+J-1))**2+ &
@@ -1266,13 +1264,12 @@
            else
               J=IR+1
            end if
-           goto 20
+           GOTO 20
         end if
         RA(I)=RRA
         RB(I)=RRB
         ISORT(I)=RRI
-      goto 10
+      GOTO 10
       end subroutine SORT
-
 
       end module rsp_lina

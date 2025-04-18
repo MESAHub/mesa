@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,9 +34,7 @@ module pgstar
 
    implicit none
 
-
 contains
-
 
    subroutine do_create_file_name(s, dir, prefix, name)
       use pgstar_support, only : create_file_name
@@ -1289,7 +1287,7 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer(8) :: time0, time1, clock_rate
+      integer(i8) :: time0, time1, clock_rate
       logical :: do_pause
 
       include 'formats'

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,7 +48,6 @@
       logical, parameter :: RSP_eddi = .true.  ! use Eddington approx at surface
 
       contains
-
 
       subroutine do_rsp_build(s,ierr)
       !use rsp_create_env, only: do_rsp_create_env
@@ -194,7 +193,7 @@
          if(TA(I)>2.d0/3.d0)then
             II=I
             IO=I+1
-            goto 77
+            GOTO 77
          end if
       end do
  77   continue
@@ -211,7 +210,7 @@
          if(T(I)>TE)then
             II=I
             IO=I+1
-            goto 78
+            GOTO 78
          end if
       end do
  78   continue
@@ -226,7 +225,7 @@
       GEFF=G*Mass/R(NZN)**2
       MBOL=-2.5d0*dlog10(ELR)+4.79d0
 
-      if(NMODES==0) goto 11  ! jesli masz liczyc tylko static envelope
+      if(NMODES==0) GOTO 11  ! jesli masz liczyc tylko static envelope
 
       if (.not. (s% use_RSP_new_start_scheme .or. s% use_other_RSP_linear_analysis)) then
          if (s% RSP_trace_RSP_build_model) write(*,*) '*** linear analysis ***'
@@ -989,6 +988,5 @@
          Lc_0=0.d0
       end if
       end subroutine CFLUX
-
 
       end module rsp_build

@@ -1,4 +1,4 @@
-.. image:: docs/source/mesa-logo2-200.png
+.. image:: docs/source/mesa-logo.png
   :align: center
   :width: 200
   :alt: MESA
@@ -23,6 +23,10 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 .. image:: https://img.shields.io/github/license/MESAHub/mesa
     :alt: GitHub
     :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
+.. image:: https://byob.yarr.is/mesahub/mesa/coverage/shields
+    :title: Coverage
+    :alt: Coverage
+    :target: http://MESAHub.github.io/mesa
 .. image:: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml/badge.svg
     :title: BuildLinux
     :alt: BuildLinux
@@ -91,3 +95,28 @@ For Developers
 * `MESA Jenkins <https://jenkins.flatironinstitute.org/job/mesa/job/main/>`__ to view nightly Jenkins test runs.
 * `mesa_test <https://github.com/MESAHub/mesa_test>`__ tool to run the test suite and upload results to the MESA Test Hub.
 * `mesa-dev yt channel <https://www.youtube.com/@mesa-dev>`__ youtube channel for recorded dev meetings.
+
+
+Support
+=======
+
+MESA is made possible thanks to support from
+
+.. image:: docs/source/assets/logo/flatiron-logo.png
+  :align: left
+  :height: 40
+  :alt: Flatiron Institute
+  :target: https://www.simonsfoundation.org/flatiron/
+
+|
+
+.. image:: docs/source/assets/logo/nsf-logo.png
+  :align: left
+  :height: 70
+  :alt: National Science Foundation
+  :target: https://www.nsf.gov/
+
+Citing
+======
+
+If you find MESA useful in your work, please star the repository and cite the papers in the `citation file <https://github.com/MESAHub/mesa/blob/main/CITATIONS.bib>`_.

@@ -1,6 +1,27 @@
-
-
-
+! ***********************************************************************
+!
+!   Copyright (C) 2013  The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   https://mesastar.org/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
 
       module mass_utils
 
@@ -8,23 +29,25 @@
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
 
-
       implicit none
 
       private
-      public :: accurate_mass_difference, reconstruct_m, reconstruct_xm, &
-                make_compressed_intersect, non_rect_array, &
-                prepare_pass_fraction, compute_pass_fraction, find_j_ranges, integrate_conserved
-
+      public :: accurate_mass_difference
+      public :: reconstruct_m
+      public :: reconstruct_xm
+      public :: make_compressed_intersect
+      public :: non_rect_array
+      public :: prepare_pass_fraction
+      public :: compute_pass_fraction
+      public :: find_j_ranges
+      public :: integrate_conserved
 
       ! A derived array type for storing non-rectangular 2D arrays
       type non_rect_array
          real(qp), dimension(:), allocatable :: arr
       end type non_rect_array
 
-
       contains
-
 
       ! Reconstructs m(j) given dm.
       ! Not currently used, but helpful for debugging.
@@ -573,6 +596,5 @@
          end do
 
       end subroutine integrate_conserved
-
 
   end module mass_utils

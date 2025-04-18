@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,9 +31,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine do_simplex( &
             n, x_lower, x_upper, x_first, x_final, f_final, &
@@ -389,36 +387,6 @@
             end do
          end subroutine shrink
 
-
       end subroutine do_simplex
 
-
-
       end module mod_simplex
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

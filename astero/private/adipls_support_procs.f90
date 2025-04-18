@@ -21,8 +21,6 @@
 ! ***********************************************************************
 
 
-
-
       ! routines that are called by adipls
       ! uses adipls_support, so must compile after that
 

@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,23 +23,38 @@
 !
 ! ***********************************************************************
 
-
 ! Routine eval_fp_ft for computing rotation corrections to the stellar structure equations.
 ! Following the method of Kippenhahn & Thomas, 1970; Endal & Sofia 1976, as implemented in
 ! Paxton et al., 2019, using the updated fits from Fabry, Marchant & Sana, 2022
-
 
       module hydro_rotation
 
       use const_def, only: pi, pi4, ln10, two_thirds, one_third, one_sixth
       use star_utils, only: get_r_from_xh
-
       use star_private_def
 
       implicit none
 
-      real(dp), parameter :: log_term_power = 5.626d0
+      private
+      public :: log_term_power
+      public :: a
+      public :: c
+      public :: w_div_w_roche_jrot
+      public :: w_div_w_roche_omega
+      public :: set_rotation_info
+      public :: compute_j_fluxes_and_extra_jdot
+      public :: set_surf_avg_rotation_info
+      public :: use_xh_to_update_i_rot_and_j_rot
+      public :: set_i_rot_from_omega_and_j_rot
+      public :: use_xh_to_update_i_rot
+      public :: update1_i_rot_from_xh
+      public :: get_rotation_sigmas
+      public :: set_omega
+      public :: set_uniform_omega
+      public :: set_i_rot
+      public :: eval_i_rot
 
+      real(dp), parameter :: log_term_power = 5.626d0
 
       contains
 
@@ -839,4 +854,3 @@
       end function sigmoid
 
       end module hydro_rotation
-

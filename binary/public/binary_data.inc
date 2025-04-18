@@ -47,7 +47,7 @@ real(dp) :: &
 integer :: generations ! 1 means no old values, 2 means have old
 
 ! array indexes for the donor and the accretor
-integer :: d_i = 1, d_i_old, a_i = 2, a_i_old, &
+integer :: d_i, d_i_old, a_i, a_i_old, &
       ! index for star that is taken as point mass
       point_mass_i, point_mass_i_old
 
@@ -65,6 +65,30 @@ integer :: dt_why_reason, dt_why_reason_old
 ! These are used in runs where point_mass_i switches from zero to another
 ! value, to save photos of both stars in a consistent way.
 logical :: have_star_1, have_star_2
+
+! 'Equivalent' BH initial mass that would have been required to evolve to the
+! initial mass and spin parameter of the BH.
+real(dp) :: eq_initial_bh_mass
+
+! Stored Parameters for common envelope evolution
+integer :: CE_nz ! number of points in model at CE onset
+real(dp) :: CE_initial_radius ! radius (in cm) at the onset of CE
+real(dp) :: CE_initial_separation ! separation (in cm) at the onset of CE
+real(dp) :: CE_initial_Mdonor ! donor mass (in grams) at the onset of CE
+real(dp) :: CE_initial_Maccretor ! accretor mass (in grams) at the onset of CE
+real(dp) :: CE_initial_age ! age (in seconds) at the onset of CE
+real(dp) :: CE_initial_model_number ! binary model_number at the onset of CE
+! values for binary are stored as well, they need not match the ones of the star
+! undergoing CE
+real(dp) :: CE_b_initial_age ! binary age (in seconds) at the onset of CE
+real(dp) :: CE_b_initial_model_number ! binary model_number at the onset of CE
+
+! more extras -- for run_binary_extras applications with state.
+! if your extra state info is all held in the following variables,
+! restarts and retries will work without doing anything special.
+integer, dimension(binary_num_xtra_vals) :: ixtra, ixtra_old
+real(dp), dimension(binary_num_xtra_vals) :: xtra, xtra_old
+logical, dimension(binary_num_xtra_vals) :: lxtra, lxtra_old
 
 ! *************** end of info that is saved and restored for restarts  ***************
 
@@ -100,9 +124,6 @@ real(dp) :: mdot_edd
 real(dp) :: mdot_edd_eta
 ! Accretion luminosity from a point mass compact object
 real(dp) :: accretion_luminosity
-! 'Equivalent' BH initial mass that would have been required to evolve to the
-! initial mass and spin parameter of the BH.
-real(dp) :: eq_initial_bh_mass
 
 ! When the donor reaches critical rotation during the steps of the implicit MT calculation,
 ! things can start to go very slowly, as for each iteration the implicit wind calculation
@@ -137,14 +158,14 @@ real(dp) :: edot, edot_tidal, edot_enhance, extra_edot
 ! info for implicit rlo
 real(dp) :: mdot_lo, mdot_hi
 real(dp) :: implicit_function_lo, implicit_function_hi
-logical :: have_mdot_lo = .false., have_mdot_hi = .false.
-integer :: num_tries = 0
+logical :: have_mdot_lo, have_mdot_hi
+integer :: num_tries
 
 ! info for Ritter and Kolb & Ritter prescriptions
 real(dp) :: ritter_h, ritter_exponent, mdot_thin, mdot_thin0, mdot_thick
 
 ! type of accretion (none=0, ballistic=1, Keplerian=2)
-integer :: accretion_mode = 0
+integer :: accretion_mode
 ! ratio of accreted specific angular momentum to that of a Keplerian orbit at R star
 real(dp) :: acc_am_div_kep_am
 
@@ -160,18 +181,7 @@ real(dp), pointer :: edot_theta(:), e1(:), e2(:), e3(:)
 ! hard limits. Set to false at the end of each step.
 logical :: ignore_hard_limits_this_step
 
-! Parameters for common envelope evolution
-integer :: CE_nz ! number of points in model at CE onset
-real(dp) :: CE_initial_radius ! radius (in cm) at the onset of CE
-real(dp) :: CE_initial_separation ! separation (in cm) at the onset of CE
-real(dp) :: CE_initial_Mdonor ! donor mass (in grams) at the onset of CE
-real(dp) :: CE_initial_Maccretor ! accretor mass (in grams) at the onset of CE
-real(dp) :: CE_initial_age ! age (in seconds) at the onset of CE
-real(dp) :: CE_initial_model_number ! binary model_number at the onset of CE
-! values for binary are stored as well, they need not match the ones of the star
-! undergoing CE
-real(dp) :: CE_b_initial_age ! binary age (in seconds) at the onset of CE
-real(dp) :: CE_b_initial_model_number ! binary model_number at the onset of CE
+! Work Parameters for common envelope evolution
 ! arrays used to interpolate properties from the star at the onset of CE
 real(dp), pointer :: CE_m(:), CE_entropy(:)
 real(dp), pointer :: CE_U_in(:), CE_U_out(:), CE_Omega_in(:), CE_Omega_out(:)
@@ -181,12 +191,6 @@ real(dp), pointer :: CE_U_in(:), CE_U_out(:), CE_Omega_in(:), CE_Omega_out(:)
 !real(dp) :: CE_Uout ! thermal energy of removed layers (includes recombination energy)
 !real(dp) :: CE_lambda ! lambda value if star is cut at this point: -standard_cgrav*Mi*Mf/Ri/(Ebind)
 
-! more extras -- for run_binary_extras applications with state.
-! if your extra state info is all held in the following variables,
-! restarts and retries will work without doing anything special.
-integer, dimension(binary_num_xtra_vals) :: ixtra, ixtra_old
-real(dp), dimension(binary_num_xtra_vals) :: xtra, xtra_old
-logical, dimension(binary_num_xtra_vals) :: lxtra, lxtra_old
 
 ! "other" procedures
 procedure(other_rlo_mdot_interface), pointer, nopass :: &
@@ -306,15 +310,14 @@ logical :: need_to_update_binary_history_now
 integer :: model_number_of_binary_history_values
 logical :: need_to_set_binary_history_names_etc
 
-logical :: doing_first_model_of_run = .false.
+logical :: doing_first_model_of_run
 ! open new history file is used to determine when the binary_history.data file
 ! needs to be open to append to it (when doing a restart), or if it needs to
 ! be rewritten (when starting a fresh run)
-logical :: open_new_history_file = .false.
+logical :: open_new_history_file
 
 ! info on terminal output
 integer :: recent_binary_log_header
 logical :: just_wrote_binary_terminal_header
 
-integer(8) :: system_clock_at_start_of_step
-
+integer(i8) :: system_clock_at_start_of_step

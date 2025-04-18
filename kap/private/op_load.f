@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://http://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,14 +34,12 @@
       use op_def
       logical :: have_loaded_op = .false.
 
-
       contains
-!******************************************************************
+! *****************************************************************
       subroutine op_dload(path, cache_filename, ierr)
         implicit none
       character (len=*), intent(in) :: path, cache_filename
       integer, intent(out) :: ierr
-
 
       real :: am,amm,delp,dpack
       integer :: ios,it,ite11,ite22,ite33,itt,itte1,itte2,itte3,izz,jne,ite
@@ -56,11 +54,11 @@
 
        common /mesh/ ntotv,dv,dv1,umesh,semesh
 !    common /atomdata/
-!       common/atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot,
-!      +  nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1(17,91,25),
-!      +  ne2(17,91,25),fion(-1:28,28,91,25),np(17,91,25),kp1(17,91,25),
-!      +  kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000),
-!      +  yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
+!       common/atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot, &
+!         nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1(17,91,25), &
+!         ne2(17,91,25),fion(-1:28,28,91,25),np(17,91,25),kp1(17,91,25), &
+!         kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000), &
+!         yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
 
       integer,dimension(ipe) :: ifl,iflp
       character num(0:9)*1,zlab(ipe)*3,tlab*6,zlabp(ipe)*3
@@ -91,24 +89,21 @@
 
 !$omp critical (critial_do_op_dload)
 
-      if (have_loaded_op) goto 1001
-
+      if (have_loaded_op) GOTO 1001
 
       !path = '../OP4STARS_1.3'
       !call getenv("oppath", path)
       !if (len(trim(path)) == 0) then
       !   write(6,*) 'Define environmental variable oppath (directory of OP data)'
       !   stop
-      !endif
-
+      !end if
 
       ios = 0
       open(1,file=trim(cache_filename),action='read',status='old',iostat=ios,form='unformatted')
       if (ios == 0) then
          write(*,*) 'reading OP cache file ' // trim(cache_filename)
-         read(1,iostat=ios) cache_version,ntotv,dv,dv1,umesh,
-     >     ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,
-     >     ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
+         read(1,iostat=ios) cache_version,ntotv,dv,dv1,umesh,ite1,ite2,ite3,jn1,jn2,jne3,
+     &                      umin,umax,ntotp,nc,nf,int,epatom,oplnck,ne1p,ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
          write(*,*) 'done reading OP cache file'
          close(1)
          if (cache_version /= op_cache_version) then
@@ -120,14 +115,13 @@
          end if
          if (ios == 0) then
             have_loaded_op = .true.
-            CALL IMESH(UMESH,NTOTV)
-            goto 1001
+            call IMESH(UMESH,NTOTV)
+            GOTO 1001
          end if
          write(*,*) 'failed in reading cache file'
          write(*,*) 'please delete cache file and try again'
          stop 'op_load'
       end if
-
 
       ite1=140
       ite2=320
@@ -144,112 +138,108 @@
 !  READ INDEX FILES
 !     FIRST FILE
       NN=1
-!     print*,' Opening '//'./'//zlab(1)//'.index'
-      OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.index',STATUS='OLD',
-     + iostat=ios)
+!     write(*,*) ' Opening '//'./'//zlab(1)//'.index'
+      OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.index',STATUS='OLD',iostat=ios)
       if (ios /= 0) then
          write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(1) // '.index'
          ierr = -1
-         goto 1001
+         GOTO 1001
       end if
-      READ(1,*)IZZ,AMM
-      READ(1,*)ITTE1,ITTE2,ITTE3
-      READ(1,*)UMIN,UMAX
-      READ(1,*)NC,NF
-      READ(1,*)DPACK
+      read(1,*)IZZ,AMM
+      read(1,*)ITTE1,ITTE2,ITTE3
+      read(1,*)UMIN,UMAX
+      read(1,*)NC,NF
+      read(1,*)DPACK
       CLOSE(1)
       if (IZZ /= KZ(1)) then
          write(6,6001)zlab(1),izz,nn,kz(1)
          ierr=1
-         goto 1001
-      endif
+         GOTO 1001
+      end if
       NTOTP=NF
       if (NTOTP > nptot) then
          write(6,6002)ntotp,nptot
          ierr=2
-         goto 1001
-      endif
+         GOTO 1001
+      end if
       INT(1)=1
       if (ITTE3 /= ITE3) then
          write(6,6077)ite3,itte3,nn
          ierr=3
-         goto 1001
-      endif
+         GOTO 1001
+      end if
 !      ITE1=MAX(ITE1,ITTE1)
 !      ITE2=MIN(ITE2,ITTE2)
 !
 !  READ MESH FILES
-      OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.mesh',status='old',
-     + form='unformatted',iostat=ios)
+      OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.mesh',status='old',form='unformatted',iostat=ios)
       if (ios /= 0) then
          write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(1) // '.mesh'
          ierr = -1
-         goto 1001
+         GOTO 1001
       end if
-      READ(1)DV,NTOTV,(UMESH(N),N=1,NTOTV)
+      read(1)DV,NTOTV,(UMESH(N),N=1,NTOTV)
       umin=umesh(1)
       umax=umesh(ntotv)
       DV1=DV
       CLOSE(1)
 !
 !  GET MESH FOR SCREEN
-      CALL IMESH(UMESH,NTOTV)
+      call IMESH(UMESH,NTOTV)
 !
 !     SUBSEQUENT FILES
-      DO N=2,ipe
+      do N=2,ipe
          NN=N
-         OPEN(1,FILE=trim(path)//'/'//ZLAB(N)//'.index',
-     +   STATUS='OLD')
-         READ(1,*)IZZ,AMM
-         READ(1,*)ITE11,ITE22,ITE33
-         READ(1,*)UMINN,UMAXX
-         READ(1,*)NC,NF
-         READ(1,*)DPACK
+         OPEN(1,FILE=trim(path)//'/'//ZLAB(N)//'.index',STATUS='OLD')
+         read(1,*)IZZ,AMM
+         read(1,*)ITE11,ITE22,ITE33
+         read(1,*)UMINN,UMAXX
+         read(1,*)NC,NF
+         read(1,*)DPACK
          CLOSE(1)
          if (ITE33 /= ITE3) then
             write(6,6077)ite3,ite33,nn
             ierr=4
-            goto 1001
-         endif
+            GOTO 1001
+         end if
 !         ITE1=MAX(ITE1,ITE11)
 !         ITE2=MIN(ITE2,ITE22)
          if (IZZ /= KZ(N)) then
             write(6,6001)zlab(n),izz,nn,kz(nn)
             ierr=5
-            goto 1001
-         endif
+            GOTO 1001
+         end if
          NTOTT=NF
          if (NTOTT > NTOTP) then
             write(6,6006)nn,ntott,ntotp
             ierr=6
-            goto 1001
-         endif
+            GOTO 1001
+         end if
 ! !!        if (UMIN /= UMINN.OR.UMAX /= UMAXX) GOTO 1003  !!
          INT(N)=NTOTP/NTOTT
          if (INT(N)*NTOTT /= NTOTP) then
             WRITE(6,6009)NN,NTOTT,NTOTP
             ierr=7
-            goto 1001
-         endif
+            GOTO 1001
+         end if
          if (INT(N) /= 1)WRITE(6,6007)N,INT(N)
 !
 !        READ MESH FILES
 !
-         OPEN(1,FILE=trim(path)//'/'//ZLAB(N)//'.mesh',
-     +   status='old',form='unformatted',iostat=ios)
+         OPEN(1,FILE=trim(path)//'/'//ZLAB(N)//'.mesh', status='old',form='unformatted',iostat=ios)
          if (ios /= 0) then
             write(*,*) 'failed to open ' // trim(path) // '/' // ZLAB(N) // '.mesh'
             ierr = -1
-            goto 1001
+            GOTO 1001
          end if
-         READ(1)DV
+         read(1)DV
        if (DV /= DV1) then
-!          PRINT*,' OP: N=',N,', DV=',DV,' NOT EQUAL TO DV1=',DV1
+!          write(*,*) ' OP: N=',N,', DV=',DV,' NOT EQUAL TO DV1=',DV1
             ierr=8
-          goto 1001
-       ENDIF
+          GOTO 1001
+       end if
          CLOSE(1)
-      END DO
+      end do
 !
 !  START TEMPERATURE LOOP
 !
@@ -264,36 +254,34 @@
          do n=1,ipe
 !            if (SKIP(N))GOTO 70
             NN=N
-            OPEN(IFL(N),FILE=trim(path)//'/'//ZLAB(N)//TLAB,
-     +      FORM='UNFORMATTED',STATUS='OLD',iostat=ios)
+            OPEN(IFL(N),FILE=trim(path)//'/'//ZLAB(N)//TLAB,FORM='UNFORMATTED',STATUS='OLD',iostat=ios)
             if (ios /= 0) then
                write(*,*) 'failed to open ' // trim(path)//'/'//ZLAB(N)//TLAB
                ierr = -1
-               goto 1001
+               GOTO 1001
             end if
             if (n > 2) then
-            OPEN(IFLP(N),FILE=trim(path)//'/'//ZLABP(N)//TLAB,
-     +      FORM='UNFORMATTED',STATUS='OLD',iostat=ios)
+            OPEN(IFLP(N),FILE=trim(path)//'/'//ZLABP(N)//TLAB,FORM='UNFORMATTED',STATUS='OLD',iostat=ios)
             if (ios /= 0) then
                write(*,*) 'failed to open ' // trim(path)//'/'//ZLABP(N)//TLAB
                ierr = -1
-               goto 1001
+               GOTO 1001
             end if
-            endif
+            end if
          end do
 !        READ HEADINGS
          NN=1
-         READ(IFL(1))IZZ,ITE,AM,UM,UX,NCCC,NFFF,DelP,JNE1,JNE2,JNE3
+         read(IFL(1))IZZ,ITE,AM,UM,UX,NCCC,NFFF,DelP,JNE1,JNE2,JNE3
          do n=2,ipe
 !            if (SKIP(N))GOTO 80
             NN=N
-            READ(IFL(N))IZZ,ITE,AM,UM,UX,NC,NF,DelP,JNE11,JNE22,JNE33
+            read(IFL(N))IZZ,ITE,AM,UM,UX,NC,NF,DelP,JNE11,JNE22,JNE33
             if (n > 2) read(iflp(n))
             if (JNE33 /= JNE3) then
               write(6,6099)jne3,jne33,nn
               ierr=9
-              goto 1001
-            endif
+              GOTO 1001
+            end if
             JNE1=MAX(JNE1,JNE11)
             JNE2=MIN(JNE2,JNE22)
          end do
@@ -311,7 +299,7 @@
 !
 !           START LOOP ON ELEMENTS
 !
-   95        READ(IFL(N))JNE,EPATOM(n,itt,jnn),OPLNCK(n,itt,jnn),ORSS,
+   95        read(IFL(N))JNE,EPATOM(n,itt,jnn),OPLNCK(n,itt,jnn),ORSS,
      +         NE1P(n,itt,jnn),NE2P(n,itt,jnn),
      +         (FIONP(NE,n,itt,jnn),NE=NE1P(n,itt,jnn),NE2P(n,itt,jnn))
              read(ifl(n))np(n,itt,jnn)
@@ -337,15 +325,15 @@
                read(ifl(n))(yy2(k+ncount2),k=1,ntotp)
                  kp2(n,itt,jnn)=ncount2
                  ncount2=ncount2+ntotp
-             endif
+             end if
                if (n > 2) then
                  read(iflp(n))ja,npp(n,itt,jnn)
                  if (npp(n,itt,jnn) > 0) then
            read(iflp(n))(nx(k+ncount3),yx(k+ncount3),k=1,npp(n,itt,jnn))
                    kp3(n,itt,jnn)=ncount3
                    ncount3=ncount3+npp(n,itt,jnn)
-                 endif
-               endif
+                 end if
+               end if
             end do
           end do
 
@@ -374,8 +362,8 @@
       if (ios == 0) then
          write(*,*) 'write ' // trim(cache_filename)
          write(1) op_cache_version, ntotv,dv,dv1,umesh,
-     >     ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,
-     >     ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
+     &     ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p,
+     &     ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
          close(1)
       end if
 
@@ -413,14 +401,14 @@ c6012  FORMAT(/10X,'ERROR, SEE WRITE(6,6012)'/
      + 10X,I5,' READ FOR N=',I5)
 
 c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
-1010  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
+1010  write(*,*) ' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
       stop
-1011  print*,' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.mesh'
+1011  write(*,*) ' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.mesh'
       stop
       end subroutine op_dload
 
-!***********************************************************************
-        SUBROUTINE IMESH(UMESH,NTOT)
+! **********************************************************************
+        subroutine IMESH(UMESH,NTOT)
 
       DIMENSION UMESH(nptot)
       COMMON/CIMESH/U(100),AA(nptot),BB(nptot),IN(nptot),ITOT,NN
@@ -432,7 +420,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       II=100
       A=(II*UMIN-UMAX)/REAL(II-1)
       B=(UMAX-UMIN)/REAL(II-1)
-      DO I=1,II
+      do I=1,II
         U(I)=A+B*I
       end do
 
@@ -450,9 +438,9 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
           if (umesh(n) > ub) then
             nn=n-1
             ibb=ib-1
-            goto 1
-          endif
-        endif
+            GOTO 1
+          end if
+        end if
         in(n)=ib
         aa(n)=(ub-umesh(n))/d
         bb(n)=(umesh(n)-ua)/d
@@ -466,8 +454,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       end do
       itot=ib
 
-        return
-      end SUBROUTINE IMESH
+      end subroutine IMESH
 
 
       subroutine msh(dv, ntot, umesh, semesh, uf, dscat)
@@ -495,8 +482,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       do i = 0, 100
          uf(i) = umin + i*dscat
       end do
-
-      return
 
       end subroutine msh
 
@@ -531,19 +516,19 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
          if (abs(d) < 1.e-4) return
       end do
 
-!      print*,' Not converged after 10 iterations in SOLVE'
-!      print*,' v=',v
-!      DO N=1,4
-!         PRINT*,' N, U(N)=',N,U(N)
+!      write(*,*) ' Not converged after 10 iterations in SOLVE'
+!      write(*,*) ' v=',v
+!      do N=1,4
+!         write(*,*) ' N, U(N)=',N,U(N)
 !      end do
       ierr = 10
       return
 !      stop
 
       end subroutine solve
-!***********************************************************************
+! **********************************************************************
 
-      SUBROUTINE BRCKR(T,FNE,RION,NION,U,NFREQ,SF, ierr)
+      subroutine BRCKR(T,FNE,RION,NION,U,NFREQ,SF, ierr)
       integer, intent(inout) :: ierr
 !
 !  CODE FOR COLLECTIVE EFFECTS ON THOMSON SCATTERING.
@@ -568,7 +553,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !         HIGHLY-DEGENERATE CASES.
 !     (2) INCLUDE RELATIVISTIC CORRECTION.
 !
-      PARAMETER (IPZ=28,IPNC=100)
+      parameter (IPZ=28,IPNC=100)
       DIMENSION RION(IPZ),U(0:IPNC),SF(0:IPNC)
 
       AUNE=1.48185E-25*FNE
@@ -576,82 +561,81 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       C1=-1.0650E-4*AUT
       C2=+1.4746E-8*AUT**2
       C3=-2.0084E-12*AUT*AUT*AUT
-      V=7.8748*AUNE/(AUT*SQRT(AUT))
-      CALL FDETA(V,ETA, ierr)  ! 23.10.93
+      V=7.8748*AUNE/(AUT*sqrt(AUT))
+      call FDETA(V,ETA, ierr)  ! 23.10.93
       W=exp(dble(ETA))         ! 23.10.93
    11 R=FMH(W)/V
       A=0.
       B=0.
-      DO I=1,NION
+      do I=1,NION
          A=A+I*RION(I)
          B=B+I**2*RION(I)
-      END DO
+      end do
       X=R+B/A
 
       Y=.353553*W
       C=1.1799E5*X*AUNE/(AUT*AUT*AUT)
-      DO N=0,NFREQ
+      do N=0,NFREQ
          D=C/U(N)**2
          if (D > 5.) then
             D=-2./D
             F=2.666667*(1.+D*(.7+D*(.55+.341*D)))
-         ELSE
+         else
             G=2.*D*(1+D)
-            F=D*((G+D*D*D)*LOG(dble(D/(2.+D)))+G+2.6666667)
-         ENDIF
+            F=D*((G+D*D*D)*log(dble(D/(2.+D)))+G+2.6666667)
+         end if
          DELTA=.375*R*F/X
          SF(N)=(1.-R*DELTA-Y*FUNS(W))*
      +   (1.+U(N)*(C1+U(N)*(C2+U(N)*C3)))   !SAMPSON CORRECTION
-      END DO
+      end do
 
-      RETURN
+      return
 
   600 FORMAT(5X,'NOT CONVERGED IN LOOP 10 OF BRCKR'/
      +       5X,'T=',1P,E10.2,', FNE=',E10.2)
 
-      END SUBROUTINE BRCKR
-!***********************************************************************
-      FUNCTION FUNS(A)
+      end subroutine BRCKR
+! **********************************************************************
+      function FUNS(A)
 !
       if (A <= 0.001) then
          FUNS=1.
-      elseif (A <= 0.01) then
+      else if (A <= 0.01) then
          FUNS=(1.+A*(-1.0886+A*(1.06066+A*1.101193)))/
      +     (1.+A*(0.35355+A*(0.19245+A+0.125)))
-      ELSE
+      else
          FUNS=(  1./(1.+0.81230*A)**2+
      +        0.92007/(1.+0.31754*A)**2+
      +        0.05683/(1.+0.04307*A)**2 )/
      +     (  1./(1.+0.65983*A)+
      +        0.92007/(1.+0.10083*A)+
      +        0.05683/(1.+0.00186*A)    )
-      ENDIF
-      RETURN
-      END FUNCTION FUNS
-!***********************************************************************
-      FUNCTION FMH(W)
+      end if
+
+      end function FUNS
+! **********************************************************************
+      function FMH(W)
 !
 !  CALCULATES FD INTEGRAL I_(-1/2)(ETA). INCLUDES FACTOR 1/GAMMA(1/2).
-!  ETA=LOG(W)
+!  ETA=log(W)
 !
       if (W <= 2.718282) then
          FMH=W*(1+W*(-.7070545+W*(-.3394862-W*6.923481E-4))
      +   /(1.+W*(1.2958546+W*.35469431)))
-      elseif (W <= 54.59815) then
-         X=LOG(dble(W))
+      else if (W <= 54.59815) then
+         X=log(dble(W))
          FMH=(.6652309+X*(.7528360+X*.6494319))
      +   /(1.+X*(.8975007+X*.1153824))
-      ELSE
-         X=LOG(dble(W))
+      else
+         X=log(dble(W))
          Y=1./X**2
-         FMH=SQRT(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))
+         FMH=sqrt(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))
      +   /(1.+Y*(-10.867628+Y*384.61501)))
-      ENDIF
+      end if
 
-      RETURN
-      END FUNCTION FMH
-!***********************************************************************
-      SUBROUTINE FDETA(X,ETA, ierr)
+      end function FMH
+! **********************************************************************
+      subroutine FDETA(X,ETA, ierr)
 !
 !  GIVEN X=N_e/P_e, CALCULATES FERMI-DIRAC ETA
 !  USE CHEBYSHEV FITS OF W.J. CODY AND H.C. THACHER,
@@ -673,42 +657,41 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
          v=x
          S=V
          U=V
-         DO N=2,12
+         do N=2,12
              S=S*V
             SS=S*D(N)
             U=U+SS
             if (ABS(SS) < 1.E-6*U)GOTO 11
-         END DO
-!         PRINT*,' COMPLETED LOOP 10 IN FDETA'
+         end do
+!         write(*,*) ' COMPLETED LOOP 10 IN FDETA'
          ierr = 11
          return
 !         STOP
-   11    ETA=LOG(dble(U))
+   11    ETA=log(dble(U))
 
-      ELSE
+      else
          if (a < 2) then
-            E=LOG(dble(X))
+            E=log(dble(X))
          else
             e=pow(1.5d0*a,2d0/3d0)
-         endif
+         end if
          do k=1,10
-            CALL FDF1F2(E,F1,F2)
+            call FDF1F2(E,F1,F2)
             DE=(A-F2)*2./F1
             E=E+DE
-            if (abs(dE) < 1.e-4*abs(E))goto 21
+            if (abs(dE) < 1.e-4*abs(E))GOTO 21
          end do
-!         print*,' completed loop 20 IN FDETA'
+!         write(*,*) ' completed loop 20 IN FDETA'
          ierr = 12
          return
 !         stop
    21    ETA=E
 
-      ENDIF
+      end if
 
-      RETURN
-      END SUBROUTINE FDETA
-!***********************************************************************
-      SUBROUTINE FDF1F2(ETA,F1,F2)
+      end subroutine FDETA
+! **********************************************************************
+      subroutine FDF1F2(ETA,F1,F2)
 !
 !  CALCULATES FD INTEGRALS F1, F2=F(-1/2), F(+1/2)
 !  USE CHEBYSHEV FITS OF W.J. CODY AND H.C. THACHER,
@@ -721,24 +704,23 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
          F2=X*(0.88622693+X*(-0.31329180+X*(-0.14275695-
      +      X*0.0010090890))/
      +      (1.+X*(0.99882853+X*0.19716967)))
-      elseif (ETA <= 4) then
+      else if (ETA <= 4) then
          X=ETA
          F1=(1.17909+X*(1.334367+X*1.151088))/
      +      (1.+X*(0.8975007+X*0.1153824))
          F2=(0.6943274+X*(0.4918855+X*0.214556))/
      +      (1.+X*(-0.0005456214+X*0.003648789))
-      ELSE
-         X=SQRT(ETA)
+      else
+         X=sqrt(ETA)
          Y=1./ETA**2
          F1=X*(2.+Y*(-0.81495847+Y*(4.0521266-Y*325.43565))/
      +      (1.+Y*(-10.867628+Y*384.61501)))
          F2=ETA*X*(0.666666667+Y*(0.822713535+Y*(5.27498049+
      +      Y*290.433403))/
      +      (1.+Y*(5.69335697+Y*322.149800)))
-      ENDIF
+      end if
 
-      RETURN
-      END SUBROUTINE FDF1F2
+      end subroutine FDF1F2
 
 
       subroutine screen2(ft,fne,rion,epa,ntot,umin,umax,umesh,p)
@@ -779,7 +761,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
             fkp=sqrt(e+w)
             x1=1.+alp2/(fkp+fk)**2
             x2=1.+alp2/(fkp-fk)**2
-            q=(1./x2-1./x1+LOG(dble(x1/x2)))*
+            q=(1./x2-1./x1+log(dble(x1/x2)))*
      +        (fkp*(1.-exp(dble(-twopi*k/fkp))))/(fk*(1.-exp(dble(-twopi*k/fk))))
               ff=ff+wt(j)*q
           end do
@@ -797,7 +779,6 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
         p(n)=p(n)+f(in(n))/(w*w*w)
       end do
 
-      return
       end subroutine screen2
 
       end module op_load

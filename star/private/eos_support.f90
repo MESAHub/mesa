@@ -10,7 +10,7 @@
 !
 !   You should have received a copy of the MESA MANIFESTO along with
 !   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   https://mesastar.org/
 !
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,11 +31,7 @@ module eos_support
 
   implicit none
 
-  integer, parameter :: MAX_ITER_FOR_SOLVE = 100
-
-
   private
-
   public :: get_eos
   public :: solve_eos_given_DE
   public :: solve_eos_given_DEgas
@@ -45,6 +41,7 @@ module eos_support
   public :: solve_eos_given_PgasT
   public :: solve_eos_given_PgasT_auto
 
+  integer, parameter :: MAX_ITER_FOR_SOLVE = 100
 
 contains
 
@@ -418,6 +415,5 @@ contains
        ierr)
 
   end subroutine solve_eos_given_PgasT_auto
-
 
 end module eos_support
