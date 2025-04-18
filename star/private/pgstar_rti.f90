@@ -233,6 +233,7 @@
          end subroutine dealloc
 
          subroutine plot_total_mass_line
+            use pgstar_colors
             call pgsave
             call pgsch(txt_scale*0.8)
             call pgsci(clr_Gray)
@@ -268,7 +269,7 @@
             if (s% pg% rti_mass_max /= -101d0) ymax = ymax + s% pg% rti_mass_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             ymin_mass_axis = ymin
             ymax_mass_axis = ymax
          end subroutine setup_mass_yaxis
@@ -376,6 +377,7 @@
 
          subroutine draw_rti_for_step( &
                pg, step, i_rti_type_first, i_rti_type_last, xval, mass, mass_center)
+            use pgstar_colors
             type (pgstar_hist_node), pointer :: pg
             integer, intent(in) :: step, i_rti_type_first, i_rti_type_last
             real, intent(in) :: xval, mass, mass_center
@@ -415,6 +417,7 @@
 
 
          subroutine plot_mass_lines
+            use pgstar_colors
             integer :: i
 
             include 'formats'

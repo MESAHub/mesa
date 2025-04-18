@@ -617,6 +617,7 @@
             use_decorator, pgstar_decorator, &
             decorate, ierr)
          use utils_lib
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: &
@@ -727,7 +728,7 @@
          call pgsvp(vp_xleft, vp_xright, vp_ybot, vp_ytop)
          call pgswin(xleft, xright, ybot, ytop)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call show_box_pgstar(s,'BCNST1','BCNSTV1')
 
          if (log_xaxis) then
@@ -807,6 +808,7 @@
 
 
          subroutine show_file_track
+            use pgstar_colors
             integer :: k
             if (len_trim(fname) == 0) return
             if (.not. read_values_from_file(fname, &

@@ -58,6 +58,7 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -162,7 +163,7 @@
             ybot = 0
             call pgswin(xmin, xmax, ymin+ybot, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_box_pgstar(s,'BCNST','BCNSTV')
             call show_left_yaxis_label_pgstar(s, 'rel=(val-min)/(max-min)')
 
@@ -208,7 +209,7 @@
 
             end do
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_xaxis_label_pgstar(s,'model number')
 
             ! show the legend
@@ -271,7 +272,7 @@
             call pgslw(lw)
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*0.70)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, name)
             summary_history_line_legend = cnt + 1

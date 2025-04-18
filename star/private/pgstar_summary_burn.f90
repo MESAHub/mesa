@@ -116,6 +116,7 @@
 
          subroutine plot(ierr)
             use rates_def
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: j, ii, jj, i, cnt, k
@@ -151,7 +152,7 @@
             call pgswin(xleft, xright, ymin+ybot, ymax)
 
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale)
             call pgbox('BCNST',0.0,0,'CMSTV',0.0,0)
             call pgsci(clr_Goldenrod)
@@ -186,7 +187,7 @@
 
             call pgswin(xleft, xright, ymin+ybot, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale)
             call pgbox('',0.0,0,'BNSTV',0.0,0)
 
@@ -224,7 +225,7 @@
                   xnuc_cat(num_cat) = maxv
                end if
             end do
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*0.8)
             do ii = 1, num_cat
                eps_max = -100; i = 0
@@ -283,7 +284,7 @@
                end if
             end do
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             ierr = 0
             call show_xaxis_name(s,xaxis_name,ierr)
             if (ierr == 0) then  ! show mix regions at bottom of plot

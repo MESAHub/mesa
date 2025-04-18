@@ -545,6 +545,7 @@
          use pgstar_mixing_Ds, only: do_Mixing_panel
          use pgstar_mode_prop, only: do_mode_propagation_panel
          use pgstar_summary_profile, only: do_summary_profile_panel
+         use pgstar_colors
          use utils_lib
          use profile_getval, only: get_profile_val, get_profile_id
 
@@ -916,7 +917,7 @@
             if (len_trim(panels_other_yaxis_name(j)) > 0) then
                call pgswin(xleft, xright, other_ybot, other_ytop)
                call pgscf(1)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_box_pgstar(s,'','CMSTV')
                call pgsci(other_y_color)
                if (panels_other_yaxis_log(j)) then
@@ -944,7 +945,7 @@
 
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (j < panels_num_panels) then
                if (other_yaxis_id <= 0 .and. other_yfile_data_len <= 0) then
                   call show_box_pgstar(s,'BCST','BCMNSTV')
@@ -984,7 +985,7 @@
                end if
             end if
             call pgslw(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
 
             call show_pgstar_decorator(s% id, use_decorator, pgstar_decorator, j, ierr)
          end do

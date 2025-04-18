@@ -242,6 +242,7 @@ contains
    contains
 
       subroutine plot(ierr)
+         use pgstar_colors
          use rates_def, only: i_rate
          use chem_def, only: ipp, icno
          integer, intent(out) :: ierr
@@ -269,7 +270,7 @@ contains
          call pgmtxt('T', 1.8, 0.9, 0.5, str)
 
          ! xlabel
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(label_scale)
          call show_pgstar_xaxis_by(s, my_xaxis_by, ierr)
          if (ierr /= 0) return
@@ -312,7 +313,7 @@ contains
 
          call pgswin(xleft, xright, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(label_scale)
          call pgbox('', 0.0, 0, 'BNSTV', 0.0, 0)
 
@@ -371,7 +372,7 @@ contains
          call pgswin(xleft, xright, ymin, ymax)
 
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(label_scale)
          call pgbox('BCNST', 0.0, 0, 'CMSTV', 0.0, 0)
 
