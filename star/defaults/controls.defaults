@@ -2030,7 +2030,7 @@
       ! Pgas_div_P_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! criteria for stopping when Pgas/P <= Pgas_div_P_limit
+      ! stop when Pgas/P <= Pgas_div_P_limit
 
       ! ::
 
