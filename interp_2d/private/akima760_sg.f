@@ -76,7 +76,7 @@
 !
 ! This subroutine calls the RGPD3P_sg, RGLCTN_sg, and RGPLNL_sg subroutines.
 !
-*
+
 ! Specification statements
 !     .. Parameters ..
       integer          NIPIMX

@@ -226,7 +226,7 @@
 !      first derivities.
 
       save
-      integer w
+      integer :: w
       character (len=*) :: filename
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh

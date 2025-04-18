@@ -55,7 +55,7 @@
 !         yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
 
       integer,dimension(ipe) :: ifl,iflp
-      character num(0:9)*1,zlab(ipe)*3,tlab*6,zlabp(ipe)*3
+      character :: num(0:9)*1,zlab(ipe)*3,tlab*6,zlabp(ipe)*3
       DATA NUM/'0','1','2','3','4','5','6','7','8','9'/
 
       integer :: kz(17)
@@ -642,7 +642,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
      +  2.0981899E-05, 8.6021311E-07, 2.8647149E-08, 7.9528315E-10,
      +  1.8774422E-11, 3.8247505E-13, 6.8427624E-15/
 
-      integer n,k
+      integer :: n,k
 
 !      ierr = 0
       a=x*0.88622693

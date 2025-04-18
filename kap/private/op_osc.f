@@ -250,8 +250,7 @@
 ! *********************************************************************
       subroutine rd(nel, nkz, izz, ilab, jh, n_tot, ff, rr, i3, umesh, fac)
       implicit none
-      integer, intent(in) :: nel, nkz(ipe), izz(ipe), ilab(0:5),
-     &     jh(0:5), n_tot, i3
+      integer, intent(in) :: nel,nkz(ipe),izz(ipe),ilab(0:5),jh(0:5),n_tot,i3
       real, intent(in) :: umesh(nptot)
       real(dp), intent(in) :: fac(nel)
       real, intent(out) :: ff(:,:,0:,0:)  ! (nptot, ipe, 6, 6)
@@ -261,11 +260,11 @@
 ! declare variables in common block (instead of by default: real (a-h, o-z), integer (i-n))
 !       integer :: ite1, ite2, ite3, jn1, jn2, jne3, ntot, nc, nf, int, ne1p, ne2p, np, kp1, kp2, kp3, npp, mx, nx
 !       real :: umin, umax, epatom, oplnck, fionp, yy1, yy2, yx
-!       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot,
-!      + nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1p(17,91,25),
-!      + ne2p(17,91,25),fionp(-1:28,28,91,25),np(17,91,25),kp1(17,91,25),
-!      + kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000),
-!      + yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
+!       common /atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot, &
+!        nc,nf,int(17),epatom(17,91,25),oplnck(17,91,25),ne1p(17,91,25), &
+!        ne2p(17,91,25),fionp(-1:28,28,91,25),np(17,91,25),kp1(17,91,25), &
+!        kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000), &
+!        yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
 !       save /atomdata/
 !
 !  i=temperature index
@@ -732,7 +731,8 @@
       Py12 = P1(x,2.,3.)*Px2(y,2.,3.)
       Py22 = P2(x,2.,3.)*Px2(y,2.,3.)
 
-      g = f(2,2)*P11 + f(3,2)*P21 + f(2,3)*P12 + f(3,3)*P22 + fx(2,2)*Px11 + fx(3,2)*Px21 + fx(2,3)*Px12 + fx(3,3)*Px22
+      g = f(2,2)*P11 + f(3,2)*P21 + f(2,3)*P12 + f(3,3)*P22
+     &    + fx(2,2)*Px11 + fx(3,2)*Px21 + fx(2,3)*Px12 + fx(3,3)*Px22
      &    + fy(2,2)*Py11 + fy(3,2)*Py21 + fy(2,3)*Py12 + fy(3,3)*Py22
 
       end subroutine interp3
@@ -814,7 +814,7 @@
       use op_load, only: screen2
       dimension uf(0:100), umesh(nptot),fscat(0:100), ih(0:5), jh(0:5)
       real, target :: f(nptot, 0:5, 0:5), rion(28, 0:5, 0:5)
-      integer i, j, k, m
+      integer :: i, j, k, m
       real, pointer :: p(:), rr(:)
 
       ite3=2

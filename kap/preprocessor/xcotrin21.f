@@ -489,7 +489,7 @@
 !     The purpose of this subroutine is to interpolate in C and O abund-
 !     ances.
       save
-      integer w
+      integer :: w
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
@@ -566,9 +566,11 @@
         iw=1
         m1=i-1
         m2=i-2
-        a(1,m)=quad(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2,it,ir),diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
+        a(1,m)=quad(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2,it,ir),
+     $              diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
         iw=iw+1
-        a(2,m)=quad(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1,it,ir),diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
+        a(2,m)=quad(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1,it,ir),
+     $              diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
         iw=iw+1
         a(3,m)=quad(is,iw,cxx,diag(m,m2,it,ir),diag(m,m1,it,ir),diag(m,i,it,ir),cxd(m2),cxd(m1),cxd(i))
          do w=1,3
@@ -638,17 +640,18 @@
 ! _________
       do i=4,no-1
 !     do not go beyond middle (where o3-o6 overlaps c3-c6), and
-      if((xxo  >  xod(i)-1.e-6) .and. (xxc  >  xc(i-1)-1.e-6) .and.
-     $     (xod(i-1)  >  xo(i-1)-1.e-6)) then
+      if((xxo > xod(i)-1.e-6) .and. (xxc > xc(i-1)-1.e-6) .and. (xod(i-1) > xo(i-1)-1.e-6)) then
       do ir=l1,l1+iq
       do it=k1,k1+ip
       cxdp=log10(zzz+xcdp)
       iw=1
       m2=i-2
       m1=i-1
-      a(1,m)=quad(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
+      a(1,m)=quad(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),
+     $                   diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
       iw=iw+1
-      a(2,m)=quad(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
+      a(2,m)=quad(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),
+     $                   diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
       iw=iw+1
       a(3,m)=quad(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
         do w=1,3
@@ -700,8 +703,7 @@
         end if
 
 !     lower-O part of grid: interpolate C before O
-      if(j3 < no .and. i3 <= n(m,j3) .and.
-     $       (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
+      if(j3 < no .and. i3 <= n(m,j3) .and. (xxc < xcd(j3)+1.e-6 .or. xxc >= xxo))then
       do ir=l1,l1+iq
       do it=k1,k1+ip
       iw=0
@@ -1528,7 +1530,7 @@
       character*1 HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
-      logical IERR
+      logical :: IERR
 
 
       NRL=2*(RLE-RLS)+1

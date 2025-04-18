@@ -76,7 +76,7 @@
 !
 ! This subroutine calls the RGPD3P_db, RGLCTN_db, and RGPLNL_db subroutines.
 !
-*
+
 ! Specification statements
 !     .. Parameters ..
       integer          NIPIMX
