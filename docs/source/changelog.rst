@@ -55,7 +55,7 @@ been introduced.
 
 The Fe core-collapse infall condition ``fe_core_infall_limit`` has been adjusted, and an additional optional infall condition
 has been introduced. Users can switch between either choice with the new logical control ``check_mass_sum_for_infall``.
-See the ``&controls`` for further details. 
+See the ``&controls`` for further details.
 
 .. _Bug Fixes main:
 

@@ -1783,10 +1783,10 @@
       ! check_mass_sum_for_infall
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If ``.true.``, use ``fe_core_infall_mass`` to check amount of mass that is collapsing, and 
-      ! only report the maximum infall velocity if > ``fe_core_infall_mass`` is collapsing. 
-      ! if ``.false.``, fe_core_infall is determined by finding the maximum velocity that is inside 
-      ! ``fe_core_mass`` in units of Msun. 
+      ! If ``.true.``, use ``fe_core_infall_mass`` to check amount of mass that is collapsing, and
+      ! only report the maximum infall velocity if > ``fe_core_infall_mass`` is collapsing.
+      ! if ``.false.``, fe_core_infall is determined by finding the maximum velocity that is inside
+      ! ``fe_core_mass`` in units of Msun.
 
     check_mass_sum_for_infall = .true.
 
