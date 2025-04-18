@@ -289,10 +289,10 @@ c
 c  common defining standard input and output
 c
       common/cstdio/ istdin, istdou, istdpr, istder
+      save
       !external time
-      data trailer_par /''/
+      trailer_par = ''
 c
-      save 
       data nnul /0/
 c
 c  find file name

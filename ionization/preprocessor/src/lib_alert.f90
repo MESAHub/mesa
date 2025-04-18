@@ -18,6 +18,7 @@
 
 
       subroutine alert(flag, message)
+         use utils_lib, only: mesa_error
 
          integer, intent(in) :: flag
          character (*), intent(in) :: message
