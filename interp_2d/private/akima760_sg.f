@@ -87,7 +87,7 @@
 !     ..
 !     .. Array Arguments ..
       real             WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
-     +                 ZD(NXD,NYD),ZI(NIP)
+     &                 ZD(NXD,NYD),ZI(NIP)
 !     ..
 !     .. Local Scalars ..
       integer          IIP,IX,IY,NIPI
@@ -129,7 +129,7 @@
 !         call RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output points.
           call RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,
-     +                INYI, ZI(IIP))
+     &                INYI, ZI(IIP))
 !         call RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
    30 continue
       return
@@ -154,11 +154,11 @@
  9000 FORMAT (1X,/,'*** RGBI3P Error 1: NXD = 1 or less')
  9010 FORMAT (1X,/,'*** RGBI3P Error 2: NYD = 1 or less')
  9020 FORMAT (1X,/,'*** RGBI3P Error 3: Identical XD values or',
-     +       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
-     +       E11.3)
+     &       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
+     &       E11.3)
  9030 FORMAT (1X,/,'*** RGBI3P Error 4: Identical YD values or',
-     +       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
-     +       E11.3)
+     &       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
+     &       E11.3)
  9040 FORMAT (1X,/,'*** RGBI3P Error 5: NIP = 0 or less')
  9050 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NIP =',I5,/)
       end
@@ -258,7 +258,7 @@
 !     ..
 !     .. Array Arguments ..
       real             WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
-     +                 ZD(NXD,NYD),ZI(NXI,NYI)
+     &                 ZD(NXD,NYD),ZI(NXI,NYI)
 !     ..
 !     .. Local Scalars ..
       integer          IX,IXI,IY,IYI,NIPI
@@ -309,7 +309,7 @@
 !             call RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output-grid points.
               call RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,
-     +                    INYI, ZI(IXI,IYI))
+     &                    INYI, ZI(IXI,IYI))
 !             call RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
    40     continue
    50 continue
@@ -338,15 +338,15 @@
  9000 FORMAT (1X,/,'*** RGSF3P_sg Error 1: NXD = 1 or less')
  9010 FORMAT (1X,/,'*** RGSF3P_sg Error 2: NYD = 1 or less')
  9020 FORMAT (1X,/,'*** RGSF3P_sg Error 3: Identical XD values or',
-     +       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
-     +       E11.3)
+     &       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
+     &       E11.3)
  9030 FORMAT (1X,/,'*** RGSF3P_sg Error 4: Identical YD values or',
-     +       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
-     +       E11.3)
+     &       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
+     &       E11.3)
  9040 FORMAT (1X,/,'*** RGSF3P_sg Error 5: NXI = 0 or less')
  9050 FORMAT (1X,/,'*** RGSF3P_sg Error 6: NYI = 0 or less')
  9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,
-     +       /)
+     &       /)
       end
 
 
@@ -394,22 +394,22 @@
 !     ..
 !     .. Local Scalars ..
       real             B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
-     +                 CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,
-     +                 DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,
-     +                 DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,
-     +                 DZXY22,DZXY23,DZXY31,DZXY32,DZXY33,DZY01,DZY02,
-     +                 DZY03,EPSLN,PEZX,PEZXY,PEZY,SMPEF,SMPEI,SMWTF,
-     +                 SMWTI,SX,SXX,SXXY,SXXYY,SXY,SXYY,SXYZ,SXZ,SY,SYY,
-     +                 SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,
-     +                 Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,
-     +                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
+     &                 CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,
+     &                 DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,
+     &                 DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,
+     &                 DZXY22,DZXY23,DZXY31,DZXY32,DZXY33,DZY01,DZY02,
+     &                 DZY03,EPSLN,PEZX,PEZXY,PEZY,SMPEF,SMPEI,SMWTF,
+     &                 SMWTI,SX,SXX,SXXY,SXXYY,SXY,SXYY,SXYZ,SXZ,SY,SYY,
+     &                 SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,
+     &                 Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,
+     &                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
       integer          IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,
-     +                 JXY,NX0,NY0
+     &                 JXY,NX0,NY0
 !     ..
 !     .. Local Arrays ..
       real             B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
-     +                 CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),
-     +                 YA(3,4),Z0IA(3,4),ZI0A(3,4)
+     &                 CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),
+     &                 YA(3,4),Z0IA(3,4),ZI0A(3,4)
       integer          IDLT(3,4)
 !     ..
 !     .. Intrinsic Functions ..
@@ -420,13 +420,13 @@
 !     ..
 ! Data statements
       DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,
-     +                 -2,-1,1,2,-1,1,2,3/
+     &                 -2,-1,1,2,-1,1,2,3/
 !     ..
 ! Statement Function definitions
       Z2F(XX1,XX2,ZZ0,ZZ1) = (ZZ1-ZZ0)*XX2/XX1 + ZZ0
       Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2) = ((ZZ2-ZZ0)* (XX3-XX1)/XX2-
-     +                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
-     +                               (XX3/ (XX2-XX1)) + ZZ0
+     &                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
+     &                               (XX3/ (XX2-XX1)) + ZZ0
 !     ..
 ! Calculation
 ! Initial setting of some local variables
@@ -451,8 +451,8 @@
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
                   if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR.
-     +                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
-     +                (IX3 > NX0)) GOTO 10
+     &                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
+     &                (IX3 > NX0)) GOTO 10
 ! Selects and/or supplements the x and z values.
                   X1 = XD(IX1) - X0
                   Z10 = ZD(IX1,IY0)
@@ -548,8 +548,8 @@
                   IY2 = IY0 + IDLT(2,IPEY)
                   IY3 = IY0 + IDLT(3,IPEY)
                   if ((IY1 < 1) .OR. (IY2 < 1) .OR. (IY3 < 1) .OR.
-     +                (IY1 > NY0) .OR. (IY2 > NY0) .OR.
-     +                (IY3 > NY0)) GOTO 20
+     &                (IY1 > NY0) .OR. (IY2 > NY0) .OR.
+     &                (IY3 > NY0)) GOTO 20
 ! Selects and/or supplements the y and z values.
                   Y1 = YD(IY1) - Y0
                   Z01 = ZD(IX0,IY1)
@@ -645,8 +645,8 @@
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
                   if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR.
-     +                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
-     +                (IX3 > NX0)) GOTO 40
+     &                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
+     &                (IX3 > NX0)) GOTO 40
 ! Retrieves the necessary values for estimating zxy in the x
 ! direction.
                   X1 = XA(1,IPEX)
@@ -669,8 +669,8 @@
                       IY2 = IY0 + IDLT(2,IPEY)
                       IY3 = IY0 + IDLT(3,IPEY)
                       if ((IY1 < 1) .OR. (IY2 < 1) .OR.
-     +                    (IY3 < 1) .OR. (IY1 > NY0) .OR.
-     +                    (IY2 > NY0) .OR. (IY3 > NY0)) GOTO 30
+     &                    (IY3 < 1) .OR. (IY1 > NY0) .OR.
+     &                    (IY2 > NY0) .OR. (IY3 > NY0)) GOTO 30
 ! Retrieves the necessary values for estimating zxy in the y
 ! direction.
                       Y1 = YA(1,IPEY)
@@ -766,8 +766,8 @@
                       DZXY32 = (Z32-Z30-Z02+Z00)/ (X3*Y2)
                       DZXY33 = (Z33-Z30-Z03+Z00)/ (X3*Y3)
                       PEZXY = CX1* (CY1*DZXY11+CY2*DZXY12+CY3*DZXY13) +
-     +                        CX2* (CY1*DZXY21+CY2*DZXY22+CY3*DZXY23) +
-     +                        CX3* (CY1*DZXY31+CY2*DZXY32+CY3*DZXY33)
+     &                        CX2* (CY1*DZXY21+CY2*DZXY22+CY3*DZXY23) +
+     &                        CX3* (CY1*DZXY31+CY2*DZXY32+CY3*DZXY33)
 ! Calculates the volatility factor and distance factor in the x
 ! and y directions for the primary estimate of zxy.
                       B00 = (B00X+B00Y)/2.0
@@ -776,8 +776,8 @@
                       SXYY = SX*SYY
                       SXXYY = SXX*SYY
                       SXYZ = X1* (Y1*Z11+Y2*Z12+Y3*Z13) +
-     +                       X2* (Y1*Z21+Y2*Z22+Y3*Z23) +
-     +                       X3* (Y1*Z31+Y2*Z32+Y3*Z33)
+     &                       X2* (Y1*Z21+Y2*Z22+Y3*Z23) +
+     &                       X3* (Y1*Z31+Y2*Z32+Y3*Z33)
                       B11 = (SXYZ-B00*SXY-B10*SXXY-B01*SXYY)/SXXYY
                       DZ00 = Z00 - B00
                       DZ01 = Z01 - (B00+B01*Y1)
@@ -796,15 +796,15 @@
                       DZ32 = Z32 - (B00+B01*Y2+X3* (B10+B11*Y2))
                       DZ33 = Z33 - (B00+B01*Y3+X3* (B10+B11*Y3))
                       VOLF = DZ00**2 + DZ01**2 + DZ02**2 + DZ03**2 +
-     +                       DZ10**2 + DZ11**2 + DZ12**2 + DZ13**2 +
-     +                       DZ20**2 + DZ21**2 + DZ22**2 + DZ23**2 +
-     +                       DZ30**2 + DZ31**2 + DZ32**2 + DZ33**2
+     &                       DZ10**2 + DZ11**2 + DZ12**2 + DZ13**2 +
+     &                       DZ20**2 + DZ21**2 + DZ22**2 + DZ23**2 +
+     &                       DZ30**2 + DZ31**2 + DZ32**2 + DZ33**2
                       DISF = SXX*SYY
 ! Calculates EPSLN.
                       EPSLN = (Z00**2+Z01**2+Z02**2+Z03**2+Z10**2+
-     +                        Z11**2+Z12**2+Z13**2+Z20**2+Z21**2+Z22**2+
-     +                        Z23**2+Z30**2+Z31**2+Z32**2+Z33**2)*
-     +                        1.0E-12
+     &                        Z11**2+Z12**2+Z13**2+Z20**2+Z21**2+Z22**2+
+     &                        Z23**2+Z30**2+Z31**2+Z32**2+Z33**2)*
+     &                        1.0E-12
 ! Accumulates the weighted primary estimates of zxy and their
 ! weights.
                       if (VOLF > EPSLN) THEN
@@ -905,7 +905,7 @@
                   if (XII > XD(1)) NINTX = 1
               else if (IXD < NXD) THEN
                   if ((XII < XD(IXD)) .OR.
-     +                (XII > XD(IXD+1))) NINTX = 1
+     &                (XII > XD(IXD+1))) NINTX = 1
               ELSE
                   if (XII < XD(NXD)) NINTX = 1
               end if
@@ -943,7 +943,7 @@
                   if (YII > YD(1)) NINTY = 1
               else if (IYD < NYD) THEN
                   if ((YII < YD(IYD)) .OR.
-     +                (YII > YD(IYD+1))) NINTY = 1
+     &                (YII > YD(IYD+1))) NINTY = 1
               ELSE
                   if (YII < YD(NYD)) NINTY = 1
               end if
@@ -1034,16 +1034,16 @@
 !     ..
 !     .. Array Arguments ..
       real             PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
-     +                 ZD(NXD,NYD),ZI(NIP)
+     &                 ZD(NXD,NYD),ZI(NIP)
       integer          INXI(NIP),INYI(NIP)
 !     ..
 !     .. Local Scalars ..
       real             A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
-     +                 P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,
-     +                 Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,
-     +                 Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,
-     +                 ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,
-     +                 ZY10,ZY11,ZY1DX
+     &                 P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,
+     &                 Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,
+     &                 Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,
+     &                 ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,
+     &                 ZY10,ZY11,ZY1DX
       integer          IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
 !     ..
 !     .. Intrinsic Functions ..
@@ -1078,7 +1078,7 @@
 ! Case 1.  When the rectangle is inside the data area in both the
 ! x and y directions.
           if ((IXDI > 0.AND.IXDI < NXD) .AND.
-     +        (IYDI > 0.AND.IYDI < NYD)) THEN
+     &        (IYDI > 0.AND.IYDI < NYD)) THEN
 ! Retrieves the z and partial derivative values at the other three
 ! vertices of the rectangle.
               if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
@@ -1143,7 +1143,7 @@
 ! Case 2.  When the rectangle is inside the data area in the x
 ! direction but outside in the y direction.
           else if ((IXDI > 0.AND.IXDI < NXD) .AND.
-     +             (IYDI <= 0.OR.IYDI >= NYD)) THEN
+     &             (IYDI <= 0.OR.IYDI >= NYD)) THEN
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
               if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
@@ -1178,7 +1178,7 @@
 ! Case 3.  When the rectangle is outside the data area in the x
 ! direction but inside in the y direction.
           else if ((IXDI <= 0.OR.IXDI >= NXD) .AND.
-     +             (IYDI > 0.AND.IYDI < NYD)) THEN
+     &             (IYDI > 0.AND.IYDI < NYD)) THEN
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
               if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
@@ -1211,7 +1211,7 @@
 ! Case 4.  When the rectangle is outside the data area in both the
 ! x and y direction.
           else if ((IXDI <= 0.OR.IXDI >= NXD) .AND.
-     +             (IYDI <= 0.OR.IYDI >= NYD)) THEN
+     &             (IYDI <= 0.OR.IYDI >= NYD)) THEN
 ! Calculates the polynomial coefficients.
               if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) THEN
                   P00 = Z00

@@ -476,10 +476,10 @@
 !  for   R  =    -3    -1     1     3
 !  then a cubic fit is:
       P(R)=(
-     +  27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(
-     +  27*(u(3)-u(2))-(u(4)-u(1))   +R*(
-     +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(
-     +  -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
+     &  27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(
+     &  27*(u(3)-u(2))-(u(4)-u(1))   +R*(
+     &  -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(
+     &  -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
 
         fint=p(r)
 
@@ -492,9 +492,9 @@
 !  for   R  =    -3    -1     1     3
 !  then a cubic fit to the derivative is:
       PP(R)=(
-     +  27*(u(3)-u(2))-(u(4)-u(1))   +2.*R*(
-     +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +3.*R*(
-     +  -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
+     &  27*(u(3)-u(2))-(u(4)-u(1))   +2.*R*(
+     &  -3*(u(2)+u(3))+3*(u(4)+u(1)) +3.*R*(
+     &  -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
 
         fintp=pp(r)
 
@@ -616,17 +616,17 @@
 !  function DEFINITIONS FOR CUBIC EXPANSION
 !
       FF(S,T)=    B( 1)+T*(B( 2)+T*(B( 3)+T*B( 4)))
-     +   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
-     +   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
+     &   +S*(     B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
+     &   +S*(     B( 9)+T*(B(10)+T*(B(11)+T*B(12)))
+     &   +S*(     B(13)+T*(B(14)+T*(B(15)+T*B(16))) )))
 
       FFX(S,T)=   B( 5)+T*(B( 6)+T*(B( 7)+T*B( 8)))
-     +   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
-     +   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
+     &   +S*(  2*(B( 9)+T*(B(10)+T*(B(11)+T*B(12))))
+     &   +S*(  3*(B(13)+T*(B(14)+T*(B(15)+T*B(16)))) ))
 
       FFY(S,T)=   B( 2)+S*(B( 6)+S*(B(10)+S*B(14)))
-     +   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
-     +   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
+     &   +T*(  2*(B( 3)+S*(B( 7)+S*(B(11)+S*B(15))))
+     &   +T*(  3*(B( 4)+S*(B( 8)+S*(B(12)+S*B(16)))) ))
 
       Y = (eta + 5.)/2.
       X = (xi + 5.)/2.
@@ -653,28 +653,28 @@
       B(9)=3*(-F(I,J)+F(I+1,J))-2*FX(I,J)-FX(I+1,J)
       B(10)=3*(-FY(I,J)+FY(I+1,J))-2*FXY(I,J)-FXY(I+1,J)
       B(11)=9*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))
-     + +4*FXY(I,J)
-     + +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))
-     + +2*(FXY(I,J+1)+FXY(I+1,J))
-     + +FXY(I+1,J+1)
+     & +6*(FX(I,J)-FX(I,J+1)+FY(I,J)-FY(I+1,J))
+     & +4*FXY(I,J)
+     & +3*(FX(I+1,J)-FX(I+1,J+1)-FY(I+1,J+1)+FY(I,J+1))
+     & +2*(FXY(I,J+1)+FXY(I+1,J))
+     & +FXY(I+1,J+1)
       B(12)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FX(I,J)+FX(I,J+1))
-     + +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))
-     + +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))
-     + -FXY(I+1,J)-FXY(I+1,J+1)
+     & +4*(-FX(I,J)+FX(I,J+1))
+     & +3*(-FY(I,J)+FY(I+1,J)+FY(I+1,J+1)-FY(I,J+1))
+     & +2*(-FX(I+1,J)+FX(I+1,J+1)-FXY(I,J)-FXY(I,J+1))
+     & -FXY(I+1,J)-FXY(I+1,J+1)
 
       B(13)=2*(F(I,J)-F(I+1,J))+FX(I,J)+FX(I+1,J)
       B(14)=2*(FY(I,J)-FY(I+1,J))+FXY(I,J)+FXY(I+1,J)
       B(15)=6*(-F(I,J)+F(I+1,J)-F(I+1,J+1)+F(I,J+1))
-     + +4*(-FY(I,J)+FY(I+1,J))
-     + +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))
-     + +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))
-     + -FXY(I+1,J+1)-FXY(I,J+1)
+     & +4*(-FY(I,J)+FY(I+1,J))
+     & +3*(-FX(I,J)-FX(I+1,J)+FX(I+1,J+1)+FX(I,J+1))
+     & +2*(FY(I+1,J+1)-FY(I,J+1)-FXY(I,J)-FXY(I+1,J))
+     & -FXY(I+1,J+1)-FXY(I,J+1)
       B(16)=4*(F(I,J)-F(I+1,J)+F(I+1,J+1)-F(I,J+1))
-     + +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)
-     +    +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))
-     + +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
+     & +2*(FX(I,J)+FX(I+1,J)-FX(I+1,J+1)-FX(I,J+1)
+     &    +FY(I,J)-FY(I+1,J)-FY(I+1,J+1)+FY(I,J+1))
+     & +FXY(I,J)+FXY(I+1,J)+FXY(I+1,J+1)+FXY(I,J+1)
 !
 !  GET G=LOG10(ROSS), DGDT=d LOG10(ROSS)/d LOG10(T),
 !      DGDRHO=d LOG10(ROSS)/d LOG10(RHO)
@@ -766,7 +766,7 @@
       use op_load, only: BRCKR
       integer, intent(inout) :: ierr
       dimension rion(28, 0:5, 0:5),uf(0:100),f(nptot,0:5,0:5),umesh(nptot),
-     +  semesh(nptot),fscat(0:100),p(nptot),rr(28),ih(0:5),jh(0:5)
+     &  semesh(nptot),fscat(0:100),p(nptot),rr(28),ih(0:5),jh(0:5)
       integer::  i,j,k,n
 ! HH: always use meshtype q='m'
       ite3=2
