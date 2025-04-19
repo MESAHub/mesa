@@ -399,13 +399,13 @@
 
             mass_sum = 0d0
             if (s% fe_core_mass > 0) then
- 
+
                 ! check if [> fe_core_infall_mass] of core is infalling
                 do k=1, nz
                    if (s% m(k) > Msun*s% fe_core_mass) cycle
                    if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
-                        
+
                if (s% report_max_infall_inside_fe_core) then  ! report peak infall velocity inside fe_core (not necessarily the maximum, since infall stars outside in)
                   if (mass_sum > s% fe_core_infall_mass*msun) then
                      k = nz
