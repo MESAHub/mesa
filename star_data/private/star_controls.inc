@@ -836,7 +836,7 @@
             L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
-         logical :: use_drag_energy
+         logical :: use_drag_energy, report_max_infall_inside_fe_core
          real(dp) :: &
             drag_coefficient, &
             min_q_for_drag, &
