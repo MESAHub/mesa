@@ -53,8 +53,8 @@ By user request, and motivated by the underestimation of line opacities from exp
 see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_. An optional control for an opacity floor, ``opacity_min``, has
 been introduced.
 
-The Fe core-collapse infall condition ``fe_core_infall_limit`` has been adjusted, and an additional optional infall condition
-has been introduced. Users can switch between either choice with the new logical control ``check_mass_sum_for_infall``.
+The Fe core-collapse infall condition ``fe_core_infall_limit`` has been adjusted, and the old control remains an optional infall condition.
+Users can switch between either choice with the new logical control ``report_max_infall_inside_fe_core``. 
 See the ``&controls`` for further details.
 
 .. _Bug Fixes main:

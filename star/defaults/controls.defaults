@@ -1780,15 +1780,14 @@
     center_R_lower_limit = -1
 
 
-      ! check_mass_sum_for_infall
+      ! report_max_infall_inside_fe_core
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+      ! use ``fe_core_infall_mass`` to check amount of mass that is collapsing. 
+      ! Then, If ``.true.``, fe_core_infall is determined by finding the maximum velocity that is inside
+      ! ``fe_core_mass`` in units of Msun. if ``.false.``, report the maximum infall velocity at any location.
 
-      ! If ``.true.``, use ``fe_core_infall_mass`` to check amount of mass that is collapsing, and
-      ! only report the maximum infall velocity if > ``fe_core_infall_mass`` is collapsing.
-      ! if ``.false.``, fe_core_infall is determined by finding the maximum velocity that is inside
-      ! ``fe_core_mass`` in units of Msun.
-
-    check_mass_sum_for_infall = .true.
+    report_max_infall_inside_fe_core = .true.
 
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
