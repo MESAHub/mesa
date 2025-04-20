@@ -130,21 +130,21 @@
 !     Make the call of BOBYQB.
 !
       CALL BOBYQB (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,W(IXB),
-     1  W(IXP),W(IFV),W(IXO),W(IGO),W(IHQ),W(IPQ),W(IBMAT),W(IZMAT),
-     2  NDIM,W(ISL),W(ISU),W(IXN),W(IXA),W(ID),W(IVL),W(IW),CALFUN,
-     3  max_valid_value)
+     &  W(IXP),W(IFV),W(IXO),W(IGO),W(IHQ),W(IPQ),W(IBMAT),W(IZMAT),
+     &  NDIM,W(ISL),W(ISU),W(IXN),W(IXA),W(ID),W(IVL),W(IW),CALFUN,
+     &  max_valid_value)
    40 RETURN
       end subroutine do_BOBYQA
 
 
       subroutine BOBYQB (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,
-     1  MAXFUN,XBASE,XPT,FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,
-     2  SL,SU,XNEW,XALT,D,VLAG,W,CALFUN,max_valid_value)
+     &  MAXFUN,XBASE,XPT,FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,
+     &  SL,SU,XNEW,XALT,D,VLAG,W,CALFUN,max_valid_value)
       implicit real(dp) (A-H,O-Z)
       integer :: N, NPT, IPRINT, MAXFUN, NDIM
       dimension X(:),XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),
-     1  XOPT(*),GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),
-     2  SL(*),SU(*),XNEW(*),XALT(*),D(*),VLAG(*),W(*)
+     &  XOPT(*),GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),
+     &  SL(*),SU(*),XNEW(*),XALT(*),D(*),VLAG(*),W(*)
       interface
 #include "num_bobyqa_proc.dek"
       end interface
@@ -204,7 +204,7 @@
 !     less than NPT. GOPT will be updated if KOPT is different from KBASE.
 !
       CALL PRELIM (N,NPT,X,XL,XU,RHOBEG,IPRINT,MAXFUN,XBASE,XPT,
-     1  FVAL,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,KOPT,CALFUN)
+     &  FVAL,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,KOPT,CALFUN)
       XOPTSQ=ZERO
       do I=1,N
          XOPT(I)=XPT(KOPT,I)
@@ -262,7 +262,7 @@
 !     label 650 or 680 with NTRITS=-1, instead of calculating F at XNEW.
 !
    60 CALL TRSBOX (N,NPT,XPT,XOPT,GOPT,HQ,PQ,SL,SU,DELTA,XNEW,D,
-     1  W,W(NP),W(NP+N),W(NP+2*N),W(NP+3*N),DSQ,CRVMIN)
+     &  W,W(NP),W(NP+N),W(NP+2*N),W(NP+3*N),DSQ,CRVMIN)
       DNORM=DMIN1(DELTA,DSQRT(DSQ))
       if (DNORM < HALF*RHO) then
           NTRITS=-1
@@ -392,8 +392,8 @@
   190 NFSAV=NF
       KBASE=KOPT
       CALL RESCUE (N,NPT,XL,XU,IPRINT,MAXFUN,XBASE,XPT,FVAL,
-     1  XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,DELTA,KOPT,
-     2  VLAG,W,W(N+NP),W(NDIM+NP),CALFUN)
+     &  XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,DELTA,KOPT,
+     &  VLAG,W,W(N+NP),W(NDIM+NP),CALFUN)
 !
 !     XOPT is updated now in case the branch below to label 720 is taken.
 !     Any updating of GOPT occurs after the branch below to label 20, which
@@ -430,7 +430,7 @@
 !     going to be made when the denominator is calculated.
 !
   210 CALL ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
-     1  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,W,W(NP),W(NDIM+1))
+     &  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,W,W(NP),W(NDIM+1))
       do I=1,N
          D(I)=XNEW(I)-XOPT(I)
       end do
@@ -564,7 +564,7 @@
       if (IPRINT == 3) then
           PRINT 400, NF,F,(X(I),I=1,N)
   400      FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,
-     1       '    The corresponding X is:'/(2X,5D15.6))
+     &       '    The corresponding X is:'/(2X,5D15.6))
       end if
       if (NTRITS == -1) then
           FSAVE=F
@@ -601,7 +601,7 @@
           if (VQUAD >= ZERO) then
               if (IPRINT > 0) PRINT 430
   430         FORMAT (/4X,'Return from BOBYQA because a trust',
-     1          ' region step has failed to reduce Q.')
+     &          ' region step has failed to reduce Q.')
               GOTO 720
           end if
           RATIO=(F-FOPT)/VQUAD
@@ -857,10 +857,10 @@
   690         FORMAT (5X)
               PRINT 700, RHO,NF
   700         FORMAT (/4X,'New RHO =',1PD11.4,5X,'Number of',
-     1          ' function values =',I6)
+     &          ' function values =',I6)
               PRINT 710, FVAL(KOPT),(XBASE(I)+XOPT(I),I=1,N)
   710         FORMAT (4X,'Least value of F =',1PD23.15,9X,
-     1          'The corresponding X is:'/(2X,5D15.6))
+     &          'The corresponding X is:'/(2X,5D15.6))
           end if
           NTRITS=0
           NFSAV=NF
@@ -889,11 +889,11 @@
 
 
       subroutine ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
-     1  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,GLAG,HCOL,W)
+     &  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,GLAG,HCOL,W)
       implicit real(dp) (A-H,O-Z)
       integer :: N, NPT, NDIM, KOPT, KNEW
       dimension XPT(NPT,*),XOPT(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),
-     1  SU(*),XNEW(*),XALT(*),GLAG(*),HCOL(*),W(*)
+     &  SU(*),XNEW(*),XALT(*),GLAG(*),HCOL(*),W(*)
 !
 !     The arguments N, NPT, XPT, XOPT, BMAT, ZMAT, NDIM, SL and SU all have
 !       the same meanings as the corresponding arguments of BOBYQB.
@@ -1186,10 +1186,10 @@
 
 
       subroutine PRELIM (N,NPT,X,XL,XU,RHOBEG,IPRINT,MAXFUN,XBASE,
-     1  XPT,FVAL,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,KOPT,CALFUN)
+     &  XPT,FVAL,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,KOPT,CALFUN)
       implicit real(dp) (A-H,O-Z)
       dimension X(:),XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),GOPT(*),
-     1  HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),SU(*)
+     &  HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),SU(*)
       interface
 #include "num_bobyqa_proc.dek"
       end interface
@@ -1351,12 +1351,12 @@
 
 
       subroutine RESCUE (N,NPT,XL,XU,IPRINT,MAXFUN,XBASE,XPT,
-     1  FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,DELTA,
-     2  KOPT,VLAG,PTSAUX,PTSID,W,CALFUN)
+     &  FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,DELTA,
+     &  KOPT,VLAG,PTSAUX,PTSID,W,CALFUN)
       implicit real(dp) (A-H,O-Z)
       dimension XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),XOPT(*),
-     1  GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),SU(*),
-     2  VLAG(*),PTSAUX(2,*),PTSID(*),W(*)
+     &  GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),SU(*),
+     &  VLAG(*),PTSAUX(2,*),PTSID(*),W(*)
       interface
 #include "num_bobyqa_proc.dek"
       end interface
@@ -1770,10 +1770,10 @@
 
 
       subroutine TRSBOX (N,NPT,XPT,XOPT,GOPT,HQ,PQ,SL,SU,DELTA,
-     1  XNEW,D,GNEW,XBDI,S,HS,HRED,DSQ,CRVMIN)
+     &  XNEW,D,GNEW,XBDI,S,HS,HRED,DSQ,CRVMIN)
       implicit real(dp) (A-H,O-Z)
       dimension XPT(NPT,*),XOPT(*),GOPT(*),HQ(*),PQ(*),SL(*),SU(*),
-     1  XNEW(*),D(*),GNEW(*),XBDI(*),S(*),HS(*),HRED(*)
+     &  XNEW(*),D(*),GNEW(*),XBDI(*),S(*),HS(*),HRED(*)
 !
 !     The arguments N, NPT, XPT, XOPT, GOPT, HQ, PQ, SL and SU have the same
 !       meanings as the corresponding arguments of BOBYQB.

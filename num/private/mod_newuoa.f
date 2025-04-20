@@ -73,15 +73,15 @@
 !     W plus the space that is needed by the last array of NEWUOB.
 !
       CALL NEWUOB (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W(IXB),
-     1  W(IXO),W(IXN),W(IXP),W(IFV),W(IGQ),W(IHQ),W(IPQ),W(IBMAT),
-     2  W(IZMAT),NDIM,W(ID),W(IVL),W(IW),CALFUN,max_valid_value)
+     &  W(IXO),W(IXN),W(IXP),W(IFV),W(IGQ),W(IHQ),W(IPQ),W(IBMAT),
+     &  W(IZMAT),NDIM,W(ID),W(IVL),W(IW),CALFUN,max_valid_value)
    20 RETURN
       END subroutine do_newuoa
 
 
       subroutine NEWUOB (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,XBASE,
-     1  XOPT,XNEW,XPT,FVAL,GQ,HQ,PQ,BMAT,ZMAT,NDIM,D,VLAG,W,
-     1  CALFUN,max_valid_value)
+     &  XOPT,XNEW,XPT,FVAL,GQ,HQ,PQ,BMAT,ZMAT,NDIM,D,VLAG,W,
+     &  CALFUN,max_valid_value)
       implicit real(dp) (A-H,O-Z)
       interface
 #include "num_newuoa_proc.dek"
@@ -89,7 +89,7 @@
       real(dp), intent(in) :: max_valid_value
       logical :: do_replace
       dimension X(*),XBASE(*),XOPT(*),XNEW(*),XPT(NPT,*),FVAL(*),
-     1  GQ(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),VLAG(*),W(*)
+     &  GQ(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),VLAG(*),W(*)
 !
 !     The arguments N, NPT, X, RHOBEG, RHOEND, IPRINT and MAXFUN are identical
 !       to the corresponding arguments in subroutine NEWUOA.
@@ -419,7 +419,7 @@
           TEMP=ONE+ALPHA*BETA/VLAG(KNEW)**2
           if (DABS(TEMP) <= 0.8D0) then
               CALL BIGDEN (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,
-     1          KNEW,D,W,VLAG,BETA,XNEW,W(NDIM+1),W(6*NDIM+1))
+     &          KNEW,D,W,VLAG,BETA,XNEW,W(NDIM+1),W(6*NDIM+1))
           end if
       end if
 !
@@ -704,7 +704,7 @@
       subroutine BIGDEN(N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,KNEW,D,W,VLAG,BETA,S,WVEC,PROD)
       implicit real(dp) (A-H,O-Z)
       dimension XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
-     1  W(*),VLAG(*),S(*),WVEC(NDIM,*),PROD(NDIM,*)
+     &  W(*),VLAG(*),S(*),WVEC(NDIM,*),PROD(NDIM,*)
       dimension DEN(9),DENEX(9),PAR(9)
 !
 !     N is the number of variables.
@@ -1060,7 +1060,7 @@
       subroutine BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,DELTA,D,ALPHA,HCOL,GC,GD,S,W)
       implicit real(dp) (A-H,O-Z)
       dimension XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
-     1  HCOL(*),GC(*),GD(*),S(*),W(*)
+     &  HCOL(*),GC(*),GD(*),S(*),W(*)
 !
 !     N is the number of variables.
 !     NPT is the number of interpolation equations.
@@ -1251,7 +1251,7 @@
       subroutine TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,STEP,D,G,HD,HS,CRVMIN)
       implicit real(dp) (A-H,O-Z)
       dimension XOPT(*),XPT(NPT,*),GQ(*),HQ(*),PQ(*),STEP(*),
-     1  D(*),G(*),HD(*),HS(*)
+     &  D(*),G(*),HD(*),HS(*)
 !
 !     N is the number of variables of a quadratic objective function, Q say.
 !     The arguments NPT, XOPT, XPT, GQ, HQ and PQ have their usual meanings,

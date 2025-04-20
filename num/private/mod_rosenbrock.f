@@ -602,8 +602,6 @@
       end subroutine calculate_work_sizes
 
 
-
-
 !
 !
 !  ----- ... and here is the core integrator  ----------

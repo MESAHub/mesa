@@ -130,15 +130,14 @@
 
         ilo=2
         ihi=mx
-    8   if(ihi-ilo > 1) then
+        do while (ihi-ilo > 1)
           imd=(ihi+ilo)/2
             if(xh <= xa(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
             end if
-          GOTO 8
-        end if
+        end do
         i=ihi
         mf=i-2
         mg=i-1
@@ -156,20 +155,19 @@
 
         ilo=2
         ihi=nr
-   12     if(ihi-ilo > 1) then
+        do while (ihi-ilo > 1)
               imd=(ihi+ilo)/2
               if (slr == rho(imd)) then
                  ihi=imd
-                 GOTO 13
+                 exit
               end if
                if(slr <= rho(imd)) then
                  ihi=imd
                else
                  ilo=imd
                end if
-             GOTO 12
-          end if
-   13     i=ihi
+        end do
+        i=ihi
         l1=i-2
         l2=i-1
         l3=i
@@ -179,20 +177,19 @@
 
         ilo=nt
         ihi=2
-   11     if(ilo-ihi > 1) then
+        do while (ilo-ihi > 1)
           imd=(ihi+ilo)/2
            if (t6 == t6list(1,imd)) then
-           ilo=imd
-           GOTO 14
+              ilo=imd
+              exit
            end if
             if(t6 <= t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          GOTO 11
-          end if
-   14     i=ilo
+        end do
+        i=ilo
         k1=i-2
         k2=i-1
         k3=i
@@ -711,33 +708,31 @@
 
         ilo=2
         ihi=mx
-    8   if(ihi-ilo > 1) then
+        do while (ihi-ilo > 1)
           imd=(ihi+ilo)/2
             if(x <= xa(imd)+1.e-7) then
               ihi=imd
             else
               ilo=imd
             end if
-          GOTO 8
-        end if
+        end do
         mlo=ilo
 
         ilo=nt
         ihi=2
-   11     if(ilo-ihi > 1) then
+        do while (ilo-ihi > 1)
           imd=(ihi+ilo)/2
            if (t6 == t6list(1,imd)) then
            ilo=imd
-           GOTO 14
+           exit
            end if
             if(t6 <= t6list(1,imd)) then
               ihi=imd
             else
               ilo=imd
             end if
-          GOTO 11
-          end if
-   14     klo=ilo
+        end do
+        klo=ilo
 
       pmax=xz(mlo,1,klo,nra(klo))*t6*rho(nra(klo))
       pmin=xz(mlo,1,klo,1)*t6*rho(1)

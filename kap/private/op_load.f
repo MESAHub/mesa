@@ -31,7 +31,7 @@
       contains
 ! *****************************************************************
       subroutine op_dload(path, cache_filename, ierr)
-        implicit none
+      implicit none
       character (len=*), intent(in) :: path, cache_filename
       integer, intent(out) :: ierr
 
@@ -243,8 +243,7 @@
 !
 !        OPEN FILES
 !
-         TLAB='.'//NUM(IT/100)//NUM(IT/10-10*(IT/100))//
-     &    NUM(IT-10*(IT/10))
+         TLAB='.'//NUM(IT/100)//NUM(IT/10-10*(IT/100))//NUM(IT-10*(IT/10))
          do n=1,ipe
 !            if (SKIP(N))GOTO 70
             NN=N
@@ -376,22 +375,16 @@
 610   format(10x,'Done IT= ',i3)
 1004  WRITE(6,6004)ZLAB(NN),TLAB
       STOP
-6001  FORMAT(//5X,'*** OP: FILE ',A3,' GIVES IZZ=',I3,
-     & 'NOT EQUAL TO IZ(',I2,')=',I2,' ***')
-6002  FORMAT(//5X,'*** OP: NTOT=',I7,' GREATER THAN nptot=',
-     & I7,' ***')
-6003  FORMAT(//5X,'*** OP: DISCREPANCY BETWEEN DATA ON FILES ',
-     & A3,' AND ',A3,' ***')
+6001  FORMAT(//5X,'*** OP: FILE ',A3,' GIVES IZZ=',I3,'NOT EQUAL TO IZ(',I2,')=',I2,' ***')
+6002  FORMAT(//5X,'*** OP: NTOT=',I7,' GREATER THAN nptot=',I7,' ***')
+6003  FORMAT(//5X,'*** OP: DISCREPANCY BETWEEN DATA ON FILES ',A3,' AND ',A3,' ***')
 6004  FORMAT(//5X,'*** OP: ERROR OPENING FILE ',A3,A6,'  ***')
 6006  FORMAT(//5X,'OP: N=',I2,', NTOTT=',I7,', GREATER THAN NTOT=',I7)
 6007  FORMAT(/5X,'OP: N=',I2,', INT(N)=',I4)
-6009  FORMAT(' OP: N=',I5,', NTOTT=',I10,', NTOT=',I10/
-     & '   NTOT NOT MULTIPLE OF NTOTT')
+6009  FORMAT(' OP: N=',I5,', NTOTT=',I10,', NTOT=',I10/'   NTOT NOT MULTIPLE OF NTOTT')
 ! 6012  FORMAT(/10X,'ERROR, SEE WRITE(6,6012)'/10X,'IT=',I3,', JN=',I3,', N=',I3,', JNE=',I3/)
-6077  FORMAT(//5X,'OP: DISCREPANCY IN ITE3'/10X,I5,' READ FROM UNIT 5'/
-     & 10X,I5,' FROM INDEX FILE ELEMENT',I5)
-6099  FORMAT(//5X,'OP: DISCREPANCY IN JNE3'/10X,I5,' READ FOR N=1'/
-     & 10X,I5,' READ FOR N=',I5)
+6077  FORMAT(//5X,'OP: DISCREPANCY IN ITE3'/10X,I5,' READ FROM UNIT 5'/10X,I5,' FROM INDEX FILE ELEMENT',I5)
+6099  FORMAT(//5X,'OP: DISCREPANCY IN JNE3'/10X,I5,' READ FOR N=1'/10X,I5,' READ FOR N=',I5)
 
 ! 8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 1010  write(*,*) ' OP: ERROR OPENING FILE '//'./'//ZLAB(1)//'.index'
@@ -584,8 +577,7 @@
 
       return
 
-  600 FORMAT(5X,'NOT CONVERGED IN LOOP 10 OF BRCKR'/
-     &       5X,'T=',1P,E10.2,', FNE=',E10.2)
+  600 FORMAT(5X,'NOT CONVERGED IN LOOP 10 OF BRCKR'/5X,'T=',1P,E10.2,', FNE=',E10.2)
 
       end subroutine BRCKR
 ! **********************************************************************
@@ -613,17 +605,14 @@
 !  ETA=log(W)
 !
       if (W <= 2.718282) then
-         FMH=W*(1+W*(-.7070545+W*(-.3394862-W*6.923481E-4))
-     &   /(1.+W*(1.2958546+W*.35469431)))
+         FMH=W*(1+W*(-.7070545+W*(-.3394862-W*6.923481E-4))/(1.+W*(1.2958546+W*.35469431)))
       else if (W <= 54.59815) then
          X=log(dble(W))
-         FMH=(.6652309+X*(.7528360+X*.6494319))
-     &   /(1.+X*(.8975007+X*.1153824))
+         FMH=(.6652309+X*(.7528360+X*.6494319))/(1.+X*(.8975007+X*.1153824))
       else
          X=log(dble(W))
          Y=1./X**2
-         FMH=sqrt(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))
-     &   /(1.+Y*(-10.867628+Y*384.61501)))
+         FMH=sqrt(X)*(1.1283792+(Y*(-.4597911+Y*(2.286168-Y*183.6074)))/(1.+Y*(-10.867628+Y*384.61501)))
       end if
 
       end function FMH

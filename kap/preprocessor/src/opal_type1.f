@@ -1395,16 +1395,16 @@
       if(X < 2.) then
          if(X < 0.75) then
             IERR=.true.
-         ELSE
+         else
             I=1
          end if
       else if(X > 84) then
          if(X > 85.25) then
             IERR=.true.
-         ELSE
+         else
             I=84
          end if
-      ELSE
+      else
          I=X
       end if
       U=X-I
@@ -1412,16 +1412,16 @@
       if(Y < 2.) then
          if(Y < 0.75) then
             IERR=.true.
-         ELSE
+         else
             J=1
          end if
       else if(Y > NRL-1) then
          if(Y > NRL+.25) then
             IERR=.true.
-         ELSE
+         else
             J=NRL-1
          end if
-      ELSE
+      else
          J=Y
       end if
       V=Y-J
