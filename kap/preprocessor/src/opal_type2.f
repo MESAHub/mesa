@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2009  Bill Paxton
+!   Copyright (C) 2009  Bill Paxton & The MESA Team
 !
 !   This file is part of MESA.
 !
@@ -1349,11 +1349,11 @@
       dimension XA(N),YA(N),Y2A(N)
       KLO=1
       KHI=N
-1     IF (KHI-KLO > 1) THEN
+1     if (KHI-KLO > 1) then
         K=(KHI+KLO)/2
         if(XA(K) > X) then
           KHI=K
-        ELSE
+        else
           KLO=K
         end if
       GOTO 1
@@ -1499,16 +1499,16 @@
       if(X < 2.) then
          if(X < 0.75) then
             IERR=.true.
-         ELSE
+         else
             I=1
          end if
       else if(X > 84) then
          if(X > 85.25) then
             IERR=.true.
-         ELSE
+         else
             I=84
          end if
-      ELSE
+      else
          I=X
       end if
       U=X-I
@@ -1516,16 +1516,16 @@
       if(Y < 2.) then
          if(Y < 0.75) then
             IERR=.true.
-         ELSE
+         else
             J=1
          end if
       else if(Y > NRL-1) then
          if(Y > NRL+.25) then
             IERR=.true.
-         ELSE
+         else
             J=NRL-1
          end if
-      ELSE
+      else
          J=Y
       end if
       V=Y-J
@@ -1822,7 +1822,7 @@
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
-!              IERR=.true. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
+!              IERR=.true. if INPUT FLT, FLRHO ARE OUT-OF-RANGE,
 !                          elseIERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS

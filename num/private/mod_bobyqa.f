@@ -56,7 +56,7 @@
 !     Return if the value of NPT is unacceptable.
 !
       NP=N+1
-      if (NPT < N+2 .OR. NPT > ((N+2)*NP)/2) then
+      if (NPT < N+2 .or. NPT > ((N+2)*NP)/2) then
           PRINT 10
    10     FORMAT (/4X,'Return from BOBYQA because NPT is not in the required interval')
           GOTO 40
@@ -277,7 +277,7 @@
 !
           ERRBIG=DMAX1(DIFFA,DIFFB,DIFFC)
           FRHOSQ=0.125D0*RHO*RHO
-          if (CRVMIN > ZERO .AND. ERRBIG > FRHOSQ*CRVMIN) GOTO 650
+          if (CRVMIN > ZERO .and. ERRBIG > FRHOSQ*CRVMIN) GOTO 650
           BDTOL=ERRBIG/RHO
           do J=1,N
             BDTEST=BDTOL
@@ -490,7 +490,7 @@
 !
       if (NTRITS == 0) then
           DENOM=VLAG(KNEW)**2+ALPHA*BETA
-          if (DENOM < CAUCHY .AND. CAUCHY > ZERO) then
+          if (DENOM < CAUCHY .and. CAUCHY > ZERO) then
               do I=1,N
                 XNEW(I)=XALT(I)
                 D(I)=XNEW(I)-XOPT(I)
@@ -1085,7 +1085,7 @@
         W(I)=ZERO
         TEMPA=DMIN1(XOPT(I)-SL(I),GLAG(I))
         TEMPB=DMAX1(XOPT(I)-SU(I),GLAG(I))
-        if (TEMPA > ZERO .OR. TEMPB < ZERO) then
+        if (TEMPA > ZERO .or. TEMPB < ZERO) then
             W(I)=BIGSTP
             GGFREE=GGFREE+GLAG(I)**2
         end if
@@ -1116,7 +1116,7 @@
                 end if
             end if
           end do
-          if (WFIXSQ > WSQSAV .AND. GGFREE > ZERO) GOTO 120
+          if (WFIXSQ > WSQSAV .and. GGFREE > ZERO) GOTO 120
       end if
 !
 !     Set the remaining free components of W and all components of XALT,
@@ -1151,7 +1151,7 @@
         CURV=CURV+HCOL(K)*TEMP*TEMP
       end do
       if (IFLAG == 1) CURV=-CURV
-      if (CURV > -GW .AND. CURV < -CONST*GW) then
+      if (CURV > -GW .and. CURV < -CONST*GW) then
           SCALE=-GW/CURV
           do I=1,N
              TEMP=XOPT(I)+SCALE*W(I)
@@ -1251,7 +1251,7 @@
       NFX=NF-N
       NF=NF+1
       if (NFM <= 2*N) then
-          if (NFM >= 1 .AND. NFM <= N) then
+          if (NFM >= 1 .and. NFM <= N) then
               STEPA=RHOBEG
               if (SU(NFM) == ZERO) STEPA=-STEPA
               XPT(NF,NFM)=STEPA
@@ -1303,7 +1303,7 @@
 !     off-diagonal second derivative terms of the initial quadratic model.
 !
       if (NF <= 2*N+1) then
-          if (NF >= 2 .AND. NF <= N+1) then
+          if (NF >= 2 .and. NF <= N+1) then
               GOPT(NFM)=(F-FBEG)/STEPA
               if (NPT < NF+N) then
                   BMAT(1,NFM)=-ONE/STEPA
@@ -1345,7 +1345,7 @@
           TEMP=XPT(NF,IPT)*XPT(NF,JPT)
           HQ(IH)=(FBEG-FVAL(IPT+1)-FVAL(JPT+1)+F)/TEMP
       end if
-      if (NF < NPT .AND. NF < MAXFUN) GOTO 50
+      if (NF < NPT .and. NF < MAXFUN) GOTO 50
       RETURN
       end subroutine PRELIM
 
@@ -1553,7 +1553,7 @@
   120 DSQMIN=ZERO
       do K=1,NPT
         if (W(NDIM+K) > ZERO) then
-            if (DSQMIN == ZERO .OR. W(NDIM+K) < DSQMIN) then
+            if (DSQMIN == ZERO .or. W(NDIM+K) < DSQMIN) then
                 KNEW=K
                 DSQMIN=W(NDIM+K)
             end if
@@ -1924,7 +1924,7 @@
       if (STPLEN > ZERO) then
           ITERC=ITERC+1
           TEMP=SHS/STEPSQ
-          if (IACT == 0 .AND. TEMP > ZERO) then
+          if (IACT == 0 .and. TEMP > ZERO) then
               CRVMIN=DMIN1(CRVMIN,TEMP)
               if (CRVMIN == ONEMIN) CRVMIN=TEMP
           end if
@@ -2108,7 +2108,7 @@
         HRED(I)=CTH*HRED(I)+STH*HS(I)
       end do
       QRED=QRED+SDEC
-      if (IACT > 0 .AND. ISAV == IU) then
+      if (IACT > 0 .and. ISAV == IU) then
           NACT=NACT+1
           XBDI(IACT)=XSAV
           GOTO 100

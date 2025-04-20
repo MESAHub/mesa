@@ -428,7 +428,7 @@
           Y(I) = Y5(I)
         end do
         N = 81
-      ELSE
+      else
         N = 0
       end if
       return

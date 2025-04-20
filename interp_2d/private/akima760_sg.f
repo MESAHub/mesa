@@ -450,8 +450,8 @@
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR.
-     &                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
+                  if ((IX1 < 1) .or. (IX2 < 1) .or. (IX3 < 1) .or.
+     &                (IX1 > NX0) .or. (IX2 > NX0) .or.
      &                (IX3 > NX0)) GOTO 10
 ! Selects and/or supplements the x and z values.
                   X1 = XD(IX1) - X0
@@ -547,8 +547,8 @@
                   IY1 = IY0 + IDLT(1,IPEY)
                   IY2 = IY0 + IDLT(2,IPEY)
                   IY3 = IY0 + IDLT(3,IPEY)
-                  if ((IY1 < 1) .OR. (IY2 < 1) .OR. (IY3 < 1) .OR.
-     &                (IY1 > NY0) .OR. (IY2 > NY0) .OR.
+                  if ((IY1 < 1) .or. (IY2 < 1) .or. (IY3 < 1) .or.
+     &                (IY1 > NY0) .or. (IY2 > NY0) .or.
      &                (IY3 > NY0)) GOTO 20
 ! Selects and/or supplements the y and z values.
                   Y1 = YD(IY1) - Y0
@@ -644,8 +644,8 @@
                   IX1 = IX0 + IDLT(1,IPEX)
                   IX2 = IX0 + IDLT(2,IPEX)
                   IX3 = IX0 + IDLT(3,IPEX)
-                  if ((IX1 < 1) .OR. (IX2 < 1) .OR. (IX3 < 1) .OR.
-     &                (IX1 > NX0) .OR. (IX2 > NX0) .OR.
+                  if ((IX1 < 1) .or. (IX2 < 1) .or. (IX3 < 1) .or.
+     &                (IX1 > NX0) .or. (IX2 > NX0) .or.
      &                (IX3 > NX0)) GOTO 40
 ! Retrieves the necessary values for estimating zxy in the x
 ! direction.
@@ -668,9 +668,9 @@
                       IY1 = IY0 + IDLT(1,IPEY)
                       IY2 = IY0 + IDLT(2,IPEY)
                       IY3 = IY0 + IDLT(3,IPEY)
-                      if ((IY1 < 1) .OR. (IY2 < 1) .OR.
-     &                    (IY3 < 1) .OR. (IY1 > NY0) .OR.
-     &                    (IY2 > NY0) .OR. (IY3 > NY0)) GOTO 30
+                      if ((IY1 < 1) .or. (IY2 < 1) .or.
+     &                    (IY3 < 1) .or. (IY1 > NY0) .or.
+     &                    (IY2 > NY0) .or. (IY3 > NY0)) GOTO 30
 ! Retrieves the necessary values for estimating zxy in the y
 ! direction.
                       Y1 = YA(1,IPEY)
@@ -904,7 +904,7 @@
               if (IXD == 0) then
                   if (XII > XD(1)) NINTX = 1
               else if (IXD < NXD) then
-                  if ((XII < XD(IXD)) .OR.
+                  if ((XII < XD(IXD)) .or.
      &                (XII > XD(IXD+1))) NINTX = 1
               else
                   if (XII < XD(NXD)) NINTX = 1
@@ -942,7 +942,7 @@
               if (IYD == 0) then
                   if (YII > YD(1)) NINTY = 1
               else if (IYD < NYD) then
-                  if ((YII < YD(IYD)) .OR.
+                  if ((YII < YD(IYD)) .or.
      &                (YII > YD(IYD+1))) NINTY = 1
               else
                   if (YII < YD(NYD)) NINTY = 1
@@ -1065,7 +1065,7 @@
           IYDI = INYI(IIP)
 ! Retrieves the z and partial derivative values at the origin of
 ! the coordinate for the rectangle.
-          if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) then
+          if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) then
               IXD0 = MAX(1,IXDI)
               IYD0 = MAX(1,IYDI)
               X0 = XD(IXD0)
@@ -1077,11 +1077,11 @@
           end if
 ! Case 1.  When the rectangle is inside the data area in both the
 ! x and y directions.
-          if ((IXDI > 0.AND.IXDI < NXD) .AND.
-     &        (IYDI > 0.AND.IYDI < NYD)) then
+          if ((IXDI > 0.and.IXDI < NXD) .and.
+     &        (IYDI > 0.and.IYDI < NYD)) then
 ! Retrieves the z and partial derivative values at the other three
 ! vertices of the rectangle.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) then
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) then
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1142,11 +1142,11 @@
 ! End of Case 1
 ! Case 2.  When the rectangle is inside the data area in the x
 ! direction but outside in the y direction.
-          else if ((IXDI > 0.AND.IXDI < NXD) .AND.
-     &             (IYDI <= 0.OR.IYDI >= NYD)) then
+          else if ((IXDI > 0.and.IXDI < NXD) .and.
+     &             (IYDI <= 0.or.IYDI >= NYD)) then
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) then
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) then
                   IXD1 = IXD0 + 1
                   DX = XD(IXD1) - X0
                   DXSQ = DX*DX
@@ -1177,11 +1177,11 @@
 ! End of Case 2
 ! Case 3.  When the rectangle is outside the data area in the x
 ! direction but inside in the y direction.
-          else if ((IXDI <= 0.OR.IXDI >= NXD) .AND.
-     &             (IYDI > 0.AND.IYDI < NYD)) then
+          else if ((IXDI <= 0.or.IXDI >= NXD) .and.
+     &             (IYDI > 0.and.IYDI < NYD)) then
 ! Retrieves the z and partial derivative values at the other
 ! vertex of the semi-infinite rectangle.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) then
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) then
                   IYD1 = IYD0 + 1
                   DY = YD(IYD1) - Y0
                   DYSQ = DY*DY
@@ -1210,10 +1210,9 @@
 ! End of Case 3
 ! Case 4.  When the rectangle is outside the data area in both the
 ! x and y direction.
-          else if ((IXDI <= 0.OR.IXDI >= NXD) .AND.
-     &             (IYDI <= 0.OR.IYDI >= NYD)) then
+          else if ((IXDI <= 0.or.IXDI >= NXD) .and. (IYDI <= 0.or.IYDI >= NYD)) then
 ! Calculates the polynomial coefficients.
-              if (IXDI /= IXDIPV .OR. IYDI /= IYDIPV) then
+              if (IXDI /= IXDIPV .or. IYDI /= IYDIPV) then
                   P00 = Z00
                   P01 = ZY00
                   P10 = ZX00

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2009  Bill Paxton
+!   Copyright (C) 2009  Bill Paxton & The MESA Team
 !
 !   This file is part of MESA.
 !
@@ -1170,7 +1170,7 @@
 !       OUTPUT IS G=LOG10(ROSS)
 !              DGDT=dG/d(LOG10(T))
 !            DGDRHO=dG/d(LOG10(RHO))
-!              IERR=.true. IF INPUT FLT, FLRHO ARE OUT-OF-RANGE,
+!              IERR=.true. if INPUT FLT, FLRHO ARE OUT-OF-RANGE,
 !                          elseIERR=.false.
 
 ! INTERPOLATE BACK TO OPAL POINTS

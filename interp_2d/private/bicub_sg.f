@@ -1,23 +1,23 @@
 ! ***********************************************************************
-
+!
 !   Copyright (C) 2012  The MESA Team
-
+!
 !   This file is part of MESA.
-
+!
 !   MESA is free software; you can redistribute it and/or modify
 !   it under the terms of the GNU General Library Public License as published
 !   by the Free Software Foundation; either version 2 of the License, or
 !   (at your option) any later version.
-
+!
 !   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 !   GNU Library General Public License for more details.
-
+!
 !   You should have received a copy of the GNU Library General Public License
 !   along with this software; if not, write to the Free Software
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
+!
 ! ***********************************************************************
 
       module bicub_sg
@@ -2437,10 +2437,10 @@
 !  bugfixes -- dmc 24 Feb 2004:
 !    (a) fixed logic for not-a-knot:
 !          !    Set f(3,1) for not-a-knot
-!                    IF(k_bc1 <= 0.or.k_bc1 > 7) THEN ...
+!                    if (k_bc1 <= 0.or.k_bc1 > 7) then ...
 !        instead of
 !          !    Set f(3,1) for not-a-knot
-!                    IF(k_bc1 <= 0.or.k_bc1 > 5) THEN ...
+!                    if (k_bc1 <= 0.or.k_bc1 > 5) then ...
 !        and similarly for logic after cmt
 !          !    Set f(3,n) for not-a-knot
 !        as required since k_bc*=6 and k_bc*=7 are NOT not-a-knot BCs.
@@ -2479,23 +2479,23 @@
       b1=0.0
       an=0.0
       bn=0.0
-      IF(k_bc1 == 1) THEN
+      if (k_bc1 == 1) then
         a1=f(2,1)
-      else if(k_bc1 == 2) THEN
+      else if(k_bc1 == 2) then
         b1=f(3,1)
-      else if(k_bc1 == 5) THEN
+      else if(k_bc1 == 5) then
         a1=(f(1,2)-f(1,1))/(x(2)-x(1))
-      else if(k_bc1 == 6) THEN
+      else if(k_bc1 == 6) then
         b1=2.0*((f(1,3)-f(1,2))/(x(3)-x(2))
      &         -(f(1,2)-f(1,1))/(x(2)-x(1)))/(x(3)-x(1))
       end if
-      IF(k_bcn == 1) THEN
+      if (k_bcn == 1) then
         an=f(2,n)
-      else if(k_bcn == 2) THEN
+      else if(k_bcn == 2) then
         bn=f(3,n)
-      else if(k_bcn == 5) THEN
+      else if(k_bcn == 5) then
         an=(f(1,n)-f(1,n-1))/(x(n)-x(n-1))
-      else if(k_bcn == 6) THEN
+      else if(k_bcn == 6) then
         bn=2.0*((f(1,n)-f(1,n-1))/(x(n)-x(n-1))
      &         -(f(1,n-1)-f(1,n-2))/(x(n-1)-x(n-2)))/(x(n)-x(n-2))
       end if
@@ -2503,7 +2503,7 @@
       f(2,n)=0.0
       f(3,n)=0.0
       f(4,n)=0.0
-      IF(n == 2) THEN
+      if (n == 2) then
 !Coefficients for n=2
         f(2,1)=(f(1,2)-f(1,1))/(x(2)-x(1))
         f(3,1)=0.0
@@ -2511,7 +2511,7 @@
         f(2,2)=f(2,1)
         f(3,2)=0.0
         f(4,2)=0.0
-      else if(n > 2) THEN
+      else if(n > 2) then
 !Set up tridiagonal system for A*y=B where y(i) are the second
 !  derivatives at the knots
 !  f(2,i) are the diagonal elements of A
@@ -2533,7 +2533,7 @@
 
 !  BC's
 !    Left
-        IF(k_bc1 == -1) THEN
+        if (k_bc1 == -1) then
           f(2,1)=2.0*(f(4,1)+f(4,n-1))
           f(3,1)=(f(1,2)-f(1,1))/f(4,1)-(f(1,n)-f(1,n-1))/f(4,n-1)
           wk(1)=f(4,n-1)
@@ -2542,46 +2542,46 @@
           end do
           wk(n-2)=f(4,n-2)
           wk(n-1)=f(4,n-1)
-        else if(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) THEN
+        else if(k_bc1 == 1.or.k_bc1 == 3.or.k_bc1 == 5) then
           f(2,1)=2.0*f(4,1)
           f(3,1)=(f(1,2)-f(1,1))/f(4,1)-a1
-        else if(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) THEN
+        else if(k_bc1 == 2.or.k_bc1 == 4.or.k_bc1 == 6) then
           f(2,1)=2.0*f(4,1)
           f(3,1)=f(4,1)*b1/3.0
           f(4,1)=0.0  ! upper diagonal only (dmc: cf elem21)
-        else if(k_bc1 == 7) THEN
+        else if(k_bc1 == 7) then
           f(2,1)=-f(4,1)
           f(3,1)=f(3,3)/(x(4)-x(2))-f(3,2)/(x(3)-x(1))
           f(3,1)=f(3,1)*f(4,1)**2/(x(4)-x(1))
-        ELSE                             ! not a knot:
+        else                             ! not a knot:
           imin=2
           f(2,2)=f(4,1)+2.0*f(4,2)
           f(3,2)=f(3,2)*f(4,2)/(f(4,1)+f(4,2))
         end if
 !    Right
-        IF(k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) THEN
+        if (k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) then
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=-(f(1,n)-f(1,n-1))/f(4,n-1)+an
-        else if(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
+        else if(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) then
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=f(4,n-1)*bn/3.0
 !xxx          f(4,n-1)=0.0  ! dmc: preserve f(4,n-1) for back subst.
           elemnn1=0.0  !  lower diagonal only (dmc)
-        else if(k_bcn == 7) THEN
+        else if(k_bcn == 7) then
           f(2,n)=-f(4,n-1)
           f(3,n)=f(3,n-1)/(x(n)-x(n-2))-f(3,n-2)/(x(n-1)-x(n-3))
           f(3,n)=-f(3,n)*f(4,n-1)**2/(x(n)-x(n-3))
-        else if(k_bc1 /= -1) THEN         ! not a knot:
+        else if(k_bc1 /= -1) then         ! not a knot:
           imax=n-1
           f(2,n-1)=2.0*f(4,n-2)+f(4,n-1)
           f(3,n-1)=f(3,n-1)*f(4,n-2)/(f(4,n-1)+f(4,n-2))
         end if
 !  Limit solution for only three points in domain
-        IF(n == 3) THEN
+        if (n == 3) then
           f(3,1)=0.0
           f(3,n)=0.0
         end if
-        IF(k_bc1 == -1) THEN
+        if (k_bc1 == -1) then
 !Solve system of equations for second derivatives at the knots
 !  Periodic BC
 !    Forward elimination
@@ -2610,14 +2610,14 @@
             f(3,i)=(f(3,i)-f(4,i)*f(3,i+1)-wk(i)*f(3,n-1))/f(2,i)
           end do
           f(3,n)=f(3,1)
-        ELSE
+        else
 !  Non-periodic BC
 !    Forward elimination
 !    For Not-A-Knot BC the off-diagonal end elements are not equal
           do i=imin+1,imax
-            IF((i == n-1).and.(imax == n-1)) THEN
+            if ((i == n-1).and.(imax == n-1)) then
               t=(f(4,i-1)-f(4,i))/f(2,i-1)
-            ELSE
+            else
               if(i == 2) then
                  t=elem21/f(2,i-1)
               else if(i == n) then
@@ -2626,9 +2626,9 @@
                  t=f(4,i-1)/f(2,i-1)
               end if
             end if
-            IF((i == imin+1).and.(imin == 2)) THEN
+            if ((i == imin+1).and.(imin == 2)) then
               f(2,i)=f(2,i)-t*(f(4,i-1)-f(4,i-2))
-            ELSE
+            else
               f(2,i)=f(2,i)-t*f(4,i-1)
             end if
             f(3,i)=f(3,i)-t*f(3,i-1)
@@ -2639,9 +2639,9 @@
             i=imax-ib
             if (abs(f(3,i)) > 1e20) then
                f(3,i) = 0.0 ! protect against overflow
-            else IF((i == 2).and.(imin == 2)) THEN
+            else if((i == 2).and.(imin == 2)) then
               f(3,i)=(f(3,i)-(f(4,i)-f(4,i-1))*f(3,i+1))/f(2,i)
-            ELSE
+            else
               f(3,i)=(f(3,i)-f(4,i)*f(3,i+1))/f(2,i)
             end if
           end do
@@ -2649,11 +2649,11 @@
           f(4,1)=x(2)-x(1)
           f(4,n-1)=x(n)-x(n-1)
 !    Set f(3,1) for not-a-knot
-          IF(k_bc1 <= 0.or.k_bc1 > 7) THEN
+          if (k_bc1 <= 0.or.k_bc1 > 7) then
             f(3,1)=(f(3,2)*(f(4,1)+f(4,2))-f(3,3)*f(4,1))/f(4,2)
           end if
 !    Set f(3,n) for not-a-knot
-          IF(k_bcn <= 0.or.k_bcn > 7) THEN
+          if (k_bcn <= 0.or.k_bcn > 7) then
             f(3,n)=f(3,n-1)+(f(3,n-1)-f(3,n-2))*f(4,n-1)/f(4,n-2)
           end if
         end if
@@ -2666,18 +2666,18 @@
           f(3,i)=6.0*f(3,i)
           f(4,i)=6.0*f(4,i)
         end do
-        IF(k_bc1 == -1) THEN
+        if (k_bc1 == -1) then
           f(2,n)=f(2,1)
           f(3,n)=f(3,1)
           f(4,n)=f(4,1)
-        ELSE
+        else
            hn=x(n)-x(n-1)
            f(2,n)=f(2,n-1)+hn*(f(3,n-1)+0.5*hn*f(4,n-1))
            f(3,n)=f(3,n-1)+hn*f(4,n-1)
            f(4,n)=f(4,n-1)
-           IF(k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) THEN
+           if (k_bcn == 1.or.k_bcn == 3.or.k_bcn == 5) then
               f(2,n)=an
-           else if(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) THEN
+           else if(k_bcn == 2.or.k_bcn == 4.or.k_bcn == 6) then
               f(3,n)=bn
            end if
         end if

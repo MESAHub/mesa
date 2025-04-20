@@ -185,7 +185,6 @@
       end subroutine do_ros3pl
 
 
-
       subroutine do_rodas3(
      &      n,fcn,ifcn,x,y,xend,
      &      h,max_step_size,max_steps,

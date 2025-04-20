@@ -4,7 +4,6 @@
 
       contains
 
-
       subroutine do_newuoa(N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,CALFUN,max_valid_value)
       implicit real(dp) (A-H,O-Z)
       dimension X(*),W(*)
@@ -48,7 +47,7 @@
 !
       NP=N+1
       NPTM=NPT-NP
-      if (NPT < N+2 .OR. NPT > ((N+2)*NP)/2) then
+      if (NPT < N+2 .or. NPT > ((N+2)*NP)/2) then
           PRINT 10
    10     FORMAT (/4X,'Return from NEWUOA because NPT is not in the required interval')
           GOTO 20
@@ -76,7 +75,7 @@
      &  W(IXO),W(IXN),W(IXP),W(IFV),W(IGQ),W(IHQ),W(IPQ),W(IBMAT),
      &  W(IZMAT),NDIM,W(ID),W(IVL),W(IW),CALFUN,max_valid_value)
    20 RETURN
-      END subroutine do_newuoa
+      end subroutine do_newuoa
 
 
       subroutine NEWUOB (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,XBASE,
@@ -160,7 +159,7 @@
       NFMM=NF-N
       NF=NF+1
       if (NFM <= 2*N) then
-          if (NFM >= 1 .AND. NFM <= N) then
+          if (NFM >= 1 .and. NFM <= N) then
               XPT(NF,NFM)=RHOBEG
           else if (NFM > N) then
               XPT(NF,NFMM)=-RHOBEG
@@ -204,7 +203,7 @@
 !     the cases when NF is at most 2*N+1.
 !
       if (NFM <= 2*N) then
-          if (NFM >= 1 .AND. NFM <= N) then
+          if (NFM >= 1 .and. NFM <= N) then
               GQ(NFM)=(F-FBEG)/RHOBEG
               if (NPT < NF+N) then
                   BMAT(1,NFM)=-ONE/RHOBEG
@@ -522,7 +521,7 @@
             DISTSQ=DISTSQ+(XPT(K,J)-XOPT(J))**2
         end do
         if (DISTSQ > RHOSQ) TEMP=TEMP*(DISTSQ/RHOSQ)*(DISTSQ/RHOSQ)*(DISTSQ/RHOSQ)
-        if (TEMP > DETRAT .AND. K /= KTEMP) then
+        if (TEMP > DETRAT .and. K /= KTEMP) then
             DETRAT=TEMP
             KNEW=K
         end if
@@ -566,7 +565,7 @@
 !     then calculate the gradient of the least Frobenius norm interpolant at
 !     XBASE, and store it in W, using VLAG for a vector of right hand sides.
 !
-      if (KSAVE == 0 .AND. DELTA == RHO) then
+      if (KSAVE == 0 .and. DELTA == RHO) then
           if (DABS(RATIO) > 1.0D-2) then
               ITEST=0
           else
@@ -855,7 +854,7 @@
 !
       do JC=1,5
         NW=NPT
-        if (JC == 2 .OR. JC == 3) NW=NDIM
+        if (JC == 2 .or. JC == 3) NW=NDIM
         do K=1,NPT
             PROD(K,JC)=ZERO
         end do
@@ -1059,8 +1058,7 @@
 
       subroutine BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,DELTA,D,ALPHA,HCOL,GC,GD,S,W)
       implicit real(dp) (A-H,O-Z)
-      dimension XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
-     &  HCOL(*),GC(*),GD(*),S(*),W(*)
+      dimension XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),HCOL(*),GC(*),GD(*),S(*),W(*)
 !
 !     N is the number of variables.
 !     NPT is the number of interpolation equations.
@@ -1250,8 +1248,7 @@
 
       subroutine TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,STEP,D,G,HD,HS,CRVMIN)
       implicit real(dp) (A-H,O-Z)
-      dimension XOPT(*),XPT(NPT,*),GQ(*),HQ(*),PQ(*),STEP(*),
-     &  D(*),G(*),HD(*),HS(*)
+      dimension XOPT(*),XPT(NPT,*),GQ(*),HQ(*),PQ(*),STEP(*),D(*),G(*),HD(*),HS(*)
 !
 !     N is the number of variables of a quadratic objective function, Q say.
 !     The arguments NPT, XOPT, XPT, GQ, HQ and PQ have their usual meanings,
@@ -1435,7 +1432,7 @@
       end do
       QRED=QRED+REDUC
       RATIO=REDUC/QRED
-      if (ITERC < ITERMAX .AND. RATIO > 0.01D0) GOTO 90
+      if (ITERC < ITERMAX .and. RATIO > 0.01D0) GOTO 90
   160 RETURN
 !
 !     The following instructions act as a subroutine for setting the vector
@@ -1532,8 +1529,8 @@
           do I=1,NPT
              ZMAT(I,1)=TEMPA*ZMAT(I,1)-TEMPB*VLAG(I)
           end do
-          if (IDZ == 1 .AND. TEMP < ZERO) IDZ=2
-          if (IDZ >= 2 .AND. TEMP >= ZERO) IFLAG=1
+          if (IDZ == 1 .and. TEMP < ZERO) IDZ=2
+          if (IDZ >= 2 .and. TEMP >= ZERO) IFLAG=1
       else
 !
 !     Complete the updating of ZMAT in the alternative case.
