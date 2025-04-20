@@ -103,7 +103,7 @@
         "physics"
     ],
     "license": {
-        "id": "LGPL-2.0"
+        "id": "LGPL-3.0"
     },
     "title" : "MESA: Modules for experiments in stellar astrophysics"
 }
