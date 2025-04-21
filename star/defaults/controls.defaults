@@ -1782,8 +1782,8 @@
 
       ! report_max_infall_inside_fe_core
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      
-      ! use ``fe_core_infall_mass`` to check amount of mass that is collapsing. 
+
+      ! use ``fe_core_infall_mass`` to check amount of mass that is collapsing.
       ! Then, If ``.true.``, fe_core_infall is determined by finding the maximum velocity that is inside
       ! ``fe_core_mass`` in units of Msun. if ``.false.``, report the maximum infall velocity at any location.
 

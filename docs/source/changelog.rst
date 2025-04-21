@@ -54,7 +54,7 @@ see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/a
 been introduced.
 
 The Fe core-collapse infall condition ``fe_core_infall_limit`` has been adjusted, and the old control remains an optional infall condition.
-Users can switch between either choice with the new logical control ``report_max_infall_inside_fe_core``. 
+Users can switch between either choice with the new logical control ``report_max_infall_inside_fe_core``.
 See the ``&controls`` for further details.
 
 .. _Bug Fixes main:
