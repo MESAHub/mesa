@@ -130,17 +130,17 @@
       end if
 
       do i=1,mz
-        if(abs(z-za(i))  <  1.e-7 ) then
+        if(abs(z-za(i)) < 1.e-7 ) then
           izz=i
           call opac (0,izz,xh,t6,r,filename)
-          if (opact  >  9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
+          if (opact > 9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
           return
         end if
       end do
 
       ilo=2
       ihi=mz
-    8 if(ihi-ilo  >  1) then
+    8 if(ihi-ilo > 1) then
       imd=(ihi+ilo)/2
       if(z <= za(imd)+1.e-7) then
         ihi=imd
@@ -161,8 +161,8 @@
 !       If so, backup to lower Z indices to perform interpolation.
 !       This should work OK, due to density of Z-grid points and the
 !       slow Z variation(except at very small Z)
-      if(xh+za(mfm)  >  1.) mfm=m3
-        if(xh+za(mfm)  >  1.) then
+      if(xh+za(mfm) > 1.) mfm=m3
+        if(xh+za(mfm) > 1.) then
             if(m1 <= 1) then
               write(*,'("special case: X,Z location not covered by logic")')
               stop
@@ -176,7 +176,7 @@
       do iz=m1,mfm
         izz=iz
         call opac(izi,izz,xh,t6,r,filename)
-          if (opact  >  9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
+          if (opact > 9.0) write (*,'(" logK > 9.0, X=",f7.5," Z=",f7.5," T6=",f10.5," R=",e12.4)') xh,z,t6,r
         izi=1
         kapz(iz)=10.**opact ! converts logK to K
         dkapdtr(iz)=dopact
@@ -252,10 +252,10 @@
       mzz=mzin
       z=za(mzz)
 
-      if(nre  <  6) GOTO 65
+      if(nre < 6) GOTO 65
 
-      if((izi == 0) .and. (z+xh-1.e-6  >  1 )) GOTO 61
-      if((izi /= 0) .and. (zval+xh-1.e-6  >  1 )) GOTO 61
+      if((izi == 0) .and. (z+xh-1.e-6 > 1 )) GOTO 61
+      if((izi /= 0) .and. (zval+xh-1.e-6 > 1 )) GOTO 61
       xxh=xh
       xxi=xh
       t6i=t6
@@ -285,7 +285,7 @@
       xa(mx-1)=xamx1
       xx(mx-1)=xxmx1
       dfsx(mx-1)=dfsxmx1
-        if (xa(mx)  <  xa(mx-1)) then
+        if (xa(mx) < xa(mx-1)) then
           mxend=mx-1
           xa(mxend)=xa(mx)
         end if
@@ -303,7 +303,7 @@
       if (izi == 0) then  ! freeze table indices
         ilo=2
         ihi=mx
-    8   if(ihi-ilo  >  1) then
+    8   if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(xh <= xa(imd)+1.e-7) then
               ihi=imd
@@ -318,7 +318,7 @@
         mh=i
         mi=i+1
         mf2=mi
-        if (xh  <  1.e-6) then
+        if (xh < 1.e-6) then
         mh=1
         mg=1
         mi=2
@@ -328,7 +328,7 @@
 
         ilo=2
         ihi=nre
-   12     if(ihi-ilo  >  1) then
+   12     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(slr <= alr(imd)+1.e-7) then
               ihi=imd
@@ -345,7 +345,7 @@
 
         ilo=2
         ihi=nt
-   11     if(ihi-ilo  >  1) then
+   11     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(t6 <= t6list(imd)+1.e-7) then
               ihi=imd
@@ -367,10 +367,10 @@
       k1in=k1
       iadvance=0
       mfin=mf
-      if ((mfin == 1) .and. (xz(1,mzz,k1,l1)  >  9.)) then   ! no data
+      if ((mfin == 1) .and. (xz(1,mzz,k1,l1) > 9.)) then   ! no data
       do i=1,6
-        if (xz(1,mzz,i,l1)  >  9.)  then
-          if (xh  <  .1) then
+        if (xz(1,mzz,i,l1) > 9.)  then
+          if (xh < .1) then
            kmin=i+1
           else
 
@@ -387,17 +387,17 @@
       end do
       if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
       k1=kmin
-      if ((xz(1,mzz,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
+      if ((xz(1,mzz,kmin,l1+1) < 9.) .and. ((slr+.01) > alr(l1+1))) then
       l1=l1+1
       kmin=0
       k1=k1in
       do i=1,6
-      if (xz(1,mzz,i,l1)  >  9.) kmin=i+1
+      if (xz(1,mzz,i,l1) > 9.) kmin=i+1
       end do
-      if ((kmin /= 0) .and. (k1in  <  kmin)) k1=kmin
+      if ((kmin /= 0) .and. (k1in < kmin)) k1=kmin
       end if
       end if
-      if ((slt+.001)  <  alt(k1)) then
+      if ((slt+.001) < alt(k1)) then
       opact=30.
       dopact=99.
       dopacr=99.
@@ -413,7 +413,7 @@
       k3s=k3+ntb-1
       end if
         do i=14,18   ! allows jagged edge at high T,rho
-          if((l3s  >  i) .and. (k3s  >  nta(i+1))) GOTO 62
+          if((l3s > i) .and. (k3s > nta(i+1))) GOTO 62
         end do
       do m=mf,mf2
       ip=3
@@ -818,7 +818,7 @@
       ROSSL(1,j)=xzff(1,j)
       end do
 
-      if (abs(T6-.0056341325)  <  1.e-8) then
+      if (abs(T6-.0056341325) < 1.e-8) then
          U(1)=6.+LOG10(T6)
       end if
 !     SET ROSSL UP TO T6=t6arr(nset)

@@ -70,8 +70,7 @@
       else
          nmax=max_steps
          if (nmax <= 0 ) then
-            if (lout > 0) write(lout,*)
-     &          ' wrong input max_steps=',max_steps
+            if (lout > 0) write(lout,*) ' wrong input max_steps=',max_steps
             arret=.true.
          end if
       end if
@@ -81,8 +80,7 @@
       else
          meth=iwork(2)
          if (meth <= 0.or.meth >= 4 ) then
-            if (lout > 0) write(lout,*)
-     &          ' curious input iwork(2)=',iwork(2)
+            if (lout > 0) write(lout,*) ' curious input iwork(2)=',iwork(2)
             arret=.true.
          end if
       end if
@@ -93,13 +91,11 @@
 ! -------- nrdens   number of dense output components
       nrdens=iwork(5)
       if (nrdens < 0.or.nrdens > n ) then
-         if (lout > 0) write(lout,*)
-     &           ' curious input iwork(5)=',iwork(5)
+         if (lout > 0) write(lout,*) ' curious input iwork(5)=',iwork(5)
          arret=.true.
       else
             if (nrdens > 0.and.iout < 2 ) then
-               if (lout > 0) write(lout,*)
-     &      ' warning: put iout=2 for dense output '
+               if (lout > 0) write(lout,*) ' warning: put iout=2 for dense output '
             end if
             if (nrdens == n) then
                 do i=1,nrdens
@@ -113,8 +109,7 @@
       else
          uround=work(1)
          if (uround <= 1.d-35.or.uround >= 1.d0 ) then
-            if (lout > 0) write(lout,*)
-     &        ' which machine do you have? your uround was:',work(1)
+            if (lout > 0) write(lout,*) ' which machine do you have? your uround was:',work(1)
             arret=.true.
          end if
       end if
@@ -124,8 +119,7 @@
       else
          safe=work(2)
          if (safe >= 1.d0.or.safe <= 1.d-4 ) then
-            if (lout > 0) write(lout,*)
-     &          ' curious input for safety factor work(2)=',work(2)
+            if (lout > 0) write(lout,*) ' curious input for safety factor work(2)=',work(2)
             arret=.true.
          end if
       end if
@@ -149,8 +143,7 @@
          else
             beta=work(5)
             if (beta > 0.2d0 ) then
-               if (lout > 0) write(lout,*)
-     &          ' curious input for beta: work(5)=',work(5)
+               if (lout > 0) write(lout,*) ' curious input for beta: work(5)=',work(5)
             arret=.true.
          end if
          end if
@@ -174,15 +167,13 @@
 ! ------ total storage requirement -----------
       istore=ieys+(3+5*nrdens)-1
       if (istore > lwork ) then
-        if (lout > 0) write(lout,*)
-     &   ' insufficient storage for work, min. lwork=',istore
+        if (lout > 0) write(lout,*) ' insufficient storage for work, min. lwork=',istore
         arret=.true.
       end if
       icomp=21
       istore=icomp+nrdens-1
       if (istore > liwork ) then
-        if (lout > 0) write(lout,*)
-     &   ' insufficient storage for iwork, min. liwork=',istore
+        if (lout > 0) write(lout,*) ' insufficient storage for iwork, min. liwork=',istore
         arret=.true.
       end if
 ! ------ when a fail has occurred, we return with idid=-1
@@ -395,8 +386,7 @@
                nonsti=0
                iasti=iasti+1
                if (iasti == 15) then
-                  if (lout > 0) write (lout,*)
-     &               ' the problem seems to become stiff at x = ',x
+                  if (lout > 0) write (lout,*) ' the problem seems to become stiff at x = ',x
                   if (lout < 0) GOTO 76
                end if
             else
@@ -461,8 +451,7 @@
       return
   78  continue
       if (lout > 0) write(lout,979)x
-      if (lout > 0) write(lout,*)
-     &     ' more than nmax =',nmax,'steps are needed'
+      if (lout > 0) write(lout,*) ' more than nmax =',nmax,'steps are needed'
       idid=-2
       return
   79  continue

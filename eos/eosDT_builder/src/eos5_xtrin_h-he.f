@@ -51,13 +51,13 @@
 
 
       save
-      double precision results_out(iorder), pgas_out, prad_out
+      double precision :: results_out(iorder), pgas_out, prad_out
       integer :: info ! returned = 0 if AOK
-      character (len=*) filename
+      character (len=*) :: filename
       integer :: w
       real :: moles
       parameter (mx=6,mv=12,nr=169,nt=197)
-      character blank*1
+      character :: blank*1
       common/lreadco_hhe/itime
       common/eeeos_hhe/ epl(mx,nt,nr),xx(mx)
       common/aaeos_hhe/ q(4),h(4),xxh
@@ -365,7 +365,7 @@
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)') ip,iq,k3,l3,xh,t6,r,z
       stop 1
       return
-      end
+      end subroutine esac_hhe
 
 ! **********************************************************************
       subroutine t6rinteos_hhe(slr,slt)
@@ -428,17 +428,17 @@
         end if
 
       return
-      end
+      end subroutine t6rinteos_hhe
 
 
 ! *********************************************************************
       subroutine readcoeos_hhe(filename)
 !..... The purpose of this subroutine is to read the data tables
       save
-      character (len=256) filename
+      character (len=256) :: filename
       parameter (mx=6,mv=12,nr=169,nt=197)
-      real moles
-      character*1 blank
+      real :: moles
+      character(len=1) :: blank
       common/aaeos_hhe/ q(4),h(4),xxh
       common/aeos_hhe/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
@@ -535,7 +535,7 @@
          dfsx(i)=1./(xx(i)-xx(i-1))
       end do
       !call system ('gzip EOS5_data_H-He')
-      end
+      end subroutine readcoeos_hhe
 
 
 ! share quadeos and gmass with the standard xtrin
@@ -543,14 +543,14 @@
 ! **********************************************************************
       subroutine radsub_hhe (irad,t6,density,moles,tmass)
       parameter (mx=6,mv=12,nr=169,nt=197)
-      real moles,k,molenak,Na
+      real :: moles,k,molenak,Na
       common/eeos_hhe/esact,eos(mv)
       common/beos_hhe/ iri(mv),index(mv),nta(nr),zz(mx)
 
       data Na/6.0221367e+23/, k/1.380658e-16/, unitf/0.9648530/, unitfold/0.965296/,
      &     c/2.9979245e+10/, sigma/5.67051e-5/, sigmac/1.8914785e-15/, sigmacc/1.8914785e-3/, aprop/83.14510/
 
-cPhysical constants
+! Physical constants
 !       Na=6.0221367e+23
 !       k =1.380658e-16 !   erg/degree K
 !       Na*k=6.0221367E+23*1.380658e-16 erg/degree K=8.314510E+7 erg/degree K
@@ -562,7 +562,7 @@ cPhysical constants
 !           Pressure is in units of E+12 bars=Mb
 !       sigma is the Stefan-Boltzmann constant
 !       sigma=5.67051E-5 !   erg /(s*cm**2*K**4)
-!       c=2.99792458E+10 !   cm/sec
+!       c=2.99792458E+10 !   cm/s
 
 !     rat=sigma/!    ! dyne/(cm**2*K**4)
 
@@ -626,7 +626,7 @@ cPhysical constants
       eos(iri(6))=chir
       eos(iri(7))=chitt
       return
-      end
+      end subroutine radsub_hhe
 ! **********************************************************************
       block data
 

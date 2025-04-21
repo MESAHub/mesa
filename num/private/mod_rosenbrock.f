@@ -517,8 +517,7 @@
          ierr = 0
          call realloc_double(work,needed_lwork,ierr)
          if (ierr /= 0) then
-            write(lout,*)
-     &         ' insufficient storage for work, min. lwork=',needed_lwork
+            write(lout,*) ' insufficient storage for work, min. lwork=',needed_lwork
             arret=.true.
          end if
       end if
@@ -527,8 +526,7 @@
          ierr = 0
          call realloc_integer(iwork,needed_liwork,ierr)
          if (ierr /= 0) then
-            write(lout,*)
-     &         ' insufficient storage for iwork, min. liwork=',needed_liwork
+            write(lout,*) ' insufficient storage for iwork, min. liwork=',needed_liwork
             arret=.true.
          end if
       end if
@@ -634,8 +632,7 @@
             integer, intent(inout), target :: iwork(*)
             integer, intent(out) :: ierr
          end function contro
-         subroutine coeffs (ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,
-     &                ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
+         subroutine coeffs(ns,ra,rc,rd,ros_d,ros_m,ros_e,ros_alpha,ros_gamma,ros_newf,ros_elo,no_aux_in_error,ros_name)
             use const_def, only: dp
             implicit none
             integer, intent(in) :: ns

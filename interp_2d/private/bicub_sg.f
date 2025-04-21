@@ -197,13 +197,13 @@
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
 ! 1001       format(' ?bcspeval:  xget=',1pe11.4,' out of range ',
-!     >         1pe11.4,' to ',1pe11.4)
+!     &         1pe11.4,' to ',1pe11.4)
          else
 !            if((xget < x(1)-0.5*zxtol).or.
-!     >         (xget > x(nx)+0.5*zxtol))
-!     >      write(6,1011) xget,x(1),x(nx)
+!     &         (xget > x(nx)+0.5*zxtol))
+!     &      write(6,1011) xget,x(1),x(nx)
 ! 1011       format(' %bcspeval:  xget=',1pe15.8,' beyond range ',
-!     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(xget < x(1)) then
                zxget=x(1)
             else
@@ -217,12 +217,12 @@
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
 ! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ',
-!     >         1pe11.4,' to ',1pe11.4)
+!     &         1pe11.4,' to ',1pe11.4)
          else
 !         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol))
-!     >      write(6,1012) yget,y(1),y(ny)
+!     &      write(6,1012) yget,y(1),y(ny)
 ! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ',
-!     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -1585,13 +1585,13 @@
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
 ! 1001       format(' ?herm2ev:  xget=',1pe11.4,' out of range ',
-!     >         1pe11.4,' to ',1pe11.4)
+!     &         1pe11.4,' to ',1pe11.4)
          else
 !            if((xget < x(1)-0.5*zxtol).or.
-!     >         (xget > x(nx)+0.5*zxtol))
-!     >      write(6,1011) xget,x(1),x(nx)
+!     &         (xget > x(nx)+0.5*zxtol))
+!     &      write(6,1011) xget,x(1),x(nx)
 ! 1011       format(' %herm2ev:  xget=',1pe15.8,' beyond range ',
-!     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(xget < x(1)) then
                zxget=x(1)
             else
@@ -1605,13 +1605,13 @@
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
 ! 1002       format(' ?herm2ev:  yget=',1pe11.4,' out of range ',
-!     >         1pe11.4,' to ',1pe11.4)
+!     &         1pe11.4,' to ',1pe11.4)
          else
 !            if((yget < y(1)-0.5*zytol).or.
-!     >         (yget > y(ny)+0.5*zytol))
-!     >      write(6,1012) yget,y(1),y(ny)
+!     &         (yget > y(ny)+0.5*zytol))
+!     &      write(6,1012) yget,y(1),y(ny)
 ! 1012       format(' %herm2ev:  yget=',1pe15.8,' beyond range ',
-!     >         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -1898,7 +1898,7 @@
          ier=1
 !         write(6,1001) slbl,xlbl,ibc,imin,imax
 ! 1001    format(' ?',a,' -- ibc',a,' = ',i9,' out of range ',
-!     >      i2,' to ',i2)
+!     &      i2,' to ',i2)
       end if
 
       return

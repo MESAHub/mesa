@@ -147,12 +147,12 @@
 ! .... INDEX refers to the index,i, of xc(i) or xo(i); xc(i) and xo(i)
 !      are the abundance grid points.
       iop=1   ! provides smoothed interpolations; iop=0 gives no smoothing
-      if(nr  <  6) GOTO 65
-      if((xh  >  1.e-6) .and. (mx  < 4)) GOTO 64
+      if(nr < 6) GOTO 65
+      if((xh > 1.e-6) .and. (mx  < 4)) GOTO 64
 
 ! .... set-up C/O axis points
       xxco=xxc+xxo
-      if(z+xh+xxco-1.e-6  >  1 ) GOTO 61
+      if(z+xh+xxco-1.e-6 > 1 ) GOTO 61
       zzz=z+0.001
       xxh=xh
        xxci=xxc
@@ -171,7 +171,7 @@
 ! .... set X indices
         ilo=2
         ihi=mx
-    8   if(ihi-ilo  >  1) then
+    8   if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(xh <= xa(imd)+1.e-7) then
               ihi=imd
@@ -187,12 +187,12 @@
         mi=i+1
         mf2=mi
         istep1=1
-        if (mx  >  1) then
+        if (mx > 1) then
         istep1=mx-1
         if((xh <= xa(2)+1.e-7) .or. (xh >= xa(istep1)-1.e-7)) mf2=mh
         end if
 
-        if ((mx == 1) .or. (xh  <  1.e-6)) then
+        if ((mx == 1) .or. (xh < 1.e-6)) then
           mf=1
           mg=1
           mh=1
@@ -210,7 +210,7 @@
       alt(i)=alt(i-1)+.05
       end do
       ntd=47
-      if ((ntb +1)  >  47) ntd=ntb+1
+      if ((ntb +1) > 47) ntd=ntb+1
       do i=ntd,68
       alt(i)=alt(i-1)+.1
       end do
@@ -223,7 +223,7 @@
       end if
         ilo=2
         ihi=nr
-   12     if(ihi-ilo  >  1) then
+   12     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(slr <= alr(imd)+1.e-7) then
               ihi=imd
@@ -240,7 +240,7 @@
 
         ilo=2
         ihi=nt
-   11     if(ihi-ilo  >  1) then
+   11     if(ihi-ilo > 1) then
           imd=(ihi+ilo)/2
             if(t6 <= t6list(imd)+1.e-7) then
               ihi=imd
@@ -262,10 +262,10 @@
       k1in=k1
       iadvance=0
       mfin=mf
-      if ((mfin == 1) .and. (co(1,1,1,k1,l1)  >  9.)) then! data missing
+      if ((mfin == 1) .and. (co(1,1,1,k1,l1) > 9.)) then! data missing
       do i=1,6
-        if (co(1,1,1,i,l1)  >  9.)  then
-          if (xh  <  .1) then
+        if (co(1,1,1,i,l1) > 9.)  then
+          if (xh < .1) then
            kmin=i+1
           else
 
@@ -282,17 +282,17 @@
       end do
       if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
       k1=kmin
-      if ((co(1,1,1,kmin,l1+1)  <  9.) .and. ((slr+.01)  >  alr(l1+1))) then
+      if ((co(1,1,1,kmin,l1+1) < 9.) .and. ((slr+.01) > alr(l1+1))) then
       l1=l1+1
       kmin=0
       k1=k1in
       do i=1,6
-      if (co(1,1,1,i,l1)  >  9.) kmin=i+1
+      if (co(1,1,1,i,l1) > 9.) kmin=i+1
       end do
-      if ((kmin /= 0) .and. (k1in  <  kmin)) k1=kmin
+      if ((kmin /= 0) .and. (k1in < kmin)) k1=kmin
       end if
       end if
-      if ((slt+.001)  <  alt(k1)) then
+      if ((slt+.001) < alt(k1)) then
       write (*,'("OPAL data not available for X=", f7.5," logT6=", f7.3, " logR=",f7.3)') xh,slt,slr
       opact=30.
       dopact=99.
@@ -390,14 +390,14 @@
 
 ! .... Determine log R and log T6 grid points to use in the
 !      interpolation.
-      if((slt  <  alt(1)).or.(slt  >  alt(nt))) GOTO 62
-      if((slr  <  alr (1)).or.(slr  >  alr(nr))) GOTO 62
+      if((slt < alt(1)).or.(slt > alt(nt))) GOTO 62
+      if((slr < alr (1)).or.(slr > alr(nr))) GOTO 62
 
       if (m == mf) then  !  calculate table indices
 
-      if((mf2 /= mxzero) .and. (k3s  >  ntm)) GOTO 62
+      if((mf2 /= mxzero) .and. (k3s > ntm)) GOTO 62
         do i=14,18
-          if((l3s  >  i) .and. (k3s  >  nta(i+1))) GOTO 62
+          if((l3s > i) .and. (k3s > nta(i+1))) GOTO 62
         end do
       ip=3
       iq=3
@@ -497,7 +497,7 @@
      &          dfs(nt),dfsr(nr),a(3,mx),b(3),m,mf,xa(8),alrf(nrm),cof(ntm,nrm),t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/bb/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq,xodp,xcdp,xxco,cxx,oxx
        is=0
-      if(xxco  <  1.e-6) then
+      if(xxco < 1.e-6) then
         do ir=l1,l1+iq
           do it=k1,k1+ip
             opl(m,it,ir)=co(m,1,1,it,ir)
@@ -507,7 +507,7 @@
             GOTO 123
       end if
 !     include boundaries that could later cause division by 0!
-      if(xxc  >  xcd(3)-1.e-6) then
+      if(xxc > xcd(3)-1.e-6) then
 ! _________
       oxdp=log10(zzz+xodp)
 !     handle possibility that xodp=0
@@ -518,7 +518,7 @@
 !                    interpolation in region c1
 
 !     include boundaries that could later cause division by 0!
-      if(xxc  >  xcd(2)-1.e-6) then
+      if(xxc > xcd(2)-1.e-6) then
       iw=1
       a(1,m)=quad(is,iw,cxx,co(m,nc-2,1,it,ir),co(m,nc-1,1,it,ir),diag(m,1,it,ir),cx(nc-2),cx(nc-1),cx(nc))
       iw=iw+1
@@ -566,10 +566,10 @@
         m1=i-1
         m2=i-2
         a(1,m)=quad(is,iw,cxx,co(m,n(m,m2)-2,m2,it,ir),co(m,n(m,m2)-1,m2,it,ir),
-     $              diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
+     &              diag(m,m2,it,ir),cx(n(m,m2)-2),cx(n(m,m2)-1),cxd(m2))
         iw=iw+1
         a(2,m)=quad(is,iw,cxx,co(m,n(m,m1)-2,m1,it,ir),co(m,n(m,m1)-1,m1,it,ir),
-     $              diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
+     &              diag(m,m1,it,ir),cx(n(m,m1)-2),cx(n(m,m1)-1),cxd(m1))
         iw=iw+1
         a(3,m)=quad(is,iw,cxx,diag(m,m2,it,ir),diag(m,m1,it,ir),diag(m,i,it,ir),cxd(m2),cxd(m1),cxd(i))
          do w=1,3
@@ -600,7 +600,7 @@
 !                    interpolation in region  o1
 
 !     include boundaries that could later cause division by 0!
-      if(xxo  >  xod(2)-1.e-6) then
+      if(xxo > xod(2)-1.e-6) then
       iw=1
       a(1,m)=quad(is,iw,oxx,co(m,1,no-2,it,ir),co(m,1,no-1,it,ir),diago(m,no-1,it,ir),ox(no-2),ox(no-1),ox(no))
       iw=iw+1
@@ -647,10 +647,10 @@
       m2=i-2
       m1=i-1
       a(1,m)=quad(is,iw,oxx,co(m,m2,n(m,m2)-2,it,ir),co(m,m2,n(m,m2)-1,it,ir),
-     $                   diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
+     &                   diago(m,no-m2,it,ir),ox(n(m,m2)-2),ox(n(m,m2)-1),oxd(m2))
       iw=iw+1
       a(2,m)=quad(is,iw,oxx,co(m,m1,n(m,m1)-2,it,ir),co(m,m1,n(m,m1)-1,it,ir),
-     $                   diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
+     &                   diago(m,no-m1,it,ir),ox(n(m,m1)-2),ox(n(m,m1)-1),oxd(m1))
       iw=iw+1
       a(3,m)=quad(is,iw,oxx,diago(m,no-m2,it,ir),diago(m,no-m1,it,ir),diago(m,no-i,it,ir),oxd(m2),oxd(m1),oxd(i))
         do w=1,3
@@ -673,9 +673,9 @@
    52 ie=100*xxc+1
       iei=index(ie)+1
 !     must also allow index = nc, to avoid extrapolation
-      if (iei  >  nc) iei=nc
+      if (iei > nc) iei=nc
 
-        if(iei  >  3) then
+        if(iei > 3) then
           i1=iei-2
           i2=iei-1
           i3=iei
@@ -689,9 +689,9 @@
       ie=100*xxo+1
       iej=index(ie)+1
 !     must also allow index = no, to avoid extrapolation
-      if (iej  >  no) iej=no
+      if (iej > no) iej=no
 
-        if(iej  >  3) then
+        if(iej > 3) then
           j1=iej-2
           j2=iej-1
           j3=iej
@@ -842,11 +842,11 @@
               dopacr=dopacr*dix+dopacrq*(1.-dix)
         end if
       dopactd=dopact-3.*dopacr
-        if (opact  >  1.e+15) then
+        if (opact > 1.e+15) then
           write(*,'("Interpolation indices out of range; please report conditions.")')
           stop
         end if
-      if (opact  >  9) then
+      if (opact > 9) then
       opact=30.
       dopact=99.
       dopactr=99.
@@ -900,7 +900,7 @@
        do i=1,nc
          if(xcd(j) >= xc(i)) then
            n(m,j)=i+1
-           if(xcd(j)  <  xc(i)+1.e-6) n(m,j)=i
+           if(xcd(j) < xc(i)+1.e-6) n(m,j)=i
          end if
         end do
       end do
@@ -1047,7 +1047,7 @@
        dfsr(i)=1./(alr(i)-alr(i-1))
       end do
       istep=-1
-      if (mx  >  1 ) then
+      if (mx > 1 ) then
         istep=1
         do i=2,mx,istep
           dfsx(i)=1./(xx(i)-xx(i-1))
@@ -1534,7 +1534,7 @@
       ROSSL(1,j)=coff(1,j)
       end do
 
-      if( abs(T6 -.0056341325)  <  1.e-8) then
+      if( abs(T6 -.0056341325) < 1.e-8) then
          U(1)=6.+LOG10(T6)
       end if
 !     SET ROSSL UP TO T6=t6arr(nset)
