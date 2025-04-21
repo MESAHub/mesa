@@ -79,28 +79,27 @@
 
 ! Specification statements
 !     .. Parameters ..
-      integer          NIPIMX
-      parameter        (NIPIMX=51)
-!     ..
+      integer :: NIPIMX
+      parameter (NIPIMX=51)
+
 !     .. Scalar Arguments ..
-      integer          IER,MD,NIP,NXD,NYD
-!     ..
+      integer :: IER,MD,NIP,NXD,NYD
+
 !     .. Array Arguments ..
-      double precision             WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
-     &                 ZD(NXD,NYD),ZI(NIP)
-!     ..
+      double precision :: WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),ZD(NXD,NYD),ZI(NIP)
+
 !     .. Local Scalars ..
-      integer          IIP,IX,IY,NIPI
-!     ..
+      integer :: IIP,IX,IY,NIPI
+
 !     .. Local Arrays ..
-      integer          INXI(NIPIMX),INYI(NIPIMX)
-!     ..
+      integer :: INXI(NIPIMX),INYI(NIPIMX)
+
 !     .. External Subroutines ..
-      EXTERNAL         RGLCTN_db,RGPD3P_db,RGPLNL_db
-!     ..
+      EXTERNAL RGLCTN_db,RGPD3P_db,RGPLNL_db
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MIN
-!     ..
+      INTRINSIC MIN
+
 ! Preliminary processing
 ! Error check
       if (NXD <= 1) GOTO 40
@@ -160,7 +159,7 @@
      &       E11.3)
  9040 FORMAT (1X,/,'*** RGBI3P Error 5: NIP = 0 or less')
  9050 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NIP =',I5,/)
-      end
+      end subroutine do_RGBI3P_db
 
 
       subroutine do_RGSF3P_db(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
@@ -249,29 +248,28 @@
 
 ! Specification statements
 !     .. Parameters ..
-      integer          NIPIMX
-      parameter        (NIPIMX=51)
-!     ..
+      integer :: NIPIMX
+      parameter (NIPIMX=51)
+
 !     .. Scalar Arguments ..
-      integer          IER,MD,NXD,NXI,NYD,NYI
-!     ..
+      integer :: IER,MD,NXD,NXI,NYD,NYI
+
 !     .. Array Arguments ..
-      double precision             WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
-     &                 ZD(NXD,NYD),ZI(NXI,NYI)
-!     ..
+      double precision :: WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),ZD(NXD,NYD),ZI(NXI,NYI)
+
 !     .. Local Scalars ..
-      integer          IX,IXI,IY,IYI,NIPI
-!     ..
+      integer :: IX,IXI,IY,IYI,NIPI
+
 !     .. Local Arrays ..
-      double precision             YII(NIPIMX)
-      integer          INXI(NIPIMX),INYI(NIPIMX)
-!     ..
+      double precision :: YII(NIPIMX)
+      integer :: INXI(NIPIMX),INYI(NIPIMX)
+
 !     .. External Subroutines ..
-      EXTERNAL         RGLCTN_db,RGPD3P_db,RGPLNL_db
-!     ..
+      EXTERNAL RGLCTN_db,RGPD3P_db,RGPLNL_db
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MIN
-!     ..
+      INTRINSIC MIN
+
 ! Preliminary processing
 ! Error check
       if (NXD <= 1) GOTO 60
@@ -342,7 +340,7 @@
  9040 FORMAT (1X,/,'*** RGSF3P_db Error 5: NXI = 0 or less')
  9050 FORMAT (1X,/,'*** RGSF3P_db Error 6: NYI = 0 or less')
  9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,/)
-      end
+      end subroutine do_RGSF3P_db
 
 
       subroutine RGPD3P_db(NXD,NYD,XD,YD,ZD, PDD)
@@ -383,10 +381,10 @@
 ! Specification statements
 !     .. Scalar Arguments ..
       integer :: NXD,NYD
-!     ..
+
 !     .. Array Arguments ..
       double precision :: PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
-!     ..
+
 !     .. Local Scalars ..
       double precision :: B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
      &                 CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,
@@ -399,29 +397,28 @@
      &                 Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,
      &                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
       integer :: IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,JXY,NX0,NY0
-!     ..
+
 !     .. Local Arrays ..
       double precision :: B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
      &                 CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),
      &                 YA(3,4),Z0IA(3,4),ZI0A(3,4)
       integer :: IDLT(3,4)
-!     ..
+
 !     .. Intrinsic Functions ..
       INTRINSIC        MAX
-!     ..
+
 !     .. Statement Functions ..
       double precision :: Z2F,Z3F
-!     ..
+
 ! Data statements
-      DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,
-     &                 -2,-1,1,2,-1,1,2,3/
-!     ..
+      DATA ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,-2,-1,1,2,-1,1,2,3/
+
 ! Statement Function definitions
       Z2F(XX1,XX2,ZZ0,ZZ1) = (ZZ1-ZZ0)*XX2/XX1 + ZZ0
       Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2) = ((ZZ2-ZZ0)* (XX3-XX1)/XX2-
      &                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
      &                               (XX3/ (XX2-XX1)) + ZZ0
-!     ..
+
 ! Calculation
 ! Initial setting of some local variables
       NX0 = MAX(4,NXD)
@@ -828,7 +825,7 @@
    50     continue
    60 continue
       return
-      end
+      end subroutine RGPD3P_db
 
 
       subroutine RGLCTN_db(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
@@ -875,15 +872,15 @@
 ! Specification statements
 !     .. Scalar Arguments ..
       integer :: NIP,NXD,NYD
-!     ..
+
 !     .. Array Arguments ..
       double precision :: XD(NXD),XI(NIP),YD(NYD),YI(NIP)
       integer :: INXI(NIP),INYI(NIP)
-!     ..
+
 !     .. Local Scalars ..
       double precision :: XII,YII
       integer :: IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
-!     ..
+
 ! DO-loop with respect to IIP, which is the point number of the
 ! output point
       do IIP = 1,NIP
@@ -1023,11 +1020,11 @@
 ! Specification statements
 !     .. Scalar Arguments ..
       integer :: NIP,NXD,NYD
-!     ..
+
 !     .. Array Arguments ..
       double precision :: PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),ZD(NXD,NYD),ZI(NIP)
       integer :: INXI(NIP),INYI(NIP)
-!     ..
+
 !     .. Local Scalars ..
       double precision :: A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
      &                 P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,
@@ -1036,10 +1033,10 @@
      &                 ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,
      &                 ZY10,ZY11,ZY1DX
       integer :: IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
-!     ..
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MAX
-!     ..
+      INTRINSIC MAX
+
 ! Calculation
 ! Outermost DO-loop with respect to the output point
       do IIP = 1,NIP

@@ -79,28 +79,27 @@
 
 ! Specification statements
 !     .. Parameters ..
-      integer          NIPIMX
-      parameter        (NIPIMX=51)
-!     ..
+      integer :: NIPIMX
+      parameter (NIPIMX=51)
+
 !     .. Scalar Arguments ..
-      integer          IER,MD,NIP,NXD,NYD
-!     ..
+      integer :: IER,MD,NIP,NXD,NYD
+
 !     .. Array Arguments ..
-      real             WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
-     &                 ZD(NXD,NYD),ZI(NIP)
-!     ..
+      real :: WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),ZD(NXD,NYD),ZI(NIP)
+
 !     .. Local Scalars ..
-      integer          IIP,IX,IY,NIPI
-!     ..
+      integer :: IIP,IX,IY,NIPI
+
 !     .. Local Arrays ..
-      integer          INXI(NIPIMX),INYI(NIPIMX)
-!     ..
+      integer :: INXI(NIPIMX),INYI(NIPIMX)
+
 !     .. External Subroutines ..
-      EXTERNAL         RGLCTN_sg,RGPD3P_sg,RGPLNL_sg
-!     ..
+      EXTERNAL RGLCTN_sg,RGPD3P_sg,RGPLNL_sg
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MIN
-!     ..
+      INTRINSIC MIN
+
 ! Preliminary processing
 ! Error check
       if (NXD <= 1) GOTO 40
@@ -122,16 +121,15 @@
       end if
 ! DO-loop with respect to the output point
 ! Processes NIPIMX output points, at most, at a time.
-      do 30 IIP = 1,NIP,NIPIMX
+      do IIP = 1,NIP,NIPIMX
           NIPI = MIN(NIP- (IIP-1),NIPIMX)
 ! Locates the output points.
           call RGLCTN_sg(NXD,NYD,XD,YD,NIPI,XI(IIP),YI(IIP), INXI,INYI)
 !         call RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output points.
-          call RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,
-     &                INYI, ZI(IIP))
+          call RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IIP),YI(IIP),INXI,INYI, ZI(IIP))
 !         call RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
-   30 continue
+      end do
       return
 ! Error exit
    40 WRITE (*,FMT=9000)
@@ -161,7 +159,7 @@
      &       E11.3)
  9040 FORMAT (1X,/,'*** RGBI3P Error 5: NIP = 0 or less')
  9050 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NIP =',I5,/)
-      end
+      end subroutine do_RGBI3P_sg
 
 
       subroutine do_RGSF3P_sg(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK)
@@ -250,29 +248,28 @@
 
 ! Specification statements
 !     .. Parameters ..
-      integer          NIPIMX
-      parameter        (NIPIMX=51)
-!     ..
+      integer :: NIPIMX
+      parameter (NIPIMX=51)
+
 !     .. Scalar Arguments ..
-      integer          IER,MD,NXD,NXI,NYD,NYI
-!     ..
+      integer :: IER,MD,NXD,NXI,NYD,NYI
+
 !     .. Array Arguments ..
-      real             WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
-     &                 ZD(NXD,NYD),ZI(NXI,NYI)
-!     ..
+      real :: WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),ZD(NXD,NYD),ZI(NXI,NYI)
+
 !     .. Local Scalars ..
-      integer          IX,IXI,IY,IYI,NIPI
-!     ..
+      integer :: IX,IXI,IY,IYI,NIPI
+
 !     .. Local Arrays ..
-      real             YII(NIPIMX)
-      integer          INXI(NIPIMX),INYI(NIPIMX)
-!     ..
+      real :: YII(NIPIMX)
+      integer :: INXI(NIPIMX),INYI(NIPIMX)
+
 !     .. External Subroutines ..
-      EXTERNAL         RGLCTN_sg,RGPD3P_sg,RGPLNL_sg
-!     ..
+      EXTERNAL RGLCTN_sg,RGPD3P_sg,RGPLNL_sg
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MIN
-!     ..
+      INTRINSIC MIN
+
 ! Preliminary processing
 ! Error check
       if (NXD <= 1) GOTO 60
@@ -295,24 +292,23 @@
       end if
 ! Outermost DO-loop with respect to the y coordinate of the output
 ! grid points
-      do 50 IYI = 1,NYI
-          do 30 IXI = 1,NIPIMX
+      do IYI = 1,NYI
+          do IXI = 1,NIPIMX
               YII(IXI) = YI(IYI)
-   30     continue
+          end do
 ! Second DO-loop with respect to the x coordinate of the output
 ! grid points
 ! Processes NIPIMX output-grid points, at most, at a time.
-          do 40 IXI = 1,NXI,NIPIMX
+          do IXI = 1,NXI,NIPIMX
               NIPI = MIN(NXI- (IXI-1),NIPIMX)
 ! Locates the output-grid points.
               call RGLCTN_sg(NXD,NYD,XD,YD,NIPI,XI(IXI),YII, INXI,INYI)
 !             call RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
 ! Calculates the z values at the output-grid points.
-              call RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,
-     &                    INYI, ZI(IXI,IYI))
+              call RGPLNL_sg(NXD,NYD,XD,YD,ZD,WK,NIPI,XI(IXI),YII,INXI,INYI, ZI(IXI,IYI))
 !             call RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
-   40     continue
-   50 continue
+          end do
+      end do
       return
 ! Error exit
    60 WRITE (*,FMT=9000)
@@ -338,16 +334,13 @@
  9000 FORMAT (1X,/,'*** RGSF3P_sg Error 1: NXD = 1 or less')
  9010 FORMAT (1X,/,'*** RGSF3P_sg Error 2: NYD = 1 or less')
  9020 FORMAT (1X,/,'*** RGSF3P_sg Error 3: Identical XD values or',
-     &       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
-     &       E11.3)
+     &       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',E11.3)
  9030 FORMAT (1X,/,'*** RGSF3P_sg Error 4: Identical YD values or',
-     &       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
-     &       E11.3)
+     &       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',E11.3)
  9040 FORMAT (1X,/,'*** RGSF3P_sg Error 5: NXI = 0 or less')
  9050 FORMAT (1X,/,'*** RGSF3P_sg Error 6: NYI = 0 or less')
- 9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,
-     &       /)
-      end
+ 9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,/)
+      end subroutine do_RGSF3P_sg
 
 
       subroutine RGPD3P_sg(NXD,NYD,XD,YD,ZD, PDD)
@@ -387,13 +380,13 @@
 
 ! Specification statements
 !     .. Scalar Arguments ..
-      integer          NXD,NYD
-!     ..
+      integer :: NXD,NYD
+
 !     .. Array Arguments ..
-      real             PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
-!     ..
+      real :: PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
+
 !     .. Local Scalars ..
-      real             B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
+      real :: B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
      &                 CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,
      &                 DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,
      &                 DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,
@@ -403,31 +396,29 @@
      &                 SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,
      &                 Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,
      &                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
-      integer          IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,
-     &                 JXY,NX0,NY0
-!     ..
+      integer :: IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,JXY,NX0,NY0
+
 !     .. Local Arrays ..
-      real             B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
+      real :: B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
      &                 CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),
      &                 YA(3,4),Z0IA(3,4),ZI0A(3,4)
-      integer          IDLT(3,4)
-!     ..
+      integer :: IDLT(3,4)
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MAX
-!     ..
+      INTRINSIC MAX
+
 !     .. Statement Functions ..
-      real             Z2F,Z3F
-!     ..
+      real :: Z2F,Z3F
+
 ! Data statements
-      DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,
-     &                 -2,-1,1,2,-1,1,2,3/
-!     ..
+      DATA ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,-2,-1,1,2,-1,1,2,3/
+
 ! Statement Function definitions
       Z2F(XX1,XX2,ZZ0,ZZ1) = (ZZ1-ZZ0)*XX2/XX1 + ZZ0
       Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2) = ((ZZ2-ZZ0)* (XX3-XX1)/XX2-
      &                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
      &                               (XX3/ (XX2-XX1)) + ZZ0
-!     ..
+
 ! Calculation
 ! Initial setting of some local variables
       NX0 = MAX(4,NXD)
@@ -834,7 +825,7 @@
    50     continue
    60 continue
       return
-      end
+      end subroutine RGPD3P_sg
 
 
       subroutine RGLCTN_sg(NXD,NYD,XD,YD,NIP,XI,YI, INXI,INYI)
@@ -880,19 +871,19 @@
 
 ! Specification statements
 !     .. Scalar Arguments ..
-      integer          NIP,NXD,NYD
-!     ..
+      integer :: NIP,NXD,NYD
+
 !     .. Array Arguments ..
-      real             XD(NXD),XI(NIP),YD(NYD),YI(NIP)
-      integer          INXI(NIP),INYI(NIP)
-!     ..
+      real :: XD(NXD),XI(NIP),YD(NYD),YI(NIP)
+      integer :: INXI(NIP),INYI(NIP)
+
 !     .. Local Scalars ..
-      real             XII,YII
-      integer          IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
-!     ..
+      real :: XII,YII
+      integer :: IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
+
 ! DO-loop with respect to IIP, which is the point number of the
 ! output point
-      do 30 IIP = 1,NIP
+      do IIP = 1,NIP
           XII = XI(IIP)
           YII = YI(IIP)
 ! Checks if the x coordinate of the IIPth output point, XII, is
@@ -904,8 +895,7 @@
               if (IXD == 0) then
                   if (XII > XD(1)) NINTX = 1
               else if (IXD < NXD) then
-                  if ((XII < XD(IXD)) .or.
-     &                (XII > XD(IXD+1))) NINTX = 1
+                  if ((XII < XD(IXD)) .or. (XII > XD(IXD+1))) NINTX = 1
               else
                   if (XII < XD(NXD)) NINTX = 1
               end if
@@ -971,9 +961,9 @@
               end if
           end if
           INYI(IIP) = IYD
-   30 continue
+      end do
       return
-      end
+      end subroutine RGLCTN_sg
 
 
       subroutine RGPLNL_sg(NXD,NYD,XD,YD,ZD,PDD,NIP,XI,YI,INXI,INYI, ZI)
@@ -1030,25 +1020,25 @@
 
 ! Specification statements
 !     .. Scalar Arguments ..
-      integer          NIP,NXD,NYD
-!     ..
+      integer :: NIP,NXD,NYD
+
 !     .. Array Arguments ..
-      real             PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
+      real :: PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
      &                 ZD(NXD,NYD),ZI(NIP)
-      integer          INXI(NIP),INYI(NIP)
-!     ..
+      integer :: INXI(NIP),INYI(NIP)
+
 !     .. Local Scalars ..
-      real             A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
+      real :: A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
      &                 P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,
      &                 Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,
      &                 Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,
      &                 ZX1DY,ZXY00,ZXY01,ZXY10,ZXY11,ZY00,ZY01,ZY0DX,
      &                 ZY10,ZY11,ZY1DX
-      integer          IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
-!     ..
+      integer :: IIP,IXD0,IXD1,IXDI,IXDIPV,IYD0,IYD1,IYDI,IYDIPV
+
 !     .. Intrinsic Functions ..
-      INTRINSIC        MAX
-!     ..
+      INTRINSIC MAX
+
 ! Calculation
 ! Outermost DO-loop with respect to the output point
       do 10 IIP = 1,NIP
@@ -1230,4 +1220,4 @@
    10 continue
       return
 
-      end
+      end subroutine RGPLNL_sg
