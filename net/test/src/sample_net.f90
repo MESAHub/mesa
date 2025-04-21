@@ -188,7 +188,8 @@ contains
       skip_jacobian = .false.
 
 ! main loop, keep returning here
-100   xa(:) = 0
+      do
+      xa(:) = 0
 
       write (6, *)
       write (6, *) 'give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>'
@@ -259,7 +260,7 @@ contains
       write (6, 24) 'eps_nuc    =', eps_nuc, 'erg/g/sec'
 
 ! back for more
-      GOTO 100
+      end do
 
    end subroutine do1_net_eval
 
