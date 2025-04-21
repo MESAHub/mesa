@@ -401,9 +401,14 @@
             if (s% fe_core_mass > 0) then
 
                 ! check if [> fe_core_infall_mass] of core is infalling
-                do k=1, nz
-                   if (s% m(k) > Msun*s% fe_core_mass) cycle
-                   if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
+                ! instead of a for loop, we move inside out and only check regions inside the fe_core
+                k = nz
+                do while (k > 1)
+                   if (s% m(k) > Msun * s% fe_core_mass) exit  ! exit when outside Fe core
+                   if (-velocity(k) > s% fe_core_infall) then
+                      mass_sum = mass_sum + s% dm(k)
+                   end if
+                   k = k-1 ! loop outwards
                end do
 
                if (s% report_max_infall_inside_fe_core) then  ! report peak infall velocity inside fe_core (not necessarily the maximum, since infall stars outside in)
