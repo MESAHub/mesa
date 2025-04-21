@@ -153,10 +153,12 @@
 
          do l = 0, 3
             if (nl(l) > 0) then
-               ymin = min(ymin,minval(freq_target(l,1:nl(l))))
-               ymax = max(ymax,maxval(freq_target(l,1:nl(l))))
-               xpt_min = min(xpt_min,minval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
-               xpt_max = max(xpt_max,maxval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
+               ymin = min(ymin,real(minval(freq_target(l,1:nl(l))), kind=sp))
+               ymax = max(ymax,real(maxval(freq_target(l,1:nl(l))), kind=sp))
+               xpt_min = min(xpt_min, &
+                             minval(mod(real(freq_target(l,1:nl(l)), kind=sp),plot_delta_nu)))
+               xpt_max = max(xpt_max, &
+                             maxval(mod(real(freq_target(l,1:nl(l)), kind=sp),plot_delta_nu)))
             end if
          end do
 
@@ -290,7 +292,6 @@
          call pgmove(2*plot_delta_nu, ymin + dy*0.08)
          call pgdraw(2*plot_delta_nu, ymin)
 
-
          call pgunsa
 
          call show_pgstar_annotations(s, &
@@ -306,7 +307,7 @@
             real(dp), intent(in) :: freq
             integer, intent(in) :: color, shape
             y_obs = freq
-            x_obs = mod(freq,plot_delta_nu)
+            x_obs = mod(real(freq, kind=sp),plot_delta_nu)
             call pgsci(color)
             call pgpt1(x_obs, y_obs, shape)
             call pgpt1(x_obs + plot_delta_nu, y_obs, shape)
@@ -325,7 +326,7 @@
             y_model_alt_shift = echelle_model_alt_y_shift
             call pgsci(color)
             y_model = freq
-            x_obs = mod(freq_obs, plot_delta_nu)
+            x_obs = mod(real(freq_obs, kind=sp), plot_delta_nu)
             x_model = (freq - freq_obs) + x_obs
             call pgpt1(x_model, y_model, model_shape)
             call pgmove(x_obs, y_obs)

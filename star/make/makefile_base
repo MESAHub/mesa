@@ -311,14 +311,6 @@ else
 	$(COMPILE) $<
 endif
 
-pgstar_ctrls_io.o: %.o : %.f90
-ifneq ($(QUIET),)
-	@echo COMPILE_LEGACY $<
-	@$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
-else
-	$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
-endif
-
 se_support_full.o se_support_stub.o report.o profile.o : %.o : %.f90
 ifneq ($(QUIET),)
 	@echo STAR_COMPILE_BASIC $<

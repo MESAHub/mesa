@@ -470,7 +470,6 @@
          read_extra_astero_pgstar_inlist, extra_astero_pgstar_inlist_name
 
 
-
       ! private data
 
 
@@ -538,8 +537,7 @@
          best_surf_coef2, &
          best_constraint_value(max_constraints)
 
-      integer :: &
-         best_model_number
+      integer :: best_model_number
 
       integer  :: best_order(0:3,max_nl)
       real(dp) :: best_freq(0:3,max_nl)
@@ -670,7 +668,6 @@
          star_astero_procs% how_many_extra_profile_columns => null()
          star_astero_procs% data_for_extra_profile_columns => null()
       end subroutine init_astero_def
-
 
 
       subroutine store_new_oscillation_results( &
@@ -1707,9 +1704,6 @@
             read(iounit, astero_results_int_format, advance='no', iostat=ierr) i
          end subroutine read1_int
 
-
       end subroutine read1_sample_from_file
 
-
       end module astero_def
-
