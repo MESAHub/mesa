@@ -869,7 +869,7 @@
       common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/e/ opact,dopact,dopacr,dopacrd
-      character*1 dumarra(250)
+      character(len=1) :: dumarra(250)
       common/recoin/ itimeco,mxzero
 
         if (itimeco /= 12345678) then
@@ -1095,7 +1095,8 @@
       common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/recoin/ itimeco,mxzero
-      data itime/mx*0/,itimeco/0/
+      data itime/mx*0/
+      data itimeco/0/
       data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,
      &                         5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
      &                         6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
@@ -1520,7 +1521,7 @@
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      character*1 HEAD(100)
+      character(len=1) :: HEAD(100)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       logical :: IERR

@@ -3,7 +3,7 @@ Modules for Experiments in Stellar Astrophysics
 ###############################################
 
 .. note::
-   👀 Looking for the `KU Leuven 2025 summer school page <https://mesa-leuven.4d-star.org/>`_?
+   👀 Looking for the `KU Leuven 2025 MESA Summer School page <https://mesa-leuven.4d-star.org/>`_?
 
 Modules for Experiments in Stellar Astrophysics (MESA) is an advanced, open-source 1D stellar evolution code.
 The code is developed and maintained by a globally distributed team of researchers.

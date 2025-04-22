@@ -196,7 +196,6 @@ contains
       !Calculate Nu_mu using Formula (33) from Brown et al, with C = 7.
       numu = 1.d0 + 49.d0*lambdamax*lambdamax/(diffratio*maxl2*(lambdamax + diffratio*maxl2))
 
-      return
    end function numu
 
    subroutine thermohaline_rhs(myx, myf, myj, prandtl, diffratio, R0)
@@ -237,7 +236,6 @@ contains
       myj(2, 1) = 4*myx(1)*myterm*myx(2) + 12.d0*myx1_3*diffratio*prandtl
       myj(2, 2) = 2*b_2*myx(2) + b_1
 
-      return
    end subroutine thermohaline_rhs
 
    subroutine analytical_estimate_th(maxl, lambdamax, r_th, prandtl, diffratio)
@@ -273,7 +271,6 @@ contains
          lambdamax = 0.5d0
       end if
 
-      return
    end subroutine analytical_estimate_th
 
    subroutine NR(xrk, prandtl, diffratio, R0, ierr)
@@ -361,7 +358,6 @@ contains
          ierr = 1
       end if
 
-      return
    end subroutine NR
 
 end module thermohaline

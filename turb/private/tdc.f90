@@ -33,7 +33,6 @@ public :: get_TDC_solution
 
 contains
 
-
    !> Computes the outputs of time-dependent convection theory following the model specified in
    !! Radek Smolec's thesis [https://users.camk.edu.pl/smolec/phd_smolec.pdf], which in turn
    !! follows the model of Kuhfuss 1986.
