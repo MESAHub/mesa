@@ -22,7 +22,7 @@
 
       subroutine init_opal_type1(z_in,xh_in)
          double precision, intent(in) :: z_in, xh_in
-         real z, xh
+         real :: z, xh
          common/init/itimeco,read_z
          z = z_in; xh = xh_in
          if (z /= read_z) itimeco = 0
@@ -77,7 +77,7 @@
 
       return
 
-      end
+      end subroutine eval_opal_type1
 
       subroutine instruct
 !-----VERSION of October 5, 1995-----------------------------------------
@@ -175,7 +175,7 @@
 !         DOPACTD     Is Dlog(kappa)/Dlog(T6)   at constant Rho
 
       dum=0.0
-      end
+      end subroutine instruct
 
 ! ********************************************************************
       subroutine opacgn93 (z,xh,t6,r,filename,OP_file,logK)
@@ -201,7 +201,7 @@
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/eee/m1,zval
-      real kapz,kapz1,kapz2
+      real :: kapz,kapz1,kapz2
       dimension kapz(mz),dkapdtr(mz),dkapdrt(mz)
       logK = 0
       zval=z
@@ -297,7 +297,7 @@
       dopactd=-3.*dopacr+dopact
       is=0
       logK = opact
-      end
+      end subroutine opacgn93
 ! **********************************************************************
 
       subroutine opac (izi,mzin,xh,t6,r,filename,OP_file)
@@ -722,7 +722,7 @@
    66 return
       write(*,'(" Z does not match Z in codata* files you are using")')
       call mesa_error(__FILE__,__LINE__)
-      end
+      end subroutine opac
 
 ! **********************************************************************
       subroutine t6rinterp(slr,slt)
@@ -838,7 +838,7 @@
             dopacr=99.
             dopactd=99.
           end if
-      end
+      end subroutine t6rinterp
 
 
 ! *********************************************************************
@@ -849,7 +849,7 @@
       logical :: OP_file
       parameter (ismdata=0)   ! modified
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
-      character(len=250) dumarra
+      character(len=250) :: dumarra
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
       common/a/ mzz, xz(mx,mz,nt,nr), t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),
@@ -996,7 +996,7 @@
       do i=2,mz
          dfsz(i)=1./(zza(i)-zza(i-1))
       end do
-      end
+      end subroutine readco
 
 ! **********************************************************************
       function quad(ic,i,x,y1,y2,y3,x1,x2,x3)
@@ -1025,7 +1025,7 @@
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       dkap=c2+(x+x)*c3
       quad=c1+x*(c2+x*c3)
-      end
+      end function quad
 
 ! **********************************************************************
       block data
@@ -1081,7 +1081,7 @@
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb,ntm=70,ntb=1,nt=ntm+1-ntb)
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      CHARACTER(len=100) HEAD
+      CHARACTER(len=100) :: HEAD
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       logical :: IERR
@@ -1206,7 +1206,7 @@
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
  6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
-      end
+      end subroutine opaltab
 
 ! ********************************************************************
       subroutine SPLINE(X,Y,N,Y2)
@@ -1235,7 +1235,7 @@
       do K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
       end do
-      end
+      end subroutine SPLINE
 ! ********************************************************************
       subroutine SPLINT(XA,YA,N,Y2A,X,Y,YP)
       dimension XA(N),YA(N),Y2A(N)
@@ -1256,7 +1256,7 @@
       B=(X-XA(KLO))/H
       Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
       YP=0.05*  (  (-YA(KLO)+YA(KHI))/H + ( -(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI) )*H/6. )
-      end
+      end subroutine SPLINT
 ! ********************************************************************
       subroutine FITY
 
@@ -1289,7 +1289,7 @@
          end do
       end do
 
-      end
+      end subroutine FITY
 ! ********************************************************************
       subroutine FITX
 
@@ -1315,7 +1315,7 @@
          end do
       end do
 
-      end
+      end subroutine FITX
 
 ! ***********************************************************************
       subroutine GETD(F,N,D,FP1,FPN)
@@ -1343,7 +1343,7 @@
          D(J)=D(J)*D(J+1)+T(J)
       end do
 
-      end
+      end subroutine GETD
 
 ! ********************************************************************
       subroutine INTERP(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1477,7 +1477,7 @@
       DGDT=20.*FFX(U,V)-6.*FFY(U,V)
       DGDRHO=2.*FFY(U,V)
 
-      end
+      end subroutine INTERP
 
 ! ********************************************************************
       subroutine SMOOTH
@@ -1589,4 +1589,4 @@
          end do
       end do
 
-      end
+      end subroutine SMOOTH

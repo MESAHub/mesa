@@ -1340,7 +1340,7 @@
 !   on output fval= [df/dy] ... elements 2 -- 6 never referenced.
 
 !  ier -- completion code:  0 means OK
-C-------------------
+!-------------------
 !  local:
 
       integer i,j                       ! cell indices
@@ -1361,7 +1361,7 @@ C-------------------
 !  0 <= yparam <= 1
 
 !  ** the interface is very similar to herm2ev.for; can use herm2xy **
-C---------------------------------------------------------------------
+!---------------------------------------------------------------------
 
       call herm2xy_db(xget,yget,x,nx,y,ny,ilinx,iliny,
      &   i,j,xparam,yparam,hx,hxi,hy,hyi,ier)
@@ -1374,7 +1374,7 @@ C---------------------------------------------------------------------
       return
       end subroutine evbicub_db
 
-C---------------------------------------------------------------------
+!---------------------------------------------------------------------
 !  evaluate C1 cubic Hermite function interpolation -- 2d fcn
 !   --vectorized-- dmc 10 Feb 1999
 
@@ -1709,7 +1709,7 @@ C---------------
             end do
          end if
 
-C-------------------------------------------------
+!-------------------------------------------------
 
       else if(ict(1) == 3) then
          if(ict(2) == 1) then

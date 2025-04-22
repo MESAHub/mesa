@@ -18,10 +18,10 @@
 
 ! Array storage:
 
-      real X(NMAX), Y(NMAX), W(NMAX), RW(NMAX), A(9,NMAX), P(NI), FT(NI,NI)
+      real :: X(NMAX), Y(NMAX), W(NMAX), RW(NMAX), A(9,NMAX), P(NI), FT(NI,NI)
       integer :: LCELL(NRMAX,NRMAX), LNEXT(NMAX)
 
-      real DEL, DUM, DX, DY, ERMAX, ERMEAN, PW, RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
+      real :: DEL, DUM, DX, DY, ERMAX, ERMEAN, PW, RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
 !      real CS2VAL_sg
       integer :: I, IER, J, K, KF, KFF, KFL, KS, LOUT, N, NC, NFUN, NP, NR, NSET, NW
 
@@ -144,8 +144,8 @@
 
 
       subroutine testdt_sg (K, N,X,Y)
-      real X(100), Y(100)
-      integer K, N
+      real :: X(100), Y(100)
+      integer :: K, N
 
 ! **********************************************************
 
@@ -435,8 +435,8 @@
       end subroutine testdt_sg
 
       subroutine TSTFN1_sg (K,X,Y,IFLAG, F,FX,FY)
-      integer K, IFLAG
-      real X, Y, F, FX, FY
+      integer :: K, IFLAG
+      real :: X, Y, F, FX, FY
 
 ! **********************************************************
 
@@ -634,8 +634,8 @@
 
 
       subroutine TSTFN2_sg (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
-      integer K, IFLAG
-      real X, Y, F, FX, FY, FXX, FXY, FYY
+      integer :: K, IFLAG
+      real :: X, Y, F, FX, FY, FXX, FXY, FYY
 
 ! **********************************************************
 
@@ -711,7 +711,7 @@
 
 ! **********************************************************
 
-      real T1, T2, T3, T4, T5, T6
+      real :: T1, T2, T3, T4, T5, T6
       if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
@@ -884,4 +884,4 @@
       FXY = T5*(T1*(86.4*T4 - 150.48*T3) + 1080.0*T4 + 288.0*T3)*(80.0*X-40.0)*(90.0*Y-45.0)
       FYY = T5*(T1*(97.2*T4 - 169.29*T3)*(90.0*Y-45.0)**2 - (1215.0*T4 + 324.0*T3)*(80.0*X-40.0)**2)
       return
-      end subroutine
+      end subroutine TSTFN2_sg

@@ -30,7 +30,7 @@
 
       subroutine init_opal_type2(z_in,xh_in)
          double precision, intent(in) :: z_in, xh_in
-         real z, xh
+         real :: z, xh
          common/type2_recoin/ itimeco,mxzero,readco22_z
          z = z_in; xh = xh_in
          if (z /= readco22_z) itimeco = 0
@@ -40,9 +40,9 @@
 
       subroutine eval_opal_type2 (z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap,data_dir)
       common/type2_e/ opact,dopact,dopacr,dopactd
-      double precision z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap
+      double precision :: z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap
       character (len=*), intent(in) :: data_dir
-      real z,xh,xxc,xxo,t6,r
+      real :: z,xh,xxc,xxo,t6,r
       z = z_in; xh = xh_in; xxc = xxc_in; xxo = xxo_in; t6 = t6_in; r = r_in
  1    format(a40,1pe26.16)
 !.....clip args to range of tables
@@ -52,7 +52,7 @@
       if (r > 1e1) r = 1e1
       call opac2 (z,xh,xxc,xxo,t6,r,data_dir)
       logKap = opact
-      end
+      end subroutine eval_opal_type2
 
 ! ***********************************************************************
 
@@ -85,7 +85,7 @@
             write(*,*) 'failed to open ', trim(fname)
             call mesa_error(__FILE__,__LINE__)
          end if
-      end
+      end subroutine open_unit2
 
 ! ***********************************************************************
       subroutine instruct2
@@ -200,7 +200,7 @@
 !         DOPACR      Is Dlog(kappa)/Dlog(R),   ! at constant T6
 
       dum=0.0
-      end
+      end subroutine instruct2
 
 ! **********************************************************************
       subroutine opac2 (z,xh,xxc,xxo,t6,r,dir)
@@ -218,7 +218,7 @@
 
       save
       character (len=*) :: dir
-      integer w
+      integer :: w
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
@@ -600,7 +600,7 @@
       call mesa_error(__FILE__,__LINE__)
    66 write(*,'(" Z does not match Z in codata* files you are using")')
       call mesa_error(__FILE__,__LINE__)
-      end
+      end subroutine opac2
 
 ! ***********************************************************************
       subroutine cointerp(xxc,xxo)
@@ -608,7 +608,7 @@
 !     The purpose of this subroutine is to interpolate in C and O abund-
 !     ances.
       save
-      integer w
+      integer :: w
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_aa/ q(4),h(4),xcd(mc),xod(mc),xc(mc),xo(mo),xcs(mc),xos(mo),cxd(mc),oxd(mo),cx(mc),ox(mo),zzz,xxh,xx(mx),nc,no
@@ -863,7 +863,7 @@
        end do
       end if
   123 continue
-      end
+      end subroutine cointerp
 
 ! **********************************************************************
       subroutine t6rinterp2(slr,slt)
@@ -974,7 +974,7 @@
       dopactr=99.
       dopactd=99.
       end if
-      end
+      end subroutine t6rinterp2
 
 ! ***********************************************************************
       subroutine readco2(z,dir)
@@ -992,10 +992,10 @@
       common/type2_alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_e/ opact,dopact,dopacr,dopacrd
-      character(len=250) dumarra
+      character(len=250) :: dumarra
       common/type2_recoin/ itimeco,mxzero,readco_z
 
-      logical line_full
+      logical :: line_full
 
         if (itimeco /= 12345678) then
         readco_z = z
@@ -1245,7 +1245,7 @@
         end do
       end if
 
-      end
+      end subroutine readco2
 
 ! ***********************************************************************
       function quad2(ic,i,x,y1,y2,y3,x1,x2,x3)
@@ -1293,7 +1293,7 @@
       c1=yy(1)-xx(1)*c2-xx1sq(i)*c3
       dkap=c2+(x+x)*c3
       quad2=c1+x*(c2+x*c3)
-      end
+      end function quad2
 
 ! ***********************************************************************
       block data type2
@@ -1305,7 +1305,8 @@
       common/type2_b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs),zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
       common/type2_aaa/ oxf(mx,mc),cxf(mx,mc),xcdf(mx,mc),xodf(mx,mc),opl(mx,nt,nr),itime(mx),cxdf(mx,mc),oxdf(mx,mc)
       common/type2_recoin/ itimeco,mxzero,readco_z
-      data itime/mx*0/,itimeco/0/
+      data itime/mx*0/
+      data itimeco/0/
       data ( index(i),i=1,101)/1,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,
      &                         5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
      &                         6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
@@ -1342,7 +1343,7 @@
       do K=N-1,1,-1
         Y2(K)=Y2(K)*Y2(K+1)+U(K)
       end do
-      end
+      end subroutine SPLINE2
 ! ********************************************************************
       subroutine SPLINT2(XA,YA,N,Y2A,X,Y,YP)
       use utils_lib, only: mesa_error
@@ -1367,7 +1368,7 @@
       B=(X-XA(KLO))/H
       Y=A*YA(KLO)+B*YA(KHI)+((A**3-A)*Y2A(KLO)+(B**3-B)*Y2A(KHI))*(H**2)/6.
       YP=0.05*((-YA(KLO)+YA(KHI))/H + (-(3*A**2-1)*Y2A(KLO)+(3*B**2-1)*Y2A(KHI))*H/6.)
-      end
+      end subroutine SPLINT2
 ! ********************************************************************
       subroutine FITY2
 
@@ -1400,7 +1401,7 @@
          end do
       end do
 
-      end
+      end subroutine FITY2
 ! ********************************************************************
       subroutine FITX2
 
@@ -1425,7 +1426,7 @@
          end do
       end do
 
-      end
+      end subroutine FITX2
 
 ! ***********************************************************************
       subroutine GETD2(F,N,D,FP1,FPN)
@@ -1452,7 +1453,7 @@
          D(J)=D(J)*D(J+1)+T(J)
       end do
 
-      end
+      end subroutine GETD2
 
 ! ********************************************************************
       subroutine INTERP2(FLT,FLRHO,G,DGDT,DGDRHO,IERR)
@@ -1465,7 +1466,7 @@
       parameter(IPR=20)
       common/type2_CF/ F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
       dimension B(16)
-      logical IERR
+      logical :: IERR
 
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
 
@@ -1581,7 +1582,7 @@
       DGDT=20.*FFX(U,V)-6.*FFY(U,V)
       DGDRHO=2.*FFY(U,V)
 
-      end
+      end subroutine INTERP2
 
 ! ********************************************************************
       subroutine SMOOTH2
@@ -1735,10 +1736,10 @@
       dimension U(IP),ROSSL(IP,IPR),V(IP),V2(IP)
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb,ntabs=60,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/type2_CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
-      character(len=100) HEAD
+      character(len=100) :: HEAD
       common/type2_CST/NRL,RLS,nset,tmax  ! modified
       common/type2_alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),coff(100,nr)
-      logical IERR
+      logical :: IERR
 
 
       NRL=2*(RLE-RLS)+1
@@ -1858,4 +1859,4 @@
  6000 FORMAT(/' FIRST T6=',1P,E10.3,', SHOULD BE 0.006')
  6003 FORMAT(/' !!! OUT-OF-RANGE !!!'/' FLT=',1P,E10.3,', FLRHO=',E10.3,', FLR=',E10.3)
 
-      end
+      end subroutine opaltab2

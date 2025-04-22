@@ -191,7 +191,7 @@
 
 ! **********************************************************
 
-      double precision X1(100),Y1(100),X2(33),Y2(33),X3(25),Y3(25),X4(100),Y4(100),X5(81),Y5(81)
+      double precision :: X1(100),Y1(100),X2(33),Y2(33),X3(25),Y3(25),X4(100),Y4(100),X5(81),Y5(81)
       integer :: I
 
 ! Node set 1:  Franke's 100-node set.
@@ -634,8 +634,8 @@
 
 
       subroutine TSTFN2_db (K,X,Y,IFLAG, F,FX,FY,FXX,FXY,FYY)
-      integer K, IFLAG
-      double precision X, Y, F, FX, FY, FXX, FXY, FYY
+      integer :: K, IFLAG
+      double precision :: X, Y, F, FX, FY, FXX, FXY, FYY
 
 ! **********************************************************
 
@@ -711,7 +711,7 @@
 
 ! **********************************************************
 
-      double precision T1, T2, T3, T4, T5, T6
+      double precision :: T1, T2, T3, T4, T5, T6
       if (K  <  1  .or.  K  >  10) return
       GOTO (1,2,3,4,5,6,7,8,9,10), K
 
