@@ -346,6 +346,18 @@
 
             allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
 
+            if(s% fill_arrays_with_NaNs) then
+               call fill_with_NaNs(sig)
+               call fill_with_NaNs(rhs)
+               call fill_with_NaNs(d)
+               call fill_with_NaNs(du)
+               call fill_with_NaNs(dl)
+               call fill_with_NaNs(bp)
+               call fill_with_NaNs(vp)
+               call fill_with_NaNs(xp)
+               call fill_with_NaNs(x)
+            end if
+            
             rate = min(s% D_omega_mixing_rate, 1d0/dt)
             do k=2,nz-1
                if (s% D_omega(k) == 0 .or. s% D_omega(k+1) == 0) then
@@ -471,6 +483,62 @@
                smooth_work(nz,num_instabilities), saved(nz,num_instabilities), &
                unstable(num_instabilities,nz))
 
+            if(s% fill_arrays_with_NaNs) then
+               call fill_with_NaNs(csound)
+               call fill_with_NaNs(rho)
+               call fill_with_NaNs(T)
+               call fill_with_NaNs(P)
+               call fill_with_NaNs(cp)
+               call fill_with_NaNs(cv)
+               call fill_with_NaNs(chiRho)
+               call fill_with_NaNs(abar)
+               call fill_with_NaNs(zbar)
+               call fill_with_NaNs(opacity)
+               call fill_with_NaNs(kap_cond)
+               call fill_with_NaNs(gamma1)
+               call fill_with_NaNs(mu_alt)
+               call fill_with_NaNs(omega)
+               call fill_with_NaNs(cell_dr)
+               call fill_with_NaNs(eps_nuc)
+               call fill_with_NaNs(enu)
+               call fill_with_NaNs(L_neu)
+               call fill_with_NaNs(gradT_sub_grada)
+               call fill_with_NaNs(delta)
+               call fill_with_NaNs(scale_height)
+               call fill_with_NaNs(dRho)
+               call fill_with_NaNs(dr)
+               call fill_with_NaNs(dPressure)
+               call fill_with_NaNs(domega)
+               call fill_with_NaNs(d_mu)
+               call fill_with_NaNs(d_j_rot)
+               call fill_with_NaNs(dRho_dr)
+               call fill_with_NaNs(dRho_dr_ad)
+               call fill_with_NaNs(dr2omega)
+               call fill_with_NaNs(H_T)
+               call fill_with_NaNs(domega_dlnR)
+               call fill_with_NaNs(Hj)
+               call fill_with_NaNs(dlnR_domega)
+               call fill_with_NaNs(t_dyn)
+               call fill_with_NaNs(t_kh)
+               call fill_with_NaNs(Ri_mu)
+               call fill_with_NaNs(Ri_T)
+               call fill_with_NaNs(ve0)
+               call fill_with_NaNs(ve_mu)
+               call fill_with_NaNs(v_ssi)
+               call fill_with_NaNs(h_ssi)
+               call fill_with_NaNs(Ris_1)
+               call fill_with_NaNs(Ris_2)
+               call fill_with_NaNs(v_es)
+               call fill_with_NaNs(H_es)
+               call fill_with_NaNs(v_gsf)
+               call fill_with_NaNs(H_gsf)
+               call fill_with_NaNs(N2)
+               call fill_with_NaNs(N2_mu)
+               call fill_with_NaNs_2d(smooth_work)
+               call fill_with_NaNs_2d(saved)
+            end if
+
+
             ! interpolate by mass to get values at cell boundaries
             enu00 = s% eps_nuc_neu_total(1) + s% non_nuc_neu(1)
             enu(1) = enu00
@@ -581,10 +649,8 @@
             Hj(1) = Hj(2); Hj(nz) = Hj(nz-1)
 
             do i = 1, nz
-               dlnRho_dlnP = s% grad_density(i)
-               dlnT_dlnP = s% grad_temperature(i)
-               N2(i) = -grav(i)*(1/gamma1(i) - dlnRho_dlnP)/scale_height(i)
-               N2_mu(i) = -grav(i)/scale_height(i)*(1/chiRho(i) - delta(i)*dlnT_dlnP - dlnRho_dlnP)
+               N2(i) = s%brunt_N2(i)
+               N2_mu(i) = s%brunt_N2_composition_term(i)
             end do
 
             do k=1,nz
