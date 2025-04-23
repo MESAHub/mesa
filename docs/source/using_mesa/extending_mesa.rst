@@ -431,7 +431,7 @@ neon burning.
 
   end function extras_check_model
 
-
+.. _using_other:
 Using the "other" hooks
 -----------------------
 
