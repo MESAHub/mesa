@@ -2,29 +2,23 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module net_burn_const_P
-      use const_def
+      use const_def, only: dp, i8, ln10
       use chem_def
       use math_lib
       use net_def
@@ -336,7 +330,7 @@
             real(dp), target :: eps_nuc_categories(num_categories)
             logical :: rates_only, skip_jacobian
             integer :: screening_mode, i, num_isos
-            integer(8) :: time0, time1, clock_rate
+            integer(i8) :: time0, time1, clock_rate
 
             real(dp) :: xh, Y, z, Cp, rate_limit
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
@@ -409,7 +403,7 @@
                call system_clock(time0,clock_rate)
             else
                time0 = 0
-            endif
+            end if
 
             call eosPT_get( &
                eos_handle, &

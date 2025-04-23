@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2015-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module hydro_riemann
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff
@@ -47,7 +41,6 @@
       ! "Well-balanced schemes for the Euler equations with gravitation",
       ! J. Comp. Phys., 259 (2014), 199-219.
 
-
       private
       public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
          do_uface_and_Pface
@@ -55,7 +48,6 @@
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
       contains
-
 
       subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, nvar, ierr)
          type (star_info), pointer :: s
@@ -455,6 +447,4 @@
 
       end subroutine do1_uface_and_Pface
 
-
       end module hydro_riemann
-

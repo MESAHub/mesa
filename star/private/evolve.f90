@@ -2,43 +2,41 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module evolve
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, i8, pi, pi4, msun, lsun, crad, clight, secyer, secday
+      use utils_lib, only: is_bad
       use star_utils
+      use auto_diff_support
 
       implicit none
 
       private
-      public :: do_evolve_step_part1, do_evolve_step_part2, &
-         pick_next_timestep, prepare_to_redo, prepare_to_retry, &
-         finish_step, set_age
-
+      public :: do_evolve_step_part1
+      public :: do_evolve_step_part2
+      public :: pick_next_timestep
+      public :: prepare_to_redo
+      public :: prepare_to_retry
+      public :: finish_step
+      public :: set_age
 
       contains
-
 
       integer function do_evolve_step_part1(id, first_try)
          use alloc, only: fill_star_info_arrays_with_NaNs, &
@@ -298,7 +296,7 @@
 
          type (star_info), pointer :: s
          integer :: ierr, k, nz
-         integer(8) :: time0, clock_rate
+         integer(i8) :: time0, clock_rate
          real(dp) :: total_radiation
 
          logical, parameter :: dbg = .false.
@@ -526,7 +524,7 @@
          type (star_info), pointer :: s
          integer :: ierr, &
             k, mdot_redo_cnt, max_mdot_redo_cnt, nz
-         integer(8) :: time0, clock_rate
+         integer(i8) :: time0, clock_rate
          logical :: trace, skip_global_corr_coeff_limit, &
             have_too_large_wind_mdot, have_too_small_wind_mdot, &
             ignored_first_step, was_in_implicit_wind_limit
@@ -1115,8 +1113,6 @@
 
             include 'formats'
 
-
-
 !   phase1 := from end of previous step until start of solver
 !   phase2 := from start of solver to end of step
 !
@@ -1132,8 +1128,6 @@
 !   error_in_energy_conservation = total_energy_end - (total_energy_old + total_energy_sources_and_sinks)
 !
 !   equivalently, error_in_energy_conservation = phase1_energy_error + phase2_energy_error
-
-
 
 
             okay_energy_conservation = .false.
@@ -1215,8 +1209,6 @@
             !
             ! does not equal the total energy *after* adjust_mass and *before* the Newton iterations.
             ! However it should equal the total energy at the end of the step.
-
-
 
             if (s% rotation_flag .and. &
                   (s% use_other_torque .or. s% use_other_torque_implicit .or. &
@@ -1379,7 +1371,8 @@
 
             ! provide info about non-conservation due to mass corrections
             if (s% use_mass_corrections) then
-               write(*,2) 'INFO: use_mass_corrections incurred rel_E_err', s% model_number, -total_energy_from_fixed_m_grav/s% total_energy
+               write(*,2) 'INFO: use_mass_corrections incurred rel_E_err', &
+                          s% model_number, -total_energy_from_fixed_m_grav/s% total_energy
             end if
 
             if (s% model_number == s% energy_conservation_dump_model_number &
@@ -1408,7 +1401,8 @@
                   write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
                   write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
                   write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
-                  write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, s% non_epsnuc_energy_change_from_split_burn
+                  write(*,2) 's% non_epsnuc_energy_change_from_split_burn', &
+                              s% model_number, s% non_epsnuc_energy_change_from_split_burn
                   write(*,2) 'phase2 sum cell dt*dm*eps_mdot', s% model_number, phase2_total_energy_from_mdot
                   write(*,2) 'phase1_total_energy_from_mdot', s% model_number, phase1_total_energy_from_mdot
                   write(*,2) 'from_do_adjust_mass_and_eps_mdot', s% model_number, &
@@ -1430,7 +1424,6 @@
                      (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
                   write(*,'(A)')
                   write(*,'(A)')
-
 
 
                   write(*,*) 'for debugging phase2_sources_and_sinks'
@@ -1968,7 +1961,7 @@
          use adjust_mesh_split_merge, only: remesh_split_merge
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          include 'formats'
          do_mesh = keep_going
@@ -2372,7 +2365,6 @@
 
          contains
 
-
          subroutine check(i)
             integer, intent(in) :: i
             include 'formats'
@@ -2390,7 +2382,6 @@
             prev_num_iounits_in_use = current_num_iounits_in_use
          end subroutine check
 
-
       end function finish_step
 
 
@@ -2407,8 +2398,4 @@
          s% star_age = age
       end subroutine set_age
 
-
-
       end module evolve
-
-

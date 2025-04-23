@@ -18,7 +18,7 @@ models.for.n.tar.Z should be used.
 
 The installation consists in the following steps:
 
-1) Transfer the relevant compressed tar files to the directory where you 
+1) Transfer the relevant compressed tar files to the directory where you
    wish to place the code and models. Use the binary mode of ftp.
    Then, uncompress and un-tar them.
 
@@ -39,7 +39,7 @@ The installation consists in the following steps:
    - bin: contains executables
    - gensr: contains general subroutines required by programs
    - idl_pro: contains IDL procedures for reading relevant data files
-   - notes: contains plain TeX and postscript files of notes on the 
+   - notes: contains plain TeX and postscript files of notes on the
      programs and data.
 
    models.n.tar will generate the following directory:
@@ -80,7 +80,7 @@ The installation consists in the following steps:
    - operation.tex (or operation.ps): more general notes on the programs
      and models provided
    - file-format.tex (or file-format.ps): notes on data structure for
-     models in the form of an extensive set of variables, in 
+     models in the form of an extensive set of variables, in
      an ASCII file (the so-called FGONG format).
 
 7) If required, convert ASCII versions of binary data files
@@ -104,7 +104,7 @@ The installation consists in the following steps:
    enable me to notify you of bugs or updates.
 
 Notes on file formats:
----------------------
+----------------------
 
 The programmes generally operate with binary input and output files.
 The binary format evidently may vary between installations.
@@ -124,7 +124,7 @@ To convert the model files from ASCII to binary, use, e.g., the command
   form-amdl.d 2 amdl.l5bi.d.15.p2.for amdl.l5bi.d.15.p2
 
 Similarly, to convert the ASCII version of the grand summary file of
-oscillation results, use, e.g., 
+oscillation results, use, e.g.,
 
   form-agsm.d 2 agsm.l5bi.d.15.p2.for agsm.l5bi.d.15.p2
 
@@ -140,7 +140,7 @@ on this file; if the result looks reasonable, your binary format is
 probably consistent with mine.
 
 Compiler warnings:
------------------
+------------------
 
 It is possible that compilation will produce warnings on some systems.
 These should generally be unimportant. A particular cause of warnings
@@ -156,13 +156,13 @@ Please let me know if you suspect that it is a problem in the
 results of computations on your system.
 
 Disclaimer:
-----------
+-----------
 
 There is no guarantee that the package will work as intended,
 although it has been used previously, in a less well-documented
 form, by several people. I am willing to consider problems,
 or suggestions for improvements, but given my schedule I cannot
-promise to act quickly on them. 
+promise to act quickly on them.
 
 I shall attempt to correct errors in the package, as they are pointed
 out to me, and post revised versions. This file (and the Web pages)
@@ -175,7 +175,7 @@ that are convenient on most machines, even if they cause problems
 in selected cases.
 
 Acknowledgements:
-----------------
+-----------------
 
 I am very grateful to Alan Irwin and Helmut Schlattl for their help
 in testing this version of the package, as well as to Frank Hill for
@@ -186,10 +186,10 @@ Aarhus, October 9 1997                        Joergen Christensen-Dalsgaard
 -------------------------------------------------------------------------
 
 Known potential problems:
-------------------------
+-------------------------
 
 On IBM RS6000, AIX4.1 operating system, and some Linux systems:
-  
+
   In gensr/ofiles.f, line 168: The option disp='delete' is apparently
     not allowed. (The purpose is to create a scratch file that is
     deleted at the end of the run.) The simple fix is to remove
@@ -204,9 +204,9 @@ On HP-UX:
 ---------------------------------------------------------------------------
 
 Notes on modifications:
-----------------------
+-----------------------
 
-26/4/99: Fixed a number of minor problems. These were mainly related 
+26/4/99: Fixed a number of minor problems. These were mainly related
 	 to unset variables, at points in the programmes which would
 	 rarely be used. I am grateful to Ladislav Zejda for pointing these out.
 	 The following files were affected:

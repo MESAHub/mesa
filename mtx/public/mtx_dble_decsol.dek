@@ -4,10 +4,10 @@
          integer, intent(in) :: iop, n, ndim, lrd, lid
          integer, intent(in) :: ml
             ! if ml=n: full matrix.
-            ! if 0<=ml<n: ml is the lower bandwith of matrix
+            ! if 0<=ml<n: ml is the lower bandwidth of matrix
                ! (>= number of non-zero diagonals below the main diagonal).
          integer, intent(in) :: mu
-            ! upper bandwith of the matrix (need not be defined if ml=n)
+            ! upper bandwidth of the matrix (need not be defined if ml=n)
                ! (>= number of non-zero diagonals above the main diagonal).
          ! for banded matrix, format as needed for dgbtrf
          integer, intent(inout), pointer :: ip(:) ! (n)
@@ -46,7 +46,6 @@
       end subroutine lapack_work_sizes
 
 
-
       ! complex(dp) routines
 
 
@@ -65,16 +64,15 @@
       end subroutine lapack_zwork_sizes
 
 
-
       subroutine lapack_decsolc(iop,n,ndim,ar,ai,ml,mu,br,bi,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
          use const_def, only: dp
          integer, intent(in) :: iop, n, ndim, lcd, lrd, lid
          integer, intent(in) :: ml
             ! if ml=n: full matrix.
-            ! if 0<=ml<n: ml is the lower bandwith of matrix
+            ! if 0<=ml<n: ml is the lower bandwidth of matrix
                ! (>= number of non-zero diagonals below the main diagonal).
          integer, intent(in) :: mu
-            ! upper bandwith of the matrix (need not be defined if ml=n)
+            ! upper bandwidth of the matrix (need not be defined if ml=n)
                ! (>= number of non-zero diagonals above the main diagonal).
          integer, intent(inout) :: ip(n)
          real(dp), intent(inout) :: ar(ndim,n), ai(ndim,n)
@@ -140,7 +138,6 @@
          end do
 
       end subroutine lapack_decc
-
 
 
       subroutine lapack_decbc(n,ndim,ar,ai,ml,mu,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)

@@ -39,11 +39,11 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 
 - reserve accommodation. Hotel room blocks can be booked for discounted rates. Some universities are willing to provide discounted bulk accommodation through their own facilities (e.g. dorms), as was the case at Santa Barbara.
 
-- open the application for students. A template for this is available from Meridith Joyce, Earl Bellinger, or Eoin Farrell (MESAdev). A Google form is a good way to provide the application. Be aware that summer schools have been oversubscribed by more than a factor of 2 in recent years, and be prepared to rank applications in a systematic way. We aim for 50-50 gender representation among students and have a track record of achieving 35%-45% participation from women and gender minorities, on average.
+- open the application for students. A template for this is available from Meridith Joyce, Earl Bellinger, or Eoin Farrell (MESA-dev). A Google form is a good way to provide the application. Be aware that summer schools have been oversubscribed by more than a factor of 2 in recent years, and be prepared to rank applications in a systematic way. We aim for 50-50 gender representation among students and have a track record of achieving 35%-45% participation from women and gender minorities, on average.
 
 6 months out (February)
 -----------------------
-- post the Summer School website. Bill Wolf (MESAev) has been the web manager for many Summer Schools
+- post the Summer School website. Bill Wolf (MESA-dev) has been the web manager for many Summer Schools
 
 - assign TAs to lecturers. We recommend assigning one first-time TA, one returning TA, and one very experienced TA per lecturer. This ensures that new TAs receive excellent training while the more experienced TAs can provide leadership on the development of exercises and management of the group. Please be aware that it has not been a requirement  historically that the lecturers have any experience with MESA. It is the lecturers' jobs to develop the scientific program and contribute their subject expertise. It is the TAs jobs to turn the lecturers' science into accessible, MESA-based exercises.
 
@@ -52,7 +52,7 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 --------------------
 - close applications
 
-- make selections among applications. An admissions rubric used for the 2022, 2023, and 2024 Summer School programs is available from Meridith Joyce (MESAdev)
+- make selections among applications. An admissions rubric used for the 2022, 2023, and 2024 Summer School programs is available from Meridith Joyce (MESA-dev)
 
 - email the supervisors of potential attendees to confirm that they have their advisor's permission and funding to attend. Be aware that some prospective students may apply without having secured funding and without their advisor's knowledge.
 

@@ -13,13 +13,13 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-COMMON_SRCS = ferguson.f freedman.f \
+COMMON_SRCS = ferguson.f90 freedman.f90 \
    opal_type1.f opal_type2.f \
-   kap_support.f fixed_metal.f co_enhanced.f
+   kap_support.f90 fixed_metal.f90 co_enhanced.f90
 
-CKAP_SRCS = $(COMMON_SRCS) create_tables.f
+CKAP_SRCS = $(COMMON_SRCS) create_tables.f90
 
-PLOT_SRCS = $(COMMON_SRCS) plot.f
+PLOT_SRCS = $(COMMON_SRCS) plot.f90
 
 #################################################################
 #
@@ -77,6 +77,14 @@ else
 	$(COMPILE) $(FCfree) $<
 endif
 
+%.o: %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE $<
+	@$(COMPILE) $(FCfree) $<
+else
+	$(COMPILE) $(FCfree) $<
+endif
+
 COMPILE_OPAL = $(COMPILE_BASIC) $(FCopt) $(FCchecks) $(FCdebug) -c
 
 COMPILE_LEGACY_OPAL =  $(filter-out -std=f2008, $(COMPILE_OPAL)) -std=legacy
@@ -96,6 +104,7 @@ endif
 SRC_PATH = ../src
 
 vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(MESA_DIR)/include
 

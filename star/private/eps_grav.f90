@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module eps_grav
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use chem_def, only: chem_isos
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -37,7 +31,6 @@
       public :: eval_eps_grav_and_partials, zero_eps_grav_and_partials
 
       contains
-
 
       subroutine eval_eps_grav_and_partials(s, k, ierr)
          type (star_info), pointer :: s
@@ -180,7 +173,8 @@
          if (s% use_time_centered_eps_grav .and. .not. s% doing_relax) then
 
             ! start values are constants during Newton iters
-            eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
+            eps_grav_start = -s% T_start(k)*s% cp_start(k) &
+                            * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
 
             ! phase transition latent heat
             eps_grav_start = eps_grav_start - (dlnd_dt * s% latent_ddlnRho_start(k) + dlnT_dt * s% latent_ddlnT_start(k))
@@ -395,7 +389,8 @@
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
             end if
             if (s% stop_for_bad_nums) then
-               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
+               write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', &
+                          k, eps_grav_composition_term% val
                call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             return
@@ -411,4 +406,3 @@
       end subroutine zero_eps_grav_and_partials
 
       end module eps_grav
-

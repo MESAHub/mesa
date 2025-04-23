@@ -21,13 +21,14 @@
 ! ***********************************************************************
 
       module rsp_eval_eos_and_kap
+
       use eos_def
       use eos_lib
       use chem_def
       use chem_lib, only: chem_Xsol, basic_composition_info
       use kap_lib
       use kap_def
-      use const_lib
+      use const_def, only: dp, ln10, arg_not_provided
       use utils_lib
       use star_utils, only: &
          store_rho_in_xh, store_lnd_in_xh, get_rho_and_lnd_from_xh, &
@@ -36,7 +37,6 @@
       use rsp_def, only: xa, X, Z, Y, &
          abar, zbar, z53bar, XC, XN, XO, Xne
 
-
       implicit none
 
       integer :: species
@@ -44,7 +44,6 @@
       integer :: eos_handle, kap_handle
 
       contains
-
 
       subroutine restart_rsp_eos_and_kap(s)
          type (star_info), pointer :: s
@@ -145,11 +144,6 @@
          write(*,1) 'init_for_rsp_eos_and_kap X', X
          write(*,1) 'Y', Y
          write(*,1) 'Z', Z
-
-
-
-
-
 
 
          write(*,1) 'abar', abar
@@ -1053,7 +1047,4 @@
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
       end subroutine set_T_for_new_energy
 
-
       end module rsp_eval_eos_and_kap
-
-

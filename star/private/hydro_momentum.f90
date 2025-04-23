@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2012-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module hydro_momentum
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, secyer
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use star_utils, only: em1, e00, ep1
@@ -35,12 +28,12 @@
       implicit none
 
       private
-      public :: do1_momentum_eqn, do_surf_momentum_eqn, do1_radius_eqn, &
-         expected_HSE_grav_term
-
+      public :: do1_momentum_eqn
+      public :: do_surf_momentum_eqn
+      public :: do1_radius_eqn
+      public :: expected_HSE_grav_term
 
       contains
-
 
       subroutine do_surf_momentum_eqn(s, P_surf_ad, nvar, ierr)
          use star_utils, only: store_partials
@@ -602,6 +595,5 @@
             write(*,*) 'do1_radius_eqn', s% solver_test_partials_var
          end if
       end subroutine do1_radius_eqn
-
 
       end module hydro_momentum

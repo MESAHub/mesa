@@ -8,7 +8,7 @@
       integer :: which_for_pgstar
       real(dp) :: stopping_age
       logical :: stop_when_1st_finishes
-      
+
       namelist /multi_stars_job/ &
          num_stars, & ! up to max_num_stars
          inlist_names, &

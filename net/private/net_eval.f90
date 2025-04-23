@@ -2,30 +2,24 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module net_eval
 
-      use const_def
+      use const_def, only: dp, i8, Qconv, arg_not_provided
       use math_lib
       use chem_def
       use chem_lib, only: get_mass_excess
@@ -34,9 +28,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine eval_net( &
             n, g, rates_only, just_dxdt, &
@@ -98,7 +90,7 @@
          real(dp) :: eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
          integer :: ci, i, j, ir, weak_id, h1, iwork
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          logical :: doing_timing
 
          logical, parameter :: dbg = .false.
@@ -273,7 +265,7 @@
 
          ! convert the eps_nuc_categories
          do i=1,num_categories
-            n% eps_nuc_categories(i) = Qconv*n% eps_nuc_categories(i)
+            n% eps_nuc_categories(i) = Qconv * n% eps_nuc_categories(i)
          end do
 
          ! store the results
@@ -594,7 +586,7 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: dbg=.false.
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          integer :: i, num, num_reactions
          real(dp) :: f
@@ -693,7 +685,7 @@
 
          integer, intent(out) :: ierr
          integer :: i, j, id, ir
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          include 'formats'
 
@@ -736,7 +728,6 @@
          end if
 
       end subroutine get_weaklib_rates
-
 
 
       subroutine get_T_limit_factor( &
@@ -786,12 +777,10 @@
                call mesa_error(__FILE__,__LINE__,'set_molar_abundances')
             end if
             n% y(i) = min(1d0, max(n% x(i), 0d0)) / chem_isos% Z_plus_N(ci)
-         enddo
-
+         end do
 
 
          return      ! let it go even with bad xsum.
-
 
 
 
@@ -860,6 +849,4 @@
          xa(1: species) = xa(1: species)/xsum
       end subroutine do_clean1
 
-
       end module net_eval
-

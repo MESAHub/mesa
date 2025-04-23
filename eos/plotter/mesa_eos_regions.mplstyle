@@ -30,6 +30,6 @@ savefig.pad_inches	: 0.1 # Padding when bbox is tight.
 savefig.dpi		: 300
 savefig.format		: pdf
 
-# Miscellanious
+# Miscellaneous
 axes.formatter.use_mathtext : True
 #figure.autolayout	    : True

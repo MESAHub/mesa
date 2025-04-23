@@ -2,39 +2,28 @@
 !
 !   Copyright (C) 2010-2022  The MESA Team, Bill Paxton & Matthias Fabry
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pgbinary_support
 
    use binary_private_def
-   use const_def
+   use const_def, only: dp, secyer
    use rates_def, only : i_rate
    use utils_lib
-   use pgstar_support, only : Set_Colours, do1_pgmtxt, &
-      clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
-      clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-      clr_anonymous, colormap_offset, colormap_last, colormap_size, &
-      colormap, Line_Type_Solid, Line_Type_Dash, Line_Type_Dash_Dot, Line_Type_Dot_Dash, &
-      Line_Type_Dot  ! inherit colors/linetypes + some routines from pgstar
+   use pgstar_support, only : do1_pgmtxt
    use star_pgstar
 
    implicit none
@@ -119,7 +108,7 @@ contains
             call pgslct(p% id_win)
             call pgclos
             p% id_win = 0
-         endif
+         end if
       else if (p% win_flag .and. (.not. p% do_win)) then
          if (p% id_win == 0) &
             call open_device(b, p, .false., '/xwin', p% id_win, ierr)
@@ -210,6 +199,7 @@ contains
 
 
    subroutine open_device(b, p, is_file, dev, id, ierr)
+      use pgstar_colors, only: set_device_colors
       type (binary_info), pointer :: b
       type (pgbinary_win_file_data), pointer :: p
       logical, intent(in) :: is_file
@@ -245,7 +235,7 @@ contains
          p% prev_win_width = p% win_width
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
-      call Set_Colours(white_on_black_flag, ierr)
+      call set_device_colors(white_on_black_flag)
    end subroutine open_device
 
 
@@ -416,9 +406,10 @@ contains
 
 
    subroutine draw_rect()
+      use pgstar_colors, only: clr_Foreground
       real, dimension(5) :: xs, ys
       call pgsave
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       xs = [0.0, 0.0, 1.0, 1.0, 0.0]
       ys = [0.0, 1.0, 1.0, 0.0, 0.0]
       call pgswin(0.0, 1.0, 0.0, 1.0)

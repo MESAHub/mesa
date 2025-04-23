@@ -1,16 +1,16 @@
-      
+
       subroutine read_inlist_xtra_coeff_os(ierr)
          use utils_lib
          integer, intent(out) :: ierr
          character (len=256) :: filename, message
          integer :: unit
-         
+
          filename = 'inlist_xtra_coeff_os'
-         
+
          write(*,*) 'read_inlist_xtra_coeff_os'
-         
+
          ! set defaults
-         skip_xtra_os = .false. 
+         skip_xtra_os = .false.
          xtra_coef_os_full_on = 1d-4
          xtra_coef_os_full_off = 0.1d0
          xtra_coef_os_above_nonburn = 1d0
@@ -22,11 +22,11 @@
          xtra_coef_os_above_burn_z = 1d0
          xtra_coef_os_below_burn_z = 1d0
          xtra_dist_os_above_nonburn = 0.2d0
-         xtra_dist_os_below_nonburn = 0.2d0   
+         xtra_dist_os_below_nonburn = 0.2d0
          xtra_dist_os_above_burn_h = 0.2d0
-         xtra_dist_os_below_burn_h = 0.2d0   
+         xtra_dist_os_below_burn_h = 0.2d0
          xtra_dist_os_above_burn_he = 0.2d0
-         xtra_dist_os_below_burn_he = 0.2d0   
+         xtra_dist_os_below_burn_he = 0.2d0
          xtra_dist_os_above_burn_z = 0.2d0
          xtra_dist_os_below_burn_z = 0.2d0
 
@@ -34,17 +34,17 @@
          if (ierr /= 0) then
             write(*, *) 'Failed to open control namelist file ', trim(filename)
          else
-            read(unit, nml=xtra_coeff_os, iostat=ierr)  
+            read(unit, nml=xtra_coeff_os, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=xtra_coeff_os)
                close(unit)
-            end if  
+            end if
          end if
 
       end subroutine read_inlist_xtra_coeff_os
@@ -63,9 +63,9 @@
          real(dp) :: eps, eps_h, eps_he, eps_z
          logical :: in_convective_region
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          !write(*,*) 'enter other_mesh_delta_coeff_factor'
          ierr = 0
          if (skip_xtra_os) return
@@ -77,7 +77,7 @@
              xtra_coef_os_below_burn_he == 1d0 .and. &
              xtra_coef_os_above_burn_z == 1d0 .and. &
              xtra_coef_os_below_burn_z == 1d0) return
-             
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
@@ -257,4 +257,4 @@
 
       end subroutine other_mesh_delta_coeff_factor
 
-        
+

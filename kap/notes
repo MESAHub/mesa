@@ -2,7 +2,7 @@ mesa/kap information by Bill Paxton and Aaron Dotter
 
 Contents:
 1. Introduction
-2. Runtime talbes
+2. Runtime tables
 3. Creating the tables
 
 
@@ -97,7 +97,7 @@ consulted and read in if current.  If not, the latest tables need to be installe
 mesa/kap/preprocessor is the location of the preprocessor code and also the location of the default input opacity tables.
 
 The preprocessor executable is called 'ckap' and should be run through the scripts 'rn_fixed_metal' and 'run_co_enhanced'.
-These scritps will generate mesa/kap format tables for all of the X,Z pairs for both fixed Z and CO-enhanced.
+These scripts will generate mesa/kap format tables for all of the X,Z pairs for both fixed Z and CO-enhanced.
 
 The preprocessor is controlled through a namelist file called 'inlist'.  This file allows the user to specify the location
 of the input opacity tables, the name of the OPAL type 1 table to use, and the prefix used in the low-T/Ferguson et al. tables.

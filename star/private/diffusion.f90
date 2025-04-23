@@ -2,31 +2,24 @@
 !
 !   Copyright (C) 2012-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANT\ILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module diffusion
 
-      use const_def
+      use const_def, only: dp, i8, amu, me, msun
       use chem_def
       use star_private_def
       use diffusion_support
@@ -34,12 +27,15 @@
 
       implicit none
 
+      private
+      public :: do_solve_diffusion
+      public :: set_diffusion_classes
+      public :: diffusion_min_nc
+
       integer, parameter :: diffusion_min_nc = 4  ! minimum number of classes
       logical, parameter :: use_dcoeff_dX = .true.
 
-
       contains
-
 
       subroutine do_solve_diffusion( &
             s, nz, species, nc, m, class, class_chem_id, net_iso, chem_id, &
@@ -143,7 +139,7 @@
          integer, pointer :: ipiv1(:)
          integer :: lrd, lid, kmax_rad_accel, min_num_substeps, &
             iter_dbg, j_dbg, k_dbg, k_max
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          integer, pointer :: ipar_decsol(:)
          real(dp), pointer :: rpar_decsol(:)
          real(dp), dimension(species) :: xa_total_before
@@ -183,7 +179,7 @@
             call system_clock(time0,clock_rate)
          else
             time0 = 0
-         endif
+         end if
 
          ierr = 0
          ierr_dealloc = 0
@@ -222,8 +218,8 @@
          do k=nzlo,nzhi
             if (T(k) > T_full_off) then
                nbound=k; exit
-            endif
-         enddo
+            end if
+         end do
          nzlo=nbound
 
          allocate( &
@@ -2050,7 +2046,5 @@
          end function limiter
 
       end function adjust_timestep
-
-
 
       end module diffusion

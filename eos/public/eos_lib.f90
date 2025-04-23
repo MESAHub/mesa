@@ -2,28 +2,20 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module eos_lib
 
@@ -32,9 +24,7 @@
 
       implicit none
 
-      contains  ! the procedure interface for the library
-      ! client programs should only call these routines.
-
+      contains
 
       subroutine eos_init( &
             eosDT_cache_dir, use_cache, info)
@@ -108,7 +98,6 @@
       end function Radiation_Energy
 
 
-
       ! eos evaluation
 
       ! you can call these routines after you've allocated a handle.
@@ -171,9 +160,7 @@
          ! INPUT
 
          integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
-
          integer, intent(in) :: which_eos  ! see eos_def: i_eos_<component>
-
          integer, intent(in) :: species  ! number of species
          integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
@@ -428,7 +415,7 @@
          if ((rho <= 0) .or. (energy <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call Get_eos_gamma_DE_Results( &
             rq, abar, energy, log10E, rho, log10Rho, gamma, &
             T, log10T, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
@@ -463,7 +450,7 @@
          if ((P <= 0) .or. (T <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call eos_gamma_PT_get_rho_energy( &
             abar, P, T, gamma, rho, energy, ierr)
          log10Rho = log10(rho)
@@ -502,7 +489,7 @@
          if ((rho <= 0) .or. (T <= 0)) then
             ierr = -1
             return
-         endif
+         end if
          call eos_gamma_DT_get_P_energy( &
             abar, rho, T, gamma, P, energy, ierr)
          if (ierr /= 0) return
@@ -904,7 +891,6 @@
          call get_eos_ptr(handle,rq,ierr)
          if(ierr/=0) return
          call get_eos_controls(rq, name, val, ierr)
-
       end subroutine eos_get_control_namelist
 
       subroutine eos_set_control_namelist(handle, name, val, ierr)
@@ -919,8 +905,6 @@
          call get_eos_ptr(handle,rq,ierr)
          if(ierr/=0) return
          call set_eos_controls(rq, name, val, ierr)
-
       end subroutine eos_set_control_namelist
-
 
       end module eos_lib

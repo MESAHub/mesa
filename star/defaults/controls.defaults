@@ -216,7 +216,7 @@
       ! log_directory
       ! ~~~~~~~~~~~~~
 
-      ! for data files about the run
+      ! directory for data files about the run
 
       ! ::
 
@@ -226,7 +226,7 @@
       ! do_history_file
       ! ~~~~~~~~~~~~~~~
 
-      ! history file is created if this is true
+      ! a history file is created if this is true
 
       ! ::
 
@@ -781,16 +781,6 @@
     burn_min2 = 1000
 
 
-      ! max_conv_vel_div_csound_maxq
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! only consider from center out to this location
-
-      ! ::
-
-    max_conv_vel_div_csound_maxq = 1
-
-
       ! width_for_limit_conv_vel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1115,7 +1105,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the center entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1129,7 +1119,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the max entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1183,7 +1173,7 @@
       ! Lower limits on surface mass fractions.
       ! Stop when surface abundance drops below this limit.
       ! Can have up to ``num_xa_surface_limits`` of these (see ``star_def`` for value)
-      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f``
+      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f90``
       ! ``xa_surface_lower_limit`` contains the lower limit value
 
       ! ::
@@ -1246,7 +1236,7 @@
       ! HB_limit
       ! ~~~~~~~~
 
-      ! For detecting horizontal branch.
+      ! For detecting when the model has completed the horizontal branch.
       ! Only applies when center abundance by mass of h1 is < 1d-4.
       ! Stop when the center abundance by mass of he4 drops below this limit.
 
@@ -1297,6 +1287,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! star_species_mass_max_limit_iso
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when a particular species mass in units of Msun exceeds these limits.
 
       ! ::
 
@@ -1793,7 +1785,7 @@
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
+      ! stop if at least ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
 
       ! ::
 
@@ -1812,7 +1804,7 @@
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
+      ! stop if at least ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
 
       ! ::
 
@@ -1972,6 +1964,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is greater than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -1982,6 +1977,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is less than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -2022,7 +2020,7 @@
       ! Pgas_div_P_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! criteria for stopping on Pgas/P
+      ! stop when Pgas/P <= Pgas_div_P_limit
 
       ! ::
 
@@ -2032,7 +2030,7 @@
       ! Pgas_div_P_limit_max_q
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if Pgas/P < this limit at any location with ``q <= Pgas_div_P_limit_max_q``
+      ! stop if Pgas/P < Pgas_div_P_limit at any location with ``q <= Pgas_div_P_limit_max_q``
       ! values near unity skip the outer envelope
 
       ! ::
@@ -3378,12 +3376,21 @@
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! convective velocities are limited to local sound speed times this factor
+      ! convective velocities are limited to local sound speed times this factor.
 
       ! ::
 
     max_conv_vel_div_csound = 1d99
 
+
+      ! max_conv_vel_div_csound_maxq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! only consider ``max_conv_vel_div_csound`` from center out to this location
+
+      ! ::
+
+    max_conv_vel_div_csound_maxq = -1
 
       ! max_v_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~
@@ -4109,8 +4116,8 @@
 
     D_mix_rotation_min_tau_full_off = 0d0
 
-          ! D_mix_rotation_max_tau_full_on
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! D_mix_rotation_max_tau_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use rotational components of ``D_mix`` for locations where tau >= this.
       ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
@@ -5633,6 +5640,7 @@
 
       ! Maximum number of grid points allowed.
       ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
+      ! If nz > max_allowed_nz, MESA will prematurely exit and call this error.
 
       ! ::
 
@@ -7408,10 +7416,19 @@
     use_starting_composition_for_kap = .false.
 
 
+      ! opacity_min
+      ! ~~~~~~~~~~~
+
+      ! limit minimum opacities to this value (ignore this if value is < 0)
+
+      ! ::
+
+    opacity_min = -1
+
       ! opacity_max
       ! ~~~~~~~~~~~
 
-      ! limit opacities to this value (ignore this is value is < 0)
+      ! limit opacities to this value (ignore this if value is < 0)
 
       ! ::
 
@@ -8205,8 +8222,11 @@
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_flux_limiting_with_dPrad_dm_form
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
@@ -8231,6 +8251,11 @@
       !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
       !|         else
       !|            use L_rad = L
+      !|     if (use_flux_limiting_with_dPrad_dm_form)
+      !|         flxR = 4 * pi * r^2 * abs(dT^4/dm) / kap
+      !|         flxLambda = (6 + 3*flxR) / (6 + 3*flxR + flxR^2) (see Levermore & Pomraning 1981)
+      !|         L_rad = L_rad / flxLambda
+      !|
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
 
@@ -8239,6 +8264,7 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
 

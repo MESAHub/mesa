@@ -1,6 +1,6 @@
 
       ! helm results
-      
+
       integer, parameter :: &
          h_ptot = 1, &
          h_dpt = 2, &
@@ -17,7 +17,7 @@
          h_dpaa = 13, &
          h_dpaz = 14, &
          h_dpzz = 15
-         
+
       integer, parameter :: &
          x_p = 15
 
@@ -37,7 +37,7 @@
          h_deaa = x_p + 13, &
          h_deaz = x_p + 14, &
          h_dezz = x_p + 15
-         
+
       integer, parameter :: &
          x_e = x_p + 15
 
@@ -57,12 +57,12 @@
          h_dsaa = x_e + 13, &
          h_dsaz = x_e + 14, &
          h_dszz = x_e + 15
-         
+
       integer, parameter :: &
          x_s = x_e + 15
 
 
-      !..radiation contributions 
+      !..radiation contributions
       integer, parameter :: &
          h_prad = x_s + 1, &
          h_dpradt = x_s + 2, &
@@ -79,7 +79,7 @@
          h_dpradaa = x_s + 13, &
          h_dpradaz = x_s + 14, &
          h_dpradzz = x_s + 15
-         
+
       integer, parameter :: &
          x_pr = x_s + 15
 
@@ -100,7 +100,7 @@
          h_deradaa = x_pr + 13, &
          h_deradaz = x_pr + 14, &
          h_deradzz = x_pr + 15
-         
+
       integer, parameter :: &
          x_er = x_pr + 15
 
@@ -121,13 +121,12 @@
          h_dsradaa = x_er + 13, &
          h_dsradaz = x_er + 14, &
          h_dsradzz = x_er + 15
-         
+
       integer, parameter :: &
          x_sr = x_er + 15
 
 
-
-      !..gas contributions 
+      !..gas contributions
       integer, parameter :: &
          h_pgas = x_sr + 1, &
          h_dpgast = x_sr + 2, &
@@ -144,7 +143,7 @@
          h_dpgasaa = x_sr + 13, &
          h_dpgasaz = x_sr + 14, &
          h_dpgaszz = x_sr + 15
-         
+
       integer, parameter :: &
          x_pg = x_sr + 15
 
@@ -165,7 +164,7 @@
          h_degasaa = x_pg + 13, &
          h_degasaz = x_pg + 14, &
          h_degaszz = x_pg + 15
-         
+
       integer, parameter :: &
          x_eg = x_pg + 15
 
@@ -186,7 +185,7 @@
          h_dsgasaa = x_eg + 13, &
          h_dsgasaz = x_eg + 14, &
          h_dsgaszz = x_eg + 15
-         
+
       integer, parameter :: &
          x_sg = x_eg + 15
 
@@ -208,7 +207,7 @@
          h_dpionaa = x_sg + 13, &
          h_dpionaz = x_sg + 14, &
          h_dpionzz = x_sg + 15
-         
+
       integer, parameter :: &
          x_pi = x_sg + 15
 
@@ -229,7 +228,7 @@
          h_deionaa = x_pi + 13, &
          h_deionaz = x_pi + 14, &
          h_deionzz = x_pi + 15
-         
+
       integer, parameter :: &
          x_ei = x_pi + 15
 
@@ -250,7 +249,7 @@
          h_dsionaa = x_ei + 13, &
          h_dsionaz = x_ei + 14, &
          h_dsionzz = x_ei + 15
-         
+
       integer, parameter :: &
          x_si = x_ei + 15
 
@@ -270,7 +269,7 @@
          h_detaiaa = x_si + 13, &
          h_detaiaz = x_si + 14, &
          h_detaizz = x_si + 15
-         
+
       integer, parameter :: &
          x_etai = x_si + 15
 
@@ -291,12 +290,12 @@
          h_dxniaa = x_etai + 13, &
          h_dxniaz = x_etai + 14, &
          h_dxnizz = x_etai + 15
-         
+
       integer, parameter :: &
          x_xni = x_etai + 15
 
 
-      !..electron-positron contributions 
+      !..electron-positron contributions
 
       integer, parameter :: &
          h_etaele = x_xni + 1, &
@@ -315,7 +314,7 @@
          h_detaaa = x_xni + 14, &
          h_detaaz = x_xni + 15, &
          h_detazz = x_xni + 16
-         
+
       integer, parameter :: &
          x_etae = x_xni + 16
 
@@ -336,7 +335,7 @@
          h_dpepaa = x_etae + 14, &
          h_dpepaz = x_etae + 15, &
          h_dpepzz = x_etae + 16
-         
+
       integer, parameter :: &
          x_pep = x_etae + 16
 
@@ -358,7 +357,7 @@
          h_deepaa = x_pep + 14, &
          h_deepaz = x_pep + 15, &
          h_deepzz = x_pep + 16
-         
+
       integer, parameter :: &
          x_eep = x_pep + 16
 
@@ -380,7 +379,7 @@
          h_dsepaa = x_eep + 14, &
          h_dsepaz = x_eep + 15, &
          h_dsepzz = x_eep + 16
-         
+
       integer, parameter :: &
          x_sep = x_eep + 16
 
@@ -403,7 +402,7 @@
          h_dxneaa = x_sep + 15, &
          h_dxneaz = x_sep + 16, &
          h_dxnezz = x_sep + 17
-         
+
       integer, parameter :: &
          x_xne = x_sep + 17
 
@@ -413,7 +412,7 @@
          h_pip = x_xne + 1, &
          h_eip = x_xne + 2, &
          h_sip = x_xne + 3
-         
+
       integer, parameter :: &
          x_ip = x_xne + 3
 
@@ -436,17 +435,17 @@
          h_dscoua = x_ip + 14, &
          h_dscouz = x_ip + 15, &
          h_plasg = x_ip + 16
-         
+
       integer, parameter :: &
          x_cou = x_ip + 16
 
 
-      !..thermodynamic consistency checks; maxwell relations 
+      !..thermodynamic consistency checks; maxwell relations
       integer, parameter :: &
          h_dse = x_cou + 1, &
          h_dpe = x_cou + 2, &
          h_dsp = x_cou + 3
-         
+
       integer, parameter :: &
          x_mxwll = x_cou + 3
 
@@ -488,7 +487,7 @@
          h_dcs_gasdt = x_mxwll + 33, &
          h_dcs_gasda = x_mxwll + 34, &
          h_dcs_gasdz = x_mxwll + 35
-         
+
       integer, parameter :: &
          x_dgas = x_mxwll + 35
 
@@ -540,10 +539,10 @@
          h_dchiddt = x_dgas + 43, &
          h_dchidda = x_dgas + 44, &
          h_dchiddz = x_dgas + 45
-         
+
       integer, parameter :: &
          x_dtot = x_dgas + 45
-         
+
 
       !  random cr.p for debugging
       integer, parameter :: &
@@ -562,26 +561,26 @@
          h_dcrpaa = x_dtot + 13, &
          h_dcrpaz = x_dtot + 14, &
          h_dcrpzz = x_dtot + 15
-     
-     
+
+
       ! validity flag
       ! nonzero if the previous entries were actually computed by helm
-      ! zero if we didn't call helm 
+      ! zero if we didn't call helm
       integer, parameter :: h_valid = h_dcrpzz + 1
 
-         
+
       integer, parameter :: num_helm_results = h_valid
 
       ! end helm results
 
 
       ! the following is private info for helm
-      
+
       type Helm_Table
-      
+
          ! controls
          logical :: with_coulomb_corrections
-      
+
          ! sizes of the arrays
          integer :: imax
          integer :: jmax
@@ -599,11 +598,11 @@
          double precision :: denhi ! 10**logdhi
          double precision :: logdstp
          double precision :: logdstpi
-         double precision, dimension(:), pointer :: d ! (imax) 
-         double precision, dimension(:), pointer :: t ! (jmax) 
+         double precision, dimension(:), pointer :: d ! (imax)
+         double precision, dimension(:), pointer :: t ! (jmax)
 
          !..for the helmholtz free energy tables
-         double precision, dimension(:,:), pointer :: f ! (imax,jmax) 
+         double precision, dimension(:,:), pointer :: f ! (imax,jmax)
          double precision, dimension(:,:), pointer :: fd ! (imax,jmax)
          double precision, dimension(:,:), pointer :: ft ! (imax,jmax)
          double precision, dimension(:,:), pointer :: fdd ! (imax,jmax)

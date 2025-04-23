@@ -1,17 +1,14 @@
 
 
       module mod_qsort
-      use const_def, only: dp
 
+        use const_def, only: dp
 
       implicit none
 
-
       contains
 
-
-
-           ! FILE: sort.f
+      ! FILE: sort.f
          ! PURPOSE: demonstrate the use of "qsort_inline.inc" and
          ! "qsort_inline_index.inc". These can be used as specific
          ! sort procedures under a common SORT generic name.
@@ -160,8 +157,4 @@
 
          end subroutine sortp_dp
 
-
-
-
       end module mod_qsort
-

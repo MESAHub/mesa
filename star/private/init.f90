@@ -2,41 +2,43 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module init
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, secyer
 
       implicit none
 
       private
-      public :: alloc_star_data, set_starting_star_data, do_star_init, &
-         do_starlib_shutdown, set_kap_and_eos_handles, load_zams_model, &
-         create_pre_ms_model, create_initial_model, &
-         create_RSP_model, create_RSP2_model, &
-         doing_restart, load_restart_photo, load_saved_model, &
-         do_garbage_collection
+      public :: alloc_star_data
+      public :: set_starting_star_data
+      public :: do_star_init
+      public :: do_starlib_shutdown
+      public :: set_kap_and_eos_handles
+      public :: load_zams_model
+      public :: create_pre_ms_model
+      public :: create_initial_model
+      public :: create_RSP_model
+      public :: create_RSP2_model
+      public :: doing_restart
+      public :: load_restart_photo
+      public :: load_saved_model
+      public :: do_garbage_collection
 
       integer, parameter :: do_create_pre_ms_model = 0
       integer, parameter :: do_load_zams_model = 1
@@ -45,11 +47,9 @@
       integer, parameter :: do_create_RSP_model = 4
       integer, parameter :: do_create_RSP2_model = 5
 
-
       logical :: have_done_starlib_init = .false.
 
       contains
-
 
       subroutine set_kap_and_eos_handles(id, ierr)
          use kap_lib, only: alloc_kap_handle_using_inlist, kap_ptr
@@ -1205,6 +1205,5 @@
                use_cache_for_eos,&
                ierr)
       end subroutine do_garbage_collection
-
 
       end module init

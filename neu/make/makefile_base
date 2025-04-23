@@ -13,18 +13,18 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   neu_def.f90 \
-   mod_neu.f90 \
-   neu_lib.f90
+	neu_def.f90 \
+	mod_neu.f90 \
+	neu_lib.f90
 
 #################################################################
 #
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = $(LIBS_MESA_NUMERICS)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS)
+	LIBS_OTHER = $(LIBS_MESA_NUMERICS)
+	DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+	LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS)
 endif
 
 #################################################################

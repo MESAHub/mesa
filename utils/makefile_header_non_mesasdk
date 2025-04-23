@@ -6,7 +6,7 @@
 # Step 0) Check if you have set the correct environment variables
 ifndef MESA_DIR
 ifndef MESA_DIR_INTENTIONALLY_EMPTY
-$(error MESA_DIR enviroment variable is not set)
+$(error MESA_DIR environment variable is not set)
 endif
 endif
 
@@ -122,7 +122,7 @@ endif
 
 
 
-# step 5) Load options for HDF5, this must be compiled with the same compilier as mesa
+# step 5) Load options for HDF5, this must be compiled with the same compiler as mesa
 
 # To install hdf5 in $MESA_DIR/utils with ifort run:
 #export CC=icc

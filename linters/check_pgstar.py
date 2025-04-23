@@ -200,11 +200,11 @@ def check_pgstar(filename, options, defaults, false_positives):
     return result
 
 
-def check_all_pgstars(options, defualts, false_postives):
+def check_all_pgstars(options, defaults, false_postives):
     for filename in glob.glob(
         os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
     ):
-        values = check_pgstar(filename, options, defualts, false_postives)
+        values = check_pgstar(filename, options, defaults, false_postives)
         if values is None:
             continue
         if len(values):

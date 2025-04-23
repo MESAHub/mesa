@@ -2,43 +2,39 @@
 !
 !   Copyright (C) 2015-2022  Evan Bauer & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module diffusion_support
 
-      use const_def
+      use const_def, only: dp, pi, pi4, me, mp, qe, amu, fine, boltzm, hbar, msun, rsun, secyer, one_third, four_thirds_pi
       use chem_def
       use utils_lib, only: is_bad_num
       use star_private_def
 
       implicit none
 
+      private
+      public :: tiny_mass
+      public :: smallx
+      public :: get_matrix_coeffs
 
       real(dp), parameter :: Xlim = 1d-14
       real(dp), parameter :: tiny_mass = 1d3  ! a kilogram
       real(dp), parameter :: tinyX = 1d-50
       real(dp), parameter :: smallX = 1d-20
-
 
       contains
 
@@ -113,7 +109,6 @@
 
 
 !$OMP PARALLEL DO PRIVATE(k, j, i, total_diffusion_factor, op_err, C_face, Z_face, dC_dr_face, dlnne_dr_face, tmp) SCHEDULE(dynamic,2)
-
          do k = nzlo+1, nzhi
 
             ! Total diffusion scaling factor is product of
@@ -193,7 +188,6 @@
             end do
 
          end do
-
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) return
@@ -785,13 +779,13 @@
       end subroutine get1_flow_coeffs
 
 
-!*************************************************************
+! *************************************************************
 ! Original of this routine was written by Anne A. Thoul, at the Institute
 ! for Advanced Study, Princeton, NJ 08540.
 ! See Thoul et al., Ap.J. 421, p. 828 (1994)
 
 ! With modifications by Hali Hu for non Coulomb and rad levitation.
-!*************************************************************
+! *************************************************************
 ! This routine inverses the burgers equations.
 !
 ! The system contains N equations with N unknowns.
@@ -804,7 +798,7 @@
 !                   the electric field E
 !                   the gravitational force g.
 !
-!**************************************************
+! **************************************************
 
 
 ! comments from Anne's original version
@@ -820,7 +814,6 @@
    ! For I=M,2M, we get the heat fluxes
    ! For I=N-1, we get the electric field
    ! For I=N, we get the gravitational force g
-
 
 
       subroutine do1_solve_thoul_hu( &
@@ -1057,8 +1050,6 @@
          end do
 
       end subroutine do1_solve_thoul_hu
-
-
 
 
       subroutine solve_burgers_cgs_no_thermal( &
@@ -1462,7 +1453,6 @@
       end subroutine solve_burgers_cgs_with_thermal
 
 
-
       ! Calculate coefficients given in Appendix C.3 of Stanton & Murillo, PR E 93, 043203 (2016)
       subroutine get_SM_coeffs(nc,m,rho,T,A,Z,nd,Kdiff,zdiff,zdiff1,zdiff2,kappa)
         integer, intent(in) :: nc, m
@@ -1808,4 +1798,3 @@
       end function bitsafe_erf_fit
 
       end module diffusion_support
-

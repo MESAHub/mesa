@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -30,14 +24,13 @@
       use utils_lib
       use star_utils
       use num_lib, only: find0
-
-      use const_def, only: avo, kerg, pi, clight, crad, Rsun, Lsun, Msun, &
-         secyer, ln10, mev_amu, ev2erg, two_thirds
+      use const_def, only: avo, kerg, pi, amu, clight, crad, Rsun, Lsun, Msun, &
+         secday, secyer, ln10, mev_amu, ev2erg, one_third, two_thirds, four_thirds_pi, &
+         no_mixing, convective_mixing, semiconvective_mixing
 
       implicit none
 
       contains
-
 
       subroutine set_min_gamma1(s)
          type (star_info), pointer :: s
@@ -751,7 +744,6 @@
 
       subroutine find_epsnuc_zone( &
             s, i_start, bzm_1, bzm_2, bzm_3, bzm_4, burn_min1, burn_min2, ierr)
-         use const_def, only:Msun
          type (star_info), pointer :: s
          integer, intent(inout) :: i_start
          real(dp), intent(out) :: bzm_1, bzm_2, bzm_3, bzm_4
@@ -1409,6 +1401,5 @@
          end do
          s% num_mixing_regions = n
       end subroutine get_mixing_regions
-
 
       end module report

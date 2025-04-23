@@ -20,18 +20,15 @@
 !
 ! ***********************************************************************
 
-
       module adipls_support
 
+      use const_def, only: dp, i8, pi, pi4, four_thirds_pi, Msun, Rsun, Lsun
       use astero_def
       use star_lib
       use star_def
-      use const_def
       use utils_lib
 
-
       implicit none
-
 
       ! args for adipls
       integer, save :: i_paramset, ierr_param, i_inout, nn
@@ -40,11 +37,8 @@
       real(dp), save :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
-
       integer, save :: iounit_dev_null = -1
-
       integer, save :: nn_redist  ! set from redistrb.c input file
-
 
       real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
       integer, save :: nn_arg
@@ -52,9 +46,7 @@
 
       logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
-
       contains
-
 
       ! this can be called from user run_star_extras check model routine
       subroutine do_adipls_get_one_el_info( &
@@ -350,7 +342,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, nn_arg_0
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder
@@ -990,7 +982,6 @@
          real(dp), pointer :: var(:,:)  ! (ivar,nn)
          integer, intent(out) :: ierr
 
-         real(dp), parameter :: Msun = 1.9892d33, Rsun = 6.9598d10, Lsun = 3.8418d33
          integer :: iounit, k, offset
 
          ierr = 0
@@ -1079,6 +1070,5 @@
          end do
          write(*,'(A)')
       end subroutine show_adipls_results
-
 
       end module adipls_support

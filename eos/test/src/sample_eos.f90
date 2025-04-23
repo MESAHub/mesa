@@ -25,7 +25,8 @@ program sample_eos
    use eos_lib
    use chem_def
    use chem_lib
-   use const_lib
+   use const_def
+   use const_lib, only: const_init
    use math_lib
 
    implicit none
@@ -324,7 +325,7 @@ contains
       my_dcsdd = yy*((my_dg1dd - dfk)*xx*(my_detotdd*Rho - ww*my_dptotdd + x)/my_ptot)
       my_dcsdt = yy*((my_dg1dt - dfk)*xx*(my_detotdt*Rho - ww*my_dptotdt)/my_ptot)
 
-      ! maxwell relations; each is at flaoting point if the consistency is perfect
+      ! maxwell relations; each is at floating point if the consistency is perfect
       dse = T*my_dstotdt/my_detotdt - 1.0d0
       dpe = (my_detotdd*Rho*Rho + T*my_dptotdt)/my_ptot - 1.0d0
       dsp = -my_dstotdd*(Rho*Rho/my_dptotdt) - 1.0d0

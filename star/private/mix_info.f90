@@ -2,46 +2,48 @@
 !
 !   Copyright (C) 2011-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module mix_info
 
-      use const_def
+      use const_def, only: dp, i8, ln10, pi4, msun, no_mixing, &
+                           minimum_mixing, &
+                           rayleigh_taylor_mixing, &
+                           convective_mixing, &
+                           semiconvective_mixing, &
+                           overshoot_mixing, &
+                           thermohaline_mixing, &
+                           rotation_mixing
       use num_lib
       use utils_lib
       use star_private_def
 
-
       implicit none
 
       private
-      public :: set_mixing_info, set_RTI_mixing_info, do_smoothing_by_mass, &
-         update_rotation_mixing_info, set_dPdr_dRhodr_info, get_convection_sigmas, &
-         set_dxdt_mix, set_cz_bdy_mass
-
+      public :: set_mixing_info
+      public :: set_RTI_mixing_info
+      public :: do_smoothing_by_mass
+      public :: update_rotation_mixing_info
+      public :: set_dPdr_dRhodr_info
+      public :: get_convection_sigmas
+      public :: set_dxdt_mix
+      public :: set_cz_bdy_mass
 
       contains
-
 
       subroutine set_mixing_info(s, skip_set_cz_bdy_mass, ierr)
          ! set convection variables cdc and conv_vel starting from local MLT results.
@@ -63,7 +65,7 @@
 
          logical :: RSP2_or_RSP
 
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
 
          include 'formats'
@@ -2432,10 +2434,4 @@
 
       end subroutine add_RTI_turbulence
 
-
       end module mix_info
-
-
-
-
-

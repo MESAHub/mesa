@@ -4,38 +4,38 @@
             finish_relax_step => null()
          procedure(id_only_subroutine_interface), pointer, nopass :: &
             finished_relax => null()
-           
+
          procedure(how_many_extra_header_items_interface), pointer, nopass :: &
             how_many_extra_profile_header_items => null()
          procedure(data_for_extra_header_items_interface), pointer, nopass :: &
             data_for_extra_profile_header_items => null()
-           
+
          procedure(how_many_extra_header_items_interface), pointer, nopass :: &
             how_many_extra_history_header_items => null()
          procedure(data_for_extra_header_items_interface), pointer, nopass :: &
             data_for_extra_history_header_items => null()
-            
+
       ! "extras" procedures
          procedure(extras_startup_interface), pointer, nopass :: &
             extras_startup => null()
-            
+
          procedure(extras_check_model_interface), pointer, nopass :: &
             extras_check_model => null()
-            
+
          procedure(extras_start_step_interface), pointer, nopass :: &
             extras_start_step => null()
-            
+
          procedure(extras_finish_step_interface), pointer, nopass :: &
             extras_finish_step => null()
-            
+
          procedure(extras_after_evolve_interface), pointer, nopass :: &
             extras_after_evolve => null()
-         
-         
+
+
       ! "other" procedures
 
          procedure(other_remove_surface_interface), pointer, nopass :: &
-            other_remove_surface => null()         
+            other_remove_surface => null()
          procedure(other_adjust_mdot_interface), pointer, nopass :: &
             other_adjust_mdot => null()
          procedure(other_j_for_adjust_J_lost_interface), pointer, nopass :: &
@@ -67,19 +67,19 @@
          procedure (other_energy_implicit_interface), pointer, nopass :: &
             other_energy_implicit => null()
          procedure (other_eval_fp_ft_interface), pointer, nopass :: &
-            other_eval_fp_ft => null()            
+            other_eval_fp_ft => null()
          procedure (other_eval_i_rot_interface), pointer, nopass :: &
-            other_eval_i_rot => null()            
+            other_eval_i_rot => null()
          procedure (other_torque_interface), pointer, nopass :: &
-            other_torque => null()            
+            other_torque => null()
          procedure (other_torque_implicit_interface), pointer, nopass :: &
-            other_torque_implicit => null()            
+            other_torque_implicit => null()
          procedure (other_brunt_interface), pointer, nopass :: &
-            other_brunt => null()            
+            other_brunt => null()
          procedure (other_brunt_smoothing_interface), pointer, nopass :: &
-            other_brunt_smoothing => null()            
+            other_brunt_smoothing => null()
          procedure (other_build_initial_model_interface), pointer, nopass :: &
-            other_build_initial_model => null()            
+            other_build_initial_model => null()
          procedure (other_cgrav_interface), pointer, nopass :: &
             other_cgrav => null()
          procedure (other_mesh_delta_coeff_factor_interface), pointer, nopass :: &
@@ -100,7 +100,7 @@
             other_gradr_factor => null()
          procedure (other_overshooting_scheme_interface), pointer, nopass :: &
             other_overshooting_scheme => null()
-         
+
          procedure (other_solver_monitor_interface), pointer, nopass :: &
             other_solver_monitor => null()
          procedure (other_neu_interface), pointer, nopass :: &
@@ -109,7 +109,7 @@
             other_net_get => null()
          procedure (other_split_burn_interface), pointer, nopass :: &
             other_split_burn =>null()
-            
+
          procedure (other_adjust_mlt_gradT_fraction_interface), pointer, nopass :: &
             other_adjust_mlt_gradT_fraction => null()
          procedure (other_mlt_results_interface), pointer, nopass :: &

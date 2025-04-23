@@ -90,7 +90,7 @@ contains
 
    subroutine Setup_eos
       use chem_lib
-      use const_lib
+      use const_lib, only: const_init
       !..allocate and load the eos tables
 
       character(len=256) :: my_mesa_dir

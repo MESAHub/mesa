@@ -21,14 +21,12 @@ This test case has 1 part. Click to see a larger version of a plot.
   terminate due to beginning of RLO
 
 
-|br|
-Binary period and seperation history:
+Binary period and separation history:
 
 .. image:: ../../../binary/test_suite/jdot_gr_check/docs/grid_000232.svg
    :width: 100%
 
 
-|br|
 pgstar commands used for the plot above:
 
 .. code-block:: console
@@ -132,7 +130,7 @@ pgstar commands used for the plot above:
  History_Track2_xname = 'model_number'
  History_Track2_yname = 'binary_separation'
  History_Track2_xaxis_label = 'Model Number'
- History_Track2_yaxis_label = 'Binary Seperation (R\d\(2281)\u)'
+ History_Track2_yaxis_label = 'Binary Separation (R\d\(2281)\u)'
  History_Track2_reverse_xaxis = .false.
  History_Track2_reverse_yaxis = .false.
 
@@ -206,8 +204,3 @@ pgstar commands used for the plot above:
 
 Last-Updated: 12Jul2021 (MESA 094ff71) by fxt.
 
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

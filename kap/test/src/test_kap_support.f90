@@ -471,7 +471,7 @@ contains
 
    subroutine setup(quietly)
       use chem_lib
-      use const_lib
+      use const_lib, only: const_init
       logical, intent(in) :: quietly
 
       integer :: ierr

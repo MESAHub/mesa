@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010-2019  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
       module paquette_coeffs
 
       use const_def, only: dp, qe
@@ -6,7 +25,6 @@
       implicit none
 
       private
-
       public :: paquette_coefficients
       public :: initialise_collision_integrals
       public :: free_collision_integrals
@@ -22,7 +40,7 @@
 
       contains
 
-!********************************************************
+! ********************************************************
 ! PAQUETTE_COEFFICIENTS:
 ! Compute atomic diffusion coefficients, according to Paquette et al. (1986)
 ! The coefficients are derived from a screened resistive/attractive Coulomb potential.
@@ -66,13 +84,13 @@
       integer :: i, J, N, K, NREF
       real(dp) :: NZZ, NE
 
-      NE = NA1(NN)                  ! number density is per cm^3
+      NE = NA1(NN)  ! number density is per cm^3
       NI = 0.0D0
       NZZ = 0.0D0
       do i = 1, NN-1
          NI = NI + NA1(i)
          NZZ = NZZ + KZN1(i)*KZN1(i) * NA1(i)
-      enddo
+      end do
 
       KT = BOLTZM*T
 ! Typical distance between ions (squared)
@@ -112,7 +130,7 @@
 ! repulsive potential (ion-ion or electron-electron)
                F22 = exp(DD(1,N)*DPSI_N1*DPSI_N1*DPSI_N1 + DD(2,N)*DPSI_N*DPSI_N*DPSI_N &
                     + DD(3,N)*DPSI_N1 + DD(4,N)*DPSI_N)
-            endif
+            end if
          elseif (PSI_ST > 3.0D0 .and. PSI_ST < 4.0d0) then
 ! repulsive potential (ion-ion or electron-electron)
             if (NREF==NN .and. NREF/=I .or. I==NN .and. NREF/=I) then
@@ -120,11 +138,11 @@
             else
 ! attractive potential (electron-ion)
                F22   = 1.99016D0*E_PSI_ST - 4.56958D0
-            endif
+            end if
          elseif (PSI_ST >= 4.0D0) then
 ! repulsive and attractive coefficients are the same in this range
             F22   = 1.99016D0*E_PSI_ST - 4.56958D0
-         endif
+         end if
          OMEGA2(I)   = EPS_ST*F22
       end do      ! I
 
@@ -173,7 +191,7 @@
                           + DD(2,N)*DPSI_N*DPSI_N*DPSI_N &
                           + DD(3,N)*DPSI_N1 &
                           + DD(4,N)*DPSI_N)
-               endif
+               end if
             elseif (PSI_ST > 3.0D0 .and. PSI_ST < 4.0d0) then
                if (NREF==NN .and. NREF/=I .or. I==NN .and. NREF/=I) then
 ! attractive potential (electron-ion)
@@ -187,14 +205,14 @@
                   F1(2) = 0.99559D0*E_PSI_ST - 1.29553D0
                   F1(3) = 1.99814D0*E_PSI_ST - 0.64413D0
                   F22   = 1.99016D0*E_PSI_ST - 4.56958D0
-               endif
+               end if
             elseif (PSI_ST>=4.0D0) then
 ! repulsive and attractive coefficients are the same in this range
                F1(1) = 1.00141D0*E_PSI_ST - 3.18209D0
                F1(2) = 0.99559D0*E_PSI_ST - 1.29553D0
                F1(3) = 1.99814D0*E_PSI_ST - 0.64413D0
                F22   = 1.99016D0*E_PSI_ST - 4.56958D0
-            endif
+            end if
             OMEGA1(:) = EPS_ST*F1(:)
             OMEGA22   = EPS_ST*F22                        ! for particle species NREF & K
 
@@ -235,7 +253,7 @@
       return
 
       end subroutine paquette_coefficients
-!****************************************************
+! ****************************************************
 
 
 ! Initialise collision integrals for atomic diffusion
@@ -699,6 +717,5 @@
       end if
 !$omp end critical (collision_integrals_shutdown)
       end subroutine free_collision_integrals
-
 
       end module paquette_coeffs

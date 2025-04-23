@@ -2,28 +2,20 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
-
 
 
 ! last checked for consistency with Frank's ratlib.f on Sept 18, 2008
@@ -33,16 +25,13 @@
       use utils_lib
       use chem_def  !, only: nuclide_data, chem_isos
       use chem_lib, only: chem_get_iso_id
-      use const_def, only: dp, ln2
+      use const_def, only: dp, ln2, ln10, me, kerg, clight, pi2
       use math_lib
 
       implicit none
 
       real(dp), parameter :: lowT9_cutoff = 1d-3  ! all non-pp rates except decays go to 0 below this
-
-
-
-      real(dp), parameter :: lowT9pp_cutoff = 1d-5  ! all pp rates except decays go to 0 below this
+      real(dp), parameter :: lowT9pp_cutoff = 1d-5 ! all pp rates except decays go to 0 below this
 
       real(dp)  :: oneth, twoth, fourth, fiveth, elvnth, fivfour, onesix, &
                         fivsix, sevsix, onefif, sixfif, onesev, twosev, foursev
@@ -72,7 +61,6 @@
    ! nacre     C. Angulo et al., Nucl. Phys. A656 (1999)3-187
    ! wk82      wiescher and kettner, ap. j., 263, 891 (1982)
    ! c96       champagne 1996
-
 
 
 ! Hydrogen
@@ -272,7 +260,6 @@
          end if
 
 
-
 ! p(n, g)d
 ! smith, kawano, malany 1992
 
@@ -294,8 +281,6 @@
       rr    = rev * term
 
       end subroutine rate_png_fxt
-
-
 
 
       subroutine rate_ddg_jina(tf, temp, fr, rr)  ! cf88
@@ -357,7 +342,6 @@
 !         d  he3    p  he4                  de04      1.83530d+01
          call jina_reaclib_2_2(ih2, ihe3, ih1, ihe4, tf, fr, rr, 'rate_he3d_jina')
       end subroutine rate_he3d_jina
-
 
 
 ! r33, he3(he3, 2p)he4
@@ -442,7 +426,6 @@
       end subroutine rate_he3he4_nacre
 
 
-
 ! r3a, triple alpha
 
 
@@ -466,7 +449,6 @@
          write(*,'(A)')
          call mesa_error(__FILE__,__LINE__,'rate_tripalf_jina')
       end subroutine rate_tripalf_jina
-
 
 
       subroutine rate_tripalf_reaclib(tf, temp, fr, rr)
@@ -496,7 +478,6 @@
          rev    = 2.00d+20*(tf% t93)*exp(-84.424d0*(tf% t9i))
          rr = fr * rev
       end subroutine rate_tripalf_reaclib
-
 
 
       subroutine rate_tripalf_nacre(tf, temp, fr, rr)
@@ -643,8 +624,6 @@
       end subroutine rate_he3ng_fxt
 
 
-
-
 ! Lithium
 
 
@@ -680,8 +659,6 @@
       end subroutine rate_li7pa_nacre
 
 
-
-
       subroutine rate_li7pa_jina(tf, temp, fr, rr)  ! jina reaclib
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
@@ -713,7 +690,7 @@
             term = 1.34d-10 * (tf% T9i12) * bb
          else
             term = 0.0d0
-         endif
+         end if
          fr = term
          rr = 0.0d0
       end subroutine rate_be7em_fxt
@@ -765,8 +742,6 @@
       end subroutine rate_be7pg_nacre
 
 
-
-
       subroutine rate_be7pg_jina(tf, temp, fr, rr)  ! jina reaclib   cf88
 !         p  be7   b8                       cf88n     1.37000d-01
          type (T_Factors) :: tf
@@ -803,9 +778,7 @@
       end subroutine rate_be7he3_jina
 
 
-
 ! be9(p,d)be8 => 2a
-
 
 
 ! Boron
@@ -926,8 +899,6 @@
          fr   = term
          rr   = rev * term
       end subroutine rate_c12ag_fxt
-
-
 
 
       subroutine rate_c12ag_nacre(tf, temp, fr, rr)
@@ -1225,7 +1196,7 @@
       else
 !       term    = 2.6288035d-29
        term    = 0.0d0
-      endif
+      end if
       fr    = term
       rr    = 0.0d0
       end subroutine rate_c12o16_fxt
@@ -1323,7 +1294,7 @@
          else
          !       dd     = 2.6288035d-29
          dd     = 0.0d0
-         endif
+         end if
 
          ! branching ratios from pwnsz data
          b27n = 0.1d0
@@ -1645,8 +1616,6 @@
       end subroutine rate_o14ag_jina
 
 
-
-
 ! ro14gp, o14(g,p)n13
    ! see rn13pg
 
@@ -1769,7 +1738,6 @@
 !       he4  o16 ne20                       nacrr     4.73000d+00
          call jina_reaclib_2_1(ihe4, io16, ine20, tf, fr, rr, 'rate_o16ag_jina')
       end subroutine rate_o16ag_jina
-
 
 
 ! ro16gp, o16(g,p)n15
@@ -1968,7 +1936,6 @@
       end subroutine fowthrsh
 
 
-
 ! o17(a,g)ne21
 
 
@@ -2066,7 +2033,6 @@
 
 ! rf17pa, f17(p,a)o14
    ! see ro14ap
-
 
 
 ! rf17gp, f17(g,p)o16
@@ -2266,7 +2232,6 @@
       end subroutine rate_ne18ag_jina
 
 
-
 ! rne18gp, ne18(g,p)f17
    ! see rf17pg
 
@@ -2374,7 +2339,6 @@
 !       he4 ne20 mg24                       nacrr     9.31600d+00
          call jina_reaclib_2_1(ihe4, ine20, img24, tf, fr, rr, 'rate_ne20ag_jina')
       end subroutine rate_ne20ag_jina
-
 
 
 ! rne20ga, ne20(g,a)o16
@@ -3266,7 +3230,6 @@
    ! see mg51pg
 
 
-
       subroutine rate_fe52ng_jina(tf, temp, fr,  rr)
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
@@ -3373,7 +3336,6 @@
       real(dp), intent(out) :: fr, rr
          call jina_reaclib_2_1(ineut, ife54, ife55, tf, fr, rr, 'rate_fe54ng_jina')
       end subroutine rate_fe54ng_jina
-
 
 
       subroutine rate_fe55ng_jina(tf, temp, fr,  rr)
@@ -3556,9 +3518,7 @@
       end subroutine rate_he4_mg24_to_c12_o16_jina
 
 
-
       subroutine tfactors(tf, logT_in, temp_in)
-      use const_def, only: ln10
 ! sets various popular temperature factors
 ! this routine must be called before any of the rates are called
 
@@ -4263,10 +4223,7 @@
       end subroutine reaclib_rate_and_dlnT
 
 
-
-
       subroutine do_reaclib(tf, a1, a2, a3, a4, a5, a6, a7, term)
-         use const_def
          type (T_Factors) :: tf
          real(dp), intent(in) :: a1, a2, a3, a4, a5, a6, a7
          real(dp), intent(out) :: term
@@ -4342,13 +4299,13 @@
             rfd0(k)=1.d0/((rv(k)-rv(k-1))*(rv(k)-rv(k+1))*(rv(k)-rv(k+2)))
             rfd1(k)=1.d0/((rv(k+1)-rv(k-1))*(rv(k+1)-rv(k))*(rv(k+1)-rv(k+2)))
             rfd2(k)=1.d0/((rv(k+2)-rv(k-1))*(rv(k+2)-rv(k))*(rv(k+2)-rv(k+1)))
-         enddo
+         end do
          do j=2,5
             tfdm(j)=1.d0/((tv(j-1)-tv(j))*(tv(j-1)-tv(j+1))*(tv(j-1)-tv(j+2)))
             tfd0(j)=1.d0/((tv(j)-tv(j-1))*(tv(j)-tv(j+1))*(tv(j)-tv(j+2)))
             tfd1(j)=1.d0/((tv(j+1)-tv(j-1))*(tv(j+1)-tv(j))*(tv(j+1)-tv(j+2)))
             tfd2(j)=1.d0/((tv(j+2)-tv(j-1))*(tv(j+2)-tv(j))*(tv(j+2)-tv(j+1)))
-         enddo
+         end do
       end subroutine mazurek_init
 
       subroutine mazurek(btemp,bden,y56,ye,rn56ec,sn56ec)
@@ -4424,10 +4381,10 @@
        do jd = jp-1,jp+2
         rne(jr,jd) =   dfacm*datn(jr,kp-1,jd) + dfac0*datn(jr,kp,jd)  &
                      + dfac1*datn(jr,kp+1,jd) + dfac2*datn(jr,kp+2,jd)
-       enddo
+       end do
        rnt(jr) =  tfacm*rne(jr,jp-1) + tfac0*rne(jr,jp)  &
                 + tfac1*rne(jr,jp+1) + tfac2*rne(jr,jp+2)
-      enddo
+      end do
 
 !  set the output
       rn56ec = exp10(rnt(1))
@@ -4485,7 +4442,7 @@
           GUESS = 2.0D0*X*X*X*exp(AA)
       ELSE
           GUESS = pow3(Y-1.0D0+(3.0D0-AL92)*X)/3.0D0
-      ENDIF
+      end if
 !
 !     Now multiply by the prefactors .. .
 !
@@ -4498,7 +4455,6 @@
 
 
       subroutine ecapnuc(etakep,temp,rho,rpen,rnep,spen,snep)
-         use const_def
       real(dp), intent(in) :: etakep,temp,rho
       real(dp), intent(out) :: rpen,rnep,spen,snep
 
@@ -4530,7 +4486,6 @@
                         qndeca = 1.2533036d-06, &
                         tmean  = 886.7d0, &
                         rho_low_cutoff = 1d-9, eta_low_cutoff = -50d0)
-
 
 
 !  tmean and qndeca are the mean lifetime and decay energy of the neutron
@@ -4633,26 +4588,26 @@
               + facv2*f2g + facv1*f1g + facv0*f0
 
 !  for electrons capture onto protons
-      if (iflag == 2) go to 503
-      if (eta > 0d0) go to 505
+      if (iflag == 2) GOTO 503
+      if (eta > 0d0) GOTO 505
       rpen  = ln2*cmk5*t5*rie1/ft
       spen  = ln2*cmk6*t5*temp*rjv1/ft
       spenc = ln2*cmk6*t5*temp*rjv1/ft*c2me
-      go to 504
+      GOTO 504
 505   rpen = ln2*cmk5*t5*rie2/ft
       spen = ln2*cmk6*t5*temp*rjv2/ft
       spenc = ln2*cmk6*t5*temp*rjv2/ft*c2me
 504   continue
       qn = qn2
-      go to 502
+      GOTO 502
 
 !  for positrons capture onto neutrons
-503   if (eta>0d0) go to 507
+503   if (eta>0d0) GOTO 507
       rnep  = ln2*cmk5*t5*rie1/ft
       snep  = ln2*cmk6*t5*temp*rjv1/ft
       snepc = ln2*cmk6*t5*temp*rjv1/ft*c2me
 !      if (rho.lt.1.0d+06) snep=snep+qndeca*xn(9)/mn/tmean
-      go to 506
+      GOTO 506
 507   rnep  = ln2*cmk5*t5*rie2/ft
       snep  = ln2*cmk6*t5*temp*rjv2/ft
       snepc = ln2*cmk6*t5*temp*rjv2/ft*c2me
@@ -4662,7 +4617,3 @@
       end subroutine ecapnuc
 
       end module ratelib
-
-
-
-

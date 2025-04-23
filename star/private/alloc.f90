@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -46,7 +40,6 @@
 
       logical, parameter :: quad_array_debug = .false.
       logical, parameter :: quad_array_trace = .false.
-
 
       ! working storage
 
@@ -81,9 +74,7 @@
       integer :: num_calls, num_returns
       integer :: num_allocs, num_deallocs
 
-
       contains
-
 
       subroutine init_alloc
          integer :: i
@@ -281,7 +272,7 @@
 
             deallocate(s%other_star_info)
 
-         endif
+         end if
 
          call dealloc_history(s)
 
@@ -765,6 +756,11 @@
             if (failed('tau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
+
+            call do1(s% flux_limit_R, c% flux_limit_R)
+            if (failed('flux_limit_R')) exit
+            call do1(s% flux_limit_lambda, c% flux_limit_lambda)
+            if (failed('flux_limit_lambda')) exit
 
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit
@@ -3088,22 +3084,22 @@
                deallocate(work_pointers(i)%p)
                nullify(work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_int_work_arrays
             if (associated(int_work_pointers(i)%p)) then
                deallocate(int_work_pointers(i)%p)
                nullify(int_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_logical_work_arrays
             if (associated(logical_work_pointers(i)%p)) then
                deallocate(logical_work_pointers(i)%p)
                nullify(logical_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
 
       end subroutine free_work_arrays
 
@@ -3212,6 +3208,5 @@
          character (len=*), intent(in) :: str
          call do_return_work_array(s, .false., ptr, str)
       end subroutine non_crit_return_work_array
-
 
       end module alloc

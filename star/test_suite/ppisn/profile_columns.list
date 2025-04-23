@@ -456,7 +456,10 @@
    !lum_rad_div_L
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
       ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
-
+   Frad_div_cUrad
+   flux_limit_lambda
+   flux_limit_R
+   
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    
    gradr ! dlnT/dlnP required for purely radiative transport

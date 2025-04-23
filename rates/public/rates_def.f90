@@ -1,25 +1,19 @@
 ! ***********************************************************************
 !
-!  Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
-!  MESA is free software; you can use it and/or modify
-!  it under the combined terms and restrictions of the MESA MANIFESTO
-!  and the GNU General Library Public License as published
-!  by the Free Software Foundation; either version 2 of the License,
-!  or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!  You should have received a copy of the MESA MANIFESTO along with
-!  this software; if not, it is available at the mesa website:
-!  http://mesa.sourceforge.net/
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!  MESA is distributed in the hope that it will be useful,
-!  but WITHOUT ANY WARRANTY; without even the implied warranty of
-!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!  See the GNU Library General Public License for more details.
-!
-!  You should have received a copy of the GNU Library General Public License
-!  along with this software; if not, write to the Free Software
-!  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -295,8 +289,6 @@
          reaction_is_reverse, reaction_reaclib_lo, reaction_reaclib_hi, reverse_reaction_id
          ! caches for get_reaclib_rate_and_dlnT (in raw_rates.f)
          ! for all of these, 0 means "cache entry not yet set -- don't have the information"
-
-
 
 
       ! for tabular evaluation of the raw reaction rates
@@ -637,7 +629,6 @@
          integer :: rates_reaction_id_max
 
 
-
       ! for mazurek's ni56 electron capture rate interpolation
          real(dp) :: tv(7),rv(6),rfdm(4),rfd0(4),rfd1(4),rfd2(4),tfdm(5),tfd0(5),tfd1(5),tfd2(5)
 
@@ -704,14 +695,12 @@
       end type T_Factors
 
 
-
       ! rate results components
 
       integer, parameter :: i_rate = 1
       integer, parameter :: i_rate_dT = 2
       integer, parameter :: i_rate_dRho = 3
       integer, parameter :: num_rvs = 3
-
 
 
       ! screening
@@ -850,7 +839,6 @@
       type (reaction_data), target :: reaclib_rates
 
       character (len=1000) :: rates_dir, rates_cache_dir, rates_temp_cache_dir
-
 
 
       ! coulomb corrections for weak reactions
@@ -1026,7 +1014,7 @@
                if (ASSOCIATED(weak_reactions_tables(i)%t)) deallocate(weak_reactions_tables(i)%t)
             end do
             deallocate(weak_reactions_tables)
-         endif
+         end if
 
          if (ASSOCIATED(weak_lhs_nuclide_id)) deallocate(weak_lhs_nuclide_id)
          if (ASSOCIATED(weak_rhs_nuclide_id)) deallocate(weak_rhs_nuclide_id)

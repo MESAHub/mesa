@@ -22,7 +22,7 @@
 
       module create_EXCOR7_table
 
-      use const_def
+      use const_def, only: dp
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
@@ -58,7 +58,7 @@
       open(newunit=io_unit,file=trim(fname))
 
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
-      		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
+            'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
 
       write(io_unit,'(2(i10,4x,3(f14.4)),i10)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
@@ -154,7 +154,7 @@
          T2DH=0.d0
          T1DHH=0.d0
          T2DHH=0.d0
-      endif
+      end if
       A0=0.75d0+3.04363d0*THETA2-0.09227d0*THETA3+1.7035d0*THETA4
       A0DH=6.08726d0*THETA-0.27681d0*THETA2+6.814d0*THETA3
       A0DHH=6.08726d0-0.55362d0*THETA+20.442d0*THETA2

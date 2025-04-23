@@ -1,3 +1,21 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
 
 !!% This module contains code to interpolate gravity darkening coefficients.
 !!% The coefficients scale surface-averaged Teff and Luminosity as a function
@@ -76,8 +94,8 @@ contains
           if(j==1) omega_grid(i) = dummy(1)
           C_T(1,i,j) = dummy(3)
           C_L(1,i,j) = dummy(4)
-       enddo
-    enddo
+       end do
+    end do
     close(io)
 
     ! construct interpolant for C_T
@@ -111,7 +129,7 @@ contains
        coeff = coeff_eval(1)
     else
        coeff = 1.0d0
-    endif
+    end if
   end function GD_coeff
 
 
@@ -128,7 +146,4 @@ contains
     L_coeff = GD_coeff(omega,inclination,C_L1)
   end function gravity_darkening_L_coeff
 
-
 end module gravity_darkening
-
-

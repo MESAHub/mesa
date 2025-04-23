@@ -86,7 +86,7 @@
             write(*,'(a)') 'all values are within tolerance'
          else
             write(*,'(a)') 'test failed!'
-         endif
+         end if
 
          call test_suite_after_evolve(s, ierr)
 

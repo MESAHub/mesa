@@ -32,7 +32,7 @@ check_pgstar.py
 ----------------
 
 This script checks that the inlist_pgstar files in the test_suite
-have valid history/profile columns. Note it will have false postives for things only
+have valid history/profile columns. Note it will have false positives for things only
 defined in a run_star_extras.f90 and does not check non inlist_pgstar files
 pgstar sections.
 
@@ -82,13 +82,13 @@ occurs rather than the non-unique stop 1 location.
 check_empty_writes.py
 ---------------------
 
-Checks all .f90 files for writes thats are both empty and unformatted (i.e write (*,*) ) (it also handles if the write is to a unit).
+Checks all .f90 files for writes that are both empty and unformatted (i.e write (*,*) ) (it also handles if the write is to a unit).
 Unformatted writes are non-portable and can cause issues with ifort.
 
 check_omp_critical.py
 ---------------------
 
-Checks all .f90 files for unamed critical blocks. When critical blocks are unnamed they acts as one block
+Checks all .f90 files for unnamed critical blocks. When critical blocks are unnamed they acts as one block
 thus each must be run separately. When critical blocks are named they can each be run in parallel improving performance.
 
 update_columns.py

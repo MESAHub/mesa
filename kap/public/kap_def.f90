@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -636,8 +630,8 @@ contains
              0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, &
              0.04d0, 0.06d0, 0.08d0, 0.100d0 ]
           num_kap_lowT_Xs_for_this_Z(1:num_kap_lowT_Zs(i), i) = [ num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
        end select
     end do
 
@@ -716,14 +710,14 @@ contains
        xstr='bad'
        ierr=-1
        return
-    endif
+    end if
     ierr=0
     write(str,'(f8.6)') X
     k=0
     do i=1,9
        j=index(str,c(i),back=.true.)
        k=max(k,j)
-    enddo
+    end do
     xstr=str(1:max(k,3))
   end subroutine get_output_string
 
@@ -838,6 +832,4 @@ contains
 
   end subroutine do_Free_Kap_Tables
 
-
 end module kap_def
-

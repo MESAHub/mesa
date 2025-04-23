@@ -5,7 +5,7 @@ c  reads model xmod on d/s ids and takes every in-th point
 c
 c  Returns as diagnostics:
 c  nwmod: nwmod = 1 if new model has been set, 0 if no model was set.
-c  icry : icry =  1 for succesful read.
+c  icry : icry =  1 for successful read.
 c         icry = -1 if read or taking subset of points failed.
 c         icry =  2 for attempted interpolation between models
 c                   in sequence, with non-integral xmod

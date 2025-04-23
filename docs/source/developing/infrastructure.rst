@@ -14,8 +14,8 @@ privileges. MESAHub is classified as an educational organization and
 this currently grants us a 100% discount, meaning this costs $0/yr.
 Unsubsidized, it would cost about $1200/yr.
 
-To classify MESAHub as an eduction account requires someone in the MESAHub
-organization to sign up for a eduction plan. This requires that the user has
+To classify MESAHub as an education account requires someone in the MESAHub
+organization to sign up for a education plan. This requires that the user has
 an University ID card with an expiry date (this is important). Steps to get
 access to this:
 
@@ -24,7 +24,7 @@ access to this:
 - It is set up, if you have access to this https://github.com/community/Global-Campus-Teachers repository
 - Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
-If MESAHub gets unsynced from this and is no longer on the eduction plan:
+If MESAHub gets unsynced from this and is no longer on the education plan:
 
 - Goto `Global campus <https://education.github.com/globalcampus/teacher#>`__
 - Find ``Upgrade your academic organizations``
@@ -131,11 +131,11 @@ Community
 ^^^^^^^^^
 
 The `MESA community <https://zenodo.org/communities/mesa/>`__ on Zenodo
-is controlled by Pablo.
+is controlled by Philip.
 
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Pablo.
+* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Philip.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
-* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Pablo.
+* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Philip.

@@ -4,4 +4,3 @@
       ! in new code, you should include standard_run_star_extras.inc
 
       include 'standard_run_star_extras.inc'
-      

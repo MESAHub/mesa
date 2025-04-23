@@ -1,9 +1,36 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2013-2019  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
       module op_eval_mombarg
 
       use const_def, only: dp, pi
-      !use crlibm_lib
 
       implicit none
+
+      private
+      public :: compute_grad
+      public :: compute_grad_fast
+      public :: compute_gamma_grid
+      public :: compute_kappa
+      public :: compute_kappa_fast
+      public :: interpolate_kappa
+      public :: compute_kappa_grid
 
       real(dp), parameter :: log_c = 10.476820702927927d0  !log10_cr(dble(299792458e2)) c = speed of light
       real(dp), parameter :: log10_bohr_radius_sqr = -16.55280d0
@@ -17,7 +44,8 @@
       !!! Compute g_rad for a single cell. (Currently not used.)
       subroutine compute_grad(k, fk, logT_face, logRho_face,l, r,lkap_ross_cell, lgrad_cell, ierr,ite,jne,epatom,amamu,sig,eumesh)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -76,7 +104,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-        enddo
+        end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -110,7 +138,7 @@
       else if (logT_min > logT_face .and. logRho_min > logRho_face) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
       !write(*,*) 'ii, jj min', ii_min, jj_min, logT_min, XC, logRho_min, logRho_cell
 
       offset1 = 0
@@ -137,10 +165,10 @@
                   !write(*,*) ite_i, jne_i, ii, jj, i_grid(ii,jj), ',',logT_grid(ii,jj),&
                   !',', logRho_grid(ii,jj)
                   missing_point(ii,jj) = 0
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
       if (SUM(missing_point) > 0) then
         retry = .true.
         if (SUM(missing_point(2:4,1:3)) == 0) then
@@ -170,9 +198,9 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
 
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
@@ -182,9 +210,9 @@
                     imin, imax, log_amu_mix_cell
         ierr = 1
         return
-      endif
+      end if
       tries = tries + 1
-      enddo
+      end do
       !write(*,*) 'Points for interpolation selected', k
 
       !!! Compute the monochromatic cross-section for the local mixture.
@@ -195,9 +223,9 @@
             ik = i_grid(ii,jj)  !+ 1648*(ke-1)
             do m=1,nptot
               sig_mix_cell(ii,jj,m) = dot_product(fk,sig(:,ik,m))
-            enddo
-          enddo
-      enddo
+            end do
+          end do
+      end do
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
       sig_Ross = 0d0
@@ -207,9 +235,9 @@
            do m=1, nptot-1
                 !sig_Ross(ii,jj) = sig_Ross(ii,jj) + (1/sig_mix_cell(ii,jj,m) + 1/sig_mix_cell(ii,jj,m+1))/2.0d0 * dv
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
-           enddo
-        enddo
-      enddo
+           end do
+        end do
+      end do
 
       lkap_Ross =  log10_bohr_radius_sqr - log_amu_mix_cell - log10(sig_Ross)
 
@@ -217,8 +245,8 @@
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_face,logRho_face)
 
@@ -233,11 +261,11 @@
             gam = 0
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,ik,m)/ sig_mix_cell(ii,jj,m)) +(eumesh(ke,ik,m+1)/ sig_mix_cell(ii,jj,m+1)))
-            enddo
+            end do
            gamma_k(ii,jj,ke) = gam/2.0d0 * dv
-          enddo
-        enddo
-      enddo
+          end do
+        end do
+      end do
 
       deallocate(sig_mix_cell,sig_int)
 
@@ -251,11 +279,11 @@
          do jj = 1, 4
             do ii = 1, 4
                call gaml_interpolators(ke)% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lgamm(ii,jj,ke))
-            enddo
-         enddo
+            end do
+         end do
 
         lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face)  !cell
-      enddo
+      end do
       lgamm_cell(1) = -30.
       lgamm_cell(2) = -30.
       !write(*,*) 'lgamm_cell computed'!, ke, lgamm_cell(ke)
@@ -273,9 +301,11 @@
 
 
       !!! Compute gamma factors and kappa_Ross for all OP mono data points for a given mixture.
-      subroutine compute_gamma_grid(ngp, fk_all,lgamm_pcg, lkap_face_pcg, logT_pcg, logRho_pcg, ierr,ite,jne,epatom,amamu,sig,eumesh)
+      subroutine compute_gamma_grid(ngp, fk_all,lgamm_pcg, lkap_face_pcg, &
+                                    logT_pcg, logRho_pcg, ierr,ite,jne,epatom,amamu,sig,eumesh)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -297,7 +327,7 @@
       integer :: n, ke, nz, id, m, ik, i, j
 
       !real(dp) :: fk_norm_fac !Local fractional abundance per element and normalization factor.
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       !integer ::  eid(nel)
       real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
@@ -323,7 +353,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-        enddo
+        end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -338,8 +368,8 @@
           do i=1,1648
               do m=1,nptot
               sig_mix_cell(i,m) = dot_product(fk,sig(:,i,m))
-              enddo
-          enddo
+              end do
+          end do
 !$OMP END PARALLEL DO
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
@@ -349,8 +379,8 @@
               sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
-              enddo
-        enddo
+              end do
+        end do
 !$OMP END PARALLEL DO
 
 
@@ -364,10 +394,10 @@
             gam = 0d0
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,i,m)/ sig_mix_cell(i,m))+(eumesh(ke,i,m+1)/ sig_mix_cell(i,m+1)))
-            enddo
+            end do
            gamma_k(ke,i) = gam/2.0d0 * dv
-          enddo
-        enddo
+          end do
+        end do
 !$OMP END PARALLEL DO
 
         where (gamma_k < 0.0d0)
@@ -381,7 +411,8 @@
 
 
       !!! Compute g_rad from precomputeds for grid for gamma and kappa_Ross for the entire OP mono data.
-      subroutine compute_grad_fast(k,fk, logT_face, logRho_face, l, r,lgrad_cell, ierr,ite,jne,epatom,amamu,logT_pcg,logRho_pcg,lgamm_pcg,lkap_face_pcg)
+      subroutine compute_grad_fast(k, fk, logT_face, logRho_face, l, r,lgrad_cell, &
+                                   ierr,ite,jne,epatom,amamu,logT_pcg,logRho_pcg,lgamm_pcg,lkap_face_pcg)
 
       use cubic_interpolator, only: interpolator
 
@@ -459,7 +490,7 @@
       else if (logT_min > logT_face .and. logRho_min > logRho_face) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
 
 
       offset1 = 0
@@ -484,10 +515,10 @@
                   i_grid(ii,jj) = i
                   missing_point(ii,jj) = 0
 
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
 
       if (SUM(missing_point) > 0) then
         retry = .true.
@@ -516,9 +547,9 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
        do_difficult_point = .false.
@@ -540,10 +571,10 @@
                   logRho_grid(ii,jj) = logRho(i)
                   i_grid(ii,jj) = i
 
-                endif
-              enddo
-             enddo
-            enddo
+                end if
+              end do
+             end do
+            end do
             retry = .false.
         else
 
@@ -552,28 +583,28 @@
                     missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
-        endif
-      endif
+        end if
+      end if
       tries = tries + 1
-      enddo
+      end do
 
       do jj=1,4
         do ii=1,4
           ik = i_grid(ii,jj)
           do ke=3,nel
             lgamm(ii,jj,ke) = lgamm_pcg(ke,ik)
-          enddo
+          end do
           lkap_Ross(ii,jj) = lkap_face_pcg(ik)
-        enddo
-      enddo
+        end do
+      end do
 
 
       call rossl_interpolator% initialize()
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_face,logRho_face)
 
@@ -582,11 +613,11 @@
          do jj = 1, 4
             do ii = 1, 4
                call gaml_interpolators(ke)% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lgamm(ii,jj,ke))
-            enddo
-         enddo
+            end do
+         end do
 
         lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face)  !cell
-      enddo
+      end do
       lgamm_cell(1) = -30d0
       lgamm_cell(2) = -30d0
 
@@ -600,9 +631,11 @@
 
 
       !!! Compute Rossland opacity and derivatives for a single cell.
-      subroutine compute_kappa(k,fk, logT_cntr, logRho_cntr, lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,ite,jne,epatom,amamu,sig,logT_grid,logRho_grid,lkap_Ross)
+      subroutine compute_kappa(k,fk,logT_cntr,logRho_cntr,lkap_ross_cell, &
+                               dlnkap_rad_dlnT,dlnkap_rad_dlnRho,ierr,ite,jne,epatom,amamu,sig,logT_grid,logRho_grid,lkap_Ross)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -621,7 +654,7 @@
 
       integer :: n, ke, nz, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648), logT(1648)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
       real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
@@ -655,7 +688,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-        enddo
+        end do
 
 
       amu_mix_cell = dot_product(fk,amamu)
@@ -691,7 +724,7 @@
       else if (logT_min > logT_cntr .and. logRho_min > logRho_cntr) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
 
       offset1 = 0
       offset2 = 0
@@ -715,10 +748,10 @@
                   i_grid(ii,jj) = i
 
                   missing_point(ii,jj) = 0
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
 
       if (SUM(missing_point) > 0) then
         retry = .true.
@@ -747,9 +780,9 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
 
 
 
@@ -759,9 +792,9 @@
                     missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
         ierr = 1
         return
-      endif
+      end if
       tries = tries + 1
-      enddo
+      end do
 
 
       !!! Compute the monochromatic cross-section for the local mixture.
@@ -774,9 +807,9 @@
               ik = i_grid(ii,jj)
               do m=1,nptot
                  sig_mix_cell(ii,jj,m) = dot_product(fk,sig(:,ik,m))
-              enddo
-        enddo
-      enddo
+              end do
+        end do
+      end do
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
       sig_Ross = 0d0
@@ -785,9 +818,9 @@
               sig_int = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2.0d0 * dv  !(1:nptot-1) inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
-              enddo
-        enddo
-      enddo
+              end do
+        end do
+      end do
 
       lkap_Ross =  log10_bohr_radius_sqr - log_amu_mix_cell - log10(sig_Ross)
 
@@ -796,8 +829,8 @@
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_cntr,logRho_cntr)
       dlnkap_rad_dlnT = rossl_interpolator% evaluate_deriv(logT_cntr,logRho_cntr, .true., .false.)
@@ -813,7 +846,8 @@
       !!! Compute the Rossland opacity for the entire OP mono data set given a mixture.
       subroutine compute_kappa_grid(fk,lkap_ross_pcg, ierr,ite,jne,epatom,amamu,sig)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use interp_2d_lib_sg
       use cubic_interpolator, only: interpolator
 
@@ -856,7 +890,7 @@
       epa_mix_cell = 0d0
       do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(1:nel,i))
-      enddo
+      end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -871,19 +905,20 @@
           do i=1,1648
               do m=1,nptot
               sig_mix_cell(i,m) = dot_product(fk,sig(:,i,m))
-              enddo
-          enddo
+              end do
+          end do
 !$OMP END PARALLEL DO
 
       !!! Compute the Rossland mean cross-section by integrating over variable v (mesh equally spaced in v).
       sig_Ross = 0
 !$OMP PARALLEL DO PRIVATE(i,m,sig_int) SCHEDULE(guided)
         do i=1,1648
-              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv
+              ! inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
-              enddo
-        enddo
+              end do
+        end do
 !$OMP END PARALLEL DO
 
       deallocate(sig_mix_cell,sig_int)
@@ -897,9 +932,11 @@
 
 
       !!! Routine to compute Rossland opacity from a precomputed grid of the entire OP mono data.
-      subroutine compute_kappa_fast(k,fk, logT_cntr, logRho_cntr,lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,ite,jne,epatom,amamu,sig,lkap_ross_pcg)
+      subroutine compute_kappa_fast(k, fk, logT_cntr, logRho_cntr, lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, &
+                                    ierr,ite,jne,epatom,amamu,sig,lkap_ross_pcg)
         ! OP mono data for: H, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, Cr, Mn, Fe, and Ni.
-      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23,img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
+      use chem_def, only: chem_isos, ih1, ihe3, ihe4, ic12, in14, io16, ine20, ina23, &
+                          img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58
       use cubic_interpolator, only: interpolator
 
       integer, intent(inout) :: ierr
@@ -946,7 +983,7 @@
       epa_mix_cell = 0d0
         do i=imin,imax
           epa_mix_cell(i) = dot_product(fk,epatom(:,i))
-        enddo
+        end do
 
       amu_mix_cell = dot_product(fk,amamu)
 
@@ -982,7 +1019,7 @@
       else if (logT_min > logT_cntr .and. logRho_min > logRho_cntr) then
         ii_min = 3
         jj_min = 3
-      endif
+      end if
 
 
       offset1 = 0
@@ -1007,10 +1044,10 @@
                   i_grid(ii,jj) = i
                   missing_point(ii,jj) = 0
 
-                endif
-              enddo
-            enddo
-      enddo
+                end if
+              end do
+            end do
+      end do
 
       if (SUM(missing_point) > 0) then
         retry = .true.
@@ -1039,10 +1076,10 @@
           else if (ii_min == 3 .and. jj_min == 3) then
             offset1 = offset1 + 2
             offset2 = offset2 - 1
-          endif
+          end if
 
-        endif
-      endif
+        end if
+      end if
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
         do_difficult_point = .false.
@@ -1063,10 +1100,10 @@
                    logT_grid(ii,jj) = logT(i)
                    logRho_grid(ii,jj) = logRho(i)
                    i_grid(ii,jj) = i
-                 endif
-               enddo
-              enddo
-             enddo
+                 end if
+               end do
+              end do
+             end do
              retry = .false.
          else
         write(*,*) 'Cannot find points for interpolation compute_kappa_fast', &
@@ -1075,24 +1112,24 @@
         ierr = 1
         return
         !stop
-        endif
-      endif
+        end if
+      end if
       tries = tries + 1
-      enddo
+      end do
 
       do jj=1,4
         do ii=1,4
           ik = i_grid(ii,jj)
           lkap_Ross(ii,jj) = lkap_ross_pcg(ik)
-        enddo
-      enddo
+        end do
+      end do
 
       call rossl_interpolator% initialize()
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_Ross(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_cntr,logRho_cntr)
       dlnkap_rad_dlnT = rossl_interpolator% evaluate_deriv(logT_cntr, logRho_cntr, .true., .false.)
@@ -1102,7 +1139,8 @@
 
 
       !!! Interpolate Rossland opacity and derivatives from a 4x4 grid computed last time step.
-      subroutine interpolate_kappa(k,logT_cntr, logRho_cntr,lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,logT_grid, logRho_grid, lkap_grid)
+      subroutine interpolate_kappa(k, logT_cntr, logRho_cntr,lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, &
+                                   ierr,logT_grid, logRho_grid, lkap_grid)
 
       use cubic_interpolator, only: interpolator
 
@@ -1122,8 +1160,8 @@
       do jj = 1, 4
          do ii = 1, 4
             call rossl_interpolator% add_point(logT_grid(ii,jj), logRho_grid(ii,jj), lkap_grid(ii,jj))
-         enddo
-      enddo
+         end do
+      end do
 
       lkap_ross_cell  = rossl_interpolator% evaluate(logT_cntr,logRho_cntr)
       dlnkap_rad_dlnT = rossl_interpolator% evaluate_deriv(logT_cntr,logRho_cntr, .true., .false.)

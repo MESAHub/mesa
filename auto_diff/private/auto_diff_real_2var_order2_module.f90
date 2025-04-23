@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module auto_diff_real_2var_order2_module
       use const_def, only: dp, ln10, pi
       use utils_lib
@@ -645,7 +664,8 @@ module auto_diff_real_2var_order2_module
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
       binary%d1val2 = x%d1val2*z_d1x + y%d1val2*z_d1y
       binary%d2val1 = 2.0_dp*q0*y%d1val1 + x%d2val1*z_d1x + y%d2val1*z_d1y + z_d2x*pow2(x%d1val1) + z_d2y*pow2(y%d1val1)
-      binary%d1val1_d1val2 = q0*y%d1val2 + q1*y%d1val1 + x%d1val1*x%d1val2*z_d2x + x%d1val1_d1val2*z_d1x + y%d1val1*y%d1val2*z_d2y + y%d1val1_d1val2*z_d1y
+      binary%d1val1_d1val2 = q0*y%d1val2 + q1*y%d1val1 + x%d1val1*x%d1val2*z_d2x &
+                           + x%d1val1_d1val2*z_d1x + y%d1val1*y%d1val2*z_d2y + y%d1val1_d1val2*z_d1y
       binary%d2val2 = 2.0_dp*q1*y%d1val2 + x%d2val2*z_d1x + y%d2val2*z_d1y + z_d2x*pow2(x%d1val2) + z_d2y*pow2(y%d1val2)
    end function make_binary_operator
 
@@ -1623,7 +1643,8 @@ module auto_diff_real_2var_order2_module
       binary%d1val1 = q0*q4
       binary%d1val2 = q0*q5
       binary%d2val1 = q6*(q7*y%d2val1 + x%val*(2.0_dp*x%d1val1*y%d1val1 + x%d2val1*y%val) - y%val*pow2(x%d1val1) + pow2(q4))
-      binary%d1val1_d1val2 = (-q1*x%d1val2 + q4*q5 + q7*y%d1val1_d1val2 + x%val*(x%d1val1*y%d1val2 + x%d1val1_d1val2*y%val + x%d1val2*y%d1val1))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
+      binary%d1val1_d1val2 = (-q1*x%d1val2 + q4*q5 + q7*y%d1val1_d1val2 + x%val*(x%d1val1*y%d1val2 + x%d1val1_d1val2*y%val &
+                              + x%d1val2*y%d1val1))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
       binary%d2val2 = q6*(q7*y%d2val2 + x%val*(2.0_dp*x%d1val2*y%d1val2 + x%d2val2*y%val) - y%val*pow2(x%d1val2) + pow2(q5))
    end function pow_self
 

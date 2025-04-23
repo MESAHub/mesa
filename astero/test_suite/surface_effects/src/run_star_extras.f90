@@ -203,7 +203,9 @@
          okay = check_okay('a3', x0, target_a3, perfect_tol) .and. okay
 
          do l = 0, 3
-            test_freq(l,1:nl(l)) = model_freq(l,1:nl(l)) + (target_b1*powm1(model_freq(l,1:nl(l)))+target_b3*pow3(model_freq(l,1:nl(l))))/model_inertia(l,1:nl(l))
+            test_freq(l,1:nl(l)) = model_freq(l,1:nl(l)) &
+                                 + (target_b1*powm1(model_freq(l,1:nl(l)))+target_b3*pow3(model_freq(l,1:nl(l)))) &
+                                   / model_inertia(l,1:nl(l))
          end do
 
          call astero_get_combined_all_freq_corr(x0, x1, .false., &
@@ -217,7 +219,9 @@
 
          do l = 1, 3
             do i = 1, nl(l)
-               test_freq(l,i) = model_freq(l,i) + target_p0*pow(model_freq(l,i)/nu_max, target_p1)*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
+               test_freq(l,i) = model_freq(l,i) &
+                              + target_p0*pow(model_freq(l,i)/nu_max, target_p1) &
+                               * astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
             end do
          end do
 
@@ -232,7 +236,9 @@
 
          do l = 1, 3
             do i = 1, nl(l)
-               test_freq(l,i) = model_freq(l,i) + target_s0*nu_max*(1d0-1d0/(1d0+pow(model_freq(l,i)/nu_max, target_s1)))*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
+               test_freq(l,i) = model_freq(l,i) &
+                              + target_s0*nu_max*(1d0-1d0/(1d0+pow(model_freq(l,i)/nu_max, target_s1))) &
+                               * astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
             end do
          end do
 
@@ -346,7 +352,7 @@
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depending on which
-         ! condition was triggered.  MESA provides 9 customizeable
+         ! condition was triggered.  MESA provides 9 customizable
          ! termination codes, named t_xtra1 .. t_xtra9.  You can
          ! customize the messages that will be printed upon exit by
          ! setting the corresponding termination_code_str value.

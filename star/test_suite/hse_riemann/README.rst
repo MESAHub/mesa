@@ -18,7 +18,7 @@ This test case has 1 parts. Click to see a larger version of a plot.
   </video>
 
 
-pgstar commands used for the plots that ake the movie above:
+pgstar commands used for the plots that make the movie above:
 
 
 .. code-block:: console

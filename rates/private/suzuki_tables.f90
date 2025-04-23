@@ -1,6 +1,25 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module suzuki_tables
 
-  use const_def
+  use const_def, only: dp, mesa_data_dir
   use math_lib
   use utils_lib, only: mesa_error, is_bad, set_nan
   use rates_def
@@ -91,7 +110,6 @@ contains
   subroutine interpolate_suzuki_table(table, T9, lYeRho, &
        lambda, dlambda_dlnT, dlambda_dlnRho, &
        Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
-    use const_def, only : dp
     class(suzuki_rate_table), intent(inout) :: table
     real(dp), intent(in) :: T9, lYeRho
     real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
@@ -227,7 +245,7 @@ contains
        Qneu = 0d0
        dQneu_dlnT = 0d0
        dQneu_dlnRho = 0d0
-    endif
+    end if
 
   contains
 

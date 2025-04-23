@@ -13,13 +13,13 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 MTX_SRCS = \
-   mtx_def.f \
-   my_lapack95.f90 \
-   mtx_support.f90 \
-   DGBSVX_wrapper.f90 \
-   pre_conditioners.f90 \
-   bcyclic.f90 \
-   mtx_lib.f90 \
+	mtx_def.f90 \
+	my_lapack95.f90 \
+	mtx_support.f90 \
+	DGBSVX_wrapper.f90 \
+	pre_conditioners.f90 \
+	bcyclic.f90 \
+	mtx_lib.f90 \
 
 #################################################################
 #
@@ -37,7 +37,7 @@ ifneq ($(QUIET),)
 	@$(LIB_TOOL) $@ $(MTX_OBJS)
 else
 	$(LIB_TOOL) $@ $(MTX_OBJS)
-endif 
+endif
 
 clean:
 	-@rm -f *.o *.f90 *.mod *genmod.f90 *.so *.a .depend *.smod
@@ -96,7 +96,6 @@ SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
 
 vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)
-vpath %.F90 $(SRC_PATH)
 vpath %.dek $(SRC_PATH)
 
 vpath %.mod $(MESA_DIR)/include

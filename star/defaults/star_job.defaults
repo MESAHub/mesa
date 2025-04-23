@@ -689,6 +689,8 @@
       ! set hydrogen and helium mass fractions according to the following:
       ! If no h2 in current net, then this will be added to h1.
       ! If no he3 in current net, then this will be added to he4.
+      ! When ``set_uniform_initial_composition = .false.``, defer to
+      ! composition controls in ``star/defaults/controls.defaults``.
 
       ! ::
 

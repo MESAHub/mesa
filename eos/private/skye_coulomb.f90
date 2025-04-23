@@ -1,15 +1,33 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module skye_coulomb
    use math_lib
    use math_def
    use auto_diff
-   use const_def, only: dp, PI, rbohr, qe, amu, me
+   use const_def, only: dp, pi, rbohr, qe, amu, me, boltzm, five_thirds, kerg
    use skye_coulomb_solid
    use skye_coulomb_liquid
 
    implicit none
 
    logical, parameter :: dbg = .false.
-   !logical, parameter :: dbg = .true.
 
    private
 
@@ -65,7 +83,7 @@ module skye_coulomb
          Z53=Z53+AY(IX)*pow(AZION(IX), five_thirds)
          Z52=Z52+AY(IX)*pow5(sqrt(AZion(IX)))
          Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0))
-      enddo
+      end do
 
       DENS = xnefer * pow3(rbohr)  ! DENS = (electrons per cubic bohr)
       RS = pow(3d0 / (4d0 * PI * DENS),1d0/3d0)  ! r_s - electron density parameter
@@ -206,7 +224,8 @@ module skye_coulomb
       ! Inputs
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
-      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, min_gamma_for_solid, max_gamma_for_liquid
+      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, &
+                              min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: temp, GAME, RS
       character(len=128), intent(in) :: Skye_solid_mixing_rule
 
@@ -234,14 +253,14 @@ module skye_coulomb
             dF = dF + AY(i) * f
 
          end if
-      enddo
+      end do
 
       ! Corrections to the linear mixing rule:
       if (LIQSOL == 0) then  ! liquid phase
          FMIX = liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321)
       else  ! solid phase (only Madelung contribution) [22.12.12]
          FMIX = solid_mixing_rule_correction(Skye_solid_mixing_rule, NMIX, AY, AZion, GAME)
-      endif
+      end if
       dF = dF + FMIX
 
    end function nonideal_corrections_phase
@@ -330,7 +349,8 @@ module skye_coulomb
          ! on temp_boundary, which in turn depends on rho. Note that the order of the arguments matters here: above we've
          ! made temperature the first independent variable, so the thing we're substituting for it (temp_boundary) has to be
          ! the first argument here.
-         dF_dlnT = make_binop(temp_boundary, fake_dens, dF_dlnT%val, dF_dlnT%d1val1, dF_dlnT%d1val2, dF_dlnT%d2val1, dF_dlnT%d1val1_d1val2, &
+         dF_dlnT = make_binop(temp_boundary, fake_dens, &
+                     dF_dlnT%val, dF_dlnT%d1val1, dF_dlnT%d1val2, dF_dlnT%d2val1, dF_dlnT%d1val1_d1val2, &
                      dF_dlnT%d2val2, dF_dlnT%d3val1, dF_dlnT%d2val1_d1val2, dF_dlnT%d1val1_d2val2, dF_dlnT%d3val2)
 
          F = make_binop(temp_boundary, fake_dens, F%val, F%d1val1, F%d1val2, F%d2val1, &
@@ -369,7 +389,7 @@ module skye_coulomb
       else
          F = ocp_solid_harmonic_free_energy(GAMI,TPT)  ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT)  ! anharmonic classical and quantum ion-ion corrections
-      endif
+      end if
 
    end function ocp_free_energy
 
@@ -414,7 +434,7 @@ module skye_coulomb
       else
          T1=1.d0
          T2=1.d0
-      endif
+      end if
 
       A0=0.75d0+3.04363d0*THETA2-0.09227d0*THETA3+1.7035d0*THETA4
       A1=1d0+8.31051d0*THETA2+5.1105d0*THETA4

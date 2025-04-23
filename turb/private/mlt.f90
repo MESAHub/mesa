@@ -2,27 +2,20 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
 module MLT
 
@@ -57,17 +50,17 @@ contains
    !! @param D The chemical diffusion coefficient (cm^2/s).
    !! @param mixing_type Set to convective if convection operates (output).
    !! @param ierr Tracks errors (output).
-   subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
-      use const_def
+   subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, &
+                     Henyey_MLT_y_param, chiT, chiRho, Cp, grav, Lambda, rho, &
+                     P, T, opacity, gradr, grada, gradL, Gamma, gradT, Y_face, &
+                     conv_vel, D, mixing_type, max_conv_vel, ierr)
+      use const_def, only: dp, clight, convective_mixing, crad, two_13, four_13, one_third
       use num_lib
       use utils_lib
       use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
-      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
+      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
@@ -75,7 +68,7 @@ contains
       type(auto_diff_real_star_order1) :: &
          Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
-         f, f0, f1, f2, radiative_conductivity, convective_conductivity
+         f, f0, f1, f2, radiative_conductivity, convective_conductivity, csound
       include 'formats'
       if (gradr > gradL) then
          ! Convection zone
@@ -153,6 +146,10 @@ contains
 
          ! average convection velocity   C&G 14.86b
          conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
+
+         ! convective velocity limiter
+         if (conv_vel%val > max_conv_vel) conv_vel%val = max_conv_vel
+
          D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
 
          !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80

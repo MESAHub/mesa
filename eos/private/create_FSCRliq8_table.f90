@@ -22,7 +22,7 @@
 
       module create_FSCRliq8_table
 
-      use const_def
+      use const_def, only: dp
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
@@ -64,7 +64,7 @@
       open(unit=io_unit,file=trim(fname))
 
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
-      		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME', 'Zion'
+            'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME', 'Zion'
 
       write(io_unit,'(2(i10,4x,3(f14.4)),i14)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
@@ -153,7 +153,7 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
+      end if
       SQG=sqrt(GAME)
       SQR=sqrt(RS)
       SQZ1=sqrt(1d0+Zion)

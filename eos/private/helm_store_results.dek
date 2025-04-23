@@ -31,7 +31,7 @@
         helm_res(h_deaz) = denerdaz
         helm_res(h_dezz) = denerdzz
 
-        helm_res(h_stot) = entr 
+        helm_res(h_stot) = entr
         helm_res(h_dst)  = dentrdt
         helm_res(h_dsd)  = dentrdd
         helm_res(h_dsa)  = dentrda
@@ -51,7 +51,7 @@
         helm_res(h_pgas)    = pgas
         helm_res(h_dpgast)  = dpgasdt
         helm_res(h_dpgasd)  = dpgasdd
-        helm_res(h_dpgasa)  = dpgasda   
+        helm_res(h_dpgasa)  = dpgasda
         helm_res(h_dpgasz)  = dpgasdz
         helm_res(h_dpgasdd) = dpgasddd
         helm_res(h_dpgasdt) = dpgasddt
@@ -67,7 +67,7 @@
         helm_res(h_egas)    = egas
         helm_res(h_degast)  = degasdt
         helm_res(h_degasd)  = degasdd
-        helm_res(h_degasa)  = degasda   
+        helm_res(h_degasa)  = degasda
         helm_res(h_degasz)  = degasdz
         helm_res(h_degasdd) = degasddd
         helm_res(h_degasdt) = degasddt
@@ -80,10 +80,10 @@
         helm_res(h_degasaz) = degasdaz
         helm_res(h_degaszz) = degasdzz
 
-        helm_res(h_sgas)    = sgas 
+        helm_res(h_sgas)    = sgas
         helm_res(h_dsgast)  = dsgasdt
         helm_res(h_dsgasd)  = dsgasdd
-        helm_res(h_dsgasa)  = dsgasda        
+        helm_res(h_dsgasa)  = dsgasda
         helm_res(h_dsgasz)  = dsgasdz
         helm_res(h_dsgasdd) = dsgasddd
         helm_res(h_dsgasdt) = dsgasddt
@@ -128,7 +128,7 @@
         helm_res(h_deradaz) = deraddaz
         helm_res(h_deradzz) = deraddzz
 
-        helm_res(h_srad)    = srad 
+        helm_res(h_srad)    = srad
         helm_res(h_dsradt)  = dsraddt
         helm_res(h_dsradd)  = dsraddd
         helm_res(h_dsrada)  = dsradda
@@ -176,7 +176,7 @@
         helm_res(h_deionaz) = deiondaz
         helm_res(h_deionzz) = deiondz
 
-        helm_res(h_sion)   = sion 
+        helm_res(h_sion)   = sion
         helm_res(h_dsiont) = dsiondt
         helm_res(h_dsiond) = dsiondd
         helm_res(h_dsiona) = dsionda
@@ -258,11 +258,11 @@
         helm_res(h_deepaz) = deepdaz
         helm_res(h_deepzz) = deepdzz
 
-        helm_res(h_sele)   = sele 
+        helm_res(h_sele)   = sele
         helm_res(h_spos)   = 0.0d0
-        helm_res(h_dsept)  = dsepdt 
-        helm_res(h_dsepd)  = dsepdd 
-        helm_res(h_dsepa)  = dsepda 
+        helm_res(h_dsept)  = dsepdt
+        helm_res(h_dsepd)  = dsepdd
+        helm_res(h_dsepa)  = dsepda
         helm_res(h_dsepz)  = dsepdz
         helm_res(h_dsepdd) = dsepddd
         helm_res(h_dsepdt) = dsepddt
@@ -279,20 +279,20 @@
         helm_res(h_xnem)   = xne
         helm_res(h_xne)    = xnefer
         helm_res(h_xnp)    = 0.0d0
-        helm_res(h_dxnet)  = dxnedt 
-        helm_res(h_dxned)  = dxnedd 
-        helm_res(h_dxnea)  = dxneda 
-        helm_res(h_dxnez)  = dxnedz 
-        helm_res(h_dxnedd) = dxneddd 
-        helm_res(h_dxnedt) = dxneddt 
-        helm_res(h_dxneda) = dxnedda 
-        helm_res(h_dxnedz) = dxneddz 
-        helm_res(h_dxnett) = dxnedtt 
-        helm_res(h_dxneta) = dxnedta 
-        helm_res(h_dxnetz) = dxnedtz 
-        helm_res(h_dxneaa) = dxnedaa 
-        helm_res(h_dxneaz) = dxnedaz 
-        helm_res(h_dxnezz) = dxnedzz 
+        helm_res(h_dxnet)  = dxnedt
+        helm_res(h_dxned)  = dxnedd
+        helm_res(h_dxnea)  = dxneda
+        helm_res(h_dxnez)  = dxnedz
+        helm_res(h_dxnedd) = dxneddd
+        helm_res(h_dxnedt) = dxneddt
+        helm_res(h_dxneda) = dxnedda
+        helm_res(h_dxnedz) = dxneddz
+        helm_res(h_dxnett) = dxnedtt
+        helm_res(h_dxneta) = dxnedta
+        helm_res(h_dxnetz) = dxnedtz
+        helm_res(h_dxneaa) = dxnedaa
+        helm_res(h_dxneaz) = dxnedaz
+        helm_res(h_dxnezz) = dxnedzz
 
         helm_res(h_etaele) = etaele
         helm_res(h_detat)  = detadt
@@ -431,7 +431,7 @@
         helm_res(h_dchiddt) = dchiddt
         helm_res(h_dchidda) = dchidda
         helm_res(h_dchiddz) = dchiddz
-        
+
         helm_res(h_pip) = 0
         helm_res(h_eip) = 0
         helm_res(h_sip) = 0

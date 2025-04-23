@@ -2,45 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pulse_fgong
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, rsun, four_thirds, no_mixing, standard_cgrav
   use utils_lib
   use chem_def
   use atm_def
   use eos_def, only: i_Gamma1, i_lnPgas, i_chiRho, i_chiT
   use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
-
   use atm_support
   use eos_support
-
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
@@ -50,10 +38,7 @@ module pulse_fgong
   integer, parameter :: ICONST = 15
   integer, parameter :: IVAR = 40
 
-  ! Access specifiers
-
   private
-
   public :: get_fgong_data
   public :: write_fgong_data
 
@@ -167,13 +152,13 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Store global data
 
@@ -196,7 +181,7 @@ contains
        rho_c = eval_center_rho(s, k_b(n_sg))
     else
        rho_c = eval_center(s%rmid, s%rho, k_a(n_sg), k_b(n_sg))
-    endif
+    end if
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
@@ -240,7 +225,7 @@ contains
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -259,8 +244,6 @@ contains
 
     deallocate(dres_dxa)
     deallocate(xa)
-
-    ! Finish
 
     return
 
@@ -391,13 +374,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
 
@@ -524,13 +504,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j, k_a, k_b)
 
@@ -649,15 +626,12 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_ctr
 
   end subroutine get_fgong_data
 
-  !****
 
   subroutine write_fgong_data (id, filename, global_data, point_data, ierr)
 
@@ -728,8 +702,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

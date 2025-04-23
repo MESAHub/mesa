@@ -2,53 +2,37 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pulse_cafein
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, pi4, crad, clight, msun, rsun, cgas
   use utils_lib
   use atm_def
   use atm_support
-
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
-  ! Parameters
-
-  integer, parameter :: NCOL = 35
-
-  ! Access specifiers
-
   private
-
   public :: get_cafein_data
   public :: write_cafein_data
+
+  integer, parameter :: NCOL = 35
 
 contains
 
@@ -112,13 +96,13 @@ contains
        nn_env = n_env
     else
        nn_env = n_env - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Store global data
 
@@ -285,8 +269,6 @@ contains
        deallocate(s%atm_structure)
     end if
 
-    ! Finish
-
     return
 
   contains
@@ -389,13 +371,11 @@ contains
 
       end associate
 
-      ! Finish
 
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k)
 
@@ -488,7 +468,7 @@ contains
         else
            eps_rho = 0d0
            eps_T = 0d0
-        endif
+        end if
         eps_ad = nabla_ad*eps_T + eps_rho/Gamma_1
         eps_S = eps_T - delta*eps_rho
 
@@ -511,13 +491,11 @@ contains
 
       end associate
 
-      ! Finish
 
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j)
 
@@ -606,7 +584,7 @@ contains
         else
            eps_rho = 0d0
            eps_T = 0d0
-        endif
+        end if
         eps_ad = nabla_ad*eps_T + eps_rho/Gamma_1
         eps_S = eps_T - delta*eps_rho
 
@@ -631,13 +609,11 @@ contains
 
       end associate
 
-      ! Finish
 
       return
 
     end subroutine store_point_data_ctr
 
-    !****
 
     function log_deriv (x, y, dy_a, dy_b) result (dy)
 
@@ -659,7 +635,7 @@ contains
          dy(1) = dy_a
       else
          dy(1) = x(1)/y(1) * (y(2) - y(1))/(x(2) - x(1))
-      endif
+      end if
 
       do j = 2, n-1
          dy(j) = x(j)/y(j) * (y(j+1) - y(j-1))/(x(j+1) - x(j-1))
@@ -669,9 +645,7 @@ contains
          dy(n) = dy_b
       else
          dy(n) = x(n)/y(n) * (y(n) - y(n-1))/(x(n) - x(n-1))
-      endif
-
-      ! Finish
+      end if
 
       return
 
@@ -679,7 +653,6 @@ contains
 
   end subroutine get_cafein_data
 
-  !****
 
   subroutine write_cafein_data (id, filename, global_data, point_data, ierr)
 
@@ -738,13 +711,9 @@ contains
 120    format(35(1X,E24.14E3))
     end do
 
-    ! Finish
-
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

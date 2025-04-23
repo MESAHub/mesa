@@ -4,7 +4,7 @@ Run the preprocessor by using one of the rn* scripts.
 Typically, you'll just want to rebuilt everything -- use the ./rebuild_all script for that.
 For testing, you can edit the rn_test script to do a single kap file.
 
-The preprocessor is controlled by inlists.   
+The preprocessor is controlled by inlists.
 At the time of writing (Oct, 2013) we use the following inlists:
 
    inlist_OP_a05+Ne
@@ -37,7 +37,7 @@ At the time of writing (Oct, 2013) we use the following inlists:
    inlist_lowT_fa05_gs98_aFe_p8
 
 The inlists give information about the location of the input data,
-and the specifications for the output.  
+and the specifications for the output.
 For example, here's the contents of inlist_OP_a09:
 
       data_dir = 'kap_input_data/OP'
@@ -55,25 +55,25 @@ For example, here's the contents of inlist_OP_a09:
 Each of these inlists appears in the rebuild_add script in a line like this:
 
    do_one inlist_OP_a09
-   
+
 The input data lives in a subdirectory of the kap/preprocessor/kap_input_data directory.
 The 'data_dir' entry in the inlist gives the path, and the 'type1_table' entry gives the filename.
 So the input data for OP_a09 is in the file kap_input_data/OP/A09.OP17.
 The kap_input_data is distributed in the mesa download as a tar.xz file.
 If you add to the kap_input_data files, rerun the build_kap_input_tar script.
 
-To add a new set of opacity tables, 
+To add a new set of opacity tables,
 put the input data files in the right subdirectory in kap_input_data,
-create a new inlist, and 
+create a new inlist, and
 a line for the inlist to the rebuild_all script,
 then run ./rebuild_all
 
 At the end of rebuild_all, it will tell you to run ./build_4_export
 Do that -- it will create kap_data.tar.xz
 
-At the end of build_4_export, it will tell you to do 
+At the end of build_4_export, it will tell you to do
    cd .. ; ./build_data_and_export
-   
+
 Do that -- it will unpack and install the new mesa kap tables.
 
 Now check the new data by making plots.
@@ -94,7 +94,7 @@ and here's an example for Type2 where you need to give zbase, xc, and xo.
    xh =    2.8d-2
    xc =    2d-3
    xo =    3.56d-3
-   
+
 Set the bounds for the plot like this:
    logT_max = 10.2d0
    logT_min = 1.7d0
@@ -122,6 +122,3 @@ I make plots from that data using the tioga script kap/test/kap.rb
 You can edit the "logK_with_contours" in that to set the range for the colormap.
         z_lower = -6.7
         z_upper = 9
-
-
-

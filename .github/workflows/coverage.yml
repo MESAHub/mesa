@@ -1,0 +1,81 @@
+---
+name: Code Coverage
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  run-code-coverage:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name : Install lcov
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install lcov
+        shell: bash
+
+      - name: Tweak makefile script to link gcov
+        run: |
+          cd $GITHUB_WORKSPACE
+          sed -i 's/FC = gfortran/FC = gfortran -fprofile-arcs -ftest-coverage -lgcov --coverage/' utils/makefile_header
+        shell: bash
+
+      - name: Install MESA on ${{ runner.os }} with SDK 24.7.1
+        uses: ./.github/actions/install-mesa
+        with:
+          sdk: "24.7.1"
+
+      - name: Run gcov
+        run: |
+          gcov */*/*.gcno */*/*/*.gcno 
+        shell: bash
+
+      - name: Generate html with lcov
+        run: |
+          lcov --gcov-tool gcov --ignore-errors negative,inconsistent,mismatch --capture --directory . --output-file coverage.info
+          genhtml --ignore-errors empty,source --synthesize-missing --output-directory .htmlcov coverage.info
+        shell: bash
+
+      - name: Extract coverage percentage
+        id: extract
+        run: |
+          echo "coverage=$(awk -F'[<>]' '/headerCovTableEntryLo/{gsub("&nbsp;", ""); print $3}' .htmlcov/index.html | tail -n 1)" >> $GITHUB_OUTPUT
+        shell: bash
+        env:
+          GITHUB_ENV: ${{ github.env }}
+
+      - name: Make coverage badge
+        uses: RubbaBoy/BYOB@v1.3.0
+        with:
+          NAME: coverage
+          LABEL: 'coverage'
+          STATUS: ${{ steps.extract.outputs.coverage }}
+          COLOR: green
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save the html folder as an artifact
+        uses: actions/upload-pages-artifact@v3
+        with: 
+          path: './.htmlcov/'
+      
+      - name: Deploy to Github Pages
+        uses: actions/deploy-pages@v4
+        id: deployment

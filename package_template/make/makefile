@@ -20,7 +20,7 @@ SRCS = pkg_mod.f90 \
 
 LIB = libpkg.$(LIB_SUFFIX)
 ifeq ($(USE_SHARED), YES)
-    LIB_DEPENDS = 
+    LIB_DEPENDS =
 endif
 LIB_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
 $(LIB) : $(LIB_OBJS)

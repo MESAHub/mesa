@@ -20,17 +20,15 @@
 !
 ! ***********************************************************************
 
-
       module adipls_support
 
       use astero_def
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, i8
       use utils_lib
 
       implicit none
-
 
       ! args for adipls
       integer :: i_paramset, ierr_param, i_inout, nn
@@ -52,7 +50,6 @@
       logical, parameter :: ADIPLS_IS_ENABLED = .false.
 
       contains
-
 
       ! this can be called from user run_star_extras check model routine
       subroutine do_adipls_get_one_el_info( &
@@ -136,7 +133,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, nn_arg_0
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder
@@ -267,8 +264,6 @@
 
       subroutine show_adipls_results
          integer :: k
-
       end subroutine show_adipls_results
-
 
       end module adipls_support

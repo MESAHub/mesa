@@ -107,7 +107,7 @@
          else
             write(*,*) 'Test passed: mass_conv_core within specified range'
             write(*,*) 'mass_conv_core', mass_conv_core
-         endif
+         end if
 
          call test_suite_after_evolve(s, ierr)
 

@@ -1367,11 +1367,6 @@
          end if
 
 
-
-
-
-
-
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
 
@@ -1503,4 +1498,3 @@
       end function extras_finish_step
 
       end module run_star_extras
-

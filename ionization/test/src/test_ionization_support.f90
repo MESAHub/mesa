@@ -3,7 +3,7 @@ module test_ionization_support
    use ionization_lib
    use chem_def
    use chem_lib, only: chem_init
-   use const_lib
+   use const_lib, only: const_init
    use math_lib
    use utils_lib, only: mesa_error
 
@@ -135,7 +135,6 @@ contains
    end subroutine do_test_eval_ionization
 
    subroutine Build_Plots
-      use const_lib
       use utils_lib, only: mkdir
       character(len=256) :: data_dir, dir
 

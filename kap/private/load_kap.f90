@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -35,16 +29,16 @@ module load_kap
 
   implicit none
 
+  private
+  public :: load_one
+  public :: setup_kap_tables
 
   logical, parameter :: dbg = .false.
-
   logical, parameter :: dbg_cache = .false.
 
 contains
 
-
-  subroutine Setup_Kap_Tables(rq, &
-       use_cache, load_on_demand, ierr)
+  subroutine setup_kap_tables(rq, use_cache, load_on_demand, ierr)
     use const_def, only: mesa_data_dir
     use condint, only: init_potekhin
     type (Kap_General_Info), pointer :: rq
@@ -182,7 +176,7 @@ contains
     end subroutine setup_lowT
 
 
-  end subroutine Setup_Kap_Tables
+  end subroutine setup_kap_tables
 
 
   subroutine load_one(rq, &
@@ -301,7 +295,7 @@ contains
        write(*,'(A)')
        write(*,'(A)')
        write(*,'(A)')
-       write(*,*) 'NOTICE: you need to install a new verion of the kap data.'
+       write(*,*) 'NOTICE: you need to install a new version of the kap data.'
        write(*,*) 'Please remove the directory mesa/data/kap_data,'
        write(*,*) 'and rerun the mesa ./install script.'
        write(*,'(A)')
@@ -768,6 +762,4 @@ contains
          trim(prefix) // '_z' // trim(zstr) // '_x' // trim(xstr) // '.bin'
   end subroutine create_fname
 
-
 end module load_kap
-

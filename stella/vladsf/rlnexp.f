@@ -120,7 +120,7 @@ c  in zone NR for element IZ, IONDENZ(NR,1,IZ) contains the IONSTG1(NR,IZ)th
 c  ionization stage, IONDENZ(NR,2,IZ) contains the (IONSTG1(NR,IZ)+1)th 
 c  ionization stage, etc. 
  
-c (integer) NR1 and NR2 are the indecies of the first and second zone over which 
+c (integer) NR1 and NR2 are the indices of the first and second zone over which 
 c  to compute the opacity. 
  
       character*80  linelist, longlist 
@@ -221,7 +221,7 @@ c Local variables
  
 c QENCHFAC is the electron quenching correction factor computed by 
 c L. Anderson, ApJ. 399, p558, 1989. I have rescaled Anderson's values  
-c so as to be mulitiplied by 2 * H * FREQ(NF)**2 / C**2, with everything  
+c so as to be multiplied by 2 * H * FREQ(NF)**2 / C**2, with everything  
 c in cgs units. 
       data quench_fac/2.9d+17, 3.4d+16/ 
  
@@ -440,9 +440,9 @@ c        ----
       end if 
 c          <- if (mkshtlst) 
  
-c Allocate seperate space for temporary storage of scattering opacity.  
-c Scattering opacity is computed by spacial zone, but will be transfered 
-c to arrays where it is stored by frequency and then spacial zone. The 
+c Allocate separate space for temporary storage of scattering opacity.  
+c Scattering opacity is computed by spatial zone, but will be transferred 
+c to arrays where it is stored by frequency and then spatial zone. The 
 c same holds for absorptive opacity and emissivity, below. 
           call mzalloc('ptrlscat ', ptrlscat, 8  * nwave * nradii) 
           call mzalloc('ptrlopac ', ptrlopac, 8  * nwave * nradii) 

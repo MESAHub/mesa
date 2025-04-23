@@ -6,7 +6,7 @@
         dxnidd  = avo * ytot1
         dxnidt  = 0.0d0
         dxnida  = -xni * ytot1
-        dxnidz  = 0.0d0 
+        dxnidz  = 0.0d0
 
 !..second derivatives
         dxniddd = 0.0d0
@@ -25,9 +25,9 @@
         pion    = max(xni * kt, 1d-99)
 
 !..first derivatives
-        dpiondd = dxnidd * kt 
-        dpiondt = xni * kerg 
-        dpionda = -pion * ytot1 
+        dpiondd = dxnidd * kt
+        dpiondt = xni * kerg
+        dpionda = -pion * ytot1
         dpiondz = 0.0d0
 
 !..second derivatives
@@ -43,7 +43,6 @@
         dpiondzz = 0.0d0
 
 
-
 !..energy in erg/gr
         y       = 1.5d0 * deninv
         eion    = y * pion
@@ -57,8 +56,8 @@
 !..second derivatives
         deionddd = 0.0d0
         deionddt = 0.0d0
-        deiondda = y * dpiondda - deionda*deninv 
-        deionddz = y * dpionddz - deiondz*deninv 
+        deiondda = y * dpiondda - deionda*deninv
+        deionddz = y * dpionddz - deiondz*deninv
         deiondtt = y * dpiondtt
         deiondta = y * dpiondta
         deiondtz = y * dpiondtz
@@ -78,7 +77,7 @@
         detaidd = dxnidd*xx
         detaidt = dxnidt*xx - 1.5d0*tempinv
         detaida = dxnida*xx - 1.5d0*ytot1
-        detaidz = dxnidz*xx 
+        detaidz = dxnidz*xx
 
 !..second derivatives
         detaiddd = (dxniddd - dxnidd*dxnidd*xx)*xx
@@ -95,7 +94,7 @@
 
 
 !..entropy in erg/gr/kelvin
-!..the last term is the usual  etaion * kerg * xni/den 
+!..the last term is the usual  etaion * kerg * xni/den
 !..sometimes called the sacker-tetrode equation
 
         y        = kergavo * ytot1
@@ -143,18 +142,18 @@
         dsiondzz = 0.0d0
 
 ! keep sion > 0
-      
+
       if (sion < sion0) then ! exponential rolloff to zero
          sionfactor = 1d0-sion/sion0
          sionfactor = exp(-sionfactor*sionfactor)
          if (sionfactor < 1d-20) sionfactor = 1d-20
          sion_new = sion0*sionfactor
-         
+
          dsionfactord = dsiondd / sion0
          dsionfactort = dsiondt / sion0
          dsionfactora = dsionda / sion0
          dsionfactorz = dsiondz / sion0
-         
+
          dsiondd_new = sionfactor * 2 * (1 - sion/sion0) * dsiondd
          dsionddd_new = &
                dsionfactord * 2 * (1 - sion/sion0) * dsiondd + &

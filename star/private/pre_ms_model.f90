@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pre_ms_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, ln10, clight, standard_cgrav, crad, lsun, msun, rsun, one_third, two_thirds, four_thirds_pi
 
       implicit none
 
@@ -36,7 +30,6 @@
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine build_pre_ms_model(id, s, nvar_hydro, species, ierr)
          use chem_def
@@ -242,11 +235,13 @@
 
          mstar1 = rpar(1)
 
+! these pointers are set, but none of these vars are set.
          xh => s% xh
          q => s% q
          dq => s% dq
          nz = s% nz
 
+! this debug statement will cause a backtrace because the above vars are not set.
          if (dbg) then
             write(*,'(A)')
             write(*,*) 'finished pre-MS model'
@@ -740,6 +735,4 @@
 
       end subroutine eval_gradT
 
-
       end module pre_ms_model
-

@@ -2,49 +2,31 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module micro
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, i8, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
   use star_utils, only: foreach_cell
   use utils_lib, only: is_bad
 
-  ! No implicit typing
-
   implicit none
 
-  ! Parameters
-
-  logical, parameter :: dbg = .false.
-
-
-  ! Access specifiers
-
   private
-
   public :: set_micro_vars
   public :: set_eos_with_mask
   public :: do_eos_for_cell
@@ -52,6 +34,7 @@ module micro
   public :: do_kap_for_cell
   public :: shutdown_microphys
 
+  logical, parameter :: dbg = .false.
   logical :: initiaze_kap_grid = .true.
   real(dp), public, save :: fk_pcg_old(17)
 
@@ -74,7 +57,7 @@ contains
     integer, intent(out) :: ierr
 
     integer :: k, op_err, i
-    integer(8) :: time0
+    integer(i8) :: time0
     real(dp) :: total, alfa, beta
     character(len=4) :: e_name
     real(dp) :: fk(17), delta
@@ -123,7 +106,7 @@ contains
        if (.not. skip_kap .and. s% op_mono_method == 'hu') then
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
-       endif
+       end if
        if (.not. skip_kap .and. s% op_mono_method == 'mombarg' .and. &
             s% high_logT_op_mono_full_on - s% low_logT_op_mono_full_on > 0  ) then
           fk = 0
@@ -163,8 +146,8 @@ contains
              call call_compute_kappa_grid_mombarg(fk, ierr)
              !write(*,*) 'Finished computing grid for core mixture.'
              fk_pcg_old = fk
-          endif
-       endif
+          end if
+       end if
 
        if (s% use_other_opacity_factor) then
           call s% other_opacity_factor(s% id, ierr)
@@ -254,7 +237,6 @@ contains
 
   end subroutine set_micro_vars
 
-  !****
 
   subroutine do_eos(s,nzlo,nzhi,ierr)
 
@@ -272,7 +254,6 @@ contains
 
   end subroutine do_eos
 
-  !****
 
   subroutine set_eos_with_mask (s,nzlo,nzhi,mask,ierr)
 
@@ -295,7 +276,7 @@ contains
           lerr(k) = ierr /= 0
        else
           lerr(k) = .FALSE.
-       endif
+       end if
     end do
     !$OMP END PARALLEL DO
 
@@ -303,15 +284,13 @@ contains
        ierr = 1
     else
        ierr = 0
-    endif
+    end if
 
   end subroutine set_eos_with_mask
 
-  !****
 
   subroutine do_eos_for_cell(s,k,ierr)
 
-    use const_def
     use chem_def
     use chem_lib
     use eos_def
@@ -433,7 +412,6 @@ contains
 
   end subroutine do_eos_for_cell
 
-  !****
 
   subroutine store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -566,11 +544,9 @@ contains
 
   end subroutine store_eos_for_cell
 
-  !****
 
   subroutine do_kap_for_cell(s,k,ierr)
 
-    use const_def,only:ln10
     use net_def,only:net_general_info
     use rates_def, only:i_rate
     use chem_def
@@ -665,6 +641,12 @@ contains
 
     if (s% opacity(k) > s% opacity_max .and. s% opacity_max > 0) then
        s% opacity(k) = s% opacity_max
+       s% d_opacity_dlnd(k) = 0
+       s% d_opacity_dlnT(k) = 0
+    end if
+
+    if (s% opacity(k) < s% opacity_min .and. s% opacity_min > 0) then
+       s% opacity(k) = s% opacity_min
        s% d_opacity_dlnd(k) = 0
        s% d_opacity_dlnT(k) = 0
     end if
@@ -771,7 +753,6 @@ contains
 
   end subroutine do_kap_for_cell
 
-  !****
 
   subroutine shutdown_microphys
     use eos_lib, only: eos_shutdown
@@ -781,6 +762,5 @@ contains
     call kap_shutdown
     call net_shutdown
   end subroutine shutdown_microphys
-
 
 end module micro

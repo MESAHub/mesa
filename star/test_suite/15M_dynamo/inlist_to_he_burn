@@ -1,9 +1,9 @@
 
-! inlist_to_he_burn - stops when reach power_he_burn_upper_limit 
+! inlist_to_he_burn - stops when reach power_he_burn_upper_limit
 
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       load_model_filename = 'zams.mod'
@@ -15,15 +15,15 @@
 
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
-               
+
       change_initial_v_flag = .true.
       new_v_flag = .true.
-               
+
       change_rotation_flag = .true.
       new_rotation_flag = .true.
-      
+
       set_initial_surface_rotation_v = .true.
-      new_surface_rotation_v = 200 ! km/sec   << saved model is rotating 
+      new_surface_rotation_v = 200 ! km/sec   << saved model is rotating
 
       set_initial_model_number = .true.
       initial_model_number = 0

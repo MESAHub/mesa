@@ -14,13 +14,17 @@
 !!   SOURCE
 !******************************************************************************
 module nag_sub
- use kinds,                           only: dp, sp
-  use termination,            only:   stop_program, stop_memory
+   use kinds, only: dp, sp
+   use termination, only: stop_program, stop_memory
 #include "cp_common_uses.h"
 
-  implicit none
-  private
-     character(len=*), parameter, private :: mdl_name = 'lnag_sub'   public :: nag_d01gaf contains
+   implicit none
+   character(len=*), parameter :: mdl_name = 'lnag_sub'
+
+   public :: nag_d01gaf
+   private :: mdl_name
+
+contains
 
 !!******
 !!
@@ -43,22 +47,25 @@ module nag_sub
 !!       -!!   SOURCE
 !!
 !!*** **********************************************************************
-  subroutine nag_d01gaf (X,y,N,ans,err)
-    real (kind=dp), dimension(:), intent(in)   :: X    real (kind=dp), dimension(:), intent(in)   ::  y    integer, intent(in) :: N    real (kind=dp), intent(out)  :: ans, err
-    character(len=*), parameter ::  subrtn_name = 'd01gaf' &
-                                       , fullPathSubrtn = mdl_name//'.'//subrtn_name
-    integer  ::  ifail
+   subroutine nag_d01gaf(X, y, N, ans, err)
+      real(kind=dp), dimension(:), intent(in) :: X
+      real(kind=dp), dimension(:), intent(in) ::  y
+      integer, intent(in) :: N
+      real(kind=dp), intent(out) :: ans, err
+      character(len=*), parameter :: subrtn_name = 'd01gaf'
+      character(len=*), parameter :: fullPathSubrtn = mdl_name//'.'//subrtn_name
+      integer :: ifail
 
-    call d01gaf(X,y,N,ans,err,ifail)
-    if(ifail > 0)  then
-        if (ifail==1) then
-            call stop_program(subrtn_name,mdl_name,__LINE__, 'less than 4 points supplied');
-        else if (ifail==2) then
-            call stop_program(subrtn_name,mdl_name,__LINE__, 'points not in increasing or decreasing order');
-        else if (ifail==3) then
-            call stop_program(subrtn_name,mdl_name,__LINE__, 'points not all distinct');
-        end if
-    endif
-  end subroutine nag_d01gaf
+      call d01gaf(X, y, N, ans, err, ifail)
+      if (ifail > 0) then
+         if (ifail == 1) then
+            call stop_program(subrtn_name, mdl_name, __LINE__, 'less than 4 points supplied')
+         else if (ifail == 2) then
+            call stop_program(subrtn_name, mdl_name, __LINE__, 'points not in increasing or decreasing order')
+         else if (ifail == 3) then
+            call stop_program(subrtn_name, mdl_name, __LINE__, 'points not all distinct')
+         end if
+      end if
+   end subroutine nag_d01gaf
 
 end module nag_sub

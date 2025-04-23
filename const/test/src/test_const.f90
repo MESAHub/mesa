@@ -1,6 +1,8 @@
 program test_const
+
    use const_def
-   use const_lib
+   use const_lib, only: const_init
+
    implicit none
 
    integer :: ierr
@@ -28,7 +30,6 @@ contains
       write (*, fmt=fmt1) 'boltz_sigma*4/clight', boltz_sigma*4/clight
       write (*, fmt=fmt1) 'boltz_sigma/clight', boltz_sigma/clight
       write (*, fmt=fmt1) 'crad', crad
-
       write (*, fmt=fmt1) 'secyer', secyer
       write (*, fmt=fmt1) 'Msun', Msun
       write (*, fmt=fmt1) 'Rsun', Rsun
@@ -49,4 +50,3 @@ contains
    end subroutine do_test_const
 
 end program test_const
-

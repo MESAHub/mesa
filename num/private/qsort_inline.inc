@@ -1,7 +1,5 @@
-      
-      
-         ! http://fortranwiki.org/fortran/show/qsort_inline
 
+         ! http://fortranwiki.org/fortran/show/qsort_inline
 
 
          !======================================================================
@@ -54,20 +52,20 @@
          !   the benefit is in blocks of 8 or less, and values of 16 to 128
          !   are generally about equal speed. However, the optimal value
          !   depends a lot on the hardware and the data being sorted, so this
-         !   is left as a tunable parameter for cases where ther is an
+         !   is left as a tunable parameter for cases where there is an
          !   effect on performance.
          !
          !---------------------------------------------------------------------
          ! NOTES:
          ! The procedure uses a optimized combination of QSORT and INSERTION
-         ! sorting. The algorithm is based on code used in GLIBC. 
+         ! sorting. The algorithm is based on code used in GLIBC.
          ! A stack is used in place of recursive calls. The stack size must
          ! be at least as big as the number of bits in the largest array index.
          !
          ! Sorting vectors of a multidimensional allocatable array can be
          ! VERY slow. In this case, or with large derived types, it is better
          ! to sort a simple derived type of key/index pairs, then reorder
-         ! tha actual data using the sorted indices.
+         ! the actual data using the sorted indices.
          !
          !---------------------------------------------------------------------
            integer :: stack_top, right_size, left_size
@@ -75,10 +73,10 @@
 
          ! A stack of 32 can handle the entire extent of a 32-bit
          ! index, so this value is fixed. If you have 64-bit indexed
-         ! arrays, which might contain more thant 2^32 elements, this
+         ! arrays, which might contain more than 2^32 elements, this
          ! should be set to 64.
            integer, parameter :: QSORT_STACK_SIZE = 32, QSORT_THRESHOLD = 10
-           type qsort_stack; integer :: low, high; end type
+           type qsort_stack; integer :: low, high; end type qsort_stack
            type(qsort_stack) :: stack(QSORT_STACK_SIZE)
 
            call init()

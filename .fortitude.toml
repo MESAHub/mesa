@@ -1,0 +1,3 @@
+[check]
+ignore = ["C003","C061","C071","C072","C092","C121","C131","OB011","PORT011"]
+line-length = 132

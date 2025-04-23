@@ -24,14 +24,13 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, secyer
       use utils_lib
       use astero_support
       use astero_def
       use astero_def
 
       implicit none
-
 
       contains
 
@@ -875,7 +874,8 @@
 
          write(format_string,'( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
          write(num_string,format_string) num
-         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) // trim(num_string) // trim(sample_results_postfix)
+         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) &
+                    // trim(num_string) // trim(sample_results_postfix)
          open(unit=iounit, file=trim(filename), action='write', status='replace', iostat=ierr)
          if (ierr == 0) then
             call show_best(iounit)
@@ -1237,7 +1237,5 @@
          end subroutine move_flg
 
       end subroutine move_extra_info
-
-
 
       end module extras_support

@@ -2,44 +2,29 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_utils
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, pi, boltz_sigma, ln10, clight, crad
   use math_lib
-
-  ! No implicit typing
 
   implicit none
 
-  ! Parameter definitions
-
   integer, parameter :: E2_NPAIRS = 571
-
-  ! Module variables
 
   real(dp), target, save  :: E2_x(E2_NPAIRS)
   real(dp), save          :: E2_pairs(2*E2_NPAIRS)
@@ -47,17 +32,12 @@ module atm_utils
   real(dp), pointer, save :: E2_f1(:), E2_f(:,:)
   logical, save           :: have_E2_interpolant = .false.
 
-  ! Access specifiers
-
   private
-
   public :: init
   public :: shutdown
   public :: eval_Teff_g
   public :: eval_Paczynski_gradr
   public :: eval_E2
-
-  ! Procedures
 
 contains
 
@@ -79,7 +59,6 @@ contains
 
   end subroutine init
 
-  !****
 
   subroutine shutdown()
 
@@ -89,7 +68,6 @@ contains
 
   end subroutine shutdown
 
-  !****
 
   subroutine eval_Teff_g(L, R, M, cgrav, Teff, g)
 
@@ -108,7 +86,6 @@ contains
 
   end subroutine eval_Teff_g
 
-  !****
 
   function eval_Paczynski_gradr( &
        T, P, rho, tau, kap, L, M, R, cgrav) result (gradr)
@@ -154,13 +131,9 @@ contains
 
     end if
 
-    ! Finish
-
     return
 
   end function eval_Paczynski_gradr
-
-  !****
 
   subroutine eval_E2(x, E2, dE2_dx, ierr)
 
@@ -195,8 +168,6 @@ contains
     dE2_dx = slope*ln10*E2
 
   end subroutine eval_E2
-
-  !****
 
   subroutine create_E2_interpolant(ierr)
 

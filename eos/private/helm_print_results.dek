@@ -3,34 +3,34 @@
 
  11      format(a20,e20.10)
  12      format(a20,i20)
-         
+
         write(*,12) 'iat', iat
         write(*,12) 'jat', jat
 
         write(*,11) 'den', den
         write(*,11) 'din', din
         write(*,11) 'df_d', df_d
- 
- 
+
+
         write(*,11) 'pres', pres
         write(*,11) 'prad', prad
         write(*,11) 'pion', pion
         write(*,11) 'pele', pele
         write(*,11) 'pcoul', pcoul
         write(*,*)
-        
+
         write(*,11) 'ener', ener
         write(*,11) 'erad', erad
         write(*,11) 'eion', eion
         write(*,11) 'eele', eele
         write(*,11) 'ecoul', ecoul
         write(*,*)
-        
-        write(*,11) 'entr', entr 
-        write(*,11) 'srad', srad 
-        write(*,11) 'sion', sion 
-        write(*,11) 'sele', sele 
-        write(*,11) 'scoul', scoul 
+
+        write(*,11) 'entr', entr
+        write(*,11) 'srad', srad
+        write(*,11) 'sion', sion
+        write(*,11) 'sele', sele
+        write(*,11) 'scoul', scoul
         write(*,*)
 
         write(*,11) 'dpresdt',  dpresdt
@@ -47,14 +47,14 @@
         write(*,11) 'dentrdd',  dentrdd
         write(*,11) 'dentrda',  dentrda
         write(*,11) 'dentrdz',  dentrdz
-        
+
         write(*,11) 'prad',    prad
         write(*,11) 'erad',    erad
-        write(*,11) 'srad',    srad 
+        write(*,11) 'srad',    srad
 
         write(*,11) 'pion',   pion
         write(*,11) 'eion',   eion
-        write(*,11) 'sion',   sion 
+        write(*,11) 'sion',   sion
         write(*,11) 'xni',    xni
 
         write(*,11) 'pele',   pele
@@ -71,20 +71,20 @@
         write(*,11) 'deepa',  deepda
         write(*,11) 'deepz',  deepdz
 
-        write(*,11) 'sele',   sele 
+        write(*,11) 'sele',   sele
         write(*,11) 'spos',   0.0d0
-        write(*,11) 'dsept',  dsepdt 
-        write(*,11) 'dsepd',  dsepdd 
-        write(*,11) 'dsepa',  dsepda 
+        write(*,11) 'dsept',  dsepdt
+        write(*,11) 'dsepd',  dsepdd
+        write(*,11) 'dsepa',  dsepda
         write(*,11) 'dsepz',  dsepdz
 
         write(*,11) 'xnem',   xne
         write(*,11) 'xne',    xnefer
         write(*,11) 'xnp',    0.0d0
-        write(*,11) 'dxnet',  dxnedt 
-        write(*,11) 'dxned',  dxnedd 
-        write(*,11) 'dxnea',  dxneda 
-        write(*,11) 'dxnez',  dxnedz 
+        write(*,11) 'dxnet',  dxnedt
+        write(*,11) 'dxned',  dxnedd
+        write(*,11) 'dxnea',  dxneda
+        write(*,11) 'dxnez',  dxnedz
 
         write(*,11) 'etaele', etaele
         write(*,11) 'detat',  detadt
@@ -111,9 +111,8 @@
         write(*,11) 'nabad',  nabad
         write(*,11) 'chit',    chit
         write(*,11) 'chid',    chid
-        
-        write(*,*)
 
+        write(*,*)
 
 
 02    format(1x,t2,a,1p7e16.8)
