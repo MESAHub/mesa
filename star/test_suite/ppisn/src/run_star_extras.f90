@@ -386,11 +386,11 @@
 
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
-            if (s% q(k) > 0.999) then
+            if (s% q(k) > 0.999d0) then
                fp = 1d0
                ft = 1d0
-            else if (s% q(k) > 0.998) then
-               alpha = (1d0 - (s% q(k) - 0.998) / 0.001)
+            else if (s% q(k) > 0.998d0) then
+               alpha = (1d0 - (s% q(k) - 0.998d0) / 1d-3)
                fp = fp * alpha + 1d0 * (1 - alpha)
                ft = ft * alpha + 1d0 * (1 - alpha)
             end if
