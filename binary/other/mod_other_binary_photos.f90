@@ -17,7 +17,7 @@
 !
 ! ***********************************************************************
 
-      module mod_other_binary_photo_write
+      module mod_other_binary_photos
 
 
       implicit none
@@ -45,4 +45,4 @@
          !read(iounit,iostat=ierr) stuff
       end subroutine default_other_binary_photo_read
 
-      end module mod_other_binary_photo_write
+      end module mod_other_binary_photos

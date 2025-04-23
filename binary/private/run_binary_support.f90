@@ -61,8 +61,7 @@ contains
       use mod_other_binary_edot
       use mod_other_binary_ce
       use mod_other_binary_extras
-      use mod_other_binary_photo_read
-      use mod_other_binary_photo_write
+      use mod_other_binary_photos
       use mod_other_e2
       use mod_other_pgbinary_plots
       use binary_timestep
