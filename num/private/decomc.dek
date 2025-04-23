@@ -301,7 +301,6 @@
 ! ***********************************************************
 
 
-
       subroutine decsolc_done(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,
      &            m1,m2,nm1,alphn,betan,e2r,e2i,lde1,ip2,br,bi,ierr,ijob,
      &            mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,

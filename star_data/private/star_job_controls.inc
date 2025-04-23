@@ -50,7 +50,7 @@
 
       logical :: save_star_job_namelist
       character (len=strlen) :: star_job_namelist_name
-      
+
       character (len=strlen) :: echo_at_start, echo_at_end
 
       logical :: load_saved_model
@@ -67,7 +67,7 @@
       logical :: relax_mass_scale, relax_initial_mass_scale
       real(dp) :: dlgm_per_step, relax_M_center_dt, change_mass_years_for_dt
       logical :: relax_M_center, relax_initial_M_center
-     
+
       logical :: relax_mass_to_remove_H_env, relax_initial_mass_to_remove_H_env
       real(dp) :: extra_mass_retained_by_remove_H_env
 
@@ -112,7 +112,7 @@
          remove_fallback_at_each_step, remove_center_adjust_L_center, &
          retain_fallback_at_each_step, remove_center_set_zero_v_center, remove_initial_fe_core, remove_fe_core, &
          fallback_check_total_energy
-         
+
       real(dp) :: limit_center_logP_at_each_step
       real(dp) :: min_q_for_remove_surface_by_v_surf_div_v_escape, &
          max_q_for_remove_surface_by_v_surf_div_v_escape
@@ -278,7 +278,7 @@
 
       logical :: set_initial_number_retries
       integer :: initial_number_retries
-      
+
       logical :: set_initial_dt, limit_initial_dt
       real(dp) :: years_for_initial_dt, seconds_for_initial_dt
 
@@ -366,8 +366,8 @@
 
 
       logical :: warn_run_star_extras
-      
+
       ! When to run cleanup to deallocate unneeded data
       logical :: report_garbage_collection
       integer :: num_steps_for_garbage_collection
-      
+

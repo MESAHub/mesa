@@ -1,6 +1,4 @@
 
-
-
       subroutine dense_to_sparse_with_diag(isparse,n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
          use mtx_def
          integer,intent(in) :: isparse,n,ndim,nzmax
@@ -21,8 +19,6 @@
          end if
          !if (ierr /= 0) stop 'dense_to_sparse_with_diag'
       end subroutine dense_to_sparse_with_diag
-
-
 
 
       ! sparse conversion based on similar routines from sparskit_src/formats.f
@@ -123,7 +119,6 @@
       end subroutine dense_to_row_with_diag_0_based
 
 
-
       subroutine row_sparse_0_based_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr)
          use mtx_support
          integer,intent(in) :: n,ndim,nz
@@ -188,7 +183,6 @@
          call do_dense_to_col_sparse_0_based_qp(n,ndim,a,nzmax,nz,colptr,rowind,values,.true.,ierr)
          !if (ierr /= 0) stop 'dense_to_col_with_diag_0_based'
       end subroutine dense_to_col_with_diag_0_based_qp
-
 
 
       subroutine column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr)
@@ -334,7 +328,6 @@
       end subroutine find_loc_in_row_0_based
 
 
-
       subroutine find_loc_in_sparse(isparse,n,nz,ia,ja,i,j,hint,k,ierr)
          use mtx_def
          ! set k to index in values of entry for row=i, column=j in dense format.
@@ -355,7 +348,6 @@
          end if
          !if (ierr /= 0) stop 'find_loc_in_sparse'
       end subroutine find_loc_in_sparse
-
 
 
       subroutine dense_to_band(n,ndim,a,ml,mu,ab,ldab,ierr)

@@ -115,7 +115,6 @@
         write(*,*)
 
 
-
 02    format(1x,t2,a,1p7e16.8)
 03    format(1x,t2,a7,1pe12.4,t22,a7,1pe12.4,  &
                t42,a7,1pe12.4,t62,a7,1pe12.4)

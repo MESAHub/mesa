@@ -351,7 +351,6 @@
         fi(16) = ht% efdt(iat+1,jat+1)
 
 
-
 !..electron chemical potential etaele
         etaele  = h3(iat,jat,fi, &
                      si0t,   si1t,   si0mt,   si1mt, &
@@ -574,7 +573,6 @@ end if
         dpepdzz = zz*dindz*dindz
 
 
-
 !..entropy in erg/g/k
         x       = ye * ye
         y       = ye * ytot1
@@ -613,7 +611,6 @@ end if
                   - df_t*dinddaz
         dsepdzz = -df_ddt*dindz*dindz*ye  &
                   - df_dt*(dindzz*ye + dindz*ytot1 + dindz*dinddz)
-
 
 
 !..energy in erg/g

@@ -59,7 +59,6 @@
        dsgasdzz = dsiondzz + dsepdzz + dscouldzz
 
 
-
        if (include_radiation) then
           !..add in radiation to get the total
           pres    = prad + pgas

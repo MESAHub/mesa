@@ -87,8 +87,6 @@
 !
 
 
-
-
       !  brent_local_min seeks a local minimum of a function F(X) in an interval [A,B].
       real(dp) function brent_local_min(max_tries, a, b, eps, t, f, x, ierr)
          use mod_brent, only: eval_local_min
@@ -160,7 +158,6 @@
 !    Dover, 2002,
 !    ISBN: 0-486-41998-3,
 !    LC: QA402.5.B74.
-
 
 
       real(dp) function brent_safe_zero(a, b, eps, t, epsy, f, fa, fb, lrpar, rpar, lipar, ipar, ierr)

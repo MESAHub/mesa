@@ -106,8 +106,6 @@
       real(dp) :: detaidaa,detaidaz,detaidzz
 
 
-
-
 !..electron-positrons
       integer :: elemult
 
@@ -178,8 +176,6 @@
       real(dp) :: dxneferdddz, dxneferdttz, dxneferddtz
 
 
-
-
 !..ionization contributions
       real(dp) :: eip,deipdd,deipdt,deipda,deipdz
       real(dp) :: sip,dsipdd,dsipdt,dsipda,dsipdz
@@ -221,7 +217,6 @@
       real(dp) :: dscoulddd,dscoulddt,dscouldda,dscoulddz
       real(dp) :: dscouldtt,dscouldta,dscouldtz,dscouldaa
       real(dp) :: dscouldaz,dscouldzz
-
 
 
       real(dp) :: s,sinv,dsdd,dsdt,dsda,dsdz

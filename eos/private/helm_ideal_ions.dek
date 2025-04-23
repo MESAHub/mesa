@@ -43,7 +43,6 @@
         dpiondzz = 0.0d0
 
 
-
 !..energy in erg/gr
         y       = 1.5d0 * deninv
         eion    = y * pion

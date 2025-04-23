@@ -84,7 +84,6 @@
          if (ier /= 0) return
 
 
-
          !do i=1,n
          !  write(*,*) 'out', i, ak(i)
          !end do

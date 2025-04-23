@@ -126,7 +126,6 @@
          x_sr = x_er + 15
 
 
-
       !..gas contributions
       integer, parameter :: &
          h_pgas = x_sr + 1, &

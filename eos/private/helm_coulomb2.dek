@@ -17,7 +17,6 @@
 !..scoul and all its derivatives = coulomb entropy through common block
 
 
-
 !..yakovlev & shalybkov eqs 5, 9 and 10
 !..use the ion number density instead of the free electron number density
 !..to avoid issues with positrons being included or not (eosfxt vs helmeos)
@@ -43,7 +42,6 @@
       dsdaa   = y * dxnidaa
       dsdaz   = y * dxnidaz + forthpi*dxnida
       dsdzz   = y * dxnidzz + forthpi*dxnidz
-
 
 
 !..electron-sphere radius aele
@@ -271,8 +269,6 @@
        end if
 
 
-
-
 !..yakovlev & shalybkov 1989 equations 102, 103, 104
       else if (plasg < 1.0d0) then
 
@@ -388,7 +384,6 @@
 
 !..end of plasg if block
       end if
-
 
 
 !..cut coulomb terms at low T and low density

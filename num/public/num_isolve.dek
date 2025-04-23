@@ -8,7 +8,7 @@
             solout, iout,  & ! step-by-step output
             decsol, decsols, decsolblk,  & ! linear algebra routines and parameters
             lrd, rpar_decsol, lid, ipar_decsol, &
-            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &  ! nvar > 0 means use decsolblk, 
+            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &  ! nvar > 0 means use decsolblk,
             fcn_blk_dble, jac_blk_dble, &  ! args for bcyclic_dble
             work, lwork, iwork, liwork, &  ! work arrays
             lrpar, rpar, lipar, ipar, &  ! parameters for user supplied routines

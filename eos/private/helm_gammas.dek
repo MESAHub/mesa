@@ -255,7 +255,6 @@
                     * (denerdz*den - ww*dpresdz)*presinv)
 
 
-
 !..ahh the good old simple days
 !       zz    = pres/den
 !       chit  = temp/pres * dpresdt

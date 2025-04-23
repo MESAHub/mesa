@@ -46,7 +46,6 @@
       end subroutine lapack_work_sizes
 
 
-
       ! complex(dp) routines
 
 
@@ -63,7 +62,6 @@
          lrd = 0
          lcd = lda*(n+1) + n
       end subroutine lapack_zwork_sizes
-
 
 
       subroutine lapack_decsolc(iop,n,ndim,ar,ai,ml,mu,br,bi,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
@@ -140,7 +138,6 @@
          end do
 
       end subroutine lapack_decc
-
 
 
       subroutine lapack_decbc(n,ndim,ar,ai,ml,mu,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)

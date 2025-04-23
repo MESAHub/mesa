@@ -1,7 +1,5 @@
-      
-      
-         ! http://fortranwiki.org/fortran/show/qsort_inline
 
+         ! http://fortranwiki.org/fortran/show/qsort_inline
 
 
          !======================================================================
@@ -60,7 +58,7 @@
          !---------------------------------------------------------------------
          ! NOTES:
          ! The procedure uses a optimized combination of QSORT and INSERTION
-         ! sorting. The algorithm is based on code used in GLIBC. 
+         ! sorting. The algorithm is based on code used in GLIBC.
          ! A stack is used in place of recursive calls. The stack size must
          ! be at least as big as the number of bits in the largest array index.
          !
