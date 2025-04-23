@@ -270,6 +270,7 @@ other_e2                         binary_tides
 other_sync_spin_to_orbit         binary_tides
 other_tsync                      binary_tides
 other_check_implicit_rlo         binary_evolve
+other_implicit_function_to_solve binary_mdot
 ===============================  =============
 
 control flow
