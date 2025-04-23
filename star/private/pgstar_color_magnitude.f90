@@ -605,6 +605,7 @@
             ierr)
          use utils_lib
          use star_def
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id, color_num_panels
@@ -808,7 +809,7 @@
                      color_other_dymin(j), other_ybot, other_ytop)
                call pgswin(xleft, xright, other_ybot, other_ytop)
                call pgscf(1)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_box_pgstar(s,'','CMSTV')
                call pgsci(other_y_color)
 
@@ -830,7 +831,7 @@
                      color_dymin(j), ybot, ytop)
                call pgswin(xleft, xright, ybot, ytop)
                call pgscf(1)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                if (j < color_num_panels) then
                   if (.not. have_other_yaxis) then
                      call show_box_pgstar(s,'BCST1','BCMNSTV1')
@@ -855,7 +856,7 @@
                call pgslw(1)
             end if
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
 
             call show_pgstar_decorator(s%id,color_use_decorator,color_pgstar_decorator, j, ierr)
 

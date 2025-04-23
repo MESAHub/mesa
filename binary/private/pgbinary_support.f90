@@ -23,12 +23,7 @@ module pgbinary_support
    use const_def, only: dp, secyer
    use rates_def, only : i_rate
    use utils_lib
-   use pgstar_support, only : Set_Colours, do1_pgmtxt, &
-      clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
-      clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-      clr_anonymous, colormap_offset, colormap_last, colormap_size, &
-      colormap, Line_Type_Solid, Line_Type_Dash, Line_Type_Dash_Dot, Line_Type_Dot_Dash, &
-      Line_Type_Dot  ! inherit colors/linetypes + some routines from pgstar
+   use pgstar_support, only : do1_pgmtxt
    use star_pgstar
 
    implicit none
@@ -204,6 +199,7 @@ contains
 
 
    subroutine open_device(b, p, is_file, dev, id, ierr)
+      use pgstar_colors, only: set_device_colors
       type (binary_info), pointer :: b
       type (pgbinary_win_file_data), pointer :: p
       logical, intent(in) :: is_file
@@ -239,7 +235,7 @@ contains
          p% prev_win_width = p% win_width
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
-      call Set_Colours(white_on_black_flag, ierr)
+      call set_device_colors(white_on_black_flag)
    end subroutine open_device
 
 
@@ -410,9 +406,10 @@ contains
 
 
    subroutine draw_rect()
+      use pgstar_colors, only: clr_Foreground
       real, dimension(5) :: xs, ys
       call pgsave
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       xs = [0.0, 0.0, 1.0, 1.0, 0.0]
       ys = [0.0, 1.0, 1.0, 0.0, 0.0]
       call pgswin(0.0, 1.0, 0.0, 1.0)

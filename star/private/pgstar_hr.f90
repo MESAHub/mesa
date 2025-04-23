@@ -54,6 +54,7 @@
 
 
       subroutine HR_decorate(id, ierr)
+         use pgstar_colors
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

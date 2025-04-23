@@ -65,6 +65,7 @@
 
 #ifdef USE_PGPLOT
       subroutine col_mag1_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+         use pgstar_colors, only: clr_Coral
          integer, intent(in) :: id
          !Not dp
          real,intent(in) :: xmin, xmax, ymin, ymax

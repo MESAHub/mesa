@@ -183,6 +183,7 @@
 
 
          subroutine plot(ierr)
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: lw, lw_sav
@@ -213,7 +214,7 @@
                   call show_age_pgstar(s)
                end if
                call show_title_pgstar(s, title)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,MixDs_xaxis_name,ierr)
                if (ierr /= 0) return
             end if
@@ -328,7 +329,7 @@
 
             call pgswin(xleft, xright, ymin, ymax)
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','BCNSTV')
             else
@@ -536,6 +537,7 @@
 
          integer function mixing_line_legend( &
                cnt, clr, lw, lw_sav, txt_scale, str)
+            use pgstar_colors, only: clr_Foreground
             integer, intent(in) :: cnt, clr, lw, lw_sav
             real, intent(in) :: txt_scale
             character (len=*), intent(in) :: str
@@ -550,7 +552,7 @@
             call pgslw(lw)
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*s% pg% Mixing_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, trim(str))
             mixing_line_legend = cnt + 1

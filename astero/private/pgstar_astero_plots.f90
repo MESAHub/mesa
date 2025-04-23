@@ -121,6 +121,7 @@
 
          use utils_lib
          use const_def, only: dp
+         use pgstar_colors
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -177,7 +178,7 @@
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgstar_show_box(s,'BCNST1','BCNSTV1')
          call pgstar_show_xaxis_label(s, &
             "Frequency mod \(0530)\d\(0639)\u (\(0638)Hz) (duplicated at x+\(0530)\d\(0639)\u)")
@@ -219,7 +220,7 @@
          call pgsci(freq_color(0))
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, freq_shape(0))
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=0')
 
@@ -227,7 +228,7 @@
          call pgsci(freq_color(1))
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, freq_shape(1))
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=1')
 
@@ -235,7 +236,7 @@
          call pgsci(freq_color(2))
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, freq_shape(2))
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=2')
 
@@ -244,7 +245,7 @@
             call pgsci(freq_color(3))
             call pgsch(1.6*txt_scale)
             call pgpt1(x_obs, y_obs, freq_shape(3))
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(1.0*txt_scale)
             call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=3')
          end if
@@ -394,6 +395,7 @@
 
          use utils_lib
          use const_def, only: dp
+         use pgstar_colors
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -468,7 +470,7 @@
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgstar_show_box(s,'BCNST1','BCNSTV1')
          call pgstar_show_xaxis_label(s,"Ratio")
          call pgstar_show_left_yaxis_label(s,"Frequency (\(0638)Hz)")
@@ -501,7 +503,7 @@
          call pgsci(r01_color)
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, r01_shape)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r01')
 
@@ -509,7 +511,7 @@
          call pgsci(r10_color)
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, r10_shape)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r10')
 
@@ -517,7 +519,7 @@
          call pgsci(r02_color)
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, r02_shape)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r02')
 

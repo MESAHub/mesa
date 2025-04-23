@@ -23,8 +23,12 @@
       use const_def, only: dp, msun, anonymous_mixing, minimum_mixing, rayleigh_taylor_mixing
       use pgstar_support
       use star_pgstar
+      use pgstar_colors
 
       implicit none
+      private
+
+      public :: Kipp_Plot, do_Kipp_Plot
 
       contains
 
@@ -368,7 +372,7 @@
             if (s% pg% Kipp_lgL_max /= -101d0) ymax = ymax + s% pg% Kipp_lgL_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             ymin_L_axis = ymin
             ymax_L_axis = ymax
          end subroutine setup_L_yaxis
@@ -386,7 +390,7 @@
             if (s% pg% Kipp_mass_max /= -101d0) ymax = ymax + s% pg% Kipp_mass_margin*dy
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             ymin_mass_axis = ymin
             ymax_mass_axis = ymax
          end subroutine setup_mass_yaxis
@@ -482,7 +486,7 @@
             include 'formats'
             xmass = mass - mass_center
             burn_qbot = 0
-            mid_map = colormap_size/2
+            mid_map = colormap_length/2
             do k = i_burn_type_first, i_burn_type_last, 2
                burn_type = pg% vals(k)
                burn_qtop = pg% vals(k+1)
@@ -493,7 +497,7 @@
                   if (burn_type > 0.0) then
                      color_frac = 1.0 - max(0.0, min(1.0, burn_type/bmax))
                      colormap_index = &
-                        colormap_size - int(0.6*color_frac*(colormap_size - mid_map))
+                        colormap_length - int(0.6*color_frac*(colormap_length - mid_map))
                   else  ! burn_type < 0.0
                      color_frac = 1.0 - max(0.0, min(1.0, burn_type/bmin))
                      colormap_index = 1 + int(0.6*color_frac*mid_map)
@@ -682,11 +686,11 @@
             call pgsave
             call pgslw(2)
 
-            colormap_index = int(colormap_size*0.85)
+            colormap_index = int(colormap_length*0.85)
             call pgsci(colormap_offset + colormap_index)
             call show_xaxis_label_pgmtxt_pgstar(s, 0.17, 0.5, 'burning', 1.0)
 
-            colormap_index = int(colormap_size*0.15)
+            colormap_index = int(colormap_length*0.15)
             call pgsci(colormap_offset + colormap_index)
             call show_xaxis_label_pgmtxt_pgstar(s, 0.82, 0.5, 'cooling', 1.0)
 

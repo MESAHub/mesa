@@ -341,6 +341,7 @@ contains
       Text_Summary_name, ierr)
 
       use utils_lib
+      use pgstar_colors, only: clr_Foreground
       use pgstar_support, only : write_info_line_exp, write_info_line_flt, &
          write_info_line_int
 
@@ -367,7 +368,7 @@ contains
       call pgsch(txt_scale)
 
       call pgsvp(winxmin, winxmax, winymin, winymax)
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       call pgscf(1)
       call pgswin(0.0, 1.0, 0.0, 1.0)
       call show_title_pgbinary(b, title)

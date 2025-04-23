@@ -79,6 +79,7 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -200,7 +201,7 @@
                   call show_age_pgstar(s)
                end if
                call show_title_pgstar(s, title)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,xaxis_name,ierr)
                if (ierr /= 0) return
             end if
@@ -208,7 +209,7 @@
             ybot = -0.05
             call pgswin(xleft, xright, ymin+ybot, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','BCNSTV')
             else
@@ -391,7 +392,7 @@
             call pgslw(lw)
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*s% pg% Abundance_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, trim(str))
             abundance_line_legend = cnt + 1

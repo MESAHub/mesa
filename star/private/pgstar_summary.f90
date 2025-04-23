@@ -339,6 +339,7 @@
             Text_Summary_num_rows, Text_Summary_num_cols, &
             Text_Summary_name, ierr)
 
+         use pgstar_colors, only: clr_Foreground
          use utils_lib
          use chem_def
          use net_def
@@ -366,7 +367,7 @@
          call pgsch(txt_scale)
 
          call pgsvp(winxmin, winxmax, winymin, winymax)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgscf(1)
          call pgswin(0.0,1.0,0.0,1.0)
          call show_title_pgstar(s, title)
