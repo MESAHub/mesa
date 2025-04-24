@@ -1303,100 +1303,11 @@
       subroutine write_colors_info(id, s, ierr)
          use colors_lib
          use colors_def
-         use chem_def, only: zsol
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: io, i, j
-         character (len=strlen) :: fname
-         real(dp)  :: log_Teff  ! log10 of surface temp
-         real(dp)  :: log_L  ! log10 of luminosity in solar units
-         real(dp)  :: mass  ! mass in solar units
-         real(dp)  :: Fe_H  ! [Fe/H]
-         ! output
-         real(dp),dimension(bc_total_num_colors) :: results
-         real(dp) :: log_g
-
-         character(len=strlen),dimension(bc_total_num_colors) :: names
-
-         ierr = 0
-
-         call get_all_bc_names(names,ierr)
-         if (ierr /= 0) then
-            ierr=-1
-            call cleanup
-            return
-         end if
-
-         fname = 'colors.log'
-         !if (s% doing_first_model_of_run) then
-         if (.false.) then
-            open(newunit=io, file=trim(fname), action='write', status='replace', iostat=ierr)
-            ! write column numbers
-            j = 1
-            write(io,fmt='(i10)',advance='no') j
-            j = j+1
-            do i=1,4+bc_total_num_colors
-               write(io,fmt='(i25)',advance='no') j
-               j = j+1
-            end do
-            write(io,fmt='(i25)') j
-            ! write column labels
-            write(io,fmt='(a10)',advance='no') 'model'
-            write(io,fmt='(a25)',advance='no') 'log_Teff'
-            write(io,fmt='(a25)',advance='no') 'log_L'
-            write(io,fmt='(a25)',advance='no') 'mass'
-            write(io,fmt='(a25)',advance='no') 'Fe_H'
-            do i=1,bc_total_num_colors
-               write(io,fmt='(a25)',advance='no') trim(names(i))
-            end do
-            write(io,fmt='(a25)') 'log_g'
-         else
-            open(newunit=io, file=trim(fname), action='write', position='append', iostat=ierr)
-         end if
-         if (ierr /= 0) then
-            write(*,*) 'failed to open colors.log'
-            call cleanup
-            return
-         end if
-
-         log_Teff = log10(s% Teff)
-         log_L = s% log_surface_luminosity
-         mass = s% star_mass
-         Fe_H = safe_log10(get_current_z_at_point(id, 1, ierr) / zsol)
-         log_g = safe_log10(s% grav(1))
-         if (ierr /= 0) then
-            write(*,*) 'failed in get_current_z_at_point'
-            call cleanup
-            return
-         end if
-
-         call get_bcs_all(log_Teff, log_g, Fe_H, results, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in colors_get'
-            call cleanup
-            return
-         end if
-
-         1 format(1x,f24.12)
-         write(io,fmt='(i10)',advance='no') s% model_number
-         write(io,fmt=1,advance='no') log_Teff
-         write(io,fmt=1,advance='no') log_L
-         write(io,fmt=1,advance='no') mass
-         write(io,fmt=1,advance='no') Fe_H
-         do i=1,bc_total_num_colors
-            write(io,fmt=1,advance='no') results(i)
-         end do
-         write(io,1) log_g
-
-         call cleanup
-
-         contains
-
-         subroutine cleanup
-            close(io)
-         end subroutine cleanup
+          !TODO: implement me
 
       end subroutine write_colors_info
 
