@@ -5,11 +5,17 @@ program test_colors
    implicit none
 
    integer :: ierr
+   logical :: use_cache
+
+   ierr = 0
+   use_cache = .false.
+
+   ! TODO: implement me
 
    write(*,*) 'Testing colors module initialization...'
    
    ! Initialize colors module
-   call colors_init(ierr)
+   ! TODO: call colors_init(ierr)
    if (ierr /= 0) then
       write(*,*) 'Error: colors_init failed with code', ierr
       stop 1

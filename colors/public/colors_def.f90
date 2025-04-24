@@ -1,109 +1,132 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2025  Niall Miller & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module colors_def
-  use const_def, only : strlen, dp
-  implicit none
 
-  ! Make everything in this module public by default
-  public
+   use const_def, only: dp
 
-  ! Define the controls type
-  type :: colors_controls_type
-    ! Paths and filenames
-    character(len=256) :: instrument
-    character(len=256) :: vega_sed
-    character(len=256) :: stellar_atm
+   implicit none
 
-    ! Numeric parameters
-    real(dp) :: metallicity
-    real(dp) :: distance
+   ! Make everything in this module public by default
+   public
 
-    ! Boolean controls
-    logical :: make_csv
-    logical :: use_colors
+   ! Colors Module control parameters
+   type :: Colors_General_Info
+      character(len=256) :: instrument
+      character(len=256) :: vega_sed
+      character(len=256) :: stellar_atm
+      real(dp) :: metallicity
+      real(dp) :: distance
+      logical :: make_csv
+      logical :: use_colors
+      ! bookkeeping
+      integer :: handle
+      logical :: in_use
+   end type Colors_General_Info
 
-    ! Bookkeeping (similar to kap)
-    integer :: handle
-    logical :: in_use
-  end type colors_controls_type
+   integer, parameter :: max_colors_handles = 10
+   type (Colors_General_Info), target :: colors_handles(max_colors_handles)
 
-  ! Handle management (similar to kap)
-  integer, parameter :: max_colors_handles = 10
-  logical :: colors_is_initialized = .false.
-  ! Global array of handles (like kap_handles)
-  type (colors_controls_type), target :: colors_handles(max_colors_handles)
+   logical :: colors_is_initialized = .false.
 
-  ! Global instance accessible everywhere (needed for compatibility)
-  type(colors_controls_type), target :: colors_controls
-
-  ! Variables needed by MESA
-  ! This is the specific variable referenced in history_specs.f90
-  integer, parameter :: bc_total_num_colors = 0
+   character (len=1000) :: colors_dir, colors_cache_dir, colors_temp_cache_dir
+   logical :: colors_use_cache = .true.
 
 contains
 
-  integer function alloc_colors_handle(ierr) result(handle)
-    integer, intent(out) :: ierr
-    integer :: i
-    ierr = 0
-    handle = -1
-    do i = 1, max_colors_handles
-       if (.not. colors_handles(i)% in_use) then
-          colors_handles(i)% in_use = .true.
-          colors_handles(i)% handle = i
-          handle = i
-          exit
-       end if
-    end do
-    if (handle == -1) then
-       ierr = -1
-       return
-    end if
-  end function alloc_colors_handle
+subroutine colors_def_init(colors_cache_dir_in)
+  use utils_lib, only : mkdir
+  use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir, use_mesa_temp_cache
+  character (*), intent(in) :: colors_cache_dir_in
+  integer :: i
 
-  subroutine free_colors_handle(handle)
-    integer, intent(in) :: handle
-    if (handle >= 1 .and. handle <= max_colors_handles) then
-       colors_handles(handle)% in_use = .false.
-    end if
-  end subroutine free_colors_handle
+  if (len_trim(colors_cache_dir_in) > 0) then
+     colors_cache_dir = colors_cache_dir_in
+  else if (len_trim(mesa_caches_dir) > 0) then
+     colors_cache_dir = trim(mesa_caches_dir) // '/colors_cache'
+  else
+     colors_cache_dir = trim(mesa_data_dir) // '/colors_data/cache'
+  end if
+  call mkdir(colors_cache_dir)
 
-  subroutine colors_ptr(handle, ctrl, ierr)
-    integer, intent(in) :: handle
-    type (colors_controls_type), pointer :: ctrl
-    integer, intent(out) :: ierr
+  do i=1,max_colors_handles
+      colors_handles(i)% handle = i
+      colors_handles(i)% in_use = .false.
+  end do
 
-    ierr = 0
-    if (handle < 1 .or. handle > max_colors_handles) then
-       ierr = -1
-       return
-    end if
+  colors_temp_cache_dir=trim(mesa_temp_caches_dir)//'/colors_cache'
+  if(use_mesa_temp_cache) call mkdir(colors_temp_cache_dir)
 
-    ctrl => colors_handles(handle)
-  end subroutine colors_ptr
+end subroutine colors_def_init
+
+
+integer function do_alloc_colors(ierr)
+  integer, intent(out) :: ierr
+  integer :: i
+  ierr = 0
+  do_alloc_colors = -1
+  !$omp critical (colors_handle)
+  do i = 1, max_colors_handles
+     if (.not. colors_handles(i)% in_use) then
+      colors_handles(i)% in_use = .true.
+        do_alloc_colors = i
+        exit
+     end if
+  end do
+  !$omp end critical (colors_handle)
+  if (do_alloc_colors == -1) then
+     ierr = -1
+     return
+  end if
+  if (colors_handles(do_alloc_colors)% handle /= do_alloc_colors) then
+     ierr = -1
+     return
+  end if
+end function do_alloc_colors
+
+
+subroutine do_free_colors(handle)
+  integer, intent(in) :: handle
+  if (handle >= 1 .and. handle <= max_colors_handles) &
+    colors_handles(handle)% in_use = .false.
+end subroutine do_free_colors
+
+
+subroutine get_colors_ptr(handle,rq,ierr)
+  integer, intent(in) :: handle
+  type (Colors_General_Info), pointer :: rq
+  integer, intent(out):: ierr
+  if (handle < 1 .or. handle > max_colors_handles) then
+     ierr = -1
+     return
+  end if
+  rq => colors_handles(handle)
+  ierr = 0
+end subroutine get_colors_ptr
+
+
+subroutine do_free_colors_tables
+  
+  ! TODO: implement me if needed, see kap
+
+end subroutine do_free_colors_tables
+
+
 
 end module colors_def

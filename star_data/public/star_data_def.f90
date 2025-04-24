@@ -74,7 +74,7 @@
             integer :: retry_cnt, redo_cnt
             type (EoS_General_Info), pointer :: eos_rq  ! from call eos_ptr(s% eos_handle,s% eos_rq,ierr)
             type (Kap_General_Info), pointer :: kap_rq  ! from call kap_ptr(s% kap_handle,s% kap_rq,ierr)
-            type (Net_General_Info), pointer :: net_rq  ! from call net_ptr(s% net_handle,s% net_rq, ierr)
+            type (Net_General_Info), pointer :: net_rq  ! from call net_ptr(s% net_handle,s% net_rq,ierr)
 
             ! parameters for create pre ms -- set in run_star before calling star_create_pre_ms_model
             real(dp) :: pre_ms_T_c, pre_ms_guess_rho_c, &

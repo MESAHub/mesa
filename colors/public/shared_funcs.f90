@@ -4,7 +4,7 @@ MODULE shared_funcs
   IMPLICIT NONE
   
   PRIVATE
-  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, SimpsonIntegration, loadsed, loadfilter, loadvegased, loadlookuptable, remove_dat
+  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, SimpsonIntegration, loadsed, loadfilter, loadvegased, load_lookuptable, remove_dat
 
 CONTAINS
 
@@ -290,7 +290,7 @@ CONTAINS
   !****************************
   ! Load Lookup Table For Identifying Stellar Atmosphere Models
   !****************************
-  SUBROUTINE loadlookuptable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
+  SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
@@ -452,7 +452,7 @@ CONTAINS
       END IF
     END SUBROUTINE AppendToken
 
-  END SUBROUTINE loadlookuptable
+  END SUBROUTINE load_lookuptable
 
 
 

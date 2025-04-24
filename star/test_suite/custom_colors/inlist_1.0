@@ -22,13 +22,26 @@
 
 / ! end of star_job namelist
 
+
 &eos
 / ! end of eos namelist
+
 
 &kap
       Zbase = 0.014d0
       kap_file_prefix = 'gs98'
 / ! end of kap namelist
+
+
+&colors
+      use_colors = .true.
+      instrument = 'data/filters/GAIA/GAIA'
+      vega_sed = 'data/stellar_models/vega_flam.csv'
+      stellar_atm = 'data/stellar_models/Kurucz2003all/'
+      metallicity = 0.02
+      distance = 3.0857d17
+      make_csv = .true.
+/ ! end of colors namelist
 
 
 &controls
@@ -46,7 +59,7 @@
 !==============================================================
 
     ! Option 1: Use predefined parameter files
-    read_extra_controls_inlist(1) = .true.
+    !read_extra_controls_inlist(1) = .true.
 
     ! Uncomment ONE of the following:
     !extra_controls_inlist_name(1) = 'inlist_template/PopIII.params'
@@ -91,16 +104,7 @@
     profile_interval = 100
     history_interval = 5
     terminal_interval = 50
-
-    ! Colors parameters
-    color_instrument = 'data/filters/GAIA/GAIA'
-    color_vega_sed = 'data/stellar_models/vega_flam.csv'
-    color_atm = 'data/stellar_models/Kurucz2003all/'
-    color_z = 0.02
-    color_d = 3.0857d17
-    color_make_csv = .true.
   
-
 / ! end of controls namelist
 
 &pgstar

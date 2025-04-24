@@ -19,7 +19,6 @@ SRCS = \
    hermite_interp.f90 \
    knn_interp.f90 \
    tetra_interp.f90 \
-   mod_colors.f90 \
    colors_lib.f90
 
 #################################################################
@@ -54,8 +53,6 @@ clean:
 install:
 	@$(CP_IF_NEWER) colors_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) colors_def.mod $(MESA_DIR)/include
-	@$(CP_IF_NEWER) colors_ctrls_io.mod $(MESA_DIR)/include
-	@$(CP_IF_NEWER) mod_colors.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 
 nodeps : $(.DEFAULT_GOAL)
