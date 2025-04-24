@@ -1,30 +1,24 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2024  The MESA Team
+!   Copyright (C) 2025  Niall Miller & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module colors_lib
+
   use const_def, only: dp, strlen
   use colors_def
   use math_lib
@@ -36,66 +30,120 @@ module colors_lib
   
   ! Make public interface explicit
   public :: colors_init, colors_shutdown
-  public :: set_default_colors_controls
-  public :: calculatebolometric, calculatesynthetic
-  public :: loadlookuptable, remove_dat
+  public :: calculate_bolometric, calculate_synthetic
+  public :: load_lookuptable, remove_dat
   
   ! Keep internals private
-  private :: calculatebolometricphot
+  private :: calculate_bolometric_phot
   
   contains
 
-  !-----------------------------------------------------------------------
-  ! Module initialization and cleanup
-  !-----------------------------------------------------------------------
-  
-  ! Initialize colors module
-  subroutine colors_init(ierr)
-    integer, intent(out) :: ierr
-    integer :: i
-
+      ! call this routine to initialize the colors module.
+      ! only needs to be done once at start of run.
+      ! Reads data from the 'colors' directory in the data_dir.
+      ! If use_cache is true and there is a 'colors/cache' directory, it will try that first.
+      ! If it doesn't find what it needs in the cache,
+      ! it reads the data and writes the cache for next time.
+  subroutine colors_init(use_cache, colors_cache_dir, ierr)
+    use colors_def, only : colors_def_init, colors_use_cache, colors_is_initialized
+    logical, intent(in) :: use_cache
+    character (len=*), intent(in) :: colors_cache_dir  ! blank means use default
+    integer, intent(out) :: ierr  ! 0 means AOK.
     ierr = 0
     if (colors_is_initialized) return
-
-    ! Initialize all handles
-    do i=1, max_colors_handles
-      colors_handles(i)% handle = i
-      colors_handles(i)% in_use = .false.
-    end do
-
-    ! Set default values for the global instance
-    call set_default_colors_controls(colors_controls)
-
+    call colors_def_init(colors_cache_dir)
+    colors_use_cache = use_cache
     colors_is_initialized = .true.
-  end subroutine colors_init
+ end subroutine colors_init
 
-  ! Cleanup the colors module
-  subroutine colors_shutdown()
-    integer :: i
 
-    ! Free all handles
-    do i = 1, max_colors_handles
-      if (colors_handles(i)% in_use) then
-        colors_handles(i)% in_use = .false.
-      end if
-    end do
-
+ subroutine colors_shutdown
+    use colors_def, only: do_free_colors_tables, colors_is_initialized
+    call do_free_colors_tables()
     colors_is_initialized = .false.
-  end subroutine colors_shutdown
+ end subroutine colors_shutdown
 
-  ! Set default controls
-  subroutine set_default_colors_controls(ctrl)
-    type (colors_controls_type), intent(out) :: ctrl
 
-    ! Set default values
-    ctrl% instrument = 'data/filters/GAIA/GAIA'
-    ctrl% vega_sed = 'data/stellar_models/vega_flam.csv'
-    ctrl% stellar_atm = 'data/stellar_models/Kurucz2003all/'
-    ctrl% metallicity = 0.0d0
-    ctrl% distance = 3.0857d17  ! 10pc for abs mag
-    ctrl% make_csv = .false.
-    ctrl% use_colors = .true.
-  end subroutine set_default_colors_controls
+      ! after colors_init has finished, you can allocate a "handle".
+
+ integer function alloc_colors_handle(ierr) result(handle)
+ integer, intent(out) :: ierr  ! 0 means AOK.
+ character (len=0) :: inlist
+ handle = alloc_colors_handle_using_inlist(inlist, ierr)
+end function alloc_colors_handle
+
+integer function alloc_colors_handle_using_inlist(inlist,ierr) result(handle)
+ use colors_def, only: do_alloc_colors, colors_is_initialized
+ use colors_ctrls_io, only: read_namelist
+ character (len=*), intent(in) :: inlist  ! empty means just use defaults.
+ integer, intent(out) :: ierr  ! 0 means AOK.
+ ierr = 0
+ if (.not. colors_is_initialized) then
+    ierr=-1
+    return
+ endif
+ handle = do_alloc_colors(ierr)
+ if (ierr /= 0) return
+ call read_namelist(handle, inlist, ierr)
+ if (ierr /= 0) return
+ call colors_setup_tables(handle, ierr)
+ call colors_setup_hooks(handle, ierr)
+end function alloc_colors_handle_using_inlist
+
+subroutine free_colors_handle(handle)
+ ! frees the handle and all associated data
+ use colors_def,only: colors_General_Info, do_free_colors
+ integer, intent(in) :: handle
+ call do_free_colors(handle)
+end subroutine free_colors_handle
+
+
+subroutine colors_ptr(handle,rq,ierr)
+ use colors_def,only:Colors_General_Info,get_colors_ptr,colors_is_initialized
+ integer, intent(in) :: handle  ! from alloc_colors_handle
+ type (colors_General_Info), pointer :: rq
+ integer, intent(out):: ierr
+ if (.not. colors_is_initialized) then
+    ierr=-1
+    return
+ endif
+ call get_colors_ptr(handle,rq,ierr)
+end subroutine colors_ptr
+
+
+subroutine colors_setup_tables(handle, ierr)
+ use colors_def, only : colors_General_Info, get_colors_ptr
+ ! TODO: use load_colors, only : Setup_colors_Tables
+ integer, intent(in) :: handle
+ integer, intent(out):: ierr
+
+ type (colors_General_Info), pointer :: rq
+ logical, parameter :: use_cache = .true.
+ logical, parameter :: load_on_demand = .true.
+
+ ierr = 0
+ call get_colors_ptr(handle,rq,ierr)
+ ! TODO: call Setup_colors_Tables(rq, use_cache, load_on_demand, ierr)
+
+end subroutine colors_setup_tables
+
+
+subroutine colors_setup_hooks(handle, ierr)
+ use colors_def, only : colors_General_Info, get_colors_ptr
+ integer, intent(in) :: handle
+ integer, intent(out):: ierr
+
+ type (colors_General_Info), pointer :: rq
+
+ ierr = 0
+ call get_colors_ptr(handle,rq,ierr)
+
+ ! TODO: currently does nothing. See kap if this feature is needed
+
+end subroutine colors_setup_hooks
+
+
+
 
   !-----------------------------------------------------------------------
   ! Main public interface functions
@@ -104,7 +152,7 @@ module colors_lib
   !****************************
   ! Calculate Bolometric Photometry Using Multiple SEDs
   !****************************
-  SUBROUTINE calculatebolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
+  SUBROUTINE calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
                                  bolometric_flux, wavelengths, fluxes, sed_filepath)
     REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
     CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
@@ -119,20 +167,20 @@ module colors_lib
     lookup_file = TRIM(sed_filepath) // '/lookup_table.csv'
 
     ! Load the lookup table
-    CALL loadlookuptable(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
+    CALL load_lookuptable(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
     
     ! Use KNN interpolation for constructing the SED
     CALL constructsed_knn(teff, log_g, metallicity, R, d, file_names, &
                          lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
     
     ! Calculate bolometric flux and magnitude
-    CALL calculatebolometricphot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-  END SUBROUTINE calculatebolometric
+    CALL calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
+  END SUBROUTINE calculate_bolometric
 
   !****************************
   ! Calculate Synthetic Photometry Using SED and Filter
   !****************************
-  REAL(dp) FUNCTION calculatesynthetic(temperature, gravity, metallicity, ierr, &
+  REAL(dp) FUNCTION calculate_synthetic(temperature, gravity, metallicity, ierr, &
                                       wavelengths, fluxes, filter_wavelengths, &
                                       filter_trans, filter_filepath, vega_filepath, &
                                       filter_name, make_sed)
@@ -164,7 +212,7 @@ module colors_lib
     ! Check for invalid gravity input
     IF (gravity <= 0.0_dp) THEN
         ierr = 1
-        calculatesynthetic = -1.0_dp
+        calculate_synthetic = -1.0_dp
         RETURN
     END IF
 
@@ -219,20 +267,20 @@ module colors_lib
                                  filter_name, make_sed)
 
     ! Calculate synthetic flux
-    CALL calculatesyntheticflux(wavelengths, convolved_flux, synthetic_flux, &
+    CALL calculate_syntheticflux(wavelengths, convolved_flux, synthetic_flux, &
                                filter_wavelengths, filter_trans)
 
     ! Calculate magnitude using Vega zero point
     IF (vega_flux > 0.0_dp) THEN
-      calculatesynthetic = -2.5 * LOG10(synthetic_flux / vega_flux)
+      calculate_synthetic = -2.5 * LOG10(synthetic_flux / vega_flux)
     ELSE
       PRINT *, "Error: Vega flux is zero, magnitude calculation is invalid."
-      calculatesynthetic = HUGE(1.0_dp)
+      calculate_synthetic = HUGE(1.0_dp)
     END IF
     
     ! Clean up
     DEALLOCATE(convolved_flux)
-  END FUNCTION calculatesynthetic
+  END FUNCTION calculate_synthetic
 
   !-----------------------------------------------------------------------
   ! Internal functions for synthetic photometry
@@ -266,7 +314,7 @@ module colors_lib
   !****************************
   ! Calculate Synthetic Flux
   !****************************
-  SUBROUTINE calculatesyntheticflux(wavelengths, fluxes, synthetic_flux, filter_wavelengths, filter_trans)
+  SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, filter_wavelengths, filter_trans)
     REAL(dp), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
     REAL(dp), INTENT(OUT) :: synthetic_flux
@@ -292,12 +340,12 @@ module colors_lib
         synthetic_flux = -1.0_dp
         RETURN
     END IF
-  END SUBROUTINE calculatesyntheticflux
+  END SUBROUTINE calculate_syntheticflux
 
   !****************************
   ! Calculate Bolometric Magnitude and Flux
   !****************************
-  SUBROUTINE calculatebolometricphot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
+  SUBROUTINE calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(dp), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
     INTEGER :: i
@@ -330,7 +378,7 @@ module colors_lib
     END IF
 
     bolometric_magnitude = fluxtomagnitude(bolometric_flux)
-  END SUBROUTINE calculatebolometricphot
+  END SUBROUTINE calculate_bolometric_phot
   
   !****************************
   ! Convert Flux to Magnitude

@@ -1,47 +1,62 @@
-! ======
-! colors
-! ======
+! colors module controls
+! ======================
+
+   ! The MESA/colors parameters are given default values here.
 
 
-
-! Color Files
-! ===========
-
-
-      ! color_instrument
-      ! ~~~~~~~~~~~~~~~
-      ! color_vega_sed
-      ! ~~~~~~~~~~~~~~~
-      ! color_make_csv
-      ! ~~~~~~~~~~~~~~~~
-      ! color_atm
-      ! ~~~~~~~~~~~~~~~
-      ! color_z
-      ! ~~~~~~~~~~~~~~~
-      ! color_d
-      ! ~~~~~~~~~~~~~~~~
-
-      !some 
-      !stuff
-      !more of a blurb about the stuff
-
-      ! ::
+! Colors Files
+! ------------
 
 
-      color_instrument = 'data/filters/GAIA/GAIA'
-      color_vega_sed = 'data/stellar_models/vega_flam.csv'
-      color_make_csv = 'false'    
+   ! use_colors
+   ! ~~~~~~~~~~
+   ! instrument
+   ! ~~~~~~~~~~
+   ! vega_sed
+   ! ~~~~~~~~
+   ! make_csv
+   ! ~~~~~~~~
+   ! stellar_atm
+   ! ~~~~~~~~~~~
+   ! metallicity
+   ! ~~~~~~~~~~~
+   ! distance
+   ! ~~~~~~~~
 
-      !Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
-      !Vega SED for Vega photometric system
-      !make csv
+   ! TODO: add description
+   ! stuff
+   ! more of a blurb about the stuff
+   ! Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
+   ! Vega SED for Vega photometric system
+   ! make csv
+   ! Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
+   ! Metallicity
+   ! Stellar distance 'd' (10pc for abs mag...)
+   ! ::
+
+      use_colors = .false.
+      instrument = 'data/filters/GAIA/GAIA'
+      vega_sed = 'data/stellar_models/vega_flam.csv'
+      make_csv = .false.  
+      stellar_atm = 'data/stellar_models/Kurucz2003all/'
+      metallicity = 0.58d0
+      distance = 3.0857d17   
 
 
-      color_atm = 'data/stellar_models/Kurucz2003all/'
-      color_z = 0.58d0
-      color_d = 3.0857d17   
-      
-      !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
-      !Metallicity
-      !Stellar distance 'd' (10pc for abs mag...)
-      # Test comment
+! Extra inlist controls
+! ---------------------
+
+   ! One can split a colors inlist into pieces using the following parameters.
+   ! It works recursively, so the extras can read extras too.
+
+
+         ! read_extra_colors_inlist(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         ! extra_colors_inlist_name(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+         ! If ``read_extra_colors_inlist(i)`` is true, then read ``&colors`` from the file ``extra_colors_inlist_name(i)``.
+         ! ::
+
+      read_extra_colors_inlist(:) = .false.
+      extra_colors_inlist_name(:) = 'undefined'

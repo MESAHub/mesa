@@ -4,13 +4,16 @@ module run_star_extras
   use const_def
   use math_lib
   use auto_diff
-  use colors_def
-  use colors_lib
+  ! TODO: below are things we will need to incorporate into the main code
+  ! So that we do not need to create a custom run_stars_extras file
+  use colors_def, only: Colors_General_Info
+  use colors_lib, only: colors_init,colors_ptr,alloc_colors_handle_using_inlist, calculate_bolometric, calculate_synthetic, remove_dat
 
   implicit none
 
-
+  type (colors_General_Info), pointer :: colors_settings
   include "test_suite_extras_def.inc"
+
   contains
 
 subroutine extras_controls(id, ierr)
@@ -18,25 +21,33 @@ subroutine extras_controls(id, ierr)
     integer, intent(out) :: ierr
     type (star_info), pointer :: s
 
+    integer :: colors_handle
+
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
     print *, "Extras startup routine"
 
     ! Initialize the colors module
-    call colors_init(ierr)
+    ! TODO: we will have to do this somewhere in MESA, dig around how/where kap does this.
+    ! this is a little hacky
+    call colors_init(.false., '', ierr)
+    colors_handle = alloc_colors_handle_using_inlist(s% inlist_fname, ierr)
+    call colors_ptr(colors_handle,colors_settings,ierr)
     if (ierr /= 0) then
         print *, "Error initializing colors module"
         return
     end if
 
-    ! Set the colors parameters directly in star_info
-    s%color_instrument = 'data/filters/GAIA/GAIA'
-    s%color_vega_sed = 'data/stellar_models/vega_flam.csv'
-    s%color_atm = 'data/stellar_models/Kurucz2003all/'
-    s%color_z = 0.0d0
-    s%color_d = 3.0857d17  ! 10pc for abs mag
-    s%color_make_csv = .false.
+    ! Debug print statements to check that values are properly loaded from inlist
+    write(*,*) 'DEBUG: colors_handle = ', colors_handle
+    write(*,*) 'DEBUG: colors instrument = ', trim(colors_settings% instrument)
+    write(*,*) 'DEBUG: colors vega_sed = ', trim(colors_settings% vega_sed)
+    write(*,*) 'DEBUG: colors stellar_atm = ', trim(colors_settings% stellar_atm)
+    write(*,*) 'DEBUG: colors metallicity = ', colors_settings% metallicity
+    write(*,*) 'DEBUG: colors distance = ', colors_settings% distance
+    write(*,*) 'DEBUG: colors make_csv = ', colors_settings% make_csv
+    write(*,*) 'DEBUG: colors use_colors = ', colors_settings% use_colors
 
     ! Register callbacks
     s%extras_startup         => extras_startup
@@ -49,24 +60,6 @@ subroutine extras_controls(id, ierr)
     s%data_for_extra_profile_columns => data_for_extra_profile_columns
 end subroutine extras_controls
 
-  subroutine process_color_files(id, ierr)
-    integer, intent(in) :: id
-    integer, intent(out) :: ierr
-    type(star_info), pointer :: s
-
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
-
-    ! Debug print statements to check that values are properly loaded from inlist
-    write(*,*) 'DEBUG: color_instrument = ', trim(s%color_instrument)
-    write(*,*) 'DEBUG: color_vega_sed = ', trim(s%color_vega_sed)
-    write(*,*) 'DEBUG: color_atm = ', trim(s%color_atm)
-    write(*,*) 'DEBUG: color_z = ', s%color_z
-    write(*,*) 'DEBUG: color_d = ', s%color_d
-    write(*,*) 'DEBUG: color_make_csv = ', s%color_make_csv
-  end subroutine process_color_files
-
   subroutine extras_startup(id, restart, ierr)
      integer, intent(in) :: id
      logical, intent(in) :: restart
@@ -75,7 +68,7 @@ end subroutine extras_controls
      ierr = 0
      call star_ptr(id, s, ierr)
      if (ierr /= 0) return
-     call test_suite_startup(restart, ierr)
+     !XXXcall test_suite_startup(restart, ierr)
   end subroutine extras_startup
 
   subroutine extras_after_evolve(id, ierr)
@@ -92,7 +85,7 @@ end subroutine extras_controls
 
     ! Remove cleanup for col pointer
 
-    call test_suite_after_evolve(ierr)
+    !XXXcall test_suite_after_evolve(ierr)
   end subroutine extras_after_evolve
 
   
@@ -162,7 +155,7 @@ end subroutine extras_controls
           how_many_extra_history_columns = 0
           return
       end if
-   write(*,*) 'how_many: color_vega_sed = ', trim(s%color_vega_sed)
+   write(*,*) 'how_many: vega_sed = ', trim(colors_settings% vega_sed)
       call read_strings_from_file(strings, n, id)
       how_many_extra_history_columns = n + 2
       if (allocated(strings)) deallocate(strings)
@@ -196,12 +189,11 @@ end function
       if (ierr /= 0) return
 
 
-      !s%color_instrument = s%x_character_ctrl(2)
-      write(*,*) 's%color_vega_sed = ', trim(s%color_vega_sed)
-      write(*,*) 's%color_instrument = ', trim(s%color_instrument)
+      write(*,*) 'vega_sed = ', trim(colors_settings% vega_sed)
+      write(*,*) 'instrument = ', trim(colors_settings% instrument)
 
-      filename = trim(s%color_instrument) // "/" // &
-      trim(basename(s%color_instrument))
+      filename = trim(colors_settings% instrument) // "/" // &
+      trim(basename(colors_settings% instrument))
       n = 0
       unit = 10
       open(unit, file=filename, status='old', action='read', iostat=status)
@@ -249,22 +241,22 @@ end function
       R      = s%R(1)
 
 
-      metallicity = s%color_z
-      d = s%color_d
-      sed_filepath = s%color_atm
-      filter_dir = s%color_instrument
-      vega_filepath = s%color_vega_sed
-      make_sed = s%color_make_csv
+      metallicity = colors_settings% metallicity
+      d = colors_settings% distance
+      sed_filepath = colors_settings% stellar_atm
+      filter_dir = colors_settings% instrument
+      vega_filepath = colors_settings% vega_sed
+      make_sed = colors_settings% make_csv
 
       ! Use s% just like s%
-      print *, "Stellar atmosphere:", trim(s%color_atm)
-      print *, "Instrument:", trim(s%color_instrument)
+      print *, "Stellar atmosphere:", trim(colors_settings% stellar_atm)
+      print *, "Instrument:", trim(colors_settings% instrument)
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))
       call read_strings_from_file(array_of_strings, num_strings, id)
 
-      CALL calculatebolometric(teff, log_g, metallicity, R, d,&
+      CALL calculate_bolometric(teff, log_g, metallicity, R, d,&
        bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude
@@ -280,7 +272,7 @@ end function
               filter_filepath = trim(filter_dir) // "/" // array_of_strings(i - 2)
 
               if (teff >= 0 .and. log_g >= 0 .and. metallicity >= 0) then
-                  vals(i) = calculatesynthetic(teff, log_g, metallicity, ierr,&
+                  vals(i) = calculate_synthetic(teff, log_g, metallicity, ierr,&
                    wavelengths, fluxes, filter_wavelengths, filter_trans, &
                    filter_filepath, vega_filepath, array_of_strings(i - 2),&
                     make_sed)
