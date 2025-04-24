@@ -25,168 +25,180 @@ CONTAINS
     CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
     REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
 
-    INTEGER :: i, n_lambda
+    INTEGER :: i, n_lambda, status, n_teff, n_logg, n_meta
     REAL(dp), DIMENSION(:), ALLOCATABLE :: interp_flux, diluted_flux
-    REAL(dp), DIMENSION(:,:,:), ALLOCATABLE :: flux_cube
+    REAL(dp), DIMENSION(:,:,:,:), ALLOCATABLE :: precomputed_flux_cube
+    REAL(dp), DIMENSION(:,:,:), ALLOCATABLE :: flux_cube_lambda
     
     ! Parameter grids
-    INTEGER :: n_teff, n_logg, n_meta
     REAL(dp), ALLOCATABLE :: teff_grid(:), logg_grid(:), meta_grid(:)
+    CHARACTER(LEN=256) :: bin_filename
 
-    ! Create parameter grids from available model parameters
-    PRINT *, 'Sorting unique Teff...'
-    CALL get_unique_sorted(lu_teff, teff_grid)
-    PRINT *, 'Unique Teff count:', SIZE(teff_grid)
+    ! Construct the binary filename
+    bin_filename = TRIM(stellar_model_dir) // '/flux_cube.bin'
     
-    PRINT *, 'Sorting unique logg...'
-    CALL get_unique_sorted(lu_logg, logg_grid)
-    PRINT *, 'Unique logg count:', SIZE(logg_grid)
+    PRINT *, 'Loading precomputed flux cube from:', TRIM(bin_filename)
     
-    PRINT *, 'Sorting unique metallicity...'
-    CALL get_unique_sorted(lu_meta, meta_grid)
-    PRINT *, 'Unique metallicity count:', SIZE(meta_grid)
-
+    ! Load the data from binary file
+    CALL load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
+                         wavelengths, precomputed_flux_cube, status)
+                         
+    IF (status /= 0) THEN
+      PRINT *, 'Error loading precomputed data. Falling back to on-the-fly computation.'
+      ! Here you could call the original implementation
+      RETURN
+    END IF
+    
     n_teff = SIZE(teff_grid)
     n_logg = SIZE(logg_grid)
     n_meta = SIZE(meta_grid)
-    
-    ! Allocate 3D grid for flux values at each wavelength point
-    ALLOCATE(flux_cube(n_teff, n_logg, n_meta))
-
-    ! Load first SED to get wavelength grid
-    PRINT *, 'Loading first SED for wavelength grid:'
-    PRINT *, TRIM(stellar_model_dir) // TRIM(file_names(1))
-    CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(1)), 1, wavelengths, fluxes)
-    PRINT *, 'Wavelength count:', SIZE(wavelengths)
     n_lambda = SIZE(wavelengths)
+    
+    PRINT *, 'Loaded flux cube with dimensions:', n_teff, 'x', n_logg, 'x', n_meta, 'x', n_lambda
+    PRINT *, 'Performing interpolation at target parameters...'
     
     ! Allocate space for interpolated flux
     ALLOCATE(interp_flux(n_lambda))
-
+    
     ! Process each wavelength point
-    PRINT *, 'Beginning interpolation over all wavelengths...'
     DO i = 1, n_lambda
-      IF (MOD(i, 100) == 0) PRINT *, '  Interpolating wavelength index:', i
-      
-      ! Build the 3D grid for this wavelength
-      CALL build_flux_grid_at_lambda(i, file_names, stellar_model_dir, &
-                                    teff_grid, logg_grid, meta_grid, flux_cube)
+      ! Extract the 3D grid for this wavelength
+      ALLOCATE(flux_cube_lambda(n_teff, n_logg, n_meta))
+      flux_cube_lambda = precomputed_flux_cube(:,:,:,i)
       
       ! Interpolate at the target parameters
       interp_flux(i) = hermite_tensor_interp3d(teff, log_g, metallicity, &
-                                              teff_grid, logg_grid, meta_grid, flux_cube)
+                                              teff_grid, logg_grid, meta_grid, flux_cube_lambda)
+      
+      DEALLOCATE(flux_cube_lambda)
     END DO
-
+    
     ! Apply distance dilution to get observed flux
     ALLOCATE(diluted_flux(n_lambda))
     CALL dilute_flux(interp_flux, R, d, diluted_flux)
     fluxes = diluted_flux
     
     ! Clean up
+    DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
     DEALLOCATE(diluted_flux, interp_flux)
+    
+    PRINT *, 'Interpolation complete'
   END SUBROUTINE constructsed_hermite
 
   !---------------------------------------------------------------------------
-  ! Build the 3D flux grid for a single wavelength point
+  ! Load data from binary file
   !---------------------------------------------------------------------------
-  SUBROUTINE build_flux_grid_at_lambda(lambda_index, file_names, stellar_model_dir, &
-                                      teff_grid, logg_grid, meta_grid, flux_cube)
-    INTEGER, INTENT(IN) :: lambda_index
-    CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
-    CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
-    REAL(dp), INTENT(IN) :: teff_grid(:), logg_grid(:), meta_grid(:)
-    REAL(dp), DIMENSION(:,:,:), INTENT(INOUT) :: flux_cube
-
-    INTEGER :: i, j, k, model_index
-    CHARACTER(LEN=256) :: model_path
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: temp_wavelengths, temp_flux
-
-    model_index = 1
-
-    DO i = 1, SIZE(teff_grid)
-      DO j = 1, SIZE(logg_grid)
-        DO k = 1, SIZE(meta_grid)
-          IF (MOD(model_index, 500) == 0) THEN
-            PRINT *, '  Loading model ', model_index, ' for lambda=', lambda_index
-          END IF
-          
-          IF (model_index <= SIZE(file_names)) THEN
-            model_path = TRIM(stellar_model_dir) // TRIM(file_names(model_index))
-            CALL loadsed(model_path, model_index, temp_wavelengths, temp_flux)
-            
-            IF (ALLOCATED(temp_flux) .AND. lambda_index <= SIZE(temp_flux)) THEN
-              flux_cube(i,j,k) = temp_flux(lambda_index)
-            ELSE
-              flux_cube(i,j,k) = 0.0_dp
-            END IF
-          ELSE
-            flux_cube(i,j,k) = 0.0_dp
-          END IF
-          
-          model_index = model_index + 1
-        END DO
-      END DO
-    END DO
-
-    IF (ALLOCATED(temp_wavelengths)) DEALLOCATE(temp_wavelengths)
-    IF (ALLOCATED(temp_flux)) DEALLOCATE(temp_flux)
+  SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
+                             wavelengths, flux_cube, status)
+    CHARACTER(LEN=*), INTENT(IN) :: filename
+    REAL(dp), ALLOCATABLE, INTENT(OUT) :: teff_grid(:), logg_grid(:), meta_grid(:)
+    REAL(dp), ALLOCATABLE, INTENT(OUT) :: wavelengths(:)
+    REAL(dp), ALLOCATABLE, INTENT(OUT) :: flux_cube(:,:,:,:)
+    INTEGER, INTENT(OUT) :: status
     
-    PRINT *, '  Finished lambda ', lambda_index
-  END SUBROUTINE build_flux_grid_at_lambda
-
-  !---------------------------------------------------------------------------
-  ! Get sorted unique values from an array
-  !---------------------------------------------------------------------------
-  SUBROUTINE get_unique_sorted(input_array, output_array)
-    REAL(dp), INTENT(IN) :: input_array(:)
-    REAL(dp), ALLOCATABLE, INTENT(OUT) :: output_array(:)
-
-    INTEGER :: i, n, unique_count
-    REAL(dp), ALLOCATABLE :: temp(:)
-    REAL(dp), PARAMETER :: TOLERANCE = 1.0D-8
-
-    n = SIZE(input_array)
-    ALLOCATE(temp(n))
-    temp = input_array
-
-    ! Sort the array
-    CALL sort_array(temp)
-
-    ! Count unique values (with tolerance)
-    unique_count = 1
-    DO i = 2, n
-      IF (ABS(temp(i) - temp(unique_count)) > TOLERANCE) THEN
-        unique_count = unique_count + 1
-        temp(unique_count) = temp(i)
-      END IF
-    END DO
-
-    ! Create output array with unique values
-    ALLOCATE(output_array(unique_count))
-    output_array = temp(1:unique_count)
-    DEALLOCATE(temp)
-  END SUBROUTINE get_unique_sorted
-
-  !---------------------------------------------------------------------------
-  ! Sort an array using selection sort (simple but effective for small arrays)
-  !---------------------------------------------------------------------------
-  SUBROUTINE sort_array(array)
-    REAL(dp), INTENT(INOUT) :: array(:)
-    INTEGER :: i, j, min_idx
-    REAL(dp) :: temp
-
-    DO i = 1, SIZE(array)-1
-      min_idx = i
-      DO j = i+1, SIZE(array)
-        IF (array(j) < array(min_idx)) min_idx = j
-      END DO
-      IF (min_idx /= i) THEN
-        temp = array(i)
-        array(i) = array(min_idx)
-        array(min_idx) = temp
-      END IF
-    END DO
-  END SUBROUTINE sort_array
+    INTEGER :: unit, n_teff, n_logg, n_meta, n_lambda
+    
+    unit = 99
+    status = 0
+    
+    ! Open the binary file
+    OPEN(UNIT=unit, FILE=filename, STATUS='OLD', ACCESS='STREAM', FORM='UNFORMATTED', IOSTAT=status)
+    IF (status /= 0) THEN
+      PRINT *, 'Error opening binary file:', TRIM(filename)
+      RETURN
+    END IF
+    
+    ! Read dimensions
+    READ(unit, IOSTAT=status) n_teff, n_logg, n_meta, n_lambda
+    IF (status /= 0) THEN
+      PRINT *, 'Error reading dimensions from binary file'
+      CLOSE(unit)
+      RETURN
+    END IF
+    
+    ! Allocate arrays based on dimensions
+    ALLOCATE(teff_grid(n_teff), STAT=status)
+    IF (status /= 0) THEN
+      PRINT *, 'Error allocating teff_grid array'
+      CLOSE(unit)
+      RETURN
+    END IF
+    
+    ALLOCATE(logg_grid(n_logg), STAT=status)
+    IF (status /= 0) THEN
+      PRINT *, 'Error allocating logg_grid array'
+      DEALLOCATE(teff_grid)
+      CLOSE(unit)
+      RETURN
+    END IF
+    
+    ALLOCATE(meta_grid(n_meta), STAT=status)
+    IF (status /= 0) THEN
+      PRINT *, 'Error allocating meta_grid array'
+      DEALLOCATE(teff_grid, logg_grid)
+      CLOSE(unit)
+      RETURN
+    END IF
+    
+    ALLOCATE(wavelengths(n_lambda), STAT=status)
+    IF (status /= 0) THEN
+      PRINT *, 'Error allocating wavelengths array'
+      DEALLOCATE(teff_grid, logg_grid, meta_grid)
+      CLOSE(unit)
+      RETURN
+    END IF
+    
+    ALLOCATE(flux_cube(n_teff, n_logg, n_meta, n_lambda), STAT=status)
+    IF (status /= 0) THEN
+      PRINT *, 'Error allocating flux_cube array'
+      DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths)
+      CLOSE(unit)
+      RETURN
+    END IF
+    
+    ! Read grid arrays
+    READ(unit, IOSTAT=status) teff_grid
+    IF (status /= 0) THEN
+      PRINT *, 'Error reading teff_grid'
+      GOTO 999  ! Cleanup and return cheeky goto
+    END IF
+    
+    READ(unit, IOSTAT=status) logg_grid
+    IF (status /= 0) THEN
+      PRINT *, 'Error reading logg_grid'
+      GOTO 999  ! Cleanup and return
+    END IF
+    
+    READ(unit, IOSTAT=status) meta_grid
+    IF (status /= 0) THEN
+      PRINT *, 'Error reading meta_grid'
+      GOTO 999  ! Cleanup and return
+    END IF
+    
+    READ(unit, IOSTAT=status) wavelengths
+    IF (status /= 0) THEN
+      PRINT *, 'Error reading wavelengths'
+      GOTO 999  ! Cleanup and return
+    END IF
+    
+    ! Read flux cube
+    READ(unit, IOSTAT=status) flux_cube
+    IF (status /= 0) THEN
+      PRINT *, 'Error reading flux_cube'
+      GOTO 999  ! Cleanup and return
+    END IF
+    
+    ! Close file and return success
+    CLOSE(unit)
+    RETURN
+    
+999 CONTINUE
+    ! Cleanup on error
+    DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths, flux_cube)
+    CLOSE(unit)
+    RETURN
+    
+  END SUBROUTINE load_binary_data
 
   !---------------------------------------------------------------------------
   ! Main 3D Hermite interpolation function
@@ -462,7 +474,7 @@ CONTAINS
       RETURN
     END IF
     
-    ! Binary search to find interval
+! Binary search to find interval
     lo = 1
     hi = n
     DO WHILE (hi - lo > 1)
@@ -590,15 +602,4 @@ CONTAINS
     h = t**3 - t**2
   END FUNCTION h11
 
-
-
-
-
-
-
-
-
-
-
-
-END MODULE hermite_interp
+END MODULE hermite_interp      
