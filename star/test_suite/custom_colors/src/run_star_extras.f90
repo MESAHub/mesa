@@ -155,7 +155,7 @@ end subroutine extras_controls
           how_many_extra_history_columns = 0
           return
       end if
-   write(*,*) 'how_many: vega_sed = ', trim(colors_settings% vega_sed)
+
       call read_strings_from_file(strings, n, id)
       how_many_extra_history_columns = n + 2
       if (allocated(strings)) deallocate(strings)
@@ -189,8 +189,8 @@ end function
       if (ierr /= 0) return
 
 
-      write(*,*) 'vega_sed = ', trim(colors_settings% vega_sed)
-      write(*,*) 'instrument = ', trim(colors_settings% instrument)
+      !write(*,*) 'vega_sed = ', trim(colors_settings% vega_sed)
+      !write(*,*) 'instrument = ', trim(colors_settings% instrument)
 
       filename = trim(colors_settings% instrument) // "/" // &
       trim(basename(colors_settings% instrument))
@@ -239,9 +239,9 @@ end function
       teff   = s%T(1)
       log_g  = LOG10(s%grav(1))
       R      = s%R(1)
+      metallicity = s%kap_rq%Zbase
 
-
-      metallicity = colors_settings% metallicity
+      !metallicity = colors_settings% metallicity
       d = colors_settings% distance
       sed_filepath = colors_settings% stellar_atm
       filter_dir = colors_settings% instrument
@@ -249,8 +249,8 @@ end function
       make_sed = colors_settings% make_csv
 
       ! Use s% just like s%
-      print *, "Stellar atmosphere:", trim(colors_settings% stellar_atm)
-      print *, "Instrument:", trim(colors_settings% instrument)
+      !print *, "Stellar atmosphere:", trim(colors_settings% stellar_atm)
+      !print *, "Instrument:", trim(colors_settings% instrument)
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))

@@ -65,6 +65,9 @@ def load_lookup_table(lookup_file):
         for line in f:
             if line.strip():
                 values = line.strip().split(',')
+                if len(values) <= max(file_col, teff_col or 0, logg_col or 0, meta_col or 0):
+                    continue  # Skip lines that don't have enough values
+                
                 file_names.append(values[file_col].strip())
                 
                 try:
@@ -79,6 +82,7 @@ def load_lookup_table(lookup_file):
                     # Skip rows with invalid values
                     file_names.pop()  # Remove the added filename
     
+    print(f"Column indices found - teff: {teff_col}, logg: {logg_col}, meta: {meta_col}")
     return file_names, np.array(teff_values), np.array(logg_values), np.array(meta_values)
 
 def get_unique_sorted(values, tolerance=1e-8):
@@ -104,8 +108,21 @@ def save_binary_file(output_file, wavelengths, teff_grid, logg_grid, meta_grid, 
         meta_grid.astype(np.float64).tofile(f)
         wavelengths.astype(np.float64).tofile(f)
         
-        # Write flux cube
+        # Write flux cube - make sure it's in Fortran column-major order
         flux_cube.astype(np.float64).tofile(f)
+        
+        # Also save a text version of the grids for debugging
+        debug_file = output_file + ".txt"
+        with open(debug_file, 'w') as df:
+            df.write("# Teff grid\n")
+            for val in teff_grid:
+                df.write(f"{val}\n")
+            df.write("\n# Logg grid\n")
+            for val in logg_grid:
+                df.write(f"{val}\n")
+            df.write("\n# Metallicity grid\n")
+            for val in meta_grid:
+                df.write(f"{val}\n")
 
 def precompute_flux_cube(stellar_model_dir, output_file):
     """Precompute the 3D flux cube for all wavelengths."""
@@ -121,8 +138,19 @@ def precompute_flux_cube(stellar_model_dir, output_file):
     meta_grid = get_unique_sorted(meta_values)
     
     print(f"Unique Teff values: {len(teff_grid)}")
+    for i, v in enumerate(teff_grid):
+        if i < 5 or i > len(teff_grid) - 5:
+            print(f"  Teff[{i}] = {v}")
+    
     print(f"Unique logg values: {len(logg_grid)}")
+    for i, v in enumerate(logg_grid):
+        if i < 5 or i > len(logg_grid) - 5:
+            print(f"  logg[{i}] = {v}")
+    
     print(f"Unique metallicity values: {len(meta_grid)}")
+    for i, v in enumerate(meta_grid):
+        if i < 5 or i > len(meta_grid) - 5:
+            print(f"  meta[{i}] = {v}")
     
     # Load first SED to get wavelength grid
     first_file = os.path.join(stellar_model_dir, file_names[0])
@@ -134,22 +162,42 @@ def precompute_flux_cube(stellar_model_dir, output_file):
     # Create the flux cube
     flux_cube = np.zeros((len(teff_grid), len(logg_grid), len(meta_grid), n_lambda))
     
+    # Create a map to track where we've filled in the cube
+    filled_map = np.zeros((len(teff_grid), len(logg_grid), len(meta_grid)), dtype=bool)
+    
     # Process all model files
     model_index = 0
+    missing_points = 0
+    
     for file_name, teff, logg, meta in tqdm(zip(file_names, teff_values, logg_values, meta_values), 
                                           total=len(file_names), desc="Processing models"):
         # Find the indices in the grids
         i_teff = np.searchsorted(teff_grid, teff)
-        if i_teff == len(teff_grid):
-            i_teff -= 1
-            
+        if i_teff == len(teff_grid) or teff_grid[i_teff] != teff:
+            if i_teff > 0 and i_teff < len(teff_grid):
+                # Check which one is closer
+                if abs(teff_grid[i_teff-1] - teff) < abs(teff_grid[i_teff] - teff):
+                    i_teff = i_teff - 1
+            elif i_teff == len(teff_grid):
+                i_teff = i_teff - 1
+                
         i_logg = np.searchsorted(logg_grid, logg)
-        if i_logg == len(logg_grid):
-            i_logg -= 1
-            
+        if i_logg == len(logg_grid) or logg_grid[i_logg] != logg:
+            if i_logg > 0 and i_logg < len(logg_grid):
+                # Check which one is closer
+                if abs(logg_grid[i_logg-1] - logg) < abs(logg_grid[i_logg] - logg):
+                    i_logg = i_logg - 1
+            elif i_logg == len(logg_grid):
+                i_logg = i_logg - 1
+                
         i_meta = np.searchsorted(meta_grid, meta)
-        if i_meta == len(meta_grid):
-            i_meta -= 1
+        if i_meta == len(meta_grid) or meta_grid[i_meta] != meta:
+            if i_meta > 0 and i_meta < len(meta_grid):
+                # Check which one is closer
+                if abs(meta_grid[i_meta-1] - meta) < abs(meta_grid[i_meta] - meta):
+                    i_meta = i_meta - 1
+            elif i_meta == len(meta_grid):
+                i_meta = i_meta - 1
         
         # Load the SED
         model_path = os.path.join(stellar_model_dir, file_name)
@@ -160,21 +208,58 @@ def precompute_flux_cube(stellar_model_dir, output_file):
             if len(model_wavelengths) == n_lambda and np.allclose(model_wavelengths, wavelengths):
                 # Same grid, directly store values
                 flux_cube[i_teff, i_logg, i_meta, :] = model_fluxes
+                filled_map[i_teff, i_logg, i_meta] = True
             else:
                 # Interpolate to the common wavelength grid
                 flux_cube[i_teff, i_logg, i_meta, :] = np.interp(
                     wavelengths, model_wavelengths, model_fluxes, 
                     left=0.0, right=0.0
                 )
+                filled_map[i_teff, i_logg, i_meta] = True
         except Exception as e:
+            missing_points += 1
             print(f"Error processing {model_path}: {str(e)}")
         
         model_index += 1
+    
+    # Check for empty grid points
+    empty_points = np.sum(~filled_map)
+    if empty_points > 0:
+        print(f"Warning: {empty_points} grid points are empty and need filling")
+        
+        # Simple fill algorithm: use nearest neighbor
+        for i_teff in range(len(teff_grid)):
+            for i_logg in range(len(logg_grid)):
+                for i_meta in range(len(meta_grid)):
+                    if not filled_map[i_teff, i_logg, i_meta]:
+                        # Find nearest filled neighbor
+                        best_dist = float('inf')
+                        best_i, best_j, best_k = -1, -1, -1
+                        
+                        for ii in range(len(teff_grid)):
+                            for jj in range(len(logg_grid)):
+                                for kk in range(len(meta_grid)):
+                                    if filled_map[ii, jj, kk]:
+                                        # Simple Euclidean distance, could be improved
+                                        d_teff = (teff_grid[i_teff] - teff_grid[ii])/1000  # Scale for comparable magnitude
+                                        d_logg = logg_grid[i_logg] - logg_grid[jj]
+                                        d_meta = meta_grid[i_meta] - meta_grid[kk]
+                                        dist = d_teff**2 + d_logg**2 + d_meta**2
+                                        
+                                        if dist < best_dist:
+                                            best_dist = dist
+                                            best_i, best_j, best_k = ii, jj, kk
+                        
+                        if best_i >= 0:
+                            # Copy data from nearest neighbor
+                            flux_cube[i_teff, i_logg, i_meta, :] = flux_cube[best_i, best_j, best_k, :]
+                            filled_map[i_teff, i_logg, i_meta] = True
     
     # Save the precomputed data
     save_binary_file(output_file, wavelengths, teff_grid, logg_grid, meta_grid, flux_cube)
     
     print(f"Precomputed data saved to {output_file}")
+    print(f"Missing points during processing: {missing_points}")
     
     # Print some stats for verification
     print("\nData summary:")

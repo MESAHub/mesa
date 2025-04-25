@@ -1,0 +1,10 @@
+
+&colors
+      use_colors = .true.
+      instrument = 'data/filters/GAIA/GAIA'
+      vega_sed = 'data/stellar_models/vega_flam.csv'
+      stellar_atm = 'data/stellar_models/Kurucz2003all/'
+      metallicity = 0.02
+      distance = 3.0857d17
+      make_csv = .true.
+/ ! end of colors namelist

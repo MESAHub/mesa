@@ -1,151 +1,255 @@
-#!/usr/bin/env python3.8
-####################################################
-#
-# Author: M Joyce, Modified by N. Miller,
-#         Further modified to automatically use all filters
-#         by reading the header of the history file.
-#
-####################################################
+#!/usr/bin/env python3
 import glob
-
+import os
+import time
 import matplotlib.pyplot as plt
 import mesa_reader as mr
 import numpy as np
+from matplotlib.animation import FuncAnimation
 
-# Locate the history.data file
-f = glob.glob("../LOGS/history.data")[0]
 
-# Read the MESA data (this part is unchanged and works)
-md = mr.MesaData(f)
-Teff = md.Teff
-Log_L = md.log_L
-Log_g = md.log_g
-Log_R = md.log_R
-Star_Age = md.star_age
-Mag_bol = md.Mag_bol
-Flux_bol = np.log10(md.Flux_bol)  # Convert to log scale
-
-# -------------------------------------------------------------------
-# Determine all history file column names by reading the header.
-#
-# The history file (by your description) has two header blocks.
-# The second header block (which lists the history data column names)
-# has a line that includes "model_number".
-# We read that line and split it into column names.
-# -------------------------------------------------------------------
-header_line = None
-with open(f, "r") as fp:
-    for line in fp:
-        if "model_number" in line:
-            header_line = line.strip()
-            break
-
-if header_line is None:
-    raise ValueError(
-        "Could not find a header line containing 'model_number' in the file."
-    )
-
-# Split the header line on whitespace.
-all_cols = header_line.split()
-# For example, with your sample header, all_cols might be:
-# ['model_number', 'num_zones', 'star_age', 'log_dt', 'star_mass', 'Teff',
-#  'log_Teff', 'log_L', 'log_R', 'log_g', 'num_retries', 'num_iters',
-#  'Mag_bol', 'Flux_bol', 'Gbp_bright', 'Gbp', 'Gbp_faint', 'G', 'Grp', 'Grvs']
-# print("All history columns:", all_cols)
-
-# -------------------------------------------------------------------
-# Assume that all columns after "Flux_bol" are filters.
-# (That is, Flux_bol is the last "fixed" column.)
-# -------------------------------------------------------------------
-try:
-    flux_index = all_cols.index("Flux_bol")
-except ValueError:
-    raise ValueError("The header does not contain a 'Flux_bol' column.")
-
-filter_names = all_cols[flux_index + 1 :]
-print("Detected filter columns:", filter_names)
-
-# -------------------------------------------------------------------
-# For the HR diagram, we want a color index.
-#
-# If Gaia filters ("Gbp", "Grp", and "G") are among the filters,
-# we use them (as in your working version).
-# Otherwise, if at least two filter columns exist, we use the first two.
-# -------------------------------------------------------------------
-if "Gbp" in filter_names and "Grp" in filter_names and "G" in filter_names:
-    hr_color = md.Gbp - md.Grp
-    hr_mag = md.G
-    hr_xlabel = "Gbp - Grp"
-    hr_ylabel = "G"
-    color_index = hr_color
-else:
-    if len(filter_names) >= 2:
-        # Use the first two filters.
-        f1 = filter_names[0]
-        f2 = filter_names[1]
-        # We can retrieve the data using getattr (mesa_reader creates attributes for each column)
+class HistoryChecker:
+    def __init__(self, history_file="../LOGS/history.data", refresh_interval=1):
+        """
+        Initialize the History checker with auto-refresh capability.
+        
+        Args:
+            history_file: Path to the MESA history.data file
+            refresh_interval: Time in seconds between refresh attempts
+        """
+        self.history_file = history_file
+        self.refresh_interval = refresh_interval
+        self.last_modified = None
+        
+        # Create the figure and axes
+        self.fig, self.axes = plt.subplots(
+            2, 2, figsize=(14, 18), gridspec_kw={"hspace": 0.2, "wspace": 0.2}
+        )
+    
+        self.update_flag = 0
+        # Initial setup
+        self.filter_columns = []
+        self.update_data()
+        self.setup_plot()
+    
+    def setup_plot(self):
+        """Set up the plot with formatting and labels."""
+        # Top-left plot: HR Diagram (Color vs. Magnitude)
+        self.axes[0, 0].set_xlabel(self.hr_xlabel)
+        self.axes[0, 0].set_ylabel(self.hr_ylabel)
+        self.axes[0, 0].invert_yaxis()
+        
+        # Top-right plot: Teff vs. Log_L
+        self.axes[0, 1].set_xlabel("Teff (K)")
+        self.axes[0, 1].set_ylabel("Log_L")
+        self.axes[0, 1].invert_xaxis()
+        self.axes[0, 1].yaxis.set_label_position("right")
+        self.axes[0, 1].yaxis.tick_right()
+        
+        # Bottom-left plot: Age vs. Color Index
+        self.axes[1, 0].set_xlabel("Age")
+        self.axes[1, 0].set_ylabel(f"Color ({self.hr_xlabel})")
+        
+        # Bottom-right plot: Age vs. All Filter Magnitudes
+        self.axes[1, 1].set_xlabel("Age")
+        self.axes[1, 1].set_ylabel("Magnitude")
+        self.axes[1, 1].invert_yaxis()
+        self.axes[1, 1].yaxis.set_label_position("right")
+        self.axes[1, 1].yaxis.tick_right()
+        
+        plt.tight_layout()
+    
+    def check_for_changes(self):
+        """Check if history file has been modified since last check."""
+        if not os.path.exists(self.history_file):
+            print(f"Warning: History file {self.history_file} not found")
+            return False
+            
+        current_mtime = os.path.getmtime(self.history_file)
+        
+        if self.last_modified is None or current_mtime > self.last_modified:
+            self.last_modified = current_mtime
+            return True
+        
+        return False
+    
+    def update_data(self):
+        """Read data from history file and extract relevant columns."""
+        if not os.path.exists(self.history_file):
+            print(f"Warning: History file {self.history_file} not found")
+            return
+        
         try:
-            col1 = getattr(md, f1)
-            col2 = getattr(md, f2)
-        except AttributeError:
-            # Alternatively, use md.data(key) if the attribute isn't present.
-            col1 = md.data(f1)
-            col2 = md.data(f2)
-        hr_color = col1 - col2
-        hr_mag = col1
-        hr_xlabel = f"{f1} - {f2}"
-        hr_ylabel = f1
-        color_index = hr_color
-    else:
-        raise ValueError("Not enough filter columns found to construct a color index.")
+            # Read the MESA data
+            self.md = mr.MesaData(self.history_file)
+            
+            # Basic stellar parameters
+            self.Teff = self.md.Teff
+            self.Log_L = self.md.log_L
+            self.Log_g = self.md.log_g
+            self.Log_R = self.md.log_R
+            self.Star_Age = self.md.star_age
+            self.Mag_bol = self.md.Mag_bol
+            self.Flux_bol = np.log10(self.md.Flux_bol)  # Convert to log scale
+            
+            # Determine all history file column names by reading the header
+            self.read_header_columns()
+            
+            # Set up HR diagram parameters
+            self.setup_hr_diagram_params()
+            
+        except Exception as e:
+            print(f"Error reading history data: {e}")
+    
+    def read_header_columns(self):
+        """Read column headers from history file."""
+        header_line = None
+        with open(self.history_file, "r") as fp:
+            for line in fp:
+                if "model_number" in line:
+                    header_line = line.strip()
+                    break
+        
+        if header_line is None:
+            print("Warning: Could not find header line with 'model_number'")
+            self.all_cols = []
+            self.filter_columns = []
+            return
+        
+        # Split the header line on whitespace
+        self.all_cols = header_line.split()
+        
+        # Find the index of Flux_bol
+        try:
+            flux_index = self.all_cols.index("Flux_bol")
+            self.filter_columns = self.all_cols[flux_index + 1:]
+            #print("Detected filter columns:", self.filter_columns)
+        except ValueError:
+            print("Warning: Could not find 'Flux_bol' column in header")
+            self.filter_columns = []
+    
+    def setup_hr_diagram_params(self):
+        """Set up parameters for HR diagram based on available filters."""
+        # For the HR diagram, set up color index and magnitude
+        if "Gbp" in self.filter_columns and "Grp" in self.filter_columns and "G" in self.filter_columns:
+            self.hr_color = self.md.Gbp - self.md.Grp
+            self.hr_mag = self.md.G
+            self.hr_xlabel = "Gbp - Grp"
+            self.hr_ylabel = "G"
+            self.color_index = self.hr_color
+        else:
+            if len(self.filter_columns) >= 2:
+                # Use the first two filters
+                f1 = self.filter_columns[0]
+                f2 = self.filter_columns[1]
+                
+                # Retrieve the data using getattr or data method
+                try:
+                    col1 = getattr(self.md, f1)
+                    col2 = getattr(self.md, f2)
+                except AttributeError:
+                    # Alternatively, use md.data(key) if the attribute isn't present
+                    col1 = self.md.data(f1)
+                    col2 = self.md.data(f2)
+                    
+                self.hr_color = col1 - col2
+                self.hr_mag = col1
+                self.hr_xlabel = f"{f1} - {f2}"
+                self.hr_ylabel = f1
+                self.color_index = self.hr_color
+            else:
+                # Default values if not enough filters
+                print("Warning: Not enough filter columns to construct color index")
+                self.hr_color = np.zeros_like(self.Teff)
+                self.hr_mag = np.zeros_like(self.Teff)
+                self.hr_xlabel = "Color Index"
+                self.hr_ylabel = "Magnitude"
+                self.color_index = self.hr_color
+    
+    def update_plot(self, frame):
+        """Update the plot with new data if the file has changed."""
+        if not self.check_for_changes():
+            return
+        
+        if self.update_flag < 5:
+            print(f"Detected changes in {self.history_file}, updating plot...")
+            self.update_flag = self.update_flag + 1
+        elif self.update_flag == 5:
+            print(f"... MESA is clearly running so no more updates about: {self.history_file}")
+            self.update_flag = self.update_flag + 1
+        
+        # Update data
+        self.update_data()
+        
+        # Clear all axes
+        for ax in self.axes.flatten():
+            ax.clear()
+        
+        # Reset plot formatting
+        self.setup_plot()
+        
+        # Top-left plot: HR Diagram (Color vs. Magnitude)
+        self.axes[0, 0].plot(self.hr_color, self.hr_mag, "go")
+        
+        # Top-right plot: Teff vs. Log_L
+        self.axes[0, 1].plot(self.Teff, self.Log_L, "go")
+        
+        # Bottom-left plot: Age vs. Color Index
+        self.axes[1, 0].plot(self.Star_Age, self.color_index, "kx")
+        
+        # Bottom-right plot: Age vs. All Filter Magnitudes
+        for filt in self.filter_columns:
+            # Retrieve filter magnitude data
+            try:
+                col_data = getattr(self.md, filt)
+            except AttributeError:
+                try:
+                    col_data = self.md.data(filt)
+                except:
+                    print(f"Warning: Could not retrieve data for filter {filt}")
+                    continue
+                    
+            self.axes[1, 1].plot(
+                self.Star_Age, col_data, marker="o", linestyle="-", label=filt
+            )
+        
+        # Add legend to filter plot
+        self.axes[1, 1].legend()
+        
+        # Update the figure
+        self.fig.canvas.draw_idle()
+    
+    def run(self):
+        """Start the auto-refreshing display."""
+        print(f"Monitoring history file: {self.history_file}")
+        print(f"Refresh interval: {self.refresh_interval} seconds")
+        
+        # Initial plot
+        self.update_plot(0)
+        
+        # Set up animation
+        self.animation = FuncAnimation(
+            self.fig, 
+            self.update_plot,
+            interval=self.refresh_interval * 1000,  # Convert to milliseconds
+            cache_frame_data=False
+        )
+        
+        # Show the plot (this will block until window is closed)
+        plt.show()
 
-# -------------------------------------------------------------------
-# Create the plots.
-#
-# The top-left panel shows the HR diagram (color vs. magnitude),
-# the top-right panel is Teff vs. Log_L,
-# the bottom-left panel is Age vs. color index,
-# and the bottom-right panel shows Age vs. magnitude for every filter.
-# -------------------------------------------------------------------
-fig, axes = plt.subplots(
-    2, 2, figsize=(14, 18), gridspec_kw={"hspace": 0.2, "wspace": 0.2}
-)
 
-# Top-left plot: HR Diagram (Color vs. Magnitude)
-axes[0, 0].plot(hr_color, hr_mag, "go")
-axes[0, 0].set_xlabel(hr_xlabel)
-axes[0, 0].set_ylabel(hr_ylabel)
-axes[0, 0].invert_yaxis()
-
-# Top-right plot: Teff vs. Log_L
-axes[0, 1].plot(Teff, Log_L, "go")
-axes[0, 1].set_xlabel("Teff (K)")
-axes[0, 1].set_ylabel("Log_L")
-axes[0, 1].invert_xaxis()
-axes[0, 1].yaxis.set_label_position("right")
-axes[0, 1].yaxis.tick_right()
-
-# Bottom-left plot: Age vs. Color Index
-axes[1, 0].plot(Star_Age, color_index, "kx")
-axes[1, 0].set_xlabel("Age")
-axes[1, 0].set_ylabel(f"Color ({hr_xlabel})")
-
-# Bottom-right plot: Age vs. All Filter Magnitudes
-for filt in filter_names:
-    # Retrieve each filter's data.
-    # Since mesa_reader creates properties for each column,
-    # we can try using getattr; if that fails, we use md.data(filt)
+def main():
+    # Locate the history.data file
     try:
-        col_data = getattr(md, filt)
-    except AttributeError:
-        col_data = md.data(filt)
-    axes[1, 1].plot(Star_Age, col_data, marker="o", linestyle="-", label=filt)
+        history_file = glob.glob("../LOGS/history.data")[0]
+    except IndexError:
+        history_file = "../LOGS/history.data"  # Default path if not found
+        print(f"Warning: No history.data file found, will check for {history_file}")
+    
+    checker = HistoryChecker(history_file=history_file, refresh_interval=5)
+    checker.run()
 
-axes[1, 1].set_xlabel("Age")
-axes[1, 1].set_ylabel("Magnitude")
-axes[1, 1].invert_yaxis()
-axes[1, 1].yaxis.set_label_position("right")
-axes[1, 1].yaxis.tick_right()
-axes[1, 1].legend()
 
-plt.show()
+if __name__ == "__main__":
+    main()
