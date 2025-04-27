@@ -142,16 +142,16 @@
 ! C%C      do IX=1,MAXY
 ! C%C         write(*,'(''Z, A ('',I2,''): ''$)') IX
 ! C%C         read*,AZion(IX),ACMI(IX)
-! C%C        if (AZion(IX).le.0..or.ACMI(IX).le.0.) GOTO 2
+! C%C        if (AZion(IX) <= 0..or.ACMI(IX) <= 0.) GOTO 2
 ! C%C         write(*,'(''x ('',I2,''): ''$)') IX
 ! C%C         read*,AY(IX)
 ! C%C         XSUM=XSUM+AY(IX)
-! C%C        if (AY(IX).le.0.) GOTO 2
+! C%C        if (AY(IX) <= 0.) GOTO 2
 ! C%C         NMIX=IX
-! C%C        if (dabs(XSUM-1.d0).lt.EPS) GOTO 2
+! C%C        if (dabs(XSUM-1.d0) < EPS) GOTO 2
 ! C%C      end do
 ! C%C    2 continue
-! C%C      if (NMIX.eq.0) then
+! C%C      if (NMIX == 0) then
 ! C%C         print*,'There must be at least one set of positive (x,Z,A).'
 ! C%C        GOTO 3
 ! C%C      end if
@@ -162,11 +162,11 @@
 ! C%C    9 continue
 ! C%C      write(*,'('' Input T (K) (<0 to stop): ''$)')
 ! C%C      read*,T
-! C%C      if (T.le.0.) stop
+! C%C      if (T <= 0.) stop
 ! C%C   10 continue
 ! C%C      write(*,'('' Input RHO [g/cc] (<0 to new T): ''$)')
 ! C%C      read*,RHO
-! C%C      if (RHO.le.0.) GOTO 9
+! C%C      if (RHO <= 0.) GOTO 9
 ! C%C      RHOlg=dlog10(RHO)
 ! C%C      Tlg=dlog10(T)
 ! C%C      T6=10.d0**(Tlg-6.d0)
@@ -419,7 +419,7 @@
          ! MESA doesn't warn/error when this term gets large because
          ! it is not clear that we are better off falling back to HELM
          !
-         ! if (FWK.gt..7d0) then
+         ! if (FWK > .7d0) then
          !    print*,'MELANGE9: strong quantum effects in liquid!'
          !    ierr = -1
          !    return
@@ -1647,7 +1647,7 @@
       TEMR=TEMP/BOHR2  ! T in rel.units (=T/mc^2)
       EF=CHI*TEMR  ! Fermi energy in mc^2 - zeroth approx. = CMU1
       DeltaEF=PI2*TEMR*TEMR/6.d0*(1.d0+2.d0*EF*(2.d0+EF)) &
-             /(EF*(1.d0+EF)*(2.d0+EF))  ! corr. [page 125, equiv.Eq.(6) of PC'10]]
+             /(EF*(1.d0+EF)*(2.d0+EF))  ! corr. [page 125, equiv. Eq.(6) of PC'10]]
       EF=EF+DeltaEF  ! corrected Fermi energy (14.02.09)
       G=1.d0+EF  ! electron Lorentz-factor
       if (EF>1.d-5) then  ! relativistic expansion (Yak.&Shal.'89)

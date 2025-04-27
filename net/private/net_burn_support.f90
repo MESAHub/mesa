@@ -28,9 +28,7 @@
       integer, parameter :: qcol_imax=13, kmaxx = 7, stifbs_imax  = kmaxx+1
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine netint( &
             start,stptry,stpmin,max_steps,stopp,y, &
@@ -75,7 +73,6 @@
 
       real(dp) :: yscal(nvar),dydx(nvar),cons,x,h,hdid,hnext,xx
       real(dp), parameter  :: tiny=1.0d-15
-
 
       real(dp) :: y0(nvar),a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
       integer :: i,kmax,kopt,nseq(stifbs_imax),nvold
@@ -317,7 +314,7 @@
          reduct = .true.
          ierr = 0
          if (dbg) write(*,*) 'ierr: simpr failed in stifbs'
-         GOTO 2
+         GOTO 02
 
          write(*,*) 'simpr failed in stifbs'
          return
@@ -339,7 +336,7 @@
          end if
         end do
 
-        errmax   = errmax/eps
+        errmax = errmax/eps
         km = k - 1
         err(km) = pow(errmax/safe1,1.0d0/(2*km+1))
        end if
@@ -379,7 +376,7 @@
       if (dbg) write(*,*) 'reduce stepsize', i, errmax, yerr(i), yscal(i), red, h
       i_errmax   = 0
       reduct = .true.
-      GOTO 2
+      GOTO 02
 
 
 ! successful step; get optimal row for convergence and corresponding stepsize
