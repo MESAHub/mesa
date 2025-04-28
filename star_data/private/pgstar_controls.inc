@@ -63,7 +63,7 @@
          pgstar_right_yaxis_label_disp, &
          pgstar_num_scale
 
-      logical :: pause
+      logical :: pause_flag
       integer :: pause_interval
       real :: pgstar_sleep
       logical :: clear_history
