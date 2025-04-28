@@ -50,7 +50,6 @@
 /
 
 
-
 &controls
       x_integer_ctrl(1) = 4 ! Inlist number
 
@@ -186,6 +185,5 @@
 
 
 &pgstar
-
 
 / ! end of pgstar namelist

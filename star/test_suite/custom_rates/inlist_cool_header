@@ -23,7 +23,6 @@
 / ! end of kap namelist
 
 
-
 &controls
 
   read_extra_controls_inlist(1) = .true.

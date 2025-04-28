@@ -2,7 +2,7 @@
 
 &star_job
 
-   show_log_description_at_start = .false. 
+   show_log_description_at_start = .false.
    create_initial_model = .true.
 
    save_model_when_terminate = .true.
@@ -25,7 +25,7 @@
 
 &controls
 
-   mlt_make_surface_no_mixing = .false.   
+   mlt_make_surface_no_mixing = .false.
    convergence_ignore_equL_residuals = .true.
    make_gradr_sticky_in_solver_iters = .true.
    use_gold2_tolerances = .true.
@@ -36,10 +36,10 @@
    initial_z = 0.0001
 
    max_age = 2.0d10
-   
+
    energy_eqn_option = 'dedt'
 
-   warning_limit_for_max_residual = 1d99   
+   warning_limit_for_max_residual = 1d99
 
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
@@ -60,7 +60,7 @@
 &pgstar
 
       Grid1_win_flag = .true.
-      
+
       TRho_Profile_xmin = -8
       TRho_Profile_xmax = 4
       TRho_Profile_ymin = 2

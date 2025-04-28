@@ -30,7 +30,7 @@
   ! Initial conditions
     initial_mass = 15
     initial_z = 0.01
-      
+
   ! Stopping conditions
     stop_near_zams = .true.
     Lnuc_div_L_zams_limit = 0.9d0

@@ -40,11 +40,10 @@
 
 &pgstar
 
+   read_extra_pgstar_inlist(2) = .true.
+   extra_pgstar_inlist_name(2) = 'inlist_pgstar'
 
-      read_extra_pgstar_inlist(2) = .true.
-      extra_pgstar_inlist_name(2) = 'inlist_pgstar'
-
-      read_extra_pgstar_inlist(3) = .true.
-      extra_pgstar_inlist_name(3) = 'inlist_to_cc'
+   read_extra_pgstar_inlist(3) = .true.
+   extra_pgstar_inlist_name(3) = 'inlist_to_cc'
 
 / ! end of pgstar namelist

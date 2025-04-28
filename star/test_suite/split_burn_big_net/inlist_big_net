@@ -79,7 +79,6 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
 !pause = .true.

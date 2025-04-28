@@ -62,7 +62,6 @@
    x_ctrl(1) = 1.73724d0 ! expected period (in days) ! with RSP_do_check_omega = .false.
 
 
-
    RSP_mass = 0.55d0
    RSP_Teff = 6410d0
    RSP_L = 136d0
@@ -111,7 +110,6 @@
       terminal_interval = 100
 
 / ! end of controls namelist
-
 
 
 &pgstar

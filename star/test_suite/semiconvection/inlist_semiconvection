@@ -98,8 +98,6 @@
 / ! end of controls namelist
 
 
-
-
 &pgstar
 
 !      Grid4_win_flag = .true.

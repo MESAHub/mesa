@@ -324,7 +324,6 @@
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
 
-
       !terminal_show_age_in_years = .false.
       !terminal_show_age_in_days = .true.
 
@@ -335,7 +334,6 @@
 
 
 / ! end of controls namelist
-
 
 
 &pgstar

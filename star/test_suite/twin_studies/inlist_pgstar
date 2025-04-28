@@ -401,7 +401,6 @@ Abundance_which_isos_to_show(20) = 'neut'
 !Abundance_which_isos_to_show(22) = 'ne22'
 
 
-
 ! number and size of isotope labels along curves
 num_abundance_line_labels = 4
 Abundance_line_txt_scale_factor = 1.1
@@ -487,7 +486,6 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     TRho_logRho_min = -101d0
     TRho_logRho_max = -101d0
     show_TRho_degeneracy_line = .true.
-
 
 
 !-----------------------------------------------------------------------

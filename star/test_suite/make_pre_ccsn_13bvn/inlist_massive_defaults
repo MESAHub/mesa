@@ -16,10 +16,10 @@
       write_profile_when_terminate = .true.
 
       ! This profile will be overwritten when each inlist finishes running
-      filename_for_profile_when_terminate = '3.42Mf_12Mi_vvc_0.0_wnd_0.0_ovr_010_mlt_2.0_z2m2.data' 
-                            
+      filename_for_profile_when_terminate = '3.42Mf_12Mi_vvc_0.0_wnd_0.0_ovr_010_mlt_2.0_z2m2.data'
+
       pgstar_flag = .true.
-    
+
 
 / ! end of star_job namelist
 
@@ -30,41 +30,41 @@
 
    kap_file_prefix = 'gs98'
    kap_lowT_prefix = 'lowT_fa05_gs98'
-   kap_CO_prefix   = 'gs98_co'           
+   kap_CO_prefix   = 'gs98_co'
    use_Type2_opacities = .true.
    Zbase = 0.02
 
 / ! end of kap namelist
 
 
-&controls  
+&controls
 
 ! Initial model controls
      initial_mass = 12.0
-     initial_z = 0.02 
+     initial_z = 0.02
      Dutch_scaling_factor = 0.0
 
 
-! On stopping conditions 
-      
-     when_to_stop_rtol = 1d-3    
+! On stopping conditions
+
+     when_to_stop_rtol = 1d-3
      when_to_stop_atol = 1d-3
 
 
-! MLT ++ section 
+! MLT ++ section
 
-     okay_to_reduce_gradT_excess = .true. 
-         
+     okay_to_reduce_gradT_excess = .true.
+
      gradT_excess_f1 = 1d-4
      gradT_excess_f2 = 1d-2
      gradT_excess_age_fraction = 0.9d0
 
      gradT_excess_lambda1 = 1.0
      gradT_excess_beta1 = 0.35
-            
+
      gradT_excess_lambda2 = 0.5
      gradT_excess_beta2 = 0.25
-            
+
      gradT_excess_dlambda = 0.1
      gradT_excess_dbeta = 0.1
 
@@ -78,7 +78,7 @@
      cool_wind_full_on_T = 0d0
 
 
-! Convection model 
+! Convection model
 
      MLT_option = 'TDC'
 
@@ -88,22 +88,22 @@
      use_other_alpha_mlt = .true.
      x_ctrl(21) = 2.0 ! alpha_H
      x_ctrl(22) = 1.5 ! alpha_other
-     x_ctrl(23) = 0.5 ! H_limit 
+     x_ctrl(23) = 0.5 ! H_limit
 
      ! let's take the same approach as MESA IV, no extra mixing schemes
      use_Ledoux_criterion = .true. ! Ledoux is fine, but not used in MESA IV 13BVN inlist
-     alpha_semiconvection = 0d0 
+     alpha_semiconvection = 0d0
      thermohaline_coeff = 0 ! Turned off for numerical stability
      thermohaline_option = 'Kippenhahn'
 
 
-! Let's decouple burning and mixing in zones above 4.2d9, or else 
+! Let's decouple burning and mixing in zones above 4.2d9, or else
 ! you might run into convergence issues near cc without better numerical resolution, see MESA VI
 
      ! To get the star to cc.
      op_split_burn = .true.
      op_split_burn_min_T = 4.2d9
-     op_split_burn_eps = 1d-5 !1d-7 
+     op_split_burn_eps = 1d-5 !1d-7
      op_split_burn_odescal = 1d-5 !1d-8
 
      ! high center T limit to avoid negative mass fractions
@@ -118,44 +118,44 @@
      fe_core_boundary_si28_fraction = 0.5
 
 
-! Overshooting, identical to 13BVN from MESA IV 
-! except double diffusive ov mixing was removed after r11701 
-     overshoot_scheme(1) = 'exponential' 
-     overshoot_zone_type(1) = 'any' 
-     overshoot_zone_loc(1) = 'any' 
+! Overshooting, identical to 13BVN from MESA IV
+! except double diffusive ov mixing was removed after r11701
+     overshoot_scheme(1) = 'exponential'
+     overshoot_zone_type(1) = 'any'
+     overshoot_zone_loc(1) = 'any'
      overshoot_bdy_loc(1) = 'any'
      overshoot_f(1) = 0.01
      overshoot_f0(1) = 0.004
 
      min_overshoot_q = 0d0
-         
+
 
 ! Atomosphere choice
 
-     atm_option = 'T_tau'                   
-     atm_T_tau_relation = 'Eddington'       
-     atm_T_tau_opacity = 'fixed'            
+     atm_option = 'T_tau'
+     atm_T_tau_relation = 'Eddington'
+     atm_T_tau_opacity = 'fixed'
 
-     Pextra_factor = 2 ! Let's use 2, else the atmosphere will crash the model 
+     Pextra_factor = 2 ! Let's use 2, else the atmosphere will crash the model
 
 
 ! solver controls
-      ! Can't handle large residuals at this low of numerical resolution, so we need help. 
-      use_gold_tolerances = .true. 
-      use_gold2_tolerances = .true. 
-      convergence_ignore_equL_residuals = .true. 
+      ! Can't handle large residuals at this low of numerical resolution, so we need help.
+      use_gold_tolerances = .true.
+      use_gold2_tolerances = .true.
+      convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true. ! impossible without this.
-      mlt_make_surface_no_mixing = .true. 
+      mlt_make_surface_no_mixing = .true.
       energy_eqn_option = 'dedt'
-      include_composition_in_eps_grav = .true.  
-      !min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes 
+      include_composition_in_eps_grav = .true.
+      !min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
 
 
-! mesh resolution section 
+! mesh resolution section
       mesh_delta_coeff = 2.0
       mesh_delta_coeff_for_highT = 2.5
-      logT_max_for_standard_mesh_delta_coeff = 9.0 
-      logT_min_for_highT_mesh_delta_coeff = 9.5 
+      logT_max_for_standard_mesh_delta_coeff = 9.0
+      logT_min_for_highT_mesh_delta_coeff = 9.5
 
 ! timestep resolution controls
 
@@ -164,33 +164,33 @@
       time_delta_coeff = 1.0
       varcontrol_target = 1d-3
       min_timestep_limit = 1d-16 ! (seconds)
-         
+
       ! on composition changes
-      dX_nuc_drop_limit = 5d-2 
+      dX_nuc_drop_limit = 5d-2
       dX_nuc_drop_limit_at_high_T = 5d-2 ! for center logT > 9.45
       dX_nuc_drop_max_A_limit = 52
       dX_nuc_drop_min_X_limit = 1d-4
       dX_nuc_drop_hard_limit = 1d99
-  
+
       ! on surface and luminosity changes
-      delta_lgTeff_limit = 0.5  
+      delta_lgTeff_limit = 0.5
       delta_lgL_limit = 0.5
       delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
 
-      
-      ! on changes in central structure   
+
+      ! on changes in central structure
       delta_Ye_highT_limit = 1d-3
-      
+
       delta_lgRho_cntr_limit = 0.01
       delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1 
-      
-      delta_lgT_cntr_limit = 0.01  
+      delta_lgRho_limit = 0.1
+
+      delta_lgT_cntr_limit = 0.01
       delta_lgT_cntr_hard_limit = 0.1
 
-      ! If off center burning in O/Ne/Mg WD, need to decrease this further or solver will crash 
+      ! If off center burning in O/Ne/Mg WD, need to decrease this further or solver will crash
       delta_lgT_max_limit_lgT_min = 7.0d0
-      delta_lgT_max_limit = 0.01     
+      delta_lgT_max_limit = 0.01
       delta_lgT_max_hard_limit = 0.1
 
 ! -----------------------
@@ -199,13 +199,11 @@
 ! output frequency section:
        photo_interval         = 100
        photo_digits           = 8
-       profile_interval       = 200 
+       profile_interval       = 200
        max_num_profile_models = 400000
        history_interval       = 1
        terminal_interval      = 10
        write_header_frequency = 10
-
-
 
 
 ! FOR DEBUGGING

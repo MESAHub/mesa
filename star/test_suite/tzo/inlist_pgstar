@@ -51,7 +51,6 @@ Text_Summary1_name(4,4) = 'log_g'
 Text_Summary1_name(4,5) = 'log_Teff'
 
 
-
 !------------------------------------------------------------------------------------
 
 ! Abundance profile plot
@@ -139,8 +138,6 @@ Power_file_prefix = 'power_'
 Power_file_interval = 5 ! output when mod(model_number,Power_file_interval)==0
 Power_file_width = -1 ! (inches) negative means use same value as for window
 Power_file_aspect_ratio = -1 ! negative means use same value as for window
-
-
 
 
 !------------------------------------------------------------------------------------
@@ -369,8 +366,6 @@ Profile_Panels2_file_width = -1        ! (inches) negative means use same value 
 Profile_Panels2_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
-
-
 !------------------------------------------------------------------------------------
 
 History_Panels1_win_flag = .false.
@@ -583,7 +578,6 @@ profile_mass_point_str(3) = '  0.999 M\d\(0844)\u'
 profile_mass_point_str_clr(3) = 1
 
 
-
 !------------------------------------------------------------------------------------
 
 ! global grid plot settings
@@ -605,7 +599,6 @@ pgstar_model_fjust = 1.0
 pgstar_xaxis_label_disp = 2.5
 pgstar_left_yaxis_label_disp = 2.0
 pgstar_right_yaxis_label_disp = 2.5
-
 
 
 !------------------------------------------------------------------------------------
@@ -753,8 +746,6 @@ Grid1_plot_pad_bot(8) = -0.02     ! fraction of full window height for padding a
 Grid1_txt_scale_factor(8) = 0.7 ! multiply txt_scale for subplot by this
 
 
-
-
 ! file output
 Grid1_file_flag = .true.
 Grid1_file_dir = 'Grid1'
@@ -776,8 +767,6 @@ Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 ! Production_ymax=2d0
 ! production_file_flag=.true.
 ! production_file_interval = 10
-
-
 
 
 Summary_History_win_flag = .false.
@@ -823,7 +812,5 @@ Summary_History_scaled_value(2) = .true.
 Summary_History_legend(3) = 'rpp_to_he3'
 Summary_History_legend(3) = 'rpp_to_he3'
 Summary_History_scaled_value(3) = .true.
-
-
 
 / ! end of pgstar namelist

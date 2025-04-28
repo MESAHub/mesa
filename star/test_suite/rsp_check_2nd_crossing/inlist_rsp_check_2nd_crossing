@@ -8,7 +8,6 @@
 ! the results are written to a file such as 7B_2nd_crossing.data
 
 
-
 &star_job
 
       show_log_description_at_start = .false.
@@ -129,7 +128,6 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
 
@@ -204,7 +202,6 @@
   Grid1_file_interval = 5 ! output when mod(model_number,Grid1_file_interval)==0
   Grid1_file_width = 9 ! negative means use same value as for window
   Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
-
 
 
   Profile_Panels1_win_flag = .false.
@@ -298,7 +295,6 @@
   Profile_Panels1_file_interval = 5 ! output when `mod(model_number,Profile_Panels1_file_interval)==0`
   Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
   Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
-
 
 
   History_Panels1_win_flag = .false.

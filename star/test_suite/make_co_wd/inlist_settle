@@ -48,7 +48,7 @@
       gradT_excess_lambda1 = -1 ! turn on full all the time
 
       thermohaline_coeff = 1000
-      
+
 ! solver controls
       ignore_too_large_correction = .true.
 
@@ -60,7 +60,6 @@
       co_core_boundary_he4_fraction = 0.2d0
 
 / ! end of controls namelist
-
 
 
 &pgstar

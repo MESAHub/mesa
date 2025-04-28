@@ -42,6 +42,7 @@
 /
 
 &kap
+
    Zbase = 0.02d0
 
    use_Type2_opacities = .true.
@@ -123,7 +124,6 @@
    lgL_nuc_burn_min = -3d0
 
 
-
    atm_option = 'T_tau'
    atm_T_tau_relation = 'Eddington'
    atm_T_tau_opacity = 'fixed'
@@ -133,9 +133,6 @@
 
    mesh_delta_coeff = 1.0
    max_allowed_nz = 20000
-
-
-
 
 
    num_trace_history_values = 2
@@ -151,8 +148,8 @@
 / ! end of controls namelist
 
 
-
 &pgstar
+
    Grid8_win_flag = .true.
    Grid8_win_width = 7
    Summary_Burn_xaxis_name = 'logxq'
@@ -163,5 +160,5 @@
    Abundance_xaxis_reversed = .true.
    Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
    Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
-/ ! end of pgstar namelist
 
+/ ! end of pgstar namelist

@@ -119,7 +119,6 @@
       mlt_make_surface_no_mixing = .true.
 
 
-
 ! superadiabatic convection routines, it's a choice:
 
       ! superadiabatic reduction, implicit, new
@@ -140,7 +139,6 @@
 ! mixing
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
-
 
 
   ! we use step overshooting in H core
@@ -240,7 +238,6 @@
     !  delta_XO_cntr_hard_limit = -1
     !  delta_XSi_cntr_limit = -1
     !  delta_XSi_cntr_hard_limit = -1
-
 
 
       delta_lg_XH_cntr_limit = 0.01d0
@@ -363,9 +360,6 @@
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
-
-
-
 
 
 ! GYRE output controls

@@ -28,7 +28,6 @@
 /
 
 
-
 &controls
    use_other_cgrav=.true.
 
@@ -162,9 +161,6 @@
    !trace_evolve = .true.
 
    !stop_for_bad_nums = .true.
-
-
-
 
 
    ! solver debugging

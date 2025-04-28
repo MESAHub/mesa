@@ -1,8 +1,7 @@
 
-
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       load_model_filename = 'co_wd_settled.mod'
@@ -18,9 +17,11 @@
 
 / ! end of star_job namelist
 
+
 &eos
 
 / ! end of eos namelist
+
 
 &kap
       Zbase = 0.02d0
@@ -29,6 +30,7 @@
       use_Type2_opacities = .true.
 
 / ! end of kap namelist
+
 
 &controls
 
@@ -43,12 +45,12 @@
       energy_eqn_option = 'eps_grav'
 
       Teff_lower_limit = 9d3
-      
+
       min_dq = 1d-20
       mesh_delta_coeff = 0.75
       !varcontrol_target = 2d-4
       max_timestep_factor = 1.05d0 ! 1.2d0
-      
+
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
@@ -63,7 +65,7 @@
 
 
       ! element diffusion
-                     
+
       show_diffusion_info = .true. ! terminal output for diffusion
 
       do_element_diffusion = .true.
@@ -96,7 +98,7 @@
 
 
 &pgstar
-        
+
         ! Profile_Panels2_win_flag = .true.
         Profile_Panels2_file_flag = .true.
         Profile_Panels2_file_interval = 100000
@@ -107,6 +109,6 @@
         Profile_Panels2_xmin = -8
         Profile_Panels2_xmax = 0
         Profile_Panels2_show_mix_regions_on_xaxis = .true.
-        
+
 
 / ! end of pgstar namelist

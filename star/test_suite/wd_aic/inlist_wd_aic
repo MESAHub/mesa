@@ -90,7 +90,6 @@
       warning_limit_for_max_residual = 1d99
 
 
-
       photo_interval = 50
       profile_interval = 50
       history_interval = 10
@@ -99,7 +98,6 @@
 
 
 / ! end of controls namelist
-
 
 
 &pgstar

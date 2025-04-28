@@ -21,11 +21,11 @@
          ! Make these < 1 to increase resolution.
 
       xtra_coef_os_above_nonburn = 0.5d0
-      xtra_coef_os_below_nonburn = 0.25d0   
+      xtra_coef_os_below_nonburn = 0.25d0
       xtra_coef_os_above_burn_h = 0.25d0
-      xtra_coef_os_below_burn_h = 0.15d0   
+      xtra_coef_os_below_burn_h = 0.15d0
       xtra_coef_os_above_burn_he = 0.25d0
-      xtra_coef_os_below_burn_he = 0.25d0   
+      xtra_coef_os_below_burn_he = 0.25d0
       xtra_coef_os_above_burn_z = 0.25d0
       xtra_coef_os_below_burn_z = 0.25d0
 

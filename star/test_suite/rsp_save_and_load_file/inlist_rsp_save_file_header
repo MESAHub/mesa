@@ -34,7 +34,6 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
       read_extra_pgstar_inlist(1) = .true.

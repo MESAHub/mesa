@@ -24,14 +24,12 @@
 / ! end of kap namelist
 
 
-
 &controls
 
    read_extra_controls_inlist(2) = .true.
    extra_controls_inlist_name(2)= 'inlist_setup'
 
 / ! end of controls namelist
-
 
 
 &pgstar

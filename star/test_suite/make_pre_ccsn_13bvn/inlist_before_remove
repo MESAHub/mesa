@@ -24,14 +24,13 @@
       trace_history_value_name(1) = 'surf_avg_v_rot'
       trace_history_value_name(2) = 'total_mass h1'
       trace_history_value_name(3) = 'total_mass he4'
-      
+
       x_integer_ctrl(1) = 2 ! inlist_part
 
 
 ! FOR DEBUGGING
 
 / ! end of controls namelist
-
 
 
 &pgstar
