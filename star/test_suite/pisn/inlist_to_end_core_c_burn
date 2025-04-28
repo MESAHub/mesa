@@ -138,7 +138,7 @@
 
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 !pgstar_interval = 1
 
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0

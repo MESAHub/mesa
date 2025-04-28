@@ -64,7 +64,7 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
 
          show_TRho_Profile_eos_regions = .true.
 

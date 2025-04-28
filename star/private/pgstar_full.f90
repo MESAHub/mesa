@@ -1302,7 +1302,7 @@ contains
       if (s% pg% pause_interval > 0) then
          do_pause = (mod(s% model_number, s% pg% pause_interval) == 0)
       else
-         do_pause = s% pg% pause
+         do_pause = s% pg% pause_flag
       end if
 
       if (do_pause .and. s% pg% pgstar_interval > 0) &

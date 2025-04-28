@@ -148,7 +148,7 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
 
    ! HR window -- lg_L vs. lg_Teff
    
