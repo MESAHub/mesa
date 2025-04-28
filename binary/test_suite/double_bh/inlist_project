@@ -8,6 +8,8 @@
    change_initial_ignore_rlof_flag = .true.
    new_ignore_rlof_flag = .true.
 
+   !pgbinary_flag = .true.
+
 / ! end of binary_job namelist
 
 &binary_controls
@@ -64,6 +66,8 @@
    Ftid_2 = 1
    do_initial_orbit_sync_1 = .true.
    do_initial_orbit_sync_2 = .true.
+
+   use_tidal_deformation = .true.
 
    min_mdot_for_implicit = 1d-10
    roche_min_mdot = 1d-12
