@@ -26,7 +26,7 @@ The MESA SDK contains the GNU debugger `gdb <https://www.gnu.org/software/gdb/>`
 Using pgstar
 ~~~~~~~~~~~~
 
-The built in pgstar plotting is itself an invaluable a debugging tool.  Something may jump out from a plot as strange behavior before it shows up as a problem in the run.  You may notice that an issue begins when the model reaches certain conditions and that can provide a useful guide to the problem.  After you identify an issue and configure some useful plots, consider setting ``pgstar_interval = 1`` and ``pause = .true.`` so that you can step through the model timestep-by-timestep.
+The built in pgstar plotting is itself an invaluable a debugging tool.  Something may jump out from a plot as strange behavior before it shows up as a problem in the run.  You may notice that an issue begins when the model reaches certain conditions and that can provide a useful guide to the problem.  After you identify an issue and configure some useful plots, consider setting ``pgstar_interval = 1`` and ``pause_flag = .true.`` so that you can step through the model timestep-by-timestep.
 
 Using a profiler
 ~~~~~~~~~~~~~~~~
