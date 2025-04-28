@@ -4,11 +4,11 @@
 simplex_solar_calibration
 *************************
 
-This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
+This test case exercises the simplex framework with a check of the chi^2 value for 1.0 |Msun|, Z=0.02 metallicity, solar model.
 
 This test case has 2 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_prezams``) builds a 1.0 Msun, Z=0.02 metallicity, model and evolves it for 1 million years.
+* Part 1 (``inlist_prezams``) builds a 1.0 |Msun|, Z=0.02 metallicity, model and evolves it for 1 million years.
 
 * Part 2 (``inlist_solar``) continues the evolution until the age reaches 4.61 billion years. Within the simplex modules, a chi^2 value is calculated using target values and controls in ``inlist_simplex_search_controls_solar``. An actual simplex optimizationn is performed:
 

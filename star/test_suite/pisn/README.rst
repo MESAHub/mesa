@@ -14,10 +14,8 @@ This tracks the central value of (Gamma1 - 4/3) and the point when the pressure 
 This value should be 0 or negative otherwise we do not have a PISN but instead PPISN (`Renzo et al (2020) <https://ui.adsabs.harvard.edu/abs/2020A%26A...640A..56R/abstract>`__)
 
 
-
 Inlists
 =======
-
 
 This test case has seven parts.
 
@@ -36,6 +34,4 @@ This test case has seven parts.
 * Part 7 (``inlist_finish``) This evoles the model through the PISN by taking it through carbon burning, explosive oxygen ignition, and stops once the star reaches a positive total energy.
 
 
-
 Last-Updated: 23Jun2021 (MESA 21a860) by rjfarmer
-

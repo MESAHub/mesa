@@ -70,7 +70,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
-

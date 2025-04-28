@@ -5,12 +5,12 @@ twin_studies
 ************
 
 This test case exercise the capability to simultaneously evolve two model stars.
-The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overshooting and one without overshooting.
+The test vehicle is a pair of 15 |Msun|, Z=0.02 metallicity, models one with overshooting and one without overshooting.
 
 ``inlist_multi_stars_job`` and the ``run_star_extras.f90`` control the overall flow.
 For star 1, ``inlist_to_end_core_he_burn_header``, ``inlist_common``, ``inlist_mass_Z_wind_rotation``, ``inlist_to_end_core_he_burn``
 and ``inlist_star1`` are read. The same is done for star 2, but with ``inlist_star2`` which turns off overshooting being read.
-A pre-built 15 Msun, Z=0.02 metallicity, is then loaded for each model. Both models evolve simultaneously for 1.013e7 year.
+A pre-built 15 |Msun|, Z=0.02 metallicity, is then loaded for each model. Both models evolve simultaneously for 1.013e7 year.
 
 Star 1, with overshooting, reaches the ending age in 80 steps:
 

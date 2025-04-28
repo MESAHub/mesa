@@ -8,7 +8,7 @@ This test case checks that RSP models can be saved and loaded to produce the sam
 
 This test case has 2 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_rsp_save_file``) follows :ref:`rsp_Cepheid` by creating the initial 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins, terminates after 50 time steps, and writes the file ``test_loading.mod``.
+* Part 1 (``inlist_rsp_save_file``) follows :ref:`rsp_Cepheid` by creating the initial 4.165 |Msun|, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins, terminates after 50 time steps, and writes the file ``test_loading.mod``.
 
 * Part 2 (``inlist_rsp_load_file``) loads the saved file ``test_loading.mod`` and continues the evolution. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 3.92396 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
 

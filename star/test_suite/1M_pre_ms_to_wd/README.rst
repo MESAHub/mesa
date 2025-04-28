@@ -4,11 +4,11 @@
 1M_pre_ms_to_wd
 ***************
 
-This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre-main sequence to a white dwarf.
+This test case checks the evolution of a 1 |Msun|, Z=0.02 metallicity from the pre-main sequence to a white dwarf.
 
 This test case has six parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_start_header``) builds a 1 Msun, Z=0.02 metallicity pre-main-sequence model.
+* Part 1 (``inlist_start_header``) builds a 1 |Msun|, Z=0.02 metallicity pre-main-sequence model.
 
 * Part 2 (``inlist_to_end_core_h_burn``) continues the evolution until core hydrogen depletion (mass fraction h1_center < 1e-4).
 
@@ -78,7 +78,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 28May2021 (MESA ebecc10) by fxt
-

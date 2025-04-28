@@ -8,7 +8,7 @@ This test suite example builds a Type IIp supernova model, including Rayleigh-Ta
 
 This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_infall``) loads ``pre_ccsn.mod`` from ``make_pre_ccsn_IIp``. The evolution of the 11.7 MSun model with with cell center Riemann velocities (u) and a total energy of -9.4e50 erg continues util R_center drops below 400 km:
+* Part 1 (``inlist_infall``) loads ``pre_ccsn.mod`` from ``make_pre_ccsn_IIp``. The evolution of the 11.7 |MSun| model with with cell center Riemann velocities (u) and a total energy of -9.4e50 erg continues util R_center drops below 400 km:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/infall.svg
    :width: 100%
@@ -44,7 +44,7 @@ This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click t
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part4.svg
    :width: 100%
 
-* Part 8 (``inlist_shock_part5``) continues the approach to shock breakout, terminating when the shock reaches 11.70 Msun, and creating the ``mesa.abn`` and ``mesa.abn`` files for subsequent use with STELLA:
+* Part 8 (``inlist_shock_part5``) continues the approach to shock breakout, terminating when the shock reaches 11.70 |Msun|, and creating the ``mesa.abn`` and ``mesa.abn`` files for subsequent use with STELLA:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part5.svg
    :width: 100%
@@ -337,6 +337,4 @@ pgstar commands used for the 8th plot:
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 03Jun2021 (MESA 5be9e57) by fxt
-

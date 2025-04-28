@@ -29,7 +29,6 @@ Temperature and density profile at ignition:
    :width: 100%
 
 
-
 pgstar commands used for the plots above:
 
 .. code-block:: console
@@ -149,7 +148,6 @@ pgstar commands used for the plots above:
     TRho_Profile_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
-
 
 
 Last-Updated: 07Jul2021 (MESA 094ff71) by fxt.

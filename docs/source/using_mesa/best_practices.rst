@@ -299,8 +299,6 @@ Repeat answering the questions above.
  When finished, return ``alpha_semiconvection`` to the test case value of 0.1.
 
 
-
-
 Explore Numerical Convergence
 -----------------------------
 
@@ -385,7 +383,6 @@ Gather your science and write it up for publication.
  ``Table10_abstract.txt``, to our shared Dropbox directory timmes/Abstracts.
 
 
-
 In the article
 --------------
 
@@ -429,7 +426,6 @@ briefly summarize these, including appropriate citations.
   Thermal neutrino loss rates are from \citet{Itoh1996}.
 
 
-
 Note that this only summarizes the "default" capabilities, of the
 currently released version of MESA. If you are making use of other
 microphysics options, employing prescriptions such as wind mass loss
@@ -444,7 +440,6 @@ In the the MESA binary module, by default:
    \citet{Eggleton1983}.  Mass transfer rates in Roche lobe
    overflowing binary systems are determined following the
    prescription of \citet{Ritter1988}.
-
 
 
 A :download:`BibTex file <mesa.bib>` with these references is available.

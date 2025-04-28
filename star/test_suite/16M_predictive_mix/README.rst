@@ -11,7 +11,7 @@ criterion), as detailed in Section 2 of the MESA IV instrument paper
 
 This test case has two parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_start``) creates a 16 Msun pre-main-sequence model and evolves it for 10 time steps.
+* Part 1 (``inlist_start``) creates a 16 |Msun| pre-main-sequence model and evolves it for 10 time steps.
 
 * Part 2 (``inlist_16M_predictive_mix``) continues the evolution until core hydrogen depletion (mass fraction h1_center < 1e-6).
 
@@ -70,6 +70,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 28May2021 (MESA ebecc10) by fxt
-

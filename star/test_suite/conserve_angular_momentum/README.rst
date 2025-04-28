@@ -4,13 +4,13 @@
 conserve_angular_momentum
 *************************
 
-This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 Msun, Z=0.02 metallicity, model.
+This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 |Msun|, Z=0.02 metallicity, model.
 
 This test case has 2 parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_zams``) builds a 1.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves until the zero age main-sequence.
+* Part 1 (``inlist_zams``) builds a 1.0 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves until the zero age main-sequence.
 
-* Part 2 (``inlist_conserve_J``) imposes a uniform 10 km/s rotation profile, and continues the evolution until the helium core reaches a mass of 0.22 Msun. Throughout this evolution a relative change in the angular momentum (J_init - J)/J_init of order 3e-13 is reported in the terminal:
+* Part 2 (``inlist_conserve_J``) imposes a uniform 10 km/s rotation profile, and continues the evolution until the helium core reaches a mass of 0.22 |Msun|. Throughout this evolution a relative change in the angular momentum (J_init - J)/J_init of order 3e-13 is reported in the terminal:
 
 .. image:: ../../../star/test_suite/conserve_angular_momentum/docs/grid_000455.svg
    :width: 100%
@@ -206,11 +206,7 @@ pgstar commands used for the first 7 plots:
  Grid1_file_width = -1       ! (inches) negative means use same value as for window
  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
-
-
-
  / ! end of pgstar namelist
 
 
 Last-Updated: 04Jun2021 (MESA 5be9e57) by fxt
-

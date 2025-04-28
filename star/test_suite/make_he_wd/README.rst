@@ -4,22 +4,22 @@
 make_he_wd
 **********
 
-This test case checks the creation and evolution of a 0.15 Msun helium white dwarf.
+This test case checks the creation and evolution of a 0.15 |Msun| helium white dwarf.
 
 This test case has 3 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_to_he_core``) creates a 1.5 Msun, Z=0.01 metallicity, pre-main sequence model and evolves the model until the helium core reaches 0.15 Msun:
+* Part 1 (``inlist_to_he_core``) creates a 1.5 |Msun|, Z=0.01 metallicity, pre-main sequence model and evolves the model until the helium core reaches 0.15 |Msun|:
 
 .. image:: ../../../star/test_suite/make_he_wd/docs/abund_000515.svg
    :width: 100%
 
-* Part 2 (``inlist_remove_envelope``) relaxes the model to a new mass of 0.15 Msun, shedding the outer 1.35 Msun with a wind whose maximum mass loss rate is 1e-5 Msun/yr, and then evolving the hot He white dwarf for 100 million years:
+* Part 2 (``inlist_remove_envelope``) relaxes the model to a new mass of 0.15 |Msun|, shedding the outer 1.35 |Msun| with a wind whose maximum mass loss rate is 1e-5 |Msun|/yr, and then evolving the hot He white dwarf for 100 million years:
 
 .. image:: ../../../star/test_suite/make_he_wd/docs/abund_000119.svg
    :width: 100%
 
 
-* Part 3 (``inlist_evolve``) continues the evolution as the 0.15 Msun helium white dwarf model slides down a white dwarf cooling track for 10 billion years:
+* Part 3 (``inlist_evolve``) continues the evolution as the 0.15 |Msun| helium white dwarf model slides down a white dwarf cooling track for 10 billion years:
 
 .. image:: ../../../star/test_suite/make_he_wd/docs/hr000195.svg
    :width: 100%
