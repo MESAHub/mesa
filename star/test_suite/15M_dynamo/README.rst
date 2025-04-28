@@ -61,25 +61,25 @@ pgstar commands used for the plots above:
  &pgstar
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-   !file_device = 'png'            ! png
 
-   file_device = 'vcps'          ! postscript
+   !file_device = 'png'   ! png
+   file_device = 'vcps'   ! postscript
 
-    pgstar_interval = 10
-    file_digits = 8
+   pgstar_interval = 10
+   file_digits = 8
 
-    Dynamo_legend_txt_scale_factor = 0.7
-    Mixing_legend_txt_scale_factor = 0.55
-    Profile_Panels4_txt_scale = 0.8
+   Dynamo_legend_txt_scale_factor = 0.7
+   Mixing_legend_txt_scale_factor = 0.55
+   Profile_Panels4_txt_scale = 0.8
 
-    Profile_Panels4_win_flag = .true.
-    Profile_Panels4_win_width = 10
+   Profile_Panels4_win_flag = .true.
+   Profile_Panels4_win_width = 10
 
-    Profile_Panels4_file_flag = .true.
-    Profile_Panels4_file_dir = 'png'
-    Profile_Panels4_file_prefix = 'profile_Panels4_'
-    Profile_Panels4_file_interval = 10
-    Profile_Panels4_file_width = 10
+   Profile_Panels4_file_flag = .true.
+   Profile_Panels4_file_dir = 'png'
+   Profile_Panels4_file_prefix = 'profile_Panels4_'
+   Profile_Panels4_file_interval = 10
+   Profile_Panels4_file_width = 10
 
  / ! end of pgstar namelist
 
