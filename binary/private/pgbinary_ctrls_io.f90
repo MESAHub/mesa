@@ -1449,7 +1449,7 @@ contains
       pg% file_device = file_device
       pg% file_digits = file_digits
       pg% pgbinary_interval = pgbinary_interval
-      pg% pause = pause_flag
+      pg% pause_flag = pause_flag
       pg% pause_interval = pause_interval
       pg% pgbinary_sleep = pgbinary_sleep
       pg% clear_history = clear_history
