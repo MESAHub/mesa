@@ -4,7 +4,6 @@
    read_extra_star_job_inlist(2) = .true.
    extra_star_job_inlist_name(2) = 'inlist_massive_defaults'
 
-
    read_extra_star_job_inlist(4) = .true.
    extra_star_job_inlist_name(4) = 'inlist_to_post_si_burn'
 
