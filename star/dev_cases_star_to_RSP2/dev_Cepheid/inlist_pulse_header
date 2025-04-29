@@ -26,17 +26,17 @@
 
 &controls
    read_extra_controls_inlist(1) = .true.
-   extra_controls_inlist_name(1)= 'inlist_common_post_zams'
+   extra_controls_inlist_name(1) = 'inlist_common_post_zams'
    read_extra_controls_inlist(2) = .true.
-   extra_controls_inlist_name(2)= 'inlist_pulse'
+   extra_controls_inlist_name(2) = 'inlist_pulse'
 / ! end of controls namelist
 
 
 &pgstar
    read_extra_pgstar_inlist(1) = .true.
-   extra_pgstar_inlist_name(1)= 'inlist_pgstar'
+   extra_pgstar_inlist_name(1) = 'inlist_pgstar'
    read_extra_pgstar_inlist(2) = .true.
-   extra_pgstar_inlist_name(2)= 'inlist_pgstar_pulses'
+   extra_pgstar_inlist_name(2) = 'inlist_pgstar_pulses'
    read_extra_pgstar_inlist(3) = .true.
-   extra_pgstar_inlist_name(3)= 'inlist_pulse'
+   extra_pgstar_inlist_name(3) = 'inlist_pulse'
 / ! end of pgstar namelist
