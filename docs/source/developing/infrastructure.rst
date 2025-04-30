@@ -42,13 +42,13 @@ The main website redirects to a landing page hosted on `GitHub Pages <https://me
 Domain Name
 ^^^^^^^^^^^
 
-Matteo controls the domain name (using domain.com) and handles
+Matteo controls the domain name (using `domain.com <https://domain.com>`__) and handles
 renewing it, updating nameservers, etc.
 
 DNS Servers
 ^^^^^^^^^^^
 
-The mesastar.org domain is configured to use Cloudflare nameservers
+The mesastar.org domain is configured to use `Cloudflare <https://cloudflare.com>`__ nameservers
 and the DNS records are managed by Philip.
 
 Mailing lists
@@ -73,8 +73,8 @@ hosted by Frank at ASU.
 ReadTheDocs
 -----------
 
-The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__. Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it). This is
+The Sphinx documentation is hosted by `ReadTheDocs <https://readthedocs.org/>`__.
+Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it). This is
 currently free for open source software.
 
 
@@ -82,8 +82,7 @@ Sourceforge
 -----------
 
 The original home of MESA development was sourceforge. Most developers
-involved c. 2015 or earlier have admin privileges. This is a free
-service.
+involved c. 2015 or earlier have admin privileges. This is a free service.
 
 Website
 ^^^^^^^
@@ -91,7 +90,8 @@ Website
 We still use the mesa.sourceforge.net website domain name, but only for a top-level
 redirect to docs.mesastar.org.
 
-The source code for the old sourceforge site lives at https://github.com/MESAHub/mesa-website.
+The source code for the old sourceforge site lives at
+`<https://github.com/MESAHub/mesa-website>`__.
 
 Slack
 -----
@@ -136,6 +136,6 @@ is controlled by Philip.
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Philip.
+* The `record for MESA releases <https://zenodo.org/records/13353788>`__ is controlled by Philip.
+* The records for MESA SDK releases (`macOS <https://zenodo.org/records/13768941>`__, `linux <https://zenodo.org/records/13768913>`__) are controlled by Philip.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
-* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Philip.

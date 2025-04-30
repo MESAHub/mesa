@@ -53,9 +53,10 @@ By user request, an option for limiting the convective velocity predicted by mix
 allowing users to limit the convective velocity to some fraction of the local sound speed using the
 controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
 
-By user request, and motivated by the underestimation of line opacities from expanding material by the `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
-see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_. An optional control for an opacity floor, ``opacity_min``, has
-been introduced.
+By user request, and motivated by the underestimation of line opacities from expanding material by the
+`Ferguson (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
+see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_.
+An optional control for an opacity floor, ``opacity_min``, has been introduced.
 
 .. _Bug Fixes main:
 
