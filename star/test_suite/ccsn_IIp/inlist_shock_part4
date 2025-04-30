@@ -116,7 +116,7 @@
 
 &pgstar
          
-!pause = .true.
+!pause_flag = .true.
 Grid2_win_flag = .true.
 
 Profile_Panels1_xmin = -101 ! 1.9

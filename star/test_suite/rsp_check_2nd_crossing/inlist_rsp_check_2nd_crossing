@@ -132,7 +132,7 @@
 
 
   pgstar_interval = 5
-  pause = .false.
+  pause_flag = .false.
 
   Grid1_win_flag = .true.
 

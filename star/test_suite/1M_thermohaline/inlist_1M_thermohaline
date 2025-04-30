@@ -194,7 +194,7 @@
 &pgstar
          
          
-!pause = .true.
+!pause_flag = .true.
          pgstar_grid_title_scale = 1.2
          pgstar_grid_title_disp = 2
 

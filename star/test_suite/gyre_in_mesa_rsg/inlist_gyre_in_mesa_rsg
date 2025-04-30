@@ -72,7 +72,7 @@
 &pgstar
 
 
-!pause = .true.
+!pause_flag = .true.
 
       Grid1_win_flag = .true.
          Grid1_win_width = 9

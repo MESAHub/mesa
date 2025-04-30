@@ -1,7 +1,7 @@
 
 &pgstar
    pgstar_interval = 10
-   !pause = .true.
+   !pause_flag = .true.
    
    pgstar_age_disp = 2.5
    pgstar_model_disp = 2.5

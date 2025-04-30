@@ -24,6 +24,8 @@ Backwards-incompatible changes
 
 Removed `file_extension` option because it is redundant with `file_device`. Delete `file_extension` from your inlists.
 
+Renamed pgstar `pause` option to `pause_flag` because pause is a reserved Fortran 77 keyword.
+
 .. _New Features main:
 
 New Features

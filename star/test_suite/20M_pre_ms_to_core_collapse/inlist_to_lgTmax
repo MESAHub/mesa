@@ -75,7 +75,7 @@ TRho_logRho_max = 10d0
 TRho_logT_max = 10d0
 
 
-!pause = .true.
+!pause_flag = .true.
 Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax = 5 ! 
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'

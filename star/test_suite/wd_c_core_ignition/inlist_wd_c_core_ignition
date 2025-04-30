@@ -101,7 +101,7 @@
 
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
          TRho_Profile_win_flag = .true.
          TRho_Profile_xmin = -5.0

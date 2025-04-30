@@ -1,5 +1,5 @@
 &pgstar
-      !pause = .true.
+      !pause_flag = .true.
       !pgstar_show_log_age_in_years = .true.
       pgstar_show_age_in_years = .true.
       pgstar_interval = 1

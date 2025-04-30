@@ -39,7 +39,7 @@ General Controls
    Changing the win_flag from .true. to .false. removes the window, but because
    of quirks of pgplot and/or x-windows, it will pause and ask you to hit a return.
 
-   you can have the code pause at each step by setting pause = .true.
+   you can have the code pause at each step by setting pause_flag = .true.
    it will pause every nth step if you set pause_interval = n.
 
    you can slow it down by setting pgstar_sleep to the minimum number

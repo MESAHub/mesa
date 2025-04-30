@@ -148,7 +148,7 @@
 / ! end of controls namelist
 
 &pgstar
-!pause = .true.
+!pause_flag = .true.
 TRho_logT_max = 10d0
 TRho_logRho_max = 10d0
 

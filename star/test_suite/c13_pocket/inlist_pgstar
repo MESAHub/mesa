@@ -1,6 +1,6 @@
 &pgstar
 
-  pause = .false.
+  pause_flag = .false.
 
   pgstar_interval = 1
 
