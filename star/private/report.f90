@@ -144,7 +144,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
+         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min, k_fe
          real(dp) :: radius, dr, non_fe_core_mass, nu_for_delta_Pg, v, mstar, luminosity, mass_sum
          integer, pointer :: net_iso(:)
          real(dp), pointer :: velocity(:) => null()
@@ -375,10 +375,12 @@
          if (failed('get_burn_zone_info')) return
 
 
-         s% fe_core_infall = 0
-         s% non_fe_core_infall = 0
-         s% non_fe_core_rebound = 0
-         s% max_infall_speed_mass = 0
+         s% fe_core_infall = 0d0
+         s% non_fe_core_infall = 0d0
+         s% non_fe_core_rebound = 0d0
+         s% max_infall_speed_mass = 0d0
+         k_fe = -1 ! initialize, in case u_flag & v_flag = .false.
+         k_min = -1 ! initialize, in case u_flag & v_flag = .false.
 
          if(s% u_flag .or. s% v_flag) then
 
@@ -393,14 +395,26 @@
 
             mass_sum = 0d0
             if (s% fe_core_mass > 0) then
-               do k=1, nz
-                  if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
+                ! check if [> fe_core_infall_mass] of core is infalling
+                ! instead of a for loop, we move inside out and only check regions inside the fe_core
+                k = nz
+                do while (k > 1)
+                   if (s% m(k) > Msun * s% fe_core_mass) exit  ! exit when outside Fe core
+                   if (-velocity(k) > s% fe_core_infall) then
+                      mass_sum = mass_sum + s% dm(k)
+                   end if
+                   k = k-1 ! loop outwards
                end do
+               k_fe = k ! mark fe_core_mass boundary cell location, k_fe = nz if no fe_core
 
-               if ((mass_sum > s% fe_core_infall_mass*msun) .and. &
-                   (s%m(k_min) <= s%fe_core_mass*msun)) then
-                  s% fe_core_infall = -velocity(k_min)
+               if (s% report_max_infall_inside_fe_core) then  ! report peak infall velocity inside fe_core (not necessarily the maximum, since infall tends to start outside in)
+                  if (mass_sum > s% fe_core_infall_mass*msun) then ! prevents toggling when k == nz
+                     s% fe_core_infall = - minval(s%v(k_fe:nz))
+                  end if
+               else !(default in r24.03.1 prior) report max infall velocity anywhere
+                  if(mass_sum > s% fe_core_infall_mass*msun) then
+                     s% fe_core_infall = -velocity(k_min)
+                  end if
                end if
             end if
 

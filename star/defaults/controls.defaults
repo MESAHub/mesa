@@ -1782,6 +1782,15 @@
     center_R_lower_limit = -1
 
 
+      ! report_max_infall_inside_fe_core
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use ``fe_core_infall_mass`` to check amount of mass that is collapsing.
+      ! Then, If ``.true.``, fe_core_infall is determined by finding the maximum velocity that is inside
+      ! ``fe_core_mass`` in units of Msun. if ``.false.``, report the maximum infall velocity at any location.
+
+    report_max_infall_inside_fe_core = .true.
+
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
@@ -1794,11 +1803,11 @@
       ! fe_core_infall_mass
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
+      ! if ``check_mass_sum_for_infall = .true.``, ``fe_core_infall_mass`` is the amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
       ! transistent velocity spike causing the model to prematurely exit.  In solar masses
 
 
-      fe_core_infall_mass = 0.1d0
+    fe_core_infall_mass = 0.1d0
 
 
       ! non_fe_core_infall_limit
