@@ -417,7 +417,7 @@
                   if (mass_sum > s% fe_core_infall_mass*msun) then ! prevents toggling when k == nz
                      s% fe_core_infall = - minval(s%v(k_fe:nz))
                   end if
-               else !(default in r24.08.1 prior) report max infall velocity anywhere
+               else !(default in r24.03.1 prior) report max infall velocity anywhere
                   if(mass_sum > s% fe_core_infall_mass*msun) then
                      s% fe_core_infall = -velocity(k_min)
                   end if
