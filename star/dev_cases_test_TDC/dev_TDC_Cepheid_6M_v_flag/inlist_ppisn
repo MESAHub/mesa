@@ -60,31 +60,6 @@
 
 &controls
 
-
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
-      pulse_data_format = 'GYRE'
-      
-      x_logical_ctrl(37) = .false. ! if true, then run GYRE
-
-      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
-      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-
-      x_integer_ctrl(2) = 5 ! max number of modes to output per call
-      x_logical_ctrl(2) = .false. ! output eigenfunction files
-
-      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-         ! should match gyre.in mode l
-      x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      x_ctrl(2) = 0.33d+03 ! growth < this (days)
-
-
-
-
-
-
 ! atmosphere
     !  Pextra_factor = 1 
     !  ! need this extra pressure to stabilize the atmosphere during core He burning
@@ -93,6 +68,7 @@
     !  !atm_T_tau_relation = 'Eddington'
     !  !atm_T_tau_opacity = 'fixed'
     !  atm_fixed_Tsurf = 160000
+
 
 
 
@@ -111,7 +87,7 @@
 
    fill_arrays_with_nans = .false.
    report_solver_progress = .true.
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_ierr = .false. ! if true, produce terminal output when have some internal error
 
    max_resid_jump_limit = 1d99
 
@@ -189,7 +165,7 @@
    extra_controls_inlist_name(1)= 'inlist_extra'
 
    ! our wind implementation follows Brott+ 2011
-   use_other_wind = .true.
+   use_other_wind = .false.
 
    ! when using hydro, we reduce the rotational corrections near the surface
    use_other_eval_fp_ft = .false.
@@ -202,7 +178,7 @@
    mixing_length_alpha = 2d0
    alpha_semiconvection = 1d0
    thermohaline_coeff = 0d0
-   num_cells_for_smooth_gradL_composition_term = 0
+   !num_cells_for_smooth_gradL_composition_term = 0
 
 ! deprecated control
    max_conv_vel_div_csound = 100d0 !20d0!1d0!10d0
@@ -218,7 +194,7 @@
 !correction is scaled such that the change in surface luminosity is 
 ! -max_frac_for_negative_surf_lum*s% L(1)
 
-scale_max_correction_for_negative_surf_lum = .true.
+scale_max_correction_for_negative_surf_lum = .false.
 max_frac_for_negative_surf_lum = 0.8
 
 !
@@ -237,7 +213,7 @@ max_frac_for_negative_surf_lum = 0.8
    overshoot_zone_type(2) = 'any'
    overshoot_zone_loc(2) = 'core'
    overshoot_bdy_loc(2) = 'any'
-   overshoot_f(2) = 0.01
+   overshoot_f(2) = 0.02
    overshoot_f0(2) = 0.005
    
    ! termination conditions
@@ -315,11 +291,12 @@ max_frac_for_negative_surf_lum = 0.8
 
    ! mesh controls
    okay_to_remesh = .true.
-   max_dq = 1d-3 ! RECOMMENDED 1d-3
-   mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
+   !max_dq = 1d-3 ! RECOMMENDED 1d-3
+   mesh_delta_coeff = 1d0!0.8d0 ! RECOMMENDED 0.8d0
    !! this one is turned on in run_star_extras
    ! true in pulses use_split_merge_amr = .false.
-   !split_merge_amr_log_zoning = .true.
+   split_merge_amr_log_zoning = .false.
+   equal_split_density_amr = .false.
    split_merge_amr_logtau_zoning = .true.
    !split_merge_amr_flipped_hybrid_zoning = .true.
 
@@ -327,7 +304,7 @@ max_frac_for_negative_surf_lum = 0.8
 split_merge_amr_nz_r_core = 10000
 
 
-   split_merge_amr_nz_baseline = 1000!6000 ! RECOMMENDED 6000
+   split_merge_amr_nz_baseline = 1000!1000!6000 ! RECOMMENDED 6000
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
 
@@ -344,10 +321,10 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
    merge_amr_ignore_surface_cells = .false.
     merge_amr_k_for_ignore_surface_cells = 20!1500!100
 
-   merge_amr_max_abs_du_div_cs = 0.03d0!0.5d0!5d-1!3d-2!0.03!0.05d0
+   merge_amr_max_abs_du_div_cs = 0.5d0!0.5d0!5d-1!3d-2!0.03!0.05d0
    merge_amr_du_div_cs_limit_only_for_compression = .true.
-   split_merge_amr_avoid_repeated_remesh = .true.
-   merge_amr_inhibit_at_jumps =.false. ! reduce udnersize ratio for large jumps
+   split_merge_amr_avoid_repeated_remesh = .false.
+   merge_amr_inhibit_at_jumps =.false. ! reduce undersize ratio for large jumps
 
 
 
@@ -384,14 +361,24 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
 
     ! Fixing the position of the Lagrangian region of the mesh helps
     ! convergence near the Eddington limit
-    max_logT_for_k_below_const_q = 100
-    max_q_for_k_below_const_q = 0.99
-    min_q_for_k_below_const_q = 0.99
-    max_logT_for_k_const_mass = 100
-    max_q_for_k_const_mass = 0.98
-    min_q_for_k_const_mass = 0.98
+ !   max_logT_for_k_below_const_q = 100
+ !!   max_q_for_k_below_const_q = 0.99
+  !  min_q_for_k_below_const_q = 0.99
+  !  max_logT_for_k_const_mass = 100
+  !  max_q_for_k_const_mass = 0.98
+  !  min_q_for_k_const_mass = 0.98
 
+! make similar to rsp
+max_logT_for_k_below_const_q = 11d3 !5
+max_q_for_k_below_const_q = 1.0d0
+min_q_for_k_below_const_q = 0.99d0
 
+max_logT_for_k_const_mass = 6
+max_q_for_k_const_mass = 1.0d0
+min_q_for_k_const_mass = 0.98d0
+
+   history_interval = 1
+   max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000
 
    warn_rates_for_high_temp = .false.
 
@@ -404,19 +391,19 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
    ! after the pulse starts, we estimate the dynamical timescale of the star
    ! (excluding some of the outer layers), and model the dynamical evolution
    ! for at least a fixed number of these timescales before turning off hydro
-   x_ctrl(22) = 2d0 ! velocity in km/s at any zone for which we consider the system to be undergoing a pulse
+   x_ctrl(12) = 2d0 ! velocity in km/s at any zone for which we consider the system to be undergoing a pulse
                     ! time will start counting from this point before switching off hydro
                     ! (max_v_for_pulse)
                     ! NOTE: we only consider the velocities for q < x_ctrl(7)
-   x_ctrl(3) = 0.9d0 ! dynamical timescale will be estimated for the inside of the
+   x_ctrl(13) = 0.9d0 ! dynamical timescale will be estimated for the inside of the
                      ! star, up to a mass fraction equal to this value of the CO core mass.
                      ! If there is no CO core yet (unlikely but just to be sure),
                      ! the He core mass is used. The timescale is calculated as 1/sqrt(G*<rho>),
                      ! where <rho>=M/(4 pi R^3/3) up to the specified q
                      ! (q_for_dyn_ts)
-   x_ctrl(4) = 50d0 ! number of dynamical timescales to evolve before turning off hydro
+   x_ctrl(14) = 50d0 ! number of dynamical timescales to evolve before turning off hydro
                     ! (num_dyn_ts_for_relax)
-   x_ctrl(5) = 1d0!0.99d0 ! after the set number of timescales have passed, before turning off hydro
+   x_ctrl(15) = 1d0!0.99d0 ! after the set number of timescales have passed, before turning off hydro
                     ! two more conditions must be met. This is to allow more time for additional
                     ! shocks to develop on the outermost layers, which can add additional heat there.
                     ! These conditions must be met at all points inside a given mass fraction of
@@ -426,56 +413,57 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
                     ! in the inner 47.5 Msun of the star.
                     ! (q_for_relax_check)
                     ! The additional conditions are as follows
-   x_ctrl(6) = 1d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
-   x_ctrl(7) = 0.5d0 ! the ratio of the (absolute) velocity to the sound speed must be below this (max_machn_for_relax)
-   x_ctrl(8) = 11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
-   x_ctrl(9) = 3d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
+   x_ctrl(16) = 1d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
+   x_ctrl(17) = 0.5d0 ! the ratio of the (absolute) velocity to the sound speed must be below this (max_machn_for_relax)
+   x_ctrl(18) = 11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
+   x_ctrl(19) = 3d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
 
-   x_integer_ctrl(31) = 10 ! conditions for relax must be satisfied for this number of consecutive steps
+   x_integer_ctrl(11) = 1!10 ! conditions for relax must be satisfied for this number of consecutive steps
                            ! before the outer layers are removed
                            ! (num_steps_before_relax)
 
-   x_ctrl(10) = 1d5!1d5!1d5 !5d2 ! With Riemann hydro, limit the timestep to this (in seconds) before the onset of a pulse.
+   x_ctrl(20) = 2d3!1d5!1d5 !5d2 ! With Riemann hydro, limit the timestep to this (in seconds) before the onset of a pulse.
                     ! prevents surface cells from going wild
                     ! (max_dt_before_pulse)
                     ! RECOMMENDED 1d4
 
-   x_ctrl(11) = 9d0 ! turn off wind mass loss  if log10(Lneu/Lsun) exceeds this (max_Lneu_for_mass_loss)
+   x_ctrl(21) = 9d0 ! turn off wind mass loss  if log10(Lneu/Lsun) exceeds this (max_Lneu_for_mass_loss)
 
-   x_ctrl(12) = 0.025d0 ! 0.05d0 ! log(L_nuc) timestep limit is set to this, hard limit to double this value.
+   x_ctrl(22) = 0.025d0 ! 0.05d0 ! log(L_nuc) timestep limit is set to this, hard limit to double this value.
                        ! This is turned off during relax and near core collapse
                        ! (delta_lgLnuc_limit)
                        ! RECOMMENDED 0.025d0
 
-   x_ctrl(13) = 10d0 ! Ignore the L_nuc limit of x_ctrl(18) if L_photo exceeds this value, otherwise step to step
+   x_ctrl(23) = 10d0 ! Ignore the L_nuc limit of x_ctrl(18) if L_photo exceeds this value, otherwise step to step
                      ! variations can lead to tiny timesteps
                      ! When we reach this value we switch the timestep limit for lgLnuc to lgLphot instead
                      ! (max_Lphoto_for_lgLnuc_limit)
 
-   x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(18) is not used for L_photo either
+   x_ctrl(24) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(18) is not used for L_photo either
 
-   x_ctrl(15) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and logT_center falls below this.
+   x_ctrl(25) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and logT_center falls below this.
                       ! (logT_for_v_flag)
-   x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
+   x_ctrl(26) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)
 
-   x_logical_ctrl(1) = .false.! If true, terminate after evolving 100d after first relax
+   x_logical_ctrl(11) = .false.! If true, terminate after evolving 100d after first relax
                               ! meant for use in the test_suite
                               ! (stop_100d_after_pulse)
                               ! RECOMMENDED .false.
 
-  x_ctrl(18) = 1d5!1d4 ! After a pulse begins, limit the timestep to this (in seconds). Ignored after outer layers expand
+  x_ctrl(27) = 2d3 ! After a pulse begins, limit the timestep to this (in seconds). Ignored after outer layers expand
                     ! beyond 1d4 Rsun when x_logical_ctrl(1) is true
                     ! (max_dt_during_pulse)
                     ! RECOMMENDED 1d4
 
 
-   x_ctrl(19) = 2d4 ! if surface velocity exceeds this, switch to fixed_vsurf BC with the current vsurf
+   x_ctrl(28) = 2d4 ! if surface velocity exceeds this, switch to fixed_vsurf BC with the current vsurf
                     ! (vsurf_for_fixed_bc)
 
-! remove extended layers
-x_logical_ctrl(22) = .true.
+x_logical_ctrl(12) = .false. ! false assumes not in inlist pulses. Overwritten by inlist_pulses.
    
+
+
 
 
 ! atm
@@ -483,11 +471,10 @@ x_logical_ctrl(22) = .true.
 !
 
       photo_digits = 8
-      photo_interval = 10!50
+      photo_interval = 1000!50
       profile_interval = 200!50
-      history_interval = 1!10
+      history_interval = 10
       terminal_interval = 1!10
-   max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000
 
 / ! end of controls namelist
 

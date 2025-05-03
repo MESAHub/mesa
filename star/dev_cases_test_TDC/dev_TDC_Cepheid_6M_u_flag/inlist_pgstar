@@ -341,7 +341,7 @@ Text_Summary1_name(3,5) = 'CO_core'
 
 Text_Summary1_name(4,1) = 'radius'!'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'
-Text_Summary1_name(4,3) = 'lg_Lnuc'
+Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'M_below_vesc'
 
@@ -525,7 +525,11 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
          HR_logL_min = -101d0!4.4!-101d0 ! only used if /= -101d0
          HR_logL_max = -101d0!5.5!-101d0 ! only used if /= -101d0
 
-
+         ! axis limits -- to override system default selections
+         !HR_logT_min = 3.7 !-101d0 ! only used if /= -101d0
+         !HR_logT_max = 3.72!-101d0 ! only used if /= -101d0
+         !HR_logL_min = 3.35!-101d0 ! only used if /= -101d0
+         !HR_logL_max = 3.5!-101d0 ! only used if /= -101d0
 
          HR_logL_margin = 0.1
          HR_logT_margin = 0.1
@@ -570,7 +574,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_title = ''
 
     History_Panels1_xaxis_name = 'model_number'
-    History_Panels1_max_width = 2000! 10000
+    History_Panels1_max_width = 1000! 10000
 
     !History_Panels1_xaxis_name = 'star_age'
     !History_Panels1_max_width = 10

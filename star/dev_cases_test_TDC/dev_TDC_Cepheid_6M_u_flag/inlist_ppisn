@@ -66,9 +66,9 @@
       !write_pulse_data_with_profile = .true.
       pulse_data_format = 'GYRE'
       
-      x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      x_logical_ctrl(37) = .true. ! if true, then run GYRE
 
-      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+      x_integer_ctrl(1) = 200 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
       x_integer_ctrl(2) = 5 ! max number of modes to output per call
@@ -110,7 +110,7 @@
 
 
    fill_arrays_with_nans = .false.
-   report_solver_progress = .true.
+   report_solver_progress = .false.
       report_ierr = .true. ! if true, produce terminal output when have some internal error
 
    max_resid_jump_limit = 1d99
@@ -239,6 +239,8 @@ max_frac_for_negative_surf_lum = 0.8
    overshoot_bdy_loc(2) = 'any'
    overshoot_f(2) = 0.01
    overshoot_f0(2) = 0.005
+
+overshoot_D_min = 1d-8
    
    ! termination conditions
    ! make this a bit higher to avoid interrupting pair-instability collapse
@@ -315,8 +317,8 @@ max_frac_for_negative_surf_lum = 0.8
 
    ! mesh controls
    okay_to_remesh = .true.
-   max_dq = 1d-3 ! RECOMMENDED 1d-3
-   mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
+   !max_dq = 1d-3 ! RECOMMENDED 1d-3
+   mesh_delta_coeff = 1d0!0.8d0 ! RECOMMENDED 0.8d0
    !! this one is turned on in run_star_extras
    ! true in pulses use_split_merge_amr = .false.
    !split_merge_amr_log_zoning = .true.
@@ -327,7 +329,7 @@ max_frac_for_negative_surf_lum = 0.8
 split_merge_amr_nz_r_core = 10000
 
 
-   split_merge_amr_nz_baseline = 1000!6000 ! RECOMMENDED 6000
+   split_merge_amr_nz_baseline = 500!6000 ! RECOMMENDED 6000
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
 
@@ -414,9 +416,9 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
                      ! the He core mass is used. The timescale is calculated as 1/sqrt(G*<rho>),
                      ! where <rho>=M/(4 pi R^3/3) up to the specified q
                      ! (q_for_dyn_ts)
-   x_ctrl(4) = 50d0 ! number of dynamical timescales to evolve before turning off hydro
+   x_ctrl(24) = 50d0 ! number of dynamical timescales to evolve before turning off hydro
                     ! (num_dyn_ts_for_relax)
-   x_ctrl(5) = 1d0!0.99d0 ! after the set number of timescales have passed, before turning off hydro
+   x_ctrl(25) = 1d0!0.99d0 ! after the set number of timescales have passed, before turning off hydro
                     ! two more conditions must be met. This is to allow more time for additional
                     ! shocks to develop on the outermost layers, which can add additional heat there.
                     ! These conditions must be met at all points inside a given mass fraction of
@@ -426,7 +428,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
                     ! in the inner 47.5 Msun of the star.
                     ! (q_for_relax_check)
                     ! The additional conditions are as follows
-   x_ctrl(6) = 1d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
+   x_ctrl(26) = 1d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
    x_ctrl(7) = 0.5d0 ! the ratio of the (absolute) velocity to the sound speed must be below this (max_machn_for_relax)
    x_ctrl(8) = 11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
    x_ctrl(9) = 3d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
@@ -435,7 +437,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
                            ! before the outer layers are removed
                            ! (num_steps_before_relax)
 
-   x_ctrl(10) = 1d5!1d5!1d5 !5d2 ! With Riemann hydro, limit the timestep to this (in seconds) before the onset of a pulse.
+   x_ctrl(10) = 1.2d3 !1d5!1d5!1d5 !5d2 ! With Riemann hydro, limit the timestep to this (in seconds) before the onset of a pulse.
                     ! prevents surface cells from going wild
                     ! (max_dt_before_pulse)
                     ! RECOMMENDED 1d4
@@ -464,7 +466,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
                               ! (stop_100d_after_pulse)
                               ! RECOMMENDED .false.
 
-  x_ctrl(18) = 1d5!1d4 ! After a pulse begins, limit the timestep to this (in seconds). Ignored after outer layers expand
+  x_ctrl(18) = 1.2d3 !1d5!1d4 ! After a pulse begins, limit the timestep to this (in seconds). Ignored after outer layers expand
                     ! beyond 1d4 Rsun when x_logical_ctrl(1) is true
                     ! (max_dt_during_pulse)
                     ! RECOMMENDED 1d4
@@ -486,7 +488,7 @@ x_logical_ctrl(22) = .true.
       photo_interval = 10!50
       profile_interval = 200!50
       history_interval = 1!10
-      terminal_interval = 1!10
+      terminal_interval = 10!10
    max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000
 
 / ! end of controls namelist

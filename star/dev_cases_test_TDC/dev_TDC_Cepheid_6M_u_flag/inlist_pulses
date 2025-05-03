@@ -34,14 +34,25 @@
     seconds_for_initial_dt = 1d5!-1
 
 
-! remove_center_by_temperature = 3d6
+ remove_center_by_temperature = 2d6
 
 / !end of star_job namelist
 
 
 &controls
 !split_merge_amr_nz_baseline = 500
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
 
+! kick when true and not restarting.
+x_logical_ctrl(12) = .true.
+! GYRE set starting velocities, kick!
+   x_logical_ctrl(5) = .true. ! to turn on gyre kick
+   x_ctrl(4) = 1d0 ! fraction_1st_overtone (order 2)
+   x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
+   x_ctrl(6) = 0.1d0 ! initial vsurf (kms)
 
    ! in order for Riemann hydro to be turned on, the following two conditions need to be met
    x_ctrl(21) = 10d0 ! the integrated gamma1 must be smaller than this (min_gamma_sub_43_for_hydro)
@@ -61,7 +72,7 @@
       alpha_TDC_DAMPR = 1d0!1d0! 0d0 for mlt
       alpha_TDC_PtdVdt = 0d0!1d0!1d-2!1d-2!0d0
       steps_before_use_TDC = 0
-      !alpha_TDC_DAMPM = 0d0
+      alpha_TDC_DAMPM = 0d0!0d0
 
    !v_drag is set in run_star_extras
    !q_for_v_drag_full_off = 0.98d0

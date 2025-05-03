@@ -16,7 +16,7 @@ pgstar_show_age = .false.
 !------------------------------------------------------------------------------------
 
 Grid1_win_flag = .true.
-Grid1_win_width = 12
+Grid1_win_width = 21!12
 Grid1_win_aspect_ratio = 0.666
 
 ! file output
@@ -141,13 +141,14 @@ Profile_Panels3_yaxis_name(2) = 'Power'
 Profile_Panels3_yaxis_name(3) = 'Mixing'
 Mixing_legend_txt_scale_factor = 0.9
 
-Profile_Panels3_yaxis_name(4) = 'conv_vel_div_csound'!'conv_vel'!'logRho'
-Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
+Profile_Panels3_yaxis_name(4) = 'conv_vel_div_csound'!'frad_div_cU'!'conv_vel_div_csound'!'conv_vel'!'logRho'
+Profile_Panels3_other_yaxis_name(4) = 'v_div_cs'!'flux_limit_lambda'!'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
 Profile_Panels3_other_dymin(4) = 0.14
 
-Profile_Panels3_yaxis_name(5) = 'v_div_vesc'!'lum_div_Ledd'!'log_csound'!'logT'
+Profile_Panels3_yaxis_name(5) = 'Uq'!'v_div_vesc'!'lum_div_Ledd'!'log_csound'!'logT'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'!'burn_num_iters'
     Profile_Panels3_yaxis_log(5) = .false.
+Profile_Panels3_other_dymin(5) = 0.1
 
 ! x-axis limits and properties
 Profile_Panels3_xaxis_name = 'zone'!'zone'!'radius'
@@ -181,12 +182,12 @@ Profile_Panels1_title = ''
 Profile_Panels1_txt_scale = 0.7
 Profile_Panels1_num_panels = 4
 
-Profile_Panels1_yaxis_name(1) = 'Eq'
-!Profile_Panels1_dymin(1) = 0.14
-Profile_Panels1_other_yaxis_name(1) = 'Uq'
-!Profile_Panels1_other_dymin(1) = 0.14
+Profile_Panels1_yaxis_name(1) = 'logRho'
+Profile_Panels1_dymin(1) = 0.14
+Profile_Panels1_other_yaxis_name(1) = 'logT'
+Profile_Panels1_other_dymin(1) = 0.14
 
-Profile_Panels1_yaxis_name(2) = 'radius'!'entropy'
+Profile_Panels1_yaxis_name(2) = 'vel_km_per_s'!'radius'!'mu'!'radius'!'entropy'
 Profile_Panels1_other_yaxis_name(2) = 'pgas_div_p'
 
 Profile_Panels1_yaxis_name(3) = 'lum_rad'!'gradT'
@@ -196,9 +197,9 @@ Profile_Panels1_other_dymin(3) = 0.08
 
 
 Profile_Panels1_yaxis_name(4) = 'log_opacity'
-Profile_Panels1_dymin(4) = 0.14
+Profile_Panels1_dymin(1) = 0.14
 Profile_Panels1_other_yaxis_name(4) = 'gradr'
-Profile_Panels1_other_dymin(4) = 0.14
+Profile_Panels1_other_dymin(1) = 0.14
 
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'
@@ -341,7 +342,7 @@ Text_Summary1_name(3,5) = 'CO_core'
 
 Text_Summary1_name(4,1) = 'radius'!'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'
-Text_Summary1_name(4,3) = 'lg_Lnuc'
+Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'M_below_vesc'
 
@@ -413,7 +414,7 @@ Abundance_legend_max_cnt = 10
 Abundance_legend_txt_scale_factor = 1.3
          
 ! yaxis limits 
-Abundance_log_mass_frac_min = -4!-6.4 ! -3.5 
+Abundance_log_mass_frac_min = -5!-6.4 ! -3.5 
 Abundance_log_mass_frac_max =  0.3
          
 ! file output
@@ -520,10 +521,10 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
          ! axis limits -- to override system default selections
-         HR_logT_min = -101d0!3.3 !-101d0 ! only used if /= -101d0
-         HR_logT_max = -101d0!3.9!-101d0 ! only used if /= -101d0
-         HR_logL_min = -101d0!4.4!-101d0 ! only used if /= -101d0
-         HR_logL_max = -101d0!5.5!-101d0 ! only used if /= -101d0
+         HR_logT_min = -101d0 ! only used if /= -101d0
+         HR_logT_max = -101d0 ! only used if /= -101d0
+         HR_logL_min = -101d0 ! only used if /= -101d0
+         HR_logL_max = -101d0 ! only used if /= -101d0
 
 
 
@@ -570,7 +571,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_title = ''
 
     History_Panels1_xaxis_name = 'model_number'
-    History_Panels1_max_width = 2000! 10000
+    History_Panels1_max_width = 5000! 10000
 
     !History_Panels1_xaxis_name = 'star_age'
     !History_Panels1_max_width = 10
@@ -620,7 +621,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_dymin(2) = 0.14
 
       ! ::
-
+! 'log_L_div_Ledd'
     History_Panels1_yaxis_name(3) = 'radius'
     History_Panels1_yaxis_reversed(3) = .false.
     History_Panels1_ymin(3) = -101d0
@@ -686,11 +687,38 @@ file_device = 'png'            ! options 'png' and 'vcps' for png and postscript
 !file_white_on_black_flag = .false.
 !file_device = 'vcps'            ! options 'png' and 'vcps' for png and postscript respectively
 
-
 kipp_win_flag=.false.
 kipp_file_flag=.false.
 Kipp_mix_interval = 1
 Kipp_show_luminosities = .true.
 
+
+
+
+
+! history tracks
+ History_Track1_file_flag = .true.
+ History_Track2_file_flag = .true.
+
+
+History_Track1_win_flag = .true.
+History_Track1_win_width = 6
+History_Track1_win_aspect_ratio = 0.75
+
+History_Track1_xname = 'v_surf_km_s'
+History_Track1_yname = 'log_L'
+History_Track1_xaxis_label = 'Vsurf'
+History_Track1_yaxis_label = 'log L/L\d\(2281)'
+History_Track1_reverse_xaxis = .false.
+
+History_Track2_win_flag = .true.
+History_Track2_win_width = 6
+History_Track2_win_aspect_ratio = 0.75
+
+History_Track2_xname = 'radius' !'v_surf_km_s'
+History_Track2_yname = 'log_L'
+History_Track2_xaxis_label = 'Radius'
+History_Track2_yaxis_label = 'log L/L\d\(2281)'
+History_Track2_reverse_xaxis = .false.
 / ! end of pgstar namelist
 

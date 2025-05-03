@@ -51,6 +51,7 @@
       implicit none
       
       include "test_suite_extras_def.inc"
+      include '/Users/owner/Documents/Software/dev/mesa_release/mesa/star/rsp2_utils/run_star_extras_rsp2_defs.inc'
 
       logical :: dbg = .false.
 
@@ -135,8 +136,8 @@
       contains
 
       include "test_suite_extras.inc"
-      include 'gyre_in_mesa_extras_finish_step.inc'
-
+      !include 'gyre_in_mesa_extras_finish_step.inc'
+      include '/Users/owner/Documents/Software/dev/mesa_release/mesa/star/rsp2_utils/run_star_extras_rsp2.inc'
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -172,9 +173,9 @@
          min_gamma_sub_43_for_hydro = s% x_ctrl(21)
          max_v_for_pulse = s% x_ctrl(22)
          q_for_dyn_ts = s% x_ctrl(3)
-         num_dyn_ts_for_relax = s% x_ctrl(4)
-         q_for_relax_check = s% x_ctrl(5)
-         max_v_for_relax = s% x_ctrl(6)
+         num_dyn_ts_for_relax = s% x_ctrl(24)
+         q_for_relax_check = s% x_ctrl(25)
+         max_v_for_relax = s% x_ctrl(26)
          max_machn_for_relax = s% x_ctrl(7)
          max_Lneu_for_relax = s% x_ctrl(8)
          max_Lnuc_for_relax = s% x_ctrl(9)
@@ -1285,6 +1286,23 @@ call final()
                if (ierr /= 0) return
          end if
 
+
+                 
+         ! kick
+!         if (.not. restart .and. s% x_logical_ctrl(12)) &
+!         if ( s% lxtra(lx_hydro_on) .and.  (s% xtra(x_time_start_pulse) > 9.5d0*max_dt_before_pulse) .and.  (s% xtra(x_time_start_pulse) < 10.5d0*max_dt_before_pulse) .and. (s% x_logical_ctrl(12)))
+        
+        if (s% model_number == 2000)then
+        
+            call gyre_in_mesa_extras_set_velocities(s,.false.,ierr)
+            write(*,*) 'kick'
+            write(*,*) 'kick'
+            write(*,*) 'kick'
+            write(*,*) 'kick'
+            write(*,*) 'kick'
+
+        end if
+
          !Always call this at the end to ensure we are using the correct
          !inlists
          call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
@@ -1339,7 +1357,7 @@ call final()
                !right after a relax
                !s% v_drag = 0d0
                !s% v_drag_factor = 0d0!1d0
-                write(*,*) 'using drag2'
+                !write(*,*) 'using drag2'
                 !s% v_drag = s% u(1)
                 !s% v_drag_factor = 1d0!1d0!1d0
                 !s% max_q_for_convection_with_hydro_on = 1d0 - s% q(20)!0.999d0
@@ -1397,9 +1415,9 @@ call final()
             s% atm_option = 'T_tau'
             s% atm_T_tau_relation = 'Eddington'
             s% atm_T_tau_opacity = 'fixed'
-            s% tau_factor = 1d0
+            s% tau_factor = 1d-3
             s% Pextra_factor = 1d0
-            s% force_tau_factor = 1d0
+            s% force_tau_factor = 1d-3
             s% delta_lgL_limit = 0.25d0
             !s% delta_lgTeff_limit = 1d-2!0.25d0
             s% delta_lgL_limit_L_min = 1d99!-100
