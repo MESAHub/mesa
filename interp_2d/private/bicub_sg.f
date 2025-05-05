@@ -34,8 +34,7 @@
 
 !  bcspeval -- eval bicubic spline function and/or derivatives
 
-      subroutine bcspeval(xget,yget,iselect,fval,
-     &                    x,nx,y,ny,ilinx,iliny,f,inf3,ier)
+      subroutine bcspeval(xget,yget,iselect,fval,x,nx,y,ny,ilinx,iliny,f,inf3,ier)
 
       integer iselect(6)
       integer ilinx,iliny,nx,ny,inf3,ier
@@ -193,14 +192,10 @@
          if((xget < x(1)-zxtol).or.(xget > x(nx)+zxtol)) then
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
-! 1001       format(' ?bcspeval:  xget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1001       format(' ?bcspeval:  xget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!            if((xget < x(1)-0.5*zxtol).or.
-!     &         (xget > x(nx)+0.5*zxtol))
-!     &      write(6,1011) xget,x(1),x(nx)
-! 1011       format(' %bcspeval:  xget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!            if((xget < x(1)-0.5*zxtol).or. (xget > x(nx)+0.5*zxtol)) write(6,1011) xget,x(1),x(nx)
+! 1011       format(' %bcspeval:  xget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(xget < x(1)) then
                zxget=x(1)
             else
@@ -213,13 +208,10 @@
          if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
-! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol))
-!     &      write(6,1012) yget,y(1),y(ny)
-! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol)) write(6,1012) yget,y(1),y(ny)
+! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -637,8 +629,7 @@
          do v=1,ivec
             i=iv(v)
             j=jv(v)
-            fval(v,iaval)=
-     &              36.0*f(4,4,i,j)
+            fval(v,iaval) = 36.0*f(4,4,i,j)
          end do
       end if
 
@@ -653,8 +644,7 @@
 !    modified dmc 3 Mar 2000 -- to use Wayne Houlberg's v_spline code.
 !    new BC options added.
 
-      subroutine cspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,
-     &   wk,iwk,ilinx,ier)
+      subroutine cspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,wk,iwk,ilinx,ier)
 
       integer nx, iwk
       real x(nx)                        ! x axis (in)
@@ -812,8 +802,7 @@
       return
       end subroutine cspline
 
-      subroutine evbicub(xget,yget,x,nx,y,ny,ilinx,iliny,
-     &                   f1,inf2,ict,fval,ier)
+      subroutine evbicub(xget,yget,x,nx,y,ny,ilinx,iliny,f1,inf2,ict,fval,ier)
 
 !  use mkbicub to set up spline coefficients!
 
@@ -1581,14 +1570,10 @@
          if((xget < x(1)-zxtol).or.(xget > x(nx)+zxtol)) then
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
-! 1001       format(' ?herm2ev:  xget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1001       format(' ?herm2ev:  xget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!            if((xget < x(1)-0.5*zxtol).or.
-!     &         (xget > x(nx)+0.5*zxtol))
-!     &      write(6,1011) xget,x(1),x(nx)
-! 1011       format(' %herm2ev:  xget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!            if((xget < x(1)-0.5*zxtol).or. (xget > x(nx)+0.5*zxtol)) write(6,1011) xget,x(1),x(nx)
+! 1011       format(' %herm2ev:  xget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(xget < x(1)) then
                zxget=x(1)
             else
@@ -1601,14 +1586,10 @@
          if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
-! 1002       format(' ?herm2ev:  yget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1002       format(' ?herm2ev:  yget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!            if((yget < y(1)-0.5*zytol).or.
-!     &         (yget > y(ny)+0.5*zytol))
-!     &      write(6,1012) yget,y(1),y(ny)
-! 1012       format(' %herm2ev:  yget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!            if((yget < y(1)-0.5*zytol).or. (yget > y(ny)+0.5*zytol)) write(6,1012) yget,y(1),y(ny)
+! 1012       format(' %herm2ev:  yget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -1894,8 +1875,7 @@
       if((ibc < imin).or.(ibc > imax)) then
          ier=1
 !         write(6,1001) slbl,xlbl,ibc,imin,imax
-! 1001    format(' ?',a,' -- ibc',a,' = ',i9,' out of range ',
-!     &      i2,' to ',i2)
+! 1001    format(' ?',a,' -- ibc',a,' = ',i9,' out of range ', i2,' to ',i2)
       end if
 
       return
@@ -2082,8 +2062,7 @@
          fwk(1,1:nx) = f(1,1:nx,iy)
          if((ibcxmin == 1).or.(ibcxmin == 2)) zbcmin=bcxmin(iy)
          if((ibcxmax == 1).or.(ibcxmax == 2)) zbcmax=bcxmax(iy)
-         call mkspline(x,nx,fwk,
-     &      ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
+         call mkspline(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
          if(ier /= 0) then
             deallocate(fwk)
             return
@@ -2104,8 +2083,7 @@
             if((ibcymin == 1).or.(ibcymin == 2)) ibcmin=0
             if((ibcymax == 1).or.(ibcymax == 2)) ibcmax=0
          end if
-         call mkspline(y,ny,fwk,
-     &      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
+         call mkspline(y,ny,fwk,ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
          if(ier /= 0) then
             deallocate(fwk)
             return
@@ -2126,8 +2104,7 @@
             if((ibcymin == 1).or.(ibcymin == 2)) ibcmin=0
             if((ibcymax == 1).or.(ibcymax == 2)) ibcmax=0
          end if
-         call mkspline(y,ny,fwk,
-     &      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
+         call mkspline(y,ny,fwk,ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
          if(ier /= 0) then
             deallocate(fwk)
             return
@@ -2165,8 +2142,7 @@
             end if
 
             fwk(1,1:ny)=0.0  ! values are zero; only BC is not
-            call mkspline(y,ny,fwk,ibcymin,zdiff(1),ibcymax,zdiff(2),
-     &         iliny,ier)
+            call mkspline(y,ny,fwk,ibcymin,zdiff(1),ibcymax,zdiff(2),iliny,ier)
             if(ier /= 0) then
                deallocate(fwk,fcorr)
                return
@@ -2178,8 +2154,7 @@
          zbcmax=0
          do iy=1,ny
             fwk(1,1:nx)=fcorr(1,1:nx,iy)
-            call mkspline(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,
-     &         ilinx,ier)
+            call mkspline(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
             if(ier /= 0) then
                deallocate(fwk,fcorr)
                return
@@ -2202,8 +2177,7 @@
       return
       end subroutine do_mkbicub
 
-      subroutine mkspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,
-     &   ilinx,ier)
+      subroutine mkspline(x,nx,fspl,ibcxmin,bcxmin,ibcxmax,bcxmax,ilinx,ier)
 
 !  make a 2-coefficient 1d spline
 
@@ -2331,10 +2305,9 @@
 !  copy the output -- careful of end point.
 
          do i=1,nx-1
-            fspl(2,i)=2.0*fspl4(3,i)
+            fspl(2,i) = 2.0*fspl4(3,i)
          end do
-         fspl(2,nx)=2.0*fspl4(3,nx-1) +
-     &        (x(nx)-x(nx-1))*6.0*fspl4(4,nx-1)
+         fspl(2,nx) = 2.0*fspl4(3,nx-1) + (x(nx)-x(nx-1))*6.0*fspl4(4,nx-1)
       end if
 
       deallocate(fspl4,wk)

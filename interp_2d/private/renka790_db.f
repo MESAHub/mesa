@@ -228,13 +228,12 @@
       NNR = NR
       NCWMAX = MAX(NNC,NNW)
       LMAX = MIN(LMX,NN-1)
-      if (NNC < 9 .or. NNW < 1 .or. NCWMAX  >
+      if (NNC < 9 .or. NNW < 1 .or. NCWMAX >
      &    LMAX .or. NNR < 1) GOTO 21
 
 ! Create the cell data structure, and initialize RSMX.
 
-      call STORE2_db (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,
-     &             IERR)
+      call STORE2_db (NN,X,Y,NNR, LCELL,LNEXT,XMN,YMN,DDX,DDY,IERR)
       if (IERR /= 0) GOTO 23
       RSMX = 0.
 
