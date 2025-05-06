@@ -17,6 +17,10 @@
 !
 ! ***********************************************************************
 
+! Module for handling starspot calculations
+! contains parameterized YREC routines
+! note: MESA models a pressure contrast rather than temperature contrast
+
 module starspots
 
    use star_private_def
@@ -34,16 +38,12 @@ module starspots
 
 contains
 
-! -------------
-! parameterized YREC routines
-! MESA models a pressure contrast rather than temperature contrast
-! -------------
-
    subroutine starspot_tweak_gradr(s, P, gradr, gradr_spot)
-      ! adjusts the gradient of the radius to account for starspots.
+      ! Purpose: adjusts the gradient of the radius to account for starspots.
+      !
       ! This subroutine is called at the beginning of Get_results()
       ! in turb_support.f90
-      ! ------------------------------------------------------------
+
       use auto_diff_support
       type(star_info), pointer :: s
       type(auto_diff_real_star_order1), intent(in) :: P
@@ -66,11 +66,11 @@ contains
    end subroutine starspot_tweak_gradr
 
    subroutine starspot_tweak_PT(s)
-      ! saves the surface luminosity and adjusts it and the effective
+      ! Purpose: saves the surface luminosity and adjusts it and the effective
       ! temperature to account for starspots.
+      !
       ! This subroutine is called at the beginning of get_surf_PT()
       ! in hydro_vars.f90
-      ! ------------------------------------------------------------
 
       type(star_info), pointer :: s
 
@@ -90,9 +90,9 @@ contains
    end subroutine starspot_tweak_PT
 
    subroutine starspot_restore_PT(s)
-      ! restores the surface luminosity effective temeperature.
+      ! Purpose: restores the surface luminosity and effective temperature.
+      !
       ! Called at the end of get_surf_PT()
-      ! ------------------------------------------------------------
 
       type(star_info), pointer :: s
 
