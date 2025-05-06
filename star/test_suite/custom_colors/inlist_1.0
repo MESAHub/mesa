@@ -1,83 +1,94 @@
+! MESA inlist for custom colors module.
+! Uses predefined stellar class parameter files.
 
 &star_job
-
-      show_log_description_at_start = .false.
-
-      load_saved_model = .true.
-      load_model_filename = 'start.mod'
+      create_pre_main_sequence_model = .false.
+      pre_ms_relax_to_start_radiative_core = .false.
 
       save_model_when_terminate = .true.
-      save_model_filename = 'end_core_h_burn.mod'
+      save_model_filename = 'custom_colors_end.mod'
       required_termination_code_string = 'xa_central_lower_limit'
-
-
-      change_D_omega_flag = .true.
-      new_D_omega_flag = .true.
-      
 
       pgstar_flag = .true.
 
+      ! Custom colors settings
+      history_columns_file = 'custom_colors_history_columns.list'
+
+      !extras_lrpar = 1
+      !extras_rpar(1) = 0.58d0   ! Metallicity
+      !extras_rpar(2) = 3.0857d17   ! Stellar distance 'd' (10pc for abs mag...)
+
+      show_log_description_at_start = .true. 
+
 / ! end of star_job namelist
 
+
 &eos
-
-
 / ! end of eos namelist
 
+
 &kap
-      Zbase = 0.02d0
-
+      Zbase = 0.014d0
       kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
-
 / ! end of kap namelist
 
+
+
 &controls
+!==============================================================
+!#                      MESA controls test Setup              #
+!#                                                            #
+!# Choose ONE of the following setups:                        #
+!#                                                            #
+!# 1. Use predefined stellar class parameter files            #
+!#    (Uncomment 'read_extra_controls_inlist' and one         #
+!#     'extra_controls_inlist_name' entry)                    #
+!#                                                            #
+!# 2. Manually define initial mass, metallicity, and age      #
+!#    (Set 'read_extra_controls_inlist' to .false.)           #
+!==============================================================
 
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 0.0001
+    read_extra_controls_inlist(1) = .false.
 
-      energy_eqn_option = 'dedt'
-      use_gold2_tolerances = .true.
+    ! Option 1: Use predefined parameter files
+    ! Uncomment ONE of the following:
+    !extra_controls_inlist_name(1) = 'inlist_template/PopIII.params'
+    !extra_controls_inlist_name(1) = 'inlist_template/PopII.params'
+    !extra_controls_inlist_name(1) = 'inlist_template/OType.params'
+    !extra_controls_inlist_name(1) = 'inlist_template/BType.params'
+    !extra_controls_inlist_name(1) = 'inlist_template/AType.params'
+    !extra_controls_inlist_name(1) = 'inlist_template/MDwarf.params'
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+    !-------------------------------------------------------
+    ! OR
+    !-------------------------------------------------------
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 2000
-         
-      initial_mass = 1.0
-      initial_z = 0.02d0
-      
+    !# Option 2: Manually define stellar properties
+    initial_mass = 1.0d0   ! Default: Sun-like star
+    initial_z = 0.02d0     ! Solar metallicity
+    max_age = 13d9         ! 13 Gyr (entire stellar evolution)
 
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d0
-      D_DSI_factor = 0
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
-      
-      varcontrol_target = 1d-3
-      delta_lgL_He_limit = 0.01d0
-     
-      cool_wind_full_on_T = 9.99d9
-      hot_wind_full_on_T = 1d10 
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.8d0  
-      Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+    !==============================================================
+    !# Note: Ensure only ONE setup is active at a time!          
+    !==============================================================
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 1
-      terminal_interval = 10
-      write_header_frequency = 10
+    num_trace_history_values = 2
+    trace_history_value_name(1) = 'rel_E_err'
+    trace_history_value_name(2) = 'log_rel_run_E_err'
 
+    ! limit max_model_number as part of test_suite
+    max_model_number = 20000
+    use_gold2_tolerances = .true.
 
+    ! xa_central_lower_limit_species(1) = 'h1'
+    ! xa_central_lower_limit(1) = 0.1d0
+
+    photo_interval = 100
+    profile_interval = 100
+    history_interval = 5
+    terminal_interval = 50
+  
 / ! end of controls namelist
+
 
 
