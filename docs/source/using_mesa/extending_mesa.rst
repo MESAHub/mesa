@@ -332,7 +332,7 @@ discuss some useful MESA features.
      ! MESA also provides a number of arrays that are useful for implementing
      ! algorithms which require a state. if you use these variables
      ! restarts and retries will work without doing anything special.
-     ! they are named xtra, ixtra, lextra.
+     ! they are named xtra, ixtra, lxtra.
      ! they are automatically versioned, that is if you set s% xtra(1), then
      ! s% xtra_old(1) will contains the value of s% xtra(1) from the previous step.
   
