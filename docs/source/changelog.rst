@@ -466,7 +466,7 @@ where you want to update every inlist by invoking ::
 
 .. code-block:: console
 
-  $MESA_DIR/scripts/update_inlists
+  $MESA_DIR/scripts/update_inlists.sh
 
 This script will save the previous versions of your inlists to a directory named
 ``backup_inlists``.
