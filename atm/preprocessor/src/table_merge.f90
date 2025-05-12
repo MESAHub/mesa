@@ -18,8 +18,11 @@
 ! ***********************************************************************
 
 program table_merge
+
    use const_def, only: dp
+
    implicit none
+
 !Combines three types of surface BC tables [ Pgas(Teff,logg) ] as listed below.
 !Resulting tables have 14 columns (1=Teff; 2-14=Pgas@logg = -0.5 - 5.5 dex) and
 !82 rows of Teff values + 2 header lines.  logg is provided from -0.5 (0.5) 5.5

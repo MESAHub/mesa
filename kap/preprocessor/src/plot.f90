@@ -10,7 +10,6 @@ contains
 
    subroutine Build_Plots
 
-      !logical, parameter :: co_enhanced = .true.
       logical, parameter :: co_enhanced = .false.
 
       integer, parameter :: io_unit0 = 40

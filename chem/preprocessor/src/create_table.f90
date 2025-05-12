@@ -1,6 +1,7 @@
 program create_table
+
    use chem_support
-   use iso_fortran_env, only : error_unit
+   use iso_fortran_env, only: error_unit
 
    implicit none
 
@@ -8,9 +9,9 @@ program create_table
    integer :: ios
 
    ios = 0
-   call get_command_argument(1,inlist_fname,status=ios)
+   call get_command_argument(1, inlist_fname, status=ios)
    if (ios /= 0) then
-      write (error_unit,*) 'unable to get inlist filename from command line'
+      write (error_unit, *) 'unable to get inlist filename from command line'
       stop
    end if
 
@@ -19,4 +20,5 @@ program create_table
    call read_mass_table
    call process_winvn_table
    call cleanup
+
 end program create_table

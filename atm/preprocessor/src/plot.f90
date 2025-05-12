@@ -19,6 +19,7 @@
 ! ***********************************************************************
 
 module plot_support
+
    use const_def, only: dp
 
    implicit none

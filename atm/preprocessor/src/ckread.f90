@@ -18,9 +18,12 @@
 ! ***********************************************************************
 
 program ckread
+
    use const_def, only: dp
+
    implicit none
-! this program reads in a Castelli & Kurucz 2003 atmosphere structure file, input as
+
+   ! this program reads in a Castelli & Kurucz 2003 atmosphere structure file, input as
 ! the first command line argument, and writes out a formatted table of Pgas @ T=Teff
 ! for the full range of Teff and logg covered by the model grid.
 ! the program should be executed with both input and output filenames specified on

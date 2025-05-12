@@ -10,33 +10,31 @@
 ! flag = 0 is a warning (usually no stop)
 !
 
-      module lib_alert
+module lib_alert
 
-      implicit none
+   implicit none
 
-      contains
+contains
 
+   subroutine alert(flag, message)
 
-      subroutine alert(flag, message)
+      integer, intent(in) :: flag
+      character(*), intent(in) :: message
 
-         integer, intent(in) :: flag
-         character (*), intent(in) :: message
+      !
+      ! whether to stop on warning/error
+      !
+      logical, parameter :: stop_on_warning = .false.
+      logical, parameter :: stop_on_error = .true.
 
-         !
-         ! whether to stop on warning/error
-         !
-         logical, parameter :: stop_on_warning = .false.
-         logical, parameter :: stop_on_error = .true.
+      if (flag == 0) then
+         write (*, *) 'WARNING: ', trim(message)
+         if (stop_on_warning) call mesa_error(__FILE__, __LINE__)
+      else if (flag == 1) then
+         write (*, *) 'ERROR:   ', trim(message)
+         if (stop_on_error) call mesa_error(__FILE__, __LINE__)
+      end if
 
-         if (flag == 0) then
-            write (*,*) 'WARNING: ', trim(message)
-            if (stop_on_warning) call mesa_error(__FILE__,__LINE__)
-         else if (flag == 1) then
-            write (*,*) 'ERROR:   ', trim(message)
-            if (stop_on_error) call mesa_error(__FILE__,__LINE__)
-         end if
+   end subroutine alert
 
-      end subroutine alert
-
-
-      end module lib_alert
+end module lib_alert

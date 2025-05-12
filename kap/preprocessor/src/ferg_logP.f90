@@ -18,6 +18,7 @@
 ! ***********************************************************************
 
 module ferg_logP
+
    use interp_2D_lib_sg
    use math_lib
    use utils_lib, only: mesa_error
@@ -304,7 +305,7 @@ contains
 
       xxc = xxc; xxo = xxo; xh = xh; z = z ! for now, we are ignoring these
 
-      logT = log10(t6*1e6);
+      logT = log10(t6*1e6); 
       if (logT > logP_logT_max) then
          logT = logK_logT_max
       end if
