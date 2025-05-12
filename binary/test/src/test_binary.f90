@@ -1,4 +1,5 @@
 module test_binary_mod
+
    use binary_lib
    use binary_timestep, only: binary_pick_next_timestep
    use binary_def

@@ -18,6 +18,7 @@
 ! ***********************************************************************
 
 program test_mtx
+
    use const_lib, only: const_init
    use math_lib, only: math_init
    use mtx_lib

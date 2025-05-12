@@ -18,6 +18,7 @@
 ! ***********************************************************************
 
 module test_net_support
+
    use chem_def
    use chem_lib, only: chem_init
    use math_lib

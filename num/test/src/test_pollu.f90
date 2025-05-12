@@ -1,7 +1,9 @@
 module test_pollu
+
    use num_def
    use num_lib
    use test_int_support, only: i_nfcn, i_njac
+
    implicit none
 
 contains

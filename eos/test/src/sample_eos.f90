@@ -18,6 +18,7 @@
 ! ***********************************************************************
 
 program sample_eos
+
    use eos_def
    use eos_lib
    use chem_def

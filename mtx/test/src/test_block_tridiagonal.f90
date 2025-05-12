@@ -18,6 +18,7 @@
 ! ***********************************************************************
 
 module test_block_tri_dble
+
    use mtx_lib
    use mtx_def
    use const_def, only: dp
