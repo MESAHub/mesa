@@ -97,7 +97,6 @@ def get_unique_sorted(values, tolerance=1e-8):
     return sorted_vals[unique_indices]
 
 def save_binary_file(output_file, wavelengths, teff_grid, logg_grid, meta_grid, flux_cube):
-    """Save the precomputed data in a simple binary format that Fortran can read."""
     with open(output_file, 'wb') as f:
         # Write dimensions
         f.write(struct.pack('4i', len(teff_grid), len(logg_grid), len(meta_grid), len(wavelengths)))
@@ -108,11 +107,16 @@ def save_binary_file(output_file, wavelengths, teff_grid, logg_grid, meta_grid, 
         meta_grid.astype(np.float64).tofile(f)
         wavelengths.astype(np.float64).tofile(f)
         
+        # FIXED: Transpose to match Fortran's column-major order expectations
+        # This swaps the dimension order to (wavelength, meta, logg, teff)
+        transposed_cube = np.transpose(flux_cube, (3, 2, 1, 0))
+        transposed_cube.astype(np.float64).tofile(f)
+
         # Write flux cube - make sure it's in Fortran column-major order
         flux_cube.astype(np.float64).tofile(f)
         
         # Also save a text version of the grids for debugging
-        debug_file = output_file + ".txt"
+        debug_file = output_file[:-4] + ".txt"
         with open(debug_file, 'w') as df:
             df.write("# Teff grid\n")
             for val in teff_grid:
