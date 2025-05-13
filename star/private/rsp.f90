@@ -972,10 +972,11 @@
          TET = s% time
          cycle_complete = .false.
          UN=s% v(1)
+         ! ULL is not set for the first model
+         if (s% model_number==1) return
          if(UN>0.d0.and.ULL<=0.d0) then
             RMIN=s% r(1)/SUNR
          end if
-         if (s% model_number==1) return
          if (.not. s% RSP_have_set_velocities) return
          if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
          if (UN/s% csound(1) > VMAX) then
