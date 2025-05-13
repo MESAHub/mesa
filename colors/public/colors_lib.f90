@@ -169,10 +169,12 @@ end subroutine colors_setup_hooks
 
     ! Load the lookup table
     CALL load_lookuptable(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
-    
-    ! Use KNN interpolation for constructing the SED
-    CALL constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
-                         lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+
+    CALL constructsed_knn(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+
+    CALL constructsed_linear(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+
+    CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
     
     ! Calculate bolometric flux and magnitude
     CALL calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
