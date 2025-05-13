@@ -16,77 +16,93 @@ CONTAINS
   !---------------------------------------------------------------------------
   ! Main entry point: Construct a SED using linear interpolation
   !---------------------------------------------------------------------------
-  SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
-                                  lu_teff, lu_logg, lu_meta, stellar_model_dir, &
-                                  wavelengths, fluxes)
-    REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
-    REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
-    CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
-    CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
-    REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
 
-    INTEGER :: i, n_lambda, status, n_teff, n_logg, n_meta
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: interp_flux, diluted_flux
-    REAL(dp), DIMENSION(:,:,:,:), ALLOCATABLE :: precomputed_flux_cube
-    REAL(dp), DIMENSION(:,:,:), ALLOCATABLE :: flux_cube_lambda
-    
-    ! Parameter grids
-    REAL(dp), ALLOCATABLE :: teff_grid(:), logg_grid(:), meta_grid(:)
-    CHARACTER(LEN=256) :: bin_filename
+SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
 
-    ! Construct the binary filename
-    bin_filename = TRIM(stellar_model_dir) // '/flux_cube.bin'
+  REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
+  REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+  CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+  CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
+  REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
+
+  INTEGER :: i, n_lambda, status, n_teff, n_logg, n_meta
+  REAL(dp), DIMENSION(:), ALLOCATABLE :: interp_flux, diluted_flux
+  REAL(dp), DIMENSION(:,:,:,:), ALLOCATABLE :: precomputed_flux_cube
+  REAL(dp), DIMENSION(:,:,:), ALLOCATABLE :: flux_cube_lambda
+  
+  ! Parameter grids
+  REAL(dp), ALLOCATABLE :: teff_grid(:), logg_grid(:), meta_grid(:)
+  CHARACTER(LEN=256) :: bin_filename, clean_path
+  LOGICAL :: file_exists
+
+  ! Clean up any double slashes in the path
+  clean_path = TRIM(stellar_model_dir)
+  IF (clean_path(LEN_TRIM(clean_path):LEN_TRIM(clean_path)) == '/') THEN
+    bin_filename = TRIM(clean_path) // 'flux_cube.bin'
+  ELSE
+    bin_filename = TRIM(clean_path) // '/flux_cube.bin'
+  END IF
+  
+  PRINT *, 'Loading precomputed flux cube from:', TRIM(bin_filename)
+  PRINT *, 'Target parameters: Teff =', teff, ', log_g =', log_g, ', metallicity =', metallicity
+  
+  ! Check if file exists first
+  INQUIRE(FILE=bin_filename, EXIST=file_exists)
+  
+  IF (.NOT. file_exists) THEN
+    PRINT *, 'ERROR: Required binary file not found:', TRIM(bin_filename)
+    PRINT *, 'Please run the precompute_flux_cube.py script to generate this file.'
+    PRINT *, 'Sample command: python precompute_flux_cube.py --model_dir=', TRIM(stellar_model_dir)
+    STOP 'Missing required binary file for interpolation'
+  END IF
+  
+  ! Load the data from binary file
+  CALL load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
+                       wavelengths, precomputed_flux_cube, status)
+                       
+  IF (status /= 0) THEN
+    PRINT *, 'ERROR: Failed to load binary data from:', TRIM(bin_filename)
+    PRINT *, 'The file exists but may be corrupted or in the wrong format.'
+    STOP 'Binary data loading error'
+  END IF
+  
+  n_teff = SIZE(teff_grid)
+  n_logg = SIZE(logg_grid)
+  n_meta = SIZE(meta_grid)
+  n_lambda = SIZE(wavelengths)
+  
+  PRINT *, 'Loaded flux cube with dimensions:', n_teff, 'x', n_logg, 'x', n_meta, 'x', n_lambda
+  PRINT *, 'Teff range:', teff_grid(1), 'to', teff_grid(n_teff)
+  PRINT *, 'logg range:', logg_grid(1), 'to', logg_grid(n_logg)
+  PRINT *, 'metallicity range:', meta_grid(1), 'to', meta_grid(n_meta)
+  PRINT *, 'Performing interpolation at target parameters...'
+  
+  ! Allocate space for interpolated flux
+  ALLOCATE(interp_flux(n_lambda))
+  
+  ! Perform trilinear interpolation for each wavelength
+  DO i = 1, n_lambda
+    ! Extract the 3D grid for this wavelength
+    ALLOCATE(flux_cube_lambda(n_teff, n_logg, n_meta))
+    flux_cube_lambda = precomputed_flux_cube(:,:,:,i)
     
-    PRINT *, 'Loading precomputed flux cube from:', TRIM(bin_filename)
-    PRINT *, 'Target parameters: Teff =', teff, ', log_g =', log_g, ', metallicity =', metallicity
+    ! Simple trilinear interpolation at the target parameters
+    interp_flux(i) = trilinear_interp(teff, log_g, metallicity, &
+                                     teff_grid, logg_grid, meta_grid, flux_cube_lambda)
     
-    ! Load the data from binary file
-    CALL load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
-                         wavelengths, precomputed_flux_cube, status)
-                         
-    IF (status /= 0) THEN
-      PRINT *, 'Error loading precomputed data. Falling back to on-the-fly computation.'
-      ! Here you could call the original implementation
-      RETURN
-    END IF
-    
-    n_teff = SIZE(teff_grid)
-    n_logg = SIZE(logg_grid)
-    n_meta = SIZE(meta_grid)
-    n_lambda = SIZE(wavelengths)
-    
-    PRINT *, 'Loaded flux cube with dimensions:', n_teff, 'x', n_logg, 'x', n_meta, 'x', n_lambda
-    PRINT *, 'Teff range:', teff_grid(1), 'to', teff_grid(n_teff)
-    PRINT *, 'logg range:', logg_grid(1), 'to', logg_grid(n_logg)
-    PRINT *, 'metallicity range:', meta_grid(1), 'to', meta_grid(n_meta)
-    PRINT *, 'Performing interpolation at target parameters...'
-    
-    ! Allocate space for interpolated flux
-    ALLOCATE(interp_flux(n_lambda))
-    
-    ! Perform trilinear interpolation for each wavelength
-    DO i = 1, n_lambda
-      ! Extract the 3D grid for this wavelength
-      ALLOCATE(flux_cube_lambda(n_teff, n_logg, n_meta))
-      flux_cube_lambda = precomputed_flux_cube(:,:,:,i)
-      
-      ! Simple trilinear interpolation at the target parameters
-      interp_flux(i) = trilinear_interp(teff, log_g, metallicity, &
-                                       teff_grid, logg_grid, meta_grid, flux_cube_lambda)
-      
-      DEALLOCATE(flux_cube_lambda)
-    END DO
-    
-    ! Apply distance dilution to get observed flux
-    ALLOCATE(diluted_flux(n_lambda))
-    CALL dilute_flux(interp_flux, R, d, diluted_flux)
-    fluxes = diluted_flux
-    
-    ! Clean up
-    DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
-    DEALLOCATE(diluted_flux, interp_flux)
-    
-    PRINT *, 'Interpolation complete'
+    DEALLOCATE(flux_cube_lambda)
+  END DO
+  
+  ! Apply distance dilution to get observed flux
+  ALLOCATE(diluted_flux(n_lambda))
+  CALL dilute_flux(interp_flux, R, d, diluted_flux)
+  fluxes = diluted_flux
+  
+  ! Clean up
+  DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
+  DEALLOCATE(diluted_flux, interp_flux)
+  
+  PRINT *, 'Interpolation complete'
   END SUBROUTINE constructsed_linear
 
   !---------------------------------------------------------------------------
@@ -203,7 +219,12 @@ CONTAINS
     DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths, flux_cube)
     CLOSE(unit)
     RETURN
-    
+
+! After reading the grid arrays
+PRINT *, 'Teff grid min/max:', MINVAL(teff_grid), MAXVAL(teff_grid)
+PRINT *, 'logg grid min/max:', MINVAL(logg_grid), MAXVAL(logg_grid)
+PRINT *, 'meta grid min/max:', MINVAL(meta_grid), MAXVAL(meta_grid)    
+
   END SUBROUTINE load_binary_data
 
   !---------------------------------------------------------------------------
@@ -261,6 +282,10 @@ CONTAINS
     
     ! 3. Interpolate along z direction
     f_interp = c0 * (1.0_dp - t_z) + c1 * t_z
+
+    PRINT *, 'Corner values:', c000, c001, c010, c011, c100, c101, c110, c111
+    PRINT *, 'Interpolation weights:', t_x, t_y, t_z
+
   END FUNCTION trilinear_interp
 
   !---------------------------------------------------------------------------
