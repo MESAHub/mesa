@@ -29,7 +29,7 @@ contains
       v1 = 0.0_dp
 
       ! search for v0,v1 pair that bracket the root
-      do, i = 1, max_iter
+      do i = 1, max_iter
       args%dv0 = v0
 
       flag = fasttfdh(args)
@@ -40,7 +40,7 @@ contains
       end do
 
       ! now close in on root
-      do, i = 1, max_iter
+      do i = 1, max_iter
       vr = (v0 + v1)/2.0_dp
       if (vr == v0 .or. vr == v1) exit !underflow
       args%dv0 = vr

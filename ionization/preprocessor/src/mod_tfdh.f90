@@ -80,7 +80,7 @@ contains
          call reallocate_dp(args%qi, args%species*firstlength)
       end if
 
-      do, istep = 1, max_iter
+      do istep = 1, max_iter
 
       call d_tfdh(x, y, dydx, args)
       yscal(:) = abs(y(:)) + abs(dx*dydx(:)) + tiny
@@ -103,7 +103,7 @@ contains
       call rkqs(x, dx, dxdid, dxnext, y, dydx, yscal, eps, d_tfdh, args)
 
       ! look for exclusion radius for each species
-      do, i = 1, args%species
+      do i = 1, args%species
       if (.not. rex_flag(i)) then
          if (y(1)/x < v_rex(i)) then
             args%rex(i) = (x*(vlast/xlast - v_rex(i)) + xlast*(v_rex(i) - y(1)/x))/(vlast/xlast - y(1)/x)

@@ -46,7 +46,7 @@ contains
 
       if (xfinal <= xinit) return
 
-      do, istep = 1, max_iter
+      do istep = 1, max_iter
 
       call d_fermidirac(x, y, dydx, args)
       yscal(:) = abs(y(:)) + abs(dx*dydx(:)) + tiny

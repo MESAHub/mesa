@@ -229,7 +229,7 @@ program main
       ! then loop to vary mixture of elements 1,2 and compare real value
       ! to interpolation on the pure OCP cases calculated above
       !
-      do, jx = 1, nx
+      do jx = 1, nx
       write (*, '(a20,4x,i3,a1,i3)') 'running iteration..', jx, '/', nx
 
       ! use a tanh dependence for x1,x2
@@ -295,7 +295,7 @@ program main
       write (f_unit, '(3a20)') 'E_cut/kT', 'Z_cut', 'N_bound'
       flush (f_unit)
 
-      do, jc = 1, nc
+      do jc = 1, nc
       write (*, '(a20,4x,i3,a1,i3)') 'running iteration..', jc, '/', nc
 
       args%cut = -cut_min*(cut_max/cut_min)**((jc - 1.0_dp)/(nc - 1.0_dp))
@@ -343,27 +343,27 @@ program main
       ! run code, print output
       !
       open (unit=f_unit, file=file_t)
-      do, jt = 1, nt
+      do jt = 1, nt
       write (f_unit, '(es20.9)') t_list(jt)
    end do
    close (f_unit)
 
    open (unit=f_unit, file=file_n)
-   do, jn = 1, nn
+   do jn = 1, nn
    write (f_unit, '(es20.9)') nmin*(nmax/nmin)**((jn - 1.0_dp)/(nn - 1.0_dp))
 end do
 close (f_unit)
 
 open (unit=f_unit, file=file_rho)
-do, jn = 1, nn
+do jn = 1, nn
 write (f_unit, '(es20.9)') mp/sum(zs(:)*xs(:)/as(:))*nmin*(nmax/nmin)**((jn - 1.0_dp)/(nn - 1.0_dp))
 end do
 close (f_unit)
 
 open (unit=f_unit, file=file_z, status='replace')
 open (unit=g_unit, file=file_r, status='replace')
-do, jt = 1, nt
-do, jn = 1, nn
+do jt = 1, nt
+do jn = 1, nn
 write (*, '(a20,4x,i3,a1,i3,4x,a3,4x,i3,a1,i3)') 'running iteration..', jt, '/', nt, 'and', jn, '/', nn
 
 temp = t_list(jt)
@@ -416,26 +416,26 @@ write (*, *) 'initialization complete'
 ! run code, print output
 !
 open (unit=f_unit, file=file_t)
-do, jt = 1, nt
+do jt = 1, nt
 write (f_unit, '(es20.9)') tmin*(tmax/tmin)**((jt - 1.0_dp)/(nt - 1.0_dp))
 end do
 close (f_unit)
 
 open (unit=f_unit, file=file_n)
-do, jn = 1, nn
+do jn = 1, nn
 write (f_unit, '(es20.9)') nmin*(nmax/nmin)**((jn - 1.0_dp)/(nn - 1.0_dp))
 end do
 close (f_unit)
 
 open (unit=f_unit, file=file_rho)
-do, jn = 1, nn
+do jn = 1, nn
 write (f_unit, '(es20.9)') mp/sum(zs(:)*xs(:)/as(:))*nmin*(nmax/nmin)**((jn - 1.0_dp)/(nn - 1.0_dp))
 end do
 close (f_unit)
 
 open (unit=f_unit, file=file_z, status='replace')
-do, jt = 1, nt
-do, jn = 1, nn
+do jt = 1, nt
+do jn = 1, nn
 write (*, '(a20,4x,i3,a1,i3,4x,a3,4x,i3,a1,i3)') 'running iteration..', jt, '/', nt, 'and', jn, '/', nn
 
 temp = tmin*(tmax/tmin)**((jt - 1.0_dp)/(nt - 1.0_dp))

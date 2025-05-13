@@ -39,7 +39,7 @@ contains
 
       rootfind_chi = 0.0_dp
 
-      call bracket_chi(ne, tau, guess, x1, fa, x2, fb); 
+      call bracket_chi(ne, tau, guess, x1, fa, x2, fb)
       if (fa*fb > 0) call alert(1, '(root_chi) root is not bracketed')
 
       a = x1
@@ -49,7 +49,7 @@ contains
       e = 0.0_dp
       fc = fb
 
-      do, i = 1, max_iter
+      do i = 1, max_iter
       if ((fb > 0.0 .and. fc > 0.0) .or. (fb < 0.0 .and. fc < 0.0)) then
          c = a
          fc = fa

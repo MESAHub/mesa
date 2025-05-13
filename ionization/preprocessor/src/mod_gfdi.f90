@@ -53,12 +53,12 @@ contains
       dk = 5*k
 
       if (chi <= 0.6_dp) then
-         do, i = 1, 5
+         do i = 1, 5
          temp = sqrt(1 + khi(i + dk)*tau/2)/(exp(-khi(i + dk)) + exp(-chi))
          gfdi = gfdi + c(i + dk)*temp
          end do
          else if (chi < 14.0_dp) then
-         do, i = 1, 5
+         do i = 1, 5
          temp = h(i)*x(i)**k*chi**(k + 3/2.0_dp)*sqrt(1 + chi*x(i)*tau/2)
          temp = temp/(1 + exp(chi*(x(i) - 1)))
          temp = temp + v(i)*(xi(i) + chi)**(k + 1/2.0_dp)*sqrt(1 + (xi(i) + chi)*tau/2)

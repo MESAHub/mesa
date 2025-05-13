@@ -51,7 +51,7 @@ contains
       vlast = 0.0_dp
       dlast = 0.0_dp
 
-      do, istep = 1, max_iter
+      do istep = 1, max_iter
 
       call d_fasttfdh(x, y, dydx, args)
       yscal(:) = abs(y(:)) + abs(dx*dydx(:)) + tiny
