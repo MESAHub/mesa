@@ -285,7 +285,7 @@ PRINT *, 'meta grid min/max:', MINVAL(meta_grid), MAXVAL(meta_grid)
 
     PRINT *, 'Corner values:', c000, c001, c010, c011, c100, c101, c110, c111
     PRINT *, 'Interpolation weights:', t_x, t_y, t_z
-
+    STOP
   END FUNCTION trilinear_interp
 
   !---------------------------------------------------------------------------
