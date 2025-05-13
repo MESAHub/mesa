@@ -29,9 +29,7 @@ CONTAINS
     REAL(dp), DIMENSION(:,:,:,:), ALLOCATABLE :: precomputed_flux_cube
     REAL(dp), DIMENSION(:,:,:), ALLOCATABLE :: flux_cube_lambda
     REAL(dp) :: min_flux, max_flux, mean_flux, progress_pct
-
-REAL(dp), ALLOCATABLE :: log_flux_cube(:,:,:), flux_slice(:,:,:)
-REAL(dp) :: interp_log_flux
+    
     ! Parameter grids
     REAL(dp), ALLOCATABLE :: teff_grid(:), logg_grid(:), meta_grid(:)
     CHARACTER(LEN=256) :: bin_filename, clean_path
@@ -89,19 +87,20 @@ REAL(dp) :: interp_log_flux
     ! Allocate space for interpolated flux
     ALLOCATE(interp_flux(n_lambda))
     
-
-
-    ALLOCATE(log_flux_cube(SIZE(teff_grid), SIZE(logg_grid), SIZE(meta_grid)))
-    ALLOCATE(flux_slice(SIZE(teff_grid), SIZE(logg_grid), SIZE(meta_grid)))
-
+    ! Perform trilinear interpolation for each wavelength
     DO i = 1, n_lambda
-      flux_slice = f_cube(:, :, :, i)
-      log_flux_cube = LOG10(MAX(flux_slice, 1d-99))  ! safe log10
-      interp_log_flux = trilinear_interp(teff, log_g, metallicity, &
-                                          teff_grid, logg_grid, meta_grid, log_flux_cube)
-      interp_flux(i) = 10.0_dp ** interp_log_flux
-    END DO
+      ! !PRINT progress updates at regular intervals
 
+      ! Extract the 3D grid for this wavelength
+      ALLOCATE(flux_cube_lambda(n_teff, n_logg, n_meta))
+      flux_cube_lambda = precomputed_flux_cube(:,:,:,i)
+      
+      ! Simple trilinear interpolation at the target parameters
+      interp_flux(i) = trilinear_interp(teff, log_g, metallicity, &
+                                       teff_grid, logg_grid, meta_grid, flux_cube_lambda)
+      
+      DEALLOCATE(flux_cube_lambda)
+    END DO
     
     ! Calculate statistics for validation
     min_flux = MINVAL(interp_flux)
