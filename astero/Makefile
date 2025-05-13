@@ -27,10 +27,10 @@ SRCS += private/gyre_support_stub.f90
 endif
 
 ifeq ($(WITH_ADIPLS),yes)
-SRCS += private/adipls_support.f90 private/adipls_support_procs.f90
+SRCS += private/adipls_support.f90
 INTERNAL_DEPENDS_ON += adipls
 else
-SRCS += private/adipls_support_stub.f90 private/adipls_support_procs_stub.f90
+SRCS += private/adipls_support_stub.f90
 endif
 
 SRCS_CHECK = test/src/test_astero.f90

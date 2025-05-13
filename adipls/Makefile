@@ -56,7 +56,6 @@ SRCS := adipack.c/adipls/adipls.c.d.f \
         adipack.c/adipls/takata.d.f \
         adipack.c/adipls/trnmod.n.d.f \
         adipack.c/adipls/uhx.d.f \
-        adipack.c/adipls/user_adi.c.d.f \
         adipack.c/adipls/varfrq.n.d.f \
         adipack.c/adipls/xlmult.d.f \
         adipack.c/gensr/aramax.d.f \
@@ -104,12 +103,14 @@ SRCS := adipack.c/adipls/adipls.c.d.f \
         adipack.c/adiajobs/sr/setssm.d.f \
         adipack.c/adiajobs/sr/srdist.c.d.f \
         adipack.c/adiajobs/sr/wrfreq.d.f \
+        src/callbacks.f90
 
 SRCS_CHECK :=
 INTERNAL_DEPENDS_ON := const
 EXTERNAL_DEPENDS_ON :=
 BINTYPE = static-lib
 INCLUDE_DIRS := -Iadipack.c/adipls
+MODULES := adipls_callbacks.mod
 
 CHECK_RESULTS_GOLDEN :=
 
