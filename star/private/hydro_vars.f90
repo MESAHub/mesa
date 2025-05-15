@@ -1108,7 +1108,7 @@
          contains
 
          subroutine compute_smoothed_brunt_B
-            use star_utils, only: weighed_smoothing, threshold_smoothing
+            use star_utils, only: weighted_smoothing, threshold_smoothing
             logical, parameter :: preserve_sign = .false.
             real(dp), pointer, dimension(:) :: work
             include 'formats'

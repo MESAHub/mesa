@@ -40,6 +40,9 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
+Exposed `star_utils` functions `star_weighted_smoothing`, `star_threshold_smoothing`, `star_kh_time_scale` to the user.
+These functions can now be called in your custom `run_star_extras.f90` file, for data in a star, getting relevant timescales.
+
 For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
 a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide
 between adopting the traditional integral of N2 over the entire stellar model, or the

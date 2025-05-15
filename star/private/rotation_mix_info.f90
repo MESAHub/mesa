@@ -45,7 +45,7 @@
       contains
 
       subroutine set_rotation_mixing_info(s, ierr)
-         use star_utils, only: weighed_smoothing
+         use star_utils, only: weighted_smoothing
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -1124,13 +1124,13 @@
 
 
       subroutine smooth_for_rotation(s, v, width, work)
-         use star_utils, only: weighed_smoothing
+         use star_utils, only: weighted_smoothing
          type (star_info), pointer :: s
          real(dp), dimension(:) :: v, work
          integer :: width
          logical, parameter :: preserve_sign = .false.
          if (width <= 0) return
-         call weighed_smoothing(v, s% nz, width, preserve_sign, work)
+         call weighted_smoothing(v, s% nz, width, preserve_sign, work)
       end subroutine smooth_for_rotation
 
 

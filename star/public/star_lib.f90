@@ -65,7 +65,10 @@
            star_conv_time_scale => conv_time_scale, &
            star_QHSE_time_scale => QHSE_time_scale, &
            star_eps_nuc_time_scale => eps_nuc_time_scale, &
-           star_cooling_time_scale => cooling_time_scale
+           star_cooling_time_scale => cooling_time_scale, &
+           star_kh_time_scale => eval_kh_timescale, &
+           star_weighted_smoothing => weighted_smoothing, &
+           star_threshold_smoothing => threshold_smoothing
 
       implicit none
 
