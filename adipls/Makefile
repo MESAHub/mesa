@@ -111,6 +111,10 @@ EXTERNAL_DEPENDS_ON :=
 BINTYPE = static-lib
 INCLUDE_DIRS := -Iadipack.c/adipls
 MODULES := adipls_callbacks.mod
+# adipls has too much UB, plaster over it by disabling optimizations. If you
+# ever remove this line, make sure that all arrays in common blocks have proper
+# bounds everywhere.
+PROFILE := debug
 
 CHECK_RESULTS_GOLDEN :=
 
