@@ -33,9 +33,9 @@ my @provided_modules;
 my @parsed_files;
 
 sub process_file ($filename) {
-    my @output_files;
-    my @not_found_mod_dependency;
-    my @dependency;
+    my %output_files;
+    my %not_found_mod_dependency;
+    my %dependency;
     my $current_mod = '';
     my $has_submod = 0;
 
@@ -49,36 +49,38 @@ sub process_file ($filename) {
             $line = trim($line);
             if ($line =~ /^module ([^\s!]*)\s*(!.*)?$/i) {
                 $current_mod = lc $1;
-                push(@output_files, "$build_dir_module/modules/$current_mod.mod");
+                $output_files{"$build_dir_module/modules/$current_mod.mod"} = undef;
                 $has_submod = 0;
             } elsif ($line =~ /^module\s+(subroutine|function)/i and !$has_submod) {
-                push(@output_files, "$build_dir_module/modules/$current_mod.smod");
+                $output_files{"$build_dir_module/modules/$current_mod.smod"} = undef;
                 $has_submod = 1;
             } elsif ($line =~ /^use\s+([^\s,]*)/i) {
                 my $mod = lc $1;
                 if (exists $include_files{"$mod.mod"}) {
-                    push(@dependency, $include_files{"$mod.mod"});
+                    $dependency{$include_files{"$mod.mod"}} = undef;
                 } else {
-                    push(@not_found_mod_dependency, "$build_dir_module/modules/$mod.mod");
+                    $not_found_mod_dependency{"$build_dir_module/modules/$mod.mod"} = undef;
                 }
             } elsif ($line =~ /^submodule\s+\((?:[^:]*:)*([^\)])\)\s+(.*)$/i) {
                 my $parent_mod = lc $1;
                 $current_mod = lc $2;
-                push(@dependency, "$build_dir_module/modules/$parent_mod.smod");
-                push(@output_files, "$build_dir_module/modules/$current_mod.mod");
+                $dependency{"$build_dir_module/modules/$parent_mod.smod"} = undef;
+                $output_files{"$build_dir_module/modules/$current_mod.mod"} = undef;
                 $has_submod = 0;
             } elsif ($line =~ /^include (?:'|")([^'"]*)(?:'|")/i) {
                 push(@handles, $fh);
                 my $inc_file = $include_files{$1} or do { warn "Could not find include file $1"; next };
-                push(@dependency, $inc_file);
+                $dependency{$inc_file} = undef;
                 open(my $fh2, '<:encoding(UTF-8)', $inc_file) or die "Could not open file '$inc_file' $!";
                 $fh = $fh2;
             }
         }
     }
 
-    push(@provided_modules, @output_files);
-    push(@parsed_files, [$filename, \@output_files, \@not_found_mod_dependency, \@dependency]);
+    my @not_found_mod_dependency = grep { !exists $output_files{$_} } keys %not_found_mod_dependency;
+
+    push(@provided_modules, keys %output_files);
+    push(@parsed_files, [$filename, [ keys %output_files ], \@not_found_mod_dependency, [ keys %dependency ]]);
 }
 
 sub output_make ($filename, $output_files, $not_found_mod_dependency, $dependency) {
