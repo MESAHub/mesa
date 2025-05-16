@@ -1,0 +1,28 @@
+&pgstar
+  pgstar_interval = 10
+
+  ! Standard HR Diagram
+  HR_win_flag = .true.
+  HR_logT_min = 3.2
+  HR_logT_max = 4.6
+  HR_logL_min = -1.0
+  HR_logL_max = 6.0
+  HR_win_width = 6
+  HR_win_aspect_ratio = 1.0
+
+  ! Temperature/density profile
+  TRho_Profile_win_flag = .true.
+  show_TRho_Profile_legend = .true.
+  show_TRho_Profile_text_info = .true.
+  TRho_Profile_win_width = 8
+  TRho_Profile_win_aspect_ratio = 0.75
+
+  ! G band light curve only
+  History_Track2_win_flag = .true.
+  History_Track2_xname = 'star_age'
+  History_Track2_yname = 'G'
+  History_Track2_title = 'G Light Curve'
+  History_Track2_xaxis_label = 'Age (yr)'
+  History_Track2_yaxis_label = 'G mag'
+
+/ ! end of pgstar namelist

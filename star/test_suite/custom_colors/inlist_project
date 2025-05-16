@@ -1,0 +1,77 @@
+&star_job
+  ! see star/defaults/star_job.defaults
+  ! begin with a pre-main sequence model
+  create_pre_main_sequence_model = .true.
+  ! save a model at the end of the run
+  save_model_when_terminate = .true.
+  save_model_filename = 'star_to_AGB.mod'
+  ! display on-screen plots
+  pgstar_flag = .true.
+/ ! end of star_job namelist
+
+&eos
+  ! eos options
+  ! see eos/defaults/eos.defaults
+/ ! end of eos namelist
+
+&kap
+  ! kap options
+  ! see kap/defaults/kap.defaults
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+  ! see star/defaults/controls.defaults
+  
+  ! starting specifications 
+  initial_mass = 5 ! in Msun units 
+  initial_z = 0.02
+  
+  ! when to stop
+  
+  ! Set these limits to keep the star within Kurucz model range
+  ! Stop if temperature gets too low (below Kurucz lower limit)
+  Teff_lower_limit = 3600 
+  
+  ! Stop if log_g gets too low (below Kurucz lower limit)
+  log_g_lower_limit = 0.1
+  
+  
+  ! Stop if temperature gets too high (unlikely for this star)
+  Teff_upper_limit = 49000
+
+  
+  ! Extend max_age to allow full AGB evolution (in years)
+  max_age = 1d8 
+  
+
+  ! Mass loss parameters (critical for AGB evolution)
+  cool_wind_RGB_scheme = 'Reimers'
+  cool_wind_AGB_scheme = 'Blocker'
+  Reimers_scaling_factor = 0.5
+  Blocker_scaling_factor = 0.1
+
+  
+  ! output controls for better tracking
+  photo_interval = 50
+  profile_interval = 50
+  history_interval = 5
+  terminal_interval = 10
+  
+  ! AGB phase can have convergence issues
+  energy_eqn_option = 'dedt'
+  use_gold_tolerances = .true.
+  
+  ! for AGB thermal pulses
+  mesh_delta_coeff = 0.5 
+  max_allowed_nz = 25000  ! Allow more mesh points for better resolution
+  
+  ! controls for better thermal pulse resolution
+  varcontrol_target = 1d-4
+  time_delta_coeff = 1.0
+  
+  ! These help with convergence in advanced phases
+  min_timestep_limit = 1d-12
+  solver_iters_timestep_limit = 100
+/ ! end of controls namelist
