@@ -70,7 +70,7 @@ All variables mentioned above can be modified in this way.
 Preprocessing
 -------------
 
-Some of the modules require some preprocessing of the FORTRAN source code. This requires setting up a make target for these files, and add the generated files to the ``SRCS_GENERATED`` or ``SRCS_CHECK_GENERATED``. These source files will be automatically prefixed with the path to the build directory, so make sure that the output files from the preprocessing are written to the build directory. The following snippet shows an example from the ``mtx`` module (currently no longer used, but can serve as inspiration):
+Some of the modules require some preprocessing of the FORTRAN source code. This requires setting up a make target for these files, and add the generated files to the ``SRCS_GENERATED`` or ``SRCS_CHECK_GENERATED``. These source files will be automatically prefixed with the path to the build directory, so make sure that the output files from the preprocessing are written to the build directory. The following snippet shows an example from the ``mtx`` module (currently no longer used, but can serve as inspiration). Be carefull copying the text, as all tabs will have converted to spaces:
 
 .. code-block:: make
 
@@ -79,24 +79,24 @@ Some of the modules require some preprocessing of the FORTRAN source code. This 
     SRCS_CHECK_GENERATED := \
             test/src/test_block_tridiagonal_dble.f90 \
             test/src/test_block_tridiagonal_quad.f90
-    
+
     include ../make/Makefile
-    
+
     # Custom build steps (this needs to come after the include statement,
     #  otherwise the BUILD_DIR_MODULE variable is not set)
-    
+
     $(BUILD_DIR_MODULE)/private/my_lapack95_dble.f90: private/my_lapack95.F90 | $(BUILD_DIR_MODULE)/private/
         # Note: PREPROCESS just calls the C preprocessor, and is set in compile-settings-*.mk
-    	$(PREPROCESS) -DDBLE $^ > $@
-    
+            $(PREPROCESS) -DDBLE $^ > $@
+
     $(BUILD_DIR_MODULE)/private/my_lapack95_quad.f90: private/my_lapack95.F90 | $(BUILD_DIR_MODULE)/private/
-    	$(PREPROCESS) $^ > $@
-    
+            $(PREPROCESS) $^ > $@
+
     $(BUILD_DIR_MODULE)/test/src/test_block_tridiagonal_dble.f90: test/src/test_block_tridiagonal.f90 | $(BUILD_DIR_MODULE)/test/src/
-    	$(PREPROCESS) -DDBLE $^ > $@
-    
+            $(PREPROCESS) -DDBLE $^ > $@
+
     $(BUILD_DIR_MODULE)/test/src/test_block_tridiagonal_quad.f90: test/src/test_block_tridiagonal.f90 | $(BUILD_DIR_MODULE)/test/src/
-    	$(PREPROCESS) $^ > $@
+            $(PREPROCESS) $^ > $@
 
 Integrating modules in another piece of software
 ================================================
