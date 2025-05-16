@@ -24,7 +24,6 @@
 
       implicit none
 
-
       contains
 
       subroutine null_other_e2(id, e2, ierr)
