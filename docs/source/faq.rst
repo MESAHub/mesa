@@ -831,7 +831,7 @@ How can I read and/or plot MESA data using language X?
 
 Users have posted numerous useful scripts in a variety of languages on
 `the MESA
-marketplace <http://cococubed.com/mesa_market/add-ons.html>`__.
+marketplace <https://mesastar.org/marketplace/add-ons/>`__.
 
 How can I include the effects of chemical enhancements on the opacities?
 ------------------------------------------------------------------------
