@@ -78,7 +78,7 @@ Links
 * `MESA Users Mailing List <https://lists.mesastar.org/mailman/listinfo/mesa-users>`__ for info about new releases, news items, and requests for help/bug reports.
 * `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
 * `mesa_reader <https://github.com/wmwolf/py_mesa_reader>`__ to interact and plot data from MESA in Python.
-* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA.
+* `MESA Marketplace <https://mesastar.org/marketplace/>`__ for resources for published papers using MESA.
 
 
 Download
