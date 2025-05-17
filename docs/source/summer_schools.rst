@@ -5,7 +5,7 @@ MESA Summer Schools
 History of the MESA Summer School Program
 -----------------------------------------
 
-The MESA Summer Schools (material linked `here <https://mesastar.org/marketplace/education/#mesa-summer-school-web-pages>`_) have traditionally been held in Santa Barbara, California, until 2022.
+The MESA Summer Schools (material linked `here <https://mesastar.org/summer-schools>`_) have traditionally been held in Santa Barbara, California, until 2022.
 The 2023 MESA Summer School program, branded as `MESA@Konkoly <https://mesahub.github.io/summer-school-2023/>`_, was held in Budapest, Hungary.
 This was followed by `MESA Down Under <https://maygpedersen.github.io/mesa-down-under-2024/>`_, hosted in Sydney in June of 2024,
 and `MESA Summer School 2025 <https://mesa-leuven.4d-star.org/>`_, hosted at KU Leuven.
