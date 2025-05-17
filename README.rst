@@ -79,7 +79,7 @@ Links
 * `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
 * `mesa_reader <https://github.com/wmwolf/py_mesa_reader>`__ to interact and plot data from MESA in Python.
 * `MESA Marketplace <https://mesastar.org/marketplace/>`__ for resources for published papers using MESA.
-* `MESA-contrib <https://github.com/MESAHub/mesa-contrib>`__ for community contributed procedures.
+* `mesa-contrib <https://github.com/MESAHub/mesa-contrib>`__ for community contributed procedures.
 
 
 Download
