@@ -66,7 +66,7 @@ Marketplace
 ^^^^^^^^^^^
 
 The `MESA marketplace
-<http://cococubed.com/mesa_market/>`__ is controlled and
+<https://mesastar.org/marketplace/>`__ is controlled and
 hosted by Frank at ASU.
 
 
