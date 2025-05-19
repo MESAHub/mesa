@@ -1,0 +1,35 @@
+# based on matplotlib style sheet for MESA Instrument Papers
+
+# Some minor style changes from MESA standard for regions plot
+xtick.direction	    : out
+xtick.top	    : False
+ytick.direction	    : out
+ytick.right	    : False
+
+# Based on Rich's style suggestions for MESA3
+figure.figsize		: 3.38, 2.535 # 4x3 with width=apjcolwidth
+lines.markersize	: 4
+lines.linewidth		: 1.5
+text.usetex		: True
+font.size		: 10
+font.family		: serif
+# Not sure about the right font to use...
+font.serif		: Computer Modern Roman # Times Roman?
+axes.titlesize		: medium
+axes.labelsize		: medium
+legend.fontsize		: 8
+legend.frameon		: False
+figure.dpi 		: 300
+
+xtick.minor.visible     : True
+ytick.minor.visible     : True
+
+# Some other things we should agree on.
+savefig.bbox		: tight # standard
+savefig.pad_inches	: 0.1 # Padding when bbox is tight.
+savefig.dpi		: 300
+savefig.format		: pdf
+
+# Miscellanious
+axes.formatter.use_mathtext : True
+#figure.autolayout	    : True
