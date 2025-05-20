@@ -25,7 +25,7 @@
 
       ! ::
 
-    chem_isotopes_filename = 'isotopes.data '
+    chem_isotopes_filename = 'isotopes.data'
 
 
       ! pause_before_terminate
