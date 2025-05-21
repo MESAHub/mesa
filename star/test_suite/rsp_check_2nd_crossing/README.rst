@@ -4,12 +4,12 @@
 rsp_check_2nd_crossing
 **********************
 
-This test case exercises the RSP model building and linear nonadiabatic stability analysis 
+This test case exercises the RSP model building and linear nonadiabatic stability analysis
 to find the instability strip edges, and effective temperatures offset from the blue edge of the instability strip.
 
-This test case has 1 part. 
+This test case has 1 part.
 
-* Part 1 (``inlist_rsp_check_2nd_crossing``) opens the MESA history file ``history_logs/history_7M.data`` for a 7 Msun, Z=0.008 constructed from the :ref:`5M_cepheid_blue_loop` test case. Using a significant ``run_star_extras.f90``, the RSP initial model building and linear nonadiabatic stability analysis modules (see Section 2.2 of |MESA V| for details) are exercised to find the edges of the instability strip. The run then continues by interpolating the HR diagram evolutionary track to find points at selected effective temperatures Teff offset from the blue edge of the instabilty strip. The results are written to the terminal and a user-specifed file, ``7B_2nd_crossing.data`` in this case:
+* Part 1 (``inlist_rsp_check_2nd_crossing``) opens the MESA history file ``history_logs/history_7M.data`` for a 7 |Msun|, Z=0.008 constructed from the :ref:`5M_cepheid_blue_loop` test case. Using a significant ``run_star_extras.f90``, the RSP initial model building and linear nonadiabatic stability analysis modules (see Section 2.2 of |MESA V| for details) are exercised to find the edges of the instability strip. The run then continues by interpolating the HR diagram evolutionary track to find points at selected effective temperatures Teff offset from the blue edge of the instabilty strip. The results are written to the terminal and a user-specifed file, ``7B_2nd_crossing.data`` in this case:
 
 .. code-block:: console
 

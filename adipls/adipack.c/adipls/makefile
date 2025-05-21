@@ -46,7 +46,7 @@ default: adipls.c.d.x
 $(LIB) : $(LIB_OBJS) $(REDIST_OBS) lofiles
 	$(LIB_TOOL) $(LIB) $(LIB_OBJS) $(REDIST_OBS) $(LOFILES)
 
-#On windows the blstio common block isnt linked in properly 
+#On windows the blstio common block isn't linked in properly 
 ifeq ($(BUILD_ON_WINDOWS),YES)
    EXTRAS=$(GDIR)/blstio.o
 endif

@@ -216,7 +216,7 @@
       ! log_directory
       ! ~~~~~~~~~~~~~
 
-      ! for data files about the run
+      ! directory for data files about the run
 
       ! ::
 
@@ -226,7 +226,7 @@
       ! do_history_file
       ! ~~~~~~~~~~~~~~~
 
-      ! history file is created if this is true
+      ! a history file is created if this is true
 
       ! ::
 
@@ -781,16 +781,6 @@
     burn_min2 = 1000
 
 
-      ! max_conv_vel_div_csound_maxq
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! only consider from center out to this location
-
-      ! ::
-
-    max_conv_vel_div_csound_maxq = 1
-
-
       ! width_for_limit_conv_vel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1115,7 +1105,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the center entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1129,7 +1119,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the max entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1183,7 +1173,7 @@
       ! Lower limits on surface mass fractions.
       ! Stop when surface abundance drops below this limit.
       ! Can have up to ``num_xa_surface_limits`` of these (see ``star_def`` for value)
-      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f``
+      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f90``
       ! ``xa_surface_lower_limit`` contains the lower limit value
 
       ! ::
@@ -1246,7 +1236,7 @@
       ! HB_limit
       ! ~~~~~~~~
 
-      ! For detecting horizontal branch.
+      ! For detecting when the model has completed the horizontal branch.
       ! Only applies when center abundance by mass of h1 is < 1d-4.
       ! Stop when the center abundance by mass of he4 drops below this limit.
 
@@ -1297,6 +1287,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! star_species_mass_max_limit_iso
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when a particular species mass in units of Msun exceeds these limits.
 
       ! ::
 
@@ -1790,10 +1782,19 @@
     center_R_lower_limit = -1
 
 
+      ! report_max_infall_inside_fe_core
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use ``fe_core_infall_mass`` to check amount of mass that is collapsing.
+      ! Then, If ``.true.``, fe_core_infall is determined by finding the maximum velocity that is inside
+      ! ``fe_core_mass`` in units of Msun. if ``.false.``, report the maximum infall velocity at any location.
+
+    report_max_infall_inside_fe_core = .true.
+
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
+      ! stop if at least ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
 
       ! ::
 
@@ -1802,17 +1803,17 @@
       ! fe_core_infall_mass
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
+      ! if ``check_mass_sum_for_infall = .true.``, ``fe_core_infall_mass`` is the amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
       ! transistent velocity spike causing the model to prematurely exit.  In solar masses
 
 
-      fe_core_infall_mass = 0.1d0
+    fe_core_infall_mass = 0.1d0
 
 
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
+      ! stop if at least ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
 
       ! ::
 
@@ -1972,6 +1973,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is greater than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -1982,6 +1986,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is less than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -2022,7 +2029,7 @@
       ! Pgas_div_P_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! criteria for stopping on Pgas/P
+      ! stop when Pgas/P <= Pgas_div_P_limit
 
       ! ::
 
@@ -2032,7 +2039,7 @@
       ! Pgas_div_P_limit_max_q
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if Pgas/P < this limit at any location with ``q <= Pgas_div_P_limit_max_q``
+      ! stop if Pgas/P < Pgas_div_P_limit at any location with ``q <= Pgas_div_P_limit_max_q``
       ! values near unity skip the outer envelope
 
       ! ::
@@ -2313,7 +2320,7 @@
       ! convection model ``TDC`` with an overshooting model, or combining ``TDC``
       ! with other models for chemical composition gradients
       ! (predictive mixing or convective premixing), rotation, etc. (MESA VI)
-      
+
       ! ::
 
     MLT_option = 'TDC'
@@ -2985,7 +2992,7 @@
     conv_premix_dump_snapshots = .false.
 
 
-   ! Rayleigh Taylor Instability
+   ! Rayleigh-Taylor Instability
    ! ____________________________
 
       ! derived from Paul Duffell's code RT1D.
@@ -3378,12 +3385,21 @@
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! convective velocities are limited to local sound speed times this factor
+      ! convective velocities are limited to local sound speed times this factor.
 
       ! ::
 
     max_conv_vel_div_csound = 1d99
 
+
+      ! max_conv_vel_div_csound_maxq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! only consider ``max_conv_vel_div_csound`` from center out to this location
+
+      ! ::
+
+    max_conv_vel_div_csound_maxq = -1
 
       ! max_v_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~
@@ -4060,57 +4076,21 @@
 
       ! ::
 
-    w_div_wcrit_max = 0.90d0
+    w_div_wcrit_max = 0.89d0
 
 
       ! w_div_wcrit_max2
       ! ~~~~~~~~~~~~~~~~
 
       ! When w_div_wc_flag is true, rather than a hard limit on w_div_wcrit
-      ! we use w_div_wcrit_max2<w_div_wcrit_max to provide a smooth transition.
-      ! In the limit of j_rot->infinity, the resulting w_div_wc will match
-      ! w_div_wcrit_max, while nothing is done when w_div_wcrit_max<w_div_wcrit_max2
+      ! we use two limiting values w_div_wcrit_max < w_div_wcrit_max2 to provide a smooth transition.
+      ! Nothing is done when w_div_wc < w_div_wcrit_max, if w_div_wcrit_max < w_div_wc < w_div_wcrit_max2,
+      ! we apply a sigmoid, and in the limit of j_rot -> infinity, the resulting w_div_wc will match
+      ! w_div_wcrit_max2 (being on the top of the sigmoid)
 
       ! ::
 
-    w_div_wcrit_max2 = 0.89d0
-
-
-      ! FP_min
-      ! ~~~~~~
-      ! FT_min
-      ! ~~~~~~
-
-      ! Lower limits for rotational distortion corrections factors FP and FT.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false., otherwise the
-      ! limits are set using w_div_wcrit_max
-
-      ! ::
-
-    FP_min = 0.75d0
-    FT_min = 0.95d0
-
-
-      ! FP_error_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If calculate an fp < this, treat it as an error.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false.
-
-      ! ::
-
-    FP_error_limit = 0d0
-
-
-      ! FT_error_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If calculate an ft < this, treat it as an error.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false.
-
-      ! ::
-
-    FT_error_limit = 0d0
+    w_div_wcrit_max2 = 0.90d0
 
 
       ! D_mix_rotation_max_logT_full_on
@@ -4133,6 +4113,27 @@
       ! ::
 
     D_mix_rotation_min_logT_full_off = 9.5d0
+
+
+      ! D_mix_rotation_min_tau_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Drop rotational components of ``D_mix`` for locations where tau <= this.
+      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
+
+      ! ::
+
+    D_mix_rotation_min_tau_full_off = 0d0
+
+      ! D_mix_rotation_max_tau_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Use rotational components of ``D_mix`` for locations where tau >= this.
+      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
+
+      ! ::
+
+    D_mix_rotation_min_tau_full_on = 0d0
 
 
       ! D_omega_max_replacement_fraction
@@ -4350,7 +4351,7 @@
       ! ~~~~~~~~~~~~~~~~
 
       ! Error tolerance for iterations and integrations when
-      ! ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'iterated'`` or
+      ! ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'iterated'`` or
       ! ``'varying'``.
 
       ! ::
@@ -4362,7 +4363,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of iterations for the opacity when
-      ! ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'iterated'``.
+      ! ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'iterated'``.
 
       ! ::
 
@@ -4373,7 +4374,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of steps for integrating the hydrostatic equilibrium
-      ! equation when ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'varying'``.
+      ! equation when ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'varying'``.
 
       ! ::
 
@@ -4449,7 +4450,7 @@
       ! atm_irradiated_errtol
       ! ~~~~~~~~~~~~~~~~~~~~~
 
-      ! Error tolerance for iterations when ``atm_option`` = ``'irradiated_grey'
+      ! Error tolerance for iterations when ``atm_option`` = ``'irradiated_grey'``
       ! and ``atm_irradiated_opacity`` = ``'iterated'``.
 
       ! ::
@@ -4461,7 +4462,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of iterations for the opacity when ``atm_option`` =
-      ! ``'irradiated_grey' and ``atm_irradiated_opacity`` = ``'iterated'``.
+      ! ``'irradiated_grey'`` and ``atm_irradiated_opacity`` = ``'iterated'``.
 
       ! ::
 
@@ -4652,8 +4653,8 @@
       ! do_starspots
       ! ~~~~~~~~~~~~
 
-      ! If ``.true.``, switch on impedance of the surface flux due to magnetic pressure from starspots, 
-      ! parameterized in the style of an atmospheric boundary modification. First described by 
+      ! If ``.true.``, switch on impedance of the surface flux due to magnetic pressure from starspots,
+      ! parameterized in the style of an atmospheric boundary modification. First described by
       ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
       ! Detailed discussion of this functionality can be found in |MESA VI|.
 
@@ -4674,8 +4675,8 @@
       ! xspot
       ! ~~~~~
 
-      ! Temperature contrast between the spotted and unspotted regions. 
-      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5 
+      ! Temperature contrast between the spotted and unspotted regions.
+      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5
       ! (half of the total pressure is due to magnetic pressure)
 
       ! ::
@@ -5648,6 +5649,7 @@
 
       ! Maximum number of grid points allowed.
       ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
+      ! If nz > max_allowed_nz, MESA will prematurely exit and call this error.
 
       ! ::
 
@@ -7423,10 +7425,19 @@
     use_starting_composition_for_kap = .false.
 
 
+      ! opacity_min
+      ! ~~~~~~~~~~~
+
+      ! limit minimum opacities to this value (ignore this if value is < 0)
+
+      ! ::
+
+    opacity_min = -1
+
       ! opacity_max
       ! ~~~~~~~~~~~
 
-      ! limit opacities to this value (ignore this is value is < 0)
+      ! limit opacities to this value (ignore this if value is < 0)
 
       ! ::
 
@@ -7687,13 +7698,26 @@
     delta_nu_sun = 134.91d0 ! μHz
     astero_Teff_sun = 5772d0 ! kelvin
 
+      ! delta_Pg_traditional
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! uHz. if <=0, use nu_max from scaled solar value
+      ! For calculating the asymptotic g-mode period spacing ``delta_Pg``
+
+      ! if ``delta_Pg_traditional`` = ``.true.``, then calculate the
+      ! asymptotic gravity mode period space by directly integrating
+      ! N2 over the entire stellar model.
+
+      ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
+      ! Bildsten et al. (2012): //ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract
+
+      ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
+      ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
 
       ! ::
 
+    delta_Pg_traditional = .true.
     delta_Pg_mode_freq = 0d0
 
 
@@ -8216,8 +8240,11 @@
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_flux_limiting_with_dPrad_dm_form
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
@@ -8242,6 +8269,11 @@
       !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
       !|         else
       !|            use L_rad = L
+      !|     if (use_flux_limiting_with_dPrad_dm_form)
+      !|         flxR = 4 * pi * r^2 * abs(dT^4/dm) / kap
+      !|         flxLambda = (6 + 3*flxR) / (6 + 3*flxR + flxR^2) (see Levermore & Pomraning 1981)
+      !|         L_rad = L_rad / flxLambda
+      !|
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
 
@@ -8250,15 +8282,19 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
+
+! Hydrodynamic drag
+! =================
 
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
       ! min_q_for_drag
       ! ~~~~~~~~~~~~~~
 
-      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
+      ! only when v_flag = .true.. Adjusts both v and energy transfer from kinetic to thermal.
       ! only for v(k) when q(k) > min_q_for_drag.
       ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
       ! useful for preventing the development radial pulsations during advanced
@@ -8285,11 +8321,35 @@
     min_q_for_drag = 0d0
 
 
+      ! v_drag_factor
+      ! ~~~~~~~~~~~~~
+      ! v_drag
+      ! ~~~~~~
+      ! q_for_v_drag_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! q_for_v_drag_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+
+      ! Only when u_flag = .true.. Adds a pseudo drag term of the form
+      ! -v_drag_factor*(v-v_drag)^2/r, can be used damp velocities in outer layers
+      ! of a star, useful for smoothing out spurious shocks colliding in ejected layers.
+      ! Effect is full on for q>q_for_v_drag_full_on and full off for
+      ! q < q_for_v_drag_full_off.
+
+      ! ::
+
+    v_drag_factor = 0d0
+    v_drag = 0d0
+    q_for_v_drag_full_off = 0.95d0
+    q_for_v_drag_full_on = 0.96d0
+
+
+      ! Rayleigh-Taylor Instability: hydro drag terms
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       ! for hydro comparison tests (e.g., Sedov)
 
-
-      ! Rayleigh-Taylor Instability
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! RTI_A
       ! ~~~~~
       ! RTI_B

@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
    module mod_colors
       use colors_def
       use math_lib
-      use const_def
+      use const_def, only: dp, mesa_data_dir
       use utils_lib
 
       implicit none
@@ -202,7 +195,7 @@
 
 
       subroutine Read_One_Colors_Data(fname, thead, n_colors, col_names, ierr)
-         integer, intent(out) :: ierr ! 0 means ok
+         integer, intent(out) :: ierr  ! 0 means ok
          type (lgt_list), pointer,intent(inout) :: thead
 
          ! read file and build lists
@@ -227,14 +220,14 @@
          if(ios/=0) THEN
             ! Try colors data dir
             open(NEWUNIT=IO_UBV, FILE=trim(mesa_data_dir)//'/colors_data/'//trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ios)
-            if (ios /= 0) then ! failed to open lcb98cor.dat
+            if (ios /= 0) then  ! failed to open lcb98cor.dat
                write(*,*) 'colors_init: failed to open ' // trim(fname)
                write(*,*) 'or ',trim(mesa_data_dir)//'/colors_data/'//trim(fname)
                write(*,*)
                write(*,*) 'Please check that the file exists in your local work directory'
                write(*,*) 'or in ',trim(mesa_data_dir)//'/colors_data/'
                ierr = 1; return
-            endif
+            end if
          end if
 
          ierr = 0
@@ -282,21 +275,21 @@
          tlist => thead
          lgt = 1d99
          do while (associated(tlist))
-            if (tlist% lgt >= lgt) then ! bad tlist order
+            if (tlist% lgt >= lgt) then  ! bad tlist order
                ierr = -1; return
             end if
             lgt = tlist% lgt
             glist => tlist% glist
             lgg = 1d99
             do while (associated(glist))
-               if (glist% lgg >= lgg) then ! bad glist order
+               if (glist% lgg >= lgg) then  ! bad glist order
                   ierr = -2; return
                end if
                lgg = glist% lgg
                zlist => glist% zlist
                lgz = 1d99
                do while (associated(zlist))
-                  if (zlist% lgz >= lgz) then ! bad zlist order
+                  if (zlist% lgz >= lgz) then  ! bad zlist order
                      ierr = -3; return
                   end if
                   lgz = zlist% lgz
@@ -318,7 +311,7 @@
 
 
       subroutine Read_Colors_Data(fname, thead, col_names, n_colors, ierr)
-         integer, intent(out) :: ierr ! 0 means ok
+         integer, intent(out) :: ierr  ! 0 means ok
          type (lgt_list), pointer,intent(inout) :: thead
          character (len=*),intent(in) :: fname
          character(len=*),dimension(:),intent(out) :: col_names
@@ -336,24 +329,24 @@
          type (lgt_list), pointer :: head
          real(dp), intent(in) :: lgt
          type (lgt_list), pointer :: tlist
-         integer, intent(out) :: ierr ! 0 means ok
+         integer, intent(out) :: ierr  ! 0 means ok
 
          type (lgt_list), pointer :: t1=>null(), t2=>null()
 
          ierr = 0
 
-         if (.not. associated(head)) then ! first time
+         if (.not. associated(head)) then  ! first time
             if (.not. alloc_tlist()) return
             head => tlist
             return
          end if
 
-         if (head% lgt == lgt) then ! matches head of list
+         if (head% lgt == lgt) then  ! matches head of list
             tlist => head
             return
          end if
 
-         if (head% lgt < lgt) then ! becomes new head of list
+         if (head% lgt < lgt) then  ! becomes new head of list
             if (.not. alloc_tlist()) return
             tlist% nxt => head
             head => tlist
@@ -367,7 +360,7 @@
             if (t2% lgt == lgt) then
                tlist => t2; return
             end if
-            if (t2% lgt < lgt) then ! insert new one before t2
+            if (t2% lgt < lgt) then  ! insert new one before t2
                if (.not. alloc_tlist()) return
                tlist% nxt => t2
                t1% nxt => tlist
@@ -406,18 +399,18 @@
 
          ierr = 0
 
-         if (.not. associated(head)) then ! first time
+         if (.not. associated(head)) then  ! first time
             if (.not. alloc_glist()) return
             head => glist
             return
          end if
 
-         if (head% lgg == lgg) then ! matches head of list
+         if (head% lgg == lgg) then  ! matches head of list
             glist => head
             return
          end if
 
-         if (head% lgg < lgg) then ! becomes new head of list
+         if (head% lgg < lgg) then  ! becomes new head of list
             if (.not. alloc_glist()) return
             glist% nxt => head
             head => glist
@@ -431,7 +424,7 @@
             if (g2% lgg == lgg) then
                glist => g2; return
             end if
-            if (g2% lgg < lgg) then ! insert new one before g2
+            if (g2% lgg < lgg) then  ! insert new one before g2
                if (.not. alloc_glist()) return
                glist% nxt => g2
                g1% nxt => glist
@@ -448,7 +441,7 @@
          logical function alloc_glist()
             integer :: istat
             allocate(glist,stat=istat)
-            if (istat /= 0) then ! allocate failed in alloc_glist
+            if (istat /= 0) then  ! allocate failed in alloc_glist
                alloc_glist = .false.; ierr = -1; return
             end if
             nullify(glist% zlist)
@@ -463,25 +456,25 @@
          type (lgz_list), pointer :: head
          real(dp), intent(in) :: lgz
          type (lgz_list), pointer :: zlist
-         integer, intent(out) :: ierr ! 0 means ok
+         integer, intent(out) :: ierr  ! 0 means ok
          integer,intent(inout) :: num_entries
 
          type (lgz_list), pointer :: z1=>null(), z2=>null()
 
          ierr = 0
 
-         if (.not. associated(head)) then ! first time
+         if (.not. associated(head)) then  ! first time
             if (.not. alloc_zlist()) return
             head => zlist
             return
          end if
 
-         if (head% lgz == lgz) then ! matches head of list
+         if (head% lgz == lgz) then  ! matches head of list
             zlist => head
             return
          end if
 
-         if (head% lgz < lgz) then ! becomes new head of list
+         if (head% lgz < lgz) then  ! becomes new head of list
             if (.not. alloc_zlist()) return
             zlist% nxt => head
             head => zlist
@@ -495,7 +488,7 @@
             if (z2% lgz == lgz) then
                zlist => z2; return
             end if
-            if (z2% lgz < lgz) then ! insert new one before z2
+            if (z2% lgz < lgz) then  ! insert new one before z2
                if (.not. alloc_zlist()) return
                zlist% nxt => z2
                z1% nxt => zlist
@@ -525,8 +518,8 @@
 
 
       subroutine Eval_Colors(log_Teff,log_g, M_div_h_in, results, thead, n_colors, ierr)
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h_in ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h_in  ! [M/H]
          real(dp),dimension(:), intent(out) :: results
          real(dp), intent(in) :: log_g
          integer, intent(in) :: n_colors
@@ -551,7 +544,7 @@
 
         ! write(*,*) log_Teff,log_g, M_div_h_in
 
-         if (lgt >= thead% lgt) then ! Error out
+         if (lgt >= thead% lgt) then  ! Error out
             results = -1d99
             return
          else
@@ -559,14 +552,14 @@
             tlist => thead
             do while (associated(tlist% nxt))
                tnxt => tlist% nxt
-               if (lgt == tnxt% lgt) then ! use tnxt
+               if (lgt == tnxt% lgt) then  ! use tnxt
                   call get_glist_results( &
                      tnxt% glist, lgg, lgz, results1, n_colors, ierr)
                      if (ierr /= 0) return
                   results = results1
                   return
                end if
-               if (lgt >= tnxt% lgt) then ! interpolate between tlist and tnxt
+               if (lgt >= tnxt% lgt) then  ! interpolate between tlist and tnxt
                   call get_glist_results(tlist% glist, lgg, lgz, results1, n_colors, ierr)
                   if (ierr /= 0) return
                   call get_glist_results(tnxt% glist, lgg, lgz, results2, n_colors, ierr)
@@ -610,20 +603,20 @@
             return
          end if
 
-         if (lgg >= glist% lgg) then ! use the largest lgg
+         if (lgg >= glist% lgg) then  ! use the largest lgg
             results = -1d99
             return
          end if
 
          do while (associated(glist% nxt))
             gnxt => glist% nxt
-            if (lgg == gnxt% lgg) then ! use gnxt
+            if (lgg == gnxt% lgg) then  ! use gnxt
                call get_zlist_results(gnxt% zlist, lgz, results1, n_colors, ierr)
                if (ierr /= 0) return
                results=results1
                return
             end if
-            if (lgg >= gnxt% lgg) then ! interpolate between lgg's
+            if (lgg >= gnxt% lgg) then  ! interpolate between lgg's
                call get_zlist_results(glist% zlist, lgz, results1, n_colors, ierr)
                if (ierr /= 0) return
                call get_zlist_results(gnxt% zlist, lgz, results2, n_colors, ierr)
@@ -666,18 +659,18 @@
             return
          end if
 
-         if (lgz >= zlist% lgz) then ! use the largest lgz
+         if (lgz >= zlist% lgz) then  ! use the largest lgz
             results = -1d99
             return
          end if
 
          do while (associated(zlist% nxt))
             znxt => zlist% nxt
-            if (lgz == znxt% lgz) then ! use znxt
+            if (lgz == znxt% lgz) then  ! use znxt
                results(1:n_colors) = znxt% colors(1:n_colors)
                return
             end if
-            if (lgz >= znxt% lgz) then ! interpolate between zlist and znxt
+            if (lgz >= znxt% lgz) then  ! interpolate between zlist and znxt
                alfa = (lgz - znxt% lgz) / (zlist% lgz - znxt% lgz)
                beta = 1 - alfa
                results(1:n_colors) = alfa * zlist% colors(1:n_colors) + beta * znxt% colors(1:n_colors)

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/sel-amdl.d.x
 #  usage: sel-amdl -ltinput file-gt -ltoutput file-gt -ltmodel number-gt
 if [ $# -eq 0 ]

@@ -26,7 +26,7 @@ The MESA SDK contains the GNU debugger `gdb <https://www.gnu.org/software/gdb/>`
 Using pgstar
 ~~~~~~~~~~~~
 
-The built in pgstar plotting is itself an invaluable a debugging tool.  Something may jump out from a plot as strange behavior before it shows up as a problem in the run.  You may notice that an issue begins when the model reaches certain conditions and that can provide a useful guide to the problem.  After you identify an issue and configure some useful plots, consider setting ``pgstar_interval = 1`` and ``pause = .true.`` so that you can step through the model timestep-by-timestep.
+The built in pgstar plotting is itself an invaluable a debugging tool.  Something may jump out from a plot as strange behavior before it shows up as a problem in the run.  You may notice that an issue begins when the model reaches certain conditions and that can provide a useful guide to the problem.  After you identify an issue and configure some useful plots, consider setting ``pgstar_interval = 1`` and ``pause_flag = .true.`` so that you can step through the model timestep-by-timestep.
 
 Using a profiler
 ~~~~~~~~~~~~~~~~
@@ -66,7 +66,7 @@ After the call to ``Get_kap_Results_blend_T``, add
 .. code-block:: fortran
 
      dlnkap_rad_dlnRho = -dlnkap_rad_dlnRho
-         
+
 thereby making the derivatives of the radiative opacity with respect
 to density incorrect.
 
@@ -115,29 +115,29 @@ terminal output, you can see that the timesteps are often set by
 .. code-block:: console
 
            step    lg_Tmax     Teff     lg_LH      lg_Lnuc     Mass       H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry
-       lg_dt_yr    lg_Tcntr    lg_R     lg_L3a     lg_Lneu     lg_Mdot    He_core    He_cntr    O_cntr     Z_surf   gam_cntr   iters  
+       lg_dt_yr    lg_Tcntr    lg_R     lg_L3a     lg_Lneu     lg_Mdot    He_core    He_cntr    O_cntr     Z_surf   gam_cntr   iters
          age_yr    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   C_core     C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit
     __________________________________________________________________________________________________________________________________________________
-    
+
              10   7.186162   6026.290   0.310381   0.310381   1.300000   1.300000   0.639691   0.003250   0.320000  -2.349937    805      0
        4.820702   7.186162   0.119685 -44.790170  -1.003419 -99.000000   0.000000   0.320132   0.018721   0.040000   0.071396     16
      8.4252E+05   1.739919   0.314263 -14.875409 -99.000000  -7.019694   0.000000   0.005826   0.004199   0.040176  0.000E+00  solver iters
                                    rel_E_err    5.8461078509513597D-13
                            log_rel_run_E_err      -11.0597023512447645
-    
+
              13   7.185990   6017.566   0.300802   0.300802   1.300000   1.300000   0.639670   0.003358   0.320000  -2.355541    805      0
        4.873378   7.185990   0.113850 -44.803173  -1.013273 -99.000000   0.000000   0.320139   0.018721   0.040000   0.071285     15
      1.0438E+06   1.737310   0.300077 -14.750470 -99.000000  -7.010156   0.000000   0.005733   0.004199   0.040192  0.000E+00    varcontrol
                                    rel_E_err    7.3563886572871659D-13
                            log_rel_run_E_err      -10.9707092147706380
-    
+
     save LOGS/profile2.data for model 13
              20   7.185235   5994.060   0.274258   0.274258   1.300000   1.300000   0.639610   0.003646   0.320000  -2.362919    806      0
        4.851161   7.185235   0.101141 -44.848473  -1.043016 -99.000000   0.000000   0.320157   0.018721   0.040000   0.071188     18
      1.5910E+06   1.733084   0.267860 -15.352530 -99.000000  -6.988274   0.000000   0.005486   0.004199   0.040233  0.000E+00  solver iters
                                    rel_E_err    5.1727204553814077D-13
                            log_rel_run_E_err      -10.1566890117973099
-    
+
 
 Step 1: Activate debugging options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -283,13 +283,13 @@ model will stop after the specified solver call and you'll see
                                              equ name dv_dt
     *****                 log dfridr rel_diff partials wrt  lnd(k)   of dv_dt(k)      1     0.677   log uncertainty    -9.668   analytic   -2.9597633549276736E-01   numeric   -1.7033292388187307E+00
                           log dfridr rel_diff partials wrt  lnd(k+1) of dv_dt(k)      1   -99.000   log uncertainty   -99.000   analytic    0.0000000000000000E+00   numeric    0.0000000000000000E+00
-    
+
                           log dfridr rel_diff partials wrt  lnT(k)   of dv_dt(k)      1   -10.058   log uncertainty   -10.644   analytic   -6.9708999322145324E+00   numeric   -6.9708999316051248E+00
                           log dfridr rel_diff partials wrt  lnT(k+1) of dv_dt(k)      1   -99.000   log uncertainty   -99.000   analytic    0.0000000000000000E+00   numeric    0.0000000000000000E+00
-    
+
     ?????                   log dfridr rel_diff partials wrt  L(k)   of dv_dt(k)      1    -4.255   log uncertainty    -4.272   analytic    6.3131382934316702E-39   numeric    6.3127875526588140E-39
                             log dfridr rel_diff partials wrt  L(k+1) of dv_dt(k)      1   -99.000   log uncertainty   -99.000   analytic    0.0000000000000000E+00   numeric    0.0000000000000000E+00
-    
+
                           log dfridr rel_diff partials wrt  lnR(k)   of dv_dt(k)      1   -11.110   log uncertainty   -10.064   analytic   -2.0080506394821409E+00   numeric   -2.0080506394665569E+00
                           log dfridr rel_diff partials wrt  lnR(k+1) of dv_dt(k)      1   -99.000   log uncertainty   -99.000   analytic    0.0000000000000000E+00   numeric    0.0000000000000000E+00
 
@@ -353,7 +353,7 @@ but ``solver_test_partials_equ_name == 'opacity'`` and restarting shows
 
 Comparing the bad analytic derivative to the numerical one reveals the
 sign error that we introduced.
-                        
+
 We've reached the end of the part of debugging that can be done with
 inlists only.  We will need to edit the code in order to MESA to dive
 deeper into a module or to check individual terms in the equation
@@ -389,7 +389,7 @@ which derivative of that quantity to check::
 
       solver_test_partials_equ_name = ''
       solver_test_partials_var_name = 'lnd'
-         
+
 The variables ``kap_test_partials_val`` and
 ``kap_test_partials_dval_dx`` can now be set within ``kap`` and
 thereby communicate their values into star and dfridr.
@@ -426,9 +426,9 @@ options, run your model, and hopefully see improved performance.
 Advanced: Investigate the bad cell and equation in detail
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note:: 
+.. note::
 
-    We will now pretend we didn't find the bug and re-use this setup
+    We will now pretend we didn't find the bug and reuse this setup
     to illustrate how to dig in at an even deeper level.
 
 MESA equations and structure variables have integer indices.  The full
@@ -436,7 +436,7 @@ list is in ``star_data/public/star_data.inc``, but the most common
 ones are
 
 .. code-block:: fortran
-  
+
       ! index definitions for the variables (= 0 if variable not in use)
          integer :: i_lnd ! ln(cell density average by mass)
          integer :: i_lnT ! ln cell temperature average by mass
@@ -480,18 +480,18 @@ There you'll see the code that indicates that we've reached the
       else
          i_eqn = i_dv_dt
       end if
-      
+
       equ(i_eqn,1) = lnP_bc - s% lnP(1)
 
 This is an extremely simple equation.  By driving the residual to
 zero, MESA requires that the surface cell pressure match the imposed
 boundary condition.
-    
+
 Now, we want to tell MESA to test the partial derivatives.  Near the
 start of the routine, set
 
 .. code-block:: fortran
-  
+
       test_partials = (s% solver_iter == s% solver_test_partials_iter_number)
       !test_partials = .false.
 
@@ -502,17 +502,17 @@ up to check partials.  (But if you are in uncharted territory you
 might have to add them yourself.)
 
 .. note::
-    
+
     Since ``PT_eqns_surf`` and ``set_Psurf_BC`` are only called for
     ``k=1``, we do not test for zone number.  In other equations that
     are evaluated for multiple ``k``, the analogous test will usually
     look like
-    
+
     .. code-block:: fortran
-      
+
           test_partials = (k == s% solve_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number)
           !test_partials = .false.
-    
+
 Set ``solver_test_partials_val`` to a variable that is used in
 calculating the equation residual.  Let's begin with the residual
 itself, which should reproduce the bad entry from the previous step in
@@ -521,7 +521,7 @@ this tutorial.
 .. code-block:: fortran
 
       if (test_partials) s% solver_test_partials_val = equ(i_eqn,1)
-         
+
 Find the call on ``e00`` for ``i_lnd`` to find the relevant partial with respect to density.
 
 .. code-block:: fortran
@@ -540,11 +540,11 @@ Find the call on ``e00`` for ``i_lnd`` to find the relevant partial with respect
    subroutines indicate that this call is setting the derivative of a
    specific equation (recall ``i_eqn = i_dv_dt`` earlier) with respect
    to a specific variable (here ``i_lnd``).
-      
+
 Set ``solver_test_partials_var`` to the thing you want to take a
 derivative with respect to and ``solver_test_partials_dval_dx`` to the
 analytic derivative.
-         
+
 .. code-block:: fortran
 
       if (test_partials) then
@@ -553,7 +553,7 @@ analytic derivative.
          write(*,*) 'set_Psurf_BC', s% solver_test_partials_var
       end if
 
-      
+
 We changed code in star, so we need to do ``./mk && ./export`` in
 ``star`` and then in the work directory also recompile before we
 restart ``./mk && ./re``.  We will repeat this recompilation/restart
@@ -567,7 +567,7 @@ must also stop selecting the equations/variables in the inlist.
 
       solver_test_partials_equ_name = ''
       solver_test_partials_var_name = ''
-      
+
       solver_test_kap_partials = .false.
 
 After that edit, once you recompile and restart you should see
@@ -575,12 +575,12 @@ After that edit, once you recompile and restart you should see
 .. code-block:: console
 
         set_Psurf_BC           1
-    
-    
+
+
                       analytic and numeric partials wrt lnd   -2.9597633549276736D-01   -1.7033292388187307D+00
         log dfridr relative uncertainty for numeric partial   -9.6678068357602811D+00
                                                    rel_diff    4.7549507665296238D+00
-    
+
     STOP done solver_test_partials
 
 
@@ -635,11 +635,11 @@ the variables yourself.)  That should give
 .. code-block:: console
 
        set_Psurf_BC           1
-    
+
                       analytic and numeric partials wrt lnd    7.0157923462638694D-01   -7.0157923451592796D-01
             dfridr relative uncertainty for numeric partial   -1.6481349835630704D-12
                                                    rel_diff    2.0000000001574434D+00
-    
+
     STOP done solver_test_partials
 
 and at this point you can clearly see the sign error we introduced.
@@ -652,7 +652,7 @@ With that confirmed, we want to start dissecting
 For more complex expressions involving many terms, you might need to
 test term by term.
 
-.. note:: 
+.. note::
 
     The ``dfridr`` machinery in MESA tests the derivatives with
     respect to structure variables, so it can't magically check every
@@ -667,11 +667,11 @@ test term by term.
 Here, since there's only one ``dlnd`` derivative, ``dlnkap_dlnd`` is
 the clear place to start (even if we didn't already know it was the
 issue).  Set
-    
+
 .. code-block:: fortran
 
     s% solver_test_partials_val = log(s% opacity(1))
-            
+
     s% solver_test_partials_var = s% i_lnd
     s% solver_test_partials_dval_dx = dlnkap_dlnd
 
@@ -699,21 +699,21 @@ these derivatives in a specific cell, you can always adjust
 Therefore, to check ``d_esum_dlnTm1`` one can do
 
 .. code-block:: fortran
-  
+
       test_partials = (k-1 == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number)
       !test_partials = .false.
 
 and
-      
+
 .. code-block:: fortran
-                
+
       s% solver_test_partials_val = esum
       s% solver_test_partials_var = s% i_lnT
       s% solver_test_partials_dval_dx = d_esum_dlnTm1
 
 This will check the derivative of ``esum`` in cell
 ``solver_test_partials_k+1`` with respect to ``lnT`` in cell
-``solver_test_partials_k``.  
+``solver_test_partials_k``.
 
 
 Checking composition derivatives requires setting a sink isotope such
@@ -768,9 +768,9 @@ So then the in the code you would do something like
 
 .. code-block:: fortran
 
-        if (test_partials) then   
+        if (test_partials) then
            s% solver_test_partials_dx_sink = 20 ! fe56 (index in xa)
-           s% solver_test_partials_var = 10 ! he4 (variable number) 
+           s% solver_test_partials_var = 10 ! he4 (variable number)
            s% solver_test_partials_dval_dx = s% d_epsnuc_dx(5,k) ! he4 (index in xa)
            write(*,*) 'get1_energy_eqn', s% solver_test_partials_var
         end if
@@ -788,21 +788,21 @@ Diagnosing Meshing Problems
 to get info about why the mesh is doing what it is doing,
 
 in controls section of inlist::
-  
+
    show_mesh_changes = .true.
-   
+
 run to get current mesh call number, n
 
 in controls section of inlist::
-  
+
    mesh_dump_call_number = n
-   
+
 run to get plot data
 
 mesh_plan.rb shows input data that was used to form the plan
 
 mesh.rb shows new mesh (with some old values interpolated to the new mesh for comparison)
-   
+
 
 .. _fpe:
 
@@ -886,7 +886,7 @@ The important line is the first line that does not include ???, in this case it 
 
 This is telling us that the problem occurs at line 155 in ../src/run_star_extras.f90
 
-.. note:: 
+.. note::
       The ../src is because the file path is relative to the make/ folder in your work folder
 
 At this point you should go to that line and work out why the number is undefined.
@@ -927,7 +927,7 @@ These can also be protected by wrapping the array after its declared with:
       allocate(x(1:10))
       call fill_with_NaNs(x)
 
-.. note:: 
+.. note::
       Never try to fill the array yourself with a NaN, say by setting each element to 1/0. We want to track down the location where an array element is being **used** before being set, not the point where we set the element to a NaN. If you set the array yourself the fpe checking will warn you about that location, not where the array is being before being set.  fill_with_NaNs does some clever tricks to set each element to the bit pattern that corresponds to a NaN, which does not trigger the fpe checks.
 
 Memory leaks

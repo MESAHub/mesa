@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2013-2021  Josiah Schwab & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -54,7 +48,6 @@ contains
     use auto_diff
     ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT
@@ -72,7 +65,7 @@ contains
     type(auto_diff_real_2var_order1) :: c2, c3
 
     ! check that assumptions are met
-    if (zeta.gt.-beta) stop "ECAPTURE:  zeta > -beta"
+    if (zeta>-beta) stop "ECAPTURE:  zeta > -beta"
 
     y = zeta+eta
 
@@ -101,7 +94,6 @@ contains
 
     ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT
@@ -119,7 +111,7 @@ contains
     type(auto_diff_real_2var_order1) :: c0, c1, c2, c3, c4
 
     ! check that assumptions are met
-    if (zeta.lt.beta) stop "ECAPTURE:  zeta < beta"
+    if (zeta<beta) stop "ECAPTURE:  zeta < beta"
 
 
     y = zeta-eta

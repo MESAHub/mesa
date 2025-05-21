@@ -64,7 +64,7 @@
 
          real(dp) :: star_mass_min_limit, star_mass_max_limit
          real(dp) :: remnant_mass_min_limit, ejecta_mass_max_limit
-         
+
          real(dp) :: star_species_mass_min_limit, star_species_mass_max_limit
          character (len=iso_name_length) :: &
             star_species_mass_min_limit_iso, star_species_mass_max_limit_iso
@@ -136,7 +136,7 @@
          real(dp) :: Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit
          real(dp) :: v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit
          real(dp) :: v_surf_div_v_esc_limit, Lnuc_div_L_zams_limit, v_surf_kms_limit
-         logical :: stop_near_zams, stop_at_phase_PreMS, & 
+         logical :: stop_near_zams, stop_at_phase_PreMS, &
             stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, &
             stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
             stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
@@ -288,9 +288,9 @@
 
          real(dp) :: mlt_gradT_fraction, max_logT_for_mlt
 
-    
-            
-         
+
+
+
          logical :: use_superad_reduction
          real(dp) :: &
             superad_reduction_Gamma_limit, &
@@ -302,10 +302,10 @@
       ! mixing parameters
 
          real(dp) :: min_overshoot_q, overshoot_alpha
-         
+
          real(dp) :: burn_z_mix_region_logT, burn_he_mix_region_logT, burn_h_mix_region_logT
          real(dp) :: max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region
-         
+
          logical :: limit_overshoot_Hp_using_size_of_convection_zone
 
          logical        :: predictive_mix(NUM_PREDICTIVE_PARAM_SETS)
@@ -337,7 +337,7 @@
          character(256) :: overshoot_bdy_loc(NUM_OVERSHOOT_PARAM_SETS)
          character(256) :: overshoot_scheme(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_D_min
-         real(dp)       :: overshoot_brunt_B_max   
+         real(dp)       :: overshoot_brunt_B_max
 
          logical :: RSP_write_map, RSP_report_limit_dt, &
             use_other_RSP_linear_analysis, RSP_testing, RSP_use_Prad_for_Psurf, RSP_use_atm_grey_with_kap_for_Psurf, &
@@ -366,7 +366,7 @@
             RSP_kap_density_factor, RSP_T_anchor_tolerance, RSP_T_inner_tolerance, RSP_relax_dm_tolerance, &
             RSP_max_dt_times_min_rad_diff_time, RSP_Qvisc_linear_static, RSP_dq_1_factor, &
             RSP_surface_tau
-         
+
          real(dp) :: &
             max_conv_vel_div_csound, &
             max_v_for_convection, max_q_for_convection_with_hydro_on, &
@@ -421,7 +421,7 @@
          real(dp) :: fixed_vsurf
          logical :: use_fixed_Psurf_outer_BC
          real(dp) :: fixed_Psurf
-         
+
          real(dp) :: Tsurf_factor
 
       ! create atmosphere
@@ -454,7 +454,7 @@
          real(dp) :: mdot_omega_power, max_rotational_mdot_boost, lim_trace_rotational_mdot_boost, &
             rotational_mdot_boost_fac, rotational_mdot_kh_fac, surf_avg_tau, surf_avg_tau_min, &
             max_mdot_jump_for_rotation
-         
+
          integer :: max_tries_for_implicit_wind
          real(dp) :: iwind_tolerance, iwind_lambda
 
@@ -635,7 +635,7 @@
          real(dp) :: mesh_dlog_pnhe4_dlogP_extra
          real(dp) :: mesh_dlog_photo_dlogP_extra
          real(dp) :: mesh_dlog_other_dlogP_extra
-         
+
          integer :: mesh_delta_coeff_factor_smooth_iters
 
          real(dp) :: P_function_weight, E_function_weight, E_function_param
@@ -667,7 +667,7 @@
          real(dp) :: xa_function_weight(num_xa_function)
          real(dp) :: xa_function_param(num_xa_function)
          real(dp) :: xa_mesh_delta_coeff(num_xa_function)
-         
+
          logical :: use_split_merge_amr, trace_split_merge_amr, &
             equal_split_density_amr, &
             split_merge_amr_hybrid_zoning, &
@@ -697,7 +697,7 @@
 
          real(dp) :: reaction_neuQs_factor, nonlocal_NiCo_kap_gamma, &
             dtau_gamma_NiCo_decay_heat, max_logT_for_net
-         
+
          logical :: nonlocal_NiCo_decay_heat
 
          real(dp) :: weak_rate_factor, mix_factor, dxdt_nuc_factor, &
@@ -752,7 +752,7 @@
          real(dp) :: diffusion_T_full_on
          real(dp) :: diffusion_T_full_off
          real(dp) :: D_mix_ignore_diffusion
-         
+
          real(dp) :: D_mix_zero_region_bottom_q, D_mix_zero_region_top_q, &
             dq_D_mix_zero_at_H_He_crossover, dq_D_mix_zero_at_H_C_crossover
 
@@ -796,7 +796,7 @@
          logical :: use_simple_es_for_kap, use_starting_composition_for_kap
 
          real(dp) :: min_kap_for_dPrad_dm_eqn
-         real(dp) :: opacity_max, opacity_factor
+         real(dp) :: opacity_min, opacity_max, opacity_factor
          real(dp) :: min_logT_for_opacity_factor_off
          real(dp) :: min_logT_for_opacity_factor_on
          real(dp) :: max_logT_for_opacity_factor_on
@@ -812,6 +812,7 @@
 
          logical :: get_delta_nu_from_scaled_solar
          real(dp) :: nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq
+         logical :: delta_Pg_traditional
 
 
       ! hydro parameters
@@ -824,6 +825,7 @@
 
          logical :: use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
+            use_flux_limiting_with_dPrad_dm_form, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
             no_dedt_form_during_relax, &
             include_P_in_velocity_time_centering, &
@@ -834,10 +836,14 @@
             L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
-         logical :: use_drag_energy
+         logical :: use_drag_energy, report_max_infall_inside_fe_core
          real(dp) :: &
             drag_coefficient, &
-            min_q_for_drag
+            min_q_for_drag, &
+            v_drag_factor, &
+            v_drag, &
+            q_for_v_drag_full_off, &
+            q_for_v_drag_full_on
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -861,14 +867,14 @@
 
          logical :: include_L_in_correction_limits, &
             include_v_in_correction_limits, include_u_in_correction_limits
-         
+
          real(dp) :: max_X_for_conv_timescale, min_X_for_conv_timescale
          real(dp) :: max_q_for_conv_timescale, min_q_for_conv_timescale
          real(dp) :: max_q_for_QHSE_timescale, min_q_for_QHSE_timescale
 
          logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
          logical :: report_min_rcond_from_DGESXV
-         
+
          logical :: do_normalize_dqs_as_part_of_set_qs
 
          logical :: trace_solver_damping
@@ -886,7 +892,7 @@
          real(dp) :: tol_residual_norm1, tol_max_residual1
          real(dp) :: tol_residual_norm2, tol_max_residual2
          real(dp) :: tol_residual_norm3, tol_max_residual3
-         
+
          real(dp) :: warning_limit_for_max_residual
 
          logical :: relax_use_gold_tolerances
@@ -898,10 +904,10 @@
          integer :: &
             relax_solver_iters_timestep_limit, &
             relax_iter_for_resid_tol2, relax_iter_for_resid_tol3
-         
+
          integer :: steps_before_start_stress_test
          logical :: stress_test_relax
-         
+
          logical :: use_gold_tolerances
          integer :: &
             gold_solver_iters_timestep_limit, &
@@ -916,7 +922,7 @@
             gold_tol_max_residual2, &
             gold_tol_residual_norm3, &
             gold_tol_max_residual3
-         
+
          logical :: use_gold2_tolerances
          integer :: &
             gold2_solver_iters_timestep_limit, &
@@ -1031,11 +1037,13 @@
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
          real(dp) :: D_mix_rotation_max_logT_full_on, &
-            D_mix_rotation_min_logT_full_off
-         
+            D_mix_rotation_min_logT_full_off, &
+            D_mix_rotation_min_tau_full_off, &
+            D_mix_rotation_min_tau_full_on
+
          real(dp) :: D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
          logical :: D_omega_mixing_across_convection_boundary
-         
+
          real(dp) :: nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
 
@@ -1068,26 +1076,26 @@
 
          logical :: solver_show_correction_info
          real(dp) :: solver_epsder_chem, solver_epsder_struct
-         
+
          logical :: fill_arrays_with_NaNs
          logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
             warn_rates_for_high_temp, absolute_cumulative_energy_err
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
-            
+
          logical :: stop_for_bad_nums
          integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
 
       ! WD phase separation
-         
+
          logical :: do_phase_separation
          logical :: do_phase_separation_heating
          logical :: phase_separation_mixing_use_brunt
          character (len=32) :: phase_separation_option
 
       ! timestep parameters
-      
+
          real(dp) :: time_delta_coeff ! like mesh_delta_coeff
 
          real(dp) :: max_timestep
@@ -1105,7 +1113,7 @@
 
          real(dp) :: timestep_dt_factor
          logical :: use_dt_low_pass_controller
-         
+
          real(dp) :: force_timestep_min, force_timestep_min_years, force_timestep_min_factor, &
             force_timestep, force_timestep_years
 
@@ -1188,7 +1196,7 @@
          real(dp) :: delta_lgL_nuc_at_high_T_limit_lgT_min
          real(dp) :: max_lgT_for_lgL_nuc_limit
          real(dp) :: lgL_nuc_burn_min, lgL_nuc_drop_factor
-         
+
          real(dp) :: delta_lgL_power_photo_limit = -1
          real(dp) :: delta_lgL_power_photo_hard_limit = -1
          real(dp) :: min_lgT_for_lgL_power_photo_limit = 9d0
@@ -1233,7 +1241,7 @@
 
          real(dp) :: delta_log_eps_nuc_limit
          real(dp) :: delta_log_eps_nuc_hard_limit
-         
+
          logical :: delta_dX_div_X_drop_only
          logical :: delta_lg_XH_drop_only
          logical :: delta_lg_XHe_drop_only
@@ -1328,7 +1336,7 @@
 
          character (len=strlen) :: zams_filename
          logical :: set_rho_to_dm_div_dV
-         
+
          logical :: fix_d_eos_dxa_partials
 
          logical :: use_other_surface_PT

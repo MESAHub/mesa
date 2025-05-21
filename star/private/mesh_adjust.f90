@@ -2,31 +2,24 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module mesh_adjust
 
-      use const_def
+      use const_def, only: dp, ln10, one_third, four_thirds_pi
       use star_private_def
       use chem_def
       use interp_1d_def, only: pm_work_size
@@ -47,9 +40,7 @@
 
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine do_mesh_adjust( &
             s, nz, nz_old, xh_old, xa_old, &
@@ -205,7 +196,7 @@
             tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, ierr)
          if (failed('do_lnR_and_lnd')) return
 
-         if (s% v_flag) then ! calculate new v to conserve kinetic energy
+         if (s% v_flag) then  ! calculate new v to conserve kinetic energy
             if (dbg) write(*,*) 'call do_v'
             call do_v( &
                s, nz, nz_old, cell_type, comes_from, &
@@ -214,7 +205,7 @@
             if (failed('do_v')) return
          end if
 
-         if (s% u_flag) then ! calculate new u to conserve kinetic energy
+         if (s% u_flag) then  ! calculate new u to conserve kinetic energy
             if (dbg) write(*,*) 'call do_u'
             call do_u( &
                s, nz, nz_old, cell_type, comes_from, &
@@ -223,7 +214,7 @@
             if (failed('do_u')) return
          end if
 
-         if (s% RSP2_flag) then ! calculate new etrb to conserve turbulent energy
+         if (s% RSP2_flag) then  ! calculate new etrb to conserve turbulent energy
             if (dbg) write(*,*) 'call do_etrb'
             call do_etrb( &
                s, nz, nz_old, cell_type, comes_from, &
@@ -272,8 +263,8 @@
 
             sumx = sum(xa_old(1:species,k))
             do j=1,species
-               xa_c0(k,j) = xa_old(j,k)/sumx ! make sure that adds to 1
-               xa_c2(k,j) = 0 ! no curvature terms
+               xa_c0(k,j) = xa_old(j,k)/sumx  ! make sure that adds to 1
+               xa_c2(k,j) = 0  ! no curvature terms
             end do
 
             ! only reduce magnitude of slopes
@@ -489,7 +480,7 @@
                old_total = dot_product(xa_old(j,1:nz_old),dq_old(1:nz_old))
                if (old_total < 1d-9) cycle
                new_total = dot_product(xa(j,1:nz),dq(1:nz))
-               if (abs(new_total - old_total) > 1d-4) then ! check for major problems
+               if (abs(new_total - old_total) > 1d-4) then  ! check for major problems
                   ierr = -1
                   jbad = j
                   okay = .false.
@@ -619,11 +610,11 @@
 
          if (s% D_omega_flag) then
             call prune1(s% D_omega, D_omega_old, skip)
-         endif
+         end if
 
          if (s% RTI_flag) then
             call prune1(s% dPdr_dRhodr_info, dPdr_dRhodr_info_old, skip)
-         endif
+         end if
 
          contains
 
@@ -694,7 +685,7 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
                xh(i_var,nz-k) = xh_old(i_var,nz_old-k)
             end do
@@ -753,7 +744,7 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
                xh(i_lum,nz-k) = xh_old(i_lum,nz_old-k)
             end do
@@ -808,7 +799,7 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
                xh(i_alpha_RTI,nz-k) = xh_old(i_alpha_RTI,nz_old-k)
             end do
@@ -864,7 +855,7 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
                val(nz-k) = val_old(nz_old-k)
             end do
@@ -932,7 +923,7 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do i=0,n
                val_new_out(nz-i) = val_old(nz_old-i)
             end do
@@ -1155,13 +1146,13 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
                new_r(nz-k) = old_r(nz_old-k)
                density_new(nz-k) = old_rho(nz_old-k)
                Vol_new(nz-k) = four_thirds_pi*new_r(nz-k)*new_r(nz-k)*new_r(nz-k)
             end do
-         else ! nzhi == nz
+         else  ! nzhi == nz
             density_new(nz) = xmstar*dq(nz)/(Vol_new(nz) - Vol_center)
             new_r(nz) = pow(Vol_new(nz)/four_thirds_pi, one_third)
 
@@ -1258,7 +1249,7 @@
          dbg_get_integral = .false.
          total(:) = 0
          do j=1,species
-            dbg_get_integral = (k == kdbg) .and. (j == 1) ! h1
+            dbg_get_integral = (k == kdbg) .and. (j == 1)  ! h1
             if (dbg_get_integral) write(*,2) trim(chem_isos% name(s% chem_id(j)))
             call get_xq_integral( &
                k_old, nz_old, xq_old, xq_outer, cell_dq, &
@@ -1377,7 +1368,7 @@
 
          if (cell_type(k) == revised_type) then
             avg_lnT = get_lnT_from_xh(s, k, xh_old)
-         else ! find average lnT between xq_outer and xq_inner
+         else  ! find average lnT between xq_outer and xq_inner
             call get_old_value_integral( &
                k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
                lnT_old, sum_lnT, dbg, ierr)
@@ -1423,7 +1414,7 @@
 
          if (cell_type(k) == revised_type) then
             avg_energy = energy_old(k_old)
-         else ! find average internal energy between q_outer and q_inner
+         else  ! find average internal energy between q_outer and q_inner
             call get_old_value_integral( &
                k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
                energy_old, sum_energy, dbg, ierr)
@@ -1443,7 +1434,7 @@
 
             if (cell_type(k) == revised_type) then
                avg_PE = specific_PE_old(k_old)
-            else ! find average potential energy between q_outer and q_inner
+            else  ! find average potential energy between q_outer and q_inner
                call get_old_value_integral( &
                   k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
                   specific_PE_old, sum_energy, dbg, ierr)
@@ -1457,7 +1448,7 @@
 
             if (cell_type(k) == revised_type) then
                avg_KE = specific_KE_old(k_old)
-            else ! find average kinetic energy between q_outer and q_inner
+            else  ! find average kinetic energy between q_outer and q_inner
                call get_old_value_integral( &
                   k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
                   specific_KE_old, sum_energy, dbg, ierr)
@@ -1602,7 +1593,7 @@
                sum_dqs = dq_range
                integral = val*dq_range
 
-            else ! only use the part of old cell that is in new range
+            else  ! only use the part of old cell that is in new range
 
                if (xq_inner <= old_xq_inner) then
 
@@ -1611,7 +1602,7 @@
                   integral = integral + val*(dq_range - sum_dqs)
                   sum_dqs = dq_range
 
-               else ! partial overlap -- general case
+               else  ! partial overlap -- general case
 
                   dq_overlap = max(0d0, old_xq_inner - xq_outer)
                   sum_dqs = sum_dqs + dq_overlap
@@ -1668,8 +1659,8 @@
 
          ierr = 0
 
-         logT_tol = tol ! 1d-11
-         logE_tol = tol ! 1d-11
+         logT_tol = tol  ! 1d-11
+         logE_tol = tol  ! 1d-11
          call solve_eos_given_DE( &
             s, k, xa(:), &
             logRho, log10(energy), lnT_guess/ln10, &
@@ -1727,8 +1718,8 @@
 
       subroutine get1_lpp(k, ldv, nz, j, dq, v, quad, c0, c1, c2)
          integer, intent(in) :: k, ldv, nz, j
-         real(dp), intent(in) :: dq(:) ! (nz)
-         real(dp), intent(in) :: v(:,:) ! (ldv,nz)
+         real(dp), intent(in) :: dq(:)  ! (nz)
+         real(dp), intent(in) :: v(:,:)  ! (ldv,nz)
          logical, intent(in) :: quad
          real(dp), dimension(:) :: c0, c1, c2
 
@@ -1759,10 +1750,10 @@
 
          if (.not. quad) then
             c0(k) = v(j,k)
-            c1(k) = (sm1 + s00)/2 ! use average to smooth abundance transitions
-            c2(k) = 0 ! Yan Wang fixed this -- it was left out initially.
+            c1(k) = (sm1 + s00)/2  ! use average to smooth abundance transitions
+            c2(k) = 0  ! Yan Wang fixed this -- it was left out initially.
          else
-            c1(k) = sprod*2/(s00 + sm1) ! harmonic mean slope
+            c1(k) = sprod*2/(s00 + sm1)  ! harmonic mean slope
             if (abs(sm1) <= abs(s00)) then
                c2(k) = (sm1 - c1(k))/(2*dq(k))
             else
@@ -1773,8 +1764,8 @@
 
          ! check values at edges for monotonicity
          dqhalf = dq(k)/2
-         vbdy1 = c0(k) + c1(k)*dqhalf + c2(k)/2*dqhalf*dqhalf ! value at face(k)
-         vbdy2 = c0(k) - c1(k)*dqhalf + c2(k)/2*dqhalf*dqhalf ! value at face(k+1)
+         vbdy1 = c0(k) + c1(k)*dqhalf + c2(k)/2*dqhalf*dqhalf  ! value at face(k)
+         vbdy2 = c0(k) - c1(k)*dqhalf + c2(k)/2*dqhalf*dqhalf  ! value at face(k+1)
          if ((v(j,k-1) - vbdy1)*(vbdy1 - v(j,k)) < 0 .or. &
              (v(j,k) - vbdy2)*(vbdy2 - v(j,k+1)) < 0) then
             if (dbg) then
@@ -1822,7 +1813,7 @@
          integer, intent(in) :: k_old_in, nz_old
          real(dp), intent(in) :: xq_old(:), xq_outer, dq
          integer, intent(in) :: order  ! 0, 1, 2
-         real(dp), intent(in), dimension(:) :: c0, c1, c2 ! coefficients
+         real(dp), intent(in), dimension(:) :: c0, c1, c2  ! coefficients
          real(dp), intent(out) :: integral
          logical, intent(in) :: dbg
          integer, intent(out) :: k_old_last, ierr
@@ -1875,7 +1866,7 @@
                xq_inner = xq_outer + dq
                xq_overlap_inner = xq_inner
                dq1 = dq
-            else if (old_xq_inner >= xq_inner) then ! this is the last one
+            else if (old_xq_inner >= xq_inner) then  ! this is the last one
                dq1 = dq - sum_dqs
             else
                dq1 = max(0d0, xq_overlap_inner-xq_overlap_outer)
@@ -1905,7 +1896,7 @@
                   v_overlap_outer = a + dq_outer*b
                   v_overlap_inner = a + dq_inner*b
                   avg_value = (v_overlap_outer + v_overlap_inner)/2
-               else ! use quadratic reconstruction
+               else  ! use quadratic reconstruction
                   if (dbg) write(*,*) 'use quadratic reconstruction'
                   avg_value = &
                      a + b*(dq_inner + dq_outer)/2 + &
@@ -1923,7 +1914,7 @@
                write(*,'(A)')
             end if
             k_old_last = k
-            if (old_xq_inner >= xq_inner) exit ! this is the last one
+            if (old_xq_inner >= xq_inner) exit  ! this is the last one
 
          end do
 
@@ -2008,7 +1999,7 @@
             k_outer = comes_from(k-1)
          end if
 
-         do kk = k_outer, nz_old ! loop until reach m_inner
+         do kk = k_outer, nz_old  ! loop until reach m_inner
 
             if (kk == nz_old) then
                xq1 = 1d0
@@ -2033,7 +2024,7 @@
                return
             end if
 
-            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then ! entire old kk is in new k
+            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
 
                dq = old_dqbar(kk)
                dq_sum = dq_sum + dq
@@ -2046,13 +2037,13 @@
 
                j_tot = j_tot + old_j_rot(kk)*dq
 
-            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then ! entire new k is in old kk
+            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then  ! entire new k is in old kk
 
                dq = new_dqbar(k)
                dq_sum = dq_sum + dq
                j_tot = j_tot + old_j_rot(kk)*dq
 
-            else ! only use the part of old kk that is in new k
+            else  ! only use the part of old kk that is in new k
 
                if (k == k_dbg) then
                   write(*,*) 'only use the part of old kk that is in new k', xq_inner <= xq1
@@ -2065,14 +2056,14 @@
                   write(*,1) 'new_point_dqbar - dq_sum', new_point_dqbar - dq_sum
                end if
 
-               if (xq_inner <= xq1) then ! this is the last part of new k
+               if (xq_inner <= xq1) then  ! this is the last part of new k
 
                   if (k == k_dbg) write(*,3) 'this is the last part of new k', k, kk
 
                   dq = new_point_dqbar - dq_sum
                   dq_sum = new_point_dqbar
 
-               else ! we avoid this case if possible because of numerical roundoff
+               else  ! we avoid this case if possible because of numerical roundoff
 
                   if (k == k_dbg) write(*,3) 'we avoid this case if possible', k, kk
 
@@ -2144,7 +2135,7 @@
          xmstar = s% xmstar
 
          old_ke_tot = 0d0
-         do k=1,nz_old ! skip common factor 1/2 xmstar in ke
+         do k=1,nz_old  ! skip common factor 1/2 xmstar in ke
             old_ke(k) = old_dqbar(k)*xh_old(i_v,k)*xh_old(i_v,k)
             old_ke_tot = old_ke_tot + old_ke(k)
          end do
@@ -2252,7 +2243,7 @@
             k_outer = comes_from(k-1)
          end if
 
-         do kk = k_outer, nz_old ! loop until reach xq_inner
+         do kk = k_outer, nz_old  ! loop until reach xq_inner
 
             if (kk == nz_old) then
                xq1 = 1d0
@@ -2282,7 +2273,7 @@
                return
             end if
 
-            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then ! entire old kk is in new k
+            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
 
                dq = old_dqbar(kk)
                dq_sum = dq_sum + dq
@@ -2299,7 +2290,7 @@
                   write(*,3) 'new k contains all of old kk', &
                      k, kk, old_ke(kk)*dq, ke_sum
 
-            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then ! entire new k is in old kk
+            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then  ! entire new k is in old kk
 
                dq = new_dqbar(k)
                dq_sum = dq_sum + dq
@@ -2309,7 +2300,7 @@
                   write(*,3) 'all new k is in old kk', &
                      k, kk, old_ke(kk)*dq, ke_sum
 
-            else ! only use the part of old kk that is in new k
+            else  ! only use the part of old kk that is in new k
 
                if (k == k_dbg) then
                   write(*,*) 'only use the part of old kk that is in new k', xq_inner <= xq1
@@ -2322,12 +2313,12 @@
                   write(*,1) 'new_point_dqbar - dq_sum', new_point_dqbar - dq_sum
                end if
 
-               if (xq_inner <= xq1) then ! this is the last part of new k
+               if (xq_inner <= xq1) then  ! this is the last part of new k
 
                   dq = new_point_dqbar - dq_sum
                   dq_sum = new_point_dqbar
 
-               else ! we avoid this case if possible because of numerical roundoff
+               else  ! we avoid this case if possible because of numerical roundoff
 
                   if (k == k_dbg) write(*,3) 'we avoid this case if possible', k, kk
 
@@ -2363,7 +2354,7 @@
 
          end do
 
-         xh(i_v,k) = sqrt(ke_sum/new_point_dqbar) ! we have skipped the 1/2 xmstar factor
+         xh(i_v,k) = sqrt(ke_sum/new_point_dqbar)  ! we have skipped the 1/2 xmstar factor
          if (xh_old(i_v,comes_from(k)) < 0d0) xh(i_v,k) = -xh(i_v,k)
 
          if (k == k_dbg) then
@@ -2401,7 +2392,7 @@
          xmstar = s% xmstar
 
          old_ke_tot = 0d0
-         do k=1,nz_old ! skip common factor 1/2 xmstar in ke
+         do k=1,nz_old  ! skip common factor 1/2 xmstar in ke
             old_ke(k) = old_dq(k)*xh_old(i_u,k)*xh_old(i_u,k)
             old_ke_tot = old_ke_tot + old_ke(k)
          end do
@@ -2501,7 +2492,7 @@
             k_outer = comes_from(k-1)
          end if
 
-         do kk = k_outer, nz_old ! loop until reach xq_inner
+         do kk = k_outer, nz_old  ! loop until reach xq_inner
 
             if (kk == nz_old) then
                xq1 = 1d0
@@ -2516,7 +2507,7 @@
             end if
 
             xq0 = xout_old(kk)
-            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then ! entire old kk is in new k
+            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
 
                dq = old_dq(kk)
                dq_sum = dq_sum + dq
@@ -2533,7 +2524,7 @@
                   write(*,3) 'new k contains all of old kk', &
                      k, kk, old_ke(kk)*dq, ke_sum
 
-            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then ! entire new k is in old kk
+            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then  ! entire new k is in old kk
 
                dq = new_dq(k)
                dq_sum = dq_sum + dq
@@ -2543,7 +2534,7 @@
                   write(*,3) 'all new k is in old kk', &
                      k, kk, old_ke(kk)*dq, ke_sum
 
-            else ! only use the part of old kk that is in new k
+            else  ! only use the part of old kk that is in new k
 
                if (k == k_dbg) then
                   write(*,*) 'only use the part of old kk that is in new k', xq_inner <= xq1
@@ -2556,12 +2547,12 @@
                   write(*,1) 'new_cell_dq - dq_sum', new_cell_dq - dq_sum
                end if
 
-               if (xq_inner <= xq1) then ! this is the last part of new k
+               if (xq_inner <= xq1) then  ! this is the last part of new k
 
                   dq = new_cell_dq - dq_sum
                   dq_sum = new_cell_dq
 
-               else ! we avoid this case if possible because of numerical roundoff
+               else  ! we avoid this case if possible because of numerical roundoff
 
                   if (k == k_dbg) write(*,3) 'we avoid this case if possible', k, kk
 
@@ -2597,7 +2588,7 @@
 
          end do
 
-         xh(i_u,k) = sqrt(ke_sum/new_cell_dq) ! we have skipped the 1/2 xmstar factor
+         xh(i_u,k) = sqrt(ke_sum/new_cell_dq)  ! we have skipped the 1/2 xmstar factor
          if (xh_old(i_u,comes_from(k)) < 0d0) xh(i_u,k) = -xh(i_u,k)
 
          if (k == k_dbg) then
@@ -2662,7 +2653,7 @@
          end if
 
          if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
+            n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
                xh(i_Hp,nz-k) = xh_old(i_Hp,nz_old-k)
             end do
@@ -2671,7 +2662,7 @@
       end subroutine do_Hp_face
 
 
-      subroutine do_etrb( & ! same logic as do_u
+      subroutine do_etrb( &  ! same logic as do_u
             s, nz, nz_old, cell_type, comes_from, &
             old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
             xout_old, xout_new, old_eturb, ierr)
@@ -2794,7 +2785,7 @@
             k_outer = comes_from(k-1)
          end if
 
-         do kk = k_outer, nz_old ! loop until reach xq_inner
+         do kk = k_outer, nz_old  ! loop until reach xq_inner
 
             if (kk == nz_old) then
                xq1 = 1d0
@@ -2809,7 +2800,7 @@
             end if
 
             xq0 = xout_old(kk)
-            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then ! entire old kk is in new k
+            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
 
                dq = old_dq(kk)
                dq_sum = dq_sum + dq
@@ -2826,7 +2817,7 @@
                   write(*,3) 'new k contains all of old kk', &
                      k, kk, old_eturb(kk)*dq, eturb_sum
 
-            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then ! entire new k is in old kk
+            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then  ! entire new k is in old kk
 
                dq = new_dq(k)
                dq_sum = dq_sum + dq
@@ -2836,7 +2827,7 @@
                   write(*,3) 'all new k is in old kk', &
                      k, kk, old_eturb(kk)*dq, eturb_sum
 
-            else ! only use the part of old kk that is in new k
+            else  ! only use the part of old kk that is in new k
 
                if (k == k_dbg) then
                   write(*,*) 'only use the part of old kk that is in new k', xq_inner <= xq1
@@ -2849,12 +2840,12 @@
                   write(*,1) 'new_cell_dq - dq_sum', new_cell_dq - dq_sum
                end if
 
-               if (xq_inner <= xq1) then ! this is the last part of new k
+               if (xq_inner <= xq1) then  ! this is the last part of new k
 
                   dq = new_cell_dq - dq_sum
                   dq_sum = new_cell_dq
 
-               else ! we avoid this case if possible because of numerical roundoff
+               else  ! we avoid this case if possible because of numerical roundoff
 
                   if (k == k_dbg) write(*,3) 'we avoid this case if possible', k, kk
 
@@ -2894,7 +2885,4 @@
 
       end subroutine adjust1_etrb
 
-
-
       end module mesh_adjust
-

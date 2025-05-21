@@ -7,17 +7,17 @@
       change_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
       dump_missing_metals_into_heaviest = .false.
-      
+
       ! Example ccsn network for properly capturing the energy generation rate during all stages
       !change_net_net = .true.
       !new_net_name = 'mesa_206.net'
       !dump_missing_metals_into_heaviest = .false.
-    
-       
+
+
       ! if using rotation
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
-      
+
       ! turn on hydrodynamics
       change_v_flag = .true.
       new_v_flag = .true.
@@ -46,24 +46,24 @@
 
 / ! end of star_job namelist
 
-&eos      
+&eos
       use_Skye = .true.
       use_PC = .false.
 / ! end of eos namelist
 
-&kap      
+&kap
       ! OPAL asplund 2009 opacities, Zbase set in inlist_mass_Z_wind_rotation
       kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
       use_Type2_opacities = .true.
-      
+
 / ! end of kap namelist
 
 &controls
 
 ! wind
-      ! Dutch scaling factor set in inlist_mass_Z_wind_rotation      
+      ! Dutch scaling factor set in inlist_mass_Z_wind_rotation
       cool_wind_full_on_T = 0.8d4
       hot_wind_full_on_T = 1.2d4
       cool_wind_RGB_scheme = 'Dutch'
@@ -75,9 +75,9 @@
 
 ! atmosphere
       Pextra_factor = 2 ! easy to lower with mass loss!ideally 1.5 is most physical
-      ! if you run into issues, you can increase Pextra 
+      ! if you run into issues, you can increase Pextra
       ! extra pressure helps stabilize the atmosphere during core He burning +
-     
+
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
@@ -118,10 +118,9 @@
 
       mlt_make_surface_no_mixing = .true.
 
-      
 
 ! superadiabatic convection routines, it's a choice:
-      
+
       ! superadiabatic reduction, implicit, new
       use_superad_reduction = .false.
       superad_reduction_Gamma_limit = 0.3d0 ! default is 0.5d0
@@ -142,14 +141,13 @@
       D_omega_mixing_across_convection_boundary = .false.
 
 
-
   ! we use step overshooting in H core
       overshoot_scheme(1) = 'step'
       overshoot_zone_type(1) = 'burn_H'
       overshoot_zone_loc(1) = 'core'
       overshoot_bdy_loc(1) = 'top'
       overshoot_f(1) = 0.345 ! for M>10
-      !overshoot_f(1) = 0.21 ! For M<10 
+      !overshoot_f(1) = 0.21 ! For M<10
       overshoot_f0(1) = 0.01
 
   ! exponential in the H core
@@ -160,7 +158,7 @@
       overshoot_f(2) = 0.01
       overshoot_f0(2) = 0.005
 
-     ! we don't want to deal with He/CO core mergers 
+     ! we don't want to deal with He/CO core mergers
      ! and there is reason to believe there is little
      ! inward overshooting in the shell across compositions boundaries
       overshoot_scheme(3) = 'none'
@@ -182,48 +180,48 @@
 ! timesteps
       time_delta_coeff = 1.0
       varcontrol_target   = 1d-3
-      
+
       min_timestep_factor = 0.8d0
       max_timestep_factor = 1.05d0
       timestep_factor_for_retries = 0.75
-      
+
       limit_for_rel_error_in_energy_conservation = 1d-7
-      hard_limit_for_rel_error_in_energy_conservation = 1d-6      
-      
+      hard_limit_for_rel_error_in_energy_conservation = 1d-6
+
       never_skip_hard_limits = .true.
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
       delta_lgTeff_limit =  0.01
-      delta_lgL_limit = 0.1     
+      delta_lgL_limit = 0.1
       delta_lgL_He_limit = 0.1
 
 
-      ! Recommend decreasing all three Rho, T, Tmax 
+      ! Recommend decreasing all three Rho, T, Tmax
       ! to 1d-3 or lower in production runs
       delta_lgRho_cntr_limit = 0.03
       delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1 
-      
+      delta_lgRho_limit = 0.1
+
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.002  
-      delta_lgT_cntr_hard_limit = 0.1 
+      delta_lgT_cntr_limit = 0.002
+      delta_lgT_cntr_hard_limit = 0.1
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.002     
+      delta_lgT_max_limit = 0.002
       delta_lgT_max_hard_limit = 0.1
 
       dX_div_X_limit(2) = -1 ! for he4
 
       ! On the changes in total abundance of each isotope
-      ! one of the most useful timestep controls, period 
+      ! one of the most useful timestep controls, period
       dX_nuc_drop_limit = 2d-2 ! Recommend decreasing to 1d-3 or lower in a production run
       dX_nuc_drop_limit_at_high_T = 2d-2  ! default = -1 = same as dX_nuc_drop_limit
       dX_nuc_drop_min_X_limit = 1d-3 ! try decreasing to 1d-4 or 1d-5 in a production run
       dX_nuc_drop_max_A_limit = 70   ! try increasing beyond 60 in a big network run
       dX_nuc_drop_hard_limit = 1d99
 
-     
+
     !  delta_XHe_cntr_limit = 0.01d0
     !  delta_XHe_cntr_hard_limit = 0.1d0
     !  delta_lg_XH_cntr_limit = -1
@@ -242,38 +240,37 @@
     !  delta_XSi_cntr_hard_limit = -1
 
 
-
       delta_lg_XH_cntr_limit = 0.01d0
       delta_lg_XH_cntr_max   = 0.0d0
       delta_lg_XH_cntr_min   = -2.0d0
       !delta_lg_XH_cntr_hard_limit = 0.02d0
-      
+
       delta_lg_XHe_cntr_limit = 0.01d0
       delta_lg_XHe_cntr_max   = 0.0d0
       delta_lg_XHe_cntr_min   = -2.0d0
       !delta_lg_XHe_cntr_hard_limit = -1!0.02d0
-      
+
 ! time step controls below are useful for resolution on fuel depletion
       !delta_lg_XC_cntr_limit = 0.01d0
       !delta_lg_XC_cntr_max   = 0.0d0
       !delta_lg_XC_cntr_min   = -2.0d0
       !delta_lg_XC_cntr_hard_limit = -1!0.2d0
-      
-      !delta_lg_XNe_cntr_limit = 0.01d0  
+
+      !delta_lg_XNe_cntr_limit = 0.01d0
       !delta_lg_XNe_cntr_max   = 0.0d0
       !delta_lg_XNe_cntr_min   = -2.0d0
       !delta_lg_XNe_cntr_hard_limit = 0.02 !0.1d0!0.02d0 can crash run
       !delta_XNe_cntr_limit = 0.01
 
-      !delta_lg_XO_cntr_limit = 0.01d0  
+      !delta_lg_XO_cntr_limit = 0.01d0
       !delta_lg_XO_cntr_max   = 0.0d0
       !delta_lg_XO_cntr_min   = -2.0d0
       !delta_lg_XO_cntr_hard_limit = -1 !0.1d0!0.02d0 can crash run
-      
+
       delta_XSi_cntr_limit = 0.01
       delta_XSi_cntr_hard_limit = -1!0.02
 
-      !delta_lg_XSi_cntr_limit = 0.01d0  
+      !delta_lg_XSi_cntr_limit = 0.01d0
       !delta_lg_XSi_cntr_max   = 0.0d0
       !delta_lg_XSi_cntr_min   = -2.0d0
       !delta_lg_XSi_cntr_hard_limit = -1 !0.1d0!0.02d0 can crash run
@@ -290,8 +287,8 @@
       !max_dq= 1d-3 ! or lower
       mesh_delta_coeff = 2.5 ! try 1.0 or below in production run
       mesh_delta_coeff_for_highT = 1.5 ! try 1.0 or below in production run
-      logT_max_for_standard_mesh_delta_coeff = 9.0 
-      logT_min_for_highT_mesh_delta_coeff = 9.5 
+      logT_max_for_standard_mesh_delta_coeff = 9.0
+      logT_min_for_highT_mesh_delta_coeff = 9.5
       !min_dq_for_xa = 1d-4 ! avoid over-resolving composition changes, bad for bit for bit convergence
       !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
@@ -303,7 +300,7 @@
 
       ! might help to turn off gold2 in 8-10 Msun degenerate cores
       ! for O-Ne flames.
-      use_gold2_tolerances = .true. 
+      use_gold2_tolerances = .true.
       gold2_tol_max_residual2 = 5d-7
       gold2_tol_max_residual3 = 5d-4
 
@@ -319,9 +316,9 @@
       max_abs_rel_run_E_err = 1d-2
 
       energy_eqn_option = 'dedt'
-      max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run     
+      max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run
 
-      convergence_ignore_equL_residuals = .true. 
+      convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
@@ -336,13 +333,13 @@
       sig_min_factor_for_high_Tcenter = 0.01
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-     
-      ! Can be helpful to decrease op_split_burn_min_T 
+
+      ! Can be helpful to decrease op_split_burn_min_T
       ! 4d9 has been well tested with the approx21 network
       ! lower to 2.5d9 or worst case 1d9 for large networks to help with
-      ! numerical stability and speed, see MESA VI (Jermyn 2023) 
+      ! numerical stability and speed, see MESA VI (Jermyn 2023)
       op_split_burn = .true.
-      op_split_burn_min_T = 4d9 
+      op_split_burn_min_T = 4d9
       burn_steps_limit = 150
       burn_steps_hard_limit = 250
       op_split_burn_eps = 1d-5
@@ -355,7 +352,7 @@
 
        photo_interval         = 200 !1000
        photo_digits           = 8
-       profile_interval       = 100 
+       profile_interval       = 100
        max_num_profile_models = 400000
        history_interval       = 1
        write_header_frequency = 10
@@ -365,13 +362,10 @@
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
 
-
-
-
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
       pulse_data_format = 'GYRE'
-      
+
       x_logical_ctrl(37) = .false. ! if true, then run GYRE
 
       x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
@@ -390,7 +384,7 @@
 /
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
 !pgstar_interval = 1
 

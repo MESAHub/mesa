@@ -3,7 +3,7 @@
 
 ! include 'set_star_astero_procs.inc'
 
-! also need to add 
+! also need to add
 ! use astero_def, only: star_astero_procs
 
    star_astero_procs% set_constraint_value => set_constraint_value
@@ -17,4 +17,3 @@
    star_astero_procs% data_for_extra_history_columns => data_for_extra_history_columns
    star_astero_procs% how_many_extra_profile_columns => how_many_extra_profile_columns
    star_astero_procs% data_for_extra_profile_columns => data_for_extra_profile_columns
-   

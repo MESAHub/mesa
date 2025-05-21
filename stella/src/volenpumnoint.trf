@@ -12,11 +12,11 @@
 --  write(*,'(a,1p,3g15.5)')'  (AM(Kmarg)-AMini)*UM, AMHT,tburst=',(AM(Kmarg)-AMini)*UM, AMHT,tburst;
 --  pause;
    IF(NREG(Kmarg)==3)THEN;
-       --   radioactive pumping 56Ni - 56Fe     
+       --   radioactive pumping 56Ni - 56Fe
       If(KNadap>0)then;
         <*Uniform:  standard uniform heating in Amni   *>;
       else;
-        <*foreign:  56Ni profile from foreign model *>; 
+        <*foreign:  56Ni profile from foreign model *>;
       endif;
       <*Anmodel*  heating for separation of var. in an.mod. *>;
       IF((AM(Kmarg)-AMini)*UM<=AMHT & t*Utime>tbeght & t*Utime<=tburst+tbeght)THEN;
@@ -24,14 +24,14 @@
             -- for Eburst in 1e50 erg & Ueng=1e12 erg/g/s
 --  write(*,'(a,i5,1p,2g15.5)')' if1 kmarg volenpumnoint  t*Utime Eng=',KMarg,t*Utime,Eng;
 --  pause;
-      ELSEIF(Kmarg>1)then; 
+      ELSEIF(Kmarg>1)then;
         if ( (AM(Kmarg)-AMini)*UM>AMHT & (AM(Kmarg-1)-AMini)*UM<AMHT
             & t*Utime<=tburst )THEN;
           Eng=Eng+Eburst*1.D+38/(AMHT*CMS*tburst)*
               (AMHT-(AM(Kmarg-1)-AMini)*UM)/(Dm(Kmarg)*UM);
 --  write(*,'(a,i5,1p,2g15.5)')' if2 kmarg volenpumnoint  t*Utime Eng=',KMarg,t*Utime,Eng;
 --  pause;
-        endif; 
+        endif;
       ENDIF;
    ENDIF;
    ENGT=0.D0;
@@ -60,7 +60,7 @@
     ENGgam=(epsNi*EXP(-tday/tNi)
                 +epsCo*(EXP(-tday/tCo)-EXP(-tday/tNi)));
     GammaJ=FJgam(Kmarg,2);
-/*    if( tnewg > toldg & (GammaJ>exp(gamfloor) 
+/*    if( tnewg > toldg & (GammaJ>exp(gamfloor)
             & FJgam(Kmarg,1)>exp(gamfloor)) ) then;
        GammaJ=exp(log(GammaJ)+(log(FJgam(Kmarg,2))-log(FJgam(Kmarg,1)))*
                (log(t)-log(tnewg))/(log(tnewg)-log(toldg)));
@@ -68,7 +68,7 @@
        GammaJ=GammaJ+(FJgam(Kmarg,2)-FJgam(Kmarg,1))*
                                        (t-tnewg)/(tnewg-toldg);
     endif;
- */  
+ */
     ENG=ENGgam*GammaJ;
     Engpst=epspst*XNifor(Kmarg)*(EXP(-tday/tCo)-EXP(-tday/tNi));
     ENG=ENG+Engpst;

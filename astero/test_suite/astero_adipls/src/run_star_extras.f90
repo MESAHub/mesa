@@ -1,22 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011  Bill Paxton
+!   Copyright (C) 2011  Bill Paxton & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -58,7 +55,7 @@
       end subroutine extras_controls
 
 
-      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
+      subroutine set_constraint_value(id, name, val, ierr)  ! called from star_astero code
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
          real(dp), intent(out) :: val
@@ -86,10 +83,10 @@
       end subroutine set_constraint_value
 
 
-      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+      subroutine set_param(id, name, val, ierr)  ! called from star_astero code
          !use astero_search_data, only: vary_param1
          integer, intent(in) :: id
-         character(len=strlen), intent(in) :: name ! which of param's will be set
+         character(len=strlen), intent(in) :: name  ! which of param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -223,9 +220,9 @@
          integer, intent(in) :: l_to_match, order_to_match, order_to_save
          logical, intent(in) :: store_for_adipls, save_mode_info
          character (len=*), intent(in) :: save_mode_filename
-         real(dp), intent(in) :: expected_freq ! ignore if < 0
+         real(dp), intent(in) :: expected_freq  ! ignore if < 0
          real(dp), intent(out) :: freq
-         logical, intent(out) :: okay ! true if expected_freq is okay
+         logical, intent(out) :: okay  ! true if expected_freq is okay
          integer, intent(out) :: ierr
 
          integer :: l, iscan, i, num
@@ -346,7 +343,4 @@
 
       end function extras_finish_step
 
-
-
       end module run_star_extras
-

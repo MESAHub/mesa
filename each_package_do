@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function check_okay {
 	if [ $? -ne 0 ]
@@ -9,7 +9,7 @@ function check_okay {
 
 function do_one {
     # do something here
-    echo $1
+    echo "$1"
 }
 
 

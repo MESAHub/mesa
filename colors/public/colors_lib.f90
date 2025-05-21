@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
    module colors_lib
       use math_lib
       use colors_def
-      use const_def
+      use const_def, only : dp, strlen, mbolsun, loggsun, Teffsun
       ! library for calculating theoretical estimates of magnitudes and colors
       ! from Teff, L, M, and [M/H].
 
@@ -44,7 +37,7 @@
 
       ! Routines get_bc will return the coefficients from interpolating over log Teff, log g, [M/H]
       ! even though the tables are defined as Teff, log g, [M/H]. get_abs_mag routines return
-      ! data thats been turned into an absolute magnitude. A color can be computed by taking the difference between
+      ! data that's been turned into an absolute magnitude. A color can be computed by taking the difference between
       ! two get_bc or two get_abs_mag calls.
 
       ! Names for the filters should be unique across all data files (left to the user to enforce this).
@@ -56,7 +49,7 @@
       implicit none
 
 
-      contains ! the procedure interface for the library
+      contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
 
@@ -72,14 +65,14 @@
 !$OMP critical (color_init)
          if (.not. color_is_initialized) then
             call do_colors_init(num_files,fnames,num_colors,ierr)
-         endif
+         end if
 !$OMP end critical (color_init)
 
          if(ierr/=0)THEN
             ierr=-1
             write(*,*) "colors_init failed"
             return
-         endif
+         end if
 
       end subroutine colors_init
 
@@ -100,8 +93,8 @@
       subroutine get_bcs_one(log_Teff, log_g, M_div_h, results, thead,n_colors, ierr)
          use mod_colors, only : Eval_Colors
          ! input
-         real(dp), intent(in) :: log_Teff ! log10 of surface temp
-         real(dp), intent(in) :: M_div_H ! [M/H]
+         real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in) :: M_div_H  ! [M/H]
          ! output
          real(dp), dimension(:), intent(out) :: results
          real(dp), intent(in) :: log_g
@@ -115,7 +108,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          call Eval_Colors(log_Teff, log_g, M_div_h, results,thead,n_colors, ierr)
 
@@ -124,9 +117,9 @@
       real(dp) function get_bc_by_name(name,log_Teff,log_g, M_div_h, ierr)
          ! input
          character(len=*),intent(in) :: name
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
          real(dp), dimension(max_num_bcs_per_file) :: results
          type (lgt_list), pointer :: thead => null()
          integer, intent(inout) :: ierr
@@ -138,7 +131,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          do i=1,num_thead
             thead=>thead_all(i)%thead
@@ -168,9 +161,9 @@
       real(dp) function get_bc_by_id(id,log_Teff,log_g, M_div_h, ierr)
          ! input
          integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
          integer, intent(inout) :: ierr
          character(len=strlen) :: name
 
@@ -180,7 +173,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          name=get_bc_name_by_id(id,ierr)
          if(ierr/=0) return
@@ -201,7 +194,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          k=0
          do i=1,num_thead
@@ -230,7 +223,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          k=1
          do i=1,num_thead
@@ -246,8 +239,8 @@
       end function get_bc_name_by_id
 
       real(dp) function get_abs_bolometric_mag(lum)
-         use const_def
-         real(dp), intent(in) :: lum ! Luminsoity in lsun units
+         use const_def, only: dp
+         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
 
          get_abs_bolometric_mag = mbolsun - 2.5d0*log10(lum)
 
@@ -256,10 +249,10 @@
       real(dp) function get_abs_mag_by_name(name,log_Teff,log_g, M_div_h,lum, ierr)
          ! input
          character(len=*) :: name
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in) :: lum ! Luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
          integer, intent(inout) :: ierr
 
          ierr=0
@@ -268,7 +261,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          get_abs_mag_by_name=get_abs_bolometric_mag(lum)-&
                               get_bc_by_name(name,log_Teff,log_g, M_div_h,ierr)
@@ -278,10 +271,10 @@
       real(dp) function get_abs_mag_by_id(id,log_Teff,log_g, M_div_h,lum, ierr)
          ! input
          integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in) :: lum ! Luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
          integer, intent(inout) :: ierr
          character(len=strlen) :: name
 
@@ -291,7 +284,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          name=get_bc_name_by_id(id,ierr)
          if(ierr/=0) return
@@ -310,7 +303,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          cnt=1
          do i=1,num_thead
@@ -324,8 +317,8 @@
 
       subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
          ! input
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
          ! output
          real(dp),dimension(:), intent(out) :: results
          real(dp), intent(in) :: log_g
@@ -339,7 +332,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          do i=1,num_thead
             thead=>thead_all(i)%thead
@@ -355,10 +348,10 @@
       real(dp) function get_lum_band_by_name(name,log_Teff,log_g, M_div_h, lum, ierr)
          ! input
          character(len=*) :: name
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in) :: lum ! Total luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
          real(dp) :: solar_abs_mag, star_abs_mag
          integer, intent(inout) :: ierr
 
@@ -368,7 +361,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          ! Filter dependent terms
          solar_abs_mag=get_abs_mag_by_name(name, safe_log10(Teffsun), loggsun, 0.d0, 1.d0, ierr)
@@ -385,10 +378,10 @@
       real(dp) function get_lum_band_by_id(id,log_Teff,log_g, M_div_h, lum, ierr)
          ! input
          integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in) :: lum ! Total luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
          real(dp) :: solar_abs_mag, star_abs_mag
          integer, intent(inout) :: ierr
 
@@ -398,7 +391,7 @@
          if (.not. color_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          ! Filter dependent terms
          solar_abs_mag=get_abs_mag_by_id(id, safe_log10(Teffsun), loggsun, 0.d0, 1.d0, ierr)

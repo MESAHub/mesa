@@ -4,11 +4,11 @@
 gyre_in_mesa_ms
 ***************
 
-This test case checks the implementation of GYRE in MESA for a 1 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion.
+This test case checks the implementation of GYRE in MESA for a 1 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion.
 
 This test case has 2 parts.
 
-* Part 1 (``inlist_zams``) builds a 1 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
+* Part 1 (``inlist_zams``) builds a 1 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
 
 * Part 2 (``inlist_gyre_in_mesa_ms``) continues the evolution until the central hydrogen mass fraction drops below 1e-3. During the evolution the ``run_star_extras.f90`` calls GYRE, processes the GYRE output, and searches for a p-mode frequency of 2e-4 Hz (200 microHz). Close matches to this target frequency are reported in the terminal:
 
@@ -28,5 +28,3 @@ This test case has 2 parts.
 
 
 Last-Updated: 11Jun2021 (MESA 5be9e57) by fxt.
-
-

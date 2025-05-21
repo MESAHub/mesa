@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [ -d defaults_$1 ]
 then
    echo defaults_$1 "already exists, so abort cpv"

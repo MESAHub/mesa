@@ -1,5 +1,3 @@
-
-
 &star_job
       show_log_description_at_start = .false.
 
@@ -30,7 +28,7 @@ op_split_burn_min_T = 1d9
       !min_q_for_drag = 0.8d0
 
       set_min_D_mix = .true.
-      min_D_mix = 1d-2 
+      min_D_mix = 1d-2
 
       fe_core_infall_limit = 1d7
 
@@ -99,7 +97,7 @@ ignore_too_large_correction = .true. ! for conv_vel's
       photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10 
+      terminal_interval = 10
 
       x_integer_ctrl(5) =  6 ! Inlist part number
 
@@ -110,11 +108,11 @@ ignore_too_large_correction = .true. ! for conv_vel's
 &pgstar
 !Grid1_file_flag = .true.
 
-!pause = .true.
+!pause_flag = .true.
 
 Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax =  5 ! 
+Profile_Panels3_xmax =  5 !
 Profile_Panels3_xaxis_reversed = .false.
 
 

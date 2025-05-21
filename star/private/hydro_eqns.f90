@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2012-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module hydro_eqns
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, ln10, two_thirds
       use star_utils, only: em1, e00, ep1
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -37,9 +31,7 @@
       private
       public :: eval_equ
 
-
       contains
-
 
       subroutine eval_equ(s, nvar, ierr)
          type (star_info), pointer :: s
@@ -181,7 +173,7 @@
                   ierr = op_err
                end if
             end if
-            if (k > 1) then ! k=1 is surf P BC
+            if (k > 1) then  ! k=1 is surf P BC
                if (do_du_dt) then
                   call do1_Riemann_momentum_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
@@ -263,7 +255,7 @@
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_L_eqn'
                      ierr = op_err
                   end if
-               else if (k > 1) then ! k==1 is done by T_surf BC
+               else if (k > 1) then  ! k==1 is done by T_surf BC
                   call do1_dlnT_dm_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_dlnT_dm_eqn', k
@@ -297,7 +289,7 @@
             return
          end if
 
-         if (.false. .and. s% model_number == 2) then !  .and. .not. s% doing_relax) then
+         if (.false. .and. s% model_number == 2) then  !  .and. .not. s% doing_relax) then
             if (.false.) then
                i = s% i_dv_dt
                k = 1
@@ -309,7 +301,7 @@
             end if
             !write(*,*) 'call show_matrix'
             !call show_matrix(s, s% dblk(1:s% nvar_hydro,1:s% nvar_hydro,1), s% nvar_hydro)
-            call dump_equ ! debugging
+            call dump_equ  ! debugging
             call mesa_error(__FILE__,__LINE__,'after dump_equ')
          end if
 
@@ -482,7 +474,7 @@
 
                      ! fix up derivatives
 
-                     if (debug .and. k == s% solver_test_partials_k) & ! .and. s% solver_iter == s% solver_test_partials_iter_number) &
+                     if (debug .and. k == s% solver_test_partials_k) &  ! .and. s% solver_iter == s% solver_test_partials_iter_number) &
                         write(*,2) 'res(i_lnE) - lnE_with_xa_start', j, res(i_lnE) - lnE_with_xa_start
 
                      s% dlnE_dxa_for_partials(j,k) = dres_dxa(i_lnE, j) + &
@@ -491,7 +483,8 @@
 
                      s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% Peos(k) + &
                         frac_without_dxa * (s% Pgas(k)/s% Peos(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
-                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
+                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. &
+                         j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
                         write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                         write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
                         write(*,2) 's% Peos(k)', k, s% Peos(k)
@@ -513,11 +506,13 @@
                         if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                            if (dxa < dxa_threshold) then
                               if (j == i_var - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                    trim (s% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
-                              endif
+                              end if
                               if (j == i_var_sink - s% nvar_hydro) then
-                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
+                                 write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                    trim (s% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
                            end if
@@ -601,10 +596,9 @@
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
-         real(dp) :: wwc
-         real(dp) :: jr_lim1, jr_lim2, A, C
+         real(dp) :: wwc, wwc4, wwc6, wwc_log_term, dimless_rphi, dimless_rphi_given_wwc, w1, w2, jr_lim1, jr_lim2
          type(auto_diff_real_star_order1) :: &
-            w_d_wc00, r00, jrot00, resid_ad, A_ad, C_ad, &
+            w_d_wc00, w4_d_wc00, w6_d_wc00, r00, w_log_term_d_wc00, jrot00, resid_ad, A_ad, C_ad, &
             jrot_ratio, sigmoid_jrot_ratio
          logical :: test_partials
          include 'formats'
@@ -618,34 +612,42 @@
          i_w_div_wc = s% i_w_div_wc
 
          wwc = s% w_div_wcrit_max
-         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
-         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
-         jr_lim1 = two_thirds*wwc*C/A
+         wwc4 = pow4(wwc)
+         wwc6 = pow6(wwc)
+         wwc_log_term = log(1d0 - pow(wwc, log_term_power))
+         jr_lim1 = two_thirds * wwc * C(pow2(wwc), wwc4, wwc6, wwc_log_term) / A(wwc4, wwc6, wwc_log_term)
 
          wwc = s% w_div_wcrit_max2
-         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
-         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
-         jr_lim2 = two_thirds*wwc*C/A
+         wwc4 = pow4(wwc)
+         wwc6 = pow6(wwc)
+         wwc_log_term = log(1d0 - pow(wwc, log_term_power))
+         jr_lim2 = two_thirds * wwc * C(pow2(wwc), wwc4, wwc6, wwc_log_term) / A(wwc4, wwc6, wwc_log_term)
 
          w_d_wc00 = wrap_w_div_wc_00(s, k)
-         A_ad = 1d0-0.1076d0*pow4(w_d_wc00)-0.2336d0*pow6(w_d_wc00)-0.5583d0*log(1d0-pow4(w_d_wc00))
-         C_ad = 1d0+17d0/60d0*pow2(w_d_wc00)-0.3436d0*pow4(w_d_wc00)-0.4055d0*pow6(w_d_wc00)-0.9277d0*log(1d0-pow4(w_d_wc00))
+         w4_d_wc00 = pow4(w_d_wc00)
+         w6_d_wc00 = pow6(w_d_wc00)
+         w_log_term_d_wc00 = log(1d0 - pow(w_d_wc00, log_term_power))
+         A_ad = 1d0 + 0.3293d0 * w4_d_wc00 - 0.4926d0 * w6_d_wc00 - 0.5560d0 * w_log_term_d_wc00
+         C_ad = 1d0 + 17d0 / 60d0 * pow2(w_d_wc00) + 0.4010d0 * w4_d_wc00 - 0.8606d0 * w6_d_wc00 &
+                                                                           - 0.9305d0 * w_log_term_d_wc00
 
          r00 = wrap_r_00(s, k)
          if (s% j_rot_flag) then
             jrot00 = wrap_jrot_00(s, k)
-            jrot_ratio = jrot00/sqrt(s% cgrav(k)*s% m(k)*r00)
+            jrot_ratio = jrot00 / sqrt(s% cgrav(k) * s% m(k) * r00)
          else
-            jrot_ratio = s% j_rot(k)/sqrt(s% cgrav(k)*s% m(k)*r00)
+            jrot_ratio = s% j_rot(k) / sqrt(s% cgrav(k) * s% m(k) * r00)
          end if
          if (abs(jrot_ratio% val) > jr_lim1) then
-            sigmoid_jrot_ratio = 2*(jr_lim2-jr_lim1)/(1+exp(-2*(abs(jrot_ratio)-jr_lim1)/(jr_lim2-jr_lim1)))-jr_lim2+2*jr_lim1
+            sigmoid_jrot_ratio = 2d0 * (jr_lim2-jr_lim1) &
+                                   / (1d0 + exp(-2d0 * (abs(jrot_ratio) - jr_lim1) / (jr_lim2 - jr_lim1))) &
+                                 - jr_lim2 + 2 * jr_lim1
             if (jrot_ratio% val < 0d0) then
                sigmoid_jrot_ratio = -sigmoid_jrot_ratio
             end if
-            resid_ad = (sigmoid_jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
+            resid_ad = (sigmoid_jrot_ratio - two_thirds * w_d_wc00 * C_ad / A_ad)
          else
-            resid_ad = (jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
+            resid_ad = (jrot_ratio - two_thirds * w_d_wc00 * C_ad / A_ad)
          end if
 
          s% equ(i_equ_w_div_wc, k) = resid_ad% val
@@ -740,7 +742,7 @@
          ierr = 0
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
-         else ! use this even if not v_flag
+         else  ! use this even if not v_flag
             i_P_eqn = s% i_dv_dt
          end if
 
@@ -812,7 +814,7 @@
 
          contains
 
-         subroutine get_PT_bc_ad(ierr) ! set P_bc_ad and T_bc_ad
+         subroutine get_PT_bc_ad(ierr)  ! set P_bc_ad and T_bc_ad
             use hydro_vars, only: set_Teff_info_for_eqns
             use chem_def
             use atm_def
@@ -885,7 +887,7 @@
             end if
 
             dP0_dlnR = 0
-            if (offset_P_to_cell_center) then ! include partials of dP0
+            if (offset_P_to_cell_center) then  ! include partials of dP0
                dP0_dlnR = -4*dP0
             end if
 
@@ -893,7 +895,7 @@
             dT0_dlnT = 0
             dT0_dlnd = 0
             dT0_dL = 0
-            if (offset_T_to_cell_center) then ! include partials of dT0
+            if (offset_T_to_cell_center) then  ! include partials of dT0
                d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
                d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
                d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
@@ -909,7 +911,7 @@
                     dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
                dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
-            endif
+            end if
 
             dlnP_bc_dP0 = 1/P_bc
             dlnT_bc_dT0 = 1/T_bc
@@ -1007,7 +1009,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
-            if (s% RSP2_flag) then ! interpolate lnT by mass
+            if (s% RSP2_flag) then  ! interpolate lnT by mass
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
                dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
@@ -1087,8 +1089,8 @@
             ierr = 0
             rho1 = wrap_d_00(s,1)
             rho2 = wrap_d_p1(s,1)
-            dlnd1 = wrap_dxh_lnd(s,1) ! lnd(1) - lnd_start(1)
-            dlnd2 = shift_p1(wrap_dxh_lnd(s,2)) ! lnd(2) - lnd_start(2)
+            dlnd1 = wrap_dxh_lnd(s,1)  ! lnd(1) - lnd_start(1)
+            dlnd2 = shift_p1(wrap_dxh_lnd(s,2))  ! lnd(2) - lnd_start(2)
             resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt
             s% equ(i_P_eqn, 1) = resid_ad%val
             call save_eqn_residual_info( &
@@ -1157,6 +1159,4 @@
          end do
       end subroutine equ_data_for_extra_profile_columns
 
-
       end module hydro_eqns
-

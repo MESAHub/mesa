@@ -1,9 +1,9 @@
 
 # Defining the exact version will make sure things don't break
-sphinx==7.4.7
-sphinx_rtd_theme==2.0.0
+sphinx==8.2.3
+sphinx_book_theme==1.1.4
 readthedocs-sphinx-search==0.3.2
 sphinx_copybutton==0.5.2
-sphinx_design==0.6.0
+sphinx_design==0.6.1
 sphinx-tags==0.4
 sphinxemoji==0.3.1

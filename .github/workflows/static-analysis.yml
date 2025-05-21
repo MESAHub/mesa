@@ -1,0 +1,43 @@
+---
+name: Static Analysis
+
+on:
+  workflow_dispatch:
+  release:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Apply Fortran linter, fortitude
+        run: |
+          cd ${{ github.workspace }}
+          fortitude check
+
+      - name: Apply Python linter, ruff
+        run: |
+          cd ${{ github.workspace }}
+          ruff format --check
+          ruff check
+
+      - name: Apply RST linter, sphinx-lint
+        run: |
+          cd ${{ github.workspace }}
+          sphinx-lint --ignore=gyre/gyre

@@ -4,16 +4,16 @@
 rsp_Cepheid
 ***********
 
-This test case checks the non-linear pulsation evolution of a 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model - a classical Cepheid variable similar to CEP-227 shown in |Pilecki2013|.
+This test case checks the non-linear pulsation evolution of a 4.165 |Msun|, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model - a classical Cepheid variable similar to CEP-227 shown in |Pilecki2013|.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_rsp_Cepheid``) creates the initial 4.165 Msun, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 3.92305 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
+* Part 1 (``inlist_rsp_Cepheid``) creates the initial 4.165 |Msun|, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 3.92305 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
 
 .. code-block:: console
 
   rel_run_E_err   3.8990079261471820E-010
-  good match for period   3.9239601593741478        3.9230499999999999  
+  good match for period   3.9239601593741478        3.9230499999999999
 
 .. image:: ../../../star/test_suite/rsp_Cepheid/docs/grid_0007266.svg
    :width: 100%
@@ -27,10 +27,8 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default``, used for
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 100
 

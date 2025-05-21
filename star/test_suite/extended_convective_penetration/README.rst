@@ -8,9 +8,9 @@ This test case checks the implementation of the extended convective penetration 
 
 This test case has 2 parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_zams``) builds a 5.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
+* Part 1 (``inlist_zams``) builds a 5.0 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
 
-* Part 2 (``inlist_extended_convective_penetration``) continues the evolution until the hydrogen mass fraction drops below 0.4 Msun. The mixing types and temperature gradients are then checked at 4 points in the model:
+* Part 2 (``inlist_extended_convective_penetration``) continues the evolution until the hydrogen mass fraction drops below 0.4 |Msun|. The mixing types and temperature gradients are then checked at 4 points in the model:
 
 
 .. code-block:: console
@@ -54,20 +54,20 @@ where the number in the second column is the value from running the test case,
 the number in the second column is the allowed lower bound, and
 the number in the second column is the allowed upper bound.
 
-At 0.8 Msun, we expect to be inside the convective core, and hence to have convective mixing with an adiabatic temperature gradient
-(:math:`\nabla_T = \nabla_{ad}`). 
+At 0.8 |Msun|, we expect to be inside the convective core, and hence to have convective mixing with an adiabatic temperature gradient
+(:math:`\nabla_T = \nabla_{ad}`).
 
-At 0.95 Msun, we should be in the convective penetrative part of the core boundary mixing region. 
-So we expect the mixing type to be overshoot, and the temperature gradient to be adiabatic. Here, we also check if the mixing coefficient 
-equals the one at the convective boundary, to check if the coefficient behaves step-like in this region. 
+At 0.95 |Msun|, we should be in the convective penetrative part of the core boundary mixing region.
+So we expect the mixing type to be overshoot, and the temperature gradient to be adiabatic. Here, we also check if the mixing coefficient
+equals the one at the convective boundary, to check if the coefficient behaves step-like in this region.
 
-At 1.1 Msun, we expect to be in the exponentially decaying overshoot region, where the temperature gradient is making a gradual switch between 
+At 1.1 |Msun|, we expect to be in the exponentially decaying overshoot region, where the temperature gradient is making a gradual switch between
 the radiative and adiabatic gradients, :math:`\nabla_T = f\nabla_{ad} + (1-f)\nabla_{rad}`, with :math:`f` the fraction of the
 temperature gradient that is adiabatic. Here, we also check that the fraction :math:`f` deviates from 1 and 0, so that :math:`\nabla_T`
-is actually making a gradual switch, and that the mixing coefficient is between 1e4 cm :sup:`2`/s and 1% 
+is actually making a gradual switch, and that the mixing coefficient is between 1e4 cm :sup:`2`/s and 1%
 of the mixing at the core boundary, to confirm that it is decaying.
 
-At 1.5 Msun, we should be outside the convective core and overshoot region, so that the mixing type is minimum diffusive mixing and that 
+At 1.5 |Msun|, we should be outside the convective core and overshoot region, so that the mixing type is minimum diffusive mixing and that
 we have a radiative temperature gradient (:math:`\nabla_T = \nabla_{rad}`).
 
 
@@ -85,10 +85,8 @@ pgstar commands used for the plot:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -110,22 +108,22 @@ pgstar commands used for the plot:
     Summary_Profile_win_width = 12
     Summary_Profile_win_aspect_ratio = 0.75
     Summary_Profile_title = 'inlist_extended_convective_penetration'
-    
+
     Summary_Profile_num_lines = 3
     Summary_Profile_xmin = 0.5
     Summary_Profile_xmax = 1.5
 
     Summary_Profile_name(1) = 'grada'
-    Summary_Profile_legend(1) = 'grada'  
+    Summary_Profile_legend(1) = 'grada'
     Summary_Profile_scaled_value(1)=.false.
 
     Summary_Profile_name(2) = 'gradr'
-    Summary_Profile_legend(2) = 'gradr'  
-    Summary_Profile_scaled_value(2)=.false.  
+    Summary_Profile_legend(2) = 'gradr'
+    Summary_Profile_scaled_value(2)=.false.
 
     Summary_Profile_name(3) = 'gradT'
-    Summary_Profile_legend(3) = 'gradT'  
-    Summary_Profile_scaled_value(3)=.false.  
+    Summary_Profile_legend(3) = 'gradT'
+    Summary_Profile_scaled_value(3)=.false.
 
     Summary_Profile_file_flag = .true.
     Summary_Profile_file_dir = 'png'
@@ -136,4 +134,3 @@ pgstar commands used for the plot:
  / ! end of pgstar namelist
 
 Last-Updated: 07Jun2021 (MESA 5be9e57) by fxt based on notes by Mathias Michielsen in Jan2020.
-

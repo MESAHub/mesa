@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2015  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
    module other_extras
       use star_def
       use star_lib
-      use const_def
+      use const_def, only: dp
       use utils_lib
 
       implicit none
@@ -47,7 +41,7 @@
          integer, intent(out) :: ierr
          logical, intent(in) :: restart
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 
@@ -62,7 +56,7 @@
          integer, intent(in) :: id
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_extras_check_model = keep_going
@@ -79,7 +73,7 @@
          integer, intent(in) :: id
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_extras_start_step = keep_going
@@ -96,7 +90,7 @@
          integer, intent(in) :: id
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_extras_finish_step = keep_going
@@ -111,7 +105,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 
@@ -125,7 +119,7 @@
          type (star_info), pointer :: s
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_how_many_extra_history_columns=0
@@ -143,7 +137,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 
@@ -157,7 +151,7 @@
          type (star_info), pointer :: s
          integer :: ierr
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
          null_how_many_extra_profile_columns=0
@@ -175,7 +169,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! failure in  ptr
+         if (ierr /= 0) then  ! failure in  ptr
             return
          end if
 

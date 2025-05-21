@@ -2,29 +2,23 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module rates_support
-      use const_def, only: dp, use_mesa_temp_cache
+      use const_def, only: dp, use_mesa_temp_cache, missing_value, ln10
       use math_lib
       use rates_def
       use utils_lib, only: mv, switch_str, mesa_error
@@ -40,7 +34,6 @@
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
             ye, logtemp_in, btemp, bden, raw_rate_factor, logttab, &
             rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
-         use const_def, only : missing_value
          integer, intent(in) :: num_reactions, reaction_id(:), nT8s
          real(dp), intent(in) ::  &
             ye, logtemp_in, btemp, bden, raw_rate_factor(:),  &
@@ -94,13 +87,13 @@
 
          end do
 
-         if(warn_rates_for_high_temp .and. logtemp_in .ge. max_safe_logT_for_rates) then
+         if(warn_rates_for_high_temp .and. logtemp_in >= max_safe_logT_for_rates) then
             write(*,'(A,F0.6,A,F0.6,A)') "WARNING: evaluating rates with lgT=",logtemp_in," which is above lgT=",&
                                     max_safe_logT_for_rates,", rates have been truncated"
          end if
 
 
-         if(logtemp_in .ge. max_safe_logT_for_rates) then
+         if(logtemp_in >= max_safe_logT_for_rates) then
             logtemp = max_safe_logT_for_rates
          else
             logtemp = logtemp_in
@@ -115,7 +108,7 @@
             iat0 = int((logtemp - rattab_tlo)/rattab_tstp) + 1
             iat = max(1, min(iat0 - mp/2 + 1, imax - mp + 1))
             call get_rates_from_table(1, num_reactions)
-         else ! table only has a single temperature
+         else  ! table only has a single temperature
             do i=1,num_reactions
                rate_raw(i) = rattab(i,1)*dtab(i)
                rate_raw_dT(i) = 0
@@ -124,7 +117,7 @@
          end if
 
          do i=1,num_reactions
-            if(raw_rate_factor(i).gt. max_safe_rate_for_any_temp) then
+            if(raw_rate_factor(i)> max_safe_rate_for_any_temp) then
                write(*,*) "Rate has exceeded any sensible limit for a reaction rate"
                write(*,*) trim(reaction_Name(reaction_id(i)))
                write(*,*) raw_rate_factor(i),max_safe_rate_for_any_temp,raw_rate_factor(i)/max_safe_rate_for_any_temp
@@ -139,7 +132,7 @@
             rate_raw_dRho(i) = rate_raw_dRho(i)*fac
          end do
 
-         if(logtemp .ge. max_safe_logT_for_rates) then
+         if(logtemp >= max_safe_logT_for_rates) then
             rate_raw_dT(1:num_reactions) = 0d0
          end if
 
@@ -148,7 +141,6 @@
          contains
 
          subroutine get_rates_from_table(r1, r2)
-            use const_def, only: ln10
             integer, intent(in) :: r1, r2
 
             integer :: i, k
@@ -156,7 +148,7 @@
 
             include 'formats'
 
-            k = iat+1 ! starting guess for search
+            k = iat+1  ! starting guess for search
             do while (logtemp < logttab(k) .and. k > 1)
                k = k-1
             end do
@@ -190,7 +182,6 @@
       subroutine do_make_rate_tables( &
            num_reactions, cache_suffix, net_reaction_id, &
            rattab, rattab_f1, nT8s, ttab, logttab, ierr)
-         use const_def
          use interp_1d_lib, only: interp_pm, interp_m3q
          use interp_1d_def, only: pm_work_size, mp_work_size
          use utils_lib
@@ -264,7 +255,7 @@
                logttab(i) = logT
                do j=1, num_reactions
                   if (reaction_id(j) <= 0) cycle
-                  rattab(j, i) = missing_value ! so can check
+                  rattab(j, i) = missing_value  ! so can check
                end do
                operr = 0
                !write(*,2) 'logT', i, logT
@@ -295,7 +286,7 @@
             end if
          end if
 
-         if (nrattab > 1) then ! create interpolants
+         if (nrattab > 1) then  ! create interpolants
             allocate(work(nrattab*mp_work_size,utils_OMP_GET_MAX_THREADS()), stat=ierr)
             call fill_with_NaNs_2D(work)
             if (ierr /= 0) return
@@ -494,7 +485,7 @@
 
 
          ! Write cache file to temporary storage that is local to the run,
-         ! then at the end move the file atomicly to the final cache location
+         ! then at the end move the file atomically to the final cache location
          call reaction_filename(reaction_id(i), cache_suffix, which, cache_filename, temp_cache_filename, ierr)
          if (ierr /= 0) return
 
@@ -611,7 +602,7 @@
       subroutine do_eval_reaclib_21( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use raw_rates, only: get_reaclib_rate_and_dlnT
-         integer, intent(in) :: ir ! reaction_id
+         integer, intent(in) :: ir  ! reaction_id
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr
@@ -662,7 +653,7 @@
       subroutine do_eval_reaclib_22( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use raw_rates, only: get_reaclib_rate_and_dlnT
-         integer, intent(in) :: ir ! reaction_id
+         integer, intent(in) :: ir  ! reaction_id
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr

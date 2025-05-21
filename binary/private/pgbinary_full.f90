@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2022  The MESA Team, Bill Paxton & Matthias Fabry
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pgbinary
 
    use binary_def
-   use const_def
+   use const_def, only: dp, i8
    use chem_def, only : category_name
    use rates_def, only : i_rate
    use pgbinary_support
@@ -38,7 +32,7 @@ module pgbinary
 contains
 
    ! pgbinary interface
-   subroutine start_new_run_for_pgbinary(b, ierr) ! reset logs
+   subroutine start_new_run_for_pgbinary(b, ierr)  ! reset logs
       use binary_def, only : binary_info
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
@@ -112,7 +106,7 @@ contains
    end subroutine do_show_pgbinary_annotations
 
 
-   subroutine do_start_new_run_for_pgbinary(b, ierr) ! reset logs
+   subroutine do_start_new_run_for_pgbinary(b, ierr)  ! reset logs
       use utils_lib
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
@@ -766,8 +760,8 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer(8) :: time0, time1, clock_rate
-      logical :: pause
+      integer(i8) :: time0, time1, clock_rate
+      logical ::do_pause
 
       include 'formats'
 
@@ -781,10 +775,10 @@ contains
       if (failed('onScreen_Plots')) return
       call update_pgbinary_history_file(b, ierr)
       if (failed('save_text_data')) return
-      pause = b% pg% pause
-      if ((.not. pause) .and. b% pg% pause_interval > 0) &
-         pause = (mod(b% model_number, b% pg% pause_interval) == 0)
-      if (pause) then
+      do_pause = b% pg% pause_flag
+      if ((.not. do_pause) .and. b% pg% pause_interval > 0) &
+      do_pause = (mod(b% model_number, b% pg% pause_interval) == 0)
+      if (do_pause) then
          write(*, *)
          write(*, *) 'model_number', b% model_number
          write(*, *) 'pgbinary: paused -- hit RETURN to continue'
@@ -983,7 +977,7 @@ contains
       if (ierr /= 0) then
          write(*, *) 'failed read pgbinary history ' // trim(fname)
       else
-         do ! keep reading until reach end of file so take care of restarts
+         do  ! keep reading until reach end of file so take care of restarts
             allocate(pg)
             allocate(pg% vals(n))
             read(iounit, iostat = ierr) pg% age, pg% step, pg% vals(1:n)

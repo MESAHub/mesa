@@ -8,14 +8,14 @@ This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 This test case has 1 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_wd_stable_h_burn``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt 1.1 Msun carbon oxygen white dwarf from the :ref:`make_co_wd` test suite in r13738 with an an ``initial_mass`` of 6.4 Msun. The mass is relaxed to 1.0 Msun, the optical depth is relaxed to 300, and a hydrogen-rich composition is accreted at 2.5e7 Msun/yr. After about 100 year of evolution there is a hydrogen burning outburst followed by a period of stable hydrogen burning:
+* Part 1 (``inlist_wd_stable_h_burn``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt 1.1 |Msun| carbon oxygen white dwarf from the :ref:`make_co_wd` test suite in r13738 with an an ``initial_mass`` of 6.4 |Msun|. The mass is relaxed to 1.0 |Msun|, the optical depth is relaxed to 300, and a hydrogen-rich composition is accreted at 2.5e7 |Msun|/yr. After about 100 year of evolution there is a hydrogen burning outburst followed by a period of stable hydrogen burning:
 
 
 .. image:: ../../../star/test_suite/wd_stable_h_burn/docs/grid_000829.svg
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plots above:
 
 .. code-block:: console
@@ -24,12 +24,9 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
-          pgstar_interval = 1
+   pgstar_interval = 1
 
    pgstar_left_yaxis_label_disp = 4.0
 
@@ -166,17 +163,10 @@ pgstar commands used for the plots above:
    Grid1_file_dir = 'pgstar_out'
    Grid1_file_prefix = 'grid_'
    Grid1_file_interval = 10000
-   Grid1_file_width = -1        
-   Grid1_file_aspect_ratio = -1 
+   Grid1_file_width = -1
+   Grid1_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 08Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

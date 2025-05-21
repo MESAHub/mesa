@@ -2,42 +2,51 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module adjust_xyz
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use chem_def
       use utils_lib
 
       implicit none
 
+      private
+      public :: change_net
+      public :: change_small_net
+      public :: get_xa_for_standard_metals
+      public :: get_xa_for_accretion
+      public :: set_z
+      public :: set_y
+      public :: set_uniform_composition
+      public :: set_standard_composition
+      public :: set_uniform_xa_from_file
+      public :: set_composition
+      public :: do_change_to_xa_for_accretion
+      public :: set_abundance_ratio
+      public :: do_replace
+      public :: do_set_abundance
+      public :: do_uniform_mix_section
+      public :: do_uniform_mix_envelope_down_to_t
+
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine change_net( &
             id, adjust_abundances_for_new_isos, new_net_name, ierr)
@@ -267,7 +276,7 @@
 
          include 'formats'
 
-         dbg = .false. !(k == nz) .or. (k == nz-1)
+         dbg = .false.  !(k == nz) .or. (k == nz-1)
 
          ierr = 0
          zfrac = s% initial_z / zsol
@@ -341,7 +350,7 @@
          ! copy old isos and set abundances for new ones
          do j=1, species
             cid = chem_id(j)
-            i = old_net_iso(cid) ! old index number for this species
+            i = old_net_iso(cid)  ! old index number for this species
             if (i /= 0) then
                xa_new(j,k) = xa_startv(i,k)
             else if (.not. adjust_abundances_for_new_isos) then
@@ -357,15 +366,15 @@
                else
                   ! cannot simply add light elements to high temperature region
                   ! or will create an explosive situation that won't converge
-                  if (lgT >= lgT_hi) then ! don't add any
+                  if (lgT >= lgT_hi) then  ! don't add any
                      xa_new(j,k) = 0
                   else
                      sol_name = chem_isos% name(cid)
                      xsol = chem_Xsol(sol_name)
-                     if (lgT > lgT_lo) then ! interpolate
+                     if (lgT > lgT_lo) then  ! interpolate
                         xa_new(j, k) = &
                            xsol*0.5d0*(1+cospi((lgT-lgT_lo)/(lgT_hi-lgT_lo)))
-                     else ! add solar
+                     else  ! add solar
                         xa_new(j,k) = xsol
                      end if
                   end if
@@ -647,7 +656,7 @@
 
          ierr = 0
 
-         if (y == 0) then ! convert all he4 to h1
+         if (y == 0) then  ! convert all he4 to h1
             call set_abundance_ratio(s% id, ihe4, ih1, 0d0, nzlo, nzhi, ierr)
          end if
 
@@ -659,9 +668,9 @@
          desired_xhe4 = y - xhe3
          desired_xh1 = 1d0 - z - y
 
-         if (desired_xh1 <= 0d0) then ! convert all h1 to he4
+         if (desired_xh1 <= 0d0) then  ! convert all h1 to he4
             ratio = 0d0
-         else if (desired_xhe4 <= 0d0) then ! convert all he4 to h1
+         else if (desired_xhe4 <= 0d0) then  ! convert all he4 to h1
             ratio = 1d0
          else
             ratio = desired_xh1/desired_xhe4
@@ -674,7 +683,7 @@
 
       subroutine set_abundance_ratio(id, i1, i2, ratio, nzlo, nzhi, ierr)
          integer, intent(in) :: id, i1, i2, nzlo, nzhi
-         real(dp), intent(in) :: ratio ! new x(i1)/x(i2)
+         real(dp), intent(in) :: ratio  ! new x(i1)/x(i2)
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -721,7 +730,7 @@
 
          ierr = 0
 
-         xa(1:species) = 0 ! default
+         xa(1:species) = 0  ! default
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
@@ -735,7 +744,7 @@
          do
             t = token(iounit, n, i, buffer, string)
             select case(t)
-               case(name_token) ! iso name
+               case(name_token)  ! iso name
                   cid = chem_get_iso_id(string)
                   if (cid <= 0) then
                      write(*,*) 'reading ' // trim(filename)
@@ -884,8 +893,8 @@
             dump_missing_into_heaviest, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: species
-         real(dp), intent(in) :: h1, h2, he3, he4 ! mass fractions
-         integer, intent(in) :: which_zfracs ! defined in chem_def. e.g., GS98_zfracs
+         real(dp), intent(in) :: h1, h2, he3, he4  ! mass fractions
+         integer, intent(in) :: which_zfracs  ! defined in chem_def. e.g., GS98_zfracs
          logical, intent(in) :: dump_missing_into_heaviest
          integer, intent(out) :: ierr
          real(dp) :: xa(species)
@@ -901,7 +910,7 @@
       subroutine get_xa_for_accretion(s, xa, ierr)
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
-         real(dp) :: xa(:) ! (species)
+         real(dp) :: xa(:)  ! (species)
          integer, intent(out) :: ierr
          integer :: j, i, species, cid
          include 'formats'
@@ -943,7 +952,7 @@
          integer, intent(in) :: nzlo_in, nzhi_in
          integer, intent(out) :: ierr
          integer :: j, k, species
-         real(dp), pointer :: xa(:) ! (species)
+         real(dp), pointer :: xa(:)  ! (species)
          type (star_info), pointer :: s
          integer :: nzlo, nzhi
          include 'formats'
@@ -987,7 +996,7 @@
          integer, intent(in) :: species, chem_id(:), net_iso(:), which_zfracs
          real(dp), intent(in) :: h1_in, h2_in, he3_in, he4_in
          logical, intent(in) :: dump_missing_into_heaviest
-         real(dp) :: xa(:) ! (species)
+         real(dp) :: xa(:)  ! (species)
          integer, intent(out) :: ierr
          real(dp) :: zfrac(num_chem_elements), Z, h1, h2, he3, he4
          integer :: i
@@ -1015,7 +1024,7 @@
                zfrac(:) = MB22_photospheric_element_zfrac(:)
             case (AAG21_photospheric_zfracs)
                zfrac(:) = AAG21_photospheric_element_zfrac(:)
-            case (Custom_zfracs) ! use non-standard values given in controls
+            case (Custom_zfracs)  ! use non-standard values given in controls
                zfrac(:) = 0
                zfrac(e_li) = s% z_fraction_li
                zfrac(e_be) = s% z_fraction_be
@@ -1058,7 +1067,7 @@
                end do
                zfrac(:) = zfrac(:) / sum(zfrac(:))
             case default
-               if (abs(1d0 - (h1 + h2 + he3 + he4)) < 1d-8) then ! okay -- no metals
+               if (abs(1d0 - (h1 + h2 + he3 + he4)) < 1d-8) then  ! okay -- no metals
                   if (h1 > he4) then
                      h1 = max(0d0, min(1d0, 1d0 - (h2 + he3 + he4)))
                   else
@@ -1090,9 +1099,9 @@
          use chem_def
          integer, intent(in) :: species, chem_id(:), net_iso(:)
          real(dp), intent(in) :: h1, h2, he3, he4, Zinit
-         real(dp), intent(in) :: zfrac(:) ! (num_chem_elements)
+         real(dp), intent(in) :: zfrac(:)  ! (num_chem_elements)
          logical, intent(in) :: dump_missing_into_heaviest
-         real(dp) :: xa(:) ! (species)
+         real(dp) :: xa(:)  ! (species)
          real(dp), parameter :: tiny = 1d-15
          integer, intent(out) :: ierr
          include 'formats'
@@ -1145,11 +1154,11 @@
             species, chem_id, ztotal, zfrac, dump_missing_into_heaviest, xa, ierr)
          use chem_def
          use chem_lib, only: lodders03_element_atom_percent
-         integer, intent(in) :: species, chem_id(:) ! (species)
+         integer, intent(in) :: species, chem_id(:)  ! (species)
          real(dp), intent(in) :: ztotal
-         real(dp), intent(in) :: zfrac(:) ! (num_chem_elements)
+         real(dp), intent(in) :: zfrac(:)  ! (num_chem_elements)
          logical, intent(in) :: dump_missing_into_heaviest
-         real(dp) :: xa(:) ! (species) h & he not touched
+         real(dp) :: xa(:)  ! (species) h & he not touched
          integer, intent(out) :: ierr
 
          integer :: i, j, cid, cid2, element_id, jskip, Z(species)
@@ -1161,7 +1170,7 @@
          new_xa(:) = 0
 
          if (dump_missing_into_heaviest) then
-            jskip = maxloc(chem_isos% W(chem_id(:)),dim=1) ! find the heaviest
+            jskip = maxloc(chem_isos% W(chem_id(:)),dim=1)  ! find the heaviest
          else
             jskip = 0
          end if
@@ -1184,8 +1193,8 @@
                frac_sum = frac_sum + &
                   1d-2*lodders03_element_atom_percent(chem_isos% name(cid2))*chem_isos% W(cid2)
             end do
-            element_id = Z(j) ! element index equals number of protons
-            iso_frac = frac/frac_sum ! this iso is iso_frac of the element abundance by mass
+            element_id = Z(j)  ! element index equals number of protons
+            iso_frac = frac/frac_sum  ! this iso is iso_frac of the element abundance by mass
             new_xa(j) = ztotal*zfrac(element_id)*iso_frac
          end do
 
@@ -1198,8 +1207,8 @@
                xa(j) = new_xa(j)
             end do
             xa(jskip) = new_xa(jskip)
-         else ! renormalize all of the metals
-            zsum = sum(new_xa(:)) ! only have metals in new_xa
+         else  ! renormalize all of the metals
+            zsum = sum(new_xa(:))  ! only have metals in new_xa
             if (zsum > 0d0) then
                do j=1,species
                   if (Z(j) <= 2) cycle
@@ -1347,7 +1356,7 @@
       subroutine do_replace(s, id1, id2, nzlo, nzhi, ierr)
          ! replaces species1 by species2
          type (star_info), pointer :: s
-         integer, intent(in) :: id1, id2 ! values are chem_id's such as ihe4
+         integer, intent(in) :: id1, id2  ! values are chem_id's such as ihe4
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
 
@@ -1456,17 +1465,4 @@
 
       end subroutine do_set_abundance
 
-
       end module adjust_xyz
-
-
-
-
-
-
-
-
-
-
-
-

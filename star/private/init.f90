@@ -2,41 +2,43 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module init
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, secyer
 
       implicit none
 
       private
-      public :: alloc_star_data, set_starting_star_data, do_star_init, &
-         do_starlib_shutdown, set_kap_and_eos_handles, load_zams_model, &
-         create_pre_ms_model, create_initial_model, &
-         create_RSP_model, create_RSP2_model, &
-         doing_restart, load_restart_photo, load_saved_model, &
-         do_garbage_collection
+      public :: alloc_star_data
+      public :: set_starting_star_data
+      public :: do_star_init
+      public :: do_starlib_shutdown
+      public :: set_kap_and_eos_handles
+      public :: load_zams_model
+      public :: create_pre_ms_model
+      public :: create_initial_model
+      public :: create_RSP_model
+      public :: create_RSP2_model
+      public :: doing_restart
+      public :: load_restart_photo
+      public :: load_saved_model
+      public :: do_garbage_collection
 
       integer, parameter :: do_create_pre_ms_model = 0
       integer, parameter :: do_load_zams_model = 1
@@ -45,17 +47,15 @@
       integer, parameter :: do_create_RSP_model = 4
       integer, parameter :: do_create_RSP2_model = 5
 
-
       logical :: have_done_starlib_init = .false.
 
       contains
-
 
       subroutine set_kap_and_eos_handles(id, ierr)
          use kap_lib, only: alloc_kap_handle_using_inlist, kap_ptr
          use eos_lib, only: alloc_eos_handle_using_inlist, eos_ptr
          integer, intent(in) :: id
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          type (star_info), pointer :: s
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
@@ -515,7 +515,7 @@
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
+         s% okay_to_set_mlt_vc = .false.  ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
 
          s% have_ST_start_info = .false.
@@ -682,7 +682,7 @@
 
          s% he_core_mass = 0
          s% co_core_mass = 0
-         s% Teff = -1 ! need to calculate it
+         s% Teff = -1  ! need to calculate it
          s% center_eps_nuc = 0
          s% Lrad_div_Ledd_avg_surf = 0
          s% w_div_w_crit_avg_surf = 0
@@ -744,6 +744,7 @@
          s% len_extra_iwork = 0
          s% len_extra_work = 0
 
+         s% crystal_core_boundary_mass = -1
          s% phase_sep_mixing_mass = -1
 
          call init_random(s)
@@ -847,7 +848,7 @@
 
          type (star_info), pointer :: s
          real(dp) :: initial_mass, initial_z
-         real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
+         real(dp), parameter :: lg_max_abs_mdot = -1000  ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
          real(dp) :: total_radiation, warning_limit_for_max_residual
@@ -881,7 +882,7 @@
             call set_net(s, s% net_name, ierr)
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
-            call init_def(s) ! RSP
+            call init_def(s)  ! RSP
             call finish_load_model(s, restart, ierr)
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
@@ -992,7 +993,7 @@
                      s% dt_next = yrs_for_init_timestep(s)*secyer
                   end if
                case (do_create_RSP_model)
-                  call build_rsp_model(s, ierr) ! like build_pre_ms_model
+                  call build_rsp_model(s, ierr)  ! like build_pre_ms_model
                   if (ierr /= 0) then
                      write(*,*) 'failed in build_rsp_model'
                      return
@@ -1052,14 +1053,14 @@
 
          if (do_which == do_create_pre_ms_model) then
             call setup_for_relax_after_create_pre_ms_model
-            if (s% mstar > s% initial_mass*Msun) then ! need to reduce mass
+            if (s% mstar > s% initial_mass*Msun) then  ! need to reduce mass
                write(*,1) 'reduce mass to', s% initial_mass
                call do_relax_mass(s% id, s% initial_mass, lg_max_abs_mdot, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
                   return
                end if
-            else if (s% mstar < s% initial_mass*Msun) then ! need to increase mass
+            else if (s% mstar < s% initial_mass*Msun) then  ! need to increase mass
                write(*,1) 'increase mass to', s% initial_mass
                call do_relax_mass_scale( &
                   s% id, s% initial_mass, s% job% dlgm_per_step, s% job% change_mass_years_for_dt, ierr)
@@ -1204,6 +1205,5 @@
                use_cache_for_eos,&
                ierr)
       end subroutine do_garbage_collection
-
 
       end module init

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/sortsum.d.x
 if [ $# -eq 0 ]
 	"$aprgdir"/adiajobs/sortsum.d.x

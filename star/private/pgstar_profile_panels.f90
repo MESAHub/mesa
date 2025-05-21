@@ -2,40 +2,32 @@
 !
 !   Copyright (C) 2013-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pgstar_profile_panels
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, rsun
       use pgstar_support
       use pgstar_trho_profile
       use star_pgstar
 
       implicit none
 
-
       contains
-
 
       subroutine Profile_Panels1_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -553,6 +545,7 @@
          use pgstar_mixing_Ds, only: do_Mixing_panel
          use pgstar_mode_prop, only: do_mode_propagation_panel
          use pgstar_summary_profile, only: do_summary_profile_panel
+         use pgstar_colors
          use utils_lib
          use profile_getval, only: get_profile_val, get_profile_id
 
@@ -654,7 +647,7 @@
 
             xmin = get_profile_val(s, xaxis_id, nz)
             xmax = get_profile_val(s, xaxis_id, 1)
-            if (xmin > xmax) then ! switch
+            if (xmin > xmax) then  ! switch
                dx = xmin; xmin = xmax; xmax = dx
             end if
 
@@ -924,7 +917,7 @@
             if (len_trim(panels_other_yaxis_name(j)) > 0) then
                call pgswin(xleft, xright, other_ybot, other_ytop)
                call pgscf(1)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_box_pgstar(s,'','CMSTV')
                call pgsci(other_y_color)
                if (panels_other_yaxis_log(j)) then
@@ -952,7 +945,7 @@
 
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (j < panels_num_panels) then
                if (other_yaxis_id <= 0 .and. other_yfile_data_len <= 0) then
                   call show_box_pgstar(s,'BCST','BCMNSTV')
@@ -992,7 +985,7 @@
                end if
             end if
             call pgslw(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
 
             call show_pgstar_decorator(s% id, use_decorator, pgstar_decorator, j, ierr)
          end do
@@ -1000,7 +993,7 @@
          xname = trim(panels_xaxis_name)
          call show_xaxis_label_pgstar(s,xname)
 
-         if (show_mix_regions) then ! show mix regions at bottom of plot
+         if (show_mix_regions) then  ! show mix regions at bottom of plot
             call pgslw(10)
             call show_mix_regions_on_xaxis( &
                s,ybot,ytop,grid_min,grid_max,unshifted_xvec)
@@ -1012,7 +1005,4 @@
 
       end subroutine Pro_panels_plot
 
-
-
       end module pgstar_profile_panels
-

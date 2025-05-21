@@ -40,7 +40,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (.not. restart) then     
+         if (.not. restart) then
             num_periods = 0
             run_num_steps_end_prev = 0
             run_num_iters_end_prev = 0
@@ -71,25 +71,25 @@
             T_min = 0
             T_max = 0
             best_period = 0
-            best_model_number = 0    
+            best_model_number = 0
             best_order = 0
-            best_cycles_to_double = 0                    
+            best_cycles_to_double = 0
          end if
          if (.not. s% x_logical_ctrl(5)) then
-            call gyre_init('gyre.in')
-            call gyre_set_constant('G_GRAVITY', standard_cgrav)
-            call gyre_set_constant('C_LIGHT', clight)
-            call gyre_set_constant('A_RADIATION', crad)
-            call gyre_set_constant('M_SUN', Msun)
-            call gyre_set_constant('R_SUN', Rsun)
-            call gyre_set_constant('L_SUN', Lsun)
-            call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')         
+            call init('gyre.in')
+            call set_constant('G_GRAVITY', standard_cgrav)
+            call set_constant('C_LIGHT', clight)
+            call set_constant('A_RADIATION', crad)
+            call set_constant('M_SUN', Msun)
+            call set_constant('R_SUN', Rsun)
+            call set_constant('L_SUN', Lsun)
+            call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
          else
             call gyre_in_mesa_extras_set_velocities(s,restart,ierr)
-         end if        
+         end if
       end subroutine rsp2_extras_startup
-      
-      
+
+
       integer function rsp2_extras_finish_step(id)
          use chem_def
          integer, intent(in) :: id
@@ -98,13 +98,13 @@
          real(dp) :: target_period
          logical :: doing_pulses
          include 'formats'
-         
+
          rsp2_extras_finish_step = terminate
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          rsp2_extras_finish_step = keep_going
-         
+
          gyre_interval = s% x_integer_ctrl(1)
          if (gyre_interval > 0) then
             if (MOD(s% model_number, gyre_interval) == 0) &
@@ -113,22 +113,22 @@
                s% termination_code = t_extras_finish_step
             if (rsp2_extras_finish_step /= keep_going) return
          end if
-         
+
          doing_pulses = s% x_logical_ctrl(7)
          if (.not. doing_pulses) return
          target_period = s% x_ctrl(7)
          if (target_period <= 0d0) return
          if (.not. get_period_info()) return
-         
+
          test_period = s% x_integer_ctrl(7)
          if (num_periods < test_period .or. test_period <= 0) return
-         
+
          ! have finished test run
          call report_test_results
          rsp2_extras_finish_step = terminate
-         
+
          contains
-      
+
          subroutine get_gyre_info_for_this_step
             integer :: i
             rsp2_extras_finish_step = gyre_in_mesa_extras_finish_step(id)
@@ -148,14 +148,14 @@
                end do
             end if
          end subroutine get_gyre_info_for_this_step
-         
+
          logical function get_period_info()
             real(dp) :: v_surf, v_surf_start, KE, min_period, time_ended, &
                delta_R, min_deltaR_for_periods, growth_avg_frac_new, &
                min_period_div_target, cs, vesc
             include 'formats'
             get_period_info = .false.
-         
+
             if (s% r(1) < R_min) R_min = s% r(1)
             if (s% r(1) > R_max) R_max = s% r(1)
             if (s% L(1) < L_min) L_min = s% L(1)
@@ -165,7 +165,7 @@
             KE = s% total_radial_kinetic_energy_end
             if (KE > KE_max) KE_max = KE
             if (KE < KE_min) KE_min = KE
-            
+
             if (s% v_flag) then
                v_surf = s% v(1)
                v_surf_start = s% v_start(1)
@@ -179,10 +179,10 @@
             if (v_surf > v_div_cs_max*cs) v_div_cs_max = v_surf/cs
             vesc = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             if (v_surf > v_div_vesc_max*vesc) v_div_vesc_max = v_surf/vesc
-               
+
             ! period is completed when v_surf goes from positive to negative during step
             if (v_surf > 0d0 .or. v_surf_start < 0d0) return
-            
+
             if (time_started == 0) then ! start of 1st cycle
                time_started = s% time
                run_num_steps_end_prev = s% model_number
@@ -194,13 +194,13 @@
                   s% model_number, s% time/(24*3600)
                return
             end if
-            
+
             delta_R = R_max - R_min
             min_deltaR_for_periods = s% x_ctrl(8)*Rsun
             if (min_deltaR_for_periods > 0d0) then
                if (delta_R < min_deltaR_for_periods) return ! filter out glitches
             end if
-         
+
             time_ended = s% time
             if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
                time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
@@ -211,7 +211,7 @@
 
             period = time_ended - time_started
             num_periods = num_periods + 1
-         
+
             if (num_periods > 1) then
                growth_avg_frac_new = s% x_ctrl(9)
                KE_growth = (KE_max - prev_KE_max)/prev_KE_max
@@ -221,7 +221,7 @@
                delta_R_growth_avg = growth_avg_frac_new*delta_R_growth + &
                   (1d0 - growth_avg_frac_new)*delta_R_growth_avg
             end if
-         
+
             period_delta_Teff = T_max - T_min
             period_delta_logTeff = log10(T_max/T_min)
             period_delta_R = R_max - R_min
@@ -231,12 +231,12 @@
             period_max_v_div_vesc = v_div_vesc_max
             prev_KE_max = KE_max
             prev_delta_R = period_delta_R
-            !                 1       2       3         4       5        6       7          8        9   
+            !                 1       2       3         4       5        6       7          8        9
             write(*,'(i4,a14,i6,a13,f8.3,a13,f9.3,a9,f9.4,a15,f10.4,a13,f9.4,a13,f10.4,a11,f9.4,a13,f9.4)')  &
                num_periods, &
                'steps/cycle', s% model_number - run_num_steps_end_prev, &              ! 1   a14,i6
                'iters/step',  &
-                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &     
+                  dble(s% total_num_solver_iterations - run_num_iters_end_prev)/ &
                   dble(s% model_number - run_num_steps_end_prev), &                    ! 2   a13,f8.3
                'period (d)', period/(24*3600), &                                       ! 3   a13,f9.3
                'growth', delta_R_growth_avg, &                                         ! 4   a9,f9.4
@@ -254,7 +254,7 @@
             get_period_info = .true.
 
          end function get_period_info
-         
+
          subroutine init_min_max_info
             v_div_cs_max = 0d0
             v_div_vesc_max = 0d0
@@ -267,7 +267,7 @@
             T_min = 1d99
             T_max = -1d99
          end subroutine init_min_max_info
-         
+
          subroutine report_test_results
             real(dp) :: rel_run_E_err
             write(*,*)
@@ -289,10 +289,10 @@
             write(*,*)
             write(*,*)
          end subroutine report_test_results
-           
+
       end function rsp2_extras_finish_step
-           
-      
+
+
       include 'gyre_in_mesa_extras_finish_step.inc'
 
 
@@ -300,7 +300,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          ierr = 0
-         call gyre_final()
+         call final()
       end subroutine rsp2_extras_after_evolve
 
 
@@ -313,8 +313,8 @@
          if (ierr /= 0) return
          rsp2_how_many_extra_history_columns = 10
       end function rsp2_how_many_extra_history_columns
-      
-      
+
+
       subroutine rsp2_data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -349,8 +349,8 @@
          if (ierr /= 0) return
          rsp2_how_many_extra_profile_columns = 0 ! 6
       end function rsp2_how_many_extra_profile_columns
-      
-      
+
+
       subroutine rsp2_data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -362,8 +362,8 @@
          integer :: k
          ierr = 0
          return
-         
-         
+
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
@@ -374,18 +374,18 @@
          names(5) = 'xtra5'
          names(6) = 'xtra6'
 
-         do k=1,nz            
+         do k=1,nz
             vals(k,1) = s% xtra1_array(k)
             vals(k,2) = s% xtra2_array(k)
             vals(k,3) = s% xtra3_array(k)
             vals(k,4) = s% xtra4_array(k)
             vals(k,5) = s% xtra5_array(k)
-            vals(k,6) = s% xtra6_array(k)            
+            vals(k,6) = s% xtra6_array(k)
          end do
-            
+
       end subroutine rsp2_data_for_extra_profile_columns
-      
-      
+
+
       include 'gyre_in_mesa_extras_set_velocities.inc'
 
 

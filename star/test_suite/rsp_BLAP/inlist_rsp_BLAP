@@ -104,7 +104,7 @@ use_Skye = .false.
 
 &pgstar
 
-      !pause = .true.
+      !pause_flag = .true.
 
       pgstar_interval = 10
          

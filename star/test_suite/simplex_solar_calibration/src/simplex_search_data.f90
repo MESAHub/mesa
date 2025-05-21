@@ -2,25 +2,18 @@
 !
 !   Copyright (C) 2020  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -414,7 +407,7 @@
       integer, parameter :: npts = 79
       real(dp), dimension(npts) :: data_r, data_csound, data_width
 
-      logical, parameter :: scale_simplex_params = .false. ! experimental
+      logical, parameter :: scale_simplex_params = .false.  ! experimental
 
 
       ! interfaces for procedure pointers
@@ -430,7 +423,7 @@
             use const_def, only: dp
             implicit none
             integer, intent(in) :: id
-            integer, intent(in) :: i ! which of my_param's will be set
+            integer, intent(in) :: i  ! which of my_param's will be set
             real(dp), intent(in) :: new_value
             integer, intent(out) :: ierr
          end subroutine will_set_my_param_interface
@@ -484,6 +477,5 @@
          star_simplex_procs% extras_finish_step => null()
          star_simplex_procs% extras_after_evolve => null()
       end subroutine init_simplex_search_data
-
 
       end module simplex_search_data

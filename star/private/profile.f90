@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,23 +21,24 @@
 
       use star_private_def
       use star_profile_def
-      use const_def
+      use const_def, only: dp, strlen
       use profile_getval
 
       implicit none
 
       private
-      public :: write_profile_info, set_profile_columns, &
-         get_profile_val, do_save_profiles, &
-         do_get_data_for_profile_columns, do_get_num_standard_profile_columns
+      public :: write_profile_info
+      public :: set_profile_columns
+      public :: get_profile_val
+      public :: do_save_profiles
+      public :: do_get_data_for_profile_columns
+      public :: do_get_num_standard_profile_columns
 
       ! model log priorities
       integer, parameter :: delta_priority = 1
       integer, parameter :: phase_priority = 2
 
-
       contains
-
 
       recursive subroutine add_profile_columns( &
             s, level, capacity, spec, profile_columns_file, report, ierr)
@@ -81,7 +76,7 @@
          ! first try local directory
          filename = profile_columns_file
 
-         if(level==1) then ! First pass either the user set the file or we load the defaults
+         if(level==1) then  ! First pass either the user set the file or we load the defaults
             if (len_trim(filename) == 0) filename = 'profile_columns.list'
 
             exists=.false.
@@ -176,7 +171,7 @@
                   ierr = -1; call error; return
                end if
 
-            case ('add_reaction_categories') ! add all the reaction categories
+            case ('add_reaction_categories')  ! add all the reaction categories
                do k = 1, num_categories
                   call insert_spec(category_offset + k, category_name(k), spec_err)
                   if (spec_err /= 0) then
@@ -278,7 +273,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (associated(s% profile_column_spec)) deallocate(s% profile_column_spec)
-         capacity = 100 ! will increase if needed
+         capacity = 100  ! will increase if needed
          allocate(s% profile_column_spec(capacity), stat=ierr)
          if (ierr /= 0) return
          s% profile_column_spec(:) = 0
@@ -299,7 +294,7 @@
       end subroutine set_profile_columns
 
 
-      integer function do_get_num_standard_profile_columns(s) ! not including extra profile columns
+      integer function do_get_num_standard_profile_columns(s)  ! not including extra profile columns
          use star_def, only: star_info
          type (star_info), pointer :: s
          integer :: numcols, j, num_specs
@@ -330,9 +325,9 @@
             names, vals, is_int, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nz
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_profile_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_profile_columns)
-         logical, pointer :: is_int(:) ! (num_profile_columns) true iff the values in the column are integers
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_profile_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_profile_columns)
+         logical, pointer :: is_int(:)  ! (num_profile_columns) true iff the values in the column are integers
          integer, intent(out) :: ierr
          character (len=0) :: fname
          logical, parameter :: write_flag = .false.
@@ -343,13 +338,13 @@
 
       subroutine write_profile_info(s, fname, ierr)
          use chem_def
-         use net_def ! categories
+         use net_def  ! categories
          use rates_def, only: i_rate
          type (star_info), pointer :: s
          character (len=*) :: fname
          integer, intent(out) :: ierr
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_profile_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_profile_columns)
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_profile_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_profile_columns)
          logical, pointer :: is_int(:)
          logical, parameter :: write_flag = .true.
          names => null()
@@ -363,7 +358,7 @@
       subroutine do_profile_info(s, fname, &
             write_flag, names, vals, is_int, ierr)
          use chem_def
-         use net_def ! categories
+         use net_def  ! categories
          use rates_def, only: i_rate
          use ctrls_io, only: write_controls
          use write_model, only: do_write_model
@@ -374,8 +369,8 @@
          type (star_info), pointer :: s
          character (len=*) :: fname
          logical, intent(in) :: write_flag
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_profile_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_profile_columns)
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_profile_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_profile_columns)
          logical, pointer :: is_int(:)
          integer, intent(out) :: ierr
 
@@ -580,7 +575,7 @@
 
                call do_string(i, 'version_number', version_number)
 
-               if (s% profile_header_include_sys_details) then ! make this optional
+               if (s% profile_header_include_sys_details) then  ! make this optional
                   call do_string(i, 'compiler', compiler_name)
                   call do_string(i, 'build', compiler_version_name)
                   call do_string(i, 'MESA_SDK_version', mesasdk_version_name)
@@ -711,7 +706,7 @@
                   s% most_recent_controls_filename = trim(fname_out)
                end if
                   write(*,'(a)', advance='no') ' ' // trim(fname_out)
-            end if ! write_controls_info_with_profile
+            end if  ! write_controls_info_with_profile
 
             num_digits = 1 + log10(dble(max(1,s% model_number)))
             write(fstring,'( "(a,i",i2.2,".",i2.2,")" )') num_digits, num_digits
@@ -999,7 +994,7 @@
          model_priorities(num_models) = model_priority
          model_logs(num_models) = model_profile_number
 
-         s% save_profiles_model_priority = delta_priority ! reset it to the default value
+         s% save_profiles_model_priority = delta_priority  ! reset it to the default value
 
          ! write the profiles before adding them to the list
          ! so if user interrupts during write, the index is still okay.
@@ -1106,7 +1101,7 @@
             end if
          end do
          num_models = j
-         if (num_models == max_num_mods) then ! pick one to delete
+         if (num_models == max_num_mods) then  ! pick one to delete
             j = 1
             do i=2, num_models
                if (dbg) then
@@ -1150,7 +1145,7 @@
          num_models = 0
          ierr = 0
          open(newunit=iounit, file=trim(fname), action='read', status='old', iostat=ierr)
-         if (ierr == 0) then ! file exists
+         if (ierr == 0) then  ! file exists
             read(iounit, *, iostat=ierr) num_models
             if (ierr == 0) then
                if (num_models > max_num_mods) num_models = max_num_mods
@@ -1189,4 +1184,3 @@
       end subroutine get_model_profile_filename
 
       end module profile
-

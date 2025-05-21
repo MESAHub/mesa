@@ -4,11 +4,11 @@
 timing
 ******
 
-This test checks the counter and timing routines with a 1.5 Msun, Z=0.02 metallicity model.
+This test checks the counter and timing routines with a 1.5 |Msun|, Z=0.02 metallicity model.
 
-This test case has 2 part2. 
+This test case has 2 part2.
 
-* Part 1 (``inlist_zams``) builds a 1.5 Msun, Z=0.02 metallicity and evolves it to the zero-age main sequence.
+* Part 1 (``inlist_zams``) builds a 1.5 |Msun|, Z=0.02 metallicity and evolves it to the zero-age main sequence.
 
 * Part 2 (``inlist_timing``) continues the evolution until the central mass fraction of hydrogen drops below 0.5. To get a counter and timing breakdown the  star_job namelist parameter ``first_model_for_timing=2`` is set. At the end of the run, various counters and timings are written to the terminal:
 
@@ -39,7 +39,6 @@ This test case has 2 part2.
                                          run1_star    0.056    0.006
                                        adjust_mass    0.019    0.002
                                        mixing_info    0.012    0.001
-
 
 
 Last-Updated: 03Jul2021 (MESA 094ff71) by fxt.

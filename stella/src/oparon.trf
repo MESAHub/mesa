@@ -18,7 +18,7 @@ Subroutine Opacit;
 Implicit real*8 (a-h,o-z);
 -- "Dust" added already in HAPPA!!!
 -- Parameter(DUSTK=1.d2,
---          TpDust=0.032d0); 
+--          TpDust=0.032d0);
 --Parameter(DUSTK=1.d1, -- coefficient for 'dust' kappa in units (cm**2/g)*UTp**2
   --        TpDust=0.032d0); -- temperature for transition to "dust" kappa
 _include snrad;
@@ -27,7 +27,7 @@ _include opacity;
 _include black;
 
 _Define @TP Tp ;
-@Cappa; 
+@Cappa;
 Cappa=CapRos;
 do Lfr=1,Nfreq;
   SaveHappal(Lfr)=HAPPAL(Lfr);
@@ -37,7 +37,7 @@ TpOld=Tp; Xeold=Xe;
 DTp=TpOld*Delta;
 Xe=Xeold+XeT*DTp;
 _Define @TP "Tp+DTp";
-@Cappa; 
+@Cappa;
 CapT=(CapRos-Cappa)/DTp;
 PlOld=Pl;
 
@@ -46,7 +46,7 @@ Xe=Xeold+XePL*Delta;
 _Define @TP TpOld ;
 @Cappa; CapPl=(CapRos-Cappa)/Delta;
 
-Pl=Plold; Xe=Xeold;  
+Pl=Plold; Xe=Xeold;
 
 do Lfr=1,Nfreq;
   HAPPAL(Lfr)=SaveHappal(Lfr);  -- restore HAPPAL

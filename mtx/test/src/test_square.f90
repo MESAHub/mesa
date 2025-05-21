@@ -1,22 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011  Bill Paxton
+!   Copyright (C) 2011  Bill Paxton & The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not,write to the Free Software
-!   Foundation,Inc.,59 Temple Place,Suite 330,Boston,MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -48,18 +45,18 @@ contains
       write (*, *) 'test_square_inv'
       write (*, *)
 
-      A1(1, 1:n) = (/3.14d0, 7.5d0, 0.00d0/)
-      A1(2, 1:n) = (/4.1d0, 3.2d0, 0.3d0/)
-      A1(3, 1:n) = (/0.00d0, 1d0, 4.1d0/)
+      A1(1, 1:n) = [3.14d0, 7.5d0, 0.00d0]
+      A1(2, 1:n) = [4.1d0, 3.2d0, 0.3d0]
+      A1(3, 1:n) = [0.00d0, 1d0, 4.1d0]
       A1_init = A1
 
-      A2(1, 1:n) = (/0d0, 3.1d0, 0d0/)
-      A2(2, 1:n) = (/4.7d0, 6.2d0, 0d0/)
-      A2(3, 1:n) = (/3.2d0, 0d0, 0.31d0/)
+      A2(1, 1:n) = [0d0, 3.1d0, 0d0]
+      A2(2, 1:n) = [4.7d0, 6.2d0, 0d0]
+      A2(3, 1:n) = [3.2d0, 0d0, 0.31d0]
       A2_init = A2
 
-      B1(1:n) = (/1.0d0, 2.0d0, 3.0d0/)
-      B2(1:n) = (/1.1d0, 2.1d0, 3.1d0/)
+      B1(1:n) = [1.0d0, 2.0d0, 3.0d0]
+      B2(1:n) = [1.1d0, 2.1d0, 3.1d0]
 
       call DGETRF(n, n, A1, n, ipiv, info)
       if (info /= 0) then
@@ -106,16 +103,16 @@ contains
       write (*, *) 'test_square2'
       write (*, *)
 
-      A1(1, 1:n) = (/3.14d0, 7.5d0, 0.00d0/)
-      A1(2, 1:n) = (/4.1d0, 3.2d0, 0.3d0/)
-      A1(3, 1:n) = (/0.00d0, 1d0, 4.1d0/)
+      A1(1, 1:n) = [3.14d0, 7.5d0, 0.00d0]
+      A1(2, 1:n) = [4.1d0, 3.2d0, 0.3d0]
+      A1(3, 1:n) = [0.00d0, 1d0, 4.1d0]
 
-      A2(1, 1:n) = (/4.7d0, 6.2d0, 0d0/)
-      A2(2, 1:n) = (/3.2d0, 0d0, 0.31d0/)
-      A2(3, 1:n) = (/0d0, 3.1d0, 0d0/)
+      A2(1, 1:n) = [4.7d0, 6.2d0, 0d0]
+      A2(2, 1:n) = [3.2d0, 0d0, 0.31d0]
+      A2(3, 1:n) = [0d0, 3.1d0, 0d0]
 
-      B1(1:n, 1) = (/1.0d0, 2.0d0, 3.0d0/)
-      B2(1:n, 1) = (/1.1d0, 2.1d0, 3.1d0/)
+      B1(1:n, 1) = [1.0d0, 2.0d0, 3.0d0]
+      B2(1:n, 1) = [1.1d0, 2.1d0, 3.1d0]
 
       call DGETRF(n, n, A1, n, ipiv, info)
       if (info /= 0) then
@@ -148,11 +145,11 @@ contains
 
       include 'formats'
 
-      A(1, 1:n) = (/1.80d0, 2.88d0, 2.05d0, 0.00d0/)
-      A(2, 1:n) = (/5.25d0, -2.95d0, -0.95d0, -3.80d0/)
-      A(3, 1:n) = (/0.00d0, 0.00d0, -2.90d0, -1.04d0/)
-      A(4, 1:n) = (/-1.11d0, 0.00d0, -0.59d0, 0.80d0/)
-      B(1:n, 1) = (/4.35d0, 5.05d0, 3.04d0, -2.05d0/)
+      A(1, 1:n) = [1.80d0, 2.88d0, 2.05d0, 0.00d0]
+      A(2, 1:n) = [5.25d0, -2.95d0, -0.95d0, -3.80d0]
+      A(3, 1:n) = [0.00d0, 0.00d0, -2.90d0, -1.04d0]
+      A(4, 1:n) = [-1.11d0, 0.00d0, -0.59d0, 0.80d0]
+      B(1:n, 1) = [4.35d0, 5.05d0, 3.04d0, -2.05d0]
 
       A2 = A
 

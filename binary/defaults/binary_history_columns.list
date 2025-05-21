@@ -72,6 +72,8 @@
       star_2_mass ! mass of second star in msun
       !lg_star_2_mass ! log10 mass of second star in msun
       !sum_of_masses ! star_1_mass + star_2_mass
+      !mass_ratio ! star_2_mass / star_1_mass
+      !obs_mass_ratio ! min(m2/m1, m2/m1)
       lg_mtransfer_rate ! log10 of abs(mass transfer rate) in Msun/yr
                      ! this considers the amount of mass lost from the donor due to RLOF
                      ! not the actual mass that ends up accreted

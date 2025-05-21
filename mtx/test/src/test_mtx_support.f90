@@ -1,22 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011  Bill Paxton
+!   Copyright (C) 2011  Bill Paxton & The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not,write to the Free Software
-!   Foundation,Inc.,59 Temple Place,Suite 330,Boston,MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -42,19 +39,19 @@ contains
 
       write (*, *) 'test_format_conversion'
 
-      a(1, 1:n) = (/10d0, 0d0, 0d0, 0d0, 0d0, 0d0/)
-      a(2, 1:n) = (/0d0, 12d0, -3d0, -1d0, 0d0, 0d0/)
-      a(3, 1:n) = (/0d0, 0d0, 15d0, 0d0, 0d0, 0d0/)
-      a(4, 1:n) = (/-2d0, 0d0, 0d0, 10d0, -1d0, 0d0/)
-      a(5, 1:n) = (/-1d0, 0d0, 0d0, -5d0, 1d0, -1d0/)
-      a(6, 1:n) = (/-1d0, -2d0, 0d0, 0d0, 0d0, 6d0/)
+      a(1, 1:n) = [10d0, 0d0, 0d0, 0d0, 0d0, 0d0]
+      a(2, 1:n) = [0d0, 12d0, -3d0, -1d0, 0d0, 0d0]
+      a(3, 1:n) = [0d0, 0d0, 15d0, 0d0, 0d0, 0d0]
+      a(4, 1:n) = [-2d0, 0d0, 0d0, 10d0, -1d0, 0d0]
+      a(5, 1:n) = [-1d0, 0d0, 0d0, -5d0, 1d0, -1d0]
+      a(6, 1:n) = [-1d0, -2d0, 0d0, 0d0, 0d0, 6d0]
 
-      b(1, 1:n) = (/10d0, 0d0, 0d0, 0d0, 0d0, 0d0/)
-      b(2, 1:n) = (/-2d0, 12d0, -3d0, -1d0, 0d0, 0d0/)
-      b(3, 1:n) = (/0d0, 1d0, 15d0, 0d0, 0d0, 0d0/)
-      b(4, 1:n) = (/0d0, 0d0, 0d0, 10d0, -1d0, 0d0/)
-      b(5, 1:n) = (/0d0, 0d0, 0d0, -5d0, 1d0, -1d0/)
-      b(6, 1:n) = (/0d0, 0d0, 0d0, 0d0, 0d0, 6d0/)
+      b(1, 1:n) = [10d0, 0d0, 0d0, 0d0, 0d0, 0d0]
+      b(2, 1:n) = [-2d0, 12d0, -3d0, -1d0, 0d0, 0d0]
+      b(3, 1:n) = [0d0, 1d0, 15d0, 0d0, 0d0, 0d0]
+      b(4, 1:n) = [0d0, 0d0, 0d0, 10d0, -1d0, 0d0]
+      b(5, 1:n) = [0d0, 0d0, 0d0, -5d0, 1d0, -1d0]
+      b(6, 1:n) = [0d0, 0d0, 0d0, 0d0, 0d0, 6d0]
 
       ierr = 0
 

@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -30,9 +24,10 @@
 
       implicit none
 
+      private
+      public :: eval_typical_charge
 
       logical, parameter :: dbg = .false.
-
 
       contains
 
@@ -59,8 +54,8 @@
 
       real(dp) function eval_typical_charge( &
             cid, abar, free_e, T, log10_T, rho, log10_rho)
-         integer, intent(in) :: cid ! chem id such as ihe4.  defined in chem_def.
-         real(dp), intent(in) :: abar ! average atomic weight (from chem_lib)
+         integer, intent(in) :: cid  ! chem id such as ihe4.  defined in chem_def.
+         real(dp), intent(in) :: abar  ! average atomic weight (from chem_lib)
          real(dp), intent(in) :: free_e
             ! mean number of free electrons per nucleon (from eos_lib)
             ! abar*free_e = (nucleons/particle)*(charge/nucleon) = charge/particle = z1
@@ -73,7 +68,7 @@
       subroutine chi_info(a1, z1, T, log_T, rho, log_rho, chi, c0, c1, c2)
          real(dp), intent(in) :: a1, z1, T, log_T, rho, log_rho
          real(dp), intent(out) :: chi, c0, c1, c2
-         chi = 1.987d-4*T*(-8.392d0 - log_rho + 1.5d0*log_T - log10(z1/a1)) ! eqn 20
+         chi = 1.987d-4*T*(-8.392d0 - log_rho + 1.5d0*log_T - log10(z1/a1))  ! eqn 20
          ! coef's used in eqn 21
          c0 = 1.085d-4*rho*T/a1
          c1 = 1.617d4*sqrt(rho*(z1*z1 + z1)/(T*a1))
@@ -113,9 +108,4 @@
          end do
       end function get_typical_charge
 
-
-
-
-
       end module mod_typical_charge
-

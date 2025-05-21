@@ -10,7 +10,6 @@
       ! PGstar controls
       integer :: pgstar_interval
       character (len=32) :: file_device
-      character (len=32) :: file_extension
       integer :: file_digits
 
       real :: delta_HR_limit_for_file_output
@@ -64,7 +63,7 @@
          pgstar_right_yaxis_label_disp, &
          pgstar_num_scale
 
-      logical :: pause
+      logical :: pause_flag
       integer :: pause_interval
       real :: pgstar_sleep
       logical :: clear_history
@@ -507,7 +506,6 @@
          prev_HR_file_width, prev_HR_file_ratio
 
 
-
       logical :: TRho_win_flag, TRho_file_flag
       logical :: do_TRho_win, do_TRho_file
       logical :: show_TRho_annotation1, show_TRho_annotation2, show_TRho_annotation3, &
@@ -527,7 +525,6 @@
          prev_TRho_file_width, prev_TRho_file_ratio
 
 
-
       logical :: TmaxRho_win_flag, TmaxRho_file_flag
       logical :: do_TmaxRho_win, do_TmaxRho_file
       logical :: show_TmaxRho_annotation1, show_TmaxRho_annotation2, show_TmaxRho_annotation3, &
@@ -545,7 +542,6 @@
          prev_TmaxRho_win_width, prev_TmaxRho_win_ratio, &
          TmaxRho_file_width, TmaxRho_file_aspect_ratio, &
          prev_TmaxRho_file_width, prev_TmaxRho_file_ratio
-
 
 
       logical :: logL_R_win_flag, logL_R_file_flag
@@ -590,7 +586,6 @@
          prev_logL_Teff_file_width, prev_logL_Teff_file_ratio, &
          logL_Teff_target_logL, logL_Teff_target_logL_sigma, &
          logL_Teff_target_Teff, logL_Teff_target_Teff_sigma
-
 
 
       logical :: logL_v_win_flag, logL_v_file_flag
@@ -725,7 +720,6 @@
          R_L_target_L, R_L_target_L_sigma
 
 
-
       logical :: logg_Teff_win_flag, logg_Teff_file_flag
       logical :: do_logg_Teff_win, do_logg_Teff_file
       logical :: show_logg_Teff_target_box
@@ -746,7 +740,6 @@
          prev_logg_Teff_file_width, prev_logg_Teff_file_ratio, &
          logg_Teff_target_logg, logg_Teff_target_logg_sigma, &
          logg_Teff_target_Teff, logg_Teff_target_Teff_sigma
-
 
 
       logical :: logg_logT_win_flag, logg_logT_file_flag
@@ -816,7 +809,6 @@
          prev_Kipp_file_width, prev_Kipp_file_ratio, &
          Kipp_xmax, Kipp_xmin,Kipp_xmargin, &
          Kipp_burn_type_cutoff
-
 
 
       logical :: TRho_Profile_win_flag, TRho_Profile_file_flag, TRho_switch_to_Column_Depth
@@ -2055,7 +2047,6 @@
       integer, dimension(max_num_pgstar_grid_plots) :: &
          Grid9_plot_row, Grid9_plot_rowspan, &
          Grid9_plot_col, Grid9_plot_colspan
-
 
 
       integer :: annotation1_ci, annotation1_lw, annotation1_cf

@@ -45,7 +45,6 @@
   logg_logT_target_logT_sigma = 0.1
 
 
-
   ! show temperature/density profile
   ! this plots the internal structure at single timestep
   TRho_Profile_win_flag = .false.

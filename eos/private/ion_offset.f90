@@ -1,12 +1,29 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module ion_offset
-      use const_def
+      use const_def, only: dp, amu, ev2erg
       use math_lib
 
       implicit none
 
       logical, parameter :: dbg = .false.
-      !logical, parameter :: dbg = .true.
-
 
       private
       public :: compute_ion_offset
@@ -40,8 +57,8 @@ module ion_offset
          ! Get basic species info
          norm = 0d0
          do k=1,species
-            A(k) = chem_isos% Z_plus_N(chem_id(k)) ! baryon number
-            Z(k) = chem_isos% Z(chem_id(k)) ! charge
+            A(k) = chem_isos% Z_plus_N(chem_id(k))  ! baryon number
+            Z(k) = chem_isos% Z(chem_id(k))  ! charge
             ya(k) = xa(k) / A(k)            ! number fraction (not normalized)
             norm = norm + ya(k)             ! accumulate number fraction normalization
          end do

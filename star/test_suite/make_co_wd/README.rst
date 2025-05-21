@@ -56,7 +56,7 @@ specified using ``x_ctrl(1)`` to leave :math:`10^{-3}` |Msun| of the
 hydrogen envelope. After the relaxation ends, residual burning will
 reduce the final hydrogen envelope mass to around
 :math:`10^{-4}` |Msun| (for the default 0.6 |Msun| white dwarf).
-      
+
 
 5. ``inlist_settle``
 --------------------

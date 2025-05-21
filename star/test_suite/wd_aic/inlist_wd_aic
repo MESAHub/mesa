@@ -19,13 +19,13 @@
       set_tau_factor = .true.
       set_to_this_tau_factor = 300
 
-      set_cumulative_energy_error_at_step = 1 
+      set_cumulative_energy_error_at_step = 1
       new_cumulative_energy_error = 0d0
 
       ! TESTING WITH STD WEAK RATES
-      !use_suzuki_weak_rates = .true. 
+      !use_suzuki_weak_rates = .true.
       !use_special_weak_rates = .false.
-      
+
       use_special_weak_rates = .true.
       special_weak_states_file = 'aic.states'
       special_weak_transitions_file = 'aic.transitions'
@@ -53,7 +53,7 @@
 / ! end of kap namelist
 
 &controls
-      
+
       energy_eqn_option = 'eps_grav'
       use_time_centered_eps_grav = .true.
       include_composition_in_eps_grav = .true.
@@ -64,7 +64,7 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 1600
-         
+
       delta_lgRho_cntr_limit = 1e-3
       delta_lgRho_cntr_hard_limit = 3e-3
 
@@ -90,16 +90,14 @@
       warning_limit_for_max_residual = 1d99
 
 
-
       photo_interval = 50
       profile_interval = 50
       history_interval = 10
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 10
 
 
 / ! end of controls namelist
-
 
 
 &pgstar

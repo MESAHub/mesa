@@ -2,42 +2,33 @@
 !
 !   Copyright (C) 2013-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pgstar_summary_burn
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10
       use pgstar_support
       use star_pgstar
 
       implicit none
 
-
       contains
 
-
       subroutine summary_burn_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -125,6 +116,7 @@
 
          subroutine plot(ierr)
             use rates_def
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: j, ii, jj, i, cnt, k
@@ -160,7 +152,7 @@
             call pgswin(xleft, xright, ymin+ybot, ymax)
 
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale)
             call pgbox('BCNST',0.0,0,'CMSTV',0.0,0)
             call pgsci(clr_Goldenrod)
@@ -195,7 +187,7 @@
 
             call pgswin(xleft, xright, ymin+ybot, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale)
             call pgbox('',0.0,0,'BNSTV',0.0,0)
 
@@ -233,7 +225,7 @@
                   xnuc_cat(num_cat) = maxv
                end if
             end do
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*0.8)
             do ii = 1, num_cat
                eps_max = -100; i = 0
@@ -246,10 +238,10 @@
                end do
                if (i == 0) exit
                if (dbg) write(*,2) 'place ' // category_name(docat(i)), i, eps_max
-               xnuc_cat(i) = -1e10 ! mark as done
+               xnuc_cat(i) = -1e10  ! mark as done
                eps_max = -100
                eps_k(i) = 0
-               do k = 1, nz ! if limit this to grid_min:grid_max, locations jump around too much
+               do k = 1, nz  ! if limit this to grid_min:grid_max, locations jump around too much
                   eps = s% eps_nuc_categories(docat(i),k)
                   if(eps > eps_max) then
                      eps_max = eps
@@ -261,15 +253,15 @@
                   xpos_nuc(i) = xvec(k)
                   if (xpos_nuc(i) < xmin .or. xpos_nuc(i) > xmax) cycle
                   cnt = 0
-                  do j = 1, num_cat ! compare location to ones already placed
+                  do j = 1, num_cat  ! compare location to ones already placed
                      if (j == i) cycle
-                     if (xnuc_cat(j) > -1) cycle ! haven't done this one yet
+                     if (xnuc_cat(j) > -1) cycle  ! haven't done this one yet
                      if (abs(xpos_nuc(i) - xpos_nuc(j)) < 0.1*dx) then
                         cnt = cnt + 1
                         if (dbg) write(*,*) 'conflicts with ' // category_name(docat(j))
                      end if
                   end do
-                  if (cnt < 3) then ! only show 3 max
+                  if (cnt < 3) then  ! only show 3 max
                      str = category_name(docat(i))
                      if (str(1:5) == 'burn_') then
                         str = str(6:len_trim(str))
@@ -292,10 +284,10 @@
                end if
             end do
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             ierr = 0
             call show_xaxis_name(s,xaxis_name,ierr)
-            if (ierr == 0) then ! show mix regions at bottom of plot
+            if (ierr == 0) then  ! show mix regions at bottom of plot
                call pgslw(10)
                call show_mix_regions_on_xaxis( &
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)
@@ -304,12 +296,8 @@
          call show_pgstar_decorator(s%id, s% pg% summary_burn_use_decorator, &
             s% pg% summary_burn_pgstar_decorator, 0, ierr)
 
-
          end subroutine plot
-
 
       end subroutine do_summary_burn_plot
 
-
       end module pgstar_summary_burn
-

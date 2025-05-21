@@ -24,7 +24,7 @@
       !min_q_for_drag = 0.8d0
 
       set_min_D_mix = .true.
-      min_D_mix = 1d-2 
+      min_D_mix = 1d-2
 
       xa_central_lower_limit_species(1) = 'c12'
       xa_central_lower_limit(1) = 1d-3
@@ -69,11 +69,10 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 
+Profile_Panels3_xmax = -101d0 !
 
 TRho_Profile_xmin = 2.5
 TRho_Profile_xmax = 7.5

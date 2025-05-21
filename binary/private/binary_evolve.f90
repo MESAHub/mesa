@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2019  Pablo Marchant & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 
       module binary_evolve
 
-      use const_def
+      use const_def, only: dp, pi, msun, rsun, secyer, secday, one_third, standard_cgrav
       use math_lib
       use star_lib
       use star_def
@@ -109,7 +103,7 @@
                end if
             end if
 
-            if (b% initial_period_in_days <= 0) then ! calculate from initial_separation_in_Rsuns
+            if (b% initial_period_in_days <= 0) then  ! calculate from initial_separation_in_Rsuns
                call set_separation_eccentricity(b% binary_id, &
                   b% initial_separation_in_Rsuns*Rsun, b% initial_eccentricity, ierr)
                   if (ierr /= 0) then
@@ -130,7 +124,7 @@
             end do
             ! 2) time between periastron and polar angle theta 0 -> 1 (fraction of the
             !    orbital period)
-            do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
+            do i = 1,b% anomaly_steps  ! time between periastron and polar angle theta
                b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
                                tan(b% theta_co(i)/2d0) ) - b% eccentricity * &
                                sqrt(1 - pow2(b% eccentricity)) * sin(b% theta_co(i)) / &
@@ -188,7 +182,7 @@
             b% CE_lambda2 = 0d0
             b% CE_Ebind1 = 0d0
             b% CE_Ebind2 = 0d0
-            b% mtransfer_rate = 0
+            b% mtransfer_rate = 0d0
 
             b% num_tries = 0
 
@@ -346,7 +340,7 @@
          end if
 
          !use new eccentricity to calculate new time coordinate
-         do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
+         do i = 1,b% anomaly_steps  ! time between periastron and polar angle theta
             b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
                             tan(b% theta_co(i)/2d0) ) - b% eccentricity * &
                             sqrt(1 - pow2(b% eccentricity)) * sin(b% theta_co(i)) / &
@@ -371,9 +365,9 @@
          b% rl(1) = eval_rlobe(b% m(1), b% m(2), b% separation)
          b% rl(2) = eval_rlobe(b% m(2), b% m(1), b% separation)
          b% rl_relative_gap(1) = (b% r(1) - b% rl(1) * (1 - b% eccentricity) ) / &
-             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact
+             b% rl(1) / (1 - b% eccentricity)  ! gap < 0 means out of contact
          b% rl_relative_gap(2) = (b% r(2) - b% rl(2) * (1 - b% eccentricity) ) / &
-             b% rl(2) / (1 - b% eccentricity) ! gap < 0 means out of contact
+             b% rl(2) / (1 - b% eccentricity)  ! gap < 0 means out of contact
 
          if (is_bad(b% rl_relative_gap(1)) .or. is_bad(b% rl_relative_gap(2))) then
             write(*,*) "rl_relative_gap for each component", b% rl_relative_gap(1), b% rl_relative_gap(2)
@@ -415,7 +409,7 @@
          binary_check_model = keep_going
 
          if (.not. b% ignore_rlof_flag) then
-            if (implicit_rlo) then ! check agreement between new r and new rl
+            if (implicit_rlo) then  ! check agreement between new r and new rl
                if (.not. b% use_other_check_implicit_rlo) then
                   binary_check_model = check_implicit_rlo(b% binary_id, new_mdot)
                else
@@ -428,7 +422,7 @@
                   b% s_donor% was_in_implicit_wind_limit
             else
                if (.not. b% use_other_rlo_mdot) then
-                  call rlo_mdot(b% binary_id, new_mdot, ierr) ! grams per second
+                  call rlo_mdot(b% binary_id, new_mdot, ierr)  ! grams per second
                   if (ierr /= 0) then
                      write(*,*) 'failed in rlo_mdot'
                      binary_check_model = retry
@@ -453,7 +447,7 @@
             end if
             b% mtransfer_rate = new_mdot
          else
-            b% mtransfer_rate = 0
+            b% mtransfer_rate = 0d0
          end if
          call adjust_irradiation(b)
 

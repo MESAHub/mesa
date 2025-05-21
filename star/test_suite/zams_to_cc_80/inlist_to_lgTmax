@@ -24,7 +24,7 @@
       min_q_for_drag = 0.8d0
 
       set_min_D_mix = .true.
-      min_D_mix = 1d-2 
+      min_D_mix = 1d-2
 
       log_max_temp_upper_limit = 9.600d0
 
@@ -59,27 +59,25 @@
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-      
+
       x_integer_ctrl(5) =  6 ! Inlist part number
 
 / ! end of controls namelist
 
 
-
 &pgstar
 
-TRho_logT_min = 8.6d0
-TRho_logRho_min = 5d0
-TRho_logRho_max = 10d0
-TRho_logT_max = 10d0
+   TRho_logT_min = 8.6d0
+   TRho_logRho_min = 5d0
+   TRho_logRho_max = 10d0
+   TRho_logT_max = 10d0
 
+   !pause_flag = .true.
+   Profile_Panels3_xmin = 0 ! -101d0
+   Profile_Panels3_xmax =-101d0 !
+   Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
-!pause = .true.
-Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax =-101d0 ! 
-Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
-
-TRho_Profile_xmin = -12d0
-TRho_Profile_ymin = 3.0d0
+   TRho_Profile_xmin = -12d0
+   TRho_Profile_ymin = 3.0d0
 
 / ! end of pgstar namelist

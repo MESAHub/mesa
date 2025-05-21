@@ -16,7 +16,7 @@ Inlists
 
 This test case has two parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_zams``) creates a 15 Msun, Z=0.02 metallicity, main-sequence model using the default 8 isotope ``basic.net``.
+* Part 1 (``inlist_zams``) creates a 15 |Msun|, Z=0.02 metallicity, main-sequence model using the default 8 isotope ``basic.net``.
 
 * Part 2 (``inlist_adjust_net_header``) continues the evolution, activates the adaptive nuclear reaction network, and terminates at about 2 million years with 62 isotopes in the reaction network:
 
@@ -38,10 +38,8 @@ pgstar commands used for the plots above:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -73,7 +71,7 @@ pgstar commands used for the plots above:
 
     History_Track1_win_flag = .true.
     History_Track1_win_width = 12
-    History_Track1_title = 'adjust_net'                                                                                                                                                                                   
+    History_Track1_title = 'adjust_net'
     History_Track1_xname = 'model_number'
     History_Track1_xaxis_label = 'model number'
 
@@ -98,6 +96,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 31May2021 (MESA e37f76f) by fxt
-

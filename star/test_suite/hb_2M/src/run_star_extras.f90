@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -124,7 +121,7 @@
          include 'formats'
 
          select case (s% x_integer_ctrl(1))
-         case (3) ! inlist_hb_2M
+         case (3)  ! inlist_hb_2M
 
             ! put target info in TestHub output
             testhub_extras_names(1) = 'mass_conv_core_y050'; testhub_extras_vals(1) = mass_conv_core_y050
@@ -139,7 +136,7 @@
             max_mass_conv_core = s% x_ctrl(2)
 
             ! check if value is outside of the target range
-            if ((mass_conv_core_y050 .lt. min_mass_conv_core) .or. (mass_conv_core_y050 .gt. max_mass_conv_core)) then
+            if ((mass_conv_core_y050 < min_mass_conv_core) .or. (mass_conv_core_y050 > max_mass_conv_core)) then
                write(*,*) 'bad value for mass_conv_core_y050'
                write(*,1) 'min allowed value', min_mass_conv_core
                write(*,1) 'mass_conv_core_y050', mass_conv_core_y050
@@ -234,13 +231,12 @@
          ! during part 3: CHeB
          if (s% x_integer_ctrl(1) == 3) then
             ! save core mass the first time Yc < 0.5
-            if (s% center_he4 .lt. 0.5d0 .and. mass_conv_core_y050 .lt. 0) then
+            if (s% center_he4 < 0.5d0 .and. mass_conv_core_y050 < 0) then
                mass_conv_core_y050 = s% mass_conv_core
             end if
          end if
 
       end function extras_finish_step
-
 
 
       end module run_star_extras

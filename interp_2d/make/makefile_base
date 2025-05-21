@@ -13,25 +13,25 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   bicub_sg.f \
-   bicub_db.f \
-   bipm_db.f \
-   bipm_sg.f \
-   akima760_sg.f \
-   akima760_db.f \
-   renka790_sg.f \
-   renka790_db.f \
-   interp_2d_lib_db.f90 \
-   interp_2d_lib_sg.f90
+  bicub_sg.f \
+  bicub_db.f \
+  bipm_db.f90 \
+  bipm_sg.f90 \
+  akima760_sg.f \
+  akima760_db.f \
+  renka790_sg.f \
+  renka790_db.f \
+  interp_2d_lib_db.f90 \
+  interp_2d_lib_sg.f90
 
 #################################################################
 #
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-    LIBS_OTHER = num auto_diff interp_1d $(LIBS_MATRIX)
-    DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-    LOAD_OTHER = -L$(MESA_LIB_DIR) -lnum -lauto_diff -linterp_1d $(LOAD_MATRIX)
+  LIBS_OTHER = num auto_diff interp_1d $(LIBS_MATRIX)
+  DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+  LOAD_OTHER = -L$(MESA_LIB_DIR) -lnum -lauto_diff -linterp_1d $(LOAD_MATRIX)
 endif
 
 #################################################################
@@ -72,7 +72,7 @@ COMPILE_FIXED = $(COMPILE_NO_CHECKS) $(FCfixed)
 
 COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_FIXED))
 
-renka790_sg.o renka790_db.o bicub_sg.o bicub_db1.o bicub_db.o bicub_db2.o : %.o : %.f
+renka790_sg.o renka790_db.o bicub_sg.o bicub_db.o : %.o : %.f
 ifneq ($(QUIET),)
 	@echo COMPILE_NO_CHECKS $<
 	@$(COMPILE_NO_CHECKS) $(FCfixed) $<

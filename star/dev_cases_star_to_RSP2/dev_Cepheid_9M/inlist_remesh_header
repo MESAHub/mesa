@@ -25,15 +25,15 @@
 
 &controls
    read_extra_controls_inlist(1) = .true.
-   extra_controls_inlist_name(1)= '../shared/inlist_remesh_header'
+   extra_controls_inlist_name(1) = '../shared/inlist_remesh_header'
    read_extra_controls_inlist(3) = .true.
-   extra_controls_inlist_name(3)= 'inlist_remesh'
+   extra_controls_inlist_name(3) = 'inlist_remesh'
 / ! end of controls namelist
 
 
 &pgstar
    read_extra_pgstar_inlist(1) = .true.
-   extra_pgstar_inlist_name(1)= '../shared/inlist_remesh_header'
+   extra_pgstar_inlist_name(1) = '../shared/inlist_remesh_header'
    read_extra_pgstar_inlist(2) = .true.
-   extra_pgstar_inlist_name(2)= 'inlist_remesh'
+   extra_pgstar_inlist_name(2) = 'inlist_remesh'
 / ! end of pgstar namelist

@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -188,7 +182,7 @@
                if (cid1 > 0 .and. cid2 > 0) then
                   i1 = g% net_iso(cid1)
                   i2 = g% net_iso(cid2)
-                  if (i1 == 0 .or. i2 == 0) then ! not in current net
+                  if (i1 == 0 .or. i2 == 0) then  ! not in current net
                      if (g% doing_approx21 .and. &
                               .not. (cid1 == ico55 .or. cid1 == ico57 .or. &
                                      cid2 == ico55 .or. cid2 == ico57 .or. &
@@ -226,8 +220,8 @@
             logical, intent(in) :: init
             integer, intent(in) :: jscr
             type (Screen_Info) :: sc
-            integer, intent(in) :: i1, i2 ! chem id's for the isotopes
-            integer, intent(in) :: i ! rate number
+            integer, intent(in) :: i1, i2  ! chem id's for the isotopes
+            integer, intent(in) :: i  ! rate number
             integer, intent(in) :: ir
             integer, intent(out) :: ierr
             real(dp) :: sc1a, sc1adt, sc1add, a1, z1, a2, z2
@@ -254,8 +248,8 @@
             logical, intent(in) :: init
             integer, intent(in) :: jscr
             type (Screen_Info) :: sc
-            integer, intent(in) :: i1_in, i2_in, i3_in ! chem id's for the isotopes
-            integer, intent(in) :: i ! rate number
+            integer, intent(in) :: i1_in, i2_in, i3_in  ! chem id's for the isotopes
+            integer, intent(in) :: i  ! rate number
             integer, intent(in) :: ir
             integer, intent(out) :: ierr
             integer :: i1, i2, i3, ii
@@ -273,7 +267,7 @@
             a3 = chem_isos% Z_plus_N(i3)
             z3 = dble(chem_isos% Z(i3))
             if (z2 == 0) then
-               if (z1 == 0) return ! n + n + A
+               if (z1 == 0) return  ! n + n + A
                ! have A + n + B
                ! swap 1 and 2 so have n + A + B
                ii = i2; i2 = i1; i1 = ii
@@ -282,7 +276,7 @@
                a2 = chem_isos% Z_plus_N(i2)
                z2 = dble(chem_isos% Z(i2))
             end if
-            if (z3 == 0) then ! have A + B + n
+            if (z3 == 0) then  ! have A + B + n
                ! swap 1 and 3 so have n + A + B
                ii = i1; i1 = i3; i3 = ii
                a1 = chem_isos% Z_plus_N(i1)
@@ -296,9 +290,9 @@
             if (z1 == 0) then
                if (init) return
                call set_rate_screening(i, sc2, sc2dt, sc2dd)
-               return ! n + (A + B)
+               return  ! n + (A + B)
             end if
-            i2 = 0 ! 0 for cid to disable caching
+            i2 = 0  ! 0 for cid to disable caching
             a2 = a2 + a3
             z2 = z2 + z3
             call screening_pair( &
@@ -529,7 +523,7 @@
             pg_raw_rate = rate_raw(irpg)
             pa_raw_rate = rate_raw(irpa)
 
-            if (pg_raw_rate + pa_raw_rate < 1d-99) then ! avoid divide by 0
+            if (pg_raw_rate + pa_raw_rate < 1d-99) then  ! avoid divide by 0
                pg_raw_rate = 1; pa_raw_rate = 1
             end if
 

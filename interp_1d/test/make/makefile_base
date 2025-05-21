@@ -12,7 +12,7 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-SRCS = interp_1d_support.f interp_1d_support_sg.f test_interp_1d.f
+SRCS = interp_1d_support.f90 interp_1d_support_sg.f90 test_interp_1d.f90
 
 #################################################################
 #
@@ -51,12 +51,12 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
-	@$(TEST_COMPILE) $(FCfixed) $<
+	@$(TEST_COMPILE) $(FCfree) $<
 else
-	$(TEST_COMPILE) $(FCfixed) $<
+	$(TEST_COMPILE) $(FCfree) $<
 endif
 
 #################################################################
@@ -65,7 +65,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

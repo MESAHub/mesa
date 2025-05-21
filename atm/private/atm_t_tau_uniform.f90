@@ -2,49 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_T_tau_uniform
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, pi, ln10, clight, crad
   use math_lib
   use utils_lib, only: mesa_error
   use utils_lib, only: is_bad
 
-  ! No implicit typing
-
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: eval_T_tau_uniform
   public :: build_T_tau_uniform
-
-  ! Procedures
 
 contains
 
@@ -186,7 +170,7 @@ contains
 
        if (err < 1._dp) exit iterate_loop
 
-       kap = kap_prev + 0.5_dp*(kap - kap_prev) ! under correct
+       kap = kap_prev + 0.5_dp*(kap - kap_prev)  ! under correct
 
        ! Re-evaluate atmosphere data
 
@@ -247,15 +231,12 @@ contains
        dlnP_dlnkap = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine eval_T_tau_uniform
 
-  !****
 
   ! Build atmosphere structure data from T-tau relation with uniform
   ! opacity
@@ -320,7 +301,7 @@ contains
 
     ! Sanity check
 
-    if (dlogtau <= 0.) then
+    if (dlogtau <= 0._dp) then
        write(*,*) 'atm: Invalid dlogtau in build_T_tau_uniform:', dlogtau
        call mesa_error(__FILE__,__LINE__)
     end if
@@ -433,11 +414,8 @@ contains
 
       f(1) = -tau/(kap*rho)
 
-      ! Finish
-
     end subroutine build_fcn
 
-    !****
 
     subroutine build_solout( &
          nr, xold, x, n, y, rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, irtrn)
@@ -493,13 +471,10 @@ contains
 
       atm_structure(:,atm_structure_num_pts) = atm_structure_sgl
 
-      ! Finish
-
       return
 
     end subroutine build_solout
 
-    !***
 
     subroutine build_data(lntau, delta_r, atm_structure_sgl, ierr)
 
@@ -563,12 +538,12 @@ contains
 
       ! Store data
 
-      atm_structure_sgl(atm_xm) = 0._dp ! We assume negligible mass in the atmosphere
+      atm_structure_sgl(atm_xm) = 0._dp  ! We assume negligible mass in the atmosphere
       atm_structure_sgl(atm_delta_r) = delta_r
       atm_structure_sgl(atm_lnP) = lnP
       atm_structure_sgl(atm_lnd) = lnRho
       atm_structure_sgl(atm_lnT) = lnT
-      atm_structure_sgl(atm_gradT) = gradr ! by assumption, atm is radiative
+      atm_structure_sgl(atm_gradT) = gradr  ! by assumption, atm is radiative
       atm_structure_sgl(atm_kap) = kap
       atm_structure_sgl(atm_gamma1) = res(i_gamma1)
       atm_structure_sgl(atm_grada) = res(i_grad_ad)
@@ -587,7 +562,6 @@ contains
 
   end subroutine build_T_tau_uniform
 
-  !****
 
   ! Evaluate atmosphere data
 
@@ -719,9 +693,7 @@ contains
        dlnT_dlnM = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
+    end if
 
     return
 

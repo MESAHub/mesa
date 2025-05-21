@@ -2,25 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -53,10 +46,7 @@
 
       integer, parameter :: file_max_num_logQs = 1000
 
-
-
       contains
-
 
       subroutine request_user_to_reinstall
          write(*,'(A)')
@@ -233,7 +223,7 @@
          integer :: j, i, k, iQ, ios, status
          character (len=1000) :: message
          real(dp), parameter :: tiny = 1d-10
-         real(dp), pointer :: tbl(:,:,:,:) ! => ep% tbl1
+         real(dp), pointer :: tbl(:,:,:,:)  ! => ep% tbl1
          real(dp), pointer :: tbl2_1(:), tbl2(:,:,:)
          real(dp), target :: vec_ary(50)
          real(dp), pointer :: vec(:)
@@ -327,7 +317,7 @@
 
          status = 0
          allocate(tbl2_1(num_eos_file_vals*ep% num_logQs*ep% num_logTs), STAT=status)
-         if (status .ne. 0) then
+         if (status /= 0) then
             info = -1
             return
          end if
@@ -377,7 +367,7 @@
                   tbl2(j,iQ,i) = vec(1+j)
                end do
 
-            enddo
+            end do
 
             if(iQ == ep% num_logQs) exit
             read(io_unit,*,iostat=info)
@@ -450,13 +440,13 @@
          use const_def, only: crad, ln10
 
          type (EosDT_XZ_Info), pointer :: ep
-         real(dp), pointer :: tbl2_1(:) ! =(num_eos_file_vals, ep% num_logQs, ep% num_logTs)
+         real(dp), pointer :: tbl2_1(:)  ! =(num_eos_file_vals, ep% num_logQs, ep% num_logTs)
          integer, intent(out) :: info
 
          real(dp) :: logQs(ep% num_logQs)              ! x vector, strict ascending
          real(dp) :: logTs(ep% num_logTs)                    ! y vector, strict ascending
          real(dp) :: Ts(ep% num_logTs)
-         real(dp), allocatable, target :: f1_ary(:) ! data & spline coefficients
+         real(dp), allocatable, target :: f1_ary(:)  ! data & spline coefficients
          real(dp), pointer :: f1(:), f(:,:,:), ep_tbl(:,:,:,:), tbl2(:,:,:)
          integer :: ibcxmin                   ! bc flag for x=xmin
          real(dp) :: bcxmin(ep% num_logTs)    ! bc data vs. y at x=xmin
@@ -570,7 +560,7 @@
          real(dp), intent(in) :: X, Z
          type (EosDT_XZ_Info), pointer :: ep
          character (*), intent(in) :: cache_filename
-         integer, intent(in) :: io_unit ! use this for file access
+         integer, intent(in) :: io_unit  ! use this for file access
          integer, intent(out) :: ios
 
          real(dp) :: X_in, Z_in, logT_min_in, logT_max_in, del_logT_in,  &
@@ -649,6 +639,5 @@
          close(io_unit)
 
       end subroutine Read_EoS_Cache
-
 
       end module eosDT_load_tables

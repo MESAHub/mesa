@@ -2,35 +2,28 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module mod_neu
-      use const_def
+      use const_def, only: dp, pi, ln10, weinberg_theta, num_neu_fam, iln10, one_third, two_thirds, one_sixth, arg_not_provided
       use neu_def
       use math_lib
       use utils_lib, only: mesa_error
 
       implicit none
-
 
       !..various numerical constants
 
@@ -38,22 +31,20 @@
 
       !..cv and ca are the vector and axial currents.
 
-      real(dp), parameter :: cv     = 0.5d0 + 2.0d0 * weinberg_theta
-      real(dp), parameter :: cvp    = 1.0d0 - cv
-      real(dp), parameter :: ca     = 0.5d0
-      real(dp), parameter :: cap    = 1.0d0 - ca
-      real(dp), parameter :: tfac1  = cv*cv + ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp+cap*cap)
-      real(dp), parameter :: tfac2  = cv*cv - ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp - cap*cap)
-      real(dp), parameter :: tfac3  = tfac2/tfac1
-      real(dp), parameter :: tfac4  = 0.5d0 * tfac1
-      real(dp), parameter :: tfac5  = 0.5d0 * tfac2
-      real(dp), parameter :: tfac6  = cv*cv + 1.5d0*ca*ca + (num_neu_fam - 1.0d0)*(cvp*cvp + 1.5d0*cap*cap)
+      real(dp), parameter :: cv    = 0.5d0 + 2.0d0 * weinberg_theta
+      real(dp), parameter :: cvp   = 1.0d0 - cv
+      real(dp), parameter :: ca    = 0.5d0
+      real(dp), parameter :: cap   = 1.0d0 - ca
+      real(dp), parameter :: tfac1 = cv*cv + ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp+cap*cap)
+      real(dp), parameter :: tfac2 = cv*cv - ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp - cap*cap)
+      real(dp), parameter :: tfac3 = tfac2/tfac1
+      real(dp), parameter :: tfac4 = 0.5d0 * tfac1
+      real(dp), parameter :: tfac5 = 0.5d0 * tfac2
+      real(dp), parameter :: tfac6 = cv*cv + 1.5d0*ca*ca + (num_neu_fam - 1.0d0)*(cvp*cvp + 1.5d0*cap*cap)
 
-
-
-      real(dp), parameter :: fac1   = 5.0d0 * pi / 3.0d0
-      real(dp), parameter :: fac2   = 10.0d0 * pi
-      real(dp), parameter :: fac3   = pi / 5.0d0
+      real(dp), parameter :: fac1 = 5.0d0 * pi / 3.0d0
+      real(dp), parameter :: fac2 = 10.0d0 * pi
+      real(dp), parameter :: fac3 = pi / 5.0d0
 
 
       type t8s
@@ -79,8 +70,9 @@
 !..maximum error is 4.19d-9.   reference: antia apjs 84,101 1993
 
 !..declare
-      integer          i,m1,k1,m2,k2
-      real(dp) f,an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
+      real(dp), intent(in) :: f
+      integer :: i,m1,k1,m2,k2
+      real(dp) :: an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
 
 
 !..load the coefficients of the expansion
@@ -99,15 +91,15 @@
                           -1.145531476975d0,  -6.067091689181d-2/
 
 
-      if (f .lt. 4.0d0) then
+      if (f < 4.0d0) then
          rn  = f + a1(m1)
          do i=m1-1,1,-1
             rn  = rn*f + a1(i)
-         enddo
+         end do
          den = b1(k1+1)
          do i=k1,1,-1
             den = den*f + b1(i)
-         enddo
+         end do
          ifermi12 = log(f * rn/den)
 
       else
@@ -115,19 +107,15 @@
          rn = ff + a2(m2)
          do i=m2-1,1,-1
             rn = rn*ff + a2(i)
-         enddo
+         end do
          den = b2(k2+1)
          do i=k2,1,-1
             den = den*ff + b2(i)
-         enddo
+         end do
          ifermi12 = rn/(den*ff)
       end if
 
       end function ifermi12
-
-
-
-
 
 
       real(dp) function zfermim12(x)
@@ -137,8 +125,9 @@
 !..reference: antia apjs 84,101 1993
 
 !..declare
-      integer          i,m1,k1,m2,k2
-      real(dp) x,an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
+      real(dp), intent(in) :: x
+      integer :: i,m1,k1,m2,k2
+      real(dp) :: an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
 
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /-0.5d0, 7, 7, 11, 11/
@@ -164,33 +153,31 @@
                            1.86795964993052d0,    4.16485970495288d-1/
 
 
-      if (x .lt. 2.0d0) then
+      if (x < 2.0d0) then
          xx = exp(x)
          rn = xx + a1(m1)
          do i=m1-1,1,-1
             rn = rn*xx + a1(i)
-         enddo
+         end do
          den = b1(k1+1)
          do i=k1,1,-1
             den = den*xx + b1(i)
-         enddo
+         end do
          zfermim12 = xx * rn/den
-!..
       else
          xx = 1.0d0/(x*x)
          rn = xx + a2(m2)
          do i=m2-1,1,-1
             rn = rn*xx + a2(i)
-         enddo
+         end do
          den = b2(k2+1)
          do i=k2,1,-1
             den = den*xx + b2(i)
-         enddo
+         end do
          zfermim12 = sqrt(x)*rn/den
       end if
 
       end function zfermim12
-
 
 
       subroutine neutrinos(T, logT, Rho, logRho, abar, zbar, log10_Tlim,  &
@@ -203,20 +190,20 @@
       ! provide T or logT or both (the code needs both, so pass 'em if you've got 'em!)
       ! same for Rho and logRho
 
-      real(dp), intent(in) :: T ! temperature
-      real(dp), intent(in) :: logT ! log10 of temperature
-      real(dp), intent(in) :: Rho ! density
-      real(dp), intent(in) :: logRho ! log10 of density
-      real(dp), intent(in) :: abar ! mean atomic weight
-      real(dp), intent(in) :: zbar ! mean charge
-      real(dp), intent(in) :: log10_Tlim ! start to cutoff at this temperature
-      logical, intent(in) :: flags(num_neu_types) ! true if should include the type
+      real(dp), intent(in) :: T  ! temperature
+      real(dp), intent(in) :: logT  ! log10 of temperature
+      real(dp), intent(in) :: Rho  ! density
+      real(dp), intent(in) :: logRho  ! log10 of density
+      real(dp), intent(in) :: abar  ! mean atomic weight
+      real(dp), intent(in) :: zbar  ! mean charge
+      real(dp), intent(in) :: log10_Tlim  ! start to cutoff at this temperature
+      logical, intent(in) :: flags(num_neu_types)  ! true if should include the type
       ! in most cases for stellar evolution, you may want to include brem, plas, pair, and phot
       ! but skip reco.  it is fairly expensive to compute and typically makes only a small contribution.
 
-      real(dp), intent(inout) :: loss(num_neu_rvs) ! total from all sources
+      real(dp), intent(inout) :: loss(num_neu_rvs)  ! total from all sources
       real(dp), intent(inout) :: sources(num_neu_types, num_neu_rvs)
-      integer, intent(out) :: info ! 0 means AOK.
+      integer, intent(out) :: info  ! 0 means AOK.
 
 !..local variables
       type(inputs) ::  input
@@ -224,7 +211,7 @@
       real(dp) :: temp,logtemp,den,logden,tcutoff_factor
 
       real(dp) :: snu, dsnudt, dsnudd, dsnuda, dsnudz, dtcutoff_factordt, dtlim
-      real(dp) spair,spairdt,spairdd,spairda,spairdz, &
+      real(dp) :: spair,spairdt,spairdd,spairda,spairdz, &
                        splas,splasdt,splasdd,splasda,splasdz, &
                        sphot,sphotdt,sphotdd,sphotda,sphotdz, &
                        sbrem,sbremdt,sbremdd,sbremda,sbremdz, &
@@ -233,8 +220,8 @@
 
       info = 0
 
-      if ((T /= arg_not_provided .and. T .le. Tmin_neu) .or. &
-            (logT /= arg_not_provided .and. logT .le. log10Tmin_neu)) then
+      if ((T /= arg_not_provided .and. T <= Tmin_neu) .or. &
+            (logT /= arg_not_provided .and. logT <= log10Tmin_neu)) then
          loss = 0d0
          sources(1:num_neu_types, 1:num_neu_rvs) = 0d0
          return
@@ -534,7 +521,7 @@
          real(dp), intent(out) :: sphot,sphotdt,sphotdd,sphotda,sphotdz
          type(inputs), intent(in) :: input
 
-         real(dp) tau,taudt,cos1,cos2,cos3,cos4,cos5,sin1,sin2, &
+         real(dp) :: tau,taudt,cos1,cos2,cos3,cos4,cos5,sin1,sin2, &
             sin3,sin4,sin5,last,xast, &
             fphot,fphotdt,fphotdd,fphotda,fphotdz, &
             qphot,qphotdt,qphotdd,qphotda,qphotdz
@@ -563,9 +550,9 @@
          sphotda = 0.0d0
          sphotdz = 0.0d0
 
-         if(input% temp .le.1.0d7) then
+         if(input% temp <=1.0d7) then
             return
-         else if (input% temp .ge. 1.0d7  .and. input% temp .lt. 1.0d8) then
+         else if (input% temp >= 1.0d7  .and. input% temp < 1.0d8) then
             tau  =  input% logtemp - 7d0
             cc   =  0.5654d0 + tau
             dccdt = 1d0/(ln10*input% temp)
@@ -606,7 +593,7 @@
             dd24 = -4.222d9
             dd25 = -1.560d9
 
-         else if (input% temp .ge. 1.0d8  .and. input% temp .lt. 1.0d9) then
+         else if (input% temp >= 1.0d8  .and. input% temp < 1.0d9) then
             tau   =  input% logtemp - 8d0
             cc   =  1.5654d0
             dccdt = 0d0
@@ -647,7 +634,7 @@
             dd24 = -3.035d9
             dd25 = -1.598d9
 
-         else if (input% temp .ge. 1.0d9) then
+         else if (input% temp >= 1.0d9) then
             tau  =  input% logtemp - 9d0
             cc   =  1.5654d0
             dccdt = 0d0
@@ -835,7 +822,7 @@
             write(*,*)
          end if
 
-         if (sphot .le. 0.0d0) then
+         if (sphot <= 0.0d0) then
             sphot   = 0.0d0
             sphotdt = 0.0d0
             sphotdd = 0.0d0
@@ -922,7 +909,6 @@
          fbremdz = xdendz
 
 
-
    !..equation 5.9
          a0    = 230.0d0 + 6.7d5*t8% t8m2 + 7.66d9*t8% t8m5
          f0    = (-2.0d0*6.7d5*t8% t8m3 - 5.0d0*7.66d9*t8% t8m6)*1.0d-8
@@ -975,7 +961,6 @@
          gbremdd = xnumdd + xdendd
          gbremda = xnumda + xdenda
          gbremdz = xnumdz + xdendz
-
 
 
    !..equation 5.1
@@ -1223,15 +1208,15 @@
          U = pow(input% den6*input% ye,two_thirds)
          tfermi = A * (sqrt(U) - D)
 
-         if (input% temp .ge. tfhi * tfermi) then
+         if (input% temp >= tfhi * tfermi) then
 
             call brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
 
-         else if (input% temp .le. tflo * tfermi) then
+         else if (input% temp <= tflo * tfermi) then
 
             call brem_neu_liquid_metal(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
 
-         else ! blend
+         else  ! blend
 
             call brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
             sb   = sbrem
@@ -1343,7 +1328,7 @@
          nu3  = nu2 * nu
 
    !..table 12
-         if (nu .ge. -20.0d0  .and. nu .lt. 0.0d0) then
+         if (nu >= -20.0d0  .and. nu < 0.0d0) then
             a1 = 1.51d-2
             a2 = 2.42d-1
             a3 = 1.21d0
@@ -1353,7 +1338,7 @@
             f1 = 0.0d0
             f2 = 0.0d0
             f3 = 0.0d0
-         else if (nu .ge. 0.0d0  .and. nu .le. 10.0d0) then
+         else if (nu >= 0.0d0  .and. nu <= 10.0d0) then
             a1 = 1.23d-2
             a2 = 2.66d-1
             a3 = 1.30d0
@@ -1367,7 +1352,7 @@
 
 
    !..equation 6.7, 6.13 and 6.14
-         if (nu .ge. -20.0d0  .and.  nu .le. 10.0d0) then
+         if (nu >= -20.0d0  .and.  nu <= 10.0d0) then
 
             zeta   = 1.579d5*input% zbar*input% zbar*input% tempi
             zetadt = -zeta*input% tempi
@@ -1519,7 +1504,7 @@
 
 
    !..equation 4.11
-         if (abs(xnum) .gt. 0.7d0  .or.  xden .lt. 0.0d0) then
+         if (abs(xnum) > 0.7d0  .or.  xden < 0.0d0) then
             fxy   = 1.0d0
             fxydt = 0.0d0
             fxydd = 0.0d0
@@ -1535,7 +1520,7 @@
             b2  = -b1*2.0d0*(4.5d0*xnum + 0.9d0)*4.5d0
 
             c   = min(0.0d0, xden - 1.6d0 + 1.25d0*xnum)
-         if (c .eq. 0.0d0) then
+         if (c == 0.0d0) then
             dumdt = 0.0d0
             dumdd = 0.0d0
             dumda = 0.0d0
@@ -1564,7 +1549,6 @@
             fxydz = (a2*xnumdz -  b2*xnumdz)*c00 + (a1-b1)*c04
 
          end if
-
 
 
    !..equation 4.1 and 4.5
@@ -1609,7 +1593,6 @@
       end subroutine plas_neu
 
 
-
       subroutine pair_neu(spair,spairdt,spairdd,spairda,spairdz, input)
          real(dp), intent(out) :: spair,spairdt,spairdd,spairda,spairdz
          type(inputs), intent(in) :: input
@@ -1634,7 +1617,7 @@
          a1     = 6.002d19 + 2.084d20*input% zeta + 1.872d21*input% zeta2
          a2     = 2.084d20 + 2.0d0*1.872d21*input% zeta
 
-         if (input% t9 .lt. 10.0d0) then
+         if (input% t9 < 10.0d0) then
             b1     = exp(-5.5924d0*input% zeta)
             b2     = -b1*5.5924d0
          else
@@ -1649,7 +1632,7 @@
          xnumda = c*input% zetada
          xnumdz = c*input% zetadz
 
-         if (input% t9 .lt. 10.0d0) then
+         if (input% t9 < 10.0d0) then
             a1   = 9.383d-1*input% xlm1 - 4.141d-1*input% xlm2 + 5.829d-2*input% xlm3
             a2   = -9.383d-1*input% xlm2 + 2.0d0*4.141d-1*input% xlm3 - 3.0d0*5.829d-2*input% xlm4
          else
@@ -1730,6 +1713,3 @@
 
 
       end module mod_neu
-
-
-

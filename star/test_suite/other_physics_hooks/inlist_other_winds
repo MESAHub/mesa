@@ -16,11 +16,11 @@
 
       ! Grafener, G. & Hamann, W.-R. 2008, A&A 482, 945
       ! contributed to mesa by Nilou Afsari
-      
+
       Grafener_scaling_factor = 0d0
-      
-      
+
+
       Stern51_scaling_factor = 0d0
-      
+
 
 / ! end of other_winds

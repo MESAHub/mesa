@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 rm -rf forum
-tar xf forum-1.0.3.tar.gz
-mv forum-1.0.3 forum
+tar xf forum-1.0.4.tar.gz
+mv forum-1.0.4 forum
 
 ../utils/build_and_test_parallel
 

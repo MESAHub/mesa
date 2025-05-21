@@ -2,38 +2,32 @@
 !
 !   Copyright (C) 2012-2019  Phil Arras & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module create_initial_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, &
+                           arg_not_provided, two_thirds, four_thirds_pi
       use chem_def
 
       implicit none
 
       private
       public :: build_initial_model
-
 
       integer :: eos_handle, kap_handle, species
 
@@ -56,9 +50,7 @@
       type (create_star_info), target, save :: &
          create_star_handles(max_create_star_handles)
 
-
       contains
-
 
       subroutine get_create_star_ptr(id,cs,ierr)
          integer, intent(in) :: id
@@ -155,8 +147,8 @@
             mass_correction, sumx)
 
          G = standard_cgrav
-         Tmin = 0.d0 ! sets surface isotherm
-         eps = s% initial_model_eps ! integration accuracy
+         Tmin = 0.d0  ! sets surface isotherm
+         eps = s% initial_model_eps  ! integration accuracy
          R_try = R   ! used to set grid spacing near the center
 
          ! init guess
@@ -215,7 +207,7 @@
 
          end do
 
-         s% nz = cs% nz - 1 ! skip center point
+         s% nz = cs% nz - 1  ! skip center point
          call allocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             return
@@ -233,7 +225,7 @@
          i_lum = s% i_lum
 
          do k=1, s% nz
-            i = s% nz - k + 2 ! skip center point
+            i = s% nz - k + 2  ! skip center point
             call store_rho_in_xh(s, k, cs% rhog(i))
             call store_T_in_xh(s, k, cs% Tg(i))
             call store_r_in_xh(s, k, cs% rg(i))
@@ -309,7 +301,7 @@
          m1 = four_thirds_pi * rhoc * r1*r1*r1
          P = Pc - two_thirds*pi * G*rhoc*rhoc*r1*r1
          intdmT1=m1*Tc
-         y=(/r1,m1,intdmT1/)
+         y=[r1,m1,intdmT1]
          call get_TRho_from_PS(cs,P,S,T,rho)
 
          ! record first point off center
@@ -359,11 +351,11 @@
             if (T<150.d0) then
                print *,"temp too low in integration"
                stop
-            endif
+            end if
 
             if (tau < 2.d0/3.d0) then
                exitnow=.true.
-            endif
+            end if
 
             if (exitnow) exit
 
@@ -459,7 +451,7 @@
          if(ierr/=0) then
             write(*,*) 'kap_get failed'
             stop
-         endif
+         end if
 
       end subroutine get_kap_from_rhoT
 
@@ -498,7 +490,7 @@
          if (ierr /=0) then
             print *,"failure in eosPT_get_T"
             stop
-         endif
+         end if
          T = exp10(logT_result)
 
     ! don't let T get below min temp. use to make a surface isotherm.
@@ -506,6 +498,4 @@
 
       end subroutine get_TRho_from_PS
 
-
       end module create_initial_model
-

@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2018-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -35,7 +32,6 @@ module run_star_extras
       contains
 
       include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -158,7 +154,7 @@ module run_star_extras
          write(io_out,'(99a20)') 'model_number', 'period(d)', 'growth', &
             'Teff', 'L', 'star_age'
 
-         s% RSP_nmodes = 1 ! just F
+         s% RSP_nmodes = 1  ! just F
          finished_1st_crossing = .false.
          in_2nd_crossing = .false.
          have_first = .false.
@@ -180,18 +176,18 @@ module run_star_extras
             if (s% RSP_Teff < prev_Teff) then
                !write(*,2) 'still going to lower T', modnums(model_cnt), s% RSP_Teff, prev_Teff
                prev_Teff = s% RSP_Teff
-               cycle search_loop ! still going to lower Ts
+               cycle search_loop  ! still going to lower Ts
             end if
             max_T = exp10(get_blue_logT(log_L))
             min_T = exp10(get_red_logT(log_L))
             if (s% RSP_Teff < min_T - 4*delta_Teff) then
                !write(*,2) 'too far from red edge', modnums(model_cnt), s% RSP_Teff, min_T
                prev_Teff = s% RSP_Teff
-               cycle search_loop ! too far from red edge
+               cycle search_loop  ! too far from red edge
             end if
             if (have_first .and. s% RSP_Teff - delta_Teff < prev_Teff) then
                !write(*,2) 'too close to prev', modnums(model_cnt), s% RSP_Teff - delta_Teff - prev_Teff
-               cycle search_loop ! too close to prev
+               cycle search_loop  ! too close to prev
             end if
             !if (s% RSP_Teff < 0.5d0*(min_T + max_T)) cycle search_loop ! too far from blue edge
             write(*,*) 'call star_do1_rsp_build model Teff L', &
@@ -358,7 +354,7 @@ module run_star_extras
 
          !deallocate(f1, work1, x_new, v_new)
 
-         ierr = -1 ! to force termination of run
+         ierr = -1  ! to force termination of run
 
          contains
 
@@ -495,8 +491,4 @@ module run_star_extras
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
 
-
-
-
       end module run_star_extras
-

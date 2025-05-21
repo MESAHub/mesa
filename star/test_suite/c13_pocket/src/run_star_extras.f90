@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010-2020  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -338,14 +335,14 @@
          case (1)
 
             ! measure MS lifetime
-            if (ms_t0 .eq. 0) then
-               if (s% power_h_burn .gt. 0.99 * s% L_surf) then
+            if (ms_t0 == 0) then
+               if (s% power_h_burn > 0.99d0 * s% L_surf) then
                   ms_t0 = s% star_age
                   write(*,*) 'started MS', ms_t0
                end if
             else
-               if (ms_t1 .eq. 0) then
-                  if (s% center_h1 .lt. 1d-4) then
+               if (ms_t1 == 0) then
+                  if (s% center_h1 < 1d-4) then
                      ms_t1 = s% star_age
                      write(*,*) 'finished MS', ms_t1
                   end if
@@ -353,14 +350,14 @@
             end if
 
             ! measure CHeB lifetime
-            if ((ms_t1 .ne. 0) .and. (cheb_t0 .eq. 0)) then
-               if (s% power_he_burn .gt. 0.01 * s% L_surf) then
+            if ((ms_t1 /= 0) .and. (cheb_t0 == 0)) then
+               if (s% power_he_burn > 0.01d0 * s% L_surf) then
                   cheb_t0 = s% star_age
                   write(*,*) 'started CHeB', cheb_t0
                end if
             else
-               if (cheb_t1 .eq. 0) then
-                  if (s% center_he4 .lt. 1d-4) then
+               if (cheb_t1 == 0) then
+                  if (s% center_he4 < 1d-4) then
                      cheb_t1 = s% star_age
                      write(*,*) 'finished CHeB', cheb_t1
                      mcore_TACHeB = s% he_core_mass
@@ -369,8 +366,8 @@
             end if
 
             ! measure extent of 1DUP
-            if ((ms_t1 .gt. 0) .and. (cheb_t0 .eq. 0)) then
-               if ((s% conv_mx1_top - s% conv_mx1_bot) .gt. 0.1) then
+            if ((ms_t1 > 0) .and. (cheb_t0 == 0)) then
+               if ((s% conv_mx1_top - s% conv_mx1_bot) > 0.1d0) then
                   m_1DUP = min(s% conv_mx1_bot * s% star_mass, m_1DUP)
                end if
             end if
@@ -380,7 +377,7 @@
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
-               if (s% power_he_burn .gt. 1e4) then
+               if (s% power_he_burn > 1d4) then
                   in_LHe_peak = .true.
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse', TP_count
@@ -397,7 +394,7 @@
                   end if
                end if
             else
-               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false. ! pulse over
+               if (s% power_h_burn/s% power_he_burn > 10) in_LHe_peak = .false.  ! pulse over
             end if
 
             ! checking for 3DUP
@@ -405,7 +402,7 @@
                mcore_min_after_TP = min(mcore_min_after_TP, s% he_core_mass)
             end if
 
-            ! mark when signifcant 3DUP has first occured
+            ! mark when signifcant 3DUP has first occurred
             if (TP_with_3DUP == 0) then
                if ((mcore_min_after_TP - mcore_at_TP) < -1d-4) then
                   TP_with_3DUP = TP_count
@@ -414,7 +411,7 @@
             end if
 
             ! stop after 3rd TP after dredge up starts
-            if (.not. in_LHe_peak) then ! pulse is over
+            if (.not. in_LHe_peak) then  ! pulse is over
                if ((TP_with_3DUP > 0) .and. (TP_count - TP_with_3DUP == 2)) then
                   termination_code_str(t_xtra1) = 'third pulse with 3DUP has occurred'
                   s% termination_code = t_xtra1
@@ -429,18 +426,18 @@
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
-               if (s% power_he_burn .gt. 1e4) then
+               if (s% power_he_burn > 1d4) then
                   in_LHe_peak = .true.
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse'
                   mcore_min_after_TP = mcore_at_TP
                end if
             else
-               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false. ! pulse over
+               if (s% power_h_burn/s% power_he_burn > 10) in_LHe_peak = .false.  ! pulse over
             end if
 
             ! stop after one TP
-            if (.not. in_LHe_peak) then ! pulse is over
+            if (.not. in_LHe_peak) then  ! pulse is over
                if (TP_count == 1) then
                   termination_code_str(t_xtra1) = 'one thermal pulse cycle complete'
                   s% termination_code = t_xtra1
@@ -454,12 +451,12 @@
          if (s% x_integer_ctrl(1) == 4) then
             c13 = s% net_iso(ic13)
             k_max_c13 = maxloc(s% xa(c13,1:s% nz),dim=1)
-            if (s% xa(c13,k_max_c13) .gt. 0.01) then
-               s% pg% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001
-               s% pg% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001
+            if (s% xa(c13,k_max_c13) > 0.01d0) then
+               s% pg% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001d0
+               s% pg% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001d0
             else
-               s% pg% Abundance_xmin = s% he_core_mass - 0.0125
-               s% pg% Abundance_xmax = s% he_core_mass + 0.0025
+               s% pg% Abundance_xmin = s% he_core_mass - 0.0125d0
+               s% pg% Abundance_xmax = s% he_core_mass + 0.0025d0
             end if
          end if
 
@@ -499,15 +496,17 @@
             write(*,'(A70, F8.3)') '[TestHub] Core mass at first thermal pulse (Msun): ', mcore_1TP
             write(*,'(A70, F8.3)') '[TestHub] Age at first thermal pulse (Gyr): ', age_1TP / 1d9
             write(*,'(A70, F8.3)') '[TestHub] Core mass at second thermal pulse with 3DUP (Msun): ', mcore_2TP_with_3DUP
-            write(*,'(A70, F8.3)') '[TestHub] Following interpulse time (kyr): ', (age_at_TP - age_2TP_with_3DUP) / 1e3
-            write(*,'(A70, F8.3)') '[TestHub] Following pulse-to-pulse core growth (1e-3 Msun): ', (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
-            write(*,'(A70, F8.3)') '[TestHub] Dredge up mass at following pulse (1e-3 Msun): ', (mcore_at_TP - mcore_min_after_TP) / 1d-3
+            write(*,'(A70, F8.3)') '[TestHub] Following interpulse time (kyr): ', (age_at_TP - age_2TP_with_3DUP) / 1d3
+            write(*,'(A70, F8.3)') '[TestHub] Following pulse-to-pulse core growth (1e-3 Msun): ', &
+                                    (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
+            write(*,'(A70, F8.3)') '[TestHub] Dredge up mass at following pulse (1e-3 Msun): ', &
+                                    (mcore_at_TP - mcore_min_after_TP) / 1d-3
 
             ! put comparison info in TestHub output
             testhub_extras_names(1) = 'mcore_1TP'; testhub_extras_vals(1) = mcore_1TP
             testhub_extras_names(2) = 'age_1TP' ; testhub_extras_vals(2) = age_1TP / 1d9
             testhub_extras_names(3) = 'mcore_2TP_with_3DUP'; testhub_extras_vals(3) = mcore_2TP_with_3DUP
-            testhub_extras_names(4) = 'interpulse_time'; testhub_extras_vals(4) = (age_at_TP - age_2TP_with_3DUP) / 1e3
+            testhub_extras_names(4) = 'interpulse_time'; testhub_extras_vals(4) = (age_at_TP - age_2TP_with_3DUP) / 1d3
             testhub_extras_names(5) = 'delta_mcore_TP'; testhub_extras_vals(5) = (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
             testhub_extras_names(6) = 'mass_DUP'; testhub_extras_vals(6) = (mcore_at_TP - mcore_min_after_TP) / 1d-3
 
@@ -530,7 +529,7 @@
                   pocket_mass_c13 = pocket_mass_c13 + s% dq(k)
                end if
             end do
-            pocket_mass_c13 = pocket_mass_c13*s% star_mass ! mass in Msun units
+            pocket_mass_c13 = pocket_mass_c13*s% star_mass  ! mass in Msun units
 
             delta_surface_c12 = s% surface_c12 - initial_surface_c12
 

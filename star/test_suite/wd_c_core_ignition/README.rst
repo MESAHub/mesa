@@ -18,18 +18,18 @@ This test case has 2 parts. Click to see a larger version of a plot.
 
 .. image:: ../../../star/test_suite/wd_c_core_ignition/docs/track1_000747.svg
 
-|br| 
+
 Central density and temperature evolution:
 
 .. image:: ../../../star/test_suite/wd_c_core_ignition/docs/trhoc_000747.svg
 
-|br| 
+
 Convective and burn history
 
 .. image:: ../../../star/test_suite/wd_c_core_ignition/docs/kipp_000747.svg
 
 
-|br|
+
 pgstar commands used for the Part 1 plot above:
 
 .. code-block:: console
@@ -37,17 +37,15 @@ pgstar commands used for the Part 1 plot above:
  &pgstar
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
      Abundance_win_flag = .true.
      Abundance_win_width = 12
      Abundance_win_aspect_ratio = 1 ! aspect_ratio = height/width
 
      Abundance_xaxis_name = 'mass'
-     Abundance_xmin = 0 
+     Abundance_xmin = 0
      Abundance_xmin = -101d0
 
      Abundance_line_txt_scale_factor = 1.1 ! relative to other text
@@ -59,13 +57,13 @@ pgstar commands used for the Part 1 plot above:
      Abundance_file_dir = 'pgstar_out'
      Abundance_file_prefix = 'abund_'
      Abundance_file_interval = 10000
-     Abundance_file_width = -1 
-     Abundance_file_aspect_ratio = -1 
+     Abundance_file_width = -1
+     Abundance_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 
 
-|br|
+
 pgstar commands used for the Part 2 plots above:
 
 .. code-block:: console
@@ -74,28 +72,26 @@ pgstar commands used for the Part 2 plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
      TRho_win_flag = .true.
      TRho_win_width = 12
      TRho_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-     TRho_title = 'wd_c_core_ignition'      
+     TRho_title = 'wd_c_core_ignition'
 
-     TRho_logT_min = 7.4 
-     TRho_logT_max = 8.7 
-     TRho_logRho_min = 7.0 
-     TRho_logRho_max = 10.5 
+     TRho_logT_min = 7.4
+     TRho_logT_max = 8.7
+     TRho_logRho_min = 7.0
+     TRho_logRho_max = 10.5
      show_TRho_degeneracy_line = .true.
 
      TRho_file_flag = .true.
      TRho_file_dir = 'pgstar_out'
      TRho_file_prefix = 'trhoc_'
      TRho_file_interval = 10000
-     TRho_file_width = -1 
-     TRho_file_aspect_ratio = -1 
+     TRho_file_width = -1
+     TRho_file_aspect_ratio = -1
 
 
      History_Track1_win_flag = .true.
@@ -124,7 +120,7 @@ pgstar commands used for the Part 2 plots above:
 
      Kipp_win_flag = .true.
      Kipp_win_width = 12
-     Kipp_title = 'wd_c_core_ignition'      
+     Kipp_title = 'wd_c_core_ignition'
      Kipp_mass_max = -101d0
      Kipp_show_mixing = .true.
      Kipp_show_burn = .true.
@@ -134,17 +130,10 @@ pgstar commands used for the Part 2 plots above:
      Kipp_file_dir = 'pgstar_out'
      Kipp_file_prefix = 'kipp_'
      Kipp_file_interval = 10000
-     Kipp_file_width = -1 
-     Kipp_file_aspect_ratio = -1 
+     Kipp_file_width = -1
+     Kipp_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 04Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

@@ -12,6 +12,6 @@ Pinsonneault, and Aaron Dotter.
 Apply for admission at:
 
 `MESA Summer School
-2019 <http://cococubed.com/mesa_summer_school_2019/application.html>`__
+2019 <https://mesastar.org/summer-school-2019>`__
 
 Enrollment is limited and closes March 1, 2019.

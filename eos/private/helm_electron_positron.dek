@@ -1,5 +1,5 @@
 
-!..assume complete ionization 
+!..assume complete ionization
         xne    = xni * zbar
 
 !..density derivs
@@ -13,7 +13,7 @@
         dindaz  = -den*ww
         dinddaa = 2.0d0*ye*ww
         dinddaz = -ww
-        dindzz = 0.0d0 
+        dindzz = 0.0d0
 
 
 !..hash locate this temperature and density
@@ -60,20 +60,20 @@
         fi(34) = ht% fddtt(iat+1,jat)
         fi(35) = ht% fddtt(iat,jat+1)
         fi(36) = ht% fddtt(iat+1,jat+1)
-        
+
         if (.false.) then
           fi(           1 ) =    6.7955181191688634d+019
           fi(           2 ) =    6.4153793083172643d+019
           fi(           3 ) =    7.1949978394642317d+019
           fi(           4 ) =    6.7925125811238838d+019
-          fi(           5 ) =   -95723.493066505616d0     
-          fi(           6 ) =   -101151.76591915185d0      
-          fi(           7 ) =   -96069.380284212413d0      
-          fi(           8 ) =   -101518.14833891283d0      
-          fi(           9 ) =   -20.125669209403792d0      
-          fi(          10 ) =   -20.125673679884493d0      
-          fi(          11 ) =   -19.002315451465396d0      
-          fi(          12 ) =   -19.002319323130294d0      
+          fi(           5 ) =   -95723.493066505616d0
+          fi(           6 ) =   -101151.76591915185d0
+          fi(           7 ) =   -96069.380284212413d0
+          fi(           8 ) =   -101518.14833891283d0
+          fi(           9 ) =   -20.125669209403792d0
+          fi(          10 ) =   -20.125673679884493d0
+          fi(          11 ) =   -19.002315451465396d0
+          fi(          12 ) =   -19.002319323130294d0
           fi(          13 ) =    4.4843029837101228d+019
           fi(          14 ) =    4.2334538740420534d+019
           fi(          15 ) =    4.7500183193874416d+019
@@ -82,24 +82,24 @@
           fi(          18 ) =   -1.3387419506508374d+024
           fi(          19 ) =   -1.5910986550797369d+024
           fi(          20 ) =   -1.4180679764777474d+024
-          fi(          21 ) =    4484362052739.8555d0      
-          fi(          22 ) =    4233511265507.4458d0      
-          fi(          23 ) =    4484360639522.0361d0      
-          fi(          24 ) =    4233509890335.1753d0      
+          fi(          21 ) =    4484362052739.8555d0
+          fi(          22 ) =    4233511265507.4458d0
+          fi(          23 ) =    4484360639522.0361d0
+          fi(          24 ) =    4233509890335.1753d0
           fi(          25 ) =   -1.5021032993489110d+017
           fi(          26 ) =   -1.3387510342435318d+017
           fi(          27 ) =   -1.5021030742082810d+017
           fi(          28 ) =   -1.3387508286723318d+017
-          fi(          29 ) =   -2.5622106979824100     
-          fi(          30 ) =   -2.4932220854878300     
-          fi(          31 ) =   -2.2190032624589202     
-          fi(          32 ) =   -2.1592602908194998     
-          fi(          33 ) =    0.0000000000000000     
-          fi(          34 ) =    0.0000000000000000     
-          fi(          35 ) =    0.0000000000000000     
-          fi(          36 ) =    0.0000000000000000     
+          fi(          29 ) =   -2.5622106979824100
+          fi(          30 ) =   -2.4932220854878300
+          fi(          31 ) =   -2.2190032624589202
+          fi(          32 ) =   -2.1592602908194998
+          fi(          33 ) =    0.0000000000000000
+          fi(          34 ) =    0.0000000000000000
+          fi(          35 ) =    0.0000000000000000
+          fi(          36 ) =    0.0000000000000000
       end if
- 
+
 
 !..various differences
         xt  = max( (temp - ht% t(jat)) * ht% dti_sav(jat), 0.0d0)
@@ -145,7 +145,7 @@
         ddsi0t =   ddpsi0(xt) * ht% dt2i_sav(jat)
         ddsi1t =   ddpsi1(xt) * ht% dti_sav(jat)
         ddsi2t =   ddpsi2(xt)
- 
+
         ddsi0mt =  ddpsi0(mxt) * ht% dt2i_sav(jat)
         ddsi1mt = -ddpsi1(mxt) * ht% dti_sav(jat)
         ddsi2mt =  ddpsi2(mxt)
@@ -162,7 +162,7 @@
         dddsi0t =   dddpsi0(xt) * ht% dt3i_sav(jat)
         dddsi1t =   dddpsi1(xt) * ht% dt2i_sav(jat)
         dddsi2t =   dddpsi2(xt) * ht% dti_sav(jat)
- 
+
         dddsi0mt = -dddpsi0(mxt) * ht% dt3i_sav(jat)
         dddsi1mt =  dddpsi1(mxt) * ht% dt2i_sav(jat)
         dddsi2mt = -dddpsi2(mxt) * ht% dti_sav(jat)
@@ -231,7 +231,7 @@
 
          if (.false.) then ! debug
             write(*,'(a,1p99e22.14)') 'den, temp, xt mxt, xd, mxd', den, temp, xt, mxt, xd, mxd
-            
+
             write(*,'(99a22)') 'Fgas', 'dFgas_dT', 'dFgas_dRho', 'd2Fgas_dRho2', 'd2Fgas_dRho_dT',  &
                 'd2Fgas_dT2', 'd3Fgas_dRho2_dT', 'd3Fgas_dRho_dT2', 'd4Fgas_dRho2_dT2'
             do k=0,3
@@ -248,7 +248,7 @@
                 si0d,   si1d,   si2d,   si0md,   si1md,   si2md)
          end if
 
-!..now get the pressure derivative with density, chemical potential, and 
+!..now get the pressure derivative with density, chemical potential, and
 !..electron positron number densities
 !..get the cubic interpolation weight functions
 
@@ -293,7 +293,7 @@
         dddsi0d  = xdddpsi0(xd) * ht% dd3i_sav(iat)
         dddsi1d  = xdddpsi1(xd) * ht% dd2i_sav(iat)
         dddsi0md = -xdddpsi0(mxd) * ht% dd3i_sav(iat)
-        dddsi1md = xdddpsi1(mxd) * ht% dd2i_sav(iat)      
+        dddsi1md = xdddpsi1(mxd) * ht% dd2i_sav(iat)
 
 !..look in the pressure derivative only once
         fi(1)  = ht% dpdf(iat,jat)
@@ -311,7 +311,7 @@
         fi(13) = ht% dpdfdt(iat,jat)
         fi(14) = ht% dpdfdt(iat+1,jat)
         fi(15) = ht% dpdfdt(iat,jat+1)
-        fi(16) = ht% dpdfdt(iat+1,jat+1)         
+        fi(16) = ht% dpdfdt(iat+1,jat+1)
 
 !..pressure derivative with density
         dpepdd_in = h3(iat,jat,fi, &
@@ -351,7 +351,6 @@
         fi(16) = ht% efdt(iat+1,jat+1)
 
 
-
 !..electron chemical potential etaele
         etaele  = h3(iat,jat,fi, &
                      si0t,   si1t,   si0mt,   si1mt, &
@@ -361,7 +360,7 @@
         x       = h3(iat,jat,fi, &
                      si0t,   si1t,   si0mt,   si1mt, &
                     dsi0d,  dsi1d,  dsi0md,  dsi1md)
-        detadd  = ye * x  
+        detadd  = ye * x
         detadt  = h3(iat,jat,fi, &
                     dsi0t,  dsi1t,  dsi0mt,  dsi1mt, &
                      si0d,   si1d,   si0md,   si1md)
@@ -385,14 +384,14 @@
         detadta = z * dinda
         detadtz = z * dindz
         detadaa = (y*din + 2.0d0*x)*din*ww
-        detadaz = -(y*dindz*din + x*den*ytot1)*ytot1 
+        detadaz = -(y*dindz*din + x*den*ytot1)*ytot1
         detadzz = y*dindz*den*ytot1
 
 !..third derivatives
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
-                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)        
-        detadddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)  
+                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
+        detadddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
                                     !  ! d/drho^3
 
         detadttt = h3(iat,jat,fi, &
@@ -401,12 +400,12 @@
 
         y       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
-                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)    
+                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
         detadddt = ye * ye * y ! d/drho^2 d/dT
 
         y       = h3(iat,jat,fi, &
                     ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)    
+                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
 
         detaddtt = ye * y ! d/drho d/dT^2
 
@@ -469,7 +468,7 @@
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
                     ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
-        dxneddd = ye * ye * y  
+        dxneddd = ye * ye * y
         z       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,   dsi0mt,   dsi1mt, &
                     dsi0d,  dsi1d,  dsi0md,  dsi1md)
@@ -482,14 +481,14 @@
         dxnedta = z * dinda
         dxnedtz = z * dindz
         dxnedaa = (y*din + 2.0d0*x)*din*ytot1*ytot1
-        dxnedaz = -(y*dindz*din + x*den*ytot1)*ytot1 
+        dxnedaz = -(y*dindz*din + x*den*ytot1)*ytot1
         dxnedzz = y*dindz*den*ytot1
 
 !..third derivatives
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
-                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)        
-        dxneferdddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)  
+                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
+        dxneferdddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
                                     !  ! d/drho^3
 
         dxneferdttt = h3(iat,jat,fi, &
@@ -499,12 +498,12 @@
 
         y       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
-                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)    
+                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
         dxneferdddt = ye * ye * y ! d/drho^2 d/dT
 
         y       = h3(iat,jat,fi, &
                     ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)    
+                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
 
         dxneferddtt = ye * y ! d/drho d/dT^2
 
@@ -571,8 +570,7 @@ end if
         dpepdtz = y * dindz
         dpepdaa = (zz*dinda + ww)*dindaa
         dpepdaz = (zz*dinda + ww)*dindaz
-        dpepdzz = zz*dindz*dindz 
-
+        dpepdzz = zz*dindz*dindz
 
 
 !..entropy in erg/g/k
@@ -613,7 +611,6 @@ end if
                   - df_t*dinddaz
         dsepdzz = -df_ddt*dindz*dindz*ye  &
                   - df_dt*(dindzz*ye + dindz*ytot1 + dindz*dinddz)
-
 
 
 !..energy in erg/g

@@ -70,7 +70,7 @@
 !..ions
 
 !..pressure, energy, entropy
-      real(dp) pion,eion,sion
+      real(dp) :: pion,eion,sion
       real(dp) :: dpiondd,dpiondt,dpionda,dpiondz
       real(dp) :: deiondd,deiondt,deionda,deiondz
       real(dp) :: dsiondd,dsiondt,dsionda,dsiondz
@@ -85,7 +85,7 @@
       real(dp) :: dsiondaa,dsiondaz,dsiondzz
 
 !..number densities
-      real(dp) xni
+      real(dp) :: xni
       real(dp) :: dxnidd,dxnidt,dxnida,dxnidz
       real(dp) :: dxniddd,dxniddt,dxnidda,dxniddz
       real(dp) :: dxnidtt,dxnidta,dxnidtz
@@ -104,8 +104,6 @@
       real(dp) :: detaiddd,detaiddt,detaidda,detaiddz
       real(dp) :: detaidtt,detaidta,detaidtz
       real(dp) :: detaidaa,detaidaz,detaidzz
-
-
 
 
 !..electron-positrons
@@ -178,15 +176,13 @@
       real(dp) :: dxneferdddz, dxneferdttz, dxneferddtz
 
 
-
-
 !..ionization contributions
       real(dp) :: eip,deipdd,deipdt,deipda,deipdz
       real(dp) :: sip,dsipdd,dsipdt,dsipda,dsipdz
       real(dp) :: pip,dpipdd,dpipdt,dpipda,dpipdz
 
 !..ionization contributions; now in the file xneroot_common.dek
-      integer          ionized,potmult
+      integer :: ionized,potmult
 
 
 !..coulomb corrections
@@ -223,11 +219,10 @@
       real(dp) :: dscouldaz,dscouldzz
 
 
-
       real(dp) :: s,sinv,dsdd,dsdt,dsda,dsdz
       real(dp) :: dsddd,dsddt,dsdda,dsddz,dsdtt,dsdta,dsdtz
       real(dp) :: dsdaa,dsdaz,dsdzz
-      
+
       real(dp) :: aele,aeleinv,daeledd,daeledt,daeleda,daeledz
       real(dp) :: daeleddd,daeleddt,daeledda,daeleddz,daeledtt
       real(dp) :: daeledta,daeledtz,daeledaa,daeledaz,daeledzz
@@ -243,7 +238,7 @@
       real(dp) :: dplasgdtt,dplasgdta,dplasgdtz,dplasgdaa
       real(dp) :: dplasgdaz,dplasgdzz
 
-      real(dp) u0,du0,ddu0,p1,p2,p3,p4,p5,p6,ion_radius
+      real(dp) :: u0,du0,ddu0,p1,p2,p3,p4,p5,p6,ion_radius
       real(dp), parameter :: a1 = -0.898004d0
       real(dp), parameter :: b1 =  0.96786d0
       real(dp), parameter :: c1 =  0.220703d0
@@ -289,7 +284,7 @@
       real(dp) :: dscouldaz_new,dscouldzz_new
 
 
-!..various physical quantities based on derivatives 
+!..various physical quantities based on derivatives
       real(dp) :: chit
       real(dp) :: dchitdd,dchitdt,dchitda,dchitdz
       real(dp) :: chid
@@ -330,10 +325,10 @@
 
 
 !..for the maxwell relations
-      real(dp) dse,dpe,dsp
+      real(dp) :: dse,dpe,dsp
 
 
-!..miscelaneous local variables 
+!..miscellaneous local variables
       integer  :: i,j,k,kend,niter,mode
       real(dp) :: kt,ktinv,x,y,z,ww,xx,yy,zz,zzi,ytot1,ye
       real(dp) :: ratio,fk,dfk

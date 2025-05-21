@@ -4,12 +4,12 @@
 rsp_BLAP
 ********
 
-This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model - 
+This test case checks the non-linear pulsation evolution of a 0.36 |Msun|, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model -
 a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_rsp_BEP``) creates the initial 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.05543 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
+* Part 1 (``inlist_rsp_BEP``) creates the initial 0.36 |Msun|, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.05543 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
 
 .. code-block:: console
 
@@ -28,10 +28,8 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default``, used for
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 100
 

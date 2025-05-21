@@ -15,10 +15,9 @@ This test case tracks the total number of burner sub-steps taken in the final ti
 Inlists
 =======
 
-This test case has one part. 
+This test case has one part.
 
 
 * Part 1 (``inlist_big_net``) loads a model and runs it for 10 timesteps.
 
 * Part 1 (``inlist_common``) provides a number of useful options when evolving massive stars to core collapse.
-

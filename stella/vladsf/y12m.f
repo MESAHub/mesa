@@ -2542,7 +2542,7 @@ c
 
       end if
 c
-c  Solve the system with upper triagular matrix.
+c  Solve the system with upper triangular matrix.
 c
       n8=n+1
 
@@ -2648,7 +2648,7 @@ c
 
       end if
 c
-c  Solve the system with upper triagular matrix.
+c  Solve the system with upper triangular matrix.
 c
       n8=n+1
 

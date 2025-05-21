@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2013-2022  The MESA Team, Bill Paxton & Matthias Fabry
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pgbinary_history_panels
 
    use binary_private_def
-   use const_def
+   use const_def, only: dp
    use pgbinary_support
 
    implicit none
@@ -593,6 +587,7 @@ contains
 
       use utils_lib
       use pgstar_support, only : set_xleft_xright, set_ytop_ybot
+      use pgstar_colors
 
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id, hist_num_panels
@@ -779,7 +774,7 @@ contains
             !write(*,1) trim(other_yname), other_ybot, other_ytop
             call pgswin(xleft, xright, other_ybot, other_ytop)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_box_pgbinary(b, '', 'CMSTV')
             call pgsci(other_y_color)
             if (hist_other_yaxis_log(j)) then
@@ -824,7 +819,7 @@ contains
             !write(*,1) trim(yname), ybot, ytop
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (j < hist_num_panels) then
                if (.not. have_other_yaxis) then
                   call show_box_pgbinary(b, 'BCST1', 'BCMNSTV1')
@@ -848,11 +843,11 @@ contains
                   return
                end if
                read(iounit, *) num_pts
-               ishape = b% pg% History_Panel_points_marker ! 5
+               ishape = b% pg% History_Panel_points_marker  ! 5
                call pgsave
-               call pgsci(b% pg% History_Panel_points_ci) !1)
-               call pgslw(b% pg% History_Panel_points_lw) !2)
-               call pgsch(b% pg% History_Panel_points_ch) !1.0)
+               call pgsci(b% pg% History_Panel_points_ci)  !1)
+               call pgslw(b% pg% History_Panel_points_lw)  !2)
+               call pgsch(b% pg% History_Panel_points_ch)  !1.0)
                do k = 1, num_pts
                   if (b% pg% History_Panel_points_error_bars) then
                      read(iounit, *) xpt, ypt, errpt
@@ -889,7 +884,7 @@ contains
             call pgslw(1)
          end if
 
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call show_pgbinary_decorator(b% binary_id, use_decorator, pgbinary_decorator, j, ierr)
       end do
 

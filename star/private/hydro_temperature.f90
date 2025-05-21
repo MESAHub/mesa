@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2018-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module hydro_temperature
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -35,11 +28,11 @@
       implicit none
 
       private
-      public :: do1_alt_dlnT_dm_eqn, do1_gradT_eqn, do1_dlnT_dm_eqn
+      public :: do1_alt_dlnT_dm_eqn
+      public :: do1_gradT_eqn
+      public :: do1_dlnT_dm_eqn
 
       contains
-
-
 
       ! just relate L_rad to T gradient.
       ! d_P_rad/dm = -<opacity_face>*L_rad/(clight*area^2) -- see, e.g., K&W (5.12)
@@ -58,6 +51,7 @@
          type(auto_diff_real_star_order1) :: L_ad, r_00, area, area2, Lrad_ad, &
             kap_00, kap_m1, kap_face, d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
             P_rad_m1, P_rad_00, d_P_rad_actual_ad, resid
+         type(auto_diff_real_star_order1) :: flxR, flxLambda
 
          integer :: i_equL
          logical :: dbg
@@ -89,7 +83,7 @@
          if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
                .and. s% mixing_type(k) == convective_mixing .and. s% gradr(k) > 0d0 &
                .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5) then
-            Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k) ! C&G 14.109
+            Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k)  ! C&G 14.109
          else
             Lrad_ad = L_ad
          end if
@@ -109,9 +103,28 @@
 
          !d_P_rad_expected = d_P_rad_expected*s% gradr_factor(k) !TODO(Pablo): check this
 
-         P_rad_m1 = (crad/3d0)*T4_m1
-         P_rad_00 = (crad/3d0)*T4_00
+         P_rad_m1 = (crad/3._dp)*T4_m1
+         P_rad_00 = (crad/3._dp)*T4_00
          d_P_rad_actual_ad = P_rad_m1 - P_rad_00
+
+         ! enable flux-limited radiation transport derived by Levermore & Pomraning 1981
+         s% flux_limit_R(k) = 0._dp
+         s% flux_limit_lambda(k) =0._dp
+         if (s% use_flux_limiting_with_dPrad_dm_form) then
+            ! calculate the flux ratio R
+            flxR = area * abs(T4_m1 - T4_00) / dm_bar / &
+                  (kap_face * 0.5_dp * (T4_m1 + T4_00))
+
+            s% flux_limit_R(k) = flxR%val
+
+            ! calculate the flux limiter lambda
+            flxLambda = (6._dp + 3._dp*flxR) / (6._dp + (3._dp + flxR)*flxR)
+
+            s% flux_limit_lambda(k) = flxLambda%val
+
+            ! calculate d_P_rad given the flux limiter
+            d_P_rad_expected_ad = d_P_rad_expected_ad / flxLambda
+         end if
 
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale
@@ -267,7 +280,7 @@
          dT = Tm1 - T00
          alfa = s% dm(k-1)/(s% dm(k-1) + s% dm(k))
          Tpoint = alfa*T00 + (1d0 - alfa)*Tm1
-         lnTdiff = dT/Tpoint ! use this in place of lnT(k-1)-lnT(k)
+         lnTdiff = dT/Tpoint  ! use this in place of lnT(k-1)-lnT(k)
          delm = (s% dm(k) + s% dm(k-1))/2
 
          resid = delm*dlnTdm - lnTdiff
@@ -298,7 +311,7 @@
 
 
       ! only used for dlnT_dm equation
-      subroutine eval_dlnPdm_qhse(s, k, & ! calculate the expected dlnPdm for HSE
+      subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
             dlnPdm_qhse, Ppoint, ierr)
          use hydro_momentum, only: expected_HSE_grav_term
          type (star_info), pointer :: s
@@ -332,7 +345,7 @@
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if
 
-         dlnPdm_qhse = grav/(area*Ppoint) ! note that expected_HSE_grav_term is negative
+         dlnPdm_qhse = grav/(area*Ppoint)  ! note that expected_HSE_grav_term is negative
 
          if (is_bad(dlnPdm_qhse%val)) then
             ierr = -1
@@ -353,4 +366,3 @@
       end subroutine eval_dlnPdm_qhse
 
       end module hydro_temperature
-

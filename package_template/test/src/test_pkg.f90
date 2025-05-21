@@ -1,23 +1,22 @@
-      module test_xxx_mod
-      use xxx_lib
-      implicit none
+module test_xxx_mod
 
-      contains
+   use xxx_lib
 
-      subroutine do_test
+   implicit none
 
-         write(*,*) 'done'
+contains
 
-      end subroutine do_test
+   subroutine do_test
+
+      write (*, *) 'done'
+
+   end subroutine do_test
+
+end module test_xxx_mod
 
 
-      end module test_xxx_mod
-
-
-
-
-      program test_xxx
-      use test_xxx_mod
-      implicit none
-      call do_test
-      end program test_xxx
+program test_xxx
+   use test_xxx_mod
+   implicit none
+   call do_test
+end program test_xxx

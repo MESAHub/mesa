@@ -1,32 +1,26 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2019  Radek Smolec
+!   Copyright (C) 2019  Radek Smolec & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module rsp_lina
       use star_def, only: star_info
       use utils_lib, only: is_bad, mesa_error
-      use const_def, only: dp, crad
+      use const_def, only: dp, i8, crad
       use rsp_def
 
       implicit none
@@ -34,9 +28,7 @@
       private
       public :: mesa_eos_kap, SORT, do_LINA
 
-
       contains
-
 
       subroutine do_LINA(s, L0, NZN, NMODES, VEL, PERS, ETO, &
          M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
@@ -46,7 +38,7 @@
       type (star_info), pointer :: s
       real(dp), intent(in) :: L0
       integer, intent(in) :: NMODES, NZN
-      real(dp), intent(out) :: VEL(:,:) ! (NZN+1,15)
+      real(dp), intent(out) :: VEL(:,:)  ! (NZN+1,15)
       real(dp), intent(out), dimension(15) :: PERS, ETO
       real(dp), intent(inout), dimension(:) :: &
          M, DM, DM_BAR, R, Vol, T, Et, Lr
@@ -107,9 +99,9 @@
       real(dp) :: T4,POM3,POM2,POM,POM4
       integer :: I,J,NZN3,IG,IE,IR,IC,INFO,IMI,LD_VL,LD_VR,n,op_err
       real(dp) :: VRRS(15),Q(15)
-      character (len=250) FILENAME
-      character (len=1) NUMER1
-      character (len=2) NUMER2
+      character (len=250) :: FILENAME
+      character (len=1) :: NUMER1
+      character (len=2) :: NUMER2
       complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),DPEV,dP_dT_00URB
       real(dp) :: SGRP,SGRM
       real(dp) :: PSIG,TEMI,TEMM,TEM1
@@ -222,13 +214,13 @@
             dC_dT_00(I) = 0.d0
             dC_dT_out(I) = 0.d0
             dC_dw_00(I) = 0.d0
-         enddo
-      endif
+         end do
+      end if
 
 !     LOOP 1 .. EOS
 
       !$OMP PARALLEL DO PRIVATE(I,T1,op_err) SCHEDULE(dynamic,2)
-      do 1 I=1,NZN
+      do I=1,NZN
 
          if(Et(I)<=EFL02) Et(I)=EFL02
 
@@ -241,10 +233,10 @@
 
          T1=P43/dm(I)
          DVR(I)=3.d0*T1*R(I)**2
-         if(I==1) goto 2
+         if(I==1) GOTO 2
          DVRM(I)=-3.d0*T1*R(max(1,I-1))**2
              ! bp: max(1,i-1) to prevent bogus warning from gfortran
-         goto 3
+         GOTO 3
  2       DVRM(I)=-3.d0*T1*s% R_center**2
  3       continue
          dP_dr_00(I) =DPV(I)*DVR(I)
@@ -254,19 +246,19 @@
          dQQ_dr_00(I) =QQV(I)*DVR(I)
          dQQ_dr_in(I)=QQV(I)*DVRM(I)
 
- 1    continue
+      end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) return
 
 !     SKIP ALL DERIVATIVE CALCULATIONS IN CASE OF FROZEN-IN
 !     APPROXIMATION OR ALFA=0 (RADIATIVE CASE)
-      if(ALFA==0.d0) goto 999
+      if(ALFA==0.d0) GOTO 999
 
 !     SET E_T (NOW =w) BELOW AND ABOVE BOUNDARIES
       Et(NZN) = 0.d0
       do I=1,IBOTOM
          Et(I) = 0.d0
-      enddo
+      end do
 
       do I=1,NZN-1
          POM=  (R(I)**2)/(2.d0*G*M(I))
@@ -278,7 +270,7 @@
          dHp_dr_out(I)=POM*(P(I+1)*DVR(I+1)+Vol(I+1)*dP_dr_00(I+1))
          dHp_dT_00(I)=POM*Vol(I)*dP_dT_00(I)
          dHp_dT_out(I)=POM*Vol(I+1)*dP_dT_00(I+1)
-      enddo
+      end do
       POM=(R(NZN)**2)/(2.d0*G*M(NZN))
       Hp_face(NZN)=POM*P(NZN)*Vol(NZN)
       dHp_dr_in(NZN)=POM*(P(NZN)*DVRM(NZN)+Vol(NZN)*dP_dr_in(NZN))
@@ -325,7 +317,7 @@
          dY_dr_out(I)=IGR1*IGR2XP+IGR2*IGR1XP
          dY_dT_00(I)=IGR1*IGR2Y0+IGR2*IGR1Y0
          dY_dT_out(I)=IGR1*IGR2YP+IGR2*IGR1YP
-      enddo
+      end do
 
       !call mesa_error(__FILE__,__LINE__,'IGRS')
 
@@ -362,7 +354,7 @@
          dPII_dr_out(I)=POM*GGXP
          dPII_dT_00(I)=POM*GGY0
          dPII_dT_out(I)=POM*GGYP
-      enddo
+      end do
 
       !call mesa_error(__FILE__,__LINE__,'LINA')
 
@@ -421,7 +413,7 @@
 !           dsrc_dT_in(I) = 0.d0
 !           dsrc_dT_00(I) = 0.d0
 !           dsrc_dw_00(I) = 0.d0
-!        endif
+!        end if
 
 !        DAMP TERM
          POM=(CEDE/ALFA)*(Et(I)**1.5d0-EFL02**1.5d0)
@@ -487,7 +479,7 @@
                                        +1.d0/K(I)*dK_dT_00(I))) &
                          /(CPS(I)*K(I))
 
-         endif
+         end if
 
          dC_dr_00(I) =dsrc_dr_00(I) -d_damp_dr_00(I) -d_dampR_dr_00(I)
          dC_dr_out(I) =dsrc_dr_out(I) -d_damp_dr_out(I) -d_dampR_dr_out(I)
@@ -498,7 +490,7 @@
          dC_dT_out(I) =dsrc_dT_out(I) -d_damp_dT_out(I) -d_dampR_dT_out(I)
          dC_dw_00(I) =dsrc_dw_00(I) -d_damp_dw_00(I) -d_dampR_dw_00(I)
 
-      enddo
+      end do
 
        !call mesa_error(__FILE__,__LINE__,'LINA')
 
@@ -533,7 +525,7 @@
             DLCYP(I)=0.d0
             DLCZ0(I)=0.d0
             DLCZP(I)=0.d0
-         endif
+         end if
 
 !         if(PII(I)<0.d0.or.ALFA==0.d0)then
 !            Lc(I)=0.d0
@@ -544,7 +536,7 @@
 !            DLCYP(I)=0.d0
 !            DLCZ0(I)=0.d0
 !            DLCZP(I)=0.d0
-!         endif
+!         end if
 
 !        TURBULENT LUMINOSITY
          if(ALFAT==0.d0.or.ALFA==0.d0)then
@@ -574,8 +566,8 @@
             DLTYP(I)=Lt(I)/Hp_face(I)*dHp_dT_out(I)
             DLTZ0(I)=-POM*POM2*1.5d0*sqrt(Et(I)  )/dm_bar(I)
             DLTZP(I)= POM*POM2*1.5d0*sqrt(Et(I+1))/dm_bar(I)
-         endif
-      enddo
+         end if
+      end do
 
 !     TURBULENT PRESSURE (ZONE)
       do I=IBOTOM+1,NZN-1
@@ -590,8 +582,8 @@
             TEM1=-ALFAP*Et(I)/Vol(I)**2
             dPtrb_dr_00(I) = TEM1*DVR(I)
             dPtrb_dr_in(I) = TEM1*DVRM(I)
-         endif
-      enddo
+         end if
+      end do
 
 !     EDDY VISCOSITY
       do I=IBOTOM+1,NZN-1
@@ -609,8 +601,8 @@
             POM2=(R(I)**3+R(I-1)**3)*(Hp_face(I)+Hp_face(I-1))*0.25d0
             EVUU0(I)= POM*POM1*POM2/R(I)
             EVUUM(I)=-POM*POM1*POM2/R(I-1)
-          endif
-      enddo
+          end if
+      end do
 
       do I=1,IBOTOM
          Lc(I)= 0.d0
@@ -629,7 +621,7 @@
          dC_dw_00(I) = 0.d0
          EVUU0(I) = 0.d0
          EVUUM(I) = 0.d0
-      enddo
+      end do
       do I=1,IBOTOM-1
          DLCX0(I)=0.d0
          DLCXM(I)=0.d0
@@ -645,7 +637,7 @@
          DLTYP(I)=0.d0
          DLTZ0(I)=0.d0
          DLTZP(I)=0.d0
-      enddo
+      end do
       Lc(NZN)= 0.d0
       Lt(NZN)= 0.d0
       PTURB(NZN)= 0.d0
@@ -688,7 +680,7 @@
       DLRM =  0.d0
       DLT  =  0.d0
       DLTP =  0.d0
-      DLR  =  0.d0!-1.d0
+      DLR  =  0.d0  !-1.d0
 
       DFCX0 = 0.d0
       DFCXM = 0.d0
@@ -697,7 +689,7 @@
       DFCYP = 0.d0
       DFCZ0 = 0.d0
       DFCZP = 0.d0
-      do 5 I=1,NZN
+      do I=1,NZN
 !        SET LUM(I-1)
          DLMR  = DLR
          DLMRP = DLRP
@@ -712,7 +704,7 @@
          DFCMYP = DFCYP
          DFCMZ0 = DFCZ0
          DFCMZP = DFCZP
-         if(I==NZN) goto 6
+         if(I==NZN) GOTO 6
 !        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
 !        CALC LUM(I)
          W_00=T(I)**4
@@ -722,8 +714,8 @@
          T1=-CL*R(I)**4/dm_bar(I)
          T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
          T3=T1/(BW-BK)
-         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
-         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2) !dL(i)/dK(i+1)
+         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2)  !dL(i)/dK(i)
+         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2)  !dL(i)/dK(i+1)
          DLRP= DLKP*dK_dV_00(I+1)*DVR(I+1)
          DLRM= DLK *dK_dV_00(I)  *DVRM(I)
          DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
@@ -737,7 +729,7 @@
          DFCYP=DLCYP(I)
          DFCZ0=DLCZ0(I)
          DFCZP=DLCZP(I)
-         goto 7
+         GOTO 7
 !        OUTER LUM BOUNDARY CONDITION
  6       continue
          DLT = 4.d0*L0/T(I)  !L=4piR^2sigT^4
@@ -780,7 +772,7 @@
          else
             EU10(I) =  T3*R(max(1,I-1))**2
              ! bp: max(1,I-1) to prevent bogus warning from gfortran
-         endif
+         end if
          EU00(I) = -T3*R(I)**2
 
 !        CALC CONVECTIVE ENERGY EQUATION(I)
@@ -811,7 +803,7 @@
          else
             CU10(I) =  T3*R(max(1,I-1))**2
              ! bp: max(1,I-1) to prevent bogus warning from gfortran
-         endif
+         end if
          CU00(I) = -T3*R(I)**2
 
 !        CALC MOMENTUM EQUATION(I)
@@ -838,15 +830,15 @@
             MU00(I) = T4*(-EVUU0(I))
             MU01(I) = 0.d0
             MZ01(I) = 0.d0
-         endif
+         end if
 
-  5    continue
+      end do
 
       do I=1,NZN3
          do J=1,NZN3
             LLL(I,J)=0.d0
-         enddo
-      enddo
+         end do
+      end do
 
 !
 ! VELOCITY DEFINITION
@@ -934,9 +926,9 @@
          IF (IE+4 <= NZN3) then
             if(LLL(IE,IE+4)<0.d0)then
                !write(*,*) 'rerrrrrrrrrrrrrrrrrrrrrrrr',i
-            endif
-         endif
-      enddo
+            end if
+         end if
+      end do
 
       if (s% RSP_trace_RSP_build_model) &
          write(*,*) 'waiting for DGEEV to solve eigenvalue problem....'
@@ -948,7 +940,7 @@
          ierr = -1
          return
          stop
-      endif
+      end if
 
 ! THIS IS A MODIFIED "NUMERICAL RECIPES" SORTING SUBROUTINE
 ! IT SORTS THE VECTOR WI (DIMENSION NZN3) IN ASCENDING ORDER
@@ -972,7 +964,7 @@
                MINI=WIx(I)
                IMI=I
             end if
-         endif
+         end if
          if (abs(WIx(I)) > 1d-50) then
             !write(15,'(2(d14.8,tr2),f11.6)') &
             !   WIx(I),WRx(I),2.d0*PI/WIx(I)/86400d0
@@ -980,18 +972,18 @@
             !write(15,'(2(d14.8,tr2),f11.6)') &
             !   0d0,WRx(I),0d0
          end if
-      enddo
+      end do
       !close(15)
 
       do J=1,NMODES
  444     continue
          if(P4*WRx(IMI+J-1)/WIx(IMI+J-1)<-.5d+1)then
             IMI=IMI+1
-            goto 444
-         endif
+            GOTO 444
+         end if
 !        VRRS(J) IS THE MODULI OF THE SUTFACE R-EIGENVECTOR OF THE MODE J
          VRRS(J)=sqrt(VRx(4*NZN-3,ISORTx(IMI+J-1))**2+ &
-                       VRx(4*NZN-3,ISORTx(IMI+J-1)+1)**2) !surface value
+                       VRx(4*NZN-3,ISORTx(IMI+J-1)+1)**2)  !surface value
          VTTS(J)=VRx(4*NZN-3,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                        VRx(4*NZN-3,ISORTx(IMI+J-1)+1)
 
@@ -1069,7 +1061,7 @@
             if(ALFAM>0.d0)then
                QWKEV(I,J)=PI*dm(I)*aimag(conjg(DPEV)*(DV_0/R(I)**3- &
                         3.d0*Vol(I)/R(I)**4*VRR(I,J)*SCALE(J)))
-            endif
+            end if
 
             if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)>=0.d0) &
               SGRP=SGRP+QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)
@@ -1078,17 +1070,17 @@
 
             VEL(I,J)=abs(VRR(I,J))/VRRS(J)
             if(abs(PHR(I,J))>1.57d0)VEL(I,J)=-VEL(I,J)
-         enddo
+         end do
 
 !        WRITE WORK-INTEGRALS INTO FILE
          if(J<=9)then
             write(NUMER1,'(I1)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER1//'.data'
-         endif
+         end if
          if(J>=10)then
             write(NUMER2,'(I2)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER2//'.data'
-         endif
+         end if
 
          open(57,file=trim(FILENAME),status='unknown')
          write(57,'(a)') &
@@ -1106,7 +1098,7 @@
               NZN+1-I,dlog10(T(I)),R(I)/R(NZN), &
                 QWK(I,J)/EK(J), QWKEV(I,J)/EK(J), QWKPT(I,J)/EK(J), &
                 ETOI(J)/EK(J),ETOIEV(J)/EK(J),ETOIPT(J)/EK(J)
-         enddo
+         end do
          write(57,'("#KINETIC ENERGY:",e15.8)') EK(J)
          close(57)
 
@@ -1125,17 +1117,17 @@
 !           (dL_i/L0)/(dR_NZN/R_NZN)
             DVRL(I,J)=VRL(I,J)/L0*SCALE(J)
             PHL(I,J)=datan2(aimag(DVRL(I,J)),dble(DVRL(I,J)))
-         enddo
+         end do
 
 !        WRITE EIGENVECTORS TO FILE
          if(J<=9)then
             write(NUMER1,'(I1)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER1//'.data'
-         endif
+         end if
          if(J>=10)then
             write(NUMER2,'(I2)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER2//'.data'
-         endif
+         end if
          open(56,file=trim(FILENAME),status='unknown')
          write(56,'(a)') &
             '#ZONE  TEMP.           FRAC. RADIUS  ABS(dR/R)       ' // &
@@ -1166,7 +1158,7 @@
  25      format('         f: (',1P,D15.8,' , ',D15.8,'), abs(f):',D15.8)
  26      format('control: f: (',1P,D15.8,' , ',D15.8,'), abs(f):',D15.8)
 
-      enddo
+      end do
 
       !write(*,'(a55,i12,99(1pd26.16))') 'end LINA s% w(2)**2 Et', &
       !   2, s% w(2)**2, Et(NZN-1)
@@ -1179,7 +1171,6 @@
                P,PV,PT,E,EV,ET,CP,CPV,dCp_dT_00, &
                Q,QV,QT,OP,OPV,OPT,ierr)
       use rsp_eval_eos_and_kap, only : eval_mesa_eos_and_kap
-      implicit none
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
       integer :: k, j
@@ -1220,7 +1211,6 @@
 ! NAMELY ELEMENT I OF SORTED RA (AND REARRANGED RB) WAS ISORT(I) ELEMENT
 ! OF UNSORTED RA (AND NOT REARANGED RB)
       subroutine SORT(N,RA,RB,ISORT)
-      implicit none
       integer :: N,ISORT(N)
       real(dp) :: RA(N),RB(N)
       integer :: L,IR,I,J,RRI
@@ -1228,7 +1218,7 @@
 
       do I=1,N
          ISORT(I)=I
-      enddo
+      end do
 
       L=N/2+1
       IR=N
@@ -1251,14 +1241,14 @@
               RB(1)=RRB
               ISORT(1)=RRI
               return
-           endif
-        endif
+           end if
+        end if
         I=L
         J=L+L
  20     if(J<=IR)then
            if(J<IR)then
               if(RA(J)<RA(J+1))J=J+1
-           endif
+           end if
            if(RRA<RA(J))then
               RA(I)=RA(J)
               RB(I)=RB(J)
@@ -1267,14 +1257,13 @@
               J=J+J
            else
               J=IR+1
-           endif
-           goto 20
-        endif
+           end if
+           GOTO 20
+        end if
         RA(I)=RRA
         RB(I)=RRB
         ISORT(I)=RRI
-      goto 10
+      GOTO 10
       end subroutine SORT
-
 
       end module rsp_lina

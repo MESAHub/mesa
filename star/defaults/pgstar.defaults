@@ -26,14 +26,14 @@
     pgstar_interval = 2
 
 
-      ! pause
-      ! ~~~~~
+      ! pause_flag
+      ! ~~~~~~~~~~
 
       ! if true, then after refresh windows, wait for user to hit RETURN
 
       ! ::
 
-    pause = .false.
+    pause_flag = .false.
 
 
       ! pause_interval
@@ -88,24 +88,13 @@
       ! file_device
       ! ~~~~~~~~~~~
 
-      ! 'png' is Portable Network Graphics format
-      ! can also use:
-      ! 'ps' (in combination with file_extension = 'ps') for PostScript
-      ! or:
-      ! 'vcps' (in combination with file_extension = 'eps') for Encapsulated PostScript
+      ! 'png' for Portable Network Graphics format
+      ! 'vcps' for Color PostScript ('ps')
+      ! 'ps' for PostScript
 
       ! ::
 
     file_device = 'png'
-
-      ! file_extension
-      ! ~~~~~~~~~~~~~~
-
-      ! Can use: 'png', 'ps', or 'eps' with the appropriate file_device
-
-      ! ::
-
-    file_extension = 'png'
 
 
       ! file_digits
@@ -121,7 +110,7 @@
       ! delta_HR_limit_for_file_output
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! trigger file output by distance travelled on HR diagram
+      ! trigger file output by distance traveled on HR diagram
       ! negative means no limit
       ! HR distance since last file output = sum of dHR
       ! where per step dHR = same definition as used for timestep limits
@@ -293,16 +282,16 @@
 
       ! pgstar_profile_line_style for profile panels plot
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! pgstar_history_line_style for history panels plot 
+      ! pgstar_history_line_style for history panels plot
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Referring to the the left side plot, not the "other" one on the right
       !
       ! 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
 
-      ! :: 
+      ! ::
 
-    pgstar_profile_line_style = 1 
+    pgstar_profile_line_style = 1
     pgstar_history_line_style = 1
 
 ! TRho Profile window
@@ -321,7 +310,7 @@
     TRho_Profile_win_width = 6
     TRho_Profile_win_aspect_ratio = 0.75
 
-      ! :: 
+      ! ::
 
     TRho_Profile_xleft = 0.15
     TRho_Profile_xright = 0.85
@@ -340,7 +329,7 @@
     TRho_Profile_ymax = 10.2
 
 
-      ! If ``TRho_switch_to_Column_Depth = .true.``, replace logRho for xaxis by log column depth (g/cm^2). 
+      ! If ``TRho_switch_to_Column_Depth = .true.``, replace logRho for xaxis by log column depth (g/cm^2).
       ! If ``TRho_switch_to_mass = .true.``, replace logRho for xaxis by log mass coordinate M-m(k) |Msun|.
 
       ! ::
@@ -375,8 +364,8 @@
 
     show_TRho_accretion_mesh_borders = .false.
 
-      ! The regions shown by ``show_TRho_Profile_kap_regions`` and ``show_TRho_Profile_eos_regions`` may **not** correspond exactly to those used in the model as 
-      ! they are **not** updated to reflect changes made in a inlist that change the boundaries between eos or kap regions. 
+      ! The regions shown by ``show_TRho_Profile_kap_regions`` and ``show_TRho_Profile_eos_regions`` may **not** correspond exactly to those used in the model as
+      ! they are **not** updated to reflect changes made in a inlist that change the boundaries between eos or kap regions.
 
       ! ::
 
@@ -430,11 +419,11 @@
 
       ! **Setting colors**
 
-      ! ``profile_mass_point_color_index`` and ``profile_mass_point_str_clr`` 
-      ! set the color of the mass location's symbol and corresponding string, respectively, 
+      ! ``profile_mass_point_color_index`` and ``profile_mass_point_str_clr``
+      ! set the color of the mass location's symbol and corresponding string, respectively,
       ! with 1 = foreground color, 2 = Red, 3 = Green, 4 = Blue, etc.
       ! The full range of available indices is defined in Set_Colours in pgstar.support.f.
-      
+
       ! **Setting symbols and text**
 
       ! ``profile_mass_point_symbol`` sets the symbol to be drawn for a given marker.
@@ -449,11 +438,11 @@
       ! > 127       A Hershey symbol number
       ! =========   ==============================================================================================
 
-      !``profile_mass_point_str`` sets the text displayed with the marker. 
+      !``profile_mass_point_str`` sets the text displayed with the marker.
 
       ! **Syntax**
 
-      ! To set defaults for all entries: 
+      ! To set defaults for all entries:
 
       ! ::
 
@@ -522,7 +511,7 @@
 
       ! **Axis limits and labels**
 
-      ! X-axis limits are set by ``Abundance_xmin`` and ``Abundance_xmax``. 
+      ! X-axis limits are set by ``Abundance_xmin`` and ``Abundance_xmax``.
       ! Y-axis limits are set by ``Abundance_log_mass_frac_min`` and ``Abundance_log_mass_frac_max``
 
       ! ::
@@ -533,12 +522,12 @@
     Abundance_log_mass_frac_max = 0.3
 
       ! ::
-    
+
     Abundance_xaxis_name = 'mass'
     Abundance_xaxis_reversed = .false.
 
       ! **Legend**
-      
+
       ! ::
 
     Abundance_legend_max_cnt = 16
@@ -568,7 +557,7 @@
 
     Abundance_show_photosphere_location = .false.
 
-      ! ''Abundance_use_decorator`` enables calling a subroutine to add extra information to a plot,
+      ! ``Abundance_use_decorator`` enables calling a subroutine to add extra information to a plot,
       ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``
 
       ! ::
@@ -618,7 +607,7 @@
     Power_xmax = -101d0
     Power_ymin = -101d0
     Power_ymax = -101d0
-    
+
       ! ::
 
     Power_xaxis_name = 'mass'
@@ -695,7 +684,7 @@
       ! **Legend**
 
       ! ::
-    
+
     Mixing_legend_txt_scale_factor = 1
 
       ! **Decorators**
@@ -850,7 +839,7 @@
 
       ! **Decorators**
 
-      ! ``Mode_Prop_nu_max_obs`` sets the observed nu max that is plotted for comparison 
+      ! ``Mode_Prop_nu_max_obs`` sets the observed nu max that is plotted for comparison
       ! and can be ignored by setting the value to -999
 
       ! ::
@@ -982,7 +971,7 @@
     Summary_Profile_name(:) = ''
     Summary_Profile_legend(:) = ''
 
-      ! If ``Summary_Profile_scaled_value = .true.``, show values scaled max to 1.0 and min to 0.0. 
+      ! If ``Summary_Profile_scaled_value = .true.``, show values scaled max to 1.0 and min to 0.0.
       ! If ``Summary_Profile_scaled_value = .false.``, show the unmapped values (which should be in range 0.0 to 1.0)
       ! typically set .false. for mass fractions; .true. for everything else.
 
@@ -1237,13 +1226,13 @@
     Kipp_xaxis_name = 'model_number'
 
       ! If ``Kipp_max_width`` is negative, then all steps will be shown, thereby overriding ``Kipp_step_xmin``
-      
+
       ! ::
 
     Kipp_max_width = -1
 
-      ! Changes to ``Kipp_xaxis_log``, ``Kipp_xmin``, ``Kipp_xmax``, ``Kipp_xmargin``, 
-      ! ``Kipp_xaxis_reversed``, ``Kipp_xaxis_in_seconds``, ``Kipp_xaxis_in_Myr``, and 
+      ! Changes to ``Kipp_xaxis_log``, ``Kipp_xmin``, ``Kipp_xmax``, ``Kipp_xmargin``,
+      ! ``Kipp_xaxis_reversed``, ``Kipp_xaxis_in_seconds``, ``Kipp_xaxis_in_Myr``, and
       ! ``Kipp_xaxis_time_from_present`` all require ``Kipp_xaxis_name = star_age``
       ! ::
 
@@ -1340,7 +1329,7 @@
 ! "rti" window
 ! ============
 
-      ! history of Rayleigh Taylor instabilities.
+      ! history of Rayleigh-Taylor instabilities.
 
       ! ::
 
@@ -1369,7 +1358,7 @@
     rti_ybot = 0.15
     rti_ytop = 0.85
     rti_txt_scale = 1.0
-    rti_title = 'Rayleigh Taylor Instability'
+    rti_title = 'Rayleigh-Taylor Instability'
 
       ! **Axis limits and Labels**
 
@@ -1381,15 +1370,15 @@
     rti_step_xmax = -1
     rti_xaxis_name = 'model_number'
 
-      ! If ``rti_max_width`` is negative, then all steps will be shown, 
+      ! If ``rti_max_width`` is negative, then all steps will be shown,
       ! thereby overriding ``rti_step_xmin``
 
       ! ::
 
     rti_max_width = -1
 
-      ! Changes to ``rti_xaxis_log``, ``rti_xmin``, ``rti_xmax``, ``rti_xmargin``, 
-      ! ``rti_xaxis_reversed``, ``rti_xaxis_in_seconds``, ``rti_xaxis_in_Myr``, 
+      ! Changes to ``rti_xaxis_log``, ``rti_xmin``, ``rti_xmax``, ``rti_xmargin``,
+      ! ``rti_xaxis_reversed``, ``rti_xaxis_in_seconds``, ``rti_xaxis_in_Myr``,
       ! and ``rti_xaxis_time_from_present`` all require ``rti_xaxis_name = star_age``
 
       ! ::
@@ -1417,8 +1406,8 @@
     rti_mass_margin = 0.01
 
       ! **Decorators**
-      
-      ! ``rti_interval`` sets the model number step in between 
+
+      ! ``rti_interval`` sets the model number step in between
       ! updates of the displayed rti data
       ! ::
 
@@ -1739,7 +1728,7 @@
     logL_Teff_step_max = -1
 
       ! **Decorators**
-      
+
       ! ::
 
     show_logL_Teff_target_box = .false.
@@ -2663,7 +2652,7 @@
 
       ! **Decorators**
 
-      ! If ``Network_show_mass_fraction = .true.``, then show mass fraction as a coloured square. 
+      ! If ``Network_show_mass_fraction = .true.``, then show mass fraction as a coloured square.
       ! The mass fractions shown are limited by ``Network_log_mass_frac_min`` and ``Network_log_mass_frac_max``.
 
       ! ::
@@ -2672,7 +2661,7 @@
     Network_log_mass_frac_min = -5.0d0
     Network_log_mass_frac_max = 0.0d0
 
-      ! Use ``Network_show_element_names`` to label Y-axis with element name and 
+      ! Use ``Network_show_element_names`` to label Y-axis with element name and
       ! ``Network_show_colorbar`` to add a color bar.
 
       ! ::
@@ -2814,7 +2803,7 @@
     Profile_Panels1_title = 'Profile Panels1'
 
       ! ::
- 
+
     Profile_Panels1_xaxis_name = 'mass'
     Profile_Panels1_xaxis_reversed = .false.
     Profile_Panels1_xmin = -101d0
@@ -2823,7 +2812,7 @@
     Profile_Panels1_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels1_same_yaxis_range(:) = .false.
 
       ! ::
@@ -2913,7 +2902,7 @@
     Profile_Panels2_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels2_same_yaxis_range(:) = .false.
 
       ! ::
@@ -3018,7 +3007,7 @@
     Profile_Panels3_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels3_same_yaxis_range(:) = .false.
 
       ! ::
@@ -3227,7 +3216,7 @@
     Profile_Panels5_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels5_same_yaxis_range(:) = .false.
 
       ! ::
@@ -3333,7 +3322,7 @@
     Profile_Panels6_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels6_same_yaxis_range(:) = .false.
 
       ! ::
@@ -3417,7 +3406,7 @@
     Profile_Panels7_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels7_same_yaxis_range(:) = .false.
 
       ! ::
@@ -3501,7 +3490,7 @@
     Profile_Panels8_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels8_same_yaxis_range(:) = .false.
 
       ! ::
@@ -3585,7 +3574,7 @@
     Profile_Panels9_show_mix_regions_on_xaxis = .false.
 
       ! ::
- 
+
     Profile_Panels9_same_yaxis_range(:) = .false.
 
       ! ::

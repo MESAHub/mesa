@@ -256,7 +256,7 @@ c
       c1=(p2*(el+2)-ec*a2)*x2
       c2=ell*(p2-(el+3.d0)*bc*a2/sig)*x2
 c
-c  set expansion coeffients
+c  set expansion coefficients
 c
       c11=1.d0+c1*f2
       c13=-c1

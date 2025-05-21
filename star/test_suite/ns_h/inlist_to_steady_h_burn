@@ -3,15 +3,15 @@
 &star_job
 
 
-      show_log_description_at_start = .false. 
-      
+      show_log_description_at_start = .false.
+
       load_saved_model = .true.
       load_model_filename = 'ns_plus_he_layer.mod'
-      
+
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       required_termination_code_string = 'max_age'
-      
+
       !change_initial_v_flag = .true.
       !new_v_flag = .true.
 
@@ -20,7 +20,7 @@
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-   
+
       set_initial_dt = .true.
       seconds_for_initial_dt = 1d-4
 
@@ -41,7 +41,7 @@
    ! move the density corner far away so that blend is over logT
    logRho_min_for_any_Skye = 4.9
    logRho_min_for_all_Skye = 5.0
-   
+
 / ! end of eos namelist
 
 &kap
@@ -53,7 +53,7 @@
 &controls
 
       use_other_cgrav = .true. ! for GR factor with gravity
-           
+
       mass_change = 5d-11 ! this gives steady h burn
       max_years_for_timestep = 1d-3
       !max_timestep = 1d-1
@@ -64,37 +64,37 @@
 
       max_number_retries = 200
       max_model_number = 2000
-         
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-      
+
       delta_lgL_nuc_limit = 0.01
       delta_lgL_nuc_hard_limit = 0.05
       lgL_nuc_burn_min = -2d0
 
-      accrete_same_as_surface = .false. 
-      accrete_given_mass_fractions = .false. 
+      accrete_same_as_surface = .false.
+      accrete_given_mass_fractions = .false.
       accretion_h1 = 0.72
       accretion_h2 = 0
       accretion_he3 = 0
       accretion_he4 = 0.26
       accretion_zfracs = 3
-      
+
       energy_eqn_option = 'eps_grav'
 
       max_abar_for_burning = 55
-      
+
       initial_z = 0.02d0
 
       mixing_length_alpha = 1.5
       MLT_option = 'TDC'
 
-      use_Ledoux_criterion = .false.  
+      use_Ledoux_criterion = .false.
       alpha_semiconvection = 0.1
       thermohaline_coeff = 2
       thermohaline_option = 'Kippenhahn'
-   
+
       merge_if_dlnR_too_small = .true.
       mesh_min_dlnR = 1d-9
 
@@ -102,9 +102,9 @@
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
       Pextra_factor = 2
-   
-      varcontrol_target = 1d-3 
-      
+
+      varcontrol_target = 1d-3
+
       !mesh_delta_coeff = 0.5
 
       limit_for_rel_error_in_energy_conservation = 1d-4
@@ -122,10 +122,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
-         
-!pause = .true.
+
+!pause_flag = .true.
 
 Grid2_win_flag = .true.
 pgstar_interval = 1

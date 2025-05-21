@@ -27,7 +27,7 @@
 --      Lb=31;
 --      Lf=35;
     <*findL: Lb to begin, Lf to finish (UBVRI bands: Rlong--Ushort) *>;
-    write(51,*) '   time          L_ubvri    L_bol    XEUV<325   IR>890'; -- limts defined in Ushort
+    write(51,*) '   time          L_ubvri    L_bol    XEUV<325   IR>890'; -- limits defined in Ushort
    _repeat [
      read(50,@ap(F15.10,1X,I4,1X,E10.3,999F8.3)@ap,end=10) t_tt,NFRUS,dummy,
                (ttt(L),L=1,NFREQ); -- Lum  erg/(sec*Hz)

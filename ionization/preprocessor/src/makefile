@@ -2,28 +2,28 @@ FC=gfortran
 FCFLAGS=-ffree-form -O2 #-std=f2003
 LDFLAGS=
 
-SOURCES=def_args.f\
-def_const.f\
-def_type.f\
-lib_alert.f\
-lib_rkqsstep.f\
-lib_util.f\
-mod_bi.f\
-mod_density.f\
-mod_fast_tfdh.f\
-mod_gfdi.f\
-mod_run_tfdh.f\
-mod_tfdh.f\
-root_chi.f\
-root_vex.f
-OBJECTS=$(SOURCES:.f=.o)
+SOURCES=def_args.f90\
+def_const.f90\
+def_type.f90\
+lib_alert.f90\
+lib_rkqsstep.f90\
+lib_util.f90\
+mod_bi.f90\
+mod_density.f90\
+mod_fast_tfdh.f90\
+mod_gfdi.f90\
+mod_run_tfdh.f90\
+mod_tfdh.f90\
+root_chi.f90\
+root_vex.f90
+OBJECTS=$(SOURCES:.f90=.o)
 
-SRCMAIN=main.f
-OBJMAIN=$(SRCMAIN:.f=.o)
+SRCMAIN=main.f90
+OBJMAIN=$(SRCMAIN:.f90=.o)
 EXECUTABLE=tfdh
 
-SRCTEST=maintest.f
-OBJTEST=$(SRCTEST:.f=.o)
+SRCTEST=maintest.f90
+OBJTEST=$(SRCTEST:.f90=.o)
 TESTEXECUTABLE=tfdh_test
 
 #################################################
@@ -40,7 +40,7 @@ $(TESTEXECUTABLE): $(OBJECTS) $(OBJTEST)
 	$(FC) $(FCFLAGS) $(OBJECTS) $(OBJTEST) -o $(TESTEXECUTABLE)
 
 
-.f.o:
+.f90.o:
 	$(FC) $(FCFLAGS) -c $<
 
 
@@ -67,5 +67,4 @@ def_args.o: def_type.o
 def_type.o:
 lib_alert.o:
 #################################################
-
 

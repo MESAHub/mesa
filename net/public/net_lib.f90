@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -28,12 +22,11 @@
       ! the data interface for the library is defined in net_def
 
       use chem_def
-      use const_def, only: dp
+      use const_def, only: dp, i8
 
       implicit none
 
-
-      contains ! the procedure interface for the library
+      contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
 
@@ -43,7 +36,7 @@
       subroutine net_init(ierr)
          use net_def, only : do_net_def_init
          use net_initialize, only : init_special_case_reaction_info
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          call do_net_def_init
          call init_special_case_reaction_info
@@ -75,7 +68,7 @@
       ! you'll need a pointer to it.
       subroutine net_ptr(handle, g, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
-         integer, intent(in) :: handle ! from alloc_net_handle
+         integer, intent(in) :: handle  ! from alloc_net_handle
          type (Net_General_Info), pointer :: g
          integer, intent(out):: ierr
          call get_net_ptr(handle, g, ierr)
@@ -361,7 +354,7 @@
       ! general info about the net
 
 
-      integer function net_num_isos(handle, ierr) ! total number in current net
+      integer function net_num_isos(handle, ierr)  ! total number in current net
          use net_def, only: Net_General_Info, get_net_ptr
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
@@ -375,7 +368,7 @@
          net_num_isos = g% num_isos
       end function net_num_isos
 
-      integer function net_num_reactions(handle, ierr) ! total number of rates for net
+      integer function net_num_reactions(handle, ierr)  ! total number of rates for net
          use net_def, only: Net_General_Info, get_net_ptr
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
@@ -391,8 +384,8 @@
 
       subroutine get_chem_id_table(handle, num_isos, chem_id, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
-         integer, intent(in) :: handle, num_isos ! num_isos must be number of isos in current net
-         integer, intent(out) :: chem_id(num_isos) ! maps net iso number to chem id
+         integer, intent(in) :: handle, num_isos  ! num_isos must be number of isos in current net
+         integer, intent(out) :: chem_id(num_isos)  ! maps net iso number to chem id
             ! index from 1 to num_isos in current net
             ! value is between 1 and num_chem_isos
          integer, intent(out) :: ierr
@@ -414,7 +407,7 @@
       subroutine get_chem_id_table_ptr(handle, chem_id_ptr, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
          integer, intent(in) :: handle
-         integer, pointer :: chem_id_ptr(:) ! maps net iso number to chem id
+         integer, pointer :: chem_id_ptr(:)  ! maps net iso number to chem id
             ! index from 1 to num_isos in current net
             ! value is between 1 and num_chem_isos
          integer, intent(out) :: ierr
@@ -431,7 +424,7 @@
       subroutine get_net_iso_table(handle, net_iso_table, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
          integer, intent(in) :: handle
-         integer, intent(out) :: net_iso_table(num_chem_isos) ! maps chem id to net iso number
+         integer, intent(out) :: net_iso_table(num_chem_isos)  ! maps chem id to net iso number
             ! index from 1 to num_chem_isos
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and num_isos in current net
@@ -450,7 +443,7 @@
       subroutine get_net_iso_table_ptr(handle, net_iso_ptr, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
          integer, intent(in) :: handle
-         integer, pointer :: net_iso_ptr(:) ! maps chem id to net iso number
+         integer, pointer :: net_iso_ptr(:)  ! maps chem id to net iso number
             ! index from 1 to num_chem_isos
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and num_isos in current net
@@ -494,7 +487,7 @@
       subroutine get_reaction_id_table_ptr(handle, reaction_id_ptr, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
          integer, intent(in) :: handle
-         integer, pointer :: reaction_id_ptr(:) ! maps net reaction number to reaction id
+         integer, pointer :: reaction_id_ptr(:)  ! maps net reaction number to reaction id
             ! index from 1 to num_reactions in current net
             ! value is between 1 and rates_reaction_id_max
          integer, intent(out) :: ierr
@@ -579,54 +572,54 @@
          type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), intent(in)  :: x(:) ! (num_isos)
-         real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-         real(dp), intent(in)  :: rho, log10rho ! log10 of rho
+         real(dp), intent(in)  :: x(:)  ! (num_isos)
+         real(dp), intent(in)  :: temp, log10temp  ! log10 of temp
+         real(dp), intent(in)  :: rho, log10rho  ! log10 of rho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
-         real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
+         real(dp), intent(in)  :: z2bar  ! mean charge squared per nucleus
          real(dp), intent(in)  :: ye
             ! mean number free electrons per nucleon, assuming complete ionization
             ! d_dxdt_dx(i, j) is d_dxdt(i)_dx(j),
             ! i.e., partial derivative of rate for i'th isotope wrt j'th isotope abundance
-         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho ! electron degeneracy from eos.
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho  ! electron degeneracy from eos.
             ! this arg is only used for prot(e-nu)neut and neut(e+nu)prot.
             ! if your net doesn't include those, you can safely ignore this arg.
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
             ! when rates are calculated, they are multiplied by the
             ! corresponding values in this array.
             ! rate_factors array is indexed by reaction number.
             ! use net_reaction_table to map reaction id to reaction number.
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
 
-         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after including losses from reaction neutrinos
+         real(dp), intent(out) :: eps_nuc  ! ergs/g/s from burning after including losses from reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
-         real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos)
+         real(dp), intent(inout) :: d_eps_nuc_dx(:)  ! (num_isos)
             ! partial derivatives wrt mass fractions
 
-         real(dp), intent(inout) :: dxdt(:) ! (num_isos)
+         real(dp), intent(inout) :: dxdt(:)  ! (num_isos)
             ! rate of change of mass fractions caused by nuclear reactions
-         real(dp), intent(inout) :: d_dxdt_dRho(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dT(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dx(:,:) ! (num_isos, num_isos)
+         real(dp), intent(inout) :: d_dxdt_dRho(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dT(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dx(:,:)  ! (num_isos, num_isos)
             ! partial derivatives of rates wrt mass fractions
 
-         real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
+         real(dp), intent(inout) :: eps_nuc_categories(:)  ! (num_categories)
             ! eps_nuc subtotals for each reaction category
 
-         real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
+         real(dp), intent(out) :: eps_neu_total  ! ergs/g/s neutrinos from weak reactions
 
          integer, intent(in) :: screening_mode
 
-         integer, intent(out) :: ierr ! 0 means okay
+         integer, intent(out) :: ierr  ! 0 means okay
 
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          type (Net_General_Info), pointer :: g
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs
-         logical, pointer :: from_weaklib(:) ! ignore if null
+         logical, pointer :: from_weaklib(:)  ! ignore if null
          logical, parameter :: symbolic = .false.
          logical, parameter :: rates_only = .false.
          actual_Qs => null()
@@ -644,7 +637,7 @@
             call system_clock(time0)
          else
             time0 = 0
-         endif
+         end if
 
          call eval_net( &
                n, g, rates_only, just_dxdt, num_isos, num_reactions, g% num_wk_reactions, &
@@ -685,38 +678,38 @@
          type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), intent(in)  :: x(:) ! (num_isos)
-         real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-         real(dp), intent(in)  :: rho, log10rho ! log10 of rho
+         real(dp), intent(in)  :: x(:)  ! (num_isos)
+         real(dp), intent(in)  :: temp, log10temp  ! log10 of temp
+         real(dp), intent(in)  :: rho, log10rho  ! log10 of rho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
-         real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
+         real(dp), intent(in)  :: z2bar  ! mean charge squared per nucleus
          real(dp), intent(in)  :: ye
             ! mean number free electrons per nucleon, assuming complete ionization
             ! d_dxdt_dx(i, j) is d_dxdt(i)_dx(j),
             ! i.e., partial derivative of rate for i'th isotope wrt j'th isotope abundance
-         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho ! electron degeneracy from eos.
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho  ! electron degeneracy from eos.
             ! this arg is only used for prot(e-nu)neut and neut(e+nu)prot.
             ! if your net doesn't include those, you can safely ignore this arg.
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
             ! when rates are calculated, they are multiplied by the
             ! corresponding values in this array.
             ! rate_factors array is indexed by reaction number.
             ! use net_reaction_table to map reaction id to reaction number.
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
 
          ! rate_raw and rate_screened are described in the declaration of the Net_Info derived type
 
          integer, intent(in) :: screening_mode
 
-         integer, intent(out) :: ierr ! 0 means okay
+         integer, intent(out) :: ierr  ! 0 means okay
 
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          type (Net_General_Info), pointer :: g
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs
-         logical, pointer :: from_weaklib(:) ! ignore if null
+         logical, pointer :: from_weaklib(:)  ! ignore if null
          logical, parameter :: symbolic = .false.
 
          real(dp) :: eps_nuc, d_eps_nuc_dT, d_eps_nuc_dRho, eps_neu_total
@@ -751,7 +744,7 @@
             call system_clock(time0)
          else
             time0 = 0
-         endif
+         end if
 
          call eval_net( &
                n, g, rates_only, just_dxdt, num_isos, num_reactions, g% num_wk_reactions, &
@@ -796,49 +789,49 @@
          type (Net_Info)  :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), intent(in)  :: x(:) ! (num_isos)
-         real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-         real(dp), intent(in)  :: rho, log10rho ! log10 of rho
+         real(dp), intent(in)  :: x(:)  ! (num_isos)
+         real(dp), intent(in)  :: temp, log10temp  ! log10 of temp
+         real(dp), intent(in)  :: rho, log10rho  ! log10 of rho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
-         real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
+         real(dp), intent(in)  :: z2bar  ! mean charge squared per nucleus
          real(dp), intent(in)  :: ye
             ! mean number free electrons per nucleon, assuming complete ionization
             ! d_dxdt_dx(i, j) is d_dxdt(i)_dx(j),
             ! i.e., partial derivative of rate for i'th isotope wrt j'th isotope abundance
-         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho ! electron degeneracy from eos.
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho  ! electron degeneracy from eos.
             ! this arg is only used for prot(e-nu)neut and neut(e+nu)prot.
             ! if your net doesn't include those, you can safely ignore this arg.
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
             ! when rates are calculated, they are multiplied by the
             ! corresponding values in this array.
             ! rate_factors array is indexed by reaction number.
             ! use net_reaction_table to map reaction id to reaction number.
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
 
-         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after including reaction neutrinos
+         real(dp), intent(out) :: eps_nuc  ! ergs/g/s from burning after including reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
-         real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos)
+         real(dp), intent(inout) :: d_eps_nuc_dx(:)  ! (num_isos)
             ! partial derivatives wrt mass fractions
 
-         real(dp), intent(inout) :: dxdt(:) ! (num_isos)
+         real(dp), intent(inout) :: dxdt(:)  ! (num_isos)
             ! rate of change of mass fractions caused by nuclear reactions
-         real(dp), intent(inout) :: d_dxdt_dRho(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dT(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dx(:,:) ! (num_isos, num_isos)
+         real(dp), intent(inout) :: d_dxdt_dRho(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dT(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dx(:,:)  ! (num_isos, num_isos)
             ! partial derivatives of rates wrt mass fractions
 
-         real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
+         real(dp), intent(inout) :: eps_nuc_categories(:)  ! (num_categories)
             ! eps_nuc subtotals for each reaction category
 
-         real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
+         real(dp), intent(out) :: eps_neu_total  ! ergs/g/s neutrinos from weak reactions
 
          ! rate_raw and rate_screened are described in the declaration of the Net_Info derived type
 
-         integer, intent(in) :: screening_mode ! Selects which screening mode to use, see rates_def for definition
+         integer, intent(in) :: screening_mode  ! Selects which screening mode to use, see rates_def for definition
 
          integer, intent(out) :: ierr
             ! ierr = 0 means AOK
@@ -848,7 +841,7 @@
 
          type (Net_General_Info), pointer :: g
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs
-         logical, pointer :: from_weaklib(:) ! ignore if null
+         logical, pointer :: from_weaklib(:)  ! ignore if null
          logical, parameter :: symbolic = .true.
          integer :: num_rates_reduced
          real(dp) :: max_old_rate_div_new_rate
@@ -903,36 +896,36 @@
          type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), intent(in)  :: x(:) ! (num_isos)
-         real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-         real(dp), intent(in)  :: rho, log10rho ! log10 of rho
+         real(dp), intent(in)  :: x(:)  ! (num_isos)
+         real(dp), intent(in)  :: temp, log10temp  ! log10 of temp
+         real(dp), intent(in)  :: rho, log10rho  ! log10 of rho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
-         real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
+         real(dp), intent(in)  :: z2bar  ! mean charge squared per nucleus
          real(dp), intent(in)  :: ye
-         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho ! electron degeneracy from eos.
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho  ! electron degeneracy from eos.
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         real(dp), intent(out) :: eps_nuc ! ergs/g/s from burning after including reaction neutrinos
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
+         real(dp), intent(out) :: eps_nuc  ! ergs/g/s from burning after including reaction neutrinos
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
-         real(dp), intent(inout) :: d_eps_nuc_dx(:) ! (num_isos)
-         real(dp), intent(inout) :: dxdt(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dRho(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dT(:) ! (num_isos)
-         real(dp), intent(inout) :: d_dxdt_dx(:,:) ! (num_isos, num_isos)
-         real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
-         real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
+         real(dp), intent(inout) :: d_eps_nuc_dx(:)  ! (num_isos)
+         real(dp), intent(inout) :: dxdt(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dRho(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dT(:)  ! (num_isos)
+         real(dp), intent(inout) :: d_dxdt_dx(:,:)  ! (num_isos, num_isos)
+         real(dp), intent(inout) :: eps_nuc_categories(:)  ! (num_categories)
+         real(dp), intent(out) :: eps_neu_total  ! ergs/g/s neutrinos from weak reactions
          integer, intent(in) :: screening_mode
-         real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null  (num_reactions)
-         logical, pointer :: from_weaklib(:) ! ignore if null
+         real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs  ! ignore if null  (num_reactions)
+         logical, pointer :: from_weaklib(:)  ! ignore if null
          integer, intent(out) :: ierr
 
          logical, parameter :: rates_only = .false.
          logical, parameter :: symbolic = .false.
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          type (Net_General_Info), pointer :: g
 
          ierr = 0
@@ -946,7 +939,7 @@
             call system_clock(time0)
          else
             time0 = 0
-         endif
+         end if
 
          call eval_net( &
             n, g, rates_only, just_dxdt, num_isos, num_reactions, g% num_wk_reactions, &
@@ -986,24 +979,24 @@
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (num_isos)
+         real(dp), intent(in) :: t_start, t_end, starting_x(:)  ! (num_isos)
 
          integer, intent(in) :: num_times_for_interpolation
             ! ending time is times(num_times); starting time is 0
-         real(dp), pointer, intent(in) :: times(:) ! (num_times)
-         real(dp), pointer, intent(in) :: log10Ts_f1(:) ! =(4,numtimes) interpolant for log10T(time)
-         real(dp), pointer, intent(in) :: log10Rhos_f1(:) ! =(4,numtimes) interpolant for log10Rho(time)
-         real(dp), pointer, intent(in) :: etas_f1(:) ! =(4,numtimes) interpolant for eta(time)
-         real(dp), pointer, intent(in) :: dxdt_source_term(:) ! (num_isos)  or null if no source term.
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), pointer, intent(in) :: times(:)  ! (num_times)
+         real(dp), pointer, intent(in) :: log10Ts_f1(:)  ! =(4,numtimes) interpolant for log10T(time)
+         real(dp), pointer, intent(in) :: log10Rhos_f1(:)  ! =(4,numtimes) interpolant for log10Rho(time)
+         real(dp), pointer, intent(in) :: etas_f1(:)  ! =(4,numtimes) interpolant for eta(time)
+         real(dp), pointer, intent(in) :: dxdt_source_term(:)  ! (num_isos)  or null if no source term.
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         integer, intent(in) :: screening_mode ! see screen_def
-         real(dp), intent(in) :: stptry ! try this for 1st step.  0 means try in 1 step.
-         integer, intent(in) :: max_steps ! maximal number of allowed steps.
-         real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
-         logical, intent(in) :: use_pivoting ! for matrix solves
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
+         integer, intent(in) :: screening_mode  ! see screen_def
+         real(dp), intent(in) :: stptry  ! try this for 1st step.  0 means try in 1 step.
+         integer, intent(in) :: max_steps  ! maximal number of allowed steps.
+         real(dp), intent(in) :: eps, odescal  ! tolerances.  e.g., set both to 1d-6
+         logical, intent(in) :: use_pivoting  ! for matrix solves
          logical, intent(in) :: trace, dbg
          interface
             include 'burner_finish_substep.inc'
@@ -1050,7 +1043,7 @@
          use chem_def, only: num_categories
 
          integer, intent(in) :: net_handle, eos_handle, num_isos, num_reactions
-         real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (num_isos)
+         real(dp), intent(in) :: t_start, t_end, starting_x(:)  ! (num_isos)
          real(dp), intent(in) :: starting_log10T, log10Rho
          interface
             include 'burner_const_density_get_eos_info.inc'
@@ -1114,33 +1107,33 @@
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), pointer, intent(in) :: starting_x(:) ! (num_isos)
+         real(dp), pointer, intent(in) :: starting_x(:)  ! (num_isos)
          real(dp), intent(in) :: starting_temp
-         logical, intent(in) :: clip ! if true, set negative x's to zero during burn.
+         logical, intent(in) :: clip  ! if true, set negative x's to zero during burn.
 
-         integer, intent(in) :: which_solver ! as defined in num_def.f
-         integer, intent(in) :: num_times_for_interpolation ! ending time is times(num_times); starting time is 0
-         real(dp), pointer, intent(in) :: times(:) ! (num_times)
-         real(dp), pointer, intent(in) :: log10Ps_f1(:) ! =(4,numtimes) interpolant for log10P(time)
+         integer, intent(in) :: which_solver  ! as defined in num_def.f
+         integer, intent(in) :: num_times_for_interpolation  ! ending time is times(num_times); starting time is 0
+         real(dp), pointer, intent(in) :: times(:)  ! (num_times)
+         real(dp), pointer, intent(in) :: log10Ps_f1(:)  ! =(4,numtimes) interpolant for log10P(time)
 
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode
 
          ! args to control the solver -- see num/public/num_isolve.dek
          real(dp), intent(inout) :: h
-         real(dp), intent(in) :: max_step_size ! maximal step size.
-         integer, intent(in) :: max_steps ! maximal number of allowed steps.
+         real(dp), intent(in) :: max_step_size  ! maximal step size.
+         integer, intent(in) :: max_steps  ! maximal number of allowed steps.
          ! absolute and relative error tolerances
-         real(dp), pointer :: rtol(:) ! relative error tolerance (num_isos)
-         real(dp), pointer :: atol(:) ! absolute error tolerance (num_isos)
-         integer, intent(in) :: itol ! switch for rtol and atol
-         real(dp), intent(in) :: x_min, x_max ! bounds on allowed values
-         integer, intent(in) :: which_decsol ! from mtx_def
+         real(dp), pointer :: rtol(:)  ! relative error tolerance (num_isos)
+         real(dp), pointer :: atol(:)  ! absolute error tolerance (num_isos)
+         integer, intent(in) :: itol  ! switch for rtol and atol
+         real(dp), intent(in) :: x_min, x_max  ! bounds on allowed values
+         integer, intent(in) :: which_decsol  ! from mtx_def
          integer, intent(in) :: caller_id
-         interface ! subroutine called after each successful step
+         interface  ! subroutine called after each successful step
             include "num_solout.dek"
          end interface
          integer, intent(in)  :: iout
@@ -1176,7 +1169,7 @@
       ! Fowler, Caughlan, Zimmerman, Annual Review Astro. Astrophys., 1975.12:69-112. eqn (1).
       real(dp) function eval_neutrino_Q(i1, i2)
          use net_initialize, only:neutrino_Q
-         integer, intent(in) :: i1, i2 ! i1 decays to i2.  e.g., i1=in13 and i2=ic13
+         integer, intent(in) :: i1, i2  ! i1 decays to i2.  e.g., i1=in13 and i2=ic13
          eval_neutrino_Q = neutrino_Q(i1, i2)
       end function eval_neutrino_Q
 
@@ -1193,7 +1186,7 @@
          ! make sure all fractions are okay and sum to 1.0
          use net_eval, only: do_clean_up_fractions
          integer, intent(in) :: nzlo, nzhi, species, nz
-         real(dp), intent(inout) :: xa(:,:) ! (species, nz) ! mass fractions
+         real(dp), intent(inout) :: xa(:,:)  ! (species, nz) ! mass fractions
          real(dp), intent(in) :: max_sum_abs
          ! if any k has sum(abs(xa(:,k))) greater than this, set ierr = -1 and return.
          ! else clip each element abundance to the range 0 to 1 and continue.
@@ -1208,12 +1201,10 @@
       subroutine clean1(species, xa, max_sum_abs, xsum_tol, ierr)
          use net_eval, only: do_clean1
          integer, intent(in) :: species
-         real(dp), intent(inout) :: xa(:) ! (species)
+         real(dp), intent(inout) :: xa(:)  ! (species)
          real(dp), intent(in) :: max_sum_abs, xsum_tol
          integer, intent(out) :: ierr
          call do_clean1(species, xa, 1, max_sum_abs, xsum_tol, ierr)
       end subroutine clean1
 
-
       end module net_lib
-

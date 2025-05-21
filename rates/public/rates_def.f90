@@ -1,25 +1,19 @@
 ! ***********************************************************************
 !
-!  Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2019  The MESA Team
 !
-!  MESA is free software; you can use it and/or modify
-!  it under the combined terms and restrictions of the MESA MANIFESTO
-!  and the GNU General Library Public License as published
-!  by the Free Software Foundation; either version 2 of the License,
-!  or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!  You should have received a copy of the MESA MANIFESTO along with
-!  this software; if not, it is available at the mesa website:
-!  http://mesa.sourceforge.net/
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!  MESA is distributed in the hope that it will be useful,
-!  but WITHOUT ANY WARRANTY; without even the implied warranty of
-!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!  See the GNU Library General Public License for more details.
-!
-!  You should have received a copy of the GNU Library General Public License
-!  along with this software; if not, write to the Free Software
-!  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -73,8 +67,8 @@
          r_one_four = 11
 
 
-      integer, dimension(nchapters), parameter :: Nin = (/1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 1/)
-      integer, dimension(nchapters), parameter :: Nout = (/1, 2, 3, 1, 2, 3, 4, 1, 2, 2, 4/)
+      integer, dimension(nchapters), parameter :: Nin = [1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 1]
+      integer, dimension(nchapters), parameter :: Nout = [1, 2, 3, 1, 2, 3, 4, 1, 2, 2, 4]
 
 
       type reaclib_data
@@ -96,8 +90,8 @@
          type(nuclide_data), pointer :: nuclides=>NULL()
 
          integer :: num_from_weaklib
-         integer, dimension(:), pointer :: weaklib_ids=>NULL() ! (num_from_weaklib)
-         logical, dimension(:), pointer :: also_in_reaclib=>NULL() ! (num_from_weaklib)
+         integer, dimension(:), pointer :: weaklib_ids=>NULL()  ! (num_from_weaklib)
+         logical, dimension(:), pointer :: also_in_reaclib=>NULL()  ! (num_from_weaklib)
 
          integer, dimension(2, nchapters) :: bookmarks
          character(len=max_id_length), dimension(:), pointer :: reaction_handle=>NULL(), reverse_handle=>NULL()
@@ -125,30 +119,30 @@
          ! reactions information
 
          integer, parameter :: maxlen_reaction_Name = 32
-         character (len=maxlen_reaction_Name), pointer :: reaction_Name(:)=>NULL() ! (rates_reaction_id_max)
+         character (len=maxlen_reaction_Name), pointer :: reaction_Name(:)=>NULL()  ! (rates_reaction_id_max)
 
          integer, parameter :: maxlen_reaction_Info = 72
-         character (len=maxlen_reaction_Info), pointer :: reaction_Info(:)=>NULL() ! (rates_reaction_id_max)
+         character (len=maxlen_reaction_Info), pointer :: reaction_Info(:)=>NULL()  ! (rates_reaction_id_max)
 
-         real(dp), pointer :: std_reaction_Qs(:)=>NULL() ! (rates_reaction_id_max)
+         real(dp), pointer :: std_reaction_Qs(:)=>NULL()  ! (rates_reaction_id_max)
             ! set at initialization; read-only afterwards.
             ! avg energy including neutrinos
 
-         real(dp), pointer :: std_reaction_neuQs(:)=>NULL() ! (rates_reaction_id_max)
+         real(dp), pointer :: std_reaction_neuQs(:)=>NULL()  ! (rates_reaction_id_max)
             ! set at initialization; read-only afterwards.
             ! avg neutrino loss
 
-         real(dp), pointer :: weak_lowT_rate(:)=>NULL() ! (rates_reaction_id_max)
+         real(dp), pointer :: weak_lowT_rate(:)=>NULL()  ! (rates_reaction_id_max)
             ! these are from reaclib or weak_info.list
             ! set at initialization; read-only afterwards.
 
-         integer, pointer :: reaction_screening_info(:,:)=>NULL() !(3,rates_reaction_id_max)
+         integer, pointer :: reaction_screening_info(:,:)=>NULL()  !(3,rates_reaction_id_max)
             ! reaction_screen_info(1:2,i) = [chem_id1, chem_id2] for screening.  0's if no screening.
 
-         integer, pointer :: weak_reaction_info(:,:)=>NULL() ! (2,rates_reaction_id_max)
+         integer, pointer :: weak_reaction_info(:,:)=>NULL()  ! (2,rates_reaction_id_max)
             ! weak_reaction_info(1:2,i) = [chem_id_in, chem_id_out].  0's if not a weak reaction.
 
-         integer, pointer :: reaction_ye_rho_exponents(:,:)=>NULL() ! (2,rates_reaction_id_max)
+         integer, pointer :: reaction_ye_rho_exponents(:,:)=>NULL()  ! (2,rates_reaction_id_max)
             ! multiply T dependent rate by Ye^a(i) * Rho^b(i)
             ! reaction_ye_rho_coeffs(1,i) is a(i)
             ! reaction_ye_rho_coeffs(2,i) is b(i)
@@ -159,14 +153,14 @@
             ! (1,2) for 3 body electron captures (e.g., pep)
 
          integer, parameter :: max_num_reaction_inputs = 3
-         integer, pointer :: reaction_inputs(:,:)=>NULL() ! (2*max_num_reaction_inputs,rates_reaction_id_max)
+         integer, pointer :: reaction_inputs(:,:)=>NULL()  ! (2*max_num_reaction_inputs,rates_reaction_id_max)
             ! up to max_num_reaction_inputs pairs of coefficients and chem id's, terminated by 0's.
             ! e.g.,  o16(p,g)f17 would be (/ 1, io16, 1, ih1, 0 /)
             ! triple alpha would be (/ 3, ihe4, 0 /)
             ! he3(he4, g)be7(e-,nu)li7(p,a)he4 would be (/ 1, ihe3, 1, ihe4, i, ih1, 0 /)
 
          integer, parameter :: max_num_reaction_outputs = 4
-         integer, pointer :: reaction_outputs(:,:)=>NULL() ! (2*max_num_reaction_outputs,rates_reaction_id_max)
+         integer, pointer :: reaction_outputs(:,:)=>NULL()  ! (2*max_num_reaction_outputs,rates_reaction_id_max)
             ! up to max_num_reaction_outputs pairs of coefficients and chem id's, terminated by 0's.
             ! e.g.,  o16(p,g)f17 would be (/ 1, if17, 0 /)
             ! c12(a, p)n15 would be (/ 1, in15, 1, ih1, 0 /)
@@ -180,8 +174,8 @@
       ! weak
 
          real(dp) :: &
-            T9_weaklib_full_off = 0.01d0, & ! use pure reaclib for T <= this
-            T9_weaklib_full_on = 0.02d0 ! use pure weaklib for T >= this
+            T9_weaklib_full_off = 0.01d0, &  ! use pure reaclib for T <= this
+            T9_weaklib_full_on = 0.02d0  ! use pure weaklib for T >= this
             ! blend for intermediate temperatures
 
          ! for high Z elements, switch to reaclib at temp where no longer fully ionized
@@ -189,8 +183,8 @@
          integer :: weaklib_blend_hi_Z = 26
          ! if input element has Z >= weaklib_blend_hi_Z, then use the following T9 limits
          real(dp) :: &
-            T9_weaklib_full_off_hi_Z = 0.063d0, & ! use pure reaclib for T <= this
-            T9_weaklib_full_on_hi_Z = 0.073d0 ! use pure weaklib for T >= this
+            T9_weaklib_full_off_hi_Z = 0.063d0, &  ! use pure reaclib for T <= this
+            T9_weaklib_full_on_hi_Z = 0.073d0  ! use pure weaklib for T >= this
 
          integer :: num_weak_reactions
 
@@ -201,7 +195,7 @@
             real(dp), allocatable :: T9s(:)
             real(dp), allocatable :: lYeRhos(:)
 
-            real(dp), allocatable :: data(:,:,:,:) ! (4, num_T9, num_lYeRho, 3)
+            real(dp), allocatable :: data(:,:,:,:)  ! (4, num_T9, num_lYeRho, 3)
             contains
 
               procedure(setup_weak_table), deferred :: setup
@@ -239,10 +233,10 @@
 
          type(table_c), dimension(:), allocatable :: weak_reactions_tables
 
-         integer, pointer, dimension(:) :: & ! (num_weak_reactions)
+         integer, pointer, dimension(:) :: &  ! (num_weak_reactions)
             weak_lhs_nuclide_id=>NULL(), weak_rhs_nuclide_id=>NULL(), weak_reaclib_id=>NULL()
          character(len=iso_name_length), dimension(:), pointer :: &
-            weak_lhs_nuclide_name=>NULL(), weak_rhs_nuclide_name=>NULL() ! (num_weak_reactions)
+            weak_lhs_nuclide_name=>NULL(), weak_rhs_nuclide_name=>NULL()  ! (num_weak_reactions)
          type (integer_dict), pointer :: weak_reactions_dict=>NULL()
 
          logical :: weak_bicubic = .false.
@@ -282,13 +276,13 @@
 
       integer :: num_ecapture_nuclei, num_ecapture_reactions
       integer, pointer, dimension(:) :: ecapture_nuclide_id=>NULL(), &
-             ecapture_lhs_nuclide_id=>NULL(), ecapture_rhs_nuclide_id=>NULL() ! (num_ecapture_reactions)
+             ecapture_lhs_nuclide_id=>NULL(), ecapture_rhs_nuclide_id=>NULL()  ! (num_ecapture_reactions)
       character(len=iso_name_length), dimension(:), pointer :: ecapture_nuclide_name=>NULL(), &
-             ecapture_lhs_nuclide_name=>NULL(), ecapture_rhs_nuclide_name=>NULL() ! (num_ecapture_reactions)
+             ecapture_lhs_nuclide_name=>NULL(), ecapture_rhs_nuclide_name=>NULL()  ! (num_ecapture_reactions)
       type (integer_dict), pointer :: ecapture_reactions_dict=>NULL()
 
 
-      integer, pointer :: reaction_categories(:)=>NULL() ! (rates_reaction_id_max) set by net using reactions.list info
+      integer, pointer :: reaction_categories(:)=>NULL()  ! (rates_reaction_id_max) set by net using reactions.list info
 
 
       integer, pointer,dimension(:) :: &
@@ -297,19 +291,17 @@
          ! for all of these, 0 means "cache entry not yet set -- don't have the information"
 
 
-
-
       ! for tabular evaluation of the raw reaction rates
-      real(dp) :: rattab_thi != 10.301029995664d0 ! log10(highest temp = 2e10)
-      real(dp) :: rattab_tlo != 5.30102999566398d0 ! log10(lowest temp = 2e5)
-      real(dp) :: rattab_temp_hi != 10**rattab_thi
-      real(dp) :: rattab_temp_lo != 10**rattab_tlo
+      real(dp) :: rattab_thi  != 10.301029995664d0 ! log10(highest temp = 2e10)
+      real(dp) :: rattab_tlo  != 5.30102999566398d0 ! log10(lowest temp = 2e5)
+      real(dp) :: rattab_temp_hi  != 10**rattab_thi
+      real(dp) :: rattab_temp_lo  != 10**rattab_tlo
 
       integer :: rattab_points_per_decade = 2000
-      integer :: nrattab ! number of reaction rate table temperatures
+      integer :: nrattab  ! number of reaction rate table temperatures
          ! nrattab = <points per decade>*(rattab_thi - rattab_tlo) + 1
 
-      real(dp) :: rattab_tstp != (rattab_thi-rattab_tlo)/(nrattab-1)! step size
+      real(dp) :: rattab_tstp  != (rattab_thi-rattab_tlo)/(nrattab-1)! step size
 
       ! reactions for hardwired nets and reactions with multiple choices for rates
          integer, parameter :: ir1212 = 1
@@ -637,7 +629,6 @@
          integer :: rates_reaction_id_max
 
 
-
       ! for mazurek's ni56 electron capture rate interpolation
          real(dp) :: tv(7),rv(6),rfdm(4),rfd0(4),rfd1(4),rfd2(4),tfdm(5),tfd0(5),tfd1(5),tfd2(5)
 
@@ -704,14 +695,12 @@
       end type T_Factors
 
 
-
       ! rate results components
 
       integer, parameter :: i_rate = 1
       integer, parameter :: i_rate_dT = 2
       integer, parameter :: i_rate_dRho = 3
       integer, parameter :: num_rvs = 3
-
 
 
       ! screening
@@ -728,7 +717,7 @@
       integer, parameter :: chugunov_screening = 4
         ! based on code from Sam Jones
         ! Implements screening from Chugunov et al (2007)
-      integer, parameter :: other_screening = 5 ! User defined screening
+      integer, parameter :: other_screening = 5  ! User defined screening
 
       type Screen_Info
          real(dp) :: temp
@@ -768,7 +757,7 @@
             import dp, screen_info
             implicit none
 
-            type (Screen_Info) :: sc ! See rates_def
+            type (Screen_Info) :: sc  ! See rates_def
             real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
             real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
             real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction
@@ -782,9 +771,9 @@
             import dp, t_factors
             implicit none
 
-            integer :: ir ! Rate id
+            integer :: ir  ! Rate id
             real(dp),intent(in) ::    temp      !< Temperature
-            type (T_Factors) :: tf !< Various temperature factors
+            type (T_Factors) :: tf  !< Various temperature factors
             real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
             integer, intent(out) ::   ierr
 
@@ -794,7 +783,7 @@
       end interface
 
 
-      real(dp) :: reaclib_min_T9 ! for T9 < this, return 0 for reaclib strong rates
+      real(dp) :: reaclib_min_T9  ! for T9 < this, return 0 for reaclib strong rates
 
       type (integer_dict), pointer :: reaction_names_dict
 
@@ -838,8 +827,8 @@
          logical :: need_to_read
          character (len=132) :: rate_fname
          integer :: nT8s
-         real(dp), pointer :: T8s(:) ! (nT8s)
-         real(dp), pointer :: f1(:) ! =(4,nT8s)
+         real(dp), pointer :: T8s(:)  ! (nT8s)
+         real(dp), pointer :: f1(:)  ! =(4,nT8s)
       end type rate_table_info
 
       type (rate_table_info), pointer :: raw_rates_records(:)
@@ -850,7 +839,6 @@
       type (reaction_data), target :: reaclib_rates
 
       character (len=1000) :: rates_dir, rates_cache_dir, rates_temp_cache_dir
-
 
 
       ! coulomb corrections for weak reactions
@@ -941,7 +929,7 @@
          ! first try the local directory
          filename = trim(list_filename)
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in rates_data
+         if (ierr /= 0) then  ! if don't find that file, look in rates_data
             filename = trim(rates_dir) // '/' // trim(list_filename)
             ierr = 0
             open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -987,7 +975,7 @@
 
       integer function reaclib_index(handle) result(indx)
          use utils_lib, only: integer_dict_lookup
-         character(len=*), intent(in) :: handle ! as in rates% reaction_handle
+         character(len=*), intent(in) :: handle  ! as in rates% reaction_handle
          integer :: ierr
          ierr = 0
          call integer_dict_lookup(reaclib_rates% reaction_dict, handle, indx, ierr)
@@ -997,7 +985,7 @@
 
       integer function reaclib_reverse(handle) result(indx)
          use utils_lib, only: integer_dict_lookup
-         character(len=*), intent(in) :: handle ! as in rates% reaction_handle
+         character(len=*), intent(in) :: handle  ! as in rates% reaction_handle
          integer :: ierr
          ierr = 0
          call integer_dict_lookup(reaclib_rates% reverse_dict, handle, indx, ierr)
@@ -1026,7 +1014,7 @@
                if (ASSOCIATED(weak_reactions_tables(i)%t)) deallocate(weak_reactions_tables(i)%t)
             end do
             deallocate(weak_reactions_tables)
-         endif
+         end if
 
          if (ASSOCIATED(weak_lhs_nuclide_id)) deallocate(weak_lhs_nuclide_id)
          if (ASSOCIATED(weak_rhs_nuclide_id)) deallocate(weak_rhs_nuclide_id)
@@ -1115,8 +1103,8 @@
 
       subroutine allocate_reaction_data(r, n, nweak, ierr)
          type(reaction_data), intent(out) :: r
-         integer, intent(in) :: n ! number of rates
-         integer, intent(in) :: nweak ! number of weaklib rates
+         integer, intent(in) :: n  ! number of rates
+         integer, intent(in) :: nweak  ! number of weaklib rates
          integer, intent(out) :: ierr
          allocate( &
             r% reaction_handle(n), r% reverse_handle(n), r% category(n), r% chapter(n), &
@@ -1211,7 +1199,7 @@
       end subroutine create_weak_dict_key
 
 
-      integer function do_get_weak_rate_id(lhs, rhs) ! returns 0 if reaction not found
+      integer function do_get_weak_rate_id(lhs, rhs)  ! returns 0 if reaction not found
          use utils_lib
          character (len=*), intent(in)  :: lhs, rhs
          integer :: ierr, i
@@ -1231,10 +1219,10 @@
       end function do_get_weak_rate_id
 
 
-      integer function do_get_weak_info_list_id(lhs, rhs) ! returns 0 if reaction not found
+      integer function do_get_weak_info_list_id(lhs, rhs)  ! returns 0 if reaction not found
          ! value can be used to index weak_info_list_halflife and weak_info_list_Qneu
          use utils_lib
-         character (len=*), intent(in)  :: lhs, rhs ! names as in weak_info.list file
+         character (len=*), intent(in)  :: lhs, rhs  ! names as in weak_info.list file
          integer :: ierr, i
          character(len=2*iso_name_length+1) :: key
          character (len=iso_name_length) :: lhs_name, rhs_name

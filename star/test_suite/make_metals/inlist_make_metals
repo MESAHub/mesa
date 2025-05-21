@@ -1,7 +1,7 @@
 
 &star_job
-      
-      show_log_description_at_start = .false. 
+
+      show_log_description_at_start = .false.
 
       create_pre_main_sequence_model = .true.
       pre_ms_T_c = 5d5
@@ -46,19 +46,19 @@
 
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 1d-4
-      
+
       mesh_delta_coeff = 0.7
-      
+
       mixing_length_alpha = 1.89
       MLT_option = 'Henyey'
-      
+
       overshoot_scheme(1) = 'exponential'
       overshoot_zone_type(1) = 'burn_H'
       overshoot_zone_loc(1) = 'any'
       overshoot_bdy_loc(1) = 'top'
       overshoot_f(1) = 0.01
       overshoot_f0(1) = 0.005
-      
+
       overshoot_scheme(2) = 'exponential'
       overshoot_zone_type(2) = 'burn_He'
       overshoot_zone_loc(2) = 'any'
@@ -71,21 +71,18 @@
       history_interval = 100
       terminal_interval = 10
       write_header_frequency = 10
-      
+
       max_age = 10d9
       max_years_for_timestep = 1d9
 
 / ! end of controls namelist
 
 
-
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+   ! top level controls
 
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
 
 / ! end of pgstar namelist

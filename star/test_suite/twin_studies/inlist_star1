@@ -11,7 +11,7 @@
 &kap
 / ! end of kap namelist
 
-&controls  
+&controls
 
 ! solver
 
@@ -26,12 +26,12 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
    !pause_interval = 10
    pgstar_interval = 1
 
    Grid1_title = 'star1 - with overshooting'
-   
+
    !Grid1_file_flag = .true.
    Grid1_file_dir = 'png1'
    Grid1_file_prefix = 'star1'

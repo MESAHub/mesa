@@ -1368,7 +1368,7 @@ C-    factorstep = 5.0d2;
       MAXCAL=600
       IPRINT=20
       ITRES=0
-Cfindabs* the same only with absorbtion*
+Cfindabs* the same only with absorption*
 C
 C      write(@wres,'(F15.10,1p,5e11.3,0p,6f10.3)') time_n, Tbb, rbb,
 C         1e3*worky(1,nnx),UR*worky(2,nnx), -- Teff & r last scatering -- crude
@@ -1650,7 +1650,7 @@ C-       if(Tbb<0.d0 .or. Tbb>1.d7 .or. abs(Av)>1.d2)then;
 C-         Iflag=-1;
 C-         pause;
 C-       else;
-C: residuals with absorbtion*
+C: residuals with absorption*
       DO09846j=1,nfrus-1
 C-  _do j=28,33;
 C-  write(*,'(a,i3,1p,2e15.3)') ' in resid nfrus Tbb Av=',nfrus,Tbb,Av;

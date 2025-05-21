@@ -1,17 +1,14 @@
 
 
       module mod_qsort
-      use const_def, only: dp
 
+        use const_def, only: dp
 
       implicit none
 
-
       contains
 
-
-
-           ! FILE: sort.f
+      ! FILE: sort.f
          ! PURPOSE: demonstrate the use of "qsort_inline.inc" and
          ! "qsort_inline_index.inc". These can be used as specific
          ! sort procedures under a common SORT generic name.
@@ -19,8 +16,8 @@
          ! Sort a string array, with any string length.
          subroutine sortp_string(array_size,index,string)
            integer, intent(in) :: array_size
-           integer, intent(out) :: index(:) ! (array_size)
-           character(len=*), intent(in) :: string(:) ! (array_size)
+           integer, intent(out) :: index(:)  ! (array_size)
+           character(len=*), intent(in) :: string(:)  ! (array_size)
 #include "qsort_inline.inc"
          contains
          ! set up initial index:
@@ -42,7 +39,6 @@
 
          ! circular shift-right by one:
            subroutine rshift(left,right)
-             implicit none
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
@@ -69,9 +65,9 @@
          ! Sort an array of indices into a string array, with any string length.
          subroutine sortp_string_index(array_size,index,str_index,string)
            integer, intent(in) :: array_size
-           integer, intent(out) :: index(:) ! (array_size)
-           integer, intent(in) :: str_index(:) ! (array_size)
-           character(len=*), intent(in) :: string(:) ! 1..maxval(str_index)
+           integer, intent(out) :: index(:)  ! (array_size)
+           integer, intent(in) :: str_index(:)  ! (array_size)
+           character(len=*), intent(in) :: string(:)  ! 1..maxval(str_index)
 #include "qsort_inline.inc"
          contains
          ! set up initial index:
@@ -93,7 +89,6 @@
 
          ! circular shift-right by one:
            subroutine rshift(left,right)
-             implicit none
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
@@ -120,8 +115,8 @@
          ! Sort a double-precision array by index
          subroutine sortp_dp(array_size,index,value)
            integer, intent(in) :: array_size
-           integer, intent(inout) :: index(:) ! (array_size)
-           real(dp), intent(in) :: value(:) ! (array_size)
+           integer, intent(inout) :: index(:)  ! (array_size)
+           real(dp), intent(in) :: value(:)  ! (array_size)
 #include "qsort_inline.inc"
          contains
          ! set up initial index:
@@ -143,7 +138,6 @@
 
          ! circular shift-right by one:
            subroutine rshift(left,right)
-             implicit none
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
@@ -163,8 +157,4 @@
 
          end subroutine sortp_dp
 
-
-
-
       end module mod_qsort
-

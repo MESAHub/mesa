@@ -1,6 +1,6 @@
 .. highlight:: console
 
-Just a Module 
+Just a Module
 =============
 
 This document describes how to use the MESA equation of state, opacity, and nuclear reaction networks outside of MESA.
@@ -22,7 +22,7 @@ This document describes how to use the MESA equation of state, opacity, and nucl
    cp $MESA_DIR/eos/test/src/sample_eos.f90 .
 
 
-Edit sample_eos.f90 and change the variable 
+Edit sample_eos.f90 and change the variable
 
 
 ::
@@ -38,7 +38,7 @@ to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automa
 while you are editing sample_eos.f90, take some time to explore the source code. Save and exit sample_eos.f90.
 Now take some time to explore the makefile, and use it to build the executable
 
-:: 
+::
 
      make
 
@@ -56,7 +56,7 @@ Run the interactive executable, named sample_eos
  T     =  1.000000E+09 Rho   =  1.000000E+04 abar  =  1.200000E+01 zbar  =  6.000000E+00
  h1    =  0.000000E+00 he4   =  0.000000E+00 c12   =  1.000000E+00 n14   =  0.000000E+00
  o16   =  0.000000E+00 ne20  =  0.000000E+00 mg24  =  0.000000E+00
-  
+
  quantity      value          d/d(Rho)       d/d(T)       d^2/d(Rho)^2   d^2/d(Rho)d(T) d^2/d(T)^2
  p tot   =   3.033664E+21   4.616282E+16   1.098950E+13   7.389591E+11  -2.632100E+07   3.148155E+04
  p gas   =   5.117530E+20   4.616282E+16   9.018528E+11   7.389591E+11  -2.632100E+07   1.218618E+03
@@ -93,11 +93,11 @@ Run the interactive executable, named sample_eos
 
 
 For homework, edit sample_eos.f90 to write out :math:`\partial{T}/\partial{\rho}|_{S}`.
-As mentioned in sample_eos.f90, it can be useful to look at the integer indices contained in $MESA_DIR/eos/public/eos_def.f90. 
+As mentioned in sample_eos.f90, it can be useful to look at the integer indices contained in $MESA_DIR/eos/public/eos_def.f90.
 
 
- 
-2. Opacity 
+
+2. Opacity
 ----------
 
 | Before starting, explore :ref:`kap/overview:Overview of kap module` and :ref:`kap/defaults:kap module controls`.
@@ -110,7 +110,7 @@ As mentioned in sample_eos.f90, it can be useful to look at the integer indices 
    cp $MESA_DIR/kap/test/sample_kap_agb.model .
 
 
-Edit sample_kap.f90 and change the variable 
+Edit sample_kap.f90 and change the variable
 
 ::
 
@@ -125,7 +125,7 @@ to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automa
 while you are editing sample_kap.f90, take some time to explore the source code. Save and exit sample_kap.f90.
 Now take some time to explore the makefile, and use it to build the executable
 
-:: 
+::
 
      make
 
@@ -141,7 +141,7 @@ Run the executable, named sample_kap, which reads a mesa model file and writes o
 
  write kap_test.data
 
-Explore the output with, for example, 
+Explore the output with, for example,
 
 .. code-block:: console
 
@@ -166,7 +166,7 @@ Explore the output with, for example,
    cp $MESA_DIR/net/test/src/sample_net.f90 .
 
 
-Edit sample_net.f90 and change the variable 
+Edit sample_net.f90 and change the variable
 
 ::
 
@@ -182,7 +182,7 @@ to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automa
 while you are editing sample_net.f90, take some time to explore the source code. Save and exit sample_net.f90.
 Now take some time to explore the makefile, and use it to build the executable
 
-:: 
+::
 
      make
 
@@ -190,7 +190,7 @@ Run the interactive executable, named sample_net
 
 .. code-block:: console
 
- ./sample_net 
+ ./sample_net
 
  load approx21.net
 

@@ -30,7 +30,7 @@ ADIPLS_SRCS = adipls_support.f90 adipls_support_procs.f90
 ADIPLS_LIB = -ladipls
 else
 ADIPLS_SRCS = adipls_support_stub.f90 adipls_support_procs_stub.f90
-ADIPLS_LIB = 
+ADIPLS_LIB =
 endif
 
 
@@ -50,9 +50,9 @@ SRCS = \
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = $(LIBS_MESA_STAR)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR) $(ADIPLS_LIB)
+	LIBS_OTHER = $(LIBS_MESA_STAR)
+	DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+	LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR) $(ADIPLS_LIB)
 endif
 
 #################################################################
@@ -101,14 +101,6 @@ COMPILE_CMD = $(COMPILE)
 COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE))
 
 %.o : %.mod
-
-pgstar_astero_plots.o: %.o : %.f90
-ifneq ($(QUIET),)
-	@echo COMPILE_LEGACY $<
-	@$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
-else
-	$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
-endif
 
 %.o : %.f90
 ifneq ($(QUIET),)

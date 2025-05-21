@@ -13,11 +13,11 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   chem_def.f90 \
-   nuclide_set_mod.f90 \
-   chem_isos_io.f90 \
-   lodders_mod.f90 \
-   chem_lib.f90
+	chem_def.f90 \
+	nuclide_set_mod.f90 \
+	chem_isos_io.f90 \
+	lodders_mod.f90 \
+	chem_lib.f90
 
 #################################################################
 #

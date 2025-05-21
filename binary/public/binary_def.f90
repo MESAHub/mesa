@@ -1,39 +1,35 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Pablo Marchant
+!   Copyright (C) 2013  Pablo Marchant & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module binary_def
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, strlen
       use binary_pgbinary
 
    implicit none
 
-      real(dp) :: initial_binary_period ! (seconds)
-      real(dp) :: min_binary_period ! (seconds)
+      real(dp) :: initial_binary_period  ! (seconds)
+      real(dp) :: min_binary_period  ! (seconds)
 
-      real(dp) :: initial_mass(2) ! (msun)
+      real(dp) :: initial_mass(2)  ! (msun)
 
       integer, parameter :: maxlen_binary_history_column_name = 80
       integer, parameter :: binary_num_xtra_vals = 30
@@ -49,7 +45,7 @@
       integer, parameter :: b_Tlim_dm = b_Tlim_ecc + 1
       integer, parameter :: b_numTlim = b_Tlim_dm
 
-      character (len=24) :: binary_dt_why_str(b_numTlim) ! indicates the reason for the timestep choice
+      character (len=24) :: binary_dt_why_str(b_numTlim)  ! indicates the reason for the timestep choice
 
       !interfaces for procedure pointers
       abstract interface
@@ -233,7 +229,7 @@
 
       type binary_info
          !binary id
-         integer :: binary_id ! unique identifier for each binary_info instance
+         integer :: binary_id  ! unique identifier for each binary_info instance
          logical :: in_use
 
          integer :: extra_binary_terminal_iounit
@@ -246,7 +242,7 @@
       end type binary_info
 
       logical :: have_initialized_binary_handles = .false.
-      integer, parameter :: max_binary_handles = 10 ! this can be increased as necessary
+      integer, parameter :: max_binary_handles = 10  ! this can be increased as necessary
       type (binary_info), target, save :: binary_handles(max_binary_handles)
          ! gfortran seems to require "save" here.  at least it did once upon a time.
 

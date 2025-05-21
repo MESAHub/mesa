@@ -14,7 +14,7 @@
          integer, intent(in) :: caller_id, iop, nvar, nz, lrd, lid
          integer, pointer, intent(inout) :: ipiv(:) ! =(nvar,nz)
          real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-         real(dp), pointer, intent(inout)  :: brhs(:) ! =(nvar,nz)     
+         real(dp), pointer, intent(inout)  :: brhs(:) ! =(nvar,nz)
          real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
@@ -59,6 +59,5 @@
          integer, intent(out) :: ier
          ier = -1
       end subroutine null_decsols
-
 
 

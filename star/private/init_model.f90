@@ -2,39 +2,34 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module init_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, secyer
 
       implicit none
 
+      private
+      public :: get_zams_model
 
-      integer :: min_when_created = 20081212
+      integer, parameter :: min_when_created = 20081212
 
       contains
-
 
       subroutine get_revised_mass(s, fullname, ierr)
          use read_model, only: do_read_saved_model
@@ -120,7 +115,7 @@
 
          call dealloc
 
-         if (.not. in_range) then ! have revised s% initial_mass
+         if (.not. in_range) then  ! have revised s% initial_mass
             s% mstar = s% initial_mass*Msun
             s% xmstar = s% mstar
             s% M_center = 0
@@ -187,7 +182,7 @@
          initial_mass = s% initial_mass
          nvar_hydro = s% nvar_hydro
 
-         call read_zams_header ! sets net_name
+         call read_zams_header  ! sets net_name
          if (ierr /= 0) then
             close(iounit)
             write(*,*) 'failed in read_zams_header'
@@ -209,13 +204,13 @@
          okay = .false.
          in_range = .true.
 
-         read(iounit, *, iostat=ierr) ! this is the 'M/Msun n_shells' header line
+         read(iounit, *, iostat=ierr)  ! this is the 'M/Msun n_shells' header line
          if (ierr == 0) then
             index_loop: do
                read(iounit, *, iostat=ierr) m2, nz2
                if (ierr /= 0) exit index_loop
-               if (m2 <= 0) then ! end of list
-                  read(iounit, *, iostat=ierr) ! blank line
+               if (m2 <= 0) then  ! end of list
+                  read(iounit, *, iostat=ierr)  ! blank line
                   m2 = m1
                   nz2 = nz1
                   in_range = .false.
@@ -234,7 +229,7 @@
                   ! skip to end of index
                   skip_loop: do
                      read(iounit, fmt='(a)', iostat=ierr) line
-                     if (len_trim(line) == 0) then ! blank line indicates end of index
+                     if (len_trim(line) == 0) then  ! blank line indicates end of index
                         okay = .true.
                         exit index_loop
                      end if
@@ -273,7 +268,7 @@
             use read_model, only: read_properties
             integer :: year_month_day_when_created, iprop
             real(dp) :: dprop, initial_z, initial_y
-            read(iounit, *, iostat=ierr) ! skip blank line before property list
+            read(iounit, *, iostat=ierr)  ! skip blank line before property list
             include 'formats'
             if (ierr /= 0) return
             year_month_day_when_created = -1
@@ -349,10 +344,10 @@
          type (star_info), pointer :: s
          integer, intent(in) :: iounit, nz1, nz2, nvar_hydro, species
          real(dp), intent(in) :: m1, m2, initial_mass
-         real(dp), intent(inout) :: xh(:,:) ! (nvar_hydro,nz1)
-         real(dp), intent(inout) :: xa(:,:) ! (species,nz1)
+         real(dp), intent(inout) :: xh(:,:)  ! (nvar_hydro,nz1)
+         real(dp), intent(inout) :: xa(:,:)  ! (species,nz1)
          real(dp), intent(inout), dimension(:) :: &
-            q, dq, omega, j_rot ! (nz1)
+            q, dq, omega, j_rot  ! (nz1)
          integer, intent(out) :: ierr
 
          integer :: i, k, nz, nz_in, iprop
@@ -363,8 +358,8 @@
          real(dp) :: alfa, struct(nvar_hydro), comp(species)
          logical :: okay
          character (len=net_name_len) :: net_name
-         character(len=iso_name_length), pointer :: names(:) ! (species)
-         integer, pointer :: perm(:) ! (species)
+         character(len=iso_name_length), pointer :: names(:)  ! (species)
+         integer, pointer :: perm(:)  ! (species)
 
          include 'formats'
 
@@ -377,7 +372,7 @@
             names(species), perm(species), stat=ierr)
          if (ierr /= 0) return
          okay = .false.
-         mass_loop: do ! loop until find desired mass
+         mass_loop: do  ! loop until find desired mass
 
             m_in = -1; nz_in = -1; net_name = ''
             call read_properties(iounit, &
@@ -400,12 +395,12 @@
 
             if (abs(m_in-m_read) > 1d-4) then
 
-               do i = 1, nz_in ! skip this one
+               do i = 1, nz_in  ! skip this one
                   read(iounit, *, iostat=ierr)
                   if (ierr /= 0) exit mass_loop
                end do
 
-            else ! store this one
+            else  ! store this one
 
                if (nz /= nz_in) then
                   write(*, '(a, 2i6)') &
@@ -434,7 +429,7 @@
                end if
 
             end if
-            read(iounit, *, iostat=ierr) ! skip line following the last zone
+            read(iounit, *, iostat=ierr)  ! skip line following the last zone
             if (ierr /= 0) exit mass_loop
 
          end do mass_loop
@@ -445,7 +440,7 @@
             return
          end if
 
-         if (m1 /= m2) then ! interpolate linearly in log(m)
+         if (m1 /= m2) then  ! interpolate linearly in log(m)
             lnm1 = log(m1)
             lnm2 = log(m2)
             alfa = (log(initial_mass) - lnm2) / (lnm1 - lnm2)
@@ -470,6 +465,4 @@
 
       end subroutine get1_mass
 
-
       end module init_model
-

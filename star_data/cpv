@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [ -d private_$1 ]
 then
    echo private_$1 "already exists, so abort cpv"

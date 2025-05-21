@@ -18,7 +18,7 @@
 
       change_initial_D_omega_flag = .true.
       new_D_omega_flag = .true.
-      
+
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
@@ -43,7 +43,7 @@
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
       use_Type2_opacities = .true.
-      
+
 / ! end of kap namelist
 
 &controls
@@ -59,7 +59,7 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 4  
+      Pextra_factor = 4
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
@@ -90,7 +90,7 @@
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
       gradT_excess_lambda1 = -1 ! full on
-  
+
 ! mixing
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
@@ -106,27 +106,27 @@
 
 ! timesteps
       varcontrol_target = 1d-3
-      
+
       never_skip_hard_limits = .true
       limit_for_rel_error_in_energy_conservation = 1d-7
-      hard_limit_for_rel_error_in_energy_conservation = 1d-6      
+      hard_limit_for_rel_error_in_energy_conservation = 1d-6
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
       delta_lgTeff_limit =  0.01
-      delta_lgL_limit = 0.1     
+      delta_lgL_limit = 0.1
       delta_lgL_He_limit = 0.1
 
       delta_lgRho_cntr_limit = 0.03
       delta_lgRho_cntr_hard_limit = -1
       delta_lgRho_limit = 0.1
-      
+
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.002  
+      delta_lgT_cntr_limit = 0.002
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.002     
+      delta_lgT_max_limit = 0.002
       delta_lgT_max_hard_limit = 0.01
 
       dX_div_X_limit(2) = -1 ! for he4
@@ -134,7 +134,7 @@
       dX_nuc_drop_limit = 5d-1 ! 2d-2
       dX_nuc_drop_limit_at_high_T = -1
       dX_nuc_drop_min_X_limit = 1d-3
-      dX_nuc_drop_max_A_limit = 52   
+      dX_nuc_drop_max_A_limit = 52
       dX_nuc_drop_hard_limit = 1d99
 
       delta_XHe_cntr_limit = 0.01d0
@@ -158,10 +158,10 @@
 
 ! mesh
       mesh_delta_coeff = 1d0
-      mesh_delta_coeff_for_highT = 1d0 
-      logT_max_for_standard_mesh_delta_coeff = 9.0 
-      logT_min_for_highT_mesh_delta_coeff = 9.5 
-      min_dq_for_xa = 1d-4 
+      mesh_delta_coeff_for_highT = 1d0
+      logT_max_for_standard_mesh_delta_coeff = 9.0
+      logT_min_for_highT_mesh_delta_coeff = 9.5
+      min_dq_for_xa = 1d-4
       !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
@@ -172,9 +172,9 @@
       gold_tol_max_residual2 = 5d-4
 
       energy_eqn_option = 'dedt'
-      max_tries_for_implicit_wind = 0      
+      max_tries_for_implicit_wind = 0
 
-      convergence_ignore_equL_residuals = .true. 
+      convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
@@ -209,10 +209,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
 !pgstar_interval = 1
 

@@ -4,12 +4,12 @@
 1M_thermohaline
 ***************
 
-The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
+The test checks thermohaline mixing in a rotating, 1 |Msun|, Z=0.02 metallicity model.
 
 
 This test case has one part. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_1M_thermohaline``) loads a 1 Msun main-sequence model, applies a 10 km/s rotation profile, and evolves the model until the helium core mass reaches 0.24 Msun, where some key quantities are reported:
+* Part 1 (``inlist_1M_thermohaline``) loads a 1 |Msun| main-sequence model, applies a 10 km/s rotation profile, and evolves the model until the helium core mass reaches 0.24 |Msun|, where some key quantities are reported:
 
 .. code-block:: console
 
@@ -62,19 +62,17 @@ pgstar commands used for the plots above:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
     file_digits = 8
 
       Grid3_win_flag = .true.
-         
+
          Grid3_win_width = 12
          Grid3_win_aspect_ratio = 0.7 ! aspect_ratio = height/width
-         
+
          Grid3_xleft = 0.10 ! fraction of full window width for margin on left
          Grid3_xright = 0.89 ! fraction of full window width for margin on right
          Grid3_ybot = 0.08 ! fraction of full window width for margin on bottom
@@ -84,63 +82,63 @@ pgstar commands used for the plots above:
          Grid3_num_cols = 2 ! divide plotting region into this many equal width cols
          Grid3_num_rows = 4 ! divide plotting region into this many equal height rows
          Grid3_num_plots = 4 ! <= 10
-         
+
          Grid3_plot_name(1) = 'Mixing'
 
          Mixing_xmin = 0.22 ! only used if /= -101d0
          Mixing_xmax = 0.28 ! only used if /= -101d0
-         
+
          Mixing_ymin = -101d0 ! only used if /= -101d0
-         Mixing_ymax = -101d0 ! only used if /= -101d0        
+         Mixing_ymax = -101d0 ! only used if /= -101d0
          Mixing_dymin = -101d0 ! only used if /= -101d0
-         
-         
+
+
          Grid3_plot_row(1) = 3 ! number from 1 at top
          Grid3_plot_rowspan(1) = 2 ! plot spans this number of rows
          Grid3_plot_col(1) =  2 ! number from 1 at left
-         Grid3_plot_colspan(1) = 1 ! plot spans this number of columns 
+         Grid3_plot_colspan(1) = 1 ! plot spans this number of columns
          Grid3_plot_pad_left(1) = 0.08 ! fraction of full window width for padding on left
          Grid3_plot_pad_right(1) = 0.00 ! fraction of full window width for padding on right
          Grid3_plot_pad_top(1) = 0.08 ! fraction of full window height for padding at top
          Grid3_plot_pad_bot(1) = 0.00 ! fraction of full window height for padding at bottom
          Grid3_txt_scale_factor(1) = 0.7 ! multiply txt_scale for subplot by this
-         
+
          Grid3_plot_name(2) = 'History_Panels1'
-         
-         History_Panels1_title = 'History'      
+
+         History_Panels1_title = 'History'
 
          History_Panels1_num_panels = 2
-         History_Panels1_yaxis_name(1) = 'log_center_T' 
-         History_Panels1_other_yaxis_name(1) = 'log_L' 
-         History_Panels1_yaxis_name(2) = 'log_center_Rho' 
-         History_Panels1_other_yaxis_name(2) = 'log_Teff' 
-         
+         History_Panels1_yaxis_name(1) = 'log_center_T'
+         History_Panels1_other_yaxis_name(1) = 'log_L'
+         History_Panels1_yaxis_name(2) = 'log_center_Rho'
+         History_Panels1_other_yaxis_name(2) = 'log_Teff'
+
          Grid3_plot_row(2) = 3 ! number from 1 at top
          Grid3_plot_rowspan(2) = 2 ! plot spans this number of rows
          Grid3_plot_col(2) =  1 ! number from 1 at left
-         Grid3_plot_colspan(2) = 1 ! plot spans this number of columns 
+         Grid3_plot_colspan(2) = 1 ! plot spans this number of columns
          Grid3_plot_pad_left(2) = 0.00 ! fraction of full window width for padding on left
          Grid3_plot_pad_right(2) = 0.08 ! fraction of full window width for padding on right
          Grid3_plot_pad_top(2) = 0.08 ! fraction of full window height for padding at top
          Grid3_plot_pad_bot(2) = 0.00 ! fraction of full window height for padding at bottom
          Grid3_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
 
-         
+
          Grid3_plot_name(3) = 'TRho_Profile'
          Grid3_plot_row(3) = 1 ! number from 1 at top
          Grid3_plot_rowspan(3) = 2 ! plot spans this number of rows
          Grid3_plot_col(3) =  2 ! number from 1 at left
-         Grid3_plot_colspan(3) = 1 ! plot spans this number of columns 
+         Grid3_plot_colspan(3) = 1 ! plot spans this number of columns
          Grid3_plot_pad_left(3) = 0.08 ! fraction of full window width for padding on left
          Grid3_plot_pad_right(3) = 0.00 ! fraction of full window width for padding on right
          Grid3_plot_pad_top(3) = 0.00 ! fraction of full window height for padding at top
          Grid3_plot_pad_bot(3) = 0.08 ! fraction of full window height for padding at bottom
          Grid3_txt_scale_factor(3) = 0.7 ! multiply txt_scale for subplot by this
 
-         
-         
+
+
          Grid3_plot_name(4) = 'Kipp'
-         
+
          Kipp_show_mass_boundaries = .false.
          Kipp_mass_max = 0.28 ! (Msun units) negative means use default
          Kipp_mass_min = 0.22 ! (Msun units) negative means use default
@@ -148,12 +146,12 @@ pgstar commands used for the plots above:
          Kipp_show_luminosities = .false.
          Kipp_lgL_max = 2d0 ! only used if /= -101d0; (L in Lsun units)
          Kipp_lgL_min = 1d0 ! only used if /= -101d0; (L in Lsun units)
-         
-         
+
+
          Grid3_plot_row(4) = 1 ! number from 1 at top
          Grid3_plot_rowspan(4) = 2 ! plot spans this number of rows
          Grid3_plot_col(4) =  1 ! number from 1 at left
-         Grid3_plot_colspan(4) = 1 ! plot spans this number of columns 
+         Grid3_plot_colspan(4) = 1 ! plot spans this number of columns
          Grid3_plot_pad_left(4) = 0.00 ! fraction of full window width for padding on left
          Grid3_plot_pad_right(4) = 0.08 ! fraction of full window width for padding on right
          Grid3_plot_pad_top(4) = 0.00 ! fraction of full window height for padding at top
@@ -172,7 +170,7 @@ pgstar commands used for the plots above:
   ! Brunt B profile
      Profile_Panels1_win_flag = .true.
      Profile_Panels1_win_width = 14
-     Profile_Panels1_title = '' 
+     Profile_Panels1_title = ''
      Profile_Panels1_show_grid = .true.
 
      Profile_Panels1_xaxis_name = 'mass'
@@ -244,7 +242,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 28May2021 (MESA e37f76f) by fxt
-

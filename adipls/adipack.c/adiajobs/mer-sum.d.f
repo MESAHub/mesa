@@ -10,7 +10,7 @@ c  note: if the same mode is present on both files, the mode
 c  from the  f i r s t  file is used.
 c
 c  if the same mode appears several times in one of the files,
-c  only the  f i r s t  occurence is included.
+c  only the  f i r s t  occurrence is included.
 c
 c  Double precision version
 c  ++++++++++++++++++++++++

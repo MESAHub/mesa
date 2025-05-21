@@ -1,9 +1,9 @@
-*********
-Reference
-*********
+**********************
+Reference and Defaults
+**********************
 
 This page describes the options associated with MESA/star,
-MESA/binary, and MESA/astero.  
+MESA/binary, and MESA/astero.
 
 Star defaults
 =============

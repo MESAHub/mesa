@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,7 +21,7 @@
       module turb_info
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, i8, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -35,16 +29,13 @@
       implicit none
 
       private
-      public :: &
-         set_mlt_vars, & ! for hydro_vars and conv_premix
-         do1_mlt_2, & ! for predictive_mix
-         switch_to_radiative, & ! mix_info
-         check_for_redo_MLT, & ! for hydro_vars
-         set_gradT_excess_alpha ! for evolve
-
+      public :: set_mlt_vars  ! for hydro_vars and conv_premix
+      public :: do1_mlt_2  ! for predictive_mix
+      public :: switch_to_radiative  ! mix_info
+      public :: check_for_redo_MLT  ! for hydro_vars
+      public :: set_gradT_excess_alpha  ! for evolve
 
       contains
-
 
       subroutine set_mlt_vars(s, nzlo, nzhi, ierr)
          use star_utils, only: start_time, update_time
@@ -52,7 +43,7 @@
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
          integer :: k, op_err
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          logical :: make_gradr_sticky_in_solver_iters
          include 'formats'
@@ -172,7 +163,7 @@
             return
          end if
 
-         if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then ! check for outward shock above k
+         if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then  ! check for outward shock above k
             if (s% u_flag) then
                vel => s% u
             else
@@ -253,7 +244,7 @@
          if (s% mlt_mixing_type(k) == no_mixing .or. abs(s% gradr(k)) < 1d-20) then
             s% L_conv(k) = 0d0
          else
-            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109
+            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k))  ! C&G 14.109
          end if
 
          contains
@@ -266,7 +257,7 @@
 
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
-            s% mlt_gradT(k) = s% gradT(k) ! prior to adjustments
+            s% mlt_gradT(k) = s% gradT(k)  ! prior to adjustments
 
             s% Y_face_ad(k) = Y_face_ad
             s% Y_face(k) = s% Y_face_ad(k)%val
@@ -351,10 +342,10 @@
          real(dp), intent(in) :: f
          integer, intent(in) :: k
          include 'formats'
-         if (f >= 0.0 .and. f <= 1.0) then
+         if (f >= 0.0d0 .and. f <= 1.0d0) then
             if (f == 0d0) then
                s% gradT_ad(k) = s% gradr_ad(k)
-            else ! mix
+            else  ! mix
                s% gradT_ad(k) = f*s% grada_face_ad(k) + (1.0d0 - f)*s% gradr_ad(k)
             end if
             s% gradT(k) = s% gradT_ad(k)%val
@@ -375,7 +366,7 @@
          gradT_excess_alpha = s% gradT_excess_alpha
          s% gradT_excess_effect(k) = 0.0d0
          gradT_sub_grada = s% gradT(k) - s% grada_face(k)
-         if (gradT_excess_alpha <= 0.0  .or. &
+         if (gradT_excess_alpha <= 0.0d0  .or. &
              gradT_sub_grada <= s% gradT_excess_f1) return
          if (s% lnT(k)/ln10 > s% gradT_excess_max_logT) return
          log_tau = log10(s% tau(k))
@@ -384,8 +375,8 @@
             gradT_excess_alpha = gradT_excess_alpha* &
                (log_tau - s% gradT_excess_max_log_tau_full_off)/ &
                (s% gradT_excess_min_log_tau_full_on - s% gradT_excess_max_log_tau_full_off)
-         alfa = s% gradT_excess_f2 ! for full boost, use this fraction of gradT
-         if (gradT_excess_alpha < 1) & ! only partial boost, so increase alfa
+         alfa = s% gradT_excess_f2  ! for full boost, use this fraction of gradT
+         if (gradT_excess_alpha < 1) &  ! only partial boost, so increase alfa
             ! alfa goes to 1 as gradT_excess_alpha goes to 0
             ! alfa unchanged as gradT_excess_alpha goes to 1
             alfa = alfa + (1d0 - alfa)*(1d0 - gradT_excess_alpha)
@@ -447,7 +438,7 @@
                return
             end if
          end if
-         beta = 1d0 ! beta = min over k of Pgas(k)/Peos(k)
+         beta = 1d0  ! beta = min over k of Pgas(k)/Peos(k)
          k_beta = 0
          do k=1,nz
             tmp = s% Pgas(k)/s% Peos(k)
@@ -458,7 +449,7 @@
          end do
          beta = beta*(1d0 + s% xa(1,nz))
          s% gradT_excess_min_beta = beta
-         lambda = 0d0 ! lambda = max over k of Lrad(k)/Ledd(k)
+         lambda = 0d0  ! lambda = max over k of Lrad(k)/Ledd(k)
          do k=2,k_beta
             tmp = get_Lrad_div_Ledd(s,k)
             if (tmp > lambda) then
@@ -483,7 +474,7 @@
                alpha = 1
             else if (beta < beta1 + dbeta) then
                alpha = (beta1 + dbeta - beta)/dbeta
-            else ! beta >= beta1 + dbeta
+            else  ! beta >= beta1 + dbeta
                alpha = 0
             end if
          else if (lambda >= lambda2) then
@@ -501,13 +492,13 @@
                alpha = 1
             else if (beta < beta2 + dbeta) then
                alpha = (lambda - (lambda2 - dlambda))/dlambda
-            else ! beta >= beta2 + dbeta
+            else  ! beta >= beta2 + dbeta
                alpha = 0
             end if
-         else ! lambda <= lambda2 - dlambda
+         else  ! lambda <= lambda2 - dlambda
             alpha = 0
          end if
-         if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
+         if (s% generations > 1 .and. lambda1 >= 0) then  ! time smoothing
             s% gradT_excess_alpha = &
                (1d0 - s% gradT_excess_age_fraction)*alpha + &
                s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
@@ -542,7 +533,7 @@
          if (.not. ((nzlo==1).and.(nzhi==s%nz))) then
             write(*,*) 'nzlo != 1 or nzhi != nz'
             call mesa_error(__FILE__,__LINE__)
-         endif
+         end if
          ierr = 0
          dbg = .false.
          bot_Hp = 0; bot_r = 0; top_Hp = 0; top_r = 0; dr = 0
@@ -555,7 +546,7 @@
                if (s% mlt_mixing_type(k) /= convective_mixing) then
                   call end_of_convective_region
                end if
-            else ! in non-convective region
+            else  ! in non-convective region
                if (s% mlt_mixing_type(k) == convective_mixing) then
                   ! start of a convective region
                   k_bot = k+1
@@ -566,7 +557,7 @@
             end if
          end do
          if (in_convective_region) then
-            k = 1 ! end at top
+            k = 1  ! end at top
             call end_of_convective_region
          end if
 

@@ -1,7 +1,6 @@
 
 ! inlist_semiconvection
 
-
 &star_job
       show_log_description_at_start = .false.
 
@@ -18,14 +17,14 @@
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'pp_and_cno_extras.net'
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      history_columns_file = 'history_columns.list' 
-      
+      history_columns_file = 'history_columns.list'
+
       !pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -58,12 +57,12 @@
 
       initial_mass = 1.5
       initial_z = 0.02d0
-      
-      
+
+
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 1d-1
       semiconvection_option = 'Langer_85'
-     
+
       mixing_length_alpha = 1.8d0
       MLT_option = 'Henyey'
 
@@ -83,10 +82,10 @@
       threshold_for_smooth_gradL_composition_term = 0.02
       num_cells_for_smooth_brunt_B = 10
       threshold_for_smooth_brunt_B = 0.1
-          
+
       xa_central_lower_limit_species(1) = 'h1' ! isotope name as defined in chem_def
-      xa_central_lower_limit(1) = 0.38                   
-      
+      xa_central_lower_limit(1) = 0.38
+
       mesh_delta_coeff = 0.5
       max_years_for_timestep = 5d6
 
@@ -97,8 +96,6 @@
       write_header_frequency = 10
 
 / ! end of controls namelist
-
-
 
 
 &pgstar

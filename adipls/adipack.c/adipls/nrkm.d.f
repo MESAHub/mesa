@@ -25,7 +25,7 @@ c
 c   the programmer has the option of defining common/nrmchk/nrkwsp
 c   and setting it to the number of 8 byte words that has been
 c   reserved in labelled common/work/
-c   if nrkwsp.gt.0, nrkm checks that it is great enough to accomodate th
+c   if nrkwsp.gt.0, nrkm checks that it is great enough to accommodate th
 c   problem.
 c   if the work space is too small or if nrkwsp.le.0, appropriate
 c   diagnostics are written
@@ -105,7 +105,7 @@ c
 c   call newton-raphson-kantorovich routine
 c  note:logically gd and gp are equivalent
 c   g,gst,eb and gs,p share store to save space, consequently ik1*16
-c   bytes have been reserved for g in /work/ to accomodate gst
+c   bytes have been reserved for g in /work/ to accommodate gst
 c
    50 continue
 c
@@ -291,7 +291,7 @@ c    equations at first boundary
       call rhs(x(nqs),y(1,nqs),zk(kqs1),ap,aq,f,fd,h,d,in,i,nu)
 c     note that although the dimensions of d might not be adequate to
 c     store hd, in that event there is always sufficient unused space
-c     at the beginning of p to accomodate the overflow
+c     at the beginning of p to accommodate the overflow
 c
 c     set boundary derivative matrix
 c

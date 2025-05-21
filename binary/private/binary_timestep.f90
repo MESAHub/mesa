@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2019  Pablo Marchant & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 
       module binary_timestep
 
-      use const_def
+      use const_def, only: dp, msun, secyer
       use math_lib
       use star_lib
       use star_def
@@ -36,7 +30,7 @@
 
       contains
 
-      subroutine set_star_timesteps(b) ! sets the smallest next timestep for all stars
+      subroutine set_star_timesteps(b)  ! sets the smallest next timestep for all stars
          type (binary_info), pointer :: b
          integer :: i, l
          real(dp) :: dt_min
@@ -287,7 +281,7 @@
             call mesa_error(__FILE__,__LINE__,'Something wrong in binary timestep')
          end if
 
-         if (set_dt < 1d-7) set_dt = 1d-7 ! there's a limit to everything
+         if (set_dt < 1d-7) set_dt = 1d-7  ! there's a limit to everything
 
          b% max_timestep = exp10(b% dt_softening_factor*log10(b% max_timestep) + &
              (1-b% dt_softening_factor)*log10(set_dt*secyer))

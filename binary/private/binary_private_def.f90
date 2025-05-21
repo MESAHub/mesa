@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -57,7 +51,9 @@
       integer, parameter :: bh_star_2_mass = bh_lg_star_1_mass + 1
       integer, parameter :: bh_lg_star_2_mass = bh_star_2_mass + 1
       integer, parameter :: bh_sum_of_masses = bh_lg_star_2_mass + 1
-      integer, parameter :: bh_lg_mtransfer_rate = bh_sum_of_masses + 1
+      integer, parameter :: bh_mass_ratio = bh_sum_of_masses + 1
+      integer, parameter :: bh_obs_mass_ratio = bh_mass_ratio + 1
+      integer, parameter :: bh_lg_mtransfer_rate = bh_obs_mass_ratio + 1
       integer, parameter :: bh_lg_mstar_dot_1 = bh_lg_mtransfer_rate + 1
       integer, parameter :: bh_lg_mstar_dot_2 = bh_lg_mstar_dot_1 + 1
       integer, parameter :: bh_lg_system_mdot_1 = bh_lg_mstar_dot_2 + 1
@@ -145,6 +141,8 @@
          binary_history_column_name(bh_star_2_mass) = 'star_2_mass'
          binary_history_column_name(bh_lg_star_2_mass) = 'lg_star_2_mass'
          binary_history_column_name(bh_sum_of_masses) = 'sum_of_masses'
+         binary_history_column_name(bh_mass_ratio) = 'mass_ratio'
+         binary_history_column_name(bh_obs_mass_ratio) = 'obs_mass_ratio'
          binary_history_column_name(bh_lg_mtransfer_rate) = 'lg_mtransfer_rate'
          binary_history_column_name(bh_lg_mstar_dot_1) = 'lg_mstar_dot_1'
          binary_history_column_name(bh_lg_mstar_dot_2) = 'lg_mstar_dot_2'

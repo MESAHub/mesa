@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function do_one {
     COUNT=$((COUNT+1))

@@ -2,7 +2,7 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       create_pre_main_sequence_model = .true.
 
@@ -29,10 +29,10 @@
 
       initial_mass = 1.5
       initial_z = 0.02
-      
+
       stop_near_zams = .true.
       Lnuc_div_L_zams_limit = 0.9d0
-      
+
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
 

@@ -1,24 +1,22 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012  Bill Paxton
+!   Copyright (C) 2012  Bill Paxton & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
+
       module run_binary_extras
 
       use star_lib
@@ -124,12 +122,12 @@
          integer, intent(out) :: ierr
          logical, intent(in) :: restart
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          if (.not. restart) then
-            b% lxtra(lx_tested_super_edd) = .false. ! this is used to verify that the system has a super edd phase
-            b% lxtra(lx_tested_sub_edd) = .false. ! this is used to verify that the system has a sub edd phase
+            b% lxtra(lx_tested_super_edd) = .false.  ! this is used to verify that the system has a super edd phase
+            b% lxtra(lx_tested_sub_edd) = .false.  ! this is used to verify that the system has a sub edd phase
          end if
 
          call test_suite_startup(b, restart, ierr)
@@ -144,7 +142,7 @@
 
          extras_binary_start_step = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -156,7 +154,7 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_check_model = keep_going
@@ -171,12 +169,12 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          real(dp) :: frac_error
-         real(dp) :: actual_mtransfer_rate !actual rate of mass falling into the BH
-         real(dp) :: expected_mdot_system !rate of mass loss from vicinity of BH (includes rest mass energy from radiation)
-         real(dp) :: expected_mdot_wind !rate of mass loss from the system as a wind from donor
+         real(dp) :: actual_mtransfer_rate  !actual rate of mass falling into the BH
+         real(dp) :: expected_mdot_system  !rate of mass loss from vicinity of BH (includes rest mass energy from radiation)
+         real(dp) :: expected_mdot_wind  !rate of mass loss from the system as a wind from donor
          real(dp) :: donor_wind_mdot
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_finish_step = keep_going
@@ -213,7 +211,7 @@
          donor_wind_mdot = b% s_donor% mstar_dot - b% mtransfer_rate
          frac_error = abs((b% mdot_wind_transfer(b% d_i)-donor_wind_mdot*b% wind_xfer_fraction(b% d_i)) &
             /b% mdot_wind_transfer(b% d_i))
-         if (frac_error > 1e-10) then ! there's a loss of precision when adding wind and mtransfer_rate, so test is not that strigent
+         if (frac_error > 1e-10) then  ! there's a loss of precision when adding wind and mtransfer_rate, so test is not that strigent
                write(*,*) "ERROR: unexpected difference in expected wind mdot", &
                   b% mdot_wind_transfer(b% d_i), donor_wind_mdot*b% wind_xfer_fraction(b% d_i), frac_error
                stop
@@ -233,7 +231,7 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 

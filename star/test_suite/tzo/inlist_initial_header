@@ -14,28 +14,27 @@
 
 / ! end of star_job namelist
 
+
 &eos
 
-      read_extra_eos_inlist(1) = .true.
-      extra_eos_inlist_name(1) = 'inlist_common'
+   read_extra_eos_inlist(1) = .true.
+   extra_eos_inlist_name(1) = 'inlist_common'
 
-      read_extra_eos_inlist(2) = .true.
-      extra_eos_inlist_name(2) = 'inlist_initial'
+   read_extra_eos_inlist(2) = .true.
+   extra_eos_inlist_name(2) = 'inlist_initial'
 
 / ! end of eos namelist
 
 
 &kap
 
-      read_extra_kap_inlist(1) = .true.
-      extra_kap_inlist_name(1) = 'inlist_common'
+   read_extra_kap_inlist(1) = .true.
+   extra_kap_inlist_name(1) = 'inlist_common'
 
-      read_extra_kap_inlist(2) = .true.
-      extra_kap_inlist_name(2) = 'inlist_initial'
+   read_extra_kap_inlist(2) = .true.
+   extra_kap_inlist_name(2) = 'inlist_initial'
 
 / ! end of kap namelist
-
-
 
 
 &controls

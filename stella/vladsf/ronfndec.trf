@@ -31,7 +31,7 @@
   <*deffreq: define frequency grid *>;
    tstwritten=.false.;
   _do nw=itable,itable;
-     nu=70+nw; -- channel for Opafile.nw     
+     nu=70+nw; -- channel for Opafile.nw
      time=1.d+01**(daybegl+(dayendl-daybegl)/dble(@ns-1)*(nw-1));
          -- time in days for the velocity gradient
       -- Velocity gradient = 1 / time
@@ -48,7 +48,7 @@
          <*fillhapp: fill tables of log (happa) for desired Tp and rho
                      and save in the arrays hpbanab1, hpbansc1
                      -- hpbansc1 must keep total opacity  *>
-         write(nures,'(A,F8.2,A,I4)')' done time=',time,'  zone=',km; 
+         write(nures,'(A,F8.2,A,I4)')' done time=',time,'  zone=',km;
      _od;
      tstwritten=.true.;
      Msta=@ns;
@@ -59,11 +59,11 @@
      close(unit=nu);
      if(nw==@ns)then;
         write(69) hpbanab1;
-     endif;   
+     endif;
   _od;
   <*closefiles:  *>;
       end;
-%_openfiles: 
+%_openfiles:
     Open(unit=1,file='ronfict.1',status='old',action='read');
     --        Model, NiDist  & Opafile file
     READ(1,'(A)');
@@ -140,7 +140,7 @@
      abund(26)=Xnifor(Km)-abund(28)-abund(27); -- only Fe56 made from Ni56
      write(nures,'(a,1p,3e10.3)')
       ' Fe Co Ni from Ni56=', abund(26),abund(27),abund(28);
-     abund(28)=abund(28)+Yabun(Natom,km)*AZ(Natom); -- full Ni at this time 
+     abund(28)=abund(28)+Yabun(Natom,km)*AZ(Natom); -- full Ni at this time
      abund(26)=Yabun(Natom-1,km)*AZ(Natom-1)-Xnifor(Km)+abund(26);
                                                     -- full Fe at this time
      write(nures,'(a,1p,3e10.3)')
@@ -153,7 +153,7 @@
 -- Compute frequency grid.
 --   wlmax=5.d+04; wlmin=1.d+01;
      wlmax=5.d+04; wlmin=1.d0; -- for peter
---   wlmax=5.d+04; wlmin=1.d-01; -- MUST be for very strong shbrk 
+--   wlmax=5.d+04; wlmin=1.d-01; -- MUST be for very strong shbrk
    -- it was 1 at q UCSC for s1b7a models and 0.1 for he15b3 models
 --   write(*,'(2(a,f8.2), a )')' wlmax=',wlmax, '   wlmin=',wlmin,' AA, OK?';
 --   read(*,*);
@@ -176,14 +176,14 @@
 -- must be redefined in Begrad
 --
 %_fillhapp:
-   lastTp=1; -- to save last value of tabulated Tp  
+   lastTp=1; -- to save last value of tabulated Tp
   _do ir=1,@Ntab;
 --  _do ir=@Ntab,@Ntab; -- test
       rho=1.d+01**(-18+ir);
       rhotab(ir)=log(rho); -- here we use natural log, unlike petfict!
       if(ir==1)then;
          rho=1.d+01*rho;
-          -- save boundary nodes in the tables for ficticious values
+          -- save boundary nodes in the tables for fictitious values
       elseif(ir==@Ntab)then;
          rho=rho/1.d+01;
       endif;
@@ -207,11 +207,11 @@
         Tptab(itp)=log(temp);
         if(itp==1)then;
            temp=1.d+01**(3.4d0+0.2d0*itp);
-           -- save boundary nodes in the tables for ficticious values
+           -- save boundary nodes in the tables for fictitious values
         elseif(itp==@Ntab)then;
            temp=1.d+01**(3.4d0+0.2d0*(@Ntab-2));
         endif;
-        call opacity(rho, temp, abund, nfreq, freq, freqmn, 
+        call opacity(rho, temp, abund, nfreq, freq, freqmn,
             dvdr, linelist, rdlndump, .false. , longlist,
             0.0, xsecdatadir, opac, scatop, eden);
         -- write the computed opacity.
@@ -232,7 +232,7 @@
                   alog(sngl((scatop(lf)+opac(lf))*1.d+01**UlgR/(rho/Urho)));
                --old DP  log(scatop(lf)*1.d+01**UlgR/(rho/Urho));
                      -- hpbansc1 must keep total opacity !!!
-               -- 
+               --
          hbab=hpbanab1(lf,itp,ir,(km-1)/@skip+1);
          hbal=hpbansc1(lf,itp,ir,(km-1)/@skip+1);
          if (hbal >1.d50 .or. hbab > 1.d50)then;
@@ -249,7 +249,7 @@
       write(nures,15) rho, temp, time, eden, eden / nucden;
      -- write(@term,15) rho, temp, time, eden, eden / nucden;
   _od  -- loop ir
-%_closefiles: 
+%_closefiles:
     close(nures);
     close(9);
     close(10);
@@ -295,4 +295,4 @@ c Solar abundance set (by mass).
      .     -17.73, -17.72, -17.71, -17.71/
 
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-*/      
+*/

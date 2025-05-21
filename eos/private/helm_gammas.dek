@@ -1,10 +1,10 @@
 
-!..temperature and density exponents (cox & giuli 9.81 9.82) 
+!..temperature and density exponents (cox & giuli 9.81 9.82)
 !..specific heat at constant volume (cox & giuli 9.92)
 !..third adiabatic exponent (cox & giuli 9.93)
-!..first adiabatic exponent (cox & giuli 9.97) 
+!..first adiabatic exponent (cox & giuli 9.97)
 !..second adiabatic exponent (cox & giuli 9.105)
-!..specific heat at constant pressure (cox & giuli 9.98) 
+!..specific heat at constant pressure (cox & giuli 9.98)
 !..relativistic formula for the sound speed footnote (cox & giuli 14.29)
 
 
@@ -16,7 +16,7 @@
        dchit_gasdd = yy*dpgasdd + ww*dpgasddt
        dchit_gasdt = yy*dpgasdt + ww*dpgasdtt + dpgasdt*presinv
        dchit_gasda = yy*dpgasda + ww*dpgasdta
-       dchit_gasdz = yy*dpgasdz + ww*dpgasdtz       
+       dchit_gasdz = yy*dpgasdz + ww*dpgasdtz
 
        ww          = den*presinv
        yy          = -ww*presinv*dpgasdd
@@ -51,7 +51,7 @@
                      + (dchit_gasdz*z - dfk*dcv_gasdz)*ww
 
        gam1_gas    = chit_gas*x + chid_gas
-       
+
        if (gam1_gas < 0d0) then
          ierr = -1
          if (dbg) then
@@ -73,7 +73,7 @@
          end if
          return
        end if
-       
+
        dgam1_gasdd = dchit_gasdd*x + chit_gas*dgam3_gasdd + dchid_gasdd
        dgam1_gasdt = dchit_gasdt*x + chit_gas*dgam3_gasdt + dchid_gasdt
        dgam1_gasda = dchit_gasda*x + chit_gas*dgam3_gasda + dchid_gasda
@@ -174,7 +174,7 @@
                   + (dchitdt*z - dfk*dcvdt)*ww
        dgam3da = dpresda*deninv*xx + (dchitda*z - dfk*dcvda)*ww
        dgam3dz = dpresdz*deninv*xx + (dchitdz*z - dfk*dcvdz)*ww
-       
+
        if (is_bad(gam3)) then
          ierr = -1
          if (dbg) then
@@ -209,7 +209,7 @@
        dnabdt  = (dgam3dt - nabad*dgam1dt)*z
        dnabda  = (dgam3da - nabad*dgam1da)*z
        dnabdz  = (dgam3dz - nabad*dgam1dz)*z
-       
+
 
        ww      = (1.0d0 - nabad)
        gam2    = 1.0d0/ww
@@ -253,7 +253,6 @@
                     * (denerda*den - ww*dpresda)*presinv)
        dcsdz   = yy*((dgam1dz - dfk)*xx  &
                     * (denerdz*den - ww*dpresdz)*presinv)
-
 
 
 !..ahh the good old simple days

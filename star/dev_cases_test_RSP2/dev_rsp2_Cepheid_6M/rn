@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]

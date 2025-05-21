@@ -4,11 +4,11 @@
 make_zams_ultra_high_mass
 *************************
 
-This test case shows an example of creating a 250 Msun, Z = 1e-4 metallicity, model close to the main sequence.
+This test case shows an example of creating a 250 |Msun|, Z = 1e-4 metallicity, model close to the main sequence.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_zams_ultra_high_mass``) loads the pre-built 90 Msun, Z = 1e-4 metallicity, model ``late_pre_zams_90M.mod``. This initial model is then relaxed to 250 Msun using ``relax_initial_mass_scale = .true.``. At the 250 Msun point, the model already exceeds the termination criteria of Lnuc/L = 0.9 and there is no evolution in the HR diagram: 
+* Part 1 (``inlist_zams_ultra_high_mass``) loads the pre-built 90 |Msun|, Z = 1e-4 metallicity, model ``late_pre_zams_90M.mod``. This initial model is then relaxed to 250 |Msun| using ``relax_initial_mass_scale = .true.``. At the 250 |Msun| point, the model already exceeds the termination criteria of Lnuc/L = 0.9 and there is no evolution in the HR diagram:
 
 .. image:: ../../../star/test_suite/make_zams_ultra_high_mass/docs/grid_000075.svg
    :width: 100%
@@ -22,10 +22,8 @@ pgstar commands used for the plot above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 10
 

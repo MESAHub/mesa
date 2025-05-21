@@ -2,12 +2,12 @@
 
 &star_job
 
-     
-      show_log_description_at_start = .false. 
+
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       load_model_filename = 'has_he_core.mod'
-      
+
       save_model_when_terminate = .true.
       save_model_filename = 'bare_he_core.mod'
       required_termination_code_string = 'max_age'
@@ -43,7 +43,7 @@
 / ! end of kap namelist
 
 &controls
-      
+
       max_age = 1d8
 
       energy_eqn_option = 'eps_grav'
@@ -51,7 +51,7 @@
 
       warn_when_large_rel_run_E_err = 1d99
       max_abs_rel_run_E_err = 1d99
-      
+
       limit_for_rel_error_in_energy_conservation = 1d-5
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
@@ -64,7 +64,7 @@
       mesh_delta_coeff = 0.5
 
       delta_lg_star_mass_limit = 5d-2 ! allow large change per step
-      
+
       mixing_length_alpha = 1.89
 
       photo_interval = 50
@@ -79,14 +79,13 @@
 / ! end of controls namelist
 
 
-
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
+   ! top level controls
 
-!Grid3_win_flag = .true.
-      
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
+
+   !Grid3_win_flag = .true.
+
 / ! end of pgstar namelist

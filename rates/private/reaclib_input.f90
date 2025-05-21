@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -112,10 +106,10 @@
             ios = 0
             open(newunit=cache_io_unit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
-            if (ios == 0) then ! opened it okay
+            if (ios == 0) then  ! opened it okay
                call read_reaclib_cache(cache_io_unit,ios)
                close(cache_io_unit)
-               if (ios == 0) then ! read it okay
+               if (ios == 0) then  ! read it okay
                   close(reaclib_unitno)
                   return
                end if
@@ -125,7 +119,7 @@
          count = 0
          do i = 1, max_nreaclib
             read(unit=reaclib_unitno, fmt=line0, iostat=ierr) reaclib% chapter(i)
-            if (ierr /= 0 ) then ! assume end of file
+            if (ierr /= 0 ) then  ! assume end of file
                ierr = 0; exit
             end if
             read(unit=reaclib_unitno,fmt=line1,iostat=ierr,err=100) &
@@ -244,7 +238,7 @@
          type(nuclide_set), dimension(:), intent(in) :: set
          logical, intent(in) :: use_weaklib
          integer, intent(out) :: ierr
-         type(reaction_data) :: r ! temporary storage
+         type(reaction_data) :: r  ! temporary storage
          integer :: i,j,l,count,loc_count,nt,indx,cat, &
             weaklib_count,chapter,num_in,num_out,num_skip_for_weaklib,num_from_reaclib, &
             max_lhs_Z, min_Z
@@ -270,7 +264,7 @@
          end if
 
          count = 0
-         if (use_weaklib) then ! add weaklib rates first
+         if (use_weaklib) then  ! add weaklib rates first
             if (dbg) write(*,*) 'add weaklib rates'
             do i = 1, nuclides% nnuclides
                do j = 1, nuclides% nnuclides
@@ -354,7 +348,7 @@
                         already_included_from_weaklib = .true.
                      end if
                   end if
-                  if (already_included_from_weaklib) then ! find it and store coefficients
+                  if (already_included_from_weaklib) then  ! find it and store coefficients
                      found_it = .false.
                      do j=1,weaklib_count
                         if (r% weaklib_ids(j) == indx) then
@@ -420,9 +414,9 @@
                   r% Qneu(count) = 0.2668D0
 
                else if (handle == 'r_he3_ec_h3') then
-                  r% Qneu(count) = 10D0 ! who knows?  who cares?
+                  r% Qneu(count) = 10D0  ! who knows?  who cares?
 
-               else if (adjustl(reaclib% reaction_flag(i)) == 'w') then ! check weak_info list
+               else if (adjustl(reaclib% reaction_flag(i)) == 'w') then  ! check weak_info list
                   name1 = reaclib% species(1,i)
                   if (num_out == 1) then
                      name2 = reaclib% species(2,i)

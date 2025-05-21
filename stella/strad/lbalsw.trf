@@ -235,7 +235,7 @@ IMPLICIT REAL*8(A-H,O-Z);
     ETOT=ETERM+ERADD+EGRAV+EKIN;
     If(NSTEP==0)ETOT0=ETOT;
     BALENG=ETOT-ELOST-ETOT0;
---    write(*,'(a,i5,1p,4g15.3)')' nstep, Etot, Elost, Etot0, Baleng=', 
+--    write(*,'(a,i5,1p,4g15.3)')' nstep, Etot, Elost, Etot0, Baleng=',
   --          nstep, Etot, Elost, Etot0, Baleng;
     --pause;
     BALVIR=EVIR+VISVIR+EGRAV-ACVIR;
@@ -606,7 +606,7 @@ IMPLICIT REAL*8(A-H,O-Z);
 --     WRITE(@Wres,'(A,1P,10E12.4)')' THICK TPRAD PTH ETH PTTH ETTH DPE: ',
   --      WTH,PTH,ETH,PTTH,ETTH,DPE;
        WRITE(@Wres,'(A,I4,2X,10L2,A,1P,2E12.4)') ' km Lth: ',
-          Km,(LTHICK(L,Km),L=1,10),' TprTh DPE:',WTh,DPE;
+          Km,(LTHICK(L,Km),L=1,10),' TprTh DPE:',WTH,DPE;
     endif;
 %PA_Pre.F_Burn.A=LE:
 %PA_Pre_swdet:
@@ -1049,7 +1049,7 @@ IMPLICIT REAL*8(A-H,O-Z);
 --        wfr0=(freqmn(Lfr0+1)-fr0)/(freqmn(Lfr0+1)-freqmn(Lfr0));
                                      -- in linear scale
         L=Lfr0;
---	if(mod(Lfr,20)==0 .and. mod(Nstep,100)==0)then;
+--  if(mod(Lfr,20)==0 .and. mod(Nstep,100)==0)then;
 --        if(Nstep==1000 .or. Nstep==1050 .or. Nstep==1100)then;
 --        if(Nstep==350 .or. Nstep==400 .or. Nstep==450)then;
 --          write(*,'(a,2I5)')' in lbalsw Lfr, Lfr0:',Lfr,Lfr0;

@@ -1,9 +1,9 @@
 ! inlist_to_agb
- 
+
 &star_job
       load_saved_model = .true.
       load_model_filename = 'zams.mod'
-      
+
       save_model_when_terminate = .true.
       save_model_filename = 'agb.mod'
       required_termination_code_string = 'log_max_temp_upper_limit'
@@ -24,11 +24,14 @@
 
 / ! end of star_job namelist
 
+
 &eos
 / ! end of eos namelist
 
+
 &kap
 / ! end of kap namelist
+
 
 &controls
 
@@ -41,12 +44,12 @@
 
 ! wind
       cool_wind_full_on_T = 1d6
-      hot_wind_full_on_T = 1d6 
+      hot_wind_full_on_T = 1d6
       hot_wind_scheme = ''
       cool_wind_RGB_scheme = 'Reimers'
       cool_wind_AGB_scheme = 'Blocker'
       RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5  
+      Reimers_scaling_factor = 0.5
       Blocker_scaling_factor = 0.5
 
 ! atmosphere
@@ -71,10 +74,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 Grid1_plot_name(3) = 'HR'
 Profile_Panels3_xmin = -101d0
 Profile_Panels3_xmax = -101d0

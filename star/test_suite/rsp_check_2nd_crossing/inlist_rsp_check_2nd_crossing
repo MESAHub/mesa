@@ -8,7 +8,6 @@
 ! the results are written to a file such as 7B_2nd_crossing.data
 
 
-
 &star_job
 
       show_log_description_at_start = .false.
@@ -29,7 +28,7 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
@@ -52,67 +51,67 @@
 ! RSP controls
 
    use_other_rsp_build_model = .true.
-   
+
    RSP_T_anchor_tolerance = 1d-6
    RSP_T_inner_tolerance = 1d-5
-   
+
    x_character_ctrl(1) = 'history_logs/history_7M.data'
    x_character_ctrl(2) = '7B_2nd_crossing.data'
    RSP_mass = 7d0
-   
+
    RSP_X = 0.736d0
    RSP_Z = 0.008d0
 
    x_ctrl(1) = 100d0 ! delta Teff      10C needs 133 for this
 
    ! approximate IS edges
-   
+
    ! blue edge
    x_ctrl(2) = 3.76 ! logT1
-   x_ctrl(3) = 4.5 ! logL1   
+   x_ctrl(3) = 4.5 ! logL1
    x_ctrl(4) = 3.83 ! logT2
    x_ctrl(5) = 2.4 ! logL2
-   
+
    ! red edge
    x_ctrl(6) = 3.65 ! logT3
-   x_ctrl(7) = 4.5 ! logL3   
+   x_ctrl(7) = 4.5 ! logL3
    x_ctrl(8) = 3.77 ! logT4
-   x_ctrl(9) = 2.4 ! logL4            
-   
+   x_ctrl(9) = 2.4 ! logL4
+
    x_integer_ctrl(1) = 6 ! number of lines to skip before data
    x_integer_ctrl(2) = 1 ! column for model_number
    x_integer_ctrl(3) = 2 ! column for star_age
    x_integer_ctrl(4) = 4 ! column for log_Teff
    x_integer_ctrl(5) = 5 ! column for log_L
 
-   
+
    ! set A
    !RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   !RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   !RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap
    !RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-   !RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
-   
+   !RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar
+
    ! set B
    RSP_alfam =     0.50d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap
    RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-   RSP_gammar =    1.0d0         ! radiative losses; dampR ~ RSP_gammar          
-   
+   RSP_gammar =    1.0d0         ! radiative losses; dampR ~ RSP_gammar
+
    ! set C
    !RSP_alfam =     0.40d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   !RSP_alfap =     1.0d0         ! turbulent pressure; Pt ~ alfap     
+   !RSP_alfap =     1.0d0         ! turbulent pressure; Pt ~ alfap
    !RSP_alfat =     0.01d0        ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-   !RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
-   
+   !RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar
+
    ! set D
    !RSP_alfam =     0.70d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   !RSP_alfap =     1.0d0         ! turbulent pressure; Pt ~ alfap     
+   !RSP_alfap =     1.0d0         ! turbulent pressure; Pt ~ alfap
    !RSP_alfat =     0.01d0        ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-   !RSP_gammar =    1.0d0         ! radiative losses; dampR ~ RSP_gammar          
-      
+   !RSP_gammar =    1.0d0         ! radiative losses; dampR ~ RSP_gammar
+
 
 ! output controls
-   
+
       terminal_show_age_units = 'days'
 
       !num_trace_history_values = 2
@@ -129,12 +128,11 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
 
   pgstar_interval = 5
-  pause = .false.
+  pause_flag = .false.
 
   Grid1_win_flag = .true.
 
@@ -204,7 +202,6 @@
   Grid1_file_interval = 5 ! output when mod(model_number,Grid1_file_interval)==0
   Grid1_file_width = 9 ! negative means use same value as for window
   Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
-
 
 
   Profile_Panels1_win_flag = .false.
@@ -298,7 +295,6 @@
   Profile_Panels1_file_interval = 5 ! output when `mod(model_number,Profile_Panels1_file_interval)==0`
   Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
   Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
-
 
 
   History_Panels1_win_flag = .false.

@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -292,11 +286,11 @@
          ! first look in local directory
          filename = trim(net_filename)
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! look in local nets directory
+         if (ierr /= 0) then  ! look in local nets directory
             filename = 'nets/' // trim(net_filename)
             ierr = 0
             open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-            if (ierr /= 0) then ! look in global nets directory
+            if (ierr /= 0) then  ! look in global nets directory
                filename = trim(net_dir) // '/nets/' // trim(net_filename)
                ierr = 0
                open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -442,7 +436,7 @@
          end subroutine error
 
 
-         subroutine do_approx21(which_case, ierr) ! e.g. approx21(cr56)
+         subroutine do_approx21(which_case, ierr)  ! e.g. approx21(cr56)
             use chem_lib, only: chem_get_iso_id
             use chem_def, only: chem_isos
             integer, intent(in) :: which_case
@@ -982,7 +976,7 @@
             character (len=*), intent(in) :: string
             integer, intent(out) :: ir, ierr
             logical :: okay, dbg
-            dbg = .false. ! (string == 'r_h1_li7_to_he4_he4')
+            dbg = .false.  ! (string == 'r_h1_li7_to_he4_he4')
             okay = add_this_reaclib_forward_reaction(string, ir, ierr)
             if (ierr /= 0) then
                write(*,*) 'ierr from add_this_reaclib_forward_reaction ' // trim(string)
@@ -1027,7 +1021,7 @@
             ierr = 0
             add_reaction_for_this_handle = .false.
             ir = rates_reaction_id(string)
-            if (ir == 0) then ! check if reaction is defined in reaclib
+            if (ir == 0) then  ! check if reaction is defined in reaclib
                call add_reaction_for_handle(string, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in add_reaction_for_handle for ' // trim(string)
@@ -1055,9 +1049,9 @@
             ierr = 0
             add_this_reaclib_forward_reaction = .false.
             ir = rates_reaction_id(string)
-            if (ir == 0) then ! check if reaction is defined in reaclib
+            if (ir == 0) then  ! check if reaction is defined in reaclib
                indx = reaclib_lookup(string, reaclib_rates% reaction_dict)
-               if (indx > 0) then ! add a definition for it
+               if (indx > 0) then  ! add a definition for it
                   call add_reaction_from_reaclib(string, '', indx, ierr)
                   if (ierr /= 0) then
                      write(*,*) 'failed in add_this_reaclib_forward_reaction for ' // trim(string)
@@ -1086,9 +1080,9 @@
             ierr = 0
             add_this_reaclib_reverse_reaction = .false.
             ir = rates_reaction_id(string)
-            if (ir == 0) then ! check if reaction is defined in reaclib
+            if (ir == 0) then  ! check if reaction is defined in reaclib
                indx = reaclib_lookup(string, reaclib_rates% reverse_dict)
-               if (indx > 0) then ! add a definition for it
+               if (indx > 0) then  ! add a definition for it
                   call add_reaction_from_reaclib( &
                            string, reaclib_rates% reaction_handle(indx), indx, ierr)
                   if (ierr /= 0) return
@@ -1132,9 +1126,9 @@
                call mesa_error(__FILE__,__LINE__,'net_init')
             end if
 
-            if (ir == 0) then ! check if reaction or reverse is defined in reaclib
+            if (ir == 0) then  ! check if reaction or reverse is defined in reaclib
                indx = reaclib_lookup(string, reaclib_rates% reaction_dict)
-               if (indx > 0) then ! add a definition for it
+               if (indx > 0) then  ! add a definition for it
                   call add_reaction_from_reaclib(string, '', indx, ierr)
                   if (ierr /= 0) then
                      write(*,*) 'failed in add_reaction_from_reaclib for ' // trim(string)
@@ -1149,11 +1143,11 @@
 
                else
                   ierr = 0
-                  if (len_trim(reverse_op) > 0) then ! check for the reverse reaction in reaclib
+                  if (len_trim(reverse_op) > 0) then  ! check for the reverse reaction in reaclib
                      reverse = 'r_' // trim(chem_isos% name(iso_out)) // '_' // &
                         trim(reverse_op) // '_' // trim(chem_isos% name(iso_in))
                      indx = reaclib_lookup(reverse, reaclib_rates% reaction_dict)
-                     if (indx > 0) then ! add a definition for it
+                     if (indx > 0) then  ! add a definition for it
                         call add_reaction_from_reaclib(string, reverse, indx, ierr)
                         if (ierr /= 0) then
                            write(*,'(a)') 'failed in add_reaction_from_reaclib for '  &
@@ -1243,6 +1237,7 @@
 
 
       subroutine finish_net_def(handle, ierr)
+         use const_def, only: mev2gr
          use rates_def, only: reaction_names_dict
          use utils_lib, only: integer_dict_create_hash, realloc_integer
          use chem_def, only: chem_isos
@@ -1250,11 +1245,10 @@
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
 
-         type (Net_General_Info), pointer  :: g
+         type (Net_General_Info), pointer :: g
          integer :: i
 
          logical, parameter :: dbg = .false.
-         !logical, parameter :: dbg = .true.
 
          include 'formats'
 
@@ -1321,7 +1315,7 @@
          ! Precompute some powers of Z for screening and coulomb
          do i=1, g% num_isos
             g% z158(i) = pow(real(chem_isos% Z(g% chem_id(i)),kind=dp),1.58d0)
-            g% z52(i)  = pow(real(chem_isos% Z(g% chem_id(i)),kind=dp),2.50d0) ! 5.d0/2.d0)
+            g% z52(i)  = pow(real(chem_isos% Z(g% chem_id(i)),kind=dp),2.50d0)  ! 5.d0/2.d0)
          end do
 
          do i=1, g% num_isos
@@ -1361,7 +1355,7 @@
       end subroutine finish_net_def
 
 
-      subroutine check_for_hardwired_pairs ! especially for approx21
+      subroutine check_for_hardwired_pairs  ! especially for approx21
          call check_pair('r_he4_he4_he4_to_c12', 'r_c12_to_he4_he4_he4')
          call check_pair('rhe4_breakup', 'rhe4_rebuild')
                               ! << should treat this as he4 + n + p -> 3 n + 3 p ???
@@ -1454,24 +1448,24 @@
             reverse_id(i) = 0
             ir = g% reaction_id(i)
 
-            if (is_weak_reaction(ir)) cycle ! don't do weak reactions
-            if (reaction_name(ir)(1:2) /= 'r_') cycle ! don't mess with special ones.
+            if (is_weak_reaction(ir)) cycle  ! don't do weak reactions
+            if (reaction_name(ir)(1:2) /= 'r_') cycle  ! don't mess with special ones.
 
             r_ir = reverse_reaction_id(ir)
             if (r_ir <= 0) then
-               cycle ! no reverse reaction
+               cycle  ! no reverse reaction
             end if
             reverse_id(i) = r_ir
             r_i = g% net_reaction(r_ir)
             if (r_i <= 0) then
-               cycle ! reverse reaction not in this net
+               cycle  ! reverse reaction not in this net
             end if
 
             if (reaction_inputs(6,ir) /= 0) then
-               cycle ! more than 2 input species
+               cycle  ! more than 2 input species
             end if
             if (reaction_outputs(6,ir) /= 0) then
-               cycle ! more than 2 output species
+               cycle  ! more than 2 output species
             end if
 
             num_in1 = reaction_inputs(1,ir)
@@ -1487,14 +1481,14 @@
             iso_out2 = reaction_outputs(4,ir)
 
             if (iso_in1 == 0 .or. iso_out1 == 0) then
-               cycle ! non-standard reaction
+               cycle  ! non-standard reaction
             end if
             if (num_in1 > 3 .or. num_out1 > 3) then
-               cycle ! non-standard reaction
+               cycle  ! non-standard reaction
             end if
 
-            if (iso_in2 == 0) then ! only 1 species on lhs
-               if (iso_out2 > 0) cycle ! 1 to many is treated as reverse of many to 1
+            if (iso_in2 == 0) then  ! only 1 species on lhs
+               if (iso_out2 > 0) cycle  ! 1 to many is treated as reverse of many to 1
                ! 1 species to 1 species reaction
                if (num_in1 == 1 .and. num_out1 == 1) cycle
                kind(i) = general_one_one_kind
@@ -1508,7 +1502,7 @@
 
             if (is_weak_reaction(ir)) cycle
 
-            if (iso_out2 == 0) then ! 2 to 1
+            if (iso_out2 == 0) then  ! 2 to 1
                if (num_in1 > 1 .or. num_in2 > 1 .or. num_out1 > 1) then
                   kind(i) = general_two_one_kind
                   if (r_ir <= 0) then
@@ -1518,7 +1512,7 @@
                   end if
                   cycle
                end if
-            else ! 2 to 2
+            else  ! 2 to 2
                if (num_in1 > 1 .or. num_in2 > 1 .or. num_out1 > 1 .or. num_out2 > 1) then
                   kind(i) = general_two_two_kind
                   if (r_ir <= 0) then
@@ -1542,7 +1536,7 @@
             end if
             ! a + b => c; Z(a) <= Z(b)
 
-            if (iso_out2 == 0) then ! 2-to-1
+            if (iso_out2 == 0) then  ! 2-to-1
 
                if (in_a == ineut) then
                   kind(i) = ng_kind
@@ -1565,7 +1559,7 @@
                   end if
                end if
 
-            else ! 2-to-2. only do ap,an,pn.  skip pa,na,np.
+            else  ! 2-to-2. only do ap,an,pn.  skip pa,na,np.
 
                if (chem_isos% Z(iso_out1) <= chem_isos% Z(iso_out2)) then
                   out_c = iso_out1
@@ -1680,7 +1674,7 @@
             return
          end if
 
-         g% net_iso(iso_id) = 1 ! mark as added
+         g% net_iso(iso_id) = 1  ! mark as added
 
       end subroutine add_net_iso
 
@@ -1724,7 +1718,7 @@
             return
          end if
 
-         g% net_iso(iso_id) = 0 ! mark as removed
+         g% net_iso(iso_id) = 0  ! mark as removed
 
          call remove_reactions_for_iso(g, iso_id, ierr)
 
@@ -1786,7 +1780,7 @@
             g% net_reaction(old_sz+1:new_sz) = 0
          end if
 
-         g% net_reaction(reaction_id) = 1 ! mark as added
+         g% net_reaction(reaction_id) = 1  ! mark as added
 
       end subroutine add_net_reaction
 
@@ -1830,7 +1824,7 @@
             return
          end if
 
-         g% net_reaction(reaction_id) = 0 ! mark as removed
+         g% net_reaction(reaction_id) = 0  ! mark as removed
 
       end subroutine remove_net_reaction
 
@@ -1897,12 +1891,12 @@
          !   write(*,*) 'remove_reactions_for_iso ' // trim(chem_isos% name(target_iso))
 
          do ir = 1, size(rtab,dim=1)
-            if (rtab(ir) == 0) cycle ! not used
+            if (rtab(ir) == 0) cycle  ! not used
             num_reaction_inputs = get_num_reaction_inputs(ir)
             do i = 1, num_reaction_inputs
                j = reaction_inputs(2*i,ir)
                if (j == target_iso) then
-                  rtab(ir) = 0 ! mark as removed
+                  rtab(ir) = 0  ! mark as removed
                   !write(*,*) 'remove reaction ' // trim(reaction_Name(ir))
                   exit
                end if
@@ -1911,7 +1905,7 @@
             do i = 1, num_reaction_outputs
                j = reaction_outputs(2*i,ir)
                if (j == target_iso) then
-                  rtab(ir) = 0 ! mark as removed
+                  rtab(ir) = 0  ! mark as removed
                   !write(*,*) 'remove reaction ' // trim(reaction_Name(ir))
                   exit
                end if
@@ -1921,7 +1915,7 @@
       end subroutine remove_reactions_for_iso
 
 
-      subroutine setup_reaction_info(g, ierr) ! assumes have already called setup_iso_info
+      subroutine setup_reaction_info(g, ierr)  ! assumes have already called setup_iso_info
          use chem_def, only: chem_isos
          use rates_lib, only: get_weak_rate_id, is_weak_reaction
          use num_lib, only: qsort_string_index
@@ -1968,7 +1962,7 @@
          reaction_num = 0
          num_wk_reactions = 0
          do ir = 1, rates_reaction_id_max
-            if (rtab(ir) == 0) cycle ! reaction not in this net
+            if (rtab(ir) == 0) cycle  ! reaction not in this net
             reaction_num = reaction_num + 1
             reaction_id(reaction_num) = ir
             if (is_weak_reaction(ir)) &
@@ -2009,14 +2003,14 @@
          end do
 
          i = 1
-kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes last
+kind_loop: do kind = 1, max_kind  ! reorder by kind of reaction; other_kind goes last
             do while (reaction_reaclib_kind(i) == kind)
                i = i+1
                if (i > num_reactions) exit kind_loop
             end do
-            do ! move all of the instances of current kind
+            do  ! move all of the instances of current kind
                found_one = .false.
-               do j=i+1,num_reactions ! locate the next instance of current kind of reaction
+               do j=i+1,num_reactions  ! locate the next instance of current kind of reaction
                   if (reaction_reaclib_kind(j) /= kind) cycle
 
                   ! exchange
@@ -2040,15 +2034,15 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
                   exit
                end do
 
-               if (.not. found_one) exit ! look for another kind
-               i = i+1 ! next destination
+               if (.not. found_one) exit  ! look for another kind
+               i = i+1  ! next destination
                if (i > num_reactions) exit
             end do
          end do kind_loop
 
          i = 0
          !g% have_all_reverses = .true.
-         do ! reorder so that forward + reverse pairs are adjacent.
+         do  ! reorder so that forward + reverse pairs are adjacent.
             i = i+1
             if (i >= num_reactions) exit
             if (reaction_reaclib_kind(i) == other_kind) cycle
@@ -2059,7 +2053,7 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
                call mesa_error(__FILE__,__LINE__,'setup_reaction_info: missing reverse id')
             end if
             r_i = rtab(r_ir)
-            if (r_i == 0) then ! reverse reaction not in net
+            if (r_i == 0) then  ! reverse reaction not in net
                !g% have_all_reverses = .false.
                cycle
             end if
@@ -2148,7 +2142,7 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
 
       ! Fowler, Caughlan, Zimmerman, Annual Review Astro. Astrophys., 1975.12:69-112. eqn (1).
       real(dp) function neutrino_Q(i1, i2)
-         integer, intent(in) :: i1, i2 ! i1 decays to i2
+         integer, intent(in) :: i1, i2  ! i1 decays to i2
          real(dp) :: sum, sum2
          sum    = chem_isos% binding_energy(i2) - chem_isos% binding_energy(i1) - 0.782d0 - 1.022d0
          sum    = 1.0d0 + sum/0.511d0

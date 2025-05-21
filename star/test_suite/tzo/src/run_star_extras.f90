@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -231,13 +228,13 @@
          do k=1,s% nz
             r = s% r(k)
             G = standard_cgrav
-            m = s% m(k) ! m_grav hasn't been set when other_cgrav is called
-            if (k > 1) then ! get approximate P and rho at face
+            m = s% m(k)  ! m_grav hasn't been set when other_cgrav is called
+            if (k > 1) then  ! get approximate P and rho at face
                rho = 0.5d0*(s% rho(k-1) + s% rho(k))
                P = 0.5d0*(s% Peos(k-1) + s% Peos(k))
                f1 = 1d0 + P/(rho*clight**2)
                f2 = 1d0 + 4d0*pi*r**3*P/(m*clight**2)
-            else ! k == 1
+            else  ! k == 1
                f1 = 1d0
                f2 = 1d0
             end if

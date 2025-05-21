@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -30,14 +24,13 @@
       use utils_lib
       use star_utils
       use num_lib, only: find0
-
-      use const_def, only: avo, kerg, pi, clight, crad, Rsun, Lsun, Msun, &
-         secyer, ln10, mev_amu, ev2erg, two_thirds
+      use const_def, only: avo, kerg, pi, amu, clight, crad, Rsun, Lsun, Msun, &
+         secday, secyer, ln10, mev_amu, ev2erg, one_third, two_thirds, four_thirds_pi, &
+         no_mixing, convective_mixing, semiconvective_mixing
 
       implicit none
 
       contains
-
 
       subroutine set_min_gamma1(s)
          type (star_info), pointer :: s
@@ -151,7 +144,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
+         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min, k_fe
          real(dp) :: radius, dr, non_fe_core_mass, nu_for_delta_Pg, v, mstar, luminosity, mass_sum
          integer, pointer :: net_iso(:)
          real(dp), pointer :: velocity(:) => null()
@@ -347,7 +340,7 @@
          end if
 
          if (.not. s% get_delta_nu_from_scaled_solar) then
-            s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
+            s% delta_nu = 1d6/(2*s% photosphere_acoustic_r)  ! microHz
          else
             s% delta_nu = &
                s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
@@ -363,7 +356,11 @@
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
          if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
-         call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
+         if ( .not. s% delta_Pg_traditional) then
+            call get_delta_Pg_bildsten2012(s, nu_for_delta_Pg, s% delta_Pg)
+         else
+            call get_delta_Pg_traditional(s, s% delta_Pg)
+         end if
 
          if (s% rsp_flag) return
 
@@ -378,10 +375,12 @@
          if (failed('get_burn_zone_info')) return
 
 
-         s% fe_core_infall = 0
-         s% non_fe_core_infall = 0
-         s% non_fe_core_rebound = 0
-         s% max_infall_speed_mass = 0
+         s% fe_core_infall = 0d0
+         s% non_fe_core_infall = 0d0
+         s% non_fe_core_rebound = 0d0
+         s% max_infall_speed_mass = 0d0
+         k_fe = -1 ! initialize, in case u_flag & v_flag = .false.
+         k_min = -1 ! initialize, in case u_flag & v_flag = .false.
 
          if(s% u_flag .or. s% v_flag) then
 
@@ -396,14 +395,26 @@
 
             mass_sum = 0d0
             if (s% fe_core_mass > 0) then
-               do k=1, nz
-                  if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
+                ! check if [> fe_core_infall_mass] of core is infalling
+                ! instead of a for loop, we move inside out and only check regions inside the fe_core
+                k = nz
+                do while (k > 1)
+                   if (s% m(k) > Msun * s% fe_core_mass) exit  ! exit when outside Fe core
+                   if (-velocity(k) > s% fe_core_infall) then
+                      mass_sum = mass_sum + s% dm(k)
+                   end if
+                   k = k-1 ! loop outwards
                end do
+               k_fe = k ! mark fe_core_mass boundary cell location, k_fe = nz if no fe_core
 
-               if ((mass_sum > s% fe_core_infall_mass*msun) .and. &
-                   (s%m(k_min) <= s%fe_core_mass*msun)) then
-                  s% fe_core_infall = -velocity(k_min)
+               if (s% report_max_infall_inside_fe_core) then  ! report peak infall velocity inside fe_core (not necessarily the maximum, since infall tends to start outside in)
+                  if (mass_sum > s% fe_core_infall_mass*msun) then ! prevents toggling when k == nz
+                     s% fe_core_infall = - minval(s%v(k_fe:nz))
+                  end if
+               else !(default in r24.03.1 prior) report max infall velocity anywhere
+                  if(mass_sum > s% fe_core_infall_mass*msun) then
+                     s% fe_core_infall = -velocity(k_min)
+                  end if
                end if
             end if
 
@@ -747,7 +758,6 @@
 
       subroutine find_epsnuc_zone( &
             s, i_start, bzm_1, bzm_2, bzm_3, bzm_4, burn_min1, burn_min2, ierr)
-         use const_def, only:Msun
          type (star_info), pointer :: s
          integer, intent(inout) :: i_start
          real(dp), intent(out) :: bzm_1, bzm_2, bzm_3, bzm_4
@@ -759,12 +769,12 @@
          real(dp) :: prev_m, prev_x, cur_m, cur_x
          ierr = 0
          bzm_1 = null_zone; bzm_2 = null_zone; bzm_3 = null_zone; bzm_4 = null_zone
-         burn_zone = 0 ! haven't entered the zone yet
+         burn_zone = 0  ! haven't entered the zone yet
          if (i_start /= s% nz) then
             i = i_start+1
             prev_m = s% m(i)
             prev_x = s% eps_nuc(i)
-         else ! keep the compiler happy
+         else  ! keep the compiler happy
             prev_m = 0
             prev_x = 0
          end if
@@ -774,22 +784,22 @@
             select case (burn_zone)
                case (0)
                   if ( cur_x > burn_min2 ) then
-                     if ( i == s% nz ) then ! use star center as start of zone
+                     if ( i == s% nz ) then  ! use star center as start of zone
                         bzm_2 = 0d0
-                     else ! interpolate to estimate where rate reached burn_min1
+                     else  ! interpolate to estimate where rate reached burn_min1
                         bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      end if
                      bzm_1 = bzm_2
                      burn_zone = 2
                   elseif ( cur_x > burn_min1 ) then
-                     if ( i == s% nz ) then ! use star center as start of zone
+                     if ( i == s% nz ) then  ! use star center as start of zone
                         bzm_1 = 0d0
-                     else ! interpolate to estimate where rate reached burn_min1
+                     else  ! interpolate to estimate where rate reached burn_min1
                         bzm_1 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      end if
                      burn_zone = 1
                   end if
-               case (1) ! in the initial eps > burn_min1 region
+               case (1)  ! in the initial eps > burn_min1 region
                   if ( cur_x > burn_min2 ) then
                      bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 2
@@ -798,7 +808,7 @@
                      i_start = i
                      return
                   end if
-               case (2) ! in the initial eps > burn_min2 region
+               case (2)  ! in the initial eps > burn_min2 region
                   if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      bzm_3 = bzm_4
@@ -809,7 +819,7 @@
                      bzm_3 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 3
                   end if
-               case (3) ! in the final eps > burn_min1 region
+               case (3)  ! in the final eps > burn_min1 region
                   if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
@@ -1221,8 +1231,8 @@
          else
             jm1 = maxloc(s% xa(:,k-1), dim=1)
             j00 = maxloc(s% xa(:,k), dim=1)
-            qm1 = s% q(k-1) - 0.5d0*s% dq(k-1) ! center of k-1
-            q00 = s% q(k) - 0.5d0*s% dq(k) ! center of k
+            qm1 = s% q(k-1) - 0.5d0*s% dq(k-1)  ! center of k-1
+            q00 = s% q(k) - 0.5d0*s% dq(k)  ! center of k
             dm1 = s% xa(j00,k-1) - s% xa(jm1,k-1)
             d00 = s% xa(j00,k) - s% xa(jm1,k)
             if (dm1*d00 > 0d0) then
@@ -1405,6 +1415,5 @@
          end do
          s% num_mixing_regions = n
       end subroutine get_mixing_regions
-
 
       end module report

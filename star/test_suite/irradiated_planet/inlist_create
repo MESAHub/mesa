@@ -78,7 +78,7 @@
          
       ! top level controls
 
-         !pause = .true. 
+         !pause_flag = .true. 
             ! if true, the code waits for user to enter a RETURN on the command line
       
 

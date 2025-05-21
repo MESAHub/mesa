@@ -13,7 +13,7 @@ c  ierr_param: Is returned as 0 for successful completion, as .lt. 0
 c     in case of error.
 c  i_inout: If i_inout = 1 read model from file, as usual.
 c     If i_inout = 0, model quantities must be provided in
-c     x_arg(1:nn_arg), aa(arg(1:ivarmd,1:nn_arg), data_arg(1:8)
+c     x_arg(1:nn_arg), aa_arg(1:ivarmd,1:nn_arg), data_arg(1:8)
 c     If i_inout = -1, assume that model is already stored,
 c     regardless of possible model parameters read in.
 c
@@ -488,7 +488,7 @@ c  test for skipping to continuing run with parameter setting
 c
       if(i_paramset.eq.1.and.init_paramset.ne.0) go to 10000
 c
-c  as initilization zero all elements in csummm
+c  as initialization zero all elements in csummm
 c
       call zero(csummm,50)
 c

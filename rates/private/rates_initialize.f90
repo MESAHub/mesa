@@ -2,38 +2,29 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module rates_initialize
-      use const_def
+      use const_def, only: dp, mesa_data_dir, ln2
       use math_lib
       use rates_def
 
-
       implicit none
 
-
       contains
-
 
       subroutine finish_rates_def_init
          use utils_lib, only: integer_dict_define, integer_dict_create_hash, integer_dict_size
@@ -73,7 +64,7 @@
 
       subroutine do_add_reaction_for_handle(reaction_handle, ierr)
          use reaclib_support, only: do_parse_reaction_handle
-         character (len=*), intent(in) :: reaction_handle ! to be added
+         character (len=*), intent(in) :: reaction_handle  ! to be added
          integer, intent(out) :: ierr
 
          integer :: ir, num_in, num_out
@@ -81,7 +72,7 @@
          logical :: already_defined
          integer :: iso_ids(max_num_reaction_inputs+max_num_reaction_outputs)
          integer :: cin(max_num_reaction_inputs), cout(max_num_reaction_outputs)
-         character (len=16) :: op ! e.g., 'pg', 'wk', 'to', or ...
+         character (len=16) :: op  ! e.g., 'pg', 'wk', 'to', or ...
 
          logical, parameter :: weak = .false.
          logical, parameter :: dbg = .false.
@@ -150,9 +141,9 @@
 
       subroutine do_add_reaction_from_reaclib(reaction_handle, reverse_handle, indx, ierr)
 
-         character (len=*), intent(in) :: reaction_handle ! to be added
-         character (len=*), intent(in) :: reverse_handle ! = '' if not a reverse
-         integer, intent(in) :: indx ! index in reaclib rates
+         character (len=*), intent(in) :: reaction_handle  ! to be added
+         character (len=*), intent(in) :: reverse_handle  ! = '' if not a reverse
+         integer, intent(in) :: indx  ! index in reaclib rates
          integer, intent(out) :: ierr
 
          integer :: i, ir, chapter, num_in, num_out
@@ -337,7 +328,7 @@
             weak_reaction_info(1:2,ir) = 0
          end if
 
-         reaction_ye_rho_exponents(1,ir) = 0 ! 1 for electron captures, 0 for rest.
+         reaction_ye_rho_exponents(1,ir) = 0  ! 1 for electron captures, 0 for rest.
 
          if (particles_in > 1) then
             reaction_screening_info(1,ir) = reaction_inputs(2,ir)
@@ -429,7 +420,7 @@
 
          call do_reaclib_indices_for_reaction( &
             reaction_Name(ir), reaclib_rates, lo, hi, ierr)
-         if (ierr /= 0) then ! not in reaclib
+         if (ierr /= 0) then  ! not in reaclib
             ierr = 0
             i = do_get_weak_info_list_id( &
                chem_isos% name(weak_reaction_info(1,ir)), &
@@ -548,7 +539,7 @@
          dir = rates_table_dir
          filename = trim(dir) // '/rate_list.txt'
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in rates_dir
+         if (ierr /= 0) then  ! if don't find that file, look in rates_dir
             dir = trim(rates_dir) // '/rate_tables'
             filename = trim(dir) // '/rate_list.txt'
             ierr = 0
@@ -588,7 +579,6 @@
          !call check
 
 
-
          contains
 
 
@@ -623,7 +613,7 @@
             if (ierr == 0) return
             if (len_trim(str) > 0) then
                write(*,*) trim(str) // ' failed in reading ' // trim(filename)
-            else ! non-fatal error, so just quietly stop reading
+            else  ! non-fatal error, so just quietly stop reading
                ierr = 0
             end if
             failed = .true.
@@ -676,7 +666,6 @@
          use utils_lib
          use chem_lib
          use chem_def, only: chem_isos, category_id, category_Name
-         use const_def, only: mesa_data_dir
          character (len=*), intent(in) :: reactionlist_filename
          integer, intent(out) :: ierr
 
@@ -695,7 +684,7 @@
          ! first try the reaction_filename alone
          filename = trim(reactionlist_filename)
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in rates_data
+         if (ierr /= 0) then  ! if don't find that file, look in rates_data
             filename = trim(mesa_data_dir) // '/rates_data/' // trim(reactionlist_filename)
             ierr = 0
             open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -707,7 +696,7 @@
          end if
 
          num_reactions = 0
-         do cnt = 1, rates_reaction_id_max*10 ! will stop when reach end of file
+         do cnt = 1, rates_reaction_id_max*10  ! will stop when reach end of file
             if (dbg) write(*, *) 'cnt', cnt
 
             read(iounit,'(a)',iostat=ierr) line
@@ -917,7 +906,7 @@
 
 
          subroutine read_Q
-            if (missing_dbl()) then ! use standard Q from chem_lib
+            if (missing_dbl()) then  ! use standard Q from chem_lib
                std_reaction_Qs(ir) = get_Qtotal(ir)
             else
                std_reaction_Qs(ir) = read_dbl()
@@ -1250,11 +1239,9 @@
       end function get_Qtotal
 
 
-
-
       subroutine init_rates_info(reactionlist_filename, ierr)
          character (len=*), intent(in) :: reactionlist_filename
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          include 'formats'
 
          ierr = 0
@@ -1302,7 +1289,7 @@
       end subroutine init1_rates_info
 
 
-      integer function lookup_rate_name(str) ! -1 if not found
+      integer function lookup_rate_name(str)  ! -1 if not found
          use rates_def
          character (len=*), intent(in) :: str
          integer :: i
@@ -1432,7 +1419,4 @@
          if (ierr /= 0) return
       end subroutine do_rates_init
 
-
       end module rates_initialize
-
-

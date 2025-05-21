@@ -1,7 +1,7 @@
 .. highlight:: console
 
 **********
-Test suite
+Test Suite
 **********
 
 MESA includes a comprehensive test suite.
@@ -11,7 +11,7 @@ Building upon test suite cases
 
 Your first stop when setting up a new problem with MESA should be the
 MESA test suite. You will find a wide range of sample cases there.
-Looking at the test_suite inlists is a quick way to familiarize yourself
+Looking at the ``test_suite`` inlists is a quick way to familiarize yourself
 with the set of options relevant to your problem. You may want to copy
 an inlist from the test suite to one of your working directories to use
 as a starting point for a project of your own.
@@ -22,9 +22,8 @@ Each test suite problem lives in a subdirectory of
 
    $MESA_DIR/star/test_suite
 
-and you can find (slightly out-of-date, but still useful) descriptions
-of some of the test problems in the ``docs/`` sub-directory of each
-test_suite case.
+and you can find descriptions of some of the test problems in the
+``docs/`` sub-directory of each ``test_suite`` case.
 
 For example, take a look at the "high mass" test case. It starts by
 creating a pre-main-sequence model of 100 |Msun| with Z=0.02, and then it
@@ -38,9 +37,9 @@ central X of 0.5. To try it yourself,
    ./mk
    ./rn
 
-You can do the same with any of the test_suite cases.
+You can do the same with any of the ``test_suite`` cases.
 
-If you want to base your work off of a test_suite case, you should make
+If you want to base your work off of a ``test_suite`` case, you should make
 a copy the directory and then edit this copy.
 
 ::
@@ -99,13 +98,13 @@ Star tests
 :ref:`1.3M_ms_high_Z`
 ^^^^^^^^^^^^^^^^^^^^^
 
-The test checks the evolution of metal-rich low-mass stars by evolving 
+The test checks the evolution of metal-rich low-mass stars by evolving
 a 1.3 |Msun|, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
 
 :ref:`1.4M_ms_op_mono`
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The test checks the functionality of OP mono opacities. 
+The test checks the functionality of OP mono opacities.
 The test vehicle is a 1.4 |Msun| solar metallicity model.
 
 :ref:`1.5M_with_diffusion`
@@ -221,7 +220,7 @@ This test checks that the atmosphere structure written to the
 pulsation output closely matches what is expected for the
 :math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
 
-   
+
 :ref:`conductive_flame`
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -292,7 +291,7 @@ This test case checks the implementation of GYRE in MESA for a 21 |Msun|, Z=0.02
 :ref:`gyre_in_mesa_spb`
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case checks the implementation of GYRE in MESA for a 5 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; 
+This test case checks the implementation of GYRE in MESA for a 5 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion;
 a slowly pulsating B-type star (SPB) stellar model.
 
 :ref:`gyre_in_mesa_wd`
@@ -579,7 +578,7 @@ This test case shows an accreting ONeMg white dwarf (WD) evolving
 towards accretion induced collapse (AIC).  It also illustrates use of
 the special weak rate implementation described in Section 8 of |MESA
 III|.
-   
+
 
 :ref:`wd_c_core_ignition`
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -610,7 +609,6 @@ This test case checks the evolution of a nova outburst for one cycle.
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 This test case checks the evolution stable hydrogen burning on a white dwarf.
-
 
 
 Binary tests
@@ -667,6 +665,7 @@ wind_fed_hmxb
 Model for a high mass X-ray binary, including both Roche lobe overflow
 and wind mass transfer. Verifies the Eddington limit is working, and
 that the accretion luminosity is computed correctly.
+
 
 Astero tests
 ------------

@@ -4,11 +4,11 @@
 high_z
 ******
 
-This test case checks the capability of evolving high metallicity models through core helium depletion with a 7 Msun, Z=0.07 metallicity model.
+This test case checks the capability of evolving high metallicity models through core helium depletion with a 7 |Msun|, Z=0.07 metallicity model.
 
 This test case has 2 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_zams``) creates a 7 Msun, Z=0.07 metallicity, pre-main sequence model and evolves it to the zero-age main sequence.
+* Part 1 (``inlist_zams``) creates a 7 |Msun|, Z=0.07 metallicity, pre-main sequence model and evolves it to the zero-age main sequence.
 
 * Part 2 (``inlist_high_z``) continues the evolution until the central helium mass fraction drops below 1e-6:
 
@@ -17,7 +17,6 @@ This test case has 2 parts. Click to see a larger version of a plot.
 
 .. image:: ../../../star/test_suite/high_z/docs/kipp000438.svg
    :width: 100%
-
 
 
 pgstar commands used for the plots above:
@@ -29,10 +28,8 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
    pgstar_interval = 10
 
@@ -57,12 +54,12 @@ pgstar commands used for the plots above:
   Kipp_win_width = 12
   Kipp_win_aspect_ratio = 0.75
   Kipp_txt_scale = 0.9
-  Kipp_title = ''      
+  Kipp_title = ''
 
   Kipp_mass_max = 7.0
   Kipp_mass_min = 0.0
   Kipp_xmax = -101
-  Kipp_xmin = 0   
+  Kipp_xmin = 0
 
   Kipp_show_mass_boundaries = .true.
   Kipp_show_mixing = .true.

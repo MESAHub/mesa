@@ -1,18 +1,19 @@
-      program run
-      use run_star_support, only: do_read_star_job
-      use run_star, only: do_run_star
+program run
 
-      implicit none
+   use run_star_support, only: do_read_star_job
+   use run_star, only: do_run_star
 
-      integer :: ierr
-      character (len=32) :: inlist_fname
+   implicit none
 
-      ierr = 0
-      inlist_fname = 'inlist'
+   integer :: ierr
+   character(len=32) :: inlist_fname
 
-      call do_read_star_job(inlist_fname, ierr)
-      if (ierr /= 0) stop 1
+   ierr = 0
+   inlist_fname = 'inlist'
 
-      call do_run_star(inlist_fname)
+   call do_read_star_job(inlist_fname, ierr)
+   if (ierr /= 0) stop 1
 
-      end program run
+   call do_run_star(inlist_fname)
+
+end program run

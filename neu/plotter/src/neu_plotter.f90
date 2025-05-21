@@ -2,9 +2,10 @@ program neu_plotter
 
    use neu_def
    use neu_lib
-   use const_lib
+   use const_def, only: dp
+   use const_lib, only: const_init
    use math_lib
-   use num_lib, only : dfridr
+   use num_lib, only: dfridr
 
    implicit none
 
@@ -12,9 +13,9 @@ program neu_plotter
    integer :: ierr
    character (len=32) :: my_mesa_dir
 
-   real(dp), parameter :: log10_Tlim = 7.5d0 ! this is what the neu/test uses?
-   logical :: flags(num_neu_types) ! true if should include the type of loss
-   real(dp) :: loss(num_neu_rvs) ! total from all sources
+   real(dp), parameter :: log10_Tlim = 7.5d0  ! this is what the neu/test uses?
+   logical :: flags(num_neu_types)  ! true if should include the type of loss
+   real(dp) :: loss(num_neu_rvs)  ! total from all sources
    real(dp) :: sources(num_neu_types, num_neu_rvs)
 
    real(dp) :: res1
@@ -180,25 +181,25 @@ program neu_plotter
    end if
 
 
-   if (nT .gt. 1) then
+   if (nT > 1) then
       logT_step = delta_logT / (nT-1d0)
    else
       logT_step = 0
    end if
 
-   if (nRho .gt. 1) then
+   if (nRho > 1) then
       logRho_step = delta_logRho / (nRho-1d0)
    else
       logRho_step = 0
    end if
 
-   if (nZbar .gt. 1) then
+   if (nZbar > 1) then
       Zbar_step = delta_Zbar / (nZbar-1d0)
    else
       Zbar_step = 0
    end if
 
-   if (nAbar .gt. 1) then
+   if (nAbar > 1) then
       Abar_step = delta_Abar / (nAbar-1d0)
    else
       Abar_step = 0
@@ -214,8 +215,8 @@ program neu_plotter
    Zbar = Zbar_center
    Abar = Abar_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')
@@ -262,20 +263,20 @@ program neu_plotter
                   res1 = Rho * loss(idneu_dRho) / loss(ineu)
                else
                   res1 = Rho * sources(i_var, idneu_dRho) / loss(ineu)
-               endif
+               end if
             else
                if (i_var == 0) then
                   res1 = T * loss(idneu_dT) / loss(ineu)
                else
                   res1 = T * sources(i_var, idneu_dT) / loss(ineu)
-               endif
+               end if
             end if
          else
             if (i_var == 0) then
                res1 = log(loss(ineu))
             else
                res1 = log(sources(i_var, ineu))
-            endif
+            end if
          end if
 
          if (doing_dfridr) then
@@ -283,19 +284,19 @@ program neu_plotter
                res1 = log(loss(ineu))
             else
                res1 = log(sources(i_var, ineu))
-            endif
+            end if
             if (doing_d_dlnd) then
                if (i_var == 0) then
                   dvardx_0 = Rho * loss(idneu_dRho) / loss(ineu)
                else
                   dvardx_0 = Rho * sources(i_var, idneu_dRho) / loss(ineu)
-               endif
+               end if
             else
                if (i_var == 0) then
                   dvardx_0 = T * loss(idneu_dT) / loss(ineu)
                else
                   dvardx_0 = T * sources(i_var, idneu_dT) / loss(ineu)
-               endif
+               end if
             end if
 
             dx_0 = 1d-3
@@ -344,7 +345,7 @@ contains
          val = log(loss(ineu))
       else
          val = log(sources(i_var, ineu))
-      endif
+      end if
 
    end function dfridr_func
 

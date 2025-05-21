@@ -1,1 +1,0 @@
-detab: detab.c

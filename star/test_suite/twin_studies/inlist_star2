@@ -11,12 +11,12 @@
 &kap
 / ! end of kap namelist
 
-&controls  
+&controls
 
 ! mixing
 
       overshoot_scheme(1) = 'none'
-      overshoot_scheme(2) = 'none'      
+      overshoot_scheme(2) = 'none'
       overshoot_scheme(3) = 'none'
 
 ! solver
@@ -32,12 +32,12 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
    !pause_interval = 10
    pgstar_interval = 1
 
    Grid1_title = 'star2 - without overshooting'
-   
+
    !Grid1_file_flag = .true.
    Grid1_file_dir = 'png2'
    Grid1_file_prefix = 'star2'

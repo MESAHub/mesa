@@ -15,7 +15,7 @@ include $(MESA_DIR)/utils/makefile_header
 TEST_SRCS = \
    test_renka790_sg.f test_renka790_db.f \
    test_akima_sg.f test_akima_db.f \
-   interp_2d_support.f test_interp_2d.f
+   interp_2d_support.f90 test_interp_2d.f90
 
 #################################################################
 #
@@ -70,6 +70,14 @@ else
 	$(TEST_COMPILE_LEGACY) $(FCfixed) $<
 endif
 
+%.o: %.f90
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
+else
+	$(TEST_COMPILE) $(FCfree) $<
+endif
+
 #################################################################
 #
 # DEPENDENCIES
@@ -77,6 +85,7 @@ endif
 SRC_PATH = $(TEST_SRC_DIR)
 
 vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

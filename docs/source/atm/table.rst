@@ -30,23 +30,23 @@ the boundary conditions. The interpolations are performed using
    * - ``'tau_10'``
      - Same as ``'tau_100'``, except that surface optical depth is
        :math:`\tau_{\rm surf} = 10`.
-  
+
    * - ``'tau_1'``
      - Same as ``'tau_100'``, except that surface optical depth is
        :math:`\tau_{\rm surf} = 1`.
-  
+
    * - ``'tau_1m1'``
      - Same as ``'tau_100'``, except that surface optical depth is
        :math:`\tau_{\rm surf} = 0.1`.
-  
+
    * - ``'WD_tau_25'``
      - Use model atmospheres for cool white dwarfs, via Rohrmann et
        al. (2011, MNRAS, 411, 781) treatment. Surface optical depth
        is :math:`\tau_{\rm surf} = 25.12`.
 
    * - ``'DB_WD_tau_25'``
-     - Use model atmospheres for hot(ter) white dwarrfs, provided by Odette
-       Toloza based on Detlev Koester’s atmosphere code. Surface
+     - Use model atmospheres for hot(ter) white dwarfs, provided by Odette
+       Toloza based on Detlev Koester's atmosphere code. Surface
        optical depth is :math:`\tau_{\rm surf} = 25.12`.
 
 When any of these ``'table'`` choices is used, it's possible that the

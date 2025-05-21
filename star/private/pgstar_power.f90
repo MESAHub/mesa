@@ -2,42 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pgstar_power
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use pgstar_support
       use star_pgstar
 
       implicit none
 
-
       contains
 
-
       subroutine power_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -87,7 +78,7 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
-         implicit none
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -113,13 +104,13 @@
          ierr = 0
          nz = s% nz
 
-         colors(:) = (/ &
+         colors(:) = [ &
                clr_MediumSlateBlue, clr_LightSkyBlue, clr_Goldenrod, clr_Lilac, &
                clr_Coral, clr_Crimson, clr_LightSkyGreen, clr_DarkGray, &
                clr_Tan, clr_IndianRed, clr_Gold, &
                clr_Teal, clr_Silver, clr_BrightBlue, clr_FireBrick, &
                clr_RoyalPurple, clr_SlateGray, clr_LightSteelBlue, &
-               clr_Gray, clr_RoyalBlue /)
+               clr_Gray, clr_RoyalBlue ]
 
          chScale = txt_scale
 
@@ -201,7 +192,7 @@
                   call show_age_pgstar(s)
                end if
                call show_title_pgstar(s, title)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,xaxis_name,ierr)
                if (ierr /= 0) return
             end if
@@ -209,7 +200,7 @@
             ybot = -0.05
             call pgswin(xleft, xright, ymin+ybot, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','BCNSTV')
             else
@@ -226,7 +217,7 @@
             end do
             call pgslw(lw_sav)
 
-            if (.not. panel_flag) then ! show mix regions at bottom of plot
+            if (.not. panel_flag) then  ! show mix regions at bottom of plot
                call pgslw(10)
                call show_mix_regions_on_xaxis( &
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)
@@ -276,7 +267,7 @@
             call pgslw(lw)
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*s% pg% Power_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, &
                trim(adjustl(category_name(icat))))
@@ -286,6 +277,4 @@
 
       end subroutine do_power_panel
 
-
       end module pgstar_power
-

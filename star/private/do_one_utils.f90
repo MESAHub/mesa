@@ -2,48 +2,43 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module do_one_utils
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, secday, dayyer, clight, msun, rsun
       use utils_lib, only: is_bad
 
       implicit none
 
       private
-      public :: do_one_check_model, &
-         write_terminal_header, do_bare_bones_check_model, do_check_limits, &
-         do_show_log_description, do_show_terminal_header, do_terminal_summary
+      public :: do_one_check_model
+      public :: write_terminal_header
+      public :: do_bare_bones_check_model
+      public :: do_check_limits
+      public :: do_show_log_description
+      public :: do_show_terminal_header
+      public :: do_terminal_summary
 
       ! model log priorities
       integer, parameter :: delta_priority = 1
       integer, parameter :: phase_priority = 2
 
-
-
       contains
-
 
       logical function model_is_okay(s)
          type (star_info), pointer :: s
@@ -92,8 +87,8 @@
          write(*,'(a)') "      'lg_LH' is log10 total PP and CNO hydrogen burning power (Lsun),"
          write(*,'(a)') "      'lg_L3a' is log10 total triple-alpha helium burning power (Lsun),"
          write(*,'(a)') "      'lg_gsurf' is log10 surface gravity,"
-         write(*,'(a)') "      'lg_LNuc' is log10 nuclear power (Lsun),"
-         write(*,'(a)') "      'lg_LNeu' is log10 total neutrino power (Lsun),"
+         write(*,'(a)') "      'lg_Lnuc' is log10 nuclear power (Lsun),"
+         write(*,'(a)') "      'lg_Lneu' is log10 total neutrino power (Lsun),"
          write(*,'(a)') "      'lg_Lphoto' is log10 total photodisintegration (Lsun),"
          write(*,'(a)') "      'Mass' is the total stellar baryonic mass (Msun),"
          write(*,'(a)') "      'lg_Mdot' is log10 magnitude of rate of change of mass (Msun/year),"
@@ -151,7 +146,7 @@
             '___________________________________________________________________________'
          write(io,'(A)')
          write(io,'(a)') &
-            '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc     Mass       ' // &
+            '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc_tot     Mass       ' // &
             'H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry'
 
          ! note that if the age is in days, then the timestep is automatically in seconds.
@@ -269,7 +264,7 @@
 
          include 'formats'
 
-         age = s% star_age ! in years
+         age = s% star_age  ! in years
          if (trim(s% terminal_show_age_units) == 'seconds' .or. &
              trim(s% terminal_show_age_units) == 'secs') then
             age = age*secyer
@@ -277,7 +272,7 @@
             age = age*dayyer
          end if
 
-         time_step = s% time_step ! in years
+         time_step = s% time_step  ! in years
          if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
              trim(s% terminal_show_timestep_units) == 'secs') then
             time_step = time_step*secyer
@@ -345,15 +340,15 @@
             id_str, model, &
             s% log_max_temperature, &   ! fmt1
             s% Teff, &   ! fmt2
-            safe_log10(sum_LH), & ! fmt3
+            safe_log10(sum_LH), &  ! fmt3
             safe_log10(sum_Lnuc), &
             s% star_mass, &
             s% star_mass - max(s% he_core_mass, s% co_core_mass), &
-            s% center_h1, & ! fmt4
+            s% center_h1, &  ! fmt4
             s% center_n14, &
             s% surface_he3 + s% surface_he4, &
             s% eta(s% nz), &
-            s% nz, & ! fmt5
+            s% nz, &  ! fmt5
             s% num_retries
 
          tmp = max(0d0, min(1d0, 1 - (s% surface_h1 + s% surface_he3 + s% surface_he4)))
@@ -533,7 +528,7 @@
                  .and. .not. s% doing_first_model_of_run) then
                write(*,'(A)')
                call write_terminal_header(s)
-            endif
+            end if
          end if
          if (write_terminal) call do_terminal_summary(s)
          if (write_history) s% need_to_update_history_now = .true.
@@ -650,8 +645,8 @@
 
          log_surface_gravity = safe_log10(s%grav(1))
          log_surface_temperature = s% lnT(1) / ln10
-         log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
-         log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
+         log_surface_density = s% lnd(1)/ln10  ! log10(density at surface)
+         log_surface_pressure = s% lnPeos(1)/ln10  ! log10(eos pressure at surface)
 
          center_gamma = center_value(s, s% gam)
 
@@ -663,7 +658,7 @@
          if (s% L_phot > 0d0) then
             Lnuc_div_L = s% L_nuc_burn_total / s% L_phot
             if (.not. s% get_delta_nu_from_scaled_solar) then
-               delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
+               delta_nu = 1d6/(2*s% photosphere_acoustic_r)  ! microHz
             else
                delta_nu = &
                   s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
@@ -692,7 +687,7 @@
          min_logQ = 100
          do k = 1, s% nz
             logQ = s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
-            if (s% lnT(k)/ln10 < 5.5d0) then ! only worry about lower T cases
+            if (s% lnT(k)/ln10 < 5.5d0) then  ! only worry about lower T cases
                if (logQ > max_logQ) max_logQ = logQ
             end if
             if (logQ < min_logQ) min_logQ = logQ
@@ -1262,7 +1257,7 @@
 
          end if
 
-         if (s% u_flag .or. s% v_flag) then ! Things that depend on hydro related quantities
+         if (s% u_flag .or. s% v_flag) then  ! Things that depend on hydro related quantities
             if (s% shock_mass >= s% shock_mass_upper_limit .and. s% shock_mass_upper_limit > 0) then
                call compare_to_target('shock_mass >= shock_mass_upper_limit', &
                   s% shock_mass, s% shock_mass_upper_limit, t_shock_mass_upper_limit)
@@ -1452,7 +1447,7 @@
          end subroutine compare_to_target
 
 
-         real(dp) function get_species_mass(str) ! Msun
+         real(dp) function get_species_mass(str)  ! Msun
             use chem_lib, only: chem_get_iso_id
             character(len=*), intent(in) :: str
             integer :: id, j
@@ -1546,6 +1541,4 @@
 
       end function do_one_check_model
 
-
       end module do_one_utils
-

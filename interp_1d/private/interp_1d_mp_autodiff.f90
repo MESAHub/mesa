@@ -2,30 +2,24 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-      module interp_1d_mp_autodiff ! high accuracy monotonicity preserving algorithms
+      module interp_1d_mp_autodiff  ! high accuracy monotonicity preserving algorithms
 
-      use const_lib, only: dp
+      use const_def, only: dp
       use auto_diff
 
       implicit none
@@ -41,12 +35,12 @@
          use interp_1d_misc
          use interp_1d_pm_autodiff, only: mk_pmlinear, mk_pmquad
          integer, intent(in) :: nx       ! length of x vector
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          integer, intent(in) :: which
          logical, intent(in) :: slope_only
          integer, intent(in) :: nwork
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
@@ -54,7 +48,7 @@
                spL, spR, t, tmax, tmp, tmp1, tmp2
          real(dp), parameter :: tiny = 1d-20
          integer :: i
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -109,10 +103,10 @@
 
          ! divided differences
          do i=1,nx-1
-            s_mid(i) = (f(1,i+1) - f(1,i)) / h(i) ! eqn 2.1
+            s_mid(i) = (f(1,i+1) - f(1,i)) / h(i)  ! eqn 2.1
          end do
          do i=2,nx-1
-            d(i) = (s_mid(i) - s_mid(i-1)) / (x(i+1) - x(i-1)) ! eqn 3.1
+            d(i) = (s_mid(i) - s_mid(i-1)) / (x(i+1) - x(i-1))  ! eqn 3.1
          end do
          ! need to extend d to full range. simplest way is just to copy from neighbor
          d(1) = d(2)
@@ -139,7 +133,7 @@
             spR(i) = s_mid(i) - hd_mid(i)
          end do
 
-         call minmod_autodiff(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1)) ! eqn (2.8)
+         call minmod_autodiff(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1))  ! eqn (2.8)
          call minmod_autodiff(t(2:nx-1), nx-2, spL(2:nx-1), spR(2:nx-1))
 
          if (which == average) then
@@ -188,7 +182,7 @@
                f(2,i) = tmp2(i)
             end do
 
-         else !if (which == super_bee) then
+         else  !if (which == super_bee) then
 
             do i=2,nx-1
                f(2,i) = sign(t(i))* &
@@ -200,11 +194,11 @@
 
          ! slope at i=1
          !f(2, 1) = minmod1_autodiff(spR(1), 3*s_mid(1)) ! eqn (5.2)
-         f(2,1) = minmod1_autodiff(s_mid(1), s_mid(2)) ! stabilize the ends
+         f(2,1) = minmod1_autodiff(s_mid(1), s_mid(2))  ! stabilize the ends
 
          ! slope at i=nx
          !f(2, nx) = minmod1_autodiff(spL(nx), 3*s_mid(nx-1)) ! eqn (5.2)
-         f(2,nx) = minmod1_autodiff(s_mid(nx-2), s_mid(nx-1)) ! stabilize the ends
+         f(2,nx) = minmod1_autodiff(s_mid(nx-2), s_mid(nx-1))  ! stabilize the ends
 
          if (slope_only) return
 
@@ -225,13 +219,13 @@
          use interp_1d_misc
          use interp_1d_pm_autodiff, only: mk_pmlinear, mk_pmquad
          ! make piecewise monotonic cubic interpolant
-         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
+         type(auto_diff_real_2var_order1), intent(in) :: dx  ! the grid spacing
          integer, intent(in) :: nx       ! length of x vector
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          integer, intent(in) :: which
          logical, intent(in) :: slope_only
          integer, intent(in) :: nwork
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
@@ -240,7 +234,7 @@
          real(dp), parameter :: tiny = 1d-20
          type(auto_diff_real_2var_order1) :: x(3)
          integer :: i
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -290,10 +284,10 @@
 
          ! divided differences
          do i=1,nx-1
-            s_mid(i) = (f(1,i+1) - f(1,i)) / dx ! eqn 2.1
+            s_mid(i) = (f(1,i+1) - f(1,i)) / dx  ! eqn 2.1
          end do
          do i=2,nx-1
-            d(i) = (s_mid(i) - s_mid(i-1)) / (2*dx) ! eqn 3.1
+            d(i) = (s_mid(i) - s_mid(i-1)) / (2*dx)  ! eqn 3.1
          end do
          ! need to extend d to full range. simplest way is just to copy from neighbor
          d(1) = d(2)
@@ -316,7 +310,7 @@
             spR(i) = s_mid(i) - dx*d_mid(i)
          end do
 
-         call minmod_autodiff(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1)) ! eqn (2.8)
+         call minmod_autodiff(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1))  ! eqn (2.8)
          call minmod_autodiff(t(2:nx-1), nx-2, spL(2:nx-1), spR(2:nx-1))
 
          if (which == average) then
@@ -363,7 +357,7 @@
                f(2,i) = tmp2(i)
             end do
 
-         else !if (which == super_bee) then
+         else  !if (which == super_bee) then
 
             do i=2,nx-1
                f(2,i) = sign(t(i))* &
@@ -375,11 +369,11 @@
 
          ! slope at i=1
          !f(2, 1) = minmod1_autodiff(spR(1), 3*s_mid(1)) ! eqn (5.2)
-         f(2,1) = minmod1_autodiff(s_mid(1), s_mid(2)) ! stabilize the ends
+         f(2,1) = minmod1_autodiff(s_mid(1), s_mid(2))  ! stabilize the ends
 
          ! slope at i=nx
          !f(2, nx) = minmod1_autodiff(spL(nx), 3*s_mid(nx-1)) ! eqn (5.2)
-         f(2, nx) = minmod1_autodiff(s_mid(nx-2), s_mid(nx-1)) ! stabilize the ends
+         f(2, nx) = minmod1_autodiff(s_mid(nx-2), s_mid(nx-1))  ! stabilize the ends
 
          if (slope_only) return
 

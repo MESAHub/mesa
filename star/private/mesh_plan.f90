@@ -2,31 +2,24 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module mesh_plan
 
-      use const_def
+      use const_def, only: dp, convective_mixing
       use num_lib
       use utils_lib
       use star_private_def
@@ -39,9 +32,7 @@
       logical, parameter :: plan_dbg = .false.
       integer, parameter :: kdbg = -1
 
-
       contains
-
 
       subroutine do_mesh_plan( &
             s, nz_old, max_allowed_nz, okay_to_merge, D_mix, &
@@ -59,27 +50,27 @@
          integer, intent(in) :: nz_old, max_allowed_nz, max_num_subcells, &
             max_num_merge_cells, max_k_old_for_split_in, min_k_old_for_split_in
          logical, intent(in) :: okay_to_merge
-         real(dp), pointer :: D_mix(:) ! (nz_old)
-         real(dp), pointer :: xq_old(:) ! (nz_old)
-         real(dp), pointer :: dq_old(:) ! (nz_old)
+         real(dp), pointer :: D_mix(:)  ! (nz_old)
+         real(dp), pointer :: xq_old(:)  ! (nz_old)
+         real(dp), pointer :: dq_old(:)  ! (nz_old)
          real(dp), intent(in) :: min_dq_in, max_dq, min_dq_for_split, mesh_max_allowed_ratio
          logical, pointer :: do_not_split(:)
          integer, intent(in) :: num_gvals
          character (len=32) :: gval_names(max_allowed_gvals)
          logical, dimension(max_allowed_gvals) :: gval_is_xa_function, gval_is_logT_function
-         real(dp), pointer :: gvals(:,:) ! (nz_old, num_gvals)
-         real(dp), pointer :: delta_gval_max(:) ! (nz_old)
+         real(dp), pointer :: gvals(:,:)  ! (nz_old, num_gvals)
+         real(dp), pointer :: delta_gval_max(:)  ! (nz_old)
          real(dp), intent(in) :: max_center_cell_dq, max_surface_cell_dq
          ! outputs
          integer, intent(out) :: nz_new
-         real(dp), pointer :: xq_new(:), dq_new(:) ! (nz_new)
+         real(dp), pointer :: xq_new(:), dq_new(:)  ! (nz_new)
             ! must be allocated on entry; suggested size >= nz_old.
             ! reallocated as necessary if need to enlarge.
             ! size on return is >= nz_new.
-         integer, pointer :: which_gval(:) ! (nz_new)  for debugging.
+         integer, pointer :: which_gval(:)  ! (nz_new)  for debugging.
             ! which_gval(k) = gval number that set the size for new cell k.
             ! size may have been reduced below gradient setting by other restrictions.
-         integer, pointer :: comes_from(:) ! (nz_new)
+         integer, pointer :: comes_from(:)  ! (nz_new)
             ! xq_old(comes_from(k)+1) > xq_new(k) >= xq_old(comes_from(k)), if comes_from(k) < nz_old.
          integer, intent(out) :: ierr
 
@@ -108,7 +99,7 @@
             min_k_old_for_split = min_k_old_for_split_in
          end if
 
-         max_num_merge_surface_cells = max_num_merge_cells ! for now
+         max_num_merge_surface_cells = max_num_merge_cells  ! for now
 
          if (max_dq < min_dq) then
             write(*,1) 'ERROR in controls: max_dq < min_dq', max_dq, min_dq
@@ -176,7 +167,7 @@
             end do
          end if
 
-         call smooth_new_points(ierr) ! split as necessary
+         call smooth_new_points(ierr)  ! split as necessary
          if (ierr /= 0) return
 
          if (write_plan_debug) then
@@ -360,14 +351,14 @@
                end do
             end if
 
-            if (from_merger) then ! find range of old cells that were merged to form k
+            if (from_merger) then  ! find range of old cells that were merged to form k
                if (k == nz_new) then
                   xq_end = 1
                   k_old_last = nz_old
                else
                   xq_end = xq_new(k+1)
                   k_old_last = 0
-                  do kk = k_old+1, nz_old ! find last old cell included in k
+                  do kk = k_old+1, nz_old  ! find last old cell included in k
                      if (xq_old(kk) == xq_end) then
                         k_old_last = kk-1; exit
                      end if
@@ -405,7 +396,7 @@
                end if
             end if
 
-            if (nz_new == new_capacity) then ! increase allocated size
+            if (nz_new == new_capacity) then  ! increase allocated size
                new_capacity = (new_capacity*5)/4 + 10
                call realloc(s, nz_new, new_capacity, xq_new, dq_new, which_gval, comes_from, ierr)
                if (ierr /= 0) return
@@ -423,14 +414,14 @@
                comes_from(kk) = comes_from(kk-1)
             end do
 
-            if (from_merger) then ! split by breaking up the merger
+            if (from_merger) then  ! split by breaking up the merger
                xq_mid = xq_new(k) + dq_new(k)*0.5d0
                split_at_k_old = k_old_last
-               do kk = k_old+1, k_old_last ! check interior boundaries for closest to xq_mid
+               do kk = k_old+1, k_old_last  ! check interior boundaries for closest to xq_mid
                   if (xq_old(kk) >= xq_mid) then
-                     if (xq_old(kk) - xq_mid < xq_mid - xq_old(kk-1)) then ! xq_mid closer to xq_old(kk)
+                     if (xq_old(kk) - xq_mid < xq_mid - xq_old(kk-1)) then  ! xq_mid closer to xq_old(kk)
                         split_at_k_old = kk
-                     else ! xq_mid closer to xq_old(kk-1)
+                     else  ! xq_mid closer to xq_old(kk-1)
                         split_at_k_old = kk-1
                      end if
                      exit
@@ -444,7 +435,7 @@
                dq_new(k:k+1) = dq_new(k)*0.5d0
                xq_new(k+1) = xq_new(k) + dq_new(k)
                ! fix up comes_from(k+1)
-               comes_from(k+1) = nz_old ! just in case
+               comes_from(k+1) = nz_old  ! just in case
                do k_old = comes_from(k), nz_old-1
                   if (xq_new(k+1) <= xq_old(k_old+1)) then
                      comes_from(k+1) = k_old
@@ -509,12 +500,12 @@
                dr_old = rR - rL
                min_dr = s% csound(k_old)*s% mesh_min_dr_div_cs
                if (dr_old*dq_new/dq_old(k_old) < 2*min_dr) then
-                  return ! sound crossing time would be too small
+                  return  ! sound crossing time would be too small
                end if
 
                min_dr = s% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
                if (dr_old*dq_new/dq_old(k_old) < 2*min_dr) then
-                  return ! new dr would be too small
+                  return  ! new dr would be too small
                end if
 
                if (s% mesh_min_dlnR > 0d0) then
@@ -544,7 +535,7 @@
             dbg = .false.
             alfa = mesh_max_allowed_ratio
 
-            do ! repeat until nothing left to do
+            do  ! repeat until nothing left to do
                if (min_k_old_for_split <= 1 .and. &
                      dq_new(1) > alfa*dq_new(2) .and. &
                      okay_to_split1(1,dq_new(1),0d0)) then
@@ -554,7 +545,7 @@
                end if
                done = .true.
                k = 2
-               do ! check for cell that is too large
+               do  ! check for cell that is too large
                   if (k == nz_new) exit
                   k_old = comes_from(k)
                   if (k_old <= max_k_old_for_split .and. &
@@ -589,7 +580,7 @@
                      call split1(k,ierr)
                      if (ierr /= 0) return
                      done = .false.
-                     k = k + 1 ! recheck the same cell
+                     k = k + 1  ! recheck the same cell
                   else
                      k = k - 1
                   end if
@@ -626,9 +617,9 @@
             xq_new(1) = 0
             min_dr = s% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
 
-            do ! pick next point location
+            do  ! pick next point location
 
-               dbg = plan_dbg .or. (k_new == kdbg) !.or. (s% mesh_call_number == 2005)
+               dbg = plan_dbg .or. (k_new == kdbg)  !.or. (s% mesh_call_number == 2005)
 
                ! when reach this point,
                ! have set xq_new(k) for k = 1 to k_new, and dq_new(k) for k = 1 to k_new-1.
@@ -684,7 +675,7 @@
 
                if (next_dq < remaining_dq_old) then
                   if (.not. okay_to_split1(k_old, next_dq, remaining_dq_old)) then
-                     next_dq = remaining_dq_old ! dq_old(k_old)
+                     next_dq = remaining_dq_old  ! dq_old(k_old)
                   end if
                end if
 
@@ -711,7 +702,7 @@
                next_xq = xq_new(k_new) + next_dq
                if (next_xq > 1 - min_dq) then
                   next_xq = (1 + xq_new(k_new))/2
-                  if (k_old < nz_old) then ! make sure don't split current k_old for this case
+                  if (k_old < nz_old) then  ! make sure don't split current k_old for this case
                      if (xq_old(k_old+1) > next_xq) next_xq = xq_old(k_old+1)
                   end if
                   next_dq = next_xq - xq_new(k_new)
@@ -731,15 +722,15 @@
 
                         k_old_next = k_old + 1
 
-                     else ! consider doing merge
+                     else  ! consider doing merge
 
                         if (next_dq > 1.5d0*dq_old(k_old)) then
-                           next_dq = 0.9d0*next_dq ! to avoid split-merge flip-flops
+                           next_dq = 0.9d0*next_dq  ! to avoid split-merge flip-flops
                            next_xq = xq_new(k_new) + next_dq
                         end if
 
                         k_old_next_max = min(nz_old, k_old + max_merge)
-                        k_old_next = k_old_next_max ! will cut this back as necessary
+                        k_old_next = k_old_next_max  ! will cut this back as necessary
                         do kk=k_old+1,k_old_next_max
                            maxval_delta_xa = maxval(abs(s% xa(:,kk)-s% xa(:,kk-1)))
                            j00 = maxloc(s% xa(:,kk),dim=1)
@@ -769,7 +760,7 @@
                      next_xq = xq_old(k_old_next)
                      next_dq = next_xq - xq_new(k_new)
 
-                  else ! non-final subcell of split
+                  else  ! non-final subcell of split
 
                      k_old_next = k_old
 
@@ -849,7 +840,7 @@
 
                dq_new(k_new) = next_dq
 
-               if (k_new == new_capacity) then ! increase allocated size
+               if (k_new == new_capacity) then  ! increase allocated size
                   new_capacity = (new_capacity*5)/4 + 10
                   call realloc(s, k_new, new_capacity, xq_new, dq_new, which_gval, comes_from, ierr)
                   if (ierr /= 0) return
@@ -915,7 +906,7 @@
 
          logical function is_crystal_boundary(kk)
             integer, intent(in) :: kk
-            if(s% do_phase_separation .and. & ! only need this protection when phase separation is on
+            if(s% do_phase_separation .and. &  ! only need this protection when phase separation is on
                  s% m(kk) <= s% crystal_core_boundary_mass .and. &
                  s% m(kk-1) >= s% crystal_core_boundary_mass) then
                is_crystal_boundary = .true.
@@ -967,17 +958,17 @@
          type (star_info), pointer :: s
          logical, intent(in) :: dbg
          integer, intent(in) :: k_old, k_new, nz_old, num_gvals, max_num_subcells
-         real(dp), pointer :: xq_new(:), dq_new(:) ! (nz)
-         real(dp), pointer :: xq_old(:) ! (nz_old)
-         real(dp), pointer :: dq_old(:) ! (nz_old)
+         real(dp), pointer :: xq_new(:), dq_new(:)  ! (nz)
+         real(dp), pointer :: xq_old(:)  ! (nz_old)
+         real(dp), pointer :: dq_old(:)  ! (nz_old)
          logical, dimension(max_allowed_gvals) :: gval_is_xa_function, gval_is_logT_function
-         real(dp), pointer :: gvals(:,:) ! (nz_old, num_gvals)
+         real(dp), pointer :: gvals(:,:)  ! (nz_old, num_gvals)
          real(dp), intent(in) :: &
             next_dq_max, min_dq, min_dq_for_split, &
             min_dq_for_xa, min_dq_for_logT, max_surface_cell_dq, max_dq_cntr
-         real(dp), pointer :: delta_gval_max(:) ! (nz_old, num_gvals)
-         character (len=32) :: gval_names(:) ! (num_gvals)  for debugging.
-         integer, pointer :: which_gval(:) ! (nz_new)  for debugging.
+         real(dp), pointer :: delta_gval_max(:)  ! (nz_old, num_gvals)
+         character (len=32) :: gval_names(:)  ! (num_gvals)  for debugging.
+         integer, pointer :: which_gval(:)  ! (nz_new)  for debugging.
          integer, intent(out) :: ierr
 
          real(dp) :: nxt_dqs(num_gvals), default
@@ -986,7 +977,7 @@
 
          include 'formats'
 
-         pkdbg = dbg !.or. k_old == 4000
+         pkdbg = dbg  !.or. k_old == 4000
          ierr = 0
 
          if (pkdbg) write(*,*)
@@ -1013,7 +1004,7 @@
             return
          end if
 
-         default = pick_next_dq ! default size. can be reduced according to gradients of gvals
+         default = pick_next_dq  ! default size. can be reduced according to gradients of gvals
          do j=1,num_gvals
             nxt_dqs(j) = pick1_dq(s, &
                j, next_dq_max, default, .false., k_old, k_new, nz_old, &
@@ -1041,13 +1032,13 @@
          real(dp), intent(in) :: next_dq_max, default, min_dq, min_dq_for_xa, min_dq_for_logT
          logical, intent(in) :: dbg
          integer, intent(in) :: k_old, k_new, nz_old, max_num_subcells
-         real(dp), pointer :: xq_new(:) ! (nz)
-         real(dp), pointer :: xq_old(:) ! (nz_old)
-         real(dp), pointer :: dq_old(:) ! (nz_old)
+         real(dp), pointer :: xq_new(:)  ! (nz)
+         real(dp), pointer :: xq_old(:)  ! (nz_old)
+         real(dp), pointer :: dq_old(:)  ! (nz_old)
          logical :: is_xa_function, is_logT_function
-         real(dp), pointer :: gvals(:,:) ! (nz_old, num_gvals)
-         real(dp), pointer :: delta_gval_max(:) ! (nz_old, num_gvals)
-         character (len=32) :: gval_names(:) ! (num_gvals)  for debugging.
+         real(dp), pointer :: gvals(:,:)  ! (nz_old, num_gvals)
+         real(dp), pointer :: delta_gval_max(:)  ! (nz_old, num_gvals)
+         character (len=32) :: gval_names(:)  ! (num_gvals)  for debugging.
          integer, intent(out) :: ierr
 
          real(dp) :: gnew, dgnew, gmax, gmin, xq, dq_next, dq_sum, sz, dval
@@ -1057,7 +1048,7 @@
          include 'formats'
 
          ierr = 0
-         dbg1 = dbg !.or. (k_old == -1)
+         dbg1 = dbg  !.or. (k_old == -1)
 
          pick1_dq = default
          dq_next = -1
@@ -1107,10 +1098,10 @@
                if (k < nz_old) cycle
                ! pick location inside center zone
                if (dbg1) write(*,*) 'pick location inside center zone'
-               if (gvals(k-1,j) < gvals(k,j)) then ! see where reach gmax in center cell
+               if (gvals(k-1,j) < gvals(k,j)) then  ! see where reach gmax in center cell
                   dq_next = find0(0d0, gvals(k-1,j)-gmax, dq_old(k-1), gvals(k,j)-gmax)
                   if (dbg1) write(*,1) 'gvals(k-1,j) < gvals(k,j)', dq_next
-               else if (gvals(k-1,j) > gvals(k,j)) then ! see where reach gmin
+               else if (gvals(k-1,j) > gvals(k,j)) then  ! see where reach gmin
                   dq_next = find0(0d0, gvals(k-1,j)-gmin, dq_old(k-1), gvals(k,j)-gmin)
                   if (dbg1) then
                      write(*,1) 'gvals(k-1,j)-gmin', gvals(k-1,j)-gmin
@@ -1119,8 +1110,8 @@
                      write(*,1) 'gvals(k-1,j) > gvals(k,j)', dq_next
                      call mesa_error(__FILE__,__LINE__,'debug pick1_dq')
                   end if
-               else ! we're done -- don't need another point for this gval
-                  dq_sum = default; exit ! just return the default
+               else  ! we're done -- don't need another point for this gval
+                  dq_sum = default; exit  ! just return the default
                end if
                if (dq_next > 1 - (xq_new(k_new) + min_dq)) then
                   dq_sum = default
@@ -1130,9 +1121,9 @@
                exit
             end if
 
-            if (gvals(k,j) > gmax) then ! estimate where = gmax
+            if (gvals(k,j) > gmax) then  ! estimate where = gmax
                dq_next = find0(0d0, gvals(k-1,j)-gmax, dq_old(k-1), gvals(k,j)-gmax)
-            else if (gvals(k,j) < gmin) then ! estimate where = gmin
+            else if (gvals(k,j) < gmin) then  ! estimate where = gmin
                dq_next = find0(0d0, gvals(k-1,j)-gmin, dq_old(k-1), gvals(k,j)-gmin)
             end if
             if (is_bad(dq_next)) then
@@ -1202,9 +1193,9 @@
       real(dp) function round_off_xq(k_old, nz_old, n, xq, xq_old, dq_old, sz, ierr)
          ! adjust to match one of the candidate subcell locations
          ! this prevents generating too many candidate new points
-         integer, intent(in) :: k_old, nz_old, n ! n is number of subcells
+         integer, intent(in) :: k_old, nz_old, n  ! n is number of subcells
          real(dp), intent(in) :: xq, xq_old(:), dq_old(:)
-         real(dp), intent(out) :: sz ! subcell size at new location
+         real(dp), intent(out) :: sz  ! subcell size at new location
          integer, intent(out) :: ierr
 
          real(dp) :: dq, tmp
@@ -1236,11 +1227,11 @@
          ! xq is in old cell knxt-1
          ! move location to next subcell boundary
          dq = xq - xq_old(knxt-1)
-         sz = dq_old(knxt-1)/dble(n) ! size of subcells
+         sz = dq_old(knxt-1)/dble(n)  ! size of subcells
          tmp = dq/sz
          if(tmp>huge(n)) tmp=huge(n)
          i = max(1,floor(tmp))
-         if (knxt > nz_old) i = min(i,n/2) ! limit extrapolation into center
+         if (knxt > nz_old) i = min(i,n/2)  ! limit extrapolation into center
          dq = i*sz
          round_off_xq = xq_old(knxt-1) + dq
          if (dq <= 0) then
@@ -1251,6 +1242,5 @@
             return
          end if
       end function round_off_xq
-
 
       end module mesh_plan

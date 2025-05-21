@@ -4,7 +4,7 @@
    ! no H, so do blend higher up
    kap_blend_logT_upper_bdy = 4.1d0
    kap_blend_logT_lower_bdy = 4.0d0
- 
+
    ! We use 10% solar, with the definition of Asplund+ 2009
    ! Zbase defined in inlist_extra
    use_Type2_opacities = .true.
@@ -106,7 +106,7 @@
 
    ! limit max_model_number as part of test_suite
    max_model_number = 10000 ! RECOMMENDED -1
-   
+
    relax_max_number_retries = 1000
    max_number_retries = 500 ! RECOMMENDED 5000
 
@@ -120,7 +120,7 @@
    use_other_wind = .true.
 
    ! when using hydro, we reduce the rotational corrections near the surface
-   use_other_eval_fp_ft = .true.
+   use_other_eval_fp_ft = .false.
 
    ! During hydro we use es scaterring opacity on the very outermost cell
    use_other_kap = .true.
@@ -146,7 +146,7 @@
    overshoot_bdy_loc(1) = 'any'
    overshoot_f(1) = 0.01
    overshoot_f0(1) = 0.005
-   
+
    ! termination conditions
    ! make this a bit higher to avoid interrupting pair-instability collapse
    fe_core_infall_limit = 8d8
@@ -322,7 +322,7 @@
                               ! (stop_100d_after_pulse)
                               ! RECOMMENDED .false.
 
-   
+
       photo_interval = 50
       profile_interval = 100
       history_interval = 1

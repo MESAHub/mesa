@@ -1,6 +1,3 @@
-c
-! ***********************************************************
-!
       subroutine slvseu(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
      &          m1,m2,nm1,fac1,e,lde,ip,iphes,del,ijob,
      &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
@@ -8,7 +5,7 @@ c
      &          caller_id, nvar, nz, lblk, dblk, ublk,
      &          nzmax,isparse,ia,ja,sa,
      &          lrd,rpar_decsol,lid,ipar_decsol,ier)
-      implicit real(dp) (a-h,o-z)
+      implicit none
       interface
 #include "mtx_decsol.dek"
 #include"mtx_decsols.dek"
@@ -29,7 +26,6 @@ c
       dimension fjac(ldjac,n),fmas(ldmas,nm1)
       dimension iphes(n)
 !     common/linal/mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag
-!
 
       ier = 0
       if (nvar > 0) then
@@ -37,14 +33,14 @@ c
      &      1,caller_id,nvar,nz,lblk,dblk,ublk,del,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
          return
       end if
-      
-      goto (1,2,1,2,1,55,55,8,8,55,11,12,11,12,11), ijob
+
+      GOTO (1,2,1,2,1,55,55,8,8,55,11,12,11,12,11), ijob
 !
 ! -----------------------------------------------------------
 !
    1  continue
 ! ---  b=identity, jacobian a full matrix
-      
+
         ! write(*,*) 'rhs(1)', del(1)
         ! write(*,*) 'rhs(2)', del(2)
       call decsol(1,n,lde,e,n,n,del,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
@@ -119,6 +115,3 @@ c
        write(*,*) 'slvseu: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! slvseu
       end subroutine slvseu
-!
-!    end of subroutine slvseu
-!

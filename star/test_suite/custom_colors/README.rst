@@ -8,7 +8,7 @@ This test suite example shows how to use user-defined color filter and extinctio
 
 This test case has 1 part. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_1.0``) builds a 1.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves until core hydrogen depletion (mass fraction h1 < 0.1). This example loads the default |LCB98| color filter ''lcb98cor.dat'', a custom color filter ``data/blackbody_bc_v.txt`` which in this case is blackbody V band filter, and a custom extinction color correction file ``data/fake_av_v.txt``. Example color-color, color-magnitude, magnitude-color and magnitude-magnitude plots:
+* Part 1 (``inlist_1.0``) builds a 1.0 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves until core hydrogen depletion (mass fraction h1 < 0.1). This example loads the default |LCB98| color filter ''lcb98cor.dat'', a custom color filter ``data/blackbody_bc_v.txt`` which in this case is blackbody V band filter, and a custom extinction color correction file ``data/fake_av_v.txt``. Example color-color, color-magnitude, magnitude-color and magnitude-magnitude plots:
 
 .. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude1_000241.svg
    :width: 100%
@@ -28,10 +28,8 @@ pgstar commands used for the first 7 plots:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 1
 
@@ -65,7 +63,7 @@ pgstar commands used for the first 7 plots:
          Color_magnitude1_yaxis1_name(1) = 'bc_B'
          Color_magnitude1_yaxis2_name(1) = 'bc_U'
          Color_magnitude1_yaxis_reversed(1) = .false.
-         
+
          ! Plots `other_yaxis1-other_yaxis2` leave `other_yaxis2` blank if you only want to plot `other_yaxis1`.
          Color_magnitude1_other_yaxis1_name(1) = 'abs_mag_V'
          Color_magnitude1_other_yaxis2_name(1) = ''
@@ -74,7 +72,7 @@ pgstar commands used for the first 7 plots:
 
          Color_magnitude1_yaxis1_name(2) = 'bc_B'
          Color_magnitude1_other_yaxis1_name(2) = 'bc_U'
-         
+
          ! Enables calling a subroutine to add extra information to a plot
          ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
          Color_magnitude1_use_decorator = .true.
@@ -141,9 +139,9 @@ pgstar commands used for the first 7 plots:
 
          ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
          Color_magnitude3_yaxis1_name(1) = 'bc_v_bb'
-         
+
          Color_magnitude3_other_yaxis1_name(1) = 'av_v'
-         
+
          ! setup default
          Color_magnitude3_num_panels = 1
          ! file output
@@ -160,4 +158,3 @@ pgstar commands used for the first 7 plots:
 .. |LCB98| replace:: `Lejeune, Cuisinier, & Buser (1998) <https://ui.adsabs.harvard.edu/abs/1998A%26AS..130...65L/abstract>`__
 
 Last-Updated: 05Jun2021 (MESA 5be9e57) by fxt
-

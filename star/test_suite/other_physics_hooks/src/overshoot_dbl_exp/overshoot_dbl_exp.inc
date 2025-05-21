@@ -1,13 +1,13 @@
 
-      
+
       subroutine read_inlist_overshoot_dbl_exp(ierr)
          integer, intent(out) :: ierr
          character (len=256) :: filename, message
-         integer :: unit         
+         integer :: unit
          filename = 'inlist_overshoot_dbl_exp'
-         
+
          write(*,*) 'read_inlist_overshoot_dbl_exp'
-         
+
          ! set defaults
          overshoot_f2 = 0d0
          overshoot_D2 = 0d0
@@ -16,17 +16,17 @@
          if (ierr /= 0) then
             write(*, *) 'Failed to open control namelist file ', trim(filename)
          else
-            read(unit, nml=overshoot_dbl_exp, iostat=ierr)  
+            read(unit, nml=overshoot_dbl_exp, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=overshoot_dbl_exp)
                close(unit)
-            end if  
+            end if
          end if
 
       end subroutine read_inlist_overshoot_dbl_exp
@@ -195,7 +195,7 @@
              k_b = k
              exit face_loop
           endif
-       
+
        end do face_loop
 
        ! Finish

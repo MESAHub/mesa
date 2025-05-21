@@ -4,13 +4,13 @@
 simplex_solar_calibration
 *************************
 
-This test case exercises the simplex framework with a check of the chi^2 value for 1.0 Msun, Z=0.02 metallicity, solar model.
+This test case exercises the simplex framework with a check of the chi^2 value for 1.0 |Msun|, Z=0.02 metallicity, solar model.
 
 This test case has 2 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_prezams``) builds a 1.0 Msun, Z=0.02 metallicity, model and evolves it for 1 million years.
+* Part 1 (``inlist_prezams``) builds a 1.0 |Msun|, Z=0.02 metallicity, model and evolves it for 1 million years.
 
-* Part 2 (``inlist_solar``) continues the evolution until the age reaches 4.61 billion years. Within the simplex modules, a chi^2 value is calculated using target values and controls in ``inlist_simplex_search_controls_solar``. An actual simplex optimzation is performed:
+* Part 2 (``inlist_solar``) continues the evolution until the age reaches 4.61 billion years. Within the simplex modules, a chi^2 value is calculated using target values and controls in ``inlist_simplex_search_controls_solar``. An actual simplex optimizationn is performed:
 
 .. code-block:: console
 
@@ -87,10 +87,8 @@ pgstar commands used for the plot above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 10
 
@@ -113,9 +111,9 @@ pgstar commands used for the plot above:
   HR_file_flag = .true.
   HR_file_dir = 'pgstar_out'
   HR_file_prefix = 'hr'
-  HR_file_interval = 10000 
+  HR_file_interval = 10000
   HR_file_width = 12
-  HR_file_aspect_ratio = -1 
+  HR_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 

@@ -19,12 +19,12 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-      
+
       !pgstar_flag = .true.
-   
+
 / ! end of star_job namelist
 
 &eos
@@ -44,7 +44,7 @@
    ! limit max_model_number as part of test_suite
    max_model_number = 8000
    use_gold2_tolerances = .true.
-   
+
    calculate_Brunt_N2 = .true.
 
 ! RSP controls
@@ -53,7 +53,7 @@
    okay_to_remesh = .false.
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 1.49298d0 ! expected period (in days) 
+   x_ctrl(1) = 1.49298d0 ! expected period (in days)
 
    RSP_mass = 4.165d0
    RSP_Teff = 6050
@@ -66,11 +66,11 @@
    RSP_nz_outer = 40 ! number of zones in outer region of initial model
    RSP_T_anchor = 11d3 ! approx temperature at base of outer region
    RSP_T_inner = 2d6 ! T at inner boundary of initial model
-   
+
 ! solver
 
 ! output controls
-   
+
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
@@ -85,25 +85,24 @@
    ! i suggest the following method. interrupt the run soon after
    ! it makes a photo.  remove or delete LOGS/history.data to force
    ! creation of a new one when restart.  edit the inlist to set
-   ! history_interval to 1 to get maximum time resolution.  
-   ! restart the run and let it go for as many periods as desired.   
+   ! history_interval to 1 to get maximum time resolution.
+   ! restart the run and let it go for as many periods as desired.
 
       photo_interval = 1000
       profile_interval = 4000
       history_interval = 10
       terminal_interval = 4000
-      
+
       photo_interval = 100
       terminal_interval = 10
-      
+
 
 / ! end of controls namelist
 
 
-
 &pgstar
 
-    !pause = .true.
+    !pause_flag = .true.
     !pause_interval = 100
     pgstar_interval = 5 ! 10
 
@@ -116,17 +115,17 @@
     Grid1_file_dir = 'png1'
     Grid1_file_prefix = 'grid1'
     Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
-   
+
     Profile_Panels1_xaxis_name = 'zone'
     Profile_Panels1_xaxis_reversed = .true.
     !Profile_Panels1_xmin = 50 ! -101D0
     !Profile_Panels1_xmax = 65 ! -101D0
-   
+
  ! window 2
-      
+
     Grid2_win_flag = .true.
     Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid  TDC'
-   
+
     History_Panels2_xaxis_name='star_age_day'
     History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
@@ -135,7 +134,7 @@
     Grid2_file_dir = 'png'
     Grid2_file_prefix = 'grid2'
     Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-   
+
     !Profile_Panels2_show_grid = .true.
 
     Profile_Panels2_xaxis_name = 'logtau'
@@ -144,6 +143,6 @@
     Profile_Panels2_xmax = -101D0
 
     Profile_Panels2_dymin(4) = 0.02
-  
+
 
 / ! end of pgstar namelist

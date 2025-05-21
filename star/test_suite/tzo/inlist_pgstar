@@ -8,14 +8,6 @@ pgstar_interval=1
 ! white_on_black flags -- true means white foreground color on black background
 file_white_on_black_flag = .true.
 file_device = 'png'            ! options 'png' and 'vcps' for png and postscript respectively
-file_extension = 'png'           ! common names are 'png' and 'ps'
-
-
-!file_white_on_black_flag = .false.
-!file_device = 'vcps'            ! options 'png' and 'vcps' for png and postscript respectively
-!file_extension = 'ps'           ! common names are 'png' and 'ps'
-
-
 
 ! Text_Summary windows
 
@@ -59,7 +51,6 @@ Text_Summary1_name(4,4) = 'log_g'
 Text_Summary1_name(4,5) = 'log_Teff'
 
 
-
 !------------------------------------------------------------------------------------
 
 ! Abundance profile plot
@@ -69,7 +60,7 @@ Abundance_win_flag = .false.
 ! window properties
 Abundance_win_width = 12
 Abundance_win_aspect_ratio = 0.75
-         
+
 Abundance_xleft = 0.15
 Abundance_xright = 0.85
 Abundance_ybot = 0.15
@@ -79,28 +70,28 @@ Abundance_title = ''
 
 ! isotopes to plot
 
-         
+
 ! number and size of isotope labels along curves
 num_abundance_line_labels = 3
 Abundance_line_txt_scale_factor = 0.8
 
 
-! number and size of isotopes on legend         
+! number and size of isotopes on legend
 Abundance_legend_max_cnt = 0
-Abundance_legend_txt_scale_factor = 0.8 
+Abundance_legend_txt_scale_factor = 0.8
 
 ! xaxis name and orientation
-Abundance_xaxis_name = 'zone' 
+Abundance_xaxis_name = 'zone'
 Abundance_xaxis_reversed = .false.
-         
-! xaxis limits 
+
+! xaxis limits
 Abundance_xmin = 0.0
 Abundance_xmax = -101
-         
-! yaxis limits 
-Abundance_log_mass_frac_min = -5.0 
+
+! yaxis limits
+Abundance_log_mass_frac_min = -5.0
 Abundance_log_mass_frac_max = 0.3
-         
+
 ! file output
 Abundance_file_flag = .false.
 Abundance_file_dir = 'Abundance'
@@ -117,7 +108,7 @@ Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
 Power_win_flag = .false.
 Power_win_width = 10
 Power_win_aspect_ratio = 0.75
-Power_title = ''      
+Power_title = ''
 
 Power_xleft = 0.15
 Power_xright = 0.85
@@ -133,7 +124,7 @@ Power_legend_max_cnt = 16
 Power_legend_txt_scale_factor = 1.0 ! relative to other text
 
 ! power xaxis limits -- to override system default selections
-Power_xmin = 0.0 
+Power_xmin = 0.0
 Power_xmax = -101
 
 ! power yaxis limits -- to override system default selections
@@ -149,8 +140,6 @@ Power_file_width = -1 ! (inches) negative means use same value as for window
 Power_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
-
-
 !------------------------------------------------------------------------------------
 
 ! Kippenhahn diagram history plot
@@ -160,7 +149,7 @@ Kipp_win_flag = .false.
 ! window properties
 Kipp_win_width = 10
 Kipp_win_aspect_ratio = 0.75
-Kipp_title = ''      
+Kipp_title = ''
 
 ! y axis limits
 Kipp_mass_max = -101
@@ -188,13 +177,13 @@ Kipp_file_aspect_ratio = -1 ! negative means use same value as for window
 !------------------------------------------------------------------------------------
 
 
-! Mixing profile 
+! Mixing profile
 
 Mixing_win_flag = .false.
 
 ! window properties
 Mixing_win_width = 10
-Mixing_win_aspect_ratio = 0.75 
+Mixing_win_aspect_ratio = 0.75
 
 Mixing_xleft = 0.15
 Mixing_xright = 0.85
@@ -210,9 +199,9 @@ Mixing_xmin = 0.0
 Mixing_xmax = -101
 
 ! y-axis
-Mixing_ymin = -101d0 
+Mixing_ymin = -101d0
 Mixing_ymax = -101d0
-Mixing_dymin = -101d0  
+Mixing_dymin = -101d0
 
 ! file output
 Mixing_file_flag = .false.
@@ -224,13 +213,13 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
 !------------------------------------------------------------------------------------
 
-! Dynamo profile 
+! Dynamo profile
 
 Dynamo_win_flag = .false.
 
 ! window properties
 Dynamo_win_width = 10
-Dynamo_win_aspect_ratio = 0.75 
+Dynamo_win_aspect_ratio = 0.75
 Dynamo_title = 'Dynamo'
 Dynamo_title = ''
 
@@ -275,7 +264,7 @@ Profile_Panels1_show_grid = .true.
 Profile_Panels1_win_width = 10
 Profile_Panels1_win_aspect_ratio = 1.0
 Profile_Panels1_txt_scale = 0.8
-Profile_Panels1_title = '' 
+Profile_Panels1_title = ''
 
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'zone'
@@ -284,22 +273,22 @@ Profile_Panels1_xmax = -101
 Profile_Panels1_xaxis_reversed = .false.
 
 ! contents of panel 1
-Profile_Panels1_yaxis_name(1) = 'logT'   
+Profile_Panels1_yaxis_name(1) = 'logT'
 Profile_Panels1_ymin(1) = -101d0 ! only used if /= -101d0
 Profile_Panels1_ymax(1) = -101d0 ! only used if /= -101d0
 
-Profile_Panels1_other_yaxis_name(1) = 'opacity'         
+Profile_Panels1_other_yaxis_name(1) = 'opacity'
 Profile_Panels1_other_ymin(1) = -101d0 ! only used if /= -101d0
 Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
 Profile_Panels1_other_yaxis_log(1) = .true.
 
 ! contents of panel 2
-Profile_Panels1_yaxis_name(2) = 'logRho'         
+Profile_Panels1_yaxis_name(2) = 'logRho'
 Profile_Panels1_ymin(2) = -101d0 ! only used if /= -101d0
 Profile_Panels1_ymax(2) = -101d0 ! only used if /= -101d0
 
-!Profile_Panels1_other_yaxis_name(2) = 'logR_cm'  
-Profile_Panels1_other_yaxis_name(2) = 'logL'    
+!Profile_Panels1_other_yaxis_name(2) = 'logR_cm'
+Profile_Panels1_other_yaxis_name(2) = 'logL'
 Profile_Panels1_other_ymin(2) = 5.0 ! only used if /= -101d0
 Profile_Panels1_other_ymax(2) = 5.5 ! only used if /= -101d0
 
@@ -327,7 +316,7 @@ Profile_Panels2_show_grid = .true.
 Profile_Panels2_win_width = 10
 Profile_Panels2_win_aspect_ratio = 1.0
 Profile_Panels2_txt_scale = 0.8
-Profile_Panels2_title = ''      
+Profile_Panels2_title = ''
 
 ! x-axis limits and properties
 Profile_Panels2_xaxis_name = 'zone'
@@ -348,22 +337,22 @@ Profile_Panels2_other_ymax(1) = -101d0 ! only used if /= -101d0
 Profile_Panels2_other_yaxis_log(1) =.false.
 
 ! contents of panel 2
-Profile_Panels2_yaxis_name(2) = 'cgrav_factor'   
+Profile_Panels2_yaxis_name(2) = 'cgrav_factor'
 Profile_Panels2_yaxis_log(2) = .true.
 Profile_Panels2_ymin(2) = 0 ! only used if /= -101d0
 Profile_Panels2_ymax(2) = -101 ! only used if /= -101d0
 
-Profile_Panels2_other_yaxis_name(2) = 'pressure_scale_height'   
+Profile_Panels2_other_yaxis_name(2) = 'pressure_scale_height'
 Profile_Panels2_other_ymin(2) = 0d0 ! only used if /= -101d0
 Profile_Panels2_other_ymax(2) = -101d0 ! only used if /= -101d0
 Profile_Panels2_other_yaxis_log(2) = .true.
 
 ! contents of panel 3
-Profile_Panels2_yaxis_name(3) = 'net_nuclear_energy'         
+Profile_Panels2_yaxis_name(3) = 'net_nuclear_energy'
 Profile_Panels2_ymin(3) = -101d0 ! only used if /= -101d0
 Profile_Panels2_ymax(3) = -101d0 ! only used if /= -101d0
 
-Profile_Panels2_other_yaxis_name(3) = 'burn_num_iters'   
+Profile_Panels2_other_yaxis_name(3) = 'burn_num_iters'
 Profile_Panels2_other_ymin(3) = -101d0 ! only used if /= -101d0
 Profile_Panels2_other_ymax(3) = -101d0 ! only used if /= -101d0
 
@@ -377,14 +366,12 @@ Profile_Panels2_file_width = -1        ! (inches) negative means use same value 
 Profile_Panels2_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
-
-
 !------------------------------------------------------------------------------------
 
 History_Panels1_win_flag = .false.
 
 History_Panels1_win_width = 10
-History_Panels1_win_aspect_ratio = 0.75 
+History_Panels1_win_aspect_ratio = 0.75
 
 History_Panels1_xleft = 0.15
 History_Panels1_xright = 0.85
@@ -467,15 +454,15 @@ History_Panels1_file_aspect_ratio = -1 ! negative means use same value as for wi
 TRho_win_flag = .false.
 TRho_win_width = 10
 TRho_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-         
+
 TRho_xleft = 0.15
 TRho_xright = 0.85
 TRho_ybot = 0.15
 TRho_ytop = 0.85
 TRho_txt_scale = 1.0
-TRho_title = ' '      
+TRho_title = ' '
 
-! axis limits 
+! axis limits
 TRho_logT_min =-101 ! only used if /= -101d0
 TRho_logT_max = -101 ! only used if /= -101d0
 TRho_logRho_min = -101 ! only used if /= -101d0
@@ -488,13 +475,13 @@ TRho_logRho_max = -101 ! only used if /= -101d0
 HR_win_flag = .false.
 HR_win_width = 10
 HR_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-         
+
 HR_xleft = 0.15
 HR_xright = 0.85
 HR_ybot = 0.15
 HR_ytop = 0.85
 HR_txt_scale = 1.0
-HR_title = ' '      
+HR_title = ' '
 
          HR_dlogT_min = 0.01
          HR_dlogL_min = 0.01
@@ -511,17 +498,17 @@ TRho_Profile_win_flag = .false.
 
 TRho_Profile_win_width = 16
 TRho_Profile_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-         
+
 TRho_Profile_xleft = 0.15
 TRho_Profile_xright = 0.85
 TRho_Profile_ybot = 0.15
 TRho_Profile_ytop = 0.85
 TRho_Profile_txt_scale = 1.0
-TRho_Profile_title = ' '      
-         
-TRho_switch_to_Column_Depth = .false. 
+TRho_Profile_title = ' '
+
+TRho_switch_to_Column_Depth = .false.
 TRho_switch_to_mass = .false.
-            
+
 show_TRho_Profile_legend = .true.
  TRho_Profile_legend_coord = 0.55
  TRho_Profile_legend_fjust = 0.0
@@ -533,7 +520,7 @@ show_TRho_Profile_text_info = .false.
  TRho_Profile_text_info_dxfac = 0.02 ! controls x spacing to value from text
  TRho_Profile_text_info_yfac = 0.6 ! controls y location of 1st line
  TRho_Profile_text_info_dyfac = -0.04 ! controls line spacing
-         
+
 show_TRho_Profile_mass_locs = .false.
 show_TRho_accretion_mesh_borders = .false.
 show_TRho_Profile_kap_regions = .false.
@@ -548,8 +535,8 @@ show_TRho_Profile_gamma1_4_3rd = .true.
 TRho_Profile_xmin = -10
 TRho_Profile_xmax = 8.0
 TRho_Profile_ymin = 3.0
-TRho_Profile_ymax = 10.0      
-         
+TRho_Profile_ymax = 10.0
+
 ! file output
 TRho_Profile_file_flag = .false.
 TRho_Profile_file_dir = 'TRho'
@@ -559,7 +546,7 @@ TRho_Profile_file_width = -1 ! (inches) negative means use same value as for win
 TRho_Profile_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
-! these are shown if show_TRho_Profile_mass_locs = .true.         
+! these are shown if show_TRho_Profile_mass_locs = .true.
 ! set all the entries
 profile_mass_point_q = -1
 profile_mass_point_color_index = 1
@@ -568,8 +555,8 @@ profile_mass_point_symbol_scale = 1.7
 profile_mass_point_str = ''
 profile_mass_point_str_clr = 1
 profile_mass_point_str_scale = 1.0
-         
-! set defaults      
+
+! set defaults
 num_profile_mass_points = 3 ! max is defined in star_def (max_num_profile_mass_points)
 
 profile_mass_point_q(1) = 0.5
@@ -577,19 +564,18 @@ profile_mass_point_color_index(1) = 1
 profile_mass_point_symbol(1) = -6
 profile_mass_point_str(1) = '  0.5 M\d\(0844)\u'
 profile_mass_point_str_clr(1) = 1
-         
+
 profile_mass_point_q(2) = 0.95
 profile_mass_point_color_index(2) = 1
 profile_mass_point_symbol(2) = -6
 profile_mass_point_str(2) = '  0.95 M\d\(0844)\u'
 profile_mass_point_str_clr(3) = 1
-         
+
 profile_mass_point_q(3) = 0.999
 profile_mass_point_color_index(3) = 1
 profile_mass_point_symbol(3) = -6
 profile_mass_point_str(3) = '  0.999 M\d\(0844)\u'
 profile_mass_point_str_clr(3) = 1
-
 
 
 !------------------------------------------------------------------------------------
@@ -613,7 +599,6 @@ pgstar_model_fjust = 1.0
 pgstar_xaxis_label_disp = 2.5
 pgstar_left_yaxis_label_disp = 2.0
 pgstar_right_yaxis_label_disp = 2.5
-
 
 
 !------------------------------------------------------------------------------------
@@ -761,8 +746,6 @@ Grid1_plot_pad_bot(8) = -0.02     ! fraction of full window height for padding a
 Grid1_txt_scale_factor(8) = 0.7 ! multiply txt_scale for subplot by this
 
 
-
-
 ! file output
 Grid1_file_flag = .true.
 Grid1_file_dir = 'Grid1'
@@ -778,14 +761,12 @@ Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
 ! production_win_flag=.true.
 ! production_win_width=14
-! Production_min_mass_frac = -1000.0d0 
-! 
+! Production_min_mass_frac = -1000.0d0
+!
 ! Production_ymin=-2.d0
 ! Production_ymax=2d0
 ! production_file_flag=.true.
-! production_file_interval = 10 
-
-
+! production_file_interval = 10
 
 
 Summary_History_win_flag = .false.
@@ -831,7 +812,5 @@ Summary_History_scaled_value(2) = .true.
 Summary_History_legend(3) = 'rpp_to_he3'
 Summary_History_legend(3) = 'rpp_to_he3'
 Summary_History_scaled_value(3) = .true.
-
-
 
 / ! end of pgstar namelist

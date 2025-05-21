@@ -2,45 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pulse_fgong
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, rsun, four_thirds, no_mixing, standard_cgrav
   use utils_lib
   use chem_def
   use atm_def
   use eos_def, only: i_Gamma1, i_lnPgas, i_chiRho, i_chiT
   use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
-
   use atm_support
   use eos_support
-
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
@@ -50,10 +38,7 @@ module pulse_fgong
   integer, parameter :: ICONST = 15
   integer, parameter :: IVAR = 40
 
-  ! Access specifiers
-
   private
-
   public :: get_fgong_data
   public :: write_fgong_data
 
@@ -110,7 +95,7 @@ contains
     ! ∂lnΓ₁/∂… blocks in each region can probably be refactored.
     real(dp), allocatable :: dres_dxa(:,:)
     real(dp), allocatable :: xa(:)
-    real(dp), parameter :: dxa = 1d-3 ! perturbation of abundances for ∂lnΓ₁/∂Y
+    real(dp), parameter :: dxa = 1d-3  ! perturbation of abundances for ∂lnΓ₁/∂Y
 
     ! Get FGONG data
 
@@ -167,13 +152,13 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Store global data
 
@@ -196,11 +181,11 @@ contains
        rho_c = eval_center_rho(s, k_b(n_sg))
     else
        rho_c = eval_center(s%rmid, s%rho, k_a(n_sg), k_b(n_sg))
-    endif
+    end if
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
-    P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+    P_c = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(11) = r_outer**2*d2P_dr2_c/P_c
     global_data(12) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
     global_data(13) = s%star_age
@@ -240,7 +225,7 @@ contains
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -259,8 +244,6 @@ contains
 
     deallocate(dres_dxa)
     deallocate(xa)
-
-    ! Finish
 
     return
 
@@ -329,13 +312,13 @@ contains
         nabla_ad = s%atm_structure(atm_grada,k)
         delta = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
         c_P = s%atm_structure(atm_cp,k)
-        rec_mu_e = exp(s%atm_structure(atm_lnfree_e,k)) ! check
+        rec_mu_e = exp(s%atm_structure(atm_lnfree_e,k))  ! check
 
         grav = s%cgrav(1)*s%m_grav(1)/(r*r)
         N2 = grav*grav*(rho/P)*delta*(nabla_ad - s%atm_structure(atm_gradT,k))
         A_ast = N2*r/grav
 
-        r_X = 0d0 ! dxdt_nuc_h1
+        r_X = 0d0  ! dxdt_nuc_h1
         Z = MIN(1d0, MAX(0d0, 1d0 - &
              eval_face(s%dq, s%X, 1, k_a, k_b) - &
              eval_face(s%dq, s%Y, 1, k_a, k_b)))
@@ -387,17 +370,14 @@ contains
 
         dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
            - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
-        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1)  ! d/dY ~ -d/dX
 
       end associate
-
-      ! Finish
 
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
 
@@ -520,17 +500,14 @@ contains
 
         dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
            - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
-        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1)  ! d/dY ~ -d/dX
 
       end associate
-
-      ! Finish
 
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j, k_a, k_b)
 
@@ -645,11 +622,9 @@ contains
 
         dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
            - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
-        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1)  ! d/dY ~ -d/dX
 
       end associate
-
-      ! Finish
 
       return
 
@@ -657,7 +632,6 @@ contains
 
   end subroutine get_fgong_data
 
-  !****
 
   subroutine write_fgong_data (id, filename, global_data, point_data, ierr)
 
@@ -728,8 +702,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

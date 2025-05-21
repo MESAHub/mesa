@@ -15,28 +15,28 @@
    ! The base metallicity for the opacity tables. This provides the
    ! reference metallicity necessary to calculate element variations.
    ! Physically, this usually corresponds to the initial metallicity
-   ! of the model and remains static during the entirety of a 
+   ! of the model and remains static during the entirety of a
    ! calculation. Variations in metallicity from nuclear burning and
    ! mixing should not alter Zbase as its purpose is to serve as a
-   ! reference metallicity for C and O enhancement during Helium burning. 
+   ! reference metallicity for C and O enhancement during Helium burning.
 
    ! See ``use_Zbase_for_Type1``. By default, Zbase does not typically affect the
-   ! outer regions of a stellar model when the surface metallicity remains 
-   ! below the initial metallicity (Z < Zbase). Zbase is typically 
-   ! only used for Type2 opacities which operate deeper in the stellar interior. 
+   ! outer regions of a stellar model when the surface metallicity remains
+   ! below the initial metallicity (Z < Zbase). Zbase is typically
+   ! only used for Type2 opacities which operate deeper in the stellar interior.
 
    ! Specific scenarios such as high Z accretion onto a metal poor model
    ! can produce a situation where (Z > Zbase). During this scenario
-   ! the surface metallicity can be enhanced beyond the initial metallicity. 
+   ! the surface metallicity can be enhanced beyond the initial metallicity.
    ! Users can opt to exclusively adopt Type1 opacities in this scenario with
    ! the ``use_Zbase_for_Type1`` flag.
 
    ! NOTE: For wind schemes that scale with metallicity, we use Zbase rather than Z (as long as Zbase > 0).
       ! This is because wind mass loss rate is primarily determined by iron opacity,
-      ! which is unlikely to change during the evolution. 
+      ! which is unlikely to change during the evolution.
 
    ! Zbase must be set if using kapCN, AESOPUS, or Type2
-   ! opacities or else MESA well draw an error. 
+   ! opacities or else MESA well draw an error.
    ! ::
 
       Zbase = -1
@@ -62,9 +62,9 @@
    !The OPLIB Type1 tables offer additional table density, for 1194 (X,Z) pairs from the following sets:
    !
    ! + X:  0.0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.05, 0.1,
-   ! + 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 
-   ! + 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 
-   ! + 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
+   ! + 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
+   ! + 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
+   ! + 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97,
    ! + 0.98, 0.99, 1-Z
 
    ! + Z: 0.0, 0.000001, 0.00001, 0.00003, 0.00007, 0.0001,
@@ -493,11 +493,12 @@
 ! -------------
 
     ! These are arrays of size(10) that can be used to pass in custom information to kap ::
+    ! ::
 
-    kap_ctrl(:) = 0d0
-    kap_integer_ctrl(:) = 0
-    kap_logical_ctrl(:) = .false.
-    kap_character_ctrl(:) = ''
+      kap_ctrl(:) = 0d0
+      kap_integer_ctrl(:) = 0
+      kap_logical_ctrl(:) = .false.
+      kap_character_ctrl(:) = ''
 
 
 ! Extra inlist controls
@@ -507,19 +508,19 @@
    ! It works recursively, so the extras can read extras too.
 
 
-         ! read_extra_kap_inlist(1..5)
-         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_kap_inlist_name(1..5)
-         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! read_extra_kap_inlist(1..5)
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_kap_inlist_name(1..5)
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-         ! If ``read_extra_kap_inlist(i)`` is true, then read ``&eos`` from the file ``extra_kap_inlist_name(i)``.
-         ! ::
+   ! If ``read_extra_kap_inlist(i)`` is true, then read ``&eos`` from the file ``extra_kap_inlist_name(i)``.
+   ! ::
 
       read_extra_kap_inlist(:) = .false.
       extra_kap_inlist_name(:) = 'undefined'
-      
-      
-      
+
+
+
 
 ! Debugging controls
 ! ------------------

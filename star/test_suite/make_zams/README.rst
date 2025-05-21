@@ -4,11 +4,11 @@
 make_zams
 *********
 
-This test case shows an example of creating a 4 Msun, Z = 0.01 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
+This test case shows an example of creating a 4 |Msun|, Z = 0.01 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_zams``) creates a 4 Msun, Z = 0.01 metallicity, pre-main sequence model and evolves the model to the zero age main sequence, terminating when Lnuc / L = 0.9.
+* Part 1 (``inlist_zams``) creates a 4 |Msun|, Z = 0.01 metallicity, pre-main sequence model and evolves the model to the zero age main sequence, terminating when Lnuc / L = 0.9.
 
 .. image:: ../../../star/test_suite/make_zams/docs/grid_000192.svg
    :width: 100%

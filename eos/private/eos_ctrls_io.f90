@@ -1,31 +1,25 @@
 ! ***********************************************************************
 !
-! Copyright (C) 2020 The MESA Team
+!   Copyright (C) 2020 The MESA Team
 !
-! MESA is free software; you can use it and/or modify
-! it under the combined terms and restrictions of the MESA MANIFESTO
-! and the GNU General Library Public License as published
-! by the Free Software Foundation; either version 2 of the License,
-! or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-! You should have received a copy of the MESA MANIFESTO along with
-! this software; if not, it is available at the mesa website:
-! http://mesa.sourceforge.net/
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-! MESA is distributed in the hope that it will be useful,
-! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-! See the GNU Library General Public License for more details.
-!
-! You should have received a copy of the GNU Library General Public License
-! along with this software; if not, write to the Free Software
-! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
    module eos_ctrls_io
 
-   use const_def
+   use const_def, only: dp, max_extra_inlists
    use eos_def
    use math_lib
    use utils_lib, only: mesa_error
@@ -36,21 +30,21 @@
    private
 
    ! controls for HELM
-   real(dp) :: Z_all_HELM ! all HELM for Z >= this unless use_FreeEOS
-   real(dp) :: logT_all_HELM ! all HELM for lgT >= this
-   real(dp) :: logT_low_all_HELM ! all HELM for lgT <= this
+   real(dp) :: Z_all_HELM  ! all HELM for Z >= this unless use_FreeEOS
+   real(dp) :: logT_all_HELM  ! all HELM for lgT >= this
+   real(dp) :: logT_low_all_HELM  ! all HELM for lgT <= this
    real(dp) :: coulomb_temp_cut_HELM, coulomb_den_cut_HELM
 
    ! controls for OPAL_SCVH
    logical :: use_OPAL_SCVH
-   real(dp) :: logT_low_all_SCVH ! SCVH for lgT >= this
-   real(dp) :: logT_all_OPAL ! OPAL for lgT <= this
-   real(dp) :: logRho1_OPAL_SCVH_limit ! don't use OPAL_SCVH for logRho > this
-   real(dp) :: logRho2_OPAL_SCVH_limit ! full OPAL_SCVH okay for logRho < this
-   real(dp) :: logRho_min_OPAL_SCVH_limit ! no OPAL/SCVH for logRho < this
-   real(dp) :: logQ_max_OPAL_SCVH ! no OPAL/SCVH for logQ > this
-   real(dp) :: logQ_min_OPAL_SCVH ! no OPAL/SCVH for logQ <= this.
-   real(dp) :: Z_all_OPAL ! all OPAL for Z <= this
+   real(dp) :: logT_low_all_SCVH  ! SCVH for lgT >= this
+   real(dp) :: logT_all_OPAL  ! OPAL for lgT <= this
+   real(dp) :: logRho1_OPAL_SCVH_limit  ! don't use OPAL_SCVH for logRho > this
+   real(dp) :: logRho2_OPAL_SCVH_limit  ! full OPAL_SCVH okay for logRho < this
+   real(dp) :: logRho_min_OPAL_SCVH_limit  ! no OPAL/SCVH for logRho < this
+   real(dp) :: logQ_max_OPAL_SCVH  ! no OPAL/SCVH for logQ > this
+   real(dp) :: logQ_min_OPAL_SCVH  ! no OPAL/SCVH for logQ <= this.
+   real(dp) :: Z_all_OPAL  ! all OPAL for Z <= this
 
    ! controls for FreeEOS
    logical :: use_FreeEOS
@@ -80,37 +74,37 @@
    ! controls for CMS
    logical :: use_CMS, CMS_use_fixed_composition
    integer :: CMS_fixed_composition_index
-   real(dp) :: max_Z_for_any_CMS, max_Z_for_all_CMS ! set to -1 to disable CMS
+   real(dp) :: max_Z_for_any_CMS, max_Z_for_all_CMS  ! set to -1 to disable CMS
    real(dp) :: logQ_max_for_any_CMS, logQ_max_for_all_CMS      ! for upper blend zone in logQ = logRho - 2*logT + 12
    real(dp) :: logQ_min_for_any_CMS, logQ_min_for_all_CMS      ! for lower blend zone in logQ
    real(dp) :: logRho_max_for_all_CMS, logRho_max_for_any_CMS  ! for upper blend zone in logRho
    real(dp) :: logRho_min_for_all_CMS, logRho_min_for_any_CMS  ! for lower blend zone in logRho
    real(dp) :: logT_max_for_all_CMS, logT_max_for_any_CMS      ! for upper blend zone in logT
    real(dp) :: logT_min_for_all_CMS, logT_min_for_any_CMS      ! for lower blend zone in logT
-   real(dp) :: logT_max_for_all_CMS_pure_He, logT_max_for_any_CMS_pure_He ! upper logT blend zone is different for pure He
+   real(dp) :: logT_max_for_all_CMS_pure_He, logT_max_for_any_CMS_pure_He  ! upper logT blend zone is different for pure He
 
    ! controls for PC
    logical :: use_PC
-   real(dp) :: mass_fraction_limit_for_PC ! skip any species with abundance < this
-   real(dp) :: logRho1_PC_limit ! okay for pure PC for logRho > this
-   real(dp) :: logRho2_PC_limit ! don't use PC for logRho < this (>= 2.8)
+   real(dp) :: mass_fraction_limit_for_PC  ! skip any species with abundance < this
+   real(dp) :: logRho1_PC_limit  ! okay for pure PC for logRho > this
+   real(dp) :: logRho2_PC_limit  ! don't use PC for logRho < this (>= 2.8)
    logical :: PC_use_Gamma_limit_instead_of_T
-   real(dp) :: logT1_PC_limit ! okay for pure PC for logT < this (like logT_all_OPAL)
-   real(dp) :: logT2_PC_limit ! don't use PC for logT > this (like logT_all_HELM)
-   real(dp) :: log_Gamma_e_all_HELM ! HELM for log_Gamma_e <= this
-   real(dp) :: Gamma_e_all_HELM ! 10**log_Gamma_e_all_HELM
-   real(dp) :: log_Gamma_e_all_PC ! PC for log_Gamma_e >= this
+   real(dp) :: logT1_PC_limit  ! okay for pure PC for logT < this (like logT_all_OPAL)
+   real(dp) :: logT2_PC_limit  ! don't use PC for logT > this (like logT_all_HELM)
+   real(dp) :: log_Gamma_e_all_HELM  ! HELM for log_Gamma_e <= this
+   real(dp) :: Gamma_e_all_HELM  ! 10**log_Gamma_e_all_HELM
+   real(dp) :: log_Gamma_e_all_PC  ! PC for log_Gamma_e >= this
    ! crystallization boundaries
-   real(dp) :: PC_Gamma_start_crystal ! Begin releasing latent heat of crystallization
-   real(dp) :: PC_Gamma_full_crystal ! Fully into the solid phase
+   real(dp) :: PC_Gamma_start_crystal  ! Begin releasing latent heat of crystallization
+   real(dp) :: PC_Gamma_full_crystal  ! Fully into the solid phase
 
    ! limits for Skye
    logical :: use_Skye
    logical :: Skye_use_ion_offsets
    real(dp) :: mass_fraction_limit_for_Skye
-   real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
-   real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
-   character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
+   real(dp) :: Skye_min_gamma_for_solid  ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+   real(dp) :: Skye_max_gamma_for_liquid  ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+   character(len=128) :: Skye_solid_mixing_rule  ! Currently support 'Ogata' or 'PC'
 
    logical :: use_simple_Skye_blends
    real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
@@ -148,22 +142,22 @@
       use_FreeEOS, &
 
       ! controls for HELM
-      Z_all_HELM, & ! all HELM for Z >= this unless use_FreeEOS
-      logT_all_HELM, & ! all HELM for lgT >= this
-      logT_low_all_HELM, & ! all HELM for lgT <= this
+      Z_all_HELM, &  ! all HELM for Z >= this unless use_FreeEOS
+      logT_all_HELM, &  ! all HELM for lgT >= this
+      logT_low_all_HELM, &  ! all HELM for lgT <= this
       coulomb_temp_cut_HELM, &
       coulomb_den_cut_HELM, &
 
       ! controls for OPAL_SCVH
       use_OPAL_SCVH, &
-      logT_low_all_SCVH, & ! SCVH for lgT >= this
-      logT_all_OPAL, & ! OPAL for lgT <= this
-      logRho1_OPAL_SCVH_limit, & ! don't use OPAL_SCVH for logRho > this
-      logRho2_OPAL_SCVH_limit, & ! full OPAL_SCVH okay for logRho < this
-      logRho_min_OPAL_SCVH_limit, & ! no OPAL/SCVH for logRho < this
-      logQ_max_OPAL_SCVH, & ! no OPAL/SCVH for logQ > this
-      logQ_min_OPAL_SCVH, & ! no OPAL/SCVH for logQ <= this.
-      Z_all_OPAL, & ! all OPAL for Z <= this
+      logT_low_all_SCVH, &  ! SCVH for lgT >= this
+      logT_all_OPAL, &  ! OPAL for lgT <= this
+      logRho1_OPAL_SCVH_limit, &  ! don't use OPAL_SCVH for logRho > this
+      logRho2_OPAL_SCVH_limit, &  ! full OPAL_SCVH okay for logRho < this
+      logRho_min_OPAL_SCVH_limit, &  ! no OPAL/SCVH for logRho < this
+      logQ_max_OPAL_SCVH, &  ! no OPAL/SCVH for logQ > this
+      logQ_min_OPAL_SCVH, &  ! no OPAL/SCVH for logQ <= this.
+      Z_all_OPAL, &  ! all OPAL for Z <= this
 
       ! controls for FreeEOS
       use_FreeEOS, &
@@ -194,7 +188,7 @@
       use_CMS, CMS_use_fixed_composition, &
       CMS_fixed_composition_index, &
       max_Z_for_any_CMS, &
-      max_Z_for_all_CMS, & ! set to -1 to disable CMS
+      max_Z_for_all_CMS, &  ! set to -1 to disable CMS
       logQ_max_for_any_CMS, &
       logQ_max_for_all_CMS, &      ! for upper blend zone in logQ = logRho - 2*logT + 12
       logQ_min_for_any_CMS, &
@@ -208,28 +202,28 @@
       logT_min_for_all_CMS, &
       logT_min_for_any_CMS, &      ! for lower blend zone in logT
       logT_max_for_all_CMS_pure_He, &
-      logT_max_for_any_CMS_pure_He, & ! upper logT blend zone is different for pure He
+      logT_max_for_any_CMS_pure_He, &  ! upper logT blend zone is different for pure He
 
       ! controls for PC
       use_PC, &
-      mass_fraction_limit_for_PC, & ! skip any species with abundance < this
-      logRho1_PC_limit, & ! okay for pure PC for logRho > this
-      logRho2_PC_limit, & ! don't use PC for logRho < this (>= 2.8)
+      mass_fraction_limit_for_PC, &  ! skip any species with abundance < this
+      logRho1_PC_limit, &  ! okay for pure PC for logRho > this
+      logRho2_PC_limit, &  ! don't use PC for logRho < this (>= 2.8)
       PC_use_Gamma_limit_instead_of_T, &
-      logT1_PC_limit, & ! okay for pure PC for logT < this (like logT_all_OPAL)
-      logT2_PC_limit, & ! don't use PC for logT > this (like logT_all_HELM)
-      log_Gamma_e_all_HELM, & ! HELM for log_Gamma_e <= this
-      log_Gamma_e_all_PC, & ! PC for log_Gamma_e >= this
+      logT1_PC_limit, &  ! okay for pure PC for logT < this (like logT_all_OPAL)
+      logT2_PC_limit, &  ! don't use PC for logT > this (like logT_all_HELM)
+      log_Gamma_e_all_HELM, &  ! HELM for log_Gamma_e <= this
+      log_Gamma_e_all_PC, &  ! PC for log_Gamma_e >= this
       ! crystallization boundaries
-      PC_Gamma_start_crystal, & ! Begin releasing latent heat of crystallization
-      PC_Gamma_full_crystal, & ! Fully into the solid phase
+      PC_Gamma_start_crystal, &  ! Begin releasing latent heat of crystallization
+      PC_Gamma_full_crystal, &  ! Fully into the solid phase
 
       ! controls for Skye
       use_Skye, &
       Skye_use_ion_offsets, &
       mass_fraction_limit_for_Skye, &
-      Skye_min_gamma_for_solid, & ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
-      Skye_max_gamma_for_liquid, & ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+      Skye_min_gamma_for_solid, &  ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+      Skye_max_gamma_for_liquid, &  ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
       Skye_solid_mixing_rule, &
 
       use_simple_Skye_blends, &
@@ -274,7 +268,7 @@
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
       character (len=*), intent(in) :: inlist
-      integer, intent(out) :: ierr ! 0 means AOK.
+      integer, intent(out) :: ierr  ! 0 means AOK.
       type (EoS_General_Info), pointer :: rq
       include 'formats'
       call get_eos_ptr(handle,rq,ierr)
@@ -312,7 +306,7 @@
             action='read', delim='quote', status='old', iostat=ierr)
          if (ierr /= 0) then
             if (level == 1) then
-               ierr = 0 ! no inlist file so just use defaults
+               ierr = 0  ! no inlist file so just use defaults
                call store_controls(rq)
             else
                write(*, *) 'Failed to open eos namelist file ', trim(filename)
@@ -321,7 +315,7 @@
          end if
          read(unit, nml=eos, iostat=ierr)
          close(unit)
-         if (ierr == IOSTAT_END) then ! end-of-file means didn't find an &eos namelist
+         if (ierr == IOSTAT_END) then  ! end-of-file means didn't find an &eos namelist
             ierr = 0
             write(*, *) 'WARNING: Failed to find eos namelist in file: ', trim(filename)
             call store_controls(rq)
@@ -499,7 +493,7 @@
       if (ierr /= 0) then
          write(*,*) 'failed to open ' // trim(filename)
          return
-      endif
+      end if
       call get_eos_ptr(handle,rq,ierr)
       if (ierr /= 0) then
          close(iounit)
@@ -661,7 +655,7 @@
          read(iounit,'(A)',iostat=iostat) str
          ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1)  ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do
@@ -701,4 +695,3 @@
 
 
    end module eos_ctrls_io
-

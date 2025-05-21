@@ -12,7 +12,7 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-TEST_SRCS = test_astero.f
+TEST_SRCS = test_astero.f90
 
 #################################################################
 #
@@ -57,12 +57,12 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
-	@$(TEST_COMPILE) $(FCfixed) $<
+	@$(TEST_COMPILE) $(FCfree) $<
 else
-	$(TEST_COMPILE) $(FCfixed) $<
+	$(TEST_COMPILE) $(FCfree) $<
 endif
 
 #################################################################
@@ -71,7 +71,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(TEST_SRC_DIR)
+vpath %.f90 $(TEST_SRC_DIR)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

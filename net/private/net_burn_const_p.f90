@@ -2,29 +2,23 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module net_burn_const_P
-      use const_def
+      use const_def, only: dp, i8, ln10
       use chem_def
       use math_lib
       use net_def
@@ -54,33 +48,33 @@
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
-         real(dp), pointer, intent(in) :: starting_x(:) ! (num_isos)
+         real(dp), pointer, intent(in) :: starting_x(:)  ! (num_isos)
          real(dp), intent(in) :: starting_temp
-         logical, intent(in) :: clip ! if true, set negative x's to zero during burn.
+         logical, intent(in) :: clip  ! if true, set negative x's to zero during burn.
 
-         integer, intent(in) :: which_solver ! as defined in num_def.f
-         integer, intent(in) :: ntimes ! ending time is times(num_times); starting time is 0
-         real(dp), pointer, intent(in) :: times(:) ! (num_times)
-         real(dp), pointer, intent(in) :: log10Ps_f1(:) ! =(4,numtimes) interpolant for log10P(time)
+         integer, intent(in) :: which_solver  ! as defined in num_def.f
+         integer, intent(in) :: ntimes  ! ending time is times(num_times); starting time is 0
+         real(dp), pointer, intent(in) :: times(:)  ! (num_times)
+         real(dp), pointer, intent(in) :: log10Ps_f1(:)  ! =(4,numtimes) interpolant for log10P(time)
 
-         real(dp), intent(in) :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in) :: rate_factors(:)  ! (num_reactions)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode
 
          ! args to control the solver -- see num/public/num_isolve.dek
          real(dp), intent(inout) :: h
-         real(dp), intent(in) :: max_step_size ! maximal step size.
-         integer, intent(in) :: max_steps ! maximal number of allowed steps.
+         real(dp), intent(in) :: max_step_size  ! maximal step size.
+         integer, intent(in) :: max_steps  ! maximal number of allowed steps.
          ! absolute and relative error tolerances
-         real(dp), intent(inout) :: rtol(*) ! relative error tolerance(s)
-         real(dp), intent(inout) :: atol(*) ! absolute error tolerance(s)
-         integer, intent(in) :: itol ! switch for rtol and atol
-         real(dp), intent(in) :: x_min, x_max ! bounds on allowed values
-         integer, intent(in) :: which_decsol ! from mtx_def
+         real(dp), intent(inout) :: rtol(*)  ! relative error tolerance(s)
+         real(dp), intent(inout) :: atol(*)  ! absolute error tolerance(s)
+         integer, intent(in) :: itol  ! switch for rtol and atol
+         real(dp), intent(in) :: x_min, x_max  ! bounds on allowed values
+         integer, intent(in) :: which_decsol  ! from mtx_def
          integer, intent(in) :: caller_id
-         interface ! subroutine called after each successful step
+         interface  ! subroutine called after each successful step
             include "num_solout.dek"
          end interface
          integer, intent(in)  :: iout
@@ -147,7 +141,7 @@
          end if
 
          ijac = 1
-         mljac = nvar ! square matrix
+         mljac = nvar  ! square matrix
          mujac = nvar
 
          imas = 0
@@ -195,8 +189,8 @@
          t = 0
          tend = times(ntimes)
 
-         rpar(r_burn_const_P_rho) = 1d-99 ! dummy value, will be calculated later
-         rpar(r_burn_const_P_pressure) = exp10(log10Ps_f1(1)) ! no interpolation yet
+         rpar(r_burn_const_P_rho) = 1d-99  ! dummy value, will be calculated later
+         rpar(r_burn_const_P_pressure) = exp10(log10Ps_f1(1))  ! no interpolation yet
          rpar(r_burn_const_P_temperature) = starting_temp
          rpar(r_burn_const_P_init_rho) = -1d99
          rpar(r_burn_const_P_init_lnS) = -1d99
@@ -291,10 +285,10 @@
          subroutine burn_derivs(nvar, t, h, v, f, lrpar, rpar, lipar, ipar, ierr)
             integer, intent(in) :: nvar, lrpar, lipar
             real(dp), intent(in) :: t, h
-            real(dp), intent(inout) :: v(:) ! (nvar)
-            real(dp), intent(inout) :: f(:) ! (nvar) ! dvdt
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            real(dp), intent(inout) :: v(:)  ! (nvar)
+            real(dp), intent(inout) :: f(:)  ! (nvar) ! dvdt
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             integer, intent(out) :: ierr
             integer, parameter :: ld_dfdv = 0
             real(dp) :: dfdv(ld_dfdv,nvar)
@@ -315,8 +309,8 @@
             real(dp), intent(in) :: time, h
             real(dp), intent(inout) :: v(:)
             real(dp), intent(inout) :: f(:), dfdv(:,:)
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             integer, intent(out) :: ierr
 
             integer :: net_handle, num_reactions, eos_handle
@@ -336,7 +330,7 @@
             real(dp), target :: eps_nuc_categories(num_categories)
             logical :: rates_only, skip_jacobian
             integer :: screening_mode, i, num_isos
-            integer(8) :: time0, time1, clock_rate
+            integer(i8) :: time0, time1, clock_rate
 
             real(dp) :: xh, Y, z, Cp, rate_limit
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
@@ -409,7 +403,7 @@
                call system_clock(time0,clock_rate)
             else
                time0 = 0
-            endif
+            end if
 
             call eosPT_get( &
                eos_handle, &
@@ -545,10 +539,10 @@
             real(dp), intent(inout) :: y(n)
             integer, intent(out) :: ia(:), ja(:)
             real(dp), intent(inout) :: f(:), values(:)
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-            integer, intent(out) :: ierr ! nonzero means terminate integration
-            real(dp), pointer :: dfdv(:,:) ! (n,n)
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+            integer, intent(out) :: ierr  ! nonzero means terminate integration
+            real(dp), pointer :: dfdv(:,:)  ! (n,n)
             integer :: ld_dfdv, nz, i, j, cnt, nnz
             include 'formats'
             !write(*,1) 'burn_sjac', x

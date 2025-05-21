@@ -18,9 +18,9 @@ The (xz compressed) directory RCrB_GS98 contains the opacity files
 obtained from the webform.  The preprocessing steps
 
 .. code-block:: sh
-  
+
     tar xf RCrB_GS98.tar.xz
-    $MESA_DIR/kap/preprocessor/AESOPUS/aesopus.py RCrB_GS98.yaml
+    $MESA_DIR/kap/preprocessor/AESOPUS/aesopus.py RCrB_GS98.yml
 
 generated the AESOPUS_GS98_RCrB.h5 file.  This is the opacity file
 that is read by MESA.  The .dat files in the RCrB_GS98 tarball are
@@ -53,7 +53,7 @@ Click to see a larger plot:
 .. image:: ../../../star/test_suite/R_CrB_star/docs/grid1-000709.svg
    :width: 100%
 
-.. |Weiss1987| replace:: `Weiss (1987) <https://ui.adsabs.harvard.edu/abs/1987A%26A...185..165W/abstract>`__           
+.. |Weiss1987| replace:: `Weiss (1987) <https://ui.adsabs.harvard.edu/abs/1987A%26A...185..165W/abstract>`__
 .. |Schwab2019| replace:: `Schwab (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...885...27S/abstract>`__
 
 

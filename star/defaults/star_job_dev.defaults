@@ -28,8 +28,8 @@
     change_RSP2_flag_at_model_number = -111
     new_RSP2_flag = .false.
     create_RSP2_model = .false.
-    
-    
+
+
       ! remove_surface_by_relax_to_star_cut
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_do_jrot
@@ -40,7 +40,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
-      
+
     remove_surface_by_relax_to_star_cut = .false.
     remove_surface_do_jrot = .false.
     remove_surface_do_entropy = .true.
@@ -117,7 +117,8 @@
 
     save_photo_number = -1
     save_photo_filename = ''
-!   !save_photo_when_terminate = .true.
+
+!   ! save_photo_when_terminate = .true.
 
       ! create_merger_model !!! EXPERIMENTAL
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

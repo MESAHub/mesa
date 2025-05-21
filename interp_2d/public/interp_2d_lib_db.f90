@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -30,7 +24,7 @@ module interp_2d_lib_db
 
    implicit none
 
-contains ! the procedure interface for the library
+contains  ! the procedure interface for the library
    ! client programs should only call these routines.
 
 ! contents
@@ -79,7 +73,7 @@ contains ! the procedure interface for the library
 ! ***********************************************************************
 ! ***********************************************************************
 
-! cubic shepard method for bivariate interpolation of scattered data.
+! cubic Shepard method for bivariate interpolation of scattered data.
 ! from acm algorithm 790., acm trans. math. software (25) 1999, 70-73.
 ! robert j. renka
 ! dept. of computer science
@@ -135,18 +129,18 @@ contains ! the procedure interface for the library
       use bicub_db, only: do_mkbicub_db
       integer, intent(in) :: nx                        ! length of x vector
       integer, intent(in) :: ny                        ! length of y vector
-      real(dp), intent(in) :: x(:) ! (nx)              ! x vector, strict ascending
-      real(dp), intent(in) :: y(:) ! (ny)              ! y vector, strict ascending
+      real(dp), intent(in) :: x(:)  ! (nx)              ! x vector, strict ascending
+      real(dp), intent(in) :: y(:)  ! (ny)              ! y vector, strict ascending
       integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2 >= nx
-      real(dp), intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & spline coefficients
+      real(dp), intent(inout), pointer :: f1(:)  ! =(4,nf2,ny)   ! data & spline coefficients
       integer, intent(in) :: ibcxmin                   ! bc flag for x=xmin
-      real(dp), intent(in) :: bcxmin(:) ! (ny)         ! bc data vs. y at x=xmin
+      real(dp), intent(in) :: bcxmin(:)  ! (ny)         ! bc data vs. y at x=xmin
       integer, intent(in) :: ibcxmax                   ! bc flag for x=xmax
-      real(dp), intent(in) :: bcxmax(:) ! (ny)         ! bc data vs. y at x=xmax
+      real(dp), intent(in) :: bcxmax(:)  ! (ny)         ! bc data vs. y at x=xmax
       integer, intent(in) :: ibcymin                   ! bc flag for y=ymin
-      real(dp), intent(in) :: bcymin(:) ! (nx)         ! bc data vs. x at y=ymin
+      real(dp), intent(in) :: bcymin(:)  ! (nx)         ! bc data vs. x at y=ymin
       integer, intent(in) :: ibcymax                   ! bc flag for y=ymax
-      real(dp), intent(in) :: bcymax(:) ! (nx)         ! bc data vs. x at y=ymax
+      real(dp), intent(in) :: bcymax(:)  ! (nx)         ! bc data vs. x at y=ymax
       integer, intent(out) :: ilinx                    ! =1: x grid is "nearly" equally spaced
       integer, intent(out) :: iliny                    ! =1: y grid is "nearly" equally spaced
       integer, intent(out) :: ierr                     ! =0 on exit if there is no error.
@@ -159,8 +153,8 @@ contains ! the procedure interface for the library
       use bicub_db, only: fvbicub_db, herm2xy_db
       integer, intent(in) :: nx, ny                    ! grid sizes
       real(dp), intent(in) :: xget, yget               ! target of this interpolation
-      real(dp), intent(in) :: x(:) ! (nx)              ! ordered x grid
-      real(dp), intent(in) :: y(:) ! (ny)              ! ordered y grid
+      real(dp), intent(in) :: x(:)  ! (nx)              ! ordered x grid
+      real(dp), intent(in) :: y(:)  ! (ny)              ! ordered y grid
       integer, intent(in) :: ilinx                     ! ilinx=1 => assume x evenly spaced
       integer, intent(in) :: iliny                     ! iliny=1 => assume y evenly spaced
       integer, intent(in) :: inf2
@@ -170,7 +164,7 @@ contains ! the procedure interface for the library
       integer, intent(out) :: ierr                     ! error code =0 ==> no error
       integer :: i, j
       integer :: ii(1), jj(1)
-      real(dp) xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1)
+      real(dp) :: xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1)
       call herm2xy_db(xget, yget, x, nx, y, ny, ilinx, iliny, i, j, xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1), ierr)
       if (ierr /= 0) return
       ii(1) = i
@@ -181,9 +175,9 @@ contains ! the procedure interface for the library
    ! this is used by do_mkbicub_db to get 2nd derivatives d_dx2 and d_dy2
    subroutine interp_mkspline_db(x, nx, fspl, ibcxmin, bcxmin, ibcxmax, bcxmax, ilinx, ierr)
       use bicub_db, only: mkspline_db
-      integer, intent(in) :: nx ! no. of data points
-      real(dp), intent(in) :: x(nx) ! x axis data, strict ascending order
-      real(dp), intent(inout) :: fspl(2, nx) ! f(1,*): data in; f(2,*): coeffs out
+      integer, intent(in) :: nx  ! no. of data points
+      real(dp), intent(in) :: x(nx)  ! x axis data, strict ascending order
+      real(dp), intent(inout) :: fspl(2, nx)  ! f(1,*): data in; f(2,*): coeffs out
       integer, intent(in) :: ibcxmin                   ! b.c. flag @ x=xmin=x(1)
       real(dp), intent(in) :: bcxmin                   ! b.c. data @xmin
       integer, intent(in) :: ibcxmax                   ! b.c. flag @ x=xmax=x(nx)
@@ -205,10 +199,10 @@ contains ! the procedure interface for the library
       use bipm_db, only: do_mkbipm_db
       integer, intent(in) :: nx                        ! length of x vector
       integer, intent(in) :: ny                        ! length of y vector
-      real(dp), intent(in), pointer :: x(:) ! (nx)     ! x vector, strict ascending
-      real(dp), intent(in), pointer :: y(:) ! (ny)     ! y vector, strict ascending
+      real(dp), intent(in), pointer :: x(:)  ! (nx)     ! x vector, strict ascending
+      real(dp), intent(in), pointer :: y(:)  ! (ny)     ! y vector, strict ascending
       integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2 >= nx
-      real(dp), intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & interpolant coefficients
+      real(dp), intent(inout), pointer :: f1(:)  ! =(4,nf2,ny)   ! data & interpolant coefficients
       integer, intent(out) :: ierr                     ! =0 on exit if there is no error.
       call do_mkbipm_db(x, nx, y, ny, f1, nf2, ierr)
    end subroutine interp_mkbipm_db
@@ -217,10 +211,10 @@ contains ! the procedure interface for the library
       use bipm_db, only: do_evbipm_db
       integer, intent(in) :: nx, ny
       real(dp), intent(in) :: xget, yget               ! target of this interpolation
-      real(dp), intent(in), pointer :: x(:) ! (nx)     ! ordered x grid
-      real(dp), intent(in), pointer :: y(:) ! (ny)     ! ordered y grid
+      real(dp), intent(in), pointer :: x(:)  ! (nx)     ! ordered x grid
+      real(dp), intent(in), pointer :: y(:)  ! (ny)     ! ordered y grid
       integer, intent(in) :: nf2
-      real(dp), intent(in), pointer :: f1(:) ! =(4,nf2,ny)   ! function data
+      real(dp), intent(in), pointer :: f1(:)  ! =(4,nf2,ny)   ! function data
       real(dp), intent(out) :: z
       integer, intent(out) :: ierr                     ! error code =0 ==> no error
       call do_evbipm_db(xget, yget, x, nx, y, ny, f1, nf2, z, ierr)

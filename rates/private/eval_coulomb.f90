@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2013-2021  Josiah Schwab & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -48,12 +42,11 @@ contains
 
     use rates_def, only: Coulomb_Info, which_mui_coulomb
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     select case (which_mui_coulomb)
     case (None)
@@ -77,12 +70,11 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     ! calculate the chemical potential of an ion
 
@@ -108,7 +100,7 @@ contains
 
     ! ratios for convenience
     zr = Z/cc% zbar
-    zr_m1o3 = pow(zr,-1d0/3d0) ! zr to the minus 1/3 power
+    zr_m1o3 = pow(zr,-1d0/3d0)  ! zr to the minus 1/3 power
 
     ! evaluate mu(Z); C&L eq. (11)
     mu = -zr * (gamma * (c0 + (c1  + c2 * zr_m1o3) * zr_m1o3) + &
@@ -123,12 +115,11 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     ! calculate the chemical potential of an ion
 
@@ -164,12 +155,11 @@ contains
 
     ! calculate the chemical potential of an ion
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     type(auto_diff_real_2var_order1) :: gamma
 
@@ -195,7 +185,6 @@ contains
 
     function fii(gamma) result(f)
 
-      implicit none
 
       type(auto_diff_real_2var_order1), intent(in) :: gamma
       type(auto_diff_real_2var_order1) :: f
@@ -221,7 +210,6 @@ contains
 
     function fie(rs, gamma_e, Z) result(f)
 
-      implicit none
 
       type(auto_diff_real_2var_order1), intent(in) :: rs
       type(auto_diff_real_2var_order1), intent(in) :: gamma_e
@@ -271,12 +259,11 @@ contains
 
     use rates_def, only: Coulomb_Info, which_Vs_coulomb
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs  ! the screening potential in units of the fermi energy
 
     select case (which_Vs_coulomb)
     case (None)
@@ -299,12 +286,11 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs  ! the screening potential in units of the fermi energy
 
     ! this uses the thomas-fermi approximation, in the relativistic limit
     Vs = 2d0 * Z * fine * sqrt(fine/pi)
@@ -318,41 +304,40 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs  ! the screening potential in units of the fermi energy
 
     ! code from Itoh, N., Tomizawa, N., Tamamura, M., Wanajo, S., & Nozawa, S. 2002, ApJ, 579, 380
 
     integer :: i
     type(auto_diff_real_2var_order1) :: rs, rs0, s, fj
-    real(dp), dimension(11), parameter :: c(0:10) = (/ &
+    real(dp), dimension(11), parameter :: c(0:10) = [ &
         0.450861D-01, 0.113078D-02, 0.312104D-02, 0.864302D-03, &
         0.157214D-01, 0.816962D-01, 0.784921D-01,-0.680863D-01, &
-       -0.979967D-01, 0.204907D-01, 0.366713D-01 /)
+       -0.979967D-01, 0.204907D-01, 0.366713D-01 ]
 
     rs = cc% rs
 
     rs0=0
-    if(rs.lt.0.00001d0)then
+    if(rs<0.00001d0)then
        rs0=1d0-rs
        rs=0.00001d0
-    endif
+    end if
     s=(log10(rs)+3d0)/2d0
     fj=0
-    if(s.ne.0)then
+    if(s/=0)then
        do i=0,10
           fj=c(i)*pow(s,dble(i))+fj
-       enddo
+       end do
     else
        fj=c(0)
-    endif
-    if(rs0.ne.0)then
+    end if
+    if(rs0/=0)then
        rs=1d0-rs0
-    endif
+    end if
 
     Vs = 1.46d-2 * Z * fj
 

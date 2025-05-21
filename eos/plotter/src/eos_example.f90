@@ -4,7 +4,7 @@ program eos_plotter
    use eos_lib, only: eos_ptr, eosDT_get, eosDT_get_T_given_Ptotal
    use chem_def
    use chem_lib
-   use const_lib
+   use const_lib, only: const_init
    use math_lib
    use num_lib, only : dfridr
    use utils_lib, only: set_nan

@@ -1,24 +1,26 @@
 ! ***********************************************************************
-! Copyright (C) 2012  The MESA Team
-! This file is part of MESA.
-! MESA is free software; you can redistribute it and/or modify
-! it under the terms of the GNU General Library Public License as published
-! by the Free Software Foundation; either version 2 of the License, or
-! (at your option) any later version.
-! MESA is distributed in the hope that it will be useful,
-! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-! GNU Library General Public License for more details.
-! You should have received a copy of the GNU Library General Public License
-! along with this software; if not, write to the Free Software
-! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+!   Copyright (C) 2012  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
 ! ***********************************************************************
 
 ! derived from BCYCLIC as described in hirshman et. al.
 ! S.P.Hirshman, K.S.Perumalla, V.E.Lynch, & R.Sanchez,
 ! BCYCLIC: A parallel block tridiagonal matrix cyclic solver,
 ! J. Computational Physics, 229 (2010) 6392-6404.
-
 
       module bcyclic
 
@@ -34,29 +36,25 @@
       end type ulstore
 
       type(ulstore), pointer :: odd_storage(:) => null()
-
       logical, parameter :: dbg = .false.
-
       logical, parameter :: do_fill_with_NaNs = .false.
 
-
       contains
-
 
       subroutine bcyclic_factor ( &
             lblk1, dblk1, ublk1, ipivot1, brhs1, nvar, nz, sparse, &
             lrd, rpar_decsol, lid, ipar_decsol, ierr)
-         real(dp), pointer :: lblk1(:) ! row section of lower block
-         real(dp), pointer :: dblk1(:) ! row section of diagonal block
-         real(dp), pointer :: ublk1(:) ! row section of upper block
-         integer, pointer :: ipivot1(:) ! row section of pivot array for block factorization
-         real(dp), pointer :: brhs1(:) ! row section of rhs
-         integer, intent(in) :: nvar ! linear size of each block
-         integer, intent(in) :: nz ! number of block rows
+         real(dp), pointer :: lblk1(:)  ! row section of lower block
+         real(dp), pointer :: dblk1(:)  ! row section of diagonal block
+         real(dp), pointer :: ublk1(:)  ! row section of upper block
+         integer, pointer :: ipivot1(:)  ! row section of pivot array for block factorization
+         real(dp), pointer :: brhs1(:)  ! row section of rhs
+         integer, intent(in) :: nvar  ! linear size of each block
+         integer, intent(in) :: nz  ! number of block rows
          logical, intent(in) :: sparse
          integer, intent(in) :: lrd, lid
-         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
-         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
+         real(dp), pointer, intent(inout) :: rpar_decsol(:)  ! (lrd)
+         integer, pointer, intent(inout) :: ipar_decsol(:)  ! (lid)
          integer, intent(out) :: ierr
 
          integer, pointer :: nslevel(:), ipivot(:)
@@ -114,7 +112,7 @@
 
          if (dbg) write(*,*) 'start factor_cycle'
 
-         factor_cycle: do ! perform cyclic-reduction factorization
+         factor_cycle: do  ! perform cyclic-reduction factorization
 
             nslevel(nlevel) = nstemp
 
@@ -170,17 +168,17 @@
       subroutine bcyclic_solve ( &
             lblk1, dblk1, ublk1, ipivot1, brhs1, nvar, nz, sparse, &
             lrd, rpar_decsol, lid, ipar_decsol, ierr)
-         real(dp), pointer :: lblk1(:) ! row section of lower block
-         real(dp), pointer :: dblk1(:) ! row section of diagonal block
-         real(dp), pointer :: ublk1(:) ! row section of upper block
-         integer, pointer :: ipivot1(:) ! row section of pivot array for block factorization
+         real(dp), pointer :: lblk1(:)  ! row section of lower block
+         real(dp), pointer :: dblk1(:)  ! row section of diagonal block
+         real(dp), pointer :: ublk1(:)  ! row section of upper block
+         integer, pointer :: ipivot1(:)  ! row section of pivot array for block factorization
          real(dp), pointer :: brhs1(:)   ! row section of rhs
-         integer, intent(in) :: nvar ! linear size of each block
+         integer, intent(in) :: nvar  ! linear size of each block
          integer, intent(in) :: nz     ! number of block rows
          logical, intent(in) :: sparse
          integer, intent(in) :: lrd, lid
-         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
-         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
+         real(dp), pointer, intent(inout) :: rpar_decsol(:)  ! (lrd)
+         integer, pointer, intent(inout) :: ipar_decsol(:)  ! (lid)
          integer, intent(out) :: ierr
 
          integer, pointer :: nslevel(:), ipivot(:)
@@ -587,20 +585,19 @@
       subroutine bcyclic_deallocate ( &
             lblk1, dblk1, ublk1, ipivot1, brhs1, nvar, nz, sparse, &
             lrd, rpar_decsol, lid, ipar_decsol, ierr)
-         real(dp), pointer :: lblk1(:) ! row section of lower block
-         real(dp), pointer :: dblk1(:) ! row section of diagonal block
-         real(dp), pointer :: ublk1(:) ! row section of upper block
-         integer, pointer :: ipivot1(:) ! row section of pivot array for block factorization
-         real(dp), pointer :: brhs1(:) ! row section of rhs
-         integer, intent(in) :: nvar ! linear size of each block
-         integer, intent(in) :: nz ! number of block rows
+         real(dp), pointer :: lblk1(:)  ! row section of lower block
+         real(dp), pointer :: dblk1(:)  ! row section of diagonal block
+         real(dp), pointer :: ublk1(:)  ! row section of upper block
+         integer, pointer :: ipivot1(:)  ! row section of pivot array for block factorization
+         real(dp), pointer :: brhs1(:)  ! row section of rhs
+         integer, intent(in) :: nvar  ! linear size of each block
+         integer, intent(in) :: nz  ! number of block rows
          logical, intent(in) :: sparse
          integer, intent(in) :: lrd, lid
-         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
-         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
+         real(dp), pointer, intent(inout) :: rpar_decsol(:)  ! (lrd)
+         integer, pointer, intent(inout) :: ipar_decsol(:)  ! (lid)
          integer, intent(out) :: ierr
          ierr = 0
       end subroutine bcyclic_deallocate
-
 
       end module bcyclic

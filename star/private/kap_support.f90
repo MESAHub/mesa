@@ -2,50 +2,35 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module kap_support
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, ln10
   use auto_diff
-
-  ! No implicit typing
 
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: prepare_kap
   public :: setup_for_op_mono
   public :: fraction_of_op_mono
   public :: frac_op_mono
   public :: get_kap
-
-  ! Procedures
 
 contains
 
@@ -61,7 +46,6 @@ contains
 
   end subroutine prepare_kap
 
-  !****
 
   subroutine setup_for_op_mono(s, check_if_need, ierr)
 
@@ -79,7 +63,7 @@ contains
     include 'formats'
 
     ierr = 0
-    if (s% op_mono_n > 0) return ! already setup
+    if (s% op_mono_n > 0) return  ! already setup
 
     if (check_if_need) then
        if (s% high_logT_op_mono_full_off < 0d0 .or. &
@@ -132,7 +116,6 @@ contains
 
   end subroutine setup_for_op_mono
 
-  !****
 
   real(dp) function fraction_of_op_mono(s, k) result(beta)
     ! returns the real(dp) value of the blend function for cell k
@@ -142,7 +125,7 @@ contains
     type(auto_diff_real_2var_order1) :: frac
 
     if (s% op_mono_method == 'mombarg' .and. k < 2) then
-       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+       beta = 0d0  ! don't use 'mombarg' op mono method for atmospheres
     else
        frac = frac_op_mono(s, s% lnd(k)/ln10, s% lnT(k)/ln10)
     end if
@@ -151,7 +134,6 @@ contains
 
   end function fraction_of_op_mono
 
-  !****
 
   type(auto_diff_real_2var_order1) function frac_op_mono(s, logRho, logT) result(beta)
     ! returns an auto_diff type: var1 = lnd, var2 = lnT (derivs w.r.t. ln *not* log)
@@ -197,13 +179,13 @@ contains
        alfa = 1d0
     else if (log10_T <= high_full_on .and. log10_T >= low_full_on) then
        alfa = 0d0
-    else if (log10_T > high_full_on) then ! between high_on and high_off
+    else if (log10_T > high_full_on) then  ! between high_on and high_off
        if (high_full_off - high_full_on > 1d-10) then
           alfa = (log10_T - high_full_on) / (high_full_off - high_full_on)
        else
           alfa = 1d0
        end if
-    else ! between low_off and low_on
+    else  ! between low_off and low_on
        if (low_full_on - low_full_off > 1d-10) then
           alfa = (log10_T - low_full_on) / (low_full_off - low_full_on)
        else
@@ -218,7 +200,6 @@ contains
 
   end function frac_op_mono
 
-  !****
 
   subroutine get_kap( &
        s, k, zbar, xa, logRho, logT, &
@@ -326,7 +307,7 @@ contains
     end if
 
     if (s% op_mono_method == 'mombarg' .and. k < 2) then
-       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+       beta = 0d0  ! don't use 'mombarg' op mono method for atmospheres
     else
        beta = frac_op_mono(s, logRho, logT)
     end if
@@ -346,7 +327,7 @@ contains
 
          if (associated(s% op_mono_umesh1)) then
 
-            thread_num = utils_OMP_GET_THREAD_NUM() ! in range 0 to op_mono_n-1
+            thread_num = utils_OMP_GET_THREAD_NUM()  ! in range 0 to op_mono_n-1
             if (thread_num < 0) then
                write(*,3) 'thread_num < 0', thread_num, s% op_mono_n
                ierr = -1
@@ -431,7 +412,7 @@ contains
 
       else if (s% op_mono_method == 'mombarg') then
          fk = 0
-         if (logT > 3.5 .and. logT < 8.0) then
+         if (logT > 3.5d0 .and. logT < 8.0d0) then
             do i=1, s% species
                e_name = chem_isos% name(s% chem_id(i))
                if (e_name == 'h1')  fk(1)  =  xa(i)/ chem_isos% W(s% chem_id(i))
@@ -457,7 +438,7 @@ contains
                  fk, logT, logRho, &
                  zbar, lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                  kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
-         endif
+         end if
       else
          write(*,*) 'Invalid argument for op_mono_method.'
          stop

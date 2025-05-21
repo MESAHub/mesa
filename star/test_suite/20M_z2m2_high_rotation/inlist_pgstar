@@ -1,7 +1,7 @@
 
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
 pgstar_interval = 1
 pgstar_show_age_in_years = .true.
@@ -285,7 +285,7 @@ Text_Summary1_name(3,5) = 'CO_core'
 
 Text_Summary1_name(4,1) = 'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'
-Text_Summary1_name(4,3) = 'lg_Lnuc'
+Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'Fe_core'
 
@@ -677,13 +677,6 @@ pgstar_model_fjust = 1.0
 ! white_on_black flags -- true means white foreground color on black background
 file_white_on_black_flag = .true.
 file_device = 'png'            ! options 'png' and 'vcps' for png and postscript respectively
-file_extension = 'png'           ! common names are 'png' and 'ps'
-
-
-!file_white_on_black_flag = .false.
-!file_device = 'vcps'            ! options 'png' and 'vcps' for png and postscript respectively
-!file_extension = 'ps'           ! common names are 'png' and 'ps'
-
 
 
 / ! end of pgstar namelist

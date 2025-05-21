@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -89,7 +83,7 @@
             write(*,'(A)')
          end if
 
-         do ! skip to line starting with 'from '
+         do  ! skip to line starting with 'from '
             read(iounit,'(a)',iostat=ierr) string
             if (failed('read weak info comments')) return
             if (len_trim(string) > 4) then
@@ -101,7 +95,7 @@
          allocate(weak_info_list_halflife(max_num_weak_info))
          allocate(weak_info_list_Qneu(max_num_weak_info))
          num_weak_info_list_reactions = 0
-         do i = 1, max_num_weak_info ! keep reading until end of file
+         do i = 1, max_num_weak_info  ! keep reading until end of file
             read(iounit,fmt='(a5,a5,a)',iostat=ierr) lhs, rhs, string
             if (ierr == 0) then
                call str_to_vector(string, vec, nvec, ierr)
@@ -170,9 +164,9 @@
 
          integer, parameter :: weak_num_T9 = 12, weak_num_lYeRho = 11
          real(dp), parameter :: weak_reaction_T9s(weak_num_T9) = &
-            (/ 0.01d0, 0.1d0, 0.2d0, 0.4d0, 0.7d0, 1.0d0, 1.5d0, 2.0d0, 3.0d0, 5.0d0, 10.0d0, 30.0d0 /)
+            [ 0.01d0, 0.1d0, 0.2d0, 0.4d0, 0.7d0, 1.0d0, 1.5d0, 2.0d0, 3.0d0, 5.0d0, 10.0d0, 30.0d0 ]
          real(dp), parameter :: weak_reaction_lYeRhos(weak_num_lYeRho) = &
-            (/ 1.0d0, 2.0d0, 3.0d0, 4.0d0, 5.0d0, 6.0d0, 7.0d0, 8.0d0, 9.0d0, 10.0d0, 11.0d0 /)
+            [ 1.0d0, 2.0d0, 3.0d0, 4.0d0, 5.0d0, 6.0d0, 7.0d0, 8.0d0, 9.0d0, 10.0d0, 11.0d0 ]
 
          integer, parameter :: i_ldecay = 1, i_lcapture = 2, i_lneutrino = 3
 
@@ -188,13 +182,13 @@
             ios = 0
             open(newunit=iounit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
-            if (ios == 0) then ! opened it okay
+            if (ios == 0) then  ! opened it okay
                call read_weak_cache(iounit,ios)
                close(iounit)
             end if
          end if
 
-         if (ios /= 0) then ! need to read data file
+         if (ios /= 0) then  ! need to read data file
 
             filename = trim(weak_data_dir) // '/weakreactions.tables'
             ierr = 0
@@ -210,7 +204,7 @@
                write(*,'(A)')
             end if
 
-            do ! skip to after line starting with '='
+            do  ! skip to after line starting with '='
                read(iounit,'(a)',iostat=ierr) string
                if (failed('read header')) return
                if (len_trim(string) > 0) then
@@ -230,7 +224,7 @@
 
             do i = 1, num_weak_reactions
                if (.not. skip_line()) return
-               if (mod(i,2)==1) then ! first of pair
+               if (mod(i,2)==1) then  ! first of pair
                   if (.not. skip_line()) return
                   if (.not. skip_line()) return
                   read(iounit,fmt='(2a5)',iostat=ierr) lhs1, rhs1
@@ -498,7 +492,7 @@
         dir = rates_table_dir
         filename = trim(dir) // '/weak_rate_list.txt'
         open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-        if (ierr /= 0) then ! if don't find that file, look in rates_dir
+        if (ierr /= 0) then  ! if don't find that file, look in rates_dir
            dir = trim(rates_dir) // '/rate_tables'
            filename = trim(dir) // '/weak_rate_list.txt'
            ierr = 0
@@ -638,7 +632,6 @@
           call hi% final()
 
         end subroutine read_hd5_file
-
 
 
         subroutine extend

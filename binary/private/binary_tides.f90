@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2013-2019  Pablo Marchant & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -24,7 +21,7 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, pi, pi4, secyer, rsun, msun, one_third, standard_cgrav, convective_mixing
       use utils_lib
       use math_lib
       use binary_def
@@ -39,10 +36,10 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         real(dp) :: osep ! orbital separation (cm)
-         real(dp) :: qratio ! mass_other_star/mass_this_star
-         real(dp) :: rlr ! roche lobe radius (cm)
-         real(dp) :: dt_next ! next timestep
+         real(dp) :: osep  ! orbital separation (cm)
+         real(dp) :: qratio  ! mass_other_star/mass_this_star
+         real(dp) :: rlr  ! roche lobe radius (cm)
+         real(dp) :: dt_next  ! next timestep
          real(dp) :: Ftid  ! efficiency of tidal synchronization. (time scale × FSYNC).
          character (len=strlen) :: sync_type
          character (len=strlen) :: sync_mode
@@ -97,14 +94,14 @@
          ! initially based on spiba.f kindly provided by Norbert Langer and group.
          integer, intent(in) :: id
          integer, intent(in) :: nz
-         real(dp), intent(in) :: osep ! orbital separation (cm)
-         real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
-         real(dp), intent(in) :: rl ! roche lobe radius (cm)
-         real(dp), intent(in) :: dt_next ! next timestep
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
+         real(dp), intent(in) :: osep  ! orbital separation (cm)
+         real(dp), intent(in) :: qratio  ! mass_other_star/mass_this_star
+         real(dp), intent(in) :: rl  ! roche lobe radius (cm)
+         real(dp), intent(in) :: dt_next  ! next timestep
+         real(dp), intent(in) :: Ftid  ! efficiency of tidal synchronization. (time scale / Ftid ).
 
-         character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-         character (len=strlen), intent(in) :: sync_mode ! where to put/take angular momentum
+         character (len=strlen), intent(in) :: sync_type  ! synchronization timescale
+         character (len=strlen), intent(in) :: sync_mode  ! where to put/take angular momentum
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -159,7 +156,7 @@
             j_sync(k) = omega_orb*s% i_rot(k)% val
          end do
 
-         if (sync_type == "Instantaneous") then ! instantaneous synchronisation
+         if (sync_type == "Instantaneous") then  ! instantaneous synchronisation
             do k=1,nz
                delta_j(k) = s% j_rot(k) - j_sync(k)
             end do
@@ -188,7 +185,7 @@
                   cv_face = star_interp_val_to_pt(s% cv,k,nz,s% dq,"binary_tides")
                   T_face = star_interp_val_to_pt(s% T,k,nz,s% dq,"binary_tides")
                   csound_face = star_interp_val_to_pt(s% csound,k,nz,s% dq,"binary_tides")
-                  tkh = pi4*s% r(k)*s% r(k)*rho_face*cv_face*T_face/s% L(k) ! (4.4)
+                  tkh = pi4*s% r(k)*s% r(k)*rho_face*cv_face*T_face/s% L(k)  ! (4.4)
                   tdyn = 1/csound_face
                   tdyn_div_tkh(k) = tdyn/tkh
                end do
@@ -326,12 +323,12 @@
 
       subroutine get_tsync(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
          integer, intent(in) :: id
-         character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
-         real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
+         character (len=strlen), intent(in) :: sync_type  ! synchronization timescale
+         real(dp), intent(in) :: Ftid  ! efficiency of tidal synchronization. (time scale / Ftid ).
+         real(dp), intent(in) :: qratio  ! mass_other_star/mass_this_star
          real(dp), intent(in) :: m
          real(dp), intent(in) :: r_phot
-         real(dp), intent(in) :: osep ! orbital separation (cm)
+         real(dp), intent(in) :: osep  ! orbital separation (cm)
          real(dp), intent(out) :: t_sync
          integer, intent(out) :: ierr
          real(dp) :: rGyr_squared, moment_of_inertia, kdivt
@@ -378,8 +375,8 @@
             t_sync = 3d0*kdivt*(qratio*qratio/rGyr_squared)*pow6(r_phot/osep)
             ! invert it.
             t_sync = 1d0/t_sync
-         else if (sync_type == "Orb_period") then ! sync on timescale of orbital period
-            t_sync = b% period ! synchronize on timescale of orbital period
+         else if (sync_type == "Orb_period") then  ! sync on timescale of orbital period
+            t_sync = b% period  ! synchronize on timescale of orbital period
          else
             ierr = -1
             write(*,*) 'unrecognized sync_type', sync_type
@@ -395,7 +392,7 @@
          integer, intent(out) :: ierr
 
          integer :: k
-         real(dp) osep, qratio, m, r_phot,porb, m_env, r_env, tau_conv, P_tid, f_conv
+         real(dp) :: osep, qratio, m, r_phot,porb, m_env, r_env, tau_conv, P_tid, f_conv
          real(dp) :: e2
 
          ierr = 0

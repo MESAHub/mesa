@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2012  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module solve_omega_mix
 
       use star_private_def
-      use const_def
+      use const_def, only: qp, dp, i8
 
       implicit none
 
@@ -45,15 +39,14 @@
 
          integer :: ierr, nz, k, max_iters_per_substep, &
             max_iters_total, total_num_iters, num_iters
-         integer(8) :: time0
+         integer(i8) :: time0
          integer :: steps_used, max_steps, min_steps
          real(qp) :: remaining_time, total_time, time, dt, &
             J_tot0, J_tot1, max_del, avg_del, &
             tol_correction_max, tol_correction_norm
          real(dp) :: total
          real(dp), pointer, dimension(:) :: am_sig_omega, am_sig_j
-         real(qp), pointer, dimension(:) :: &
-            du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del
+         real(qp), pointer, dimension(:) :: du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del
          logical :: okay, recalc_mixing_info_each_substep
          logical, parameter :: dbg = .false.
 
@@ -182,7 +175,7 @@
             else
                dt = min(dt, 0.5d0*remaining_time)
             end if
-            if (steps_used >= max_steps) dt = remaining_time ! just go for it
+            if (steps_used >= max_steps) dt = remaining_time  ! just go for it
             if (dbg) write(*,3) 'mix dt', &
                   s% model_number, steps_used, dt, dt/remaining_time
 
@@ -251,7 +244,7 @@
                   if (dbg) &
                      write(*,3) 'substep converged: iters max_del avg_del dt/total', &
                         steps_used, num_iters, max_del, avg_del, dt/total_time
-                  exit solve_loop ! this substep is done
+                  exit solve_loop  ! this substep is done
                end if
 
                if (num_iters == max_iters_per_substep) then
@@ -301,7 +294,7 @@
                   associated(s% binary_other_torque))) then
 
                ! check conservation for cases with no extra torque
-               J_tot1 = total_angular_momentum(s) ! what we have
+               J_tot1 = total_angular_momentum(s)  ! what we have
 
                if (abs(J_tot0 - J_tot1) > s% angular_momentum_error_retry*abs(J_tot0)) then
                   s% retry_message = 'retry: failed to conserve angular momentum in mixing'
@@ -403,7 +396,6 @@
 
 
          subroutine solve_tridiag(sub, diag, sup, rhs, x, n, ierr)
-            implicit none
             !      sub - sub-diagonal
             !      diag - the main diagonal
             !      sup - sup-diagonal
@@ -443,7 +435,7 @@
 
          real(dp) function min_mixing_timescale() result(dt)
             integer :: k
-            real(dp) :: & ! use dp instead of qp to get same answer in ifort and gfortran
+            real(dp) :: &  ! use dp instead of qp to get same answer in ifort and gfortran
                omega, irot, irot_mid_00, am_sig_omega_00, c_omega_00, del00_omega, &
                omega_mid_00, am_sig_irot_00, c_irot_00, del00_irot, &
                dmbar, irot_mid_m1, am_sig_omega_m1, c_omega_m1, delm1_omega, &
@@ -672,10 +664,6 @@
 
          end subroutine create_matrix_and_rhs
 
-
       end function do_solve_omega_mix
 
-
       end module solve_omega_mix
-
-

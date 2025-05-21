@@ -136,7 +136,7 @@ x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
    !pause_interval = 5
    pgstar_interval = 1
       

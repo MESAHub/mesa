@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -70,7 +64,7 @@ contains
       integer, intent(in) :: id
       integer, intent(out) :: ierr
 
-      integer, parameter :: num_Other_plots = 1 ! can have up to max_num_Other_plots
+      integer, parameter :: num_Other_plots = 1  ! can have up to max_num_Other_plots
       integer :: i, plot_id
       type(pgstar_win_file_data), pointer :: p
       type(star_info), pointer :: s
@@ -107,27 +101,27 @@ contains
       my_win_flag = .false.
 
       my_win_width = 7
-      my_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+      my_win_aspect_ratio = 0.62  ! aspect_ratio = height/width
 
-      my_xaxis_by = 'mass' ! same choices as for main window xaxis_by
-      my_xmin = -101 ! only used if > -100
-      my_xmax = -101 ! only used if > -100
+      my_xaxis_by = 'mass'  ! same choices as for main window xaxis_by
+      my_xmin = -101  ! only used if > -100
+      my_xmax = -101  ! only used if > -100
 
-      my_ymin_left = -101 ! only used if > -100
-      my_ymax_left = -101 ! only used if > -100
-      my_dymin_left = -101 ! only used if > -100
+      my_ymin_left = -101  ! only used if > -100
+      my_ymax_left = -101  ! only used if > -100
+      my_dymin_left = -101  ! only used if > -100
 
-      my_ymin_right = -101 ! only used if > -100
-      my_ymax_right = -101 ! only used if > -100
-      my_dymin_right = -101 ! only used if > -100
+      my_ymin_right = -101  ! only used if > -100
+      my_ymax_right = -101  ! only used if > -100
+      my_dymin_right = -101  ! only used if > -100
 
       ! file output
       my_file_flag = .false.
       my_file_dir = 'pgstar_out'
       my_file_prefix = 'profile'
-      my_file_interval = 5 ! output when mod(model_number,my_file_interval)==0
-      my_file_width = -1 ! negative means use same value as for window
-      my_file_aspect_ratio = -1 ! negative means use same value as for window
+      my_file_interval = 5  ! output when mod(model_number,my_file_interval)==0
+      my_file_width = -1  ! negative means use same value as for window
+      my_file_aspect_ratio = -1  ! negative means use same value as for window
 
    end subroutine set_my_namelist_defaults
 
@@ -200,7 +194,7 @@ contains
                          winxmin, winxmax, winymin, winymax, label_scale, ierr)
 
       use utils_lib
-      use const_def
+      use const_def, only: dp, ln10
 
       type(star_info), pointer :: s
       integer, intent(in) :: device_id
@@ -248,6 +242,7 @@ contains
    contains
 
       subroutine plot(ierr)
+         use pgstar_colors
          use rates_def, only: i_rate
          use chem_def, only: ipp, icno
          integer, intent(out) :: ierr
@@ -275,7 +270,7 @@ contains
          call pgmtxt('T', 1.8, 0.9, 0.5, str)
 
          ! xlabel
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(label_scale)
          call show_pgstar_xaxis_by(s, my_xaxis_by, ierr)
          if (ierr /= 0) return
@@ -318,7 +313,7 @@ contains
 
          call pgswin(xleft, xright, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(label_scale)
          call pgbox('', 0.0, 0, 'BNSTV', 0.0, 0)
 
@@ -377,7 +372,7 @@ contains
          call pgswin(xleft, xright, ymin, ymax)
 
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(label_scale)
          call pgbox('BCNST', 0.0, 0, 'CMSTV', 0.0, 0)
 
@@ -426,4 +421,3 @@ end module sample_pgstar_plot
 !
 !
 !/ ! end of my_pgstar namelist
-

@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2018-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module hydro_energy
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi, pi4
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -40,8 +33,7 @@
 
       contains
 
-
-      subroutine do1_energy_eqn( & ! energy conservation
+      subroutine do1_energy_eqn( &  ! energy conservation
             s, k, do_chem, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
@@ -92,7 +84,7 @@
          ierr = 0
          call init
 
-         call setup_eps_grav(ierr); if (ierr /= 0) return ! do this first - it sets eps_grav_form
+         call setup_eps_grav(ierr); if (ierr /= 0) return  ! do this first - it sets eps_grav_form
          call setup_de_dt_and_friends(ierr); if (ierr /= 0) return
          call setup_dwork_dm(ierr); if (ierr /= 0) return
          call setup_dL_dm(ierr); if (ierr /= 0) return
@@ -107,7 +99,7 @@
          s% energy_others(k) = others_ad%val
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix, eps_phase_separation
          ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
-         if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
+         if (eps_grav_form) then  ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad + eps_grav_ad
          else if (s% using_velocity_time_centering .and. &
@@ -118,8 +110,8 @@
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - dke_dt_ad - dpe_dt_ad - de_dt_ad
          end if
-         resid_ad = esum_ad ! convert back to auto_diff_real_star_order1
-         s% ergs_error(k) = -dm*dt*resid_ad%val ! save ergs_error before scaling
+         resid_ad = esum_ad  ! convert back to auto_diff_real_star_order1
+         s% ergs_error(k) = -dm*dt*resid_ad%val  ! save ergs_error before scaling
          resid_ad = scal*resid_ad
          residual = resid_ad%val
          s% equ(i_dlnE_dt, k) = residual
@@ -220,7 +212,7 @@
             dL_dm_ad = (L00_ad - Lp1_ad)/dm
          end subroutine setup_dL_dm
 
-         subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
+         subroutine setup_sources_and_others(ierr)  ! sources_ad, others_ad
             !use hydro_rsp2, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
@@ -230,7 +222,7 @@
             ierr = 0
 
             if (s% eps_nuc_factor == 0d0 .or. s% nonlocal_NiCo_decay_heat) then
-               eps_nuc_ad = 0 ! get eps_nuc from extra_heat instead
+               eps_nuc_ad = 0  ! get eps_nuc from extra_heat instead
             else if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
                eps_nuc_ad = 0d0
                eps_nuc_ad%val = s% burn_avg_epsnuc(k)
@@ -267,7 +259,7 @@
 
             Eq_ad = 0d0
             if (s% RSP2_flag) then
-               Eq_ad = s% Eq_ad(k) ! compute_Eq_cell(s, k, ierr)
+               Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if
 
@@ -363,7 +355,7 @@
             include 'formats'
             ierr = 0
 
-            if (s% u_flag) then ! for now, assume u_flag means no eps_grav
+            if (s% u_flag) then  ! for now, assume u_flag means no eps_grav
                eps_grav_form = .false.
                return
             end if
@@ -371,7 +363,7 @@
             ! value from checking s% energy_eqn_option in hydro_eqns.f90
             eps_grav_form = s% eps_grav_form_for_energy_eqn
 
-            if (.not. eps_grav_form) then ! check if want it true
+            if (.not. eps_grav_form) then  ! check if want it true
                if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.
             end if
 
@@ -379,7 +371,7 @@
                if (s% RSP2_flag) then
                   call mesa_error(__FILE__,__LINE__,'cannot use eps_grav with et yet.  fix energy eqn.')
                end if
-               call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
+               call eval_eps_grav_and_partials(s, k, ierr)  ! get eps_grav info
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,2) 'failed in eval_eps_grav_and_partials', k
                   return
@@ -560,7 +552,7 @@
          call eval1_work(s, k+1, skip_P, &
             work_p1_ad, work_p1, d_work_p1_dxap1, d_work_p1_dxa00, ierr)
          if (ierr /= 0) return
-         work_p1_ad = shift_p1(work_p1_ad) ! shift the partials
+         work_p1_ad = shift_p1(work_p1_ad)  ! shift the partials
          dwork_ad = work_00_ad - work_p1_ad
          dwork = dwork_ad%val
          do j=1,s% species
@@ -647,7 +639,7 @@
             P_face_ad = P_theta*s% P_face_ad(k) + (1d0-P_theta)*s% P_face_start(k)
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0
-         else ! set P_ad
+         else  ! set P_ad
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0
             if (skip_Peos) then
@@ -669,7 +661,7 @@
                      d_Pface_dxam1(j) = &
                         beta*s% dlnPeos_dxa_for_partials(j,k-1)*P_theta*s% Peos(k-1)
                   end do
-               else ! k == 1
+               else  ! k == 1
                   do j=1,s% species
                      d_Pface_dxa00(j) = &
                         s% dlnPeos_dxa_for_partials(j,k)*P_theta*s% Peos(k)
@@ -845,6 +837,4 @@
 
       end subroutine eval_simple_PdV_work
 
-
       end module hydro_energy
-

@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2017-2019  Rob Farmer & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -65,6 +62,7 @@
 
 #ifdef USE_PGPLOT
       subroutine col_mag1_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+         use pgstar_colors, only: clr_Coral
          integer, intent(in) :: id
          !Not dp
          real,intent(in) :: xmin, xmax, ymin, ymax
@@ -90,8 +88,8 @@
         !Add stuff to the top panel in color_magnitude1
         if(plot_num==1) Then
             a = 0.1d0
-            call pgline(5, (/xcenter-a*dx,xcenter-a*dx,xcenter+a*dx,xcenter+a*dx,xcenter-a*dx/),&
-                            (/ycenter-a*dy,ycenter+a*dy,ycenter+a*dy,ycenter-a*dy,ycenter-a*dy/))
+            call pgline(5, [xcenter-a*dx,xcenter-a*dx,xcenter+a*dx,xcenter+a*dx,xcenter-a*dx],&
+                            [ycenter-a*dy,ycenter+a*dy,ycenter+a*dy,ycenter-a*dy,ycenter-a*dy])
 
         else
         ! Second or higher panel, this function gets called once per panel for the color_magnitude1 plot, so
@@ -172,7 +170,7 @@
 
 
          !Here we get the fake av data
-         names(1)='av_v' ! Same name as used in the fake_av_v.txt file for the column
+         names(1)='av_v'  ! Same name as used in the fake_av_v.txt file for the column
 
          vals(1)=get_bc_by_name(names(1),safe_log10(s% T(1)),&
                                 safe_log10(s% grav(1)),&
@@ -223,7 +221,6 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-
 
 
       end module run_star_extras

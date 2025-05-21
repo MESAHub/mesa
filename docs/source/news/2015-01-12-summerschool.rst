@@ -11,7 +11,7 @@ inlists, customizing pgstar for your models, and much more. Apply for
 admission at:
 
 `MESA Summer School
-2015 <http://cococubed.com/mesa_summer_school_2015/>`__
+2015 <https://mesastar.org/summer-school-2015/>`__
 
 Enrollment is limited and closes March 1, 2015.
 

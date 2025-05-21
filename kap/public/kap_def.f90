@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -37,14 +31,14 @@ module kap_def
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
         implicit none
-        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
-        real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
-        real(dp), intent(in) :: logRho ! the density
-        real(dp), intent(in) :: logT ! the temperature
-        real(dp), intent(out) :: kap ! electron conduction opacity
-        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
+        real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
+        real(dp), intent(in) :: logRho  ! the density
+        real(dp), intent(in) :: logT  ! the temperature
+        real(dp), intent(out) :: kap  ! electron conduction opacity
+        real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-        integer, intent(out) :: ierr ! 0 means AOK.
+        integer, intent(out) :: ierr  ! 0 means AOK.
      end subroutine other_elect_cond_opacity_interface
 
      subroutine other_compton_opacity_interface( &
@@ -54,15 +48,15 @@ module kap_def
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
         implicit none
-        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+        integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: Rho, T
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
         ! free_e := total combined number per nucleon of free electrons and positrons
         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
         ! eta := electron degeneracy parameter from eos
-        real(dp), intent(out) :: kap ! electron conduction opacity
+        real(dp), intent(out) :: kap  ! electron conduction opacity
         real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
-        integer, intent(out) :: ierr ! 0 means AOK.
+        integer, intent(out) :: ierr  ! 0 means AOK.
      end subroutine other_compton_opacity_interface
 
      subroutine other_radiative_opacity_interface( &
@@ -71,15 +65,15 @@ module kap_def
         frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
         implicit none
-        integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
-        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
-        real(dp), intent(in) :: logRho ! density
-        real(dp), intent(in) :: logT ! temperature
+        integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe  ! composition
+        real(dp), intent(in) :: logRho  ! density
+        real(dp), intent(in) :: logT  ! temperature
         real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
-        real(dp), intent(out) :: kap ! opacity
-        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: kap  ! opacity
+        real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-        integer, intent(out) :: ierr ! 0 means AOK.
+        integer, intent(out) :: ierr  ! 0 means AOK.
      end subroutine other_radiative_opacity_interface
 
   end interface
@@ -106,11 +100,11 @@ module kap_def
 
 
   ! for fixed metal tables (no enhancements)
-  type Kap_Z_Table ! holds pointers to all the X tables for a particular Z
+  type Kap_Z_Table  ! holds pointers to all the X tables for a particular Z
      logical :: lowT_flag
      real(dp) :: Z
-     integer :: num_Xs ! number of X's for this Z
-     type (Kap_X_Table), dimension(:), pointer :: x_tables  => null()! in order of increasing X
+     integer :: num_Xs  ! number of X's for this Z
+     type (Kap_X_Table), dimension(:), pointer :: x_tables  => null()  ! in order of increasing X
   end type Kap_Z_Table
 
 
@@ -123,13 +117,13 @@ module kap_def
      real(dp) :: logR_min
      real(dp) :: logR_max
      integer :: num_logRs
-     integer :: ili_logRs ! =1 if logRs are evenly spaced
-     real(dp), pointer :: logRs(:) => null() ! indexed from 1 to num_logRs
+     integer :: ili_logRs  ! =1 if logRs are evenly spaced
+     real(dp), pointer :: logRs(:) => null()  ! indexed from 1 to num_logRs
      real(dp) :: logT_min
      real(dp) :: logT_max
      integer :: num_logTs
-     integer :: ili_logTs ! =1 if logTs are evenly spaced
-     real(dp), pointer :: logTs(:) => null() ! indexed from 1 to num_logTs
+     integer :: ili_logTs  ! =1 if logTs are evenly spaced
+     real(dp), pointer :: logTs(:) => null()  ! indexed from 1 to num_logTs
      real(dp), pointer :: kap1(:) => null()
   end type Kap_X_Table
 
@@ -137,8 +131,8 @@ module kap_def
   ! for C/O enhanced tables
   type Kap_CO_Z_Table
      real(dp) :: Zbase, Zfrac_C, Zfrac_N, Zfrac_O, Zfrac_Ne
-     real(dp) :: log10_Zbase ! log10(Zbase)
-     type (Kap_CO_X_Table), dimension(:), pointer :: x_tables  => null()! stored in order of increasing X
+     real(dp) :: log10_Zbase  ! log10(Zbase)
+     type (Kap_CO_X_Table), dimension(:), pointer :: x_tables  => null()  ! stored in order of increasing X
      ! the X tables need not be equally spaced
   end type Kap_CO_Z_Table
 
@@ -147,7 +141,7 @@ module kap_def
        [ 0.00d0, 0.01d0, 0.03d0, 0.10d0, 0.20d0, 0.40d0, 0.60d0, 1.0d0 ]
 
   type Kap_CO_Table
-     integer :: table_num ! the table number from the data file
+     integer :: table_num  ! the table number from the data file
      real(dp) :: X
      real(dp) :: Z
      real(dp) :: dXC
@@ -183,13 +177,13 @@ module kap_def
      real(dp) :: logR_min
      real(dp) :: logR_max
      integer :: num_logRs
-     integer :: ili_logRs ! =1 if logRs are evenly spaced
-     real(dp), dimension(:), pointer :: logRs => null() ! indexed from 1 to num_logRs
+     integer :: ili_logRs  ! =1 if logRs are evenly spaced
+     real(dp), dimension(:), pointer :: logRs => null()  ! indexed from 1 to num_logRs
      real(dp) :: logT_min
      real(dp) :: logT_max
      integer :: num_logTs
-     integer :: ili_logTs ! =1 if logTs are evenly spaced
-     real(dp), dimension(:), pointer :: logTs => null() ! indexed from 1 to num_logTs
+     integer :: ili_logTs  ! =1 if logTs are evenly spaced
+     real(dp), dimension(:), pointer :: logTs => null()  ! indexed from 1 to num_logTs
 
      integer :: num_CO_tables
      ! the tables are in 3 groups
@@ -197,7 +191,7 @@ module kap_def
      ! 2) tables with dXC = dXO, ordered by increasing value.
      ! 3) tables with dXC < dXO, ordered by increasing dXC, and by increasing dXO within same dXC.
      ! the spacing of dXC's is the same as dXO's, so there are as many tables in 3) as in 1).
-     integer :: num_dXC_gt_dXO ! the number of tables with dXC > dXO
+     integer :: num_dXC_gt_dXO  ! the number of tables with dXC > dXO
      integer :: CO_table_numbers(num_kap_CO_dXs,num_kap_CO_dXs)
      ! entry (i,j) is the co_index for table with dXC=Xs(i) and dXO=Xs(j), or -1 if no such table.
      integer :: next_dXO_table(max_num_CO_tables)
@@ -215,8 +209,8 @@ module kap_def
       integer :: kap_option, kap_CO_option, kap_lowT_option
 
       ! blending in T is done between the following limits
-      real(dp) :: kap_blend_logT_upper_bdy ! = 3.88d0 ! old value was 4.1d0
-      real(dp) :: kap_blend_logT_lower_bdy ! = 3.80d0 ! old value was 4.0d0
+      real(dp) :: kap_blend_logT_upper_bdy  ! = 3.88d0 ! old value was 4.1d0
+      real(dp) :: kap_blend_logT_lower_bdy  ! = 3.80d0 ! old value was 4.0d0
       ! last time I looked, the table bottom for the higher T tables was logT = 3.75
       ! while max logT for the lower T Freeman tables was 4.5
       ! so for those, you need to keep kap_blend_logT_upper_bdy < 4.5
@@ -235,12 +229,12 @@ module kap_def
       logical :: use_Type2_opacities
 
       ! switch to Type1 if X too large
-      real(dp) :: kap_Type2_full_off_X ! Type2 full off for X >= this
-      real(dp) :: kap_Type2_full_on_X ! Type2 full on for X <= this
+      real(dp) :: kap_Type2_full_off_X  ! Type2 full off for X >= this
+      real(dp) :: kap_Type2_full_on_X  ! Type2 full on for X <= this
 
       ! switch to Type1 if dZ too small (dZ = Z - Zbase)
-      real(dp) :: kap_Type2_full_off_dZ ! Type2 is full off for dZ <= this
-      real(dp) :: kap_Type2_full_on_dZ ! Type2 can be full on for dZ >= this
+      real(dp) :: kap_Type2_full_off_dZ  ! Type2 is full off for dZ <= this
+      real(dp) :: kap_Type2_full_on_dZ  ! Type2 can be full on for dZ >= this
 
       real(dp) :: logT_Compton_blend_hi, logR_Compton_blend_lo
 
@@ -295,7 +289,7 @@ module kap_def
      kap_options_max = 11
 
 
-  integer, parameter :: kap_max_dim = 50 !change this to make even larger grids in X and/or Z
+  integer, parameter :: kap_max_dim = 50  !change this to make even larger grids in X and/or Z
 
   integer, dimension(kap_options_max) :: num_kap_Xs = 0
   real(dp), dimension(kap_max_dim, kap_options_max) :: kap_Xs = -1d0
@@ -356,11 +350,11 @@ module kap_def
      kap_CO_option_str(kap_CO_options_max), &
      kap_lowT_option_str(kap_lowT_options_max)
 
-  type Kap_Z_Table_Array ! in order of increasing Z
+  type Kap_Z_Table_Array  ! in order of increasing Z
       type (Kap_Z_Table), dimension(:), pointer :: ar
   end type Kap_Z_Table_Array
 
-  type Kap_CO_Z_Table_Array ! in order of increasing Z
+  type Kap_CO_Z_Table_Array  ! in order of increasing Z
       type (Kap_CO_Z_Table), dimension(:), pointer :: ar
   end type Kap_CO_Z_Table_Array
 
@@ -393,7 +387,7 @@ module kap_def
   character (len=1000) :: kap_dir, kap_cache_dir, kap_temp_cache_dir
   logical :: kap_use_cache = .true.
   logical :: kap_read_after_write_cache = .true.
-  logical :: clip_to_kap_table_boundaries = .true. ! typically, this should be set true.
+  logical :: clip_to_kap_table_boundaries = .true.  ! typically, this should be set true.
    ! if this is set true, then temperature and density args are
    ! clipped to the boundaries of the table.
   real(dp), parameter :: kap_min_logRho = -40d0
@@ -412,7 +406,7 @@ module kap_def
   integer, parameter :: kapCN_num_logT = 18
   integer, parameter :: kapCN_num_logR = 17
   integer, parameter :: kapCN_tbl_size = kapCN_num_logR*kapCN_num_logT           ! 306
-  integer, parameter :: kapCN_num_tbl = num_kapCN_Xs*num_kapCN_fCs*num_kapCN_fNs !  63
+  integer, parameter :: kapCN_num_tbl = num_kapCN_Xs*num_kapCN_fCs*num_kapCN_fNs  !  63
 
   real(dp), target :: kapCN_Z(num_kapCN_Zs)
   real(dp), target :: kapCN_fN(num_kapCN_fNs,num_kapCN_Zs)
@@ -636,8 +630,8 @@ contains
              0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, &
              0.04d0, 0.06d0, 0.08d0, 0.100d0 ]
           num_kap_lowT_Xs_for_this_Z(1:num_kap_lowT_Zs(i), i) = [ num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
-             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), &
+             num_kap_lowT_Xs(i), num_kap_lowT_Xs(i), num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-1, num_kap_lowT_Xs(i)-2 ]
        end select
     end do
 
@@ -704,7 +698,7 @@ contains
   end subroutine get_kap_ptr
 
 
-  subroutine get_output_string(x,xstr,ierr) !works with X and Z
+  subroutine get_output_string(x,xstr,ierr)  !works with X and Z
     real(dp), intent(in) :: x
     character(len=*), intent(out) :: xstr
     integer, intent(out) :: ierr
@@ -716,14 +710,14 @@ contains
        xstr='bad'
        ierr=-1
        return
-    endif
+    end if
     ierr=0
     write(str,'(f8.6)') X
     k=0
     do i=1,9
        j=index(str,c(i),back=.true.)
        k=max(k,j)
-    enddo
+    end do
     xstr=str(1:max(k,3))
   end subroutine get_output_string
 
@@ -838,6 +832,4 @@ contains
 
   end subroutine do_Free_Kap_Tables
 
-
 end module kap_def
-

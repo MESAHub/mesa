@@ -4,12 +4,12 @@
 rsp_Type_II_Cepheid
 *******************
 
-This test case checks the non-linear pulsation evolution of a 0.55 Msun, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model - 
+This test case checks the non-linear pulsation evolution of a 0.55 |Msun|, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model -
 type-II Cepheid of BL Her type based on |Smolec14|.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_rsp_Type_II_Cepheid``) creates the initial 0.65 Msun, 0.55 Msun, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. The convective parameters are such that the model should show deterministic chaos - lots of struggling between low and high amplitudes. The growth rates are large, so the attractor is approached only after ~20-40 cycles. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.71262 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
+* Part 1 (``inlist_rsp_Type_II_Cepheid``) creates the initial 0.65 |Msun|, 0.55 |Msun|, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. The convective parameters are such that the model should show deterministic chaos - lots of struggling between low and high amplitudes. The growth rates are large, so the attractor is approached only after ~20-40 cycles. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.71262 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
 
 .. code-block:: console
 
@@ -28,10 +28,8 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default`` which cur
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 100
 

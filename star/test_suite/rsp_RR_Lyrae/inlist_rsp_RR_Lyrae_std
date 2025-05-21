@@ -22,10 +22,10 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-   
+
 / ! end of star_job namelist
 
 &eos
@@ -51,17 +51,17 @@
 ! RSP controls
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 0.71262d0 ! expected period (in days) 
+   x_ctrl(1) = 0.71262d0 ! expected period (in days)
 
    RSP_mass = 0.65d0
    RSP_Teff = 6500d0
    RSP_L = 60d0
    RSP_X = 0.75d0
    RSP_Z = 0.0004d0
-      
+
 
 ! output controls
-   
+
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
@@ -76,8 +76,8 @@
    ! i suggest the following method. interrupt the run soon after
    ! it makes a photo.  remove or delete LOGS/history.data to force
    ! creation of a new one when restart.  edit the inlist to set
-   ! history_interval to 1 to get maximum time resolution.  
-   ! restart the run and let it go for as many periods as desired.   
+   ! history_interval to 1 to get maximum time resolution.
+   ! restart the run and let it go for as many periods as desired.
 
       photo_interval = 1000
       profile_interval = 4000
@@ -87,19 +87,18 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-      !pause = .true.
+      !pause_flag = .true.
 
       pgstar_interval = 6
-         
+
       Grid2_win_flag = .true.
 
 
       Grid2_title = '0.65 M\d\(2281)\u  Z=0.0004  RR Lyrae'
 
-      
+
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
@@ -108,7 +107,7 @@
       Grid2_file_dir = 'png'
       Grid2_file_prefix = 'grid'
       Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-      
+
       !Profile_Panels1_show_grid = .true.
 
       Profile_Panels1_xaxis_name = 'logtau'

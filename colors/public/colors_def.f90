@@ -2,25 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -88,21 +81,21 @@
 
       ! THE FOLLOWING ARE PRIVATE DEFS -- NOT FOR USE BY CLIENTS
 
-      type :: lgz_list ! sorted in decreasing order of lgz ([M/H])
-         real(dp) :: lgz ! [Fe_H]
+      type :: lgz_list  ! sorted in decreasing order of lgz ([M/H])
+         real(dp) :: lgz  ! [Fe_H]
          type (lgz_list), pointer :: nxt => null()
          real(dp),dimension(max_num_bcs_per_file) :: colors = -1d99
       end type lgz_list
 
-      type :: lgt_list ! sorted in decreasing order of lgt
-         real(dp) :: lgt ! logTeff
+      type :: lgt_list  ! sorted in decreasing order of lgt
+         real(dp) :: lgt  ! logTeff
          integer :: n_colors
          type (lgt_list), pointer :: nxt => null()
          type (lgg_list), pointer :: glist => null()
       end type lgt_list
 
-      type :: lgg_list ! sorted in decreasing order of lgg
-         real(dp) :: lgg ! log g
+      type :: lgg_list  ! sorted in decreasing order of lgg
+         real(dp) :: lgg  ! log g
          type (lgg_list), pointer :: nxt => null()
          type (lgz_list), pointer :: zlist => null()
       end type lgg_list

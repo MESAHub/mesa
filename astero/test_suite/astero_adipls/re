@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-shopt -u expand_aliases 
+shopt -u expand_aliases
 
 photo_directory=photos
 

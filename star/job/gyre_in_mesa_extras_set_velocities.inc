@@ -1,7 +1,7 @@
 !      example lines from inlist
 
 ! GYRE set starting velocities
-!   x_logical_ctrl(5) = .true. 
+!   x_logical_ctrl(5) = .true.
 !   x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
 !   x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
 !   x_ctrl(6) = 0.1d0 ! initial vsurf (kms)
@@ -16,12 +16,12 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         
+
          real(dp), allocatable     :: global_data(:)
          real(dp), allocatable     :: point_data(:,:)
          integer                   :: ipar(5), mode_l
          real(dp)                  :: rpar(1)
-         
+
          integer, parameter :: modes = 3
          integer :: npts(modes), nz, nz_max, i, k, i_v, j, nz_gyre, mode
          real(dp), pointer :: vel(:)
@@ -30,33 +30,33 @@
          real(dp), allocatable, dimension(:) :: &
             r_old, r_new, v_old, v_new
          real(dp), pointer :: work1(:) ! =(nz_max, pm_work_size)
-         
+
          include 'formats'
-         
+
          if (restart) return
-         
+
          nz = s% nz
          nz_max = nz+100
          allocate( &
             r(modes,nz_max), v(modes,nz_max), &
             r_old(nz_max), r_new(nz_max), v_old(nz_max), v_new(nz_max))
          npts(:) = 0
-         
-         call gyre_init('gyre.in')
 
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
+         call init('gyre.in')
 
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
+         call set_constant('G_GRAVITY', standard_cgrav)
+         call set_constant('C_LIGHT', clight)
+         call set_constant('A_RADIATION', crad)
 
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-         
+         call set_constant('M_SUN', Msun)
+         call set_constant('R_SUN', Rsun)
+         call set_constant('L_SUN', Lsun)
+
+         call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+
          mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
-         
+
          !write(*,*) 'call star_get_pulse_data'
          call star_get_pulse_data(s%id, 'GYRE', &
             .FALSE., .FALSE., .FALSE., global_data, point_data, ierr)
@@ -64,7 +64,7 @@
             write(*,*) 'Failed when calling star_get_pulse_data'
             return
          end if
-         
+
          !write(*,*) 'call star_write_pulse_data'
          call star_write_pulse_data(s%id, &
             'GYRE', 'gyre.data', global_data, point_data, ierr)
@@ -74,7 +74,7 @@
          end if
 
          !write(*,*) 'call gyre_set_model'
-         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
+         call set_model(global_data, point_data, s%gyre_data_schema)
 
           write(*, 100) 'order', 'freq (Hz)', &
              'P (sec)', 'P (day)', 'growth', 'cycles to double'
@@ -87,8 +87,8 @@
          ipar(4) = 3 ! max number of modes to output per call
          ipar(5) = 0 ! num_written
 
-         call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
-         
+         call get_modes(mode_l, process_mode_, ipar, rpar)
+
          if (s% x_ctrl(4) == 1d0) then
             mode = 2
             write(*,*) 'set gyre starting velocities for order 2'
@@ -104,13 +104,13 @@
             return
          end if
          nz_gyre = npts(mode)
-         
+
          if (nz_gyre == 0) then
             ierr = -1
             write(*,*) 'Failed to find requested mode for setting velocities'
             return
          end if
-         
+
          v_surf = v(mode,nz_gyre)
          v1 = 1d5/v_surf ! rescale v's
          if (s% x_ctrl(6) > 0d0) v1 = v1*s% x_ctrl(6)
@@ -120,11 +120,11 @@
             v_old(k) = v1*v(mode,i)
             r_old(k) = r(mode,i)*s% r(1)
          end do
-         
+
          do k=1,nz
             r_new(k) = s% r(k)
          end do
-         
+
          allocate(work1(nz_max*pm_work_size))
          call interpolate_vector_pm( &
             nz_gyre, r_old, nz, r_new, v_old, v_new, work1, 'get_pulse_data', ierr)
@@ -133,7 +133,7 @@
             write(*,*) 'Failed when calling interpolate_vector_pm for pulse data'
             return
          end if
-                  
+
          if (s% v_flag) then
             do k=1,nz
                s% xh(s% i_v,k) = v_new(k)
@@ -145,19 +145,19 @@
          else
             stop 'set_gyre_linear_analysis failed to set velocities'
          end if
-         
+
          return
-         
+
          do k=1,nz_gyre
             write(*,2) 'gyre r v', k, r_old(k)/Rsun, v_old(k)
             if (k <= nz) write(*,2) 'star r v', k, r_new(k)/Rsun, v_new(k)
             write(*,*)
          end do
-         
+
          do k=nz_gyre+1,nz
             write(*,2) 'star r v', k, r_new(k), v_new(k)
          end do
-         
+
          stop 'gyre_in_mesa_extras_set_velocities'
 
          contains
@@ -204,7 +204,7 @@
                   freq, per, per/(24*3600), 'stable'
 110            format(I8,E20.4,2F20.4,A20)
             end if
-            
+
             if (md%n_pg > modes) return
 
             gr = md%grid()
@@ -213,7 +213,7 @@
             npts(md%n_pg) = md%n
             do k = 1, md%n
                r(md%n_pg,k) = gr%pt(k)%x
-               v(md%n_pg,k) = md%xi_r(k)            
+               v(md%n_pg,k) = md%xi_r(k)
             end do
 
             if (write_flag) then
@@ -235,5 +235,5 @@
             retcode = 0
 
          end subroutine process_mode_
-         
+
       end subroutine gyre_in_mesa_extras_set_velocities

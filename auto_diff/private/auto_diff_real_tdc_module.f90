@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module auto_diff_real_tdc_module
       use const_def, only: dp, ln10, pi
       use utils_lib
@@ -394,210 +413,210 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .eq. other%val)
+      z = (this%val == other%val)
    end function equal_self
 
    function equal_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .eq. other)
+      z = (this%val == other)
    end function equal_auto_diff_real_tdc_real_dp
 
    function equal_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .eq. other%val)
+      z = (this == other%val)
    end function equal_real_dp_auto_diff_real_tdc
 
    function equal_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .eq. other)
+      z = (this%val == other)
    end function equal_auto_diff_real_tdc_int
 
    function equal_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .eq. other%val)
+      z = (this == other%val)
    end function equal_int_auto_diff_real_tdc
 
    function neq_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .ne. other%val)
+      z = (this%val /= other%val)
    end function neq_self
 
    function neq_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .ne. other)
+      z = (this%val /= other)
    end function neq_auto_diff_real_tdc_real_dp
 
    function neq_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ne. other%val)
+      z = (this /= other%val)
    end function neq_real_dp_auto_diff_real_tdc
 
    function neq_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .ne. other)
+      z = (this%val /= other)
    end function neq_auto_diff_real_tdc_int
 
    function neq_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ne. other%val)
+      z = (this /= other%val)
    end function neq_int_auto_diff_real_tdc
 
    function greater_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .gt. other%val)
+      z = (this%val > other%val)
    end function greater_self
 
    function greater_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .gt. other)
+      z = (this%val > other)
    end function greater_auto_diff_real_tdc_real_dp
 
    function greater_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .gt. other%val)
+      z = (this > other%val)
    end function greater_real_dp_auto_diff_real_tdc
 
    function greater_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .gt. other)
+      z = (this%val > other)
    end function greater_auto_diff_real_tdc_int
 
    function greater_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .gt. other%val)
+      z = (this > other%val)
    end function greater_int_auto_diff_real_tdc
 
    function less_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .lt. other%val)
+      z = (this%val < other%val)
    end function less_self
 
    function less_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .lt. other)
+      z = (this%val < other)
    end function less_auto_diff_real_tdc_real_dp
 
    function less_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .lt. other%val)
+      z = (this < other%val)
    end function less_real_dp_auto_diff_real_tdc
 
    function less_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .lt. other)
+      z = (this%val < other)
    end function less_auto_diff_real_tdc_int
 
    function less_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .lt. other%val)
+      z = (this < other%val)
    end function less_int_auto_diff_real_tdc
 
    function leq_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .le. other%val)
+      z = (this%val <= other%val)
    end function leq_self
 
    function leq_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .le. other)
+      z = (this%val <= other)
    end function leq_auto_diff_real_tdc_real_dp
 
    function leq_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .le. other%val)
+      z = (this <= other%val)
    end function leq_real_dp_auto_diff_real_tdc
 
    function leq_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .le. other)
+      z = (this%val <= other)
    end function leq_auto_diff_real_tdc_int
 
    function leq_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .le. other%val)
+      z = (this <= other%val)
    end function leq_int_auto_diff_real_tdc
 
    function geq_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .ge. other%val)
+      z = (this%val >= other%val)
    end function geq_self
 
    function geq_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .ge. other)
+      z = (this%val >= other)
    end function geq_auto_diff_real_tdc_real_dp
 
    function geq_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ge. other%val)
+      z = (this >= other%val)
    end function geq_real_dp_auto_diff_real_tdc
 
    function geq_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .ge. other)
+      z = (this%val >= other)
    end function geq_auto_diff_real_tdc_int
 
    function geq_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ge. other%val)
+      z = (this >= other%val)
    end function geq_int_auto_diff_real_tdc
 
    function make_unary_operator(x, z_val, z_d1x, z_d2x) result(unary)
@@ -625,7 +644,9 @@ module auto_diff_real_tdc_module
       binary%val = z_val
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
       binary%d1Array(1:33) = x%d1Array(1:33)*z_d1x + y%d1Array(1:33)*z_d1y
-      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*x%d1val1*z_d2x + x%d1Array(1:33)*y%d1val1*z_d1x_d1y + x%d1val1*y%d1Array(1:33)*z_d1x_d1y + x%d1val1_d1Array(1:33)*z_d1x + y%d1Array(1:33)*y%d1val1*z_d2y + y%d1val1_d1Array(1:33)*z_d1y
+      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*x%d1val1*z_d2x + x%d1Array(1:33)*y%d1val1*z_d1x_d1y &
+                                    + x%d1val1*y%d1Array(1:33)*z_d1x_d1y + x%d1val1_d1Array(1:33)*z_d1x &
+                                    + y%d1Array(1:33)*y%d1val1*z_d2y + y%d1val1_d1Array(1:33)*z_d1y
    end function make_binary_operator
 
    function sign_self(x) result(unary)
@@ -993,7 +1014,8 @@ module auto_diff_real_tdc_module
       unary%val = powm1(pi)*atan(x%val)
       unary%d1val1 = q2*x%d1val1
       unary%d1Array(1:33) = q2*x%d1Array(1:33)
-      unary%d1val1_d1Array(1:33) = (-2.0_dp*x%d1Array(1:33)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:33) + x%d1val1_d1Array(1:33))*powm1(2.0_dp*q1 + pi*pow4(x%val) + pi)
+      unary%d1val1_d1Array(1:33) = (-2.0_dp*x%d1Array(1:33)*x%d1val1*x%val + q0*x%d1val1_d1Array(1:33) + x%d1val1_d1Array(1:33)) &
+                                   * powm1(2.0_dp*q1 + pi*pow4(x%val) + pi)
    end function atanpi_self
 
    function asinh_self(x) result(unary)
@@ -1251,7 +1273,8 @@ module auto_diff_real_tdc_module
       binary%val = x%val*y%val
       binary%d1val1 = x%d1val1*y%val + x%val*y%d1val1
       binary%d1Array(1:33) = x%d1Array(1:33)*y%val + x%val*y%d1Array(1:33)
-      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%d1val1_d1Array(1:33)*y%val + x%val*y%d1val1_d1Array(1:33)
+      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) &
+                                    + x%d1val1_d1Array(1:33)*y%val + x%val*y%d1val1_d1Array(1:33)
    end function mul_self
 
    function mul_self_real(x, y) result(unary)
@@ -1311,7 +1334,9 @@ module auto_diff_real_tdc_module
       binary%val = x%val*powm1(y%val)
       binary%d1val1 = q1*(-q2 + x%d1val1*y%val)
       binary%d1Array(1:33) = q1*(x%d1Array(1:33)*y%val - x%val*y%d1Array(1:33))
-      binary%d1val1_d1Array(1:33) = (2.0_dp*q2*y%d1Array(1:33) + q0*x%d1val1_d1Array(1:33) - y%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%val*y%d1val1_d1Array(1:33)))*powm1(pow3(y%val))
+      binary%d1val1_d1Array(1:33) = (2.0_dp*q2*y%d1Array(1:33) + q0*x%d1val1_d1Array(1:33) &
+                                    - y%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) &
+                                    + x%val*y%d1val1_d1Array(1:33)))*powm1(pow3(y%val))
    end function div_self
 
    function div_self_real(x, y) result(unary)
@@ -1385,7 +1410,9 @@ module auto_diff_real_tdc_module
       binary%val = pow(x%val, y%val)
       binary%d1val1 = q0*q4
       binary%d1Array(1:33) = q0*q5
-      binary%d1val1_d1Array(1:33) = (-q1*x%d1Array(1:33) + q2*y%d1val1_d1Array(1:33)*pow2(x%val) + q4*q5 + x%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) + x%d1val1_d1Array(1:33)*y%val))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
+      binary%d1val1_d1Array(1:33) = (-q1*x%d1Array(1:33) + q2*y%d1val1_d1Array(1:33)*pow2(x%val) &
+                                    + q4*q5 + x%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) &
+                                    + x%d1val1_d1Array(1:33)*y%val))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
    end function pow_self
 
    function pow_self_real(x, y) result(unary)
@@ -1595,7 +1622,9 @@ module auto_diff_real_tdc_module
       binary%val = -0.5_dp*y%val + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       binary%d1val1 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1 + q1*(x%d1val1 - y%d1val1)
       binary%d1Array(1:33) = -0.5_dp*y%d1Array(1:33) + 0.5_dp*x%d1Array(1:33) + q1*(x%d1Array(1:33) - y%d1Array(1:33))
-      binary%d1val1_d1Array(1:33) = -0.5_dp*y%d1val1_d1Array(1:33) + 0.5_dp*x%d1val1_d1Array(1:33) + q1*(x%d1val1_d1Array(1:33) - y%d1val1_d1Array(1:33))
+      binary%d1val1_d1Array(1:33) = -0.5_dp*y%d1val1_d1Array(1:33) &
+                                   + 0.5_dp*x%d1val1_d1Array(1:33) &
+                                   + q1*(x%d1val1_d1Array(1:33) - y%d1val1_d1Array(1:33))
    end function dim_self
 
    function dim_self_real(x, y) result(unary)
