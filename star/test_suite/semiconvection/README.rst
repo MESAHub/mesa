@@ -10,6 +10,7 @@ see |MESA V|. The test vehicle is with a 1.5 |Msun|, Z=0.02 metallicity, model.
 This test case has 1 part. Click to see a larger version of a plot.
 
 * Part 1 (``inlist_semiconvection``) loads a pre-built 1.5 |Msun|, Z=0.02 metallicity, model from test case :ref:`make_zams_high_mass`.
+
 New initial model generation should use the supplied ``inlist_to_ZAMS``.
 The model is then evolved until the central hydrogen mass fraction drops below 0.4.
 At this time the convective core has almost reached its maximum mass extension, and there is a semiconvective layer above the convective core.

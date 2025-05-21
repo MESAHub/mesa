@@ -23,11 +23,11 @@
 
       ! ::
 
-    change_RSP2_flag = .false.
-    change_initial_RSP2_flag = .false.
-    change_RSP2_flag_at_model_number = -111
-    new_RSP2_flag = .false.
-    create_RSP2_model = .false.
+   change_RSP2_flag = .false.
+   change_initial_RSP2_flag = .false.
+   change_RSP2_flag_at_model_number = -111
+   new_RSP2_flag = .false.
+   create_RSP2_model = .false.
 
 
       ! remove_surface_by_relax_to_star_cut
@@ -41,10 +41,10 @@
 
       ! ::
 
-    remove_surface_by_relax_to_star_cut = .false.
-    remove_surface_do_jrot = .false.
-    remove_surface_do_entropy = .true.
-    remove_surface_turn_off_energy_sources_and_sinks = .true.
+   remove_surface_by_relax_to_star_cut = .false.
+   remove_surface_do_jrot = .false.
+   remove_surface_do_entropy = .true.
+   remove_surface_turn_off_energy_sources_and_sinks = .true.
 
 
       ! change_w_div_wc_flag
@@ -59,9 +59,9 @@
 
       ! ::
 
-    change_w_div_wc_flag = .false.
-    change_initial_w_div_wc_flag = .false.
-    new_w_div_wc_flag = .false.
+   change_w_div_wc_flag = .false.
+   change_initial_w_div_wc_flag = .false.
+   new_w_div_wc_flag = .false.
 
 
       ! change_j_rot_flag
@@ -76,9 +76,9 @@
 
       ! ::
 
-    change_j_rot_flag = .false.
-    change_initial_j_rot_flag = .false.
-    new_j_rot_flag = .false.
+   change_j_rot_flag = .false.
+   change_initial_j_rot_flag = .false.
+   new_j_rot_flag = .false.
 
 
       ! use_w_div_wc_flag_with_rotation
@@ -91,9 +91,8 @@
 
       ! ::
 
-    use_w_div_wc_flag_with_rotation = .false.
-    use_j_rot_flag_with_rotation = .false.
-
+   use_w_div_wc_flag_with_rotation = .false.
+   use_j_rot_flag_with_rotation = .false.
 
 
       ! load_saved_photo
@@ -103,8 +102,8 @@
 
       ! ::
 
-    load_saved_photo = .false.
-    saved_photo_name = 'undefined'
+   load_saved_photo = .false.
+   saved_photo_name = 'undefined'
 
       ! save_photo_number
       ! ~~~~~~~~~~~~~~~~~
@@ -115,22 +114,24 @@
 
       ! ::
 
-    save_photo_number = -1
-    save_photo_filename = ''
+   save_photo_number = -1
+   save_photo_filename = ''
 
 !   ! save_photo_when_terminate = .true.
 
-      ! create_merger_model !!! EXPERIMENTAL
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! create_merger_model
+      ! ~~~~~~~~~~~~~~~~~~~
       ! saved_model_for_merger_1
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! saved_model_for_merger_2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
+      ! !!! EXPERIMENTAL. !!! 
       ! If ``create_merger_model`` is true, then create a star by merging the two models provided.
 
       ! ::
 
-    create_merger_model = .false.
-    saved_model_for_merger_1 = 'undefined'
-    saved_model_for_merger_2 = 'undefined'
+   create_merger_model = .false.
+   saved_model_for_merger_1 = 'undefined'
+   saved_model_for_merger_2 = 'undefined'

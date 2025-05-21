@@ -1622,18 +1622,18 @@
     set_initial_omega_div_omega_crit = .false.
 
 
-      ! new_surface_rotation_v = 0 ! (km sec^1)
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! set_surface_rotation_v = .false.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! set_initial_surface_rotation_v = .false.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! new_surface_rotation_v
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! set_surface_rotation_v
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! set_initial_surface_rotation_v
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! as above, but sets surface velocity in km/sec
 
       ! ::
 
-    new_surface_rotation_v = 0
+    new_surface_rotation_v = 0  ! in km/sec
     set_surface_rotation_v = .false.
     set_initial_surface_rotation_v = .false.
 
