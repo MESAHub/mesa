@@ -7710,7 +7710,7 @@
       ! N2 over the entire stellar model.
 
       ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
-      ! Bildsten et al. (2012): //ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract
+      ! `Bildsten et al. (2012) <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_
 
       ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
       ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
@@ -9211,8 +9211,8 @@
       ! if using this, do not set use_artificial_viscosity true.
 
       ! artificial viscosity controls
-      ! for the equations see: Appendix C in Stellingwerf 1975
-      ! http://adsabs.harvard.edu/abs/1975ApJ...195..441S.
+      ! for the equations see: Appendix C in
+      ! `Stellingwerf (1975) <http://adsabs.harvard.edu/abs/1975ApJ...195..441S>`_
       ! In principle, for not too-non-adiabatic convective models artificial viscosity is not
       ! needed or should be very small. Hence a large cut-off parameter below (in purely
       ! radiative models the default value for cut-off was 0.01)

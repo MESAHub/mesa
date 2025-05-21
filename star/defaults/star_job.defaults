@@ -860,6 +860,8 @@
       ! ``relax_composition_filename`` holds the desired composition profile information
       ! file format for relax composition
 
+      ! ::
+
       !     1st line: num_points num_species
       !     then 1 line for for each point where define desired composition
       !     xq xa(1) ... xa(num_species)
@@ -1059,6 +1061,8 @@
       ! ``relax_angular_momentum_filename`` holds the desired angular momentum profile information
       ! file format for relax angular momentum
 
+      ! ::
+
       !     1st line: num_points
       !     then 1 line for for each point where define desired angular momentum
       !     xq angular_momentum
@@ -1066,7 +1070,7 @@
       !     where xmstar = mstar - M_center
       !     angular_momentum = specific angular momentum in units of cm^2/s
 
-      ! 'relax_angular_momentum_constant_omega_center' is used to account for points near the center that could
+      ! ``relax_angular_momentum_constant_omega_center`` is used to account for points near the center that could
       ! be outside the range of the input data. In this case, normally the interpolation routine would just
       ! provide a value truncated to the edge of the data that would result in a large spike in central omega.
       ! If this option is true, then the innermost regions of the star that are outside of the range
@@ -2687,10 +2691,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! If this is true, use the A=17-28 weak reaction rates from
-
-      !     Suzuki, Toki, and Nomoto (2016)
-      !     Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
-      !     http://adsabs.harvard.edu/abs/2016ApJ...817..163S
+      ! `Suzuki, Toki, and Nomoto (2016) <http://adsabs.harvard.edu/abs/2016ApJ...817..163S>`_:
+      ! Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
 
       ! If you make use of these rates, please cite the above paper.
 
@@ -2877,6 +2879,8 @@
       ! ~~~~~~~~~~~~~~~~
       ! color_num_colors
       ! ~~~~~~~~~~~~~~~~
+
+      ! ::
 
       !     Filenames for each bolometric correction (BC) table to load
       !     Must set the number of files to load

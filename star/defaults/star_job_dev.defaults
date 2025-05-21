@@ -127,7 +127,7 @@
       ! saved_model_for_merger_2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! !!! EXPERIMENTAL. !!! 
+      ! !!! EXPERIMENTAL. !!!
       ! If ``create_merger_model`` is true, then create a star by merging the two models provided.
 
       ! ::
