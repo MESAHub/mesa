@@ -34,7 +34,7 @@
 ! warn_binary_extra
 ! ~~~~~~~~~~~~~~~~~
 
-! Due to changing the run_star_extras functions to hooks,we break existing
+! Due to changing the run_star_extras functions to hooks, we break existing
 ! run_binary_extras files. This flag sets a warning message and stops the MESA
 ! run until it is set to .false.. This way people will hopefully not be confused
 ! as to why their run_binary_extras functions are not being called.
@@ -83,8 +83,8 @@
 ! Set this to .true. to model the evolution of both stars. If
 ! .false. then only inlist_names(1) will be used, and the other
 ! star will be modeled as a point mass. This option is ignored for
-! loaded models, to setup a component as a point mass in that case
-! use 'change_point_mass_i'
+! loaded models, to set up a component as a point mass in that case
+! use ``change_point_mass_i``
 
 ! ::
 
@@ -190,7 +190,7 @@
 
 ! point_mass_i stores the index of the star that is treated as a point mass
 ! equal to zero if both stars are modeled
-! by default point_mass_i is set by evolve_both_stars (0 if evolve_both_stars istrue, 2 if false)
+! by default point_mass_i is set by evolve_both_stars (0 if evolve_both_stars is true, 2 if false)
 
 ! ::
 

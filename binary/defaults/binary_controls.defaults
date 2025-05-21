@@ -1368,7 +1368,7 @@
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ! Terminate if, for the current orbital separation, the radius at the point
-! where CE_xa_diff_to_terminate applies would overflow its Roche lobe
+! where ``CE_xa_diff_to_terminate`` applies would overflow its Roche lobe
 
 ! ::
 
