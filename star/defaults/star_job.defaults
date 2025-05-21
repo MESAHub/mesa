@@ -463,12 +463,12 @@
       ! pre_ms_check_radiative_core_min_mass
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! pre_ms_relax_to_start_radiative_core. wait this many steps before start checking for radiative core
-      ! pre_ms_check_radiative_core_start. only start checking after have encountered min_conv_mx1_bot < this
-      ! this forces it to wait until after have become fully convective.
-      ! pre_ms_check_radiative_core_stop. stop when conv_mx1_bot > this (measured in q).
-      ! The relaxation to a radiative core is stopped if Lnuc/L>pre_ms_check_radiative_core_Lnuc_div_L_limit,
-      ! or when the mass is below pre_ms_check_radiative_core_min_mass (in Msun).
+      ! |    ``pre_ms_relax_to_start_radiative_core``. wait this many steps before start checking for radiative core
+      ! |    ``pre_ms_check_radiative_core_start``. only start checking after have encountered ``min_conv_mx1_bot`` < this
+      ! |    this forces it to wait until after have become fully convective.
+      ! |    ``pre_ms_check_radiative_core_stop``. stop when ``conv_mx1_bot`` > this (measured in q).
+      ! |    The relaxation to a radiative core is stopped if Lnuc/L > ``pre_ms_check_radiative_core_Lnuc_div_L_limit``,
+      ! |    or when the mass is below ``pre_ms_check_radiative_core_min_mass`` (in Msun).
 
       ! ::
 
@@ -860,7 +860,7 @@
       ! ``relax_composition_filename`` holds the desired composition profile information
       ! file format for relax composition
 
-      ! ::
+      ! .. code-block:: console
 
       !     1st line: num_points num_species
       !     then 1 line for for each point where define desired composition
@@ -1061,8 +1061,6 @@
       ! ``relax_angular_momentum_filename`` holds the desired angular momentum profile information
       ! file format for relax angular momentum
 
-      ! ::
-
       !     1st line: num_points
       !     then 1 line for for each point where define desired angular momentum
       !     xq angular_momentum
@@ -1119,7 +1117,7 @@
       ! ``relax_entropy_filename`` holds the desired entropy profile information
       ! file format for relax entropy
 
-      ! ::
+      ! .. code-block:: console
 
       !     1st line: num_points
       !     then 1 line for for each point where define desired entropy
@@ -1149,7 +1147,7 @@
       ! specified above. So, for example, when using 'eosDT' the format of
       ! the input file is
 
-      ! ::
+      ! .. code-block:: console
 
       !     1st line: num_points
       !     then 1 line for for each point where define desired entropy
@@ -2880,21 +2878,19 @@
       ! color_num_colors
       ! ~~~~~~~~~~~~~~~~
 
-      ! ::
+      ! |    Filenames for each bolometric correction (BC) table to load
+      ! |    Must set the number of files to load
+      ! |    Must be <= ``max_num_color_files`` (defined in ``colors_def.f90``).
+      ! |    Must set the number of BC's in each file (May be different for each file).
+      ! |    Must be <= ``max_num_bcs_per_file`` (defined in ``colors_def.f90``).
+      ! |    Files should be structured as:
+      ! |    Teff log_g M_div_h filter1 filter2 ....
+      ! |    where filter1 is the name of the filter (No spaces allowed in name)
+      ! |    Names must be unique across all files loaded and are case sensitive.
+      ! |    For a filter named filter1 history output will be bc_filter1 for bolometric corrections
+      ! |    and abs_mag_filter1 for absolute magnitude
 
-      !     Filenames for each bolometric correction (BC) table to load
-      !     Must set the number of files to load
-      !     Must be <= ``max_num_color_files`` (defined in ``colors_def.f90``).
-      !     Must set the number of BC's in each file (May be different for each file).
-      !     Must be <= ``max_num_bcs_per_file`` (defined in ``colors_def.f90``).
-      !     Files should be structured as:
-      !     Teff log_g M_div_h filter1 filter2 ....
-      !     where filter1 is the name of the filter (No spaces allowed in name)
-      !     Names must be unique across all files loaded and are case sensitive.
-      !     For a filter named filter1 history output will be bc_filter1 for bolometric corrections
-      !     and abs_mag_filter1 for absolute magnitude
-
-      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code
+      ! Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code
 
       ! ::
 
