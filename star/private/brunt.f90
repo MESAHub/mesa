@@ -414,6 +414,7 @@
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_eos_dxa
          real(dp) :: mass_corr_factor, delta_lnP, delta_lnMbar, Ppoint, dlnP_dm, alfa
          real(dp) :: chiT, B_term, spatial_derivative_dX_dlnP
+         !real(dp) :: num, deriv, den
          integer :: i
 
          logical, parameter :: dbg = .false.
@@ -426,7 +427,7 @@
 
          logT_face = log10(T_face)
          logRho_face = log10(rho_face)
-         Prad_face = crad * T_face**4 / 3
+         Prad_face = crad * pow4(T_face) / 3d0
 
          if (is_bad_num(logT_face) .or. is_bad_num(logRho_face)) then
             ierr = -1
@@ -445,7 +446,23 @@
          chiT = d_eos_dlnT(i_lnPgas)
 
          ! Initialize B_term to accumulate the contribution from each species
-         B_term = 0.0
+         B_term = 0d0
+
+        ! Compute pressure difference across adjacent cells
+        delta_lnP = s% lnPeos(k-1) - s% lnPeos(k)
+
+        if (.false.) then ! for debugging, if we want to know when Peos is unchanging.
+            if (abs(delta_lnP) < 1d-30) then
+            write (*,'(A,I0,A,F12.5)') '*** ZERO ΔlnP at k=', k, ', ΔlnP=', delta_lnP
+            end if
+        end if
+
+        if (abs(delta_lnP) < 1d-15) then
+        ! no resolvable composition gradient ⇒  B stays zero
+        s%brunt_B(k) = 0d0
+        return
+        end if
+
 
          ! Compute the Brunt B composition term
          do i = 1, species
@@ -453,6 +470,17 @@
             spatial_derivative_dX_dlnP = (s% xa(i,k) - s% xa(i,k-1))/(s% lnPeos(k) - s% lnPeos(k-1))
             B_term = B_term - (d_eos_dxa(i_lnPgas, i)  * spatial_derivative_dX_dlnP)
          end do
+
+!        do i = 1, species
+!        num = s% xa(i,k) - s% xa(i,k-1)
+!        den = delta_lnP
+!        deriv = num/den
+!        if (is_bad_num(deriv)) then
+!        write (*,'(A,I0,A,I0,A,F12.5,A,F12.5)') &
+!        'Bad dX/dlnP at k=', k, ', i=', i, ': num=', num, ', den=', den
+!        end if
+!        B_term = B_term - d_eos_dxa(i_lnPgas,i) * deriv
+!        end do
 
          ! Final calculation of B using chiT
          s% brunt_B(k) = B_term / chiT
