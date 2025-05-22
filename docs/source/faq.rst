@@ -635,10 +635,11 @@ Installing Older Versions of MESA
 Older versions of MESA may fail to compile with more recent versions of
 the MESA SDK. There are a few possible solutions:
 
-(1) Use the contemporary version of the SDK. There is a `list of old
-    MESA
-    SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
-    that indicates which version of MESA was current when each was
+(1) Use the contemporary version of the SDK.
+    See the `MESA SDK Download Page <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Download>`__
+    or the `list of old
+    MESA SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
+    for a table of which version of MESA was current when each version of the MESA SDK
     released.
 
 (2) Work in a Docker container configured to set up an environment
