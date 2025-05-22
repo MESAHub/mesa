@@ -414,7 +414,7 @@
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_eos_dxa
          real(dp) :: delta_lnMbar, Ppoint, dlnP_dm, alfa
          real(dp) :: B_term, spatial_derivative_dX_dlnP, chiT
-         real(dp) :: delta_lnP_cell, comp, y, t
+         real(dp) :: delta_lnP !, comp, y, t
          integer :: i
 
          logical, parameter :: dbg = .false.
@@ -443,54 +443,45 @@
          if (ierr /= 0) return
 
          ! Extract chiT
-         chiT = d_eos_dlnT(i_lnPgas)
+         chiT = d_eos_dlnT(i_lnPgas) ! should we be using chiT_face instead?
 
          ! Initialize B_term to accumulate the contribution from each species
          B_term = 0d0
          comp   = 0d0          ! compensator
 
         ! Compute pressure difference across adjacent cells
-        delta_lnP_cell  = s%lnPeos(k-1) - s%lnPeos(k) ! center difference
-        if (abs(delta_lnP_cell) < tiny(1d0)) then ! is this an okay check?
-            ! if the face pressure is flat, then the derivative is numerically zero
-            s% brunt_B(k) = 0d0
-            return
+        delta_lnP  = s%lnPeos(k-1) - s%lnPeos(k) ! center difference
+        if (delta_lnP > -1d-50) then ! always applied.
+        alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+        Ppoint = alfa*s% Peos(k) + (1-alfa)*s% Peos(k-1)
+        dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))*Ppoint)
+        delta_lnP = dlnP_dm*s% dm_bar(k)
         end if
 
-         ! Compute the Brunt B composition term
-!        do i = 1, species
-!            !X_face_p1 = xa_face(i, k)      ! face between zones k and k+1
-!            !X_face_m1 = xa_face(i, k-1)    ! face between zones k-1 and k
-!            spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP_cell
-!            if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
-!            B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
-!        end do
+        ! Compute the Brunt B composition term
+        do i = 1, species
+            spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
+            if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
+            B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
+        end do
 
-
-         do i = 1, species
-             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP_cell
-             if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
-             y = -d_eos_dxa(i_lnPgas,i) * spatial_derivative_dX_dlnP - comp
-             t = B_term + y
-             comp = (t - B_term) - y
-             B_term = t
-         end do
+! might be necessary to use a compensator for large sums...
+!         do i = 1, species
+!             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
+!             if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
+!             y = -d_eos_dxa(i_lnPgas,i) * spatial_derivative_dX_dlnP - comp
+!             t = B_term + y
+!             comp = (t - B_term) - y
+!             B_term = t
+!         end do
 
          ! Final calculation of B using chiT
          s% brunt_B(k) = B_term / chiT
 
-        ! this block is always executed and assume HSE, is this an error?
-         if (delta_lnP_cell > -1d-50) then
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            Ppoint = alfa*s% Peos(k) + (1-alfa)*s% Peos(k-1)
-            dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))*Ppoint)
-            delta_lnP_cell = dlnP_dm*s% dm_bar(k)
-         end if
-
          ! add term accounting for the composition-related gradient in gravitational mass
          if (s% use_mass_corrections) then
             delta_lnMbar = log(s% mass_correction(k-1)) - log(s% mass_correction(k))
-            s% brunt_B(k) = s% brunt_B(k) - chiRho_face*delta_lnMbar/delta_lnP_cell/chiT_face
+            s% brunt_B(k) = s% brunt_B(k) - chiRho_face*delta_lnMbar/delta_lnP/ChiT
          end if
 
          ! Check for bad numbers
