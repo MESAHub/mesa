@@ -286,10 +286,10 @@ c
 c  common defining standard input and output
 c
       common/cstdio/ istdin, istdou, istdpr, istder
-      !external time
-      data trailer_par /''/
-c
       save 
+      !external time
+      trailer_par = ''
+c
       data nnul /0/
 c
 c  find file name
