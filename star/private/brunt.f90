@@ -447,7 +447,7 @@
 
          ! Initialize B_term to accumulate the contribution from each species
          B_term = 0d0
-         comp   = 0d0          ! compensator
+         !comp   = 0d0          ! compensator
 
         ! Compute pressure difference across adjacent cells
         delta_lnP  = s%lnPeos(k-1) - s%lnPeos(k) ! center difference
