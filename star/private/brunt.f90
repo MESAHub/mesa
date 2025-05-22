@@ -62,6 +62,17 @@
                 s% retry_message = 'failed in other_brunt'
                 if (s% report_ierr) write(*, *) s% retry_message
             end if
+
+         else if (s% use_eos_partials_for_Brunt) then
+            ! ------------------------------------------------------------
+            ! chain-rule approach for calculating B from eos partials, see MESA II equation 6.
+            ! ------------------------------------------------------------
+            call do_brunt_B_eos_partials_form(s, nzlo, nzhi, ierr)
+            if (ierr /= 0) then
+               s% retry_message = 'failed in do_brunt_B_eos_partials_form'
+               if (s% report_ierr) write(*, *) s% retry_message
+            end if
+
          else
             call do_brunt_B_MHM_form(s,nzlo,nzhi,ierr)
             if (ierr /= 0) then
@@ -331,5 +342,158 @@
          end if
 
       end subroutine get_brunt_B
+
+
+      subroutine do_brunt_B_eos_partials_form(s, nzlo, nzhi, ierr)
+         use star_utils, only: get_face_values
+         use interp_1d_def
+
+         type (star_info), pointer :: s
+         integer, intent(in) :: nzlo, nzhi
+         integer, intent(out) :: ierr
+
+
+         real(dp), allocatable, dimension(:) :: T_face, rho_face, chiT_face, chiRho_face
+         real(dp), allocatable, dimension(:,:) :: xa_face! (species, k)
+         integer :: nz, species, k, op_err
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         ierr = 0
+
+         nz = s% nz
+         species = s% species
+
+         allocate(T_face(nz), rho_face(nz), chiT_face(nz), chiRho_face(nz), xa_face(species, nz))
+
+         ! should we parallelize this?
+         do k = 1, species
+            call get_face_values(s, s% xa(k, :), xa_face(k, :), ierr)
+            if (ierr /= 0) return
+         end do
+         !!!
+
+         call get_face_values(s, s% chiT, chiT_face, ierr)
+         if (ierr /= 0) return
+
+         call get_face_values(s, s% chiRho, chiRho_face, ierr)
+         if (ierr /= 0) return
+
+         call get_face_values(s, s% T, T_face, ierr)
+         if (ierr /= 0) return
+
+         call get_face_values(s, s% rho, rho_face, ierr)
+         if (ierr /= 0) return
+
+      !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+         do k=nzlo,nzhi
+            op_err = 0
+            call get_brunt_B_from_eos_partials(&
+               s, species, nz, k, T_face(k), rho_face(k), chiT_face(k), chiRho_face(k), xa_face(:,:), op_err)
+            if (op_err /= 0) ierr = op_err
+         end do
+      !$OMP END PARALLEL DO
+
+
+      end subroutine do_brunt_B_eos_partials_form
+
+      subroutine get_brunt_B_from_eos_partials(s, species, nz, k, T_face, rho_face, chiT_face, chiRho_face, xa_face, ierr)
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
+         use eos_support, only: get_eos
+
+         type (star_info), pointer :: s
+         integer, intent(in) :: species, nz, k
+         real(dp), intent(in) :: T_face, rho_face, chiT_face, chiRho_face
+         integer, intent(out) :: ierr
+
+         real(dp) :: logRho_face, logT_face, Prad_face
+         real(dp),  dimension(species,nz), intent(in):: xa_face! (species, nz)
+         real(dp), dimension(num_eos_basic_results) :: res, d_eos_dlnd, d_eos_dlnT
+         real(dp), dimension(num_eos_d_dxa_results, species) :: d_eos_dxa
+         real(dp) :: delta_lnMbar, Ppoint, dlnP_dm, alfa
+         real(dp) :: B_term, spatial_derivative_dX_dlnP, chiT
+         real(dp) :: delta_lnP !, comp, y, t
+         integer :: i
+
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         ierr = 0
+         s% brunt_B(k) = 0
+         if (k <= 1) return ! should we add a check for nz?
+
+         logT_face = log10(T_face)
+         logRho_face = log10(rho_face)
+         Prad_face = crad * pow4(T_face) / 3d0
+
+         if (is_bad_num(logT_face) .or. is_bad_num(logRho_face)) then
+            ierr = -1
+            return
+         end if
+
+         ! Call the EOS to get the required partial derivatives
+         call get_eos( &
+            s, 0, xa_face(:,k), &
+            rho_face, logRho_face, T_face, logT_face, &
+            res, d_eos_dlnd, d_eos_dlnT, &
+            d_eos_dxa, ierr)
+         if (ierr /= 0) return
+
+         ! Extract chiT
+         chiT = d_eos_dlnT(i_lnPgas) ! should we be using chiT_face instead?
+
+         ! Initialize B_term to accumulate the contribution from each species
+         B_term = 0d0
+         !comp   = 0d0          ! compensator
+
+        ! Compute pressure difference across adjacent cells
+        delta_lnP  = s%lnPeos(k-1) - s%lnPeos(k) ! center difference
+        if (delta_lnP > -1d-50) then ! always applied.
+        alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+        Ppoint = alfa*s% Peos(k) + (1-alfa)*s% Peos(k-1)
+        dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))*Ppoint)
+        delta_lnP = dlnP_dm*s% dm_bar(k)
+        end if
+
+        ! Compute the Brunt B composition term
+        do i = 1, species
+            spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
+            B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
+        end do
+
+! might be necessary to use a compensator for large sums...
+!         do i = 1, species
+!             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
+!             y = -d_eos_dxa(i_lnPgas,i) * spatial_derivative_dX_dlnP - comp
+!             t = B_term + y
+!             comp = (t - B_term) - y
+!             B_term = t
+!         end do
+
+         ! Final calculation of B using chiT
+         s% brunt_B(k) = B_term / chiT
+
+         ! add term accounting for the composition-related gradient in gravitational mass
+         if (s% use_mass_corrections) then
+            delta_lnMbar = log(s% mass_correction(k-1)) - log(s% mass_correction(k))
+            s% brunt_B(k) = s% brunt_B(k) - chiRho_face*delta_lnMbar/delta_lnP/ChiT
+         end if
+
+         ! Check for bad numbers
+         if (is_bad_num(s% brunt_B(k))) then
+            ierr = -1
+            s% retry_message = 'bad num for brunt_B'
+            if (s% report_ierr) then
+               write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
+               write(*,2) 'chiT', k, chiT
+               write(*,2) 'B_term', k, B_term
+               call mesa_error(__FILE__, __LINE__, 'get_brunt_B_from_eos_partials')
+            end if
+         end if
+      end subroutine get_brunt_B_from_eos_partials
+
+
 
       end module brunt
