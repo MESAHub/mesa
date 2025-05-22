@@ -354,7 +354,6 @@
 
 
          real(dp), allocatable, dimension(:) :: T_face, rho_face, chiT_face, chiRho_face
-      !   real(dp) :: mass_corr_factor, delta_lnP, delta_lnMbar, B_cell_centered
          real(dp), allocatable, dimension(:,:) :: xa_face! (species, k)
          integer :: nz, species, k, op_err
          logical, parameter :: dbg = .false.
@@ -366,9 +365,9 @@
          nz = s% nz
          species = s% species
 
-         allocate(T_face(nz), rho_face(nz), chiT_face(nz), chiRho_face(nz), xa_face(species, nz)) ! ,B_cell_centered(nz)
+         allocate(T_face(nz), rho_face(nz), chiT_face(nz), chiRho_face(nz), xa_face(species, nz))
 
-         ! can we paralleize this?
+         ! should we parallelize this?
          do k = 1, species
             call get_face_values(s, s% xa(k, :), xa_face(k, :), ierr)
             if (ierr /= 0) return
@@ -461,14 +460,12 @@
         ! Compute the Brunt B composition term
         do i = 1, species
             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
-            !if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
             B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
         end do
 
 ! might be necessary to use a compensator for large sums...
 !         do i = 1, species
 !             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
-!             if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
 !             y = -d_eos_dxa(i_lnPgas,i) * spatial_derivative_dX_dlnP - comp
 !             t = B_term + y
 !             comp = (t - B_term) - y
