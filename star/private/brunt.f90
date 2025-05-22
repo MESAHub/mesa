@@ -461,7 +461,7 @@
         ! Compute the Brunt B composition term
         do i = 1, species
             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
-            if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
+            !if (abs(spatial_derivative_dX_dlnP) < 1d-12) spatial_derivative_dX_dlnP = 0d0
             B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
         end do
 
