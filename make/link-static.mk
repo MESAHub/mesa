@@ -3,6 +3,6 @@ LIB_NAMES := $(MODULE_NAME)
 INSTALL_COMMANDS += install-lib
 
 $(OBJ_OUT): $(OBJS) | $(BUILD_DIR_MODULE)/lib/
-	$(LIB_TOOL_STATIC) -o $(OBJ_OUT) $(OBJS)
+	$(LIB_TOOL_STATIC) $(OBJ_OUT) $(OBJS)
 
 include $(MAKE_DIR)/pkg-config.mk
