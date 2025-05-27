@@ -100,7 +100,7 @@ def get_star_history_def(filename="star/private/star_history_def.f90"):
     # these lines look like:
     #   history_column_name(h_star_mass) = 'star_mass'
     #                                       ^^^^^^^^^
-    regexp = r"history_column_name\\(h_\w+\\)[ ]*=[&\s]*'(\w+)'"
+    regexp = r"history_column_name\(h_\w+\)[ ]*=[&\s]*'(\w+)'"
 
     return get_options(filename, regexp)
 
@@ -111,7 +111,7 @@ def get_star_history(filename="star/private/history.f90"):
     # these lines look like:
     #   case(h_star_mass)
     #          ^^^^^^^^^
-    regexp = r"case[ ]*\\(h_(\w+)\\)"
+    regexp = r"case[ ]*\(h_(\w+)\)"
 
     return get_options(filename, regexp)
 
@@ -274,7 +274,7 @@ def get_profile_getval(filename="star/private/profile_getval.f90"):
     # these lines look like:
     #   case(p_zone)
     #          ^^^^
-    regexp = r"case[ ]*\\(p_(\w+)\\)"
+    regexp = r"case[ ]*\(p_(\w+)\)"
 
     return get_options(filename, regexp)
 
@@ -285,7 +285,7 @@ def get_profile_def(filename="star/private/star_profile_def.f90"):
     # these lines look like:
     #   profile_column_name(p_zone) = 'zone'
     #                                  ^^^^^
-    regexp = r"profile_column_name\\(p_\w+\\)[ ]*=[&\s]*'(\w+)'"
+    regexp = r"profile_column_name\(p_\w+\)[ ]*=[&\s]*'(\w+)'"
 
     return get_options(filename, regexp)
 
