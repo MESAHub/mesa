@@ -29,7 +29,7 @@ This script checks that the controls and star_job defaults, the
 ``*_controls.inc``, and ``*_io.f90`` files are in sync.
 
 check_pgstar.py
-----------------
+---------------
 
 This script checks that the inlist_pgstar files in the test_suite
 have valid history/profile columns. Note it will have false positives for things only
