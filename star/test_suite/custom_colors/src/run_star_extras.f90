@@ -249,12 +249,6 @@ end function
       vega_filepath = trim(mesa_dir) // colors_settings% vega_sed
       make_sed = colors_settings% make_csv
 
-      print *, sed_filepath, filter_dir 
-
-      ! Use s% just like s%
-      print *, "Stellar atmosphere:", trim(colors_settings% stellar_atm)
-      print *, "Instrument:", trim(colors_settings% instrument)
-
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))
       call read_strings_from_file(array_of_strings, num_strings, id)
