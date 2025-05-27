@@ -171,16 +171,8 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
     cdef = get_defaults(defaults_file)
 
     false_positives = (
-        f"extra_{module}_inlist1_name",
-        f"extra_{module}_inlist2_name",
-        f"extra_{module}_inlist3_name",
-        f"extra_{module}_inlist4_name",
-        f"extra_{module}_inlist5_name",
-        f"read_extra_{module}_inlist1",
-        f"read_extra_{module}_inlist2",
-        f"read_extra_{module}_inlist3",
-        f"read_extra_{module}_inlist4",
-        f"read_extra_{module}_inlist5",
+        f"extra_{module}_inlist_name",
+        f"read_extra_{module}_inlist",
         f"save_{module}_namelist",
         f"{module}_namelist_name",
     )
