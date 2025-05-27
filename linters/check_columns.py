@@ -168,6 +168,7 @@ def check_history():
         "lg_Dsurf",
         "lg_Lneu",
         "lg_Lnuc",
+        "lg_Lnuc_tot",
         "lg_Lphoto",
         "lg_Mdot",
         "remnant_M",
