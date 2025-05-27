@@ -1,6 +1,3 @@
-#!/bin/bash
-
-function error {
 	echo
 	more diff.txt
 	echo
