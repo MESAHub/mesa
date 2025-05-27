@@ -36,14 +36,13 @@ have valid history/profile columns. Note it will have false positives for things
 defined in a run_star_extras.f90 and does not check non inlist_pgstar files
 pgstar sections.
 
-
 fix_underlines.py
 -----------------
 
 This script checks that the ~-level underlines in the defaults files
 are the correct lengths and fixes any problems it finds.
 
-mesa_linter.py
+mesa-linter.py
 --------------
 
 Checks fortran files for consistency with MESA's style guide.
@@ -60,7 +59,7 @@ Provides only a count per file of the number of issues found
 
   python mesa-linter.py -s *.f90
 
-check_test_suite_onwers.py
+check_test_suite_owners.py
 --------------------------
 
 This script checks that each test suite case is listed in CODEOWNERS and

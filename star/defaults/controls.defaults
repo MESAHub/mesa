@@ -4116,7 +4116,7 @@
 
 
       ! D_mix_rotation_min_tau_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Drop rotational components of ``D_mix`` for locations where tau <= this.
       ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
