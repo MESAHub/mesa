@@ -194,7 +194,11 @@ def check_pgstar(filename, options, defaults, false_positives):
             continue
 
         if column_check in options:
-            if value not in defaults and value not in false_positives:
+            if (
+                value not in defaults
+                and value not in false_positives
+                and column_check[-5:] != "_name"
+            ):
                 result.append((column, value))
 
     return result
