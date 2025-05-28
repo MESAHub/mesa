@@ -6,7 +6,10 @@ import glob
 
 import check_columns as cc
 
-MESA_DIR = os.environ["MESA_DIR"]
+try:
+    MESA_DIR = os.environ["MESA_DIR"]
+except KeyError:
+    MESA_DIR = "../"
 
 profile_options = cc.CaseInsensitiveSet(
     [

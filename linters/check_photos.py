@@ -5,7 +5,10 @@ import sys
 import re
 from collections.abc import MutableSet
 
-MESA_DIR = "../"
+try:
+    MESA_DIR = os.environ["MESA_DIR"]
+except KeyError:
+    MESA_DIR = "../"
 
 
 class CaseInsensitiveSet(MutableSet):
