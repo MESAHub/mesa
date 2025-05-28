@@ -195,7 +195,8 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
         r1, r2 = check_io(io_file, dt, i)
         m1.extend(r1)
         m2.extend(r2)
-        exit_code = 1
+        if len(r1) or len(r2):
+            exit_code = 1
 
     for i in m1:
         print(i)

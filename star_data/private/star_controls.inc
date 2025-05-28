@@ -1033,7 +1033,6 @@
             mdot_revise_factor, implicit_mdot_boost
          real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
-         real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
          real(dp) :: D_mix_rotation_max_logT_full_on, &
             D_mix_rotation_min_logT_full_off, &

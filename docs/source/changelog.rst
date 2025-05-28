@@ -76,7 +76,7 @@ Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to c
 
 Fixed bug in binary photos. They were not saving the variables: ``CE_years_detached``, ``CE_years_detached_old``, ``generations``.
 
-Fixed missing default values for: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``. Removed ``retain_fallback_at_each_step`` (unused)
+Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
