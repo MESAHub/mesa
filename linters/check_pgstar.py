@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import glob
 
 import check_columns as cc
@@ -207,6 +208,7 @@ def check_pgstar(filename, options, defaults, false_positives):
 
 
 def check_all_pgstars(options, defaults, false_postives):
+    exit_code = 0
     for filename in glob.glob(
         os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
     ):
@@ -214,21 +216,31 @@ def check_all_pgstars(options, defaults, false_postives):
         if values is None:
             continue
         if len(values):
+            exit_code = 1
             print(f"\n\n*** {filename} ***\n")
             for i in values:
                 print(*i)
             print()
             print()
 
+    return exit_code
+
 
 def check_all_history_pgstars():
-    check_all_pgstars(history_options, history_defaults, history_false_positives)
+    return check_all_pgstars(history_options, history_defaults, history_false_positives)
 
 
 def check_all_profile_pgstars():
-    check_all_pgstars(profile_options, profile_defaults, profile_false_positives)
+    return check_all_pgstars(profile_options, profile_defaults, profile_false_positives)
 
 
 if __name__ == "__main__":
-    check_all_history_pgstars()
-    check_all_profile_pgstars()
+    result1 = check_all_history_pgstars()
+    result2 = check_all_profile_pgstars()
+
+    result = result1 or result2
+    if result == 0:
+        print("All checks passed.")
+    else:
+        print("Some checks failed.")
+    sys.exit(result)

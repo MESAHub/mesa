@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import re
 from collections.abc import MutableSet
 
@@ -168,6 +169,11 @@ def check_in_out():
     print_section("Out, not in")
     print_variables(v_out - v_in)
 
+    print()
+
+    # return 0 if pass, else 1
+    return 0 if not (v_in - v_out or v_out - v_in) else 1
+
 
 def check_step_input():
     sd_vars = get_star_data_set_input_variables()
@@ -176,11 +182,22 @@ def check_step_input():
     print_section("step input vars not read in photo")
     print_variables(sd_vars - pi_vars)
 
+    print()
+
+    # return 0 if pass, else 1
+    return 0 if not (sd_vars - pi_vars) else 1
+
 
 if __name__ == "__main__":
     print("=== Photo In/Out Comparison ===")
-    check_in_out()
-    print()
+    result1 = check_in_out()
 
     print("=== Step Input / Photo In Comparison ===")
-    check_step_input()
+    result2 = check_step_input()
+
+    result = result1 or result2
+    if result == 0:
+        print("All checks passed.")
+    else:
+        print("Some checks failed.")
+    sys.exit(result)

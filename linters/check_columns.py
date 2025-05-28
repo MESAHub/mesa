@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import re
 import glob
 from collections.abc import MutableSet
@@ -252,6 +253,7 @@ def check_history():
 
     print_options(vals_history_list - vals_history - known_false_positives)
 
+    result = []
     if ENABLE_TEST_SUITE_HIST_CHECKS:
         # Value in each test case's history_columns.list but not in star/default/history_columns.list
         for i in glob.glob(
@@ -267,6 +269,8 @@ def check_history():
                 )
                 print_options(result)
                 delete_command(result, "history_columns.list")
+
+    return len(result)
 
 
 def get_profile_getval(filename="star/private/profile_getval.f90"):
@@ -438,6 +442,7 @@ def check_profile():
     )
     print_options(vals_profile - vals_profile_list)
 
+    result = []
     if ENABLE_TEST_SUITE_PROF_CHECKS:
         # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
         for i in glob.glob(
@@ -456,7 +461,16 @@ def check_profile():
                 print_options(result)
                 delete_command(result, "profile_columns.list")
 
+    return len(result)
+
 
 if __name__ == "__main__":
-    check_history()
-    check_profile()
+    result1 = check_history()
+    result2 = check_profile()
+
+    result = result1 or result2
+    if result == 0:
+        print("All checks passed.")
+    else:
+        print("Some checks failed.")
+    sys.exit(result)
