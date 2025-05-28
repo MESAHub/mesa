@@ -218,7 +218,7 @@ if __name__ == "__main__":
         "star/defaults/controls_dev.defaults",
         "star/private/ctrls_io.f90",
         "s",
-        "controls",
+        "controls_dev",
     )
 
     run_checks(
@@ -233,5 +233,5 @@ if __name__ == "__main__":
         "star/defaults/star_job_dev.defaults",
         "star/private/star_job_ctrls_io.f90",
         "s% job",
-        "star_job",
+        "star_job_dev",
     )
