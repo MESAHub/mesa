@@ -862,8 +862,7 @@
          real(dp) :: max_abs_rel_change_surf_lnS
 
          logical :: op_split_burn
-         real(dp) :: op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
-            op_split_burn_min_T_for_variable_T_solver
+         real(dp) :: op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal
 
          logical :: include_L_in_correction_limits, &
             include_v_in_correction_limits, include_u_in_correction_limits
