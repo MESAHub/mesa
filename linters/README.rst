@@ -75,7 +75,7 @@ check_stop.py
 -------------
 
 Checks all .f90 files for stop 1 or stop 'string' and replaces them with a call
-to mesa_error(__FILE__,__LINE__) . This way we can always find where an error
+to ``mesa_error(__FILE__,__LINE__)``. This way we can always find where an error
 occurs rather than the non-unique stop 1 location.
 
 check_empty_writes.py
