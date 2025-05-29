@@ -41,7 +41,7 @@
            b% extra_edot = 0d0
            b% edot = 0d0
        else
-           ! tidal circularisation
+           ! tidal circularization
            if (b% do_tidal_circ) then
               if (.not. b% use_other_edot_tidal) then
                  call edot_tidal(b% binary_id, ierr)
@@ -143,7 +143,7 @@
        end if
     end subroutine edot_tidal
 
-    real(dp) function edot_tidal_Hut(b, s , has_convective_envelope, ierr) result(edot_tidal)
+    real(dp) function edot_tidal_Hut(b, s, has_convective_envelope, ierr) result(edot_tidal)
        type (binary_info), pointer :: b
        type (star_info), pointer :: s
        logical, intent(in) :: has_convective_envelope
@@ -201,25 +201,25 @@
 
        b% edot_enhance = 0d0
 
-       ! cos_cr isn't vectorised, so we have to do this in a loop
+       ! cos_cr isn't vectorized, so we have to do this in a loop
        do i = 1, b% anomaly_steps
           costh = cos(b% theta_co(i))
 
           b% e1(i) = b% eccentricity + costh
           b% e2(i) = 2d0*costh + b% eccentricity*(1d0 + costh*costh)
-          b% e3(i) = b% eccentricity*(1d0-costh*costh)  ! = b% eccentricity*sin(b% theta_co)**2
+          b% e3(i) = b% eccentricity*(1d0 - costh*costh)  ! = b% eccentricity*sin(b% theta_co)**2
        end do
 
 !        xfer = min(b% wind_xfer_fraction, b% xfer_fraction)
        Mtot = b% m(1) + b% m(2)  ! total mass in gr
 
-       b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1  !-&
-!               b% mdot_donor_theta * xfer / b% m(b% a_i) * (b% m(b% d_i) / Mtot *&
+       b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1  !- &
+!               b% mdot_donor_theta * xfer / b% m(b% a_i) * (b% m(b% d_i) / Mtot * &
 !               ((b% m(b% a_i)**2 / b% m(b% d_i)**2 - 1 ) * e2 - e3 ))
 
-       !integrate to get total eccentricity enhancement
+       ! integrate to get total eccentricity enhancement
        de = 0d0
-       do i = 2,b% anomaly_steps  ! trapezoidal integration
+       do i = 2, b% anomaly_steps  ! trapezoidal integration
           de = de + 0.5d0 * (b% edot_theta(i-1) + b% edot_theta(i)) * (b% time_co(i) - b% time_co(i-1))
        end do
 
@@ -229,4 +229,3 @@
 
 
     end module binary_edot
-

@@ -118,9 +118,9 @@
       v_wind = sqrt(2d0 * beta *  standard_cgrav * b% m(s_i) / b% r(s_i))
 
       ! Bondi-Hoyle transfer fraction Hurley et al. 2002 eq. 6
-      b% wind_xfer_fraction(s_i) = alpha / pow2(b% separation) /&
-                  (2d0 * sqrt(1d0 - pow2(b% eccentricity))) *&
-                  pow2(standard_cgrav * b% m(3-s_i) / pow2(v_wind)) *&
+      b% wind_xfer_fraction(s_i) = alpha / pow2(b% separation) / &
+                  (2d0 * sqrt(1d0 - pow2(b% eccentricity))) * &
+                  pow2(standard_cgrav * b% m(3-s_i) / pow2(v_wind)) * &
                   pow(1d0 + pow2(v_orb/v_wind),-1.5d0)
 
       ! limit to provided maximum
@@ -151,12 +151,12 @@
 
       do i = 1,b% anomaly_steps  !limit radius / roche lobe
          ! phase dependent roche lobe radius
-         rl_d(i) = (1d0-pow2(b%eccentricity)) / (1+b%eccentricity*cos(b% theta_co(i))) * b% rl(s_i)
+         rl_d(i) = (1d0 - pow2(b%eccentricity)) / (1d0 + b%eccentricity*cos(b% theta_co(i))) * b% rl(s_i)
          r_rl(i) = min(pow6(b% r(s_i) / rl_d(i)), pow6(0.5d0))
       end do
 
       ! actual enhancement
-      mdot = s% mstar_dot * (1 + B_wind * r_rl)
+      mdot = s% mstar_dot * (1d0 + B_wind * r_rl)
 
       dm = 0d0
       do i = 2,b% anomaly_steps  ! trapezoidal integration
