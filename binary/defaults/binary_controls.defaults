@@ -427,7 +427,7 @@
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ! Limit accretion using ``mdot_edd``. The current implementation is intended for use with
-! black hole accretors, as in e.g. Podsiadlowski, Rappaport & Han (2003), MNRAS, 341, 385.
+! black hole accretors, as in, e.g., `Podsiadlowski, Rappaport & Han (2003) <https://ui.adsabs.harvard.edu/abs/2003MNRAS.341..385P/abstract>`_.
 ! For other accretors ``mdot_edd`` should be set with ``use_this_for_mdot_edd``, the hook
 ! ``use_other_mdot_edd``, or by appropriately setting ``use_this_for_mdot_edd_eta``.
 ! Note: MESA versions equal or lower than 8118 used eta=1 and did not correct
@@ -906,7 +906,7 @@
 ! do_jdot_mb
 ! ~~~~~~~~~~
 
-! Include magnetic braking as in Rappaport, Verbunt, and Joss.  apj, 275, 713-731. 1983.
+! Include magnetic braking as in `Rappaport, Verbunt & Joss (1983) <https://ui.adsabs.harvard.edu/abs/1983ApJ...275..713R/abstract>`_.
 
 ! ::
 
@@ -1009,7 +1009,7 @@
 ! ~~~~~~~~~~~~~~
 
 ! If true, compute accretion of angular momentum following A.3.3 of
-! de Mink et al. 2013, ApJ, 764, 166. Otherwise, incoming  material is
+! `de Mink et al. (2013) <https://ui.adsabs.harvard.edu/abs/2013ApJ...764..166D/abstract>`_. Otherwise, incoming material is
 ! assumed to have the specific angular momentum of the surface of the accretor.
 
 ! ::
