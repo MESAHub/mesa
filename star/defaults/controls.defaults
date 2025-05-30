@@ -1730,7 +1730,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Stop if the abs value of cumulative_energy_error/total_energy exceeds this value.
-      ! Ignore if < 0.   Also ignore during relax operations.
+      ! Ignore if < 0. Also ignore during relax operations.
 
       ! ::
 
@@ -2345,7 +2345,7 @@
       ! Henyey_MLT_nu_param
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Values of the f1..f4 coefficients are taken from Table 1 of Ludwig et al. 1999, A&A, 346, 111
+      ! Values of the f1..f4 coefficients are taken from Table 1 of `Ludwig et al. (1999) <https://ui.adsabs.harvard.edu/abs/1999A%26A...346..111L>`_
       ! with the following exception: their value of f3 for Henyey convection is ``f4/8`` when it should be
       ! ``8*f4``, i.e., ``f3=32*pi**2/3`` and ``f4=4*pi**2/3``. f3 and f4 are related to the henyey y parameter, so
       ! for the 'Henyey' case they are set based on the value of ``Henyey_y_param``.
@@ -2632,15 +2632,15 @@
       ! take a look at the following from an email concerning this:
       ! Overshooting works by taking the diffusion mixing coefficient at the edge
       ! of the convection zone and extending it beyond the zone. But -- and here's the issue --
-      ! at the exact edge of the zone the mixing coefficient goes to 0.  So we don't want that.
+      ! at the exact edge of the zone the mixing coefficient goes to 0. So we don't want that.
       ! Instead we want the value of the mixing coeff NEAR the edge, but not AT the edge.
-      ! The "f0" parameter determines the exact meaning of "near" for this.  It tells the code
+      ! The "f0" parameter determines the exact meaning of "near" for this. It tells the code
       ! how far back into the zone to go in terms of scale height. The overshooting actually
       ! begins at the location determined by f0 back into the convection zone rather than at
-      ! the edge where the diffusion coeff is ill-defined.  So, for example, if you want
+      ! the edge where the diffusion coeff is ill-defined. So, for example, if you want
       ! overshooting of 0.2 scale heights beyond the normal edge, you might want to back up
       ! 0.05 scale heights to get the diffusion coeff from near the edge and then go out
-      ! by 0.25 scale heights from there to reach 0.2 Hp beyond the old boundary.  In the
+      ! by 0.25 scale heights from there to reach 0.2 Hp beyond the old boundary. In the
       ! inlist this would mean setting the "f0" to 0.05 and the "f" to 0.25.
 
       ! For step overshoot: overshooting extends a distance overshoot_f*Hp0 from r0 with constant diffusion coefficient
@@ -3088,7 +3088,7 @@
       ! model reduces to standard MLT. See Table 1 in `Smolec & Moskalik (2008)`_
       ! for standard values and the description of the parameters.
 
-      ! .. _Smolec & Moskalik (2008): http://adsabs.harvard.edu/abs/2008AcA....58..193S
+      ! .. _Smolec & Moskalik (2008): https://ui.adsabs.harvard.edu/abs/2008AcA....58..193S
 
       ! ::
 
@@ -3172,7 +3172,7 @@
       ! Integration of the same model with different initial kicks is a way to study
       ! the nonlinear mode selection - for an example see Fig. 1 in `Smolec & Moskalik (2010)`_.
 
-      ! .. _Smolec & Moskalik (2010): http://adsabs.harvard.edu/abs/2010A%26A...524A..40S
+      ! .. _Smolec & Moskalik (2010): https://ui.adsabs.harvard.edu/abs/2010A%26A...524A..40S
 
       ! random initial velocity profile.  added to any kick from eigenvector.
 
@@ -3233,7 +3233,7 @@
       ! needed or should be very small. Hence a large cut-off parameter below (in purely
       ! radiative models the default value for cut-off was 0.01)
 
-      ! .. _Stellingwerf (1975): http://adsabs.harvard.edu/abs/1975ApJ...195..441S
+      ! .. _Stellingwerf (1975): https://ui.adsabs.harvard.edu/abs/1975ApJ...195..441S
 
       ! ::
 
@@ -4655,7 +4655,7 @@
 
       ! If ``.true.``, switch on impedance of the surface flux due to magnetic pressure from starspots,
       ! parameterized in the style of an atmospheric boundary modification. First described by
-      ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
+      ! `Somers et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`_.
       ! Detailed discussion of this functionality can be found in |MESA VI|.
 
       ! ::
@@ -4691,7 +4691,7 @@
       ! mass_change
       ! ~~~~~~~~~~~
 
-      ! Rate of accretion (Msun/year).  Negative for mass loss.
+      ! Rate of accretion (Msun/year). Negative for mass loss.
       ! This only applies when the ``wind_scheme = ''``.
 
       ! ::
@@ -4800,7 +4800,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! This section replaces the old "``RGB_wind_scheme``" and "``AGB_wind_scheme``"
-      ! with temperature-dependent hot\_wind and cool\_wind.  You can still
+      ! with temperature-dependent hot\_wind and cool\_wind. You can still
       ! use the RGB and AGB wind scheme as before, the functionality remains.
 
       ! Now you can also select a hot wind scheme that takes effect *above*
@@ -5327,7 +5327,7 @@
 
       ! Winds automatically shut off when star_mass - he_core_mass mass is less than this limit.
       ! The value of ``he_core_boundary_h1_fraction`` defines he_core_mass.
-      ! Mass in Msun units.   Previously called ``wind_envelope_limit``.
+      ! Mass in Msun units. Previously called ``wind_envelope_limit``.
 
       ! ::
 
@@ -5957,9 +5957,9 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! Temperature gradient, ``T_function1 = T_function1_weight*log10(T)``.
-      ! NOTE: The T gradient mesh controls below  seems to be necessary to allow burning that starts off center
-      ! to be able to reach the center.  You can see this in the ``pre_zahb`` ``test_suite`` case if you
-      ! try running it without the T function.   The center temperature will fail to rise.
+      ! NOTE: The T gradient mesh controls below seems to be necessary to allow burning that starts off center
+      ! to be able to reach the center. You can see this in the ``pre_zahb`` ``test_suite`` case if you
+      ! try running it without the T function. The center temperature will fail to rise.
 
       ! ::
 
@@ -6359,7 +6359,7 @@
 
       ! If true, then after a retry the remeshing is undone for the step,
       ! and the following try is performed with the same mesh used in the
-      ! previous step.   This can help with the retry by reducing the changes.
+      ! previous step. This can help with the retry by reducing the changes.
 
       ! ::
 
@@ -7335,7 +7335,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Phase separation upon crystallization in WD cores
-      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
+      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023ApJ...950..115B>`_.
 
       ! ::
 
@@ -7347,9 +7347,9 @@
       ! Choice of appropriate option for the WD core mixture:
 
       ! + ``'CO'`` : carbon-oxygen phase separation using the two-component
-      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
-      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
 
       ! ::
 
@@ -7710,7 +7710,7 @@
       ! N2 over the entire stellar model.
 
       ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
-      ! `Bildsten et al. (2012) <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_
+      ! `Bildsten et al. (2012) <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B>`_
 
       ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
       ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
@@ -8434,16 +8434,16 @@
       ! and the Jacobian was exact, neither of which are true.  So the best we can hope
       ! for is that the corrections will get smaller next time.
 
-      ! The "norm" is the average; the "max" is the max.  Sometimes you mainly care about
-      ! the norm and will accept a few outliers.  But sometimes you don't want any really
+      ! The "norm" is the average; the "max" is the max. Sometimes you mainly care about
+      ! the norm and will accept a few outliers. But sometimes you don't want any really
       ! bad outliers, so you want to set a low limit for the max residual or correction
       ! as well as the norm.
 
       ! You might want to try for several iterations with strict tolerances, and then
       ! relax them if things are still not converged.  For example, you might be willing
       ! to live with the larger tolerances, but you'd like to give it a good try at the
-      ! smaller ones before switching.  Also, you might be willing to settle for any-old
-      ! residual if the corrections have become small enough.  You can do that too by
+      ! smaller ones before switching. Also, you might be willing to settle for any-old
+      ! residual if the corrections have become small enough. You can do that too by
       ! relaxing the residual tolerances after a few iterations.
 
       ! Hope that at least helps with the nomenclature.
@@ -9212,7 +9212,7 @@
 
       ! artificial viscosity controls
       ! for the equations see: Appendix C in
-      ! `Stellingwerf (1975) <http://adsabs.harvard.edu/abs/1975ApJ...195..441S>`_
+      ! `Stellingwerf (1975) <https://ui.adsabs.harvard.edu/abs/1975ApJ...195..441S>`_
       ! In principle, for not too-non-adiabatic convective models artificial viscosity is not
       ! needed or should be very small. Hence a large cut-off parameter below (in purely
       ! radiative models the default value for cut-off was 0.01)
