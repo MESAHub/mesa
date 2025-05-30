@@ -210,7 +210,7 @@ contains
 
        ! read Xs
 
-       call hi_ts%  alloc_read_dset('Xs', ts% Xs)
+       call hi_ts% alloc_read_dset('Xs', ts% Xs)
        if (debug) write(*,*) "Xs", ts% Xs
        ts% num_Xs = SIZE(ts% Xs)
        if (rq% show_info) write(*,ifmt) "num Xs =", ts% num_Xs
