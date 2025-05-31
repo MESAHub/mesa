@@ -44,6 +44,7 @@ SRCS = \
    binary_utils.f90 \
    binary_photos.f90 \
    binary_jdot.f90 \
+   binary_disk.f90 \
    binary_wind.f90 \
    binary_mdot.f90 \
    binary_tides.f90 \
