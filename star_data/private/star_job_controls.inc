@@ -110,7 +110,7 @@
       real(dp) :: remove_center_logRho_limit, remove_fallback_speed_limit
       logical :: remove_initial_center_at_inner_max_abs_v, remove_center_at_inner_max_abs_v, &
          remove_fallback_at_each_step, remove_center_adjust_L_center, &
-         retain_fallback_at_each_step, remove_center_set_zero_v_center, remove_initial_fe_core, remove_fe_core, &
+         remove_center_set_zero_v_center, remove_initial_fe_core, remove_fe_core, &
          fallback_check_total_energy
 
       real(dp) :: limit_center_logP_at_each_step

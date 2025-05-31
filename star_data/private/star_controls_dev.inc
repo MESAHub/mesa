@@ -34,9 +34,10 @@
 
 
 
-
          logical :: use_mass_corrections
+
+         real(dp) :: op_split_burn_min_T_for_variable_T_solver
 
       ! WD phase separation
 
-            logical :: phase_separation_no_diffusion
+         logical :: phase_separation_no_diffusion

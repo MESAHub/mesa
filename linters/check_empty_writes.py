@@ -5,7 +5,10 @@ import re
 import sys
 from pathlib import Path
 
-MESA_DIR = os.environ["MESA_DIR"]
+try:
+    MESA_DIR = os.environ["MESA_DIR"]
+except KeyError:
+    MESA_DIR = "../"
 
 # Search files for instances on an empty writing using * as the format i.e write(*,*)
 # and replace with calls to write(*,'(A)')

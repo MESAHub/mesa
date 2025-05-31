@@ -163,7 +163,6 @@
          fallback_check_total_energy, &
          remove_fallback_speed_limit, &
          remove_center_set_zero_v_center, &
-         retain_fallback_at_each_step, &
          limit_center_logP_at_each_step, &
          remove_center_adjust_L_center, &
          remove_center_logRho_limit, &
@@ -777,7 +776,6 @@
          s% job% fallback_check_total_energy = fallback_check_total_energy
          s% job% remove_fallback_speed_limit = remove_fallback_speed_limit
          s% job% remove_center_set_zero_v_center = remove_center_set_zero_v_center
-         s% job% retain_fallback_at_each_step = retain_fallback_at_each_step
          s% job% limit_center_logP_at_each_step = limit_center_logP_at_each_step
          s% job% remove_center_adjust_L_center = remove_center_adjust_L_center
          s% job% remove_center_logRho_limit = remove_center_logRho_limit
