@@ -2,6 +2,4 @@
 
 rm -f .restart
 
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-./binary
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+make run

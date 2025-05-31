@@ -1974,6 +1974,17 @@
             call mesa_error(__FILE__,__LINE__,'setup_reaction_info')
          end if
 
+         g% num_wk_reactions = num_wk_reactions
+         allocate( &
+               g% weak_reaction_num(num_wk_reactions), &
+               g% reaction_id_for_weak_reactions(num_wk_reactions), &
+               g% weaklib_ids(num_wk_reactions), &
+               g% weak_reaction_index(num_reactions), &
+               stat=ierr)
+         if (ierr /= 0) return
+
+         if (num_reactions == 0) return
+
          call check_for_hardwired_pairs
 
          ! need to order reactions to ensure bit-for-bit results
@@ -2084,15 +2095,6 @@ kind_loop: do kind = 1, max_kind  ! reorder by kind of reaction; other_kind goes
             rtab(r_ir) = i
 
          end do
-
-         g% num_wk_reactions = num_wk_reactions
-         allocate( &
-               g% weak_reaction_num(num_wk_reactions), &
-               g% reaction_id_for_weak_reactions(num_wk_reactions), &
-               g% weaklib_ids(num_wk_reactions), &
-               g% weak_reaction_index(num_reactions), &
-               stat=ierr)
-         if (ierr /= 0) return
 
          j = 0
          do i = 1, reaction_num

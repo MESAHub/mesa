@@ -63,7 +63,7 @@ c
 c
       save
 c
-      data iblank/8h        /
+      data iblank/z'20202020'/
       data inp /-1/
       data amsun /1.989d33/
 c

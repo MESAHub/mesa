@@ -6,6 +6,7 @@ program neu_plotter
    use const_lib, only: const_init
    use math_lib
    use num_lib, only: dfridr
+   use utils_lib, only: mesa_error
 
    implicit none
 
