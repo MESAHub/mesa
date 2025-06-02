@@ -9,9 +9,6 @@ import operator
 
 MESA_DIR = os.environ.get("MESA_DIR", "../")
 
-ENABLE_TEST_SUITE_HIST_CHECKS = True
-ENABLE_TEST_SUITE_PROF_CHECKS = True
-
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):

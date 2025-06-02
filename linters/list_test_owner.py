@@ -1,9 +1,10 @@
+#!/usr/bin/env python
+
 from collections import defaultdict
 
 import check_test_suite_owners as cc
 
 # Lists test cases for each name
-
 
 codeowner = cc.parse_codeowners(cc.CODEOWNERS)
 

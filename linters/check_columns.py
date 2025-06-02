@@ -8,9 +8,6 @@ from collections.abc import MutableSet
 
 MESA_DIR = os.environ.get("MESA_DIR", "../")
 
-ENABLE_TEST_SUITE_HIST_CHECKS = True
-ENABLE_TEST_SUITE_PROF_CHECKS = True
-
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
@@ -255,21 +252,18 @@ def check_history():
     print_options(vals_history_list - vals_history - known_false_positives)
 
     result = []
-    if ENABLE_TEST_SUITE_HIST_CHECKS:
-        # Value in each test case's history_columns.list but not in star/default/history_columns.list
-        for i in glob.glob(
-            os.path.join(MESA_DIR, "star", "test_suite", "*", "history_columns.list")
-        ):
-            test_case = get_history_columns(os.path.relpath(i, MESA_DIR))
-            result = test_case - vals_history_list - known_false_positives
-            if len(result):
-                print_section(
-                    "Values that are in are in "
-                    + i
-                    + " but not in history_columns.list"
-                )
-                print_options(result)
-                delete_command(result, "history_columns.list")
+    # Value in each test case's history_columns.list but not in star/default/history_columns.list
+    for i in glob.glob(
+        os.path.join(MESA_DIR, "star", "test_suite", "*", "history_columns.list")
+    ):
+        test_case = get_history_columns(os.path.relpath(i, MESA_DIR))
+        result = test_case - vals_history_list - known_false_positives
+        if len(result):
+            print_section(
+                "Values that are in are in " + i + " but not in history_columns.list"
+            )
+            print_options(result)
+            delete_command(result, "history_columns.list")
 
     return len(result)
 
@@ -444,23 +438,18 @@ def check_profile():
     print_options(vals_profile - vals_profile_list)
 
     result = []
-    if ENABLE_TEST_SUITE_PROF_CHECKS:
-        # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
-        for i in glob.glob(
-            os.path.join(MESA_DIR, "star", "test_suite", "*", "profile_columns.list")
-        ):
-            test_case = get_profile_columns(os.path.relpath(i, MESA_DIR))
-            result = (
-                test_case - vals_profile_list - known_false_positives - general_info
+    # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
+    for i in glob.glob(
+        os.path.join(MESA_DIR, "star", "test_suite", "*", "profile_columns.list")
+    ):
+        test_case = get_profile_columns(os.path.relpath(i, MESA_DIR))
+        result = test_case - vals_profile_list - known_false_positives - general_info
+        if len(result):
+            print_section(
+                "Values that are in are in " + i + " but not in profile_columns.list"
             )
-            if len(result):
-                print_section(
-                    "Values that are in are in "
-                    + i
-                    + " but not in profile_columns.list"
-                )
-                print_options(result)
-                delete_command(result, "profile_columns.list")
+            print_options(result)
+            delete_command(result, "profile_columns.list")
 
     return len(result)
 
