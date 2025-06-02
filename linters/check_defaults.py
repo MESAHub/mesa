@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import re
 from collections.abc import MutableSet
 import functools
 import operator
 
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
-MESA_DIR = "../"
 ENABLE_TEST_SUITE_HIST_CHECKS = True
 ENABLE_TEST_SUITE_PROF_CHECKS = True
 
@@ -189,10 +190,13 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
 
     m1 = []
     m2 = []
+    exit_code = 0
     for i in cdef - false_positives:
         r1, r2 = check_io(io_file, dt, i)
         m1.extend(r1)
         m2.extend(r2)
+        if len(r1) or len(r2):
+            exit_code = 1
 
     for i in m1:
         print(i)
@@ -204,16 +208,18 @@ def run_checks(inc_file, defaults_file, io_file, dt, module):
 
     print()
 
+    return exit_code
+
 
 if __name__ == "__main__":
-    run_checks(
+    result1 = run_checks(
         "star_data/private/star_controls.inc",
         "star/defaults/controls.defaults",
         "star/private/ctrls_io.f90",
         "s",
         "controls",
     )
-    run_checks(
+    result2 = run_checks(
         "star_data/private/star_controls_dev.inc",
         "star/defaults/controls_dev.defaults",
         "star/private/ctrls_io.f90",
@@ -221,17 +227,25 @@ if __name__ == "__main__":
         "controls_dev",
     )
 
-    run_checks(
+    result3 = run_checks(
         "star_data/private/star_job_controls.inc",
         "star/defaults/star_job.defaults",
         "star/private/star_job_ctrls_io.f90",
         "s% job",
         "star_job",
     )
-    run_checks(
+    result4 = run_checks(
         "star_data/private/star_job_controls_dev.inc",
         "star/defaults/star_job_dev.defaults",
         "star/private/star_job_ctrls_io.f90",
         "s% job",
         "star_job_dev",
     )
+
+    failed = result1 + result2 + result3 + result4
+    if not failed:
+        print("All checks passed.")
+        sys.exit(0)
+    else:
+        print("Some checks failed.")
+        sys.exit(1)
