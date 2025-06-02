@@ -469,8 +469,8 @@ if __name__ == "__main__":
     result1 = check_history()
     result2 = check_profile()
 
-    result = result1 or result2
-    if result == 0:
+    result = check_history() + check_profile() > 0
+    if not result:
         print("All checks passed.")
     else:
         print("Some checks failed.")
