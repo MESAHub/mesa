@@ -7,10 +7,7 @@ from collections.abc import MutableSet
 import functools
 import operator
 
-try:
-    MESA_DIR = os.environ["MESA_DIR"]
-except KeyError:
-    MESA_DIR = "../"
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 ENABLE_TEST_SUITE_HIST_CHECKS = True
 ENABLE_TEST_SUITE_PROF_CHECKS = True
@@ -245,9 +242,10 @@ if __name__ == "__main__":
         "star_job_dev",
     )
 
-    result = result1 or result2 or result3 or result4
-    if result == 0:
+    failed = result1 + result2 + result3 + result4
+    if not failed:
         print("All checks passed.")
+        sys.exit(0)
     else:
         print("Some checks failed.")
-    sys.exit(result)
+        sys.exit(1)

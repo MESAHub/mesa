@@ -3,10 +3,7 @@ import glob
 
 # Checks whether a test case has a owner and warns for test cases with only one owner
 
-try:
-    MESA_DIR = os.environ["MESA_DIR"]
-except KeyError:
-    MESA_DIR = "../"
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 CODEOWNERS = os.path.join(MESA_DIR, "CODEOWNERS")
 

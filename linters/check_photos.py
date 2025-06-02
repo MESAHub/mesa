@@ -5,10 +5,7 @@ import sys
 import re
 from collections.abc import MutableSet
 
-try:
-    MESA_DIR = os.environ["MESA_DIR"]
-except KeyError:
-    MESA_DIR = "../"
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 
 class CaseInsensitiveSet(MutableSet):
@@ -166,6 +163,8 @@ def check_in_out():
     v_in = get_photo_in_variables()
     v_out = get_photo_out_variables()
 
+    print("=== Photo In/Out Comparison ===")
+
     print_section("In, not out")
     print_variables(v_in - v_out)
 
@@ -182,6 +181,8 @@ def check_step_input():
     sd_vars = get_star_data_set_input_variables()
     pi_vars = get_photo_in_variables()
 
+    print("=== Step Input / Photo In Comparison ===")
+
     print_section("step input vars not read in photo")
     print_variables(sd_vars - pi_vars)
 
@@ -192,15 +193,10 @@ def check_step_input():
 
 
 if __name__ == "__main__":
-    print("=== Photo In/Out Comparison ===")
-    result1 = check_in_out()
-
-    print("=== Step Input / Photo In Comparison ===")
-    result2 = check_step_input()
-
-    result = result1 or result2
-    if result == 0:
+    failed = check_in_out() + check_step_input()
+    if not failed:
         print("All checks passed.")
+        sys.exit(0)
     else:
         print("Some checks failed.")
-    sys.exit(result)
+        sys.exit(1)

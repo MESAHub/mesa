@@ -5,10 +5,7 @@ import sys
 import re
 from pathlib import Path
 
-try:
-    MESA_DIR = os.environ["MESA_DIR"]
-except KeyError:
-    MESA_DIR = "../"
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 # Search files for unnamed omp critical blocks
 

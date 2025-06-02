@@ -260,7 +260,7 @@ def check_history():
         for i in glob.glob(
             os.path.join(MESA_DIR, "star", "test_suite", "*", "history_columns.list")
         ):
-            test_case = get_history_columns(i.removeprefix(MESA_DIR))
+            test_case = get_history_columns(os.path.relpath(i, MESA_DIR))
             result = test_case - vals_history_list - known_false_positives
             if len(result):
                 print_section(
@@ -449,7 +449,7 @@ def check_profile():
         for i in glob.glob(
             os.path.join(MESA_DIR, "star", "test_suite", "*", "profile_columns.list")
         ):
-            test_case = get_profile_columns(i.removeprefix(MESA_DIR))
+            test_case = get_profile_columns(os.path.relpath(i, MESA_DIR))
             result = (
                 test_case - vals_profile_list - known_false_positives - general_info
             )
@@ -466,12 +466,10 @@ def check_profile():
 
 
 if __name__ == "__main__":
-    result1 = check_history()
-    result2 = check_profile()
-
-    result = check_history() + check_profile() > 0
-    if not result:
+    failed = check_history() + check_profile()
+    if not failed:
         print("All checks passed.")
+        sys.exit(0)
     else:
         print("Some checks failed.")
-    sys.exit(result)
+        sys.exit(1)

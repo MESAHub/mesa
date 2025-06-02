@@ -6,10 +6,7 @@ import glob
 
 import check_columns as cc
 
-try:
-    MESA_DIR = os.environ["MESA_DIR"]
-except KeyError:
-    MESA_DIR = "../"
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 profile_options = cc.CaseInsensitiveSet(
     [
@@ -238,12 +235,10 @@ def check_all_profile_pgstars():
 
 
 if __name__ == "__main__":
-    result1 = check_all_history_pgstars()
-    result2 = check_all_profile_pgstars()
-
-    result = result1 or result2
-    if result == 0:
+    failed = check_all_history_pgstars() + check_all_profile_pgstars()
+    if not failed:
         print("All checks passed.")
+        sys.exit(0)
     else:
         print("Some checks failed.")
-    sys.exit(result)
+        sys.exit(1)
