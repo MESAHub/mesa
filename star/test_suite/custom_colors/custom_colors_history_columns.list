@@ -37,13 +37,13 @@
       ! Adds all the absolute magnitudes to the output
       !add_abs_mag
 
-      ! Ouputs luminosity in filter band ``filter'' (lsun)
+      ! Outputs luminosity in filter band ``filter'' (lsun)
       ! lum_band filter
 
       ! Adds all the filter band luminosities to the output (lsun)
       ! add_lum_band
 
-      ! Ouputs log luminosity in filter band ``filter'' (log lsun)
+      ! Outputs log luminosity in filter band ``filter'' (log lsun)
       ! log_lum_band filter
 
       ! Adds all the filter band luminosities to the output (log lsun)

@@ -261,7 +261,7 @@
          ! termination codes, named t_xtra1 .. t_xtra9.  You can
          ! customize the messages that will be printed upon exit by
          ! setting the corresponding termination_code_str value.
-         ! termination_code_str(t_xtra1) = 'my termination conditon'
+         ! termination_code_str(t_xtra1) = 'my termination condition'
 
          ! by default, indicate where (in the code) MESA terminated
          if (extras_check_model == terminate) s% termination_code = t_extras_check_model
@@ -389,4 +389,3 @@
 
 
       end module run_star_extras
-

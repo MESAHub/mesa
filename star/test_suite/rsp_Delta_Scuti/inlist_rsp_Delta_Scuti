@@ -72,7 +72,7 @@
 
    ! initial kick velocity-amplitude
    RSP_kick_vsurf_km_per_sec = 3.0d0 ! can be negative
-   ! arbitrarily give weigth also to the overstable O1 mode
+   ! arbitrarily give weight also to the overstable O1 mode
    RSP_fraction_1st_overtone = 0.5d0
    RSP_fraction_2nd_overtone = 0d0
 

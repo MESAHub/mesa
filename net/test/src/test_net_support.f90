@@ -1753,7 +1753,7 @@ contains
             hh = hh/con
             a(1, i) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
             write (*, 2) 'dfdx hh', i, a(1, i), hh
-            ! compute extrapolations of various orders; the error stratagy is to compare
+            ! compute extrapolations of various orders; the error strategy is to compare
             ! each new extrapolation to one order lower but both at the same stepsize
             ! and at the previous stepsize
             fac = con2

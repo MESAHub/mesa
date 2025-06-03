@@ -31,6 +31,6 @@ xtick.top	    : True
 ytick.direction	    : in
 ytick.right	    : True
 
-# Miscellanious
+# Miscellaneous
 axes.formatter.use_mathtext : True
 #figure.autolayout	    : True

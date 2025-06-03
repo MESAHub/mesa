@@ -81,7 +81,7 @@
       ierr=0
       if (have_loaded_op) return
 
-!$omp critical (critial_do_op_dload)
+!$omp critical (critical_do_op_dload)
 
       if (have_loaded_op) GOTO 1001
 
@@ -368,7 +368,7 @@
          semesh(n) = 1.d0 - exp(dble(-u))
       end do
 
-!$omp end critical (critial_do_op_dload)
+!$omp end critical (critical_do_op_dload)
 
 
       return
