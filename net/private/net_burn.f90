@@ -281,7 +281,7 @@
             integer, parameter :: ld_dfdx = 0
             real(dp), target :: dfdx_arry(ld_dfdx,species)
             real(dp), pointer :: dfdx(:,:)
-            real(dp) :: dxdt_sum, dxdt_sum_aprox21, &
+            real(dp) :: dxdt_sum, dxdt_sum_approx21, &
                Z_plus_N, xsum, r, r1, r2
             integer :: i, ir, ci, j, k, ibad
             logical :: okay

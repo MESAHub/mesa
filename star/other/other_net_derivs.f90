@@ -27,8 +27,8 @@ module other_net_derivs
    !  other_net_derivs => my_net_derivs
 
    ! This hook is aimed at being able to modify dydt term.
-   ! This means you can add arbitary new reactions that MESA does not know about
-   ! by changing the dydt (change in compostion with time)
+   ! This means you can add arbitrary new reactions that MESA does not know about
+   ! by changing the dydt (change in composition with time)
 
    ! This hook only works with soft nets (so no approx networks)
 

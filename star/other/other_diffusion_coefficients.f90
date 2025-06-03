@@ -36,7 +36,7 @@ contains
 ! charge       charge [e]
 ! na           number density [cm^-3]
 ! The output are the resistance coefficients in Burgers equations K_ij, z_ij, z'_ij and z''_ij
-! It is also possible to output diffusion coefficients D_ij and thermal diffusion coeffcient
+! It is also possible to output diffusion coefficients D_ij and thermal diffusion coefficient
 !     A_th used in Cowling&Chapman formalism, note Ath(m,i) is Ath_ei
 
 ! NOTE: the number of classes of isos = m-1; m is for electrons

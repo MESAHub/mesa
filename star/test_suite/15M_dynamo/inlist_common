@@ -26,7 +26,7 @@
 
    ! not a science converged model, but enough for a test case
 
-   max_dq = 4d-3             ! default 1e-2, 1/max_dq = minumum number of cells
+   max_dq = 4d-3             ! default 1e-2, 1/max_dq = minimum number of cells
    varcontrol_target = 1d-4  ! default 1d-3 gives non-robust results
 
 

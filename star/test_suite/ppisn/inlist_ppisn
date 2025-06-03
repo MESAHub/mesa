@@ -258,7 +258,7 @@
    ! in order for Riemann hydro to be turned on, the following two conditions need to be met
    x_ctrl(1) = 0.01d0 ! the integrated gamma1 must be smaller than this (min_gamma_sub_43_for_hydro)
 
-   ! parameters controlling swtich between hydrostatic and Riemann hydro
+   ! parameters controlling switch between hydrostatic and Riemann hydro
    ! after the pulse starts, we estimate the dynamical timescale of the star
    ! (excluding some of the outer layers), and model the dynamical evolution
    ! for at least a fixed number of these timescales before turning off hydro

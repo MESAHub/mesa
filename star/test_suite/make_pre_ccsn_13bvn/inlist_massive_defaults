@@ -130,7 +130,7 @@
      min_overshoot_q = 0d0
 
 
-! Atomosphere choice
+! Atmosphere choice
 
      atm_option = 'T_tau'
      atm_T_tau_relation = 'Eddington'

@@ -178,7 +178,7 @@
          ! high T
          delta_lgRho_cntr_hard_limit = s% delta_lgRho_cntr_hard_limit
          ! we also store dt_div_min_dr_div_cs_limit, we keep it at a
-         ! high value until the onset of a pulse to prevent unnecesarily
+         ! high value until the onset of a pulse to prevent unnecessarily
          ! small timesteps before a pulsation
          dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
 

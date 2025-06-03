@@ -293,7 +293,7 @@
             integer, intent(out) :: ierr
             integer, parameter :: ld_dfdx = 0
             real(dp) :: dfdx(ld_dfdx,nvar)
-            real(dp) :: dxdt_sum, dxdt_sum_aprox21, &
+            real(dp) :: dxdt_sum, dxdt_sum_approx21, &
                Z_plus_N, xsum, r, r1, r2
             integer :: i, ir, ci, j, k, ibad
             logical :: okay

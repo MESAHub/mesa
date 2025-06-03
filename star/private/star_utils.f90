@@ -937,8 +937,8 @@
          ! we integrate at cell edges.
          do k = 2, s% nz
          N2 = s% brunt_N2(k) ! brunt_N2 at cell_face
-         r  = s% r(k) ! r evalulated at cell_face
-         dr = s% rmid(k-1) - s% rmid(k) ! dr evalulated at cell face.
+         r  = s% r(k) ! r evaluated at cell_face
+         dr = s% rmid(k-1) - s% rmid(k) ! dr evaluated at cell face.
          if (N2 > 0d0) integral = integral + sqrt(N2)*dr/r
          end do
 

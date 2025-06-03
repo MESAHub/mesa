@@ -402,7 +402,7 @@
                mcore_min_after_TP = min(mcore_min_after_TP, s% he_core_mass)
             end if
 
-            ! mark when signifcant 3DUP has first occurred
+            ! mark when significant 3DUP has first occurred
             if (TP_with_3DUP == 0) then
                if ((mcore_min_after_TP - mcore_at_TP) < -1d-4) then
                   TP_with_3DUP = TP_count

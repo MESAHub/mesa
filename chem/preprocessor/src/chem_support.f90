@@ -21,7 +21,7 @@ module chem_support
    ! http://ftp.aip.org/epaps//phys_rev_c/E-PRVCAN-64-028108/
    ! Note that these values do not match their Table IV.
 
-   real(dp), dimension(24)  :: partiton_al26_1 = &
+   real(dp), dimension(24)  :: partition_al26_1 = &
                                [1.00000E+00_dp, 1.00000E+00_dp, 1.00000E+00_dp, 1.00000E+00_dp, &
                                 1.00000E+00_dp, 1.00000E+00_dp, 1.00020E+00_dp, 1.00060E+00_dp, &
                                 1.00150E+00_dp, 1.00290E+00_dp, 1.00500E+00_dp, 1.02440E+00_dp, &
@@ -29,7 +29,7 @@ module chem_support
                                 1.00780E+00_dp, 1.00760E+00_dp, 1.00870E+00_dp, 1.01620E+00_dp, &
                                 1.03310E+00_dp, 1.06000E+00_dp, 1.09270E+00_dp, 1.12850E+00_dp]
 
-   real(dp), dimension(24) :: partiton_al26_2 = &
+   real(dp), dimension(24) :: partition_al26_2 = &
                               [1.00000E+00_dp, 1.00000E+00_dp, 1.00000E+00_dp, 1.00010E+00_dp, &
                                1.00030E+00_dp, 1.00090E+00_dp, 1.00180E+00_dp, 1.00310E+00_dp, &
                                1.00460E+00_dp, 1.00620E+00_dp, 1.00800E+00_dp, 1.06220E+00_dp, &
@@ -218,11 +218,11 @@ contains
          if (name == 't') name = 'h3'
          if (name == 'al-6') then
             name = 'al26-1'
-            pfcn = partiton_al26_1
+            pfcn = partition_al26_1
          end if
          if (name == 'al*6') then
             name = 'al26-2'
-            pfcn = partiton_al26_2
+            pfcn = partition_al26_2
          end if
 
          ! write to the processed datafile
