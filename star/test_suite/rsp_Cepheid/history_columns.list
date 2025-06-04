@@ -76,7 +76,7 @@ i! history_columns.list -- determines the contents of star history logs
    !## mass change
 
       !star_mdot ! d(star_mass)/dt (in msolar per year)
-      log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
+      !log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
       !Tsurf_factor
