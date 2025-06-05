@@ -117,7 +117,7 @@ Developers
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
-* `Anne Thoul <https://www.linkedin.com/in/anne-thoul-b8279853>`__
+* `Anne Thoul <https://scholar.google.be/citations?user=pVXttZoAAAAJ&hl=fr>`__
 * `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__

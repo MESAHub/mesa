@@ -2703,8 +2703,8 @@ from `Gupta & Meyer (2001)
 ``rate_list.txt`` file.
 
 User-Beware: if you want a local ``rate_tables`` directory,
-http://mesa.sourceforge.net/star_job_defaults.html#rate_tables_dir
-<http://mesa.sourceforge.net/star_job_defaults.html#rate_tables_dir>,
+`https://docs.mesastar.org/en/latest/reference/star_job.html#rate-tables-dir
+<https://docs.mesastar.org/en/latest/reference/star_job.html#rate-tables-dir>`__,
 and you want the ²⁶Al isomers, then the two ``al26-1 <-> al26-2`` rate
 files must be copied from their default location to your local
 rate_tables directory and your local ``rate_list.txt`` modified to include

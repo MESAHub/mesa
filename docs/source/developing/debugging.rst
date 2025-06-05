@@ -21,7 +21,7 @@ There is auto-generated documentation from Doxygen available at `<http://mesa.so
 Using a debugger
 ~~~~~~~~~~~~~~~~
 
-The MESA SDK contains the GNU debugger `gdb <https://www.gnu.org/software/gdb/>`_.  Detailed instructions for using ``gdb`` are beyond the scope of the documentation, but it allows you to interactively set breakpoints, step through code, and inspect values.
+The MESA SDK contains the GNU debugger `gdb <https://www.sourceware.org/gdb/>`_.  Detailed instructions for using ``gdb`` are beyond the scope of the documentation, but it allows you to interactively set breakpoints, step through code, and inspect values.
 
 Using pgstar
 ~~~~~~~~~~~~

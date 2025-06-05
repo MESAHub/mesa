@@ -84,7 +84,7 @@ The easiest way to make sure that your system is always configured
 appropriately is to define the necessary environment variables in
 your `shell start-up file <https://kb.iu.edu/d/abdy>`__. The file that
 you need to edit will depend on `which shell you're using
-<http://askubuntu.com/questions/590899/how-to-check-which-shell-am-i-using>`__.
+<https://askubuntu.com/questions/590899/how-do-i-check-which-shell-i-am-using>`__.
 You can find out by running ``echo $0``. The default on most Linux
 distros is bash, in which case you need to edit ``$HOME/.bashrc``. If
 you don't set the environment variables in your shell start-up file,

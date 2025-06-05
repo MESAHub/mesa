@@ -36,6 +36,11 @@ have valid history/profile columns. Note it will have false positives for things
 defined in a run_star_extras.f90 and does not check non inlist_pgstar files
 pgstar sections.
 
+check_urls.py
+---------------
+
+This script checks for broken or invalid URLs in the documentation files located in ``docs/source/``.
+
 fix_underlines.py
 -----------------
 

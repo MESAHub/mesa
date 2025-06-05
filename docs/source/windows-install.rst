@@ -45,9 +45,3 @@ Once installed launch ``VcXsrv``. Accept the default choices except that you sho
 ``Disable access control``. The first time you run VcXsrv you may get a firewall prompt, in which
 case you should allow it access to public and private networks.
 
-
-
-
-
-
-

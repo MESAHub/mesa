@@ -29,7 +29,7 @@ regime and (b) direct reports to the developers of those
 packages. GYRE is an excellent example. One of reasons why one doesn't
 see many GYRE related questions on mesa-users is because GYRE has an
 active and robust support system (see
-http://www.astro.wisc.edu/~townsend/gyre-forums/). This said, it is
+`gyre-forums <http://user.astro.wisc.edu/~townsend/gyre-forums/>`__). This said, it is
 possible that another mesa-user has encountered the same challenge
 when using one of these external instruments, been able to resolve the
 issue, and is willing to share their solution with the community. We

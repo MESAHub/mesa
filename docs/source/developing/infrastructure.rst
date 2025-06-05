@@ -21,7 +21,7 @@ access to this:
 
 - Add your university email address to Github.
 - Follow instructions `Apply to Github Global campus <https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-global-campus-for-teachers/apply-to-github-global-campus-as-a-teacher>`__
-- It is set up, if you have access to this https://github.com/community/Global-Campus-Teachers repository
+- It is set up, if you have access to the `Global-Campus-Teachers repository <https://github.com/community/Global-Campus-Teachers>`__
 - Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
 If MESAHub gets unsynced from this and is no longer on the education plan:
