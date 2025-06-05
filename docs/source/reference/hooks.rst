@@ -262,6 +262,7 @@ other_accreted_material_j          binary_mdot
 other_adjust_mdots                 binary_mdot
 other_mdot_edd                     binary_mdot
 other_rho_mdot                     binary_mdot
+other_implicit_function_to_solve   binary_mdot
 other_edot_tidal                   binary_edot
 other_edot_enhance                 binary_edot
 other_extra_edot                   binary_edot
@@ -276,7 +277,6 @@ other_e2                           binary_tides
 other_sync_spin_to_orbit           binary_tides
 other_tsync                        binary_tides
 other_check_implicit_rlo           binary_evolve
-other_implicit_function_to_solve   binary_mdot
 ================================   =============
 
 control flow
