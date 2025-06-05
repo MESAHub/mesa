@@ -66,8 +66,8 @@ contains
         min(kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logT_max - 0.01d0, &
             kap_CO_z_tables(rq% kap_CO_option)% ar(1)% x_tables(1)% logT_max - 0.01d0)
       !rq% kap_z_tables(1)% x_tables(1)% logT_max - 0.01d0
-    rq% logR_Compton_blend_lo = kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logR_min + 0.01d0
-      !rq% kap_z_tables(1)% x_tables(1)% logR_min + 0.01d0
+    rq% logR_Compton_blend_hi = kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logR_max - 0.01d0
+       !rq% kap_z_tables(1)% x_tables(1)% logR_max - 0.01d0
 
     call init_potekhin(ierr)
 

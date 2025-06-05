@@ -23,6 +23,11 @@
 
 &plotter
 
+  !### Plot kap regions
+  ! if plot_regions is true, show the opacity tables
+  !   used in the plotted region
+  plot_regions = .false.
+
   !### check derivatives?
   ! if doing_partial is true, show the partial value
   ! if doing_dfridr is true, do dfridr and show the error

@@ -32,7 +32,8 @@ program kap_plotter
 
    real(dp) :: Y, z2bar, z53bar, ye, mass_correction, sumx
    real(dp) :: abar, zbar
-   real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2
+   real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT
+   real(dp) :: frac_lowT, frac_Type2, frac_highT, frac_Compton
    real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(species)
 
    real(dp) :: res1
@@ -54,11 +55,14 @@ program kap_plotter
 
    real(dp) :: var, dvardx_0, dvardx, err, dx_0, xdum
    logical :: doing_partial, doing_dfridr, doing_d_dlnd
+   logical :: plot_regions
 
    character(len=4) :: xname, yname
 
    real(dp), parameter :: UNSET = -999
    real(dp), parameter :: min_derivative_error = 1d-4
+
+   integer :: region
 
    namelist /plotter/ &
       nT, nRho, nX, nZ, &
@@ -67,7 +71,7 @@ program kap_plotter
       X_center, delta_X, Z_center, delta_Z, &
       X_min, X_max, Z_min, Z_max, &
       xname, yname, doing_partial, doing_dfridr, doing_d_dlnd, &
-      i_var
+      i_var, plot_regions
 
 
    include 'formats'
@@ -126,7 +130,11 @@ program kap_plotter
    ! file for output
    open(newunit=iounit, file='kap_plotter.dat')
 
-   if (doing_partial) then
+   if (plot_regions) then
+      write(*,*) 'plotting regions for kap tables'
+      write(iounit,*) 'regions for kap tables'
+
+   else if (doing_partial) then
       if (doing_d_dlnd) then
          write(*,*) 'plotting partial of log(kap) w.r.t. logRho'
          write(iounit,*) 'log(kap) (partial w.r.t. logRho)'
@@ -320,7 +328,25 @@ program kap_plotter
               res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
               kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
 
+         frac_lowT= kap_fracs(i_frac_lowT)
          frac_Type2 = kap_fracs(i_frac_Type2)
+         frac_highT = kap_fracs(i_frac_highT)
+         frac_Compton = kap_fracs(i_frac_Compton)
+
+         if (frac_lowT + frac_Type2 + frac_highT + frac_Compton .eq. 0) then
+            region = 5 ! no tables
+         else if (frac_lowT .eq. 1) then
+            region = 1 ! all low T tables used
+         else if (frac_Type2 .eq. 1) then
+            region = 2 ! all type 2 tables used
+         else if (frac_highT .eq. 1) then
+            region = 3 ! all high T tables used
+         else if (frac_Compton .eq. 1) then 
+            region = 4 ! all Compton kap used
+         else
+            region = 0 ! blending zone 
+         end if
+         
 
          if (doing_partial) then
             if (doing_d_dlnd) then
@@ -351,7 +377,9 @@ program kap_plotter
             res1 = log10(abs(xdum))
          end if
 
-         if (is_nan(kap)) then
+         if (plot_regions) then 
+            write(iounit,*) kval, jval, region
+         else if (is_nan(kap)) then
             write(iounit,*) kval, jval, "NaN"
          else
             write(iounit,*) kval, jval, res1
