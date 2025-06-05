@@ -25,7 +25,7 @@ export PKG_CONFIG_PATH
 define pkg-config-inner
 ifneq ($(2),)
   TMP_VAR := $$(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(PKG_CONFIG_FLAGS) $(1) $(2))
-  ifneq ($$(.SHELLSTATUS),0)
+  ifeq ($$(TMP_VAR),)
     $$(warning PKG_CONFIG_PATH is $$(PKG_CONFIG_PATH))
     $$(error pkg-config failed to find some of $(2), check PKG_CONFIG_PATH is correct)
   endif
