@@ -37,6 +37,17 @@ smoothly. Visit the `MESA SDK website
 <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
 the details of setting it up.
 
+.. warning::
+
+   The MESA SDK itself has a few dependencies you may need
+   to install manually, including `binutils`, `make`,
+   `Perl`, `X11`, `Z` and `C` shell on Linux and `Xcode`,
+   `Xcode command line tools` and `Xquartz` on Mac. See "prerequisites"
+   section on the `MESA SDK website
+   <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
+   for a complete and updated list including how to install them.
+
+
 If you would prefer to use ifort (the MESA SDK uses gfortran), that is
 also an option, so long as you use ifort 14 or later. Even if you choose
 to use ifort, you should still visit the MESA SDK website to get a feel
