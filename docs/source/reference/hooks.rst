@@ -250,7 +250,7 @@ extras_after_evolve              run_star_support
 binary hooks
 ============
 
-There are many hooks in star (see ``binary/other``).  Code location
+There are many hooks in binary (see ``binary/other``).  Code location
 indicates the file in ``binary/private`` where the hook is called.
 
 binary physics
