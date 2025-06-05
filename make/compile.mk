@@ -21,7 +21,7 @@ MODULES := $(addprefix $(MODULE_DIR)/, $(MODULES))
 
 FORTRAN_SOURCES := $(filter-out %.c, $(SRCS) $(SRCS_CHECK) $(addprefix $(BUILD_DIR_MODULE)/,$(SRCS_GENERATED) $(SRCS_CHECK_GENERATED)))
 
-$(BUILD_DIR_MODULE)/depend : $(FORTRAN_SOURCES) | $(BUILD_DIR_MODULE)/
+$(BUILD_DIR_MODULE)/depend : $(FORTRAN_SOURCES) | $(BUILD_DIR_MODULE)/.
 	INSTALL_INCLUDES=$(call escape,$(INSTALL_INCLUDES)) \
 	MODULES=$(call escape,$(MODULES)) \
 	BUILD_DIR_MODULE=$(call escape,$(BUILD_DIR_MODULE)) \
@@ -34,5 +34,5 @@ include $(BUILD_DIR_MODULE)/depend
 # expansions when these variables are set.
 .SECONDEXPANSION:
 
-$(BUILD_DIR_MODULE)/%.o: %.c | $$(dir $$@0)/
+$(BUILD_DIR_MODULE)/%.o: %.c | $$(dir $$@0)/.
 	$(CCOMPILE) $< -o $@

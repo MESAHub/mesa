@@ -107,11 +107,11 @@ sub output_make ($filename, $output_files, $not_found_mod_dependency, $dependenc
     }
 
     print <<~"MAKEFILE"
-    $obj.anc : $filename ${ \join(" ", @dependency) } | \$(MODULE_DIR)/ $obj_dir/
+    $obj.anc : $filename ${ \join(" ", @dependency) } | \$(MODULE_DIR)/. $obj_dir/.
     \t\@touch \$@
     \t\@echo $module_compiler $filename && \$($module_compiler) $filename -J \$(MODULE_DIR)
     ${ \join(" ", @output_files) } : $obj.anc
-    $obj :  $filename ${ \join(" ", @dependency) } | \$(SCRATCH_DIR)/ $obj_dir/ \$(MODULE_DIR)/
+    $obj :  $filename ${ \join(" ", @dependency) } | \$(SCRATCH_DIR)/. $obj_dir/. \$(MODULE_DIR)/.
     \t\@rm -rf \$(SCRATCH_DIR)/$obj_fname/
     \t\@mkdir \$(SCRATCH_DIR)/$obj_fname/
     \t\@echo $compiler $filename && \$($compiler) $filename -o $obj -I \$(MODULE_DIR) -J \$(SCRATCH_DIR)/$obj_fname/
@@ -131,7 +131,7 @@ foreach my $pars (@parsed_files) {
 foreach my $f (split " ","$install_includes $modules") {
     my $basename_f = basename($f);
     print <<~"MAKEFILE"
-    $build_dir_module/include/$basename_f : $f | $build_dir_module/include/
+    $build_dir_module/include/$basename_f : $f | $build_dir_module/include/.
     \tcp \$^ \$@
     MAKEFILE
 }

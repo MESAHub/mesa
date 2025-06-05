@@ -51,7 +51,7 @@ endif
 BUILD_DIR_GYRE_BUILD := $(BUILD_DIR_MODULE)/src
 OBJ_OUT := $(BUILD_DIR_MODULE)/lib/libgyre.a $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a
 
-$(BUILD_DIR_GYRE_BUILD): gyre-8.0.tar.gz | $(BUILD_DIR_GYRE_BUILD)/ $(BUILD_DIR_MODULE)/include/
+$(BUILD_DIR_GYRE_BUILD): gyre-8.0.tar.gz | $(BUILD_DIR_GYRE_BUILD)/. $(BUILD_DIR_MODULE)/include/.
 	tar --strip-components=1 -xf $< -C $(BUILD_DIR_GYRE_BUILD)
 
 $(BUILD_DIR_GYRE_BUILD)/build-complete: $(BUILD_DIR_GYRE_BUILD)
@@ -59,10 +59,10 @@ $(BUILD_DIR_GYRE_BUILD)/build-complete: $(BUILD_DIR_GYRE_BUILD)
 	touch $@
 
 
-$(BUILD_DIR_MODULE)/lib/libgyre.a $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a: $(BUILD_DIR_GYRE_BUILD)/build-complete | $(BUILD_DIR_MODULE)/lib/
+$(BUILD_DIR_MODULE)/lib/libgyre.a $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a: $(BUILD_DIR_GYRE_BUILD)/build-complete | $(BUILD_DIR_MODULE)/lib/.
 	cp $(BUILD_DIR_GYRE_BUILD)/build/$(notdir $@) $@
 
-$(BUILD_DIR_MODULE)/modules/gyre_mesa_m.mod: $(BUILD_DIR_GYRE_BUILD)/build-complete | $(BUILD_DIR_MODULE)/modules/
+$(BUILD_DIR_MODULE)/modules/gyre_mesa_m.mod: $(BUILD_DIR_GYRE_BUILD)/build-complete | $(BUILD_DIR_MODULE)/modules/.
 	cp $(BUILD_DIR_GYRE_BUILD)/build/$(notdir $@) $@
 
 all: $(PKG_CONFIG) $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a $(BUILD_DIR_MODULE)/lib/libgyre.a

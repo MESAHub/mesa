@@ -36,7 +36,7 @@ endif
 BUILD_DIR_FORUM_BUILD := $(BUILD_DIR_MODULE)/src
 INSTALL_INCLUDES_BUILD += $(BUILD_DIR_MODULE)/include/forum.inc
 
-$(BUILD_DIR_FORUM_BUILD): forum-1.0.4.tar.gz | $(BUILD_DIR_FORUM_BUILD)/ $(BUILD_DIR_MODULE)/include/
+$(BUILD_DIR_FORUM_BUILD): forum-1.0.4.tar.gz | $(BUILD_DIR_FORUM_BUILD)/. $(BUILD_DIR_MODULE)/include/.
 	tar --strip-components=1 -xf $< -C $(BUILD_DIR_FORUM_BUILD)
 	cp $(BUILD_DIR_FORUM_BUILD)/src/include/forum.inc $(BUILD_DIR_MODULE)/include/forum.inc
 
@@ -44,10 +44,10 @@ $(BUILD_DIR_FORUM_BUILD)/build-complete: $(BUILD_DIR_FORUM_BUILD)
 	$(MAKE) -C $(BUILD_DIR_FORUM_BUILD) SHARED=no DEBUG=$(FORUM_DEBUG) OMP=$(WITH_OPENMP) FPE=yes VERSION_CHECK=passed FPP="$(FPP)" LDFLAGS="$(LIB_DEP_ARGS)" FFLAGS="$(FLAGS_DEPS)"
 	touch $@
 
-$(OBJ_OUT): $(BUILD_DIR_FORUM_BUILD)/build-complete | $(BUILD_DIR_MODULE)/lib/
+$(OBJ_OUT): $(BUILD_DIR_FORUM_BUILD)/build-complete | $(BUILD_DIR_MODULE)/lib/.
 	cp $(BUILD_DIR_FORUM_BUILD)/build/$(notdir $@) $@
 
-$(BUILD_DIR_MODULE)/modules/forum_m.mod: $(BUILD_DIR_FORUM_BUILD)/build-complete | $(BUILD_DIR_MODULE)/modules/
+$(BUILD_DIR_MODULE)/modules/forum_m.mod: $(BUILD_DIR_FORUM_BUILD)/build-complete | $(BUILD_DIR_MODULE)/modules/.
 	cp $(BUILD_DIR_FORUM_BUILD)/build/$(notdir $@) $@
 
 check:
