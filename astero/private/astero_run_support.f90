@@ -212,6 +212,11 @@
          id = id_in
 
          call star_ptr(id, s, ierr)
+         if(ierr/=0) then
+            write(*,*) 'XXX eval1'
+            stop 1
+            return
+         end if
          if (ierr /= 0) return
 
          eval1 = -1

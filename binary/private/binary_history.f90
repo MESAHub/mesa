@@ -40,6 +40,8 @@ contains
       if (ierr /= 0) then
          write(*, *) 'failed in binary_ptr'
          numcols = 0
+         write(*,*) 'XXX how_many_binary_history_columns'
+         stop 1
          return
       end if
 

@@ -49,6 +49,8 @@
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in binary_ptr'
+            write(*,*) 'XXX check_implicit_rlo'
+            stop 1
             return
          end if
          s => b% s_donor

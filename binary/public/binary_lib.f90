@@ -240,7 +240,11 @@
 
          ierr = 0
          call binary_ptr(binary_id, b, ierr)
-         if(ierr/=0) return
+         if(ierr/=0) then
+            write(*,*) 'XXX binary_compute_k_div_T'
+            stop 1
+            return
+         end if
 
          if(is_donor) then
             s => b% s_donor
@@ -253,4 +257,3 @@
       end function binary_compute_k_div_T
 
       end module binary_lib
-

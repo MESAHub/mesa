@@ -894,6 +894,11 @@
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
+         if(ierr/=0) then
+            write(*,*) 'XXX astero_extras_check_model'
+            stop 1
+            return
+         end if
          if (ierr /= 0) return
 
          if (s% job% astero_just_call_my_extras_check_model) then
@@ -920,6 +925,11 @@
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
+         if(ierr/=0) then
+            write(*,*) 'XXX astero_extras_finish_step'
+            stop 1
+            return
+         end if
          if (ierr /= 0) return
          if (s% job% pgstar_flag) then
             ierr = 0
@@ -1015,6 +1025,11 @@
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
+         if(ierr/=0) then
+            write(*,*) 'XXX astero_how_many_extra_history_columns'
+            stop 1
+            return
+         end if
          if (ierr /= 0) return
          astero_how_many_extra_history_columns = &
             star_astero_procs% how_many_extra_history_columns(id)

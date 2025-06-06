@@ -1412,6 +1412,11 @@
             if (ratios_n == 0) then
                write(*,*) 'ERROR: chi2_seismo_r_010_fraction > 0 but cannot evaluate r_010'
                ierr = -1
+         if(ierr/=0) then
+            write(*,*) 'XXX1 get_chi2'
+            stop 1
+            return
+         end if
                return
             end if
 
@@ -1467,6 +1472,11 @@
             if (n == 0) then
                write(*,*) 'ERROR: chi2_seismo_r_02_fraction > 0 but cannot evaluate r_02'
                ierr = -1
+         if(ierr/=0) then
+            write(*,*) 'XXX2 get_chi2'
+            stop 1
+            return
+         end if
                return
             end if
             if (normalize_chi2_seismo_r_02) then
