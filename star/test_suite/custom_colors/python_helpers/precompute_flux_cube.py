@@ -85,6 +85,23 @@ def load_lookup_table(lookup_file):
     print(f"Column indices found - teff: {teff_col}, logg: {logg_col}, meta: {meta_col}")
     return file_names, np.array(teff_values), np.array(logg_values), np.array(meta_values)
 
+
+def find_grid_index(grid, value):
+    """Find the closest grid index for a value."""
+    idx = np.searchsorted(grid, value)
+    if idx == len(grid):
+        return idx - 1
+    elif idx == 0:
+        return 0
+    else:
+        # Choose the closer of the two
+        if abs(grid[idx-1] - value) < abs(grid[idx] - value):
+            return idx - 1
+        else:
+            return idx
+
+
+
 def get_unique_sorted(values, tolerance=1e-8):
     """Get sorted unique values with tolerance."""
     sorted_vals = np.sort(values)
@@ -128,8 +145,73 @@ def save_binary_file(output_file, wavelengths, teff_grid, logg_grid, meta_grid, 
             for val in meta_grid:
                 df.write(f"{val}\n")
 
-def precompute_flux_cube(stellar_model_dir, output_file):
-    """Precompute the 3D flux cube for all wavelengths."""
+def create_reasonable_wavelength_grid(stellar_model_dir, file_names):
+    """Create a reasonable wavelength grid focused on optical/near-IR where filters typically work."""
+    
+    # Most photometric filters work in these ranges:
+    # UV: 200-400 nm (2000-4000 Å)
+    # Optical: 400-1000 nm (4000-10000 Å)  
+    # Near-IR: 1-5 μm (10000-50000 Å)
+    
+    # Sample a few models to see their actual resolution
+    print("Analyzing resolution of stellar models...")
+    
+    resolutions = []
+    min_wavelength = float('inf')
+    max_wavelength = 0
+    
+    for i, file_name in enumerate(file_names[:20]):  # Sample first 20
+        model_path = os.path.join(stellar_model_dir, file_name)
+        try:
+            wavelengths, _ = load_sed(model_path, i)
+            
+            # Focus on optical/near-IR range where most filters work
+            mask = (wavelengths >= 3000) & (wavelengths <= 25000)  # 300 nm to 2.5 μm
+            if mask.sum() > 10:
+                wl_subset = wavelengths[mask]
+                resolution = np.median(np.diff(wl_subset))
+                resolutions.append(resolution)
+                
+                min_wavelength = min(min_wavelength, wl_subset.min())
+                max_wavelength = max(max_wavelength, wl_subset.max())
+                
+                if i < 5:
+                    print(f"  Model {file_name}: resolution ≈ {resolution:.1f} Å in optical range")
+                    
+        except Exception as e:
+            print(f"Error reading {model_path}: {e}")
+            continue
+    
+    if not resolutions:
+        print("Warning: No models found with optical data. Using defaults.")
+        min_wavelength = 3000
+        max_wavelength = 25000
+        typical_resolution = 50.0
+    else:
+        typical_resolution = np.median(resolutions)
+    
+    print(f"Typical model resolution: {typical_resolution:.1f} Å")
+    print(f"Optical wavelength range: [{min_wavelength:.0f}, {max_wavelength:.0f}] Å")
+    
+    # Create a grid with resolution similar to the models, but not finer
+    # Use 2x the typical resolution to avoid over-sampling
+    grid_resolution = max(50.0, typical_resolution * 2)  # At least 50 Å spacing
+    
+    n_points = int((max_wavelength - min_wavelength) / grid_resolution) + 1
+    n_points = min(n_points, 5000)  # Cap at 5000 points maximum
+    
+    common_wavelengths = np.linspace(min_wavelength, max_wavelength, n_points)
+    
+    print(f"Created wavelength grid:")
+    print(f"  Range: {min_wavelength:.0f} - {max_wavelength:.0f} Å")
+    print(f"  Points: {len(common_wavelengths)}")
+    print(f"  Resolution: {grid_resolution:.1f} Å")
+    
+    return common_wavelengths
+
+
+def precompute_flux_cube_fixed(stellar_model_dir, output_file):
+    """Precompute flux cube with reasonable wavelength sampling."""
     # Load the lookup table
     lookup_file = os.path.join(stellar_model_dir, 'lookup_table.csv')
     file_names, teff_values, logg_values, meta_values = load_lookup_table(lookup_file)
@@ -141,97 +223,61 @@ def precompute_flux_cube(stellar_model_dir, output_file):
     logg_grid = get_unique_sorted(logg_values)
     meta_grid = get_unique_sorted(meta_values)
     
-    print(f"Unique Teff values: {len(teff_grid)}")
-    for i, v in enumerate(teff_grid):
-        if i < 5 or i > len(teff_grid) - 5:
-            print(f"  Teff[{i}] = {v}")
+    print(f"Parameter grid sizes:")
+    print(f"  Teff: {len(teff_grid)} points ({teff_grid[0]:.0f} - {teff_grid[-1]:.0f} K)")
+    print(f"  log g: {len(logg_grid)} points ({logg_grid[0]:.1f} - {logg_grid[-1]:.1f})")
+    print(f"  [M/H]: {len(meta_grid)} points ({meta_grid[0]:.1f} - {meta_grid[-1]:.1f})")
     
-    print(f"Unique logg values: {len(logg_grid)}")
-    for i, v in enumerate(logg_grid):
-        if i < 5 or i > len(logg_grid) - 5:
-            print(f"  logg[{i}] = {v}")
-    
-    print(f"Unique metallicity values: {len(meta_grid)}")
-    for i, v in enumerate(meta_grid):
-        if i < 5 or i > len(meta_grid) - 5:
-            print(f"  meta[{i}] = {v}")
-    
-    # Load first SED to get wavelength grid
-    first_file = os.path.join(stellar_model_dir, file_names[0])
-    wavelengths, _ = load_sed(first_file, 0)
+    # Create reasonable wavelength grid (focused on optical/near-IR)
+    wavelengths = create_reasonable_wavelength_grid(stellar_model_dir, file_names)
     n_lambda = len(wavelengths)
     
-    print(f"Wavelength grid has {n_lambda} points")
-    
-    # Create the flux cube
+    # Create the flux cube and tracking map
     flux_cube = np.zeros((len(teff_grid), len(logg_grid), len(meta_grid), n_lambda))
-    
-    # Create a map to track where we've filled in the cube
     filled_map = np.zeros((len(teff_grid), len(logg_grid), len(meta_grid)), dtype=bool)
     
-    # Process all model files
-    model_index = 0
-    missing_points = 0
+    print(f"Flux cube shape: {flux_cube.shape}")
+    print(f"Memory usage: {flux_cube.nbytes / (1024*1024):.1f} MB")
     
+    # Process all model files
+    missing_points = 0
     for file_name, teff, logg, meta in tqdm(zip(file_names, teff_values, logg_values, meta_values), 
                                           total=len(file_names), desc="Processing models"):
-        # Find the indices in the grids
-        i_teff = np.searchsorted(teff_grid, teff)
-        if i_teff == len(teff_grid) or teff_grid[i_teff] != teff:
-            if i_teff > 0 and i_teff < len(teff_grid):
-                # Check which one is closer
-                if abs(teff_grid[i_teff-1] - teff) < abs(teff_grid[i_teff] - teff):
-                    i_teff = i_teff - 1
-            elif i_teff == len(teff_grid):
-                i_teff = i_teff - 1
-                
-        i_logg = np.searchsorted(logg_grid, logg)
-        if i_logg == len(logg_grid) or logg_grid[i_logg] != logg:
-            if i_logg > 0 and i_logg < len(logg_grid):
-                # Check which one is closer
-                if abs(logg_grid[i_logg-1] - logg) < abs(logg_grid[i_logg] - logg):
-                    i_logg = i_logg - 1
-            elif i_logg == len(logg_grid):
-                i_logg = i_logg - 1
-                
-        i_meta = np.searchsorted(meta_grid, meta)
-        if i_meta == len(meta_grid) or meta_grid[i_meta] != meta:
-            if i_meta > 0 and i_meta < len(meta_grid):
-                # Check which one is closer
-                if abs(meta_grid[i_meta-1] - meta) < abs(meta_grid[i_meta] - meta):
-                    i_meta = i_meta - 1
-            elif i_meta == len(meta_grid):
-                i_meta = i_meta - 1
+        # Find grid indices
+        i_teff = find_grid_index(teff_grid, teff)
+        i_logg = find_grid_index(logg_grid, logg) 
+        i_meta = find_grid_index(meta_grid, meta)
         
         # Load the SED
         model_path = os.path.join(stellar_model_dir, file_name)
         try:
-            model_wavelengths, model_fluxes = load_sed(model_path, model_index)
+            model_wavelengths, model_fluxes = load_sed(model_path, 0)
             
-            # Check if wavelength grids match
-            if len(model_wavelengths) == n_lambda and np.allclose(model_wavelengths, wavelengths):
-                # Same grid, directly store values
-                flux_cube[i_teff, i_logg, i_meta, :] = model_fluxes
-                filled_map[i_teff, i_logg, i_meta] = True
-            else:
-                # Interpolate to the common wavelength grid
-                flux_cube[i_teff, i_logg, i_meta, :] = np.interp(
-                    wavelengths, model_wavelengths, model_fluxes, 
-                    left=0.0, right=0.0
-                )
-                filled_map[i_teff, i_logg, i_meta] = True
+            # Interpolate to common wavelength grid
+            # Use log interpolation for flux since it spans many orders of magnitude
+            log_fluxes = np.log10(np.maximum(model_fluxes, 1e-50))  # Avoid log(0)
+            
+            log_interpolated = np.interp(
+                wavelengths, model_wavelengths, log_fluxes,
+                left=log_fluxes[0], right=log_fluxes[-1]
+            )
+            
+            interpolated_flux = 10**log_interpolated
+            
+            flux_cube[i_teff, i_logg, i_meta, :] = interpolated_flux
+            filled_map[i_teff, i_logg, i_meta] = True
+            
         except Exception as e:
             missing_points += 1
-            print(f"Error processing {model_path}: {str(e)}")
-        
-        model_index += 1
+            if missing_points < 10:  # Only print first few errors
+                print(f"Error processing {model_path}: {str(e)}")
+            continue
     
-    # Check for empty grid points
+    # Fill empty grid points using nearest neighbor
     empty_points = np.sum(~filled_map)
     if empty_points > 0:
-        print(f"Warning: {empty_points} grid points are empty and need filling")
+        print(f"Filling {empty_points} empty grid points...")
         
-        # Simple fill algorithm: use nearest neighbor
         for i_teff in range(len(teff_grid)):
             for i_logg in range(len(logg_grid)):
                 for i_meta in range(len(meta_grid)):
@@ -244,8 +290,8 @@ def precompute_flux_cube(stellar_model_dir, output_file):
                             for jj in range(len(logg_grid)):
                                 for kk in range(len(meta_grid)):
                                     if filled_map[ii, jj, kk]:
-                                        # Simple Euclidean distance, could be improved
-                                        d_teff = (teff_grid[i_teff] - teff_grid[ii])/1000  # Scale for comparable magnitude
+                                        # Normalized distance
+                                        d_teff = (teff_grid[i_teff] - teff_grid[ii])/1000
                                         d_logg = logg_grid[i_logg] - logg_grid[jj]
                                         d_meta = meta_grid[i_meta] - meta_grid[kk]
                                         dist = d_teff**2 + d_logg**2 + d_meta**2
@@ -255,29 +301,30 @@ def precompute_flux_cube(stellar_model_dir, output_file):
                                             best_i, best_j, best_k = ii, jj, kk
                         
                         if best_i >= 0:
-                            # Copy data from nearest neighbor
                             flux_cube[i_teff, i_logg, i_meta, :] = flux_cube[best_i, best_j, best_k, :]
                             filled_map[i_teff, i_logg, i_meta] = True
     
     # Save the precomputed data
     save_binary_file(output_file, wavelengths, teff_grid, logg_grid, meta_grid, flux_cube)
     
-    print(f"Precomputed data saved to {output_file}")
-    print(f"Missing points during processing: {missing_points}")
+    print(f"\nPrecomputed data saved to {output_file}")
+    print(f"Statistics:")
+    print(f"  Models processed: {len(file_names) - missing_points}/{len(file_names)}")
+    print(f"  Empty points filled: {empty_points}")
+    print(f"  Final cube shape: {flux_cube.shape}")
+    print(f"  File size: {flux_cube.nbytes / (1024*1024):.1f} MB")
     
-    # Print some stats for verification
-    print("\nData summary:")
-    print(f"Wavelength range: {wavelengths[0]} to {wavelengths[-1]}")
-    print(f"Teff range: {teff_grid[0]} to {teff_grid[-1]}")
-    print(f"logg range: {logg_grid[0]} to {logg_grid[-1]}")
-    print(f"Metallicity range: {meta_grid[0]} to {meta_grid[-1]}")
-    print(f"Flux cube shape: {flux_cube.shape}")
-    print(f"Flux cube size: {flux_cube.nbytes / (1024*1024):.2f} MB")
+    # Quick sanity check
+    print(f"  Flux range: {flux_cube.min():.2e} - {flux_cube.max():.2e}")
+    print(f"  Zero values: {np.sum(flux_cube == 0)}/{flux_cube.size}")
+    print(f"  NaN values: {np.sum(np.isnan(flux_cube))}")
 
+
+# Usage - replace the function call in your script:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Precompute flux cube for stellar atmosphere models')
     parser.add_argument('--model_dir', type=str, required=True, help='Directory containing stellar model files')
     parser.add_argument('--output', type=str, default='flux_cube.bin', help='Output binary file')
     
     args = parser.parse_args()
-    precompute_flux_cube(args.model_dir, args.output)
+    precompute_flux_cube_fixed(args.model_dir, args.output)  # Use the fixed version

@@ -6,5 +6,5 @@
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
       metallicity = 0.02
       distance = 3.0857d17
-      make_csv = .false.
+      make_csv = .true.
 / ! end of colors namelist
