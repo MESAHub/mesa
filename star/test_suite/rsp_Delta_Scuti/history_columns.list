@@ -1,4 +1,4 @@
-n! history_columns.list -- determines the contents of star history logs
+! history_columns.list -- determines the contents of star history logs
 ! you can use a non-standard version by setting history_columns_file in your inlist
 
 ! units are cgs unless otherwise noted.
