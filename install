@@ -184,6 +184,8 @@ if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
     fi
 fi
 
+SYSTEM=`uname -s`
+
 function enum_procs {
     if [ -n "$NPROCS" ]; then
 	echo $NPROCS
@@ -206,7 +208,13 @@ function enum_procs {
     fi
 }
 
-make -w -Oline -j$(enum_procs)
+# MacOS has gnumake version 3.81, which does not support -Oline
+if [ "${SYSTEM}" = "Darwin" ]; then
+    make -w -j$(enum_procs)
+else
+    make -w -Oline -j$(enum_procs)
+fi
+
 if [ $? -ne 0 ]
 then
     echo
