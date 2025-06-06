@@ -13,5 +13,7 @@ Cflags: -I$${prefix}/include
 Libs: -L$${prefix}/lib $(addprefix -l,$(LIB_NAMES))
 endef
 
+export PKG_CONFIG_CONTENTS
+
 $(PKG_CONFIG): | $(BUILD_DIR_MODULE)/lib/pkgconfig/. $(BUILD_DIR_MODULE)/include/.
-	$(file > $@,$(PKG_CONFIG_CONTENTS))
+	echo "$${PKG_CONFIG_CONTENTS}" > $@
