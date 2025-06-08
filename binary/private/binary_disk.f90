@@ -86,7 +86,7 @@ contains
       mu = q / (1.0_dp + q)
 
       ! outer disk radius
-      Rd_over_a = (1.0_dp - xL1)**4 / mu
+      Rd_over_a = pow4(1.0_dp - xL1) / mu
       ! relavent potential energies
       PhiL1_dimless = -((1.0_dp - mu)/abs(xL1) + mu/abs(1.0_dp - xL1) + 0.5*(xL1 - mu)**2)  ! [G(M1+M2)/a]
       PhiL2_dimless = -((1.0_dp - mu)/abs(xL2) + mu/abs(1.0_dp - xL2) + 0.5*(xL2 - mu)**2)  ! [G(M1+M2)/a]
