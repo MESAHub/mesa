@@ -36,7 +36,7 @@ contains
                                          disk_alpha, disk_mu, &
                                          fL2, ierr)
       ! Calculate the (outer) L2 mass-loss fraction
-      ! according to Lu et al. (2022) "On rapid binary mass transfer -I. Physical model"
+      ! according to Lu et al. (2023, MNRAS 519, 1409) "On rapid binary mass transfer -I. Physical model"
       real(dp), intent(in) :: donor_mass         ! [M_sun]
       real(dp), intent(in) :: accretor_mass      ! [M_sun]
       real(dp), intent(in) :: mass_transfer_rate ! [M_sun/yr]
