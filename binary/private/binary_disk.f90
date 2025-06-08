@@ -255,7 +255,7 @@ contains
       rho = (1.0_dp - fL2) * M1dot / (2.0_dp * pi * disk_alpha * omega_K * Rd**3) / the**3
       f2_the_T_fL2 = &
          7.0_dp / 4.0_dp &
-         - (1.5_dp * U_over_P + c3 * T**4 / kap(rho, T) / (1.0_dp - fL2) ** 2) * the**2 &
+         - (1.5_dp * U_over_P + c3 * pow4(T) / kap(rho, T) / (1.0_dp - fL2) ** 2) * the**2 &
          - PhiRd / (GM2 / Rd) &
          + (PhiL1 - fL2 * PhiL2) / (GM2 / Rd) / (1.0_dp - fL2)
    end function f2_the_T_fL2
