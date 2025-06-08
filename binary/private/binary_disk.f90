@@ -279,7 +279,7 @@ contains
          i_the = floor((logthe - logthe_grid(1)) / dlogthe) + 1
          slope = (logT_arr(i_the + 1) - logT_arr(i_the)) / dlogthe
          logT = logT_arr(i_the) + (logthe - logthe_grid(i_the)) * slope
-         T_the_nofL2 = 10 ** logT
+         T_the_nofL2 = pow10(logT)
       end if
    end function T_the_nofL2
 
