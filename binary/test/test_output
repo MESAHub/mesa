@@ -2,6 +2,6 @@
                                b% max_timestep / secyer    5.0000000000000044D+00
                                b% max_timestep / secyer    2.5000000000000067D+00
  check L2_mass_loss_fraction behavior
-                                                    fL2    8.9736757964500380D-01
-                                                    fL2    2.1362669743169793D-01
+                                                    fL2    8.9701564145435098D-01
+                                                    fL2    2.1022134020418981D-01
 done

@@ -37,6 +37,7 @@ contains
                                          fL2, ierr)
       ! Calculate the (outer) L2 mass-loss fraction
       ! according to Lu et al. (2023, MNRAS 519, 1409) "On rapid binary mass transfer -I. Physical model"
+      ! https://ui.adsabs.harvard.edu/abs/2023MNRAS.519.1409L/abstract
       real(dp), intent(in) :: donor_mass         ! [M_sun]
       real(dp), intent(in) :: accretor_mass      ! [M_sun]
       real(dp), intent(in) :: mass_transfer_rate ! [M_sun/yr]
@@ -76,7 +77,7 @@ contains
       log_q = log10(q)
 
       ! positions of Lagrangian points (based on analytic fits)
-      xL1 = -0.0355_dp * log_q**2 + 0.251_dp * abs(log_q) + 0.500_dp  ! [a = SMA]
+      xL1 = -0.0355_dp * log_q**2 + 0.251_dp * abs(log_q) + 0.5_dp  ! [a = SMA]
       xL2 = 0.0756_dp * log_q**2 - 0.424_dp * abs(log_q) + 1.699_dp  ! [a]
 
       if (log_q > 0.0_dp) then  ! m2 is more massive
@@ -88,9 +89,9 @@ contains
       ! outer disk radius
       Rd_over_a = pow4(1.0_dp - xL1) / mu
       ! relavent potential energies
-      PhiL1_dimless = -((1.0_dp - mu)/abs(xL1) + mu/abs(1.0_dp - xL1) + 0.5*(xL1 - mu)**2)  ! [G(M1+M2)/a]
-      PhiL2_dimless = -((1.0_dp - mu)/abs(xL2) + mu/abs(1.0_dp - xL2) + 0.5*(xL2 - mu)**2)  ! [G(M1+M2)/a]
-      PhiRd_dimless = -(1.0_dp - mu + mu/Rd_over_a + 0.5*(1.0_dp - mu)**2)
+      PhiL1_dimless = -((1.0_dp - mu)/abs(xL1) + mu/abs(1.0_dp - xL1) + 0.5_dp*(xL1 - mu)**2)  ! [G(M1+M2)/a]
+      PhiL2_dimless = -((1.0_dp - mu)/abs(xL2) + mu/abs(1.0_dp - xL2) + 0.5_dp*(xL2 - mu)**2)  ! [G(M1+M2)/a]
+      PhiRd_dimless = -(1.0_dp - mu + mu/Rd_over_a + 0.5_dp*(1.0_dp - mu)**2)
 
       GM2 = standard_cgrav * M2
 
@@ -137,7 +138,7 @@ contains
                T_right = T
             end if
          end do
-         T_arr(i) = (T_left + T_right) / 2.0_dp
+         T_arr(i) = 0.5_dp * (T_left + T_right)
       end do
       ! now we have obtained numerical relation between the and T
       do i = 1, n_the
@@ -164,7 +165,7 @@ contains
       end do
       ! now the solution is between the_left and the_right
       do while (abs((the_left - the_right) / the_right) > tol)
-         the = (the_left + the_right) / 2.0_dp
+         the = 0.5_dp * (the_left + the_right)
          f2 = f2_the_T_fL2(the, T_the_nofL2(the, logthe_grid, logT_arr, n_the, dlogthe), 0.0_dp, &
                            c3, c4, M1dot, disk_alpha, omega_K, Rd, PhiRd, GM2, PhiL1, PhiL2)
          if (f2 * f2_left > 0.0_dp) then
@@ -175,7 +176,7 @@ contains
          end if
        end do
       ! solution
-      the = (the_left + the_right) / 2.0_dp
+      the = 0.5_dp * (the_left + the_right)
       T = T_the_nofL2(the, logthe_grid, logT_arr, n_the, dlogthe)
       the_max = sqrt(3.0_dp / 8.0_dp * c2 * T + 1.0_dp / 4.0_dp * (PhiL2 - PhiRd) / (GM2 / Rd) - 1.0_dp / 8.0_dp)
 
@@ -183,14 +184,14 @@ contains
          ! return a tiny numner
          fL2 = eps_small
       else
-         the_min = ( 1.0_dp / 2.0_dp * sqrt((PhiL2 - PhiRd) / (GM2 / Rd) - 1.0_dp / 2.0_dp) )  ! corresponding to fL2=1, T=0
+         the_min = ( 0.5_dp * sqrt((PhiL2 - PhiRd) / (GM2 / Rd) - 0.5_dp) )  ! corresponding to fL2=1, T=0
          ! need to find the maximum corresponding to fL2=0
          ! this is given by the intersection between T_the(the), T_the_nofL2(the)
          the_left = the_min
          the_right = 1.0_dp
          f_left = T_the(the_left, c2, PhiL2, PhiRd, GM2, Rd) - T_the_nofL2(the_left, logthe_grid, logT_arr, n_the, dlogthe)
          do while (abs((the_left - the_right) / the_right) > tol)
-            the = (the_left + the_right) / 2.0_dp
+            the = 0.5_dp * (the_left + the_right)
             f = T_the(the, c2, PhiL2, PhiRd, GM2, Rd) - T_the_nofL2(the, logthe_grid, logT_arr, n_the, dlogthe)
             if (f * f_left > 0.0_dp) then
                the_left = the
@@ -199,7 +200,7 @@ contains
                the_right = the
             end if
          end do
-         the_max = (the_left + the_right) / 2.0_dp  ! this corresponds to fL2=0
+         the_max = 0.5_dp * (the_left + the_right)  ! this corresponds to fL2=0
 
          ! --- numerical solution for f2(the, T, fL2)=0 under non-zero fL2
 
@@ -215,7 +216,7 @@ contains
          the_right = the_max / (1.0_dp + eps_small)
          ! bisection again
          do while (abs((the_left - the_right) / the_right) > tol)
-            the = (the_left + the_right) / 2
+            the = 0.5_dp * (the_left + the_right)
             f2 = f2_the_T_fL2(the, T_the(the, c2, PhiL2, PhiRd, GM2, Rd), fL2_the(the, c1, c2, PhiL2, PhiRd, GM2, Rd), &
                               c3, c4, M1dot, disk_alpha, omega_K, Rd, PhiRd, GM2, PhiL1, PhiL2)
             if (f2 * f2_left > 0.0_dp) then
@@ -226,7 +227,7 @@ contains
             end if
          end do
          ! solution
-         the = (the_left + the_right) / 2.0_dp
+         the = 0.5_dp * (the_left + the_right)
          fL2 = fL2_the(the, c1, c2, PhiL2, PhiRd, GM2, Rd)
       end if
 
@@ -242,7 +243,7 @@ contains
    real(dp) function  kap(rho, T)
       ! simplified Kramers rule (cgs; approximate)
       real(dp), intent(in) :: rho, T
-      kap = 0.34 + 3.0e24 * rho * pow(T, -3.5_dp)
+      kap = 0.34_dp + 3.0d24 * rho * pow(T, -3.5_dp)
    end function kap
 
    real(dp) function f2_the_T_fL2(the, T, fL2, &
@@ -271,15 +272,15 @@ contains
       logthe = log10(the)
       if (logthe > logthe_grid(n_the-1)) then
          ! use analytic extrapolation
-         T_the_nofL2 = pow10(logT_arr(n_the-1) - 0.25_dp * (logthe - logthe_grid(n_the-1)))
+         T_the_nofL2 = exp10(logT_arr(n_the-1) - 0.25_dp * (logthe - logthe_grid(n_the-1)))
       else if (logthe < logthe_grid(1)) then
          ! analytic extrapolation
-         T_the_nofL2 = pow10(logT_arr(1) + 2.0_dp * (logthe - logthe_grid(1)))
+         T_the_nofL2 = exp10(logT_arr(1) + 2.0_dp * (logthe - logthe_grid(1)))
       else
          i_the = floor((logthe - logthe_grid(1)) / dlogthe) + 1
          slope = (logT_arr(i_the + 1) - logT_arr(i_the)) / dlogthe
          logT = logT_arr(i_the) + (logthe - logthe_grid(i_the)) * slope
-         T_the_nofL2 = pow10(logT)
+         T_the_nofL2 = exp10(logT)
       end if
    end function T_the_nofL2
 
