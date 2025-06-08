@@ -271,7 +271,7 @@ contains
       logthe = log10(the)
       if (logthe > logthe_grid(n_the-1)) then
          ! use analytic extrapolation
-         T_the_nofL2 = 10 ** (logT_arr(n_the-1) - 0.25_dp * (logthe - logthe_grid(n_the-1)))
+         T_the_nofL2 = pow10(logT_arr(n_the-1) - 0.25_dp * (logthe - logthe_grid(n_the-1)))
       else if (logthe < logthe_grid(1)) then
          ! analytic extrapolation
          T_the_nofL2 = pow10(logT_arr(1) + 2.0_dp * (logthe - logthe_grid(1)))
