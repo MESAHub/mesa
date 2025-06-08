@@ -252,7 +252,7 @@ contains
       real(dp) :: x, U_over_P, rho
       x = c4 * pow3(T * the) / (1.0_dp - fL2)
       U_over_P = (1.5_dp + x) / (1.0_dp + 1.0_dp / 3.0_dp * x)
-      rho = (1.0_dp - fL2) * M1dot / (2.0_dp * pi * disk_alpha * omega_K * Rd**3) / the**3
+      rho = (1.0_dp - fL2) * M1dot / (2.0_dp * pi * disk_alpha * omega_K * pow3(Rd)) / pow2(the)
       f2_the_T_fL2 = &
          7.0_dp / 4.0_dp &
          - (1.5_dp * U_over_P + c3 * pow4(T) / kap(rho, T) / (1.0_dp - fL2) ** 2) * the**2 &
