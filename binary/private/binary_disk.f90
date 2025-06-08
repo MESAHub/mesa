@@ -19,13 +19,21 @@
 
 module binary_disk
 
-   use const_def, only: dp, pi, pi2, two_thirds, standard_cgrav, Msun, Rsun, secyer, crad, boltzm, clight, mp
+   use const_def, only: dp, pi, pi2, one_third, two_thirds, standard_cgrav, Msun, Rsun, secyer, crad, boltzm, clight, mp
    use star_lib
    use star_def
    use math_lib
    use binary_def
 
    implicit none
+   
+   ! more numerical constants
+   real(dp), parameter :: one_fourth = 1.0_dp / 4.0_dp
+   real(dp), parameter :: seven_fourths = 7.0_dp / 4.0_dp
+   real(dp), parameter :: one_eigth = 1.0_dp / 8.0_dp
+   real(dp), parameter :: three_eigths = 3.0_dp / 8.0_dp
+   real(dp), parameter :: one_ninth = 1.0_dp / 9.0_dp
+   real(dp), parameter :: four_twentyseventh = 4.0_dp / 27.0_dp
 
    ! This module includes functions for mass transfer and L2 mass loss for binary systems with a thin disk
    ! TODO: switch Kramers opacity module to real one in eval_L2_mass_loss_fraction()
@@ -77,7 +85,7 @@ contains
       log_q = log10(q)
 
       ! positions of Lagrangian points (based on analytic fits)
-      xL1 = -0.0355_dp * log_q**2 + 0.251_dp * abs(log_q) + 0.5_dp  ! [a = SMA]
+      xL1 = -0.0355_dp * log_q**2 + 0.251_dp * abs(log_q) + 0.500_dp  ! [a = SMA]
       xL2 = 0.0756_dp * log_q**2 - 0.424_dp * abs(log_q) + 1.699_dp  ! [a]
 
       if (log_q > 0.0_dp) then  ! m2 is more massive
@@ -116,7 +124,7 @@ contains
       end do
 
       ! only T < T_max is possible to calculate
-      T_max = pow(4.0_dp / (27.0_dp * c1**2 * c2), 1.0_dp / 9.0_dp)
+      T_max = pow(four_twentyseventh / (c1**2 * c2), one_ninth)
 
       do i = 1, n_the
          T_arr(i) = 0.0_dp
@@ -178,7 +186,7 @@ contains
       ! solution
       the = 0.5_dp * (the_left + the_right)
       T = T_the_nofL2(the, logthe_grid, logT_arr, n_the, dlogthe)
-      the_max = sqrt(3.0_dp / 8.0_dp * c2 * T + 1.0_dp / 4.0_dp * (PhiL2 - PhiRd) / (GM2 / Rd) - 1.0_dp / 8.0_dp)
+      the_max = sqrt(three_eigths * c2 * T + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eigth)
 
       if (the < the_max) then
          ! return a tiny numner
@@ -206,8 +214,8 @@ contains
 
          ! -- do not use exactly the_min (corresponding to T = 0, bc. kap table breaks down)
          ! -- define another the_min based on T_floor (kap table won't be a problem)
-         the_min = sqrt( 3.0_dp / 8.0_dp * c2 * T_floor &
-                       + 1.0_dp / 4.0_dp * (PhiL2 - PhiRd) / (GM2 / Rd) - 1.0_dp / 8.0_dp )
+         the_min = sqrt( three_eigths * c2 * T_floor &
+                       + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eigth )
          the_left = the_min
          f2_left = f2_the_T_fL2(the_left, &
                                 T_the(the_left, c2, PhiL2, PhiRd, GM2, Rd), &
@@ -252,10 +260,10 @@ contains
       real(dp), intent(in) :: c3, c4, M1dot, disk_alpha, omega_K, Rd, PhiRd, GM2, PhiL1, PhiL2
       real(dp) :: x, U_over_P, rho
       x = c4 * pow3(T * the) / (1.0_dp - fL2)
-      U_over_P = (1.5_dp + x) / (1.0_dp + 1.0_dp / 3.0_dp * x)
+      U_over_P = (1.5_dp + x) / (1.0_dp + one_third * x)
       rho = (1.0_dp - fL2) * M1dot / (2.0_dp * pi * disk_alpha * omega_K * pow3(Rd)) / pow2(the)
       f2_the_T_fL2 = &
-         7.0_dp / 4.0_dp &
+         seven_fourths &
          - (1.5_dp * U_over_P + c3 * pow4(T) / kap(rho, T) / (1.0_dp - fL2) ** 2) * the**2 &
          - PhiRd / (GM2 / Rd) &
          + (PhiL1 - fL2 * PhiL2) / (GM2 / Rd) / (1.0_dp - fL2)
