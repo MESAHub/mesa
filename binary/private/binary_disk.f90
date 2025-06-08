@@ -250,7 +250,7 @@ contains
       real(dp), intent(in) :: the, T, fL2
       real(dp), intent(in) :: c3, c4, M1dot, disk_alpha, omega_K, Rd, PhiRd, GM2, PhiL1, PhiL2
       real(dp) :: x, U_over_P, rho
-      x = c4 * (T * the) ** 3 / (1.0_dp - fL2)
+      x = c4 * pow3(T * the) / (1.0_dp - fL2)
       U_over_P = (1.5_dp + x) / (1.0_dp + 1.0_dp / 3.0_dp * x)
       rho = (1.0_dp - fL2) * M1dot / (2.0_dp * pi * disk_alpha * omega_K * Rd**3) / the**3
       f2_the_T_fL2 = &
