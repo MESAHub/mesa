@@ -19,7 +19,7 @@
 
 module binary_disk
 
-   use const_def, only: dp, pi, standard_cgrav, Msun, Rsun, secyer, crad, boltzm, clight, mp
+   use const_def, only: dp, pi, pi2, two_thirds, standard_cgrav, Msun, Rsun, secyer, crad, boltzm, clight, mp
    use star_lib
    use star_def
    use math_lib
