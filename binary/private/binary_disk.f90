@@ -104,7 +104,7 @@ contains
 
 
       ! constants involved in numerical solutions
-      c1 = 2.0_dp * pi * crad * disk_alpha * Rd / (3.0_dp * omega_K * M1dot)
+      c1 = two_thirds * pi * crad * disk_alpha * Rd / (omega_K * M1dot)
       c2 = boltzm * Rd / (GM2 * disk_mu * mp)
       c3 = 8.0_dp * pi**2 * crad * disk_alpha * clight * Rd**2 / (M1dot**2 * omega_K)
       c4 = 2.0_dp * pi * disk_mu * crad * disk_alpha * omega_K * mp * Rd**3 / (boltzm * M1dot)
