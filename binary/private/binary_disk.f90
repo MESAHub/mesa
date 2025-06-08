@@ -100,7 +100,7 @@ contains
       PhiL2 = PhiL2_dimless * Phi_units
       PhiRd = PhiRd_dimless * Phi_units
       ! Keplerian frequency at Rd
-      omega_K = sqrt(GM2 / Rd**3)
+      omega_K = sqrt(GM2 / pow3(Rd))
 
 
       ! constants involved in numerical solutions
