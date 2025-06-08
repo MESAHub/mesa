@@ -111,7 +111,7 @@ contains
 
       ! Create logarithmically spaced grid for grid search for disk thickness [only used at the beginning]
       do i = 1, n_the
-         the_grid(i) = 10.0_dp**(log10(the_grid_min) + (i - 1) * (log10(the_grid_max) - log10(the_grid_min)) / (n_the - 1))
+         the_grid(i) = exp10(log10(the_grid_min) + (i - 1) * (log10(the_grid_max) - log10(the_grid_min)) / (n_the - 1))
       end do
 
       ! only T < T_max is possible to calculate
