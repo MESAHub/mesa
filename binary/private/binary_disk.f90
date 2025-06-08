@@ -236,7 +236,7 @@ contains
    ! Helper Functions
    real(dp) function f1_the_T_fL2(the, T, fL2, c1, c2)
       real(dp), intent(in) :: the, T, fL2, c1, c2
-      f1_the_T_fL2 = c1 * T**4 * the**3 / (1.0_dp - fL2) - the**2 + c2 * T
+      f1_the_T_fL2 = c1 * pow4(T) * pow3(the) / (1.0_dp - fL2) - the**2 + c2 * T
    end function f1_the_T_fL2
 
    real(dp) function  kap(rho, T)
