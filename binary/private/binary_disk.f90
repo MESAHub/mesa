@@ -296,7 +296,7 @@ contains
       real(dp) :: T
       ! only for non-zero fL2
       T = T_the(the, c2, PhiL2, PhiRd, GM2, Rd)
-      fL2_the =  1.0_dp - c1 * T**4 * the**3 / (the**2 - c2 * T)
+      fL2_the =  1.0_dp - c1 * pow4(T) * pow3(the) / (the**2 - c2 * T)
    end function fL2_the
 
 
