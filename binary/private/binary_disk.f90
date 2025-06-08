@@ -128,7 +128,7 @@ contains
          f1_left = f1_the_T_fL2(the, T_left, 0.0_dp, c1, c2)
          T_right = T_max
          do while (abs((T_left - T_right) / T_right) > tol)
-            T = (T_left + T_right) / 2.0_dp
+            T = 0.5_dp * (T_left + T_right)
             f1 = f1_the_T_fL2(the, T, 0.0_dp, c1, c2)
             if (f1 * f1_left > 0) then
                T_left = T
