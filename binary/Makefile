@@ -63,7 +63,7 @@ EXTERNAL_DEPENDS_ON :=
 endif
 
 SRCS_CHECK = test/src/test_binary.f90
-INTERNAL_DEPENDS_ON := utils star
+INTERNAL_DEPENDS_ON := const utils math net interp_1d chem rates num star_data star
 BINTYPE := static-lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
 

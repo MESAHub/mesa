@@ -8,7 +8,7 @@ SRCS := public/star_data_def.f90 \
 	public/star_pgstar.f90
 
 SRCS_CHECK = test/src/test_star_data.f90
-INTERNAL_DEPENDS_ON := const chem net kap colors neu
+INTERNAL_DEPENDS_ON := const utils auto_diff chem net kap colors eos neu rates
 EXTERNAL_DEPENDS_ON :=
 BINTYPE := static-lib
 

@@ -10,7 +10,7 @@ SRCS := \
     private/extras_support.f90 \
     private/astero_run_support.f90
 
-INTERNAL_DEPENDS_ON := utils star
+INTERNAL_DEPENDS_ON := const utils math num auto_diff star_data star
 
 ifeq ($(WITH_PGSTAR),yes)
 SRCS += private/pgstar_astero_plots.f90

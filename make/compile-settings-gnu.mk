@@ -38,7 +38,7 @@ endif
 FFLAGS_COMPAT := -fno-sign-zero
 FFLAGS_FREE :=  -ffree-form -x f95-cpp-input -fimplicit-none
 FFLAGS_FIXED := -ffixed-form -x f77-cpp-input
-FLAGS_DEPS := $(call pkg-config,--cflags,$(DEPENDS_ON)) $(INCLUDE_DIRS)
+FLAGS_DEPS := $(call pkg-config,--cflags,$(EXTERNAL_DEPENDS_ON) $(INTERNAL_DEPENDS_ON)) $(INCLUDE_DIRS)
 
 FFLAGS_SHARED  := \
   $(FLAGS_CODE_SANITY) \
@@ -61,7 +61,7 @@ FCOMPILE_MODULE := gfortran $(_FFLAGS) -w -c -fsyntax-only
 FCOMPILE_FIXED := gfortran $(FFLAGS_FIXED) -c
 FCOMPILE_MODULE_FIXED:= gfortran $(FFLAGS_FIXED) -w -c -fsyntax-only
 CCOMPILE := gcc $(_CFLAGS) -c
-LIB_DEP_ARGS := $(call pkg-config, --libs,$(DEPENDS_ON))
+LIB_DEP_ARGS := $(call pkg-config, --libs,$(EXTERNAL_DEPENDS_ON)) $(call pkg-config, --libs --static,$(INTERNAL_DEPENDS_ON))
 LIB_TOOL_STATIC := ar rcs
 LIB_TOOL_DYNAMIC := gfortran -shared $(FLAGS_OPENMP)
 EXECUTABLE := gfortran $(FLAGS_OPENMP)

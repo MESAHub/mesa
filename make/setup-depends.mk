@@ -1,8 +1,4 @@
-DEPENDS_ON := $(EXTERNAL_DEPENDS_ON)
-
-ifneq ($(INTERNAL_DEPENDS_ON),)
-  DEPENDS_ON += $(addprefix mesa-,$(INTERNAL_DEPENDS_ON))
-endif
+INTERNAL_DEPENDS_ON := $(addprefix mesa-,$(INTERNAL_DEPENDS_ON))
 
 include $(MAKE_DIR)/subdirs.mk
 
@@ -32,6 +28,8 @@ ifneq ($(2),)
     $$(warning PKG_CONFIG_PATH is $$(PKG_CONFIG_PATH))
     $$(error pkg-config failed to find some of $(2), check PKG_CONFIG_PATH is correct)
   endif
+else
+  TMP_VAR :=
 endif
 endef
 

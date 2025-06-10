@@ -4,7 +4,7 @@ CHECK_RESULTS := $(CHECK_RESULT_DIR)/check-results
 CHECK_DIFF_PROG ?= diff -b
 
 $(CHECKER): $(ALL_DEPS) $(OBJS_CHECK) | $(BUILD_DIR_MODULE)/bin/.
-	$(EXECUTABLE) -o $(CHECKER) $(OBJS_CHECK) $(call pkg-config,--libs,mesa-$(MODULE_NAME))
+	$(EXECUTABLE) -o $(CHECKER) $(OBJS_CHECK) $(call pkg-config,--libs --static,mesa-$(MODULE_NAME))
 
 # Can be disabled by setting CHECK_FILTER_PROG = cat
 CHECK_FILTER_PROG ?= grep -Ev "^(write)|(create rate data for)|( read )|( write )|(                           number not already in cache:)"
