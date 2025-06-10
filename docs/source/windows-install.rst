@@ -5,7 +5,7 @@ This page describes two options for installing MESA on Windows.
 
 Option 1: MESA-Docker
 ---------------------
-MESA-Docker provides a pre built version of MESA inside a Docker container. This simplifies the setup as MESA and all
+MESA-Docker provides a pre-built version of MESA inside a Docker container. This simplifies the setup as MESA and all
 its dependencies are already installed.
 
 `MESA-Docker <https://github.com/evbauer/MESA-Docker>`__

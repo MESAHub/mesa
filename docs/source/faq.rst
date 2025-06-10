@@ -31,7 +31,7 @@ The picture shows the intense authors hard at work making final edits.
 
 A late-night session working on |MESA I| around Bill's
 dining room table with a projector, a makeshift screen, and ample red
-wine (left to right, Frank Timmes, Aaron Dotter, Falk Herwig, Lars
+wine (left to right: Frank Timmes, Aaron Dotter, Falk Herwig, Lars
 Bildsten, and Bill Paxton). Photo taken by Bill's patient wife, Kathlyn,
 who deserves a great deal of credit for the existence of MESA.
 
@@ -79,7 +79,7 @@ Errors like::
 typically arise because the build environment doesn't have enough RAM.
 We've found that this usually happens because you're building MESA on
 a virtual machine (VM) that hasn't been allocated enough virtual
-memory, in which case the solution is to allocate more memory to
+memory. In this case, the solution is to allocate more memory to
 the VM.  If you aren't using a VM, then MESA might somehow not be able
 to access the amount of RAM that it needs.
 

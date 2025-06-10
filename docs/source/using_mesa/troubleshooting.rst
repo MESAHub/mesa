@@ -16,9 +16,9 @@ support interfaces to them.  See, for example,
 for how to make calls to those packages
 during a stellar evolution run. Also see
 ``$MESA_DIR/star/test_suite/ccsn_IIp`` for how to prepare input for STELLA
-from the output of mesa/star run. Finally,
+from the output of a mesa/star run. Finally,
 ``$MESA_DIR/stella/res/stella_extras.f90`` has routines for converting some of
-the output of STELLA into a more "MESA friendly" form. Again, we
+the output of STELLA into a more "MESA-friendly" form. Again, we
 support all of these interfaces and continue to welcome questions
 about using them and suggestions for making them better.
 

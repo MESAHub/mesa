@@ -40,7 +40,7 @@ central X of 0.5. To try it yourself,
 You can do the same with any of the ``test_suite`` cases.
 
 If you want to base your work off of a ``test_suite`` case, you should make
-a copy the directory and then edit this copy.
+a copy of the directory and then edit this copy.
 
 ::
 

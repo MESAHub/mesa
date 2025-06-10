@@ -59,7 +59,7 @@ system. There's a template to get you started at
 :file:`$MESA_DIR/utils/makefile_header_non_mesasdk`.
 
 Regardless of whether you use the MESA SDK or ifort, and whether your
-machine runs MacOS or Linux, the output of MESA should be bit-for-bit
+machine runs macOS or Linux, the output of MESA should be bit-for-bit
 identical.  If it's not, this is considered to be a bug. (This has
 been the case since Release 5819 in early January 2014.)
 

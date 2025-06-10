@@ -8,7 +8,7 @@ Output files
 
 
 By default, MESA stores its data in the `LOGS` directory. The data files
-are text-based and can fed into your favorite plotting program. You
+are text-based and can be fed into your favorite plotting program. You
 should visit the
 `Add-ons <https://mesastar.org/marketplace/add-ons/>`__ section
 of the MESA forum and see if someone has contributed code in your
@@ -176,7 +176,7 @@ the same thing if we know the exact file we want to load:
 
 But often it's frustrating to know exactly what profile file you want to
 load, so we can use the ``MesaLogDir`` class to simplify the process. It
-lets us load profiles by their associated model number and most simply
+lets us load profiles by their associated model number, or most simply
 by just loading the last saved profile:
 
 .. code:: python
