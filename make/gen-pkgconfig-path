@@ -2,7 +2,7 @@
 
 set -e
 
-BUILD_DIR=$(realpath ${BUILD_DIR})
+BUILD_DIR=$(perl -e "use Cwd; use File::Spec; print File::Spec->abs2rel(Cwd::realpath('${BUILD_DIR}'))")
 PKG_CONFIG_PATH="$BUILD_DIR/$1/lib/pkgconfig"
 
 shift
