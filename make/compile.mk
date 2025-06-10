@@ -25,7 +25,7 @@ $(BUILD_DIR_MODULE)/depend : $(FORTRAN_SOURCES) | $(BUILD_DIR_MODULE)/.
 	INSTALL_INCLUDES=$(call escape,$(INSTALL_INCLUDES)) \
 	MODULES=$(call escape,$(MODULES)) \
 	BUILD_DIR_MODULE=$(call escape,$(BUILD_DIR_MODULE)) \
-	$(MAKE_DIR)/gen-compile-tree  $(INCLUDE_DIRS) $(FLAGS_DEPS) $(FORTRAN_SOURCES) > $(BUILD_DIR_MODULE)/depend
+	$(MAKE_DIR)/gen-compile-tree $(FLAGS_DEPS) $(FORTRAN_SOURCES) > $(BUILD_DIR_MODULE)/depend
 
 include $(BUILD_DIR_MODULE)/depend
 
