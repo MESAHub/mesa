@@ -980,22 +980,22 @@
       !abs_mag filter
 
       ! Adds all the bc's to the output
-      !add_bc
+      add_bc
 
       ! Adds all the absolute magnitudes to the output
-      !add_abs_mag
+      add_abs_mag
 
       ! Outputs luminosity in filter band ``filter'' (erg s^-1) (case sensitive)
-      ! lum_band filter
+      !lum_band filter
 
       ! Adds all the filter band luminosities to the output (erg s^-1)
-      ! add_lum_band
+       add_lum_band
 
       ! Outputs log luminosity in filter band ``filter'' (log erg s^-1) (case sensitive)
-      ! log_lum_band filter
+      !log_lum_band filter
 
       ! Adds all the filter band luminosities to the output (log erg s^-1)
-      ! add_log_lum_band
+       add_log_lum_band
 
 !----------------------------------------------------------------------------------------------
 
