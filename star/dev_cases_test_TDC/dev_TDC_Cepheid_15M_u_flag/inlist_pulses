@@ -24,18 +24,18 @@
    !change_v_flag = .true.
    !new_v_flag = .false.
 
-   !relax_to_this_tau_factor = 1d-3!-1
-   !dlogtau_factor = 0.1d0
-   !relax_tau_factor = .true.
+   change_u_flag = .true.
+   new_u_flag = .false.
+
+   relax_to_this_tau_factor = 1d-1!-1
+   dlogtau_factor = 0.1d0
+   relax_tau_factor = .true.
 
    
     ! if restarting from .mod file, need high initial dt for relaxing.
     set_initial_dt = .true.
     years_for_initial_dt = -1
     seconds_for_initial_dt = 1d7!-1
-
-    set_initial_age = .true.
-    initial_age = 0
 
     ! on first pass.
     remove_center_by_temperature = 2d6
@@ -45,36 +45,40 @@
 
 &controls
 
+   ! remeshing flag for if we are doing an envelope model or full stellar model.
+   x_logical_ctrl(23) = .false. ! .false. = envelope model, .true. = full stellar model ! depracated
+   x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
+   x_ctrl(12) = 2810! model number to turn off remesh
 
-   x_integer_ctrl(1) = 0 ! gyre interval to check
-   x_ctrl(1) = 17d0 ! expected period (in days) 
+   ! timestep	
+   x_ctrl(13) = 2810! model number to drop timestep
 
-   x_logical_ctrl(7) = .true. ! doing pulses
-   x_integer_ctrl(7) = -1 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 17d0 ! expected period (in days) 
-!   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
-   x_ctrl(9) = 0.5 ! KE_growth_avg_abs_frac_new ! for averaging growth rates across steps.
-   x_ctrl(10) = 0.3 ! min_period_div_target
+! turn off burning and mixing, if evolving envelope model
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
 
-
-! kick when true and not restarting.
-x_logical_ctrl(12) = .true.
 ! GYRE set starting velocities, kick!
    x_logical_ctrl(5) = .true. ! to turn on gyre kick
+   x_ctrl(11) = 2810! kick model at this model number
+
    x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
    x_ctrl(6) = 5d0 ! initial vsurf (kms)
 
 
    ! TDC Pulsation timestepping.
-   x_ctrl(17) = 5d6 ! dt before pulse, seconds
-   x_ctrl(18) = 2d3 ! After a pulse begins, limit the timestep to this (in seconds). 
+   x_ctrl(10) = 1d4 ! dt before pulse, seconds for relaxing mesh
+   x_ctrl(18) = 1d4 ! After a pulse begins, limit the timestep to this (in seconds). 
+
+! add controls steps for relax, steps before timestep drop, steps before kick.
  
    ! turn of wind during Pulsation
    use_other_wind = .false.
 
    ! can optionally use QHSE form of dp/dm or hydro form below.
-   use_dPrad_dm_form_of_T_gradient_eqn = .false. ! if false use QHSE form.
+   use_dPrad_dm_form_of_T_gradient_eqn = .true. ! if false use QHSE form.
 
  
 ! timesteps for saturation
@@ -84,19 +88,19 @@ x_logical_ctrl(12) = .true.
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
    
    ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
-   dt_div_min_dr_div_cs_limit = 5d0!10d0
+   dt_div_min_dr_div_cs_limit = 10d0!10d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
 
-   ! artificial viscosity if necessary, v_flag only
+   ! artificial viscosity if necessary, only works for v_flag 
    use_Pvsc_art_visc = .true.
    Pvsc_cq = 4.0d0
    Pvsc_zsh = 0.1d0
 
    ! velocity time centering for v_flag only.
-   steps_before_use_velocity_time_centering = 2300 ! wait until the model settles to time center
+   !steps_before_use_velocity_time_centering = 2900
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true.
@@ -111,9 +115,9 @@ x_logical_ctrl(12) = .true.
    convergence_ignore_equL_residuals = .false. ! true in inlist_ppisn
 
    ! OUTER BC for TDC Pulsations
-   use_RSP_L_eqn_outer_BC = .true.
+   use_RSP_L_eqn_outer_BC = .false.
    RSP2_Lsurf_factor = 0.5d0
-   use_zero_Pgas_outer_BC = .true.
+   use_zero_Pgas_outer_BC = .false.
 
    ! for u_flag, can use these.
    use_compression_outer_BC = .false.
@@ -123,19 +127,22 @@ x_logical_ctrl(12) = .true.
    mesh_ok_to_merge = .true.
 
 max_num_merge_cells = 2
-max_num_merge_surface_cells = 5 ! necessary for surface
+
+! these two in combination are important
+max_num_merge_surface_cells = 15 ! necessary for surface, 15 better for massive stars
+min_surface_cell_dq = 1d-5!2d-6 ! 1d-6 might be safer. any higher and you risk touching the convective shell during a pulsation cycle which will make the surface go haywire.
 
 
+!mesh_min_k_old_for_split = 15
 min_dq = 1d-7
-max_center_cell_dq = 1d-1!1d-5!1d-7
+!max_center_cell_dq = 1d-1! leave at default if including core
 max_surface_cell_dq = 1d-4
 mesh_max_allowed_ratio = 2.5d0 !default
-min_surface_cell_dq = 5d-6!2d-6 ! 1d-6 might be safer. any higher and you risk touching the convective shell during a pulsation cycle which will make the surface go haywire.
 
 mesh_delta_coeff_factor_smooth_iters = 3!20!50 ! 3
 !remesh_max_allowed_logT = 5d0 ! global control, not good.
-T_function1_weight = 40!110
-P_function_weight = 10!50 ! need custom P function weight for logT < 4.5
+T_function1_weight = 30!110
+P_function_weight = 5!50 ! need custom P function weight for logT < 4.5
 log_tau_function_weight = 10!100
 !log_kap_function_weight = 10
 
@@ -155,8 +162,8 @@ use_other_mesh_functions = .true.
   ! num_steps_to_hold_mesh_after_retry = 5
 ! if hydro use momentum bc?
 
-   use_split_merge_amr = .false.
-split_merge_amr_okay_to_split_1 = .false.
+    use_split_merge_amr = .false.
+    split_merge_amr_okay_to_split_1 = .true.
     merge_amr_ignore_core_cells = .true.
     merge_amr_logT_for_ignore_core_cells = 5d0 !1d99
     split_amr_ignore_core_cells = .true.
@@ -175,8 +182,8 @@ split_merge_amr_nz_r_core = 1000!10000
 
 
    split_merge_amr_nz_baseline = 1000!6000 ! RECOMMENDED 6000
-   split_merge_amr_MaxLong = 1.5d0!1.25d0
-   split_merge_amr_MaxShort = 1.5d0!2.5d0
+   split_merge_amr_MaxLong = 1.25d0
+   split_merge_amr_MaxShort = 2.5d0
 
 
 !    equal_split_density_amr = .false.
@@ -184,7 +191,7 @@ split_merge_amr_nz_r_core = 1000!10000
 ! deprecated?    trace_split_merge_amr = .false.
 
 
-   split_merge_amr_max_iters = 1000 ! setting this too high will smear pulsations. must restrict?
+   split_merge_amr_max_iters = 100 ! setting this too high will smear pulsations. must restrict?
    split_merge_amr_okay_to_split_nz = .false.
 split_merge_amr_mesh_delta_coeff = 1.0!0.3
 
@@ -200,11 +207,7 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
 
 
 
-! turn off burning and mixing.
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
+
 
    x_logical_ctrl(22) = .true. ! flag for in inlist_pulses
 
@@ -217,8 +220,6 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
 
       !drag_coefficient = 0.8d0
       !min_q_for_drag = 0.98d0
-
-!Pextra_factor = 2
 
 report_solver_progress = .false.
 report_ierr = .true. ! if true, produce terminal output when have some internal error

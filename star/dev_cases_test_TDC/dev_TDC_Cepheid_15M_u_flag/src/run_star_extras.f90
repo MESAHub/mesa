@@ -35,11 +35,23 @@
 
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interp_pm, interp_values, interp_value
+      
+
+!gyre
+      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      !x_logical_ctrl(2) = .false. ! output eigenfunction files
+      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      !x_integer_ctrl(4) = 1 ! order
+      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
       implicit none
       
       include "test_suite_extras_def.inc"
-      include 'run_star_extras_TDC_pulsation_defs.inc'
+      include '/Users/eb/Documents/Software/dev/mesa_pulsations/mesa/star/rsp2_utils/run_star_extras_rsp2_defs.inc'
 
       logical :: dbg = .false.
 
@@ -48,7 +60,8 @@
       ! values specified on inlist_ppisn
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
-      logical :: in_inlist_pulses
+      logical :: in_inlist_pulses, envelope_model, turn_off_remesh
+      integer :: kick_model_number, timestep_drop_model_number, turn_off_remesh_model_number
       real(dp) :: max_dt_before_pulse
 
       
@@ -57,8 +70,8 @@
       contains
 
       include "test_suite_extras.inc"
-      include 'run_star_extras_TDC_pulsation.inc'
-
+      !include 'gyre_in_mesa_extras_finish_step.inc'
+      include '/Users/eb/Documents/Software/dev/mesa_pulsations/mesa/star/rsp2_utils/run_star_extras_rsp2.inc'
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -78,10 +91,6 @@
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
-         ! pulsation info
-         s% other_photo_write => photo_write
-         s% other_photo_read => photo_read
-
          s% how_many_other_mesh_fcns => how_many_other_mesh_fcns
          s% other_mesh_fcn_data => RSP_mesh
 
@@ -94,8 +103,13 @@
          ! store user provided options from the inlist
 
          in_inlist_pulses = s% x_logical_ctrl(22)
-         max_dt_before_pulse = s% x_ctrl(17)
+         max_dt_before_pulse = s% x_ctrl(10)
          max_dt_during_pulse = s% x_ctrl(18)
+         envelope_model = s% x_logical_ctrl(23)
+         turn_off_remesh = s% x_logical_ctrl(24)
+         kick_model_number = s% x_ctrl(11)
+         timestep_drop_model_number = s% x_ctrl(13)
+         turn_off_remesh_model_number = s% x_ctrl(12)
 
       end subroutine extras_controls
 
@@ -362,8 +376,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
-         call TDC_pulsation_extras_startup(id, restart, ierr)
-
+            
          ! Initialize GYRE
 
          call init('gyre.in')
@@ -422,7 +435,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = TDC_pulsation_how_many_extra_history_columns(id)
+         how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
       
       
@@ -436,7 +449,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call TDC_pulsation_data_for_extra_history_columns(id, n, names, vals, ierr)
+
       end subroutine data_for_extra_history_columns
 
       
@@ -448,8 +461,11 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = TDC_pulsation_how_many_extra_profile_columns(id)
-
+         if (s% u_flag) then
+            how_many_extra_profile_columns = 8
+         else
+            how_many_extra_profile_columns = 1
+         end if
       end function how_many_extra_profile_columns
       
       
@@ -458,14 +474,54 @@
          use const_def, only: dp
          integer, intent(in) :: id, n, nz
          character (len=maxlen_profile_column_name) :: names(n)
-         real(dp) :: vals(nz,n)
+         real(dp) :: vals(nz,n), alpha, J_inside
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: k
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call TDC_pulsation_data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
+
+         J_inside = 0d0
+         if (s% u_flag) then
+            names(1) = "vesc"
+            names(2) = "v_div_vesc"
+            names(3) = "specific_grav_e"
+            names(4) = "specific_kin_e"
+            names(5) = "specific_thermal_e"
+            names(6) = "total_specific_e"
+            names(7) = "mlt_vc"
+            names(8) = "spin_parameter" 
+            
+            do k = s% nz, 1, -1
+               vals(k,1) = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
+               vals(k,2) = s% u(k)/vals(k,1)
+               vals(k,3) = -s% cgrav(k)*s% m(k)/s% r(k)
+               vals(k,4) = 0.5d0*s% u(k)*s% u(k)
+               vals(k,5) = two_thirds*avo*kerg*s% T(k)/(2*s% mu(k)*s% rho(k)) &
+                           + crad*pow4(s% T(k))/s% rho(k)
+               vals(k,6) = vals(k,3) + vals(k,4) + vals(k,5)
+               vals(k,7) = s% mlt_vc(k)
+               if (s% rotation_flag) then
+                  J_inside = J_inside + s% j_rot(k)*s% dm_bar(k)
+                  vals(k,8) = J_inside*clight/(pow2(s% m(k))*standard_cgrav)
+               else
+                  vals(k,8) = 0d0
+               end if
+            end do
+         else
+            names(1) = "spin_parameter" 
+
+            if (s% rotation_flag) then
+               do k = s% nz, 1, -1
+                  J_inside = J_inside + s% j_rot(k)*s% dm_bar(k)
+                  vals(k,1) = J_inside*clight/(pow2(s% m(k))*standard_cgrav)
+               end do
+            else
+               vals(:,1) = 0d0
+            end if
+         end if
+         
 
       end subroutine data_for_extra_profile_columns
       
@@ -492,7 +548,7 @@
          s% use_other_before_struct_burn_mix = .true.
 
 
-         if (s% model_number == 2200 .and. in_inlist_pulses)then
+         if (s% model_number == kick_model_number .and. in_inlist_pulses .and. s% x_logical_ctrl(5))then
 
             call gyre_in_mesa_extras_set_velocities(s,.false.,ierr)
             write(*,*) 'kick'
@@ -539,17 +595,26 @@
 !
 !            !s% atm_T_tau_errtol = 1d-12
 !            !s% atm_T_tau_max_iters = 500
-  
          ! change timestep back to normal
          if (in_inlist_pulses) then
-            if (s% model_number > 2100 )then
+            if (s% model_number > timestep_drop_model_number )then
                  s% max_timestep = max_dt_during_pulse
             else
                  s% max_timestep = max_dt_before_pulse
             end if
 
-            if (s% model_number > 2050 )then
+            if (s% model_number > turn_off_remesh_model_number .and. turn_off_remesh )then
                s% okay_to_remesh = .false.
+!               if ((s% model_number == turn_off_remesh_model_number + 1) &
+!                     .and. .not. envelope_model )then
+!                  do k =1,s%nz
+!                     if (s%lnT(k) >= log(2d6)) then
+!                        exit
+!                     end if
+!                  end do
+!                  s% mesh_min_k_old_for_split = k
+!               end if
+!               write (*,*) 's% mesh_min_k_old_for_split', s% mesh_min_k_old_for_split
             end if
          end if
          ! reading inlists can turn this flag off for some reason
@@ -578,10 +643,9 @@
          if (ierr /= 0) return
 
          extras_finish_step = keep_going
-         extras_finish_step = TDC_pulsation_extras_finish_step(id)
 
-!         if (.not. s% x_logical_ctrl(37)) return
-!         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+         if (.not. s% x_logical_ctrl(37)) return
+         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
 
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
 
@@ -597,7 +661,6 @@
          n = 1
       end subroutine how_many_other_mesh_fcns
 
-
       subroutine RSP_mesh( &
          id, nfcns, names, gval_is_xa_function, vals1, ierr)
          use star_def
@@ -611,8 +674,8 @@
          integer, intent(out) :: ierr
          integer :: nz, k
          real(dp), pointer :: vals(:, :)
-         real(dp) :: weight1 = 1d6!1d4
-         real(dp) :: weight2 = 8d5!1d4
+         real(dp) :: weight1 = 1d5!1d4
+         real(dp) :: weight2 = 1d5!1d4
          real(dp) :: weight3 = 0d0
          real(dp) :: logT_anchor1, logT_anchor2, logT_anchor3, lmid, delta, ell
          integer :: k_anchor1, k_anchor2
@@ -631,55 +694,44 @@
          logT_anchor3 = log(30d3)
 
          lmid  = 0.5d0*(logT_anchor2+logT_anchor3)
-         delta = (logT_anchor3 - logT_anchor2)
+         delta = (logT_anchor3 - logT_anchor2)/10d0
 
          k_anchor1 = 0
          k_anchor2 = 0
 
-      !         do k = 1, nz
-      !            if (s% lnT(k) < logT_anchor1) then
-      !               vals(k, 1) = weight1*(s% m(1) - s% m(k))/Msun
-      !               k_anchor = k
-      !               !write (*,*) "k", k ,"dm", vals(k, 1)
-      !            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-      !               vals(k, 1) = weight2*(s% m(k_anchor) - s% m(k))/Msun
-      !               !write (*,*) "k", k ,"dm", vals(k, 1)
-      !            else
-      !               vals(k, 1) = weight3*(s% m(1)/Msun - s% m(k)/Msun)
-      !            end if
-      !         end do
+!         do k = 1, nz
+!            if (s% lnT(k) < logT_anchor1) then
+!               vals(k, 1) = weight1*(s% m(1) - s% m(k))/Msun
+!               k_anchor = k
+!               !write (*,*) "k", k ,"dm", vals(k, 1)
+!            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
+!               vals(k, 1) = weight2*(s% m(k_anchor) - s% m(k))/Msun
+!               !write (*,*) "k", k ,"dm", vals(k, 1)
+!            else
+!               vals(k, 1) = weight3*(s% m(1)/Msun - s% m(k)/Msun)
+!            end if
+!         end do
 
 
          do k = 1, nz
             ell = s%lnT(k)
-            if (s% lnT(k) <= logT_anchor1) then
+            if (s% lnT(k) < logT_anchor1) then
+               ! core weighting
                vals(k,1) = weight1*(s%m(1) - s%m(k))/Msun
                k_anchor1 = k
-            else if (s% lnT(k) <= logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-               vals(k,1) = weight2*(s%m(1) - s%m(k))/Msun
+            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
+               ! envelope weighting
+               vals(k,1) = weight2*(s%m(k_anchor1) - s%m(k))/Msun
                k_anchor2 = k
-            else if (s% lnT(k) < logT_anchor3) then
-               ! smooth taper doqn to 0.
-!               vals(k,1) = vals(k-1,1)/2d0
-               vals(k,1) = (0.5d0*weight2*(1d0 - tanh( (ell - lmid)/delta )) &
+            else
+               ! smooth taper from weight2 → 0
+               vals(k,1) = ( &
+                  0.5d0*weight2*(1d0 - tanh( (ell - lmid)/delta )) &
                   ) * ( (s%m(k_anchor2) - s%m(k)) / Msun )
             end if
          end do
 
       end subroutine RSP_mesh
-
-
-      subroutine photo_write(id, iounit)
-         integer, intent(in) :: id, iounit
-         call TDC_pulsation_photo_write(id, iounit)
-      end subroutine photo_write
-
-
-      subroutine photo_read(id, iounit, ierr)
-         integer, intent(in) :: id, iounit
-         integer, intent(out) :: ierr
-         call TDC_pulsation_photo_read(id, iounit, ierr)
-      end subroutine photo_read
 
       end module run_star_extras
       

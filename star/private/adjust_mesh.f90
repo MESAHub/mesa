@@ -289,8 +289,8 @@
             do_not_split, num_gvals, gval_names, &
             gval_is_xa_function, gval_is_logT_function, gvals, delta_gval_max, &
             s% max_center_cell_dq*s% mesh_delta_coeff, s% max_surface_cell_dq*s% mesh_delta_coeff, &
-            s% max_num_subcells, s% max_num_merge_cells, &
-            nz_new, xq_new, dq_new, which_gval, comes_from, ierr)
+            s% min_surface_cell_dq*s% mesh_delta_coeff, s% max_num_subcells, s% max_num_merge_cells, &
+            s% max_num_merge_surface_cells, nz_new, xq_new, dq_new, which_gval, comes_from, ierr)
 
          if (dbg_remesh .or. dbg) write(*,*) 'back from mesh_plan'
 

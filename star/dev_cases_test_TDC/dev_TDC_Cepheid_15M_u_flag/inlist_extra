@@ -20,7 +20,7 @@ use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
-initial_mass = 6d0
+initial_mass = 15d0
 initial_Y = 0.267d0 !0.2703 !0.99858d0
 initial_Z = 0.003d0 !0.0142d0
 !initial_he3 = 0d0

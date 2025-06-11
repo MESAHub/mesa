@@ -226,8 +226,8 @@
     mesh_min_dlnR, merge_if_dlnR_too_small, min_dq_for_logT, &
     mesh_min_dr_div_dRstar, merge_if_dr_div_dRstar_too_small, &
     mesh_min_dr_div_cs, merge_if_dr_div_cs_too_small, &
-    max_center_cell_dq, max_surface_cell_dq, max_num_subcells, max_num_merge_cells, &
-    mesh_delta_coeff, mesh_delta_coeff_for_highT, &
+    max_center_cell_dq, max_surface_cell_dq, min_surface_cell_dq, max_num_subcells, max_num_merge_cells, &
+    max_num_merge_surface_cells ,mesh_delta_coeff, mesh_delta_coeff_for_highT, &
     logT_max_for_standard_mesh_delta_coeff, logT_min_for_highT_mesh_delta_coeff, remesh_dt_limit, &
     mesh_Pgas_div_P_exponent, &
     E_function_weight, E_function_param, P_function_weight, &
@@ -255,6 +255,8 @@
     split_merge_amr_okay_to_split_1, merge_amr_inhibit_at_jumps, split_merge_amr_MaxLong, split_merge_amr_nz_r_core_fraction, &
     split_merge_amr_MaxShort, merge_amr_max_abs_du_div_cs, &
     merge_amr_ignore_surface_cells, merge_amr_k_for_ignore_surface_cells, &
+    merge_amr_ignore_core_cells, merge_amr_logT_for_ignore_core_cells, &
+    split_amr_ignore_core_cells, split_amr_logT_for_ignore_core_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
     split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, trace_split_merge_amr, equal_split_density_amr, &
 
@@ -486,7 +488,7 @@
     atm_irradiated_max_iters, &
 
     use_compression_outer_BC, use_momentum_outer_BC, Tsurf_factor, use_zero_Pgas_outer_BC, &
-    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, &
+    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
 
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
@@ -1279,6 +1281,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
+ s% use_RSP_L_eqn_outer_BC = use_RSP_L_eqn_outer_BC
  s% fixed_Psurf = fixed_Psurf
  s% use_fixed_Psurf_outer_BC = use_fixed_Psurf_outer_BC
 
@@ -1479,8 +1482,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% max_center_cell_dq = max_center_cell_dq
  s% max_surface_cell_dq = max_surface_cell_dq
+ s% min_surface_cell_dq = min_surface_cell_dq
  s% max_num_subcells = max_num_subcells
  s% max_num_merge_cells = max_num_merge_cells
+ s% max_num_merge_surface_cells = max_num_merge_surface_cells
 
  s% mesh_delta_coeff = mesh_delta_coeff
  s% mesh_delta_coeff_for_highT = mesh_delta_coeff_for_highT
@@ -1582,9 +1587,13 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% split_merge_amr_MaxShort = split_merge_amr_MaxShort
  s% merge_amr_max_abs_du_div_cs = merge_amr_max_abs_du_div_cs
  s% merge_amr_ignore_surface_cells = merge_amr_ignore_surface_cells
+ s% merge_amr_ignore_core_cells = merge_amr_ignore_core_cells
+ s% split_amr_ignore_core_cells = split_amr_ignore_core_cells
  s% merge_amr_du_div_cs_limit_only_for_compression = merge_amr_du_div_cs_limit_only_for_compression
  s% split_merge_amr_avoid_repeated_remesh = split_merge_amr_avoid_repeated_remesh
  s% merge_amr_k_for_ignore_surface_cells = merge_amr_k_for_ignore_surface_cells
+ s% merge_amr_logT_for_ignore_core_cells = merge_amr_logT_for_ignore_core_cells
+ s% split_amr_logT_for_ignore_core_cells = split_amr_logT_for_ignore_core_cells
  s% split_merge_amr_dq_min = split_merge_amr_dq_min
  s% split_merge_amr_dq_max = split_merge_amr_dq_max
  s% split_merge_amr_r_core_cm = split_merge_amr_r_core_cm
@@ -2969,6 +2978,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
+ use_RSP_L_eqn_outer_BC = s% use_RSP_L_eqn_outer_BC
  fixed_Psurf = s% fixed_Psurf
  use_fixed_Psurf_outer_BC = s% use_fixed_Psurf_outer_BC
 
@@ -3163,8 +3173,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  max_center_cell_dq = s% max_center_cell_dq
  max_surface_cell_dq = s% max_surface_cell_dq
+ min_surface_cell_dq = s% min_surface_cell_dq
+
  max_num_subcells = s% max_num_subcells
  max_num_merge_cells = s% max_num_merge_cells
+ max_num_merge_surface_cells = s% max_num_merge_surface_cells
 
  mesh_delta_coeff = s% mesh_delta_coeff
  mesh_delta_coeff_for_highT = s% mesh_delta_coeff_for_highT
@@ -3266,9 +3279,13 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  split_merge_amr_MaxShort = s% split_merge_amr_MaxShort
  merge_amr_max_abs_du_div_cs = s% merge_amr_max_abs_du_div_cs
  merge_amr_ignore_surface_cells = s% merge_amr_ignore_surface_cells
+ merge_amr_ignore_core_cells = s% merge_amr_ignore_core_cells
+ split_amr_ignore_core_cells = s% split_amr_ignore_core_cells
  merge_amr_du_div_cs_limit_only_for_compression = s% merge_amr_du_div_cs_limit_only_for_compression
  split_merge_amr_avoid_repeated_remesh = s% split_merge_amr_avoid_repeated_remesh
  merge_amr_k_for_ignore_surface_cells = s% merge_amr_k_for_ignore_surface_cells
+ merge_amr_logT_for_ignore_core_cells = s% merge_amr_logT_for_ignore_core_cells
+ split_amr_logT_for_ignore_core_cells = s% split_amr_logT_for_ignore_core_cells
  split_merge_amr_dq_min = s% split_merge_amr_dq_min
  split_merge_amr_dq_max = s% split_merge_amr_dq_max
  split_merge_amr_r_core_cm = s% split_merge_amr_r_core_cm

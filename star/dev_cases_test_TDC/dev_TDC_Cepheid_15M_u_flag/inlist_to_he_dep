@@ -29,12 +29,12 @@
 &controls
 
 ! stop when the center mass fraction of h1 drops below this limit
-!    xa_central_lower_limit_species(1) = 'he4'
-!    xa_central_lower_limit(1) = 1d-1
-max_model_number = 1970
+    !xa_central_lower_limit_species(1) = 'he4'
+    !xa_central_lower_limit(1) = 1d-6
+max_model_number = 2610 !1970
 
     x_logical_ctrl(22) = .false. ! not in inlist_pulses
-    x_logical_ctrl(7) = .false.
+
 
    ! our wind implementation follows Brott+ 2011
     use_other_wind = .true.

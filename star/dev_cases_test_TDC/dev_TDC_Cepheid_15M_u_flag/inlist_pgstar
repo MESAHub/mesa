@@ -194,7 +194,7 @@ Profile_Panels1_other_yaxis_log(2) = .false.
 !Profile_Panels1_other_ymax(2) = 29
 
 Profile_Panels1_yaxis_name(3) = 'lum_conv'!'gradT'
-Profile_Panels1_other_yaxis_name(3) = 'lum_div_Ledd'!'grada'
+Profile_Panels1_other_yaxis_name(3) = 'vel_km_per_s'!'grada'
 Profile_Panels1_same_yaxis_range(3) = .false.
 Profile_Panels1_other_dymin(3) = 0.08
 !Profile_Panels1_yaxis_log(3) = .false.
@@ -206,8 +206,8 @@ Profile_Panels1_other_yaxis_name(4) = 'gradr'
 Profile_Panels1_other_dymin(4) = 0.14
 
 ! x-axis limits and properties
-Profile_Panels1_xaxis_name = 'zone'!'zone'
-Profile_Panels1_xmin = -101d0!-101d0
+Profile_Panels1_xaxis_name = 'zone'
+Profile_Panels1_xmin = -10!-101d0
 Profile_Panels1_xmax = -101d0!9d0 !-101d0 !8.1
 Profile_Panels1_xaxis_reversed = .true.
 
@@ -220,7 +220,7 @@ Profile_Panels1_xaxis_reversed = .true.
 Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
 !------------------------------------------------------------------------------------
-
+!use_RSP_L_eqn_outer_BC
 
 !TRho_Profile_win_flag = .true.
 TRho_Profile_win_width = 8
@@ -338,19 +338,19 @@ Text_Summary1_name(2,3) = 'lg_Mdot'
 Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
-Text_Summary1_name(3,1) = 'growth'
+Text_Summary1_name(3,1) = 'fe_core_infall'
 Text_Summary1_name(3,2) = 'gamma1_min'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'CO_core'
 
-Text_Summary1_name(4,1) = 'period'!'log_max_T'
+Text_Summary1_name(4,1) = 'radius'!'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'
 Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
 Text_Summary1_name(4,4) = 'O_cntr'
-Text_Summary1_name(4,5) = 'radius'
+Text_Summary1_name(4,5) = ''
 
-Text_Summary1_name(5,1) = 'num_periods'
+Text_Summary1_name(5,1) = 'log_cntr_T'
 Text_Summary1_name(5,2) = 'log_LHe'
 Text_Summary1_name(5,3) = 'lg_Lneu'
 Text_Summary1_name(5,4) = 'Ne_cntr'
@@ -360,7 +360,7 @@ Text_Summary1_name(6,1) = 'log_cntr_Rho'
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'retries'
-Text_Summary1_name(6,5) = 'log_cntr_T'
+Text_Summary1_name(6,5) = ''
 
 
 !------------------------------------------------------------------------------------
@@ -578,8 +578,8 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
     History_Panels1_title = ''
 
-    History_Panels1_xaxis_name = 'day'!'model_number'
-    History_Panels1_max_width = 50! 10000
+    History_Panels1_xaxis_name = 'model_number'
+    History_Panels1_max_width = 2000! 10000
 
     !History_Panels1_xaxis_name = 'star_age'
     !History_Panels1_max_width = 10
@@ -614,11 +614,11 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = 'growth'!'lum_div_Ledd'
+    History_Panels1_yaxis_name(2) = 'lum_div_Ledd'
     History_Panels1_yaxis_reversed(2) = .false.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
-    !History_Panels1_dymin(2) = 0.14
+    History_Panels1_dymin(2) = 0.14
 
       ! ::
 

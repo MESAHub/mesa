@@ -240,8 +240,8 @@
          i_equL = s% i_equL
          if (i_equL == 0) return
 
-         if (k ==1 .and. s% RSP2_use_L_eqn_at_surface) then
-            call set_RSP2_Lsurf_BC(s, nvar, ierr)
+         if (k ==1 .and. s% use_RSP_L_eqn_outer_BC) then
+            call set_RSP_Lsurf_BC(s, nvar, ierr)
             return
          end if
 
@@ -302,80 +302,78 @@
 
 
 
-subroutine set_RSP2_Lsurf_BC(s, nvar, ierr)
-   use const_def, only: crad, clight, pi4
-   use eos_def
-   use star_utils, only: save_eqn_residual_info
-   use auto_diff_support
-   implicit none
+      subroutine set_RSP_Lsurf_BC(s, nvar, ierr)
+         use const_def, only: crad, clight, pi4
+         use eos_def
+         use star_utils, only: save_eqn_residual_info
+         use auto_diff_support
+         implicit none
 
-   type(star_info), pointer :: s
-   integer, intent(out) :: ierr
-   integer, intent(in) :: nvar
+         type(star_info), pointer :: s
+         integer, intent(out) :: ierr
+         integer, intent(in) :: nvar
 
-   type(auto_diff_real_star_order1) :: L1_ad, r1_ad, area_ad, rhs_ad, lhs_ad, resid_ad
-   type(auto_diff_real_star_order1) :: T_surf, Erad_ad
-   integer :: i_equL
-   real(dp) :: factor, scale
-   logical :: debug
+         type(auto_diff_real_star_order1) :: L1_ad, r1_ad, area_ad, rhs_ad, lhs_ad, resid_ad
+         type(auto_diff_real_star_order1) :: T_surf, Erad_ad
+         integer :: i_equL
+         real(dp) :: factor, scale
+         logical :: debug
 
-   ierr = 0
-   debug = .false.
+         ierr = 0
+         debug = .false.
 
-   i_equL = s% i_equL
+         i_equL = s% i_equL
 
-   if (s%nz < 1) then
-      write(*,*) 'ERROR: Insufficient zones (nz < 1)'
-      ierr = -1
-      return
-   end if
+         if (s%nz < 1) then
+            write(*,*) 'ERROR: Insufficient zones (nz < 1)'
+            ierr = -1
+            return
+         end if
 
-   if (debug) write(*,*) 'Exact RSP2 zone 1 surface BC being set'
+         if (debug) write(*,*) 'Exact RSP2 zone 1 surface BC being set'
 
-   ! Wrap explicitly ONLY zone 1 variables as rsp2 does:
-   L1_ad = wrap_L_00(s, 1)
-   r1_ad = wrap_r_00(s, 1)
-   area_ad = pi4 * pow2(r1_ad)
-   T_surf = wrap_T_00(s,1)
+         ! wrap zone 1 variables
+         L1_ad = wrap_L_00(s, 1)
+         r1_ad = wrap_r_00(s, 1)
+         area_ad = pi4 * pow2(r1_ad)
+         T_surf = wrap_T_00(s,1)
 
-   if (debug) then
-      write(*,*) 'T_surf =', T_surf%val, ' r_surf =', r1_ad%val, ' area =', area_ad%val
-   end if
+         if (debug) then
+            write(*,*) 'T_surf =', T_surf%val, ' r_surf =', r1_ad%val, ' area =', area_ad%val
+         end if
 
-   ! EXACT rsp2 equation, zone 1:
-   rhs_ad = s%RSP2_Lsurf_factor * area_ad * clight * (crad * pow4(T_surf))
+         ! rsp2 equation, zone 1:
+         rhs_ad = s%RSP2_Lsurf_factor * area_ad * clight * (crad * pow4(T_surf)) ! missing Lc at the moment, so only radiative surface
 
-   if (debug) then
-      write(*,*) 'RSP2_Lsurf_factor =', s%RSP2_Lsurf_factor
-      write(*,*) 'rhs_ad (exact RSP2 BC) =', rhs_ad%val
-   end if
+         if (debug) then
+            write(*,*) 'RSP2_Lsurf_factor =', s%RSP2_Lsurf_factor
+            write(*,*) 'rhs_ad (exact RSP2 BC) =', rhs_ad%val
+         end if
 
-   ! residual
-   lhs_ad = L1_ad
-   resid_ad = lhs_ad - rhs_ad
+         ! residual
+         lhs_ad = L1_ad
+         resid_ad = lhs_ad - rhs_ad
 
-   scale =abs(s% L_start(1)) !maxval(s% L_start(1:s% nz))!abs(lhs_ad%val)
-   resid_ad = resid_ad / scale
+         scale =abs(s% L_start(1)) ! maybe use maxval(s% L_start(1:s% nz))
+         resid_ad = resid_ad / scale
 
-   if (debug) then
-      write(*,*) 'lhs (L1) =', lhs_ad%val
-      write(*,*) 'scaled residual =', resid_ad%val
-   end if
+         if (debug) then
+            write(*,*) 'lhs (L1) =', lhs_ad%val
+            write(*,*) 'scaled residual =', resid_ad%val
+         end if
 
-   ! Assign to MESA equation solver explicitly
-   s%equ(i_equL,1) = resid_ad%val
+         s%equ(i_equL,1) = resid_ad%val
 
-   ! Check for numerical validity
-   if (is_bad(resid_ad%val)) then
-      write(*,*) 'ERROR: NaN or Inf residual:', resid_ad%val
-      ierr = -1
-   end if
+         if (is_bad(resid_ad%val)) then
+            write(*,*) 'ERROR: NaN or Inf residual:', resid_ad%val
+            ierr = -1
+         end if
 
-call save_eqn_residual_info( &
-   s, 1, nvar, i_equL, resid_ad, 'do1_dlnT_dm_eqn', ierr)
+      call save_eqn_residual_info( &
+         s, 1, nvar, i_equL, resid_ad, 'do1_dlnT_dm_eqn', ierr)
 
 
-end subroutine set_RSP2_Lsurf_BC
+      end subroutine set_RSP_Lsurf_BC
 
 
 

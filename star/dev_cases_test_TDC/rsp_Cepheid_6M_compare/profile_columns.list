@@ -44,15 +44,15 @@
 
 !# Structure
    !logM ! log10(m/Msun)
-   !log_mass
+   log_mass
    !dm ! cell mass (grams)
    !dm_bar ! boundary mass (grams) average of adjacent dm's
    logdq ! log10(dq)
-   !log_dq
+   log_dq
    dq_ratio ! dq(k-1)/dq(k)
    q ! fraction of star mass interior to outer boundary of this zone
-   log_q ! log10(q)
-   !xq
+   !log_q ! log10(q)
+   xq
 
    !grav ! gravitational acceleration (cm sec^2)
    !log_g ! log10 gravitational acceleration (cm sec^2)
@@ -64,17 +64,17 @@
    radius ! radius at outer boundary of zone (in Rsun units)
    !radius_cm ! radius at outer boundary of zone (in centimeters)
    !radius_km ! radius at outer boundary of zone (in kilometers)
-   !logR_cm ! log10 radius at outer boundary of zone (in centimeters)
+   logR_cm ! log10 radius at outer boundary of zone (in centimeters)
    !rmid ! radius at center by mass of zone (in Rsun units)
    !r_div_R ! fraction of total radius
 
-   velocity   ! velocity at outer boundary of zone (cm/s) -- 0 if no velocity variable
-   !v_div_r ! velocity divided by radius
+   !velocity   ! velocity at outer boundary of zone (cm/s) -- 0 if no velocity variable
+   v_div_r ! velocity divided by radius
    !v_times_t_div_r
    !rho_times_r3 ! at face
    !log_rho_times_r3 ! at face
    !scale_height ! in Rsun units
-   pressure_scale_height ! in Rsun units
+   !pressure_scale_height ! in Rsun units
 
    !m_div_r ! gm/cm
    !dmbar_m_div_r
@@ -86,9 +86,9 @@
    !m_grav_div_m_baryonic ! mass_gravitational/mass at cell boundary
    !mass_correction_factor ! dm_gravitational/dm (dm is baryonic mass of cell)
    
-   !xm ! mass exterior to point (Msun units)
+   xm ! mass exterior to point (Msun units)
    dq ! mass of zone as a fraction of total star mass
-   !logxq ! log10(1-q)
+   logxq ! log10(1-q)
    !logxm ! log10(xm)
    
    !xr ! radial distance from point to surface (Rsun)
@@ -102,15 +102,15 @@
    !log_dr ! log10 cell width (cm)
    !dv ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
 
-   dt_dv_div_dr ! dt*dv/dr; need to have this << 1 for every cell
+   !dt_dv_div_dr ! dt*dv/dr; need to have this << 1 for every cell
    !dr_div_R ! cell width divided by star R
    !log_dr_div_R ! log10 cell width divided by star R
    !dr_div_rmid ! cell width divided by rmid
    !log_dr_div_rmid ! log(dr_div_rmid)
 
    !dr_div_cs ! cell sound crossing time (sec)
-   !log_dr_div_cs ! log10 cell sound crossing time (sec)
-   dr_div_cs_yr ! cell sound crossing time (years)
+   log_dr_div_cs ! log10 cell sound crossing time (sec)
+   !dr_div_cs_yr ! cell sound crossing time (years)
    !log_dr_div_cs_yr ! log10 cell sound crossing time (years)
 
    !acoustic_radius ! sound time from center to outer cell boundary (sec)
@@ -129,28 +129,28 @@
 
 
 !# Thermodynamics
-   !temperature ! temperature at center of zone
+   temperature ! temperature at center of zone
    !logT_face ! log10(temperature) at outer boundary of zone
    !logT_bb ! log10(black body temperature) at outer boundary of zone
    !logT_face_div_logT_bb
 
    energy ! internal energy (ergs/g)
-   !logE ! log10(specific internal energy) at center of zone
-   !rho ! density
+   logE ! log10(specific internal energy) at center of zone
+   rho ! density
    !density ! rho
 
    entropy ! specific entropy divided by (avo*kerg)
    !logS ! log10(specific entropy)
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
 
-   !pressure ! total pressure at center of zone (pgas + prad)
+   pressure ! total pressure at center of zone (pgas + prad)
    !prad ! radiation pressure at center of zone
    !pgas ! gas pressure at center of zone (electrons and ions)
    logPgas ! log10(pgas)
    pgas_div_ptotal ! pgas/pressure
 
-   eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
-   mu ! mean molecular weight per gas particle (ions + free electrons)
+   !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
+   !mu ! mean molecular weight per gas particle (ions + free electrons)
 
    grada ! dlnT_dlnP at constant S
    !dE_dRho ! at constant T
@@ -162,12 +162,12 @@
    !gamma3 ! gamma3 - 1 = dlnT_dlnRho at constant S
    !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
    free_e ! free_e is mean number of free electrons per nucleon
-   !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
+   logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
    !chiRho ! dlnP_dlnRho at constant T
    !chiT ! dlnP_dlnT at constant Rho
 
    csound ! sound speed
-   log_csound
+   !log_csound
    !csound_face ! sound speed (was previously called csound_at_face)
    !cs_at_cell_bdy ! sound speed at cell boundary (csound is at cell center)
    !v_div_cs ! velocity divided by sound speed
@@ -196,7 +196,7 @@
    !pressure_scale_height_cm
 
    !eps_grav_composition_term
-   eps_grav_plus_eps_mdot
+   !eps_grav_plus_eps_mdot
 
    !chiRho_for_partials
    !chiT_for_partials
@@ -214,12 +214,12 @@
 
 
 !# Mass accretion
-   eps_grav ! -T*ds/dt (negative for expansion)
+   !eps_grav ! -T*ds/dt (negative for expansion)
    !log_abs_eps_grav_dm_div_L
    !log_abs_v ! log10(abs(velocity)) (cm/s)
    !log_mdot_cs
    !log_mdot_v
-   eps_mdot
+   !eps_mdot
    !env_eps_grav
    !xm_div_delta_m
    !log_xm_div_delta_m
@@ -228,17 +228,17 @@
 !# Nuclear energy generation
    !signed_log_eps_grav ! sign(eps_grav)*log10(max(1,abs(eps_grav)))
    !signed_log_eps_nuc
-   net_nuclear_energy ! erg/gm/s from nuclear reactions minus all neutrino losses
+   !net_nuclear_energy ! erg/gm/s from nuclear reactions minus all neutrino losses
       ! The value plotted is net_nuclear_energy = sign(val)*log10(max(1,abs(val)))
       ! where val = net nuclear energy minus all neutrino losses.
-   net_energy ! net_energy + eps_grav.
+   !net_energy ! net_energy + eps_grav.
       ! The value plotted is net_energy = sign(val)*log10(max(1,abs(val)))
       ! where val = net nuclear energy plus eps_grav minus all neutrino losses.
-   eps_nuc_plus_nuc_neu
+   !eps_nuc_plus_nuc_neu
    !eps_nuc_minus_non_nuc_neu
    !eps_nuc_start
 
-   eps_nuc ! ergs/g/sec from nuclear reactions (including losses to reaction neutrinos)
+   !eps_nuc ! ergs/g/sec from nuclear reactions (including losses to reaction neutrinos)
    !log_abs_eps_nuc
    !d_lnepsnuc_dlnd
    !d_epsnuc_dlnd
@@ -250,7 +250,7 @@
       !  (was previously called deps_dlnT_at_face)
    !eps_nuc_neu_total ! erg/gm/sec as neutrinos from nuclear reactions
 
-   non_nuc_neu ! non-nuclear-reaction neutrino losses
+   !non_nuc_neu ! non-nuclear-reaction neutrino losses
    !nonnucneu_plas ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
    !nonnucneu_brem ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
    !nonnucneu_phot ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
@@ -258,7 +258,7 @@
    !nonnucneu_reco ! recombination  neutrinos (for reactions like e- (continuum) => e- (bound) + nu_e + nubar_e)
 
    ! ergs/g/sec for reaction categories
-   add_reaction_categories ! this adds all the reaction categories
+   !add_reaction_categories ! this adds all the reaction categories
       ! NOTE: you can list specific categories by giving their names (from chem_def)
       pp
       cno
@@ -303,19 +303,19 @@
    !x_mass_fraction_H
    !y_mass_fraction_He
    !z_mass_fraction_metals
-   abar ! average atomic weight (g/mole)
+   !abar ! average atomic weight (g/mole)
    !zbar ! average charge
    !z2bar ! average charge^2
-   ye  ! average charge per baryon = proton fraction
+   !ye  ! average charge per baryon = proton fraction
 
-   x ! hydrogen mass fraction
+   !x ! hydrogen mass fraction
    !log_x
-   y ! helium mass fraction
+   !y ! helium mass fraction
    !log_y
-   z ! metallicity
+   !z ! metallicity
    !log_z ! metallicity
 
-   add_abundances ! this adds all of the isos that are in the current net
+   !add_abundances ! this adds all of the isos that are in the current net
    ! NOTE: you can list specific isotopes by giving their names (from chem_def)
    !h1
    !he3
@@ -358,7 +358,7 @@
 
 
 !# Opacity
-   !opacity ! opacity measured at center of zone
+   opacity ! opacity measured at center of zone
    log_opacity ! log10(opacity)
    !dkap_dlnrho_face ! partial derivative of opacity wrt. ln rho (at T=const) at outer edge of cell
       !  (was previously called dkap_dlnrho_at_face)
@@ -380,21 +380,21 @@
 
 !# Luminosity 
    luminosity ! luminosity at outer boundary of zone (in Lsun units)
-   !logL ! log10(max(1d-2,L/Lsun))
+   logL ! log10(max(1d-2,L/Lsun))
    !log_Lrad
-   log_Ledd ! log10(Leddington/Lsun) -- local Ledd, 4 pi clight G m / kap
-   !log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
-   log_Lrad_div_Ledd
+   !log_Ledd ! log10(Leddington/Lsun) -- local Ledd, 4 pi clight G m / kap
+   log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
+   !log_Lrad_div_Ledd
    !log_Lrad_div_L
    !signed_log_power ! sign(L)*log10(max(1,abs(L))) 
 
    !lum_adv
-   lum_conv
+   !lum_conv
    !lum_conv_MLT
-   lum_div_Ledd
+   !lum_div_Ledd
    !lum_erg_s
    !lum_plus_lum_adv
-   lum_rad
+   !lum_rad
 
    !log_L_div_CpTMdot
    !log_abs_lum_erg_s
@@ -422,64 +422,64 @@
    !log_cell_ie_div_star_ie
    !log_cell_specific_IE
 
-   ergs_eps_grav_plus_eps_mdot
-   ergs_error
+   !ergs_eps_grav_plus_eps_mdot
+   !ergs_error
    !ergs_error_integral
-   ergs_mdot
+   !ergs_mdot
    !ergs_rel_error_integral
    !dm_eps_grav
 
    !dE
 
    !etrb
-   log_etrb
+   !log_etrb
    !extra_grav
-   log_rel_E_err
+   !log_rel_E_err
 
    !total_energy_sign
 
 !# Convection
    !mlt_mixing_length ! mixing length for mlt (cm)
-   mlt_mixing_type ! value returned by mlt
-   mlt_Pturb
+   !mlt_mixing_type ! value returned by mlt
+   !mlt_Pturb
    !alpha_mlt
 
-   conv_vel ! convection velocity (cm/sec)
-   log_conv_vel ! log10 convection velocity (cm/sec)
+   !conv_vel ! convection velocity (cm/sec)
+   !log_conv_vel ! log10 convection velocity (cm/sec)
 
    !conv_L_div_L
-   log_conv_L_div_L
+   !log_conv_L_div_L
    !lum_conv_div_lum_rad
    !lum_rad_div_L_Edd
    !lum_conv_div_lum_Edd
-   lum_conv_div_L
-   lum_rad_div_L
+   !lum_conv_div_L
+   !lum_rad_div_L
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
       ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
 
-   gradT ! mlt value for required temperature gradient dlnT/dlnP
+   !gradT ! mlt value for required temperature gradient dlnT/dlnP
    
-   gradr ! dlnT/dlnP required for purely radiative transport
+   !gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
    !grad_density ! smoothed dlnRho/dlnP at cell boundary
    
-   gradL ! gradient for Ledoux criterion for convection
+   !gradL ! gradient for Ledoux criterion for convection
    !sch_stable ! 1 if grada > gradr, 0 otherwise
    !ledoux_stable ! 1 if gradL > gradr, 0 otherwise
 
    !grada_sub_gradT
-   gradT_sub_grada ! gradT-grada at cell boundary 
-   gradT_div_grada ! gradT/grada at cell boundary 
+   !gradT_sub_grada ! gradT-grada at cell boundary 
+   !gradT_div_grada ! gradT/grada at cell boundary 
 
    !gradr_sub_gradT
    !gradT_sub_gradr ! gradT-gradr at cell boundary 
    !gradT_div_gradr ! gradT/gradr at cell boundary 
 
    !log_gradT_div_gradr ! log10 gradT/gradr at cell boundary 
-   log_mlt_Gamma ! convective efficiency
-   conv_vel_div_csound ! convection velocity divided by sound speed
+   !log_mlt_Gamma ! convective efficiency
+   !conv_vel_div_csound ! convection velocity divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
-   log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
+   !log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
 
    !gradr_div_grada ! gradr/grada_face; > 1 => Schwarzschild unstable for convection
    !gradr_sub_grada ! gradr - grada_face; > 0 => Schwarzschild unstable for convection
@@ -496,7 +496,7 @@
 
    !mlt_D
    !mlt_Gamma
-   mlt_Y_face
+   !mlt_Y_face
    !mlt_Zeta
    !mlt_gradT
    !mlt_log_abs_Y
@@ -511,16 +511,16 @@
    !log_Lconv_div_L
 
 !# Mixing
-   mixing_type ! mixing types are defined in mesa/const/public/const_def   
-   log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
+   !mixing_type ! mixing types are defined in mesa/const/public/const_def   
+   !log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
    !log_D_mix_non_rotation
    !log_D_mix_rotation
 
-   log_D_conv ! D_mix for regions where mix_type = convective_mixing
+   !log_D_conv ! D_mix for regions where mix_type = convective_mixing
    !log_D_leftover ! D_mix for regions where mix_type = leftover_convective_mixing
-   log_D_semi ! D_mix for regions where mix_type = semiconvective_mixing
-   log_D_ovr ! D_mix for regions where mix_type = overshoot_mixing
-   log_D_thrm ! D_mix for regions where mix_type = thermohaline_mixing
+   !log_D_semi ! D_mix for regions where mix_type = semiconvective_mixing
+   !log_D_ovr ! D_mix for regions where mix_type = overshoot_mixing
+   !log_D_thrm ! D_mix for regions where mix_type = thermohaline_mixing
    !log_D_minimum ! D_mix for regions where mix_type = minimum_mixing
    !log_D_rayleigh_taylor ! D_mix for regions where mix_type = rayleigh_taylor_mixing
    !log_D_anon ! D_mix for regions where mix_type = anonymous_mixing
@@ -541,7 +541,7 @@
    tau ! optical depth
    !log_column_depth ! log10 column depth, exterior mass / area (g cm^-2)
    !log_radial_depth ! log10 radial distance to surface (cm)
-   !logtau ! log10(optical depth) at cell face
+   logtau ! log10(optical depth) at cell face
    !tau_eff ! tau that gives the local P == P_atm if this location at surface
       ! tau_eff = kap*(P/g - Pextra_factor*(L/M)/(6*pi*clight*cgrav))
    !tau_eff_div_tau
@@ -549,26 +549,26 @@
 
 
 !# Rotation
-   omega ! angular velocity = j_rot/i_rot
+   !omega ! angular velocity = j_rot/i_rot
    !log_omega
-   log_j_rot
+   !log_j_rot
    !log_J_div_M53 ! J is j*1e-15 integrated from center; M53 is m^(5/3)
-   log_J_inside ! J_inside is j_rot integrated from center
+   !log_J_inside ! J_inside is j_rot integrated from center
    !shear ! -dlnomega/dlnR
    !log_abs_shear ! log10(abs(dlnomega/dlnR))
    !richardson_number
-   i_rot ! specific moment of inertia at cell boundary
+   !i_rot ! specific moment of inertia at cell boundary
    !j_rot ! specific angular momentum at cell boundary
    !v_rot ! rotation velocity at cell boundary (km/sec)
    !w_div_w_crit_roche !ratio of rotational velocity to keplerian at the equator
                        !without the contribution from the Eddington factor
-   fp_rot ! rotation factor for pressure
-   ft_rot ! rotation factor for temperature
+   !fp_rot ! rotation factor for pressure
+   !ft_rot ! rotation factor for temperature
    !ft_rot_div_fp_rot ! gradr factor
       
    !log_am_nu_non_rot ! log10(am_nu_non_rot)
    !log_am_nu_rot ! log10(am_nu_rot)
-   log_am_nu ! log10(am_nu_non_rot + am_nu_rot)
+   !log_am_nu ! log10(am_nu_non_rot + am_nu_rot)
       
    !r_polar ! (Rsun)
    !log_r_polar ! log10 (Rsun)
@@ -647,9 +647,9 @@
    !eps_phase_separation
 
 !# Oscillations
-   brunt_N2 ! brunt-vaisala frequency squared
-   brunt_N2_structure_term
-   brunt_N2_composition_term
+   !brunt_N2 ! brunt-vaisala frequency squared
+   !brunt_N2_structure_term
+   !brunt_N2_composition_term
    !log_brunt_N2_structure_term
    !log_brunt_N2_composition_term
    !brunt_A ! = N^2*r/g
@@ -692,29 +692,29 @@
 
 !# RSP
 
-   !rsp_Chi        ! dlnP_dlnRho 
-   !rsp_Et         ! Specific turbulent energy
-   !rsp_logEt      ! Log specific turbulent energy
+   rsp_Chi        ! dlnP_dlnRho 
+   rsp_Et         ! Specific turbulent energy
+   rsp_logEt      ! Log specific turbulent energy
    !rsp_erad       ! Specific internal (radiative) energy
-   !rsp_log_erad   ! Log specific internal (radiative) energy
-   !rsp_Hp_face    ! Pressure scale height at cell face
-   !rsp_Lc         ! Convective luminosity
-   !rsp_Lc_div_L   ! Convective luminosity div total luminosity 
-   !rsp_Lr         ! Radiative luminosity
-   !rsp_Lr_div_L   ! Radiative luminosity div total luminosity
-   !rsp_Lt         ! Turbulent luminosity 
-   !rsp_Lt_div_L   ! Turbulent luminosity div total luminosity
-   !rsp_Pt         ! Turbulent pressure, p_t, see Table 1 in MESA5
-   !rsp_Uq         ! Viscous momentum transfer rate, U_q, see Table 1 in MESA5
-   !rsp_Eq         ! Viscous energy transfer rate, epsilon_q, see Table 1 in MESA5
-   !rsp_Pvsc       ! Artificial viscosity, p_av, see Table 1 in MESA5
+   rsp_log_erad   ! Log specific internal (radiative) energy
+   rsp_Hp_face    ! Pressure scale height at cell face
+   rsp_Lc         ! Convective luminosity
+   rsp_Lc_div_L   ! Convective luminosity div total luminosity 
+   rsp_Lr         ! Radiative luminosity
+   rsp_Lr_div_L   ! Radiative luminosity div total luminosity
+   rsp_Lt         ! Turbulent luminosity 
+   rsp_Lt_div_L   ! Turbulent luminosity div total luminosity
+   rsp_Pt         ! Turbulent pressure, p_t, see Table 1 in MESA5
+   rsp_Uq         ! Viscous momentum transfer rate, U_q, see Table 1 in MESA5
+   rsp_Eq         ! Viscous energy transfer rate, epsilon_q, see Table 1 in MESA5
+   rsp_Pvsc       ! Artificial viscosity, p_av, see Table 1 in MESA5
    !rsp_gradT      ! Temperature gradient
-   !rsp_Y_face     ! Superadiabatic gradient at cell face, Y_sag, see Table 1 in MESA5
-   !rsp_damp       ! Turbulent dissipation, D, see Table 1 in MESA5
-   !rsp_dampR      ! Radiative cooling, D_r, see Table 1 in MESA5
-   !rsp_sink       ! Sum of turbulent dissipation and radiative cooling terms
-   !rsp_src        ! Source function, S, see Table 1 in MESA5
-   !rsp_src_snk    ! Convective coupling, C, see Table 1 in MESA5
+   rsp_Y_face     ! Superadiabatic gradient at cell face, Y_sag, see Table 1 in MESA5
+   rsp_damp       ! Turbulent dissipation, D, see Table 1 in MESA5
+   rsp_dampR      ! Radiative cooling, D_r, see Table 1 in MESA5
+   rsp_sink       ! Sum of turbulent dissipation and radiative cooling terms
+   rsp_src        ! Source function, S, see Table 1 in MESA5
+   rsp_src_snk    ! Convective coupling, C, see Table 1 in MESA5
    !rsp_heat_exchange_timescale      !  1d0/(clight * opacity * density)
    !rsp_log_heat_exchange_timescale 
    !rsp_log_dt_div_heat_exchange_timescale   ! Ratio of time step to heat exchange timescale
@@ -759,7 +759,7 @@
 !# Hydrodynamics
 
 
-   !v
+   v
    !v_div_v_escape
    !v_div_vesc
    !v_kms
@@ -853,7 +853,7 @@
 
    !d_u_div_rmid
    !d_u_div_rmid_start
-   !d_v_div_r_dm
+   d_v_div_r_dm
    !d_v_div_r_dr
 
    !dlnP_dlnR
@@ -869,7 +869,7 @@
    !dr_ratio
    !dm_eps_grav
    !dr_ratio
-   !dt_cs_div_dr
+   dt_cs_div_dr
    !dt_div_tau_conv
    !dt_times_conv_vel_div_mixing_length
    log_dt_cs_div_dr
@@ -889,7 +889,7 @@
 
    !tdc_num_iters
 
-   !k
+   k
 
 
 ! the first few lines of the profile contain general info about the model.

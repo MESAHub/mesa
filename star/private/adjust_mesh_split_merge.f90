@@ -381,6 +381,12 @@
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual  ! make dx_actual > 0
 
+
+            if (s% split_amr_ignore_core_cells .and. &
+            s%lnT(k)/ln10 >= s% split_amr_logT_for_ignore_core_cells) then
+               cycle
+            end if
+
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
@@ -393,8 +399,13 @@
 
             ! next check for cells that are too small and need to be merged
 
+            ! surface cells
             if (s% merge_amr_ignore_surface_cells .and. &
                   k<=s% merge_amr_k_for_ignore_surface_cells) cycle
+
+            ! core cells
+            if (s% merge_amr_ignore_core_cells .and. &
+                  s%lnT(k)/ln10>= s% merge_amr_logT_for_ignore_core_cells) cycle
 
             if (abs(dx_actual)>0d0) then
                undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))
@@ -595,6 +606,10 @@
             s% xa(q,i) = (dm_i*s% xa(q,i) + dm_ip*s% xa(q,ip))/dm
          end do
 
+!        ! remesh mlt_vc after merge.
+!        s% mlt_vc(i) = (dm_i*s% mlt_vc(i) + dm_ip*s% mlt_vc(ip)) / dm
+!        s% mlt_vc_old(i) = (dm_i*s% mlt_vc_old(i) + dm_ip*s% mlt_vc_old(ip)) / dm
+
          KE = KE_i + KE_ip
          if (s% u_flag) then
             v = sqrt(KE/(0.5d0*dm))
@@ -652,6 +667,7 @@
             s% lnT(im) = s% lnT(i0)
             s% D_mix(im) = s% D_mix(i0)
             s% mlt_vc(im) = s% mlt_vc(i0)
+!            s% mlt_vc_old(im) = s% mlt_vc_old(i0)
             s% csound(im) = s% csound(i0)
             s% tau(im) = s% tau(i0)
             s% opacity(im) = s% opacity(i0)
@@ -825,7 +841,7 @@
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v2, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
-            mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
+            mlt_vcL, mlt_vcR, mlt_vc_oldL, mlt_vc_oldR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
          logical :: done, use_new_grad_rho
          include 'formats'
@@ -872,6 +888,17 @@
             mlt_vcL = s% mlt_vc(ip)
             tauL = s% tau(ip)
          end if
+
+!         mlt_vc_oldR = s% mlt_vc_old(i)
+!         if (i == nz) then
+!            rL = s% R_center
+!            mlt_vc_oldL = 0d0
+!            tauL = tau_center
+!         else
+!            rL = s% r(ip)
+!            mlt_vc_oldL = s% mlt_vc_old(ip)
+!            tauL = s% tau(ip)
+!         end if
 
          tauR = s% tau(i)
          if (i == nz) then
@@ -1033,6 +1060,7 @@
                s% lnT(jp) = s% lnT(j)
                s% D_mix(jp) = s% D_mix(j)
                s% mlt_vc(jp) = s% mlt_vc(j)
+!               s% mlt_vc_old(jp) = s% mlt_vc_old(j)
                s% csound(jp) = s% csound(j)
                s% tau(jp) = s% tau(j)
                s% opacity(jp) = s% opacity(j)
@@ -1176,6 +1204,17 @@
             s% mlt_vc(ip) = (mlt_vcL*dML + mlt_vcR*dMR)/dM
          end if
 
+!         if (i == 1) then
+!            s% mlt_vc_old(ip) = s% mlt_vc_old(i)
+!         else
+!            s% mlt_vc_old(ip) = (mlt_vc_oldL*dML + mlt_vc_oldR*dMR)/dM
+!         end if
+!
+!         ! keep mlt_vc pair in the *right-hand* piece (cell i) consistent  <--- PATCH
+!         s% mlt_vc(i)      = mlt_vcR                              ! PATCH
+!         s% mlt_vc_old(i)  = mlt_vc_oldR                          ! PATCH
+
+
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then
             write(*,2) 'tau', ip, s% tau(ip), tauL, tauR, dMR/dM
@@ -1238,6 +1277,7 @@
          s% T(ip) = s% T(i)
          s% D_mix(ip) = s% D_mix(i)
          s% mlt_vc(ip) = s% mlt_vc(i)
+!         s% mlt_vc_old(ip) = s% mlt_vc_old(i)
          s% csound(ip) = s% csound(i)
          s% opacity(ip) = s% opacity(i)
          if (s% RTI_flag) s% alpha_RTI(ip) = s% alpha_RTI(i)

@@ -4578,6 +4578,20 @@
     Tsurf_factor = 1
 
 
+      ! use_RSP_L_eqn_outer_BC
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use RSP2 luminosity equation
+      ! as the outer boundary condition on L rather than the
+      ! default atmospheric BC for temperature.
+      ! solves L1 - s% RSP2_Lsurf_factor*4*pi*r^2*c*a*T1^4 = 0
+      ! uses dev control s% RSP2_Lsurf_factor  = 0.5 (default),
+      ! see controls_dev.defaults.list
+
+      ! ::
+
+    use_RSP_L_eqn_outer_BC = .false.
+
       ! irradiation_flux
       ! ~~~~~~~~~~~~~~~~
       ! column_depth_for_irradiation
@@ -5863,11 +5877,15 @@
       ! max_surface_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~
 
+      ! min_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~
+
       ! Largest allowed dq at surface.
 
       ! ::
 
     max_surface_cell_dq = 1d-12
+    min_surface_cell_dq = 1d-99
 
 
       ! max_num_subcells
@@ -5882,12 +5900,15 @@
 
       ! max_num_merge_cells
       ! ~~~~~~~~~~~~~~~~~~~
+      ! max_num_merge_surface_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Limits number of old cells to merge into 1 new one.
 
       ! ::
 
     max_num_merge_cells = 2
+    max_num_merge_surface_cells = 2
 
 
       ! mesh_adjust_get_T_from_E
@@ -6473,6 +6494,28 @@
 
     merge_amr_ignore_surface_cells = .true.
     merge_amr_k_for_ignore_surface_cells = 2
+
+
+      ! merge_amr_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! merge_amr_logT_for_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_amr_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_amr_logT_for_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! For pulsation calulations, splitting and merging core cells can cause problems. 
+      ! If merge_amr_ignore_core_cells or split_amr_ignore_surface_cells is true,
+      ! then the innermost cells above merge_amr_logT_for_ignore_core_cells or 
+      ! split_amr_logT_for_ignore_core_cells  cells are ignored for split/merge.
+
+      ! ::
+
+    merge_amr_ignore_core_cells = .false.
+    merge_amr_logT_for_ignore_core_cells = 1d99
+    split_amr_ignore_core_cells = .false.
+    split_amr_logT_for_ignore_core_cells = 1d99
 
 
       ! split_merge_amr_avoid_repeated_remesh
