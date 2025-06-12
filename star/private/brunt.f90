@@ -20,7 +20,7 @@
       module brunt
 
       use star_private_def
-      use const_def, only: dp, pi4, crad
+      use const_def, only: dp, pi4, crad, ln10
       use utils_lib
 
       implicit none
@@ -399,8 +399,9 @@
       end subroutine do_brunt_B_eos_partials_form
 
       subroutine get_brunt_B_from_eos_partials(s, species, nz, k, T_face, rho_face, chiT_face, chiRho_face, xa_face, ierr)
-         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas, i_chiT
          use eos_support, only: get_eos
+         use chem_def, only: ihe4, ic12
 
          type (star_info), pointer :: s
          integer, intent(in) :: species, nz, k
@@ -414,14 +415,18 @@
          real(dp) :: delta_lnMbar, Ppoint, dlnP_dm, alfa
          real(dp) :: B_term, spatial_derivative_dX_dlnP, chiT
          real(dp) :: delta_lnP !, comp, y, t
+         logical :: patch_eos_partials
+
          integer :: i
 
-         logical, parameter :: dbg = .false.
+         logical, parameter :: dbg = .true.
 
          include 'formats'
 
          ierr = 0
          s% brunt_B(k) = 0
+         patch_eos_partials = (s%eos_frac_PC(k)+s%eos_frac_Skye(k)+s%eos_frac_ideal(k) > 0d0)
+
          if (k <= 1) return ! should we add a check for nz?
 
          logT_face = log10(T_face)
@@ -440,6 +445,14 @@
             res, d_eos_dlnd, d_eos_dlnT, &
             d_eos_dxa, ierr)
          if (ierr /= 0) return
+
+        !Bill/Adam's hack for eos partials from finite difference when none are provided.
+        !Can be removed when EOS fully provides composition partials
+        ! temp block, set to false currently as this needs to be inside the newton solver.
+        if (s% fix_d_eos_dxa_partials .and. .false.) then
+           call fix_d_eos_dxa_partials(s, k, ierr)
+           if (ierr /= 0) return
+        end if
 
          ! Extract chiT
          chiT = d_eos_dlnT(i_lnPgas) ! should we be using chiT_face instead?
@@ -460,8 +473,37 @@
         ! Compute the Brunt B composition term
         do i = 1, species
             spatial_derivative_dX_dlnP = (s%xa(i,k-1) - s%xa(i,k)) / delta_lnP
-            B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
+            if (s% fix_d_eos_dxa_partials .and. patch_eos_partials) then
+               ! use the finite-differences to estimate eos partials
+               B_term = B_term - s%dlnPeos_dxa_for_partials(i,k) * spatial_derivative_dX_dlnP
+            else
+                ! use eos derivatives (if provided), otherwise returns 0
+                B_term = B_term - d_eos_dxa(i_lnPgas, i) * spatial_derivative_dX_dlnP
+            end if
+
+!            ! Debugging block
+!            if (dbg .and. k >= 500 .and. k <= nz) then
+!            write(*,'(A,I5)') 'Diagnostic at zone k =', k
+!            write(*,'(A,1P,E12.5)') '  T_face = ', T_face
+!            write(*,'(A,1P,E12.5)') '  rho_face = ', rho_face
+!            write(*,'(A,1P,E12.5)') '  chiT = ', chiT
+!
+!            ! He-4
+!            spatial_derivative_dX_dlnP = (s%xa(ihe4,k-1) - s%xa(ihe4,k)) / delta_lnP
+!            write(*,'(A,1P,E12.5)') '  dlnP/dX_He4 = ', d_eos_dxa(i_lnPgas, ihe4)
+!            write(*,'(A,1P,E12.5)') '  dX_He4/dlnP = ', spatial_derivative_dX_dlnP
+!            write(*,'(A,1P,E12.5)') '  contrib_He4 = ', -d_eos_dxa(i_lnPgas, ihe4)*spatial_derivative_dX_dlnP
+!
+!            ! C-12
+!            spatial_derivative_dX_dlnP = (s%xa(ic12,k-1) - s%xa(ic12,k)) / delta_lnP
+!            write(*,'(A,1P,E12.5)') '  dlnP/dX_C12 = ', d_eos_dxa(i_lnPgas, ic12)
+!            write(*,'(A,1P,E12.5)') '  dX_C12/dlnP = ', spatial_derivative_dX_dlnP
+!            write(*,'(A,1P,E12.5)') '  contrib_C12 = ', -d_eos_dxa(i_lnPgas, ic12)*spatial_derivative_dX_dlnP
+!
+!            write(*,*)
+!            end if
         end do
+
 
 ! might be necessary to use a compensator for large sums...
 !         do i = 1, species
@@ -478,7 +520,7 @@
          ! add term accounting for the composition-related gradient in gravitational mass
          if (s% use_mass_corrections) then
             delta_lnMbar = log(s% mass_correction(k-1)) - log(s% mass_correction(k))
-            s% brunt_B(k) = s% brunt_B(k) - chiRho_face*delta_lnMbar/delta_lnP/ChiT
+            s% brunt_B(k) = s% brunt_B(k) - chiRho_face*delta_lnMbar/delta_lnP/chiT
          end if
 
          ! Check for bad numbers
@@ -492,8 +534,206 @@
                call mesa_error(__FILE__, __LINE__, 'get_brunt_B_from_eos_partials')
             end if
          end if
+
+         contains
+
+      subroutine fix_d_eos_dxa_partials(s, k, ierr)
+
+         ! revise composition partials
+         ! subroutine can be removed when EOS fully provides composition partials
+
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnE, i_lnPgas
+         use eos_support, only: get_eos
+         use star_utils, only: lookup_nameofvar
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+
+         integer :: j
+
+         logical, parameter :: debug = .false.
+
+         ! these vars are for faking composition derivatives
+         real(dp), dimension(num_eos_basic_results) :: &
+            res, dres_dlnd, dres_dlnT
+         real(dp) :: dres_dxa(num_eos_d_dxa_results, s% species)
+         real(dp) :: dxa
+         real(dp) :: xa_start_1(s% species)
+         real(dp) :: frac_without_dxa
+         real(dp) :: lnE_with_xa_start, lnPgas_with_xa_start
+
+         integer :: i_var, i_var_sink
+
+         real(dp), parameter :: dxa_threshold = 1d-4
+
+         logical, parameter :: checking = .true.
+
+         include 'formats'
+
+         ierr = 0
+
+         ! some EOSes have composition partials and some do not
+         ! those currently without dx partials are PC & Skye & ideal
+         frac_without_dxa = s% eos_frac_PC(k) + s% eos_frac_Skye(k) + s% eos_frac_ideal(k)
+
+         if (debug .and. k == s% solver_test_partials_k) then
+           write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
+           write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
+           write(*,2) 's% eos_frac_ideal(k)', k, s% eos_frac_ideal(k)
+           write(*,2) 'frac_without_dxa', k, frac_without_dxa
+         end if
+
+         if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
+            i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
+            if (i_var > s% nvar_hydro) then
+               i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
+            end if
+         end if
+
+         ! if we're on an EOS where there aren't composition partials,
+         ! approximate derivatives with finite differences
+         if (frac_without_dxa > 0) then
+            s% dlnE_dxa_for_partials   (:,k) = 0d0 
+            s% dlnPeos_dxa_for_partials(:,k) = 0d0
+
+            do j=1, s% species
+               !write (*,*) 'k', k
+               !write (*,*) 'j', j
+               !write (*,*) 's% xa_start', s% xa_start(j,k)
+               dxa = s% xa(j,k) - s% xa_start(j,k)
+
+               if (debug .and. k == s% solver_test_partials_k .and. &
+                     s% solver_iter == s% solver_test_partials_iter_number) &
+                  write(*,2) 'dxa', j, dxa
+
+               if (abs(dxa) >= dxa_threshold) then
+
+                  ! first, get eos with xa_start
+
+                  call get_eos( &
+                     s, k, s% xa_start(:,k), &
+                     rho_face, logRho_face, T_face, logT_face, &
+                     res, dres_dlnd, dres_dlnT, dres_dxa, ierr)
+                  if (ierr /= 0) then
+                     if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
+                     return
+                  end if
+
+
+                  if (is_bad(res(i_lnPgas)) .or. is_bad(res(i_lnE)) .or. is_bad(dres_dxa(i_lnPgas,j)) .or. is_bad(dres_dxa(i_lnE,j))) then
+                     write(*,*) '--- BAD IN GET_EOS (perturbed) ---'
+                     write(*,*) 'k =',k,'  j =',j
+                     write(*,*) 'rho_face =',rho_face,'  T_face =',T_face
+                     write(*,*) 'xa_start_1(j) =',xa_start_1(j),'  dxa =',dxa
+                     write(*,*) 'res(i_lnPgas) =',res(i_lnPgas)
+                     write(*,*) 'res(i_lnE)    =',res(i_lnE)
+                     write(*,*) 'dres_dxa(lnP) =',dres_dxa(i_lnPgas,j)
+                     write(*,*) 'dres_dxa(lnE) =',dres_dxa(i_lnE,j)
+                  end if
+
+                  lnE_with_xa_start = res(i_lnE)
+                  lnPgas_with_xa_start = res(i_lnPgas)
+
+                  ! now, get eos with 1 iso perturbed
+
+                  xa_start_1 = s% xa_start(:,k)
+                  xa_start_1(j) = s% xa_start(j,k) + dxa
+
+                  call get_eos( &
+                     s, k, xa_start_1, &
+                     rho_face, logRho_face, T_face, logT_face, &
+                     res, dres_dlnd, dres_dlnT, dres_dxa, ierr)
+
+
+
+                  if (is_bad(res(i_lnPgas)).or. is_bad(res(i_lnE))) ierr = -1 ! ierr /= 0
+                  if (ierr /= 0) then
+
+                     ! punt silently for now
+                     s% dlnE_dxa_for_partials(:,k) = 0d0
+                     s% dlnPeos_dxa_for_partials(:,k) = 0d0
+                     ierr = 0
+                     return
+
+                     if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start_1', k
+                     return
+                  end if
+
+
+                  if (is_bad(dres_dxa(i_lnPgas,j))) dres_dxa(i_lnPgas,j) = 0d0
+                  if (is_bad(dres_dxa(i_lnE   ,j))) dres_dxa(i_lnE   ,j) = 0d0
+
+                  ! fix up derivatives
+
+                  if (debug .and. k == s% solver_test_partials_k) &  ! .and. s% solver_iter == s% solver_test_partials_iter_number) &
+                     write(*,2) 'res(i_lnE) - lnE_with_xa_start', j, res(i_lnE) - lnE_with_xa_start
+
+                  s% dlnE_dxa_for_partials(j,k) = dres_dxa(i_lnE, j) + &
+                     frac_without_dxa * (res(i_lnE) - lnE_with_xa_start) / dxa
+                  if (checking) call check_dxa(j,k,s% dlnE_dxa_for_partials(j,k),'dlnE_dxa_for_partials')
+
+                  s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% Peos(k) + &
+                     frac_without_dxa * (s% Pgas(k)/s% Peos(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
+                  if (.false. .and. s% model_number == 1100 .and. k == 151 .and. &
+                      j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
+                     write(*,2) 's% Pgas(k)', k, s% Pgas(k)
+                     write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
+                     write(*,2) 's% Peos(k)', k, s% Peos(k)
+                     write(*,2) 'frac_without_dxa', k, frac_without_dxa
+                     write(*,2) 'res(i_lnPgas)', k, res(i_lnPgas)
+                     write(*,2) 'lnPgas_with_xa_start', k, lnPgas_with_xa_start
+                     write(*,2) 'dxa', k, dxa
+                     write(*,2) 'dxa_threshold', k, dxa_threshold
+                     write(*,2) 's% xa_start(j,k)', j, s% xa_start(j,k)
+                     write(*,2) 'xa_start_1(j)', j, xa_start_1(j)
+                     write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
+                     write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
+                  end if
+                  if (checking) call check_dxa(j,k,s% dlnPeos_dxa_for_partials(j,k),'dlnPeos_dxa_for_partials')
+
+               else
+
+                  if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
+                     if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
+                        if (dxa < dxa_threshold) then
+                           if (j == i_var - s% nvar_hydro) then
+                              write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                 trim (s% solver_test_partials_var_name), &
+                                 ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
+                           end if
+                           if (j == i_var_sink - s% nvar_hydro) then
+                              write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', &
+                                 trim (s% solver_test_partials_sink_name), &
+                                 ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
+                           end if
+                        end if
+                     end if
+                  end if
+
+               end if
+            end do
+
+         end if
+
+      end subroutine fix_d_eos_dxa_partials
+
+         subroutine check_dxa(j, k, dxa, str)
+            integer, intent(in) :: j, k
+            real(dp), intent(in) :: dxa
+            character (len=*), intent(in) :: str
+            include 'formats'
+            if (is_bad(dxa)) then
+!$omp critical (get_brunt_B_from_eos_partials1)
+               ierr = -1
+               if (s% report_ierr) then
+                  write(*,3) 'get_brunt_B_from_eos_partials: bad ' // trim(str), j, k, dxa
+               end if
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get_brunt_B_from_eos_partials')
+!$omp end critical (get_brunt_B_from_eos_partials1)
+               return
+            end if
+         end subroutine check_dxa
+
       end subroutine get_brunt_B_from_eos_partials
-
-
 
       end module brunt
