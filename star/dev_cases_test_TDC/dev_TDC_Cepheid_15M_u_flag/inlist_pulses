@@ -21,13 +21,13 @@
    !change_initial_v_flag = .true.
    !new_v_flag = .true.
 
-   !change_v_flag = .true.
-   !new_v_flag = .false.
+   change_v_flag = .false.
+   new_v_flag = .false.
 
    change_u_flag = .true.
-   new_u_flag = .false.
+   new_u_flag = .true.
 
-   relax_to_this_tau_factor = 1d-1!-1
+   relax_to_this_tau_factor = 1d-3!-1
    dlogtau_factor = 0.1d0
    relax_tau_factor = .true.
 
@@ -37,18 +37,54 @@
     years_for_initial_dt = -1
     seconds_for_initial_dt = 1d7!-1
 
+    set_initial_age = .true.
+    initial_age = 0
+
     ! on first pass.
-    remove_center_by_temperature = 2d6
+    !remove_center_by_temperature = 2d6
 
 / !end of star_job namelist
 
 
 &controls
 
+   ! probably not necessary
+   remove_small_D_limit = 1d-16
+   remove_mixing_glitches = .false.!.true. ! If true, then okay to remove gaps and singletons.
+   mlt_make_surface_no_mixing = .false.
+
+
+   ! controls for analyzing pulsations
+   x_integer_ctrl(1) = 0 ! gyre interval to check
+   x_ctrl(1) = 17d0 ! expected period (in days) 
+
+   x_logical_ctrl(7) = .true. ! doing pulses
+   x_integer_ctrl(7) = -1 ! 3 ! which period to check (<= 0 means don't check any)
+   x_ctrl(7) = 17d0 ! expected period (in days) 
+!   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(9) = 1d0 ! KE_growth_avg_abs_frac_new ! for averaging growth rates across steps.
+   x_ctrl(10) = 0.3 ! min_period_div_target
+
+
+   ! new rsp style meshing, thanks to Bill P.
+   RSP2_use_mass_interp_face_values = .true.
+   RSP2_nz = 400
+   RSP2_nz_outer = 200
+   RSP2_T_anchor = 11d3
+   RSP2_dq_1_factor = 3d0
+   remesh_for_TDC_pulsations_log_core_zoning = .false. ! .false means do rsp style core
+
+   ! old star meshing to achieve rsp style models.
+   okay_to_remesh = .false. 
+
+   ! control for excising core upon loading .mod file.
+   x_logical_ctrl(25) = .true. ! set true to remove core
+   x_ctrl(14) = 2d6 ! desired core temperature to make cut at 
+
    ! remeshing flag for if we are doing an envelope model or full stellar model.
-   x_logical_ctrl(23) = .false. ! .false. = envelope model, .true. = full stellar model ! depracated
+   x_logical_ctrl(23) = .true. ! .true. = envelope model, .false. = full stellar model ! depracated
    x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
-   x_ctrl(12) = 2810! model number to turn off remesh
+   x_ctrl(12) = 2810! model number to turn off remesh ( only if if okay_to_remesh = .true.)
 
    ! timestep	
    x_ctrl(13) = 2810! model number to drop timestep
@@ -60,6 +96,7 @@
    mix_factor = 0
 
 ! GYRE set starting velocities, kick!
+! kick when true and not restarting.
    x_logical_ctrl(5) = .true. ! to turn on gyre kick
    x_ctrl(11) = 2810! kick model at this model number
 
@@ -69,16 +106,14 @@
 
 
    ! TDC Pulsation timestepping.
-   x_ctrl(10) = 1d4 ! dt before pulse, seconds for relaxing mesh
+   x_ctrl(17) = 1d4 ! dt before pulse, seconds for relaxing mesh
    x_ctrl(18) = 1d4 ! After a pulse begins, limit the timestep to this (in seconds). 
-
-! add controls steps for relax, steps before timestep drop, steps before kick.
  
    ! turn of wind during Pulsation
    use_other_wind = .false.
 
    ! can optionally use QHSE form of dp/dm or hydro form below.
-   use_dPrad_dm_form_of_T_gradient_eqn = .true. ! if false use QHSE form.
+   use_dPrad_dm_form_of_T_gradient_eqn = .false. ! if false use QHSE form.
 
  
 ! timesteps for saturation
@@ -100,7 +135,7 @@
    Pvsc_zsh = 0.1d0
 
    ! velocity time centering for v_flag only.
-   !steps_before_use_velocity_time_centering = 2900
+   !steps_before_use_velocity_time_centering = 2900 ! no v centering when commented
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true.
@@ -112,46 +147,75 @@
    set_rho_to_dm_div_dV = .false. 
 
 
-   convergence_ignore_equL_residuals = .false. ! true in inlist_ppisn
+   convergence_ignore_equL_residuals = .false. ! include T-gradient eqn in newton
 
    ! OUTER BC for TDC Pulsations
-   use_RSP_L_eqn_outer_BC = .false.
+   use_RSP_L_eqn_outer_BC = .true.
    RSP2_Lsurf_factor = 0.5d0
-   use_zero_Pgas_outer_BC = .false.
+   use_zero_Pgas_outer_BC = .true.
 
-   ! for u_flag, can use these.
+   ! for u_flag, can optionally use these.
    use_compression_outer_BC = .false.
    use_momentum_outer_BC = .false.
 
-   okay_to_remesh = .true.
-   mesh_ok_to_merge = .true.
+      ! Convection model
+      MLT_option = 'TDC'
+      alpha_TDC_DAMP = 1d0
+      alpha_TDC_DAMPR = 0d0!1d0! 0d0 for mlt
+      alpha_TDC_PtdVdt = 0d0!1d0!1d-2!1d-2!0d0
+      steps_before_use_TDC = 0
+      alpha_TDC_DAMPM = 0.25d0
+      TDC_use_density_form_for_eddy_viscosity = .false.
 
-max_num_merge_cells = 2
+   ! controls for shock capturing, relaxed for pulsations
+    max_abs_du_div_cs_for_convection = 1d-1 !0.03d0
+    max_v_div_cs_for_convection = 1d2
+    max_v_for_convection = 1d4
 
-! these two in combination are important
-max_num_merge_surface_cells = 15 ! necessary for surface, 15 better for massive stars
-min_surface_cell_dq = 1d-5!2d-6 ! 1d-6 might be safer. any higher and you risk touching the convective shell during a pulsation cycle which will make the surface go haywire.
+   x_logical_ctrl(22) = .true. ! flag for in inlist_pulses
+
+
+
+
+
+
+
+! everything below is old and from testing.
+
+
+
+
+
+
+   max_num_merge_cells = 2
+
+   ! these two in combination are important
+   !max_num_merge_surface_cells = 15 ! necessary for surface, 15 better for massive stars
+   !min_surface_cell_dq = 1d-5!2d-6 ! 1d-6 might be safer.
+   ! any higher and you risk touching the convective shell during a 
+   ! pulsation cycle which will make the surface go haywire.
+
 
 
 !mesh_min_k_old_for_split = 15
-min_dq = 1d-7
+!min_dq = 1d-7
 !max_center_cell_dq = 1d-1! leave at default if including core
-max_surface_cell_dq = 1d-4
-mesh_max_allowed_ratio = 2.5d0 !default
+!max_surface_cell_dq = 1d-4
+!mesh_max_allowed_ratio = 2.5d0 !default
 
-mesh_delta_coeff_factor_smooth_iters = 3!20!50 ! 3
+!mesh_delta_coeff_factor_smooth_iters = 3!20!50 ! 3
 !remesh_max_allowed_logT = 5d0 ! global control, not good.
-T_function1_weight = 30!110
-P_function_weight = 5!50 ! need custom P function weight for logT < 4.5
-log_tau_function_weight = 10!100
+!T_function1_weight = 30!110
+!P_function_weight = 5!50 ! need custom P function weight for logT < 4.5
+!log_tau_function_weight = 10!100
 !log_kap_function_weight = 10
 
-max_dq = 5d-2
+!max_dq = 5d-2
 
-xa_function_species(1) = 'he4'
-xa_function_weight(1) = 0
-xa_function_param(1) = 1d-2
-use_other_mesh_functions = .true.
+!xa_function_species(1) = 'he4'
+!xa_function_weight(1) = 0
+!xa_function_param(1) = 1d-2
+!use_other_mesh_functions = .true.
 
 !mesh_min_dlnR = 1d-14!1d-9
 !merge_if_dr_div_dRstar_too_small = .false.
@@ -203,23 +267,6 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
    split_merge_amr_avoid_repeated_remesh = .true.
    merge_amr_inhibit_at_jumps =.false. ! reduce udnersize ratio for large jumps
 
-
-
-
-
-
-
-   x_logical_ctrl(22) = .true. ! flag for in inlist_pulses
-
-      MLT_option = 'TDC'
-      alpha_TDC_DAMP = 1d0
-      alpha_TDC_DAMPR = 0d0!1d0! 0d0 for mlt
-      alpha_TDC_PtdVdt = 0d0!1d0!1d-2!1d-2!0d0
-      steps_before_use_TDC = 0
-      alpha_TDC_DAMPM = 0.25d0
-
-      !drag_coefficient = 0.8d0
-      !min_q_for_drag = 0.98d0
 
 report_solver_progress = .false.
 report_ierr = .true. ! if true, produce terminal output when have some internal error

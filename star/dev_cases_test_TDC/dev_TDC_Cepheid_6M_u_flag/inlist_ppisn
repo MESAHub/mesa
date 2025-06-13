@@ -134,10 +134,6 @@
     alpha_semiconvection = 1d0
     thermohaline_coeff = 0d0
     num_cells_for_smooth_gradL_composition_term = 0
-
-    max_abs_du_div_cs_for_convection = 1d-1 !0.03d0
-    max_v_div_cs_for_convection = 1d2
-    max_v_for_convection = 1d4
  
     energy_eqn_option = 'dedt'
 
@@ -205,18 +201,18 @@
    !max_dq = 1d-3 ! RECOMMENDED 1d-3
 
   ! rotational mixing coeffs
-    am_nu_ST_factor = 1.0
-    D_visc_factor = 0.0
-    am_nu_SH_factor = 0.0
-    D_ST_factor = 0.0
-    D_SH_factor = 0.0
-    D_GSF_factor = 1.0
-    D_ES_factor = 1.0
-    D_SSI_factor = 1.0
-    D_DSI_factor = 1.0
-    am_D_mix_factor = 0.0333333d0
-    am_gradmu_factor = 0.1d0
-    num_cells_for_smooth_gradL_composition_term = 2
+    !am_nu_ST_factor = 1.0
+    !D_visc_factor = 0.0
+    !am_nu_SH_factor = 0.0
+    !D_ST_factor = 0.0
+    !D_SH_factor = 0.0
+    !D_GSF_factor = 1.0
+    !D_ES_factor = 1.0
+    !D_SSI_factor = 1.0
+    !D_DSI_factor = 1.0
+    !am_D_mix_factor = 0.0333333d0
+    !am_gradmu_factor = 0.1d0
+    !num_cells_for_smooth_gradL_composition_term = 2
 
     ! use implicit wind close to critical
     max_tries_for_implicit_wind = 10
@@ -236,16 +232,16 @@
 
     ! Fixing the position of the Lagrangian region of the mesh helps
     ! convergence near the Eddington limit
-    max_logT_for_k_below_const_q = 100
-    max_q_for_k_below_const_q = 0.99
-    min_q_for_k_below_const_q = 0.99
-    max_logT_for_k_const_mass = 100
-    max_q_for_k_const_mass = 0.98
-    min_q_for_k_const_mass = 0.98
+    !max_logT_for_k_below_const_q = 100
+    !max_q_for_k_below_const_q = 0.99
+    !min_q_for_k_below_const_q = 0.99
+    !max_logT_for_k_const_mass = 100
+    !max_q_for_k_const_mass = 0.98
+    !min_q_for_k_const_mass = 0.98
 
 
       photo_digits = 8
-      photo_interval = 10!50
+      photo_interval = 1000
       profile_interval = 200!50
       history_interval = 1!10
       terminal_interval = 10!10

@@ -48,11 +48,11 @@
       ! values specified on inlist_ppisn
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
-      logical :: in_inlist_pulses
-      real(dp) :: max_dt_before_pulse
 
-      
-      real(dp) :: max_dt_during_pulse
+      logical :: in_inlist_pulses, remesh_for_envelope_model, turn_off_remesh, remove_core
+      integer :: kick_model_number, timestep_drop_model_number, turn_off_remesh_model_number
+      integer :: initial_model_number
+      real(dp) :: max_dt_before_pulse, max_dt_during_pulse, core_T_for_cut
 
       contains
 
@@ -96,7 +96,13 @@
          in_inlist_pulses = s% x_logical_ctrl(22)
          max_dt_before_pulse = s% x_ctrl(17)
          max_dt_during_pulse = s% x_ctrl(18)
-
+         remesh_for_envelope_model = s% x_logical_ctrl(23)
+         turn_off_remesh = s% x_logical_ctrl(24)
+         kick_model_number = s% x_ctrl(11)
+         timestep_drop_model_number = s% x_ctrl(13)
+         turn_off_remesh_model_number = s% x_ctrl(12)
+         remove_core = s% x_logical_ctrl(25)
+         core_T_for_cut = s% x_ctrl(14)
       end subroutine extras_controls
 
       subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
@@ -364,6 +370,13 @@
          call test_suite_startup(s, restart, ierr)
          call TDC_pulsation_extras_startup(id, restart, ierr)
 
+         ! interestingly, if you do this instead of remove_center_by_temperature
+         ! in the starjob section of the inlist, then the tau relaxation happens
+         ! before the cut. Not sure which is better, but leaving like this for now
+         if (.not. restart .and. in_inlist_pulses .and. remove_core) then
+            call star_remove_center_by_temperature(id, core_T_for_cut, ierr)
+          end if
+
          ! Initialize GYRE
 
          call init('gyre.in')
@@ -380,6 +393,12 @@
 
          call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
+         ! for rsp style mesh
+         if (.not. restart .and. in_inlist_pulses .and. remesh_for_envelope_model) then
+            initial_model_number = s% model_number
+
+            call remesh_for_TDC_pulsation(id, ierr)
+         end if
       end subroutine extras_startup
       
       
@@ -474,14 +493,6 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         integer :: k, k0, k1, num_pts, species, model_number, num_trace_history_values
-         real(dp) :: v_esc, time, gamma1_integral, integral_norm, tdyn, &
-            max_center_cell_dq, avg_v_div_vesc, energy_removed_layers, dt_next, dt, &
-            max_years_for_timestep, omega_crit, &
-            denergy
-         real(dp) :: core_mass, rmax, alfa, log10_r, lburn_div_lsurf
-         logical :: just_did_relax
-         character (len=200) :: fname
          include 'formats'
          extras_start_step = terminate
          ierr = 0
@@ -491,8 +502,20 @@
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
 
+         ! we want to ignore T gradient equation for a few steps after remesh
+         if (s% model_number < initial_model_number + 10 .and. in_inlist_pulses) then
+            s% convergence_ignore_equL_residuals = .true.
+         else
+            s% convergence_ignore_equL_residuals = .false.
+         end if
 
-         if (s% model_number == 2200 .and. in_inlist_pulses)then
+         if (s% model_number == kick_model_number .and. in_inlist_pulses &
+            .and. s% x_logical_ctrl(5))then
+
+            ! if v= 0, turn on v so we can kick
+            if (.not. s% v_flag .or. .not. s% u_flag) then
+               call star_set_v_flag(id, .true., ierr)
+            end if
 
             call gyre_in_mesa_extras_set_velocities(s,.false.,ierr)
             write(*,*) 'kick'
@@ -540,18 +563,28 @@
 !            !s% atm_T_tau_errtol = 1d-12
 !            !s% atm_T_tau_max_iters = 500
   
-         ! change timestep back to normal
          if (in_inlist_pulses) then
-            if (s% model_number > 2100 )then
+            if (s% model_number > timestep_drop_model_number )then
                  s% max_timestep = max_dt_during_pulse
             else
                  s% max_timestep = max_dt_before_pulse
             end if
 
-            if (s% model_number > 2050 )then
+            if (s% model_number > turn_off_remesh_model_number .and. turn_off_remesh )then
                s% okay_to_remesh = .false.
+         !               if ((s% model_number == turn_off_remesh_model_number + 1) &
+         !                     .and. .not. remesh_for_envelope_model )then
+         !                  do k =1,s%nz
+         !                     if (s%lnT(k) >= log(2d6)) then
+         !                        exit
+         !                     end if
+         !                  end do
+         !                  s% mesh_min_k_old_for_split = k
+         !               end if
+         !               write (*,*) 's% mesh_min_k_old_for_split', s% mesh_min_k_old_for_split
             end if
          end if
+
          ! reading inlists can turn this flag off for some reason
          s% use_other_before_struct_burn_mix = .true.
 

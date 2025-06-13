@@ -654,91 +654,57 @@
         end if
       end function compute_d_v_div_r
 
-!    function compute_rho_form_of_d_v_div_r(s, k, ierr) result(d_v_div_r)  ! s^-1
-!    type (star_info), pointer :: s
-!    integer, intent(in) :: k
-!    type(auto_diff_real_star_order1) :: d_v_div_r
-!    integer, intent(out) :: ierr
-!    type(auto_diff_real_star_order1) :: r_00, r_p1, dlnRho_dt, v_00, r_cell, v_cell !, v_p1,
-!    !real(dp) :: alpha, beta
-!    logical :: dbg
-!    include 'formats'
-!    ierr = 0
-!    dbg = .false.
-!    !call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-!    dlnRho_dt = wrap_dxh_lnd(s,k)/s% dt
-!    v_00 = wrap_v_00(s,k)
-!    !v_p1 = wrap_v_p1(s,k)
-!    r_00 = wrap_r_00(s,k)
-!    r_p1 = wrap_r_p1(s,k)
-!
-!    if (r_p1%val == 0d0) r_p1 = 1d0
-!    ! need new auto_diff function for wrap_v_cell, for now, this function only handles u_flag cell centered v.
-!    r_cell = 0.5d0*(r_p1 + r_00) !r_p1*alpha + r_00*beta
-!    v_cell = v_00 ! since we are using u_flag ! if u_flag, should just be v_00, need wrapper for v_flag.
-!
-!!    d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
-!     d_v_div_r = -4d0*pi*pow2(r_cell)*dlnRho_dt - 3*v_cell/pow2(r_cell) ! new form for cell_centered u.
-!!
-!!    ! Debugging output to trace values
-!!    if (dbg .and. k == -63) then
-!!    write(*,*) 'test d_v_div_r, k:', k
-!!    write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
-!!    write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
-!!    write(*,*) 'd_v_div_r:', d_v_div_r %val
-!!    end if
-!    end function compute_rho_form_of_d_v_div_r
 
 
-function compute_rho_form_of_d_v_div_r(s, k, ierr) result(d_v_div_r)
-type(star_info),  pointer :: s
-integer,          intent(in)  :: k
-integer,          intent(out) :: ierr
-type(auto_diff_real_star_order1) :: d_v_div_r
-type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
-real(dp) :: dm_cell
-ierr = 0
+      function compute_rho_form_of_d_v_div_r(s, k, ierr) result(d_v_div_r)
+      type(star_info),  pointer :: s
+      integer,          intent(in)  :: k
+      integer,          intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: d_v_div_r
+      type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
+      real(dp) :: dm_cell
+      ierr = 0
 
-! shortcuts -----------------------------------------------------------
-r_cell     = 0.5d0*(wrap_r_00(s,k) + wrap_r_p1(s,k))
-rho_cell   = wrap_d_00(s,k)
-v_cell     = wrap_v_00(s,k)              ! cell-centred velocity (u_flag)
-dlnrho_dt  = wrap_dxh_lnd(s,k) / s%dt    ! (∂/∂t)lnρ
-dm_cell    = s%dm(k)                     ! cell mass
+      ! shortcuts -----------------------------------------------------------
+      r_cell     = 0.5d0*(wrap_r_00(s,k) + wrap_r_p1(s,k))
+      rho_cell   = wrap_d_00(s,k)
+      v_cell     = wrap_v_00(s,k)              ! cell-centred velocity (u_flag)
+      dlnrho_dt  = wrap_dxh_lnd(s,k) / s%dt    ! (∂/∂t)lnρ
+      dm_cell    = s%dm(k)                     ! cell mass
 
-! Eq. (5)
-d_v_div_r = -dm_cell/(4d0*pi*rho_cell) *  &
-( dlnrho_dt/pow3(r_cell)      &
-+ 3d0*v_cell/pow4(r_cell) )
+      ! Eq. (5)
+      d_v_div_r = -dm_cell/(4d0*pi*rho_cell) *  &
+      ( dlnrho_dt/pow3(r_cell)      &
+      + 3d0*v_cell/pow4(r_cell) )
 
-! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
-end function compute_rho_form_of_d_v_div_r
+      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
+      end function compute_rho_form_of_d_v_div_r
 
 
 
-function compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
-type(star_info),  pointer :: s
-integer,          intent(in)  :: k
-integer,          intent(out) :: ierr
-type(auto_diff_real_star_order1) :: d_v_div_r
-type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
-real(dp) :: dm_cell
-ierr = 0
+      function compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
+      type(star_info),  pointer :: s
+      integer,          intent(in)  :: k
+      integer,          intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: d_v_div_r
+      type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
+      real(dp) :: dm_cell
+      ierr = 0
 
-! shortcuts -----------------------------------------------------------
-r_cell     = 0.5d0*(wrap_opt_time_center_r_00(s,k) + wrap_opt_time_center_r_p1(s,k))
-rho_cell   = wrap_d_00(s,k)
-v_cell     = wrap_opt_time_center_v_00(s,k)              ! cell-centred velocity (u_flag)
-dlnrho_dt  = wrap_dxh_lnd(s,k) / s%dt    ! (∂/∂t)lnρ
-dm_cell    = s%dm(k)                     ! cell mass
+      ! shortcuts -----------------------------------------------------------
+      r_cell     = 0.5d0*(wrap_opt_time_center_r_00(s,k) + wrap_opt_time_center_r_p1(s,k))
+      rho_cell   = wrap_d_00(s,k)
+      v_cell     = wrap_opt_time_center_v_00(s,k)              ! cell-centred velocity (u_flag)
+      dlnrho_dt  = wrap_dxh_lnd(s,k) / s%dt    ! (∂/∂t)lnρ
+      dm_cell    = s%dm(k)                     ! cell mass
 
-! Eq. (5)
-d_v_div_r = -dm_cell/(4d0*pi*rho_cell) *  &
-( dlnrho_dt/pow3(r_cell)      &
-+ 3d0*v_cell/pow4(r_cell) )
+      ! Eq. (5)
+      d_v_div_r = -dm_cell/(4d0*pi*rho_cell) *  &
+      ( dlnrho_dt/pow3(r_cell)      &
+      + 3d0*v_cell/pow4(r_cell) )
 
-! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
-end function compute_rho_form_of_d_v_div_r_opt_time_center
+      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
+      end function compute_rho_form_of_d_v_div_r_opt_time_center
 
 
 
@@ -834,7 +800,7 @@ end function compute_rho_form_of_d_v_div_r_opt_time_center
          else
             Hp_cell = Hp_cell_for_Chi(s, k, ierr)
             if (ierr /= 0) return
-            if (s% u_flag) then
+            if (s% u_flag .or. s% TDC_use_density_form_for_eddy_viscosity) then
                 ! new density derivative term
                 d_v_div_r = compute_rho_form_of_d_v_div_r(s, k, ierr)
             else
@@ -900,7 +866,7 @@ end function compute_rho_form_of_d_v_div_r_opt_time_center
             Chi_cell = s% Chi_ad(k)  ! compute_Chi_cell(s,k,ierr)
             if (ierr /= 0) return
 
-            if (s% u_flag) then
+            if (s% u_flag .or. s% TDC_use_density_form_for_eddy_viscosity) then
                 ! new density derivative term
                 d_v_div_r = compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr)
             else

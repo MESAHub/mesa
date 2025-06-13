@@ -48,16 +48,16 @@
       !star_age_min ! elapsed simulated time in minutes since the start of the run
       !star_age_hr ! elapsed simulated time in hours since the start of the run
       !star_age_day ! elapsed simulated time in days since the start of the run
-      !day ! elapsed simulated time in days since the start of the run
+      day ! elapsed simulated time in days since the start of the run
 
-      !log_star_age
-      !log_star_age_sec
+      log_star_age
+      log_star_age_sec
 
    !## timestep
 
-      !time_step ! timestep in years since previous model
+      time_step ! timestep in years since previous model
       time_step_sec ! timestep in seconds since previous model
-      !time_step_days
+      time_step_days
       log_dt ! log10 time_step in years
       log_dt_sec ! log10 time_step in seconds
       !log_dt_days ! log10 time_step in days

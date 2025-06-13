@@ -111,7 +111,7 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
-    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, &
+    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, TDC_use_density_form_for_eddy_viscosity, &
 
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -352,7 +352,8 @@
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
-    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
+    remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
+    max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     retry_for_v_above_clight, &
@@ -2069,7 +2070,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
  s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
  s% alpha_TDC_DAMPM = alpha_TDC_DAMPM
+ s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
+
+ s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
 
  s% RSP2_alfap = RSP2_alfap
  s% RSP2_alfad = RSP2_alfad
@@ -3757,7 +3761,10 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
  alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
  alpha_TDC_DAMPM = s% alpha_TDC_DAMPM
+ TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
+
+ remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning
 
  RSP2_alfap= s% RSP2_alfap
  RSP2_alfad = s% RSP2_alfad

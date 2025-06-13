@@ -26,7 +26,7 @@
 /
 
 &grid
-   w_osc = 20
-   w_exp = 5!2
-   w_ctr = 20!10
+   w_osc = 10
+   w_exp = 2
+   w_ctr = 10
 /

@@ -1,7 +1,9 @@
          
-         logical :: compare_TDC_to_MLT
- 
-         real(dp) :: alpha_TDC_DampM
+         logical :: compare_TDC_to_MLT 
+
+         real(dp) :: alpha_TDC_DAMPM
+         logical :: remesh_for_TDC_pulsations_log_core_zoning, TDC_use_density_form_for_eddy_viscosity
+
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap
          real(dp) :: RSP2_alfat

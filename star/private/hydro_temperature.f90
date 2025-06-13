@@ -354,7 +354,7 @@
          lhs_ad = L1_ad
          resid_ad = lhs_ad - rhs_ad
 
-         scale =abs(s% L_start(1)) ! maybe use maxval(s% L_start(1:s% nz))
+         scale =maxval(s% L_start(1:s% nz))!abs(s% L_start(1)) ! maybe use maxval(s% L_start(1:s% nz))
          resid_ad = resid_ad / scale
 
          if (debug) then

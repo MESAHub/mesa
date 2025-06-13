@@ -47,4 +47,12 @@ max_model_number = 1970
 
 &pgstar
 
+ pgstar_interval = 10
+
+ History_Panels1_xaxis_name = 'model_number'
+ History_Panels1_max_width = -1
+
+ Profile_Panels3_xaxis_name = 'mass'
+ Profile_Panels3_xaxis_reversed = .false.
+
 / ! end of pgstar namelist

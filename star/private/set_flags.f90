@@ -296,7 +296,7 @@
 
 
       subroutine set_TDC_to_RSP2_mesh(id, ierr)
-         use hydro_rsp2_support, only: remesh_for_RSP2
+         use hydro_rsp2_support, only: remesh_for_TDC_pulsations
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, set_qs
          integer, intent(in) :: id
@@ -316,8 +316,8 @@
 
          nvar_hydro_old = s% nvar_hydro
 
-         write(*,*) 'doing automatic remesh for RSP2'
-         call remesh_for_RSP2(s,ierr)
+         write(*,*) 'doing automatic RSP style remesh for TDC Pulsations'
+         call remesh_for_TDC_pulsations(s,ierr)
          if (ierr /= 0) return
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (ierr /= 0) return

@@ -180,17 +180,35 @@
 ! ===
 
 
-      ! alpha_TDC_DampM
+      ! alpha_TDC_DAMPM
       ! ~~~~~~~~~~~~~~~
+      ! TDC_use_density_form_for_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If alpha_TDC_DampM >0, then include eddy viscous damping in TDC alpha_TDC_DampM
+
+      ! If alpha_TDC_DAMPM >0, then include eddy viscous damping in TDC alpha_TDC_DAMPM
       ! This control is analogous to `RSP_alfam`, where the default is `RSP_alfam` = 0.25d0. 
      
       ! If hydrostatic (v_flag, u_flag = .false. , v = 0 ) there are no velocity gradients,
       ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
+
+      ! If u_flag = .true. or TDC_use_density_form_for_eddy_viscosity = .true., use density
+      ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq. 
       
       ! ::  
 
-    alpha_TDC_DampM = 0.25d0 
+    alpha_TDC_DAMPM = 0.25d0 
+    TDC_use_density_form_for_eddy_viscosity = .false.
+
+      ! remesh_for_TDC_pulsations_log_core_zoning
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If remesh_for_TDC_pulsations, .true. will rezone below RSP2_Tanchor with logarithmic
+      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
+      ! that each zone increases in mass inward following a power law.
+     
+      ! ::  
+
+    remesh_for_TDC_pulsations_log_core_zoning = .false.
 
 

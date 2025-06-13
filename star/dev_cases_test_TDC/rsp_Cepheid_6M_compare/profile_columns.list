@@ -477,7 +477,7 @@
 
    !log_gradT_div_gradr ! log10 gradT/gradr at cell boundary 
    !log_mlt_Gamma ! convective efficiency
-   !conv_vel_div_csound ! convection velocity divided by sound speed
+   conv_vel_div_csound ! convection velocity divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
    !log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
 

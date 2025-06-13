@@ -59,7 +59,7 @@
          
          !write(*,*) 'call star_get_pulse_data'
          call star_get_pulse_data(s%id, 'GYRE', &
-            .FALSE., .FALSE., .FALSE., global_data, point_data, ierr)
+            .FALSE., .FALSE., .FALSE., global_data, point_data, ierr) ! might need surface point for good kick
          if (ierr /= 0) then
             write(*,*) 'Failed when calling star_get_pulse_data'
             return
