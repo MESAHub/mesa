@@ -507,7 +507,7 @@
          ! we want to ignore T gradient equation for a few steps after remesh
          if (s% model_number < initial_model_number + 10 .and. in_inlist_pulses) then
             s% convergence_ignore_equL_residuals = .true.
-         else
+         else if (in_inlist_pulses) then
             s% convergence_ignore_equL_residuals = .false.
          end if
 

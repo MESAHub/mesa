@@ -37,12 +37,23 @@ max_model_number = 1970
     x_logical_ctrl(7) = .false.
 
    ! our wind implementation follows Brott+ 2011
-    use_other_wind = .true.
+    use_other_wind = .false.
+
+! wind model section:
+      cool_wind_full_on_T    = 9.99d9
+      hot_wind_full_on_T     = 1d10
+      cool_wind_RGB_scheme   = 'Reimers'
+      cool_wind_AGB_scheme   = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5   ! 0.1   
+      Blocker_scaling_factor = 0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
 
 
 ! solver controls
    convergence_ignore_equL_residuals = .true. ! for pre-ms 
+!   use_gold2_tolerances = .false. ! if you need to get through the he_flash
    
+
 / ! end of controls namelist
 
 &pgstar
@@ -54,5 +65,10 @@ max_model_number = 1970
 
  Profile_Panels3_xaxis_name = 'mass'
  Profile_Panels3_xaxis_reversed = .false.
+
+ TRho_Profile_xmin = -12.0
+ TRho_Profile_xmax = 7d0!5d0!10.0
+ TRho_Profile_ymin = 2.5
+ TRho_Profile_ymax = 9d0!8.5d0!10.0    
 
 / ! end of pgstar namelist

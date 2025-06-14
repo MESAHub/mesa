@@ -301,7 +301,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         TDC_pulsation_how_many_extra_history_columns = 10
+         TDC_pulsation_how_many_extra_history_columns = 11
       end function TDC_pulsation_how_many_extra_history_columns
       
       
@@ -326,6 +326,8 @@
          names(i) = 'delta_logTeff'; vals(i) = period_delta_logTeff; i=i+1
          names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
          names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'KE_growth_avg'; vals(i) = KE_growth_avg; i = i+1
+
       end subroutine TDC_pulsation_data_for_extra_history_columns
 
 

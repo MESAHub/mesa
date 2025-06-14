@@ -42,7 +42,9 @@ max_model_number = 2610 !1970
 
 ! solver controls
    convergence_ignore_equL_residuals = .true. ! for pre-ms 
+!   use_gold2_tolerances = .false. ! if you need to get through the he_flash
    
+
 / ! end of controls namelist
 
 &pgstar
@@ -56,5 +58,9 @@ max_model_number = 2610 !1970
  Profile_Panels3_xaxis_name = 'mass'
  Profile_Panels3_xaxis_reversed = .false.
 
+ TRho_Profile_xmin = -12.0
+ TRho_Profile_xmax = 7d0!5d0!10.0
+ TRho_Profile_ymin = 2.5
+ TRho_Profile_ymax = 9d0!8.5d0!10.0    
 
 / ! end of pgstar namelist
