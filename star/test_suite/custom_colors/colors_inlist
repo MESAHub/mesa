@@ -1,4 +1,3 @@
-
 &colors
       use_colors = .true.
       instrument = '/colors/data/filters/GAIA/GAIA'

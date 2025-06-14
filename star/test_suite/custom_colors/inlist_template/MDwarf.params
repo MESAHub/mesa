@@ -1,9 +1,0 @@
-Red Dwarf (M-Dwarf, ~0.3 M☉)
-
-Small, low-mass, long-lived, fully convective
-
-&controls
-    initial_mass = 0.3d0  ! smol
-    initial_z = 0.02d0    ! Solar metallicity, but lower values (0.001-0.01) are common for old M-dwarfs
-    max_age = 50d9        ! Will live long
-/ ! end of controls namelist

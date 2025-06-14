@@ -19,7 +19,6 @@ wavelength_ranges = [
     ("Radio", 1e7 * u.AA, 1e8 * u.AA),
 ]
 
-# List to hold all filters
 all_filters = []
 
 # Loop over each wavelength range

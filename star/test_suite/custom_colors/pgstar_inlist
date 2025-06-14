@@ -11,19 +11,6 @@
   HR_logL_min = -1.0
   HR_logL_max = 4.0
 
-  ! CMD: Gbp - Grp vs Grp
-  History_Track1_win_flag = .true.
-  History_Track1_xname = 'Gbp_minus_Grp'
-  History_Track1_yname = 'Grp'
-  History_Track1_title = 'CMD: Grp vs (Gbp - Grp)'
-  History_Track1_xaxis_label = 'Gbp - Grp'
-  History_Track1_yaxis_label = 'Grp'
-  History_Track1_xmin = -1.5
-  History_Track1_xmax = 2.5
-  !History_Track1_ymin = 5
-  !History_Track1_ymax = -5
-
-
   ! G band light curve
   History_Track2_win_flag = .true.
   History_Track2_xname = 'star_age'
