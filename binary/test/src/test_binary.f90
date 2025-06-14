@@ -90,6 +90,10 @@ contains
 
       write (*, 1) 'fL2', fL2  ! should be ~0.2
 
+      fL2 = binary_L2_mass_loss_fraction(20.0_dp, 18.0_dp, 0.0_dp, 304.0_dp, 0.1_dp, 0.64_dp, ierr)
+
+      write (*, 1) 'fL2', fL2  ! should be 0.0
+
       write (*, '(a)') 'done'
 
    end subroutine do_test

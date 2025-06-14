@@ -191,6 +191,9 @@ contains
       if (the < the_max) then
          ! return a tiny numner
          fL2 = eps_small
+      else if (mass_transfer_rate < eps_small) then
+         ! no mass transfer, so no L2 mass loss
+         fL2 = 0.0_dp
       else
          the_min = ( 0.5_dp * sqrt((PhiL2 - PhiRd) / (GM2 / Rd) - 0.5_dp) )  ! corresponding to fL2=1, T=0
          ! need to find the maximum corresponding to fL2=0
