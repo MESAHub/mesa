@@ -114,14 +114,14 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel,freeze_vel, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt
       real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
-      logical, intent(in) :: report
+      logical, intent(in) :: report, freeze_vel
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
@@ -163,6 +163,19 @@ module turb
       info%kap = opacity
       info%Hp = scale_height
       info%Gamma = Gamma
+
+        if (freeze_vel) then
+            !— skip tdc and solve for the starting velocity
+            conv_vel     = conv_vel_start
+            ! invert Q = (L – L0*gradL) – (L0 + c0*A0)*Y ,  Y = (L – L0*gradL)/(L0 + c0*A0)
+            Y_face       = unconvert(info%L - info%L0*info%gradL) &
+            / ( unconvert(info%L0) + unconvert(info%c0)*unconvert(info%A0) )
+            gradT        = Y_face + gradL
+            D            = conv_vel * scale_height * mixing_length_alpha/3d0
+            tdc_num_iters = 0
+            ierr          = 0
+            return
+        end if
 
       ! Get solution
       Zub = upper_bound_Z

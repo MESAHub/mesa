@@ -177,6 +177,7 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
+real(dp) :: mixing_scale, N2_val, N, v_old, v_tdc, dvc_dt, v_new
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale, max_conv_vel
@@ -271,8 +272,58 @@ contains
             conv_vel_start, mixing_length_alpha, &
             s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.false., ierr)
+
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
+
+      ! apply Arnett ad hoc conv_vel update.
+        mixing_scale = mixing_length_alpha * scale_height%val
+        N2_val = s% brunt_N2(k)              ! MESA’s stored N^2 at face k
+        N = sqrt( max(0d0, N2_val) )
+
+       ! old TDC velocities
+       v_old = conv_vel_start
+       v_tdc = conv_vel%val
+
+      if ( gradr%val > gradL .and. (v_tdc - v_old > 0d0)) then
+         ! convectively unstable
+         dvc_dt = ( pow2(v_tdc) - pow2(v_old) ) / mixing_scale
+
+         if (s% dvc_dt_TDC(k) > dvc_dt ) then
+             write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt
+             s% dvc_dt_TDC(k) = dvc_dt
+             v_new       = v_old + dvc_dt * s%dt
+             conv_vel%val = v_new
+
+             call set_TDC(&
+             v_new, mixing_length_alpha, &
+             s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true.
+
+             s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
+         end if
+        
+      else if (v_tdc - v_old < 0d0) then
+         ! convectively stable
+         dvc_dt = - pow2(v_old) / mixing_scale  -  N * v_old
+
+        if (s% dvc_dt_TDC(k) < dvc_dt ) then
+
+            write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt, 's% brunt_N2(k)', s% brunt_N2(k)
+            s% dvc_dt_TDC(k) = dvc_dt
+            v_new       = v_old + dvc_dt * s%dt
+            conv_vel%val = v_new
+
+            call set_TDC(&
+            v_new, mixing_length_alpha, &
+            s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true.
+
+            s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
+        end if
+      end if
 
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_TDC'
@@ -290,7 +341,7 @@ contains
                   conv_vel_start, mixing_length_alpha, &
                   s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, ierr)
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.false., ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
