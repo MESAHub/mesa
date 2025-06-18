@@ -3,6 +3,7 @@ module run_star_extras
   use star_def
   use const_def
   use math_lib
+  !use mesa_dir
   use auto_diff
   ! TODO: below are things we will need to incorporate into the main code
   ! So that we do not need to create a custom run_stars_extras file
@@ -192,7 +193,7 @@ end function
       !write(*,*) 'vega_sed = ', trim(colors_settings% vega_sed)
       !write(*,*) 'instrument = ', trim(colors_settings% instrument)
 
-      filename = trim(colors_settings% instrument) // "/" // &
+      filename = trim(mesa_dir) // trim(colors_settings% instrument) // "/" // &
       trim(basename(colors_settings% instrument))
       n = 0
       unit = 10
@@ -243,14 +244,10 @@ end function
 
       !metallicity = colors_settings% metallicity
       d = colors_settings% distance
-      sed_filepath = colors_settings% stellar_atm
-      filter_dir = colors_settings% instrument
-      vega_filepath = colors_settings% vega_sed
+      sed_filepath = trim(mesa_dir) // colors_settings% stellar_atm
+      filter_dir = trim(mesa_dir) // colors_settings% instrument
+      vega_filepath = trim(mesa_dir) // colors_settings% vega_sed
       make_sed = colors_settings% make_csv
-
-      ! Use s% just like s%
-      !print *, "Stellar atmosphere:", trim(colors_settings% stellar_atm)
-      !print *, "Instrument:", trim(colors_settings% instrument)
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))
