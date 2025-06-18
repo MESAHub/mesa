@@ -2,7 +2,7 @@
 
 function error {
 	echo
-	more diff.txt
+	more test/diff.txt
 	echo
 	pwd
 	echo "TEST FAILED -- compare test_output to tmp.txt"

@@ -1,0 +1,14 @@
+
+/home/njm/MESA/mesa/const
+building const package.
+
+
+more: cannot open diff.txt: No such file or directory
+
+/home/njm/MESA/mesa/const
+TEST FAILED -- compare test_output to tmp.txt
+
+
+/home/njm/MESA/mesa/const
+./build_and_test FAILED
+
