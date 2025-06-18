@@ -16,9 +16,7 @@ CONTAINS
   !---------------------------------------------------------------------------
   ! Main entry point: Construct a SED using Hermite tensor interpolation
   !---------------------------------------------------------------------------
-  SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
-                                  lu_teff, lu_logg, lu_meta, stellar_model_dir, &
-                                  wavelengths, fluxes)
+  SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
     REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
     REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
     CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
