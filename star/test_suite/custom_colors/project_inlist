@@ -25,6 +25,8 @@
 
       ! Verbosity
       show_log_description_at_start = .true.
+
+      pre_ms_relax_to_start_radiative_core = .false. !! in general doing this is bad, but for demo turn off
 /
 
 &eos
@@ -35,23 +37,37 @@
       kap_file_prefix = 'gs98'
 /
 
+&colors
+      use_colors = .true.
+      instrument = '/colors/data/filters/GAIA/GAIA'
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      
+      metallicity = 0.02 !!
+      
+      distance = 3.0857d17 !! units?
+      make_csv = .true.
+
+/ ! end of colors namelist
+
 &controls
       ! Basic stellar parameters
       initial_mass = 1.0d0         ! Solar-mass
       initial_z = 0.02d0           ! Solar metallicity
 
-      max_age = 13d9               ! Cap time to 13 Gyr
+      !! stopping conditions redundant 
+      max_age = 10d9 !13d9          ! Cap time to 13 Gyr
 
       ! Enable H core depletion termination
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 1d-5
+      !xa_central_lower_limit_species(1) = 'h1'
+      !xa_central_lower_limit(1) = 1d-5
 
       ! Output and performance settings
       profile_interval = 100
-      history_interval = 5
-      terminal_interval = 50
+      history_interval = 1 !! make this one-to-one
+      terminal_interval = 5 !0
       photo_interval = 100
-      max_model_number = 20000
+      !max_model_number = 20000
 
       use_gold2_tolerances = .true.
 

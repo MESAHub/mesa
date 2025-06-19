@@ -21,7 +21,7 @@
 
 &colors
       read_extra_colors_inlist(1) = .true.
-      extra_colors_inlist_name(1) = 'colors_inlist'
+      extra_colors_inlist_name(1) = 'project_inlist'
 / ! end of colors namelist
 
 
