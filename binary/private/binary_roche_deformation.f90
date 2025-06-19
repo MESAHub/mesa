@@ -41,10 +41,10 @@ module binary_roche_deformation
    implicit none
 
    real(dp), parameter :: nudge = 1d-4
-   real(dp), pointer :: xvals(:), yvals(:), yvals_gtr_than_1(:), fpfunc1d(:), ftfunc1d(:), &
-         irotfunc1d(:), otherrfunc1d(:), afunc1d(:)
+   real(dp), pointer :: xvals(:), yvals(:), fpfunc1d(:), ftfunc1d(:), &
+         irotfunc1d(:), otherrfunc1d(:), afunc1d(:), psifunc1d(:)
    logical :: inter_ok = .false., dbg = .false.
-   integer :: num_xpts, num_ypts, num_ypts_gtr_than_1
+   integer :: num_xpts, num_ypts
 
 contains
 
@@ -62,10 +62,12 @@ contains
                num_ypts, ftfunc1d, ierr)
          call setup_interpolator(trim(upstairs) // 'irot_data.txt', xvals, num_xpts, &
                yvals, num_ypts, irotfunc1d, ierr)
+         call setup_interpolator(trim(upstairs) // 'psi_data.txt', xvals, num_xpts, &
+               yvals, num_ypts, psifunc1d, ierr)
+
          if (dbg) then
             xtest = -0.5
             ytest = 1.35
-            ! test fp interpolator
             write(*, 11) 'grid size', num_xpts, num_ypts
             write(*, 1) 'setup interpolators succesful,'
 
@@ -77,7 +79,7 @@ contains
             write(*, 1) 'ft   test gave should be close to 0.8', testval
             call interp_evbipm_db(xtest, ytest, xvals, num_xpts, yvals, num_ypts,&
                   irotfunc1d, num_xpts, testval, ierr)
-            write(*, 1) 'irot test gave should be close to 0.4', testval
+            write(*, 1) 'irot test gave should be close to 1.4', testval
          end if
          inter_ok = .true.
       end if
@@ -175,6 +177,61 @@ contains
       if (ierr /= 0) write(*, 1) "error in eval irot", ar, irot
 
    end function eval_irot
+
+   real(dp) function eval_psi(lq, ar, ierr) result(psi)
+      ! evaluates the dimensionless Roche potential of a shell of a given fractional equivalent radius ar = r/rl and
+      ! lq = log10(m(other)/m(this)); result has no units. Scaling to dimensionfull units should be done by:
+      ! Psi_dim_full = (Psi_dim_less - q^2/(2(1+q)) * G * M_this / separation, with q = m_other / m_this
+      ! note there was an error in Fabry et al. (2022) regarding this scaling.
+
+      real(dp), intent(in) :: lq
+      real(dp) :: ar
+      integer, intent(out) :: ierr
+
+      include 'formats'
+
+      if (ar >= yvals(num_ypts)) ar = yvals(num_ypts) - 2 * nudge
+      call interp_evbipm_db(lq, ar, xvals, num_xpts, yvals, num_ypts,&
+            psifunc1d, num_xpts, psi, ierr)
+      if (ierr /= 0) write(*, 1) "error in eval psi", ar, psi
+   end function eval_psi
+
+   subroutine roche_psi(id, r, psi, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: r
+      integer, intent(out) :: ierr
+      real(dp), intent(out) :: psi
+
+      type (star_info), pointer :: s
+      type (binary_info), pointer :: b
+      integer :: j, this_star, other_star
+      real(dp) :: m1, m2, a, r_roche, lq
+
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      call binary_ptr(s% binary_id, b, ierr)
+      if (ierr /= 0) return
+
+      m1 = b% m(this_star)
+      m2 = b% m(other_star)
+      a = b% separation
+      r_roche = b% rl(this_star)
+      ! if masses or sep are not yet set at the binary level, use these
+      if (m1 <= 0) m1 = b% m1 * Msun
+      if (m2 <= 0) m2 = b% m2 * Msun
+      if (a <= 0) a = pow(standard_cgrav * (m1 + m2) * &
+            pow((b% initial_period_in_days) * 86400, 2) / (4 * pi2), one_third)
+      if (r_roche <= 0) r_roche = eval_rlobe(m1, m2, a)
+      lq = log10(m2 / m1)
+
+      psi = eval_psi(lq, r / r_roche, ierr)
+      if (ieee_is_nan(psi)) then
+         psi = -9d99  ! let's put negative a lot for regions outside what we can interpolate
+                      ! this likely happens in the core where r ~= 0, and so psi == -infty
+      end if
+
+   end subroutine roche_psi
 
    subroutine roche_fp_ft(id, r, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
       integer, intent(in) :: id
@@ -291,10 +348,10 @@ contains
 
       if (ierr /= 0) return
 
-      if (b% s1% id == s% id) then
+      if (b% s1% id == s% id .and. b% have_star_1) then
          this_star = 1
          other_star = 2
-      else if (b% s2% id == s% id) then
+      else if (b% s2% id == s% id .and. b% have_star_2) then
          this_star = 2
          other_star = 1
       else
