@@ -14,7 +14,6 @@ neu/test/test_output filter=lfs diff=lfs merge=lfs -text
 
 
 # Track all data files for colors with LFS
-colors/data/filters/** filter=lfs diff=lfs merge=lfs -text
 colors/data/stellar_models/Kurucz2003all/** filter=lfs diff=lfs merge=lfs -text
 colors/data/stellar_models/vega** filter=lfs diff=lfs merge=lfs -text
 
