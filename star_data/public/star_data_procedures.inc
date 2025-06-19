@@ -206,4 +206,5 @@
          procedure (binary_deformation_switch_fraction_interface), pointer, nopass :: &
             binary_deformation_switch_fraction => null()
 
-
+         procedure (binary_get_roche_potential_interface), pointer, nopass :: &
+            binary_get_roche_potential => null()

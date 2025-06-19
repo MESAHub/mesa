@@ -390,9 +390,6 @@
       ! interfaces for procedure pointers
       abstract interface
 
-
-
-
          integer function id_only_function_interface(id)
             integer, intent(in) :: id
          end function id_only_function_interface
@@ -400,7 +397,6 @@
          subroutine id_only_subroutine_interface(id)
             integer, intent(in) :: id
          end subroutine id_only_subroutine_interface
-
 
          subroutine extras_startup_interface(id,restart,ierr)
             integer, intent(in) :: id
@@ -1189,5 +1185,11 @@
             real(dp), intent(out) :: f_switch
          end subroutine binary_deformation_switch_fraction_interface
 
+         subroutine binary_get_roche_potential_interface(id, r, psi, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: id
+            real(dp), intent(in) :: r
+            real(dp), intent(out) :: psi
+            integer, intent(out) :: ierr
+         end subroutine binary_get_roche_potential_interface
       end interface
-

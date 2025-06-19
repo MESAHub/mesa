@@ -84,7 +84,8 @@
       integer, parameter :: p_radius_cm = p_radius_km + 1
       integer, parameter :: p_radius = p_radius_cm + 1
       integer, parameter :: p_logR = p_radius + 1
-      integer, parameter :: p_log_q = p_logR + 1
+      integer, parameter :: p_psi_roche = p_logR + 1
+      integer, parameter :: p_log_q = p_psi_roche + 1
       integer, parameter :: p_q = p_log_q + 1
       integer, parameter :: p_log_dq = p_q + 1
       integer, parameter :: p_dq = p_log_dq + 1
@@ -781,6 +782,7 @@
          profile_column_name(p_rmid) = 'rmid'
          profile_column_name(p_logR_cm) = 'logR_cm'
          profile_column_name(p_logR) = 'logR'
+         profile_column_name(p_psi_roche) = 'psi_roche'
          profile_column_name(p_log_q) = 'log_q'
          profile_column_name(p_q) = 'q'
          profile_column_name(p_dq) = 'dq'
