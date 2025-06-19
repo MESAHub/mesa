@@ -61,12 +61,8 @@ fi
 cd ..
 
 
-# Export to MESA data dir
-mkdir -p "$TARGET_DIR"
-
 for SUBDIR in filters stellar_models; do
     if [ -d "data/$SUBDIR" ]; then
-        cp -r "data/$SUBDIR" "$TARGET_DIR/"
         check_okay
     fi
 done
