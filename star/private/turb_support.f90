@@ -303,58 +303,62 @@ contains
 
         fraction = min(1d0, s%dt/tau)
 
-        u_old    = log(v_old+1d0)
+        if (fraction < 1d0) then
+            
+            u_old    = log(v_old+1d0)
 
-        if (gradr%val > gradL%val) then
-        u_target = log(v_tdc + 1d0)    ! grow toward MLT/TDC value
-        else
-        u_target = 0d0                 ! decay to 0
+            if (gradr%val > gradL%val) then
+            u_target = log(v_tdc + 1d0)    ! grow toward MLT/TDC value
+            else
+            u_target = 0d0                 ! decay to 0
+            end if
+            u_new    = u_old + fraction*(u_target-u_old)
+            v_new    = exp(u_new)-1d0
+            !conv_vel%val = v_new , set by tdc when called with v_new and , .true., ierr) for freeze = .true.
+
+            dvc_dt =(v_new - v_old)/s% dt
+
+          if (gradr%val > gradL%val) then
+             ! convectively unstable, and growing or decaying
+
+             if ( (s% dvc_dt_TDC(k) > 0d0 .and. s% dvc_dt_TDC(k) > dvc_dt) &
+                 .or. (s% dvc_dt_TDC(k) < 0d0  .and. s% dvc_dt_TDC(k) < dvc_dt) &
+                 .or. s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) ) then
+
+                 !write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt
+    !             s% dvc_dt_TDC(k) = dvc_dt
+
+                 call set_TDC(&
+                 v_new, mixing_length_alpha, &
+                 s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+                 mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+                 scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true to recalc conv_vel
+
+                 s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
+                !if (s% solver_iter > 3) s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) = .true.
+             end if
+
+          else if (gradr%val < gradL%val .and. v_old >0d0) then
+             ! convectively stable and decaying from non zero vel.
+
+            if (s% dvc_dt_TDC(k) < dvc_dt &
+                .or. s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k)) then
+
+                !if (.false. .and. k == 1436) &
+                !write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt, 'brunt_N(k)', sqrt(s% brunt_N2(k))
+
+                call set_TDC(&
+                v_new, mixing_length_alpha, &
+                s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+                mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+                scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true to recalc conv_vel
+
+                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
+                !if (s% solver_iter > 3) s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) = .true.
+            end if
+          end if
+
         end if
-        u_new    = u_old + fraction*(u_target-u_old)
-        v_new    = exp(u_new)-1d0
-        !conv_vel%val = v_new , set by tdc when called with v_new and , .true., ierr) for freeze = .true.
-
-        dvc_dt =(v_new - v_old)/s% dt
-
-      if (gradr%val > gradL%val) then
-         ! convectively unstable, and growing or decaying
-
-         if ( (s% dvc_dt_TDC(k) > 0d0 .and. s% dvc_dt_TDC(k) > dvc_dt) &
-             .or. (s% dvc_dt_TDC(k) < 0d0  .and. s% dvc_dt_TDC(k) < dvc_dt) &
-             .or. s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) ) then
-
-             !write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt
-!             s% dvc_dt_TDC(k) = dvc_dt
-
-             call set_TDC(&
-             v_new, mixing_length_alpha, &
-             s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true to recalc conv_vel
-
-             s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
-            !if (s% solver_iter > 3) s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) = .true.
-         end if
-
-      else if (gradr%val < gradL%val .and. v_old >0d0) then
-         ! convectively stable and decaying from non zero vel.
-
-        if (s% dvc_dt_TDC(k) < dvc_dt &
-            .or. s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k)) then
-
-            !if (.false. .and. k == 1436) &
-            !write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt, 'brunt_N(k)', sqrt(s% brunt_N2(k))
-
-            call set_TDC(&
-            v_new, mixing_length_alpha, &
-            s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true to recalc conv_vel
-
-            s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
-            !if (s% solver_iter > 3) s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) = .true.
-        end if
-      end if
      ! if the above two are not toggled, then mixing_type == no_mixing, zone stays stable
 
             if (ierr /= 0) then
