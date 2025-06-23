@@ -381,6 +381,7 @@
 
 
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
+         logical, pointer :: fixed_mlt_accel_limit_for_rest_of_solver_iters(:)
 
       ! Convective turbulent velocity w -- when RSP2_flag is true
 

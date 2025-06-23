@@ -1032,6 +1032,9 @@
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
 
+            call do1_logical(s% fixed_mlt_accel_limit_for_rest_of_solver_iters, c% fixed_mlt_accel_limit_for_rest_of_solver_iters)
+            if (failed('fixed_mlt_accel_limit_for_rest_of_solver_iters')) exit
+
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit
             call do1(s% L_conv, c% L_conv)

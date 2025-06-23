@@ -177,7 +177,7 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
-real(dp) :: mixing_scale, N2_val, N, v_old, v_tdc, dvc_dt, v_new
+      real(dp) ::  v_old, v_tdc, dvc_dt, v_new, tau, u_old, u_target, u_new, fraction, tau_N
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale, max_conv_vel
@@ -276,54 +276,86 @@ real(dp) :: mixing_scale, N2_val, N, v_old, v_tdc, dvc_dt, v_new
 
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
-      ! apply Arnett ad hoc conv_vel update.
-        mixing_scale = mixing_length_alpha * scale_height%val
-        N2_val = s% brunt_N2(k)              ! MESA’s stored N^2 at face k
-        N = sqrt( max(0d0, N2_val) )
+      ! apply Arnett/Wood style ad hoc conv_vel update from old mesa revisions
 
-       ! old TDC velocities
-       v_old = conv_vel_start
-       v_tdc = conv_vel%val
+        ! old TDC velocities
+        v_old = conv_vel_start
+        v_tdc = conv_vel%val
 
-      if ( gradr%val > gradL .and. (v_tdc - v_old > 0d0)) then
-         ! convectively unstable
-         dvc_dt = ( pow2(v_tdc) - pow2(v_old) ) / mixing_scale
 
-         if (s% dvc_dt_TDC(k) > dvc_dt ) then
-             write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt
-             s% dvc_dt_TDC(k) = dvc_dt
-             v_new       = v_old + dvc_dt * s%dt
-             conv_vel%val = v_new
+        if (s%brunt_N2(k) > 0d0) then
+            tau_N = max(1d0/sqrt(s%brunt_N2(k)), 1d-5)
+        end if
+
+
+        if (gradr%val > gradL%val .and. v_old > 0) then
+            ! was convective, and is unstable : growth
+            tau = lambda%val / v_old ! turnover set by mixing length
+        else if (gradr%val > gradL%val .and. v_old <= 0) then
+            ! was radiatively stable, and is unstable : growing from stable
+            tau = tau_N
+        else if (gradr%val < gradL%val .and. v_old > 0) then
+            ! was convective, and is stable or decaying: decay to stable
+            tau = lambda%val / v_old
+        else
+            tau = s% dt
+        end if
+
+        fraction = min(1d0, s%dt/tau)
+
+        u_old    = log(v_old+1d0)
+
+        if (gradr%val > gradL%val) then
+        u_target = log(v_tdc + 1d0)    ! grow toward MLT/TDC value
+        else
+        u_target = 0d0                 ! decay to 0
+        end if
+        u_new    = u_old + fraction*(u_target-u_old)
+        v_new    = exp(u_new)-1d0
+        !conv_vel%val = v_new , set by tdc when called with v_new and , .true., ierr) for freeze = .true.
+
+        dvc_dt =(v_new - v_old)/s% dt
+
+      if (gradr%val > gradL%val) then
+         ! convectively unstable, and growing or decaying
+
+         if ( (s% dvc_dt_TDC(k) > 0d0 .and. s% dvc_dt_TDC(k) > dvc_dt) &
+             .or. (s% dvc_dt_TDC(k) < 0d0  .and. s% dvc_dt_TDC(k) < dvc_dt) &
+             .or. s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) ) then
+
+             !write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt
+!             s% dvc_dt_TDC(k) = dvc_dt
 
              call set_TDC(&
              v_new, mixing_length_alpha, &
              s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
              mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true.
+             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true to recalc conv_vel
 
              s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
+            !if (s% solver_iter > 3) s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) = .true.
          end if
-        
-      else if (v_tdc - v_old < 0d0) then
-         ! convectively stable
-         dvc_dt = - pow2(v_old) / mixing_scale  -  N * v_old
 
-        if (s% dvc_dt_TDC(k) < dvc_dt ) then
+      else if (gradr%val < gradL%val .and. v_old >0d0) then
+         ! convectively stable and decaying from non zero vel.
 
-            write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt, 's% brunt_N2(k)', s% brunt_N2(k)
-            s% dvc_dt_TDC(k) = dvc_dt
-            v_new       = v_old + dvc_dt * s%dt
-            conv_vel%val = v_new
+        if (s% dvc_dt_TDC(k) < dvc_dt &
+            .or. s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k)) then
+
+            !if (.false. .and. k == 1436) &
+            !write (*,*) 's% dvc_dt_TDC(k)', s% dvc_dt_TDC(k), 'dvc_dt', dvc_dt, 'brunt_N(k)', sqrt(s% brunt_N2(k))
 
             call set_TDC(&
             v_new, mixing_length_alpha, &
             s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true.
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel,.true., ierr) ! call again with freeze true to recalc conv_vel
 
             s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt ! do it again for results from tdc that are more precise.
+            !if (s% solver_iter > 3) s% fixed_mlt_accel_limit_for_rest_of_solver_iters(k) = .true.
         end if
       end if
+     ! if the above two are not toggled, then mixing_type == no_mixing, zone stays stable
 
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_TDC'

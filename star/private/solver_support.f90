@@ -106,6 +106,10 @@
          dt = s% dt
 
          if (s% solver_iter == 0) then
+            ! set mlt_accel_limiter to false by default
+            if (dbg) write(*, *) 'call fixed_mlt_accel_limit_for_rest_of_solver_iters'
+            s% fixed_mlt_accel_limit_for_rest_of_solver_iters(1:s%nz) = .false.
+
             if (dbg) write(*, *) 'skip set_solver_vars on call before 1st iter'
          else
             if (dbg) write(*, *) 'call set_solver_vars'
