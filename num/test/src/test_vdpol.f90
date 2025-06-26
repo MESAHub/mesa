@@ -1,4 +1,5 @@
 module test_vdpol
+
    use num_def
    use num_lib
    use mtx_lib
@@ -10,7 +11,6 @@ module test_vdpol
    implicit none
 
    logical, parameter :: dbg = .false.
-
    integer :: cnt = 0
 
 contains

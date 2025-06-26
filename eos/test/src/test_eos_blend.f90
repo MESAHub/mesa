@@ -5,6 +5,7 @@ module test_eos_blend
    use eos_blend
 
    implicit none
+
    private
    public :: do_test_eos_blend
 

@@ -148,7 +148,7 @@
       ! RSP_Qvisc_linear is analogous to shock_spread_linear
       ! RSP_Qvisc_quadratic is analogous to shock_spread_quadratic
       ! if switch to this form, set RSP_cq = 0 to shut off the Neumann & Richtmyer form.
-      ! note that this form also uses RSP_zsh to delay onset of artficial viscosity
+      ! note that this form also uses RSP_zsh to delay onset of artificial viscosity
    
    ! surface pressure.  provides outer boundary condition for momentum equation.
    RSP_use_Prad_for_Psurf = .false.
@@ -343,7 +343,7 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
    !pause_interval = 100
    pgstar_interval = 25
 

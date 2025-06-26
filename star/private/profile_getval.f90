@@ -203,7 +203,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id)  ! Convert to net id not the gloabl rate id
+            id = g% net_reaction(id)  ! Convert to net id not the global rate id
             if (id > 0) then
                spec = offset + id
                return

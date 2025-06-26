@@ -586,7 +586,7 @@
       function quadeos(ic,i,x,y1,y2,y3,x1,x2,x3)
 !..... this function performs a quadratic interpolation.
       save
-      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
+      dimension xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3

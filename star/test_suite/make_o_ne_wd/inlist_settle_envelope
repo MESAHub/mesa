@@ -1,5 +1,5 @@
 ! inlist_settle_envelope
- 
+
 &star_job
 
       load_saved_model = .true.
@@ -60,7 +60,7 @@
 
 ! mixing
 
-! timesteps 
+! timesteps
      delta_XH_cntr_hard_limit = -1
      delta_XHe_cntr_hard_limit = -1
      delta_XC_cntr_hard_limit = -1
@@ -70,7 +70,7 @@
 
 ! mesh
 
-! solver      
+! solver
       op_split_burn = .true.
       op_split_burn_min_T = 3d8
 
@@ -87,20 +87,19 @@
       trace_history_value_name(3) = 'total_mass ne20'
       trace_history_value_name(4) = 'rel_E_err'
       trace_history_value_name(5) = 'log_rel_run_E_err'
-      
+
       photo_interval = 20
-      
+
 
 / ! end of controls namelist
 
 
-
 &pgstar
 
-        ! override the pgstar x-axis settings for this phase of evolution
-        Profile_Panels3_xaxis_name = 'logxm'
-        Profile_Panels3_xmin = -8d0
-        Profile_Panels3_xmax = 0d0 ! 2.2
-        Profile_Panels3_xaxis_reversed = .true.
+   ! override the pgstar x-axis settings for this phase of evolution
+   Profile_Panels3_xaxis_name = 'logxm'
+   Profile_Panels3_xmin = -8d0
+   Profile_Panels3_xmax = 0d0 ! 2.2
+   Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist

@@ -2,7 +2,7 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       create_pre_main_sequence_model = .true.
 
@@ -26,14 +26,14 @@
 
       initial_mass = 12
       initial_z = 0.02
-      
+
       stop_near_zams = .true.
       Lnuc_div_L_zams_limit = 0.9d0
-      
+
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
       use_gold2_tolerances = .true.
-      
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -42,7 +42,7 @@
       profile_interval = 100
       history_interval = 5
       terminal_interval = 50
-   
+
       !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1

@@ -2,25 +2,23 @@
 !
 !   Copyright (C) 2009-2019  Bill Paxton, Frank Timmes & The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module test_net_support
+
    use chem_def
    use chem_lib, only: chem_init
    use math_lib
@@ -1755,7 +1753,7 @@ contains
             hh = hh/con
             a(1, i) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
             write (*, 2) 'dfdx hh', i, a(1, i), hh
-            ! compute extrapolations of various orders; the error stratagy is to compare
+            ! compute extrapolations of various orders; the error strategy is to compare
             ! each new extrapolation to one order lower but both at the same stepsize
             ! and at the previous stepsize
             fac = con2

@@ -1,4 +1,5 @@
 program test_star_data
+
    use star_data_def
    use star_data_lib
    implicit none

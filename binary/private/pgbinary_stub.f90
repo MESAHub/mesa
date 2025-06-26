@@ -142,7 +142,7 @@ contains
 
       integer :: i
       integer(i8) :: time0, time1, clock_rate
-      logical :: pause
+      logical :: pause_flag
 
       include 'formats'
 

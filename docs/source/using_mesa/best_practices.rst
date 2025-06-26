@@ -6,9 +6,9 @@ During the project
 
 When you begin a new project you should generally use the most recent
 MESA release. Unless you encounter bugs that negatively impact your
-work, stick with that version throughout the project. If you’re starting
+work, stick with that version throughout the project. If you're starting
 from a set of input files that were designed for an older version, we
-suggest you invest some time porting it to the latest version, as if you
+suggest you invest some time porting them to the latest version, as if you
 run into any issues this will make it much easier for the community to
 assist you.
 
@@ -22,13 +22,13 @@ The MESA test suite (``star/test_suite`` and ``binary/test_suite``) is a
 valuable source of examples and a good first stop when setting up a new
 problem with MESA. Looking at the test suite inlists is a quick way to
 familiarize yourself with the set of options relevant to your problem.
-More information is available on :ref:`how to use a test suite case as a starting point for your own work directory <test_suite:Test suite>`.
+More information is available on :ref:`how to use a test suite case as a starting point for your own work directory <test_suite:Test Suite>`.
 
 You should always perform some sort of convergence study to ensure that
 your results are not sensitive to the time or mass resolution of your models.
 Please note, and this is very important, that MESA defaults will
 generally NOT be optimal or even acceptable for your particular science cases.
-It is the user’s responsibility to ensure that the MESA options and controls
+It is the user's responsibility to ensure that the MESA options and controls
 they choose are appropriate for the physics they want to study.
 This will usually require appropriate testing and critical analysis of the models obtained.
 
@@ -299,8 +299,6 @@ Repeat answering the questions above.
  When finished, return ``alpha_semiconvection`` to the test case value of 0.1.
 
 
-
-
 Explore Numerical Convergence
 -----------------------------
 
@@ -385,7 +383,6 @@ Gather your science and write it up for publication.
  ``Table10_abstract.txt``, to our shared Dropbox directory timmes/Abstracts.
 
 
-
 In the article
 --------------
 
@@ -429,7 +426,6 @@ briefly summarize these, including appropriate citations.
   Thermal neutrino loss rates are from \citet{Itoh1996}.
 
 
-
 Note that this only summarizes the "default" capabilities, of the
 currently released version of MESA. If you are making use of other
 microphysics options, employing prescriptions such as wind mass loss
@@ -444,7 +440,6 @@ In the the MESA binary module, by default:
    \citet{Eggleton1983}.  Mass transfer rates in Roche lobe
    overflowing binary systems are determined following the
    prescription of \citet{Ritter1988}.
-
 
 
 A :download:`BibTex file <mesa.bib>` with these references is available.

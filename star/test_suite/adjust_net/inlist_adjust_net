@@ -91,7 +91,7 @@
 
 &pgstar
          
-!pause = .true.
+!pause_flag = .true.
          
 Profile_Panels1_xmax = 2.1 ! -101d0 ! only used if /= -101d0
 Abundance_xmax = 2.1 ! -101 ! only used if /= -101d0

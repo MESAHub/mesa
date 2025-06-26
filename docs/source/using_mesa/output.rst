@@ -8,9 +8,9 @@ Output files
 
 
 By default, MESA stores its data in the `LOGS` directory. The data files
-are text-based and can fed into your favorite plotting program. You
+are text-based and can be fed into your favorite plotting program. You
 should visit the
-`Add-ons <http://cococubed.com/mesa_market/add-ons.html>`__ section
+`Add-ons <https://mesastar.org/marketplace/add-ons/>`__ section
 of the MESA forum and see if someone has contributed code in your
 language of choice. (There are reasonably mature routines for Python,
 IDL, ruby and Mathematica.) An example of Python plotting is shown
@@ -103,7 +103,7 @@ the `numpy <http://www.numpy.org>`__ and
 
 While you may want to write your own tools to read and analyze the
 output of your MESA calculations, `many already
-exist <http://cococubed.com/mesa_market/add-ons.html>`__. In that
+exist <https://mesastar.org/marketplace/add-ons/>`__. In that
 vein, we introduce a simple module for use in Python scripts and
 interactive sessions called ``mesa_reader``, which only requires
 `numpy <http://www.numpy.org>`__.
@@ -176,7 +176,7 @@ the same thing if we know the exact file we want to load:
 
 But often it's frustrating to know exactly what profile file you want to
 load, so we can use the ``MesaLogDir`` class to simplify the process. It
-lets us load profiles by their associated model number and most simply
+lets us load profiles by their associated model number, or most simply
 by just loading the last saved profile:
 
 .. code:: python

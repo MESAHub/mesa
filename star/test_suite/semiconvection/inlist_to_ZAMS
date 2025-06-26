@@ -48,7 +48,6 @@
       !semiconvection_option = 'Langer_85'
 
 
-
 ! timestep controls
 
       !max_years_for_timestep = 1d4

@@ -349,8 +349,8 @@
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
-    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
-    use_drag_energy, drag_coefficient, min_q_for_drag, &
+    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound,  &
+    report_max_infall_inside_fe_core, use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     retry_for_v_above_clight, &
 
@@ -415,7 +415,9 @@
 
 
     ! timestep
-    time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
+    time_delta_coeff, min_timestep_factor, max_timestep_factor, &
+    max_timestep_factor_at_high_T, min_logT_for_max_timestep_factor_at_high_T, &
+    timestep_factor_for_retries, retry_hold, &
     neg_mass_fraction_hold, timestep_dt_factor, use_dt_low_pass_controller, &
     force_timestep_min, force_timestep_min_years, force_timestep_min_factor, force_timestep, force_timestep_years, &
     varcontrol_target, min_allowed_varcontrol_target, varcontrol_dt_limit_ratio_hard_max, xa_scale, &
@@ -1883,7 +1885,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
  s% velocity_tau_lower_bound = velocity_tau_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
-
+ s% report_max_infall_inside_fe_core = report_max_infall_inside_fe_core
  s% retry_for_v_above_clight = retry_for_v_above_clight
 
  ! solvers
@@ -3565,7 +3567,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
  velocity_tau_lower_bound = s% velocity_tau_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
-
+ report_max_infall_inside_fe_core = s% report_max_infall_inside_fe_core
  retry_for_v_above_clight = s% retry_for_v_above_clight
 
  ! solvers

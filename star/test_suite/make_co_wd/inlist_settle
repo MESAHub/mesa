@@ -48,7 +48,7 @@
       gradT_excess_lambda1 = -1 ! turn on full all the time
 
       thermohaline_coeff = 1000
-      
+
 ! solver controls
       ignore_too_large_correction = .true.
 
@@ -62,10 +62,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
 
          show_TRho_Profile_eos_regions = .true.
 

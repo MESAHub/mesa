@@ -32,7 +32,7 @@
             file_device, &
             file_digits, &
             pgstar_interval, &
-            pause, &
+            pause_flag, &
             pause_interval, &
             pgstar_sleep, &
             clear_history, &
@@ -3145,7 +3145,7 @@
          s% pg% file_device = file_device
          s% pg% file_digits = file_digits
          s% pg% pgstar_interval = pgstar_interval
-         s% pg% pause = pause
+         s% pg% pause_flag = pause_flag
          s% pg% pause_interval = pause_interval
          s% pg% pgstar_sleep = pgstar_sleep
          s% pg% clear_history = clear_history

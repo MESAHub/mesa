@@ -24,6 +24,8 @@ Backwards-incompatible changes
 
 Removed `file_extension` option because it is redundant with `file_device`. Delete `file_extension` from your inlists.
 
+Renamed pgstar `pause` option to `pause_flag` because pause is a reserved Fortran 77 keyword.
+
 .. _New Features main:
 
 New Features
@@ -35,6 +37,9 @@ Changed the default for ``use_radiation_corrected_transfer_rate =
 ``mesa_reader`` can now be installed with ``pip``.
 
 A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
+
+Exposed `star_utils` functions `star_weighted_smoothing`, `star_threshold_smoothing`, `star_kh_time_scale` to the user.
+These functions can now be called in your custom `run_star_extras.f90` file, for data in a star, getting relevant timescales.
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
@@ -62,9 +67,14 @@ By user request, an option for limiting the convective velocity predicted by mix
 allowing users to limit the convective velocity to some fraction of the local sound speed using the
 controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
 
-By user request, and motivated by the underestimation of line opacities from expanding material by the `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
-see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_. An optional control for an opacity floor, ``opacity_min``, has
-been introduced.
+By user request, and motivated by the underestimation of line opacities from expanding material by the
+`Ferguson (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
+see also section 2.2 in `Morozova et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract>`_.
+An optional control for an opacity floor, ``opacity_min``, has been introduced.
+
+The Fe core-collapse infall condition ``fe_core_infall_limit`` has been adjusted, and the old control remains an optional infall condition.
+Users can switch between either choice with the new logical control ``report_max_infall_inside_fe_core``.
+See the ``&controls`` for further details.
 
 .. _Bug Fixes main:
 
@@ -76,6 +86,8 @@ Fixed small bug in star/private/create_initial_model.f90 that will have a small 
 Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
 
 Fixed bug in binary photos. They were not saving the variables: ``CE_years_detached``, ``CE_years_detached_old``, ``generations``.
+
+Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
@@ -470,7 +482,7 @@ where you want to update every inlist by invoking ::
 
 .. code-block:: console
 
-  $MESA_DIR/scripts/update_inlists
+  $MESA_DIR/scripts/update_inlists.sh
 
 This script will save the previous versions of your inlists to a directory named
 ``backup_inlists``.
@@ -2702,8 +2714,8 @@ from `Gupta & Meyer (2001)
 ``rate_list.txt`` file.
 
 User-Beware: if you want a local ``rate_tables`` directory,
-http://mesa.sourceforge.net/star_job_defaults.html#rate_tables_dir
-<http://mesa.sourceforge.net/star_job_defaults.html#rate_tables_dir>,
+`https://docs.mesastar.org/en/latest/reference/star_job.html#rate-tables-dir
+<https://docs.mesastar.org/en/latest/reference/star_job.html#rate-tables-dir>`__,
 and you want the ²⁶Al isomers, then the two ``al26-1 <-> al26-2`` rate
 files must be copied from their default location to your local
 rate_tables directory and your local ``rate_list.txt`` modified to include

@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+
 import os
+import sys
 import glob
 
 import check_columns as cc
 
-MESA_DIR = os.environ["MESA_DIR"]
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 profile_options = cc.CaseInsensitiveSet(
     [
@@ -194,35 +197,48 @@ def check_pgstar(filename, options, defaults, false_positives):
             continue
 
         if column_check in options:
-            if value not in defaults and value not in false_positives:
+            if (
+                value not in defaults
+                and value not in false_positives
+                and column_check[-5:] != "_name"
+            ):
                 result.append((column, value))
 
     return result
 
 
-def check_all_pgstars(options, defaults, false_postives):
+def check_all_pgstars(options, defaults, false_positives):
+    exit_code = 0
     for filename in glob.glob(
         os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
     ):
-        values = check_pgstar(filename, options, defaults, false_postives)
+        values = check_pgstar(filename, options, defaults, false_positives)
         if values is None:
             continue
         if len(values):
+            exit_code = 1
             print(f"\n\n*** {filename} ***\n")
             for i in values:
                 print(*i)
             print()
             print()
 
+    return exit_code
+
 
 def check_all_history_pgstars():
-    check_all_pgstars(history_options, history_defaults, history_false_positives)
+    return check_all_pgstars(history_options, history_defaults, history_false_positives)
 
 
 def check_all_profile_pgstars():
-    check_all_pgstars(profile_options, profile_defaults, profile_false_positives)
+    return check_all_pgstars(profile_options, profile_defaults, profile_false_positives)
 
 
 if __name__ == "__main__":
-    check_all_history_pgstars()
-    check_all_profile_pgstars()
+    failed = check_all_history_pgstars() + check_all_profile_pgstars()
+    if not failed:
+        print("All checks passed.")
+        sys.exit(0)
+    else:
+        print("Some checks failed.")
+        sys.exit(1)

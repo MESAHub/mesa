@@ -1,5 +1,5 @@
 &pgbinary
-!pause = .true.
+!pause_flag = .true.
 
 pgbinary_age_disp = 1.7
 pgbinary_age_fjust = -0.5

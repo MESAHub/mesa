@@ -1,10 +1,10 @@
 ! inlist_to_he_core
- 
+
 &star_job
       show_log_description_at_start = .false.
 
-      
-      show_log_description_at_start = .false. 
+
+      show_log_description_at_start = .false.
 
       create_pre_main_sequence_model = .true.
 
@@ -19,7 +19,7 @@
       initial_he4 = 0.27
       initial_zfracs = 3 ! GS98_zfracs = 3
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'o18_and_ne22.net'
 
 
@@ -60,7 +60,7 @@
       initial_mass = 1.5
       initial_z = 0.01d0
 
-      
+
       mixing_length_alpha = 1.89
 
       photo_interval = 50
@@ -68,21 +68,18 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
-      
+
       max_age = 10d9
       max_years_for_timestep = 1d9
 
 / ! end of controls namelist
 
 
-
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+   ! top level controls
 
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
 
 / ! end of pgstar namelist

@@ -11,7 +11,7 @@ Building upon test suite cases
 
 Your first stop when setting up a new problem with MESA should be the
 MESA test suite. You will find a wide range of sample cases there.
-Looking at the test_suite inlists is a quick way to familiarize yourself
+Looking at the ``test_suite`` inlists is a quick way to familiarize yourself
 with the set of options relevant to your problem. You may want to copy
 an inlist from the test suite to one of your working directories to use
 as a starting point for a project of your own.
@@ -22,9 +22,8 @@ Each test suite problem lives in a subdirectory of
 
    $MESA_DIR/star/test_suite
 
-and you can find (slightly out-of-date, but still useful) descriptions
-of some of the test problems in the ``docs/`` sub-directory of each
-test_suite case.
+and you can find descriptions of some of the test problems in the
+``docs/`` sub-directory of each ``test_suite`` case.
 
 For example, take a look at the "high mass" test case. It starts by
 creating a pre-main-sequence model of 100 |Msun| with Z=0.02, and then it
@@ -38,10 +37,10 @@ central X of 0.5. To try it yourself,
    ./mk
    ./rn
 
-You can do the same with any of the test_suite cases.
+You can do the same with any of the ``test_suite`` cases.
 
-If you want to base your work off of a test_suite case, you should make
-a copy the directory and then edit this copy.
+If you want to base your work off of a ``test_suite`` case, you should make
+a copy of the directory and then edit this copy.
 
 ::
 
@@ -612,7 +611,6 @@ This test case checks the evolution of a nova outburst for one cycle.
 This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 
-
 Binary tests
 ------------
 
@@ -667,6 +665,7 @@ wind_fed_hmxb
 Model for a high mass X-ray binary, including both Roche lobe overflow
 and wind mass transfer. Verifies the Eddington limit is working, and
 that the accretion luminosity is computed correctly.
+
 
 Astero tests
 ------------

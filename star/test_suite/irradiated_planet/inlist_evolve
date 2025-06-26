@@ -1,7 +1,7 @@
 
 &star_job
-      
-      show_log_description_at_start = .false. 
+
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       load_model_filename = 'start.mod'
@@ -10,7 +10,7 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'max_age'
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'basic.net'
 
       set_initial_model_number = .true.
@@ -24,7 +24,7 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       !pgstar_flag = .true.
 
 
@@ -44,28 +44,28 @@
 / ! end of kap namelist
 
 &controls
-      
+
       max_age = 15d9
       max_years_for_timestep = 1d9
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 650         
-      
+      max_model_number = 650
+
       energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
-      
+
       convergence_ignore_equL_residuals = .true.
-      
+
       mesh_delta_coeff = 0.5
-      
+
       initial_mass = 0.001
       initial_z = 0.02d0
 
       mixing_length_alpha = 1.89d0
       MLT_option = 'Henyey'
-      
+
       T_mix_limit = 0
-      
+
       atm_option = 'irradiated_grey'
       atm_irradiated_opacity = 'fixed'
       atm_irradiated_T_eq = 1000 ! equilibrium temperature based on irradiation
@@ -82,19 +82,17 @@
       history_interval = 100
       terminal_interval = 20
       write_header_frequency = 10
-      
+
 
 / ! end of controls namelist
 
 
-
 &pgstar
-         
+
       ! top level controls
 
-         !pause = .true. 
+         !pause_flag = .true.
             ! if true, the code waits for user to enter a RETURN on the command line
-      
 
 
 / ! end of pgstar namelist

@@ -5,20 +5,19 @@
       character(len=3) :: fixedTP
       data fixedTP/'no'/  ! 'yes' for fixed T6,P; 'no' for fixed T6,rho
       common/eeos/esact,eos(mv)
-    1 continue
-      iorder=9  ! gives all 1st and 2nd order data. See instructions
-!                  in esac.
-      irad=1     ! does not add radiation  corrections
-       write (*, '(" type x ztab T6 r")')
-       read (*,*) x,ztab,t6,r
-        if (x == 0.0) stop
-      if (fixedTP == 'yes' ) then
-      r=rhoofp (x,ztab,t6,p,irad)  ! calculate density (r) for fixed P.
-      end if
-      call esac(x,ztab,t6,r,iorder,irad) ! calc EOS; use r from rhoofp
-      write (*,'("eos=",9e14.4)') (eos(j),j=1,9)
-!                                            if fixedTP='yes'
-      GOTO 1
+      do
+         iorder=9  ! gives all 1st and 2nd order data. See instructions in esac.
+         irad=1     ! does not add radiation  corrections
+         write (*, '(" type x ztab T6 r")')
+         read (*,*) x,ztab,t6,r
+         if (x == 0.0) stop
+         if (fixedTP == 'yes' ) then
+            r=rhoofp (x,ztab,t6,p,irad)  ! calculate density (r) for fixed P.
+         end if
+         call esac(x,ztab,t6,r,iorder,irad) ! calc EOS; use r from rhoofp
+         write (*,'("eos=",9e14.4)') (eos(j),j=1,9)
+!                                               if fixedTP='yes'
+      end do
       stop
       end
 
@@ -66,7 +65,6 @@
 !            If you, for example, only want to return gamma1: set iorder=1
 !            and set: data (index(i),i=1,11)/8,2,3,4,5,6,7,1,9,10,11/
 
-
       save
       integer :: info ! returned = 0 if AOK
       character (len=256) :: filename
@@ -76,7 +74,7 @@
       common/lreadco/itime
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/ xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos/esact,eos(mv)
@@ -366,7 +364,7 @@
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/ xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/bbeos/l1,l2,l3,l4,k1,k2,k3,k4,ip,iq
       common/eeos/esact,eos(mv)
 
@@ -432,7 +430,7 @@
       real :: moles
       character(len=1) :: blank
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/ xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       common/eeos/esact,eos(mv)
       common/eeeos/ epl(mx,nt,nr),xx(mx)
@@ -526,7 +524,7 @@
       function quadeos(ic,i,x,y1,y2,y3,x1,x2,x3)
 !..... this function performs a quadratic interpolation.
       save
-      dimension  xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
+      dimension xx(3),yy(3),xx12(30),xx13(30),xx23(30),xx1sq(30),xx1pxx2(30)
       xx(1)=x1
       xx(2)=x2
       xx(3)=x3
@@ -581,13 +579,13 @@
       eground=0.0
       amoles=0.0
       do i=1,6
-      eground=eground+eion(i)*frac(i)
-      amoles=amoles+(1.+anum(i))*frac(i)
+         eground=eground+eion(i)*frac(i)
+         amoles=amoles+(1.+anum(i))*frac(i)
       end do
       anume=amoles-1.
       gmass=0.
       do i=2,7
-      gmass=gmass+amas(i)*frac(i-1)
+         gmass=gmass+amas(i)*frac(i-1)
       end do
 
       end function gmass
@@ -657,8 +655,7 @@
 
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
 !..---Add difference between EOS with and without radiation.  cvtt
 !       calculation is not accurate enough to give accurate results using
 !       eq. 16.16 Landau&Lifshitz (SEE line labeled DIRECT)
@@ -669,8 +666,7 @@
 !..---End EOS calculations with radiation
 !     normalize cvt to 3/2 when gas is ideal,non-degenerate,
 !     fully-ionized, and has no radiation correction
-!     cvt=(eos(5)*molenak/tmass+4.*er/t6)
-!    x  /molenak
+!     cvt=(eos(5)*molenak/tmass+4.*er/t6)/molenak
       eos(iri(1))=pt
       eos(iri(2))=et
       eos(iri(3))=st
@@ -685,7 +681,7 @@
       function rhoofp(x,ztab,t6,p,irad)
       parameter (mx=5,mv=10,nr=169,nt=197)
       common/lreadco/itime
-      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/ xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(10),index(10),nta(nr),zz(mx)
       common/eeos/esact,eos(mv)
       dimension nra(nt)
@@ -694,16 +690,16 @@
       data (nra(i),i=1,nt)/ 26*169, 168, 2*167, 166, 165, 164, 2*163, 162, 161, 160, 2*159, 158,
      &                      2*130, 129, 2*128, 2*126, 2*125, 124, 122, 121, 2*120, 2*119, 6*118,
      &                      2*117, 2*116, 2*115, 4*114, 8*113, 22*111, 5*110, 6*109, 2*108, 5*107,
-     &                      2*106, 105, 2*104, 8*103, 16*102, 21*100, 9* 99, 6* 98, 4* 97, 95, 94, 6* 87/
+     &                      2*106, 105, 2*104, 8*103, 16*102, 21*100, 9*99, 6*98, 4*97, 95, 94, 6*87/
 
 
       rat=sigmacc
       pr=0.0
-      if(irad == 1) pr=4./3.*rat*t6**4   ! Mb
+      if(irad == 1) pr=4./3.*rat*t6**4  ! Mb
       pnr=p-pr
 
       if (itime /= 12345678) then
-      call esac (0.5,.001,1.,0.001,1,0)
+         call esac (0.5,.001,1.,0.001,1,0)
       end if
 
         ilo=2
@@ -788,7 +784,7 @@
       block data
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/aaeos/ q(4),h(4),xxh
-      common/aeos/  xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
+      common/aeos/ xz(mx,mv,nt,nr),t6list(nr,nt),rho(nr),t6a(nt),esk(nt,nr),esk2(nt,nr),dfsx(mx),dfs(nt),dfsr(nr),m,mf,xa(mx)
       common/beos/ iri(mv),index(mv),nta(nr),zz(mx)
       data (xa(i),i=1,mx)/0.0,0.2,0.4,0.6,0.8/
 

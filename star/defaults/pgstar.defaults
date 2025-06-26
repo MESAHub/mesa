@@ -26,14 +26,14 @@
     pgstar_interval = 2
 
 
-      ! pause
-      ! ~~~~~
+      ! pause_flag
+      ! ~~~~~~~~~~
 
       ! if true, then after refresh windows, wait for user to hit RETURN
 
       ! ::
 
-    pause = .false.
+    pause_flag = .false.
 
 
       ! pause_interval

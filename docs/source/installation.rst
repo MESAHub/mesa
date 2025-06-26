@@ -37,6 +37,17 @@ smoothly. Visit the `MESA SDK website
 <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
 the details of setting it up.
 
+.. warning::
+
+   The MESA SDK itself has a few dependencies you may need
+   to install manually, including `binutils`, `make`,
+   `Perl`, `X11`, `Z` and `C` shell on Linux and `Xcode`,
+   `Xcode command line tools` and `Xquartz` on Mac. See "prerequisites"
+   section on the `MESA SDK website
+   <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
+   for a complete and updated list including how to install them.
+
+
 If you would prefer to use ifort (the MESA SDK uses gfortran), that is
 also an option, so long as you use ifort 14 or later. Even if you choose
 to use ifort, you should still visit the MESA SDK website to get a feel
@@ -48,7 +59,7 @@ system. There's a template to get you started at
 :file:`$MESA_DIR/utils/makefile_header_non_mesasdk`.
 
 Regardless of whether you use the MESA SDK or ifort, and whether your
-machine runs MacOS or Linux, the output of MESA should be bit-for-bit
+machine runs macOS or Linux, the output of MESA should be bit-for-bit
 identical.  If it's not, this is considered to be a bug. (This has
 been the case since Release 5819 in early January 2014.)
 
@@ -84,7 +95,7 @@ The easiest way to make sure that your system is always configured
 appropriately is to define the necessary environment variables in
 your `shell start-up file <https://kb.iu.edu/d/abdy>`__. The file that
 you need to edit will depend on `which shell you're using
-<http://askubuntu.com/questions/590899/how-to-check-which-shell-am-i-using>`__.
+<https://askubuntu.com/questions/590899/how-do-i-check-which-shell-i-am-using>`__.
 You can find out by running ``echo $0``. The default on most Linux
 distros is bash, in which case you need to edit ``$HOME/.bashrc``. If
 you don't set the environment variables in your shell start-up file,

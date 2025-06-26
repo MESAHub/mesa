@@ -40,7 +40,7 @@
 
       read_extra_pgstar_inlist(2) = .true.
       extra_pgstar_inlist_name(2)= 'inlist_rsp_Cepheid'
-      
-      
+
+
 
 / ! end of pgstar namelist

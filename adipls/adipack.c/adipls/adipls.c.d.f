@@ -13,7 +13,7 @@ c  ierr_param: Is returned as 0 for successful completion, as .lt. 0
 c     in case of error.
 c  i_inout: If i_inout = 1 read model from file, as usual.
 c     If i_inout = 0, model quantities must be provided in
-c     x_arg(1:nn_arg), aa(arg(1:ivarmd,1:nn_arg), data_arg(1:8)
+c     x_arg(1:nn_arg), aa_arg(1:ivarmd,1:nn_arg), data_arg(1:8)
 c     If i_inout = -1, assume that model is already stored,
 c     regardless of possible model parameters read in.
 c

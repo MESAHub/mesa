@@ -7,7 +7,7 @@ Timmes `recent
 survey <http://sourceforge.net/p/mesa/mailman/message/34392396/>`__.
 
 In the US, the most growth was in Los Angeles, Texas, North Carolina and
-Pennsylvania. New states include Idaho, North Carolina, and Tennesee.
+Pennsylvania. New states include Idaho, North Carolina, and Tennessee.
 
 Global user growth between April 2014 and September 2015 is ~13%, with
 most coming from the ~35% growth in the USA market, and most of the rest

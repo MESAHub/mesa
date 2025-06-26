@@ -73,13 +73,13 @@ function update_docs {
                 if [ -e $img_dir/$filename.ps ]; then
                     echo "Converting $filename.ps to $filename.svg"
                     if [ ! command -v epstool &> /dev/null]; then
-                        echo "ERROR: 'epstool' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'epstool' could not be found! Please install it. Will not be able to convert image to optimized .svg"
                     elif [ ! command -v ps2pdf &> /dev/null]; then
-                        echo "ERROR: 'ps2pdf' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'ps2pdf' could not be found! Please install it. Will not be able to convert image to optimized .svg"
                     elif [ ! command -v inkscape &> /dev/null]; then
-                        echo "ERROR: 'inkscape' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'inkscape' could not be found! Please install it. Will not be able to convert image to optimized .svg"
                     elif [ ! command -v svgo &> /dev/null]; then
-                        echo "ERROR: 'svgo' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'svgo' could not be found! Please install it. Will not be able to convert image to optimized .svg"
                     fi
                     epstool --copy --bbox  $img_dir/$filename.ps $img_dir/_TMP_$filename.ps
                     ps2pdf -dEPSCrop $img_dir/_TMP_$filename.ps $img_dir/_TMP_$filename.pdf

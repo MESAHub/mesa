@@ -8,7 +8,7 @@ This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 This test case has 1 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_wd_stable_h_burn``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt 1.1 Msun carbon oxygen white dwarf from the :ref:`make_co_wd` test suite in r13738 with an an ``initial_mass`` of 6.4 Msun. The mass is relaxed to 1.0 Msun, the optical depth is relaxed to 300, and a hydrogen-rich composition is accreted at 2.5e7 Msun/yr. After about 100 year of evolution there is a hydrogen burning outburst followed by a period of stable hydrogen burning:
+* Part 1 (``inlist_wd_stable_h_burn``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt 1.1 |Msun| carbon oxygen white dwarf from the :ref:`make_co_wd` test suite in r13738 with an an ``initial_mass`` of 6.4 |Msun|. The mass is relaxed to 1.0 |Msun|, the optical depth is relaxed to 300, and a hydrogen-rich composition is accreted at 2.5e7 |Msun|/yr. After about 100 year of evolution there is a hydrogen burning outburst followed by a period of stable hydrogen burning:
 
 
 .. image:: ../../../star/test_suite/wd_stable_h_burn/docs/grid_000829.svg
@@ -167,7 +167,6 @@ pgstar commands used for the plots above:
    Grid1_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
-
 
 
 Last-Updated: 08Jul2021 (MESA 094ff71) by fxt.

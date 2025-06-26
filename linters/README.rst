@@ -29,13 +29,17 @@ This script checks that the controls and star_job defaults, the
 ``*_controls.inc``, and ``*_io.f90`` files are in sync.
 
 check_pgstar.py
-----------------
+---------------
 
 This script checks that the inlist_pgstar files in the test_suite
 have valid history/profile columns. Note it will have false positives for things only
 defined in a run_star_extras.f90 and does not check non inlist_pgstar files
 pgstar sections.
 
+check_urls.py
+---------------
+
+This script checks for broken or invalid URLs in the documentation files located in ``docs/source/``.
 
 fix_underlines.py
 -----------------
@@ -43,7 +47,7 @@ fix_underlines.py
 This script checks that the ~-level underlines in the defaults files
 are the correct lengths and fixes any problems it finds.
 
-mesa_linter.py
+mesa-linter.py
 --------------
 
 Checks fortran files for consistency with MESA's style guide.
@@ -60,7 +64,7 @@ Provides only a count per file of the number of issues found
 
   python mesa-linter.py -s *.f90
 
-check_test_suite_onwers.py
+check_test_suite_owners.py
 --------------------------
 
 This script checks that each test suite case is listed in CODEOWNERS and
@@ -76,7 +80,7 @@ check_stop.py
 -------------
 
 Checks all .f90 files for stop 1 or stop 'string' and replaces them with a call
-to mesa_error(__FILE__,__LINE__) . This way we can always find where an error
+to ``mesa_error(__FILE__,__LINE__)``. This way we can always find where an error
 occurs rather than the non-unique stop 1 location.
 
 check_empty_writes.py

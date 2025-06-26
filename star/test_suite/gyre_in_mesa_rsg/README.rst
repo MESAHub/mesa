@@ -4,11 +4,11 @@
 gyre_in_mesa_rsg
 ****************
 
-This test case checks the implementation of GYRE in MESA for a 21 Msun, Z=0.02 metallicity, model in the red supergiant regime.
+This test case checks the implementation of GYRE in MESA for a 21 |Msun|, Z=0.02 metallicity, model in the red supergiant regime.
 
 This test case has 4 parts.
 
-* Part 1 (``inlist_to_zams``) builds a 21.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
+* Part 1 (``inlist_to_zams``) builds a 21.0 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
 
 * Part 2 (``inlist_to_near_pulses``) continues the evolution until effective temperature goes below log10(Teff/K) = 3.55.
 
@@ -33,5 +33,3 @@ This test case has 4 parts.
 
 
 Last-Updated: 11Jun2021 (MESA 5be9e57) by fxt.
-
-

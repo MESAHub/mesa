@@ -17,28 +17,28 @@
 !
 ! ***********************************************************************
 
-!!% This module contains code to interpolate gravity darkening coefficients.
-!!% The coefficients scale surface-averaged Teff and Luminosity as a function
-!!% of the orientation of the observer w.r.t. the rotation axis of the star
-!!% and the ratio of the surface angular velocity to the Keplerian angular
-!!% velocity. The orientation angle is denoted "inclination" and the angular
-!!% velocity is denoted "omega". Permissible ranges are
-!!%
-!!%         0 (no rotation) <= omega <= 1 (critical rotation)
-!!%         0 (equator) <= inclination in radians <= pi/2 (pole)
-!!%
-!!%
-!!% The coefficients are obtained via 2D interpolation using the interp_2d
-!!% module in tables. The tables were computed using the code at
-!!%
-!!% https://github.com/aarondotter/GDit
-!!%
-!!% where the reader can also find documentation on how the calculations are
-!!% performed. The table included in mesa/data/star_data consists of a square
-!!% array with 21 values each of omega and inclination, equally spaced between
-!!% the limits quoted above. The interpolated results fall with roughly 0.001
-!!% of exact values calculated using the code referenced above over the full
-!!% range.
+! This module contains code to interpolate gravity darkening coefficients.
+! The coefficients scale surface-averaged Teff and Luminosity as a function
+! of the orientation of the observer w.r.t. the rotation axis of the star
+! and the ratio of the surface angular velocity to the Keplerian angular
+! velocity. The orientation angle is denoted "inclination" and the angular
+! velocity is denoted "omega". Permissible ranges are
+!
+!         0 (no rotation) <= omega <= 1 (critical rotation)
+!         0 (equator) <= inclination in radians <= pi/2 (pole)
+!
+!
+! The coefficients are obtained via 2D interpolation using the interp_2d
+! module in tables. The tables were computed using the code at
+!
+! https://github.com/aarondotter/GDit
+!
+! where the reader can also find documentation on how the calculations are
+! performed. The table included in mesa/data/star_data consists of a square
+! array with 21 values each of omega and inclination, equally spaced between
+! the limits quoted above. The interpolated results fall with roughly 0.001
+! of exact values calculated using the code referenced above over the full
+! range.
 
 module gravity_darkening
 

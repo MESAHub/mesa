@@ -31,7 +31,7 @@ The picture shows the intense authors hard at work making final edits.
 
 A late-night session working on |MESA I| around Bill's
 dining room table with a projector, a makeshift screen, and ample red
-wine (left to right, Frank Timmes, Aaron Dotter, Falk Herwig, Lars
+wine (left to right: Frank Timmes, Aaron Dotter, Falk Herwig, Lars
 Bildsten, and Bill Paxton). Photo taken by Bill's patient wife, Kathlyn,
 who deserves a great deal of credit for the existence of MESA.
 
@@ -79,7 +79,7 @@ Errors like::
 typically arise because the build environment doesn't have enough RAM.
 We've found that this usually happens because you're building MESA on
 a virtual machine (VM) that hasn't been allocated enough virtual
-memory, in which case the solution is to allocate more memory to
+memory. In this case, the solution is to allocate more memory to
 the VM.  If you aren't using a VM, then MESA might somehow not be able
 to access the amount of RAM that it needs.
 
@@ -635,10 +635,11 @@ Installing Older Versions of MESA
 Older versions of MESA may fail to compile with more recent versions of
 the MESA SDK. There are a few possible solutions:
 
-(1) Use the contemporary version of the SDK. There is a `list of old
-    MESA
-    SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
-    that indicates which version of MESA was current when each was
+(1) Use the contemporary version of the SDK.
+    See the `MESA SDK Download Page <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Download>`__
+    or the `list of old
+    MESA SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
+    for a table of which version of MESA was current when each version of the MESA SDK
     released.
 
 (2) Work in a Docker container configured to set up an environment
@@ -831,7 +832,7 @@ How can I read and/or plot MESA data using language X?
 
 Users have posted numerous useful scripts in a variety of languages on
 `the MESA
-marketplace <http://cococubed.com/mesa_market/add-ons.html>`__.
+marketplace <https://mesastar.org/marketplace/add-ons/>`__.
 
 How can I include the effects of chemical enhancements on the opacities?
 ------------------------------------------------------------------------

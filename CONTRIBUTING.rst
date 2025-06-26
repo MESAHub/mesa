@@ -17,7 +17,7 @@ model should not be treated as a bug.
 If you are encountering problems with your MESA models, user support
 occurs through the mesa-users@lists.mesastar.org mailing list.  Send a
 message describing the problem and including enough detail (e.g., MESA
-version, inlists, saved models) such that anyone can reproduce it.
+version, inlists, saved models) so that anyone can reproduce it.
 Other users and the MESA developers can help you understand if your
 problem represents a bug.
 

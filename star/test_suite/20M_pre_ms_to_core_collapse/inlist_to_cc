@@ -109,7 +109,7 @@ ignore_too_large_correction = .true. ! for conv_vel's
 &pgstar
 !Grid1_file_flag = .true.
 
-!pause = .true.
+!pause_flag = .true.
 
 Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0 ! -101d0

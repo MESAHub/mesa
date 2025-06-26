@@ -295,7 +295,7 @@
 ! --- basic integration step
    1  continue
       if (nstep > nmax) GOTO 78
-      if (0.1d0*abs(h) <= abs(x)*uround)GOTO 77
+      if (0.1d0*abs(h) <= abs(x)*uround) GOTO 77
       if ((x+1.01d0*h-xend)*posneg > 0.d0) then
          h=xend-x
          last=.true.

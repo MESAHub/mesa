@@ -100,10 +100,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-    !pause = .true.
+    !pause_flag = .true.
     !pause_interval = 100
     pgstar_interval = 5 ! 10
 

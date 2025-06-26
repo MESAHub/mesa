@@ -27,7 +27,7 @@ announces <https://lists.mesastar.org/pipermail/mesa-users/2017-August/007856.ht
 
 `Carl Fields
 announces <https://lists.mesastar.org/pipermail/mesa-users/2017-September/007864.html>`__
-updates to `MESA-Web <http://mesa-web.asu.edu/>`__:
+updates to `MESA-Web <http://user.astro.wisc.edu/~townsend/static.php?ref=mesa-web-submit>`__:
 
    1. *Users can now choose to upload a custom reaction rate.*
    2. *More mixing parameters available for calculations.*

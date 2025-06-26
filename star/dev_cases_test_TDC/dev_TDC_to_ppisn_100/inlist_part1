@@ -151,7 +151,7 @@
 &pgstar
 
 
-!pause = .true.
+!pause_flag = .true.
 
 !Grid1_file_flag = .true.
 Grid1_file_dir = 'png'

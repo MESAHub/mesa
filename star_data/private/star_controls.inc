@@ -836,7 +836,7 @@
             L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
-         logical :: use_drag_energy
+         logical :: use_drag_energy, report_max_infall_inside_fe_core
          real(dp) :: &
             drag_coefficient, &
             min_q_for_drag, &
@@ -862,8 +862,7 @@
          real(dp) :: max_abs_rel_change_surf_lnS
 
          logical :: op_split_burn
-         real(dp) :: op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
-            op_split_burn_min_T_for_variable_T_solver
+         real(dp) :: op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal
 
          logical :: include_L_in_correction_limits, &
             include_v_in_correction_limits, include_u_in_correction_limits
@@ -1034,7 +1033,6 @@
             mdot_revise_factor, implicit_mdot_boost
          real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
-         real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
          real(dp) :: D_mix_rotation_max_logT_full_on, &
             D_mix_rotation_min_logT_full_off, &

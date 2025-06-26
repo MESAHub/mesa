@@ -7,7 +7,7 @@ have windows with plots that change at each step. PGstar is built on
 PGPLOT for creating plots using Xwindows for on-screen plots and PNG for
 frames of movies to animate those plots.
 
-Devote lots of time watching models evolve.  It's a fun way to learn!
+Devote lots of time watching models evolve. It's a fun way to learn!
 
 If you're using the MESA SDK, you should have everything you need to use
 PGSTAR. Otherwise, you need to have installed PGPLOT, Xwindows, and a

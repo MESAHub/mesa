@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2012  The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -41,8 +38,7 @@
 
 !  bcspeval -- eval bicubic spline function and/or derivatives
 
-      subroutine bcspeval_db(xget,yget,iselect,fval,
-     &                    x,nx,y,ny,ilinx,iliny,f,inf3,ier)
+      subroutine bcspeval_db(xget,yget,iselect,fval,x,nx,y,ny,ilinx,iliny,f,inf3,ier)
 
       implicit none
       integer iselect(6)
@@ -197,14 +193,10 @@
          if((xget < x(1)-zxtol).or.(xget > x(nx)+zxtol)) then
             ier=1
 !            write(6,1001) xget,x(1),x(nx)
-! 1001       format(' ?bcspeval:  xget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1001       format(' ?bcspeval:  xget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!            if((xget < x(1)-0.5*zxtol).or.
-!     &         (xget > x(nx)+0.5*zxtol))
-!     &      write(6,1011) xget,x(1),x(nx)
-! 1011       format(' %bcspeval:  xget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!            if((xget < x(1)-0.5*zxtol).or. (xget > x(nx)+0.5*zxtol)) write(6,1011) xget,x(1),x(nx)
+! 1011       format(' %bcspeval:  xget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(xget < x(1)) then
                zxget=x(1)
             else
@@ -217,13 +209,10 @@
          if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
-! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1002       format(' ?bcspeval:  yget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol))
-!     &      write(6,1012) yget,y(1),y(ny)
-! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!         if((yget < y(1)-0.5*zytol).or.(yget > y(ny)+0.5*zytol)) write(6,1012) yget,y(1),y(ny)
+! 1012       format(' %bcspeval:  yget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -1245,8 +1234,7 @@
       end subroutine cspline_db
 
 
-      subroutine evbicub_db(xget,yget,x,nx,y,ny,ilinx,iliny,
-     &                   f1,inf2,ict,fval,ier)
+      subroutine evbicub_db(xget,yget,x,nx,y,ny,ilinx,iliny,f1,inf2,ict,fval,ier)
 
 !  use mkbicub to set up spline coefficients!
 
@@ -1954,8 +1942,7 @@ C---------------
       end subroutine fvbicub_db
 
 
-      subroutine herm2ev_db(xget,yget,x,nx,y,ny,ilinx,iliny,
-     &                   f,inf2,ict,fval,ier)
+      subroutine herm2ev_db(xget,yget,x,nx,y,ny,ilinx,iliny,f,inf2,ict,fval,ier)
 
 !  evaluate a 2d cubic Hermite interpolant on a rectilinear
 !  grid -- this is C1 in both directions.
@@ -2107,12 +2094,10 @@ C---------------
          if((xget < x(1)-zxtol).or.(xget > x(nx)+zxtol)) then
             ier=1
             !write(6,1001) xget,x(1),x(nx)
-! 1001       format(' ?herm2ev:  xget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1001       format(' ?herm2ev:  xget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
             !if((xget < x(1)-0.5*zxtol).or.(xget > x(nx)+0.5*zxtol)) write(6,1011) xget,x(1),x(nx)
-! 1011       format(' %herm2ev:  xget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+! 1011       format(' %herm2ev:  xget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(xget < x(1)) then
                zxget=x(1)
             else
@@ -2125,14 +2110,10 @@ C---------------
          if((yget < y(1)-zytol).or.(yget > y(ny)+zytol)) then
             ier=1
 !            write(6,1002) yget,y(1),y(ny)
-! 1002       format(' ?herm2ev:  yget=',1pe11.4,' out of range ',
-!     &         1pe11.4,' to ',1pe11.4)
+! 1002       format(' ?herm2ev:  yget=',1pe11.4,' out of range ', 1pe11.4,' to ',1pe11.4)
          else
-!            if((yget < y(1)-0.5*zytol).or.
-!     &         (yget > y(ny)+0.5*zytol))
-!     &      write(6,1012) yget,y(1),y(ny)
-! 1012       format(' %herm2ev:  yget=',1pe15.8,' beyond range ',
-!     &         1pe15.8,' to ',1pe15.8,' (fixup applied)')
+!            if((yget < y(1)-0.5*zytol).or. (yget > y(ny)+0.5*zytol)) write(6,1012) yget,y(1),y(ny)
+! 1012       format(' %herm2ev:  yget=',1pe15.8,' beyond range ', 1pe15.8,' to ',1pe15.8,' (fixup applied)')
             if(yget < y(1)) then
                zyget=y(1)
             else
@@ -2817,8 +2798,7 @@ C---------------
          fwk(1,1:nx) = f(1,1:nx,iy)
          if((ibcxmin == 1).or.(ibcxmin == 2)) zbcmin=bcxmin(iy)
          if((ibcxmax == 1).or.(ibcxmax == 2)) zbcmax=bcxmax(iy)
-         call mkspline_db(x,nx,fwk,
-     &      ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
+         call mkspline_db(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
          if(ier /= 0) then
             deallocate(fwk)
             return
@@ -2839,8 +2819,7 @@ C---------------
             if((ibcymin == 1).or.(ibcymin == 2)) ibcmin=0
             if((ibcymax == 1).or.(ibcymax == 2)) ibcmax=0
          end if
-         call mkspline_db(y,ny,fwk,
-     &      ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
+         call mkspline_db(y,ny,fwk,ibcmin,zbcmin,ibcmax,zbcmax,iliny,ier)
          if(ier /= 0) then
             deallocate(fwk)
             return
@@ -2913,8 +2892,7 @@ C---------------
          zbcmax=0
          do iy=1,ny
             fwk(1,1:nx)=fcorr(1,1:nx,iy)
-            call mkspline_db(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,
-     &         ilinx,ier)
+            call mkspline_db(x,nx,fwk,ibcxmin,zbcmin,ibcxmax,zbcmax,ilinx,ier)
             if(ier /= 0) then
                deallocate(fwk,fcorr)
                return
@@ -3067,10 +3045,9 @@ C---------------
 !  copy the output -- careful of end point.
 
          do i=1,nx-1
-            fspl(2,i)=2.d0*fspl4(3,i)
+            fspl(2,i) = 2.d0*fspl4(3,i)
          end do
-         fspl(2,nx)=2.d0*fspl4(3,nx-1) +
-     &        (x(nx)-x(nx-1))*6.d0*fspl4(4,nx-1)
+         fspl(2,nx) = 2.d0*fspl4(3,nx-1) + (x(nx)-x(nx-1))*6.d0*fspl4(4,nx-1)
       end if
 
       deallocate(fspl4,wk)
@@ -3200,18 +3177,12 @@ C---------------
 !***********************************************************************
       implicit none
 !Declaration of input variables
-      integer        k_bc1,                   k_bcn,
-     &               n
-      real(dp)           x(*),                    wk(*),
-     &               f(4,*)
+      integer :: k_bc1, k_bcn, n
+      real(dp) :: x(*), wk(*), f(4,*)
 !Declaration in local variables
-      integer        i,                       ib,
-     &               imax,                    imin
-      real(dp)           a1,                      an,
-     &               b1,                      bn,
-     &               q,                       t,
-     &               hn
-      real(dp)           elem21,                  elemnn1    ! (dmc)
+      integer :: i, ib, imax, imin
+      real(dp) :: a1, an, b1, bn, q, t, hn
+      real(dp) :: elem21, elemnn1    ! (dmc)
 
 !Set default range
       imin=1
@@ -3228,8 +3199,7 @@ C---------------
       else if(k_bc1 == 5) then
         a1=(f(1,2)-f(1,1))/(x(2)-x(1))
       else if(k_bc1 == 6) then
-        b1=2.d0*((f(1,3)-f(1,2))/(x(3)-x(2))
-     &         -(f(1,2)-f(1,1))/(x(2)-x(1)))/(x(3)-x(1))
+        b1=2.d0*((f(1,3)-f(1,2))/(x(3)-x(2)) -(f(1,2)-f(1,1))/(x(2)-x(1)))/(x(3)-x(1))
       end if
       if (k_bcn == 1) then
         an=f(2,n)
@@ -3238,8 +3208,7 @@ C---------------
       else if(k_bcn == 5) then
         an=(f(1,n)-f(1,n-1))/(x(n)-x(n-1))
       else if(k_bcn == 6) then
-        bn=2.d0*((f(1,n)-f(1,n-1))/(x(n)-x(n-1))
-     &         -(f(1,n-1)-f(1,n-2))/(x(n-1)-x(n-2)))/(x(n)-x(n-2))
+        bn=2.d0*((f(1,n)-f(1,n-1))/(x(n)-x(n-1)) -(f(1,n-1)-f(1,n-2))/(x(n-1)-x(n-2)))/(x(n)-x(n-2))
       end if
 !Clear f(2:4,n)
       f(2,n)=0.d0
@@ -3400,8 +3369,7 @@ C---------------
 !f(3,i) is now the sigma(i) of the text and f(4,i) is the step size
 !Compute polynomial coefficients
         do i=1,n-1
-          f(2,i)=
-     &        (f(1,i+1)-f(1,i))/f(4,i)-f(4,i)*(f(3,i+1)+2.d0*f(3,i))
+          f(2,i)= (f(1,i+1)-f(1,i))/f(4,i)-f(4,i)*(f(3,i+1)+2.d0*f(3,i))
           f(4,i)=(f(3,i+1)-f(3,i))/f(4,i)
           f(3,i)=6.d0*f(3,i)
           f(4,i)=6.d0*f(4,i)

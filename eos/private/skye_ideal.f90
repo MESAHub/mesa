@@ -201,7 +201,7 @@ module skye_ideal
       din = din_in
 
 
-!..density derivs
+!..density derivatives
         dindd   = ye
         dinda   = -din*ytot1
         dindz   = den*ytot1

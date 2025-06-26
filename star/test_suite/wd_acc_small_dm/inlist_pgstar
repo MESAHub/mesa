@@ -102,6 +102,4 @@
   Grid1_file_width = -1 ! negative means use same value as for window
   Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
-
-
 / ! end of pgstar namelist

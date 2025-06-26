@@ -1,10 +1,12 @@
 module eos_support
+
    use eos_def
    use eos_lib
    use const_def
    use chem_def
    use math_lib
    use utils_lib, only: is_bad_num
+
    implicit none
 
    logical, parameter :: use_shared_data_dir = .true.   ! MUST BE .true. FOR RELEASE

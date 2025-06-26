@@ -1,6 +1,6 @@
-! binary evolution pulsator, a model from: http://adsabs.harvard.edu/abs/2013MNRAS.428.3034S; 
+! binary evolution pulsator, a model from: http://adsabs.harvard.edu/abs/2013MNRAS.428.3034S;
 ! M=0.26Ms,
-! L=33Ls, 
+! L=33Ls,
 ! Teff=6968K,
 ! X=0.70, Z=0.01.
 ! This model needs ~1000 cycles to converge.
@@ -27,12 +27,12 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
       !pgstar_flag = .true.
-   
+
 / ! end of star_job namelist
 
 &eos
@@ -56,7 +56,7 @@
 ! RSP controls
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 0.620728d0 ! expected period (in days) 
+   x_ctrl(1) = 0.620728d0 ! expected period (in days)
 
    RSP_mass = 0.26d0
    RSP_Teff = 6968d0
@@ -65,11 +65,11 @@
    RSP_Z = 0.01d0
 
    RSP_max_num_periods = 3000
-   
+
 ! solver
-   
+
 ! output controls
-   
+
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
@@ -84,8 +84,8 @@
    ! i suggest the following method. interrupt the run soon after
    ! it makes a photo.  remove or delete LOGS/history.data to force
    ! creation of a new one when restart.  edit the inlist to set
-   ! history_interval to 1 to get maximum time resolution.  
-   ! restart the run and let it go for as many periods as desired.   
+   ! history_interval to 1 to get maximum time resolution.
+   ! restart the run and let it go for as many periods as desired.
 
       photo_interval = 1000
       profile_interval = 4000
@@ -95,18 +95,17 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-      !pause = .true.
+      !pause_flag = .true.
 
       pgstar_interval = 6
-         
+
       Grid2_win_flag = .true.
 
       Grid2_title = '0.26 M\d\(2281)\u Z=0.01 BEP'
 
-      
+
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
@@ -115,7 +114,7 @@
       Grid2_file_dir = 'png'
       Grid2_file_prefix = 'grid'
       Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-      
+
       !Profile_Panels1_show_grid = .true.
 
       Profile_Panels1_xaxis_name = 'logtau'

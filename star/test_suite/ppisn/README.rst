@@ -18,4 +18,3 @@ The initial mass of the helium star is set in ``inlist_extra``
 In this case we use a :math:`72 M_\odot`
 
 Last-Updated: 2019-11-12 (mesa r12413) by Pablo Marchant
-

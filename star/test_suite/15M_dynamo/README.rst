@@ -4,12 +4,12 @@
 15M_dynamo
 **********
 
-The test checks the functionality of rotation in a 15 Msun, Z=0.02 metallicity model.
+The test checks the functionality of rotation in a 15 |Msun|, Z=0.02 metallicity model.
 
 
 This test case has three parts.
 
-* Part 1 (``inlist_zams``) creates a 15 Msun pre-main-sequence model and evolves it to the main sequence.
+* Part 1 (``inlist_zams``) creates a 15 |Msun| pre-main-sequence model and evolves it to the main sequence.
 
 * Part 2 (``inlist_to_he_burn``) turns on rotation nnd continues the evolution for 500 steps (for test case purposes), ending approximately at core hydrogen depletion.
 
@@ -61,29 +61,27 @@ pgstar commands used for the plots above:
  &pgstar
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-   !file_device = 'png'            ! png
 
-   file_device = 'vcps'          ! postscript
+   !file_device = 'png'   ! png
+   file_device = 'vcps'   ! postscript
 
-    pgstar_interval = 10
-    file_digits = 8
+   pgstar_interval = 10
+   file_digits = 8
 
-    Dynamo_legend_txt_scale_factor = 0.7
-    Mixing_legend_txt_scale_factor = 0.55
-    Profile_Panels4_txt_scale = 0.8
+   Dynamo_legend_txt_scale_factor = 0.7
+   Mixing_legend_txt_scale_factor = 0.55
+   Profile_Panels4_txt_scale = 0.8
 
-    Profile_Panels4_win_flag = .true.
-    Profile_Panels4_win_width = 10
+   Profile_Panels4_win_flag = .true.
+   Profile_Panels4_win_width = 10
 
-    Profile_Panels4_file_flag = .true.
-    Profile_Panels4_file_dir = 'png'
-    Profile_Panels4_file_prefix = 'profile_Panels4_'
-    Profile_Panels4_file_interval = 10
-    Profile_Panels4_file_width = 10
+   Profile_Panels4_file_flag = .true.
+   Profile_Panels4_file_dir = 'png'
+   Profile_Panels4_file_prefix = 'profile_Panels4_'
+   Profile_Panels4_file_interval = 10
+   Profile_Panels4_file_width = 10
 
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
-

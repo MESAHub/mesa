@@ -90,11 +90,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-         !pause = .true.
-            ! if true, the code waits for user to enter a RETURN on the command line
-
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
 
 / ! end of pgstar namelist

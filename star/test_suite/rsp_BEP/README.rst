@@ -4,12 +4,12 @@
 rsp_BEP
 *******
 
-This test case checks the non-linear pulsation evolution of a 0.26 Msun, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar
+This test case checks the non-linear pulsation evolution of a 0.26 |Msun|, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar
 the one shown in |Smolec2013|.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_rsp_BEP``) creates the initial 0.26 Msun, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.620728 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
+* Part 1 (``inlist_rsp_BEP``) creates the initial 0.26 |Msun|, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.620728 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
 
 .. code-block:: console
 

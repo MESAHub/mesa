@@ -34,7 +34,7 @@ module other_rate
    ! Thus we call this multiple times (each with a different temperature) for each reaction.
 
    ! Note this will effect the cached rate written to data/rates_data/cache
-   ! Becuase of this it will only get called if the rate does NOT already exist in your rates_cache
+   ! Because of this it will only get called if the rate does NOT already exist in your rates_cache
    ! I recommend you use the rates_cache_dir option to redirect your rates_cache when using this hook
    ! So you dont break your whole mesa install.
 

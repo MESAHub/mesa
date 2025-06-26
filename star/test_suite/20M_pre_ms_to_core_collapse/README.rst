@@ -39,7 +39,4 @@ This test case has seven parts.
 * Part 7 (``inlist_to_cc``) evolves until core collapse.
 
 
-
-
 Last-Updated: 18Dec2023 by EbF
-

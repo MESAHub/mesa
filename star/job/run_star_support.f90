@@ -1581,7 +1581,7 @@
          ! Dont error if we are changing net
          if ((s% job% change_initial_net .or. s% job% change_net) .and. &
             trim(s% job% new_net_name)/=trim(s% net_name)) then
-               !write(*,*) "Not changing special rates untill net change"
+               !write(*,*) "Not changing special rates until net change"
                return
          end if
 

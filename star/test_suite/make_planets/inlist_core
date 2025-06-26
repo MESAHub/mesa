@@ -11,7 +11,7 @@
       save_model_when_terminate = .true.
       save_model_filename = "planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod"
       required_termination_code_string = 'max_age'
-      
+
       !set_initial_age = .true.
       !initial_age = 0.0 ! in years
       !set_initial_dt = .true.
@@ -27,7 +27,7 @@
       core_avg_eps = 0.d0 ! ergs/g/sec
       dlg_core_mass_per_step = 0.05d0     ! decrease if convergence problems
       relax_core_years_for_dt = 0.1d0     ! increase(?) if convergence problems
-      
+
       !pgstar_flag = .true.
 
 / !end of star_job
@@ -64,7 +64,7 @@
 	! knobs
 	!use_lnE_for_eps_grav = .false.
 	T_mix_limit = 0
-   
+
    use_gold2_tolerances = .false.
    use_gold_tolerances = .false.
 
@@ -80,11 +80,10 @@
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+   ! top level controls
+
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
 
 / ! end of pgstar namelist

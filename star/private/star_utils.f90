@@ -82,7 +82,7 @@
       public :: calc_ptrb_ad_tw
       public :: set_energy_eqn_scal
       public :: get_scale_height_face_val
-      public :: weighed_smoothing
+      public :: weighted_smoothing
       public :: get_kap_face
       public :: get_rho_face
       public :: get_chirho_face
@@ -937,8 +937,8 @@
          ! we integrate at cell edges.
          do k = 2, s% nz
          N2 = s% brunt_N2(k) ! brunt_N2 at cell_face
-         r  = s% r(k) ! r evalulated at cell_face
-         dr = s% rmid(k-1) - s% rmid(k) ! dr evalulated at cell face.
+         r  = s% r(k) ! r evaluated at cell_face
+         dr = s% rmid(k-1) - s% rmid(k) ! dr evaluated at cell face.
          if (N2 > 0d0) integral = integral + sqrt(N2)*dr/r
          end do
 
@@ -2760,9 +2760,9 @@
       end function omega_crit
 
 
-      subroutine weighed_smoothing(dd, n, ns, preserve_sign, ddold)
+      subroutine weighted_smoothing(dd, n, ns, preserve_sign, ddold)
       !     based on routine written by S.-C. Yoon, 18 Sept. 2002
-      !     for smoothing  any variable (dd) with size n over 2*ns+1 cells.
+      !     for smoothing any variable (dd) with size n over 2*ns+1 cells.
          real(dp), intent(inout) :: dd(:)  ! (n)
          integer, intent(in) :: n, ns
          logical, intent(in) :: preserve_sign
@@ -2813,12 +2813,12 @@
             end if
          end do
 
-      end subroutine weighed_smoothing
+      end subroutine weighted_smoothing
 
 
-      subroutine threshold_smoothing (dd, dd_thresh, n, ns, preserve_sign, ddold)
+      subroutine threshold_smoothing(dd, dd_thresh, n, ns, preserve_sign, ddold)
 
-        ! Same as weighed_smoothing, but only smooth contiguous regions where |dd| >= dd_thresh
+        ! Same as weighted_smoothing, but only smooth contiguous regions where |dd| >= dd_thresh
 
         real(dp), intent(inout) :: dd(:)    ! (n)
         real(dp), intent(in)    :: dd_thresh
@@ -2845,7 +2845,7 @@
 
               if (ABS(dd(i)) < dd_thresh) then
                  i_b = i-1
-                 if (i_b > i_a) call weighed_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
+                 if (i_b > i_a) call weighted_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
                  in_region = .FALSE.
               end if
 
@@ -2864,7 +2864,7 @@
         if (in_region) then
 
            i_b = n
-           if (i_b > i_a) call weighed_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
+           if (i_b > i_a) call weighted_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
 
         end if
 

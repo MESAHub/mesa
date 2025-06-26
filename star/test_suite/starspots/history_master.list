@@ -86,7 +86,7 @@ dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G
 ! EBs project
 !effective_T
 envelope_mass     ! defined as envelope mass = star_mass - he_core_mass
-! envelope properites -- see !## envelope section
+! envelope properties -- see !## envelope section
 e_thermal ! sum over all zones of Cp*T*dm
 !fe_core_mass
 fe_core_mass

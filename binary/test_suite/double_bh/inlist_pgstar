@@ -131,7 +131,7 @@
 
    Profile_Panels1_yaxis_name(4) = 'fp_rot'
    Profile_Panels1_other_yaxis_name(4) = 'ft_rot' ! 'mass'
-   
+
    show_TRho_Profile_kap_regions = .false.
    show_TRho_Profile_gamma1_4_3rd = .true.
    TRho_Profile_xmin = -11

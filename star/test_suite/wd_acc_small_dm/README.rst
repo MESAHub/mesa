@@ -27,4 +27,3 @@ initial surface composition.
 .. image:: ../../../star/test_suite/wd_acc_small_dm/docs/grid1000090.png
 
 Last-Updated: 2020-07-22 (mesa r14248) by Josiah Schwab
-

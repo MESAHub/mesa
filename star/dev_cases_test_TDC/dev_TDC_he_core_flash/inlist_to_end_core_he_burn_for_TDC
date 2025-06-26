@@ -208,7 +208,7 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
    !pause_interval = 10
    pgstar_interval = 1
    

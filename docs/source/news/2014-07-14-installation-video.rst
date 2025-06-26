@@ -12,7 +12,7 @@ As he announced on mesa-users:
    I recorded the process of installing new version of MESA with some
    extended commentary. The vid is rather long but together with my
    `updated installation
-   guide <http://cococubed.com/mesa_market/guides.html>`__ it could
+   guide <https://mesastar.org/marketplace/guides/>`__ it could
    be helpful for some people.
 
 You can see the full `announcement

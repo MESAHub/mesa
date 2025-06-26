@@ -115,6 +115,5 @@
     history_interval = 10
     terminal_interval = 10
     write_header_frequency = 10
-         
 
 / ! end of controls namelist
