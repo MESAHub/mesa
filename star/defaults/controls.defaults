@@ -8048,8 +8048,19 @@
       ! min_T_for_fe56ec_fake_factor
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Multiplier on ni56 electron capture rate to take isotopes in hardwired networks
-      ! to more neutron rich isotopes.
+      ! Hardwired small nuclear reaction network in the "approx"
+      ! family treat all electron captures with a compound reaction
+      ! dependent on the heaviest isotope included (see
+      ! $MESA_DIR/data/net_data/nets/). The heaviest isotope
+      ! determines the lowest value of ye possible in the core. The
+      ! rate of the compound weak reaction is non-zero only for
+      ! temperatures larger than min_T_for_fe56ec_fake_factor and is
+      ! calculated multiplying the rate of electron captures on ni56
+      ! by fe56ec_fake_factor. This used to be 1d-4 around MESA
+      ! version 7624. Increasing this factor will push the values of
+      ! ye obtained closer to the lowest possible value defined by the
+      ! net, and this can be used to tune the final ye value
+      ! obtainable with a small nuclear reaction network.
 
       ! ::
 
