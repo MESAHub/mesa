@@ -386,13 +386,14 @@
       subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
             dlnPdm_qhse, Ppoint, ierr)
          use hydro_momentum, only: expected_HSE_grav_term
+         use star_utils, only: get_area_info_opt_time_center
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: dlnPdm_qhse, Ppoint
          integer, intent(out) :: ierr
 
          real(dp) :: alfa
-         type(auto_diff_real_star_order1) :: grav, area, P00, Pm1
+         type(auto_diff_real_star_order1) :: grav, area, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1
          include 'formats'
 
          ierr = 0
@@ -402,17 +403,39 @@
 
          ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
 
-         call expected_HSE_grav_term(s, k, grav, area, ierr)
+!         if (s% make_mlt_hydrodynamic .and. (s%v_flag .or. s% u_flag)) then
+!            call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
+!            grav = wrap_geff_face(s,k)
+!         else
+            call expected_HSE_grav_term(s, k, grav, area, ierr)
+!         end if
+
          if (ierr /= 0) return
 
-         P00 = wrap_Peos_00(s,k)
+        ! mlt_pturb in thermodynamic gradients does not currently support time centering
+         if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+            .and. s% mlt_Pturb_factor > 0d0 .and. k > 1 .and. .not. s% using_velocity_time_centering) then
+            mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+            mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
+         else if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+            .and. s% mlt_Pturb_factor > 0d0 .and. k == 1 .and. .not. s% using_velocity_time_centering) then
+            mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+            mlt_Ptrbm1 = 0d0
+         else
+            mlt_Ptrb00 = 0d0
+            mlt_Ptrbm1 = 0d0
+         end if
+
+         P00 = wrap_Peos_00(s,k) + mlt_Ptrb00 ! probably don't want to add 0d0, even if safe.
+
+         ! mlt Pturb doesn't support time centering yet.
          if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
 
          if (k == 1) then
             Pm1 = 0d0
-            Ppoint = P00
+            Ppoint = P00 + mlt_Ptrb00
          else
-            Pm1 = wrap_Peos_m1(s,k)
+            Pm1 = wrap_Peos_m1(s,k) + mlt_Ptrbm1
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if

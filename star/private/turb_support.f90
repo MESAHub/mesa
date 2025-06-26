@@ -121,7 +121,7 @@ contains
 
       real(dp) :: cgrav, m, XH1
       integer :: iso
-      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
+      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, rho_start
       include 'formats'
       ierr = 0
 
@@ -131,11 +131,12 @@ contains
       m = s% m_grav(k)
       L = wrap_L_00(s,k)
       T = get_T_face(s,k)
-      P = get_Peos_face(s,k)
+      P = get_Peos_face(s,k) ! missing Pturb component
       r = wrap_r_00(s,k)
       opacity = get_kap_face(s,k)
-      rho = get_Rho_face(s,k)
-      dV = 1d0/rho - 1d0/s% rho_start(k)
+      rho = get_rho_face(s,k)
+      rho_start = get_rho_start_face(s,k)
+      dV = 1d0/rho - 1d0/rho_start ! both variables are face wrapped.
       chiRho = get_ChiRho_face(s,k)
       chiT = get_ChiT_face(s,k)
       Cp = get_Cp_face(s,k)
@@ -190,7 +191,7 @@ contains
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
-         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq
+         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -221,11 +222,25 @@ contains
          end if
       end if
 
+      ! Wrap Pturb into P
+      if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients) then
+         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+         Ptot = P + mlt_Pturb
+      else
+         Ptot = P
+      end if
+ 
       Pr = crad*pow4(T)/3d0
-      Pg = P - Pr
-      beta = Pg / P
+      Pg = Ptot - Pr
+      beta = Pg / Ptot
       Lambda = mixing_length_alpha*scale_height
-      grav = cgrav*m/pow2(r)
+
+      if (k == 0) then
+         grav = cgrav*m/pow2(r)
+      else
+         grav = wrap_geff_face(s,k) !actual geff = g - dv/dt
+      end if
+
       if (s% use_Ledoux_criterion) then
          gradL = grada + gradL_composition_term  ! Ledoux temperature gradient
       else
@@ -280,8 +295,8 @@ contains
 
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, ierr)
+            mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, grav, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -298,8 +313,8 @@ contains
             if (Gamma_factor > 1d0) then
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-                  mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, ierr)
+                  mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, grav, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
@@ -311,7 +326,7 @@ contains
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
          call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
-                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                        chiT, chiRho, Cp, grav, Lambda, rho, Ptot, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
 
@@ -328,7 +343,7 @@ contains
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
                call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
-                              chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                              chiT, chiRho, Cp, grav, Lambda, rho, Ptot, T, opacity, &
                               gradr_scaled, grada, gradL, &
                               Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
                if (ierr /= 0) then
@@ -352,7 +367,7 @@ contains
             end if
          else if (gradr > grada) then
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
-            call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
+            call set_semiconvection(L, Lambda, m, T, Ptot, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                     gradL_composition_term, &
                                     gradT, Y_face, conv_vel, D, mixing_type, ierr)
@@ -373,6 +388,33 @@ contains
          D = 0d0
          Gamma = 0d0
       end if
+
+      ! Prevent convection near center of model for TDC pulsations
+      ! We don't check for the using_TDC flag, because mlt is sometimes called when using TDC
+      if ( s% TDC_num_innermost_cells_forced_nonturbulent > 0 .and. &
+         k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+         if (report) write(*,2) 'make TDC center cells non-turbulent', k
+         mixing_type = no_mixing
+         gradT = gradr
+         Y_face = gradT - gradL
+         conv_vel = 0d0
+         D = 0d0
+         Gamma = 0d0
+      end if
+
+      !
+      ! disable negative sources? Makes TDC the same as florida budapest.
+      !Lconv_ratio = (1d0 - gradT/gradr) ! Lconv/Ltotal = 1 - gradT/gradr
+      !if ((Lconv_ratio%val < 0d0 .or. is_bad(Lconv_ratio%val))) then
+      !   if (report) write(*,2) 'Lconv_ratio < 0', k, Lconv_ratio%val
+      !   mixing_type = no_mixing
+      !   gradT = gradr
+      !   Y_face = gradT - gradL
+      !   conv_vel = 0d0
+      !   D = 0d0
+      !   Gamma = 0d0
+      !end if
+
 
       contains
 

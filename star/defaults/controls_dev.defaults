@@ -200,6 +200,49 @@
     alpha_TDC_DAMPM = 0.25d0 
     TDC_use_density_form_for_eddy_viscosity = .false.
 
+
+
+      ! TDC_num_innermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent cells 
+      ! to be nonturbulent, and sets gradT = gradr in these cells.
+      ! Useful for pulsation models in TDC.
+
+      ! ::  
+
+	TDC_num_innermost_cells_forced_nonturbulent = 0
+
+
+      ! include_mlt_Pturb_in_thermodynamic_gradients
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If mlt_Pturb_factor > 0, includes the effect of turbulent pressure Pturb 
+      ! on thermodynamic gradients gradr, grada, and hence gradT. The correction
+      ! is approximated as correction = Prad + Pgas / Ptotal, where Ptotal = Prad + Pgas + Pturb.
+      ! Not supported by other_alpha_mlt or starspots
+      
+      ! ::  
+
+	include_mlt_Pturb_in_thermodynamic_gradients = .false.
+
+
+
+      ! make_mlt_hydrodynamic
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+
+      ! If make_mlt_hydrodynamic = .true., adopt geff = g - dv/dt from newton solver.
+      ! gradr and scale_height are modified by this flag to hydro form.
+      ! If .false. default to QHSE form, where g = GM/r^2
+      ! rotation, semiconvection, and use_mass_corrections ignore this flag, see star_utils.
+      ! not supported by RSP or RSP2.
+
+      ! ::  
+
+    make_mlt_hydrodynamic = .false.
+
+
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

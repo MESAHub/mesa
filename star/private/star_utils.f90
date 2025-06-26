@@ -278,7 +278,7 @@
          do k=1,nz
             ! We need to call set_m_grav_and_grav during model loading before we have set all vars
             call get_r_and_lnR_from_xh(s, k, r, lnR)
-            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(r*r)
+            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(r*r) ! needs replaced with new wrapper for geff for hydro.
          end do
       end subroutine set_m_grav_and_grav
 
@@ -1547,7 +1547,7 @@
       end subroutine store_partials
 
 
-      subroutine set_scale_height(s)
+      subroutine set_scale_height(s) ! do i need to alter this to use geff, it doesn't look like it's used in mlt...
          type (star_info), pointer :: s
          real(dp) :: Hp, alt_Hp, alfa, beta, rho_face, Peos_face
          integer :: k
@@ -3634,6 +3634,18 @@
          rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
       end function get_rho_face_val
 
+      function get_rho_start_face(s,k) result(rho_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: rho_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            rho_face = wrap_d_00_start(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*wrap_d_00_start(s,k) + beta*wrap_d_m1_start(s,k)
+      end function get_rho_start_face
 
       function get_T_face(s,k) result(T_face)
          type (star_info), pointer :: s
@@ -3730,14 +3742,20 @@
       function get_grada_face(s,k) result(grada_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: grada_face
+         type(auto_diff_real_star_order1) :: grada_face, mlt_Pturb_ad, P
          real(dp) :: alfa, beta
+         P = get_Peos_face(s,k)
          if (k == 1) then
             grada_face = wrap_grad_ad_00(s,k)
             return
          end if
          call get_face_weights(s, k, alfa, beta)
          grada_face = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
+         if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+            .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            grada_face = grada_face*P/(P+mlt_Pturb_ad)
+         end if
       end function get_grada_face
 
 
@@ -3745,13 +3763,20 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: gradr
-         type(auto_diff_real_star_order1) :: P, opacity, L, Pr
+         type(auto_diff_real_star_order1) :: P, opacity, L, Pr, geff, r, mlt_Pturb_ad
          !include 'formats'
          P = get_Peos_face(s,k)
          opacity = get_kap_face(s,k)
          L = wrap_L_00(s,k)
+         r = wrap_r_00(s,k)
          Pr = get_Prad_face(s,k)
-         gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr)
+         geff =  wrap_geff_face(s,k) ! now supports hse and hydro form of g
+         gradr = P*opacity*L/(16d0*pi*clight*geff*pow2(r)*Pr)
+         if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+            .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            gradr = gradr*P/(P+mlt_Pturb_ad)
+         end if
       end function get_gradr_face
 
 
@@ -3763,7 +3788,7 @@
          real(dp) :: G
          include 'formats'
          G = s% cgrav(k)
-         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k))
+         grav = wrap_geff_face(s,k) ! old form is G*s% m_grav(k)/pow2(wrap_r_00(s,k))
          P = get_Peos_face(s,k)
          rho = get_rho_face(s,k)
          scale_height = P/(grav*rho)  ! this assumes HSE
@@ -3781,15 +3806,15 @@
       real(dp) function get_scale_height_face_val(s,k) result(scale_height)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: G, grav, scale_height2, P, rho
-         type(auto_diff_real_star_order1) :: P_face, rho_face
+         real(dp) :: G, scale_height2, P, rho
+         type(auto_diff_real_star_order1) :: P_face, rho_face, grav
          G = s% cgrav(k)
-         grav = G*s% m_grav(k)/pow2(s% r(k))
+         grav = wrap_geff_face(s,k) ! old form is G*s% m_grav(k)/pow2(wrap_r_00(s,k))
          P_face = get_Peos_face(s,k)
          P = P_face%val
          rho_face = get_rho_face(s,k)
          rho = rho_face%val
-         scale_height = P/(grav*rho)  ! this assumes HSE
+         scale_height = P/(grav%val*rho)  ! this assumes HSE, unles make_mlt_hydrodynamic = .true.
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)

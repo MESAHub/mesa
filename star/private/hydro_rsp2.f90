@@ -129,7 +129,7 @@
               ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
               if (s% Hp_face(k) <= 0) then
                  ! this scale height for face is already calculated in TDC
-                 s% Hp_face(k) = s% scale_height(k) !get_scale_height_face_val(s,k)
+                 s% Hp_face(k) = get_scale_height_face_val(s,k) ! because this is called before s% scale_height(k) is updated in mlt_vars.
               end if
            end do
            !$OMP END PARALLEL DO

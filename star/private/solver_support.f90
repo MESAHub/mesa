@@ -1076,7 +1076,7 @@
             if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
             call set_rv_info(s,k)
             ! note: m_grav is held constant during solver iterations
-            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
+            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k)) ! why is this here? 
          end do
 
          if (do_lnR) then

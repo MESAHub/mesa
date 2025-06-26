@@ -1,5 +1,6 @@
 &model
   add_center = .FALSE.
+
 /
 
 &mode
@@ -7,8 +8,9 @@
 /
 
 &osc
-   inner_bound = 'ZERO_R' ! for envelopes
    nonadiabatic = .TRUE.
+   inner_bound = 'ZERO_R'
+
 /
 
 &rot
@@ -20,8 +22,8 @@
 
 &scan
    grid_type = 'LINEAR'
-   freq_min = 0.5!1d-4
-   freq_max = 5.0!10.0
+   freq_min = 0.01
+   freq_max = 10.0
    freq_min_units = 'ACOUSTIC_DELTA'
    freq_max_units = 'ACOUSTIC_DELTA'
    n_freq = 50

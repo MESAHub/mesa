@@ -468,7 +468,8 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, j, nz_old, nz
-         real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1
+         real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1, xm_anchor_core
+         real(dp), parameter :: RSP2_T_core =  1d6  ! Tcore anchor
          real(dp), allocatable, dimension(:) :: &
             xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
          real(dp), pointer :: work1(:)  ! =(nz_old+1, pm_work_size)
@@ -478,34 +479,36 @@
          nz = s% RSP2_nz
          if (nz == nz_old) return  ! assume have already done remesh for RSP2
          if (nz > nz_old) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 cannot increase nz')
-         call setvars(ierr)
+         call setvars2(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in setvars')
          old_L1 = s% L(1)
          old_r1 = s% r(1)
          call set_phot_info(s)  ! sets Teff
-         call get_PT_surf(P_surf, T_surf, ierr)
+         call get_PT_surf2(P_surf, T_surf, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in get_PT_surf')
          allocate(&
             xm_old(nz_old+1), xm_mid_old(nz_old), v_old(nz_old+1), &
             xm(nz+1), xm_mid(nz), v_new(nz+1), work1((nz_old+1)*pm_work_size))
-         call set_xm_old
-         call find_xm_anchor
-         call set_xm_new
-         call interpolate1_face_val(s% i_lnR, log(max(1d0,s% r_center)))
-         call check_new_lnR
-         call interpolate1_face_val(s% i_lum, s% L_center)
-         if (s% i_v /= 0) call interpolate1_face_val(s% i_v, s% v_center)
-         call set_new_lnd
-         call interpolate1_cell_val(s% i_lnT)
+         call set_xm_old2
+         call find_xm_anchor2
+         call find_xm_anchor_core2
+         call set_xm_new2
+         call interpolate1_face_val2(s% i_lnR, log(max(1d0,s% r_center)))
+         call check_new_lnR2
+         call interpolate1_face_val2(s% i_lum, s% L_center)
+         call interpolate_mlt_vc_face_val2()
+         if (s% i_v /= 0) call interpolate1_face_val2(s% i_v, s% v_center)
+         call set_new_lnd2
+         call interpolate1_cell_val2(s% i_lnT)
          !call interpolate1_cell_val(s% i_w)
          do j=1,s% species
-            call interpolate1_xa(j)
+            call interpolate1_xa2(j)
          end do
-         call rescale_xa
-         call revise_lnT_for_QHSE(P_surf, ierr)
+         call rescale_xa2
+         call revise_lnT_for_QHSE2(P_surf, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in revise_lnT_for_QHSE')
          do k=1,nz
-            call set_Hp_face(k)
+            call set_Hp_face2(k)
          end do
          deallocate(work1)
          s% nz = nz
@@ -516,7 +519,7 @@
 
          contains
 
-         subroutine setvars(ierr)
+         subroutine setvars2(ierr)
             use hydro_vars, only: unpack_xh, set_hydro_vars
             integer, intent(out) :: ierr
             logical, parameter :: &
@@ -543,9 +546,9 @@
                skip_kap, skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
                skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in set_hydro_vars')
-         end subroutine setvars
+         end subroutine setvars2
 
-         subroutine get_PT_surf(P_surf, T_surf, ierr)
+         subroutine get_PT_surf2(P_surf, T_surf, ierr)
             use atm_support, only: get_atm_PT
             real(dp), intent(out) :: P_surf, T_surf
             integer, intent(out) :: ierr
@@ -572,9 +575,9 @@
             write(*,1) 'get_PT_surf opacity(1)', s% opacity(1)
             write(*,1)
             !call mesa_error(__FILE__,__LINE__,'get_PT_surf')
-         end subroutine get_PT_surf
+         end subroutine get_PT_surf2
 
-         subroutine set_xm_old
+         subroutine set_xm_old2
             xm_old(1) = 0d0
             do k=2,nz_old
                xm_old(k) = xm_old(k-1) + s% dm(k-1)
@@ -583,9 +586,48 @@
             do k=1,nz_old
                xm_mid_old(k) = xm_old(k) + 0.5d0*s% dm(k)
             end do
-         end subroutine set_xm_old
+         end subroutine set_xm_old2
 
-         subroutine find_xm_anchor
+      subroutine find_xm_anchor_core2
+         implicit none
+         real(dp) :: lnT_core, xmm1, xm00, lnTm1, lnT00
+         integer  :: k
+         include 'formats'
+
+         !-- target ln T for the core anchor
+         lnT_core = log(RSP2_T_core)
+
+         !-- sanity check: must be hotter than the surface
+         if ( lnT_core <= s% xh(s% i_lnT,1) ) then
+            write(*,1) 'T_core < T_surf', RSP2_T_core, exp(s% xh(s% i_lnT,1))
+            call mesa_error(__FILE__,__LINE__,'find_xm_anchor_core')
+         end if
+
+         !-- default if never crossed (should not happen)
+         xm_anchor_core = xm_old(nz_old)
+
+         !-- find first cell where lnT ≥ lnT_core
+         do k = 2, nz_old
+            if ( s% xh(s% i_lnT,k) >= lnT_core ) then
+               xmm1  = xm_old(k-1)
+               xm00  = xm_old(k)
+               lnTm1 = s% xh(s% i_lnT,k-1)
+               lnT00 = s% xh(s% i_lnT,k)
+               xm_anchor_core = xmm1 +                        &
+                    (xm00 - xmm1) *                            &
+                    (lnT_core - lnTm1) / (lnT00 - lnTm1)
+               if ( is_bad(xm_anchor_core) .or. xm_anchor_core <= 0d0 ) then
+                  write(*,2) 'bad xm_anchor_core', k, xm_anchor_core, &
+                        xmm1, xm00, lnTm1, lnT00, lnT_core
+                  call mesa_error(__FILE__,__LINE__,'find_xm_anchor_core')
+               end if
+               return
+            end if
+         end do
+      end subroutine find_xm_anchor_core2
+
+
+         subroutine find_xm_anchor2
             real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
             include 'formats'
             lnT_anchor = log(s% RSP2_T_anchor)
@@ -609,12 +651,18 @@
                   return
                end if
             end do
-         end subroutine find_xm_anchor
+         end subroutine find_xm_anchor2
 
-         subroutine set_xm_new  ! sets xm, dm, m, dq, q
+         subroutine set_xm_new2  ! sets xm, dm, m, dq, q
             integer :: nz_outer, k, n_inner
             real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx, base_dm, rem_mass, H, sum_geom
             real(dp) :: H_low, H_high, H_mid, f_low, f_high, f_mid
+
+!            integer  :: N_lnT, N_log, j, k_old, idx
+!            real(dp) :: lnT_core_old, lnT_anchor_core, dlnT_step
+!            real(dp) :: ln_xm_anchor, ln_xm_core, dln_xm, lnT_target
+!            real(dp) :: ln_xm_center, dln_xm2
+
             integer :: iter
             include 'formats'
             nz_outer = s% RSP2_nz_outer
@@ -639,12 +687,12 @@
 
                ! define function f(H) = base_dm*(sum_{j=1..n_inner-1}H^j) - rem_mass
 
-               H_low  = 1.02! Heuristics
-               H_high = 1.30! Heuristics
+               H_low  = 1.001! Heuristics
+               H_high = 1.40! Heuristics
                ! compute f at bounds
                f_low  = base_dm*( (H_low*(1d0 - H_low**(n_inner-1))/(1d0 - H_low))) - rem_mass
                f_high = base_dm*( (H_high*(1d0 - H_high**(n_inner-1))/(1d0 - H_high))) - rem_mass
-               do iter = 1, 500
+               do iter = 1, 1000
                  H_mid = 0.5d0*(H_low + H_high)
                  f_mid = base_dm*( (H_mid*(1d0 - H_mid**(n_inner-1))/(1d0 - H_mid))) - rem_mass
                  if (abs(f_mid) < 1d-12*rem_mass) exit
@@ -685,6 +733,71 @@
                   s% dm(k-1) = xm(k) - xm(k-1)
                end do
                s% dm(nz) = s% xmstar - xm(nz)
+
+
+!
+!                     !———— two-stage core zoning ————
+!
+!               ! 1) how many ΔlnT zones from core-anchor to true core T?
+!               dlnT_step        = 0.05d0
+!               lnT_anchor_core = log(RSP2_T_core)
+!               lnT_core_old    = s% xh(s% i_lnT, nz_old)
+!               N_lnT = int( (lnT_core_old - lnT_anchor_core) / dlnT_step + 0.5d0 )
+!               N_lnT = max(1, min(N_lnT, nz - nz_outer))
+!               write(*,*) "N_lnT", N_lnT
+!               ! 2) the rest are log-mass zones between xm_anchor and xm_anchor_core
+!               N_log = (nz - nz_outer) - N_lnT
+!            write(*,*) "N_log", N_log
+!
+!               idx = nz_outer + 1   ! first interior boundary
+!
+!               ! — log spacing in xm from xm_anchor → xm_anchor_core
+!               ln_xm_anchor = log(xm_anchor)
+!               ln_xm_core   = log(xm_anchor_core)
+!               dln_xm       = (ln_xm_core - ln_xm_anchor) / N_log
+!               do j = 1, N_log
+!                  xm(idx + j) = exp( ln_xm_anchor + dln_xm * j )
+!               end do
+!
+!!!                — equal ΔlnT spacing from RSP2_T_core → core
+!!               do j = 1, N_lnT
+!!                  lnT_target = lnT_anchor_core + dlnT_step * j
+!!                  if (lnT_target > lnT_core_old) lnT_target = lnT_core_old
+!!
+!!                  do k_old = 1, nz_old-1
+!!                     if ( s% xh(s% i_lnT, k_old)    <= lnT_target .and.  &
+!!                          lnT_target             <= s% xh(s% i_lnT, k_old+1) ) then
+!!                        xm(idx + N_log + j) = xm_old(k_old) +                        &
+!!                           (xm_old(k_old+1)-xm_old(k_old)) *                       &
+!!                           (lnT_target - s% xh(s% i_lnT, k_old)) /                 &
+!!                           (s% xh(s% i_lnT, k_old+1)-s% xh(s% i_lnT, k_old))
+!!                        exit
+!!                     end if
+!!                  end do
+!!               end do
+!
+!! — log spacing in xm from xm_anchor_core → center over N_lnT cells
+!ln_xm_core   = log(xm_anchor_core)
+!ln_xm_center = log(s% xmstar)
+!dln_xm2      = (ln_xm_center - ln_xm_core)   / N_lnT
+!do j = 1, N_lnT
+!  xm(idx + N_log + j) = exp( ln_xm_core + dln_xm2 * j )
+!end do
+
+!! — **equal-mass** spacing over N_lnT cells from xm_anchor_core → center
+!do j = 1, N_lnT
+!   xm(idx + N_log + j) = xm_anchor_core +                        &
+!        (s% xmstar - xm_anchor_core) * j / N_lnT
+!end do
+
+               ! — enforce the last boundary at total mass
+               xm(nz+1) = s% xmstar
+
+               ! — recompute cell masses
+               do k = nz_outer+1, nz
+                  s% dm(k) = xm(k+1) - xm(k)
+               end do
+
             end if
 
             do k=1,nz-1
@@ -707,9 +820,35 @@
             end do
             write(*,1) 'm_center', s% m_center/msun
             call mesa_error(__FILE__,__LINE__,'set_xm_new')
-         end subroutine set_xm_new
+         end subroutine set_xm_new2
 
-         subroutine interpolate1_face_val(i, cntr_val)
+
+         subroutine interpolate_mlt_vc_face_val2() ! might be unnecessary
+!            integer, intent(in) :: i
+!            real(dp), intent(in) :: cntr_val
+            do k=1,nz_old
+               v_old(k) = s% mlt_vc(k)
+            end do
+            v_old(nz_old+1) = s%mlt_vc(nz_old)
+            call interpolate_vector_pm( &
+               nz_old+1, xm_old, nz+1, xm, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
+            do k=1,nz
+               s% mlt_vc(k) = v_new(k)
+            end do
+
+            ! this could be problematic if mlt_vc_old isnt set
+!            do k=1,nz_old
+!               v_old(k) = s% mlt_vc_old(k)
+!            end do
+!            v_old(nz_old+1) = s%mlt_vc_old(nz_old)
+!            call interpolate_vector_pm( &
+!               nz_old+1, xm_old, nz+1, xm, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
+!            do k=1,nz
+!               s% mlt_vc_old(k) = v_new(k)
+!            end do
+         end subroutine interpolate_mlt_vc_face_val2
+
+         subroutine interpolate1_face_val2(i, cntr_val)
             integer, intent(in) :: i
             real(dp), intent(in) :: cntr_val
             do k=1,nz_old
@@ -721,9 +860,9 @@
             do k=1,nz
                s% xh(i,k) = v_new(k)
             end do
-         end subroutine interpolate1_face_val
+         end subroutine interpolate1_face_val2
 
-         subroutine check_new_lnR
+         subroutine check_new_lnR2
             include 'formats'
             do k=1,nz
                s% lnR(k) = s% xh(s% i_lnR,k)
@@ -739,9 +878,9 @@
                write(*,2) 'bad r center', nz, s% r(nz), s% r_center
                call mesa_error(__FILE__,__LINE__,'check_new_lnR remesh rsp2')
             end if
-         end subroutine check_new_lnR
+         end subroutine check_new_lnR2
 
-         subroutine set_new_lnd
+         subroutine set_new_lnd2
             real(dp) :: vol, r300, r3p1
             include 'formats'
             do k=1,nz
@@ -760,9 +899,9 @@
                   call mesa_error(__FILE__,__LINE__,'remesh for rsp2')
                end if
             end do
-         end subroutine set_new_lnd
+         end subroutine set_new_lnd2
 
-         subroutine interpolate1_cell_val(i)
+         subroutine interpolate1_cell_val2(i)
             integer, intent(in) :: i
             do k=1,nz_old
                v_old(k) = s% xh(i,k)
@@ -772,9 +911,9 @@
             do k=1,nz
                s% xh(i,k) = v_new(k)
             end do
-         end subroutine interpolate1_cell_val
+         end subroutine interpolate1_cell_val2
 
-         subroutine interpolate1_xa(j)
+         subroutine interpolate1_xa2(j)
             integer, intent(in) :: j
             do k=1,nz_old
                v_old(k) = s% xa(j,k)
@@ -784,9 +923,9 @@
             do k=1,nz
                s% xa(j,k) = v_new(k)
             end do
-         end subroutine interpolate1_xa
+         end subroutine interpolate1_xa2
 
-         subroutine rescale_xa
+         subroutine rescale_xa2
             integer :: k, j
             real(dp) :: sum_xa
             do k=1,nz
@@ -795,9 +934,9 @@
                   s% xa(j,k) = s% xa(j,k)/sum_xa
                end do
             end do
-         end subroutine rescale_xa
+         end subroutine rescale_xa2
 
-         subroutine revise_lnT_for_QHSE(P_surf, ierr)
+         subroutine revise_lnT_for_QHSE2(P_surf, ierr)
             use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
             use chem_def, only: chem_isos
             use eos_support, only: solve_eos_given_DP
@@ -874,7 +1013,7 @@
                   end if
                   old_kap = s% opacity(1)
                   s% opacity(1) = kap  ! for use by atm surf PT
-                  call get_PT_surf(new_P_surf, new_T_surf, ierr)
+                  call get_PT_surf2(new_P_surf, new_T_surf, ierr)
                   if (ierr /= 0) then
                      write(*,2) 'get_PT_surf failed', k
                      call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
@@ -888,9 +1027,9 @@
             end do
             !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
             !stop
-         end subroutine revise_lnT_for_QHSE
+         end subroutine revise_lnT_for_QHSE2
 
-         subroutine set_Hp_face(k)
+         subroutine set_Hp_face2(k)
             use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
             integer, intent(in) :: k
             real(dp) :: r_00, d_00, Peos_00, Peos_div_rho, Hp_face, &
@@ -908,9 +1047,9 @@
                Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
                Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
             end if
-            s% Hp_face(k) = Hp_face
+            s% Hp_face(k) = get_scale_height_face_val(s,k)!Hp_face
             !s% xh(s% i_Hp, k) = Hp_face
-         end subroutine set_Hp_face
+         end subroutine set_Hp_face2
 
       end subroutine remesh_for_TDC_pulsations
 
