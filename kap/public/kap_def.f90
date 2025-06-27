@@ -236,7 +236,7 @@ module kap_def
       real(dp) :: kap_Type2_full_off_dZ  ! Type2 is full off for dZ <= this
       real(dp) :: kap_Type2_full_on_dZ  ! Type2 can be full on for dZ >= this
 
-      real(dp) :: logT_Compton_blend_hi, logR_Compton_blend_lo
+      real(dp) :: logT_Compton_blend_hi, logR_Compton_blend_hi
 
       logical :: show_info
 
