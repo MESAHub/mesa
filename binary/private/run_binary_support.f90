@@ -45,6 +45,7 @@ contains
       use binary_job_ctrls_io
       use binary_mdot, only : adjust_mdots, set_accretion_composition
       use binary_tides, only : sync_spin_orbit_torque
+      use binary_roche_deformation, only: build_roche_interpolators, roche_fp_ft, roche_irot, roche_psi, synchronicity
       use binary_evolve
       use mod_other_rlo_mdot
       use mod_other_implicit_rlo
@@ -61,6 +62,7 @@ contains
       use mod_other_binary_photos
       use mod_other_e2
       use mod_other_pgbinary_plots
+      use mod_other_tidal_deformation_switch_function
       use binary_timestep
       use binary_history
       use binary_history_specs
@@ -187,6 +189,7 @@ contains
       b% other_CE_binary_finish_step => null_other_CE_binary_finish_step
       b% other_e2 => null_other_e2
       b% other_pgbinary_plots_info => null_other_pgbinary_plots_info
+      b% other_tidal_deformation_switch_function => null_other_tidal_deformation_switch_function
 
       b% extras_binary_startup => null_extras_binary_startup
       b% extras_binary_start_step => null_extras_binary_start_step
@@ -261,6 +264,15 @@ contains
          s% accrete_given_mass_fractions = .true.
          s% accrete_same_as_surface = .false.
          s% binary_other_torque => sync_spin_orbit_torque
+
+         ! settings for roche geometry deformation
+         if (b% use_tidal_deformation) then
+            call build_roche_interpolators
+            s% binary_other_fp_ft => roche_fp_ft
+            s% binary_other_irot => roche_irot
+            s% binary_get_roche_potential => roche_psi
+            s% binary_deformation_switch_fraction => synchronicity
+         end if
 
          s% doing_timing = .false.
 
