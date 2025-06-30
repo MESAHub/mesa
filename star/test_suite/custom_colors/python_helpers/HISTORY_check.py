@@ -7,7 +7,6 @@ import mesa_reader as mr
 import numpy as np
 from matplotlib.animation import FuncAnimation
 
-
 class HistoryChecker:
     def __init__(self, history_file="../LOGS/history.data", refresh_interval=1, skip_rows=5):
         """
