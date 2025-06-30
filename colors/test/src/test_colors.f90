@@ -1,8 +1,6 @@
 program test_colors
-   use colors_def
-   use colors_lib
-   use const_def
-   implicit none
+   use colors_lib, only: colors_init, colors_shutdown
+   implicit none (type, external)
 
    integer :: ierr
    logical :: use_cache
@@ -13,7 +11,7 @@ program test_colors
    ! TODO: implement me
 
    write(*,*) 'Testing colors module initialization...'
-   
+
    ! Initialize colors module
    ! TODO: call colors_init(ierr)
    if (ierr /= 0) then

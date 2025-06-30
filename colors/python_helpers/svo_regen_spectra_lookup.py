@@ -13,7 +13,8 @@ def clean_metadata_values(metadata):
         if key == "file_name":
             cleaned_metadata[key] = value
         else:
-            match = re.search(r"[-+]?\d*\.\d+|\d+", value)  # Matches floats or integers
+            # Matches floats or integers
+            match = re.search(r"[-+]?\d*\.\d+|\d+", value)
             cleaned_metadata[key] = (
                 match.group() if match else "999.9"
             )  # Default to 999.9 if no match
