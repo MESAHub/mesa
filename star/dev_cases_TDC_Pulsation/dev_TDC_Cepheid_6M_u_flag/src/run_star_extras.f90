@@ -45,7 +45,7 @@
 
       !!!!!!!!!!!!!!!!!!!!!!!!!
       ! These variables are loaded up from x_ctrl, x_integer_ctrl and x_logical_ctrl
-      ! values specified on inlist_ppisn
+      ! values specified on inlist_common, inlist_pulses
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
