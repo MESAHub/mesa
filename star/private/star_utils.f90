@@ -85,6 +85,7 @@
       public :: weighted_smoothing
       public :: get_kap_face
       public :: get_rho_face
+      public :: get_rho_start_face
       public :: get_chirho_face
       public :: get_chit_face
       public :: get_t_face
