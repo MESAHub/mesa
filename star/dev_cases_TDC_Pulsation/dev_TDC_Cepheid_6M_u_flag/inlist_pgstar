@@ -186,12 +186,12 @@ Profile_Panels1_yaxis_name(1) = 'vel_km_per_s'
 Profile_Panels1_other_yaxis_name(1) = 'logRho'
 !Profile_Panels1_other_dymin(1) = 0.14
 
-Profile_Panels1_yaxis_name(2) = 'log_Lrad_div_Ledd'!'logdq'!'radius'!'entropy'
+Profile_Panels1_yaxis_name(2) = 'logT'!'logdq'!'radius'!'entropy'
 Profile_Panels1_other_yaxis_name(2) = 'mlt_Y_face'! 'Lc_div_L'!'log_dt_cs_div_dr'!'pgas_div_p'
 Profile_Panels1_other_yaxis_log(2) = .false.
 
 !Profile_Panels1_ymax(2) = 2
-Profile_Panels1_other_ymax(2) = 2
+!Profile_Panels1_other_ymax(2) = 2
 
 Profile_Panels1_yaxis_name(3) = 'Lc_div_L'!'gradT'
 Profile_Panels1_other_yaxis_name(3) = 'conv_vel'!'lum_div_Ledd'!'grada'
@@ -207,9 +207,9 @@ Profile_Panels1_other_yaxis_name(4) = 'gradr'
 Profile_Panels1_other_dymin(4) = 0.14
 
 ! x-axis limits and properties
-Profile_Panels1_xaxis_name = 'logT'!'zone'
+Profile_Panels1_xaxis_name = 'logtau'!'zone'
 Profile_Panels1_xmin = -101d0!-101d0
-Profile_Panels1_xmax = 5d0!-101d0!9d0 !-101d0 !8.1
+Profile_Panels1_xmax = -101d0!9d0 !-101d0 !8.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'
@@ -339,8 +339,8 @@ Text_Summary1_name(2,3) = 'lg_Mdot'
 Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
-Text_Summary1_name(3,1) = 'growth'
-Text_Summary1_name(3,2) = 'gamma1_min'
+Text_Summary1_name(3,1) = 'KE_growth_avg'
+Text_Summary1_name(3,2) = 'growth'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'CO_core'
@@ -646,11 +646,11 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_dymin(3) = 0.14
       ! ::
 
-    History_Panels1_yaxis_name(4) = 'log_dt'
+    History_Panels1_yaxis_name(4) = 'KE_growth_avg'!'log_dt'
     History_Panels1_yaxis_reversed(4) = .false.
     History_Panels1_ymin(4) = -101d0
     History_Panels1_ymax(4) = -101d0
-    History_Panels1_dymin(4) = 0.14
+    !History_Panels1_dymin(4) = 0.14
 
       ! ::
 

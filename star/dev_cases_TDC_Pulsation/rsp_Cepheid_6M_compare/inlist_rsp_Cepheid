@@ -52,6 +52,7 @@ RSP_kick_vsurf_km_per_sec = 5d0
 RSP_fraction_1st_overtone = 0d0
 RSP_fraction_2nd_overtone = 0d0
 
+mixing_length_alpha = 1.5d0 
 
    x_integer_ctrl(1) = -1 !10 ! which period to check
    x_ctrl(1) = 14.7 ! expected period (in days) 

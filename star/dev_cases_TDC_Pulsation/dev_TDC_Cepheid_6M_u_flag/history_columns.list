@@ -734,17 +734,17 @@
 
 !# asteroseismology
 
-      !delta_nu ! large frequency separation for p-modes (microHz)
+      delta_nu ! large frequency separation for p-modes (microHz)
          ! 1e6/(seconds for sound to cross diameter of star)
-      !delta_Pg ! g-mode period spacing for l=1 (seconds)
+      delta_Pg ! g-mode period spacing for l=1 (seconds)
          ! sqrt(2) pi^2/(integral of brunt_N/r dr)
       !log_delta_Pg
-      !nu_max ! estimate from scaling relation (microHz)
+      nu_max ! estimate from scaling relation (microHz)
          ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       !nu_max_3_4th_div_delta_nu ! nu_max^0.75/delta_nu
-      !acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
-      !acoustic_radius ! integral of dr/csound (seconds)
+      acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+      acoustic_radius ! integral of dr/csound (seconds)
       !ng_for_nu_max ! = 1 / (nu_max*delta_Pg)
          ! period for g-mode with frequency nu_max = nu_max_ng*delta_Pg
       !gs_per_delta_nu ! delta_nu / (nu_max**2*delta_Pg)
@@ -832,11 +832,11 @@
          ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
       !cumulative_energy_error ! = sum over all steps of abs(error_in_energy_conservation)
       !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
-      !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
-      !log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
+      log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
+      log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
 
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
-      !log_rel_error_in_energy_conservation
+      log_rel_error_in_energy_conservation
 
       !virial_thm_P_avg
       !virial_thm_rel_err

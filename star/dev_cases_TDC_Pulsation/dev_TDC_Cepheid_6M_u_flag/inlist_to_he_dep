@@ -28,6 +28,9 @@
 
 &controls
 
+! Convection model
+ mixing_length_alpha = 1.5d0
+
 ! stop when the center mass fraction of h1 drops below this limit
 !    xa_central_lower_limit_species(1) = 'he4'
 !    xa_central_lower_limit(1) = 1d-1
@@ -45,14 +48,18 @@ max_model_number = 1970
       cool_wind_RGB_scheme   = 'Reimers'
       cool_wind_AGB_scheme   = 'Blocker'
       RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5   ! 0.1   
-      Blocker_scaling_factor = 0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
+      Reimers_scaling_factor = 0d0 !0.5   ! 0.1   
+      Blocker_scaling_factor = 0d0 !0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
 
 
 ! solver controls
    convergence_ignore_equL_residuals = .true. ! for pre-ms 
 !   use_gold2_tolerances = .false. ! if you need to get through the he_flash
    
+
+
+! output
+log_directory = 'LOGS_evolution'
 
 / ! end of controls namelist
 

@@ -393,10 +393,14 @@
 
          call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
+        !if (.not. restart .and. in_inlist_pulses) then
+        !    initial_model_number = s% model_number
+        !end if
+        initial_model_number = 0 ! since we are setting model # to 0 in inlist_pulses
+
+
          ! for rsp style mesh
          if (.not. restart .and. in_inlist_pulses .and. remesh_for_envelope_model) then
-            initial_model_number = s% model_number
-
             call remesh_for_TDC_pulsation(id, ierr)
          end if
       end subroutine extras_startup
