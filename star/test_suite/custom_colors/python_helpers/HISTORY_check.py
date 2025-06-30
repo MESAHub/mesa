@@ -9,7 +9,7 @@ from matplotlib.animation import FuncAnimation
 
 
 class HistoryChecker:
-    def __init__(self, history_file="../LOGS/history.data", refresh_interval=1):
+    def __init__(self, history_file="../LOGS/history.data", refresh_interval=1, skip_rows=5):
         """
         Initialize the History checker with auto-refresh capability.
         
@@ -20,7 +20,8 @@ class HistoryChecker:
         self.history_file = history_file
         self.refresh_interval = refresh_interval
         self.last_modified = None
-        
+        self.skip_rows = skip_rows
+
         # Create the figure and axes
         self.fig, self.axes = plt.subplots(
             2, 2, figsize=(14, 18), gridspec_kw={"hspace": 0.2, "wspace": 0.2}
@@ -73,33 +74,31 @@ class HistoryChecker:
         
         return False
     
+
     def update_data(self):
-        """Read data from history file and extract relevant columns."""
         if not os.path.exists(self.history_file):
             print(f"Warning: History file {self.history_file} not found")
             return
-        
+
         try:
-            # Read the MESA data
             self.md = mr.MesaData(self.history_file)
-            
-            # Basic stellar parameters
-            self.Teff = self.md.Teff
-            self.Log_L = self.md.log_L
-            self.Log_g = self.md.log_g
-            self.Log_R = self.md.log_R
-            self.Star_Age = self.md.star_age
-            self.Mag_bol = self.md.Mag_bol
-            self.Flux_bol = np.log10(self.md.Flux_bol)  # Convert to log scale
-            
-            # Determine all history file column names by reading the header
+            self.slice = slice(self.skip_rows, None)
+
+            s = self.slice
+            self.Teff = self.md.Teff[s]
+            self.Log_L = self.md.log_L[s]
+            self.Log_g = self.md.log_g[s]
+            self.Log_R = self.md.log_R[s]
+            self.Star_Age = self.md.star_age[s]
+            self.Mag_bol = self.md.Mag_bol[s]
+            self.Flux_bol = np.log10(self.md.Flux_bol[s])
+
             self.read_header_columns()
-            
-            # Set up HR diagram parameters
             self.setup_hr_diagram_params()
-            
+
         except Exception as e:
             print(f"Error reading history data: {e}")
+
     
     def read_header_columns(self):
         """Read column headers from history file."""
@@ -128,43 +127,42 @@ class HistoryChecker:
             print("Warning: Could not find 'Flux_bol' column in header")
             self.filter_columns = []
     
+
     def setup_hr_diagram_params(self):
-        """Set up parameters for HR diagram based on available filters."""
-        # For the HR diagram, set up color index and magnitude
+        s = self.slice
+
         if "Gbp" in self.filter_columns and "Grp" in self.filter_columns and "G" in self.filter_columns:
-            self.hr_color = self.md.Gbp - self.md.Grp
-            self.hr_mag = self.md.G
+            self.hr_color = self.md.Gbp[s] - self.md.Grp[s]
+            self.hr_mag = self.md.G[s]
             self.hr_xlabel = "Gbp - Grp"
             self.hr_ylabel = "G"
-            self.color_index = self.hr_color
+            self.color_index = self.hr_color  # DO NOT slice again
         else:
             if len(self.filter_columns) >= 2:
-                # Use the first two filters
                 f1 = self.filter_columns[0]
                 f2 = self.filter_columns[1]
-                
-                # Retrieve the data using getattr or data method
+
                 try:
-                    col1 = getattr(self.md, f1)
-                    col2 = getattr(self.md, f2)
+                    col1 = getattr(self.md, f1)[s]
+                    col2 = getattr(self.md, f2)[s]
                 except AttributeError:
-                    # Alternatively, use md.data(key) if the attribute isn't present
-                    col1 = self.md.data(f1)
-                    col2 = self.md.data(f2)
-                    
+                    col1 = self.md.data(f1)[s]
+                    col2 = self.md.data(f2)[s]
+
                 self.hr_color = col1 - col2
                 self.hr_mag = col1
                 self.hr_xlabel = f"{f1} - {f2}"
                 self.hr_ylabel = f1
                 self.color_index = self.hr_color
             else:
-                # Default values if not enough filters
                 print("Warning: Not enough filter columns to construct color index")
-                self.hr_color = np.zeros_like(self.Teff)
-                self.hr_mag = np.zeros_like(self.Teff)
+                n = len(self.Teff)
+                self.hr_color = np.zeros(n)
+                self.hr_mag = np.zeros(n)
                 self.hr_xlabel = "Color Index"
                 self.hr_ylabel = "Magnitude"
                 self.color_index = self.hr_color
+
     
     def update_plot(self, frame):
         """Update the plot with new data if the file has changed."""
@@ -197,21 +195,18 @@ class HistoryChecker:
         # Bottom-left plot: Age vs. Color Index
         self.axes[1, 0].plot(self.Star_Age, self.color_index, "kx")
         
-        # Bottom-right plot: Age vs. All Filter Magnitudes
         for filt in self.filter_columns:
-            # Retrieve filter magnitude data
             try:
-                col_data = getattr(self.md, filt)
+                col_data = getattr(self.md, filt)[self.slice]
             except AttributeError:
                 try:
-                    col_data = self.md.data(filt)
+                    col_data = self.md.data(filt)[self.slice]
                 except:
                     print(f"Warning: Could not retrieve data for filter {filt}")
                     continue
-                    
-            self.axes[1, 1].plot(
-                self.Star_Age, col_data, marker="o", linestyle="-", label=filt
-            )
+
+            self.axes[1, 1].plot(self.Star_Age, col_data, marker="o", linestyle="-", label=filt)
+
         
         # Add legend to filter plot
         self.axes[1, 1].legend()
@@ -247,7 +242,7 @@ def main():
         history_file = "../LOGS/history.data"  # Default path if not found
         print(f"Warning: No history.data file found, will check for {history_file}")
     
-    checker = HistoryChecker(history_file=history_file, refresh_interval=5)
+    checker = HistoryChecker(history_file=history_file, refresh_interval=1, skip_rows = 200)
     checker.run()
 
 

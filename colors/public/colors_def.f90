@@ -110,7 +110,7 @@ end subroutine do_free_colors
 
 subroutine get_colors_ptr(handle,rq,ierr)
   integer, intent(in) :: handle
-  type (Colors_General_Info), pointer :: rq
+  type (Colors_General_Info), pointer, intent(out) :: rq
   integer, intent(out):: ierr
   if (handle < 1 .or. handle > max_colors_handles) then
      ierr = -1
@@ -122,7 +122,7 @@ end subroutine get_colors_ptr
 
 
 subroutine do_free_colors_tables
-  
+
   ! TODO: implement me if needed, see kap
 
 end subroutine do_free_colors_tables

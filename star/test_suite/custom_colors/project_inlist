@@ -75,3 +75,43 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 /
+
+
+&pgstar
+  pgstar_interval = 10
+
+  ! Standard HR Diagram
+  HR_win_flag = .true.
+  HR_logT_min = 3.2
+  HR_logT_max = 4.3
+  HR_logL_min = -1.0
+  HR_logL_max = 4.0
+
+  ! G band light curve
+  History_Track2_win_flag = .true.
+  History_Track2_xname = 'star_age'
+  History_Track2_yname = 'G'
+  History_Track2_title = 'G Light Curve'
+  History_Track2_xaxis_label = 'Age (yr)'
+  History_Track2_yaxis_label = 'G mag'
+
+  ! Grp light curve
+  History_Track3_win_flag = .true.
+  History_Track3_xname = 'star_age'
+  History_Track3_yname = 'Grp'
+  History_Track3_title = 'Grp Light Curve'
+
+  ! Grvs light curve
+  History_Track4_win_flag = .true.
+  History_Track4_xname = 'star_age'
+  History_Track4_yname = 'Grvs'
+  History_Track4_title = 'Grvs Light Curve'
+
+  ! Flux_bol curve
+  History_Track5_win_flag = .true.
+  History_Track5_xname = 'star_age'
+  History_Track5_yname = 'Flux_bol'
+  History_Track5_title = 'Bolometric Flux'
+
+
+/

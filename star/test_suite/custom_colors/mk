@@ -14,9 +14,6 @@ function check_okay {
 DIRS=(
 	"LOGS"
 	"LOGS/SED"
-	"data/filters"
-	"data/MIST"
-	"data/stellar_models"
 )
 
 # Create directories if they don't exist

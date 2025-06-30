@@ -20,23 +20,30 @@
 module colors_lib
 
   use const_def, only: dp, strlen
-  use colors_def
-  use math_lib
-  use hermite_interp
-  use knn_interp
-  use linear_interp
-  use shared_funcs
+  use colors_def, only: Colors_General_Info, colors_def_init, colors_use_cache, &
+                      colors_is_initialized, do_alloc_colors, do_free_colors, &
+                      get_colors_ptr, do_free_colors_tables
+  use hermite_interp, only: constructsed_hermite
+  use knn_interp, only: constructsed_knn, interpolatearray
+  use linear_interp, only: constructsed_linear
+  use shared_funcs, only: load_lookuptable, remove_dat, loadfilter, loadvegased, rombergintegration
 
   implicit none
-  
+
+  private
+
   ! Make public interface explicit
   public :: colors_init, colors_shutdown
   public :: calculate_bolometric, calculate_synthetic
   public :: load_lookuptable, remove_dat
-  
+  public :: colors_ptr, alloc_colors_handle_using_inlist  ! Add this line
   ! Keep internals private
   private :: calculate_bolometric_phot
-  
+  ! Add these bolometric correction functions that MESA expects:
+  public :: get_bc_id_by_name, get_lum_band_by_id, get_abs_mag_by_id
+  public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
+  public :: get_abs_bolometric_mag, get_abs_mag_by_name, get_bcs_all
+  public :: get_lum_band_by_name
   contains
 
       ! call this routine to initialize the colors module.
@@ -100,15 +107,20 @@ end subroutine free_colors_handle
 
 
 subroutine colors_ptr(handle,rq,ierr)
+
  use colors_def,only:Colors_General_Info,get_colors_ptr,colors_is_initialized
- integer, intent(in) :: handle  ! from alloc_colors_handle
- type (colors_General_Info), pointer :: rq
+
+ type (colors_General_Info), pointer, intent(out) :: rq
+ integer, intent(in) :: handle
  integer, intent(out):: ierr
+
  if (.not. colors_is_initialized) then
     ierr=-1
     return
  endif
+
  call get_colors_ptr(handle,rq,ierr)
+
 end subroutine colors_ptr
 
 
@@ -149,7 +161,7 @@ end subroutine colors_setup_hooks
   !-----------------------------------------------------------------------
   ! Main public interface functions
   !-----------------------------------------------------------------------
-  
+
   !****************************
   ! Calculate Bolometric Photometry Using Multiple SEDs
   !****************************
@@ -159,7 +171,7 @@ end subroutine colors_setup_hooks
     CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
     REAL(dp), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
     REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
-    
+
     REAL(dp), ALLOCATABLE :: lu_logg(:), lu_meta(:), lu_teff(:)
     CHARACTER(LEN=100), ALLOCATABLE :: file_names(:)
     REAL, DIMENSION(:,:), ALLOCATABLE :: lookup_table
@@ -170,12 +182,18 @@ end subroutine colors_setup_hooks
     ! Load the lookup table
     CALL load_lookuptable(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
 
-    !CALL constructsed_knn(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+    !CALL constructsed_knn(teff, log_g, metallicity, R, d, file_names, &
+    !                       lu_teff, lu_logg, lu_meta, sed_filepath, &
+    !                       wavelengths, fluxes)
 
-    !CALL constructsed_linear(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+    !CALL constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
+    !                         lu_teff, lu_logg, lu_meta, sed_filepath, &
+    !                         wavelengths, fluxes)
 
-    CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
-    
+    CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
+                              lu_teff, lu_logg, lu_meta, sed_filepath,&
+                               wavelengths, fluxes)
+
     ! Calculate bolometric flux and magnitude
     CALL calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
   END SUBROUTINE calculate_bolometric
@@ -196,7 +214,7 @@ end subroutine colors_setup_hooks
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(INOUT) :: filter_wavelengths, filter_trans
     LOGICAL, INTENT(IN) :: make_sed
-    
+
     ! Local variables
     REAL(dp), DIMENSION(:), ALLOCATABLE :: convolved_flux
     CHARACTER(LEN=100) :: csv_file
@@ -205,7 +223,7 @@ end subroutine colors_setup_hooks
     REAL(dp) :: wv, fl, cf, fwv, ftr
 
     csv_file = 'LOGS/SED/' // TRIM(remove_dat(filter_name)) // '_SED.csv'
-    
+
     ! Initialize error flag
     ierr = 0
 
@@ -280,7 +298,7 @@ end subroutine colors_setup_hooks
       PRINT *, "Error: Vega flux is zero, magnitude calculation is invalid."
       calculate_synthetic = HUGE(1.0_dp)
     END IF
-    
+
     ! Clean up
     DEALLOCATE(convolved_flux)
   END FUNCTION calculate_synthetic
@@ -295,7 +313,7 @@ end subroutine colors_setup_hooks
   SUBROUTINE convolvesed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: convolved_flux
+    REAL(dp), DIMENSION(:), ALLOCATABLE, intent(out) :: convolved_flux
     REAL(dp), DIMENSION(:), ALLOCATABLE :: interpolated_filter
     INTEGER :: n
 
@@ -313,11 +331,13 @@ end subroutine colors_setup_hooks
     ! Deallocate temporary arrays
     DEALLOCATE(interpolated_filter)
   END SUBROUTINE convolvesed
-  
+
   !****************************
   ! Calculate Synthetic Flux
   !****************************
-  SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, filter_wavelengths, filter_trans)
+SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, &
+                                  filter_wavelengths, filter_trans)
+
     REAL(dp), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
     REAL(dp), INTENT(OUT) :: synthetic_flux
@@ -333,8 +353,8 @@ end subroutine colors_setup_hooks
     END DO
 
     CALL rombergintegration(wavelengths, fluxes * wavelengths, integrated_flux)
-    CALL rombergintegration(filter_wavelengths, filter_trans * filter_wavelengths, integrated_filter)
-
+    CALL rombergintegration(filter_wavelengths, &
+                           filter_trans * filter_wavelengths, integrated_filter)
     ! Store the total flux
     IF (integrated_filter > 0.0) THEN
         synthetic_flux = integrated_flux / integrated_filter
@@ -382,7 +402,7 @@ end subroutine colors_setup_hooks
 
     bolometric_magnitude = fluxtomagnitude(bolometric_flux)
   END SUBROUTINE calculate_bolometric_phot
-  
+
   !****************************
   ! Convert Flux to Magnitude
   !****************************
@@ -399,7 +419,8 @@ end subroutine colors_setup_hooks
   !****************************
   ! Calculate Vega Flux for Zero Point
   !****************************
-  FUNCTION calculatevegaflux(vega_filepath, filt_wave, filt_trans, filter_name, make_sed) RESULT(vega_flux)
+FUNCTION calculatevegaflux(vega_filepath, filt_wave, filt_trans, &
+                          filter_name, make_sed) RESULT(vega_flux)
     CHARACTER(LEN=*), INTENT(IN) :: vega_filepath, filter_name
     CHARACTER(len = 100) :: output_csv
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: filt_wave, filt_trans
@@ -482,17 +503,17 @@ end subroutine colors_setup_hooks
   !-----------------------------------------------------------------------
   ! Bolometric correction interface (stub implementations)
   !-----------------------------------------------------------------------
-  
+
   ! These functions are defined as stubs since they appear to be
   ! placeholder interfaces for future implementation
-  
+
   real(dp) function get_bc_by_name(name, log_Teff, log_g, M_div_h, ierr)
     character(len=*), intent(in) :: name
     real(dp), intent(in) :: log_Teff  ! log10 of surface temp
     real(dp), intent(in) :: log_g  ! log_10 of surface gravity
     real(dp), intent(in) :: M_div_h  ! [M/H]
     integer, intent(inout) :: ierr
-    
+
     get_bc_by_name = -99.9d0
     ierr = 0
   end function get_bc_by_name
@@ -503,7 +524,7 @@ end subroutine colors_setup_hooks
     real(dp), intent(in) :: log_g  ! log_10 of surface gravity
     real(dp), intent(in) :: M_div_h  ! [M/H]
     integer, intent(inout) :: ierr
-    
+
     get_bc_by_id = -99.9d0
     ierr = 0
   end function get_bc_by_id
@@ -511,7 +532,7 @@ end subroutine colors_setup_hooks
   integer function get_bc_id_by_name(name, ierr)
     character(len=*), intent(in) :: name
     integer, intent(inout) :: ierr
-    
+
     get_bc_id_by_name = -1
     ierr = 0
   end function get_bc_id_by_name
@@ -519,26 +540,26 @@ end subroutine colors_setup_hooks
   character(len=strlen) function get_bc_name_by_id(id, ierr)
     integer, intent(in) :: id
     integer, intent(inout) :: ierr
-    
+
     get_bc_name_by_id = ''
     ierr = 0
   end function get_bc_name_by_id
 
   real(dp) function get_abs_bolometric_mag(lum)
-    use const_def
+    use const_def, only: dp
     real(dp), intent(in) :: lum  ! Luminosity in lsun units
-    
+
     get_abs_bolometric_mag = -99.9d0
   end function get_abs_bolometric_mag
 
   real(dp) function get_abs_mag_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
-    character(len=*) :: name
+    character(len=*), intent(in) :: name
     real(dp), intent(in) :: log_Teff  ! log10 of surface temp
     real(dp), intent(in) :: M_div_h  ! [M/H]
     real(dp), intent(in) :: log_g  ! log_10 of surface gravity
     real(dp), intent(in) :: lum  ! Luminosity in lsun units
     integer, intent(inout) :: ierr
-    
+
     ierr = 0
     get_abs_mag_by_name = -99.9d0
   end function get_abs_mag_by_name
@@ -550,7 +571,7 @@ end subroutine colors_setup_hooks
     real(dp), intent(in) :: M_div_h  ! [M/H]
     real(dp), intent(in) :: lum  ! Luminosity in lsun units
     integer, intent(inout) :: ierr
-    
+
     ierr = 0
     get_abs_mag_by_id = -99.9d0
   end function get_abs_mag_by_id
@@ -561,19 +582,19 @@ end subroutine colors_setup_hooks
     real(dp), dimension(:), intent(out) :: results
     real(dp), intent(in) :: log_g
     integer, intent(inout) :: ierr
-    
+
     ierr = 0
     results(:) = -99.d0
   end subroutine get_bcs_all
 
   real(dp) function get_lum_band_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
-    character(len=*) :: name
+    character(len=*), intent(in) :: name
     real(dp), intent(in) :: log_Teff  ! log10 of surface temp
     real(dp), intent(in) :: M_div_h  ! [M/H]
     real(dp), intent(in) :: log_g  ! log_10 of surface gravity
     real(dp), intent(in) :: lum  ! Total luminosity in lsun units
     integer, intent(inout) :: ierr
-    
+
     ierr = 0
     get_lum_band_by_name = -99.d0
   end function get_lum_band_by_name
@@ -585,7 +606,7 @@ end subroutine colors_setup_hooks
     real(dp), intent(in) :: M_div_h  ! [M/H]
     real(dp), intent(in) :: lum  ! Total luminosity in lsun units
     integer, intent(inout) :: ierr
-    
+
     ierr = 0
     get_lum_band_by_id = -99.d0
   end function get_lum_band_by_id
@@ -593,7 +614,7 @@ end subroutine colors_setup_hooks
   !-----------------------------------------------------------------------
   ! Test suite interface (stub implementations)
   !-----------------------------------------------------------------------
-  
+
   subroutine test_suite_startup(restart, ierr)
     logical, intent(in) :: restart
     integer, intent(out) :: ierr

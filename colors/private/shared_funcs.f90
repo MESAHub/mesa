@@ -1,11 +1,12 @@
 
 MODULE shared_funcs
   USE const_def, ONLY: dp, strlen
-  IMPLICIT NONE
-  
-  PRIVATE
-  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, SimpsonIntegration, loadsed, loadfilter, loadvegased, load_lookuptable, remove_dat
+  implicit none
 
+  PRIVATE
+  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, &
+            SimpsonIntegration, loadsed, loadfilter, loadvegased, &
+            load_lookuptable, remove_dat
 CONTAINS
 
 
@@ -290,7 +291,9 @@ CONTAINS
   !****************************
   ! Load Lookup Table For Identifying Stellar Atmosphere Models
   !****************************
-  SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
+SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
+                           out_logg, out_meta, out_teff)
+
     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
@@ -529,7 +532,7 @@ CONTAINS
   !-----------------------------------------------------------------------
   ! Helper function for file names
   !-----------------------------------------------------------------------
-  
+
   function remove_dat(path) result(base)
     ! Extracts the portion of the string before the first dot
     character(len=*), intent(in) :: path

@@ -5,9 +5,9 @@
 
 MODULE knn_interp
   USE const_def, ONLY: dp
-  USE shared_funcs
-  IMPLICIT NONE
-  
+  USE shared_funcs, only: dilute_flux, loadsed
+  implicit none
+
   PRIVATE
   PUBLIC :: constructsed_knn, loadsed, interpolatearray, dilute_flux
 
@@ -34,10 +34,13 @@ CONTAINS
     REAL(dp), DIMENSION(:), ALLOCATABLE :: diluted_flux
 
     ! Get the four closest stellar models
-    CALL getcloseststellarmodels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+    CALL getcloseststellarmodels(teff, log_g, metallicity, lu_teff, &
+                                lu_logg, lu_meta, closest_indices)
 
     ! Load the first SED to define the wavelength grid
-    CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), closest_indices(1), temp_wavelengths, temp_flux)
+    CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), &
+                closest_indices(1), temp_wavelengths, temp_flux)
+
     n_points = SIZE(temp_wavelengths)
     ALLOCATE(common_wavelengths(n_points))
     common_wavelengths = temp_wavelengths
@@ -48,7 +51,9 @@ CONTAINS
 
     ! Load and interpolate remaining SEDs
     DO i = 2, 4
-      CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), closest_indices(i), temp_wavelengths, temp_flux)
+      CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), &
+                  closest_indices(i), temp_wavelengths, temp_flux)
+
       CALL interpolatearray(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(i, :))
     END DO
 
@@ -88,7 +93,8 @@ CONTAINS
   !---------------------------------------------------------------------------
   ! Identify the four closest stellar models
   !---------------------------------------------------------------------------
-  SUBROUTINE getcloseststellarmodels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+  SUBROUTINE getcloseststellarmodels(teff, log_g, metallicity, lu_teff, &
+                                  lu_logg, lu_meta, closest_indices)
     REAL(dp), INTENT(IN) :: teff, log_g, metallicity
     REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
     INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
@@ -98,7 +104,8 @@ CONTAINS
     REAL(dp), DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
     REAL(dp), DIMENSION(4) :: min_distances
     INTEGER, DIMENSION(4) :: indices
-    REAL(dp) :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max, teff_dist, logg_dist, meta_dist
+    REAL(dp) :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
+    REAL(dp) :: teff_dist, logg_dist, meta_dist
 
     n = SIZE(lu_teff)
     min_distances = HUGE(1.0)

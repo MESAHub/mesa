@@ -19,11 +19,11 @@
 
 module colors_ctrls_io
 
-   use const_def
-   use colors_def
+   use const_def, only: dp, strlen, max_extra_inlists
+   use colors_def, only: Colors_General_Info, get_colors_ptr
 
    implicit none
-   
+
    public :: read_namelist, write_namelist, get_colors_controls, set_colors_controls
 
    private
@@ -52,7 +52,7 @@ module colors_ctrls_io
       extra_colors_inlist_name
 
 contains
- 
+
 
 ! read a "namelist" file and set parameters
 subroutine read_namelist(handle, inlist, ierr)
@@ -72,8 +72,8 @@ end subroutine read_namelist
 recursive subroutine read_controls_file(rq, filename, level, ierr)
    use ISO_FORTRAN_ENV, only: IOSTAT_END
    character(*), intent(in) :: filename
-   type (Colors_General_Info), pointer :: rq
    integer, intent(in) :: level
+   type (Colors_General_Info), pointer, intent(inout) :: rq
    integer, intent(out) :: ierr
    logical, dimension(max_extra_inlists) :: read_extra
    character (len=strlen), dimension(max_extra_inlists) :: extra
@@ -114,7 +114,8 @@ recursive subroutine read_controls_file(rq, filename, level, ierr)
          write(*, '(a)') 'Failed while trying to read colors namelist file: ' // trim(filename)
          write(*, '(a)') 'Perhaps the following runtime error message will help you find the problem.'
          write(*, *)
-         open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
+         open(newunit=unit, file=trim(filename), action='read', &
+              delim='quote', status='old', iostat=ierr)
          read(unit, nml=colors)
          close(unit)
          return
@@ -147,9 +148,10 @@ end subroutine set_default_controls
 
 
 subroutine store_controls(rq, ierr)
-   type (Colors_General_Info), pointer :: rq
+   type (Colors_General_Info), pointer, intent(inout) :: rq
 
-   integer :: i, ierr
+   integer :: i
+   integer, intent(out) :: ierr
 
    rq% instrument = instrument
    rq% vega_sed = vega_sed
@@ -186,7 +188,7 @@ end subroutine write_namelist
 
 
 subroutine set_controls_for_writing(rq)
-   type (Colors_General_Info), pointer :: rq
+   type (Colors_General_Info), pointer, intent(inout) :: rq
 
    instrument = rq% instrument
    vega_sed = rq% vega_sed
@@ -202,9 +204,9 @@ end subroutine set_controls_for_writing
 
 subroutine get_colors_controls(rq, name, val, ierr)
    use utils_lib, only: StrUpCase
-   type (Colors_General_Info), pointer :: rq
+   type (Colors_General_Info), pointer, intent(inout) :: rq
    character(len=*),intent(in) :: name
-   character(len=*), intent(out) :: val
+   character(len=512), intent(out) :: val
    integer, intent(out) :: ierr
 
    character(len(name)+1) :: upper_name
@@ -245,7 +247,7 @@ subroutine get_colors_controls(rq, name, val, ierr)
 end subroutine get_colors_controls
 
 subroutine set_colors_controls(rq, name, val, ierr)
-   type (Colors_General_Info), pointer :: rq
+   type (Colors_General_Info), pointer, intent(inout) :: rq
    character(len=*), intent(in) :: name, val
    character(len=len(name)+len(val)+8) :: tmp
    integer, intent(out) :: ierr

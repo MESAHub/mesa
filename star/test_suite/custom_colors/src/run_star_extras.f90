@@ -1,17 +1,15 @@
 module run_star_extras
-  use star_lib
-  use star_def
-  use const_def
-  use math_lib
-  !use mesa_dir
-  use auto_diff
+  use star_lib, only: star_ptr
+  use star_def, only: star_info, maxlen_history_column_name, maxlen_profile_column_name, keep_going
+  use const_def, only: dp, strlen, mesa_dir
   ! TODO: below are things we will need to incorporate into the main code
   ! So that we do not need to create a custom run_stars_extras file
   use colors_def, only: Colors_General_Info
-  use colors_lib, only: colors_init,colors_ptr,alloc_colors_handle_using_inlist, calculate_bolometric, calculate_synthetic, remove_dat
-
+  use colors_lib, only: colors_init, colors_ptr, alloc_colors_handle_using_inlist, &
+                        calculate_bolometric, calculate_synthetic, remove_dat
   implicit none
-
+  private
+  public :: extras_controls  ! Add this line
   type (colors_General_Info), pointer :: colors_settings
   include "test_suite_extras_def.inc"
 
@@ -89,7 +87,7 @@ end subroutine extras_controls
     !XXXcall test_suite_after_evolve(ierr)
   end subroutine extras_after_evolve
 
-  
+
   integer function extras_check_model(id)
      integer, intent(in) :: id
      integer :: ierr
@@ -101,7 +99,6 @@ end subroutine extras_controls
   end function extras_check_model
 
   INTEGER FUNCTION how_many_extra_profile_columns(id)
-     USE star_def, ONLY: star_info
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -115,8 +112,6 @@ end subroutine extras_controls
   END FUNCTION how_many_extra_profile_columns
 
   SUBROUTINE data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
-     USE star_def, ONLY: star_info, maxlen_profile_column_name
-     USE const_def, ONLY: DP
      INTEGER, INTENT(IN) :: id, n, nz
      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
      REAL(DP) :: vals(nz, n)
@@ -131,7 +126,6 @@ end subroutine extras_controls
   END SUBROUTINE data_for_extra_profile_columns
 
   INTEGER FUNCTION extras_finish_step(id)
-     USE chem_def
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -173,12 +167,12 @@ function basename(path) result(name)
    end if
    i = index(path, '/', back=.true.)
    name = path(i+1:)
-end function
+end function basename
 
   subroutine read_strings_from_file(strings, n, id)
       integer, intent(in) :: id
       character(len=512) :: filename
-      character(len=100), allocatable :: strings(:)
+      character(len=100), allocatable, intent(out) :: strings(:)
       integer, intent(out) :: n
       integer :: unit, i, status
       character(len=100) :: line

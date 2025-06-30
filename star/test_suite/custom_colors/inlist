@@ -33,5 +33,5 @@
 
 &pgstar
       read_extra_pgstar_inlist(1) = .true.
-      extra_pgstar_inlist_name(1) = 'pgstar_inlist'
+      extra_pgstar_inlist_name(1) = 'project_inlist'
 / ! end of pgstar namelist
