@@ -2,41 +2,31 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pulse_osc
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, four_thirds, rsun
   use utils_lib
   use chem_def
   use atm_def
   use atm_support
 
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
@@ -47,10 +37,7 @@ module pulse_osc
   integer, parameter :: IVAR = 22
   integer, parameter :: IABUND = 14
 
-  ! Access specifiers
-
   private
-
   public :: get_osc_data
   public :: write_osc_data
 
@@ -153,13 +140,13 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Store global data
 
@@ -185,7 +172,7 @@ contains
        rho_c = eval_center_rho(s, k_b(n_sg))
     else
        rho_c = eval_center(s%rmid, s%rho, k_a(n_sg), k_b(n_sg))
-    endif
+    end if
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
@@ -236,7 +223,7 @@ contains
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -252,8 +239,6 @@ contains
     if (ASSOCIATED(s%atm_structure)) then
        deallocate(s%atm_structure)
     end if
-
-    ! Finish
 
     return
 
@@ -333,7 +318,7 @@ contains
            omega = s%omega(1)
         else
            omega = 0d0
-        endif
+        end if
         kap_T = s%atm_structure(atm_dlnkap_dlnT,k)
         kap_rho = s%atm_structure(atm_dlnkap_dlnd,k)
         eps_T = 0d0
@@ -357,13 +342,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
 
@@ -421,7 +403,7 @@ contains
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else
            rho = eval_face_rho(s, k, k_a, k_b)
-        endif
+        end if
         nabla = s%gradT(k)  ! Not quite right; gradT can be discontinuous
         L = s%L(k)
         kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
@@ -436,7 +418,7 @@ contains
            omega = s%omega(k)  ! Not quite right; omega can be discontinuous
         else
            omega = 0d0
-        endif
+        end if
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)/kap
         kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)/kap
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
@@ -460,13 +442,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j, k_a, k_b)
 
@@ -533,7 +512,7 @@ contains
            omega = eval_center(s%r, s%omega, k_a, k_b)
         else
            omega = 0d0
-        endif
+        end if
         kap_T = eval_center(s%rmid, s%d_opacity_dlnT, k_a, k_b)/kap
         kap_rho = eval_center(s%rmid, s%d_opacity_dlnd, k_a, k_b)/kap
         eps_T = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
@@ -557,15 +536,12 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_ctr
 
   end subroutine get_osc_data
 
-  !****
 
   subroutine write_osc_data (id, filename, global_data, point_data, ierr)
 
@@ -624,8 +600,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call fgong-amdl.d
 if [ $# -lt 2 ] || [ "$1" == "-help" ] 
 then

@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -160,7 +157,7 @@
          ! high T
          delta_lgRho_cntr_hard_limit = s% delta_lgRho_cntr_hard_limit
          ! we also store dt_div_min_dr_div_cs_limit, we keep it at a
-         ! high value until the onset of a pulse to prevent unnecesarily
+         ! high value until the onset of a pulse to prevent unnecessarily
          ! small timesteps before a pulsation
          dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
 
@@ -391,11 +388,11 @@
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
             do j=1, s% nz
-               if (s% q(j) > 0.999) then
+               if (s% q(j) > 0.999d0) then
                   fp(j) = 1d0
                   ft(j) = 1d0
-               else if (s% q(j) > 0.998) then
-                  alpha = (1d0-(s% q(j)-0.998)/(0.001))
+               else if (s% q(j) > 0.998d0) then
+                  alpha = (1d0-(s% q(j)-0.998d0)/(0.001d0))
                   fp(j) = fp(j)*alpha + 1d0*(1-alpha)
                   ft(j) = ft(j)*alpha + 1d0*(1-alpha)
                end if
@@ -838,7 +835,7 @@
          if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
             lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
             if (lburn_div_lsurf > 0d0) then
-               if((abs(log10(lburn_div_lsurf))) < 0.01 .and. &
+               if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
@@ -968,13 +965,13 @@
                write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
                write(*,*) 'check time left', &
                   s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
-               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
+               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1d5
                write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
                write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
                write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
                write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
                write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
-               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1d5)
             end if
             ! If enough time has passed after a pulse, then turn off Riemann hydro
             ! also, wait for the inner q_for_relax_check of what would remain of the star to be below a threshold
@@ -1201,7 +1198,7 @@
                tdyn = 1d0/sqrt(s% m(k)/(4d0/3d0*pi*pow3(s% r(k)))*standard_cgrav)
                s% xtra(x_time_start_pulse) = s% time
                s% xtra(x_dyn_time) = tdyn
-               write(*,*) "reached high velocities", maxval(abs(s% xh(s% i_u, k0:s% nz)))/1e5, &
+               write(*,*) "reached high velocities", maxval(abs(s% xh(s% i_u, k0:s% nz)))/1d5, &
                   "stopping in at least", num_dyn_ts_for_relax*tdyn, "seconds"
             end if
          end if
@@ -1303,7 +1300,7 @@
             s% use_other_wind = .true.
          end if
 
-         if (maxval(s% T(1:s% nz)) > 9.8) then
+         if (maxval(s% T(1:s% nz)) > 9.8d0) then
             s% delta_lgRho_cntr_hard_limit = -1d0
          else
             s% delta_lgRho_cntr_hard_limit = delta_lgRho_cntr_hard_limit

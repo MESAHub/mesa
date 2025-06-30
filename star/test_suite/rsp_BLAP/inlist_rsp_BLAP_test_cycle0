@@ -1,4 +1,4 @@
-! inlist_rsp_blap_0.36M   a Z-bump unstable pulsator.  
+! inlist_rsp_blap_0.36M   a Z-bump unstable pulsator.
 ! original test case contributed by Alfred Gautschy.
 
 &star_job
@@ -20,7 +20,7 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
@@ -48,19 +48,19 @@
    max_model_number = 12000
 
 ! RSP controls
-   
+
    x_integer_ctrl(1) = 10      ! which period to check (<0 check is skipped!)
    x_ctrl(1)         =  0.05543d0 ! expected period (in days)
 
    ! possible model for BLAP pulsations, as an F-mode pulsation
    RSP_mass = 0.36d0
    RSP_Teff = 26.0d+3
-   RSP_L    = 320.0d+0   
+   RSP_L    = 320.0d+0
    RSP_X    = 0.7d0
    RSP_Z    = 0.05d0
-   
+
    RSP_T_anchor = 2d5 ! approx temperature at base of outer region
-         
+
    ! parameters for equations
    RSP_alfam =     0.15d0         ! eddy viscosity; Chi & Eq ~ RSP_alfam
    RSP_alfat =     0.01d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
@@ -69,11 +69,11 @@
 
    ! initial kick velocity-amplitude
    RSP_kick_vsurf_km_per_sec = 0.5d0
-   
+
 ! solver
 
 ! output controls
-   
+
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
@@ -84,14 +84,14 @@
    ! i suggest the following method. interrupt the run soon after
    ! it makes a photo.  remove or delete LOGS/history.data to force
    ! creation of a new one when restart.  edit the inlist to set
-   ! history_interval to 1 to get maximum time resolution.  
-   ! restart the run and let it go for as many periods as desired.   
+   ! history_interval to 1 to get maximum time resolution.
+   ! restart the run and let it go for as many periods as desired.
 
       photo_interval = 1000
       profile_interval = 4000
       history_interval = 10
       terminal_interval = 4000
-      
+
       !max_model_number = 101
 
 / ! end of controls namelist
@@ -100,16 +100,16 @@
 
 &pgstar
 
-      !pause = .true.
+      !pause_flag = .true.
 
       pgstar_interval = 25
-         
+
       Grid2_win_flag = .true.
 
 
       Grid2_title = '0.36 M\d\(2281)\u Z=0.05 Blue Large Amplitude Pulsator (BLAP)'
 
-      
+
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
@@ -118,7 +118,7 @@
       Grid2_file_dir = 'png'
       Grid2_file_prefix = 'grid'
       Grid2_file_interval = 20 ! output when mod(model_number,Grid2_file_interval)==0
-      
+
       !Profile_Panels1_show_grid = .true.
 
       Profile_Panels1_xaxis_name = 'logtau'

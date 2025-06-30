@@ -1,30 +1,47 @@
-
-
-
+! ***********************************************************************
+!
+!   Copyright (C) 2013  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
 
       module mass_utils
 
-      use const_def
+      use const_def, only: dp, qp
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
-
 
       implicit none
 
       private
-      public :: accurate_mass_difference, reconstruct_m, reconstruct_xm, &
-                make_compressed_intersect, non_rect_array, &
-                prepare_pass_fraction, compute_pass_fraction, find_j_ranges, integrate_conserved
-
+      public :: accurate_mass_difference
+      public :: reconstruct_m
+      public :: reconstruct_xm
+      public :: make_compressed_intersect
+      public :: non_rect_array
+      public :: prepare_pass_fraction
+      public :: compute_pass_fraction
+      public :: find_j_ranges
+      public :: integrate_conserved
 
       ! A derived array type for storing non-rectangular 2D arrays
       type non_rect_array
          real(qp), dimension(:), allocatable :: arr
       end type non_rect_array
 
-
       contains
-
 
       ! Reconstructs m(j) given dm.
       ! Not currently used, but helpful for debugging.
@@ -573,6 +590,5 @@
          end do
 
       end subroutine integrate_conserved
-
 
   end module mass_utils

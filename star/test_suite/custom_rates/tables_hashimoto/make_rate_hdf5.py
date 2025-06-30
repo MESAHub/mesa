@@ -5,11 +5,9 @@ import numpy as np
 
 
 class GMPTable:
-
     _columns = ("uf", "lbeta+", "leps-", "lrnu", "lbeta-", "leps+", "lrnubar")
 
     def __init__(self, filename):
-
         data1d = np.loadtxt(filename, skiprows=4)
 
         self.T9s = np.unique(data1d[:, 0])
@@ -24,13 +22,11 @@ class GMPTable:
 
 
 if __name__ == "__main__":
-
     filename = "n14c-hr.dat"
     table = GMPTable(filename)
 
     # open hdf5 file
     with h5py.File("GMP_r_n14_wk_c14.h5", "w") as h5file:
-
         # the 1D data sets
         h5file.create_dataset("lYeRhos", data=table.lYeRhos)
         h5file.create_dataset("T9s", data=table.T9s)
@@ -42,7 +38,6 @@ if __name__ == "__main__":
 
     # open hdf5 file
     with h5py.File("GMP_r_c14_wk-minus_n14.h5", "w") as h5file:
-
         # the 1D data sets
         h5file.create_dataset("lYeRhos", data=table.lYeRhos)
         h5file.create_dataset("T9s", data=table.T9s)

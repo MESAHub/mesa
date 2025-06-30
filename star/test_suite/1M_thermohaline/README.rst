@@ -4,12 +4,12 @@
 1M_thermohaline
 ***************
 
-The test checks thermohaline mixing in a rotating, 1 Msun, Z=0.02 metallicity model.
+The test checks thermohaline mixing in a rotating, 1 |Msun|, Z=0.02 metallicity model.
 
 
 This test case has one part. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_1M_thermohaline``) loads a 1 Msun main-sequence model, applies a 10 km/s rotation profile, and evolves the model until the helium core mass reaches 0.24 Msun, where some key quantities are reported:
+* Part 1 (``inlist_1M_thermohaline``) loads a 1 |Msun| main-sequence model, applies a 10 km/s rotation profile, and evolves the model until the helium core mass reaches 0.24 |Msun|, where some key quantities are reported:
 
 .. code-block:: console
 
@@ -242,7 +242,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 28May2021 (MESA e37f76f) by fxt
-

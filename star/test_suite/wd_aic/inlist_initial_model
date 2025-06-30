@@ -18,7 +18,6 @@
 / !end of star_job namelist
 
 
-
 &kap
     Zbase = 0d0
 / ! end of kap namelist

@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2022  The MESA Team & Matthias Fabry
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -71,6 +65,8 @@ contains
 
       use num_lib, only : safe_root_with_guess
       use math_lib, only : pow
+      use const_def, only : dp, pi
+      use pgstar_colors
 
       type (binary_info), pointer :: b
       integer, intent(in) :: device_id
@@ -213,7 +209,7 @@ contains
       end if
 
       call pgsave
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       call pgscf(1)
       call pgsch(txt_scale)
       call pgslw(b% pg% pgbinary_lw / 2)
@@ -245,7 +241,7 @@ contains
       call pgslw(1)
       call pgmtxt('T', -2.0 - 1.3, 0.05, 0.0, 'Star 2')
 
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       call pgpt1(0.0, 0.0, 5)
       call pgunsa
 

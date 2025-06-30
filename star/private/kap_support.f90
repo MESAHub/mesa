@@ -2,50 +2,35 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module kap_support
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, ln10
   use auto_diff
-
-  ! No implicit typing
 
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: prepare_kap
   public :: setup_for_op_mono
   public :: fraction_of_op_mono
   public :: frac_op_mono
   public :: get_kap
-
-  ! Procedures
 
 contains
 
@@ -61,7 +46,6 @@ contains
 
   end subroutine prepare_kap
 
-  !****
 
   subroutine setup_for_op_mono(s, check_if_need, ierr)
 
@@ -132,7 +116,6 @@ contains
 
   end subroutine setup_for_op_mono
 
-  !****
 
   real(dp) function fraction_of_op_mono(s, k) result(beta)
     ! returns the real(dp) value of the blend function for cell k
@@ -151,7 +134,6 @@ contains
 
   end function fraction_of_op_mono
 
-  !****
 
   type(auto_diff_real_2var_order1) function frac_op_mono(s, logRho, logT) result(beta)
     ! returns an auto_diff type: var1 = lnd, var2 = lnT (derivs w.r.t. ln *not* log)
@@ -218,7 +200,6 @@ contains
 
   end function frac_op_mono
 
-  !****
 
   subroutine get_kap( &
        s, k, zbar, xa, logRho, logT, &
@@ -457,7 +438,7 @@ contains
                  fk, logT, logRho, &
                  zbar, lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                  kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
-         endif
+         end if
       else
          write(*,*) 'Invalid argument for op_mono_method.'
          stop

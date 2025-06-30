@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -92,7 +86,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          handle = do_alloc_kap(ierr)
          if (ierr /= 0) return
          call read_namelist(handle, inlist, ierr)
@@ -117,7 +111,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call get_kap_ptr(handle,rq,ierr)
       end subroutine kap_ptr
 
@@ -205,7 +199,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          call kap_ptr(handle,rq,ierr)
          if (ierr /= 0) return
@@ -260,7 +254,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          ierr = 0
 
          call kap_ptr(handle,rq,ierr)
@@ -295,7 +289,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          ierr = 0
 
          call kap_ptr(handle,rq,ierr)
@@ -335,7 +329,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          ierr = 0
 
          call kap_ptr(handle,rq,ierr)
@@ -388,7 +382,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call kap_ptr(handle,rq,ierr)
          if (ierr /= 0) return
 
@@ -431,7 +425,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call op_dload(op_mono_data_path, op_mono_data_cache_filename, ierr)
       end subroutine load_op_mono_data
 
@@ -512,7 +506,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call eval_op_radacc( &
             kk, izk, nel, izzp, fap, fac, flux, fltp, flrhop, screening, &
             g1, grl1, &
@@ -560,7 +554,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call eval_op_ev( &
             nel, izzp, fap, fac, fltp, flrhop, screening, &
             g1, gx1, gy1, &
@@ -606,7 +600,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
          call eval_alt_op( &
             nel, izzp, fap, fac, fltp, flrhop, screening, &
             g1, gx1, gy1, &
@@ -636,7 +630,7 @@
          if (.not. kap_is_initialized) then
             ierr=-1
             return
-         endif
+         end if
 
          nel = 0
          izzp(:) = 0
@@ -751,7 +745,7 @@
                   fk_grad_pcg(j,:), logT_face, logRho_face, l, r, &
                   lgrad, ierr,&
                   ite,jne,epatom,amamu,logT_pcg(j,:),logRho_pcg(j,:),lgamm_pcg(j,:,:),lkap_face_pcg(j,:))
-        endif
+        end if
       end subroutine call_compute_grad_mombarg
 
       subroutine call_compute_gamma_grid_mombarg(j, fk, ierr)
@@ -798,7 +792,7 @@
         if (.not. kap_is_initialized) then
            ierr=-1
            return
-        endif
+        end if
         call kap_ptr(handle,rq,ierr)
         if (ierr /= 0) return
 
@@ -809,14 +803,14 @@
         if (initialize_fk_old) then
         fk_old = 0
         initialize_fk_old = .false.
-        endif
+        end if
 
 
         delta  = MAXVAL(ABS(fk - fk_pcg)/fk_pcg, MASK=fk_pcg>0 )
         delta2 = MAXVAL(ABS(fk - fk_old(k,:))/fk_old(k,:), MASK=fk_old(k,:)>0 )
         if (SUM(fk_old(k,:)) == 0) then
           delta2 = 1d99
-        endif
+        end if
 
 
 
@@ -837,14 +831,14 @@
                 log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
                 logT_grid_old(k,:,:),logRho_grid_old(k,:,:),&
                 lkap_grid_old(k,:,:))
-          endif
+          end if
         else
           call compute_kappa_fast(k,&
               fk_pcg, logT_cntr, logRho_cntr, &
               log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
               ite,jne,epatom,amamu,sig,lkap_ross_pcg)
 
-        endif
+        end if
 
         if (ierr == 1) return
 

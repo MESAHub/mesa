@@ -1,6 +1,6 @@
  Block Data azdat;
  Implicit real*8 (a-h,o-z);
-_Include zone; 
+_Include zone;
 _include azzn;
  COMMON /SAMPLE/sampleZ(Natom);
   DATA Zn/

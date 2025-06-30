@@ -42,11 +42,9 @@ included.
 The test succeeds if the 20Ne electron captures cause a temperature
 spike at the center of the model.
 
-
 .. image:: ../../../star/test_suite/wd_aic/docs/grid1000492.png
 
 .. |Schwab2015| replace:: `Schwab et al. 2015 <https://ui.adsabs.harvard.edu/abs/2015MNRAS.453.1910S/abstract>`__
 
 
 Last-Updated: 2020-10-30 (mesa r14735) by Josiah Schwab
-

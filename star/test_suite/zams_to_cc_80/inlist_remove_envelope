@@ -27,7 +27,7 @@
 / ! end of kap namelist
 
 &controls
-      
+
       ! just run for a relatively small number of steps to adjust to removing envelope
       max_model_number = 100
       !max_number_retries = 37
@@ -63,12 +63,11 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
 
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 
+Profile_Panels3_xmax = -101d0 !
 Profile_Panels3_yaxis_name(4) = 'gamma1'
 
 TRho_Profile_xmin = 2.0

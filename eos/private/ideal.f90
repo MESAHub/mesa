@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module ideal
 
    use const_def, only: dp
@@ -16,7 +35,7 @@ module ideal
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-      use const_def
+      use const_def, only: dp
       use eos_blend
       type (EoS_General_Info), pointer :: rq
       real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -51,12 +70,12 @@ module ideal
    skip = .false.
 
    ! zero all components
-   res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-   d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-   d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+   res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+   d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+   d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
    ! mark this one
-   res(i_frac_ideal) = 1.0
+   res(i_frac_ideal) = 1.0d0
 
    end subroutine get_ideal_for_eosdt
 

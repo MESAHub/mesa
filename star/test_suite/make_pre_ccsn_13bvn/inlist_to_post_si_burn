@@ -7,17 +7,16 @@
       save_model_when_terminate = .true.
       save_model_filename = 'after_si_burn.mod'
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
 
-      
-      
+
 / ! end of star_job namelist
 
 
 &controls
 
-! stopping condition: stop when lg_centerT >= 9.60 
+! stopping condition: stop when lg_centerT >= 9.60
 ! just before Si ignites in the core
 
      log_center_temp_upper_limit = 9.60d0
@@ -27,15 +26,15 @@
 
 
 ! adjust overshoot, to prevent He shell convection from propagating inward in test case.
-     overshoot_scheme(1) = 'none' 
-     overshoot_zone_type(1) = 'burn_He' 
-     overshoot_zone_loc(1) = 'shell' 
+     overshoot_scheme(1) = 'none'
+     overshoot_zone_type(1) = 'burn_He'
+     overshoot_zone_loc(1) = 'shell'
      overshoot_bdy_loc(1) = 'bottom'
 
 
-     overshoot_scheme(2) = 'exponential' 
-     overshoot_zone_type(2) = 'any' 
-     overshoot_zone_loc(2) = 'any' 
+     overshoot_scheme(2) = 'exponential'
+     overshoot_zone_type(2) = 'any'
+     overshoot_zone_loc(2) = 'any'
      overshoot_bdy_loc(2) = 'any'
      overshoot_f(2) = 0.01
      overshoot_f0(2) = 0.004
@@ -55,9 +54,9 @@
 
 ! convergence testing tighter time_steps for advanced burning
       !mesh_delta_coeff = 0.5d0
-      delta_lgRho_cntr_limit = 0.005      
-      delta_lgT_cntr_limit = 0.005  
-      delta_lgT_max_limit = 0.005     
+      delta_lgRho_cntr_limit = 0.005
+      delta_lgT_cntr_limit = 0.005
+      delta_lgT_max_limit = 0.005
 
 
 ! Extra values to print to terminal
@@ -77,13 +76,12 @@
       !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10 
+      terminal_interval = 10
 
       x_integer_ctrl(1) = 5 ! inlist_part
-      
+
 
 / ! end of controls namelist
-
 
 
 &pgstar

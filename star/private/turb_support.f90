@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
 module turb_support
 
 use star_private_def
-use const_def
+use const_def, only: dp, crad, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -37,7 +30,9 @@ use turb
 implicit none
 
 private
-public :: get_gradT, do1_mlt_eval, Get_results
+public :: get_gradT
+public :: do1_mlt_eval
+public :: Get_results
 
 contains
 
@@ -186,7 +181,7 @@ contains
       integer, intent(out) :: ierr
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
-      real(dp) :: conv_vel_start, scale
+      real(dp) :: conv_vel_start, scale, max_conv_vel
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -247,6 +242,16 @@ contains
          gradL = grada
       end if
 
+      ! maximum convection velocity.
+      if (k>=1) then
+         if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
+             max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
+         else
+            max_conv_vel = 1d99
+         end if
+      end if
+
+
       ! Initialize with no mixing
       mixing_type = no_mixing
       gradT = gradr
@@ -296,7 +301,7 @@ contains
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, grav, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, Eq_div_w, grav, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -314,7 +319,7 @@ contains
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, grav, ierr)
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, Eq_div_w, grav, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
@@ -328,7 +333,8 @@ contains
          call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, Ptot, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
 
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'ierr from set_MLT'
@@ -345,7 +351,8 @@ contains
                call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                               chiT, chiRho, Cp, grav, Lambda, rho, Ptot, T, opacity, &
                               gradr_scaled, grada, gradL, &
-                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
                   return
@@ -481,6 +488,5 @@ contains
          end if
       end subroutine set_superad_reduction
    end subroutine Get_results
-
 
 end module turb_support

@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 ! from Frank Timmes' site, http://www.cococubed.com/code_pages/fermi_dirac.shtml
 
 !..routine dfermi gets the fermi-dirac functions and their derivatives
@@ -81,7 +100,7 @@ contains
         xi=log(1.d0+exp(eta1))/sg
       else
         xi=eta-d
-      endif
+      end if
       xi2=xi*xi
 
 !   definition of the x_i:
@@ -167,7 +186,7 @@ contains
        fdeta    = fd
        denom2   = 4.0d0 * dxst
        fdtheta  = xdkp1/denom2 * factor
-      endif
+      end if
 
       return
    end subroutine fdfunc1
@@ -209,7 +228,7 @@ contains
        fdeta   = fd
        denom2  = 4.0d0 * dxst
        fdtheta = 2.0d0 * xdkp1/denom2 * factor
-      endif
+      end if
 
       return
    end subroutine fdfunc2
@@ -283,7 +302,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -372,7 +391,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -480,7 +499,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -629,7 +648,7 @@ contains
         res   = res + (fval1 + fval2)*wg(j)
         dres  = dres + (dfval1 + dfval2)*wg(j)
         ddres = ddres + (ddfval1 + ddfval2)*wg(j)
-      enddo
+      end do
       res   = res * hlfrun
       dres  = dres * hlfrun
       ddres = ddres * hlfrun
@@ -709,7 +728,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b
@@ -809,7 +828,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b
@@ -950,7 +969,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b
@@ -1170,7 +1189,7 @@ contains
        res   = res + fval*wg(j)
        dres  = dres + dfval*wg(j)
        ddres = ddres + ddfval*wg(j)
-      enddo
+      end do
       res   = res*b
       dres  = dres*b
       ddres = ddres*b

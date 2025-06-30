@@ -23,7 +23,7 @@ else
    export SHARED = no
 endif
 
-all: 
+all:
 	@$(MAKE) --no-print-directory -C $(FORUM_DIR) install
 
 install:

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export MESA_TEST_MOD="binary"
 ../../star/test_suite/each_test_run $1

@@ -2,30 +2,24 @@
 !
 !   Copyright (C) 2010-2019  Joris Vos & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
     module binary_edot
 
-    use const_def
+    use const_def, only: dp
     use star_lib
     use star_def
     use binary_def
@@ -47,7 +41,7 @@
            b% extra_edot = 0d0
            b% edot = 0d0
        else
-           ! tidal circularisation
+           ! tidal circularization
            if (b% do_tidal_circ) then
               if (.not. b% use_other_edot_tidal) then
                  call edot_tidal(b% binary_id, ierr)
@@ -149,7 +143,7 @@
        end if
     end subroutine edot_tidal
 
-    real(dp) function edot_tidal_Hut(b, s , has_convective_envelope, ierr) result(edot_tidal)
+    real(dp) function edot_tidal_Hut(b, s, has_convective_envelope, ierr) result(edot_tidal)
        type (binary_info), pointer :: b
        type (star_info), pointer :: s
        logical, intent(in) :: has_convective_envelope
@@ -207,25 +201,25 @@
 
        b% edot_enhance = 0d0
 
-       ! cos_cr isn't vectorised, so we have to do this in a loop
+       ! cos_cr isn't vectorized, so we have to do this in a loop
        do i = 1, b% anomaly_steps
           costh = cos(b% theta_co(i))
 
           b% e1(i) = b% eccentricity + costh
           b% e2(i) = 2d0*costh + b% eccentricity*(1d0 + costh*costh)
-          b% e3(i) = b% eccentricity*(1d0-costh*costh)  ! = b% eccentricity*sin(b% theta_co)**2
+          b% e3(i) = b% eccentricity*(1d0 - costh*costh)  ! = b% eccentricity*sin(b% theta_co)**2
        end do
 
 !        xfer = min(b% wind_xfer_fraction, b% xfer_fraction)
        Mtot = b% m(1) + b% m(2)  ! total mass in gr
 
-       b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1  !-&
-!               b% mdot_donor_theta * xfer / b% m(b% a_i) * (b% m(b% d_i) / Mtot *&
+       b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1  !- &
+!               b% mdot_donor_theta * xfer / b% m(b% a_i) * (b% m(b% d_i) / Mtot * &
 !               ((b% m(b% a_i)**2 / b% m(b% d_i)**2 - 1 ) * e2 - e3 ))
 
-       !integrate to get total eccentricity enhancement
+       ! integrate to get total eccentricity enhancement
        de = 0d0
-       do i = 2,b% anomaly_steps  ! trapezoidal integration
+       do i = 2, b% anomaly_steps  ! trapezoidal integration
           de = de + 0.5d0 * (b% edot_theta(i-1) + b% edot_theta(i)) * (b% time_co(i) - b% time_co(i-1))
        end do
 
@@ -235,4 +229,3 @@
 
 
     end module binary_edot
-

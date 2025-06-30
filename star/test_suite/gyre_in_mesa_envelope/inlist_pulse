@@ -1,5 +1,5 @@
 &star_job
-      
+
   ! load the starting model
 
   load_saved_model = .true.
@@ -29,7 +29,7 @@
   use_gold2_tolerances = .true.
 
   ! GYRE output controls
-  
+
   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 

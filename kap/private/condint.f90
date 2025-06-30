@@ -2,36 +2,32 @@
 !
 !   Copyright (C) 2011-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module condint
 
-      use const_def, only: dp
+      use const_def, only: dp, iln10
       use math_lib
       use utils_lib, only: mesa_error
 
       implicit none
 
+      private
+      public :: init_potekhin
+      public :: do_electron_conduction
 
       integer, parameter :: num_logTs=29, num_logRhos=71, num_logzs=15
       !!! NB: These parameters must be consistent with the table "condtabl.d"!
@@ -42,9 +38,7 @@
       real(dp), pointer :: f(:,:,:,:)
       integer :: ilinx(num_logzs), iliny(num_logzs)
 
-
       contains
-
 
       subroutine init_potekhin(ierr)
          use kap_def, only: kap_dir
@@ -97,7 +91,7 @@
                logzs(iz) = 0d0
             else
                logzs(iz) = log10(z)
-            endif
+            end if
             do ir = 1, num_logRhos
                read(1,*,iostat=read_err) logRhos(ir), (f(1,ir,it,iz),it=1,num_logTs)
                if (read_err /= 0) ierr = read_err
@@ -451,6 +445,5 @@
          end if
 
       end subroutine do_electron_conduction
-
 
       end module condint

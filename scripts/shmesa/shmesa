@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #### MESA SHMESA 
-#### Command line utilies for MESA 
+#### Command line utilities for MESA 
 # provides commands such as `shmesa change` and `shmesa grep` 
 # for usage, execute `shmesa help`
 # add `PATH=$PATH:$MESA_DIR/scripts/shmesa` to your ~/.bashrc 

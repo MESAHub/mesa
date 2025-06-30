@@ -25,5 +25,3 @@ This test case has 1 part.
     1296      -7          0.2348E-02              0.0000              0.0000
 
 Last-Updated: 11Jun2021 (MESA 5be9e57) by fxt.
-
-

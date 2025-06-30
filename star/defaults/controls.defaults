@@ -216,7 +216,7 @@
       ! log_directory
       ! ~~~~~~~~~~~~~
 
-      ! for data files about the run
+      ! directory for data files about the run
 
       ! ::
 
@@ -226,7 +226,7 @@
       ! do_history_file
       ! ~~~~~~~~~~~~~~~
 
-      ! history file is created if this is true
+      ! a history file is created if this is true
 
       ! ::
 
@@ -781,16 +781,6 @@
     burn_min2 = 1000
 
 
-      ! max_conv_vel_div_csound_maxq
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! only consider from center out to this location
-
-      ! ::
-
-    max_conv_vel_div_csound_maxq = 1
-
-
       ! width_for_limit_conv_vel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1115,7 +1105,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the center entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1129,7 +1119,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the max entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1183,7 +1173,7 @@
       ! Lower limits on surface mass fractions.
       ! Stop when surface abundance drops below this limit.
       ! Can have up to ``num_xa_surface_limits`` of these (see ``star_def`` for value)
-      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f``
+      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f90``
       ! ``xa_surface_lower_limit`` contains the lower limit value
 
       ! ::
@@ -1246,7 +1236,7 @@
       ! HB_limit
       ! ~~~~~~~~
 
-      ! For detecting horizontal branch.
+      ! For detecting when the model has completed the horizontal branch.
       ! Only applies when center abundance by mass of h1 is < 1d-4.
       ! Stop when the center abundance by mass of he4 drops below this limit.
 
@@ -1297,6 +1287,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! star_species_mass_max_limit_iso
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when a particular species mass in units of Msun exceeds these limits.
 
       ! ::
 
@@ -1738,7 +1730,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Stop if the abs value of cumulative_energy_error/total_energy exceeds this value.
-      ! Ignore if < 0.   Also ignore during relax operations.
+      ! Ignore if < 0. Also ignore during relax operations.
 
       ! ::
 
@@ -1790,10 +1782,19 @@
     center_R_lower_limit = -1
 
 
+      ! report_max_infall_inside_fe_core
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use ``fe_core_infall_mass`` to check amount of mass that is collapsing.
+      ! Then, If ``.true.``, fe_core_infall is determined by finding the maximum velocity that is inside
+      ! ``fe_core_mass`` in units of Msun. if ``.false.``, report the maximum infall velocity at any location.
+
+    report_max_infall_inside_fe_core = .true.
+
       ! fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
+      ! stop if at least ``fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``fe_core_mass``, in cm/s
 
       ! ::
 
@@ -1802,17 +1803,17 @@
       ! fe_core_infall_mass
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
+      ! if ``check_mass_sum_for_infall = .true.``, ``fe_core_infall_mass`` is the amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
       ! transistent velocity spike causing the model to prematurely exit.  In solar masses
 
 
-      fe_core_infall_mass = 0.1d0
+    fe_core_infall_mass = 0.1d0
 
 
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if atleast ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
+      ! stop if at least ``non_fe_core_infall_mass`` of material has speed greater than this, at a location interior to ``he_core_mass`` and exterior to ``fe_core_mass``. in cm/s
 
       ! ::
 
@@ -1972,6 +1973,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is greater than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -1982,6 +1986,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is less than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -2022,7 +2029,7 @@
       ! Pgas_div_P_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! criteria for stopping on Pgas/P
+      ! stop when Pgas/P <= Pgas_div_P_limit
 
       ! ::
 
@@ -2032,7 +2039,7 @@
       ! Pgas_div_P_limit_max_q
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if Pgas/P < this limit at any location with ``q <= Pgas_div_P_limit_max_q``
+      ! stop if Pgas/P < Pgas_div_P_limit at any location with ``q <= Pgas_div_P_limit_max_q``
       ! values near unity skip the outer envelope
 
       ! ::
@@ -2338,7 +2345,7 @@
       ! Henyey_MLT_nu_param
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Values of the f1..f4 coefficients are taken from Table 1 of Ludwig et al. 1999, A&A, 346, 111
+      ! Values of the f1..f4 coefficients are taken from Table 1 of `Ludwig et al. (1999) <https://ui.adsabs.harvard.edu/abs/1999A%26A...346..111L>`_
       ! with the following exception: their value of f3 for Henyey convection is ``f4/8`` when it should be
       ! ``8*f4``, i.e., ``f3=32*pi**2/3`` and ``f4=4*pi**2/3``. f3 and f4 are related to the henyey y parameter, so
       ! for the 'Henyey' case they are set based on the value of ``Henyey_y_param``.
@@ -2625,15 +2632,15 @@
       ! take a look at the following from an email concerning this:
       ! Overshooting works by taking the diffusion mixing coefficient at the edge
       ! of the convection zone and extending it beyond the zone. But -- and here's the issue --
-      ! at the exact edge of the zone the mixing coefficient goes to 0.  So we don't want that.
+      ! at the exact edge of the zone the mixing coefficient goes to 0. So we don't want that.
       ! Instead we want the value of the mixing coeff NEAR the edge, but not AT the edge.
-      ! The "f0" parameter determines the exact meaning of "near" for this.  It tells the code
+      ! The "f0" parameter determines the exact meaning of "near" for this. It tells the code
       ! how far back into the zone to go in terms of scale height. The overshooting actually
       ! begins at the location determined by f0 back into the convection zone rather than at
-      ! the edge where the diffusion coeff is ill-defined.  So, for example, if you want
+      ! the edge where the diffusion coeff is ill-defined. So, for example, if you want
       ! overshooting of 0.2 scale heights beyond the normal edge, you might want to back up
       ! 0.05 scale heights to get the diffusion coeff from near the edge and then go out
-      ! by 0.25 scale heights from there to reach 0.2 Hp beyond the old boundary.  In the
+      ! by 0.25 scale heights from there to reach 0.2 Hp beyond the old boundary. In the
       ! inlist this would mean setting the "f0" to 0.05 and the "f" to 0.25.
 
       ! For step overshoot: overshooting extends a distance overshoot_f*Hp0 from r0 with constant diffusion coefficient
@@ -3081,7 +3088,7 @@
       ! model reduces to standard MLT. See Table 1 in `Smolec & Moskalik (2008)`_
       ! for standard values and the description of the parameters.
 
-      ! .. _Smolec & Moskalik (2008): http://adsabs.harvard.edu/abs/2008AcA....58..193S
+      ! .. _Smolec & Moskalik (2008): https://ui.adsabs.harvard.edu/abs/2008AcA....58..193S
 
       ! ::
 
@@ -3165,7 +3172,7 @@
       ! Integration of the same model with different initial kicks is a way to study
       ! the nonlinear mode selection - for an example see Fig. 1 in `Smolec & Moskalik (2010)`_.
 
-      ! .. _Smolec & Moskalik (2010): http://adsabs.harvard.edu/abs/2010A%26A...524A..40S
+      ! .. _Smolec & Moskalik (2010): https://ui.adsabs.harvard.edu/abs/2010A%26A...524A..40S
 
       ! random initial velocity profile.  added to any kick from eigenvector.
 
@@ -3226,7 +3233,7 @@
       ! needed or should be very small. Hence a large cut-off parameter below (in purely
       ! radiative models the default value for cut-off was 0.01)
 
-      ! .. _Stellingwerf (1975): http://adsabs.harvard.edu/abs/1975ApJ...195..441S
+      ! .. _Stellingwerf (1975): https://ui.adsabs.harvard.edu/abs/1975ApJ...195..441S
 
       ! ::
 
@@ -3378,12 +3385,21 @@
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! convective velocities are limited to local sound speed times this factor
+      ! convective velocities are limited to local sound speed times this factor.
 
       ! ::
 
     max_conv_vel_div_csound = 1d99
 
+
+      ! max_conv_vel_div_csound_maxq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! only consider ``max_conv_vel_div_csound`` from center out to this location
+
+      ! ::
+
+    max_conv_vel_div_csound_maxq = -1
 
       ! max_v_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~
@@ -4100,7 +4116,7 @@
 
 
       ! D_mix_rotation_min_tau_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Drop rotational components of ``D_mix`` for locations where tau <= this.
       ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
@@ -4109,8 +4125,8 @@
 
     D_mix_rotation_min_tau_full_off = 0d0
 
-          ! D_mix_rotation_max_tau_full_on
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! D_mix_rotation_max_tau_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use rotational components of ``D_mix`` for locations where tau >= this.
       ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
@@ -4653,7 +4669,7 @@
 
       ! If ``.true.``, switch on impedance of the surface flux due to magnetic pressure from starspots,
       ! parameterized in the style of an atmospheric boundary modification. First described by
-      ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
+      ! `Somers et al. (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`_.
       ! Detailed discussion of this functionality can be found in |MESA VI|.
 
       ! ::
@@ -4689,7 +4705,7 @@
       ! mass_change
       ! ~~~~~~~~~~~
 
-      ! Rate of accretion (Msun/year).  Negative for mass loss.
+      ! Rate of accretion (Msun/year). Negative for mass loss.
       ! This only applies when the ``wind_scheme = ''``.
 
       ! ::
@@ -4798,7 +4814,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! This section replaces the old "``RGB_wind_scheme``" and "``AGB_wind_scheme``"
-      ! with temperature-dependent hot\_wind and cool\_wind.  You can still
+      ! with temperature-dependent hot\_wind and cool\_wind. You can still
       ! use the RGB and AGB wind scheme as before, the functionality remains.
 
       ! Now you can also select a hot wind scheme that takes effect *above*
@@ -5325,7 +5341,7 @@
 
       ! Winds automatically shut off when star_mass - he_core_mass mass is less than this limit.
       ! The value of ``he_core_boundary_h1_fraction`` defines he_core_mass.
-      ! Mass in Msun units.   Previously called ``wind_envelope_limit``.
+      ! Mass in Msun units. Previously called ``wind_envelope_limit``.
 
       ! ::
 
@@ -5647,6 +5663,7 @@
 
       ! Maximum number of grid points allowed.
       ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
+      ! If nz > max_allowed_nz, MESA will prematurely exit and call this error.
 
       ! ::
 
@@ -5961,9 +5978,9 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! Temperature gradient, ``T_function1 = T_function1_weight*log10(T)``.
-      ! NOTE: The T gradient mesh controls below  seems to be necessary to allow burning that starts off center
-      ! to be able to reach the center.  You can see this in the ``pre_zahb`` ``test_suite`` case if you
-      ! try running it without the T function.   The center temperature will fail to rise.
+      ! NOTE: The T gradient mesh controls below seems to be necessary to allow burning that starts off center
+      ! to be able to reach the center. You can see this in the ``pre_zahb`` ``test_suite`` case if you
+      ! try running it without the T function. The center temperature will fail to rise.
 
       ! ::
 
@@ -6363,7 +6380,7 @@
 
       ! If true, then after a retry the remeshing is undone for the step,
       ! and the following try is performed with the same mesh used in the
-      ! previous step.   This can help with the retry by reducing the changes.
+      ! previous step. This can help with the retry by reducing the changes.
 
       ! ::
 
@@ -7361,7 +7378,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Phase separation upon crystallization in WD cores
-      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
+      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023ApJ...950..115B>`_.
 
       ! ::
 
@@ -7373,9 +7390,9 @@
       ! Choice of appropriate option for the WD core mixture:
 
       ! + ``'CO'`` : carbon-oxygen phase separation using the two-component
-      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
-      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
 
       ! ::
 
@@ -7451,10 +7468,19 @@
     use_starting_composition_for_kap = .false.
 
 
+      ! opacity_min
+      ! ~~~~~~~~~~~
+
+      ! limit minimum opacities to this value (ignore this if value is < 0)
+
+      ! ::
+
+    opacity_min = -1
+
       ! opacity_max
       ! ~~~~~~~~~~~
 
-      ! limit opacities to this value (ignore this is value is < 0)
+      ! limit opacities to this value (ignore this if value is < 0)
 
       ! ::
 
@@ -7715,13 +7741,26 @@
     delta_nu_sun = 134.91d0 ! μHz
     astero_Teff_sun = 5772d0 ! kelvin
 
+      ! delta_Pg_traditional
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! uHz. if <=0, use nu_max from scaled solar value
+      ! For calculating the asymptotic g-mode period spacing ``delta_Pg``
+
+      ! if ``delta_Pg_traditional`` = ``.true.``, then calculate the
+      ! asymptotic gravity mode period space by directly integrating
+      ! N2 over the entire stellar model.
+
+      ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
+      ! `Bildsten et al. (2012) <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B>`_
+
+      ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
+      ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
 
       ! ::
 
+    delta_Pg_traditional = .true.
     delta_Pg_mode_freq = 0d0
 
 
@@ -8052,8 +8091,19 @@
       ! min_T_for_fe56ec_fake_factor
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Multiplier on ni56 electron capture rate to take isotopes in hardwired networks
-      ! to more neutron rich isotopes.
+      ! Hardwired small nuclear reaction network in the "approx"
+      ! family treat all electron captures with a compound reaction
+      ! dependent on the heaviest isotope included (see
+      ! $MESA_DIR/data/net_data/nets/). The heaviest isotope
+      ! determines the lowest value of ye possible in the core. The
+      ! rate of the compound weak reaction is non-zero only for
+      ! temperatures larger than min_T_for_fe56ec_fake_factor and is
+      ! calculated multiplying the rate of electron captures on ni56
+      ! by fe56ec_fake_factor. This used to be 1d-4 around MESA
+      ! version 7624. Increasing this factor will push the values of
+      ! ye obtained closer to the lowest possible value defined by the
+      ! net, and this can be used to tune the final ye value
+      ! obtainable with a small nuclear reaction network.
 
       ! ::
 
@@ -8235,8 +8285,11 @@
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_flux_limiting_with_dPrad_dm_form
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
@@ -8261,6 +8314,11 @@
       !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
       !|         else
       !|            use L_rad = L
+      !|     if (use_flux_limiting_with_dPrad_dm_form)
+      !|         flxR = 4 * pi * r^2 * abs(dT^4/dm) / kap
+      !|         flxLambda = (6 + 3*flxR) / (6 + 3*flxR + flxR^2) (see Levermore & Pomraning 1981)
+      !|         L_rad = L_rad / flxLambda
+      !|
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
 
@@ -8269,11 +8327,12 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
 
-      ! Hydrodynamic drag
-      ! =================
+! Hydrodynamic drag
+! =================
 
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
@@ -8331,9 +8390,11 @@
     q_for_v_drag_full_on = 0.96d0
 
 
-      ! Rayleigh-Taylor Instability
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Rayleigh-Taylor Instability: hydro drag terms
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       ! for hydro comparison tests (e.g., Sedov)
+
       ! RTI_A
       ! ~~~~~
       ! RTI_B
@@ -8427,16 +8488,16 @@
       ! and the Jacobian was exact, neither of which are true.  So the best we can hope
       ! for is that the corrections will get smaller next time.
 
-      ! The "norm" is the average; the "max" is the max.  Sometimes you mainly care about
-      ! the norm and will accept a few outliers.  But sometimes you don't want any really
+      ! The "norm" is the average; the "max" is the max. Sometimes you mainly care about
+      ! the norm and will accept a few outliers. But sometimes you don't want any really
       ! bad outliers, so you want to set a low limit for the max residual or correction
       ! as well as the norm.
 
       ! You might want to try for several iterations with strict tolerances, and then
       ! relax them if things are still not converged.  For example, you might be willing
       ! to live with the larger tolerances, but you'd like to give it a good try at the
-      ! smaller ones before switching.  Also, you might be willing to settle for any-old
-      ! residual if the corrections have become small enough.  You can do that too by
+      ! smaller ones before switching. Also, you might be willing to settle for any-old
+      ! residual if the corrections have become small enough. You can do that too by
       ! relaxing the residual tolerances after a few iterations.
 
       ! Hope that at least helps with the nomenclature.
@@ -9204,8 +9265,8 @@
       ! if using this, do not set use_artificial_viscosity true.
 
       ! artificial viscosity controls
-      ! for the equations see: Appendix C in Stellingwerf 1975
-      ! http://adsabs.harvard.edu/abs/1975ApJ...195..441S.
+      ! for the equations see: Appendix C in
+      ! `Stellingwerf (1975) <https://ui.adsabs.harvard.edu/abs/1975ApJ...195..441S>`_
       ! In principle, for not too-non-adiabatic convective models artificial viscosity is not
       ! needed or should be very small. Hence a large cut-off parameter below (in purely
       ! radiative models the default value for cut-off was 0.01)

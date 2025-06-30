@@ -14,7 +14,7 @@
    @TAUGAM     30.D0    -- opaque gamma core (km=incnd)
    @taucut     1.d+02    -- tau cut along the ray
    @TAULIM     0.d0      -- or:CFR=(4/3)/(UR*Urho==(Cappa unit)**-1)
-   @ffloor     1.d-50   -- f (occ.n) floor - machine dependent     
+   @ffloor     1.d-50   -- f (occ.n) floor - machine dependent
 --
 SUBROUTINE Gdepos;
  IMPLICIT REAL*8 (A-H,O-Z);
@@ -125,7 +125,7 @@ END;
 --     Write(@term,*)' notScat gdepos6';
      NEQ=krow; -- KZrowsc was undefined if ^ScatG !!!
    endif;
-   <*shiftnu: find f_{+/-} directly and their sums and difs in 
+   <*shiftnu: find f_{+/-} directly and their sums and difs in
               FSdir with account of Doppler shift
               according to velocity difference *>;
    <*Hdir: calculate FJgam *>;
@@ -146,8 +146,8 @@ END;
      Rcore=Homo*Ry(max(Kmnick,1));
    endif;
  */
-  Rcore=Homo*Ry(max(Kmnick,1)); -- later try to find Kmnick automatically on 
-         -- the first call of gdepos6 
+  Rcore=Homo*Ry(max(Kmnick,1)); -- later try to find Kmnick automatically on
+         -- the first call of gdepos6
 
 %_gamma_Ye:
    _do k=1,nzon;
@@ -229,14 +229,14 @@ END;
    <*inward:  find quadrature solution for radiation going in *>
    _do Ip=0,Np;
      fcom(Ip,Lfr)=2.d0*FSdir(Ip,Nzon); -- comoving outgoing f
-   _od; 
+   _od;
 %_gamma_shiftnu_outward:
    _do Kpl=Nzon,incnd+1,-1;
      _Do Ip=Nmu(Kpl),0,-1;
         fr0=freqmn(Lfr); -- zero shift in zone Kpl
         chiab=HAPabW(Kpl,Lfr); -- for ScatG=F chiab=chiex (extinction),
-        chiex=HAPW(Kpl,Lfr);   -- but we need chiex also for 
-                               -- Nstep<=1 and Kpl<=Kntold 
+        chiex=HAPW(Kpl,Lfr);   -- but we need chiex also for
+                               -- Nstep<=1 and Kpl<=Kntold
                                -- when FJ is not known
         dtau(Kpl,Ip)=(Amu(Ip,Kpl)*RM(Kpl)-Amu(Ip,Kpl-1)*RM(Kpl-1))
                           *chiex*rho(Kpl);
@@ -249,7 +249,7 @@ END;
            fdirsumm=XNifor(Kpl)*(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
         else;
            fdirsumm=(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
-        endif; 
+        endif;
         tauz=dtau(Kpl,Ip)/2.d0;
         K=Kpl-1;
 --        if(Kpl==incnd+1 & Lfr==1) @wterm ' 1 Ip Kz K:',Ip,Kz(Ip),K;
@@ -260,14 +260,14 @@ END;
         fr0log=log(fr0);
         xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
         Lfr0=min(Nfrus,max(int(xnu),1));
---        if(Ip==0 & Kpl==incnd+1) 
---           write(@term,'(a,2i4,1p,2e10.3)') ' Lfr Lfr0 fr fr0 ', 
+--        if(Ip==0 & Kpl==incnd+1)
+--           write(@term,'(a,2i4,1p,2e10.3)') ' Lfr Lfr0 fr fr0 ',
   --             Lfr, Lfr0,freqmn(Lfr),fr0;
           wfr0=xnu-dble(Lfr0); -- weight (compare with fout!!!)
-   */  
-   
+   */
+
         chiab=HAPabW(K,Lfr); -- for ScatG=F chiab=chiex (extinction),
-        chiex=HAPW(K,Lfr); 
+        chiex=HAPW(K,Lfr);
 
 /*          chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
                    +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
@@ -285,7 +285,7 @@ END;
                   -- *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
           elseif(KNadap<0)then; -- Ni from foreign model
             fdirsumm=fdirsumm+XNifor(K)*exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
-          else; 
+          else;
             fdirsumm=fdirsumm+exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
           endif;
           tauz=tauz+dtau(K,Ip);
@@ -301,14 +301,14 @@ END;
               fr0log=log(fr0);
               xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
               Lfr0=min(Nfrus,max(int(xnu),1));
---              if(Ip==0 & Kpl==Nzon) 
---           write(@term,'(a,2i4,1p,2e10.3)') 
-  --               ' far end Lfr Lfr0 fr fr0 ', 
+--              if(Ip==0 & Kpl==Nzon)
+--           write(@term,'(a,2i4,1p,2e10.3)')
+  --               ' far end Lfr Lfr0 fr fr0 ',
     --             Lfr, Lfr0,freqmn(Lfr),fr0;
                 wfr0=xnu-dble(Lfr0); -- weight
        */
               chiab=HAPabW(K,Lfr); -- for ScatG=F chiab=chiex (extinction),
-              chiex=HAPW(K,Lfr); 
+              chiex=HAPW(K,Lfr);
 
 /*              chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
                    +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
@@ -320,27 +320,27 @@ END;
               dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))
                           *chiex*rho(K);
                 If(ScatG & Nstep>1)then;
-                  tauz=tauz+dtau(K,Ip); 
+                  tauz=tauz+dtau(K,Ip);
                   fdirsumm=fdirsumm+(chiab);
                   -- +(chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
                     --             +FJr(K,min(Nfrus,Lfr0+1))*wfr0 ))/chiex
                       -- *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
                 elseif(KNadap<0)then; -- Ni from foreign model
-                   tauz=tauz+dtau(K,Ip); 
+                   tauz=tauz+dtau(K,Ip);
                    fdirsumm=fdirsumm
                     +XNifor(K)*exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
                 else;
-                   tauz=tauz+dtau(K,Ip); 
+                   tauz=tauz+dtau(K,Ip);
                    fdirsumm=fdirsumm+exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
                 endif;
-  --     if(Kpl==140 & Ip==29) write(@term,'()') 
-            --    ' fdirsumm=',fdirsumm, '  k,Kpl,Ip=',k,Kpl,Ip; 
+  --     if(Kpl==140 & Ip==29) write(@term,'()')
+            --    ' fdirsumm=',fdirsumm, '  k,Kpl,Ip=',k,Kpl,Ip;
            _od;
        endif;
          If(Kpl>kz(ip))then;
               --  ftst(Ip)=log10(max(fdirsumm,1.d-300));
                  FSdir(Ip,Kpl)=fdirsumm; -- f_{-} must be added later!
---       if(Kpl==incnd+1 & Lfr==1) 
+--       if(Kpl==incnd+1 & Lfr==1)
 --            @wterm ' 4 Fsdir Ip Kpl:',FSdir(Ip,Kpl),Ip,Kpl;
          endif;
      _od -- Ip
@@ -350,10 +350,10 @@ END;
                  If(Kpl<=kz(ip))then;
                    ftst(Ip)=ftst(max(0,Ip-1));
                    fspl(Ip)=fspl(max(0,Ip-1));
-                 endif; 
+                 endif;
               _od -- Ip
                             */
-     _label @outsm ; -- to go out of sm 
+     _label @outsm ; -- to go out of sm
      <*sm* supermongo plot ftst(.) and fspl(.) *>;
      @outsm: continue;
    _od -- Kpl
@@ -389,7 +389,7 @@ END;
         call sm_relocate(xipl(0)+0.05*(xipl(Np)-xipl(0)),
                         0.5*(fmin+fmax)-0.05*(fmin-fmax));
         call sm_label(chalab);
-        call sm_gflush(); 
+        call sm_gflush();
         call sm_hardcopy;
         call sm_alpha;
         @wterm ' hit ENTER to continue';
@@ -419,7 +419,7 @@ END;
            fdirsumm=(1.d0-exp(-dtau(Ki,Ip)/2.d0));
         endif;
         tauz=dtau(Ki,Ip)/2.d0;
-        K=Ki; 
+        K=Ki;
        _while  K<Nzon _do
           K=K+1;
       /*    duz=Amu(Ip,K)*umr(K)-Amu(Ip,Ki)*umr(Ki); -- diff.vel.
@@ -429,12 +429,12 @@ END;
           fr0log=log(fr0);
           xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
           Lfr0=min(Nfrus,max(int(xnu),1));
---          if(Ip==0  & K==incnd+1 & Lfr==1) @wterm 'out  Lfr Lfr0 fr fr0', 
+--          if(Ip==0  & K==incnd+1 & Lfr==1) @wterm 'out  Lfr Lfr0 fr fr0',
   --                     Lfr, Lfr0,freqmn(Lfr),fr0;
           wfr0=xnu-dble(Lfr0); -- weight
            */
           chiab=HAPabW(K,Lfr); -- for ScatG=F chiab=chiex (extinction),
-          chiex=HAPW(K,Lfr); 
+          chiex=HAPW(K,Lfr);
 /*
           chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
                +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
@@ -452,7 +452,7 @@ END;
           elseif(KNadap<0)then; -- Ni from foreign model
              fdirsumm=fdirsumm+
                  exp(-tauz)*XNifor(K)*(1.d0-exp(-dtau(K,Ip)));
-          else; 
+          else;
              fdirsumm=fdirsumm+
                  exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
           endif;
@@ -473,9 +473,9 @@ END;
        If(Kpl<=kz(ip))then;
           ftst(Ip)=ftst(max(0,Ip-1));
           fspl(Ip)=fspl(max(0,Ip-1));
-       endif; 
+       endif;
      _od -- Ip
-_label @outsm ; -- to go out of sm 
+_label @outsm ; -- to go out of sm
      <*sm* supermongo plot ftst(.) and fspl(.) *>;
 @outsm: continue;
    _od -- Kpl

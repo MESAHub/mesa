@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the teerr of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -97,7 +94,7 @@
          initial_nico, initial_M_center, initial_he_core_mass, initial_mass, &
          start_m, stop_m
 
-      real(dp), parameter :: h1_limit = 0.1  ! We use this to check that RTI mixing worked
+      real(dp), parameter :: h1_limit = 0.1d0  ! We use this to check that RTI mixing worked
       real(dp) :: max_mass_h  ! Mass co-ordinate where h1< h1_limit
 
       contains
@@ -768,7 +765,7 @@
             logical,parameter :: dbg=.false.
 
             ! This is to check that RTI worked
-            ! Find outer most location where H1<0.1 then later we will check if this has changed
+            ! Find outer most location where H1<0.1d0 then later we will check if this has changed
             h1_mass = -1
 
             if(dbg) write(*,*) "max_mass_h", max_mass_h/msun
@@ -998,7 +995,6 @@
             end if
 
          end subroutine restore_nico_mass
-
 
 
       end function extras_finish_step

@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2011-2019  The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -25,7 +22,8 @@ program sample_eos
    use eos_lib
    use chem_def
    use chem_lib
-   use const_lib
+   use const_def, only: dp, ln10
+   use const_lib, only: const_init
    use math_lib
 
    implicit none
@@ -91,7 +89,7 @@ contains
 
       Pgas = exp(res(i_lnPgas))
 
-      ! the indices for the results are defined in eos_def.f
+      ! the indices for the results are defined in eos_def.f90
       write (*, '(A)')
       write (*, fmt1) 'temperature', T
       write (*, fmt1) 'density', Rho
@@ -116,7 +114,7 @@ contains
          Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
          res, d_dlnd, d_dlnT, d_dxa, ierr)
 
-      ! the indices for the results are defined in eos_def.f
+      ! the indices for the results are defined in eos_def.f90
       write (*, '(A)')
       write (*, fmt1) 'temperature', T
       write (*, fmt1) 'Pgas', Pgas

@@ -8,12 +8,12 @@ This page has information about how to use MESA to evolve a single
 star.  It assumes you have already installed MESA (see :ref:`installation:Installing MESA`).
 
 The ``$MESA_DIR`` directory has lots of subdirectories.  Most of these
-subdirectories are modules (the "M" in MESA) that provides some
+subdirectories are modules (the "M" in MESA) that provide some
 specific functionality (e.g., "kap" provides routines for calculating
 opacities). The most important module is "star", which contains the
 module that knows how to put the capabilities of all the other modules
 together and advance the state of a stellar model by a single step and
-then suggest a new time increment for the next step.  Basically,
+then suggest a new time increment for the next step. Basically,
 that's all it does.
 
 You came here for a program that can use these modules to do

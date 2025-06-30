@@ -1,28 +1,21 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  Bill Paxton & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
 ! this code was written by John Burkardt
 ! see his wonderful site for lots of numerical software.
@@ -38,6 +31,7 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
@@ -93,12 +87,6 @@
 !
 
 
-
-
-
-
-
-
       !  brent_local_min seeks a local minimum of a function F(X) in an interval [A,B].
       real(dp) function brent_local_min(max_tries, a, b, eps, t, f, x, ierr)
          use mod_brent, only: eval_local_min
@@ -107,6 +95,7 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
@@ -171,10 +160,6 @@
 !    LC: QA402.5.B74.
 
 
-
-
-
-
       real(dp) function brent_safe_zero(a, b, eps, t, epsy, f, fa, fb, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
          use mod_brent, only: eval_brent_safe_zero
@@ -202,7 +187,7 @@
    !
    !  Licensing:
    !
-   !    This code is distributed under the GNU LGPL license. 
+   !    This code is distributed under the GNU LGPL license.
    !
    !  Modified:
    !
@@ -223,7 +208,7 @@
    !
    !  Parameters:
    !
-   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of 
+   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of
    !    sign interval.
    !
    !    Input, real ( kind = 8 ) MACHEP, an estimate for the relative machine

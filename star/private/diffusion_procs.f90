@@ -2,42 +2,42 @@
 !
 !   Copyright (C) 2012-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module diffusion_procs
 
-      use const_def
+      use const_def, only: dp, ln10, pi4
       use chem_def
-      use diffusion_support
+      use diffusion_support, only: tiny_mass
+      use star_private_def
 
       implicit none
+
+      private
+      public :: fixup
+      public :: set_new_xa
+      public :: update_rad_accel_face
+      public :: get_limit_coeffs
+      public :: setup_struct_info
 
       integer, parameter :: ngp = 2
       real(dp), public, save :: fk_gam_old(ngp,17)
       logical :: initialize_gamma_grid = .true.
 
       contains
-
 
       subroutine fixup( &
             s, nz, nc, m, nzlo, nzhi, total_num_iters, &
@@ -113,7 +113,6 @@
          end if
 
 !$OMP PARALLEL DO PRIVATE(k, op_err) SCHEDULE(dynamic,2)
-
          do k = nzlo, nzhi
             call get1_dX_dm( &
                k, nz, nc, nzlo, nzhi, &
@@ -124,7 +123,6 @@
                ierr = op_err
             end if
          end do
-
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) then
@@ -1162,7 +1160,7 @@
           else
             write(*,*) 'Invalid argument for op_mono_method.'
             stop
-         endif
+         end if
 
          if (dbg) write(*,*) 'done calc_g_rad'
 
@@ -1278,7 +1276,7 @@
           k2 = kmax
         else
           k2 = INT((kmax - (nzlo+1))/ ngp * j + (nzlo))
-        endif
+        end if
         fk = 0
           do i=1, s% species
              e_name = chem_isos% name(s% chem_id(i))
@@ -1315,8 +1313,8 @@
             call call_compute_gamma_grid_mombarg(j, fk, ierr)
             !write(*,*) 'Done precomputing gamma grid.'
             fk_gam_old(j,:) = fk
-          endif
-        enddo
+          end if
+        end do
 
 !! PARALLEL DO PRIVATE(i,k,thread_num,op_err,j,alfa,beta,X_face,umesh,ff,ta,rs,sz,offset) SCHEDULE(guided)
 !$OMP PARALLEL DO PRIVATE(i,k,op_err,j,alfa,beta,X_face,blend,dk) SCHEDULE(guided)
@@ -1350,7 +1348,7 @@
               else
                    j = 2
                    blend = 0d0
-               endif
+               end if
 
                call set1_g_rad_mombarg( &
                   s, k, nc, j, blend, iZ, kk, T_face(k), rho_face(k), &
@@ -1744,6 +1742,5 @@
             end do
          end do
       end subroutine set_new_xa
-
 
       end module diffusion_procs

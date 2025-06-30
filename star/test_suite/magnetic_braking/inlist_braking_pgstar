@@ -1,5 +1,5 @@
 &pgstar
-      !pause = .true.
+      !pause_flag = .true.
       !pgstar_show_log_age_in_years = .true.
       pgstar_show_age_in_years = .true.
       pgstar_interval = 1
@@ -27,7 +27,6 @@
          Grid2_file_width = 18
 
          !Grid2_file_aspect_ratio = 0.7
-
 
 
         Grid2_plot_name(1) = 'TRho_Profile'
@@ -103,12 +102,6 @@
            Text_Summary1_name(3,1) = 'log_total_angular_momentum'
 
 
-
-
-
-
-
-
         Grid2_plot_name(5) = 'History_Panels1'
 	Grid2_plot_row(5) = 1
 	Grid2_plot_rowspan(5) = 9
@@ -134,7 +127,6 @@
         History_Panels1_other_ymin(1) = -101d0
         History_Panels1_other_ymax(1) = -101d0
         History_Panels1_other_dymin(1) = -1
-
 
 
         History_Panels1_yaxis_name(2) = 'surf_avg_v_rot'
@@ -171,8 +163,6 @@
         History_Panels1_other_ymax(4) = -101d0
         History_Panels1_other_dymin(4) = -1
 
-
-
         Grid2_plot_name(6) = 'Kipp'
         Grid2_plot_row(6) = 5
         Grid2_plot_rowspan(6) = 5
@@ -183,11 +173,6 @@
         Grid1_plot_pad_top(6) = 0.2
         Grid2_plot_pad_bot(6) = 0.2
         Grid2_txt_scale_factor(6) = 0.5
-
-
-
-
-
 
          Grid2_plot_name(7) = 'Profile_Panels1'
          Grid2_plot_row(7) =5
@@ -200,7 +185,6 @@
          !Profile_Panels1_other_yaxis_name(1) = 'engulfment_heating'
          Profile_Panels1_other_ymin(:) = -101 ! only used if /= -101d0
          Profile_Panels1_other_ymax(:) = -101 ! only used if /= -101d0
-
 
          Grid2_plot_pad_left(7) = 0.04
          Grid2_plot_pad_right(7) = 0.02

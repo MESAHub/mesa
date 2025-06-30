@@ -3,11 +3,11 @@
 &star_job
 
 
-      show_log_description_at_start = .false. 
-      
+      show_log_description_at_start = .false.
+
       load_saved_model = .true.
       load_model_filename = 'start.mod' ! created by run_star_extras at start of run
-      
+
       save_model_when_terminate = .true.
       save_model_filename = 'env.mod'
       required_termination_code_string = 'max_age'
@@ -17,7 +17,7 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-   
+
       set_initial_dt = .true.
       years_for_initial_dt = 1d-7
 
@@ -32,7 +32,7 @@
 &kap
 / ! end of kap namelist
 
-&controls  
+&controls
 
       max_years_for_timestep = 1d-2
       max_age = 1d0 ! 1d7
@@ -40,13 +40,13 @@
       max_number_retries = 20
       max_model_number = 2000
       use_gold2_tolerances = .true.
-      
+
       mesh_delta_coeff = 0.6
-      
+
       mixing_length_alpha = 1.5
       MLT_option = 'TDC'
 
-      use_Ledoux_criterion = .true.  
+      use_Ledoux_criterion = .true.
       alpha_semiconvection = 0.1
       thermohaline_coeff = 2
       thermohaline_option = 'Kippenhahn'
@@ -55,30 +55,29 @@
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
       Pextra_factor = 2
-   
-      varcontrol_target = 1d-3 
-      
+
+      varcontrol_target = 1d-3
+
       eps_nuc_factor = 0
       non_nuc_neu_factor = 0
       dxdt_nuc_factor = 0
 
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
-         
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-      
+
       photo_interval = 50
       profile_interval = 50
       history_interval = 20
       terminal_interval = 10
-      write_header_frequency = 10         
+      write_header_frequency = 10
 
 / ! end of controls namelist
 
 
-
 &pgstar
-/ ! end of pgstar namelist
 
+/ ! end of pgstar namelist

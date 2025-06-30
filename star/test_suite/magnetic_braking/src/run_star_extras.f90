@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2011-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -34,11 +31,9 @@
       real(dp) :: t_spindown = 1d100
       real(dp) :: j_tot = 0d0
 
-
       contains
 
       include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -60,7 +55,6 @@
 
          s% other_timestep_limit => other_timestep_limit
       end subroutine extras_controls
-
 
 
       subroutine magnetic_braking(id, ierr)
@@ -131,7 +125,6 @@
           end if
 
 
-
           ! Let's assume the magnetic field applies a ~uniform torque through the star
           ! Strategy:
           ! 1) Start from the surface. Apply weighted torque (jdot) to each gridpoint
@@ -144,15 +137,15 @@
               residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k)  ! Residual J_dot cm^2/s^2 * g
               s% extra_jdot(k) = - s% j_rot(k)/ s% dt  ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
               j=j+1
-            endif
+            end if
           end do
 
-          ! Redistribute residual J_dot (only to gridpoints that can accomodate more torque)
+          ! Redistribute residual J_dot (only to gridpoints that can accommodate more torque)
           ! j number of cells that can not take anymore torque ()
           do k = 1, s% nz
             if (abs(s% extra_jdot(k)) < abs(s% j_rot(k)/ s% dt)) then
               s% extra_jdot(k) = s% extra_jdot(k) + (residual_jdot / ((s% nz - j) * s% dm_bar(k)))
-            endif
+            end if
           end do
 
           torque = dot_product(s% extra_jdot(1:s% nz),s% dm_bar(1:s% nz))  ! Total applied Torque
@@ -172,12 +165,10 @@
              write(*,1) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
              write(*,1) 'Torque/J_dot (if = 1.0 angular momentum is conserved): ', (torque / j_dot)
           end if
-        endif
+        end if
 
 
       end subroutine magnetic_braking
-
-
 
 
       subroutine extras_startup(id, restart, ierr)
@@ -208,7 +199,6 @@
          end if
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-
 
 
       ! returns either keep_going, retry, or terminate.
@@ -312,7 +302,5 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-
-
 
       end module run_star_extras

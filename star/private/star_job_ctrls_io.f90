@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2013  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -169,7 +163,6 @@
          fallback_check_total_energy, &
          remove_fallback_speed_limit, &
          remove_center_set_zero_v_center, &
-         retain_fallback_at_each_step, &
          limit_center_logP_at_each_step, &
          remove_center_adjust_L_center, &
          remove_center_logRho_limit, &
@@ -783,7 +776,6 @@
          s% job% fallback_check_total_energy = fallback_check_total_energy
          s% job% remove_fallback_speed_limit = remove_fallback_speed_limit
          s% job% remove_center_set_zero_v_center = remove_center_set_zero_v_center
-         s% job% retain_fallback_at_each_step = retain_fallback_at_each_step
          s% job% limit_center_logP_at_each_step = limit_center_logP_at_each_step
          s% job% remove_center_adjust_L_center = remove_center_adjust_L_center
          s% job% remove_center_logRho_limit = remove_center_logRho_limit
@@ -1726,12 +1718,12 @@
          call set_star_job_controls_for_writing(s, ierr)
          if(ierr/=0) return
 
-         ! Write namelist to temporay file
+         ! Write namelist to temporary file
          open(newunit=iounit,status='scratch')
          write(iounit,nml=star_job)
          rewind(iounit)
 
-         ! Namelists get written in captials
+         ! Namelists get written in capitals
          upper_name = trim(StrUpCase(name))//'='
          val = ''
          ! Search for name inside namelist
@@ -1780,4 +1772,3 @@
 
 
       end module star_job_ctrls_io
-

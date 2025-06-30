@@ -1,7 +1,7 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       load_model_filename = 'start.mod'
@@ -26,7 +26,7 @@
 ! starting specifications
 
 ! when to stop
-      
+
       ! limit max_model_number as part of test_suite
       max_model_number = 1000
 
@@ -54,7 +54,7 @@
       photo_interval = 100
       profile_interval = 100
       history_interval = 5
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 50
 
 / ! end of controls namelist

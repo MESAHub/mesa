@@ -9,7 +9,7 @@ This is an incomplete summary of the nets included for use with
 mesa/net.  See ``$MESA_DIR/data/net_data/nets`` for the full list.
 
 This lists the isotopes that are included in each net, but not the
-reactions.  To check on those, it is best to have the code list them .
+reactions.  To check on those, it is best to have the code list them.
 In mesa/star you can do this by setting the star_job options
 ``show_net_reactions_info = .true.``; similarly, you can get a list of
 the isotopes by setting ``show_net_species_info = .true.``.

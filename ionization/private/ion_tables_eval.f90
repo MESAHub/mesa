@@ -2,49 +2,38 @@
 !
 !   Copyright (C) 2011-2019  Bill Paxton & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module ion_tables_eval
 
-      use const_def, only: dp, one_sixth
+      use const_def, only: dp, one_sixth, arg_not_provided
       use ionization_def
       use math_lib
       use utils_lib, only: mesa_error
 
       implicit none
 
-
-
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine Get_ion_Results(&
                Z_in, X_in, arho, alogrho, atemp, alogtemp, &
                res, ierr)
-         use const_def
+         use const_def, only: dp
          use utils_lib, only: is_bad
          use ion_tables_load, only: Load_ion_Table
 
@@ -481,44 +470,44 @@
 
          ierr = 0
          hx=x1-x0
-         hxi=1.0/hx
+         hxi=1.0d0/hx
          hx2=hx*hx
 
          xp=(xget-x0)*hxi
-         xpi=1.0-xp
+         xpi=1.0d0-xp
          xp2=xp*xp
          xpi2=xpi*xpi
 
-         ax=xp2*(3.0-2.0*xp)
-         axbar=1.0-ax
+         ax=xp2*(3.0d0-2.0d0*xp)
+         axbar=1.0d0-ax
 
          bx=-xp2*xpi
          bxbar=xpi2*xp
 
-         cx=xp*(xp2-1.0)
-         cxi=xpi*(xpi2-1.0)
-         cxd=3.0*xp2-1.0
-         cxdi=-3.0*xpi2+1.0
+         cx=xp*(xp2-1.0d0)
+         cxi=xpi*(xpi2-1.0d0)
+         cxd=3.0d0*xp2-1.0d0
+         cxdi=-3.0d0*xpi2+1.0d0
 
          hy=y1-y0
-         hyi=1.0/hy
+         hyi=1.0d0/hy
          hy2=hy*hy
 
          yp=(yget-y0)*hyi
-         ypi=1.0-yp
+         ypi=1.0d0-yp
          yp2=yp*yp
          ypi2=ypi*ypi
 
-         ay=yp2*(3.0-2.0*yp)
-         aybar=1.0-ay
+         ay=yp2*(3.0d0-2.0d0*yp)
+         aybar=1.0d0-ay
 
          by=-yp2*ypi
          bybar=ypi2*yp
 
-         cy=yp*(yp2-1.0)
-         cyi=ypi*(ypi2-1.0)
-         cyd=3.0*yp2-1.0
-         cydi=-3.0*ypi2+1.0
+         cy=yp*(yp2-1.0d0)
+         cyi=ypi*(ypi2-1.0d0)
+         cyd=3.0d0*yp2-1.0d0
+         cydi=-3.0d0*ypi2+1.0d0
 
          sixth_hx2 = one_sixth*hx2
          sixth_hy2 = one_sixth*hy2
@@ -584,6 +573,4 @@
 
       end subroutine Do_ion_Interpolations
 
-
       end module ion_tables_eval
-

@@ -1,8 +1,27 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module skye_coulomb_liquid
    use math_lib
    use math_def
    use auto_diff
-   use const_def
+   use const_def, only: dp, me, amu, fine, pi, ev2erg
 
    implicit none
 
@@ -12,7 +31,7 @@ module skye_coulomb_liquid
 
    !> Calculates the free energy of a classical one-component
    !! plasma in the liquid phase using the fitting form of
-   !! A.Y.Potekhin and G.Chabrier,Phys.Rev.E62,8554(2000)
+   !! A.Y.Potekhin and G.Chabrier, Phys.Rev.E62, 8554 (2000)
    !! fit to the data of DeWitt & Slattery (1999).
    !! This choice ensures consistency with the quantum_ocp_liquid_free_energy_correction
    !! routine, which is based on the fits of Baiko & Yakolev 2019 (who were correcting relative
@@ -86,7 +105,8 @@ module skye_coulomb_liquid
          b = 0.2d0 + 0.078d0 * pre_z(int(Z))% sqlogz
          nu = 1.16d0 + 0.08d0 * pre_z(int(Z))% logz
          cDH = (Z / sqrt(3d0)) * (pre_z(int(Z))% zp1_3_2 - 1d0 - pre_z(int(Z))% z3_2)
-         cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pre_z(int(Z))% z7_3 * (1d0 - pre_z(int(Z))% zm1_3 + 0.2d0 * pre_z(int(Z))% zm1_2)
+         cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pre_z(int(Z))% z7_3 &
+               * (1d0 - pre_z(int(Z))% zm1_3 + 0.2d0 * pre_z(int(Z))% zm1_2)
 
          g = ge * pre_z(int(Z))% z5_3
          COTPT = sqrt(3d0 * me_in_amu / mi) / pre_z(int(Z))% z7_6
@@ -96,7 +116,8 @@ module skye_coulomb_liquid
          gr = sqrt(1d0 + pow2(xr))
          g1 = 1d0 + 0.78d0 * sqrt(ge / z) / (21d0 + ge * pow3(Z / rs))
          g2 = 1d0 + ((Z - 1d0) / 9d0) * (1d0 + 1d0 / (0.001d0 * pre_z(int(Z))% z2 + 2d0 * ge)) * (pow3(rs) / (1d0 + 6d0 * pow2(rs)))
-         h = (1d0 + 0.2d0 * pow2(xr)) / (1d0 + 0.18d0 * xr * pre_z(int(Z))% zm1_4 + 0.37d0 * pre_z(int(Z))% zm1_2 * pow2(xr) + 0.2d0 * pow2(xr))
+         h = (1d0 + 0.2d0 * pow2(xr)) / &
+             (1d0 + 0.18d0 * xr * pre_z(int(Z))% zm1_4 + 0.37d0 * pre_z(int(Z))% zm1_2 * pow2(xr) + 0.2d0 * pow2(xr))
 
          F = -ge * (cDH * sqrt(ge) + cTF * a * pow(ge, nu) * g1 * h) / (1d0 + (b * sqrt(ge) + a * g2 * pow(ge, nu) / rs) / gr)
 
@@ -137,14 +158,14 @@ module skye_coulomb_liquid
          Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
       else
          Dif0=Z321-sqrt((Z2mean+Zmean)*(Z2mean+Zmean)*(Z2mean+Zmean)/Zmean)
-      endif
+      end if
       DifR=Dif0/Z52
       DifFDH=Dif0*GAME*sqrt(GAME/3d0)  ! F_DH - F_LM(DH)
       D=Z2mean/(Zmean*Zmean)
       if (abs(D-1.d0)<TINY) then  ! no correction
          FMIX=0d0
          return
-      endif
+      end if
       P3=pow(D,-0.2d0)
       D0=(2.6d0*DifR+14d0*DifR*DifR*DifR)/(1.d0-P3)
       GP=D0*pow(GAMImean,P3)

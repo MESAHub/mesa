@@ -2,32 +2,26 @@
 !
 !   Copyright (C) 2020  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module eoscms_eval
+
    use eos_def
    use num_lib
-   use const_def, only: avo, crad, ln10, arg_not_provided, mp, kerg, dp, qp, mesa_data_dir
+   use const_def, only: avo, crad, ln10, arg_not_provided, mp, kerg, dp, qp, mesa_data_dir, one_third
    use utils_lib, only: is_bad, mesa_error
    use math_lib
    use interp_2d_lib_db
@@ -75,7 +69,6 @@ contains
       rq, logRho, logT, Z, abar, zbar, &
       alfa, d_alfa_dlogT, d_alfa_dlogRho, &
       ierr)
-      use const_def
       use auto_diff
       type (EoS_General_Info), pointer :: rq
       real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -190,7 +183,7 @@ contains
             write(*,*) 'invalid value for CMS_fixed_composition_index.  See eos.defaults.'
             ierr=-1
             return
-         endif
+         end if
 
          iX = rq% CMS_fixed_composition_index + 1
 
@@ -199,7 +192,7 @@ contains
          if(ierr/=0) then
             write(*,*) 'failed in get_CMS_for_eosdt'
             return
-         endif
+         end if
 
          ! composition derivatives; here composition is constant so no change
          d_dxa = 0
@@ -217,9 +210,9 @@ contains
             do i = 2, CMS_num_Xs-1
                if (X < CMS_Xvals(i) )then
                   iX = i-1; exit
-               endif
-            enddo
-         endif
+               end if
+            end do
+         end if
 
          !interpolation always bicubic in logRho and logT
          if(CMS_cubic_in_X .and. iX > 2 .and. iX < CMS_num_Xs - 2)then
@@ -231,7 +224,7 @@ contains
             if(ierr/=0) then
                write(*,*) 'failed in get_CMS_for_eosdt'
                return
-            endif
+            end if
             XX(1:4) = CMS_Xvals(iX-1:iX+2)
             dX=X-CMS_Xvals(iX)  ! assumes fixed dX spacing
             do i=1,nv
@@ -249,14 +242,14 @@ contains
                y(1:4) = [dres1_dlnRho(i), dres2_dlnRho(i), dres3_dlnRho(i), dres4_dlnRho(i)]
                call interp_4pt_pm(XX,y,a)
                d_dlnd(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
-            enddo
+            end do
          else  !linear interpolation in X
             call eval_eosCMS_fixed_X(iX  ,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
             call eval_eosCMS_fixed_X(iX+1,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
             if(ierr/=0) then
                write(*,*) 'failed in get_CMS_for_eosdt'
                return
-            endif
+            end if
             beta = (X-CMS_Xvals(iX))/(CMS_Xvals(iX+1)-CMS_Xvals(iX))
             alfa = 1._dp - beta
             dbeta_dX = 1d0/(CMS_Xvals(iX+1)-CMS_Xvals(iX))
@@ -265,7 +258,7 @@ contains
             d_dX = dalfa_dX*res1 + dbeta_dX*res2
             d_dlnT = alfa*dres1_dlnT + beta*dres2_dlnT
             d_dlnd = alfa*dres1_dlnRho + beta*dres2_dlnRho
-         endif
+         end if
 
          ! composition derivatives
          do i=1,species
@@ -279,7 +272,7 @@ contains
             end select
          end do
 
-      endif
+      end if
 
       skip = .false.
 
@@ -296,12 +289,12 @@ contains
       d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
       ! zero all components
-      res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-      d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-      d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+      res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+      d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+      d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
       ! mark this one
-      res(i_frac_CMS) = 1.0
+      res(i_frac_CMS) = 1.0d0
 
    end subroutine get_CMS_for_eosdt
 
@@ -311,6 +304,7 @@ contains
       rho_in, logRho, T_in, logT, &
       res, d_dlnd, d_dlnT, d_dxa, &
       ierr)
+      use const_def, only: dp
       use auto_diff
       real(dp), intent(in) :: Z, X, abar, zbar
       integer, intent(in) :: species
@@ -493,7 +487,7 @@ contains
       if(ierr/=0) then
          write(*,*) 'failed in eval_eosCMS_fixed_X'
          return
-      endif
+      end if
 
       res = fval
       dres_dlnT = df_dx * iln10
@@ -527,11 +521,11 @@ contains
             logT0 = c% logT_min + real(iT-1,kind=dp)*c% delta_logT
             logT1 = logT0 + c% delta_logT
             logT = logT1
-         endif
+         end if
       else
          logT0 = c% logT_min + (iT-1)*c% delta_logT
          logT1 = logT0 + c% delta_logT
-      endif
+      end if
    end subroutine locate_logT
 
 
@@ -552,11 +546,11 @@ contains
             logRho0 = c% logRho_min + real(iRho-1,kind=dp)*c% delta_logRho
             logRho1 = logRho0 + c% delta_logRho
             logRho = logRho1
-         endif
+         end if
       else
          logRho0 = c% logRho_min + (iRho-1)*c% delta_logRho
          logRho1 = logRho0 + c% delta_logRho
-      endif
+      end if
    end subroutine locate_logRho
 
    subroutine load_eosCMS_table(iX, ierr)
@@ -586,7 +580,7 @@ contains
          close(io)
          ierr=-1
          return
-      endif
+      end if
 
       read(io,*)  !header
       read(io,'(a)') message
@@ -611,12 +605,12 @@ contains
       c% logTs(1) = c% logT_min
       do i = 2, c% num_logTs
          c% logTs(i) = c% logTs(i-1) + c% delta_logT
-      enddo
+      end do
 
       c% logRhos(1) = c% logRho_min
       do i = 2, c% num_logRhos
          c% logRhos(i) = c% logRhos(i-1) + c% delta_logRho
-      enddo
+      end do
 
       !check that the input X value is compatible with the expected value
       if(abs(X_in - CMS_Xvals(iX)) > 0.01_dp) then
@@ -626,7 +620,7 @@ contains
          call mesa_error(__FILE__,__LINE__)
          ierr=-1
          return
-      endif
+      end if
 
       read(io,*)  !header
       read(io,*)  !header
@@ -647,7 +641,7 @@ contains
             if(ierr/=0)then
                close(io)
                return
-            endif
+            end if
             tbl(1,i_lnPgas,i,j)   = vec(3)*ln10
             tbl(1,i_lnE,i,j)      = vec(4)*ln10
             tbl(1,i_lnS,i,j)      = vec(5)*ln10
@@ -664,8 +658,8 @@ contains
             tbl(1,i_gamma3,i,j)   = vec(16)
             tbl(1,i_grad_ad,i,j)  = vec(17)
             tbl(1,i_eta,i,j)      = vec(18)
-         enddo
-      enddo
+         end do
+      end do
 
       close(io)
 
@@ -685,8 +679,8 @@ contains
          do j = 1, c% num_logRhos
             do i = 1, c% num_logTs
                f(1,i,j) = tbl(1,v,i,j)
-            enddo
-         enddo
+            end do
+         end do
 
          call interp_mkbicub_db( &
             c% logTs, c% num_logTs, c% logRhos, c% num_logRhos, f1, c% num_logTs, &
@@ -698,13 +692,12 @@ contains
                tbl(2,v,i,j) = f(2,i,j)
                tbl(3,v,i,j) = f(3,i,j)
                tbl(4,v,i,j) = f(4,i,j)
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
 
       if(ierr==0) eosCMS_X_loaded(iX) = .true.
 
    end subroutine load_eosCMS_table
 
 end module eoscms_eval
-

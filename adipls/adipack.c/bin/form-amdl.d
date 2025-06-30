@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to change between binary and ASCII pulsation model files
 if [ $# -eq 0 ] || [ "$1" == "-help" ] 
 then

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call scan-ssm.d
 if [ $# -eq 0 ]
 then

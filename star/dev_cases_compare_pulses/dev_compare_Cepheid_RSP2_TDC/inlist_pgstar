@@ -1,7 +1,7 @@
 
 &pgstar
 
-   !pause = .true.
+   !pause_flag = .true.
 
    pgstar_xaxis_label_scale = 1.0
    pgstar_left_yaxis_label_scale = 0.9

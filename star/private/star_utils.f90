@@ -2,42 +2,167 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module star_utils
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, i8, pi, pi4, ln10, clight, crad, msun, rsun, lsun, one_third, four_thirds_pi
       use num_lib
       use utils_lib
       use auto_diff_support
 
       implicit none
 
-      private :: mdb
+      private
+      public :: eval_min_cell_collapse_time
+      public :: min_dr_div_cs
+      public :: get_XYZ
+      public :: lookup_nameofvar
+      public :: start_time
+      public :: update_time
+      public :: foreach_cell
+      public :: write_eos_call_info
+      public :: eval_csound
+      public :: eval_current_abundance
+      public :: eval_current_z
+      public :: eval_ledd
+      public :: normalize_dqs
+      public :: set_qs
+      public :: set_m_and_dm
+      public :: set_dm_bar
+      public :: set_rmid
+      public :: get_r_from_xh
+      public :: get_r_and_lnr_from_xh
+      public :: get_t_and_lnt_from_xh
+      public :: get_lnt_from_xh
+      public :: get_lnr_from_xh
+      public :: get_rho_and_lnd_from_xh
+      public :: store_t_in_xh
+      public :: store_r_in_xh
+      public :: store_rho_in_xh
+      public :: store_lnd_in_xh
+      public :: store_lnt_in_xh
+      public :: cell_specific_ke
+      public :: cell_specific_pe
+      public :: get_phot_info
+      public :: init_random
+      public :: rand
+      public :: interp_val_to_pt
+      public :: get_log_concentration
+      public :: get_lconv
+      public :: get_ladv
+      public :: get_lrad_div_ledd
+      public :: get_lrad
+      public :: get_ledd
+      public :: tau_eff
+      public :: get_rho_face_val
+      public :: omega_crit
+      public :: eval_cell_section_total_energy
+      public :: conv_time_scale
+      public :: qhse_time_scale
+      public :: eps_nuc_time_scale
+      public :: cooling_time_scale
+      public :: get_face_values
+      public :: threshold_smoothing
+      public :: save_eqn_residual_info
+      public :: calc_ptrb_ad_tw
+      public :: set_energy_eqn_scal
+      public :: get_scale_height_face_val
+      public :: weighted_smoothing
+      public :: get_kap_face
+      public :: get_rho_face
+      public :: get_chirho_face
+      public :: get_chit_face
+      public :: get_t_face
+      public :: get_peos_face
+      public :: get_cp_face
+      public :: get_grada_face
+      public :: get_gradr_face
+      public :: get_scale_height_face
+      public :: get_tau
+      public :: after_c_burn
+      public :: get_shock_info
+      public :: reset_starting_vectors
+      public :: eval_irradiation_heat
+      public :: set_phot_info
+      public :: set_m_grav_and_grav
+      public :: set_scale_height
+      public :: set_abs_du_div_cs
+      public :: set_conv_time_scales
+      public :: set_rv_info
+      public :: smooth
+      public :: safe_div_val
+      public :: center_avg_x
+      public :: surface_avg_x
+      public :: get_remnant_mass
+      public :: get_ejecta_mass
+      public :: get_phi_joss
+      public :: center_value
+      public :: eval_kh_timescale
+      public :: k_for_q
+      public :: total_angular_momentum
+      public :: reset_epsnuc_vectors
+      public :: yrs_for_init_timestep
+      public :: set_phase_of_evolution
+      public :: get_string_for_model_number
+      public :: e00
+      public :: em1
+      public :: ep1
+      public :: store_partials
+      public :: save_eqn_dxa_partials
+      public :: unpack_residual_partials
+      public :: get_area_info_opt_time_center
+      public :: calc_ptot_ad_tw
+      public :: get_face_weights
+      public :: get_dke_dt_dpe_dt
+      public :: get_pvsc_ad
+      public :: show_matrix
+      public :: no_extra_profile_columns
+      public :: no_data_for_extra_profile_columns
+      public :: total_times
+      public :: current_min_xa_hard_limit
+      public :: current_sum_xa_hard_limit
+      public :: lookup_nameofequ
+      public :: eval_total_energy_integrals
+      public :: set_luminosity_by_category
+      public :: eval_deltam_total_energy_integrals
+      public :: report_xa_bad_nums
+      public :: eval_current_y
+      public :: get_name_for_restart_file
+      public :: eval_integrated_total_energy_profile
+      public :: use_xh_to_set_rho_to_dm_div_dv
+      public :: cell_specific_total_energy
+      public :: store_lnr_in_xh
+      public :: interp_q
+      public :: set_zero_alpha_rti
+      public :: after_he_burn
+      public :: interp_xa_to_pt
+      public :: set_xqs
+      public :: get_tau_at_r
+      public :: smooth_abundances
+      public :: do_boxcar_mixing
+      public :: eval_total_energy_profile
+      public :: get_delta_pg_traditional
+      public :: get_delta_pg_bildsten2012
+      public :: write_to_extra_terminal_output_file
+
       logical, parameter :: mdb = .false.
 
       contains
-
 
       subroutine foreach_cell(s,nzlo,nzhi,use_omp,do1,ierr)
          type (star_info), pointer :: s
@@ -91,8 +216,7 @@
          real(dp), intent(out) :: y_avg, z_avg
          integer, intent(out) :: ierr
          integer :: k, nz,  h1, h2, he3, he4
-         real(dp) :: total_mass_h, total_mass_he, total_mass_z, &
-            cell_mass, total_mass
+         real(dp) :: total_mass_h, total_mass_he, total_mass_z, cell_mass, total_mass
          ierr = 0
          nz = s% nz
          h1 = s% net_iso(ih1)
@@ -679,7 +803,7 @@
             write(*,2) 'dq(k+1)', k+1, dq(k+1)
 
             call mesa_error(__FILE__,__LINE__,'interp_val_to_pt')
-         endif
+         end if
          interp_val_to_pt = (v(k)*dq(k-1) + v(k-1)*dq(k))/(dq(k-1) + dq(k))
       end function interp_val_to_pt
 
@@ -710,7 +834,7 @@
                interp_xa_to_pt, str, ierr)
             interp_xa_to_pt = min(1d0,max(0d0,interp_xa_to_pt))
             if (ierr == 0) return
-         endif
+         end if
          interp_xa_to_pt = (xa(j,k)*dq(k-1) + xa(j,k-1)*dq(k))/(dq(k-1) + dq(k))
          interp_xa_to_pt = min(1d0,max(0d0,interp_xa_to_pt))
       end function interp_xa_to_pt
@@ -789,7 +913,47 @@
       end function find_cell_for_mass
 
 
-      subroutine get_delta_Pg(s, nu_max, delta_Pg)
+      subroutine get_delta_Pg_traditional(s, delta_Pg)
+         type (star_info), pointer :: s
+         real(dp), intent(out) :: delta_Pg ! seconds
+         ! g-mode period spacing for l=1
+         real(dp) :: dr, N2, integral, r
+         integer :: k
+         logical, parameter :: dbg = .false.
+         include 'formats'
+         if (dbg) then
+            write(*,2) 's% star_mass', s% model_number, s% star_mass
+            write(*,2) 's% photosphere_r', s% model_number, s% photosphere_r
+            write(*,2) 's% Teff', s% model_number, s% Teff
+         end if
+         delta_Pg = 0._dp
+         if (.not. s% calculate_Brunt_N2) return
+         k = 0
+         r = 0._dp
+         N2 = 0._dp
+         dr = 0._dp
+         integral = 0._dp
+
+         ! we integrate at cell edges.
+         do k = 2, s% nz
+         N2 = s% brunt_N2(k) ! brunt_N2 at cell_face
+         r  = s% r(k) ! r evaluated at cell_face
+         dr = s% rmid(k-1) - s% rmid(k) ! dr evaluated at cell face.
+         if (N2 > 0d0) integral = integral + sqrt(N2)*dr/r
+         end do
+
+         if (dbg) write(*,2) ' integral ', &
+            s% model_number,integral
+
+         if (integral == 0) return
+         delta_Pg = sqrt(2._dp)*pi*pi/integral
+         if (is_bad(delta_Pg)) delta_Pg = 0._dp
+
+         if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
+
+      end subroutine get_delta_Pg_traditional
+
+      subroutine get_delta_Pg_bildsten2012(s, nu_max, delta_Pg)
          type (star_info), pointer :: s
          real(dp), intent(in) :: nu_max  ! microHz
          real(dp), intent(out) :: delta_Pg  ! seconds
@@ -851,7 +1015,7 @@
 
          if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
 
-      end subroutine get_delta_Pg
+      end subroutine get_delta_Pg_bildsten2012
 
 
       subroutine set_rmid(s, nzlo, nzhi, ierr)
@@ -1447,7 +1611,6 @@
       end subroutine save_eqn_residual_info
 
 
-
       subroutine unpack_residual_partials(s, k, nvar, i_eqn, &
             residual, d_dm1, d_d00, d_dp1)
          use auto_diff
@@ -1702,9 +1865,9 @@
 
       subroutine start_time(s, time0, total_all_before)
          type (star_info), pointer :: s
-         integer(8), intent(out) :: time0
+         integer(i8), intent(out) :: time0
          real(dp), intent(out) :: total_all_before
-         integer(8) :: clock_rate
+         integer(i8) :: clock_rate
          if (.not. s% doing_timing) return
          total_all_before = total_times(s)
          call system_clock(time0,clock_rate)
@@ -1713,11 +1876,11 @@
 
       subroutine update_time(s, time0, total_all_before, total)
          type (star_info), pointer :: s
-         integer(8), intent(in) :: time0
+         integer(i8), intent(in) :: time0
          real(dp), intent(in) :: total_all_before
          real(dp), intent(inout) :: total
          real(dp) :: total_all_after, other_stuff
-         integer(8) :: time1, clock_rate
+         integer(i8) :: time1, clock_rate
          if (.not. s% doing_timing) return
          call system_clock(time1,clock_rate)
          total_all_after = total_times(s)
@@ -2597,9 +2760,9 @@
       end function omega_crit
 
 
-      subroutine weighed_smoothing(dd, n, ns, preserve_sign, ddold)
+      subroutine weighted_smoothing(dd, n, ns, preserve_sign, ddold)
       !     based on routine written by S.-C. Yoon, 18 Sept. 2002
-      !     for smoothing  any variable (dd) with size n over 2*ns+1 cells.
+      !     for smoothing any variable (dd) with size n over 2*ns+1 cells.
          real(dp), intent(inout) :: dd(:)  ! (n)
          integer, intent(in) :: n, ns
          logical, intent(in) :: preserve_sign
@@ -2650,12 +2813,12 @@
             end if
          end do
 
-      end subroutine weighed_smoothing
+      end subroutine weighted_smoothing
 
 
-      subroutine threshold_smoothing (dd, dd_thresh, n, ns, preserve_sign, ddold)
+      subroutine threshold_smoothing(dd, dd_thresh, n, ns, preserve_sign, ddold)
 
-        ! Same as weighed_smoothing, but only smooth contiguous regions where |dd| >= dd_thresh
+        ! Same as weighted_smoothing, but only smooth contiguous regions where |dd| >= dd_thresh
 
         real(dp), intent(inout) :: dd(:)    ! (n)
         real(dp), intent(in)    :: dd_thresh
@@ -2682,15 +2845,15 @@
 
               if (ABS(dd(i)) < dd_thresh) then
                  i_b = i-1
-                 if (i_b > i_a) call weighed_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
+                 if (i_b > i_a) call weighted_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
                  in_region = .FALSE.
-              endif
+              end if
 
            else
               if (ABS(dd(i)) >= dd_thresh) then
                  i_a = i
                  in_region = .TRUE.
-              endif
+              end if
 
            end if
 
@@ -2701,11 +2864,9 @@
         if (in_region) then
 
            i_b = n
-           if (i_b > i_a) call weighed_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
+           if (i_b > i_a) call weighted_smoothing(dd(i_a:i_b), i_b-i_a+1, ns, preserve_sign, ddold(i_a:i_b))
 
-        endif
-
-        ! Finish
+        end if
 
         return
 
@@ -3317,9 +3478,9 @@
                l = mod(53*l + 1, 169)
                if (mod(l*m,64) >= 32) x = x + t
                t = 0.5d0 * t
-            enddo
+            end do
             s% rand_u(ii) = x
-         enddo
+         end do
          s% rand_c   = 362436.0d0/16777216.0d0
          s% rand_cd  = 7654321.0d0/16777216.0d0
          s% rand_cm  = 16777213.0d0/16777216.0d0
@@ -3588,8 +3749,6 @@
          end if
          tau_qhse = abs_dv/(s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)))
       end function QHSE_time_scale
-
-
 
 
       real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)
@@ -3925,6 +4084,5 @@
          s% alpha_RTI(1:s% nz) = 0d0
          s% need_to_setvars = .true.
       end subroutine set_zero_alpha_RTI
-
 
       end module star_utils

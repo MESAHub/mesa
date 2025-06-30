@@ -5,7 +5,7 @@ import sys
 import re
 from pathlib import Path
 
-MESA_DIR = os.environ["MESA_DIR"]
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 # Search files for instances of stop 1 or stop 'str'
 # and replace with calls to mesa_error. This way all error messages

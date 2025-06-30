@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2016-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -34,9 +28,7 @@
       integer, parameter :: qcol_imax=13, kmaxx = 7, stifbs_imax  = kmaxx+1
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine netint( &
             start,stptry,stpmin,max_steps,stopp,y, &
@@ -82,7 +74,6 @@
       real(dp) :: yscal(nvar),dydx(nvar),cons,x,h,hdid,hnext,xx
       real(dp), parameter  :: tiny=1.0d-15
 
-
       real(dp) :: y0(nvar),a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
       integer :: i,kmax,kopt,nseq(stifbs_imax),nvold
       logical :: first
@@ -94,10 +85,10 @@
       epsold = -1d0
       nvold = -1
       nseq = [ 2, 6, 10, 14, 22, 34, 50, 70 ]
-      x      = start
-      h      = sign(stptry,stopp-start)
-      nok    = 0
-      nbad   = 0
+      x    = start
+      h    = sign(stptry,stopp-start)
+      nok  = 0
+      nbad = 0
       ierr = 0
 
       do i=1,nvar
@@ -186,13 +177,11 @@
 
 
 ! back for another iteration or death
-      enddo
+      end do
       ierr = -1
       return
       call mesa_error(__FILE__,__LINE__,'more than max_steps steps required in netint')
       end subroutine netint
-
-
 
 
       subroutine stifbs(y,dydx,nvar,x,htry,eps,yscal,hdid,hnext, &
@@ -215,7 +204,7 @@
       real(dp) :: a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
       integer :: kmax,kopt,nseq(stifbs_imax),nvold
       logical :: first
-      integer :: ierr
+      integer, intent(out) :: ierr
 
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
@@ -252,15 +241,15 @@
        a(1)  = nseq(1) + 1
        do k=1,kmaxx
         a(k+1) = a(k) + nseq(k+1)
-       enddo
+       end do
 
 ! compute alf(k,q)
        do iq=2,kmaxx
         do k=1,iq-1
          alf(k,iq) = pow(eps1,((a(k+1) - a(iq+1)) / &
                         ((a(iq+1) - a(1) + 1.0d0) * (2*k + 1))))
-        enddo
-       enddo
+        end do
+       end do
        epsold = eps
        nvold  = nvar
 
@@ -268,12 +257,12 @@
        a(1)   = nvar + a(1)
        do k=1,kmaxx
         a(k+1) = a(k) + nseq(k+1)
-       enddo
+       end do
 
 ! determine optimal row number for convergence
        do kopt=2,kmaxx-1
-        if (a(kopt+1) > a(kopt)*alf(kopt-1,kopt)) go to 01
-       enddo
+        if (a(kopt+1) > a(kopt)*alf(kopt-1,kopt)) GOTO 01
+       end do
 01     kmax = kopt
       end if
 
@@ -281,7 +270,7 @@
       h    = htry
       do i=1,nvar
        ysav(i)  = y(i)
-      enddo
+      end do
 
 ! get the dense jacobian in dens_dfdy
       call jakob(x,y,dens_dfdy,nvar,ierr)
@@ -298,7 +287,7 @@
       reduct = .false.
 
 ! evaluate the sequence of semi implicit midpoint rules
-02    do 18 k=1,kmax
+02    do k=1,kmax
 
 !       write(6,119) 'xnew x and h',xnew,x,h
 ! 119   format(1x,a,' ',1p3e12.4)
@@ -320,19 +309,15 @@
           derivs,ierr)
        if (ierr /= 0) then
 
-
          h      = h * 0.1d0
-         i_errmax   = 0
+         i_errmax = 0
          reduct = .true.
          ierr = 0
          if (dbg) write(*,*) 'ierr: simpr failed in stifbs'
-         go to 2
-
+         GOTO 02
 
          write(*,*) 'simpr failed in stifbs'
          return
-
-
 
        end if
        xest = (h/nseq(k))*(h/nseq(k))
@@ -349,9 +334,9 @@
           errmax = dum
           i_errmax = i
          end if
-        enddo
+        end do
 
-        errmax   = errmax/eps
+        errmax = errmax/eps
         km = k - 1
         err(km) = pow(errmax/safe1,1.0d0/(2*km+1))
        end if
@@ -360,28 +345,28 @@
        if (k /= 1  .and. (k >= kopt-1  .or. first)) then
 
 ! converged
-        if (errmax < 1.0d0) go to 04
+        if (errmax < 1.0d0) GOTO 04
 
 ! possible step size reductions
         if (k == kmax  .or.  k == kopt + 1) then
          red = safe2/err(km)
-         go to 03
+         GOTO 03
         else if (k == kopt) then
          if (alf(kopt-1,kopt) < err(km)) then
           red = 1.0d0/err(km)
-          go to 03
+          GOTO 03
          end if
         else if (kopt == kmax) then
          if (alf(km,kmax-1) < err(km)) then
           red = alf(km,kmax-1) * safe2/err(km)
-          go to 03
+          GOTO 03
          end if
         else if (alf(km,kopt) < err(km)) then
          red = alf(km,kopt-1)/err(km)
-         go to 03
+         GOTO 03
         end if
        end if
-18    continue
+      end do
 
 ! reduce stepsize by at least redmin and at most redmax
 03    red    = min(red,redmin)
@@ -391,7 +376,7 @@
       if (dbg) write(*,*) 'reduce stepsize', i, errmax, yerr(i), yscal(i), red, h
       i_errmax   = 0
       reduct = .true.
-      go to 2
+      GOTO 02
 
 
 ! successful step; get optimal row for convergence and corresponding stepsize
@@ -407,7 +392,7 @@
         wrkmin = work
         kopt   = kk + 1
        end if
-      enddo
+      end do
 !
 ! check for possible order increase, but not if stepsize was just reduced
       hnext = h/scale
@@ -452,8 +437,8 @@
       do j=1,nvar
        do i=1,nvar
         dmat(i,j) = -h * dens_dfdy(i,j)
-       enddo
-      enddo
+       end do
+      end do
       do i=1,nvar
        dmat(i,i) = 1.0d0 + dmat(i,i)
       end do
@@ -474,7 +459,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-      enddo
+      end do
 
       call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
@@ -491,22 +476,22 @@
                do j=1,nvar
                 do ii=1,nvar
                  if (dens_dfdy(ii,j) /= 0) write(*,3) 'dens_dfdy(ii,j)', ii, j, dens_dfdy(ii,j)
-                enddo
-               enddo
+                end do
+               end do
 
                do ii=1,nvar
                  if (dydx(ii) /= 0) write(*,2) 'dydx(ii)', ii, dydx(ii)
-               enddo
+               end do
 
                do j=1,nvar
                 do ii=1,nvar
                  if (dmat(ii,j) /= 0) write(*,3) 'dmat(ii,j)', ii, j, dmat(ii,j)
-                enddo
-               enddo
+                end do
+               end do
 
                do ii=1,nvar
                  if (yout(ii) /= 0) write(*,2) 'yout(ii)', ii, yout(ii)
-               enddo
+               end do
 
                write(*,*) 'first step: bad ytemp in simpr nstep i ytemp', nstep, i, ytemp(i), del(i), y(i)
                call mesa_error(__FILE__,__LINE__,'simpr')
@@ -514,7 +499,7 @@
             end if
 
          end if
-      enddo
+      end do
 
       x = xs + h
       call derivs(x,ytemp,yout,nvar,ierr)
@@ -526,7 +511,7 @@
 ! use yout as temporary storage; general step
 
       do nn=2,nstep
-       do 15 i=1,nvar
+       do i=1,nvar
         yout(i) = h*yout(i) - del(i)
          if (dbg) then
             if (is_bad(yout(i))) then
@@ -534,7 +519,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-15     continue
+      end do
       call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'my_getrs1 failed in simpr'
@@ -549,7 +534,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-       enddo
+       end do
 
        x = x + h
        call derivs(x,ytemp,yout,nvar,ierr)
@@ -557,10 +542,10 @@
          if (dbg) write(*,*) 'derivs failed in simpr general step'
          return
        end if
-      enddo
+      end do
 
 ! take the last step
-      do 18 i=1,nvar
+      do i=1,nvar
        yout(i) = h * yout(i) - del(i)
          if (dbg) then
             if (is_bad(yout(i))) then
@@ -568,7 +553,7 @@
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
-18    continue
+      end do
       call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          write(*,*) 'my_getrs1 failed in simpr'
@@ -615,17 +600,17 @@
       do j=1,nvar
        dy(j) = yest(j)
        yz(j) = yest(j)
-      enddo
+      end do
 
 ! store first estimate in first column
       if (iest == 1) then
        do j=1,nvar
         qcol(j,1) = yest(j)
-       enddo
+       end do
       else
        do j=1,nvar
         d(j) = yest(j)
-       enddo
+       end do
        do k1=1,iest-1
         delta = 1.0d0/(x(iest-k1) - xest)
         f1    = xest * delta
@@ -639,19 +624,17 @@
          dy(j)      = f1*delta
          d(j)       = f2*delta
          yz(j)      = yz(j) + dy(j)
-        enddo
-       enddo
+        end do
+       end do
        do j=1,nvar
         qcol(j,iest) = dy(j)
-       enddo
+       end do
       end if
       return
       end subroutine net_pzextr
 
 
       include 'mtx_solve_routines.inc'
-
-
 
 
       end module net_burn_support

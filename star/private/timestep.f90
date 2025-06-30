@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,20 +21,20 @@
 
       use star_private_def
       use utils_lib, only: is_bad
-      use const_def
+      use const_def, only: dp, ln10, secyer, msun, lsun, convective_mixing
       use chem_def
-
 
       implicit none
 
       private
-      public :: timestep_controller, check_change, check_integer_limit
+      public :: timestep_controller
+      public :: check_change
+      public :: check_integer_limit
 
       logical, parameter :: dbg_timestep = .false.
       real(dp) :: max_dt
 
       contains
-
 
       integer function timestep_controller(s, max_timestep)
          ! if don't return keep_going, then set result_reason to say why.
@@ -738,7 +732,6 @@
       integer function check_change( &
             s, delta_value, lim_in, hard_lim_in, max_k, msg, &
             skip_hard_limit, dt_limit_ratio, relative_excess)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          real(dp), intent(in) :: delta_value, lim_in, hard_lim_in
          integer, intent(in) :: max_k
@@ -774,7 +767,6 @@
 
 
       subroutine get_dlgP_info(s, i, max_dlnP)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnP
@@ -796,7 +788,6 @@
 
 
       integer function check_dlgP_change(s, skip_hard_limit, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
@@ -819,7 +810,6 @@
 
 
       subroutine get_dlgRho_info(s, i, max_dlnRho)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnRho
@@ -843,7 +833,6 @@
 
       integer function check_dlgRho_change(s, skip_hard_limit, dt_limit_ratio)
          ! check max change in log10(density)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
@@ -866,7 +855,6 @@
 
 
       subroutine get_dlgT_info(s, i, max_dlnT)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnT
@@ -890,7 +878,6 @@
 
       integer function check_dlgT_change(s, skip_hard_limit, dt_limit_ratio)
          ! check max change in log10(temperature)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
@@ -913,7 +900,6 @@
 
 
       subroutine get_dlgE_info(s, i, max_dlnE)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnE
@@ -936,7 +922,6 @@
 
       integer function check_dlgE_change(s, skip_hard_limit, dt_limit_ratio)
          ! check max change in log10(internal energy)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
@@ -959,7 +944,6 @@
 
 
       subroutine get_dlgR_info(s, i, max_dlnR)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnR
@@ -981,7 +965,6 @@
 
 
       integer function check_dlgR_change(s, skip_hard_limit, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
@@ -1295,9 +1278,7 @@
       end function check_dlgTeff_change
 
 
-      integer function check_dYe_highT_change( &
-            s, skip_hard_limit, dt_limit_ratio)  ! check max change in Ye
-         use const_def, only:ln10
+      integer function check_dYe_highT_change(s, skip_hard_limit, dt_limit_ratio)  ! check max change in Ye
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
@@ -1328,7 +1309,6 @@
 
 
       integer function check_dlgT_max_change(s, skip_hard_limit, dt, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
@@ -1360,7 +1340,6 @@
 
 
       integer function check_dlgT_max_at_high_T_change(s, skip_hard_limit, dt, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
@@ -1388,7 +1367,6 @@
 
 
       integer function check_dlgT_cntr_change(s, skip_hard_limit, dt, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
@@ -1414,7 +1392,6 @@
 
 
       integer function check_dlgP_cntr_change(s, skip_hard_limit, dt, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
@@ -1436,7 +1413,6 @@
 
 
       integer function check_dlgRho_cntr_change(s, skip_hard_limit, dt, dt_limit_ratio)
-         use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt

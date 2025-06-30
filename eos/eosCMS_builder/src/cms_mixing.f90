@@ -1,25 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020  Aaron Dotter
+!   Copyright (C) 2020  Aaron Dotter & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -33,11 +27,11 @@
 
 module cms
 
-   use const_def, only: dp, ln10
+   use const_def, only: dp, ln10, avo, amu
 
    implicit none
 
-   logical, parameter :: DBG = .false.
+   logical, parameter :: dbg = .false.
    integer, parameter :: NT = 121
    integer, parameter :: NP = 441
 
@@ -89,8 +83,8 @@ contains
             t% data(j,i)% logP = t% data(j,i)% logP + log10(GPa_to_dyncm2)
             t% data(j,i)% logS = t% data(j,i)% logS + log10(MJ_kg_to_erg_g)
             t% data(j,i)% logU = t% data(j,i)% logU + log10(MJ_kg_to_erg_g)
-         enddo
-      enddo
+         end do
+      end do
       close(io)
    end subroutine read_one
 
@@ -116,8 +110,8 @@ contains
                tab% data(j,i)% logU, tab% data(j,i)% logS, tab% data(j,i)% dlnRho_dlnT_constP, &
                tab% data(j,i)% dlnRho_dlnP_constT, tab% data(j,i)% dlnS_dlnT_constP, &
                tab% data(j,i)% dlnS_dlnP_constT, tab% data(j,i)% grad_ad, chiRho, chiT
-         enddo
-      enddo
+         end do
+      end do
       close(io)
    end subroutine write_one
 
@@ -144,9 +138,9 @@ contains
             if(ierr/=0) then
                write(*,*) 'additive volume failed!'
                return
-            endif
-         enddo
-      enddo
+            end if
+         end do
+      end do
    end subroutine blend_tables
 
 
@@ -157,8 +151,6 @@ contains
       integer, intent(out) :: ierr
       real(dp), parameter :: tol = 1.0E-5_dp
       real(dp), parameter :: kerg = 1.380649D-16
-      real(dp), parameter :: avo =  6.02214076d23
-      real(dp), parameter :: amu = 1.0_dp/avo
 
       real(dp) :: Nx, Ny, Ntot, Abar
       real(dp) :: rhoXY, rhoX, rhoY
@@ -174,19 +166,19 @@ contains
       if ( abs(1.0_dp - mass_frac_X - mass_frac_Y) > tol )then
          write(*,*) 'additive_volume: X + Y != 1'
          ierr = -1
-      endif
+      end if
 
       !logT1 == logT2
       if (abs(eosX% logT - eosY% logT) > tol ) then
          write(*,*) 'additive_volume: logT_X != logT_Y'
          ierr = -1
-      endif
+      end if
 
       !logP1 == log
       if (abs(eosX% logP - eosY% logP) > tol ) then
          write(*,*) 'additive_volume: logP_X != logP_Y'
          ierr = -1
-      endif
+      end if
 
       if(mass_frac_X < 1.0E-12_dp)then
          eosXY = eosY
@@ -194,7 +186,7 @@ contains
       elseif(mass_frac_Y < 1.0E-12)then
          eosXY = eosX
          return
-      endif
+      end if
 
       Nx = mass_frac_X / atomic_mass_H
       Ny = mass_frac_Y / atomic_mass_He
@@ -235,7 +227,7 @@ contains
          write(*,*) ' rhoX, rhoY = ', rhoX, rhoY
          write(*,*) ' SX, SY = ', SX, SY
          stop
-      endif
+      end if
 
       !CMS equation 10
       SXY = mass_frac_X*SX + mass_frac_Y*SY + Smix
@@ -283,7 +275,7 @@ program cms_mixing
    if(command_argument_count()<2) then
       write(*,*) './cms_mixing [X] [filename]'
       stop
-   endif
+   end if
 
    call get_command_argument(1,arg)
    read(arg,*) X

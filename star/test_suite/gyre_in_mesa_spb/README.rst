@@ -4,11 +4,11 @@
 gyre_in_mesa_spb
 ****************
 
-This test case checks the implementation of GYRE in MESA for a 5 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; a slowly pulsating B-type star (SPB) stellar model.
+This test case checks the implementation of GYRE in MESA for a 5 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; a slowly pulsating B-type star (SPB) stellar model.
 
 This test case has 2 parts.
 
-* Part 1 (``inlist_zams``) builds a 5 Msun, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
+* Part 1 (``inlist_zams``) builds a 5 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves it to the main sequence.
 
 * Part 2 (``inlist_gyre_in_mesa_ms``) continues the evolution until the central hydrogen mass fraction drops below 1e-2. During the evolution the ``run_star_extras.f90`` calls GYRE, processes the GYRE output, and searches for a non-radial g-mode frequency of 7e-6 Hz (7 microHz). Close matches to this target frequency are reported in the terminal:
 
@@ -30,5 +30,3 @@ This test case has 2 parts.
 
 
 Last-Updated: 11Jun2021 (MESA 5be9e57) by fxt.
-
-

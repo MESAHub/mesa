@@ -3,18 +3,18 @@
 &star_job
 
 
-      show_log_description_at_start = .false. 
-      
+      show_log_description_at_start = .false.
+
       load_saved_model = .true.
-      load_model_filename = 'ns_c_env.mod' ! with L_center = 1d35 
-      
+      load_model_filename = 'ns_c_env.mod' ! with L_center = 1d35
+
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       required_termination_code_string = 'power_nuc_burn_upper_limit'
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'approx21_plus_co56.net'
-      
+
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
@@ -29,7 +29,7 @@
 
       set_initial_age = .true.
       initial_age = 0
-   
+
       set_initial_dt = .true.
       years_for_initial_dt = 1d-2
 
@@ -54,7 +54,7 @@
       initial_z = 0.02d0
 
 ! when to stop
-      
+
       power_nuc_burn_upper_limit = 1d6
 
       max_number_retries = 50
@@ -62,8 +62,8 @@
 
 ! mass change
       mass_change = 1.7d-9  ! rate of accretion (Msun/year)
-      accrete_same_as_surface = .false. 
-      accrete_given_mass_fractions = .true. 
+      accrete_same_as_surface = .false.
+      accrete_given_mass_fractions = .true.
       num_accretion_species = 1
       accretion_species_xa(1) = 1
       accretion_species_id(1) = 'c12'
@@ -82,7 +82,7 @@
       mixing_length_alpha = 1.5
       MLT_option = 'TDC'
 
-      use_Ledoux_criterion = .false.  
+      use_Ledoux_criterion = .false.
 
       thermohaline_coeff = 2
       thermohaline_option = 'Kippenhahn'
@@ -90,11 +90,11 @@
 ! mixing
 
 ! timesteps
-      varcontrol_target = 1d-3 
+      varcontrol_target = 1d-3
       delta_lgL_nuc_limit = 0.01
       !delta_lgL_nuc_hard_limit = 0.15
       lgL_nuc_burn_min = -2d0
-      
+
       ! reduce limit for rel error since total_energy is tiny
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
@@ -103,14 +103,14 @@
       merge_if_dlnR_too_small = .true.
       mesh_min_dlnR = 1d-9
 
-! solver    
+! solver
       energy_eqn_option = 'dedt'
 
       use_gold2_tolerances = .true.
       steps_before_use_gold2_tolerances = 1
 
       use_other_cgrav = .true. ! for GR factor with gravity
-      
+
       max_abar_for_burning = 55
       max_abs_rel_run_E_err = 1d99
       warning_limit_for_max_residual = 1d99
@@ -128,7 +128,7 @@
       !num_trace_history_values = 2
       !trace_history_value_name(1) = 'rel_E_err'
       !trace_history_value_name(2) = 'log_rel_run_E_err'
-      
+
       photo_interval = 50
       profile_interval = 50
       history_interval = 20
@@ -136,7 +136,6 @@
       write_header_frequency = 10
 
 / ! end of controls namelist
-
 
 
 &pgstar

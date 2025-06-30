@@ -1,49 +1,34 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Rich Townsend
+!   Copyright (C) 2010  Rich Townsend & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module utils_lib
 
-  ! Uses
-
   use utils_def, only: max_io_unit
   use const_def, only: dp, qp, strlen
-
   use utils_nan
 
-  ! No implicit typing
-
   implicit none
-
-  ! Module variables
 
   logical :: assigned(max_io_unit) = .false.
 
   character(*), private, parameter :: LOWER_CASE = 'abcdefghijklmnopqrstuvwxyz'
-  CHARACTER(*), private, parameter :: UPPER_CASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-  ! Procedures
+  character(*), private, parameter :: UPPER_CASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 contains
 
@@ -52,14 +37,12 @@ contains
     utils_OMP_GET_THREAD_NUM = eval_OMP_GET_THREAD_NUM()
   end function utils_OMP_GET_THREAD_NUM
 
-  !****
 
   integer function utils_OMP_GET_MAX_THREADS()
     use utils_openmp, only: eval_OMP_GET_MAX_THREADS
     utils_OMP_GET_MAX_THREADS = eval_OMP_GET_MAX_THREADS()
   end function utils_OMP_GET_MAX_THREADS
 
-  !****
 
   subroutine utils_OMP_SET_NUM_THREADS(threads)
     use utils_openmp, only: eval_OMP_SET_NUM_THREADS
@@ -67,7 +50,6 @@ contains
     call eval_OMP_SET_NUM_THREADS(threads)
   end subroutine utils_OMP_SET_NUM_THREADS
 
-  !****
 
   subroutine get_compiler_version(compiler_name,compiler_version_name)
     character(len=*) :: compiler_name, compiler_version_name
@@ -96,36 +78,34 @@ contains
 #endif
   end subroutine get_compiler_version
 
-  !****
 
   subroutine get_mesasdk_version(version, ierr)
-    use iso_fortran_env
     character(len=*), intent(out) :: version
     integer, intent(out) :: ierr
     character(len=strlen) :: mesasdk_root, filename
     integer :: unit, root_len, name_len
 
     ierr = 0
-    version = 'unknown'  !set here in case there is a problem below
+    version = 'unknown'  ! set here in case there is a problem below
 
     call get_environment_variable(name='MESASDK_VERSION', value=version, length=name_len, status=ierr)
     if (ierr /= 0) then
        ierr=0
        return
-    endif
+    end if
 
     call get_environment_variable(name='MESASDK_ROOT', value=mesasdk_root, length=root_len, status=ierr)
     if (ierr /= 0 .or. root_len==0) then
        ierr=0
        return
-    endif
+    end if
 
     filename=trim(mesasdk_root) // '/bin/mesasdk_version'
     open(newunit=unit, file=filename, status='old', action='read', iostat=ierr)
     if (ierr /= 0)then
        ierr=0
        return
-    endif
+    end if
 
     read(unit,'(A)')
     read(unit,'(A)')
@@ -139,7 +119,6 @@ contains
 
   end subroutine get_mesasdk_version
 
-  !****
 
   elemental subroutine strip(string,set)
     character(len=*), intent(inout) :: string
@@ -159,7 +138,6 @@ contains
     end do
   end subroutine strip
 
-  !****
 
   subroutine realloc_double(ptr,new_size,ierr)
     real(dp), pointer :: ptr(:)
@@ -179,7 +157,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_double
 
-  !****
 
   subroutine realloc_double2(ptr,new_size1,new_size2,ierr)
     real(dp), pointer :: ptr(:,:)
@@ -207,7 +184,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_double2
 
-  !****
 
   subroutine realloc_quad(ptr,new_size,ierr)
     real(qp), pointer :: ptr(:)
@@ -227,7 +203,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_quad
 
-  !****
 
   subroutine realloc_quad2(ptr,new_size1,new_size2,ierr)
     real(qp), pointer :: ptr(:,:)
@@ -255,7 +230,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_quad2
 
-  !****
 
   subroutine realloc_double3(ptr,new_size1,new_size2,new_size3,ierr)
     real(dp), pointer :: ptr(:,:,:)
@@ -286,7 +260,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_double3
 
-  !****
 
   subroutine realloc_real(ptr,new_size,ierr)
     real, pointer :: ptr(:)
@@ -306,7 +279,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_real
 
-  !****
 
   subroutine realloc_integer(ptr,new_size,ierr)
     integer, pointer :: ptr(:)
@@ -326,7 +298,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_integer
 
-  !****
 
   subroutine realloc_integer2(ptr,new_size1,new_size2,ierr)
     integer, pointer :: ptr(:,:)
@@ -354,7 +325,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_integer2
 
-  !****
 
   subroutine realloc_logical(ptr,new_size,ierr)
     logical, pointer :: ptr(:)
@@ -374,7 +344,6 @@ contains
     ptr => new_ptr
   end subroutine realloc_logical
 
-  !****
 
   subroutine do1D(ptr,sz,dealloc,ierr)
     real(dp),dimension(:),pointer::ptr
@@ -388,7 +357,6 @@ contains
     end if
   end subroutine do1D
 
-  !****
 
   subroutine do2D(ptr,sz1,sz2,dealloc,ierr)
     real(dp),dimension(:,:),pointer::ptr
@@ -402,7 +370,6 @@ contains
     end if
   end subroutine do2D
 
-  !****
 
   subroutine do3D(ptr,sz1,sz2,sz3,dealloc,ierr)
     real(dp),dimension(:,:,:),pointer::ptr
@@ -416,7 +383,6 @@ contains
     end if
   end subroutine do3D
 
-  !****
 
   subroutine do4D(ptr,sz1,sz2,sz3,sz4,dealloc,ierr)
     real(dp),dimension(:,:,:,:),pointer::ptr
@@ -430,7 +396,6 @@ contains
     end if
   end subroutine do4D
 
-  !****
 
   subroutine do1D_integer(ptr,sz,dealloc,ierr)
     integer,dimension(:),pointer::ptr
@@ -444,7 +409,6 @@ contains
     end if
   end subroutine do1D_integer
 
-  !***
 
   subroutine do2D_integer(ptr,sz1,sz2,dealloc,ierr)
     integer,dimension(:,:),pointer::ptr
@@ -458,7 +422,6 @@ contains
     end if
   end subroutine do2D_integer
 
-  !****
 
   subroutine do1D_logical(ptr,sz,dealloc,ierr)
     logical,dimension(:),pointer::ptr
@@ -472,7 +435,6 @@ contains
     end if
   end subroutine do1D_logical
 
-  !****
 
   subroutine alloc1(sz,a,ierr)
     real(dp), dimension(:), pointer :: a
@@ -481,7 +443,6 @@ contains
     allocate(a(sz),stat=ierr); if (ierr /= 0) return
   end subroutine alloc1
 
-  !****
 
   subroutine alloc2(sz1,sz2,a,ierr)
     real(dp), dimension(:,:), pointer :: a
@@ -490,7 +451,6 @@ contains
     allocate(a(sz1,sz2),stat=ierr); if (ierr /= 0) return
   end subroutine alloc2
 
-  !****
 
   subroutine alloc3(sz1,sz2,sz3,a,ierr)
     real(dp), dimension(:,:,:), pointer :: a
@@ -499,7 +459,6 @@ contains
     allocate(a(sz1,sz2,sz3),stat=ierr); if (ierr /= 0) return
   end subroutine alloc3
 
-  !****
 
   subroutine realloc_if_needed_1(ptr,sz,extra,ierr)
     real(dp), pointer :: ptr(:)
@@ -512,7 +471,6 @@ contains
     call realloc_double(ptr, sz + extra, ierr)
   end subroutine realloc_if_needed_1
 
-  !****
 
   subroutine quad_realloc_if_needed_1(ptr,sz,extra,ierr)
     real(qp), pointer :: ptr(:)
@@ -525,7 +483,6 @@ contains
     call realloc_quad(ptr, sz + extra, ierr)
   end subroutine quad_realloc_if_needed_1
 
-  !****
 
   subroutine realloc_integer_if_needed_1(ptr,sz,extra,ierr)
     integer, pointer :: ptr(:)
@@ -538,7 +495,6 @@ contains
     call realloc_integer(ptr, sz + extra, ierr)
   end subroutine realloc_integer_if_needed_1
 
-  !****
 
   subroutine enlarge_if_needed_1(ptr,sz,extra,ierr)
     real(dp), pointer :: ptr(:)
@@ -552,7 +508,6 @@ contains
     allocate(ptr(sz + extra), stat=ierr)
   end subroutine enlarge_if_needed_1
 
-  !****
 
   subroutine enlarge_if_needed_2(ptr,sz1,sz2,extra,ierr)
     real(dp), pointer :: ptr(:,:)
@@ -566,7 +521,6 @@ contains
     allocate(ptr(sz1, sz2 + extra), stat=ierr)
   end subroutine enlarge_if_needed_2
 
-  !****
 
   subroutine quad_enlarge_if_needed_1(ptr,sz,extra,ierr)
     real(qp), pointer :: ptr(:)
@@ -580,7 +534,6 @@ contains
     allocate(ptr(sz + extra), stat=ierr)
   end subroutine quad_enlarge_if_needed_1
 
-  !****
 
   subroutine enlarge_integer_if_needed_1(ptr,sz,extra,ierr)
     integer, pointer :: ptr(:)
@@ -594,7 +547,6 @@ contains
     allocate(ptr(sz + extra), stat=ierr)
   end subroutine enlarge_integer_if_needed_1
 
-  !****
 
   subroutine remove_underbars(str, name)
     character (len=*), intent(in) :: str
@@ -611,7 +563,6 @@ contains
     end do
   end subroutine remove_underbars
 
-  !****
 
   integer function token(iounit, n, i, buffer, string)
     use utils_def
@@ -715,7 +666,6 @@ contains
 
   end function token
 
-  !****
 
   subroutine integer_dict_define_and_report_duplicates(dict, key, value, duplicate, ierr)
     use utils_dict
@@ -728,7 +678,6 @@ contains
     call do_integer_dict_define(dict, key, value, duplicate, ierr)
   end subroutine integer_dict_define_and_report_duplicates
 
-  !****
 
   subroutine integer_dict_define(dict, key, value, ierr)
     use utils_def, only: integer_dict
@@ -740,7 +689,6 @@ contains
     call integer_dict_define_and_report_duplicates(dict, key, value, duplicate, ierr)
   end subroutine integer_dict_define
 
-  !****
 
   subroutine integer_dict_create_hash(dict, ierr)
     use utils_dict
@@ -749,7 +697,6 @@ contains
     call do_integer_dict_create_hash(dict, ierr)
   end subroutine integer_dict_create_hash
 
-  !****
 
   subroutine integer_dict_lookup(dict, key, value, ierr)
     use utils_dict
@@ -760,7 +707,6 @@ contains
     call do_integer_dict_lookup(dict, key, value, ierr)
   end subroutine integer_dict_lookup
 
-  !****
 
   integer function integer_dict_size(dict)  ! number of entries
     use utils_dict
@@ -768,7 +714,6 @@ contains
     integer_dict_size = size_integer_dict(dict)
   end function integer_dict_size
 
-  !****
 
   subroutine integer_dict_map(dict, fcn)
     use utils_dict
@@ -785,7 +730,6 @@ contains
     call do_integer_dict_map(dict, fcn, ierr)
   end subroutine integer_dict_map
 
-  !****
 
   subroutine get_dict_entries(dict, keys, values)
     use utils_dict
@@ -795,7 +739,6 @@ contains
     call do_get_dict_entries(dict, keys, values)
   end subroutine get_dict_entries
 
-  !****
 
   subroutine integer_dict_free(dict)
     use utils_dict
@@ -803,7 +746,6 @@ contains
     call do_integer_dict_free(dict)
   end subroutine integer_dict_free
 
-  !****
 
   subroutine integer_idict_define_and_report_duplicates(idict, key1, key2, value, duplicate, ierr)
     use utils_idict
@@ -815,7 +757,6 @@ contains
     call do_integer_idict_define(idict, key1, key2, value, duplicate, ierr)
   end subroutine integer_idict_define_and_report_duplicates
 
-  !****
 
   subroutine integer_idict_define(idict, key1, key2, value, ierr)
     use utils_def, only: integer_idict
@@ -827,7 +768,6 @@ contains
          idict, key1, key2, value, duplicate, ierr)
   end subroutine integer_idict_define
 
-  !****
 
   subroutine integer_idict_create_hash(idict, ierr)
     use utils_idict
@@ -836,7 +776,6 @@ contains
     call do_integer_idict_create_hash(idict, ierr)
   end subroutine integer_idict_create_hash
 
-  !****
 
   subroutine integer_idict_lookup(idict, key1, key2, value, ierr)
     use utils_idict
@@ -847,7 +786,6 @@ contains
     call do_integer_idict_lookup(idict, key1, key2, value, ierr)
   end subroutine integer_idict_lookup
 
-  !****
 
   integer function integer_idict_size(idict)  ! number of entries
     use utils_idict
@@ -855,7 +793,6 @@ contains
     integer_idict_size = size_integer_idict(idict)
   end function integer_idict_size
 
-  !****
 
   subroutine integer_idict_map(idict, fcn)
     use utils_idict
@@ -871,7 +808,6 @@ contains
     call do_integer_idict_map(idict, fcn, ierr)
   end subroutine integer_idict_map
 
-  !****
 
   subroutine get_idict_entries(idict, key1s, key2s, values)
     use utils_idict
@@ -880,7 +816,6 @@ contains
     call do_get_idict_entries(idict, key1s, key2s, values)
   end subroutine get_idict_entries
 
-  !****
 
   subroutine integer_idict_free(idict)
     use utils_idict
@@ -888,7 +823,6 @@ contains
     call do_integer_idict_free(idict)
   end subroutine integer_idict_free
 
-  !****
 
   function StrUpCase ( Input_String ) result ( Output_String )
     character(len=*), intent(in) :: Input_String
@@ -901,7 +835,6 @@ contains
     end do
   end function StrUpCase
 
-  !****
 
   function StrLowCase ( Input_String ) result ( Output_String )
     character(len=*), intent(in) :: Input_String
@@ -914,7 +847,6 @@ contains
     end do
   end function StrLowCase
 
-  !****
 
   subroutine mkdir(folder)
     use utils_system, only : mkdir_p
@@ -1019,7 +951,6 @@ contains
     end if
   end function alloc_iounit
 
-  !****
 
   integer function number_iounits_allocated()
     use utils_def
@@ -1033,7 +964,6 @@ contains
     number_iounits_allocated = cnt
   end function number_iounits_allocated
 
-  !****
 
   subroutine free_iounit(iounit)
     use utils_def
@@ -1053,7 +983,6 @@ contains
     end if
   end subroutine free_iounit
 
-  !****
 
   subroutine append_line(n, arry, filename, format_str, initialize, ierr)
     integer, intent(in) :: n
@@ -1078,7 +1007,6 @@ contains
     call free_iounit(iounit)
   end subroutine append_line
 
-  !****
 
   subroutine append_data(n, arry, filename, format_str, initialize, ierr)
     integer, intent(in) :: n
@@ -1258,6 +1186,4 @@ contains
          x = xa(1)
       end subroutine set_to_NaN
 
-
 end module utils_lib
-

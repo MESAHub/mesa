@@ -1,5 +1,5 @@
 ! the energy levels of a given nucleus
-! these are needed to calcuate the partition function
+! these are needed to calculate the partition function
 ! each has an entry of the form (E = energy, J = spin)
 ! <name> <nlevels>
 ! <E_1> <J_1>

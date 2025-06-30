@@ -1,11 +1,26 @@
-
-
-
+! ***********************************************************************
+!
+!   Copyright (C) 2010  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
 
       module eps_mdot
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use star_utils
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
@@ -17,10 +32,7 @@
       private
       public :: calculate_eps_mdot
 
-
-
       contains
-
 
       !> We choose as a convention to fix F on the faces between cells and to be
       !! positive when mass is flowing downward. With this, the mass flux may be
@@ -690,6 +702,5 @@
 
 
       end subroutine calculate_eps_mdot
-
 
       end module eps_mdot

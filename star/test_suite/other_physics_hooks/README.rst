@@ -4,12 +4,12 @@
 other_physics_hooks
 *******************
 
-This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 Msun, Z=0.02 metallicity, model.
+This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 |Msun|, Z=0.02 metallicity, model.
 It provides an example of how to include your own physics code into a MESA run.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_other_physics_hooks_header``) and its significant ``src`` directory first loads a prebuilt 1 Msun, Z=0.02 metallicity, zero age main sequence model (see ``data/star_data/zams_models/zams_z2m2_y28.data`` for such ZAMS models). A careful examination of the ``run_star_extras.f90`` is warranted and rewarding -- also see the Extending MESA tutorial. The hooks ``other_kap``, ``other_eos``, ``other_screening``, ``overshoot_dbl_exp``, ``other_wind``, ``other_mesh_functions``, and ``other_timestep`` are activated. Some, such as ``other_eos``, simply use the default module. Others, such as ``other_wind``, implement different physics. Some information about their use is reported in the terminal as the model evolves toward its termination when the hydrogen mass fractions drops below 0.25 :
+* Part 1 (``inlist_other_physics_hooks_header``) and its significant ``src`` directory first loads a prebuilt 1 |Msun|, Z=0.02 metallicity, zero age main sequence model (see ``data/star_data/zams_models/zams_z2m2_y28.data`` for such ZAMS models). A careful examination of the ``run_star_extras.f90`` is warranted and rewarding -- also see the Extending MESA tutorial. The hooks ``other_kap``, ``other_eos``, ``other_screening``, ``overshoot_dbl_exp``, ``other_wind``, ``other_mesh_functions``, and ``other_timestep`` are activated. Some, such as ``other_eos``, simply use the default module. Others, such as ``other_wind``, implement different physics. Some information about their use is reported in the terminal as the model evolves toward its termination when the hydrogen mass fractions drops below 0.25 :
 
 .. code-block:: console
 

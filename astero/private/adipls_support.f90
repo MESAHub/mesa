@@ -2,36 +2,30 @@
 !
 !   Copyright (C) 2013  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module adipls_support
 
+      use const_def, only: dp, i8, pi, pi4, four_thirds_pi, Msun, Rsun, Lsun
       use astero_def
       use star_lib
       use star_def
-      use const_def
       use utils_lib
 
-
       implicit none
-
 
       ! args for adipls
       integer, save :: i_paramset, ierr_param, i_inout, nn
@@ -40,11 +34,8 @@
       real(dp), save :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
-
       integer, save :: iounit_dev_null = -1
-
       integer, save :: nn_redist  ! set from redistrb.c input file
-
 
       real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
       integer, save :: nn_arg
@@ -52,9 +43,7 @@
 
       logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
-
       contains
-
 
       ! this can be called from user run_star_extras check model routine
       subroutine do_adipls_get_one_el_info( &
@@ -350,7 +339,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, nn_arg_0
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder
@@ -990,7 +979,6 @@
          real(dp), pointer :: var(:,:)  ! (ivar,nn)
          integer, intent(out) :: ierr
 
-         real(dp), parameter :: Msun = 1.9892d33, Rsun = 6.9598d10, Lsun = 3.8418d33
          integer :: iounit, k, offset
 
          ierr = 0
@@ -1079,6 +1067,5 @@
          end do
          write(*,'(A)')
       end subroutine show_adipls_results
-
 
       end module adipls_support

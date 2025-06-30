@@ -148,6 +148,8 @@
    !pgas ! gas pressure at center of zone (electrons and ions)
    !logPgas ! log10(pgas)
    !pgas_div_ptotal ! pgas/pressure
+   !flux_limit_lambda ! flux limiter defined as in Levermore & Pomraning 1981
+   !flux_limit_R ! flux ratio defined as in Levermore & Pomraning 1981
 
    !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
    !mu ! mean molecular weight per gas particle (ions + free electrons)
@@ -454,6 +456,9 @@
    !lum_conv_div_lum_Edd
    !lum_conv_div_L
    !lum_rad_div_L
+   !Frad_div_cUrad ! Frad/(C*Urad), must be < 1 to not violate c.
+   !flux_limit_lambda
+   !flux_limit_R
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
       ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
 
@@ -467,11 +472,11 @@
    !sch_stable ! 1 if grada > gradr, 0 otherwise
    !ledoux_stable ! 1 if gradL > gradr, 0 otherwise
 
-   !grada_sub_gradT
+   !grada_sub_gradT ! grada-gradT at cell boundary
    !gradT_sub_grada ! gradT-grada at cell boundary 
    !gradT_div_grada ! gradT/grada at cell boundary 
 
-   !gradr_sub_gradT
+   !gradr_sub_gradT ! gradr-gradT at cell boundary
    !gradT_sub_gradr ! gradT-gradr at cell boundary 
    !gradT_div_gradr ! gradT/gradr at cell boundary 
 
@@ -484,28 +489,28 @@
    !gradr_div_grada ! gradr/grada_face; > 1 => Schwarzschild unstable for convection
    !gradr_sub_grada ! gradr - grada_face; > 0 => Schwarzschild unstable for convection
 
-   !gradL_sub_gradr
-   !gradP_div_rho
-   !gradT_excess_effect
-   !gradT_rel_err
-   !gradT_sub_a
-   !grada_face
-   !grada_sub_gradr
-   !diff_grads
-   !log_diff_grads
+   !gradL_sub_gradr ! gradL-gradr at cell boundary
+   !gradP_div_rho ! finite difference (deltaP/deltam)* 4*pi*r^2, at cell boundary
+   !gradT_excess_effect ! 1 - alpha, where alpha is the gradT_excess_alpha from mlt++
+   !gradT_rel_err ! gradT - actual_gradT / gradT, actual_gradT = deltaT/deltaP from finite difference
+   !gradT_sub_a !  same as gradT_sub_grada ! gradT-grada at cell boundary 
+   !grada_face ! grada at cell boundary
+   !grada_sub_gradr ! grada-gradr at cell boundary 
+   !diff_grads ! gradr - gradL at cell boundary 
+   !log_diff_grads ! log10(diff_grads)
 
-   !mlt_D
-   !mlt_Gamma
-   !mlt_Y_face
-   !mlt_Zeta
-   !mlt_gradT
-   !mlt_log_abs_Y
-   !mlt_vc
-   !log_mlt_vc
-   !dvc_dt_TDC_div_g 
+   !mlt_D ! The chemical diffusion coefficient (cm^2/s)
+   !mlt_Gamma ! The convective efficiency parameter from the mlt equation, Gamma=(grad-gradE)/(gradE-gradL)
+   !mlt_Y_face ! The superadiabaticity Y = dlnT/dlnP - grada, or dlnT/dlnP - gradL at cell boundary
+   !mlt_Zeta ! convective efficiency as Zeta = (gradr-gradT)/(gradr-grada)
+   !mlt_gradT ! same as gradT, mlt/TDC value for dlnT/dlnP.
+   !mlt_log_abs_Y ! log10(abs(Y_face)) 
+   !mlt_vc    ! convective velocity from mlt/TDC in cm/s
+   !log_mlt_vc ! log10(mlt_vc)
+   !dvc_dt_TDC_div_g ! dimensionless ratio of convective velocity to g
 
-   !superad_reduction_factor
-   !conv_vel_div_mlt_vc
+   !superad_reduction_factor ! gamma_factor from superad_reduction
+   !conv_vel_div_mlt_vc ! conv_vel from any convection model (including RSP) / mlt_vc, for comparison 
 
    !log_Lconv
    !log_Lconv_div_L

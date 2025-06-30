@@ -6,7 +6,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      load_model_filename = 'start_core_he_burn.mod' 
+      load_model_filename = 'start_core_he_burn.mod'
          ! from 1M_pre_ms_to_wd
          ! inlist_to_end_core_he_burn
          ! modified to stop when he4 drops below xa_central_lower_limit = 0.95
@@ -16,7 +16,7 @@
       extra_mass_retained_by_remove_H_env = 5d-3 ! (Msun)
       lg_max_abs_mdot = -1
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'basic_plus_fe56_ni58.net'
 
       save_model_when_terminate = .true.
@@ -35,7 +35,7 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      
+
       !pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -57,10 +57,10 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 4200
       use_gold2_tolerances = .true.
-      
+
       xa_central_upper_limit_species(1) = 'c12'
       xa_central_upper_limit(1) = 0.05d0
-      
+
       when_to_stop_rtol = 1d-3
       when_to_stop_atol = 1d-5
 
@@ -72,30 +72,29 @@
 
       varcontrol_target = 1d-3
       min_timestep_limit = 1d-6 ! (seconds)
-         
+
       do_conv_premix = .true.
       do_premix_heating = .true.
 
       photo_interval = 50
       profile_interval = 50
       history_interval = 5
-      terminal_interval = 10 
-      
+      terminal_interval = 10
+
       !trace_k = 0
 
 / ! end of controls namelist
 
 
-
 &pgstar
-         
-         !pause = .true.
-         !Profile_Panels4_win_flag = .true. ! Abundance, Power, Mixing_Ds, and Dynamo    
+
+         !pause_flag = .true.
+         !Profile_Panels4_win_flag = .true. ! Abundance, Power, Mixing_Ds, and Dynamo
          Profile_Panels4_num_panels = 3
          Profile_Panels4_title = 'Abundance-Power-Mixing'
          !History_Panels1_win_flag = .true. ! logT, logRho, log_L, log_Teff
          Grid8_win_flag = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
-         
+
          Profile_Panels4_xaxis_name = 'mass'
          Profile_Panels4_xaxis_reversed = .false.
 

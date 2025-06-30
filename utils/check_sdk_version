@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Check whether the MESA SDK meets version requirements
 
@@ -47,7 +47,7 @@ version_check () {
 
 }
 
-# Check for existance of mesasdk_version (and not mesasdk_version.sh that older sdk's shipped)
+# Check for existence of mesasdk_version (and not mesasdk_version.sh that older sdk's shipped)
 
 if ! command -v mesasdk_version >/dev/null 2>&1; then
     echo 'failed'

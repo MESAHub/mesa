@@ -11,10 +11,10 @@
 
    ! save a model at the end of the run
    save_model_when_terminate = .true.
-   save_model_filename = 'post_tzo.mod' 
+   save_model_filename = 'post_tzo.mod'
 
    set_initial_age = .true.
-   initial_age = 0     
+   initial_age = 0
 
    set_initial_model_number = .true.
    initial_model_number = 0
@@ -37,7 +37,7 @@
    new_Z = 1d-4
 
    change_initial_net=.false.
-   new_net_name='approx21.net' 
+   new_net_name='approx21.net'
 
 / ! end of star_job namelist
 
@@ -49,7 +49,6 @@
 &kap
 
 /
-
 
 
 &controls
@@ -75,6 +74,5 @@
 
 
 &pgstar
-
 
 / ! end of pgstar namelist

@@ -52,7 +52,6 @@ contains
 
    end function xi_r
 
-  !****
 
   function xi_h(this, k)
 
@@ -64,7 +63,6 @@ contains
 
   end function xi_h
 
-  !****
 
   function dW_dx(this, k)
 
@@ -76,7 +74,6 @@ contains
 
   end function dW_dx
 
-  !****
 
   function freq(this, freq_units, freq_frame)
 
@@ -89,7 +86,6 @@ contains
 
   end function freq
 
-  !****
 
   function grid(this) result (gr)
 
@@ -100,13 +96,10 @@ contains
 
      gr = this%gr
 
-     ! Finish
-
      return
 
   end function grid
 
-  !****
 
   subroutine init(file)
 
@@ -119,12 +112,10 @@ contains
 
   end subroutine init
 
-  !****
 
   subroutine final()
   end subroutine final
 
-  !****
 
   subroutine read_model (file)
 
@@ -132,7 +123,6 @@ contains
 
   end subroutine read_model
 
-  !****
 
   subroutine set_model (global_data, point_data, version)
 
@@ -142,7 +132,6 @@ contains
 
   end subroutine set_model
 
-  !****
 
   subroutine get_modes (l, user_sub, ipar, rpar)
 
@@ -163,7 +152,6 @@ contains
 
   end subroutine get_modes
 
-  !****
 
   subroutine set_constant_r_ (name, value)
 
@@ -172,7 +160,6 @@ contains
 
   end subroutine set_constant_r_
 
-  !****
 
   subroutine set_constant_c_ (name, value)
 

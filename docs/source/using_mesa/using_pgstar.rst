@@ -4,13 +4,13 @@ Using PGSTAR
 Watching lots of numbers fly by in the terminal window can provide some
 idea of how a run is going, but it is much better (and much more fun) to
 have windows with plots that change at each step. PGstar is built on
-PGPLOT for creating plots using XWindows for on-screen plots and PNG for
+PGPLOT for creating plots using Xwindows for on-screen plots and PNG for
 frames of movies to animate those plots.
 
-Devote lots of time watching models evolve.  It's a fun way to learn!
+Devote lots of time watching models evolve. It's a fun way to learn!
 
 If you're using the MESA SDK, you should have everything you need to use
-PGSTAR. Otherwise, you need to have installed PGPLOT, XWindows, and a
+PGSTAR. Otherwise, you need to have installed PGPLOT, Xwindows, and a
 few libraries that they need. See the makefile_header_non_mesasdk in
 $MESA_DIR/utils for details. You'll find pgplot.tar.bz2 in
 $MESA_DIR/scripts in case you need to install PGPLOT (thanks to Tim

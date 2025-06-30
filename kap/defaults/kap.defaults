@@ -11,7 +11,6 @@
 
    ! Zbase
    ! ~~~~~
-
    ! The base metallicity for the opacity tables. This provides the
    ! reference metallicity necessary to calculate element variations.
    ! Physically, this usually corresponds to the initial metallicity
@@ -108,7 +107,6 @@
    ! + X: 0.0, 0.03, 0.10, 0.35, 0.70
    ! + Z: 0.00, 0.001, 0.004, 0.01, 0.02, 0.03, 0.05, 0.1
 
-
    ! Available options:
 
    ! + ``'gn93_co'``
@@ -118,8 +116,6 @@
    ! ::
 
       kap_CO_prefix = 'gs98_co'
-
-
 
 
    ! kap_lowT_prefix
@@ -145,7 +141,6 @@
    !     | Low temperature Rosseland opacities with varied abundances of carbon and nitrogen
    !     | http://adsabs.harvard.edu/abs/2009A%26A...494..403L
 
-
    ! ``'AESOPUS'`` uses tables from AESOPUS
    !
    !     | Marigo, P.; Aringer, B. (2009)
@@ -167,12 +162,12 @@
       kap_lowT_prefix = 'lowT_fa05_gs98'
       AESOPUS_filename = '' ! used only if kap_lowT_prefix = 'AESOPUS'
 
+
 ! Blend controls
 ! --------------
 
    ! use_Zbase_for_Type1
    ! ~~~~~~~~~~~~~~~~~~~
-
    ! If true, then if ``use_Type2_opacities = .true.``, Type1 opacities will be computed
    ! using ``Zbase`` instead of ``Z`` when Z > Zbase. This helps with blending from Type1 to Type2.
    ! Ignored if ``use_Type2_opacities = .false.``.
@@ -183,7 +178,6 @@
 
    ! use_Type2_opacities
    ! ~~~~~~~~~~~~~~~~~~~
-
    ! Select whether to use Type2 opacity tables (see :ref:`kap/defaults:kap_CO_prefix`).
    ! Even when true, in regions where hydrogen is
    ! above a given threshold, or the metallicity is not significantly higher than
@@ -199,7 +193,6 @@
    ! ~~~~~~~~~~~~~~~~~~~~
    ! kap_Type2_full_on_X
    ! ~~~~~~~~~~~~~~~~~~~
-
    ! Switch to Type1 if X too large.
    ! Type2 is full off for ``X >= kap_Type2_full_off_X``
    ! Type2 can be full on for ``X <= kap_Type2_full_on_X``.
@@ -213,7 +206,6 @@
    ! ~~~~~~~~~~~~~~~~~~~~~
    ! kap_Type2_full_on_dZ
    ! ~~~~~~~~~~~~~~~~~~~~
-
    ! Switch to Type1 if dZ too small ``(dZ = Z - Zbase)``.
    ! Type2 is full off for ``dZ <= kap_Type2_full_off_dZ``.
    ! Type2 can be full on for ``dZ >= kap_Type2_full_on_dZ``.
@@ -221,7 +213,6 @@
 
       kap_Type2_full_off_dZ = 0.001d0
       kap_Type2_full_on_dZ = 0.01d0
-
 
    ! X and dZ terms are multiplied to get actual fraction of Type2.
    ! The fraction of Type2 is calculated for each cell depending on the X and dZ for that cell.
@@ -236,7 +227,6 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
    ! kap_blend_logT_lower_bdy
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! Region to blend between higher temperature tables
    ! (see :ref:`kap/defaults:kap_file_prefix` and :ref:`kap/defaults:kap_CO_prefix`) and lower
    ! temperature tables (see :ref:`kap/defaults:kap_lowT_prefix`).
@@ -257,14 +247,11 @@
       kap_blend_logT_lower_bdy = 3.80d0
 
 
-
-
 ! Interpolation options
 ! ---------------------
 
    ! cubic_interpolation_in_X
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! type of interpolation in X.
    ! true is cubic; false is linear.
    ! ::
@@ -274,7 +261,6 @@
 
    ! cubic_interpolation_in_Z
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! type of interpolation in Z.
    ! true is cubic; false is linear.
    ! ::
@@ -294,11 +280,11 @@
 
    ! user_num_kap_Xs
    ! ~~~~~~~~~~~~~~~
-
    ! Number of X values.
    ! ::
 
       !! user_num_kap_Xs = 10
+
 
    ! user_kap_Xs
    ! ~~~~~~~~~~~
@@ -310,21 +296,22 @@
 
       !! user_kap_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0, 0.95d0, 1.0d0
 
+
    ! user_num_kap_Zs
    ! ~~~~~~~~~~~~~~~
-
    ! Number of Z values.
    ! ::
 
       !! user_num_kap_Zs = 13
 
+
    ! user_kap_Zs
    ! ~~~~~~~~~~~
-
    ! Z values for the tables (length ``user_num_kap_Zs``).
    ! ::
 
       !! user_kap_Zs = 0.000d0, 0.0001d0, 0.0003d0, 0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, 0.04d0, 0.06d0, 0.08d0, 0.100d0
+
 
    ! user_num_kap_Xs_for_this_Z
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,33 +331,33 @@
 
       !! user_num_kap_CO_Xs = 5
 
+
    ! user_kap_CO_Xs
    ! ~~~~~~~~~~~~~~
-
    ! X values for the tables (length ``user_num_kap_CO_Xs``).
    ! ::
 
       !! user_kap_CO_Xs = 0.00d0, 0.03d0, 0.10d0, 0.35d0, 0.70d0
 
+
    ! user_num_kap_CO_Zs
    ! ~~~~~~~~~~~~~~~~~~
-
    ! Number of Z values.
    ! ::
 
       !! user_num_kap_CO_Zs = 8
 
+
    ! user_kap_CO_Zs
    ! ~~~~~~~~~~~~~~
-
    ! Z values for the tables (length ``user_num_kap_CO_Zs``).
    ! ::
 
       !! user_kap_CO_Zs = 0.000d0, 0.001d0, 0.004d0, 0.010d0, 0.020d0, 0.030d0, 0.050d0, 0.100d0
 
+
    ! user_num_kap_CO_Xs_for_this_Z
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
    ! Use the first N (``<= user_num_kap_CO_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_CO_Zs``).
    ! ::
@@ -380,15 +367,14 @@
 
    ! user_num_kap_lowT_Xs
    ! ~~~~~~~~~~~~~~~~~~~~
-
    ! Number of X values.
    ! ::
 
       !! user_num_kap_lowT_Xs = 10
 
+
    ! user_kap_lowT_Xs
    ! ~~~~~~~~~~~~~~~~
-
    ! X values for the tables (length ``user_num_kap_lowT_Xs``).
    ! Values such that X + Z > 1 will have X reduced to 1-Z.
    ! Choose ``user_num_kap_lowT_Xs_for_this_Z`` such that at most 1 X value for each Z will be reduced in this way.
@@ -396,25 +382,25 @@
 
       !! user_kap_lowT_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0, 0.95d0, 1.0d0
 
+
    ! user_num_kap_lowT_Zs
    ! ~~~~~~~~~~~~~~~~~~~~
-
    ! Number of Z values.
    ! ::
 
       !! user_num_kap_lowT_Zs = 13
 
+
    ! user_kap_lowT_Zs
    ! ~~~~~~~~~~~~~~~~
-
    ! Z values for the tables (length ``user_num_kap_lowT_Zs``).
    ! ::
 
       !! user_kap_lowT_Zs = 0.000d0, 0.0001d0, 0.0003d0, 0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, 0.04d0, 0.06d0, 0.08d0, 0.100d0
 
+
    ! user_num_kap_lowT_Xs_for_this_Z
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
    ! Use the first N (``<= user_num_kap_lowT_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_lowT_Zs``).
    ! ::
@@ -436,7 +422,6 @@
 
    ! use_blouin_conductive_opacities
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! Use fits from Blouin et al. (2020) for H and He in the regime of
    ! moderate coupling and moderate degeneracy.
    ! ::
@@ -464,15 +449,14 @@
 
    ! use_other_elect_cond_opacity
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! Replace electron conduction opacity routine
    ! ::
 
       use_other_elect_cond_opacity = .false.
 
+
    ! use_other_compton_opacity
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! Replace Compton opacity routine
    ! ::
 
@@ -481,7 +465,6 @@
 
    ! use_other_radiative_opacity
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
    ! Replace radiative opacity routine.
    ! The standard routine evaluates the opacity using the low-T and high-T tables.
    ! ::
@@ -492,12 +475,13 @@
 ! User controls
 ! -------------
 
-    ! These are arrays of size(10) that can be used to pass in custom information to kap ::
+    ! These are arrays of size(10) that can be used to pass in custom information to kap
+    ! ::
 
-    kap_ctrl(:) = 0d0
-    kap_integer_ctrl(:) = 0
-    kap_logical_ctrl(:) = .false.
-    kap_character_ctrl(:) = ''
+      kap_ctrl(:) = 0d0
+      kap_integer_ctrl(:) = 0
+      kap_logical_ctrl(:) = .false.
+      kap_character_ctrl(:) = ''
 
 
 ! Extra inlist controls
@@ -507,18 +491,16 @@
    ! It works recursively, so the extras can read extras too.
 
 
-         ! read_extra_kap_inlist(1..5)
-         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_kap_inlist_name(1..5)
-         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! read_extra_kap_inlist(1..5)
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_kap_inlist_name(1..5)
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-         ! If ``read_extra_kap_inlist(i)`` is true, then read ``&eos`` from the file ``extra_kap_inlist_name(i)``.
-         ! ::
+   ! If ``read_extra_kap_inlist(i)`` is true, then read ``&eos`` from the file ``extra_kap_inlist_name(i)``.
+   ! ::
 
       read_extra_kap_inlist(:) = .false.
       extra_kap_inlist_name(:) = 'undefined'
-
-
 
 
 ! Debugging controls

@@ -1,3 +1,4 @@
+---
 name: Build on Linux with SDK
 
 on:
@@ -16,7 +17,7 @@ jobs:
         sdk: ["22.6.1", "23.7.3", "24.7.1"]  # pick 2 or 3 most recent.
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install MESA on ${{ runner.os }} with SDK ${{matrix.sdk}}

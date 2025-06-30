@@ -4,11 +4,11 @@
 20M_z2m2_high_rotation
 **********************
 
-This test case checks the evolution of a strongly rotating, Omega/Omega_crit = 0.75, 20 Msun, Z=0.02 metallicity model from the pre-main sequence to the end of core helium burning.
+This test case checks the evolution of a strongly rotating, Omega/Omega_crit = 0.75, 20 |Msun|, Z=0.02 metallicity model from the pre-main sequence to the end of core helium burning.
 
 This test case has one part. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_to_end_core_he_burn``) loads a 20 Msun zero-age main-sequence model, relaxes a uniform new_omega_div_omega_crit = 0.75 rotation profile, and evolves the model to the end of core helium burning (mass fraction he4 < 0.0001). At the end of the run:
+* Part 1 (``inlist_to_end_core_he_burn``) loads a 20 |Msun| zero-age main-sequence model, relaxes a uniform new_omega_div_omega_crit = 0.75 rotation profile, and evolves the model to the end of core helium burning (mass fraction he4 < 0.0001). At the end of the run:
 
 .. image:: ../../../star/test_suite/20M_z2m2_high_rotation/docs/grid1_000890.svg
    :width: 100%
@@ -697,7 +697,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 28May2021 (MESA ebecc10) by fxt
-

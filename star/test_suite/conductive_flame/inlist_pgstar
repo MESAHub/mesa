@@ -5,7 +5,7 @@
    file_device = 'png'      ! png
 
    pgstar_interval = 1
-   pause = .false.
+   pause_flag = .false.
 
    Grid1_win_flag = .false.
    Grid1_title = 'TW92 Flame'

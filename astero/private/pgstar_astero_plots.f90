@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2012  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -31,9 +25,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine astero_pgstar_plots_info(id, ierr)
          integer, intent(in) :: id
@@ -128,7 +120,8 @@
             id, device_id, xleft, xright, ybot, ytop, subplot, title, txt_scale, ierr)
 
          use utils_lib
-         use const_def
+         use const_def, only: dp
+         use pgstar_colors
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -161,10 +154,12 @@
 
          do l = 0, 3
             if (nl(l) > 0) then
-               ymin = min(ymin,minval(freq_target(l,1:nl(l))))
-               ymax = max(ymax,maxval(freq_target(l,1:nl(l))))
-               xpt_min = min(xpt_min,minval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
-               xpt_max = max(xpt_max,maxval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
+               ymin = min(ymin,real(minval(freq_target(l,1:nl(l))), kind=sp))
+               ymax = max(ymax,real(maxval(freq_target(l,1:nl(l))), kind=sp))
+               xpt_min = min(xpt_min, &
+                             minval(mod(real(freq_target(l,1:nl(l)), kind=sp),plot_delta_nu)))
+               xpt_max = max(xpt_max, &
+                             maxval(mod(real(freq_target(l,1:nl(l)), kind=sp),plot_delta_nu)))
             end if
          end do
 
@@ -183,7 +178,7 @@
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgstar_show_box(s,'BCNST1','BCNSTV1')
          call pgstar_show_xaxis_label(s, &
             "Frequency mod \(0530)\d\(0639)\u (\(0638)Hz) (duplicated at x+\(0530)\d\(0639)\u)")
@@ -225,7 +220,7 @@
          call pgsci(freq_color(0))
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, freq_shape(0))
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=0')
 
@@ -233,7 +228,7 @@
          call pgsci(freq_color(1))
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, freq_shape(1))
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=1')
 
@@ -241,7 +236,7 @@
          call pgsci(freq_color(2))
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, freq_shape(2))
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=2')
 
@@ -250,7 +245,7 @@
             call pgsci(freq_color(3))
             call pgsch(1.6*txt_scale)
             call pgpt1(x_obs, y_obs, freq_shape(3))
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(1.0*txt_scale)
             call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=3')
          end if
@@ -298,7 +293,6 @@
          call pgmove(2*plot_delta_nu, ymin + dy*0.08)
          call pgdraw(2*plot_delta_nu, ymin)
 
-
          call pgunsa
 
          call show_pgstar_annotations(s, &
@@ -314,7 +308,7 @@
             real(dp), intent(in) :: freq
             integer, intent(in) :: color, shape
             y_obs = freq
-            x_obs = mod(freq,plot_delta_nu)
+            x_obs = mod(real(freq, kind=sp),plot_delta_nu)
             call pgsci(color)
             call pgpt1(x_obs, y_obs, shape)
             call pgpt1(x_obs + plot_delta_nu, y_obs, shape)
@@ -333,7 +327,7 @@
             y_model_alt_shift = echelle_model_alt_y_shift
             call pgsci(color)
             y_model = freq
-            x_obs = mod(freq_obs, plot_delta_nu)
+            x_obs = mod(real(freq_obs, kind=sp), plot_delta_nu)
             x_model = (freq - freq_obs) + x_obs
             call pgpt1(x_model, y_model, model_shape)
             call pgmove(x_obs, y_obs)
@@ -400,7 +394,8 @@
             id, device_id, xleft, xright, ybot, ytop, subplot, title, txt_scale, ierr)
 
          use utils_lib
-         use const_def
+         use const_def, only: dp
+         use pgstar_colors
 
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
@@ -475,7 +470,7 @@
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgstar_show_box(s,'BCNST1','BCNSTV1')
          call pgstar_show_xaxis_label(s,"Ratio")
          call pgstar_show_left_yaxis_label(s,"Frequency (\(0638)Hz)")
@@ -508,7 +503,7 @@
          call pgsci(r01_color)
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, r01_shape)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r01')
 
@@ -516,7 +511,7 @@
          call pgsci(r10_color)
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, r10_shape)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r10')
 
@@ -524,7 +519,7 @@
          call pgsci(r02_color)
          call pgsch(1.6*txt_scale)
          call pgpt1(x_obs, y_obs, r02_shape)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r02')
 
@@ -647,9 +642,4 @@
 
       end subroutine write_plot_to_file
 
-
       end module pgstar_astero_plots
-
-
-
-

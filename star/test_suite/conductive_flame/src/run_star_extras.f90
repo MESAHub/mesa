@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -302,7 +299,7 @@
 
             ! if you want to check multiple conditions, it can be useful
             ! to set a different termination code depending on which
-            ! condition was triggered.   MESA provides 9 customizeable
+            ! condition was triggered.   MESA provides 9 customizable
             ! termination codes, named t_xtra1 .. t_xtra9.   You can
             ! customize the messages that will be printed upon exit by
             ! setting the corresponding termination_code_str value.
@@ -527,12 +524,12 @@
             flame_speed_expected = s% x_ctrl(9)
             flame_width_expected = s% x_ctrl(10)
 
-            if (abs(flame_speed - flame_speed_expected) > 0.1 * flame_speed_expected) then
+            if (abs(flame_speed - flame_speed_expected) > 0.1d0 * flame_speed_expected) then
                write(*,*) 'bad value for flame_speed'
                write(*,1) 'flame_speed', flame_speed
                write(*,1) 'expected', flame_speed_expected
                write(*,1) 'flame_speed-expected', flame_speed-flame_speed_expected
-            else if (abs(flame_width - flame_width_expected) > 0.1 * flame_width_expected) then
+            else if (abs(flame_width - flame_width_expected) > 0.1d0 * flame_width_expected) then
                write(*,*) 'bad value for flame_width'
                write(*,1) 'flame_width', flame_width
                write(*,1) 'expected', flame_width_expected

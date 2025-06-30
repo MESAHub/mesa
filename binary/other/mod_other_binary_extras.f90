@@ -1,25 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2015  Bill Paxton and Pablo Marchant
+!   Copyright (C) 2015  Bill Paxton, Pablo Marchant & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -36,7 +30,7 @@
       integer function null_extras_binary_startup(binary_id,restart,ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -53,7 +47,7 @@
       integer function null_extras_binary_start_step(binary_id,ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -70,7 +64,7 @@
       integer function null_extras_binary_check_model(binary_id)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer :: ierr
@@ -88,7 +82,7 @@
       integer function null_extras_binary_finish_step(binary_id)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer :: ierr
@@ -104,7 +98,7 @@
 
       subroutine null_extras_binary_after_evolve(binary_id, ierr)
          use binary_def, only : binary_info, binary_ptr
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -117,7 +111,7 @@
 
       integer function null_how_many_extra_binary_history_columns(binary_id)
          use binary_def, only : binary_info, binary_ptr
-         use const_def
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          type (binary_info), pointer :: b
          integer :: ierr
@@ -133,7 +127,7 @@
 
       subroutine null_data_for_extra_binary_history_columns(binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
-         use const_def
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          integer, intent(in) :: n
          character (len=maxlen_binary_history_column_name) :: extra_names(n)
@@ -151,7 +145,7 @@
 
 
       integer function null_how_many_extra_binary_history_header_items(binary_id)
-         use const_def
+         use const_def, only: dp
          integer, intent(in) :: binary_id
          null_how_many_extra_binary_history_header_items = 0
       end function null_how_many_extra_binary_history_header_items
@@ -159,7 +153,7 @@
       subroutine null_data_for_extra_binary_history_header_items( &
            binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
-         use const_def
+         use const_def, only: dp
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id, n
          character (len=maxlen_binary_history_column_name) :: extra_names(n)

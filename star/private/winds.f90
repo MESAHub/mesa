@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,7 +21,7 @@
       module winds
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, rsun, msun, lsun, clight, crad, pi, pi4, secyer
       use chem_def, only: ih1, ihe4, ic12, ic13, in14, io16
       use utils_lib, only: is_bad
 
@@ -37,7 +31,6 @@
       public :: set_mdot
 
       contains
-
 
       subroutine set_mdot(s, L_phot, M_phot, T_phot, ierr)
          use chem_def
@@ -152,13 +145,13 @@
             ierr = -1
             write(*,*) ' *** set_mdot error: hot_wind_full_on_T < cool_wind_full_on_T '
             return
-         endif
+         end if
 
          if(T1 >= s% cool_wind_full_on_T)then  !do hot_wind calculation
             call eval_wind_for_scheme(s% hot_wind_scheme,hot_wind)
          else
             hot_wind = 0d0
-         endif
+         end if
 
          if(T1 <= s% hot_wind_full_on_T)then
             if (center_h1 < 0.01d0 .and. center_he4 < s% RGB_to_AGB_wind_switch) then
@@ -174,7 +167,7 @@
             call eval_wind_for_scheme(scheme, cool_wind)
          else
             cool_wind = 0d0
-         endif
+         end if
 
          !now combine the contributions of hot and cool winds
          if(T1 >= s% hot_wind_full_on_T)then
@@ -188,7 +181,7 @@
             beta = min( (s% hot_wind_full_on_T - T1) / divisor, 1d0)
             alfa = 1d0 - beta
             wind = alfa*hot_wind + beta*cool_wind
-         endif
+         end if
 
          if (wind*Msun/secyer > abs(wind_mdot)) then
             using_wind_scheme_mdot = .true.

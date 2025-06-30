@@ -1,12 +1,12 @@
 
-!..this code fragment implments coulomb corrections
-!..see yakovlev & shalybkov 1989, uniform background corrections 
+!..this code fragment implements coulomb corrections
+!..see yakovlev & shalybkov 1989, uniform background corrections
 
 !..input:
 !..den  = density g/cc
 !..temp = temperature k
-!..abar = avarage atomic weight
-!..zbar = avarge charge
+!..abar = average atomic weight
+!..zbar = average charge
 !..pion and all its derivatives = ion pressure through common block
 !..xne and all its derivatives = electron number density through common block
 
@@ -15,7 +15,6 @@
 !..pcoul and all its derivatives = coulomb pressure through common block
 !..ecoul and all its derivatives = coulomb energy through common block
 !..scoul and all its derivatives = coulomb entropy through common block
-
 
 
 !..yakovlev & shalybkov eqs 5, 9 and 10
@@ -45,12 +44,11 @@
       dsdzz   = y * dxnidzz + forthpi*dxnidz
 
 
-
 !..electron-sphere radius aele
       aele     = pow(sinv,third)
       aeleinv  = 1.0d0/aele
       z        = -third * aele * sinv
-      y        = -forth * z * sinv    
+      y        = -forth * z * sinv
 
 !..first derivatives
       daeledd  = z * dsdd
@@ -83,8 +81,8 @@
       deplasgdz = z * daeledz
 
 !..second derivatives
-      deplasgddd = y*daeledd*daeledd + z*daeleddd 
-      deplasgddt = y*daeledt*daeledd - deplasgdd*tempinv + z*daeleddt 
+      deplasgddd = y*daeledd*daeledd + z*daeleddd
+      deplasgddt = y*daeledt*daeledd - deplasgdd*tempinv + z*daeleddt
       deplasgdda = y*daeleda*daeledd + z*daeledda
       deplasgddz = y*daeledz*daeledd + z*daeleddz
       deplasgdtt = y*daeledt*daeledt + z*daeledtt &
@@ -129,7 +127,7 @@
 
 
 !..yakovlev & shalybkov 1989 equations 82, 85, 86, 87
-      if (plasg .ge. 1.0) then
+      if (plasg >= 1.0) then
        x        = sqrt(sqrt(plasg))
        p1       = x
        p2       = 1.0d0/x
@@ -211,22 +209,22 @@
 !..entropy in erg/g/kelvin
        u0   = 3.0d0*b1*p1 - 5.0d0*c1*p2 + d1*(log(plasg) - 1.0d0) - e1
        du0  = 0.75d0*b1*p3 + 1.25d0*c1*p4 + d1*plasginv
-       ddu0 = -0.5625d0*b1*p5 - 1.5625d0*c1*p6 - d1*plasginv*plasginv 
+       ddu0 = -0.5625d0*b1*p5 - 1.5625d0*c1*p6 - d1*plasginv*plasginv
 
        z    = -avo*ytot1*kerg
 
        scoul = z*u0
-       
+
        if (.false. .and. scoul < 0) then  ! this breaks thermo consistency
 
          !write(*,'(a30,1pe26.16)') 'scoul', scoul
          !stop
-         
+
          scoul = 1d-99
          u0 = 0
          du0 = 0
          ddu0 = 0
-         
+
           dscouldd = 0
           dscouldt = 0
           dscoulda = 0
@@ -241,9 +239,9 @@
           dscouldaa = 0
           dscouldaz = 0
           dscouldzz = 0
-         
+
        else
-       
+
           ww    = z*du0
           x     = z*ddu0
 
@@ -271,17 +269,15 @@
        end if
 
 
-
-
 !..yakovlev & shalybkov 1989 equations 102, 103, 104
-      else if (plasg .lt. 1.0d0) then
+      else if (plasg < 1.0d0) then
 
        if (plasg < 0d0) then
          ierr = -1
          if (dbg) write(*,*) 'plasg < 0d0 in helm_coulomb2'
          return
        end if
-       x        = sqrt(plasg)       
+       x        = sqrt(plasg)
        p1       = plasg*x
        p2       = pow(plasg,b2)
        p3       = x
@@ -338,7 +334,7 @@
        x = deninv*deninv
 
 !..first derivatives
-       decouldd = z*dpcouldd - ecoul*deninv  
+       decouldd = z*dpcouldd - ecoul*deninv
        decouldt = z*dpcouldt
        decoulda = z*dpcoulda
        decouldz = z*dpcouldz
@@ -390,12 +386,11 @@
       end if
 
 
-
 !..cut coulomb terms at low T and low density
-      
-      if (temp .le. coulomb_temp_cut .and. den .le. coulomb_den_cut) then
-   
-         if (temp .le. 0.1d0*coulomb_temp_cut) then
+
+      if (temp <= coulomb_temp_cut .and. den <= coulomb_den_cut) then
+
+         if (temp <= 0.1d0*coulomb_temp_cut) then
             coulfactor = 0d0
             dcfdt = 0d0
          else
@@ -403,7 +398,7 @@
             coulfactor = exp(1d0 - ratio*ratio)
             dcfdt = coulfactor*2*ratio*ratio/temp
          end if
-               
+
          dpcouldd = coulfactor * dpcouldd
          dpcouldt = coulfactor * dpcouldt + dcfdt * pcoul
          dpcoulda = coulfactor * dpcoulda
@@ -421,5 +416,5 @@
          dscoulda = coulfactor * dscoulda
          dscouldz = coulfactor * dscouldz
          scoul    = coulfactor * scoul
-      
+
       end if

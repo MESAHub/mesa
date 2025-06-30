@@ -1,7 +1,7 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       save_model_when_terminate = .true.
       required_termination_code_string = ''
@@ -18,7 +18,7 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+   Zbase = 0.02d0
 / ! end of kap namelist
 
 
@@ -29,7 +29,7 @@
       initial_mass = 1.0d0
       initial_y = 0.28d0
       initial_z = 0.02d0
-      
+
       ! limit max_model_number as part of test_suite
       max_model_number = 50
       use_gold2_tolerances = .true.
@@ -40,13 +40,12 @@
       photo_interval = 100
       profile_interval = 100
       history_interval = 5
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 50
 
 / ! end of controls namelist
 
 
 &pgstar
-
 
 / ! end of pgstar namelist

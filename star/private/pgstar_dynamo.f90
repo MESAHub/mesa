@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pgstar_dynamo
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use pgstar_support
       use star_pgstar
 
@@ -164,6 +158,7 @@
          subroutine plot(ierr)
             use pgstar_support, only: show_convective_section, show_semiconvective_section, &
                show_thermohaline_section, show_overshoot_section
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: lw, lw_sav, k
@@ -184,7 +179,7 @@
                   call show_model_number_pgstar(s)
                   call show_age_pgstar(s)
                end if
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,Dyn_xaxis_name,ierr)
                if (ierr /= 0) return
             end if
@@ -221,7 +216,7 @@
 
             call pgswin(xleft, xright, ymin, ymax)
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_box_pgstar(s,'','BNSTV')
 
             call pgsci(clr_Teal)
@@ -276,7 +271,7 @@
             call pgswin(xleft, xright, ymin, ymax)
 
             call pgscf(1)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','CMSTV')
             else

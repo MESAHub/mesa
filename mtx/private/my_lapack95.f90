@@ -2,37 +2,29 @@
 !
 !   copyright (c) 2012  The MESA Team
 !
-!   mesa is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the mesa manifesto
-!   and the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   you should have received a copy of the mesa manifesto along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.
-!   see the gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module my_lapack95
+
       use const_def, only: dp
       use utils_lib, only: mesa_error
       implicit none
       integer, parameter :: fltp = dp
 
-
-
       contains
-
 
       subroutine my_gemv(m,n,a,lda,x,y)  ! y = y - a*x
          integer :: lda,m,n
@@ -1401,16 +1393,11 @@
                ip = ipiv( ix )
 
 
-
                if (ip == 0) then
 
                   stop 'my_lapack95  ip == 0'
 
-
                end if
-
-
-
 
                if( ip/=i ) then
                   do k = n32, n

@@ -2,50 +2,35 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_support
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, ln10
   use utils_lib, only: mesa_error, is_bad
-
-  ! No implicit typing
 
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: get_atm_PT
   public :: get_atm_PT_legacy_grey_and_kap
   public :: get_atm_tau_base
   public :: get_T_tau_id
   public :: build_atm
-
-  ! Procedures
 
 contains
 
@@ -120,11 +105,8 @@ contains
 
     end select
 
-    ! Finish
-
   end subroutine get_atm_PT
 
-  !****
 
   subroutine get_atm_PT_legacy_grey_and_kap( &
        s, tau_surf, L, R, M, cgrav, skip_partials, &
@@ -160,13 +142,10 @@ contains
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
        ierr)
 
-    ! Finish
-
     return
 
   end subroutine get_atm_PT_legacy_grey_and_kap
 
-  !****
 
   subroutine get_atm_tau_base(s, tau_base, ierr)
 
@@ -194,7 +173,7 @@ contains
          s% retry_message = 'Call to get_T_tau_id failed in get_atm_tau_base'
          if (s% report_ierr) write(*, *) s% retry_message
           return
-       endif
+       end if
 
        call atm_get_T_tau_base(T_tau_id, tau_base, ierr)
        if (ierr /= 0) then
@@ -210,7 +189,7 @@ contains
          s% retry_message = 'Call to get_table_id failed in get_atm_tau_base'
          if (s% report_ierr) write(*, *) s% retry_message
           return
-       endif
+       end if
 
        call atm_get_table_base(table_id, tau_base, ierr)
        if (ierr /= 0) then
@@ -231,13 +210,10 @@ contains
 
     end select
 
-    ! Finish
-
     return
 
   end subroutine get_atm_tau_base
 
-  !****
 
   subroutine get_T_tau( &
        s, tau_surf, L, R, M, cgrav, T_tau_relation, T_tau_opacity, skip_partials, &
@@ -320,7 +296,7 @@ contains
          s% retry_message = 'Call to prepare_kap failed in get_T_tau'
          if (s% report_ierr) write(*, *) s% retry_message
           return
-       endif
+       end if
 
        ! need to start iterations from same kap each time, so use opacity_start
        if (s% solver_iter > 0) then
@@ -344,7 +320,7 @@ contains
          s% retry_message = 'Call to prepare_kap failed in get_T_tau'
          if (s% report_ierr) write(*, *) s% retry_message
           return
-       endif
+       end if
 
        call atm_eval_T_tau_varying( &
             tau_surf, L, R, M, cgrav, &
@@ -363,8 +339,6 @@ contains
        call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     end select
-
-    ! Finish
 
     return
 
@@ -391,7 +365,6 @@ contains
 
     end subroutine eos_proc_for_get_T_tau
 
-    !****
 
     subroutine kap_proc_for_get_T_tau( &
          lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
@@ -418,7 +391,6 @@ contains
 
   end subroutine get_T_tau
 
-  !****
 
   subroutine get_T_tau_id (T_tau_relation, T_tau_id, ierr)
 
@@ -450,13 +422,10 @@ contains
        call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
     end select
 
-    ! Finish
-
     return
 
   end subroutine get_T_tau_id
 
-  !****
 
   subroutine get_table( &
        s, skip_partials, L, R, M, cgrav, &
@@ -555,7 +524,7 @@ contains
        s% retry_message = 'Call to atm_get_table_alfa_beta failed in get_table'
        if (s% report_ierr) write(*, *) s% retry_message
        return
-    endif
+    end if
 
     ! If completely off the table, may need to reset tau_base to the
     ! T_Tau value to get the expected off-table behavior.
@@ -564,9 +533,9 @@ contains
        if (ierr /= 0) then
           if (s% report_ierr) then
              write(*,*) 'Call to get_T_tau_id failed in get_table'
-          endif
+          end if
           return
-       endif
+       end if
 
        call atm_get_T_tau_base(T_tau_id, tau_base, ierr)
        if (ierr /= 0) then
@@ -627,7 +596,7 @@ contains
        dlnP_dlnM_b = 0._dp
        dlnP_dlnkap_b = 0._dp
 
-    endif
+    end if
 
     ! Evaluate temperature and pressure from the backup atmosphere
     ! option
@@ -697,7 +666,7 @@ contains
        dlnP_dlnM = alfa*dlnP_dlnM_a + beta*dlnP_dlnM_b
        dlnP_dlnkap = alfa*dlnP_dlnkap_a + beta*dlnP_dlnkap_b
 
-    endif
+    end if
 
     ! Set the effective temperature
 
@@ -709,19 +678,16 @@ contains
     !          write(*,*) 'Mismatch between Teff values in get_tables: ', Teff_a, Teff_b
     !          !call mesa_error(__FILE__,__LINE__)
     !       end if
-    !    endif
+    !    end if
     !    Teff = Teff_a
     ! else
     !    Teff = Teff_b
-    ! endif
-
-    ! Finish
+    ! end if
 
     return
 
   end subroutine get_table
 
-  !****
 
   subroutine get_table_id (table_name, table_id, ierr)
 
@@ -762,13 +728,10 @@ contains
        call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
     end select
 
-    ! Finish
-
     return
 
   end subroutine get_table_id
 
-  !****
 
   subroutine get_irradiated( &
        s, irradiated_opacity, skip_partials, L, R, M, cgrav, &
@@ -844,7 +807,7 @@ contains
           s% retry_message = 'Failed in call to prepare_kap'
           if (s% report_ierr) write(*, *) s% retry_message
           return
-       endif
+       end if
 
        call atm_eval_irradiated( &
             L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
@@ -875,8 +838,6 @@ contains
 
     s% tau_factor = tau_surf/s% tau_base
 
-    ! Finish
-
     return
 
   contains
@@ -901,7 +862,6 @@ contains
 
     end subroutine eos_proc_for_get_irradiated
 
-    !****
 
     subroutine kap_proc_for_get_irradiated( &
          lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
@@ -927,7 +887,6 @@ contains
 
   end subroutine get_irradiated
 
-  !****
 
   subroutine get_legacy (s, ierr)
 
@@ -1034,13 +993,10 @@ contains
     ierr = -1  ! ifort complains if this isn't set
     call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
-    ! Finish
-
     return
 
   end subroutine get_legacy
 
-  !****
 
   subroutine build_atm( &
        s, L, R, Teff, M, cgrav, ierr)
@@ -1069,11 +1025,8 @@ contains
 
     end select
 
-    ! Finish
-
   end subroutine build_atm
 
-  !****
 
   subroutine build_T_tau( &
        s, tau_surf, L, R, Teff, M, cgrav, T_tau_relation, T_tau_opacity, &
@@ -1170,8 +1123,6 @@ contains
 
     end select
 
-    ! Finish
-
     return
 
   contains
@@ -1196,7 +1147,6 @@ contains
 
     end subroutine eos_proc_for_build_T_tau
 
-    !****
 
     subroutine kap_proc_for_build_T_tau( &
          lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
@@ -1222,7 +1172,6 @@ contains
 
   end subroutine build_T_tau
 
-  !****
 
   subroutine eos_proc( &
        s, lnP, lnT, &
@@ -1281,14 +1230,11 @@ contains
 
     lnRho = logRho*ln10
 
-    ! Finish
-
 
     return
 
   end subroutine eos_proc
 
-  !****
 
   subroutine kap_proc( &
        s, lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
@@ -1324,8 +1270,6 @@ contains
        s% retry_message = 'Call to get_kap failed in kap_proc'
        if (s% report_ierr) write(*, *) s% retry_message
     end if
-
-    ! Finish
 
     if (kap <= 0d0 .or. is_bad(kap)) then
        write(*,1) 'bad kap', kap

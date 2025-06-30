@@ -8,7 +8,7 @@ for i, line in enumerate(fi):
     if i <= 2:
         continue
     line = line.strip().split(" ")
-    line = list(float(l) for l in line if len(l) > 0)
+    line = list(float(j) for j in line if len(j) > 0)
     if line[1] > data[int(line[0]) - 1]:
         data[int(line[0]) - 1] = line[1]  # Pull out max binding energy
 

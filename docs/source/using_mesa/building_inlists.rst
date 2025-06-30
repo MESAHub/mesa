@@ -83,7 +83,8 @@ For example when evolving a stellar model on the horizontal branch (helium burni
 Energy equation
 ---------------
 
-The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation.
+The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__).
+As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation.
 The dLdm form is currently the default in MESA. If the dEdt form is preferred it has to be specified in the inlist.
 
 .. literalinclude:: inlist_example
@@ -91,10 +92,11 @@ The dLdm form is currently the default in MESA. If the dEdt form is preferred it
    :end-before: ! mass and metallicity
 
 
-Starting model
---------------
+Starting mass and metallicity
+-----------------------------
 
-The main stellar parameters to specify are its initial mass M, metallicity Z, and helium fraction Y. If only M and Z are specified,the helium content is by default Y=0.24 + 2Z.
+The main stellar parameters to specify are its initial mass M, metallicity Z, and helium fraction Y.
+If only M and Z are specified,the helium content is by default Y=0.24 + 2Z.
 
 .. literalinclude:: inlist_example
    :start-after:  ! mass and metallicity
@@ -104,9 +106,6 @@ The main stellar parameters to specify are its initial mass M, metallicity Z, an
 
 When to stop
 ------------
-
-Output
-------
 
 Opacity controls
 ----------------
@@ -130,7 +129,7 @@ If you want to use another formalism, for example the `Henyey theory of convecti
    :start-after:  ! convection
    :end-before: ! convective boundaries
 
-There are two possible criteria that can be used to determine the position of the convective boundaries: the Schwarzchild and Ledoux criteria. By default MESA uses the Schwarzchild criterion. If determined correctly, the position of the convective boundaries should not depend on which criterion is used. But using the Schwarzchild or the Ledoux criterion can lead to different abundance profiles outside the convective region. There are extensive discussions about this topic in the `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ and `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__ papers.
+There are two possible criteria that can be used to determine the position of the convective boundaries: the Schwarzschild and Ledoux criteria. By default, MESA uses the Schwarzschild criterion. If determined correctly, the position of the convective boundaries should not depend on which criterion is used. But using the Schwarzschild or the Ledoux criterion can lead to different abundance profiles outside the convective region. There are extensive discussions about this topic in the `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ and `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__ papers.
 Two new algorithms have been introduced in MESA, called **Predictive mixing** (described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ )and **Convective PreMixing**, described in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). By default, none of these are used in MESA, which can lead to very incorrectly determined convective boundaries, with important consequences on the evolution of the stellar model. It is therefore highly recommended to use one of these algorithms.
 
 If using **Convective premixing**, there is no additional parameter to specify.

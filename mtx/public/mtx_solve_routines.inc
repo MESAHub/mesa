@@ -1,5 +1,5 @@
 
-      
+
       subroutine my_getf2(m, a, lda, ipiv, info)
          integer, intent(in) :: m, lda
          integer, intent(out) :: info
@@ -13,8 +13,8 @@
             info = 0
             jp = j - 1 + maxloc(abs(a(j:lda,j)),dim=1)
             ipiv( j ) = jp
-            if( a( jp, j ).ne.zero ) then
-               if( jp.ne.j ) then ! swap a(j,:) and a(jp,:)
+            if( a( jp, j )/=zero ) then
+               if( jp/=j ) then ! swap a(j,:) and a(jp,:)
                   !$omp simd private(tmp)
                   do i=1,m
                      tmp = a(j,i)
@@ -22,17 +22,17 @@
                      a(jp,i) = tmp
                   end do
                end if
-               if( j.lt.m ) then 
+               if( j<m ) then
                   da = one / a( j, j )
                   !$omp simd
-                  do i = 1, m-j 
+                  do i = 1, m-j
                      a( j+i, j ) = da*a( j+i, j )
-                  end do 
-               end if 
-            else if( info.eq.0 ) then
+                  end do
+               end if
+            else if( info==0 ) then
                info = j
             end if
-            if( j.lt.m ) then
+            if( j<m ) then
                aj = a(:,j)
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
@@ -46,7 +46,7 @@
          end do
       end subroutine my_getf2
 
-      
+
       subroutine my_getf2_n4(a, ipiv, info)
          integer, intent(out) :: info
          integer, intent(out) :: ipiv(4)
@@ -59,8 +59,8 @@
             info = 0
             jp = j - 1 + maxloc(abs(a(j:lda,j)),dim=1)
             ipiv( j ) = jp
-            if( a( jp, j ).ne.zero ) then
-               if( jp.ne.j ) then ! swap a(j,:) and a(jp,:)
+            if( a( jp, j )/=zero ) then
+               if( jp/=j ) then ! swap a(j,:) and a(jp,:)
                   !$omp simd private(tmp)
                   do i=1,m
                      tmp = a(j,i)
@@ -68,17 +68,17 @@
                      a(jp,i) = tmp
                   end do
                end if
-               if( j.lt.m ) then 
+               if( j<m ) then
                   da = one / a( j, j )
                   !$omp simd
-                  do i = 1, m-j 
+                  do i = 1, m-j
                      a( j+i, j ) = da*a( j+i, j )
-                  end do 
-               end if 
-            else if( info.eq.0 ) then
+                  end do
+               end if
+            else if( info==0 ) then
                info = j
             end if
-            if( j.lt.m ) then
+            if( j<m ) then
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
                   !$omp simd
@@ -90,7 +90,7 @@
          end do
       end subroutine my_getf2_n4
 
-      
+
       subroutine my_getf2_n5(a, ipiv, info)
          integer, intent(out) :: info
          integer, intent(out) :: ipiv(5)
@@ -103,8 +103,8 @@
             info = 0
             jp = j - 1 + maxloc(abs(a(j:lda,j)),dim=1)
             ipiv( j ) = jp
-            if( a( jp, j ).ne.zero ) then
-               if( jp.ne.j ) then ! swap a(j,:) and a(jp,:)
+            if( a( jp, j )/=zero ) then
+               if( jp/=j ) then ! swap a(j,:) and a(jp,:)
                   !$omp simd private(tmp)
                   do i=1,m
                      tmp = a(j,i)
@@ -112,17 +112,17 @@
                      a(jp,i) = tmp
                   end do
                end if
-               if( j.lt.m ) then 
+               if( j<m ) then
                   da = one / a( j, j )
                   !$omp simd
-                  do i = 1, m-j 
+                  do i = 1, m-j
                      a( j+i, j ) = da*a( j+i, j )
-                  end do 
-               end if 
-            else if( info.eq.0 ) then
+                  end do
+               end if
+            else if( info==0 ) then
                info = j
             end if
-            if( j.lt.m ) then
+            if( j<m ) then
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
                   !$omp simd
@@ -133,8 +133,8 @@
             end if
          end do
       end subroutine my_getf2_n5
-            
-      
+
+
       subroutine my_getrs( n, nrhs, a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb, n, nrhs
          integer :: ipiv(:)
@@ -146,7 +146,7 @@
          !call dtrsm( 'left', 'lower', 'no transpose', 'unit', n, nrhs, one, a, lda, b, ldb )
          do j = 1,nrhs
             do k = 1,n
-               if (b(k,j).ne.zero) then
+               if (b(k,j)/=zero) then
                   !$omp simd
                   do i = k + 1,n
                      b(i,j) = b(i,j) - b(k,j)*a(i,k)
@@ -157,7 +157,7 @@
          !call dtrsm( 'left', 'upper', 'no transpose', 'non-unit', n, nrhs, one, a, lda, b, ldb )
          do j = 1,nrhs
             do k = n,1,-1
-               if (b(k,j).ne.zero) then
+               if (b(k,j)/=zero) then
                   b(k,j) = b(k,j)/a(k,k)
                   !$omp simd
                   do i = 1,k - 1
@@ -166,10 +166,10 @@
                end if
             end do
          end do
-         
+
       end subroutine my_getrs
-      
-      
+
+
       subroutine my_laswp( n, a, lda,  k1, k2, ipiv, incx )
          integer :: incx, k1, k2, lda, n
          integer :: ipiv(:)
@@ -177,12 +177,12 @@
          integer :: i, i1, i2, inc, ip, ix, ix0, k
          real(dp) :: temp
          ! interchange row i with row ipiv(i) for each of rows k1 through k2.
-         if( incx.gt.0 ) then
+         if( incx>0 ) then
             ix0 = k1
             i1 = k1
             i2 = k2
             inc = 1
-         else if( incx.lt.0 ) then
+         else if( incx<0 ) then
             ix0 = 1 + ( 1-k2 )*incx
             i1 = k2
             i2 = k1
@@ -193,7 +193,7 @@
          ix = ix0
          do i = i1, i2, inc
             ip = ipiv( ix )
-            if( ip.ne.i ) then
+            if( ip/=i ) then
                !$omp simd private(temp)
                do k = 1,n
                   temp = a( i, k )
@@ -202,10 +202,10 @@
                end do
             end if
             ix = ix + incx
-         end do         
+         end do
       end subroutine my_laswp
-            
-      
+
+
       subroutine my_getrs1( n, a, lda, ipiv, b, ldb, info )
          integer, intent(out) :: info
          integer, intent(in) :: ipiv(:), lda, ldb, n
@@ -220,9 +220,9 @@
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
-         end do         
+         end do
          do k = 1,n
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                !$omp simd
                do i = k + 1,n
                   b(i) = b(i) - b(k)*a(i,k)
@@ -230,7 +230,7 @@
             end if
          end do
          do k = n,1,-1
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                b(k) = b(k)/a(k,k)
                !$omp simd
                do i = 1,k - 1
@@ -239,8 +239,8 @@
             end if
          end do
       end subroutine my_getrs1
-            
-      
+
+
       subroutine my_getrs1_n4( a, ipiv, b, info )
          integer, intent(out) :: info
          integer, intent(in) :: ipiv(4)
@@ -256,9 +256,9 @@
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
-         end do         
+         end do
          do k = 1,n
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                !$omp simd
                do i = k + 1,n
                   b(i) = b(i) - b(k)*a(i,k)
@@ -266,7 +266,7 @@
             end if
          end do
          do k = n,1,-1
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                b(k) = b(k)/a(k,k)
                !$omp simd
                do i = 1,k - 1
@@ -275,8 +275,8 @@
             end if
          end do
       end subroutine my_getrs1_n4
-            
-      
+
+
       subroutine my_getrs1_n5( a, ipiv, b, info )
          integer, intent(out) :: info
          integer, intent(in) :: ipiv(5)
@@ -292,9 +292,9 @@
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
-         end do         
+         end do
          do k = 1,n
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                !$omp simd
                do i = k + 1,n
                   b(i) = b(i) - b(k)*a(i,k)
@@ -302,7 +302,7 @@
             end if
          end do
          do k = n,1,-1
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                b(k) = b(k)/a(k,k)
                !$omp simd
                do i = 1,k - 1
@@ -311,8 +311,8 @@
             end if
          end do
       end subroutine my_getrs1_n5
-      
-      
+
+
       subroutine my_gemm0_p1(m,n,k,a,lda,b,ldb,c,ldc) ! c := -a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(dp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
@@ -326,8 +326,8 @@
          c(1:m,1:n) = zero
          call my_gemm_p1(m,n,k,a,lda,b,ldb,c,ldc)
       end subroutine my_gemm0_p1
-      
-      
+
+
       subroutine my_gemm_plus_mm(m,n,k,a,b,d,e,c) ! c := c + a*b + d*e
          integer, intent(in) :: k,m,n
          real(dp), dimension(:,:) :: a, b, c, d, e
@@ -338,8 +338,8 @@
             do l = 1,k
                tmp_b = b(l,j)
                tmp_e = e(l,j)
-               if (tmp_b .ne. zero) then
-                  if (tmp_e .ne. zero) then
+               if (tmp_b /= zero) then
+                  if (tmp_e /= zero) then
                      !$omp simd
                      do i = 1,m
                         c(i,j) = c(i,j) + tmp_b*a(i,l) + tmp_e*d(i,l)
@@ -350,17 +350,17 @@
                         c(i,j) = c(i,j) + tmp_b*a(i,l)
                      end do
                   end if
-               else if (tmp_e .ne. zero) then
+               else if (tmp_e /= zero) then
                   !$omp simd
                   do i = 1,m
                      c(i,j) = c(i,j) + tmp_e*d(i,l)
                   end do
                end if
             end do
-         end do      
+         end do
       end subroutine my_gemm_plus_mm
-      
-      
+
+
       subroutine my_gemm(m,n,k,a,lda,b,ldb,c,ldc) ! c := c - a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(dp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
@@ -375,17 +375,17 @@
          do j = 1,n
             do l = 1,k
                tmp = b(l,j)
-               if (tmp .ne. zero) then
+               if (tmp /= zero) then
                   !$omp simd
                   do i = 1,m
                      c(i,j) = c(i,j) - tmp*a(i,l)
                   end do
                end if
             end do
-         end do      
+         end do
       end subroutine my_gemm
-      
-      
+
+
       subroutine my_gemm_p1(m,n,k,a,lda,b,ldb,c,ldc) ! c := c + a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(dp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
@@ -400,19 +400,19 @@
          do j = 1,n
             do l = 1,k
                tmp = b(l,j)
-               if (tmp .ne. zero) then
+               if (tmp /= zero) then
                   !$omp simd
                   do i = 1,m
                      c(i,j) = c(i,j) + tmp*a(i,l)
                   end do
                end if
             end do
-         end do      
+         end do
       end subroutine my_gemm_p1
 
 
       subroutine my_gemv_mv(m,n,a,x,b,z,y) ! y = y - a*x - b*z
-         integer m,n
+         integer :: m,n
          real(dp) :: a(:,:), b(:,:)
          real(dp) :: x(:), z(:), y(:)
          real(dp) :: tmp_x, tmp_z
@@ -421,7 +421,7 @@
          do j = 1,n
             tmp_x = x(j)
             tmp_z = z(j)
-            if (tmp_x.ne.zero) then
+            if (tmp_x/=zero) then
                if (tmp_z /= zero) then
                   !$omp simd
                   do i = 1,m
@@ -444,7 +444,7 @@
 
 
       subroutine my_gemv(m,n,a,lda,x,y) ! y = y - a*x
-         integer lda,m,n
+         integer :: lda,m,n
          real(dp) :: a(:,:) ! (lda,*)
          real(dp) :: x(:), y(:)
          real(dp) :: tmp
@@ -457,7 +457,7 @@
          integer :: j, i
          do j = 1,n
             tmp = x(j)
-            if (tmp.ne.zero) then
+            if (tmp/=zero) then
                !$omp simd
                do i = 1,m
                   y(i) = y(i) - tmp*a(i,j)
@@ -468,7 +468,7 @@
 
 
       subroutine my_gemv_p_mv(m,n,a,x,b,z,y) ! y = y + a*x + b*z
-         integer m,n
+         integer :: m,n
          real(dp) :: a(:,:), b(:,:)
          real(dp) :: x(:), z(:), y(:)
          real(dp) :: tmp_x, tmp_z
@@ -477,7 +477,7 @@
          do j = 1,n
             tmp_x = x(j)
             tmp_z = z(j)
-            if (tmp_x.ne.zero) then
+            if (tmp_x/=zero) then
                if (tmp_z /= zero) then
                   !$omp simd
                   do i = 1,m
@@ -500,7 +500,7 @@
 
 
       subroutine my_gemv_p1(m,n,a,lda,x,y) ! y = y + a*x
-         integer lda,m,n
+         integer :: lda,m,n
          real(dp) :: a(:,:) ! (lda,*)
          real(dp) :: x(:), y(:)
          real(dp) :: tmp
@@ -513,7 +513,7 @@
          integer :: j, i
          do j = 1,n
             tmp = x(j)
-            if (tmp.ne.zero) then
+            if (tmp/=zero) then
                !$omp simd
                do i = 1,m
                   y(i) = y(i) + tmp*a(i,j)
@@ -522,7 +522,7 @@
          end do
       end subroutine my_gemv_p1
 
-      
+
       subroutine my_getf2_no_pivot(m, a, lda, info)
          integer :: info, lda, m
          real(dp) :: a(:,:)
@@ -531,18 +531,18 @@
          real(dp) :: da
          do j = 1, m
             info = 0
-            if( a( j, j ).ne.zero ) then
-               if( j.lt.m ) then 
+            if( a( j, j )/=zero ) then
+               if( j<m ) then
                   da = one / a( j, j )
                   !$omp simd
-                  do i = 1, m-j 
+                  do i = 1, m-j
                      a( j+i, j ) = da*a( j+i, j )
-                  end do 
-               end if 
-            else if( info.eq.0 ) then
+                  end do
+               end if
+            else if( info==0 ) then
                info = j
             end if
-            if( j.lt.m ) then
+            if( j<m ) then
                do jj = j+1, m
                   !$omp simd
                   do i = j+1, m
@@ -552,8 +552,8 @@
             end if
          end do
       end subroutine my_getf2_no_pivot
-            
-      
+
+
       subroutine my_getrs_no_pivot( n, nrhs, a, lda, b, ldb, info )
          integer :: info, lda, ldb, n, nrhs
          real(dp) :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
@@ -562,7 +562,7 @@
          info = 0
          do j = 1,nrhs
             do k = 1,n
-               if (b(k,j).ne.zero) then
+               if (b(k,j)/=zero) then
                   !$omp simd
                   do i = k + 1,n
                      b(i,j) = b(i,j) - b(k,j)*a(i,k)
@@ -572,7 +572,7 @@
          end do
          do j = 1,nrhs
             do k = n,1,-1
-               if (b(k,j).ne.zero) then
+               if (b(k,j)/=zero) then
                   b(k,j) = b(k,j)/a(k,k)
                   !$omp simd
                   do i = 1,k - 1
@@ -582,8 +582,8 @@
             end do
          end do
       end subroutine my_getrs_no_pivot
-            
-      
+
+
       subroutine my_getrs1_no_pivot( n, a, lda, b, ldb, info )
          integer :: info, lda, ldb, n
          real(dp) :: a(:,:), b(:)
@@ -591,7 +591,7 @@
          integer :: i,k
          info = 0
          do k = 1,n
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                !$omp simd
                do i = k + 1,n
                   b(i) = b(i) - b(k)*a(i,k)
@@ -599,7 +599,7 @@
             end if
          end do
          do k = n,1,-1
-            if (b(k).ne.zero) then
+            if (b(k)/=zero) then
                b(k) = b(k)/a(k,k)
                !$omp simd
                do i = 1,k - 1
@@ -632,7 +632,7 @@
        do i=k,n
         scale = max(scale,abs(a(i,k)))
        enddo
-       if (scale .eq. 0.0) then
+       if (scale == 0.0) then
         sing = .true.
         c(k) = 0.0d0
         d(k) = 0.0d0
@@ -662,7 +662,7 @@
        end if
       enddo
       d(n) = a(n,n)
-      if (d(n) .eq. 0.0) sing = .true.
+      if (d(n) == 0.0) sing = .true.
       end subroutine qrdcmp
 
 

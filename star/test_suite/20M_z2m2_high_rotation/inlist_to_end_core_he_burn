@@ -44,7 +44,6 @@
 / ! end of star_job namelist
 
 &eos
-use_Skye = .false.
 / ! end of eos namelist
 
 &kap
@@ -322,7 +321,7 @@ use_Skye = .false.
 
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
 !pgstar_interval = 1
 

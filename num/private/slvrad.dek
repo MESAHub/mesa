@@ -25,21 +25,21 @@
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1), cont(n)
       double precision, pointer, dimension(:) :: z1, z2, z3, f1, f2, f3 ! (n)
       integer, pointer, dimension(:) :: ip1, ip2 ! (nm1)
-      
-      
+
+
       ! LOCALS
       double precision :: s1, s2, s3, abno, sum1, sum2, sum3, sumh, z2i, z3i, ffja, bb
       integer :: i, mm, j, k, jkm, im1, mpi, j1b, j2b, jm1
       real(dp), pointer :: e1(:,:)
       real(dp), pointer, dimension(:) :: p1, p2, p3
-      
+
       e1(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
       p1(1:n) => z1(m1+1:m1+n)
       p2(1:n) => z2(m1+1:m1+n)
       p3(1:n) => z3(m1+1:m1+n)
 
 
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,13,15), ijob
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,13,15), ijob
 !
 ! -----------------------------------------------------------
 !
@@ -166,7 +166,7 @@
       end do
       call decsol(1,nm1,lde1,e1_1D,mle,mue,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
       call decsolc(1,nm1,lde1,e2r,e2i,mle,mue,p2,p3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
-      goto 49
+      GOTO 49
 !
 ! -----------------------------------------------------------
 !
@@ -244,8 +244,8 @@
          z2(im1)=z2(im1)+s2*alphn-s3*betan
          z3(im1)=z3(im1)+s3*alphn+s2*betan
       end do
-      if (ijob.eq.14) goto 45
-      goto 48
+      if (ijob==14) GOTO 45
+      GOTO 48
 !
 ! -----------------------------------------------------------
 !
@@ -318,7 +318,7 @@
          z2(im1)=z2(im1)+s2*alphn-s3*betan
          z3(im1)=z3(im1)+s3*alphn+s2*betan
       end do
-      goto 48
+      GOTO 48
 !
 ! -----------------------------------------------------------
 !

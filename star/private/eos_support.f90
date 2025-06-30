@@ -2,47 +2,30 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module eos_support
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, ln10, arg_not_provided
   use star_private_def
   use utils_lib, only : is_bad, mesa_error
 
-  ! No implicit typing
-
   implicit none
 
-  ! Parameter definitions
-
-  integer, parameter :: MAX_ITER_FOR_SOLVE = 100
-
-  ! Access specifiers
-
   private
-
   public :: get_eos
   public :: solve_eos_given_DE
   public :: solve_eos_given_DEgas
@@ -52,7 +35,7 @@ module eos_support
   public :: solve_eos_given_PgasT
   public :: solve_eos_given_PgasT_auto
 
-  ! Procedures
+  integer, parameter :: MAX_ITER_FOR_SOLVE = 100
 
 contains
 
@@ -117,7 +100,6 @@ contains
 
   end subroutine get_eos
 
-  !****
 
   ! Solve for temperature & eos results data given density & energy
 
@@ -160,7 +142,6 @@ contains
 
   end subroutine solve_eos_given_DE
 
-  !****
 
   ! Solve for temperature & eos results data given density & gas energy
 
@@ -202,7 +183,6 @@ contains
 
   end subroutine solve_eos_given_DEgas
 
-  !****
 
   ! Solve for temperature & eos results data given density & pressure
 
@@ -244,7 +224,6 @@ contains
 
   end subroutine solve_eos_given_DP
 
-  !****
 
   ! Solve for temperature & eos results data for a given density &
   ! entropy
@@ -288,7 +267,6 @@ contains
 
   end subroutine solve_eos_given_DS
 
-  !****
 
   ! Solve for density & eos results data given pressure & temperature
 
@@ -330,7 +308,6 @@ contains
 
   end subroutine solve_eos_given_PT
 
-  !****
 
   ! Solve for density & eos results data given gas pressure &
   ! temperature
@@ -380,7 +357,6 @@ contains
 
   end subroutine solve_eos_given_PgasT
 
-  !****
 
   ! Solve for density & eos results data given gas pressure &
   ! temperature, with logRho_guess calculated automatically via an
@@ -433,7 +409,5 @@ contains
        ierr)
 
   end subroutine solve_eos_given_PgasT_auto
-
-  !****
 
 end module eos_support

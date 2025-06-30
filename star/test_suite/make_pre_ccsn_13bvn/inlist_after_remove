@@ -1,20 +1,20 @@
 
 
 &star_job
-   
+
       load_saved_model = .true.
       load_model_filename = 'removed.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'ready.mod'      
+      save_model_filename = 'ready.mod'
 
       write_profile_when_terminate = .false.
 
       steps_to_take_before_terminate = 5 ! if nothing to do after remove
-      
+
       ! for Ib
       replace_element = .true.
-      !replace_initial_element = .false.  
+      !replace_initial_element = .false.
       chem_name1 = 'h1'
       chem_name2 = 'he4'
       ! replaces chem1 by chem2
@@ -25,21 +25,20 @@
 
 
 &controls
-      
-      terminal_interval = 10 
+
+      terminal_interval = 10
 
       x_integer_ctrl(1) = 4 ! inlist_part
 
 ! prevent development of radial pulses during advanced burning
       drag_coefficient = 1d0
       min_q_for_drag = 0.8d0
-      
+
 
 ! FOR DEBUGGING
 
 
 / ! end of controls namelist
-
 
 
 &pgstar

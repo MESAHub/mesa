@@ -2,33 +2,29 @@
 !
 !   Copyright (C) 2006, 2007-2019  Frank Timmes & The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module helm_alloc
-      use const_def, only: dp, use_mesa_temp_cache
+
+         use const_def, only: dp, use_mesa_temp_cache
       use math_lib
 
       implicit none
 
-
       contains
-
 
       subroutine alloc_helm_table(h, imax, jmax, ierr)
          ! This routine allocates a Helm_Table and places pointer to it in h.
@@ -142,7 +138,7 @@
             h% ddi_sav(i)  = ddi
             h% dd2i_sav(i) = dd2i
             h% dd3i_sav(i) = dd3i
-         enddo
+         end do
       end subroutine setup_td_deltas
 
 
@@ -230,11 +226,11 @@
             do j=1,jmax
                tsav = h% logtlo + (j-1)*h% logtstp
                h% t(j) = exp10(tsav)
-            enddo
+            end do
             do i=1,imax
                dsav = h% logdlo + (i-1)*h% logdstp
                h% d(i) = exp10(dsav)
-            enddo
+            end do
          end if
 
          close(unit=19)
@@ -281,8 +277,8 @@
                   end do
                   write(*,'(A)')
                end if
-            enddo
-          enddo
+            end do
+          end do
 
          !..read the pressure derivative with density table
           do j=1,jmax
@@ -304,8 +300,8 @@
                end do
                write(*,'(A)')
             end if
-           enddo
-          enddo
+           end do
+          end do
 
          !..read the electron chemical potential table
           do j=1,jmax
@@ -327,8 +323,8 @@
                end do
                write(*,'(A)')
             end if
-           enddo
-          enddo
+           end do
+          end do
 
          !..read the number density table
           do j=1,jmax
@@ -350,8 +346,8 @@
                end do
                write(*,'(A)')
             end if
-           enddo
-          enddo
+           end do
+          end do
 
           close(unit=19)
           !..write cachefile
@@ -402,8 +398,6 @@
        call setup_td_deltas(h, imax, jmax)
 
       end subroutine read_helm_table
-
-
 
 
       subroutine free_helm_table(h)
@@ -469,9 +463,6 @@
             if (associated(array_ptr)) deallocate(array_ptr)
          end subroutine do_free2
 
-
       end subroutine free_helm_table
-
-
 
       end module helm_alloc

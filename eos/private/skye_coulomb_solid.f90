@@ -1,8 +1,27 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module skye_coulomb_solid
    use math_lib
    use math_def
    use auto_diff
-   use const_def
+   use const_def, only: dp, pi, fine, eulernum
 
    implicit none
 
@@ -166,7 +185,8 @@ module skye_coulomb_solid
 
          s = 1d0 / (1d0 + 1d-2 * pre_z(int(Z))% logz_3_2 + 0.097d0 / pre_z(int(Z))% z2)
          b1 = 1d0 - 1.1866d0 * pre_z(int(Z))% zm0p267 + 0.27d0 / Z
-         b2 = 1d0 + (2.25d0 * pre_z(int(Z))% zm1_3) * (1d0 + 0.684d0 * pre_z(int(Z))% z5 + 0.222d0 * pre_z(int(Z))% z6) / (1d0 + 0.222d0 * pre_z(int(Z))% z6)
+         b2 = 1d0 + (2.25d0 * pre_z(int(Z))% zm1_3) * (1d0 + 0.684d0 * pre_z(int(Z))% z5 + 0.222d0 * pre_z(int(Z))% z6) &
+                  / (1d0 + 0.222d0 * pre_z(int(Z))% z6)
          b3 = 41.5d0 / (1d0 + pre_z(int(Z))% logz)
          b4 = 0.395d0 * pre_z(int(Z))% logz + 0.347d0 * pre_z(int(Z))% zm3_2
 
@@ -212,7 +232,9 @@ module skye_coulomb_solid
       real(dp) :: CR
 
       CR = 0.05d0 * pow2(Rz - 1d0) / ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
-      dG = CR / (1 + (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
+      dG = CR / (1 + &
+           (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) &
+           * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
 
    end function deltaG_Ogata93
 

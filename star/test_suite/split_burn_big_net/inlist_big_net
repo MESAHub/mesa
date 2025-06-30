@@ -1,5 +1,4 @@
 
-
 &star_job
 
       load_saved_model = .true.
@@ -18,7 +17,7 @@
 
       set_initial_model_number = .true.
       initial_model_number = 0
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
@@ -33,7 +32,7 @@
 / ! end of kap namelist
 
 &controls
-      
+
       xa_central_lower_limit_species(1) = 'si28'
       xa_central_lower_limit(1) = 0.55d0
 
@@ -61,7 +60,7 @@
 ! solver
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
-      
+
       use_gold2_tolerances = .false.
 
 ! output
@@ -72,7 +71,7 @@
       photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10 
+      terminal_interval = 10
 
       x_integer_ctrl(1) = 1 ! Part number ! Set this to 0 to turn of test suite checks
 
@@ -80,10 +79,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax = 2.6 ! -101d0
 

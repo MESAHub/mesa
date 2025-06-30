@@ -1,13 +1,35 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module skye_ideal
+
    use math_lib
    use auto_diff
-   use const_def
+   use const_def, only: dp, pi, amu, planck_h, avo, crad, kerg
 
    implicit none
 
    private
-
-   public :: compute_F_rad, compute_F_ideal_ion, compute_xne, compute_ideal_ele
+   public :: compute_F_rad
+   public :: compute_F_ideal_ion
+   public :: compute_xne
+   public :: compute_ideal_ele
 
    real(dp), parameter :: sifac  = planck_h * planck_h * planck_h / (2d0 * pi * amu * sqrt(2d0 * pi * amu))
 
@@ -60,7 +82,8 @@ module skye_ideal
 
    end function compute_xne
 
-   subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
+   subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, &
+                                zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
       use helm_polynomials
       use eos_def
       real(dp), intent(in) :: temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye
@@ -178,7 +201,7 @@ module skye_ideal
       din = din_in
 
 
-!..density derivs
+!..density derivatives
         dindd   = ye
         dinda   = -din*ytot1
         dindz   = den*ytot1
@@ -426,7 +449,6 @@ module skye_ideal
         fi(14) = ht% efdt(iat+1,jat)
         fi(15) = ht% efdt(iat,jat+1)
         fi(16) = ht% efdt(iat+1,jat+1)
-
 
 
 !..electron chemical potential etaele
@@ -680,9 +702,6 @@ module skye_ideal
 !      adr_xnefer%d2val1_d1val4 = dxneferdttz
 !      adr_xnefer%d2val2_d1val4 = dxneferdddz
 !      adr_xnefer%d1val1_d1val2_d1val4 = dxneferddtz
-
-
-
 
    end subroutine compute_ideal_ele
 

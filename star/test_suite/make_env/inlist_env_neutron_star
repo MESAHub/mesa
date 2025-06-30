@@ -31,10 +31,10 @@
       accretion_he4 = 0d0
       accretion_zfracs = 0
       z_fraction_fe = 1d0
-            
+
       x_integer_ctrl(1) = 1500 ! initial nz
       x_ctrl(5) = -15d0 ! initial log(dq(1))
-      
+
       x_logical_ctrl(1) = .true. ! build starting model
       ! neutron star
          x_ctrl(1) = 1.4 ! star mass (Msun)
@@ -54,18 +54,16 @@
       energy_eqn_option = 'dedt'
 
       max_abar_for_burning = 55
-   
+
       merge_if_dlnR_too_small = .true.
       mesh_min_dlnR = 1d-9
-
 
 
       varcontrol_target = 1d-3
       min_allowed_varcontrol_target = 5d-4
       never_skip_hard_limits = .true.
       relax_hard_limits_after_retry = .false.
-      !mlt_make_surface_no_mixing = .true. 
-
+      !mlt_make_surface_no_mixing = .true.
 
 
       gold2_tol_residual_norm2 = 1d-8
@@ -74,21 +72,18 @@
       gold2_tol_residual_norm3 = 0
       gold2_tol_max_residual3 = 0
 
-      
+
 
 
 / ! end of controls namelist
 
 
-
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+   ! top level controls
 
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
 
 / ! end of pgstar namelist
 

@@ -2,45 +2,43 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module kap_eval
+
       use utils_lib, only: is_bad, mesa_error
       use kap_def
-      use const_def, only: dp, ln10, sige
+      use const_def, only: dp, ln10, sige, me, kev, kerg, amu, clight
       use math_lib
 
       implicit none
 
+      private
+      public :: get_kap_results
+      public :: combine_rad_with_conduction
+      public :: get_kap_results_blend_t
+      public :: compton_opacity
 
       contains
 
-
-      subroutine Get_kap_Results( &
+      subroutine get_kap_Results( &
            rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
            eta, d_eta_dlnRho, d_eta_dlnT, &
            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-         use const_def
          use utils_lib, only: is_bad
          use auto_diff
 
@@ -132,7 +130,7 @@
             blend_logR = (logR_Compton_blend_hi - logR_auto) / (logR_Compton_blend_hi - logR_Compton_blend_lo)
          else
             blend_logR = 0d0
-         endif
+         end if
          ! quintic smoothing
          blend_logR = -blend_logR*blend_logR*blend_logR*(-10d0 + blend_logR*(15d0 - 6d0*blend_logR))
 
@@ -225,10 +223,10 @@
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
-      end subroutine Get_kap_Results
+      end subroutine get_kap_Results
 
 
-      subroutine Get_kap_Results_blend_T( &
+      subroutine get_kap_Results_blend_T( &
            rq, X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
            frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
@@ -379,10 +377,10 @@
 
         if (dbg) write(*,1) 'Get_kap_blend_logT kap', kap
 
-      end subroutine Get_kap_Results_blend_T
+      end subroutine get_kap_Results_blend_T
 
 
-      subroutine Get_kap_lowT_Results( &
+      subroutine get_kap_lowT_Results( &
            rq, &
            X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -473,10 +471,10 @@
 
         return
 
-      end subroutine Get_kap_lowT_Results
+      end subroutine get_kap_lowT_Results
 
 
-      subroutine Get_kap_highT_Results(rq, &
+      subroutine get_kap_highT_Results(rq, &
            X, Z, XC_in, XN_in, XO_in, XNe_in, logRho_in, logT_in, &
            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
@@ -540,7 +538,7 @@
            XN = 0d0
            XO = 0d0
            XNe = 0d0
-        endif
+        end if
 
 
         dXC = 0d0
@@ -696,7 +694,7 @@
            dlnkap_dlnT = (alfa*kap_alfa*dlnkap_alfa_dlnT + beta*kap_beta*dlnkap_beta_dlnT) / kap
         end if
 
-      end subroutine Get_kap_highT_Results
+      end subroutine get_kap_highT_Results
 
 
       subroutine combine_rad_with_conduction( &
@@ -798,7 +796,6 @@
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use eos_lib
          use eos_def
-         use const_def
          use auto_diff
 
          type (Kap_General_Info), pointer :: rq
@@ -873,6 +870,5 @@
          dlnkap_dlnT = T% val * kap_auto% d1val2 / kap
 
       end subroutine Compton_Opacity
-
 
       end module kap_eval

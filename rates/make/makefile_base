@@ -13,41 +13,41 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCE FILES
 
 SRCS = \
-   rates_def.f90 \
-   rates_names.f90 \
-   rates_reverses.f90 \
-   weak_support.f90 \
-   weaklib_tables.f90 \
-   suzuki_tables.f90 \
-   load_weak.f90 \
-   eval_weak.f90 \
-   coulomb.f90 \
-   load_ecapture.f90 \
-   eval_psi.f90 \
-   eval_coulomb.f90 \
-   eval_ecapture.f90 \
-   reaclib_eval.f90 \
-   reaclib_support.f90 \
-   reaclib_print.f90 \
-   reaclib_input.f90 \
-   ratelib.f90 \
-   pycno.f90 \
-   raw_rates.f90 \
-   rates_initialize.f90 \
-   rates_support.f90 \
-   screen5.f90 \
-   screen_chugunov.f90 \
-   screen.f90 \
-   rates_lib.f90
+  rates_def.f90 \
+  rates_names.f90 \
+  rates_reverses.f90 \
+  weak_support.f90 \
+  weaklib_tables.f90 \
+  suzuki_tables.f90 \
+  load_weak.f90 \
+  eval_weak.f90 \
+  coulomb.f90 \
+  load_ecapture.f90 \
+  eval_psi.f90 \
+  eval_coulomb.f90 \
+  eval_ecapture.f90 \
+  reaclib_eval.f90 \
+  reaclib_support.f90 \
+  reaclib_print.f90 \
+  reaclib_input.f90 \
+  ratelib.f90 \
+  pycno.f90 \
+  raw_rates.f90 \
+  rates_initialize.f90 \
+  rates_support.f90 \
+  screen5.f90 \
+  screen_chugunov.f90 \
+  screen.f90 \
+  rates_lib.f90
 
 #################################################################
 #
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = chem eos $(LIBS_MESA_NUMERICS)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) -lchem -leos $(LOAD_MESA_NUMERICS)
+  LIBS_OTHER = chem eos $(LIBS_MESA_NUMERICS)
+  DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+  LOAD_OTHER = -L$(MESA_LIB_DIR) -lchem -leos $(LOAD_MESA_NUMERICS)
 endif
 
 #################################################################

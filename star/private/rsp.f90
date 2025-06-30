@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2018-2019  Radek Smolec & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -33,11 +27,14 @@
       implicit none
 
       private
-      public :: rsp_setup_part1, rsp_setup_part2, rsp_one_step, &
-         build_rsp_model, rsp_total_energy_integrals, do1_rsp_build
+      public :: rsp_setup_part1
+      public :: rsp_setup_part2
+      public :: rsp_one_step
+      public :: build_rsp_model
+      public :: rsp_total_energy_integrals
+      public :: do1_rsp_build
 
       contains
-
 
       subroutine do1_rsp_build(s,ierr)
          ! call from other_rsp_build_model after changing params.
@@ -385,7 +382,7 @@
             write(*,'(I3,2X,99e16.5)') I-1, &
                s% rsp_LINA_periods(I)/86400.d0, &
                s% rsp_LINA_growth_rates(I)
-         enddo
+         end do
 
          s% rsp_period = &
             s% rsp_LINA_periods(s% RSP_mode_for_setting_PERIODLIN + 1)
@@ -537,7 +534,7 @@
                   s% need_to_set_history_names_etc = .true.
                   s% star_history_name = s% RSP_map_history_filename
                   FASE0 = s% time
-               endif
+               end if
                FASE=(s% time-FASE0)/s% rsp_period
                !write(*,4) 'add to map', s% model_number, IP, NPCH2, FASE
                do k=1,NZN,s% RSP_map_zone_interval  ! gnuplot pm3d map
@@ -555,8 +552,8 @@
                      !    s% RSP_w(k)**2,s% egas(k)+s% erad(k),s% csound(k), &
                      !    s% Pt(k),s% Pgas(k)+s% Prad(k),s% Eq(k), &
                      !    s% COUPL(k)
-                  endif
-               enddo
+                  end if
+               end do
                !write(io,*)
             end if
             if(IP==NPCH2 .and. .not. done_writing_map) then
@@ -811,7 +808,7 @@
             WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
                  (THETA*PPQ0(I)+THETA1*s% Pvsc(k))
             PDVWORK=PDVWORK+WORK(i)
-         enddo
+         end do
          s% rsp_GRPDV=PDVWORK/EKDEL
          if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
       end subroutine get_GRPDV
@@ -883,7 +880,7 @@
                WORKQ(I) = WORKQ(I) + dVol*dm*Pvsc_tw
                WORKT(I) = WORKT(I) + dVol*dm*Ptrb_tw
                WORKC(I) = WORKC(I) - dt*dm*s% Eq(k)
-            enddo
+            end do
             if (s% rsp_num_periods == s% RSP_work_period) then
                fname = trim(s% log_directory) // '/' // trim(s% RSP_work_filename)
                write(*,*) 'write work integral data to ' // trim(fname)
@@ -894,7 +891,7 @@
                      I, log10(sum(s% dm(1:k))), &
                      WORK(I)/EKDEL, WORKQ(I)/EKDEL, &
                      WORKT(I)/EKDEL, WORKC(I)/EKDEL
-               enddo
+               end do
                close(78)
             end if
             PDVWORK=0.d0
@@ -905,9 +902,9 @@
                WORKQ(I)=0.d0
                WORKT(I)=0.d0
                WORKC(I)=0.d0
-            enddo
+            end do
             s% rsp_GRPDV=PDVWORK/EKDEL
-         endif
+         end if
 
          ! INITIAL STEP OF PdV:
          if((INSIDE==1.and.IWORK==0).or. &
@@ -920,8 +917,8 @@
                PPQ0(I) = s% Pvsc_start(k)
                PPT0(I) = s% Ptrb_start(k)
                PPC0(I) = s% Chi_start(k)
-            enddo
-         endif
+            end do
+         end if
 
          ! FIRST AND NEXT STEPS of PdV:
          if(IWORK==1)then
@@ -938,8 +935,8 @@
                WORKQ(I)=  WORKQ(I) + dm*dVol*Pvsc_tw
                WORKT(I)=  WORKT(I) + dm*dVol*Ptrb_tw
                WORKC(I)=  WORKC(I) - dt*dm*s% Eq(k)
-            enddo
-         endif
+            end do
+         end if
       end subroutine calculate_work_integrals
 
 
@@ -1026,9 +1023,7 @@
              TT1=T0
              FIRST=1
              ID=0
-         endif
+         end if
       end subroutine check_cycle_completed
 
-
       end module rsp
-

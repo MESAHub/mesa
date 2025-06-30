@@ -22,9 +22,6 @@
          ! `delta_lgT_limit` limits only apply where `log10_T(k) >= delta_lgT_limit_min_lgT`.
 
       delta_lgT_limit_min_lgT = 3d0 ! 1d99
-      
-      
-
 
          !### rotation_steps_limit
 
@@ -38,7 +35,6 @@
          ! If rotation solver uses more steps than this, retry.
 
       rotation_steps_hard_limit = 700
-      
 
 
          ! limit for change in mdot in Msun/yr
@@ -60,7 +56,6 @@
 
       delta_mdot_limit = -1
       delta_mdot_hard_limit = -1
-      
 
 
 / ! end of other_timestep_limit

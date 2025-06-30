@@ -2,42 +2,33 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module eosPT_eval
       use eos_def
-      use const_def
+      use const_def, only: dp, crad, kerg, mp, ln10, arg_not_provided
       use math_lib
       use utils_lib, only: mesa_error
 
       implicit none
 
-
       integer, parameter :: doing_get_T = 1
       integer, parameter :: doing_get_Pgas = 2
 
       contains
-
 
       subroutine Get_eosPT_Results(rq, &
                Z_in, X_in, abar, zbar, &
@@ -344,8 +335,6 @@
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
-         use const_def
-
          integer, intent(in) :: handle
 
          real(dp), intent(in) :: Z  ! the metals mass fraction
@@ -409,7 +398,6 @@
                Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
-         use const_def
          use utils_lib, only: is_bad
          use num_lib, only: brent_safe_zero, look_for_brackets
          use chem_def, only: num_chem_isos
@@ -616,4 +604,3 @@
       end subroutine do_safe_get_Pgas_T
 
       end module eosPT_eval
-

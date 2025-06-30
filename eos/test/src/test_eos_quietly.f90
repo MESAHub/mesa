@@ -1,14 +1,13 @@
-      program test_eos_quietly
-      use test_eos_support
+program test_eos_quietly
 
-      implicit none
+   use test_eos_support
 
-      logical, parameter :: quietly = .true.
+   implicit none
 
-      call Setup_eos
+   logical, parameter :: quietly = .true.
 
-      call Do_One(quietly)
-      call test1_eosPT_for_ck(quietly)
+   call Setup_eos
+   call Do_One(quietly)
+   call test1_eosPT_for_ck(quietly)
 
-      end program test_eos_quietly
-
+end program test_eos_quietly

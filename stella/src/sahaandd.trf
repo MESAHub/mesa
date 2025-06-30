@@ -18,7 +18,7 @@
   SUBROUTINE URSOS;
   IMPlICIT REAL*8 (A-H,O-Z);
 
-/* 
+/*
   _include nstep;
  -- with  COMMON/NSTEP/NSTEP,MAXER,IOUT, -- IOUT      LINE PRINT INTERVAL
          --                  NOUT; -- NOUT      PRINT STEP

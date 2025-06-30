@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2020  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module hydro_rsp2_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi, lsun, rsun, msun
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
@@ -39,7 +33,6 @@
       public :: remesh_for_RSP2, remesh_for_TDC_pulsations
 
       contains
-
 
       subroutine remesh_for_RSP2(s,ierr)
          ! uses these controls
@@ -449,14 +442,6 @@
 
       end subroutine remesh_for_RSP2
 
-
-
-
-
-
-
-
-
       subroutine remesh_for_TDC_pulsations(s,ierr)
          ! uses these controls
          !  RSP2_nz = 150
@@ -496,7 +481,7 @@
          call interpolate1_face_val2(s% i_lnR, log(max(1d0,s% r_center)))
          call check_new_lnR2
          call interpolate1_face_val2(s% i_lum, s% L_center)
-         call interpolate_mlt_vc_face_val2()
+         !call interpolate_mlt_vc_face_val2()
          if (s% i_v /= 0) call interpolate1_face_val2(s% i_v, s% v_center)
          call set_new_lnd2
          call interpolate1_cell_val2(s% i_lnT)
@@ -1054,4 +1039,3 @@
       end subroutine remesh_for_TDC_pulsations
 
       end module hydro_rsp2_support
-

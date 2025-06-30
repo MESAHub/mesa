@@ -2,38 +2,30 @@
 !
 !   Copyright (C) 2010-2019  Ed Brown & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module chem_lib
+
       use chem_def, only: chem_has_been_initialized
       use const_def, only: dp
       use math_lib
 
       implicit none
 
-
       contains
-
 
       subroutine chem_init(isotopes_filename, ierr)
          ! uses mesa_data_dir from const_def
@@ -408,7 +400,7 @@
          use_al26_isomers = .false.
          do i = 1, size(Z)
            if (A(i) == 26 .and. Z(i) == 13) count_isomer = count_isomer + 1
-         enddo
+         end do
          if (count_isomer > 1) use_al26_isomers = .true.
 
          count_isomer = 1
@@ -444,7 +436,7 @@
          use_al26_isomers = .false.
          do i = 1, size(Z)
            if (A(i) == 26 .and. Z(i) == 13) count_isomer = count_isomer + 1
-         enddo
+         end do
          if (count_isomer > 1) use_al26_isomers = .true.
 
          count_isomer = 1
@@ -604,7 +596,7 @@
       ! return the abundances of the stable isotopes where the unstable ones
       ! have decayed to the stable versions.
       ! Code from Frank Timmes "decay.zip"
-      ! Note this makes some asumptions, firstly that isotopes can only decay to one
+      ! Note this makes some assumptions, firstly that isotopes can only decay to one
       ! output (thus there are no branches), also we assume an infinite timescale
       ! for decay. If you need a high precision output I suggest you use a one zone
       ! burn model rather than this.
@@ -720,9 +712,6 @@
 
          chem_M_div_h = log10(z/x)-log10(zsolar/(1.d0-zsolar-ysolar))
 
-
       end function chem_M_div_h
 
-
       end module chem_lib
-

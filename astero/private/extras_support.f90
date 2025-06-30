@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -24,14 +21,13 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, secyer
       use utils_lib
       use astero_support
       use astero_def
       use astero_def
 
       implicit none
-
 
       contains
 
@@ -875,7 +871,8 @@
 
          write(format_string,'( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
          write(num_string,format_string) num
-         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) // trim(num_string) // trim(sample_results_postfix)
+         filename = trim(astero_results_directory) // '/' // trim(sample_results_prefix) &
+                    // trim(num_string) // trim(sample_results_postfix)
          open(unit=iounit, file=trim(filename), action='write', status='replace', iostat=ierr)
          if (ierr == 0) then
             call show_best(iounit)
@@ -1237,7 +1234,5 @@
          end subroutine move_flg
 
       end subroutine move_extra_info
-
-
 
       end module extras_support

@@ -218,7 +218,7 @@ _od;
         nnx=nnx+1;
         NFRUS=NFRUSED(Jsave); -- exact number of used (saved) freqs
 --        write(*,'(a,1p,3e11.3)') ' UR,flsave(Mfreq/1,JSAVE): ',
---		UR,flsave(Mfreq,JSAVE),flsave(1,JSAVE);
+--    UR,flsave(Mfreq,JSAVE),flsave(1,JSAVE);
 --        pause;
         Rphtau=UR*flsave(Mfreq,JSAVE);
         <*getttt: obtain in ttt(MFREQ) corrected output flux
@@ -386,7 +386,7 @@ _od;
       IPRINT = 20;
       ITRES=0;
 
-       <*findabs* the same only with absorbtion*>;
+       <*findabs* the same only with absorption*>;
 
 /*
       write(@wres,'(F15.10,1p,5e11.3,0p,6f10.3)') time_n, Tbb, rbb,
@@ -873,7 +873,7 @@ If(Ifail==0)
  nnx=nfrus;         -- # of used points
  nny=nzon-ncnd+1;   -- # of functions plotted( nzon-ncnd) + 1 of BB
  _do L=1, ntotx;
-     plotx(L)=SNGL(log10(CS/(freq(L)*UFREQ)))+8.; -- lg \lamba \AA
+     plotx(L)=SNGL(log10(CS/(freq(L)*UFREQ)))+8.; -- lg \lambda \AA
 --                set wave=$(3*10**$(18 - lgfreq[$bin]))
 --     plotx(L)=SNGL(log10(freq(L)*UFREQ));
   --   plotx(L)=float(L);
@@ -1360,7 +1360,7 @@ _od;
 --         Iflag=-1;
 --         pause;
 --       else;
-         <*findabs: residuals with absorbtion*>;
+         <*findabs: residuals with absorption*>;
          RC(1)=F1;
          RC(2)=F2;
 --       endif;
@@ -1590,4 +1590,3 @@ _define @NPTSX NPTSI @WLX WLI @FX0 IF0 @TX TI @lband 5 ;@flux; MI=AMAGX;
       VF0 = -13.72;
       RF0 = -13.66;
       IF0 = -14.42;
-

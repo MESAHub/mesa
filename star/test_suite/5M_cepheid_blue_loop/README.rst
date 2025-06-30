@@ -4,7 +4,7 @@
 5M_cepheid_blue_loop
 ********************
 
-This test case checks that the evolution of a 5 Msun, metal-poor Z=0.008, helium-enriched Y=0.256 model
+This test case checks that the evolution of a 5 |Msun|, metal-poor Z=0.008, helium-enriched Y=0.256 model
 executes a blue-loop in the HR diagram and crosses the classical Cepheid instability strip boundaries three times.
 
 This test case has two parts. Click to see a larger view of a plot.
@@ -49,7 +49,4 @@ pgstar commands used:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 29May2021 (MESA e37f76f) by fxt
-

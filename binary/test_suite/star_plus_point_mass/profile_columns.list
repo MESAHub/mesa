@@ -188,7 +188,7 @@
       
       
       
-      !brunt_N2 ! brunt-vaisala frequence squared.  only positive values shown.
+      !brunt_N2 ! brunt-vaisala frequency squared.  only positive values shown.
       !brunt_Astar ! Astar := r N^2 / g.  only positive values shown.
       !brunt_B ! the composition gradient term in the brunt N^2 calculation
       !chiY ! dlnP/dlnY used in calculate of brunt_B term

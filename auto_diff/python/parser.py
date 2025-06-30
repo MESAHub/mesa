@@ -5,7 +5,12 @@ from partial import Partial
 from auto_diff_type import AutoDiffType
 from make_auto_diff_type import make_auto_diff_type
 from utils import py_to_fort, tab
-from functions import *
+from functions import (
+    unary_operators,
+    binary_operators,
+    comparison_operators,
+    intrinsics,
+)
 
 # Get config files
 config_path = "../config"

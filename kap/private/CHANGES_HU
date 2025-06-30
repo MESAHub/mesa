@@ -1,7 +1,7 @@
 OP4STARS_1.2
 ------------
 2011, Changes on OPserver (v3.3) made by Haili Hu
-------------------------
+-------------------------------------------------
 
 OPserver has been significantly altered for the use in the stellar evolution 
 code STARS, where the chemical abundances are solved simultaneously with the 
@@ -51,7 +51,7 @@ has an unnamed common block.
 
 4) Subroutine op_radacc, based on op_ax. Changes:
  - Calculate g_rad for any number of elements in the chemical mixture.
- - Calculate g_rad as funtion of local radiative flux rather than Teff and r/R*;
+ - Calculate g_rad as function of local radiative flux rather than Teff and r/R*;
  - Do not loop over nmix, chi, and nstar, but calculate g_rad for for 1 meshpoint. 
  - Do not calculate diffusion coefficient zet. We compute more accurate diffusion 
  coefficients elsewhere (based on Paquette at al 1986).

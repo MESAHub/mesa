@@ -2,7 +2,7 @@
 MESA-Web Updates
 ================
 
-`MESA-Web <http://mesa-web.asu.edu>`__ is an online web interface for
+`MESA-Web <http://user.astro.wisc.edu/~townsend/static.php?ref=mesa-web-submit>`__ is an online web interface for
 MESA, which can be used for education and research purposes to calculate
 stellar models.
 

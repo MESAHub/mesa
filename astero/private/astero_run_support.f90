@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2020  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -24,7 +21,7 @@
 
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp
       use astero_support
 
       implicit none
@@ -536,8 +533,8 @@
 
       subroutine bobyqa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(*)
-         double precision, intent(out) :: f
+         real(dp), intent(in) :: x(*)
+         real(dp), intent(out) :: f
 
          character(len=256) :: filename
          integer :: ierr
@@ -561,8 +558,8 @@
 
       subroutine newuoa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(*)
-         double precision, intent(out) :: f
+         real(dp), intent(in) :: x(*)
+         real(dp), intent(out) :: f
 
          character(len=256) :: filename
          integer :: ierr
@@ -586,8 +583,8 @@
 
       subroutine bobyqa_or_newuoa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(*)
-         double precision, intent(out) :: f
+         real(dp), intent(in) :: x(*)
+         real(dp), intent(out) :: f
          integer :: ierr, prev_sample_number, i
          include 'formats'
 
@@ -770,7 +767,7 @@
             write(*,*) 'chi2 < simplex_chi2_tol; stopping further iteration'
             ierr = -1
             return
-         endif
+         end if
 
       end function simplex_f
 

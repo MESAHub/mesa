@@ -98,7 +98,7 @@ _Define
          HaplP1(L)=Happal(L);
        _od;
  --
-     if(km<Mzon)then;  
+     if(km<Mzon)then;
        Pl=3.d0*dM(Km+1)/(@R2**3-(@R1+DeltR)**3);
        Tp=@T2;
        Tp2up4=Tp**4;
@@ -134,5 +134,5 @@ _Define
                                    );
          DHaphR(Km,L)=(HapHP(L)-HapHM(L))/DeltR;
        _od;
-     endif; 
+     endif;
    _od;

@@ -5,8 +5,8 @@
      &            caller_id,nvar,nz,lblk1,dblk1,ublk1,uf_lblk1,uf_dblk1,uf_ublk1,
      &            sparse_jac,nzmax,isparse,ia,ja,sa,
      &            lrd,rpar_decsol,lid,ipar_decsol)
-      use mtx_lib,only:find_loc_in_sparse      
-      implicit none !real(dp) (a-h,o-z)
+      use mtx_lib,only:find_loc_in_sparse
+      implicit none
       interface
 #include "mtx_decsol.dek"
 #include "mtx_decsols.dek"
@@ -37,11 +37,11 @@
       real(dp), pointer :: e1_2D(:,:)
       real(dp), pointer, dimension(:,:,:) :: lblk, dblk, ublk
       real(dp), pointer, dimension(:,:,:) :: uf_lblk, uf_dblk, uf_ublk
-      
+
       e1_2D(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
-      
+
       !write(*,*) 'decomr ijob', ijob
-      
+
       ier = 0
       if (nvar > 0) then
          k = 1
@@ -66,7 +66,7 @@
 !               write(*,'(a30,2i4,e26.16)') 'input dblk(i,j,k)', i, j, dblk(i,j,k)
 !            end do
 !         end do
-!         write(*,*) 
+!         write(*,*)
          call decsolblk(
      &      0,caller_id,nvar,nz,lblk1,dblk1,ublk1,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
 !         do j=1,nvar
@@ -74,11 +74,11 @@
 !               write(*,'(a30,2i4,e26.16)') 'factored dblk(i,j,k)', i, j, dblk(i,j,k)
 !            end do
 !         end do
-!         write(*,*) 
+!         write(*,*)
          return
       end if
-      
-      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+
+      GOTO (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
 !
 ! -----------------------------------------------------------
 !
@@ -101,14 +101,14 @@
 !            write(*,'(a30,2i4,e26.16)') 'input e1(i,j)', i, j, e1_2D(i,j)
 !         end do
 !      end do
-!      write(*,*) 
+!      write(*,*)
       call decsol(0,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
 !      do j=1,n
 !         do i=1,n
 !            write(*,'(a30,2i4,e26.16)') 'factored e1(i,j)', i, j, e1_2D(i,j)
 !         end do
 !      end do
-!      write(*,*) 
+!      write(*,*)
       return
 !
 ! -----------------------------------------------------------
@@ -204,8 +204,8 @@
       end do
       stop
       end if
-      
-      
+
+
       call decsol(0,nm1,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
       return
 !
@@ -265,7 +265,7 @@
             e1_2D(i,j)=e1_2D(i,j)+fac1*fmas(i-j+mbdiag,j)
          end do
       end do
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -308,8 +308,7 @@
       end if
 
 
-
-      goto 46
+      GOTO 46
 !
 ! -----------------------------------------------------------
 !
@@ -333,7 +332,7 @@
             e1_2D(i,j)=fmas(i,j)*fac1-fjac(i,jm1)
          end do
       end do
-      goto 45
+      GOTO 45
 !
 ! -----------------------------------------------------------
 !
@@ -348,5 +347,3 @@
        write(*,*) 'decomr: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! decomr
       end subroutine decomr
-!
-! ***********************************************************

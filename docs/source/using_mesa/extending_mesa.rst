@@ -14,7 +14,7 @@ routines.
 
 Someone may have already written something similar to what you want.
 Check the list of `user-submitted
-routines <http://cococubed.com/mesa_market/add-ons.html>`__ to see.
+routines <https://mesastar.org/marketplace/add-ons/>`__ to see.
 If you develop something new and useful, consider sharing it with the
 community.
 
@@ -332,7 +332,7 @@ discuss some useful MESA features.
      ! MESA also provides a number of arrays that are useful for implementing
      ! algorithms which require a state. if you use these variables
      ! restarts and retries will work without doing anything special.
-     ! they are named xtra, ixtra, lextra.
+     ! they are named xtra, ixtra, lxtra.
      ! they are automatically versioned, that is if you set s% xtra(1), then
      ! s% xtra_old(1) will contains the value of s% xtra(1) from the previous step.
 
@@ -431,7 +431,7 @@ neon burning.
 
   end function extras_check_model
 
-
+.. _using_other:
 Using the "other" hooks
 -----------------------
 

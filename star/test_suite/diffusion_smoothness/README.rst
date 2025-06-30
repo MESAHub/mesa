@@ -8,7 +8,7 @@ This test suite case checks that element diffusion produces a sufficiently smoot
 
 This test case has 2 part2. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_zams``) builds a 1.0 Msun, Z=0.02 metallicity, main-sequence model.
+* Part 1 (``inlist_zams``) builds a 1.0 |Msun|, Z=0.02 metallicity, main-sequence model.
 
 * Part 2 (``inlist_diffusion_smoothness``) activates element diffusion and continues the evolution for 3e9 years. The ``run-star_extras.f90`` then checks that the Brunt profile is sufficiently smooth in the central portion of the model.
 

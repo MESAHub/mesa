@@ -2,29 +2,23 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module eosDT_eval
+
       use eos_def
       use const_def, only: avo, crad, ln10, arg_not_provided, mp, kerg, dp, qp
       use utils_lib, only: is_bad, mesa_error
@@ -34,7 +28,6 @@
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
       use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
       use ideal, only: get_ideal_for_eosdt
-
 
       implicit none
 
@@ -311,9 +304,9 @@
             ierr)
 
          ! zero all frac components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          skip = .false.
 
@@ -755,7 +748,7 @@
 
       subroutine get_HELM_alfa( &
             rq, logRho, logT, alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
-         use const_def
+         use const_def, only: dp
          use eos_blend
          use auto_diff
          type (EoS_General_Info), pointer :: rq
@@ -816,7 +809,7 @@
             rq, dbg, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
+         use const_def, only: dp
          use auto_diff
          type (EoS_General_Info), pointer :: rq
          logical, intent(in) :: dbg
@@ -956,7 +949,7 @@
                blend_cut = 1d0
             else
                blend_cut = max(blend_logRho_cut, blend_logQ_cut)
-            endif
+            end if
          elseif (blend_logT_cut == 1) then
             blend_cut = 1d0
          else
@@ -966,7 +959,7 @@
                blend_cut = 1d0
             else
                blend_cut = max(blend_logT_cut, blend_logQ_cut)
-            endif
+            end if
          end if
 
          ! combine all blends
@@ -1013,12 +1006,12 @@
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_OPAL_SCVH) = 1.0
+         res(i_frac_OPAL_SCVH) = 1.0d0
 
       end subroutine get_opal_scvh_for_eosdt
 
@@ -1055,12 +1048,12 @@
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_FreeEOS) = 1.0
+         res(i_frac_FreeEOS) = 1.0d0
 
       end subroutine get_FreeEOS_for_eosdt
 
@@ -2312,7 +2305,7 @@
                logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
-         use const_def
+         use const_def, only: dp
 
          integer, intent(in) :: handle
 
@@ -2371,7 +2364,7 @@
                xacc, yacc, ntry, &
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
-         use const_def
+         use const_def, only: dp
          use chem_def, only: num_chem_isos
          use num_lib, only: safe_root_with_guess
          integer, intent(in) :: handle
@@ -2540,6 +2533,5 @@
          end function f
 
       end subroutine do_safe_get_Rho_T
-
 
       end module eosDT_eval

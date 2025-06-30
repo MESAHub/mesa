@@ -1,10 +1,12 @@
 module test_medakzo
+
    use num_def
    use num_lib
    use mtx_lib
    use mtx_def
    use test_int_support, only: i_nfcn, i_njac
    use utils_lib, only: mesa_error
+   use bari_medakzo, only: medakzo_feval, medakzo_jeval, medakzo_init, medakzo_solut
 
    implicit none
 

@@ -1,7 +1,7 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       ! load_saved_model = .true.
       ! load_model_filename = 'zams.mod'  ! from make_zams
@@ -28,7 +28,7 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02      
+      Zbase = 0.02
 / ! end of kap namelist
 
 &controls
@@ -45,22 +45,22 @@
 
       initial_mass = 1
       initial_z = 0.02
-      
+
       max_years_for_timestep = 6d7
       never_skip_hard_limits = .false. ! needs to be false for other_timestep_limit to work
-      
+
       xa_central_lower_limit_species(1) = 'h1'
       xa_central_lower_limit(1) = 0.25
 
       photo_interval = 50
       profile_interval = 100
       history_interval = 5
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 50
 
 		use_other_mesh_functions = .true.
       use_other_wind = .true.
-      
+
       overshoot_scheme(1) = 'other'
       overshoot_zone_type(1) = 'any' ! 'burn_Z'
       overshoot_zone_loc(1) = 'any'
@@ -73,6 +73,6 @@
       history_interval = 1
       terminal_interval = 10
       write_header_frequency = 10
-      
+
 / ! end of controls namelist
 

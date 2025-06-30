@@ -1,6 +1,6 @@
 #./../../utils/test/ck
 
-#!/bin/bash
+#!/usr/bin/env bash
 
 function check_okay {
 	if [ $? -ne 0 ]

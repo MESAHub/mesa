@@ -1,21 +1,21 @@
-      program test_eos
-      use eos_support, only: Setup_eos
-      use test_eos_support
-      use math_lib
-      use auto_diff
-      use test_eos_blend
+program test_eos
 
-      implicit none
+   use eos_support, only: Setup_eos
+   use test_eos_support
+   use math_lib
+   use auto_diff
+   use test_eos_blend
 
-      logical, parameter :: quietly = .false.
+   implicit none
 
-      call Setup_eos
+   logical, parameter :: quietly = .false.
 
-      call Do_One(quietly)
+   call Setup_eos
 
-      call test1_eosPT_for_ck(quietly)
+   call Do_One(quietly)
 
-      call do_test_eos_blend()
+   call test1_eosPT_for_ck(quietly)
 
-      end program test_eos
+   call do_test_eos_blend()
 
+end program test_eos

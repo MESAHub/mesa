@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module auto_diff_real_2var_order3_module
       use const_def, only: dp, ln10, pi
       use utils_lib
@@ -658,7 +677,9 @@ module auto_diff_real_2var_order3_module
       unary%d3val2 = 3.0_dp*q1*x%d2val2 + x%d3val2*z_d1x + z_d3x*pow3(x%d1val2)
    end function make_unary_operator
 
-   function make_binary_operator(x, y, z_val, z_d1x, z_d1y, z_d2x, z_d1x_d1y, z_d2y, z_d3x, z_d2x_d1y, z_d1x_d2y, z_d3y) result(binary)
+   function make_binary_operator(x, y, z_val, &
+                                 z_d1x, z_d1y, z_d2x, z_d1x_d1y, z_d2y, z_d3x, z_d2x_d1y, z_d1x_d2y, z_d3y) &
+                                 result(binary)
       type(auto_diff_real_2var_order3), intent(in) :: x
       type(auto_diff_real_2var_order3), intent(in) :: y
       real(dp), intent(in) :: z_val
@@ -807,7 +828,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q8*(q4*x%d1val1_d1val2 - x%d1val1*x%d1val2)
       unary%d2val2 = q8*(-q10 + q9)
       unary%d3val1 = q13*(-6.0_dp*q11*x%d2val1 + 3.0_dp*pow3(x%d1val1) + q12*x%d3val1)
-      unary%d2val1_d1val2 = 0.125_dp*(3.0_dp*q6*x%d1val2 - q11*q14 + q12*x%d2val1_d1val2 - q5*x%d1val2)*pow3(sqrt(q1))*powm1(q0)*powm1(pow4(x%val))
+      unary%d2val1_d1val2 = 0.125_dp*(3.0_dp*q6*x%d1val2 - q11*q14 + q12*x%d2val1_d1val2 - q5*x%d1val2) &
+                            * pow3(sqrt(q1))*powm1(q0)*powm1(pow4(x%val))
       unary%d1val1_d2val2 = q13*(3.0_dp*q10*x%d1val1 + q12*x%d1val1_d2val2 - q14*q15 - q9*x%d1val1)
       unary%d3val2 = q13*(-6.0_dp*q15*x%d2val2 + 3.0_dp*pow3(x%d1val2) + q12*x%d3val2)
    end function safe_sqrt_self
@@ -1570,7 +1592,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(q1*x%d1val1_d1val2 + q7*x%val)
       unary%d2val2 = q3*(-q5*x%d2val2 + q8*x%val)
       unary%d3val1 = q9*(q10*pow3(x%d1val1) + q11*x%d3val1 - q12*(3.0_dp*x%d2val1*x%val + q4))
-      unary%d2val1_d1val2 = (q1*q6*x%d1val2*x%val + q5*(-2.0_dp*q0*q4*x%d1val2 - q11*x%d2val1_d1val2 + q12*(q13 + q7)))*powm1(pow7(sqrt(q1)))
+      unary%d2val1_d1val2 = (q1*q6*x%d1val2*x%val &
+                             + q5*(-2.0_dp*q0*q4*x%d1val2 - q11*x%d2val1_d1val2 + q12*(q13 + q7)))*powm1(pow7(sqrt(q1)))
       unary%d1val1_d2val2 = q9*(q11*x%d1val1_d2val2 - q13*q14 - x%d1val1*(-q10*q8 + q5*(q15 + q8)))
       unary%d3val2 = q9*(q10*pow3(x%d1val2) + q11*x%d3val2 - q14*(3.0_dp*q15 + q8))
    end function asin_self
@@ -1621,7 +1644,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = -q3*(q8*x%val - q9)
       unary%d2val2 = q3*(-q10*x%val + q6*x%d2val2)
       unary%d3val1 = q11*(q12*x%d3val1 - q14*pow3(x%d1val1) - q15*x%d1val1*(3.0_dp*x%d2val1*x%val + q4))
-      unary%d2val1_d1val2 = q11*(-q1*x%d1val2*x%val*(q5 - q7) + q6*(2.0_dp*q0*q4*x%d1val2 + q15*x%d2val1_d1val2 - q6*x%d1val1*(q16*x%d1val1_d1val2 + q8)))
+      unary%d2val1_d1val2 = q11*(-q1*x%d1val2*x%val*(q5 - q7) &
+                          + q6*(2.0_dp*q0*q4*x%d1val2 + q15*x%d2val1_d1val2 - q6*x%d1val1*(q16*x%d1val1_d1val2 + q8)))
       unary%d1val1_d2val2 = (-q15*x%d1val1_d2val2 + q16*q9*x%d1val2 + x%d1val1*(-q10*q13 + q6*(q10 + q17)))*powm1(pow5(sqrt(q1)))
       unary%d3val2 = q11*(q12*x%d3val2 - q14*pow3(x%d1val2) - q15*x%d1val2*(3.0_dp*q17 + q10))
    end function acos_self
@@ -1725,7 +1749,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q6*(q2*x%d1val1_d1val2 + q7*x%d1val1)
       unary%d2val2 = q6*(-q5*x%d2val2 + q8*x%val)
       unary%d3val1 = q11*(q10*x%d3val1 - q5*x%d1val1*(3.0_dp*x%d2val1*x%val + q4) + q9*pow3(x%d1val1))
-      unary%d2val1_d1val2 = q3*(q12*x%d2val1_d1val2 + q13*q14 - q13*x%d2val1_d1val2 + q14 - q16*q17 + q16*x%val - q17*x%d1val2*x%d2val1 + q7*x%d2val1 + x%d2val1_d1val2)*powm1(q12 - q13 + 1)
+      unary%d2val1_d1val2 = q3*(q12*x%d2val1_d1val2 + q13*q14 - q13*x%d2val1_d1val2 + q14 &
+                                - q16*q17 + q16*x%val - q17*x%d1val2*x%d2val1 + q7*x%d2val1 + x%d2val1_d1val2)*powm1(q12 - q13 + 1)
       unary%d1val1_d2val2 = q11*(q10*x%d1val1_d2val2 - q15*q5*q7 - x%d1val1*(q5*(q18 + q8) - q8*q9))
       unary%d3val2 = q11*(q10*x%d3val2 - q5*x%d1val2*(3.0_dp*q18 + q8) + q9*pow3(x%d1val2))
    end function asinpi_self
@@ -1782,7 +1807,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = -q6*(q7*x%d1val1 - q8)
       unary%d2val2 = q6*(q5*x%d2val2 - q9*x%val)
       unary%d3val1 = q14*(q10*x%d3val1 - q12*pow3(x%d1val1) - q13*x%d1val1*(3.0_dp*x%d2val1*x%val + q4))
-      unary%d2val1_d1val2 = q3*(-q15*x%d2val1_d1val2 - q16*q18 + q16*x%d2val1_d1val2 + q17*q19 - q17*x%val - q18 + q19*x%d1val2*x%d2val1 - q7*x%d2val1 - x%d2val1_d1val2)*powm1(q15 - q16 + 1)
+      unary%d2val1_d1val2 = q3*(-q15*x%d2val1_d1val2 - q16*q18 + q16*x%d2val1_d1val2 + q17*q19 - q17*x%val &
+                                - q18 + q19*x%d1val2*x%d2val1 - q7*x%d2val1 - x%d2val1_d1val2)*powm1(q15 - q16 + 1)
       unary%d1val1_d2val2 = q0*(2.0_dp*q7*q8 - q13*x%d1val1_d2val2 + x%d1val1*(-q11*q9 + q5*(q20 + q9)))*powm1(pow5(sqrt(q2)))
       unary%d3val2 = q14*(q10*x%d3val2 - q12*pow3(x%d1val2) - q13*x%d1val2*(3.0_dp*q20 + q9))
    end function acospi_self
@@ -1847,8 +1873,12 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q7*(q0*x%d1val1_d1val2 - q8*x%d1val1 + x%d1val1_d1val2)
       unary%d2val2 = q7*(q0*x%d2val2 - q4*q9 + x%d2val2)
       unary%d3val1 = q10*(-2.0_dp*q11 + q11*q17 - q12*q13 - q13*q16 + q14*x%d3val1 + q5*x%d3val1 + x%d3val1)
-      unary%d2val1_d1val2 = q10*(-q12*q18 + q14*x%d2val1_d1val2 - q15*q19*x%d2val1 - q16*q18 + q17*q3*x%d1val2 - q19*q3 + q5*x%d2val1_d1val2 - q8*x%d2val1 + x%d2val1_d1val2)
-      unary%d1val1_d2val2 = q10*(q14*x%d1val1_d2val2 - q15*q20 + q17*q9*x%d1val1 - q20*x%val - q21*q22 - q21*q9 - q4*x%d1val1*x%d2val2 + q5*x%d1val1_d2val2 + x%d1val1_d2val2)
+      unary%d2val1_d1val2 = q10 * &
+                            (-q12*q18 + q14*x%d2val1_d1val2 - q15*q19*x%d2val1 - q16*q18 &
+                              + q17*q3*x%d1val2 - q19*q3 + q5*x%d2val1_d1val2 - q8*x%d2val1 + x%d2val1_d1val2)
+      unary%d1val1_d2val2 = q10 * &
+                            (q14*x%d1val1_d2val2 - q15*q20 + q17*q9*x%d1val1 - q20*x%val &
+                              - q21*q22 - q21*q9 - q4*x%d1val1*x%d2val2 + q5*x%d1val1_d2val2 + x%d1val1_d2val2)
       unary%d3val2 = q10*(-2.0_dp*q23 + q14*x%d3val2 + q17*q23 - q22*q24 - q24*x%d2val2*x%val + q5*x%d3val2 + x%d3val2)
    end function atanpi_self
 
@@ -1894,7 +1924,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(-q7*x%val + q8)
       unary%d2val2 = q3*(q1*x%d2val2 - q9*x%val)
       unary%d3val1 = q10*(q11*pow3(x%d1val1) + q12*x%d3val1 - q13*(3.0_dp*x%d2val1*x%val + q4))
-      unary%d2val1_d1val2 = q10*(2.0_dp*q0*q4*x%d1val2 + q12*x%d2val1_d1val2 - q13*(2.0_dp*x%d1val1_d1val2*x%val + q7) + q14*(q5 - q6))
+      unary%d2val1_d1val2 = q10*(2.0_dp*q0*q4*x%d1val2 &
+                                 + q12*x%d2val1_d1val2 - q13*(2.0_dp*x%d1val1_d1val2*x%val + q7) + q14*(q5 - q6))
       unary%d1val1_d2val2 = q10*(-2.0_dp*q14*q8 + q12*x%d1val1_d2val2 - x%d1val1*(q1*(q15 + q9) - q11*q9))
       unary%d3val2 = q10*(-q1*x%d1val2*(3.0_dp*q15 + q9) + q11*pow3(x%d1val2) + q12*x%d3val2)
    end function asinh_self
@@ -1941,7 +1972,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(-q7*x%val + q8)
       unary%d2val2 = q3*(q1*x%d2val2 - q9*x%val)
       unary%d3val1 = q10*(q11*pow3(x%d1val1) + q12*x%d3val1 - q13*(3.0_dp*x%d2val1*x%val + q4))
-      unary%d2val1_d1val2 = q10*(2.0_dp*q0*q4*x%d1val2 + q12*x%d2val1_d1val2 - q13*(2.0_dp*x%d1val1_d1val2*x%val + q7) + q14*(q5 - q6))
+      unary%d2val1_d1val2 = q10*(2.0_dp*q0*q4*x%d1val2 &
+                                 + q12*x%d2val1_d1val2 - q13*(2.0_dp*x%d1val1_d1val2*x%val + q7) + q14*(q5 - q6))
       unary%d1val1_d2val2 = q10*(-2.0_dp*q14*q8 + q12*x%d1val1_d2val2 - x%d1val1*(q1*(q15 + q9) - q11*q9))
       unary%d3val2 = q10*(-q1*x%d1val2*(3.0_dp*q15 + q9) + q11*pow3(x%d1val2) + q12*x%d3val2)
    end function acosh_self
@@ -2083,7 +2115,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(2.0_dp*x%d1val1*x%d1val2 + q4)
       unary%d2val2 = q3*(2.0_dp*q6 + q5)
       unary%d3val1 = 18.0_dp*q1*x%d1val1 + 6.0_dp*pow3(x%d1val1) + q0*x%d3val1
-      unary%d2val1_d1val2 = 3.0_dp*q2*x%d1val2 + q3*(4.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val)
+      unary%d2val1_d1val2 = 3.0_dp*q2*x%d1val2 &
+                            + q3*(4.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val)
       unary%d1val1_d2val2 = 12.0_dp*q4*x%d1val2 + 6.0_dp*x%d1val1*(q5 + q6) + q0*x%d1val1_d2val2
       unary%d3val2 = 18.0_dp*q5*x%d1val2 + 6.0_dp*pow3(x%d1val2) + q0*x%d3val2
    end function pow3_self
@@ -2118,7 +2151,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q4*(q5 + q6*x%d1val2)
       unary%d2val2 = q4*(3.0_dp*q8 + q7)
       unary%d3val1 = q9*(6.0_dp*pow3(x%d1val1) + 9.0_dp*q1*x%d1val1 + q3*x%d3val1)
-      unary%d2val1_d1val2 = q9*(2.0_dp*q2*x%d1val2 + x%val*(6.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
+      unary%d2val1_d1val2 = q9*(2.0_dp*q2*x%d1val2 &
+                            + x%val*(6.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
       unary%d1val1_d2val2 = q9*(6.0_dp*q5*x%d1val2 + q3*x%d1val1_d2val2 + q6*(2.0_dp*q8 + q7))
       unary%d3val2 = q9*(6.0_dp*pow3(x%d1val2) + 9.0_dp*q7*x%d1val2 + q3*x%d3val2)
    end function pow4_self
@@ -2153,7 +2187,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(q4 + q5*x%d1val2)
       unary%d2val2 = q3*(4.0_dp*q7 + q6)
       unary%d3val1 = q9*(12.0_dp*q1*x%d1val1 + 12.0_dp*pow3(x%d1val1) + q8*x%d3val1)
-      unary%d2val1_d1val2 = q9*(3.0_dp*q2*x%d1val2 + x%val*(8.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
+      unary%d2val1_d1val2 = q9*(3.0_dp*q2*x%d1val2 &
+                            + x%val*(8.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
       unary%d1val1_d2val2 = q9*(8.0_dp*q4*x%d1val2 + q5*(3.0_dp*q7 + q6) + q8*x%d1val1_d2val2)
       unary%d3val2 = q9*(12.0_dp*q6*x%d1val2 + 12.0_dp*pow3(x%d1val2) + q8*x%d3val2)
    end function pow5_self
@@ -2188,7 +2223,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(q4 + q5*x%d1val2)
       unary%d2val2 = q3*(5.0_dp*q7 + q6)
       unary%d3val1 = q9*(15.0_dp*q1*x%d1val1 + 20.0_dp*pow3(x%d1val1) + q8*x%d3val1)
-      unary%d2val1_d1val2 = q9*(4.0_dp*q2*x%d1val2 + x%val*(10.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
+      unary%d2val1_d1val2 = q9*(4.0_dp*q2*x%d1val2 + &
+                            x%val*(10.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
       unary%d1val1_d2val2 = q9*(10.0_dp*q4*x%d1val2 + q5*(4.0_dp*q7 + q6) + q8*x%d1val1_d2val2)
       unary%d3val2 = q9*(15.0_dp*q6*x%d1val2 + 20.0_dp*pow3(x%d1val2) + q8*x%d3val2)
    end function pow6_self
@@ -2223,7 +2259,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(q4 + q5*x%d1val2)
       unary%d2val2 = q3*(6.0_dp*q7 + q6)
       unary%d3val1 = q9*(18.0_dp*q1*x%d1val1 + 30.0_dp*pow3(x%d1val1) + q8*x%d3val1)
-      unary%d2val1_d1val2 = q9*(5.0_dp*q2*x%d1val2 + x%val*(12.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
+      unary%d2val1_d1val2 = q9*(5.0_dp*q2*x%d1val2 &
+                            + x%val*(12.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
       unary%d1val1_d2val2 = q9*(12.0_dp*q4*x%d1val2 + q5*(5.0_dp*q7 + q6) + q8*x%d1val1_d2val2)
       unary%d3val2 = q9*(18.0_dp*q6*x%d1val2 + 30.0_dp*pow3(x%d1val2) + q8*x%d3val2)
    end function pow7_self
@@ -2258,7 +2295,8 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d1val2 = q3*(q4 + q5*x%d1val2)
       unary%d2val2 = q3*(7.0_dp*q7 + q6)
       unary%d3val1 = q9*(21.0_dp*q1*x%d1val1 + 42.0_dp*pow3(x%d1val1) + q8*x%d3val1)
-      unary%d2val1_d1val2 = q9*(6.0_dp*q2*x%d1val2 + x%val*(14.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
+      unary%d2val1_d1val2 = q9*(6.0_dp*q2*x%d1val2 &
+                            + x%val*(14.0_dp*x%d1val1*x%d1val1_d1val2 + x%d1val2*x%d2val1 + x%d2val1_d1val2*x%val))
       unary%d1val1_d2val2 = q9*(14.0_dp*q4*x%d1val2 + q5*(6.0_dp*q7 + q6) + q8*x%d1val1_d2val2)
       unary%d3val2 = q9*(21.0_dp*q6*x%d1val2 + 42.0_dp*pow3(x%d1val2) + q8*x%d3val2)
    end function pow8_self
@@ -2463,8 +2501,10 @@ module auto_diff_real_2var_order3_module
       binary%d1val1_d1val2 = x%d1val1*y%d1val2 + x%d1val1_d1val2*y%val + x%d1val2*y%d1val1 + x%val*y%d1val1_d1val2
       binary%d2val2 = q1*x%d1val2 + x%d2val2*y%val + x%val*y%d2val2
       binary%d3val1 = 3.0_dp*x%d1val1*y%d2val1 + 3.0_dp*x%d2val1*y%d1val1 + x%d3val1*y%val + x%val*y%d3val1
-      binary%d2val1_d1val2 = 2.0_dp*x%d1val1_d1val2*y%d1val1 + q0*y%d1val1_d1val2 + x%d1val2*y%d2val1 + x%d2val1*y%d1val2 + x%d2val1_d1val2*y%val + x%val*y%d2val1_d1val2
-      binary%d1val1_d2val2 = 2.0_dp*x%d1val2*y%d1val1_d1val2 + q1*x%d1val1_d1val2 + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2
+      binary%d2val1_d1val2 = 2.0_dp*x%d1val1_d1val2*y%d1val1 + q0*y%d1val1_d1val2 &
+                             + x%d1val2*y%d2val1 + x%d2val1*y%d1val2 + x%d2val1_d1val2*y%val + x%val*y%d2val1_d1val2
+      binary%d1val1_d2val2 = 2.0_dp*x%d1val2*y%d1val1_d1val2 + q1*x%d1val1_d1val2 &
+                             + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2
       binary%d3val2 = 3.0_dp*x%d1val2*y%d2val2 + 3.0_dp*x%d2val2*y%d1val2 + x%d3val2*y%val + x%val*y%d3val2
    end function mul_self
 
@@ -2592,13 +2632,17 @@ module auto_diff_real_2var_order3_module
       binary%d2val1 = q7*(q13*x%val - q2*q9 + q8)
       binary%d1val1_d1val2 = q7*(q14 + q15*q3 - y%val*(q16 + x%d1val1*y%d1val2 + x%val*y%d1val1_d1val2))
       binary%d2val2 = q7*(-q15*q4 + q17 + q20*x%val)
-      binary%d3val1 = q21*(-3.0_dp*q8*y%d1val1 + 3.0_dp*q13*q2 + q6*x%d3val1 - x%val*(-6.0_dp*q10*y%d1val1 + 6.0_dp*pow3(y%d1val1) + q0*y%d3val1))
+      binary%d3val1 = q21*(-3.0_dp*q8*y%d1val1 + 3.0_dp*q13*q2 + q6*x%d3val1 &
+                           - x%val*(-6.0_dp*q10*y%d1val1 + 6.0_dp*pow3(y%d1val1) + q0*y%d3val1))
       binary%d2val1_d1val2 = q21*(-6.0_dp*q11*q5 + 2.0_dp*q10*q5 + 4.0_dp*q2*y%d1val1*y%d1val2 &
-                             + 4.0_dp*q3*y%d1val1_d1val2*y%val - q0*q22*x%d1val1 &
-                             - q0*x%d1val2*y%d2val1 - q0*x%val*y%d2val1_d1val2 + q12*q4 - q14*q9 + q6*x%d2val1_d1val2 - q8*y%d1val2)
+                           + 4.0_dp*q3*y%d1val1_d1val2*y%val - q0*q22*x%d1val1 &
+                           - q0*x%d1val2*y%d2val1 - q0*x%val*y%d2val1_d1val2 + q12*q4 - q14*q9 + q6*x%d2val1_d1val2 - q8*y%d1val2)
       binary%d1val1_d2val2 = q21*(-6.0_dp*q19*q3 + 2.0_dp*y%val*(q15*q16 + q19*x%d1val1 + q22*q5 + q3*y%d2val2) &
-                             - q0*(q15*x%d1val1_d1val2 + q22*x%d1val2 + x%d1val1*y%d2val2 + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2) + q6*x%d1val1_d2val2)
-      binary%d3val2 = q21*(-3.0_dp*q17*y%d1val2 + 3.0_dp*q20*q4 + q6*x%d3val2 - x%val*(-6.0_dp*q18*y%d1val2 + 6.0_dp*pow3(y%d1val2) + q0*y%d3val2))
+                           - q0*(q15*x%d1val1_d1val2 + q22*x%d1val2 &
+                                 + x%d1val1*y%d2val2 + x%d2val2*y%d1val1 + x%val*y%d1val1_d2val2) &
+                           + q6*x%d1val1_d2val2)
+      binary%d3val2 = q21*(-3.0_dp*q17*y%d1val2 + 3.0_dp*q20*q4 &
+                      + q6*x%d3val2 - x%val*(-6.0_dp*q18*y%d1val2 + 6.0_dp*pow3(y%d1val2) + q0*y%d3val2))
    end function div_self
 
    function div_self_real(x, y) result(unary)
@@ -2803,11 +2847,14 @@ module auto_diff_real_2var_order3_module
       binary%d2val1_d1val2 = (2.0_dp*q5*q8 + q14*q6 + q25*y%d2val1_d1val2 + q29*q4 &
                              + q9*(q27*x%d1val1 + q28*y%d1val1 + x%d1val2*y%d2val1 &
                              + x%d2val1*y%d1val2 + x%d2val1_d1val2*y%val) &
-                             - x%val*(2.0_dp*q16*x%d1val1 + q1*q28 + q5*x%d2val1 + q8*y%d1val2))*pow(x%val, 10.0_dp + y%val)*powm1(pow(x%val, 13.0_dp))
+                             - x%val*(2.0_dp*q16*x%d1val1 + q1*q28 + q5*x%d2val1 + q8*y%d1val2)) &
+                              * pow(x%val, 10.0_dp + y%val)*powm1(pow(x%val, 13.0_dp))
       binary%d1val1_d2val2 = q23*(2.0_dp*q1*q18 + q22*q4 + q25*y%d1val1_d2val2 + q29*q6 &
                              + q9*(q27*x%d1val2 + q28*y%d1val2 + x%d1val1*y%d2val2 + x%d1val1_d2val2*y%val + x%d2val2*y%d1val1) &
                              - x%val*(2.0_dp*q15*x%d1val2 + q1*x%d2val2 + q18*y%d1val1 + q28*q5))
-      binary%d3val2 = q23*(3.0_dp*q21*q6 + q24*pow3(x%d1val2) + q25*y%d3val2 - q30*x%val*(q19 + q20) + q9*(3.0_dp*x%d2val2*y%d1val2 + q30*y%d2val2 + x%d3val2*y%val) + pow3(q6))
+      binary%d3val2 = q23 * &
+                      ( 3.0_dp*q21*q6 + q24*pow3(x%d1val2) + q25*y%d3val2 - q30*x%val*(q19 + q20) &
+                       + q9*(3.0_dp*x%d2val2*y%d1val2 + q30*y%d2val2 + x%d3val2*y%val) + pow3(q6))
    end function pow_self
 
    function pow_self_real(x, y) result(unary)

@@ -1,24 +1,21 @@
-    ! ***********************************************************************
-    !
-    !   Copyright (C) 2010  The MESA Team
-    !
-    !   this file is part of mesa.
-    !
-    !   mesa is free software; you can redistribute it and/or modify
-    !   it under the terms of the gnu general library public license as published
-    !   by the free software foundation; either version 2 of the license, or
-    !   (at your option) any later version.
-    !
-    !   mesa is distributed in the hope that it will be useful,
-    !   but without any warranty; without even the implied warranty of
-    !   merchantability or fitness for a particular purpose.  see the
-    !   gnu library general public license for more details.
-    !
-    !   you should have received a copy of the gnu library general public license
-    !   along with this software; if not, write to the free software
-    !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
-    !
-    ! ***********************************************************************
+! ***********************************************************************
+!
+!   Copyright (C) 2010  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
 
     module run_star_extras
 
@@ -294,8 +291,8 @@
                 f = 0.0_dp
                 f0 = 0.0_dp
                 f2 = 0.0_dp
-            endif
-        endif
+            end if
+        end if
 
         ! Evaluate convective boundary (_cb) parameters
         call star_eval_conv_bdy_r(s, i, r_cb, ierr)
@@ -319,13 +316,13 @@
             k_a = k_ob+1
             k_b = s%nz
             dk = 1
-        endif
+        end if
 
         if (f > 0.0_dp) then
             r_step = f*Hp_cb
         else
             r_step = 0.0_dp
-        endif
+        end if
 
         face_loop : do k = k_a, k_b, dk
             ! Evaluate the extended convective penetration factor
@@ -334,7 +331,7 @@
                 dr = r - r_ob
             else
                 dr = r_ob - r
-            endif
+            end if
 
             if (dr < r_step .AND. f > 0.0_dp) then  ! step factor
                 factor = 1.0_dp
@@ -343,8 +340,8 @@
                     factor = exp(-2.0_dp*(dr-r_step)/(f2*Hp_cb))
                 else
                     factor = 0.0_dp
-                endif
-            endif
+                end if
+            end if
 
             ! Store the diffusion coefficient and velocity
             D(k) = (D0 + Delta0*D_ob)*factor
@@ -360,7 +357,7 @@
             if (D(k) < s%overshoot_D_min) then
                 k_b = k
                 exit face_loop
-            endif
+            end if
 
         end do face_loop
 
@@ -398,7 +395,7 @@
               write(*,*) 'runstarex_gradT: skip since there are no convective boundaries'
            end if
            return
-        endif
+        end if
 
         do k= s%nz, 1, -1
             if (s%D_mix(k) <= s% min_D_mix) exit

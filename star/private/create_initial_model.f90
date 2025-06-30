@@ -2,38 +2,32 @@
 !
 !   Copyright (C) 2012-2019  Phil Arras & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module create_initial_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi, pi4, mp, lsun, msun, standard_cgrav, boltzm, boltz_sigma, &
+                           arg_not_provided, two_thirds, four_thirds_pi
       use chem_def
 
       implicit none
 
       private
       public :: build_initial_model
-
 
       integer :: eos_handle, kap_handle, species
 
@@ -56,9 +50,7 @@
       type (create_star_info), target, save :: &
          create_star_handles(max_create_star_handles)
 
-
       contains
-
 
       subroutine get_create_star_ptr(id,cs,ierr)
          integer, intent(in) :: id
@@ -359,11 +351,11 @@
             if (T<150.d0) then
                print *,"temp too low in integration"
                stop
-            endif
+            end if
 
             if (tau < 2.d0/3.d0) then
                exitnow=.true.
-            endif
+            end if
 
             if (exitnow) exit
 
@@ -459,7 +451,7 @@
          if(ierr/=0) then
             write(*,*) 'kap_get failed'
             stop
-         endif
+         end if
 
       end subroutine get_kap_from_rhoT
 
@@ -498,7 +490,7 @@
          if (ierr /=0) then
             print *,"failure in eosPT_get_T"
             stop
-         endif
+         end if
          T = exp10(logT_result)
 
     ! don't let T get below min temp. use to make a surface isotherm.
@@ -506,6 +498,4 @@
 
       end subroutine get_TRho_from_PS
 
-
       end module create_initial_model
-

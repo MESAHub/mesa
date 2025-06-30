@@ -8,7 +8,7 @@
       save_model_when_terminate = .true.
       save_model_filename = "planet_create_0.9685_MJ_2.0_RJ.mod"
       required_termination_code_string = 'max_age'
-      
+
       ! new adiabatic, contracting initial model
       create_initial_model = .true.
       radius_in_cm_for_create_initial_model = 13982200000.d0 ! in cm
@@ -17,7 +17,7 @@
 	
       set_initial_age = .true.
       initial_age = 0.d0 ! in years
-      
+
       !pgstar_flag = .true.
 
 / !end of star_job
@@ -39,13 +39,13 @@
 
    use_gold2_tolerances = .false. ! wait a few steps
    steps_before_use_gold2_tolerances = 31
-      
+
    warning_limit_for_max_residual = 1d99 ! off until evolve
    warn_when_large_virial_thm_rel_err = 1d99 ! off until evolve
 
    limit_for_rel_error_in_energy_conservation = 1d-5
    hard_limit_for_rel_error_in_energy_conservation = 1d-3
-      
+
    convergence_ignore_equL_residuals = .true.
 
       ! limit max_model_number as part of test_suite
@@ -78,12 +78,10 @@
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+   ! top level controls
 
+   !pause_flag = .true.
+   ! if true, the code waits for user to enter a RETURN on the command line
 
 / ! end of pgstar namelist

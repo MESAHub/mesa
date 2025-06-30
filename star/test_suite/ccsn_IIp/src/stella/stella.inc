@@ -2,11 +2,11 @@
       subroutine read_inlist_stella(ierr)
          integer, intent(out) :: ierr
          character (len=256) :: filename, message
-         integer :: unit         
+         integer :: unit
          filename = 'inlist_stella'
-         
+
          write(*,*) 'read_inlist_stella'
-         
+
          ! set defaults
          save_stella_data_when_terminate = .true.
          save_stella_data_filename = 'mesa'
@@ -25,22 +25,22 @@
          if (ierr /= 0) then
             write(*, *) 'Failed to open control namelist file ', trim(filename)
          else
-            read(unit, nml=stella, iostat=ierr)  
+            read(unit, nml=stella, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=stella)
                close(unit)
-            end if  
+            end if
          end if
 
       end subroutine read_inlist_stella
-      
-      
+
+
       subroutine write_stella_data(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -54,7 +54,7 @@
             stella_v_wind, stella_show_headers, ierr)
       end subroutine write_stella_data
 
-      
+
       subroutine write_stella_files(s, &
             fname, &
             min_surf_logRho, &
@@ -63,7 +63,7 @@
             skip_inner_v_limit, &
             num_points, &
             nz_extra, &
-            mdot_years_for_CSM, & 
+            mdot_years_for_CSM, &
             mdot_for_CSM, &
             v_CSM, &
             show_headers, ierr)
@@ -77,7 +77,7 @@
             min_velocity, &
             skip_inner_dm, &
             skip_inner_v_limit, &
-            mdot_years_for_CSM, & 
+            mdot_years_for_CSM, &
             mdot_for_CSM, &
             v_CSM
          integer, intent(in) :: &
@@ -85,8 +85,8 @@
             nz_extra
          logical, intent(in) :: show_headers
          integer, intent(out) :: ierr
-            
-         integer, parameter :: io_hyd = 34, io_abn = 35         
+
+         integer, parameter :: io_hyd = 34, io_abn = 35
          integer :: &
             i_h1, i_he3, i_he4, i_c12, i_n14, i_o16, i_ne20, &
             i_mg24, i_si28, i_s32, i_ar36, i_ca40, i_ti44, &
@@ -117,11 +117,11 @@
             o16_out, ne20_out, mg24_out, si28_out, s32_out, &
             ar36_out, ca40_out, ti44_out, cr48_out, cr60_out, &
             fe52_out, fe54_out, fe56_out, co56_out, ni56_out
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          i_h1 = s% net_iso(ih1)
          i_he3 = s% net_iso(ihe3)
          i_he4 = s% net_iso(ihe4)
@@ -142,10 +142,10 @@
          i_fe56 = s% net_iso(ife56)
          i_co56 = s% net_iso(ico56)
          i_ni56 = s% net_iso(ini56)
-         
+
          open(unit=io_hyd, file=trim(fname) // '.hyd', action='write', status='replace')
          open(unit=io_abn, file=trim(fname) // '.abn', action='write', status='replace')
-         
+
          nz = s% nz
          n = num_points - nz_extra
          if (nz_extra > 0) then
@@ -153,7 +153,7 @@
          else
             radius_wind = 0
          end if
-         
+
          k_center = nz
          do k = nz, 1, -1
             if (s% m(k) >= s% M_center + skip_inner_dm*Msun) then
@@ -174,13 +174,13 @@
                exit
             end if
          end do
-         
+
          tot_ni56 = dot_product(s% dm(1:k_center), s% xa(i_ni56,1:k_center))
          tot_co56 = dot_product(s% dm(1:k_center), s% xa(i_co56,1:k_center))
          !write(*,2) 'k_center', k_center, s% m(k_center)/Msun, (tot_co56 + tot_ni56)/Msun
-         
+
          nz_mod = k_center - k_surf + 1
-         
+
          allocate( &
             mmid(nz), rmid(nz), taumid(nz), work(nz*pm_work_size))
          k = nz_mod
@@ -214,7 +214,7 @@
          do k = n-kout+1, n
             interp_ks(k) = interp_ks(k-1) + 1d0
          end do
-         
+
          do k = 1, nz-1
             mmid(k) = 0.5d0*(s% m(k) + s% m(k+1))
             rmid(k) = 0.5d0*(s% r(k) + s% r(k+1))
@@ -223,7 +223,7 @@
          mmid(nz) = 0.5d0*(s% m(nz) + s% M_center)
          rmid(nz) = 0.5d0*(s% r(nz) + s% R_center)
          taumid(nz) = s% tau(nz)
-      
+
          ! vectors of model data at cell centers ordered from inner to outer
          do k=1,nz_mod
             j = k_center-k+1
@@ -259,7 +259,7 @@
             if (i_co56 > 0) co56_mod(k) = s% xa(i_co56,j)
             if (i_ni56 > 0) ni56_mod(k) = s% xa(i_ni56,j)
          end do
-         
+
          call interp1(mmid_mod, mmid_out)
          call interp1(rmid_mod, rmid_out)
          call interp1(u_mod, u_out)
@@ -291,7 +291,7 @@
          if (i_fe56 > 0) call interp1(fe56_mod, fe56_out)
          if (i_co56 > 0) call interp1(co56_mod, co56_out)
          if (i_ni56 > 0) call interp1(ni56_mod, ni56_out)
-         
+
          if (k_center == nz) then
             m_center = s% M_center
             r_center = s% R_center
@@ -300,12 +300,12 @@
             r_center = s% r(k_center+1)
          end if
          rho_center = s% rho(k_center)
-         
+
          if (show_headers) &
             write(io_hyd,'(12x,a)') '   n      mass IB        R IB           rho IB'
          write(io_hyd,'(1pe12.6,i5,3(3x,1pe12.6))') &
             0.0d0, n+nz_extra, m_center/Msun, r_center, rho_center
-         
+
          if (show_headers) then
             write(io_hyd,'(99a24)') &
               "mass (Msun)", & !      # 1
@@ -344,7 +344,7 @@
 
          f_na23 = 0.044538489161177d0 ! Lodders 2009 ratio of na/n.
          f_al27 = 0.0766594958504439d0 ! Lodders 2009 ratio of al/n.
-   
+
          total_co56 = 0
          total_ni56 = 0
          h1 = 0
@@ -370,14 +370,14 @@
          na23 = 0
          al27 = 0
          minx = 1d-30
-      
+
          ! measure ni56 + co56
          mass = m_center
          do i=1,n
             m_prev = mass
             mass = mmid_out(i)
             dm = mass - m_prev
-               
+
             if (i_h1 > 0) h1 = h1_out(i)
             if (i_he3 > 0) he3 = he3_out(i)
             if (i_he4 > 0) he4 = he4_out(i)
@@ -400,7 +400,7 @@
             na23 = f_na23*n14
             al27 = f_al27*n14
             n14 = n14 - na23 - al27
-            
+
             xsum = h1 + he3 + he4 + c12 + n14 + o16 + ne20 + na23 + mg24 + al27 + si28 + &
                  s32 + ar36 + ca40 + ti44 + cr48 + cr60 + fe52 + fe54 + fe56 + co56 + ni56
             if (xsum > 1.1d0 .or. xsum < 0.9d0 .or. is_bad(xsum)) then
@@ -443,11 +443,11 @@
                stop 'write_stella_files'
             end if
          end do
-      
+
          ! adjust mass fractions to get desired ni56 + co56
          f = (tot_co56 + tot_ni56)/(total_co56 + total_ni56)
          !write(*,1) 'f', f, (tot_co56 + tot_ni56)/Msun, (total_co56 + total_ni56)/Msun
-         
+
          do i=1,n
             o16_out(i) = o16_out(i) - (f-1d0)*(co56_out(i) + ni56_out(i))
             if (o16_out(i) > 1d01 .or. o16_out(i) < 0d0) then
@@ -457,7 +457,7 @@
             co56_out(i) = f*co56_out(i)
             ni56_out(i) = f*ni56_out(i)
          end do
-      
+
          r = 0
          mass = 0
          density = 0
@@ -484,7 +484,7 @@
             write(io_hyd,'(i4,99(1pe24.16))') &
                i, mass/Msun, r, density, temperature, velocity, pressure, &
                0d0, energy, entropy, opacity, tau, v_div_csound
-               
+
             if (i_h1 > 0) h1 = h1_out(i)
             if (i_he3 > 0) he3 = he3_out(i)
             if (i_he4 > 0) he4 = he4_out(i)
@@ -507,7 +507,7 @@
             na23 = f_na23*n14
             al27 = f_al27*n14
             n14 = n14 - na23 - al27
-            
+
             xsum = h1 + he3 + he4 + c12 + n14 + o16 + ne20 + na23 + mg24 + al27 + si28 + &
                  s32 + ar36 + ca40 + ti44 + cr48 + cr60 + fe52 + fe54 + fe56 + co56 + ni56
             if (xsum > 1.1d0 .or. xsum < 0.9d0) then
@@ -547,7 +547,7 @@
             write(io_abn,'(i4,3(1pe13.6),99(1pe14.6))') &
                i, &
                mass/Msun, &
-               dm/Msun, & 
+               dm/Msun, &
                r, &
                max(h1, minx), &
                max(he3 + he4, minx), &
@@ -566,7 +566,7 @@
                minx, &
                max(co56 + ni56, minx)
          end do
-      
+
          if (nz_extra > 0 .and. radius_wind > r) then
             velocity = v_CSM*1d5 ! convert km/s to cm/s
             K_wind = mdot_for_CSM*Msun/secyer/(4*pi*velocity)
@@ -584,7 +584,7 @@
                write(io_abn,'(i4,3(1pe13.6),99(1pe14.6))') &
                   n+i, &
                   mass/Msun, &
-                  dm/Msun, & 
+                  dm/Msun, &
                   r, &
                   max(h1, minx), &
                   max(he3 + he4, minx), &
@@ -604,13 +604,13 @@
                   max(co56 + ni56, minx)
             end do
          end if
-         
+
          write(*,*)
          write(*,1) 'stella total mass co56+ni56', (total_co56 + total_ni56)/Msun
-         
+
          close(io_hyd)
          close(io_abn)
-            
+
          deallocate( &
             model_ks, &
             mmid_mod, rmid_mod, tau_mod, u_mod, rho_mod, &
@@ -633,7 +633,7 @@
             mmid, rmid, taumid, work)
 
          contains
-         
+
          subroutine interp1(v_old, v_new)
             real(dp), pointer, dimension(:) :: v_old, v_new
             call interpolate_vector( &
@@ -644,5 +644,3 @@
 
 
       end subroutine write_stella_files
-
-

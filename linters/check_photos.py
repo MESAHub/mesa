@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import re
 from collections.abc import MutableSet
 
-MESA_DIR = "../"
+MESA_DIR = os.environ.get("MESA_DIR", "../")
 
 
 class CaseInsensitiveSet(MutableSet):
@@ -120,7 +121,6 @@ def get_star_data_set_input_variables():
     input_vars = []
 
     for line in lines:
-
         # first, lose white space
         line = line.strip()
 
@@ -163,27 +163,40 @@ def check_in_out():
     v_in = get_photo_in_variables()
     v_out = get_photo_out_variables()
 
+    print("=== Photo In/Out Comparison ===")
+
     print_section("In, not out")
     print_variables(v_in - v_out)
 
     print_section("Out, not in")
     print_variables(v_out - v_in)
 
+    print()
+
+    # return 0 if pass, else 1
+    return 0 if not (v_in - v_out or v_out - v_in) else 1
+
 
 def check_step_input():
-
     sd_vars = get_star_data_set_input_variables()
     pi_vars = get_photo_in_variables()
+
+    print("=== Step Input / Photo In Comparison ===")
 
     print_section("step input vars not read in photo")
     print_variables(sd_vars - pi_vars)
 
-
-if __name__ == "__main__":
-
-    print("=== Photo In/Out Comparison ===")
-    check_in_out()
     print()
 
-    print("=== Step Input / Photo In Comparison ===")
-    check_step_input()
+    # return 0 if pass, else 1
+    return 0 if not (sd_vars - pi_vars) else 1
+
+
+if __name__ == "__main__":
+    failed = check_in_out() + check_step_input()
+    if not failed:
+        print("All checks passed.")
+        sys.exit(0)
+    else:
+        print("Some checks failed.")
+        sys.exit(1)

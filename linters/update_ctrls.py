@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 
+import os
+import re
+from collections.abc import MutableSet
+import functools
+import operator
+import sys
+
+MESA_DIR = os.environ["MESA_DIR"]
+
 # This file is designed to handle moving controls from s% xx to s% ctrl %xx
 # While this replicates a lot of check_defaults.py we want this to be standalone
 # and only depend on the python stdlib. This way users can easily use it to port their
@@ -9,16 +18,6 @@
 
 # Note this only works for s% (or s %) it does not work if you renamed the star_type variable
 # to something other than s, for instance in the binary module.
-
-import os
-import re
-from collections.abc import MutableSet
-import functools
-import operator
-import sys
-
-
-MESA_DIR = os.environ["MESA_DIR"]
 
 ctrls_files = [
     os.path.join("star_data", "private", "star_controls.inc"),
@@ -114,7 +113,7 @@ def get_inc(filename):
     # Remove line continutaion characters
     lines = [i.replace("&", "").strip() for i in lines if i]
 
-    # Remove type defintion (i.e real(dp) :: x) leaves just x
+    # Remove type definition (i.e real(dp) :: x) leaves just x
     # as well as anything that starts with a comment
     # or has a comment embedded in it
     for idl, line in enumerate(lines):

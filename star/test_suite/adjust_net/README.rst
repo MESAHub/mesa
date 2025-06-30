@@ -16,7 +16,7 @@ Inlists
 
 This test case has two parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_zams``) creates a 15 Msun, Z=0.02 metallicity, main-sequence model using the default 8 isotope ``basic.net``.
+* Part 1 (``inlist_zams``) creates a 15 |Msun|, Z=0.02 metallicity, main-sequence model using the default 8 isotope ``basic.net``.
 
 * Part 2 (``inlist_adjust_net_header``) continues the evolution, activates the adaptive nuclear reaction network, and terminates at about 2 million years with 62 isotopes in the reaction network:
 
@@ -96,6 +96,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 31May2021 (MESA e37f76f) by fxt
-

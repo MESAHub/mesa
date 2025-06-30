@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -29,7 +23,7 @@
       use star_def
       use chem_def
       use chem_lib
-      use const_def
+      use const_def, only: dp, pi, ln10, amu, mp, secyer, kerg, msun, rsun, lsun, mesa_dir, arg_not_provided
       use math_lib
       use eos_lib
       use kap_def
@@ -1509,7 +1503,7 @@
 
 
       subroutine do_report_mass_not_fe56(s)
-         use const_def
+         use const_def, only: dp
          type (star_info), pointer :: s
          integer :: k, fe56
          real(dp) :: sumdq
@@ -1536,7 +1530,7 @@
 
 
       subroutine do_report_cell_for_xm(s)
-         use const_def
+         use const_def, only: dp
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: sumdq, dq
@@ -1587,7 +1581,7 @@
          ! Dont error if we are changing net
          if ((s% job% change_initial_net .or. s% job% change_net) .and. &
             trim(s% job% new_net_name)/=trim(s% net_name)) then
-               !write(*,*) "Not changing special rates untill net change"
+               !write(*,*) "Not changing special rates until net change"
                return
          end if
 
@@ -1941,7 +1935,7 @@
 
 
          subroutine change_net(net_name)
-            use const_def
+            use const_def, only: dp
             character (len=*), intent(in) :: net_name
 
             include 'formats'
@@ -1983,7 +1977,7 @@
 
 
       subroutine do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
-         use const_def
+         use const_def, only: dp
          use rates_def
          use rates_lib
          use utils_lib, only: utils_OMP_GET_MAX_THREADS
@@ -2087,7 +2081,7 @@
          if (max_timestep > 0 .and. max_timestep < s% dt_next) then
             write(*,1) 'max_timestep (seconds)', max_timestep
             s% dt_next = max_timestep
-         endif
+         end if
 
          if (s% job% set_initial_model_number .and. .not. restart) then
             write(*,2) 'set_initial_model_number', s% job% initial_model_number
@@ -2832,6 +2826,9 @@
 
          if (s% opacity_max > 0) &
             write(*,1) 'opacity_max', s% opacity_max
+
+         if (s% opacity_min > 0) &
+            write(*,1) 'opacity_min', s% opacity_min
 
          if (s% job% show_net_reactions_info) then
             write(*,'(a)') ' net reactions '
@@ -3677,7 +3674,7 @@
               call GET_ENVIRONMENT_VARIABLE('MESA_INLIST', inlist_out, STATUS=status)
               if (status /= 0) inlist_out = ''
 
-            endif
+            end if
          end if
 
         if (inlist_out == '') then
@@ -3686,11 +3683,9 @@
               inlist_out = inlist_opt
            else
               inlist_out = 'inlist'
-           endif
+           end if
 
-        endif
-
-        ! Finish
+        end if
 
         return
 
@@ -3718,7 +3713,6 @@
          end if
 
       end subroutine add_fpe_checks
-
 
 
       subroutine multiply_tolerances(id, s, ierr)
@@ -3792,7 +3786,3 @@
       end subroutine pgstar_env_check
 
       end module run_star_support
-
-
-
-

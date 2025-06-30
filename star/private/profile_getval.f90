@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,16 +21,22 @@
 
       use star_private_def
       use star_profile_def
-      use const_def
+      use const_def, only: dp, qe, kerg, avo, amu, boltz_sigma, secday, secyer, standard_cgrav, &
+         clight, four_thirds_pi, ln10, lsun, msun, pi, pi4, rsun, sqrt_2_div_3, one_third, &
+         convective_mixing, &
+         overshoot_mixing, &
+         semiconvective_mixing, &
+         thermohaline_mixing, &
+         minimum_mixing, &
+         anonymous_mixing, &
+         leftover_convective_mixing
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
 
       implicit none
 
-
       integer, parameter :: idel = 10000
-
       integer, parameter :: add_abundances = idel
       integer, parameter :: add_log_abundances = add_abundances + 1
       integer, parameter :: category_offset = add_log_abundances + 1
@@ -58,12 +58,9 @@
       integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
       integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
       integer, parameter :: extra_offset = eps_neu_rate_offset + idel
-
       integer, parameter :: max_profile_offset = extra_offset + idel
 
-
       contains
-
 
       integer function do1_profile_spec( &
             s, iounit, n, i, string, buffer, report, ierr) result(spec)
@@ -206,7 +203,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id)  ! Convert to net id not the gloabl rate id
+            id = g% net_reaction(id)  ! Convert to net id not the global rate id
             if (id > 0) then
                spec = offset + id
                return
@@ -420,6 +417,9 @@
             case (p_lum_conv_MLT)
                val = s% L_conv(k)/Lsun
 
+            case(p_Frad_div_cUrad)
+               val = ((s% L(k) - s% L_conv(k)) / (4._dp*pi*pow2(s%r(k)))) &
+                        /(clight * s% Prad(k) *3._dp)
             case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
                val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
             case (p_lum_rad_div_L_Edd)
@@ -767,7 +767,15 @@
                val = (s% Prad(k)/s% Pgas(k))/max(1d-12,s% L(k)/get_Ledd(s,k))
             case (p_pgas_div_p)
                val = s% Pgas(k)/s% Peos(k)
-
+            case (p_flux_limit_R)
+               if (s% use_dPrad_dm_form_of_T_gradient_eqn .and. k > 1) &
+                  val = s% flux_limit_R(k)
+            case (p_flux_limit_lambda)
+               if (s% use_dPrad_dm_form_of_T_gradient_eqn .and. k > 1) then
+                  val = s% flux_limit_lambda(k)
+               else
+                  val = 1d0
+               end if
             case (p_cell_collapse_time)
                if (s% v_flag) then
                   if (k == s% nz) then
@@ -2404,7 +2412,7 @@
                pt = v(k)
             else
                pt = (v(k)*s% dq(k-1) + v(k-1)*s% dq(k))/(s% dq(k-1) + s% dq(k))
-            endif
+            end if
          end function pt
 
 
@@ -2420,7 +2428,7 @@
                else
                   if_rot = 0
                end if
-            endif
+            end if
          end function if_rot
 
 
@@ -2436,10 +2444,9 @@
                else
                   if_rot_ad = 0
                end if
-            endif
+            end if
          end function if_rot_ad
 
       end subroutine getval_for_profile
 
       end module profile_getval
-

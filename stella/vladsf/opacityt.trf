@@ -159,7 +159,7 @@
        numelems = p_Nelements;
        call edensol(rho, temp, abund, eden, maxiter, acc,
             numelems);
- 	if (eden .ne. eden) print *, ' Bardak:',abund;
+   if (eden .ne. eden) print *, ' Bardak:',abund;
  -- ****************************************************
 --       write(0,3) rho, temp, eden / nucden;
  3:format(' rho: ', 1pe10.3, ' temp: ', 1pe10.3,
@@ -181,19 +181,19 @@
  -- Solve Saha-Boltzmann equation to compute the ionization.
             call sahaeqn(1, .true., press, temp, eden, iz,
                6, ionstg1(iz), frac, part);
- --	 if(iz.lt.4)
- --     +	 write(0,'(a,1p6g11.4)')' frac=',(frac(iqq),iqq=1,6)
+ --   if(iz.lt.4)
+ --     +   write(0,'(a,1p6g11.4)')' frac=',(frac(iqq),iqq=1,6)
            if (iz .eq. 1) iondenzHminus=totden * frac(0);
            do i = 1, min(6, iz+1);
               iondenz(i,iz) = totden * frac(i);
-  	      iondenz_part(i,iz) = iondenz(i,iz) / part(i);
+          iondenz_part(i,iz) = iondenz(i,iz) / part(i);
            end do;
- --	 if(iz.lt.4)
---      	 write(*,'(a,1p6g11.4)')' iondenz=',(iondenz(iqq,iz),iqq=1,6);
+ --   if(iz.lt.4)
+--         write(*,'(a,1p6g11.4)')' iondenz=',(iondenz(iqq,iz),iqq=1,6);
           else;
            do i = 1, min(6, iz+1);
               iondenz(i,iz) = 0.d0;
-  	      iondenz_part(i,iz) = 0.d0;
+          iondenz_part(i,iz) = 0.d0;
            end do;
           endif;
 --          write(*,*)' after sahaeqn: iz abund(iz) ionstg1(iz): ',iz, abund(iz), ionstg1(iz);
@@ -327,10 +327,10 @@
  --                              opac(nf) = opac(nf) + iondenz(i,iz) *
  -- seb changed: iondenz(i,iz) to iondenz(k,iz)
  -- !!! check also iondenz_part(i,iz) on this subj
- --			if ( i .ne. k ) then
- --				print *, ' in opacity.f  i,k',i,k
- --				pause
- --			endif
+ --      if ( i .ne. k ) then
+ --        print *, ' in opacity.f  i,k',i,k
+ --        pause
+ --      endif
                                opac(nf) = opac(nf) + iondenz_part(k,iz) *
                                     expfac * sig * (1.d+00 - expnu(nf));
                             end if;
@@ -364,4 +364,3 @@
        opac(nf) = opac(nf) + iondenzHminus * sig * (1.d+00 - expnu(nf));
 --       write(*,*)' hMinusAbsorp-> totden=',totden, 'opac(nf)=',opac(nf);
     end do;
-

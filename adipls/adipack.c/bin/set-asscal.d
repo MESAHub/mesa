@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adiajobs/set-asscal.d.x
 
 if [ $# -lt 2 ]

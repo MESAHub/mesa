@@ -4,7 +4,7 @@
 #  written by Francois Hebert, 2009-2010
 #
 #  this code calculates the charge state
-#   of a ‘heavy’ nucleus in a dense plasma
+#   of a heavy nucleus in a dense plasma
 #   of lighter, fully-ionized, atoms.
 #  ex: iron in a degenerate helium plasma
 #
@@ -51,11 +51,11 @@ gfortran install:
 
 to run:
 
-i have not implemented inlist input for this code, so input is hard-coded 
+i have not implemented inlist input for this code, so input is hard-coded
 in the main.f file which must be recompiled for each run.
-(just re-run the mk script. it’s quick)
+(just re-run the mk script. it's quick)
 
-the tfdh code prints the output to files as it runs. in order to keep things 
+the tfdh code prints the output to files as it runs. in order to keep things
 clean, i have set it up to take an output directory as command-line argument.
 
 
@@ -81,8 +81,8 @@ some issues:
 for the case of Fe in a He OCP, this region of pain lies roughly in the phase
 space of T ~ 1e8 K and ne ~< 1e27 cm^-3
 
-- for very high Ztrace cases, the central divergence is stronger and the code 
-will tend to behave strangely, giving Znet = 0. this is best dealt with by 
-increasing the initial radius "eps" of the tfdh and fast_tfdh integrators 
-to start further from the singularity. for runs with Ztrace ~ 100, i found 
+- for very high Ztrace cases, the central divergence is stronger and the code
+will tend to behave strangely, giving Znet = 0. this is best dealt with by
+increasing the initial radius "eps" of the tfdh and fast_tfdh integrators
+to start further from the singularity. for runs with Ztrace ~ 100, i found
 that increasing eps from 1e-13_dp to 1e-12_dp fixed this issue.
