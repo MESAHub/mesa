@@ -1,5 +1,4 @@
 ! ***********************************************************************
-!
 ! K-Nearest Neighbors interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 

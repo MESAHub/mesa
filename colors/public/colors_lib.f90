@@ -223,8 +223,6 @@ end subroutine colors_setup_hooks
     REAL(dp) :: wv, fl, cf, fwv, ftr
 
     csv_file = 'LOGS/SED/' // TRIM(remove_dat(filter_name)) // '_SED.csv'
-
-    ! Initialize error flag
     ierr = 0
 
     ! Load filter data
@@ -376,7 +374,6 @@ SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, &
     ! Validate inputs and replace invalid wavelengths with 0
     DO i = 1, SIZE(wavelengths) - 1
       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
-        PRINT *, "bolometric Invalid input at index", i, ":", wavelengths(i), fluxes(i)
         fluxes(i) = 0.0  ! Replace invalid wavelength with 0
       END IF
     END DO
@@ -503,9 +500,6 @@ FUNCTION calculatevegaflux(vega_filepath, filt_wave, filt_trans, &
   !-----------------------------------------------------------------------
   ! Bolometric correction interface (stub implementations)
   !-----------------------------------------------------------------------
-
-  ! These functions are defined as stubs since they appear to be
-  ! placeholder interfaces for future implementation
 
   real(dp) function get_bc_by_name(name, log_Teff, log_g, M_div_h, ierr)
     character(len=*), intent(in) :: name

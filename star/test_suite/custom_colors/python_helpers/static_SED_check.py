@@ -59,8 +59,6 @@ def process_all_files(directory, xlim=None):
         print("Convolved Flux shape:", convolved_flux.shape)
 
         # Normalize data safely
-        nflux = normalize(flux)
-        nconvolved_flux = normalize(convolved_flux)
         nfilter_trans = normalize(filter_trans)
 
         # Plot full SED only once (assume it is the same across files)
@@ -87,7 +85,8 @@ def process_all_files(directory, xlim=None):
 
         # Plot normalized filters if available
         if len(filter_wavelengths) > 0 and len(nfilter_trans) > 0:
-            pass  # plt.plot(filter_wavelengths, filter_trans, label=f"Filter ({file_path})", linewidth=1, linestyle=":")
+            # plt.plot(filter_wavelengths, filter_trans, label=f"Filter ({file_path})", linewidth=1, linestyle=":")
+            pass
 
     # Formatting
     plt.xlabel("Wavelengths")

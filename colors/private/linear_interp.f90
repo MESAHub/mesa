@@ -1,5 +1,4 @@
 ! ***********************************************************************
-!
 ! Linear interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 
@@ -46,22 +45,11 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
       bin_filename = TRIM(clean_path) // '/flux_cube.bin'
     END IF
 
-    !PRINT *, '============================================================'
-    !PRINT *, 'Loading precomputed flux cube from:', TRIM(bin_filename)
-    !PRINT *, 'Target parameters:'
-    !PRINT *, '  Teff    =', teff
-    !PRINT *, '  log_g   =', log_g
-    !PRINT *, '  [M/H]   =', metallicity
-    !PRINT *, '  Radius  =', R, ' (solar radii)'
-    !PRINT *, '  Distance=', d, ' (cm)'
 
     ! Check if file exists first
     INQUIRE(FILE=bin_filename, EXIST=file_exists)
 
     IF (.NOT. file_exists) THEN
-      !PRINT *, 'ERROR: Required binary file not found:', TRIM(bin_filename)
-      !PRINT *, 'Please run the precompute_flux_cube.py script to generate this file.'
-      !PRINT *, 'Sample command: python precompute_flux_cube.py --model_dir=', TRIM(stellar_model_dir)
       STOP 'Missing required binary file for interpolation'
     END IF
 
@@ -70,8 +58,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
                          wavelengths, precomputed_flux_cube, status)
 
     IF (status /= 0) THEN
-      !PRINT *, 'ERROR: Failed to load binary data from:', TRIM(bin_filename)
-      !PRINT *, 'The file exists but may be corrupted or in the wrong format.'
       STOP 'Binary data loading error'
     END IF
 
@@ -79,13 +65,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     n_logg = SIZE(logg_grid)
     n_meta = SIZE(meta_grid)
     n_lambda = SIZE(wavelengths)
-
-    !PRINT *, 'Flux cube dimensions:', n_teff, 'x', n_logg, 'x', n_meta, 'x', n_lambda
-    !PRINT *, 'Parameter ranges:'
-    !PRINT *, '  Teff:     ', teff, ' in range [', teff_grid(1), ',', teff_grid(n_teff), ']'
-    !PRINT *, '  log_g:    ', log_g, ' in range [', logg_grid(1), ',', logg_grid(n_logg), ']'
-    !PRINT *, '  [M/H]:    ', metallicity, ' in range [', meta_grid(1), ',', meta_grid(n_meta), ']'
-    !PRINT *, 'Wavelength range: [', wavelengths(1), ',', wavelengths(n_lambda), '] Å'
 
     ! Allocate space for interpolated flux
     ALLOCATE(interp_flux(n_lambda))
@@ -110,11 +89,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     max_flux = MAXVAL(interp_flux)
     mean_flux = SUM(interp_flux) / n_lambda
 
-    !PRINT *, 'Interpolation completed successfully.'
-    !PRINT *, 'Interpolated flux statistics:'
-    !PRINT *, '  Min flux:', min_flux
-    !PRINT *, '  Max flux:', max_flux
-    !PRINT *, '  Mean flux:', mean_flux
 
     ! Apply distance dilution to get observed flux
     ALLOCATE(diluted_flux(n_lambda))
@@ -126,18 +100,14 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     max_flux = MAXVAL(diluted_flux)
     mean_flux = SUM(diluted_flux) / n_lambda
 
-    !PRINT *, 'Diluted flux statistics (observed from Earth):'
-    !PRINT *, '  Min flux:', min_flux
-    !PRINT *, '  Max flux:', max_flux
-    !PRINT *, '  Mean flux:', mean_flux
 
     ! Clean up
     DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
     DEALLOCATE(diluted_flux, interp_flux)
 
-    !PRINT *, 'SED construction complete'
-    !PRINT *, '============================================================'
   END SUBROUTINE constructsed_linear
+
+
   !---------------------------------------------------------------------------
   ! Load data from binary file
   !---------------------------------------------------------------------------
@@ -168,8 +138,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
       CLOSE(unit)
       RETURN
     END IF
-
-    !PRINT *, 'Read dimensions from file:', n_teff, n_logg, n_meta, n_lambda
 
     ! Allocate arrays based on dimensions
     ALLOCATE(teff_grid(n_teff), STAT=status)

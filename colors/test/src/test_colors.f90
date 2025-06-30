@@ -1,6 +1,6 @@
 program test_colors
    use colors_lib, only: colors_init, colors_shutdown
-   implicit none (type, external)
+   implicit none
 
    integer :: ierr
    logical :: use_cache

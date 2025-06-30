@@ -16,7 +16,7 @@ HISTORY_FILE = os.path.join(MESA_DIR, "LOGS/history.data")  # Default history fi
 param_options = [
     "MDwarf.params",
     "PopIII.params",
-    "PopII.params" "OType.params",
+    "PopII.paramsOType.params",
     "BType.params",
     "AType.params",
 ]
