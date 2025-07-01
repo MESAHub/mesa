@@ -88,7 +88,7 @@ contains
 
       character(len=3) :: MLT_option
       integer :: mixing_type, ierr, tdc_num_iters
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC
 
       include 'formats'
 
@@ -132,6 +132,7 @@ contains
       report = .false.
       dt = 1d40 ! Long time-step so we get into equilibrium
       Eq_div_w = 0d0
+      include_mlt_corr_to_TDC = .true.
 
       ! MLT
       MLT_option = 'Cox'
@@ -143,7 +144,7 @@ contains
       call set_TDC( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, ierr)
+         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, ierr)
 
 
       write (*, 1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel%val, dt
@@ -164,7 +165,7 @@ contains
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Eq_div_w, grav
       integer :: mixing_type, ierr, tdc_num_iters
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC
       integer :: j
 
       include 'formats'
@@ -201,7 +202,7 @@ contains
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * cgrav * m)
       grav = m * cgrav / pow2(r)
       Eq_div_w = 0d0
-
+      include_mlt_corr_to_TDC = .true.
 
       write (*, *) "####################################"
       write (*, *) "Running dt test"
@@ -211,7 +212,7 @@ contains
          call set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, ierr)
 
 
          write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val

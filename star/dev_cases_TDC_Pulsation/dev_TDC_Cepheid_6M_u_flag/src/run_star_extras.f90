@@ -532,6 +532,13 @@
 
          call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
 
+         ! add stopping condition for testing.
+         if ((.not. in_inlist_pulses) .and. s% center_he4 < 2d-1) then
+            s% Teff_lower_limit = exp10(3.75d0)
+         else
+            s% Teff_lower_limit = -1d99
+         end if
+
          extras_start_step = keep_going
       end function extras_start_step
    
@@ -572,6 +579,12 @@
                  s% max_timestep = max_dt_during_pulse
             else
                  s% max_timestep = max_dt_before_pulse
+            end if
+
+            ! time step control on pulsations
+            if (period > 0d0 .and. period/s% max_timestep < 600 .and. &
+            s% model_number > timestep_drop_model_number) then
+                s% max_timestep = period/600d0
             end if
 
             if (s% model_number > turn_off_remesh_model_number .and. turn_off_remesh )then

@@ -19,14 +19,18 @@ cubic_interpolation_in_Z = .false.
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_common'
 
+   color_num_files=2
+   color_file_names(2)='blackbody_johnson.dat'
+   color_num_colors(2)=5
+
    !change_initial_v_flag = .true.
    !new_v_flag = .false.
 
-   change_u_flag = .true.
-   new_u_flag = .false.
+   change_v_flag = .true.
+   new_v_flag = .true.
 
    change_u_flag = .true.
-   new_u_flag = .true.
+   new_u_flag = .false.
 
 
 
@@ -34,11 +38,13 @@ cubic_interpolation_in_Z = .false.
    dlogtau_factor = 0.1d0
    relax_tau_factor = .true.
 
-   
     ! if restarting from .mod file, need high initial dt for relaxing.
     set_initial_dt = .true.
     years_for_initial_dt = -1
     seconds_for_initial_dt = 1d7!-1
+
+    set_initial_cumulative_energy_error = .true.
+    new_cumulative_energy_error = 0d0
 
     set_initial_age = .true.
     initial_age = 0
@@ -47,8 +53,10 @@ cubic_interpolation_in_Z = .false.
     initial_model_number = 0
 
     ! on first pass.
-    !remove_center_by_temperature = 2d6
+    remove_center_by_temperature = 2d6 ! need an initial flag for this.
 
+    !change_RSP2_flag = .true.
+    !new_RSP2_flag = .true.
 / !end of star_job namelist
 
 
@@ -74,23 +82,21 @@ cubic_interpolation_in_Z = .false.
 
 
    ! new rsp style meshing, thanks to Bill P.
+   x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC 
    RSP2_use_mass_interp_face_values = .true.
-   RSP2_nz = 400
-   RSP2_nz_outer = 200
+   RSP2_nz = 600 !150 
+   RSP2_nz_outer = 240 !40 
    RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 3d0
+   RSP2_dq_1_factor = 2d0
    remesh_for_TDC_pulsations_log_core_zoning = .false. ! .false means do rsp style core
 
 
-   ! old star meshing to achieve rsp style models.
-   okay_to_remesh = .false. 
+   okay_to_remesh = .false. ! freeze mesh after initial remesh.
 
    ! control for excising core upon loading .mod file.
-   x_logical_ctrl(25) = .true. ! set true to remove core
+   x_logical_ctrl(25) = .false. ! set true to remove core, or use starjob option above.
    x_ctrl(14) = 2d6 ! desired core temperature to make cut at 
 
-   ! remeshing flag for if we are doing an envelope model or full stellar model.
-   x_logical_ctrl(23) = .true. ! .true. = envelope model, .false. = full stellar model ! depracated
    x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
    x_ctrl(12) = 200! model number to turn off remesh ( only if if okay_to_remesh = .true.)
 
@@ -121,7 +127,7 @@ cubic_interpolation_in_Z = .false.
    use_other_wind = .false.
 
    ! can optionally use QHSE form of dp/dm or dprad/dm form below.
-   use_dPrad_dm_form_of_T_gradient_eqn = .true. ! if false use QHSE form.
+   use_dPrad_dm_form_of_T_gradient_eqn = .false. ! if false use QHSE form.
    min_kap_for_dPrad_dm_eqn = 1d-5
 
 ! timesteps for saturation
@@ -131,7 +137,7 @@ cubic_interpolation_in_Z = .false.
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
    
    ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
-   dt_div_min_dr_div_cs_limit = 2d0!5d0!10d0
+   dt_div_min_dr_div_cs_limit = 4d0!5d0!10d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
@@ -168,6 +174,7 @@ cubic_interpolation_in_Z = .false.
 
       ! Convection model
       MLT_option = 'TDC'
+      include_mlt_corr_to_TDC = .false. ! true K. 1986 model, no mlt limiting
       mixing_length_alpha = 1.5d0
       alpha_TDC_DAMP = 1d0
       alpha_TDC_DAMPR = 0d0
@@ -178,13 +185,15 @@ cubic_interpolation_in_Z = .false.
       alt_scale_height_flag = .false. ! ignore eggleton 
       TDC_num_innermost_cells_forced_nonturbulent = 2
 
+
       ! dev feature, modify g -> geff (with hydro corr)
       make_mlt_hydrodynamic = .false.
 
       TDC_use_density_form_for_eddy_viscosity = .false. ! always true for u_flag.
 
    ! controls for shock capturing, relaxed for pulsations
-    max_abs_du_div_cs_for_convection = 1d-1 !0.03d0
+   ! main purpose is to force radiative in shock face
+    max_abs_du_div_cs_for_convection = 1d0 !1d-1 !0.03d0
     max_v_div_cs_for_convection = 1d2
     max_v_for_convection = 1d4
 
@@ -273,12 +282,15 @@ split_merge_amr_mesh_delta_coeff = 1.0!0.3
 
 
 
-report_solver_progress = .true.
+report_solver_progress = .false.
 report_ierr = .true. ! if true, produce terminal output when have some internal error
 
 / ! end of controls namelist
 
 &pgstar
+
+Grid1_file_dir = 'png_pulsation'
+
 
          ! axis limits -- to override system default selections
          !HR_logT_min = 3.6 !-101d0 ! only used if /= -101d0

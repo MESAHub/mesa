@@ -880,7 +880,7 @@
    !dvdt_dPdm
    !dvdt_grav
 
-   !tau_conv
+   tau_conv
    !tau_cool
    !tau_epsnuc
    !tau_qhse

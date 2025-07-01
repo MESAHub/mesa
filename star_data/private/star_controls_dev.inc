@@ -6,7 +6,7 @@
          logical :: TDC_use_density_form_for_eddy_viscosity
          real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
-         logical ::make_mlt_hydrodynamic
+         logical :: make_mlt_hydrodynamic, include_mlt_corr_to_TDC
 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap

@@ -98,7 +98,7 @@
    ignore_species_in_max_correction = .true.
 
 
-   mlt_make_surface_no_mixing = .true.
+   mlt_make_surface_no_mixing = .false.
    !convergence_ignore_equL_residuals = .false., see other inlists 
    make_gradr_sticky_in_solver_iters = .false.
    xa_scale = 1d-5
@@ -115,9 +115,6 @@
    relax_max_number_retries = 99999999!1000
    max_number_retries = 99999999 !500 ! RECOMMENDED 5000
 
-   ! our wind implementation follows Brott+ 2011
-   ! set inside inlist_
-
    ! During hydro we can use es scattering opacity on the very outermost cell
    use_other_kap = .false.
 
@@ -130,7 +127,6 @@
       steps_before_use_TDC = 0
 
     use_ledoux_criterion = .true.
-    mixing_length_alpha = 1.5d0
     alpha_semiconvection = 1d0
     thermohaline_coeff = 0d0
     num_cells_for_smooth_gradL_composition_term = 0
@@ -241,7 +237,7 @@
 
 
       photo_digits = 8
-      photo_interval = 10!50
+      photo_interval = 1000
       profile_interval = 200!50
       history_interval = 1!10
       terminal_interval = 10!10

@@ -106,7 +106,8 @@
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, TDC_use_density_form_for_eddy_viscosity, &
-    TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, make_mlt_hydrodynamic, &
+    TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
+    make_mlt_hydrodynamic, include_mlt_corr_to_TDC, &
 
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -2081,6 +2082,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
  s% make_mlt_hydrodynamic = make_mlt_hydrodynamic
+ s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
 
  s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
@@ -3778,6 +3780,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
  make_mlt_hydrodynamic = s% make_mlt_hydrodynamic
+ include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
 
  remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning

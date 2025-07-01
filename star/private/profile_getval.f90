@@ -1892,7 +1892,7 @@
             case(p_PII_face)
                if (rsp_or_w) val = s% PII(k)
             case(p_Chi)
-               if (rsp_or_w) val = s% Chi(k)
+                val = s% Chi(k)
             case(p_Eq)
                val = s% Eq(k)
             case(p_Uq)

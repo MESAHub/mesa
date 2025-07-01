@@ -62,7 +62,7 @@ public :: compute_Q
    !! @param grada grada is the adiabatic dlnT/dlnP,
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC
       real(dp) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
       type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w
@@ -459,6 +459,7 @@ contains
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: Q, Af
       type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env
+      type(auto_diff_real_tdc) :: w, G, F, X, FL
 
       ! Y = grad-gradL
       ! Gamma=(grad-gradE)/(gradE-gradL)
@@ -469,7 +470,7 @@ contains
       ! We only use Y_env /= Y when Y > 0 (i.e. the system is convectively unstable)
       ! because we only have a Gamma from MLT in that case.
       ! so when Y < 0 we just use Y_env = Y.
-      if (Y > 0) then
+      if (Y > 0 .and. info%include_mlt_corr_to_TDC) then
          Y_env = Y * convert(info%Gamma/(1+info%Gamma))
       else
          Y_env = Y
@@ -479,8 +480,66 @@ contains
       call eval_xis(info, Y_env, xi0, xi1, xi2)
       Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
 
+      if (.false.) then ! tdc use enthalpy flux limiter use_TDC_enthalpy_flux_limiter
+
+          ! Compute specific enthalpy for flux limiter, can optionally extend with total
+          ! energy terms from MESA-star, but eos enthalpy is fine approximation for now.
+          ! w = E+P/ρ ~ Cp*T
+          w = convert(info%Cp * info%T)
+
+          ! build the correlation function G = α·α_s·cₚ·Y:
+          G =  info%mixing_length_alpha * convert(info%Cp) * Y_env ! assumes alpha_s == 1.
+
+          ! enthalpy flux scale F = √(2/3)·w·√(e_t)
+          F = sqrt(2d0/3d0)* w * Af ! unused, but can experiment with
+
+          ! rsp form from smolec 2008, we skip this and use G/F instead...
+          X = sqrt(3d0/2d0)*(convert(info%T)/w)*G ! should be same as G/F
+
+          FL = flux_limiter_function(G/F) ! X
+      else
+          FL = 1d0 ! might need to set derivs to 0.
+      end if
+
+
       ! Y_env sets the convective flux but not the radiative flux.
-      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env
+      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env!*FL
+
+    contains
+
+    type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
+    implicit none
+    type(auto_diff_real_tdc), intent(in) :: X
+    real(dp), parameter :: delta = 0.1_dp
+    real(dp) :: t, P, dPdt
+
+    if (X%val <= 1.0_dp) then
+        ! no limiting below X=1
+        FL = 1.0_dp
+
+    else if (X%val >= 1.0_dp + delta) then
+        ! full cap above X=1+delta
+        FL = 1.0_dp / X%val
+
+    else
+        ! smooth quintic blend on [1,1+delta]
+        t = (X%val - 1.0_dp) / delta    ! t in [0,1]
+
+        ! S(t) = 6 t^5 − 15 t^4 + 10 t^3
+        P    = 6.0_dp * pow5(t) -15.0_dp * pow4(t) +10.0_dp * pow3(t)
+
+        ! blend from FL=1 -> FL=1/X
+        FL%val = (1.0_dp - P) + P / X%val
+
+        ! dP/dt = 30 t^4 − 60 t^3 + 30 t^2
+        dPdt = 30.0_dp * pow4(t) -60.0_dp * pow3(t)+ 30.0_dp * pow2(t)
+
+        ! dFL/dX = (dP/dt)/delta * (−1 + 1/X) − P/X^2
+        FL%d1val1 = (dPdt / delta) * (-1.0_dp + 1.0_dp/X%val) - P / (X%val * X%val)
+    end if
+
+    end function flux_limiter_function
+
 
    end subroutine compute_Q
 

@@ -10,7 +10,7 @@
          pgstar_right_yaxis_label_disp = 4.4
 
 
-         Grid2_win_width = 12
+         Grid2_win_width = 8
          Grid2_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
          Grid2_num_cols = 3 ! divide plotting region into this many equal width cols
          Grid2_num_rows = 8 ! divide plotting region into this many equal height rows

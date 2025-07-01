@@ -47,17 +47,17 @@
       !star_age_sec ! elapsed simulated time in seconds since the start of the run
       !star_age_min ! elapsed simulated time in minutes since the start of the run
       !star_age_hr ! elapsed simulated time in hours since the start of the run
-      star_age_day ! elapsed simulated time in days since the start of the run
+      !star_age_day ! elapsed simulated time in days since the start of the run
       day ! elapsed simulated time in days since the start of the run
 
-      !log_star_age
-      !log_star_age_sec
+      log_star_age
+      log_star_age_sec
 
    !## timestep
 
       time_step ! timestep in years since previous model
       time_step_sec ! timestep in seconds since previous model
-      !time_step_days
+      time_step_days
       log_dt ! log10 time_step in years
       log_dt_sec ! log10 time_step in seconds
       !log_dt_days ! log10 time_step in days
@@ -75,7 +75,7 @@
 
    !## mass change
 
-      !star_mdot ! d(star_mass)/dt (in msolar per year)
+      star_mdot ! d(star_mass)/dt (in msolar per year)
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
@@ -89,7 +89,7 @@
       !r_center
       !r_center_cm
       !r_center_km
-      L_center
+      !L_center
       !log_L_center
       !log_L_center_ergs_s
       !v_center
@@ -249,7 +249,7 @@
       !log_extra_L ! log10 extra_L
 
    !## neutrino losses
-      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
       !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
       !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
 
@@ -368,7 +368,7 @@
 
    !## helium core
       he_core_mass
-      !he_core_radius
+      he_core_radius
       !he_core_lgT
       !he_core_lgRho
       !he_core_L
@@ -380,7 +380,7 @@
    !## CO core
       co_core_mass
       !CO_core
-      !co_core_radius
+      co_core_radius
       !co_core_lgT
       !co_core_lgRho
       !co_core_L
@@ -453,7 +453,7 @@
       !log_min_dr_div_cs ! log10 min dr_div_csound (seconds)
       !min_dr_div_cs_yr ! min over all cells of dr/csound (years)
       !log_min_dr_div_cs_yr ! log10 min dr_div_csound (years)
-      dt_div_min_dr_div_cs
+      !dt_div_min_dr_div_cs
       !log_dt_div_min_dr_div_cs
 
       !min_t_eddy ! minimum value of scale_height/conv_velocity
@@ -463,8 +463,8 @@
 !# conditions at or near the surface of the model
 
    !## conditions at the photosphere
-      effective_T
-      Teff
+      !effective_T
+      !Teff
       log_Teff ! log10 effective temperature
          ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
          ! where L and R are evaluated at the photosphere (tau_factor < 1)
@@ -507,10 +507,10 @@
       !log_R_cm
 
       log_g ! log10 gravity
-      !gravity
-      !log_Ledd
-      !log_L_div_Ledd ! log10(L/Leddington)
-      !lum_div_Ledd
+      gravity
+      log_Ledd
+      log_L_div_Ledd ! log10(L/Leddington)
+      lum_div_Ledd
       !log_surf_optical_depth
       !surface_optical_depth
 
@@ -524,13 +524,13 @@
       !surface_cell_entropy ! in units of kerg per baryon
           ! old name was surface_entropy
 
-      !v_surf ! (cm/s)
+      v_surf ! (cm/s)
       v_surf_km_s ! (km/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      v_div_csound_max ! max value of velocity divided by sound speed at face
+      !v_div_csound_max ! max value of velocity divided by sound speed at face
       !v_div_vesc
       !v_phot_km_s
-      v_surf_div_escape_v
+      !v_surf_div_escape_v
 
       !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
 
@@ -578,7 +578,7 @@
 
       log_center_T ! temperature
       log_center_Rho ! density
-      !log_center_P ! pressure
+      log_center_P ! pressure
 
       ! shorter names for above
       log_cntr_P
@@ -734,16 +734,17 @@
 
 !# asteroseismology
 
-      !delta_nu ! large frequency separation for p-modes (microHz)
+      delta_nu ! large frequency separation for p-modes (microHz)
          ! 1e6/(seconds for sound to cross diameter of star)
-      !delta_Pg ! g-mode period spacing for l=1 (seconds)
+      delta_Pg ! g-mode period spacing for l=1 (seconds)
          ! sqrt(2) pi^2/(integral of brunt_N/r dr)
       !log_delta_Pg
-      !nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/astero_Teff_sun)^0.5)
+      nu_max ! estimate from scaling relation (microHz)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
+         ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       !nu_max_3_4th_div_delta_nu ! nu_max^0.75/delta_nu
-      !acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
-      !acoustic_radius ! integral of dr/csound (seconds)
+      acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+      acoustic_radius ! integral of dr/csound (seconds)
       !ng_for_nu_max ! = 1 / (nu_max*delta_Pg)
          ! period for g-mode with frequency nu_max = nu_max_ng*delta_Pg
       !gs_per_delta_nu ! delta_nu / (nu_max**2*delta_Pg)
@@ -768,8 +769,8 @@
       !total_energy_after_adjust_mass ! after mass adjustments
 
       ! shorter versions of above
-      tot_E
-      log_tot_E
+      !tot_E
+      !log_tot_E
 
 
       !total_gravitational_energy
@@ -777,30 +778,30 @@
       !total_gravitational_energy_after_adjust_mass
 
       ! shorter versions of above
-      tot_PE
-      log_tot_PE
+      !tot_PE
+      !log_tot_PE
 
       !total_internal_energy
       !log_total_internal_energy
       !total_internal_energy_after_adjust_mass
 
       ! shorter versions of above
-      tot_IE
-      log_tot_IE
+      !tot_IE
+      !log_tot_IE
 
       !total_radial_kinetic_energy
       !log_total_radial_kinetic_energy
       !total_radial_kinetic_energy_after_adjust_mass
 
       ! shorter versions of above (does not include rot KE)
-      tot_KE
-      log_tot_KE
+      !tot_KE
+      !log_tot_KE
 
       !total_turbulent_energy
       !log_total_turbulent_energy
       !total_turbulent_energy_after_adjust_mass
-      tot_Et
-      log_tot_Et
+      !tot_Et
+      !log_tot_Et
 
       !total_energy_foe
 
@@ -819,7 +820,7 @@
 
       !rel_run_E_err
 
-      rel_E_err
+      !rel_E_err
       !abs_rel_E_err
       !log_rel_E_err
 
@@ -831,11 +832,11 @@
          ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
       !cumulative_energy_error ! = sum over all steps of abs(error_in_energy_conservation)
       !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
-      !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
+      log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
       log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
 
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
-      !log_rel_error_in_energy_conservation
+      log_rel_error_in_energy_conservation
 
       !virial_thm_P_avg
       !virial_thm_rel_err
@@ -848,7 +849,7 @@
  !# rotation
 
       !total_angular_momentum
-      !log_total_angular_momentum
+      log_total_angular_momentum
       !i_rot_total ! moment of inertia
 
       !total_rotational_kinetic_energy
@@ -861,7 +862,7 @@
 
       !avg_abs_v_div_cs
       !log_avg_abs_v_div_cs
-      max_abs_v_div_cs
+      !max_abs_v_div_cs
       !log_max_abs_v_div_cs
 
       !avg_abs_v
@@ -985,13 +986,13 @@
       add_abs_mag
 
       ! Outputs luminosity in filter band ``filter'' (erg s^-1) (case sensitive)
-      ! lum_band filter
+      !lum_band filter
 
       ! Adds all the filter band luminosities to the output (erg s^-1)
        add_lum_band
 
       ! Outputs log luminosity in filter band ``filter'' (log erg s^-1) (case sensitive)
-       !log_lum_band filter
+      !log_lum_band filter
 
       ! Adds all the filter band luminosities to the output (log erg s^-1)
        add_log_lum_band
@@ -1065,3 +1066,8 @@
 
    !## timing
       !elapsed_time ! time since start of run (seconds)
+
+   !## Extras
+      burning_regions 40
+      mixing_regions 40
+      mix_relr_regions 40

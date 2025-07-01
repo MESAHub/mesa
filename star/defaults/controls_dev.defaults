@@ -214,6 +214,18 @@
 	TDC_num_innermost_cells_forced_nonturbulent = 0
 
 
+      ! include_mlt_corr_to_TDC
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If include_mlt_corr_to_TDC = .true. , mlt correction to TDC follows MESA VI (Jermyn et a. 2023)
+      ! in which we correct TDC on long timescales with Y_face ~ Y*Gamma/(1+Gamma). If .false., abandon
+      ! mlt limit of tdc and adopt original form of (Kuhfuß 1986) convection model in the local limit.
+      
+      ! ::  
+
+  include_mlt_corr_to_TDC = .true.
+
+
       ! include_mlt_Pturb_in_thermodynamic_gradients
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -225,7 +237,6 @@
       ! ::  
 
 	include_mlt_Pturb_in_thermodynamic_gradients = .false.
-
 
 
       ! make_mlt_hydrodynamic

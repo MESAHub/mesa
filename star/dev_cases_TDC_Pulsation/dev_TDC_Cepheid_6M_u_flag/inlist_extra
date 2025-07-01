@@ -6,19 +6,6 @@
 
 / ! end of controls namelist
 
-&kap
-kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
-kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
-Zbase = 0.003d0 !0.0142d0
-kap_lowT_prefix = 'lowT_fa05_a09p'
-!AESOPUS_filename = 'AESOPUS_AGSS09.h5' ! used only if kap_lowT_prefix = 'AESOPUS'
-use_Type2_opacities = .true.
-
-!cubic_interpolation_in_X = .true.
-!cubic_interpolation_in_Z = .true.
-
-/ ! end of kap namelist
-
 &controls
 initial_mass = 6d0
 initial_Y = 0.267d0 !0.2703 !0.99858d0

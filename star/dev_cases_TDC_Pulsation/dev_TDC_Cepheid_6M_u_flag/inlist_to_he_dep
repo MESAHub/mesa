@@ -34,7 +34,10 @@
 ! stop when the center mass fraction of h1 drops below this limit
 !    xa_central_lower_limit_species(1) = 'he4'
 !    xa_central_lower_limit(1) = 1d-1
-max_model_number = 1970
+!max_model_number = 1970
+! see run_star_extras for stopping condition
+when_to_stop_rtol = 1d-3 
+when_to_stop_atol = 1d-3
 
     x_logical_ctrl(22) = .false. ! not in inlist_pulses
     x_logical_ctrl(7) = .false.
@@ -48,8 +51,8 @@ max_model_number = 1970
       cool_wind_RGB_scheme   = 'Reimers'
       cool_wind_AGB_scheme   = 'Blocker'
       RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0d0 !0.5   ! 0.1   
-      Blocker_scaling_factor = 0d0 !0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
+      Reimers_scaling_factor = 0.5   ! 0.1   
+      Blocker_scaling_factor = 0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
 
 
 ! solver controls
@@ -64,6 +67,10 @@ log_directory = 'LOGS_evolution'
 / ! end of controls namelist
 
 &pgstar
+
+Grid1_file_dir = 'png_evolution'
+History_Track1_file_flag = .false.
+History_Track2_file_flag = .false.
 
  pgstar_interval = 10
 

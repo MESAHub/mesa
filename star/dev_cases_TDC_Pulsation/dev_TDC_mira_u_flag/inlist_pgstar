@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 50!50 ! making this too small slows the model down.
+pgstar_interval = 50 ! making this too small slows the model down.
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0
@@ -145,7 +145,7 @@ Profile_Panels3_yaxis_name(4) = 'conv_vel_div_csound'!'conv_vel'!'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
 Profile_Panels3_other_dymin(4) = 0.14
 
-Profile_Panels3_yaxis_name(5) = 'Frad_div_cUrad'!'lum_div_Ledd'!'log_csound'!'logT'
+Profile_Panels3_yaxis_name(5) = 'Frad_div_cUrad'!'Frad_div_cUrad'!'lum_div_Ledd'!'logT'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'!'burn_num_iters'
     Profile_Panels3_yaxis_log(5) = .false.
 
@@ -648,7 +648,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_dymin(3) = 0.14
       ! ::
 
-    History_Panels1_yaxis_name(4) = 'log_g'!'log_dt'
+    History_Panels1_yaxis_name(4) = 'abs_mag_I'!'log_g'!'log_dt'
     History_Panels1_yaxis_reversed(4) = .false.
     History_Panels1_ymin(4) = -101d0
     History_Panels1_ymax(4) = -101d0

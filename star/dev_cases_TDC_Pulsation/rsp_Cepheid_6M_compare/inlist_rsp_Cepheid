@@ -55,18 +55,32 @@ RSP_fraction_2nd_overtone = 0d0
 mixing_length_alpha = 1.5d0 
 
    x_integer_ctrl(1) = -1 !10 ! which period to check
-   x_ctrl(1) = 14.7 ! expected period (in days) 
+   x_ctrl(1) = 12.7 ! expected period (in days) 
 
-!RSP_nz = 300
-!RSP_nz_outer = 80
+RSP_nz = 600
+RSP_nz_outer = 240
 
-   RSP_mass = 5.9634671d0
-   RSP_Teff = 5310!5559 !4892
-   RSP_L = 5070 !6250 !4660
-   RSP_X = 0.7295d0
-   RSP_Z = 0.003032d0
+   RSP_mass = 5.9089479 !5.9634671d0
+   RSP_Teff = 5623.4d0 !3.75
+   RSP_L = 5357.96d0 !3.729
+   RSP_X = 0.729525d0 !0.7295d0
+   RSP_Z = 0.003032d0 !0.003032d0
    !   Y = 0.267d0
       
+
+! timesteps for saturation
+
+   !dt_div_min_dr_div_cs_limit = 2d0
+   dt_div_min_dr_div_cs_hard_limit = 100d0! i don't like hard limits ~ EbF
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
+   
+   ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
+   dt_div_min_dr_div_cs_limit = 4d0!5d0!10d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
+
 ! solver
    use_gold2_tolerances = .true.
 
@@ -77,7 +91,7 @@ mixing_length_alpha = 1.5d0
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
 
-      !num_trace_history_values = 2
+      num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
@@ -93,7 +107,7 @@ mixing_length_alpha = 1.5d0
 
       photo_interval = 1000
       profile_interval = 4000
-      history_interval = 10
+      history_interval = 1
       terminal_interval = 200
 
 / ! end of controls namelist

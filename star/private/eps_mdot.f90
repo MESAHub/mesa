@@ -484,7 +484,7 @@
          real(dp), dimension(:), allocatable :: &
             p_bar, rho_bar, te_bar, te, &
             leak_frac, thermal_energy, density_weighted_flux, eps_mdot_per_total_mass,&
-            accumulated, grad_r_sub_grad_a
+            accumulated, grad_r_sub_grad_a!, v_bar
          real(qp), dimension(:), allocatable :: change_in_dm, mass_flux, dm, prev_mesh_dm,&
              total_mass_through_cell
          type(accurate_real) :: sum
@@ -550,6 +550,7 @@
          allocate(p_bar(nz+1))
          allocate(rho_bar(nz+1))
          allocate(te_bar(nz+1))
+         !allocate(v_bar(nz+1))
 
          !$OMP PARALLEL DO
          do j=1,nz
@@ -565,6 +566,12 @@
             p_bar(j) = interpolate_onto_faces(s%Peos, prev_mesh_dm, nz, j)
             rho_bar(j) = interpolate_onto_faces(s%rho, prev_mesh_dm, nz, j)
             te_bar(j) = interpolate_onto_faces(te, prev_mesh_dm, nz, j)
+
+!            if (s% u_flag) then
+!                v_bar(j) = interpolate_onto_faces( s%v, prev_mesh_dm, nz, j)
+!            else
+!                v_bar(j) = s%v(j)
+!            end if
          end do
          !$OMP END PARALLEL DO
 
@@ -612,6 +619,10 @@
 
          ! Calculate change in heat.
          s % mdot_acoustic_surface = delta_m * p_bar(1) / rho_bar(1) / dt
+
+         ! kinetic‐energy loss at the surface face j=1:
+         !s%mdot_ke_surface = delta_m * 0.5_dp * v_bar(1)**2 / dt
+
          do j=1,nz
             ! We calculate eps_mdot using accurate reals to reduce roundoff errors.
             sum % sum = 0.0d0
@@ -631,6 +642,10 @@
             ! In the absence of composition changes this is just dm_new * (change in gravitational potential),
             ! but when composition changes this term also captures that.
             sum = sum - real(s% total_energy_profile_after_adjust_mass(j) - s%dm(j) * te(j), qp)
+
+            !— kinetic‐energy flux: ½·ṁ·v² difference across faces j and j+1 —
+           ! sum = sum + real( 0.5_qp * mass_flux(j)   * pow2(v_bar(j)) , qp)
+           ! sum = sum - real( 0.5_qp * mass_flux(j+1) * pow2(v_bar(j+1)) , qp)
 
             change_sum = change_sum + sum%value() / (dt)
 

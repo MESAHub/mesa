@@ -181,17 +181,17 @@ Profile_Panels1_title = ''
 Profile_Panels1_txt_scale = 0.7
 Profile_Panels1_num_panels = 4
 
-Profile_Panels1_yaxis_name(1) = 'vel_km_per_s'
+Profile_Panels1_yaxis_name(1) = 'Lc_div_L'
 !Profile_Panels1_dymin(1) = 0.14
-Profile_Panels1_other_yaxis_name(1) = 'logRho'
+Profile_Panels1_other_yaxis_name(1) = 'Frad_div_cUrad'!'lum_conv'
 !Profile_Panels1_other_dymin(1) = 0.14
 
 Profile_Panels1_yaxis_name(2) = 'logT'!'logdq'!'radius'!'entropy'
 Profile_Panels1_other_yaxis_name(2) = 'mlt_Y_face'! 'Lc_div_L'!'log_dt_cs_div_dr'!'pgas_div_p'
 Profile_Panels1_other_yaxis_log(2) = .false.
 
-!Profile_Panels1_ymax(2) = 2
-!Profile_Panels1_other_ymax(2) = 2
+!Profile_Panels1_ymax(2) = 210
+!Profile_Panels1_ymin(2) = 160
 
 Profile_Panels1_yaxis_name(3) = 'Lc_div_L'!'gradT'
 Profile_Panels1_other_yaxis_name(3) = 'conv_vel'!'lum_div_Ledd'!'grada'
@@ -209,7 +209,7 @@ Profile_Panels1_other_dymin(4) = 0.14
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'!'zone'
 Profile_Panels1_xmin = -101d0!-101d0
-Profile_Panels1_xmax = -101d0!9d0 !-101d0 !8.1
+Profile_Panels1_xmax = 5.5d0!-101d0!9d0 !-101d0 !8.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'
@@ -259,18 +259,18 @@ show_TRho_Profile_text_info = .false.
  TRho_Profile_text_info_yfac = 0.6 ! controls y location of 1st line
  TRho_Profile_text_info_dyfac = -0.04 ! controls line spacing
          
-show_TRho_Profile_mass_locs = .false.
+show_TRho_Profile_mass_locs = .true.
 show_TRho_accretion_mesh_borders = .false.
 show_TRho_Profile_kap_regions = .false.
 show_TRho_Profile_gamma1_4_3rd = .true.
-show_TRho_Profile_eos_regions = .false.
+show_TRho_Profile_eos_regions = .true.
 show_TRho_Profile_degeneracy_line = .true.
 show_TRho_Profile_Pgas_Prad_line = .true.
 show_TRho_Profile_burn_lines = .true.
 show_TRho_Profile_burn_labels = .true.
       
 ! axis limits
-TRho_Profile_xmin = -20.0
+TRho_Profile_xmin = -15.0
 TRho_Profile_xmax = 0!5d0!10.0
 TRho_Profile_ymin = 2.5
 TRho_Profile_ymax = 7.5!8.5d0!10.0        
@@ -568,7 +568,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
          ! file output
-         HR_file_flag = .true.
+         HR_file_flag = .false.
          HR_file_dir = 'hr_png'
          HR_file_prefix = 'hr_'
          HR_file_interval = 10 ! output when `mod(model_number,HR_file_interval)==0`
@@ -708,8 +708,8 @@ Kipp_show_luminosities = .true.
 
 
 ! history tracks
- History_Track1_file_flag = .true.
- History_Track2_file_flag = .true.
+ History_Track1_file_flag = .false.
+ History_Track2_file_flag = .false.
 
 
 History_Track1_win_flag = .true.

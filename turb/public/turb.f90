@@ -114,14 +114,14 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC,  ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt
       real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav
-      logical, intent(in) :: report
+      logical, intent(in) :: report, include_mlt_corr_to_TDC
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
@@ -145,6 +145,7 @@ module turb
 
       ! Pack TDC info
       info%report = report
+      info%include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
       info%mixing_length_alpha = mixing_length_alpha
       info%alpha_TDC_DAMP = alpha_TDC_DAMP
       info%alpha_TDC_DAMPR = alpha_TDC_DAMPR
