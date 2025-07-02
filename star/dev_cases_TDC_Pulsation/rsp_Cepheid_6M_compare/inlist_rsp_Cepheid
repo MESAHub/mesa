@@ -60,26 +60,17 @@ mixing_length_alpha = 1.5d0
 RSP_nz = 600
 RSP_nz_outer = 240
 
-   RSP_mass = 5.9089479 !5.9634671d0
-   RSP_Teff = 5623.4d0 !3.75
-   RSP_L = 5357.96d0 !3.729
+   RSP_mass = 5.9089479d0 !5.9634671d0
+   RSP_Teff = 5638.9728d0 !5623.4d0 !3.7512
+   RSP_L =  5060.5765d0 !5357.96d0 !3.7042
    RSP_X = 0.729525d0 !0.7295d0
    RSP_Z = 0.003032d0 !0.003032d0
    !   Y = 0.267d0
       
 
 ! timesteps for saturation
+RSP_max_dt_times_min_dr_div_cs = 4d0 ! default is 2d0
 
-   !dt_div_min_dr_div_cs_limit = 2d0
-   dt_div_min_dr_div_cs_hard_limit = 100d0! i don't like hard limits ~ EbF
-   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
-   
-   ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
-   dt_div_min_dr_div_cs_limit = 4d0!5d0!10d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
-   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
-   min_k_for_dt_div_min_dr_div_cs_limit = 1 
-   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
 
 ! solver
    use_gold2_tolerances = .true.
@@ -107,7 +98,7 @@ RSP_nz_outer = 240
 
       photo_interval = 1000
       profile_interval = 4000
-      history_interval = 1
+      history_interval = 10
       terminal_interval = 200
 
 / ! end of controls namelist
@@ -127,11 +118,11 @@ RSP_nz_outer = 240
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-      ! Grid2_file_flag = .true.
-      file_digits = 7
+      Grid2_file_flag = .true.
+      file_digits = 8
       Grid2_file_dir = 'png'
       Grid2_file_prefix = 'grid'
-      Grid2_file_interval = 100 ! output when mod(model_number,Grid2_file_interval)==0
+      Grid2_file_interval = 50 ! output when mod(model_number,Grid2_file_interval)==0
       
       !Profile_Panels1_show_grid = .true.
 

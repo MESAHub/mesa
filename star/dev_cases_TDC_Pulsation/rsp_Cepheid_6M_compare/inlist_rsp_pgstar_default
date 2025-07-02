@@ -1,5 +1,5 @@
 &pgstar
-         pgstar_interval = 10
+         pgstar_interval = 500
 
          pgstar_xaxis_label_scale = 0.9
          pgstar_left_yaxis_label_scale = 0.9
@@ -168,11 +168,11 @@
          Profile_Panels2_yaxis_name(3) = 'logtau' 
          Profile_Panels2_other_yaxis_name(3) = 'opacity' 
                   
-         Profile_Panels2_yaxis_name(4) = 'dq'     
+         Profile_Panels2_yaxis_name(4) = 'opacity'     
          Profile_Panels2_ymax(4) = -101D0
          Profile_Panels2_ymin(4) = -101D0
          Profile_Panels2_other_yaxis_name(4) = 'zone' 
-         Profile_Panels2_other_ymax(4) = 70!-101D0 ! 
+         Profile_Panels2_other_ymax(4) = -101D0 ! 
          Profile_Panels2_other_ymin(4) = -101D0 ! 
          Profile_Panels2_yaxis_log(4) = .true.
 
