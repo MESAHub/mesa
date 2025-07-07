@@ -346,13 +346,20 @@
          if (debug) write(*,*) 'Exact RSP2 zone 1 surface BC being set'
 
          call get_area_info_opt_time_center(s, 1, area_ad, inv_R2, ierr) ! handles time centering for area
-         if (s% using_velocity_time_centering .and. &
-         s% include_L_in_velocity_time_centering) then
-             L_theta = s% L_theta_for_velocity_time_centering
-         else
-             L_theta = 1d0
-         end if
-         L1_ad = L_theta*wrap_L_00(s, 1) + (1d0 - L_theta)*s% L_start(1)
+         ! time centering the surface luminosity can be very noisy
+         !if (s% using_velocity_time_centering .and. &
+         !s% include_L_in_velocity_time_centering) then
+         !    L_theta = s% L_theta_for_velocity_time_centering
+         !else
+         !    L_theta = 1d0
+         !end if
+         !L1_ad = L_theta*wrap_L_00(s, 1) + (1d0 - L_theta)*s% L_start(1)
+
+         ! uncoment lines below to remove time centering entirely.
+         !r1_ad = wrap_r_00(s,1)
+         !area_ad = pi4*pow2(r1_ad)
+
+         L1_ad = wrap_L_00(s, 1)
          T_surf = wrap_T_00(s,1)
 
          if (debug) then

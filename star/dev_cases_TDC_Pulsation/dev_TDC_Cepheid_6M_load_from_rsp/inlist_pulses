@@ -111,12 +111,12 @@ new_RSP_flag = .false.
 
   ! TDC Pulsation timestepping.
    x_ctrl(17) = 2d3 ! dt before pulse, seconds
-   x_ctrl(18) = 1.2d3 ! After a pulse begins, limit the timestep to this (in seconds). 
+   x_ctrl(18) = 2d3 ! After a pulse begins, limit the timestep to this (in seconds). 
 
 ! GYRE set starting velocities, kick!
 ! kick when true and not restarting.
-   x_logical_ctrl(5) = .true. ! to turn on gyre kick
-   x_ctrl(11) = 200! kick model at this model number
+   x_logical_ctrl(5) = .false. ! to turn on gyre kick
+   x_ctrl(11) = 10! kick model at this model number
 
    x_ctrl(4) = 0d0 ! fraction_1st_overtone (order 2)
    x_ctrl(5) = 0d0 ! fraction_2nd_overtone (order 3)
@@ -154,8 +154,8 @@ new_RSP_flag = .false.
    Pvsc_cq = 4.0d0
    Pvsc_zsh = 0.1d0
 
-   ! velocity time centering for v_flag only.
-   steps_before_use_velocity_time_centering = 300 ! no v centering when commented
+   ! velocity time centering. ! if u_flag, always time center after kick.
+   steps_before_use_velocity_time_centering = 0 !300 ! no v centering when commented
    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
    
    include_P_in_velocity_time_centering = .true. ! set to false for u_flag
@@ -184,14 +184,14 @@ new_RSP_flag = .false.
       TDC_include_eturb_in_energy_equation = .true. 
       use_rsp_form_of_scale_height = .true.
       include_mlt_in_velocity_time_centering = .false.
-      include_mlt_Pturb_in_thermodynamic_gradients = .true.
+      include_mlt_Pturb_in_thermodynamic_gradients = .false.
       mixing_length_alpha = 1.5d0
       alpha_TDC_DAMP = 1d0
       alpha_TDC_DAMPR = 0d0
-      alpha_TDC_PtdVdt = 1d0
+      alpha_TDC_PtdVdt = 0d0
       alpha_TDC_DAMPM = 0.25d0
       steps_before_use_TDC = 0
-      mlt_Pturb_factor = 1d0
+      mlt_Pturb_factor = 0d0
       alt_scale_height_flag = .false. ! ignore eggleton 
       TDC_num_innermost_cells_forced_nonturbulent = 2
 
@@ -300,7 +300,7 @@ report_ierr = .true. ! if true, produce terminal output when have some internal 
 &pgstar
 
 Grid1_file_dir = 'png_pulsation'
-
+pgstar_interval = 50
 
          ! axis limits -- to override system default selections
          !HR_logT_min = 3.6 !-101d0 ! only used if /= -101d0
