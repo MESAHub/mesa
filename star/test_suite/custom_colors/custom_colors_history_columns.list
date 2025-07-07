@@ -9,6 +9,7 @@
 
       model_number ! counting from the start of the run
       num_zones ! number of zones in the model
+      phase_of_evolution
 
    !## age
 

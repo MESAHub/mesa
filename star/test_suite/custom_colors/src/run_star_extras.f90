@@ -4,6 +4,7 @@ module run_star_extras
   use const_def, only: dp, strlen, mesa_dir
   ! TODO: below are things we will need to incorporate into the main code
   ! So that we do not need to create a custom run_stars_extras file
+  use utils_lib, only: mkdir  ! Add this line for directory creation
   use colors_def, only: Colors_General_Info
   use colors_lib, only: colors_init, colors_ptr, alloc_colors_handle_using_inlist, &
                         calculate_bolometric, calculate_synthetic, remove_dat
@@ -37,6 +38,10 @@ subroutine extras_controls(id, ierr)
         print *, "Error initializing colors module"
         return
     end if
+
+
+    call mkdir('LOGS')
+    call mkdir('LOGS/SED')
 
     ! Debug print statements to check that values are properly loaded from inlist
     write(*,*) 'DEBUG: colors_handle = ', colors_handle

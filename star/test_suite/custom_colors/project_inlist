@@ -45,18 +45,18 @@
       
       metallicity = 0.02 !!
       
-      distance = 3.0857d17 !! units?
+      distance = 3.0857d17 !! distance in Meter
       make_csv = .true.
 
 / ! end of colors namelist
 
 &controls
       ! Basic stellar parameters
-      initial_mass = 1.0d0         ! Solar-mass
-      initial_z = 0.02d0           ! Solar metallicity
+      initial_mass = 1.2d0         ! Solar-mass
+      initial_z = 0.014d0           ! Solar metallicity
 
       !! stopping conditions redundant 
-      max_age = 10d9 !13d9          ! Cap time to 13 Gyr
+      max_age = 13d9          ! Cap time to 13 Gyr
 
       ! Enable H core depletion termination
       !xa_central_lower_limit_species(1) = 'h1'
@@ -65,9 +65,16 @@
       ! Output and performance settings
       profile_interval = 100
       history_interval = 1 !! make this one-to-one
-      terminal_interval = 5 !0
+      terminal_interval = 10 !0
       photo_interval = 100
       !max_model_number = 20000
+
+cool_wind_RGB_scheme = 'Reimers'
+Reimers_scaling_factor = 0.3d0
+
+cool_wind_AGB_scheme = 'Blocker'
+Blocker_scaling_factor = 0.05d0
+
 
       use_gold2_tolerances = .true.
 
