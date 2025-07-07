@@ -999,18 +999,22 @@
 
       function wrap_geff_face(s, k) result(geff)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: geff, dv_dt, r
+         type(auto_diff_real_star_order1) :: geff, dv_dt, r2
          integer, intent(in) :: k
          geff = 0d0
          dv_dt = 0d0
-         r = wrap_r_00(s,k)
+         if (s% include_mlt_in_velocity_time_centering) then
+            r2 = pow2(wrap_opt_time_center_r_00(s,k))
+         else
+            r2 = pow2(wrap_r_00(s,k))
+         end if
          if (s% make_mlt_hydrodynamic .and. (s% v_flag .or. s% u_flag)) then
             ! add in hydrodynamic term
             dv_dt = wrap_dxh_v_face(s,k)/s%dt
-            ! hydrodynamic correction to g is geff = g - dvdt
-            geff = s%cgrav(k)*s%m_grav(k)/pow2(r) - dv_dt
+            ! hydrodynamic correction to g is geff = g - dvdt, to do: add a floor and ceiling
+            geff = s%cgrav(k)*s%m_grav(k)/r2 - dv_dt
          else
-            geff = s% m_grav(k)*s% cgrav(k)/pow2(r)
+            geff = s% m_grav(k)*s% cgrav(k)/r2
          end if
       end function wrap_geff_face
 

@@ -318,7 +318,7 @@
       subroutine set_RSP_Lsurf_BC(s, nvar, ierr)
          use const_def, only: crad, clight, pi4
          use eos_def
-         use star_utils, only: save_eqn_residual_info
+         use star_utils, only: save_eqn_residual_info, get_area_info_opt_time_center
          use auto_diff_support
          implicit none
 
@@ -326,10 +326,10 @@
          integer, intent(out) :: ierr
          integer, intent(in) :: nvar
 
-         type(auto_diff_real_star_order1) :: L1_ad, r1_ad, area_ad, rhs_ad, lhs_ad, resid_ad
+         type(auto_diff_real_star_order1) :: L1_ad, r1_ad, area_ad, rhs_ad, lhs_ad, resid_ad, inv_R2
          type(auto_diff_real_star_order1) :: T_surf, Erad_ad
          integer :: i_equL
-         real(dp) :: factor, scale
+         real(dp) :: factor, scale, L_theta
          logical :: debug
 
          ierr = 0
@@ -345,10 +345,14 @@
 
          if (debug) write(*,*) 'Exact RSP2 zone 1 surface BC being set'
 
-         ! wrap zone 1 variables
-         L1_ad = wrap_L_00(s, 1)
-         r1_ad = wrap_r_00(s, 1)
-         area_ad = pi4 * pow2(r1_ad)
+         call get_area_info_opt_time_center(s, 1, area_ad, inv_R2, ierr) ! handles time centering for area
+         if (s% using_velocity_time_centering .and. &
+         s% include_L_in_velocity_time_centering) then
+             L_theta = s% L_theta_for_velocity_time_centering
+         else
+             L_theta = 1d0
+         end if
+         L1_ad = L_theta*wrap_L_00(s, 1) + (1d0 - L_theta)*s% L_start(1)
          T_surf = wrap_T_00(s,1)
 
          if (debug) then
@@ -388,13 +392,6 @@
 
       end subroutine set_RSP_Lsurf_BC
 
-
-
-
-
-
-
-
       ! only used for dlnT_dm equation
       subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
             dlnPdm_qhse, Ppoint, ierr)
@@ -426,20 +423,22 @@
          if (ierr /= 0) return
 
         ! mlt_pturb in thermodynamic gradients does not currently support time centering
+        ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
          if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
-            .and. s% mlt_Pturb_factor > 0d0 .and. k > 1 .and. .not. s% using_velocity_time_centering) then
-            mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-            mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
-         else if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
-            .and. s% mlt_Pturb_factor > 0d0 .and. k == 1 .and. .not. s% using_velocity_time_centering) then
-            mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-            mlt_Ptrbm1 = 0d0
-         else
+            .and. s% mlt_Pturb_factor > 0d0) then
+            if (k ==1) then
+               mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+               mlt_Ptrbm1 = 0d0
+            else
+               mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+               mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
+            end if
+         else ! no mlt_pturb
             mlt_Ptrb00 = 0d0
             mlt_Ptrbm1 = 0d0
          end if
 
-         P00 = wrap_Peos_00(s,k) + mlt_Ptrb00 ! probably don't want to add 0d0, even if safe.
+         P00 = wrap_Peos_00(s,k)
 
          ! mlt Pturb doesn't support time centering yet.
          if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
@@ -448,7 +447,9 @@
             Pm1 = 0d0
             Ppoint = P00 + mlt_Ptrb00
          else
-            Pm1 = wrap_Peos_m1(s,k) + mlt_Ptrbm1
+            Pm1 = wrap_Peos_m1(s,k)
+            if (s% using_velocity_time_centering) Pm1 = 0.5d0*(Pm1 + s% Peos_start(k-1)) ! pm1 wasn't time centered until now
+            Pm1 = Pm1 + mlt_Ptrbm1
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if

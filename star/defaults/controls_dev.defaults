@@ -201,6 +201,25 @@
     TDC_use_density_form_for_eddy_viscosity = .false.
 
 
+      ! TDC_include_eturb_in_energy_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! calculates and incorporates det/dt from TDC as a negative source term in
+      ! the total energy equation  
+
+      ! ::  
+
+    TDC_include_eturb_in_energy_equation = .false.
+
+      ! use_rsp_form_of_scale_height
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! calculate scale height by averaging P/rho onto faces together instead
+      ! of of wrapping P and rho seperately by default. Both forms assume HSE. 
+
+      ! ::  
+
+      use_rsp_form_of_scale_height = .false.
 
       ! TDC_num_innermost_cells_forced_nonturbulent
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,7 +230,7 @@
 
       ! ::  
 
-	TDC_num_innermost_cells_forced_nonturbulent = 0
+	  TDC_num_innermost_cells_forced_nonturbulent = 0
 
 
       ! include_mlt_corr_to_TDC
@@ -223,7 +242,7 @@
       
       ! ::  
 
-  include_mlt_corr_to_TDC = .true.
+    include_mlt_corr_to_TDC = .true.
 
 
       ! include_mlt_Pturb_in_thermodynamic_gradients
@@ -236,8 +255,19 @@
       
       ! ::  
 
-	include_mlt_Pturb_in_thermodynamic_gradients = .false.
+	  include_mlt_Pturb_in_thermodynamic_gradients = .false.
 
+
+      ! include_mlt_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If doing velocity time_centering, include time centering in mlt. Depending on the time
+      ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
+      ! for P, L, and r in geff, gradr, grada, and mlt. 
+
+      ! ::  
+
+    include_mlt_in_velocity_time_centering = .false.
 
       ! make_mlt_hydrodynamic
       ! ~~~~~~~~~~~~~~~~~~~~~

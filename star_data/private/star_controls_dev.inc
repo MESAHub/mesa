@@ -7,6 +7,8 @@
          real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
          logical :: make_mlt_hydrodynamic, include_mlt_corr_to_TDC
+         logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
+         logical :: include_mlt_in_velocity_time_centering
 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap

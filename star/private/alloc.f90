@@ -1192,6 +1192,8 @@
             if (failed('lnPeos_start')) exit
             call do1(s% Peos_start, c% Peos_start)
             if (failed('Peos_start')) exit
+            call do1(s% Peos_face_start, c% Peos_face_start)
+            if (failed('Peos_face_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
             call do1(s% energy_start, c% energy_start)

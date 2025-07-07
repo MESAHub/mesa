@@ -114,20 +114,40 @@ contains
          gradT, Y_face, mlt_vc, D, Gamma
       integer, intent(out) :: ierr
 
-      real(dp) :: cgrav, m, XH1
+      real(dp) :: cgrav, m, XH1, P_theta, L_theta
       integer :: iso
       type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, rho_start
       include 'formats'
       ierr = 0
 
-      gradr = gradr_in
 
+      P = get_Peos_face(s,k) ! if u_flag, should this be P_face_ad? (time centered in riemann)
+      if (s% include_mlt_in_velocity_time_centering) then
+          ! could be cleaner with a wrapper for time_centered P and L
+          if (s% using_velocity_time_centering .and. &
+            s% include_P_in_velocity_time_centering) then
+             P_theta = s% P_theta_for_velocity_time_centering
+          else
+             P_theta = 1d0
+          end if
+          ! consder building a wrapper : wrap_opt_time_center_L_00(s,k)
+          if (s% using_velocity_time_centering .and. &
+            s% include_L_in_velocity_time_centering) then
+             L_theta = s% L_theta_for_velocity_time_centering
+          else
+             L_theta = 1d0
+          end if
+          L = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
+          P = P_theta*P + (1d0-P_theta)*s% Peos_face_start(k)
+          r = wrap_opt_time_center_r_00(s,k)
+      else
+          L = wrap_L_00(s,k)
+          r = wrap_r_00(s,k)
+      end if
+      gradr = gradr_in
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
-      L = wrap_L_00(s,k)
       T = get_T_face(s,k)
-      P = get_Peos_face(s,k) ! missing Pturb component
-      r = wrap_r_00(s,k)
       opacity = get_kap_face(s,k)
       rho = get_rho_face(s,k)
       rho_start = get_rho_start_face(s,k)
@@ -188,7 +208,7 @@ contains
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       character (len=256) :: message        
-      logical ::  test_partials, using_TDC
+      logical ::  test_partials, using_TDC, time_center_L
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -215,6 +235,13 @@ contains
                end if
            end if
          end if
+      end if
+
+      if (s% using_velocity_time_centering .and. &
+       s% include_L_in_velocity_time_centering) then
+         time_center_L = .true. ! change to Ltheta check later, this is inefficient.
+      else
+         time_center_L = .false.
       end if
 
       ! Wrap Pturb into P
@@ -301,7 +328,7 @@ contains
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, Eq_div_w, grav, s% include_mlt_corr_to_TDC, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -319,7 +346,7 @@ contains
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, Eq_div_w, grav, s% include_mlt_corr_to_TDC, ierr)
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

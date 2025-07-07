@@ -37,6 +37,8 @@
       kap_lowT_prefix = 'lowT_fa05_a09p'
       kap_CO_prefix = 'a09_co'
 
+use_Type2_opacities = .false.
+
 / ! end of kap namelist
 
 
@@ -52,8 +54,6 @@ RSP_kick_vsurf_km_per_sec = 5d0
 RSP_fraction_1st_overtone = 0d0
 RSP_fraction_2nd_overtone = 0d0
 
-mixing_length_alpha = 1.5d0 
-
    x_integer_ctrl(1) = -1 !10 ! which period to check
    x_ctrl(1) = 12.7 ! expected period (in days) 
 
@@ -61,7 +61,7 @@ RSP_nz = 600
 RSP_nz_outer = 240
 
    RSP_mass = 5.9089479d0 !5.9634671d0
-   RSP_Teff = 5638.9728d0 !5623.4d0 !3.7512
+   RSP_Teff = 5662d0 !5638.9728d0 !5623.4d0 !3.7512
    RSP_L =  5060.5765d0 !5357.96d0 !3.7042
    RSP_X = 0.729525d0 !0.7295d0
    RSP_Z = 0.003032d0 !0.003032d0

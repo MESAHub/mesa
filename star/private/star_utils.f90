@@ -89,7 +89,8 @@
       public :: get_chirho_face
       public :: get_chit_face
       public :: get_t_face
-      public :: get_peos_face
+      public :: get_Peos_face
+      public :: get_Peos_face_val
       public :: get_cp_face
       public :: get_grada_face
       public :: get_gradr_face
@@ -3842,6 +3843,19 @@
          Peos_face = alfa*wrap_Peos_00(s,k) + beta*wrap_Peos_m1(s,k)
       end function get_Peos_face
 
+      function get_Peos_face_val(s,k) result(Peos_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: Peos_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            Peos_face = s% Peos(k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         Peos_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
+      end function get_Peos_face_val
+
 
       function get_Cp_face(s,k) result(Cp_face)
          type (star_info), pointer :: s
@@ -3924,11 +3938,25 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: gradr
          type(auto_diff_real_star_order1) :: P, opacity, L, Pr, geff, r, mlt_Pturb_ad
+         real(dp) :: L_theta
          !include 'formats'
          P = get_Peos_face(s,k)
          opacity = get_kap_face(s,k)
-         L = wrap_L_00(s,k)
-         r = wrap_r_00(s,k)
+
+         if (s% include_mlt_in_velocity_time_centering) then
+            ! consider building a wrapper : wrap_opt_time_center_L_00(s,k)
+            if (s% using_velocity_time_centering .and. &
+              s% include_L_in_velocity_time_centering) then
+               L_theta = s% L_theta_for_velocity_time_centering
+            else
+               L_theta = 1d0
+            end if
+            L = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
+            r = wrap_opt_time_center_r_00(s,k)
+         else
+            L = wrap_L_00(s,k)
+            r = wrap_r_00(s,k)
+         end if
          Pr = get_Prad_face(s,k)
          geff =  wrap_geff_face(s,k) ! now supports hse and hydro form of g
          gradr = P*opacity*L/(16d0*pi*clight*geff*pow2(r)*Pr)
@@ -3945,13 +3973,18 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: scale_height
          type(auto_diff_real_star_order1) :: grav, scale_height2, P, rho
-         real(dp) :: G
+         real(dp) :: G, alfa, beta
          include 'formats'
          G = s% cgrav(k)
          grav = wrap_geff_face(s,k) ! old form is G*s% m_grav(k)/pow2(wrap_r_00(s,k))
-         P = get_Peos_face(s,k)
-         rho = get_rho_face(s,k)
-         scale_height = P/(grav*rho)  ! this assumes HSE
+         if (s% use_rsp_form_of_scale_height .and. k >1) then ! use rsp form of Hp, assumes HSE, wraps P/rho together.
+            call get_face_weights(s, k, alfa, beta)
+            scale_height = (alfa*(wrap_Peos_00(s,k))/wrap_d_00(s,k) + beta*(wrap_Peos_m1(s,k))/wrap_d_m1(s,k))/grav
+         else
+            P = get_Peos_face(s,k)
+            rho = get_rho_face(s,k)
+            scale_height = P/(grav*rho)  ! this assumes HSE
+         end if
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)
@@ -3966,15 +3999,20 @@
       real(dp) function get_scale_height_face_val(s,k) result(scale_height)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: G, scale_height2, P, rho
+         real(dp) :: G, scale_height2, P, rho, alfa, beta
          type(auto_diff_real_star_order1) :: P_face, rho_face, grav
          G = s% cgrav(k)
          grav = wrap_geff_face(s,k) ! old form is G*s% m_grav(k)/pow2(wrap_r_00(s,k))
-         P_face = get_Peos_face(s,k)
-         P = P_face%val
-         rho_face = get_rho_face(s,k)
-         rho = rho_face%val
-         scale_height = P/(grav%val*rho)  ! this assumes HSE, unles make_mlt_hydrodynamic = .true.
+         if (s% use_rsp_form_of_scale_height .and. k >1) then ! use rsp form of Hp, assumes HSE, wraps P/rho together.
+            call get_face_weights(s, k, alfa, beta)
+            scale_height = (alfa*(s% Peos(k)/s% rho(k)) + beta*(s% Peos(k-1)/s% rho(k-1)))/grav%val
+         else
+            P_face = get_Peos_face(s,k)
+            P = P_face%val
+            rho_face = get_rho_face(s,k)
+            rho = rho_face%val
+            scale_height = P/(grav%val*rho)  ! this assumes HSE, unles make_mlt_hydrodynamic = .true.
+         end if
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)
