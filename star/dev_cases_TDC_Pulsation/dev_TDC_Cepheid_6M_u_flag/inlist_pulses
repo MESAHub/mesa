@@ -53,7 +53,8 @@ cubic_interpolation_in_Z = .false.
     initial_model_number = 0
 
     ! on first pass.
-    remove_center_by_temperature = 2d6 ! need an initial flag for this.
+    !remove_center_by_temperature = 2d6 
+    remove_initial_center_by_temperature = 2d6
 
     !change_RSP2_flag = .true.
     !new_RSP2_flag = .true.

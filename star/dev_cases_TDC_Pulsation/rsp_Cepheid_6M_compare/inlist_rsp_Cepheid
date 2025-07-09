@@ -98,7 +98,7 @@ RSP_max_dt_times_min_dr_div_cs = 4d0 ! default is 2d0
 
       photo_interval = 1000
       profile_interval = 4000
-      history_interval = 10
+      history_interval = 1!10
       terminal_interval = 200
 
 / ! end of controls namelist

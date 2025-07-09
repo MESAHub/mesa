@@ -171,7 +171,7 @@
          Profile_Panels2_yaxis_name(4) = 'opacity'     
          Profile_Panels2_ymax(4) = -101D0
          Profile_Panels2_ymin(4) = -101D0
-         Profile_Panels2_other_yaxis_name(4) = 'zone' 
+         Profile_Panels2_other_yaxis_name(4) = 'rsp_Y_face' 
          Profile_Panels2_other_ymax(4) = -101D0 ! 
          Profile_Panels2_other_ymin(4) = -101D0 ! 
          Profile_Panels2_yaxis_log(4) = .true.
