@@ -145,7 +145,7 @@ Profile_Panels3_yaxis_name(4) = 'conv_vel_div_csound'!'conv_vel'!'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
 Profile_Panels3_other_dymin(4) = 0.14
 
-Profile_Panels3_yaxis_name(5) = 'Frad_div_cUrad'!'lum_div_Ledd'!'log_csound'!'logT'
+Profile_Panels3_yaxis_name(5) = 'v_div_vesc'!'lum_div_Ledd'!'log_csound'!'logT'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'!'burn_num_iters'
     Profile_Panels3_yaxis_log(5) = .false.
 
@@ -181,29 +181,19 @@ Profile_Panels1_title = ''
 Profile_Panels1_txt_scale = 0.7
 Profile_Panels1_num_panels = 4
 
-Profile_Panels1_yaxis_name(1) = 'Lc_div_L'!'vel_km_per_s'
+Profile_Panels1_yaxis_name(1) = 'Lc_div_L'
 !Profile_Panels1_dymin(1) = 0.14
-Profile_Panels1_other_yaxis_name(1) = 'lum_conv'!'Lc_div_L'
+Profile_Panels1_other_yaxis_name(1) = 'Frad_div_cUrad'!'lum_conv'
 !Profile_Panels1_other_dymin(1) = 0.14
-!Profile_Panels1_other_ymax(1) = 500
-!Profile_Panels1_other_ymin(1) = -100
-!Profile_Panels1_ymax(1) = 100
-!Profile_Panels1_other_ymin(1) = -100
-!Profile_Panels1_other_yaxis_log = .true.
 
-Profile_Panels1_yaxis_name(2) = 'logT'!'pressure'!'logT'!'logdq'!'radius'!'entropy'
-Profile_Panels1_other_yaxis_name(2) = 'Lc_div_L'!'mlt_Pturb'! 'Lc_div_L'!'log_dt_cs_div_dr'
-!Profile_Panels1_other_yaxis_log(2) = .true.
-!Profile_Panels1_yaxis_log(2) = .true.
-!Profile_Panels1_other_ymax(2) = 0.3
-!Profile_Panels1_other_ymin(2) = -5
-!Profile_Panels1_ymin(2) = -5
-!Profile_Panels1_same_yaxis_range(2) = .true.
+Profile_Panels1_yaxis_name(2) = 'logT'!'logdq'!'radius'!'entropy'
+Profile_Panels1_other_yaxis_name(2) = 'mlt_Y_face'! 'Lc_div_L'!'log_dt_cs_div_dr'!'pgas_div_p'
+Profile_Panels1_other_yaxis_log(2) = .false.
 
-!Profile_Panels1_ymax(2) = 4.5
-!Profile_Panels1_other_ymax(2) = 2
+!Profile_Panels1_ymax(2) = 210
+!Profile_Panels1_ymin(2) = 160
 
-Profile_Panels1_yaxis_name(3) = 'mlt_Y_face'!'gradT'
+Profile_Panels1_yaxis_name(3) = 'Lc_div_L'!'gradT'
 Profile_Panels1_other_yaxis_name(3) = 'conv_vel'!'lum_div_Ledd'!'grada'
 Profile_Panels1_same_yaxis_range(3) = .false.
 Profile_Panels1_other_dymin(3) = 0.08
@@ -211,7 +201,7 @@ Profile_Panels1_other_dymin(3) = 0.08
 Profile_Panels1_ymax(3)  =-101d0
 
 Profile_Panels1_yaxis_name(4) = 'log_opacity'
-!Profile_Panels1_ymin(4) = 0
+Profile_Panels1_ymin(4) = 0
 Profile_Panels1_dymin(4) = 0.14
 Profile_Panels1_other_yaxis_name(4) = 'gradr'
 Profile_Panels1_other_dymin(4) = 0.14
@@ -219,7 +209,7 @@ Profile_Panels1_other_dymin(4) = 0.14
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'!'zone'
 Profile_Panels1_xmin = -101d0!-101d0
-Profile_Panels1_xmax = -101d0!9d0 !-101d0 !8.1
+Profile_Panels1_xmax = 5.5d0!-101d0!9d0 !-101d0 !8.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'
@@ -269,18 +259,18 @@ show_TRho_Profile_text_info = .false.
  TRho_Profile_text_info_yfac = 0.6 ! controls y location of 1st line
  TRho_Profile_text_info_dyfac = -0.04 ! controls line spacing
          
-show_TRho_Profile_mass_locs = .false.
+show_TRho_Profile_mass_locs = .true.
 show_TRho_accretion_mesh_borders = .false.
 show_TRho_Profile_kap_regions = .false.
 show_TRho_Profile_gamma1_4_3rd = .true.
-show_TRho_Profile_eos_regions = .false.
+show_TRho_Profile_eos_regions = .true.
 show_TRho_Profile_degeneracy_line = .true.
 show_TRho_Profile_Pgas_Prad_line = .true.
 show_TRho_Profile_burn_lines = .true.
 show_TRho_Profile_burn_labels = .true.
       
 ! axis limits
-TRho_Profile_xmin = -20.0
+TRho_Profile_xmin = -15.0
 TRho_Profile_xmax = 0!5d0!10.0
 TRho_Profile_ymin = 2.5
 TRho_Profile_ymax = 7.5!8.5d0!10.0        
@@ -578,7 +568,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
          ! file output
-         HR_file_flag = .true.
+         HR_file_flag = .false.
          HR_file_dir = 'hr_png'
          HR_file_prefix = 'hr_'
          HR_file_interval = 10 ! output when `mod(model_number,HR_file_interval)==0`
@@ -589,8 +579,8 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
     History_Panels1_title = ''
 
-    History_Panels1_xaxis_name = 'model_number'!'model_number'
-    History_Panels1_max_width = 2000! 10000
+    History_Panels1_xaxis_name = 'day'!'model_number'
+    History_Panels1_max_width = 3! 10000
 
     !History_Panels1_xaxis_name = 'star_age'
     !History_Panels1_max_width = 10
@@ -656,11 +646,11 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_dymin(3) = 0.14
       ! ::
 
-    History_Panels1_yaxis_name(4) = 'log_g'!'log_dt'
+    History_Panels1_yaxis_name(4) = 'KE_growth_avg'!'log_dt'
     History_Panels1_yaxis_reversed(4) = .false.
     History_Panels1_ymin(4) = -101d0
     History_Panels1_ymax(4) = -101d0
-    History_Panels1_dymin(4) = 0.14
+    !History_Panels1_dymin(4) = 0.14
 
       ! ::
 
@@ -718,8 +708,8 @@ Kipp_show_luminosities = .true.
 
 
 ! history tracks
- History_Track1_file_flag = .true.
- History_Track2_file_flag = .true.
+ History_Track1_file_flag = .false.
+ History_Track2_file_flag = .false.
 
 
 History_Track1_win_flag = .true.
@@ -727,7 +717,7 @@ History_Track1_file_interval = 50
 History_Track1_win_width = 12
 History_Track1_win_aspect_ratio = 0.75
 
-History_Track1_xname = 'v_surf_km_s'
+History_Track1_xname = 'v_surf_km_s' !Teff
 History_Track1_yname = 'log_L'
 History_Track1_xaxis_label = 'Vsurf'
 History_Track1_yaxis_label = 'log L/L\d\(2281)'

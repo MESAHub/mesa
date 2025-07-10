@@ -45,7 +45,7 @@
 
       !!!!!!!!!!!!!!!!!!!!!!!!!
       ! These variables are loaded up from x_ctrl, x_integer_ctrl and x_logical_ctrl
-      ! values specified on inlist_ppisn
+      ! values specified on inlist_common, inlist_pulses
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -372,9 +372,7 @@
 
          ! interestingly, if you do this instead of remove_center_by_temperature
          ! in the starjob section of the inlist, then the tau relaxation happens
-         ! before the cut. Not sure which is better, but leaving like this for now.
-         ! It turns out that this appears to be the better way and
-         ! to do it, as this smooths the initialization of new atm BCs (if changed).
+         ! before the cut. Not sure which is better, but leaving like this for now
          if (.not. restart .and. in_inlist_pulses .and. remove_core) then
             call star_remove_center_by_temperature(id, core_T_for_cut, ierr)
           end if
@@ -395,14 +393,14 @@
 
          call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
+        !if (.not. restart .and. in_inlist_pulses) then
+        !    initial_model_number = s% model_number
+        !end if
+        initial_model_number = 0 ! since we are setting model # to 0 in inlist_pulses
+
+
          ! for rsp style mesh
-         if (.not. restart .and. in_inlist_pulses ) then
-         initial_model_number = s% model_number
-         end if
-
          if (.not. restart .and. in_inlist_pulses .and. remesh_for_envelope_model) then
-            initial_model_number = s% model_number
-
             call remesh_for_TDC_pulsation(id, ierr)
          end if
       end subroutine extras_startup
@@ -473,8 +471,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-!         how_many_extra_profile_columns = TDC_pulsation_how_many_extra_profile_columns(id)
-         how_many_extra_profile_columns = 1!how_many_extra_profile_columns +1
+         how_many_extra_profile_columns = TDC_pulsation_how_many_extra_profile_columns(id)
+
       end function how_many_extra_profile_columns
       
       
@@ -490,12 +488,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-!         call TDC_pulsation_data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
-         names(1) = 'Frad_div_cUrad'
-         do k = 1, s% nz
-         vals(k,1) = ((s% L(k) - s% L_conv(k)) / (4._dp*pi*pow2(s%r(k)))) &
-            /(clight * s% Prad(k) *3._dp)
-         end do
+         call TDC_pulsation_data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
+
       end subroutine data_for_extra_profile_columns
       
 
@@ -513,7 +507,7 @@
          s% use_other_before_struct_burn_mix = .true.
 
          ! we want to ignore T gradient equation for a few steps after remesh
-         if (s% model_number < initial_model_number + 100 .and. in_inlist_pulses) then
+         if (s% model_number < initial_model_number + 10 .and. in_inlist_pulses) then
             s% convergence_ignore_equL_residuals = .true.
          else if (in_inlist_pulses) then
             s% convergence_ignore_equL_residuals = .false.
@@ -537,6 +531,13 @@
          end if
 
          call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
+
+         ! add stopping condition for testing.
+         if ((.not. in_inlist_pulses) .and. s% center_he4 < 2d-1) then
+            s% Teff_lower_limit = exp10(3.75d0)
+         else
+            s% Teff_lower_limit = -1d99
+         end if
 
          extras_start_step = keep_going
       end function extras_start_step
@@ -580,11 +581,11 @@
                  s% max_timestep = max_dt_before_pulse
             end if
 
-         ! time step control on pulsations
-         if (period > 0d0 .and. period/s% max_timestep < 600 .and. &
-         s% model_number > timestep_drop_model_number) then
-             s% max_timestep = period/600d0
-         end if
+            ! time step control on pulsations
+            if (period > 0d0 .and. period/s% max_timestep < 600 .and. &
+            s% model_number > timestep_drop_model_number) then
+                s% max_timestep = period/600d0
+            end if
 
             if (s% model_number > turn_off_remesh_model_number .and. turn_off_remesh )then
                s% okay_to_remesh = .false.
@@ -600,16 +601,6 @@
          !               write (*,*) 's% mesh_min_k_old_for_split', s% mesh_min_k_old_for_split
             end if
          end if
-         
-         ! adjust convection near surface to prevent crazy issues:
-
-!         do k = 1, s% nz
-!            if (s% tau(k) > 2d0/3d0) then
-!               exit
-!            end if
-!         end do
-!
-!         s% max_q_for_convection_with_hydro_on = s% q(k-1)
 
          ! reading inlists can turn this flag off for some reason
          s% use_other_before_struct_burn_mix = .true.
@@ -657,147 +648,75 @@
       end subroutine how_many_other_mesh_fcns
 
 
-!      subroutine RSP_mesh( &
-!         id, nfcns, names, gval_is_xa_function, vals1, ierr)
-!         use star_def
-!         use math_lib
-!         use const_def
-!         integer, intent(in) :: id
-!         integer, intent(in) :: nfcns
-!         character(len=*) :: names(:)
-!         logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
-!         real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
-!         integer, intent(out) :: ierr
-!         integer :: nz, k
-!         real(dp), pointer :: vals(:, :)
-!         real(dp) :: weight1 = 1d6!1d4
-!         real(dp) :: weight2 = 8d5!1d4
-!         real(dp) :: weight3 = 0d0
-!         real(dp) :: logT_anchor1, logT_anchor2, logT_anchor3, lmid, delta, ell
-!         integer :: k_anchor1, k_anchor2
-!
-!         type(star_info), pointer :: s
-!         ierr = 0
-!         call star_ptr(id, s, ierr)
-!         if (ierr /= 0) return
-!         names(1) = 'RSP_function'
-!         gval_is_xa_function(1) = .false.
-!         nz = s%nz
-!         vals(1:nz, 1:nfcns) => vals1(1:nz*nfcns)
-!
-!         logT_anchor1 = log(11d3)!log(11d3)
-!         logT_anchor2 = log(20d3)!log(11d3)
-!         logT_anchor3 = log(30d3)
-!
-!         lmid  = 0.5d0*(logT_anchor2+logT_anchor3)
-!         delta = (logT_anchor3 - logT_anchor2)
-!
-!         k_anchor1 = 0
-!         k_anchor2 = 0
-!
-!      !         do k = 1, nz
-!      !            if (s% lnT(k) < logT_anchor1) then
-!      !               vals(k, 1) = weight1*(s% m(1) - s% m(k))/Msun
-!      !               k_anchor = k
-!      !               !write (*,*) "k", k ,"dm", vals(k, 1)
-!      !            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-!      !               vals(k, 1) = weight2*(s% m(k_anchor) - s% m(k))/Msun
-!      !               !write (*,*) "k", k ,"dm", vals(k, 1)
-!      !            else
-!      !               vals(k, 1) = weight3*(s% m(1)/Msun - s% m(k)/Msun)
-!      !            end if
-!      !         end do
-!
-!
-!         do k = 1, nz
-!            ell = s%lnT(k)
-!            if (s% lnT(k) <= logT_anchor1) then
-!               vals(k,1) = weight1*(s%m(1) - s%m(k))/Msun
-!               k_anchor1 = k
-!            else if (s% lnT(k) <= logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-!               vals(k,1) = weight2*(s%m(1) - s%m(k))/Msun
-!               k_anchor2 = k
-!            else if (s% lnT(k) < logT_anchor3) then
-!               ! smooth taper doqn to 0.
-!!               vals(k,1) = vals(k-1,1)/2d0
-!               vals(k,1) = (0.5d0*weight2*(1d0 - tanh( (ell - lmid)/delta )) &
-!                  ) * ( (s%m(k_anchor2) - s%m(k)) / Msun )
-!            end if
-!         end do
-!
-!      end subroutine RSP_mesh
+      subroutine RSP_mesh( &
+         id, nfcns, names, gval_is_xa_function, vals1, ierr)
+         use star_def
+         use math_lib
+         use const_def
+         integer, intent(in) :: id
+         integer, intent(in) :: nfcns
+         character(len=*) :: names(:)
+         logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
+         real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
+         integer, intent(out) :: ierr
+         integer :: nz, k
+         real(dp), pointer :: vals(:, :)
+         real(dp) :: weight1 = 1d6!1d4
+         real(dp) :: weight2 = 8d5!1d4
+         real(dp) :: weight3 = 0d0
+         real(dp) :: logT_anchor1, logT_anchor2, logT_anchor3, lmid, delta, ell
+         integer :: k_anchor1, k_anchor2
 
-subroutine RSP_mesh( &
-   id, nfcns, names, gval_is_xa_function, vals1, ierr)
-   use star_def
-   use math_lib
-   use const_def
-   integer, intent(in) :: id
-   integer, intent(in) :: nfcns
-   character(len=*) :: names(:)
-   logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
-   real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
-   integer, intent(out) :: ierr
-   integer :: nz, k
-   real(dp), pointer :: vals(:, :)
-   real(dp) :: weight1 = 1d5!1d4
-   real(dp) :: weight2 = 1d5!1d4
-   real(dp) :: weight3 = 0d0
-   real(dp) :: logT_anchor1, logT_anchor2, logT_anchor3, lmid, delta, ell
-   integer :: k_anchor1, k_anchor2
+         type(star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         names(1) = 'RSP_function'
+         gval_is_xa_function(1) = .false.
+         nz = s%nz
+         vals(1:nz, 1:nfcns) => vals1(1:nz*nfcns)
 
-   type(star_info), pointer :: s
-   ierr = 0
-   call star_ptr(id, s, ierr)
-   if (ierr /= 0) return
-   names(1) = 'RSP_function'
-   gval_is_xa_function(1) = .false.
-   nz = s%nz
-   vals(1:nz, 1:nfcns) => vals1(1:nz*nfcns)
+         logT_anchor1 = log(11d3)!log(11d3)
+         logT_anchor2 = log(20d3)!log(11d3)
+         logT_anchor3 = log(30d3)
 
-   logT_anchor1 = log(11d3)!log(11d3)
-   logT_anchor2 = log(20d3)!log(11d3)
-   logT_anchor3 = log(30d3)
+         lmid  = 0.5d0*(logT_anchor2+logT_anchor3)
+         delta = (logT_anchor3 - logT_anchor2)
 
-   lmid  = 0.5d0*(logT_anchor2+logT_anchor3)
-   delta = (logT_anchor3 - logT_anchor2)/10d0
+         k_anchor1 = 0
+         k_anchor2 = 0
 
-   k_anchor1 = 0
-   k_anchor2 = 0
-
-!         do k = 1, nz
-!            if (s% lnT(k) < logT_anchor1) then
-!               vals(k, 1) = weight1*(s% m(1) - s% m(k))/Msun
-!               k_anchor = k
-!               !write (*,*) "k", k ,"dm", vals(k, 1)
-!            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-!               vals(k, 1) = weight2*(s% m(k_anchor) - s% m(k))/Msun
-!               !write (*,*) "k", k ,"dm", vals(k, 1)
-!            else
-!               vals(k, 1) = weight3*(s% m(1)/Msun - s% m(k)/Msun)
-!            end if
-!         end do
+      !         do k = 1, nz
+      !            if (s% lnT(k) < logT_anchor1) then
+      !               vals(k, 1) = weight1*(s% m(1) - s% m(k))/Msun
+      !               k_anchor = k
+      !               !write (*,*) "k", k ,"dm", vals(k, 1)
+      !            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
+      !               vals(k, 1) = weight2*(s% m(k_anchor) - s% m(k))/Msun
+      !               !write (*,*) "k", k ,"dm", vals(k, 1)
+      !            else
+      !               vals(k, 1) = weight3*(s% m(1)/Msun - s% m(k)/Msun)
+      !            end if
+      !         end do
 
 
-   do k = 1, nz
-      ell = s%lnT(k)
-      if (s% lnT(k) < logT_anchor1) then
-         ! core weighting
-         vals(k,1) = weight1*(s%m(1) - s%m(k))/Msun
-         k_anchor1 = k
-      else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-         ! envelope weighting
-         vals(k,1) = weight2*(s%m(k_anchor1) - s%m(k))/Msun
-         k_anchor2 = k
-      else
-         ! smooth taper from weight2 → 0
-         vals(k,1) = ( &
-            0.5d0*weight2*(1d0 - tanh( (ell - lmid)/delta )) &
-            ) * ( (s%m(k_anchor2) - s%m(k)) / Msun )
-      end if
-   end do
+         do k = 1, nz
+            ell = s%lnT(k)
+            if (s% lnT(k) <= logT_anchor1) then
+               vals(k,1) = weight1*(s%m(1) - s%m(k))/Msun
+               k_anchor1 = k
+            else if (s% lnT(k) <= logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
+               vals(k,1) = weight2*(s%m(1) - s%m(k))/Msun
+               k_anchor2 = k
+            else if (s% lnT(k) < logT_anchor3) then
+               ! smooth taper doqn to 0.
+!               vals(k,1) = vals(k-1,1)/2d0
+               vals(k,1) = (0.5d0*weight2*(1d0 - tanh( (ell - lmid)/delta )) &
+                  ) * ( (s%m(k_anchor2) - s%m(k)) / Msun )
+            end if
+         end do
 
-end subroutine RSP_mesh
+      end subroutine RSP_mesh
 
 
       subroutine photo_write(id, iounit)

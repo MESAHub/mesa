@@ -497,21 +497,25 @@ contains
           X = sqrt(3d0/2d0)*(convert(info%T)/w)*G ! should be same as G/F
 
           FL = flux_limiter_function(G/F) ! X
+          !if (G%val/F%val > 1d0) write(*,*) 'G/F', G%val/F%val
       else
           FL = 1d0 ! might need to set derivs to 0.
       end if
 
 
       ! Y_env sets the convective flux but not the radiative flux.
-      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env!*FL
+      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env*FL
+      !if (G%val/F%val > 1d0) write(*,*) 'G/F', G%val/F%val, 'FL', FL%val
 
     contains
 
     type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
     implicit none
     type(auto_diff_real_tdc), intent(in) :: X
+    type(auto_diff_real_tdc) :: t, P
+
     real(dp), parameter :: delta = 0.1_dp
-    real(dp) :: t, P, dPdt
+    !real(dp) :: t, P, dPdt
 
     if (X%val <= 1.0_dp) then
         ! no limiting below X=1
@@ -519,23 +523,16 @@ contains
 
     else if (X%val >= 1.0_dp + delta) then
         ! full cap above X=1+delta
-        FL = 1.0_dp / X%val
-
+        FL = 1.0_dp / X
     else
         ! smooth quintic blend on [1,1+delta]
-        t = (X%val - 1.0_dp) / delta    ! t in [0,1]
+        t = (X - 1.0_dp) / delta    ! t in [0,1]
 
         ! S(t) = 6 t^5 − 15 t^4 + 10 t^3
         P    = 6.0_dp * pow5(t) -15.0_dp * pow4(t) +10.0_dp * pow3(t)
 
         ! blend from FL=1 -> FL=1/X
-        FL%val = (1.0_dp - P) + P / X%val
-
-        ! dP/dt = 30 t^4 − 60 t^3 + 30 t^2
-        dPdt = 30.0_dp * pow4(t) -60.0_dp * pow3(t)+ 30.0_dp * pow2(t)
-
-        ! dFL/dX = (dP/dt)/delta * (−1 + 1/X) − P/X^2
-        FL%d1val1 = (dPdt / delta) * (-1.0_dp + 1.0_dp/X%val) - P / (X%val * X%val)
+        FL = (1.0_dp - P) + P / X
     end if
 
     end function flux_limiter_function

@@ -1,8 +1,16 @@
 
 &kap
  
-   read_extra_kap_inlist(1) = .true.
-   extra_kap_inlist_name(1) = 'inlist_extra'
+kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
+kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
+Zbase = 0.003d0 !0.0142d0
+kap_lowT_prefix = 'lowT_fa05_a09p'
+!AESOPUS_filename = 'AESOPUS_AGSS09.h5' ! used only if kap_lowT_prefix = 'AESOPUS'
+use_Type2_opacities = .true.
+
+!cubic_interpolation_in_X = .true.
+!cubic_interpolation_in_Z = .true.
+
 /
 
 &eos
@@ -52,10 +60,10 @@
       
       x_logical_ctrl(37) = .true. ! if true, then run GYRE
 
-      x_integer_ctrl(1) = 100 ! output GYRE info at this step interval
+      x_integer_ctrl(1) = 1000 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
-      x_integer_ctrl(2) = 5 ! max number of modes to output per call
+      x_integer_ctrl(2) = 3 ! max number of modes to output per call
       x_logical_ctrl(2) = .false. ! output eigenfunction files
 
       x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
@@ -65,12 +73,12 @@
       x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 
-    okay_to_remove_mixing_singleton = .true.
+    okay_to_remove_mixing_singleton = .false.
 
 
 
-    limit_for_rel_error_in_energy_conservation = 1d99
-    hard_limit_for_rel_error_in_energy_conservation = 1d99
+    limit_for_rel_error_in_energy_conservation = 1d1
+    hard_limit_for_rel_error_in_energy_conservation = 1d2
 
 
 
@@ -98,7 +106,7 @@
    ignore_species_in_max_correction = .true.
 
 
-   mlt_make_surface_no_mixing = .true.
+   mlt_make_surface_no_mixing = .false.
    !convergence_ignore_equL_residuals = .false., see other inlists 
    make_gradr_sticky_in_solver_iters = .false.
    xa_scale = 1d-5
@@ -115,9 +123,6 @@
    relax_max_number_retries = 99999999!1000
    max_number_retries = 99999999 !500 ! RECOMMENDED 5000
 
-   ! our wind implementation follows Brott+ 2011
-   ! see other inlists.
-
    ! During hydro we can use es scattering opacity on the very outermost cell
    use_other_kap = .false.
 
@@ -130,7 +135,6 @@
       steps_before_use_TDC = 0
 
     use_ledoux_criterion = .true.
-    !mixing_length_alpha = 2d0
     alpha_semiconvection = 1d0
     thermohaline_coeff = 0d0
     num_cells_for_smooth_gradL_composition_term = 0
@@ -161,10 +165,7 @@
    overshoot_f0(2) = 0.005
 
    overshoot_D_min = 1d-8
-
-! add a run_star_extras or something that adds this in the last moment before pulsations.
-!log_tau_function_weight = 150
-!log_kap_function_weight = 20
+   
 
    ! timestep options
    varcontrol_target = 1d-3!5d-4
@@ -179,7 +180,7 @@
    delta_lgTeff_limit = 1d0
 
    delta_lgL_hard_limit = -1!1d200
-   delta_lgR_limit = 1d-1!0.025d0
+   delta_lgR_limit = 1d-2!0.025d0
    delta_lgR_hard_limit = -1!0.05d0
    delta_lgR_limit_min_lgR = 3d0 ! 3d0 for >1000 Rsun
    delta_lgL_He_limit = -1d0
@@ -244,11 +245,11 @@
 
 
       photo_digits = 8
-      photo_interval = 10!50
-      profile_interval = 200!50
-      history_interval = 1!10
-      terminal_interval = 10!10
-      max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000
+      photo_interval = 1000
+      profile_interval = 200 
+      history_interval = 1
+      terminal_interval = 10
+      max_num_profile_models = 1000000 ! 100 ! RECOMMENDED 10000
 
 
     num_trace_history_values = 2
