@@ -13,9 +13,13 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-	colors_def.f90 \
-	mod_colors.f90 \
-	colors_lib.f90
+   colors_ctrls_io.f90 \
+   colors_def.f90 \
+   shared_funcs.f90 \
+   hermite_interp.f90 \
+   knn_interp.f90 \
+   linear_interp.f90 \
+   colors_lib.f90
 
 #################################################################
 #
@@ -57,7 +61,12 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+MOD_DEFAULTS_DIR = $(MODULE_DIR)/defaults
+INCLUDE_DEFAULTS = -I$(MOD_DEFAULTS_DIR)
+
+MOD_INCLUDES = $(INCLUDE_DEFAULTS)
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(MOD_INCLUDES)
 
 COMPILE_CMD = $(COMPILE)
 

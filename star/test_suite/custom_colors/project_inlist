@@ -1,0 +1,124 @@
+! Sun from PMS to TAMS
+! This inlist evolves a standard 1.0 M_sol with solar metallicity (Z=0.02)
+! from the pre-main sequence through to the exhaustion of central hydrogen.
+!try feh to z conversion for -1 and -2 at solar mass -3 wont work but try it
+! evolve a 2 and a 5 solar mass as late as they will go
+
+!two solar masses 
+
+&star_job
+      ! Create a fresh pre-main-sequence model
+      create_pre_main_sequence_model = .true.
+
+      ! Save final model
+      save_model_when_terminate = .true.
+      save_model_filename = 'custom_colors_end.mod'
+
+      ! Stop when core H is exhausted
+      required_termination_code_string = 'xa_central_lower_limit'
+
+      ! Enable PGSTAR plotting
+      pgstar_flag = .true.
+
+      ! Custom history output
+      history_columns_file = 'custom_colors_history_columns.list'
+
+      ! Verbosity
+      show_log_description_at_start = .true.
+
+      pre_ms_relax_to_start_radiative_core = .false. !! in general doing this is bad, but for demo turn off
+/
+
+&eos
+/
+
+&kap
+      Zbase = 0.014d0
+      kap_file_prefix = 'gs98'
+/
+
+&colors
+      use_colors = .true.
+      instrument = '/colors/data/filters/GAIA/GAIA'
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      
+      metallicity = 0.02 !!
+      
+      distance = 3.0857d17 !! distance in Meter
+      make_csv = .true.
+
+/ ! end of colors namelist
+
+&controls
+      ! Basic stellar parameters
+      initial_mass = 1.2d0         ! Solar-mass
+      initial_z = 0.014d0           ! Solar metallicity
+
+      !! stopping conditions redundant 
+      max_age = 13d9          ! Cap time to 13 Gyr
+
+      ! Enable H core depletion termination
+      !xa_central_lower_limit_species(1) = 'h1'
+      !xa_central_lower_limit(1) = 1d-5
+
+      ! Output and performance settings
+      profile_interval = 100
+      history_interval = 1 !! make this one-to-one
+      terminal_interval = 10 !0
+      photo_interval = 100
+      !max_model_number = 20000
+
+cool_wind_RGB_scheme = 'Reimers'
+Reimers_scaling_factor = 0.3d0
+
+cool_wind_AGB_scheme = 'Blocker'
+Blocker_scaling_factor = 0.05d0
+
+
+      use_gold2_tolerances = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+/
+
+
+&pgstar
+  pgstar_interval = 10
+
+  ! Standard HR Diagram
+  HR_win_flag = .true.
+  HR_logT_min = 3.2
+  HR_logT_max = 4.3
+  HR_logL_min = -1.0
+  HR_logL_max = 4.0
+
+  ! G band light curve
+  History_Track2_win_flag = .true.
+  History_Track2_xname = 'star_age'
+  History_Track2_yname = 'G'
+  History_Track2_title = 'G Light Curve'
+  History_Track2_xaxis_label = 'Age (yr)'
+  History_Track2_yaxis_label = 'G mag'
+
+  ! Grp light curve
+  History_Track3_win_flag = .true.
+  History_Track3_xname = 'star_age'
+  History_Track3_yname = 'Grp'
+  History_Track3_title = 'Grp Light Curve'
+
+  ! Grvs light curve
+  History_Track4_win_flag = .true.
+  History_Track4_xname = 'star_age'
+  History_Track4_yname = 'Grvs'
+  History_Track4_title = 'Grvs Light Curve'
+
+  ! Flux_bol curve
+  History_Track5_win_flag = .true.
+  History_Track5_xname = 'star_age'
+  History_Track5_yname = 'Flux_bol'
+  History_Track5_title = 'Bolometric Flux'
+
+
+/
