@@ -36,8 +36,6 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
     ! Construct the binary filename
     bin_filename = TRIM(stellar_model_dir) // '/flux_cube.bin'
 
-    PRINT *, 'Loading precomputed flux cube from:', TRIM(bin_filename)
-
     ! Load the data from binary file
     CALL load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
                          wavelengths, precomputed_flux_cube, status)
@@ -52,9 +50,6 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
     n_logg = SIZE(logg_grid)
     n_meta = SIZE(meta_grid)
     n_lambda = SIZE(wavelengths)
-
-    PRINT *, 'Loaded flux cube with dimensions:', n_teff, 'x', n_logg, 'x', n_meta, 'x', n_lambda
-    PRINT *, 'Performing interpolation at target parameters...'
 
     ! Allocate space for interpolated flux
     ALLOCATE(interp_flux(n_lambda))
