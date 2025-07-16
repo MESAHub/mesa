@@ -76,7 +76,6 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
     DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
     DEALLOCATE(diluted_flux, interp_flux)
 
-    PRINT *, 'Interpolation complete'
   END SUBROUTINE constructsed_hermite
 
   !---------------------------------------------------------------------------
