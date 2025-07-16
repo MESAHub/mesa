@@ -1,0 +1,118 @@
+## Version number
+data/version_number
+
+## Compilation
+build.log
+.depend
+.order
+*.a
+**/make/*.f
+**/make/*.f90
+**/make/*.mod
+**/make/*.smod
+*.o
+*.so
+/lib/
+/include/
+*.pyc
+*/other/*.mod
+
+## Debugging/Profiling
+gmon.out
+callgrind.out*
+massif.out*
+valgrind.out*
+vgcore.*
+
+## Diffs/Patches
+*.orig
+*.patch
+*.rej
+
+
+## Documentation
+/dox/
+docs/source/_tags
+
+
+## Executables
+*.x
+
+
+## Output
+**/LOGS*/
+**/LOGS1/
+**/LOGS2/
+**/photos/
+**/png/
+**/png1/
+**/png2/
+**/png3/
+**/pgstar_out/
+**/pgstar_out1/
+**/pgstar_out2/
+**/pgstar_out3/
+**/plt_out/
+**/plt_out1/
+**/plt_out2/
+**/plt_out3/
+
+## Bill
+star_data/public_*
+star_data/private_*
+star/defaults_*
+star/job_*
+star/other_*
+star/private_*
+star/public_*
+*.notes
+inlist
+lst*
+d1*
+fort.*
+
+
+## Restarts
+.restart
+restart_photo
+
+
+## Testing
+**/test/diff.txt
+**/test/plotter
+**/test/sample
+**/test/tester
+**/test/test_quietly
+**/test/test_quietly.txt
+**/test/tmp.txt
+
+
+## Test Suite
+.running
+checks.md5
+mk.txt
+err.txt
+mem-rn.txt
+mem-re.txt
+out.txt
+final.mod
+final_check.mod
+final_check_diff.txt
+final_profile.data
+final_profile_check.data
+test_results.yml
+testhub.yml
+
+
+## Misc
+._*
+.DS_Store
+.mesa_temp_cache/
+TAGS
+.vscode
+.idea
+
+## Colors
+star/test_suite/custom_colors/testdata.txz
+colors/data
+*.mp4
