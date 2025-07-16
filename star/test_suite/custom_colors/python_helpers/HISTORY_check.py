@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import glob
 import os
-import time
 import matplotlib.pyplot as plt
 import mesa_reader as mr
 import numpy as np
@@ -9,7 +8,7 @@ from matplotlib.animation import FuncAnimation
 
 # Import functions from static version for consistency
 from static_HISTORY_check import (
-    get_mesa_phase_info,
+    # get_mesa_phase_info,
     get_phase_info_from_mesa,
     read_header_columns,
     setup_hr_diagram_params,
@@ -225,7 +224,7 @@ class HistoryChecker:
             except AttributeError:
                 try:
                     col_data = self.md.data(filt)
-                except:
+                except Exception:
                     print(f"Warning: Could not retrieve data for filter {filt}")
                     continue
 

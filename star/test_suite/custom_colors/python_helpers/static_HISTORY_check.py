@@ -140,11 +140,11 @@ def create_phase_plots(history_file="../LOGS/history.data"):
     # Basic stellar parameters
     Teff = md.Teff
     Log_L = md.log_L
-    Log_g = md.log_g
-    Log_R = md.log_R
+    # Log_g = md.log_g
+    # Log_R = md.log_R
     Star_Age = md.star_age
-    Mag_bol = md.Mag_bol
-    Flux_bol = np.log10(md.Flux_bol)
+    # Mag_bol = md.Mag_bol
+    # Flux_bol = np.log10(md.Flux_bol)
 
     # Read headers and get filter info
     all_cols, filter_columns = read_header_columns(history_file)
@@ -169,7 +169,7 @@ def create_phase_plots(history_file="../LOGS/history.data"):
     )
 
     # Top-left plot: HR Diagram (Color vs. Magnitude) with phase colors
-    scatter1 = axes[0, 0].scatter(
+    axes[0, 0].scatter(
         hr_color, hr_mag, c=phase_colors, s=20, alpha=0.7, edgecolors="none"
     )
 
@@ -181,9 +181,7 @@ def create_phase_plots(history_file="../LOGS/history.data"):
     axes[0, 0].grid(True, alpha=0.3)
 
     # Top-right plot: Teff vs. Log_L with phase colors
-    scatter2 = axes[0, 1].scatter(
-        Teff, Log_L, c=phase_colors, s=20, alpha=0.7, edgecolors="none"
-    )
+    axes[0, 1].scatter(Teff, Log_L, c=phase_colors, s=20, alpha=0.7, edgecolors="none")
 
     axes[0, 1].set_xlabel("Teff (K)", fontsize=14)
     axes[0, 1].set_ylabel("Log L/L☉", fontsize=14)
@@ -195,7 +193,7 @@ def create_phase_plots(history_file="../LOGS/history.data"):
     axes[0, 1].grid(True, alpha=0.3)
 
     # Bottom-left plot: Age vs. Color Index with phase colors
-    scatter3 = axes[1, 0].scatter(
+    axes[1, 0].scatter(
         Star_Age, color_index, c=phase_colors, s=20, alpha=0.7, edgecolors="none"
     )
 
@@ -210,7 +208,7 @@ def create_phase_plots(history_file="../LOGS/history.data"):
         except AttributeError:
             try:
                 col_data = md.data(filt)
-            except:
+            except Exception:
                 print(f"Warning: Could not retrieve data for filter {filt}")
                 continue
 
