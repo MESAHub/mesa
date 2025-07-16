@@ -20,8 +20,7 @@ class SVOSpectraGrabber:
         self.base_dir = base_dir
         self.max_workers = max_workers
         self.session = requests.Session()
-        self.session.headers.update(
-            {"User-Agent": "Mozilla/5.0 (MESA Colors Module)"})
+        self.session.headers.update({"User-Agent": "Mozilla/5.0 (MESA Colors Module)"})
 
         # SVO endpoints
         self.model_index_url = "http://svo2.cab.inta-csic.es/theory/newov2/index.php"
@@ -64,8 +63,7 @@ class SVOSpectraGrabber:
         # Method 1: Direct metadata query
         try:
             params = {"model": model_name, "format": "json"}
-            response = self.session.get(
-                self.metadata_url, params=params, timeout=30)
+            response = self.session.get(self.metadata_url, params=params, timeout=30)
             if response.status_code == 200:
                 try:
                     metadata = response.json()
@@ -94,8 +92,7 @@ class SVOSpectraGrabber:
 
         try:
             # Query for all spectra in this model
-            params = {"model": model_name,
-                      "REQUEST": "queryData", "FORMAT": "metadata"}
+            params = {"model": model_name, "REQUEST": "queryData", "FORMAT": "metadata"}
 
             response = self.session.get(
                 self.spectra_base_url, params=params, timeout=30
@@ -126,8 +123,7 @@ class SVOSpectraGrabber:
 
         # Use batch requests to speed up discovery
         for start_fid in tqdm(range(1, max_fid, batch_size), desc="Scanning FIDs"):
-            batch_fids = list(
-                range(start_fid, min(start_fid + batch_size, max_fid)))
+            batch_fids = list(range(start_fid, min(start_fid + batch_size, max_fid)))
 
             # Test batch in parallel
             with ThreadPoolExecutor(max_workers=min(10, batch_size)) as executor:
@@ -155,7 +151,8 @@ class SVOSpectraGrabber:
             ):
                 print(
                     f"    Stopping search after {
-                        consecutive_failures} consecutive failures"
+                        consecutive_failures
+                    } consecutive failures"
                 )
                 break
 
@@ -283,7 +280,8 @@ class SVOSpectraGrabber:
         else:
             print(
                 f"  No spectra downloaded for {
-                    model_name}. Consider using --force-brute if the model lacks metadata."
+                    model_name
+                }. Consider using --force-brute if the model lacks metadata."
             )
 
         return successful_downloads
@@ -305,8 +303,7 @@ class SVOSpectraGrabber:
             lookup_table_path, mode="w", newline="", encoding="utf-8"
         ) as csv_file:
             csv_file.write("#" + ", ".join(header) + "\n")
-            writer = csv.DictWriter(
-                csv_file, fieldnames=header, extrasaction="ignore")
+            writer = csv.DictWriter(csv_file, fieldnames=header, extrasaction="ignore")
             writer.writerows(metadata_rows)
 
         print(f"    Lookup table saved: {lookup_table_path}")
@@ -386,8 +383,7 @@ class SVOSpectraGrabber:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Download stellar spectra from SVO")
+    parser = argparse.ArgumentParser(description="Download stellar spectra from SVO")
     parser.add_argument(
         "--output",
         type=str,
@@ -407,8 +403,7 @@ def main():
     args = parser.parse_args()
 
     # Create downloader
-    downloader = SVOSpectraGrabber(
-        base_dir=args.output, max_workers=args.workers)
+    downloader = SVOSpectraGrabber(base_dir=args.output, max_workers=args.workers)
 
     # Run downloader
     downloader.run(selected_models=args.models)

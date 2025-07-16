@@ -23,8 +23,9 @@ all_filters = []
 # Loop over each wavelength range
 for region_name, wavelength_min, wavelength_max in wavelength_ranges:
     print(
-        f"\nRetrieving filters for {
-            region_name} range ({wavelength_min} - {wavelength_max})"
+        f"\nRetrieving filters for {region_name} range ({wavelength_min} - {
+            wavelength_max
+        })"
     )
     try:
         filters_table = SvoFps.get_filter_index(
@@ -107,8 +108,7 @@ for idx, row in filters_df.iterrows():
         if transmission_data is not None and len(transmission_data) > 0:
             # Save the data to a file
             file_path = os.path.join(directory_path, filter_filename)
-            transmission_data.write(
-                file_path, format="ascii.csv", overwrite=True)
+            transmission_data.write(file_path, format="ascii.csv", overwrite=True)
             print(f"Saved filter '{filter_name}' to {file_path}")
         else:
             print(f"No transmission data for filter '{filter_id}'")

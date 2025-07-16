@@ -127,7 +127,8 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     """
     print(
         f"  Normalizing to reference model: {
-            os.path.basename(reference_data['model_dir'])}"
+            os.path.basename(reference_data['model_dir'])
+        }"
     )
 
     # Check if reference data is valid
@@ -145,7 +146,8 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     if not valid_mask.all():
         print(
             f"    Warning: Found {
-                np.sum(~valid_mask)} invalid reference models, removing them"
+                np.sum(~valid_mask)
+            } invalid reference models, removing them"
         )
         reference_params = reference_params[valid_mask]
         # Also filter the corresponding data
@@ -163,16 +165,19 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
 
     print("    Reference model parameter ranges:")
     print(
-        f"      Teff: {reference_params[:, 0].min(
-        ):.1f} - {reference_params[:, 0].max():.1f} K"
+        f"      Teff: {reference_params[:, 0].min():.1f} - {
+            reference_params[:, 0].max():.1f
+        } K"
     )
     print(
-        f"      logg: {reference_params[:, 1].min(
-        ):.2f} - {reference_params[:, 1].max():.2f}"
+        f"      logg: {reference_params[:, 1].min():.2f} - {
+            reference_params[:, 1].max():.2f
+        }"
     )
     print(
-        f"      [M/H]: {reference_params[:,
-                                         2].min():.2f} - {reference_params[:, 2].max():.2f}"
+        f"      [M/H]: {reference_params[:, 2].min():.2f} - {
+            reference_params[:, 2].max():.2f
+        }"
     )
 
     # Normalize parameters for better distance calculation
@@ -182,27 +187,25 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     meta_range = reference_params[:, 2].max() - reference_params[:, 2].min()
 
     print(
-        f"    Parameter ranges: Teff={teff_range:.1f}, logg={
-            logg_range:.2f}, meta={meta_range:.2f}"
+        f"    Parameter ranges: Teff={teff_range:.1f}, logg={logg_range:.2f}, meta={
+            meta_range:.2f
+        }"
     )
 
     if teff_range > 0:
-        teff_norm = (reference_params[:, 0] -
-                     reference_params[:, 0].min()) / teff_range
+        teff_norm = (reference_params[:, 0] - reference_params[:, 0].min()) / teff_range
     else:
         teff_norm = np.zeros(len(reference_params))
         print("    Warning: Teff range is zero, using constant normalization")
 
     if logg_range > 0:
-        logg_norm = (reference_params[:, 1] -
-                     reference_params[:, 1].min()) / logg_range
+        logg_norm = (reference_params[:, 1] - reference_params[:, 1].min()) / logg_range
     else:
         logg_norm = np.zeros(len(reference_params))
         print("    Warning: logg range is zero, using constant normalization")
 
     if meta_range > 0:
-        meta_norm = (reference_params[:, 2] -
-                     reference_params[:, 2].min()) / meta_range
+        meta_norm = (reference_params[:, 2] - reference_params[:, 2].min()) / meta_range
     else:
         meta_norm = np.zeros(len(reference_params))
         print("    Warning: [M/H] range is zero, using constant normalization")
@@ -213,16 +216,19 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     if not np.isfinite(reference_params_norm).all():
         print("    Error: Normalized parameters contain NaN/inf values!")
         print(
-            f"    Teff range: {reference_params[:, 0].min(
-            ):.1f} - {reference_params[:, 0].max():.1f}"
+            f"    Teff range: {reference_params[:, 0].min():.1f} - {
+                reference_params[:, 0].max():.1f
+            }"
         )
         print(
-            f"    logg range: {reference_params[:, 1].min(
-            ):.2f} - {reference_params[:, 1].max():.2f}"
+            f"    logg range: {reference_params[:, 1].min():.2f} - {
+                reference_params[:, 1].max():.2f
+            }"
         )
         print(
-            f"    meta range: {reference_params[:, 2].min(
-            ):.2f} - {reference_params[:, 2].max():.2f}"
+            f"    meta range: {reference_params[:, 2].min():.2f} - {
+                reference_params[:, 2].max():.2f
+            }"
         )
         return np.ones(len(target_data["files"]))
 
@@ -247,33 +253,30 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
         # Check for invalid target parameters
         if not (np.isfinite(teff) and np.isfinite(logg) and np.isfinite(meta)):
             print(
-                f"    Warning: Invalid target parameters for {
-                    file}: Teff={teff}, logg={logg}, meta={meta}"
+                f"    Warning: Invalid target parameters for {file}: Teff={teff}, logg={
+                    logg
+                }, meta={meta}"
             )
             norm_factors.append(1.0)
             continue
 
         # Normalize target parameters the same way
         if teff_range > 0:
-            target_teff_norm = (
-                teff - reference_params[:, 0].min()) / teff_range
+            target_teff_norm = (teff - reference_params[:, 0].min()) / teff_range
         else:
             target_teff_norm = 0.0
 
         if logg_range > 0:
-            target_logg_norm = (
-                logg - reference_params[:, 1].min()) / logg_range
+            target_logg_norm = (logg - reference_params[:, 1].min()) / logg_range
         else:
             target_logg_norm = 0.0
 
         if meta_range > 0:
-            target_meta_norm = (
-                meta - reference_params[:, 2].min()) / meta_range
+            target_meta_norm = (meta - reference_params[:, 2].min()) / meta_range
         else:
             target_meta_norm = 0.0
 
-        query = np.array(
-            [target_teff_norm, target_logg_norm, target_meta_norm])
+        query = np.array([target_teff_norm, target_logg_norm, target_meta_norm])
 
         # Check if query is finite
         if not np.isfinite(query).all():
@@ -290,8 +293,7 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
 
         # Load both SEDs
         file_target = os.path.join(target_data["model_dir"], file)
-        file_ref = os.path.join(
-            reference_data["model_dir"], reference_files[idx])
+        file_ref = os.path.join(reference_data["model_dir"], reference_files[idx])
 
         try:
             wl_tgt, flux_tgt = prepare_sed(file_target, teff)
@@ -309,10 +311,8 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
 
             wl_common = wavelength_grid[mask]
 
-            interp_tgt = interp1d(
-                wl_tgt, flux_tgt, bounds_error=False, fill_value=0)
-            interp_ref = interp1d(
-                wl_ref, flux_ref, bounds_error=False, fill_value=0)
+            interp_tgt = interp1d(wl_tgt, flux_tgt, bounds_error=False, fill_value=0)
+            interp_ref = interp1d(wl_ref, flux_ref, bounds_error=False, fill_value=0)
 
             flux_tgt_interp = interp_tgt(wl_common)
             flux_ref_interp = interp_ref(wl_common)
@@ -337,7 +337,8 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     norm_factors = np.array(norm_factors)
     print(
         f"    Normalization factors: median={np.median(norm_factors):.2f}, range=[{
-            np.min(norm_factors):.2f}, {np.max(norm_factors):.2f}]"
+            np.min(norm_factors):.2f
+        }, {np.max(norm_factors):.2f}]"
     )
 
     return norm_factors
@@ -388,12 +389,10 @@ def create_common_wavelength_grid(all_models_data, sample_size=20):
     for model_data in all_models_data:
         # Sample a few SEDs from this model
         n_sample = min(sample_size, len(model_data["files"]))
-        indices = np.random.choice(
-            len(model_data["files"]), n_sample, replace=False)
+        indices = np.random.choice(len(model_data["files"]), n_sample, replace=False)
 
         for idx in indices:
-            filepath = os.path.join(
-                model_data["model_dir"], model_data["files"][idx])
+            filepath = os.path.join(model_data["model_dir"], model_data["files"][idx])
             try:
                 wavelengths, _ = load_sed(filepath)
 
@@ -435,15 +434,15 @@ def identify_reference_model(all_models_data):
         model_name = os.path.basename(model_data["model_dir"]).lower()
         if "kurucz" in model_name:
             print(
-                f"Using {os.path.basename(
-                    model_data['model_dir'])} as reference model"
+                f"Using {os.path.basename(model_data['model_dir'])} as reference model"
             )
             return i
 
     # If no Kurucz, use the first model
     print(
-        f"No Kurucz model found, using {os.path.basename(
-            all_models_data[0]['model_dir'])} as reference"
+        f"No Kurucz model found, using {
+            os.path.basename(all_models_data[0]['model_dir'])
+        } as reference"
     )
     return 0
 
@@ -476,8 +475,7 @@ def build_combined_flux_cube(
     for model_idx, model_data in enumerate(all_models_data):
         if model_idx == reference_idx:
             # Reference model doesn't need normalization
-            normalization_factors[model_idx] = np.ones(
-                len(model_data["files"]))
+            normalization_factors[model_idx] = np.ones(len(model_data["files"]))
         else:
             # Normalize to reference
             normalization_factors[model_idx] = normalize_to_reference(
@@ -486,12 +484,9 @@ def build_combined_flux_cube(
 
     # Build KDTree for fast nearest neighbor searches
     # Normalize parameters for distance calculation
-    teff_norm = (teff_grid - teff_grid.min()) / \
-        (teff_grid.max() - teff_grid.min())
-    logg_norm = (logg_grid - logg_grid.min()) / \
-        (logg_grid.max() - logg_grid.min())
-    meta_norm = (meta_grid - meta_grid.min()) / \
-        (meta_grid.max() - meta_grid.min())
+    teff_norm = (teff_grid - teff_grid.min()) / (teff_grid.max() - teff_grid.min())
+    logg_norm = (logg_grid - logg_grid.min()) / (logg_grid.max() - logg_grid.min())
+    meta_norm = (meta_grid - meta_grid.min()) / (meta_grid.max() - meta_grid.min())
 
     # Process each model
     for model_idx, model_data in enumerate(all_models_data):
@@ -708,8 +703,7 @@ def visualize_parameter_space(
     print("\nCreating parameter space visualizations...")
 
     # Get model names
-    model_names = [os.path.basename(data["model_dir"])
-                   for data in all_models_data]
+    model_names = [os.path.basename(data["model_dir"]) for data in all_models_data]
 
     # Create color map for models
     colors = plt.cm.tab10(np.linspace(0, 1, len(model_names)))
@@ -871,8 +865,7 @@ def visualize_parameter_space(
         density_map.T,
         origin="lower",
         aspect="auto",
-        extent=[teff_grid.min(), teff_grid.max(),
-                logg_grid.min(), logg_grid.max()],
+        extent=[teff_grid.min(), teff_grid.max(), logg_grid.min(), logg_grid.max()],
         cmap="YlOrRd",
     )
     ax6.set_xlabel("Teff (K)")
@@ -891,8 +884,7 @@ def visualize_parameter_space(
     print("=" * 60)
     print(f"Total number of source models: {len(all_models_data)}")
     print(
-        f"Total grid points: {len(teff_grid)} × {len(logg_grid)} × {
-            len(meta_grid)} = "
+        f"Total grid points: {len(teff_grid)} × {len(logg_grid)} × {len(meta_grid)} = "
         f"{len(teff_grid) * len(logg_grid) * len(meta_grid):,}"
     )
     print("\nParameter ranges:")
@@ -985,8 +977,7 @@ def main():
         teff_grid, logg_grid, meta_grid, source_map, all_models_data, output_dir
     )
 
-    print(f"\nSuccessfully combined {
-          len(selected_models)} stellar atmosphere models!")
+    print(f"\nSuccessfully combined {len(selected_models)} stellar atmosphere models!")
     print(f"Output saved to: {output_dir}")
     print("You can now use this combined model in MESA by setting:")
     print(f"  stellar_atm = '{output_dir}/'")

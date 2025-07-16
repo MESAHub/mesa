@@ -75,12 +75,9 @@ def load_lookup_table(lookup_file):
                 file_names.append(values[file_col].strip())
 
                 try:
-                    teff = float(values[teff_col]
-                                 ) if teff_col is not None else 0.0
-                    logg = float(values[logg_col]
-                                 ) if logg_col is not None else 0.0
-                    meta = float(values[meta_col]
-                                 ) if meta_col is not None else 0.0
+                    teff = float(values[teff_col]) if teff_col is not None else 0.0
+                    logg = float(values[logg_col]) if logg_col is not None else 0.0
+                    meta = float(values[meta_col]) if meta_col is not None else 0.0
 
                     teff_values.append(teff)
                     logg_values.append(logg)
@@ -90,8 +87,7 @@ def load_lookup_table(lookup_file):
                     file_names.pop()  # Remove the added filename
 
     print(
-        f"Column indices found - teff: {
-            teff_col}, logg: {logg_col}, meta: {meta_col}"
+        f"Column indices found - teff: {teff_col}, logg: {logg_col}, meta: {meta_col}"
     )
     return (
         file_names,
@@ -120,8 +116,7 @@ def save_binary_file(
         # Write dimensions
         f.write(
             struct.pack(
-                "4i", len(teff_grid), len(logg_grid), len(
-                    meta_grid), len(wavelengths)
+                "4i", len(teff_grid), len(logg_grid), len(meta_grid), len(wavelengths)
             )
         )
 
@@ -157,8 +152,7 @@ def precompute_flux_cube(stellar_model_dir, output_file):
     """Precompute the 3D flux cube for all wavelengths."""
     # Load the lookup table
     lookup_file = os.path.join(stellar_model_dir, "lookup_table.csv")
-    file_names, teff_values, logg_values, meta_values = load_lookup_table(
-        lookup_file)
+    file_names, teff_values, logg_values, meta_values = load_lookup_table(lookup_file)
 
     print(f"Loaded {len(file_names)} model files from lookup table")
 
@@ -190,12 +184,10 @@ def precompute_flux_cube(stellar_model_dir, output_file):
     print(f"Wavelength grid has {n_lambda} points")
 
     # Create the flux cube
-    flux_cube = np.zeros((len(teff_grid), len(
-        logg_grid), len(meta_grid), n_lambda))
+    flux_cube = np.zeros((len(teff_grid), len(logg_grid), len(meta_grid), n_lambda))
 
     # Create a map to track where we've filled in the cube
-    filled_map = np.zeros((len(teff_grid), len(
-        logg_grid), len(meta_grid)), dtype=bool)
+    filled_map = np.zeros((len(teff_grid), len(logg_grid), len(meta_grid)), dtype=bool)
 
     # Process all model files
     model_index = 0
@@ -269,8 +261,7 @@ def precompute_flux_cube(stellar_model_dir, output_file):
         fill_empty = user_input in ("true", "t", "yes", "y", "1")
 
         if fill_empty:
-            print(f"Warning: {
-                  empty_points} grid points are empty and need filling")
+            print(f"Warning: {empty_points} grid points are empty and need filling")
 
             # Simple fill algorithm: use nearest neighbor
             for i_teff in tqdm(range(len(teff_grid))):
@@ -287,13 +278,10 @@ def precompute_flux_cube(stellar_model_dir, output_file):
                                         if filled_map[ii, jj, kk]:
                                             # Simple Euclidean distance, could be improved
                                             d_teff = (
-                                                teff_grid[i_teff] -
-                                                teff_grid[ii]
+                                                teff_grid[i_teff] - teff_grid[ii]
                                             ) / 1000  # Scale for comparable magnitude
-                                            d_logg = logg_grid[i_logg] - \
-                                                logg_grid[jj]
-                                            d_meta = meta_grid[i_meta] - \
-                                                meta_grid[kk]
+                                            d_logg = logg_grid[i_logg] - logg_grid[jj]
+                                            d_meta = meta_grid[i_meta] - meta_grid[kk]
                                             dist = d_teff**2 + d_logg**2 + d_meta**2
 
                                             if dist < best_dist:

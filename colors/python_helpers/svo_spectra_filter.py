@@ -49,14 +49,14 @@ def filter_lookup_table(input_file):
             median_val = df[column].median()
             print(f"Number of unique values: {unique_count}")
             print(
-                f"Range: [{column_range[0]}, {
-                    column_range[1]}], Median: {median_val}"
+                f"Range: [{column_range[0]}, {column_range[1]}], Median: {median_val}"
             )
 
         # Prompt the user for filter input
         print(
             f"Set range or value for '{
-                column}' (e.g., 1.0-10.0 for range, 5.0 for single value, or leave blank for no filter):"
+                column
+            }' (e.g., 1.0-10.0 for range, 5.0 for single value, or leave blank for no filter):"
         )
         user_input = input(f"Filter for {column}: ").strip()
 
@@ -88,8 +88,7 @@ def filter_lookup_table(input_file):
             return
 
     # Rename the original table
-    original_backup = input_file.replace(
-        "lookup_table.csv", "OG_lookup_table.csv")
+    original_backup = input_file.replace("lookup_table.csv", "OG_lookup_table.csv")
     os.rename(input_file, original_backup)
     print(f"Original lookup table backed up as: {original_backup}")
 

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 
+
 class SEDChecker:
     def __init__(
         self,
@@ -47,7 +48,8 @@ class SEDChecker:
 
     def find_output_files(self):
         return [
-            f for f in os.listdir(self.directory)
+            f
+            for f in os.listdir(self.directory)
             if "SED.csv" in f and os.path.isfile(os.path.join(self.directory, f))
         ]
 
@@ -80,8 +82,8 @@ class SEDChecker:
                 full_path = os.path.join(self.directory, file_path)
                 current_mtime = os.path.getmtime(full_path)
                 if (
-                    file_path not in self.file_timestamps or
-                    self.file_timestamps[file_path] != current_mtime
+                    file_path not in self.file_timestamps
+                    or self.file_timestamps[file_path] != current_mtime
                 ):
                     self.file_timestamps[file_path] = current_mtime
                     changed = True
@@ -146,14 +148,16 @@ class SEDChecker:
             "Grp": "Gaia G_RP",
             "G": "Gaia G",
             "Grvs": "Gaia G_RVS",
-            "VEGA": "VEGA"
+            "VEGA": "VEGA",
         }
         displayed_labels = set()
 
         for file_path in output_files:
             linestyle = "--" if "VEGA" in file_path else "-"
             try:
-                df = pd.read_csv(os.path.join(self.directory, file_path), delimiter=",", header=0)
+                df = pd.read_csv(
+                    os.path.join(self.directory, file_path), delimiter=",", header=0
+                )
                 df = df.rename(columns=str.strip).dropna()
                 wavelengths = self.ensure_numeric(df.get("wavelengths"))
                 flux = self.ensure_numeric(df.get("fluxes"))
@@ -166,20 +170,32 @@ class SEDChecker:
 
                 if len(wavelengths) > 0 and len(flux) > 0 and not self.full_sed_plotted:
                     self.ax.plot(
-                        wavelengths, flux,
-                        label="Full SED", color="black",
-                        linewidth=1.5, linestyle=linestyle
+                        wavelengths,
+                        flux,
+                        label="Full SED",
+                        color="black",
+                        linewidth=1.5,
+                        linestyle=linestyle,
                     )
                     self.full_sed_plotted = True
 
                 if len(wavelengths) > 0 and len(convolved_flux) > 0:
-                    short_label = next((v for k, v in legend_labels.items() if k in file_path), None)
-                    label = short_label if short_label and short_label not in displayed_labels else None
+                    short_label = next(
+                        (v for k, v in legend_labels.items() if k in file_path), None
+                    )
+                    label = (
+                        short_label
+                        if short_label and short_label not in displayed_labels
+                        else None
+                    )
                     if label:
                         displayed_labels.add(label)
                     self.ax.plot(
-                        wavelengths, convolved_flux,
-                        label=label, linewidth=1, linestyle=linestyle
+                        wavelengths,
+                        convolved_flux,
+                        label=label,
+                        linewidth=1,
+                        linestyle=linestyle,
                     )
             except Exception:
                 continue
@@ -188,7 +204,9 @@ class SEDChecker:
         self.setup_plot()
 
         if not self.ylim and all_convolved_flux_data:
-            min_val, max_val = self.calculate_data_range(all_convolved_flux_data + all_flux_data)
+            min_val, max_val = self.calculate_data_range(
+                all_convolved_flux_data + all_flux_data
+            )
             if min_val is not None and max_val is not None:
                 padding = (max_val - min_val) * 0.1
                 self.ax.set_ylim([min_val, max_val + padding])
@@ -214,7 +232,8 @@ class SEDChecker:
                     bitrate=5000,
                 )
                 self.animation = FuncAnimation(
-                    self.fig, self.update_plot,
+                    self.fig,
+                    self.update_plot,
                     frames=self.video_frame_count,
                     interval=self.refresh_interval * 1000,
                     cache_frame_data=False,
@@ -226,7 +245,8 @@ class SEDChecker:
         else:
             try:
                 self.animation = FuncAnimation(
-                    self.fig, self.update_plot,
+                    self.fig,
+                    self.update_plot,
                     interval=self.refresh_interval * 1000,
                     cache_frame_data=False,
                 )
