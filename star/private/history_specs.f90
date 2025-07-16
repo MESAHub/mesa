@@ -76,7 +76,7 @@
          use chem_def
          use chem_lib
          use const_def, only: mesa_dir
-         use colors_def, only: bc_total_num_colors
+         !use colors_def, only: bc_total_num_colors
          use colors_lib
          type (star_info), pointer :: s
          integer, intent(in) :: level
@@ -458,12 +458,14 @@
             character(len=*) :: prefix
             integer, intent(out) :: ierr
             integer :: k
+
             ierr = 0
-            do k=1,bc_total_num_colors
-               call insert_spec( &
-                  offset + k,trim(prefix)//trim(get_bc_name_by_id(k,ierr)), ierr)
-               if (ierr /= 0) return
-            end do
+            ! TODO. below is old module
+            !do k=1,bc_total_num_colors
+            !   call insert_spec( &
+            !      offset + k,trim(prefix)//trim(get_bc_name_by_id(k,ierr)), ierr)
+            !   if (ierr /= 0) return
+            !end do
          end subroutine do_colors
 
          subroutine do_rate(offset,prefix,ierr)  ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
