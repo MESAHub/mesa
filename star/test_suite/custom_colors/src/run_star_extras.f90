@@ -1,7 +1,7 @@
 module run_star_extras
   use star_lib, only: star_ptr
   use star_def, only: star_info, maxlen_history_column_name, maxlen_profile_column_name, keep_going
-  use const_def, only: dp, strlen, mesa_dir
+  use const_def, only: dp, i8, strlen, mesa_dir
   ! TODO: below are things we will need to incorporate into the main code
   ! So that we do not need to create a custom run_stars_extras file
   use utils_lib, only: mkdir  ! Add this line for directory creation
