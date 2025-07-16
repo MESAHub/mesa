@@ -51,7 +51,7 @@ if [ ! -f "$EXTRACTED_FLAG" ]; then
     mkdir -p filters stellar_models
     tar -xJf "$ARCHIVE_NAME"
     touch "$EXTRACTED_FLAG"
-    rm "$ARCHIVE_NAME"
+    # rm "$ARCHIVE_NAME"
 
 else
     echo "Colors data already extracted."
