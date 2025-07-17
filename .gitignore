@@ -2,6 +2,7 @@
 data/version_number
 
 ## Compilation
+build/
 build.log
 .depend
 .order
@@ -29,7 +30,6 @@ vgcore.*
 *.patch
 *.rej
 
-
 ## Documentation
 /dox/
 docs/source/_tags
@@ -37,7 +37,6 @@ docs/source/_tags
 
 ## Executables
 *.x
-
 
 ## Output
 **/LOGS*/
@@ -71,11 +70,9 @@ lst*
 d1*
 fort.*
 
-
 ## Restarts
 .restart
 restart_photo
-
 
 ## Testing
 **/test/diff.txt
@@ -85,7 +82,6 @@ restart_photo
 **/test/test_quietly
 **/test/test_quietly.txt
 **/test/tmp.txt
-
 
 ## Test Suite
 .running
@@ -103,6 +99,12 @@ final_profile_check.data
 test_results.yml
 testhub.yml
 
+## gcov
+.htmlcov/
+*.gcov
+*.gcda
+*.gcno
+coverage.info
 
 ## Misc
 ._*
@@ -111,6 +113,7 @@ testhub.yml
 TAGS
 .vscode
 .idea
+*~
 
 ## Colors
 **/colors/data/.extraction_complete
