@@ -1,186 +1,83 @@
+.. _custom_colors:
+
+*************
 custom_colors
-=============
+*************
 
-**Custom Colors Test Suite**
+This test case demonstrates the calculation of synthetic photometry during stellar evolution using the MESA colors module. It evolves a stellar model while computing bolometric magnitudes and synthetic magnitudes in multiple photometric filters, adding these as extra history columns.
 
-This test case demonstrates the integration of synthetic photometry calculations into MESA stellar evolution models. The test evolves a stellar model while computing bolometric corrections and synthetic magnitudes across multiple photometric filter systems, providing additional diagnostic outputs for stellar evolution analysis.
+This test case has one part. Click to see a larger view of a plot.
 
-Purpose
--------
+* Part 1 (``inlist``) evolves a 1 |Msun|, Z=0.02 metallicity model from the pre-main sequence, calculating synthetic photometry at each timestep using interpolated stellar atmosphere models. The test adds the following columns to the history file:
 
-The test validates the colors module functionality by:
+.. code-block:: console
 
-- Computing bolometric magnitudes and fluxes during stellar evolution
-- Calculating synthetic photometry for multiple filter systems
-- Generating spectral energy distributions (SEDs) through atmospheric model interpolation
-- Writing photometric data as additional history columns
-- Providing verification tools for output validation
+   Mag_bol              ! Bolometric magnitude
+   Flux_bol             ! Bolometric flux  
+   Gbp                  ! Gaia blue photometer magnitude
+   G                    ! Gaia magnitude
+   Grp                  ! Gaia red photometer magnitude
 
-Key Components
---------------
+At the end of the run, the test reports synthetic magnitudes that should be within expected ranges for the final stellar parameters.
 
-Test Structure
-^^^^^^^^^^^^^^
+Physical Setup
+==============
 
-The test consists of several interconnected components:
+The colors module interpolates between pre-computed stellar atmosphere models (Kurucz 2003) to construct spectral energy distributions (SEDs) matching the evolving stellar parameters (Teff, log g, metallicity). These SEDs are then convolved with filter transmission curves to produce synthetic magnitudes.
 
-``src/run_star_extras.f90``
-  Custom stellar evolution driver that integrates colors module functionality into the standard MESA workflow. Handles initialization, configuration reading, and photometric calculations at each timestep.
+The test uses:
 
-``mk``
-  Build script that downloads required data files (~35MB) including stellar atmosphere models, filter transmission curves, and reference spectra. Creates necessary directory structure and compiles the test.
-
-``python_helpers/``
-  Visualization and verification tools for analyzing test outputs:
-  
-  - ``HISTORY_check.py``: Real-time monitoring of photometric evolution with automatic plot updates
-  - ``static_HISTORY_check.py``: Static analysis of complete evolution tracks
-  - ``SED_check.py``: Interactive SED visualization with optional video output
-  - ``static_SED_check.py``: Static SED analysis and comparison
-
-Data Requirements
------------------
-
-The test automatically downloads and configures:
-
-**Stellar Atmosphere Models**
-  Kurucz 2003 model atmospheres covering temperature range 3500-50000 K, surface gravity log g = 0.0-5.0, and metallicity [M/H] = -5.0 to +1.0. Models are organized with a CSV lookup table containing stellar parameters.
-
-**Filter Systems**
-  Transmission curves for Gaia DR3 photometric system (Gbp, G, Grp bands) with wavelength coverage optimized for stellar photometry.
-
-**Reference Spectra**
-  Vega spectral energy distribution for photometric zero-point calibration.
+* **Stellar atmosphere models**: Kurucz 2003 grid covering Teff = 3500-50000 K, log g = 0.0-5.0, [M/H] = -5.0 to +1.0
+* **Filter system**: Gaia DR3 photometric bands (Gbp, G, Grp)  
+* **Reference spectrum**: Vega SED for magnitude zero-points
+* **Distance**: 10 parsecs (for absolute magnitudes)
 
 Configuration
--------------
+=============
 
-The test uses standard MESA inlist parameters plus colors-specific namelist options:
+The test requires a ``&colors`` namelist in addition to standard MESA controls:
 
-.. code-block:: fortran
+.. literalinclude:: ../../../star/test_suite/custom_colors/inlist
+   :start-after: &colors
+   :end-before: /
 
-   &colors
-      use_colors = .true.
-      instrument = 'data/filters/GAIA/GAIA'
-      vega_sed = 'data/stellar_models/vega_flam.csv'  
-      stellar_atm = 'data/stellar_models/Kurucz2003all/'
-      metallicity = 0.58d0
-      distance = 3.0857d17  ! 10 parsecs
-      make_csv = .false.
-   /
+Data Download
+=============
 
-**Configuration Parameters**
+The test automatically downloads required data files (~35MB) on first run:
 
-``use_colors``
-  Enable colors module calculations (boolean)
+.. code-block:: console
 
-``instrument`` 
-  Path to filter system directory containing transmission curves
+   ./mk      # Downloads atmosphere models, filters, and Vega spectrum
+   ./rn      # Runs the test
 
-``vega_sed``
-  Path to Vega reference spectrum for magnitude zero-points
+The build script (``mk``) creates the necessary directory structure and downloads:
 
-``stellar_atm``
-  Directory containing stellar atmosphere model grid and lookup table
+* Stellar atmosphere model grid and lookup table
+* Filter transmission curves  
+* Vega reference spectrum
 
-``metallicity``
-  Stellar metallicity for atmosphere model selection (dex)
+Verification Tools  
+==================
 
-``distance``
-  Distance for flux calibration (cm)
+Python helper scripts are provided for monitoring and verification:
 
-``make_csv``
-  Output detailed SED files for each filter and timestep (boolean)
-
-Computational Method
---------------------
-
-The colors module employs several interpolation techniques for SED construction:
-
-**K-Nearest Neighbors (KNN)**
-  Identifies four closest atmosphere models in 3D parameter space (Teff, log g, [M/H]) using normalized Euclidean distance. Performs weighted interpolation based on inverse distance weighting.
-
-**Linear Interpolation**
-  Uses precomputed flux cubes for fast trilinear interpolation. Requires binary data preprocessing but provides superior performance for production runs.
-
-**Hermite Interpolation**
-  Higher-order interpolation using derivative information for enhanced accuracy in smooth parameter regions.
-
-The synthetic photometry calculation follows standard procedures:
-
-1. **SED Construction**: Interpolate atmosphere models to stellar parameters
-2. **Distance Scaling**: Apply geometric dilution factor :math:`(R/d)^2`
-3. **Filter Convolution**: Integrate SED with filter transmission curves
-4. **Magnitude Calculation**: Compute magnitudes using Vega zero-points
-
-Expected Outputs
-----------------
-
-**History File Extensions**
-  Additional columns appended to standard MESA history output:
-
-  - ``Mag_bol``: Bolometric magnitude
-  - ``Flux_bol``: Integrated bolometric flux  
-  - Filter-specific magnitudes (e.g., ``Gbp``, ``G``, ``Grp`` for Gaia system)
-
-**Optional SED Files**
-  When ``make_csv = .true.``, detailed CSV files containing:
-  
-  - Wavelength grids
-  - Stellar and Vega flux arrays
-  - Filter transmission functions
-  - Convolved flux products
-
-**Log Output**
-  Diagnostic information including parameter validation, interpolation statistics, and calculation timing.
-
-Running the Test
-----------------
-
-Execute the standard test procedure:
-
-.. code-block:: bash
-
-   ./mk      # Download data and compile
-   ./rn      # Run evolution calculation
-
-The test downloads required data files on first execution. Subsequent runs use cached data unless explicitly cleaned.
-
-**Verification**
-
-Monitor evolution progress using Python helpers:
-
-.. code-block:: bash
+.. code-block:: console
 
    cd python_helpers
-   python HISTORY_check.py     # Real-time photometric monitoring
-   python SED_check.py         # Interactive SED visualization
+   python HISTORY_check.py      # Real-time monitoring of photometric evolution
+   python static_HISTORY_check.py   # Static analysis of complete tracks
+   python SED_check.py          # SED visualization and validation
 
-**Expected Termination**
+Expected Outputs
+================
 
-The test completes when the stellar model reaches the specified termination condition. Successful completion produces history files with populated photometric columns and convergent magnitude calculations.
+The test produces standard MESA output plus additional photometric columns in the history file. Successful completion should show:
 
-Performance Considerations
---------------------------
+* Smooth evolution of synthetic magnitudes consistent with stellar parameter changes
+* Bolometric magnitudes within expected ranges for stellar mass and evolutionary phase
+* Filter magnitudes that track effective temperature variations
 
-Computational overhead depends on interpolation method and output options:
+The ``run_star_extras.f90`` module handles the integration between MESA's stellar evolution and the colors module calculations.
 
-- **KNN interpolation**: ~2-5% overhead per timestep
-- **Linear interpolation**: ~0.5-1% overhead (requires preprocessing)
-- **SED output**: Significant I/O overhead when ``make_csv = .true.``
-
-Memory usage scales with atmosphere model grid size and filter system complexity. The default configuration requires ~100MB additional memory allocation.
-
-Numerical Validation
---------------------
-
-The test validates several aspects of synthetic photometry calculations:
-
-**Interpolation Accuracy**
-  Comparison with direct atmosphere model calculations shows RMS errors <0.01 mag for main sequence stars within the model grid.
-
-**Filter Integration**
-  Numerical integration accuracy verified against analytical results for simple test functions.
-
-**Zero-point Consistency**
-  Vega magnitudes reproduce literature values within observational uncertainties.
+Last-Updated: 17Jul2025 by Niall Miller
