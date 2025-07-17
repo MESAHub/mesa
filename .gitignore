@@ -34,7 +34,6 @@ vgcore.*
 /dox/
 docs/source/_tags
 
-
 ## Executables
 *.x
 
