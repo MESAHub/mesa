@@ -14,6 +14,7 @@ contains
 
    subroutine do_test
       integer :: binary_id, id, ierr, res
+      real(dp) :: fL2
       type(binary_info), pointer :: b
       type(star_info), pointer :: s
 
@@ -77,6 +78,21 @@ contains
       res = binary_pick_next_timestep(b)
 
       write (*, 1) 'b% max_timestep / secyer', b%max_timestep/secyer  ! should be 2.5
+
+      ! Test accretion disk functions
+      write (*, *) 'check L2_mass_loss_fraction behavior'
+
+      fL2 = binary_L2_mass_loss_fraction(20.0_dp, 10.0_dp, 0.001_dp, 2.0_dp, 0.1_dp, 1.3_dp/2.4_dp, ierr)
+
+      write (*, 1) 'fL2', fL2  ! should be ~0.9
+
+      fL2 = binary_L2_mass_loss_fraction(20.0_dp, 10.0_dp, 0.0001_dp, 2.0_dp, 0.1_dp, 1.3_dp/2.4_dp, ierr)
+
+      write (*, 1) 'fL2', fL2  ! should be ~0.2
+
+      fL2 = binary_L2_mass_loss_fraction(20.0_dp, 18.0_dp, 0.0_dp, 304.0_dp, 0.1_dp, 0.64_dp, ierr)
+
+      write (*, 1) 'fL2', fL2  ! should be 0.0
 
       write (*, '(a)') 'done'
 
