@@ -10,7 +10,10 @@
       create_pre_main_sequence_model = .true.  ! Start from pre-MS rather than ZAMS
       
       ! Termination conditions
-      required_termination_code_string = 'xa_central_lower_limit'  ! Stop when central H is depleted
+      ! required_termination_code_string = 'xa_central_lower_limit'  ! Stop when central H is depleted
+      save_model_when_terminate = .true.
+      save_model_filename = 'custom_colors_end.mod'
+      required_termination_code_string = ''
       
       ! Graphics and plotting
       pgstar_flag = .false.  ! Enable real-time plotting (This is set to .false. for test hub -- .true. will enable a CMD and Light curves!!)
@@ -167,6 +170,5 @@
   History_Track5_xname = 'star_age'
   History_Track5_yname = 'Flux_bol'
   History_Track5_title = 'Bolometric Flux'
-
 
 /
