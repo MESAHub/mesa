@@ -1,25 +1,70 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+set -e  # Immediately exit on error
 
 function check_okay {
-	if [ $? -ne 0 ]
-	then
-		exit 1
-	fi
+    if [ $? -ne 0 ]; then
+        echo "Error in colors data build process"
+        exit 1
+    fi
 }
 
-
+# Create working directory
 mkdir -p data
 cd data
-check_okay
+
+# Variables
+ARCHIVE_NAME="colors_data.txz"
+EXTRACTED_FLAG=".extraction_complete"
+TARGET_DIR="../data/colors_data"
+
+# Validate archive
+validate_archive() {
+    tar -tJf "$ARCHIVE_NAME" > /dev/null 2>&1
+}
+
+# If not extracted yet
+if [ ! -f "$EXTRACTED_FLAG" ]; then
+
+    # If the archive is missing
+    if [ ! -f "$ARCHIVE_NAME" ]; then
+        echo "Archive $ARCHIVE_NAME is missing."
+        echo "Please ensure it is downloaded or available in this directory."
+        # it should now auto-download from a LFS pointer... i think?
+
+        exit 1
+    fi
+
+    # Validate it
+    if ! validate_archive; then
+        echo "Archive $ARCHIVE_NAME is invalid."
+        # try again to download or something?
+
+        # Validate it
+        if ! validate_archive; then
+            echo "Archive $ARCHIVE_NAME is invalid."
+            exit 1
+        fi
+    fi
+
+    echo "Extracting colors data..."
+    mkdir -p filters stellar_models
+    tar -xJf "$ARCHIVE_NAME"
+    touch "$EXTRACTED_FLAG"
+    # rm "$ARCHIVE_NAME"
+
+else
+    echo "Colors data already extracted."
+fi
+
+
 cd ..
 
-rm -rf ../data/colors_data
-check_okay
-mkdir ../data/colors_data
-check_okay
-cp data/lcb98cor.dat ../data/colors_data
-cp data/blackbody_johnson.dat ../data/colors_data
-check_okay
-echo "done"
 
-cd ..
+for SUBDIR in filters stellar_models; do
+    if [ -d "data/$SUBDIR" ]; then
+        check_okay
+    fi
+done
+
+echo "Colors data has been successfully built and exported."

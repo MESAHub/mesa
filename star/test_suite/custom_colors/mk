@@ -10,4 +10,30 @@ function check_okay {
 	fi
 }
 
-cd make; make; check_okay
+# Define directories to be created
+DIRS=(
+	"LOGS"
+	"LOGS/SED"
+)
+
+# Create directories if they don't exist
+for dir in "${DIRS[@]}"; do
+	if [ ! -d "$dir" ]; then
+		mkdir -p "$dir"
+	fi
+done
+
+
+
+# Proceed to make
+cd make
+make
+check_okay
+
+
+if [ -f "$LOCAL_FILE" ]; then
+	rm "$LOCAL_FILE"
+	echo "Custom colours has been made"	
+else
+	echo "Custom colours has been made"	
+fi

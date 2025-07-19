@@ -19,9 +19,10 @@
 
       initial_zfracs = 6
 
-      color_num_files=2
-      color_file_names(2)='blackbody_johnson.dat'
-      color_num_colors(2)=5
+      ! old color module (deprecated)
+      !color_num_files=2
+      !color_file_names(2)='blackbody_johnson.dat'
+      !color_num_colors(2)=5
 
       set_initial_age = .true.
       initial_age = 0
