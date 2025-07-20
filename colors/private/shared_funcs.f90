@@ -3,7 +3,7 @@ MODULE shared_funcs
   USE const_def, ONLY: dp, strlen
   implicit none
 
-  PRIVATE
+  
   PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, &
             SimpsonIntegration, loadsed, loadfilter, loadvegased, &
             load_lookuptable, remove_dat
@@ -166,7 +166,6 @@ CONTAINS
      END DO
 
      result = R(1)
-     DEALLOCATE(R)
    END SUBROUTINE rombergintegration
 
 
@@ -451,7 +450,7 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
         ALLOCATE(tokens(n + 1))  ! Allocate with one extra space
         tokens(1:n) = temp  ! Restore old tokens
         tokens(n + 1) = token  ! Add the new token
-        DEALLOCATE(temp)  ! Clean up temporary array
+        DEALLOCATE(temp)  ! unsure if this is till needed. 
       END IF
     END SUBROUTINE AppendToken
 

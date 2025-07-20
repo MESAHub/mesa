@@ -85,8 +85,6 @@ CONTAINS
     CALL dilute_flux(fluxes, R, d, diluted_flux)
     fluxes = diluted_flux
 
-    ! Deallocate temporary arrays
-    DEALLOCATE(temp_wavelengths, temp_flux, common_wavelengths, diluted_flux)
   END SUBROUTINE constructsed_knn
 
   !---------------------------------------------------------------------------
@@ -174,8 +172,6 @@ CONTAINS
     END DO
 
     closest_indices = indices
-    ! Deallocate arrays
-    DEALLOCATE(scaled_lu_teff, scaled_lu_logg, scaled_lu_meta)
   END SUBROUTINE getcloseststellarmodels
 
   !---------------------------------------------------------------------------

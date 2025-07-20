@@ -40,12 +40,6 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
     CALL load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
                          wavelengths, precomputed_flux_cube, status)
 
-    IF (status /= 0) THEN
-      PRINT *, 'Error loading precomputed data. Falling back to on-the-fly computation.'
-      ! Here you could call the original implementation
-      RETURN
-    END IF
-
     n_teff = SIZE(teff_grid)
     n_logg = SIZE(logg_grid)
     n_meta = SIZE(meta_grid)
@@ -56,14 +50,12 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
 
     ! Process each wavelength point
     DO i = 1, n_lambda
-      ! Extract the 3D grid for this wavelength
       ALLOCATE(flux_cube_lambda(n_teff, n_logg, n_meta))
       flux_cube_lambda = precomputed_flux_cube(:,:,:,i)
 
-      ! Interpolate at the target parameters
       interp_flux(i) = hermite_tensor_interp3d(teff, log_g, metallicity, &
                                               teff_grid, logg_grid, meta_grid, flux_cube_lambda)
-
+      
       DEALLOCATE(flux_cube_lambda)
     END DO
 
@@ -72,128 +64,119 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
     CALL dilute_flux(interp_flux, R, d, diluted_flux)
     fluxes = diluted_flux
 
-    ! Clean up
-    DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
-    DEALLOCATE(diluted_flux, interp_flux)
-
   END SUBROUTINE constructsed_hermite
 
-  !---------------------------------------------------------------------------
-  ! Load data from binary file
-  !---------------------------------------------------------------------------
-  SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
-                             wavelengths, flux_cube, status)
-    CHARACTER(LEN=*), INTENT(IN) :: filename
-    REAL(dp), ALLOCATABLE, INTENT(OUT) :: teff_grid(:), logg_grid(:), meta_grid(:)
-    REAL(dp), ALLOCATABLE, INTENT(OUT) :: wavelengths(:)
-    REAL(dp), ALLOCATABLE, INTENT(OUT) :: flux_cube(:,:,:,:)
-    INTEGER, INTENT(OUT) :: status
 
-    INTEGER :: unit, n_teff, n_logg, n_meta, n_lambda
-
-    unit = 99
-    status = 0
-
-    ! Open the binary file
-    OPEN(UNIT=unit, FILE=filename, STATUS='OLD', ACCESS='STREAM', FORM='UNFORMATTED', IOSTAT=status)
-    IF (status /= 0) THEN
-      PRINT *, 'Error opening binary file:', TRIM(filename)
-      RETURN
-    END IF
-
-    ! Read dimensions
-    READ(unit, IOSTAT=status) n_teff, n_logg, n_meta, n_lambda
-    IF (status /= 0) THEN
-      PRINT *, 'Error reading dimensions from binary file'
-      CLOSE(unit)
-      RETURN
-    END IF
-
-    ! Allocate arrays based on dimensions
-    ALLOCATE(teff_grid(n_teff), STAT=status)
-    IF (status /= 0) THEN
-      PRINT *, 'Error allocating teff_grid array'
-      CLOSE(unit)
-      RETURN
-    END IF
-
-    ALLOCATE(logg_grid(n_logg), STAT=status)
-    IF (status /= 0) THEN
-      PRINT *, 'Error allocating logg_grid array'
-      DEALLOCATE(teff_grid)
-      CLOSE(unit)
-      RETURN
-    END IF
-
-    ALLOCATE(meta_grid(n_meta), STAT=status)
-    IF (status /= 0) THEN
-      PRINT *, 'Error allocating meta_grid array'
-      DEALLOCATE(teff_grid, logg_grid)
-      CLOSE(unit)
-      RETURN
-    END IF
-
-    ALLOCATE(wavelengths(n_lambda), STAT=status)
-    IF (status /= 0) THEN
-      PRINT *, 'Error allocating wavelengths array'
-      DEALLOCATE(teff_grid, logg_grid, meta_grid)
-      CLOSE(unit)
-      RETURN
-    END IF
-
-    ALLOCATE(flux_cube(n_teff, n_logg, n_meta, n_lambda), STAT=status)
-    IF (status /= 0) THEN
-      PRINT *, 'Error allocating flux_cube array'
-      DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths)
-      CLOSE(unit)
-      RETURN
-    END IF
-
-    ! Read grid arrays
-    READ(unit, IOSTAT=status) teff_grid
-    IF (status /= 0) THEN
-      PRINT *, 'Error reading teff_grid'
-      GOTO 999  ! Cleanup and return cheeky goto
-    END IF
-
-    READ(unit, IOSTAT=status) logg_grid
-    IF (status /= 0) THEN
-      PRINT *, 'Error reading logg_grid'
-      GOTO 999  ! Cleanup and return
-    END IF
-
-    READ(unit, IOSTAT=status) meta_grid
-    IF (status /= 0) THEN
-      PRINT *, 'Error reading meta_grid'
-      GOTO 999  ! Cleanup and return
-    END IF
-
-    READ(unit, IOSTAT=status) wavelengths
-    IF (status /= 0) THEN
-      PRINT *, 'Error reading wavelengths'
-      GOTO 999  ! Cleanup and return
-    END IF
-
-    ! Read flux cube
-    READ(unit, IOSTAT=status) flux_cube
-    IF (status /= 0) THEN
-      PRINT *, 'Error reading flux_cube'
-      GOTO 999  ! Cleanup and return
-    END IF
-
-    ! Close file and return success
+!---------------------------------------------------------------------------
+! Load data from binary file
+!---------------------------------------------------------------------------
+SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
+                           wavelengths, flux_cube, status)
+  CHARACTER(LEN=*), INTENT(IN) :: filename
+  REAL(dp), ALLOCATABLE, INTENT(OUT) :: teff_grid(:), logg_grid(:), meta_grid(:)
+  REAL(dp), ALLOCATABLE, INTENT(OUT) :: wavelengths(:)
+  REAL(dp), ALLOCATABLE, INTENT(OUT) :: flux_cube(:,:,:,:)
+  INTEGER, INTENT(OUT) :: status
+  
+  INTEGER :: unit, n_teff, n_logg, n_meta, n_lambda
+  
+  unit = 99
+  status = 0
+  
+  ! Open the binary file
+  OPEN(UNIT=unit, FILE=filename, STATUS='OLD', ACCESS='STREAM', FORM='UNFORMATTED', IOSTAT=status)
+  IF (status /= 0) THEN
+    PRINT *, 'Error opening binary file:', TRIM(filename)
+    RETURN
+  END IF
+  
+  ! Read dimensions
+  READ(unit, IOSTAT=status) n_teff, n_logg, n_meta, n_lambda
+  IF (status /= 0) THEN
+    PRINT *, 'Error reading dimensions from binary file'
     CLOSE(unit)
     RETURN
-
-999 CONTINUE
-    ! Cleanup on error
-    DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths, flux_cube)
+  END IF
+  
+  ! Allocate arrays based on dimensions
+  ALLOCATE(teff_grid(n_teff), STAT=status)
+  IF (status /= 0) THEN
+    PRINT *, 'Error allocating teff_grid array'
     CLOSE(unit)
     RETURN
+  END IF
+  
+  ALLOCATE(logg_grid(n_logg), STAT=status)
+  IF (status /= 0) THEN
+    PRINT *, 'Error allocating logg_grid array'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  ALLOCATE(meta_grid(n_meta), STAT=status)
+  IF (status /= 0) THEN
+    PRINT *, 'Error allocating meta_grid array'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  ALLOCATE(wavelengths(n_lambda), STAT=status)
+  IF (status /= 0) THEN
+    PRINT *, 'Error allocating wavelengths array'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  ALLOCATE(flux_cube(n_teff, n_logg, n_meta, n_lambda), STAT=status)
+  IF (status /= 0) THEN
+    PRINT *, 'Error allocating flux_cube array'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  ! Read grid arrays
+  READ(unit, IOSTAT=status) teff_grid
+  IF (status /= 0) THEN
+    PRINT *, 'Error reading teff_grid'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  READ(unit, IOSTAT=status) logg_grid
+  IF (status /= 0) THEN
+    PRINT *, 'Error reading logg_grid'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  READ(unit, IOSTAT=status) meta_grid
+  IF (status /= 0) THEN
+    PRINT *, 'Error reading meta_grid'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  READ(unit, IOSTAT=status) wavelengths
+  IF (status /= 0) THEN
+    PRINT *, 'Error reading wavelengths'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  ! Read flux cube
+  READ(unit, IOSTAT=status) flux_cube
+  IF (status /= 0) THEN
+    PRINT *, 'Error reading flux_cube'
+    CLOSE(unit)
+    RETURN
+  END IF
+  
+  ! Close file and return success
+  CLOSE(unit)
+END SUBROUTINE load_binary_data
 
-  END SUBROUTINE load_binary_data
 
-  !---------------------------------------------------------------------------
+!---------------------------------------------------------------------------
   ! Main 3D Hermite interpolation function
   !---------------------------------------------------------------------------
 FUNCTION hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
@@ -207,12 +190,10 @@ FUNCTION hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
     REAL(dp) :: t_x, t_y, t_z
     REAL(dp) :: dx, dy, dz
     REAL(dp) :: dx_values(2,2,2), dy_values(2,2,2), dz_values(2,2,2)
-    REAL(dp) :: h00_x, h10_x, h01_x, h11_x
-    REAL(dp) :: h00_y, h10_y, h01_y, h11_y
-    REAL(dp) :: h00_z, h10_z, h01_z, h11_z
     REAL(dp) :: values(2,2,2)
     REAL(dp) :: sum
     INTEGER :: ix, iy, iz
+    REAL(dp) :: h_x(2), h_y(2), h_z(2)
 
     ! Find containing cell and parameter values
     CALL find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
@@ -223,11 +204,8 @@ FUNCTION hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
         i_y < 1 .OR. i_y >= SIZE(y_grid) .OR. &
         i_z < 1 .OR. i_z >= SIZE(z_grid)) THEN
 
-      ! Find nearest grid point
       CALL find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                              i_x, i_y, i_z)
-
-      ! Use the value at the nearest point
       f_interp = f_values(i_x, i_y, i_z)
       RETURN
     END IF
@@ -237,13 +215,11 @@ FUNCTION hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
     dy = y_grid(i_y+1) - y_grid(i_y)
     dz = z_grid(i_z+1) - z_grid(i_z)
 
-    ! Extract the local 2x2x2 grid cell
+    ! Extract the local 2x2x2 grid cell and compute derivatives
     DO iz = 0, 1
       DO iy = 0, 1
         DO ix = 0, 1
           values(ix+1, iy+1, iz+1) = f_values(i_x+ix, i_y+iy, i_z+iz)
-
-          ! Compute derivatives at each corner using finite differences
           CALL compute_derivatives_at_point(f_values, i_x+ix, i_y+iy, i_z+iz, &
                                            SIZE(x_grid), SIZE(y_grid), SIZE(z_grid), &
                                            dx, dy, dz, &
@@ -254,176 +230,55 @@ FUNCTION hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
       END DO
     END DO
 
-    ! Evaluate Hermite basis functions
-    h00_x = h00(t_x)
-    h10_x = h10(t_x)
-    h01_x = h01(t_x)
-    h11_x = h11(t_x)
-
-    h00_y = h00(t_y)
-    h10_y = h10(t_y)
-    h01_y = h01(t_y)
-    h11_y = h11(t_y)
-
-    h00_z = h00(t_z)
-    h10_z = h10(t_z)
-    h01_z = h01(t_z)
-    h11_z = h11(t_z)
-
-    ! Perform tensor product interpolation
     sum = 0.0_dp
 
-    ! Function values at corners
+    ! Function values
+    h_x = [h00(t_x), h01(t_x)]
+    h_y = [h00(t_y), h01(t_y)]
+    h_z = [h00(t_z), h01(t_z)]
     DO iz = 1, 2
       DO iy = 1, 2
         DO ix = 1, 2
-          ! Function values
-          IF (ix == 1) THEN
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h00_x * h00_y * h00_z * values(ix,iy,iz)
-              ELSE
-                sum = sum + h00_x * h00_y * h01_z * values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h00_x * h01_y * h00_z * values(ix,iy,iz)
-              ELSE
-                sum = sum + h00_x * h01_y * h01_z * values(ix,iy,iz)
-              END IF
-            END IF
-          ELSE
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h01_x * h00_y * h00_z * values(ix,iy,iz)
-              ELSE
-                sum = sum + h01_x * h00_y * h01_z * values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h01_x * h01_y * h00_z * values(ix,iy,iz)
-              ELSE
-                sum = sum + h01_x * h01_y * h01_z * values(ix,iy,iz)
-              END IF
-            END IF
-          END IF
+          sum = sum + h_x(ix) * h_y(iy) * h_z(iz) * values(ix,iy,iz)
         END DO
       END DO
     END DO
 
     ! x-derivatives
+    h_x = [h10(t_x), h11(t_x)]
     DO iz = 1, 2
       DO iy = 1, 2
         DO ix = 1, 2
-          IF (ix == 1) THEN
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h10_x * h00_y * h00_z * dx * dx_values(ix,iy,iz)
-              ELSE
-                sum = sum + h10_x * h00_y * h01_z * dx * dx_values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h10_x * h01_y * h00_z * dx * dx_values(ix,iy,iz)
-              ELSE
-                sum = sum + h10_x * h01_y * h01_z * dx * dx_values(ix,iy,iz)
-              END IF
-            END IF
-          ELSE
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h11_x * h00_y * h00_z * dx * dx_values(ix,iy,iz)
-              ELSE
-                sum = sum + h11_x * h00_y * h01_z * dx * dx_values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h11_x * h01_y * h00_z * dx * dx_values(ix,iy,iz)
-              ELSE
-                sum = sum + h11_x * h01_y * h01_z * dx * dx_values(ix,iy,iz)
-              END IF
-            END IF
-          END IF
+          sum = sum + h_x(ix) * h_y(iy) * h_z(iz) * dx * dx_values(ix,iy,iz)
         END DO
       END DO
     END DO
 
     ! y-derivatives
+    h_x = [h00(t_x), h01(t_x)]
+    h_y = [h10(t_y), h11(t_y)]
     DO iz = 1, 2
       DO iy = 1, 2
         DO ix = 1, 2
-          IF (ix == 1) THEN
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h00_x * h10_y * h00_z * dy * dy_values(ix,iy,iz)
-              ELSE
-                sum = sum + h00_x * h10_y * h01_z * dy * dy_values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h00_x * h11_y * h00_z * dy * dy_values(ix,iy,iz)
-              ELSE
-                sum = sum + h00_x * h11_y * h01_z * dy * dy_values(ix,iy,iz)
-              END IF
-            END IF
-          ELSE
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h01_x * h10_y * h00_z * dy * dy_values(ix,iy,iz)
-              ELSE
-                sum = sum + h01_x * h10_y * h01_z * dy * dy_values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h01_x * h11_y * h00_z * dy * dy_values(ix,iy,iz)
-              ELSE
-                sum = sum + h01_x * h11_y * h01_z * dy * dy_values(ix,iy,iz)
-              END IF
-            END IF
-          END IF
+          sum = sum + h_x(ix) * h_y(iy) * h_z(iz) * dy * dy_values(ix,iy,iz)
         END DO
       END DO
     END DO
 
-    ! z-derivatives
+    ! z-derivatives  
+    h_y = [h00(t_y), h01(t_y)]
+    h_z = [h10(t_z), h11(t_z)]
     DO iz = 1, 2
       DO iy = 1, 2
         DO ix = 1, 2
-          IF (ix == 1) THEN
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h00_x * h00_y * h10_z * dz * dz_values(ix,iy,iz)
-              ELSE
-                sum = sum + h00_x * h00_y * h11_z * dz * dz_values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h00_x * h01_y * h10_z * dz * dz_values(ix,iy,iz)
-              ELSE
-                sum = sum + h00_x * h01_y * h11_z * dz * dz_values(ix,iy,iz)
-              END IF
-            END IF
-          ELSE
-            IF (iy == 1) THEN
-              IF (iz == 1) THEN
-                sum = sum + h01_x * h00_y * h10_z * dz * dz_values(ix,iy,iz)
-              ELSE
-                sum = sum + h01_x * h00_y * h11_z * dz * dz_values(ix,iy,iz)
-              END IF
-            ELSE
-              IF (iz == 1) THEN
-                sum = sum + h01_x * h01_y * h10_z * dz * dz_values(ix,iy,iz)
-              ELSE
-                sum = sum + h01_x * h01_y * h11_z * dz * dz_values(ix,iy,iz)
-              END IF
-            END IF
-          END IF
+          sum = sum + h_x(ix) * h_y(iy) * h_z(iz) * dz * dz_values(ix,iy,iz)
         END DO
       END DO
     END DO
 
     f_interp = sum
   END FUNCTION hermite_tensor_interp3d
+
 
   !---------------------------------------------------------------------------
   ! Find the cell containing the interpolation point

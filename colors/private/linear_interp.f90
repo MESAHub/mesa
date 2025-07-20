@@ -81,7 +81,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
       interp_flux(i) = trilinear_interp(teff, log_g, metallicity, &
                                        teff_grid, logg_grid, meta_grid, flux_cube_lambda)
 
-      DEALLOCATE(flux_cube_lambda)
     END DO
 
     ! Calculate statistics for validation
@@ -100,10 +99,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     max_flux = MAXVAL(diluted_flux)
     mean_flux = SUM(diluted_flux) / n_lambda
 
-
-    ! Clean up
-    DEALLOCATE(teff_grid, logg_grid, meta_grid, precomputed_flux_cube)
-    DEALLOCATE(diluted_flux, interp_flux)
 
   END SUBROUTINE constructsed_linear
 
@@ -150,7 +145,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     ALLOCATE(logg_grid(n_logg), STAT=status)
     IF (status /= 0) THEN
       !PRINT *, 'Error allocating logg_grid array'
-      DEALLOCATE(teff_grid)
       CLOSE(unit)
       RETURN
     END IF
@@ -158,7 +152,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     ALLOCATE(meta_grid(n_meta), STAT=status)
     IF (status /= 0) THEN
       !PRINT *, 'Error allocating meta_grid array'
-      DEALLOCATE(teff_grid, logg_grid)
       CLOSE(unit)
       RETURN
     END IF
@@ -166,7 +159,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     ALLOCATE(wavelengths(n_lambda), STAT=status)
     IF (status /= 0) THEN
       !PRINT *, 'Error allocating wavelengths array'
-      DEALLOCATE(teff_grid, logg_grid, meta_grid)
       CLOSE(unit)
       RETURN
     END IF
@@ -174,7 +166,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     ALLOCATE(flux_cube(n_teff, n_logg, n_meta, n_lambda), STAT=status)
     IF (status /= 0) THEN
       !PRINT *, 'Error allocating flux_cube array'
-      DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths)
       CLOSE(unit)
       RETURN
     END IF
@@ -217,7 +208,6 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
 
 999 CONTINUE
     ! Cleanup on error
-    DEALLOCATE(teff_grid, logg_grid, meta_grid, wavelengths, flux_cube)
     CLOSE(unit)
     RETURN
 
