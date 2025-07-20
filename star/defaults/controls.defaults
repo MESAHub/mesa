@@ -2683,7 +2683,7 @@
 
       ! ::
 
-    overshoot_D_min = 1d2
+    overshoot_D_min = 1d-2
 
 
       ! overshoot_brunt_B_max
