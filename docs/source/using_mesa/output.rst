@@ -69,7 +69,7 @@ Selecting output quantities
 
 The default MESA output is set by the files
 
-::
+.. code:: console
 
    $MESA_DIR/star/defaults/history_columns.list
    $MESA_DIR/star/defaults/profile_columns.list
@@ -77,7 +77,7 @@ The default MESA output is set by the files
 In order to customize the output, copy these files to your work
 directory
 
-::
+.. code:: console
 
    cp $MESA_DIR/star/defaults/history_columns.list .
    cp $MESA_DIR/star/defaults/profile_columns.list .

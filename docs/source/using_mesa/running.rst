@@ -30,14 +30,14 @@ checkout of a new MESA version at some point in the future. Therefore
 each time you want to start a new MESA project, you should make a new
 copy of the star/work directory. Let's do that for this tutorial.
 
-::
+.. code-block:: console
 
    cp -r $MESA_DIR/star/work tutorial
 
 Now that we have our copy of the work directory, we need to compile the
 code that lives in it.
 
-::
+.. code-block:: console
 
    cd tutorial
    ./mk
@@ -106,7 +106,7 @@ Run MESA
 
 Running the code is now as simple as typing
 
-::
+.. code-block:: console
 
    ./rn
 
@@ -172,7 +172,7 @@ run terminated.
 Open up ``inlist_project`` in your editor. You can see there were two
 stopping conditions,
 
-::
+.. code-block:: fortran
 
   ! stop when the star nears ZAMS (Lnuc/L > 0.99)
   Lnuc_div_L_zams_limit = 0.99d0
@@ -186,7 +186,7 @@ As MESA indicated in the termination message, we stopped because of the
 first condition (naturally, ZAMS is before H-exhaustion). Turn off this
 stopping condition by editing your inlist so that
 
-::
+.. code-block:: fortran
 
   stop_near_zams = .false.
 
@@ -194,7 +194,7 @@ and save the inlist file.
 
 Now we can restart using the photo and our new settings. Try it.
 
-::
+.. code-block:: console
 
    ./re x207
 
@@ -218,7 +218,7 @@ inlist.
 Let's save a model file at the end of our run. Go to the following lines
 to the ``&star_job`` section of your inlist:
 
-::
+.. code-block:: fortran
 
   ! save a model at the end of the run
   save_model_when_terminate = .false.
@@ -229,7 +229,7 @@ inlist and changing ``save_model_when_terminate`` to ``.true.``.
 
 Save the file and then restart MESA from the same point as before.
 
-::
+.. code-block:: console
 
    ./re x207
 
@@ -243,7 +243,7 @@ Now you could begin studying the post-main sequence evolution of stars,
 starting a new MESA run using the model you've just saved. In order to
 do this your inlist might look like:
 
-::
+.. code-block:: fortran
 
    &star_job
      ! see star/defaults/star_job.defaults
@@ -298,7 +298,7 @@ everywhere within inlist (i.e., ``extra_star_job_inlist_name(1)`` and
 
 Then as usual, do
 
-::
+.. code-block:: console
 
    ./rn
 
@@ -321,7 +321,7 @@ papers, which discuss the most important flags.
 The files that contain a description of all of the MESA options and
 their default values live in the directory
 
-::
+.. code-block:: console
 
    $MESA_DIR/star/defaults
 
@@ -334,6 +334,7 @@ in controls.defaults for the word "Dutch" quickly leads to the following
 summary of these options.
 
 .. literalinclude:: ../../../star/defaults/controls.defaults
+   :language: fortran
    :start-at: ! Dutch_scaling_factor
    :end-before: ! Kudritzki_scaling_factor
 
