@@ -498,7 +498,7 @@ What do I need to do to run MESA on OS X?
 -----------------------------------------
 
 It is necessary to take the following actions on recent versions of OS X
-(10.9 or later) , even if you had a working version of MESA on your
+(10.9 or later), even if you had a working version of MESA on your
 previous version of OS X.
 
 -  Install or reinstall the current version of

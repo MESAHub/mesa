@@ -3,7 +3,7 @@ Building inlists
 ****************
 
 Inlists for MESA are composed of five main sections labeled ``&star_job``, ``&controls``.
-``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state respectively.
+``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state, respectively.
 The ``&pgstar`` section contains the commands for creating pgstar plots.
 
 &star_job

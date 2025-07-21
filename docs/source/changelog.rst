@@ -250,7 +250,7 @@ There has been a bug present in the rates module due to the incorrect
 phase space factors for reverse reaction rates involving greater than 2 reactants or
 products. This bug resulted in inconsistent equilibrium compositions when the network
 evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK.
-This bug effects users who evolve models into NSE using large reaction networks. This
+This bug affects users who evolve models into NSE using large reaction networks. This
 includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
 networks are less affected. We strongly recommend that users update to the latest MESA release.
 
@@ -790,7 +790,7 @@ The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et a
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10^7 K.
 
 The ability to set the rates preferences has been removed. This added a lot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
-From now on we excusivily use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
+From now on we exculsively use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
 from CF88 (if they aren't in REACLIB or NACRE).
 
 Of note is that the default C12(a,g)O16 rate has thus changed from NACRE to that of REACLIB.
