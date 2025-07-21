@@ -126,13 +126,14 @@ MESA will keep you updated via terminal output that looks like this:
 
 MESA will also display some pgstar plots that look like:
 
-.. figure:: hr_000200.png
+.. figure:: hr_000207.svg
    :alt: HR Diagram
 
-.. figure:: trho_profile_000200.png
+.. figure:: trho_profile_000207.svg
    :alt: TRho Profile
 
-This should run for 208 steps before stopping with the following
+This should run for 207 steps (the number may differ slightly between
+MESA versions) before stopping with the following
 message:
 
 ::
@@ -158,12 +159,12 @@ MESA star, you should expect your existing photo files to become
 obsolete.
 
 If you scroll back in the terminal output from the run, you should find
-a line that looks like (though the number may differ slightly between
+a line that looks like (the number may differ slightly between
 MESA versions):
 
 ::
 
-   save photos/x849 for model 849
+   save photos/x207 for model 207
 
 indicating that one of these snapshots was automatically saved when the
 run terminated.
@@ -195,9 +196,9 @@ Now we can restart using the photo and our new settings. Try it.
 
 ::
 
-   ./re x208
+   ./re x207
 
-This resumes the run from model 208, but this time the run will stop
+This resumes the run from model 207, but this time the run will stop
 when our other condition is satisfied, when the central hydrogen drops
 below 0.001. This will happen at model number 305.
 
@@ -230,7 +231,7 @@ Save the file and then restart MESA from the same point as before.
 
 ::
 
-   ./re x208
+   ./re x207
 
 This time when the run terminates MESA will save a model named
 ``15M_at_TAMS.mod``. Take a look and see.
