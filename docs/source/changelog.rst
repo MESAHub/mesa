@@ -22,9 +22,9 @@ Backwards-incompatible changes
 ``pgstar`` / ``pgbinary``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Removed `file_extension` option because it is redundant with `file_device`. Delete `file_extension` from your inlists.
+Removed ``file_extension`` option because it is redundant with ``file_device``. Delete ``file_extension`` from your inlists.
 
-Renamed pgstar `pause` option to `pause_flag` because pause is a reserved Fortran 77 keyword.
+Renamed pgstar ``pause``` option to ``pause_flag``` because pause is a reserved Fortran 77 keyword.
 
 .. _New Features main:
 
@@ -40,8 +40,8 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
-Exposed `star_utils` functions `star_weighted_smoothing`, `star_threshold_smoothing`, `star_kh_time_scale` to the user.
-These functions can now be called in your custom `run_star_extras.f90` file, for data in a star, getting relevant timescales.
+Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
+These functions can now be called in your custom ``run_star_extras.f90`` file, for data in a star, getting relevant timescales.
 
 For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
 a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide
@@ -54,7 +54,7 @@ control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_for
 
 By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced
 allowing users to limit the convective velocity to some fraction of the local sound speed using the
-controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
+controls ``max_conv_vel_div_csound`` and ``max_conv_vel_div_csound_maxq``.
 
 By user request, and motivated by the underestimation of line opacities from expanding material by the
 `Ferguson (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
