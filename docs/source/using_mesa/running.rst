@@ -81,6 +81,7 @@ initialization, so you only need to set the ones that you actually want
 to change.
 
 .. literalinclude:: ../../../star/work/inlist
+   :language: fortran
 
 inlist_project
 ~~~~~~~~~~~~~~
@@ -90,6 +91,7 @@ from a pre-main sequence model and then stop the evolution once we reach
 the zero-age main sequence (ZAMS).
 
 .. literalinclude:: ../../../star/work/inlist_project
+   :language: fortran
 
 inlist_pgstar
 ~~~~~~~~~~~~~
@@ -99,6 +101,7 @@ these for now, but to learn more, have look at the :ref:`using_mesa/using_pgstar
 section of this website.
 
 .. literalinclude:: ../../../star/work/inlist_pgstar
+   :language: fortran
 
 
 Run MESA
