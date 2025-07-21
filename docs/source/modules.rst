@@ -35,7 +35,7 @@ evolving the interior model.
 
    MESA treats the atmosphere separately, via these boundary
    conditions, because the physics governing the atmosphere is often
-   quite different than in the interior.
+   quite different from that in the interior.
 
 Historically, MESA decided how :math:`T_{\rm surf}` and :math:`P_{\rm
 surf}` are calculated using the ``which_atm_option`` control. To

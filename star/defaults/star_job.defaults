@@ -337,7 +337,7 @@
 
       ! By default at the start of a run a zams starting model is loaded,
       ! and then the ``initial_mass``, ``initial_z``, and ``initial_y`` are adjusted as necessary.
-      ! However, there are alternatives.  you can use a model you saved previously,
+      ! However, there are alternatives. You can use a model you saved previously,
       ! or you can request the system to create a pre-main-sequence model.
 
       ! BTW: the system finds the zams file by using the control called ``zams_filename``
@@ -1570,7 +1570,7 @@
 
       ! NOTE: why 2 flags?
       ! because I want 3 options: set true, set false, and leave it alone.
-      ! there are of course other ways to get 3 options, but this is what we have.
+      ! There are, of course, other ways to get 3 options, but this is what we have.
 
       ! ::
 
@@ -2445,8 +2445,8 @@
     special_rate_factor(:) = 1
 
       ! If set, we read this filename from the local work directory, then try ``data/rates_data/rate_tables``.
-      ! This enables using the MESA provide custom rate tables with out changing the default for everyone.
-      ! Note we still multiple the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
+      ! This enables using the MESA provided custom rate tables without changing the default for everyone.
+      ! Note we still multiply the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
 
       ! For instance setting:
       !    num_special_rate_factors = 1
@@ -2462,7 +2462,7 @@
       ! use_3a_fl87
       ! ~~~~~~~~~~~
 
-      ! If true then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
+      ! If true, then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
       ! This replaces the old set_rate_3a = 'Fl87' option
 
       use_3a_fl87 = .false.

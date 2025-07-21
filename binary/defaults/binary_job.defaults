@@ -123,7 +123,7 @@
 ! years, even if the condition is met at the first step. If the process takes more than
 ! max_steps_for_relax_primary_to_th_eq steps, then the simulation is terminated.
 
-! If want output to be written to history during the relaxation process, then
+! If you want output to be written to history during the relaxation process, then
 ! no_history_during_relax_primary_to_th_eq = .false.. After relaxation, if
 ! reset_age_relax_primary_to_th_eq = .true., then both model numbers and ages of the
 ! components and the binary will be reset to their values before relaxation.
