@@ -28,16 +28,15 @@ module other_eval_fp_ft
 contains
 
    subroutine null_other_eval_fp_ft( &
-      id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+      id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
       use num_lib
       use star_utils
       use auto_diff_support
       use star_def
-      integer, intent(in) :: id
-      integer, intent(in) :: nz
-      real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)  ! (nz)
-      type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)  ! (nz)
-      real(dp), intent(inout) :: r_polar(:), r_equatorial(:)  ! (nz)
+      integer, intent(in) :: id, k
+      real(dp), intent(in) :: aw, r, rho, xm
+      type(auto_diff_real_star_order1), intent(out) :: fp, ft
+      real(dp), intent(inout) :: r_polar, r_equatorial
       logical, intent(in) :: report_ierr
       integer, intent(out) :: ierr
 
