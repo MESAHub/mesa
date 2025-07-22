@@ -8,7 +8,7 @@ from matplotlib.animation import FFMpegWriter, FuncAnimation
 class SEDChecker:
     def __init__(
         self,
-        directory="../LOGS/SED/",
+        directory="../SED/",
         xlim=None,
         ylim=None,
         refresh_interval=2,
@@ -259,7 +259,7 @@ class SEDChecker:
 
 def main():
     checker = SEDChecker(
-        directory="../LOGS/SED/",
+        directory="../SED/",  # Change if needed
         xlim=[2500, 20000],
         ylim=None,
         refresh_interval=5,

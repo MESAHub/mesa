@@ -34,6 +34,7 @@ module colors_ctrls_io
    character(len=256) :: instrument
    character(len=256) :: vega_sed
    character(len=256) :: stellar_atm
+   character(len=256) :: colors_results_directory
    real(dp) :: metallicity
    real(dp) :: distance
    logical :: make_csv
@@ -47,6 +48,7 @@ module colors_ctrls_io
       metallicity, &
       distance, &
       make_csv, &
+      colors_results_directory, &
       use_colors, &
       read_extra_colors_inlist, &
       extra_colors_inlist_name
@@ -159,6 +161,7 @@ subroutine store_controls(rq, ierr)
    rq% metallicity = metallicity
    rq% distance = distance
    rq% make_csv = make_csv
+   rq% colors_results_directory = colors_results_directory
    rq% use_colors = use_colors
 
 end subroutine store_controls
@@ -196,6 +199,7 @@ subroutine set_controls_for_writing(rq)
    metallicity = rq% metallicity
    distance = rq% distance
    make_csv = rq% make_csv
+   colors_results_directory = rq% colors_results_directory
    use_colors = rq% use_colors
 
 end subroutine set_controls_for_writing

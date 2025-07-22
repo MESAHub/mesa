@@ -12,31 +12,8 @@ Changelog
 Changes in main
 ===============
 
-
-Colors Module Overhaul
-~~~~~~~~~~~~~~~~~~~~~~
-
-The previous colors module has been completely replaced. 
-A new ``colors`` module has been added for calculating synthetic photometry during stellar evolution. 
-The module computes bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
-
-The colors module is controlled via a new ``&colors`` namelist with key options:
-
-- ``use_colors``: Enable colors calculations (default ``.false.``)
-- ``instrument``: Path to filter system directory
-- ``stellar_atm``: Path to stellar atmosphere model grid  
-- ``vega_sed``: Vega spectrum for photometric zero points
-- ``make_csv``: Output detailed spectral energy distributions
-
-Three interpolation methods are available: K-nearest neighbors, trilinear, and Hermite tensor interpolation.
-Filter-specific magnitude columns are automatically added to history output based on the selected instrument. -- This selection is done in the testsuite stage. 
-
-See the ``star/test_suite/custom_colors`` test suite case for usage examples.
-
----------------------------------
-
-
 Upgraded software license from LGPL-v2.1 to LGPL-v3.0
+
 
 .. _Backwards-incompatible changes main:
 
@@ -54,6 +31,32 @@ Renamed pgstar `pause` option to `pause_flag` because pause is a reserved Fortra
 
 New Features
 ------------
+
+Colors Module Overhaul
+~~~~~~~~~~~~~~~~~~~~~~
+
+The previous colors module has been completely replaced. 
+A new ``colors`` module has been added for calculating synthetic photometry during stellar evolution. 
+The module computes bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
+
+The colors module is controlled via a new ``&colors`` namelist with key options:
+
+- ``use_colors``: Enable colors calculations (default ``.false.``)
+- ``instrument``: Path to filter system directory
+- ``stellar_atm``: Path to stellar atmosphere model grid  
+- ``vega_sed``: Vega spectrum for photometric zero points
+- ``metallicity``: Metallicity of the star
+- ``distance``: Distance to the star in cm
+- ``make_csv``: Output detailed spectral energy distributions
+- ``colors_results_directory``: Directory for output files
+
+Three interpolation methods are available: K-nearest neighbors, trilinear, and Hermite tensor interpolation.
+Filter-specific magnitude columns are automatically added to history output based on the selected instrument. -- This selection is done in the testsuite stage. 
+
+See the ``star/test_suite/custom_colors`` test suite case for usage examples.
+
+Other features
+~~~~~~~~~~~~~~
 
 Changed the default for ``use_radiation_corrected_transfer_rate =
 .false.``.

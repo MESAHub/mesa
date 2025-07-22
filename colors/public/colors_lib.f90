@@ -20,6 +20,7 @@
 module colors_lib
 
   use const_def, only: dp, strlen
+  use utils_lib, only: mkdir, folder_exists
   use colors_def, only: Colors_General_Info, colors_def_init, colors_use_cache, &
                       colors_is_initialized, do_alloc_colors, do_free_colors, &
                       get_colors_ptr, do_free_colors_tables
@@ -203,11 +204,12 @@ end subroutine colors_setup_hooks
   !****************************
   REAL(dp) FUNCTION calculate_synthetic(temperature, gravity, metallicity, ierr, &
                                       wavelengths, fluxes, filter_wavelengths, &
-                                      filter_trans, filter_filepath, vega_filepath, &
-                                      filter_name, make_sed)
+                                      filter_trans, &
+                                      filter_filepath, vega_filepath, &
+                                      filter_name, make_sed, colors_results_directory)
     ! Input arguments
     REAL(dp), INTENT(IN) :: temperature, gravity, metallicity
-    CHARACTER(LEN=*), INTENT(IN) :: filter_filepath, filter_name, vega_filepath
+    CHARACTER(LEN=*), INTENT(IN) :: filter_filepath, filter_name, vega_filepath, colors_results_directory
     INTEGER, INTENT(OUT) :: ierr
     CHARACTER(LEN=1000) :: line
 
@@ -222,7 +224,8 @@ end subroutine colors_setup_hooks
     INTEGER :: max_size, i
     REAL(dp) :: wv, fl, cf, fwv, ftr
 
-    csv_file = 'LOGS/SED/' // TRIM(remove_dat(filter_name)) // '_SED.csv'
+    if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
+    csv_file = trim(colors_results_directory) // '/' // TRIM(remove_dat(filter_name)) // '_SED.csv'
     ierr = 0
 
     ! Load filter data
@@ -282,11 +285,11 @@ end subroutine colors_setup_hooks
     END IF
 
     ! Calculate Vega flux for zero point calibration
-    vega_flux = calculatevegaflux(vega_filepath, filter_wavelengths, filter_trans, &
-                                 filter_name, make_sed)
+    vega_flux = calculate_vega_flux(vega_filepath, filter_wavelengths, filter_trans, &
+                                 filter_name, make_sed, colors_results_directory)
 
     ! Calculate synthetic flux
-    CALL calculate_syntheticflux(wavelengths, convolved_flux, synthetic_flux, &
+    CALL calculate_synthetic_flux(wavelengths, convolved_flux, synthetic_flux, &
                                filter_wavelengths, filter_trans)
 
     ! Calculate magnitude using Vega zero point
@@ -333,7 +336,7 @@ end subroutine colors_setup_hooks
   !****************************
   ! Calculate Synthetic Flux
   !****************************
-SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, &
+SUBROUTINE calculate_synthetic_flux(wavelengths, fluxes, synthetic_flux, &
                                   filter_wavelengths, filter_trans)
 
     REAL(dp), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
@@ -361,7 +364,7 @@ SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, &
         synthetic_flux = -1.0_dp
         RETURN
     END IF
-  END SUBROUTINE calculate_syntheticflux
+  END SUBROUTINE calculate_synthetic_flux
 
   !****************************
   ! Calculate Bolometric Magnitude and Flux
@@ -416,9 +419,9 @@ SUBROUTINE calculate_syntheticflux(wavelengths, fluxes, synthetic_flux, &
   !****************************
   ! Calculate Vega Flux for Zero Point
   !****************************
-FUNCTION calculatevegaflux(vega_filepath, filt_wave, filt_trans, &
-                          filter_name, make_sed) RESULT(vega_flux)
-    CHARACTER(LEN=*), INTENT(IN) :: vega_filepath, filter_name
+FUNCTION calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
+                          filter_name, make_sed, colors_results_directory) RESULT(vega_flux)
+    CHARACTER(LEN=*), INTENT(IN) :: vega_filepath, filter_name, colors_results_directory
     CHARACTER(len = 100) :: output_csv
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: filt_wave, filt_trans
     REAL(dp) :: vega_flux
@@ -453,7 +456,8 @@ FUNCTION calculatevegaflux(vega_filepath, filt_wave, filt_trans, &
       max_size = MAX(SIZE(vega_wave), SIZE(vega_flux_arr), SIZE(conv_flux), &
                      SIZE(filt_wave), SIZE(filt_trans))
 
-      output_csv = 'LOGS/SED/VEGA_' //TRIM(remove_dat(filter_name)) // '_SED.csv'
+      if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
+      output_csv = trim(colors_results_directory) // '/VEGA_' // TRIM(remove_dat(filter_name)) // '_SED.csv'
 
       ! Open the CSV file for writing
       OPEN(UNIT=10, FILE=output_csv, STATUS='REPLACE', ACTION='WRITE', IOSTAT=ierr)
@@ -492,7 +496,7 @@ FUNCTION calculatevegaflux(vega_filepath, filt_wave, filt_trans, &
 
     ! Clean up
     DEALLOCATE(conv_flux, vega_wave, vega_flux_arr)
-  END FUNCTION calculatevegaflux
+  END FUNCTION calculate_vega_flux
 
 
 

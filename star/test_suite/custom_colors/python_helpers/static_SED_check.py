@@ -106,7 +106,7 @@ def process_all_files(directory, xlim=None):
 
 
 def main():
-    directory = "../LOGS/SED/"  # Change if needed
+    directory = "../SED/"  # Change if needed
     process_all_files(directory, xlim=[0, 60000])
 
 

@@ -1,5 +1,6 @@
 #ignore data folders and things not in top level git
 LOGS/
+SED/
 star
 photos/
 data/

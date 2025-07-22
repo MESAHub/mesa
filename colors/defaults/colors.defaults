@@ -7,14 +7,11 @@
 ! Colors Files
 ! ------------
 
-
    ! use_colors
    ! ~~~~~~~~~~
    ! instrument
    ! ~~~~~~~~~~
    ! vega_sed
-   ! ~~~~~~~~
-   ! make_csv
    ! ~~~~~~~~
    ! stellar_atm
    ! ~~~~~~~~~~~
@@ -22,25 +19,25 @@
    ! ~~~~~~~~~~~
    ! distance
    ! ~~~~~~~~
+   ! make_csv
+   ! ~~~~~~~~
+   ! colors_results_directory
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-   ! TODO: add description
-   ! stuff
-   ! more of a blurb about the stuff
-   ! Photometric filter system - http://svo2.cab.inta-csic.es/theory/fps/
-   ! Vega SED for Vega photometric system
-   ! make csv
-   ! Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/ 
-   ! Metallicity
-   ! Stellar distance 'd' (10pc for abs mag...)
+   ! If ``use_colors`` is true, the colors modul is turned on, which will calculate
+   ! bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
+   ! Vega SED for Vega photometric system is used for photometric zero points.
+   ! Stellar distance is given in cm.
    ! ::
 
       use_colors = .false.
       instrument = '/colors/data/filters/GAIA/GAIA'
       vega_sed = '/colors/data/stellar_models/vega_flam.csv'
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
-      make_csv = .false.  
       metallicity = 0.58d0
       distance = 3.0857d17   
+      make_csv = .false.  
+      colors_results_directory = 'SED'
 
 
 ! Extra inlist controls

@@ -2,6 +2,8 @@
 ! This inlist evolves a star from pre-main sequence through multiple evolutionary phases
 ! Uses the custom colors module to calculate synthetic magnitudes in multiple filters
 
+! Niall Miller (2025)
+
 ! =============================================================================
 ! STAR_JOB NAMELIST - Controls model creation and global job settings
 ! =============================================================================
@@ -16,7 +18,7 @@
       required_termination_code_string = ''
       
       ! Graphics and plotting
-      pgstar_flag = .false.  ! Enable real-time plotting (This is set to .false. for test hub -- .true. will enable a CMD and Light curves!!)
+      pgstar_flag = .true.  ! Enable real-time plotting (This is set to .false. for test hub -- .true. will enable a CMD and Light curves!!)
       
       ! Custom output files
       history_columns_file = 'custom_colors_history_columns.list'  ! Additional history columns
@@ -75,8 +77,9 @@
       distance = 3.0857d16         ! Distance to star in cm (1 pc = 3.0857e16 m for absolute mags)
       
       ! Output options
+      colors_results_directory = 'SED'
       make_csv = .true.            ! Write detailed SED files showing filter convolution  -- This is also needed for plotting the SED.
-                                   ! Creates files like: LOGS/SED/G_SED.csv, LOGS/SED/VEGA_G_SED.csv
+                                   ! Creates files like: SED/G_SED.csv, SED/VEGA_G_SED.csv
 / ! end of colors namelist
 
 ! =============================================================================

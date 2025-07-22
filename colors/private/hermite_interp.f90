@@ -55,7 +55,7 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
 
       interp_flux(i) = hermite_tensor_interp3d(teff, log_g, metallicity, &
                                               teff_grid, logg_grid, meta_grid, flux_cube_lambda)
-      
+
       DEALLOCATE(flux_cube_lambda)
     END DO
 
@@ -77,19 +77,19 @@ SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
   REAL(dp), ALLOCATABLE, INTENT(OUT) :: wavelengths(:)
   REAL(dp), ALLOCATABLE, INTENT(OUT) :: flux_cube(:,:,:,:)
   INTEGER, INTENT(OUT) :: status
-  
+
   INTEGER :: unit, n_teff, n_logg, n_meta, n_lambda
-  
+
   unit = 99
   status = 0
-  
+
   ! Open the binary file
   OPEN(UNIT=unit, FILE=filename, STATUS='OLD', ACCESS='STREAM', FORM='UNFORMATTED', IOSTAT=status)
   IF (status /= 0) THEN
     PRINT *, 'Error opening binary file:', TRIM(filename)
     RETURN
   END IF
-  
+
   ! Read dimensions
   READ(unit, IOSTAT=status) n_teff, n_logg, n_meta, n_lambda
   IF (status /= 0) THEN
@@ -97,7 +97,7 @@ SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ! Allocate arrays based on dimensions
   ALLOCATE(teff_grid(n_teff), STAT=status)
   IF (status /= 0) THEN
@@ -105,35 +105,35 @@ SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ALLOCATE(logg_grid(n_logg), STAT=status)
   IF (status /= 0) THEN
     PRINT *, 'Error allocating logg_grid array'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ALLOCATE(meta_grid(n_meta), STAT=status)
   IF (status /= 0) THEN
     PRINT *, 'Error allocating meta_grid array'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ALLOCATE(wavelengths(n_lambda), STAT=status)
   IF (status /= 0) THEN
     PRINT *, 'Error allocating wavelengths array'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ALLOCATE(flux_cube(n_teff, n_logg, n_meta, n_lambda), STAT=status)
   IF (status /= 0) THEN
     PRINT *, 'Error allocating flux_cube array'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ! Read grid arrays
   READ(unit, IOSTAT=status) teff_grid
   IF (status /= 0) THEN
@@ -141,28 +141,28 @@ SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
     CLOSE(unit)
     RETURN
   END IF
-  
+
   READ(unit, IOSTAT=status) logg_grid
   IF (status /= 0) THEN
     PRINT *, 'Error reading logg_grid'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   READ(unit, IOSTAT=status) meta_grid
   IF (status /= 0) THEN
     PRINT *, 'Error reading meta_grid'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   READ(unit, IOSTAT=status) wavelengths
   IF (status /= 0) THEN
     PRINT *, 'Error reading wavelengths'
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ! Read flux cube
   READ(unit, IOSTAT=status) flux_cube
   IF (status /= 0) THEN
@@ -170,7 +170,7 @@ SUBROUTINE load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
     CLOSE(unit)
     RETURN
   END IF
-  
+
   ! Close file and return success
   CLOSE(unit)
 END SUBROUTINE load_binary_data
@@ -265,7 +265,7 @@ FUNCTION hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
       END DO
     END DO
 
-    ! z-derivatives  
+    ! z-derivatives
     h_y = [h00(t_y), h01(t_y)]
     h_z = [h10(t_z), h11(t_z)]
     DO iz = 1, 2

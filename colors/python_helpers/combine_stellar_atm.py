@@ -165,19 +165,13 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
 
     print("    Reference model parameter ranges:")
     print(
-        f"      Teff: {reference_params[:, 0].min():.1f} - {
-            reference_params[:, 0].max():.1f
-        } K"
+        f"      Teff: {reference_params[:, 0].min():.1f} - {reference_params[:, 0].max():.1f} K"
     )
     print(
-        f"      logg: {reference_params[:, 1].min():.2f} - {
-            reference_params[:, 1].max():.2f
-        }"
+        f"      logg: {reference_params[:, 1].min():.2f} - {reference_params[:, 1].max():.2f}"
     )
     print(
-        f"      [M/H]: {reference_params[:, 2].min():.2f} - {
-            reference_params[:, 2].max():.2f
-        }"
+        f"      [M/H]: {reference_params[:, 2].min():.2f} - {reference_params[:, 2].max():.2f}"
     )
 
     # Normalize parameters for better distance calculation
@@ -187,9 +181,7 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     meta_range = reference_params[:, 2].max() - reference_params[:, 2].min()
 
     print(
-        f"    Parameter ranges: Teff={teff_range:.1f}, logg={logg_range:.2f}, meta={
-            meta_range:.2f
-        }"
+        f"    Parameter ranges: Teff={teff_range:.1f}, logg={logg_range:.2f}, meta={meta_range:.2f}"
     )
 
     if teff_range > 0:
@@ -216,19 +208,13 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
     if not np.isfinite(reference_params_norm).all():
         print("    Error: Normalized parameters contain NaN/inf values!")
         print(
-            f"    Teff range: {reference_params[:, 0].min():.1f} - {
-                reference_params[:, 0].max():.1f
-            }"
+            f"    Teff range: {reference_params[:, 0].min():.1f} - {reference_params[:, 0].max():.1f}"
         )
         print(
-            f"    logg range: {reference_params[:, 1].min():.2f} - {
-                reference_params[:, 1].max():.2f
-            }"
+            f"    logg range: {reference_params[:, 1].min():.2f} - {reference_params[:, 1].max():.2f}"
         )
         print(
-            f"    meta range: {reference_params[:, 2].min():.2f} - {
-                reference_params[:, 2].max():.2f
-            }"
+            f"    meta range: {reference_params[:, 2].min():.2f} - {reference_params[:, 2].max():.2f}"
         )
         return np.ones(len(target_data["files"]))
 
@@ -336,9 +322,7 @@ def normalize_to_reference(target_data, reference_data, wavelength_grid):
 
     norm_factors = np.array(norm_factors)
     print(
-        f"    Normalization factors: median={np.median(norm_factors):.2f}, range=[{
-            np.min(norm_factors):.2f
-        }, {np.max(norm_factors):.2f}]"
+        f"    Normalization factors: median={np.median(norm_factors):.2f}, range=[{np.min(norm_factors):.2f}, {np.max(norm_factors):.2f}]"
     )
 
     return norm_factors
@@ -440,9 +424,7 @@ def identify_reference_model(all_models_data):
 
     # If no Kurucz, use the first model
     print(
-        f"No Kurucz model found, using {
-            os.path.basename(all_models_data[0]['model_dir'])
-        } as reference"
+        f"No Kurucz model found, using {os.path.basename(all_models_data[0]['model_dir'])} as reference"
     )
     return 0
 

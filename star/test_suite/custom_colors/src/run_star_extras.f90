@@ -4,7 +4,6 @@ module run_star_extras
   use const_def, only: dp, i8, strlen, mesa_dir
   ! TODO: below are things we will need to incorporate into the main code
   ! So that we do not need to create a custom run_stars_extras file
-  use utils_lib, only: mkdir  ! Add this line for directory creation
   use colors_def, only: Colors_General_Info
   use colors_lib, only: colors_init, colors_ptr, alloc_colors_handle_using_inlist, &
                         calculate_bolometric, calculate_synthetic, remove_dat
@@ -20,7 +19,6 @@ subroutine extras_controls(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
     type (star_info), pointer :: s
-
     integer :: colors_handle
 
     ierr = 0
@@ -38,10 +36,6 @@ subroutine extras_controls(id, ierr)
         print *, "Error initializing colors module"
         return
     end if
-
-
-    call mkdir('LOGS')
-    call mkdir('LOGS/SED')
 
     ! Debug print statements to check that values are properly loaded from inlist
     write(*,*) 'DEBUG: colors_handle = ', colors_handle
@@ -64,33 +58,24 @@ subroutine extras_controls(id, ierr)
     s%data_for_extra_profile_columns => data_for_extra_profile_columns
 end subroutine extras_controls
 
-  subroutine extras_startup(id, restart, ierr)
-     integer, intent(in) :: id
-     logical, intent(in) :: restart
-     integer, intent(out) :: ierr
-     type (star_info), pointer :: s
-     ierr = 0
-     call star_ptr(id, s, ierr)
-     if (ierr /= 0) return
-     !XXXcall test_suite_startup(restart, ierr)
+   subroutine extras_startup(id, restart, ierr)
+      integer, intent(in) :: id
+      logical, intent(in) :: restart
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
   end subroutine extras_startup
 
-  subroutine extras_after_evolve(id, ierr)
-    integer, intent(in) :: id
-    integer, intent(out) :: ierr
-    type (star_info), pointer :: s
-    real(dp) :: dt
-
-    ierr = 0
-    call star_ptr(id, s, ierr)
-    if (ierr /= 0) return
-
-    write(*,'(a)') 'finished custom colors'
-
-    ! Remove cleanup for col pointer
-
-    !XXXcall test_suite_after_evolve(ierr)
-  end subroutine extras_after_evolve
+   subroutine extras_after_evolve(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+   end subroutine extras_after_evolve
 
 
   integer function extras_check_model(id)
@@ -103,45 +88,37 @@ end subroutine extras_controls
      extras_check_model = keep_going
   end function extras_check_model
 
-  INTEGER FUNCTION how_many_extra_profile_columns(id)
-     INTEGER, INTENT(IN) :: id
+   integer function how_many_extra_profile_columns(id)
+      integer, intent(in) :: id
+      integer :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      how_many_extra_profile_columns = 0
+   end function how_many_extra_profile_columns
 
-     INTEGER :: ierr
-     TYPE(star_info), POINTER :: s
+   subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
+      integer, intent(in) :: id, n, nz
+      character (len=maxlen_profile_column_name) :: names(n)
+      real(dp) :: vals(nz,n)
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+   end subroutine data_for_extra_profile_columns
 
-     ierr = 0
-     CALL star_ptr(id, s, ierr)
-     IF (ierr /= 0) RETURN
-
-     how_many_extra_profile_columns = 0
-  END FUNCTION how_many_extra_profile_columns
-
-  SUBROUTINE data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
-     INTEGER, INTENT(IN) :: id, n, nz
-     CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
-     REAL(DP) :: vals(nz, n)
-     INTEGER, INTENT(OUT) :: ierr
-
-     TYPE(star_info), POINTER :: s
-
-     ierr = 0
-     CALL star_ptr(id, s, ierr)
-     IF (ierr /= 0) RETURN
-
-  END SUBROUTINE data_for_extra_profile_columns
-
-  INTEGER FUNCTION extras_finish_step(id)
-     INTEGER, INTENT(IN) :: id
-
-     INTEGER :: ierr
-     TYPE(star_info), POINTER :: s
-
-     ierr = 0
-     CALL star_ptr(id, s, ierr)
-     IF (ierr /= 0) RETURN
-
-     extras_finish_step = keep_going
-  END FUNCTION extras_finish_step
+   integer function extras_finish_step(id)
+      integer, intent(in) :: id
+      integer :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      extras_finish_step = keep_going
+   end function extras_finish_step
 
   integer function how_many_extra_history_columns(id)
       integer, intent(in) :: id
@@ -157,6 +134,7 @@ end subroutine extras_controls
       end if
 
       call read_strings_from_file(strings, n, id)
+      ! TODO: move this into mesa
       how_many_extra_history_columns = n + 2
       if (allocated(strings)) deallocate(strings)
   end function how_many_extra_history_columns
@@ -232,6 +210,8 @@ end function basename
       filter_wavelengths, filter_trans
       logical :: make_sed
 
+      ! TODO: move this into mesa
+
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -271,7 +251,7 @@ end function basename
                   vals(i) = calculate_synthetic(teff, log_g, metallicity, ierr,&
                    wavelengths, fluxes, filter_wavelengths, filter_trans, &
                    filter_filepath, vega_filepath, array_of_strings(i - 2),&
-                    make_sed)
+                    make_sed, colors_settings% colors_results_directory)
                   if (ierr /= 0) vals(i) = -1.0_dp
               else
                   vals(i) = -1.0_dp
