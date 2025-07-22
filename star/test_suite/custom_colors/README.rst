@@ -13,7 +13,7 @@ This test case has one part. Click to see a larger view of a plot.
 .. code-block:: console
 
    Mag_bol              ! Bolometric magnitude
-   Flux_bol             ! Bolometric flux  
+   Flux_bol             ! Bolometric flux
    Gbp                  ! Gaia blue photometer magnitude
    G                    ! Gaia magnitude
    Grp                  ! Gaia red photometer magnitude
@@ -28,7 +28,7 @@ The colors module interpolates between pre-computed stellar atmosphere models (K
 The test uses:
 
 * **Stellar atmosphere models**: Kurucz 2003 grid covering Teff = 3500-50000 K, log g = 0.0-5.0, [M/H] = -5.0 to +1.0
-* **Filter system**: Gaia DR3 photometric bands (Gbp, G, Grp)  
+* **Filter system**: Gaia DR3 photometric bands (Gbp, G, Grp)
 * **Reference spectrum**: Vega SED for magnitude zero-points
 * **Distance**: 10 parsecs (for absolute magnitudes)
 
@@ -54,10 +54,10 @@ The test automatically downloads required data files (~35MB) on first run:
 The build script (``mk``) creates the necessary directory structure and downloads:
 
 * Stellar atmosphere model grid and lookup table
-* Filter transmission curves  
+* Filter transmission curves
 * Vega reference spectrum
 
-Verification Tools  
+Verification Tools
 ==================
 
 Python helper scripts are provided for monitoring and verification:
