@@ -46,4 +46,3 @@ There you will find inlists used in published papers and MESA Summer School mate
 
 `Using pgstar for your MESA project <https://youtu.be/JZFa4WURztI>`_
 
-

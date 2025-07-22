@@ -171,7 +171,7 @@ Listing all commits that acknowledge help from someone ::
 Post release fixes
 ------------------
 
-By having the release be in a separate branch, we can push changes if we need to to fix issues. However, this should be done with caution. Changes to the documentation (highlighting some workarounds are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change requiring a new Zenodo upload). It may be easier if a version
+By having the release be in a separate branch, we can push changes if we need to fix issues. However, this should be done with caution. Changes to the documentation (highlighting some workarounds are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change requiring a new Zenodo upload). It may be easier if a version
 needs fixes to simply push a new release, and flag the current release as not working.
 
 New readthedocs version

@@ -119,7 +119,7 @@
 
 !      log(s% L_nuc_burn_total*Lsun/s% L(1)) < log_Lnuc_div_L_for_relax_primary_to_th_eq,
 
-! and the relaxation process  is followed for at least min_age_for_relax_primary_to_th_eq
+! and the relaxation process is followed for at least min_age_for_relax_primary_to_th_eq
 ! years, even if the condition is met at the first step. If the process takes more than
 ! max_steps_for_relax_primary_to_th_eq steps, then the simulation is terminated.
 
