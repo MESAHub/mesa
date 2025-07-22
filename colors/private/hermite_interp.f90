@@ -1,4 +1,23 @@
 ! ***********************************************************************
+!
+!   Copyright (C) 2025  Niall Miller & The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
+! ***********************************************************************
 ! Hermite interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 
@@ -8,14 +27,14 @@ MODULE hermite_interp
   implicit none
 
   PRIVATE
-  PUBLIC :: constructsed_hermite, hermite_tensor_interp3d
+  PUBLIC :: construct_sed_hermite, hermite_tensor_interp3d
 
 CONTAINS
 
   !---------------------------------------------------------------------------
   ! Main entry point: Construct a SED using Hermite tensor interpolation
   !---------------------------------------------------------------------------
-SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
+SUBROUTINE construct_sed_hermite(teff, log_g, metallicity, R, d, file_names, &
                                lu_teff, lu_logg, lu_meta, stellar_model_dir, &
                                wavelengths, fluxes)
     REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
@@ -64,7 +83,7 @@ SUBROUTINE constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
     CALL dilute_flux(interp_flux, R, d, diluted_flux)
     fluxes = diluted_flux
 
-  END SUBROUTINE constructsed_hermite
+  END SUBROUTINE construct_sed_hermite
 
 
 !---------------------------------------------------------------------------

@@ -129,5 +129,4 @@ subroutine do_free_colors_tables
 end subroutine do_free_colors_tables
 
 
-
 end module colors_def

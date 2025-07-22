@@ -1,21 +1,40 @@
 ! ***********************************************************************
+!
+!   Copyright (C) 2025  Niall Miller & The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
+! ***********************************************************************
 ! K-Nearest Neighbors interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 
 MODULE knn_interp
   USE const_def, ONLY: dp
-  USE shared_funcs, only: dilute_flux, loadsed
+  USE shared_funcs, only: dilute_flux, load_sed
   implicit none
 
   PRIVATE
-  PUBLIC :: constructsed_knn, loadsed, interpolatearray, dilute_flux
+  PUBLIC :: construct_sed_knn, load_sed, interpolate_array, dilute_flux
 
 CONTAINS
 
   !---------------------------------------------------------------------------
   ! Main entry point: Construct a SED using KNN interpolation
   !---------------------------------------------------------------------------
-  SUBROUTINE constructsed_knn(teff, log_g, metallicity, R, d, file_names, &
+  SUBROUTINE construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
                          lu_teff, lu_logg, lu_meta, stellar_model_dir, &
                          wavelengths, fluxes)
     REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
@@ -33,11 +52,11 @@ CONTAINS
     REAL(dp), DIMENSION(:), ALLOCATABLE :: diluted_flux
 
     ! Get the four closest stellar models
-    CALL getcloseststellarmodels(teff, log_g, metallicity, lu_teff, &
+    CALL get_closest_stellar_models(teff, log_g, metallicity, lu_teff, &
                                 lu_logg, lu_meta, closest_indices)
 
     ! Load the first SED to define the wavelength grid
-    CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), &
+    CALL load_sed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), &
                 closest_indices(1), temp_wavelengths, temp_flux)
 
     n_points = SIZE(temp_wavelengths)
@@ -46,14 +65,14 @@ CONTAINS
 
     ! Allocate flux array for the models (4 models, n_points each)
     ALLOCATE(model_fluxes(4, n_points))
-    CALL interpolatearray(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(1, :))
+    CALL interpolate_array(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(1, :))
 
     ! Load and interpolate remaining SEDs
     DO i = 2, 4
-      CALL loadsed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), &
+      CALL load_sed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), &
                   closest_indices(i), temp_wavelengths, temp_flux)
 
-      CALL interpolatearray(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(i, :))
+      CALL interpolate_array(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(i, :))
     END DO
 
     ! Compute distances and weights for the four models
@@ -85,12 +104,12 @@ CONTAINS
     CALL dilute_flux(fluxes, R, d, diluted_flux)
     fluxes = diluted_flux
 
-  END SUBROUTINE constructsed_knn
+  END SUBROUTINE construct_sed_knn
 
   !---------------------------------------------------------------------------
   ! Identify the four closest stellar models
   !---------------------------------------------------------------------------
-  SUBROUTINE getcloseststellarmodels(teff, log_g, metallicity, lu_teff, &
+  SUBROUTINE get_closest_stellar_models(teff, log_g, metallicity, lu_teff, &
                                   lu_logg, lu_meta, closest_indices)
     REAL(dp), INTENT(IN) :: teff, log_g, metallicity
     REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
@@ -172,12 +191,12 @@ CONTAINS
     END DO
 
     closest_indices = indices
-  END SUBROUTINE getcloseststellarmodels
+  END SUBROUTINE get_closest_stellar_models
 
   !---------------------------------------------------------------------------
   ! Linear interpolation (binary search version for efficiency)
   !---------------------------------------------------------------------------
-  SUBROUTINE linearinterpolate(x, y, x_val, y_val)
+  SUBROUTINE linear_interpolate(x, y, x_val, y_val)
     REAL(dp), INTENT(IN) :: x(:), y(:), x_val
     REAL(dp), INTENT(OUT) :: y_val
     INTEGER :: low, high, mid
@@ -218,12 +237,12 @@ CONTAINS
 
     ! Linear interpolation between x(low) and x(low+1)
     y_val = y(low) + (y(low+1) - y(low)) / (x(low+1) - x(low)) * (x_val - x(low))
-  END SUBROUTINE linearinterpolate
+  END SUBROUTINE linear_interpolate
 
   !---------------------------------------------------------------------------
   ! Array interpolation for SED construction
   !---------------------------------------------------------------------------
-  SUBROUTINE interpolatearray(x_in, y_in, x_out, y_out)
+  SUBROUTINE interpolate_array(x_in, y_in, x_out, y_out)
     REAL(dp), INTENT(IN) :: x_in(:), y_in(:), x_out(:)
     REAL(dp), INTENT(OUT) :: y_out(:)
     INTEGER :: i
@@ -245,8 +264,8 @@ CONTAINS
     END IF
 
     DO i = 1, SIZE(x_out)
-      CALL linearinterpolate(x_in, y_in, x_out(i), y_out(i))
+      CALL linear_interpolate(x_in, y_in, x_out(i), y_out(i))
     END DO
-  END SUBROUTINE interpolatearray
+  END SUBROUTINE interpolate_array
 
 END MODULE knn_interp

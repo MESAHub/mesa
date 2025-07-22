@@ -24,10 +24,10 @@ module colors_lib
   use colors_def, only: Colors_General_Info, colors_def_init, colors_use_cache, &
                       colors_is_initialized, do_alloc_colors, do_free_colors, &
                       get_colors_ptr, do_free_colors_tables
-  use hermite_interp, only: constructsed_hermite
-  use knn_interp, only: constructsed_knn, interpolatearray
-  use linear_interp, only: constructsed_linear
-  use shared_funcs, only: load_lookuptable, remove_dat, loadfilter, loadvegased, rombergintegration
+  use hermite_interp, only: construct_sed_hermite
+  use knn_interp, only: construct_sed_knn, interpolate_array
+  use linear_interp, only: construct_sed_linear
+  use shared_funcs, only: load_lookup_table, remove_dat, load_filter, load_vega_sed, romberg_integration
 
   implicit none
 
@@ -36,7 +36,7 @@ module colors_lib
   ! Make public interface explicit
   public :: colors_init, colors_shutdown
   public :: calculate_bolometric, calculate_synthetic
-  public :: load_lookuptable, remove_dat
+  public :: load_lookup_table, remove_dat
   public :: colors_ptr, alloc_colors_handle_using_inlist  ! Add this line
   ! Keep internals private
   private :: calculate_bolometric_phot
@@ -157,8 +157,6 @@ subroutine colors_setup_hooks(handle, ierr)
 end subroutine colors_setup_hooks
 
 
-
-
   !-----------------------------------------------------------------------
   ! Main public interface functions
   !-----------------------------------------------------------------------
@@ -181,17 +179,17 @@ end subroutine colors_setup_hooks
     lookup_file = TRIM(sed_filepath) // '/lookup_table.csv'
 
     ! Load the lookup table
-    CALL load_lookuptable(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
+    CALL load_lookup_table(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
 
-    !CALL constructsed_knn(teff, log_g, metallicity, R, d, file_names, &
+    !CALL construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
     !                       lu_teff, lu_logg, lu_meta, sed_filepath, &
     !                       wavelengths, fluxes)
 
-    !CALL constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
+    !CALL construct_sed_linear(teff, log_g, metallicity, R, d, file_names, &
     !                         lu_teff, lu_logg, lu_meta, sed_filepath, &
     !                         wavelengths, fluxes)
 
-    CALL constructsed_hermite(teff, log_g, metallicity, R, d, file_names, &
+    CALL construct_sed_hermite(teff, log_g, metallicity, R, d, file_names, &
                               lu_teff, lu_logg, lu_meta, sed_filepath,&
                                wavelengths, fluxes)
 
@@ -229,7 +227,7 @@ end subroutine colors_setup_hooks
     ierr = 0
 
     ! Load filter data
-    CALL loadfilter(filter_filepath, filter_wavelengths, filter_trans)
+    CALL load_filter(filter_filepath, filter_wavelengths, filter_trans)
 
     ! Check for invalid gravity input
     IF (gravity <= 0.0_dp) THEN
@@ -240,7 +238,7 @@ end subroutine colors_setup_hooks
 
     ! Perform SED convolution
     ALLOCATE(convolved_flux(SIZE(wavelengths)))
-    CALL convolvesed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
+    CALL convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
 
     ! Write SED to CSV if requested
     IF (make_sed) THEN
@@ -311,7 +309,7 @@ end subroutine colors_setup_hooks
   !****************************
   ! Convolve SED With Filter
   !****************************
-  SUBROUTINE convolvesed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
+  SUBROUTINE convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(dp), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
     REAL(dp), DIMENSION(:), ALLOCATABLE, intent(out) :: convolved_flux
@@ -324,14 +322,14 @@ end subroutine colors_setup_hooks
     ALLOCATE(interpolated_filter(n))
 
     ! Interpolate the filter transmission onto the wavelengths array
-    CALL interpolatearray(filter_wavelengths, filter_trans, wavelengths, interpolated_filter)
+    CALL interpolate_array(filter_wavelengths, filter_trans, wavelengths, interpolated_filter)
 
     ! Perform convolution (element-wise multiplication)
     convolved_flux = fluxes * interpolated_filter
 
     ! Deallocate temporary arrays
     DEALLOCATE(interpolated_filter)
-  END SUBROUTINE convolvesed
+  END SUBROUTINE convolve_sed
 
   !****************************
   ! Calculate Synthetic Flux
@@ -353,8 +351,8 @@ SUBROUTINE calculate_synthetic_flux(wavelengths, fluxes, synthetic_flux, &
       END IF
     END DO
 
-    CALL rombergintegration(wavelengths, fluxes * wavelengths, integrated_flux)
-    CALL rombergintegration(filter_wavelengths, &
+    CALL romberg_integration(wavelengths, fluxes * wavelengths, integrated_flux)
+    CALL romberg_integration(filter_wavelengths, &
                            filter_trans * filter_wavelengths, integrated_filter)
     ! Store the total flux
     IF (integrated_filter > 0.0) THEN
@@ -382,7 +380,7 @@ SUBROUTINE calculate_synthetic_flux(wavelengths, fluxes, synthetic_flux, &
     END DO
 
     ! Call Romberg integration
-    CALL rombergintegration(wavelengths, fluxes, bolometric_flux)
+    CALL romberg_integration(wavelengths, fluxes, bolometric_flux)
 
     ! Validate integration result
     IF (bolometric_flux <= 0.0) THEN
@@ -400,21 +398,21 @@ SUBROUTINE calculate_synthetic_flux(wavelengths, fluxes, synthetic_flux, &
       PRINT *, "Warning: Flux value is very small, precision might be affected."
     END IF
 
-    bolometric_magnitude = fluxtomagnitude(bolometric_flux)
+    bolometric_magnitude = flux_to_magnitude(bolometric_flux)
   END SUBROUTINE calculate_bolometric_phot
 
   !****************************
   ! Convert Flux to Magnitude
   !****************************
-  REAL(dp) FUNCTION fluxtomagnitude(flux)
+  REAL(dp) FUNCTION flux_to_magnitude(flux)
     REAL(dp), INTENT(IN) :: flux
     IF (flux <= 0.0) THEN
       PRINT *, "Error: Flux must be positive to calculate magnitude."
-      fluxtomagnitude = 99.0  ! Return an error value
+      flux_to_magnitude = 99.0  ! Return an error value
     ELSE
-      fluxtomagnitude = -2.5 * LOG10(flux)
+      flux_to_magnitude = -2.5 * LOG10(flux)
     END IF
-  END FUNCTION fluxtomagnitude
+  END FUNCTION flux_to_magnitude
 
   !****************************
   ! Calculate Vega Flux for Zero Point
@@ -434,15 +432,15 @@ FUNCTION calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
     CHARACTER(LEN=1000) :: line
 
     ! Load the Vega SED
-    CALL loadvegased(vega_filepath, vega_wave, vega_flux_arr)
+    CALL load_vega_sed(vega_filepath, vega_wave, vega_flux_arr)
 
     ! Convolve the Vega SED with the filter transmission
     ALLOCATE(conv_flux(SIZE(vega_wave)))
-    CALL convolvesed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
+    CALL convolve_sed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
 
     ! Integrate the convolved Vega SED and the filter transmission
-    CALL rombergintegration(vega_wave, vega_wave*conv_flux, int_flux)
-    CALL rombergintegration(filt_wave, filt_wave*filt_trans, int_filter)
+    CALL romberg_integration(vega_wave, vega_wave*conv_flux, int_flux)
+    CALL romberg_integration(filt_wave, filt_wave*filt_trans, int_filter)
 
     IF (int_filter > 0.0_dp) THEN
       vega_flux = int_flux / int_filter
@@ -497,8 +495,6 @@ FUNCTION calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
     ! Clean up
     DEALLOCATE(conv_flux, vega_wave, vega_flux_arr)
   END FUNCTION calculate_vega_flux
-
-
 
 
   !-----------------------------------------------------------------------
@@ -608,20 +604,5 @@ FUNCTION calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
     ierr = 0
     get_lum_band_by_id = -99.d0
   end function get_lum_band_by_id
-
-  !-----------------------------------------------------------------------
-  ! Test suite interface (stub implementations)
-  !-----------------------------------------------------------------------
-
-  subroutine test_suite_startup(restart, ierr)
-    logical, intent(in) :: restart
-    integer, intent(out) :: ierr
-    ierr = 0
-  end subroutine test_suite_startup
-
-  subroutine test_suite_after_evolve(ierr)
-    integer, intent(out) :: ierr
-    ierr = 0
-  end subroutine test_suite_after_evolve
 
 end module colors_lib

@@ -1,4 +1,23 @@
 ! ***********************************************************************
+!
+!   Copyright (C) 2025  Niall Miller & The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
+! ***********************************************************************
 ! Linear interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 
@@ -8,7 +27,7 @@ MODULE linear_interp
   implicit none
 
   PRIVATE
-  PUBLIC :: constructsed_linear, trilinear_interp
+  PUBLIC :: construct_sed_linear, trilinear_interp
 
 CONTAINS
 
@@ -16,7 +35,7 @@ CONTAINS
   ! Main entry point: Construct a SED using linear interpolation
   !---------------------------------------------------------------------------
 
-SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
+SUBROUTINE construct_sed_linear(teff, log_g, metallicity, R, d, file_names, &
                               lu_teff, lu_logg, lu_meta, stellar_model_dir, &
                               wavelengths, fluxes)
 
@@ -100,7 +119,7 @@ SUBROUTINE constructsed_linear(teff, log_g, metallicity, R, d, file_names, &
     mean_flux = SUM(diluted_flux) / n_lambda
 
 
-  END SUBROUTINE constructsed_linear
+  END SUBROUTINE construct_sed_linear
 
 
   !---------------------------------------------------------------------------

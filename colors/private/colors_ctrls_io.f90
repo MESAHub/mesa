@@ -205,7 +205,6 @@ subroutine set_controls_for_writing(rq)
 end subroutine set_controls_for_writing
 
 
-
 subroutine get_colors_controls(rq, name, val, ierr)
    use utils_lib, only: StrUpCase
    type (Colors_General_Info), pointer, intent(inout) :: rq
@@ -272,6 +271,5 @@ subroutine set_colors_controls(rq, name, val, ierr)
    if(ierr/=0) return
 
 end subroutine set_colors_controls
-
 
 end module colors_ctrls_io

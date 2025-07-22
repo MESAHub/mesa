@@ -1,15 +1,31 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2025  Niall Miller & The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
 
 MODULE shared_funcs
   USE const_def, ONLY: dp, strlen
   implicit none
 
 
-  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, &
-            SimpsonIntegration, loadsed, loadfilter, loadvegased, &
-            load_lookuptable, remove_dat
+  PUBLIC :: dilute_flux, trapezoidal_integration, romberg_integration, &
+            simpson_integration, load_sed, load_filter, load_vega_sed, &
+            load_lookup_table, remove_dat
 CONTAINS
-
-
 
 
   !---------------------------------------------------------------------------
@@ -31,12 +47,6 @@ CONTAINS
   END SUBROUTINE dilute_flux
 
 
-
-
-
-
-
-
      !###########################################################
      !## MATHS
      !###########################################################
@@ -45,7 +55,7 @@ CONTAINS
    !Trapezoidal and Simpson Integration For Flux Calculation
    !****************************
 
-     SUBROUTINE trapezoidalintegration(x, y, result)
+     SUBROUTINE trapezoidal_integration(x, y, result)
        REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
        REAL(DP), INTENT(OUT) :: result
 
@@ -72,10 +82,10 @@ CONTAINS
        END DO
 
        result = sum
-     END SUBROUTINE trapezoidalintegration
+     END SUBROUTINE trapezoidal_integration
 
 
-   SUBROUTINE SimpsonIntegration(x, y, result)
+   SUBROUTINE simpson_integration(x, y, result)
      INTEGER, PARAMETER :: DP = KIND(1.0D0)
      REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
      REAL(DP), INTENT(OUT) :: result
@@ -116,9 +126,9 @@ CONTAINS
      END IF
 
      result = sum
-   END SUBROUTINE SimpsonIntegration
+   END SUBROUTINE simpson_integration
 
-   SUBROUTINE rombergintegration(x, y, result)
+   SUBROUTINE romberg_integration(x, y, result)
      INTEGER, PARAMETER :: DP = KIND(1.0D0)
      REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
      REAL(DP), INTENT(OUT) :: result
@@ -166,8 +176,7 @@ CONTAINS
      END DO
 
      result = R(1)
-   END SUBROUTINE rombergintegration
-
+   END SUBROUTINE romberg_integration
 
 
   !-----------------------------------------------------------------------
@@ -177,7 +186,7 @@ CONTAINS
   !****************************
   ! Load Vega SED for Zero Point Calculation
   !****************************
-  SUBROUTINE loadvegased(filepath, wavelengths, flux)
+  SUBROUTINE load_vega_sed(filepath, wavelengths, flux)
     CHARACTER(LEN=*), INTENT(IN) :: filepath
     REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, flux
     CHARACTER(LEN=512) :: line
@@ -222,12 +231,12 @@ CONTAINS
     END DO
 
     CLOSE(unit)
-  END SUBROUTINE loadvegased
+  END SUBROUTINE load_vega_sed
 
   !****************************
   ! Load Filter File
   !****************************
-  SUBROUTINE loadfilter(directory, filter_wavelengths, filter_trans)
+  SUBROUTINE load_filter(directory, filter_wavelengths, filter_trans)
     CHARACTER(LEN=*), INTENT(IN) :: directory
     REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: filter_wavelengths, filter_trans
 
@@ -285,12 +294,12 @@ CONTAINS
     END DO
 
     CLOSE(unit)
-  END SUBROUTINE loadfilter
+  END SUBROUTINE load_filter
 
   !****************************
   ! Load Lookup Table For Identifying Stellar Atmosphere Models
   !****************************
-SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
+SUBROUTINE load_lookup_table(lookup_file, lookup_table, out_file_names, &
                            out_logg, out_meta, out_teff)
 
     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
@@ -319,15 +328,15 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
       STOP
     END IF
 
-    CALL splitline(line, delimiter, headers)
+    CALL split_line(line, delimiter, headers)
 
     ! Determine column indices for logg, meta, and teff
-    logg_col = getcolumnindex(headers, "logg")
-    teff_col = getcolumnindex(headers, "teff")
+    logg_col = get_column_index(headers, "logg")
+    teff_col = get_column_index(headers, "teff")
 
-    meta_col = getcolumnindex(headers, "meta")
+    meta_col = get_column_index(headers, "meta")
     IF (meta_col < 0) THEN
-      meta_col = getcolumnindex(headers, "feh")
+      meta_col = get_column_index(headers, "feh")
     END IF
 
     n_rows = 0
@@ -352,7 +361,7 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
       IF (status /= 0) EXIT
       i = i + 1
 
-      CALL splitline(line, delimiter, columns)
+      CALL split_line(line, delimiter, columns)
 
       ! Populate arrays
       out_file_names(i) = columns(1)
@@ -392,7 +401,7 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
 
   CONTAINS
 
-    FUNCTION getcolumnindex(headers, target) RESULT(index)
+    FUNCTION get_column_index(headers, target) RESULT(index)
       CHARACTER(LEN=100), INTENT(IN) :: headers(:)
       CHARACTER(LEN=*), INTENT(IN) :: target
       INTEGER :: index, i
@@ -408,9 +417,9 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
           EXIT
         END IF
       END DO
-    END FUNCTION getcolumnindex
+    END FUNCTION get_column_index
 
-    SUBROUTINE splitline(line, delimiter, tokens)
+    SUBROUTINE split_line(line, delimiter, tokens)
       CHARACTER(LEN=*), INTENT(IN) :: line, delimiter
       CHARACTER(LEN=100), ALLOCATABLE, INTENT(OUT) :: tokens(:)
       INTEGER :: num_tokens, pos, start, len_delim
@@ -425,15 +434,15 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
 
         IF (pos == 0) EXIT
         num_tokens = num_tokens + 1
-        CALL AppendToken(tokens, line(start:start + pos - 2))
+        CALL append_token(tokens, line(start:start + pos - 2))
         start = start + pos + len_delim - 1
       END DO
 
       num_tokens = num_tokens + 1
-      CALL AppendToken(tokens, line(start:))
-    END SUBROUTINE splitline
+      CALL append_token(tokens, line(start:))
+    END SUBROUTINE split_line
 
-    SUBROUTINE AppendToken(tokens, token)
+    SUBROUTINE append_token(tokens, token)
       CHARACTER(LEN=*), INTENT(IN) :: token
       CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: tokens(:)
       CHARACTER(LEN=100), ALLOCATABLE :: temp(:)
@@ -452,17 +461,12 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
         tokens(n + 1) = token  ! Add the new token
         DEALLOCATE(temp)  ! unsure if this is till needed.
       END IF
-    END SUBROUTINE AppendToken
+    END SUBROUTINE append_token
 
-  END SUBROUTINE load_lookuptable
-
-
+  END SUBROUTINE load_lookup_table
 
 
-
-
-
-     SUBROUTINE loadsed(directory, index, wavelengths, flux)
+     SUBROUTINE load_sed(directory, index, wavelengths, flux)
        CHARACTER(LEN=*), INTENT(IN) :: directory
        INTEGER, INTENT(IN) :: index
        REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, flux
@@ -525,7 +529,7 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
 
        CLOSE(unit)
 
-     END SUBROUTINE loadsed
+     END SUBROUTINE load_sed
 
 
   !-----------------------------------------------------------------------
@@ -553,10 +557,6 @@ SUBROUTINE load_lookuptable(lookup_file, lookup_table, out_file_names, &
         base = path
     end if
   end function remove_dat
-
-
-
-
 
 
 END MODULE shared_funcs
