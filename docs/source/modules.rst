@@ -2,8 +2,8 @@
 Modules
 *******
 
-This page lists the MESA modules alphabetically by name and briefly
-summarizes their purpose.
+This page lists the MESA modules alphabetically used by ``star`` and ``binary``
+and briefly summarizes their purpose.
 
 Each MESA module has its own directory with the same general
 structure, including a standard set of subdirectories and scripts. The

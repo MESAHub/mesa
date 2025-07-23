@@ -133,7 +133,7 @@ contains
 
    end function extras_binary_start_step
 
-   !Return either keep_going, retry or terminate
+   ! Return either keep_going, retry, or terminate
    integer function extras_binary_check_model(binary_id)
       type(binary_info), pointer :: b
       integer, intent(in) :: binary_id
