@@ -542,7 +542,7 @@ If you receive the error
 
 during the MESA installation of crlibm, please check that you are not
 using an unsupported 32-bit system. If you're using macOS, make sure
-you've `installed Xcode and the command line tools <#osx>`__.
+you've `installed Xcode and the command line tools <#what-do-i-need-to-do-to-run-mesa-on-os-x>`__.
 
 If you're using Linux and you see an error message in config.log like
 

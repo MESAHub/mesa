@@ -14,7 +14,7 @@ should visit the
 of the MESA forum and see if someone has contributed code in your
 language of choice. (There are reasonably mature routines for Python,
 IDL, ruby and Mathematica.) An example of Python plotting is shown
-`later on this page <#python>`__.
+`later on this page <#plotting-mesa-output>`__.
 
 In the LOGS directory, you'll find the following files.
 
