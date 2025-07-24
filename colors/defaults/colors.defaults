@@ -4,8 +4,8 @@
    ! The MESA/colors parameters are given default values here.
 
 
-! Colors Files
-! ------------
+! Colors User Parameters
+! ----------------------
 
    ! use_colors
    ! ~~~~~~~~~~

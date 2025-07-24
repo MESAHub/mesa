@@ -37,9 +37,9 @@ Configuration
 
 The test requires a ``&colors`` namelist in addition to standard MESA controls:
 
-.. literalinclude:: ../../../star/test_suite/custom_colors/inlist
+.. literalinclude:: ../../../star/test_suite/custom_colors/inlist_colors
    :start-after: &colors
-   :end-before: /
+   :end-before: ! end of colors namelist
 
 Data Download
 =============

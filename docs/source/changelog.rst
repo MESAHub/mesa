@@ -50,7 +50,7 @@ The colors module is controlled via a new ``&colors`` namelist with key options:
 - ``colors_results_directory``: Directory for output files
 
 Three interpolation methods are available: K-nearest neighbors, trilinear, and Hermite tensor interpolation.
-Filter-specific magnitude columns are automatically added to history output based on the selected instrument. -- This selection is done in the testsuite stage.
+Filter-specific magnitude columns are automatically added to history output based on the selected instrument.
 
 See the ``star/test_suite/custom_colors`` test suite case for usage examples.
 
