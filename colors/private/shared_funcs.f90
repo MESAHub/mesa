@@ -297,8 +297,8 @@ contains
 
       character(len=*), intent(in) :: lookup_file
       REAL, dimension(:, :), allocatable, intent(out) :: lookup_table
-      character(len=100), allocatable, INTENT(INOUT) :: out_file_names(:)
-      real(dp), allocatable, INTENT(INOUT) :: out_logg(:), out_meta(:), out_teff(:)
+      character(len=100), allocatable, intent(inout) :: out_file_names(:)
+      real(dp), allocatable, intent(inout) :: out_logg(:), out_meta(:), out_teff(:)
 
       integer :: i, n_rows, status, unit
       character(len=512) :: line
@@ -437,7 +437,7 @@ contains
 
       subroutine append_token(tokens, token)
          character(len=*), intent(in) :: token
-         character(len=100), allocatable, INTENT(INOUT) :: tokens(:)
+         character(len=100), allocatable, intent(inout) :: tokens(:)
          character(len=100), allocatable :: temp(:)
          integer :: n
 

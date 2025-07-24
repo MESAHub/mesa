@@ -45,8 +45,8 @@ contains
       integer, intent(out) :: ierr
       character(len=1000) :: line
 
-      real(dp), dimension(:), INTENT(INOUT) :: wavelengths, fluxes
-      real(dp), dimension(:), allocatable, INTENT(INOUT) :: filter_wavelengths, filter_trans
+      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
+      real(dp), dimension(:), allocatable, intent(inout) :: filter_wavelengths, filter_trans
       logical, intent(in) :: make_sed
 
       ! Local variables
@@ -144,8 +144,8 @@ contains
    ! Convolve SED With Filter
    !****************************
    subroutine convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
-      real(dp), dimension(:), INTENT(INOUT) :: wavelengths, fluxes
-      real(dp), dimension(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
+      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
+      real(dp), dimension(:), intent(inout) :: filter_wavelengths, filter_trans
       real(dp), dimension(:), allocatable, intent(out) :: convolved_flux
       real(dp), dimension(:), allocatable :: interpolated_filter
       integer :: n
@@ -172,7 +172,7 @@ contains
                                        filter_wavelengths, filter_trans)
 
       real(dp), dimension(:), intent(in) :: wavelengths, fluxes
-      real(dp), dimension(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
+      real(dp), dimension(:), intent(inout) :: filter_wavelengths, filter_trans
       real(dp), intent(out) :: synthetic_flux
       integer :: i
       real(dp) :: integrated_flux, integrated_filter
@@ -205,7 +205,7 @@ contains
                                 filter_name, make_sed, colors_results_directory) result(vega_flux)
       character(len=*), intent(in) :: vega_filepath, filter_name, colors_results_directory
       character(len=100) :: output_csv
-      real(dp), dimension(:), INTENT(INOUT) :: filt_wave, filt_trans
+      real(dp), dimension(:), intent(inout) :: filt_wave, filt_trans
       real(dp) :: vega_flux
       real(dp) :: int_flux, int_filter
       real(dp), allocatable :: vega_wave(:), vega_flux_arr(:), conv_flux(:)

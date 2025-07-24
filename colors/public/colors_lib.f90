@@ -29,7 +29,7 @@ module colors_lib
    private
 
    public :: colors_init, colors_shutdown
-   public :: alloc_colors_handle, alloc_colors_handle_using_inlist
+   public :: alloc_colors_handle, alloc_colors_handle_using_inlist, free_colors_handle
    public :: colors_ptr
    public :: colors_setup_tables, colors_setup_hooks
    ! Main functions

@@ -290,6 +290,14 @@
       end subroutine star_set_kap_and_eos_handles
 
 
+      subroutine star_set_colors_handles(id, ierr)
+         use init, only: set_colors_handles
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         call set_colors_handles(id, ierr)
+      end subroutine star_set_colors_handles
+
+
       subroutine star_set_net(id, new_net_name, ierr)
          use net, only: set_net
          integer, intent(in) :: id

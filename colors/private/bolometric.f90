@@ -61,7 +61,7 @@ contains
    ! Calculate Bolometric Magnitude and Flux
    !****************************
    subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-      real(dp), dimension(:), INTENT(INOUT) :: wavelengths, fluxes
+      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux
       integer :: i
 

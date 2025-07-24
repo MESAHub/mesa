@@ -375,6 +375,10 @@
          call star_set_kap_and_eos_handles(id, ierr)
          if (failed('set_star_kap_and_eos_handles',ierr)) return
 
+         if (dbg) write(*,*) 'call star_colors_handles'
+         call star_set_colors_handles(id, ierr)
+         if (failed('set_star_colors_handles',ierr)) return
+
          if (dbg) write(*,*) 'call star_setup'
          call star_setup(id, inlist_fname, ierr)
          if (failed('star_setup',ierr)) return
@@ -1739,6 +1743,8 @@
          if (failed('init_starting_star_data',ierr)) return
          call star_set_kap_and_eos_handles(id_aux, ierr)
          if (failed('set_star_kap_and_eos_handles',ierr)) return
+         call star_set_colors_handles(id_aux, ierr)
+         if (failed('star_set_colors_handles',ierr)) return
          call store_controls(s_aux, ierr)
          if (failed('store_controls',ierr)) return
          call do_star_job_controls_before(id_aux, s_aux, .false., ierr)

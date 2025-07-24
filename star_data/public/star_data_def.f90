@@ -53,6 +53,7 @@ module star_data_def
       integer :: eos_handle
       integer :: kap_handle
       integer :: net_handle
+      integer :: colors_handle
 
       ! star id
       integer :: id  ! unique identifier for each star_info instance

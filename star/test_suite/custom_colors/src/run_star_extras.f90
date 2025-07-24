@@ -24,18 +24,12 @@ subroutine extras_controls(id, ierr)
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
-    print *, "Extras startup routine"
 
-    ! Initialize the colors module
-    ! TODO: we will have to do this somewhere in MESA, dig around how/where kap does this.
-    ! this is a little hacky
-    colors_handle = alloc_colors_handle_using_inlist(s% inlist_fname, ierr)
-    call colors_ptr(colors_handle,colors_settings,ierr)
+    call colors_ptr(s% colors_handle, colors_settings, ierr)
     if (ierr /= 0) then
-        print *, "Error initializing colors module"
+        print *, "Error getting colors_settings"
         return
     end if
-
     ! Debug print statements to check that values are properly loaded from inlist
     write(*,*) 'DEBUG: colors_handle = ', colors_handle
     write(*,*) 'DEBUG: colors instrument = ', trim(colors_settings% instrument)
