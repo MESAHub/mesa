@@ -24,7 +24,7 @@
    ! colors_results_directory
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-   ! If ``use_colors`` is true, the colors modul is turned on, which will calculate
+   ! If ``use_colors`` is true, the colors module is turned on, which will calculate
    ! bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
    ! Vega SED for Vega photometric system is used for photometric zero points.
    ! Stellar distance is given in cm.

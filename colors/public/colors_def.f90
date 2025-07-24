@@ -129,4 +129,12 @@ subroutine do_free_colors_tables
 end subroutine do_free_colors_tables
 
 
+integer function get_number_of_filters(colors_settings)
+  type (Colors_General_Info), pointer, intent(in) :: colors_settings
+  get_number_of_filters = 0
+end function get_number_of_filters
+
+
+
+
 end module colors_def
