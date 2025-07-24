@@ -19,8 +19,8 @@ SRCS = \
    hermite_interp.f90 \
    knn_interp.f90 \
    linear_interp.f90 \
-	 bolometric.f90 \
-	 synthetic.f90 \
+   bolometric.f90 \
+   synthetic.f90 \
    colors_lib.f90
 
 #################################################################

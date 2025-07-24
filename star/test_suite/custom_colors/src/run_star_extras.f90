@@ -29,7 +29,6 @@ subroutine extras_controls(id, ierr)
     ! Initialize the colors module
     ! TODO: we will have to do this somewhere in MESA, dig around how/where kap does this.
     ! this is a little hacky
-    call colors_init(.false., '', ierr)
     colors_handle = alloc_colors_handle_using_inlist(s% inlist_fname, ierr)
     call colors_ptr(colors_handle,colors_settings,ierr)
     if (ierr /= 0) then
@@ -165,10 +164,6 @@ end function basename
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
-
-
-      !write(*,*) 'vega_sed = ', trim(colors_settings% vega_sed)
-      !write(*,*) 'instrument = ', trim(colors_settings% instrument)
 
       filename = trim(mesa_dir) // trim(colors_settings% instrument) // "/" // &
       trim(basename(colors_settings% instrument))

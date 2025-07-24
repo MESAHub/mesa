@@ -524,9 +524,6 @@
          special_rate_factor, &
          filename_of_special_rate, &
          reaction_for_special_factor,&
-         color_num_files,&
-         color_file_names,&
-         color_num_colors,&
          warn_run_star_extras, &
 
          report_garbage_collection, &
@@ -1112,9 +1109,6 @@
          s% job% special_rate_factor = special_rate_factor
          s% job% filename_of_special_rate = filename_of_special_rate
          s% job% reaction_for_special_factor = reaction_for_special_factor
-         s% job% color_num_files = color_num_files
-         s% job% color_file_names = color_file_names
-         s% job% color_num_colors = color_num_colors
 
          s% job% warn_run_star_extras = warn_run_star_extras
          s% job% report_garbage_collection = report_garbage_collection

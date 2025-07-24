@@ -14,7 +14,6 @@ Changes in main
 
 Upgraded software license from LGPL-v2.1 to LGPL-v3.0
 
-
 .. _Backwards-incompatible changes main:
 
 Backwards-incompatible changes
