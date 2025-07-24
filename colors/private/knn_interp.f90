@@ -21,251 +21,251 @@
 ! K-Nearest Neighbors interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 
-MODULE knn_interp
-  USE const_def, ONLY: dp
-  USE shared_funcs, only: dilute_flux, load_sed
-  implicit none
+module knn_interp
+   use const_def, only: dp
+   use shared_funcs, only: dilute_flux, load_sed
+   implicit none
 
-  PRIVATE
-  PUBLIC :: construct_sed_knn, load_sed, interpolate_array, dilute_flux
+   private
+   public :: construct_sed_knn, load_sed, interpolate_array, dilute_flux
 
-CONTAINS
+contains
 
-  !---------------------------------------------------------------------------
-  ! Main entry point: Construct a SED using KNN interpolation
-  !---------------------------------------------------------------------------
-  SUBROUTINE construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
-                         lu_teff, lu_logg, lu_meta, stellar_model_dir, &
-                         wavelengths, fluxes)
-    REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
-    REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
-    CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
-    CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
-    REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
+   !---------------------------------------------------------------------------
+   ! Main entry point: Construct a SED using KNN interpolation
+   !---------------------------------------------------------------------------
+   subroutine construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
+                                lu_teff, lu_logg, lu_meta, stellar_model_dir, &
+                                wavelengths, fluxes)
+      real(dp), intent(in) :: teff, log_g, metallicity, R, d
+      real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
+      character(len=*), intent(in) :: stellar_model_dir
+      character(len=100), intent(in) :: file_names(:)
+      real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
 
-    INTEGER, DIMENSION(4) :: closest_indices
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: temp_wavelengths, temp_flux, common_wavelengths
-    REAL(dp), DIMENSION(:,:), ALLOCATABLE :: model_fluxes
-    REAL(dp), DIMENSION(4) :: weights, distances
-    INTEGER :: i, n_points
-    REAL(dp) :: sum_weights
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: diluted_flux
+      integer, dimension(4) :: closest_indices
+      real(dp), dimension(:), allocatable :: temp_wavelengths, temp_flux, common_wavelengths
+      real(dp), dimension(:, :), allocatable :: model_fluxes
+      real(dp), dimension(4) :: weights, distances
+      integer :: i, n_points
+      real(dp) :: sum_weights
+      real(dp), dimension(:), allocatable :: diluted_flux
 
-    ! Get the four closest stellar models
-    CALL get_closest_stellar_models(teff, log_g, metallicity, lu_teff, &
-                                lu_logg, lu_meta, closest_indices)
+      ! Get the four closest stellar models
+      call get_closest_stellar_models(teff, log_g, metallicity, lu_teff, &
+                                      lu_logg, lu_meta, closest_indices)
 
-    ! Load the first SED to define the wavelength grid
-    CALL load_sed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), &
-                closest_indices(1), temp_wavelengths, temp_flux)
+      ! Load the first SED to define the wavelength grid
+      call load_sed(trim(stellar_model_dir)//trim(file_names(closest_indices(1))), &
+                    closest_indices(1), temp_wavelengths, temp_flux)
 
-    n_points = SIZE(temp_wavelengths)
-    ALLOCATE(common_wavelengths(n_points))
-    common_wavelengths = temp_wavelengths
+      n_points = size(temp_wavelengths)
+      allocate (common_wavelengths(n_points))
+      common_wavelengths = temp_wavelengths
 
-    ! Allocate flux array for the models (4 models, n_points each)
-    ALLOCATE(model_fluxes(4, n_points))
-    CALL interpolate_array(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(1, :))
+      ! Allocate flux array for the models (4 models, n_points each)
+      allocate (model_fluxes(4, n_points))
+      call interpolate_array(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(1, :))
 
-    ! Load and interpolate remaining SEDs
-    DO i = 2, 4
-      CALL load_sed(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), &
-                  closest_indices(i), temp_wavelengths, temp_flux)
+      ! Load and interpolate remaining SEDs
+      do i = 2, 4
+         call load_sed(trim(stellar_model_dir)//trim(file_names(closest_indices(i))), &
+                       closest_indices(i), temp_wavelengths, temp_flux)
 
-      CALL interpolate_array(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(i, :))
-    END DO
+         call interpolate_array(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(i, :))
+      end do
 
-    ! Compute distances and weights for the four models
-    DO i = 1, 4
-      distances(i) = SQRT((lu_teff(closest_indices(i)) - teff)**2 + &
-                         (lu_logg(closest_indices(i)) - log_g)**2 + &
-                         (lu_meta(closest_indices(i)) - metallicity)**2)
-      IF (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
-      weights(i) = 1.0 / distances(i)
-    END DO
+      ! Compute distances and weights for the four models
+      do i = 1, 4
+         distances(i) = SQRT((lu_teff(closest_indices(i)) - teff)**2 + &
+                             (lu_logg(closest_indices(i)) - log_g)**2 + &
+                             (lu_meta(closest_indices(i)) - metallicity)**2)
+         if (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
+         weights(i) = 1.0/distances(i)
+      end do
 
-    ! Normalize weights
-    sum_weights = SUM(weights)
-    weights = weights / sum_weights
+      ! Normalize weights
+      sum_weights = SUM(weights)
+      weights = weights/sum_weights
 
-    ! Allocate output arrays
-    ALLOCATE(wavelengths(n_points), fluxes(n_points))
-    wavelengths = common_wavelengths
-    fluxes = 0.0
+      ! Allocate output arrays
+      allocate (wavelengths(n_points), fluxes(n_points))
+      wavelengths = common_wavelengths
+      fluxes = 0.0
 
-    ! Perform weighted combination of the model fluxes (still at the stellar surface)
-    DO i = 1, 4
-      fluxes = fluxes + weights(i) * model_fluxes(i, :)
-    END DO
+      ! Perform weighted combination of the model fluxes (still at the stellar surface)
+      do i = 1, 4
+         fluxes = fluxes + weights(i)*model_fluxes(i, :)
+      end do
 
-    ! Now, apply the dilution factor (R/d)^2 to convert the surface flux density
-    ! into the observed flux density at Earth.
-    ALLOCATE(diluted_flux(n_points))
-    CALL dilute_flux(fluxes, R, d, diluted_flux)
-    fluxes = diluted_flux
+      ! Now, apply the dilution factor (R/d)^2 to convert the surface flux density
+      ! into the observed flux density at Earth.
+      allocate (diluted_flux(n_points))
+      call dilute_flux(fluxes, R, d, diluted_flux)
+      fluxes = diluted_flux
 
-  END SUBROUTINE construct_sed_knn
+   end subroutine construct_sed_knn
 
-  !---------------------------------------------------------------------------
-  ! Identify the four closest stellar models
-  !---------------------------------------------------------------------------
-  SUBROUTINE get_closest_stellar_models(teff, log_g, metallicity, lu_teff, &
-                                  lu_logg, lu_meta, closest_indices)
-    REAL(dp), INTENT(IN) :: teff, log_g, metallicity
-    REAL(dp), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
-    INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+   !---------------------------------------------------------------------------
+   ! Identify the four closest stellar models
+   !---------------------------------------------------------------------------
+   subroutine get_closest_stellar_models(teff, log_g, metallicity, lu_teff, &
+                                         lu_logg, lu_meta, closest_indices)
+      real(dp), intent(in) :: teff, log_g, metallicity
+      real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
+      integer, dimension(4), intent(out) :: closest_indices
 
-    INTEGER :: i, n, j
-    REAL(dp) :: distance, norm_teff, norm_logg, norm_meta
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
-    REAL(dp), DIMENSION(4) :: min_distances
-    INTEGER, DIMENSION(4) :: indices
-    REAL(dp) :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
-    REAL(dp) :: teff_dist, logg_dist, meta_dist
+      integer :: i, n, j
+      real(dp) :: distance, norm_teff, norm_logg, norm_meta
+      real(dp), dimension(:), allocatable :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+      real(dp), dimension(4) :: min_distances
+      integer, dimension(4) :: indices
+      real(dp) :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
+      real(dp) :: teff_dist, logg_dist, meta_dist
 
-    n = SIZE(lu_teff)
-    min_distances = HUGE(1.0)
-    indices = -1
+      n = size(lu_teff)
+      min_distances = HUGE(1.0)
+      indices = -1
 
-    ! Find min and max for normalization
-    teff_min = MINVAL(lu_teff)
-    teff_max = MAXVAL(lu_teff)
-    logg_min = MINVAL(lu_logg)
-    logg_max = MAXVAL(lu_logg)
-    meta_min = MINVAL(lu_meta)
-    meta_max = MAXVAL(lu_meta)
+      ! Find min and max for normalization
+      teff_min = minval(lu_teff)
+      teff_max = maxval(lu_teff)
+      logg_min = minval(lu_logg)
+      logg_max = maxval(lu_logg)
+      meta_min = minval(lu_meta)
+      meta_max = maxval(lu_meta)
 
-    ! Allocate and scale lookup table values
-    ALLOCATE(scaled_lu_teff(n), scaled_lu_logg(n), scaled_lu_meta(n))
+      ! Allocate and scale lookup table values
+      allocate (scaled_lu_teff(n), scaled_lu_logg(n), scaled_lu_meta(n))
 
-    IF (teff_max - teff_min > 0.00) THEN
-      scaled_lu_teff = (lu_teff - teff_min) / (teff_max - teff_min)
-    END IF
+      if (teff_max - teff_min > 0.00) then
+         scaled_lu_teff = (lu_teff - teff_min)/(teff_max - teff_min)
+      end if
 
-    IF (logg_max - logg_min > 0.00) THEN
-      scaled_lu_logg = (lu_logg - logg_min) / (logg_max - logg_min)
-    END IF
+      if (logg_max - logg_min > 0.00) then
+         scaled_lu_logg = (lu_logg - logg_min)/(logg_max - logg_min)
+      end if
 
-    IF (meta_max - meta_min > 0.00) THEN
-      scaled_lu_meta = (lu_meta - meta_min) / (meta_max - meta_min)
-    END IF
+      if (meta_max - meta_min > 0.00) then
+         scaled_lu_meta = (lu_meta - meta_min)/(meta_max - meta_min)
+      end if
 
-    ! Normalize input parameters
-    norm_teff = (teff - teff_min) / (teff_max - teff_min)
-    norm_logg = (log_g - logg_min) / (logg_max - logg_min)
-    norm_meta = (metallicity - meta_min) / (meta_max - meta_min)
+      ! Normalize input parameters
+      norm_teff = (teff - teff_min)/(teff_max - teff_min)
+      norm_logg = (log_g - logg_min)/(logg_max - logg_min)
+      norm_meta = (metallicity - meta_min)/(meta_max - meta_min)
 
-    ! Find closest models
-    DO i = 1, n
-      teff_dist = 0.0
-      logg_dist = 0.0
-      meta_dist = 0.0
+      ! Find closest models
+      do i = 1, n
+         teff_dist = 0.0
+         logg_dist = 0.0
+         meta_dist = 0.0
 
-      IF (teff_max - teff_min > 0.00) THEN
-        teff_dist = scaled_lu_teff(i) - norm_teff
-      END IF
+         if (teff_max - teff_min > 0.00) then
+            teff_dist = scaled_lu_teff(i) - norm_teff
+         end if
 
-      IF (logg_max - logg_min > 0.00) THEN
-        logg_dist = scaled_lu_logg(i) - norm_logg
-      END IF
+         if (logg_max - logg_min > 0.00) then
+            logg_dist = scaled_lu_logg(i) - norm_logg
+         end if
 
-      IF (meta_max - meta_min > 0.00) THEN
-        meta_dist = scaled_lu_meta(i) - norm_meta
-      END IF
+         if (meta_max - meta_min > 0.00) then
+            meta_dist = scaled_lu_meta(i) - norm_meta
+         end if
 
-      ! Using squared distance without sqrt (monotonic transform)
-      distance = teff_dist**2 + logg_dist**2 + meta_dist**2
+         ! Using squared distance without sqrt (monotonic transform)
+         distance = teff_dist**2 + logg_dist**2 + meta_dist**2
 
-      DO j = 1, 4
-        IF (distance < min_distances(j)) THEN
-          ! Shift larger distances down
-          IF (j < 4) THEN
-            min_distances(j+1:4) = min_distances(j:3)
-            indices(j+1:4) = indices(j:3)
-          END IF
-          min_distances(j) = distance
-          indices(j) = i
-          EXIT
-        END IF
-      END DO
-    END DO
+         do j = 1, 4
+            if (distance < min_distances(j)) then
+               ! Shift larger distances down
+               if (j < 4) then
+                  min_distances(j + 1:4) = min_distances(j:3)
+                  indices(j + 1:4) = indices(j:3)
+               end if
+               min_distances(j) = distance
+               indices(j) = i
+               exit
+            end if
+         end do
+      end do
 
-    closest_indices = indices
-  END SUBROUTINE get_closest_stellar_models
+      closest_indices = indices
+   end subroutine get_closest_stellar_models
 
-  !---------------------------------------------------------------------------
-  ! Linear interpolation (binary search version for efficiency)
-  !---------------------------------------------------------------------------
-  SUBROUTINE linear_interpolate(x, y, x_val, y_val)
-    REAL(dp), INTENT(IN) :: x(:), y(:), x_val
-    REAL(dp), INTENT(OUT) :: y_val
-    INTEGER :: low, high, mid
+   !---------------------------------------------------------------------------
+   ! Linear interpolation (binary search version for efficiency)
+   !---------------------------------------------------------------------------
+   subroutine linear_interpolate(x, y, x_val, y_val)
+      real(dp), intent(in) :: x(:), y(:), x_val
+      real(dp), intent(out) :: y_val
+      integer :: low, high, mid
 
-    ! Validate input sizes
-    IF (SIZE(x) < 2) THEN
-      PRINT *, "Error: x array has fewer than 2 points."
-      y_val = 0.0_dp
-      RETURN
-    END IF
+      ! Validate input sizes
+      if (size(x) < 2) then
+         print *, "Error: x array has fewer than 2 points."
+         y_val = 0.0_dp
+         return
+      end if
 
-    IF (SIZE(x) /= SIZE(y)) THEN
-      PRINT *, "Error: x and y arrays have different sizes."
-      y_val = 0.0_dp
-      RETURN
-    END IF
+      if (size(x) /= size(y)) then
+         print *, "Error: x and y arrays have different sizes."
+         y_val = 0.0_dp
+         return
+      end if
 
-    ! Handle out-of-bounds cases
-    IF (x_val <= x(1)) THEN
-      y_val = y(1)
-      RETURN
-    ELSE IF (x_val >= x(SIZE(x))) THEN
-      y_val = y(SIZE(y))
-      RETURN
-    END IF
+      ! Handle out-of-bounds cases
+      if (x_val <= x(1)) then
+         y_val = y(1)
+         return
+      else if (x_val >= x(size(x))) then
+         y_val = y(size(y))
+         return
+      end if
 
-    ! Binary search to find the proper interval [x(low), x(low+1)]
-    low = 1
-    high = SIZE(x)
-    DO WHILE (high - low > 1)
-      mid = (low + high) / 2
-      IF (x(mid) <= x_val) THEN
-        low = mid
-      ELSE
-        high = mid
-      END IF
-    END DO
+      ! Binary search to find the proper interval [x(low), x(low+1)]
+      low = 1
+      high = size(x)
+      do while (high - low > 1)
+         mid = (low + high)/2
+         if (x(mid) <= x_val) then
+            low = mid
+         else
+            high = mid
+         end if
+      end do
 
-    ! Linear interpolation between x(low) and x(low+1)
-    y_val = y(low) + (y(low+1) - y(low)) / (x(low+1) - x(low)) * (x_val - x(low))
-  END SUBROUTINE linear_interpolate
+      ! Linear interpolation between x(low) and x(low+1)
+      y_val = y(low) + (y(low + 1) - y(low))/(x(low + 1) - x(low))*(x_val - x(low))
+   end subroutine linear_interpolate
 
-  !---------------------------------------------------------------------------
-  ! Array interpolation for SED construction
-  !---------------------------------------------------------------------------
-  SUBROUTINE interpolate_array(x_in, y_in, x_out, y_out)
-    REAL(dp), INTENT(IN) :: x_in(:), y_in(:), x_out(:)
-    REAL(dp), INTENT(OUT) :: y_out(:)
-    INTEGER :: i
+   !---------------------------------------------------------------------------
+   ! Array interpolation for SED construction
+   !---------------------------------------------------------------------------
+   subroutine interpolate_array(x_in, y_in, x_out, y_out)
+      real(dp), intent(in) :: x_in(:), y_in(:), x_out(:)
+      real(dp), intent(out) :: y_out(:)
+      integer :: i
 
-    ! Validate input sizes
-    IF (SIZE(x_in) < 2 .OR. SIZE(y_in) < 2) THEN
-      PRINT *, "Error: x_in or y_in arrays have fewer than 2 points."
-      STOP
-    END IF
+      ! Validate input sizes
+      if (size(x_in) < 2 .OR. size(y_in) < 2) then
+         print *, "Error: x_in or y_in arrays have fewer than 2 points."
+         stop
+      end if
 
-    IF (SIZE(x_in) /= SIZE(y_in)) THEN
-      PRINT *, "Error: x_in and y_in arrays have different sizes."
-      STOP
-    END IF
+      if (size(x_in) /= size(y_in)) then
+         print *, "Error: x_in and y_in arrays have different sizes."
+         stop
+      end if
 
-    IF (SIZE(x_out) <= 0) THEN
-      PRINT *, "Error: x_out array is empty."
-      STOP
-    END IF
+      if (size(x_out) <= 0) then
+         print *, "Error: x_out array is empty."
+         stop
+      end if
 
-    DO i = 1, SIZE(x_out)
-      CALL linear_interpolate(x_in, y_in, x_out(i), y_out(i))
-    END DO
-  END SUBROUTINE interpolate_array
+      do i = 1, size(x_out)
+         call linear_interpolate(x_in, y_in, x_out(i), y_out(i))
+      end do
+   end subroutine interpolate_array
 
-END MODULE knn_interp
+end module knn_interp

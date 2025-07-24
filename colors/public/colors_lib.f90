@@ -19,590 +19,238 @@
 
 module colors_lib
 
-  use const_def, only: dp, strlen
-  use utils_lib, only: mkdir, folder_exists
-  use colors_def, only: Colors_General_Info, colors_def_init, colors_use_cache, &
-                      colors_is_initialized, do_alloc_colors, do_free_colors, &
-                      get_colors_ptr, do_free_colors_tables
-  use hermite_interp, only: construct_sed_hermite
-  use knn_interp, only: construct_sed_knn, interpolate_array
-  use linear_interp, only: construct_sed_linear
-  use shared_funcs, only: load_lookup_table, remove_dat, load_filter, load_vega_sed, romberg_integration
-
-  implicit none
-
-  private
-
-  ! Make public interface explicit
-  public :: colors_init, colors_shutdown
-  public :: calculate_bolometric, calculate_synthetic
-  public :: load_lookup_table, remove_dat
-  public :: colors_ptr, alloc_colors_handle_using_inlist  ! Add this line
-  ! Keep internals private
-  private :: calculate_bolometric_phot
-  ! Add these bolometric correction functions that MESA expects:
-  public :: get_bc_id_by_name, get_lum_band_by_id, get_abs_mag_by_id
-  public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
-  public :: get_abs_bolometric_mag, get_abs_mag_by_name, get_bcs_all
-  public :: get_lum_band_by_name
-  contains
-
-      ! call this routine to initialize the colors module.
-      ! only needs to be done once at start of run.
-      ! Reads data from the 'colors' directory in the data_dir.
-      ! If use_cache is true and there is a 'colors/cache' directory, it will try that first.
-      ! If it doesn't find what it needs in the cache,
-      ! it reads the data and writes the cache for next time.
-  subroutine colors_init(use_cache, colors_cache_dir, ierr)
-    use colors_def, only : colors_def_init, colors_use_cache, colors_is_initialized
-    logical, intent(in) :: use_cache
-    character (len=*), intent(in) :: colors_cache_dir  ! blank means use default
-    integer, intent(out) :: ierr  ! 0 means AOK.
-    ierr = 0
-    if (colors_is_initialized) return
-    call colors_def_init(colors_cache_dir)
-    colors_use_cache = use_cache
-    colors_is_initialized = .true.
- end subroutine colors_init
-
-
- subroutine colors_shutdown
-    use colors_def, only: do_free_colors_tables, colors_is_initialized
-    call do_free_colors_tables()
-    colors_is_initialized = .false.
- end subroutine colors_shutdown
-
-
-      ! after colors_init has finished, you can allocate a "handle".
-
- integer function alloc_colors_handle(ierr) result(handle)
- integer, intent(out) :: ierr  ! 0 means AOK.
- character (len=0) :: inlist
- handle = alloc_colors_handle_using_inlist(inlist, ierr)
-end function alloc_colors_handle
-
-integer function alloc_colors_handle_using_inlist(inlist,ierr) result(handle)
- use colors_def, only: do_alloc_colors, colors_is_initialized
- use colors_ctrls_io, only: read_namelist
- character (len=*), intent(in) :: inlist  ! empty means just use defaults.
- integer, intent(out) :: ierr  ! 0 means AOK.
- ierr = 0
- if (.not. colors_is_initialized) then
-    ierr=-1
-    return
- endif
- handle = do_alloc_colors(ierr)
- if (ierr /= 0) return
- call read_namelist(handle, inlist, ierr)
- if (ierr /= 0) return
- call colors_setup_tables(handle, ierr)
- call colors_setup_hooks(handle, ierr)
-end function alloc_colors_handle_using_inlist
-
-subroutine free_colors_handle(handle)
- ! frees the handle and all associated data
- use colors_def,only: colors_General_Info, do_free_colors
- integer, intent(in) :: handle
- call do_free_colors(handle)
-end subroutine free_colors_handle
-
-
-subroutine colors_ptr(handle,rq,ierr)
-
- use colors_def,only:Colors_General_Info,get_colors_ptr,colors_is_initialized
-
- type (colors_General_Info), pointer, intent(out) :: rq
- integer, intent(in) :: handle
- integer, intent(out):: ierr
-
- if (.not. colors_is_initialized) then
-    ierr=-1
-    return
- endif
-
- call get_colors_ptr(handle,rq,ierr)
-
-end subroutine colors_ptr
-
-
-subroutine colors_setup_tables(handle, ierr)
- use colors_def, only : colors_General_Info, get_colors_ptr
- ! TODO: use load_colors, only : Setup_colors_Tables
- integer, intent(in) :: handle
- integer, intent(out):: ierr
-
- type (colors_General_Info), pointer :: rq
- logical, parameter :: use_cache = .true.
- logical, parameter :: load_on_demand = .true.
-
- ierr = 0
- call get_colors_ptr(handle,rq,ierr)
- ! TODO: call Setup_colors_Tables(rq, use_cache, load_on_demand, ierr)
-
-end subroutine colors_setup_tables
-
-
-subroutine colors_setup_hooks(handle, ierr)
- use colors_def, only : colors_General_Info, get_colors_ptr
- integer, intent(in) :: handle
- integer, intent(out):: ierr
-
- type (colors_General_Info), pointer :: rq
-
- ierr = 0
- call get_colors_ptr(handle,rq,ierr)
-
- ! TODO: currently does nothing. See kap if this feature is needed
-
-end subroutine colors_setup_hooks
-
-
-  !-----------------------------------------------------------------------
-  ! Main public interface functions
-  !-----------------------------------------------------------------------
-
-  !****************************
-  ! Calculate Bolometric Photometry Using Multiple SEDs
-  !****************************
-  SUBROUTINE calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
-                                 bolometric_flux, wavelengths, fluxes, sed_filepath)
-    REAL(dp), INTENT(IN) :: teff, log_g, metallicity, R, d
-    CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
-    REAL(dp), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
-    REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
-
-    REAL(dp), ALLOCATABLE :: lu_logg(:), lu_meta(:), lu_teff(:)
-    CHARACTER(LEN=100), ALLOCATABLE :: file_names(:)
-    REAL, DIMENSION(:,:), ALLOCATABLE :: lookup_table
-    CHARACTER(LEN=256) :: lookup_file
-
-    lookup_file = TRIM(sed_filepath) // '/lookup_table.csv'
-
-    ! Load the lookup table
-    CALL load_lookup_table(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
-
-    !CALL construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
-    !                       lu_teff, lu_logg, lu_meta, sed_filepath, &
-    !                       wavelengths, fluxes)
-
-    !CALL construct_sed_linear(teff, log_g, metallicity, R, d, file_names, &
-    !                         lu_teff, lu_logg, lu_meta, sed_filepath, &
-    !                         wavelengths, fluxes)
-
-    CALL construct_sed_hermite(teff, log_g, metallicity, R, d, file_names, &
-                              lu_teff, lu_logg, lu_meta, sed_filepath,&
-                               wavelengths, fluxes)
-
-    ! Calculate bolometric flux and magnitude
-    CALL calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-  END SUBROUTINE calculate_bolometric
-
-  !****************************
-  ! Calculate Synthetic Photometry Using SED and Filter
-  !****************************
-  REAL(dp) FUNCTION calculate_synthetic(temperature, gravity, metallicity, ierr, &
-                                      wavelengths, fluxes, filter_wavelengths, &
-                                      filter_trans, &
-                                      filter_filepath, vega_filepath, &
-                                      filter_name, make_sed, colors_results_directory)
-    ! Input arguments
-    REAL(dp), INTENT(IN) :: temperature, gravity, metallicity
-    CHARACTER(LEN=*), INTENT(IN) :: filter_filepath, filter_name, vega_filepath, colors_results_directory
-    INTEGER, INTENT(OUT) :: ierr
-    CHARACTER(LEN=1000) :: line
-
-    REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
-    REAL(dp), DIMENSION(:), ALLOCATABLE, INTENT(INOUT) :: filter_wavelengths, filter_trans
-    LOGICAL, INTENT(IN) :: make_sed
-
-    ! Local variables
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: convolved_flux
-    CHARACTER(LEN=100) :: csv_file
-    REAL(dp) :: synthetic_flux, vega_flux
-    INTEGER :: max_size, i
-    REAL(dp) :: wv, fl, cf, fwv, ftr
-
-    if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
-    csv_file = trim(colors_results_directory) // '/' // TRIM(remove_dat(filter_name)) // '_SED.csv'
-    ierr = 0
-
-    ! Load filter data
-    CALL load_filter(filter_filepath, filter_wavelengths, filter_trans)
-
-    ! Check for invalid gravity input
-    IF (gravity <= 0.0_dp) THEN
-        ierr = 1
-        calculate_synthetic = -1.0_dp
-        RETURN
-    END IF
-
-    ! Perform SED convolution
-    ALLOCATE(convolved_flux(SIZE(wavelengths)))
-    CALL convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
-
-    ! Write SED to CSV if requested
-    IF (make_sed) THEN
-      ! Determine the maximum size among all arrays
-      max_size = MAX(SIZE(wavelengths), SIZE(filter_wavelengths), &
-                     SIZE(fluxes), SIZE(convolved_flux), SIZE(filter_trans))
-
-      ! Open the CSV file for writing
-      OPEN(UNIT=10, FILE=csv_file, STATUS='REPLACE', ACTION='WRITE', IOSTAT=ierr)
-      IF (ierr /= 0) THEN
-          PRINT *, "Error opening file for writing"
-          RETURN
-      END IF
-
-      ! Write headers to the CSV file
-      WRITE(10, '(A)') "wavelengths,fluxes,convolved_flux,filter_wavelengths,filter_trans"
-
-      ! Loop through data and safely write values, ensuring no out-of-bounds errors
-      DO i = 1, max_size
-          ! Initialize values to zero in case they are out of bounds
-          wv = 0.0_dp
-          fl = 0.0_dp
-          cf = 0.0_dp
-          fwv = 0.0_dp
-          ftr = 0.0_dp
-
-          ! Assign actual values only if within valid indices
-          IF (i <= SIZE(wavelengths)) wv = wavelengths(i)
-          IF (i <= SIZE(fluxes)) fl = fluxes(i)
-          IF (i <= SIZE(convolved_flux)) cf = convolved_flux(i)
-          IF (i <= SIZE(filter_wavelengths)) fwv = filter_wavelengths(i)
-          IF (i <= SIZE(filter_trans)) ftr = filter_trans(i)
-
-          ! Write the formatted output
-          WRITE(line, '(ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6)') &
-              wv, fl, cf, fwv, ftr
-          WRITE(10, '(A)') TRIM(line)
-      END DO
-
-      ! Close the file
-      CLOSE(10)
-    END IF
-
-    ! Calculate Vega flux for zero point calibration
-    vega_flux = calculate_vega_flux(vega_filepath, filter_wavelengths, filter_trans, &
-                                 filter_name, make_sed, colors_results_directory)
-
-    ! Calculate synthetic flux
-    CALL calculate_synthetic_flux(wavelengths, convolved_flux, synthetic_flux, &
-                               filter_wavelengths, filter_trans)
-
-    ! Calculate magnitude using Vega zero point
-    IF (vega_flux > 0.0_dp) THEN
-      calculate_synthetic = -2.5 * LOG10(synthetic_flux / vega_flux)
-    ELSE
-      PRINT *, "Error: Vega flux is zero, magnitude calculation is invalid."
-      calculate_synthetic = HUGE(1.0_dp)
-    END IF
-
-    ! Clean up
-    DEALLOCATE(convolved_flux)
-  END FUNCTION calculate_synthetic
-
-  !-----------------------------------------------------------------------
-  ! Internal functions for synthetic photometry
-  !-----------------------------------------------------------------------
-
-  !****************************
-  ! Convolve SED With Filter
-  !****************************
-  SUBROUTINE convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
-    REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
-    REAL(dp), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
-    REAL(dp), DIMENSION(:), ALLOCATABLE, intent(out) :: convolved_flux
-    REAL(dp), DIMENSION(:), ALLOCATABLE :: interpolated_filter
-    INTEGER :: n
-
-    n = SIZE(wavelengths)
-
-    ! Allocate arrays
-    ALLOCATE(interpolated_filter(n))
-
-    ! Interpolate the filter transmission onto the wavelengths array
-    CALL interpolate_array(filter_wavelengths, filter_trans, wavelengths, interpolated_filter)
-
-    ! Perform convolution (element-wise multiplication)
-    convolved_flux = fluxes * interpolated_filter
-
-    ! Deallocate temporary arrays
-    DEALLOCATE(interpolated_filter)
-  END SUBROUTINE convolve_sed
-
-  !****************************
-  ! Calculate Synthetic Flux
-  !****************************
-SUBROUTINE calculate_synthetic_flux(wavelengths, fluxes, synthetic_flux, &
-                                  filter_wavelengths, filter_trans)
-
-    REAL(dp), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
-    REAL(dp), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
-    REAL(dp), INTENT(OUT) :: synthetic_flux
-    INTEGER :: i
-    REAL(dp) :: integrated_flux, integrated_filter
-
-    ! Validate inputs
-    DO i = 1, SIZE(wavelengths) - 1
-      IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
-        PRINT *, "synthetic Invalid input at index", i, ":", wavelengths(i), fluxes(i)
-        STOP
-      END IF
-    END DO
-
-    CALL romberg_integration(wavelengths, fluxes * wavelengths, integrated_flux)
-    CALL romberg_integration(filter_wavelengths, &
-                           filter_trans * filter_wavelengths, integrated_filter)
-    ! Store the total flux
-    IF (integrated_filter > 0.0) THEN
-        synthetic_flux = integrated_flux / integrated_filter
-    ELSE
-        PRINT *, "Error: Integrated filter transmission is zero."
-        synthetic_flux = -1.0_dp
-        RETURN
-    END IF
-  END SUBROUTINE calculate_synthetic_flux
-
-  !****************************
-  ! Calculate Bolometric Magnitude and Flux
-  !****************************
-  SUBROUTINE calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-    REAL(dp), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
-    REAL(dp), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
-    INTEGER :: i
-
-    ! Validate inputs and replace invalid wavelengths with 0
-    DO i = 1, SIZE(wavelengths) - 1
-      IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
-        fluxes(i) = 0.0  ! Replace invalid wavelength with 0
-      END IF
-    END DO
-
-    ! Call Romberg integration
-    CALL romberg_integration(wavelengths, fluxes, bolometric_flux)
-
-    ! Validate integration result
-    IF (bolometric_flux <= 0.0) THEN
-      PRINT *, "Error: Flux integration resulted in non-positive value."
-      bolometric_magnitude = 99.0
-      RETURN
-    END IF
-
-    ! Calculate bolometric magnitude
-    IF (bolometric_flux <= 0.0) THEN
-      PRINT *, "Error: Flux integration resulted in non-positive value."
-      bolometric_magnitude = 99.0
-      RETURN
-    ELSE IF (bolometric_flux < 1.0E-10) THEN
-      PRINT *, "Warning: Flux value is very small, precision might be affected."
-    END IF
-
-    bolometric_magnitude = flux_to_magnitude(bolometric_flux)
-  END SUBROUTINE calculate_bolometric_phot
-
-  !****************************
-  ! Convert Flux to Magnitude
-  !****************************
-  REAL(dp) FUNCTION flux_to_magnitude(flux)
-    REAL(dp), INTENT(IN) :: flux
-    IF (flux <= 0.0) THEN
-      PRINT *, "Error: Flux must be positive to calculate magnitude."
-      flux_to_magnitude = 99.0  ! Return an error value
-    ELSE
-      flux_to_magnitude = -2.5 * LOG10(flux)
-    END IF
-  END FUNCTION flux_to_magnitude
-
-  !****************************
-  ! Calculate Vega Flux for Zero Point
-  !****************************
-FUNCTION calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
-                          filter_name, make_sed, colors_results_directory) RESULT(vega_flux)
-    CHARACTER(LEN=*), INTENT(IN) :: vega_filepath, filter_name, colors_results_directory
-    CHARACTER(len = 100) :: output_csv
-    REAL(dp), DIMENSION(:), INTENT(INOUT) :: filt_wave, filt_trans
-    REAL(dp) :: vega_flux
-    REAL(dp) :: int_flux, int_filter
-    REAL(dp), ALLOCATABLE :: vega_wave(:), vega_flux_arr(:), conv_flux(:)
-    LOGICAL, INTENT(IN) :: make_sed
-    INTEGER :: i, unit, max_size
-    REAL(dp) :: wv, fl, cf, fwv, ftr
-    INTEGER:: ierr
-    CHARACTER(LEN=1000) :: line
-
-    ! Load the Vega SED
-    CALL load_vega_sed(vega_filepath, vega_wave, vega_flux_arr)
-
-    ! Convolve the Vega SED with the filter transmission
-    ALLOCATE(conv_flux(SIZE(vega_wave)))
-    CALL convolve_sed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
-
-    ! Integrate the convolved Vega SED and the filter transmission
-    CALL romberg_integration(vega_wave, vega_wave*conv_flux, int_flux)
-    CALL romberg_integration(filt_wave, filt_wave*filt_trans, int_filter)
-
-    IF (int_filter > 0.0_dp) THEN
-      vega_flux = int_flux / int_filter
-    ELSE
-      vega_flux = -1.0_dp
-    END IF
-
-    ! Write Vega SED to CSV if requested
-    IF (make_sed) THEN
-      ! Determine the maximum size among all arrays
-      max_size = MAX(SIZE(vega_wave), SIZE(vega_flux_arr), SIZE(conv_flux), &
-                     SIZE(filt_wave), SIZE(filt_trans))
-
-      if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
-      output_csv = trim(colors_results_directory) // '/VEGA_' // TRIM(remove_dat(filter_name)) // '_SED.csv'
-
-      ! Open the CSV file for writing
-      OPEN(UNIT=10, FILE=output_csv, STATUS='REPLACE', ACTION='WRITE', IOSTAT=ierr)
-      IF (ierr /= 0) THEN
-        PRINT *, "Error opening file for writing"
-        RETURN
-      END IF
-
-      WRITE(10, '(A)') "wavelengths,fluxes,convolved_flux,filter_wavelengths,filter_trans"
-
-      ! Loop through data and safely write values, ensuring no out-of-bounds errors
-      DO i = 1, max_size
-        ! Initialize values to zero in case they are out of bounds
-        wv = 0.0_dp
-        fl = 0.0_dp
-        cf = 0.0_dp
-        fwv = 0.0_dp
-        ftr = 0.0_dp
-
-        ! Assign actual values only if within valid indices
-        IF (i <= SIZE(vega_wave)) wv = vega_wave(i)
-        IF (i <= SIZE(vega_flux_arr)) fl = vega_flux_arr(i)
-        IF (i <= SIZE(conv_flux)) cf = conv_flux(i)
-        IF (i <= SIZE(filt_wave)) fwv = filt_wave(i)
-        IF (i <= SIZE(filt_trans)) ftr = filt_trans(i)
-
-        ! Write the formatted output
-        WRITE(line, '(ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6)') &
-            wv, fl, cf, fwv, ftr
-        WRITE(10, '(A)') TRIM(line)
-      END DO
-
-      ! Close the file
-      CLOSE(10)
-    END IF
-
-    ! Clean up
-    DEALLOCATE(conv_flux, vega_wave, vega_flux_arr)
-  END FUNCTION calculate_vega_flux
-
-
-  !-----------------------------------------------------------------------
-  ! Bolometric correction interface (stub implementations)
-  !-----------------------------------------------------------------------
-
-  real(dp) function get_bc_by_name(name, log_Teff, log_g, M_div_h, ierr)
-    character(len=*), intent(in) :: name
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: log_g  ! log_10 of surface gravity
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    integer, intent(inout) :: ierr
-
-    get_bc_by_name = -99.9d0
-    ierr = 0
-  end function get_bc_by_name
-
-  real(dp) function get_bc_by_id(id, log_Teff, log_g, M_div_h, ierr)
-    integer, intent(in) :: id
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: log_g  ! log_10 of surface gravity
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    integer, intent(inout) :: ierr
-
-    get_bc_by_id = -99.9d0
-    ierr = 0
-  end function get_bc_by_id
-
-  integer function get_bc_id_by_name(name, ierr)
-    character(len=*), intent(in) :: name
-    integer, intent(inout) :: ierr
-
-    get_bc_id_by_name = -1
-    ierr = 0
-  end function get_bc_id_by_name
-
-  character(len=strlen) function get_bc_name_by_id(id, ierr)
-    integer, intent(in) :: id
-    integer, intent(inout) :: ierr
-
-    get_bc_name_by_id = ''
-    ierr = 0
-  end function get_bc_name_by_id
-
-  real(dp) function get_abs_bolometric_mag(lum)
-    use const_def, only: dp
-    real(dp), intent(in) :: lum  ! Luminosity in lsun units
-
-    get_abs_bolometric_mag = -99.9d0
-  end function get_abs_bolometric_mag
-
-  real(dp) function get_abs_mag_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
-    character(len=*), intent(in) :: name
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    real(dp), intent(in) :: log_g  ! log_10 of surface gravity
-    real(dp), intent(in) :: lum  ! Luminosity in lsun units
-    integer, intent(inout) :: ierr
-
-    ierr = 0
-    get_abs_mag_by_name = -99.9d0
-  end function get_abs_mag_by_name
-
-  real(dp) function get_abs_mag_by_id(id, log_Teff, log_g, M_div_h, lum, ierr)
-    integer, intent(in) :: id
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: log_g  ! log_10 of surface gravity
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    real(dp), intent(in) :: lum  ! Luminosity in lsun units
-    integer, intent(inout) :: ierr
-
-    ierr = 0
-    get_abs_mag_by_id = -99.9d0
-  end function get_abs_mag_by_id
-
-  subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    real(dp), dimension(:), intent(out) :: results
-    real(dp), intent(in) :: log_g
-    integer, intent(inout) :: ierr
-
-    ierr = 0
-    results(:) = -99.d0
-  end subroutine get_bcs_all
-
-  real(dp) function get_lum_band_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
-    character(len=*), intent(in) :: name
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    real(dp), intent(in) :: log_g  ! log_10 of surface gravity
-    real(dp), intent(in) :: lum  ! Total luminosity in lsun units
-    integer, intent(inout) :: ierr
-
-    ierr = 0
-    get_lum_band_by_name = -99.d0
-  end function get_lum_band_by_name
-
-  real(dp) function get_lum_band_by_id(id, log_Teff, log_g, M_div_h, lum, ierr)
-    integer, intent(in) :: id
-    real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-    real(dp), intent(in) :: log_g  ! log_10 of surface gravity
-    real(dp), intent(in) :: M_div_h  ! [M/H]
-    real(dp), intent(in) :: lum  ! Total luminosity in lsun units
-    integer, intent(inout) :: ierr
-
-    ierr = 0
-    get_lum_band_by_id = -99.d0
-  end function get_lum_band_by_id
+   use const_def, only: dp, strlen
+   use shared_funcs, only: remove_dat
+   use bolometric, only: calculate_bolometric
+   use synthetic, only: calculate_synthetic
+
+   implicit none
+
+   private
+
+   public :: colors_init, colors_shutdown
+   public :: alloc_colors_handle, alloc_colors_handle_using_inlist
+   public :: colors_ptr
+   public :: colors_setup_tables, colors_setup_hooks
+   ! Main functions
+   public :: calculate_bolometric, calculate_synthetic
+   public :: remove_dat
+   ! Old bolometric correction functions that MESA expects (stub implementations, remove later):
+   public :: get_bc_id_by_name, get_lum_band_by_id, get_abs_mag_by_id
+   public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
+   public :: get_abs_bolometric_mag, get_abs_mag_by_name, get_bcs_all
+   public :: get_lum_band_by_name
+contains
+
+   ! call this routine to initialize the colors module.
+   ! only needs to be done once at start of run.
+   ! Reads data from the 'colors' directory in the data_dir.
+   ! If use_cache is true and there is a 'colors/cache' directory, it will try that first.
+   ! If it doesn't find what it needs in the cache,
+   ! it reads the data and writes the cache for next time.
+   subroutine colors_init(use_cache, colors_cache_dir, ierr)
+      use colors_def, only: colors_def_init, colors_use_cache, colors_is_initialized
+      logical, intent(in) :: use_cache
+      character(len=*), intent(in) :: colors_cache_dir  ! blank means use default
+      integer, intent(out) :: ierr  ! 0 means AOK.
+      ierr = 0
+      if (colors_is_initialized) return
+      call colors_def_init(colors_cache_dir)
+      colors_use_cache = use_cache
+      colors_is_initialized = .true.
+   end subroutine colors_init
+
+   subroutine colors_shutdown
+      use colors_def, only: do_free_colors_tables, colors_is_initialized
+      call do_free_colors_tables()
+      colors_is_initialized = .false.
+   end subroutine colors_shutdown
+
+   ! after colors_init has finished, you can allocate a "handle".
+   integer function alloc_colors_handle(ierr) result(handle)
+      integer, intent(out) :: ierr  ! 0 means AOK.
+      character(len=0) :: inlist
+      handle = alloc_colors_handle_using_inlist(inlist, ierr)
+   end function alloc_colors_handle
+
+   integer function alloc_colors_handle_using_inlist(inlist, ierr) result(handle)
+      use colors_def, only: do_alloc_colors, colors_is_initialized
+      use colors_ctrls_io, only: read_namelist
+      character(len=*), intent(in) :: inlist  ! empty means just use defaults.
+      integer, intent(out) :: ierr  ! 0 means AOK.
+      ierr = 0
+      if (.not. colors_is_initialized) then
+         ierr = -1
+         return
+      end if
+      handle = do_alloc_colors(ierr)
+      if (ierr /= 0) return
+      call read_namelist(handle, inlist, ierr)
+      if (ierr /= 0) return
+      call colors_setup_tables(handle, ierr)
+      call colors_setup_hooks(handle, ierr)
+   end function alloc_colors_handle_using_inlist
+
+   subroutine free_colors_handle(handle)
+      ! frees the handle and all associated data
+      use colors_def, only: colors_General_Info, do_free_colors
+      integer, intent(in) :: handle
+      call do_free_colors(handle)
+   end subroutine free_colors_handle
+
+   subroutine colors_ptr(handle, rq, ierr)
+
+      use colors_def, only: Colors_General_Info, get_colors_ptr, colors_is_initialized
+
+      type(colors_General_Info), pointer, intent(out) :: rq
+      integer, intent(in) :: handle
+      integer, intent(out):: ierr
+
+      if (.not. colors_is_initialized) then
+         ierr = -1
+         return
+      end if
+
+      call get_colors_ptr(handle, rq, ierr)
+
+   end subroutine colors_ptr
+
+   subroutine colors_setup_tables(handle, ierr)
+      use colors_def, only: colors_General_Info, get_colors_ptr
+      ! TODO: use load_colors, only: Setup_colors_Tables
+      integer, intent(in) :: handle
+      integer, intent(out):: ierr
+
+      type(colors_General_Info), pointer :: rq
+      logical, parameter :: use_cache = .true.
+      logical, parameter :: load_on_demand = .true.
+
+      ierr = 0
+      call get_colors_ptr(handle, rq, ierr)
+      ! TODO: call Setup_colors_Tables(rq, use_cache, load_on_demand, ierr)
+
+   end subroutine colors_setup_tables
+
+   subroutine colors_setup_hooks(handle, ierr)
+      use colors_def, only: colors_General_Info, get_colors_ptr
+      integer, intent(in) :: handle
+      integer, intent(out):: ierr
+
+      type(colors_General_Info), pointer :: rq
+
+      ierr = 0
+      call get_colors_ptr(handle, rq, ierr)
+
+      ! TODO: currently does nothing. See kap if this feature is needed
+
+   end subroutine colors_setup_hooks
+
+   !-----------------------------------------------------------------------
+   ! Bolometric correction interface (stub implementations)
+   !-----------------------------------------------------------------------
+
+   real(dp) function get_bc_by_name(name, log_Teff, log_g, M_div_h, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      integer, intent(inout) :: ierr
+
+      get_bc_by_name = -99.9d0
+      ierr = 0
+   end function get_bc_by_name
+
+   real(dp) function get_bc_by_id(id, log_Teff, log_g, M_div_h, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      integer, intent(inout) :: ierr
+
+      get_bc_by_id = -99.9d0
+      ierr = 0
+   end function get_bc_by_id
+
+   integer function get_bc_id_by_name(name, ierr)
+      character(len=*), intent(in) :: name
+      integer, intent(inout) :: ierr
+
+      get_bc_id_by_name = -1
+      ierr = 0
+   end function get_bc_id_by_name
+
+   character(len=strlen) function get_bc_name_by_id(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(inout) :: ierr
+
+      get_bc_name_by_id = ''
+      ierr = 0
+   end function get_bc_name_by_id
+
+   real(dp) function get_abs_bolometric_mag(lum)
+      use const_def, only: dp
+      real(dp), intent(in) :: lum  ! Luminosity in lsun units
+
+      get_abs_bolometric_mag = -99.9d0
+   end function get_abs_bolometric_mag
+
+   real(dp) function get_abs_mag_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: lum  ! Luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_abs_mag_by_name = -99.9d0
+   end function get_abs_mag_by_name
+
+   real(dp) function get_abs_mag_by_id(id, log_Teff, log_g, M_div_h, lum, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: lum  ! Luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_abs_mag_by_id = -99.9d0
+   end function get_abs_mag_by_id
+
+   subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), dimension(:), intent(out) :: results
+      real(dp), intent(in) :: log_g
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      results(:) = -99.d0
+   end subroutine get_bcs_all
+
+   real(dp) function get_lum_band_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: lum  ! Total luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_lum_band_by_name = -99.d0
+   end function get_lum_band_by_name
+
+   real(dp) function get_lum_band_by_id(id, log_Teff, log_g, M_div_h, lum, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: lum  ! Total luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_lum_band_by_id = -99.d0
+   end function get_lum_band_by_id
 
 end module colors_lib
