@@ -358,48 +358,17 @@ contains
    !---------------------------------------------------------------------------
    ! Find the nearest grid point
    !---------------------------------------------------------------------------
-   subroutine find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+   SUBROUTINE find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                  i_x, i_y, i_z)
-      real(dp), intent(in) :: x_val, y_val, z_val
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      integer, intent(out) :: i_x, i_y, i_z
+     REAL(dp), INTENT(IN) :: x_val, y_val, z_val
+     REAL(dp), INTENT(IN) :: x_grid(:), y_grid(:), z_grid(:)
+     INTEGER, INTENT(OUT) :: i_x, i_y, i_z
 
-      integer :: i
-      real(dp) :: min_dist, dist
-
-      ! Find nearest x grid point
-      min_dist = abs(x_val - x_grid(1))
-      i_x = 1
-      do i = 2, size(x_grid)
-         dist = abs(x_val - x_grid(i))
-         if (dist < min_dist) then
-            min_dist = dist
-            i_x = i
-         end if
-      end do
-
-      ! Find nearest y grid point
-      min_dist = abs(y_val - y_grid(1))
-      i_y = 1
-      do i = 2, size(y_grid)
-         dist = abs(y_val - y_grid(i))
-         if (dist < min_dist) then
-            min_dist = dist
-            i_y = i
-         end if
-      end do
-
-      ! Find nearest z grid point
-      min_dist = abs(z_val - z_grid(1))
-      i_z = 1
-      do i = 2, size(z_grid)
-         dist = abs(z_val - z_grid(i))
-         if (dist < min_dist) then
-            min_dist = dist
-            i_z = i
-         end if
-      end do
-   end subroutine find_nearest_point
+     ! Find nearest grid points using intrinsic MINLOC
+     i_x = MINLOC(ABS(x_val - x_grid), 1)
+     i_y = MINLOC(ABS(y_val - y_grid), 1)
+     i_z = MINLOC(ABS(z_val - z_grid), 1)
+   END SUBROUTINE find_nearest_point
 
    !---------------------------------------------------------------------------
    ! Compute derivatives at a grid point
