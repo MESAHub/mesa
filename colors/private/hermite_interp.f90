@@ -23,7 +23,7 @@
 
 module hermite_interp
    use const_def, only: dp
-   use shared_funcs, only: dilute_flux
+   use colors_utils, only: dilute_flux
    implicit none
 
    private

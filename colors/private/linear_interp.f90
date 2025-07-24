@@ -23,7 +23,7 @@
 
 module linear_interp
    use const_def, only: dp
-   use shared_funcs, only: dilute_flux
+   use colors_utils, only: dilute_flux
    implicit none
 
    private
@@ -58,7 +58,7 @@ contains
 
       ! Clean up any double slashes in the path
       clean_path = trim(stellar_model_dir)
-      if (clean_path(LEN_trim(clean_path):LEN_trim(clean_path)) == '/') then
+      if (clean_path(len_trim(clean_path):len_trim(clean_path)) == '/') then
          bin_filename = trim(clean_path)//'flux_cube.bin'
       else
          bin_filename = trim(clean_path)//'/flux_cube.bin'
@@ -67,7 +67,7 @@ contains
       ! Check if file exists first
       INQUIRE (file=bin_filename, EXIST=file_exists)
 
-      if (.NOT. file_exists) then
+      if (.not. file_exists) then
          stop 'Missing required binary file for interpolation'
       end if
 
@@ -293,10 +293,10 @@ contains
       ! If the linear result is valid and non-zero, try log space
       if (f_interp > tiny_value) then
          ! Perform log-space interpolation
-         c00 = LOG(c000)*(1.0_dp - t_x) + LOG(c100)*t_x
-         c01 = LOG(c001)*(1.0_dp - t_x) + LOG(c101)*t_x
-         c10 = LOG(c010)*(1.0_dp - t_x) + LOG(c110)*t_x
-         c11 = LOG(c011)*(1.0_dp - t_x) + LOG(c111)*t_x
+         c00 = log(c000)*(1.0_dp - t_x) + log(c100)*t_x
+         c01 = log(c001)*(1.0_dp - t_x) + log(c101)*t_x
+         c10 = log(c010)*(1.0_dp - t_x) + log(c110)*t_x
+         c11 = log(c011)*(1.0_dp - t_x) + log(c111)*t_x
 
          c0 = c00*(1.0_dp - t_y) + c10*t_y
          c1 = c01*(1.0_dp - t_y) + c11*t_y

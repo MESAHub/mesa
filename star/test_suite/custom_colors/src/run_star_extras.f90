@@ -1,12 +1,11 @@
 module run_star_extras
   use star_lib, only: star_ptr
   use star_def, only: star_info, maxlen_history_column_name, maxlen_profile_column_name, keep_going
-  use const_def, only: dp, i8, strlen, mesa_dir
+  use const_def, only: dp, i8, mesa_dir
   ! TODO: below are things we will need to incorporate into the main code
   ! So that we do not need to create a custom run_stars_extras file
   use colors_def, only: Colors_General_Info
-  use colors_lib, only: colors_init, colors_ptr, alloc_colors_handle_using_inlist, &
-                        calculate_bolometric, calculate_synthetic, remove_dat
+  use colors_lib, only: colors_ptr, calculate_bolometric, calculate_synthetic, remove_dat, read_strings_from_file
   implicit none
   private
   public :: extras_controls  ! Add this line
@@ -31,7 +30,7 @@ subroutine extras_controls(id, ierr)
         return
     end if
     ! Debug print statements to check that values are properly loaded from inlist
-    write(*,*) 'DEBUG: colors_handle = ', colors_handle
+    write(*,*) 'DEBUG: colors_handle = ', s% colors_handle
     write(*,*) 'DEBUG: colors instrument = ', trim(colors_settings% instrument)
     write(*,*) 'DEBUG: colors vega_sed = ', trim(colors_settings% vega_sed)
     write(*,*) 'DEBUG: colors stellar_atm = ', trim(colors_settings% stellar_atm)
@@ -126,62 +125,12 @@ end subroutine extras_controls
           return
       end if
 
-      call read_strings_from_file(strings, n, id)
+      call read_strings_from_file(colors_settings, strings, n)
       ! TODO: move this into mesa
       how_many_extra_history_columns = n + 2
       if (allocated(strings)) deallocate(strings)
   end function how_many_extra_history_columns
 
-
-function basename(path) result(name)
-   character(len=*), intent(in) :: path
-   character(len=strlen) :: name
-   integer :: i
-   if (len_trim(path) == 0) then
-      name = ''
-      return
-   end if
-   i = index(path, '/', back=.true.)
-   name = path(i+1:)
-end function basename
-
-  subroutine read_strings_from_file(strings, n, id)
-      integer, intent(in) :: id
-      character(len=512) :: filename
-      character(len=100), allocatable, intent(out) :: strings(:)
-      integer, intent(out) :: n
-      integer :: unit, i, status
-      character(len=100) :: line
-      integer :: ierr
-      type(star_info), pointer :: s
-
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      filename = trim(mesa_dir) // trim(colors_settings% instrument) // "/" // &
-      trim(basename(colors_settings% instrument))
-      n = 0
-      unit = 10
-      open(unit, file=filename, status='old', action='read', iostat=status)
-      if (status /= 0) then
-          print *, "Error: Could not open file", filename
-          stop
-      end if
-
-      do
-          read(unit, '(A)', iostat=status) line
-          if (status /= 0) exit
-          n = n + 1
-      end do
-      rewind(unit)
-      if (allocated(strings)) deallocate(strings)
-      allocate(strings(n))
-      do i = 1, n
-          read(unit, '(A)') strings(i)
-      end do
-      close(unit)
-  end subroutine read_strings_from_file
 
   subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
       integer, intent(in) :: id, n
@@ -198,6 +147,7 @@ end function basename
       real(dp), dimension(:), allocatable :: wavelengths, fluxes, &
       filter_wavelengths, filter_trans
       logical :: make_sed
+      integer :: n_tmp
 
       ! TODO: move this into mesa
 
@@ -219,7 +169,8 @@ end function basename
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))
-      call read_strings_from_file(array_of_strings, num_strings, id)
+      call read_strings_from_file(colors_settings, array_of_strings, n_tmp)
+      num_strings = n
 
       CALL calculate_bolometric(teff, log_g, metallicity, R, d,&
        bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)

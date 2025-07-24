@@ -21,7 +21,7 @@ module synthetic
 
    use const_def, only: dp
    use utils_lib, only: mkdir, folder_exists
-   use shared_funcs, only: remove_dat, romberg_integration, load_filter, load_vega_sed, load_lookup_table
+   use colors_utils, only: remove_dat, romberg_integration, load_filter, load_vega_sed, load_lookup_table
    use knn_interp, only: interpolate_array
 
    implicit none

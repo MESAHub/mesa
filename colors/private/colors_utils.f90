@@ -17,8 +17,10 @@
 !
 ! ***********************************************************************
 
-module shared_funcs
-   use const_def, only: dp, strlen
+module colors_utils
+   use const_def, only: dp, strlen, mesa_dir
+   use colors_def, only: Colors_General_Info
+
    implicit none
 
    public :: dilute_flux, trapezoidal_integration, romberg_integration, &
@@ -89,7 +91,7 @@ contains
       real(dp) :: sum, h1, h2, f1, f2, f0
 
       n = size(x)
-      sum = 0.0_DP
+      sum = 0.0_dp
 
       ! Validate input sizes
       if (size(x) /= size(y)) then
@@ -112,12 +114,12 @@ contains
          f2 = y(i + 2)
 
          ! Simpson's rule: (h/3) * (f0 + 4f1 + f2)
-         sum = sum + (h1 + h2)/6.0_DP*(f0 + 4.0_DP*f1 + f2)
+         sum = sum + (h1 + h2)/6.0_dp*(f0 + 4.0_dp*f1 + f2)
       end do
 
       ! Handle the case where n is odd (last interval)
       if (MOD(n, 2) == 0) then
-         sum = sum + 0.5_DP*(x(n) - x(n - 1))*(y(n) + y(n - 1))
+         sum = sum + 0.5_dp*(x(n) - x(n - 1))*(y(n) + y(n - 1))
       end if
 
       result = sum
@@ -132,7 +134,7 @@ contains
       real(dp) :: h, sum, factor
 
       n = size(x)
-      m = INT(LOG(real(n, DP))/LOG(2.0_DP)) + 1  ! Number of refinement levels
+      m = int(log(real(n, DP))/log(2.0_dp)) + 1  ! Number of refinement levels
 
       ! Validate input sizes
       if (size(x) /= size(y)) then
@@ -149,23 +151,23 @@ contains
 
       ! Compute initial trapezoidal rule estimate
       h = x(n) - x(1)
-      R(1) = 0.5_DP*h*(y(1) + y(n))
+      R(1) = 0.5_dp*h*(y(1) + y(n))
 
       ! Refinement using Romberg's method
       do j = 2, m
-         sum = 0.0_DP
+         sum = 0.0_dp
          do i = 1, 2**(j - 2)
             sum = sum + y(1 + (2*i - 1)*(n - 1)/(2**(j - 1)))
          end do
 
-         h = h/2.0_DP
-         R(j) = 0.5_DP*R(j - 1) + h*sum
+         h = h/2.0_dp
+         R(j) = 0.5_dp*R(j - 1) + h*sum
 
          ! Richardson extrapolation
-         factor = 4.0_DP
+         factor = 4.0_dp
          do k = j, 2, -1
-            R(k - 1) = (factor*R(k) - R(k - 1))/(factor - 1.0_DP)
-            factor = factor*4.0_DP
+            R(k - 1) = (factor*R(k) - R(k - 1))/(factor - 1.0_dp)
+            factor = factor*4.0_dp
          end do
       end do
 
@@ -208,7 +210,7 @@ contains
          n_rows = n_rows + 1
       end do
 
-      REWIND (unit)
+      rewind (unit)
       read (unit, '(A)', iostat=status) line  ! Skip header again
 
       allocate (wavelengths(n_rows))
@@ -265,7 +267,7 @@ contains
       allocate (filter_trans(n_rows))
 
       ! Rewind to the first non-comment line
-      REWIND (unit)
+      rewind (unit)
       do
          read (unit, '(A)', iostat=status) line
          if (status /= 0) then
@@ -338,7 +340,7 @@ contains
          if (status /= 0) exit
          n_rows = n_rows + 1
       end do
-      REWIND (unit)
+      rewind (unit)
 
       ! Skip header
       read (unit, '(A)', iostat=status) line
@@ -401,10 +403,10 @@ contains
          character(len=100) :: clean_header, clean_target
 
          index = -1
-         clean_target = trim(ADJUSTL(target))  ! Clean the target string
+         clean_target = trim(adjustl(target))  ! Clean the target string
 
          do i = 1, size(headers)
-            clean_header = trim(ADJUSTL(headers(i)))  ! Clean each header
+            clean_header = trim(adjustl(headers(i)))  ! Clean each header
             if (clean_header == clean_target) then
                index = i
                exit
@@ -417,13 +419,13 @@ contains
          character(len=100), allocatable, intent(out) :: tokens(:)
          integer :: num_tokens, pos, start, len_delim
 
-         len_delim = LEN_trim(delimiter)
+         len_delim = len_trim(delimiter)
          start = 1
          num_tokens = 0
-         if (allocateD(tokens)) deallocate (tokens)
+         if (allocated(tokens)) deallocate (tokens)
 
          do
-            pos = INDEX(line(start:), delimiter)
+            pos = index(line(start:), delimiter)
 
             if (pos == 0) exit
             num_tokens = num_tokens + 1
@@ -441,7 +443,7 @@ contains
          character(len=100), allocatable :: temp(:)
          integer :: n
 
-         if (.NOT. allocateD(tokens)) then
+         if (.not. allocated(tokens)) then
             allocate (tokens(1))
             tokens(1) = token
          else
@@ -498,7 +500,7 @@ contains
       allocate (flux(n_rows))
 
       ! Rewind to the first non-comment line
-      REWIND (unit)
+      rewind (unit)
       do
          read (unit, '(A)', iostat=status) line
          if (status /= 0) then
@@ -549,4 +551,51 @@ contains
       end if
    end function remove_dat
 
-end module shared_funcs
+   function basename(path) result(name)
+      character(len=*), intent(in) :: path
+      character(len=strlen) :: name
+      integer :: i
+      if (len_trim(path) == 0) then
+         name = ''
+         return
+      end if
+      i = index(path, '/', back=.true.)
+      name = path(i + 1:)
+   end function basename
+
+   subroutine read_strings_from_file(colors_settings, strings, n)
+      character(len=512) :: filename
+      character(len=100), allocatable, intent(out) :: strings(:)
+      integer, intent(out) :: n
+      integer :: unit, i, status
+      character(len=100) :: line
+      integer :: ierr
+      type(Colors_General_Info), pointer :: colors_settings
+
+      ierr = 0
+
+      filename = trim(mesa_dir)//trim(colors_settings%instrument)//"/"// &
+                 trim(basename(colors_settings%instrument))
+      n = 0
+      unit = 10
+      open (unit, file=filename, status='old', action='read', iostat=status)
+      if (status /= 0) then
+         print *, "Error: Could not open file", filename
+         stop
+      end if
+
+      do
+         read (unit, '(A)', iostat=status) line
+         if (status /= 0) exit
+         n = n + 1
+      end do
+      rewind (unit)
+      if (allocated(strings)) deallocate (strings)
+      allocate (strings(n))
+      do i = 1, n
+         read (unit, '(A)') strings(i)
+      end do
+      close (unit)
+   end subroutine read_strings_from_file
+
+end module colors_utils

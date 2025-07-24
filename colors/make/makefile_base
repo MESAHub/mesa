@@ -14,8 +14,8 @@ include $(MESA_DIR)/utils/makefile_header
 
 SRCS = \
    colors_ctrls_io.f90 \
+	 colors_utils.f90 \
    colors_def.f90 \
-   shared_funcs.f90 \
    hermite_interp.f90 \
    knn_interp.f90 \
    linear_interp.f90 \

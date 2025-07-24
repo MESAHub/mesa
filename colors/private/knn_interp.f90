@@ -23,7 +23,7 @@
 
 module knn_interp
    use const_def, only: dp
-   use shared_funcs, only: dilute_flux, load_sed
+   use colors_utils, only: dilute_flux, load_sed
    implicit none
 
    private

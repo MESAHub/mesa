@@ -161,17 +161,20 @@
   History_Track3_xname = 'star_age'
   History_Track3_yname = 'Grp'
   History_Track3_title = 'Grp Light Curve'
+  History_Track3_xaxis_label = 'Age (yr)'
 
   ! Grvs light curve
   History_Track4_win_flag = .true.
   History_Track4_xname = 'star_age'
   History_Track4_yname = 'Grvs'
   History_Track4_title = 'Grvs Light Curve'
+  History_Track4_xaxis_label = 'Age (yr)'
 
   ! Flux_bol curve
   History_Track5_win_flag = .true.
   History_Track5_xname = 'star_age'
   History_Track5_yname = 'Flux_bol'
   History_Track5_title = 'Bolometric Flux'
+  History_Track5_xaxis_label = 'Age (yr)'
 
 /

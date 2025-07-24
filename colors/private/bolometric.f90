@@ -20,7 +20,7 @@
 module bolometric
 
    use const_def, only: dp
-   use shared_funcs, only: romberg_integration, load_lookup_table
+   use colors_utils, only: romberg_integration, load_lookup_table
    use hermite_interp, only: construct_sed_hermite
 
    implicit none

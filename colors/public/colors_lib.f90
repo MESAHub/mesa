@@ -20,7 +20,7 @@
 module colors_lib
 
    use const_def, only: dp, strlen
-   use shared_funcs, only: remove_dat
+   use colors_utils, only: remove_dat, read_strings_from_file
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
 
@@ -34,7 +34,7 @@ module colors_lib
    public :: colors_setup_tables, colors_setup_hooks
    ! Main functions
    public :: calculate_bolometric, calculate_synthetic
-   public :: remove_dat
+   public :: remove_dat, read_strings_from_file ! TODO: remove these if not needed
    ! Old bolometric correction functions that MESA expects (stub implementations, remove later):
    public :: get_bc_id_by_name, get_lum_band_by_id, get_abs_mag_by_id
    public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
