@@ -8,9 +8,62 @@ from matplotlib.animation import FFMpegWriter, FuncAnimation
 plt.rcParams['text.usetex'] = False
 
 class SEDChecker:
+    def parse_inlist_file(self, inlist_path="../inlist_colors"):
+        """Parse MESA inlist file to extract SED directory and stellar parameters"""
+        params = {
+            'sed_directory': '../SED/',  # default
+            'distance': None,
+            'initial_mass': None,
+            'initial_z': None
+        }
+        
+        try:
+            with open(inlist_path, 'r') as f:
+                content = f.read()
+            
+            # Extract parameters using simple string parsing
+            lines = content.split('\n')
+            for line in lines:
+                line = line.strip()
+                if '=' in line and not line.startswith('!'):
+                    # Remove comments
+                    if '!' in line:
+                        line = line.split('!')[0].strip()
+                    
+                    if 'colors_results_directory' in line:
+                        value = line.split('=')[1].strip().strip("'\"")
+                        params['sed_directory'] = f"../{value}/"
+                    
+                    elif 'distance' in line and 'distance' == line.split('=')[0].strip():
+                        value = line.split('=')[1].strip().replace('d', 'e')  # Convert Fortran double precision
+                        try:
+                            params['distance'] = float(value)
+                        except ValueError:
+                            pass
+                    
+                    elif 'initial_mass' in line:
+                        value = line.split('=')[1].strip().replace('d', 'e')
+                        try:
+                            params['initial_mass'] = float(value)
+                        except ValueError:
+                            pass
+                    
+                    elif 'initial_z' in line:
+                        value = line.split('=')[1].strip().replace('d', 'e')
+                        try:
+                            params['initial_z'] = float(value)
+                        except ValueError:
+                            pass
+            
+            return params
+            
+        except Exception as e:
+            print(f"Warning: Could not parse inlist file {inlist_path}: {e}")
+            return params
+
     def __init__(
         self,
-        directory="../SED/",
+        directory=None,  # Will be determined from inlist file
         xlim=None,
         ylim=None,
         refresh_interval=0.1,
@@ -18,8 +71,13 @@ class SEDChecker:
         video_filename="sed_animation.mp4",
         video_fps=10,
         video_duration=30,
+        inlist_file="../inlist_colors",
     ):
-        self.directory = directory
+        # Parse inlist file to get parameters
+        self.stellar_params = self.parse_inlist_file(inlist_file)
+        
+        # Use directory from inlist file if not specified
+        self.directory = directory if directory is not None else self.stellar_params['sed_directory']
         self.xlim = xlim
         self.ylim = ylim
         self.refresh_interval = refresh_interval
@@ -36,6 +94,33 @@ class SEDChecker:
 
         self.setup_plot()
 
+    def find_output_files(self):
+        return [
+            f
+            for f in os.listdir(self.directory)
+            if "SED.csv" in f and os.path.isfile(os.path.join(self.directory, f))
+        ]
+
+    def format_stellar_info(self):
+        """Format stellar parameters for display"""
+        info_lines = []
+        
+        if self.stellar_params['initial_mass'] is not None:
+            info_lines.append(f"Mass: {self.stellar_params['initial_mass']:.1f} M☉")
+        
+        if self.stellar_params['initial_z'] is not None:
+            info_lines.append(f"Z: {self.stellar_params['initial_z']:.4f}")
+        
+        if self.stellar_params['distance'] is not None:
+            # Convert distance from cm to parsecs for display
+            distance_pc = self.stellar_params['distance'] / 3.0857e18
+            if distance_pc < 1000:
+                info_lines.append(f"Distance: {distance_pc:.1f} pc")
+            else:
+                info_lines.append(f"Distance: {distance_pc/1000:.1f} kpc")
+        
+        return '\n'.join(info_lines)
+
     def setup_plot(self):
         """Set up the plot with formatting and labels."""
         # Use matplotlib's mathtext for math rendering
@@ -45,18 +130,72 @@ class SEDChecker:
         self.ax.set_xscale('log')
         # Only apply ticklabel formatting to y-axis (log scale incompatible with ticklabel_format)
         self.ax.yaxis.set_major_formatter(plt.ScalarFormatter(useOffset=False))
+        
+        # Add stellar information text in top left corner
+        stellar_info = self.format_stellar_info()
+        if stellar_info:
+            self.ax.text(0.02, 0.98, stellar_info, transform=self.ax.transAxes,
+                        fontsize=10, verticalalignment='top', horizontalalignment='left',
+                        bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8))
+        
         if self.xlim:
             self.ax.set_xlim(self.xlim)
         if self.ylim:
             self.ax.set_ylim(self.ylim)
         plt.tight_layout()
 
-    def find_output_files(self):
-        return [
-            f
-            for f in os.listdir(self.directory)
-            if "SED.csv" in f and os.path.isfile(os.path.join(self.directory, f))
-        ]
+    def parse_inlist_file(self, inlist_path="../inlist_colors"):
+        """Parse MESA inlist file to extract SED directory and stellar parameters"""
+        params = {
+            'sed_directory': '../SED/',  # default
+            'distance': None,
+            'initial_mass': None,
+            'initial_z': None
+        }
+        
+        try:
+            with open(inlist_path, 'r') as f:
+                content = f.read()
+            
+            # Extract parameters using simple string parsing
+            lines = content.split('\n')
+            for line in lines:
+                line = line.strip()
+                if '=' in line and not line.startswith('!'):
+                    # Remove comments
+                    if '!' in line:
+                        line = line.split('!')[0].strip()
+                    
+                    if 'colors_results_directory' in line:
+                        value = line.split('=')[1].strip().strip("'\"")
+                        params['sed_directory'] = f"../{value}/"
+                    
+                    elif 'distance' in line and 'distance' == line.split('=')[0].strip():
+                        value = line.split('=')[1].strip().replace('d', 'e')  # Convert Fortran double precision
+                        try:
+                            params['distance'] = float(value)
+                        except ValueError:
+                            pass
+                    
+                    elif 'initial_mass' in line:
+                        value = line.split('=')[1].strip().replace('d', 'e')
+                        try:
+                            params['initial_mass'] = float(value)
+                        except ValueError:
+                            pass
+                    
+                    elif 'initial_z' in line:
+                        value = line.split('=')[1].strip().replace('d', 'e')
+                        try:
+                            params['initial_z'] = float(value)
+                        except ValueError:
+                            pass
+            
+            return params
+            
+        except Exception as e:
+            print(f"Warning: Could not parse inlist file {inlist_path}: {e}")
+            return params
 
     def normalize(self, data):
         if data is None or len(data) == 0:
