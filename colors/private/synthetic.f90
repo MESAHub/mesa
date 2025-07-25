@@ -126,10 +126,10 @@ contains
 
       ! Calculate magnitude using Vega zero point
       if (vega_flux > 0.0_dp) then
-         calculate_synthetic = -2.5*LOG10(synthetic_flux/vega_flux)
+         calculate_synthetic = -2.5d0*log10(synthetic_flux/vega_flux)
       else
          print *, "Error: Vega flux is zero, magnitude calculation is invalid."
-         calculate_synthetic = HUGE(1.0_dp)
+         calculate_synthetic = huge(1.0_dp)
       end if
 
       ! Clean up
@@ -179,7 +179,7 @@ contains
 
       ! Validate inputs
       do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) then
+         if (wavelengths(i) <= 0.0_dp .or. fluxes(i) < 0.0_dp) then
             print *, "synthetic Invalid input at index", i, ":", wavelengths(i), fluxes(i)
             stop
          end if
@@ -189,7 +189,7 @@ contains
       call romberg_integration(filter_wavelengths, &
                                filter_trans*filter_wavelengths, integrated_filter)
       ! Store the total flux
-      if (integrated_filter > 0.0) then
+      if (integrated_filter > 0.0_dp) then
          synthetic_flux = integrated_flux/integrated_filter
       else
          print *, "Error: Integrated filter transmission is zero."

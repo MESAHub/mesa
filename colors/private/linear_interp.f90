@@ -104,7 +104,7 @@ contains
       ! Calculate statistics for validation
       min_flux = minval(interp_flux)
       max_flux = maxval(interp_flux)
-      mean_flux = SUM(interp_flux)/n_lambda
+      mean_flux = sum(interp_flux)/n_lambda
 
       ! Apply distance dilution to get observed flux
       allocate (diluted_flux(n_lambda))
@@ -114,7 +114,7 @@ contains
       ! Calculate statistics after dilution
       min_flux = minval(diluted_flux)
       max_flux = maxval(diluted_flux)
-      mean_flux = SUM(diluted_flux)/n_lambda
+      mean_flux = sum(diluted_flux)/n_lambda
 
    end subroutine construct_sed_linear
 
@@ -310,7 +310,7 @@ contains
       end if
 
       ! Final sanity check
-      if (f_interp /= f_interp .OR. f_interp <= 0.0_dp) then
+      if (f_interp /= f_interp .or. f_interp <= 0.0_dp) then
          ! If we somehow still got an invalid result, use nearest neighbor
          call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, i_x, i_y, i_z)
          f_interp = max(tiny_value, f_values(i_x, i_y, i_z))

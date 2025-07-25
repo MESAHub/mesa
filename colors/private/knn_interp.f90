@@ -77,15 +77,15 @@ contains
 
       ! Compute distances and weights for the four models
       do i = 1, 4
-         distances(i) = SQRT((lu_teff(closest_indices(i)) - teff)**2 + &
+         distances(i) = sqrt((lu_teff(closest_indices(i)) - teff)**2 + &
                              (lu_logg(closest_indices(i)) - log_g)**2 + &
                              (lu_meta(closest_indices(i)) - metallicity)**2)
-         if (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
+         if (distances(i) == 0.0) distances(i) = 1.0d-10  ! Prevent division by zero
          weights(i) = 1.0/distances(i)
       end do
 
       ! Normalize weights
-      sum_weights = SUM(weights)
+      sum_weights = sum(weights)
       weights = weights/sum_weights
 
       ! Allocate output arrays
@@ -124,7 +124,7 @@ contains
       real(dp) :: teff_dist, logg_dist, meta_dist
 
       n = size(lu_teff)
-      min_distances = HUGE(1.0)
+      min_distances = huge(1.0)
       indices = -1
 
       ! Find min and max for normalization
@@ -248,7 +248,7 @@ contains
       integer :: i
 
       ! Validate input sizes
-      if (size(x_in) < 2 .OR. size(y_in) < 2) then
+      if (size(x_in) < 2 .or. size(y_in) < 2) then
          print *, "Error: x_in or y_in arrays have fewer than 2 points."
          stop
       end if

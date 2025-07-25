@@ -67,8 +67,8 @@ contains
 
       ! Validate inputs and replace invalid wavelengths with 0
       do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) then
-            fluxes(i) = 0.0  ! Replace invalid wavelength with 0
+         if (wavelengths(i) <= 0.0d0 .or. fluxes(i) < 0.0d0) then
+            fluxes(i) = 0.0d0  ! Replace invalid wavelength with 0
          end if
       end do
 
@@ -76,18 +76,18 @@ contains
       call romberg_integration(wavelengths, fluxes, bolometric_flux)
 
       ! Validate integration result
-      if (bolometric_flux <= 0.0) then
+      if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."
-         bolometric_magnitude = 99.0
+         bolometric_magnitude = 99.0d0
          return
       end if
 
       ! Calculate bolometric magnitude
-      if (bolometric_flux <= 0.0) then
+      if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."
-         bolometric_magnitude = 99.0
+         bolometric_magnitude = 99.0d0
          return
-      else if (bolometric_flux < 1.0E-10) then
+      else if (bolometric_flux < 1.0d-10) then
          print *, "Warning: Flux value is very small, precision might be affected."
       end if
 
@@ -99,11 +99,11 @@ contains
    !****************************
    real(dp) function flux_to_magnitude(flux)
       real(dp), intent(in) :: flux
-      if (flux <= 0.0) then
+      if (flux <= 0.0d0) then
          print *, "Error: Flux must be positive to calculate magnitude."
-         flux_to_magnitude = 99.0  ! Return an error value
+         flux_to_magnitude = 99.0d0  ! Return an error value
       else
-         flux_to_magnitude = -2.5*LOG10(flux)
+         flux_to_magnitude = -2.5d0*log10(flux)
       end if
    end function flux_to_magnitude
 

@@ -217,9 +217,9 @@ contains
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
       ! If outside grid, use nearest point
-      if (i_x < 1 .OR. i_x >= size(x_grid) .OR. &
-          i_y < 1 .OR. i_y >= size(y_grid) .OR. &
-          i_z < 1 .OR. i_z >= size(z_grid)) then
+      if (i_x < 1 .or. i_x >= size(x_grid) .or. &
+          i_y < 1 .or. i_y >= size(y_grid) .or. &
+          i_z < 1 .or. i_z >= size(z_grid)) then
 
          call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                  i_x, i_y, i_z)
