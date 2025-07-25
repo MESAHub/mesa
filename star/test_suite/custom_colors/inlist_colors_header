@@ -1,6 +1,4 @@
 &star_job
-   history_columns_file = 'custom_colors_history_columns.list'
-
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_colors'
 / ! end of star_job namelist

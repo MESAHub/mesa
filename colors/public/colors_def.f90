@@ -41,6 +41,11 @@ module colors_def
       logical :: in_use
    end type Colors_General_Info
 
+   ! TODO: Use handles/caching in the future once we have more colors tables
+   ! For now, we will just point to a single file
+   integer :: num_color_filters
+   character(len=100), allocatable :: color_filter_names(:)
+
    integer, parameter :: max_colors_handles = 10
    type(Colors_General_Info), target :: colors_handles(max_colors_handles)
 
@@ -122,12 +127,9 @@ contains
 
       ! TODO: implement me if needed, see kap
 
-   end subroutine do_free_colors_tables
+      ! for now, free the strings tables
+      if (allocated(color_filter_names)) deallocate (color_filter_names)
 
-   integer function get_number_of_filters(colors_settings)
-      type(Colors_General_Info), pointer, intent(in) :: colors_settings
-      get_number_of_filters = 0
-      ! TODO: implement me
-   end function get_number_of_filters
+   end subroutine do_free_colors_tables
 
 end module colors_def

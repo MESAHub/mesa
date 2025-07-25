@@ -20,9 +20,10 @@
 module colors_lib
 
    use const_def, only: dp, strlen
-   use colors_utils, only: remove_dat, read_strings_from_file
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
+   use colors_utils, only: read_strings_from_file
+   use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
 
    implicit none
 
@@ -34,7 +35,7 @@ module colors_lib
    public :: colors_setup_tables, colors_setup_hooks
    ! Main functions
    public :: calculate_bolometric, calculate_synthetic
-   public :: remove_dat, read_strings_from_file ! TODO: remove these if not needed
+   public :: how_many_colors_history_columns, data_for_colors_history_columns
    ! Old bolometric correction functions that MESA expects (stub implementations, remove later):
    public :: get_bc_id_by_name, get_lum_band_by_id, get_abs_mag_by_id
    public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
@@ -116,7 +117,7 @@ contains
    end subroutine colors_ptr
 
    subroutine colors_setup_tables(handle, ierr)
-      use colors_def, only: colors_General_Info, get_colors_ptr
+      use colors_def, only: colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
       ! TODO: use load_colors, only: Setup_colors_Tables
       integer, intent(in) :: handle
       integer, intent(out):: ierr
@@ -128,6 +129,10 @@ contains
       ierr = 0
       call get_colors_ptr(handle, rq, ierr)
       ! TODO: call Setup_colors_Tables(rq, use_cache, load_on_demand, ierr)
+
+      ! TODO: For now, don't use cache (future feature)
+      ! but rely on user specifying a single filters directory, and read it here
+      call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)
 
    end subroutine colors_setup_tables
 

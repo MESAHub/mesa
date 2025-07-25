@@ -563,13 +563,12 @@ contains
       name = path(i + 1:)
    end function basename
 
-   subroutine read_strings_from_file(colors_settings, strings, n)
+   subroutine read_strings_from_file(colors_settings, strings, n, ierr)
       character(len=512) :: filename
       character(len=100), allocatable, intent(out) :: strings(:)
-      integer, intent(out) :: n
+      integer, intent(out) :: n, ierr
       integer :: unit, i, status
       character(len=100) :: line
-      integer :: ierr
       type(Colors_General_Info), pointer :: colors_settings
 
       ierr = 0
@@ -580,6 +579,7 @@ contains
       unit = 10
       open (unit, file=filename, status='old', action='read', iostat=status)
       if (status /= 0) then
+         ierr = -1
          print *, "Error: Could not open file", filename
          stop
       end if

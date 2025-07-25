@@ -358,17 +358,17 @@ contains
    !---------------------------------------------------------------------------
    ! Find the nearest grid point
    !---------------------------------------------------------------------------
-   SUBROUTINE find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+   subroutine find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                  i_x, i_y, i_z)
-     REAL(dp), INTENT(IN) :: x_val, y_val, z_val
-     REAL(dp), INTENT(IN) :: x_grid(:), y_grid(:), z_grid(:)
-     INTEGER, INTENT(OUT) :: i_x, i_y, i_z
+      real(dp), intent(in) :: x_val, y_val, z_val
+      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
+      integer, intent(out) :: i_x, i_y, i_z
 
-     ! Find nearest grid points using intrinsic MINLOC
-     i_x = MINLOC(ABS(x_val - x_grid), 1)
-     i_y = MINLOC(ABS(y_val - y_grid), 1)
-     i_z = MINLOC(ABS(z_val - z_grid), 1)
-   END SUBROUTINE find_nearest_point
+      ! Find nearest grid points using intrinsic minloc
+      i_x = minloc(abs(x_val - x_grid), 1)
+      i_y = minloc(abs(y_val - y_grid), 1)
+      i_z = minloc(abs(z_val - z_grid), 1)
+   end subroutine find_nearest_point
 
    !---------------------------------------------------------------------------
    ! Compute derivatives at a grid point
@@ -381,7 +381,7 @@ contains
       real(dp), intent(out) :: df_dx, df_dy, df_dz
 
       ! Compute x derivative using centered differences where possible
-      if (i > 1 .AND. i < nx) then
+      if (i > 1 .and. i < nx) then
          df_dx = (f(i + 1, j, k) - f(i - 1, j, k))/(2.0_dp*dx)
       else if (i == 1) then
          df_dx = (f(i + 1, j, k) - f(i, j, k))/dx
@@ -390,7 +390,7 @@ contains
       end if
 
       ! Compute y derivative using centered differences where possible
-      if (j > 1 .AND. j < ny) then
+      if (j > 1 .and. j < ny) then
          df_dy = (f(i, j + 1, k) - f(i, j - 1, k))/(2.0_dp*dy)
       else if (j == 1) then
          df_dy = (f(i, j + 1, k) - f(i, j, k))/dy
@@ -399,7 +399,7 @@ contains
       end if
 
       ! Compute z derivative using centered differences where possible
-      if (k > 1 .AND. k < nz) then
+      if (k > 1 .and. k < nz) then
          df_dz = (f(i, j, k + 1) - f(i, j, k - 1))/(2.0_dp*dz)
       else if (k == 1) then
          df_dz = (f(i, j, k + 1) - f(i, j, k))/dz

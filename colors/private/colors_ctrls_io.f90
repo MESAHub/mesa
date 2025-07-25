@@ -69,7 +69,7 @@ contains
    end subroutine read_namelist
 
    recursive subroutine read_controls_file(rq, filename, level, ierr)
-      use ISO_FORTRAN_ENV, only: IOSTAT_END
+      use iso_fortran_env, only: iostat_end
       character(*), intent(in) :: filename
       integer, intent(in) :: level
       type(Colors_General_Info), pointer, intent(inout) :: rq

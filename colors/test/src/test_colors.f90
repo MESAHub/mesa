@@ -8,12 +8,12 @@ program test_colors
    ierr = 0
    use_cache = .false.
 
-   ! TODO: implement me
+   ! TODO: add tests for colors module functionality here
 
    write(*,*) 'Testing colors module initialization...'
 
    ! Initialize colors module
-   ! TODO: call colors_init(ierr)
+   ! call colors_init(use_cache, '', ierr)
    if (ierr /= 0) then
       write(*,*) 'Error: colors_init failed with code', ierr
       stop 1
@@ -23,6 +23,6 @@ program test_colors
    write(*,*) 'Test passed!'
 
    ! Clean up
-   call colors_shutdown()
+   ! call colors_shutdown()
 
 end program test_colors

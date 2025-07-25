@@ -13,8 +13,10 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
+   colors_def.f90 \
    colors_ctrls_io.f90 \
-	 colors_utils.f90 \
+   colors_utils.f90 \
+   colors_history.f90 \
    colors_def.f90 \
    hermite_interp.f90 \
    knn_interp.f90 \

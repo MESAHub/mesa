@@ -35,8 +35,8 @@
       vega_sed = '/colors/data/stellar_models/vega_flam.csv'
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
       metallicity = 0.58d0
-      distance = 3.0857d17   
-      make_csv = .false.  
+      distance = 3.0857d17
+      make_csv = .false.
       colors_results_directory = 'SED'
 
 
