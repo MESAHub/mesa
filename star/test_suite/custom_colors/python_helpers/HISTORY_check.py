@@ -21,21 +21,21 @@ def get_improved_mesa_phase_info(phase_code):
     """
     # Improved phase colors that make physical sense
     phase_map = {
-        -1: ("Relax", "#808080"),      # Gray - Relaxation phase
-        1: ("Starting", "#E6E6FA"),    # Lavender - Starting phase
-        2: ("Pre-MS", "#9370DB"),      # Medium purple - Pre-main sequence (young)
-        3: ("ZAMS", "#4169E1"),        # Royal blue - Zero-age MS (hot, young MS)
-        4: ("IAMS", "#00CED1"),        # Dark turquoise - Intermediate-age MS 
-        5: ("TAMS", "#FF6347"),        # Tomato - Terminal-age MS (cooler, evolved MS)
-        6: ("He-Burn", "#FF4500"),     # Orange red - Helium burning (post-MS)
-        7: ("ZACHeB", "#FF8C00"),      # Dark orange - Zero-age core helium burning
-        8: ("TACHeB", "#FFA500"),      # Orange - Terminal-age core helium burning
-        9: ("TP-AGB", "#DC143C"),      # Crimson - Thermally pulsing AGB (very evolved)
-        10: ("C-Burn", "#B22222"),     # Fire brick - Carbon burning (massive stars)
-        11: ("Ne-Burn", "#8B0000"),    # Dark red - Neon burning
-        12: ("O-Burn", "#800000"),     # Maroon - Oxygen burning
-        13: ("Si-Burn", "#654321"),    # Dark brown - Silicon burning (pre-collapse)
-        14: ("WDCS", "#F5F5F5"),       # White smoke - White dwarf cooling sequence
+        -1: ("Relax", "#808080"),  # Gray - Relaxation phase
+        1: ("Starting", "#E6E6FA"),  # Lavender - Starting phase
+        2: ("Pre-MS", "#9370DB"),  # Medium purple - Pre-main sequence (young)
+        3: ("ZAMS", "#4169E1"),  # Royal blue - Zero-age MS (hot, young MS)
+        4: ("IAMS", "#00CED1"),  # Dark turquoise - Intermediate-age MS
+        5: ("TAMS", "#FF6347"),  # Tomato - Terminal-age MS (cooler, evolved MS)
+        6: ("He-Burn", "#FF4500"),  # Orange red - Helium burning (post-MS)
+        7: ("ZACHeB", "#FF8C00"),  # Dark orange - Zero-age core helium burning
+        8: ("TACHeB", "#FFA500"),  # Orange - Terminal-age core helium burning
+        9: ("TP-AGB", "#DC143C"),  # Crimson - Thermally pulsing AGB (very evolved)
+        10: ("C-Burn", "#B22222"),  # Fire brick - Carbon burning (massive stars)
+        11: ("Ne-Burn", "#8B0000"),  # Dark red - Neon burning
+        12: ("O-Burn", "#800000"),  # Maroon - Oxygen burning
+        13: ("Si-Burn", "#654321"),  # Dark brown - Silicon burning (pre-collapse)
+        14: ("WDCS", "#F5F5F5"),  # White smoke - White dwarf cooling sequence
     }
 
     return phase_map.get(phase_code, ("Unknown", "#696969"))  # Dim gray for unknown
@@ -186,7 +186,7 @@ class HistoryChecker:
 
             # Get evolutionary phase information using MESA's built-in phases with improved colors
             self.phases, self.phase_colors = get_phase_info_from_mesa(self.md)
-            
+
             # Get filter colors for the magnitude plot
             self.filter_colors = get_filter_colors(self.filter_columns)
 
@@ -244,17 +244,14 @@ class HistoryChecker:
 
         # Top-left plot: HR Diagram with phase colors
         if len(self.phases) > 0:
-
-
             self.axes[0, 0].plot(
                 self.hr_color,
                 self.hr_mag,
                 marker=",",
                 linestyle="-",
-                color='k',
+                color="k",
                 alpha=0.2,
             )
-
 
             self.axes[0, 0].scatter(
                 self.hr_color,
@@ -270,18 +267,14 @@ class HistoryChecker:
 
         # Top-right plot: Teff vs. Log_L with phase colors
         if len(self.phases) > 0:
-
-
             self.axes[0, 1].plot(
                 self.Teff,
                 self.Log_L,
                 marker=",",
                 linestyle="-",
-                color='k',
+                color="k",
                 alpha=0.2,
             )
-
-
 
             self.axes[0, 1].scatter(
                 self.Teff,
@@ -297,13 +290,12 @@ class HistoryChecker:
 
         # Bottom-left plot: Age vs. Color Index with phase colors
         if len(self.phases) > 0:
-
             self.axes[1, 0].plot(
                 self.Star_Age,
                 self.color_index,
                 marker=",",
                 linestyle="-",
-                color='k',
+                color="k",
                 alpha=0.2,
             )
 
@@ -333,8 +325,8 @@ class HistoryChecker:
                     continue
 
             # Use filter-specific color
-            color = self.filter_colors[i] if i < len(self.filter_colors) else 'black'
-            
+            color = self.filter_colors[i] if i < len(self.filter_colors) else "black"
+
             self.axes[1, 1].plot(
                 self.Star_Age,
                 col_data,
