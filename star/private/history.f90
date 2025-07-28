@@ -58,6 +58,8 @@ contains
       use chem_def, only : category_name
       use math_lib, only : math_backend
       use net_def, only : Net_General_Info, get_net_ptr
+      use colors_def, only: Colors_General_Info, get_colors_ptr
+      use colors_lib, only: how_many_colors_history_columns, data_for_colors_history_columns
       type (star_info), pointer :: s
 
       logical, intent(in) :: write_flag
@@ -65,22 +67,23 @@ contains
 
       character (len = strlen) :: fname, dbl_fmt, int_fmt, txt_fmt
       integer :: numcols, io, i, nz, col, j, i0, &
-         num_extra_cols, num_binary_cols, num_extra_binary_cols, num_extra_header_items, n
+         num_extra_cols, num_binary_cols, num_extra_binary_cols, num_colors_cols,num_extra_header_items, n
       integer, parameter :: num_epsnuc_out = 12
       real(dp) :: &
          epsnuc_out(num_epsnuc_out), csound_surf, v_surf, envelope_fraction_left
       integer :: mixing_regions, mix_relr_regions, burning_regions, burn_relr_regions
       integer, pointer :: mixing_type(:), mix_relr_type(:), burning_type(:), burn_relr_type(:)
       character (len = maxlen_history_column_name), pointer, dimension(:) :: &
-         extra_col_names, binary_col_names, extra_binary_col_names, extra_header_item_names
+         extra_col_names, binary_col_names, extra_binary_col_names, colors_col_names, extra_header_item_names
       real(dp), pointer, dimension(:) :: &
-         extra_col_vals, binary_col_vals, extra_binary_col_vals, extra_header_item_vals
+         extra_col_vals, binary_col_vals, extra_binary_col_vals, colors_col_vals, extra_header_item_vals
 
       character (len = maxlen_history_column_name), pointer :: &
          names(:)  ! (num_history_columns)
       real(dp), pointer :: vals(:)  ! (num_history_columns)
       logical, pointer :: is_int(:)  ! (num_history_columns)
       type(net_general_info), pointer :: g => null()
+      type(colors_general_info), pointer :: colors_settings => null()
 
       logical :: history_file_exists
 
@@ -93,6 +96,9 @@ contains
       ierr = 0
 
       call get_net_ptr(s% net_handle, g, ierr)
+      if(ierr/=0) return
+
+      call get_colors_ptr(s% colors_handle, colors_settings, ierr)
       if(ierr/=0) return
 
       if (.not. associated(s% history_column_spec)) then
@@ -108,7 +114,12 @@ contains
          num_binary_cols = 0
          num_extra_binary_cols = 0
       end if
-      n = numcols + num_extra_cols + num_binary_cols + num_extra_binary_cols
+      if (colors_settings% use_colors) then
+         num_colors_cols = how_many_colors_history_columns(s% colors_handle)
+      else
+         num_colors_cols = 0
+      end if
+      n = numcols + num_extra_cols + num_binary_cols + num_extra_binary_cols + num_colors_cols
       if (n == 0) then
          write(*, *) 'WARNING: do not have any output specified for logs.'
          ierr = -1
@@ -185,6 +196,8 @@ contains
       nullify(binary_col_vals)
       nullify(extra_binary_col_names)
       nullify(extra_binary_col_vals)
+      nullify(colors_col_names)
+      nullify(colors_col_vals)
 
       if (num_extra_cols > 0) then
          allocate(&
@@ -241,6 +254,28 @@ contains
          do i = 1, num_extra_binary_cols
             if(trim(extra_binary_col_names(i))=='unknown') then
                write(*, *) "Warning empty history name for extra_binary_history_column ", i
+            end if
+         end do
+      end if
+
+      if (num_colors_cols > 0) then
+         allocate(&
+            colors_col_names(num_colors_cols), colors_col_vals(num_colors_cols), stat = ierr)
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
+         colors_col_names(1:num_colors_cols) = 'unknown'
+         colors_col_vals(1:num_colors_cols) = -1d99
+         call data_for_colors_history_columns(s%T(1), log10(s%grav(1)), s%R(1), s%kap_rq%Zbase, &
+            s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
+         do i = 1, num_colors_cols
+            if(trim(colors_col_names(i))=='unknown') then
+               write(*, *) "Warning empty history name for color_history_column ", i
             end if
          end do
       end if
@@ -420,6 +455,9 @@ contains
          do j = 1, num_extra_binary_cols
             call do_extra_binary_col(i, j, numcols + num_extra_cols + num_binary_cols)
          end do
+         do j = 1, num_colors_cols
+            call do_color_col(i, j, numcols + num_extra_cols + num_binary_cols + num_extra_binary_cols)
+         end do
 
          if (write_flag) write(io, *)
 
@@ -452,6 +490,8 @@ contains
          if (associated(binary_col_vals)) deallocate(binary_col_vals)
          if (associated(extra_binary_col_names)) deallocate(extra_binary_col_names)
          if (associated(extra_binary_col_vals)) deallocate(extra_binary_col_vals)
+         if (associated(colors_col_names)) deallocate(colors_col_names)
+         if (associated(colors_col_vals)) deallocate(colors_col_vals)
 
          nullify(mixing_type)
          nullify(mix_relr_type)
@@ -463,6 +503,8 @@ contains
          nullify(binary_col_vals)
          nullify(extra_binary_col_names)
          nullify(extra_binary_col_vals)
+         nullify(colors_col_names)
+         nullify(colors_col_vals)
 
       end subroutine dealloc
 
@@ -502,6 +544,18 @@ contains
             call do_val(j + col_offset, extra_binary_col_vals(j))
          end if
       end subroutine do_extra_binary_col
+
+
+      subroutine do_color_col(pass, j, col_offset)
+         integer, intent(in) :: pass, j, col_offset
+         if (pass == 1) then
+            if (write_flag) write(io, fmt = int_fmt, advance = 'no') j + col_offset
+         else if (pass == 2) then
+            call do_name(j + col_offset, colors_col_names(j))
+         else if (pass == 3) then
+            call do_val(j + col_offset, colors_col_vals(j))
+         end if
+      end subroutine do_color_col
 
 
       subroutine do_name(j, col_name)

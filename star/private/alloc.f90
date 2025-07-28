@@ -230,6 +230,7 @@
          use kap_lib, only: free_kap_handle
          use eos_lib, only: free_eos_handle
          use net_lib, only: free_net_handle
+         use colors_lib, only: free_colors_handle
          use star_private_def, only: free_star
          use star_bcyclic, only: clear_storage
          type (star_info), pointer :: s
@@ -245,6 +246,9 @@
 
          call free_kap_handle(s% kap_handle)
          s%kap_handle = 0
+
+         call free_colors_handle(s% colors_handle)
+         s%colors_handle = 0
 
          ! Free star_info arrays
 

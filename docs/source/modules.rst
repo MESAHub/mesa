@@ -75,6 +75,20 @@ isotopes (e.g., atomic masses).  It also defines solar abundance
 patterns as reported in various references.
 
 
+.. _colors:
+
+Colors (``colors``)
+===================
+
+The ``colors`` module calculates synthetic photometry during stellar evolution.
+
+.. toctree::
+    :maxdepth: 1
+
+   colors/overview
+   colors/defaults
+
+
 .. _const:
 
 Constants (``const``)

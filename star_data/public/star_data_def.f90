@@ -27,7 +27,7 @@ module star_data_def
    use eos_def, only: EoS_General_Info
    use kap_def, only: Kap_General_Info
    use net_def, only: Net_General_Info, other_net_derivs_interface
-   use colors_def, only: max_num_color_files, max_num_bcs_per_file
+   use colors_def, only: Colors_General_Info
    use auto_diff, only: auto_diff_real_star_order1
    use star_pgstar, only: pgstar_controls
 
@@ -53,6 +53,7 @@ module star_data_def
       integer :: eos_handle
       integer :: kap_handle
       integer :: net_handle
+      integer :: colors_handle
 
       ! star id
       integer :: id  ! unique identifier for each star_info instance

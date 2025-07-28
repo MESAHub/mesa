@@ -43,6 +43,7 @@ Module defaults
 
    reference/eos
    reference/kap
+   reference/colors
 
 Hooks
 =====

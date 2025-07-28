@@ -401,7 +401,6 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
          use colors_lib, only : colors_init
          use kap_lib, only: kap_init
@@ -425,9 +424,6 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
-         integer, intent(in) :: color_num_files
-         character (len=*), intent(in) :: color_file_names(:)
-         integer, intent(in) :: color_num_colors(:)
          real(dp), intent(in) :: reaclib_min_T9_in
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          integer, intent(out) :: ierr
@@ -465,15 +461,15 @@
          call chem_init(chem_isotopes_filename, ierr)
          if (ierr /= 0) return
 
+         ! TODO: implement caching for colors
          if (dbg) write(*,*) 'call colors_init'
-         call colors_init(color_num_files,color_file_names,color_num_colors,ierr)
+         call colors_init(.false., '', ierr)
          if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call eos_init'
          !write(*,*) 'eos_file_prefix "' // trim(eos_file_prefix) // '"'
          !write(*,*) 'eosDT_cache_dir "' // trim(eosDT_cache_dir) // '"'
-         call eos_init( &
-            eosDT_cache_dir, use_cache, ierr)
+         call eos_init(eosDT_cache_dir, use_cache, ierr)
          if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call kap_init'

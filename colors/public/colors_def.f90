@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2025  Niall Miller & The MESA Team
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU Lesser General Public License
@@ -17,99 +17,119 @@
 !
 ! ***********************************************************************
 
-      module colors_def
-      use const_def, only : strlen, dp
-      implicit none
+module colors_def
 
-      !Public constants for use by clients
-      !Have we called colors_init yet?
-      logical :: color_is_initialized=.false.
+   use const_def, only: dp
 
-      integer, parameter :: max_num_color_files=10
-      integer, parameter :: max_num_bcs_per_file=20
-      integer :: bc_total_num_colors
+   implicit none
 
-      ! color indices are differences in magnitudes in different wavelength bands
-      ! as a reminder for non-experts like myself, here's how it goes
-      !
-      ! msun := apparent magnitude of sun is -26.81
-      ! Fsun := solar flux at 1AU is 1.36e6 erg/s/cm^2
-      !
-      ! "apparent magnitude" m of star with flux F is m = msun - 2.5 log10(F/Fsun)
-      ! "absolute magnitude" M for star of apparent magnitude m at distance d is M = m - 5 log(d/d0)
-      !     where the standard distance d0 is 10pc.
-      !     i.e., absolute magnitude is what the apparent magnitude would be if star were at 10 parsecs.
-      !
-      ! thus absolute magnitude of sun is about 4.75
-      !
-      ! "bolometric magnitude" = absolute magnitude using flux integrated over all wavelengths
-      !     can be derived from the current stellar luminosity using the equation
-      !     log(Lstar/Lsun) = (Mbol_sun - Mbol_star)/2.5 using Mbol_sun = 4.75 (LCB)
-      !
-      ! "visual magnitude" = absolute magnitude only using flux in visible wavelengths
-      !      more precisely, this is magnitude as measured with filter centered at 5500A, 890A width.
-      !
-      ! "bolometric correction" = bolometric magnitude minus visual magnitude
-      !      for the sun, the bolometric correction is about -0.11
-      !      thus visual magnitude of sun is about 4.86 = Mbol_sun - BC_sun = 4.75 - (-0.11)
-      !
-      ! in order of increasing wavelength, the "color" magnitudes are as follows:
-      !
-      ! "U" is the ultraviolet magnitude, center at 365nm.
-      ! "B" is the        blue magnitude, center at 440nm.
-      ! "V" is the      visual magnitude, center at 550nm.
-      ! "R" is the         red magnitude, center at 600nm.
-      ! "I" is the   infra-red magnitude, center at 800nm.
+   ! Make everything in this module public by default
+   public
 
-      ! in addition, longer wavelength "colors" have been defined as well
-      ! by order of increasing wavelength, these are J, H, K, L, and M.
+   ! Colors Module control parameters
+   type :: Colors_General_Info
+      character(len=256) :: instrument
+      character(len=256) :: vega_sed
+      character(len=256) :: stellar_atm
+      character(len=256) :: colors_results_directory
+      real(dp) :: metallicity
+      real(dp) :: distance
+      logical :: make_csv
+      logical :: use_colors
+      ! bookkeeping
+      integer :: handle
+      logical :: in_use
+   end type Colors_General_Info
 
-      ! "color index" is the difference between 2 color magnitudes
-      ! for example, B-V is colors_B - colors_V
-      ! smaller B-V means larger brightness in blue band compared to visual band, means bluer star.
+   ! TODO: Use handles/caching in the future once we have more colors tables
+   ! For now, we will just point to a single file
+   integer :: num_color_filters
+   character(len=100), allocatable :: color_filter_names(:)
 
+   integer, parameter :: max_colors_handles = 10
+   type(Colors_General_Info), target :: colors_handles(max_colors_handles)
 
-      ! color magnitude data from Lejeune, Cuisinier, Buser (1998) A&AS 130, 65-75. [LCB]
-      ! the coverage is approximately Teff from 50,000K to 2000K, log g 5.5 to -1.02, [Fe/H} 1.0 to -5.0
-      !
-      ! but not all combination of these are actually represented in the tables.
-      ! the current implementation limits the given arguments to the actual range in the tables.
-      ! and it does a simple linear interpolation between tabulated values.
+   logical :: colors_is_initialized = .false.
 
-      ! BTW: they use [Fe/H] as a parameter;
-      ! the evolution code uses log10(Z/Zsun) as an approximation for this.
+   character(len=1000) :: colors_dir, colors_cache_dir, colors_temp_cache_dir
+   logical :: colors_use_cache = .true.
 
-      ! THE FOLLOWING ARE PRIVATE DEFS -- NOT FOR USE BY CLIENTS
+contains
 
-      type :: lgz_list  ! sorted in decreasing order of lgz ([M/H])
-         real(dp) :: lgz  ! [Fe_H]
-         type (lgz_list), pointer :: nxt => null()
-         real(dp),dimension(max_num_bcs_per_file) :: colors = -1d99
-      end type lgz_list
+   subroutine colors_def_init(colors_cache_dir_in)
+      use utils_lib, only: mkdir
+      use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir, use_mesa_temp_cache
+      character(*), intent(in) :: colors_cache_dir_in
+      integer :: i
 
-      type :: lgt_list  ! sorted in decreasing order of lgt
-         real(dp) :: lgt  ! logTeff
-         integer :: n_colors
-         type (lgt_list), pointer :: nxt => null()
-         type (lgg_list), pointer :: glist => null()
-      end type lgt_list
+      if (len_trim(colors_cache_dir_in) > 0) then
+         colors_cache_dir = colors_cache_dir_in
+      else if (len_trim(mesa_caches_dir) > 0) then
+         colors_cache_dir = trim(mesa_caches_dir)//'/colors_cache'
+      else
+         colors_cache_dir = trim(mesa_data_dir)//'/colors_data/cache'
+      end if
+      call mkdir(colors_cache_dir)
 
-      type :: lgg_list  ! sorted in decreasing order of lgg
-         real(dp) :: lgg  ! log g
-         type (lgg_list), pointer :: nxt => null()
-         type (lgz_list), pointer :: zlist => null()
-      end type lgg_list
+      do i = 1, max_colors_handles
+         colors_handles(i)%handle = i
+         colors_handles(i)%in_use = .false.
+      end do
 
-      type :: col_list
-         !Main data store
-         type(lgt_list), pointer :: thead => null()
-         CHARACTER(len=strlen),dimension(max_num_bcs_per_file) :: color_names
-         integer :: n_colors
-      end type col_list
+      colors_temp_cache_dir = trim(mesa_temp_caches_dir)//'/colors_cache'
+      if (use_mesa_temp_cache) call mkdir(colors_temp_cache_dir)
 
-      integer :: num_thead
-      type (col_list),dimension(:),pointer :: thead_all => null()
+   end subroutine colors_def_init
 
+   integer function do_alloc_colors(ierr)
+      integer, intent(out) :: ierr
+      integer :: i
+      ierr = 0
+      do_alloc_colors = -1
+      !$omp critical (colors_handle)
+      do i = 1, max_colors_handles
+         if (.not. colors_handles(i)%in_use) then
+            colors_handles(i)%in_use = .true.
+            do_alloc_colors = i
+            exit
+         end if
+      end do
+      !$omp end critical (colors_handle)
+      if (do_alloc_colors == -1) then
+         ierr = -1
+         return
+      end if
+      if (colors_handles(do_alloc_colors)%handle /= do_alloc_colors) then
+         ierr = -1
+         return
+      end if
+   end function do_alloc_colors
 
-      end module colors_def
+   subroutine do_free_colors(handle)
+      integer, intent(in) :: handle
+      if (handle >= 1 .and. handle <= max_colors_handles) &
+         colors_handles(handle)%in_use = .false.
+   end subroutine do_free_colors
 
+   subroutine get_colors_ptr(handle, rq, ierr)
+      integer, intent(in) :: handle
+      type(Colors_General_Info), pointer, intent(out) :: rq
+      integer, intent(out):: ierr
+      if (handle < 1 .or. handle > max_colors_handles) then
+         ierr = -1
+         return
+      end if
+      rq => colors_handles(handle)
+      ierr = 0
+   end subroutine get_colors_ptr
+
+   subroutine do_free_colors_tables
+
+      ! TODO: implement me if needed, see kap
+
+      ! for now, free the strings tables
+      if (allocated(color_filter_names)) deallocate (color_filter_names)
+
+   end subroutine do_free_colors_tables
+
+end module colors_def

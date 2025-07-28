@@ -9,6 +9,7 @@ DEFAULTS_FILES = (
     "reference/astero_pgstar",
     "eos/defaults",
     "kap/defaults",
+    "colors/defaults",
     "reference/binary_job",
     "reference/binary_controls",
     "reference/pgbinary",
@@ -20,6 +21,7 @@ DEFAULTS_FILES = (
     "reference/controls_dev",
     "reference/eos",
     "reference/kap",
+    "reference/colors",
 )
 
 
