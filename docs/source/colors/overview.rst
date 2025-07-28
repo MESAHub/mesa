@@ -10,7 +10,6 @@ The colors module is controlled via the ``&colors`` namelist with key options:
 - ``instrument``: Path to filter system directory
 - ``stellar_atm``: Path to stellar atmosphere model grid
 - ``vega_sed``: Vega spectrum for photometric zero points
-- ``metallicity``: Metallicity of the star
 - ``distance``: Distance to the star in cm
 - ``make_csv``: Output detailed spectral energy distributions
 - ``colors_results_directory``: Directory for output files
