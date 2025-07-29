@@ -31,6 +31,9 @@ Renamed pgstar ``pause``` option to ``pause_flag``` because pause is a reserved 
 New Features
 ------------
 
+The default ``overshoot_D_min = 1d2`` has been changed to ``overshoot_D_min = 1d-2``. This change primarily affects
+exponential diffusive overshooting routines, improving their convergence properties. See `Buchele et al. (2025) <https://ui.adsabs.harvard.edu/abs/2025RNAAS...9..193B/abstract>`_.
+
 Changed the default for ``use_radiation_corrected_transfer_rate =
 .false.``.
 
