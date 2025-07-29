@@ -79,6 +79,8 @@ Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to c
 
 Fixed bug in binary photos. They were not saving the variables: ``CE_years_detached``, ``CE_years_detached_old``, ``generations``.
 
+Fixed bug that ``Orbit_win_flag = .true.`` was not showing Orbit plot (pgbinary)
+
 Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
 
