@@ -365,10 +365,10 @@ contains
             if (columns(logg_col) /= "") then
                read (columns(logg_col), *) out_logg(i)
             else
-               out_logg(i) = 0.0
+               out_logg(i) = -999.0
             end if
          else
-            out_logg(i) = 0.0
+            out_logg(i) = -999.0
          end if
 
          if (meta_col > 0) then

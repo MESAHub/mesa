@@ -98,7 +98,7 @@ contains
 
             filter_filepath = trim(filter_dir)//"/"//color_filter_names(i)
 
-            if (t_eff >= 0 .and. log_g >= 0 .and. metallicity >= 0) then
+            if (t_eff >= 0 .and. metallicity >= 0) then
                vals(i + filter_offset) = calculate_synthetic(t_eff, log_g, metallicity, ierr, &
                                                              wavelengths, fluxes, filter_wavelengths, filter_trans, &
                                                              filter_filepath, vega_filepath, color_filter_names(i), &

@@ -63,12 +63,6 @@ contains
       ! Load filter data
       call load_filter(filter_filepath, filter_wavelengths, filter_trans)
 
-      ! Check for invalid gravity input
-      if (gravity <= 0.0_dp) then
-         ierr = 1
-         calculate_synthetic = -1.0_dp
-         return
-      end if
 
       ! Perform SED convolution
       allocate (convolved_flux(size(wavelengths)))
