@@ -24,6 +24,15 @@
 
 / ! end of controls namelist
 
+
+
+&colors
+   read_extra_colors_inlist(1) = .true.
+   extra_colors_inlist_name(1) = 'inlist_rsp_common'
+/ ! end of colors namelist
+
+
+
 &controls
 
    read_extra_controls_inlist(1) = .true.
