@@ -883,7 +883,7 @@
         ierr = 0
         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
         if (k == 0) then
-            Eq_face = 0d0
+            Eq_face = compute_Eq_cell(s, k, ierr)
         else
             Eq_face = alfa*compute_Eq_cell(s, k, ierr) + beta*compute_Eq_cell(s, k-1, ierr) ! should it be k and k+1?
         end if
