@@ -35,7 +35,7 @@
          compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
          Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_etrb_start_vars, &
          RSP2_adjust_vars_before_call_solver, get_RSP2_alfa_beta_face_weights, &
-         set_viscosity_vars_TDC
+         set_viscosity_vars_TDC, compute_Eq_face
 
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &  ! Ptrb
@@ -873,6 +873,22 @@
          s% Eq_ad(k) = Eq_cell
       end function compute_Eq_cell
 
+     function compute_Eq_face(s,k,ierr) result(Eq_face)
+        type (star_info), pointer :: s
+        integer, intent(in) :: k
+        integer, intent(out) :: ierr
+        type(auto_diff_real_star_order1) :: Eq_face
+        real(dp) :: alfa, beta
+        include 'formats'
+        ierr = 0
+        call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+        if (k == 0) then
+            Eq_face = 0d0
+        else
+            Eq_face = alfa*compute_Eq_cell(s, k, ierr) + beta*compute_Eq_cell(s, k-1, ierr) ! should it be k and k+1?
+        end if
+        if (ierr /= 0) return
+     end function compute_Eq_face
 
       function compute_Uq_face(s, k, ierr) result(Uq_face)  ! cm s^-2, acceleration
          type (star_info), pointer :: s
