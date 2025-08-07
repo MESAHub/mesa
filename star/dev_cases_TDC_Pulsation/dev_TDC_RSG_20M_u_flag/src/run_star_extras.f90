@@ -90,6 +90,7 @@
          s% other_adjust_mdot => my_adjust_mdot
          s% other_before_struct_burn_mix => my_before_struct_burn_mix
          s% other_kap_get => my_other_kap_get
+         s% other_alpha_mlt => alpha_mlt_routine
 
          ! store user provided options from the inlist
 
@@ -104,6 +105,40 @@
          remove_core = s% x_logical_ctrl(25)
          core_T_for_cut = s% x_ctrl(14)
       end subroutine extras_controls
+
+
+        subroutine alpha_mlt_routine(id, ierr)
+        use chem_def, only: ih1
+        integer, intent(in) :: id
+        integer, intent(out) :: ierr
+        type (star_info), pointer :: s
+        integer :: k, h1
+        real(dp) :: alpha_H, alpha_other, H_limit
+        include 'formats'
+        ierr = 0
+        call star_ptr(id, s, ierr)
+        if (ierr /= 0) return
+        alpha_H = s% x_ctrl(21)
+        alpha_other = s% x_ctrl(22)
+        H_limit = s% x_ctrl(23)
+        h1 = s% net_iso(ih1)
+        !write(*,1) 'alpha_H', alpha_H
+        !write(*,1) 'alpha_other', alpha_other
+        !write(*,1) 'H_limit', H_limit
+        !write(*,2) 'h1', h1
+        !write(*,2) 's% nz', s% nz
+        if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
+        do k=1,s% nz
+        if (s% xa(h1,k) >= H_limit) then
+        s% alpha_mlt(k) = alpha_H
+        else
+        s% alpha_mlt(k) = alpha_other
+        end if
+        !write(*,2) 'alpha_mlt', k, s% alpha_mlt(k),
+        end do
+        !stop
+        end subroutine alpha_mlt_routine
+
 
       subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
          use star_def
@@ -537,6 +572,14 @@
          end if
 
          call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
+
+        ! add stopping condition for testing.
+        if ((.not. in_inlist_pulses) .and. s% center_h1 < 1d-1) then
+            s% Teff_lower_limit = exp10(3.5563d0) ! joyce et al. 2020.
+            !write(*,*) 'stopping because have reached ~ 3600 K Teff for Betelgeuse'
+        else
+            s% Teff_lower_limit = -1d99
+        end if
 
          extras_start_step = keep_going
       end function extras_start_step

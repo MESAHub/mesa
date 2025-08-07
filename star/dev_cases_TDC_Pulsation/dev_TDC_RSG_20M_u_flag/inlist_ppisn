@@ -128,6 +128,11 @@
       alpha_TDC_DAMPM = 0.25d0
       steps_before_use_TDC = 0
 
+      use_other_alpha_mlt = .true. ! implemented in run_star_extras
+      x_ctrl(21) = 3.0 ! alpha_H
+      x_ctrl(22) = 1.5 ! alpha_other
+      x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
+
     use_ledoux_criterion = .true.
     mixing_length_alpha = 1.5d0
     alpha_semiconvection = 1d0

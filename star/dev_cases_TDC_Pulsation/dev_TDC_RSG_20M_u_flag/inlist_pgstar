@@ -589,8 +589,8 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
     History_Panels1_title = ''
 
-    History_Panels1_xaxis_name = 'model_number'!'model_number'
-    History_Panels1_max_width = 2000! 10000
+    History_Panels1_xaxis_name = 'day'!'model_number'
+    History_Panels1_max_width = 1000! 10000
 
     !History_Panels1_xaxis_name = 'star_age'
     !History_Panels1_max_width = 10
