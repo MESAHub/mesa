@@ -881,10 +881,10 @@
         real(dp) :: alfa, beta
         include 'formats'
         ierr = 0
-        call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-        if (k == 0) then
-            Eq_face = compute_Eq_cell(s, k, ierr)
+        if (k == 1) then
+            Eq_face = 0d0
         else
+            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
             Eq_face = alfa*compute_Eq_cell(s, k, ierr) + beta*compute_Eq_cell(s, k-1, ierr) ! should it be k and k+1?
         end if
         if (ierr /= 0) return

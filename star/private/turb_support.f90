@@ -225,12 +225,12 @@ contains
          if (using_TDC .and. s% alpha_TDC_DampM > 0) then
            if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
                if (s% mlt_vc_old(k) > 0) then ! calculate using mlt_vc from previous timestep.
-                   check_Eq = compute_Eq_face(s,k,ierr) !compute_Eq_cell(s, k, ierr)
+                   check_Eq = compute_Eq_cell(s, k, ierr)
                    Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3)
                end if
            else ! if mlt_vc_old is not set, i.e. when building a new model.
                if (s% mlt_vc(k) > 0) then ! calculate using mlt_vc from current timestep.
-                   check_Eq = compute_Eq_face(s,k,ierr) !compute_Eq_cell(s, k, ierr)
+                   check_Eq = compute_Eq_cell(s, k, ierr)
                    Eq_div_w = check_Eq/(s% mlt_vc(k)/sqrt_2_div_3)
                end if
            end if
