@@ -492,19 +492,38 @@
 
       end subroutine eval_mdot_edd
 
+      ! switch donor and accretor pointers
+      subroutine switch_donor(b)
+         type (binary_info), pointer :: b
+
+         if (b% d_i == 2) then
+            b% d_i = 1
+            b% a_i = 2
+            b% s_donor => b% s1
+            b% s_accretor => b% s2
+         else
+            b% d_i = 2
+            b% a_i = 1
+            b% s_donor => b% s2
+            b% s_accretor => b% s1
+         end if
+      end subroutine switch_donor
+
       subroutine adjust_mdots(b)
          use binary_wind, only: eval_wind_xfer_fractions
          type (binary_info), pointer :: b
 
-         real(dp) :: actual_mtransfer_rate
+         real(dp) :: actual_mtransfer_rate, mdot_donor, mdot_acc
          integer :: ierr
+
+         include 'formats'
 
          actual_mtransfer_rate = 0d0
 
          if (b% use_other_adjust_mdots) then
             call b% other_adjust_mdots(b% binary_id, ierr)
             if (ierr /= 0) then
-               write(*,*) "Error in other_adjust_mdots"
+               write(*, 1) "Error in other_adjust_mdots"
                stop
             end if
             return
@@ -523,7 +542,7 @@
          call Tout_enhance_wind(b, b% s_donor)
          if (b% point_mass_i == 0) then
             ! do not repeat if using the implicit wind
-            if (.not. (b% num_tries >0 .and. b% s_accretor% was_in_implicit_wind_limit)) &
+            if (.not. (b% num_tries > 0 .and. b% s_accretor% was_in_implicit_wind_limit)) &
                call Tout_enhance_wind(b, b% s_accretor)
          end if
 
@@ -533,7 +552,7 @@
          ! accretor.
          call eval_wind_xfer_fractions(b% binary_id, ierr)
          if (ierr/=0) then
-            write(*,*) "Error in eval_wind_xfer_fractions"
+            write(*, 1) "Error in eval_wind_xfer_fractions"
             return
          end if
          b% mdot_wind_transfer(b% d_i) = b% s_donor% mstar_dot * &
@@ -545,20 +564,37 @@
             b% mdot_wind_transfer(b% a_i) = 0d0
          end if
 
-         ! Set mdot for the donor
+         ! compute total mdots in current configuration
+         mdot_donor = b% s_donor% mstar_dot + b% mtransfer_rate - &
+            b% mdot_wind_transfer(b% a_i)
+         if (b% point_mass_i == 0) then
+            mdot_acc = b% s_accretor% mstar_dot - &
+                  b% mtransfer_rate*b% fixed_xfer_fraction - b% mdot_wind_transfer(b% d_i)
+         else
+            mdot_acc = -b% mtransfer_rate*b% fixed_xfer_fraction - b% mdot_wind_transfer(b% d_i)
+         end if
+
+         ! if accretor ended up losing mass while the donor is gaining it, switch donor.\\
+         ! this is likely due to wind-mass transfer, b% mtransfer_rate is probably low
+         ! we do not switch the sign of mtransfer rate here.
+         if (mdot_donor > 0d0 .and. mdot_acc < 0d0) then
+            if (b% report_rlo_solver_progress) write(*, 1) "adjust_mdots: switching donor due to accreting donor and donating accretor"
+            call switch_donor(b)
+         end if
+
+         ! now set mdot for the (possibly new) donor
          b% s_donor% mstar_dot = b% s_donor% mstar_dot + b% mtransfer_rate - &
             b% mdot_wind_transfer(b% a_i)
 
          ! Set mdot for the accretor
          if (b% point_mass_i == 0 .and. .not. b% CE_flag) then
             ! do not repeat if using the implicit wind
-            if (.not. (b% num_tries >0 .and. b% s_accretor% was_in_implicit_wind_limit)) then
+            if (.not. (b% num_tries > 0 .and. b% s_accretor% was_in_implicit_wind_limit)) then
                b% accretion_mode = 0
                b% acc_am_div_kep_am = 0.0d0
                b% s_accretor% mstar_dot = b% s_accretor% mstar_dot - &
                   b% mtransfer_rate*b% fixed_xfer_fraction - b% mdot_wind_transfer(b% d_i)
 
-               !set angular momentum accretion as described in A.3.3 of de Mink et al. 2013
                if (b% do_j_accretion) then
                   if (.not. b% use_other_accreted_material_j) then
                      call eval_accreted_material_j(b% binary_id, ierr)
@@ -566,7 +602,7 @@
                      call b% other_accreted_material_j(b% binary_id, ierr)
                   end if
                   if (ierr /= 0) then
-                     write(*,*) 'error in accreted_material_j'
+                     write(*, 1) 'error in accreted_material_j'
                      return
                   end if
                end if
@@ -947,11 +983,12 @@
 
       end subroutine get_info_for_kolb_eccentric
 
+      !Angular momentum accretion as described in A.3.3 of de Mink et al. 2013
       subroutine eval_accreted_material_j(binary_id, ierr)
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type(binary_info), pointer :: b
-         real(dp) :: qratio, min_r
+         real(dp) :: q, min_r
          logical, parameter :: dbg = .false.
          include 'formats'
 
@@ -961,27 +998,25 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         qratio = b% m(b% a_i) / b% m(b% d_i)
-         qratio = min(max(qratio,0.0667d0),15d0)
-         min_r = 0.0425d0*b% separation*pow(qratio+qratio*qratio, 0.25d0)
 
-         !TODO: MUST USE EQUATORIAL RADIUS
-         if (dbg) write(*,*) "radius, impact_radius, separation: ", &
+         ! minimum approach of the gas stream from Ulrich & Burger, 1976, ApJ 206:509-514
+         q = b% m(b% a_i) / b% m(b% d_i)
+         q = min(max(q, 0.0667d0), 15d0)
+         min_r = 0.0425d0 * b% separation * pow(q + q * q, 0.25d0)
+
+         if (dbg) write(*, *) "radius, impact_radius, separation: ", &
              b% r(b% a_i), min_r/rsun, b% separation/rsun
-         if (b% r(b% a_i) < min_r) then
+         if (b% r(b% a_i) < min_r) then  ! accretion through disk; inner rim has j = sqrt(GMR)
             b% accretion_mode = 2
             b% s_accretor% accreted_material_j = &
                sqrt(standard_cgrav * b% m(b% a_i) * b% r(b% a_i))
-         else
+         else                             ! direct impact; stream has j \approx sqrt(GM * 1.7 Rmin)
             b% accretion_mode = 1
             b% s_accretor% accreted_material_j = &
                sqrt(standard_cgrav * b% m(b% a_i) * 1.7d0*min_r)
          end if
          b% acc_am_div_kep_am = b% s_accretor% accreted_material_j / &
              sqrt(standard_cgrav * b% m(b% a_i) * b% r(b% a_i))
-
-          !TODO: when using wind mass transfer donor star can end up
-          ! with positive mdot, need to properly set jdot in that case
 
       end subroutine eval_accreted_material_j
 
