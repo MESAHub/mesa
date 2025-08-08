@@ -80,14 +80,15 @@ contains
    end subroutine check_efficient_MLT_scaling
 
    subroutine compare_TDC_and_Cox_MLT()
-      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, L_start
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma, Eq_div_w
       real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
+
       character(len=3) :: MLT_option
       integer :: mixing_type, ierr, tdc_num_iters
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC, time_center_L
 
       include 'formats'
 
@@ -129,7 +130,11 @@ contains
       conv_vel_start = 0d0  !1d10
       scale = L%val*1d-3
       report = .false.
-      dt = 1d40  ! Long time-step so we get into equilibrium
+      dt = 1d40 ! Long time-step so we get into equilibrium
+      Eq_div_w = 0d0
+      include_mlt_corr_to_TDC = .true.
+      time_center_L = .false.
+      L_start = 0d0
 
       ! MLT
       MLT_option = 'Cox'
@@ -141,7 +146,8 @@ contains
       call set_TDC( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
+         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, time_center_L, ierr)
+
 
       write (*, 1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel%val, dt
 
@@ -156,12 +162,12 @@ contains
 
    subroutine check_TDC()
       real(dp) :: mixing_length_alpha, conv_vel_start
-      real(dp) :: alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
+      real(dp) :: alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel, L_start
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Eq_div_w, grav
       integer :: mixing_type, ierr, tdc_num_iters
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC, time_center_L
       integer :: j
 
       include 'formats'
@@ -194,7 +200,13 @@ contains
       report = .false.
       chiT = 1d0
       chiRho = 1d0
-      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*cgrav*m)
+
+      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * cgrav * m)
+      grav = m * cgrav / pow2(r)
+      Eq_div_w = 0d0
+      include_mlt_corr_to_TDC = .true.
+      time_center_L = .false.
+      L_start = 0d0
 
       write (*, *) "####################################"
       write (*, *) "Running dt test"
@@ -204,7 +216,9 @@ contains
          call set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, &
+                time_center_L, ierr)
+
 
          write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
          if (report) stop

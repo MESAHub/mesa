@@ -418,6 +418,7 @@
          logical :: use_momentum_outer_BC
          logical :: use_zero_Pgas_outer_BC
          logical :: use_fixed_vsurf_outer_BC
+         logical :: use_RSP_L_eqn_outer_BC
          real(dp) :: fixed_vsurf
          logical :: use_fixed_Psurf_outer_BC
          real(dp) :: fixed_Psurf
@@ -593,8 +594,10 @@
 
          real(dp) :: max_center_cell_dq
          real(dp) :: max_surface_cell_dq
+         real(dp) :: min_surface_cell_dq
          integer :: max_num_subcells
          integer :: max_num_merge_cells
+         integer :: max_num_merge_surface_cells
 
 
          character (len=iso_name_length) :: mesh_logX_species(num_mesh_logX)
@@ -682,10 +685,14 @@
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
+            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff, &
+            merge_amr_logT_for_ignore_core_cells, split_amr_logT_for_ignore_core_cells
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells
+         logical :: merge_amr_ignore_core_cells
+         logical :: split_amr_ignore_core_cells
+
          logical :: merge_amr_du_div_cs_limit_only_for_compression
 
          logical :: split_merge_amr_avoid_repeated_remesh
