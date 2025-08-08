@@ -1004,6 +1004,7 @@
          q = min(max(q, 0.0667d0), 15d0)
          min_r = 0.0425d0 * b% separation * pow(q + q * q, 0.25d0)
 
+         !TODO: find an appropriate way to define an "equatorial radius" in a binary
          if (dbg) write(*, *) "radius, impact_radius, separation: ", &
              b% r(b% a_i), min_r/rsun, b% separation/rsun
          if (b% r(b% a_i) < min_r) then  ! accretion through disk; inner rim has j = sqrt(GMR)
