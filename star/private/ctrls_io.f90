@@ -110,6 +110,7 @@
     TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
     make_mlt_hydrodynamic, include_mlt_corr_to_TDC, TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
+    TDC_pulse_use_mass_interp_face_values, TDC_pulse_nz, TDC_pulse_nz_outer, TDC_pulse_T_anchor, TDC_pulse_dq_1_factor, &
 
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -2091,6 +2092,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
+ s% TDC_pulse_use_mass_interp_face_values = TDC_pulse_use_mass_interp_face_values
+ s% TDC_pulse_nz = TDC_pulse_nz
+ s% TDC_pulse_nz_outer = TDC_pulse_nz_outer
+ s% TDC_pulse_T_anchor = TDC_pulse_T_anchor
+ s% TDC_pulse_dq_1_factor = TDC_pulse_dq_1_factor
 
  s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
 
@@ -3794,6 +3800,11 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
+ TDC_pulse_use_mass_interp_face_values = s% TDC_pulse_use_mass_interp_face_values
+ TDC_pulse_nz = s% TDC_pulse_nz
+ TDC_pulse_nz_outer = s% TDC_pulse_nz_outer
+ TDC_pulse_T_anchor = s% TDC_pulse_T_anchor
+ TDC_pulse_dq_1_factor = s% TDC_pulse_dq_1_factor
 
  remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning
 

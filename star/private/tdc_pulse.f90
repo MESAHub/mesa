@@ -381,7 +381,7 @@ contains
       real(dp), intent(out) :: alfa, beta
       ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
       if (k == 1) call mesa_error(__FILE__, __LINE__, 'bad k==1 for get_RSP2_alfa_beta_face_weights')
-      if (s%RSP2_use_mass_interp_face_values) then
+      if (s%TDC_pulse_use_mass_interp_face_values) then
          alfa = s%dq(k - 1)/(s%dq(k - 1) + s%dq(k))
          beta = 1d0 - alfa
       else

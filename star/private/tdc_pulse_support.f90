@@ -36,10 +36,10 @@ contains
 
    subroutine remesh_for_TDC_pulsations(s, ierr)
       ! uses these controls
-      !  RSP2_nz = 150
-      !  RSP2_nz_outer = 40
-      !  RSP2_T_anchor = 11d3
-      !  RSP2_dq_1_factor = 2d0
+      !  TDC_pulse_nz = 150
+      !  TDC_pulse_nz_outer = 40
+      !  TDC_pulse_T_anchor = 11d3
+      !  TDC_pulse_dq_1_factor = 2d0
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
       type(star_info), pointer :: s
@@ -53,7 +53,7 @@ contains
       include 'formats'
       ierr = 0
       nz_old = s%nz
-      nz = s%RSP2_nz
+      nz = s%TDC_pulse_nz
       if (nz == nz_old) return  ! assume have already done remesh for RSP2
       if (nz > nz_old) call mesa_error(__FILE__, __LINE__, 'remesh_for_RSP2 cannot increase nz')
       call setvars2(ierr)
@@ -206,9 +206,9 @@ contains
       subroutine find_xm_anchor2
          real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
          include 'formats'
-         lnT_anchor = log(s%RSP2_T_anchor)
+         lnT_anchor = log(s%TDC_pulse_T_anchor)
          if (lnT_anchor <= s%xh(s%i_lnT, 1)) then
-            write (*, 1) 'T_anchor < T_surf', s%RSP2_T_anchor, exp(s%xh(s%i_lnT, 1))
+            write (*, 1) 'T_anchor < T_surf', s%TDC_pulse_T_anchor, exp(s%xh(s%i_lnT, 1))
             call mesa_error(__FILE__, __LINE__, 'find_xm_anchor')
          end if
          xm_anchor = xm_old(nz_old)
@@ -241,8 +241,8 @@ contains
 
          integer :: iter
          include 'formats'
-         nz_outer = s%RSP2_nz_outer
-         dq_1_factor = s%RSP2_dq_1_factor
+         nz_outer = s%TDC_pulse_nz_outer
+         dq_1_factor = s%TDC_pulse_dq_1_factor
          dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
          !write(*,2) 'dxm_outer', nz_outer, dxm_outer, xm_anchor
          xm(1) = 0d0

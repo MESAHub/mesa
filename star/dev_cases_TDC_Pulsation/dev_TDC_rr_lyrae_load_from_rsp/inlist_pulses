@@ -89,11 +89,11 @@ new_RSP_flag = .false.
 
    ! new rsp style meshing, thanks to Bill P.
    x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC 
-   RSP2_use_mass_interp_face_values = .true.
-   RSP2_nz = 150 
-   RSP2_nz_outer = 40 
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
+   TDC_pulse_use_mass_interp_face_values = .true.
+   TDC_pulse_nz = 150 
+   TDC_pulse_nz_outer = 40 
+   TDC_pulse_T_anchor = 11d3
+   TDC_pulse_dq_1_factor = 2d0
    remesh_for_TDC_pulsations_log_core_zoning = .false. ! .false means do rsp style core
 
 
