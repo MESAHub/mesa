@@ -571,7 +571,7 @@ contains
       include 'formats'
       ierr = 0
       dbg = .false.
-      
+
       if (k >1) then
          v_00 = 0.5d0 * (wrap_v_00(s, k) + wrap_v_m1(s, k))
       else
