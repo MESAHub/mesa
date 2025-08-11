@@ -268,7 +268,7 @@
 
             if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation) then
-                Eq_ad = s% Eq_ad(k) !compute_tdc_Eq_cell(s, k, ierr)
+                Eq_ad = compute_tdc_Eq_cell(s, k, ierr)
                 !if (k==91) then
                 !write(*,*) 'test Eq, k', Eq_ad %val , k
                 !end if
