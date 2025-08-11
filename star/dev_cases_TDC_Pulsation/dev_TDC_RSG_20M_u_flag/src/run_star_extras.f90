@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -37,7 +37,7 @@
       use interp_1d_lib, only: interp_pm, interp_values, interp_value
 
       implicit none
-      
+
       include "test_suite_extras_def.inc"
       include 'run_star_extras_TDC_pulsation_defs.inc'
 
@@ -59,7 +59,7 @@
       include "test_suite_extras.inc"
       include 'run_star_extras_TDC_pulsation.inc'
 
-      
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -67,7 +67,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% extras_startup => extras_startup
          s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
@@ -223,7 +223,7 @@
                   alfa = (T1 - (Teff_jump - dT)) / (2*dT)
                end if
             end if
-            
+
             if (alfa > 0) then ! eval hot side wind (eqn 24)
                vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
                vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
@@ -239,7 +239,7 @@
             else
                w1 = 0
             end if
-            
+
             if (alfa < 1) then ! eval cool side wind (eqn 25)
                vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
                vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
@@ -254,9 +254,9 @@
             else
                w2 = 0
             end if
-            
+
             w = alfa*w1 + (1 - alfa)*w2
-            
+
          end subroutine eval_Vink_wind
 
          subroutine eval_Nieuwenhuijzen_wind(w)
@@ -285,7 +285,7 @@
          end subroutine eval_Hamann_wind
 
       end subroutine brott_wind
-      
+
       subroutine my_adjust_mdot(id, ierr)
          use star_def
          integer, intent(in) :: id
@@ -315,15 +315,15 @@
 
          use kap_def, only: num_kap_fracs
          use kap_lib
- 
+
          ! INPUT
          integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+         integer, intent(in) :: k ! cell number or 0 if not for a particular cell
          integer, intent(in) :: handle ! from alloc_kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
+            ! value is between 1 and num_chem_isos
          integer, pointer :: net_iso(:) ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
@@ -353,7 +353,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-                  
+
          kap = 0; dln_kap_dlnRho = 0; dln_kap_dlnT = 0; dln_kap_dxa = 0
          velocity = 0
          radius = 0
@@ -441,8 +441,8 @@
             call remesh_for_TDC_pulsation(id, ierr)
          end if
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -457,7 +457,7 @@
          if (.not. s% x_logical_ctrl(37)) return
          call final()
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -469,7 +469,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
 
 
       end function extras_check_model
@@ -484,8 +484,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = TDC_pulsation_how_many_extra_history_columns(id)
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -499,7 +499,7 @@
          call TDC_pulsation_data_for_extra_history_columns(id, n, names, vals, ierr)
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -511,8 +511,8 @@
 !         how_many_extra_profile_columns = TDC_pulsation_how_many_extra_profile_columns(id)
          how_many_extra_profile_columns = 1!how_many_extra_profile_columns +1
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -532,7 +532,7 @@
             /(clight * s% Prad(k) *3._dp)
          end do
       end subroutine data_for_extra_profile_columns
-      
+
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
@@ -583,7 +583,7 @@
 
          extras_start_step = keep_going
       end function extras_start_step
-   
+
       subroutine my_before_struct_burn_mix(id, dt, res)
          use const_def, only: dp
          use star_def
@@ -615,7 +615,7 @@
 !
 !            !s% atm_T_tau_errtol = 1d-12
 !            !s% atm_T_tau_max_iters = 500
-  
+
          if (in_inlist_pulses) then
             if (s% model_number > timestep_drop_model_number )then
                  s% max_timestep = max_dt_during_pulse
@@ -643,7 +643,7 @@
          !               write (*,*) 's% mesh_min_k_old_for_split', s% mesh_min_k_old_for_split
             end if
          end if
-         
+
          ! adjust convection near surface to prevent crazy issues:
 
 !         do k = 1, s% nz
@@ -659,7 +659,7 @@
 
          res = keep_going
       end subroutine my_before_struct_burn_mix
-      
+
       subroutine null_binary_controls(id, binary_id, ierr)
          integer, intent(in) :: id, binary_id
          integer, intent(out) :: ierr
@@ -856,4 +856,4 @@ end subroutine RSP_mesh
       end subroutine photo_read
 
       end module run_star_extras
-      
+

@@ -771,7 +771,7 @@
          include 'formats'
          ierr = 0
          dbg = .false.
-         
+
          ! check where we are getting alfam from.
          if (s% MLT_option == 'TDC' .and. .not. s% RSP2_flag) then
             ALFAM_ALFA = s% alpha_TDC_DampM * s% mixing_length_alpha
@@ -781,7 +781,7 @@
             ALFAM_ALFA = 0d0
          end if
 
-         
+
          if (ALFAM_ALFA == 0d0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
                k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
@@ -800,7 +800,7 @@
                 d_v_div_r = compute_d_v_div_r(s, k, ierr)
             end if
             if (ierr /= 0) return
-            
+
             ! don't need to check if mlt_vc > 0 here.
             if (s% MLT_option == 'TDC' .and. .not. s% RSP2_flag) then
                 if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then

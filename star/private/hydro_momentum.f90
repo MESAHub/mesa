@@ -439,7 +439,7 @@
             end if
 
          end if  ! v_flag
-         
+
          other_ad = extra_ad - accel_ad + drag + Uq_ad
          other = other_ad%val
 

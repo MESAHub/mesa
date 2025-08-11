@@ -664,7 +664,7 @@
 
             if ( .not. s% remesh_for_TDC_pulsations_log_core_zoning) then
                ! do rsp style core zoning with a power law on dq
-              
+
                !-- solve for a smooth ramp factor H via bisection ----------------------
                n_inner  = nz - nz_outer
                rem_mass = s% xmstar - xm(nz_outer+1)

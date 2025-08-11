@@ -207,7 +207,7 @@ contains
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      character (len=256) :: message        
+      character (len=256) :: message
       logical ::  test_partials, using_TDC, time_center_L
       logical, parameter :: report = .false.
       include 'formats'
@@ -219,7 +219,7 @@ contains
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
 
-      ! Pre-calculate some things. 
+      ! Pre-calculate some things.
       Eq_div_w = 0d0
       if (s% v_flag .or. s% u_flag) then ! only include Eq_div_w if v_flag or u_flag is true.
          if (using_TDC .and. s% alpha_TDC_DampM > 0) then
@@ -251,7 +251,7 @@ contains
       else
          Ptot = P
       end if
- 
+
       Pr = crad*pow4(T)/3d0
       Pg = Ptot - Pr
       beta = Pg / Ptot
