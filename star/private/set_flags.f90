@@ -288,8 +288,8 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_TDC_to_RSP2_mesh(id, ierr)
-         use hydro_rsp2_support, only: remesh_for_TDC_pulsations
+      subroutine set_TDC_to_RSP2_mesh(id, ierr) ! this is the remeshing function called from starlib
+         use tdc_pulse_support, only: remesh_for_TDC_pulsations
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, set_qs
          integer, intent(in) :: id

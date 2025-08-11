@@ -215,6 +215,7 @@
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
             use hydro_rsp2, only: compute_Eq_cell
+            use tdc_pulse, only: compute_tdc_Eq_cell
 
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
@@ -267,7 +268,7 @@
 
             if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation) then
-                Eq_ad = s% Eq_ad(k) !compute_Eq_cell(s, k, ierr)
+                Eq_ad = s% Eq_ad(k) !compute_tdc_Eq_cell(s, k, ierr)
                 !if (k==91) then
                 !write(*,*) 'test Eq, k', Eq_ad %val , k
                 !end if

@@ -30,12 +30,16 @@
       implicit none
 
       private
-      public :: &
-         do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
-         compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
-         Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_etrb_start_vars, &
-         RSP2_adjust_vars_before_call_solver, get_RSP2_alfa_beta_face_weights, &
-         set_viscosity_vars_TDC, compute_Eq_face
+      public :: do1_rsp2_L_eqn
+      public :: do1_turbulent_energy_eqn
+      public :: do1_rsp2_Hp_eqn
+      public :: compute_Eq_cell
+      public :: compute_Uq_face
+      public :: set_RSP2_vars
+      public :: Hp_face_for_rsp2_val
+      public :: Hp_face_for_rsp2_eqn, set_etrb_start_vars
+      public :: RSP2_adjust_vars_before_call_solver
+      public :: get_RSP2_alfa_beta_face_weights
 
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &  ! Ptrb
@@ -105,53 +109,6 @@
             s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
          end do
       end subroutine set_RSP2_vars
-
-
-        ! This routine is called to initialize eq and uq for TDC.
-        subroutine set_viscosity_vars_TDC(s,ierr)
-           type (star_info), pointer :: s
-           integer, intent(out) :: ierr
-           type(auto_diff_real_star_order1) :: x
-           integer :: k, op_err
-           include 'formats'
-           ierr = 0
-           op_err = 0
-
-           !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-           do k=1,s%nz
-              ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-              if (s% Hp_face(k) <= 0) then
-                 ! this scale height for face is already calculated in TDC
-                 s% Hp_face(k) = get_scale_height_face_val(s,k) ! because this is called before s% scale_height(k) is updated in mlt_vars.
-              end if
-           end do
-           !$OMP END PARALLEL DO
-           if (ierr /= 0) then
-              if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 1', s% model_number
-              return
-           end if
-           !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-           do k=1,s% nz
-              x = compute_Chi_cell(s, k, op_err)
-              if (op_err /= 0) ierr = op_err
-              x = compute_Eq_cell(s, k, op_err)
-              if (op_err /= 0) ierr = op_err
-              x = compute_Uq_face(s, k, op_err)
-              if (op_err /= 0) ierr = op_err
-           end do
-           !$OMP END PARALLEL DO
-           if (ierr /= 0) then
-              if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 2', s% model_number
-              return
-           end if
-           if (.not. (s% v_flag .or. s% u_flag)) then ! set values 0 if not using v_flag or u_flag.
-              do k = 1, s% nz
-                 s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
-                 s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
-                 s% Uq(k) = 0d0
-              end do
-           end if
-        end subroutine set_viscosity_vars_TDC
 
 
       subroutine do1_rsp2_L_eqn(s, k, nvar, ierr)
@@ -626,80 +583,16 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: d_v_div_r
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1, term1, term2
-         logical :: dbg
+         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
          include 'formats'
          ierr = 0
-         dbg = .false.
          v_00 = wrap_v_00(s,k)
          v_p1 = wrap_v_p1(s,k)
          r_00 = wrap_r_00(s,k)
          r_p1 = wrap_r_p1(s,k)
          if (r_p1%val == 0d0) r_p1 = 1d0
-         d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
-
-        ! Debugging output to trace values
-        if (dbg .and. k == -63) then
-            write(*,*) 'test d_v_div_r, k:', k
-            write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
-            write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
-            write(*,*) 'd_v_div_r:', d_v_div_r %val
-        end if
+         d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
       end function compute_d_v_div_r
-
-
-
-      function compute_rho_form_of_d_v_div_r(s, k, ierr) result(d_v_div_r)
-      type(star_info),  pointer :: s
-      integer,          intent(in)  :: k
-      integer,          intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
-      type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
-      real(dp) :: dm_cell
-      ierr = 0
-
-      ! shortcuts -----------------------------------------------------------
-      r_cell     = 0.5d0*(wrap_r_00(s,k) + wrap_r_p1(s,k))
-      rho_cell   = wrap_d_00(s,k)
-      v_cell     = wrap_v_00(s,k)              ! cell-centred velocity (u_flag)
-      dlnrho_dt  = wrap_dxh_lnd(s,k) / s%dt    ! (∂/∂t)lnρ
-      dm_cell    = s%dm(k)                     ! cell mass
-
-      ! Eq. (5)
-      d_v_div_r = -dm_cell/(4d0*pi*rho_cell) *  &
-      ( dlnrho_dt/pow3(r_cell)      &
-      + 3d0*v_cell/pow4(r_cell) )
-
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
-      end function compute_rho_form_of_d_v_div_r
-
-
-
-      function compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
-      type(star_info),  pointer :: s
-      integer,          intent(in)  :: k
-      integer,          intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
-      type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
-      real(dp) :: dm_cell
-      ierr = 0
-
-      ! shortcuts -----------------------------------------------------------
-      r_cell     = 0.5d0*(wrap_opt_time_center_r_00(s,k) + wrap_opt_time_center_r_p1(s,k))
-      rho_cell   = wrap_d_00(s,k)
-      v_cell     = wrap_opt_time_center_v_00(s,k)              ! cell-centred velocity (u_flag)
-      dlnrho_dt  = wrap_dxh_lnd(s,k) / s%dt    ! (∂/∂t)lnρ
-      dm_cell    = s%dm(k)                     ! cell mass
-
-      ! Eq. (5)
-      d_v_div_r = -dm_cell/(4d0*pi*rho_cell) *  &
-      ( dlnrho_dt/pow3(r_cell)      &
-      + 3d0*v_cell/pow4(r_cell) )
-
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
-      end function compute_rho_form_of_d_v_div_r_opt_time_center
-
-
 
 
       function compute_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r)  ! s^-1
@@ -767,21 +660,9 @@
          type(auto_diff_real_star_order1) :: &
             rho2, r6_cell, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
          real(dp) :: f, ALFAM_ALFA
-         logical :: dbg
          include 'formats'
          ierr = 0
-         dbg = .false.
-
-         ! check where we are getting alfam from.
-         if (s% MLT_option == 'TDC' .and. .not. s% RSP2_flag) then
-            ALFAM_ALFA = s% alpha_TDC_DampM * s% mixing_length_alpha
-         else if (s% RSP2_flag) then
-            ALFAM_ALFA = s% RSP2_alfam * s% mixing_length_alpha
-         else ! this is for safety, but probably is never called.
-            ALFAM_ALFA = 0d0
-         end if
-
-
+         ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
          if (ALFAM_ALFA == 0d0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
                k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
@@ -793,24 +674,9 @@
          else
             Hp_cell = Hp_cell_for_Chi(s, k, ierr)
             if (ierr /= 0) return
-            if (s% u_flag .or. s% TDC_use_density_form_for_eddy_viscosity) then
-                ! new density derivative term
-                d_v_div_r = compute_rho_form_of_d_v_div_r(s, k, ierr)
-            else
-                d_v_div_r = compute_d_v_div_r(s, k, ierr)
-            end if
+            d_v_div_r = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
-
-            ! don't need to check if mlt_vc > 0 here.
-            if (s% MLT_option == 'TDC' .and. .not. s% RSP2_flag) then
-                if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
-                   w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
-                else
-                   w_00 = s% mlt_vc(k)/sqrt_2_div_3! same as info%A0 from TDC
-                end if
-            else ! normal RSP2
-                w_00 = wrap_w_00(s,k)
-            end if
+            w_00 = wrap_w_00(s,k)
             d_00 = wrap_d_00(s,k)
             f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)
             rho2 = pow2(d_00)
@@ -821,24 +687,10 @@
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
             !       = g cm^2 s^-2
             !       = erg
-
-
          end if
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
 
-         if (dbg .and. k==-100) then
-                write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
-                write(*,*) 'Hp_cell', Hp_cell %val
-                write(*,*) 'd_v_div_r', d_v_div_r %val
-                write(*,*) ' f',  f
-                write(*,*) 'w_00',w_00 %val
-                write(*,*) 'd_00 ', d_00 %val
-                write(*,*) 'rho2 ', rho2 %val
-                write(*,*) 'r_00',  r_00 %val
-                write(*,*) 'r_p1 ',  r_p1 %val
-                write(*,*) 'r6_cell',  r6_cell %val
-         end if
       end function compute_Chi_cell
 
 
@@ -858,14 +710,7 @@
          else
             Chi_cell = s% Chi_ad(k)  ! compute_Chi_cell(s,k,ierr)
             if (ierr /= 0) return
-
-            if (s% u_flag .or. s% TDC_use_density_form_for_eddy_viscosity) then
-                ! new density derivative term
-                d_v_div_r = compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr)
-            else
-                d_v_div_r = compute_d_v_div_r_opt_time_center(s, k, ierr)
-            end if
-
+            d_v_div_r = compute_d_v_div_r_opt_time_center(s, k, ierr)
             if (ierr /= 0) return
             Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k)  ! erg s^-1 g^-1
          end if
@@ -873,22 +718,6 @@
          s% Eq_ad(k) = Eq_cell
       end function compute_Eq_cell
 
-     function compute_Eq_face(s,k,ierr) result(Eq_face)
-        type (star_info), pointer :: s
-        integer, intent(in) :: k
-        integer, intent(out) :: ierr
-        type(auto_diff_real_star_order1) :: Eq_face
-        real(dp) :: alfa, beta
-        include 'formats'
-        ierr = 0
-        if (k == 1) then
-            Eq_face = 0d0
-        else
-            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-            Eq_face = alfa*compute_Eq_cell(s, k, ierr) + beta*compute_Eq_cell(s, k-1, ierr) ! should it be k and k+1?
-        end if
-        if (ierr /= 0) return
-     end function compute_Eq_face
 
       function compute_Uq_face(s, k, ierr) result(Uq_face)  ! cm s^-2, acceleration
          type (star_info), pointer :: s
@@ -904,14 +733,10 @@
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
-
-            ! which do we adopt?
-            Chi_00 = compute_Chi_cell(s,k,ierr)  ! s% Chi_ad(k) XXX
-            !Chi_00 = s% Chi_ad(k)  ! compute_Chi_cell(s,k,ierr)
-
+            Chi_00 = s% Chi_ad(k)  ! compute_Chi_cell(s,k,ierr)
             if (k > 1) then
-               Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
-               !Chi_m1 = shift_m1(s% Chi_ad(k-1)) XXX
+               !Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
+               Chi_m1 = shift_m1(s% Chi_ad(k-1))
                if (ierr /= 0) return
             else
                Chi_m1 = 0d0

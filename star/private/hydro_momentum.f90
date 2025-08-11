@@ -371,6 +371,7 @@
       subroutine expected_non_HSE_term( &
             s, k, other_ad, other, accel_ad, Uq_ad, ierr)
          use hydro_rsp2, only: compute_Uq_face
+         use tdc_pulse, only: compute_tdc_Uq_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
@@ -433,7 +434,7 @@
 
             ! need to add check for v_flag.
             if (s% alpha_TDC_DampM > 0 .and. s% MLT_option == 'TDC') then ! Uq(k) is turbulent viscosity drag at face k
-               Uq_ad = compute_Uq_face(s, k, ierr)
+               Uq_ad = compute_tdc_Uq_face(s, k, ierr)
                !write (*,*) Uq_ad %val, 'Uq_ad %val'
                if (ierr /= 0) return
             end if

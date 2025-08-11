@@ -484,7 +484,8 @@
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
-         use hydro_rsp2, only: set_RSP2_vars, set_viscosity_vars_TDC
+         use hydro_rsp2, only: set_RSP2_vars
+         use tdc_pulse, only: set_viscosity_vars_TDC
 
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi

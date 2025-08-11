@@ -72,7 +72,8 @@
             total_angular_momentum, reset_epsnuc_vectors, set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
-         use hydro_RSP2, only: set_RSP2_vars, set_viscosity_vars_TDC
+         use hydro_RSP2, only: set_RSP2_vars
+         use tdc_pulse, only: set_viscosity_vars_TDC
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
