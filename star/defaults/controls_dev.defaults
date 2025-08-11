@@ -238,7 +238,7 @@
 
       ! ::
 
-	  TDC_num_innermost_cells_forced_nonturbulent = 0
+    TDC_num_innermost_cells_forced_nonturbulent = 0
 
 
       ! include_mlt_corr_to_TDC
@@ -263,7 +263,7 @@
 
       ! ::
 
-	  include_mlt_Pturb_in_thermodynamic_gradients = .false.
+    include_mlt_Pturb_in_thermodynamic_gradients = .false.
 
 
       ! include_mlt_in_velocity_time_centering
