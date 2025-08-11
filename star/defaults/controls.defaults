@@ -6522,9 +6522,9 @@
       ! split_amr_logT_for_ignore_core_cells
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! For pulsation calulations, splitting and merging core cells can cause problems. 
+      ! For pulsation calculations, splitting and merging core cells can cause problems.
       ! If merge_amr_ignore_core_cells or split_amr_ignore_surface_cells is true,
-      ! then the innermost cells above merge_amr_logT_for_ignore_core_cells or 
+      ! then the innermost cells above merge_amr_logT_for_ignore_core_cells or
       ! split_amr_logT_for_ignore_core_cells  cells are ignored for split/merge.
 
       ! ::

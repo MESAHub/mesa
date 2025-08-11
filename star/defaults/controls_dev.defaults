@@ -182,22 +182,30 @@
 
       ! alpha_TDC_DAMPM
       ! ~~~~~~~~~~~~~~~
+      ! alpha_TDC_c
+      ! ~~~~~~~~~~~
+      ! alpha_TDC_s
+      ! ~~~~~~~~~~~
       ! TDC_use_density_form_for_eddy_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-      ! If alpha_TDC_DAMPM >0, then include eddy viscous damping in TDC alpha_TDC_DAMPM
-      ! This control is analogous to `RSP_alfam`, where the default is `RSP_alfam` = 0.25d0. 
-     
-      ! If hydrostatic (v_flag, u_flag = .false. , v = 0 ) there are no velocity gradients,
+      ! If ``alpha_TDC_DAMPM>0``, then include eddy viscous damping in TDC ``alpha_TDC_DAMPM``
+      ! This control is analogous to ``RSP_alfam``, where the default is ``RSP_alfam = 0.25d0``.
+
+      ! If hydrostatic (``v_flag``, ``u_flag = .false.``, ``v = 0`` ) there are no velocity gradients,
       ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
 
-      ! If u_flag = .true. or TDC_use_density_form_for_eddy_viscosity = .true., use density
-      ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq. 
-      
-      ! ::  
+      ! ``alpha_TDC_c`` and ``alpha_TDC_s`` are pre-factors to scale the flux and source terms.
 
-    alpha_TDC_DAMPM = 0.25d0 
+      ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
+      ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
+
+      ! ::
+
+    alpha_TDC_DAMPM = 0.25d0
+    alpha_TDC_c = 1.0d0
+    alpha_TDC_s = 1.0d0
     TDC_use_density_form_for_eddy_viscosity = .false.
 
 
@@ -205,9 +213,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! calculates and incorporates det/dt from TDC as a negative source term in
-      ! the total energy equation  
+      ! the total energy equation
 
-      ! ::  
+      ! ::
 
     TDC_include_eturb_in_energy_equation = .false.
 
@@ -215,20 +223,20 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! calculate scale height by averaging P/rho onto faces together instead
-      ! of of wrapping P and rho seperately by default. Both forms assume HSE. 
+      ! of of wrapping P and rho separately by default. Both forms assume HSE.
 
-      ! ::  
+      ! ::
 
       use_rsp_form_of_scale_height = .false.
 
       ! TDC_num_innermost_cells_forced_nonturbulent
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent cells 
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent cells
       ! to be nonturbulent, and sets gradT = gradr in these cells.
       ! Useful for pulsation models in TDC.
 
-      ! ::  
+      ! ::
 
 	  TDC_num_innermost_cells_forced_nonturbulent = 0
 
@@ -239,8 +247,8 @@
       ! If include_mlt_corr_to_TDC = .true. , mlt correction to TDC follows MESA VI (Jermyn et a. 2023)
       ! in which we correct TDC on long timescales with Y_face ~ Y*Gamma/(1+Gamma). If .false., abandon
       ! mlt limit of tdc and adopt original form of (Kuhfuß 1986) convection model in the local limit.
-      
-      ! ::  
+
+      ! ::
 
     include_mlt_corr_to_TDC = .true.
 
@@ -248,12 +256,12 @@
       ! include_mlt_Pturb_in_thermodynamic_gradients
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If mlt_Pturb_factor > 0, includes the effect of turbulent pressure Pturb 
+      ! If mlt_Pturb_factor > 0, includes the effect of turbulent pressure Pturb
       ! on thermodynamic gradients gradr, grada, and hence gradT. The correction
       ! is approximated as correction = Prad + Pgas / Ptotal, where Ptotal = Prad + Pgas + Pturb.
       ! Not supported by other_alpha_mlt or starspots
-      
-      ! ::  
+
+      ! ::
 
 	  include_mlt_Pturb_in_thermodynamic_gradients = .false.
 
@@ -263,9 +271,9 @@
 
       ! If doing velocity time_centering, include time centering in mlt. Depending on the time
       ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
-      ! for P, L, and r in geff, gradr, grada, and mlt. 
+      ! for P, L, and r in geff, gradr, grada, and mlt.
 
-      ! ::  
+      ! ::
 
     include_mlt_in_velocity_time_centering = .false.
 
@@ -279,7 +287,7 @@
       ! rotation, semiconvection, and use_mass_corrections ignore this flag, see star_utils.
       ! not supported by RSP or RSP2.
 
-      ! ::  
+      ! ::
 
     make_mlt_hydrodynamic = .false.
 
@@ -290,8 +298,8 @@
       ! If remesh_for_TDC_pulsations, .true. will rezone below RSP2_Tanchor with logarithmic
       ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
       ! that each zone increases in mass inward following a power law.
-     
-      ! ::  
+
+      ! ::
 
     remesh_for_TDC_pulsations_log_core_zoning = .false.
 

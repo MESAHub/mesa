@@ -2,6 +2,8 @@
          logical :: compare_TDC_to_MLT 
 
          real(dp) :: alpha_TDC_DAMPM
+         real(dp) :: alpha_TDC_c
+         real(dp) :: alpha_TDC_s
          logical :: remesh_for_TDC_pulsations_log_core_zoning
          logical :: TDC_use_density_form_for_eddy_viscosity
          real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
