@@ -4011,7 +4011,7 @@
             P = P_face%val
             rho_face = get_rho_face(s,k)
             rho = rho_face%val
-            scale_height = P/(grav%val*rho)  ! this assumes HSE, unles make_mlt_hydrodynamic = .true.
+            scale_height = P/(grav%val*rho)  ! this assumes HSE, unless make_mlt_hydrodynamic = .true.
          end if
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height

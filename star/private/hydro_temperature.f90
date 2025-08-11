@@ -355,7 +355,7 @@
          !end if
          !L1_ad = L_theta*wrap_L_00(s, 1) + (1d0 - L_theta)*s% L_start(1)
 
-         ! uncoment lines below to remove time centering entirely.
+         ! uncomment lines below to remove time centering entirely.
          !r1_ad = wrap_r_00(s,1)
          !area_ad = pi4*pow2(r1_ad)
 

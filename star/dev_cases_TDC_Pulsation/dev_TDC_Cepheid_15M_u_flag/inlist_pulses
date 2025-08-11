@@ -94,7 +94,7 @@ cubic_interpolation_in_Z = .false.
    x_ctrl(14) = 2d6 ! desired core temperature to make cut at 
 
    ! remeshing flag for if we are doing an envelope model or full stellar model.
-   x_logical_ctrl(23) = .true. ! .true. = envelope model, .false. = full stellar model ! depracated
+   x_logical_ctrl(23) = .true. ! .true. = envelope model, .false. = full stellar model ! deprecated
    x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
    x_ctrl(12) = 200! model number to turn off remesh ( only if if okay_to_remesh = .true.)
 
