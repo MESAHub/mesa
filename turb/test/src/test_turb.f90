@@ -80,7 +80,8 @@ contains
    end subroutine check_efficient_MLT_scaling
 
    subroutine compare_TDC_and_Cox_MLT()
-      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, L_start
+      real(dp) :: mixing_length_alpha, conv_vel_start, &
+         alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, L_start
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma, Eq_div_w
@@ -146,7 +147,8 @@ contains
       call set_TDC( &
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, time_center_L, ierr)
+         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
+         Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, time_center_L, ierr)
 
 
       write (*, 1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel%val, dt
@@ -216,8 +218,8 @@ contains
          call set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, &
-                time_center_L, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
+            Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, time_center_L, ierr)
 
 
          write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
