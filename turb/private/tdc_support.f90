@@ -480,7 +480,7 @@ contains
       call eval_xis(info, Y_env, xi0, xi1, xi2)
       Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
 
-      if (.false.) then ! tdc use enthalpy flux limiter use_TDC_enthalpy_flux_limiter
+      if (.false. .and. Y_env > 0) then ! tdc use enthalpy flux limiter use_TDC_enthalpy_flux_limiter
 
           ! Compute specific enthalpy for flux limiter, can optionally extend with total
           ! energy terms from MESA-star, but eos enthalpy is fine approximation for now.
@@ -491,7 +491,7 @@ contains
           G =  info%mixing_length_alpha * convert(info%Cp) * Y_env ! assumes alpha_s == 1.
 
           ! enthalpy flux scale F = √(2/3)·w·√(e_t)
-          F = sqrt(2d0/3d0)* w * Af ! unused, but can experiment with
+          F = sqrt(2d0/3d0)* w / convert(info%T) ! * Af
 
           ! rsp form from smolec 2008, we skip this and use G/F instead...
           X = sqrt(3d0/2d0)*(convert(info%T)/w)*G ! should be same as G/F
