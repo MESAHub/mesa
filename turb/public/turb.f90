@@ -138,7 +138,7 @@ module turb
       ! Do a call to MLT
       !grav = cgrav * m / pow2(r)
       L = 64 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
-      if (.false.) then ! don't include until we correct L0 with L_start/gradr_start
+      if (time_center_L) then
         L = L_theta*L + (1d0-L_theta)*L_start
       end if
       Lambda = mixing_length_alpha * scale_height

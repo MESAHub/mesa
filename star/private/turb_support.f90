@@ -238,7 +238,8 @@ contains
       end if
 
       if (s% using_velocity_time_centering .and. &
-       s% include_L_in_velocity_time_centering) then
+       s% include_L_in_velocity_time_centering .and. &
+       s% include_mlt_in_velocity_time_centering) then
          time_center_L = .true. ! change to Ltheta check later, this is inefficient.
       else
          time_center_L = .false.
