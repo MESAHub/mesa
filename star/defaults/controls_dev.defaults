@@ -284,7 +284,7 @@
       ! If make_mlt_hydrodynamic = .true., adopt geff = g - dv/dt from newton solver.
       ! gradr and scale_height are modified by this flag to hydro form.
       ! If .false. default to QHSE form, where g = GM/r^2
-      ! rotation, semiconvection, and use_mass_corrections ignore this flag, see star_utils.
+      ! semiconvection, and use_mass_corrections ignore this flag, see star_utils.
       ! not supported by RSP or RSP2.
 
       ! ::

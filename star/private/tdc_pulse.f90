@@ -132,7 +132,6 @@ contains
       real(dp) :: dm_cell
       ierr = 0
 
-      ! shortcuts
       r_cell = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
       rho_cell = wrap_d_00(s, k)
       v_cell = wrap_v_00(s, k)              ! cell-centred velocity (u_flag)
@@ -142,7 +141,7 @@ contains
       ! Eq. (5)
       d_v_div_r = -dm_cell/(4d0*pi*rho_cell)*(dlnrho_dt/pow3(r_cell) + 3d0*v_cell/pow4(r_cell))
 
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
+      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹
    end function compute_rho_form_of_d_v_div_r
 
    function compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
@@ -314,8 +313,7 @@ contains
       end if
 
       if (ALFAM_ALFA == 0d0 .or. &
-          k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
-          k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+          k > TDC_num_innermost_cells_forced_nonturbulent) then
          Chi_cell = 0d0
          if (k >= 1 .and. k <= s%nz) then
             s%Chi(k) = 0d0
@@ -440,10 +438,7 @@ contains
       s%Uq(k) = Uq_face%val
    end function compute_tdc_Uq_face
 
-
-
-
-
+  ! face centered variables for tdc update below
    function compute_Chi_div_w_face(s, k, ierr) result(Chi_face)
    ! eddy viscosity energy (Kuhfuss 1986) [erg]
    type(star_info), pointer :: s
@@ -466,8 +461,7 @@ contains
    end if
 
    if (ALFAM_ALFA == 0d0 .or. &
-      k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
-      k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+      k > s%nz - TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
       if (k >= 1 .and. k <= s%nz) then
          s%Chi(k) = 0d0
@@ -498,7 +492,7 @@ contains
       Chi_face = f*rho2*r6_face*d_v_div_r*Hp_face!*w_00
       ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
       !       = g cm^2 s^-2
-      !       = erg
+      !       = erg ! * (s / cm) - > [erg] * 1/w00
 
    end if
    !s%Chi(k) = Chi_face%val
@@ -530,8 +524,7 @@ contains
    include 'formats'
    ierr = 0
    if (s%mixing_length_alpha == 0d0 .or. &
-   k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
-   k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+   k > s%nz - TDC_num_innermost_cells_forced_nonturbulent) then
    Eq_face = 0d0
    if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
    else
@@ -557,9 +550,6 @@ contains
    !s%Eq(k) = Eq_face%val
    !s%Eq_ad(k) = Eq_face
    end function compute_tdc_Eq_div_w_face
-
-
-
 
    function compute_d_v_div_r_face(s, k, ierr) result(d_v_div_r)  ! s^-1
       type(star_info), pointer :: s
@@ -609,7 +599,6 @@ contains
       include 'formats'
       ierr = 0
 
-
       if (k >1) then
          v_00 = 0.5d0 * (wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_m1(s, k))
       else
@@ -627,11 +616,6 @@ contains
       if (r_p1%val == 0d0) r_p1 = 1d0
       d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
 
-
-   !   v_00 = wrap_opt_time_center_v_00(s, k)
-   !   v_p1 = wrap_opt_time_center_v_p1(s, k)
-   !   r_00 = wrap_opt_time_center_r_00(s, k)
-   !   r_p1 = wrap_opt_time_center_r_p1(s, k)
       if (r_p1%val == 0d0) r_p1 = 1d0
       d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center_face

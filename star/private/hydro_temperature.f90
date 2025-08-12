@@ -429,7 +429,7 @@
 
          if (ierr /= 0) return
 
-        ! mlt_pturb in thermodynamic gradients does not currently support time centering
+        ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
         ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
          if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
             .and. s% mlt_Pturb_factor > 0d0) then
@@ -456,7 +456,8 @@
          else
             Pm1 = wrap_Peos_m1(s,k)
             if (s% using_velocity_time_centering) Pm1 = 0.5d0*(Pm1 + s% Peos_start(k-1)) ! pm1 wasn't time centered until now
-            Pm1 = Pm1 + mlt_Ptrbm1
+            Pm1 = Pm1 + mlt_Ptrbm1 ! include mlt Ptrb in k-1
+            P00 = P00 + mlt_Ptrb00 ! include mlt Ptrb in k
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if

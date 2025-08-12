@@ -1012,9 +1012,17 @@
             ! add in hydrodynamic term
             dv_dt = wrap_dxh_v_face(s,k)/s%dt
             ! hydrodynamic correction to g is geff = g - dvdt, to do: add a floor and ceiling
-            geff = s%cgrav(k)*s%m_grav(k)/r2 - dv_dt
-         else
-            geff = s% m_grav(k)*s% cgrav(k)/r2
+            if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+               geff = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2 - dv_dt
+            else
+               geff = s%cgrav(k)*s%m_grav(k)/r2 - dv_dt
+            end if
+         else ! default is below
+            if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+               geff = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
+            else
+               geff = s%cgrav(k)*s%m_grav(k)/r2
+            end if
          end if
       end function wrap_geff_face
 
