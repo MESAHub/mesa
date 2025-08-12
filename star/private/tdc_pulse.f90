@@ -463,10 +463,10 @@ contains
    if (ALFAM_ALFA == 0d0 .or. &
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
-      if (k >= 1 .and. k <= s%nz) then
-         s%Chi(k) = 0d0
-         s%Chi_ad(k) = 0d0
-      end if
+      !if (k >= 1 .and. k <= s%nz) then
+      !   s%Chi(k) = 0d0
+      !   s%Chi_ad(k) = 0d0
+      !end if
    else
       Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
       if (ierr /= 0) return
@@ -525,27 +525,27 @@ contains
    ierr = 0
    if (s%mixing_length_alpha == 0d0 .or. &
    k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
-   Eq_face = 0d0
-   if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
+      Eq_face = 0d0
+      !if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
    else
-   Chi_face = compute_Chi_div_w_face(s,k,ierr)
-   if (ierr /= 0) return
+      Chi_face = compute_Chi_div_w_face(s,k,ierr)
+      if (ierr /= 0) return
 
-   if (s%u_flag .or. s%TDC_use_density_form_for_eddy_viscosity) then
-   ! new density derivative term
-   d_v_div_r = compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr)
-   else
-   d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
-   end if
+      if (s%u_flag .or. s%TDC_use_density_form_for_eddy_viscosity) then
+         ! new density derivative term
+         d_v_div_r = compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr)
+      else
+         d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
+      end if
 
-   if (k >= 2) then
-      dmbar = 0.5d0*(s% dm(k) + s% dm(k-1))
-   else
-      dmbar = 0.5d0*s% dm(k)
-   end if
+      if (k >= 2) then
+         dmbar = 0.5d0*(s% dm(k) + s% dm(k-1))
+      else
+         dmbar = 0.5d0*s% dm(k)
+      end if
 
-   if (ierr /= 0) return
-   Eq_face = 4d0*pi*Chi_face*d_v_div_r/dmbar  ! erg s^-1 g^-1
+      if (ierr /= 0) return
+      Eq_face = 4d0*pi*Chi_face*d_v_div_r/dmbar  ! erg s^-1 g^-1
    end if
    !s%Eq(k) = Eq_face%val
    !s%Eq_ad(k) = Eq_face
