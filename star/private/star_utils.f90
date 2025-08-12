@@ -2451,7 +2451,7 @@
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
          integer :: k
-         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, alfa, beta,TDC_eturb_cell
          include 'formats'
 
          total_internal_energy = 0d0
@@ -2488,6 +2488,19 @@
             end if
             if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
+               cell_total = cell_total + cell1
+               total_turbulent_energy = total_turbulent_energy + cell1
+            else if (.not. s% RSP2_flag .and. s% mlt_vc_old(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then
+               ! write a wrapper for this.
+               if (k == 1) then
+                  TDC_eturb_cell = pow2(s% mlt_vc(k)/sqrt_2_div_3)
+               else
+                  call get_face_weights(s, k, alfa, beta)
+                  TDC_eturb_cell = alfa*pow2(s% mlt_vc(k)/sqrt_2_div_3) + &
+                     beta*pow2(s% mlt_vc(k-1)/sqrt_2_div_3)
+               end if
+               cell1 = dm*TDC_eturb_cell
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if

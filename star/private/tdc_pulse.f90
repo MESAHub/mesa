@@ -313,7 +313,7 @@ contains
       end if
 
       if (ALFAM_ALFA == 0d0 .or. &
-          k > TDC_num_innermost_cells_forced_nonturbulent) then
+          k > s% TDC_num_innermost_cells_forced_nonturbulent) then
          Chi_cell = 0d0
          if (k >= 1 .and. k <= s%nz) then
             s%Chi(k) = 0d0
@@ -461,7 +461,7 @@ contains
    end if
 
    if (ALFAM_ALFA == 0d0 .or. &
-      k > s%nz - TDC_num_innermost_cells_forced_nonturbulent) then
+      k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
       if (k >= 1 .and. k <= s%nz) then
          s%Chi(k) = 0d0
@@ -524,7 +524,7 @@ contains
    include 'formats'
    ierr = 0
    if (s%mixing_length_alpha == 0d0 .or. &
-   k > s%nz - TDC_num_innermost_cells_forced_nonturbulent) then
+   k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
    Eq_face = 0d0
    if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
    else
