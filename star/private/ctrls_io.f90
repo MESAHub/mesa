@@ -106,7 +106,7 @@
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, &
-    alpha_TDC_c, alpha_TDC_s, TDC_use_density_form_for_eddy_viscosity, &
+    alpha_TDC_C, alpha_TDC_S TDC_use_density_form_for_eddy_viscosity, &
     TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
     make_mlt_hydrodynamic, include_mlt_corr_to_TDC, TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
@@ -2081,8 +2081,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
  s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
  s% alpha_TDC_DAMPM = alpha_TDC_DAMPM
- s% alpha_TDC_c = alpha_TDC_c
- s% alpha_TDC_s = alpha_TDC_s
+ s% alpha_TDC_C = alpha_TDC_C
+ s% alpha_TDC_S = alpha_TDC_S
  s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
@@ -3789,8 +3789,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
  alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
  alpha_TDC_DAMPM = s% alpha_TDC_DAMPM
- alpha_TDC_c = s% alpha_TDC_c
- alpha_TDC_s = s% alpha_TDC_s
+ alpha_TDC_C = s% alpha_TDC_C
+ alpha_TDC_S = s% alpha_TDC_S
  TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients

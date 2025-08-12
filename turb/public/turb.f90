@@ -115,7 +115,7 @@ module turb
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
-            Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, time_center_L, alpha_TDC_c, alpha_TDC_s, ierr)
+            Eq_div_w, grav, include_mlt_corr_to_TDC, L_start, time_center_L, alpha_TDC_C, alpha_TDC_S, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, L_start
@@ -159,7 +159,7 @@ module turb
       info%L = convert(L)
       info%gradL = convert(gradL)
       info%grada = convert(grada)
-      info%c0 = convert(alpha_TDC_c * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
+      info%c0 = convert(alpha_TDC_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
       info%L0 = convert((16d0*pi*crad*clight/3d0)*pow2(r)*grav*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm, needs correction for if s% make_mlt_hydrodynamic = .false.
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%T = T
@@ -170,8 +170,8 @@ module turb
       info%Hp = scale_height
       info%Gamma = Gamma
       info%Eq_div_w = Eq_div_w
-      info%alpha_TDC_c = alpha_TDC_c
-      info%alpha_TDC_s = alpha_TDC_s
+      info%alpha_TDC_c = alpha_TDC_C
+      info%alpha_TDC_s = alpha_TDC_S
 
       ! Get solution
       Zub = upper_bound_Z

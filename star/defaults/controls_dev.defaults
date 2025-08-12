@@ -182,9 +182,9 @@
 
       ! alpha_TDC_DAMPM
       ! ~~~~~~~~~~~~~~~
-      ! alpha_TDC_c
+      ! alpha_TDC_C
       ! ~~~~~~~~~~~
-      ! alpha_TDC_s
+      ! alpha_TDC_S
       ! ~~~~~~~~~~~
       ! TDC_use_density_form_for_eddy_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -196,7 +196,7 @@
       ! If hydrostatic (``v_flag``, ``u_flag = .false.``, ``v = 0`` ) there are no velocity gradients,
       ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
 
-      ! ``alpha_TDC_c`` and ``alpha_TDC_s`` are pre-factors to scale the flux and source terms.
+      ! ``alpha_TDC_C`` and ``alpha_TDC_S`` are pre-factors to scale the flux and source terms.
 
       ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
       ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
@@ -204,8 +204,8 @@
       ! ::
 
     alpha_TDC_DAMPM = 0.25d0
-    alpha_TDC_c = 1.0d0
-    alpha_TDC_s = 1.0d0
+    alpha_TDC_C = 1.0d0
+    alpha_TDC_S = 1.0d0
     TDC_use_density_form_for_eddy_viscosity = .false.
 
 

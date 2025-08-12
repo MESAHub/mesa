@@ -460,6 +460,7 @@ contains
       type(auto_diff_real_tdc), intent(out) :: Q, Af
       type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env
       type(auto_diff_real_tdc) :: w, G, F, X, FL
+      real(dp) :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
 
       ! Y = grad-gradL
       ! Gamma=(grad-gradE)/(gradE-gradL)
@@ -471,7 +472,7 @@ contains
       ! because we only have a Gamma from MLT in that case.
       ! so when Y < 0 we just use Y_env = Y.
       if (Y > 0 .and. info%include_mlt_corr_to_TDC) then
-         Y_env = Y * convert(info%Gamma/(1+info%Gamma))
+         Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
       else
          Y_env = Y
       end if
@@ -488,13 +489,13 @@ contains
           w = convert(info%Cp * info%T)
 
           ! build the correlation function G = α·α_s·cₚ·Y:
-          G =  info%mixing_length_alpha * convert(info%Cp) * Y_env ! assumes alpha_s == 1.
+          G =  info%mixing_length_alpha * info%alpha_TDC_s * x_ALFAS * convert(info%Cp) * Y_env
 
           ! enthalpy flux scale F = √(2/3)·w·√(e_t)
-          F = sqrt(2d0/3d0)* w / convert(info%T) ! * Af
+          F = sqrt_2_div_3 * w / convert(info%T) ! * Af
 
           ! rsp form from smolec 2008, we skip this and use G/F instead...
-          X = sqrt(3d0/2d0)*(convert(info%T)/w)*G ! should be same as G/F
+          X = (convert(info%T)/w)*G / sqrt_2_div_3 ! should be same as G/F
 
           FL = flux_limiter_function(G/F) ! X
           !if (G%val/F%val > 1d0) write(*,*) 'G/F', G%val/F%val

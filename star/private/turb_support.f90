@@ -331,7 +331,7 @@ contains
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, s% alpha_TDC_c, s% alpha_TDC_s, ierr)
+            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -351,7 +351,7 @@ contains
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, s% alpha_TDC_c, s% alpha_TDC_s, ierr)
+                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

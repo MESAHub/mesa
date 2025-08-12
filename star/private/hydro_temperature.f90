@@ -343,7 +343,7 @@
             return
          end if
 
-         if (debug) write(*,*) 'Exact RSP2 zone 1 surface BC being set'
+         if (debug) write(*,*) 'RSP zone 1 surface BC being set'
 
          call get_area_info_opt_time_center(s, 1, area_ad, inv_R2, ierr) ! handles time centering for area
          ! time centering the surface luminosity can be very noisy
@@ -370,8 +370,8 @@
          rhs_ad = s%RSP2_Lsurf_factor * area_ad * clight * (crad * pow4(T_surf)) ! missing Lc at the moment, so only radiative surface
 
          if (debug) then
-            write(*,*) 'RSP2_Lsurf_factor =', s%RSP2_Lsurf_factor
-            write(*,*) 'rhs_ad (exact RSP2 BC) =', rhs_ad%val
+            write(*,*) 'RSP_Lsurf_factor =', s%RSP2_Lsurf_factor
+            write(*,*) 'rhs_ad (RSP BC) =', rhs_ad%val
          end if
 
          ! residual
