@@ -106,7 +106,7 @@
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, &
-    alpha_TDC_C, alpha_TDC_S TDC_use_density_form_for_eddy_viscosity, &
+    alpha_TDC_C, alpha_TDC_S, TDC_use_density_form_for_eddy_viscosity, &
     TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
     make_mlt_hydrodynamic, include_mlt_corr_to_TDC, TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
