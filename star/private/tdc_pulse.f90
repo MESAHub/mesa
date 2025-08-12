@@ -313,7 +313,7 @@ contains
       end if
 
       if (ALFAM_ALFA == 0d0 .or. &
-          k > s% TDC_num_innermost_cells_forced_nonturbulent) then
+          k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Chi_cell = 0d0
          if (k >= 1 .and. k <= s%nz) then
             s%Chi(k) = 0d0
@@ -378,8 +378,7 @@ contains
       include 'formats'
       ierr = 0
       if (s%mixing_length_alpha == 0d0 .or. &
-          k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
-          k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+          k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Eq_cell = 0d0
          if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
       else
@@ -463,10 +462,10 @@ contains
    if (ALFAM_ALFA == 0d0 .or. &
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
-      !if (k >= 1 .and. k <= s%nz) then
-      !   s%Chi(k) = 0d0
-      !   s%Chi_ad(k) = 0d0
-      !end if
+      if (k >= 1 .and. k <= s%nz) then
+         s%Chi(k) = 0d0
+         s%Chi_ad(k) = 0d0
+      end if
    else
       Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
       if (ierr /= 0) return
@@ -526,7 +525,7 @@ contains
    if (s%mixing_length_alpha == 0d0 .or. &
    k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Eq_face = 0d0
-      !if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
+      if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
    else
       Chi_face = compute_Chi_div_w_face(s,k,ierr)
       if (ierr /= 0) return

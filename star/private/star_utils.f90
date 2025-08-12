@@ -2490,7 +2490,7 @@
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
-            else if (.not. s% RSP2_flag .and. s% mlt_vc_old(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
+            else if (.not. s% RSP2_flag .and. s% mlt_vc(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation) then
                ! write a wrapper for this.
                if (k == 1) then
