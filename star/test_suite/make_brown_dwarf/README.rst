@@ -15,7 +15,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 
 pgstar commands used for the plots above:
 
-.. literalinclude:: ../../../star/test_suite/1.3M_ms_high_Z/inlist_pgstar
+.. literalinclude:: ../../../star/test_suite/make_brown_dwarf/inlist_pgstar
   :language: console
 
 
