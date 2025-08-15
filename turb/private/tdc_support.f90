@@ -38,6 +38,7 @@ public :: tdc_info
 public :: eval_Af
 public :: eval_xis
 public :: compute_Q
+public :: flux_limiter_function
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.
@@ -63,9 +64,9 @@ public :: compute_Q
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
       logical :: report, include_mlt_corr_to_TDC
-      real(dp) :: mixing_length_alpha, alpha_TDC_c, alpha_TDC_s, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
+      real(dp) :: mixing_length_alpha, alpha_TDC_c, alpha_TDC_s, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, e
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P
    end type tdc_info
 
 contains
@@ -459,8 +460,9 @@ contains
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: Q, Af
       type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env
-      type(auto_diff_real_tdc) :: w, G, F, X, FL
+      type(auto_diff_real_tdc) :: w, G, F, X, FL, scale
       real(dp) :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
+      real(dp), parameter :: eps2 = 1d-20
 
       ! Y = grad-gradL
       ! Gamma=(grad-gradE)/(gradE-gradL)
@@ -477,16 +479,13 @@ contains
          Y_env = Y
       end if
 
-      ! Y_env sets the acceleration of blobs.
-      call eval_xis(info, Y_env, xi0, xi1, xi2)
-      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
-
-      if (.false. .and. Y_env > 0) then ! tdc use enthalpy flux limiter use_TDC_enthalpy_flux_limiter
+      scale = 1d0
+      if (.false.) then ! tdc use enthalpy flux limiter use_TDC_enthalpy_flux_limiter
 
           ! Compute specific enthalpy for flux limiter, can optionally extend with total
           ! energy terms from MESA-star, but eos enthalpy is fine approximation for now.
           ! w = E+P/ρ ~ Cp*T
-          w = convert(info%Cp * info%T)
+          w = convert(info%Cp * info%T) ! info%e + convert(info%P/info%rho)!
 
           ! build the correlation function G = α·α_s·cₚ·Y:
           G =  info%mixing_length_alpha * info%alpha_TDC_s * x_ALFAS * convert(info%Cp) * Y_env
@@ -494,50 +493,39 @@ contains
           ! enthalpy flux scale F = √(2/3)·w·√(e_t)
           F = sqrt_2_div_3 * w / convert(info%T) ! * Af
 
-          ! rsp form from smolec 2008, we skip this and use G/F instead...
-          X = (convert(info%T)/w)*G / sqrt_2_div_3 ! should be same as G/F
+         ! rsp form from smolec 2008
+         !X = (convert(info%T)/w)*G / sqrt_2_div_3 ! should be same as G/F
+         X = info%mixing_length_alpha * info%alpha_TDC_s * x_ALFAS* Y_env / sqrt_2_div_3 ! should be   same as G/F
 
-          FL = flux_limiter_function(G/F) ! X
-          !if (G%val/F%val > 1d0) write(*,*) 'G/F', G%val/F%val
-      else
-          FL = 1d0 ! might need to set derivs to 0.
+!         X = G/F
+!         if (X > 1d10) then
+!           FL = X!1d0
+!         else
+         if (Y_env >0) then
+            FL = flux_limiter_function(X) ! X
+            scale = FL / sqrt(X*X + eps2)
+            if (X > 1d10) then
+               scale = 1d0
+            end if
+!         else if  (Y_env <0) then
+!            FL = flux_limiter_function(-X)
+!            scale = FL / (-X)
+         !else
+         !   scale = 1d0
+         end if
+
       end if
 
+      Y_env = scale*Y_env
+
+
+      ! Y_env sets the acceleration of blobs.
+      call eval_xis(info, Y_env, xi0, xi1, xi2)
+      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
 
       ! Y_env sets the convective flux but not the radiative flux.
-      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env*FL
-      !if (G%val/F%val > 1d0) write(*,*) 'G/F', G%val/F%val, 'FL', FL%val
-
-    contains
-
-    type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
-    implicit none
-    type(auto_diff_real_tdc), intent(in) :: X
-    type(auto_diff_real_tdc) :: t, P
-
-    real(dp), parameter :: delta = 0.1_dp
-    !real(dp) :: t, P, dPdt
-
-    if (X%val <= 1.0_dp) then
-        ! no limiting below X=1
-        FL = 1.0_dp
-
-    else if (X%val >= 1.0_dp + delta) then
-        ! full cap above X=1+delta
-        FL = 1.0_dp / X
-    else
-        ! smooth quintic blend on [1,1+delta]
-        t = (X - 1.0_dp) / delta    ! t in [0,1]
-
-        ! S(t) = 6 t^5 − 15 t^4 + 10 t^3
-        P    = 6.0_dp * pow5(t) -15.0_dp * pow4(t) +10.0_dp * pow3(t)
-
-        ! blend from FL=1 -> FL=1/X
-        FL = (1.0_dp - P) + P / X
-    end if
-
-    end function flux_limiter_function
-
+      Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env
+!      if (X%val > 1d0) write(*,*) 'X', X%val, 'FL', FL%val, 'scale', scale%val
 
    end subroutine compute_Q
 
@@ -671,5 +659,61 @@ contains
       end if
 
    end function eval_Af
+
+   type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
+     implicit none
+     type(auto_diff_real_tdc), intent(in) :: X
+     real(dp), parameter :: X0 = 0.95_dp
+     real(dp), parameter :: delta = 0.05_dp   ! transition width
+     type(auto_diff_real_tdc) :: absX, t
+
+
+     absX = X !abs(X)
+
+     if (X%val <= X0) then
+        FL = absX
+     else
+        ! Map X from [X0, ∞) -> t in [0, ∞)
+        t = (absX - X0) / delta
+        ! Smooth monotonic rise: caps at 1 as X → ∞
+        FL = 1.0_dp - exp(-t)
+        ! Shift so that FL(X0) = X0 and derivative matches 1 at X0
+        FL = X0 + (1.0_dp - X0) * FL
+     end if
+   end function flux_limiter_function
+
+!type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
+!  implicit none
+!  type(auto_diff_real_tdc), intent(in) :: X
+!  real(dp), parameter :: X0     = 0.95_dp      ! end of linear region
+!  real(dp), parameter :: delta0 = 0.05_dp      ! requested width
+!  type(auto_diff_real_tdc) :: t, S
+!  real(dp) :: X1, width
+!
+!  ! Ensure the transition ends no later than 1.0
+!  X1    = min(1.0_dp, X0 + delta0)
+!  width = max(1.0e-12_dp, X1 - X0)   ! guard
+!
+!  if (X%val <= X0) then
+!     FL = X
+!  else if (X%val >= X1) then
+!     FL = 1.0_dp
+!  else
+!     t = (X - X0) / width     ! t in (0,1)
+!
+!     ! C^5 smoothstep via Beta(6,6) CDF:
+!     ! S'(t) = 2772 t^5 (1-t)^5, S(0)=0, S(1)=1
+!     S = 2772d0 * (  ( pow6(t)      / 6.0_dp )  &
+!        - ( 5.0_dp*pow7(t)  / 7.0_dp )  &
+!        + (10.0_dp*pow8(t)  / 8.0_dp )  &
+!        - (10.0_dp*pow8(t)*t  / 9.0_dp )  &
+!        + ( 5.0_dp*pow8(t)*t*t /10.0_dp )  &
+!        - (        pow8(t)*t*t*t /11.0_dp )  )
+!
+!     FL = (1.0_dp - S)*X + S*1.0_dp
+!  end if
+!
+!end function flux_limiter_function
+
 
 end module tdc_support

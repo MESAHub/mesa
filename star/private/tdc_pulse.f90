@@ -248,7 +248,7 @@ contains
       d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center
 
-   function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm
+   function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm , different than rsp2
       type(star_info), pointer :: s
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: Hp1, Hp0, Hp_cell
