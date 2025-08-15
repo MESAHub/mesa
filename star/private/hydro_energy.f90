@@ -212,8 +212,11 @@
             dL_dm_ad = (L00_ad - Lp1_ad)/dm
          end subroutine setup_dL_dm
 
-         subroutine setup_sources_and_others(ierr)  ! sources_ad, others_ad
-            !use hydro_rsp2, only: compute_Eq_cell
+
+         subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
+            use hydro_rsp2, only: compute_Eq_cell
+            use tdc_pulse, only: compute_tdc_Eq_cell
+
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
@@ -261,6 +264,15 @@
             if (s% RSP2_flag) then
                Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
+            end if
+
+            if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then
+                Eq_ad = compute_tdc_Eq_cell(s, k, ierr)
+                !if (k==91) then
+                !write(*,*) 'test Eq, k', Eq_ad %val , k
+                !end if
+                if (ierr /= 0) return
             end if
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
@@ -339,11 +351,29 @@
          end subroutine setup_RTI_diffusion
 
          subroutine setup_d_turbulent_energy_dt(ierr)
+            use star_utils, only: get_face_weights
+            use const_def, only: sqrt_2_div_3
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: TDC_eturb_cell
+            real (dp) :: TDC_eturb_cell_start, alfa, beta
             include 'formats'
             ierr = 0
             if (s% RSP2_flag) then
                d_turbulent_energy_dt_ad = (wrap_etrb_00(s,k) - get_etrb_start(s,k))/dt
+            else if (s% mlt_vc_old(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then
+               ! write a wrapper for this.
+               if (k == 1) then
+                  TDC_eturb_cell_start = pow2(s% mlt_vc_old(k)/sqrt_2_div_3)
+                  TDC_eturb_cell = pow2(s% mlt_vc(k)/sqrt_2_div_3)
+               else
+                  call get_face_weights(s, k, alfa, beta)
+                  TDC_eturb_cell_start = alfa*pow2(s% mlt_vc_old(k)/sqrt_2_div_3) + &
+                     beta*pow2(s% mlt_vc_old(k-1)/sqrt_2_div_3)
+                  TDC_eturb_cell = alfa*pow2(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
+                     beta*pow2(s% mlt_vc_ad(k-1)/sqrt_2_div_3)
+               end if
+               d_turbulent_energy_dt_ad = (TDC_eturb_cell - TDC_eturb_cell_start) / dt
             else
                d_turbulent_energy_dt_ad = 0d0
             end if

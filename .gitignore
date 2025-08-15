@@ -39,21 +39,13 @@ docs/source/_tags
 
 ## Output
 **/LOGS*/
-**/LOGS1/
-**/LOGS2/
 **/photos/
 **/png/
-**/png1/
-**/png2/
-**/png3/
+**/png*/
 **/pgstar_out/
-**/pgstar_out1/
-**/pgstar_out2/
-**/pgstar_out3/
+**/pgstar_out*/
 **/plt_out/
-**/plt_out1/
-**/plt_out2/
-**/plt_out3/
+**/plt_out*/
 
 ## Bill
 star_data/public_*
