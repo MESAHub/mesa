@@ -185,8 +185,13 @@ module turb
          ! L = L0 * (gradL + Y) + c0 * Af * Y_env
          ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
          ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
-         Y_face = unconvert(info%L - info%L0 * info%gradL) / &
-            (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
+         if (include_mlt_corr_to_TDC) then
+            Y_face = unconvert(info%L - info%L0 * info%gradL) / &
+               (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
+         else
+            Y_face = unconvert(info%L - info%L0 * info%gradL) / &
+               (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel)
+         end if
       end if
 
       ! Unpack output
