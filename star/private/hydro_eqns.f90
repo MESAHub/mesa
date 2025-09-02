@@ -1009,7 +1009,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
-            if (s% RSP2_flag) then  ! interpolate lnT by mass, To do: check what happens if we try this with mlt?
+            if (s% RSP2_flag) then  ! interpolate lnT by mass, To do: check what happens when we do this with mlt?
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
                dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))

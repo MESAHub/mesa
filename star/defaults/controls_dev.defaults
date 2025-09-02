@@ -304,6 +304,7 @@
       ! Remeshing parameters
       ! ~~~~~~~~~~~~~~~~~~~~
 
+    remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_pulse_use_mass_interp_face_values = .false.
 
     TDC_pulse_nz = 150

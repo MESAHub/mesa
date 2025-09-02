@@ -178,7 +178,7 @@ module turb
       Zlb = lower_bound_Z
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
 
-      ! Cap conv_vel at max_conv_vel_div_csound*cs, always uses mlt correction.
+      ! Cap conv_vel at max_conv_vel_div_csound*cs
       if (conv_vel%val > max_conv_vel) then
          conv_vel = max_conv_vel
          ! if max_conv_vel = csound,

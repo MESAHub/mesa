@@ -138,10 +138,7 @@ contains
       dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       dm_cell = s%dm(k)                     ! cell mass
 
-      ! Eq. (5)
       d_v_div_r = -dm_cell/(4d0*pi*rho_cell)*(dlnrho_dt/pow3(r_cell) + 3d0*v_cell/pow4(r_cell))
-
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹
    end function compute_rho_form_of_d_v_div_r
 
    function compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
@@ -159,12 +156,9 @@ contains
       dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       dm_cell = s%dm(k)                     ! cell mass
 
-      ! Eq. (5)
       d_v_div_r = -dm_cell/(4d0*pi*rho_cell)* &
                   (dlnrho_dt/pow3(r_cell) &
                    + 3d0*v_cell/pow4(r_cell))
-
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
    end function compute_rho_form_of_d_v_div_r_opt_time_center
 
 
@@ -192,11 +186,7 @@ contains
          dm_bar = 0.5d0*s% dm(k)
       end if
 
-
-      ! Eq. (5)
       d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
-
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
    end function compute_rho_form_of_d_v_div_r_face
 
    function compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
@@ -224,11 +214,7 @@ contains
          dm_bar = 0.5d0*s% dm(k)
       end if
 
-
-      ! Eq. (5)
       d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
-
-      ! units check:  (g) / (g cm) * (s⁻¹ cm⁻3) = s⁻¹        ✓
    end function compute_rho_form_of_d_v_div_r_face_opt_time_center
 
 
@@ -513,7 +499,7 @@ contains
 
 
 
-   function compute_tdc_Eq_div_w_face(s, k, ierr) result(Eq_face)  ! erg g^-1 s^-1
+   function compute_tdc_Eq_div_w_face(s, k, ierr) result(Eq_face)  ! erg g^-1 s^-1 * (cm^-1 s^1)
    type(star_info), pointer :: s
    integer, intent(in) :: k
    type(auto_diff_real_star_order1) :: Eq_face
@@ -544,7 +530,7 @@ contains
       end if
 
       if (ierr /= 0) return
-      Eq_face = 4d0*pi*Chi_face*d_v_div_r/dmbar  ! erg s^-1 g^-1
+      Eq_face = 4d0*pi*Chi_face*d_v_div_r/dmbar  ! erg s^-1 g^-1 * (cm^-1 s^1)
    end if
    !s%Eq(k) = Eq_face%val
    !s%Eq_ad(k) = Eq_face

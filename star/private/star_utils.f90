@@ -1712,7 +1712,7 @@
       end subroutine store_partials
 
 
-      subroutine set_scale_height(s) ! do i need to alter this to use geff, it doesn't look like it's used in mlt...
+      subroutine set_scale_height(s) ! does this need to use geff, not used in mlt.
          type (star_info), pointer :: s
          real(dp) :: Hp, alt_Hp, alfa, beta, rho_face, Peos_face
          integer :: k

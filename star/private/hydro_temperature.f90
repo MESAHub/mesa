@@ -318,7 +318,7 @@
       subroutine set_RSP_Lsurf_BC(s, nvar, ierr)
          use const_def, only: crad, clight, pi4
          use eos_def
-         use star_utils, only: save_eqn_residual_info, get_area_info_opt_time_center
+         use star_utils, only: save_eqn_residual_info
          use auto_diff_support
          implicit none
 
@@ -345,20 +345,7 @@
 
          if (debug) write(*,*) 'RSP zone 1 surface BC being set'
 
-         call get_area_info_opt_time_center(s, 1, area_ad, inv_R2, ierr) ! handles time centering for area
-         ! time centering the surface luminosity can be very noisy
-         !if (s% using_velocity_time_centering .and. &
-         !s% include_L_in_velocity_time_centering) then
-         !    L_theta = s% L_theta_for_velocity_time_centering
-         !else
-         !    L_theta = 1d0
-         !end if
-         !L1_ad = L_theta*wrap_L_00(s, 1) + (1d0 - L_theta)*s% L_start(1)
-
-         ! uncomment lines below to remove time centering entirely.
-         !r1_ad = wrap_r_00(s,1)
-         !area_ad = pi4*pow2(r1_ad)
-
+         ! no time centering the surface equations.
          L1_ad = wrap_L_00(s, 1)
          T_surf = wrap_T_00(s,1)
 
@@ -366,7 +353,7 @@
             write(*,*) 'T_surf =', T_surf%val, ' r_surf =', r1_ad%val, ' area =', area_ad%val
          end if
 
-         ! rsp2 equation, zone 1:
+         ! rsp equation, zone 1
          rhs_ad = s%RSP2_Lsurf_factor * area_ad * clight * (crad * pow4(T_surf)) ! missing Lc at the moment, so only radiative surface
 
          if (debug) then
@@ -378,7 +365,7 @@
          lhs_ad = L1_ad
          resid_ad = lhs_ad - rhs_ad
 
-         scale =maxval(s% L_start(1:s% nz))!abs(s% L_start(1)) ! maybe use maxval(s% L_start(1:s% nz))
+         scale =maxval(s% L_start(1:s% nz))
          resid_ad = resid_ad / scale
 
          if (debug) then
@@ -420,12 +407,12 @@
 
          ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
 
-!         if (s% make_mlt_hydrodynamic .and. (s%v_flag .or. s% u_flag)) then
-!            call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
-!            grav = wrap_geff_face(s,k)
-!         else
-            call expected_HSE_grav_term(s, k, grav, area, ierr)
-!         end if
+         if (s% make_mlt_hydrodynamic .and. (s%v_flag .or. s% u_flag)) then
+            call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
+            grav = -wrap_geff_face(s,k)
+         else
+            call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
+         end if
 
          if (ierr /= 0) return
 

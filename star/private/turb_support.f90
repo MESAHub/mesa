@@ -430,7 +430,7 @@ contains
          Gamma = 0d0
       end if
 
-      ! Prevent convection near center of model for TDC pulsations
+      ! Prevent convection near center of model for MLT or TDC pulsations
       ! We don't check for the using_TDC flag, because mlt is sometimes called when using TDC
       if ( s% TDC_num_innermost_cells_forced_nonturbulent > 0 .and. &
          k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
@@ -442,19 +442,6 @@ contains
          D = 0d0
          Gamma = 0d0
       end if
-
-      !
-      ! disable negative sources? Makes TDC the same as florida budapest.
-      !Lconv_ratio = (1d0 - gradT/gradr) ! Lconv/Ltotal = 1 - gradT/gradr
-      !if ((Lconv_ratio%val < 0d0 .or. is_bad(Lconv_ratio%val))) then
-      !   if (report) write(*,2) 'Lconv_ratio < 0', k, Lconv_ratio%val
-      !   mixing_type = no_mixing
-      !   gradT = gradr
-      !   Y_face = gradT - gradL
-      !   conv_vel = 0d0
-      !   D = 0d0
-      !   Gamma = 0d0
-      !end if
 
 
       contains

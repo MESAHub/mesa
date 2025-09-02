@@ -430,12 +430,8 @@
             if (s% RSP2_flag) then  ! Uq(k) is turbulent viscosity drag at face k
                Uq_ad = compute_Uq_face(s, k, ierr)
                if (ierr /= 0) return
-            end if
-
-            ! need to add check for v_flag.
-            if (s% alpha_TDC_DampM > 0 .and. s% MLT_option == 'TDC') then ! Uq(k) is turbulent viscosity drag at face k
+            else if (s% alpha_TDC_DampM > 0 .and. s% MLT_option == 'TDC') then ! Uq(k) is turbulent viscosity drag at face k
                Uq_ad = compute_tdc_Uq_face(s, k, ierr)
-               !write (*,*) Uq_ad %val, 'Uq_ad %val'
                if (ierr /= 0) return
             end if
 

@@ -264,14 +264,9 @@
             if (s% RSP2_flag) then
                Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
-            end if
-
-            if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
-               s% TDC_include_eturb_in_energy_equation) then
-                Eq_ad = compute_tdc_Eq_cell(s, k, ierr)
-                !if (k==91) then
-                !write(*,*) 'test Eq, k', Eq_ad %val , k
-                !end if
+            else if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then ! not checking for v or u flag.
+                Eq_ad = compute_tdc_Eq_cell(s, k, ierr) ! safe to just recompute
                 if (ierr /= 0) return
             end if
 

@@ -45,8 +45,7 @@ contains
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
       integer :: k, j, nz_old, nz
-      real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1, xm_anchor_core
-      real(dp), parameter :: RSP2_T_core = 1d6  ! Tcore anchor
+      real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1
       real(dp), allocatable, dimension(:) :: &
          xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
       real(dp), pointer :: work1(:)  ! =(nz_old+1, pm_work_size)
@@ -68,16 +67,13 @@ contains
          xm(nz + 1), xm_mid(nz), v_new(nz + 1), work1((nz_old + 1)*pm_work_size))
       call set_xm_old2
       call find_xm_anchor2
-      call find_xm_anchor_core2
       call set_xm_new2
       call interpolate1_face_val2(s%i_lnR, log(max(1d0, s%r_center)))
       call check_new_lnR2
       call interpolate1_face_val2(s%i_lum, s%L_center)
-      !call interpolate_mlt_vc_face_val2()
       if (s%i_v /= 0) call interpolate1_face_val2(s%i_v, s%v_center)
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
-      !call interpolate1_cell_val(s% i_w)
       do j = 1, s%species
          call interpolate1_xa2(j)
       end do
@@ -165,44 +161,6 @@ contains
          end do
       end subroutine set_xm_old2
 
-      subroutine find_xm_anchor_core2
-         implicit none
-         real(dp) :: lnT_core, xmm1, xm00, lnTm1, lnT00
-         integer  :: k
-         include 'formats'
-
-         !-- target ln T for the core anchor
-         lnT_core = log(RSP2_T_core)
-
-         !-- sanity check: must be hotter than the surface
-         if (lnT_core <= s%xh(s%i_lnT, 1)) then
-            write (*, 1) 'T_core < T_surf', RSP2_T_core, exp(s%xh(s%i_lnT, 1))
-            call mesa_error(__FILE__, __LINE__, 'find_xm_anchor_core')
-         end if
-
-         !-- default if never crossed (should not happen)
-         xm_anchor_core = xm_old(nz_old)
-
-         !-- find first cell where lnT ≥ lnT_core
-         do k = 2, nz_old
-            if (s%xh(s%i_lnT, k) >= lnT_core) then
-               xmm1 = xm_old(k - 1)
-               xm00 = xm_old(k)
-               lnTm1 = s%xh(s%i_lnT, k - 1)
-               lnT00 = s%xh(s%i_lnT, k)
-               xm_anchor_core = xmm1 + &
-                                (xm00 - xmm1)* &
-                                (lnT_core - lnTm1)/(lnT00 - lnTm1)
-               if (is_bad(xm_anchor_core) .or. xm_anchor_core <= 0d0) then
-                  write (*, 2) 'bad xm_anchor_core', k, xm_anchor_core, &
-                     xmm1, xm00, lnTm1, lnT00, lnT_core
-                  call mesa_error(__FILE__, __LINE__, 'find_xm_anchor_core')
-               end if
-               return
-            end if
-         end do
-      end subroutine find_xm_anchor_core2
-
       subroutine find_xm_anchor2
          real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
          include 'formats'
@@ -231,20 +189,13 @@ contains
 
       subroutine set_xm_new2  ! sets xm, dm, m, dq, q
          integer :: nz_outer, k, n_inner
-         real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx, base_dm, rem_mass, H, sum_geom
+         real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx, base_dm, rem_mass, H
          real(dp) :: H_low, H_high, H_mid, f_low, f_high, f_mid
-
-!            integer  :: N_lnT, N_log, j, k_old, idx
-!            real(dp) :: lnT_core_old, lnT_anchor_core, dlnT_step
-!            real(dp) :: ln_xm_anchor, ln_xm_core, dln_xm, lnT_target
-!            real(dp) :: ln_xm_center, dln_xm2
-
          integer :: iter
          include 'formats'
          nz_outer = s%TDC_pulse_nz_outer
          dq_1_factor = s%TDC_pulse_dq_1_factor
          dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
-         !write(*,2) 'dxm_outer', nz_outer, dxm_outer, xm_anchor
          xm(1) = 0d0
          xm(2) = dxm_outer*dq_1_factor
          s%dm(1) = xm(2)
@@ -256,10 +207,10 @@ contains
          if (.not. s%remesh_for_TDC_pulsations_log_core_zoning) then
             ! do rsp style core zoning with a power law on dq
 
-            !-- solve for a smooth ramp factor H via bisection ----------------------
+            ! solve for a smooth ramp factor H via bisection
             n_inner = nz - nz_outer
             rem_mass = s%xmstar - xm(nz_outer + 1)
-            base_dm = dxm_outer            ! anchor continuity: first dm equals outer spacing
+            base_dm = dxm_outer !first dm equals outer spacing
 
             ! define function f(H) = base_dm*(sum_{j=1..n_inner-1}H^j) - rem_mass
 
@@ -282,17 +233,17 @@ contains
             end do
             H = H_mid
 
-            !-- first interior cell:
+            ! first interior cell:
             s%dm(nz_outer + 1) = base_dm
             xm(nz_outer + 2) = xm(nz_outer + 1) + s%dm(nz_outer + 1)
 
-            !-- subsequent interior cells: ramp by H per zone (except final)
+            ! subsequent interior cells: ramp by H per zone (except final)
             do k = nz_outer + 2, nz - 1
                s%dm(k) = H**(k - nz_outer - 1)*base_dm
                xm(k + 1) = xm(k) + s%dm(k)
             end do
 
-            !-- final interior cell absorbs any remaining mass
+            ! final interior cell absorbs any remaining mass
             s%dm(nz) = s%xmstar - xm(nz)
             xm(nz + 1) = s%xmstar
 
@@ -309,61 +260,6 @@ contains
                s%dm(k - 1) = xm(k) - xm(k - 1)
             end do
             s%dm(nz) = s%xmstar - xm(nz)
-
-!
-!                     !———— two-stage core zoning ————
-!
-!               ! 1) how many ΔlnT zones from core-anchor to true core T?
-!               dlnT_step        = 0.05d0
-!               lnT_anchor_core = log(RSP2_T_core)
-!               lnT_core_old    = s% xh(s% i_lnT, nz_old)
-!               N_lnT = int( (lnT_core_old - lnT_anchor_core) / dlnT_step + 0.5d0 )
-!               N_lnT = max(1, min(N_lnT, nz - nz_outer))
-!               write(*,*) "N_lnT", N_lnT
-!               ! 2) the rest are log-mass zones between xm_anchor and xm_anchor_core
-!               N_log = (nz - nz_outer) - N_lnT
-!            write(*,*) "N_log", N_log
-!
-!               idx = nz_outer + 1   ! first interior boundary
-!
-!               ! — log spacing in xm from xm_anchor → xm_anchor_core
-!               ln_xm_anchor = log(xm_anchor)
-!               ln_xm_core   = log(xm_anchor_core)
-!               dln_xm       = (ln_xm_core - ln_xm_anchor) / N_log
-!               do j = 1, N_log
-!                  xm(idx + j) = exp( ln_xm_anchor + dln_xm * j )
-!               end do
-!
-!!!                — equal ΔlnT spacing from RSP2_T_core → core
-!!               do j = 1, N_lnT
-!!                  lnT_target = lnT_anchor_core + dlnT_step * j
-!!                  if (lnT_target > lnT_core_old) lnT_target = lnT_core_old
-!!
-!!                  do k_old = 1, nz_old-1
-!!                     if ( s% xh(s% i_lnT, k_old)    <= lnT_target .and.  &
-!!                          lnT_target             <= s% xh(s% i_lnT, k_old+1) ) then
-!!                        xm(idx + N_log + j) = xm_old(k_old) +                        &
-!!                           (xm_old(k_old+1)-xm_old(k_old)) *                       &
-!!                           (lnT_target - s% xh(s% i_lnT, k_old)) /                 &
-!!                           (s% xh(s% i_lnT, k_old+1)-s% xh(s% i_lnT, k_old))
-!!                        exit
-!!                     end if
-!!                  end do
-!!               end do
-!
-!! — log spacing in xm from xm_anchor_core → center over N_lnT cells
-!ln_xm_core   = log(xm_anchor_core)
-!ln_xm_center = log(s% xmstar)
-!dln_xm2      = (ln_xm_center - ln_xm_core)   / N_lnT
-!do j = 1, N_lnT
-!  xm(idx + N_log + j) = exp( ln_xm_core + dln_xm2 * j )
-!end do
-
-!! — **equal-mass** spacing over N_lnT cells from xm_anchor_core → center
-!do j = 1, N_lnT
-!   xm(idx + N_log + j) = xm_anchor_core +                        &
-!        (s% xmstar - xm_anchor_core) * j / N_lnT
-!end do
 
             ! — enforce the last boundary at total mass
             xm(nz + 1) = s%xmstar
@@ -396,31 +292,6 @@ contains
          write (*, 1) 'm_center', s%m_center/msun
          call mesa_error(__FILE__, __LINE__, 'set_xm_new')
       end subroutine set_xm_new2
-
-      subroutine interpolate_mlt_vc_face_val2() ! might be unnecessary
-!            integer, intent(in) :: i
-!            real(dp), intent(in) :: cntr_val
-         do k = 1, nz_old
-            v_old(k) = s%mlt_vc(k)
-         end do
-         v_old(nz_old + 1) = s%mlt_vc(nz_old)
-         call interpolate_vector_pm( &
-            nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
-         do k = 1, nz
-            s%mlt_vc(k) = v_new(k)
-         end do
-
-         ! this could be problematic if mlt_vc_old isnt set
-!            do k=1,nz_old
-!               v_old(k) = s% mlt_vc_old(k)
-!            end do
-!            v_old(nz_old+1) = s%mlt_vc_old(nz_old)
-!            call interpolate_vector_pm( &
-!               nz_old+1, xm_old, nz+1, xm, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
-!            do k=1,nz
-!               s% mlt_vc_old(k) = v_new(k)
-!            end do
-      end subroutine interpolate_mlt_vc_face_val2
 
       subroutine interpolate1_face_val2(i, cntr_val)
          integer, intent(in) :: i
