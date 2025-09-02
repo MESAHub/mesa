@@ -734,7 +734,7 @@
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          integer, intent(out) :: ierr
 
-         integer, parameter :: inspectB_iter_stop = -1 ! XXXXXX 25!-1
+         integer, parameter :: inspectB_iter_stop = 25 ! XXXXXX 25!-1
          include 'formats'
 
          if (dbg) write(*, *) 'inspectB', s% solver_iter
