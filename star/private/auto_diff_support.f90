@@ -999,7 +999,7 @@
 
       function wrap_geff_face(s, k) result(geff)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: geff, dv_dt, r2
+         type(auto_diff_real_star_order1) :: geff, dv_dt, r2, g
          integer, intent(in) :: k
          geff = 0d0
          dv_dt = 0d0
@@ -1012,10 +1012,13 @@
             ! add in hydrodynamic term
             dv_dt = wrap_dxh_v_face(s,k)/s%dt
             ! hydrodynamic correction to g is geff = g - dvdt, to do: add a floor and ceiling
+
             if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
-               geff = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2 - dv_dt
+               g = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
+               geff = g - sign(dv_dt)*min(abs(dv_dt),0.5d0*g)
             else
-               geff = s%cgrav(k)*s%m_grav(k)/r2 - dv_dt
+               g = s%cgrav(k)*s%m_grav(k)/r2
+               geff = g - sign(dv_dt)*min(abs(dv_dt),0.5d0*g)
             end if
          else ! default is below
             if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
@@ -1024,6 +1027,7 @@
                geff = s%cgrav(k)*s%m_grav(k)/r2
             end if
          end if
+
       end function wrap_geff_face
 
       subroutine get_face_weights_ad_support(s, k, alfa, beta)

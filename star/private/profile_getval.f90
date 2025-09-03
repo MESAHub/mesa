@@ -1186,7 +1186,10 @@
                if (k > 1) val = log(s% rho_face(k-1)/s% rho_face(k)) / (s% lnR(k-1) - s% lnR(k))
 
             case (p_dvdt_grav)
-               val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
+                  val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
+            case (p_grav_eff)
+                  int_val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
+                  val = s% dxh_v(k)/s%dt / (int_val * s% cgrav(k) * s% m(k) /(s% r(k)*s% r(k)))
             case (p_dvdt_dPdm)
                if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% Peos(k-1) - s% Peos(k))/s% dm_bar(k)
 

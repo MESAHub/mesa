@@ -318,7 +318,7 @@
       subroutine set_RSP_Lsurf_BC(s, nvar, ierr)
          use const_def, only: crad, clight, pi4
          use eos_def
-         use star_utils, only: save_eqn_residual_info
+         use star_utils, only: save_eqn_residual_info, get_area_info_opt_time_center
          use auto_diff_support
          implicit none
 
@@ -345,6 +345,7 @@
 
          if (debug) write(*,*) 'RSP zone 1 surface BC being set'
 
+         call get_area_info_opt_time_center(s, 1, area_ad, inv_R2, ierr)
          ! no time centering the surface equations.
          L1_ad = wrap_L_00(s, 1)
          T_surf = wrap_T_00(s,1)
@@ -409,7 +410,7 @@
 
          if (s% make_mlt_hydrodynamic .and. (s%v_flag .or. s% u_flag)) then
             call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
-            grav = -wrap_geff_face(s,k)
+            grav = -wrap_geff_face(s,k) ! analytic form for hydrodynamic grav
          else
             call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
          end if
