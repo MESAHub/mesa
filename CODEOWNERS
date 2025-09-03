@@ -21,7 +21,7 @@ interp_2d/ @rhdtownsend
 ionization/ @fxt44
 kap/ @fxt44 @Debraheem
 linters/
-turb/
+turb/ @Debraheem
 math/ @rhdtownsend
 mtx/ @mjoyceGR
 net/ @fxt44 @Debraheem
