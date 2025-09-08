@@ -28,7 +28,7 @@ The first step in making use of these capabilities is to activate them.
 In the MESA work directory you made as part of the tutorial, navigate to
 the src directory
 
-::
+.. code-block:: console
 
    cd tutorial/src
 
@@ -36,7 +36,7 @@ and open up run_star_extras.f90 in your text editor of choice. The stock
 version of run_star_extras.f90 is quite boring. It “includes” another file
 which holds the default set of routines.
 
-::
+.. code-block:: fortran
 
    include 'standard_run_star_extras.inc'
 
@@ -50,7 +50,7 @@ $MESA_DIR/include/standard_run_star_extras.inc.
 
 Before we make any changes, we should check that the code compiles.
 
-::
+.. code-block:: console
 
    cd ..
    ./mk
@@ -111,7 +111,9 @@ again when using ``run_star_extras.f90`` and that is ``x_ctrl``,
 ``x_integer_ctrl``, ``x_logical_ctrl``, and ``x_character_ctrl``.
 These are arrays (of length 100 by default) of double precision,
 integer, boolean, and character values.  You
-can set the elements in your inlists::
+can set the elements in your inlists
+
+.. code-block:: fortran
 
   &controls
     x_ctrl(1) = 3.14
@@ -530,7 +532,7 @@ people encounter when using the ``other_*`` hooks.
 First, edit the controls section of your inlist to set the appropriate
 ``use_other_*`` flag to .true. . In our example, this means adding the line
 
-::
+.. code-block:: fortran
 
    use_other_neu = .true.
 
@@ -554,7 +556,9 @@ the other_neu at the routine you want to be executed.
 
   end subroutine extras_controls
 
-Now, recompile your working directory::
+Now, recompile your working directory
+
+.. code-block:: console
 
    ./mk
 

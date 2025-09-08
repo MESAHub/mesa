@@ -46,7 +46,7 @@ is starting to transform the hydrogen-rich envelope to the helium-rich core.
 The brunt B profile in the vicinity of the thermohaline region is
 shown the following plot.  The mixing type is again indicated on the
 x-axis.  A negative brunt B corresponds to a negative molecular weight
-gradient, which is the hallmark of of a region that is unstable to
+gradient, which is the hallmark of a region that is unstable to
 thermohaline mixing. Note the thermohaline region begins and ends
 where brunt B becomes negative.
 

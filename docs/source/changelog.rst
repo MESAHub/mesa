@@ -22,14 +22,15 @@ Backwards-incompatible changes
 ``pgstar`` / ``pgbinary``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Removed `file_extension` option because it is redundant with `file_device`. Delete `file_extension` from your inlists.
+Removed ``file_extension`` option because it is redundant with ``file_device``. Delete ``file_extension`` from your inlists.
 
-Renamed pgstar `pause` option to `pause_flag` because pause is a reserved Fortran 77 keyword.
+Renamed pgstar ``pause``` option to ``pause_flag``` because pause is a reserved Fortran 77 keyword.
 
 .. _New Features main:
 
 New Features
 ------------
+
 
 Colors Module Overhaul
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -53,8 +54,12 @@ Filter-specific magnitude columns are automatically added to history output base
 
 See the ``star/test_suite/custom_colors`` test suite case for usage examples.
 
+
 Other features
 ~~~~~~~~~~~~~~
+
+The default ``overshoot_D_min = 1d2`` has been changed to ``overshoot_D_min = 1d-2``. This change primarily affects
+exponential diffusive overshooting routines, improving their convergence properties. See `Buchele et al. (2025) <https://ui.adsabs.harvard.edu/abs/2025RNAAS...9..193B/abstract>`_.
 
 Changed the default for ``use_radiation_corrected_transfer_rate =
 .false.``.
@@ -65,8 +70,8 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
-Exposed `star_utils` functions `star_weighted_smoothing`, `star_threshold_smoothing`, `star_kh_time_scale` to the user.
-These functions can now be called in your custom `run_star_extras.f90` file, for data in a star, getting relevant timescales.
+Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
+These functions can now be called in your custom ``run_star_extras.f90`` file, for data in a star, getting relevant timescales.
 
 For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
 a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide
@@ -79,7 +84,7 @@ control ``use_flux_limiting_with_dPrad_dm_form`` for use with ``use_dPrad_dm_for
 
 By user request, an option for limiting the convective velocity predicted by mixing length theories has been introduced
 allowing users to limit the convective velocity to some fraction of the local sound speed using the
-controls `max_conv_vel_div_csound` and `max_conv_vel_div_csound_maxq`.
+controls ``max_conv_vel_div_csound`` and ``max_conv_vel_div_csound_maxq``.
 
 By user request, and motivated by the underestimation of line opacities from expanding material by the
 `Ferguson (2005) <https://ui.adsabs.harvard.edu/abs/1994ApJ...437..879A/abstract>`_ tables,
@@ -100,6 +105,8 @@ Fixed small bug in star/private/create_initial_model.f90 that will have a small 
 Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
 
 Fixed bug in binary photos. They were not saving the variables: ``CE_years_detached``, ``CE_years_detached_old``, ``generations``.
+
+Fixed bug that ``Orbit_win_flag = .true.`` was not showing Orbit plot (pgbinary)
 
 Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
@@ -275,7 +282,7 @@ There has been a bug present in the rates module due to the incorrect
 phase space factors for reverse reaction rates involving greater than 2 reactants or
 products. This bug resulted in inconsistent equilibrium compositions when the network
 evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK.
-This bug effects users who evolve models into NSE using large reaction networks. This
+This bug affects users who evolve models into NSE using large reaction networks. This
 includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
 networks are less affected. We strongly recommend that users update to the latest MESA release.
 
@@ -815,7 +822,7 @@ The 7Be(e-,nu)7Li has been switched from REACLIB rate to that of `Simonucci et a
 due to the fact that the REACLIB rate does not take into account the neutral ion rate below 10^7 K.
 
 The ability to set the rates preferences has been removed. This added a lot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
-From now on we excusivily use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
+From now on we exclusively use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
 from CF88 (if they aren't in REACLIB or NACRE).
 
 Of note is that the default C12(a,g)O16 rate has thus changed from NACRE to that of REACLIB.

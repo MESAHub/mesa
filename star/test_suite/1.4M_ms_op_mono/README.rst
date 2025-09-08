@@ -10,7 +10,7 @@ The test checks the functionality of OP mono opacities. The test vehicle is a
 
 This test case has three parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_1.4M_ms_initial_model``) creates the pre-main-sequence model and evolves the model until the central hydrogen mass fractions falls below 0.5. During this evolution the OP mono opacities are off.
+* Part 1 (``inlist_1.4M_ms_initial_model``) creates the pre-main-sequence model and evolves the model until the central hydrogen mass fraction falls below 0.5. During this evolution the OP mono opacities are off.
 
 .. image:: ../../../star/test_suite/1.4M_ms_op_mono/docs/initial_model.svg
    :width: 100%

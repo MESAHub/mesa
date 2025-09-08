@@ -53,7 +53,7 @@ evaluated, as follows:
 
    * - ``'fixed'``
      - Assume the same opacity at each optical depth (i.e. uniform
-       opacity), equal to the the opacity in the outermost cell of the
+       opacity), equal to the opacity in the outermost cell of the
        interior model. The equation of hydrostatic equilibrium is
        integrated analytically.
 

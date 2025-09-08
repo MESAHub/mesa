@@ -12,7 +12,6 @@
 
 
 &eos
-
    ! eos options
    ! see eos/defaults/eos.defaults
 
@@ -20,7 +19,6 @@
 
 
 &kap
-
    ! kap options
    ! see kap/defaults/kap.defaults
    use_Type2_opacities = .true.

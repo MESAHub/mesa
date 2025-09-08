@@ -16,7 +16,7 @@ This document describes how to use the MESA equation of state, opacity, and nucl
 | Before starting, explore :ref:`eos/overview:Overview of eos module` and :ref:`eos/defaults:eos module controls`.
 | From where you unpacked the zip file
 
-::
+.. code-block:: console
 
    cd my_eos
    cp $MESA_DIR/eos/test/src/sample_eos.f90 .
@@ -25,20 +25,20 @@ This document describes how to use the MESA equation of state, opacity, and nucl
 Edit sample_eos.f90 and change the variable
 
 
-::
+.. code-block:: console
 
   my_mesa_dir = '../..'
 
 to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
-::
+.. code-block:: console
 
   my_mesa_dir = ''
 
 while you are editing sample_eos.f90, take some time to explore the source code. Save and exit sample_eos.f90.
 Now take some time to explore the makefile, and use it to build the executable
 
-::
+.. code-block:: console
 
      make
 
@@ -103,7 +103,7 @@ As mentioned in sample_eos.f90, it can be useful to look at the integer indices 
 | Before starting, explore :ref:`kap/overview:Overview of kap module` and :ref:`kap/defaults:kap module controls`.
 | From where you unpacked the zip file
 
-::
+.. code-block:: console
 
    cd my_kap
    cp $MESA_DIR/kap/test/src/sample_kap.f90 .
@@ -112,20 +112,20 @@ As mentioned in sample_eos.f90, it can be useful to look at the integer indices 
 
 Edit sample_kap.f90 and change the variable
 
-::
+.. code-block:: console
 
   my_mesa_dir = '../..'
 
 to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
-::
+.. code-block:: console
 
   my_mesa_dir = ''
 
 while you are editing sample_kap.f90, take some time to explore the source code. Save and exit sample_kap.f90.
 Now take some time to explore the makefile, and use it to build the executable
 
-::
+.. code-block:: console
 
      make
 
@@ -160,7 +160,7 @@ Explore the output with, for example,
 | Before starting, explore :ref:`net/overview:Overview of net module` and :ref:`net/nets:Reaction Networks`.
 | From where you unpacked the zip file
 
-::
+.. code-block:: console
 
    cd my_net
    cp $MESA_DIR/net/test/src/sample_net.f90 .
@@ -168,13 +168,13 @@ Explore the output with, for example,
 
 Edit sample_net.f90 and change the variable
 
-::
+.. code-block:: console
 
   my_mesa_dir = '../..'
 
 to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
-::
+.. code-block:: console
 
   my_mesa_dir = ''
 
@@ -182,7 +182,7 @@ to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automa
 while you are editing sample_net.f90, take some time to explore the source code. Save and exit sample_net.f90.
 Now take some time to explore the makefile, and use it to build the executable
 
-::
+.. code-block:: console
 
      make
 

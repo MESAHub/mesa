@@ -16,7 +16,7 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :target: https://docs.mesastar.org/en/latest/
 .. image:: https://img.shields.io/github/v/release/MESAHub/mesa
     :alt: GitHub release (latest by date)
-    :target: https://github.com/MESAHub/mesa/releases/latest
+    :target: https://zenodo.org/records/13353788
 .. image:: https://img.shields.io/badge/zenodo-community-blue
     :alt: Zenodo
     :target: https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10
