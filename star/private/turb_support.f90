@@ -332,11 +332,11 @@ contains
             ! first call
             if (T <1d7) then
 
-               if (k>0) then
-                  s% xtra1_array(k) = delta_Mdot %val
-               end if
+!               if (k>0) then
+!                  s% xtra1_array(k) = delta_Mdot %val
+!               end if
 
-               Psi = max(Psi, gradL/gradr + 1d-4)
+               Psi = max(Psi, gradL/gradr + 1d-2) ! don't make the zone radiative
                Psi = min(Psi,1d0)
 
                
@@ -442,9 +442,9 @@ contains
             if (T <1d7 ) then
 
 !               write (*,*) 'delta_Mdot', delta_Mdot%val*secyer/Msun
-               if (k>0) then
-               s% xtra1_array(k) = delta_Mdot %val
-               end if
+!               if (k>0) then
+!               s% xtra1_array(k) = delta_Mdot %val
+!               end if
 
                Psi = max(Psi, gradL/gradr + 1d-4)
                Psi = min(Psi,1d0)
