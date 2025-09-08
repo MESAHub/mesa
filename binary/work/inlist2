@@ -1,7 +1,6 @@
 
 ! inlist_test_rlo
 
-
 &star_job
 
    mesa_dir = ''
@@ -41,5 +40,4 @@
 
 &pgstar
          
-
 / ! end of pgstar namelist

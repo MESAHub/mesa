@@ -88,9 +88,9 @@
       ! file_device
       ! ~~~~~~~~~~~
 
-      ! 'png' for Portable Network Graphics format
-      ! 'vcps' for Color PostScript ('ps')
-      ! 'ps' for PostScript
+      ! 'png' for Portable Network Graphics format,
+      ! 'vcps' for Color PostScript ('ps'),
+      ! 'ps' for PostScript.
 
       ! ::
 

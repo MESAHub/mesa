@@ -356,7 +356,7 @@ Each of the files in ``$MESA_DIR/data/rates_data/cache`` contains
 10000 lines listing temperature and corresponding rate for the
 specific reaction. However, these are in binary format. Inside
 ``$MESA_DIR/rates/test`` you can find an executable called
-``show_rates`` which can be used to to print the rates in a human
+``show_rates`` which can be used to print the rates in a human
 readable format. To do so, run it passing the path to a cache file as
 argument. You can pipe the output of this executable to a file to
 obtain a file that you can easily plot.

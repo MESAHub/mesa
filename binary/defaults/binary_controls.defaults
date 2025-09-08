@@ -1459,7 +1459,7 @@
 ! ~~~~~~~~~~~~~~~~~~~~~~~
 
 ! Do not change donor if mass transfer is larger than this (given in Msun/secyer).
-! Avoids erratic changes when both stars are filling their roche loches.
+! Avoids erratic changes when both stars are filling their Roche lobes.
 
 ! ::
 

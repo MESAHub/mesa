@@ -534,7 +534,7 @@ Find the call on ``e00`` for ``i_lnd`` to find the relevant partial with respect
    in |MESA II|).  The ``e00`` idiom refers to forming the block
    corresponding to the derivatives of the equations in cell ``k``
    with respect to the variables in cell ``k``.  Similarly, ``em1``
-   and ``ep1`` refer to the the derivatives of the equations in cell
+   and ``ep1`` refer to the derivatives of the equations in cell
    ``k`` with respect to the variables in cell ``k-1`` and in cell
    ``k+1`` respectively.  The 3rd and 4th arguments to these
    subroutines indicate that this call is setting the derivative of a

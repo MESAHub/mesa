@@ -1,0 +1,56 @@
+! colors module controls
+! ======================
+
+   ! The MESA/colors parameters are given default values here.
+
+
+! Colors User Parameters
+! ----------------------
+
+   ! use_colors
+   ! ~~~~~~~~~~
+   ! instrument
+   ! ~~~~~~~~~~
+   ! vega_sed
+   ! ~~~~~~~~
+   ! stellar_atm
+   ! ~~~~~~~~~~~
+   ! distance
+   ! ~~~~~~~~
+   ! make_csv
+   ! ~~~~~~~~
+   ! colors_results_directory
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! If ``use_colors`` is true, the colors module is turned on, which will calculate
+   ! bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
+   ! Vega SED for Vega photometric system is used for photometric zero points.
+   ! Stellar distance is given in cm.
+   ! ::
+
+      use_colors = .false.
+      instrument = '/colors/data/filters/GAIA/GAIA'
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      distance = 3.0857d17
+      make_csv = .false.
+      colors_results_directory = 'SED'
+
+
+! Extra inlist controls
+! ---------------------
+
+   ! One can split a colors inlist into pieces using the following parameters.
+   ! It works recursively, so the extras can read extras too.
+
+
+         ! read_extra_colors_inlist(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         ! extra_colors_inlist_name(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+         ! If ``read_extra_colors_inlist(i)`` is true, then read ``&colors`` from the file ``extra_colors_inlist_name(i)``.
+         ! ::
+
+      read_extra_colors_inlist(:) = .false.
+      extra_colors_inlist_name(:) = 'undefined'

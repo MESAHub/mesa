@@ -30,6 +30,7 @@
       public :: do_star_init
       public :: do_starlib_shutdown
       public :: set_kap_and_eos_handles
+      public :: set_colors_handles
       public :: load_zams_model
       public :: create_pre_ms_model
       public :: create_initial_model
@@ -89,6 +90,32 @@
       end subroutine set_kap_and_eos_handles
 
 
+      subroutine set_colors_handles(id, ierr)
+         use colors_lib, only: alloc_colors_handle_using_inlist, colors_ptr
+         use colors_def, only: Colors_General_Info
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         type (star_info), pointer :: s
+         type(Colors_General_Info), pointer :: colors_settings
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'get_star_ptr failed in alloc_colors_handle'
+            return
+         end if
+         if (s% colors_handle == 0) then
+            s% colors_handle = alloc_colors_handle_using_inlist(s% inlist_fname, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'set_colors_handles failed in alloc_colors_handle'
+               return
+            end if
+            call colors_ptr(s% colors_handle, colors_settings, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'colors_ptr failed in alloc_colors_handle'
+               return
+            end if
+         end if
+      end subroutine set_colors_handles
+
       subroutine do_star_init( &
             my_mesa_dir, chem_isotopes_filename, &
             net_reaction_filename, jina_reaclib_filename, &
@@ -99,7 +126,6 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
          use paquette_coeffs, only: initialise_collision_integrals
          use alloc, only: init_alloc
@@ -113,9 +139,6 @@
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          real(dp), intent(in) :: reaclib_min_T9
-         integer, intent(in) :: color_num_files
-         character (len=*), intent(in) :: color_file_names(:)
-         integer , intent(in):: color_num_colors(:)
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
@@ -132,7 +155,6 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in stardata_init'
@@ -369,6 +391,7 @@
 
          s% eos_handle = 0
          s% kap_handle = 0
+         s% colors_handle = 0
 
          do i = 1, max_num_profile_extras
             if (i < 10) then

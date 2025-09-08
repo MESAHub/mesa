@@ -337,7 +337,7 @@
 
       ! By default at the start of a run a zams starting model is loaded,
       ! and then the ``initial_mass``, ``initial_z``, and ``initial_y`` are adjusted as necessary.
-      ! However, there are alternatives.  you can use a model you saved previously,
+      ! However, there are alternatives. You can use a model you saved previously,
       ! or you can request the system to create a pre-main-sequence model.
 
       ! BTW: the system finds the zams file by using the control called ``zams_filename``
@@ -863,7 +863,7 @@
       ! .. code-block:: console
 
       !     1st line: num_points num_species
-      !     then 1 line for for each point where define desired composition
+      !     then 1 line for each point where define desired composition
       !     xq xa(1) ... xa(num_species)
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -1062,7 +1062,7 @@
       ! file format for relax angular momentum
 
       !     1st line: num_points
-      !     then 1 line for for each point where define desired angular momentum
+      !     then 1 line for each point where define desired angular momentum
       !     xq angular_momentum
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -1120,7 +1120,7 @@
       ! .. code-block:: console
 
       !     1st line: num_points
-      !     then 1 line for for each point where define desired entropy
+      !     then 1 line for each point where define desired entropy
       !     xq entropy
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -1150,7 +1150,7 @@
       ! .. code-block:: console
 
       !     1st line: num_points
-      !     then 1 line for for each point where define desired entropy
+      !     then 1 line for each point where define desired entropy
       !     xq density temperature
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -1570,7 +1570,7 @@
 
       ! NOTE: why 2 flags?
       ! because I want 3 options: set true, set false, and leave it alone.
-      ! there are of course other ways to get 3 options, but this is what we have.
+      ! There are, of course, other ways to get 3 options, but this is what we have.
 
       ! ::
 
@@ -2445,8 +2445,8 @@
     special_rate_factor(:) = 1
 
       ! If set, we read this filename from the local work directory, then try ``data/rates_data/rate_tables``.
-      ! This enables using the MESA provide custom rate tables with out changing the default for everyone.
-      ! Note we still multiple the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
+      ! This enables using the MESA provided custom rate tables without changing the default for everyone.
+      ! Note we still multiply the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
 
       ! For instance setting:
       !    num_special_rate_factors = 1
@@ -2462,7 +2462,7 @@
       ! use_3a_fl87
       ! ~~~~~~~~~~~
 
-      ! If true then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
+      ! If true, then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
       ! This replaces the old set_rate_3a = 'Fl87' option
 
       use_3a_fl87 = .false.
@@ -2866,54 +2866,6 @@
 
     extras_llpar = 0
     extras_lpar(:) = .false.
-
-! Color Files
-! ===========
-
-
-      ! color_num_files
-      ! ~~~~~~~~~~~~~~~
-      ! color_file_names
-      ! ~~~~~~~~~~~~~~~~
-      ! color_num_colors
-      ! ~~~~~~~~~~~~~~~~
-
-      ! |    Filenames for each bolometric correction (BC) table to load
-      ! |    Must set the number of files to load
-      ! |    Must be <= ``max_num_color_files`` (defined in ``colors_def.f90``).
-      ! |    Must set the number of BC's in each file (May be different for each file).
-      ! |    Must be <= ``max_num_bcs_per_file`` (defined in ``colors_def.f90``).
-      ! |    Files should be structured as:
-      ! |    Teff log_g M_div_h filter1 filter2 ....
-      ! |    where filter1 is the name of the filter (No spaces allowed in name)
-      ! |    Names must be unique across all files loaded and are case sensitive.
-      ! |    For a filter named filter1 history output will be bc_filter1 for bolometric corrections
-      ! |    and abs_mag_filter1 for absolute magnitude
-
-      ! Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code
-
-      ! ::
-
-    color_num_files = -1
-    color_file_names(:) = ''
-    color_num_colors(:) = -1
-
-      ! Default file from Lejeune, Cuisinier, Buser (1998) A&AS 130, 65-75
-      ! Can be replaced if need be.
-      ! The filter names are U B V R I J H K L Lprime M (case sensitive)
-
-      ! ::
-
-    color_num_files = 1
-    color_file_names(1) = 'lcb98cor.dat'
-    color_num_colors(1) = 11
-
-      ! Set of blackbody bolometric corrections in UBVRI
-      ! Can be used at the same time as the lcb98cor.dat file
-      ! Filter names bb_U bb_b bb_V bb_R bb_I
-      ! color_num_files=2
-      ! color_file_names(2)='blackbody_johnson.dat'
-      ! color_num_colors(2)=5
 
 ! misc
 ! ====

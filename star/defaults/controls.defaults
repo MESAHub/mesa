@@ -28,7 +28,7 @@
       ! if the requested mass is beyond the range of the prebuilt models, the code will
       ! load the closest one and then call "relax mass" to create a model to match the request.
       ! the prebuilt range is 0.08 Msun to 100 Msun, so the ``relax_mass``
-      ! method is only used for extreme cases.  there are enough prebuilt models that the
+      ! method is only used for extreme cases.  There are enough prebuilt models that the
       ! interpolation in mass seems to work fine for many applications.
 
       ! ::
@@ -118,7 +118,7 @@
       ! if not empty, output terminal info to this file in addition to terminal.
       ! this does not capture all of the terminal output -- just the common items.
       ! it is intended for use in situations where you cannot directly see the terminal output
-      ! such as when running on a cluster.  if you want to be able to monitor
+      ! such as when running on a cluster. If you want to be able to monitor
       ! the progress for such cases, you can set ``extra_terminal_output_file = 'log'``
       ! and then do ``tail -f log`` to view the terminal output as it is recorded in the file.
 
@@ -533,13 +533,13 @@
       ! pulse_data_format
       ! ~~~~~~~~~~~~~~~~~
 
-      ! Format of pulsation data.  Current options (case insensitive) are:
+      ! Format of pulsation data. Current options (case insensitive) are:
 
       ! ``'CAFEIN'``
       !   Format defined for CAFein (`Valsecchi et al. 2013 <https://ui.adsabs.harvard.edu/abs/2013ApJ...773...39V>`_).
 
       ! ``'FGONG'``
-      !   Format originally defined for the GONG solar model project.  A
+      !   Format originally defined for the GONG solar model project. A
       !   definition was given in 2005 for the `CoRoT/ESTA project`_ and
       !   `GONG itself <https://phys.au.dk/~jcd/solar_models/file-format.pdf>`_.
       !   MESA's implementation largely follows this subsequent
@@ -759,7 +759,7 @@
       ! burn_min1
       ! ~~~~~~~~~
 
-      ! used for reporting where burning zone occur, for example in the pgstar TRho profiles.
+      ! used for reporting where burning zones occur, for example in the pgstar TRho profiles.
       ! see ``star/public/star_data.inc`` for details.
       ! must be < ``burn_min2``.
       ! In ergs/g/sec.
@@ -772,7 +772,7 @@
       ! burn_min2
       ! ~~~~~~~~~
 
-      ! used for reporting where burning zone occur, for example in the pgstar TRho profiles.
+      ! used for reporting where burning zones occur, for example in the pgstar TRho profiles.
       ! see ``star/public/star_data.inc`` for details.
       ! In ergs/g/sec.
 
@@ -1804,7 +1804,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! if ``check_mass_sum_for_infall = .true.``, ``fe_core_infall_mass`` is the amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
-      ! transistent velocity spike causing the model to prematurely exit.  In solar masses
+      ! transistent velocity spike causing the model to prematurely exit. In solar masses
 
 
     fe_core_infall_mass = 0.1d0
@@ -2683,7 +2683,7 @@
 
       ! ::
 
-    overshoot_D_min = 1d2
+    overshoot_D_min = 1d-2
 
 
       ! overshoot_brunt_B_max
@@ -2722,7 +2722,7 @@
 
       ! The value of Hp for overshooting is limited to the radial thickness
       ! of the convection zone divided by ``overshoot_alpha``.
-      ! only used when > 0.  if <= 0, then use ``mixing_length_alpha`` instead.
+      ! only used when > 0. If <= 0, then use ``mixing_length_alpha`` instead.
 
       ! ::
 
@@ -3104,7 +3104,7 @@
       ! time weighting for end-of-step vs start-of-step values in equations.
       ! 1 corresponds to fully implicit scheme - stable, but can have large numerical damping.
       ! 0.5 corresponds to trapezoidal rule integration - gives least numerical damping.
-      ! do not use values less than 0.5.  strongly recommend 0.5 for theta and thetat.
+      ! do not use values less than 0.5.  Strongly recommend 0.5 for theta and thetat.
       ! don't mess with any of these unless you know what you are doing or like to watch the code crash.
 
       ! ::
@@ -3174,7 +3174,7 @@
 
       ! .. _Smolec & Moskalik (2010): https://ui.adsabs.harvard.edu/abs/2010A%26A...524A..40S
 
-      ! random initial velocity profile.  added to any kick from eigenvector.
+      ! random initial velocity profile.  Added to any kick from eigenvector.
 
       ! ::
 
@@ -3256,7 +3256,7 @@
       ! if switch to this form, set RSP_cq = 0 to shut off the Neumann & Richtmyer form.
       ! note that this form also uses RSP_zsh to delay onset of artificial viscosity
 
-      ! surface pressure.  provides outer boundary condition for momentum equation.
+      ! surface pressure.  Provides outer boundary condition for momentum equation.
 
       ! ::
 
@@ -3292,7 +3292,7 @@
     RSP_work_period = -1
     RSP_work_filename = 'work.data'
 
-      ! output data for 3d map.  format same as for gnuplot pm3d
+      ! output data for 3d map.  Format same as for gnuplot pm3d
 
       ! ::
 
@@ -5043,7 +5043,7 @@
 
       ! Radiation driven winds of hot stars.
       ! See Kudritzki et al, Astron. Astrophys. 219, 205-218 (1989).
-      ! this is now implemented using the other_wind hook.  see other_physics_hooks test case.
+      ! this is now implemented using the other_wind hook.  See other_physics_hooks test case.
 
 
       ! Grafener_scaling_factor
@@ -6619,8 +6619,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! if abar > this, suppress all burning
-      ! e.g., if want an "inert" core heavy elements, set this to 55
-      ! or, if want to turn off the net, set this to -1
+      ! e.g., if you want an "inert" core heavy elements, set this to 55
+      ! or, if you want to turn off the net, set this to -1
 
       ! ::
 
@@ -7846,7 +7846,7 @@
 
       ! The final term reflects the change in internal energy due to changes in
       ! composition (at fixed density and temperature) and is referred to in MESA as
-      ! ``eps_grav_composition_term``.  It is defined as
+      ! ``eps_grav_composition_term``. It is defined as
 
       ! :math:`\epsilon_{\rm grav, X} \equiv -\sum_i \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T, \{X\ne X_i\}} \frac{DX_i}{Dt}`,
 
@@ -7868,7 +7868,7 @@
       ! not precisely satisfy the mathematical and thermodynamic identities that are
       ! used in rewriting the total and partial derivatives present in the equation.
       ! This inconsistency is usually worst at the conditions where MESA blends
-      ! different component EOSes.  It is important to understand that time
+      ! different component EOSes. It is important to understand that time
       ! discretization error and eos inconsistencies also affect models using the
       ! ``dedt`` form of the energy equation but manifest in different ways (e.g., as
       ! entropy generation).  Under degenerate conditions, it is often preferable to
@@ -8048,8 +8048,19 @@
       ! min_T_for_fe56ec_fake_factor
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Multiplier on ni56 electron capture rate to take isotopes in hardwired networks
-      ! to more neutron rich isotopes.
+      ! Hardwired small nuclear reaction network in the "approx"
+      ! family treat all electron captures with a compound reaction
+      ! dependent on the heaviest isotope included (see
+      ! $MESA_DIR/data/net_data/nets/). The heaviest isotope
+      ! determines the lowest value of ye possible in the core. The
+      ! rate of the compound weak reaction is non-zero only for
+      ! temperatures larger than min_T_for_fe56ec_fake_factor and is
+      ! calculated multiplying the rate of electron captures on ni56
+      ! by fe56ec_fake_factor. This used to be 1d-4 around MESA
+      ! version 7624. Increasing this factor will push the values of
+      ! ye obtained closer to the lowest possible value defined by the
+      ! net, and this can be used to tune the final ye value
+      ! obtainable with a small nuclear reaction network.
 
       ! ::
 
@@ -11380,8 +11391,8 @@
       ! warn_rates_for_high_temp
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true then when any zone tries to evaluate a rate above ``max_safe_logT_for_rates``
-      ! it generates a warning message. The code will  cap the rate at the value
+      ! If true, then when any zone tries to evaluate a rate above ``max_safe_logT_for_rates``
+      ! it generates a warning message. The code will cap the rate at the value
       ! for ``max_safe_logT_for_rates`` whether the warning is on or not.
       ! 10d0 is a sensible default for the max temperature, as that is where the partition tables
       ! and polynomial fits to the rates are valid until.

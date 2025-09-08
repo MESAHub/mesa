@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2025  Niall Miller & The MESA Team
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU Lesser General Public License
@@ -17,392 +17,245 @@
 !
 ! ***********************************************************************
 
-   module colors_lib
-      use math_lib
-      use colors_def
-      use const_def, only : dp, strlen, mbolsun, loggsun, Teffsun
-      ! library for calculating theoretical estimates of magnitudes and colors
-      ! from Teff, L, M, and [M/H].
-
-      ! Color-magnitude data shipped with MESA is from:
-      ! Lejeune, Cuisinier, Buser (1998) A&AS 130, 65-75.
-      ! However, you add your own bolometric corrections files for mesa to use
-
-      ! The data interface for the library is defined in colors_def
-      ! Th easiest way to get output is to add the columns to your history_columns.list file
-
-      ! The preferred way for users (in a run_star_extras routine) for accessing the colors data is to
-      ! call either get_by_by_name, get_abs_mag_by_name or get_abs_bolometric_mag. Other routines are there
-      ! to hook into the rest of MESA.
-
-      ! Routines get_bc will return the coefficients from interpolating over log Teff, log g, [M/H]
-      ! even though the tables are defined as Teff, log g, [M/H]. get_abs_mag routines return
-      ! data that's been turned into an absolute magnitude. A color can be computed by taking the difference between
-      ! two get_bc or two get_abs_mag calls.
-
-      ! Names for the filters should be unique across all data files (left to the user to enforce this).
-      ! Name matching is performed in a case sensitive manner.
-      ! The names themselves are not important as far as MESA is concerned, you can name each filter (including the
-      ! ones MESA ships by defaults) by what ever name you want by editing the data file(s) and changing the names in the header.
-      ! MESA does not rely on any particlaur band existing.
-
-      implicit none
-
-
-      contains  ! the procedure interface for the library
-      ! client programs should only call these routines.
-
-
-      subroutine colors_init(num_files,fnames,num_colors,ierr)
-         use mod_colors, only : do_colors_init
-         integer, intent(in) :: num_files
-         integer, dimension(:), intent(in) :: num_colors
-         character(len=*), dimension(:), intent(in) :: fnames
-         integer, intent(out) :: ierr
-
-         ierr=0
-
-!$OMP critical (color_init)
-         if (.not. color_is_initialized) then
-            call do_colors_init(num_files,fnames,num_colors,ierr)
-         end if
-!$OMP end critical (color_init)
-
-         if(ierr/=0)THEN
-            ierr=-1
-            write(*,*) "colors_init failed"
-            return
-         end if
-
-      end subroutine colors_init
-
-
-      subroutine colors_shutdown ()
-
-         use mod_colors, only : free_colors_all
-
-         if (.not. color_is_initialized) return
-
-         call free_colors_all()
-
-         color_is_initialized = .FALSE.
-
-      end subroutine colors_shutdown
-
-
-      subroutine get_bcs_one(log_Teff, log_g, M_div_h, results, thead,n_colors, ierr)
-         use mod_colors, only : Eval_Colors
-         ! input
-         real(dp), intent(in) :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in) :: M_div_H  ! [M/H]
-         ! output
-         real(dp), dimension(:), intent(out) :: results
-         real(dp), intent(in) :: log_g
-         integer, intent(in) :: n_colors
-         integer, intent(inout) :: ierr
-         type (lgt_list),intent(inout), pointer :: thead
-
-         results(:)=-99.9d0
-         ierr=0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         call Eval_Colors(log_Teff, log_g, M_div_h, results,thead,n_colors, ierr)
-
-      end subroutine get_bcs_one
-
-      real(dp) function get_bc_by_name(name,log_Teff,log_g, M_div_h, ierr)
-         ! input
-         character(len=*),intent(in) :: name
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         real(dp), dimension(max_num_bcs_per_file) :: results
-         type (lgt_list), pointer :: thead => null()
-         integer, intent(inout) :: ierr
-         integer :: i,j,n_colors
-
-         get_bc_by_name=-99.9d0
-         ierr=0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         do i=1,num_thead
-            thead=>thead_all(i)%thead
-            n_colors=thead_all(i)%n_colors
-            do j=1,n_colors
-               if(trim(name)==trim(thead_all(i)%color_names(j)).or. &
-                  trim(name)=='bc_'//trim(thead_all(i)%color_names(j)).or. &
-                  trim(name)=='abs_mag_'//trim(thead_all(i)%color_names(j)).or. &
-                  trim(name)=='lum_band_'//trim(thead_all(i)%color_names(j)).or. &
-                  trim(name)=='log_lum_band_'//trim(thead_all(i)%color_names(j))&
-                  ) then
-
-                  call get_bcs_one(log_Teff,log_g, M_div_h, results,thead,n_colors, ierr)
-                  if(ierr/=0) return
-
-                  get_bc_by_name=results(j)
-
-                  return
-               end if
-            end do
-
-         end do
-
-
-      end function get_bc_by_name
-
-      real(dp) function get_bc_by_id(id,log_Teff,log_g, M_div_h, ierr)
-         ! input
-         integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         integer, intent(inout) :: ierr
-         character(len=strlen) :: name
-
-         get_bc_by_id=-99.9d0
-         ierr=0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         name=get_bc_name_by_id(id,ierr)
-         if(ierr/=0) return
-
-         get_bc_by_id=get_bc_by_name(name,log_Teff,log_g, M_div_h, ierr)
-
-      end function get_bc_by_id
-
-      integer function get_bc_id_by_name(name,ierr)
-         ! input
-         character(len=*), intent(in) :: name
-         integer, intent(inout) :: ierr
-         integer :: i,j,k
-
-         get_bc_id_by_name=-1
-         ierr=0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         k=0
-         do i=1,num_thead
-            do j=1,thead_all(i)%n_colors
-               k=k+1
-               if(trim(name)==trim(thead_all(i)%color_names(j)).or. &
-                  trim(name)=='bc_'//trim(thead_all(i)%color_names(j)).or. &
-                  trim(name)=='abs_mag_'//trim(thead_all(i)%color_names(j))) then
-                  get_bc_id_by_name=k
-                  return
-               end if
-            end do
-         end do
-
-      end function get_bc_id_by_name
-
-      character(len=strlen) function get_bc_name_by_id(id,ierr)
-         ! input
-         integer, intent(in) :: id
-         integer, intent(inout) :: ierr
-         integer :: i,j,k
-
-         get_bc_name_by_id=''
-         ierr=0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         k=1
-         do i=1,num_thead
-            do j=1,thead_all(i)%n_colors
-               if(k==id) then
-                  get_bc_name_by_id=thead_all(i)%color_names(j)
-                  return
-               end if
-               k=k+1
-            end do
-         end do
-
-      end function get_bc_name_by_id
-
-      real(dp) function get_abs_bolometric_mag(lum)
-         use const_def, only: dp
-         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
-
-         get_abs_bolometric_mag = mbolsun - 2.5d0*log10(lum)
-
-      end function get_abs_bolometric_mag
-
-      real(dp) function get_abs_mag_by_name(name,log_Teff,log_g, M_div_h,lum, ierr)
-         ! input
-         character(len=*) :: name
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
-         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
-         integer, intent(inout) :: ierr
-
-         ierr=0
-         get_abs_mag_by_name=-99.9d0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         get_abs_mag_by_name=get_abs_bolometric_mag(lum)-&
-                              get_bc_by_name(name,log_Teff,log_g, M_div_h,ierr)
-
-      end function get_abs_mag_by_name
-
-      real(dp) function get_abs_mag_by_id(id,log_Teff,log_g, M_div_h,lum, ierr)
-         ! input
-         integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
-         integer, intent(inout) :: ierr
-         character(len=strlen) :: name
-
-         ierr=0
-         get_abs_mag_by_id=-99.9d0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         name=get_bc_name_by_id(id,ierr)
-         if(ierr/=0) return
-
-         get_abs_mag_by_id=get_abs_mag_by_name(name,log_Teff,log_g, M_div_h,lum, ierr)
-
-      end function get_abs_mag_by_id
-
-      subroutine get_all_bc_names(names, ierr)
-         character(len=strlen),dimension(:) :: names
-         integer, intent(inout) :: ierr
-         integer :: i,j,cnt
-
-         names(:)=''
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         cnt=1
-         do i=1,num_thead
-            do j=1,thead_all(i)%n_colors
-               names(cnt)=trim(thead_all(i)%color_names(j))
-               cnt=cnt+1
-            end do
-         end do
-
-      end subroutine get_all_bc_names
-
-      subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
-         ! input
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         ! output
-         real(dp),dimension(:), intent(out) :: results
-         real(dp), intent(in) :: log_g
-         integer, intent(inout) :: ierr
-         type (lgt_list), pointer :: thead => null()
-         integer :: i,iStart,iEnd
-
-         ierr=0
-         results(:)=-99.d0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         do i=1,num_thead
-            thead=>thead_all(i)%thead
-            iStart=(i-1)*thead_all(i)%n_colors+1
-            iEnd=i*thead_all(i)%n_colors
-            call get_bcs_one(log_Teff, log_g, M_div_h, results(iStart:iEnd),thead,thead_all(i)%n_colors, ierr)
-            if(ierr/=0) return
-         end do
-
-      end subroutine get_bcs_all
-
-      !Returns in lsun units
-      real(dp) function get_lum_band_by_name(name,log_Teff,log_g, M_div_h, lum, ierr)
-         ! input
-         character(len=*) :: name
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
-         real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
-         real(dp) :: solar_abs_mag, star_abs_mag
-         integer, intent(inout) :: ierr
-
-         ierr=0
-         get_lum_band_by_name=-99.d0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         ! Filter dependent terms
-         solar_abs_mag=get_abs_mag_by_name(name, safe_log10(Teffsun), loggsun, 0.d0, 1.d0, ierr)
-         if(ierr/=0) return
-
-         star_abs_mag=get_abs_mag_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
-         if(ierr/=0) return
-
-         get_lum_band_by_name=exp10((star_abs_mag-solar_abs_mag)/(-2.5d0))
-
-      end function get_lum_band_by_name
-
-      !Returns in lsun units
-      real(dp) function get_lum_band_by_id(id,log_Teff,log_g, M_div_h, lum, ierr)
-         ! input
-         integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
-         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h  ! [M/H]
-         real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
-         real(dp) :: solar_abs_mag, star_abs_mag
-         integer, intent(inout) :: ierr
-
-         ierr=0
-         get_lum_band_by_id=-99.d0
-
-         if (.not. color_is_initialized) then
-            ierr=-1
-            return
-         end if
-
-         ! Filter dependent terms
-         solar_abs_mag=get_abs_mag_by_id(id, safe_log10(Teffsun), loggsun, 0.d0, 1.d0, ierr)
-         if(ierr/=0) return
-
-         star_abs_mag=get_abs_mag_by_id(id, log_Teff, log_g, M_div_h,lum, ierr)
-         if(ierr/=0) return
-
-         get_lum_band_by_id=exp10((star_abs_mag-solar_abs_mag)/(-2.5d0))
-
-      end function get_lum_band_by_id
-
-      end module colors_lib
-
+module colors_lib
+
+   use const_def, only: dp, strlen
+   use bolometric, only: calculate_bolometric
+   use synthetic, only: calculate_synthetic
+   use colors_utils, only: read_strings_from_file
+   use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
+
+   implicit none
+
+   private
+
+   public :: colors_init, colors_shutdown
+   public :: alloc_colors_handle, alloc_colors_handle_using_inlist, free_colors_handle
+   public :: colors_ptr
+   public :: colors_setup_tables, colors_setup_hooks
+   ! Main functions
+   public :: calculate_bolometric, calculate_synthetic
+   public :: how_many_colors_history_columns, data_for_colors_history_columns
+   ! Old bolometric correction functions that MESA expects (stub implementations, remove later):
+   public :: get_bc_id_by_name, get_lum_band_by_id, get_abs_mag_by_id
+   public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
+   public :: get_abs_bolometric_mag, get_abs_mag_by_name, get_bcs_all
+   public :: get_lum_band_by_name
+contains
+
+   ! call this routine to initialize the colors module.
+   ! only needs to be done once at start of run.
+   ! Reads data from the 'colors' directory in the data_dir.
+   ! If use_cache is true and there is a 'colors/cache' directory, it will try that first.
+   ! If it doesn't find what it needs in the cache,
+   ! it reads the data and writes the cache for next time.
+   subroutine colors_init(use_cache, colors_cache_dir, ierr)
+      use colors_def, only: colors_def_init, colors_use_cache, colors_is_initialized
+      logical, intent(in) :: use_cache
+      character(len=*), intent(in) :: colors_cache_dir  ! blank means use default
+      integer, intent(out) :: ierr  ! 0 means AOK.
+      ierr = 0
+      if (colors_is_initialized) return
+      call colors_def_init(colors_cache_dir)
+      colors_use_cache = use_cache
+      colors_is_initialized = .true.
+   end subroutine colors_init
+
+   subroutine colors_shutdown
+      use colors_def, only: do_free_colors_tables, colors_is_initialized
+      call do_free_colors_tables()
+      colors_is_initialized = .false.
+   end subroutine colors_shutdown
+
+   ! after colors_init has finished, you can allocate a "handle".
+   integer function alloc_colors_handle(ierr) result(handle)
+      integer, intent(out) :: ierr  ! 0 means AOK.
+      character(len=0) :: inlist
+      handle = alloc_colors_handle_using_inlist(inlist, ierr)
+   end function alloc_colors_handle
+
+   integer function alloc_colors_handle_using_inlist(inlist, ierr) result(handle)
+      use colors_def, only: do_alloc_colors, colors_is_initialized
+      use colors_ctrls_io, only: read_namelist
+      character(len=*), intent(in) :: inlist  ! empty means just use defaults.
+      integer, intent(out) :: ierr  ! 0 means AOK.
+      ierr = 0
+      if (.not. colors_is_initialized) then
+         ierr = -1
+         return
+      end if
+      handle = do_alloc_colors(ierr)
+      if (ierr /= 0) return
+      call read_namelist(handle, inlist, ierr)
+      if (ierr /= 0) return
+      call colors_setup_tables(handle, ierr)
+      call colors_setup_hooks(handle, ierr)
+   end function alloc_colors_handle_using_inlist
+
+   subroutine free_colors_handle(handle)
+      ! frees the handle and all associated data
+      use colors_def, only: colors_General_Info, do_free_colors
+      integer, intent(in) :: handle
+      call do_free_colors(handle)
+   end subroutine free_colors_handle
+
+   subroutine colors_ptr(handle, rq, ierr)
+
+      use colors_def, only: Colors_General_Info, get_colors_ptr, colors_is_initialized
+
+      type(colors_General_Info), pointer, intent(out) :: rq
+      integer, intent(in) :: handle
+      integer, intent(out):: ierr
+
+      if (.not. colors_is_initialized) then
+         ierr = -1
+         return
+      end if
+
+      call get_colors_ptr(handle, rq, ierr)
+
+   end subroutine colors_ptr
+
+   subroutine colors_setup_tables(handle, ierr)
+      use colors_def, only: colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
+      ! TODO: use load_colors, only: Setup_colors_Tables
+      integer, intent(in) :: handle
+      integer, intent(out):: ierr
+
+      type(colors_General_Info), pointer :: rq
+      logical, parameter :: use_cache = .true.
+      logical, parameter :: load_on_demand = .true.
+
+      ierr = 0
+      call get_colors_ptr(handle, rq, ierr)
+      ! TODO: call Setup_colors_Tables(rq, use_cache, load_on_demand, ierr)
+
+      ! TODO: For now, don't use cache (future feature)
+      ! but rely on user specifying a single filters directory, and read it here
+      call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)
+
+   end subroutine colors_setup_tables
+
+   subroutine colors_setup_hooks(handle, ierr)
+      use colors_def, only: colors_General_Info, get_colors_ptr
+      integer, intent(in) :: handle
+      integer, intent(out):: ierr
+
+      type(colors_General_Info), pointer :: rq
+
+      ierr = 0
+      call get_colors_ptr(handle, rq, ierr)
+
+      ! TODO: currently does nothing. See kap if this feature is needed
+
+   end subroutine colors_setup_hooks
+
+   !-----------------------------------------------------------------------
+   ! Bolometric correction interface (stub implementations)
+   !-----------------------------------------------------------------------
+
+   real(dp) function get_bc_by_name(name, log_Teff, log_g, M_div_h, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      integer, intent(inout) :: ierr
+
+      get_bc_by_name = -99.9d0
+      ierr = 0
+   end function get_bc_by_name
+
+   real(dp) function get_bc_by_id(id, log_Teff, log_g, M_div_h, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      integer, intent(inout) :: ierr
+
+      get_bc_by_id = -99.9d0
+      ierr = 0
+   end function get_bc_by_id
+
+   integer function get_bc_id_by_name(name, ierr)
+      character(len=*), intent(in) :: name
+      integer, intent(inout) :: ierr
+
+      get_bc_id_by_name = -1
+      ierr = 0
+   end function get_bc_id_by_name
+
+   character(len=strlen) function get_bc_name_by_id(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(inout) :: ierr
+
+      get_bc_name_by_id = ''
+      ierr = 0
+   end function get_bc_name_by_id
+
+   real(dp) function get_abs_bolometric_mag(lum)
+      use const_def, only: dp
+      real(dp), intent(in) :: lum  ! Luminosity in lsun units
+
+      get_abs_bolometric_mag = -99.9d0
+   end function get_abs_bolometric_mag
+
+   real(dp) function get_abs_mag_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: lum  ! Luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_abs_mag_by_name = -99.9d0
+   end function get_abs_mag_by_name
+
+   real(dp) function get_abs_mag_by_id(id, log_Teff, log_g, M_div_h, lum, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: lum  ! Luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_abs_mag_by_id = -99.9d0
+   end function get_abs_mag_by_id
+
+   subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), dimension(:), intent(out) :: results
+      real(dp), intent(in) :: log_g
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      results(:) = -99.d0
+   end subroutine get_bcs_all
+
+   real(dp) function get_lum_band_by_name(name, log_Teff, log_g, M_div_h, lum, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: lum  ! Total luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_lum_band_by_name = -99.d0
+   end function get_lum_band_by_name
+
+   real(dp) function get_lum_band_by_id(id, log_Teff, log_g, M_div_h, lum, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+      real(dp), intent(in) :: log_g  ! log_10 of surface gravity
+      real(dp), intent(in) :: M_div_h  ! [M/H]
+      real(dp), intent(in) :: lum  ! Total luminosity in lsun units
+      integer, intent(inout) :: ierr
+
+      ierr = 0
+      get_lum_band_by_id = -99.d0
+   end function get_lum_band_by_id
+
+end module colors_lib

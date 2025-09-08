@@ -14,7 +14,7 @@ should visit the
 of the MESA forum and see if someone has contributed code in your
 language of choice. (There are reasonably mature routines for Python,
 IDL, ruby and Mathematica.) An example of Python plotting is shown
-`later on this page <#python>`__.
+`later on this page <#plotting-mesa-output>`__.
 
 In the LOGS directory, you'll find the following files.
 
@@ -69,7 +69,7 @@ Selecting output quantities
 
 The default MESA output is set by the files
 
-::
+.. code:: console
 
    $MESA_DIR/star/defaults/history_columns.list
    $MESA_DIR/star/defaults/profile_columns.list
@@ -77,7 +77,7 @@ The default MESA output is set by the files
 In order to customize the output, copy these files to your work
 directory
 
-::
+.. code:: console
 
    cp $MESA_DIR/star/defaults/history_columns.list .
    cp $MESA_DIR/star/defaults/profile_columns.list .

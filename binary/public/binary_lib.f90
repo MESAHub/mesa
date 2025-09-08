@@ -252,5 +252,21 @@
 
       end function binary_compute_k_div_T
 
+      real(dp) function binary_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, &
+                                                     disk_alpha, disk_mu, ierr)
+         use binary_disk, only: eval_L2_mass_loss_fraction
+         real(dp), intent(in) :: donor_mass         ! [M_sun]
+         real(dp), intent(in) :: accretor_mass      ! [M_sun]
+         real(dp), intent(in) :: mass_transfer_rate ! [M_sun/yr]
+         real(dp), intent(in) :: orbital_separation ! [R_sun]
+         real(dp), intent(in) :: disk_alpha         ! disk alpha viscosity parameter (dimensionless)
+         real(dp), intent(in) :: disk_mu            ! disk mean molecular weight (dimensionless)
+         integer, intent(out) :: ierr
+
+         call eval_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, &
+                                    disk_alpha, disk_mu, &
+                                    binary_L2_mass_loss_fraction, ierr)
+      end function binary_L2_mass_loss_fraction
+
       end module binary_lib
 
