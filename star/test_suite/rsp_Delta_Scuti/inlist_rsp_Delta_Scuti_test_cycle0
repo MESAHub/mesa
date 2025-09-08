@@ -17,9 +17,10 @@
 
       initial_zfracs = 6
 
-      color_num_files=2
-      color_file_names(2)='blackbody_johnson.dat'
-      color_num_colors(2)=5
+      ! old color module (deprecated)
+      !color_num_files=2
+      !color_file_names(2)='blackbody_johnson.dat'
+      !color_num_colors(2)=5
 
       set_initial_age = .true.
       initial_age = 0
@@ -47,6 +48,28 @@
 &eos
 / ! end of eos namelist
 
+&colors
+
+   ! Custom colors module for calculating synthetic magnitudes
+   ! Author: Niall Miller, Meridith Joyce, Philip Mocz & The MESAteam
+
+      use_colors = .true.                      ! Activate synthetic photometry calculations
+      
+      ! Filter transmission curves directory
+      instrument = '/colors/data/filters/GAIA/GAIA'
+      
+      ! Vega spectrum for zero-point magnitude calibration
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      
+      ! Directory containing stellar atmosphere SEDs for interpolation
+      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      
+      distance = 3.0857d19         ! Distance to star in cm
+      
+      colors_results_directory = 'SED'        ! Directory for detailed SED output files
+      make_csv = .true.                       ! Generate detailed CSV files showing:
+
+/ ! end of colors namelist
 
 &controls
 

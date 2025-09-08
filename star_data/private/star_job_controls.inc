@@ -360,11 +360,6 @@
 
       logical :: do_special_test
 
-      integer :: color_num_files
-      character(len=strlen) :: color_file_names(max_num_color_files)
-      integer :: color_num_colors(max_num_bcs_per_file)
-
-
       logical :: warn_run_star_extras
 
       ! When to run cleanup to deallocate unneeded data

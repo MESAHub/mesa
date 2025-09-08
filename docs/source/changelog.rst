@@ -31,6 +31,33 @@ Renamed pgstar ``pause``` option to ``pause_flag``` because pause is a reserved 
 New Features
 ------------
 
+
+Colors Module Overhaul
+~~~~~~~~~~~~~~~~~~~~~~
+
+The previous colors module has been completely replaced.
+A new ``colors`` module has been added for calculating synthetic photometry during stellar evolution.
+The module computes bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
+
+The colors module is controlled via a new ``&colors`` namelist with key options:
+
+- ``use_colors``: Enable colors calculations (default ``.false.``)
+- ``instrument``: Path to filter system directory
+- ``stellar_atm``: Path to stellar atmosphere model grid
+- ``vega_sed``: Vega spectrum for photometric zero points
+- ``distance``: Distance to the star in cm
+- ``make_csv``: Output detailed spectral energy distributions
+- ``colors_results_directory``: Directory for output files
+
+Three interpolation methods are available: K-nearest neighbors, trilinear, and Hermite tensor interpolation.
+Filter-specific magnitude columns are automatically added to history output based on the selected instrument.
+
+See the ``star/test_suite/custom_colors`` test suite case for usage examples.
+
+
+Other features
+~~~~~~~~~~~~~~
+
 The default ``overshoot_D_min = 1d2`` has been changed to ``overshoot_D_min = 1d-2``. This change primarily affects
 exponential diffusive overshooting routines, improving their convergence properties. See `Buchele et al. (2025) <https://ui.adsabs.harvard.edu/abs/2025RNAAS...9..193B/abstract>`_.
 
