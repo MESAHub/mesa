@@ -595,9 +595,8 @@ contains
             num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
             num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
             num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
-            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
-            num_kap_Xs(i), num_kap_Xs(i)-1, num_kap_Xs(i)-2, num_kap_Xs(i)-3, num_kap_Xs(i)-4, &
-            num_kap_Xs(i)-5, num_kap_Xs(i)-6, num_kap_Xs(i)-7, num_kap_Xs(i)-8]
+            num_kap_Xs(i)-1, num_kap_Xs(i)-2, num_kap_Xs(i)-3, num_kap_Xs(i)-4, num_kap_Xs(i)-5, &
+            num_kap_Xs(i)-6, num_kap_Xs(i)-7, num_kap_Xs(i)-8 ]
        case DEFAULT
           num_kap_Xs(i) = 10
           kap_Xs(1:num_kap_Xs(i), i) = [0.00d0, 0.10d0, 0.20d0, &
