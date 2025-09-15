@@ -16,6 +16,9 @@ Changes in main
 Backwards-incompatible changes
 ------------------------------
 
+The build system scripts have been modernized. This has lead to the following changes to the standard work directory:
+- The `ck` and `mk` scripts have been removed. They are replaced by running `make` and `make clean` respectively. The `rn` and `re` scripts remain as is.
+- The `star` and `binary` executables are now stored in the `build/bin` subfolder of the work directory.
 
 .. _New Features main:
 
