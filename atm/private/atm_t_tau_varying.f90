@@ -551,8 +551,8 @@ contains
        return
     end if
 
-    if (dlntau <= 0._dp) then
-       write(*,*) 'Invalid dlntau in build_atm_uniform:', dlntau
+    if (dlogtau <= 0._dp) then
+       write(*,*) 'Invalid dlogtau in build_atm_uniform:', dlogtau
        call mesa_error(__FILE__,__LINE__)
     end if
 
