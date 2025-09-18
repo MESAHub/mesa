@@ -44,7 +44,7 @@
       if (b% point_mass_i /= 1) then
          if (.not. b% do_wind_mass_transfer_1 .or. b% model_twins_flag) then
             b% wind_xfer_fraction(1) = 0d0
-         else if(.not. b% use_other_binary_wind_transfer) then
+         else if (.not. b% use_other_binary_wind_transfer) then
             call Bondi_Hoyle_wind_transfer(b% binary_id, 1, ierr)
             if (ierr /=0) then
                write(*,*) "Error in Bondi_Hoyle_wind_transfer(b% binary_id, 1, ierr)"
@@ -52,7 +52,7 @@
             end if
          else
             call b% other_binary_wind_transfer(b% binary_id, 1, ierr)
-            if (ierr /=0) then
+            if (ierr /= 0) then
                write(*,*) "Error in other_binary_wind_transfer(b% binary_id, 1, ierr)"
                return
             end if
@@ -63,7 +63,7 @@
       if (b% point_mass_i /= 2) then
          if (.not. b% do_wind_mass_transfer_2) then
             b% wind_xfer_fraction(2) = 0d0
-         else if(.not. b% use_other_binary_wind_transfer) then
+         else if (.not. b% use_other_binary_wind_transfer) then
             call Bondi_Hoyle_wind_transfer(b% binary_id, 2, ierr)
             if (ierr /=0) then
                write(*,*) "Error in Bondi_Hoyle_wind_transfer(b% binary_id, 2, ierr)"
@@ -71,7 +71,7 @@
             end if
          else
             call b% other_binary_wind_transfer(b% binary_id, 2, ierr)
-            if (ierr /=0) then
+            if (ierr /= 0) then
                write(*,*) "Error in other_binary_wind_transfer(b% binary_id, 2, ierr)"
                return
             end if
