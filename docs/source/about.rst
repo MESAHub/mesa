@@ -120,6 +120,7 @@ Developers
 * `Anne Thoul <https://scholar.google.be/citations?user=pVXttZoAAAAJ&hl=fr>`__
 * `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
+* `Vincent Vanlaer <https://www.kuleuven.be/wieiswie/en/person/00149901>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
 
 Past Developers

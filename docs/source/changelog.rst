@@ -96,7 +96,7 @@ Users can switch between either choice with the new logical control ``report_max
 See the ``&controls`` for further details.
 
 L2 mass-loss fraction according to Lu et al. (2023) is available as a public function in the bindary moduele:
-``binary_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, disk_alpha, disk_mu, ierr)``.  
+``binary_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, disk_alpha, disk_mu, ierr)``.
 
 .. _Bug Fixes main:
 
