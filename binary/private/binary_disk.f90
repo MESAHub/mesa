@@ -26,7 +26,7 @@ module binary_disk
    use binary_def
 
    implicit none
-   
+
    ! more numerical constants
    real(dp), parameter :: one_fourth = 1.0_dp / 4.0_dp
    real(dp), parameter :: seven_fourths = 7.0_dp / 4.0_dp
