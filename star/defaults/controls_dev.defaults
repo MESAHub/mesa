@@ -213,7 +213,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! calculates and incorporates det/dt from TDC as a negative source term in
-      ! the total energy equation
+      ! the total energy equation, along with the eddy viscous heating Eq
 
       ! ::
 

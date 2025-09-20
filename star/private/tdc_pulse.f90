@@ -318,11 +318,7 @@ contains
 
          ! don't need to check if mlt_vc > 0 here.
          if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
-            if (s%have_mlt_vc .and. s%okay_to_set_mlt_vc) then
-               w_00 = s%mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
-            else
-               w_00 = s%mlt_vc(k)/sqrt_2_div_3! same as info%A0 from TDC
-            end if
+               w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
          else ! normal RSP2
             w_00 = wrap_w_00(s, k)
          end if
