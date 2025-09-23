@@ -208,7 +208,7 @@ contains
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       character (len=256) :: message
-      logical ::  test_partials, using_TDC, time_center_L
+      logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -228,14 +228,6 @@ contains
                    Eq_div_w = check_Eq
                end if
          end if
-      end if
-
-      if (s% using_velocity_time_centering .and. &
-       s% include_L_in_velocity_time_centering .and. &
-       s% include_mlt_in_velocity_time_centering) then
-         time_center_L = .true. ! change to Ltheta check later, this is inefficient.
-      else
-         time_center_L = .false.
       end if
 
       ! Wrap Pturb into P
@@ -324,7 +316,7 @@ contains
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
+            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -344,7 +336,7 @@ contains
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% L_start(k), time_center_L, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
+                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
