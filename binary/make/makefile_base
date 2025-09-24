@@ -48,6 +48,7 @@ SRCS = \
    binary_wind.f90 \
    binary_mdot.f90 \
    binary_tides.f90 \
+   binary_roche_deformation.f90 \
    binary_edot.f90 \
    binary_ctrls_io.f90 \
    binary_irradiation.f90 \
@@ -72,6 +73,7 @@ SRCS = \
    mod_other_binary_edot.f90 \
    mod_other_binary_ce.f90 \
    mod_other_implicit_rlo.f90 \
+   mod_other_tidal_deformation_switch_function.f90 \
    mod_other_binary_extras.f90 \
    mod_other_binary_photos.f90 \
    mod_other_e2.f90 \
