@@ -21,14 +21,11 @@
 ! ***********************************************************************
  
       module run_star_extras
-
       use star_lib
       use star_def
       use const_def
-      use math_lib
-      
-      implicit none
-      
+      use math_lib   
+      implicit none 
       ! these routines are called by the standard run_star check_model
       contains
       
@@ -38,16 +35,12 @@
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
+         if (ierr /= 0) return         
          ! this is the place to set any procedure pointers you want to change
          ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
-
-
          ! the extras functions in this file will not be called
          ! unless you set their function pointers as done below.
          ! otherwise we use a null_ version which does nothing (except warn).
-
          s% extras_startup => extras_startup
          s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
@@ -57,15 +50,12 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
-
          s% how_many_extra_history_header_items => how_many_extra_history_header_items
          s% data_for_extra_history_header_items => data_for_extra_history_header_items
          s% how_many_extra_profile_header_items => how_many_extra_profile_header_items
          s% data_for_extra_profile_header_items => data_for_extra_profile_header_items
-
       end subroutine extras_controls
-      
-      
+        
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -76,7 +66,6 @@
          if (ierr /= 0) return
       end subroutine extras_startup
       
-
       integer function extras_start_step(id)
          integer, intent(in) :: id
          integer :: ierr
@@ -87,20 +76,16 @@
          extras_start_step = 0
       end function extras_start_step
 
-
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
          use chem_def
          use eos_def
-        
          integer, intent(in) :: id
          integer :: ierr, k, i_accr, iXC, iXO, iXne20, iXNe22, iXNa, iXMg, iXHe
-
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
          extras_check_model = keep_going         
          if (.false. .and. s% star_mass_h1 < 0.35d0) then
             ! stop when star hydrogen mass drops to specified level
@@ -108,7 +93,6 @@
             write(*, *) 'have reached desired hydrogen mass'
             return
          end if
-
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depending on which
          ! condition was triggered.  MESA provides 9 customizeable
@@ -118,7 +102,6 @@
          ! termination_code_str(t_xtra1) = 'my termination condition'
          ! by default, indicate where (in the code) MESA terminated
          if (extras_check_model == terminate) s% termination_code = t_extras_check_model
-
          ! Set iX to the index of o16 and iY to ne20
          iXC = -1
          iXO = -1
@@ -126,8 +109,7 @@
          iXNe22 = -1
          iXNa = -1
          iXMg = -1
-         iXHe = -1
-                  
+         iXHe = -1         
          do k = 1,s% species
              if (chem_isos% name(s% chem_id(k)) .eq. 'c12') then
                 iXC = k
@@ -154,7 +136,6 @@
          if (iXC .eq. -1 .or. iXO .eq. -1 .or. iXNe20 .eq. -1 .or. iXNe22 .eq. -1 .or. iXNa .eq. -1 .or. iXMg .eq. -1 .or. iXHe .eq. -1) then
             write (*,*) 'Could not find elements specified!!'
          end if
-
          ! Find the base of the oxygen layer
          !do k = 1, s% nz
           !  if (s% xa(iX, k) .le. 0.1) then
@@ -162,8 +143,6 @@
            !     exit
             !end if
          !end do
-
-
          ! terminate the model when the base density reaches a particular value
          if (.false.) then
          write(*,*) 'base density=', log10(s% rho(s% nz))
@@ -173,9 +152,7 @@
             s% termination_code = t_xtra1
          end if
          end if
-
       end function extras_check_model
-
 
       integer function how_many_extra_history_columns(id)
          integer, intent(in) :: id
@@ -195,41 +172,30 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: i_max,kc,k
-
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
+         if (ierr /= 0) return  
          ! note: do NOT add the extras names to history_columns.list
          ! the history_columns.list is only for the built-in history column options.
          ! it must not include the new column names you are adding here.
-
          ! find the maximum in the helium burning rate
          i_max = maxloc(s% eps_nuc_categories(i3alf,:), dim=1)    
-
          ! to find the maximum in the total epsilon:
-         !i_max = maxloc(s% eps_nuc, dim=1)    
-                       
+         !i_max = maxloc(s% eps_nuc, dim=1)                  
          names(1) = "max_eps_he_lgT"
          vals(1) = log10(s% T(i_max))
-
          names(2) = "mass_core_cryst"
          vals(2) = s% crystal_core_boundary_mass
-
-        
          do k = s%nz,1,-1
                if(s% m(k) .ge. s% crystal_core_boundary_mass) then
                   kc = k
                   exit
                end if
          end do
-
          names(3) = "r_core_cryst"
-         vals(3) = exp(s% lnR(kc))
-         
+         vals(3) = exp(s% lnR(kc))   
       end subroutine data_for_extra_history_columns
-
-      
+ 
       integer function how_many_extra_profile_columns(id)
          integer, intent(in) :: id
          integer :: ierr
@@ -237,15 +203,13 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 14!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!
+         how_many_extra_profile_columns = 14
       end function how_many_extra_profile_columns
-      
       
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use chem_def
          use eos_def
          use eos_lib
-
          integer :: iXC, iXO, iXne20, iXNe22, iXNa, iXMg, iXHe
          integer, intent(in) :: id, n, nz
          character (len=maxlen_profile_column_name) :: names(n)
@@ -261,8 +225,7 @@
          type (star_info), pointer :: s     
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-             
+         if (ierr /= 0) return     
          allocate(d_dxa(num_eos_d_dxa_results,s% species))
          allocate(xa1_c12(s% species))
          allocate(xa1_o16(s% species))
@@ -270,8 +233,7 @@
          allocate(xa1_ne22(s% species))
          allocate(xa1_na23(s% species))
          allocate(xa1_mg24(s% species))
-         allocate(xa1_he4(s% species))
-                     
+         allocate(xa1_he4(s% species))              
          names(1) = 'chiX_C12'
          names(2) = 'chiX_O16'
          names(3) = 'chiX_Ne20'
@@ -279,31 +241,20 @@
          names(5) = 'chiX_Na23'
          names(6) = 'chiX_Mg24'
          names(7) = 'chiX_He4'
-         
-         
-         names(8) = 'bs_C12' !!!!!!!!!!!!
+         names(8) = 'bs_C12'
          names(9) = 'bs_O16'
          names(10) = 'bs_Ne20'
          names(11) = 'bs_Ne22'
          names(12) = 'bs_N23'
          names(13) = 'bs_Mg24'
          names(14) = 'bs_He4'
-
-        ! names(13) = 'plnxc_plnye' !!!!!!!!!!!!
-        ! names(14) = 'plnxo_plnye'
-        ! names(15) = 'plnxne20_plnye'
-        ! names(16) = 'plnxne22_plnye'
-        ! names(17) = 'plnxmg_plnye'
-   
-         
          iXC = -1
          iXO = -1
          iXNe20 = -1
          iXNe22 = -1
          iXNa = -1
          iXMg = -1
-         iXHe = -1
-                  
+         iXHe = -1       
          do k = 1,s% species
              if (chem_isos% name(s% chem_id(k)) .eq. 'c12') then
                 iXC = k
@@ -330,131 +281,77 @@
          if (iXC .eq. -1 .or. iXO .eq. -1 .or. iXNe20 .eq. -1 .or. iXNe22 .eq. -1 .or. iXMg .eq. -1 .or. iXNa .eq. -1 .or. iXHe .eq. -1) then
             write (*,*) 'Could not find elements specified!!'
          end if
-
          do k = 1, nz
-
             eps = 1d-4
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, s% xa(:, k), &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-
             P1 = res(i_lnPgas)
             S1 = exp(res(i_lnS)) 
             mu1= res(i_mu)!s% mu(k)
             ln_ye=res(i_lnfree_e)
-
-            !write(*,*) mu1,res(i_mu), '1'
-
             xa1_c12 = s% xa(:, k)
             xa1_c12(iXC) = xa1_c12(iXC)*(1d0+eps)
-
             xa1_o16 = s% xa(:, k)
             xa1_o16(iXO) = xa1_o16(iXO)*(1d0+eps)
-
             xa1_ne20 = s% xa(:, k)
             xa1_ne20(iXNe20) = xa1_ne20(iXNe20)*(1d0+eps)
-
             xa1_ne22 = s% xa(:, k)
             xa1_ne22(iXNe22) = xa1_ne22(iXNe22)*(1d0+eps)
-
             xa1_na23 = s% xa(:, k)
             xa1_na23(iXNa) = xa1_na23(iXNa)*(1d0+eps)
-            
             xa1_mg24 = s% xa(:, k)
             xa1_mg24(iXMg) = xa1_mg24(iXMg)*(1d0+eps)
-
             xa1_he4 = s% xa(:, k)
             xa1_he4(iXHe) = xa1_he4(iXHe)*(1d0+eps)
-
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_c12, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-              
-            !chimu_c12=(P1-res(i_lnPgas))/(log(mu1)-log(res(i_mu))) !!!! chi_mu
-
-            !write(*,*) mu2, res(i_mu), '2'
             chiX_C12 = (res(i_lnPgas)-P1)/eps
             bs_C12 = - s% xa(iXC,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXC,k)) !!-X ds/dX as in Medin & Cumming (2015)
-
-            !plnxc_plnmu= (log(s% xa(iXC, k))-log(xa1_c12(iXC)))/(log(mu1)-log(res(i_mu)))
-
             plnxc_plnye= (log(s% xa(iXC, k))-log(xa1_c12(iXC)))/(ln_ye-res(i_lnfree_e))
-
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_o16, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-            
-            !chimu_o16=(P1-res(i_lnPgas))/(log(mu1)-log(res(i_mu))) 
-
             chiX_O16 = (res(i_lnPgas)-P1)/eps
             bs_O16 = - s% xa(iXO,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXO,k))
-
-            !plnxo_plnmu= (log(s% xa(iXO, k))-log(xa1_o16(iXO)))/(log(mu1)-log(res(i_mu)))
-
             plnxo_plnye= (log(s% xa(iXO, k))-log(xa1_o16(iXO)))/(ln_ye-res(i_lnfree_e))
-
-
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_ne20, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-
-            !chimu_ne20=(P1-res(i_lnPgas))/(log(mu1)-log(res(i_mu))) 
-
             chiX_Ne20 = (res(i_lnPgas)-P1)/eps
             bs_Ne20 = - s% xa(iXNe20,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXNe20,k))
-
-            !plnxne20_plnmu= (log(s% xa(iXNe20, k))-log(xa1_ne20(iXNe20)))/(log(mu1)-log(res(i_mu)))
-
             plnxne20_plnye= (log(s% xa(iXNe20, k))-log(xa1_ne20(iXNe20)))/(ln_ye-res(i_lnfree_e))
-            
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_ne22, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-
             chiX_Ne22 = (res(i_lnPgas)-P1)/eps
             bs_Ne22 = - s% xa(iXNe22,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXNe22,k))
-
-            !plnxne22_plnmu= (log(s% xa(iXNe22, k))-log(xa1_ne20(iXNe22)))/(log(mu1)-log(res(i_mu)))
-
             plnxne22_plnye= (log(s% xa(iXNe22, k))-log(xa1_ne20(iXNe22)))/(ln_ye-res(i_lnfree_e))
-
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_na23, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-
-            !chimu_mg24=(P1-res(i_lnPgas))/(log(mu1)-log(res(i_mu))) 
-
             chiX_Na23 = (res(i_lnPgas)-P1)/eps
             bs_Na23 = - s% xa(iXNa,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXNa,k))
-
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_mg24, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-
-            !chimu_mg24=(P1-res(i_lnPgas))/(log(mu1)-log(res(i_mu))) 
-
             chiX_Mg24 = (res(i_lnPgas)-P1)/eps
             bs_Mg24 = - s% xa(iXMg,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXMg,k))
-           ! plnxmg_plnmu= (log(s% xa(iXMg, k))-log(xa1_mg24(iXMg)))/(log(mu1)-log(res(i_mu)))
-
-            plnxmg_plnye= (log(s% xa(iXMg, k))-log(xa1_mg24(iXMg)))/(ln_ye-res(i_lnfree_e))            
-
-            
+            plnxmg_plnye= (log(s% xa(iXMg, k))-log(xa1_mg24(iXMg)))/(ln_ye-res(i_lnfree_e))
             call eosDT_get( &
                s% eos_handle, s% species, s% chem_id, s% net_iso, xa1_he4, &
                s% rho(k), log10(s% rho(k)), s% T(k), log10(s% T(k)), &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
-
             chiX_He4 = (res(i_lnPgas)-P1)/eps
             bs_He4 = - s% xa(iXHe,k)*(exp(res(i_lnS))-S1)/(eps* s% xa(iXHe,k))
-            
             vals(k,1) = chiX_C12
             vals(k,2) = chiX_O16
             vals(k,3) = chiX_Ne20
@@ -462,7 +359,6 @@
             vals(k,5) = chiX_Na23
             vals(k,6) = chiX_Mg24
             vals(k,7) = chiX_He4
-
             vals(k,8) = bs_C12
             vals(k,9) = bs_O16
             vals(k,10) = bs_Ne20
@@ -470,16 +366,8 @@
             vals(k,12) = bs_Na23
             vals(k,13) = bs_Mg24
             vals(k,14) = bs_He4
-
-            !vals(k,13) = plnxc_plnye !chimu_c12
-            !vals(k,14) = plnxo_plnye!chimu_o16
-            !vals(k,15) = plnxne20_plnye!chimu_ne20
-            !vals(k,16) = plnxne22_plnye!chimu_ne20
-            !vals(k,17) = plnxmg_plnye!chimu_mg24
-          end do
-          
+          end do   
       end subroutine data_for_extra_profile_columns
-
 
       integer function how_many_extra_history_header_items(id)
          integer, intent(in) :: id
@@ -491,7 +379,6 @@
          how_many_extra_history_header_items = 0
       end function how_many_extra_history_header_items
 
-
       subroutine data_for_extra_history_header_items(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -501,14 +388,11 @@
          ierr = 0
          call star_ptr(id,s,ierr)
          if(ierr/=0) return
-
          ! here is an example for adding an extra history header item
          ! also set how_many_extra_history_header_items
          ! names(1) = 'mixing_length_alpha'
          ! vals(1) = s% mixing_length_alpha
-
       end subroutine data_for_extra_history_header_items
-
 
       integer function how_many_extra_profile_header_items(id)
          integer, intent(in) :: id
@@ -520,7 +404,6 @@
          how_many_extra_profile_header_items = 0
       end function how_many_extra_profile_header_items
 
-
       subroutine data_for_extra_profile_header_items(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_profile_column_name) :: names(n)
@@ -530,14 +413,11 @@
          ierr = 0
          call star_ptr(id,s,ierr)
          if(ierr/=0) return
-
          ! here is an example for adding an extra profile header item
          ! also set how_many_extra_profile_header_items
          ! names(1) = 'mixing_length_alpha'
          ! vals(1) = s% mixing_length_alpha
-
       end subroutine data_for_extra_profile_header_items
-
 
       ! returns either keep_going or terminate.
       ! note: cannot request retry; extras_check_model can do that.
@@ -549,18 +429,15 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-
          ! to save a profile, 
             ! s% need_to_save_profiles_now = .true.
          ! to update the star log,
             ! s% need_to_update_history_now = .true.
-
          ! see extras_check_model for information about custom termination codes
          ! by default, indicate where (in the code) MESA terminated
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
       end function extras_finish_step
-      
-      
+           
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -569,6 +446,5 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine extras_after_evolve
-
       end module run_star_extras
       
