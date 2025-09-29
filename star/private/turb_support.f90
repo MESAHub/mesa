@@ -103,6 +103,7 @@ contains
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
+      use const_def, only: ln10
       use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -125,15 +126,15 @@ contains
       if (s% include_mlt_in_velocity_time_centering) then
           ! could be cleaner with a wrapper for time_centered P and L
           if (s% using_velocity_time_centering .and. &
-            s% include_P_in_velocity_time_centering) then
+            s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) then
              P_theta = s% P_theta_for_velocity_time_centering
           else
              P_theta = 1d0
           end if
           ! consder building a wrapper : wrap_opt_time_center_L_00(s,k)
           if (s% using_velocity_time_centering .and. &
-            s% include_L_in_velocity_time_centering) then
-             L_theta = s% L_theta_for_velocity_time_centering
+            s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) then
+             L_theta = s% L_theta_for_velocity_time_centering 
           else
              L_theta = 1d0
           end if

@@ -1010,7 +1010,11 @@
          end if
          if (s% make_mlt_hydrodynamic .and. (s% v_flag .or. s% u_flag)) then
             ! add in hydrodynamic term
-            dv_dt = wrap_dxh_v_face(s,k)/s%dt
+            if (s% using_velocity_time_centering) then
+               dv_dt = 0.5d0*wrap_dxh_v_face(s,k)/s%dt ! time centered dv -> dv/2, theta = 0.5
+            else ! implicit theta = 1
+               dv_dt = wrap_dxh_v_face(s,k)/s%dt
+            end if
             ! hydrodynamic correction to g is geff = g - dvdt, to do: add a floor and ceiling
 
             if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
