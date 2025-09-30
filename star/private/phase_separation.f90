@@ -744,5 +744,5 @@
         endif
         ! Finish
         return   
-      end subroutine update_model
+      end subroutine update_model_
 end module phase_separation
