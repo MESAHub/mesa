@@ -63,7 +63,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
-         integer, intent(out) :: ierr         
+         integer, intent(out) :: ierr
          real(dp) :: XNe20, XNe22, XO, XC, XNa, XMg , pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20, net_ine22, net_ina23, net_img24
          logical :: save_Skye_use_ion_offsets
@@ -79,7 +79,7 @@
                s% crystal_core_boundary_mass = 0d0
                return
             end if
-         end if         
+         end if
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
          net_ine20 = s% net_iso(ine20)
@@ -93,7 +93,7 @@
                k_bound = k
                exit
             end if
-         end do         
+         end do
          XC = s% xa(net_ic12,k_bound)
          XO = s% xa(net_io16,k_bound)
          XNe20 = s% xa(net_ine20,k_bound)
@@ -118,7 +118,7 @@
             call update_model_(s,1,s%nz,.false.)
             do k=1,s% nz
                s% eps_phase_separation(k) = s% energy(k)
-            end do  
+            end do
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
@@ -129,12 +129,12 @@
                   else
                      s% crystal_core_boundary_mass = s% m(k+1)
                      exit
-                  end if                 
+                  end if
                end if
                call move_one_zone(s,k,components)
                ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
-               call mix_outward(s, k-1, 0)              
+               call mix_outward(s, k-1, 0)
             end do
             call update_model_(s,1,s%nz,.false.)
             do k=1,s% nz
@@ -152,7 +152,7 @@
         type(star_info), pointer :: s
         integer, intent(in) :: k
         real(dp), dimension(2) :: dXNe
-        real(dp), dimension(4) :: Dd 
+        real(dp), dimension(4) :: Dd
         real(dp) :: dx1_
         character (len=*), intent(in) :: components
         real(dp) :: XC, XO, XNe20, XNe22, XNa, XMg, XC1, XO1, XNe120, XNe122, XNa1, XMg1, dXO, Xfac
@@ -163,20 +163,20 @@
         net_ine20 = s% net_iso(ine20)
         net_ine22 = s% net_iso(ine22)
         net_ina23 = s% net_iso(ina23)
-        net_img24 = s% net_iso(img24)        
+        net_img24 = s% net_iso(img24)
         XO = s% xa(net_io16,k)
         XC = s% xa(net_ic12,k)
         XNe20 = s% xa(net_ine20,k)
         XNe22 = s% xa(net_ine22,k)
         XNa = s% xa(net_ina23,k)
-        XMg = s% xa(net_img24,k)  
-        if (components .ne. '3c') then   
+        XMg = s% xa(net_img24,k)
+        if (components /= '3c') then
         if(XO + XC > 0.7d0 .and. XC > XNe20 + XNe22) then
            ! Call Blouin phase diagram.
            ! Need to rescale temporarily because phase diagram assumes XO + XC = 1
            Xfac = XO + XC
            XO = XO/Xfac
-           XC = XC/Xfac 
+           XC = XC/Xfac
            dXO = blouin_delta_xo(XO)
            s% xa(net_io16,k) = Xfac*(XO + dXO)
            s% xa(net_ic12,k) = Xfac*(XC - dXO)
@@ -187,15 +187,15 @@
            s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
            s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
            !write(*,*) 'phase CO',XO,XC,XNe20+XNe22
-        else if(XO + XNe20 + XNe22> 0.7d0 .and. XNe20 + XNe22 > XC) then        
+        else if(XO + XNe20 + XNe22> 0.7d0 .and. XNe20 + XNe22 > XC) then
            ! Call Blouin phase diagram.
            ! Need to rescale temporarily because phase diagram assumes XO + XNe = 1
            Xfac = XO + XNe20 + XNe22
            XO = XO/Xfac
            XNe20 = XNe20/Xfac
-           XNe22 = XNe22/Xfac           
+           XNe22 = XNe22/Xfac
            dXNe = blouin_delta_xne(XNe20,XNe22)
-          ! write(*,*) 'dXNe', dXNe           
+          ! write(*,*) 'dXNe', dXNe
            s% xa(net_ine20,k) = Xfac*(XNe20 + dXNe(1))
            s% xa(net_ine22,k) = Xfac*(XNe22 + dXNe(2))
            s% xa(net_io16,k) = Xfac*(XO - sum(dXNe))
@@ -232,7 +232,7 @@
            s% xa(net_io16,k-1) = XO1 - Xfac*Dd(2) * s% dq(k) / s% dq(k-1)
            s% xa(net_ine20,k-1) = XNe120 - Xfac*(Dd(3)) * s% dq(k) / s% dq(k-1)
            s% xa(net_ine22,k-1) = XNe122 - Xfac*(Dd(4)) * s% dq(k) / s% dq(k-1)
-          ! write(*,*) 'phase 3 CONe abundances',XC,XO,XNe20+XNe22 
+          ! write(*,*) 'phase 3 CONe abundances',XC,XO,XNe20+XNe22
          else if (XO  + XNe20 + XNe22 + XMg > 0.7d0 .and. XMg > XC .and. XMg > XNa) then
            Xfac = XO + XNe20 + XNe22 + XMg
            XMg = XMg/Xfac
@@ -241,11 +241,11 @@
            XNe22 = XNe22/Xfac
           ! call the deltas resulting from interpolation (in mass fraction)
            call medin_cumming_3p_d_neomg(XMg,XO,XNe20,XNe22,Dd)
-           ! apply fractionation as given by the deltas from interpolation        
+           ! apply fractionation as given by the deltas from interpolation
            s% xa(net_img24,k) = Xfac*(XMg + Dd(1))
            s% xa(net_io16,k) = Xfac*(XO + Dd(2))
            s% xa(net_ine20,k) = Xfac*(XNe20 + Dd(3))
-           s% xa(net_ine22,k) = Xfac*(XNe22 + Dd(4))  
+           s% xa(net_ine22,k) = Xfac*(XNe22 + Dd(4))
            XMg1 = s% xa(net_img24,k-1)
            XO1 = s% xa(net_io16,k-1)
            XNe120 = s% xa(net_ine20,k-1)
@@ -254,7 +254,7 @@
            s% xa(net_io16,k-1) = XO1 - Xfac*Dd(2) * s% dq(k) / s% dq(k-1)
            s% xa(net_ine20,k-1) = XNe120 - Xfac*Dd(3) * s% dq(k) / s% dq(k-1)
            s% xa(net_ine22,k-1) = XNe122 - Xfac*Dd(4) * s% dq(k) / s% dq(k-1)
-          ! write(*,*) 'phase 3 ONeMg abundances',XO,XNe20+XNe22,XMg 
+          ! write(*,*) 'phase 3 ONeMg abundances',XO,XNe20+XNe22,XMg
          else if (XO  + XNe20 + XNe22 + XNa > 0.7d0 .and. XNa > XC .and. XNa > XMg) then
            Xfac = XO + XNe20 + XNe22 + XNa
            XNa = XNa/Xfac
@@ -267,7 +267,7 @@
            s% xa(net_ina23,k) = Xfac*(XNa + Dd(1))
            s% xa(net_io16,k) = Xfac*(XO + Dd(2))
            s% xa(net_ine20,k) = Xfac*(XNe20 + Dd(3))
-           s% xa(net_ine22,k) = Xfac*(XNe22 + Dd(4))           
+           s% xa(net_ine22,k) = Xfac*(XNe22 + Dd(4))
            XNa1 = s% xa(net_ina23,k-1)
            XO1 = s% xa(net_io16,k-1)
            XNe120 = s% xa(net_ine20,k-1)
@@ -276,7 +276,7 @@
            s% xa(net_io16,k-1) = XO1 - Xfac*Dd(2) * s% dq(k) / s% dq(k-1)
            s% xa(net_ine20,k-1) = XNe120 - Xfac*Dd(3) * s% dq(k) / s% dq(k-1)
            s% xa(net_ine22,k-1) = XNe122 - Xfac*Dd(4) * s% dq(k) / s% dq(k-1)
-          ! write(*,*) 'phase 3 ONeNa abundances',XO,XNe20+XNe22,XNa          
+          ! write(*,*) 'phase 3 ONeNa abundances',XO,XNe20+XNe22,XNa
          else if (XC  + XO + XMg > 0.7d0 .and. XMg > XNa .and. XMg > XNe20+XNe22) then
            Xfac = XC + XO + XMg
            XC = XC/Xfac
@@ -294,21 +294,21 @@
            s% xa(net_ic12,k-1) = XC1 - Xfac*Dd(1) * s% dq(k) / s% dq(k-1)
            s% xa(net_img24,k-1) = XMg1 - Xfac*Dd(2) * s% dq(k) / s% dq(k-1)
            s% xa(net_io16,k-1) = XO1 + Xfac*(Dd(1)+Dd(2)) * s% dq(k) / s% dq(k-1)
-          ! write(*,*) 'phase 3 COMg abundances',XC,XO,XMg 
+          ! write(*,*) 'phase 3 COMg abundances',XC,XO,XMg
          end if
         end if
-        call update_model_(s,k-1,s%nz,.true.)       
+        call update_model_(s,k-1,s%nz,.true.)
       end subroutine move_one_zone
 
       ! mix composition outward until reaching stable composition profile
       subroutine mix_outward(s,kbot,min_mix_zones)
         type(star_info), pointer :: s
-        integer, intent(in)      :: kbot, min_mix_zones       
+        integer, intent(in)      :: kbot, min_mix_zones
         real(dp) :: avg_xa(s%species)
         real(dp) :: mass, B_term, grada, gradr
         integer :: k, l, ktop
         logical :: use_brunt
-        
+
         use_brunt = s% phase_separation_mixing_use_brunt
         do k=kbot-min_mix_zones,1,-1
            ktop = k
@@ -345,7 +345,7 @@
            end if
         end do
         ! Call a final update over all mixed cells now.
-        call update_model_(s, ktop, kbot+1, .true.)  
+        call update_model_(s, ktop, kbot+1, .true.)
       end subroutine mix_outward
 
       real(dp) function blouin_delta_xo(Xin)
@@ -355,7 +355,7 @@
         real(dp) :: a0, a1, a2, a3, a4, a5
 
         ! Convert input mass fraction to number fraction, assuming C/O mixture
-        xo = (Xin/16d0)/(Xin/16d0 + (1d0 - Xin)/12d0)        
+        xo = (Xin/16d0)/(Xin/16d0 + (1d0 - Xin)/12d0)
         a0 = 0d0
         a1 = -0.311540d0
         a2 = 2.114743d0
@@ -371,7 +371,7 @@
              a5*xo*xo*xo*xo*xo
         xo = xo + dxo
         ! Convert back to mass fraction
-        Xnew = 16d0*xo/(16d0*xo + 12d0*(1d0-xo)) 
+        Xnew = 16d0*xo/(16d0*xo + 12d0*(1d0-xo))
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
 
@@ -386,7 +386,7 @@
         xne1 =(Xin20/20d0)/(Xin20/20d0 + Xin22/22d0 + (1d0 - Xin20 - Xin22)/16d0)
         xne2 =(Xin22/22d0)/(Xin20/20d0 + Xin22/22d0 + (1d0 - Xin20 - Xin22)/16d0)
         ! isotope 22Ne is added to the Ne separation along with 20Ne
-        xne =((Xin22/22d0)+(Xin20/20d0))/(Xin20/20d0 + Xin22/22d0 + (1d0 - Xin20 - Xin22)/16d0)        
+        xne =((Xin22/22d0)+(Xin20/20d0))/(Xin20/20d0 + Xin22/22d0 + (1d0 - Xin20 - Xin22)/16d0)
         a0 = 0d0
         a1 = -0.120299d0
         a2 = 1.304399d0
@@ -405,11 +405,11 @@
         xne = xne1 + xne2
         ! Convert back to mass fraction
         Xnew1 = (20d0*xne1)/(20d0*xne1 + 22d0*xne2 + 16d0*(1d0-xne))
-        Xnew2 = (22d0*xne2)/(20d0*xne1 + 22d0*xne2 + 16d0*(1d0-xne))   
+        Xnew2 = (22d0*xne2)/(20d0*xne1 + 22d0*xne2 + 16d0*(1d0-xne))
         blouin_delta_xne(1) = Xnew1 - (Xin20)
         blouin_delta_xne(2) = Xnew2 - (Xin22)
       end function blouin_delta_xne
-      
+
      subroutine tab_interp_medin_cumming_dx1(x1_,x2_,components,dx1_)
             use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
             use const_def, only: mesa_data_dir
@@ -429,9 +429,9 @@
             integer :: ier
 
             ict = 0
-            ict(1) = 1      
+            ict(1) = 1
             iounit=999
-      ! setup interpolation table for x1 x2 dx1 
+      ! setup interpolation table for x1 x2 dx1
             if (components=='CONe') then
                open(unit=iounit, file='CONe_deltaC.dat', action='read',status='old')
             else if  (components=='NeOMg') then
@@ -450,7 +450,7 @@
          read(iounit,*) x1l, x2l, deltax1
          x1_l(j)=x1l
          if (j == 1) then
-            x2_l(i) =x2l 
+            x2_l(i) =x2l
          end if
          deltax1_sob_f(1,j,i) = deltax1
       end do
@@ -528,7 +528,7 @@
          read(iounit,*) x1l, x2l, deltax1
          x1_l(j)=x1l
          if (j == 1) then
-            x2_l(i) =x2l 
+            x2_l(i) =x2l
          end if
          deltax1_sob_f(1,j,i) = deltax1
       end do
@@ -557,14 +557,14 @@
             end if
          end do
       end do
-   end do 
+   end do
    call interp_evbicub_db( &
             x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
             ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
     dx2_=fval(1)  ! delta_x2 from 2d interpolation
       end subroutine tab_interp_medin_cumming_dx2
 
-       
+
       subroutine medin_cumming_3p_d_cone(X1,X2,X3_1,X3_2,Dd)
         real(dp), intent(in) :: X1, X2, X3_1, X3_2 ! mass fraction
         real(dp), dimension(4),intent(out) :: Dd
@@ -582,20 +582,22 @@
         call tab_interp_medin_cumming_dx2(xc,xo,'CONe',dx2_)
         dxc=dx1_
         dxo=dx2_
-        !write(*,*) 'delta_xc: ',dxc,' delta_xo: ', dxo         
+        !write(*,*) 'delta_xc: ',dxc,' delta_xo: ', dxo
         xc = xc + dxc
         xo = xo + dxo
         ! convert deltas in number fraction to mass fraction
         Xnew1 = 12*xc/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1)/(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
         Xnew2 = 16*xo/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1)/(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
-        Xnew3_1 = (20*(1-xc-xo)*(xne1)/(xne1+xne2))/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1)/(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
-        Xnew3_2 = (22*(1-xc-xo)*(xne2)/(xne1+xne2))/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1)/(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))      
+        Xnew3_1 = (20*(1-xc-xo)*(xne1)/(xne1+xne2))/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1) &
+             /(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
+        Xnew3_2 = (22*(1-xc-xo)*(xne2)/(xne1+xne2))/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1) &
+             /(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
          Dd=[0,0,0,0]
          Dd(1)= Xnew1 - X1
          Dd(2)= Xnew2 - X2
          Dd(3)= Xnew3_1 - X3_1
          Dd(4)= Xnew3_2 - X3_2
-         !write(*,*) 'delta_XC: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4) 
+         !write(*,*) 'delta_XC: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
       end subroutine medin_cumming_3p_d_cone
 
       subroutine medin_cumming_3p_d_neomg(X1,X2,X3_1,X3_2,Dd)
@@ -620,14 +622,16 @@
         ! convert deltas in number fraction to mass fraction
         Xnew1 = 24*xmg/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1)/(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
         Xnew2 = 16*xo/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1)/(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
-        Xnew3_1 = (20*(1-xmg-xo)*(xne1)/(xne1+xne2))/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1)/(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
-        Xnew3_2 = (22*(1-xmg-xo)*(xne2)/(xne1+xne2))/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1)/(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))         
+        Xnew3_1 = (20*(1-xmg-xo)*(xne1)/(xne1+xne2))/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1) &
+             /(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
+        Xnew3_2 = (22*(1-xmg-xo)*(xne2)/(xne1+xne2))/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1) &
+             /(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
          Dd=[0,0,0,0]
          Dd(1)= Xnew1 - X1
          Dd(2)= Xnew2 - X2
          Dd(3)= Xnew3_1 - X3_1
          Dd(4)= Xnew3_2 - X3_2
-         !write(*,*) 'delta_XMg: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4) 
+         !write(*,*) 'delta_XMg: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
       end subroutine medin_cumming_3p_d_neomg
 
       subroutine medin_cumming_3p_d_onena(X1,X2,X3_1,X3_2,Dd)
@@ -637,8 +641,8 @@
         real(dp) :: xna, dxna, xo, dxo, xne1, xne2 ! number fractions
         real(dp) :: dx1_,dx2_
         integer :: i,j
-        
-        Xfac = X1 + X2 + X3_1 + X3_2   
+
+        Xfac = X1 + X2 + X3_1 + X3_2
         xna = (X1/23)/(X1/23 + X2/16 + X3_1/20 + X3_2/22)
         xo = (X2/16)/(X1/23 + X2/16 + X3_1/20 + X3_2/22)
         xne1 = (X3_1/20)/(X1/23 + X2/16 + X3_1/20 + X3_2/22)
@@ -654,16 +658,18 @@
         ! convert deltas in number fraction to mass fraction
         Xnew1 = 23*xna/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1)/(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
         Xnew2 = 16*xo/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1)/(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
-        Xnew3_1 = (20*(1-xna-xo)*(xne1)/(xne1+xne2))/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1)/(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
-        Xnew3_2 = (22*(1-xna-xo)*(xne2)/(xne1+xne2))/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1)/(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))    
+        Xnew3_1 = (20*(1-xna-xo)*(xne1)/(xne1+xne2))/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1) &
+             /(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
+        Xnew3_2 = (22*(1-xna-xo)*(xne2)/(xne1+xne2))/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1) &
+             /(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
          Dd=[0,0,0,0]
          Dd(1)= Xnew1 - X1
          Dd(2)= Xnew2 - X2
          Dd(3)= Xnew3_1 - X3_1
          Dd(4)= Xnew3_2 - X3_2
-         !write(*,*) 'delta_XNa: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4) 
+         !write(*,*) 'delta_XNa: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
       end subroutine medin_cumming_3p_d_onena
-      
+
       subroutine medin_cumming_3p_d_comg(X1,X2,X3,Dd)
         real(dp), intent(in) :: X1, X2, X3 ! mass fraction
         real(dp), dimension(4),intent(out) :: Dd
@@ -679,7 +685,7 @@
         call tab_interp_medin_cumming_dx1(xc,xmg,'COMg',dx1_)
         call tab_interp_medin_cumming_dx2(xc,xmg,'COMg',dx2_)
         dxc=dx1_
-        dxmg=dx2_    
+        dxmg=dx2_
         xc = xc + dxc
         xmg = xmg + dxmg
         ! convert deltas in number fraction to mass fraction
@@ -693,7 +699,7 @@
       subroutine update_model_ (s, kc_t, kc_b, do_brunt)
         use turb_info, only: set_mlt_vars
         use brunt, only: do_brunt_B
-        use micro        
+        use micro
         type(star_info), pointer :: s
         integer, intent(in)      :: kc_t
         integer, intent(in)      :: kc_b
@@ -702,7 +708,7 @@
         integer  :: kf_t
         integer  :: kf_b
         logical :: mask(s%nz)
-        
+
         mask(:) = .true.
         ! Update the model to reflect changes in the abundances across
         ! cells kc_t:kc_b (the mask part of this call is unused, mask=true for all zones).
@@ -713,9 +719,9 @@
            write(*,*) 'phase_separation: error from call to set_eos_with_mask'
            stop
         end if
-        s%fix_Pgas = .false.   
+        s%fix_Pgas = .false.
         ! Update opacities across cells kc_t:kc_b (this also sets rho_face
-        ! and related quantities on faces kc_t:kc_b)        
+        ! and related quantities on faces kc_t:kc_b)
         call set_micro_vars(s, kc_t, kc_b, &
              skip_eos=.TRUE., skip_net=.TRUE., skip_neu=.TRUE., skip_kap=.TRUE., ierr=ierr)
         if (ierr /= 0) then
@@ -736,13 +742,13 @@
         end if
         ! Finally update MLT for interior faces
         kf_t = kc_t
-        kf_b = kc_b + 1 
+        kf_b = kc_b + 1
         call set_mlt_vars(s, kf_t+1, kf_b-1, ierr)
         if (ierr /= 0) then
            write(*,*) 'phase_separation: failed in call to set_mlt_vars during update_model_'
            stop
         endif
         ! Finish
-        return   
+        return
       end subroutine update_model_
 end module phase_separation
