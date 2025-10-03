@@ -11,7 +11,7 @@
    change_initial_v_flag = .true.
    new_v_flag = .true.
 
-   relax_to_this_tau_factor = 1d-3!-1
+   relax_to_this_tau_factor = 1d-3
    dlogtau_factor = 0.1d0
    relax_tau_factor = .true.
 
@@ -28,39 +28,38 @@
 
 &controls
 
-! Convection model
+! Convection model, see inlist_common
  mixing_length_alpha = 1.5d0
 
 ! stop when the center mass fraction of h1 drops below this limit
 !    xa_central_lower_limit_species(1) = 'he4'
 !    xa_central_lower_limit(1) = 1d-1
+
 !max_model_number = 1970
+
 ! see run_star_extras for stopping condition
-when_to_stop_rtol = 1d-3 
-when_to_stop_atol = 1d-3
+   when_to_stop_rtol = 1d-3
+   when_to_stop_atol = 1d-3
 
-    x_logical_ctrl(22) = .false. ! not in inlist_pulses
-    x_logical_ctrl(7) = .false.
+   x_logical_ctrl(22) = .false. ! not in inlist_pulses
+   x_logical_ctrl(7) = .false.
 
-   ! our wind implementation follows Brott+ 2011
-    use_other_wind = .false.
+   ! optional wind implementation follows Brott+ 2011
+    use_other_wind = .false. ! for M > 10
 
-! wind model section:
-      cool_wind_full_on_T    = 9.99d9
-      hot_wind_full_on_T     = 1d10
-      cool_wind_RGB_scheme   = 'Reimers'
-      cool_wind_AGB_scheme   = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5   ! 0.1   
-      Blocker_scaling_factor = 0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
-
+! wind model section: ! for M < 10
+   cool_wind_full_on_T    = 9.99d9
+   hot_wind_full_on_T     = 1d10
+   cool_wind_RGB_scheme   = 'Reimers'
+   cool_wind_AGB_scheme   = 'Blocker'
+   RGB_to_AGB_wind_switch = 1d-4
+   Reimers_scaling_factor = 0.5   ! 0.1
+   Blocker_scaling_factor = 0.1   ! 0.5  crank up to 1.0 when the mass loss stops and/or timestep crashes
 
 ! solver controls
-   convergence_ignore_equL_residuals = .true. ! for pre-ms 
+   convergence_ignore_equL_residuals = .true.
 !   use_gold2_tolerances = .false. ! if you need to get through the he_flash
    
-
-
 ! output
 log_directory = 'LOGS_evolution'
 

@@ -1,5 +1,5 @@
 &kap
-   use_Type2_opacities = .false. ! if cutting out core.
+use_Type2_opacities = .false. ! if envelope model only
 cubic_interpolation_in_X = .false.
 cubic_interpolation_in_Z = .false.
 /
@@ -11,20 +11,13 @@ cubic_interpolation_in_Z = .false.
 
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
-   !required_termination_code_string = 'Successful test: evolved 100 days past first relax'
+   !required_termination_code_string = 'Successful test: evolve through 5 pulsation cycles.'
 
    load_saved_model = .true.
    load_model_filename = 'he_dep.mod'
 
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_common'
-
-   color_num_files=2
-   color_file_names(2)='blackbody_johnson.dat'
-   color_num_colors(2)=5
-
-   !change_initial_v_flag = .true.
-   !new_v_flag = .false.
 
    change_v_flag = .true.
    new_v_flag = .true.
@@ -38,75 +31,54 @@ cubic_interpolation_in_Z = .false.
    dlogtau_factor = 0.1d0
    relax_tau_factor = .true.
 
-    ! if restarting from .mod file, need high initial dt for relaxing.
-    set_initial_dt = .true.
-    years_for_initial_dt = -1
-    seconds_for_initial_dt = 1d7!-1
+   set_initial_dt = .true.
+   years_for_initial_dt = -1
+   seconds_for_initial_dt = 1d7
 
-    set_initial_cumulative_energy_error = .true.
-    new_cumulative_energy_error = 0d0
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
 
-    set_initial_age = .true.
-    initial_age = 0
+   set_initial_age = .true.
+   initial_age = 0
 
-    set_initial_model_number = .true.
-    initial_model_number = 0
+   set_initial_model_number = .true.
+   initial_model_number = 0
 
-    ! on first pass.
-    !remove_center_by_temperature = 2d6 
-    remove_initial_center_by_temperature = 2d6
+! on first pass.
+   remove_initial_center_by_temperature = 2d6
+   remove_center_set_zero_v_center = .true. ! set center v = 0
 
-    !change_RSP2_flag = .true.
-    !new_RSP2_flag = .true.
 / !end of star_job namelist
 
 
 &controls
 
+   ! limit max model number as part of test suite.
+   max_model_number = 3000
 
-   ! probably not necessary
-   !remove_small_D_limit = 1d-16
-   !remove_mixing_glitches = .false. !.true. ! If true, then okay to remove gaps and singletons.
-   mlt_make_surface_no_mixing = .false.
-
-
-
-   ! controls for analyzing pulsations
+   ! controls for analyzing pulsations using GYRE in MESA
    x_integer_ctrl(1) = 1000 ! gyre interval to check
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = -1 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 17d0 ! expected period (in days) 
-!   x_ctrl(8) = 1.0 ! min_deltaR_for_periods (Rsun)
-   x_ctrl(9) = 1d0 !0.5 ! KE_growth_avg_abs_frac_new ! for averaging growth rates across steps.
+   x_ctrl(7) = 12d0 ! expected period (in days) 
+   x_ctrl(8) = -1 ! min_deltaR_for_periods (Rsun)
+   x_ctrl(9) = 1d0 ! KE_growth_avg_abs_frac_new ! for averaging growth rates across steps.
    x_ctrl(10) = 0.3 ! min_period_div_target
 
 
    ! new rsp style meshing, thanks to Bill P.
    x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC 
    TDC_pulse_use_mass_interp_face_values = .true.
-   TDC_pulse_nz = 600 !150 
-   TDC_pulse_nz_outer = 240 !40 
+   TDC_pulse_nz = 150 
+   TDC_pulse_nz_outer = 40 
    TDC_pulse_T_anchor = 11d3
    TDC_pulse_dq_1_factor = 2d0
    remesh_for_TDC_pulsations_log_core_zoning = .false. ! .false means do rsp style core
 
-
    okay_to_remesh = .false. ! freeze mesh after initial remesh.
-
-   ! control for excising core upon loading .mod file.
-   x_logical_ctrl(25) = .false. ! set true to remove core, or use starjob option above.
-   x_ctrl(14) = 2d6 ! desired core temperature to make cut at 
-
    x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
    x_ctrl(12) = 200! model number to turn off remesh ( only if if okay_to_remesh = .true.)
-
-   ! timestep	
-   x_ctrl(13) = 100! model number to drop timestep
-
-  ! TDC Pulsation timestepping.
-   x_ctrl(17) = 2d3 ! dt before pulse, seconds
-   x_ctrl(18) = 2d3 ! After a pulse begins, limit the timestep to this (in seconds). 
 
 ! GYRE set starting velocities, kick!
 ! kick when true and not restarting.
@@ -132,14 +104,17 @@ cubic_interpolation_in_Z = .false.
    min_kap_for_dPrad_dm_eqn = 1d-5
 
 ! timesteps for saturation
+      
+  ! TDC Pulsation timestepping.
+   x_ctrl(13) = 100! model number to drop timestep
+   x_ctrl(17) = 2d3 ! dt before pulse, seconds
+   x_ctrl(18) = 2d3 ! After a pulse begins, limit the timestep to this (in seconds).
 
-   !dt_div_min_dr_div_cs_limit = 2d0
+   ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
+   dt_div_min_dr_div_cs_limit = 4d0! set less than 1d0 in high L/M stars.
    dt_div_min_dr_div_cs_hard_limit = 100d0! i don't like hard limits ~ EbF
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
-   
-   ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
-   dt_div_min_dr_div_cs_limit = 4d0!5d0!10d0
-   min_q_for_dt_div_min_dr_div_cs_limit = 0.5d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0d0
    max_q_for_dt_div_min_dr_div_cs_limit = 1d0
    min_k_for_dt_div_min_dr_div_cs_limit = 1 
    min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
@@ -164,35 +139,37 @@ cubic_interpolation_in_Z = .false.
 
    convergence_ignore_equL_residuals = .false. ! include T-gradient eqn in newton
 
-   ! OUTER BC for TDC Pulsations
+! OUTER BC for TDC Pulsations
    use_RSP_L_eqn_outer_BC = .true.
    RSP2_Lsurf_factor = 0.5d0
    use_zero_Pgas_outer_BC = .true.
-
-   ! for u_flag, can optionally use these.
    use_compression_outer_BC = .false.
-   use_momentum_outer_BC = .false.
+   use_momentum_outer_BC = .false. ! adopt this if not using rsp and zero P bc.
 
-      ! Convection model
-      MLT_option = 'TDC'
-      include_mlt_corr_to_TDC = .false. ! true K. 1986 model, no mlt limiting
-      mixing_length_alpha = 1.5d0
-      alpha_TDC_DAMP = 1d0
-      alpha_TDC_DAMPR = 0d0
-      alpha_TDC_PtdVdt = 0d0
-      alpha_TDC_DAMPM = 0.25d0
-      steps_before_use_TDC = 0
-      mlt_Pturb_factor = 0d0
-      alt_scale_height_flag = .false. ! ignore eggleton 
-      TDC_num_innermost_cells_forced_nonturbulent = 2
+! Convection model
+   MLT_option = 'TDC'
+   include_mlt_corr_to_TDC = .false. ! true K. 1986 model, no mlt limiting
+   TDC_include_eturb_in_energy_equation = .true.
+   use_rsp_form_of_scale_height = .true.
+   include_mlt_in_velocity_time_centering = .false.
+   include_mlt_Pturb_in_thermodynamic_gradients = .false.
+   mixing_length_alpha = 1.5d0
+   alpha_TDC_DAMP = 1d0
+   alpha_TDC_DAMPR = 0d0
+   alpha_TDC_PtdVdt = 0d0
+   alpha_TDC_DAMPM = 0.25d0
+   steps_before_use_TDC = 0
+   mlt_Pturb_factor = 0d0 ! use 3d0 = 1d0 in TDC. time lagged.
+   alt_scale_height_flag = .false. ! ignore eggleton in the core.
+   TDC_num_innermost_cells_forced_nonturbulent = 2 ! for envelope models only.
 
 
-      ! dev feature, modify g -> geff (with hydro corr)
-      make_mlt_hydrodynamic = .false.
+   ! dev feature, modify g -> geff (with hydro corr)
+   make_mlt_hydrodynamic = .false.
+   TDC_use_density_form_for_eddy_viscosity = .false. ! always true for u_flag.
+   mlt_make_surface_no_mixing = .false.
 
-      TDC_use_density_form_for_eddy_viscosity = .false. ! always true for u_flag.
-
-   ! controls for shock capturing, relaxed for pulsations
+! controls for shock capturing, relaxed for pulsations
    ! main purpose is to force radiative in shock face
     max_abs_du_div_cs_for_convection = 1d0 !1d-1 !0.03d0
     max_v_div_cs_for_convection = 1d2
@@ -201,90 +178,12 @@ cubic_interpolation_in_Z = .false.
    x_logical_ctrl(22) = .true. ! flag for in inlist_pulses
 
 
-   ! output
+! output
    log_directory = 'LOGS_pulsation'
 
-
-
-
-
-! everything below is old and from testing.
-
-
-!max_num_merge_cells = 2
-!max_num_merge_surface_cells = 5 ! necessary for surface
-
-!min_dq = 1d-7
-!max_center_cell_dq = 1d-1!1d-5!1d-7
-!max_surface_cell_dq = 1d-4
-!mesh_max_allowed_ratio = 2.5d0 !default
-!min_surface_cell_dq = 5d-6!2d-6 ! 1d-6 might be safer. any higher and you risk touching the convective shell during a pulsation cycle which will make the surface go haywire.
-
-!mesh_delta_coeff_factor_smooth_iters = 3!20!50 ! 3
-!T_function1_weight = 40!110
-!P_function_weight = 10!50 ! need custom P function weight for logT < 4.5
-!log_tau_function_weight = 10!100
-
-!max_dq = 5d-2
-
-!xa_function_species(1) = 'he4'
-!xa_function_weight(1) = 0
-!xa_function_param(1) = 1d-2
-!use_other_mesh_functions = .true.
-
-
-
-! if split merge amr hydro
-  ! restore_mesh_on_retry = .true.
-  ! num_steps_to_hold_mesh_after_retry = 5
-! if hydro use momentum bc?
-
-   use_split_merge_amr = .false.
-split_merge_amr_okay_to_split_1 = .false.
-    merge_amr_ignore_core_cells = .true.
-    merge_amr_logT_for_ignore_core_cells = 5d0 !1d99
-    split_amr_ignore_core_cells = .true.
-    split_amr_logT_for_ignore_core_cells = 5d0 !1d99
-
-   mesh_delta_coeff = 1d0!0.8d0 ! RECOMMENDED 0.8d0
-   !! this one is turned on in run_star_extras
-   ! true in pulses use_split_merge_amr = .false.
-   !split_merge_amr_log_zoning = .true.
-   split_merge_amr_logtau_zoning = .true.
-   !split_merge_amr_flipped_hybrid_zoning = .true.
-   !split_merge_amr_hybrid_zoning = .true.
-
-    split_merge_amr_r_core_cm = 1d8
-split_merge_amr_nz_r_core = 1000!10000
-
-
-   split_merge_amr_nz_baseline = 1000!6000 ! RECOMMENDED 6000
-   split_merge_amr_MaxLong = 1.5d0!1.25d0
-   split_merge_amr_MaxShort = 1.5d0!2.5d0
-
-
-!    equal_split_density_amr = .false.
-
-! deprecated?    trace_split_merge_amr = .false.
-
-
-   split_merge_amr_max_iters = 1000 ! setting this too high will smear pulsations. must restrict?
-   split_merge_amr_okay_to_split_nz = .false.
-split_merge_amr_mesh_delta_coeff = 1.0!0.3
-
-   merge_amr_ignore_surface_cells = .false.
-    merge_amr_k_for_ignore_surface_cells = 20!1500!100
-
-   merge_amr_max_abs_du_div_cs = 0.03d0!0.5d0!5d-1!3d-2!0.03!0.05d0
-   merge_amr_du_div_cs_limit_only_for_compression = .true.
-   split_merge_amr_avoid_repeated_remesh = .true.
-   merge_amr_inhibit_at_jumps =.false. ! reduce udnersize ratio for large jumps
-
-
-
-
-report_solver_progress = .false.
-report_ierr = .true. ! if true, produce terminal output when have some internal error
+! Debugging
+   report_solver_progress = .false.
+   report_ierr = .false. ! if true, produce terminal output when have some internal error
 
 / ! end of controls namelist
 
@@ -293,12 +192,12 @@ report_ierr = .true. ! if true, produce terminal output when have some internal 
 Grid1_file_dir = 'png_pulsation'
 
 
-         ! axis limits -- to override system default selections
-         !HR_logT_min = 3.6 !-101d0 ! only used if /= -101d0
-         !HR_logT_max = 3.75!-101d0 ! only used if /= -101d0
-         !HR_logL_min = 3.85!-101d0 ! only used if /= -101d0
-         !HR_logL_max = 3.6!-101d0 ! only used if /= -101d0
+! axis limits -- to override system default selections
+!HR_logT_min = 3.6 !-101d0 ! only used if /= -101d0
+!HR_logT_max = 3.75!-101d0 ! only used if /= -101d0
+!HR_logL_min = 3.85!-101d0 ! only used if /= -101d0
+!HR_logL_max = 3.6!-101d0 ! only used if /= -101d0
 
-         HR_file_interval = 50 ! output when `mod(model_number,HR_file_interval)==0`
+HR_file_interval = 50 ! output when `mod(model_number,HR_file_interval)==0`
 
 / ! end of pgstar namelist

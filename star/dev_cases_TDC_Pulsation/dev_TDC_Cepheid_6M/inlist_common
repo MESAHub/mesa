@@ -77,10 +77,6 @@ use_Type2_opacities = .true.
 
 
 
-    limit_for_rel_error_in_energy_conservation = 1d1
-    hard_limit_for_rel_error_in_energy_conservation = 1d2
-
-
 
    ! adjustments to the newton solver
    solver_max_tries_before_reject = 30
@@ -127,12 +123,12 @@ use_Type2_opacities = .true.
    use_other_kap = .false.
 
    ! convection controls
-      MLT_option = 'TDC'
-      alpha_TDC_DAMP = 1d0
-      alpha_TDC_DAMPR = 0d0
-      alpha_TDC_PtdVdt = 0d0
-      alpha_TDC_DAMPM = 0.25d0
-      steps_before_use_TDC = 0
+    MLT_option = 'TDC'
+    alpha_TDC_DAMP = 1d0
+    alpha_TDC_DAMPR = 0d0
+    alpha_TDC_PtdVdt = 0d0
+    alpha_TDC_DAMPM = 0.25d0
+    steps_before_use_TDC = 0
 
     use_ledoux_criterion = .true.
     alpha_semiconvection = 1d0
@@ -140,6 +136,8 @@ use_Type2_opacities = .true.
     num_cells_for_smooth_gradL_composition_term = 0
  
     energy_eqn_option = 'dedt'
+    limit_for_rel_error_in_energy_conservation = 1d99
+    hard_limit_for_rel_error_in_energy_conservation = 1d99
 
 
     ! surface controls, probably uncessary
@@ -244,12 +242,12 @@ use_Type2_opacities = .true.
     !min_q_for_k_const_mass = 0.98
 
 
-      photo_digits = 8
-      photo_interval = 1000
-      profile_interval = 200 
-      history_interval = 1
-      terminal_interval = 10
-      max_num_profile_models = 1000000 ! 100 ! RECOMMENDED 10000
+    photo_digits = 8
+    photo_interval = 1000
+    profile_interval = 200 
+    history_interval = 1
+    terminal_interval = 10
+    max_num_profile_models = 1000000 ! 100 ! RECOMMENDED 10000
 
 
     num_trace_history_values = 2

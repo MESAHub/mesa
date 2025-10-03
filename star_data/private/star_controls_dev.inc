@@ -11,9 +11,9 @@
          logical :: make_mlt_hydrodynamic, include_mlt_corr_to_TDC
          logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
          logical :: include_mlt_in_velocity_time_centering
-         logical :: TDC_pulse_use_mass_interp_face_values
-         integer :: TDC_pulse_nz, TDC_pulse_nz_outer
-         real(dp) :: TDC_pulse_T_anchor, TDC_pulse_dq_1_factor
+         logical :: TDC_hydro_use_mass_interp_face_values
+         integer :: TDC_hydro_nz, TDC_hydro_nz_outer
+         real(dp) :: TDC_hydro_T_anchor, TDC_hydro_dq_1_factor
 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap

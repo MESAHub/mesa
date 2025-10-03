@@ -10,12 +10,12 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 # check if can skip building starting model
-#if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-#   cp standard_he_dep.mod he_dep.mod
-#else
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+   cp standard_he_dep.mod he_dep.mod
+else
    do_one inlist_to_he_dep_header he_dep.mod
    cp he_dep.mod standard_he_dep.mod
-#fi
+fi
 
 do_one inlist_pulses_header final.mod
 

@@ -44,10 +44,10 @@ module run_star_extras
    ! values specified on inlist_common, inlist_pulses
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
-   logical :: in_inlist_pulses, remesh_for_envelope_model, turn_off_remesh, remove_core
+   logical :: in_inlist_pulses, remesh_for_envelope_model, turn_off_remesh
    integer :: kick_model_number, timestep_drop_model_number, turn_off_remesh_model_number
    integer :: initial_model_number
-   real(dp) :: max_dt_before_pulse, max_dt_during_pulse, core_T_for_cut
+   real(dp) :: max_dt_before_pulse, max_dt_during_pulse
 
 contains
 
@@ -76,9 +76,6 @@ contains
       s%other_photo_write => photo_write
       s%other_photo_read => photo_read
 
-      s%how_many_other_mesh_fcns => how_many_other_mesh_fcns
-      s%other_mesh_fcn_data => RSP_mesh
-
       ! this is optional
       s%other_wind => brott_wind
       s%other_adjust_mdot => my_adjust_mdot
@@ -95,8 +92,6 @@ contains
       kick_model_number = s%x_ctrl(11)
       timestep_drop_model_number = s%x_ctrl(13)
       turn_off_remesh_model_number = s%x_ctrl(12)
-      remove_core = s%x_logical_ctrl(25)
-      core_T_for_cut = s%x_ctrl(14)
    end subroutine extras_controls
 
    subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
@@ -362,13 +357,6 @@ contains
       call test_suite_startup(s, restart, ierr)
       call TDC_pulsation_extras_startup(id, restart, ierr)
 
-      ! interestingly, if you do this instead of remove_center_by_temperature
-      ! in the starjob section of the inlist, then the tau relaxation happens
-      ! before the cut. Not sure which is better, but leaving like this for now
-      if (.not. restart .and. in_inlist_pulses .and. remove_core) then
-         call star_remove_center_by_temperature(id, core_T_for_cut, ierr)
-      end if
-
       ! Initialize GYRE
 
       call init('gyre.in')
@@ -385,10 +373,10 @@ contains
 
       call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
-      !if (.not. restart .and. in_inlist_pulses) then
-      !    initial_model_number = s% model_number
-      !end if
-      initial_model_number = 0 ! since we are setting model # to 0 in inlist_pulses
+      if (.not. restart .and. in_inlist_pulses) then
+          initial_model_number = s% model_number
+      end if
+      !initial_model_number = 0 ! since we are setting model # to 0 in inlist_pulses
 
       ! for rsp style mesh
       if (.not. restart .and. in_inlist_pulses .and. remesh_for_envelope_model) then
@@ -500,7 +488,7 @@ contains
           .and. s%x_logical_ctrl(5)) then
 
          ! if v= 0, turn on v so we can kick
-         if (.not. s%v_flag .or. .not. s%u_flag) then
+         if (.not. s%v_flag .and. .not. s%u_flag) then
             call star_set_v_flag(id, .true., ierr)
          end if
 
@@ -539,24 +527,6 @@ contains
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
 
-!            !s% use_atm_PT_at_center_of_surface_cell = .false.
-!            s% use_momentum_outer_BC = .false. ! offset_P_to_center_cell = .true.
-!            s% use_compression_outer_BC = .false. ! offset_P_to_center_cell = .true.
-!            s% use_zero_Pgas_outer_BC = .true.
-!            s% atm_option = 'T_tau'
-!            s% atm_T_tau_relation = 'Eddington'
-!            s% atm_T_tau_opacity = 'fixed'
-!            s% tau_factor = 1d-3
-!            s% Pextra_factor = 1d0
-!            s% force_tau_factor = 1d-3
-!            s% delta_lgL_limit = 0.25d0
-!            !s% delta_lgTeff_limit = 1d-2!0.25d0
-!            s% delta_lgL_limit_L_min = 1d99!-100
-!            s% delta_lgL_limit_L_min = 1d99!-100
-!
-!            !s% atm_T_tau_errtol = 1d-12
-!            !s% atm_T_tau_max_iters = 500
-
       if (in_inlist_pulses) then
          if (s%model_number > timestep_drop_model_number) then
             s%max_timestep = max_dt_during_pulse
@@ -572,16 +542,6 @@ contains
 
          if (s%model_number > turn_off_remesh_model_number .and. turn_off_remesh) then
             s%okay_to_remesh = .false.
-            !               if ((s% model_number == turn_off_remesh_model_number + 1) &
-            !                     .and. .not. remesh_for_envelope_model )then
-            !                  do k =1,s%nz
-            !                     if (s%lnT(k) >= log(2d6)) then
-            !                        exit
-            !                     end if
-            !                  end do
-            !                  s% mesh_min_k_old_for_split = k
-            !               end if
-            !               write (*,*) 's% mesh_min_k_old_for_split', s% mesh_min_k_old_for_split
          end if
       end if
 
@@ -620,81 +580,6 @@ contains
 
    end function extras_finish_step
 
-   ! here is an example that adds a mesh function for log(opacity)
-   subroutine how_many_other_mesh_fcns(id, n)
-      integer, intent(in) :: id
-      integer, intent(out) :: n
-      n = 1
-   end subroutine how_many_other_mesh_fcns
-
-   subroutine RSP_mesh( &
-      id, nfcns, names, gval_is_xa_function, vals1, ierr)
-      use star_def
-      use math_lib
-      use const_def
-      integer, intent(in) :: id
-      integer, intent(in) :: nfcns
-      character(len=*) :: names(:)
-      logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
-      real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
-      integer, intent(out) :: ierr
-      integer :: nz, k
-      real(dp), pointer :: vals(:, :)
-      real(dp), parameter :: weight1 = 1d6 !1d4
-      real(dp), parameter :: weight2 = 8d5 !1d4
-      real(dp), parameter :: weight3 = 0d0
-      real(dp) :: logT_anchor1, logT_anchor2, logT_anchor3, lmid, delta, ell
-      integer :: k_anchor1, k_anchor2
-
-      type(star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      names(1) = 'RSP_function'
-      gval_is_xa_function(1) = .false.
-      nz = s%nz
-      vals(1:nz, 1:nfcns) => vals1(1:nz*nfcns)
-
-      logT_anchor1 = log(11d3)!log(11d3)
-      logT_anchor2 = log(20d3)!log(11d3)
-      logT_anchor3 = log(30d3)
-
-      lmid = 0.5d0*(logT_anchor2 + logT_anchor3)
-      delta = (logT_anchor3 - logT_anchor2)
-
-      k_anchor1 = 0
-      k_anchor2 = 0
-
-      !         do k = 1, nz
-      !            if (s% lnT(k) < logT_anchor1) then
-      !               vals(k, 1) = weight1*(s% m(1) - s% m(k))/Msun
-      !               k_anchor = k
-      !               !write (*,*) "k", k ,"dm", vals(k, 1)
-      !            else if (s% lnT(k) < logT_anchor2 .and. s% lnT(k) >= logT_anchor1) then
-      !               vals(k, 1) = weight2*(s% m(k_anchor) - s% m(k))/Msun
-      !               !write (*,*) "k", k ,"dm", vals(k, 1)
-      !            else
-      !               vals(k, 1) = weight3*(s% m(1)/Msun - s% m(k)/Msun)
-      !            end if
-      !         end do
-
-      do k = 1, nz
-         ell = s%lnT(k)
-         if (s%lnT(k) <= logT_anchor1) then
-            vals(k, 1) = weight1*(s%m(1) - s%m(k))/Msun
-            k_anchor1 = k
-         else if (s%lnT(k) <= logT_anchor2 .and. s%lnT(k) >= logT_anchor1) then
-            vals(k, 1) = weight2*(s%m(1) - s%m(k))/Msun
-            k_anchor2 = k
-         else if (s%lnT(k) < logT_anchor3) then
-            ! smooth taper doqn to 0.
-!               vals(k,1) = vals(k-1,1)/2d0
-            vals(k, 1) = (0.5d0*weight2*(1d0 - tanh((ell - lmid)/delta)) &
-                          )*((s%m(k_anchor2) - s%m(k))/Msun)
-         end if
-      end do
-
-   end subroutine RSP_mesh
 
    subroutine photo_write(id, iounit)
       integer, intent(in) :: id, iounit
