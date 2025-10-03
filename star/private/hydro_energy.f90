@@ -216,7 +216,7 @@
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
             use hydro_rsp2, only: compute_Eq_cell
             use star_utils, only: get_face_weights
-            use tdc_pulse, only: compute_tdc_Eq_div_w_face ! compute_Eq_cell
+            use tdc_hydro, only: compute_tdc_Eq_div_w_face ! compute_Eq_cell
             real(dp) :: alfa, beta
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &

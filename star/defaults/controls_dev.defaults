@@ -305,9 +305,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
     remesh_for_TDC_pulsations_log_core_zoning = .false.
-    TDC_pulse_use_mass_interp_face_values = .false.
+    TDC_hydro_use_mass_interp_face_values = .false.
 
-    TDC_pulse_nz = 150
-    TDC_pulse_nz_outer = 40
-    TDC_pulse_T_anchor = 11d3
-    TDC_pulse_dq_1_factor = 2d0
+    TDC_hydro_nz = 150
+    TDC_hydro_nz_outer = 40
+    TDC_hydro_T_anchor = 11d3
+    TDC_hydro_dq_1_factor = 2d0

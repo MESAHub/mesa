@@ -17,7 +17,7 @@
 !
 ! ***********************************************************************
 
-module tdc_pulse
+module tdc_hydro
 
    use star_private_def
    use const_def, only: dp, boltz_sigma, pi, clight, crad, ln10
@@ -88,7 +88,7 @@ contains
       real(dp), intent(out) :: alfa, beta
       ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
       if (k == 1) call mesa_error(__FILE__, __LINE__, 'bad k==1 for get_RSP2_alfa_beta_face_weights')
-      if (s%TDC_pulse_use_mass_interp_face_values) then
+      if (s%TDC_hydro_use_mass_interp_face_values) then
          alfa = s%dq(k - 1)/(s%dq(k - 1) + s%dq(k))
          beta = 1d0 - alfa
       else
@@ -601,4 +601,4 @@ contains
       d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center_face
 
-end module tdc_pulse
+end module tdc_hydro

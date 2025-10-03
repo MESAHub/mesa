@@ -187,7 +187,7 @@ contains
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
       use star_utils
-      use tdc_pulse, only: compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face
+      use tdc_hydro, only: compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option

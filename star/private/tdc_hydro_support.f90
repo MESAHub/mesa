@@ -17,7 +17,7 @@
 !
 ! ***********************************************************************
 
-module tdc_pulse_support
+module tdc_hydro_support
 
    use star_private_def
    use const_def, only: dp, ln10, pi, lsun, rsun, msun
@@ -36,10 +36,10 @@ contains
 
    subroutine remesh_for_TDC_pulsations(s, ierr)
       ! uses these controls
-      !  TDC_pulse_nz = 150
-      !  TDC_pulse_nz_outer = 40
-      !  TDC_pulse_T_anchor = 11d3
-      !  TDC_pulse_dq_1_factor = 2d0
+      !  TDC_hydro_nz = 150
+      !  TDC_hydro_nz_outer = 40
+      !  TDC_hydro_T_anchor = 11d3
+      !  TDC_hydro_dq_1_factor = 2d0
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
       type(star_info), pointer :: s
@@ -52,7 +52,7 @@ contains
       include 'formats'
       ierr = 0
       nz_old = s%nz
-      nz = s%TDC_pulse_nz
+      nz = s%TDC_hydro_nz
       if (nz == nz_old) return  ! assume have already done remesh for RSP2
       if (nz > nz_old) call mesa_error(__FILE__, __LINE__, 'remesh_for_RSP2 cannot increase nz')
       call setvars2(ierr)
@@ -164,9 +164,9 @@ contains
       subroutine find_xm_anchor2
          real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
          include 'formats'
-         lnT_anchor = log(s%TDC_pulse_T_anchor)
+         lnT_anchor = log(s%TDC_hydro_T_anchor)
          if (lnT_anchor <= s%xh(s%i_lnT, 1)) then
-            write (*, 1) 'T_anchor < T_surf', s%TDC_pulse_T_anchor, exp(s%xh(s%i_lnT, 1))
+            write (*, 1) 'T_anchor < T_surf', s%TDC_hydro_T_anchor, exp(s%xh(s%i_lnT, 1))
             call mesa_error(__FILE__, __LINE__, 'find_xm_anchor')
          end if
          xm_anchor = xm_old(nz_old)
@@ -193,8 +193,8 @@ contains
          real(dp) :: H_low, H_high, H_mid, f_low, f_high, f_mid
          integer :: iter
          include 'formats'
-         nz_outer = s%TDC_pulse_nz_outer
-         dq_1_factor = s%TDC_pulse_dq_1_factor
+         nz_outer = s%TDC_hydro_nz_outer
+         dq_1_factor = s%TDC_hydro_dq_1_factor
          dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
          xm(1) = 0d0
          xm(2) = dxm_outer*dq_1_factor
@@ -475,7 +475,7 @@ contains
       end subroutine revise_lnT_for_QHSE2
 
       subroutine set_Hp_face2(k)
-         use tdc_pulse, only: get_RSP2_alfa_beta_face_weights
+         use tdc_hydro, only: get_RSP2_alfa_beta_face_weights
          integer, intent(in) :: k
          real(dp) :: r_00, d_00, Peos_00, Peos_div_rho, Hp_face, &
                      d_m1, Peos_m1, alfa, beta
@@ -498,4 +498,4 @@ contains
 
    end subroutine remesh_for_TDC_pulsations
 
-end module tdc_pulse_support
+end module tdc_hydro_support

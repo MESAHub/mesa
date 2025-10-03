@@ -371,7 +371,7 @@
       subroutine expected_non_HSE_term( &
             s, k, other_ad, other, accel_ad, Uq_ad, ierr)
          use hydro_rsp2, only: compute_Uq_face
-         use tdc_pulse, only: compute_tdc_Uq_face
+         use tdc_hydro, only: compute_tdc_Uq_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
