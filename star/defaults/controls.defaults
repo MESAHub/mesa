@@ -8267,6 +8267,8 @@
       ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
       ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
+      ! Above ``max_logT_for_velocity_time_centering``, P and L are not time centered
+      ! to aid in damping spurious modes in the core.
 
       ! ::
 
