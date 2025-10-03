@@ -203,7 +203,7 @@
 
       ! ::
 
-    alpha_TDC_DAMPM = 0.25d0
+    alpha_TDC_DAMPM = 0
     alpha_TDC_C = 1.0d0
     alpha_TDC_S = 1.0d0
     TDC_use_density_form_for_eddy_viscosity = .false.
