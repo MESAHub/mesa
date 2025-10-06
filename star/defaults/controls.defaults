@@ -336,7 +336,7 @@
     profiles_index_name = 'profiles.index'
 
 
-      ! profiles_data_prefix
+      ! profile_data_prefix
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! prefix of the profile data
