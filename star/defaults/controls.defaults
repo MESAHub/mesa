@@ -346,8 +346,8 @@
     profile_data_prefix = 'profile'
 
 
-      ! profiles_data_suffix
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! profile_data_suffix
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! suffix of the profile data
 
