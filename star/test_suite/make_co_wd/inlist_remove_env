@@ -21,6 +21,9 @@
       remove_surface_do_entropy = .true.
       remove_surface_turn_off_energy_sources_and_sinks = .true.
 
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-9 ! can aid convergence after relaxation phase
+
       !pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -36,7 +39,7 @@
 &controls
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 2500
+      max_model_number = 3000
 
       retry_hold = 3
       min_timestep_limit = 1d-20 ! (seconds)
