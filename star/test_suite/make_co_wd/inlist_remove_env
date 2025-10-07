@@ -21,6 +21,9 @@
       remove_surface_do_entropy = .true.
       remove_surface_turn_off_energy_sources_and_sinks = .true.
 
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-9 ! can aid convergence after relaxation phase
+
       !pgstar_flag = .true.
 
 / ! end of star_job namelist
