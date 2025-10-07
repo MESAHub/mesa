@@ -157,3 +157,45 @@ Timestep and grid controls
 
 &eos
 ====
+
+&colors
+=======
+
+The ``&colors`` section configures the custom colors module for calculating synthetic photometry during stellar evolution. This module interpolates stellar atmosphere models to compute bolometric magnitudes and synthetic magnitudes in specified photometric filters, adding these as extra history columns.
+
+Enabling Synthetic Photometry
+-----------------------------
+
+To activate the colors module, set the ``use_colors`` control to ``.true.``. This enables the computation of synthetic magnitudes at each timestep using interpolated stellar atmosphere models.
+
+.. literalinclude:: $MESA_DIR/star/test_suite/custom_colors/inlist_colors
+   :start-after: &colors
+   :end-before: / ! end of colors namelist
+
+Key Controls
+------------
+
+- **use_colors**: Enables or disables the colors module (default: ``.false.``).
+- **instrument**: Specifies the photometric system or filter set (e.g., 'Gaia').
+- **stellar_atm**: Path to the stellar atmosphere model grid (e.g., Kurucz 2003 models).
+- **vega_sed**: Path to the Vega reference spectrum for zero-point calibration.
+- **distance**: Assumed distance to the star in parsecs for absolute magnitudes (default: 10 pc).
+- **make_csv**: If ``.true.``, outputs SED and photometry results as CSV files for verification.
+- **colors_results_directory**: Directory for storing output CSV files if ``make_csv`` is enabled.
+
+The module uses a pre-computed grid of stellar atmosphere models (e.g., Kurucz 2003, covering Teff = 3500-50000 K, log g = 0.0-5.0, [M/H] = -5.0 to +1.0) to interpolate spectral energy distributions (SEDs) based on the star's evolving parameters (Teff, log g, metallicity). These SEDs are convolved with filter transmission curves to produce synthetic magnitudes.
+
+
+Additional History Columns
+---------------------------
+
+When enabled, the module adds the following columns to the history file:
+
+- ``Mag_bol``: Bolometric magnitude.
+- ``Flux_bol``: Bolometric flux.
+- Filter-specific magnitudes (e.g., ``Gbp``, ``G``, ``Grp``, ``Grvs``).
+
+Ensure the filter names match those in the ``instrument`` directory.
+
+
+
