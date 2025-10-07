@@ -3389,7 +3389,7 @@
          d_Ptot_dxa = 0d0
 
          time_center = (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering)
+                  s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering)
          if (time_center) then
             alfa = s% P_theta_for_velocity_time_centering
          else
@@ -3959,7 +3959,7 @@
          if (s% include_mlt_in_velocity_time_centering) then
             ! consider building a wrapper : wrap_opt_time_center_L_00(s,k)
             if (s% using_velocity_time_centering .and. &
-              s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) then
+              s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
                L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0

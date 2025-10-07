@@ -418,7 +418,6 @@
          logical :: use_momentum_outer_BC
          logical :: use_zero_Pgas_outer_BC
          logical :: use_fixed_vsurf_outer_BC
-         logical :: use_RSP_L_eqn_outer_BC
          real(dp) :: fixed_vsurf
          logical :: use_fixed_Psurf_outer_BC
          real(dp) :: fixed_Psurf
@@ -840,7 +839,7 @@
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
          real(dp) :: P_theta_for_velocity_time_centering, &
-            L_theta_for_velocity_time_centering, max_logT_for_velocity_time_centering
+            L_theta_for_velocity_time_centering, max_logT_for_include_P_and_L_in_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
          logical :: use_drag_energy, report_max_infall_inside_fe_core

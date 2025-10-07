@@ -4593,21 +4593,7 @@
       ! ::
 
     Tsurf_factor = 1
-
-
-      ! use_RSP_L_eqn_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! use RSP2 luminosity equation
-      ! as the outer boundary condition on L rather than the
-      ! default atmospheric BC for temperature.
-      ! solves L1 - s% RSP2_Lsurf_factor*4*pi*r^2*c*a*T1^4 = 0
-      ! uses dev control s% RSP2_Lsurf_factor  = 0.5 (default),
-      ! see controls_dev.defaults.list
-
-      ! ::
-
-    use_RSP_L_eqn_outer_BC = .false.
+    
 
       ! irradiation_flux
       ! ~~~~~~~~~~~~~~~~
@@ -8256,8 +8242,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! max_logT_for_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_logT_for_include_P_and_L_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -8278,7 +8264,7 @@
     include_L_in_velocity_time_centering = .false.
     L_theta_for_velocity_time_centering = 0.5d0
     use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
-    max_logT_for_velocity_time_centering = 1d99
+    max_logT_for_include_P_and_L_in_velocity_time_centering = 1d99
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

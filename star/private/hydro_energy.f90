@@ -201,7 +201,7 @@
             include 'formats'
             ierr = 0
             if (s% using_velocity_time_centering .and. &
-                     s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) then
+                     s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
                L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0
@@ -662,7 +662,7 @@
          beta = 1d0 - alfa
 
          if (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) then
+                  s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
             P_theta = s% P_theta_for_velocity_time_centering
          else
             P_theta = 1d0 ! try 1 - q(k)
@@ -710,14 +710,14 @@
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  if (s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) &
+                  if (s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
                      PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               if (s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) &
+               if (s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
                   PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if

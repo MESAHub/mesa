@@ -1277,7 +1277,7 @@
 
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
-                     s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_velocity_time_centering) then
+                     s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
                   L_theta = s% L_theta_for_velocity_time_centering
                else
                   L_theta = 1d0
