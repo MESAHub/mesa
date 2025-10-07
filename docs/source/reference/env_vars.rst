@@ -2,7 +2,7 @@
 Environment Variables
 =====================
 
-The following lists environment variables that can effect the way MESA runs.
+The following lists environment variables that can affect the way MESA runs.
 
 Essential
 ---------

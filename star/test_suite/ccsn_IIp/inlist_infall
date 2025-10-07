@@ -20,10 +20,10 @@
   set_initial_cumulative_energy_error = .true.
   new_cumulative_energy_error = 0d0
 
-  change_initial_v_flag = .true.
-  change_initial_u_flag = .true.
-  new_v_flag = .false.
-  new_u_flag = .true.
+  ! change_initial_v_flag = .true.
+  ! change_initial_u_flag = .true.
+  ! new_v_flag = .false.
+  ! new_u_flag = .true.
 
   remove_initial_center_by_entropy = 4
 

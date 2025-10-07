@@ -75,7 +75,7 @@
       overshoot_f0(3) = 0.005
 
       min_overshoot_q = 0d0
-      overshoot_D_min = 100.0
+      overshoot_D_min = 1d-2
 
 ! timesteps
 

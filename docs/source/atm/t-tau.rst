@@ -54,7 +54,7 @@ constant. The ``atm_T_tau_opacity`` control determines how the opacity
 
    * - ``'fixed'``
      - Assume the same opacity at each optical depth (i.e. uniform
-       opacity), equal to the the opacity in the outermost cell of
+       opacity), equal to the opacity in the outermost cell of
        the interior model. The equation of hydrostatic
        equilibrium is integrated analytically.
 

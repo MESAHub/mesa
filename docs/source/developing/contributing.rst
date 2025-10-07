@@ -122,7 +122,7 @@ If you want to commit all your changes to files already tracked by git, you can 
 
   git commit -a -m <message>
 
-Note that this is different than ``svn commit``, as it only alters
+Note that this is different from ``svn commit``, as it only alters
 your local repository.  It does not transmit your changes to the
 remote repository.
 

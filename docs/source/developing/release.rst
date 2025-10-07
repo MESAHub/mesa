@@ -13,7 +13,7 @@ General steps
 Prior to generating a release
 -----------------------------
 
-- Update the ZAMS model file by running the work directory found in ``data/star_data/zams_models/create_z2m2_y28``. This may take up to an hour or so. This will generate the file ``data/star_data/zams_models/zams_z2m2_y28.data``. Use the ZAMS model plotting script to verify that the HR diagram and central compositions look reasonable, and commit the new data file.
+- Update the ZAMS model file by running the work directory found in ``data/star_data/zams_models/create_z2m2_y28``. This may take up to a couple of hours or so. This will generate the file ``data/star_data/zams_models/zams_z2m2_y28.data``. Use the ZAMS model plotting script to verify that the HR diagram and central compositions look reasonable, and commit the new data file.
 - Update figures in the docs by running the ``update_docs_figures`` script in the ``star/test_suite/`` folder. These figures should be checked to make sure they look reasonable. Currently not all test suite problems autogenerate figures. Pay special attention if the model numbers in the filenames of saved figures have changed (script will print an ERROR message) -- this indicates some commit to MESA has slightly changed the results of these problems, and currently the README.rst file needs to be manually updated with the new image filename and the test as to be re-run (e.g. ``./each_test_run -u 13``). A new release should not be made if one of the figures degrade in quality.
 
 Removing files
@@ -171,7 +171,7 @@ Listing all commits that acknowledge help from someone ::
 Post release fixes
 ------------------
 
-By having the release be in a separate branch, we can push changes if we need to to fix issues. However, this should be done with caution. Changes to the documentation (highlighting some workarounds are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change requiring a new Zenodo upload). It may be easier if a version
+By having the release be in a separate branch, we can push changes if we need to fix issues. However, this should be done with caution. Changes to the documentation (highlighting some workarounds are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change requiring a new Zenodo upload). It may be easier if a version
 needs fixes to simply push a new release, and flag the current release as not working.
 
 New readthedocs version

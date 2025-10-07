@@ -432,7 +432,7 @@ microphysics options, employing prescriptions such as wind mass loss
 rates, or using older versions of MESA, please consult the documentation
 for appropriate references.
 
-In the the MESA binary module, by default:
+In the MESA binary module, by default:
 
 .. code-block:: latex
 

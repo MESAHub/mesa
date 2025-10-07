@@ -73,7 +73,7 @@
     overshoot_f(1)  = 0.055
     overshoot_f0(1) = 0.005
     x_ctrl(1) = 0.02
-    overshoot_D_min = 1d0
+    overshoot_D_min = 1d-2
 
 
 ! MESH & TIMESTEPS

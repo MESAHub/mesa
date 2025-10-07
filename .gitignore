@@ -105,3 +105,8 @@ TAGS
 .vscode
 .idea
 *~
+
+## Colors
+**/colors/data/.extraction_complete
+colors/data/filters/
+colors/data/stellar_models/
