@@ -883,8 +883,7 @@
    !log_du_kick_div_du
    !du
    !dvdt_dPdm
-   !dvdt_grav ! gravity = -grav = -Gm/r^2
-   !grav_eff ! effective gravity = -(grav - dvdt)
+   !dvdt_grav
 
    !tau_conv
    !tau_cool
