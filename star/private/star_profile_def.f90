@@ -378,7 +378,8 @@
       integer, parameter :: p_d_v_div_r_dr = p_d_v_div_r_dm + 1
 
       integer, parameter :: p_dvdt_grav = p_d_v_div_r_dr + 1
-      integer, parameter :: p_dvdt_dPdm = p_dvdt_grav + 1
+      integer, parameter :: p_grav_eff = p_dvdt_grav + 1
+      integer, parameter :: p_dvdt_dPdm = p_grav_eff + 1
       integer, parameter :: p_du = p_dvdt_dPdm + 1
       integer, parameter :: p_P_face = p_du + 1
 
@@ -1071,6 +1072,7 @@
          profile_column_name(p_d_v_div_r_dm) = 'd_v_div_r_dm'
          profile_column_name(p_d_v_div_r_dr) = 'd_v_div_r_dr'
          profile_column_name(p_dvdt_grav) = 'dvdt_grav'
+         profile_column_name(p_grav_eff) = 'grav_eff'
          profile_column_name(p_dvdt_dPdm) = 'dvdt_dPdm'
          profile_column_name(p_du) = 'du'
          profile_column_name(p_P_face) = 'P_face'

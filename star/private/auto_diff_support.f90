@@ -285,6 +285,37 @@
          end if
       end function wrap_d_p1
 
+      function wrap_d_m1_start(s, k) result(d_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: d_m1
+         integer, intent(in) :: k
+         d_m1 = 0d0
+         if (k > 1) then
+            d_m1 % val = s%rho_start(k-1)
+            d_m1 % d1Array(i_lnd_m1) = s%rho_start(k-1)
+         end if
+      end function wrap_d_m1_start
+
+      function wrap_d_00_start(s, k) result(d_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: d_00
+         integer, intent(in) :: k
+         d_00 = 0d0
+         d_00 % val = s%rho_start(k)
+         d_00 % d1Array(i_lnd_00) = s%rho_start(k)
+      end function wrap_d_00_start
+
+      function wrap_d_p1_start(s, k) result(d_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: d_p1
+         integer, intent(in) :: k
+         d_p1 = 0d0
+         if (k < s%nz) then
+            d_p1 % val = s%rho_start(k+1)
+            d_p1 % d1Array(i_lnd_p1) = s%rho_start(k+1)
+         end if
+      end function wrap_d_p1_start
+
       function wrap_lnd_m1(s, k) result(lnd_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: lnd_m1
@@ -951,6 +982,89 @@
          dxh_lnR % val = s%dxh_lnR(k)
          dxh_lnR % d1Array(i_lnR_00) = 1d0
       end function wrap_dxh_lnR
+
+      function wrap_dxh_v_face(s, k) result(dxh_v) ! ! wrap_dxh_v_face_00 technically
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: dxh_v
+         integer, intent(in) :: k
+         if (s% u_flag) then
+            dxh_v = wrap_dxh_u_face(s,k) ! wrap_dxh_u_face_00 technically
+            return
+         end if
+         dxh_v = 0d0
+         dxh_v % val = s% dxh_v(k)
+         dxh_v % d1Array(i_v_00) = 1d0
+      end function wrap_dxh_v_face
+
+
+      function wrap_geff_face(s, k) result(geff)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: geff, dv_dt, r2, g
+         integer, intent(in) :: k
+         geff = 0d0
+         dv_dt = 0d0
+         if (s% include_mlt_in_velocity_time_centering) then
+            r2 = pow2(wrap_opt_time_center_r_00(s,k))
+         else
+            r2 = pow2(wrap_r_00(s,k))
+         end if
+         if (s% make_mlt_hydrodynamic .and. (s% v_flag .or. s% u_flag)) then
+            ! add in hydrodynamic term
+            if (s% using_velocity_time_centering) then
+               dv_dt = 0.5d0*wrap_dxh_v_face(s,k)/s%dt ! time centered dv -> dv/2, theta = 0.5
+            else ! implicit theta = 1
+               dv_dt = wrap_dxh_v_face(s,k)/s%dt
+            end if
+            ! hydrodynamic correction to g is geff = g - dvdt, to do: add a floor and ceiling
+
+            if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+               g = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
+               geff = g - sign(dv_dt)*min(abs(dv_dt),0.5d0*g)
+            else
+               g = s%cgrav(k)*s%m_grav(k)/r2
+               geff = g - sign(dv_dt)*min(abs(dv_dt),0.5d0*g)
+            end if
+         else ! default is below
+            if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+               geff = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
+            else
+               geff = s%cgrav(k)*s%m_grav(k)/r2
+            end if
+         end if
+
+      end function wrap_geff_face
+
+      subroutine get_face_weights_ad_support(s, k, alfa, beta)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: alfa, beta
+         ! face_value(k) = alfa*cell_value(k) + beta*cell_value(k-1)
+         if (k == 1) call mesa_error(__FILE__,__LINE__,'bad k==1 for get_face_weights')
+         alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+         beta = 1d0 - alfa
+      end subroutine get_face_weights_ad_support
+
+      function wrap_dxh_u_face(s, k) result(dxh_u_face) ! wrap_dxh_u_face_00 technically
+        type (star_info), pointer                       :: s
+        integer, intent(in)                             :: k
+        type(auto_diff_real_star_order1)                :: dxh_u_face
+        real(dp)                                        :: alpha, beta
+
+        dxh_u_face = 0d0
+        if (k == 1) then
+          ! at the inner boundary just take the first cell‐update
+          dxh_u_face%val            = s%dxh_u(1)
+          dxh_u_face%d1Array(i_v_00) = 1d0
+        else
+          ! get mass weighted face interpolation coefficients
+          call get_face_weights_ad_support(s, k, alpha, beta)
+          dxh_u_face%val            = alpha*s%dxh_u(k) + beta*s%dxh_u(k-1)
+          ! derivatives wrt the two neighbouring dxh_u's
+          dxh_u_face%d1Array(i_v_00) = alpha
+          dxh_u_face%d1Array(i_v_m1) = beta
+        end if
+      end function wrap_dxh_u_face
+
 
       function wrap_u_face_m1(s, k) result(v_m1)
          type (star_info), pointer :: s
