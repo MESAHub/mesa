@@ -12,6 +12,7 @@ ifeq ($(WITH_FPE_CHECKS),yes)
 FFLAGS_FP_SANITY += -ffpe-trap=invalid,overflow,zero -finit-real=snan
 endif
 FFLAGS_FORTRAN_SANITY := -std=f2008 -ffree-line-length-none -ffixed-line-length-none -Wno-unused-dummy-argument -Wno-compare-reals -Wno-do-subscript
+FFLAGS_TRAMPOLINE := -ftrampoline-impl=heap
 FLAGS_REPRO := -ffp-contract=off
 FFLAGS_PREPROCESSOR := -cpp
 
@@ -50,6 +51,7 @@ FFLAGS_SHARED  := \
   $(FLAGS_CODE_SANITY) \
   $(FFLAGS_FP_SANITY) \
   $(FFLAGS_FORTRAN_SANITY) \
+  $(FFLAGS_TRAMPOLINE) \
   $(FLAGS_REPRO) \
   $(FFLAGS_PREPROCESSOR) \
   $(FLAGS_OPT) \
