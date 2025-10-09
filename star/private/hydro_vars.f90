@@ -485,7 +485,6 @@
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
          use hydro_rsp2, only: set_RSP2_vars
-         use tdc_hydro, only: set_viscosity_vars_TDC
 
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
@@ -599,15 +598,6 @@
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
 
-            if (s% alpha_TDC_DampM > 0) then
-               call set_viscosity_vars_TDC(s,ierr)
-               if (ierr /= 0) then
-                  if (len_trim(s% retry_message) == 0) s% retry_message = 'set_viscosity_vars_TDC failed'
-                  if (s% report_ierr) write(*,*) 'ierr from set_viscosity_vars_TDC'
-                  return
-               end if
-            end if
-
             call set_mlt_vars(s, nzlo, nzhi, ierr)
             if (failed('set_mlt_vars')) return
             if (dbg) write(*,*) 'call check_for_redo_MLT'
@@ -644,7 +634,6 @@
                return
             end if
          end if
-
 
          if (s% doing_timing) &
             call update_time(s, time0, total, s% time_set_hydro_vars)

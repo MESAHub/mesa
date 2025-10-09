@@ -62,10 +62,10 @@ public :: compute_Q
    !! @param grada grada is the adiabatic dlnT/dlnP,
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
-      logical :: report, include_mlt_corr_to_TDC
-      real(dp) :: mixing_length_alpha, alpha_TDC_c, alpha_TDC_s, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, e
+      logical :: report
+      real(dp) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma
    end type tdc_info
 
 contains
@@ -459,7 +459,6 @@ contains
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: Q, Af
       type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env
-      real(dp) :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
 
       ! Y = grad-gradL
       ! Gamma=(grad-gradE)/(gradE-gradL)
@@ -470,8 +469,8 @@ contains
       ! We only use Y_env /= Y when Y > 0 (i.e. the system is convectively unstable)
       ! because we only have a Gamma from MLT in that case.
       ! so when Y < 0 we just use Y_env = Y.
-      if (Y > 0 .and. info%include_mlt_corr_to_TDC) then
-         Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
+      if (Y > 0) then
+         Y_env = Y * convert(info%Gamma/(1+info%Gamma))
       else
          Y_env = Y
       end if
@@ -523,8 +522,8 @@ contains
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
-      S0 = convert(info%alpha_TDC_s * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
-      S0 = S0*Y + convert(info%Eq_div_w)
+      S0 = convert(x_ALFAS*info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
+      S0 = S0*Y
       D0 = convert(info%alpha_TDC_DAMP*x_CEDE/(info%mixing_length_alpha*info%Hp))
       gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
