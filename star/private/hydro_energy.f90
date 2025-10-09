@@ -201,7 +201,7 @@
             include 'formats'
             ierr = 0
             if (s% using_velocity_time_centering .and. &
-                     s% include_L_in_velocity_time_centering) then
+                     s% include_L_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
                L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0
@@ -212,8 +212,12 @@
             dL_dm_ad = (L00_ad - Lp1_ad)/dm
          end subroutine setup_dL_dm
 
-         subroutine setup_sources_and_others(ierr)  ! sources_ad, others_ad
-            !use hydro_rsp2, only: compute_Eq_cell
+
+         subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
+            use hydro_rsp2, only: compute_Eq_cell
+            use star_utils, only: get_face_weights
+            use tdc_hydro, only: compute_tdc_Eq_div_w_face ! compute_Eq_cell
+            real(dp) :: alfa, beta
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
@@ -261,6 +265,17 @@
             if (s% RSP2_flag) then
                Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
+            else if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then ! not checking for v or u flag.
+                !Eq_ad = compute_tdc_Eq_cell(s, k, ierr) ! safe to just recompute
+                if (k == 1) then
+                   Eq_ad = compute_tdc_Eq_div_w_face(s, k, ierr)*(s% mlt_vc_ad(k)/sqrt_2_div_3)
+                else
+                   call get_face_weights(s, k, alfa, beta)
+                   Eq_ad = alfa*compute_tdc_Eq_div_w_face(s, k, ierr)*(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
+                      beta*compute_tdc_Eq_div_w_face(s, k-1, ierr)*(shift_m1(s% mlt_vc_ad(k-1))/sqrt_2_div_3)
+                end if
+                if (ierr /= 0) return
             end if
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
@@ -339,11 +354,29 @@
          end subroutine setup_RTI_diffusion
 
          subroutine setup_d_turbulent_energy_dt(ierr)
+            use star_utils, only: get_face_weights
+            use const_def, only: sqrt_2_div_3
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: TDC_eturb_cell
+            real (dp) :: TDC_eturb_cell_start, alfa, beta
             include 'formats'
             ierr = 0
             if (s% RSP2_flag) then
                d_turbulent_energy_dt_ad = (wrap_etrb_00(s,k) - get_etrb_start(s,k))/dt
+            else if (s% mlt_vc_old(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then
+               ! write a wrapper for this.
+               if (k == 1) then
+                  TDC_eturb_cell_start = pow2(s% mlt_vc_old(k)/sqrt_2_div_3)
+                  TDC_eturb_cell = pow2(s% mlt_vc(k)/sqrt_2_div_3)
+               else
+                  call get_face_weights(s, k, alfa, beta)
+                  TDC_eturb_cell_start = alfa*pow2(s% mlt_vc_old(k)/sqrt_2_div_3) + &
+                     beta*pow2(s% mlt_vc_old(k-1)/sqrt_2_div_3)
+                  TDC_eturb_cell = alfa*pow2(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
+                     beta*pow2(shift_m1(s% mlt_vc_ad(k-1))/sqrt_2_div_3)
+               end if
+               d_turbulent_energy_dt_ad = (TDC_eturb_cell - TDC_eturb_cell_start) / dt
             else
                d_turbulent_energy_dt_ad = 0d0
             end if
@@ -629,10 +662,10 @@
          beta = 1d0 - alfa
 
          if (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering) then
+                  s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
             P_theta = s% P_theta_for_velocity_time_centering
          else
-            P_theta = 1d0
+            P_theta = 1d0 ! try 1 - q(k)
          end if
 
          if (s% u_flag) then
@@ -677,14 +710,14 @@
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  if (s% include_P_in_velocity_time_centering) &
+                  if (s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
                      PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               if (s% include_P_in_velocity_time_centering) &
+               if (s% include_P_in_velocity_time_centering .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
                   PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
