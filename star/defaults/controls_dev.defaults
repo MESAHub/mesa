@@ -293,20 +293,6 @@
 
     include_mlt_in_velocity_time_centering = .false.
 
-      ! make_mlt_hydrodynamic
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-
-      ! If make_mlt_hydrodynamic = .true., adopt geff = g - dv/dt from newton solver.
-      ! gradr and scale_height are modified by this flag to hydro form.
-      ! If .false. default to QHSE form, where g = GM/r^2
-      ! semiconvection, and use_mass_corrections ignore this flag, see star_utils.
-      ! not supported by RSP or RSP2.
-
-      ! ::
-
-    make_mlt_hydrodynamic = .false.
-
 
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
