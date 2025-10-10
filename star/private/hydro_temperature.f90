@@ -408,17 +408,8 @@
 
          ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
 
-         if (s% make_mlt_hydrodynamic .and. (s%v_flag .or. s% u_flag)) then
-            call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
-            grav = -wrap_geff_face(s,k) ! analytic form for hydrodynamic grav
-         else
-            call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
-         end if
-
-         if (ierr /= 0) return
-
-        ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
-        ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
+         ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
+         ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
          if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
             .and. s% mlt_Pturb_factor > 0d0) then
             if (k ==1) then

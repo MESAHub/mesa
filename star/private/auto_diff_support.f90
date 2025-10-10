@@ -1008,28 +1008,11 @@
          else
             r2 = pow2(wrap_r_00(s,k))
          end if
-         if (s% make_mlt_hydrodynamic .and. (s% v_flag .or. s% u_flag)) then
-            ! add in hydrodynamic term
-            if (s% using_velocity_time_centering) then
-               dv_dt = 0.5d0*wrap_dxh_v_face(s,k)/s%dt ! time centered dv -> dv/2, theta = 0.5
-            else ! implicit theta = 1
-               dv_dt = wrap_dxh_v_face(s,k)/s%dt
-            end if
-            ! hydrodynamic correction to g is geff = g - dvdt, to do: add a floor and ceiling
 
-            if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
-               g = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
-               geff = g - sign(dv_dt)*min(abs(dv_dt),0.5d0*g)
-            else
-               g = s%cgrav(k)*s%m_grav(k)/r2
-               geff = g - sign(dv_dt)*min(abs(dv_dt),0.5d0*g)
-            end if
-         else ! default is below
-            if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
-               geff = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
-            else
-               geff = s%cgrav(k)*s%m_grav(k)/r2
-            end if
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+            geff = s%fp_rot(k)*s%cgrav(k)*s%m_grav(k)/r2
+         else
+            geff = s%cgrav(k)*s%m_grav(k)/r2
          end if
 
       end function wrap_geff_face
