@@ -391,7 +391,6 @@
       subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
             dlnPdm_qhse, Ppoint, ierr)
          use hydro_momentum, only: expected_HSE_grav_term
-         use star_utils, only: get_area_info_opt_time_center
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: dlnPdm_qhse, Ppoint
@@ -407,6 +406,7 @@
          ! divide by Ppoint to make it unitless
 
          ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
+         call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
 
          ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
          ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
