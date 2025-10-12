@@ -425,10 +425,17 @@
              end if
          end if
 
+
          if (s% RSP2_flag) then  ! include Uq in u_face
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
+         else if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC') then ! include Uq in u_face
+            Uq_ad = compute_Uq_face(s, k, ierr)
+            if (ierr /= 0) return
+            s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
+         else
+            Uq_ad = 0d0
          end if
 
          s% u_face_val(k) = s% u_face_ad(k)%val
