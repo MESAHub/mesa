@@ -68,15 +68,10 @@ Changed the default for ``use_radiation_corrected_transfer_rate =
 
 A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
 
-``hydro_rotation`` now contains the more accurate deformation fits from `Fabry et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.123F/abstract>`_.
- When ``use_gravity_rotation_correction = .true.`` deformation fits are now included in the effective
- gravity used to calculate the local pressure scale heights and radiative temperature gradient.
+``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
 Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
 These functions can now be called in your custom ``run_star_extras.f90`` file, for data in a star, getting relevant timescales.
-
-The terminal header ``lg_Lnuc`` has been renamed to ``lg_Lnuc_tot`` as it includes photodisintegration and is analagous to the
-history column ``log_power_nuc_burn``, and is not equivalent to ``log_Lnuc`` which does not include photodisintegration.
 
 For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
 a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide
