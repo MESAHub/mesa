@@ -76,6 +76,12 @@ contains
 
       ierr = 0
 
+      if (mass_transfer_rate < eps_small) then
+         ! no mass transfer, so no L2 mass loss
+         fL2 = 0.0_dp
+         return
+      end if
+
       ! key parameters
       M2 = accretor_mass * Msun
       M1dot = mass_transfer_rate * Msun/secyer
@@ -189,11 +195,8 @@ contains
       the_max = sqrt(three_eigths * c2 * T + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eigth)
 
       if (the < the_max) then
-         ! return a tiny numner
+         ! return a tiny number
          fL2 = eps_small
-      else if (mass_transfer_rate < eps_small) then
-         ! no mass transfer, so no L2 mass loss
-         fL2 = 0.0_dp
       else
          the_min = ( 0.5_dp * sqrt((PhiL2 - PhiRd) / (GM2 / Rd) - 0.5_dp) )  ! corresponding to fL2=1, T=0
          ! need to find the maximum corresponding to fL2=0
