@@ -5,11 +5,11 @@
 
       load_saved_model = .true.
       load_model_filename = 'late_pre_zams.mod'
-      
+
       save_model_when_terminate = .true.
       save_model_filename = 'zams.mod'
       required_termination_code_string = 'xa_central_lower_limit'
-      
+
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
@@ -37,10 +37,10 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 6000
       !max_number_retries = 58
-      
+
       !stop_near_zams = .false.
       !Lnuc_div_L_zams_limit = 0.4 ! if stop_near_zams
-      
+
 ! wind
       ! delay wind until reach zams
       Dutch_scaling_factor = 0
@@ -88,19 +88,18 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-!pause = .true.
+   !pause_flag = .true.
 
-Grid1_plot_name(3) = 'HR'
-Profile_Panels3_xmin = -101d0
-Profile_Panels3_xmax = -101d0
-Profile_Panels3_other_yaxis_name(4) = 'entropy'
+   Grid1_plot_name(3) = 'HR'
+   Profile_Panels3_xmin = -101d0
+   Profile_Panels3_xmax = -101d0
+   Profile_Panels3_other_yaxis_name(4) = 'entropy'
 
-!Profile_Panels3_xaxis_name = 'zone'
-!Profile_Panels3_xmin = 48
-!Profile_Panels3_xmax = 58
-!Profile_Panels3_xaxis_reversed = .true.
+   !Profile_Panels3_xaxis_name = 'zone'
+   !Profile_Panels3_xmin = 48
+   !Profile_Panels3_xmax = 58
+   !Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist

@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2014-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -975,7 +969,6 @@
          history_column_name(h_total_num_solver_iterations) = 'total_num_solver_iterations'
 
 
-
          history_column_name(h_h1_czb_mass) = 'h1_czb_mass'
          history_column_name(h_surf_c12_minus_o16) = 'surf_c12_minus_o16'
          history_column_name(h_surf_num_c12_div_num_o16) = 'surf_num_c12_div_num_o16'
@@ -1347,7 +1340,7 @@
          do i=1,h_col_id_max
             if (len_trim(history_column_name(i)) == 0) then
                write(*,*) 'missing name for log column id', i
-               if (i > 1) write(*,*) 'following ' // trim(history_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
+               if (i > 1) write(*,*) 'following ' // trim(history_column_name(max(1,i-1)))  ! bp: get rid of bogus compiler warning
                write(*,'(A)')
                cnt = cnt+1
             end if
@@ -1389,8 +1382,4 @@
          do_get_history_id = value
       end function do_get_history_id
 
-
-
-
       end module star_history_def
-

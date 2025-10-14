@@ -10,7 +10,7 @@
   _INCLUDE zone;
   _INCLUDE fundrad;
   _INCLUDE stateq;
- <*VAR: Variables, COMMON & DATA 
+ <*VAR: Variables, COMMON & DATA
        INCLUDE sahaz  *>;
   _Proc @SAHA;
     <*SAHA: *>;

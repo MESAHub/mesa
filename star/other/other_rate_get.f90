@@ -1,25 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2022  The MESA team
+!   Copyright (C) 2022  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -40,7 +34,7 @@ module other_rate
    ! Thus we call this multiple times (each with a different temperature) for each reaction.
 
    ! Note this will effect the cached rate written to data/rates_data/cache
-   ! Becuase of this it will only get called if the rate does NOT already exist in your rates_cache
+   ! Because of this it will only get called if the rate does NOT already exist in your rates_cache
    ! I recommend you use the rates_cache_dir option to redirect your rates_cache when using this hook
    ! So you dont break your whole mesa install.
 
@@ -49,11 +43,10 @@ contains
    subroutine default_other_rate_get(ir, temp, tf, raw_rate, ierr)
       use rates_def
       use rates_lib
-      implicit none
 
-      integer :: ir ! Rate id
+      integer :: ir  ! Rate id
       real(dp), intent(in) ::    temp      !< Temperature
-      type(T_Factors) :: tf !< Various temperature factors
+      type(T_Factors) :: tf  !< Various temperature factors
       real(dp), intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
       integer, intent(out) ::   ierr
 

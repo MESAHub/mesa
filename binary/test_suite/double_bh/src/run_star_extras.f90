@@ -1,22 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2012  Bill Paxton
+!   Copyright (C) 2012  Bill Paxton & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -58,13 +55,13 @@
       subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
          use star_def
          integer, intent(in) :: id
-         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z ! surface values (cgs)
+         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z  ! surface values (cgs)
          ! NOTE: surface is outermost cell. not necessarily at photosphere.
          ! NOTE: don't assume that vars are set at this point.
          ! so if you want values other than those given as args,
          ! you should use values from s% xh(:,:) and s% xa(:,:) only.
          ! rather than things like s% Teff or s% lnT(:) which have not been set yet.
-         real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+         real(dp), intent(out) :: w  ! wind in units of Msun/year (value is >= 0)
          integer, intent(out) :: ierr
 
          integer :: h1, he4
@@ -146,9 +143,9 @@
                end if
             end if
 
-            if (alfa > 0) then ! eval hot side wind (eqn 24)
-               vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
+            if (alfa > 0) then  ! eval hot side wind (eqn 24)
+               vinf_div_vesc = 2.6d0  ! this is the hot side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.697d0 &
                   + 2.194d0*log10(L1/Lsun/1d5) &
@@ -162,9 +159,9 @@
                w1 = 0
             end if
 
-            if (alfa < 1) then ! eval cool side wind (eqn 25)
-               vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
+            if (alfa < 1) then  ! eval cool side wind (eqn 25)
+               vinf_div_vesc = 1.3d0  ! this is the cool side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.688d0 &
                   + 2.210d0*log10(L1/Lsun/1d5) &

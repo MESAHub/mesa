@@ -1,3 +1,22 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 !..here is the tabular helmholtz free energy eos:
 !..
 !..routine helmeos computes the pressure, energy and entropy via tables
@@ -8,15 +27,12 @@
 
       implicit none
 
-
       logical, parameter :: dbg = .false.
       !logical, parameter :: dbg = .true.
-
 
       private :: dbg
 
       contains
-
 
       subroutine helmeos2( &
          T, logT, Rho, logRho, abar_in, zbar_in, &
@@ -26,7 +42,6 @@
       use eos_def
       use const_def, only: pi, avo
       use utils_lib, only: is_bad
-      implicit none
       real(dp), intent(in) :: T, logT, Rho, logRho
       real(dp), intent(in) :: abar_in, zbar_in
       real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
@@ -64,7 +79,6 @@
       use const_def, asol => crad
       use utils_lib, only: is_bad
 
-      implicit none
 
       real(dp), intent(in) :: temp_in, logtemp_in, den_in, logden_in
       real(dp), intent(in) :: abar_in, zbar_in, coulomb_temp_cut, coulomb_den_cut
@@ -73,7 +87,7 @@
       logical, intent(out) :: off_table
       integer, intent(out) :: ierr
 
-      real(dp) :: h ! = planck_h
+      real(dp) :: h  ! = planck_h
       type (Helm_Table), pointer :: ht
 
 
@@ -105,12 +119,12 @@
 
 !..declare
 
-      real(dp) abar, zbar, temp, logtemp, den, logden
-      logical skip_elec_pos
+      real(dp) :: abar, zbar, temp, logtemp, den, logden
+      logical :: skip_elec_pos
 
 !..for the interpolations
-      integer          iat, jat
-      real(dp) xt, xd, mxt, mxd, fi(36), &
+      integer          :: iat, jat
+      real(dp) :: xt, xd, mxt, mxd, fi(36), &
                        din, dindd, dinda, dindz, dindda, dinddz, dindaa, &
                        dindaz, dindzz, dinddaa, dinddaz, &
                        w0t, w1t, w2t, w0mt, w1mt, w2mt, &
@@ -125,7 +139,7 @@
       ! real(dp) xpsi0, xdpsi0, xddpsi0, &
       !                  xpsi1, xdpsi1, xddpsi1, h3
 
-      real(dp) si0t, si1t, si2t, si0mt, si1mt, si2mt, &
+      real(dp) :: si0t, si1t, si2t, si0mt, si1mt, si2mt, &
                        si0d, si1d, si2d, si0md, si1md, si2md, &
                        dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt, &
                        dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md, &
@@ -136,7 +150,7 @@
                        dddsi0d, dddsi1d, dddsi2d, &
                        dddsi0md, dddsi1md, dddsi2md
 
-      real(dp) free, df_d, df_t, df_dd, df_tt, df_dt, &
+      real(dp) :: free, df_d, df_t, df_dd, df_tt, df_dt, &
                        df_ttt, df_dtt, df_ddt, df_ddd
 
          ht => eos_ht
@@ -175,7 +189,7 @@
          din     = ye*den
 
          skip_elec_pos = must_skip_elec_pos
-         if (.not. skip_elec_pos) then ! see if need to set it true
+         if (.not. skip_elec_pos) then  ! see if need to set it true
             if (temp < ht% templo) then
                ierr = 1
                return
@@ -333,6 +347,4 @@
             write(*,'(a30,99e26.16)') 'fi(36)*w2md*w2mt', fi(36)*w2md*w2mt, fi(36),w2md,w2mt
       end subroutine show_h5
 
-
       end module helm
-

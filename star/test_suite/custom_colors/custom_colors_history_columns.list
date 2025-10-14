@@ -9,6 +9,7 @@
 
       model_number ! counting from the start of the run
       num_zones ! number of zones in the model
+      phase_of_evolution
 
    !## age
 
@@ -25,45 +26,15 @@
 
 !# Color output
 
-      ! Outputs the bolometric correction (bc) for the star in filter band ``filter''
-      !bc filter
-
-      ! Outputs the absolute magnitude for the star in filter band ``filter''
-      !abs_mag filter
-
-      ! Adds all the bc's to the output
-      !add_bc
-
-      ! Adds all the absolute magnitudes to the output
-      !add_abs_mag
-
-      ! Ouputs luminosity in filter band ``filter'' (lsun)
-      ! lum_band filter
-
-      ! Adds all the filter band luminosities to the output (lsun)
-      ! add_lum_band
-
-      ! Ouputs log luminosity in filter band ``filter'' (log lsun)
-      ! log_lum_band filter
-
-      ! Adds all the filter band luminosities to the output (log lsun)
-      ! add_log_lum_band
-      
-      
       ! Note the filter names are case sensitive and must match what is used in your color
       ! data file
-      bc V
-      bc v_bb
-      bc B
-      bc U
-      abs_mag R
-      abs_mag J
-      abs_mag V
-      abs_mag B
-      abs_mag U
-      
+      star_age
+      Teff
+      log_Teff
+      log_L
+      log_R
+      log_g
       !Custom Av values are handled in the run_star_extras
-      
 
 !----------------------------------------------------------------------------------------------
 
@@ -74,3 +45,4 @@
    !## solver iterations
 
       num_iters ! same as num_newton_iterations
+

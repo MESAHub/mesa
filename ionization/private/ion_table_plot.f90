@@ -1,15 +1,32 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2011  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
       module ion_table_plot
 
-      use const_def
+      use const_def, only: dp
       use ion_tables_eval
       use math_lib
       use utils_lib, only: mesa_error, mkdir
 
       implicit none
 
-
       contains
-
 
       subroutine do_create_table_plot_files
 
@@ -25,8 +42,8 @@
 
          real(dp), allocatable :: output_values(:,:,:)
 
-         Z = 0.018
-         X = 0.72
+         Z = 0.018d0
+         X = 0.72d0
 
          !..set the sample size
          lgT_points = 300
@@ -47,12 +64,12 @@
          lgRho_max = 5.5d0
 
          ! table full range
-         lgT_max = 8.2
-         lgT_min = 2.1
-         lgQ_min = -10
-         lgQ_max = 5.69
-         lgRho_min = -9 ! lgQ_min + 2*lgT_min - 12
-         lgRho_max = 8 ! lgQ_max + 2*lgT_max - 12
+         lgT_max = 8.2d0
+         lgT_min = 2.1d0
+         lgQ_min = -10d0
+         lgQ_max = 5.69d0
+         lgRho_min = -9d0  ! lgQ_min + 2*lgT_min - 12
+         lgRho_max = 8d0  ! lgQ_max + 2*lgT_max - 12
 
          ! test
          lgT_max = 7.5d0
@@ -243,9 +260,7 @@
          !call open1('logW')
          io_last = io
 
-
          contains
-
 
          subroutine open1(name)
             character (len=*), intent(in) :: name
@@ -255,11 +270,4 @@
 
       end subroutine open_plot_files
 
-
-
-
-
-
       end module ion_table_plot
-
-

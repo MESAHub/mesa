@@ -114,7 +114,7 @@
 &pgstar
 
          
-!pause = .true.
+!pause_flag = .true.
          
     Grid2_win_flag = .true.
     

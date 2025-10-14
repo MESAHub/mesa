@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2013-2021  Josiah Schwab & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -102,12 +96,12 @@ contains
 
     ! first, translate the density, temperature, etc into appropriate units
 
-    kT = 1d3 * keV * T9 ! in MeV
+    kT = 1d3 * keV * T9  ! in MeV
     kT% d1val1 = kT% val
     kT% d1val2 = 0d0
 
-    mec2 = me * clight*clight / mev_to_ergs ! in MeV
-    beta = mec2/kT ! dimesionless
+    mec2 = me * clight*clight / mev_to_ergs  ! in MeV
+    beta = mec2/kT  ! dimesionless
 
     ! the chemical potentials from the equation of state are kinetic
     ! so add in the rest mass terms
@@ -117,19 +111,19 @@ contains
     eta% d1val2 = d_etak_dlnRho + beta % d1val2
 
     ! only evaluate this for really degenerate stuff
-    if (eta .lt. 2*beta) return
+    if (eta < 2*beta) return
 
     ! also need chemical potential in MeV
     mue = eta * kT
 
-    do i = 1, n ! loop over reactions
+    do i = 1, n  ! loop over reactions
 
        ! if there's not a weak reaction index, don't bother
        ir = ids(i)
        if (ir <= 0) then
           if (dbg) write(*,'(a,i3)') "No weak reaction for ", ir
           cycle
-       endif
+       end if
 
        ! get reactant names & ids
        ecapture_lhs = weak_lhs_nuclide_name(ir)
@@ -144,7 +138,7 @@ contains
           if (dbg) write(*,*) key, "is not a reaction included in ecapture module"
           ierr = 0
           cycle
-       endif
+       end if
        if (dbg) write(*,*) key, "is a reaction included in ecapture module"
 
        call integer_dict_lookup(ecapture_transitions_offset_dict, key, offset, ierr)
@@ -286,14 +280,14 @@ contains
           ! convert to rates
           ln2ft = ln2 * exp10(-logft(j))
           ! protect against 0s
-          if ((Ie_ad .gt. 0) .and. (Je_ad .gt. 0)) then
+          if ((Ie_ad > 0) .and. (Je_ad > 0)) then
              lambda_ad = lambda_ad + Ie_ad * ln2ft * Pj(j)
              neutrino_ad = neutrino_ad + mec2 * Je_ad * ln2ft * Pj(j)
           end if
 
        end do
 
-       if (lambda_ad .gt. 1d-30) then
+       if (lambda_ad > 1d-30) then
           Qneu_ad = neutrino_ad / lambda_ad
        else
           Qneu_ad = 0d0

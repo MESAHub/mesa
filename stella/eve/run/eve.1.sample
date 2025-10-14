@@ -335,15 +335,15 @@ as fryer2 but  r**(-3) strictly, no r**(-6) and cooler wind -- here Rwind 2e5 sm
 	600 zones, geometric progression in dm, rho=1.d-23 g/cm^3
 
 'mr0.eve'   'res.tst'       'mr0hom.mod'  '../../opacity/msun.opa'  'mr0hom.rho'   'mr0hom.hyd'  'mr0hom.abn'  'mr0hom.xni'
- Martin's version for homogenous velocity and E_kin=E_tot
+ Martin's version for homogeneous velocity and E_kin=E_tot
 's7_0a.eve'   'res.tst'       's7_0ani.mod'  '../../opacity/msun.opa'  's7_0ani.rho'   '../../woo/s7_0ani.hyd'  '../../woo/s7_0ani.abn'  's7_0ani.xni'
 's7_0a.eve'   'res.tst'       's7_0a.mod'  '../../opacity/msun.opa'  's7_0a.rho'   's7_0a.hyd'  's7_0a.abn'  's7_0a.xni'
 
 
 'mr0.eve'   'res.tst'       'mr0hom.mod'  '../../opacity/msun.opa'  'mr0hom.rho'   'mr0hom.hyd'  'mr0hom.abn'  'mr0hom.xni'
- Martin's version for homogenous velocity and E_kin=E_tot
+ Martin's version for homogeneous velocity and E_kin=E_tot
 'mr0.eve'   'res.tst'       'mr0.mod'  '../../opacity/msun.opa'  'mr0.rho'   'mr0.hyd'  'mr0.abn'  'mr0.xni'
- Martin Reinecke model (velocity is still not homogenious), averaging over whole octant of star
+ Martin Reinecke model (velocity is still not homogeneous), averaging over whole octant of star
 's1bm7.eve'  'res.tst'   's1bm7.mod'  '../../opacity/mlmc.opa' 's1bm7.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1bm7.xni'
 's1b7a1f.eve'  'res.tst'   's1b7a1f.mod'  '../../opacity/mlmc.opa' 's1b7a1f.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a1f.xni'
 's1bm7.eve'  'res.tst'   's1bm7.mod'  '../../opacity/mlmc.opa' 's1bm7.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1bm7.xni'

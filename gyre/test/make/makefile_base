@@ -13,9 +13,9 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 ifeq ($(USE_GYRE),YES)
-    SRCS = test_gyre.f
+    SRCS = test_gyre.f90
 else
-    SRCS = test_gyre_stub.f
+    SRCS = test_gyre_stub.f90
 endif
 
 #################################################################
@@ -64,7 +64,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(FCfree) -I$(LOCAL_INC_DIR) $<
@@ -78,7 +78,7 @@ endif
 
 SRC_PATH = ../src
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_INC_DIR):$(MESA_DIR)/include
 

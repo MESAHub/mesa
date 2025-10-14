@@ -1,5 +1,24 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module skye
-      use const_def, only: dp
+      use const_def, only: dp, crad, kerg, mp
       use math_lib
       use auto_diff
       use eos_def
@@ -7,7 +26,6 @@ module skye
       implicit none
 
       logical, parameter :: dbg = .false.
-      !logical, parameter :: dbg = .true.
 
 
       private
@@ -19,7 +37,7 @@ module skye
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
+         use const_def, only: dp
          use eos_blend
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -84,7 +102,7 @@ module skye
          contained = is_contained(num_points, bounds, p)
          dist = min_distance_to_polygon(num_points, bounds, p)
 
-         if (contained) then ! Make distance negative for points inside the polygon
+         if (contained) then  ! Make distance negative for points inside the polygon
             dist = -dist
          end if
 
@@ -103,7 +121,6 @@ module skye
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
          use eos_blend
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logRho, logT, Z, abar, zbar
@@ -179,12 +196,12 @@ module skye
          skip = .false.
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_Skye) = 1.0
+         res(i_frac_Skye) = 1.0d0
 
       end subroutine get_Skye_for_eosdt
 
@@ -265,7 +282,6 @@ module skye
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
          use eos_def
-         use const_def, only: dp
          use utils_lib, only: is_bad
          use chem_def, only: chem_isos
          use ion_offset, only: compute_ion_offset
@@ -274,7 +290,6 @@ module skye
          use skye_thermodynamics
          use auto_diff
 
-         implicit none
          integer :: j
          integer, intent(in) :: species
          integer, pointer :: chem_id(:)
@@ -355,7 +370,7 @@ module skye
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
 
          if (use_ion_offsets) then
-            F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
+            F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id)  ! Offset so ion ground state energy is zero.
          end if
 
          ! Ideal electron-positron thermodynamics (s, e, p)

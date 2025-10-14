@@ -30,10 +30,8 @@ pgstar commands used for the plots above:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
     file_digits = 8
@@ -45,11 +43,11 @@ pgstar commands used for the plots above:
    Kipp_win_width = 12
    Kipp_win_aspect_ratio = 0.75
    Kipp_txt_scale = 0.9
-   Kipp_title = ''      
+   Kipp_title = ''
 
    ! y axis limits
    Kipp_mass_max = 16.0
-   Kipp_mass_min = 0 
+   Kipp_mass_min = 0
    Kipp_show_mass_boundaries = .true.
 
    ! x axis limits
@@ -72,7 +70,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
-

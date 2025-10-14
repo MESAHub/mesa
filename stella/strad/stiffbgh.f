@@ -60,7 +60,7 @@ C             value of each Y seen so far.
 C   ERROR   An array of N elements proportional to the estimated one step
 C             error in each component.
 C   KFLAG   A completion code with the following meanings:
-C             0 the step was succesful
+C             0 the step was successful
 C            -1 the requested error could not be achieved with
 C               abs(H)=HMIN
 C            -2 corrector convergence could not be achieved for
@@ -73,14 +73,14 @@ C             On input it has the following values and meanings:
 C              0 perform the first step. This value enables the
 C                subroutine to initialize itself.
 C             >0 take a new step continuing from the last.
-C                Assumes the last step was succesful and user has not
+C                Assumes the last step was successful and user has not
 C                changed any parameters.
 C             <0 repeat the last step with a new value of H and/or
 C                EPS and/or METH. This may be either in redoing a step
-C                that failed, or in continuing from a succesful step.
+C                that failed, or in continuing from a successful step.
 C             On exit, JSTART is set to NQ, the current order of the
 C                method. This is also the order of the maximum derivative
-C                available in the Y array. After a succesful step, JSTART
+C                available in the Y array. After a successful step, JSTART
 C                need not be reset for the next call.
 C   AJAC    A block used for partial derivatives. It keeps the
 C             matrix AJAC=1-EL(1)*H*Jacobian & is computed by DIFMAT.
@@ -370,7 +370,7 @@ C: reset Y & other variables for changed
 C                            METH, EPS, N, H *
 C------ '-->Entering Node %FC:'
 C- If the caller change EPSJ or METH , the constants E,EUP,EDN,BND
-C- must be reseted.
+C- must be reset.
       EPSJ=EPS*SQRT(Real(N))
       IF(METH.EQ.MEO)THEN
       IF(EPSJ.NE.EPSOLD)THEN
@@ -459,7 +459,7 @@ C- loop until .not.EVALJA
       CORRCO=.FALSE.
 C- Corrector convergence. It is tested
 C- by requiring changes relative to YMAX(I)
-C- to be less, in Euclidian norm, than BND,
+C- to be less, in Euclidean norm, than BND,
 C- which is dependent on EPSJ.
 09969 IF(.NOT.(.NOT.CORRCO.AND.ITER.LT.MAXITE))GOTO09968
 C: Up to MAXITE corrector iterations are taken.
@@ -540,7 +540,7 @@ C- velocity
 C- index of perturbation, now  IS perturbation
       CALLDIFMAT
       FSAVE(JTST)=OLD
-C: put in IRN(NZ+1:ILAST) all indeces I such that
+C: put in IRN(NZ+1:ILAST) all indices I such that
 C                ICN(I)==JTST *
 C------ '-->Entering Node %G_COR_DEB_ROW:'
       ILAST=0
@@ -1019,7 +1019,7 @@ C------ '-->Entering Node %GX:'
 09891 CONTINUE
       OLDJAC=.TRUE.
       IF(.NOT.(D.LE.E))GOTO09888
-C- After a succesful step, update the Y array and YMAX.
+C- After a successful step, update the Y array and YMAX.
 C- Consider changing H if IDOUB==1. Otherwise decrease
 C- IDOUB by 1.
 C- If a change in H is considered, an increase
@@ -1168,7 +1168,7 @@ C- Compute the optimum step size for this or one lower order.
 09849 CONTINUE
       IF(.NOT.(KFLAG.LE.-MAXFAI))GOTO09846
 C: Control reaches this section if MAXFAI or more
-C                failures have occured. It is assumed that the
+C                failures have occurred. It is assumed that the
 C                derivatives that have accumulated in the Y array
 C                have errors of the wrong order.
 C                Hence the first derivative is recomputed, and the order

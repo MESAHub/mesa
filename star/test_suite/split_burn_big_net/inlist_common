@@ -5,11 +5,11 @@
       change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
       dump_missing_metals_into_heaviest = .false.
-      
+
 
       change_initial_D_omega_flag = .true.
       new_D_omega_flag = .true.
-      
+
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
@@ -30,7 +30,7 @@
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
       use_Type2_opacities = .true.
-      
+
 / ! end of kap namelist
 
 &controls
@@ -97,25 +97,25 @@
       min_timestep_factor = 0.8d0
       max_timestep_factor = 1.05d0
       timestep_factor_for_retries = 0.75
-      
+
       never_skip_hard_limits = .true
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
       delta_lgTeff_limit =  0.01
-      delta_lgL_limit = 0.1     
+      delta_lgL_limit = 0.1
       delta_lgL_He_limit = 0.1
 
       delta_lgRho_cntr_limit = 0.03
       delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1 
-      
+      delta_lgRho_limit = 0.1
+
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.003  
+      delta_lgT_cntr_limit = 0.003
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.003     
+      delta_lgT_max_limit = 0.003
       delta_lgT_max_hard_limit = 0.01
 
       dX_div_X_limit(2) = -1 ! for he4
@@ -123,7 +123,7 @@
       dX_nuc_drop_limit = 2d-2
       dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
       dX_nuc_drop_min_X_limit = 1d-3
-      dX_nuc_drop_max_A_limit = 52   
+      dX_nuc_drop_max_A_limit = 52
       dX_nuc_drop_hard_limit = 1d99
 
       delta_lg_XH_cntr_limit = -1
@@ -152,9 +152,9 @@
 
 ! mesh
       mesh_delta_coeff = 1.5
-      mesh_delta_coeff_for_highT = 1.5      
-      logT_max_for_standard_mesh_delta_coeff = 9.0 
-      logT_min_for_highT_mesh_delta_coeff = 9.5 
+      mesh_delta_coeff_for_highT = 1.5
+      logT_max_for_standard_mesh_delta_coeff = 9.0
+      logT_min_for_highT_mesh_delta_coeff = 9.5
       min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
 
 ! solver
@@ -162,7 +162,7 @@
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 5d-4
 
-      convergence_ignore_equL_residuals = .true. 
+      convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
@@ -196,10 +196,9 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
 !pgstar_interval = 1
 

@@ -4,13 +4,13 @@
 conserve_angular_momentum
 *************************
 
-This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 Msun, Z=0.02 metallicity, model.
+This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 |Msun|, Z=0.02 metallicity, model.
 
 This test case has 2 parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_zams``) builds a 1.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves until the zero age main-sequence.
+* Part 1 (``inlist_zams``) builds a 1.0 |Msun|, Z=0.02 metallicity, pre-main sequence model and evolves until the zero age main-sequence.
 
-* Part 2 (``inlist_conserve_J``) imposes a uniform 10 km/s rotation profile, and continues the evolution until the helium core reaches a mass of 0.22 Msun. Throughout this evolution a relative change in the angular momentum (J_init - J)/J_init of order 3e-13 is reported in the terminal:
+* Part 2 (``inlist_conserve_J``) imposes a uniform 10 km/s rotation profile, and continues the evolution until the helium core reaches a mass of 0.22 |Msun|. Throughout this evolution a relative change in the angular momentum (J_init - J)/J_init of order 3e-13 is reported in the terminal:
 
 .. image:: ../../../star/test_suite/conserve_angular_momentum/docs/grid_000455.svg
    :width: 100%
@@ -24,10 +24,8 @@ pgstar commands used for the first 7 plots:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -35,7 +33,7 @@ pgstar commands used for the first 7 plots:
  Abundance_win_flag = .false.
  Abundance_win_width = 15
  Abundance_win_aspect_ratio = 0.75
-         
+
  Abundance_title = ''
  Abundance_num_isos_to_show = 6
 
@@ -51,12 +49,12 @@ pgstar commands used for the first 7 plots:
  Abundance_legend_max_cnt = 0
  Abundance_legend_txt_scale_factor = 0.6
 
- Abundance_xaxis_name = 'mass' 
+ Abundance_xaxis_name = 'mass'
  Abundance_xaxis_reversed = .false.
- Abundance_xmin = 0.0 
+ Abundance_xmin = 0.0
  Abundance_xmax = 1.0
 
- Abundance_log_mass_frac_min = -3.0 
+ Abundance_log_mass_frac_min = -3.0
  Abundance_log_mass_frac_max =  0.3
 
  Abundance_file_flag = .false.
@@ -74,18 +72,18 @@ pgstar commands used for the first 7 plots:
  Profile_Panels2_win_width = 15
  Profile_Panels2_win_aspect_ratio = 1.0
  Profile_Panels2_txt_scale = 1.0
- Profile_Panels2_title = ''      
+ Profile_Panels2_title = ''
 
  Profile_Panels2_xaxis_name = 'mass'
- Profile_Panels2_xmin = 0.0 
+ Profile_Panels2_xmin = 0.0
  Profile_Panels2_xmax = 1.0
  Profile_Panels2_xaxis_reversed = .false.
 
- Profile_Panels2_yaxis_name(1) = 'omega'   
+ Profile_Panels2_yaxis_name(1) = 'omega'
  Profile_Panels2_ymin(1) = 0.0
  Profile_Panels2_ymax(1) = 8.0e-4 ! only used if /= -101d0
 
- Profile_Panels2_other_yaxis_name(1) = 'log_j_rot'   
+ Profile_Panels2_other_yaxis_name(1) = 'log_j_rot'
  Profile_Panels2_other_ymin(1) = 10.0 ! only used if /= -101d0
  Profile_Panels2_other_ymax(1) = 17.0 ! only used if /= -101d0
 
@@ -208,11 +206,7 @@ pgstar commands used for the first 7 plots:
  Grid1_file_width = -1       ! (inches) negative means use same value as for window
  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
-
-
-
  / ! end of pgstar namelist
 
 
 Last-Updated: 04Jun2021 (MESA 5be9e57) by fxt
-

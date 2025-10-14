@@ -10,7 +10,7 @@ and is based on code provided originally by Warrick Ball.
 
 The program ``test_memory`` builds a pre-main sequence model, and then deletes it,
 twice in succession - see ``src/test_memory.f90``.
-For speed reasons, the ./rn script does NOT use valgrind. 
+For speed reasons, the ./rn script does NOT use valgrind.
 Rather, valgrind must be launched by hand:
 
 .. code-block:: console
@@ -23,7 +23,7 @@ To hide a number of false positives, due to internal gfortran issues, one can al
 
  valgrind --leak-check=full --error-limit=no --suppressions=mesa.supp ./test_memory
 
-Other usefull valgrind options:
+Other useful valgrind options:
 
 .. code-block:: console
 

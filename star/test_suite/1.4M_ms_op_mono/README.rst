@@ -4,13 +4,13 @@
 1.4M_ms_op_mono
 ***************
 
-The test checks the functionality of OP mono opacities. The test vehicle is a 
+The test checks the functionality of OP mono opacities. The test vehicle is a
 1.4 |Msun| solar metallicity model.
 
 
 This test case has three parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_1.4M_ms_initial_model``) creates the pre-main-sequence model and evolves the model until the central hydrogen mass fractions falls below 0.5. During this evolution the OP mono opacities are off.
+* Part 1 (``inlist_1.4M_ms_initial_model``) creates the pre-main-sequence model and evolves the model until the central hydrogen mass fraction falls below 0.5. During this evolution the OP mono opacities are off.
 
 .. image:: ../../../star/test_suite/1.4M_ms_op_mono/docs/initial_model.svg
    :width: 100%
@@ -41,11 +41,8 @@ pgstar commands used for the plots above:
 
    pgstar_interval = 10
 
-  ! device
-
-   file_white_on_black_flag = .true. 
+   file_white_on_black_flag = .true.
    file_device = 'vcps'
-   file_extension = 'ps'           
 
   ! two profile panels
     Profile_Panels1_win_flag = .true.
@@ -84,4 +81,3 @@ pgstar commands used for the plots above:
 
 
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
-

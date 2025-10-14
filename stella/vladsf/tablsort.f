@@ -7,8 +7,8 @@ C --------------------------------------------------------------------------
       INTEGER N, IORDER
 C This subroutine is a essentially unmodified version of a routine published
 C in 'Numerical Recipes' by Press et. al., which they called INDEXX.F.
-C TABLSORT sorts the indecies of ARRIN into ascending order (for IORDER > 0)
-C or decending order (for IORDER < 0). When IORDER > 0 (IORDER < 0), INDX(1)
+C TABLSORT sorts the indices of ARRIN into ascending order (for IORDER > 0)
+C or descending order (for IORDER < 0). When IORDER > 0 (IORDER < 0), INDX(1)
 C contains on output the index of the smallest (largest) element in ARRIN,
 C INDX(2) contains the index of the second smallest (largest) element in
 C ARRIN, etc. N is the length of ARRIN and INDX. The contents of ARRIN are
@@ -171,8 +171,8 @@ C --------------------------------------------------------------------------
       INTEGER N, IORDER
 C This subroutine is a essentially unmodified version of a routine published
 C in 'Numerical Recipes' by Press et. al., which they called INDEXX.F.
-C TABLSORT sorts the indecies of ARRIN into ascending order (for IORDER > 0)
-C or decending order (for IORDER < 0). When IORDER > 0 (IORDER < 0), INDX(1)
+C TABLSORT sorts the indices of ARRIN into ascending order (for IORDER > 0)
+C or descending order (for IORDER < 0). When IORDER > 0 (IORDER < 0), INDX(1)
 C contains on output the index of the smallest (largest) element in ARRIN,
 C INDX(2) contains the index of the second smallest (largest) element in
 C ARRIN, etc. N is the length of ARRIN and INDX. The contents of ARRIN are
@@ -335,8 +335,8 @@ C --------------------------------------------------------------------------
       INTEGER N, IORDER
 C This subroutine is a slightly modified version of a routine published
 C in 'Numerical Recipes' by Press et. al., which they called INDEXX.F.
-C ITABLSRT (similar to TABLSORT) sorts the indecies of ARRIN into 
-C ascending order (for IORDER > 0) or decending order (for IORDER < 0).
+C ITABLSRT (similar to TABLSORT) sorts the indices of ARRIN into 
+C ascending order (for IORDER > 0) or descending order (for IORDER < 0).
 C When IORDER > 0 (IORDER < 0), INDX(1) contains on output the index of 
 C the smallest (largest) element in ARRIN, INDX(2) contains the index 
 C of the second smallest (largest) element in ARRIN, etc. N is the 

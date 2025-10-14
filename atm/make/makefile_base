@@ -13,24 +13,24 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   atm_def.f90 \
-   atm_lib.f90 \
-   atm_t_tau_uniform.f90 \
-   atm_t_tau_varying.f90 \
-   atm_t_tau_relations.f90 \
-   atm_irradiated.f90 \
-   atm_table.f90 \
-   atm_utils.f90 \
-   table_atm.f90
+	atm_def.f90 \
+	atm_lib.f90 \
+	atm_t_tau_uniform.f90 \
+	atm_t_tau_varying.f90 \
+	atm_t_tau_relations.f90 \
+	atm_irradiated.f90 \
+	atm_table.f90 \
+	atm_utils.f90 \
+	table_atm.f90
 
 #################################################################
 #
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = eos kap chem $(LIBS_MESA_NUMERICS)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lkap -lchem $(LOAD_MESA_NUMERICS)
+	LIBS_OTHER = eos kap chem $(LIBS_MESA_NUMERICS)
+	DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+	LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lkap -lchem $(LOAD_MESA_NUMERICS)
 endif
 
 #################################################################
@@ -45,7 +45,7 @@ $(LIB) : $(OBJS) $(DEPS_OTHER)
 ifneq ($(QUIET),)
 	@echo LIB_TOOL $(LIB)
 	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
-else	   
+else	
 	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
 endif	
 
@@ -103,7 +103,7 @@ endif
 #
 # DEPENDENCIES
 
-SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR) 
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
 
 vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)

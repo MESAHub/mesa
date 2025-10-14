@@ -26,14 +26,14 @@
    pgbinary_interval = 1
 
 
-      ! pause
-      ! ~~~~~
+      ! pause_flag
+      ! ~~~~~~~~~~
 
       ! if true, then after refresh windows, wait for user to hit RETURN
 
       ! ::
 
-   pause = .false.
+   pause_flag = .false.
 
 
       ! pause_interval
@@ -87,15 +87,14 @@
 
       ! file_device
       ! ~~~~~~~~~~~
-      ! file_extension
-      ! ~~~~~~~~~~~~~~
 
-      ! 'png' is Portable Network Graphics format; can also use 'pdf'
+      ! 'png' for Portable Network Graphics format,
+      ! 'vcps' for Color PostScript ('ps'),
+      ! 'ps' for PostScript.
 
       ! ::
 
    file_device = 'png'
-   file_extension = 'png'
 
 
       ! file_digits

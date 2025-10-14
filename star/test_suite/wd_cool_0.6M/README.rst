@@ -14,13 +14,11 @@ This test case has 1 part. Click to see a larger version of a plot.
    :width: 100%
 
 
-|br| 
 The evolution then commences with element diffusion activated, and the run terminates when the central temperature drops below 1e6 K:
 
 .. image:: ../../../star/test_suite/wd_cool_0.6M/docs/Grid2000578.svg
 
 
-|br|
 pgstar commands used for the plots above:
 
 .. code-block:: console
@@ -29,10 +27,7 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
          Grid2_win_flag = .true.
          Grid2_win_width = 16
@@ -77,11 +72,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 05Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

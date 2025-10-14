@@ -1,13 +1,13 @@
 
-      
+
       subroutine read_inlist_xtrans_mesh_factor(ierr)
          integer, intent(out) :: ierr
          character (len=256) :: filename, message
-         integer :: unit         
+         integer :: unit
          filename = 'inlist_xtrans_mesh_factor'
-         
+
          write(*,*) 'read_inlist_xtrans_mesh_factor'
-         
+
          ! set defaults
          xtra_coef_above_xtrans = 1d0
          xtra_coef_below_xtrans = 1d0
@@ -18,22 +18,22 @@
          if (ierr /= 0) then
             write(*, *) 'Failed to open control namelist file ', trim(filename)
          else
-            read(unit, nml=xtrans_mesh_factor, iostat=ierr)  
+            read(unit, nml=xtrans_mesh_factor, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=xtrans_mesh_factor)
                close(unit)
-            end if  
+            end if
          end if
 
       end subroutine read_inlist_xtrans_mesh_factor
 
-      
+
       subroutine other_mesh_delta_coeff_factor(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -42,7 +42,7 @@
          real(dp) :: xtra_coef, xtra_dist, Hp, r_extra
          logical, parameter :: dbg = .false.
          include 'formats'
-         
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -52,7 +52,7 @@
          !write(*,*) 'set other_mesh_delta_coeff_factor'
 
          if (xtra_coef_above_xtrans >= 1d0 .and. xtra_coef_below_xtrans >= 1d0) return
-         
+
          if (dbg) write (*,*) 'do_xtrans_coef'
 
          nz = s% nz
@@ -102,5 +102,5 @@
                k = k-1
             end do
          end if
-         
+
       end subroutine other_mesh_delta_coeff_factor

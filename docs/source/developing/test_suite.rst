@@ -2,7 +2,7 @@
 The Test Suite
 **************
 
-The MESA test suites live in ``star/test_suite``, 
+The MESA test suites live in ``star/test_suite``,
 ``binary/test_suite``, and ``astero/test_suite``.
 
 Running Tests
@@ -62,7 +62,7 @@ Anatomy of a test
    cases.
 
 
-In the test case directory 
+In the test case directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All MESA test suite cases must be designed to be multi-part---that is
@@ -208,11 +208,11 @@ An entry linking to the test case page should be included in
 ``docs/source/test_suite.rst``.  This page will eventually list all
 cases.  Briefly describing the test cases all in one place will make
 it easier for people to find a test of interest.
-    
+
 The description should be one sentence broadly describing what the
 case does and then one optional sentence about anything interesting
 illustrated by the case (e.g., other_hooks).
-   
+
 MESA Test Hub
 -------------
 
@@ -224,7 +224,7 @@ When a test is run through ``each_test_run``, a file ``testhub.yml``
 will be produced.  This is the information that will be reported to
 the TestHub by ``mesa_test``.  The file will look similar to this:
 
-.. code-block:: none
+.. code-block:: yaml
 
     ---
     test_case: make_co_wd
@@ -346,7 +346,7 @@ For example, in ``c13_pocket``, the ``run_star_extras`` sets::
 
 which results in the additional output
 
-.. code-block:: none
+.. code-block:: yaml
 
     - inlist: inlist_c13_pocket_header
       ...
@@ -364,26 +364,26 @@ which results in the additional output
 
 Setting up new machine with MESA TestHub
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1. Make an account on `the TestHub <https://testhub.mesastar.org/>`_ by messaging one of the admins (Bill Wolf). You will receive a token that you will need later in order to submit logs to the logs server. Remember also the email and password you use; you'll need these later in the terminal. 
+1. Make an account on `the TestHub <https://testhub.mesastar.org/>`_ by messaging one of the admins (Bill Wolf). You will receive a token that you will need later in order to submit logs to the logs server. Remember also the email and password you use; you'll need these later in the terminal.
 
 2. Make sure ruby is installed, for example using the `Ruby version manager <https://rvm.io/>`_ (rvm).
 
   * If using the rvm, follow the instructions on that page to install the gpg keys. If this does not work, then execute the next line (``\curl -sSL https://get.rvm.io | bash -s stable``) instead, and follow the instructions printed in the terminal.
-  
-  * That line only installs the rvm; you also need Ruby itself. One can execute ``\curl -sSL https://get.rvm.io | bash -s stable --ruby`` as per the rvm installation page, but that requires sudo access. For a local installation, one can follow `this StackOverflow answer <https://stackoverflow.com/a/17219765>`_. 
+
+  * That line only installs the rvm; you also need Ruby itself. One can execute ``\curl -sSL https://get.rvm.io | bash -s stable --ruby`` as per the rvm installation page, but that requires sudo access. For a local installation, one can follow `this StackOverflow answer <https://stackoverflow.com/a/17219765>`_.
 
 3. Download and set up `mesa_test <https://github.com/MESAHub/mesa_test>`_, by doing the following:
 
   * ``gem install mesa_test``
-  
+
   * ``mesa_test setup`` (here you will supply your email, password, and token from earlier; this will create a settings file in ``~/.mesa_test/config.yml``)
-  
-  * ``mesa_test install_and_test main`` will check out the main branch, test it, and submit the results to the testhub. 
+
+  * ``mesa_test install_and_test main`` will check out the main branch, test it, and submit the results to the testhub.
 
 4. If you want to set up ``mesa_test`` to run automatically on a cluster, Rob Farmer has created `a set of scripts <https://github.com/rjfarmer/mesa-helios-test>`_ that work with the Slurm workload manager. These scripts pull all commits and submit a job to the cluster queue for each new commit. You must edit the paths in all of the scripts to point to your own directories.
 
-  * You can set up ``mesa_test`` or Rob's cluster script to run recurrently as a cronjob by doing ``crontab -e`` to edit the cronjob table. 
-  
+  * You can set up ``mesa_test`` or Rob's cluster script to run recurrently as a cronjob by doing ``crontab -e`` to edit the cronjob table.
+
   * Add for example: ``10 * * * * ~/mesa/mesa-helios-test/runMesaTest.sh >/dev/null 2>&1`` to make it run every 10 minutes (or swap out ``runMesaTest`` with a ``mesa_test`` command). The parts at the end of that line prevent it from emailing you each time it runs.
 
 
@@ -396,11 +396,11 @@ To make more efficient the usage of these machines they will respond to certain 
 commit message.
 
 .. note ::
-    It is up to each person providing the computing resources to implement each keyword. Thus some 
+    It is up to each person providing the computing resources to implement each keyword. Thus some
     machines will ignore these keywords and run the test suite normally. Therefore, these are only
     "requests" for the computing machines not "orders".
 
-The message (with brackets) may appear anywhere in the commit message. 
+The message (with brackets) may appear anywhere in the commit message.
 
 
 [ci skip]
@@ -433,4 +433,4 @@ Compiles and runs ``MESA`` with the environment variable ``MESA_FPE_CHECKS_ON=1`
 [ci converge]
 ^^^^^^^^^^^^^
 
-Runs the test suite with the environment variable ``MESA_TEST_SUITE_RESOLUTION_FACTOR`` set to a factor, giving a different temporal and spatial resolution (and max model number). 
+Runs the test suite with the environment variable ``MESA_TEST_SUITE_RESOLUTION_FACTOR`` set to a factor, giving a different temporal and spatial resolution (and max model number).

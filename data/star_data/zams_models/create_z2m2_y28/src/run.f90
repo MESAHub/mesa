@@ -1,8 +1,9 @@
-      program run
-      use run_star_extras, only: do_run
+program run
 
-      implicit none
+   use run_star_extras, only: do_run
 
-      call do_run ! create zams
+   implicit none
 
-      end program run
+   call do_run  ! create zams
+
+end program run

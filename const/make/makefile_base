@@ -13,8 +13,8 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   const_def.f90 \
-   const_lib.f90
+	const_def.f90 \
+	const_lib.f90
 
 #################################################################
 #
@@ -28,7 +28,7 @@ $(LIB) : $(OBJS)
 ifneq ($(QUIET),)
 	@echo LIB_TOOL $(LIB)
 	@$(LIB_TOOL) $(LIB) $(OBJS)
-else	   
+else	
 	$(LIB_TOOL) $(LIB) $(OBJS)
 endif
 

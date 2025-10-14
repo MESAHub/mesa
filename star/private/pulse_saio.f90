@@ -2,47 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pulse_saio
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, lsun, rsun, clight, crad
   use utils_lib
   use atm_def
   use atm_support
-
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: get_saio_data
   public :: write_saio_data
 
@@ -108,7 +94,7 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     nn = nn_env + nn_atm
 
@@ -156,7 +142,7 @@ contains
           call store_saio_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -169,8 +155,6 @@ contains
     if (ASSOCIATED(s%atm_structure)) then
        deallocate(s%atm_structure)
     end if
-
-    ! Finish
 
     return
 
@@ -236,13 +220,10 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_saio_data_atm
 
-    !****
 
     subroutine store_saio_data_env (j, k, k_a, k_b)
 
@@ -293,7 +274,7 @@ contains
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
         kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)/kap
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)/kap
-        nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
+        nabla = s%gradT(k)  ! Not quite right; gradT can be discontinuous
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         X = eval_face(s%dq, s%X, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
         Y = eval_face(s%dq, s%Y, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
@@ -307,15 +288,12 @@ contains
 
       end associate
 
-      ! Finish
-
       return
 
     end subroutine store_saio_data_env
 
   end subroutine get_saio_data
 
-  !****
 
   subroutine write_saio_data (id, filename, global_data, point_data, ierr)
 
@@ -361,8 +339,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

@@ -2,27 +2,24 @@
 !
 !   Copyright (C) 2020  The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module create_FSCRliq8_table
 
-      use const_def
+      use const_def, only: dp
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
@@ -64,7 +61,7 @@
       open(unit=io_unit,file=trim(fname))
 
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
-      		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME', 'Zion'
+            'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME', 'Zion'
 
       write(io_unit,'(2(i10,4x,3(f14.4)),i14)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
@@ -106,7 +103,7 @@
 
 
       subroutine FSCRliq8(RS,GAME,Zion, &
-           FSCR,USCR,PSCR,CVSCR,PDTSCR,PDRSCR,ierr) ! fit to the el.-ion scr.
+           FSCR,USCR,PSCR,CVSCR,PDTSCR,PDRSCR,ierr)  ! fit to the el.-ion scr.
 !                                                       Version 11.09.08
 !                                                       cleaned 16.06.09
 ! Stems from FSCRliq7 v. 09.06.07. Included a check for RS=0.
@@ -140,12 +137,12 @@
       real(dp), parameter :: TINY=1.d-19
 
       ierr = 0
-      if (RS.lt.0d0) then
+      if (RS<0d0) then
          ierr = -1
          return
          !call mesa_error(__FILE__,__LINE__,'FSCRliq8: RS < 0')
       end if
-      if (RS.lt.TINY) then
+      if (RS<TINY) then
          FSCR=0.d0
          USCR=0.d0
          PSCR=0.d0
@@ -153,17 +150,17 @@
          PDTSCR=0.d0
          PDRSCR=0.d0
          return
-      endif
+      end if
       SQG=sqrt(GAME)
       SQR=sqrt(RS)
       SQZ1=sqrt(1d0+Zion)
       SQZ=sqrt(Zion)
-      CDH0=Zion/1.73205d0 ! 1.73205=sqrt(3.)
+      CDH0=Zion/1.73205d0  ! 1.73205=sqrt(3.)
       CDH=CDH0*(SQZ1*SQZ1*SQZ1-SQZ*SQZ*SQZ-1d0)
       SQG=sqrt(GAME)
       ZLN=log(Zion)
-      Z13=exp(ZLN/3.d0) ! Zion**(1./3.)
-      X=XRS/RS ! relativity parameter
+      Z13=exp(ZLN/3.d0)  ! Zion**(1./3.)
+      X=XRS/RS  ! relativity parameter
       CTF=Zion*Zion*.2513d0*(Z13-1d0+.2d0/sqrt(Z13))
 ! Thomas-Fermi constant; .2513=(18/175)(12/\pi)^{2/3}
       P01=1.11d0*exp(0.475d0*ZLN)
@@ -243,7 +240,7 @@
       FDX=FX*GAME
       FG=(UP*DNDG/DN-UPDG)/DN
       FDG=FG*GAME-UP/DN
-      FDGDH=SQG*DNDG/(DN*DN) ! d FDG / d CDH
+      FDGDH=SQG*DNDG/(DN*DN)  ! d FDG / d CDH
       FDXX=((UP*DNDXX+2d0*(UPDX*DNDX-UP*DNDX*DNDX/DN))/DN-UPDXX)/DN*GAME
       FDGG=2d0*FG+GAME*((2d0*DNDG*(UPDG-UP*DNDG/DN)+UP*DNDGG)/DN-UPDGG)/DN
       FDXG=FX+GAME*FXDG

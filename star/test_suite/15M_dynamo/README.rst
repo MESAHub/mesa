@@ -4,14 +4,14 @@
 15M_dynamo
 **********
 
-The test checks the functionality of rotation in a 15 Msun, Z=0.02 metallicity model.
+The test checks the functionality of rotation in a 15 |Msun|, Z=0.02 metallicity model.
 
 
 This test case has three parts.
 
-* Part 1 (``inlist_zams``) creates a 15 Msun pre-main-sequence model and evolves it to the main sequence. 
+* Part 1 (``inlist_zams``) creates a 15 |Msun| pre-main-sequence model and evolves it to the main sequence.
 
-* Part 2 (``inlist_to_he_burn``) turns on rotation nnd continues the evolution for 500 steps (for test case purposes), ending approximately at core hydrogen depletion.
+* Part 2 (``inlist_to_he_burn``) turns on rotation and continues the evolution for 500 steps (for test case purposes), ending approximately at core hydrogen depletion.
 
 * Part 3 (``inlist_15M_dynamo``) continues the evolution until the central helium mass fractions drops below 0.6. When Part 3 finishes some key quantities are reported:
 
@@ -44,9 +44,8 @@ At this ending point the abundances, power, and dynamo profiles as a function of
 Click to see a larger view of a plot.
 Helium has begun to deplete in the core (top panel), where the triple-alpha reaction is dominating the energy generation rate (second panel).
 Hydrogen burning by the CNO cycles dominates the energy generation in the hydrogen shell (second panel).
-Convection is occuring in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
-Spruit-Taylor magnetic diffusion is the dominant mixing processes in the radiative region between these
-two convective regions (third panel).
+Convection is occurring in two regions: in the core and in the hydrogen-rich envelope (blue curves in the third panel).
+Spruit-Taylor magnetic diffusion is the dominant mixing processes in the radiative region between these two convective regions (third panel).
 The radial and azimuthal components of the magnetic field
 are only being generated in the radiative region between convection zone (bottom panel).
 
@@ -61,31 +60,27 @@ pgstar commands used for the plots above:
  &pgstar
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-   !file_device = 'png'            ! png
-   !file_extension = 'png'
 
-   file_device = 'vcps'          ! postscript
-   file_extension = 'ps'
+   !file_device = 'png'   ! png
+   file_device = 'vcps'   ! postscript
 
-    pgstar_interval = 10
-    file_digits = 8
+   pgstar_interval = 10
+   file_digits = 8
 
-    Dynamo_legend_txt_scale_factor = 0.7
-    Mixing_legend_txt_scale_factor = 0.55
-    Profile_Panels4_txt_scale = 0.8
+   Dynamo_legend_txt_scale_factor = 0.7
+   Mixing_legend_txt_scale_factor = 0.55
+   Profile_Panels4_txt_scale = 0.8
 
-    Profile_Panels4_win_flag = .true.
-    Profile_Panels4_win_width = 10
+   Profile_Panels4_win_flag = .true.
+   Profile_Panels4_win_width = 10
 
-    Profile_Panels4_file_flag = .true.
-    Profile_Panels4_file_dir = 'png'
-    Profile_Panels4_file_prefix = 'profile_Panels4_'
-    Profile_Panels4_file_interval = 10
-    Profile_Panels4_file_width = 10
+   Profile_Panels4_file_flag = .true.
+   Profile_Panels4_file_dir = 'png'
+   Profile_Panels4_file_prefix = 'profile_Panels4_'
+   Profile_Panels4_file_interval = 10
+   Profile_Panels4_file_width = 10
 
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
-

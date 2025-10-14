@@ -1,7 +1,7 @@
 
 &star_job
       show_log_description_at_start = .false.
-      
+
       load_saved_model = .true.
       load_model_filename = 'zams.mod'
 
@@ -59,12 +59,12 @@
       ! atmosphere
          atm_option = 'T_tau'
          atm_T_tau_relation = 'Eddington'
-         atm_T_tau_opacity = 'varying' 
-      
-      ! when to stop  
+         atm_T_tau_opacity = 'varying'
+
+      ! when to stop
       xa_central_lower_limit_species(1) = 'h1'
       xa_central_lower_limit(1) = 1d-6
-      
+
       photo_interval = 50
       profile_interval = 100
       history_interval = 50

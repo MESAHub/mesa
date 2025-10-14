@@ -10,28 +10,28 @@ This test case has 1 part. Click to see a larger version of a plot.
 
 * Part 1 (``inlist_project``) loads a pre-built 5 Msun zero-age main sequence model as the donor and a 10 Msun point mass as the companion. The binary system has an initial period of 1 day, and is evolved until the central hydrogen mass fraction of the donor drops below 1e-2. Compare the evolutions bewlow with those in :ref:`star_plus_point_mass`.
 
-|br|
+
 Binary period versus model number:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass_explicit_mdot/docs/track1_000565.svg
    :width: 100%
 
 
-|br|
-Binary seperation versus model number:
+
+Binary separation versus model number:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass_explicit_mdot/docs/track2_000565.svg
    :width: 100%
 
 
-|br|
+
 Kippenhang diagram of the mass losing donar:
 
 .. image:: ../../../binary/test_suite/star_plus_point_mass_explicit_mdot/docs/kipp_000565.svg
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plots above:
 
 .. code-block:: console
@@ -40,10 +40,7 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 1
 
@@ -84,7 +81,7 @@ pgstar commands used for the plots above:
   History_Track2_xname = 'model_number'
   History_Track2_yname = 'binary_separation'
   History_Track2_xaxis_label = 'Model Number'
-  History_Track2_yaxis_label = 'Binary Seperation (R\d\(2281)\u)'
+  History_Track2_yaxis_label = 'Binary Separation (R\d\(2281)\u)'
   History_Track2_reverse_xaxis = .false.
   History_Track2_reverse_yaxis = .false.
 
@@ -99,7 +96,7 @@ pgstar commands used for the plots above:
   History_Track2_file_interval = 100
   History_Track2_file_width = -1
   History_Track2_file_aspect_ratio = -1
-         
+
 
   Kipp_win_flag = .true.
   Kipp_win_width = 12
@@ -130,8 +127,3 @@ pgstar commands used for the plots above:
 
 Last-Updated: 10Jul2021 (MESA 094ff71) by fxt.
 
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

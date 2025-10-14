@@ -1,9 +1,11 @@
 ! ==========
 ! binary_job
 ! ==========
+
 ! ::
 
-    pgbinary_flag = .false.
+   pgbinary_flag = .false.
+
 
 ! output/input files
 ! ==================
@@ -16,7 +18,7 @@
 
 ! ::
 
-    show_binary_log_description_at_start = .true.
+   show_binary_log_description_at_start = .true.
 
 
 ! binary_history_columns_file
@@ -26,20 +28,20 @@
 
 ! ::
 
-    binary_history_columns_file = ''
+   binary_history_columns_file = ''
 
 
 ! warn_binary_extra
 ! ~~~~~~~~~~~~~~~~~
 
-! Due to changing the run_star_extras functions to hooks,we break existing
+! Due to changing the run_star_extras functions to hooks, we break existing
 ! run_binary_extras files. This flag sets a warning message and stops the MESA
 ! run until it is set to .false.. This way people will hopefully not be confused
 ! as to why their run_binary_extras functions are not being called.
 
 ! ::
 
-    warn_binary_extra = .true.
+   warn_binary_extra = .true.
 
 
 ! inlist_names(:)
@@ -50,8 +52,8 @@
 
 ! ::
 
-    inlist_names(1) = 'inlist1'
-    inlist_names(2) = 'inlist2'
+   inlist_names(1) = 'inlist1'
+   inlist_names(2) = 'inlist2'
 
 
 ! read_extra_binary_job_inlist(1..5)
@@ -68,8 +70,8 @@
 
 ! ::
 
-    read_extra_binary_job_inlist(:) = .false.
-    extra_binary_job_inlist_name(:) = 'undefined'
+   read_extra_binary_job_inlist(:) = .false.
+   extra_binary_job_inlist_name(:) = 'undefined'
 
 ! starting model
 ! ==============
@@ -81,12 +83,12 @@
 ! Set this to .true. to model the evolution of both stars. If
 ! .false. then only inlist_names(1) will be used, and the other
 ! star will be modeled as a point mass. This option is ignored for
-! loaded models, to setup a component as a point mass in that case
-! use 'change_point_mass_i'
+! loaded models, to set up a component as a point mass in that case
+! use ``change_point_mass_i``
 
 ! ::
 
-    evolve_both_stars = .false.
+   evolve_both_stars = .false.
 
 
 ! relax_primary_to_th_eq
@@ -117,11 +119,11 @@
 
 !      log(s% L_nuc_burn_total*Lsun/s% L(1)) < log_Lnuc_div_L_for_relax_primary_to_th_eq,
 
-! and the relaxation process  is followed for at least min_age_for_relax_primary_to_th_eq
+! and the relaxation process is followed for at least min_age_for_relax_primary_to_th_eq
 ! years, even if the condition is met at the first step. If the process takes more than
 ! max_steps_for_relax_primary_to_th_eq steps, then the simulation is terminated.
 
-! If want output to be written to history during the relaxation process, then
+! If you want output to be written to history during the relaxation process, then
 ! no_history_during_relax_primary_to_th_eq = .false.. After relaxation, if
 ! reset_age_relax_primary_to_th_eq = .true., then both model numbers and ages of the
 ! components and the binary will be reset to their values before relaxation.
@@ -131,13 +133,13 @@
 
 ! ::
 
-    relax_primary_to_th_eq = .false.
-    log_Lnuc_div_L_for_relax_primary_to_th_eq = 0.005d0
-    min_age_for_relax_primary_to_th_eq = 1d2
-    max_steps_for_relax_primary_to_th_eq = 1000
-    no_history_during_relax_primary_to_th_eq = .true.
-    reset_age_for_relax_primary_to_th_eq = .true.
-    tsync_for_relax_primary_to_th_eq = 1
+   relax_primary_to_th_eq = .false.
+   log_Lnuc_div_L_for_relax_primary_to_th_eq = 0.005d0
+   min_age_for_relax_primary_to_th_eq = 1d2
+   max_steps_for_relax_primary_to_th_eq = 1000
+   no_history_during_relax_primary_to_th_eq = .true.
+   reset_age_for_relax_primary_to_th_eq = .true.
+   tsync_for_relax_primary_to_th_eq = 1
 
 ! modifications to model
 ! ======================
@@ -155,9 +157,9 @@
 
 ! ::
 
-    change_ignore_rlof_flag = .false.
-    change_initial_ignore_rlof_flag = .false.
-    new_ignore_rlof_flag = .false.
+   change_ignore_rlof_flag = .false.
+   change_initial_ignore_rlof_flag = .false.
+   new_ignore_rlof_flag = .false.
 
 
 ! change_model_twins_flag
@@ -174,9 +176,9 @@
 
 ! ::
 
-    change_model_twins_flag = .false.
-    change_initial_model_twins_flag = .false.
-    new_model_twins_flag = .false.
+   change_model_twins_flag = .false.
+   change_initial_model_twins_flag = .false.
+   new_model_twins_flag = .false.
 
 
 ! change_point_mass_i
@@ -188,13 +190,13 @@
 
 ! point_mass_i stores the index of the star that is treated as a point mass
 ! equal to zero if both stars are modeled
-! by default point_mass_i is set by evolve_both_stars (0 if evolve_both_stars istrue, 2 if false)
+! by default point_mass_i is set by evolve_both_stars (0 if evolve_both_stars is true, 2 if false)
 
 ! ::
 
-    change_point_mass_i = .false.
-    change_initial_point_mass_i = .false.
-    new_point_mass_i = 0
+   change_point_mass_i = .false.
+   change_initial_point_mass_i = .false.
+   new_point_mass_i = 0
 
 
 ! change_m1
@@ -212,9 +214,9 @@
 
 ! ::
 
-    change_m1 = .false.
-    change_initial_m1 = .false.
-    new_m1 = 0d0
+   change_m1 = .false.
+   change_initial_m1 = .false.
+   new_m1 = 0d0
 
 
 ! change_m2
@@ -232,9 +234,9 @@
 
 ! ::
 
-    change_m2 = .false.
-    change_initial_m2 = .false.
-    new_m2 = 0d0
+   change_m2 = .false.
+   change_initial_m2 = .false.
+   new_m2 = 0d0
 
 
 ! change_separation_eccentricity
@@ -257,13 +259,13 @@
 
 ! ::
 
-    change_separation_eccentricity = .false.
-    change_initial_separation_eccentricity = .false.
-    change_period_eccentricity = .false.
-    change_initial_period_eccentricity = .false.
+   change_separation_eccentricity = .false.
+   change_initial_separation_eccentricity = .false.
+   change_period_eccentricity = .false.
+   change_initial_period_eccentricity = .false.
 
 ! ::
 
-    new_separation = 0d0
-    new_period = 0d0
-    new_eccentricity = 0d0
+   new_separation = 0d0
+   new_period = 0d0
+   new_eccentricity = 0d0

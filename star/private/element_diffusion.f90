@@ -2,32 +2,25 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module element_diffusion
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, i8, pi4, amu, qe, secyer, no_mixing, phase_separation_mixing
 
       implicit none
 
@@ -36,9 +29,7 @@
 
       logical, parameter :: dbg = .false.
 
-
       contains
-
 
       subroutine do_element_diffusion(s, dt_in, ierr)
          ! return ierr /= 0 if cannot satisfy accuracy requirements
@@ -53,7 +44,7 @@
 
          integer :: i, j, k, kk, nc, m, nzlo, nzhi, nz, species, iounit, &
             steps_used, total_num_iters, total_num_retries, cid
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: s1, s2, dqsum, dt, total, &
             gradT_mid, gradRho_mid, alfa, gradRho_face, chiRho_face, chiT_face
          real(dp) :: Amass, Zcharge, min_D_mix
@@ -90,7 +81,7 @@
          end do
 
          if ((.not. s% do_element_diffusion) .or. dt < s% diffusion_dt_limit) then
-            s% num_diffusion_solver_iters = 0 ! Flush diff iters to avoid crashing the timestep.
+            s% num_diffusion_solver_iters = 0  ! Flush diff iters to avoid crashing the timestep.
             s% edv(:,1:nz) = 0
             s% eps_WD_sedimentation(1:nz) = 0d0
             if (s% do_element_diffusion .and. s% report_ierr .and. dt < s% diffusion_dt_limit) &
@@ -197,9 +188,9 @@
                if (maxloc(s% xa(:,k),dim=1) /= maxloc(s% xa(:,k-1),dim=1) .or. &
                     s% D_mix(k+1) <= min_D_mix) then
                   nzlo=k; exit
-               endif
+               end if
             end do
-            nzlo = kk + (nzlo - kk)*4/5 ! back up into the convection zone
+            nzlo = kk + (nzlo - kk)*4/5  ! back up into the convection zone
          end if
 
          !write(*,3) 'nzlo mixing_type', nzlo, s% mixing_type(nzlo)
@@ -214,7 +205,7 @@
                   nzhi=k; exit
                end if
             end do
-            nzhi = (3*nzhi+nz)/4 ! back up some into the convection zone
+            nzhi = (3*nzhi+nz)/4  ! back up some into the convection zone
          end if
 
          if (s% do_phase_separation .and. s% phase_separation_no_diffusion) then
@@ -229,7 +220,7 @@
 
          if(s% diffusion_use_full_net) then
             do j=1,nc
-               class_chem_id(j) = s% chem_id(j) ! Just a 1-1 map between classes and chem_ids.
+               class_chem_id(j) = s% chem_id(j)  ! Just a 1-1 map between classes and chem_ids.
             end do
          else
             do j=1,nc
@@ -251,7 +242,7 @@
          dumping = (s% diffusion_call_number == s% diffusion_dump_call_number)
 
          if ( s% diffusion_use_full_net ) then
-            s% diffusion_calculates_ionization = .true. ! class_typical_charges can't be used, so make sure they aren't.
+            s% diffusion_calculates_ionization = .true.  ! class_typical_charges can't be used, so make sure they aren't.
          end if
 
          if (.not. s% diffusion_calculates_ionization) then
@@ -419,27 +410,27 @@
          do k=1,nzlo
             do j=1,species
                s% diffusion_D_self(j,k) = s% diffusion_D_self(j,nzlo+1)
-               s% edv(j,k) = 0d0 ! s% edv(j,nzlo+1)
+               s% edv(j,k) = 0d0  ! s% edv(j,nzlo+1)
                s% v_rad(j,k) = s% v_rad(j,nzlo+1)
                s% g_rad(j,k) = s% g_rad(j,nzlo+1)
                s% typical_charge(j,k) = s% typical_charge(j,nzlo+1)
                s% diffusion_dX(j,k) = s% xa(j,k) - xa_save(j,k)
             end do
-            s% E_field(k) = 0d0 ! s% E_field(nzlo+1)
-            s% g_field_element_diffusion(k) = 0d0 ! s% g_field_element_diffusion(nzlo+1)
+            s% E_field(k) = 0d0  ! s% E_field(nzlo+1)
+            s% g_field_element_diffusion(k) = 0d0  ! s% g_field_element_diffusion(nzlo+1)
          end do
 
          do k=nzhi+1,nz
             do j=1,species
                s% diffusion_D_self(j,k) = s% diffusion_D_self(j,nzhi)
-               s% edv(j,k) = 0d0 ! s% edv(j,nzhi)
+               s% edv(j,k) = 0d0  ! s% edv(j,nzhi)
                s% v_rad(j,k) = s% v_rad(j,nzhi)
                s% g_rad(j,k) = s% g_rad(j,nzhi)
                s% typical_charge(j,k) = s% typical_charge(j,nzhi)
                s% diffusion_dX(j,k) = s% xa(j,k) - xa_save(j,k)
             end do
-            s% E_field(k) = 0d0 ! s% E_field(nzhi)
-            s% g_field_element_diffusion(k) = 0d0 ! s% g_field_element_diffusion(nzhi)
+            s% E_field(k) = 0d0  ! s% E_field(nzhi)
+            s% g_field_element_diffusion(k) = 0d0  ! s% g_field_element_diffusion(nzhi)
          end do
 
          if (s% doing_timing) call update_time(s, time0, total, s% time_element_diffusion)
@@ -570,7 +561,7 @@
             grav = -s% cgrav(k)*s% m(k)/s% r(k)**2
             area = pi4*s% r(k)**2
             P_face = 0.5d0*(s% Peos(k) + s% Peos(k-1))
-            dlnPdm(k) = grav/(area*P_face) ! estimate based on QHSE
+            dlnPdm(k) = grav/(area*P_face)  ! estimate based on QHSE
             dlnT_dm(k) = s% gradT(k)*dlnPdm(k)
          end subroutine set1_extras
 
@@ -589,15 +580,3 @@
       end subroutine finish_element_diffusion
 
       end module element_diffusion
-
-
-
-
-
-
-
-
-
-
-
-

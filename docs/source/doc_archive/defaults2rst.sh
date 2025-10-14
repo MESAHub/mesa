@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 defaults2rst(){
     sed 's/^ *\! \?//' "$1" > "$2"

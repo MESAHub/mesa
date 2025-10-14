@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2011-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -34,11 +31,9 @@
       real(dp) :: t_spindown = 1d100
       real(dp) :: j_tot = 0d0
 
-
       contains
 
       include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -62,7 +57,6 @@
       end subroutine extras_controls
 
 
-
       subroutine magnetic_braking(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -80,7 +74,7 @@
 
          !Parameters
 
-         bfield = s% x_ctrl(1) ! Surface Magnetic Fields in Gauss
+         bfield = s% x_ctrl(1)  ! Surface Magnetic Fields in Gauss
 
          !Initialize variables
 
@@ -93,15 +87,15 @@
          factor = 0d0
          j_average = 0d0
 
-         omega_crit = star_surface_omega_crit(id, ierr) ! this forces a call to set_surf_avg_rotation_info to ensure things are up
+         omega_crit = star_surface_omega_crit(id, ierr)  ! this forces a call to set_surf_avg_rotation_info to ensure things are up
                                                         ! to date with the state
          if (ierr /= 0) return
          v_rot = s% v_rot_avg_surf
 
          ! Calculate total angular momentum
-         j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz)) ! g cm^2/s Total Stellar Angular Momentum Content
+         j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz))  ! g cm^2/s Total Stellar Angular Momentum Content
 
-         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (v_rot  .gt. 0.8d5)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
+         if ((s% mstar_dot /= 0) .and. (j_tot > 1d50) .and. (v_rot  > 0.8d5)) then  ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
            write(*,*) 'j_tot: ', j_tot, s% omega(1), v_rot/1d5
           !Calculate V_inf of stellar wind (e.g. Vinf = 1.92 Vesc, see Lamers & Cassinelli 2000)
           !N.B. This is good for line-driven winds in hot stars. For different types of Vinf = Vesc might be a better choice?
@@ -110,7 +104,7 @@
           eta = pow2( s% photosphere_r * Rsun * bfield ) / (abs( s% mstar_dot ) * vinf)
           !Calculate Jdot !Eq. 7 in  Ud-Doula et al. 2008
           j_dot = (2d0/3d0) * s% mstar_dot * s% omega_avg_surf*pow2( s% photosphere_r *Rsun)
-          j_dot = j_dot * eta ! This is g*cm^2/s^2
+          j_dot = j_dot * eta  ! This is g*cm^2/s^2
           ! This could be improved using
           ! Eq. 20 in Ud-Doula et al. (2008) MNRAS (Dipole Weber-Davis)
           ! delta_j = delta_j * (0.29 *(eta+0.25)**0.25)**2.0
@@ -124,12 +118,11 @@
 
           ! Check if spindown timescale is shorter than timestep. Print a warning in case.
           ! In other_timestep_limit we enforce timestep controls such that dt << t_spindown.
-          t_spindown = abs(j_tot / j_dot) ! Estimate spindown timescale
+          t_spindown = abs(j_tot / j_dot)  ! Estimate spindown timescale
           if (s% x_logical_ctrl(1)) then
              write(*,1) 'Spindown Timescale (Myr): ', t_spindown / (1d6*secyer)
              write(*,1) 'Spindown Timescale / dt: ', t_spindown / s% dt
           end if
-
 
 
           ! Let's assume the magnetic field applies a ~uniform torque through the star
@@ -140,22 +133,22 @@
           j = 0
           do k = 1, s% nz
             s% extra_jdot(k) =  j_dot / (s% nz * s% dm_bar(k))  ! Specific torque cm^2/s^2. Divide by shell mass and total number of shells
-            if (abs(s% extra_jdot(k)) .gt. abs(s% j_rot(k)/ s% dt)) then
-              residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k) ! Residual J_dot cm^2/s^2 * g
-              s% extra_jdot(k) = - s% j_rot(k)/ s% dt ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
+            if (abs(s% extra_jdot(k)) > abs(s% j_rot(k)/ s% dt)) then
+              residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k)  ! Residual J_dot cm^2/s^2 * g
+              s% extra_jdot(k) = - s% j_rot(k)/ s% dt  ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
               j=j+1
-            endif
+            end if
           end do
 
-          ! Redistribute residual J_dot (only to gridpoints that can accomodate more torque)
+          ! Redistribute residual J_dot (only to gridpoints that can accommodate more torque)
           ! j number of cells that can not take anymore torque ()
           do k = 1, s% nz
-            if (abs(s% extra_jdot(k)) .lt. abs(s% j_rot(k)/ s% dt)) then
+            if (abs(s% extra_jdot(k)) < abs(s% j_rot(k)/ s% dt)) then
               s% extra_jdot(k) = s% extra_jdot(k) + (residual_jdot / ((s% nz - j) * s% dm_bar(k)))
-            endif
+            end if
           end do
 
-          torque = dot_product(s% extra_jdot(1:s% nz),s% dm_bar(1:s% nz)) ! Total applied Torque
+          torque = dot_product(s% extra_jdot(1:s% nz),s% dm_bar(1:s% nz))  ! Total applied Torque
 
           ! Wind Diagnostics
           !write(*,*) 'Rotational Velocity: ',s% omega_avg_surf * s% photosphere_r *Rsun / 1d5, 'km/s' !Rot Vel.
@@ -172,12 +165,10 @@
              write(*,1) 'Fraction of total angular momentum to remove', (j_dot * s% dt) / j_tot
              write(*,1) 'Torque/J_dot (if = 1.0 angular momentum is conserved): ', (torque / j_dot)
           end if
-        endif
+        end if
 
 
       end subroutine magnetic_braking
-
-
 
 
       subroutine extras_startup(id, restart, ierr)
@@ -208,7 +199,6 @@
          end if
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-
 
 
       ! returns either keep_going, retry, or terminate.
@@ -294,7 +284,7 @@
 
          other_timestep_limit = keep_going
 
-         if ((j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5) .and. t_spindown > 0d0) then
+         if ((j_tot > 1d50) .and. (s% v_rot_avg_surf  > 0.8d5) .and. t_spindown > 0d0) then
             ! Only limit the timestep when the star is actually spinning fast.
             dt_limit_ratio = s% x_ctrl(2) * s%dt / t_spindown
          end if
@@ -312,7 +302,5 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-
-
 
       end module run_star_extras

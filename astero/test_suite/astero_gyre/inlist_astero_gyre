@@ -1,6 +1,6 @@
-&star_job  ! HD49385   
+&star_job  ! HD49385
       show_log_description_at_start = .false.
-      
+
       astero_just_call_my_extras_check_model = .true.
 
       save_model_when_terminate = .true.
@@ -11,7 +11,7 @@
       new_cumulative_energy_error = 0d0
 
       !pgstar_flag = .true.
-      
+
 
 / ! end of star_job namelist
 
@@ -41,17 +41,17 @@
 
       initial_mass = 1.2
       initial_z = 0.02
-      
+
       max_years_for_timestep = 1d7
       mesh_delta_coeff = 0.6 ! 0.3
 
       xa_central_lower_limit_species(1) = 'h1'
       xa_central_lower_limit(1) = 0.001
-      
+
       when_to_stop_rtol = 1d-5
       when_to_stop_atol = 1d-5
 
-      calculate_Brunt_N2 = .true. 
+      calculate_Brunt_N2 = .true.
 
       mixing_length_alpha = 1.9d0
 
@@ -61,17 +61,17 @@
       history_interval = 50
       terminal_interval = 5
       write_header_frequency = 10
-      
+
 / ! end of controls namelist
 
 
 &pgstar
-         
+
       ! top level controls
 
-         !pause = .true. 
+         !pause_flag = .true.
             ! if true, the code waits for user to enter a RETURN on the command line
-      
+
 
 
 / ! end of pgstar namelist

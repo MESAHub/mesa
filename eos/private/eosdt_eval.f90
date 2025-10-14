@@ -2,29 +2,23 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module eosDT_eval
+
       use eos_def
       use const_def, only: avo, crad, ln10, arg_not_provided, mp, kerg, dp, qp
       use utils_lib, only: is_bad, mesa_error
@@ -34,7 +28,6 @@
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
       use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
       use ideal, only: get_ideal_for_eosdt
-
 
       implicit none
 
@@ -244,7 +237,7 @@
          end if
 
          dbg = rq% dbg
-         if (dbg) dbg = & ! check limits
+         if (dbg) dbg = &  ! check limits
             logT >= rq% logT_lo .and. logT <= rq% logT_hi .and. &
             logRho >= rq% logRho_lo .and. logRho <= rq% logRho_hi .and. &
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
@@ -311,16 +304,16 @@
             ierr)
 
          ! zero all frac components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          skip = .false.
 
       end subroutine get_other_for_eosdt
 
 
-      subroutine get_level0_for_eosdt( & ! other
+      subroutine get_level0_for_eosdt( &  ! other
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
@@ -361,7 +354,7 @@
             d_alfa_dlogT = -d_frac_dlogT
             d_alfa_dlogRho = -d_frac_dlogRho
          else
-            alfa = 1d0 ! no other
+            alfa = 1d0  ! no other
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
          end if
@@ -386,7 +379,7 @@
       end subroutine get_level0_for_eosdt
 
 
-      subroutine get_level1_for_eosdt( & ! CMS
+      subroutine get_level1_for_eosdt( &  ! CMS
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
@@ -422,7 +415,7 @@
                ierr)
             if (ierr /= 0) return
          else
-            alfa = 1d0 ! no CMS
+            alfa = 1d0  ! no CMS
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
          end if
@@ -447,7 +440,7 @@
       end subroutine get_level1_for_eosdt
 
 
-      subroutine get_level2_for_eosdt( & ! Skye
+      subroutine get_level2_for_eosdt( &  ! Skye
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
@@ -489,7 +482,7 @@
             end if
             if (ierr /= 0) return
          else
-            alfa = 1d0 ! no Skye
+            alfa = 1d0  ! no Skye
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
          end if
@@ -514,7 +507,7 @@
       end subroutine get_level2_for_eosdt
 
 
-      subroutine get_level3_for_eosdt( & ! PC
+      subroutine get_level3_for_eosdt( &  ! PC
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
@@ -550,7 +543,7 @@
                ierr)
             if (ierr /= 0) return
          else
-            alfa = 1d0 ! no PC
+            alfa = 1d0  ! no PC
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
          end if
@@ -575,7 +568,7 @@
       end subroutine get_level3_for_eosdt
 
 
-      subroutine get_level4_for_eosdt( & ! FreeEOS
+      subroutine get_level4_for_eosdt( &  ! FreeEOS
             handle, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
@@ -611,7 +604,7 @@
                ierr)
             if (ierr /= 0) return
          else
-            alfa = 1d0 ! no FreeEOS
+            alfa = 1d0  ! no FreeEOS
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
          end if
@@ -675,7 +668,7 @@
                alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr)
             if (ierr /= 0) return
          else
-            alfa = 1d0 ! no OPAL_SCVH
+            alfa = 1d0  ! no OPAL_SCVH
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
          end if
@@ -755,7 +748,7 @@
 
       subroutine get_HELM_alfa( &
             rq, logRho, logT, alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
-         use const_def
+         use const_def, only: dp
          use eos_blend
          use auto_diff
          type (EoS_General_Info), pointer :: rq
@@ -797,7 +790,7 @@
          contained = is_contained(num_points, bounds, p)
          dist = min_distance_to_polygon(num_points, bounds, p)
 
-         if (contained) then ! Make distance negative for points inside the polygon
+         if (contained) then  ! Make distance negative for points inside the polygon
             dist = -dist
          end if
 
@@ -816,7 +809,7 @@
             rq, dbg, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
-         use const_def
+         use const_def, only: dp
          use auto_diff
          type (EoS_General_Info), pointer :: rq
          logical, intent(in) :: dbg
@@ -956,7 +949,7 @@
                blend_cut = 1d0
             else
                blend_cut = max(blend_logRho_cut, blend_logQ_cut)
-            endif
+            end if
          elseif (blend_logT_cut == 1) then
             blend_cut = 1d0
          else
@@ -966,7 +959,7 @@
                blend_cut = 1d0
             else
                blend_cut = max(blend_logT_cut, blend_logQ_cut)
-            endif
+            end if
          end if
 
          ! combine all blends
@@ -1013,12 +1006,12 @@
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_OPAL_SCVH) = 1.0
+         res(i_frac_OPAL_SCVH) = 1.0d0
 
       end subroutine get_opal_scvh_for_eosdt
 
@@ -1055,12 +1048,12 @@
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_FreeEOS) = 1.0
+         res(i_frac_FreeEOS) = 1.0d0
 
       end subroutine get_FreeEOS_for_eosdt
 
@@ -1086,37 +1079,37 @@
 
          logRho1_max = 3.71d0
 
-         logQ1 = 5.69d0 ! SCVH full off for logQ > this
-         logQ2 = 5.68d0 ! must have logQ2 < logQ1
-         logQmax = rq% logQ_max_OPAL_SCVH ! 5.3
-         logQ3 = rq% logQ_min_OPAL_SCVH ! -8.0
-         logQ4 = rq% logQ_min_OPAL_SCVH ! -8.0
+         logQ1 = 5.69d0  ! SCVH full off for logQ > this
+         logQ2 = 5.68d0  ! must have logQ2 < logQ1
+         logQmax = rq% logQ_max_OPAL_SCVH  ! 5.3
+         logQ3 = rq% logQ_min_OPAL_SCVH  ! -8.0
+         logQ4 = rq% logQ_min_OPAL_SCVH  ! -8.0
 
-         logRho5 = rq% logRho_min_OPAL_SCVH_limit ! -14.299
-         logRho6 = logRho5 - 1d-3 ! -14.3
+         logRho5 = rq% logRho_min_OPAL_SCVH_limit  ! -14.299
+         logRho6 = logRho5 - 1d-3  ! -14.3
          logRho7 = -14.90d0
          logRho8 = -14.99d0
 
-         logRho1 = rq% logRho1_OPAL_SCVH_limit ! 3.50
+         logRho1 = rq% logRho1_OPAL_SCVH_limit  ! 3.50
          if (logRho1 > logRho1_max) then
             write(*,*) 'sorry: value for logRho1_OPAL_SCVH_limit is too large.  max allowed is ', &
                logRho1_max
             ierr = -1
             return
          end if
-         logRho2 = rq% logRho2_OPAL_SCVH_limit ! 3.48
+         logRho2 = rq% logRho2_OPAL_SCVH_limit  ! 3.48
 
-         logT8 = rq% logT_low_all_HELM ! 2.2
-         logT7 = rq% logT_low_all_SCVH ! 2.3
+         logT8 = rq% logT_low_all_HELM  ! 2.2
+         logT7 = rq% logT_low_all_SCVH  ! 2.3
          logT6 = 4.890d0
          logT5 = 4.899d0   ! problems with blend here so just jump
-         logT2 = rq% logT_all_OPAL ! 7.6
-         logT1 = rq% logT_all_HELM ! 7.7
+         logT2 = rq% logT_all_OPAL  ! 7.6
+         logT1 = rq% logT_all_HELM  ! 7.7
 
          Z_all_HELM = rq% Z_all_HELM
          Z_no_HELM = rq% Z_all_OPAL
 
-         if (logT >= logT1) then ! just use other
+         if (logT >= logT1) then  ! just use other
 
             alfa = 1d0
             beta = 0d0
@@ -1251,7 +1244,7 @@
                end if
                iregion = use_none
 
-            else if (logQ <= logQ3 .and. logT >= logT5) then ! blend in Q
+            else if (logQ <= logQ3 .and. logT >= logT5) then  ! blend in Q
                d_alfa_dlogQ = 1d0/(logQ4 - logQ3)
                alfa = (logQ - logQ3)*d_alfa_dlogQ
                dlogQ_dlogRho = 1d0
@@ -1287,7 +1280,7 @@
                   c_dx = (logRho - logRho2)*d_dx_dlogRho
                   if (dbg) write(*,*) 'iregion = blend_corner_out'
                   iregion = blend_corner_out
-               else ! logRho <= logRho2
+               else  ! logRho <= logRho2
                   if (dbg) write(*,*) 'logRho <= logRho2', logRho, logRho2
                   if (dbg) write(*,*) 'iregion = blend_in_y'
                   iregion = blend_in_y
@@ -1320,7 +1313,7 @@
                   c_dx = (logRho - logRho2)*d_dx_dlogRho
                   if (dbg) write(*,*) 'iregion = blend_in_x'
                   iregion = blend_in_x
-               else ! logRho <= logRho2
+               else  ! logRho <= logRho2
                   if (dbg) write(*,*) 'logRho <= logRho2', logRho, logRho2
                   if (dbg) write(*,*) 'iregion = use_all'
                   iregion = use_all
@@ -1343,18 +1336,18 @@
                      d_dx_dlogRho = 1/(logRho3 - logRho4 + (A - B)*(logT - logT7))
                      if (dbg) write(*,*) 'iregion = blend_in_x'
                      iregion = blend_in_x
-                  else ! logRho < logRho_lo
+                  else  ! logRho < logRho_lo
                      if (dbg) write(*,*) 'logRho < logRho_lo', logRho, logRho_lo
                      if (dbg) write(*,*) 'iregion = use_all'
                      iregion = use_all
                   end if
-               else ! logT is > logT8
+               else  ! logT is > logT8
                   if (dbg) write(*,*) 'logT > logT8', logT, logT8
                   if (logRho > logRho3) then
                      if (dbg) write(*,*) 'logRho > logRho3', logRho, logRho3
                      if (dbg) write(*,*) 'iregion = use_none 4'
                      iregion = use_none
-                  else ! logRho is > logRho4
+                  else  ! logRho is > logRho4
                      if (dbg) write(*,*) 'logRho <= logRho3', logRho, logRho3
                      d_dx_dlogRho = 1/(logRho3 - logRho4)
                      c_dx = (logRho - logRho4)*d_dx_dlogRho
@@ -1397,7 +1390,7 @@
          end subroutine determine_region_opal_scvh
 
 
-         subroutine set_alfa_and_partials ! alfa = fraction other
+         subroutine set_alfa_and_partials  ! alfa = fraction other
             logical, parameter :: dbg = .false.
 
             real(dp) :: zfactor
@@ -1509,7 +1502,7 @@
          d_alfa_dlogT = d_alfa_dlogT_in
          d_alfa_dlogRho = d_alfa_dlogRho_in
 
-         if (alfa == 0d0) then ! pure 1st
+         if (alfa == 0d0) then  ! pure 1st
             call get_1st(rq% handle, dbg, &
                Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -1521,14 +1514,14 @@
                if (dbg) write(*,*) 'ierr => skip 1st in combine_for_eosdt'
                ierr = 0; skip_1st = .true.
             end if
-            if (skip_1st) then ! switch to pure 2nd
+            if (skip_1st) then  ! switch to pure 2nd
                alfa = 1d0; d_alfa_dlogT = 0d0; d_alfa_dlogRho = 0d0
             else
                return
             end if
          end if
 
-         if (alfa < 1d0) then ! some of 1st
+         if (alfa < 1d0) then  ! some of 1st
             call get_1st(rq% handle, dbg, &
                Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -1540,12 +1533,12 @@
                if (dbg) write(*,*) 'ierr => skip 1st in combine_for_eosdt'
                ierr = 0; skip_1st = .true.
             end if
-            if (skip_1st) then ! switch to pure 2nd
+            if (skip_1st) then  ! switch to pure 2nd
                alfa = 1d0; d_alfa_dlogT = 0d0; d_alfa_dlogRho = 0d0
             end if
          end if
 
-         if (alfa == 1d0) then ! no 1st
+         if (alfa == 1d0) then  ! no 1st
             call get_2nd(rq% handle, dbg, &
                Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -1623,12 +1616,12 @@
             rq, which_eosdt, xz, Z, X, Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dX, d_dZ, ierr)
          do i=1,species
-            select case(chem_isos% Z(chem_id(i))) ! charge
-            case (1) ! X
+            select case(chem_isos% Z(chem_id(i)))  ! charge
+            case (1)  ! X
                d_dxa(:,i) = d_dX
-            case (2) ! Y
+            case (2)  ! Y
                d_dxa(:,i) = 0
-            case default ! Z
+            case default  ! Z
                d_dxa(:,i) = d_dZ
             end select
          end do
@@ -1636,7 +1629,7 @@
       end subroutine get1_for_eosdt
 
 
-      subroutine Get1_eosdt_Results( & ! blend in Z
+      subroutine Get1_eosdt_Results( &  ! blend in Z
                rq, which_eosdt, xz, Z, X, Rho, logRho, T, logT, &
                res, dlnd, dlnT, dX, dZ, ierr)
          use chem_def
@@ -1761,7 +1754,7 @@
          type (EoS_General_Info), pointer :: rq
          integer, intent(in) :: which_eosdt
          type (DT_xz_Info), pointer :: xz
-         integer, intent(in) :: iz ! the index in eos_Zs
+         integer, intent(in) :: iz  ! the index in eos_Zs
          real(dp), intent(in) :: X, Rho, logRho, T, logT
          real(dp), intent(inout), dimension(nv) :: &
             res, dlnd, dlnT, d_dX
@@ -1772,7 +1765,7 @@
          real(dp) :: dX, dX1, dX2, dX3, c(4), dcdX(4), denom, delX, coef, dcoef_dX, alfa, beta, dalfa_dX, dbeta_dX, tiny
          character (len=256) :: message
          integer :: ix, ix_lo, ix_hi, j, num_Xs
-         logical, parameter :: dbg_for_X = dbg ! .or. .true.
+         logical, parameter :: dbg_for_X = dbg  ! .or. .true.
          logical :: what_we_use_is_equal_spaced
 
          include 'formats'
@@ -1847,9 +1840,9 @@
          what_we_use_is_equal_spaced = .true.
          dX1 = xz% Xs_for_Z(ix_lo+1,iz)-xz% Xs_for_Z(ix_lo,iz)
          dX2 = xz% Xs_for_Z(ix_lo+2,iz)-xz% Xs_for_Z(ix_lo+1,iz)
-         if (ix_hi-ix_lo==2) then ! check that the 3 table X's are equal spaced
+         if (ix_hi-ix_lo==2) then  ! check that the 3 table X's are equal spaced
             if (abs(dX1 - dX2) > tiny) what_we_use_is_equal_spaced = .false.
-         else ! check that the 4 table X's are equal spaced
+         else  ! check that the 4 table X's are equal spaced
             dX3 = xz% Xs_for_Z(ix_hi,iz)-xz% Xs_for_Z(ix_lo+2,iz)
             if (abs(dX1 - dX2) > tiny .or. abs(dX2 - dX3) > tiny) &
                what_we_use_is_equal_spaced = .false.
@@ -2259,8 +2252,8 @@
 
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
+         real(dp), intent(in) :: Z  ! the metals mass fraction
+         real(dp), intent(in) :: X  ! the hydrogen mass fraction
 
          real(dp), intent(in) :: abar, zbar
 
@@ -2269,18 +2262,18 @@
          integer, pointer :: net_iso(:)
          real(dp), intent(in) :: xa(:)
 
-         real(dp), intent(in) :: logRho ! log10 of density
-         integer, intent(in) :: which_other ! from eos_def.  e.g., i_P for pressure
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         real(dp), intent(in) :: logRho  ! log10 of density
+         integer, intent(in) :: which_other  ! from eos_def.  e.g., i_P for pressure
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations
+         integer, intent(in) :: max_iter  ! max number of iterations
 
          real(dp), intent(in) :: logT_guess
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
+         real(dp), intent(in) :: logT_bnd1, logT_bnd2  ! bounds for logT
             ! set to arg_not_provided if do not know bounds
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in c_def)
 
          real(dp), intent(out) :: logT_result
@@ -2288,7 +2281,7 @@
          real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          logical, parameter :: doing_Rho = .false.
 
@@ -2312,12 +2305,12 @@
                logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
 
-         use const_def
+         use const_def, only: dp
 
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
+         real(dp), intent(in) :: Z  ! the metals mass fraction
+         real(dp), intent(in) :: X  ! the hydrogen mass fraction
 
          real(dp), intent(in) :: abar, zbar
 
@@ -2326,20 +2319,20 @@
          integer, pointer :: net_iso(:)
          real(dp), intent(in) :: xa(:)
 
-         real(dp), intent(in) :: logT ! log10 of temperature
+         real(dp), intent(in) :: logT  ! log10 of temperature
 
-         integer, intent(in) :: which_other ! from eos_def.
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         integer, intent(in) :: which_other  ! from eos_def.
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logRho_tol
 
-         integer, intent(in) :: max_iter ! max number of Newton iterations
+         integer, intent(in) :: max_iter  ! max number of Newton iterations
 
          real(dp), intent(in) :: logRho_guess
-         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2 ! bounds for logrho
+         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2  ! bounds for logrho
             ! set to arg_not_provided if do not know bounds
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in c_def)
 
          real(dp), intent(out) :: logRho_result
@@ -2347,7 +2340,7 @@
          real(dp), intent(inout), dimension(:,:) :: d_dxa_c_TRho
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          logical, parameter :: doing_Rho = .true.
          real(dp) :: Prad
@@ -2371,7 +2364,7 @@
                xacc, yacc, ntry, &
                res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa_c_TRho, &
                eos_calls, ierr)
-         use const_def
+         use const_def, only: dp
          use chem_def, only: num_chem_isos
          use num_lib, only: safe_root_with_guess
          integer, intent(in) :: handle
@@ -2380,15 +2373,15 @@
          integer, pointer :: chem_id(:)
          integer, pointer :: net_iso(:)
          real(dp), intent(in) :: xa(:)
-         integer, intent(in) :: which_other ! 0 means total P
+         integer, intent(in) :: which_other  ! 0 means total P
          real(dp), intent(in) :: other_value
          logical, intent(in) :: doing_Rho
-         real(dp), intent(in) :: initial_guess ! for x
-         real(dp), intent(out) :: x ! if doing_Rho, then logRho, else logT
+         real(dp), intent(in) :: initial_guess  ! for x
+         real(dp), intent(out) :: x  ! if doing_Rho, then logRho, else logT
          real(dp), intent(in) :: the_other_log
          real(dp), intent(in) :: xbnd1, xbnd2, other_at_bnd1, other_at_bnd2
-         real(dp), intent(in) :: xacc, yacc ! tolerances
-         integer, intent(in) :: ntry ! max number of iterations
+         real(dp), intent(in) :: xacc, yacc  ! tolerances
+         integer, intent(in) :: ntry  ! max number of iterations
          real(dp), intent(inout), dimension(nv) :: res, d_dlnRho_c_T, d_dlnT_c_Rho
          real(dp), dimension(:,:) :: d_dxa_c_TRho
          integer, intent(out) :: eos_calls, ierr
@@ -2434,8 +2427,8 @@
             integer, intent(in) :: lrpar, lipar
             real(dp), intent(in) :: x
             real(dp), intent(out) :: dfdx
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             integer, intent(out) :: ierr
 
             real(dp) :: Pgas, Prad, energy, entropy, dPgas_dlnT, dPrad_dlnT, &
@@ -2506,7 +2499,7 @@
                call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
             end if
 
-            if (which_other == -1) then ! other_value is egas
+            if (which_other == -1) then  ! other_value is egas
                erad = crad*pow4(T)/rho
                egas = energy - erad
                f = egas - other_value
@@ -2518,7 +2511,7 @@
                   degas_dlnT = energy*d_dlnT_c_Rho(i_lnE) - derad_dlnT
                   dfdx = degas_dlnT*ln10
                end if
-            else if (which_other == 0) then ! other_value is log10P
+            else if (which_other == 0) then  ! other_value is log10P
                f = log10(Pgas + Prad) - other_value
                if (doing_Rho) then
                   dPgas_dlnRho = Pgas*d_dlnRho_c_T(i_lnPgas)
@@ -2540,6 +2533,5 @@
          end function f
 
       end subroutine do_safe_get_Rho_T
-
 
       end module eosDT_eval

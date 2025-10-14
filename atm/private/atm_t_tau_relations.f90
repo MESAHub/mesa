@@ -2,49 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_T_tau_relations
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, iln10, two_thirds
   use math_lib
   use utils_lib, only: mesa_error
 
-  ! No implicit typing
-
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: get_T_tau_base
   public :: eval_T_tau
   public :: eval_T_tau_dq_dtau
-
-  ! Procedures
 
 contains
 
@@ -78,13 +62,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine get_T_tau_base
 
-  !****
 
   subroutine eval_T_tau (id, tau, Teff, lnT, ierr)
 
@@ -118,13 +99,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine eval_T_tau
 
-  !****
 
   subroutine eval_Eddington (tau, Teff, lnT)
 
@@ -142,13 +120,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_Eddington
 
-  !****
 
   subroutine eval_solar_Hopf (tau, Teff, lnT)
 
@@ -181,13 +156,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_solar_Hopf
 
-  !****
 
   subroutine eval_Krishna_Swamy (tau, Teff, lnT)
 
@@ -217,13 +189,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_Krishna_Swamy
 
-  !****
 
   subroutine eval_Trampedach_solar (tau, Teff, lnT)
 
@@ -247,7 +216,7 @@ contains
 
     x = log10(tau)
 
-    if (x >= 0.07407427) then
+    if (x >= 0.07407427_dp) then
        write(*,*) 'WARNING: evaluating Trampedach_solar T-tau relation beyond valid region (log10(tau) < 0.0741):', x
     end if
 
@@ -256,13 +225,10 @@ contains
 
     lnT = log(T4)*0.25d0
 
-    ! Finish
-
     return
 
   end subroutine eval_Trampedach_solar
 
-  !****
 
   subroutine eval_T_tau_dq_dtau (id, tau, dq_dtau, ierr)
 
@@ -299,13 +265,10 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end select
 
-    ! Finish
-
     return
 
   end subroutine eval_T_tau_dq_dtau
 
-  !****
 
   subroutine eval_Eddington_dq_dtau (tau, dq_dtau)
 
@@ -316,13 +279,10 @@ contains
 
     dq_dtau = 0.0_dp
 
-    ! Finish
-
     return
 
   end subroutine eval_Eddington_dq_dtau
 
-  !****
 
   subroutine eval_solar_Hopf_dq_dtau (tau, dq_dtau)
 
@@ -348,13 +308,10 @@ contains
 
     dq_dtau = - Q2*Q3*e1 - Q4*Q5*e2
 
-    ! Finish
-
     return
 
   end subroutine eval_solar_Hopf_dq_dtau
 
-  !****
 
   subroutine eval_Krishna_Swamy_dq_dtau (tau, dq_dtau)
 
@@ -377,13 +334,10 @@ contains
 
     dq_dtau = - Q2*Q3*e1 - Q4*Q5*e2
 
-    ! Finish
-
     return
 
   end subroutine eval_Krishna_Swamy_dq_dtau
 
-  !****
 
   subroutine eval_Trampedach_solar_dq_dtau (tau, dq_dtau)
 
@@ -405,8 +359,6 @@ contains
     x = log10(tau)
 
     dq_dtau = (c1 + exp((x-a)/v))/(1._dp + exp((x-b)/w))/tau*iln10
-
-    ! Finish
 
     return
 

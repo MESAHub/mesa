@@ -2,31 +2,24 @@
 !
 !   Copyright (C) 2010-2021  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module magnetic_diffusion
 
-      use const_def
+      use const_def, only: dp, pi, pi4, clight, boltz_sigma, one_third
       use num_lib
       use math_lib
       use utils_lib
@@ -34,7 +27,8 @@
       implicit none
 
       private
-      public :: calc_sige, calc_eta
+      public :: calc_sige
+      public :: calc_eta
 
       contains
 
@@ -86,7 +80,7 @@
             sig = (1d0-ffff)*xsig3 + ffff*xsig2
          else
             sig = sige3(zbar,T,gamma)
-         endif
+         end if
 
       end function calc_sige
 
@@ -107,7 +101,7 @@
          end if
          xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
          etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
-         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
+         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0)))  ! correction: gammae
          sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
       end function sige1
 
@@ -136,9 +130,8 @@
          rme = 8.5646d-23*t*t*t*xgamma*xgamma*xgamma/pow5(z)  ! rme = rho6/mue
          rm23 = pow(rme,2d0/3d0)
          ctmp = 1d0 + 1.018d0*rm23
-         xi= sqrt(3.14159d0/3.)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
+         xi= sqrt(pi/3.0d0)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
          sige3 = 8.630d21*rme/(z*ctmp*xi)
       end function sige3
-
 
       end module magnetic_diffusion

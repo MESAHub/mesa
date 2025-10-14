@@ -2,39 +2,26 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_def
 
-  ! Uses
-
   use const_def, only: dp
 
-  ! No implicit typing
-
   implicit none
-
-  ! Parameter definitions
 
   ! T-tau relations
 
@@ -57,8 +44,8 @@ module atm_def
 
   ! Atmosphere structure info
 
-  integer, parameter :: atm_xm = 1 ! mass of atm exterior to this point (g)
-  integer, parameter :: atm_delta_r = atm_xm+1 ! radial distance above base of envelope (cm)
+  integer, parameter :: atm_xm = 1  ! mass of atm exterior to this point (g)
+  integer, parameter :: atm_delta_r = atm_xm+1  ! radial distance above base of envelope (cm)
   integer, parameter :: atm_lnP = atm_delta_r+1
   integer, parameter :: atm_lnd = atm_lnP+1
   integer, parameter :: atm_lnT = atm_lnd+1
@@ -102,8 +89,6 @@ module atm_def
      logical, pointer           :: have_atm_table(:)
   end type Atm_Info
 
-  ! Module variables
-
   ! Atmosphere tables
 
   type (Atm_Info), target, save :: &
@@ -117,8 +102,6 @@ module atm_def
   real(dp) :: atm_test_partials_L_lo, atm_test_partials_L_hi
   real(dp) :: atm_test_partials_R_lo, atm_test_partials_R_hi
   real(dp) :: atm_test_partials_M_lo, atm_test_partials_M_hi
-
-  ! Interfaces
 
   abstract interface
 
@@ -161,4 +144,3 @@ module atm_def
   end interface
 
 end module atm_def
-

@@ -1,7 +1,7 @@
 --
 --     17 Oct 1992   only Jacobian here (GAISH, Moscow)
 --     30 Jan 1997   HapH as in hcdfnrad.trf - difjac.inc changed !
---     30 Oct 2006   Ndebug etc. (Tokyo) 
+--     30 Oct 2006   Ndebug etc. (Tokyo)
 --
 --  _TRACE "If(KM>Nzon-2)WRITE(0,'(A,1P,E10.2)')' HL=',HL,"
 --  _TRACE "If(KM>Nzon-2)WRITE(0,'(A,I3,A,1P,E10.2)')
@@ -74,7 +74,7 @@
    <*A: FORM SMALL MATRICES ACcorDING THE RULE:
         A - FOR VALUES OVER ZONE 0 (LEFT)
         B - FOR VALUES OVER ZONE 1 (OWN )
-        C - FOR VALUES OVER ZONE 2 (RIGHT) WITH INDECES  i,j
+        C - FOR VALUES OVER ZONE 2 (RIGHT) WITH INDICES  i,j
         i,j = 0 corresponding to radius
         i,j = 1 corresponding to velocity
         i,j = 2 corresponding to temperature
@@ -134,12 +134,12 @@
           HapH1D(L)=(Tp1up4+Tp2up4)
           /((Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
                *exp(-tau1D(L)))
-           +(Tp1up4/hapL1D(L))*(1.d0+@hapHlim*(exp(-tau1D(L))+tau1D(L)-1.d0) 
+           +(Tp1up4/hapL1D(L))*(1.d0+@hapHlim*(exp(-tau1D(L))+tau1D(L)-1.d0)
                   *exp(-tau2(L))) );
           HapH2D(L)=(Tp1up4+Tp2up4)
           /((Tp2up4/hapL2D(L))*(1.d0+@hapHlim*(exp(-tau2D(L))+tau2D(L)-1.d0)
                *exp(-tau1(L)))
-           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0) 
+           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
                   *exp(-tau2D(L))) );
           FLUMD2=FLUMD2+@FH1*WEIGHT(L)*HapH2D(L);
           FLUMT1=FLUMT1+@FH1*WEIGHT(L)*
@@ -203,7 +203,7 @@
    @AJAC=1.D0;ICS(JAC)=Km;
    @AJAC=B01 ;ICS(JAC)=Km+NZON;
    KROW=NZON+Km;  -- u1
- If(abs(KNadap)==5)then;  
+ If(abs(KNadap)==5)then;
       @AJAC=1.d0; ICS(JAC)=KROW; -- B11 for const. hom. vel.
  else;
 -- IF(Z10 ^= ZERJ)THEN;
@@ -237,7 +237,7 @@
         ENDIF;
      _OD;
    ENDIF;
- endif; 
+ endif;
 %_Dere.T:O
    <*A: form small matrices A,B,C like %_Dere.RA plus Z for
         values over zone -1 (left to the left) *>;
@@ -776,7 +776,7 @@
                   /(@LEFT*(0.5D0*(Tp1+Tp0))**4*RS0*hapL1(L));
            B44(L)=B44(L)+(HL*CLIGHT)*RS0*RCinv1*
                   (1.5D1/PI**4)*FHcore(L)/FL0*RS0**2*CM0INV*WEIGHT(L);
-    endif;    
+    endif;
     --  ELSE; -- Km==1 -- CHECKED IN %_Dere.FE
     --    A40(L)=ZERJ; A41(L)=ZERJ;
     --    A42(L)=ZERJ; Z40(L)=ZERJ;
@@ -821,17 +821,17 @@
        A55(L)=-(HL*CLIGHT)*RVIS*(RS0/RS1)/(2.D0*(R1-R0));
        C55(L)=ZERJ;
        C54(L)=C54(L)
-	      -(HL*CLIGHT)*RVIS*HEDD(L)*(RS2/RS1)/(2.D0*(R1-R0));
-  --	      ELSEIF(Km<=Nthick(L)+1)THEN;
+        -(HL*CLIGHT)*RVIS*HEDD(L)*(RS2/RS1)/(2.D0*(R1-R0));
+  --        ELSEIF(Km<=Nthick(L)+1)THEN;
     ELSE;
        A55(L)=ZERJ; C55(L)=ZERJ;
-  --	  C55(L)=-(HL*CLIGHT)*RVIS*(RS2/RS1)/(2.D0*(R1-R0));
+  --    C55(L)=-(HL*CLIGHT)*RVIS*(RS2/RS1)/(2.D0*(R1-R0));
     ENDIF;
     IF(Km<NZON) THEN;
          IF(Km>1)THEN;
 --           write(@wres,*)' dFHPL/dr0=',-DFHDPL(L)*RCinv1*RS0;
 --           write(@wres,*)' dFdHaph  =',
---                 CLIGHT*(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0 
+--                 CLIGHT*(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0
 --                           *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1;
            A50(L)=HL*(
          -DFHDPL(L)*RCinv1*RS0+ -- old version
@@ -847,19 +847,19 @@
           if(NSTEP>=NDebug)then;
            if(Km>Ncnd .and. Km<Ncnd+3 .and. L==LfrDebug)then;
              write(@wres,*)' computing A50 Km,L=',Km,L;
-	     write(@wres,*)' dFHPL/dr0=',DFHDPL(L)*RCinv1*RS0;
-	     write(@wres,'(a,1p,3e12.3)')' grad FJ=',CLIGHT*(
-	     	  (EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1)*2.D0/(R2-R0)**2);
-	     write(@wres,'(a,1p,3e12.3)')' dFdHaph=',CLIGHT*(
-	     	  +(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0 -- new version
-	     	  *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1);
-	     write(@wres,'(a,1p,3e12.3)')' HapH1=',CLIGHT*( 
-	     	       +hapH1(L)*9.D0*RS0
-	     		       *(DM1+DM2)
-	     		       /(RC2-RC0)**2*@FH1);
-	     write(@wres,'(a,1p,3e12.3)')' EddjFj=',Clight*(
-	     		     (1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1/RS1);
-	     write(@wres,*)' Nthick=',Nthick(L);
+       write(@wres,*)' dFHPL/dr0=',DFHDPL(L)*RCinv1*RS0;
+       write(@wres,'(a,1p,3e12.3)')' grad FJ=',CLIGHT*(
+           (EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1)*2.D0/(R2-R0)**2);
+       write(@wres,'(a,1p,3e12.3)')' dFdHaph=',CLIGHT*(
+           +(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0 -- new version
+           *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1);
+       write(@wres,'(a,1p,3e12.3)')' HapH1=',CLIGHT*(
+                +hapH1(L)*9.D0*RS0
+                  *(DM1+DM2)
+                  /(RC2-RC0)**2*@FH1);
+       write(@wres,'(a,1p,3e12.3)')' EddjFj=',Clight*(
+                (1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1/RS1);
+       write(@wres,*)' Nthick=',Nthick(L);
            endif;
           endif;
 
@@ -877,7 +877,7 @@
                        *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1
                        -2.D0*((1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1*R0
                              +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2*R2)/RC1));
- 
+
    If(Km==131 & l==6)then;
       write(@wres,*)' DFHDPL=',DFHDPL(L)*RCinv1*RS1;
       write(@wres,*)' U1/rs1=',-4.D0*@FH1*U1/RS1;

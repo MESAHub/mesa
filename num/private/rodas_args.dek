@@ -4,10 +4,10 @@
 #include "num_fcn_blk_dble.dek"
          end interface
          integer, intent(in) :: ifcn ! gives information on fcn:
-         real(dp), intent(inout) :: x 
-         real(dp), intent(inout), pointer :: y(:) ! (n) 
+         real(dp), intent(inout) :: x
+         real(dp), intent(inout), pointer :: y(:) ! (n)
          real(dp), intent(in) :: xend ! desired final x value (positive or negative)
-         real(dp), intent(inout) :: h 
+         real(dp), intent(inout) :: h
          real(dp), intent(in) :: max_step_size
          integer, intent(in) :: max_steps
          real(dp), intent(in) :: rtol(*) ! relative error tolerance(s)
@@ -15,11 +15,11 @@
          integer, intent(in) :: itol ! switch for rtol and atol
          interface ! subroutines for computing the jacobian
 ! for dense or banded matrix
-#include "num_jac.dek" 
+#include "num_jac.dek"
 ! for double block tridiagonal matrix
-#include "num_jac_blk_dble.dek" 
+#include "num_jac_blk_dble.dek"
 ! for sparse matrix
-#include "num_sjac.dek" 
+#include "num_sjac.dek"
          end interface
          integer, intent(in) :: ijac, nzmax, isparse, mljac_in, mujac_in
          interface ! subroutine for computing the partials of f(x,y) wrt x
@@ -33,7 +33,7 @@
          interface ! subroutine called after each successful step
 #include"num_solout.dek"
          end interface
-         integer, intent(in)  :: iout ! switch for calling the subroutine solout
+         integer, intent(in) :: iout ! switch for calling the subroutine solout
          interface
 #include "mtx_decsol.dek"
 #include "mtx_decsols.dek"
@@ -51,5 +51,5 @@
          integer, intent(in) :: lrpar, lipar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(in)  :: lout
-         integer, intent(out)  :: idid
+         integer, intent(in) :: lout
+         integer, intent(out) :: idid

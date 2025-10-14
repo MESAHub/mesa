@@ -513,7 +513,7 @@ c First order fit found.
       end
 
 c -------------------------------------------------------------------
-c This routine does the acutal calculation of the photoionization
+c This routine does the actual calculation of the photoionization
 c crossection.
 
       subroutine gshfd_sigma_calc(l_ang, eth, p, e0, sig0, yw, ya,

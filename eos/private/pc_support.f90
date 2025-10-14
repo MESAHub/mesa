@@ -1,4 +1,23 @@
-   module pc_support
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
+module pc_support
    use utils_lib, only: is_bad, mesa_error, mv, switch_str
    use eos_def
    use const_def, only: ln10, mesa_temp_caches_dir, one_sixth
@@ -423,9 +442,9 @@
           x0, xget, x1, y0, yget, y1, &
           fval, df_dx, df_dy, ierr)
       integer, intent(in) :: nvlo, nvhi, nvals, n, nlnGAMI, ny
-      real(dp), intent(in) :: x(:) ! (nlnGAMI)
-      real(dp), intent(in) :: y(:) ! (ny)
-      real(dp), intent(in), pointer :: fin1(:) ! = (4,n,nlnGAMI,ny)
+      real(dp), intent(in) :: x(:)  ! (nlnGAMI)
+      real(dp), intent(in) :: y(:)  ! (ny)
+      real(dp), intent(in), pointer :: fin1(:)  ! = (4,n,nlnGAMI,ny)
       integer, intent(in) :: i, j           ! target cell in f
       real(dp), intent(in) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(i), x1 = xs(i+1)
       real(dp), intent(in) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(j), y1 = ys(j+1)
@@ -567,7 +586,7 @@
       use create_EXCOR7_table, only: do_create_EXCOR7_table
       use create_FSCRliq8_table, only: do_create_FSCRliq8_table
       type (eosPC_Support_Info), pointer :: fq
-      integer, intent(in) :: iZion ! 0 means EXCOR7
+      integer, intent(in) :: iZion  ! 0 means EXCOR7
       integer, intent(out) :: ierr
 
       integer :: io_unit, n, j, i, iQ, nparams, nvals
@@ -599,7 +618,7 @@
          call mesa_error(__FILE__,__LINE__)
       end if
       open(unit=io_unit, FILE=trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ierr)
-      if (ierr /= 0) then ! need to open the table file
+      if (ierr /= 0) then  ! need to open the table file
          ierr = 0
          if (iZion == 0) then
             call do_create_EXCOR7_table(fname)
@@ -614,7 +633,7 @@
          end if
       end if
 
-      read(io_unit,*,iostat=ierr) ! skip line 1
+      read(io_unit,*,iostat=ierr)  ! skip line 1
       if (ierr /= 0) return
 
       if (iZion == 0) then
@@ -624,7 +643,7 @@
          nparams = 9
          nvals = nvals_FSCRliq8
       end if
-      read(io_unit,'(a)',iostat=ierr) message ! get parameters line
+      read(io_unit,'(a)',iostat=ierr) message  ! get parameters line
       if (ierr == 0) call str_to_vector(message, vec, n, ierr)
       if (ierr /= 0 .or. n < nparams) then
          write(*,'(a)') 'failed while reading ' // trim(fname)
@@ -633,7 +652,7 @@
          return
       end if
 
-      read(io_unit,*,iostat=ierr) ! line 3
+      read(io_unit,*,iostat=ierr)  ! line 3
       if (ierr /= 0) return
 
       fq% Zion = iZion
@@ -677,7 +696,7 @@
 
       if (use_cache_for_eos) then
          call Read_Cache(fq, cache_fname, ierr)
-         if (ierr == 0) then ! got it from the cache
+         if (ierr == 0) then  ! got it from the cache
             close(io_unit)
             call free_iounit(io_unit)
             return
@@ -686,7 +705,7 @@
       end if
 
       allocate(tbl2_1(nvals*fq% nlnRS*fq% nlnGAME), STAT=ierr)
-      if (ierr .ne. 0) return
+      if (ierr /= 0) return
 
       tbl2(1:nvals, 1:fq% nlnRS, 1:fq% nlnGAME) =>  &
             tbl2_1(1:nvals*fq% nlnRS*fq% nlnGAME)
@@ -733,7 +752,7 @@
                tbl2(j,iQ,i) = vec(1+j)
             end do
 
-         enddo
+         end do
 
          if(iQ == fq% nlnRS) exit
          read(io_unit,*,iostat=ierr)
@@ -807,10 +826,10 @@
       use interp_2d_lib_db
       type (eosPC_Support_Info), pointer :: fq
       integer, intent(in) :: nvals
-      real(dp), pointer :: tbl2_1(:) ! =(nvals, nlnRS, nlnGAME)
+      real(dp), pointer :: tbl2_1(:)  ! =(nvals, nlnRS, nlnGAME)
       integer, intent(out) :: ierr
 
-      real(dp), allocatable, target :: f1_ary(:) ! data & spline coefficients
+      real(dp), allocatable, target :: f1_ary(:)  ! data & spline coefficients
       real(dp), pointer :: f1(:), f(:,:,:), tbl2(:,:,:)
       integer :: ibcxmin                 ! bc flag for x=xmin
       real(dp) :: bcxmin(fq% nlnGAME)    ! bc data vs. y at x=xmin
@@ -1000,7 +1019,7 @@
       real(dp), parameter :: G1=170.0d0
       real(dp), parameter :: C2=-8.4d-5
       real(dp), parameter :: G2=.0037d0
-      real(dp), parameter :: SQ32=.8660254038d0 ! SQ32=sqrt(3)/2
+      real(dp), parameter :: SQ32=.8660254038d0  ! SQ32=sqrt(3)/2
 
       A3=-SQ32-A1/sqrt(A2)
       F0=A1*(sqrt(GAMI*(A2+GAMI)) &
@@ -1015,8 +1034,8 @@
          + A3*(1.d0-GAMI)/pow2(1.d0+GAMI)) &
          - GAMI*GAMI*(C1*G1/pow2(G1+GAMI)+C2*(G2-GAMI*GAMI)/pow2(G2+GAMI*GAMI))
       PION=UION/3.0d0
-      PDRii=(4.0d0*UION-CVii)/9.0d0 ! p_{ii} + d p_{ii} / d ln\rho
-      PDTii=CVii/3.0d0 ! p_{ii} + d p_{ii} / d ln T
+      PDRii=(4.0d0*UION-CVii)/9.0d0  ! p_{ii} + d p_{ii} / d ln\rho
+      PDTii=CVii/3.0d0  ! p_{ii} + d p_{ii} / d ln T
       return
       end subroutine FITION9
 

@@ -102,7 +102,7 @@ There's instructions inside the code for adding a new bash subprogram to this dr
     shmesa_template () {
         if shmesa_check_h_flag "$@"; then
             echo "Usage: mesa funcname arg [optional arg]"
-            echo "put discription here"
+            echo "put description here"
             return 0
         fi
 

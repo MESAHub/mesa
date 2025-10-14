@@ -2,25 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -38,7 +31,6 @@
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine get_helm_for_eosdt( &
             handle, dbg, Z, X, abar, zbar, &
@@ -98,12 +90,12 @@
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
 
          ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0
+         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
 
          ! mark this one
-         res(i_frac_HELM) = 1.0
+         res(i_frac_HELM) = 1.0d0
 
       end subroutine get_helm_for_eosdt
 
@@ -226,7 +218,7 @@
          res(i_dS_dRho) = helm_res(h_dsd)
          mu = abar/(1 + zbar)
          res(i_mu) = mu
-         free_e = max(1d-99, helm_res(h_xne))/(avo*Rho) ! assuming complete ionization
+         free_e = max(1d-99, helm_res(h_xne))/(avo*Rho)  ! assuming complete ionization
          res(i_lnfree_e) = log(free_e)
          res(i_gamma1) = helm_res(h_gam1)
          res(i_gamma3) = helm_res(h_gam3)
@@ -323,7 +315,7 @@
                coulomb_temp_cut, coulomb_den_cut, &
                include_radiation, include_elec_pos, &
                res, off_table, ierr)
-         use const_def
+         use const_def, only: dp
          use helm
 
          type (EoS_General_Info), pointer :: rq
@@ -332,9 +324,9 @@
          real(dp), intent(in) :: atemp, alogtemp
          real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
          logical, intent(in) :: include_radiation, include_elec_pos
-         real(dp), intent(inout) :: res(:) ! (num_helm_results)
+         real(dp), intent(inout) :: res(:)  ! (num_helm_results)
          logical, intent(out) :: off_table
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          real(dp) :: Rho, logRho, T, logT, dse, dpe, dsp
 
@@ -366,6 +358,4 @@
 
       end subroutine Get_HELM_Results
 
-
       end module eos_HELM_eval
-

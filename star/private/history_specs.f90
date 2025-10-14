@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,13 +21,13 @@
 
       use star_private_def
       use star_history_def
-      use const_def
+      use const_def, only: dp
       use chem_def
       use num_lib, only: linear_interp, find0
 
       implicit none
 
-      public ! history.f90 uses most of this
+      public  ! history.f90 uses most of this
 
       ! spacing between these must be larger than max number of nuclides
       integer, parameter :: idel = 10000
@@ -73,10 +67,7 @@
 
       !integer, parameter :: next_available_offset = burning_offset + idel
 
-
       contains
-
-
 
       recursive subroutine add_history_columns( &
             s, level, capacity, spec, history_columns_file, report, ierr)
@@ -85,7 +76,7 @@
          use chem_def
          use chem_lib
          use const_def, only: mesa_dir
-         use colors_def, only: bc_total_num_colors
+         !use colors_def, only: bc_total_num_colors
          use colors_lib
          type (star_info), pointer :: s
          integer, intent(in) :: level
@@ -116,7 +107,7 @@
          ! first try local directory
          filename = history_columns_file
 
-         if(level==1) then ! First pass either the user set the file or we load the defaults
+         if(level==1) then  ! First pass either the user set the file or we load the defaults
             if (len_trim(filename) == 0) filename = 'history_columns.list'
 
             exists=.false.
@@ -467,15 +458,17 @@
             character(len=*) :: prefix
             integer, intent(out) :: ierr
             integer :: k
+
             ierr = 0
-            do k=1,bc_total_num_colors
-               call insert_spec( &
-                  offset + k,trim(prefix)//trim(get_bc_name_by_id(k,ierr)), ierr)
-               if (ierr /= 0) return
-            end do
+            ! TODO. below is old module
+            !do k=1,bc_total_num_colors
+            !   call insert_spec( &
+            !      offset + k,trim(prefix)//trim(get_bc_name_by_id(k,ierr)), ierr)
+            !   if (ierr /= 0) return
+            !end do
          end subroutine do_colors
 
-         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+         subroutine do_rate(offset,prefix,ierr)  ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_def, only: reaction_name
             use net_def, only: get_net_ptr
             integer, intent(in) :: offset
@@ -620,7 +613,12 @@
          logical function do1(string, name, offset, func)
             character(len=*) :: string, name
             integer :: offset, k
-            external :: func
+            interface
+            subroutine func(offset)
+               implicit none
+               integer, intent(in) :: offset
+            end subroutine func
+            end interface
 
             if(string == name) then
                ! We have string value (i.e total_mass c12)
@@ -699,7 +697,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id) ! Convert to net id not the global rate id
+            id = g% net_reaction(id)  ! Convert to net id not the global rate id
             if (ierr/=0) return
             if (id > 0) then
                spec = offset + id
@@ -733,7 +731,7 @@
          old_history_column_spec => null()
          if (associated(s% history_column_spec)) old_history_column_spec => s% history_column_spec
          nullify(s% history_column_spec)
-         capacity = 100 ! will increase if needed
+         capacity = 100  ! will increase if needed
          allocate(s% history_column_spec(capacity), stat=ierr)
          if (ierr /= 0) return
          s% history_column_spec(:) = 0
@@ -782,6 +780,4 @@
 
       end subroutine set_history_columns
 
-
       end module history_specs
-

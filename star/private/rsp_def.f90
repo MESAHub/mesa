@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2018-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -95,8 +89,8 @@
       ! arrays for LAPACK must be declared at compile time. legacy fortran issue.
       integer, parameter :: NV=5
       integer, parameter :: HD_DIAG=2*NV+1, LD_HD=4*NV+1, LD_ABB=6*NV+1, LPSZ=NV*MAX_NZN+1
-      real(dp) DX(LPSZ), HR(LPSZ), HD(LD_HD, LPSZ), ABB(LD_ABB, LPSZ)
-      integer IPVT(LPSZ)
+      real(dp) :: DX(LPSZ), HR(LPSZ), HD(LD_HD, LPSZ), ABB(LD_ABB, LPSZ)
+      integer :: IPVT(LPSZ)
 
       integer, parameter :: LD_LLL = 4*MAX_NZN
       real(dp), dimension(LD_LLL, LD_LLL) :: LLL, VLx, VRx
@@ -142,9 +136,7 @@
       real(dp) :: EFL0, CQ, ZSH, kapE_factor, kapP_factor
       integer :: NZN, IBOTOM
 
-
       contains
-
 
       subroutine init_def(s)
          use const_def, only: standard_cgrav, boltz_sigma, &
@@ -182,8 +174,8 @@
          CQ = s% RSP_cq
          ZSH = s% RSP_zsh
          EFL0 = s% RSP_efl0
-         kapE_factor = 1d0 ! s% RSP_kapE_factor
-         kapP_factor = 1d0 ! s% RSP_kapP_factor
+         kapE_factor = 1d0  ! s% RSP_kapE_factor
+         kapP_factor = 1d0  ! s% RSP_kapP_factor
 
          if (ALFA == 0.d0) EFL0=0.d0
 
@@ -251,7 +243,7 @@
             call mesa_error(__FILE__,__LINE__,'rsp init_allocate')
          end if
          IBOTOM = NZN/s% RSP_nz_div_IBOTOM
-         n = NZN + 1 ! room for ghost cell
+         n = NZN + 1  ! room for ghost cell
          allocate(xa(s% species), &
             dVol_dr_00(n), dVol_dr_in(n), &
             d_egas_dVol(n), d_egas_dT(n), d_egas_dr_00(n), d_egas_dr_in(n), &
@@ -587,7 +579,7 @@
       end subroutine set_star_vars
 
 
-      subroutine copy_from_xh_to_rsp(s, nz_new) ! do this when load a file
+      subroutine copy_from_xh_to_rsp(s, nz_new)  ! do this when load a file
          use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nz_new
@@ -603,7 +595,7 @@
             s% RSP_w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
             s% v(k) = s% xh(s% i_v,k)
-            if (k == NZN) then ! center
+            if (k == NZN) then  ! center
                s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
                if (s% Vol(k) <= 0d0 .or. is_bad(s% Vol(k))) then
@@ -844,7 +836,7 @@
             call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             s% Vol(k) = 1d0/s% rho(k)
             s% L(k) = 4d0*pi*s% r(k)**2*s% Fr(k) + s% Lc(k) + s% Lt(k)
-            if (s% RSP_w(k) > 1d4) then ! arbitrary cut
+            if (s% RSP_w(k) > 1d4) then  ! arbitrary cut
                s% mixing_type(k) = convective_mixing
             else
                s% mixing_type(k) = no_mixing
@@ -868,6 +860,4 @@
 
       end subroutine copy_results
 
-
       end module rsp_def
-

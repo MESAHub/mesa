@@ -2,25 +2,18 @@
 !
 !   Copyright (C) 2017-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -36,15 +29,14 @@
 
       contains
 
-
       subroutine Do_EoS_Interpolations( &
              nvlo, nvhi, n, nx, x, ny, y, fin1, i, j, &
              x0, xget, x1, y0, yget, y1, &
              fval, df_dx, df_dy, ierr)
          integer, intent(in) :: nvlo, nvhi, n, nx, ny
-         real(dp), intent(in) :: x(:) ! (nx)
-         real(dp), intent(in) :: y(:) ! (ny)
-         real(dp), intent(in), pointer :: fin1(:) ! =(4,n,nx,ny)
+         real(dp), intent(in) :: x(:)  ! (nx)
+         real(dp), intent(in) :: y(:)  ! (ny)
+         real(dp), intent(in), pointer :: fin1(:)  ! =(4,n,nx,ny)
          integer, intent(in) :: i, j           ! target cell in f
          real(dp), intent(in) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(i), x1 = xs(i+1)
          real(dp), intent(in) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(j), y1 = ys(j+1)
@@ -240,12 +232,10 @@
          do k = 1, species
             do j = 1, nv
                d_dxa(j,k) = &
-                  alfa*d_dxa_1(j,k) + beta*d_dxa_2(j,k) ! ignores blend derivatives
+                  alfa*d_dxa_1(j,k) + beta*d_dxa_2(j,k)  ! ignores blend derivatives
             end do
          end do
 
       end subroutine Do_Blend
 
-
       end module eosdt_support
-

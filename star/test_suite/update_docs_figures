@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # A job script to run tests and automatically update the figures in the docs.
 # Currently not all tests generate figures, so we just run a subset of tests:
@@ -12,6 +12,7 @@
 ./each_test_run -u 29
 ./each_test_run -u 32
 ./each_test_run -u 41
+./each_test_run -u 48
 ./each_test_run -u 56
 ./each_test_run -u 77
 ./each_test_run -u 87

@@ -8,12 +8,12 @@ This page has information about how to use MESA to evolve a single
 star.  It assumes you have already installed MESA (see :ref:`installation:Installing MESA`).
 
 The ``$MESA_DIR`` directory has lots of subdirectories.  Most of these
-subdirectories are modules (the "M" in MESA) that provides some
+subdirectories are modules (the "M" in MESA) that provide some
 specific functionality (e.g., "kap" provides routines for calculating
 opacities). The most important module is "star", which contains the
 module that knows how to put the capabilities of all the other modules
 together and advance the state of a stellar model by a single step and
-then suggest a new time increment for the next step.  Basically,
+then suggest a new time increment for the next step. Basically,
 that's all it does.
 
 You came here for a program that can use these modules to do
@@ -30,14 +30,14 @@ checkout of a new MESA version at some point in the future. Therefore
 each time you want to start a new MESA project, you should make a new
 copy of the star/work directory. Let's do that for this tutorial.
 
-::
+.. code-block:: console
 
    cp -r $MESA_DIR/star/work tutorial
 
 Now that we have our copy of the work directory, we need to compile the
 code that lives in it.
 
-::
+.. code-block:: console
 
    cd tutorial
    ./mk
@@ -68,7 +68,7 @@ There are five sections (technically fortran "namelists") in star inlist files:
 Each definition in a namelist is of the form
 
 .. code-block:: fortran
-   
+
   name = value ! comment
 
 Values are specified using the normal fortran syntax. Blank lines and
@@ -81,6 +81,7 @@ initialization, so you only need to set the ones that you actually want
 to change.
 
 .. literalinclude:: ../../../star/work/inlist
+   :language: fortran
 
 inlist_project
 ~~~~~~~~~~~~~~
@@ -90,7 +91,8 @@ from a pre-main sequence model and then stop the evolution once we reach
 the zero-age main sequence (ZAMS).
 
 .. literalinclude:: ../../../star/work/inlist_project
-  
+   :language: fortran
+
 inlist_pgstar
 ~~~~~~~~~~~~~
 
@@ -99,6 +101,7 @@ these for now, but to learn more, have look at the :ref:`using_mesa/using_pgstar
 section of this website.
 
 .. literalinclude:: ../../../star/work/inlist_pgstar
+   :language: fortran
 
 
 Run MESA
@@ -106,7 +109,7 @@ Run MESA
 
 Running the code is now as simple as typing
 
-::
+.. code-block:: console
 
    ./rn
 
@@ -126,13 +129,14 @@ MESA will keep you updated via terminal output that looks like this:
 
 MESA will also display some pgstar plots that look like:
 
-.. figure:: hr_000200.png
+.. figure:: hr_000207.svg
    :alt: HR Diagram
 
-.. figure:: trho_profile_000200.png
+.. figure:: trho_profile_000207.svg
    :alt: TRho Profile
 
-This should run for 208 steps before stopping with the following
+This should run for 207 steps (the number may differ slightly between
+MESA versions) before stopping with the following
 message:
 
 ::
@@ -158,12 +162,12 @@ MESA star, you should expect your existing photo files to become
 obsolete.
 
 If you scroll back in the terminal output from the run, you should find
-a line that looks like (though the number may differ slightly between
+a line that looks like (the number may differ slightly between
 MESA versions):
 
 ::
 
-   save photos/x849 for model 849
+   save photos/x207 for model 207
 
 indicating that one of these snapshots was automatically saved when the
 run terminated.
@@ -171,12 +175,12 @@ run terminated.
 Open up ``inlist_project`` in your editor. You can see there were two
 stopping conditions,
 
-::
+.. code-block:: fortran
 
   ! stop when the star nears ZAMS (Lnuc/L > 0.99)
   Lnuc_div_L_zams_limit = 0.99d0
   stop_near_zams = .true.
-  
+
   ! stop when the center abundance by mass of h1 drops below this limit
   xa_central_lower_limit_species(1) = 'h1'
   xa_central_lower_limit(1) = 1d-3
@@ -185,7 +189,7 @@ As MESA indicated in the termination message, we stopped because of the
 first condition (naturally, ZAMS is before H-exhaustion). Turn off this
 stopping condition by editing your inlist so that
 
-::
+.. code-block:: fortran
 
   stop_near_zams = .false.
 
@@ -193,11 +197,11 @@ and save the inlist file.
 
 Now we can restart using the photo and our new settings. Try it.
 
-::
+.. code-block:: console
 
-   ./re x208
+   ./re x207
 
-This resumes the run from model 208, but this time the run will stop
+This resumes the run from model 207, but this time the run will stop
 when our other condition is satisfied, when the central hydrogen drops
 below 0.001. This will happen at model number 305.
 
@@ -217,7 +221,7 @@ inlist.
 Let's save a model file at the end of our run. Go to the following lines
 to the ``&star_job`` section of your inlist:
 
-::
+.. code-block:: fortran
 
   ! save a model at the end of the run
   save_model_when_terminate = .false.
@@ -228,9 +232,9 @@ inlist and changing ``save_model_when_terminate`` to ``.true.``.
 
 Save the file and then restart MESA from the same point as before.
 
-::
+.. code-block:: console
 
-   ./re x208
+   ./re x207
 
 This time when the run terminates MESA will save a model named
 ``15M_at_TAMS.mod``. Take a look and see.
@@ -242,7 +246,7 @@ Now you could begin studying the post-main sequence evolution of stars,
 starting a new MESA run using the model you've just saved. In order to
 do this your inlist might look like:
 
-::
+.. code-block:: fortran
 
    &star_job
      ! see star/defaults/star_job.defaults
@@ -250,25 +254,25 @@ do this your inlist might look like:
      ! start a run from a saved model
      load_saved_model = .true.
      load_model_filename = '15M_at_TAMS.mod'
-   
+
      ! display on-screen plots
      pgstar_flag = .true.
-   
+
    / !end of star_job namelist
 
    &eos
      ! eos options
      ! see eos/defaults/eos.defaults
-   
+
    / ! end of eos namelist
-   
-   
+
+
    &kap
      ! kap options
      ! see kap/defaults/kap.defaults
      use_Type2_opacities = .true.
      Zbase = 0.02
-   
+
    / ! end of kap namelist
 
 
@@ -278,18 +282,18 @@ do this your inlist might look like:
      ! options for energy conservation (see MESA V, Section 3)
      energy_eqn_option = 'dedt'
      use_gold_tolerances = .true.
-   
+
      ! configure mass loss on RGB & AGB
      cool_wind_RGB_scheme = 'Dutch'
      cool_wind_AGB_scheme = 'Dutch'
      RGB_to_AGB_wind_switch = 1d-4
      Dutch_scaling_factor = 0.8
-   
+
    / ! end of controls namelist
-   
+
 
 If you want to try this out, save the preceding text as a file named
-``inlist_load`` in your work directory. Make sure your file ends with 
+``inlist_load`` in your work directory. Make sure your file ends with
 a blank new line. Then edit your main inlist
 file so that it will use ``inlist_load`` instead of ``inlist_project``
 everywhere within inlist (i.e., ``extra_star_job_inlist_name(1)`` and
@@ -297,7 +301,7 @@ everywhere within inlist (i.e., ``extra_star_job_inlist_name(1)`` and
 
 Then as usual, do
 
-::
+.. code-block:: console
 
    ./rn
 
@@ -320,7 +324,7 @@ papers, which discuss the most important flags.
 The files that contain a description of all of the MESA options and
 their default values live in the directory
 
-::
+.. code-block:: console
 
    $MESA_DIR/star/defaults
 
@@ -333,6 +337,7 @@ in controls.defaults for the word "Dutch" quickly leads to the following
 summary of these options.
 
 .. literalinclude:: ../../../star/defaults/controls.defaults
+   :language: fortran
    :start-at: ! Dutch_scaling_factor
    :end-before: ! Kudritzki_scaling_factor
 

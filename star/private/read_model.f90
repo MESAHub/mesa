@@ -2,36 +2,30 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module read_model
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, msun, secyer
 
       implicit none
 
       integer, parameter :: bit_for_zams_file = 0
-      integer, parameter :: bit_for_lnPgas = 1 ! OBSOLETE: includes lnPgas variables in place of lnd
+      integer, parameter :: bit_for_lnPgas = 1  ! OBSOLETE: includes lnPgas variables in place of lnd
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
@@ -70,9 +64,7 @@
 
       character (len=100000) :: buf
 
-
       contains
-
 
       subroutine finish_load_model(s, restart, ierr)
          use hydro_vars, only: set_vars
@@ -92,7 +84,7 @@
          include 'formats'
          ierr = 0
          nz = s% nz
-         s% brunt_B(1:nz) = 0 ! temporary proxy for brunt_B
+         s% brunt_B(1:nz) = 0  ! temporary proxy for brunt_B
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'set_qs failed in finish_load_model'
@@ -149,6 +141,9 @@
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
          end if
+
+         s% flux_limit_R(1:nz) = 0
+         s% flux_limit_lambda(1:nz) = 0
 
          if (s% RSP_flag) then
             call RSP_setup_part1(s, restart, ierr)
@@ -224,8 +219,8 @@
             tau_factor, Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string
          character (len=net_name_len) :: net_name
-         character(len=iso_name_length), pointer :: names(:) ! (species)
-         integer, pointer :: perm(:) ! (species)
+         character(len=iso_name_length), pointer :: names(:)  ! (species)
+         integer, pointer :: perm(:)  ! (species)
 
          include 'formats'
 
@@ -255,7 +250,7 @@
             return
          end if
 
-         read(iounit, *, iostat=ierr) ! skip the blank line after the file type
+         read(iounit, *, iostat=ierr)  ! skip the blank line after the file type
          if (ierr /= 0) then
             return
          end if
@@ -476,11 +471,11 @@
             s% dt_next = -1
             s% nz_old = -1
 
-            do ! until reach a blank line
+            do  ! until reach a blank line
                read(iounit, fmt='(a)', iostat=ierr) line
                if (ierr /= 0) return
 
-               if (len_trim(line) == 0) exit ! blank line
+               if (len_trim(line) == 0) exit  ! blank line
 
                if (match_keyword('previous n_shells', line, tmp)) then
                   s% nz_old = int(tmp)
@@ -558,15 +553,15 @@
          i_erad_RSP = s% i_erad_RSP
          i_Fr_RSP = s% i_Fr_RSP
 
-         n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
-         if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
+         n = species + nvar_hydro + 1  ! + 1 is for dq
+         if (s% rotation_flag) n = n+increment_for_rotation_flag  ! read omega
+         if (s% have_j_rot) n = n+increment_for_have_j_rot  ! read j_rot
          if (s% have_mlt_vc) n = n+increment_for_have_mlt_vc
-         if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
-         if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
-         if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
-         if (s% RSP_flag) n = n+increment_for_RSP_flag ! read RSP_et, erad, Fr
-         if (s% RSP2_flag) n = n+increment_for_RSP2_flag ! read w, Hp
+         if (s% D_omega_flag) n = n+increment_for_D_omega_flag  ! read D_omega
+         if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag  ! read am_nu_rot
+         if (s% RTI_flag) n = n+increment_for_RTI_flag  ! read alpha_RTI
+         if (s% RSP_flag) n = n+increment_for_RSP_flag  ! read RSP_et, erad, Fr
+         if (s% RSP2_flag) n = n+increment_for_RSP2_flag  ! read w, Hp
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -621,10 +616,10 @@
                j=j+1; j_rot(k) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1; ! skip saving the file data
+               j=j+1;  ! skip saving the file data
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1; ! skip saving the file data
+               j=j+1;  ! skip saving the file data
             end if
             if (s% u_flag) then
                j=j+1; xh(i_u,k) = vec(j)
@@ -809,10 +804,10 @@
          character (len=132) :: line
          real(dp) :: tmp
          ierr = 0
-         do ! until reach a blank line
+         do  ! until reach a blank line
             read(iounit, fmt='(a)', iostat=ierr) line
             if (ierr /= 0) return
-            if (len_trim(line) == 0) return ! blank line
+            if (len_trim(line) == 0) return  ! blank line
             if (match_keyword_for_string('net_name', line, net_name)) then; cycle; end if
             if (match_keyword('species', line, tmp)) then; species = int(tmp); cycle; end if
             if (match_keyword('n_shells', line, tmp)) then; n_shells = int(tmp); cycle; end if
@@ -935,17 +930,17 @@
          n = len_trim(buffer)
          i = 0
          num_found = 0
-       token_loop: do ! have non-empty buffer
+       token_loop: do  ! have non-empty buffer
             i = i+1
             if (i > n) then
                write(*,*) 'get_chem_col_names: failed to find all of the names'
                ierr = -1
                return
             end if
-            if (buffer(i:i) == char(9)) cycle token_loop ! skip tabs
+            if (buffer(i:i) == char(9)) cycle token_loop  ! skip tabs
             select case(buffer(i:i))
                case (' ')
-                  cycle token_loop ! skip spaces
+                  cycle token_loop  ! skip spaces
                case default
                   j1 = i; j2 = i
                   name_loop: do
@@ -982,6 +977,5 @@
          end do token_loop
 
       end subroutine get_chem_col_names
-
 
       end module read_model

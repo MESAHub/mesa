@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2019  Pablo Marchant & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 
       module binary_ce
 
-      use const_def
+      use const_def, only: dp, avo, secyer, boltzm, standard_cgrav, crad, ev2erg, rsun, msun
       use math_lib
       use star_lib
       use star_def
@@ -109,13 +103,13 @@
                ! the following lines compute the fractions of HI, HII, HeI, HeII and HeIII
                ! things like ion_ifneut_H are defined in $MESA_DIR/ionization/public/ionization.def
                ! this file can be checked for additional ionization output available
-               frac_HI = 0d0!get_ion_info(s,ion_ifneut_H,k)
+               frac_HI = 0d0  !get_ion_info(s,ion_ifneut_H,k)
                frac_HII = 1 - frac_HI
 
                ! ionization module provides neutral fraction and average charge of He.
                ! use these two to compute the mass fractions of HeI and HeII
-               frac_HeI = 0d0!get_ion_info(s,ion_ifneut_He,k)
-               avg_charge_He = 2d0!get_ion_info(s,ion_iZ_He,k)
+               frac_HeI = 0d0  !get_ion_info(s,ion_ifneut_He,k)
+               avg_charge_He = 2d0  !get_ion_info(s,ion_iZ_He,k)
                ! the following is the solution to the equations
                !   avg_charge_He = 2*fracHeIII + 1*fracHeII
                !               1 = fracHeI + fracHeII + fracHeIII
@@ -204,7 +198,6 @@
       end subroutine CE_init
 
       subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
-         use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: rlo_mdot
          integer, intent(out) :: ierr

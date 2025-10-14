@@ -2,9 +2,9 @@
 Using MESA
 **********
 
-MESA is a complex and powerful piece of software.  Using it
+MESA is a complex and powerful piece of software. Using it
 effectively requires becoming familiar with the basics of running the
-code and understanding its output.  Doing good science with MESA
+code and understanding its output. Doing good science with MESA
 requires carefully constructing your input files (and possible code
 modifications) and following a set of best practices throughout the
 lifecycle of your project.

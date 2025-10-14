@@ -3,7 +3,7 @@
           @skip (Mzon/50) -- standard
 --          @skip (Mzon/45) -- for Mzon=45
           ;
-Character*80 Opafile;
+Character*80 :: Opafile;
 -- Common/opabs100/opacabs100(Nfreq); -- bad if here; now in argument for subr. 'opacity"
 -- real*4 hptabab,hptabsc,hpsavsc; -- new!
 real*4 hptabab,hptababron,hptabsc,hpsavsc; -- new!

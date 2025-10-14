@@ -5,15 +5,15 @@ paper 2: https://arxiv.org/abs/2107.04434
 
 
 Update:
-Chabrier & Debras (2021), Paper 1, provided an update to the 
-H EOS table which is intended only for use in blended tables 
-(via cms_mixing below). They still recommend use of the 
-original CMS 2019 H EOS, Paper 2, table when using a pure 
-H EOS but when blending the new table should be used. The 
-program cms_mixing has been slightly modified and the 
-build_data script revamped to make this change.  The original
-data directory DirEOS2019 has also been replaced with 
-DirEOS2021. 
+Chabrier & Debras (2021), Paper 1, provided an update to the
+H EOS table which is intended only for use in blended tables
+(via cms_mixing below). They still recommend use of the
+original CMS 2019 H EOS, Paper 2, table when using a pure
+H EOS but when blending the new table should be used. The
+program cms_mixing has been slightly modified and the
+build_data script revamped to make this change. The original
+data directory DirEOS2019 has also been replaced with
+DirEOS2021.
 
 Original:
 Notes on adapting the Chabrier et al. (2019) EOS tables to MESA.
@@ -23,8 +23,8 @@ The original data release is in the tarball "DirEOS2019.tar.gz".
 
 There are two parts to building MESA tables with CMS:
 
-1. cms_mixing does the entropy of mixing calculation, blending 
-   pure-H and pure-He tables into composite tables. It also 
+1. cms_mixing does the entropy of mixing calculation, blending
+   pure-H and pure-He tables into composite tables. It also
    converts the original units of CMS (MJ, kg, etc.) to cgs.
    The entropy of mixing calculation needs to be done on PT
    tables.
@@ -37,4 +37,3 @@ There are two parts to building MESA tables with CMS:
 Some things are not provided by CMS: mu, mu_e (ln_free_e), eta.
 
 To re-run the tables, use the build_data script.
-

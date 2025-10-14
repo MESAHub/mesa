@@ -44,7 +44,6 @@
 / ! end of star_job namelist
 
 &eos
-use_Skye = .false.
 / ! end of eos namelist
 
 &kap
@@ -130,7 +129,7 @@ use_Skye = .false.
       overshoot_f0(1) = 0.005
 
       min_overshoot_q = 0d0
-      overshoot_D_min = 100.0
+      overshoot_D_min = 1d-2
 
       use_other_alpha_mlt = .true. ! implemented in run_star_extras
       x_ctrl(21) = 3.0 ! alpha_H
@@ -322,7 +321,7 @@ use_Skye = .false.
 
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
 !pgstar_interval = 1
 

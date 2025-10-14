@@ -2,21 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -160,7 +157,7 @@
          ! high T
          delta_lgRho_cntr_hard_limit = s% delta_lgRho_cntr_hard_limit
          ! we also store dt_div_min_dr_div_cs_limit, we keep it at a
-         ! high value until the onset of a pulse to prevent unnecesarily
+         ! high value until the onset of a pulse to prevent unnecessarily
          ! small timesteps before a pulsation
          dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
 
@@ -169,13 +166,13 @@
       subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
          use star_def
          integer, intent(in) :: id
-         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z ! surface values (cgs)
+         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z  ! surface values (cgs)
          ! NOTE: surface is outermost cell. not necessarily at photosphere.
          ! NOTE: don't assume that vars are set at this point.
          ! so if you want values other than those given as args,
          ! you should use values from s% xh(:,:) and s% xa(:,:) only.
          ! rather than things like s% Teff or s% lnT(:) which have not been set yet.
-         real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+         real(dp), intent(out) :: w  ! wind in units of Msun/year (value is >= 0)
          integer, intent(out) :: ierr
 
          integer :: h1, he4
@@ -250,9 +247,9 @@
                end if
             end if
 
-            if (alfa > 0) then ! eval hot side wind (eqn 24)
-               vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
+            if (alfa > 0) then  ! eval hot side wind (eqn 24)
+               vinf_div_vesc = 2.6d0  ! this is the hot side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.697d0 &
                   + 2.194d0*log10(L1/Lsun/1d5) &
@@ -266,9 +263,9 @@
                w1 = 0
             end if
 
-            if (alfa < 1) then ! eval cool side wind (eqn 25)
-               vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
+            if (alfa < 1) then  ! eval cool side wind (eqn 25)
+               vinf_div_vesc = 1.3d0  ! this is the cool side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.688d0 &
                   + 2.210d0*log10(L1/Lsun/1d5) &
@@ -336,9 +333,9 @@
          use num_lib
          integer, intent(in) :: id
          integer, intent(in) :: nz
-         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
-         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:) ! (nz)
-         real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
+         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)  ! (nz)
+         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)  ! (nz)
+         real(dp), intent(inout) :: r_polar(:), r_equatorial(:)  ! (nz)
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 
@@ -391,11 +388,11 @@
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
             do j=1, s% nz
-               if (s% q(j) > 0.999) then
+               if (s% q(j) > 0.999d0) then
                   fp(j) = 1d0
                   ft(j) = 1d0
-               else if (s% q(j) > 0.998) then
-                  alpha = (1d0-(s% q(j)-0.998)/(0.001))
+               else if (s% q(j) > 0.998d0) then
+                  alpha = (1d0-(s% q(j)-0.998d0)/(0.001d0))
                   fp(j) = fp(j)*alpha + 1d0*(1-alpha)
                   ft(j) = ft(j)*alpha + 1d0*(1-alpha)
                end if
@@ -416,20 +413,20 @@
          use kap_lib
 
          ! INPUT
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell
-         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: id  ! star id if available; 0 otherwise
+         integer, intent(in) :: k  ! cell number or 0 if not for a particular cell
+         integer, intent(in) :: handle  ! from alloc_kap_handle
          integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: log10_rho ! density
-         real(dp), intent(in) :: log10_T ! temperature
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: log10_rho  ! density
+         real(dp), intent(in) :: log10_T  ! temperature
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
          real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
@@ -437,11 +434,11 @@
 
          ! OUTPUT
          real(dp), intent(out) :: kap_fracs(num_kap_fracs)
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: kap  ! opacity
+         real(dp), intent(out) :: dln_kap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
-         real(dp), intent(out) :: dln_kap_dxa(:) ! partial derivative w.r.t. to species
-         integer, intent(out) :: ierr ! 0 means AOK.
+         real(dp), intent(out) :: dln_kap_dxa(:)  ! partial derivative w.r.t. to species
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          type (star_info), pointer :: s
          real(dp) :: velocity
@@ -459,7 +456,7 @@
 
          !if (k==1 .and. s% u_flag .and. .not. is_nan(s% lnR_start(1))) then !very surface cell can go mad, things are more stable if we fix opacity
          !   if (s% xh_start(s% i_u,1)>sqrt(2*s% cgrav(1)*s% m(1)/exp(s% lnR_start(1)))) then
-         if (k==1 .and. s% u_flag) then !very surface cell can go mad, things are more stable if we fix opacity
+         if (k==1 .and. s% u_flag) then  !very surface cell can go mad, things are more stable if we fix opacity
             ! this is to support restarts, as xh_start and r_start are
             ! not properly set when model loads
             if (s% solver_iter > 0) then
@@ -520,7 +517,7 @@
             ! to avoid showing pgstar stuff during initial model creation
             s% pg% pgstar_interval = 100000000
             s% pg% Grid2_file_interval = 100000000
-         else ! it is a restart
+         else  ! it is a restart
             if (s% lxtra(lx_hydro_on)) then
                call star_read_controls(id, 'inlist_hydro_on', ierr)
                if (dbg) write(*,*) "check ierr", ierr
@@ -618,22 +615,22 @@
          names(h_relax_count) = "relax_count"
          vals(h_relax_count) = s% ixtra(ix_num_relaxations)
 
-         names(h_log_R_098) = "log_R_098" ! Radius of 98% of the mass of the star
-         names(h_log_R_095) = "log_R_095" ! of 95%
-         names(h_log_R_090) = "log_R_090" ! and 90%
+         names(h_log_R_098) = "log_R_098"  ! Radius of 98% of the mass of the star
+         names(h_log_R_095) = "log_R_095"  ! of 95%
+         names(h_log_R_090) = "log_R_090"  ! and 90%
          names(h_helium_core_mass) = "helium_core_mass"
          names(h_co_core_mass) = "co_core_mass"
-         names(h_log_R_100) = "log_R_100" ! Radius of outermost layer
-         names(h_log_R_vesc) = "log_R_vesc" ! Radius of layers just below the escape velocity
-         names(h_log_R_vesc_098) = "log_R_vesc_098" ! Radius of 98% of the mass just below the esc. vel.
-         names(h_log_R_vesc_095) = "log_R_vesc_095" ! of 95%
-         names(h_log_R_vesc_090) = "log_R_vesc_090" ! and 90%
-         names(h_M_below_vesc) = "M_below_vesc" ! Mass of layers below vesc
-         names(h_u_flag) = "u_flag" ! 1 if hydro is on
-         names(h_U_ejecta) = "U_ejecta" ! internal energy of layers above vesc
-         names(h_T_ejecta) = "T_ejecta" ! kinetic energy of layers above vesc
-         names(h_Omega_ejecta) = "Omega_ejecta" ! gravitational energy of layers above vesc
-         names(h_gamma_integral) = "gamma_integral" ! integral of gamma1-4/3 in bound layers
+         names(h_log_R_100) = "log_R_100"  ! Radius of outermost layer
+         names(h_log_R_vesc) = "log_R_vesc"  ! Radius of layers just below the escape velocity
+         names(h_log_R_vesc_098) = "log_R_vesc_098"  ! Radius of 98% of the mass just below the esc. vel.
+         names(h_log_R_vesc_095) = "log_R_vesc_095"  ! of 95%
+         names(h_log_R_vesc_090) = "log_R_vesc_090"  ! and 90%
+         names(h_M_below_vesc) = "M_below_vesc"  ! Mass of layers below vesc
+         names(h_u_flag) = "u_flag"  ! 1 if hydro is on
+         names(h_U_ejecta) = "U_ejecta"  ! internal energy of layers above vesc
+         names(h_T_ejecta) = "T_ejecta"  ! kinetic energy of layers above vesc
+         names(h_Omega_ejecta) = "Omega_ejecta"  ! gravitational energy of layers above vesc
+         names(h_gamma_integral) = "gamma_integral"  ! integral of gamma1-4/3 in bound layers
          names(h_max_velocity) = "max_velocity"
          names(h_min_velocity) = "min_velocity"
          names(h_yr_since_coll) = "yr_since_coll"
@@ -838,7 +835,7 @@
          if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
             lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
             if (lburn_div_lsurf > 0d0) then
-               if((abs(log10(lburn_div_lsurf))) < 0.01 .and. &
+               if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
@@ -870,7 +867,7 @@
             s% pg% Grid2_file_interval = pgstar_file_interval
          end if
          just_did_relax = .false.
-         if (s% u_flag) then ! get point where v<vesc
+         if (s% u_flag) then  ! get point where v<vesc
             do k = s% nz-1, 1, -1
                v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
                if (s% u(k) > v_esc) then
@@ -904,7 +901,7 @@
             ! adjust location of boundary to remove by considering also
             ! material below the escape velocity that has a positive net
             ! total specific energy.
-            if (energy_removed_layers > 0d0) then ! possible to eject material
+            if (energy_removed_layers > 0d0) then  ! possible to eject material
                if(mod(s%model_number, s%terminal_interval) == 0) then
                   write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
                end if
@@ -968,13 +965,13 @@
                write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
                write(*,*) 'check time left', &
                   s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
-               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
+               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1d5
                write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
                write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
                write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
                write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
                write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
-               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1d5)
             end if
             ! If enough time has passed after a pulse, then turn off Riemann hydro
             ! also, wait for the inner q_for_relax_check of what would remain of the star to be below a threshold
@@ -1154,7 +1151,7 @@
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
 
-            call star_set_v_flag(id, .false., ierr)!TODO store v
+            call star_set_v_flag(id, .false., ierr)  !TODO store v
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
 
@@ -1201,7 +1198,7 @@
                tdyn = 1d0/sqrt(s% m(k)/(4d0/3d0*pi*pow3(s% r(k)))*standard_cgrav)
                s% xtra(x_time_start_pulse) = s% time
                s% xtra(x_dyn_time) = tdyn
-               write(*,*) "reached high velocities", maxval(abs(s% xh(s% i_u, k0:s% nz)))/1e5, &
+               write(*,*) "reached high velocities", maxval(abs(s% xh(s% i_u, k0:s% nz)))/1d5, &
                   "stopping in at least", num_dyn_ts_for_relax*tdyn, "seconds"
             end if
          end if
@@ -1230,7 +1227,7 @@
          use star_def
          integer, intent(in) :: id
          real(dp), intent(in) :: dt
-         integer, intent(out) :: res ! keep_going, redo, retry, terminate
+         integer, intent(out) :: res  ! keep_going, redo, retry, terminate
          real(dp) :: power_photo, v_esc
          integer :: ierr, k
          type (star_info), pointer :: s
@@ -1303,7 +1300,7 @@
             s% use_other_wind = .true.
          end if
 
-         if (maxval(s% T(1:s% nz)) > 9.8) then
+         if (maxval(s% T(1:s% nz)) > 9.8d0) then
             s% delta_lgRho_cntr_hard_limit = -1d0
          else
             s% delta_lgRho_cntr_hard_limit = delta_lgRho_cntr_hard_limit

@@ -2,27 +2,20 @@
 !
 !   Copyright (C) 2014-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module adjust_net
 
@@ -30,8 +23,10 @@
 
       implicit none
 
-      contains
+      private
+      public :: check_adjust_net
 
+      contains
 
       subroutine check_adjust_net(s, species, &
             min_x_for_keep, min_x_for_n, min_x_for_add, &
@@ -75,13 +70,13 @@
          call include_iso(6,7)   ! c13
          call include_iso(7,7)   ! n14
          call include_iso(8,8)   ! o16
-         call include_iso(10,10) ! ne20
-         call include_iso(10,12) ! ne22
-         call include_iso(12,12) ! mg24
-         call include_iso(12,14) ! mg26
-         call include_iso(14,14) ! si28
-         call include_iso(16,16) ! s32
-         call include_iso(26,30) ! fe56
+         call include_iso(10,10)  ! ne20
+         call include_iso(10,12)  ! ne22
+         call include_iso(12,12)  ! mg24
+         call include_iso(12,14)  ! mg26
+         call include_iso(14,14)  ! si28
+         call include_iso(16,16)  ! s32
+         call include_iso(26,30)  ! fe56
 
          do j=1,species
             max_x = maxval(s% xa(j,1:nz))
@@ -102,24 +97,24 @@
                   call include_iso(Z-1,N)   ! (g,p)
                end if
                if (Z+2 <= max_Z_for_add .and. N+2 <= max_N_for_add .and. A+4 <= max_A_for_add) then
-                  call include_iso(Z+2,N+2) ! (a,g)
-                  call include_iso(Z-2,N-2) ! (g,a)
+                  call include_iso(Z+2,N+2)  ! (a,g)
+                  call include_iso(Z-2,N-2)  ! (g,a)
                end if
                if (Z+2 <= max_Z_for_add .and. N+1 <= max_N_for_add .and. A+3 <= max_A_for_add) then
-                  call include_iso(Z+2,N+1) ! (a,n)
-                  call include_iso(Z-2,N-1) ! (n,a)
+                  call include_iso(Z+2,N+1)  ! (a,n)
+                  call include_iso(Z-2,N-1)  ! (n,a)
                end if
                if (Z+1 <= max_Z_for_add .and. N+2 <= max_N_for_add .and. A+3 <= max_A_for_add) then
-                  call include_iso(Z+1,N+2) ! (a,p)
-                  call include_iso(Z-1,N-2) ! (p,a)
+                  call include_iso(Z+1,N+2)  ! (a,p)
+                  call include_iso(Z-1,N-2)  ! (p,a)
                end if
                if (Z+1 <= max_Z_for_add .and. N+1 <= max_N_for_add .and. A+2 <= max_A_for_add) then
-                  call include_iso(Z+1,N-1) ! (p,n)
-                  call include_iso(Z-1,N+1) ! (n,p)
+                  call include_iso(Z+1,N-1)  ! (p,n)
+                  call include_iso(Z-1,N+1)  ! (n,p)
                end if
                if (Z+4 <= max_Z_for_add .and. N+4 <= max_N_for_add .and. A+8 <= max_A_for_add) then
-                  call include_iso(Z+4,N+4) ! (2a,g) ! extend alpha chain by 2
-                  call include_iso(Z+3,N+4) ! (2a,p) ! extend alpha chain by 2
+                  call include_iso(Z+4,N+4)  ! (2a,g) ! extend alpha chain by 2
+                  call include_iso(Z+3,N+4)  ! (2a,p) ! extend alpha chain by 2
                end if
             end if
          end do
@@ -239,9 +234,7 @@
          s% revised_net_name = s% net_name
          s% need_to_setvars = .true.
 
-
          contains
-
 
          subroutine include_iso(Z,N)
             integer, intent(in) :: Z,N
@@ -251,21 +244,6 @@
             if (N > max_N(Z)) max_N(Z) = N
          end subroutine include_iso
 
-
       end subroutine check_adjust_net
 
-
-
       end module adjust_net
-
-
-
-
-
-
-
-
-
-
-
-

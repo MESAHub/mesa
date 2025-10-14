@@ -14,7 +14,7 @@
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-      
+
       !pgstar_flag = .true.
 
 / !end of star_job
@@ -60,7 +60,7 @@
 
 	! knobs
 	T_mix_limit = 0
-      
+
 
 	! output to files and terminal
 	photo_interval = 50
@@ -74,12 +74,11 @@
 
 
 &pgstar
-         
+
       ! top level controls
 
-         !pause = .true. 
+         !pause_flag = .true.
             ! if true, the code waits for user to enter a RETURN on the command line
-      
 
 
 / ! end of pgstar namelist

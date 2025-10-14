@@ -1,5 +1,5 @@
 ! inlist_remove_envelope
- 
+
 &star_job
 
       load_saved_model = .true.
@@ -60,10 +60,9 @@
       trace_history_value_name(6) = 'log_rel_run_E_err'
 
       photo_interval = 10 ! want 2 or more photos in this phase for testing restart
-      
+
 
 / ! end of controls namelist
-
 
 
 &pgstar

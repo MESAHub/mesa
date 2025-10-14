@@ -8,13 +8,13 @@ Output files
 
 
 By default, MESA stores its data in the `LOGS` directory. The data files
-are text-based and can fed into your favorite plotting program. You
+are text-based and can be fed into your favorite plotting program. You
 should visit the
-`Add-ons <http://cococubed.com/mesa_market/add-ons.html>`__ section
+`Add-ons <https://mesastar.org/marketplace/add-ons/>`__ section
 of the MESA forum and see if someone has contributed code in your
 language of choice. (There are reasonably mature routines for Python,
 IDL, ruby and Mathematica.) An example of Python plotting is shown
-`later on this page <#python>`__.
+`later on this page <#plotting-mesa-output>`__.
 
 In the LOGS directory, you'll find the following files.
 
@@ -69,7 +69,7 @@ Selecting output quantities
 
 The default MESA output is set by the files
 
-::
+.. code:: console
 
    $MESA_DIR/star/defaults/history_columns.list
    $MESA_DIR/star/defaults/profile_columns.list
@@ -77,7 +77,7 @@ The default MESA output is set by the files
 In order to customize the output, copy these files to your work
 directory
 
-::
+.. code:: console
 
    cp $MESA_DIR/star/defaults/history_columns.list .
    cp $MESA_DIR/star/defaults/profile_columns.list .
@@ -103,7 +103,7 @@ the `numpy <http://www.numpy.org>`__ and
 
 While you may want to write your own tools to read and analyze the
 output of your MESA calculations, `many already
-exist <http://cococubed.com/mesa_market/add-ons.html>`__. In that
+exist <https://mesastar.org/marketplace/add-ons/>`__. In that
 vein, we introduce a simple module for use in Python scripts and
 interactive sessions called ``mesa_reader``, which only requires
 `numpy <http://www.numpy.org>`__.
@@ -116,18 +116,18 @@ to read in the contents of a typical ``LOGS`` directory. These three
 classes are called ``MesaData``, which corresponds to data in profiles
 or history files, ``MesaProfileIndex``, which corresponds to data found
 in ``profiles.index``, and ``MesaLogDir``, which ties together data in
-profiles, the profile index, and the history file. 
+profiles, the profile index, and the history file.
 Full documentation for how MESA Reader is installed and how to use the
 three classes can be found at the project's `GitHub
 repository <https://github.com/wmwolf/py_mesa_reader>`__ and
 accompanying
-`documentation <https://wmwolf.github.io/py_mesa_reader>`__. 
+`documentation <https://wmwolf.github.io/py_mesa_reader>`__.
 
 How to install MESA Reader?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The most stable release of `mesa_reader` can be installed
-through 
+through
 `pip <https://pip.pypa.io/en/stable>`__
 via
 
@@ -176,7 +176,7 @@ the same thing if we know the exact file we want to load:
 
 But often it's frustrating to know exactly what profile file you want to
 load, so we can use the ``MesaLogDir`` class to simplify the process. It
-lets us load profiles by their associated model number and most simply
+lets us load profiles by their associated model number, or most simply
 by just loading the last saved profile:
 
 .. code:: python

@@ -1,22 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2011  Bill Paxton
+!   Copyright (C) 2011  Bill Paxton & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -64,7 +61,7 @@
       end subroutine extras_controls
 
 
-      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
+      subroutine set_constraint_value(id, name, val, ierr)  ! called from star_astero code
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
          real(dp), intent(out) :: val
@@ -92,10 +89,10 @@
       end subroutine set_constraint_value
 
 
-      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+      subroutine set_param(id, name, val, ierr)  ! called from star_astero code
          !use astero_search_data, only: vary_param1
          integer, intent(in) :: id
-         character(len=strlen), intent(in) :: name ! which of param's will be set
+         character(len=strlen), intent(in) :: name  ! which of param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -203,7 +200,9 @@
          okay = check_okay('a3', x0, target_a3, perfect_tol) .and. okay
 
          do l = 0, 3
-            test_freq(l,1:nl(l)) = model_freq(l,1:nl(l)) + (target_b1*powm1(model_freq(l,1:nl(l)))+target_b3*pow3(model_freq(l,1:nl(l))))/model_inertia(l,1:nl(l))
+            test_freq(l,1:nl(l)) = model_freq(l,1:nl(l)) &
+                                 + (target_b1*powm1(model_freq(l,1:nl(l)))+target_b3*pow3(model_freq(l,1:nl(l)))) &
+                                   / model_inertia(l,1:nl(l))
          end do
 
          call astero_get_combined_all_freq_corr(x0, x1, .false., &
@@ -217,7 +216,9 @@
 
          do l = 1, 3
             do i = 1, nl(l)
-               test_freq(l,i) = model_freq(l,i) + target_p0*pow(model_freq(l,i)/nu_max, target_p1)*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
+               test_freq(l,i) = model_freq(l,i) &
+                              + target_p0*pow(model_freq(l,i)/nu_max, target_p1) &
+                               * astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
             end do
          end do
 
@@ -232,7 +233,9 @@
 
          do l = 1, 3
             do i = 1, nl(l)
-               test_freq(l,i) = model_freq(l,i) + target_s0*nu_max*(1d0-1d0/(1d0+pow(model_freq(l,i)/nu_max, target_s1)))*astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
+               test_freq(l,i) = model_freq(l,i) &
+                              + target_s0*nu_max*(1d0-1d0/(1d0+pow(model_freq(l,i)/nu_max, target_s1))) &
+                               * astero_interpolate_l0_inertia(model_freq(l,i))/model_inertia(l,i)
             end do
          end do
 
@@ -346,7 +349,7 @@
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depending on which
-         ! condition was triggered.  MESA provides 9 customizeable
+         ! condition was triggered.  MESA provides 9 customizable
          ! termination codes, named t_xtra1 .. t_xtra9.  You can
          ! customize the messages that will be printed upon exit by
          ! setting the corresponding termination_code_str value.
@@ -417,7 +420,6 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-
 
 
       end module run_star_extras

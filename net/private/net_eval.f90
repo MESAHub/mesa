@@ -2,30 +2,24 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module net_eval
 
-      use const_def
+      use const_def, only: dp, i8, Qconv, arg_not_provided
       use math_lib
       use chem_def
       use chem_lib, only: get_mass_excess
@@ -34,9 +28,7 @@
 
       implicit none
 
-
       contains
-
 
       subroutine eval_net( &
             n, g, rates_only, just_dxdt, &
@@ -70,14 +62,14 @@
          real(dp), intent(in)  :: rho, logrho
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
-         real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
+         real(dp), intent(in)  :: z2bar  ! mean charge squared per nucleus
          real(dp), intent(in)  :: ye
-         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho ! eta and derivatives
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho  ! eta and derivatives
          real(dp), intent(in) :: rate_factors(:)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         real(dp), intent(out) :: eps_nuc ! ergs/gram/second from burning
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
+         real(dp), intent(out) :: eps_nuc  ! ergs/gram/second from burning
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(inout) :: d_eps_nuc_dx(:)
@@ -88,8 +80,8 @@
          real(dp), intent(inout) :: eps_nuc_categories(:)
          real(dp), intent(out) :: eps_neu_total
          integer, intent(in) :: screening_mode
-         real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null
-         logical, pointer :: from_weaklib(:) ! ignore if null
+         real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs  ! ignore if null
+         logical, pointer :: from_weaklib(:)  ! ignore if null
          logical, intent(in) :: symbolic
          integer, intent(out) :: ierr
 
@@ -98,7 +90,7 @@
          real(dp) :: eps_total, Ys, sum_dxdt, compare, Z_plus_N
          real(qp) :: eps_nuc_MeV(num_rvs)
          integer :: ci, i, j, ir, weak_id, h1, iwork
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
          logical :: doing_timing
 
          logical, parameter :: dbg = .false.
@@ -151,7 +143,7 @@
          n% d_eta_dlnRho = d_eta_dlnRho
          n% rate_factors = rate_factors
 
-         if (n% logT < rattab_tlo) then ! clip to table so can eval beta decays
+         if (n% logT < rattab_tlo) then  ! clip to table so can eval beta decays
             n% logT = rattab_tlo
             n% temp = rattab_temp_lo
          end if
@@ -273,7 +265,7 @@
 
          ! convert the eps_nuc_categories
          do i=1,num_categories
-            n% eps_nuc_categories(i) = Qconv*n% eps_nuc_categories(i)
+            n% eps_nuc_categories(i) = Qconv * n% eps_nuc_categories(i)
          end do
 
          ! store the results
@@ -318,7 +310,7 @@
                                     dxdt, d_dxdt_dT, d_dxdt_dRho, d_dxdt_dx,&
                                     eps_nuc_categories)
          type(net_info) :: n
-         real(dp), intent(out) :: eps_nuc ! ergs/gram/second from burning
+         real(dp), intent(out) :: eps_nuc  ! ergs/gram/second from burning
          real(dp), intent(out) :: d_eps_nuc_dT
          real(dp), intent(out) :: d_eps_nuc_dRho
          real(dp), intent(out) :: d_eps_nuc_dx(:)
@@ -512,7 +504,7 @@
             n% reaction_Qs(irfe54prot_to_ni56), &
             n% reaction_Qs(irhe4_breakup), &
             n% reaction_Qs(irhe4_rebuild), &
-            eps_total, eps_neu_total, & ! Dont use n% here as we call this for both eps_neu and eps_neu_dt and drho
+            eps_total, eps_neu_total, &  ! Dont use n% here as we call this for both eps_neu and eps_neu_dt and drho
             do_eps_nuc_categories, n% eps_nuc_categories, &
             .false., plus_co56, ierr)
 
@@ -594,7 +586,7 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: dbg=.false.
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          integer :: i, num, num_reactions
          real(dp) :: f
@@ -693,7 +685,7 @@
 
          integer, intent(out) :: ierr
          integer :: i, j, id, ir
-         integer(8) :: time0, time1
+         integer(i8) :: time0, time1
 
          include 'formats'
 
@@ -736,7 +728,6 @@
          end if
 
       end subroutine get_weaklib_rates
-
 
 
       subroutine get_T_limit_factor( &
@@ -786,12 +777,10 @@
                call mesa_error(__FILE__,__LINE__,'set_molar_abundances')
             end if
             n% y(i) = min(1d0, max(n% x(i), 0d0)) / chem_isos% Z_plus_N(ci)
-         enddo
-
+         end do
 
 
          return      ! let it go even with bad xsum.
-
 
 
 
@@ -811,7 +800,7 @@
 
       subroutine do_clean_up_fractions(nzlo, nzhi, species, nz, xa, max_sum_abs, xsum_tol, ierr)
          integer, intent(in) :: nzlo, nzhi, species, nz
-         real(dp), intent(inout) :: xa(:,:) ! (species, nz)
+         real(dp), intent(inout) :: xa(:,:)  ! (species, nz)
          real(dp), intent(in) :: max_sum_abs, xsum_tol
          integer, intent(out) :: ierr
          integer :: k, op_err
@@ -833,14 +822,14 @@
       subroutine do_clean1(species, xa, k, max_sum_abs, xsum_tol, ierr)
          use utils_lib
          integer, intent(in) :: species, k
-         real(dp), intent(inout) :: xa(:) ! (species)
+         real(dp), intent(inout) :: xa(:)  ! (species)
          real(dp), intent(in) :: max_sum_abs, xsum_tol
          integer, intent(out) :: ierr
          integer :: j
          real(dp) :: xsum
          real(dp), parameter :: tiny_x = 1d-99
          character (len=256) :: message
-         if (max_sum_abs > 1) then ! check for crazy values
+         if (max_sum_abs > 1) then  ! check for crazy values
             xsum = sum(abs(xa(1: species)))
             if (is_bad(xsum) .or. xsum > max_sum_abs) then
                ierr = -1
@@ -860,6 +849,4 @@
          xa(1: species) = xa(1: species)/xsum
       end subroutine do_clean1
 
-
       end module net_eval
-

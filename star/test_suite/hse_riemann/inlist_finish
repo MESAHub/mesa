@@ -117,7 +117,7 @@
 
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
          
          !show_HR_Mira_instability_region = .true.
          HR_logT_min = 4.3
@@ -133,7 +133,7 @@
          HR_target_logT_sigma = 0.01  
 
 
-!pause = .true.
+!pause_flag = .true.
 
       Grid1_win_flag = .true.
          Grid1_win_width = 9

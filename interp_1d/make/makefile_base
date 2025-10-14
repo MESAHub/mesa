@@ -13,26 +13,26 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   interp_1d_misc.f90 \
-   interp_1d_pm.f90 \
-   interp_1d_pm_autodiff.f90 \
-   interp_1d_mp.f90 \
-   interp_1d_mp_autodiff.f90\
-   interp_1d_misc_sg.f90 \
-   interp_1d_pm_sg.f90 \
-   interp_1d_mp_sg.f90 \
-   interp_1d_lib.f90 \
-   interp_1d_lib_sg.f90 \
-   interp_1d_def.f90
+  interp_1d_misc.f90 \
+  interp_1d_pm.f90 \
+  interp_1d_pm_autodiff.f90 \
+  interp_1d_mp.f90 \
+  interp_1d_mp_autodiff.f90\
+  interp_1d_misc_sg.f90 \
+  interp_1d_pm_sg.f90 \
+  interp_1d_mp_sg.f90 \
+  interp_1d_lib.f90 \
+  interp_1d_lib_sg.f90 \
+  interp_1d_def.f90
 
 #################################################################
 #
 # LIBRARIES
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = auto_diff $(LIBS_MATRIX)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) -lauto_diff $(LOAD_MATRIX)
+  LIBS_OTHER = auto_diff $(LIBS_MATRIX)
+  DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+  LOAD_OTHER = -L$(MESA_LIB_DIR) -lauto_diff $(LOAD_MATRIX)
 endif
 
 #################################################################

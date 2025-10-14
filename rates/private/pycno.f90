@@ -2,32 +2,23 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
-
-
-
       module pycno
+
       use rates_def
       use utils_lib
       use const_def, only: dp
@@ -35,18 +26,16 @@
 
       implicit none
 
-
       contains
 
       subroutine FL_epsnuc_3alf(T, Rho, Y, UE, r, drdT, drdRho)
-         real(dp), intent(in) :: T ! temperature
-         real(dp), intent(in) :: Rho ! density
-         real(dp), intent(in) :: Y ! helium mass fraction
-         real(dp), intent(in) :: UE ! electron molecular weight
-         real(dp), intent(out) :: r ! rate in ergs/g/sec
-         real(dp), intent(out) :: drdT ! partial wrt temperature
-         real(dp), intent(out) :: drdRho ! partial wrt density
-
+         real(dp), intent(in) :: T  ! temperature
+         real(dp), intent(in) :: Rho  ! density
+         real(dp), intent(in) :: Y  ! helium mass fraction
+         real(dp), intent(in) :: UE  ! electron molecular weight
+         real(dp), intent(out) :: r  ! rate in ergs/g/sec
+         real(dp), intent(out) :: drdT  ! partial wrt temperature
+         real(dp), intent(out) :: drdRho  ! partial wrt density
 
          real(dp) :: T6, R6, R6T, R6T13, R6T16, T62, T612, T623, T653, T632, T613, U, AF
          real(dp) :: G1, dG1dRho, dG1dT, G2, dG2dRho, dG2dT
@@ -114,7 +103,7 @@
          U32 = U*sqrt(U)
          U52 = U*U32
 
-         if (U < 1) then ! strong screening regime, eqn 4.8a in F&L
+         if (U < 1) then  ! strong screening regime, eqn 4.8a in F&L
 
             A1 = pow2(1d0-4.222D-2*T623) + 2.643D-5*T653
             dA1dT = -2d0*4.222d-2*dT623dT*(1d0 - 4.222D-2*T623) + 2.643D-5*dT653dT
@@ -152,7 +141,7 @@
                B1=B1+F1
                dB1dT = dB1dT + dF1dT
 
-            endif
+            end if
 
             if (1.836D4 > R6T) then
 
@@ -165,7 +154,7 @@
                B2=B2+F2
                dB2dT = dB2dT + dF2dT
 
-            endif
+            end if
 
             G1=B1*exp(60.492D0*R6T13/T6)
             dG1dT = G1*(dB1dT/B1 - 60.492D0*R6T13*dT6dT/(T6*T6))
@@ -175,7 +164,7 @@
             dG2dT = G2*(dB2dT/B2 - 106.35D0*R6T13*dT6dT/(T6*T6))
             dG2dRho=0
 
-         else ! pycnonuclear regime, eqn 4.8b in F&L
+         else  ! pycnonuclear regime, eqn 4.8b in F&L
 
             AF=1d0/U32 + 1d0
             dAFdT = -1.5d0 * dUdT/U52
@@ -220,7 +209,7 @@
 
                G1=B1; dG1dRho = dB1dRho; dG1dT = dB1dT
 
-            endif
+            end if
 
             if (1.836D4 > R6T) then
 
@@ -243,11 +232,11 @@
 
                G2=B2; dG2dRho = dB2dRho; dG2dT = dB2dT
 
-            endif
+            end if
 
-         endif
+         end if
 
-         r=5.120D29*G1*G2*Y*Y*Y*R6*R6 ! ergs/g/sec, eqn 4.7 in F&L
+         r=5.120D29*G1*G2*Y*Y*Y*R6*R6  ! ergs/g/sec, eqn 4.7 in F&L
 
          if (r < 1d-99 .or. G1 < 1d-99 .or. G2 < 1d-99) then
             drdT = 0
@@ -316,9 +305,4 @@
 
       end subroutine FL_epsnuc_3alf
 
-
       end module pycno
-
-
-
-

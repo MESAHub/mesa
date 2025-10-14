@@ -1,151 +1,141 @@
-      module test_integrate
+module test_integrate
 
-         use math_lib
-         use num_def
-         use num_lib
-         use const_def
+   use math_lib
+   use num_def
+   use num_lib
+   use const_def
 
-         implicit none
+   implicit none
 
-         contains
+contains
 
-         subroutine run_test_integrate()
+   subroutine run_test_integrate()
 
+      call test_basic()
+      call test_sine()
+      call test_exp()
+      call test_box()
 
-            call test_basic()
-            call test_sine()
-            call test_exp()
-            call test_box()
+   end subroutine run_test_integrate
 
-         end subroutine run_test_integrate
+   subroutine test_basic
+      real(dp), parameter :: xlow = 0, xhigh = 1
+      real(dp), parameter :: expected = 0.5d0
+      real(dp) :: res
+      integer :: ierr
 
+      res = integrate(linear, xlow, xhigh, [1d0], 1d-3, 1d-3, 10, ierr)
 
+      call check_result('linear', expected, res, ierr)
 
-         subroutine test_basic
-            real(dp), parameter :: xlow = 0, xhigh = 1
-            real(dp), parameter :: expected = 0.5d0
-            real(dp) :: res
-            integer :: ierr
+   contains
 
-            res = integrate(linear, xlow, xhigh, (/1d0/), 1d-3, 1d-3, 10, ierr)
+      real(dp) function linear(x, args, ierr)
+         real(dp), intent(in) :: x
+         real(dp), intent(in) :: args(:)
+         integer, intent(inout) :: ierr
 
-            call check_result('linear', expected, res, ierr)
+         ierr = 0
+         linear = x
 
-            contains
+      end function linear
 
+   end subroutine test_basic
 
-            real(dp) function linear(x, args, ierr)
-               real(dp), intent(in) :: x
-               real(dp), intent(in) :: args(:)
-               integer, intent(inout) :: ierr
+   subroutine test_sine
+      real(dp) :: res
+      integer :: ierr
 
-               ierr = 0
-               linear = x
+      res = integrate(sine, 0d0, pi, [1d0], 1d-8, 1d-8, 10, ierr)
 
-            end function linear
+      call check_result('sine', 2d0, res, ierr)
 
-         end subroutine test_basic
+      res = integrate(sine, 0d0, 2*pi, [1d0], 1d-8, 1d-8, 10, ierr)
 
-         subroutine test_sine
-            real(dp) :: res
-            integer :: ierr
+      call check_result('sine', 0d0, res, ierr)
 
-            res = integrate(sine, 0d0, pi, (/1d0/), 1d-8, 1d-8, 10, ierr)
+   contains
 
-            call check_result('sine', 2d0, res, ierr)
+      real(dp) function sine(x, args, ierr)
+         real(dp), intent(in) :: x
+         real(dp), intent(in) :: args(:)
+         integer, intent(inout) :: ierr
 
-            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8, 1d-8, 10, ierr)
+         ierr = 0
+         sine = sin(x)
 
-            call check_result('sine', 0d0, res, ierr)
+      end function sine
 
-            contains
+   end subroutine test_sine
 
+   subroutine test_exp
+      real(dp) :: res
+      integer :: ierr
 
-            real(dp) function sine(x, args, ierr)
-               real(dp), intent(in) :: x
-               real(dp), intent(in) :: args(:)
-               integer, intent(inout) :: ierr
+      res = integrate(iexp, 0d0, 2d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
-               ierr = 0
-               sine = sin(x)
+      call check_result('exp', exp(2d0) - 1d0, res, ierr)
 
-            end function sine
+      res = integrate(iexp, 0d0, 10d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
-         end subroutine test_sine
+      call check_result('exp', exp(10d0) - 1d0, res, ierr)
 
+   contains
 
-         subroutine test_exp
-            real(dp) :: res
-            integer :: ierr
+      real(dp) function iexp(x, args, ierr)
+         real(dp), intent(in) :: x
+         real(dp), intent(in) :: args(:)
+         integer, intent(inout) :: ierr
 
-            res = integrate(iexp, 0d0, 2d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+         ierr = 0
+         iexp = exp(x)
 
-            call check_result('exp', exp(2d0)-1d0, res, ierr)
+      end function iexp
 
-            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+   end subroutine test_exp
 
-            call check_result('exp', exp(10d0)-1d0, res, ierr)
+   subroutine test_box
+      real(dp) :: res
+      integer :: ierr
 
-            contains
+      res = integrate(box, 0d0, 2d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
+      call check_result('box', 1d0, res, ierr)
 
-            real(dp) function iexp(x, args, ierr)
-               real(dp), intent(in) :: x
-               real(dp), intent(in) :: args(:)
-               integer, intent(inout) :: ierr
+      res = integrate(box, 0.99d0, 1.5d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
-               ierr = 0
-               iexp = exp(x)
+      call check_result('box', 0.5d0, res, ierr)
 
-            end function iexp
+   contains
 
-         end subroutine test_exp
+      real(dp) function box(x, args, ierr)
+         real(dp), intent(in) :: x
+         real(dp), intent(in) :: args(:)
+         integer, intent(inout) :: ierr
 
+         ierr = 0
 
-         subroutine test_box
-            real(dp) :: res
-            integer :: ierr
+         if (x < 1) then
+            box = 0d0
+         else if (x >= 1d0 .and. x <= 2d0) then
+            box = 1d0
+         else
+            box = 0d0
+         end if
 
-            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+      end function box
 
-            call check_result('box', 1d0, res, ierr)
+   end subroutine test_box
 
-            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+   subroutine check_result(name, tgt, val, ierr)
+      character(len=*), intent(in) :: name
+      real(dp), intent(in) :: tgt, val
+      integer, intent(in) :: ierr
 
-            call check_result('box', 0.5d0, res, ierr)
+      write (*, '(a40, 1pd26.16, a7, 1pd26.16, i4)') &
+         'integrate '//trim(name)//' expected', &
+         tgt, 'got', val, ierr
 
-            contains
+   end subroutine check_result
 
-
-            real(dp) function box(x, args, ierr)
-               real(dp), intent(in) :: x
-               real(dp), intent(in) :: args(:)
-               integer, intent(inout) :: ierr
-
-               ierr = 0
-
-               if(x<1) then
-                  box = 0d0
-               else if(x.ge.1d0 .and. x.le.2d0) then
-                  box = 1d0
-               else
-                  box = 0d0
-               end if
-
-            end function box
-
-         end subroutine test_box
-
-
-         subroutine check_result(name, tgt, val, ierr)
-            character(len=*), intent(in) :: name
-            real(dp), intent(in) :: tgt, val
-            integer, intent(in) :: ierr
-
-            write(*, '(a40, 1pd26.16, a7, 1pd26.16, i4)') &
-                 'integrate '// trim(name) // ' expected', &
-                 tgt, 'got', val, ierr
-
-         end subroutine check_result
-
-      end module test_integrate
+end module test_integrate

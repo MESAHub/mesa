@@ -14,17 +14,17 @@ privileges. MESAHub is classified as an educational organization and
 this currently grants us a 100% discount, meaning this costs $0/yr.
 Unsubsidized, it would cost about $1200/yr.
 
-To classify MESAHub as an eduction account requires someone in the MESAHub
-organization to sign up for a eduction plan. This requires that the user has
+To classify MESAHub as an education account requires someone in the MESAHub
+organization to sign up for a education plan. This requires that the user has
 an University ID card with an expiry date (this is important). Steps to get
 access to this:
 
 - Add your university email address to Github.
 - Follow instructions `Apply to Github Global campus <https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-global-campus-for-teachers/apply-to-github-global-campus-as-a-teacher>`__
-- It is set up, if you have access to this https://github.com/community/Global-Campus-Teachers repository
+- It is set up, if you have access to the `Global-Campus-Teachers repository <https://github.com/community/Global-Campus-Teachers>`__
 - Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
-If MESAHub gets unsynced from this and is no longer on the eduction plan:
+If MESAHub gets unsynced from this and is no longer on the education plan:
 
 - Goto `Global campus <https://education.github.com/globalcampus/teacher#>`__
 - Find ``Upgrade your academic organizations``
@@ -36,19 +36,19 @@ This is currently tied to Rob's account.
 mesastar.org
 ------------
 
-This is a long-standing domain name used by MESA. 
+This is a long-standing domain name used by MESA.
 The main website redirects to a landing page hosted on `GitHub Pages <https://mesastar.org>`__
 
 Domain Name
 ^^^^^^^^^^^
 
-Matteo controls the domain name (using domain.com) and handles
+Matteo controls the domain name (using `domain.com <https://domain.com>`__) and handles
 renewing it, updating nameservers, etc.
 
 DNS Servers
 ^^^^^^^^^^^
 
-The mesastar.org domain is configured to use Cloudflare nameservers
+The mesastar.org domain is configured to use `Cloudflare <https://cloudflare.com>`__ nameservers
 and the DNS records are managed by Philip.
 
 Mailing lists
@@ -66,15 +66,15 @@ Marketplace
 ^^^^^^^^^^^
 
 The `MESA marketplace
-<http://cococubed.com/mesa_market/>`__ is controlled and
+<https://mesastar.org/marketplace/>`__ is controlled and
 hosted by Frank at ASU.
 
 
 ReadTheDocs
 -----------
 
-The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__. Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it). This is
+The Sphinx documentation is hosted by `ReadTheDocs <https://readthedocs.org/>`__.
+Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it). This is
 currently free for open source software.
 
 
@@ -82,8 +82,7 @@ Sourceforge
 -----------
 
 The original home of MESA development was sourceforge. Most developers
-involved c. 2015 or earlier have admin privileges. This is a free
-service.
+involved c. 2015 or earlier have admin privileges. This is a free service.
 
 Website
 ^^^^^^^
@@ -91,7 +90,8 @@ Website
 We still use the mesa.sourceforge.net website domain name, but only for a top-level
 redirect to docs.mesastar.org.
 
-The source code for the old sourceforge site lives at https://github.com/MESAHub/mesa-website.
+The source code for the old sourceforge site lives at
+`<https://github.com/MESAHub/mesa-website>`__.
 
 Slack
 -----
@@ -108,9 +108,8 @@ Wolf. It is funded by Frank and Bill W. The Heroku account costs
 around $600/yr, though its cost has been higher during the GitHub
 transition.
 
-The testing `log archive <https://logs.mesastar.org/>`__ lives on a
-server controlled by Josiah. The marginal cost is $1/month, which he
-covers.
+The testing `log archive <https://mesa-logs.flatironinstitute.org/>`__ lives on a
+server at the Flatiron Institute, with Philip Mocz as a point of contact.
 
 Jenkins
 ^^^^^^^
@@ -132,11 +131,11 @@ Community
 ^^^^^^^^^
 
 The `MESA community <https://zenodo.org/communities/mesa/>`__ on Zenodo
-is controlled by Pablo.
+is controlled by Philip.
 
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Pablo.
+* The `record for MESA releases <https://zenodo.org/records/13353788>`__ is controlled by Philip.
+* The records for MESA SDK releases (`macOS <https://zenodo.org/records/13768941>`__, `linux <https://zenodo.org/records/13768913>`__) are controlled by Philip.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
-* The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Pablo.

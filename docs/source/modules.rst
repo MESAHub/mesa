@@ -1,9 +1,9 @@
-********************
-Module documentation
-********************
+*******
+Modules
+*******
 
-This page lists the MESA modules alphabetically by name and briefly
-summarizes their purpose.
+This page lists the MESA modules alphabetically used by ``star`` and ``binary``
+and briefly summarizes their purpose.
 
 Each MESA module has its own directory with the same general
 structure, including a standard set of subdirectories and scripts. The
@@ -35,7 +35,7 @@ evolving the interior model.
 
    MESA treats the atmosphere separately, via these boundary
    conditions, because the physics governing the atmosphere is often
-   quite different than in the interior.
+   quite different from that in the interior.
 
 Historically, MESA decided how :math:`T_{\rm surf}` and :math:`P_{\rm
 surf}` are calculated using the ``which_atm_option`` control. To
@@ -73,6 +73,20 @@ Element data (``chem``)
 The ``chem`` module provides data on the properties of elements and
 isotopes (e.g., atomic masses).  It also defines solar abundance
 patterns as reported in various references.
+
+
+.. _colors:
+
+Colors (``colors``)
+===================
+
+The ``colors`` module calculates synthetic photometry during stellar evolution.
+
+.. toctree::
+    :maxdepth: 1
+
+   colors/overview
+   colors/defaults
 
 
 .. _const:
@@ -120,7 +134,7 @@ conductive opacities.
 Nuclear reaction networks (``net``)
 ===================================
 
-The ``net`` module implements nuclear reaction networks.  
+The ``net`` module implements nuclear reaction networks.
 
 .. toctree::
    :maxdepth: 1
@@ -155,7 +169,7 @@ Turbulence (``turb``)
 =====================
 
 The ``turb`` module provides various mixing theories (semiconvection, thermohaline,
-mixing length theory, time-dependant convection)
+mixing length theory, time-dependent convection)
 
 .. toctree::
    :maxdepth: 1

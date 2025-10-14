@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2017-2019 Josiah Schwab & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 
 module weaklib_tables
 
-  use const_def
+  use const_def, only: dp, ln10
   use math_lib
   use utils_lib, only: mesa_error, is_bad
   use rates_def
@@ -96,10 +90,10 @@ contains
       integer :: j, m, n
 
       integer :: nx       ! length of x vector (>= 2)
-      real(dp), pointer :: x(:) ! (nx)    ! junction points, strictly monotonic
-      real(dp), pointer :: f1(:), f(:,:) ! (4,nx)  ! data & interpolation coefficients
+      real(dp), pointer :: x(:)  ! (nx)    ! junction points, strictly monotonic
+      real(dp), pointer :: f1(:), f(:,:)  ! (4,nx)  ! data & interpolation coefficients
       integer, parameter :: nwork = pm_work_size
-      real(dp), pointer :: work(:) ! =(nx,nwork)
+      real(dp), pointer :: work(:)  ! =(nx,nwork)
 
       ierr = 0
 
@@ -191,7 +185,6 @@ contains
   subroutine interpolate_weaklib_table(table, T9, lYeRho, &
        lambda, dlambda_dlnT, dlambda_dlnRho, &
        Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
-    use const_def, only : dp
     class(weaklib_rate_table), intent(inout) :: table
     real(dp), intent(in) :: T9, lYeRho
     real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
@@ -221,7 +214,7 @@ contains
        call setup_for_bicubic_interpolations
     else
        call setup_for_linear_interp
-    endif
+    end if
 
     if (weak_bicubic) then
 
@@ -272,11 +265,11 @@ contains
 
   contains
 
-    subroutine find_location ! set ix, jy; x is T9; y is lYeRho
+    subroutine find_location  ! set ix, jy; x is T9; y is lYeRho
       integer :: i, j
       include 'formats'
       ! x0 <= T9 <= x1
-      ix = table % num_T9-1 ! since weak_num_T9 is small, just do a linear search
+      ix = table % num_T9-1  ! since weak_num_T9 is small, just do a linear search
       do i = 2, table % num_T9-1
          if (T9 > table% T9s(i)) cycle
          ix = i-1
@@ -284,7 +277,7 @@ contains
       end do
 
       ! y0 <= lYeRho <= y1
-      jy = table % num_lYeRho-1 ! since weak_num_lYeRho is small, just do a linear search
+      jy = table % num_lYeRho-1  ! since weak_num_lYeRho is small, just do a linear search
       do j = 2, table % num_lYeRho-1
          if (lYeRho > table % lYeRhos(j)) cycle
          jy = j-1
@@ -346,7 +339,7 @@ contains
 
     subroutine do_bicubic_interpolations(fin, fval, df_dx, df_dy, ierr)
       ! derived from routines in the PSPLINE package written by Doug McCune
-      real(dp), dimension(:,:,:) :: fin ! the spline data array, dimensions (4, nx, ny)
+      real(dp), dimension(:,:,:) :: fin  ! the spline data array, dimensions (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
 
@@ -420,8 +413,8 @@ contains
 
       dT9 = T9 - x0
       delta_T9 = x1 - x0
-      x_beta = dT9 / delta_T9 ! fraction of x1 result
-      x_alfa = 1.0d0 - x_beta ! fraction of x0 result
+      x_beta = dT9 / delta_T9  ! fraction of x1 result
+      x_alfa = 1.0d0 - x_beta  ! fraction of x0 result
       if (x_alfa < 0 .or. x_alfa > 1) then
          write(*,1) 'weaklib: x_alfa', x_alfa
          write(*,1) 'T9', T9
@@ -432,8 +425,8 @@ contains
 
       dlYeRho = lYeRho - y0
       delta_lYeRho = y1 - y0
-      y_beta = dlYeRho / delta_lYeRho ! fraction of y1 result
-      y_alfa = 1 - y_beta ! fraction of y0 result
+      y_beta = dlYeRho / delta_lYeRho  ! fraction of y1 result
+      y_alfa = 1 - y_beta  ! fraction of y0 result
       if (is_bad(y_alfa) .or. y_alfa < 0 .or. y_alfa > 1) then
          write(*,1) 'weaklib: y_alfa', y_alfa
          write(*,1) 'T9', T9
@@ -462,7 +455,7 @@ contains
     subroutine do_linear_interp(f, fval, df_dx, df_dy, ierr)
       use interp_1d_lib
       use utils_lib, only: is_bad
-      real(dp), dimension(:,:,:) :: f ! (4, nx, ny)
+      real(dp), dimension(:,:,:) :: f  ! (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
 

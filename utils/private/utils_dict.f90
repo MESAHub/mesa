@@ -2,34 +2,28 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module utils_dict
-      use utils_def
+
+      use utils_def, only: maxlen_key_string, integer_dict, hash_entry
 
       implicit none
 
       contains
-
 
       recursive subroutine do_integer_dict_map(dict, fcn, ierr)
          type (integer_dict), pointer :: dict
@@ -38,7 +32,7 @@
                implicit none
                character (len=*), intent(in) :: key
                integer, intent(in) :: value
-               integer, intent(out) :: ierr ! /= 0 means terminate map calls
+               integer, intent(out) :: ierr  ! /= 0 means terminate map calls
             end subroutine fcn
          end interface
          type (integer_dict), pointer :: node
@@ -75,7 +69,7 @@
          subroutine fcn(key, value, ierr)
             character (len=*), intent(in) :: key
             integer, intent(in) :: value
-            integer, intent(out) :: ierr ! /= 0 means terminate map calls
+            integer, intent(out) :: ierr  ! /= 0 means terminate map calls
             if (cnt >= sz) then
                ierr = -1
                return
@@ -107,7 +101,7 @@
       subroutine find_key_entry(dict, key, node)
          type (integer_dict), pointer :: dict
          character (len=*), intent(in) :: key
-         type (integer_dict), pointer :: node ! set null if cannot find key in dict
+         type (integer_dict), pointer :: node  ! set null if cannot find key in dict
          type (hash_entry), pointer :: hash(:)
          integer :: i, hash_size, hashkey
          if (.not. associated(dict)) then
@@ -117,8 +111,8 @@
             hash => dict% hash
             hash_size = size(hash)
             hashkey = dict_hashkey(key, hash_size)
-            do i=1, hash_size ! find an empty slot
-               if (.not. associated(hash(hashkey)% ptr)) exit ! failed to find key
+            do i=1, hash_size  ! find an empty slot
+               if (.not. associated(hash(hashkey)% ptr)) exit  ! failed to find key
                if (hash(hashkey)% ptr % key == key) then
                   node => hash(hashkey)% ptr
                   return
@@ -127,7 +121,7 @@
                if (hashkey > hash_size) hashkey = 1
             end do
             nullify(node)
-            return ! failed to find key
+            return  ! failed to find key
          end if
          node => dict
          do
@@ -148,9 +142,9 @@
 
 
       recursive subroutine insert_node(node, root, duplicate)
-         type (integer_dict), pointer :: node ! will be deallocated if a duplicate
+         type (integer_dict), pointer :: node  ! will be deallocated if a duplicate
          type (integer_dict), pointer :: root
-         logical :: duplicate ! true if key was already defined
+         logical :: duplicate  ! true if key was already defined
 
          integer :: height_left, height_right
          logical, parameter :: dbg = .false.
@@ -165,7 +159,7 @@
             return
          end if
 
-         if (LGT(node% key, root% key)) then ! insert on left
+         if (LGT(node% key, root% key)) then  ! insert on left
             if (.not. associated(root% left)) then
                root% left => node
             else
@@ -173,14 +167,14 @@
             end if
             height_left = root% left% height
             height_right = height_of_right_branch(root)
-            if (height_left - height_right == 2) then ! rebalance
+            if (height_left - height_right == 2) then  ! rebalance
                if (LGT(node% key, root% left% key)) then
                   call single_rotate_with_left(root)
                else
                   call double_rotate_with_left(root)
                end if
             end if
-         else ! insert on right
+         else  ! insert on right
             if (.not. associated(root% right)) then
                root% right => node
             else
@@ -188,7 +182,7 @@
             end if
             height_right = root% right% height
             height_left = height_of_left_branch(root)
-            if (height_right - height_left == 2) then ! rebalance
+            if (height_right - height_left == 2) then  ! rebalance
                if (LGT(root% right% key, node% key)) then
                   call single_rotate_with_right(root)
                else
@@ -277,10 +271,10 @@
 
 
       subroutine do_integer_dict_define(dict, key, value, duplicate, ierr)
-         type (integer_dict), pointer :: dict ! pass null for empty dict
+         type (integer_dict), pointer :: dict  ! pass null for empty dict
          character (len=*), intent(in) :: key
          integer, intent(in) :: value
-         logical, intent(out) :: duplicate ! true if key was already defined
+         logical, intent(out) :: duplicate  ! true if key was already defined
          integer, intent(out) :: ierr
          type (integer_dict), pointer :: node
          logical, parameter :: dbg = .false.
@@ -296,7 +290,7 @@
          nullify(node% right)
          nullify(node% hash)
          if (dbg) write(*,*) 'insert node ' // trim(key)
-         if (.not. associated(dict)) then ! this is the 1st entry
+         if (.not. associated(dict)) then  ! this is the 1st entry
             dict => node
          else
             if (associated(dict% hash)) then
@@ -306,7 +300,7 @@
             call insert_node(node, dict, duplicate)
          end if
 !$omp end critical (dict_define)
-         if (dbg) then ! check tree
+         if (dbg) then  ! check tree
             write(*,*) 'done insert node ' // trim(key) // ' new root ' // trim(dict% key)
             write(*,'(A)')
             call check_dict(dict, ierr)
@@ -331,7 +325,7 @@
 
 !$omp critical (create_hash)
          if (.not. associated(dict% hash)) then
-            cnt = size_integer_dict(dict) ! number of entries
+            cnt = size_integer_dict(dict)  ! number of entries
             if (cnt > 0) then
                hash_size = 4*cnt
                allocate(dict% hash(hash_size), stat=ierr)
@@ -394,7 +388,7 @@
          type (integer_dict), pointer :: dict
          character (len=*), intent(in) :: key
          integer, intent(out) :: value
-         integer, intent(out) :: ierr ! 0 if found key in dict, -1 if didn't
+         integer, intent(out) :: ierr  ! 0 if found key in dict, -1 if didn't
          type (integer_dict), pointer :: node
          logical, parameter :: dbg = .false.
          if (dbg) then
@@ -467,7 +461,7 @@
             ! enter node in hash
             hashkey = dict_hashkey(node% key, hash_size)
             okay = .false.
-            do i=1, hash_size ! find an empty slot
+            do i=1, hash_size  ! find an empty slot
                if (.not. associated(hash(hashkey)% ptr)) then
                   hash(hashkey)% ptr => node
                   okay = .true.
@@ -490,7 +484,7 @@
       end subroutine do_enter_hash
 
 
-      integer function dict_hashkey(key, hash_size) ! value between 1 and hash_size
+      integer function dict_hashkey(key, hash_size)  ! value between 1 and hash_size
          character (len=*) :: key
          integer, intent(in) :: hash_size
          integer:: i, len, new, hash, c
@@ -500,7 +494,7 @@
             return
          end if
          ! source: http://www.partow.net/programming/hashfunctions/#APHashFunction
-         hash = -1431655766 ! Z'AAAAAAAA'
+         hash = -1431655766  ! Z'AAAAAAAA'
          do i = 1, len
             c = ichar(key(i:i))
             if (iand(c,1)==1) then
@@ -525,6 +519,4 @@
          end if
       end function dict_hashkey
 
-
       end module utils_dict
-

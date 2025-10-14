@@ -2,48 +2,33 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module overshoot_utils
 
-  ! Uses
-
   use num_lib
   use star_private_def
 
-  ! No implicit typing
-
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: eval_conv_bdy_k
   public :: eval_conv_bdy_r
   public :: eval_conv_bdy_Hp
   public :: eval_over_bdy_params
-
-  ! Procedures
 
 contains
 
@@ -63,21 +48,18 @@ contains
        k = s%conv_bdy_loc(i)
     else
        k = s%conv_bdy_loc(i) - 1
-    endif
+    end if
 
     if (k >= s%nz .OR. k < 1) then
        write(*,*) 'Invalid cell for convective boundary: i, k, nz=', i, k, s%nz
        ierr = -1
        return
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine eval_conv_bdy_k
 
-  !****
 
   subroutine eval_conv_bdy_r (s, i, r, ierr)
 
@@ -117,13 +99,10 @@ contains
 
     end associate
 
-    ! Finish
-
     return
 
   end subroutine eval_conv_bdy_r
 
-  !****
 
   subroutine eval_conv_bdy_Hp (s, i, Hp, ierr)
 
@@ -209,7 +188,7 @@ contains
                 return
              end if
              r_bot = s%r(s%conv_bdy_loc(i-1))
-          endif
+          end if
 
           r_top = s%r(k)
 
@@ -224,11 +203,11 @@ contains
                 write(*,*) 'Double bottom boundary in overshoot; i=', i
                 ierr = -1
                 return
-             endif
+             end if
              r_top = s%r(s%conv_bdy_loc(i+1))
-          endif
+          end if
 
-       endif
+       end if
 
        dr = r_top - r_bot
 
@@ -242,13 +221,10 @@ contains
 
     end if
 
-    ! Finish
-
     return
 
   end subroutine eval_conv_bdy_Hp
 
-  !****
 
   subroutine eval_over_bdy_params (s, i, f0, k, r, D, vc, ierr)
 
@@ -309,7 +285,7 @@ contains
              if (s%r(k+1) <= r) exit search_in_loop
           end do search_in_loop
 
-       endif
+       end if
 
     else
 
@@ -328,9 +304,9 @@ contains
              if (s%r(k) > r) exit search_out_loop
           end do search_out_loop
 
-       endif
+       end if
 
-    endif
+    end if
 
     if (.NOT. (s%r(k+1) <= r .AND. s%r(k) >= r)) then
        write(*,*) 'r_ob not correctly bracketed: r(k+1), r, r(k)=', s%r(k+1), r, s%r(k)
@@ -385,13 +361,11 @@ contains
 
        vc = 0._dp
 
-    endif
+    end if
 
     ! Evaluate the diffusion coefficient
 
     D = vc*lambda/3._dp
-
-    ! Finish
 
     ierr = 0
 

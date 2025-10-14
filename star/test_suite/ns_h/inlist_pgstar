@@ -137,15 +137,15 @@
   Grid2_num_cols = 7
   Grid2_num_rows = 8
   Grid2_num_plots = 5
-  
+
   !Grid2_win_flag = .true.
   Grid2_win_width = 10
   Grid2_win_aspect_ratio = 0.6
-  
+
   pgstar_interval = 10
 
   !Grid2_file_flag = .true.
-  Grid2_file_dir = 'pngs_16M.8foe' 
+  Grid2_file_dir = 'pngs_16M.8foe'
   ! Grid2_file_prefix = 'test_'
   ! Grid2_file_width = -1
   ! Grid2_file_aspect_ratio = -1

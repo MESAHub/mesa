@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -35,16 +29,16 @@ module load_kap
 
   implicit none
 
+  private
+  public :: load_one
+  public :: setup_kap_tables
 
   logical, parameter :: dbg = .false.
-
   logical, parameter :: dbg_cache = .false.
 
 contains
 
-
-  subroutine Setup_Kap_Tables(rq, &
-       use_cache, load_on_demand, ierr)
+  subroutine setup_kap_tables(rq, use_cache, load_on_demand, ierr)
     use const_def, only: mesa_data_dir
     use condint, only: init_potekhin
     type (Kap_General_Info), pointer :: rq
@@ -68,7 +62,7 @@ contains
     call setup_lowT(kap_lowT_z_tables(rq% kap_lowT_option)% ar)
     call setup(kap_z_tables(rq% kap_option)% ar)
 
-    rq% logT_Compton_blend_hi = & ! apply whichever is minimum for Type1 and Type2 options
+    rq% logT_Compton_blend_hi = &  ! apply whichever is minimum for Type1 and Type2 options
         min(kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logT_max - 0.01d0, &
             kap_CO_z_tables(rq% kap_CO_option)% ar(1)% x_tables(1)% logT_max - 0.01d0)
       !rq% kap_z_tables(1)% x_tables(1)% logT_max - 0.01d0
@@ -182,7 +176,7 @@ contains
     end subroutine setup_lowT
 
 
-  end subroutine Setup_Kap_Tables
+  end subroutine setup_kap_tables
 
 
   subroutine load_one(rq, &
@@ -269,9 +263,9 @@ contains
 
     version = -1
 
-    read(io_unit,*,iostat=ierr) ! skip
+    read(io_unit,*,iostat=ierr)  ! skip
     if (ierr == 0) then
-       read(io_unit,*,iostat=ierr) ! skip
+       read(io_unit,*,iostat=ierr)  ! skip
        if (ierr == 0) then
           read(io_unit,'(a)',iostat=ierr) message
           if (ierr == 0) call str_to_vector(message, vec, nvec, ierr)
@@ -301,7 +295,7 @@ contains
        write(*,'(A)')
        write(*,'(A)')
        write(*,'(A)')
-       write(*,*) 'NOTICE: you need to install a new verion of the kap data.'
+       write(*,*) 'NOTICE: you need to install a new version of the kap data.'
        write(*,*) 'Please remove the directory mesa/data/kap_data,'
        write(*,*) 'and rerun the mesa ./install script.'
        write(*,'(A)')
@@ -341,7 +335,7 @@ contains
           open(newunit=cache_io_unit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
        end if
-       if (ios == 0) then ! try reading the cached data
+       if (ios == 0) then  ! try reading the cached data
           !write(*,'(a)') 'loading ' // trim(cache_filename)
           call Read_Kap_X_Table(cache_io_unit, .true., ierr)
           close(cache_io_unit)
@@ -425,13 +419,13 @@ contains
       x_tables(ix)% num_logTs = num_logTs
       nullify(x_tables(ix)% logTs)
 
-      nullify(x_tables(ix)% kap1) ! allocate when read the data
+      nullify(x_tables(ix)% kap1)  ! allocate when read the data
 
     end subroutine Setup_Kap_X_Table
 
 
     subroutine Read_Kap_X_Table(io_unit, reading_cache, ierr)
-      integer, intent(in) :: io_unit ! use this for file access
+      integer, intent(in) :: io_unit  ! use this for file access
       logical, intent(in) :: reading_cache
       integer, intent(out) :: ierr
 
@@ -500,7 +494,7 @@ contains
         num_logRs + num_logTs + sz_per_Kap_point*num_logRs*num_logTs
       allocate(x_tables(ix)% logRs(num_logRs), x_tables(ix)% logTs(num_logTs), &
            x_tables(ix)% kap1(sz_per_Kap_point*num_logRs*num_logTs), STAT=status)
-      if (status .ne. 0) then
+      if (status /= 0) then
          ierr = -1
          return
       end if
@@ -511,9 +505,9 @@ contains
 
       if (.not. reading_cache) then
 
-         read(io_unit,*,iostat=ierr) ! skip
+         read(io_unit,*,iostat=ierr)  ! skip
          if (ierr /= 0) return
-         read(io_unit,*,iostat=ierr) ! skip
+         read(io_unit,*,iostat=ierr)  ! skip
          if (ierr /= 0) return
 
          read(io_unit,'(a)',iostat=ierr) message
@@ -526,7 +520,7 @@ contains
          end do
          !write(*,*) "input line: <" // trim(message) // ">"
 
-         read(io_unit,*,iostat=ierr) ! skip
+         read(io_unit,*,iostat=ierr)  ! skip
          if (ierr /= 0) return
 
          do i = 1, num_logTs
@@ -570,7 +564,7 @@ contains
 
          if (ierr /= 0) write(*,*) 'Read_Kap_X_Table failed in Make_Interpolation_Data'
 
-      else ! reading_cache
+      else  ! reading_cache
 
          read(io_unit, iostat=ierr) &
               x_tables(ix)% ili_logRs, x_tables(ix)% ili_logTs
@@ -597,8 +591,8 @@ contains
     use interp_2d_lib_db
     real(dp), pointer :: kap1(:)
     integer, intent(in) :: num_logRs, num_logTs
-    real(dp), intent(in), pointer :: logRs(:) ! (num_logRs)
-    real(dp), intent(in), pointer :: logTs(:) ! (num_logTs)
+    real(dp), intent(in), pointer :: logRs(:)  ! (num_logRs)
+    real(dp), intent(in), pointer :: logTs(:)  ! (num_logTs)
     integer, intent(out) :: ili_logRs, ili_logTs, ierr
 
     character (len=256) :: message
@@ -768,6 +762,4 @@ contains
          trim(prefix) // '_z' // trim(zstr) // '_x' // trim(xstr) // '.bin'
   end subroutine create_fname
 
-
 end module load_kap
-

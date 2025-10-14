@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # unpack tables
 mkdir -p ags09
@@ -15,4 +15,4 @@ do
 done
 
 # run python script
-./aesopus.py AGSS09.yaml
+./aesopus.py AGSS09.yml

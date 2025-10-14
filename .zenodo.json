@@ -43,7 +43,7 @@
             "affiliation": "Trinity College Dublin",
             "name": "Farrell, Eoin",
             "orcid": "0000-0001-5631-5878"
-        },   
+        },
         {
             "affiliation": "Center for Computational Astrophysics",
             "name": "Jermyn, Adam",
@@ -103,7 +103,7 @@
         "physics"
     ],
     "license": {
-        "id": "LGPL-2.0"
+        "id": "LGPL-3.0"
     },
     "title" : "MESA: Modules for experiments in stellar astrophysics"
 }

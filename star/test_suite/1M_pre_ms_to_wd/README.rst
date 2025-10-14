@@ -4,11 +4,11 @@
 1M_pre_ms_to_wd
 ***************
 
-This test case checks the evolution of a 1 Msun, Z=0.02 metallicity from the pre-main sequence to a white dwarf. 
+This test case checks the evolution of a 1 |Msun|, Z=0.02 metallicity from the pre-main sequence to a white dwarf.
 
 This test case has six parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_start_header``) builds a 1 Msun, Z=0.02 metallicity pre-main-sequence model.
+* Part 1 (``inlist_start_header``) builds a 1 |Msun|, Z=0.02 metallicity pre-main-sequence model.
 
 * Part 2 (``inlist_to_end_core_h_burn``) continues the evolution until core hydrogen depletion (mass fraction h1_center < 1e-4).
 
@@ -44,34 +44,32 @@ pgstar commands used for the plots above:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
     file_digits = 8
 
       Grid6_win_flag = .true.
       Grid6_win_width = 15
-         
+
       Grid6_file_flag = .true.
       Grid6_file_dir = 'png'
       Grid6_file_prefix = 'grid6_'
       Grid6_file_interval = 1000 ! output when mod(model_number,Grid6_file_interval)==0
       Grid6_file_width = 15 ! (inches) negative means use same value as for window
 
-      Abundance_log_mass_frac_min = -4.0 
+      Abundance_log_mass_frac_min = -4.0
       Abundance_legend_max_cnt = 0
       num_abundance_line_labels = 4
       Abundance_title = ''
 
       HR_title = ''
 
-      TRho_title = '' 
+      TRho_title = ''
 
-      Summary_Burn_title = '' 
-      Summary_Burn_xaxis_name = 'mass' 
+      Summary_Burn_title = ''
+      Summary_Burn_xaxis_name = 'mass'
       Summary_Burn_xaxis_reversed = .false.
       Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
       Summary_Burn_xmax = 1.0  ! only used if /= -101d0
@@ -80,7 +78,4 @@ pgstar commands used for the plots above:
  / ! end of pgstar namelist
 
 
-
-
 Last-Updated: 28May2021 (MESA ebecc10) by fxt
-

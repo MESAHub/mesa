@@ -16,14 +16,10 @@ Say "MAY-sa".
 Can I use the MESA logo in a talk or presentation?
 --------------------------------------------------
 
-Yes. It is available in a variety of sizes for your convenience.
+Yes. It is available as a PNG or SVG image for your convenience.
 
--  :download:`30 pt </assets/logo/mesa_logo2_30pt.png>`
--  :download:`60 pt </assets/logo/mesa_logo2_60pt.png>`
--  :download:`100 pt </assets/logo/mesa_logo2_100pt.png>`
--  :download:`144 pt </assets/logo/mesa_logo2_144pt.png>`
--  :download:`200 pt </assets/logo/mesa_logo2_200pt.png>`
--  :download:`400 pt </assets/logo/mesa_logo2_400pt.png>`
+-  :download:`PNG </assets/logo/mesa-logo.png>`
+-  :download:`SVG </assets/logo/mesa-logo.svg>`
 
 What happens when an instrument paper is being written?
 -------------------------------------------------------
@@ -31,16 +27,16 @@ What happens when an instrument paper is being written?
 The picture shows the intense authors hard at work making final edits.
 
 .. figure:: /assets/images/paper_session.jpg
-   :alt: Writing the mesa paper
+   :alt: Writing the MESA paper
 
-A late night session working on |MESA I| around Bill's
+A late-night session working on |MESA I| around Bill's
 dining room table with a projector, a makeshift screen, and ample red
-wine (left to right, Frank Timmes, Aaron Dotter, Falk Herwig, Lars
+wine (left to right: Frank Timmes, Aaron Dotter, Falk Herwig, Lars
 Bildsten, and Bill Paxton). Photo taken by Bill's patient wife, Kathlyn,
 who deserves a great deal of credit for the existence of MESA.
 
 By |MESA V|, there's a bigger room and a better screen.
-Left-to-right: Aaron Dotter, Jared Goldberg, Lars Bildsten, Radek
+Left to right: Aaron Dotter, Jared Goldberg, Lars Bildsten, Radek
 Smolec, Anne Thoul, Bill Paxton, Adam Jermyn, Josiah Schwab, Frank
 Timmes, Croissants, Rich Townsend, Coffee, and Pablo Marchant. Photo
 taken by Matteo Cantiello.
@@ -83,7 +79,7 @@ Errors like::
 typically arise because the build environment doesn't have enough RAM.
 We've found that this usually happens because you're building MESA on
 a virtual machine (VM) that hasn't been allocated enough virtual
-memory, in which case the solution is to allocate more memory to
+memory. In this case, the solution is to allocate more memory to
 the VM.  If you aren't using a VM, then MESA might somehow not be able
 to access the amount of RAM that it needs.
 
@@ -468,7 +464,7 @@ Why is my MESA zipfile download taking forever?
 -----------------------------------------------
 
 The MESA zipfiles are large (~1GB), so if you're on a slow connection,
-there's nothing to be done. 
+there's nothing to be done.
 
 How do I obtain a non-release MESA version?
 -------------------------------------------
@@ -480,7 +476,7 @@ obtained by using standard git operations after cloning the repository.
 
 Previously (2010-2020), MESA was developed using SVN.  An archival
 version of the MESA SVN repository containing the complete development
-history is available at `Zenodo <https://zenodo.org/record/4745225>`__.  
+history is available at `Zenodo <https://zenodo.org/record/4745225>`__.
 Follow the
 instructions there and then use standard SVN operations to access any
 desired commit.
@@ -502,7 +498,7 @@ What do I need to do to run MESA on OS X?
 -----------------------------------------
 
 It is necessary to take the following actions on recent versions of OS X
-(10.9 or later) , even if you had a working version of MESA on your
+(10.9 or later), even if you had a working version of MESA on your
 previous version of OS X.
 
 -  Install or reinstall the current version of
@@ -530,7 +526,7 @@ previous version of OS X.
 Why do I get the error "stdlib.h: No such file or directory"?
 -------------------------------------------------------------
 
-If yore using macOS 10.14 (Mojave), then this error indicates that you
+If you're using macOS 10.14 (Mojave), then this error indicates that you
 did not install the system headers (see previous FAQ or `the SDK
 website <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Mac_OS_X>`__).
 
@@ -546,7 +542,7 @@ If you receive the error
 
 during the MESA installation of crlibm, please check that you are not
 using an unsupported 32-bit system. If you're using macOS, make sure
-you've `installed Xcode and the command line tools <#osx>`__.
+you've `installed Xcode and the command line tools <#what-do-i-need-to-do-to-run-mesa-on-os-x>`__.
 
 If you're using Linux and you see an error message in config.log like
 
@@ -600,7 +596,7 @@ are using with WSL2.
 Using file explorer navigate to the folder ``C:\Users\USERNAME\AppData\Local\Packages\``,
 where ``USERNAME`` is your windows username. If you installed Ubuntu, then you need to find the folder
 ``CanonicalGroupLimited.Ubuntu``, other distributions will have different names. Once you find this folder
-right click on its name to open it properties, go to ``Advanced`` and unclick ``Compress contents to save disk space`` 
+right click on its name to open it properties, go to ``Advanced`` and unclick ``Compress contents to save disk space``
 
 `More information can be found here <https://github.com/microsoft/WSL/issues/4299>`__
 
@@ -639,10 +635,11 @@ Installing Older Versions of MESA
 Older versions of MESA may fail to compile with more recent versions of
 the MESA SDK. There are a few possible solutions:
 
-(1) Use the contemporary version of the SDK. There is a `list of old
-    MESA
-    SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
-    that indicates which version of MESA was current when each was
+(1) Use the contemporary version of the SDK.
+    See the `MESA SDK Download Page <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Download>`__
+    or the `list of old
+    MESA SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
+    for a table of which version of MESA was current when each version of the MESA SDK
     released.
 
 (2) Work in a Docker container configured to set up an environment
@@ -650,7 +647,7 @@ the MESA SDK. There are a few possible solutions:
     `NuDocker project <https://github.com/NuGrid/NuDocker>`__
     provides a convenient interface for MESA versions as far back
     as 4942.
-    
+
 (3) Fix the individual compilation errors (there are typically only a
     handful to work through). The basic workflow is
 
@@ -674,7 +671,7 @@ Why do I get an error like "Error: Blank required in STOP statement near (1)"?
 
 This sort of error typically occurs when using an older MESA release
 with a newer SDK. To work around this, simply insert the blank space as
-requested. i.e. change ``stop'fixup'`` to ``stop 'fixup'``.
+requested. i.e. change ``stop'fixup'`` to ``stop 'fixup'``.
 
 Why do I get an error like "Error: Array reference at (1) out of bounds (0 < 1) in loop beginning at (2) [-Werror=do-subscript]"?
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -701,14 +698,14 @@ later).
 
 ::
 
-   Program received signal SIGSEGV: Segmentation fault - invalid memory reference. 
+   Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
 
-   Backtrace for this error: 
-   #0  0x7f28c0a93a7f in ??? 
-   #1  0x54313f in do_history_info 
-          at ../private/history.f90:383 
+   Backtrace for this error:
+   #0  0x7f28c0a93a7f in ???
+   #1  0x54313f in do_history_info
+          at ../private/history.f90:383
    ...
-      
+
 
 To work around this, edit ``$MESA_DIR/star/private/history.f90`` and
 replace the line
@@ -835,7 +832,7 @@ How can I read and/or plot MESA data using language X?
 
 Users have posted numerous useful scripts in a variety of languages on
 `the MESA
-marketplace <http://cococubed.com/mesa_market/add-ons.html>`__.
+marketplace <https://mesastar.org/marketplace/add-ons/>`__.
 
 How can I include the effects of chemical enhancements on the opacities?
 ------------------------------------------------------------------------

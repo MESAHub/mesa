@@ -229,7 +229,7 @@ VPATH := $(STLHOME)src $(STLHOME)src/cp2k $(STLHOME)src/stl $(STLHOME)src/util $
 INCL_DIR := -I$(STLHOME)src/ -I$(STLHOME)src/cp2k -I$(STLHOME)src/stl -I$(STLHOME)src/util -I$(STLHOME)vladsf
 
 #--------------------------
-FILES_base =  kinds.F90  math_constants.f90  phys_constants.f90
+FILES_base =  kinds.f90  math_constants.f90  phys_constants.f90
 TEMP := $(FILES_base:.trf=.F)
 TEMP := $(patsubst %.F90,%.f90, $(TEMP:.f=.f90))
 TEMP := $(patsubst %.F90,%.f90, $(TEMP:.F=.f90))
@@ -1175,7 +1175,6 @@ words.o:           words.trf
 
 ###################################################
 
-
 cleandata:
 	$(DEL) ../strad/run/nohup.out ../strad/run/core* ../strad/run/fort.*
 
@@ -1200,4 +1199,3 @@ clean:
 	( cd ../vladsf ; \
         	pwd ; \
 	$(DEL) *.o *.mod ; )
-

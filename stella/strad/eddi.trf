@@ -3,7 +3,7 @@
     -- EDDington factors by direct Integration.
     -- Formal solution of radiation equation in spherical geometry
     -- with account of Doppler shift in frequency bins.
-    -- Subroutine named Feau since formely it used the
+    -- Subroutine named Feau since formerly it used the
     -- Feautrier Method.
     -- Momentarily steady case, but applied for Edtm=T - smoothing
     -- Eddington factors in time.
@@ -802,14 +802,14 @@ _label @outsm ; -- to go out of sm
   _do Lfr=1,Nfrus+dLfrMax;
         if(Hnorm>0.d0) Hobs(Lfr)=tlum/Hnorm*Hobs(Lfr);
         fr0=freqob(Lfr)*(1.d0-uy(Nzon)/clight);
---	write(*,*)' in Eddi uy(Nzon)/clight , freqob(Lfr), fr0';
+--  write(*,*)' in Eddi uy(Nzon)/clight , freqob(Lfr), fr0';
 --      write(*,*) uy(Nzon)/clight, freqob(Lfr), fr0;
         fr0log=log(fr0);
         xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
-/*	write(*,*)' zerfr, fr0log';
-	write(*,*) zerfr, fr0log;
-	write(*,*)' exp(fr0log),dlognu(1),xnu';
-	write(*,*) exp(fr0log),dlognu(1),xnu;
+/*  write(*,*)' zerfr, fr0log';
+  write(*,*) zerfr, fr0log;
+  write(*,*)' exp(fr0log),dlognu(1),xnu';
+  write(*,*) exp(fr0log),dlognu(1),xnu;
   */
         Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
 --        Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
@@ -819,9 +819,9 @@ _label @outsm ; -- to go out of sm
                                      -- in linear scale
           wfrlog=(log(freqob(Lfr0+1))-fr0log)*(-dlognu(1)); -- log scale
           wH(Lfr)=wfrlog;
-/*	write(*,*)' wfr0,  wfrlog ';
-	write(*,*) wfr0, wfrlog;
-	write(*,*)' Lfr0, Lfr, wH(Lfr):',Lfr0, Lfr, wH(Lfr);
+/*  write(*,*)' wfr0,  wfrlog ';
+  write(*,*) wfr0, wfrlog;
+  write(*,*)' Lfr0, Lfr, wH(Lfr):',Lfr0, Lfr, wH(Lfr);
         pause;
    */
 /*        Hnorm=exp(log(max(FradH(Nzon,min(Lfr0+1,Nfrus))

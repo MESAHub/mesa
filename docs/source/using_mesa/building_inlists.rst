@@ -3,16 +3,16 @@ Building inlists
 ****************
 
 Inlists for MESA are composed of five main sections labeled ``&star_job``, ``&controls``.
-``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state respectively.
-The ``&pgstar`` section contains the commands for creating pgstar plots. 
+``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state, respectively.
+The ``&pgstar`` section contains the commands for creating pgstar plots.
 
 &star_job
 =========
 
 The main modules of MESA (other than **star**) are the :ref:`eos`, the :ref:`kap`, the :ref:`atm`, the nuclear reactions.
-In this section of the inlist, you'll have to make choices for which atmosphere and nuclear reactions network you want to use, as well as which nuclear reactions rates you want to use. 
+In this section of the inlist, you'll have to make choices for which atmosphere and nuclear reactions network you want to use, as well as which nuclear reactions rates you want to use.
 You will also specify here some information about your starting model, and about the output of the evolution.
-Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`reference/star_job:star_job`. 
+Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`reference/star_job:star_job`.
 
 Starting model
 --------------
@@ -51,7 +51,7 @@ You may want to save the final model of your evolution. In that case you have to
 Initial composition
 -------------------
 
-There are several ways to specify the initial composition. 
+There are several ways to specify the initial composition.
 (to be filled in).
 
 You can also use pre-defined chemical compositions based on published data. These are set using the control ``ìnitial_zfracs``.
@@ -83,18 +83,20 @@ For example when evolving a stellar model on the horizontal branch (helium burni
 Energy equation
 ---------------
 
-The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation. 
-The dLdm form is currently the default in MESA. If the dEdt form is preferred it has to be specified in the inlist. 
+The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__).
+As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation.
+The dLdm form is currently the default in MESA. If the dEdt form is preferred it has to be specified in the inlist.
 
 .. literalinclude:: inlist_example
    :start-after:  ! energy
    :end-before: ! mass and metallicity
 
 
-Starting model
---------------
+Starting mass and metallicity
+-----------------------------
 
-The main stellar parameters to specify are its initial mass M, metallicity Z, and helium fraction Y. If only M and Z are specified,the helium content is by default Y=0.24 + 2Z.
+The main stellar parameters to specify are its initial mass M, metallicity Z, and helium fraction Y.
+If only M and Z are specified,the helium content is by default Y=0.24 + 2Z.
 
 .. literalinclude:: inlist_example
    :start-after:  ! mass and metallicity
@@ -105,9 +107,6 @@ The main stellar parameters to specify are its initial mass M, metallicity Z, an
 When to stop
 ------------
 
-Output
-------
-
 Opacity controls
 ----------------
 
@@ -117,7 +116,7 @@ If the evolution includes helium burning, type2 opacities should be used.
 
 .. literalinclude:: inlist_example
    :start-after:  ! opacity controls
-   :end-before: ! convection 
+   :end-before: ! convection
 
 Convection and Convective boundaries
 ------------------------------------
@@ -127,11 +126,11 @@ Convection in MESA is treated using the MLT theory of convection, and provides d
 If you want to use another formalism, for example the `Henyey theory of convection <http://articles.adsabs.harvard.edu/pdf/1965ApJ...142..841H>`__ it can be specified using the ``MLT_option`` control. Several parameters can be specified for this option. The main one is the mixing length parameter. Note that the default value for this parameter in MESA is ``mixing_length_alpha=2``. This value does not come from any calibration.
 
 .. literalinclude:: inlist_example
-   :start-after:  ! convection 
-   :end-before: ! convective boundaries 
+   :start-after:  ! convection
+   :end-before: ! convective boundaries
 
-There are two possible criteria that can be used to determine the position of the convective boundaries: the Schwarzchild and Ledoux criteria. By default MESA uses the Schwarzchild criterion. If determined correctly, the position of the convective boundaries should not depend on which criterion is used. But using the Schwarzchild or the Ledoux criterion can lead to different abundance profiles outside the convective region. There are extensive discussions about this topic in the `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ and `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__ papers. 
-Two new algorithms have been introduced in MESA, called **Predictive mixing** (described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ )and **Convective PreMixing**, described in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). By default, none of these are used in MESA, which can lead to very incorrectly determined convective boundaries, with important consequences on the evolution of the stellar model. It is therefore highly recommended to use one of these algorithms. 
+There are two possible criteria that can be used to determine the position of the convective boundaries: the Schwarzschild and Ledoux criteria. By default, MESA uses the Schwarzschild criterion. If determined correctly, the position of the convective boundaries should not depend on which criterion is used. But using the Schwarzschild or the Ledoux criterion can lead to different abundance profiles outside the convective region. There are extensive discussions about this topic in the `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ and `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__ papers.
+Two new algorithms have been introduced in MESA, called **Predictive mixing** (described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ )and **Convective PreMixing**, described in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). By default, none of these are used in MESA, which can lead to very incorrectly determined convective boundaries, with important consequences on the evolution of the stellar model. It is therefore highly recommended to use one of these algorithms.
 
 If using **Convective premixing**, there is no additional parameter to specify.
 
@@ -143,7 +142,7 @@ If using **Predictive mixing**, there are additional controls. They are describe
 
 .. literalinclude:: inlist_example
    :start-after: ! Predictive
-   :end-before: ! temp 
+   :end-before: ! temp
 
 
 
@@ -158,3 +157,42 @@ Timestep and grid controls
 
 &eos
 ====
+
+&colors
+=======
+
+The ``&colors`` section configures the custom colors module for calculating synthetic photometry during stellar evolution. This module interpolates stellar atmosphere models to compute bolometric magnitudes and synthetic magnitudes in specified photometric filters, adding these as extra history columns.
+
+Enabling Synthetic Photometry
+-----------------------------
+
+To activate the colors module, set the ``use_colors`` control to ``.true.``. This enables the computation of synthetic magnitudes at each timestep using interpolated stellar atmosphere models.
+
+.. literalinclude:: $MESA_DIR/star/test_suite/custom_colors/inlist_colors
+   :start-after: &colors
+   :end-before: / ! end of colors namelist
+
+Key Controls
+------------
+
+- **use_colors**: Enables or disables the colors module (default: ``.false.``).
+- **instrument**: Specifies the photometric system or filter set (e.g., 'Gaia').
+- **stellar_atm**: Path to the stellar atmosphere model grid (e.g., Kurucz 2003 models).
+- **vega_sed**: Path to the Vega reference spectrum for zero-point calibration.
+- **distance**: Assumed distance to the star in parsecs for absolute magnitudes (default: 10 pc).
+- **make_csv**: If ``.true.``, outputs SED and photometry results as CSV files for verification.
+- **colors_results_directory**: Directory for storing output CSV files if ``make_csv`` is enabled.
+
+The module uses a pre-computed grid of stellar atmosphere models (e.g., Kurucz 2003, covering Teff = 3500-50000 K, log g = 0.0-5.0, [M/H] = -5.0 to +1.0) to interpolate spectral energy distributions (SEDs) based on the star's evolving parameters (Teff, log g, metallicity). These SEDs are convolved with filter transmission curves to produce synthetic magnitudes.
+
+
+Additional History Columns
+--------------------------
+
+When enabled, the module adds the following columns to the history file:
+
+- ``Mag_bol``: Bolometric magnitude.
+- ``Flux_bol``: Bolometric flux.
+- Filter-specific magnitudes (e.g., ``Gbp``, ``G``, ``Grp``, ``Grvs``).
+
+Ensure the filter names match those in the ``instrument`` directory.

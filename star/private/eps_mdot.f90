@@ -1,11 +1,26 @@
-
-
-
+! ***********************************************************************
+!
+!   Copyright (C) 2010  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
 
       module eps_mdot
 
       use star_private_def
-      use const_def
+      use const_def, only: dp
       use star_utils
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
@@ -17,10 +32,7 @@
       private
       public :: calculate_eps_mdot
 
-
-
       contains
-
 
       !> We choose as a convention to fix F on the faces between cells and to be
       !! positive when mass is flowing downward. With this, the mass flux may be
@@ -59,7 +71,7 @@
 
          real(qp), dimension(:), intent(out) :: mass_flux
 
-         mass_flux(nz+1) = 0 ! Fixes the inner boundary.
+         mass_flux(nz+1) = 0  ! Fixes the inner boundary.
 
          do j=nz,1,-1
             mass_flux(j) =  mass_flux(j+1) + change_in_dm(j)
@@ -75,10 +87,10 @@
          integer :: nz, j
 
          ! Intermediates
-         real(dp) alpha, beta, dmbar1
+         real(dp) :: alpha, beta, dmbar1
 
          ! Return
-         real(dp) interp
+         real(dp) :: interp
 
          !!! High-level explanation
 
@@ -131,13 +143,13 @@
          ! Inputs
          real(qp), dimension(:) :: mass_flux, dm
          real(dp), dimension(:) :: L, grad_r_sub_grad_a, thermal_energy, leak_frac
-         real(dp) eps_mdot_leak_frac_factor
-         real(dp) dt
+         real(dp) :: eps_mdot_leak_frac_factor
+         real(dp) :: dt
          integer :: nz
 
          ! Intermediates
          integer :: k, km1
-         real(dp) mass_flux_bar
+         real(dp) :: mass_flux_bar
 
          !!! High-level explanation
 
@@ -180,7 +192,7 @@
          ! Inputs
          integer :: nz
          integer, dimension(:,:) :: ranges
-         real(dp) mdot_adiabatic_surface
+         real(dp) :: mdot_adiabatic_surface
          real(qp), dimension(:) :: mass_flux, dm, mesh_intersects, total_mass_through_cell
          real(dp), dimension(:) :: eps_mdot_per_total_mass, accumulated, leak_frac
 
@@ -188,8 +200,8 @@
          integer :: j
          integer :: i_start, i_end
          integer, dimension(:), allocatable :: i_min, i_max, j_min, j_max
-         real(qp) delta_m
-         real(dp) sgn
+         real(qp) :: delta_m
+         real(dp) :: sgn
          type(non_rect_array), dimension(:), allocatable :: pf
 
          !!! High-level explanation
@@ -245,8 +257,8 @@
          call find_j_ranges(nz, ranges, mass_flux, j_min, j_max)
 
          ! Starting state
-         i_start = 1 ! Where we'll begin leaking
-         i_end = 1 ! Where we'll end leaking
+         i_start = 1  ! Where we'll begin leaking
+         i_end = 1  ! Where we'll end leaking
          if (mass_flux(1) == 0) then
             sgn = 0
          else
@@ -335,15 +347,15 @@
          integer :: nz, i_start, i_end
          integer, dimension(:) :: i_min, i_max, j_min, j_max
          type(non_rect_array), dimension(:) :: pf
-         real(qp) delta_m
+         real(qp) :: delta_m
          real(dp), dimension(:) :: leak_frac, accumulated, eps_mdot_per_total_mass
          real(qp), dimension(:) :: dm, total_mass_through_cell
-         real(dp) mdot_adiabatic_surface
+         real(dp) :: mdot_adiabatic_surface
 
 
          ! Intermediates
          integer :: i, j, direction
-         real(qp) pass_frac, next, pass_mass
+         real(qp) :: pass_frac, next, pass_mass
          real(dp), dimension(:), allocatable :: excess
 
          !!! High-level explanation
@@ -468,14 +480,14 @@
          ! Intermediates
          logical, parameter :: dbg = .false.
          integer :: nz, j
-         real(dp) delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
+         real(dp) :: delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
          real(dp), dimension(:), allocatable :: &
             p_bar, rho_bar, te_bar, te, &
             leak_frac, thermal_energy, density_weighted_flux, eps_mdot_per_total_mass,&
             accumulated, grad_r_sub_grad_a
          real(qp), dimension(:), allocatable :: change_in_dm, mass_flux, dm, prev_mesh_dm,&
              total_mass_through_cell
-         type(accurate_real) sum
+         type(accurate_real) :: sum
          integer, dimension(:,:), allocatable :: ranges
          real(qp), dimension(:), allocatable :: mesh_intersects
 
@@ -690,6 +702,5 @@
 
 
       end subroutine calculate_eps_mdot
-
 
       end module eps_mdot

@@ -1,4 +1,4 @@
-      
+
       ! GYRE "best" info
       real(dp) :: best_period, best_cycles_to_double
       integer :: best_model_number, best_order

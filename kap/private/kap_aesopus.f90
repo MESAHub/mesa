@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2018-2020  Aaron Dotter, Josiah Schwab & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -30,6 +24,10 @@ module kap_aesopus
   use kap_def
 
   implicit none
+
+  private
+  public :: kap_aesopus_init
+  public :: AESOPUS_get
 
   logical, parameter :: debug = .false.
 
@@ -81,7 +79,7 @@ contains
     real(dp), allocatable :: table_data(:,:,:,:,:,:)
     integer :: table_size
 
-    character(len=80) :: group_name ! output buffer
+    character(len=80) :: group_name  ! output buffer
 
     character(len=30), parameter :: efmt = '(A14, 99ES12.3)'
     character(len=30), parameter :: ffmt = '(A14, 99F8.3)'
@@ -212,7 +210,7 @@ contains
 
        ! read Xs
 
-       call hi_ts%  alloc_read_dset('Xs', ts% Xs)
+       call hi_ts% alloc_read_dset('Xs', ts% Xs)
        if (debug) write(*,*) "Xs", ts% Xs
        ts% num_Xs = SIZE(ts% Xs)
        if (rq% show_info) write(*,ifmt) "num Xs =", ts% num_Xs
@@ -348,25 +346,25 @@ contains
        write(*,*) 'AESOPUS_interp: logR, logT outside of table bounds'
        ierr = -1
        return
-    endif
+    end if
 
     ! restrict to range
     clipped = .false.
-    if (Zref .le. kA% Zs(1)) then
+    if (Zref <= kA% Zs(1)) then
        my_Z = kA% Zs(1)
        iZ = 1
        clipped = .true.
-    else if (Zref .ge. kA% Zs(kA% num_Zs)) then
+    else if (Zref >= kA% Zs(kA% num_Zs)) then
        my_Z = kA% Zs(kA% num_Zs)
        iZ = kA% num_Zs
        clipped = .true.
-    endif
+    end if
 
     ! if clipped in Z, then just need one call
     if (clipped) then
        call AESOPUS_interp_fixedZref(iZ, X, XC, XN, XO, logR, logT, res, ierr)
        return
-    endif
+    end if
 
     my_Z = Zref
 
@@ -374,12 +372,12 @@ contains
     ! but for now, we use an adapted version of what kapCN does
 
     ! require at least 3 Zs for interpolation
-    if (nZ .gt. kA% num_Zs) then
+    if (nZ > kA% num_Zs) then
        write(*,*) 'AESOPUS_interp: insufficient number of Z values for interpolation'
        write(*,'(I2, A, I2, A)') nZ, ' values are required; ', kA% num_Zs, ' were provided'
        ierr = -1
        return
-    endif
+    end if
 
     ! binary_search returns iZ between 1 and num_Zs-1
     ! such that Zs(iZ) <= Z < Zs(iZ+1)
@@ -393,7 +391,7 @@ contains
     ! want to call at [iZ-1, iZ, iZ+1]
     do i = 1, nZ
        call AESOPUS_interp_fixedZref(iZ+i-2, X, XC, XN, XO, logR, logT, raw_res(:,i), ierr)
-    enddo
+    end do
 
     nullify(work1)
     allocate(work1(nZ*pm_work_size))
@@ -407,7 +405,7 @@ contains
             interp_pm, pm_work_size, &
             work1, junk, ierr)
        res(i) = v_new(1)
-    enddo
+    end do
 
     deallocate(work1)
 
@@ -477,13 +475,13 @@ contains
 
       ! cycles prevent wastefully calling interp_RT with zero weights
       do i = 1, npts
-         if (wX(i) .eq. 0) cycle
+         if (wX(i) == 0) cycle
          do j = 1, npts
-            if (wfCO(j) .eq. 0) cycle
+            if (wfCO(j) == 0) cycle
             do k = 1, npts
-               if (wfC(k) .eq. 0) cycle
+               if (wfC(k) == 0) cycle
                do l = 1, npts
-                  if (wfN(l) .eq. 0) cycle
+                  if (wfN(l) == 0) cycle
 
                   if (debug) then
                      write(*,*) 'call to AESOPUS_interp_RT'
@@ -497,7 +495,7 @@ contains
                   ! now do the call and collect the results
 
                   call AESOPUS_interp_RT(ts% t(iX+i-1,ifCO+j-1,ifC+k-1,ifN+l-1), logR, logT, raw_res, ierr)
-                  if (ierr .ne. 0) return
+                  if (ierr /= 0) return
 
                   res = res + wX(i)*wfCO(j)*wfC(k)*wfN(l) * raw_res
 
@@ -517,28 +515,28 @@ contains
 
       use num_lib, only: binary_search
 
-      real(dp), intent(in) :: val ! value
-      integer, intent(in) :: len ! number of tabulated values
-      real(dp), dimension(:), intent(in) :: vec ! tabulated values
-      integer,  intent(out) :: loc ! vec(loc) <= val <= vec(loc+1)
-      real(dp), dimension(2), intent(out) :: weights ! for linear interpolation
-      logical, intent(out) :: clipped ! did we clip? if so, only locs(1)/weights(1) matter
+      real(dp), intent(in) :: val  ! value
+      integer, intent(in) :: len  ! number of tabulated values
+      real(dp), dimension(:), intent(in) :: vec  ! tabulated values
+      integer,  intent(out) :: loc  ! vec(loc) <= val <= vec(loc+1)
+      real(dp), dimension(2), intent(out) :: weights  ! for linear interpolation
+      logical, intent(out) :: clipped  ! did we clip? if so, only locs(1)/weights(1) matter
 
       weights = 0
 
       ! clip to range, if needed
       clipped = .false.
-      if (val .le. vec(1)) then
+      if (val <= vec(1)) then
          loc = 1
          weights(1) = 1d0
          weights(2) = 0d0
          clipped = .true.
-      else if (val .ge. vec(len)) then
+      else if (val >= vec(len)) then
          loc = len
          weights(1) = 1d0
          weights(2) = 0d0
          clipped = .true.
-      endif
+      end if
 
       ! find location and calculate linear weights
       if (.not. clipped) then
@@ -546,7 +544,7 @@ contains
          loc = binary_search(len, vec, len/2, val)
          weights(2) = (val - vec(loc)) / (vec(loc+1) - vec(loc))
          weights(1) = 1d0 - weights(2)
-      endif
+      end if
 
     end subroutine clipped_linear_weights
 
@@ -603,9 +601,8 @@ contains
        kap = -1d0
        dlnkap_dlnRho = 0d0
        dlnkap_dlnT = 0d0
-    endif
+    end if
 
   end subroutine AESOPUS_get
-
 
 end module kap_aesopus

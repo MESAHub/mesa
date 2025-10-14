@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2012-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -27,15 +21,23 @@
 
       use star_private_def
       use utils_lib, only: is_bad
-      use const_def
+      use const_def, only: dp, msun, secyer, ln10, four_thirds_pi
       use num_def
 
       implicit none
 
+      private
+      public :: force_another_iteration
+      public :: eval_equations
+      public :: set_xscale_info
+      public :: sizequ
+      public :: sizeB
+      public :: inspectb
+      public :: bdomain
+
       logical, parameter :: dbg = .false.
 
       contains
-
 
       subroutine set_xscale_info(s, nvar, ierr)
          type (star_info), pointer :: s
@@ -54,13 +56,13 @@
          nz = s% nz
          do k=1,nz
             do i=1,nvar
-               if (i <= nvar_hydro) then ! structure variable
+               if (i <= nvar_hydro) then  ! structure variable
                   if (i == s% i_j_rot) then
                      s% x_scale(i,k) = 10d0*sqrt(s% cgrav(k)*s% m(k)*s% r_start(k))
                   else
                      s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
                   end if
-               else ! abundance variable
+               else  ! abundance variable
                   s% x_scale(i,k) = max(s% xa_scale, s% xa_start(i-nvar_hydro,k))
                end if
             end do
@@ -180,7 +182,7 @@
       end subroutine eval_equations
 
 
-      subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr) ! equ = residuals
+      subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)  ! equ = residuals
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
@@ -314,9 +316,9 @@
       subroutine sizeB(s, nvar, B, max_correction, correction_norm, max_zone, max_var, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
-         real(dp), intent(out) :: correction_norm ! a measure of the average correction
-         real(dp), intent(out) :: max_correction ! magnitude of the max correction
+         real(dp), pointer, dimension(:,:) :: B  ! (nvar, nz)
+         real(dp), intent(out) :: correction_norm  ! a measure of the average correction
+         real(dp), intent(out) :: max_correction  ! magnitude of the max correction
          integer, intent(out) :: max_zone, max_var, ierr
 
          integer :: k, i, nz, num_terms, j, n, nvar_hydro, jmax, num_xa_terms, &
@@ -369,7 +371,7 @@
                if (abs(s% w(k)) < 1d0) then
                   s% correction_weight(s% i_w,k) = 0d0
                else
-                  s% correction_weight(s% i_w,k) = 1d0/(1d3 + abs(s% w(k))) ! don't sweat the small stuff
+                  s% correction_weight(s% i_w,k) = 1d0/(1d3 + abs(s% w(k)))  ! don't sweat the small stuff
                end if
             end do
          else
@@ -624,7 +626,7 @@
          use star_utils, only: current_min_xa_hard_limit, rand
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: B  ! (nvar, nz)
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
          integer :: i, j, k, nz, species, bad_j, bad_k
@@ -635,10 +637,10 @@
          min_alpha = 1d0
          nz = s% nz
 
-         if (s% RSP2_flag) & ! clip change in w to maintain non-negativity.
+         if (s% RSP2_flag) &  ! clip change in w to maintain non-negativity.
             call clip_so_non_negative(s% i_w, 0d0)
 
-         if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
+         if (s% RTI_flag) &  ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)
 
          if (s% i_lum>=0 .and. s% scale_max_correction_for_negative_surf_lum) then
@@ -679,7 +681,7 @@
          if (nvar > s% nvar_hydro) then
             species = s% species
             min_xa_hard_limit = current_min_xa_hard_limit(s)
-            eps = -0.5d0*min_xa_hard_limit ! allow xa to be this much below 0d0
+            eps = -0.5d0*min_xa_hard_limit  ! allow xa to be this much below 0d0
             do k=1,nz
                do j=1,species
                   i = j + s% nvar_hydro
@@ -731,7 +733,7 @@
       subroutine inspectB(s, nvar, B, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: B  ! (nvar, nz)
          integer, intent(out) :: ierr
 
          integer, parameter :: inspectB_iter_stop = -1
@@ -769,8 +771,8 @@
       ! -1 means failure. solver returns with non-convergence.
       integer function force_another_iteration(s, iter, itermin)
          type (star_info), pointer :: s
-         integer, intent(in) :: iter ! have finished this many iterations and have converged
-         integer, intent(in) :: itermin ! this is the requested minimum.  iter may be < itermin.
+         integer, intent(in) :: iter  ! have finished this many iterations and have converged
+         integer, intent(in) :: itermin  ! this is the requested minimum.  iter may be < itermin.
 
          include 'formats'
 
@@ -923,12 +925,12 @@
                   s% xa(j,k) = xa_start(j,k) + s% solver_dx(j+nvar_hydro,k)
                end do
             end do
-            max_fixes = 0 !5
+            max_fixes = 0  !5
             do cnt=1,max_fixes
                loc = minloc(s% xa(1:species,1:nz))
                j = loc(1)
                k = loc(2)
-               if (s% xa(j,k) >= 1d-3*min_xa_hard_limit) exit ! too good to fix
+               if (s% xa(j,k) >= 1d-3*min_xa_hard_limit) exit  ! too good to fix
                if (s% xa(j,k) < min_xa_hard_limit) then
                   if (s% report_ierr) then
                      khi = nz
@@ -950,7 +952,7 @@
                   s% retry_message = 'some abundance < min_xa_hard_limit'
                   ierr = -1
                   return
-                  exit ! too bad to fix
+                  exit  ! too bad to fix
                end if
                if (k == 1) then
                   k_lo = 1; k_hi = 2
@@ -1014,11 +1016,11 @@
 
          if (ierr /= 0) then
             if (s% report_ierr) then
-               do k=1,nz ! report the errors sequentially
+               do k=1,nz  ! report the errors sequentially
                   call set1(k,.true.,op_err)
                end do
                write(*,3) 'set_vars_for_solver failed: model, nz', &
-                  s% model_number, nz ! kbad depends on num threads
+                  s% model_number, nz  ! kbad depends on num threads
             end if
             return
          end if
@@ -1542,6 +1544,4 @@
          lnR_start = xh_start(s% i_lnR,1)
       end subroutine edit_dlnR_dt_above_k_below_just_added
 
-
       end module solver_support
-

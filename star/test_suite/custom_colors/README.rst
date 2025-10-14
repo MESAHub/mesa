@@ -4,160 +4,80 @@
 custom_colors
 *************
 
-This test suite example shows how to use user-defined color filter and extinction files.
+This test case demonstrates the calculation of synthetic photometry during stellar evolution using the MESA colors module. It evolves a stellar model while computing bolometric magnitudes and synthetic magnitudes in multiple photometric filters, adding these as extra history columns.
 
-This test case has 1 part. Click to see a larger view of a plot.
+This test case has one part. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_1.0``) builds a 1.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves until core hydrogen depletion (mass fraction h1 < 0.1). This example loads the default |LCB98| color filter ''lcb98cor.dat'', a custom color filter ``data/blackbody_bc_v.txt`` which in this case is blackbody V band filter, and a custom extinction color correction file ``data/fake_av_v.txt``. Example color-color, color-magnitude, magnitude-color and magnitude-magnitude plots:
-
-.. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude1_000241.svg
-   :width: 100%
-
-.. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude2_000241.svg
-   :width: 100%
-
-.. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude3_000241.svg
-   :width: 100%
-
-
-pgstar commands used for the first 7 plots:
+* Part 1 (``inlist``) evolves a 1 |Msun|, Z=0.02 metallicity model from the pre-main sequence, calculating synthetic photometry at each timestep using interpolated stellar atmosphere models. The test adds the following columns to the history file:
 
 .. code-block:: console
 
- &pgstar
+   Mag_bol              ! Bolometric magnitude
+   Flux_bol             ! Bolometric flux
+   Gbp                  ! Gaia blue photometer magnitude
+   G                    ! Gaia magnitude
+   Grp                  ! Gaia red photometer magnitude
 
-   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-   file_device = 'png'            ! png
-   file_extension = 'png'
+At the end of the run, the test reports synthetic magnitudes that should be within expected ranges for the final stellar parameters.
 
-   !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
+Physical Setup
+==============
 
-    pgstar_interval = 1
+The colors module interpolates between pre-computed stellar atmosphere models (Kurucz 2003) to construct spectral energy distributions (SEDs) matching the evolving stellar parameters (Teff, log g, metallicity). These SEDs are then convolved with filter transmission curves to produce synthetic magnitudes.
 
+The test uses:
 
- !# Color Magnitude Panels
-   ! Plots either color-color, color-magnitude, magnitude-color or magnitude-magnitude
+* **Stellar atmosphere models**: Kurucz 2003 grid covering Teff = 3500-50000 K, log g = 0.0-5.0, [M/H] = -5.0 to +1.0
+* **Filter system**: Gaia DR3 photometric bands (Gbp, G, Grp)
+* **Reference spectrum**: Vega SED for magnitude zero-points
+* **Distance**: 10 parsecs (for absolute magnitudes)
 
-      !### Color_magnitude1
+Configuration
+=============
 
-         Color_magnitude1_win_flag = .true.
+The test requires a ``&colors`` namelist in addition to standard MESA controls:
 
-         Color_magnitude1_win_width = 15
-         Color_magnitude1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+.. literalinclude:: ../../../star/test_suite/custom_colors/inlist_colors
+   :start-after: &colors
+   :end-before: ! end of colors namelist
 
-         Color_magnitude1_xleft = 0.15
-         Color_magnitude1_xright = 0.85
-         Color_magnitude1_ybot = 0.15
-         Color_magnitude1_ytop = 0.85
-         Color_magnitude1_txt_scale = 1.0
-         Color_magnitude1_title = 'Color_magnitude1'
+Data Download
+=============
 
-         ! setup default
-         Color_magnitude1_num_panels = 2
+The test automatically downloads required data files (~35MB) on first run:
 
-         ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
-         Color_magnitude1_xaxis1_name = 'model_number'
-         Color_magnitude1_xaxis2_name = ''
+.. code-block:: console
 
+   ./mk      # Downloads atmosphere models, filters, and Vega spectrum
+   ./rn      # Runs the test
 
-         ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
-         Color_magnitude1_yaxis1_name(1) = 'bc_B'
-         Color_magnitude1_yaxis2_name(1) = 'bc_U'
-         Color_magnitude1_yaxis_reversed(1) = .false.
-         
-         ! Plots `other_yaxis1-other_yaxis2` leave `other_yaxis2` blank if you only want to plot `other_yaxis1`.
-         Color_magnitude1_other_yaxis1_name(1) = 'abs_mag_V'
-         Color_magnitude1_other_yaxis2_name(1) = ''
-         Color_magnitude1_other_yaxis_reversed(1) = .true.
+The build script (``mk``) creates the necessary directory structure and downloads:
 
+* Stellar atmosphere model grid and lookup table
+* Filter transmission curves
+* Vega reference spectrum
 
-         Color_magnitude1_yaxis1_name(2) = 'bc_B'
-         Color_magnitude1_other_yaxis1_name(2) = 'bc_U'
-         
-         ! Enables calling a subroutine to add extra information to a plot
-         ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
-         Color_magnitude1_use_decorator = .true.
+Verification Tools
+==================
 
-         ! file output
-         Color_magnitude1_file_flag = .true.
-         Color_magnitude1_file_dir = 'png'
-         Color_magnitude1_file_prefix = 'Color_magnitude1_'
-         Color_magnitude1_file_interval = 5 ! output when `mod(model_number,Color_magnitude1_file_interval)==0`
-         Color_magnitude1_file_width = -1 ! (inches) negative means use same value as for window
-         Color_magnitude1_file_aspect_ratio = -1 ! negative means use same value as for window
+Python helper scripts are provided for monitoring and verification:
 
+.. code-block:: console
 
-      !### Color_magnitude2
+   cd python_helpers
+   python HISTORY_check.py      # Real-time monitoring of photometric evolution
+   python static_HISTORY_check.py   # Static analysis of complete tracks
+   python SED_check.py          # SED visualization and validation
 
-         Color_magnitude2_win_flag = .true.
+Expected Outputs
+================
 
-         Color_magnitude2_win_width = 15
-         Color_magnitude2_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+The test produces standard MESA output plus additional photometric columns in the history file. Successful completion should show:
 
-         Color_magnitude2_xleft = 0.15
-         Color_magnitude2_xright = 0.85
-         Color_magnitude2_ybot = 0.15
-         Color_magnitude2_ytop = 0.85
-         Color_magnitude2_txt_scale = 1.0
-         Color_magnitude2_title = 'Color_magnitude2'
+* Smooth evolution of synthetic magnitudes consistent with stellar parameter changes
+* Bolometric magnitudes within expected ranges for stellar mass and evolutionary phase
+* Filter magnitudes that track effective temperature variations
 
-         ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
-         Color_magnitude2_xaxis1_name = 'abs_mag_B'
-         Color_magnitude2_xaxis2_name = 'abs_mag_U'
+The ``run_star_extras.f90`` module handles the integration between MESA's stellar evolution and the colors module calculations.
 
-         ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
-         Color_magnitude2_yaxis1_name(1) = 'abs_mag_R'
-         Color_magnitude2_yaxis2_name(1) = 'abs_mag_J'
-
-         ! setup default
-         Color_magnitude2_num_panels = 1
-         ! file output
-         Color_magnitude2_file_flag = .true.
-         Color_magnitude2_file_dir = 'png'
-         Color_magnitude2_file_prefix = 'Color_magnitude2_'
-         Color_magnitude2_file_interval = 5 ! output when `mod(model_number,Color_magnitude2_file_interval)==0`
-         Color_magnitude2_file_width = -1 ! (inches) negative means use same value as for window
-         Color_magnitude2_file_aspect_ratio = -1 ! negative means use same value as for window
-
-
-      !### Color_magnitude3
-
-         Color_magnitude3_win_flag = .true.
-
-         Color_magnitude3_win_width = 15
-         Color_magnitude3_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-
-         Color_magnitude3_xleft = 0.15
-         Color_magnitude3_xright = 0.85
-         Color_magnitude3_ybot = 0.15
-         Color_magnitude3_ytop = 0.85
-         Color_magnitude3_txt_scale = 1.0
-         Color_magnitude3_title = 'Color_magnitude3'
-
-         ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
-         Color_magnitude3_xaxis1_name = 'model_number'
-         Color_magnitude3_xaxis2_name = ''
-
-         ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
-         Color_magnitude3_yaxis1_name(1) = 'bc_v_bb'
-         
-         Color_magnitude3_other_yaxis1_name(1) = 'av_v'
-         
-         ! setup default
-         Color_magnitude3_num_panels = 1
-         ! file output
-         Color_magnitude3_file_flag = .true.
-         Color_magnitude3_file_dir = 'png'
-         Color_magnitude3_file_prefix = 'Color_magnitude3_'
-         Color_magnitude3_file_interval = 5 ! output when `mod(model_number,Color_magnitude3_file_interval)==0`
-         Color_magnitude3_file_width = -1 ! (inches) negative means use same value as for window
-         Color_magnitude3_file_aspect_ratio = -1 ! negative means use same value as for window
-
-
- / ! end of pgstar namelist
-
-.. |LCB98| replace:: `Lejeune, Cuisinier, & Buser (1998) <https://ui.adsabs.harvard.edu/abs/1998A%26AS..130...65L/abstract>`__
-
-Last-Updated: 05Jun2021 (MESA 5be9e57) by fxt
-
+Last-Updated: 17Jul2025 by Niall Miller

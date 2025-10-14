@@ -24,12 +24,14 @@
 
 /
 
+
 &kap
    Zbase = 2d-2
    kap_file_prefix = 'a09'
    kap_CO_prefix = 'a09_co'
    use_Type2_opacities = .true.
 / ! end of kap namelist
+
 
 &controls
 
@@ -91,6 +93,7 @@
    use_gold2_tolerances = .true.
 
 /
+
 
 &pgstar
 

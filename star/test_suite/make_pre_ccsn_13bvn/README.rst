@@ -10,9 +10,9 @@ This test suite is made to be similar (almost identical) to the 13BVN model from
 Physical checks
 ===============
 
-Tests the functionality of velocity drag for v_flag for damping large surfaces velocities from He shell (N-alpha) flashes during advanced burning. 
+Tests the functionality of velocity drag for v_flag for damping large surfaces velocities from He shell (N-alpha) flashes during advanced burning.
 Tests energy conservation for regions where v_drag is applied.
-Tests the use of OP_split_burn as split burn <4d9 leads to large temperature swings and single zone burning in the core, and split burn >4.5d9 needs smaller timesteps. 
+Tests the use of OP_split_burn as split burn <4d9 leads to large temperature swings and single zone burning in the core, and split burn >4.5d9 needs smaller timesteps.
 This case illustrates strong coupling between burning and hydro: OP_split_burn lower and higher thresholds can only be exceeded with very tight timesteps.
 
 Inlists
@@ -34,4 +34,3 @@ This test case has five parts.
 
 
 Last-Updated: 24Dec2023 by EbF
-

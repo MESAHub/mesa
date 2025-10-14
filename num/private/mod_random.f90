@@ -2,37 +2,31 @@
 !
 !   Copyright (C) 2012  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module mod_random
       use const_def, only: dp
 
+      implicit none
 
       contains
 
-
       subroutine get_seed ( seed )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! GET_SEED returns a seed for the random number generator.
       !
@@ -61,12 +55,12 @@
       !
         implicit none
 
-        integer ( kind = 4 ) seed
-        real ( kind = 8 ) temp
-        character ( len = 10 ) time
-        character ( len = 8 ) today
-        integer ( kind = 4 ) values(8)
-        character ( len = 5 ) zone
+        integer ( kind = 4 ) :: seed
+        real ( kind = 8 ) :: temp
+        character ( len = 10 ) :: time
+        character ( len = 8 ) :: today
+        integer ( kind = 4 ) :: values(8)
+        character ( len = 5 ) :: zone
 
         call date_and_time ( today, time, zone, values )
 
@@ -106,7 +100,7 @@
 
       function i4_uniform ( a, b, seed )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! I4_UNIFORM returns a scaled pseudorandom I4.
       !
@@ -169,14 +163,14 @@
       !
         implicit none
 
-        integer ( kind = 4 ) a
-        integer ( kind = 4 ) b
+        integer ( kind = 4 ) :: a
+        integer ( kind = 4 ) :: b
         integer ( kind = 4 ), parameter :: i4_huge = 2147483647
-        integer ( kind = 4 ) i4_uniform
-        integer ( kind = 4 ) k
-        real ( kind = 4 ) r
-        integer ( kind = 4 ) seed
-        integer ( kind = 4 ) value
+        integer ( kind = 4 ) :: i4_uniform
+        integer ( kind = 4 ) :: k
+        real ( kind = 4 ) :: r
+        integer ( kind = 4 ) :: seed
+        integer ( kind = 4 ) :: value
 
         if ( seed == 0 ) then
           write ( *, '(a)' ) ' '
@@ -215,7 +209,7 @@
 
       subroutine perm_uniform ( n, base, seed, p )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! PERM_UNIFORM selects a random permutation of N objects.
       !
@@ -253,14 +247,14 @@
       !
         implicit none
 
-        integer ( kind = 4 ) n
+        integer ( kind = 4 ) :: n
 
-        integer ( kind = 4 ) base
-        integer ( kind = 4 ) i
-        integer ( kind = 4 ) j
-        integer ( kind = 4 ) k
-        integer ( kind = 4 ) p(n)
-        integer ( kind = 4 ) seed
+        integer ( kind = 4 ) :: base
+        integer ( kind = 4 ) :: i
+        integer ( kind = 4 ) :: j
+        integer ( kind = 4 ) :: k
+        integer ( kind = 4 ) :: p(n)
+        integer ( kind = 4 ) :: seed
 
         do i = 1, n
           p(i) = ( i - 1 ) + base
@@ -280,7 +274,7 @@
 
       function r8_uniform_01 ( seed )
 
-      !*****************************************************************************80
+      ! *****************************************************************************80
       !
       !! R8_UNIFORM_01 returns a unit pseudorandom R8.
       !
@@ -353,9 +347,9 @@
       !
         implicit none
 
-        integer ( kind = 4 ) k
-        real ( kind = 8 ) r8_uniform_01
-        integer ( kind = 4 ) seed
+        integer ( kind = 4 ) :: k
+        real ( kind = 8 ) :: r8_uniform_01
+        integer ( kind = 4 ) :: seed
 
         if ( seed == 0 ) then
           write ( *, '(a)' ) ' '
@@ -377,35 +371,6 @@
       !
         r8_uniform_01 = real ( seed, kind = 8 ) * 4.656612875D-10
 
-        return
       end function r8_uniform_01
 
-
       end module mod_random
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

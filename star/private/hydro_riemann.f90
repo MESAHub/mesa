@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2015-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module hydro_riemann
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, pi
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff
@@ -47,7 +41,6 @@
       ! "Well-balanced schemes for the Euler equations with gravitation",
       ! J. Comp. Phys., 259 (2014), 199-219.
 
-
       private
       public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
          do_uface_and_Pface
@@ -55,7 +48,6 @@
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
       contains
-
 
       subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, nvar, ierr)
          type (star_info), pointer :: s
@@ -83,7 +75,7 @@
          use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only for k=1
+         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad  ! only for k=1
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
 
@@ -135,7 +127,7 @@
             geometry_source_ad + gravity_source_ad + diffusion_source_ad
          dudt_expected_ad = sum_ad
          dudt_expected_ad = dudt_expected_ad/dm
-         
+
          ! implement drag
          drag_factor = s% v_drag_factor
          v_drag = s% v_drag
@@ -247,7 +239,7 @@
                Gp1 = shift_p1(Gp1)
                gsL = -Gp1*mL*0.5d0*dm*inv_R2_p1
             end if
-            gravity_source_ad = gsL + gsR ! total gravitational force on cell
+            gravity_source_ad = gsL + gsR  ! total gravitational force on cell
 
 
          end subroutine setup_gravity_source
@@ -256,8 +248,8 @@
             type(auto_diff_real_star_order1) :: u_m1, u_00, u_p1
             real(dp) :: sig00, sigp1
             do_diffusion = s% RTI_flag .and. s% dudt_RTI_diffusion_factor > 0d0
-            if (do_diffusion) then ! add diffusion source term to dudt
-               u_p1 = 0d0 ! sets val and d1Array to 0
+            if (do_diffusion) then  ! add diffusion source term to dudt
+               u_p1 = 0d0  ! sets val and d1Array to 0
                if (k < nz) then
                   sigp1 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k+1)
                   u_p1%val = s% u(k+1)
@@ -265,7 +257,7 @@
                else
                   sigp1 = 0
                end if
-               u_m1 = 0d0 ! sets val and d1Array to 0
+               u_m1 = 0d0  ! sets val and d1Array to 0
                if (k > 1) then
                   sig00 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k)
                   u_m1%val = s% u(k-1)
@@ -273,7 +265,7 @@
                else
                   sig00 = 0
                end if
-               u_00 = 0d0 ! sets val and d1Array to 0
+               u_00 = 0d0  ! sets val and d1Array to 0
                u_00%val = s% u(k)
                u_00%d1Array(i_v_00) = 1d0
                diffusion_source_ad = sig00*(u_m1 - u_00) - sigp1*(u_00 - u_p1)
@@ -328,7 +320,7 @@
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
-         real(dp), dimension(s% species) :: d_Ptot_dxa ! skip this
+         real(dp), dimension(s% species) :: d_Ptot_dxa  ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
          real(dp) :: delta_m, f
 
@@ -373,10 +365,10 @@
 
          dPdm_grav_ad = -G_ad*s% m_grav(k)/(pow2(r_ad)*A_ad)  ! cm^-1 s^-2
 
-         delta_m = 0.5d0*s% dm(k) ! positive delta_m from left center to edge
+         delta_m = 0.5d0*s% dm(k)  ! positive delta_m from left center to edge
          PL_ad = PL_ad + delta_m*dPdm_grav_ad
 
-         delta_m = -0.5d0*s% dm(k-1) ! negative delta_m from right center to edge
+         delta_m = -0.5d0*s% dm(k-1)  ! negative delta_m from right center to edge
          PR_ad = PR_ad + delta_m*dPdm_grav_ad
 
          ! acoustic wavespeeds (eqn 2.38)
@@ -421,19 +413,19 @@
          P_face_L_ad = rhoL_ad*(uL_ad-Sl_ad)*(uL_ad-Ss_ad) + PL_ad
          P_face_R_ad = rhoR_ad*(uR_ad-Sr_ad)*(uR_ad-Ss_ad) + PR_ad
 
-         s% P_face_ad(k) = 0.5d0*(P_face_L_ad + P_face_R_ad) ! these are ideally equal
+         s% P_face_ad(k) = 0.5d0*(P_face_L_ad + P_face_R_ad)  ! these are ideally equal
 
          if (k < s% nz .and. s% RTI_flag) then
              if (s% eta_RTI(k) > 0d0 .and. &
                    s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
                 f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/s% dm_bar(k)
-                du_ad = f*A_ad*(rhoL_ad - rhoR_ad) ! bump uface in direction of lower density
+                du_ad = f*A_ad*(rhoL_ad - rhoR_ad)  ! bump uface in direction of lower density
                 s% RTI_du_diffusion_kick(k) = du_ad%val
                 s% u_face_ad(k) = s% u_face_ad(k) + du_ad
              end if
          end if
 
-         if (s% RSP2_flag) then ! include Uq in u_face
+         if (s% RSP2_flag) then  ! include Uq in u_face
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
@@ -455,6 +447,4 @@
 
       end subroutine do1_uface_and_Pface
 
-
       end module hydro_riemann
-

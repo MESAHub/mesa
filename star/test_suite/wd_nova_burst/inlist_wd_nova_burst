@@ -145,7 +145,6 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
    Grid8_win_flag = .true.
@@ -165,4 +164,3 @@
    !Text_Summary1_name(8,2) = 'cz_top_radius'
 
 / ! end of pgstar namelist
-

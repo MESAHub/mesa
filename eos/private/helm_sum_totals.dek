@@ -1,22 +1,22 @@
        pgas    = pion + pele + ppos + pcoul
 
-       dpgasdd  = dpiondd  + dpepdd  + dpcouldd 
+       dpgasdd  = dpiondd  + dpepdd  + dpcouldd
        dpgasdt  = dpiondt  + dpepdt  + dpcouldt
        dpgasda  = dpionda  + dpepda  + dpcoulda
        dpgasdz  = dpiondz  + dpepdz  + dpcouldz
-       dpgasddd = dpionddd + dpepddd + dpcoulddd 
-       dpgasddt = dpionddt + dpepddt + dpcoulddt 
-       dpgasdda = dpiondda + dpepdda + dpcouldda 
-       dpgasddz = dpionddz + dpepddz + dpcoulddz 
-       dpgasdtt = dpiondtt + dpepdtt + dpcouldtt 
-       dpgasdta = dpiondta + dpepdta + dpcouldta 
-       dpgasdtz = dpiondtz + dpepdtz + dpcouldtz 
-       dpgasdaa = dpiondaa + dpepdaa + dpcouldaa 
-       dpgasdaz = dpiondaz + dpepdaz + dpcouldaz 
-       dpgasdzz = dpiondzz + dpepdzz + dpcouldzz 
+       dpgasddd = dpionddd + dpepddd + dpcoulddd
+       dpgasddt = dpionddt + dpepddt + dpcoulddt
+       dpgasdda = dpiondda + dpepdda + dpcouldda
+       dpgasddz = dpionddz + dpepddz + dpcoulddz
+       dpgasdtt = dpiondtt + dpepdtt + dpcouldtt
+       dpgasdta = dpiondta + dpepdta + dpcouldta
+       dpgasdtz = dpiondtz + dpepdtz + dpcouldtz
+       dpgasdaa = dpiondaa + dpepdaa + dpcouldaa
+       dpgasdaz = dpiondaz + dpepdaz + dpcouldaz
+       dpgasdzz = dpiondzz + dpepdzz + dpcouldzz
 
        egas    = eion + eele + epos + ecoul
-       
+
        if (.false.) then
        write(*,'(a6,e15.5)') 'egas', egas
        write(*,'(a6,e15.5)') 'eion', eion
@@ -30,16 +30,16 @@
        degasdt  = deiondt  + deepdt  + decouldt
        degasda  = deionda  + deepda  + decoulda
        degasdz  = deiondz  + deepdz  + decouldz
-       degasddd = deionddd + deepddd + decoulddd 
-       degasddt = deionddt + deepddt + decoulddt 
-       degasdda = deiondda + deepdda + decouldda 
-       degasddz = deionddz + deepddz + decoulddz 
-       degasdtt = deiondtt + deepdtt + decouldtt 
-       degasdta = deiondta + deepdta + decouldta 
-       degasdtz = deiondtz + deepdtz + decouldtz 
-       degasdaa = deiondaa + deepdaa + decouldaa 
-       degasdaz = deiondaz + deepdaz + decouldaz 
-       degasdzz = deiondzz + deepdzz + decouldzz 
+       degasddd = deionddd + deepddd + decoulddd
+       degasddt = deionddt + deepddt + decoulddt
+       degasdda = deiondda + deepdda + decouldda
+       degasddz = deionddz + deepddz + decoulddz
+       degasdtt = deiondtt + deepdtt + decouldtt
+       degasdta = deiondta + deepdta + decouldta
+       degasdtz = deiondtz + deepdtz + decouldtz
+       degasdaa = deiondaa + deepdaa + decouldaa
+       degasdaz = deiondaz + deepdaz + decouldaz
+       degasdzz = deiondzz + deepdzz + decouldzz
 
        sgas    = sion + sele + spos + scoul
 
@@ -47,17 +47,16 @@
        dsgasdt  = dsiondt  + dsepdt  + dscouldt
        dsgasda  = dsionda  + dsepda  + dscoulda
        dsgasdz  = dsiondz  + dsepdz  + dscouldz
-       dsgasddd = dsionddd + dsepddd + dscoulddd 
-       dsgasddt = dsionddt + dsepddt + dscoulddt 
-       dsgasdda = dsiondda + dsepdda + dscouldda 
-       dsgasddz = dsionddz + dsepddz + dscoulddz 
-       dsgasdtt = dsiondtt + dsepdtt + dscouldtt 
-       dsgasdta = dsiondta + dsepdta + dscouldta 
-       dsgasdtz = dsiondtz + dsepdtz + dscouldtz 
-       dsgasdaa = dsiondaa + dsepdaa + dscouldaa 
-       dsgasdaz = dsiondaz + dsepdaz + dscouldaz 
-       dsgasdzz = dsiondzz + dsepdzz + dscouldzz 
- 
+       dsgasddd = dsionddd + dsepddd + dscoulddd
+       dsgasddt = dsionddt + dsepddt + dscoulddt
+       dsgasdda = dsiondda + dsepdda + dscouldda
+       dsgasddz = dsionddz + dsepddz + dscoulddz
+       dsgasdtt = dsiondtt + dsepdtt + dscouldtt
+       dsgasdta = dsiondta + dsepdta + dscouldta
+       dsgasdtz = dsiondtz + dsepdtz + dscouldtz
+       dsgasdaa = dsiondaa + dsepdaa + dscouldaa
+       dsgasdaz = dsiondaz + dsepdaz + dscouldaz
+       dsgasdzz = dsiondzz + dsepdzz + dscouldzz
 
 
        if (include_radiation) then
@@ -112,9 +111,9 @@
           dentrdaa = dsraddaa + dsgasdaa
           dentrdaz = dsraddaz + dsgasdaz
           dentrdzz = dsraddzz + dsgasdzz
-         
+
        else ! no radiation
-       
+
           pres    = pgas
 
           dpresdd  = dpgasdd
@@ -167,4 +166,4 @@
           dentrdzz = dsgasdzz
 
        end if
-       
+

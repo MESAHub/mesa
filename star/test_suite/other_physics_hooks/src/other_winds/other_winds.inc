@@ -2,11 +2,11 @@
       subroutine read_inlist_other_winds(ierr)
          integer, intent(out) :: ierr
          character (len=256) :: filename, message
-         integer :: unit         
+         integer :: unit
          filename = 'inlist_other_winds'
-         
+
          write(*,*) 'read_inlist_other_winds'
-         
+
          ! set defaults
          wind_scheme = ''
          Kudritzki_scaling_factor = 0d0
@@ -17,21 +17,21 @@
          if (ierr /= 0) then
             write(*, *) 'Failed to open control namelist file ', trim(filename)
          else
-            read(unit, nml=other_winds, iostat=ierr)  
+            read(unit, nml=other_winds, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=other_winds)
                close(unit)
-            end if  
+            end if
          end if
 
       end subroutine read_inlist_other_winds
-      
+
 
       subroutine other_wind(id, L, M, R, Tsurf, X, Y, Z, w, ierr)
          use star_def
@@ -554,4 +554,4 @@
          xdlame=1.42d0*xlogl+0.61d0*log10(rst)-0.99d0*log10(stmass)-12.71d0
          xdbaco=1.10d0*xlogl+log10(1.35d-12)
        end subroutine mdote
-      
+

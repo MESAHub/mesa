@@ -17,6 +17,7 @@ ifeq ($(USE_PGSTAR),YES)
       pgstar_decorator.f90 \
       pgstar_ctrls_io.f90 \
       pgstar_support.f90 \
+      pgstar_colors.f90 \
       pgstar_hist_track.f90 \
       pgstar_kipp.f90 \
       pgstar_dpg_dnu.f90 \
@@ -219,7 +220,7 @@ SRCS = \
    init.f90 \
    star_job_ctrls_io.f90 \
    star_lib.f90 \
-   run_star_support.f90 
+   run_star_support.f90
 
 #################################################################
 #
@@ -228,10 +229,10 @@ SRCS = \
 ifeq ($(USE_SHARED), YES)
      LIBS_OTHER = $(LIBS_MESA_STAR_SUPPORT)
      DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR_SUPPORT) 
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR_SUPPORT)
 
 ifeq ($(USE_PGSTAR), YES)
-    LOAD_OTHER +=  $(LOAD_PGPLOT) 
+    LOAD_OTHER +=  $(LOAD_PGPLOT)
 endif
 
 endif
@@ -288,7 +289,7 @@ INCLUDE_OTHER = -I$(MOD_OTHER_DIR)
 STAR_INCLUDES = \
    $(INCLUDE_DEFAULTS) $(INCLUDE_JOB) $(INCLUDE_OTHER)
 
-COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(STAR_INCLUDES) 
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(STAR_INCLUDES)
 #COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(STAR_INCLUDES)
 
 #COMPILE = $(COMPILE_NO_OPENMP_NO_OPT) $(FCfree) $(STAR_INCLUDES)
@@ -311,14 +312,6 @@ else
 	$(COMPILE) $<
 endif
 
-pgstar_ctrls_io.o: %.o : %.f90
-ifneq ($(QUIET),)
-	@echo COMPILE_LEGACY $<
-	@$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
-else
-	$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
-endif
-
 se_support_full.o se_support_stub.o report.o profile.o : %.o : %.f90
 ifneq ($(QUIET),)
 	@echo STAR_COMPILE_BASIC $<
@@ -333,16 +326,16 @@ endif
 
 # comments from Rich:
 
-# Free source form was introduced in Fortran 90, 
-# hence the .f90 extension convention 
+# Free source form was introduced in Fortran 90,
+# hence the .f90 extension convention
 # (which in retrospect was a bad choice, but we're stuck with it).
-# In our build system, we pass flags to the compiler explicitly 
-# telling it that .f files should be compiled as fixed-form, 
-# and .f90 files as free-form. Trying to compile a free-form file 
+# In our build system, we pass flags to the compiler explicitly
+# telling it that .f files should be compiled as fixed-form,
+# and .f90 files as free-form. Trying to compile a free-form file
 # as a fixed-form file, or vice versa, will lead to syntax errors.
-# We also use the makedepf90 dependency tool, which determines 
-# which modules are 'use'd in a given source file. A mixed-up file 
-# extension will usually lead to incorrect dependency generation, 
+# We also use the makedepf90 dependency tool, which determines
+# which modules are 'use'd in a given source file. A mixed-up file
+# extension will usually lead to incorrect dependency generation,
 # which can then in turn produce weird make errors.
 
 ############################################################################################
@@ -395,12 +388,12 @@ FULLDEPS ?= yes
 # Turning off FULLDEPS makes Bill happy because eliminates unnecessary extra compiles
 # but beware; here are comments from Rich:
 #
-# Generally speaking, we *DON'T* want to make the order-only checking the default, 
-# because then a modification to a module which changes its public interface 
-# would not trigger a rebuild of all the modules which depend on it. 
+# Generally speaking, we *DON'T* want to make the order-only checking the default,
+# because then a modification to a module which changes its public interface
+# would not trigger a rebuild of all the modules which depend on it.
 # Bad things would result.
 #
-# However, for when one is playing around with internals, in a way that doesn't 
+# However, for when one is playing around with internals, in a way that doesn't
 # affect public interfaces, it can be a time-saving measure to use order-only checking.
 
 # reminders for Bill: the name of the file must be the same as the name of the module

@@ -28,19 +28,19 @@
       max_model_number = 2000
       use_gold2_tolerances = .true.
 
-      extra_terminal_output_file = 'log1' 
+      extra_terminal_output_file = 'log1'
       log_directory = 'LOGS1'
 
       profile_interval = 50
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
-      
+
       varcontrol_target = 1d-3
 
       use_ledoux_criterion = .true.
       alpha_semiconvection = 1d0
-      
+
       ! we use step overshooting
       overshoot_scheme(1) = 'step'
       overshoot_zone_type(1) = 'burn_H'
@@ -48,7 +48,7 @@
       overshoot_bdy_loc(1) = 'top'
       overshoot_f(1) = 0.345
       overshoot_f0(1) = 0.01
-      
+
       ! step_overshoot_f_above_burn_h_core = 0.345
       ! overshoot_f0_above_burn_h_core = 0.01
       ! step_overshoot_D0_coeff = 1.0
@@ -62,12 +62,12 @@
       cool_wind_full_on_T = 0d0
       Dutch_scaling_factor = 20d0 ! use an extreme wind to verify wind accretion is properly restricted
                                   ! to the Eddington limit
-      
+
 
 / ! end of controls namelist
 
 
 &pgstar
-         
+
 
 / ! end of pgstar namelist

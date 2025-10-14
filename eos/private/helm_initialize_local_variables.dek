@@ -398,7 +398,7 @@
        dscouldaa = 0.0d0
        dscouldaz = 0.0d0
        dscouldzz = 0.0d0
-       
+
        plasg = 0
 
        chit     = 0.0d0

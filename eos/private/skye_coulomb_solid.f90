@@ -1,8 +1,27 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2022  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!
+! ***********************************************************************
+
 module skye_coulomb_solid
    use math_lib
    use math_def
    use auto_diff
-   use const_def
+   use const_def, only: dp, pi, fine, eulernum
 
    implicit none
 
@@ -31,15 +50,15 @@ module skye_coulomb_solid
       real(dp), parameter :: A1 = 10.9d0
       real(dp), parameter :: A2 = 247d0
       real(dp), parameter :: A3 = 1.765d5
-      real(dp), parameter :: B1 = 0.12d0 ! coefficient of \eta^2/\Gamma at T=0
+      real(dp), parameter :: B1 = 0.12d0  ! coefficient of \eta^2/\Gamma at T=0
 
       type(auto_diff_real_2var_order3) :: TPT2
 
       TPT2=TPT*TPT
 
       F = -(A1 / GAMI + A2 / (2d0 * pow2(GAMI)) + A3 / (3d0 * pow3(GAMI)))
-      F = F * exp(-(B1 / A1) * TPT2) ! suppress.factor of classical anharmonicity
-      F = F - B1 * TPT2 / GAMI ! Quantum correction
+      F = F * exp(-(B1 / A1) * TPT2)  ! suppress.factor of classical anharmonicity
+      F = F - B1 * TPT2 / GAMI  ! Quantum correction
    end function ocp_solid_anharmonic_free_energy
 
    !> Computes the harmonic non-ideal free energy of a
@@ -66,7 +85,7 @@ module skye_coulomb_solid
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-      real(dp), parameter :: CM = .895929256d0 ! Madelung
+      real(dp), parameter :: CM = .895929256d0  ! Madelung
       real(dp), parameter :: EPS=1d-5
 
       ! BCC lattice.
@@ -74,7 +93,7 @@ module skye_coulomb_solid
       ! a lower free energy than their fit to the FCC lattice in all cases of
       ! interest (and no cases of which I am aware), so we can specialize
       ! to the BCC case.
-      real(dp), parameter :: CLM=-2.49389d0 ! 3*ln<\omega/\omega_p>
+      real(dp), parameter :: CLM=-2.49389d0  ! 3*ln<\omega/\omega_p>
       real(dp), parameter :: U1=0.5113875d0
       real(dp), parameter :: ALPHA=0.265764d0
       real(dp), parameter :: BETA=0.334547d0
@@ -99,9 +118,9 @@ module skye_coulomb_solid
 
       TPT = TPT_in
 
-      if (TPT > 1d0/EPS) then ! asymptote of Eq.(13) of BPY'01
+      if (TPT > 1d0/EPS) then  ! asymptote of Eq.(13) of BPY'01
          F=-1d0 / (C11*TPT*TPT*TPT)
-      else if (TPT < EPS) then ! Eq.(17) of BPY'01
+      else if (TPT < EPS) then  ! Eq.(17) of BPY'01
          F=3d0*log(TPT)+CLM-1.5d0*U1*TPT+TPT*TPT/24.d0
       else
          UP=1d0+TPT*(A1+TPT*(A2+TPT*(A3+TPT*(A4+TPT*TPT*(A6+TPT*TPT*A8)))))
@@ -111,7 +130,7 @@ module skye_coulomb_solid
          EB=exp(-BETA*TPT)
          EG=exp(-GAMMA*TPT)
 
-         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN ! F_{thermal}/NT
+         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN  ! F_{thermal}/NT
       end if
 
       U0=-CM*GAMI       ! perfect lattice
@@ -166,7 +185,8 @@ module skye_coulomb_solid
 
          s = 1d0 / (1d0 + 1d-2 * pre_z(int(Z))% logz_3_2 + 0.097d0 / pre_z(int(Z))% z2)
          b1 = 1d0 - 1.1866d0 * pre_z(int(Z))% zm0p267 + 0.27d0 / Z
-         b2 = 1d0 + (2.25d0 * pre_z(int(Z))% zm1_3) * (1d0 + 0.684d0 * pre_z(int(Z))% z5 + 0.222d0 * pre_z(int(Z))% z6) / (1d0 + 0.222d0 * pre_z(int(Z))% z6)
+         b2 = 1d0 + (2.25d0 * pre_z(int(Z))% zm1_3) * (1d0 + 0.684d0 * pre_z(int(Z))% z5 + 0.222d0 * pre_z(int(Z))% z6) &
+                  / (1d0 + 0.222d0 * pre_z(int(Z))% z6)
          b3 = 41.5d0 / (1d0 + pre_z(int(Z))% logz)
          b4 = 0.395d0 * pre_z(int(Z))% logz + 0.347d0 * pre_z(int(Z))% zm3_2
 
@@ -212,7 +232,9 @@ module skye_coulomb_solid
       real(dp) :: CR
 
       CR = 0.05d0 * pow2(Rz - 1d0) / ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
-      dG = CR / (1 + (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
+      dG = CR / (1 + &
+           (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) &
+           * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
 
    end function deltaG_Ogata93
 
@@ -301,12 +323,12 @@ module skye_coulomb_solid
             ! We extend to the case of equality by grouping equal-charge species together, as above.
             if (unique_charges(j) < unique_charges(i)) cycle
 
-            RZ = unique_charges(j)/unique_charges(i) ! Charge ratio
+            RZ = unique_charges(j)/unique_charges(i)  ! Charge ratio
 
             ! max avoids divergence.
             ! The contribution to F scales as abundance_sum^2, so in cases where the max returns eps
             ! we don't care much about the error this incurs.
-            aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))! = x2 / (x1 + x2) in MC10's language
+            aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))  ! = x2 / (x1 + x2) in MC10's language
             if (Skye_solid_mixing_rule == 'Ogata') then
                dG = deltaG_Ogata93(aj, RZ)
             else if (Skye_solid_mixing_rule == 'PC') then

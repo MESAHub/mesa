@@ -8,7 +8,7 @@ This test suite example builds a Type IIp supernova model, including Rayleigh-Ta
 
 This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_infall``) loads ``pre_ccsn.mod`` from ``make_pre_ccsn_IIp``. The evolution of the 11.7 MSun model with with cell center Riemann velocities (u) and a total energy of -9.4e50 erg continues util R_center drops below 400 km:
+* Part 1 (``inlist_infall``) loads ``pre_ccsn.mod`` from ``make_pre_ccsn_IIp``. The evolution of the 11.7 |MSun| model with with cell center Riemann velocities (u) and a total energy of -9.4e50 erg continues util R_center drops below 400 km:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/infall.svg
    :width: 100%
@@ -44,7 +44,7 @@ This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click t
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part4.svg
    :width: 100%
 
-* Part 8 (``inlist_shock_part5``) continues the approach to shock breakout, terminating when the shock reaches 11.70 Msun, and creating the ``mesa.abn`` and ``mesa.abn`` files for subsequent use with STELLA:
+* Part 8 (``inlist_shock_part5``) continues the approach to shock breakout, terminating when the shock reaches 11.70 |Msun|, and creating the ``mesa.abn`` and ``mesa.abn`` files for subsequent use with STELLA:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part5.svg
    :width: 100%
@@ -59,10 +59,7 @@ pgstar commands used for the first 7 plots:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
-
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -201,13 +198,13 @@ pgstar commands used for the first 7 plots:
   Grid2_num_cols = 7
   Grid2_num_rows = 8
   Grid2_num_plots = 5
-  
+
   Grid2_win_flag = .true.
   Grid2_win_width = 15
   Grid2_win_aspect_ratio = 0.6
-  
+
   Grid2_file_flag = .true.
-  Grid2_file_dir = 'png' 
+  Grid2_file_dir = 'png'
   Grid2_file_prefix = 'test_'
   Grid2_file_interval = 100
   Grid2_file_width = 15
@@ -245,10 +242,8 @@ pgstar commands used for the 8th plot:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 1
 
@@ -333,7 +328,7 @@ pgstar commands used for the 8th plot:
    Grid2_win_flag = .true.
 
   Grid2_file_flag = .true.
-  Grid2_file_dir = 'png' 
+  Grid2_file_dir = 'png'
   Grid2_file_prefix = 'test_'
   Grid2_file_interval = 100
   Grid2_file_width = 15
@@ -342,6 +337,4 @@ pgstar commands used for the 8th plot:
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 03Jun2021 (MESA 5be9e57) by fxt
-

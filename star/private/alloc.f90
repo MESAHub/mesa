@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -46,7 +40,6 @@
 
       logical, parameter :: quad_array_debug = .false.
       logical, parameter :: quad_array_trace = .false.
-
 
       ! working storage
 
@@ -81,9 +74,7 @@
       integer :: num_calls, num_returns
       integer :: num_allocs, num_deallocs
 
-
       contains
-
 
       subroutine init_alloc
          integer :: i
@@ -239,6 +230,7 @@
          use kap_lib, only: free_kap_handle
          use eos_lib, only: free_eos_handle
          use net_lib, only: free_net_handle
+         use colors_lib, only: free_colors_handle
          use star_private_def, only: free_star
          use star_bcyclic, only: clear_storage
          type (star_info), pointer :: s
@@ -254,6 +246,9 @@
 
          call free_kap_handle(s% kap_handle)
          s%kap_handle = 0
+
+         call free_colors_handle(s% colors_handle)
+         s%colors_handle = 0
 
          ! Free star_info arrays
 
@@ -281,7 +276,7 @@
 
             deallocate(s%other_star_info)
 
-         endif
+         end if
 
          call dealloc_history(s)
 
@@ -475,7 +470,7 @@
          include 'formats'
 
          ierr = 0
-         null_str = '' ! avoid bogus compiler warnings 'array subscript 1 is above array bounds'
+         null_str = ''  ! avoid bogus compiler warnings 'array subscript 1 is above array bounds'
 
 
          species = s% species
@@ -497,12 +492,12 @@
          if (action == do_copy_pointers_and_resize) then
             if (associated(c_in)) then
                c => c_in
-            else ! nothing to copy, so switch to allocate
+            else  ! nothing to copy, so switch to allocate
                action = do_allocate
             end if
          end if
 
-         do ! just so can exit on failure
+         do  ! just so can exit on failure
 
             if (action /= do_fill_arrays_with_NaNs) then
                ! these arrays must not be filled with NaNs
@@ -765,6 +760,11 @@
             if (failed('tau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
+
+            call do1(s% flux_limit_R, c% flux_limit_R)
+            if (failed('flux_limit_R')) exit
+            call do1(s% flux_limit_lambda, c% flux_limit_lambda)
+            if (failed('flux_limit_lambda')) exit
 
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit
@@ -2374,7 +2374,7 @@
             s% i_dlnR_dt = s% i_lnR
             s% i_dv_dt = s% i_v
             s% i_du_dt = s% i_u
-         else ! HSE is included in dv_dt, so drop dlnR_dt
+         else  ! HSE is included in dv_dt, so drop dlnR_dt
             s% i_equL = s% i_lnd
             s% i_dv_dt = s% i_lnT
             s% i_dlnE_dt = s% i_lum
@@ -2442,7 +2442,7 @@
 
          include 'formats'
 
-         if (s% nvar_hydro == 0) return ! not ready to set chem names yet
+         if (s% nvar_hydro == 0) return  ! not ready to set chem names yet
 
          old_size = size(s% nameofvar,dim=1)
          if (old_size < s% nvar_total) then
@@ -2548,7 +2548,7 @@
 
          if (crit) then
 !$omp critical (alloc_work_array1)
-            num_calls = num_calls + 1 ! not safe, but just for info
+            num_calls = num_calls + 1  ! not safe, but just for info
             do i = 1, num_work_arrays
                if (get1(i)) then
                   okay = .true.
@@ -3088,22 +3088,22 @@
                deallocate(work_pointers(i)%p)
                nullify(work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_int_work_arrays
             if (associated(int_work_pointers(i)%p)) then
                deallocate(int_work_pointers(i)%p)
                nullify(int_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
          do i=1,num_logical_work_arrays
             if (associated(logical_work_pointers(i)%p)) then
                deallocate(logical_work_pointers(i)%p)
                nullify(logical_work_pointers(i)%p)
                num_deallocs = num_deallocs + 1
-            endif
-         enddo
+            end if
+         end do
 
       end subroutine free_work_arrays
 
@@ -3212,6 +3212,5 @@
          character (len=*), intent(in) :: str
          call do_return_work_array(s, .false., ptr, str)
       end subroutine non_crit_return_work_array
-
 
       end module alloc

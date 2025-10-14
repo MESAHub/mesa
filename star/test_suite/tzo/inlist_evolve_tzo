@@ -11,7 +11,7 @@
 
       ! save a model at the end of the run
       save_model_when_terminate = .true.
-      save_model_filename = 'final.mod' 
+      save_model_filename = 'final.mod'
       required_termination_code_string = 'PASS: Have reached requested NS mass'
 
       write_profile_when_terminate = .true.
@@ -19,19 +19,19 @@
       save_pgstar_files_when_terminate=.true.
 
       change_initial_net=.true.
-      new_net_name='approx21.net' 
+      new_net_name='approx21.net'
 
       set_initial_dt = .true.
       years_for_initial_dt = 1d-6
 
       set_initial_age = .true.
-      initial_age = 0     
+      initial_age = 0
 
       set_initial_model_number = .true.
       initial_model_number = 0
 
       set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0 
+      new_cumulative_energy_error = 0d0
 
       relax_Y = .false.
       relax_Z = .false.
@@ -50,7 +50,6 @@
 /
 
 
-
 &controls
       x_integer_ctrl(1) = 4 ! Inlist number
 
@@ -58,7 +57,7 @@
       ! Default choices
       x_ctrl(1) = 1d0 ! Scale L_center by this times L_edd
       x_ctrl(2) = 1d0 ! Accretion efficeny for growth of the NS mass
-    
+
       mixing_length_alpha = 1.8
       van_Loon_scaling_factor = 1d0
       x_logical_ctrl(1) = .true. ! If true turn on v_flag after 100 years
@@ -92,7 +91,7 @@
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'iterated'
-      
+
       op_split_burn=.true.
 
       MLT_option = 'TDC'
@@ -103,7 +102,7 @@
       delta_lgL_He_limit = 1d99
 
       restore_mesh_on_retry = .true.
-      num_steps_to_hold_mesh_after_retry = 1 
+      num_steps_to_hold_mesh_after_retry = 1
 
       make_gradr_sticky_in_solver_iters = .true.
       convergence_ignore_equL_residuals = .true.
@@ -126,16 +125,16 @@
       overshoot_f0(1) = 0.0d0
 
       min_dq_for_xa_convective = -1
-      
+
       max_timestep=2d8 ! This is helpful to limit, you can take larger timesteps but you end up with many more retries
-      
+
       ignore_too_large_correction = .true.
       scale_max_correction = 0.01d0
       ignore_species_in_max_correction = .true.
 
       set_min_d_mix=.true.
       min_d_mix=1d6
-      mass_lower_limit_for_min_D_mix = 0d0 
+      mass_lower_limit_for_min_D_mix = 0d0
       mass_upper_limit_for_min_D_mix = 3.0d0
       min_center_Ye_for_min_D_mix = 0.0d0
 
@@ -186,6 +185,5 @@
 
 
 &pgstar
-
 
 / ! end of pgstar namelist

@@ -1,4 +1,4 @@
-_outcom ;
+reset_outcom ;
 _trace '-------' ;
 -- GEAR integrator for ODE with sparse Jacobian and option METH=3
 -- for BRAYTON, GUSTAVSON & HACHTEL method
@@ -19,7 +19,7 @@ _Define
 --_TRACE "99996(@term,'(a,4L3,i4,a)')' EVALJA needbr corrco badste ifail=',
 --             EVALJA, needbr, corrco, badste, ifail,"
 --_TRACE "@wterm' EVALJA=',EVALJA,'  ifail =',ifail,'  H=',H,"
---_TRACE "if (Nstep>16290)write( @term,'(a,L3,a,i3,2(a,1p,g12.5),a)') 
+--_TRACE "if (Nstep>16290)write( @term,'(a,L3,a,i3,2(a,1p,g12.5),a)')
 --   ' EVALJA=',EVALJA,'  ifail =',ifail,'  H=',H,' Tp(76)=',Y(276,1),"
 --_TRACE "WRITE(*,*)' N=',N,' Nzmod=',Nzmod,"
 --  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
@@ -88,7 +88,7 @@ SUBROUTINE VTSTIF;
    ERROR   An array of N elements proportional to the estimated one step
              error in each component.
    KFLAG   A completion code with the following meanings:
-             0 the step was succesful
+             0 the step was successful
             -1 the requested error could not be achieved with
                abs(H)=HMIN
             -2 corrector convergence could not be achieved for
@@ -101,14 +101,14 @@ SUBROUTINE VTSTIF;
               0 perform the first step. This value enables the
                 subroutine to initialize itself.
              >0 take a new step continuing from the last.
-                Assumes the last step was succesful and user has not
+                Assumes the last step was successful and user has not
                 changed any parameters.
              <0 repeat the last step with a new value of H and/or
                 EPS and/or METH. This may be either in redoing a step
-                that failed, or in continuing from a succesful step.
+                that failed, or in continuing from a successful step.
              On exit, JSTART is set to NQ, the current order of the
                 method. This is also the order of the maximum derivative
-                available in the Y array. After a succesful step, JSTART
+                available in the Y array. After a successful step, JSTART
                 need not be reset for the next call.
    AJAC    A block used for partial derivatives. It keeps the
              matrix AJAC=1-EL(1)*H*Jacobian & is computed by DIFMAT.
@@ -146,7 +146,7 @@ _INCLUDE snrad;
    IF(MOD(NSTEP,MBATCH)==0) NEEDBR=.TRUE.;
    RETCOD=0;
    <*G: GENERAL STEP OF STIFF WHILE RETCOD==0 *>;
-   <*X: ALL RETURNS ARE MADE THROUGH THIS SECTION DEPENDING ON RETCOD. 
+   <*X: ALL RETURNS ARE MADE THROUGH THIS SECTION DEPENDING ON RETCOD.
         H IS USED IN HOLD TO ALLOW THE CALLER TO CHANGE H ON THE NEXT STEP. *>;
    RETURN;
    END;
@@ -219,7 +219,7 @@ REAL*8 XMOD,ERREST,ERROLD;
          -- EVALJA is set to .TRUE. to force
          -- Jacobian to be calculated in DIFMAT.
       HOLD=H; MEO=METH;
-      EVALJA=.TRUE.; 
+      EVALJA=.TRUE.;
       OLDJAC=.FALSE.;
       NEEDBR=.TRUE.;
       LMAX=MAXORD+1;
@@ -232,7 +232,7 @@ REAL*8 XMOD,ERREST,ERROLD;
                      -- correction iterates
 %FC:
  -- If the caller change EPSJ or METH , the constants E,EUP,EDN,BND
- -- must be reseted.
+ -- must be reset.
     EPSJ=EPS*SQRT(Real(N));
       IF(METH==MEO) THEN;
         IF(EPSJ^=EPSOLD)THEN;
@@ -269,7 +269,7 @@ REAL*8 XMOD,ERREST,ERROLD;
        _DO I=1,N; FSAVE(I)=Y(I,1) _OD;
        CORRCO=.FALSE.; -- Corrector convergence. It is tested
                        -- by requiring changes relative to YMAX(I)
-                       -- to be less, in Euclidian norm, than BND,
+                       -- to be less, in Euclidean norm, than BND,
                        -- which is dependent on EPSJ.
        _WHILE ^CORRCO & ITER<MAXITE _DO
           <*Cor: Up to MAXITE corrector iterations are taken.
@@ -322,11 +322,11 @@ REAL*8 XMOD,ERREST,ERROLD;
     -- if(Nstep>1586 & EVALJA)then;
     if(Nstep>=NDebug & EVALJA)then;
       <*DEB: full debugger of Jacobian *>;
-    end if;  
+    end if;
     CALL DIFMAT;     -- if necessary (i.e. EVALJA=.true.) the partials
                      -- are reevaluated by DIFMAT
     <*MatrOut : output Jacobian matrix *>;
-    -- stop ' Jacobian is output'; 
+    -- stop ' Jacobian is output';
     _IF BADSTE _THEN
        -- Something is wrong in DIFMAT (i.e. Y(I) is out of physical
        -- range for some I)
@@ -378,13 +378,13 @@ REAL*8 XMOD,ERREST,ERROLD;
   _Do Isw=1,NZMOD;
      ASAVE(Isw)=AJAC(Isw);
   _od;
---_repeat 
+--_repeat
   If(Needbr)then;
       <*SOLY12:   *>
       IRW=Idisp(11);
       IF (IFAIL==2)then;
          NUMSING=.true.;
-         NEEDBR=.true.; 
+         NEEDBR=.true.;
          ITER=MAXITE; EVALJA=.FALSE.; OLDJAC=.FALSE.;
          Ifail=13;
        -- Variables are given the values such as to guarantee that
@@ -397,14 +397,14 @@ REAL*8 XMOD,ERREST,ERROLD;
       IRW=IW(1);
       IF (IFAIL==6)then;
          NUMSING=.true.;
-         NEEDBR=.true.; 
+         NEEDBR=.true.;
        ITER=MAXITE; EVALJA=.FALSE.; OLDJAC=.FALSE.;
        Ifail=13;
        -- Variables are given the values such as to guarantee that
        -- control passes to the node %GY - to try a new smaller step
       else;
          NUMSING=.false.;
-         NEEDBR=.false.; 
+         NEEDBR=.false.;
       endif;
   endif;
   IF (NUMSING) THEN;
@@ -423,7 +423,7 @@ REAL*8 XMOD,ERREST,ERROLD;
          ICN(isw)=isw;
          AJAC(isw)=1.d0;
        enddo;
-     else;  
+     else;
  */
        _DO Isw=1,NZMOD;
          IRN(Isw)=IRS(Isw);
@@ -584,7 +584,7 @@ REAL*8 XMOD,ERREST,ERROLD;
            AJAC(Isw)=ASAVE(Isw);
         _OD;
         NEEDBR=.TRUE.; EVALJA=.TRUE.;
---        @wterm ' G_Cor.UK: ifail 13'; 
+--        @wterm ' G_Cor.UK: ifail 13';
    Endif;
 -- _Until ERREST<=ANOISE*XMOD ! ITQ > MAXIT;
    _Until ERREST<=ANOISE*XMOD .or. Ifail==13
@@ -611,7 +611,7 @@ REAL*8 XMOD,ERREST,ERROLD;
      _OD;
       OLDJAC=.TRUE.;
   _IF D<=E _THEN
-        -- After a succesful step, update the Y array and YMAX.
+        -- After a successful step, update the Y array and YMAX.
         -- Consider changing H if IDOUB==1. Otherwise decrease
         -- IDOUB by 1.
         -- If a change in H is considered, an increase
@@ -670,7 +670,7 @@ REAL*8 XMOD,ERREST,ERROLD;
        _ELSE
           _IF KFLAG<=-MAXFAI _THEN
            <*Z: Control reaches this section if MAXFAI or more
-                failures have occured. It is assumed that the
+                failures have occurred. It is assumed that the
                 derivatives that have accumulated in the Y array
                 have errors of the wrong order.
                 Hence the first derivative is recomputed, and the order
@@ -765,7 +765,7 @@ REAL*8 XMOD,ERREST,ERROLD;
            _DO I=1,N;Y(I,NEWQ+1)=ERROR(I)*EL(LNQ)/DBLE(LNQ) _OD;
         ELSE; -- NQ==MAXORD
            NEWQ=NQ;RH=PR3; -- PR3 IS GREATER
-        ENDIF; 
+        ENDIF;
 
 
         -- If there is a change of order, reset NQ and LNQ.
@@ -801,18 +801,18 @@ REAL*8 XMOD,ERREST,ERROLD;
       IF(ABS(H)<=(HMIN*1.00001D0)) THEN;
         RETCOD=2;
       ELSE;
---        write(*,'(a,i7,2i3,1p,2e12.3)') ' GY: maxer, NQ, kflag, H, Hu:', 
+--        write(*,'(a,i7,2i3,1p,2e12.3)') ' GY: maxer, NQ, kflag, H, Hu:',
 --                                             maxer, NQ, kflag, H, Hused;
         RH=RHCORR;
         if(ifail==13 .and. Kbad>0)then;
---          @wterm ' GY: ifail 13'; 
+--          @wterm ' GY: ifail 13';
           -- NQ=1; LNQ=2; -- if we want 1st order
 --           @wterm' Initial from Y  R0=',Y(Kbad-1,1),'  u0=',Y(Nzon+Kbad-1,1);
 --           @wterm' Initial from Y  R1=',Y(Kbad,1),'  u1=',Y(Nzon+Kbad,1);
 --           @wterm' Initial dr=',Y(Kbad,1)-Y(Kbad-1,1),
 --                '  predicted dr=',
 --                 Y(Kbad,1)-Y(Kbad-1,1)+(Y(Nzon+Kbad,1)-Y(Nzon+Kbad-1,1))*h;
-        endif; 
+        endif;
         IF(METH==3)THEN;
            HNT(1)=H*RH;
            CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);
@@ -831,7 +831,7 @@ REAL*8 XMOD,ERREST,ERROLD;
 
 _DO JTST=1,N;      --@VAR
 
-<*ROW: put in IRN(NZ+1:ILAST) all indeces I such that
+<*ROW: put in IRN(NZ+1:ILAST) all indices I such that
                 ICN(I)==JTST *>:
 
      _Do KTST=1,N; --@NAMELEFT,@NAMERIGHT;
@@ -846,7 +846,7 @@ _OD
   ILAST=0;
   do I=1,NZMOD;
     IF(ICS(I)==JTST)THEN;
-      ILAST=ILAST+1; 
+      ILAST=ILAST+1;
       IRN(NZ+ILAST)=I;
     ENDIF;
   enddo;
@@ -875,21 +875,21 @@ _OD
     <*PhysInfo : give info on variable number KTST *>;
 
 %G_COR_MatrOut_COMPR_PhysInfo:
- 	do I=1,NZMOD;
-  	  if(IRS(I)==KTST .and. ICS(I)==JTST)then;   
-	    WRITE(@Wres,'(3(A,1P,E12.4))')
-        	'  Y(K)=',Y(KTST,1),'    Fsave(K)=',Fsave(KTST),
-	        '    Ydot(K)=',FSAVE(NYDIM+KTST);
+   do I=1,NZMOD;
+      if(IRS(I)==KTST .and. ICS(I)==JTST)then;
+      WRITE(@Wres,'(3(A,1P,E12.4))')
+          '  Y(K)=',Y(KTST,1),'    Fsave(K)=',Fsave(KTST),
+          '    Ydot(K)=',FSAVE(NYDIM+KTST);
             WRITE(@Wres,'(2(A,I5),A,1P,E12.4)') ' Control IR=',KTST,
-          	'  IC=',JTST,'   AJAC=',AJAC(I);
+            '  IC=',JTST,'   AJAC=',AJAC(I);
           endif;
-	enddo; -- this is for control of found AJAC; 
+  enddo; -- this is for control of found AJAC;
         ICW=JTST;
         If(ICW<=NZON*NVARS)then;
            Izon=MOD(ICW-1,NZON)+1;
            Ivar=(ICW-1)/NZON +1;
-           WRITE(@Wres,'(3A,I3)') 
-            ' Derivative over ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+           WRITE(@Wres,'(3A,I3)')
+            ' Derivative over ',CharVarName(Ivar)(1:length(CharVarName(Ivar))),
             ' in  zon=',Izon;
         else;
            ICW=ICW-NZON*NVARS;
@@ -903,12 +903,12 @@ _OD
               Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
               WRITE(@Wres,'(2(A,I3))') '  over  FH in L=',L,'    Izon=',Izon;
            endif;
-        endif;  
+        endif;
    If(KTST<=NZON*NVARS)then;
       Izon=MOD(KTST-1,NZON)+1;
       Ivar=(KTST-1)/NZON +1;
-      WRITE(@Wres,'(3A,I3)') 
-            ' for Ydot of ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+      WRITE(@Wres,'(3A,I3)')
+            ' for Ydot of ',CharVarName(Ivar)(1:length(CharVarName(Ivar))),
             ' in  zon=',Izon;
    else;
       KTST1=KTST-NZON*NVARS;
@@ -949,7 +949,7 @@ _DEFINE
 --************** ************** ************** **************
 --   EVALJA=.FALSE.; -- never put it here: some errors may be lost
 --************** ************** ************** **************
-     Nperturb=0; -- index of perturbation, now NO perturbation        
+     Nperturb=0; -- index of perturbation, now NO perturbation
      CALL DIFMAT;
      _Do KTST=1,N;                        -- save old YDOT
         DSAVE(KTST)=FSAVE(NYDIM+KTST);
@@ -979,10 +979,10 @@ _DEFINE
          _Do Ich=1,Mzon;
             Chem0(Ich)=0.1
          _od;
-         Nperturb=1; -- index of perturbation, now  IS perturbation        
+         Nperturb=1; -- index of perturbation, now  IS perturbation
          CALL DIFMAT;
          FSAVE(JTST)=OLD;
-         <*ROW: put in IRN(NZ+1:ILAST) all indeces I such that
+         <*ROW: put in IRN(NZ+1:ILAST) all indices I such that
                 ICN(I)==JTST *>;
          _Do KTST=1,N; --@NAMELEFT,@NAMERIGHT;
             @DNAMEDVAR(KTST) = (FSAVE(NYDIM+KTST)-DSAVE(KTST));
@@ -1068,21 +1068,21 @@ _DEFINE
   ENDIF;
 
 %G_COR_DEB_COMPR_PhysInfo:
- 	do I=1,NZMOD;
-  	  if(IRS(I)==KTST .and. ICS(I)==JTST)then;   
-	    WRITE(@Wres,'(3(A,1P,E12.4))')
-        	'  Y(K)=',Y(KTST,1),'    Fsave(K)=',Fsave(KTST),
-	        '    Ydot(K)=',FSAVE(NYDIM+KTST);
+   do I=1,NZMOD;
+      if(IRS(I)==KTST .and. ICS(I)==JTST)then;
+      WRITE(@Wres,'(3(A,1P,E12.4))')
+          '  Y(K)=',Y(KTST,1),'    Fsave(K)=',Fsave(KTST),
+          '    Ydot(K)=',FSAVE(NYDIM+KTST);
             WRITE(@Wres,'(2(A,I5),A,1P,E12.4)') ' Control IR=',KTST,
-          	'  IC=',JTST,'   AJAC=',AJAC(I);
+            '  IC=',JTST,'   AJAC=',AJAC(I);
           endif;
-	enddo; -- this is for control of found AJAC; 
+  enddo; -- this is for control of found AJAC;
         ICW=JTST;
         If(ICW<=NZON*NVARS)then;
            Izon=MOD(ICW-1,NZON)+1;
            Ivar=(ICW-1)/NZON +1;
-           WRITE(@Wres,'(3A,I3)') 
-            ' Derivative over ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+           WRITE(@Wres,'(3A,I3)')
+            ' Derivative over ',CharVarName(Ivar)(1:length(CharVarName(Ivar))),
             ' in  zon=',Izon;
         else;
            ICW=ICW-NZON*NVARS;
@@ -1096,12 +1096,12 @@ _DEFINE
               Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
               WRITE(@Wres,'(2(A,I3))') '  over  FH in L=',L,'    Izon=',Izon;
            endif;
-        endif;  
+        endif;
    If(KTST<=NZON*NVARS)then;
       Izon=MOD(KTST-1,NZON)+1;
       Ivar=(KTST-1)/NZON +1;
-      WRITE(@Wres,'(3A,I3)') 
-            ' for Ydot of ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+      WRITE(@Wres,'(3A,I3)')
+            ' for Ydot of ',CharVarName(Ivar)(1:length(CharVarName(Ivar))),
             ' in  zon=',Izon;
    else;
       KTST1=KTST-NZON*NVARS;

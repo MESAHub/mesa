@@ -13,9 +13,9 @@ include $(MESA_DIR)/utils/makefile_header
 # SOURCES
 
 SRCS = \
-   star_pgstar.f90 \
-   star_data_def.f90 \
-   star_data_lib.f90 \
+	star_pgstar.f90 \
+	star_data_def.f90 \
+	star_data_lib.f90 \
 
 #################################################################
 #
@@ -29,7 +29,7 @@ $(LIB) : $(OBJS)
 ifneq ($(QUIET),)
 	@echo LIB_TOOL $(LIB)
 	@$(LIB_TOOL) $(LIB) $(OBJS)
-else	   
+else	
 	$(LIB_TOOL) $(LIB) $(OBJS)
 endif
 
@@ -100,12 +100,12 @@ FULLDEPS ?= yes
 # Turning off FULLDEPS makes Bill happy because eliminates unnecessary extra compiles
 # but beware; here are comments from Rich:
 #
-# Generally speaking, we *DON'T* want to make the order-only checking the default, 
-# because then a modification to a module which changes its public interface 
-# would not trigger a rebuild of all the modules which depend on it. 
+# Generally speaking, we *DON'T* want to make the order-only checking the default,
+# because then a modification to a module which changes its public interface
+# would not trigger a rebuild of all the modules which depend on it.
 # Bad things would result.
 #
-# However, for when one is playing around with internals, in a way that doesn't 
+# However, for when one is playing around with internals, in a way that doesn't
 # affect public interfaces, it can be a time-saving measure to use order-only checking.
 
 ifeq ($(filter clean,$(MAKECMDGOALS)),)

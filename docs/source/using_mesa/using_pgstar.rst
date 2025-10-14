@@ -4,13 +4,13 @@ Using PGSTAR
 Watching lots of numbers fly by in the terminal window can provide some
 idea of how a run is going, but it is much better (and much more fun) to
 have windows with plots that change at each step. PGstar is built on
-PGPLOT for creating plots using XWindows for on-screen plots and PNG for
+PGPLOT for creating plots using Xwindows for on-screen plots and PNG for
 frames of movies to animate those plots.
 
-Devote lots of time watching models evolve.  It's a fun way to learn!
+Devote lots of time watching models evolve. It's a fun way to learn!
 
 If you're using the MESA SDK, you should have everything you need to use
-PGSTAR. Otherwise, you need to have installed PGPLOT, XWindows, and a
+PGSTAR. Otherwise, you need to have installed PGPLOT, Xwindows, and a
 few libraries that they need. See the makefile_header_non_mesasdk in
 $MESA_DIR/utils for details. You'll find pgplot.tar.bz2 in
 $MESA_DIR/scripts in case you need to install PGPLOT (thanks to Tim
@@ -110,7 +110,7 @@ won't be available for plotting in PGSTAR history plots. For example, if
 your Kipp plots doesn't show burning and mixing regions, then add them
 to your history_columns.list - e.g., add these:
 
-::
+.. code-block:: fortran
 
    mixing_regions 40
    burning_regions 80
@@ -189,7 +189,9 @@ need to stop and restart the run to change the plots.
 
 Start by opening the pre-defined profile plots. Copy-and-paste the
 following lines to your inlist, then do save. Take a quick look at each
-to familiarize yourself with the options.::
+to familiarize yourself with the options.
+
+.. code-block:: fortran
 
   TRho_Profile_win_flag = .true.
   Summary_Profile_win_flag = .true.
@@ -203,7 +205,9 @@ to familiarize yourself with the options.::
 Next replace those lines by ones to open some of the history plots.
 Copy-and-paste these lines to replace the previous ones. Then do save.
 PGPLOT will ask you to hit return to close the windows that were
-previously open.::
+previously open.
+
+.. code-block:: fortran
 
   Kipp_win_flag = .true.
   TRho_win_flag = .true.
@@ -213,7 +217,9 @@ previously open.::
 
 After looking at those, check out some of the defaults for a few of the
 multi-panel plots. As before, cut-and-paste these lines and replace the
-previous ones.::
+previous ones.
+
+.. code-block:: fortran
 
   Profile_Panels1_win_flag = .true.
   Profile_Panels2_win_flag = .true.
@@ -222,14 +228,16 @@ previous ones.::
   Grid1_win_flag = .true.
   Grid2_win_flag = .true.
 
-  
+
 When you're finished admiring these beauties, delete the "win_flag"
 lines from your inlist, and we'll take a look at how you can modify
 plots.
 
 Let's start by changing some of the Abundance plot controls; do the
 changes one at a time so you can see each change. And make sure the plot
-is visible when you do the save!::
+is visible when you do the save!
+
+.. code-block:: fortran
 
   Abundance_win_flag = .true.
   Abundance_win_width = 6
@@ -244,7 +252,9 @@ control for the number of lines, and name and legend strings for each
 line. Each value can be shown scaled or unscaled. The scaling is max to
 1.0 and min to 0.0. Usually mass fractions are the only things shown
 unscaled. Here are some examples from the default settings. Note the use
-of the PGPLOT symbol for "omega".::
+of the PGPLOT symbol for "omega".
+
+.. code-block:: fortran
 
   Summary_Profile_win_flag = .true.
   Summary_Profile_num_lines = 11 ! <= 16
@@ -265,7 +275,9 @@ of the PGPLOT symbol for "omega".::
 
 Open the Summary_Profile window, then make some changes. Note that you
 can remove a line just by setting the name to ''; you don't have to
-renumber the other lines.::
+renumber the other lines.
+
+.. code-block:: fortran
 
   Summary_Profile_num_lines = 12 ! <= 16
   Summary_Profile_name(12) = 'zone'
@@ -277,7 +289,9 @@ control for the number of lines, and name and legend strings for each
 line. Each value can be shown scaled or unscaled. The scaling is max to
 1.0 and min to 0.0. Usually mass fractions are the only things shown
 unscaled. Here are some examples from the default settings. Note the use
-of PGPLOT text controls for the subscript "c" for center values.::
+of PGPLOT text controls for the subscript "c" for center values.
+
+.. code-block:: fortran
 
   Summary_History_num_lines = 7 ! <= 16
 
@@ -289,7 +303,9 @@ of PGPLOT text controls for the subscript "c" for center values.::
 
 Open the Summary_History window, then make some changes.  Note that
 you can remove a line just by setting the name to ''; you don't have
-to renumber the other lines.::
+to renumber the other lines.
+
+.. code-block:: fortran
 
   Summary_History_win_flag = .true.
   Summary_History_num_lines = 9
@@ -301,7 +317,9 @@ to renumber the other lines.::
 Next, turn on the History\_Track1 plot.  Then change what it is
 plotting by editing the axis name and label. Here's an example.  After
 that, try plotting some other combinations; just pick axis names from
-the column headings in your current LOGS/history.data.::
+the column headings in your current LOGS/history.data.
+
+.. code-block:: fortran
 
   History_Track1_win_flag = .true.
 
@@ -313,7 +331,9 @@ Turn on Profile\_Panels1 and History\_Panels1; they are set up with
 defaults for the number of panels and axes.  Change the defaults to
 show other things -- for the profiles you can select anything that can
 be in a profile_columns.list; for the history you have to select one
-of the column headings in your current LOGS/history.data.::
+of the column headings in your current LOGS/history.data.
+
+.. code-block:: fortran
 
   History_Panels1_win_flag = .true.
   History_Panels1_other_yaxis_name(1) = 'log_center_P'
@@ -322,13 +342,17 @@ of the column headings in your current LOGS/history.data.::
   Profile_Panels1_xaxis_name = 'logP'
   Profile_Panels1_xaxis_reversed = .true.
 
-Add another panel to the Profile plot.::
+Add another panel to the Profile plot.
+
+.. code-block:: fortran
 
   Profile_Panels1_num_panels = 3
   Profile_Panels1_yaxis_name(3) = 'logtau'
   Profile_Panels1_other_yaxis_name(3) = 'log_opacity'
 
-Increase the y margins.::
+Increase the y margins.
+
+.. code-block:: fortran
 
   Profile_Panels1_ymargin(1) = 0.2
   Profile_Panels1_other_ymargin(1) = 0.2
@@ -337,7 +361,9 @@ Increase the y margins.::
   Profile_Panels1_ymargin(3) = 0.2
   Profile_Panels1_other_ymargin(3) = 0.2
 
-Change the aspect ratio, reduce the width, and fix the left and right margins.::
+Change the aspect ratio, reduce the width, and fix the left and right margins.
+
+.. code-block:: fortran
 
   Profile_Panels1_win_aspect_ratio = 1.0 ! aspect_ratio = height/width
   Profile_Panels1_win_width = 6
@@ -350,7 +376,9 @@ the history case, you don't have to limit yourself to the contents of
 your current list.
 
 Next, take a look at the following default definition for
-Profile\_Panels3.::
+Profile\_Panels3.
+
+.. code-block:: fortran
 
   Profile_Panels3_xaxis_name = 'logP'
   Profile_Panels3_xaxis_reversed = .true.
@@ -360,7 +388,9 @@ Profile\_Panels3.::
   Profile_Panels3_yaxis_name(3) = 'Mixing'
 
 Open the plot window and then change the number of panels and the
-contents.  Revise the title and switch the xaxis to mass.::
+contents.  Revise the title and switch the xaxis to mass.
+
+.. code-block:: fortran
 
   Profile_Panels3_win_flag = .true.
   Profile_Panels3_num_panels = 4
@@ -370,7 +400,9 @@ contents.  Revise the title and switch the xaxis to mass.::
   Profile_Panels3_xaxis_reversed = .false.
 
 Now, edit the definition of the Grid1 plot.  Replace the TRho\_Profile
-plot by the Kipp plot and adjust the margins and text scale.::
+plot by the Kipp plot and adjust the margins and text scale.
+
+.. code-block:: fortran
 
   Grid1_win_flag = .true.
   Grid1_plot_name(1) = 'Kipp'
@@ -382,7 +414,9 @@ plot by the Kipp plot and adjust the margins and text scale.::
 Move the text summary up to just below the Kipp plot, and increase the
 number of rows to make the HR and TRho plots taller.  This will
 temporarily mess us the spacing between the subplots, but we'll fix
-that next.::
+that next.
+
+.. code-block:: fortran
 
   Grid1_num_rows = 9 ! divide plotting region into this many equal height rows
   Grid1_plot_row(2) = 7 ! number from 1 at top
@@ -392,31 +426,37 @@ that next.::
   Grid1_plot_row(4) = 5 ! number from 1 at top
   Grid1_plot_rowspan(4) = 2 ! plot spans this number of rows
 
-After that, fix the padding between the plots and adjust the text sizes.::
+After that, fix the padding between the plots and adjust the text sizes.
+
+.. code-block:: fortran
 
   Grid1_plot_pad_top(2) = 0.01 ! fraction of full window height for padding at top
   Grid1_plot_pad_bot(2) = 0.1 ! fraction of full window height for padding at bottom
   Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
   Grid1_plot_pad_right(2) = 0.1 ! fraction of full window width for padding on right
   Grid1_txt_scale_factor(2) = 0.6 ! multiply txt_scale for subplot by this
-  
+
   Grid1_plot_pad_top(3) = 0.01 ! fraction of full window height for padding at top
   Grid1_plot_pad_bot(3) = 0.1 ! fraction of full window height for padding at bottom
   Grid1_plot_pad_left(3) = 0.1 ! fraction of full window width for padding on left
   Grid1_plot_pad_right(3) = 0.05 ! fraction of full window width for padding on right
   Grid1_txt_scale_factor(3) = 0.6 ! multiply txt_scale for subplot by this
-  
+
   Grid1_plot_pad_top(4) = 0.00 ! fraction of full window height for padding at top
   Grid1_plot_pad_bot(4) = 0.05 ! fraction of full window height for padding at bottom
 
-Change the text summary to report 'log\_L\_div\_Ledd' instead of 'log\_LH'.::
+Change the text summary to report 'log\_L\_div\_Ledd' instead of 'log\_LH'.
+
+.. code-block:: fortran
 
  Text_Summary1_name(3,4) = 'log_L_div_Ledd'
 
 Finally, take a quick look at the various multi-panel and grid
 defaults (listed above).  You are not limited to those, but they might
 give you ideas for your own personalized plots.  Here are some of my
-favorites -- you might also find them useful.::
+favorites -- you might also find them useful.
+
+.. code-block:: fortran
 
   Grid8_win_flag = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
   Profile_Panels4_win_flag = .true. ! Abundance, Power, Mixing, and Dynamo
@@ -424,39 +464,51 @@ favorites -- you might also find them useful.::
 
 If you don't have rotation turned on, change from Profile\_Panels4 to
 Profile\_Panels3, or edit your controls for Profile\_Panels4 to drop the
-last panel.::
+last panel.
+
+.. code-block:: fortran
 
   Profile_Panels3_win_flag = .true. ! Abundance, Power, and Mixing
 
-or::
+or
+
+.. code-block:: fortran
 
   Profile_Panels4_num_panels = 3
   Profile_Panels4_title = 'Abundance-Power-Mixing'
 
 PGSTAR has a number of options to control its file output.
 
-The default output format is PNG::
+The default output format is PNG
+
+.. code-block:: fortran
 
   file_device = 'png'
-  file_extension = 'png'
 
-but you can use PostScript output by setting::
+but you can use PostScript output by setting
+
+.. code-block:: fortran
 
   file_device = 'vcps'
-  file_extension = 'ps'
 
 You can change the foreground/background color of your plots between
-black/white and white/black::
+black/white and white/black
+
+.. code-block:: fortran
 
   ! white_on_black flags -- true means white foreground color on black background
   file_white_on_black_flag = .true.
 
-and control the number of digits that appear in the filenames::
-  
+and control the number of digits that appear in the filenames
+
+.. code-block:: fortran
+
   file_digits = 5 ! number of digits for model_number in filenames
 
 In addition, each plot has controls for its own file output similar to
-the following ones for the TRho_Profile:::
+the following ones for the TRho_Profile:
+
+.. code-block:: fortran
 
   TRho_Profile_file_dir = 'png'
   TRho_Profile_file_flag = .false.
@@ -474,7 +526,9 @@ Make sure to create such a directory first!  (If you're using
 PostScript output, you probably want to create a directory named "ps"
 and set TRho\_Profile\_file\_dir='ps'.)
 
-Finally, there is an HR distance trigger for file output.::
+Finally, there is an HR distance trigger for file output.
+
+.. code-block:: fortran
 
   ! trigger file output by distance traveled on HR diagram
   delta_HR_limit_for_file_output = -1 ! negative means no limit
@@ -488,4 +542,3 @@ Finally, there is an HR distance trigger for file output.::
 
 There are a variety of tools available for combining png files in
 movies.
-

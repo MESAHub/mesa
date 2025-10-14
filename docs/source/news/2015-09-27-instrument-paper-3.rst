@@ -14,4 +14,4 @@ MESA-users <https://sourceforge.net/p/mesa/mailman/message/34195810/>`__
 for more information.
 
 The inlists used are `available for download in the MESA
-marketplace <http://cococubed.com/mesa_market/inlists.html>`__.
+marketplace <https://mesastar.org/marketplace/inlists/>`__.

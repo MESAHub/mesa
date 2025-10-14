@@ -2,30 +2,24 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-      module interp_1d_pm_autodiff ! piecewise monotonic algorithms
+      module interp_1d_pm_autodiff  ! piecewise monotonic algorithms
 
-      use const_lib, only: dp
+      use const_def, only: dp
       use auto_diff
 
       implicit none
@@ -44,18 +38,18 @@
          use interp_1d_def
          use auto_diff
          integer, intent(in) :: nx       ! length of x vector (nx >= 2)
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: h, s, p
          integer :: i
          logical, parameter :: dbg = .true.
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          include 'formats'
@@ -95,7 +89,7 @@
          !end if
 
          do i=1,nx-1
-            h(i) = x(i+1) - x(i) ! width of interval
+            h(i) = x(i+1) - x(i)  ! width of interval
          end do
          do i = 1, nx-1
             if (h(i) == 0) then
@@ -107,7 +101,7 @@
          end do
 
          do i=1,nx-1
-            s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
+            s(i) = (f(1,i+1) - f(1,i)) / h(i)  ! slope across interval
          end do
 
          do i=2,nx-1
@@ -158,17 +152,17 @@
          use interp_1d_def
          use auto_diff
          integer, parameter :: nx = 4   ! length of x vector (nx >= 2)
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: h, s, p
          integer :: i
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -183,7 +177,7 @@
          p(1:nx) => work1(1+2*nx:3*nx)
 
          do i=1,nx-1
-            h(i) = x(i+1) - x(i) ! width of interval
+            h(i) = x(i+1) - x(i)  ! width of interval
          end do
          do i = 1, nx-1
             if (h(i) == 0) then
@@ -195,7 +189,7 @@
          end do
 
          do i=1,nx-1
-            s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
+            s(i) = (f(1,i+1) - f(1,i)) / h(i)  ! slope across interval
          end do
          do i=2,nx-1
             p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
@@ -246,17 +240,17 @@
          use interp_1d_def
          use auto_diff
          integer, parameter :: nx = 3
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: h, s, p
          integer :: i
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          if (nwork < pm_work_size) then
@@ -270,7 +264,7 @@
          p(1:nx) => work1(1+2*nx:3*nx)
 
          do i=1,nx-1
-            h(i) = x(i+1) - x(i) ! width of interval
+            h(i) = x(i+1) - x(i)  ! width of interval
          end do
          do i = 1, nx-1
             if (h(i) == 0) then
@@ -282,7 +276,7 @@
          end do
 
          do i=1,nx-1
-            s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
+            s(i) = (f(1,i+1) - f(1,i)) / h(i)  ! slope across interval
          end do
          do i=2,nx-1
             p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
@@ -332,16 +326,16 @@
          use interp_1d_def
          use auto_diff
          integer, parameter :: nx = 2
-         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
 
          type(auto_diff_real_2var_order1) :: h, s
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -351,7 +345,7 @@
             return
          end if
 
-         h = x(2) - x(1) ! width of interval
+         h = x(2) - x(1)  ! width of interval
          if (h == 0) then
             ierr = -1
             write(*, '(a,1x,2i5,1x,a)')  &
@@ -359,7 +353,7 @@
             return
          end if
 
-         s = (f(1, 2) - f(1, 1)) / h ! slope across interval
+         s = (f(1, 2) - f(1, 1)) / h  ! slope across interval
          f(2, 1) = s
          f(2, 2) = 0
 
@@ -379,17 +373,17 @@
          use auto_diff
          integer, intent(in) :: n     ! length of vector
          type(auto_diff_real_2var_order1), intent(in) :: dx
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,n)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:)  ! =(4,n)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
-         character (len=*) :: str ! for debugging
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
+         character (len=*) :: str  ! for debugging
          integer, intent(out) :: ierr
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: s, p
          type(auto_diff_real_2var_order1) :: x(2)
          integer :: i
-         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, n)  ! data & interpolation coefficients
+         type(auto_diff_real_2var_order1), pointer :: f(:,:)  ! (4, n)  ! data & interpolation coefficients
          f(1:4,1:n) => f1(1:4*n)
 
          ierr = 0
@@ -422,7 +416,7 @@
          ierr = 0
 
          do i=1,n-1
-            s(i) = f(1,i+1) - f(1,i) ! slope across interval
+            s(i) = f(1,i+1) - f(1,i)  ! slope across interval
          end do
          do i=2,n-1
             p(i) = 0.5d0*(s(i-1) + s(i))

@@ -2,49 +2,43 @@
 !
 !   Copyright (C) 2011-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
       module condint
 
-      use const_def, only: dp
+      use const_def, only: dp, iln10
       use math_lib
       use utils_lib, only: mesa_error
 
       implicit none
 
+      private
+      public :: init_potekhin
+      public :: do_electron_conduction
 
       integer, parameter :: num_logTs=29, num_logRhos=71, num_logzs=15
       !!! NB: These parameters must be consistent with the table "condtabl.d"!
       logical :: initialized = .false.
 
       real(dp) :: logTs(num_logTs), logRhos(num_logRhos), logzs(num_logzs)
-      real(dp), target :: f_ary(4*num_logRhos*num_logTs*num_logzs) ! for bicubic splines
+      real(dp), target :: f_ary(4*num_logRhos*num_logTs*num_logzs)  ! for bicubic splines
       real(dp), pointer :: f(:,:,:,:)
       integer :: ilinx(num_logzs), iliny(num_logzs)
 
-
       contains
-
 
       subroutine init_potekhin(ierr)
          use kap_def, only: kap_dir
@@ -88,16 +82,16 @@
          end if
          !print*,'Reading thermal conductivity data...'
          read_err = 0
-         read(1,'(A)',iostat=read_err) ! skip the first line
+         read(1,'(A)',iostat=read_err)  ! skip the first line
          if (read_err /= 0) ierr = read_err
          do iz = 1, num_logzs
             read (1,*,iostat=read_err) z, (logTs(it),it=1,num_logTs)
             if (read_err /= 0) ierr = read_err
-            if (z .eq. 1d0) then
+            if (z == 1d0) then
                logzs(iz) = 0d0
             else
                logzs(iz) = log10(z)
-            endif
+            end if
             do ir = 1, num_logRhos
                read(1,*,iostat=read_err) logRhos(ir), (f(1,ir,it,iz),it=1,num_logTs)
                if (read_err /= 0) ierr = read_err
@@ -168,10 +162,10 @@
          ierr = 0
          shift = 4*num_logRhos*num_logTs
 
-         if (logRho_in .lt. logRhos(1)) then
+         if (logRho_in < logRhos(1)) then
             logRho = logRhos(1)
             clipped_logRho = .true.
-         else if (logRho_in .gt. logRhos(num_logRhos)) then
+         else if (logRho_in > logRhos(num_logRhos)) then
             logRho = logRhos(num_logRhos)
             clipped_logRho = .true.
          else
@@ -179,10 +173,10 @@
             clipped_logRho = .false.
          end if
 
-         if (logT_in .lt. logTs(1)) then
+         if (logT_in < logTs(1)) then
             logT = logTs(1)
             clipped_logT = .true.
-         else if (logT_in .gt. logTs(num_logTs)) then
+         else if (logT_in > logTs(num_logTs)) then
             logT = logTs(num_logTs)
             clipped_logT = .true.
          else
@@ -192,11 +186,11 @@
 
          zlog = max(logzs(1),min(logzs(num_logzs),log10(max(1d-30,zbar))))
 
-         if (zlog <= logzs(1)) then ! use 1st
+         if (zlog <= logzs(1)) then  ! use 1st
             call get1(1, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
-         else if (zlog >= logzs(num_logzs)) then ! use last
+         else if (zlog >= logzs(num_logzs)) then  ! use last
             call get1(num_logzs, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
-         else ! interpolate
+         else  ! interpolate
             iz1 = -1
             do iz = 2, num_logzs
                if (zlog >= logzs(iz-1) .and. zlog <= logzs(iz)) then
@@ -309,13 +303,13 @@
          kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use const_def, only: dp
          use auto_diff
-         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
-         real(dp), intent(in) :: logRho ! the density
-         real(dp), intent(in) :: logT ! the temperature
-         real(dp), intent(out) :: kap ! electron conduction opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho  ! the density
+         real(dp), intent(in) :: logT  ! the temperature
+         real(dp), intent(out) :: kap  ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! this implements the correction formulae from Blouin et al. (2020)
          ! https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract
@@ -357,25 +351,25 @@
          ! Therefore, we apply the Blouin+ 2020 corrections in a manner
          ! equivalent to individually correcting the Zbar = {1,2} tables.
 
-         if (Zbar .le. 1d0) then ! all H
+         if (Zbar <= 1d0) then  ! all H
             frac_H = 1d0
             frac_He = 0d0
-         else if (Zbar .le. 2d0) then ! mix H and He
+         else if (Zbar <= 2d0) then  ! mix H and He
             alfa = (log10(Zbar) - log10(1d0)) / (log10(2d0) - log10(1d0))
             frac_H = 1d0 - alfa
             frac_He = alfa
-         else if (Zbar .le. 3d0) then ! mix He and no correction
+         else if (Zbar <= 3d0) then  ! mix He and no correction
             alfa = (log10(Zbar) - log10(2d0)) / (log10(3d0) - log10(2d0))
             frac_H = 0d0
             frac_He = 1d0 - alfa
-         else ! no correction
+         else  ! no correction
             frac_H = 0d0
             frac_He = 0d0
             return
          end if
 
 
-         if (frac_H .gt. 0) then
+         if (frac_H > 0) then
 
             ! correction for H
             Rhostar = logRho_auto - logRho0_H
@@ -396,7 +390,7 @@
          end if
 
 
-         if (frac_He .gt. 0) then
+         if (frac_He > 0) then
 
             ! correction for He
             Rhostar = logRho_auto - logRho0_He
@@ -432,13 +426,13 @@
          kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def, only: Kap_General_Info
          type (Kap_General_Info), pointer, intent(in) :: rq
-         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
-         real(dp), intent(in) :: logRho ! the density
-         real(dp), intent(in) :: logT ! the temperature
-         real(dp), intent(out) :: kap ! electron conduction opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(in) :: zbar  ! average ionic charge (for electron conduction)
+         real(dp), intent(in) :: logRho  ! the density
+         real(dp), intent(in) :: logT  ! the temperature
+         real(dp), intent(out) :: kap  ! electron conduction opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          if (rq% use_blouin_conductive_opacities) then
             call do_electron_conduction_blouin( &
@@ -451,6 +445,5 @@
          end if
 
       end subroutine do_electron_conduction
-
 
       end module condint

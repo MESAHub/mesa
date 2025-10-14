@@ -61,7 +61,7 @@
    star_history_name = 'history.data'
 
    max_age = 24.63d9 !26d9 !0.8d9
-   
+
    do_starspots = .true.
    fspot = 0.34d0
    xspot = 0.85d0
@@ -143,10 +143,8 @@
 
    pgstar_interval = 50
 
-   ! device
    file_white_on_black_flag = .true.
    file_device = 'vcps' ! postscript
-   file_extension = 'ps'
 
    HR_win_flag = .true. ! switch to .true. to visualize in real-time
    HR_file_flag = .true.

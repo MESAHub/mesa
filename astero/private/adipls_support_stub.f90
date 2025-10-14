@@ -2,47 +2,42 @@
 !
 !   Copyright (C) 2021  The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
-
 
       module adipls_support
 
       use astero_def
       use star_lib
       use star_def
-      use const_def
+      use const_def, only: dp, i8
       use utils_lib
 
       implicit none
 
-
       ! args for adipls
       integer :: i_paramset, ierr_param, i_inout, nn
-      real(dp), pointer :: x(:) ! (nn)
-      real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)
+      real(dp), pointer :: x(:)  ! (nn)
+      real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)
       real(dp) :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
 
       integer :: iounit_dev_null = -1
 
-      integer :: nn_redist ! set from redistrb.c input file
+      integer :: nn_redist  ! set from redistrb.c input file
 
 
       real(dp), pointer :: x_arg(:), aa_arg(:,:)
@@ -52,7 +47,6 @@
       logical, parameter :: ADIPLS_IS_ENABLED = .false.
 
       contains
-
 
       ! this can be called from user run_star_extras check model routine
       subroutine do_adipls_get_one_el_info( &
@@ -115,8 +109,8 @@
 
          integer :: i, iriche, iturpr
          integer :: iconst, ivar, ivers
-         real(dp), allocatable :: global_data(:) ! (iconst)
-         real(dp), allocatable :: point_data(:,:) ! (ivar,nn)
+         real(dp), allocatable :: global_data(:)  ! (iconst)
+         real(dp), allocatable :: point_data(:,:)  ! (ivar,nn)
          character (len=2000) :: format_string, num_string, filename
 
          ierr = -1
@@ -136,7 +130,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, nn_arg_0
-         integer(8) :: time0, time1, clock_rate
+         integer(i8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder
@@ -185,10 +179,10 @@
          real(dp), intent(in) :: cgrav
          character (len=64) :: fname
          integer :: nn, iconst, ivar, ivers, ierr
-         real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
-         real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
-         real(dp), pointer :: x(:) ! (nn)   will be allocated
+         real(dp), pointer :: glob(:)  ! (iconst)   will be allocated
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)   will be allocated
+         real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)   will be allocated
+         real(dp), pointer :: x(:)  ! (nn)   will be allocated
          real(dp) :: data(8)
 
 
@@ -201,7 +195,7 @@
          integer, intent(inout) :: iturpr
          real(dp), intent(in) :: data(8)
          real(dp), pointer :: aa(:,:)
-         real(dp), pointer :: x(:) ! (nn)     will be allocated
+         real(dp), pointer :: x(:)  ! (nn)     will be allocated
          ! nn can be less than nn_in
          integer, intent(out) :: nn, ierr
 
@@ -221,14 +215,14 @@
          ! derived from fgong-amdl.d.f
          real(dp), intent(in) :: cgrav
          integer, intent(in) :: nn_in, iconst, ivar, ivers
-         real(dp), intent(inout) :: glob(:) ! (iconst)
-         real(dp), intent(inout) :: var(:,:) ! (ivar,nn_in)
+         real(dp), intent(inout) :: glob(:)  ! (iconst)
+         real(dp), intent(inout) :: var(:,:)  ! (ivar,nn_in)
          real(dp), intent(inout) :: data(8)
-         real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
+         real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)   will be allocated
          integer, intent(out) :: nn, ierr
 
          integer, parameter :: ireset(16) = &
-            (/3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20/)
+            [3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20]
          integer :: nn1, i, n, ir
          real(dp) :: d2amax, var1(ivar,nn_in+100), q(nn_in+100), x(nn_in+100)
 
@@ -240,11 +234,11 @@
       subroutine read_fgong_file(fin, nn, iconst, ivar, ivers, glob, var, ierr)
          character (len=*), intent(in) :: fin
          integer, intent(out) :: nn, iconst, ivar, ivers
-         real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
+         real(dp), pointer :: glob(:)  ! (iconst)   will be allocated
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)   will be allocated
          integer, intent(out) :: ierr
 
-         real(dp), pointer :: var1(:,:) ! (ivar,nn)
+         real(dp), pointer :: var1(:,:)  ! (ivar,nn)
          integer :: ios, iounit, i, n, ir, nn1
          character(80) :: head
 
@@ -257,8 +251,8 @@
       subroutine dump(filename_for_dump,nn,glob,var,ierr)
          character (len=*), intent(in) :: filename_for_dump
          integer, intent(in) :: nn
-         real(dp), pointer :: glob(:) ! (iconst)
-         real(dp), pointer :: var(:,:) ! (ivar,nn)
+         real(dp), pointer :: glob(:)  ! (iconst)
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)
          integer, intent(out) :: ierr
 
          ierr = -1
@@ -267,8 +261,6 @@
 
       subroutine show_adipls_results
          integer :: k
-
       end subroutine show_adipls_results
-
 
       end module adipls_support

@@ -38,10 +38,9 @@ Similarly, it is critical to use the Ledoux criterion::
 
 so that the stabilizing effects of the composition gradient is
 included.
-    
+
 The test succeeds if the 20Ne electron captures cause a temperature
 spike at the center of the model.
-
 
 .. image:: ../../../star/test_suite/wd_aic/docs/grid1000492.png
 
@@ -49,4 +48,3 @@ spike at the center of the model.
 
 
 Last-Updated: 2020-10-30 (mesa r14735) by Josiah Schwab
-

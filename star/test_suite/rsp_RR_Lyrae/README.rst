@@ -4,12 +4,12 @@
 rsp_RR_Lyrae
 ************
 
-This test case checks the non-linear pulsation evolution of a 0.65 Msun, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity - 
+This test case checks the non-linear pulsation evolution of a 0.65 |Msun|, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity -
 a long-period RR Lyrae model contributed by Radek Smolec.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_rsp_rsp_RR_Lyrae``) creates the initial 0.65 Msun, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.71262 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
+* Part 1 (``inlist_rsp_rsp_RR_Lyrae``) creates the initial 0.65 |Msun|, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity model, and writes the results of conducting a linear nonadiabatic stability analysis to the LOGS directory (see Section 2.2 of |MESA V| for details). The evolution with RSP then begins. After 10 periods, the ``run_star_extras.f90`` checks if the energy conservation is less than 1e-5 and if fundamental period is within 1% of the expected 0.71262 day period. If these values are within bounds, then a message is written to the terminal and the run terminates:
 
 .. code-block:: console
 
@@ -28,10 +28,8 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default``, used for
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 100
 

@@ -44,6 +44,7 @@ SRCS = \
    binary_utils.f90 \
    binary_photos.f90 \
    binary_jdot.f90 \
+   binary_disk.f90 \
    binary_wind.f90 \
    binary_mdot.f90 \
    binary_tides.f90 \
@@ -72,10 +73,9 @@ SRCS = \
    mod_other_binary_ce.f90 \
    mod_other_implicit_rlo.f90 \
    mod_other_binary_extras.f90 \
-   mod_other_binary_photo_read.f90 \
-   mod_other_binary_photo_write.f90 \
+   mod_other_binary_photos.f90 \
    mod_other_e2.f90 \
-   mod_other_pgbinary_plots.f90 
+   mod_other_pgbinary_plots.f90
 
 #################################################################
 #
@@ -87,7 +87,7 @@ ifeq ($(USE_SHARED), YES)
      LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR)
 
 ifeq ($(USE_PGSTAR), YES)
-    LOAD_OTHER +=  $(LOAD_PGPLOT) 
+    LOAD_OTHER +=  $(LOAD_PGPLOT)
 endif
 
 endif

@@ -1,6 +1,6 @@
-      
-      ! use the Tolman–Oppenheimer–Volkoff (TOV) equation. 
-      ! See first equation in https://en.wikipedia.org/wiki/Tolman%E2%80%93Oppenheimer%E2%80%93Volkoff_equation.  
+
+      ! use the Tolman–Oppenheimer–Volkoff (TOV) equation.
+      ! See first equation in https://en.wikipedia.org/wiki/Tolman%E2%80%93Oppenheimer%E2%80%93Volkoff_equation.
       ! want to replace -G*m/r^2 by -G*m/r^2*(1 + P/(rho c^2))(1 + 4 pi r^3 P /(m c^2))/(1 - 2 G m/(r c^2))
       subroutine my_other_cgrav(id, ierr)
          use star_def

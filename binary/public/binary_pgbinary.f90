@@ -1,29 +1,28 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2022  Matthias Fabry
+!   Copyright (C) 2022  Matthias Fabry & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module binary_pgbinary
 
-   use const_def
+   use const_def, only: dp, strlen
    use star_pgstar
+
+   implicit none
 
    abstract interface
 
@@ -118,8 +117,8 @@ module binary_pgbinary
 
    integer, parameter :: i_Binary_Star1 = i_Binary_Grid9 + 1
    integer, parameter :: i_Binary_Star2 = i_Binary_Star1 + 1
-
-   integer, parameter :: i_Binary_Other = i_Binary_Star2 + 1
+   integer, parameter :: i_Binary_Orbit = i_Binary_Star2 + 1
+   integer, parameter :: i_Binary_Other = i_Binary_Orbit + 1
 
    integer, parameter :: num_pgbinary_plots = i_Binary_Other + &
       max_num_Binary_Other_plots
@@ -131,7 +130,7 @@ module binary_pgbinary
    type pgbinary_hist_node
       real(dp) :: age
       integer :: step
-      real(dp), pointer :: vals(:) => null() ! values of items in history_columns list
+      real(dp), pointer :: vals(:) => null()  ! values of items in history_columns list
       type (pgbinary_hist_node), pointer :: next => null()
       ! list kept in strictly decreasing order by age & step
    end type pgbinary_hist_node

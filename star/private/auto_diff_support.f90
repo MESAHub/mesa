@@ -1,32 +1,26 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2020  Adam Jermyn, The MESA Team
+!   Copyright (C) 2020  Adam Jermyn & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module auto_diff_support
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, sqrt_2_div_3
       use auto_diff
 
       implicit none
@@ -42,7 +36,7 @@
          type(auto_diff_real_star_order1), intent(in) :: val_00
          integer :: j
          val_p1%val = val_00%val
-         do j=auto_diff_star_num_vars-2,1,-3 ! p1 gets 00, 00 gets m1, m1 gets 0d0
+         do j=auto_diff_star_num_vars-2,1,-3  ! p1 gets 00, 00 gets m1, m1 gets 0d0
             val_p1%d1Array(j+2) = val_00%d1Array(j+1)
             val_p1%d1Array(j+1) = val_00%d1Array(j)
             val_p1%d1Array(j) = 0d0
@@ -53,7 +47,7 @@
          type(auto_diff_real_star_order1), intent(in) :: val_00
          integer :: j
          val_m1%val = val_00%val
-         do j=1,auto_diff_star_num_vars,3 ! m1 gets 00, 00 gets p1, p1 gets 0d0
+         do j=1,auto_diff_star_num_vars,3  ! m1 gets 00, 00 gets p1, p1 gets 0d0
             val_m1%d1Array(j) = val_00%d1Array(j+1)
             val_m1%d1Array(j+1) = val_00%d1Array(j+2)
             val_m1%d1Array(j+2) = 0d0
@@ -374,7 +368,7 @@
          get_etrb_start = pow2(s% w_start(k))
       end function get_etrb_start
 
-      real(dp) function get_RSP2_conv_velocity(s,k) result (cv) ! at face k
+      real(dp) function get_RSP2_conv_velocity(s,k) result (cv)  ! at face k
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: alfa, beta
@@ -1333,6 +1327,5 @@
             xtra2_p1 % d1Array(i_xtra2_p1) = 1d0
          end if
       end function wrap_xtra2_p1
-
 
 end module auto_diff_support

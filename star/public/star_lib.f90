@@ -2,31 +2,24 @@
 !
 !   Copyright (C) 2010  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
+      module star_lib  ! this is the procedure interface to mesa/star.
 
-      module star_lib ! this is the procedure interface to mesa/star.
-
-      use const_def, only: dp
+      use const_def, only: dp, i8
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
       use utils_lib, only: mesa_error
 
@@ -41,29 +34,29 @@
            star_eval_conv_bdy_Hp => eval_conv_bdy_Hp, &
            star_eval_over_bdy_params => eval_over_bdy_params
 
-      use auto_diff_support, only: & ! for variables of type auto_diff_real_star_order1
-            shift_p1, shift_m1, & ! my_val_m1 = shift_m1(get_my_val(s,k-1)) for use in terms going into equation at k
-            wrap_T_m1, wrap_T_00, wrap_T_p1, & ! for s% T
-            wrap_lnT_m1, wrap_lnT_00, wrap_lnT_p1, & ! for s% lnT
-            wrap_d_m1, wrap_d_00, wrap_d_p1, & !  ! values from s% rho
-            wrap_lnd_m1, wrap_lnd_00, wrap_lnd_p1, & ! values from s% lnd
-            wrap_w_m1, wrap_w_00, wrap_w_p1, & ! values from s% w
-            wrap_kap_m1, wrap_kap_00, wrap_kap_p1, & ! values from s% opacity
-            wrap_s_m1, wrap_s_00, wrap_s_p1, & ! values from s% entropy
-            wrap_e_m1, wrap_e_00, wrap_e_p1, & ! values from s% energy
-            wrap_Peos_m1, wrap_Peos_00, wrap_Peos_p1, & ! values from s% Peos
-            wrap_lnPeos_m1, wrap_lnPeos_00, wrap_lnPeos_p1, & ! values from s% lnPeos
-            wrap_ChiRho_m1, wrap_ChiRho_00, wrap_ChiRho_p1, & ! values from s% ChiRho
-            wrap_ChiT_m1, wrap_ChiT_00, wrap_ChiT_p1, & ! values from s% ChiT
-            wrap_Cp_m1, wrap_Cp_00, wrap_Cp_p1, & ! values from s% Cp
-            wrap_gamma1_m1, wrap_gamma1_00, wrap_gamma1_p1, & ! values from s% gamma1
-            wrap_L_m1, wrap_L_00, wrap_L_p1, & ! values from s% L
-            wrap_r_m1, wrap_r_00, wrap_r_p1, & ! values from s% r
-            wrap_lnR_m1, wrap_lnR_00, wrap_lnR_p1, & ! values from s% lnr
-            wrap_v_m1, wrap_v_00, wrap_v_p1, & ! Riemann or non-Riemann velocity at face, s% v or s% u_face
-            wrap_u_m1, wrap_u_00, wrap_u_p1, & ! Riemann cell velocity s% u
-            wrap_w_div_wc_m1, wrap_w_div_wc_00, wrap_w_div_wc_p1, & ! Riemann cell velocity s% u
-            wrap_jrot_m1, wrap_jrot_00, wrap_jrot_p1, & ! Riemann cell velocity s% u
+      use auto_diff_support, only: &  ! for variables of type auto_diff_real_star_order1
+            shift_p1, shift_m1, &  ! my_val_m1 = shift_m1(get_my_val(s,k-1)) for use in terms going into equation at k
+            wrap_T_m1, wrap_T_00, wrap_T_p1, &  ! for s% T
+            wrap_lnT_m1, wrap_lnT_00, wrap_lnT_p1, &  ! for s% lnT
+            wrap_d_m1, wrap_d_00, wrap_d_p1, &  !  ! values from s% rho
+            wrap_lnd_m1, wrap_lnd_00, wrap_lnd_p1, &  ! values from s% lnd
+            wrap_w_m1, wrap_w_00, wrap_w_p1, &  ! values from s% w
+            wrap_kap_m1, wrap_kap_00, wrap_kap_p1, &  ! values from s% opacity
+            wrap_s_m1, wrap_s_00, wrap_s_p1, &  ! values from s% entropy
+            wrap_e_m1, wrap_e_00, wrap_e_p1, &  ! values from s% energy
+            wrap_Peos_m1, wrap_Peos_00, wrap_Peos_p1, &  ! values from s% Peos
+            wrap_lnPeos_m1, wrap_lnPeos_00, wrap_lnPeos_p1, &  ! values from s% lnPeos
+            wrap_ChiRho_m1, wrap_ChiRho_00, wrap_ChiRho_p1, &  ! values from s% ChiRho
+            wrap_ChiT_m1, wrap_ChiT_00, wrap_ChiT_p1, &  ! values from s% ChiT
+            wrap_Cp_m1, wrap_Cp_00, wrap_Cp_p1, &  ! values from s% Cp
+            wrap_gamma1_m1, wrap_gamma1_00, wrap_gamma1_p1, &  ! values from s% gamma1
+            wrap_L_m1, wrap_L_00, wrap_L_p1, &  ! values from s% L
+            wrap_r_m1, wrap_r_00, wrap_r_p1, &  ! values from s% r
+            wrap_lnR_m1, wrap_lnR_00, wrap_lnR_p1, &  ! values from s% lnr
+            wrap_v_m1, wrap_v_00, wrap_v_p1, &  ! Riemann or non-Riemann velocity at face, s% v or s% u_face
+            wrap_u_m1, wrap_u_00, wrap_u_p1, &  ! Riemann cell velocity s% u
+            wrap_w_div_wc_m1, wrap_w_div_wc_00, wrap_w_div_wc_p1, &  ! Riemann cell velocity s% u
+            wrap_jrot_m1, wrap_jrot_00, wrap_jrot_p1, &  ! Riemann cell velocity s% u
             ! the following check the flag using_velocity_time_centering
             wrap_opt_time_center_r_m1, wrap_opt_time_center_r_00, wrap_opt_time_center_r_p1, &
             wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1
@@ -72,15 +65,14 @@
            star_conv_time_scale => conv_time_scale, &
            star_QHSE_time_scale => QHSE_time_scale, &
            star_eps_nuc_time_scale => eps_nuc_time_scale, &
-           star_cooling_time_scale => cooling_time_scale
-
+           star_cooling_time_scale => cooling_time_scale, &
+           star_kh_time_scale => eval_kh_timescale, &
+           star_weighted_smoothing => weighted_smoothing, &
+           star_threshold_smoothing => threshold_smoothing
 
       implicit none
 
-
       contains
-
-
 
       ! allocate data structures for a star and returns a handle.
       subroutine alloc_star(id, ierr)
@@ -90,7 +82,7 @@
       end subroutine alloc_star
 
 
-      subroutine init_starting_star_data(s, ierr) ! this is done when alloc_star
+      subroutine init_starting_star_data(s, ierr)  ! this is done when alloc_star
          ! but if you are reusing the star data (and not calling alloc_star)
          ! then call this to get things initialized.
          use init, only: set_starting_star_data
@@ -175,7 +167,6 @@
             s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
             s% job% eosDT_cache_dir, &
             s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
-            s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
       end subroutine starlib_init
 
@@ -191,7 +182,6 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
          use init, only: do_star_init
          character (len=*), intent(in) :: &
@@ -205,9 +195,6 @@
          real(dp), intent(in) :: &
             reaclib_min_T9
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
-         integer, intent(in) :: color_num_files
-         character (len=*), intent(in) :: color_file_names(:)
-         integer , intent(in):: color_num_colors(:)
          integer, intent(out) :: ierr
          call do_star_init( &
             my_mesa_dir, &
@@ -220,7 +207,6 @@
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
-            color_num_files,color_file_names,color_num_colors,&
             ierr)
       end subroutine do_starlib_init
 
@@ -230,7 +216,6 @@
          use init, only: do_starlib_shutdown
          call do_starlib_shutdown
       end subroutine starlib_shutdown
-
 
 
       ! if you want direct access to the star data structure,
@@ -290,8 +275,8 @@
       subroutine star_setup(id, inlist, ierr)
          use ctrls_io, only: do_one_setup
          integer, intent(in) :: id
-         character (len=*), intent(in) :: inlist ! can be blank meaning no inlist file
-         integer, intent(out) :: ierr ! 0 means AOK.
+         character (len=*), intent(in) :: inlist  ! can be blank meaning no inlist file
+         integer, intent(out) :: ierr  ! 0 means AOK.
          call do_one_setup(id, inlist, ierr)
       end subroutine star_setup
 
@@ -300,9 +285,17 @@
       subroutine star_set_kap_and_eos_handles(id, ierr)
          use init, only: set_kap_and_eos_handles
          integer, intent(in) :: id
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          call set_kap_and_eos_handles(id, ierr)
       end subroutine star_set_kap_and_eos_handles
+
+
+      subroutine star_set_colors_handles(id, ierr)
+         use init, only: set_colors_handles
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         call set_colors_handles(id, ierr)
+      end subroutine star_set_colors_handles
 
 
       subroutine star_set_net(id, new_net_name, ierr)
@@ -520,7 +513,7 @@
 
       subroutine star_number_from_saved_model(fname, model_number, ierr)
          use read_model, only: do_read_saved_model_number
-         character (len=*), intent(in) :: fname ! filename for the saved model
+         character (len=*), intent(in) :: fname  ! filename for the saved model
          integer, intent(inout) :: model_number
             ! set only if this property is present in file
          integer, intent(out) :: ierr
@@ -530,14 +523,12 @@
 
       subroutine star_age_from_saved_model(fname, star_age, ierr)
          use read_model, only: do_read_saved_model_age
-         character (len=*), intent(in) :: fname ! filename for the saved model
+         character (len=*), intent(in) :: fname  ! filename for the saved model
          real(dp), intent(inout) :: star_age
             ! set only if this property is present in file
          integer, intent(out) :: ierr
          call do_read_saved_model_age(fname, star_age, ierr)
       end subroutine star_age_from_saved_model
-
-
 
 
       ! after you've created a starting model, you're ready to evolve it.
@@ -557,7 +548,7 @@
             ! false if this is a repeat for a retry
          type (star_info), pointer :: s
          integer :: ierr
-         integer(8) :: time0
+         integer(i8) :: time0
          real(dp) :: total
          star_evolve_step = terminate
          ierr = 0
@@ -711,7 +702,7 @@
       end subroutine star_save_for_restart
 
 
-      integer function num_standard_history_columns(s) ! not including any extra columns
+      integer function num_standard_history_columns(s)  ! not including any extra columns
          type (star_info), pointer :: s
          num_standard_history_columns = size(s% history_column_spec, dim=1)
       end function num_standard_history_columns
@@ -729,7 +720,7 @@
       end subroutine get_data_for_history_columns
 
 
-      integer function num_standard_profile_columns(s) ! not including extra profile columns
+      integer function num_standard_profile_columns(s)  ! not including extra profile columns
          use profile, only: do_get_num_standard_profile_columns
          type (star_info), pointer :: s
          num_standard_profile_columns = do_get_num_standard_profile_columns(s)
@@ -744,14 +735,13 @@
          ! note: it is the caller's job to allocate names and vals before calling
          ! and deallocate them when done.
          ! see num_standard_profile_columns function
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_columns)
-         logical, pointer :: is_int(:) ! (num_columns) true iff the values in the column are integers
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_columns)
+         logical, pointer :: is_int(:)  ! (num_columns) true iff the values in the column are integers
          integer, intent(out) :: ierr
          call do_get_data_for_profile_columns(s, nz, &
             names, vals, is_int, ierr)
       end subroutine get_data_for_profile_columns
-
 
 
       ! you may want to have some data automatically saved and restored along with
@@ -794,7 +784,7 @@
       subroutine star_set_age(id, age, ierr)
          use evolve, only: set_age
          integer, intent(in) :: id
-         real(dp), intent(in) :: age ! in years
+         real(dp), intent(in) :: age  ! in years
          integer, intent(out) :: ierr
          call set_age(id, age, ierr)
       end subroutine star_set_age
@@ -894,7 +884,7 @@
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_rotation_flag(id, rotation_flag, ierr)
          use set_flags, only: set_rotation_flag
-         use hydro_rotation, only: set_rotation_info, set_i_rot
+         use hydro_rotation, only: set_rotation_info
          integer, intent(in) :: id
          logical, intent(in) :: rotation_flag
          integer, intent(out) :: ierr
@@ -961,7 +951,7 @@
 
       logical function is_included_in_net(id, species, ierr)
          integer, intent(in) :: id
-         integer, intent(in) :: species ! a chem_id such as ihe3.  see chem_def.
+         integer, intent(in) :: species  ! a chem_id such as ihe3.  see chem_def.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -981,8 +971,8 @@
             which_zfracs, dump_missing_metals_into_heaviest, ierr)
          use adjust_xyz, only: set_standard_composition
          integer, intent(in) :: id
-         real(dp), intent(in) :: h1, h2, he3, he4 ! mass fractions
-         integer, intent(in) :: which_zfracs ! defined in chem_def. e.g., GS98_zfracs
+         real(dp), intent(in) :: h1, h2, he3, he4  ! mass fractions
+         integer, intent(in) :: which_zfracs  ! defined in chem_def. e.g., GS98_zfracs
          logical, intent(in) :: dump_missing_metals_into_heaviest
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -1016,7 +1006,7 @@
          use adjust_xyz, only: set_composition
          integer, intent(in) :: id
          integer, intent(in) :: species
-         real(dp), intent(in) :: xa(species) ! the replacement mass fractions
+         real(dp), intent(in) :: xa(species)  ! the replacement mass fractions
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1028,9 +1018,9 @@
       subroutine set_composition_in_section(id, nzlo, nzhi, species, xa, ierr)
          use adjust_xyz, only: set_composition
          integer, intent(in) :: id
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(in) :: species
-         real(dp), intent(in) :: xa(species) ! cells from nzlo to nzhi get this composition.
+         real(dp), intent(in) :: xa(species)  ! cells from nzlo to nzhi get this composition.
          integer, intent(out) :: ierr
          call set_composition(id, nzlo, nzhi, species, xa, ierr)
       end subroutine set_composition_in_section
@@ -1039,7 +1029,7 @@
       subroutine change_to_xa_for_accretion(id, nzlo, nzhi, ierr)
          use adjust_xyz, only: do_change_to_xa_for_accretion
          integer, intent(in) :: id
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          call do_change_to_xa_for_accretion(id, nzlo, nzhi, ierr)
       end subroutine change_to_xa_for_accretion
@@ -1048,8 +1038,8 @@
       subroutine star_set_abundance_ratio(id, i1, i2, ratio, ierr)
          use adjust_xyz, only: set_abundance_ratio
          integer, intent(in) :: id
-         integer, intent(in) :: i1, i2 ! chem id's such as ih1 or ihe4 from chem_def
-         real(dp), intent(in) :: ratio ! change abundances of i1 and i2 s.t. x(i1)/x(i2)=ratio
+         integer, intent(in) :: i1, i2  ! chem id's such as ih1 or ihe4 from chem_def
+         real(dp), intent(in) :: ratio  ! change abundances of i1 and i2 s.t. x(i1)/x(i2)=ratio
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1061,9 +1051,9 @@
       subroutine set_abundance_ratio_in_section(id, i1, i2, ratio, nzlo, nzhi, ierr)
          use adjust_xyz, only: set_abundance_ratio
          integer, intent(in) :: id
-         integer, intent(in) :: i1, i2 ! chem id's such as ih1 or ihe4 from chem_def
-         real(dp), intent(in) :: ratio ! change abundances of i1 and i2 s.t. x(i1)/x(i2)=ratio
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: i1, i2  ! chem id's such as ih1 or ihe4 from chem_def
+         real(dp), intent(in) :: ratio  ! change abundances of i1 and i2 s.t. x(i1)/x(i2)=ratio
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          call set_abundance_ratio(id, i1, i2, ratio, nzlo, nzhi, ierr)
       end subroutine set_abundance_ratio_in_section
@@ -1082,7 +1072,7 @@
          ! adjust ratio of h1 to he4 to be (1-y-z)/y at each point
          use adjust_xyz, only: set_y
          integer, intent(in) :: id
-         real(dp), intent(in) :: y ! new value for average he4 mass fraction
+         real(dp), intent(in) :: y  ! new value for average he4 mass fraction
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1095,8 +1085,8 @@
          ! change abundances of h1 and he4
          use adjust_xyz, only: set_y
          integer, intent(in) :: id
-         real(dp), intent(in) :: y ! new value for average he4 mass fraction
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         real(dp), intent(in) :: y  ! new value for average he4 mass fraction
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1128,7 +1118,7 @@
          use adjust_xyz, only: set_z
          integer, intent(in) :: id
          real(dp), intent(in) :: new_z
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1141,7 +1131,7 @@
          ! replaces chem1 by chem2.
          ! NOTE: this routine simply changes abundances; it doesn't reconverge the model.
          integer, intent(in) :: id
-         integer, intent(in) :: chem1, chem2 ! values are chem_id's such as ihe4.  see chem_def.
+         integer, intent(in) :: chem1, chem2  ! values are chem_id's such as ihe4.  see chem_def.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1155,8 +1145,8 @@
          ! NOTE: this routine simply changes abundances; it doesn't reconverge the model.
          use adjust_xyz, only: do_replace
          integer, intent(in) :: id
-         integer, intent(in) :: chem1, chem2 ! values are chem_id's such as ihe4.  see chem_def.
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: chem1, chem2  ! values are chem_id's such as ihe4.  see chem_def.
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1170,7 +1160,7 @@
          !
          ! NOTE: this routine simply changes abundances; it doesn't reconverge the model.
          integer, intent(in) :: id
-         integer, intent(in) :: chem_id ! a chem_id such as ihe4.  see chem_def.
+         integer, intent(in) :: chem_id  ! a chem_id such as ihe4.  see chem_def.
          real(dp), intent(in) :: new_frac
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -1185,9 +1175,9 @@
          ! NOTE: this routine simply changes abundances; it doesn't reconverge the model.
          use adjust_xyz, only: do_set_abundance
          integer, intent(in) :: id
-         integer, intent(in) :: chem_id ! a chem_id such as ihe4.  see chem_def.
+         integer, intent(in) :: chem_id  ! a chem_id such as ihe4.  see chem_def.
          real(dp), intent(in) :: new_frac
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1201,7 +1191,7 @@
          ! NOTE: this routine simply changes abundances; it doesn't reconverge the model.
          use adjust_xyz, only: do_uniform_mix_section
          integer, intent(in) :: id
-         integer, intent(in) :: nzlo, nzhi ! change cells from nzlo to nzhi, inclusive.
+         integer, intent(in) :: nzlo, nzhi  ! change cells from nzlo to nzhi, inclusive.
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          write(*,*) 'uniform_mix_section'
@@ -1255,15 +1245,14 @@
       end subroutine set_dt_next
 
 
-
       ! relaxation routines (for "pseudo-evolution" of the model)
 
-      subroutine star_relax_mass(id, new_mass, lg_max_abs_mdot, ierr) ! also resets initial_mass
+      subroutine star_relax_mass(id, new_mass, lg_max_abs_mdot, ierr)  ! also resets initial_mass
          ! acts like accretion or wind to change star mass
          use relax, only: do_relax_mass
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_mass ! in Msun units
-         real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
+         real(dp), intent(in) :: new_mass  ! in Msun units
+         real(dp), intent(in) :: lg_max_abs_mdot  ! in log10(Msun/year)
             ! e.g., -8.0 for mdot of -10^-8 Msun/year
          integer, intent(out) :: ierr
          call do_relax_mass(id, new_mass, lg_max_abs_mdot, ierr)
@@ -1271,12 +1260,12 @@
 
 
       subroutine star_relax_mass_to_remove_H_env( &
-            id, extra_mass, lg_max_abs_mdot, ierr) ! also resets initial_mass
+            id, extra_mass, lg_max_abs_mdot, ierr)  ! also resets initial_mass
          use relax, only: do_relax_mass
          use report, only: get_mass_info
          integer, intent(in) :: id
          real(dp), intent(in) :: extra_mass
-         real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
+         real(dp), intent(in) :: lg_max_abs_mdot  ! in log10(Msun/year)
             ! e.g., -8.0 for mdot of -10^-8 Msun/year
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -1290,11 +1279,11 @@
 
 
       subroutine star_relax_mass_scale( &
-            id, new_mass, dlgm_per_step, change_mass_years_for_dt, ierr) ! also resets initial_mass
+            id, new_mass, dlgm_per_step, change_mass_years_for_dt, ierr)  ! also resets initial_mass
          ! rescales star mass without changing composition as function of m/mstar
          use relax, only: do_relax_mass_scale
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_mass ! in Msun units
+         real(dp), intent(in) :: new_mass  ! in Msun units
          real(dp), intent(in) :: dlgm_per_step, change_mass_years_for_dt
          integer, intent(out) :: ierr
          call do_relax_mass_scale( &
@@ -1307,7 +1296,7 @@
             relax_core_years_for_dt, core_avg_rho, core_avg_eps, ierr)
          use relax, only: do_relax_core
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_core_mass ! in Msun units
+         real(dp), intent(in) :: new_core_mass  ! in Msun units
          real(dp), intent(in) :: dlg_core_mass_per_step, relax_core_years_for_dt
          real(dp), intent(in) :: core_avg_rho, core_avg_eps
             ! adjust R_center according to core_avg_rho (g cm^-3)
@@ -1323,7 +1312,7 @@
             id, new_mass, dlgm_per_step, relax_M_center_dt, ierr)
          use relax, only: do_relax_M_center
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_mass ! in Msun units
+         real(dp), intent(in) :: new_mass  ! in Msun units
          real(dp), intent(in) :: dlgm_per_step, relax_M_center_dt
          integer, intent(out) :: ierr
          call do_relax_M_center( &
@@ -1335,7 +1324,7 @@
             id, new_R_center, dlgR_per_step, relax_R_center_dt, ierr)
          use relax, only: do_relax_R_center
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_R_center ! in cm
+         real(dp), intent(in) :: new_R_center  ! in cm
          real(dp), intent(in) :: dlgR_per_step, relax_R_center_dt
          integer, intent(out) :: ierr
          call do_relax_R_center( &
@@ -1347,7 +1336,7 @@
             id, new_v_center, dv_per_step, relax_v_center_dt, ierr)
          use relax, only: do_relax_v_center
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_v_center ! in cm/s
+         real(dp), intent(in) :: new_v_center  ! in cm/s
          real(dp), intent(in) :: dv_per_step, relax_v_center_dt
          integer, intent(out) :: ierr
          call do_relax_v_center( &
@@ -1359,7 +1348,7 @@
             id, new_L_center, dlgL_per_step, relax_L_center_dt, ierr)
          use relax, only: do_relax_L_center
          integer, intent(in) :: id
-         real(dp), intent(in) :: new_L_center ! in ergs/second
+         real(dp), intent(in) :: new_L_center  ! in ergs/second
          real(dp), intent(in) :: dlgL_per_step, relax_L_center_dt
          integer, intent(out) :: ierr
          call do_relax_L_center( &
@@ -1413,13 +1402,13 @@
          ! incrementally revise composition to get requested profile
          use relax, only: do_relax_composition
          integer, intent(in) :: id
-         integer, intent(in) :: num_steps_to_use ! use this many steps to do conversion
+         integer, intent(in) :: num_steps_to_use  ! use this many steps to do conversion
          integer, intent(in) :: num_pts
             ! length of composition vector; need not equal nz for current model (will interpolate)
          integer, intent(in) :: species
             ! must = number of species for current model
-         real(dp), intent(in) :: xa(:,:) ! (species, num_pts) ! target composition profile
-         real(dp), intent(in) :: xq(:) ! (num_pts)
+         real(dp), intent(in) :: xa(:,:)  ! (species, num_pts) ! target composition profile
+         real(dp), intent(in) :: xq(:)  ! (num_pts)
             ! xq(i) = fraction of xmstar exterior to the point i
             ! where xmstar = mstar - M_center
          integer, intent(out) :: ierr
@@ -1432,11 +1421,11 @@
          ! add extra heating term to get requested entropy profile
          use relax, only: do_relax_angular_momentum
          integer, intent(in) :: id
-         integer, intent(in) :: max_steps_to_use ! use this many steps to do conversion
+         integer, intent(in) :: max_steps_to_use  ! use this many steps to do conversion
          integer, intent(in) :: num_pts
             ! length of angular momentum vector; need not equal nz for current model (will interpolate)
-         real(dp), intent(in) :: angular_momentum(:) ! (num_pts) ! target am profile
-         real(dp), intent(in) :: xq(:) ! (num_pts)
+         real(dp), intent(in) :: angular_momentum(:)  ! (num_pts) ! target am profile
+         real(dp), intent(in) :: xq(:)  ! (num_pts)
             ! xq(i) = fraction of xmstar exterior to the point i
             ! where xmstar = mstar - M_center
          integer, intent(out) :: ierr
@@ -1449,11 +1438,11 @@
          ! add extra heating term to get requested entropy profile
          use relax, only: do_relax_entropy
          integer, intent(in) :: id
-         integer, intent(in) :: max_steps_to_use ! use this many steps to do conversion
+         integer, intent(in) :: max_steps_to_use  ! use this many steps to do conversion
          integer, intent(in) :: num_pts
             ! length of entropy vector; need not equal nz for current model (will interpolate)
-         real(dp), intent(in) :: entropy(:) ! (num_pts) ! target entropy profile
-         real(dp), intent(in) :: xq(:) ! (num_pts)
+         real(dp), intent(in) :: entropy(:)  ! (num_pts) ! target entropy profile
+         real(dp), intent(in) :: xq(:)  ! (num_pts)
             ! xq(i) = fraction of xmstar exterior to the point i
             ! where xmstar = mstar - M_center
          integer, intent(out) :: ierr
@@ -1465,29 +1454,29 @@
          ! incrementally revise composition to get uniform match to current accretion specs
          use relax, only: do_relax_to_xaccrete
          integer, intent(in) :: id
-         integer, intent(in) :: num_steps_to_use ! use this many steps to do conversion
+         integer, intent(in) :: num_steps_to_use  ! use this many steps to do conversion
          integer, intent(out) :: ierr
          call do_relax_to_xaccrete(id, num_steps_to_use, ierr)
       end subroutine star_relax_to_xaccrete
 
 
-      subroutine star_relax_Y(id, new_Y, dY, minq, maxq, ierr) ! also resets initial_y
+      subroutine star_relax_Y(id, new_Y, dY, minq, maxq, ierr)  ! also resets initial_y
          use relax, only: do_relax_Y
          integer, intent(in) :: id
          real(dp), intent(in) :: new_Y
-         real(dp), intent(in) :: dY ! change Y by this amount per step
-         real(dp), intent(in) :: minq, maxq ! change in this q range
+         real(dp), intent(in) :: dY  ! change Y by this amount per step
+         real(dp), intent(in) :: minq, maxq  ! change in this q range
          integer, intent(out) :: ierr
          call do_relax_Y(id, new_Y, dY, minq, maxq, ierr)
       end subroutine star_relax_Y
 
 
-      subroutine star_relax_Z(id, new_z, dlnz, minq, maxq, ierr) ! also resets initial_z
+      subroutine star_relax_Z(id, new_z, dlnz, minq, maxq, ierr)  ! also resets initial_z
          use relax, only: do_relax_Z
          integer, intent(in) :: id
          real(dp), intent(in) :: new_z
-         real(dp), intent(in) :: dlnz ! change lnz by this amount per step
-         real(dp), intent(in) :: minq, maxq ! change in this q range
+         real(dp), intent(in) :: dlnz  ! change lnz by this amount per step
+         real(dp), intent(in) :: minq, maxq  ! change in this q range
          integer, intent(out) :: ierr
          call do_relax_Z(id, new_z, dlnz, minq, maxq, ierr)
       end subroutine star_relax_Z
@@ -1600,8 +1589,8 @@
          use relax, only: do_internal_evolve
          integer, intent(in) :: id, lipar, lrpar
          logical, intent(in) :: restore_at_end
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             subroutine before_evolve(s, id, lipar, ipar, lrpar, rpar, ierr)
                use const_def, only: dp
@@ -1609,8 +1598,8 @@
                implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: id, lipar, lrpar
-               integer, intent(inout), pointer :: ipar(:) ! (lipar)
-               real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+               integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+               real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
                integer, intent(out) :: ierr
             end subroutine before_evolve
             integer function adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -1621,8 +1610,8 @@
                implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: id, lipar, lrpar
-               integer, intent(inout), pointer :: ipar(:) ! (lipar)
-               real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+               integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+               real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             end function adjust_model
             integer function check_model(s, id, lipar, ipar, lrpar, rpar)
                ! returns either keep_going, redo, retry, or terminate.
@@ -1632,8 +1621,8 @@
                implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: id, lipar, lrpar
-               integer, intent(inout), pointer :: ipar(:) ! (lipar)
-               real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+               integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+               real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             end function check_model
             integer function finish_model(s)
                use star_def, only:star_info
@@ -1657,7 +1646,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine star_special_test
-
 
 
       ! rotation
@@ -1789,8 +1777,8 @@
       real(dp) function val_for_profile(s, c, k)
          use profile_getval, only: getval_for_profile
          type (star_info), pointer :: s
-         integer, intent(in) :: c ! one of the values like p_logL defined in star_def
-         integer, intent(in) :: k ! the zone number
+         integer, intent(in) :: c  ! one of the values like p_logL defined in star_def
+         integer, intent(in) :: k  ! the zone number
          logical :: int_flag
          integer :: int_val
          call getval_for_profile(s, c, k, val_for_profile, int_flag, int_val)
@@ -1829,7 +1817,7 @@
       real(dp) function get_current_y_in_section(id, nzlo, nzhi, ierr)
          use star_utils, only: eval_current_y
          integer, intent(in) :: id
-         integer, intent(in) :: nzlo, nzhi ! consider only zones nzlo to nzhi inclusive
+         integer, intent(in) :: nzlo, nzhi  ! consider only zones nzlo to nzhi inclusive
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1844,7 +1832,7 @@
       real(dp) function get_current_y_at_point(id, k, ierr)
          use star_utils, only: eval_current_y
          integer, intent(in) :: id
-         integer, intent(in) :: k ! between 1 and nz
+         integer, intent(in) :: k  ! between 1 and nz
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1873,7 +1861,7 @@
       real(dp) function get_current_z_in_section(id, nzlo, nzhi, ierr)
          use star_utils, only: eval_current_z
          integer, intent(in) :: id
-         integer, intent(in) :: nzlo, nzhi ! consider only zones nzlo to nzhi inclusive
+         integer, intent(in) :: nzlo, nzhi  ! consider only zones nzlo to nzhi inclusive
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1888,7 +1876,7 @@
       real(dp) function get_current_z_at_point(id, k, ierr)
          use star_utils, only: eval_current_z
          integer, intent(in) :: id
-         integer, intent(in) :: k ! between 1 and nz
+         integer, intent(in) :: k  ! between 1 and nz
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1904,7 +1892,7 @@
          ! returns mass fraction for iso
          use star_utils, only: eval_current_abundance
          integer, intent(in) :: id
-         integer, intent(in) :: iso ! chem id from chem_def
+         integer, intent(in) :: iso  ! chem id from chem_def
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1921,8 +1909,8 @@
          ! returns mass fraction for iso
          use star_utils, only: eval_current_abundance
          integer, intent(in) :: id
-         integer, intent(in) :: iso ! chem id from chem_def
-         integer, intent(in) :: nzlo, nzhi ! consider only zones nzlo to nzhi inclusive
+         integer, intent(in) :: iso  ! chem id from chem_def
+         integer, intent(in) :: nzlo, nzhi  ! consider only zones nzlo to nzhi inclusive
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -1939,7 +1927,7 @@
          ! returns mass fraction for iso
          use star_utils, only: eval_current_abundance
          integer, intent(in) :: id
-         integer, intent(in) :: iso ! chem id from chem_def
+         integer, intent(in) :: iso  ! chem id from chem_def
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          current_abundance_at_point = current_abundance_in_section(id, iso, k, k, ierr)
@@ -1967,9 +1955,9 @@
          use adjust_xyz, only: get_xa_for_standard_metals
          type (star_info), pointer :: s
          integer, intent(in) :: species, chem_id(:), net_iso(:), which_zfracs
-         real(dp), intent(in) :: h1, h2, he3, he4 ! mass fractions
+         real(dp), intent(in) :: h1, h2, he3, he4  ! mass fractions
          logical, intent(in) :: dump_missing_metals_into_heaviest
-         real(dp), intent(inout) :: xa(:) ! (species)
+         real(dp), intent(inout) :: xa(:)  ! (species)
          integer, intent(out) :: ierr
          call get_xa_for_standard_metals( &
             s, species, chem_id, net_iso, &
@@ -1984,7 +1972,7 @@
             omega, omega_div_omega_crit)
          use report, only: get_info_at_q
          type (star_info), pointer :: s
-         real(dp), intent(in) :: q ! relative mass coord
+         real(dp), intent(in) :: q  ! relative mass coord
          integer, intent(out) :: kbdy
          real(dp), intent(out) :: &
             m, r, lgT, lgRho, L, v, &
@@ -2031,7 +2019,7 @@
       real(dp) function star_interp_val_to_pt(v,k,sz,dq,debug_str)
          use star_utils, only: interp_val_to_pt
          integer, intent(in) :: k, sz
-         real(dp), pointer :: v(:), dq(:) ! (sz)
+         real(dp), pointer :: v(:), dq(:)  ! (sz)
          character (len=*), intent(in) :: debug_str
          star_interp_val_to_pt = interp_val_to_pt(v,k,sz,dq,debug_str)
       end function star_interp_val_to_pt
@@ -2040,7 +2028,7 @@
       ! this routine returns an interpolated value of xa(j,:) at outer boundary of cell k
       real(dp) function star_interp_xa_to_pt(xa,j,k,sz,dq,debug_str)
          use star_utils, only: interp_xa_to_pt
-         real(dp), pointer :: xa(:,:), dq(:) ! (sz)
+         real(dp), pointer :: xa(:,:), dq(:)  ! (sz)
          integer, intent(in) :: j, k, sz
          character (len=*), intent(in) :: debug_str
          star_interp_xa_to_pt = interp_xa_to_pt(xa,j,k,sz,dq,debug_str)
@@ -2048,11 +2036,11 @@
       ! misc routines
 
 
-      subroutine star_set_xqs(nz, xq, dq, ierr) ! set xq's using dq's
+      subroutine star_set_xqs(nz, xq, dq, ierr)  ! set xq's using dq's
          use star_utils, only: set_xqs
          integer, intent(in) :: nz
-         real(dp), intent(inout) :: dq(:) ! (nz)
-         real(dp), intent(inout) :: xq(:) ! (nz)
+         real(dp), intent(inout) :: dq(:)  ! (nz)
+         real(dp), intent(inout) :: xq(:)  ! (nz)
          integer, intent(out) :: ierr
          call set_xqs(nz, xq, dq, ierr)
       end subroutine star_set_xqs
@@ -2066,7 +2054,7 @@
          use eos_def, only: num_eos_basic_results
          use eos_support, only: get_eos
          integer, intent(in) :: id
-         integer, intent(in) :: k ! 0 means not being called for a particular cell
+         integer, intent(in) :: k  ! 0 means not being called for a particular cell
          real(dp), intent(in) :: xa(:), Rho, logRho, T, logT
          real(dp), dimension(num_eos_basic_results), intent(out) :: &
             res, dres_dlnRho, dres_dlnT
@@ -2092,7 +2080,7 @@
          use eos_def, only: num_eos_basic_results
          !use eos_support, only: get_peos
          integer, intent(in) :: id
-         integer, intent(in) :: k ! 0 means not being called for a particular cell
+         integer, intent(in) :: k  ! 0 means not being called for a particular cell
          real(dp), intent(in) :: xa(:), Pgas, logPgas, T, logT
          real(dp), intent(out) :: &
             Rho, logRho, dlnRho_dlnPgas, dlnRho_dlnT
@@ -2122,7 +2110,7 @@
          use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
          use eos_support, only : solve_eos_given_PgasT
          integer, intent(in) :: id
-         integer, intent(in) :: k ! 0 indicates not for a particular cell.
+         integer, intent(in) :: k  ! 0 indicates not for a particular cell.
          real(dp), intent(in) :: &
             xa(:), logT, logPgas, &
             logRho_guess, logRho_tol, logPgas_tol
@@ -2150,8 +2138,8 @@
          use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
          use eos_support, only: solve_eos_given_PgasT_auto
          use star_def
-         integer, intent(in) :: id ! id for star
-         integer, intent(in) :: k ! 0 indicates not for a particular cell.
+         integer, intent(in) :: id  ! id for star
+         integer, intent(in) :: k  ! 0 indicates not for a particular cell.
          real(dp), intent(in) :: &
             xa(:), logT, logPgas, &
             logRho_tol, logPgas_tol
@@ -2361,7 +2349,7 @@
          use star_utils, only: normalize_dqs
          integer, intent(in) :: id
          integer, intent(in) :: nz
-         real(dp), intent(inout) :: dq(:) ! (nz)
+         real(dp), intent(inout) :: dq(:)  ! (nz)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -2370,12 +2358,12 @@
       end subroutine star_normalize_dqs
 
 
-      subroutine star_set_qs(id, nz, q, dq, ierr) ! set q's using normalized dq's
+      subroutine star_set_qs(id, nz, q, dq, ierr)  ! set q's using normalized dq's
          use star_utils, only: set_qs
          integer, intent(in) :: id
          integer, intent(in) :: nz
-         real(dp), intent(inout) :: dq(:) ! (nz)
-         real(dp), intent(inout) :: q(:) ! (nz)
+         real(dp), intent(inout) :: dq(:)  ! (nz)
+         real(dp), intent(inout) :: q(:)  ! (nz)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -2446,7 +2434,7 @@
       subroutine star_remove_center_by_he4(id, x, ierr)
          use remove_shells, only: do_remove_center_by_he4
          integer, intent(in) :: id
-         real(dp), intent(in) :: x ! mass fraction
+         real(dp), intent(in) :: x  ! mass fraction
          integer, intent(out) :: ierr
          call do_remove_center_by_he4(id, x, ierr)
       end subroutine star_remove_center_by_he4
@@ -2455,7 +2443,7 @@
       subroutine star_remove_center_by_c12_o16(id, x, ierr)
          use remove_shells, only: do_remove_center_by_c12_o16
          integer, intent(in) :: id
-         real(dp), intent(in) :: x ! mass fraction
+         real(dp), intent(in) :: x  ! mass fraction
          integer, intent(out) :: ierr
          call do_remove_center_by_c12_o16(id, x, ierr)
       end subroutine star_remove_center_by_c12_o16
@@ -2464,7 +2452,7 @@
       subroutine star_remove_center_by_si28(id, x, ierr)
          use remove_shells, only: do_remove_center_by_si28
          integer, intent(in) :: id
-         real(dp), intent(in) :: x ! mass fraction
+         real(dp), intent(in) :: x  ! mass fraction
          integer, intent(out) :: ierr
          call do_remove_center_by_si28(id, x, ierr)
       end subroutine star_remove_center_by_si28
@@ -2473,7 +2461,7 @@
       subroutine star_remove_center_to_reduce_co56_ni56(id, x, ierr)
          use remove_shells, only: do_remove_center_to_reduce_co56_ni56
          integer, intent(in) :: id
-         real(dp), intent(in) :: x ! mass fraction
+         real(dp), intent(in) :: x  ! mass fraction
          integer, intent(out) :: ierr
          call do_remove_center_to_reduce_co56_ni56(id, x, ierr)
       end subroutine star_remove_center_to_reduce_co56_ni56
@@ -2546,7 +2534,7 @@
 
          integer, intent(in) :: id, k_remove
          logical, intent(in) :: do_jrot, do_entropy
-         logical, intent(in) :: turn_off_energy_sources_and_sinks ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
+         logical, intent(in) :: turn_off_energy_sources_and_sinks  ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
          call do_relax_to_star_cut(id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)
@@ -2681,8 +2669,8 @@
          ! purely for cosmetic purposes.  doesn't even try to conserve abundances.
          use star_utils, only: smooth_abundances
          integer, intent(in) :: id
-         integer, intent(in) :: cnt ! make this many passes
-         integer, intent(in) :: nzlo, nzhi ! only smooth zones nzlo to nzhi inclusive
+         integer, intent(in) :: cnt  ! make this many passes
+         integer, intent(in) :: nzlo, nzhi  ! only smooth zones nzlo to nzhi inclusive
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -2696,7 +2684,7 @@
          ! conserves total mass by species
          use star_utils, only: do_boxcar_mixing
          integer, intent(in) :: id
-         real(dp), intent(in) :: max_mass, min_mass, boxcar_mass ! Msun
+         real(dp), intent(in) :: max_mass, min_mass, boxcar_mass  ! Msun
          integer, intent(in) :: number_iterations
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -2725,7 +2713,7 @@
 
 
       ! PGSTAR interface
-      subroutine start_new_run_for_pgstar(s, ierr) ! reset logs
+      subroutine start_new_run_for_pgstar(s, ierr)  ! reset logs
          use pgstar
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -3031,7 +3019,7 @@
          logical :: is_int_value(num_rows)
          logical :: failed_to_find_value(num_rows)
          if (present(ierr)) ierr = 0
-         call get_history_specs(s, num_rows, (/name/), specs, .false.)
+         call get_history_specs(s, num_rows, [name], specs, .false.)
          call get_history_values( &
             s, num_rows, specs, &
             is_int_value, int_values, values, failed_to_find_value)
@@ -3067,8 +3055,8 @@
       subroutine star_set_mlt_vars(id, nzlo, nzhi, ierr)
          use turb_info, only: set_mlt_vars
          use star_def
-         integer, intent(in) :: id ! id for star
-         integer, intent(in) :: nzlo, nzhi ! range of cell numbers
+         integer, intent(in) :: id  ! id for star
+         integer, intent(in) :: nzlo, nzhi  ! range of cell numbers
          integer, intent(inout) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
@@ -3077,7 +3065,7 @@
       end subroutine star_set_mlt_vars
 
 
-      subroutine star_mlt_gradT(id, MLT_option, & ! can be useful when creating models
+      subroutine star_mlt_gradT(id, MLT_option, &  ! can be useful when creating models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -3126,7 +3114,7 @@
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
+         dV = 0d0  ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
@@ -3149,7 +3137,7 @@
 
       subroutine star_shutdown_pgstar(id, ierr)
          use pgstar, only: shutdown_pgstar
-         integer, intent(in) :: id ! id for star
+         integer, intent(in) :: id  ! id for star
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
@@ -3341,6 +3329,5 @@
          call set_star_job(s, name, val, ierr)
 
       end subroutine star_set_star_job_namelist
-
 
       end module star_lib

@@ -12,6 +12,6 @@ Charlie Conroy, and Matteo Cantiello.
 Apply for admission at:
 
 `MESA Summer School
-2018 <http://cococubed.com/mesa_summer_school_2018/>`__
+2018 <https://mesastar.org/summer-school-2018/>`__
 
 Enrollment is limited and closes March 1, 2018.

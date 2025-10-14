@@ -1,22 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2010  Bill Paxton & The MESA Team
 !
-!   this file is part of mesa.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   mesa is free software; you can redistribute it and/or modify
-!   it under the terms of the gnu general library public license as published
-!   by the free software foundation; either version 2 of the license, or
-!   (at your option) any later version.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   mesa is distributed in the hope that it will be useful,
-!   but without any warranty; without even the implied warranty of
-!   merchantability or fitness for a particular purpose.  see the
-!   gnu library general public license for more details.
-!
-!   you should have received a copy of the gnu library general public license
-!   along with this software; if not, write to the free software
-!   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -247,15 +244,15 @@
          subroutine get_gyre_info_for_this_step
             integer :: i
             extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-            if (s% ixtra3_array(1) > 0) then ! unpack the GYRE results
+            if (s% ixtra3_array(1) > 0) then  ! unpack the GYRE results
                do i=1,s% ixtra3_array(1)
                   if (s% xtra1_array(i) == 0d0 .or. &
                      (s% ixtra1_array(i) /= s% x_integer_ctrl(4) .and. s% x_integer_ctrl(4) > 0)) cycle
                   if (s% xtra3_array(i) > 0d0 .and. &
                       (best_cycles_to_double == 0d0 .or. s% xtra3_array(i) < best_cycles_to_double)) then
                      !best_growth = s% xtra1_array(i)
-                     best_period = 1d0/s% xtra2_array(i) ! xtra2_array = freq (s^-1)
-                     best_period = best_period/(24*3600) ! change to days
+                     best_period = 1d0/s% xtra2_array(i)  ! xtra2_array = freq (s^-1)
+                     best_period = best_period/(24*3600)  ! change to days
                      best_cycles_to_double = s% xtra3_array(i)
                      best_order = s% ixtra1_array(i)
                      best_model_number = s% model_number
@@ -301,7 +298,7 @@
             ! period is completed when v_surf goes from positive to negative during step
             if (v_surf > 0d0 .or. v_surf_start < 0d0) return
 
-            if (time_started == 0) then ! start of 1st cycle
+            if (time_started == 0) then  ! start of 1st cycle
                time_started = s% time
                run_num_steps_end_prev = s% model_number
                run_num_iters_end_prev = s% total_num_solver_iterations
@@ -316,16 +313,16 @@
             delta_R = R_max - R_min
             min_deltaR_for_periods = s% x_ctrl(8)*Rsun
             if (min_deltaR_for_periods > 0d0) then
-               if (delta_R < min_deltaR_for_periods) return ! filter out glitches
+               if (delta_R < min_deltaR_for_periods) return  ! filter out glitches
             end if
 
             time_ended = s% time
-            if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
+            if (abs(v_surf - v_surf_start) > 1d-10) &  ! tweak the end time to match when v_surf == 0
                time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
             min_period_div_target = s% x_ctrl(10)
             min_period = target_period*(24*3600)*min_period_div_target
             if (min_period > 0d0 .and. &
-                time_ended - time_started < min_period) return ! filter out glitches
+                time_ended - time_started < min_period) return  ! filter out glitches
 
             period = time_ended - time_started
             num_periods = num_periods + 1
@@ -472,7 +469,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 0 ! 6
+         how_many_extra_profile_columns = 0  ! 6
       end function how_many_extra_profile_columns
 
 
@@ -553,7 +550,7 @@
 
          call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
-         mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         mode_l = 0  ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
 
          !write(*,*) 'call star_get_pulse_data'
@@ -576,17 +573,17 @@
              'P (sec)', 'P (day)', 'growth (day)', 'cycles to double'
 100       format(A8,8A20)
 
-         rpar(1) = 0.5d-6 ! freq < this (Hz)
+         rpar(1) = 0.5d-6  ! freq < this (Hz)
          ipar(1) = s% model_number
-         ipar(2) = 1 ! order_target
-         ipar(3) = 1 ! 1 means output eigenfunction files
-         ipar(4) = 3 ! max number of modes to output per call
-         ipar(5) = 0 ! num_written
+         ipar(2) = 1  ! order_target
+         ipar(3) = 1  ! 1 means output eigenfunction files
+         ipar(4) = 3  ! max number of modes to output per call
+         ipar(5) = 0  ! num_written
 
          call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
 
-         amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
-         amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
+         amix1 = s% x_ctrl(4)  ! s% RSP_fraction_1st_overtone
+         amix2 = s% x_ctrl(5)  ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
             write(*,*) 'AMIX DO NOT ADD UP RIGHT'
             call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
@@ -635,7 +632,7 @@
          end if
 
          do i=nz-1,1,-1
-            k = nz+1-i ! v(1) from gyre => vel(nz) in star
+            k = nz+1-i  ! v(1) from gyre => vel(nz) in star
             vel(k) = v1*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
             !write(*,2) 'vel', k, vel(k)
          end do
@@ -702,11 +699,11 @@
                per = 0d0
             end if
 
-            if (growth > 0._dp) then ! unstable
+            if (growth > 0._dp) then  ! unstable
                write(*, 100) md%n_pg, &
                   freq, per, per/(24*3600), growth*(24*3600), freq/(2d0*pi*growth)
 100            format(I8,E20.4,2F20.4,E20.4,F20.4)
-            else ! stable
+            else  ! stable
                write(*, 110) md%n_pg, &
                   freq, per, per/(24*3600), growth*(24*3600), 'stable'
 110            format(I8,E20.4,2F20.4,E20.4,A20)

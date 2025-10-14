@@ -1,5 +1,10 @@
 .. _list-otherhooks:
 
+hooks
+*****
+
+.. note:: General setup and use of hooks is explained in :ref:`using_other`
+
 eos hooks
 =========
 
@@ -14,7 +19,6 @@ other_eos_component              eosdt_eval
 other_eos_results                eosdt_eval
 ===============================  =============
 
-
 kap hooks
 =========
 
@@ -28,7 +32,6 @@ other_elect_cond_opacity         kap_eval
 other_compton_opacity            kap_eval
 other_radiative_opacity          kap_eval
 ===============================  =============
-
 
 star hooks
 ==========
@@ -50,7 +53,7 @@ other_gradr_factor               hydro_vars
 other_opacity_factor             micro
 other_cgrav                      hydro_vars
 ===============================  =============
-   
+
 atm
 ---
 ===============================  =============
@@ -193,7 +196,7 @@ logs
 Hook name                              Code Location
 =====================================  =============
 how_many_extra_history_columns         history
-data_for_extra_history_columns         
+data_for_extra_history_columns
 how_many_extra_profile_columns         profile
 data_for_extra_profile_columns
 how_many_extra_history_header_items
@@ -224,10 +227,10 @@ solver
 ===============================  =============
 Hook name                        Code Location
 ===============================  =============
-other_after_enter_setmatrix      hydro_mtx		
-other_after_struct_burn_mix	 struct_burn_mix
-other_before_struct_burn_mix	 struct_burn_mix
-other_solver_monitor		 star_solver
+other_after_enter_setmatrix      hydro_mtx
+other_after_struct_burn_mix      struct_burn_mix
+other_before_struct_burn_mix     struct_burn_mix
+other_solver_monitor             star_solver
 other_new_generation             evolve_support
 other_set_current_to_old         evolve_support
 ===============================  =============
@@ -242,4 +245,77 @@ extras_controls                  run_star_support
 extras_check_model               run_star_support
 extras_finish_step               run_star_support
 extras_after_evolve              run_star_support
+===============================  =============
+
+binary hooks
+============
+
+There are many hooks in binary (see ``binary/other``).  Code location
+indicates the file in ``binary/private`` where the hook is called.
+
+binary physics
+--------------
+================================   =============
+Hook name                          Code Location
+================================   =============
+other_accreted_material_j          binary_mdot
+other_adjust_mdots                 binary_mdot
+other_mdot_edd                     binary_mdot
+other_rho_mdot                     binary_mdot
+other_implicit_function_to_solve   binary_mdot
+other_edot_tidal                   binary_edot
+other_edot_enhance                 binary_edot
+other_extra_edot                   binary_edot
+other_jdot_mb                      binary_jdot
+other_jdot_gr                      binary_jdot
+other_jdot_ml                      binary_jdot
+other_extra_jdot                   binary_jdot
+other_jdot_ls                      binary_jdot
+other_jdot_missing_wind            binary_jdot
+other_binary_wind_transfer         binary_wind
+other_e2                           binary_tides
+other_sync_spin_to_orbit           binary_tides
+other_tsync                        binary_tides
+other_check_implicit_rlo           binary_evolve
+================================   =============
+
+control flow
+------------
+===============================  ==================
+Hook name                        Code Location
+===============================  ==================
+extras_binary_startup            run_binary_support
+extras_binary_start_step         run_binary_support
+extras_binary_check_model        run_binary_support
+extras_binary_finish_step        run_binary_support
+extras_binary_after_evolve       run_binary_support
+===============================  ==================
+
+logs
+----
+==========================================  =============
+Hook name                                   Code Location
+==========================================  =============
+how_many_extra_binary_history_columns       binary_history
+data_for_extra_binary_history_columns
+how_many_extra_binary_history_header_items
+data_for_extra_binary_history_header_items
+==========================================  =============
+
+photos
+------
+===============================  =============
+Hook name                        Code Location
+===============================  =============
+other_binary_photo_write         binary_photos
+other_binary_photo_read          binary_photos
+===============================  =============
+
+pgbinary
+--------
+===============================  =============
+Hook name                        Code Location
+===============================  =============
+pgbinary_decorator               pgbinary_support
+other_pgbinary_plots_info        pgbinary_full
 ===============================  =============

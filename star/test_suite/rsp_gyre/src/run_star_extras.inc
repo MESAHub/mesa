@@ -1,5 +1,5 @@
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -10,7 +10,7 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -45,8 +45,8 @@
          write(*,*)
          extras_finish_step = terminate
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -57,7 +57,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -67,7 +67,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -80,8 +80,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -93,7 +93,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -104,8 +104,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -119,4 +119,4 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+

@@ -25,7 +25,7 @@
 
       ! ::
 
-    chem_isotopes_filename = 'isotopes.data '
+    chem_isotopes_filename = 'isotopes.data'
 
 
       ! pause_before_terminate
@@ -337,7 +337,7 @@
 
       ! By default at the start of a run a zams starting model is loaded,
       ! and then the ``initial_mass``, ``initial_z``, and ``initial_y`` are adjusted as necessary.
-      ! However, there are alternatives.  you can use a model you saved previously,
+      ! However, there are alternatives. You can use a model you saved previously,
       ! or you can request the system to create a pre-main-sequence model.
 
       ! BTW: the system finds the zams file by using the control called ``zams_filename``
@@ -463,12 +463,12 @@
       ! pre_ms_check_radiative_core_min_mass
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! pre_ms_relax_to_start_radiative_core. wait this many steps before start checking for radiative core
-      ! pre_ms_check_radiative_core_start. only start checking after have encountered min_conv_mx1_bot < this
-      ! this forces it to wait until after have become fully convective.
-      ! pre_ms_check_radiative_core_stop. stop when conv_mx1_bot > this (measured in q).
-      ! The relaxation to a radiative core is stopped if Lnuc/L>pre_ms_check_radiative_core_Lnuc_div_L_limit,
-      ! or when the mass is below pre_ms_check_radiative_core_min_mass (in Msun).
+      ! |    ``pre_ms_relax_to_start_radiative_core``. wait this many steps before start checking for radiative core
+      ! |    ``pre_ms_check_radiative_core_start``. only start checking after have encountered ``min_conv_mx1_bot`` < this
+      ! |    this forces it to wait until after have become fully convective.
+      ! |    ``pre_ms_check_radiative_core_stop``. stop when ``conv_mx1_bot`` > this (measured in q).
+      ! |    The relaxation to a radiative core is stopped if Lnuc/L > ``pre_ms_check_radiative_core_Lnuc_div_L_limit``,
+      ! |    or when the mass is below ``pre_ms_check_radiative_core_min_mass`` (in Msun).
 
       ! ::
 
@@ -689,6 +689,8 @@
       ! set hydrogen and helium mass fractions according to the following:
       ! If no h2 in current net, then this will be added to h1.
       ! If no he3 in current net, then this will be added to he4.
+      ! When ``set_uniform_initial_composition = .false.``, defer to
+      ! composition controls in ``star/defaults/controls.defaults``.
 
       ! ::
 
@@ -858,8 +860,10 @@
       ! ``relax_composition_filename`` holds the desired composition profile information
       ! file format for relax composition
 
+      ! .. code-block:: console
+
       !     1st line: num_points num_species
-      !     then 1 line for for each point where define desired composition
+      !     then 1 line for each point where define desired composition
       !     xq xa(1) ... xa(num_species)
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -953,7 +957,7 @@
       ! ``relax_Z = .true.`` gradually changes average Z, reconverging at each step.
       ! ``change_Z = .true.`` simply changes abundances; doesn't reconverge the model.
       ! note: ``relax_dlnZ`` in the controls inlist determines the rate of change
-      ! note: ``initial_zfracs`` are not adjusted when using these controls, 
+      ! note: ``initial_zfracs`` are not adjusted when using these controls,
       ! except if ``set_uniform_initial_composition = .true.``, and manually setting abundances.
 
       ! ::
@@ -1058,13 +1062,13 @@
       ! file format for relax angular momentum
 
       !     1st line: num_points
-      !     then 1 line for for each point where define desired angular momentum
+      !     then 1 line for each point where define desired angular momentum
       !     xq angular_momentum
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
       !     angular_momentum = specific angular momentum in units of cm^2/s
 
-      ! 'relax_angular_momentum_constant_omega_center' is used to account for points near the center that could
+      ! ``relax_angular_momentum_constant_omega_center`` is used to account for points near the center that could
       ! be outside the range of the input data. In this case, normally the interpolation routine would just
       ! provide a value truncated to the edge of the data that would result in a large spike in central omega.
       ! If this option is true, then the innermost regions of the star that are outside of the range
@@ -1113,10 +1117,10 @@
       ! ``relax_entropy_filename`` holds the desired entropy profile information
       ! file format for relax entropy
 
-      ! ::
+      ! .. code-block:: console
 
       !     1st line: num_points
-      !     then 1 line for for each point where define desired entropy
+      !     then 1 line for each point where define desired entropy
       !     xq entropy
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -1143,10 +1147,10 @@
       ! specified above. So, for example, when using 'eosDT' the format of
       ! the input file is
 
-      ! ::
+      ! .. code-block:: console
 
       !     1st line: num_points
-      !     then 1 line for for each point where define desired entropy
+      !     then 1 line for each point where define desired entropy
       !     xq density temperature
       !     xq = fraction of xmstar exterior to the point
       !     where xmstar = mstar - M_center
@@ -1455,7 +1459,7 @@
       ! ~~~~~~~~~~~~
 
       ! RTI variables
-      ! ``RTI_flag`` is true if we are doing Rayleigh Taylor Instabilities
+      ! ``RTI_flag`` is true if we are doing Rayleigh-Taylor Instabilities
 
       ! ::
 
@@ -1566,7 +1570,7 @@
 
       ! NOTE: why 2 flags?
       ! because I want 3 options: set true, set false, and leave it alone.
-      ! there are of course other ways to get 3 options, but this is what we have.
+      ! There are, of course, other ways to get 3 options, but this is what we have.
 
       ! ::
 
@@ -1620,18 +1624,18 @@
     set_initial_omega_div_omega_crit = .false.
 
 
-      ! new_surface_rotation_v = 0 ! (km sec^1)
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! set_surface_rotation_v = .false.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! set_initial_surface_rotation_v = .false.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! new_surface_rotation_v
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! set_surface_rotation_v
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! set_initial_surface_rotation_v
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! as above, but sets surface velocity in km/sec
 
       ! ::
 
-    new_surface_rotation_v = 0
+    new_surface_rotation_v = 0  ! in km/sec
     set_surface_rotation_v = .false.
     set_initial_surface_rotation_v = .false.
 
@@ -1751,7 +1755,7 @@
 
       ! if ``relax_omega`` true, relax to value of ``new_omega``. applies when do ./rn or ./re
       ! ``relax_initial_omega`` only applies at start of run, not for restarts.
-      ! ``near_zams_relax``+omega applies when "near zams".
+      ! ``near_zams_relax`` omega applies when "near zams".
       ! The working definition of "near zams" is
       ! ``L_nuc_burn_total/L_phot >= Lnuc_div_L_zams_limit``
       ! ``Lnuc_div_L_zams_limit`` is in the controls part of the inlist.
@@ -2376,7 +2380,7 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! For switching reaction networks.
-      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`. 
+      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`.
 
       ! ::
 
@@ -2441,8 +2445,8 @@
     special_rate_factor(:) = 1
 
       ! If set, we read this filename from the local work directory, then try ``data/rates_data/rate_tables``.
-      ! This enables using the MESA provide custom rate tables with out changing the default for everyone.
-      ! Note we still multiple the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
+      ! This enables using the MESA provided custom rate tables without changing the default for everyone.
+      ! Note we still multiply the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
 
       ! For instance setting:
       !    num_special_rate_factors = 1
@@ -2458,7 +2462,7 @@
       ! use_3a_fl87
       ! ~~~~~~~~~~~
 
-      ! If true then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
+      ! If true, then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
       ! This replaces the old set_rate_3a = 'Fl87' option
 
       use_3a_fl87 = .false.
@@ -2685,10 +2689,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! If this is true, use the A=17-28 weak reaction rates from
-
-      !     Suzuki, Toki, and Nomoto (2016)
-      !     Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
-      !     http://adsabs.harvard.edu/abs/2016ApJ...817..163S
+      ! `Suzuki, Toki, and Nomoto (2016) <http://adsabs.harvard.edu/abs/2016ApJ...817..163S>`_:
+      ! Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
 
       ! If you make use of these rates, please cite the above paper.
 
@@ -2865,54 +2867,6 @@
     extras_llpar = 0
     extras_lpar(:) = .false.
 
-! Color Files
-! ===========
-
-
-      ! color_num_files
-      ! ~~~~~~~~~~~~~~~
-      ! color_file_names
-      ! ~~~~~~~~~~~~~~~~
-      ! color_num_colors
-      ! ~~~~~~~~~~~~~~~~
-
-      !     Filenames for each bolometric correction (BC) table to load
-      !     Must set the number of files to load
-      !     Must be <= ``max_num_color_files`` (defined in ``colors_def.f90``).
-      !     Must set the number of BC's in each file (May be different for each file).
-      !     Must be <= ``max_num_bcs_per_file`` (defined in ``colors_def.f90``).
-      !     Files should be structured as:
-      !     Teff log_g M_div_h filter1 filter2 ....
-      !     where filter1 is the name of the filter (No spaces allowed in name)
-      !     Names must be unique across all files loaded and are case sensitive.
-      !     For a filter named filter1 history output will be bc_filter1 for bolometric corrections
-      !     and abs_mag_filter1 for absolute magnitude
-
-      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code 
-
-      ! ::
-
-    color_num_files = -1
-    color_file_names(:) = ''
-    color_num_colors(:) = -1
-
-      ! Default file from Lejeune, Cuisinier, Buser (1998) A&AS 130, 65-75
-      ! Can be replaced if need be.
-      ! The filter names are U B V R I J H K L Lprime M (case sensitive)
-
-      ! ::
-
-    color_num_files = 1
-    color_file_names(1) = 'lcb98cor.dat'
-    color_num_colors(1) = 11
-
-      ! Set of blackbody bolometric corrections in UBVRI
-      ! Can be used at the same time as the lcb98cor.dat file
-      ! Filter names bb_U bb_b bb_V bb_R bb_I
-      ! color_num_files=2
-      ! color_file_names(2)='blackbody_johnson.dat'
-      ! color_num_colors(2)=5
-
 ! misc
 ! ====
 
@@ -3045,5 +2999,7 @@
 
       ! do_special_test
       ! ~~~~~~~~~~~~~~~
+
+      ! ::
 
     do_special_test = .false.

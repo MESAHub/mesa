@@ -2,48 +2,32 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_T_tau_varying
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp, ln10, cgas
   use math_lib
   use utils_lib, only: mesa_error
 
-  ! No implicit typing
-
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: eval_T_tau_varying
   public :: build_T_tau_varying
-
-  ! Procedures
 
 contains
 
@@ -128,7 +112,7 @@ contains
        if (ierr /= 0) then
           write(*,*) 'atm: Call to eval_data failed in atm_t_tau_varying'
           return
-       endif
+       end if
 
        dlnT_dL = 0._dp
        dlnT_dlnR = 0._dp
@@ -182,7 +166,7 @@ contains
        if (ierr /= 0) then
           write(*,*) 'Call to eval_data failed in atm_t_tau_varying_opacity'
           return
-       endif
+       end if
 
        ! Set up the partials
 
@@ -201,15 +185,12 @@ contains
        dlnP_dlnM = 0._dp
        dlnP_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
+    end if
 
     return
 
   end subroutine eval_T_tau_varying
 
-  !****
 
   ! Evaluate atmosphere data from T-tau relation with varying opacity
 
@@ -258,13 +239,10 @@ contains
 
     end do try_loop
 
-    ! Finish
-
     return
 
   end subroutine eval_data
 
-  !****
 
   subroutine eval_data_try( &
        tau_surf, Teff, g, tau_outer, &
@@ -398,8 +376,6 @@ contains
 
     deallocate(work, iwork)
 
-    ! Finish
-
     return
 
   contains
@@ -469,13 +445,10 @@ contains
 
        f(1) = tau*g/(kap*exp(lnP))
 
-      ! Finish
-
       return
 
     end subroutine eval_fcn
 
-    !****
 
     subroutine eval_solout( &
          nr, xold, x, n, y, rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, irtrn)
@@ -498,9 +471,9 @@ contains
            integer, intent(out) :: ierr
          end function interp_y
       end interface
-      integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+      integer, intent(out) :: irtrn  ! < 0 causes solver to return to calling program.
 
-      irtrn = 0 ! for ifort
+      irtrn = 0  ! for ifort
 
       ! Dummy routine that's never called
 
@@ -510,7 +483,6 @@ contains
 
   end subroutine eval_data_try
 
-  !****
 
   ! Build atmosphere structure data from T-tau relation with varying
   ! opacity
@@ -579,8 +551,8 @@ contains
        return
     end if
 
-    if (dlntau <= 0.) then
-       write(*,*) 'Invalid dlntau in build_atm_uniform:', dlntau
+    if (dlogtau <= 0._dp) then
+       write(*,*) 'Invalid dlogtau in build_atm_uniform:', dlogtau
        call mesa_error(__FILE__,__LINE__)
     end if
 
@@ -699,11 +671,8 @@ contains
       f(1) = -tau/(kap*rho)
       f(2) = tau*g/(kap*P)
 
-      ! Finish
-
     end subroutine build_fcn
 
-    !****
 
     subroutine build_solout( &
          nr, xold, x, n, y, rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, irtrn)
@@ -759,13 +728,10 @@ contains
 
       atm_structure(:,atm_structure_num_pts) = atm_structure_sgl
 
-      ! Finish
-
       return
 
     end subroutine build_solout
 
-    !***
 
     subroutine build_data(lntau, delta_r, lnP, atm_structure_sgl, ierr)
 
@@ -831,12 +797,12 @@ contains
 
       ! Store data
 
-      atm_structure_sgl(atm_xm) = 0._dp ! We assume negligible mass in the atmosphere
+      atm_structure_sgl(atm_xm) = 0._dp  ! We assume negligible mass in the atmosphere
       atm_structure_sgl(atm_delta_r) = delta_r
       atm_structure_sgl(atm_lnP) = lnP
       atm_structure_sgl(atm_lnd) = lnRho
       atm_structure_sgl(atm_lnT) = lnT
-      atm_structure_sgl(atm_gradT) = gradr ! by assumption, atm is radiative
+      atm_structure_sgl(atm_gradT) = gradr  ! by assumption, atm is radiative
       atm_structure_sgl(atm_kap) = kap
       atm_structure_sgl(atm_gamma1) = res(i_gamma1)
       atm_structure_sgl(atm_grada) = res(i_grad_ad)

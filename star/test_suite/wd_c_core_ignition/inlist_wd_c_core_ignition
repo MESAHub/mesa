@@ -2,7 +2,7 @@
 
 &star_job
       show_log_description_at_start = .false.
-      
+
       load_saved_model = .true.
       load_model_filename = 'wd_c_core_ignition.mod'
 
@@ -10,12 +10,12 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'power_nuc_burn_upper_limit'
 
-      change_initial_net = .true.      
+      change_initial_net = .true.
       new_net_name = 'approx21.net'
 
-      use_3a_fl87 = .true.      
+      use_3a_fl87 = .true.
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       change_v_flag = .true.
       new_v_flag = .true.
@@ -34,7 +34,7 @@
       years_for_initial_dt = 1e4
 
       pgstar_flag = .false.
-      
+
 / ! end of star_job namelist
 
 
@@ -61,8 +61,8 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 1000
 
-      power_nuc_burn_upper_limit = 1d8 
-      
+      power_nuc_burn_upper_limit = 1d8
+
       varcontrol_target = 1d-3
 
       min_timestep_limit = 1d-4 ! seconds
@@ -75,7 +75,7 @@
       lgL_nuc_burn_min = 0d0
 
       T_mix_limit = 1d4
-       
+
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'iterated'
@@ -83,7 +83,7 @@
       accrete_same_as_surface = .true.
 
       mass_change = 1d-9 ! rate of accretion (Msun/year)
-      
+
       convergence_ignore_equL_residuals = .true.
 
       num_trace_history_values = 2
@@ -93,27 +93,26 @@
       photo_interval = 50
       profile_interval = 50
       history_interval = 10
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 10
 
 / ! end of controls namelist
 
 
-
 &pgstar
 
-!pause = .true.
+!pause_flag = .true.
 
          TRho_Profile_win_flag = .true.
          TRho_Profile_xmin = -5.0
          TRho_Profile_xmax = 11.0
          TRho_Profile_ymin = 4.0
-         TRho_Profile_ymax = 10.0        
+         TRho_Profile_ymax = 10.0
 
          show_TRho_Profile_text_info = .true.
 
          !History_Panels1_win_flag = .true.
-         History_Panels1_yaxis_name(3) = 'log_R' 
+         History_Panels1_yaxis_name(3) = 'log_R'
          History_Panels1_other_yaxis_name(3) = 'v_div_csound_surf'
 
          Abundance_win_flag = .true.

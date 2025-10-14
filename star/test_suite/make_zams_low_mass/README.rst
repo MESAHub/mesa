@@ -4,11 +4,11 @@
 make_zams_low_mass
 ******************
 
-This test case shows an example of creating a 0.085 Msun, Z = 0.014 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
+This test case shows an example of creating a 0.085 |Msun|, Z = 0.014 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_zams``) creates a 0.085 Msun, Z = 0.014 metallicity, pre-main sequence model and evolves the model to the zero age main sequence, terminating when Lnuc / L = 0.9.
+* Part 1 (``inlist_zams``) creates a 0.085 |Msun|, Z = 0.014 metallicity, pre-main sequence model and evolves the model to the zero age main sequence, terminating when Lnuc / L = 0.9.
 
 .. image:: ../../../star/test_suite/make_zams_low_mass/docs/grid_000196.svg
    :width: 100%
@@ -22,10 +22,8 @@ pgstar commands used for the plot above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 10
 

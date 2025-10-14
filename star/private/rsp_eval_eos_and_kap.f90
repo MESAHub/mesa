@@ -2,32 +2,30 @@
 !
 !   Copyright (C) 2018-2019  The MESA Team
 !
-!   This file is part of MESA.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU Library General Public License for more details.
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module rsp_eval_eos_and_kap
+
       use eos_def
       use eos_lib
       use chem_def
       use chem_lib, only: chem_Xsol, basic_composition_info
       use kap_lib
       use kap_def
-      use const_lib
+      use const_def, only: dp, ln10, arg_not_provided
       use utils_lib
       use star_utils, only: &
          store_rho_in_xh, store_lnd_in_xh, get_rho_and_lnd_from_xh, &
@@ -36,7 +34,6 @@
       use rsp_def, only: xa, X, Z, Y, &
          abar, zbar, z53bar, XC, XN, XO, Xne
 
-
       implicit none
 
       integer :: species
@@ -44,7 +41,6 @@
       integer :: eos_handle, kap_handle
 
       contains
-
 
       subroutine restart_rsp_eos_and_kap(s)
          type (star_info), pointer :: s
@@ -147,11 +143,6 @@
          write(*,1) 'Z', Z
 
 
-
-
-
-
-
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
          write(*,1) 'XC', XC
@@ -244,7 +235,7 @@
                call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
                CSND = s% csound(k)
             end if
-         else ! k <= 0 or k > nz
+         else  ! k <= 0 or k > nz
             call get_eos( &
                s, 0, xa, &
                Rho, logRho, T, logT, &
@@ -290,7 +281,7 @@
          Prad = crad*T**4/3d0  ! erg/cm^2
          d_Pr_dT = 4d0*Prad/T
 
-         erad = 3d0*Prad/rho ! 3*Prad*V   erg/gm
+         erad = 3d0*Prad/rho  ! 3*Prad*V   erg/gm
          d_erad_dT = 3d0*d_Pr_dT/rho
          d_erad_dV = 3d0*Prad
 
@@ -317,7 +308,7 @@
          dchiRho_dlnd = d_dlnd(i_chiRho)
          dchiRho_dlnT = d_dlnT(i_chiRho)
 
-         Q = chiT/(rho*T*chiRho) ! thermal expansion coefficient
+         Q = chiT/(rho*T*chiRho)  ! thermal expansion coefficient
          dQ_dlnd = Q*(dchiT_dlnd/chiT - dchiRho_dlnd/chiRho - 1d0)
          dQ_dlnT = Q*(dchiT_dlnT/chiT - dchiRho_dlnT/chiRho - 1d0)
          QV = dQ_dlnd*dlnd_dV
@@ -429,7 +420,7 @@
                call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
                CSND = s% csound(k)
             end if
-         else ! k <= 0 or k > nz
+         else  ! k <= 0 or k > nz
             write(*,*) 'cannot call eval1_mesa_eosDEgas_and_kap with k <= 0 or k > nz'
             ierr = -1
             return
@@ -464,7 +455,7 @@
 
          Pgas = exp(res(i_lnPgas))
          CP = res(i_Cp)
-         Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
+         Q = res(i_chiT)/(rho*T*res(i_chiRho))  ! thermal expansion coefficient
 
       end subroutine eval1_mesa_eosDEgas_and_kap
 
@@ -561,7 +552,7 @@
                call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
                CSND = s% csound(k)
             end if
-         else ! k <= 0 or k > nz
+         else  ! k <= 0 or k > nz
             write(*,*) 'cannot call eval1_mesa_eosDE_and_kap with k <= 0 or k > nz'
             ierr = -1
             return
@@ -595,7 +586,7 @@
 
          Pgas = exp(res(i_lnPgas))
          CP = res(i_Cp)
-         Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
+         Q = res(i_chiT)/(rho*T*res(i_chiRho))  ! thermal expansion coefficient
 
       end subroutine eval1_mesa_eosDE_and_kap
 
@@ -1053,7 +1044,4 @@
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
       end subroutine set_T_for_new_energy
 
-
       end module rsp_eval_eos_and_kap
-
-

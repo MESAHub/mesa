@@ -1,34 +1,26 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2022  The MESA Team, Bill Paxton, Pablo Marchant
-!                                                           & Matthias Fabry
+!   Copyright (C) 2010-2022  Bill Paxton, Pablo Marchant, Matthias Fabry
+!                                                          & The MESA Team
 !
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
-!
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
-
 module binary_history
 
-   use const_def
+   use const_def, only: dp, pi, lsun, msun, rsun, secyer, secday, two_thirds
    use math_lib
    use binary_def
    use binary_private_def
@@ -63,7 +55,6 @@ contains
 
    subroutine data_for_binary_history_columns(&
       binary_id, n, names, vals, ierr)
-      use const_def, only : dp
       integer, intent(in) :: binary_id, n
       character (len = 80) :: names(n)
       real(dp) :: vals(n)
@@ -132,9 +123,9 @@ contains
 
       logical :: binary_history_file_exists
       character (len = maxlen_history_column_name), pointer :: &
-         names(:) ! (num_history_columns)
-      real(dp), pointer :: vals(:) ! (num_history_columns)
-      logical, pointer :: is_int(:) ! (num_history_columns)
+         names(:)  ! (num_history_columns)
+      real(dp), pointer :: vals(:)  ! (num_history_columns)
+      logical, pointer :: is_int(:)  ! (num_history_columns)
 
       include 'formats'
 
@@ -269,7 +260,7 @@ contains
          end if
       end if
 
-      if (write_flag .and. i0 == 1) then ! write parameters at start of log
+      if (write_flag .and. i0 == 1) then  ! write parameters at start of log
 
          num_extra_header_items = b% how_many_extra_binary_history_header_items(b% binary_id)
 
@@ -320,7 +311,7 @@ contains
          write(io, *)
       end if
 
-      do i = i0, 3 ! add a row to the log
+      do i = i0, 3  ! add a row to the log
          col = 0
 !         write(*, *) "doing cols pass", i
          do j = 1, numcols
@@ -399,13 +390,13 @@ contains
       end subroutine do_col
 
 
-      subroutine do_col_pass1 ! write the column number
+      subroutine do_col_pass1  ! write the column number
          col = col + 1
          if (write_flag) write(io, fmt = int_fmt, advance = 'no') col
       end subroutine do_col_pass1
 
 
-      subroutine do_col_pass2(j) ! get the column name
+      subroutine do_col_pass2(j)  ! get the column name
          integer, intent(in) :: j
          character (len = 100) :: col_name
          integer :: c
@@ -415,7 +406,7 @@ contains
       end subroutine do_col_pass2
 
 
-      subroutine do_col_pass3(c) ! get the column value
+      subroutine do_col_pass3(c)  ! get the column value
          integer, intent(in) :: c
          integer :: k, int_val
          logical :: is_int_val
@@ -476,7 +467,7 @@ contains
       end subroutine write_integer
 
 
-      subroutine write_val(io, col, pass, name, val) ! for header items only
+      subroutine write_val(io, col, pass, name, val)  ! for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character (len = *), intent(in) :: name
@@ -492,7 +483,7 @@ contains
       end subroutine write_val
 
 
-      subroutine write_string(io, col, pass, name, val) !for header items only
+      subroutine write_string(io, col, pass, name, val)  !for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character(len = *), intent(in) :: name, val
@@ -851,7 +842,7 @@ contains
 
       get1_binary_hist_value = .false.
       call integer_dict_lookup(b% binary_history_names_dict, name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) return ! didn't find it
+      if (ierr /= 0 .or. i <= 0) return  ! didn't find it
       if (associated(b% pg% pgbinary_hist)) then
          if (associated(b% pg% pgbinary_hist% vals)) then
             if (size(b% pg% pgbinary_hist% vals, dim = 1) >= i) then

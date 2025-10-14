@@ -6,7 +6,7 @@
          ! note: number of zones for redistribute is set in the redistrb.c input file
 
 / ! end astero_search_controls
-   
+
 
 &astero_pgstar_controls
 / ! end astero_pgstar_controls

@@ -2,10 +2,10 @@
 &star_job
       show_log_description_at_start = .false.
 
-      
-      change_net = .true.      
+
+      change_net = .true.
       new_net_name = 'co_burn_extras.net'
-      
+
       set_initial_age = .false.
       set_initial_model_number = .false.
 
@@ -45,7 +45,7 @@
       ! ONe WD.
 
       initial_z = 0.02d0
-      
+
 ! opacity
 
 ! when to stop
@@ -55,14 +55,14 @@
       mesh_delta_coeff = 1.5
 
 ! diffusion
-      !do_element_diffusion = .true.    
-      !do_WD_sedimentation_heating = .true. 
+      !do_element_diffusion = .true.
+      !do_WD_sedimentation_heating = .true.
       !do_diffusion_heating = .false.
 
       !show_diffusion_info = .true. ! terminal output for diffusion
 
       diffusion_v_max = 1d-5
-      
+
       ! Bypasses the need to set up diffusion classes.
       diffusion_use_full_net = .true.
 
@@ -79,7 +79,7 @@
       diffusion_steps_limit = 20
       diffusion_steps_hard_limit = 50
       diffusion_iters_limit = 50
-      diffusion_iters_hard_limit = 100      
+      diffusion_iters_hard_limit = 100
 
 ! convection
       mlt_option = 'TDC'
@@ -90,7 +90,7 @@
 ! timesteps
       max_years_for_timestep = 1d9
       use_gold2_tolerances = .true.
-      
+
       varcontrol_target = 1d-3
       dX_nuc_drop_limit = 3d-2
       delta_HR_limit = 0.1
@@ -116,12 +116,11 @@
 
 ! Output
       history_interval = 10
-      terminal_interval = 10 
+      terminal_interval = 10
       write_header_frequency = 10
 
 
 / ! end of controls namelist
-
 
 
 &pgstar
@@ -132,7 +131,7 @@
       !Grid2_plot_name(2) = 'Power'
       !Power_xmin = 0.510 ! only used if /= -101d0
       !Power_xmax = 0.590 ! only used if /= -101d0
-         
+
       Grid2_file_flag = .true.
       Grid2_file_dir = 'png'
       Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
@@ -199,7 +198,7 @@
 
          Profile_Panels3_xaxis_name = 'mass'
          Profile_Panels3_xaxis_reversed = .false.
-         
+
          Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
          Profile_Panels3_xmax = 2.2 ! -101d0 ! only used if /= -101d0
 

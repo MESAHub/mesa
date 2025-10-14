@@ -81,7 +81,7 @@ Behind the scenes are ludicrously large Fortran files, which begin like:
          use utils_lib
          use support_functions
          use math_lib
-      
+
          implicit none
          private
       public :: auto_diff_real_1var_order1, &
@@ -200,7 +200,7 @@ Two functions I want to highlight are ``make_unop`` and ``make_binop``:
          unary%val = z_val
          unary%d1val1 = x%d1val1*z_d1x
       end function make_unary_operator
-      
+
       function make_binary_operator(x, y, z_val, z_d1x, z_d1y) result(binary)
          type(auto_diff_real_1var_order1), intent(in) :: x
          type(auto_diff_real_1var_order1), intent(in) :: y

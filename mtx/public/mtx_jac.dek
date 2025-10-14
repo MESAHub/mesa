@@ -3,21 +3,21 @@
          double precision, intent(out) :: A(:,:) ! (ldA,nvar*nz) ! the jacobian matrix
          ! A(idiag+q-v,v) = partial of equation(q) wrt variable(v)
          integer, intent(in) :: idiag
-         double precision, dimension(nvar,nvar,ne), intent(in) :: em1, e00, ep1         
+         double precision, dimension(nvar,nvar,ne), intent(in) :: em1, e00, ep1
          integer :: eqn
-         A = 0         
+         A = 0
          do eqn = 1,nvar
             call copy_one_to_3point_jacobian(nvar, nz, ldA, A, idiag, eqn, ne, em1, e00, ep1)
          end do
       end subroutine copy_all_to_3point_jacobian
 
-      
+
       subroutine copy_one_to_3point_jacobian(nvar, nz, ldA, A, idiag, eqn, ne, em1, e00, ep1)
          integer, intent(in) :: nvar, nz, ldA, ne
          integer, intent(in) :: idiag, eqn
          double precision, intent(out) :: A(:,:) ! (ldA,nvar*nz) ! the jacobian matrix
          ! A(idiag+q-v,v) = partial of equation(q) wrt variable(v)
-         double precision, dimension(nvar,nvar,ne), intent(in) :: em1, e00, ep1         
+         double precision, dimension(nvar,nvar,ne), intent(in) :: em1, e00, ep1
          ! em1(i,j,k) is partial of equation i of cell k wrt variable j of cell k-1
          ! e00(i,j,k) is partial of equation i of cell k wrt variable j of cell k
          ! ep1(i,j,k) is partial of equation i of cell k wrt variable j of cell k+1
@@ -28,15 +28,15 @@
                ii = eqn - var - nvar*dk + idiag
                jj = var + nvar*(dk-1)
                select case(dk)
-                  case(-1) 
+                  case(-1)
                      do k=2,nz
                         A(ii,jj+nvar*k) = em1(eqn,var,k)
                      end do
-                  case(0) 
+                  case(0)
                      do k=1,nz
                         A(ii,jj+nvar*k) = e00(eqn,var,k)
                      end do
-                  case(1) 
+                  case(1)
                      do k=1,nz-1
                         A(ii,jj+nvar*k) = ep1(eqn,var,k)
                      end do
@@ -77,10 +77,10 @@
             write(*,*) 'failed to open ', trim(fname)
             return
          end if
-         
+
          do j = eqn_lo, equ_hi ! the equation number
             do i = var_lo, var_hi ! the variable number
-            
+
                write(fig_name,'(a)') 'd' // trim(equ_names(j)) // '_d' // trim(var_names(i))
                fname = trim(data_dir) // '/' // trim(fig_name) // '.data'
                open(newunit=iodata,file=trim(fname),action='write',status='replace',iostat=ierr)
@@ -115,10 +115,10 @@
                write(iodata,'(9999e20.8)') A00(z_low:z_hi)
                write(iodata,'(9999e20.8)') Ap1(z_low:z_hi)
                close(iodata)
-               
+
             end do
-         end do         
-         
+         end do
+
          close(iodata)
          close(ionames)
 

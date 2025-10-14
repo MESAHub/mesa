@@ -12,7 +12,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 
 .. code-block:: console
 
- Core eE/mg =    2.0005029376686494     
+ Core eE/mg =    2.0005029376686494
  passed test for electric field in the core
 
 
@@ -20,7 +20,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    :width: 100%
 
 
-|br|
+
 pgstar commands used for the plots above:
 
 .. code-block:: console
@@ -29,10 +29,8 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
         Profile_Panels2_win_flag = .true.
         Profile_Panels2_win_width = 12
@@ -55,18 +53,11 @@ pgstar commands used for the plots above:
         Profile_Panels2_file_flag = .true.
         Profile_Panels2_file_dir = 'pgstar_out'
         Profile_Panels2_file_prefix = 'profile_'
-        Profile_Panels2_file_interval = 100000     
+        Profile_Panels2_file_interval = 100000
         Profile_Panels2_file_width = -1
         Profile_Panels2_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 
 
-
 Last-Updated: 06Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>

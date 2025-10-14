@@ -2,46 +2,31 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module atm_irradiated
 
-  ! Uses
-
-  use const_def
+  use const_def, only: dp
   use math_lib
 
-  ! No implicit typing
-
   implicit none
-
-  ! Access specifiers
 
   private
 
   public :: eval_irradiated
-
-  ! Procedures
 
 contains
 
@@ -107,7 +92,7 @@ contains
     if (L <= 0._dp .OR. R <= 0._dp .OR. M <= 0._dp) then
        ierr = -1
        return
-    endif
+    end if
 
     ! Evaluate the 'interior' temperature & gravity
 
@@ -158,7 +143,7 @@ contains
 
        if (err < 1._dp) exit iterate_loop
 
-       kap = kap_prev + 0.5_dp*(kap - kap_prev) ! under correct
+       kap = kap_prev + 0.5_dp*(kap - kap_prev)  ! under correct
 
        ! Re-evaluate atmosphere data
 
@@ -191,7 +176,7 @@ contains
 
        dlnT_dlnkap = 0._dp
 
-    endif
+    end if
 
     ! Set the effective temperature. This is equal to T_int, because
     ! irradiation has no effect on the *net* flux emerging from the
@@ -199,13 +184,10 @@ contains
 
     ! Teff = T_int
 
-    ! Finish
-
     return
 
   end subroutine eval_irradiated
 
-  !****
 
   ! Evaluate atmosphere data
 
@@ -273,7 +255,7 @@ contains
        gamma_eff = gamma
     else
        gamma_eff = kap_v/kap
-    endif
+    end if
 
     x = gamma_eff*tau
 
@@ -323,7 +305,7 @@ contains
           dlnx_dlnkap = 1._dp
        else
           dlnx_dlnkap = 0._dp
-       endif
+       end if
 
        dlnT_dL = (dlnT_dlnT_int*dlnT_int_dlnL + &
                   dlnT_dlntau*dlntau_dlnL + &
@@ -345,11 +327,7 @@ contains
        dlnT_dlnM = 0._dp
        dlnT_dlnkap = 0._dp
 
-    endif
-
-    ! Finish
-
-    return
+    end if
 
   end subroutine eval_data
 

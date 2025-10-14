@@ -2,43 +2,34 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pgstar_mixing_Ds
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, rayleigh_taylor_mixing, minimum_mixing
       use pgstar_support
       use pgstar_trho_profile
       use star_pgstar
 
       implicit none
 
-
       contains
 
-
       subroutine Mixing_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -128,7 +119,6 @@
             panel_flag, xaxis_numeric_labels_flag, ierr)
 
          use utils_lib
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: device_id
@@ -193,6 +183,7 @@
 
 
          subroutine plot(ierr)
+            use pgstar_colors
             integer, intent(out) :: ierr
 
             integer :: lw, lw_sav
@@ -223,7 +214,7 @@
                   call show_age_pgstar(s)
                end if
                call show_title_pgstar(s, title)
-               call pgsci(1)
+               call pgsci(clr_Foreground)
                call show_xaxis_name(s,MixDs_xaxis_name,ierr)
                if (ierr /= 0) return
             end if
@@ -338,7 +329,7 @@
 
             call pgswin(xleft, xright, ymin, ymax)
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             if (xaxis_numeric_labels_flag) then
                call show_box_pgstar(s,'BCNST','BCNSTV')
             else
@@ -546,6 +537,7 @@
 
          integer function mixing_line_legend( &
                cnt, clr, lw, lw_sav, txt_scale, str)
+            use pgstar_colors, only: clr_Foreground
             integer, intent(in) :: cnt, clr, lw, lw_sav
             real, intent(in) :: txt_scale
             character (len=*), intent(in) :: str
@@ -560,15 +552,12 @@
             call pgslw(lw)
             call pgline(2, xpts, ypts)
             call pgslw(lw_sav)
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call pgsch(txt_scale*s% pg% Mixing_legend_txt_scale_factor)
             call pgptxt(xpts(2) + dx, ypos, 0.0, 0.0, trim(str))
             mixing_line_legend = cnt + 1
          end function mixing_line_legend
 
-
       end subroutine MixDs_plot
 
-
       end module pgstar_mixing_Ds
-

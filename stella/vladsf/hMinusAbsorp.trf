@@ -1,9 +1,9 @@
 
 /********************************************
-*               
-*              Article: 
+*
+*              Article:
 *              Title:
-*                  Continuos absorbtion by the negative hydrogen ion reconsidered
+*                  Continuous absorption by the negative hydrogen ion reconsidered
 *              Author: T.L. John
 *              Link:  http://adsabs.harvard.edu/cgi-bin/nph-bib_query?1988A%26A...193..189J&amp;db_key=AST
 *
@@ -11,16 +11,16 @@
 *            ON ENTRY
 *              T      - temperature ( C )
 *              wLength      - wave length (micrometers)
-*              paramTypeAbsrb      - type of returned coeffiecient: K_bf, K_ff, K_tot
+*              paramTypeAbsrb      - type of returned coefficient: K_bf, K_ff, K_tot
 *                                           = 1,  return K_tot = K_bf + K_ff
 *                                           = 2,  return K_bf
 *                                           = 3,  return K_ff
-*                         
-*            ON RETURN, 
+*
+*            ON RETURN,
 *              K_res      -  [cm**4 * dyne**-1 ] one from from K_bf, K_ff, K_tot,  it depends from paramTypeAbsrb
 *
 *              ----------------------------------------------------------
-*              K_bf      - Photo-detachment of H_minus 
+*              K_bf      - Photo-detachment of H_minus
 *              K_ff      -  free-free transitions
 *              K_tot     -  K_bf + K_ff
 *
@@ -40,9 +40,9 @@ subroutine hMinusAbsorp( T, wLength, pTypeAbsrb, K_res);
 -- var bf
      Real*8 calc_K_bf_wl,calc_K_ff_wl;
 -- var ff
-  
+
      K_res = 333.33;
-     
+
      if( pTypeAbsrb .eq. 1 ) then;
          K_res = calc_K_bf_wl(T,wLength,pTypeAbsrb) + calc_K_ff_wl(T,wLength);
      endif;
@@ -52,7 +52,7 @@ subroutine hMinusAbsorp( T, wLength, pTypeAbsrb, K_res);
      if( pTypeAbsrb .eq. 3 ) then;
          K_res = calc_K_ff_wl(T,wLength);
      endif;
-     
+
 --     <*printParameters: *>;
   RETURN;
 end subroutine;
@@ -60,25 +60,25 @@ end subroutine;
 /*-------------------------------------*/
 
 
-/*----------------  FUNCTIONS -------------------------------*/ 
+/*----------------  FUNCTIONS -------------------------------*/
  function calc_K_ff_wl( l_T, l_wLength ) result(K_ff_wl);
--- var 
+-- var
     Real*8 l_T, T5040, l_wLength;
     Real*8 K_ff_wl, ff_func_sum;
     Dimension ff_An_g(6), ff_Bn_g(6), ff_Cn_g(6), ff_Dn_g(6), ff_En_g(6), ff_Fn_g(6); -- parameters coeff in table  3a
     Dimension ff_An_s(6), ff_Bn_s(6), ff_Cn_s(6), ff_Dn_s(6), ff_En_s(6), ff_Fn_s(6); -- parameters coeff in table  3b
 /*
-    	    Fill table with data of free-free absorption coefficient parameters for wavelengths greater than 0.3645 mcm
-    	    Table 3a and 3b
+          Fill table with data of free-free absorption coefficient parameters for wavelengths greater than 0.3645 mcm
+          Table 3a and 3b
 */
---    	    Fill table with data of free-free absorption coefficient parameters for wavelengths smaller than 0.3645 mcm
+--          Fill table with data of free-free absorption coefficient parameters for wavelengths smaller than 0.3645 mcm
          Data ff_An_s /    518.1021,     473.2636,  -482.2089,    115.5291,  0.0,  0.0   /;
          Data ff_Bn_s/  -734.8666,   1443.4137,  -737.1616,    169.6374,  0.0,  0.0/;
          Data ff_Cn_s/  1021.1775, -1977.3395,  1096.8827,  -245.649,  0.0,  0.0/;
          Data ff_Dn_s/  -479.0721,    922.3575,  -521.1341,    114.2430,  0.0,  0.0/;
          Data ff_En_s /      93.1373,  -178.9275,    101.7963,    -21.9972,  0.0,  0.0/;
          Data ff_Fn_s /      -6.4285,      12.36,         -7.0571,        1.5097,  0.0,  0.0/;
---    	    Fill table with data of free-free absorption coefficient parameters for wavelengths greater than 0.3645 mcm
+--          Fill table with data of free-free absorption coefficient parameters for wavelengths greater than 0.3645 mcm
          Data ff_An_g /0.0,    2483.3460,   -3449.8890,    2200.04,   -696.271,      88.283/;
          Data ff_Bn_g /0.0,      285.827,     -1158.382,     2427.719,  -1841.4,        444.517/;
          Data ff_Cn_g /0.0,  -2054.291,       8746.523,  -13651.105,   8624.97,   -1863.864/;
@@ -89,7 +89,7 @@ end subroutine;
     if( l_wLength <= 0.182d0 .or.    l_T <= 0 ) then;
 --        write(*,*) '!!!!!  hMinusAbsorp.trf::calc_K_ff_wl   Out of range  0.182 <=  wLength <= infinite or  T <= 0';
 --        write(*,'(1X,2(A,F10.2))') '!!!!!  hMinusAbsorp.trf::calc_K_ff_wl   Out of range  T or wLength: T = ', l_T,   ' wLength = ', l_wLength;
-     	 K_ff_wl = 0.d0;
+        K_ff_wl = 0.d0;
   --      write(*,*) 'hMinusAbsorp.trf::calc_K_ff_wl  K_ff_wl = ', K_ff_wl;
          return;
     endif;
@@ -97,7 +97,7 @@ end subroutine;
     if( T5040 < 0.5 .or.  T5040 > 3.6) then;
 --        write(*,*) '!!!!!  hMinusAbsorp.trf::calc_K_ff_wl   Out of range  0.5 <=  5040 / T <= 3.6';
 --        write(*,'(1X,2(A,F10.2))') '!!!!!  hMinusAbsorp.trf::calc_K_ff_wl   Out of range  T:  l_T = ', l_T,   ' 5040/T = ', T5040;
-     	 K_ff_wl = 0.d0;
+        K_ff_wl = 0.d0;
 --        write(*,*) 'hMinusAbsorp.trf::calc_K_ff_wl  K_ff_wl = ', K_ff_wl;
          return;
     endif;
@@ -126,12 +126,12 @@ end subroutine;
 
 
  function calc_K_bf_wl( l_T, l_wLength, typeReturn ) result(K_bf_wl);
--- var 
+-- var
     Real*8::l_T, l_wLength;
-    Integer::typeReturn; 
+    Integer::typeReturn;
     Real*8       K_bf_wl, bf_sigma_lambda, bf_func_sum;
-    Parameter(bf_alpha=1.439d4); 
-    Parameter(bf_lambda0=1.6419d0); -- the photo-detach. threshold 
+    Parameter(bf_alpha=1.439d4);
+    Parameter(bf_lambda0=1.6419d0); -- the photo-detach. threshold
     Dimension bf_Cn(6); -- parameters Cn in table 2
          Data bf_Cn /152.519, 49.534, -118.858, 92.536, -34.194, 4.982/;
 
@@ -140,7 +140,7 @@ end subroutine;
     if(  l_T <= 0  .or.   l_wLength < 0.125d0 .or.  l_wLength > 1.6419   ) then;
 --        write(*,*) '!!!!!  hMinusAbsorp.trf::calc_K_bf_wl   Out of range  0.125 <=  wLength <=1.6419  or  T <= 0';
 --        write(*,'(1X,2(A,F10.2))') '!!!!!  hMinusAbsorp.trf::calc_K_bf_wl   Out of range  T or wLength: T = ', l_T,   ' wLength = ', l_wLength;
-     	 K_bf_wl = 0.d0;
+        K_bf_wl = 0.d0;
 --        write(*,*) 'hMinusAbsorp.trf::calc_K_bf_wl  K_bf_wl = ', K_bf_wl;
          return;
     endif;
@@ -156,7 +156,7 @@ end subroutine;
 --     write(*,*) 'bf_func_sum=', bf_func_sum, 'bf_sigma_lambda=', bf_sigma_lambda, 'l_wLength=', l_wLength;
 
     if(  typeReturn .EQ. 4 ) then;
-     	 K_bf_wl = bf_sigma_lambda;
+        K_bf_wl = bf_sigma_lambda;
          return;
     endif;
 ------ formula (3)
@@ -170,7 +170,7 @@ end subroutine;
 --           write(*,*) 'bf_func_sum=', bf_func_sum,   ' bf_sigma_lambda=', bf_sigma_lambda,  ' K_bf_wl',K_bf_wl;
     return;
   end function;
-/*----  End Functions ----*/ 
+/*----  End Functions ----*/
 
 %_printParameters:
      write(*,*) '################     PARAMETERS        ################';

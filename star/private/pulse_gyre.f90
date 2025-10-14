@@ -2,48 +2,34 @@
 !
 !   Copyright (C) 2010-2018  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
 module pulse_gyre
 
-  ! Uses
-
   use star_private_def
-  use const_def
+  use const_def, only: dp, pi, four_thirds, rsun
   use utils_lib
   use atm_def
   use atm_support
   use eps_grav
-
   use pulse_utils
-
-  ! No implicit typing
 
   implicit none
 
-  ! Access specifiers
-
   private
-
   public :: get_gyre_data
   public :: write_gyre_data
 
@@ -129,13 +115,13 @@ contains
        nn_env = n_env + n_sg - 1
     else
        nn_env = n_env - 1 + n_sg - 1
-    endif
+    end if
 
     if (add_center_point) then
        nn = nn_env + nn_atm + 1
     else
        nn = nn_env + nn_atm
-    endif
+    end if
 
     ! Allocate arrays & set up data pointers
 
@@ -253,7 +239,7 @@ contains
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
 
-       endif
+       end if
 
     end do env_loop
 
@@ -278,8 +264,6 @@ contains
        deallocate(s%atm_structure)
     end if
 
-    ! Finish
-
     return
 
   contains
@@ -295,7 +279,7 @@ contains
       ! point_data array at position j
 
       r(j) = s%r(1) + s%atm_structure(atm_delta_r,k)
-      m(j) = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
+      m(j) = s%m_grav(1)  !+ s%atm_structure(atm_delta_m,k)
       L(j) = s%L(1)
 
       P(j) = exp(s%atm_structure(atm_lnP,k))
@@ -325,13 +309,10 @@ contains
          Omega_rot(j) = 0d0
       end if
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_atm
 
-    !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
 
@@ -359,7 +340,7 @@ contains
       Gamma_1(j) = eval_face(s%dq, s%gamma1, k, k_a, k_b)
       nabla_ad(j) = eval_face(s%dq, s%grada, k, k_a, k_b)
       delta(j) = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
-      nabla(j) = s%gradT(k) ! Not quite right; gradT can be discontinuous
+      nabla(j) = s%gradT(k)  ! Not quite right; gradT can be discontinuous
 
       kap(j) = eval_face(s%dq, s%opacity, k, k_a, k_b)
       kap_kap_T(j) = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)
@@ -371,18 +352,15 @@ contains
       if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
 
       if (s%rotation_flag) then
-         Omega_rot(j) = s%omega(k) ! Not quite right; omega can be discontinuous
+         Omega_rot(j) = s%omega(k)  ! Not quite right; omega can be discontinuous
       else
          Omega_rot = 0d0
       end if
-
-      ! Finish
 
       return
 
     end subroutine store_point_data_env
 
-    !****
 
     subroutine store_point_data_ctr (j, k_a, k_b)
 
@@ -406,7 +384,7 @@ contains
       end if
       ! at the centre d²P/dr² = -4πGρ²/3
       d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho(j)**2
-      P(j) = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+      P(j) = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
       T(j) = eval_center(s%rmid, s%T, 1, s%nz)
 
       N2(j) = 0d0
@@ -431,15 +409,12 @@ contains
       end if
 
 
-      ! Finish
-
       return
 
     end subroutine store_point_data_ctr
 
   end subroutine get_gyre_data
 
-  !****
 
   subroutine write_gyre_data (id, filename, global_data, point_data, ierr)
 
@@ -493,8 +468,6 @@ contains
     ! Close the file
 
     close(iounit)
-
-    ! Finish
 
     return
 

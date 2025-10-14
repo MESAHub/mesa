@@ -2,24 +2,18 @@
 !
 !   Copyright (C) 2012-2019  Bill Paxton & The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -29,9 +23,9 @@
       use math_lib
       use num_def
 
+      implicit none
 
       contains
-
 
       subroutine do_simplex( &
             n, x_lower, x_upper, x_first, x_final, f_final, &
@@ -43,11 +37,11 @@
             lrpar, rpar, lipar, ipar, &
             num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
-         integer, intent(in) :: n ! number of dimensions
-         real(dp), intent(in) :: x_lower(:), x_upper(:), x_first(:) ! (n)
-         real(dp), intent(inout) :: x_final(:) ! (n)
-         real(dp), intent(inout) :: simplex(:,:) ! (n,n+1)
-         real(dp), intent(inout) :: f(:) ! (n+1)
+         integer, intent(in) :: n  ! number of dimensions
+         real(dp), intent(in) :: x_lower(:), x_upper(:), x_first(:)  ! (n)
+         real(dp), intent(inout) :: x_final(:)  ! (n)
+         real(dp), intent(inout) :: simplex(:,:)  ! (n,n+1)
+         real(dp), intent(inout) :: f(:)  ! (n+1)
          logical, intent(in) :: start_from_given_simplex_and_f
          interface
 #include "num_simplex_fcn.dek"
@@ -58,8 +52,8 @@
          integer, intent(in) :: iter_max, fcn_calls_max
          logical, intent(in) :: enforce_bounds, adaptive_random_search
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          real(dp), intent(out) :: f_final
          integer, intent(out) :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr
@@ -160,17 +154,17 @@
             if (ierr /= 0) return
             if (dbg) write(*,1) 'reflect', f_reflect, x_reflect(1:n)
 
-            if (f_reflect < f(s)) then ! accept reflect
+            if (f_reflect < f(s)) then  ! accept reflect
                if (dbg) write(*,2) 'accept reflect', num_iters
                do i=1,n
                   simplex(i,h) = x_reflect(i)
                end do
                f(h) = f_reflect
-               if (f_reflect < f(l)) then ! try to expand
+               if (f_reflect < f(l)) then  ! try to expand
                   call expand(ierr)
                   if (ierr /= 0) return
                   if (dbg) write(*,1) 'expand', f_expand, x_expand(1:n)
-                  if (f_expand < f(l)) then ! accept expand
+                  if (f_expand < f(l)) then  ! accept expand
                      ! note: to keep the simplex large in a good direction,
                      ! we take x_expand even if f_expand > f_reflect
                      do i=1,n
@@ -180,11 +174,11 @@
                      if (dbg) write(*,2) 'accept expand', num_iters
                   end if
                end if
-            else ! try to contract
+            else  ! try to contract
                call contract(ierr)
                if (ierr /= 0) return
                if (dbg) write(*,1) 'contract', f_contract, x_contract(1:n)
-               if (f_contract < min(f(h),f_reflect)) then ! accept contraction
+               if (f_contract < min(f(h),f_reflect)) then  ! accept contraction
                   if (dbg) write(*,2) 'accept contraction', num_iters
                   do i=1,n
                      simplex(i,h) = x_contract(i)
@@ -265,7 +259,7 @@
 
          real(dp) function get_val(x, op_code, ierr) result(f)
             real(dp), intent(in) :: x(:)
-            integer, intent(in) :: op_code ! what nelder-mead is doing for this call
+            integer, intent(in) :: op_code  ! what nelder-mead is doing for this call
             integer, intent(out) :: ierr
             integer :: i
             include 'formats'
@@ -314,13 +308,13 @@
             integer :: i, op_code
             include 'formats'
             ierr = 0
-            if (f_reflect < f(h)) then ! outside contraction
+            if (f_reflect < f(h)) then  ! outside contraction
                if (dbg) write(*,1) 'outside contraction'
                op_code = simplex_outside
                do i=1,n
                   x_contract(i) = c(i) + gamma*(x_reflect(i) - c(i))
                end do
-            else ! inside contraction
+            else  ! inside contraction
                if (dbg) write(*,1) 'inside contraction'
                op_code = simplex_inside
                do i=1,n
@@ -337,12 +331,12 @@
             include 'formats'
             ierr = 0
             k_max = 100
-            do k=1,k_max ! keep trying until find a better random point
+            do k=1,k_max  ! keep trying until find a better random point
                if (num_fcn_calls > fcn_calls_max) exit
                call get_point_for_ars(ierr)
                if (ierr /= 0) return
                if (dbg) write(*,2) 'adaptive_random_search', num_iters, f_ars, x_ars(1:n)
-               if (f_ars <= f(h)) then ! accept adaptive random search
+               if (f_ars <= f(h)) then  ! accept adaptive random search
                   if (dbg) write(*,2) 'accept adaptive random search', num_iters, f_ars, x_ars(1:n)
                   do i=1,n
                      simplex(i,h) = x_ars(i)
@@ -373,7 +367,7 @@
          end subroutine get_point_for_ars
 
 
-         subroutine shrink ! shrink the simplex towards the best point
+         subroutine shrink  ! shrink the simplex towards the best point
             integer :: j, i
             include 'formats'
             do j=1,n+1
@@ -387,36 +381,6 @@
             end do
          end subroutine shrink
 
-
       end subroutine do_simplex
 
-
-
       end module mod_simplex
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

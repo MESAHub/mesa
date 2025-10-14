@@ -2,31 +2,25 @@
 !
 !   Copyright (C) 2010-2019  The MESA Team
 !
-!   MESA is free software; you can use it and/or modify
-!   it under the combined terms and restrictions of the MESA MANIFESTO
-!   and the GNU General Library Public License as published
-!   by the Free Software Foundation; either version 2 of the License,
-!   or (at your option) any later version.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
 !
-!   You should have received a copy of the MESA MANIFESTO along with
-!   this software; if not, it is available at the mesa website:
-!   http://mesa.sourceforge.net/
-!
-!   MESA is distributed in the hope that it will be useful,
+!   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Library General Public License for more details.
+!   See the GNU Lesser General Public License for more details.
 !
-!   You should have received a copy of the GNU Library General Public License
-!   along with this software; if not, write to the Free Software
-!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
       module pgstar_trho_profile
 
       use star_private_def
-      use const_def
+      use const_def, only: dp, ln10, pi4, msun
       use pgstar_support
       use star_pgstar
 
@@ -62,6 +56,7 @@
       subroutine do_TRho_Profile_plot(s, id, device_id, &
             xleft, xright, ybot, ytop, subplot, title, txt_scale_in, ierr)
          use utils_lib
+         use pgstar_colors
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -88,7 +83,7 @@
             do k=1,nz
                xvec(k) = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
             end do
-         else ! log rho
+         else  ! log rho
             do k=1,nz
                xvec(k) = s% lnd(k)/ln10
             end do
@@ -116,7 +111,7 @@
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
          call pgscf(1)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          call show_box_pgstar(s,'BCNST1','BCMNSTV1')
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          if (s% pg% show_TRho_accretion_mesh_borders) then
@@ -238,8 +233,8 @@
             call pgsls(Line_Type_Dash)
             call pgline(size(psi4_logT), psi4_logRho, psi4_logT)
             call pgsls(Line_Type_Solid)
-            xpos = -0.2 ! 1.9 ! psi4_logRho(1)
-            ypos = 4 ! 5.9 ! psi4_logT(1)-dy*0.04
+            xpos = -0.2  ! 1.9 ! psi4_logRho(1)
+            ypos = 4  ! 5.9 ! psi4_logT(1)-dy*0.04
             if (inside(xpos, ypos)) call pgptxt(xpos, ypos, 0.0, 0.5, '\ge\dF\u/kT\(0248)4')
             call pgunsa
          end subroutine do_degeneracy_line
@@ -282,7 +277,7 @@
             call add_TR_line(1.0, freg_blend_logT2, -8.0, freg_blend_logT2)
             call add_TR_line(1.0, 8.2, -8.0, 8.2)
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call add_TR_line(-8.0, logT_hi, -8.0, logT_max)
             call add_TR_line(-8.0, logT_max, 8.0, logT_max)
             !call add_TR_line(8.0, logT_lo, 8.0, logT_hi)
@@ -299,7 +294,7 @@
             call pgdraw(-8.8,1.88)
 
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_label(-4.9, 2.47, 0.0, 0.5, 'FREEDMAN')
             call show_label(-8.5, 3.3, 0.0, 0.5, 'FERGUSON')
             call show_label(-7.5, 5.1, 0.0, 0.5, 'OPAL/OP')
@@ -309,7 +304,7 @@
             call show_label(0.2, 3.9, 0.0, 1.0, '\(0636)\drad\u = \(0636)\dcond\u')
             call pgsci(clr_Crimson)
             call show_label(3.8, 9.4, 0.0, 0.5, 'e\u-\de\u+\d')
-            call pgsci(1)
+            call pgsci(clr_Foreground)
 
             call show_label(-6.8, 6.9, 0.0, 0.5, 'logR = -8')
             call show_label(5.0, 6.9, 0.0, 0.5, 'logR = 1')
@@ -339,8 +334,8 @@
 
             logT1 = s% eos_rq% logT_min_for_all_Skye
             logT2 = s% eos_rq% logT_min_for_any_Skye
-            logT3 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
-            logT4 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
+            logT3 = 0  ! s% eos_rq% logT_min_FreeEOS_lo
+            logT4 = 0  ! s% eos_rq% logT_min_FreeEOS_lo
 
             logRho1 = s% eos_rq% logRho_min_for_all_Skye
             logRho2 = s% eos_rq% logRho_min_for_any_Skye
@@ -388,7 +383,7 @@
             call stroke_line(logRho0, logT5, logRho6, logT6)
             call stroke_line(logRho5, logT6, logRho6, logT6)
 
-            call pgsci(1)
+            call pgsci(clr_Foreground)
             call show_label(1.0, 3.2, 0.0, 0.5, 'HELM')
             call show_label(-7.2, 5.8, 0.0, 0.5, 'FreeEOS')
             call show_label(-1.5, 3.7, 0.0, 0.5, 'OPAL/SCVH')
@@ -429,8 +424,8 @@
             call pgmove(lgRho1, lgT1)
             call pgdraw(lgRho2, lgT2)
             call pgsls(Line_Type_Solid)
-            xpos = -4 ! lgRho1-dx*0.065
-            ypos = 6.5 ! lgT1-dy*0.025
+            xpos = -4  ! lgRho1-dx*0.065
+            ypos = 6.5  ! lgT1-dy*0.025
             if (inside(xpos, ypos)) call pgptxt(xpos, ypos, 0.0, 0.0, 'P\drad\u\(0248)P\dgas\u')
             call pgunsa
          end subroutine do_Pgas_Prad_line
@@ -482,6 +477,7 @@
       subroutine do_show_Profile_text_info( &
             s, txt_scale, xmin, xmax, ymin, ymax, xfac, dxfac, yfac, dyfac, &
             xaxis_reversed, yaxis_reversed)
+         use pgstar_colors, only: clr_Foreground
          type (star_info), pointer :: s
          real, intent(in) :: txt_scale, xmin, xmax, ymin, ymax, xfac, dxfac, yfac, dyfac
          logical, intent(in) :: xaxis_reversed, yaxis_reversed
@@ -494,7 +490,7 @@
 
          call pgsave
          call pgsch(0.7*txt_scale)
-         call pgsci(1)
+         call pgsci(clr_Foreground)
          dxpos = 0
          xpos0 = xmin + xfac*(xmax-xmin)
          dxval = dxfac*(xmax-xmin)
