@@ -223,7 +223,7 @@ contains
 
       ! Pre-calculate some things.
       Eq_div_w = 0d0
-      if (s% v_flag .or. s% u_flag) then ! only include Eq_div_w if v_flag or u_flag is true.
+      if ((s% v_flag .or. s% u_flag) .and. k > 0 ) then ! only include Eq_div_w if v_flag or u_flag is true.
          if (using_TDC .and. s% alpha_TDC_DampM > 0) then
                if (s% mlt_vc(k) > 0) then ! calculate using mlt_vc from current timestep.
                    check_Eq = compute_tdc_Eq_div_w_face(s, k, ierr)
@@ -233,7 +233,7 @@ contains
       end if
 
       ! Wrap Pturb into P
-      if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients) then
+      if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients .and. k > 0) then
          mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
          Ptot = P + mlt_Pturb
       else
@@ -258,12 +258,14 @@ contains
       end if
 
       ! maximum convection velocity.
-      if (k>=1) then
+      if (k > 0) then
          if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
              max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
          else
             max_conv_vel = 1d99
          end if
+      else ! if k == 0
+         max_conv_vel = 1d99
       end if
 
 
