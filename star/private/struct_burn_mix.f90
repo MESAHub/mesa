@@ -267,7 +267,7 @@
 
       subroutine save_start_values(s, ierr)
          use hydro_rsp2, only: set_etrb_start_vars
-         use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category, get_Peos_face_val
+         use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, j
@@ -297,7 +297,6 @@
             !s% csound_start(k) set elsewhere
             s% lnPeos_start(k) = s% lnPeos(k)
             s% Peos_start(k) = s% Peos(k)
-            s% Peos_face_start(k) = get_Peos_face_val(s,k)
             s% lnPgas_start(k) = s% lnPgas(k)
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
