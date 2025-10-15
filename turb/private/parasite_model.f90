@@ -28,6 +28,7 @@ module parasite_model
    use const_def, only: dp, pi
    use num_lib
    use math_lib
+   use forum_m, only: sort_indices
    use fingering_modes
    use parasite_model_matrices
 
@@ -116,9 +117,20 @@ contains
          write(*,*) 'f_1 > 0, resetting brackets:', w_1, '-->', w_1/10d0
 
          if (i > 20) then ! we tried decreasing w_1 by 20 orders of magnitude, so need to break
-            write(*, *) 'Can''t find valid lower bracket for FRG w search'
-            ierr = -1
+            write(*, *) 'Can''t find valid lower bracket for FRG w search; assuming w=0'
+            !ierr = -1
+
+            ! Temporary workaround: if we fail, just assume w = 0 and set sigma/k_max to flag values
+
+            w = 0
+
+            sigma_max = -1
+            k_z_max = -1
+
+            ierr = 0
+
             return
+
          end if
 
          i = i + 1
@@ -331,6 +343,9 @@ contains
 
          real(dp), allocatable :: L(:,:)
          integer               :: s
+         integer, allocatable  :: L_diag(:)
+         integer               :: i
+         integer, allocatable  :: j(:)
          real(dp), allocatable :: sigma_r(:)
          real(dp), allocatable :: sigma_i(:)
 
@@ -342,7 +357,16 @@ contains
 
          s = SIZE(L, 1)
 
-         L = L(s:1:-1,s:1:-1)
+         allocate(L_diag(s))
+
+         do i = 1, s
+            L_diag(s) = L(s,s)
+         end do
+
+         j = sort_indices(L_diag, descend=.TRUE.)
+
+         L = L(j,:)
+         L = L(:,j)
 
          ! Calculate its eigenvalues
 
