@@ -114,19 +114,18 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
-            Eq_div_w, grav, include_mlt_corr_to_TDC, alpha_TDC_C, alpha_TDC_S, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt
-      real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel, alpha_TDC_c, alpha_TDC_s
+      real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1), intent(in) :: &
-         chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav
-      logical, intent(in) :: report, include_mlt_corr_to_TDC
+         chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
+      logical, intent(in) :: report
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
-      type(auto_diff_real_star_order1) :: L, Lambda, Gamma
+      type(auto_diff_real_star_order1) :: L, grav, Lambda, Gamma
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
@@ -135,7 +134,7 @@ module turb
       include 'formats'
 
       ! Do a call to MLT
-      !grav = cgrav * m / pow2(r)
+      grav = cgrav * m / pow2(r)
       L = 64 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
       Lambda = mixing_length_alpha * scale_height
       call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
@@ -146,7 +145,6 @@ module turb
 
       ! Pack TDC info
       info%report = report
-      info%include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
       info%mixing_length_alpha = mixing_length_alpha
       info%alpha_TDC_DAMP = alpha_TDC_DAMP
       info%alpha_TDC_DAMPR = alpha_TDC_DAMPR
@@ -155,8 +153,8 @@ module turb
       info%L = convert(L)
       info%gradL = convert(gradL)
       info%grada = convert(grada)
-      info%c0 = convert(alpha_TDC_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*pow2(r)*grav*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm, needs correction for if s% make_mlt_hydrodynamic = .false.
+      info%c0 = convert(mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r))
+      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%T = T
       info%rho = rho
@@ -165,9 +163,6 @@ module turb
       info%kap = opacity
       info%Hp = scale_height
       info%Gamma = Gamma
-      info%Eq_div_w = Eq_div_w
-      info%alpha_TDC_c = alpha_TDC_C
-      info%alpha_TDC_s = alpha_TDC_S
 
       ! Get solution
       Zub = upper_bound_Z
@@ -181,13 +176,8 @@ module turb
          ! L = L0 * (gradL + Y) + c0 * Af * Y_env
          ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
          ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
-         if (include_mlt_corr_to_TDC) then
-            Y_face = unconvert(info%L - info%L0 * info%gradL) / &
-               (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
-         else
-            Y_face = unconvert(info%L - info%L0 * info%gradL) / &
-               (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel)
-         end if
+         Y_face = unconvert(info%L - info%L0 * info%gradL) / &
+            (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
       end if
 
       ! Unpack output
