@@ -593,10 +593,8 @@
 
          real(dp) :: max_center_cell_dq
          real(dp) :: max_surface_cell_dq
-         real(dp) :: min_surface_cell_dq
          integer :: max_num_subcells
          integer :: max_num_merge_cells
-         integer :: max_num_merge_surface_cells
 
 
          character (len=iso_name_length) :: mesh_logX_species(num_mesh_logX)
@@ -684,14 +682,10 @@
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff, &
-            merge_amr_logT_for_ignore_core_cells, split_amr_logT_for_ignore_core_cells
+            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells
-         logical :: merge_amr_ignore_core_cells
-         logical :: split_amr_ignore_core_cells
-
          logical :: merge_amr_du_div_cs_limit_only_for_compression
 
          logical :: split_merge_amr_avoid_repeated_remesh
@@ -839,7 +833,7 @@
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
          real(dp) :: P_theta_for_velocity_time_centering, &
-            L_theta_for_velocity_time_centering, max_logT_for_include_P_and_L_in_velocity_time_centering
+            L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
          logical :: use_drag_energy, report_max_infall_inside_fe_core
