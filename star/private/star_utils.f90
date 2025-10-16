@@ -3953,7 +3953,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: gradr
-         type(auto_diff_real_star_order1) :: P, opacity, L, Pr, geff, r, mlt_Pturb_ad
+         type(auto_diff_real_star_order1) :: P, opacity, L, Pr, r
          real(dp) :: L_theta
          !include 'formats'
          P = get_Peos_face(s,k)
@@ -3976,13 +3976,6 @@
          end if
          Pr = get_Prad_face(s,k)
          gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr)
-         if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
-            .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
-            geff =  wrap_geff_face(s,k) ! now supports hse and hydro form of g
-            gradr = P*opacity*L/(16d0*pi*clight*geff*pow2(r)*Pr)
-            gradr = gradr*(P+mlt_Pturb_ad)/P
-         end if
       end function get_gradr_face
 
 
