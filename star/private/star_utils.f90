@@ -404,7 +404,7 @@
          do k=1,nz
             ! We need to call set_m_grav_and_grav during model loading before we have set all vars
             call get_r_and_lnR_from_xh(s, k, r, lnR)
-            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(r*r) ! needs replaced with new wrapper for geff for hydro.
+            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(r*r)
          end do
       end subroutine set_m_grav_and_grav
 
@@ -1712,7 +1712,7 @@
       end subroutine store_partials
 
 
-      subroutine set_scale_height(s) ! does this need to use geff, not used in mlt.
+      subroutine set_scale_height(s)
          type (star_info), pointer :: s
          real(dp) :: Hp, alt_Hp, alfa, beta, rho_face, Peos_face
          integer :: k
@@ -3973,11 +3973,12 @@
             r = wrap_r_00(s,k)
          end if
          Pr = get_Prad_face(s,k)
-         geff =  wrap_geff_face(s,k) ! now supports hse and hydro form of g
-         gradr = P*opacity*L/(16d0*pi*clight*geff*pow2(r)*Pr)
+         gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr)
          if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
             .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
             mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            geff =  wrap_geff_face(s,k) ! now supports hse and hydro form of g
+            gradr = P*opacity*L/(16d0*pi*clight*geff*pow2(r)*Pr)
             gradr = gradr*P/(P+mlt_Pturb_ad)
          end if
       end function get_gradr_face
