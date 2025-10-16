@@ -3930,7 +3930,7 @@
       function get_grada_face(s,k) result(grada_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: grada_face, mlt_Pturb_ad, P
+         type(auto_diff_real_star_order1) :: grada_face, mlt_Pturb_ad, P, gamma1_face, alpha
          real(dp) :: alfa, beta
          P = get_Peos_face(s,k)
          if (k == 1) then
@@ -3941,8 +3941,10 @@
          grada_face = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
          if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
             .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            gamma1_face = alfa*wrap_gamma1_00(s,k) + beta*wrap_gamma1_m1(s,k)
             mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
-            grada_face = grada_face*P/(P+mlt_Pturb_ad)
+            alpha = mlt_Pturb_ad/ (P*gamma1_face)
+            grada_face = grada_face*(P+mlt_Pturb_ad) / (P * (1d0 + alpha))
          end if
       end function get_grada_face
 
@@ -3979,7 +3981,7 @@
             mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
             geff =  wrap_geff_face(s,k) ! now supports hse and hydro form of g
             gradr = P*opacity*L/(16d0*pi*clight*geff*pow2(r)*Pr)
-            gradr = gradr*P/(P+mlt_Pturb_ad)
+            gradr = gradr*(P+mlt_Pturb_ad)/P
          end if
       end function get_gradr_face
 

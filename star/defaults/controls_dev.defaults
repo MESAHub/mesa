@@ -273,8 +273,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If mlt_Pturb_factor > 0, includes the effect of turbulent pressure Pturb
-      ! on thermodynamic gradients gradr, grada, and hence gradT. The correction
-      ! is approximated as correction = Prad + Pgas / Ptotal, where Ptotal = Prad + Pgas + Pturb.
+      ! on thermodynamic gradients gradr, grada, and hence gradT.
       ! Not supported by other_alpha_mlt or starspots
 
       ! ::

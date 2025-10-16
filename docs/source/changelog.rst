@@ -70,7 +70,7 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from `Fabry et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.123F/abstract>`_.
  When ``use_gravity_rotation_correction = .true.`` deformation fits are now included in the effective
- gravity used to calculate the local pressure scale heights and radiative temperature gradient.
+ gravity used to calculate the local pressure scale heights.
 
 
 Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
