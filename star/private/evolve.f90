@@ -1099,6 +1099,7 @@
 
 
          logical function okay_energy_conservation()
+            use const_def, only: ln10
             use rsp, only: rsp_total_energy_integrals
             integer :: nz, k
             real(dp) :: phase1_sources_and_sinks, phase2_sources_and_sinks, phase2_work, &
@@ -1276,7 +1277,8 @@
 
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
-                     s% include_L_in_velocity_time_centering) then
+                     s% include_L_in_velocity_time_centering .and. &
+                     s% lnT(1)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
                   L_theta = s% L_theta_for_velocity_time_centering
                else
                   L_theta = 1d0

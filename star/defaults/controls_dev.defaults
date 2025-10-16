@@ -174,3 +174,141 @@
       ! ::
 
     op_split_burn_min_T_for_variable_T_solver = 1d99
+
+
+! TDC
+! ===
+
+
+      ! alpha_TDC_DAMPM
+      ! ~~~~~~~~~~~~~~~
+      ! alpha_TDC_C
+      ! ~~~~~~~~~~~
+      ! alpha_TDC_S
+      ! ~~~~~~~~~~~
+      ! TDC_use_density_form_for_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+      ! If ``alpha_TDC_DAMPM>0``, then include eddy viscous damping in TDC ``alpha_TDC_DAMPM``
+      ! This control is analogous to ``RSP_alfam``, where the default is ``RSP_alfam = 0.25d0``.
+
+      ! If hydrostatic (``v_flag``, ``u_flag = .false.``, ``v = 0`` ) there are no velocity gradients,
+      ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
+
+      ! ``alpha_TDC_C`` and ``alpha_TDC_S`` are pre-factors to scale the flux and source terms.
+
+      ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
+      ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
+
+      ! ::
+
+    alpha_TDC_DAMPM = 0d0
+    alpha_TDC_C = 1.0d0
+    alpha_TDC_S = 1.0d0
+    TDC_use_density_form_for_eddy_viscosity = .false.
+
+
+      ! TDC_include_eturb_in_energy_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! calculates and incorporates det/dt from TDC as a negative source term in
+      ! the total energy equation, along with the eddy viscous heating Eq
+
+      ! ::
+
+    TDC_include_eturb_in_energy_equation = .false.
+
+      ! use_rsp_form_of_scale_height
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! calculate scale height by averaging P/rho onto faces together instead
+      ! of of wrapping P and rho separately by default. Both forms assume HSE.
+
+      ! ::
+
+      use_rsp_form_of_scale_height = .false.
+
+
+      ! use_RSP_L_eqn_outer_BC
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use RSP2 luminosity equation
+      ! as the outer boundary condition on L rather than the
+      ! default atmospheric BC for temperature.
+      ! solves L1 - s% RSP2_Lsurf_factor*4*pi*r^2*c*a*T1^4 = 0
+      ! uses dev control s% RSP2_Lsurf_factor  = 0.5 (default),
+      ! see controls_dev.defaults.list
+
+      ! ::
+
+    use_RSP_L_eqn_outer_BC = .false.
+
+
+      ! TDC_num_innermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent cells
+      ! to be nonturbulent, and sets gradT = gradr in these cells.
+      ! Useful for pulsation models in TDC.
+
+      ! ::
+
+    TDC_num_innermost_cells_forced_nonturbulent = 0
+
+
+      ! include_mlt_corr_to_TDC
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If include_mlt_corr_to_TDC = .true. , mlt correction to TDC follows MESA VI (Jermyn et a. 2023)
+      ! in which we correct TDC on long timescales with Y_face ~ Y*Gamma/(1+Gamma). If .false., abandon
+      ! mlt limit of tdc and adopt original form of (Kuhfuß 1986) convection model in the local limit.
+
+      ! ::
+
+    include_mlt_corr_to_TDC = .true.
+
+
+      ! include_mlt_Pturb_in_thermodynamic_gradients
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If mlt_Pturb_factor > 0, includes the effect of turbulent pressure Pturb
+      ! on thermodynamic gradients gradr, grada, and hence gradT.
+      ! Not supported by other_alpha_mlt or starspots
+
+      ! ::
+
+    include_mlt_Pturb_in_thermodynamic_gradients = .false.
+
+
+      ! include_mlt_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If doing velocity time_centering, include time centering in mlt. Depending on the time
+      ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
+      ! for P, L, and r in geff, gradr, grada, and mlt.
+
+      ! ::
+
+    include_mlt_in_velocity_time_centering = .false.
+
+
+      ! remesh_for_TDC_pulsations_log_core_zoning
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If remesh_for_TDC_pulsations, .true. will rezone below RSP2_Tanchor with logarithmic
+      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
+      ! that each zone increases in mass inward following a power law.
+
+      ! ::
+
+      ! Remeshing parameters
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+    remesh_for_TDC_pulsations_log_core_zoning = .false.
+    TDC_hydro_use_mass_interp_face_values = .false.
+
+    TDC_hydro_nz = 150
+    TDC_hydro_nz_outer = 40
+    TDC_hydro_T_anchor = 11d3
+    TDC_hydro_dq_1_factor = 2d0
