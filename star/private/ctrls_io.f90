@@ -105,12 +105,7 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
-    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, &
-    alpha_TDC_C, alpha_TDC_S, TDC_use_density_form_for_eddy_viscosity, &
-    TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
-    include_mlt_corr_to_TDC, TDC_include_eturb_in_energy_equation, &
-    use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
-    TDC_hydro_use_mass_interp_face_values, TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_T_anchor, TDC_hydro_dq_1_factor, &
+    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
 
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -226,8 +221,8 @@
     mesh_min_dlnR, merge_if_dlnR_too_small, min_dq_for_logT, &
     mesh_min_dr_div_dRstar, merge_if_dr_div_dRstar_too_small, &
     mesh_min_dr_div_cs, merge_if_dr_div_cs_too_small, &
-    max_center_cell_dq, max_surface_cell_dq, min_surface_cell_dq, max_num_subcells, max_num_merge_cells, &
-    max_num_merge_surface_cells ,mesh_delta_coeff, mesh_delta_coeff_for_highT, &
+    max_center_cell_dq, max_surface_cell_dq, max_num_subcells, max_num_merge_cells, &
+    mesh_delta_coeff, mesh_delta_coeff_for_highT, &
     logT_max_for_standard_mesh_delta_coeff, logT_min_for_highT_mesh_delta_coeff, remesh_dt_limit, &
     mesh_Pgas_div_P_exponent, &
     E_function_weight, E_function_param, P_function_weight, &
@@ -256,8 +251,6 @@
     split_merge_amr_okay_to_split_1, merge_amr_inhibit_at_jumps, split_merge_amr_MaxLong, split_merge_amr_nz_r_core_fraction, &
     split_merge_amr_MaxShort, merge_amr_max_abs_du_div_cs, &
     merge_amr_ignore_surface_cells, merge_amr_k_for_ignore_surface_cells, &
-    merge_amr_ignore_core_cells, merge_amr_logT_for_ignore_core_cells, &
-    split_amr_ignore_core_cells, split_amr_logT_for_ignore_core_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
     split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, trace_split_merge_amr, equal_split_density_amr, &
 
@@ -355,11 +348,9 @@
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
-    max_logT_for_include_P_and_L_in_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
-    remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
-    max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
-    use_drag_energy, drag_coefficient, min_q_for_drag, &
+    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound,  &
+    report_max_infall_inside_fe_core, use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     retry_for_v_above_clight, &
 
@@ -498,7 +489,7 @@
     atm_irradiated_max_iters, &
 
     use_compression_outer_BC, use_momentum_outer_BC, Tsurf_factor, use_zero_Pgas_outer_BC, &
-    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
+    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, &
 
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
@@ -1292,7 +1283,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
- s% use_RSP_L_eqn_outer_BC = use_RSP_L_eqn_outer_BC
  s% fixed_Psurf = fixed_Psurf
  s% use_fixed_Psurf_outer_BC = use_fixed_Psurf_outer_BC
 
@@ -1493,10 +1483,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% max_center_cell_dq = max_center_cell_dq
  s% max_surface_cell_dq = max_surface_cell_dq
- s% min_surface_cell_dq = min_surface_cell_dq
  s% max_num_subcells = max_num_subcells
  s% max_num_merge_cells = max_num_merge_cells
- s% max_num_merge_surface_cells = max_num_merge_surface_cells
 
  s% mesh_delta_coeff = mesh_delta_coeff
  s% mesh_delta_coeff_for_highT = mesh_delta_coeff_for_highT
@@ -1598,13 +1586,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% split_merge_amr_MaxShort = split_merge_amr_MaxShort
  s% merge_amr_max_abs_du_div_cs = merge_amr_max_abs_du_div_cs
  s% merge_amr_ignore_surface_cells = merge_amr_ignore_surface_cells
- s% merge_amr_ignore_core_cells = merge_amr_ignore_core_cells
- s% split_amr_ignore_core_cells = split_amr_ignore_core_cells
  s% merge_amr_du_div_cs_limit_only_for_compression = merge_amr_du_div_cs_limit_only_for_compression
  s% split_merge_amr_avoid_repeated_remesh = split_merge_amr_avoid_repeated_remesh
  s% merge_amr_k_for_ignore_surface_cells = merge_amr_k_for_ignore_surface_cells
- s% merge_amr_logT_for_ignore_core_cells = merge_amr_logT_for_ignore_core_cells
- s% split_amr_logT_for_ignore_core_cells = split_amr_logT_for_ignore_core_cells
  s% split_merge_amr_dq_min = split_merge_amr_dq_min
  s% split_merge_amr_dq_max = split_merge_amr_dq_max
  s% split_merge_amr_r_core_cm = split_merge_amr_r_core_cm
@@ -1871,7 +1855,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
  s% P_theta_for_velocity_time_centering = P_theta_for_velocity_time_centering
  s% L_theta_for_velocity_time_centering = L_theta_for_velocity_time_centering
- s% max_logT_for_include_P_and_L_in_velocity_time_centering = max_logT_for_include_P_and_L_in_velocity_time_centering
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -2082,24 +2065,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% alpha_TDC_DAMP = alpha_TDC_DAMP
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
  s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
- s% alpha_TDC_DAMPM = alpha_TDC_DAMPM
- s% alpha_TDC_C = alpha_TDC_C
- s% alpha_TDC_S = alpha_TDC_S
- s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
- s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
- s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
- s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
- s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
- s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
- s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
- s% TDC_hydro_use_mass_interp_face_values = TDC_hydro_use_mass_interp_face_values
- s% TDC_hydro_nz = TDC_hydro_nz
- s% TDC_hydro_nz_outer = TDC_hydro_nz_outer
- s% TDC_hydro_T_anchor = TDC_hydro_T_anchor
- s% TDC_hydro_dq_1_factor = TDC_hydro_dq_1_factor
-
- s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
 
  s% RSP2_alfap = RSP2_alfap
  s% RSP2_alfad = RSP2_alfad
@@ -3008,7 +2974,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
- use_RSP_L_eqn_outer_BC = s% use_RSP_L_eqn_outer_BC
  fixed_Psurf = s% fixed_Psurf
  use_fixed_Psurf_outer_BC = s% use_fixed_Psurf_outer_BC
 
@@ -3203,11 +3168,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  max_center_cell_dq = s% max_center_cell_dq
  max_surface_cell_dq = s% max_surface_cell_dq
- min_surface_cell_dq = s% min_surface_cell_dq
-
  max_num_subcells = s% max_num_subcells
  max_num_merge_cells = s% max_num_merge_cells
- max_num_merge_surface_cells = s% max_num_merge_surface_cells
 
  mesh_delta_coeff = s% mesh_delta_coeff
  mesh_delta_coeff_for_highT = s% mesh_delta_coeff_for_highT
@@ -3309,13 +3271,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  split_merge_amr_MaxShort = s% split_merge_amr_MaxShort
  merge_amr_max_abs_du_div_cs = s% merge_amr_max_abs_du_div_cs
  merge_amr_ignore_surface_cells = s% merge_amr_ignore_surface_cells
- merge_amr_ignore_core_cells = s% merge_amr_ignore_core_cells
- split_amr_ignore_core_cells = s% split_amr_ignore_core_cells
  merge_amr_du_div_cs_limit_only_for_compression = s% merge_amr_du_div_cs_limit_only_for_compression
  split_merge_amr_avoid_repeated_remesh = s% split_merge_amr_avoid_repeated_remesh
  merge_amr_k_for_ignore_surface_cells = s% merge_amr_k_for_ignore_surface_cells
- merge_amr_logT_for_ignore_core_cells = s% merge_amr_logT_for_ignore_core_cells
- split_amr_logT_for_ignore_core_cells = s% split_amr_logT_for_ignore_core_cells
  split_merge_amr_dq_min = s% split_merge_amr_dq_min
  split_merge_amr_dq_max = s% split_merge_amr_dq_max
  split_merge_amr_r_core_cm = s% split_merge_amr_r_core_cm
@@ -3579,7 +3537,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
  P_theta_for_velocity_time_centering = s% P_theta_for_velocity_time_centering
  L_theta_for_velocity_time_centering = s% L_theta_for_velocity_time_centering
- max_logT_for_include_P_and_L_in_velocity_time_centering = s% max_logT_for_include_P_and_L_in_velocity_time_centering
  use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
 
  RTI_A = s% RTI_A
@@ -3790,24 +3747,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  alpha_TDC_DAMP = s% alpha_TDC_DAMP
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
  alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
- alpha_TDC_DAMPM = s% alpha_TDC_DAMPM
- alpha_TDC_C = s% alpha_TDC_C
- alpha_TDC_S = s% alpha_TDC_S
- TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
- TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
- include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
- include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
- TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
- use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
- include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
- TDC_hydro_use_mass_interp_face_values = s% TDC_hydro_use_mass_interp_face_values
- TDC_hydro_nz = s% TDC_hydro_nz
- TDC_hydro_nz_outer = s% TDC_hydro_nz_outer
- TDC_hydro_T_anchor = s% TDC_hydro_T_anchor
- TDC_hydro_dq_1_factor = s% TDC_hydro_dq_1_factor
-
- remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning
 
  RSP2_alfap= s% RSP2_alfap
  RSP2_alfad = s% RSP2_alfad

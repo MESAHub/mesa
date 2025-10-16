@@ -255,7 +255,7 @@
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_L_eqn'
                      ierr = op_err
                   end if
-               else if (k > 1 .or. (k ==1 .and. s% use_RSP_L_eqn_outer_BC) ) then  ! k==1 is done by T_surf BC
+               else if (k > 1) then  ! k==1 is done by T_surf BC
                   call do1_dlnT_dm_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_dlnT_dm_eqn', k
@@ -772,7 +772,7 @@
 
          need_T_surf = .false.
          if ((.not. do_equL) .or. &
-               (s% RSP2_flag) .or. (s% use_RSP_L_eqn_outer_BC)) then
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then
             ! no Tsurf BC
          else
             need_T_surf = .true.
@@ -782,7 +782,7 @@
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
 
          offset_T_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% RSP2_flag .or. s% use_RSP_L_eqn_outer_BC) &
+         if (s% use_other_surface_PT .or. s% RSP2_flag) &
             offset_T_to_cell_center = .false.
 
          call get_PT_bc_ad(ierr)
@@ -1009,7 +1009,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
-            if (s% RSP2_flag) then  ! interpolate lnT by mass, To do: check what happens when we do this with mlt?
+            if (s% RSP2_flag) then  ! interpolate lnT by mass
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
                dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
