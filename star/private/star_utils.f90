@@ -3987,7 +3987,7 @@
          real(dp) :: G, alfa, beta
          include 'formats'
          G = s% cgrav(k)
-         grav = wrap_geff_face(s,k) ! old form is G*s% m_grav(k)/pow2(wrap_r_00(s,k))
+         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k)) ! try geff later.
          if (s% use_rsp_form_of_scale_height .and. k >1) then ! use rsp form of Hp, assumes HSE, wraps P/rho together.
             call get_face_weights(s, k, alfa, beta)
             scale_height = (alfa*(wrap_Peos_00(s,k))/wrap_d_00(s,k) + beta*(wrap_Peos_m1(s,k))/wrap_d_m1(s,k))/grav
@@ -4013,7 +4013,7 @@
          real(dp) :: G, scale_height2, P, rho, alfa, beta
          type(auto_diff_real_star_order1) :: P_face, rho_face, grav
          G = s% cgrav(k)
-         grav = wrap_geff_face(s,k) ! old form is G*s% m_grav(k)/pow2(wrap_r_00(s,k))
+         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k))! try geff later
          if (s% use_rsp_form_of_scale_height .and. k >1) then ! use rsp form of Hp, assumes HSE, wraps P/rho together.
             call get_face_weights(s, k, alfa, beta)
             scale_height = (alfa*(s% Peos(k)/s% rho(k)) + beta*(s% Peos(k-1)/s% rho(k-1)))/grav%val

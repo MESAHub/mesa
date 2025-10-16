@@ -248,7 +248,7 @@ contains
       if (k == 0) then
          grav = cgrav*m/pow2(r)
       else
-         grav = wrap_geff_face(s,k)
+         grav = cgrav*m/pow2(r) !try replacing with wrap_geff_face(s,k) 
       end if
 
       if (s% use_Ledoux_criterion) then
