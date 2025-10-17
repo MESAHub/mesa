@@ -375,12 +375,6 @@
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual  ! make dx_actual > 0
 
-
-            if (s% split_amr_ignore_core_cells .and. &
-            s%lnT(k)/ln10 >= s% split_amr_logT_for_ignore_core_cells) then
-               cycle
-            end if
-
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
@@ -393,13 +387,8 @@
 
             ! next check for cells that are too small and need to be merged
 
-            ! surface cells
             if (s% merge_amr_ignore_surface_cells .and. &
                   k<=s% merge_amr_k_for_ignore_surface_cells) cycle
-
-            ! core cells
-            if (s% merge_amr_ignore_core_cells .and. &
-                  s%lnT(k)/ln10>= s% merge_amr_logT_for_ignore_core_cells) cycle
 
             if (abs(dx_actual)>0d0) then
                undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))
@@ -1462,3 +1451,5 @@
 
 
       end module adjust_mesh_split_merge
+
+

@@ -185,7 +185,6 @@
             call set_v_flag(id, .false., ierr)
          end if
 
-
          contains
 
          subroutine del(xs)
@@ -287,39 +286,6 @@
 
       end subroutine set_RTI_flag
 
-
-      subroutine set_TDC_to_RSP2_mesh(id, ierr) ! this is the remeshing function called from starlib
-         use tdc_hydro_support, only: remesh_for_TDC_pulsations
-         use hydro_vars, only: set_vars
-         use star_utils, only: set_m_and_dm, set_dm_bar, set_qs
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, i, k, nz
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-
-
-         nz = s% nz
-
-         nvar_hydro_old = s% nvar_hydro
-
-         write(*,*) 'doing automatic RSP style remesh for TDC Pulsations'
-         call remesh_for_TDC_pulsations(s,ierr)
-         if (ierr /= 0) return
-         call set_qs(s, nz, s% q, s% dq, ierr)
-         if (ierr /= 0) return
-         call set_m_and_dm(s)
-         call set_dm_bar(s, nz, s% dm, s% dm_bar)
-         call set_vars(s, s% dt, ierr)  ! redo after remesh_for_RSP2
-         if (ierr /= 0) return
-
-      end subroutine set_TDC_to_RSP2_mesh
 
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          use const_def, only: sqrt_2_div_3
