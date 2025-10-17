@@ -136,7 +136,7 @@ module turb
 
       ! Do a call to MLT
       !grav = cgrav * m / pow2(r)
-      L = 64 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
+      L = 64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
       Lambda = mixing_length_alpha * scale_height
       call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
@@ -156,7 +156,7 @@ module turb
       info%gradL = convert(gradL)
       info%grada = convert(grada)
       info%c0 = convert(alpha_TDC_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*pow2(r)*grav*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm, needs correction for if s% make_mlt_hydrodynamic = .false.
+      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm, needs correction for if s% make_mlt_hydrodynamic = .false.
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%T = T
       info%rho = rho
