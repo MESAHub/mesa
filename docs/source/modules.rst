@@ -83,7 +83,7 @@ Colors (``colors``)
 The ``colors`` module calculates synthetic photometry during stellar evolution.
 
 .. toctree::
-    :maxdepth: 1
+   :maxdepth: 1
 
    colors/overview
    colors/defaults

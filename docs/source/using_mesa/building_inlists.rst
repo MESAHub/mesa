@@ -168,7 +168,7 @@ Enabling Synthetic Photometry
 
 To activate the colors module, set the ``use_colors`` control to ``.true.``. This enables the computation of synthetic magnitudes at each timestep using interpolated stellar atmosphere models.
 
-.. literalinclude:: $MESA_DIR/star/test_suite/custom_colors/inlist_colors
+.. literalinclude:: ../../../star/test_suite/custom_colors/inlist_colors
    :start-after: &colors
    :end-before: / ! end of colors namelist
 
