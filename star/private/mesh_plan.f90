@@ -40,15 +40,16 @@
             min_dq_in, max_dq, min_dq_for_split, mesh_max_allowed_ratio, &
             do_not_split, num_gvals, gval_names, &
             gval_is_xa_function, gval_is_logT_function, gvals, &
-            delta_gval_max, max_center_cell_dq, max_surface_cell_dq, &
-            max_num_subcells, max_num_merge_cells, &
+            delta_gval_max, max_center_cell_dq, max_surface_cell_dq, min_surface_cell_dq, &
+            max_num_subcells, max_num_merge_cells, max_num_merge_surface_cells, &
             nz_new, xq_new, dq_new, which_gval, comes_from, ierr)
          ! return keep_going, or terminate
          use mesh_functions, only: max_allowed_gvals
          ! inputs
          type (star_info), pointer :: s
          integer, intent(in) :: nz_old, max_allowed_nz, max_num_subcells, &
-            max_num_merge_cells, max_k_old_for_split_in, min_k_old_for_split_in
+            max_num_merge_cells, max_num_merge_surface_cells, max_k_old_for_split_in, &
+            min_k_old_for_split_in
          logical, intent(in) :: okay_to_merge
          real(dp), pointer :: D_mix(:)  ! (nz_old)
          real(dp), pointer :: xq_old(:)  ! (nz_old)
@@ -60,7 +61,8 @@
          logical, dimension(max_allowed_gvals) :: gval_is_xa_function, gval_is_logT_function
          real(dp), pointer :: gvals(:,:)  ! (nz_old, num_gvals)
          real(dp), pointer :: delta_gval_max(:)  ! (nz_old)
-         real(dp), intent(in) :: max_center_cell_dq, max_surface_cell_dq
+         real(dp), intent(in) :: max_center_cell_dq, max_surface_cell_dq, &
+            min_surface_cell_dq
          ! outputs
          integer, intent(out) :: nz_new
          real(dp), pointer :: xq_new(:), dq_new(:)  ! (nz_new)
@@ -75,7 +77,7 @@
          integer, intent(out) :: ierr
 
          integer :: j, k, k_old, k_new, nz, new_capacity, iounit, species, &
-            max_num_merge_surface_cells, max_k_old_for_split, min_k_old_for_split
+            max_k_old_for_split, min_k_old_for_split
          real(dp) :: D_mix_cutoff, next_xq, next_dq, max_dq_cntr, &
             dq_sum, min_dq, min_dq_for_xa, min_dq_for_logT
 
@@ -98,8 +100,6 @@
          else
             min_k_old_for_split = min_k_old_for_split_in
          end if
-
-         max_num_merge_surface_cells = max_num_merge_cells  ! for now
 
          if (max_dq < min_dq) then
             write(*,1) 'ERROR in controls: max_dq < min_dq', max_dq, min_dq
@@ -699,9 +699,15 @@
                   next_dq = max_surface_cell_dq
                end if
 
+               ! Enforce minimum surface‐cell dq
+               if (k_old == 1 .and. next_dq < min_surface_cell_dq) then
+                   !write(*,*) 'next_dq < min_surface_cell_dq'
+                  next_dq = min_surface_cell_dq
+               end if
+
                next_xq = xq_new(k_new) + next_dq
-               if (next_xq > 1 - min_dq) then
-                  next_xq = (1 + xq_new(k_new))/2
+               if (next_xq > 1d0 - min_dq) then
+                  next_xq = (1d0 + xq_new(k_new))/2d0
                   if (k_old < nz_old) then  ! make sure don't split current k_old for this case
                      if (xq_old(k_old+1) > next_xq) next_xq = xq_old(k_old+1)
                   end if
@@ -711,7 +717,7 @@
                if (k_old < nz_old) then
 
                   if (xq_new(k_new) == xq_old(k_old) .and. &
-                        next_dq > dq_old(k_old) - min_dq/2) then
+                        next_dq > dq_old(k_old) - min_dq/2d0) then
 
                      if (.not. okay_to_merge) then
 
@@ -741,7 +747,7 @@
                               ! don't merge across convective or crystal boundary
                               k_old_next = kk-1
                               exit
-                           else if (next_xq <= xq_old(kk) + min_dq/2) then
+                           else if (next_xq <= xq_old(kk) + min_dq/2d0) then
                               k_old_next = max(k_old+1,kk-1)
                               exit
                            end if
@@ -753,7 +759,7 @@
                      next_xq = xq_old(k_old_next)
                      next_dq = next_xq - xq_new(k_new)
 
-                  else if (next_xq >= xq_old(k_old+1) - min_dq/2) then
+                  else if (next_xq >= xq_old(k_old+1) - min_dq/2d0) then
                      ! this is final subcell of a split, so adjust to finish the parent cell
 
                      k_old_next = k_old+1
