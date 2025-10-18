@@ -2284,8 +2284,9 @@
       ! mlt_Pturb_factor
       ! ~~~~~~~~~~~~~~~~
 
-      ! include MLT turbulent pressure at face k = mlt_Pturb_factor*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
-      ! MLT turbulent pressure for cell k = avg of values at faces.
+      ! include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
+      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 3d0
+      ! corresponds to alpha_TDC_Ptdvdt = 1d0, where Pt = (2/3)*rho(k)*(mlt_vc(k)/sqrt(2/3))**2
 
       ! this replaces conv_dP_term_factor.   also see extra_pressure vector and other_pressure routine
 
@@ -5880,11 +5881,15 @@
       ! max_surface_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~
 
+      ! min_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~
+
       ! Largest allowed dq at surface.
 
       ! ::
 
     max_surface_cell_dq = 1d-12
+    min_surface_cell_dq = 1d-99
 
 
       ! max_num_subcells
@@ -5899,12 +5904,15 @@
 
       ! max_num_merge_cells
       ! ~~~~~~~~~~~~~~~~~~~
+      ! max_num_merge_surface_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Limits number of old cells to merge into 1 new one.
 
       ! ::
 
     max_num_merge_cells = 2
+    max_num_merge_surface_cells = 2
 
 
       ! mesh_adjust_get_T_from_E
@@ -6490,6 +6498,28 @@
 
     merge_amr_ignore_surface_cells = .true.
     merge_amr_k_for_ignore_surface_cells = 2
+
+
+      ! merge_amr_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! merge_amr_logT_for_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_amr_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_amr_logT_for_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! For pulsation calculations, splitting and merging core cells can cause problems.
+      ! If merge_amr_ignore_core_cells or split_amr_ignore_surface_cells is true,
+      ! then the innermost cells above merge_amr_logT_for_ignore_core_cells or
+      ! split_amr_logT_for_ignore_core_cells  cells are ignored for split/merge.
+
+      ! ::
+
+    merge_amr_ignore_core_cells = .false.
+    merge_amr_logT_for_ignore_core_cells = 1d99
+    split_amr_ignore_core_cells = .false.
+    split_amr_logT_for_ignore_core_cells = 1d99
 
 
       ! split_merge_amr_avoid_repeated_remesh
@@ -7630,14 +7660,6 @@
 
     use_op_mono_alt_get_kap = .false.
 
-
-      ! min_kap_for_dPrad_dm_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    min_kap_for_dPrad_dm_eqn = 1d-4
-
 ! asteroseismology controls
 ! =========================
 
@@ -8220,6 +8242,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_logT_for_include_P_and_L_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -8229,6 +8253,8 @@
       ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
       ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
+      ! Above ``max_logT_for_include_P_and_L_in_velocity_time_centering``, P and L are not time centered
+      ! to aid in damping spurious modes in the core.
 
       ! ::
 
@@ -8238,7 +8264,7 @@
     include_L_in_velocity_time_centering = .false.
     L_theta_for_velocity_time_centering = 0.5d0
     use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
-
+    max_logT_for_include_P_and_L_in_velocity_time_centering = 1d99
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8246,6 +8272,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_kap_for_dPrad_dm_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
       ! These are for alternatives ways to determine the T gradient.
@@ -8284,6 +8312,7 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    min_kap_for_dPrad_dm_eqn = 1d-4
     use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
