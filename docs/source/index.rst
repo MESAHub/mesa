@@ -29,14 +29,14 @@ Modules for Experiments in Stellar Astrophysics
 
       MESA implements tested, peer-reviewed physics and numerical methods for modeling stellar structure and evolution across a wide range of masses and evolutionary stages.
 
-   .. grid-item-card:: Open-source & Community-driven
+   .. grid-item-card:: Open-source
       :columns: 12 6 6 4
       :class-card: sd-border-0
       :shadow: None
 
       Freely available with an active global developer and user community, documentation, and examples to help drive new scientific results.
 
-   .. grid-item-card:: Modular and Extensible
+   .. grid-item-card:: Modular
       :columns: 12 6 6 4
       :class-card: sd-border-0
       :shadow: None
