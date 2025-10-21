@@ -74,7 +74,7 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
 These functions can now be called in your custom ``run_star_extras.f90`` file, for data in a star, getting relevant timescales.
 
-The terminal header ``lg_Lnuc`` has been renamed to ``lg_Lnuc_tot`` as it includes photodisintegration and is analagous to the
+The terminal header ``lg_Lnuc`` has been renamed to ``lg_Lnuc_tot`` as it includes photodisintegration and is analogous to the
 history column ``log_power_nuc_burn``, and is not equivalent to ``log_Lnuc`` which does not include photodisintegration.
 
 For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
