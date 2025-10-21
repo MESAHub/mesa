@@ -20,7 +20,7 @@
 module turb_support
 
 use star_private_def
-use const_def, only: dp, crad, no_mixing, one_third
+use const_def, only: dp, crad, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -240,7 +240,7 @@ contains
          Ptot = P
       end if
 
-      Pr = one_third * crad * pow4(T)
+      Pr = crad*pow4(T)/3d0
       Pg = Ptot - Pr
       beta = Pg / Ptot
       Lambda = mixing_length_alpha*scale_height
