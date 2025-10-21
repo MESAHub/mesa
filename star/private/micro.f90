@@ -461,7 +461,7 @@ contains
        end if
        return
     end if
-    s% Prad(k) = crad * T*T*T*T / 3d0
+    s% Prad(k) = one_third * crad * pow4(T)
     s% Peos(k) = s% Prad(k) + s% Pgas(k)
     s% lnPeos(k) = log(s% Peos(k))
     s% lnS(k) = res(i_lnS)
