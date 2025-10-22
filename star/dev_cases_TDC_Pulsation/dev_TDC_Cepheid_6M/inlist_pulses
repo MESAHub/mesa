@@ -25,9 +25,7 @@ cubic_interpolation_in_Z = .false.
    change_u_flag = .true.
    new_u_flag = .false.
 
-
-
-   relax_to_this_tau_factor = 1d-3!-1
+   relax_to_this_tau_factor = 1d-3
    dlogtau_factor = 0.1d0
    relax_tau_factor = .true.
 
@@ -69,16 +67,16 @@ cubic_interpolation_in_Z = .false.
 
    ! new rsp style meshing, thanks to Bill P.
    x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC 
-   TDC_pulse_use_mass_interp_face_values = .true.
-   TDC_pulse_nz = 150 
-   TDC_pulse_nz_outer = 40 
-   TDC_pulse_T_anchor = 11d3
-   TDC_pulse_dq_1_factor = 2d0
+   TDC_hydro_use_mass_interp_face_values = .true.
+   TDC_hydro_nz = 150 
+   TDC_hydro_nz_outer = 40 
+   TDC_hydro_T_anchor = 11d3
+   TDC_hydro_dq_1_factor = 2d0
    remesh_for_TDC_pulsations_log_core_zoning = .false. ! .false means do rsp style core
 
    okay_to_remesh = .false. ! freeze mesh after initial remesh.
    x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
-   x_ctrl(12) = 200! model number to turn off remesh ( only if if okay_to_remesh = .true.)
+   x_ctrl(12) = 200 ! model number to turn off remesh ( only if if okay_to_remesh = .true.)
 
 ! GYRE set starting velocities, kick!
 ! kick when true and not restarting.
@@ -134,8 +132,7 @@ cubic_interpolation_in_Z = .false.
    include_L_in_velocity_time_centering = .true.
    L_theta_for_velocity_time_centering = 0.5d0
 
-   set_rho_to_dm_div_dV = .false. ! only applies to v_flag
-
+   set_rho_to_dm_div_dV = .false.
 
    convergence_ignore_equL_residuals = .false. ! include T-gradient eqn in newton
 
@@ -159,13 +156,11 @@ cubic_interpolation_in_Z = .false.
    alpha_TDC_PtdVdt = 0d0
    alpha_TDC_DAMPM = 0.25d0
    steps_before_use_TDC = 0
-   mlt_Pturb_factor = 0d0 ! use 3d0 = 1d0 in TDC. time lagged.
+   mlt_Pturb_factor = 0d0 ! use 2d0 = 1d0 in TDC. time lagged.
    alt_scale_height_flag = .false. ! ignore eggleton in the core.
    TDC_num_innermost_cells_forced_nonturbulent = 2 ! for envelope models only.
 
 
-   ! dev feature, modify g -> geff (with hydro corr)
-   make_mlt_hydrodynamic = .false.
    TDC_use_density_form_for_eddy_viscosity = .false. ! always true for u_flag.
    mlt_make_surface_no_mixing = .false.
 

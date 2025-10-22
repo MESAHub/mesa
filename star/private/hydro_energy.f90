@@ -274,7 +274,7 @@
                 else
                    call get_face_weights(s, k, alfa, beta)
                    Eq_ad = alfa*compute_tdc_Eq_div_w_face(s, k, ierr)*(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
-                      beta*compute_tdc_Eq_div_w_face(s, k-1, ierr)*(shift_m1(s% mlt_vc_ad(k-1))/sqrt_2_div_3)
+                      beta*shift_m1(compute_tdc_Eq_div_w_face(s, k-1, ierr))*(shift_m1(s% mlt_vc_ad(k-1))/sqrt_2_div_3)
                 end if
                 if (ierr /= 0) return
             end if

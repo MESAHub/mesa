@@ -310,6 +310,7 @@
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          use hydro_rsp2, only: compute_Uq_face
+         use tdc_hydro, only: compute_tdc_Uq_face
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -431,7 +432,7 @@
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          else if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC') then ! include Uq in u_face
-            Uq_ad = compute_Uq_face(s, k, ierr)
+            Uq_ad = compute_tdc_Uq_face(s, k, ierr)
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          else
