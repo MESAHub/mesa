@@ -138,8 +138,9 @@ Once the zip folder has been created, it should be uploaded to Zenodo prior to s
 
 - For a pre-release, do not upload to the main MESA Zenodo repository.
   Instead upload to its own Zenodo entry. This can be done on a personal account.
-  For an example, see `r25.10.1-rc1 <https://doi.org/XXXXXXXX>`_.
+  For an example, see `r25.10.1-rc1 <https://zenodo.org/records/17426065>`_.
 - Official releases need to be uploaded to `this MESA Zenodo page <https://doi.org/10.5281/zenodo.2602941>`_.
+- The zip uploaded to Zenodo should be larger than 2 Gb in size, and takes a few hours to upload.
 
 Send an email to mesa-users
 ---------------------------
@@ -162,14 +163,14 @@ Getting all authors who committed code (this includes merged pull requests)
 
 .. code-block:: console
 
-    git log --format='%aN' r21.12.1..HEAD | sort -u
+    git log --format='%aN' 24.08.1..HEAD | sort -u
 
 
 Listing all commits that acknowledge help from someone
 
 .. code-block:: console
 
-    git log --all --grep="-by" r21.12.1..HEAD
+    git log --all --grep="-by" 24.08.1..HEAD
 
 
 

@@ -42,7 +42,7 @@
       !!
       !! The left-hand side is known: we have
       !!
-      !! Delta(dm_j) = (dm_j_after_adust_mass - dm_j_before_adjust_mass)
+      !! Delta(dm_j) = (dm_j_after_adjust_mass - dm_j_before_adjust_mass)
       !!
       !! This is what we call change_in_dm.
       !!
@@ -56,7 +56,7 @@
       !!
       !! With a little rearranging we therefore find_mass_flux
       !!
-      !! F_{j} = F_{j+1} + (dm_j_after_adust_mass - dm_j_before_adjust_mass)
+      !! F_{j} = F_{j+1} + (dm_j_after_adjust_mass - dm_j_before_adjust_mass)
       !!
       !! @param change_in_dm Change in cell masses.
       !! @param nz Number of cells.
