@@ -86,7 +86,7 @@ For version ``rXX.YY.Z`` this script will make a branch ``release/rXX.YY.Z`` and
 - Updates :file:`data/version_number`
 
 .. note::
-    :file:`data/version_number` is normally not included in a commit (it must be explicitly added via ``git add -f``. as we gitignore it).
+    :file:`data/version_number` is normally not included in a commit (it must be explicitly added via ``git add -f``. as we gitignore it. The release script will add it.).
 
 - Updates :file:`docs/source/conf.py`
 - Updates :file:`Doxyfile`
