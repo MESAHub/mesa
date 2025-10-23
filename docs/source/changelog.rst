@@ -530,11 +530,11 @@ like to see the changes without modifying the file.
 For convenience, we have also included a bash script that will call a version of
 this ``sed`` command (along with ``sed`` commands for the next changelog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
-where you want to update every inlist by invoking ::
+where you want to update every inlist by invoking
 
 .. code-block:: console
 
-  $MESA_DIR/scripts/update_inlists.sh
+    $MESA_DIR/scripts/update_inlists.sh
 
 This script will save the previous versions of your inlists to a directory named
 ``backup_inlists``.
