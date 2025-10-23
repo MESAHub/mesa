@@ -84,12 +84,21 @@ contains
       gradr_ad = gradr
       grada_ad = grada
       scale_height_ad = scale_height
-      call Get_results(s, 0, MLT_option, &
-         r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad, &
-         gradr_ad, grada_ad, scale_height_ad, &
-         iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-         s% alpha_semiconvection, s% thermohaline_coeff, &
-         mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+      if (s% use_other_mlt_results) then
+         call s% other_mlt_results(s% id, 0, MLT_option, &
+            r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, &
+            chiT_ad, Cp_ad, gradr_ad, grada_ad, scale_height_ad, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            s% alpha_semiconvection, s% thermohaline_coeff, &
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+      else
+         call Get_results(s, 0, MLT_option, &
+            r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, &
+            chiT_ad, Cp_ad, gradr_ad, grada_ad, scale_height_ad, &
+            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            s% alpha_semiconvection, s% thermohaline_coeff, &
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+      end if
       gradT = gradT_ad%val
       Y_face = Y_face_ad%val
       conv_vel = mlt_vc_ad%val
@@ -163,7 +172,7 @@ contains
 
       if (s% use_other_mlt_results) then
          call s% other_mlt_results(s% id, k, MLT_option, &
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+            r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
