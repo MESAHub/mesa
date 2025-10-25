@@ -28,7 +28,7 @@ module other_mlt_results
 contains
 
    subroutine null_other_mlt_results(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
-                                     r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+                                     r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
                                      iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
                                      alpha_semiconvection, thermohaline_coeff, &
                                      mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -39,7 +39,7 @@ contains
       integer, intent(in) :: k
       character(len=*), intent(in) :: MLT_option
       type(auto_diff_real_star_order1), intent(in) :: &
-         r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
+         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
       integer, intent(in) :: iso
       real(dp), intent(in) :: &
          XH1, cgrav, m, gradL_composition_term, &
