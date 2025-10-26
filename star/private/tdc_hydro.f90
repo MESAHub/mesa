@@ -32,7 +32,7 @@ module tdc_hydro
    private
    public :: &
       compute_tdc_Eq_cell, compute_tdc_Uq_face, compute_tdc_Eq_div_w_face, &
-      get_RSP2_alfa_beta_face_weights, set_viscosity_vars_TDC
+      get_TDC_alfa_beta_face_weights, set_viscosity_vars_TDC, compute_tdc_Uq_dm_cell
 
 contains
 
@@ -45,6 +45,15 @@ contains
       include 'formats'
       ierr = 0
       op_err = 0
+
+      if (.not. (s%v_flag .or. s%u_flag)) then ! set values 0 if not using v_flag or u_flag.
+         do k = 1, s%nz
+            s%Eq(k) = 0d0; s%Eq_ad(k) = 0d0
+            s%Chi(k) = 0d0; s%Chi_ad(k) = 0d0
+            s%Uq(k) = 0d0
+         end do
+         return
+      end if
 
       !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
       do k = 1, s%nz
@@ -61,11 +70,19 @@ contains
       end if
       !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
       do k = 1, s%nz
-         x = compute_Chi_cell(s, k, op_err)
+         if (s% v_flag) then
+            x = compute_Chi_cell(s, k, op_err)
+         else if (s% u_flag) then
+            x = compute_Chi_div_w_face(s, k, op_err)
+         end if
          if (op_err /= 0) ierr = op_err
          x = compute_tdc_Eq_cell(s, k, op_err)
          if (op_err /= 0) ierr = op_err
-         x = compute_tdc_Uq_face(s, k, op_err)
+         if (s% v_flag) then
+            x = compute_tdc_Uq_face(s, k, op_err)
+         else if (s% u_flag) then
+            x = compute_tdc_Uq_dm_cell(s, k, op_err)
+         end if
          if (op_err /= 0) ierr = op_err
       end do
       !$OMP END PARALLEL DO
@@ -73,16 +90,9 @@ contains
          if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 2', s%model_number
          return
       end if
-      if (.not. (s%v_flag .or. s%u_flag)) then ! set values 0 if not using v_flag or u_flag.
-         do k = 1, s%nz
-            s%Eq(k) = 0d0; s%Eq_ad(k) = 0d0
-            s%Chi(k) = 0d0; s%Chi_ad(k) = 0d0
-            s%Uq(k) = 0d0
-         end do
-      end if
    end subroutine set_viscosity_vars_TDC
 
-   subroutine get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+   subroutine get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
       type(star_info), pointer :: s
       integer, intent(in) :: k
       real(dp), intent(out) :: alfa, beta
@@ -95,7 +105,7 @@ contains
          alfa = 0.5d0
          beta = 0.5d0
       end if
-   end subroutine get_RSP2_alfa_beta_face_weights
+   end subroutine get_TDC_alfa_beta_face_weights
 
    function compute_d_v_div_r(s, k, ierr) result(d_v_div_r)  ! s^-1
       type(star_info), pointer :: s
@@ -134,7 +144,11 @@ contains
 
       r_cell = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
       rho_cell = wrap_d_00(s, k)
-      v_cell = wrap_v_00(s, k)              ! cell-centred velocity (u_flag)
+      if (s% u_flag) then
+         v_cell = wrap_u_00(s,k) ! doesn't support time centering?
+      else ! v flag
+         v_cell = 0.5d0*(wrap_v_00(s, k) + wrap_v_p1(s, k))
+      end if
       dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       dm_cell = s%dm(k)                     ! cell mass
 
@@ -152,13 +166,18 @@ contains
 
       r_cell = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
       rho_cell = wrap_d_00(s, k)
-      v_cell = wrap_opt_time_center_v_00(s, k)              ! cell-centred velocity (u_flag)
+      if (s% u_flag) then
+         v_cell = wrap_u_00(s,k) ! doesn't support time centering?
+      else ! v flag
+         v_cell = 0.5d0*(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
+      end if
       dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       dm_cell = s%dm(k)                     ! cell mass
 
       d_v_div_r = -dm_cell/(4d0*pi*rho_cell)* &
                   (dlnrho_dt/pow3(r_cell) &
                    + 3d0*v_cell/pow4(r_cell))
+
    end function compute_rho_form_of_d_v_div_r_opt_time_center
 
 
@@ -168,25 +187,26 @@ contains
       integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: d_v_div_r
       type(auto_diff_real_star_order1) :: r_face, rho_face, v_face, dlnrho_dt
-      real(dp) :: dm_bar
+      real(dp) :: dm_bar, alfa, beta
       ierr = 0
 
       r_face = wrap_r_00(s, k)
       rho_face = get_rho_face(s, k)
-      if (s% v_flag .and. .not. s% u_flag) then
-         v_face =  wrap_v_00(s, k)   ! face-centred velocity (v_flag)
-      else if (s% u_flag .and. .not. s% v_flag) then
-         v_face = s% u_face_ad(k) ! reconstructed face velocity (u_flag)
-      end if
-      dlnrho_dt = 0.5d0*(wrap_dxh_lnd(s, k) + wrap_dxh_lnd(s, k+1))/s%dt    ! (∂/∂t)lnρ
-
+      v_face = wrap_v_00(s, k)   ! face-centered velocity
       if (k >= 2) then
          dm_bar = 0.5d0*(s% dm(k) + s% dm(k-1))
+         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         dlnrho_dt = (alfa*wrap_dxh_lnd(s, k) + beta*shift_m1(wrap_dxh_lnd(s, k-1)))/s%dt    ! (∂/∂t)lnρ
       else
          dm_bar = 0.5d0*s% dm(k)
+         dlnrho_dt = 0.5d0*wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       end if
 
-      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
+!      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
+
+      ! 1/r * du/dm - U/4/pi/rho/r^4
+      d_v_div_r = ((wrap_u_m1(s,k) - wrap_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
+
    end function compute_rho_form_of_d_v_div_r_face
 
    function compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
@@ -195,26 +215,26 @@ contains
       integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: d_v_div_r
       type(auto_diff_real_star_order1) :: r_face, rho_face, v_face, dlnrho_dt
-      real(dp) :: dm_bar
+      real(dp) :: dm_bar, alfa, beta
       ierr = 0
 
       r_face = wrap_opt_time_center_r_00(s, k)
       rho_face = get_rho_face(s, k)
-
-      if (s% v_flag .and. .not. s% u_flag) then
-         v_face =  wrap_opt_time_center_v_00(s, k)   ! face-centred velocity (v_flag)
-      else if (s% u_flag .and. .not. s% v_flag) then
-         v_face = s% u_face_ad(k) ! reconstructed face velocity (u_flag)
-      end if
-      dlnrho_dt = 0.5d0*(wrap_dxh_lnd(s, k) + wrap_dxh_lnd(s, k+1))/s%dt    ! (∂/∂t)lnρ
-
+      v_face = wrap_opt_time_center_v_00(s, k)   ! face-centered velocity
       if (k >= 2) then
          dm_bar = 0.5d0*(s% dm(k) + s% dm(k-1))
+         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         dlnrho_dt = (alfa*wrap_dxh_lnd(s, k) + beta*shift_m1(wrap_dxh_lnd(s, k-1)))/s%dt    ! (∂/∂t)lnρ
       else
          dm_bar = 0.5d0*s% dm(k)
+         dlnrho_dt = 0.5d0*wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       end if
 
-      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
+!      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
+
+      ! dm_bar*(1/r * du/dm - U/4/pi/rho/r^4)
+      d_v_div_r = ((wrap_u_m1(s,k) - wrap_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
+
    end function compute_rho_form_of_d_v_div_r_face_opt_time_center
 
 
@@ -241,7 +261,7 @@ contains
       Hp0 = get_scale_height_face(s,k)
       Hp1 = 0d0
       if (k+1 < s%nz) then
-         Hp1 = get_scale_height_face(s,k+1)
+         Hp1 = shift_p1(get_scale_height_face(s,k+1))
       end if
       Hp_cell = 0.5d0*(Hp0 + Hp1)
       !0.5d0*(wrap_Hp_00(s, k) + wrap_Hp_p1(s, k))
@@ -317,10 +337,18 @@ contains
          if (ierr /= 0) return
 
          ! don't need to check if mlt_vc > 0 here.
-         if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
-               w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
-         else ! normal RSP2
-            w_00 = wrap_w_00(s, k)
+         if (k < s% nz) then
+            if (s% okay_to_set_mlt_vc .and. s% have_mlt_vc) then !add option for explicit mlt_vc, operator split in momentum eq.
+               w_00 = 0.5d0*(s% mlt_vc_old(k) + s% mlt_vc_old(k+1))/sqrt_2_div_3! same as info%A0 from TDC
+            else
+               w_00 = 0.5d0*(s% mlt_vc_ad(k) + shift_p1(s% mlt_vc_ad(k+1)))/sqrt_2_div_3! same as info%A0 from TDC
+            end if
+         else
+            if (s% okay_to_set_mlt_vc .and. s% have_mlt_vc) then !add option for explicit mlt_vc, operator split in momentum eq.
+               w_00 = 0.5d0*s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+            else
+               w_00 = 0.5d0*s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
+            end if
          end if
          d_00 = wrap_d_00(s, k)
          f = (16d0/3d0)*pi*ALFAM_ALFA/s%dm(k)
@@ -444,10 +472,6 @@ contains
    if (ALFAM_ALFA == 0d0 .or. &
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
-      if (k >= 1 .and. k <= s%nz) then
-         s%Chi(k) = 0d0
-         s%Chi_ad(k) = 0d0
-      end if
    else
       Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
       if (ierr /= 0) return
@@ -476,8 +500,12 @@ contains
       !       = erg ! * (s / cm) - > [erg] * 1/w00
 
    end if
-   !s%Chi(k) = Chi_face%val
-   !s%Chi_ad(k) = Chi_face
+
+   ! since chi_cell is not called for u_flag
+   if (s% u_flag .and. .not. s% v_flag) then ! when v_flag, set inside chi_cell
+      s%Chi(k) = Chi_face%val
+      s%Chi_ad(k) = Chi_face
+   end if
 
    if (dbg .and. k == -100) then
    write (*, *) ' s% ALFAM_ALFA', ALFAM_ALFA
@@ -500,7 +528,7 @@ contains
    integer, intent(in) :: k
    type(auto_diff_real_star_order1) :: Eq_face
    integer, intent(out) :: ierr
-   type(auto_diff_real_star_order1) :: d_v_div_r, Chi_face
+   type(auto_diff_real_star_order1) :: d_v_div_r, Chi_face, w_00
    real(dp) :: dmbar
    include 'formats'
    ierr = 0
@@ -528,8 +556,16 @@ contains
       if (ierr /= 0) return
       Eq_face = 4d0*pi*Chi_face*d_v_div_r/dmbar  ! erg s^-1 g^-1 * (cm^-1 s^1)
    end if
-   !s%Eq(k) = Eq_face%val
-   !s%Eq_ad(k) = Eq_face
+
+   ! only for output, really only used for returning Eq to star pointers.
+   if (s% okay_to_set_mlt_vc .and. s% have_mlt_vc) then !add option for explicit mlt_vc, operator split in momentum eq.
+      w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+   else
+      w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
+   end if
+
+   s%Eq(k) = Eq_face%val * w_00%val
+   s%Eq_ad(k) = Eq_face * w_00
    end function compute_tdc_Eq_div_w_face
 
    function compute_d_v_div_r_face(s, k, ierr) result(d_v_div_r)  ! s^-1
@@ -600,5 +636,60 @@ contains
       if (r_p1%val == 0d0) r_p1 = 1d0
       d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center_face
+
+
+
+   ! for u_flag only. cell centered Uq as source for Reimann flux.
+   function compute_tdc_Uq_dm_cell(s, k, ierr) result(Uq_cell)  ! cm s^-2, acceleration
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: Chi_00, Chi_p1, r_00, r_p1, w_00, w_p1, r_cell, Uq_cell
+      include 'formats'
+      ierr = 0
+      if (s%mixing_length_alpha == 0d0 .or. &
+          k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
+          k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+         Uq_cell = 0d0
+      else
+         r_00 = wrap_opt_time_center_r_00(s, k)
+         r_p1 = wrap_opt_time_center_r_p1(s, k)
+         r_cell = 0.5d0*(r_00+r_p1)
+
+         if (s% okay_to_set_mlt_vc .and. s% have_mlt_vc) then !add option for explicit mlt_vc, operator split in momentum eq.
+            w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+         else
+            w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
+         end if
+
+         Chi_00 = compute_Chi_div_w_face(s, k, ierr) * w_00  ! s% Chi_ad(k) XXX
+         !Chi_00 = s% Chi_ad(k)  ! compute_Chi_cell(s,k,ierr)
+
+         if (k < s% nz) then
+            if (s% okay_to_set_mlt_vc .and. s% have_mlt_vc) then !add option for explicit mlt_vc, operator split in momentum eq.
+               w_p1 = s% mlt_vc_old(k+1)/sqrt_2_div_3! same as info%A0 from TDC
+            else
+               w_p1 = shift_p1(s% mlt_vc_ad(k+1))/sqrt_2_div_3! same as info%A0 from TDC
+            end if
+
+            Chi_p1 = shift_p1(compute_Chi_div_w_face(s, k + 1, ierr))*w_p1
+            !Chi_m1 = shift_m1(s% Chi_ad(k-1)) XXX
+            if (ierr /= 0) return
+         else
+            Chi_p1 = 0d0
+            w_p1 = 0d0
+         end if
+   
+         Uq_cell = 4d0*pi*(Chi_00 - Chi_p1)/(r_cell) ! we have neglected the /dm here, because it is restored in the reimann flux calculation
+
+         if (k == -56) then
+            write (*, 3) 'RSP2 Uq chi_m1 chi_00 r', k, s%solver_iter, &
+               Uq_cell%val, Chi_p1%val, Chi_00%val, r_00%val
+         end if
+
+      end if
+      ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
+      s%Uq(k) = Uq_cell%val/ s% dm(k)
+   end function compute_tdc_Uq_dm_cell
 
 end module tdc_hydro

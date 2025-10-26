@@ -73,18 +73,19 @@
             s, k, P_surf_ad, nvar, ierr)
          use accurate_sum_auto_diff_star_order1
          use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
+         use tdc_hydro, only: compute_tdc_Uq_dm_cell
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad  ! only for k=1
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
-
          integer :: nz, i_du_dt
          type(auto_diff_real_star_order1) :: &
             flux_in_ad, flux_out_ad, diffusion_source_ad, &
             geometry_source_ad, gravity_source_ad, &
             area_00, area_p1, inv_R2_00, inv_R2_p1, &
-            dudt_expected_ad, dudt_actual_ad, resid_ad
+            dudt_expected_ad, dudt_actual_ad, resid_ad, &
+            Uq_cell
          type(accurate_auto_diff_real_star_order1) :: sum_ad
          real(dp) :: dt, dm, ie_plus_ke, scal, residual
          logical :: dbg, do_diffusion, test_partials
@@ -123,8 +124,15 @@
          call setup_gravity_source
          call setup_diffusion_source
 
+         ! Add turbulent eddy viscous acceleration Uq for TDC as source
+         Uq_cell = 0d0
+         if (s% MLT_option == 'TDC' .and. s%alpha_TDC_DampM > 0d0) then
+            Uq_cell = compute_tdc_Uq_dm_cell(s, k, ierr) ! Uq * dm
+            if (ierr /= 0) return
+         end if
+
          sum_ad = flux_in_ad - flux_out_ad + &
-            geometry_source_ad + gravity_source_ad + diffusion_source_ad
+            geometry_source_ad + gravity_source_ad + diffusion_source_ad + Uq_cell
          dudt_expected_ad = sum_ad
          dudt_expected_ad = dudt_expected_ad/dm
 
@@ -310,7 +318,6 @@
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          use hydro_rsp2, only: compute_Uq_face
-         use tdc_hydro, only: compute_tdc_Uq_face
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -427,16 +434,10 @@
          end if
 
 
-         if (s% RSP2_flag) then  ! include Uq in u_face
+         if (s% RSP2_flag) then  ! include Uq in u_face, To do: implement in sources instead ~ EbF
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
-         else if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC') then ! include Uq in u_face
-            Uq_ad = compute_tdc_Uq_face(s, k, ierr)
-            if (ierr /= 0) return
-            s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
-         else
-            Uq_ad = 0d0
          end if
 
          s% u_face_val(k) = s% u_face_ad(k)%val
