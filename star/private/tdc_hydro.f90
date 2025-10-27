@@ -137,7 +137,7 @@ contains
       type(star_info), pointer :: s
       integer, intent(in)  :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
+      type(auto_diff_real_star_order1) :: d_v_div_r, v_00, v_p1
       type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
       real(dp) :: dm_cell
       ierr = 0
@@ -149,17 +149,22 @@ contains
       else ! v flag
          v_cell = 0.5d0*(wrap_v_00(s, k) + wrap_v_p1(s, k))
       end if
+      v_00 = wrap_opt_time_center_v_00(s, k)
+      v_p1 = wrap_opt_time_center_v_p1(s, k)
       dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       dm_cell = s%dm(k)                     ! cell mass
 
       d_v_div_r = -dm_cell/(4d0*pi*rho_cell)*(dlnrho_dt/pow3(r_cell) + 3d0*v_cell/pow4(r_cell))
+
+!      d_v_div_r = ((v_00 - v_p1) - dm_cell*v_cell/(4d0*pi*rho_cell*pow3(r_cell)))/r_cell
+
    end function compute_rho_form_of_d_v_div_r
 
    function compute_rho_form_of_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
       type(star_info), pointer :: s
       integer, intent(in)  :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
+      type(auto_diff_real_star_order1) :: d_v_div_r, v_00, v_p1
       type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
       real(dp) :: dm_cell
       ierr = 0
@@ -171,12 +176,16 @@ contains
       else ! v flag
          v_cell = 0.5d0*(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
       end if
+      v_00 = wrap_opt_time_center_v_00(s, k)
+      v_p1 = wrap_opt_time_center_v_p1(s, k)
+   
       dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
       dm_cell = s%dm(k)                     ! cell mass
 
-      d_v_div_r = -dm_cell/(4d0*pi*rho_cell)* &
-                  (dlnrho_dt/pow3(r_cell) &
-                   + 3d0*v_cell/pow4(r_cell))
+      d_v_div_r = -dm_cell/(4d0*pi*rho_cell)*(dlnrho_dt/pow3(r_cell) + 3d0*v_cell/pow4(r_cell))
+
+      ! want this on the cell now instead of face.
+!      d_v_div_r = ((v_00 - v_p1) - dm_cell*v_cell/(4d0*pi*rho_cell*pow3(r_cell)))/r_cell
 
    end function compute_rho_form_of_d_v_div_r_opt_time_center
 
@@ -501,7 +510,7 @@ contains
 
    end if
 
-   ! since chi_cell is not called for u_flag
+   ! since chi_cell is not called for u_flag when doing Uq_cell_dm
    if (s% u_flag .and. .not. s% v_flag) then ! when v_flag, set inside chi_cell
       s%Chi(k) = Chi_face%val
       s%Chi_ad(k) = Chi_face
