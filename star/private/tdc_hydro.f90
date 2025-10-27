@@ -145,7 +145,7 @@ contains
       r_cell = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
       rho_cell = wrap_d_00(s, k)
       if (s% u_flag) then
-         v_cell = wrap_u_00(s,k) ! doesn't support time centering?
+         v_cell = wrap_u_00(s,k)
       else ! v flag
          v_cell = 0.5d0*(wrap_v_00(s, k) + wrap_v_p1(s, k))
       end if
@@ -172,7 +172,7 @@ contains
       r_cell = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
       rho_cell = wrap_d_00(s, k)
       if (s% u_flag) then
-         v_cell = wrap_u_00(s,k) ! doesn't support time centering?
+         v_cell = wrap_opt_time_center_u_00(s,k)
       else ! v flag
          v_cell = 0.5d0*(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
       end if
@@ -242,7 +242,7 @@ contains
 !      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
 
       ! dm_bar*(1/r * du/dm - U/4/pi/rho/r^4)
-      d_v_div_r = ((wrap_u_m1(s,k) - wrap_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
+      d_v_div_r = ((wrap_opt_time_center_u_m1(s,k) - wrap_opt_time_center_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
 
    end function compute_rho_form_of_d_v_div_r_face_opt_time_center
 
@@ -628,8 +628,8 @@ contains
          v_00 = 0.5d0 *(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
          v_m1 = 0.5d0*(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_m1(s, k))
      else if(s% u_flag) then
-         v_00 = wrap_u_00(s,k)
-         v_m1 = wrap_u_m1(s,k)
+         v_00 = wrap_opt_time_center_u_00(s,k)
+         v_m1 = wrap_opt_time_center_u_m1(s,k)
       end if
          
          r_00 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
