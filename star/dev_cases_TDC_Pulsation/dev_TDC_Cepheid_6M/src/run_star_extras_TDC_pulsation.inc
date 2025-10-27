@@ -158,8 +158,8 @@
                v_surf = s% v(1)
                v_surf_start = s% v_start(1)
             else if (s% u_flag) then
-               v_surf = s% u_face_val(1)
-               v_surf_start = s% u_face_start(1)
+               v_surf = s% u(1) ! s% u_face_val(1)
+               v_surf_start = s% u_start(1) ! s% u_face_start(1)
             else !
                v_surf = 0d0
                v_surf_start = 0d0

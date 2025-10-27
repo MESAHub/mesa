@@ -490,6 +490,7 @@ contains
          ! if v= 0, turn on v so we can kick
          if (.not. s%v_flag .and. .not. s%u_flag) then
             call star_set_v_flag(id, .true., ierr)
+            write (*,*) 'turning on v_flag hydro for kick'
          end if
 
          call gyre_in_mesa_extras_set_velocities(s, .false., ierr)
