@@ -582,38 +582,35 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1, term1, term2
+      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1, term1, term2
       logical :: dbg
       include 'formats'
       ierr = 0
       dbg = .false.
 
-      if (k >1) then
-         v_00 = 0.5d0 * (wrap_v_00(s, k) + wrap_v_m1(s, k))
-      else
-         v_00 = 0.5d0 * wrap_v_00(s, k)
+     if (s% v_flag) then
+         v_00 = 0.5d0 * (wrap_v_00(s, k) + wrap_v_p1(s, k))
+         v_m1 = 0.5d0*(wrap_v_00(s, k) + wrap_v_m1(s, k))
+     else if(s% u_flag) then
+         v_00 = wrap_u_00(s,k)
+         v_m1 = wrap_u_m1(s,k)
       end if
 
-      v_p1 = 0.5d0 * (wrap_v_00(s, k) + wrap_v_p1(s, k))
+         r_00 = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
+         r_m1 = 0.5d0*(wrap_r_00(s, k) + wrap_r_m1(s, k))
 
-      if (k >1) then
-         r_00 = 0.5d0 * (wrap_r_00(s, k) + wrap_r_m1(s, k))
-      else
-         r_00 = 0.5d0 * wrap_r_00(s, k)
-      end if
-      r_p1 = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
-      if (r_p1%val == 0d0) r_p1 = 1d0
-      d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
+      if (r_00%val == 0d0) r_00 = 1d0
+      if (r_m1%val == 0d0) r_m1 = 1d0
+      d_v_div_r = v_m1/r_m1 - v_00/r_00 ! units s^-1
 
       ! Debugging output to trace values
       if (dbg .and. k == -63) then
          write (*, *) 'test d_v_div_r, k:', k
-         write (*, *) 'v_00:', v_00%val, 'v_p1:', v_p1%val
-         write (*, *) 'r_00:', r_00%val, 'r_p1:', r_p1%val
+         write (*, *) 'v_00:', v_00%val, 'v_p1:', v_m1%val
+         write (*, *) 'r_00:', r_00%val, 'r_p1:', r_m1%val
          write (*, *) 'd_v_div_r:', d_v_div_r%val
       end if
    end function compute_d_v_div_r_face
-
 
 
    function compute_d_v_div_r_opt_time_center_face(s, k, ierr) result(d_v_div_r)  ! s^-1
@@ -621,29 +618,34 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
+      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1, term1, term2
+      logical :: dbg
       include 'formats'
       ierr = 0
+      dbg = .false.
 
-      if (k >1) then
-         v_00 = 0.5d0 * (wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_m1(s, k))
-      else
-         v_00 = 0.5d0 * wrap_opt_time_center_v_00(s, k)
+     if (s% v_flag) then
+         v_00 = 0.5d0 *(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
+         v_m1 = 0.5d0*(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_m1(s, k))
+     else if(s% u_flag) then
+         v_00 = wrap_u_00(s,k)
+         v_m1 = wrap_u_m1(s,k)
       end if
+         
+         r_00 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
+         r_m1 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_m1(s, k))
 
-      v_p1 = 0.5d0 * (wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
+      if (r_00%val == 0d0) r_00 = 1d0
+      if (r_m1%val == 0d0) r_m1 = 1d0
+      d_v_div_r = v_m1/r_m1 - v_00/r_00 ! units s^-1
 
-      if (k >1) then
-         r_00 = 0.5d0 * (wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_m1(s, k))
-      else
-         r_00 = 0.5d0 * wrap_opt_time_center_r_00(s, k)
+      ! Debugging output to trace values
+      if (dbg .and. k == -63) then
+         write (*, *) 'test d_v_div_r, k:', k
+         write (*, *) 'v_00:', v_00%val, 'v_p1:', v_m1%val
+         write (*, *) 'r_00:', r_00%val, 'r_p1:', r_m1%val
+         write (*, *) 'd_v_div_r:', d_v_div_r%val
       end if
-      r_p1 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
-      if (r_p1%val == 0d0) r_p1 = 1d0
-      d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
-
-      if (r_p1%val == 0d0) r_p1 = 1d0
-      d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center_face
 
 
