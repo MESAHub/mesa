@@ -1,4 +1,0 @@
-
-cd make; make clean
-cd ..
-rm -rf .mesa_temp_cache
