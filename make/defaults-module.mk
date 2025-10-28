@@ -12,4 +12,5 @@ PROFILE ?= release-with-dbg-info
 WITH_OPENMP ?= yes
 WITH_CRLIBM ?= yes
 WITH_FPE_CHECKS ?= no
+WITH_GYRE ?= yes
 PREFIX ?= $(MAKE_DIR)/..
