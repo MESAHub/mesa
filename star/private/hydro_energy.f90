@@ -216,7 +216,6 @@
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
             use hydro_rsp2, only: compute_Eq_cell
-            use star_utils, only: get_face_weights
             use tdc_hydro, only: compute_tdc_Eq_div_w_face ! compute_Eq_cell
             real(dp) :: alfa, beta
             integer, intent(out) :: ierr
@@ -267,14 +266,13 @@
                Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             else if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC' .and. &
-               s% TDC_include_eturb_in_energy_equation) then ! not checking for v or u flag.
+               s% TDC_include_eturb_in_energy_equation .and. (s% v_flag .or. s% u_flag)) then ! not checking for v or u flag.
                 !Eq_ad = compute_tdc_Eq_cell(s, k, ierr) ! safe to just recompute
-                if (k == 1) then
-                   Eq_ad = compute_tdc_Eq_div_w_face(s, k, ierr)*(s% mlt_vc_ad(k)/sqrt_2_div_3)
-                else
-                   call get_face_weights(s, k, alfa, beta)
-                   Eq_ad = alfa*compute_tdc_Eq_div_w_face(s, k, ierr)*(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
-                      beta*shift_m1(compute_tdc_Eq_div_w_face(s, k-1, ierr))*(shift_m1(s% mlt_vc_ad(k-1))/sqrt_2_div_3)
+                if (k < s% nz) then
+                  Eq_ad = 0.5d0*(compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k) + &
+                     shift_p1(compute_tdc_Eq_div_w_face(s, k+1, ierr))*shift_p1(s% mlt_vc_ad(k+1)))/sqrt_2_div_3
+                else ! center cell is 0 at inner face
+                     Eq_ad = 0.5d0*compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k)/sqrt_2_div_3
                 end if
                 if (ierr /= 0) return
             end if
@@ -355,11 +353,10 @@
          end subroutine setup_RTI_diffusion
 
          subroutine setup_d_turbulent_energy_dt(ierr)
-            use star_utils, only: get_face_weights
             use const_def, only: sqrt_2_div_3
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: TDC_eturb_cell
-            real (dp) :: TDC_eturb_cell_start, alfa, beta
+            real (dp) :: TDC_eturb_cell_start
             include 'formats'
             ierr = 0
             if (s% RSP2_flag) then
@@ -367,15 +364,14 @@
             else if (s% mlt_vc_old(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation) then
                ! write a wrapper for this.
-               if (k == 1) then
-                  TDC_eturb_cell_start = pow2(s% mlt_vc_old(k)/sqrt_2_div_3)
-                  TDC_eturb_cell = pow2(s% mlt_vc(k)/sqrt_2_div_3)
-               else
-                  call get_face_weights(s, k, alfa, beta)
-                  TDC_eturb_cell_start = alfa*pow2(s% mlt_vc_old(k)/sqrt_2_div_3) + &
-                     beta*pow2(s% mlt_vc_old(k-1)/sqrt_2_div_3)
-                  TDC_eturb_cell = alfa*pow2(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
-                     beta*pow2(shift_m1(s% mlt_vc_ad(k-1))/sqrt_2_div_3)
+               if (k < s% nz) then
+                  TDC_eturb_cell_start = 0.5d0*(pow2(s% mlt_vc_old(k)/sqrt_2_div_3) + &
+                     pow2(s% mlt_vc_old(k+1)/sqrt_2_div_3))
+                  TDC_eturb_cell = 0.5d0*(pow2(s% mlt_vc_ad(k)/sqrt_2_div_3) + &
+                     pow2(shift_p1(s% mlt_vc_ad(k+1))/sqrt_2_div_3))
+               else ! center cell averaged with 0 for inner face
+                  TDC_eturb_cell_start = 0.5d0*pow2(s% mlt_vc_old(k)/sqrt_2_div_3)
+                  TDC_eturb_cell = 0.5d0*pow2(s% mlt_vc(k)/sqrt_2_div_3)
                end if
                d_turbulent_energy_dt_ad = (TDC_eturb_cell - TDC_eturb_cell_start) / dt
             else

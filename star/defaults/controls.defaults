@@ -2284,8 +2284,8 @@
       ! mlt_Pturb_factor
       ! ~~~~~~~~~~~~~~~~
 
-      ! include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
-      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 3d0
+      ! For MESA's momentume equation, include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
+      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 2d0
       ! corresponds to alpha_TDC_Ptdvdt = 1d0, where Pt = (2/3)*rho(k)*(mlt_vc(k)/sqrt(2/3))**2
 
       ! this replaces conv_dP_term_factor.   also see extra_pressure vector and other_pressure routine

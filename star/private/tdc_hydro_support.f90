@@ -475,7 +475,7 @@ contains
       end subroutine revise_lnT_for_QHSE2
 
       subroutine set_Hp_face2(k)
-         use tdc_hydro, only: get_RSP2_alfa_beta_face_weights
+         use tdc_hydro, only: get_TDC_alfa_beta_face_weights
          integer, intent(in) :: k
          real(dp) :: r_00, d_00, Peos_00, Peos_div_rho, Hp_face, &
                      d_m1, Peos_m1, alfa, beta
@@ -488,7 +488,7 @@ contains
          else
             d_m1 = s%rho(k - 1)
             Peos_m1 = s%Peos(k - 1)
-            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
             Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
             Hp_face = pow2(r_00)*Peos_div_rho/(s%cgrav(k)*s%m(k))
          end if
