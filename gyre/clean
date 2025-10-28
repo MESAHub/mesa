@@ -1,3 +1,0 @@
-cd make; make clean
-cd ../test/make; make clean
-cd ../..; rm -rf gyre

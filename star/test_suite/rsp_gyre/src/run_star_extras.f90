@@ -104,7 +104,7 @@ module run_star_extras
          call set_constant('R_SUN', Rsun)
          call set_constant('L_SUN', Lsun)
 
-         call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+         call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/build/gyre/src')
 
          mode_l = 0  ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
