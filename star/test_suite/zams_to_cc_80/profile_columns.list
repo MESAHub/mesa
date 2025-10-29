@@ -496,7 +496,7 @@
 
    !mlt_D
    !mlt_Gamma
-   !mlt_Y_face
+   mlt_Y_face
    !mlt_Zeta
    !mlt_gradT
    !mlt_log_abs_Y
@@ -504,7 +504,7 @@
    !log_mlt_vc
    !dvc_dt_TDC_div_g 
 
-   !superad_reduction_factor
+   superad_reduction_factor
    !conv_vel_div_mlt_vc
 
    !log_Lconv

@@ -20,7 +20,7 @@
       
       ! turn on hydrodynamics
       change_v_flag = .true.
-      new_v_flag = .true.
+      new_v_flag = .false.
 
       ! Can be adopted to avoid issues with surface for high Z or during advanced burning
       !relax_to_this_tau_factor = 1.5d6
@@ -41,7 +41,7 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       ! pgstar is recommended for diagnosing issues and understanding the evolution
-      pgstar_flag = .false.
+      pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
@@ -62,6 +62,8 @@
 
 &controls
 
+remove_mixing_glitches = .false.
+
 ! wind
       ! Dutch scaling factor set in inlist_mass_Z_wind_rotation      
       cool_wind_full_on_T = 0.8d4
@@ -78,6 +80,7 @@
       ! if you run into issues, you can increase Pextra 
       ! extra pressure helps stabilize the atmosphere during core He burning +
      
+!delta_lg_star_mass_limit =5d-4
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
@@ -93,9 +96,20 @@
       D_GSF_factor = 1
       D_ST_factor = 1
 
+
+    ! Fixing the position of the Lagrangian region of the mesh helps
+    ! convergence near the Eddington limit
+    max_logT_for_k_below_const_q = 100
+    max_q_for_k_below_const_q = 0.99
+    min_q_for_k_below_const_q = 0.99
+    max_logT_for_k_const_mass = 100
+    max_q_for_k_const_mass = 0.98
+    min_q_for_k_const_mass = 0.98
+
+
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'TDC'
+      MLT_option = 'Henyey'
 
       ! If you would like to be bold, try radiative damping, although it
       ! is a departure from the mlt limit of 'TDC'
@@ -124,18 +138,18 @@
 ! typically only necessary at higher metallicities 1/5 solar +
 
       ! superadiabatic reduction, implicit, new
-      use_superad_reduction = .false.
+      use_superad_reduction = .true.
       superad_reduction_Gamma_limit = 0.5d0 !default is 0.5d0
       superad_reduction_Gamma_limit_scale = 5d0
       superad_reduction_Gamma_inv_scale = 5d0
-      superad_reduction_diff_grads_limit = 1d-2 ! default is 1d-3
+      superad_reduction_diff_grads_limit = 1d-3 ! default is 1d-3
       superad_reduction_limit = -1d0
 
 
       ! MLT ++, explicit, well tested
-      okay_to_reduce_gradT_excess = .true.
-      gradT_excess_f1 = 1d-4
-      gradT_excess_f2 = 1d-2
+      okay_to_reduce_gradT_excess = .false.
+      !gradT_excess_f1 = 1d-4
+      !gradT_excess_f2 = 1d-2
       !gradT_excess_lambda1 = -1d0 ! full on
 
 ! mixing
@@ -195,9 +209,10 @@
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
-      delta_lgTeff_limit =  0.01
+      delta_lgTeff_limit =  1d-1 !0.01
       delta_lgL_limit = 0.1     
       delta_lgL_He_limit = 0.1
+      delta_lgR_limit = 1d-2     
 
 
       ! Recommend decreasing all three Rho, T, Tmax 
@@ -320,7 +335,7 @@
       max_abs_rel_run_E_err = 1d-2
 
       energy_eqn_option = 'dedt'
-      max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run     
+      max_tries_for_implicit_wind = 10 ! Recommend 10 for a production run     
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
@@ -362,7 +377,7 @@
        write_header_frequency = 10
        terminal_interval      = 10
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
+      report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
 

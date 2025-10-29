@@ -11,7 +11,7 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 60!80
+   initial_mass = 80
    initial_z = 1.42d-2 ! from asplund et al. 2009
    initial_y = 0.2703d0 ! from asplund et al. 2009
    Dutch_scaling_factor = 0.4d0!0.4d0

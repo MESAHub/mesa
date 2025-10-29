@@ -77,11 +77,17 @@ contains
          Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad
       ierr = 0
       r_ad = r
+      r_ad % d1Array = 0d0
       L_ad = L
+      L_ad % d1Array  = 0d0
       T_ad = T
+      T_ad % d1Array  = 0d0
       P_ad = P
+      P_ad % d1Array  = 0d0
       opacity_ad = opacity
+      opacity_ad % d1Array =0d0
       rho_ad = rho
+      rho_ad % d1Array =0d0
       dV_ad = 0d0
       chiRho_ad = chiRho
       chiT_ad = chiT
@@ -89,6 +95,7 @@ contains
       gradr_ad = gradr
       grada_ad = grada
       scale_height_ad = scale_height
+      scale_height_ad % d1Array  = 0d0
       call Get_results(s, 0, MLT_option, &
          r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad, &
          gradr_ad, grada_ad, scale_height_ad, &
@@ -199,13 +206,13 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, pseudoMach, Psi, opacity, gradr
-      real(dp) :: conv_vel_start, scale, eta_edd, eta_factor
+      real(dp) :: conv_vel_start, scale, eta_edd, eta_factor, b
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit, mu
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, L_excess, e_bind, delta_Mdot, &
-         t_dyn, L_rad
+         t_dyn, L_rad, Ddrive, trel, covariance
 
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
@@ -244,16 +251,52 @@ contains
       else
          mu = 0.5d0 ! pure H. as a fallback when k < 1.
       end if
-      pseudoMach = (L / (4d0 * pi * crad * pow2(r) * pow4(T))) * sqrt(mu * mp / (T * boltzm)) ! s%mu(k) *
-      pseudoMach = max(pseudoMach,1d-10)
-      pseudoMach = min(pseudoMach,1d5)
-      Psi = Will_Psi(pseudoMach)
-      if (is_bad(Psi%val)) then
-         write(*,*) pseudoMach
-         write(*,*) Psi
-         stop
-      end if
 
+!      if (s% gradr(k)>s% grada_start(k)) then
+         pseudoMach = (L / (4d0 * pi * crad * pow2(r) * pow4(T))) * sqrt(mu * mp / (T * boltzm)) ! s%mu(k) *
+         pseudoMach = max(pseudoMach,1d-10)
+!         pseudoMach = min(pseudoMach,1d5) ! 1d5
+
+         pseudoMach = smooth_mach_tanh(pseudoMach)
+!      else
+!         pseudoMach = 1d-5
+!      end if
+      Psi = Will_Psi(pseudoMach)
+
+!     Ddrive = 1d-1*pseudoMach*sqrt((T * boltzm) / (mu * mp)) / (s% mixing_length_alpha*scale_height)
+!!write(*,*) 'Ddrive', Ddrive
+!     trel = (3*opacity_in*rho*pow2(s% mixing_length_alpha*scale_height))/clight
+!!write(*,*) 'trel', trel
+!
+!     b = 1d0 + opacity_in % d1Array(i_lnd_00)
+!!write(*,*) 'opacity % d1Array(i_lnd_00)', opacity_in % d1Array(i_lnd_00)
+!     covariance = Ddrive*trel ! sigma_X^2, in the steady state limit
+!!write(*,*) 'covariance', covariance
+!
+!covariance = min(covariance,1d3)
+!
+!
+!     Psi = exp(-b*covariance)
+!
+!!Psi = max(Psi, 1d-3)
+!
+!if (s% model_number < 350) Psi = 1d0
+
+!write(*,*) 'Psi', Psi
+
+
+
+if (pseudoMach%val <= 1d-5) then
+   Psi = 1d0
+ end if
+
+s% xtra1_array(k) = pseudoMach %val!L_excess %val !* t_dyn %val!delta_Mdot %val
+
+if (is_bad(Psi%val)) then
+   write(*,*) pseudoMach
+   write(*,*) Psi
+   stop
+end if
       opacity = opacity_in
       gradr = gradr_in
       gradr_scaled = 0d0
@@ -328,20 +371,20 @@ contains
          ! Experimental method to lower superadiabaticity derived from 3D turbulence models in athena++, see Willium Schultz MLT.
          ! Call TDC again with an artificially reduced opacity and gradr, with an option to drive ml when Lr exceeds Eddington limit.
          ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess and superad_reduction
-         if (.true.) then
+         if (.false.) then
             ! first call
-            if (T <1d7) then
+            if (T <1d7) then ! if zone is convective, recalculate with gradr correction
 
 !               if (k>0) then
 !                  s% xtra1_array(k) = delta_Mdot %val
 !               end if
 
-               Psi = max(Psi, gradL/gradr + 1d-2) ! don't make the zone radiative
+               Psi = max(Psi, gradL/gradr + 1d-4) ! don't make the zone radiative
                Psi = min(Psi,1d0)
 
                
                gradr_scaled = blend_gradr(T, gradr_in, Psi) !gradr* Psi!max(Psi,gradL%val/gradr%val)
-               opacity = blend_gradr(T, opacity_in, Psi)
+               opacity =blend_gradr(T, opacity_in, Psi)
 
                if (k /= 0) s% superad_reduction_factor(k) = Psi %val
                call set_TDC(&
@@ -366,7 +409,6 @@ contains
                   !delta_Mdot = eta_factor*L_excess/e_bind ! assume delta_M/ delta_t,timestep = delta_Mdot
                   !delta_Mdot = delta_M!/t_dyn!*min(1d0/s% dt,1d0/t_dyn %val)
                   !delta_Mdot = max(0d0,delta_Mdot)
-                  s% xtra1_array(k) = pseudoMach %val!L_excess %val !* t_dyn %val!delta_Mdot %val
                end if
                ! extra call to set gradr back to original value in zones that were actually supposed to be radiatve.
                ! call once more with original gradr. inthe futurue we should check the first time not the second time, if the zone was already convective. so
@@ -438,19 +480,23 @@ contains
             end if
          end if
 
-         if (.true.) then ! toggle for envelope turbulence.
-            if (T <1d7 ) then
+
+         if (.false.) then ! toggle for envelope turbulence.
+            if (T <1d7) then
 
 !               write (*,*) 'delta_Mdot', delta_Mdot%val*secyer/Msun
 !               if (k>0) then
 !               s% xtra1_array(k) = delta_Mdot %val
 !               end if
 
-               Psi = max(Psi, gradL/gradr + 1d-4)
+               Psi = max(Psi, gradL/gradr + 1d-3)
                Psi = min(Psi,1d0)
+      
+!               gradr_in = max(Psi*gradr, gradL/gradr + 1d-4)
                !end do
-               gradr_scaled = blend_gradr(T, gradr_in, Psi)!gradr* Psi!max(Psi,gradL%val/gradr%val)
-               opacity = blend_gradr(T, opacity_in, Psi)
+               gradr_scaled = gradr_in*Psi !blend_gradr(T, gradr_in, Psi)!gradr* Psi!max(Psi,gradL%val/gradr%val)
+               opacity = opacity_in*Psi !blend_gradr(T, opacity_in, Psi)
+
 
                if (k /= 0) s% superad_reduction_factor(k) = Psi %val
                ! first call
@@ -464,6 +510,11 @@ contains
                   return
                end if
 
+!write(*,*) 'are we at the first call inside mlt instead?', k
+!
+!                if ((Y_face >0) .and. Psi == 1d0 ) then
+!                write(*,*) "k, solver iter, Y_face, psedau_mach, psi ", k, s% solver_iter, Y_face%val, pseudoMach %val, psi%val
+!                end if
                if (k>0) then
                   Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
    !               if (Lrad_div_Ledd >= 1d0) then
@@ -482,7 +533,7 @@ contains
                ! extra call to set gradr back to original value in zones that were actually supposed to be radiatve.
                ! call once more with original gradr. inthe futurue we should check the first time not the second time, if the zone was already convective. so
                ! only one additional call needs to be made.
-               if  (conv_vel%val< 0d0) then
+               if  (conv_vel%val<= 0d0) then
 
                Psi = 1d0
 
@@ -641,6 +692,31 @@ function blend_gradr(T, gradr_in, Psi) result(gradr)
    end if
 
 end function blend_gradr
+
+
+function smooth_mach_tanh(M) result(M_limited)
+   type(auto_diff_real_star_order1), intent(in) :: M
+   type(auto_diff_real_star_order1) :: M_limited
+   real(dp), parameter :: M0   = 4d3    ! start bending point
+   real(dp), parameter :: Mmax = 5d3    ! asymptotic limit
+   real(dp), parameter :: k    = 1d-2   ! sharpness of roll-off
+   type(auto_diff_real_star_order1) :: dM
+
+   ! difference term for auto-diff math
+   dM = Mmax - M
+
+   ! smooth tanh limiter: linear below M0, asymptotes toward Mmax
+   if (M%val < M0) then
+      ! no limiting below threshold — identity mapping
+      M_limited = M
+   else
+      ! fully differentiable limit for M ≥ M0
+      M_limited = Mmax - (Mmax - M0) * tanh(k * dM)
+   end if
+end function smooth_mach_tanh
+
+
+
    end subroutine Get_results
 
 

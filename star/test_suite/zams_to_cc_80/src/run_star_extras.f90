@@ -187,7 +187,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 1
+         how_many_extra_profile_columns = 2
       end function how_many_extra_profile_columns
 
 
@@ -204,8 +204,10 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          names(1) = 'zbar_div_abar'
+         names(2) = 'pseudoMach'
          do k=1,s% nz
             vals(k,1) = s% zbar(k)/s% abar(k)
+            vals(k,2)  = s% xtra1_array(k)
          end do
       end subroutine data_for_extra_profile_columns
 

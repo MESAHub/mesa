@@ -63,7 +63,7 @@
 &controls
 delta_lg_star_mass_limit = 1d-2
 
-use_other_wind = .true.
+use_other_wind = .false.
 x_ctrl(18) = 1.0e0 !fudge factor / efficiency factor for eruptive mass loss other_wind model
 !min_wind = 1e-8
 mlt_Pturb_factor = 1d0

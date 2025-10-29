@@ -1369,7 +1369,7 @@
          else
              s% delta_lgRho_cntr_limit = 0.02d0 
              s% delta_lgRho_cntr_hard_limit = 0.04d0
-             s% convergence_ignore_equL_residuals = .false.
+             s% convergence_ignore_equL_residuals = .true.
          end if
 
       end function extras_start_step
