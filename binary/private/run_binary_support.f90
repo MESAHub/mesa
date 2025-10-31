@@ -425,11 +425,13 @@ contains
                end if
 
                id = b% star_ids(j)
+               call star_ptr(id, s, ierr)
+               if (failed('star_ptr', ierr)) return
 
                ! Avoid repeating the accretor when using the implicit scheme plus
                ! rotation and implicit winds. When this happens the accretor won't
                ! usually care about the result of the evolution of the donor.
-               if (j == b% a_i .and. b% num_tries >0 .and. s% was_in_implicit_wind_limit) &
+               if (j == b% a_i .and. b% num_tries > 0 .and. s% was_in_implicit_wind_limit) &
                   cycle
 
                ! fix sync timescales to zero. If synching stars these will be
@@ -440,6 +442,7 @@ contains
                   b% t_sync_2 = 0
                end if
 
+               ! evaluates mdot from wind for either star
                result = worst_result(result, &
                   star_evolve_step_part1(id, first_try))
 
@@ -477,9 +480,12 @@ contains
                         j = 3 - k
                      end if
                   end if
-                  id = b% star_ids(j)
 
-                  if (j == b% a_i .and. b% num_tries >0 .and. s% was_in_implicit_wind_limit) &
+                  id = b% star_ids(j)
+                  call star_ptr(id, s, ierr)
+                  if (failed('star_ptr', ierr)) return
+
+                  if (j == b% a_i .and. b% num_tries > 0 .and. s% was_in_implicit_wind_limit) &
                      cycle
 
                   ! set accretion composition
