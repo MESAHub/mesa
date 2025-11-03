@@ -55,7 +55,7 @@ c
      *  nnq1,nnq2,idgnrk
       common/sysord/ ii
       common/ccgrav/ cgrav
-      common/xarra/ x(1)
+      common/xarra/ x(nnmax)
       common/wrklir/ wwwww(300)
       common/worksp/ aa1(iaa1,1)
       common/yyyyyy/ y(iy,1)

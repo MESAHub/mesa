@@ -346,7 +346,7 @@ c
      *        'write amde, nw1, nn =',nw1, nn
 	  end if
         end if
-        call flush(idsefn)
+        flush(idsefn)
         idsn=4
         if(istdpr.gt.0) write(istdpr,195) idsn, nfmode
       end if
@@ -355,7 +355,7 @@ c  output grand summary
 c
       if(idsgsm.gt.0.and.nscfil(idsgsm)) then
         write(idsgsm) csummm
-        call flush(idsgsm)
+        flush(idsgsm)
       end if
 c
 c  set and output short summary
@@ -364,7 +364,7 @@ c
         call setssm(csummm,icsumm,ssummm,issumm,ssmmod,irsmod)
         if(irsmod.eq.1) write(idsssm) ssmmod
         write(idsssm) ssummm
-        call flush(idsssm)
+        flush(idsssm)
       end if
 c
 c  set mode quantities in common/cobs_param/

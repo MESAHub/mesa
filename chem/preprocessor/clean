@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-cd make
-make clean
-cd ..
-
-rm -rf cchem data
-
