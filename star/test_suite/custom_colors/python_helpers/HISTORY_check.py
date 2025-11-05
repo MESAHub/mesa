@@ -11,7 +11,68 @@ from static_HISTORY_check import (
     # get_mesa_phase_info,
     read_header_columns,
     setup_hr_diagram_params,
+    MesaView,
 )
+
+
+# ---------------------------
+# Insert after imports (HISTORY_check.py)
+# ---------------------------
+import matplotlib as mpl
+
+def age_colormap_colors(ages, cmap_name='inferno', recent_fraction=0.25, stretch=5.0):
+    """
+    Map ages -> RGBA colors with these properties:
+      - cmap_name: 'inferno'|'plasma'|'magma', etc.
+      - recent_fraction: fraction (0..1) of the top of the age range that
+                         receives most of the color variation (default 0.25).
+      - stretch: non-linear exponent applied to normalized ages to compress older ages.
+                 larger -> more compression of old ages (default 5.0).
+    Behavior:
+      - Colors update with the min/max of `ages` passed in each call.
+      - We first normalize ages to [0,1] using current min/max.
+      - Apply non-linear transform that compresses the lower (1-recent_fraction)
+        and expands the top `recent_fraction` so the most recent quarter is "hot".
+    """
+    ages = np.asarray(ages, dtype=float)
+    # handle degenerate case
+    if ages.size == 0:
+        return np.zeros((0,4))
+
+    amin, amax = ages.min(), ages.max()
+    span = amax - amin if amax > amin else 1.0
+    nrm = (ages - amin) / span
+    # Nonlinear compressor that allocates most dynamic range to the top `recent_fraction`.
+    # We'll compress lower portion via a power transform, then rescale piecewise.
+    rf = float(np.clip(recent_fraction, 1e-6, 0.99))
+    # first apply power-law compression to whole range (older ages -> smaller)
+    nrm_pow = nrm ** stretch
+
+    # Now remap such that nrm_pow in [0, 1-rf] -> [0, 0.05] (very dark ramp),
+    # and nrm_pow in [1-rf,1] -> [0.05,1.0] (main color variation).
+    cutoff = 1.0 - rf
+    below = nrm_pow <= cutoff
+    above = ~below
+    remapped = np.empty_like(nrm_pow)
+    if cutoff <= 0:
+        # degenerate: everything treated as recent
+        remapped = nrm_pow
+    else:
+        # compress the big older chunk into a small lower band [0, low_band]
+        low_band = 0.02  # almost-black band for the old bulk
+        # linear rescale below cutoff into [0, low_band]
+        if below.any():
+            remapped[below] = (nrm_pow[below] / cutoff) * low_band
+        # rescale above cutoff into [low_band, 1.0]
+        if above.any():
+            remapped[above] = low_band + ((nrm_pow[above] - cutoff) / (1.0 - cutoff)) * (1.0 - low_band)
+
+    # Ensure in [0,1]
+    remapped = np.clip(remapped, 0.0, 1.0)
+
+    cmap = mpl.cm.get_cmap(cmap_name)
+    colors = cmap(remapped)   # RGBA Nx4
+    return colors
 
 
 def get_improved_mesa_phase_info(phase_code):
@@ -42,27 +103,36 @@ def get_improved_mesa_phase_info(phase_code):
 
 
 def get_phase_info_from_mesa(md):
-    """Get evolutionary phase information using MESA's phase_of_evolution with improved colors."""
-
-    # Check if phase_of_evolution exists in the data
+    """Get evolutionary phase information using MESA's phase_of_evolution if present.
+       If missing, return None phase names and AGE-driven colors (inferno by default)."""
+    # If present, use original behavior (map codes to names/colors)
     if hasattr(md, "phase_of_evolution"):
         phase_codes = md.phase_of_evolution
-    else:
-        print("Warning: phase_of_evolution not found in history file.")
-        print("Make sure to add 'phase_of_evolution' to your history_columns.list")
-        # Fallback to unknown phase
-        n_models = len(md.model_number)
-        phase_codes = np.full(n_models, -1)
+        phases = []
+        phase_colors = []
+        for code in phase_codes:
+            phase_name, color = get_improved_mesa_phase_info(int(code))
+            phases.append(phase_name)
+            phase_colors.append(color)
+        return phases, phase_colors
 
-    phases = []
-    phase_colors = []
+    # fallback: color by age using inferno colormap, updated every call
+    # Warning message kept (but only once)
+    print("Warning: phase_of_evolution not found in history file.")
+    print("Make sure to add 'phase_of_evolution' to your history_columns.list")
+    ages = getattr(md, "star_age", None)
+    if ages is None:
+        # nothing to color
+        return [], []
 
-    for code in phase_codes:
-        phase_name, color = get_improved_mesa_phase_info(int(code))
-        phases.append(phase_name)
-        phase_colors.append(color)
-
+    # choose params: recent_fraction=0.25 compress older ages heavily (stretch=5)
+    colors = age_colormap_colors(ages, cmap_name='jet', recent_fraction=0.25, stretch=5.0)
+    # produce placeholder phase names (None or empty is fine)
+    phases = [None] * len(colors)
+    phase_colors = list(colors)
     return phases, phase_colors
+
+
 
 
 def get_filter_colors(filter_names):
@@ -162,6 +232,9 @@ class HistoryChecker:
         try:
             # Read the MESA data
             self.md = mr.MesaData(self.history_file)
+            self.md = MesaView(self.md, 5)
+            # after: self.phases, self.phase_colors = get_phase_info_from_mesa(self.md)
+            self.has_phase = hasattr(self.md, "phase_of_evolution")
 
             # Basic stellar parameters
             self.Teff = self.md.Teff
@@ -194,29 +267,20 @@ class HistoryChecker:
             print(f"Error reading history data: {e}")
 
     def create_phase_legend(self):
-        """Create legend for evolutionary phases."""
-        unique_phases = []
-        unique_colors = []
+        unique_phases, unique_colors = [], []
         for phase, color in zip(self.phases, self.phase_colors):
+            if phase is None:          # ignore fallback age-color entries
+                continue
             if phase not in unique_phases:
                 unique_phases.append(phase)
                 unique_colors.append(color)
-
-        legend_elements = [
-            plt.Line2D(
-                [0],
-                [0],
-                marker="o",
-                color="w",
-                markerfacecolor=color,
-                markersize=8,
-                label=phase,
-                markeredgecolor="none",
-            )
+        return [
+            plt.Line2D([0],[0], marker="o", color="w",
+                       markerfacecolor=color, markersize=8, label=phase,
+                       markeredgecolor="none")
             for phase, color in zip(unique_phases, unique_colors)
         ]
 
-        return legend_elements
 
     def update_plot(self, frame):
         """Update the plot with new data if the file has changed."""
@@ -338,27 +402,32 @@ class HistoryChecker:
                 alpha=0.8,
             )
 
-        # Add legend to filter plot
-        self.axes[1, 1].legend()
 
         # Add evolutionary phase legend at the top of the figure
-        if len(self.phases) > 0:
-            legend_elements = self.create_phase_legend()
-            # Calculate number of columns for max 2 rows
-            n_phases = len(legend_elements)
-            ncol = max(1, (n_phases + 1) // 1)  # Ceiling division to get max 2 rows
+        if len(self.phases) > 1:
+            # Add legend to filter plot
+            self.axes[1, 1].legend()
 
-            self.fig.legend(
-                handles=legend_elements,
-                loc="upper center",
-                bbox_to_anchor=(0.5, 0.53),
-                ncol=ncol,
-                title_fontsize=10,
-                fontsize=10,
-                frameon=True,
-                fancybox=True,
-                shadow=True,
-            )
+        # --- legend block ---
+        if getattr(self, "has_phase", False):
+            legend_elements = self.create_phase_legend()
+            if len(legend_elements) > 0:
+                # optional: also keep the filter legend on bottom-right axes
+                self.axes[1, 1].legend()
+
+                n_phases = len(legend_elements)
+                ncol = max(1, (n_phases + 1) // 1)  # same as before; tweak if needed
+                self.fig.legend(
+                    handles=legend_elements,
+                    loc="upper center",
+                    bbox_to_anchor=(0.5, 0.53),
+                    ncol=ncol,
+                    title_fontsize=10,
+                    fontsize=10,
+                    frameon=True,
+                    fancybox=True,
+                    shadow=True,
+                )
 
         # Adjust layout to make room for top legend
         plt.tight_layout()
