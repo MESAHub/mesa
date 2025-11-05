@@ -8,7 +8,7 @@
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
    pre_ms_relax_to_start_radiative_core = .false.
-      
+
 / ! end of star_job namelist
 
 &controls
@@ -41,4 +41,3 @@
    overshoot_f0(1) = 0.005
 
 / ! end of controls namelist
-

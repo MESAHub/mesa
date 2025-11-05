@@ -94,12 +94,14 @@
 ! Get range for efa > 0
       do i = 1, 4
          do jh = jhmin, jhmax
-            if(efa(i, jh) <= 0.)then
+            if (efa(i, jh) <= 0.) then
                jm = jh - 1
-               jhmax = min(jhmax, jm)
-               cycle
+               GOTO 3
             end if
          end do
+         GOTO 4
+    3    jhmax = min(jhmax, jm)
+    4    continue
       end do
 
 ! Get flrh
@@ -118,7 +120,7 @@
       end do
 
 !  Check range of flrho
-      if(flrho < flrmin .or. flrho > flrmax)then
+      if (flrho < flrmin .or. flrho > flrmax) then
          write(*,*) "findne failed because density is out of range for logT, logRho", flt, flrho
          write(*,*) "Allowed range for logRho is",flrmin," to ",flrmax
          ierr = 101
@@ -129,13 +131,13 @@
       do jh = jhmin, jhmax
          if (flrh(2,jh) > flrho) then
             jm = jh - 1
-            cycle
+            GOTO 5
          end if
-         write(*,*) ' Interpolations in j for flne'
-         write(*,*) ' Not found, i=',i
-         stop
       end do
-      jm=max(jm,jhmin+1)
+      write(*,*) ' Interpolations in j for flne'
+      write(*,*) ' Not found, i=',i
+      stop
+    5 jm=max(jm,jhmin+1)
       jm=min(jm,jhmax-2)
 
       do i = 1, 4

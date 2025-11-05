@@ -120,6 +120,7 @@ Developers
 * `Anne Thoul <https://scholar.google.be/citations?user=pVXttZoAAAAJ&hl=fr>`__
 * `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
+* `Vincent Vanlaer <https://www.kuleuven.be/wieiswie/en/person/00149901>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
 
 Past Developers
@@ -127,7 +128,7 @@ Past Developers
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
 * `Aaron Dotter <https://aarondotter.github.io/>`__
-* `Robert Farmer <http://rjfarmer.io/>`__
+* Robert Farmer
 * `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__

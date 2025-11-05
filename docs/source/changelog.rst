@@ -7,10 +7,34 @@ Changelog
 .. note:: This section describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
 
 
-
-
 Changes in main
 ===============
+
+
+.. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
+
+
+.. _New Features main:
+
+New Features
+------------
+
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+
+.. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
+
+
+
+Changes in r25.10.1-rc1
+=======================
 
 Upgraded software license from LGPL-v2.1 to LGPL-v3.0
 
@@ -68,13 +92,16 @@ Changed the default for ``use_radiation_corrected_transfer_rate =
 
 A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
 
+``hydro_rotation`` now contains the more accurate deformation fits from `Fabry et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.123F/abstract>`_.
+
 Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
 These functions can now be called in your custom ``run_star_extras.f90`` file, for data in a star, getting relevant timescales.
 
-``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
+The terminal header ``lg_Lnuc`` has been renamed to ``lg_Lnuc_tot`` as it includes photodisintegration and is analogous to the
+history column ``log_power_nuc_burn``, and is not equivalent to ``log_Lnuc`` which does not include photodisintegration.
 
 ``hydro_rotation`` now supports the use of stellar-structure corrections for tidally deformed stars
-in the Roche potential. Following Fabry+2022, A&A 661, A123, ``binary/private/binary_roche_deformation.f90``
+in the Roche potential. Following `Fabry et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.123F/abstract>`_, ``binary/private/binary_roche_deformation.f90``
 calculates the corrections ``fp``, ``ft``, and the specific moments of inertial ``i_rot`` as function of
 the mass ratio and fractional radius r/RL.
 The values are interpolated from results of an integration grid (there are no simple analytical fits like in
@@ -107,7 +134,7 @@ Users can switch between either choice with the new logical control ``report_max
 See the ``&controls`` for further details.
 
 L2 mass-loss fraction according to Lu et al. (2023) is available as a public function in the bindary moduele:
-``binary_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, disk_alpha, disk_mu, ierr)``.  
+``binary_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, disk_alpha, disk_mu, ierr)``.
 
 .. _Bug Fixes main:
 
@@ -513,11 +540,11 @@ like to see the changes without modifying the file.
 For convenience, we have also included a bash script that will call a version of
 this ``sed`` command (along with ``sed`` commands for the next changelog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
-where you want to update every inlist by invoking ::
+where you want to update every inlist by invoking
 
 .. code-block:: console
 
-  $MESA_DIR/scripts/update_inlists.sh
+    $MESA_DIR/scripts/update_inlists.sh
 
 This script will save the previous versions of your inlists to a directory named
 ``backup_inlists``.

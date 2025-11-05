@@ -15,7 +15,7 @@ fi
 
 # check that the changelog has been updated
 if ! grep -q "Changes in ${VERSION}" docs/source/changelog.rst; then
-	echo "Error: Please update the changelog by moving 'Changes in main' to a new section called 'Changes in ${VERSION}' and add a new 'Changes in main' section at the top of the file following 'changelog_template.rst'. Make sure this change is committed in the 'main' development branch of MESA."
+	echo "Error: Please update the changelog by moving 'Changes in main' to a new section called 'Changes in ${VERSION}' and add a new 'Changes in main' section at the top of the file following the example in 'changelog_template.rst'. Make sure this change is committed in the 'main' development branch of MESA before proceeding with the release."
 	exit 1
 fi
 

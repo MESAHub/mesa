@@ -150,7 +150,7 @@
       delta_lgT_max_limit_only_after_near_zams = .true.
       delta_lgT_max_limit_lgT_min = 7d0!6.5d0
       delta_lgT_max_limit = 0.001     
-      delta_lgT_max_hard_limit = 0.01
+      delta_lgT_max_hard_limit = -1
 
       delta_lgL_power_photo_limit = 0.01d0
       delta_lgL_power_photo_hard_limit = 0.02d0
@@ -207,7 +207,7 @@
       !warn_when_large_rel_run_E_err = 1d99
 
       use_gold2_tolerances = .false.
-      use_gold_tolerances = .false.
+      use_gold_tolerances = .true.
       
       scale_max_correction = 0.1d0
       ignore_species_in_max_correction = .true.
@@ -220,8 +220,7 @@
       max_safe_logT_for_rates = 10.5d0
       
 
-      !Pextra_factor = 1 ! for atm
-      Pextra_factor = 1d2 ! for atm
+      Pextra_factor = 2 ! for atm
 
       !op_split_burn = .true.
       !op_split_burn_min_T = 1d9
@@ -326,10 +325,10 @@
 !pgstar_interval = 1
 
 ! x-axis limits and properties
-Profile_Panels3_xaxis_name = 'mass'
-Profile_Panels3_xmin = 0.0
-Profile_Panels3_xmax = 2.0
-Profile_Panels3_xaxis_reversed = .false.
+Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xmin = -101d0!0.0
+Profile_Panels3_xmax = -101d0!2.0
+Profile_Panels3_xaxis_reversed = .true.
 
 
 / ! end of pgstar namelist

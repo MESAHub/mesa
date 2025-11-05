@@ -4,7 +4,7 @@
 Test Suite
 **********
 
-MESA includes a comprehensive test suite.
+MESA includes a comprehensive test suite, showcasing MESA's capabilities and serving as a project starting point, but often requiring modifications for science-grade accuracy.
 
 Building upon test suite cases
 ------------------------------

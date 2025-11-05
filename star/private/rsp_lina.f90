@@ -344,7 +344,7 @@
          GGYP=POM*(POM2*dY_dT_out(I)+Y_face(I)*0.5d0*dCp_dT_00(I+1))
          GPF=GG/FF
 
-!        corelation PI defined without e_t
+!        correlation PI defined without e_t
          POM=1.d0
 
          PII(I)=POM*GG

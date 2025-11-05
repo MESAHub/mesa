@@ -1192,7 +1192,10 @@
                if (k > 1) val = log(s% rho_face(k-1)/s% rho_face(k)) / (s% lnR(k-1) - s% lnR(k))
 
             case (p_dvdt_grav)
-               val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
+                  val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
+            case (p_grav_eff)
+                  int_val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
+                  val = s% dxh_v(k)/s%dt / (int_val * s% cgrav(k) * s% m(k) /(s% r(k)*s% r(k)))
             case (p_dvdt_dPdm)
                if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% Peos(k-1) - s% Peos(k))/s% dm_bar(k)
 
@@ -1222,9 +1225,10 @@
                if (abs(s% gradr(k) - s% grada_face(k)) > 1d-20) &
                   val = (s% gradr(k) - s% gradT(k))/(s% gradr(k) - s% grada_face(k))
             case (p_mlt_Pturb)
-               if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
+               if (s% mlt_Pturb_factor > 0d0 .and. s% okay_to_set_mlt_vc) then
+                if (s% mlt_vc_old(k) > 0d0) &
                   val = s% mlt_Pturb_factor*pow2(s% mlt_vc(k))*get_rho_face_val(s,k)/3d0
-
+               end if
             case (p_grad_density)
                val = s% grad_density(k)
             case (p_grad_temperature)
@@ -1898,11 +1902,11 @@
             case(p_PII_face)
                if (rsp_or_w) val = s% PII(k)
             case(p_Chi)
-               if (rsp_or_w) val = s% Chi(k)
+                val = s% Chi(k)
             case(p_Eq)
-               if (rsp_or_w) val = s% Eq(k)
+               val = s% Eq(k)
             case(p_Uq)
-               if (rsp_or_w) val = s% Uq(k)
+               val = s% Uq(k)
             case(p_Lr)
                val = get_Lrad(s,k)
             case(p_Lr_div_L)

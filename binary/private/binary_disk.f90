@@ -30,8 +30,8 @@ module binary_disk
    ! more numerical constants
    real(dp), parameter :: one_fourth = 1.0_dp / 4.0_dp
    real(dp), parameter :: seven_fourths = 7.0_dp / 4.0_dp
-   real(dp), parameter :: one_eigth = 1.0_dp / 8.0_dp
-   real(dp), parameter :: three_eigths = 3.0_dp / 8.0_dp
+   real(dp), parameter :: one_eighth = 1.0_dp / 8.0_dp
+   real(dp), parameter :: three_eighths = 3.0_dp / 8.0_dp
    real(dp), parameter :: one_ninth = 1.0_dp / 9.0_dp
    real(dp), parameter :: four_twentyseventh = 4.0_dp / 27.0_dp
 
@@ -76,6 +76,12 @@ contains
 
       ierr = 0
 
+      if (mass_transfer_rate < eps_small) then
+         ! no mass transfer, so no L2 mass loss
+         fL2 = 0.0_dp
+         return
+      end if
+
       ! key parameters
       M2 = accretor_mass * Msun
       M1dot = mass_transfer_rate * Msun/secyer
@@ -96,7 +102,7 @@ contains
 
       ! outer disk radius
       Rd_over_a = pow4(1.0_dp - xL1) / mu
-      ! relavent potential energies
+      ! relevant potential energies
       PhiL1_dimless = -((1.0_dp - mu)/abs(xL1) + mu/abs(1.0_dp - xL1) + 0.5_dp*(xL1 - mu)**2)  ! [G(M1+M2)/a]
       PhiL2_dimless = -((1.0_dp - mu)/abs(xL2) + mu/abs(1.0_dp - xL2) + 0.5_dp*(xL2 - mu)**2)  ! [G(M1+M2)/a]
       PhiRd_dimless = -(1.0_dp - mu + mu/Rd_over_a + 0.5_dp*(1.0_dp - mu)**2)
@@ -186,14 +192,11 @@ contains
       ! solution
       the = 0.5_dp * (the_left + the_right)
       T = T_the_nofL2(the, logthe_grid, logT_arr, n_the, dlogthe)
-      the_max = sqrt(three_eigths * c2 * T + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eigth)
+      the_max = sqrt(three_eighths * c2 * T + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eighth)
 
       if (the < the_max) then
-         ! return a tiny numner
+         ! return a tiny number
          fL2 = eps_small
-      else if (mass_transfer_rate < eps_small) then
-         ! no mass transfer, so no L2 mass loss
-         fL2 = 0.0_dp
       else
          the_min = ( 0.5_dp * sqrt((PhiL2 - PhiRd) / (GM2 / Rd) - 0.5_dp) )  ! corresponding to fL2=1, T=0
          ! need to find the maximum corresponding to fL2=0
@@ -217,8 +220,8 @@ contains
 
          ! -- do not use exactly the_min (corresponding to T = 0, bc. kap table breaks down)
          ! -- define another the_min based on T_floor (kap table won't be a problem)
-         the_min = sqrt( three_eigths * c2 * T_floor &
-                       + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eigth )
+         the_min = sqrt( three_eighths * c2 * T_floor &
+                       + one_fourth * (PhiL2 - PhiRd) / (GM2 / Rd) - one_eighth )
          the_left = the_min
          f2_left = f2_the_T_fL2(the_left, &
                                 T_the(the_left, c2, PhiL2, PhiRd, GM2, Rd), &

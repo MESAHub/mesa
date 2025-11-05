@@ -306,8 +306,8 @@
          ICAT=1
       end if
 !-
-      PRECR = 1.d-10  !PRECISION FOR NEWTON-RHAPSON ITERATIONS
-      DXH = 0.01d0   !UNDERCORRECTION FOR NEWTON-RHAPSON CORRECTIONS
+      PRECR = 1.d-10  !PRECISION FOR NEWTON-RAPHSON ITERATIONS
+      DXH = 0.01d0   !UNDERCORRECTION FOR NEWTON-RAPHSON CORRECTIONS
       DDT = -dm(NZN)/1000.d0  !INITIAL CHANGE IN OUTER ZONE MASS
 
       IOP = 0
@@ -660,7 +660,7 @@
          GGYP=POM*(POM2*dY_dT_out(I)+Y_face(I)*0.5d0*dCp_dT_00(I+1))
          GPF=GG/FF
 
-!        corelation PI defined without e_t
+!        correlation PI defined without e_t
          POM=1.d0
 
          PII(I)=POM*GG
@@ -1056,7 +1056,7 @@
          HD(11,IW) = (DLRP+DLCXP(I)+DLTXP(I))/L0     !X(i+1)
          HD(7,IW)  = (     DLCZ0(I)+DLTZ0(I))/L0     !Z(i)
          HD(10,IW) = (     DLCZP(I)+DLTZP(I))/L0     !Z(i+1)
-!        CALC MOMEMTUM EQUATION(I)
+!        CALC MOMENTUM EQUATION(I)
          T1=-P4*(R(I)**2)/dm_bar(I)
          if(I==NZN) then
             HR(IR) = -T1*(Psurf-P(I)-PTURB(I))+G*M(I)/R(I)**2
