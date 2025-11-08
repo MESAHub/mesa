@@ -317,6 +317,8 @@
    x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)
 
+   x_ctrl(17) = 2d4 ! km/s : if surface exceeds 20,000 km/s, cap vsurf with fixed velocity BC. 
+
    x_logical_ctrl(1) = .true.! If true, terminate after evolving 100d after first relax
                               ! meant for use in the test_suite
                               ! (stop_100d_after_pulse)

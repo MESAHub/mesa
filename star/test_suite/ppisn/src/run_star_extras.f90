@@ -93,6 +93,7 @@
       !logical :: remove_extended_layers, in_inlist_pulses
       logical :: in_inlist_pulses
       real(dp) :: max_dt_before_pulse
+      real(dp) :: vsurf_for_fixed_bc
       real(dp) :: max_Lneu_for_mass_loss
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
@@ -154,6 +155,7 @@
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
          stop_100d_after_pulse = s% x_logical_ctrl(1)
+         vsurf_for_fixed_bc = s% x_ctrl(17)
 
          ! we store the value given in inlist_ppisn and deactivate it at
          ! high T
@@ -833,7 +835,9 @@
          ! be sure power info is stored
          call star_set_power_info(s)
 
-         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
+         ! sets initial rotation profile at helium ZAMS, when rotation is turned on in inlist_pulses
+         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams) .and. &
+            s% job% change_rotation_flag .and. s% job% new_rotation_flag) then
             lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
             if (lburn_div_lsurf > 0d0) then
                if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
@@ -1252,7 +1256,24 @@
             else
                s% max_timestep = max_dt_before_pulse
             end if
-         else
+
+            ! sweep and ensure speeds are below ~ 6.7% speed of light, 20,000 km/s. For surface layers.
+            do k=1, s% nz
+               s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
+               s% u(k) = s% xh(s% i_u,k)
+            end do
+
+            ! use fixed_vsurf if surface v remains too high
+            if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
+               s% use_fixed_vsurf_outer_BC = .true.
+               s% use_momentum_outer_BC = .false.
+               s% fixed_vsurf = 1d5*vsurf_for_fixed_bc
+            else
+               s% use_fixed_vsurf_outer_BC = .false.
+               s% use_momentum_outer_BC = .true.
+            end if
+
+         else ! not using hydro (u_flag = .false.)
             s% max_timestep = 1d99
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
@@ -1332,6 +1353,10 @@
          if (ierr /= 0) return
 
          extras_finish_step = keep_going
+
+         if (s% use_fixed_vsurf_outer_BC .and. mod(s% model_number,10) == 0) then
+            write(*,*) "Using fixed_vsurf", s% fixed_vsurf/1e5
+         end if
 
          !count time since first collapse
          if (s% lxtra(lx_have_reached_gamma_limit)) then
