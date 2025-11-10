@@ -277,7 +277,7 @@
             r00, rp1, v00, vp1, Ap1, &
             r00_start, rp1_start, dr3, dr3_start, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
-         integer :: j, nz, ionization_k, klo, khi, i, ii
+         integer :: j, nz, ionization_k, klo, khi, i, ii, ierr
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor
          logical :: rsp_or_w
          include 'formats'
@@ -554,6 +554,12 @@
                val = safe_log10(s% r(k))
             case (p_logR)
                val = safe_log10(s% r(k)/Rsun)
+            case (p_psi_roche)
+               if (.not. associated(s% binary_get_roche_potential)) then
+                  val = -99d0
+               else
+                  call s% binary_get_roche_potential(s% id, s% r(k), val, ierr)
+               end if
 
             case (p_q)
                val = s% q(k)

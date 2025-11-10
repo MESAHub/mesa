@@ -25,8 +25,6 @@
     set_cumulative_energy_error_at_step = 1
     new_cumulative_energy_error = 0d0
 
-    !pgstar_flag = .true.
-
 / ! end of star_job namelist
 
 

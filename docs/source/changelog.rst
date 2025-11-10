@@ -94,12 +94,22 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from `Fabry et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.123F/abstract>`_.
 
-
 Exposed ``star_utils`` functions ``star_weighted_smoothing``, ``star_threshold_smoothing``, ``star_kh_time_scale`` to the user.
 These functions can now be called in your custom ``run_star_extras.f90`` file, for data in a star, getting relevant timescales.
 
 The terminal header ``lg_Lnuc`` has been renamed to ``lg_Lnuc_tot`` as it includes photodisintegration and is analogous to the
 history column ``log_power_nuc_burn``, and is not equivalent to ``log_Lnuc`` which does not include photodisintegration.
+
+``hydro_rotation`` now supports the use of stellar-structure corrections for tidally deformed stars
+in the Roche potential. Following `Fabry et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022A%26A...661A.123F/abstract>`_, ``binary/private/binary_roche_deformation.f90``
+calculates the corrections ``fp``, ``ft``, and the specific moments of inertial ``i_rot`` as function of
+the mass ratio and fractional radius r/RL.
+The values are interpolated from results of an integration grid (there are no simple analytical fits like in
+the rotating-star potential), with an estimated error lower than 2%.
+Currently, the supported mass-ratio range is -3 < log q < 3, and any radius larger than r/RL > 1.61 is evaluated
+at the edge of the grid.
+To start using tidal deformation corrections, put ``use_tidal_deformation = .true.`` in your ``&binary_controls``
+inlist.
 
 For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
 a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide

@@ -19,7 +19,7 @@
 
 ! Routine eval_fp_ft for computing rotation corrections to the stellar structure equations.
 ! Following the method of Kippenhahn & Thomas, 1970; Endal & Sofia 1976, as implemented in
-! Paxton et al., 2019, using the updated fits from Fabry, Marchant & Sana, 2022
+! Paxton et al., 2019 (MESA V), using the updated fits from Fabry, Marchant & Sana, 2022, A&A 661:A123.
 
       module hydro_rotation
 
@@ -109,7 +109,7 @@
 
       ! compute w_div_w_roche for a known specific angular momentum jrot, rpsi, and Mphi
       real(dp) function w_div_w_roche_jrot(rpsi, Mphi, jrot, cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
-         real(dp), intent(in) :: rpsi,Mphi,jrot,cgrav, max_w, max_w2
+         real(dp), intent(in) :: rpsi, Mphi, jrot, cgrav, max_w, max_w2
          logical, intent(in) :: w_div_wc_flag
          real(dp) :: wr, wr_high, wr_low, dimless_factor, new_dimless_factor
          real(dp) :: w2, w4, w6, w_log_term, jr_lim1, jr_lim2
@@ -178,6 +178,54 @@
 
       end function w_div_w_roche_jrot
 
+      subroutine eval_i_rot(id, r00, w_div_w_crit_roche, i_rot)
+         use auto_diff_support
+
+         integer, intent(in) :: id
+         real(dp), intent(in) :: r00,w_div_w_crit_roche
+         type (auto_diff_real_star_order1), intent(out) :: i_rot
+
+         type (star_info), pointer :: s
+         type (auto_diff_real_2var_order1) :: ir, r, re, w, w2, w4, w6, lg_one_sub_w4, B, A
+         integer :: ierr
+
+         include 'formats'
+
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         i_rot = 0d0
+         if (s% simple_i_rot_flag) then
+            i_rot = two_thirds*r00*r00
+            i_rot% d1Array(i_lnR_00) = 2*i_rot% val
+            i_rot% d1Array(i_w_div_wc_00) = 0d0
+         else
+            ! Compute i_rot following Paxton et al. 2019 (ApJs, 243, 10)
+            w = w_div_w_crit_roche
+            w%d1val1 = 1d0
+
+            r = r00
+            r%d1val2 = r00 ! Makes the independent variable lnR
+
+            w2 = pow2(w)
+            w4 = pow4(w)
+            w6 = pow6(w)
+            lg_one_sub_w4 = log(1d0-w4)
+            re = r*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
+            B = (1d0+w2/5d0-0.2735d0*w4-0.4327d0*w6-3d0/2d0*0.5583d0*lg_one_sub_w4)
+            A = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
+
+            ir =  two_thirds*pow2(re)*B/A
+
+            i_rot = 0d0
+            i_rot = ir%val
+            i_rot% d1Array(i_w_div_wc_00) = ir%d1val1
+            i_rot% d1Array(i_lnR_00) = ir%d1val2
+         end if
+
+      end subroutine eval_i_rot
+
+
       subroutine set_i_rot(s, skip_w_div_w_crit_roche)
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
@@ -188,13 +236,12 @@
          do k=1,s% nz
             if (.not. skip_w_div_w_crit_roche) then
                s% w_div_w_crit_roche(k) = &
-                  w_div_w_roche_jrot(s% r(k),s% m(k),s% j_rot(k),s% cgrav(k), &
+                  w_div_w_roche_jrot(s% r(k), s% m(k), s% j_rot(k), s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             end if
-            call eval_i_rot(s, k, s% r(k), s% w_div_w_crit_roche(k), s% i_rot(k))
+            call set1_i_rot(s, k, s% r(k))
          end do
 !$OMP END PARALLEL DO
-
       end subroutine set_i_rot
 
       subroutine set_i_rot_from_omega_and_j_rot(s)
@@ -202,6 +249,8 @@
          type (star_info), pointer :: s
          integer :: k
          include 'formats'
+
+!$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic, 2)
          do k=1,s% nz
             if (s% omega(k) /= 0d0) then
                ! we can directly compute i_rot using j_rot and omega
@@ -211,15 +260,18 @@
                call update1_i_rot_from_xh(s, k)
             end if
          end do
+!$OMP END PARALLEL DO
       end subroutine set_i_rot_from_omega_and_j_rot
 
       subroutine set_j_rot(s)
          type (star_info), pointer :: s
          integer :: k
          include 'formats'
+!$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic, 2)
          do k=1,s% nz
             s% j_rot(k) = s% i_rot(k)% val*s% omega(k)
          end do
+!$OMP END PARALLEL DO
       end subroutine set_j_rot
 
       subroutine set_omega(s, str)
@@ -227,9 +279,11 @@
          character (len=*) :: str
          integer :: k
          include 'formats'
+!$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic, 2)
          do k=1,s% nz
             s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
          end do
+!$OMP END PARALLEL DO
       end subroutine set_omega
 
       subroutine check_omega(s, str)
@@ -256,40 +310,89 @@
          integer, intent(in) :: k
          real(dp) :: r00
          include 'formats'
-
-         r00 = get_r_from_xh(s,k)
-
-         call eval_i_rot(s, k, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
+         r00 = get_r_from_xh(s, k)
+         call set1_i_rot(s, k, r00)
       end subroutine update1_i_rot_from_xh
+
+      subroutine set1_i_rot(s, k, r)
+         use auto_diff
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: r
+         integer, intent(in) :: k
+
+         type (auto_diff_real_star_order1) :: i_rot_single, i_rot_tidal
+
+         if (s% use_other_eval_i_rot) then
+            call s% other_eval_i_rot(s% id, k, r, s% w_div_w_crit_roche(k), s% i_rot(k))
+         else
+            call eval_i_rot(s% id, r, s% w_div_w_crit_roche(k), i_rot_single)
+            if (associated(s% binary_other_irot)) then
+               call s% binary_other_irot(s% id, r, i_rot_tidal)
+               call blend_tidal_values(s, k, i_rot_single, i_rot_tidal, s% omega(k), s% i_rot(k))
+            else
+               s% i_rot(k) = i_rot_single
+            end if
+         end if
+      end subroutine set1_i_rot
+
+      subroutine blend_tidal_values(s, k, single, tidal, omega, final)
+         use auto_diff
+
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: omega
+         type (auto_diff_real_star_order1), intent(in) :: single, tidal
+         type (auto_diff_real_star_order1), intent(out) :: final
+
+         real(dp) :: tidal_frac
+         integer :: ierr
+
+         include 'formats'
+
+         ! do blending with tidal case according to synchronicity
+         if (associated(s% binary_deformation_switch_fraction)) then
+            call s% binary_deformation_switch_fraction(s% id, k, omega, tidal_frac, ierr)  ! tells how much of the tidal value we should use
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*, 1) "failed in blend_tidal_values"
+            end if
+         end if
+         final = tidal_frac * tidal + (1d0 - tidal_frac) * single
+      end subroutine blend_tidal_values
 
       subroutine use_xh_to_update_i_rot(s)
          type (star_info), pointer :: s
          integer :: k
+         real(dp) :: r00
+
+!$OMP PARALLEL DO PRIVATE(k, r00) SCHEDULE(dynamic,2)
          do k=1,s% nz
             if (s% j_rot(k) /= 0d0) then
+               r00 = get_r_from_xh(s,k)
                s% w_div_w_crit_roche(k) = &
-                  w_div_w_roche_jrot(get_r_from_xh(s,k),s% m(k),s% j_rot(k),s% cgrav(k), &
+                  w_div_w_roche_jrot(r00, s% m(k), s% j_rot(k), s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             else
                s% w_div_w_crit_roche(k) = 0d0
             end if
+            call update1_i_rot_from_xh(s, k)
          end do
-         do k=1,s% nz
-            call update1_i_rot_from_xh(s,k)
-         end do
+!$OMP END PARALLEL DO
       end subroutine use_xh_to_update_i_rot
 
       subroutine use_xh_to_update_i_rot_and_j_rot(s)
          type (star_info), pointer :: s
          integer :: k
+         real(dp) :: r00
+
+!$OMP PARALLEL DO PRIVATE(k, r00) SCHEDULE(dynamic,2)
          do k=1,s% nz
+            r00 = get_r_from_xh(s,k)
             s% w_div_w_crit_roche(k) = &
-               w_div_w_roche_omega(get_r_from_xh(s,k),s% m(k),s% omega(k),s% cgrav(k), &
+               w_div_w_roche_omega(r00, s% m(k), s% omega(k), s% cgrav(k), &
                   s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-         end do
-         do k=1,s% nz
             call update1_i_rot_from_xh(s,k)
          end do
+!$OMP END PARALLEL DO
          call set_j_rot(s)
       end subroutine use_xh_to_update_i_rot_and_j_rot
 
@@ -432,9 +535,13 @@
       end subroutine set_uniform_omega
 
       subroutine set_rotation_info(s, skip_w_div_w_crit_roche, ierr)
+         use auto_diff
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
          integer, intent(out) :: ierr
+
+         type (auto_diff_real_star_order1) :: fp_single, fp_tidal, ft_single, ft_tidal
+         integer :: k
          include 'formats'
          ierr = 0
 
@@ -443,18 +550,39 @@
          call set_i_rot(s, skip_w_div_w_crit_roche)
          call set_omega(s, 'set_rotation_info')
 
-         if (.not. s% use_other_eval_fp_ft) then
-            call eval_fp_ft( &
-                  s% id, s% nz, s% m, s% r, s% rho, s% omega, s% ft_rot, s% fp_rot, &
-                  s% r_polar, s% r_equatorial, s% report_ierr, ierr)
-         else
-            call s% other_eval_fp_ft( &
-                  s% id, s% nz, s% m, s% r, s% rho, s% omega, s% ft_rot, s% fp_rot, &
-                  s% r_polar, s% r_equatorial, s% report_ierr, ierr)
-         end if
-         if (ierr /= 0) then
-            write(*,*) 'failed in eval_fp_ft'
-         end if
+!$OMP PARALLEL DO PRIVATE(k, fp_single, ft_single, fp_tidal, ft_tidal, ierr) SCHEDULE(dynamic,2)
+         do k=1, s% nz
+            if (s% use_other_eval_fp_ft) then
+               call s% other_eval_fp_ft( &
+                     s% id, k, s% m(k), s% r(k), s% rho(k), s% omega(k), s% fp_rot(k), s% ft_rot(k), &
+                     s% r_polar(k), s% r_equatorial(k), s% report_ierr, ierr)
+            else
+               call eval_fp_ft( &
+                     s% id, s% r(k), s% w_div_w_crit_roche(k), fp_single, ft_single, &
+                     s% r_polar(k), s% r_equatorial(k), s% report_ierr, ierr)
+               !if (k == s% solver_test_partials_k) then
+               !   s% solver_test_partials_val = fp_single
+               !   s% solver_test_partials_var = s% i_w_div_wc
+               !   s% solver_test_partials_dval_dx = s% dfp_rot_dw_div_wc(k)
+               !end if
+               if (associated(s% binary_other_fp_ft)) then
+                  call s% binary_other_fp_ft(&
+                        s% id, s% r(k), fp_tidal, ft_tidal, s% r_polar(k), s% r_equatorial(k), &
+                        s% report_ierr, ierr)
+                  call blend_tidal_values(s, k, fp_single, fp_tidal, s% omega(k), s% fp_rot(k))
+                  call blend_tidal_values(s, k, ft_single, ft_tidal, s% omega(k), s% ft_rot(k))
+               else
+                  s% fp_rot(k) = fp_single
+                  s% ft_rot(k) = ft_single
+               end if
+
+               if (ierr /= 0) then
+                  write(*,1) 'failed in eval_fp_ft'
+               end if
+
+            end if
+         end do
+!$OMP END PARALLEL DO
       end subroutine set_rotation_info
 
       subroutine set_surf_avg_rotation_info(s)
@@ -611,23 +739,19 @@
       end subroutine set_surf_avg_rotation_info
 
       ! Input variables:
-      !  N     Number of meshpoints used by the model (arrays are this size)
-      !  XM    Mass coordinate [gram]
-      !  R     Radius coordinate [cm]
-      !  RHO   Density [gram/cm^3]
-      !  AW    Angular velocity [rad/sec]
+      !  r     Radius coordinate [cm]
+      !  aw    fractional critical angular velocity Omega/Omega_crit
       ! Output variables:
-      !  Correction factor FT at each meshpoint
-      !  Correction factor FP at each meshpoint
+      !  Correction factor Fp at each meshpoint
+      !  Correction factor Ft at each meshpoint
       !  r_polar, r_equatorial at each meshpoint
-      subroutine eval_fp_ft(id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+      subroutine eval_fp_ft(id, r, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
          use auto_diff_support
          integer, intent(in) :: id
-         integer, intent(in) :: nz
-         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)  ! (nz)
-         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)  ! (nz)
-         real(dp), intent(inout) :: r_polar(:), r_equatorial(:)  ! (nz)
+         real(dp), intent(in) :: r, aw
+         type(auto_diff_real_star_order1), intent(out) :: fp, ft
+         real(dp), intent(inout) :: r_polar, r_equatorial
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 
@@ -636,7 +760,8 @@
 
          logical :: dbg
 
-         type (auto_diff_real_1var_order1) :: A_omega, w, w2, w4, w6, w_log_term, fp_temp, ft_temp
+         type(auto_diff_real_1var_order1) :: A_omega, fp_numerator, ft_numerator, &
+            w, w2, w3, w4, w5, w6, w_log_term, fp_temp, ft_temp
 
          include 'formats'
 
@@ -646,92 +771,39 @@
 
          dbg = .false.  ! (s% model_number >= 5)
 
-!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_temp, ft_temp, w, w2, w4, w6, w_log_term) SCHEDULE(dynamic,2)
-         do j=1, s% nz
-            ! Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
-            ! by this point in the code, w_div_w_crit_roche is set
-            w = abs(s% w_div_w_crit_roche(j))
-            w% d1val1 = 1d0
+         !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
+         w = abs(aw)  ! single rotation deformation is symmetric to prograde/retrograde
+         w% d1val1 = 1d0
 
-            w2 = pow2(w)
-            w4 = pow4(w)
-            w6 = pow6(w)
-            w_log_term = log(1d0 - pow(w, log_term_power))
-            ! cannot use real function below because need derivatives
-            A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
+         w2 = pow2(w)
+         w4 = pow4(w)
+         w6 = pow6(w)
+         w_log_term = log(1d0 - pow(w, log_term_power))
+         ! cannot use real function below because these are auto_diff variables
+         A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
 
-            ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
-            fp_temp = (1d0 - two_thirds * w2 - 0.2133d0 * w4 - 0.1068d0 * w6) / A_omega
-            ft_temp = (1d0 - 0.07955d0 * w4 - 0.2322d0 * w6) / A_omega
+         ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
+         fp_temp = (1d0 - two_thirds * w2 - 0.2133d0 * w4 - 0.1068d0 * w6) / A_omega
+         ft_temp = (1d0 - 0.07955d0 * w4 - 0.2322d0 * w6) / A_omega
 
-            ! re and rp can be derived analytically from w_div_wcrit
-            r_equatorial(j) = r(j) * re_from_rpsi_factor(w2% val, w4% val, w6% val)
-            r_polar(j) = r_equatorial(j) / (1d0 + 0.5d0 * w2% val)
+         ! re and rp can be derived analytically from w_div_wcrit
+         r_equatorial = r * re_from_rpsi_factor(w2% val, w4% val, w6% val)
+         r_polar = r_equatorial / (1d0 + 0.5d0 * w2% val)
 
-            ! Be sure they are consistent with r_Psi
-            r_equatorial(j) = max(r_equatorial(j), r(j))
-            r_polar(j) = min(r_polar(j), r(j))
+         ! Be sure they are consistent with r_Psi
+         r_equatorial = max(r_equatorial, r)
+         r_polar = min(r_polar, r)
 
-            fp(j) = 0d0
-            ft(j) = 0d0
-            fp(j)% val = fp_temp% val
-            ft(j)% val = ft_temp% val
-            if (s% w_div_wc_flag) then
-               fp(j)% d1Array(i_w_div_wc_00) = fp_temp% d1val1
-               ft(j)% d1Array(i_w_div_wc_00) = ft_temp% d1val1
-            end if
-            !if (j == s% solver_test_partials_k) then
-            !   s% solver_test_partials_val = fp(j)
-            !   s% solver_test_partials_var = s% i_w_div_wc
-            !   s% solver_test_partials_dval_dx = s% dfp_rot_dw_div_wc(j)
-            !end if
-         end do
-!$OMP END PARALLEL DO
-
-      end subroutine eval_fp_ft
-
-      subroutine eval_i_rot(s, k, r00, w_div_w_crit_roche, i_rot)
-         use auto_diff_support
-         type (star_info), pointer :: s
-         integer, intent(in) :: k  ! just for debugging
-         real(dp), intent(in) :: r00, w_div_w_crit_roche
-         type(auto_diff_real_star_order1), intent(out) :: i_rot
-
-         type(auto_diff_real_2var_order1) :: ir, r, re, w, w2, w4, w6, w_log_term
-
-         include 'formats'
-
-         i_rot = 0d0
-         if (s% use_other_eval_i_rot) then
-            call s% other_eval_i_rot(s% id, k, r00, w_div_w_crit_roche, i_rot)
-         else if (s% simple_i_rot_flag) then
-            i_rot = two_thirds * r00 * r00
-            i_rot% d1Array(i_lnR_00) = 2d0 * i_rot% val
-            i_rot% d1Array(i_w_div_wc_00) = 0d0
-         else
-            w = abs(w_div_w_crit_roche)
-            w% d1val1 = 1d0
-
-            r = r00
-            r% d1val2 = r00  ! Makes the independent variable lnR
-
-            w2 = pow2(w)
-            w4 = pow4(w)
-            w6 = pow6(w)
-            w_log_term = log(1d0 - pow(w, log_term_power))
-            ! cannot use real functions below, since need derivatives
-            re = r * (1d0 + one_sixth * w2 - 0.005124d0 * w4 + 0.06562d0 * w6)
-            ! Compute i_rot following Fabry+2022, Eq. A.9
-            ir = two_thirds * pow2(re) * (1d0 + w2 / 5d0 + 0.4140d0 * w4 - 0.8650d0 * w6 - 0.8370d0 * w_log_term) &
-                                       / (1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term)
-
-            i_rot = 0d0
-            i_rot = ir% val
-            i_rot% d1Array(i_w_div_wc_00) = ir% d1val1
-            i_rot% d1Array(i_lnR_00) = ir% d1val2
+         fp = 0d0
+         ft = 0d0
+         fp% val = fp_temp% val
+         ft% val = ft_temp% val
+         if (s% w_div_wc_flag) then
+            fp% d1Array(i_w_div_wc_00) = fp_temp% d1val1
+            ft% d1Array(i_w_div_wc_00) = ft_temp% d1val1
          end if
 
-      end subroutine eval_i_rot
+      end subroutine eval_fp_ft
 
       subroutine compute_j_fluxes_and_extra_jdot(id, ierr)
          use auto_diff_support
