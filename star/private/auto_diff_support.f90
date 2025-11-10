@@ -1250,7 +1250,6 @@
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_tc
          integer, intent(in) :: k
-         v_tc = 0d0
          v_tc = wrap_u_00(s,k)
          if (s% using_velocity_time_centering) &
             v_tc = 0.5d0*(v_tc + s% u_start(k))
