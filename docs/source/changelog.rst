@@ -139,6 +139,8 @@ Fixed bug in binary photos. They were not saving the variables: ``CE_years_detac
 
 Fixed bug that ``Orbit_win_flag = .true.`` was not showing Orbit plot (pgbinary)
 
+Fixed a bug in ``other_mlt_results`` which resulted in the pre-ms model builder reporting a segfault. ``other_mlt_results`` should now support ``mlt_option = TDC`` as well. see `gh-874 <https://github.com/MESAHub/mesa/issues/874`_.
+
 Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
 
