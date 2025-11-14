@@ -83,9 +83,9 @@ module turb
    !!
    !! @param conv_vel_start The convection speed at the start of the step.
    !! @param mixing_length_alpha The mixing length parameter.
-   !! @param alpha_TDC_DAMP TDC turbulent damping parameter
-   !! @param alpha_TDC_DAMPR TDC radiative damping parameter
-   !! @param alpha_TDC_PtdVdt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
+   !! @param TDC_alpha_D TDC turbulent damping parameter
+   !! @param TDC_alpha_R TDC radiative damping parameter
+   !! @param TDC_alpha_Pt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
    !! @param The time-step (s).
    !! @param cgrav gravitational constant (erg*cm/g^2).
    !! @param m Mass inside the face (g).
@@ -112,14 +112,14 @@ module turb
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
    subroutine set_TDC( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+            conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
-            Eq_div_w, grav, include_mlt_corr_to_TDC, alpha_TDC_C, alpha_TDC_S, ierr)
+            Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, ierr)
       use tdc
       use tdc_support
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt
-      real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel, alpha_TDC_c, alpha_TDC_s
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
+      real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav
       logical, intent(in) :: report, include_mlt_corr_to_TDC
@@ -148,14 +148,14 @@ module turb
       info%report = report
       info%include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
       info%mixing_length_alpha = mixing_length_alpha
-      info%alpha_TDC_DAMP = alpha_TDC_DAMP
-      info%alpha_TDC_DAMPR = alpha_TDC_DAMPR
-      info%alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
+      info%TDC_alpha_D = TDC_alpha_D
+      info%TDC_alpha_R = TDC_alpha_R
+      info%TDC_alpha_Pt = TDC_alpha_Pt
       info%dt = dt
       info%L = convert(L)
       info%gradL = convert(gradL)
       info%grada = convert(grada)
-      info%c0 = convert(alpha_TDC_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
+      info%c0 = convert(TDC_alpha_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
       info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm, needs correction for if s% make_mlt_hydrodynamic = .false.
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%T = T
@@ -166,8 +166,8 @@ module turb
       info%Hp = scale_height
       info%Gamma = Gamma
       info%Eq_div_w = Eq_div_w
-      info%alpha_TDC_c = alpha_TDC_C
-      info%alpha_TDC_s = alpha_TDC_S
+      info%TDC_alpha_C = TDC_alpha_C
+      info%TDC_alpha_S = TDC_alpha_S
 
       ! Get solution
       Zub = upper_bound_Z

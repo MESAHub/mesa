@@ -52,7 +52,7 @@ cubic_interpolation_in_Z = .false.
 &controls
 
    ! limit max model number as part of test suite.
-   max_model_number = 3000
+   !max_model_number = 3000
 
    ! controls for analyzing pulsations using GYRE in MESA
    x_integer_ctrl(1) = 1000 ! gyre interval to check
@@ -66,7 +66,7 @@ cubic_interpolation_in_Z = .false.
 
 
    ! new rsp style meshing, thanks to Bill P.
-   x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC 
+   x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC
    TDC_hydro_use_mass_interp_face_values = .true.
    TDC_hydro_nz = 150 
    TDC_hydro_nz_outer = 40 
@@ -75,8 +75,12 @@ cubic_interpolation_in_Z = .false.
    remesh_for_TDC_pulsations_log_core_zoning = .false. ! .false means do rsp style core
 
    okay_to_remesh = .false. ! freeze mesh after initial remesh.
-   x_logical_ctrl(24) = .true. ! if true turn off remesh at the following model number
+   x_logical_ctrl(24) = .false. ! if true turn off remesh at the following model number
    x_ctrl(12) = 200 ! model number to turn off remesh ( only if if okay_to_remesh = .true.)
+
+   !max_num_merge_surface_cells = 5
+   !max_surface_cell_dq= 1d-4
+   !min_surface_cell_dq = 1d-6
 
 ! GYRE set starting velocities, kick!
 ! kick when true and not restarting.
@@ -151,15 +155,14 @@ cubic_interpolation_in_Z = .false.
    include_mlt_in_velocity_time_centering = .false.
    include_mlt_Pturb_in_thermodynamic_gradients = .false.
    mixing_length_alpha = 1.5d0
-   alpha_TDC_DAMP = 1d0
-   alpha_TDC_DAMPR = 0d0
-   alpha_TDC_PtdVdt = 0d0
-   alpha_TDC_DAMPM = 0.25d0
+   TDC_alpha_D = 1d0
+   TDC_alpha_R = 0d0
+   TDC_alpha_Pt = 0d0
+   TDC_alpha_M = 0.25d0
    steps_before_use_TDC = 0
    mlt_Pturb_factor = 0d0 ! use 2d0 = 1d0 in TDC. time lagged.
    alt_scale_height_flag = .false. ! ignore eggleton in the core.
    TDC_num_innermost_cells_forced_nonturbulent = 2 ! for envelope models only.
-
 
    TDC_use_density_form_for_eddy_viscosity = .false. ! always true for u_flag.
    mlt_make_surface_no_mixing = .false.

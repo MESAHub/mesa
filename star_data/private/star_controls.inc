@@ -255,9 +255,9 @@
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
          integer :: steps_before_use_TDC
-         real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
-         real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
-         real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
+         real(dp) :: TDC_alpha_D   ! ~ RSP2_alfad
+         real(dp) :: TDC_alpha_R  ! ~ RSP2_alfar
+         real(dp) :: TDC_alpha_Pt  ! RSP2_alfap
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag

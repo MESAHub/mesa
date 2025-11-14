@@ -2490,15 +2490,13 @@
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
-            else if (.not. s% RSP2_flag .and. s% mlt_vc(k) > 0d0 .and. s% MLT_option == 'TDC' .and. &
-               s% TDC_include_eturb_in_energy_equation) then
-               ! write a wrapper for this.
-               if (k == 1) then
-                  TDC_eturb_cell = pow2(s% mlt_vc(k)/sqrt_2_div_3)
-               else
-                  call get_face_weights(s, k, alfa, beta)
-                  TDC_eturb_cell = alfa*pow2(s% mlt_vc(k)/sqrt_2_div_3) + &
-                     beta*pow2(s% mlt_vc(k-1)/sqrt_2_div_3)
+            else if ( s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then ! needs corrected s% mlt_vc(k) >= 0 causes failures.
+               if (k < s% nz) then
+                  TDC_eturb_cell = 0.75d0*(pow2(s% mlt_vc(k)) + &
+                     pow2(s% mlt_vc(k+1)))
+               else ! k == s% nz
+                  TDC_eturb_cell = 0.75d0*pow2(s% mlt_vc(k))
                end if
                cell1 = dm*TDC_eturb_cell
                cell_total = cell_total + cell1
