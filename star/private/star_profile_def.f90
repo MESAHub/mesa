@@ -572,8 +572,9 @@
 
       integer, parameter :: p_total_energy_sign = p_cs_at_cell_bdy + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
+      integer, parameter :: p_dwork_dm = p_total_energy + 1
 
-      integer, parameter :: p_Ptrb = p_total_energy + 1
+      integer, parameter :: p_Ptrb = p_dwork_dm + 1
       integer, parameter :: p_log_Ptrb = p_Ptrb + 1
       integer, parameter :: p_log_w = p_log_Ptrb + 1
       integer, parameter :: p_w = p_log_w + 1
@@ -1249,6 +1250,7 @@
 
          profile_column_name(p_total_energy_sign) = 'total_energy_sign'
          profile_column_name(p_total_energy) = 'total_energy'
+         profile_column_name(p_dwork_dm) = 'dwork_dm'
 
          profile_column_name(p_Ptrb) = 'Ptrb'
          profile_column_name(p_log_Ptrb) = 'log_Ptrb'

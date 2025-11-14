@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 50 ! making this too small slows the model down.
+pgstar_interval = 200 ! making this too small slows the model down.
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0

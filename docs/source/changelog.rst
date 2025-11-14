@@ -26,6 +26,13 @@ Removed ``file_extension`` option because it is redundant with ``file_device``. 
 
 Renamed pgstar ``pause``` option to ``pause_flag``` because pause is a reserved Fortran 77 keyword.
 
+For greater consistency and clarity between ``TDC`` and ``RSP``, the controls for ``mlt_option = TDC`` have been renamed to match their respective ``RSP``
+counter part. See below :   
+  
+- ``alpha_TDC_DAMP`` has been renamed to ``TDC_alpha_D`` and is analogous to ``RSP_alfad``
+- ``alpha_TDC_DAMPR`` has been renamed to ``TDC_alpha_R`` and is analogous to ``RSP_gammar``
+- ``alpha_TDC_PtdVdt`` has been renamed to ``TDC_alpha_Pt`` and is analogous to ``RSP_alfap``
+
 .. _New Features main:
 
 New Features

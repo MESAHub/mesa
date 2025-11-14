@@ -126,7 +126,7 @@
 
          ! Add turbulent eddy viscous acceleration Uq for TDC as source
          Uq_cell = 0d0
-         if (s% MLT_option == 'TDC' .and. s%alpha_TDC_DampM > 0d0) then
+         if (s% MLT_option == 'TDC' .and. s%TDC_alpha_M > 0d0) then
             Uq_cell = compute_tdc_Uq_dm_cell(s, k, ierr) ! Uq * dm
             if (ierr /= 0) return
          end if

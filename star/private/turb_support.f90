@@ -189,7 +189,7 @@ contains
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
       use star_utils
-      use tdc_hydro, only: compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face
+      use tdc_hydro, only: compute_tdc_Eq_div_w_face
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
@@ -224,11 +224,9 @@ contains
       ! Pre-calculate some things.
       Eq_div_w = 0d0
       if ((s% v_flag .or. s% u_flag) .and. k > 0 ) then ! only include Eq_div_w if v_flag or u_flag is true.
-         if (using_TDC .and. s% alpha_TDC_DampM > 0) then
-               if (s% mlt_vc(k) > 0) then ! calculate using mlt_vc from current timestep.
-                   check_Eq = compute_tdc_Eq_div_w_face(s, k, ierr)
-                   Eq_div_w = check_Eq
-               end if
+         if (using_TDC .and. s% TDC_alpha_M > 0) then
+             check_Eq = compute_tdc_Eq_div_w_face(s, k, ierr)
+             Eq_div_w = check_Eq
          end if
       end if
 
@@ -316,11 +314,11 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, &
+            conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
+            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -336,11 +334,11 @@ contains
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
                call set_TDC(&
-                  conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, &
+                  conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
+                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

@@ -99,7 +99,7 @@
 
       ! If you would like to be bold, try radiative damping, although it
       ! is a departure from the mlt limit of 'TDC'
-      alpha_TDC_DAMPR = 0d0 ! 0d0 is default for mlt limit
+      TDC_alpha_R = 0d0 ! 0d0 is default for mlt limit
 
 
       use_other_alpha_mlt = .true. ! implemented in run_star_extras

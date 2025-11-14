@@ -44,9 +44,9 @@ public :: compute_Q
    !!
    !! @param report Write debug output if true, not if false.
    !! @param mixing_length_alpha Mixing length parameter
-   !! @param alpha_TDC_DAMP TDC turbulent damping parameter
-   !! @param alpha_TDC_DAMPR TDC radiative damping parameter
-   !! @param alpha_TDC_PtdVdt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
+   !! @param TDC_alpha_D TDC turbulent damping parameter
+   !! @param TDC_alpha_R TDC radiative damping parameter
+   !! @param TDC_alpha_Pt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
    !! @param dt Time-step
    !! @param c0 A proportionality factor for the convective luminosity
    !! @param L luminosity
@@ -63,7 +63,7 @@ public :: compute_Q
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
       logical :: report, include_mlt_corr_to_TDC
-      real(dp) :: mixing_length_alpha, alpha_TDC_c, alpha_TDC_s, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, e
+      real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
       type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P
    end type tdc_info
@@ -523,12 +523,12 @@ contains
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
-      S0 = convert(info%alpha_TDC_s * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
+      S0 = convert(info%TDC_alpha_S * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
       S0 = S0*Y + convert(info%Eq_div_w)
-      D0 = convert(info%alpha_TDC_DAMP*x_CEDE/(info%mixing_length_alpha*info%Hp))
-      gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
+      D0 = convert(info%TDC_alpha_D*x_CEDE/(info%mixing_length_alpha*info%Hp))
+      gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
-      Pt0 = info%alpha_TDC_PtdVdt*x_ALFAP*info%rho
+      Pt0 = info%TDC_alpha_Pt*x_ALFAP*info%rho
       dVdt = info%dV/info%dt
 
       xi0 = S0

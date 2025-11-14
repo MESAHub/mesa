@@ -2026,6 +2026,10 @@
                end if
                val = dble(int_val)
                int_flag = .true.
+            case (p_dwork_dm)
+               ! differential work per unit mass per unit mass*time dW/dm
+               ! W = dwork_dm*dm*dt
+               val = s% dwork_dm(k) ! returns (dw/dt)/dm
 
             case (p_cell_specific_IE)
                val = s% energy(k)

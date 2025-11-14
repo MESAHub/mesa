@@ -420,6 +420,7 @@
    !cell_internal_energy_fraction
    !cell_internal_energy_fraction_start
    !cell_specific_PE
+   !dwork_dm ! cell specific work per unit time, Work = dwork_dm*dm*dt
 
    !log_cell_ie_div_star_ie
    !log_cell_specific_IE
