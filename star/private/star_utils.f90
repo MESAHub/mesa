@@ -86,9 +86,10 @@
       public :: get_kap_face
       public :: get_rho_face
       public :: get_rho_start_face
-      public :: get_chirho_face
-      public :: get_chit_face
-      public :: get_t_face
+      public :: get_e_face
+      public :: get_ChiRho_face
+      public :: get_ChiT_face
+      public :: get_T_face
       public :: get_Peos_face
       public :: get_Peos_face_val
       public :: get_cp_face
@@ -3868,6 +3869,18 @@
          Peos_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
       end function get_Peos_face_val
 
+      function get_e_face(s,k) result(e_face) ! specific energy on face
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: e_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            e_face = wrap_e_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         e_face = alfa*wrap_e_00(s,k) + beta*wrap_e_m1(s,k)
+      end function get_e_face
 
       function get_Cp_face(s,k) result(Cp_face)
          type (star_info), pointer :: s

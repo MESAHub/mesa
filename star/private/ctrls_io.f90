@@ -109,8 +109,9 @@
     TDC_alpha_C, TDC_alpha_S, &
     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
     TDC_use_density_form_for_eddy_viscosity, &
-    TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
-    include_mlt_corr_to_TDC, TDC_include_eturb_in_energy_equation, &
+    TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
+    include_mlt_Pturb_in_thermodynamic_gradients, &
+    include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
     TDC_hydro_use_mass_interp_face_values, TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_T_anchor, TDC_hydro_dq_1_factor, &
 
@@ -2091,8 +2092,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
+ s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
  s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
+ s% use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
  s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
@@ -3800,8 +3803,10 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
+ TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
  include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
+ use_TDC_enthalpy_flux_limiter = s% use_TDC_enthalpy_flux_limiter
  TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering

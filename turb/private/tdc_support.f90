@@ -62,10 +62,10 @@ public :: compute_Q
    !! @param grada grada is the adiabatic dlnT/dlnP,
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
-      logical :: report, include_mlt_corr_to_TDC
+      logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h
    end type tdc_info
 
 contains
@@ -518,13 +518,45 @@ contains
       type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
       type(auto_diff_real_tdc) :: S0, D0, DR0
       type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
+      type(auto_diff_real_tdc) :: X, FL, scale
       real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
       real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
+      ! -------------------------------------------------------------------
+      ! 1. Build flux-limiter scale factor from Wuchterl & Feuchtinger form
+      !    X ~ G/F, with G ∝ α α_s c_p Y_env and F = √(2/3)·w/T.
+      !
+      !    Here Y is already Y_env (from compute_Q), so:
+      !       X = α α_s x_ALFAS * Y_env / sqrt(2/3)
+      !
+      !    scale = 1       for small X  (linear regime)
+      !    scale ~ FL(X)/X for large X  (saturating regime)
+      ! -------------------------------------------------------------------
+
+      scale = 1d0
+      if (Y > 0d0 .and. info%use_TDC_enthalpy_flux_limiter) then
+         ! X = G/F, with Cp and T cancelled via w ≈ Cp*T approximation.
+         X = convert(info%Cp*info%T/info%h)*info%mixing_length_alpha * info%TDC_alpha_S * x_ALFAS * Y / sqrt_2_div_3
+         FL = flux_limiter_function(X)
+         ! Avoid 0/0 or tiny/tiny; for X ≈ 0, FL ≈ X so scale ~ 1 anyway.
+         if (abs(X%val) > 1d-12) then
+            scale = FL / X
+         else
+            scale = 1d0
+         end if
+         ! Optional safety: if X is totally nuts, just fall back to no extra scaling.
+         if (X%val > 1d10) scale = 1d0
+      end if
+
       S0 = convert(info%TDC_alpha_S * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
-      S0 = S0*Y + convert(info%Eq_div_w)
+      if (info%use_TDC_enthalpy_flux_limiter) then
+         S0 = S0 * (scale * Y) + convert(info%Eq_div_w)
+      else ! no flux limiting
+         S0 = S0*Y + convert(info%Eq_div_w)
+      end if
+
       D0 = convert(info%TDC_alpha_D*x_CEDE/(info%mixing_length_alpha*info%Hp))
       gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
@@ -535,6 +567,29 @@ contains
       xi1 = -(DR0 + convert(Pt0*dVdt))
       xi2 = -D0
    end subroutine eval_xis
+
+   type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
+     implicit none
+     type(auto_diff_real_tdc), intent(in) :: X
+     real(dp), parameter :: X0 = 0.95_dp
+     real(dp), parameter :: delta = 0.05_dp   ! transition width
+     type(auto_diff_real_tdc) :: absX, t
+
+     absX = X !abs(X)
+
+     if (X%val <= X0) then
+        FL = absX
+     else
+        ! Map X from [X0, infinity) -> t in [0, infinity)
+        t = (absX - X0) / delta
+        ! Smooth monotonic rise: caps at 1 as X -> infinity
+        FL = 1.0_dp - exp(-t)
+        ! Shift so that FL(X0) = X0 and derivative matches 1 at X0
+        FL = X0 + (1.0_dp - X0) * FL
+     end if
+   end function flux_limiter_function
+
+
 
    !! Calculates the solution to the TDC velocity equation.
    !! The velocity equation is

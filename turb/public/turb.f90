@@ -114,19 +114,20 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
-            Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
+            max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
+            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
       real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1), intent(in) :: &
-         chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav
-      logical, intent(in) :: report, include_mlt_corr_to_TDC
+         chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav, energy
+      logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
-      type(auto_diff_real_star_order1) :: L, Lambda, Gamma
+      type(auto_diff_real_star_order1) :: L, Lambda, Gamma, h
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
@@ -147,6 +148,7 @@ module turb
       ! Pack TDC info
       info%report = report
       info%include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
+      info%use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
       info%mixing_length_alpha = mixing_length_alpha
       info%TDC_alpha_D = TDC_alpha_D
       info%TDC_alpha_R = TDC_alpha_R
@@ -156,8 +158,9 @@ module turb
       info%gradL = convert(gradL)
       info%grada = convert(grada)
       info%c0 = convert(TDC_alpha_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm, needs correction for if s% make_mlt_hydrodynamic = .false.
+      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm
       info%A0 = conv_vel_start/sqrt_2_div_3
+      info%h = energy + P/rho ! actual enthalpy
       info%T = T
       info%rho = rho
       info%dV = dV

@@ -170,6 +170,7 @@ contains
       end if
 
       if (ALFAM_ALFA == 0d0 .or. &
+          k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
           k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Chi_cell = 0d0
       else
@@ -363,8 +364,8 @@ contains
       include 'formats'
       ierr = 0
       if (s%mixing_length_alpha == 0d0 .or. &
-          k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
-          k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+          k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+          k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Uq_face = 0d0
       else
          r_00 = wrap_opt_time_center_r_00(s, k)
@@ -381,7 +382,7 @@ contains
          Uq_face = 4d0*pi*(Chi_m1 - Chi_00)/(r_00*s%dm_bar(k))
 
          if (k == -56) then
-            write (*, 3) 'RSP2 Uq chi_m1 chi_00 r', k, s%solver_iter, &
+            write (*, 3) 'TDC Uq chi_m1 chi_00 r', k, s%solver_iter, &
                Uq_face%val, Chi_m1%val, Chi_00%val, r_00%val
          end if
 
@@ -399,8 +400,8 @@ contains
       include 'formats'
       ierr = 0
       if (s%mixing_length_alpha == 0d0 .or. &
-          k <= s%RSP2_num_outermost_cells_forced_nonturbulent .or. &
-          k > s%nz - int(s%nz/s%RSP2_nz_div_IBOTOM)) then
+          k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+          k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Uq_cell = 0d0
       else
          r_00 = wrap_opt_time_center_r_00(s, k)
@@ -435,7 +436,7 @@ contains
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2 [g], acceleration*mass = Force
 
          if (k == -56) then
-            write (*, 3) 'RSP2 Uq chi_m1 chi_00 r', k, s%solver_iter, &
+            write (*, 3) 'TDC Uq chi_m1 chi_00 r', k, s%solver_iter, &
                Uq_cell%val, Chi_p1%val, Chi_00%val, r_00%val
          end if
 

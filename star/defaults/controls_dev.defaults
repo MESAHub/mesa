@@ -255,14 +255,18 @@
 
       ! TDC_num_innermost_cells_forced_nonturbulent
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_num_outermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent cells
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent or
+      ! TDC_num_outermost_cells_forced_nonturbulent cells
       ! to be nonturbulent, and sets gradT = gradr in these cells.
       ! Useful for pulsation models in TDC.
 
       ! ::
 
     TDC_num_innermost_cells_forced_nonturbulent = 0
+    TDC_num_outermost_cells_forced_nonturbulent = 0
 
 
       ! include_mlt_corr_to_TDC
@@ -275,6 +279,16 @@
       ! ::
 
     include_mlt_corr_to_TDC = .true.
+
+      ! use_TDC_enthalpy_flux_limiter
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC 
+      ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
+
+      ! ::
+
+    use_TDC_enthalpy_flux_limiter = .false.
 
 
       ! include_mlt_Pturb_in_thermodynamic_gradients

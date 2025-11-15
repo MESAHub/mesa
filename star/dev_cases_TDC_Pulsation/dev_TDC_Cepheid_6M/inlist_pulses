@@ -159,6 +159,7 @@ cubic_interpolation_in_Z = .false.
    TDC_alpha_R = 0d0
    TDC_alpha_Pt = 0d0
    TDC_alpha_M = 0.25d0
+   use_TDC_enthalpy_flux_limiter = .false.
    steps_before_use_TDC = 0
    mlt_Pturb_factor = 0d0 ! use 2d0 = 1d0 in TDC. time lagged.
    alt_scale_height_flag = .false. ! ignore eggleton in the core.
