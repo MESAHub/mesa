@@ -524,30 +524,24 @@ contains
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
-      ! -------------------------------------------------------------------
-      ! 1. Build flux-limiter scale factor from Wuchterl & Feuchtinger form
-      !    X ~ G/F, with G ∝ α α_s c_p Y_env and F = √(2/3)·w/T.
-      !
-      !    Here Y is already Y_env (from compute_Q), so:
-      !       X = α α_s x_ALFAS * Y_env / sqrt(2/3)
-      !
-      !    scale = 1       for small X  (linear regime)
-      !    scale ~ FL(X)/X for large X  (saturating regime)
-      ! -------------------------------------------------------------------
+      ! flux-limiter scale factor from Wuchterl & Feuchtinger form
+      ! X ~ G/F, with G ∝ α α_s c_p Y_env and F = √(2/3)·w/T, w = E + P/rho
+      ! Here Y is already Y_env (from compute_Q), so:
+      ! X = α α_s x_ALFAS * Y_env / sqrt(2/3)
+      ! scale = 1       for small X  (linear regime)
+      ! scale ~ FL(X)/X for large X  (saturating regime)
 
       scale = 1d0
       if (Y > 0d0 .and. info%use_TDC_enthalpy_flux_limiter) then
-         ! X = G/F, with Cp and T cancelled via w ≈ Cp*T approximation.
+         ! X = G/F
          X = convert(info%Cp*info%T/info%h)*info%mixing_length_alpha * info%TDC_alpha_S * x_ALFAS * Y / sqrt_2_div_3
          FL = flux_limiter_function(X)
          ! Avoid 0/0 or tiny/tiny; for X ≈ 0, FL ≈ X so scale ~ 1 anyway.
-         if (abs(X%val) > 1d-12) then
+         if (abs(X%val) >= 0.95d0) then
             scale = FL / X
          else
             scale = 1d0
          end if
-         ! Optional safety: if X is totally nuts, just fall back to no extra scaling.
-         if (X%val > 1d10) scale = 1d0
       end if
 
       S0 = convert(info%TDC_alpha_S * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
@@ -568,24 +562,37 @@ contains
       xi2 = -D0
    end subroutine eval_xis
 
-   type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL)
-     implicit none
+   type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL) ! should be c2 continuous
      type(auto_diff_real_tdc), intent(in) :: X
-     real(dp), parameter :: X0 = 0.95_dp
-     real(dp), parameter :: delta = 0.05_dp   ! transition width
-     type(auto_diff_real_tdc) :: absX, t
+     real(dp), parameter :: X0    = 0.95_dp         ! start of transition
+     real(dp), parameter :: delta = 0.05_dp         ! width of transition
+     real(dp), parameter :: X1    = 1d0 !X0 + delta      ! end of transition
 
-     absX = X !abs(X)
+     type(auto_diff_real_tdc) :: s, p
 
-     if (X%val <= X0) then
-        FL = absX
+     ! Region 1: purely linear, FL = X
+     if (X%val < X0) then ! should not be encountered
+        FL = X
+
+     ! Region 3: saturated, FL = 1
+     else if (X%val >= X1) then
+        FL = 1.0_dp
+
+     ! Region 2: smooth C² transition between the two
      else
-        ! Map X from [X0, infinity) -> t in [0, infinity)
-        t = (absX - X0) / delta
-        ! Smooth monotonic rise: caps at 1 as X -> infinity
-        FL = 1.0_dp - exp(-t)
-        ! Shift so that FL(X0) = X0 and derivative matches 1 at X0
-        FL = X0 + (1.0_dp - X0) * FL
+        ! Normalized coordinate in [0,1]
+        s = (X - X0) / (X1 - X0)
+
+        ! Quintic "smootherstep" polynomial:
+        ! p(s) = 10 s^3 - 15 s^4 + 6 s^5
+        ! p(0)=0, p(1)=1, p'(0)=p'(1)=0, p''(0)=p''(1)=0
+        p = pow3(s) * (10.0_dp + s * (-15.0_dp + 6.0_dp * s))
+
+        ! Blend between line FL=X and flat FL=1
+        ! At s=0:  FL = X
+        ! At s=1:  FL = 1
+        ! Because p', p'' vanish at 0 and 1, FL, FL', FL'' all match.
+        FL = X + (1.0_dp - X) * p
      end if
    end function flux_limiter_function
 
