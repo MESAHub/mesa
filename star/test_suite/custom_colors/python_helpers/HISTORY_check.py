@@ -161,7 +161,7 @@ class HistoryChecker:
 
         # Create the figure and axes
         self.fig, self.axes = plt.subplots(
-            2, 2, figsize=(14, 18), gridspec_kw={"hspace": 0.01, "wspace": 0.01}
+            2, 2, figsize=(18, 16), gridspec_kw={"hspace": 0.01, "wspace": 0.01}
         )
 
         self.update_flag = 0
@@ -234,7 +234,7 @@ class HistoryChecker:
             self.md = mr.MesaData(self.history_file)
             self.md = MesaView(self.md, 5)
             # after: self.phases, self.phase_colors = get_phase_info_from_mesa(self.md)
-            self.has_phase = hasattr(self.md, "phase_of_evolution")
+            self.has_phase = (hasattr(self.md, "phase_of_evolution")and np.unique(self.md.phase_of_evolution).size > 1)
 
             # Basic stellar parameters
             self.Teff = self.md.Teff
