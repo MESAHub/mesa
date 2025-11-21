@@ -46,7 +46,7 @@ contains
       if (.not. colors_settings%use_colors) then
          num_cols = 0
       else
-         num_cols = 2 + num_color_filters
+         num_cols = 3 + num_color_filters
       end if
 
       how_many_colors_history_columns = num_cols
@@ -63,7 +63,7 @@ contains
 
       type(Colors_General_Info), pointer :: colors_settings
       integer :: i, filter_offset
-      real(dp) :: d, bolometric_magnitude, bolometric_flux
+      real(dp) :: d, bolometric_magnitude, bolometric_flux, interpolation_radius
       character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath
       logical :: make_sed
 
@@ -84,12 +84,14 @@ contains
       make_sed = colors_settings%make_csv
 
       call calculate_bolometric(t_eff, log_g, metallicity, R, d, &
-                                bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
+                                bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius)
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude
       names(2) = "Flux_bol"
       vals(2) = bolometric_flux
-      filter_offset = 2
+      names(3) = "Interp_rad"
+      vals(3) = interpolation_radius
+      filter_offset = 3
 
       if (n == num_color_filters + filter_offset) then
          do i = 1, num_color_filters
