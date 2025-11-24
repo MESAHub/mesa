@@ -32,6 +32,7 @@ module colors_def
       character(len=256) :: vega_sed
       character(len=256) :: stellar_atm
       character(len=256) :: colors_results_directory
+      character(len=256) :: mag_system
       real(dp) :: metallicity
       real(dp) :: distance
       logical :: make_csv

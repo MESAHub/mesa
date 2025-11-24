@@ -35,6 +35,7 @@
       distance = 3.0857d17
       make_csv = .false.
       colors_results_directory = 'SED'
+      mag_system = 'ST'
 
 
 ! Extra inlist controls

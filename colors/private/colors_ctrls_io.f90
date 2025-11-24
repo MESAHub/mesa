@@ -35,6 +35,8 @@ module colors_ctrls_io
    character(len=256) :: vega_sed
    character(len=256) :: stellar_atm
    character(len=256) :: colors_results_directory
+   character(len=32) :: mag_system
+
    real(dp) :: distance
    logical :: make_csv
    logical :: use_colors
@@ -45,6 +47,7 @@ module colors_ctrls_io
       stellar_atm, &
       distance, &
       make_csv, &
+      mag_system, &
       colors_results_directory, &
       use_colors, &
       read_extra_colors_inlist, &
@@ -155,6 +158,8 @@ contains
       rq%make_csv = make_csv
       rq%colors_results_directory = colors_results_directory
       rq%use_colors = use_colors
+      rq%mag_system = mag_system
+
 
    end subroutine store_controls
 
@@ -190,6 +195,7 @@ contains
       make_csv = rq%make_csv
       colors_results_directory = rq%colors_results_directory
       use_colors = rq%use_colors
+      mag_system = rq%mag_system
 
    end subroutine set_controls_for_writing
 
