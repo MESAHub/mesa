@@ -13,12 +13,9 @@
       
       ! Termination conditions
       ! required_termination_code_string = 'xa_central_lower_limit'  ! Stop when central H is depleted
-      save_model_when_terminate = .true.
-      save_model_filename = 'custom_colors_end.mod'
-      required_termination_code_string = ''
-      
-      ! Graphics and plotting
-      pgstar_flag = .true.  ! Enable real-time plotting (This is set to .false. for test hub -- .true. will enable a CMD and Light curves!!)
+      save_model_when_terminate = .false.
+      !save_model_filename = 'custom_colors_end.mod'
+      !required_termination_code_string = ''
       
       ! Custom output files
       history_columns_file = 'custom_colors_history_columns.list'  ! Additional history columns
@@ -40,7 +37,7 @@
 ! KAP NAMELIST - Opacity settings
 ! =============================================================================
 &kap
-      Zbase = 0.014d0              ! Base metallicity (Z) for opacity tables
+      Zbase = 0.02d0               ! Base metallicity (Z) for opacity tables
       kap_file_prefix = 'gs98'     ! Use Grevesse & Sauval 1998 opacity tables
 /
 
@@ -59,7 +56,7 @@
       ! - G.dat (White light photometer)  
       ! - Grp.dat (Red photometer)
       ! - Grvs.dat (Radial Velocity Spectrometer)
-      instrument = '/colors/data/filters/GAIA/GAIA'
+      instrument = '/colors/data/filters/Generic/Johnson'
       
       ! Vega spectrum for zero-point calibration
       ! This file should contain wavelength (Å) and flux (erg/s/cm²/Å) columns
@@ -74,62 +71,46 @@
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
       
       ! Physical parameters for synthetic photometry
-      distance = 3.0857d16         ! Distance to star in cm (1 pc = 3.0857e16 m for absolute mags)
+      distance = 3.0857d19         ! Distance to star in cm (1 pc = 3.0857e16 m for absolute mags)
       
       ! Output options
       colors_results_directory = 'SED'
       make_csv = .true.            ! Write detailed SED files showing filter convolution  -- This is also needed for plotting the SED.
                                    ! Creates files like: SED/G_SED.csv, SED/VEGA_G_SED.csv
+
+      mag_system = 'Vega'
 / ! end of colors namelist
+
+
+
 
 ! =============================================================================
 ! CONTROLS NAMELIST - Main stellar evolution parameters
 ! =============================================================================
 &controls
-      ! ==========================================================================
-      ! BASIC STELLAR PARAMETERS
-      ! ==========================================================================
-      initial_mass = 2.5d0           ! Initial stellar mass in solar masses
+      ! --- BASIC STELLAR PARAMETERS ---
+      ! 7.0 Solar Masses creates a very distinct "Blue Loop" during He-burning
+      ! This causes the star to swing from Red -> Blue -> Red rapidly.
+      initial_mass = 7.0d0            
+      
+      ! Solar metallicity makes for redder Red Giants and clearer loops
+      initial_z = 0.02d0              
 
-      initial_z = 0.014d0          ! Initial metallicity (mass fraction of elements heavier than He)
-                                   ! 0.014 ≈ solar metallicity
+      ! --- STOPPING CONDITIONS ---
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 1d-2  
+
+      ! Fail-safe max age (just in case)
+      max_age = 1d10               
+
+      ! --- OUTPUT CONTROL ---
+      ! High resolution history for smooth light curves
+      history_interval = 1         
+      profile_interval = 50        
       
-      ! ==========================================================================
-      ! STOPPING CONDITIONS - Control when evolution ends
-      ! ==========================================================================
-      max_age = 2d9                ! Maximum age in years (2 Gyr)
-      
-      ! Stop when central hydrogen is depleted
-      xa_central_lower_limit_species(1) = 'h1'  ! Watch central H1 mass fraction
-      xa_central_lower_limit(1) = 1d-3          ! Stop when central H1 < 0.1%
-      
-      ! ==========================================================================
-      ! OUTPUT CONTROL - Manage file writing frequency
-      ! ==========================================================================
-      profile_interval = 100       ! Write profile every 200 models (reduce for speed)
-      history_interval = 1         ! Write history every model (needed for colors)
-      terminal_interval = 30       ! Print to terminal every 20 models
-      photo_interval = 100         ! Save restart files every 200 models
-      max_model_number = 600      ! Maximum number of models before stopping
-      
-      ! ==========================================================================
-      ! MASS LOSS - Stellar winds
-      ! ==========================================================================
-      ! RGB phase wind prescription (Reimers formula)
-      cool_wind_RGB_scheme = 'Reimers'    ! Use Reimers (1975) wind formula
-      Reimers_scaling_factor = 0.3d0      ! Scaling factor (typical range 0.1-0.5)
-      
-      ! AGB phase wind prescription (Blocker formula)  
-      cool_wind_AGB_scheme = 'Blocker'    ! Use Blocker (1995) wind formula
-      Blocker_scaling_factor = 0.05d0     ! Scaling factor for AGB winds
-      
-      ! ==========================================================================
-      ! NUMERICAL CONTROLS - Balance speed vs accuracy
-      ! ==========================================================================
-      ! Timestep controls
-      varcontrol_target = 1d-3             ! Relative error tolerance (larger = faster, less accurate)
-      max_timestep = 1d6                   ! Maximum timestep in years (1 Myr)
-      
+      ! --- NUMERICAL CONTROLS ---
+      varcontrol_target = 1d-3
+      mesh_delta_coeff = 0.5
 /
 
 
@@ -151,30 +132,9 @@
   ! G band light curve
   History_Track2_win_flag = .true.
   History_Track2_xname = 'star_age'
-  History_Track2_yname = 'G'
-  History_Track2_title = 'G Light Curve'
+  History_Track2_yname = 'V'
+  History_Track2_title = 'V Light Curve'
   History_Track2_xaxis_label = 'Age (yr)'
-  History_Track2_yaxis_label = 'G mag'
-
-  ! Grp light curve
-  History_Track3_win_flag = .true.
-  History_Track3_xname = 'star_age'
-  History_Track3_yname = 'Grp'
-  History_Track3_title = 'Grp Light Curve'
-  History_Track3_xaxis_label = 'Age (yr)'
-
-  ! Grvs light curve
-  History_Track4_win_flag = .true.
-  History_Track4_xname = 'star_age'
-  History_Track4_yname = 'Grvs'
-  History_Track4_title = 'Grvs Light Curve'
-  History_Track4_xaxis_label = 'Age (yr)'
-
-  ! Flux_bol curve
-  History_Track5_win_flag = .true.
-  History_Track5_xname = 'star_age'
-  History_Track5_yname = 'Flux_bol'
-  History_Track5_title = 'Bolometric Flux'
-  History_Track5_xaxis_label = 'Age (yr)'
+  History_Track2_yaxis_label = 'V mag'
 
 /
