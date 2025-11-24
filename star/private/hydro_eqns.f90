@@ -1018,7 +1018,7 @@
                resid_ad = T4_00_expected/T4_00_actual - 1d0
             else
                lnT1_ad = wrap_lnT_00(s,1)
-               resid_ad = lnT_bc_ad/lnT1_ad - 1d0
+               resid_ad = lnT_bc_ad - lnT1_ad
             end if
             residual = resid_ad%val
             s% equ(s% i_equL, 1) = residual
@@ -1050,7 +1050,7 @@
             test_partials = .false.
             ierr = 0
             lnP1_ad = wrap_lnPeos_00(s,1)
-            resid_ad = lnP_bc_ad/lnP1_ad - 1d0
+            resid_ad = lnP_bc_ad - lnP1_ad
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
                s% solver_test_partials_val = 0
