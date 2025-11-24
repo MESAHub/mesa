@@ -4,71 +4,186 @@
 custom_colors
 *************
 
-This test suite case demonstrates the calculation of synthetic photometry during stellar evolution using the MESA colors module. It evolves a 1 |Msun|, Z=0.02 metallicity stellar model from the pre-main sequence while computing bolometric magnitudes and synthetic magnitudes in multiple photometric filters, adding these as extra history columns.
+This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
 
-The colors module, developed by Niall Miller and Meridith Joyce, enables synthetic photometry by interpolating stellar atmosphere models to construct spectral energy distributions (SEDs) matching the evolving stellar parameters (effective temperature \( T_{\eff} \), surface gravity \( \log g \), metallicity [M/H]). These SEDs are convolved with filter transmission curves to produce absolute magnitudes.
+1. What is MESA colors?
+=======================
 
-This module is introduced in MESA r25.10.1-rc1 (release candidate available at https://zenodo.org/records/17426065, with full release expected in November/December 2025). For details, see the module documentation at https://docs.mesastar.org/en/latest/colors/overview.html.
+MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
 
-This test case has one part.
+* **Bolometric Magnitude** (:math:`M_{\rm bol}`)
+* **Bolometric Flux** (:math:`F_{\rm bol}`)
+* **Synthetic Magnitudes** in specific photometric filters (e.g., Johnson V, Gaia G, 2MASS J).
 
-* Part 1 (``inlist``) creates a 1 |Msun|, Z=0.02 metallicity pre-main sequence model and evolves it, calculating synthetic photometry at each timestep using interpolated stellar atmosphere models. The test adds the following columns to the history file:
+This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
 
-.. code-block:: console
+2. How does the MESA colors module work?
+========================================
 
-   Mag_bol              ! Bolometric magnitude
-   Flux_bol             ! Bolometric flux
-   Gbp                  ! Gaia blue photometer magnitude
-   G                    ! Gaia magnitude
-   Grp                  ! Gaia red photometer magnitude
+The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
 
-At the end of the run, the test reports synthetic magnitudes within expected ranges for the final stellar parameters.
+1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the stars current features.
+    
+2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
-Physical Setup
-==============
+3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
 
-The colors module interpolates pre-computed stellar atmosphere models to generate SEDs. These are integrated for bolometric quantities and convolved with filters for synthetic magnitudes.
+3. Running the Test Suite
+=========================
 
-- **Stellar Atmosphere Models**: Kurucz 2003 grid covering \( T_{\eff} = 3500-50000 \) K, \( \log g = 0.0-5.0 \), [M/H] = -5.0 to +1.0.
-- **Filter System**: Gaia DR3 photometric bands (Gbp, G, Grp) by default.
-- **Reference Spectrum**: Vega SED for magnitude zero-points.
-- **Distance**: 10 parsecs for absolute magnitudes.
+The module automatically appends new columns to the ``history.data`` file. You **do not** need to manually add these columns to your ``history_columns.list``. The module handles this dynamically based on the filters found in your specified instrument directory.
 
-Data Download
-=============
+The standard output includes:
 
-The test automatically downloads required data files (~35 MB) on first run:
+* ``Mag_bol``: The absolute bolometric magnitude.
+* ``Flux_bol``: The bolometric flux (in cgs).
+* ``[Filter_Name]``: A magnitude column for every filter file found in the directory specified by ``instrument``.
 
-.. code-block:: console
+For example, if your instrument folder contains ``V.dat`` and ``B.dat``, your history file will automatically gain columns named ``V`` and ``B``.
 
-   ./mk      # Downloads atmosphere models, filters, and Vega spectrum
-   ./rn      # Runs the test
+4. Inlist Options & Parameters
+==============================
 
-The build script (``mk``) creates the necessary directory structure and downloads:
+The colors module is controlled via the ``&colors`` namelist. Below is a detailed guide to the key parameters.
 
-- Stellar atmosphere model grid and lookup table
-- Filter transmission curves
-- Vega reference spectrum
+instrument
+----------
+**Type:** `string`
+**Default:** `'/colors/data/filters/GAIA/GAIA'`
 
-For additional atmospheres and filters from sources like SVO, MSG, MAST, use the SED_Tools repository at https://github.com/nialljmiller/SED_Tools, which provides a CLI for downloading and preparing them for use in the custom colors module.
+This points to the directory containing the filter transmission curves you wish to use. The path must be structured as ``facility/instrument``.
 
-Verification Tools
-==================
+* The directory must contain a file named after the instrument (e.g., ``Johnson``) which acts as an index.
+* The module will read every ``.dat`` file listed in that directory and create a corresponding history column for it.
 
-Python helper scripts are provided for monitoring and verification:
+**Example:**
 
-.. code-block:: console
+.. code-block:: fortran
 
-- python HISTORY_check.py      # Real-time monitoring of photometric evolution
-- python SED_check.py          # Real-time SED visualization
-
-Expected Outputs
-================
-
-The test produces standard MESA output plus additional photometric columns in the history file. 
-- The history file will have "Mag_bol", "Flux_bol".
-- A column for every filter in the user-selected instrument.
-- If make_csv is .true., it will also output an SED for each filter band as a CSV file in colors_results/{filter}_SED.csv.
+   instrument = '/colors/data/filters/Generic/Johnson'
 
 
-Last-Updated: 05Nov2025 by Niall Miller
+stellar_atm
+-----------
+**Type:** `string`
+**Default:** `'/colors/data/stellar_models/Kurucz2003all/'`
+
+Specifies the path to the directory containing the grid of stellar atmosphere models. This directory must contain:
+
+1.  **lookup_table.csv**: A map linking filenames to physical parameters (:math:`T_{\rm eff}`, :math:`\log g`, [M/H]).
+2.  **SED files**: The actual spectra (text or binary format).
+3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
+
+The module queries this grid using the star's current parameters. If the star evolves outside the grid boundaries, the module may clamp to the nearest edge or extrapolate, depending on internal settings.
+
+
+distance
+--------
+**Type:** `float` (double)
+**Default:** `3.0857d19` (10 parsecs in cm)
+
+The distance to the star in centimeters. 
+
+* This value is used to convert surface flux to observed flux.
+* **Default Behavior:** It defaults to 10 parsecs (:math:`3.0857 \times 10^{19}` cm), resulting in **Absolute Magnitudes**.
+* **Custom Usage:** You can set this to a specific source distance (e.g., distance to Betelgeuse) to calculate Apparent Magnitudes.
+
+
+make_csv
+--------
+**Type:** `logical`
+**Default:** `.false.`
+
+If set to ``.true.``, the module exports the full calculated SED at every profile interval. 
+
+* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
+* **Format:** CSV files containing Wavelength vs. Flux.
+* **Use Case:** useful for debugging or plotting the full spectrum of the star at a specific age.
+
+
+colors_results_directory
+------------------------
+**Type:** `string`
+**Default:** `'SED'`
+
+The folder where csv files (if ``make_csv = .true.``) and other debug outputs are saved.
+
+
+mag_system
+----------
+**Type:** `string`
+**Default:** `'ST'`
+
+Defines the zero-point system for magnitude calculations. Options are:
+
+* ``'AB'``: Based on a flat spectral flux density of 3631 Jy.
+* ``'ST'``: Based on a flat spectral flux density per unit wavelength.
+* ``'Vega'``: Calibrated such that the star Vega has magnitude 0 in all bands.
+
+
+vega_sed
+--------
+**Type:** `string`
+**Default:** `'/colors/data/stellar_models/vega_flam.csv'`
+
+Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
+
+
+5. Data Preparation (SED_Tools)
+===============================
+
+The ``colors`` module requires input data (atmospheres and filters) to be formatted in a specific way. To assist with this, we provide the **SED_Tools** repository.
+
+**Repository:** `SED_Tools <https://github.com/nialljmiller/SED_Tools>`_
+
+This tool allows you to:
+
+1.  Download spectra from repositories like **SVO**, **MSG**, and **MAST**.
+2.  Download filter profiles from the **SVO Filter Profile Service**.
+3.  **Rebuild** raw data into the binary formats (``.bin``, ``.h5``) and directory structures required by MESA.
+
+**Workflow Summary:**
+Download Data (via SED_Tools) :math:`\rightarrow` Rebuild for MESA :math:`\rightarrow` Point ``inlist`` to new directories.
+
+6. Defaults Reference
+=====================
+
+Below are the default values for the colors module parameters as defined in ``colors.defaults``. These are used if you do not override them in your inlist.
+
+.. code-block:: fortran
+
+      use_colors = .false.
+      instrument = '/colors/data/filters/GAIA/GAIA'
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
+      make_csv = .false.
+      colors_results_directory = 'SED'
+      mag_system = 'ST'
+
+Visual Summary of Data Flow
+===========================
+
+.. code-block:: text
+
+   +----------------+       +------------------+       +-------------------+
+   |  Stellar Model |       |  Stellar Atm     |       |   Filter Curves   |
+   | (Teff, logg, Z)| ----> |     Library      | ----> |    (Instrument)   |
+   +----------------+       +------------------+       +-------------------+
+           |                         |                           |
+           v                         v                           v
+   +-----------------------------------------------------------------------+
+   |                        MESA COLORS MODULE                             |
+   | 1. Query Atm Grid -> Interpolate SED                                  |
+   | 2. Apply Distance -> Flux_bol                                         |
+   | 3. Convolve SED + Filters -> Band Flux                                |
+   | 4. Apply Zero Point (Vega/AB/ST) -> Magnitude                         |
+   +-----------------------------------------------------------------------+
+           |
+           v
+   +----------------------+
+   |    history.data      |
+   | age, Teff, ...       |
+   | Mag_bol, Flux_bol    |
+   | V, B, I, ...         |
+   +----------------------+
