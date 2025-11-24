@@ -21,6 +21,8 @@
    ! ~~~~~~~~
    ! colors_results_directory
    ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! mag_system
+   ! ~~~~~~~~~~
 
    ! If ``use_colors`` is true, the colors module is turned on, which will calculate
    ! bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
@@ -29,13 +31,13 @@
    ! ::
 
       use_colors = .false.
-      instrument = '/colors/data/filters/GAIA/GAIA'
+      instrument = '/colors/data/filters/Generic/Johnson'
       vega_sed = '/colors/data/stellar_models/vega_flam.csv'
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
       distance = 3.0857d17
       make_csv = .false.
       colors_results_directory = 'SED'
-      mag_system = 'ST'
+      mag_system = 'Vega'
 
 
 ! Extra inlist controls
