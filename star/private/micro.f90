@@ -35,7 +35,7 @@ module micro
   public :: shutdown_microphys
 
   logical, parameter :: dbg = .false.
-  logical :: initiaze_kap_grid = .true.
+  logical :: initialize_kap_grid = .true.
   real(dp), public, save :: fk_pcg_old(17)
 
 contains
@@ -133,13 +133,13 @@ contains
           fk = fk / sum(fk)
           delta = MAXVAL(ABS(fk - fk_pcg_old)/fk_pcg_old)
 
-          if (initiaze_kap_grid) then
+          if (initialize_kap_grid) then
              call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
              write(*,*) 'Computing kappa grid for initial mixture.'
              call call_compute_kappa_grid_mombarg(fk, ierr)
              !write(*,*) 'Finished computing grid for initial mixture.'
              fk_pcg_old = fk
-             initiaze_kap_grid = .false.
+             initialize_kap_grid = .false.
           else if (delta > 1d-4) THEN
              write(*,*) 'Computing kappa grid for core mixture.'
              write(*,*) delta

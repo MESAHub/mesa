@@ -68,7 +68,7 @@
          if (s% rotation_flag) then
             new_J = total_angular_momentum(s)
             if (abs((old_J-new_J)/old_J)>1d-14) then
-               write(*,*) "Error in angular momemtum conservation from amr split merge"
+               write(*,*) "Error in angular momentum conservation from amr split merge"
                s% result_reason = adjust_mesh_failed
                s% termination_code = t_adjust_mesh_failed
                remesh_split_merge = terminate

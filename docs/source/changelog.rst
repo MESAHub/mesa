@@ -7,10 +7,34 @@ Changelog
 .. note:: This section describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
 
 
-
-
 Changes in main
 ===============
+
+
+.. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
+
+
+.. _New Features main:
+
+New Features
+------------
+
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+
+.. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
+
+
+
+Changes in r25.10.1-rc1
+=======================
 
 Upgraded software license from LGPL-v2.1 to LGPL-v3.0
 
@@ -513,11 +537,11 @@ like to see the changes without modifying the file.
 For convenience, we have also included a bash script that will call a version of
 this ``sed`` command (along with ``sed`` commands for the next changelog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
-where you want to update every inlist by invoking ::
+where you want to update every inlist by invoking
 
 .. code-block:: console
 
-  $MESA_DIR/scripts/update_inlists.sh
+    $MESA_DIR/scripts/update_inlists.sh
 
 This script will save the previous versions of your inlists to a directory named
 ``backup_inlists``.
