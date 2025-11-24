@@ -49,7 +49,9 @@ The colors module is controlled via the ``&colors`` namelist. Below is a detaile
 instrument
 ----------
 **Type:** `string`
-**Default:** `'/colors/data/filters/GAIA/GAIA'`
+      instrument = 
+
+**Default:** `'/colors/data/filters/Generic/Johnson'`
 
 This points to the directory containing the filter transmission curves you wish to use. The path must be structured as ``facility/instrument``.
 
@@ -60,7 +62,7 @@ This points to the directory containing the filter transmission curves you wish 
 
 .. code-block:: fortran
 
-   instrument = '/colors/data/filters/Generic/Johnson'
+   instrument = '/colors/data/filters/GAIA/GAIA'
 
 
 stellar_atm
@@ -153,7 +155,7 @@ Below are the default values for the colors module parameters as defined in ``co
 .. code-block:: fortran
 
       use_colors = .false.
-      instrument = '/colors/data/filters/GAIA/GAIA'
+      instrument = '/colors/data/filters/Generic/Johnson'
       vega_sed = '/colors/data/stellar_models/vega_flam.csv'
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
@@ -187,3 +189,63 @@ Visual Summary of Data Flow
    | Mag_bol, Flux_bol    |
    | V, B, I, ...         |
    +----------------------+
+
+
+
+
+================================================
+================================================
+
+7. Python Helper Scripts
+========================
+
+A collection of Python scripts is provided in the ``python_helpers/`` directory to assist with real-time monitoring, visualization, and analysis of the colors module output.
+
+Dependencies:
+  * ``matplotlib``
+  * ``numpy``
+  * ``mesa_reader`` (ensure this is installed/accessible)
+  * ``ffmpeg`` (optional, for movie generation)
+
+HISTORY_check.py
+----------------
+**Usage:** ``python python_helpers/HISTORY_check.py``
+
+A real-time dashboard that monitors your ``history.data`` file as MESA runs. It automatically refreshes when new data is written.
+
+**Plots:**
+  1. **HR Diagram (Color vs. Magnitude):** Points colored by evolutionary phase.
+  2. **Theoretical HR (Teff vs. Log L):** Standard theoretical track.
+  3. **Color Evolution:** Color index vs. Age.
+  4. **Light Curves:** Absolute magnitude vs. Age for all filters.
+
+**Requirements:** Ensure ``phase_of_evolution`` is present in your ``history_columns.list`` for phase-based coloring.
+
+SED_check.py
+------------
+**Usage:** ``python python_helpers/SED_check.py``
+
+Monitors the ``colors_results_directory`` (default: ``SED/``) for new CSV output.
+
+**Features:**
+  * Plots the full high-resolution stellar spectrum (black line).
+  * Plots the filter-convolved fluxes (colored lines corresponding to filters).
+  * Displays stellar parameters (Mass, Z, Distance) parsed from your inlist.
+  * Updates automatically if ``make_csv = .true.`` in your inlist and MESA overwrites the files.
+
+interactive_cmd_3d.py
+---------------------
+**Usage:** ``python python_helpers/interactive_cmd_3d.py``
+
+Generates an interactive 3D Color-Magnitude Diagram.
+
+* **X-axis:** Color Index (e.g., B-V or Gbp-Grp).
+* **Y-axis:** Magnitude (e.g., V or G).
+* **Z-axis:** User-selectable column from the history file (e.g., ``Interp_rad``, ``star_age``, ``log_R``). The script will prompt you to choose a column at runtime.
+
+Movie Makers
+------------
+Scripts to generate MP4 animations of your run. Requires ``ffmpeg``.
+
+* **make_history_movie.py**: Creates ``history.mp4``, an animated version of the ``HISTORY_check.py`` dashboard showing the evolution over time.
+* **make_CMD_InterpRad_movie.py**: Creates ``cmd_interp_rad_rotation.mp4``, a rotating 3D view of the Color-Magnitude Diagram with the Interpolation Radius on the Z-axis. Useful for visualizing grid coverage and interpolation quality.    
