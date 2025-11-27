@@ -36,6 +36,8 @@
       include "test_suite_extras_def.inc"
 
       logical :: dbg = .false.
+      real(dp), parameter :: log_term_power = 5.626d0
+
 
       logical :: pgstar_flag
       integer :: pgstar_interval, pgstar_file_interval
@@ -91,6 +93,7 @@
       !logical :: remove_extended_layers, in_inlist_pulses
       logical :: in_inlist_pulses
       real(dp) :: max_dt_before_pulse
+      real(dp) :: vsurf_for_fixed_bc
       real(dp) :: max_Lneu_for_mass_loss
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
@@ -152,6 +155,7 @@
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
          stop_100d_after_pulse = s% x_logical_ctrl(1)
+         vsurf_for_fixed_bc = s% x_ctrl(17)
 
          ! we store the value given in inlist_ppisn and deactivate it at
          ! high T
@@ -328,79 +332,78 @@
          end if
       end subroutine my_adjust_mdot
 
-      subroutine my_other_eval_fp_ft( &
-            id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+      subroutine my_other_eval_fp_ft(id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
-         integer, intent(in) :: id
-         integer, intent(in) :: nz
-         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)  ! (nz)
-         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)  ! (nz)
-         real(dp), intent(inout) :: r_polar(:), r_equatorial(:)  ! (nz)
+         integer, intent(in) :: id, k
+         real(dp), intent(in) :: aw, r, rho, xm
+         type(auto_diff_real_star_order1), intent(out) :: fp, ft
+         real(dp), intent(inout) :: r_polar, r_equatorial
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         integer :: j
          real(dp) :: alpha
 
-         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
-            fp_temp, ft_temp
+         type(auto_diff_real_1var_order1) :: A_omega, fp_numerator, ft_numerator, &
+            w, w2, w3, w4, w5, w6, w_log_term, fp_temp, ft_temp
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, fp_temp, ft_temp, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
-            do j=1, s% nz
-               !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
-               !by this point in the code, w_div_w_crit_roche is set
-               w = s% w_div_w_crit_roche(j)
-               w%d1val1 = 1d0
+         !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
+         w = aw
+         w% d1val1 = 1d0
 
-               w2 = pow2(w)
-               w4 = pow4(w)
-               w6 = pow6(w)
-               lg_one_sub_w4 = log(1d0-w4)
-               A_omega = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-               fp_numerator = (1d0-two_thirds*w2-0.06837d0*w4-0.2495d0*w6)
-               ft_numerator = (1d0+0.2185d0*w4-0.1109d0*w6)
-               !fits for fp, ft
-               fp_temp = fp_numerator/A_omega
-               ft_temp = ft_numerator/A_omega
-               !re and rp can be derived analytically from w_div_wcrit
-               r_equatorial(j) = r(j)*(1d0+w2% val/6d0-0.0002507d0*w4% val+0.06075d0*w6% val)
-               r_polar(j) = r_equatorial(j)/(1d0+0.5d0*w2% val)
-               ! Be sure they are consistent with r_Phi
-               r_equatorial(j) = max(r_equatorial(j),r(j))
-               r_polar(j) = min(r_polar(j),r(j))
+         w2 = pow2(w)
+         w4 = pow4(w)
+         w6 = pow6(w)
+         w_log_term = log(1d0 - pow(w, log_term_power))
+         ! cannot use real function below because these are auto_diff variables
+         A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
 
-               fp(j) = 0d0
-               ft(j) = 0d0
-               fp(j)% val = fp_temp% val
-               ft(j)% val = ft_temp% val
-               if (s% w_div_wc_flag) then
-                  fp(j)% d1Array(i_w_div_wc_00) = fp_temp% d1val1
-                  ft(j)% d1Array(i_w_div_wc_00) = ft_temp% d1val1
-               end if
-            end do
-!$OMP END PARALLEL DO
+         ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
+         fp_temp = (1d0 - two_thirds * w2 - 0.2133d0 * w4 - 0.1068d0 * w6) / A_omega
+         ft_temp = (1d0 - 0.07955d0 * w4 - 0.2322d0 * w6) / A_omega
+
+         ! re and rp can be derived analytically from w_div_wcrit
+         r_equatorial = r * re_from_rpsi_factor(w2% val, w4% val, w6% val)
+         r_polar = r_equatorial / (1d0 + 0.5d0 * w2% val)
+
+         ! Be sure they are consistent with r_Psi
+         r_equatorial = max(r_equatorial, r)
+         r_polar = min(r_polar, r)
+
+         fp = 0d0
+         ft = 0d0
+         fp% val = fp_temp% val
+         ft% val = ft_temp% val
+         if (s% w_div_wc_flag) then
+            fp% d1Array(i_w_div_wc_00) = fp_temp% d1val1
+            ft% d1Array(i_w_div_wc_00) = ft_temp% d1val1
+         end if
 
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
-            do j=1, s% nz
-               if (s% q(j) > 0.999d0) then
-                  fp(j) = 1d0
-                  ft(j) = 1d0
-               else if (s% q(j) > 0.998d0) then
-                  alpha = (1d0-(s% q(j)-0.998d0)/(0.001d0))
-                  fp(j) = fp(j)*alpha + 1d0*(1-alpha)
-                  ft(j) = ft(j)*alpha + 1d0*(1-alpha)
-               end if
-            end do
+            if (s% q(k) > 0.999d0) then
+               fp = 1d0
+               ft = 1d0
+            else if (s% q(k) > 0.998d0) then
+               alpha = (1d0 - (s% q(k) - 0.998d0) / 1d-3)
+               fp = fp * alpha + 1d0 * (1 - alpha)
+               ft = ft * alpha + 1d0 * (1 - alpha)
+            end if
          end if
 
       end subroutine my_other_eval_fp_ft
 
+      real(dp) function re_from_rpsi_factor(o2, o4, o6)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         ! Fabry+2022, Eq. A.3
+         re_from_rpsi_factor = 1d0 + one_sixth * o2 - 0.005124d0 * o4 + 0.06562d0 * o6
+      end function re_from_rpsi_factor
 
       subroutine my_other_kap_get( &
             id, k, handle, species, chem_id, net_iso, xa, &
@@ -832,7 +835,9 @@
          ! be sure power info is stored
          call star_set_power_info(s)
 
-         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
+         ! sets initial rotation profile at helium ZAMS, when rotation is turned on in inlist_pulses
+         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams) .and. &
+            s% job% change_rotation_flag .and. s% job% new_rotation_flag) then
             lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
             if (lburn_div_lsurf > 0d0) then
                if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
@@ -1251,7 +1256,24 @@
             else
                s% max_timestep = max_dt_before_pulse
             end if
-         else
+
+            ! sweep and ensure speeds are below ~ 6.7% speed of light, 20,000 km/s. For surface layers.
+            do k=1, s% nz
+               s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
+               s% u(k) = s% xh(s% i_u,k)
+            end do
+
+            ! use fixed_vsurf if surface v remains too high
+            if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
+               s% use_fixed_vsurf_outer_BC = .true.
+               s% use_momentum_outer_BC = .false.
+               s% fixed_vsurf = 1d5*vsurf_for_fixed_bc
+            else
+               s% use_fixed_vsurf_outer_BC = .false.
+               s% use_momentum_outer_BC = .true.
+            end if
+
+         else ! not using hydro (u_flag = .false.)
             s% max_timestep = 1d99
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
@@ -1331,6 +1353,10 @@
          if (ierr /= 0) return
 
          extras_finish_step = keep_going
+
+         if (s% use_fixed_vsurf_outer_BC .and. mod(s% model_number,10) == 0) then
+            write(*,*) "Using fixed_vsurf", s% fixed_vsurf/1e5
+         end if
 
          !count time since first collapse
          if (s% lxtra(lx_have_reached_gamma_limit)) then

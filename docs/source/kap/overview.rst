@@ -74,7 +74,7 @@ between OP/OPAL/OPLIB can be found in `Farag et al. 2024 <https://doi.org/10.384
    :alt: kap blends in solar-like compositions
 
    Location of each Type-1 opacity table in the :math:`X–Z` plane (left panel) and the
-   log:math:`T`–log:math:`R` plane (right panel). Orange circles mark the location of
+   log :math:`T` – log :math:`R` plane (right panel). Orange circles mark the location of
    the 126 OPAL Type-1 tables (Rogers & Iglesias 1992). Blue circles
    mark the location of the new 1194 Type-1 opacity tables (Farag et al. 2024).
 
