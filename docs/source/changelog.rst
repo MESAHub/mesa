@@ -153,6 +153,7 @@ Fixed a bug in ``other_mlt_results`` which resulted in the pre-ms model builder 
 
 Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
+Fixed bug in residual calculation near P = 1, or T = 1
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
 
