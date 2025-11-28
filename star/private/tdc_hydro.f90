@@ -258,7 +258,7 @@ contains
    else
       Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
       if (ierr /= 0) return
-      if (s%u_flag .or. s%TDC_use_density_form_for_eddy_viscosity) then
+      if (s%TDC_use_density_form_for_eddy_viscosity) then
          ! new density derivative form
          d_v_div_r = compute_rho_form_of_d_v_div_r_face(s, k, ierr)
       else
@@ -325,7 +325,7 @@ contains
       Chi_face = compute_Chi_div_w_face(s,k,ierr)
       if (ierr /= 0) return
 
-      if (s%u_flag .or. s%TDC_use_density_form_for_eddy_viscosity) then
+      if (s%TDC_use_density_form_for_eddy_viscosity) then
          ! new density derivative term
          d_v_div_r = compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr)
       else
@@ -406,7 +406,7 @@ contains
       else
          r_00 = wrap_opt_time_center_r_00(s, k)
          r_p1 = wrap_opt_time_center_r_p1(s, k)
-         r_cell = 0.5d0*(r_00+r_p1)
+         r_cell = 0.5d0*(r_00+r_p1) ! not staggered unlike terms inside chi_div_w_face
 
          if (s% okay_to_set_mlt_vc .and. &
             s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
@@ -594,8 +594,13 @@ contains
          v_m1 = wrap_u_m1(s,k)
       end if
 
+      if (s% v_flag) then
          r_00 = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
          r_m1 = 0.5d0*(wrap_r_00(s, k) + wrap_r_m1(s, k))
+      else if(s% u_flag) then ! stagger r for u_flag to retain tridiagonality.
+         r_00 = wrap_r_00(s, k)
+         r_m1 = wrap_r_m1(s, k)
+      end if
 
       if (r_00%val == 0d0) r_00 = 1d0
       if (r_m1%val == 0d0) r_m1 = 1d0
@@ -629,8 +634,13 @@ contains
          v_m1 = wrap_opt_time_center_u_m1(s,k)
       end if
          
+      if (s% v_flag) then
          r_00 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
          r_m1 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_m1(s, k))
+      else if(s% u_flag) then ! stagger r for u_flag to retain tridiagonality.
+         r_00 = wrap_opt_time_center_r_00(s, k)
+         r_m1 = wrap_opt_time_center_r_m1(s, k)
+      end if
 
       if (r_00%val == 0d0) r_00 = 1d0
       if (r_m1%val == 0d0) r_m1 = 1d0
