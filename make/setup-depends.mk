@@ -5,9 +5,6 @@ include $(MAKE_DIR)/subdirs.mk
 PKG_CONFIG_FLAGS =
 
 ifneq ($(MESASDK_ROOT),)
-  PKG_CONFIG_PATH := $(MAKE_DIR)/pkgconfig:$(PKG_CONFIG_PATH)
-  PKG_CONFIG_FLAGS += --define-variable=MESASDK_ROOT=$(MESASDK_ROOT)
-
   ifeq ($(WITH_CRLIBM),yes)
     PKG_CONFIG_FLAGS += --define-variable=MATH_SLOT=crmath
     MESASDK_MATH_SLOT = crmath
@@ -23,8 +20,8 @@ export PKG_CONFIG_PATH
 
 define pkg-config-inner
 ifneq ($(2),)
-  TMP_VAR := $$(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(PKG_CONFIG_FLAGS) $(1) $(2))
-  ifeq ($$(TMP_VAR),)
+  TMP_VAR := $$(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(PKG_CONFIG_FLAGS) $(1) $(2) || echo "failed")
+  ifeq ($$(TMP_VAR),failed)
     $$(warning PKG_CONFIG_PATH is $$(PKG_CONFIG_PATH))
     $$(error pkg-config failed to find some of $(2), check PKG_CONFIG_PATH is correct)
   endif

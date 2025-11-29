@@ -59,7 +59,7 @@ Sometimes you want to have certain files included in the compilation depending o
 
     ifeq ($(WITH_CRLIBM),yes)
     SRCS += public/math_lib_crmath.f90
-    EXTERNAL_DEPENDS_ON += crlibm-fortran
+    EXTERNAL_DEPENDS_ON += crmath
     else
     SRCS += public/math_lib_intrinsic.f90
     endif
