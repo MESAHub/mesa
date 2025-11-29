@@ -1003,7 +1003,7 @@
             integer, intent(out) :: ierr
             logical :: test_partials
             type(auto_diff_real_star_order1) :: &
-               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected
+               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected, scale
             real(dp) :: residual
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
@@ -1018,7 +1018,8 @@
                resid_ad = T4_00_expected/T4_00_actual - 1d0
             else
                lnT1_ad = wrap_lnT_00(s,1)
-               resid_ad = lnT_bc_ad/lnT1_ad - 1d0
+               scale = max(1d0,lnT1_ad)
+               resid_ad = (lnT_bc_ad - lnT1_ad)/scale
             end if
             residual = resid_ad%val
             s% equ(s% i_equL, 1) = residual
@@ -1044,13 +1045,14 @@
          subroutine set_Psurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
-            type(auto_diff_real_star_order1) :: lnP1_ad
+            type(auto_diff_real_star_order1) :: lnP1_ad, scale
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
             lnP1_ad = wrap_lnPeos_00(s,1)
-            resid_ad = lnP_bc_ad/lnP1_ad - 1d0
+            scale = max(1d0,lnP1_ad)
+            resid_ad = (lnP_bc_ad - lnP1_ad)/scale
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
                s% solver_test_partials_val = 0
