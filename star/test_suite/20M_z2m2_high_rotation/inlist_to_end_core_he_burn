@@ -214,7 +214,7 @@
       
       energy_eqn_option = 'dedt'
       include_composition_in_eps_grav = .true.
-      convergence_ignore_equL_residuals = .true. 
+      convergence_ignore_equL_residuals = .false. 
       ignore_too_large_correction = .true.
       warn_rates_for_high_temp = .true.
       max_safe_logT_for_rates = 10.5d0

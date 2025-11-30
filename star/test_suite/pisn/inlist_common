@@ -174,7 +174,7 @@
       energy_eqn_option = 'dedt'
       max_tries_for_implicit_wind = 0
 
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
       make_gradr_sticky_in_solver_iters = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10

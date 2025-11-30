@@ -16,7 +16,7 @@
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -40,10 +40,10 @@
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 0.0001
 
-      energy_eqn_option = 'eps_grav'
+      energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
       
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

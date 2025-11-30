@@ -47,7 +47,7 @@
    ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
    energy_eqn_option = 'dedt'
-   convergence_ignore_equL_residuals = .true.
+   convergence_ignore_equL_residuals = .false.
    use_gold2_tolerances = .true.
    limit_for_rel_error_in_energy_conservation = -1
    hard_limit_for_rel_error_in_energy_conservation = -1

@@ -54,7 +54,7 @@
       energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
 
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
       mesh_delta_coeff = 0.5
 

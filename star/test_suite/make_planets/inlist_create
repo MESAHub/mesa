@@ -46,7 +46,7 @@
    limit_for_rel_error_in_energy_conservation = 1d-5
    hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-   convergence_ignore_equL_residuals = .true.
+   convergence_ignore_equL_residuals = .false.
 
       ! limit max_model_number as part of test_suite
    max_model_number = 200
