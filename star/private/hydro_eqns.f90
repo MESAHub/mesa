@@ -1003,8 +1003,8 @@
             integer, intent(out) :: ierr
             logical :: test_partials
             type(auto_diff_real_star_order1) :: &
-               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected, scale
-            real(dp) :: residual
+               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected
+            real(dp) :: residual, scale
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
@@ -1045,7 +1045,8 @@
          subroutine set_Psurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
-            type(auto_diff_real_star_order1) :: lnP1_ad, scale
+            type(auto_diff_real_star_order1) :: lnP1_ad
+            real(dp) :: scale
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
