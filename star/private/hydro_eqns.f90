@@ -1018,7 +1018,7 @@
                resid_ad = T4_00_expected/T4_00_actual - 1d0
             else
                lnT1_ad = wrap_lnT_00(s,1)
-               scale = max(1d0,log(s%T_start(1)))
+               scale = max(1d0,s%lnT_start(1))
                resid_ad = (lnT_bc_ad - lnT1_ad)/scale
             end if
             residual = resid_ad%val
@@ -1052,7 +1052,7 @@
             test_partials = .false.
             ierr = 0
             lnP1_ad = wrap_lnPeos_00(s,1)
-            scale = max(1d0,log(s%Peos_start(1)))
+            scale = max(1d0,s%lnPeos_start(1))
             resid_ad = (lnP_bc_ad - lnP1_ad)/scale
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
