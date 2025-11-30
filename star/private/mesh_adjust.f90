@@ -594,6 +594,7 @@
 
          call prune1(s% lnT, lnT_old, skip)
          call prune1(s% D_mix, D_mix_old, skip)
+         call prune1(s% mlt_vc, mlt_vc_old, skip)
 
          if (s% rotation_flag) then
             call prune1(s% j_rot, j_rot_old, skip)
