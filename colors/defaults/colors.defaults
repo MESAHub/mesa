@@ -34,7 +34,7 @@
       instrument = '/colors/data/filters/Generic/Johnson'
       vega_sed = '/colors/data/stellar_models/vega_flam.csv'
       stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
-      distance = 3.0857d17
+      distance = 3.0857d19
       make_csv = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
