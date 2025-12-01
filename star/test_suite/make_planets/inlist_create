@@ -37,8 +37,8 @@
 
 &controls
 
-   use_gold2_tolerances = .false. ! wait a few steps
-   steps_before_use_gold2_tolerances = 31
+   use_gold2_tolerances = .true. ! wait a few steps
+   !steps_before_use_gold2_tolerances = 31
 
    warning_limit_for_max_residual = 1d99 ! off until evolve
    warn_when_large_virial_thm_rel_err = 1d99 ! off until evolve
@@ -46,7 +46,7 @@
    limit_for_rel_error_in_energy_conservation = 1d-5
    hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-   convergence_ignore_equL_residuals = .false.
+   convergence_ignore_equL_residuals = .true.
 
       ! limit max_model_number as part of test_suite
    max_model_number = 200
