@@ -8776,7 +8776,7 @@
 
       ! ::
 
-    max_corr_jump_limit = 1d6
+    max_corr_jump_limit = 1d12
 
 
       ! resid_norm_jump_limit
@@ -8796,7 +8796,7 @@
 
       ! ::
 
-    max_resid_jump_limit = 1d10
+    max_resid_jump_limit = 1d12
 
 
       ! convergence_ignore_equL_residuals
