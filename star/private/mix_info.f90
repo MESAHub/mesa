@@ -360,10 +360,11 @@
          end if
 
          ! as last thing, update conv_vel from D_mix and mixing length.
+         ! this updates the effective conv vel for rotation and overshooting effects
          do k=2,nz
             if (s% alpha_mlt(k)*s% scale_height(k) > 0) then
                s% conv_vel(k) = &
-                  3*s% D_mix(k)/(s% alpha_mlt(k)*s% scale_height(k))
+                  3d0*s% D_mix(k)/(s% alpha_mlt(k)*s% scale_height(k))
             else
                s% conv_vel(k) = 0
             end if

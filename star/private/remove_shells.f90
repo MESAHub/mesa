@@ -1108,7 +1108,7 @@
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% j_rot, prv% i_rot, &
             prv% omega, prv% D_omega, prv% am_nu_rot, &
-            prv% conv_vel, prv% lnT, &
+            prv% mlt_vc, prv% lnT, &
             prv% dPdr_dRhodr_info, prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
             prv% D_SSI, prv% D_ES, prv% D_GSF, prv% D_mix, &
             s% xh, s% xa, ierr)
