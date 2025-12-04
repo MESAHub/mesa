@@ -45,6 +45,9 @@
 
 &controls
 
+! temporary to address mesa photo restart bit for bit performance
+fill_arrays_with_NaNs = .true.
+
   ! Braking settings
     use_other_torque = .true.
     x_ctrl(1) = 500.0     ! Surface Magnetic Field (Gauss). Try e.g. 5, 50, 500, 5000
