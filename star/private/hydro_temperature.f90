@@ -240,7 +240,7 @@
 
          type(auto_diff_real_star_order1) :: resid, &
             dlnPdm, Ppoint, gradT, dlnTdm, T00, Tm1, dT, Tpoint, lnTdiff
-         real(dp) :: delm, alfa, lnTdiff_start, dT_start, Tpoint_start, scale
+         real(dp) :: delm, alfa
          integer :: i_equL
          logical :: test_partials
 
@@ -288,11 +288,7 @@
          lnTdiff = dT/Tpoint  ! use this in place of lnT(k-1)-lnT(k)
          delm = (s% dm(k) + s% dm(k-1))/2
 
-         dT_start = s% T_start(k-1) - s% T_start(k)
-         Tpoint_start = alfa*s%T_start(k) + (1d0 - alfa)*s%T_start(k-1)
-         lnTdiff_start = dT_start/Tpoint_start
-         scale = max(1d0,lnTdiff_start)
-         resid = (delm*dlnTdm - lnTdiff)/scale
+         resid = delm*dlnTdm - lnTdiff
          s% equ(i_equL, k) = resid%val
 
          if (is_bad(s% equ(i_equL, k))) then
