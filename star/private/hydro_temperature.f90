@@ -288,7 +288,7 @@
          lnTdiff = dT/Tpoint  ! use this in place of lnT(k-1)-lnT(k)
          delm = (s% dm(k) + s% dm(k-1))/2
 
-         resid = (delm*dlnTdm - lnTdiff)
+         resid = delm*dlnTdm - lnTdiff
          s% equ(i_equL, k) = resid%val
 
          if (is_bad(s% equ(i_equL, k))) then
