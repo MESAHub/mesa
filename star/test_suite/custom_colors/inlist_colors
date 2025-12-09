@@ -41,6 +41,8 @@
       kap_file_prefix = 'gs98'     ! Use Grevesse & Sauval 1998 opacity tables
 /
 
+
+
 ! =============================================================================
 ! COLORS NAMELIST - Synthetic photometry settings
 ! Custom colors and this project inlist by Niall Miller
@@ -57,12 +59,7 @@
       ! - Grp.dat (Red photometer)
       ! - Grvs.dat (Radial Velocity Spectrometer)
       instrument = '/colors/data/filters/Generic/Johnson'
-      
-      ! Vega spectrum for zero-point calibration
-      ! This file should contain wavelength (Å) and flux (erg/s/cm²/Å) columns
-      ! Used to define the zero-point of the magnitude system (Vega = 0.0 mag)
-      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
-      
+
       ! Stellar atmosphere model directory
       ! Should contain:
       ! - lookup_table.csv: mapping file with columns for filename, Teff, log_g, metallicity
@@ -79,6 +76,13 @@
                                    ! Creates files like: SED/G_SED.csv, SED/VEGA_G_SED.csv
 
       mag_system = 'Vega'
+
+      ! Vega spectrum for zero-point calibration
+      ! This file should contain wavelength (Å) and flux (erg/s/cm²/Å) columns
+      ! Used to define the zero-point of the magnitude system (Vega = 0.0 mag)
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+
+
 / ! end of colors namelist
 
 
