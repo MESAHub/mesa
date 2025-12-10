@@ -12,10 +12,7 @@
       create_pre_main_sequence_model = .true.  ! Start from pre-MS rather than ZAMS
       
       ! Termination conditions
-      ! required_termination_code_string = 'xa_central_lower_limit'  ! Stop when central H is depleted
       save_model_when_terminate = .false.
-      !save_model_filename = 'custom_colors_end.mod'
-      !required_termination_code_string = ''
       
       ! Custom output files
       history_columns_file = 'custom_colors_history_columns.list'  ! Additional history columns
@@ -52,14 +49,11 @@
 &colors
       ! Enable the colors module
       use_colors = .true.
-      
+            
       ! Filter system specification
-      ! This points to a directory containing filter transmission curves
-      ! The GAIA directory should contain files like:
-      ! - Gbp_bright.dat, Gbp.dat, Gbp_faint.dat (Blue photometer filters)
-      ! - G.dat (White light photometer)  
-      ! - Grp.dat (Red photometer)
-      ! - Grvs.dat (Radial Velocity Spectrometer)
+      ! This points to a directory containing Johnson filter transmission curves.
+      ! The Johnson directory should contain files like:
+      !   - U.dat, B.dat, V.dat, R.dat, I.dat, J.dat, M.dat   (filter transmission curves)
       instrument = '/colors/data/filters/Generic/Johnson'
 
       ! Stellar atmosphere model directory
@@ -75,8 +69,9 @@
       ! Output options
       colors_results_directory = 'SED'
       make_csv = .true.            ! Write detailed SED files showing filter convolution  -- This is also needed for plotting the SED.
-                                   ! Creates files like: SED/G_SED.csv, SED/VEGA_G_SED.csv
+                                   ! Creates files like: SED/B_SED.csv, SED/VEGA_B_SED.csv
 
+      !zero point. Select between: Vega, AB, ST
       mag_system = 'Vega'
 
       ! Vega spectrum for zero-point calibration
