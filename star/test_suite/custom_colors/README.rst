@@ -6,7 +6,7 @@ custom_colors
 
 This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
 
-1. What is MESA colors?
+What is MESA colors?
 =======================
 
 MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
@@ -17,7 +17,7 @@ MESA colors is a post-processing and runtime module that allows users to generat
 
 This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
 
-2. How does the MESA colors module work?
+How does the MESA colors module work?
 ========================================
 
 The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
@@ -28,7 +28,7 @@ The module operates by coupling the stellar structure model with pre-computed gr
 
 3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
 
-3. Running the Test Suite
+Running the Test Suite
 =========================
 
 The module automatically appends new columns to the ``history.data`` file. You **do not** need to manually add these columns to your ``history_columns.list``. The module handles this dynamically based on the filters found in your specified instrument directory.
@@ -41,7 +41,7 @@ The standard output includes:
 
 For example, if your instrument folder contains ``V.dat`` and ``B.dat``, your history file will automatically gain columns named ``V`` and ``B``.
 
-4. Inlist Options & Parameters
+Inlist Options & Parameters
 ==============================
 
 The colors module is controlled via the ``&colors`` namelist. Below is a detailed guide to the key parameters.
@@ -131,7 +131,7 @@ vega_sed
 Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
 
 
-5. Data Preparation (SED_Tools)
+Data Preparation (SED_Tools)
 ===============================
 
 The ``colors`` module requires input data (atmospheres and filters) to be formatted in a specific way. To assist with this, we provide the **SED_Tools** repository.
@@ -147,7 +147,7 @@ This tool allows you to:
 **Workflow Summary:**
 Download Data (via SED_Tools) :math:`\rightarrow` Rebuild for MESA :math:`\rightarrow` Point ``inlist`` to new directories.
 
-6. Defaults Reference
+Defaults Reference
 =====================
 
 Below are the default values for the colors module parameters as defined in ``colors.defaults``. These are used if you do not override them in your inlist.
@@ -161,26 +161,28 @@ Below are the default values for the colors module parameters as defined in ``co
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
       make_csv = .false.
       colors_results_directory = 'SED'
-      mag_system = 'ST'
-
+      mag_system = 'Vega'
+      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
 Visual Summary of Data Flow
 ===========================
 
 .. code-block:: text
 
-   +----------------+       +------------------+       +-------------------+
-   |  Stellar Model |       |  Stellar Atm     |       |   Filter Curves   |
-   | (Teff, logg, Z)| ----> |     Library      | ----> |    (Instrument)   |
-   +----------------+       +------------------+       +-------------------+
-           |                         |                           |
-           v                         v                           v
-   +-----------------------------------------------------------------------+
-   |                        MESA COLORS MODULE                             |
-   | 1. Query Atm Grid -> Interpolate SED                                  |
-   | 2. Apply Distance -> Flux_bol                                         |
-   | 3. Convolve SED + Filters -> Band Flux                                |
-   | 4. Apply Zero Point (Vega/AB/ST) -> Magnitude                         |
-   +-----------------------------------------------------------------------+
+   +----------------+      
+   |   MESA Model   |      
+   | (Teff, logg, Z)|      
+   +----------------+      
+           |               
+           v               
+   +-------------------------------------------------------------------------+
+   |                        MESA COLORS MODULE                               |
+   | 1. Query Stellar Atmosphere Grid with input model                       |
+   | 2. Interpolate grid to construct specific SED                           |
+   | 3. Convolve SED with filters to generate band flux                      |
+   | 2. Apply distance flux dilution to generate bolometric flux -> Flux_bol |   
+   | 4. Apply zero point (Vega/AB/ST) to  generate magnitudes                |
+   |                                    (Both bolometric and per filter)     |
+   +-------------------------------------------------------------------------+
            |
            v
    +----------------------+
@@ -196,7 +198,7 @@ Visual Summary of Data Flow
 ================================================
 ================================================
 
-7. Python Helper Scripts
+Python Helper Scripts
 ========================
 
 A collection of Python scripts is provided in the ``python_helpers/`` directory to assist with real-time monitoring, visualization, and analysis of the colors module output.
