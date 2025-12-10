@@ -48,9 +48,6 @@ The colors module is controlled via the ``&colors`` namelist. Below is a detaile
 
 instrument
 ----------
-**Type:** `string`
-      instrument = 
-
 **Default:** `'/colors/data/filters/Generic/Johnson'`
 
 This points to the directory containing the filter transmission curves you wish to use. The path must be structured as ``facility/instrument``.
@@ -67,7 +64,6 @@ This points to the directory containing the filter transmission curves you wish 
 
 stellar_atm
 -----------
-**Type:** `string`
 **Default:** `'/colors/data/stellar_models/Kurucz2003all/'`
 
 Specifies the path to the directory containing the grid of stellar atmosphere models. This directory must contain:
@@ -81,7 +77,6 @@ The module queries this grid using the star's current parameters. If the star ev
 
 distance
 --------
-**Type:** `float` (double)
 **Default:** `3.0857d19` (10 parsecs in cm)
 
 The distance to the star in centimeters. 
@@ -93,7 +88,6 @@ The distance to the star in centimeters.
 
 make_csv
 --------
-**Type:** `logical`
 **Default:** `.false.`
 
 If set to ``.true.``, the module exports the full calculated SED at every profile interval. 
@@ -105,7 +99,6 @@ If set to ``.true.``, the module exports the full calculated SED at every profil
 
 colors_results_directory
 ------------------------
-**Type:** `string`
 **Default:** `'SED'`
 
 The folder where csv files (if ``make_csv = .true.``) and other debug outputs are saved.
@@ -113,8 +106,7 @@ The folder where csv files (if ``make_csv = .true.``) and other debug outputs ar
 
 mag_system
 ----------
-**Type:** `string`
-**Default:** `'ST'`
+**Default:** `'Vega'`
 
 Defines the zero-point system for magnitude calculations. Options are:
 
@@ -125,7 +117,6 @@ Defines the zero-point system for magnitude calculations. Options are:
 
 vega_sed
 --------
-**Type:** `string`
 **Default:** `'/colors/data/stellar_models/vega_flam.csv'`
 
 Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
