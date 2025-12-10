@@ -40,7 +40,6 @@
 / ! end of kap namelist
 
 &controls
-    make_gradr_sticky_in_solver_iters = .false.
     use_gold2_tolerances = .true.
 
     xa_central_lower_limit_species(1) = 'h1'

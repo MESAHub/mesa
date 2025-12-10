@@ -46,7 +46,7 @@
 &controls
 
 ! temporary to address mesa photo restart bit for bit performance
-fill_arrays_with_NaNs = .true.
+!fill_arrays_with_NaNs = .true.
 
   ! Braking settings
     use_other_torque = .true.

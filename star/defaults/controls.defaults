@@ -2369,7 +2369,7 @@
 
       ! ::
 
-    make_gradr_sticky_in_solver_iters = .true.
+    make_gradr_sticky_in_solver_iters = .false.
     min_logT_for_make_gradr_sticky_in_solver_iters = 1d99
 
 
