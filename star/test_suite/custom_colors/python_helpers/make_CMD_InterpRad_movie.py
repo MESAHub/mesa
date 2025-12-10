@@ -17,7 +17,7 @@ def make_cmd_rotation_video(
     history_file="../LOGS/history.data",
     outfile="cmd_interp_rad_rotation.mp4",
     fps=30,
-    total_seconds=5,
+    total_seconds=10,
 ):
     md = mr.MesaData(history_file)
     md = MesaView(md, 5)
@@ -47,23 +47,33 @@ def make_cmd_rotation_video(
     start_azim = -90
 
     # End at an oblique 3D view
-    end_elev = 25
-    end_azim = -60
+    end_elev = 5
+    end_azim = 270
 
     def init():
         ax.view_init(elev=start_elev, azim=start_azim)
         return sc,
 
     def update(frame):
+        # hold at start
         if frame <= hold_frames:
             elev = start_elev
             azim = start_azim
+
+        # hold at end
+        elif frame >= nframes - hold_frames:
+            elev = end_elev
+            azim = end_azim
+
         else:
-            t = (frame - hold_frames) / max(1, (nframes - hold_frames - 1))
+            # transition region
+            t = (frame - hold_frames) / (nframes - 2*hold_frames)
             elev = start_elev + t * (end_elev - start_elev)
             azim = start_azim + t * (end_azim - start_azim)
+
         ax.view_init(elev=elev, azim=azim)
         return sc,
+
 
     anim = FuncAnimation(
         fig,
