@@ -74,6 +74,12 @@ Specifies the path to the directory containing the grid of stellar atmosphere mo
 
 The module queries this grid using the star's current parameters. If the star evolves outside the grid boundaries, the module may clamp to the nearest edge or extrapolate, depending on internal settings.
 
+**Example:**
+
+.. code-block:: fortran
+
+   stellar_atm = '/colors/data/stellar_models/sg-SPHINX/'
+
 
 distance
 --------
@@ -85,6 +91,11 @@ The distance to the star in centimeters.
 * **Default Behavior:** It defaults to 10 parsecs (:math:`3.0857 \times 10^{19}` cm), resulting in **Absolute Magnitudes**.
 * **Custom Usage:** You can set this to a specific source distance (e.g., distance to Betelgeuse) to calculate Apparent Magnitudes.
 
+**Example:**
+
+.. code-block:: fortran
+
+    distance = 5.1839d20 
 
 make_csv
 --------
@@ -96,12 +107,24 @@ If set to ``.true.``, the module exports the full calculated SED at every profil
 * **Format:** CSV files containing Wavelength vs. Flux.
 * **Use Case:** useful for debugging or plotting the full spectrum of the star at a specific age.
 
+**Example:**
+
+.. code-block:: fortran
+
+      make_csv = .true.
+
 
 colors_results_directory
 ------------------------
 **Default:** `'SED'`
 
 The folder where csv files (if ``make_csv = .true.``) and other debug outputs are saved.
+
+**Example:**
+
+.. code-block:: fortran
+
+      colors_results_directory = 'sed'
 
 
 mag_system
@@ -114,12 +137,24 @@ Defines the zero-point system for magnitude calculations. Options are:
 * ``'ST'``: Based on a flat spectral flux density per unit wavelength.
 * ``'Vega'``: Calibrated such that the star Vega has magnitude 0 in all bands.
 
+**Example:**
+
+.. code-block:: fortran
+
+      mag_system = 'AB'
+
 
 vega_sed
 --------
 **Default:** `'/colors/data/stellar_models/vega_flam.csv'`
 
 Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
+
+**Example:**
+
+.. code-block:: fortran
+
+      vega_sed = '/another/file/for/vega_SED.csv'
 
 
 Data Preparation (SED_Tools)
