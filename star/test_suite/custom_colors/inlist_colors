@@ -25,6 +25,8 @@
       
       ! Pre-MS model settings
       pre_ms_relax_to_start_radiative_core = .false.  ! Don't force radiative core formation
+
+      pgstar_flag     = .true.
 /
 
 ! =============================================================================
@@ -114,7 +116,7 @@
       
       ! --- NUMERICAL CONTROLS ---
       varcontrol_target = 1d-3
-      mesh_delta_coeff = 0.5
+      mesh_delta_coeff = 0.5   
 /
 
 
