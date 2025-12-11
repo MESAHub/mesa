@@ -346,10 +346,21 @@ contains
       real(dp), intent(out) :: t
 
       integer :: n, lo, hi, mid
+      logical :: dummy_axis
 
       n = size(x)
 
-      ! Handle out-of-bounds cases
+      ! Detect dummy axis
+      dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
+
+      if (dummy_axis) then
+         ! Collapse: use the first element of the axis, no interpolation
+         i = 1
+         t = 0.0_dp
+         return
+      end if
+
+      ! --- ORIGINAL CODE BELOW ---
       if (val <= x(1)) then
          i = 1
          t = 0.0_dp
@@ -360,7 +371,6 @@ contains
          return
       end if
 
-      ! Binary search to find interval
       lo = 1
       hi = n
       do while (hi - lo > 1)
@@ -375,6 +385,7 @@ contains
       i = lo
       t = (val - x(i))/(x(i + 1) - x(i))
    end subroutine find_interval
+
 
    !---------------------------------------------------------------------------
    ! Find the nearest grid point

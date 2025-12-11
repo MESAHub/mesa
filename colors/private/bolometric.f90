@@ -157,9 +157,9 @@ contains
    ! interp_radius ~ 0  => sitting very close to an atmosphere point
    ! interp_radius ~ O(1) => deep in-between points / extrapolating
    !--------------------------------------------------------------------
-
+      
    real(dp) function compute_interp_radius(teff, log_g, metallicity, &
-                                           lu_teff, lu_logg, lu_meta)
+                                          lu_teff, lu_logg, lu_meta)
 
       real(dp), intent(in) :: teff, log_g, metallicity
       real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
@@ -171,32 +171,75 @@ contains
       real(dp) :: d, d_min
       integer  :: i, n
 
-      teff_min = minval(lu_teff)
-      teff_max = maxval(lu_teff)
-      logg_min = minval(lu_logg)
-      logg_max = maxval(lu_logg)
-      meta_min = minval(lu_meta)
-      meta_max = maxval(lu_meta)
+      logical :: use_teff, use_logg, use_meta
+      real(dp), parameter :: eps = 1.0d-12
 
-      teff_range = max(teff_max - teff_min, 1.0d-10)
-      logg_range = max(logg_max - logg_min, 1.0d-10)
-      meta_range = max(meta_max - meta_min, 1.0d-10)
+      ! ---------------------------------------------------------
+      ! Detect dummy columns (entire axis is 0 or 999 or -999)
+      ! ---------------------------------------------------------
+      use_teff = .not. ( all(lu_teff == 0.0d0)   .or. &
+                         all(lu_teff == 999.0d0) .or. &
+                         all(lu_teff == -999.0d0) )
 
-      norm_teff = (teff       - teff_min )/teff_range
-      norm_logg = (log_g      - logg_min)/logg_range
-      norm_meta = (metallicity - meta_min)/meta_range
+      use_logg = .not. ( all(lu_logg == 0.0d0)   .or. &
+                         all(lu_logg == 999.0d0) .or. &
+                         all(lu_logg == -999.0d0) )
 
+      use_meta = .not. ( all(lu_meta == 0.0d0)   .or. &
+                         all(lu_meta == 999.0d0) .or. &
+                         all(lu_meta == -999.0d0) )
+
+      ! ---------------------------------------------------------
+      ! Compute min/max only for VALID axes
+      ! ---------------------------------------------------------
+
+      if (use_teff) then
+         teff_min = minval(lu_teff)
+         teff_max = maxval(lu_teff)
+         teff_range = max(teff_max - teff_min, eps)
+         norm_teff = (teff - teff_min)/teff_range
+      endif
+
+      if (use_logg) then
+         logg_min = minval(lu_logg)
+         logg_max = maxval(lu_logg)
+         logg_range = max(logg_max - logg_min, eps)
+         norm_logg = (log_g - logg_min)/logg_range
+      endif
+
+      if (use_meta) then
+         meta_min = minval(lu_meta)
+         meta_max = maxval(lu_meta)
+         meta_range = max(meta_max - meta_min, eps)
+         norm_meta = (metallicity - meta_min)/meta_range
+      endif
+
+      ! ---------------------------------------------------------
+      ! Compute minimum distance with dimension-dropping
+      ! ---------------------------------------------------------
       d_min = huge(1.0d0)
       n    = size(lu_teff)
 
       do i = 1, n
-         grid_teff = (lu_teff(i) - teff_min )/teff_range
-         grid_logg = (lu_logg(i) - logg_min)/logg_range
-         grid_meta = (lu_meta(i) - meta_min)/meta_range
 
-         d = sqrt( (norm_teff - grid_teff)**2 + &
-                   (norm_logg - grid_logg)**2 + &
-                   (norm_meta - grid_meta)**2 )
+         d = 0.0d0
+
+         if (use_teff) then
+            grid_teff = (lu_teff(i) - teff_min)/teff_range
+            d = d + (norm_teff - grid_teff)**2
+         end if
+
+         if (use_logg) then
+            grid_logg = (lu_logg(i) - logg_min)/logg_range
+            d = d + (norm_logg - grid_logg)**2
+         end if
+
+         if (use_meta) then
+            grid_meta = (lu_meta(i) - meta_min)/meta_range
+            d = d + (norm_meta - grid_meta)**2
+         end if
+
+         d = sqrt(d)
 
          if (d < d_min) d_min = d
       end do
@@ -204,7 +247,6 @@ contains
       compute_interp_radius = d_min
 
    end function compute_interp_radius
-
 
 
 
