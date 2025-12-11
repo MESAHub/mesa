@@ -69,7 +69,7 @@ contains
       integer, intent(out) :: mixing_type, ierr
       type(auto_diff_real_star_order1) :: &
          gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
-         Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad
+         Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad, energy_ad
       ierr = 0
       r_ad = r
       L_ad = L
@@ -83,6 +83,7 @@ contains
       Cp_ad = Cp
       gradr_ad = gradr
       grada_ad = grada
+      energy_ad = 0d0 ! correct to a value
       scale_height_ad = scale_height
       if (s% use_other_mlt_results) then
          call s% other_mlt_results(s% id, 0, MLT_option, &
@@ -90,14 +91,14 @@ contains
             chiT_ad, Cp_ad, gradr_ad, grada_ad, scale_height_ad, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, energy_ad, ierr)
       else
          call Get_results(s, 0, MLT_option, &
             r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, &
             chiT_ad, Cp_ad, gradr_ad, grada_ad, scale_height_ad, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, energy_ad, ierr)
       end if
       gradT = gradT_ad%val
       Y_face = Y_face_ad%val
@@ -126,7 +127,8 @@ contains
 
       real(dp) :: cgrav, m, XH1, P_theta, L_theta
       integer :: iso
-      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, rho_start
+      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, &
+         chiRho, chiT, Cp, rho_start, energy
       include 'formats'
       ierr = 0
 
@@ -167,6 +169,7 @@ contains
       chiRho = get_ChiRho_face(s,k)
       chiT = get_ChiT_face(s,k)
       Cp = get_Cp_face(s,k)
+      energy = get_e_face(s,k)
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
 
@@ -175,7 +178,7 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
+            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
       else
          ! starspot YREC routine
          if (s% do_starspots) then
@@ -186,7 +189,7 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
+            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
       end if
 
    end subroutine do1_mlt_eval
@@ -196,14 +199,14 @@ contains
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
-         mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+         mixing_type, gradT, Y_face, conv_vel, D, Gamma, energy, ierr)
       use star_utils
-      use tdc_hydro, only: compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face
+      use tdc_hydro, only: compute_tdc_Eq_div_w_face
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
       type(auto_diff_real_star_order1), intent(in) :: &
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
+         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, energy
       integer, intent(in) :: iso
       real(dp), intent(in) :: &
          XH1, cgrav, m, gradL_composition_term, &
@@ -233,11 +236,9 @@ contains
       ! Pre-calculate some things.
       Eq_div_w = 0d0
       if ((s% v_flag .or. s% u_flag) .and. k > 0 ) then ! only include Eq_div_w if v_flag or u_flag is true.
-         if (using_TDC .and. s% alpha_TDC_DampM > 0) then
-               if (s% mlt_vc(k) > 0) then ! calculate using mlt_vc from current timestep.
-                   check_Eq = compute_tdc_Eq_div_w_face(s, k, ierr)
-                   Eq_div_w = check_Eq
-               end if
+         if (using_TDC .and. s% TDC_alpha_M > 0) then
+             check_Eq = compute_tdc_Eq_div_w_face(s, k, ierr)
+             Eq_div_w = check_Eq
          end if
       end if
 
@@ -325,11 +326,11 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, &
+            conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
+            Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -345,11 +346,11 @@ contains
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
                call set_TDC(&
-                  conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, &
+                  conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
-                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% alpha_TDC_C, s% alpha_TDC_S, ierr)
+                  Eq_div_w, grav, s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
@@ -428,8 +429,8 @@ contains
 
       ! Prevent convection near center of model for MLT or TDC pulsations
       ! We don't check for the using_TDC flag, because mlt is sometimes called when using TDC
-      if ( s% TDC_num_innermost_cells_forced_nonturbulent > 0 .and. &
-         k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+      if (k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent .or. &
+            k < s% TDC_num_outermost_cells_forced_nonturbulent) then
          if (report) write(*,2) 'make TDC center cells non-turbulent', k
          mixing_type = no_mixing
          gradT = gradr

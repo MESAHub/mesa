@@ -96,7 +96,7 @@ use_Type2_opacities = .true.
    gold_solver_iters_timestep_limit = 20
    solver_iters_timestep_limit = 50
    ignore_too_large_correction = .true.
-   scale_max_correction = 0.1d0
+   !scale_max_correction = 0.1d0 ! can stall run
    !corr_coeff_limit = 0.2d0
    ignore_min_corr_coeff_for_scale_max_correction = .true.
    ignore_species_in_max_correction = .true.
@@ -124,11 +124,14 @@ use_Type2_opacities = .true.
 
    ! convection controls
     MLT_option = 'TDC'
-    alpha_TDC_DAMP = 1d0
-    alpha_TDC_DAMPR = 0d0
-    alpha_TDC_PtdVdt = 0d0
-    alpha_TDC_DAMPM = 0.25d0
+    TDC_alpha_D = 1d0
+    TDC_alpha_R = 0d0
+    TDC_alpha_Pt = 0d0
+    TDC_alpha_M = 0.25d0
+    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
     steps_before_use_TDC = 0
+    include_mlt_corr_to_TDC = .false. 
+    TDC_include_eturb_in_energy_equation = .false. ! unstable for evol
 
     use_ledoux_criterion = .true.
     alpha_semiconvection = 1d0

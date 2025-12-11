@@ -180,40 +180,48 @@
 ! ===
 
 
-      ! alpha_TDC_DAMPM
-      ! ~~~~~~~~~~~~~~~
-      ! alpha_TDC_C
+      ! TDC_alpha_M
       ! ~~~~~~~~~~~
-      ! alpha_TDC_S
+      ! TDC_alpha_C
+      ! ~~~~~~~~~~~
+      ! TDC_alpha_S
       ! ~~~~~~~~~~~
       ! TDC_use_density_form_for_eddy_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-      ! If ``alpha_TDC_DAMPM>0``, then include eddy viscous damping in TDC ``alpha_TDC_DAMPM``
+      ! If ``TDC_alpha_M>0``, then include eddy viscous damping in TDC ``TDC_alpha_M``
       ! This control is analogous to ``RSP_alfam``, where the default is ``RSP_alfam = 0.25d0``.
 
       ! If hydrostatic (``v_flag``, ``u_flag = .false.``, ``v = 0`` ) there are no velocity gradients,
       ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
 
-      ! ``alpha_TDC_C`` and ``alpha_TDC_S`` are pre-factors to scale the flux and source terms.
+      ! ``TDC_alpha_C`` and ``TDC_alpha_S`` are pre-factors to scale the flux and source terms.
 
       ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
       ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
 
+      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, ``mlt_vc_old`` (the start of step value)
+      ! is used in place of the current solver iterate ``mlt_vc_ad`` inside the hydro momentum equation. This option can
+      ! provide greater numerical stability in extremely dynamic situations, with very little loss in accuracy.
+
       ! ::
 
-    alpha_TDC_DAMPM = 0d0
-    alpha_TDC_C = 1.0d0
-    alpha_TDC_S = 1.0d0
+    TDC_alpha_M = 0d0
+    TDC_alpha_C = 1.0d0
+    TDC_alpha_S = 1.0d0
     TDC_use_density_form_for_eddy_viscosity = .false.
-
+    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
 
       ! TDC_include_eturb_in_energy_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! calculates and incorporates det/dt from TDC as a negative source term in
-      ! the total energy equation, along with the eddy viscous heating Eq
+      ! While ``TDC`` is already implicitly coupled to the total energy equation, this 
+      ! controls feedsback the turbulent energy into the total energy equation by
+      ! calculating and incorporating det/dt from TDC as a negative source term in
+      ! the total energy equation, along with the eddy viscous heating Eq. This comes
+      ! at the cost of numerical stability on long timescales, be warned. 
 
       ! ::
 
@@ -247,14 +255,18 @@
 
       ! TDC_num_innermost_cells_forced_nonturbulent
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_num_outermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent cells
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent or
+      ! TDC_num_outermost_cells_forced_nonturbulent cells
       ! to be nonturbulent, and sets gradT = gradr in these cells.
       ! Useful for pulsation models in TDC.
 
       ! ::
 
     TDC_num_innermost_cells_forced_nonturbulent = 0
+    TDC_num_outermost_cells_forced_nonturbulent = 0
 
 
       ! include_mlt_corr_to_TDC
@@ -267,6 +279,16 @@
       ! ::
 
     include_mlt_corr_to_TDC = .true.
+
+      ! use_TDC_enthalpy_flux_limiter
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC 
+      ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
+
+      ! ::
+
+    use_TDC_enthalpy_flux_limiter = .false.
 
 
       ! include_mlt_Pturb_in_thermodynamic_gradients
@@ -293,6 +315,9 @@
     include_mlt_in_velocity_time_centering = .false.
 
 
+! Remeshing 
+! =========
+
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -302,9 +327,6 @@
 
       ! ::
 
-      ! Remeshing parameters
-      ! ~~~~~~~~~~~~~~~~~~~~
-
     remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 
@@ -312,3 +334,15 @@
     TDC_hydro_nz_outer = 40
     TDC_hydro_T_anchor = 11d3
     TDC_hydro_dq_1_factor = 2d0
+
+
+      ! use_hydro_merge_limits_in_mesh_plan
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Allows use of ``merge_amr_max_abs_du_div_cs``, ``merge_amr_du_div_cs_limit_only_for_compression``,
+      ! and ``merge_amr_inhibit_at_jumps`` in default mesh_plan when ``use_split_merge_amr = .false.``.
+      ! Only supports ``v_flag``.
+
+      ! ::
+
+    use_hydro_merge_limits_in_mesh_plan = .false.

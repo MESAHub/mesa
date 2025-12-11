@@ -44,9 +44,9 @@ public :: compute_Q
    !!
    !! @param report Write debug output if true, not if false.
    !! @param mixing_length_alpha Mixing length parameter
-   !! @param alpha_TDC_DAMP TDC turbulent damping parameter
-   !! @param alpha_TDC_DAMPR TDC radiative damping parameter
-   !! @param alpha_TDC_PtdVdt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
+   !! @param TDC_alpha_D TDC turbulent damping parameter
+   !! @param TDC_alpha_R TDC radiative damping parameter
+   !! @param TDC_alpha_Pt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
    !! @param dt Time-step
    !! @param c0 A proportionality factor for the convective luminosity
    !! @param L luminosity
@@ -62,10 +62,10 @@ public :: compute_Q
    !! @param grada grada is the adiabatic dlnT/dlnP,
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
-      logical :: report, include_mlt_corr_to_TDC
-      real(dp) :: mixing_length_alpha, alpha_TDC_c, alpha_TDC_s, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, e
+      logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
+      real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h
    end type tdc_info
 
 contains
@@ -518,23 +518,85 @@ contains
       type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
       type(auto_diff_real_tdc) :: S0, D0, DR0
       type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
+      type(auto_diff_real_tdc) :: X, FL, scale
       real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
       real(dp), parameter :: x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3
       real(dp), parameter :: x_ALFAP = 2.d0/3.d0
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
-      S0 = convert(info%alpha_TDC_s * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
-      S0 = S0*Y + convert(info%Eq_div_w)
-      D0 = convert(info%alpha_TDC_DAMP*x_CEDE/(info%mixing_length_alpha*info%Hp))
-      gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
+      ! flux-limiter scale factor from Wuchterl & Feuchtinger form
+      ! X ~ G/F, with G ∝ α α_s c_p Y_env and F = √(2/3)·w/T, w = E + P/rho
+      ! Here Y is already Y_env (from compute_Q), so:
+      ! X = α α_s x_ALFAS * Y_env / sqrt(2/3)
+      ! scale = 1       for small X  (linear regime)
+      ! scale ~ FL(X)/X for large X  (saturating regime)
+
+      scale = 1d0
+      if (Y > 0d0 .and. info%use_TDC_enthalpy_flux_limiter) then
+         ! X = G/F
+         X = convert(info%Cp*info%T/info%h)*info%mixing_length_alpha * info%TDC_alpha_S * x_ALFAS * Y / sqrt_2_div_3
+         FL = flux_limiter_function(X)
+         ! Avoid 0/0 or tiny/tiny; for X ≈ 0, FL ≈ X so scale ~ 1 anyway.
+         if (abs(X%val) >= 0.95d0) then
+            scale = FL / X
+         else
+            scale = 1d0
+         end if
+      end if
+
+      S0 = convert(info%TDC_alpha_S * x_ALFAS * info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
+      if (info%use_TDC_enthalpy_flux_limiter) then
+         S0 = S0 * (scale * Y) + convert(info%Eq_div_w)
+      else ! no flux limiting
+         S0 = S0*Y + convert(info%Eq_div_w)
+      end if
+
+      D0 = convert(info%TDC_alpha_D*x_CEDE/(info%mixing_length_alpha*info%Hp))
+      gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
-      Pt0 = info%alpha_TDC_PtdVdt*x_ALFAP*info%rho
+      Pt0 = info%TDC_alpha_Pt*x_ALFAP*info%rho
       dVdt = info%dV/info%dt
 
       xi0 = S0
       xi1 = -(DR0 + convert(Pt0*dVdt))
       xi2 = -D0
    end subroutine eval_xis
+
+   type(auto_diff_real_tdc) function flux_limiter_function(X) result(FL) ! should be c2 continuous
+     type(auto_diff_real_tdc), intent(in) :: X
+     real(dp), parameter :: X0    = 0.95_dp         ! start of transition
+     real(dp), parameter :: delta = 0.05_dp         ! width of transition
+     real(dp), parameter :: X1    = 1d0 !X0 + delta      ! end of transition
+
+     type(auto_diff_real_tdc) :: s, p
+
+     ! Region 1: purely linear, FL = X
+     if (X%val < X0) then ! should not be encountered
+        FL = X
+
+     ! Region 3: saturated, FL = 1
+     else if (X%val >= X1) then
+        FL = 1.0_dp
+
+     ! Region 2: smooth C² transition between the two
+     else
+        ! Normalized coordinate in [0,1]
+        s = (X - X0) / (X1 - X0)
+
+        ! Quintic "smootherstep" polynomial:
+        ! p(s) = 10 s^3 - 15 s^4 + 6 s^5
+        ! p(0)=0, p(1)=1, p'(0)=p'(1)=0, p''(0)=p''(1)=0
+        p = pow3(s) * (10.0_dp + s * (-15.0_dp + 6.0_dp * s))
+
+        ! Blend between line FL=X and flat FL=1
+        ! At s=0:  FL = X
+        ! At s=1:  FL = 1
+        ! Because p', p'' vanish at 0 and 1, FL, FL', FL'' all match.
+        FL = X + (1.0_dp - X) * p
+     end if
+   end function flux_limiter_function
+
+
 
    !! Calculates the solution to the TDC velocity equation.
    !! The velocity equation is

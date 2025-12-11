@@ -105,10 +105,13 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
-    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, &
-    alpha_TDC_C, alpha_TDC_S, TDC_use_density_form_for_eddy_viscosity, &
-    TDC_num_innermost_cells_forced_nonturbulent, include_mlt_Pturb_in_thermodynamic_gradients, &
-    include_mlt_corr_to_TDC, TDC_include_eturb_in_energy_equation, &
+    TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
+    TDC_alpha_C, TDC_alpha_S, &
+    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
+    TDC_use_density_form_for_eddy_viscosity, &
+    TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
+    include_mlt_Pturb_in_thermodynamic_gradients, &
+    include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
     TDC_hydro_use_mass_interp_face_values, TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_T_anchor, TDC_hydro_dq_1_factor, &
 
@@ -259,7 +262,7 @@
     merge_amr_ignore_core_cells, merge_amr_logT_for_ignore_core_cells, &
     split_amr_ignore_core_cells, split_amr_logT_for_ignore_core_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
-    split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, trace_split_merge_amr, equal_split_density_amr, &
+    split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, trace_split_merge_amr, equal_split_density_amr, use_hydro_merge_limits_in_mesh_plan, &
 
     ! nuclear reaction parameters
     screening_mode, default_net_name, net_logTcut_lo, net_logTcut_lim, &
@@ -1611,6 +1614,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% split_merge_amr_max_iters = split_merge_amr_max_iters
  s% trace_split_merge_amr = trace_split_merge_amr
  s% equal_split_density_amr = equal_split_density_amr
+ s% use_hydro_merge_limits_in_mesh_plan = use_hydro_merge_limits_in_mesh_plan
 
  ! nuclear reaction parameters
  s% screening_mode = screening_mode
@@ -2079,16 +2083,19 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% alpha_TDC_DAMP = alpha_TDC_DAMP
- s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
- s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
- s% alpha_TDC_DAMPM = alpha_TDC_DAMPM
- s% alpha_TDC_C = alpha_TDC_C
- s% alpha_TDC_S = alpha_TDC_S
+ s% TDC_alpha_D = TDC_alpha_D
+ s% TDC_alpha_R = TDC_alpha_R
+ s% TDC_alpha_Pt = TDC_alpha_Pt
+ s% TDC_alpha_M = TDC_alpha_M
+ s% TDC_alpha_C = TDC_alpha_C
+ s% TDC_alpha_S = TDC_alpha_S
+ s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
+ s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
  s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
+ s% use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
  s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
@@ -3322,7 +3329,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  split_merge_amr_max_iters = s% split_merge_amr_max_iters
  trace_split_merge_amr = s% trace_split_merge_amr
  equal_split_density_amr = s% equal_split_density_amr
-
+ use_hydro_merge_limits_in_mesh_plan = s% use_hydro_merge_limits_in_mesh_plan
  ! nuclear reaction parameters
  screening_mode = s% screening_mode
  default_net_name = s% default_net_name
@@ -3787,16 +3794,19 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- alpha_TDC_DAMP = s% alpha_TDC_DAMP
- alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
- alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
- alpha_TDC_DAMPM = s% alpha_TDC_DAMPM
- alpha_TDC_C = s% alpha_TDC_C
- alpha_TDC_S = s% alpha_TDC_S
+ TDC_alpha_D = s% TDC_alpha_D
+ TDC_alpha_R = s% TDC_alpha_R
+ TDC_alpha_Pt = s% TDC_alpha_Pt
+ TDC_alpha_M = s% TDC_alpha_M
+ TDC_alpha_C = s% TDC_alpha_C
+ TDC_alpha_S = s% TDC_alpha_S
+ TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
+ TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
  include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
+ use_TDC_enthalpy_flux_limiter = s% use_TDC_enthalpy_flux_limiter
  TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering

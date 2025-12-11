@@ -1396,7 +1396,7 @@
             case (p_conv_vel_div_L_vel)
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
-               val = s% conv_vel(k)/s% csound(k)
+               val = s% conv_vel(k)/s% csound_face(k)
             case (p_dvc_dt_TDC_div_g)
                val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
@@ -2032,6 +2032,10 @@
                end if
                val = dble(int_val)
                int_flag = .true.
+            case (p_dwork_dm)
+               ! differential work per unit mass per unit mass*time dW/dm
+               ! W = dwork_dm*dm*dt
+               val = s% dwork_dm(k) ! returns (dw/dt)/dm
 
             case (p_cell_specific_IE)
                val = s% energy(k)

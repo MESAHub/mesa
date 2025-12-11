@@ -1235,6 +1235,38 @@
          end if
       end function wrap_u_p1
 
+      function wrap_opt_time_center_u_m1(s, k) result(v_tc)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: v_tc
+         integer, intent(in) :: k
+         v_tc = 0d0
+         if (k == 1) return
+         v_tc = wrap_u_m1(s,k)
+         if (s% using_velocity_time_centering) &
+            v_tc = 0.5d0*(v_tc + s% u_start(k-1))
+      end function wrap_opt_time_center_u_m1
+
+      function wrap_opt_time_center_u_00(s, k) result(v_tc)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: v_tc
+         integer, intent(in) :: k
+         v_tc = wrap_u_00(s,k)
+         if (s% using_velocity_time_centering) &
+            v_tc = 0.5d0*(v_tc + s% u_start(k))
+      end function wrap_opt_time_center_u_00
+
+      function wrap_opt_time_center_u_p1(s, k) result(v_tc)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: v_tc
+         integer, intent(in) :: k
+         v_tc = 0d0
+         if (k == s%nz) return
+         v_tc = wrap_u_p1(s,k)
+         if (s% using_velocity_time_centering) &
+            v_tc = 0.5d0*(v_tc + s% u_start(k+1))
+      end function wrap_opt_time_center_u_p1
+
+
       function wrap_Hp_m1(s, k) result(Hp_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: Hp_m1

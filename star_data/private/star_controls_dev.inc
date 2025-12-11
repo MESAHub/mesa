@@ -1,18 +1,21 @@
          
          logical :: compare_TDC_to_MLT 
 
-         real(dp) :: alpha_TDC_DAMPM
-         real(dp) :: alpha_TDC_C
-         real(dp) :: alpha_TDC_S
+         real(dp) :: TDC_alpha_M
+         real(dp) :: TDC_alpha_C
+         real(dp) :: TDC_alpha_S
+         logical :: TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
          logical :: remesh_for_TDC_pulsations_log_core_zoning
          logical :: TDC_use_density_form_for_eddy_viscosity
          logical :: use_RSP_L_eqn_outer_BC
          real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
+         real(dp) :: TDC_num_outermost_cells_forced_nonturbulent
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
-         logical :: include_mlt_corr_to_TDC
+         logical :: include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
          logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
          logical :: include_mlt_in_velocity_time_centering
          logical :: TDC_hydro_use_mass_interp_face_values
+         logical :: use_hydro_merge_limits_in_mesh_plan
          integer :: TDC_hydro_nz, TDC_hydro_nz_outer
          real(dp) :: TDC_hydro_T_anchor, TDC_hydro_dq_1_factor
 

@@ -2284,9 +2284,9 @@
       ! mlt_Pturb_factor
       ! ~~~~~~~~~~~~~~~~
 
-      ! include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
-      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 3d0
-      ! corresponds to alpha_TDC_Ptdvdt = 1d0, where Pt = (2/3)*rho(k)*(mlt_vc(k)/sqrt(2/3))**2
+      ! For MESA's momentum equation, include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
+      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 2d0
+      ! corresponds to TDC_alpha_Pt = 1d0, where Pt = (2/3)*rho(k)*(mlt_vc(k)/sqrt(2/3))**2
 
       ! this replaces conv_dP_term_factor.   also see extra_pressure vector and other_pressure routine
 
@@ -2328,16 +2328,16 @@
 
       ! TDC options
       ! ~~~~~~~~~~~
-      ! + ``alpha_TDC_DAMP`` : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
-      ! + ``alpha_TDC_DAMPR`` : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
-      ! + ``alpha_TDC_PtdVdt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity.
+      ! + ``TDC_alpha_D`` : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to ``RSP_alfad``, and previously called ``alpha_TDC_DAMP``
+      ! + ``TDC_alpha_R`` : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to ``RSP_gammar``, and previously called ``alpha_TDC_DAMPR``
+      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. This control is analogous to ``RSP_alfap``, and previously called ``alpha_TDC_PtdVdt``
       ! + ``steps_before_use_TDC`` : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
 
       ! ::
 
-      alpha_TDC_DAMP = 1d0
-      alpha_TDC_DAMPR = 0d0
-      alpha_TDC_PtdVdt = 0d0
+      TDC_alpha_D = 1d0
+      TDC_alpha_R = 0d0
+      TDC_alpha_Pt = 0d0
       steps_before_use_TDC = 0
 
 
@@ -8776,7 +8776,7 @@
 
       ! ::
 
-    max_corr_jump_limit = 1d6
+    max_corr_jump_limit = 1d12
 
 
       ! resid_norm_jump_limit
@@ -8796,7 +8796,7 @@
 
       ! ::
 
-    max_resid_jump_limit = 1d6
+    max_resid_jump_limit = 1d12
 
 
       ! convergence_ignore_equL_residuals

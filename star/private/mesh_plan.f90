@@ -602,9 +602,9 @@
             type (star_info), pointer :: s
             integer, intent(out) :: ierr
 
-            logical :: dbg, force_merge_with_one_more
+            logical :: dbg, force_merge_with_one_more, du_div_cs_limit_flag
             real(dp) :: maxval_delta_xa, next_dq_max, beta_limit, &
-               remaining_dq_old, min_dr
+               remaining_dq_old, min_dr, abs_du_div_cs
             integer :: kk, k_old_init, k_old_next, k_old_next_max, j00, jm1, i, max_merge
 
             include 'formats'
@@ -616,6 +616,7 @@
             k_new = 1
             xq_new(1) = 0
             min_dr = s% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
+            abs_du_div_cs = 0d0
 
             do  ! pick next point location
 
@@ -738,6 +739,53 @@
                         k_old_next_max = min(nz_old, k_old + max_merge)
                         k_old_next = k_old_next_max  ! will cut this back as necessary
                         do kk=k_old+1,k_old_next_max
+
+                           if (s% use_hydro_merge_limits_in_mesh_plan) then ! limit merges over steep velocity gradients
+                              ! begin hydro check_merge_limits section
+                              du_div_cs_limit_flag = .false.
+                              if (.not. s% merge_amr_du_div_cs_limit_only_for_compression) then
+                                   du_div_cs_limit_flag = .true.
+                              else if (associated(s% v)) then
+                                 ! Only set flag for compressive flow across interface (kk-1, kk)
+                                 if (kk <= nz_old .and. s% v(kk)*pow2(s% r(kk)) > s% v(kk-1)*pow2(s% r(kk-1))) du_div_cs_limit_flag = .true.
+                                 if (.not. du_div_cs_limit_flag .and. kk-1 > 1) then
+                                    if (s% v(kk-1)*pow2(s% r(kk-1)) > s% v(kk-2)*pow2(s% r(kk-2))) du_div_cs_limit_flag = .true.
+                                 end if
+                              end if
+
+                              if (du_div_cs_limit_flag .and. associated(s% v)) then
+                                  if (kk-1 == 1) then
+                                     abs_du_div_cs = abs(s% v(1) - s% v(2)) / s% csound(1)
+                                  else if (kk == nz_old) then
+                                     abs_du_div_cs = abs(s% v(nz_old-1) - s% v(nz_old)) / s% csound(nz_old)
+                                  else
+                                     abs_du_div_cs = abs(s% v(kk-1) - s% v(kk)) / s% csound(kk-1)
+                                  end if
+                              else
+                                  abs_du_div_cs = 0.0_dp
+                              end if
+
+                              if (du_div_cs_limit_flag) then
+                                  if (.not. s% merge_amr_inhibit_at_jumps) then
+                                      if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) then
+                                          ! Shock jump too large, so block merge at this interface
+                                          k_old_next = kk-1
+                                          exit
+                                      end if
+                                  else  ! inhibit_at_jumps = .true.
+                                      if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) then
+                                          if (dq_old(k_old) >= min_dq) then
+                                             ! Shock is large and zone is not extremely small, so inhibit merge
+                                             k_old_next = kk-1
+                                             exit
+                                          end if
+                                          ! else: if zone is very small, allow merge despite the shock
+                                      end if
+                                  end if
+                              end if
+                           end if
+                           ! end hydro check_merge_limits section
+
                            maxval_delta_xa = maxval(abs(s% xa(:,kk)-s% xa(:,kk-1)))
                            j00 = maxloc(s% xa(:,kk),dim=1)
                            jm1 = maxloc(s% xa(:,kk-1),dim=1)

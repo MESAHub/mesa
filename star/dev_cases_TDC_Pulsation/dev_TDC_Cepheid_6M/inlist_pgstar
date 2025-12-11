@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 50 ! making this too small slows the model down.
+pgstar_interval = 200 ! making this too small slows the model down.
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0
@@ -181,9 +181,9 @@ Profile_Panels1_title = ''
 Profile_Panels1_txt_scale = 0.7
 Profile_Panels1_num_panels = 4
 
-Profile_Panels1_yaxis_name(1) = 'Lc_div_L'
+Profile_Panels1_yaxis_name(1) = 'Eq'
 !Profile_Panels1_dymin(1) = 0.14
-Profile_Panels1_other_yaxis_name(1) = 'Frad_div_cUrad'!'lum_conv'
+Profile_Panels1_other_yaxis_name(1) = 'Uq'!'lum_conv'
 !Profile_Panels1_other_dymin(1) = 0.14
 
 Profile_Panels1_yaxis_name(2) = 'logT'!'logdq'!'radius'!'entropy'

@@ -418,6 +418,7 @@
    !cell_internal_energy_fraction
    !cell_internal_energy_fraction_start
    !cell_specific_PE
+   dwork_dm
 
    !log_cell_ie_div_star_ie
    !log_cell_specific_IE

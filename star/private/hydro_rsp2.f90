@@ -540,7 +540,8 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: PII_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Cp_00, Cp_m1, Cp_face, Y_face
+         type(auto_diff_real_star_order1) :: Cp_00, Cp_m1, Cp_face, Y_face, T_00, T_m1
+         type(auto_diff_real_star_order1) :: X, FL, scale, T_face, e_face, Peos_face, rho_face, h_face
          real(dp) :: ALFAS_ALFA, alfa, beta
          include 'formats'
          ierr = 0
@@ -559,12 +560,33 @@
          if (ierr /= 0) return
          Cp_00 = wrap_Cp_00(s, k)
          Cp_m1 = wrap_Cp_m1(s, k)
+         T_00= wrap_T_00(s, k)
+         T_m1 = wrap_T_m1(s, k)
          call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          Cp_face = alfa*Cp_00 + beta*Cp_m1  ! ergs g^-1 K^-1
+         T_face = alfa*Cp_00 + beta*Cp_m1
+         rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
+         Peos_face = alfa*wrap_Peos_00(s,k) + beta*wrap_Peos_m1(s,k)
+         e_face = alfa*wrap_e_00(s,k) + beta*wrap_e_m1(s,k)
+         h_face = e_face + Peos_face/rho_face
          ALFAS_ALFA = x_ALFAS*s% mixing_length_alpha
          PII_face = ALFAS_ALFA*Cp_face*Y_face
-         s% PII(k) = PII_face%val
-         s% PII_ad(k) = PII_face
+
+         scale = 1d0
+         if (Y_face > 0d0 .and. s% use_TDC_enthalpy_flux_limiter) then
+            ! X = G/F
+            X = (Cp_face*T_face/h_face)*ALFAS_ALFA* Y_face / sqrt_2_div_3
+            FL = flux_limiter_function(X)
+            ! Avoid 0/0 or tiny/tiny; for X ≈ 0, FL ≈ X so scale ~ 1 anyway.
+            if (abs(X%val) >= 0.95d0) then
+               scale = FL / X
+            else
+               scale = 1d0
+            end if
+         end if
+
+         s% PII(k) = PII_face%val*scale%val
+         s% PII_ad(k) = PII_face*scale
          if (k == -2 .and. s% PII(k) < 0d0) then
             write(*,2) 's% PII(k)', k, s% PII(k)
             write(*,2) 'Cp_face', k, Cp_face%val
@@ -577,6 +599,39 @@
          end if
       end function compute_PII_face
 
+      type(auto_diff_real_star_order1) function flux_limiter_function(X) result(FL) ! should be c2 continuous
+        type(auto_diff_real_star_order1), intent(in) :: X
+        real(dp), parameter :: X0    = 0.95_dp         ! start of transition
+        real(dp), parameter :: delta = 0.05_dp         ! width of transition
+        real(dp), parameter :: X1    = 1d0 !X0 + delta      ! end of transition
+
+        type(auto_diff_real_star_order1) :: s, p
+
+        ! Region 1: purely linear, FL = X
+        if (X%val < X0) then ! should not be encountered
+           FL = X
+
+        ! Region 3: saturated, FL = 1
+        else if (X%val >= X1) then
+           FL = 1.0_dp
+
+        ! Region 2: smooth C² transition between the two
+        else
+           ! Normalized coordinate in [0,1]
+           s = (X - X0) / (X1 - X0)
+
+           ! Quintic "smootherstep" polynomial:
+           ! p(s) = 10 s^3 - 15 s^4 + 6 s^5
+           ! p(0)=0, p(1)=1, p'(0)=p'(1)=0, p''(0)=p''(1)=0
+           p = pow3(s) * (10.0_dp + s * (-15.0_dp + 6.0_dp * s))
+
+           ! Blend between line FL=X and flat FL=1
+           ! At s=0:  FL = X
+           ! At s=1:  FL = 1
+           ! Because p', p'' vanish at 0 and 1, FL, FL', FL'' all match.
+           FL = X + (1.0_dp - X) * p
+        end if
+      end function flux_limiter_function
 
       function compute_d_v_div_r(s, k, ierr) result(d_v_div_r)  ! s^-1
          type (star_info), pointer :: s
