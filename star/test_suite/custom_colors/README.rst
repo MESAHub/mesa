@@ -160,18 +160,55 @@ Required only if ``mag_system = 'Vega'``. This points to the reference SED file 
 Data Preparation (SED_Tools)
 ===============================
 
-The ``colors`` module requires input data (atmospheres and filters) to be formatted in a specific way. To assist with this, we provide the **SED_Tools** repository.
+The ``colors`` module requires pre-processed stellar atmospheres and filter
+profiles organized in a very specific directory structure. To automate this
+entire workflow, we provide the dedicated repository:
 
 **Repository:** `SED_Tools <https://github.com/nialljmiller/SED_Tools>`_
 
-This tool allows you to:
+SED_Tools downloads, validates, and converts raw spectral atmosphere grids and
+filter transmission curves from the following public archives:
 
-1.  Download spectra from repositories like **SVO**, **MSG**, and **MAST**.
-2.  Download filter profiles from the **SVO Filter Profile Service**.
-3.  **Rebuild** raw data into the binary formats (``.bin``, ``.h5``) and directory structures required by MESA.
+* `SVO Filter Profile Service <http://svo2.cab.inta-csic.es/theory/fps/>`_
+* `MAST BOSZ Stellar Atmosphere Library <https://archive.stsci.edu/prepds/bosz/>`_
+* `MSG / Townsend Atmosphere Grids <https://www.astro.wisc.edu/~townsend/msg/>`_
 
-**Workflow Summary:**
-Download Data (via SED_Tools) :math:`\rightarrow` Rebuild for MESA :math:`\rightarrow` Point ``inlist`` to new directories.
+These sources provide heterogeneous formats and file organizations. SED_Tools
+standardizes them into the exact structure required by MESA:
+
+* ``lookup_table.csv``  
+* Raw SED files (text or/and HDF5)  
+* ``flux_cube.bin`` (binary cube for fast interpolation)  
+* Filter index files and ``*.dat`` transmission curves
+
+
+SED_Tools produces:
+
+.. code-block:: text
+
+    data/
+    ├── stellar_models/<ModelName>/
+    │   ├── flux_cube.bin
+    │   ├── lookup_table.csv
+    │   ├── *.txt / *.h5
+    └── filters/<Facility>/<Instrument>/
+        ├── *.dat
+        └── <Instrument>
+
+These directories can be copied or symlinked directly into your MESA
+installation.
+
+A browsable online mirror of the processed SED_Tools output is also available:
+
+`SED Tools Web Interface (mirror) <https://nillmill.ddns.net/sed_tools/>`_
+
+This server provides a live view of:
+
+* All downloaded stellar atmosphere grids  
+* All available filter facilities and instruments  
+* File counts, disk usage, and metadata  
+* Direct links to the directory structure used by MESA
+
 
 Defaults Reference
 =====================
