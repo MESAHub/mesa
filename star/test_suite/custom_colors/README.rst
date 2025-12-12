@@ -28,18 +28,85 @@ The module operates by coupling the stellar structure model with pre-computed gr
 
 3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
 
-Running the Test Suite
+The Test Suite
 =========================
 
-The module automatically appends new columns to the ``history.data`` file. You **do not** need to manually add these columns to your ``history_columns.list``. The module handles this dynamically based on the filters found in your specified instrument directory.
+This test suite evolves a complete stellar model (from the pre–main sequence onward) while the ``colors`` module runs *continuously* in the background. 
+At every timestep, MESA computes synthetic photometry by interpolating a stellar atmosphere grid and convolving the resulting SED with the filters you specify in the inlist.
 
-The standard output includes:
+During the run, the module automatically appends new photometric columns to the ``history.data`` file. 
+You **do not** need to list these in ``history_columns.list``—the module detects the available filters by inspecting the directory defined in the ``instrument`` parameter.
 
-* ``Mag_bol``: The absolute bolometric magnitude.
-* ``Flux_bol``: The bolometric flux (in cgs).
-* ``[Filter_Name]``: A magnitude column for every filter file found in the directory specified by ``instrument``.
+What the Test Suite Produces
+----------------------------
 
-For example, if your instrument folder contains ``V.dat`` and ``B.dat``, your history file will automatically gain columns named ``V`` and ``B``.
+The standard output of the test suite includes:
+
+* ``Mag_bol``  
+  The bolometric magnitude computed from the star's instantaneous bolometric flux.
+
+* ``Flux_bol``  
+  The bolometric flux (cgs units) after distance dilution is applied.  
+  The default distance is 10 pc, producing **absolute magnitudes** unless changed.
+
+* ``[Filter_Name]``  
+  A synthetic magnitude column for **every** filter in the instrument directory.
+
+For example, if your filter directory contains:
+
+.. code-block:: text
+
+   filters/Generic/Johnson/
+       B.dat
+       V.dat
+       R.dat
+       Johnson
+
+then your history file will include:
+
+``B``, ``V``, ``R``
+
+as new magnitude columns generated automatically at runtime.
+
+What the Test Suite Actually Does
+---------------------------------
+
+The provided ``inlist_colors`` configures a full evolution run with the colors module activated:
+
+* Starts from a **pre–main-sequence model**  
+* Evolves the model through multiple phases while computing synthetic photometry
+* Uses the Johnson filter set
+* Uses the Kurucz2003all atmosphere grid
+* Outputs bolometric and filter-specific magnitudes to ``history.data`` every step
+
+Because the test suite's inlist also defines a set of PGSTAR panels, you automatically
+get real-time plots of:
+
+* HR diagram (log L vs. log Teff)  
+* A light curve based on any synthetic magnitude (the test suite uses ``V``)  
+
+Real-Time Visualization (Enabled by Default)
+--------------------------------------------
+
+The test suite's ``pgstar`` block is configured so that, as the star evolves:
+
+* Panel 1: HR diagram (theoretical)
+* Panel 2: Light curve in the Johnson V band  
+
+These update automatically as the model runs.
+
+Purpose of the Test Suite
+-------------------------
+
+This test problem is designed to demonstrate:
+
+1. That MESA can compute synthetic photometry **at runtime**, without external tools.  
+2. How atmosphere grids and filters affect magnitude evolution.  
+3. How to configure your own inlists for scientific use.  
+4. How the ``colors`` module integrates with PGSTAR visualization.  
+5. How synthetic magnitudes appear in ``history.data`` and how to use them for CMDs, light curves, and population modeling.
+
+
 
 Inlist Options & Parameters
 ==============================
