@@ -20,7 +20,8 @@ from static_HISTORY_check import (
 # ---------------------------
 import matplotlib as mpl
 
-def age_colormap_colors(ages, cmap_name='inferno', recent_fraction=0.25, stretch=5.0):
+
+def age_colormap_colors(ages, cmap_name="inferno", recent_fraction=0.25, stretch=5.0):
     """
     Map ages -> RGBA colors with these properties:
       - cmap_name: 'inferno'|'plasma'|'magma', etc.
@@ -37,7 +38,7 @@ def age_colormap_colors(ages, cmap_name='inferno', recent_fraction=0.25, stretch
     ages = np.asarray(ages, dtype=float)
     # handle degenerate case
     if ages.size == 0:
-        return np.zeros((0,4))
+        return np.zeros((0, 4))
 
     amin, amax = ages.min(), ages.max()
     span = amax - amin if amax > amin else 1.0
@@ -46,7 +47,7 @@ def age_colormap_colors(ages, cmap_name='inferno', recent_fraction=0.25, stretch
     # We'll compress lower portion via a power transform, then rescale piecewise.
     rf = float(np.clip(recent_fraction, 1e-6, 0.99))
     # first apply power-law compression to whole range (older ages -> smaller)
-    nrm_pow = nrm ** stretch
+    nrm_pow = nrm**stretch
 
     # Now remap such that nrm_pow in [0, 1-rf] -> [0, 0.05] (very dark ramp),
     # and nrm_pow in [1-rf,1] -> [0.05,1.0] (main color variation).
@@ -65,13 +66,15 @@ def age_colormap_colors(ages, cmap_name='inferno', recent_fraction=0.25, stretch
             remapped[below] = (nrm_pow[below] / cutoff) * low_band
         # rescale above cutoff into [low_band, 1.0]
         if above.any():
-            remapped[above] = low_band + ((nrm_pow[above] - cutoff) / (1.0 - cutoff)) * (1.0 - low_band)
+            remapped[above] = low_band + (
+                (nrm_pow[above] - cutoff) / (1.0 - cutoff)
+            ) * (1.0 - low_band)
 
     # Ensure in [0,1]
     remapped = np.clip(remapped, 0.0, 1.0)
 
     cmap = mpl.cm.get_cmap(cmap_name)
-    colors = cmap(remapped)   # RGBA Nx4
+    colors = cmap(remapped)  # RGBA Nx4
     return colors
 
 
@@ -104,7 +107,7 @@ def get_improved_mesa_phase_info(phase_code):
 
 def get_phase_info_from_mesa(md):
     """Get evolutionary phase information using MESA's phase_of_evolution if present.
-       If missing, return None phase names and AGE-driven colors (inferno by default)."""
+    If missing, return None phase names and AGE-driven colors (inferno by default)."""
     # If present, use original behavior (map codes to names/colors)
     if hasattr(md, "phase_of_evolution"):
         phase_codes = md.phase_of_evolution
@@ -126,13 +129,13 @@ def get_phase_info_from_mesa(md):
         return [], []
 
     # choose params: recent_fraction=0.25 compress older ages heavily (stretch=5)
-    colors = age_colormap_colors(ages, cmap_name='jet', recent_fraction=0.25, stretch=5.0)
+    colors = age_colormap_colors(
+        ages, cmap_name="jet", recent_fraction=0.25, stretch=5.0
+    )
     # produce placeholder phase names (None or empty is fine)
     phases = [None] * len(colors)
     phase_colors = list(colors)
     return phases, phase_colors
-
-
 
 
 def get_filter_colors(filter_names):
@@ -234,7 +237,10 @@ class HistoryChecker:
             self.md = mr.MesaData(self.history_file)
             self.md = MesaView(self.md, 5)
             # after: self.phases, self.phase_colors = get_phase_info_from_mesa(self.md)
-            self.has_phase = (hasattr(self.md, "phase_of_evolution")and np.unique(self.md.phase_of_evolution).size > 1)
+            self.has_phase = (
+                hasattr(self.md, "phase_of_evolution")
+                and np.unique(self.md.phase_of_evolution).size > 1
+            )
 
             # Basic stellar parameters
             self.Teff = self.md.Teff
@@ -269,18 +275,24 @@ class HistoryChecker:
     def create_phase_legend(self):
         unique_phases, unique_colors = [], []
         for phase, color in zip(self.phases, self.phase_colors):
-            if phase is None:          # ignore fallback age-color entries
+            if phase is None:  # ignore fallback age-color entries
                 continue
             if phase not in unique_phases:
                 unique_phases.append(phase)
                 unique_colors.append(color)
         return [
-            plt.Line2D([0],[0], marker="o", color="w",
-                       markerfacecolor=color, markersize=8, label=phase,
-                       markeredgecolor="none")
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor=color,
+                markersize=8,
+                label=phase,
+                markeredgecolor="none",
+            )
             for phase, color in zip(unique_phases, unique_colors)
         ]
-
 
     def update_plot(self, frame):
         """Update the plot with new data if the file has changed."""
@@ -401,7 +413,6 @@ class HistoryChecker:
                 markersize=3,
                 alpha=0.8,
             )
-
 
         # Add evolutionary phase legend at the top of the figure
         if len(self.phases) > 1:

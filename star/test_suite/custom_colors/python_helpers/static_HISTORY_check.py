@@ -13,20 +13,23 @@ import mesa_reader as mr
 import numpy as np
 
 
-
 class MesaView:
     def __init__(self, md, skip):
-        self._md   = md
+        self._md = md
         self._skip = skip
+
     def __getattr__(self, name):
         v = getattr(self._md, name)
         # If it's a 1D array with same length as star_age, slice it
         if isinstance(v, np.ndarray) and v.ndim == 1:
             sa = getattr(self._md, "star_age", None)
-            if isinstance(sa, np.ndarray) and sa.ndim == 1 and v.shape[0] == sa.shape[0]:
-                return v[self._skip:]
+            if (
+                isinstance(sa, np.ndarray)
+                and sa.ndim == 1
+                and v.shape[0] == sa.shape[0]
+            ):
+                return v[self._skip :]
         return v
-
 
 
 def get_mesa_phase_info(phase_code):
@@ -121,7 +124,7 @@ def setup_hr_diagram_params(md, filter_columns):
         hr_xlabel = "B - R"
         hr_ylabel = "V"
         color_index = hr_color
-    else:        
+    else:
         if len(filter_columns) >= 2:
             # Use the first two filters
             f1 = filter_columns[0]
@@ -150,7 +153,6 @@ def setup_hr_diagram_params(md, filter_columns):
             color_index = hr_color
 
     return hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index
-
 
 
 def create_phase_plots(history_file="../LOGS/history.data"):

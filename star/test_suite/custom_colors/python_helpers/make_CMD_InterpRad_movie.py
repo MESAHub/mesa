@@ -52,7 +52,7 @@ def make_cmd_rotation_video(
 
     def init():
         ax.view_init(elev=start_elev, azim=start_azim)
-        return sc,
+        return (sc,)
 
     def update(frame):
         # hold at start
@@ -67,13 +67,12 @@ def make_cmd_rotation_video(
 
         else:
             # transition region
-            t = (frame - hold_frames) / (nframes - 2*hold_frames)
+            t = (frame - hold_frames) / (nframes - 2 * hold_frames)
             elev = start_elev + t * (end_elev - start_elev)
             azim = start_azim + t * (end_azim - start_azim)
 
         ax.view_init(elev=elev, azim=azim)
-        return sc,
-
+        return (sc,)
 
     anim = FuncAnimation(
         fig,
