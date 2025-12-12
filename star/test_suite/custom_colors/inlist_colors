@@ -63,7 +63,7 @@
       ! - lookup_table.csv: mapping file with columns for filename, Teff, log_g, metallicity
       ! - Individual SED files: wavelength vs surface flux for each stellar model
       ! - flux_cube.bin: pre-computed interpolation grid (if using linear/hermite interpolation)
-      stellar_atm = '/colors/data/stellar_models/hres/'
+      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
       
       ! Physical parameters for synthetic photometry
       distance = 3.0857d19         ! Distance to star in cm (1 pc = 3.0857e16 m for absolute mags)
