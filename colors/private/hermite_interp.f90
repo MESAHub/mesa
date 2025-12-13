@@ -296,16 +296,29 @@ contains
    !---------------------------------------------------------------------------
    ! Find the interval in a sorted array containing a value
    !---------------------------------------------------------------------------
+      
    subroutine find_interval(x, val, i, t)
       real(dp), intent(in) :: x(:), val
       integer, intent(out) :: i
       real(dp), intent(out) :: t
 
       integer :: n, lo, hi, mid
+      logical :: dummy_axis
 
       n = size(x)
 
-      ! Handle out-of-bounds cases
+      ! Detect dummy axis: all values == 0, 999, or -999
+      dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
+
+      if (dummy_axis) then
+         ! Collapse axis: always use first point, no interpolation
+         i = 1
+         t = 0.0_dp
+         return
+      end if
+
+      ! ---------- ORIGINAL CODE BELOW ----------------
+
       if (val <= x(1)) then
          i = 1
          t = 0.0_dp
@@ -316,7 +329,6 @@ contains
          return
       end if
 
-! Binary search to find interval
       lo = 1
       hi = n
       do while (hi - lo > 1)
@@ -331,6 +343,7 @@ contains
       i = lo
       t = (val - x(i))/(x(i + 1) - x(i))
    end subroutine find_interval
+   
 
    !---------------------------------------------------------------------------
    ! Find the nearest grid point

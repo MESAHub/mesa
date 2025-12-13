@@ -1,25 +1,14 @@
 ! ***********************************************************************
 !
 !   Copyright (C) 2025  Niall Miller & The MESA Team
-!
-!   This program is free software: you can redistribute it and/or modify
-!   it under the terms of the GNU Lesser General Public License
-!   as published by the Free Software Foundation,
-!   either version 3 of the License, or (at your option) any later version.
-!
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!   See the GNU Lesser General Public License for more details.
-!
-!   You should have received a copy of the GNU Lesser General Public License
-!   along with this program. If not, see <https://www.gnu.org/licenses/>.
+!   Modified to include AB and ST magnitude systems.
 !
 ! ***********************************************************************
 
 module synthetic
 
-   use const_def, only: dp
+   ! Added clight for AB conversions
+   use const_def, only: dp, clight
    use utils_lib, only: mkdir, folder_exists
    use colors_utils, only: remove_dat, romberg_integration, load_filter, load_vega_sed, load_lookup_table
    use knn_interp, only: interpolate_array
@@ -38,10 +27,12 @@ contains
                                          wavelengths, fluxes, filter_wavelengths, &
                                          filter_trans, &
                                          filter_filepath, vega_filepath, &
-                                         filter_name, make_sed, colors_results_directory)
+                                         filter_name, make_sed, colors_results_directory, &
+                                         mag_system)
       ! Input arguments
       real(dp), intent(in) :: temperature, gravity, metallicity
       character(len=*), intent(in) :: filter_filepath, filter_name, vega_filepath, colors_results_directory
+      character(len=*), intent(in) :: mag_system  ! NEW: Arguments for 'Vega', 'AB', or 'ST'
       integer, intent(out) :: ierr
       character(len=1000) :: line
 
@@ -52,7 +43,7 @@ contains
       ! Local variables
       real(dp), dimension(:), allocatable :: convolved_flux
       character(len=100) :: csv_file
-      real(dp) :: synthetic_flux, vega_flux
+      real(dp) :: synthetic_flux, zero_point_flux
       integer :: max_size, i
       real(dp) :: wv, fl, cf, fwv, ftr
 
@@ -63,66 +54,64 @@ contains
       ! Load filter data
       call load_filter(filter_filepath, filter_wavelengths, filter_trans)
 
-
-      ! Perform SED convolution
+      ! Perform SED convolution (Source Object)
       allocate (convolved_flux(size(wavelengths)))
       call convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
 
       ! Write SED to CSV if requested
       if (make_sed) then
-         ! Determine the maximum size among all arrays
          max_size = max(size(wavelengths), size(filter_wavelengths), &
                         size(fluxes), size(convolved_flux), size(filter_trans))
 
-         ! Open the CSV file for writing
          open (unit=10, file=csv_file, status='REPLACE', action='write', iostat=ierr)
          if (ierr /= 0) then
             print *, "Error opening file for writing"
             return
          end if
 
-         ! Write headers to the CSV file
          write (10, '(A)') "wavelengths,fluxes,convolved_flux,filter_wavelengths,filter_trans"
 
-         ! Loop through data and safely write values, ensuring no out-of-bounds errors
          do i = 1, max_size
-            ! Initialize values to zero in case they are out of bounds
-            wv = 0.0_dp
-            fl = 0.0_dp
-            cf = 0.0_dp
-            fwv = 0.0_dp
-            ftr = 0.0_dp
-
-            ! Assign actual values only if within valid indices
+            wv = 0.0_dp; fl = 0.0_dp; cf = 0.0_dp; fwv = 0.0_dp; ftr = 0.0_dp
             if (i <= size(wavelengths)) wv = wavelengths(i)
             if (i <= size(fluxes)) fl = fluxes(i)
             if (i <= size(convolved_flux)) cf = convolved_flux(i)
             if (i <= size(filter_wavelengths)) fwv = filter_wavelengths(i)
             if (i <= size(filter_trans)) ftr = filter_trans(i)
 
-            ! Write the formatted output
             write (line, '(ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6)') &
                wv, fl, cf, fwv, ftr
             write (10, '(A)') trim(line)
          end do
-
-         ! Close the file
          close (10)
       end if
 
-      ! Calculate Vega flux for zero point calibration
-      vega_flux = calculate_vega_flux(vega_filepath, filter_wavelengths, filter_trans, &
-                                      filter_name, make_sed, colors_results_directory)
+      ! ------------------------------------------------------------------
+      ! Calculate Zero Point Flux based on System Selection
+      ! ------------------------------------------------------------------
+      select case (trim(mag_system))
+      case ('VEGA', 'Vega', 'vega')
+         zero_point_flux = calculate_vega_flux(vega_filepath, filter_wavelengths, filter_trans, &
+                                               filter_name, make_sed, colors_results_directory)
+      case ('AB', 'ab')
+         zero_point_flux = calculate_ab_zero_point(filter_wavelengths, filter_trans)
+      case ('ST', 'st')
+         zero_point_flux = calculate_st_zero_point(filter_wavelengths, filter_trans)
+      case default
+         print *, "Error: Unknown magnitude system: ", mag_system
+         calculate_synthetic = huge(1.0_dp)
+         return
+      end select
 
-      ! Calculate synthetic flux
+      ! Calculate synthetic flux (Source Object)
       call calculate_synthetic_flux(wavelengths, convolved_flux, synthetic_flux, &
                                     filter_wavelengths, filter_trans)
 
-      ! Calculate magnitude using Vega zero point
-      if (vega_flux > 0.0_dp) then
-         calculate_synthetic = -2.5d0*log10(synthetic_flux/vega_flux)
+      ! Calculate magnitude using the selected zero point
+      if (zero_point_flux > 0.0_dp) then
+         calculate_synthetic = -2.5d0*log10(synthetic_flux/zero_point_flux)
       else
-         print *, "Error: Vega flux is zero, magnitude calculation is invalid."
+         print *, "Error: Zero point flux is zero, magnitude calculation is invalid."
          calculate_synthetic = huge(1.0_dp)
       end if
 
@@ -145,22 +134,14 @@ contains
       integer :: n
 
       n = size(wavelengths)
-
-      ! Allocate arrays
       allocate (interpolated_filter(n))
-
-      ! Interpolate the filter transmission onto the wavelengths array
       call interpolate_array(filter_wavelengths, filter_trans, wavelengths, interpolated_filter)
-
-      ! Perform convolution (element-wise multiplication)
       convolved_flux = fluxes*interpolated_filter
-
-      ! Deallocate temporary arrays
       deallocate (interpolated_filter)
    end subroutine convolve_sed
 
    !****************************
-   ! Calculate Synthetic Flux
+   ! Calculate Synthetic Flux (Integration)
    !****************************
    subroutine calculate_synthetic_flux(wavelengths, fluxes, synthetic_flux, &
                                        filter_wavelengths, filter_trans)
@@ -182,7 +163,7 @@ contains
       call romberg_integration(wavelengths, fluxes*wavelengths, integrated_flux)
       call romberg_integration(filter_wavelengths, &
                                filter_trans*filter_wavelengths, integrated_filter)
-      ! Store the total flux
+      
       if (integrated_filter > 0.0_dp) then
          synthetic_flux = integrated_flux/integrated_filter
       else
@@ -204,9 +185,8 @@ contains
       real(dp) :: int_flux, int_filter
       real(dp), allocatable :: vega_wave(:), vega_flux_arr(:), conv_flux(:)
       logical, intent(in) :: make_sed
-      integer :: i, unit, max_size
+      integer :: i, max_size, ierr
       real(dp) :: wv, fl, cf, fwv, ftr
-      integer:: ierr
       character(len=1000) :: line
 
       ! Load the Vega SED
@@ -216,7 +196,7 @@ contains
       allocate (conv_flux(size(vega_wave)))
       call convolve_sed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
 
-      ! Integrate the convolved Vega SED and the filter transmission
+      ! Integrate
       call romberg_integration(vega_wave, vega_wave*conv_flux, int_flux)
       call romberg_integration(filt_wave, filt_wave*filt_trans, int_filter)
 
@@ -228,14 +208,12 @@ contains
 
       ! Write Vega SED to CSV if requested
       if (make_sed) then
-         ! Determine the maximum size among all arrays
          max_size = max(size(vega_wave), size(vega_flux_arr), size(conv_flux), &
                         size(filt_wave), size(filt_trans))
 
          if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
          output_csv = trim(colors_results_directory)//'/VEGA_'//trim(remove_dat(filter_name))//'_SED.csv'
 
-         ! Open the CSV file for writing
          open (unit=10, file=output_csv, status='REPLACE', action='write', iostat=ierr)
          if (ierr /= 0) then
             print *, "Error opening file for writing"
@@ -244,34 +222,90 @@ contains
 
          write (10, '(A)') "wavelengths,fluxes,convolved_flux,filter_wavelengths,filter_trans"
 
-         ! Loop through data and safely write values, ensuring no out-of-bounds errors
          do i = 1, max_size
-            ! Initialize values to zero in case they are out of bounds
-            wv = 0.0_dp
-            fl = 0.0_dp
-            cf = 0.0_dp
-            fwv = 0.0_dp
-            ftr = 0.0_dp
-
-            ! Assign actual values only if within valid indices
+            wv = 0.0_dp; fl = 0.0_dp; cf = 0.0_dp; fwv = 0.0_dp; ftr = 0.0_dp
             if (i <= size(vega_wave)) wv = vega_wave(i)
             if (i <= size(vega_flux_arr)) fl = vega_flux_arr(i)
             if (i <= size(conv_flux)) cf = conv_flux(i)
             if (i <= size(filt_wave)) fwv = filt_wave(i)
             if (i <= size(filt_trans)) ftr = filt_trans(i)
 
-            ! Write the formatted output
             write (line, '(ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6, ",", ES14.6)') &
                wv, fl, cf, fwv, ftr
             write (10, '(A)') trim(line)
          end do
-
-         ! Close the file
          close (10)
       end if
-
-      ! Clean up
       deallocate (conv_flux, vega_wave, vega_flux_arr)
    end function calculate_vega_flux
+
+   !****************************
+   ! Calculate AB Zero Point Flux
+   ! f_nu = 3631 Jy = 3.631e-20 erg/s/cm^2/Hz
+   ! f_lambda = f_nu * c / lambda^2
+   !****************************
+   function calculate_ab_zero_point(filt_wave, filt_trans) result(ab_flux)
+      real(dp), dimension(:), intent(inout) :: filt_wave, filt_trans
+      real(dp) :: ab_flux
+      real(dp) :: int_flux, int_filter
+      real(dp), allocatable :: ab_sed_flux(:)
+      integer :: i
+
+      allocate(ab_sed_flux(size(filt_wave)))
+
+      ! Construct AB Spectrum (f_lambda) on the filter wavelength grid
+      ! Assumes wavelengths are in Angstroms and clight is in Angstroms/sec
+      ! 3631 Jy = 3.631E-20 erg/s/cm^2/Hz
+      do i = 1, size(filt_wave)
+         if (filt_wave(i) > 0.0_dp) then
+            ab_sed_flux(i) = 3.631d-20 * (clight / (filt_wave(i)**2))
+         else
+            ab_sed_flux(i) = 0.0_dp
+         endif
+      end do
+
+      ! Integrate using same method as source (f_lambda * T * lambda)
+      ! Note: We multiply by filt_wave inside the integration because the
+      ! romberg helper expects (flux * lambda)
+      call romberg_integration(filt_wave, ab_sed_flux * filt_trans * filt_wave, int_flux)
+      call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
+
+      if (int_filter > 0.0_dp) then
+         ab_flux = int_flux / int_filter
+      else
+         ab_flux = -1.0_dp
+      end if
+
+      deallocate(ab_sed_flux)
+   end function calculate_ab_zero_point
+
+   !****************************
+   ! Calculate ST Zero Point Flux
+   ! f_lambda = 3.63e-9 erg/s/cm^2/A (Constant)
+   !****************************
+   function calculate_st_zero_point(filt_wave, filt_trans) result(st_flux)
+      real(dp), dimension(:), intent(inout) :: filt_wave, filt_trans
+      real(dp) :: st_flux
+      real(dp) :: int_flux, int_filter
+      real(dp), allocatable :: st_sed_flux(:)
+      
+      ! For ST system, flux is constant in wavelength
+      ! However, to maintain exact consistency with how the source is integrated 
+      ! (numerical integration over the filter grid), we integrate the constant array.
+      
+      allocate(st_sed_flux(size(filt_wave)))
+      st_sed_flux = 3.63d-9 
+
+      call romberg_integration(filt_wave, st_sed_flux * filt_trans * filt_wave, int_flux)
+      call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
+
+      if (int_filter > 0.0_dp) then
+         st_flux = int_flux / int_filter
+      else
+         st_flux = -1.0_dp
+      end if
+      
+      deallocate(st_sed_flux)
+   end function calculate_st_zero_point
 
 end module synthetic

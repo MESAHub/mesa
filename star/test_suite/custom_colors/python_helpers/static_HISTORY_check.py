@@ -13,6 +13,25 @@ import mesa_reader as mr
 import numpy as np
 
 
+class MesaView:
+    def __init__(self, md, skip):
+        self._md = md
+        self._skip = skip
+
+    def __getattr__(self, name):
+        v = getattr(self._md, name)
+        # If it's a 1D array with same length as star_age, slice it
+        if isinstance(v, np.ndarray) and v.ndim == 1:
+            sa = getattr(self._md, "star_age", None)
+            if (
+                isinstance(sa, np.ndarray)
+                and sa.ndim == 1
+                and v.shape[0] == sa.shape[0]
+            ):
+                return v[self._skip :]
+        return v
+
+
 def get_mesa_phase_info(phase_code):
     """
     Map MESA's phase_of_evolution integer codes to phase names and colors.
@@ -82,7 +101,7 @@ def read_header_columns(history_file):
 
     # Find the index of Flux_bol
     try:
-        flux_index = all_cols.index("Flux_bol")
+        flux_index = all_cols.index("Interp_rad")
         filter_columns = all_cols[flux_index + 1 :]
     except ValueError:
         print("Warning: Could not find 'Flux_bol' column in header")
@@ -98,6 +117,12 @@ def setup_hr_diagram_params(md, filter_columns):
         hr_mag = md.G
         hr_xlabel = "Gbp - Grp"
         hr_ylabel = "G"
+        color_index = hr_color
+    elif "V" in filter_columns and "B" in filter_columns and "R" in filter_columns:
+        hr_color = md.B - md.R
+        hr_mag = md.V
+        hr_xlabel = "B - R"
+        hr_ylabel = "V"
         color_index = hr_color
     else:
         if len(filter_columns) >= 2:
@@ -136,7 +161,7 @@ def create_phase_plots(history_file="../LOGS/history.data"):
     """
     # Read the MESA data
     md = mr.MesaData(history_file)
-
+    md = MesaView(md, 5)
     # Basic stellar parameters
     Teff = md.Teff
     Log_L = md.log_L

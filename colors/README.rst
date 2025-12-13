@@ -1,7 +1,7 @@
 .. _custom_colors:
 
 *************
-custom_colors
+Colors
 *************
 
 This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
@@ -27,86 +27,6 @@ The module operates by coupling the stellar structure model with pre-computed gr
 2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
 3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
-
-The Test Suite
-=========================
-
-This test suite evolves a complete stellar model (from the pre–main sequence onward) while the ``colors`` module runs *continuously* in the background. 
-At every timestep, MESA computes synthetic photometry by interpolating a stellar atmosphere grid and convolving the resulting SED with the filters you specify in the inlist.
-
-During the run, the module automatically appends new photometric columns to the ``history.data`` file. 
-You **do not** need to list these in ``history_columns.list``—the module detects the available filters by inspecting the directory defined in the ``instrument`` parameter.
-
-What the Test Suite Produces
-----------------------------
-
-The standard output of the test suite includes:
-
-* ``Mag_bol``  
-  The bolometric magnitude computed from the star's instantaneous bolometric flux.
-
-* ``Flux_bol``  
-  The bolometric flux (cgs units) after distance dilution is applied.  
-  The default distance is 10 pc, producing **absolute magnitudes** unless changed.
-
-* ``[Filter_Name]``  
-  A synthetic magnitude column for **every** filter in the instrument directory.
-
-For example, if your filter directory contains:
-
-.. code-block:: text
-
-   filters/Generic/Johnson/
-       B.dat
-       V.dat
-       R.dat
-       Johnson
-
-then your history file will include:
-
-``B``, ``V``, ``R``
-
-as new magnitude columns generated automatically at runtime.
-
-What the Test Suite Actually Does
----------------------------------
-
-The provided ``inlist_colors`` configures a full evolution run with the colors module activated:
-
-* Starts from a **pre–main-sequence model**  
-* Evolves the model through multiple phases while computing synthetic photometry
-* Uses the Johnson filter set
-* Uses the Kurucz2003all atmosphere grid
-* Outputs bolometric and filter-specific magnitudes to ``history.data`` every step
-
-Because the test suite's inlist also defines a set of PGSTAR panels, you automatically
-get real-time plots of:
-
-* HR diagram (log L vs. log Teff)  
-* A light curve based on any synthetic magnitude (the test suite uses ``V``)  
-
-Real-Time Visualization (Enabled by Default)
---------------------------------------------
-
-The test suite's ``pgstar`` block is configured so that, as the star evolves:
-
-* Panel 1: HR diagram (theoretical)
-* Panel 2: Light curve in the Johnson V band  
-
-These update automatically as the model runs.
-
-Purpose of the Test Suite
--------------------------
-
-This test problem is designed to demonstrate:
-
-1. That MESA can compute synthetic photometry **at runtime**, without external tools.  
-2. How atmosphere grids and filters affect magnitude evolution.  
-3. How to configure your own inlists for scientific use.  
-4. How the ``colors`` module integrates with PGSTAR visualization.  
-5. How synthetic magnitudes appear in ``history.data`` and how to use them for CMDs, light curves, and population modeling.
-
-
 
 Inlist Options & Parameters
 ==============================
@@ -321,63 +241,3 @@ Visual Summary of Data Flow
    | Mag_bol, Flux_bol    |
    | V, B, I, ...         |
    +----------------------+
-
-
-
-
-================================================
-================================================
-
-Python Helper Scripts
-========================
-
-A collection of Python scripts is provided in the ``python_helpers/`` directory to assist with real-time monitoring, visualization, and analysis of the colors module output.
-
-Dependencies:
-  * ``matplotlib``
-  * ``numpy``
-  * ``mesa_reader`` (ensure this is installed/accessible)
-  * ``ffmpeg`` (optional, for movie generation)
-
-HISTORY_check.py
-----------------
-**Usage:** ``python python_helpers/HISTORY_check.py``
-
-A real-time dashboard that monitors your ``history.data`` file as MESA runs. It automatically refreshes when new data is written.
-
-**Plots:**
-  1. **HR Diagram (Color vs. Magnitude):** Points colored by evolutionary phase.
-  2. **Theoretical HR (Teff vs. Log L):** Standard theoretical track.
-  3. **Color Evolution:** Color index vs. Age.
-  4. **Light Curves:** Absolute magnitude vs. Age for all filters.
-
-**Requirements:** Ensure ``phase_of_evolution`` is present in your ``history_columns.list`` for phase-based coloring.
-
-SED_check.py
-------------
-**Usage:** ``python python_helpers/SED_check.py``
-
-Monitors the ``colors_results_directory`` (default: ``SED/``) for new CSV output.
-
-**Features:**
-  * Plots the full high-resolution stellar spectrum (black line).
-  * Plots the filter-convolved fluxes (colored lines corresponding to filters).
-  * Displays stellar parameters (Mass, Z, Distance) parsed from your inlist.
-  * Updates automatically if ``make_csv = .true.`` in your inlist and MESA overwrites the files.
-
-interactive_cmd_3d.py
----------------------
-**Usage:** ``python python_helpers/interactive_cmd_3d.py``
-
-Generates an interactive 3D Color-Magnitude Diagram.
-
-* **X-axis:** Color Index (e.g., B-V or Gbp-Grp).
-* **Y-axis:** Magnitude (e.g., V or G).
-* **Z-axis:** User-selectable column from the history file (e.g., ``Interp_rad``, ``star_age``, ``log_R``). The script will prompt you to choose a column at runtime.
-
-Movie Makers
-------------
-Scripts to generate MP4 animations of your run. Requires ``ffmpeg``.
-
-* **make_history_movie.py**: Creates ``history.mp4``, an animated version of the ``HISTORY_check.py`` dashboard showing the evolution over time.
-* **make_CMD_InterpRad_movie.py**: Creates ``cmd_interp_rad_rotation.mp4``, a rotating 3D view of the Color-Magnitude Diagram with the Interpolation Radius on the Z-axis. Useful for visualizing grid coverage and interpolation quality.    
