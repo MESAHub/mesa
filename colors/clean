@@ -1,2 +1,0 @@
-cd make; make clean
-cd ../test/make; make clean

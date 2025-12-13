@@ -1,2 +1,0 @@
-rm -f ckread table_merge create_table_atm
-cd make; make clean

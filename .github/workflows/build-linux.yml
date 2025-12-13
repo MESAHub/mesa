@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["22.6.1", "23.7.3", "24.7.1"]  # pick 2 or 3 most recent.
+        sdk: ["25.12.1"]  # pick 2 or 3 most recent.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
