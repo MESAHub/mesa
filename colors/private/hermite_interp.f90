@@ -296,7 +296,7 @@ contains
    !---------------------------------------------------------------------------
    ! Find the interval in a sorted array containing a value
    !---------------------------------------------------------------------------
-      
+
    subroutine find_interval(x, val, i, t)
       real(dp), intent(in) :: x(:), val
       integer, intent(out) :: i
@@ -343,7 +343,7 @@ contains
       i = lo
       t = (val - x(i))/(x(i + 1) - x(i))
    end subroutine find_interval
-   
+
 
    !---------------------------------------------------------------------------
    ! Find the nearest grid point

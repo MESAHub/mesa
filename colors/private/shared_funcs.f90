@@ -2,7 +2,7 @@
 MODULE shared_funcs
   USE const_def, ONLY: dp, strlen
   IMPLICIT NONE
-  
+
   PRIVATE
   PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, SimpsonIntegration, loadsed, loadfilter, loadvegased, load_lookuptable, remove_dat
 
@@ -529,7 +529,7 @@ CONTAINS
   !-----------------------------------------------------------------------
   ! Helper function for file names
   !-----------------------------------------------------------------------
-  
+
   function remove_dat(path) result(base)
     ! Extracts the portion of the string before the first dot
     character(len=*), intent(in) :: path

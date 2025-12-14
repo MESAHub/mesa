@@ -23,7 +23,7 @@ How does the MESA colors module work?
 The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
 
 1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the stars current features.
-    
+
 2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
 3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
@@ -31,10 +31,10 @@ The module operates by coupling the stellar structure model with pre-computed gr
 The Test Suite
 =========================
 
-This test suite evolves a complete stellar model (from the pre–main sequence onward) while the ``colors`` module runs *continuously* in the background. 
+This test suite evolves a complete stellar model (from the pre–main sequence onward) while the ``colors`` module runs *continuously* in the background.
 At every timestep, MESA computes synthetic photometry by interpolating a stellar atmosphere grid and convolving the resulting SED with the filters you specify in the inlist.
 
-During the run, the module automatically appends new photometric columns to the ``history.data`` file. 
+During the run, the module automatically appends new photometric columns to the ``history.data`` file.
 You **do not** need to list these in ``history_columns.list``—the module detects the available filters by inspecting the directory defined in the ``instrument`` parameter.
 
 What the Test Suite Produces
@@ -42,14 +42,14 @@ What the Test Suite Produces
 
 The standard output of the test suite includes:
 
-* ``Mag_bol``  
+* ``Mag_bol``
   The bolometric magnitude computed from the star's instantaneous bolometric flux.
 
-* ``Flux_bol``  
-  The bolometric flux (cgs units) after distance dilution is applied.  
+* ``Flux_bol``
+  The bolometric flux (cgs units) after distance dilution is applied.
   The default distance is 10 pc, producing **absolute magnitudes** unless changed.
 
-* ``[Filter_Name]``  
+* ``[Filter_Name]``
   A synthetic magnitude column for **every** filter in the instrument directory.
 
 For example, if your filter directory contains:
@@ -73,7 +73,7 @@ What the Test Suite Actually Does
 
 The provided ``inlist_colors`` configures a full evolution run with the colors module activated:
 
-* Starts from a **pre–main-sequence model**  
+* Starts from a **pre–main-sequence model**
 * Evolves the model through multiple phases while computing synthetic photometry
 * Uses the Johnson filter set
 * Uses the Kurucz2003all atmosphere grid
@@ -82,8 +82,8 @@ The provided ``inlist_colors`` configures a full evolution run with the colors m
 Because the test suite's inlist also defines a set of PGSTAR panels, you automatically
 get real-time plots of:
 
-* HR diagram (log L vs. log Teff)  
-* A light curve based on any synthetic magnitude (the test suite uses ``V``)  
+* HR diagram (log L vs. log Teff)
+* A light curve based on any synthetic magnitude (the test suite uses ``V``)
 
 Real-Time Visualization (Enabled by Default)
 --------------------------------------------
@@ -91,7 +91,7 @@ Real-Time Visualization (Enabled by Default)
 The test suite's ``pgstar`` block is configured so that, as the star evolves:
 
 * Panel 1: HR diagram (theoretical)
-* Panel 2: Light curve in the Johnson V band  
+* Panel 2: Light curve in the Johnson V band
 
 These update automatically as the model runs.
 
@@ -100,10 +100,10 @@ Purpose of the Test Suite
 
 This test problem is designed to demonstrate:
 
-1. That MESA can compute synthetic photometry **at runtime**, without external tools.  
-2. How atmosphere grids and filters affect magnitude evolution.  
-3. How to configure your own inlists for scientific use.  
-4. How the ``colors`` module integrates with PGSTAR visualization.  
+1. That MESA can compute synthetic photometry **at runtime**, without external tools.
+2. How atmosphere grids and filters affect magnitude evolution.
+3. How to configure your own inlists for scientific use.
+4. How the ``colors`` module integrates with PGSTAR visualization.
 5. How synthetic magnitudes appear in ``history.data`` and how to use them for CMDs, light curves, and population modeling.
 
 
@@ -152,7 +152,7 @@ distance
 --------
 **Default:** `3.0857d19` (10 parsecs in cm)
 
-The distance to the star in centimeters. 
+The distance to the star in centimeters.
 
 * This value is used to convert surface flux to observed flux.
 * **Default Behavior:** It defaults to 10 parsecs (:math:`3.0857 \times 10^{19}` cm), resulting in **Absolute Magnitudes**.
@@ -162,13 +162,13 @@ The distance to the star in centimeters.
 
 .. code-block:: fortran
 
-    distance = 5.1839d20 
+    distance = 5.1839d20
 
 make_csv
 --------
 **Default:** `.false.`
 
-If set to ``.true.``, the module exports the full calculated SED at every profile interval. 
+If set to ``.true.``, the module exports the full calculated SED at every profile interval.
 
 * **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
 * **Format:** CSV files containing Wavelength vs. Flux.
@@ -243,9 +243,9 @@ filter transmission curves from the following public archives:
 These sources provide heterogeneous formats and file organizations. SED_Tools
 standardizes them into the exact structure required by MESA:
 
-* ``lookup_table.csv``  
-* Raw SED files (text or/and HDF5)  
-* ``flux_cube.bin`` (binary cube for fast interpolation)  
+* ``lookup_table.csv``
+* Raw SED files (text or/and HDF5)
+* ``flux_cube.bin`` (binary cube for fast interpolation)
 * Filter index files and ``*.dat`` transmission curves
 
 
@@ -271,9 +271,9 @@ A browsable online mirror of the processed SED_Tools output is also available:
 
 This server provides a live view of:
 
-* All downloaded stellar atmosphere grids  
-* All available filter facilities and instruments  
-* File counts, disk usage, and metadata  
+* All downloaded stellar atmosphere grids
+* All available filter facilities and instruments
+* File counts, disk usage, and metadata
 * Direct links to the directory structure used by MESA
 
 
@@ -298,18 +298,18 @@ Visual Summary of Data Flow
 
 .. code-block:: text
 
-   +----------------+      
-   |   MESA Model   |      
-   | (Teff, logg, Z)|      
-   +----------------+      
-           |               
-           v               
+   +----------------+
+   |   MESA Model   |
+   | (Teff, logg, Z)|
+   +----------------+
+           |
+           v
    +-------------------------------------------------------------------------+
    |                        MESA COLORS MODULE                               |
    | 1. Query Stellar Atmosphere Grid with input model                       |
    | 2. Interpolate grid to construct specific SED                           |
    | 3. Convolve SED with filters to generate band flux                      |
-   | 2. Apply distance flux dilution to generate bolometric flux -> Flux_bol |   
+   | 2. Apply distance flux dilution to generate bolometric flux -> Flux_bol |
    | 4. Apply zero point (Vega/AB/ST) to  generate magnitudes                |
    |                                    (Both bolometric and per filter)     |
    +-------------------------------------------------------------------------+
@@ -380,4 +380,4 @@ Movie Makers
 Scripts to generate MP4 animations of your run. Requires ``ffmpeg``.
 
 * **make_history_movie.py**: Creates ``history.mp4``, an animated version of the ``HISTORY_check.py`` dashboard showing the evolution over time.
-* **make_CMD_InterpRad_movie.py**: Creates ``cmd_interp_rad_rotation.mp4``, a rotating 3D view of the Color-Magnitude Diagram with the Interpolation Radius on the Z-axis. Useful for visualizing grid coverage and interpolation quality.    
+* **make_CMD_InterpRad_movie.py**: Creates ``cmd_interp_rad_rotation.mp4``, a rotating 3D view of the Color-Magnitude Diagram with the Interpolation Radius on the Z-axis. Useful for visualizing grid coverage and interpolation quality.

@@ -115,7 +115,7 @@ contains
       real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
       integer, dimension(4), intent(out) :: closest_indices
       logical :: use_teff_dim, use_logg_dim, use_meta_dim
-      
+
       integer :: i, n, j
       real(dp) :: distance, norm_teff, norm_logg, norm_meta
       real(dp), dimension(:), allocatable :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta

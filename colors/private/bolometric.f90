@@ -157,7 +157,7 @@ contains
    ! interp_radius ~ 0  => sitting very close to an atmosphere point
    ! interp_radius ~ O(1) => deep in-between points / extrapolating
    !--------------------------------------------------------------------
-      
+
    real(dp) function compute_interp_radius(teff, log_g, metallicity, &
                                           lu_teff, lu_logg, lu_meta)
 

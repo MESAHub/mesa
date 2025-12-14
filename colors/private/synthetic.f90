@@ -163,7 +163,7 @@ contains
       call romberg_integration(wavelengths, fluxes*wavelengths, integrated_flux)
       call romberg_integration(filter_wavelengths, &
                                filter_trans*filter_wavelengths, integrated_filter)
-      
+
       if (integrated_filter > 0.0_dp) then
          synthetic_flux = integrated_flux/integrated_filter
       else
@@ -288,13 +288,13 @@ contains
       real(dp) :: st_flux
       real(dp) :: int_flux, int_filter
       real(dp), allocatable :: st_sed_flux(:)
-      
+
       ! For ST system, flux is constant in wavelength
-      ! However, to maintain exact consistency with how the source is integrated 
+      ! However, to maintain exact consistency with how the source is integrated
       ! (numerical integration over the filter grid), we integrate the constant array.
-      
+
       allocate(st_sed_flux(size(filt_wave)))
-      st_sed_flux = 3.63d-9 
+      st_sed_flux = 3.63d-9
 
       call romberg_integration(filt_wave, st_sed_flux * filt_trans * filt_wave, int_flux)
       call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
@@ -304,7 +304,7 @@ contains
       else
          st_flux = -1.0_dp
       end if
-      
+
       deallocate(st_sed_flux)
    end function calculate_st_zero_point
 
