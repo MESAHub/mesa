@@ -747,7 +747,8 @@
                                    du_div_cs_limit_flag = .true.
                               else if (associated(s% v)) then
                                  ! Only set flag for compressive flow across interface (kk-1, kk)
-                                 if (kk <= nz_old .and. s% v(kk)*pow2(s% r(kk)) > s% v(kk-1)*pow2(s% r(kk-1))) du_div_cs_limit_flag = .true.
+                                 if (kk <= nz_old .and. s% v(kk)*pow2(s% r(kk)) > s% v(kk-1)*pow2(s% r(kk-1))) &
+                                       du_div_cs_limit_flag = .true.
                                  if (.not. du_div_cs_limit_flag .and. kk-1 > 1) then
                                     if (s% v(kk-1)*pow2(s% r(kk-1)) > s% v(kk-2)*pow2(s% r(kk-2))) du_div_cs_limit_flag = .true.
                                  end if
