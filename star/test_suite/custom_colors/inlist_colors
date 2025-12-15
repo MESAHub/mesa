@@ -127,13 +127,6 @@
 &pgstar
   pgstar_interval = 10
 
-  ! Standard HR Diagram
-  HR_win_flag = .true.
-  HR_logT_min = 3.2
-  HR_logT_max = 4.3
-  HR_logL_min = -1.0
-  HR_logL_max = 4.0
-
   ! G band light curve
   History_Track2_win_flag = .true.
   History_Track2_xname = 'star_age'
@@ -141,5 +134,23 @@
   History_Track2_title = 'V Light Curve'
   History_Track2_xaxis_label = 'Age (yr)'
   History_Track2_yaxis_label = 'V mag'
+
+  History_Track3_win_flag = .true.
+  History_Track3_xname = 'R'
+  History_Track3_yname = 'B'
+  History_Track3_title = 'B-R'
+  History_Track3_xaxis_label = 'R mag'
+  History_Track3_yaxis_label = 'B mag'
+  History_Track3_reverse_yaxis = .true.
+
+
+  History_Track4_win_flag = .true.
+  History_Track4_xname = 'U'
+  History_Track4_yname = 'I'
+  History_Track4_title = 'U-I'
+  History_Track4_xaxis_label = 'U mag'
+  History_Track4_yaxis_label = 'I mag'
+  History_Track4_reverse_yaxis = .true.
+
 
 /
