@@ -4,7 +4,8 @@ MODULE shared_funcs
   IMPLICIT NONE
 
   PRIVATE
-  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, SimpsonIntegration, loadsed, loadfilter, loadvegased, load_lookuptable, remove_dat
+  PUBLIC :: dilute_flux, trapezoidalintegration, rombergintegration, SimpsonIntegration, loadsed,&
+             loadfilter, loadvegased, load_lookuptable, remove_dat
 
 CONTAINS
 
