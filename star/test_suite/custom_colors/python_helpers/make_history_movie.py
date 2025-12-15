@@ -5,17 +5,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter
+from HISTORY_check import HistoryChecker  # uses static_HISTORY_check under the hood
 
 
 do_tqdm = True
 try:
     from tqdm import tqdm
-except:
+except ImportError:
     do_tqdm = False
 
 
 # Reuse the live viewer so formatting/logic stays identical
-from HISTORY_check import HistoryChecker  # uses static_HISTORY_check under the hood
 
 OUT = "history.mp4"
 FPS = 24
@@ -83,7 +83,6 @@ with writer.saving(fig, OUT, dpi=DPI):
         iterator = range(N)
 
     for i in iterator:
-
         sl = slice(0, i + 1)
 
         # Clear and re-apply the exact same formatting
