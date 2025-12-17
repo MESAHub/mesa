@@ -12,7 +12,7 @@
       create_pre_main_sequence_model = .true.  ! Start from pre-MS rather than ZAMS
       
       ! Termination conditions
-      save_model_when_terminate = .false.
+      save_model_when_terminate = .true.
       
       ! Custom output files
       history_columns_file = 'custom_colors_history_columns.list'  ! Additional history columns
