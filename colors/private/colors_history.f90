@@ -46,7 +46,7 @@ contains
       if (.not. colors_settings%use_colors) then
          num_cols = 0
       else
-         num_cols = 2 + num_color_filters
+         num_cols = 3 + num_color_filters
       end if
 
       how_many_colors_history_columns = num_cols
@@ -63,12 +63,14 @@ contains
 
       type(Colors_General_Info), pointer :: colors_settings
       integer :: i, filter_offset
-      real(dp) :: d, bolometric_magnitude, bolometric_flux
-      character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath
+      real(dp) :: d, bolometric_magnitude, bolometric_flux, interpolation_radius
+      character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath!, mag_system
       logical :: make_sed
 
       real(dp), dimension(:), allocatable :: wavelengths, fluxes, filter_wavelengths, filter_trans
 
+
+      !mag_system = "ST"
       ierr = 0
       call get_colors_ptr(colors_handle, colors_settings, ierr)
       if (ierr /= 0) then
@@ -84,12 +86,14 @@ contains
       make_sed = colors_settings%make_csv
 
       call calculate_bolometric(t_eff, log_g, metallicity, R, d, &
-                                bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
+                                bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius)
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude
       names(2) = "Flux_bol"
       vals(2) = bolometric_flux
-      filter_offset = 2
+      names(3) = "Interp_rad"
+      vals(3) = interpolation_radius
+      filter_offset = 3
 
       if (n == num_color_filters + filter_offset) then
          do i = 1, num_color_filters
@@ -102,7 +106,8 @@ contains
                vals(i + filter_offset) = calculate_synthetic(t_eff, log_g, metallicity, ierr, &
                                                              wavelengths, fluxes, filter_wavelengths, filter_trans, &
                                                              filter_filepath, vega_filepath, color_filter_names(i), &
-                                                             make_sed, colors_settings%colors_results_directory)
+                                                             make_sed, colors_settings%colors_results_directory, &
+                                                             colors_settings%mag_system)
                if (ierr /= 0) vals(i + filter_offset) = -1.0_dp
             else
                vals(i + filter_offset) = -1.0_dp
