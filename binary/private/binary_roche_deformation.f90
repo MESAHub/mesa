@@ -69,7 +69,7 @@ contains
             xtest = -0.5
             ytest = 1.35
             write(*, 11) 'grid size', num_xpts, num_ypts
-            write(*, 1) 'setup interpolators succesful,'
+            write(*, 1) 'setup interpolators successful,'
 
             call interp_evbipm_db(xtest, ytest, xvals, num_xpts, yvals, num_ypts,&
                   fpfunc1d, num_xpts, testval, ierr)
