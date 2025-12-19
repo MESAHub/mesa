@@ -173,9 +173,10 @@ contains
       end if
    end subroutine calculate_synthetic_flux
 
-   !****************************
-   ! Calculate Vega Flux for Zero Point
-   !****************************
+
+
+
+
    function calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
                                 filter_name, make_sed, colors_results_directory) result(vega_flux)
       character(len=*), intent(in) :: vega_filepath, filter_name, colors_results_directory
@@ -184,6 +185,7 @@ contains
       real(dp) :: vega_flux
       real(dp) :: int_flux, int_filter
       real(dp), allocatable :: vega_wave(:), vega_flux_arr(:), conv_flux(:)
+      real(dp), allocatable :: filt_trans_on_vega_grid(:)  ! ← NEW
       logical, intent(in) :: make_sed
       integer :: i, max_size, ierr
       real(dp) :: wv, fl, cf, fwv, ftr
@@ -195,10 +197,14 @@ contains
       ! Convolve the Vega SED with the filter transmission
       allocate (conv_flux(size(vega_wave)))
       call convolve_sed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
+      
+      ! ← NEW: Interpolate filter transmission onto vega wavelength grid
+      allocate(filt_trans_on_vega_grid(size(vega_wave)))
+      call interpolate_array(filt_wave, filt_trans, vega_wave, filt_trans_on_vega_grid)
 
-      ! Integrate
+      ! Integrate - NOW BOTH USE vega_wave GRID
       call romberg_integration(vega_wave, vega_wave*conv_flux, int_flux)
-      call romberg_integration(filt_wave, filt_wave*filt_trans, int_filter)
+      call romberg_integration(vega_wave, vega_wave*filt_trans_on_vega_grid, int_filter)  ! ← FIXED
 
       if (int_filter > 0.0_dp) then
          vega_flux = int_flux/int_filter
@@ -258,7 +264,7 @@ contains
       ! 3631 Jy = 3.631E-20 erg/s/cm^2/Hz
       do i = 1, size(filt_wave)
          if (filt_wave(i) > 0.0_dp) then
-            ab_sed_flux(i) = 3.631d-20 * (clight / (filt_wave(i)**2))
+            ab_sed_flux(i) = 3.631d-20 * ((clight * 1.0e8) / (filt_wave(i)**2))
          else
             ab_sed_flux(i) = 0.0_dp
          endif
@@ -278,6 +284,8 @@ contains
 
       deallocate(ab_sed_flux)
    end function calculate_ab_zero_point
+
+
 
    !****************************
    ! Calculate ST Zero Point Flux
