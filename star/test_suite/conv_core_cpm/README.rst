@@ -20,4 +20,4 @@ core if the model continued to evolve beyond its stopping condition.
 
 Last-Updated: 2023-03-14 (MESA d6bbdf4) by Evan Bauer
 
-Last-Run: 06Oct2025 (MESA 367d7a25) by pmocz on C916PXT6XW in 179 seconds using 8 threads.
+Last-Run: 22Dec2025 (MESA fede5937) by pmocz on C916PXT6XW in 130 seconds using 8 threads.
