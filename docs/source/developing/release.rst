@@ -3,6 +3,7 @@ Release checklist
 
 This is a guide on what needs to be done before a release can be made.
 
+
 General steps
 -------------
 
@@ -10,11 +11,13 @@ General steps
 - Pick a release date
 - Pick a RC1 (release candidate) date which should be ~1 month before the release
 
+
 Prior to generating a release
 -----------------------------
 
 - Update the ZAMS model file by running the work directory found in ``data/star_data/zams_models/create_z2m2_y28``. This may take up to a couple of hours or so. This will generate the file ``data/star_data/zams_models/zams_z2m2_y28.data``. Use the ZAMS model plotting script to verify that the HR diagram and central compositions look reasonable, and commit the new data file.
 - Update figures in the docs by running the ``update_docs_figures`` script in the ``star/test_suite/`` folder. These figures should be checked to make sure they look reasonable. Currently not all test suite problems autogenerate figures. Pay special attention if the model numbers in the filenames of saved figures have changed (script will print an ERROR message) -- this indicates some commit to MESA has slightly changed the results of these problems, and currently the README.rst file needs to be manually updated with the new image filename and the test as to be re-run (e.g. ``./each_test_run -u 13``). A new release should not be made if one of the figures degrade in quality.
+
 
 Removing files
 --------------
@@ -26,21 +29,20 @@ This will prevent the file(s) or folders from appearing in the zip archive.
 Documentation
 -------------
 
-- The Changelog should be updated.
+- The Changelog (``docs/source/changelog.rst``) should be up-to-date.
 
 .. note::
-    At a minimum this should mention options that are removed/replaced and how to convert from a previous version to the newest version.
+    At a minimum the changelog should mention options that are removed/replaced and how to convert from a previous version to the newest version.
 
 - A release notes document should be written.
 
 - The release branch or tag should be added to the `list of active versions on ReadTheDocs <https://readthedocs.org/projects/mesa-doc/versions/>`__.
 
 
-
 Testing
 -------
 
-- TestHub should report all tests pass for both Linux and macOS on multiple machines and with different OS versions.
+- `TestHub <https://testhub.mesastar.org/>`__ should report all tests pass for both Linux and macOS on multiple machines and with different OS versions.
 - The previous SDK version should be tested.
 
 .. note::
@@ -48,8 +50,7 @@ Testing
 
 - A non-SDK machine should test the test_suite.
 - At least one Windows machine should get tested.
-- Recalibrate test suite cases (things like simplex_solar_calibration and example_astero).
-
+- Recalibrate test suite cases (things like ``simplex_solar_calibration`` and ``example_astero``).
 
 
 Additional Testing
@@ -121,7 +122,7 @@ This is the key bit, as the Github release will be anchored to this tag.
 .. note::
     The tag follows PEP440 standards -- there is no ``r`` or ``-`` (hyphen) in the tag (unlike the branch name) -- so readthedocs can automatically determine the stable version and add version warning banners.
 
-Go to https://github.com/MESAHub/mesa/releases and craft a new release following the guidelines `here <https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository>`_.
+Go to https://github.com/MESAHub/mesa/releases and craft a new release following the guidelines `here <https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository>`__.
 
 .. note::
     If this is a RC release, then make sure to click ``This is a pre-release``.
@@ -141,6 +142,7 @@ Once the zip folder has been created, it should be uploaded to Zenodo prior to s
   For an example, see `r25.10.1-rc1 <https://zenodo.org/records/17426065>`_.
 - Official releases need to be uploaded to `this MESA Zenodo page <https://doi.org/10.5281/zenodo.2602941>`_.
 - The zip uploaded to Zenodo should be larger than 2 Gb in size, and takes a few hours to upload.
+
 
 Send an email to mesa-users
 ---------------------------
@@ -173,12 +175,12 @@ Listing all commits that acknowledge help from someone
     git log --all --grep="-by" 24.08.1..HEAD
 
 
-
 Post release fixes
 ------------------
 
 By having the release be in a separate branch, we can push changes if we need to fix issues. However, this should be done with caution. Changes to the documentation (highlighting some workarounds are fine). Making changes to the code itself is more tricky (due to the Zenodo upload being fixed and change requiring a new Zenodo upload). It may be easier if a version
 needs fixes to simply push a new release, and flag the current release as not working.
+
 
 Add new release version to readthedocs
 --------------------------------------
