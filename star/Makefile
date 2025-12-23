@@ -167,7 +167,6 @@ SRCS := \
 
 ifeq ($(WITH_PGSTAR),yes)
 SRCS += \
-   other/pgstar_decorator.f90 \
    private/pgstar_ctrls_io.f90 \
    private/pgstar_colors.f90 \
    private/pgstar_support.f90 \
@@ -236,7 +235,6 @@ MODULES += pgstar_abundance.mod \
            pgstar_color_magnitude.mod \
            pgstar_colors.mod \
            pgstar_ctrls_io.mod \
-           pgstar_decorator.mod \
            pgstar_dpg_dnu.mod \
            pgstar_dynamo.mod \
            pgstar_grid.mod \

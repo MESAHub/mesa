@@ -472,7 +472,6 @@
          use other_photo_read, only: default_other_photo_read
          use other_set_pgstar_controls, only: default_other_set_pgstar_controls
          use other_kap
-         use pgstar_decorator
          use star_utils, only: init_random
 
          type (star_info), pointer :: s
