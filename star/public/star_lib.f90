@@ -3124,7 +3124,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          dV = 0d0  ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
-         energy = 0d0 ! for flux limiting TDC only 
+         energy = 0d0 ! for flux limiting TDC only
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &

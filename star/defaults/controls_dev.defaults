@@ -217,11 +217,11 @@
       ! TDC_include_eturb_in_energy_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! While ``TDC`` is already implicitly coupled to the total energy equation, this 
+      ! While ``TDC`` is already implicitly coupled to the total energy equation, this
       ! controls feedsback the turbulent energy into the total energy equation by
       ! calculating and incorporating det/dt from TDC as a negative source term in
       ! the total energy equation, along with the eddy viscous heating Eq. This comes
-      ! at the cost of numerical stability on long timescales, be warned. 
+      ! at the cost of numerical stability on long timescales, be warned.
 
       ! ::
 
@@ -283,7 +283,7 @@
       ! use_TDC_enthalpy_flux_limiter
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC 
+      ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC
       ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
 
       ! ::
@@ -315,7 +315,7 @@
     include_mlt_in_velocity_time_centering = .false.
 
 
-! Remeshing 
+! Remeshing
 ! =========
 
       ! remesh_for_TDC_pulsations_log_core_zoning

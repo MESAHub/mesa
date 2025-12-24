@@ -431,7 +431,7 @@ contains
             Chi_p1 = 0d0
             w_p1 = 0d0
          end if
-   
+
          Uq_cell = 4d0*pi*(Chi_00 - Chi_p1)/(r_cell) ! we have neglected the /dm here, because it is restored in the reimann flux calculation
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2 [g], acceleration*mass = Force
 
@@ -633,7 +633,7 @@ contains
          v_00 = wrap_opt_time_center_u_00(s,k)
          v_m1 = wrap_opt_time_center_u_m1(s,k)
       end if
-         
+
       if (s% v_flag) then
          r_00 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
          r_m1 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_m1(s, k))

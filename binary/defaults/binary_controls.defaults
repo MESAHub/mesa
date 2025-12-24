@@ -1472,7 +1472,7 @@
 ! Use the tidal deformation corrections fp/ft and the specific moments of inertia irot
 ! based on binary Roche geometry integrations of Fabry et al., 2022, A&A 661, A123
 ! This uses the methodology of Kippenhahn and Thomas, 1970, IAU Proc. 4, and Endal and Sofia, 1976, ApJ 210, 184-198
-! to represent the stellar stucture on equipotential surfaces. In these coordinates, all radii are volume equivalent
+! to represent the stellar structure on equipotential surfaces. In these coordinates, all radii are volume equivalent
 ! radii.
 
 ! ::

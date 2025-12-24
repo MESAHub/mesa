@@ -262,7 +262,8 @@
     merge_amr_ignore_core_cells, merge_amr_logT_for_ignore_core_cells, &
     split_amr_ignore_core_cells, split_amr_logT_for_ignore_core_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
-    split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, trace_split_merge_amr, equal_split_density_amr, use_hydro_merge_limits_in_mesh_plan, &
+    split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, &
+    trace_split_merge_amr, equal_split_density_amr, use_hydro_merge_limits_in_mesh_plan, &
 
     ! nuclear reaction parameters
     screening_mode, default_net_name, net_logTcut_lo, net_logTcut_lim, &

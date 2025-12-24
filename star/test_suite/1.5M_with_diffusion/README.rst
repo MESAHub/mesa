@@ -31,4 +31,4 @@ pgstar commands used for the plots above, e.g.:
 
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
 
-Last-Run: 06Oct2025 (MESA 367d7a25) by pmocz on C916PXT6XW in 681 seconds using 8 threads.
+Last-Run: 22Dec2025 (MESA fede5937) by pmocz on C916PXT6XW in 441 seconds using 8 threads.
