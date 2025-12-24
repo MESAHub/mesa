@@ -11,9 +11,9 @@ Devote lots of time watching models evolve. It's a fun way to learn!
 
 If you're using the MESA SDK, you should have everything you need to use
 PGSTAR. Otherwise, you need to have installed PGPLOT, Xwindows, and a
-few libraries that they need. See the makefile_header_non_mesasdk in
-$MESA_DIR/utils for details. You'll find pgplot.tar.bz2 in
-$MESA_DIR/scripts in case you need to install PGPLOT (thanks to Tim
+few libraries that they need. See the ``makefile_header_non_mesasdk`` in
+``$MESA_DIR/utils`` for details. You'll find pgplot.tar.bz2 in
+``$MESA_DIR/scripts`` in case you need to install PGPLOT (thanks to Tim
 Pearson of CalTech for creating PGPLOT and giving us permission to
 distribute it with MESA).
 
@@ -35,9 +35,9 @@ history_columns.list. If it is in your history_columns.list, you can
 show it in a history plot. The name for a history item must be the same
 as one of the column headings in your current LOGS/history.data - these
 are the same as the entries in the history_columns.list but with any
-spaces replaced by "\_". For example, "center h1" in
-history_columns.list changes to "center_h1" as a column heading in
-LOGS/history.data, so you should use "center_h1" as the name in the
+spaces replaced by ``_``. For example, ``center h1`` in
+history_columns.list changes to ``center_h1`` as a column heading in
+LOGS/history.data, so you should use ``center_h1`` as the name in the
 plot.
 
 Single Panel, Multiple Panel, and Grid Plots
@@ -52,31 +52,31 @@ General Controls
 ~~~~~~~~~~~~~~~~
 
 You can change the width, aspect ratio, margins, text scale, title, and
-axis limits of any plot by editing your pgstar_controls inlist file. The
+axis limits of any plot by editing your ``pgstar_controls`` inlist file. The
 file is reread at each timestep, so you can make changes while the
 evolution is running. For user-specified plots, you can also change any
 of the specs on-the-fly including what is plotted for the axes and the
-number of panels or grid layout. You can change the "win_flag" from
-.false. to .true. on-the-fly to create a new window. Changing the
-win_flag from .true. to .false. removes the window, but because of
+number of panels or grid layout. You can change the ``win_flag`` from
+``.false.`` to ``.true.`` on-the-fly to create a new window. Changing the
+win_flag from ``.true.`` to ``.false.`` removes the window, but because of
 quirks of pgplot and/or Xwindows, it will pause and ask you to hit a
 return.
 
-You can have the code pause at each step by setting pause = .true. It
-will pause every nth step if you set pause_interval = n.
+You can have the code pause at each step by setting ``pause = .true.`` It
+will pause every nth step if you set ``pause_interval = n``.
 
-You can slow it down by setting pgstar_sleep to the minimum number of
+You can slow it down by setting ``pgstar_sleep`` to the minimum number of
 seconds to allow between plot updates.
 
-It will update the windows every nth step if you set pgstar_interval = n.
+It will update the windows every nth step if you set ``pgstar_interval = n``.
 
-To save the plot as a png file, set the "file_flag" for the window to
-.true. You can specify a directory and prefix for the files, as well as
+To save the plot as a png file, set the ``file_flag`` for the window to
+``.true.`` You can specify a directory and prefix for the files, as well as
 the frequency of writing (every nth step) and the size of the plot for
 the file. You can even get files written when the star moves a given
 distance on the HR diagram!
 
-To switch from black background to white change the white_on_black_flag.
+To switch from black background to white change the ``white_on_black_flag``.
 There are separate flags for windows and files.
 
 The Inventory of Plots
@@ -85,25 +85,25 @@ The Inventory of Plots
 single panel profile plots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  TRho_Profile - current model in T-Rho plane
--  Summary_Profile - various profile properties
--  Summary_Burn - current model T, rho, eps burning, and eps neutrinos
--  Abundance - current model abundance profiles
--  Power - current model nuclear power profiles
--  Mixing - current model mixing diffusion coefficients
--  Dynamo - current model dynamo magnetic field info
--  Mode_Prop - asteroseimology mode propagation diagram
+-  ``TRho_Profile`` - current model in T-Rho plane
+-  ``Summary_Profile`` - various profile properties
+-  ``Summary_Burn`` - current model T, rho, eps burning, and eps neutrinos
+-  ``Abundance`` - current model abundance profiles
+-  ``Power`` - current model nuclear power profiles
+-  ``Mixing`` - current model mixing diffusion coefficients
+-  ``Dynamo`` - current model dynamo magnetic field info
+-  ``Mode_Prop`` - asteroseimology mode propagation diagram
 
 single panel history plots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Kipp - "Kippenhann" history of mixing, burning, and more
--  Summary_History - various history properties
--  TRho - history of central temperature vs. density
--  HR - history of log_L vs. log_Teff
--  logg_Teff - history of logg vs. Teff
--  logg_logT - history of logg vs. log_Teff
--  dPg_dnu - delta_Pg vs. delta_nu (for asteroseismology)
+-  ``Kipp`` - "Kippenhann" history of mixing, burning, and more
+-  ``Summary_History`` - various history properties
+-  ``TRho`` - history of central temperature vs. density
+-  ``HR`` - history of log_L vs. log_Teff
+-  ``logg_Teff`` - history of logg vs. Teff
+-  ``logg_logT`` - history of logg vs. log_Teff
+-  ``dPg_dnu`` - delta_Pg vs. delta_nu (for asteroseismology)
 
 Keep in mind that if it isn't in your current history list, then it
 won't be available for plotting in PGSTAR history plots. For example, if
@@ -115,72 +115,72 @@ to your history_columns.list - e.g., add these:
    mixing_regions 40
    burning_regions 80
 
-profile panel plots: Profile_Panels1 to Profile_Panels9
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+profile panel plots: ``Profile_Panels1`` to ``Profile_Panels9``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You select axes from anything allowed in a profile_columns.list. In
 addition, a panel can be any of these pre-defined plots: Abundance,
 Power, Mixing, Dynamo, Mode_prop, or Summary_Profile.
 
--  Profile_Panels1 - default has X = mass, panels = (logT,entropy) and
+-  ``Profile_Panels1`` - default has X = mass, panels = (logT,entropy) and
    (logRho,logP).
--  Profile_Panels2 - default has X = logP, panels = Abundance and Power.
--  Profile_Panels3 - default has X = logP, panels = Abundance, Power,
+-  ``Profile_Panels2`` - default has X = logP, panels = Abundance and Power.
+-  ``Profile_Panels3`` - default has X = logP, panels = Abundance, Power,
    and Mixing.
--  Profile_Panels4 - default has X = logP, panels = Abundance, Power,
+-  ``Profile_Panels4`` - default has X = logP, panels = Abundance, Power,
    Mixing, and Dynamo.
--  Profile_Panels5 - default has X = logP, panels = Summary_Profile,
+-  ``Profile_Panels5`` - default has X = logP, panels = Summary_Profile,
    Mode_prop, and Mixing.
 
-history track plots: History_Track1 to History_Track9
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+history track plots: ``History_Track1`` to ``History_Track9``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Like TRho, HR, and other history plots, but you select the axes from
 items in your current history_columns.list.
 
--  History_Track1 - default shows log_L vs. log_center_T
+-  ``History_Track1`` - default shows log_L vs. log_center_T
 
-history panel plots: History_Panels1 to History_Panels9
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+history panel plots: ``History_Panels1`` to ``History_Panels9``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You select Y axes from the column heading in current LOGS/history.data.
 
--  History_Panels1 - default shows logT, logRho, log_L, log_Teff, mass,
+-  ``History_Panels1`` - default shows logT, logRho, log_L, log_Teff, mass,
    mdot
 
-text summary plots: Text_Summary1 to Text_Summary9
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+text summary plots: ``Text_Summary1`` to ``Text_Summary9``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Text_Summary1 - default gives info similar to standard terminal
+-  ``Text_Summary1`` - default gives info similar to standard terminal
    output
 
-grids: Grid1 to Grid9
-~~~~~~~~~~~~~~~~~~~~~
+grids: ``Grid1`` to ``Grid9``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Grid1 - default TRho_Profile, HR, TRho, Text_Summary1
--  Grid2 - default TRho_Profile, Kipp
--  Grid3 - default TRho_Profile, Summary_Profile, Kipp
--  Grid4 - default TRho_Profile, Summary_Profile, HR, TRho, Kipp,
+-  ``Grid1`` - default TRho_Profile, HR, TRho, Text_Summary1
+-  ``Grid2`` - default TRho_Profile, Kipp
+-  ``Grid3`` - default TRho_Profile, Summary_Profile, Kipp
+-  ``Grid4`` - default TRho_Profile, Summary_Profile, HR, TRho, Kipp,
    Text_Summary1
--  Grid5 - default TRho_Profile, Summary_Profile, HR, TRho, Kipp
--  Grid6 - default Summary_Burn, Abundance, HR, TRho, Text_Summary1
--  Grid7 - default Abundance, TRho, Text_Summary1
--  Grid8 - default Summary_Burn, Abundance, HR, TRho, TRho_Profile,
+-  ``Grid5`` - default TRho_Profile, Summary_Profile, HR, TRho, Kipp
+-  ``Grid6`` - default Summary_Burn, Abundance, HR, TRho, Text_Summary1
+-  ``Grid7`` - default Abundance, TRho, Text_Summary1
+-  ``Grid8`` - default Summary_Burn, Abundance, HR, TRho, TRho_Profile,
    Text_Summary1
--  Grid9 - default Abundance, HR, TRho, TRho_Profile, Text_Summary1
+-  ``Grid9`` - default Abundance, HR, TRho, TRho_Profile, Text_Summary1
 
 Hands-on Tutorial
 -----------------
 
-Do this tutorial while $MESA_DIR/star is running and pgstar_flag is set
-.true. so you can watch as the plots change as you edit and save your
+Do this tutorial while ``$MESA_DIR/star`` is running and ``pgstar_flag`` is set
+``.true.`` so you can watch as the plots change as you edit and save your
 inlist.
 
 I suggest using the test case 1M_pre_ms_to_wd. Go to the directory,
 $MESA_DIR/star/test_suite/1M_pre_ms_to_wd, and open "inlist_1.0" in your
-text editor. In the &star_job section, set pgstar_flag = .true. and
-check the &pgstar section to make sure it starts empty. Then do the
-usual ./mk and ./rn to start the test case.
+text editor. In the ``&star_job`` section, set ``pgstar_flag = .true.`` and
+check the ``&pgstar`` section to make sure it starts empty. Then do the
+usual ``./mk`` and ``./rn`` to start the test case.
 
 First, open some plot windows and take a look at what's available. Just
 edit your pgstar inlist to set the "win_flag" for the plot; the changes
@@ -229,7 +229,7 @@ previous ones.
   Grid2_win_flag = .true.
 
 
-When you're finished admiring these beauties, delete the "win_flag"
+When you're finished admiring these beauties, delete the "``win_flag``"
 lines from your inlist, and we'll take a look at how you can modify
 plots.
 
@@ -274,7 +274,7 @@ of the PGPLOT symbol for "omega".
   Summary_Profile_legend(4) = 'log (0650) rel'
 
 Open the Summary_Profile window, then make some changes. Note that you
-can remove a line just by setting the name to ''; you don't have to
+can remove a line just by setting the name to ``''``; you don't have to
 renumber the other lines.
 
 .. code-block:: fortran
@@ -302,7 +302,7 @@ of PGPLOT text controls for the subscript "c" for center values.
   Summary_History_legend(2) = 'log Rho\dc\u rel'
 
 Open the Summary_History window, then make some changes.  Note that
-you can remove a line just by setting the name to ''; you don't have
+you can remove a line just by setting the name to ``''``; you don't have
 to renumber the other lines.
 
 .. code-block:: fortran
@@ -327,7 +327,7 @@ the column headings in your current LOGS/history.data.
   History_Track1_xaxis_label = 'log P\dcenter'
   History_Track1_title = 'L vs Center P'
 
-Turn on Profile\_Panels1 and History\_Panels1; they are set up with
+Turn on ``Profile_Panels1`` and ``History_Panels1``; they are set up with
 defaults for the number of panels and axes.  Change the defaults to
 show other things -- for the profiles you can select anything that can
 be in a profile_columns.list; for the history you have to select one

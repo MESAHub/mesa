@@ -819,7 +819,7 @@ Set the environment variable
 
     MESA_FPE_CHECKS_ON=1
 
-Then run ./clean and ./install in MESA_DIR.
+Then run ``./clean`` and ``./install`` in MESA_DIR.
 
 This setting adds the following options in ``utils/makefile_header``
 
@@ -851,7 +851,7 @@ Alter star/test_suite/1.3M_ms_high_Z/src/run_star_extras.f90 and in extras_finis
 Step 0: Notice your code has a problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Run ./mk and ./rn to run the test case and you'll get the following output:
+Run ``./mk`` and ``./rn`` to run the test case and you'll get the following output:
 
 .. code-block:: console
 

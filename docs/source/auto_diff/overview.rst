@@ -1,5 +1,5 @@
-Overview of auto_diff module
-============================
+Overview of ``auto_diff`` module
+================================
 
 .. toctree::
    :maxdepth: 1
