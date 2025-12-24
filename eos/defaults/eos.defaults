@@ -1,5 +1,5 @@
-! eos module controls
-! ===================
+! ``eos`` module controls
+! =======================
 
    ! The MESA/eos parameters are given default values here.
    ! The actual values as modified by your inlist are stored in the EoS_General_Info data structure.
@@ -9,26 +9,26 @@
 ! PC EOS controls
 ! ---------------
 
-   ! use_PC
-   ! ~~~~~~
+   ! ``use_PC``
+   ! ~~~~~~~~~~
    ! Select whether to use the PC eos.
    ! ::
 
       use_PC = .false.
 
 
-   ! mass_fraction_limit_for_PC
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``mass_fraction_limit_for_PC``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Only consider isotopes in the EOS if their mass fraction is above this value.
    ! ::
 
       mass_fraction_limit_for_PC = 1d-4
 
 
-   ! logRho1_PC_limit
-   ! ~~~~~~~~~~~~~~~~
-   ! logRho2_PC_limit
-   ! ~~~~~~~~~~~~~~~~
+   ! ``logRho1_PC_limit``
+   ! ~~~~~~~~~~~~~~~~~~~~
+   ! ``logRho2_PC_limit``
+   ! ~~~~~~~~~~~~~~~~~~~~
    ! Blend in logRho from no PC for below ``logRho1_PC_limit``
    ! to all PC above ``logRho2_PC_limit``.
    ! ::
@@ -37,10 +37,10 @@
       logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
 
 
-   ! logT1_PC_limit
-   ! ~~~~~~~~~~~~~~
-   ! logT2_PC_limit
-   ! ~~~~~~~~~~~~~~
+   ! ``logT1_PC_limit``
+   ! ~~~~~~~~~~~~~~~~~~
+   ! ``logT2_PC_limit``
+   ! ~~~~~~~~~~~~~~~~~~
    ! Blend in logT from all PC for below ``logT1_PC_limit``
    ! to no PC above ``logT2_PC_limit``.
    ! Unused by default.  See subsequent controls.
@@ -50,12 +50,12 @@
       logT2_PC_limit = 7.7d0 ! don't use PC for logT > this (like logT_all_HELM)
 
 
-   ! PC_use_Gamma_limit_instead_of_T
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! log_Gamma_e_all_HELM
-   ! ~~~~~~~~~~~~~~~~~~~~
-   ! log_Gamma_e_all_PC
-   ! ~~~~~~~~~~~~~~~~~~
+   ! ``PC_use_Gamma_limit_instead_of_T``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``log_Gamma_e_all_HELM``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``log_Gamma_e_all_PC``
+   ! ~~~~~~~~~~~~~~~~~~~~~~
    ! If ``PC_use_Gamma_limit_instead_of_T`` is true, then these
    ! controls are active instead of ``logT1_PC_limit`` and
    ! ``logT2_PC_limit``.  Here, :math:`\Gamma_e` is the electron
@@ -68,10 +68,10 @@
       log_Gamma_e_all_HELM = -1.8d0
       log_Gamma_e_all_PC = -1.7d0
 
-   ! PC_Gamma_start_crystal
-   ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! PC_Gamma_full_crystal
-   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! ``PC_Gamma_start_crystal``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``PC_Gamma_full_crystal``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! PC crystallization boundaries.
    ! Here, :math:`\Gamma` is the mean ion Coulomb coupling parameter.
@@ -84,8 +84,8 @@
 ! FreeEOS controls
 ! ----------------
 
-   ! use_FreeEOS
-   ! ~~~~~~~~~~~
+   ! ``use_FreeEOS``
+   ! ~~~~~~~~~~~~~~~
    ! Select whether to use FreeEOS.
    ! ::
 
@@ -127,8 +127,8 @@
 ! OPAL/SCVH controls
 ! ------------------
 
-   ! use_OPAL_SCVH
-   ! ~~~~~~~~~~~~~
+   ! ``use_OPAL_SCVH``
+   ! ~~~~~~~~~~~~~~~~~
    ! Select whether to use the OPAL/SCVH EOS. These two EOSes are pre-blended with each other.
    ! ::
 
@@ -167,24 +167,24 @@
 ! Skye controls
 ! -------------
 
-   ! use_Skye
-   ! ~~~~~~~~
+   ! ``use_Skye``
+   ! ~~~~~~~~~~~~
    ! Select whether to use the Skye EOS.
    ! ::
 
       use_Skye = .true.
 
 
-   ! mass_fraction_limit_for_Skye
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``mass_fraction_limit_for_Skye``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Only consider isotopes in the EOS if their mass fraction is above this value.
    ! ::
 
       mass_fraction_limit_for_Skye = 1d-4
 
 
-   ! Skye_use_ion_offsets
-   ! ~~~~~~~~~~~~~~~~~~~~
+   ! ``Skye_use_ion_offsets``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
    ! If true, set neutral ground state as zero point for each ion species energy.
    ! If false, zero point assumes fully ionized.
    ! ::
@@ -231,24 +231,24 @@
 ! CMS controls
 ! ------------
 
-   ! use_CMS
-   ! ~~~~~~~
+   ! ``use_CMS``
+   ! ~~~~~~~~~~~
    ! Select whether to use the CMS EOS. (EXPERIMENTAL)
    ! ::
 
       use_CMS = .false.
 
 
-   ! CMS_use_fixed_composition
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``CMS_use_fixed_composition``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Use a single table for a fixed composition. Don't interpolate in H mass fraction.
    ! ::
 
       CMS_use_fixed_composition = .false.
 
 
-   ! CMS_fixed_composition_index
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``CMS_fixed_composition_index``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Integer with valid values from 0 to 10 inclusive corresponding to the table
    ! to use in the fixed composition case. A value of 0 corresponds to the pure Helium
    ! table while a value of 10 corresponds to the pure Hydrogen table.
@@ -304,8 +304,8 @@
 ! Other EOS controls
 ! ------------------
 
-   ! use_other_eos_component
-   ! ~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``use_other_eos_component``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Select whether to use the other (i.e., user-provided) EOS component.
    ! If true, the user must provide the routines
    ! ``other_eos_component`` and ``other_eos_frac``.
@@ -315,8 +315,8 @@
       use_other_eos_component = .false.
 
 
-   ! use_other_eos_results
-   ! ~~~~~~~~~~~~~~~~~~~~~
+   ! ``use_other_eos_results``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Select whether to call the other_eos_results hook.  This provides
    ! an opportunity for the user to modify the results from the EOS right
    ! before they are returned. If true, the user must provide the routine
@@ -361,12 +361,12 @@
    ! One can split an eos inlist into pieces using the following parameters.
    ! It works recursively, so the extras can read extras too.
 
-   ! read_extra_eos_inlist(1..5)
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_eos_inlist_name(1..5)
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``read_extra_eos_inlist(1..5)``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``extra_eos_inlist_name(1..5)``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   ! If ``read_extra_eos_inlist(i)`` is true, then read &eos from the file ``extra_eos_inlist_name(i)``.
+   ! If ``read_extra_eos_inlist(i)`` is true, then read ``&eos`` from the file ``extra_eos_inlist_name(i)``.
    ! ::
 
       read_extra_eos_inlist(:) = .false.

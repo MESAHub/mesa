@@ -116,7 +116,7 @@ Edit sample_kap.f90 and change the variable
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
+to your ``$MESA_DIR``, or use a blank string, in which case your ``$MESA_DIR`` is automagically used
 
 .. code-block:: console
 
@@ -172,7 +172,7 @@ Edit sample_net.f90 and change the variable
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
+to your ``$MESA_DIR``, or use a blank string, in which case your ``$MESA_DIR`` is automagically used
 
 .. code-block:: console
 

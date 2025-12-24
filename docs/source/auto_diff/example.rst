@@ -1,7 +1,7 @@
 .. _autodiff example:
 
-Example of auto_diff in run_star_extras
-=======================================
+Example of ``auto_diff`` in ``run_star_extras``
+===============================================
 
 .. toctree::
    :maxdepth: 1

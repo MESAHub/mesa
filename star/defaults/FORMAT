@@ -136,8 +136,8 @@
 
       ! Boolean options are great.  They can take one of two values:
 
-      ! + .true.
-      ! + .false.
+      ! + ``.true.``
+      ! + ``.false.``
 
       ! ::
 
