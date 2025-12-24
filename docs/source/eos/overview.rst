@@ -1,6 +1,6 @@
-======================
-Overview of eos module
-======================
+==========================
+Overview of ``eos`` module
+==========================
 
 The equation of state (EOS) is delivered by the ``eos`` module.  The
 MESA EOS combines different input sources in order to cover the wide
