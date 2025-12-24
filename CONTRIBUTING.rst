@@ -41,7 +41,7 @@ New contributions must be proposed through GitHub's *pull request*
 (PR) system.  The process is roughly:
 
 1. fork the ``mesa`` repo (click *Fork* in the top-right of the GitHub interface),
-2. clone your fork to your computer,
+2. clone your fork to your computer (since the mesa repository contains large files, you'll need to have `git-lfs <https://git-lfs.com/>`_ installed),
 3. create a new branch for your additions (e.g. ``git switch -c my-new-hook``),
 4. make, commit and push your changes and
 5. open a PR against the ``main`` branch.
