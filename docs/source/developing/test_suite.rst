@@ -300,22 +300,22 @@ to the ``testhub.yml`` file.
 
 This output is generated each time MESA terminates (except after a restart).  Therefore, the per-inlist quantities that can be reported by TestHub are those accessible within a single part of a MESA run.  By default, we report
 
-   + ``runtime_minutes``
-   + ``steps``
-   + ``retries``
-   + ``redos``
-   + ``solver_calls_made``
-   + ``solver_calls_failed``
-   + ``solver_iterations``
++ ``runtime_minutes``
++ ``steps``
++ ``retries``
++ ``redos``
++ ``solver_calls_made``
++ ``solver_calls_failed``
++ ``solver_iterations``
 
 In a multi-part test case, the per-part values can be summed to give the properties of the complete run.
 
 TestHub also reports quantities that can reflect information preserved by MESA across parts.  These are transmitted via their inclusion in the model file.  That means the values reported by cases that use saved models to skip optional parts will be influenced by the performance at the time the saved model was generated.  Additionally, some parts may include inlist options that reset or modify these quantities.  TestHub reports the values at the end of each part, but the precise meaning of these quantities cannot be understood without reference to the details of the test case.
 
-   + ``model_number``
-   + ``star_age``
-   + ``num_retries``
-   + ``log_rel_run_E_err``
++ ``model_number``
++ ``star_age``
++ ``num_retries``
++ ``log_rel_run_E_err``
 
 .. note ::
 
