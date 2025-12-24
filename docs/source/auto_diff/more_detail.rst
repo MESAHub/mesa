@@ -309,7 +309,7 @@ Config Files
 In ``MESA/auto_diff/config`` there are a bunch of files, one per
 ``auto_diff`` type. These are yaml files, and look like:
 
-::
+.. code:: yaml
 
    name: auto_diff_real_2var_order1
    orders: [[1,0],[0,1]]
@@ -324,7 +324,7 @@ This says:
 
 Another example:
 
-::
+.. code:: yaml
 
    name: auto_diff_real_2var_order3
    orders: [[3,0],[2,1],[1,2],[0,3]]
@@ -340,7 +340,7 @@ which says
 
 Finally, the star example:
 
-::
+.. code:: yaml
 
    name: auto_diff_real_star_order1
    orders: [[1]]
