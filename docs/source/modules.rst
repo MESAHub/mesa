@@ -47,8 +47,6 @@ subsidiary controls.
 .. toctree::
 
    atm/overview
-   atm/mapping
-   atm/structure
 
 .. _auto_diff:
 
@@ -61,8 +59,6 @@ automatic calculation of analytic derivatives using the chain rule.
 .. toctree::
 
    auto_diff/overview
-   auto_diff/example
-   auto_diff/more_detail
 
 
 .. _chem:
@@ -86,7 +82,6 @@ The ``colors`` module calculates synthetic photometry during stellar evolution.
    :maxdepth: 1
 
    colors/overview
-   colors/defaults
 
 
 .. _const:
@@ -110,9 +105,6 @@ The ``eos`` module provides the equation of state.
    :maxdepth: 1
 
    eos/overview
-   eos/defaults
-   eos/interface
-
 
 .. _kap:
 
@@ -126,8 +118,6 @@ conductive opacities.
    :maxdepth: 1
 
    kap/overview
-   kap/defaults
-   kap/interface
 
 .. _net:
 
@@ -140,7 +130,6 @@ The ``net`` module implements nuclear reaction networks.
    :maxdepth: 1
 
    net/overview
-   net/nets
 
 .. _neu:
 
