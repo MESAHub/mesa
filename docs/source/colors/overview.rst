@@ -1,6 +1,13 @@
 Overview of colors module
 =========================
 
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   defaults
+
 The ``colors`` module calculates synthetic photometry during stellar evolution.
 The module computes bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
 

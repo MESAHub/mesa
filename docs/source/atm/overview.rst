@@ -13,6 +13,8 @@ Overview of Atmosphere Choices
    fixed-tsurf
    fixed-psurf
    fixed-psurf-tsurf
+   mapping
+   structure
 
 The ``atm_option`` control determines MESA's overall approach to
 evaluating :math:`T_{\rm surf}` and :math:`P_{\rm surf}`, as follows:

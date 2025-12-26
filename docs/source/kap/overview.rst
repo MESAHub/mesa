@@ -1,6 +1,13 @@
 Overview of kap module
 ======================
 
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   defaults
+   interface
+
 The opacity values returned by the ``kap`` module combine opacity
 data from many sources.  The most important opacity-related MESA
 options select which opacity sources to use and control the location
