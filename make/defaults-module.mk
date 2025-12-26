@@ -19,4 +19,5 @@ endif
 WITH_GYRE ?= yes
 WITH_ADIPLS ?= yes
 WITH_PGSTAR ?= yes
+WITH_COVERAGE ?= no
 PREFIX ?= $(MAKE_DIR)/..
