@@ -16,10 +16,10 @@ include $(MAKE_DIR)/setup-builddir.mk
 
 BUILD_DIR_MODULE := $(call clean-comp,$(shell echo $(dir $(firstword $(MAKEFILE_LIST))) | sed "s|/$$||")/$(BUILD_DIR))
 
-$(BUILD_DIR_MODULE)/:
+$(BUILD_DIR_MODULE)/.:
 	mkdir -p $@
 
-$(BUILD_DIR_MODULE)%/:
+$(BUILD_DIR_MODULE)%/.:
 	mkdir -p $@
 
 INTERNAL_DEPENDS_ON += $(SUBDIRS)
