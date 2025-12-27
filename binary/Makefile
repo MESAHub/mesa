@@ -60,7 +60,7 @@ SRCS += \
    private/pgbinary_full.f90
 EXTERNAL_DEPENDS_ON := pgplot
 else
-SRCS += private/pgstar_stub.f90
+SRCS += private/pgbinary_stub.f90
 EXTERNAL_DEPENDS_ON :=
 endif
 
