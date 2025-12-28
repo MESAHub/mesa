@@ -99,7 +99,7 @@ SRCS := adipack.c/adipls/adipls.c.d.f \
 SRCS_CHECK :=
 INTERNAL_DEPENDS_ON := const utils
 EXTERNAL_DEPENDS_ON :=
-BINTYPE = static-lib
+BINTYPE = lib
 INCLUDE_DIRS := -Iadipack.c/adipls
 MODULES := adipls_callbacks.mod
 # adipls has too much UB, plaster over it by disabling optimizations. If you

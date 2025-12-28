@@ -41,7 +41,7 @@ SRCS_CHECK := test/src/bari_beam.f90 \
               test/src/test_vdpol.f90
 INTERNAL_DEPENDS_ON := const utils math mtx auto_diff
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 

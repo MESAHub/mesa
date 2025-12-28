@@ -33,8 +33,8 @@ else
 SRCS += private/adipls_support_stub.f90
 endif
 
-SRCS_CHECK = test/src/test_astero.f90
-BINTYPE := static-lib
+SRCS_CHECK = test/src/test_astero.f90 test/src/run_star_extras.f90
+BINTYPE := lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
 
 # Testing

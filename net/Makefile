@@ -22,7 +22,7 @@ SRCS_CHECK := test/src/test_net.f90 \
               test/src/test_net_do_one.f90
 INTERNAL_DEPENDS_ON := const utils math mtx num chem rates interp_1d eos
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 
