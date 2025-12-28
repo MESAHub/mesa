@@ -11,9 +11,8 @@ INTERNAL_DEPENDS_ON := forum const
 EXTERNAL_DEPENDS_ON := hdf5_fortran lapack95 lapack
 CHECK_RESULTS_GOLDEN := test/test_output
 CHECK_DIFF_PROG := ndiff -quiet -relerr 1.0e-6
-BINTYPE := manual
+BINTYPE := lib
 LIB_NAMES = gyre_mesa gyre
-INSTALL_COMMANDS := install-lib
 
 ifeq ($(WITH_CRLIBM),yes)
   EXTERNAL_DEPENDS_ON += crmath
@@ -38,8 +37,6 @@ include $(MAKE_DIR)/Makefile
 
 ifeq ($(WITH_GYRE),yes)
 
-include $(MAKE_DIR)/pkg-config.mk
-
 ifeq ($(PROFILE),debug)
   GYRE_DEBUG = yes
 else
@@ -52,21 +49,13 @@ else
   FPP= PYTHONPATH=$(MESASDK_ROOT)/lib/python ./fypp_deps $(FLAGS_DEPS)
 endif
 
-ifeq ($(DYNAMIC),yes)
-  EXT = so
-else
-  EXT = a
-endif
-
-OBJ_OUT := $(BUILD_DIR_MODULE)/lib/libgyre.$(EXT) $(BUILD_DIR_MODULE)/lib/libgyre_mesa.$(EXT)
-
 BUILD_DIR_GYRE_BUILD := $(BUILD_DIR_MODULE)/src
 
 $(BUILD_DIR_GYRE_BUILD): gyre-8.1.tar.gz | $(BUILD_DIR_GYRE_BUILD)/. $(BUILD_DIR_MODULE)/include/.
 	tar --strip-components=1 -xf $< -C $(BUILD_DIR_GYRE_BUILD)
 
 $(BUILD_DIR_GYRE_BUILD)/build-complete: $(BUILD_DIR_GYRE_BUILD)
-	$(MAKE) -C $(BUILD_DIR_GYRE_BUILD) SHARED=$(DYNAMIC) DEBUG=$(GYRE_DEBUG) OMP=$(WITH_OPENMP) CRMATH=$(WITH_CRLIBM) FPE=yes VERSION_CHECK=passed FPP="$(FPP)" LDFLAGS="$(LIB_DEP_ARGS)" FFLAGS="$(FLAGS_DEPS) -fPIC" FRONTENDS=no TOOLS=no FORUM=no IFACES=yes
+	$(MAKE) -C $(BUILD_DIR_GYRE_BUILD) SHARED=$(DYNAMIC) DEBUG=$(GYRE_DEBUG) OMP=$(WITH_OPENMP) CRMATH=$(WITH_CRLIBM) VERSION_CHECK=passed FPP="$(FPP)" LDFLAGS="$(LIB_DEP_ARGS)" FFLAGS="$(_FFLAGS) -std=f2018" FRONTENDS=no TOOLS=no FORUM=no IFACES=yes
 	touch $@
 
 
