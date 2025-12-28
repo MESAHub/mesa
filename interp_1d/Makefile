@@ -19,7 +19,7 @@ SRCS_CHECK = test/src/interp_1d_support.f90 \
 	     test/src/test_interp_1d.f90
 INTERNAL_DEPENDS_ON := const math utils auto_diff
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 
