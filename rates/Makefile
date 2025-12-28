@@ -34,7 +34,7 @@ INTERNAL_DEPENDS_ON := const utils math auto_diff interp_1d interp_2d chem eos f
 # Test dependency
 INTERNAL_DEPENDS_ON += num
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 

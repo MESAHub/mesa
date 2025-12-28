@@ -34,7 +34,7 @@ SRCS_CHECK = \
    test/src/test_kap_support.f90
 INTERNAL_DEPENDS_ON := const utils math auto_diff num chem interp_1d interp_2d forum eos
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
 
 # Testing

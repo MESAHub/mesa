@@ -64,9 +64,9 @@ SRCS += private/pgbinary_stub.f90
 EXTERNAL_DEPENDS_ON :=
 endif
 
-SRCS_CHECK = test/src/test_binary.f90
+SRCS_CHECK = test/src/test_binary.f90 test/src/run_star_extras.f90
 INTERNAL_DEPENDS_ON := const utils math net interp_1d interp_2d auto_diff chem rates num star_data star
-BINTYPE := static-lib
+BINTYPE := lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
 
 # Testing
