@@ -71,5 +71,5 @@ FCOMPILE_MODULE_FIXED:= gfortran $(FFLAGS_FIXED) -w -c -fsyntax-only
 CCOMPILE := gcc $(_CFLAGS) -c
 LIB_DEP_ARGS := $(call pkg-config, --libs,$(EXTERNAL_DEPENDS_ON)) $(call pkg-config, --libs --static,$(INTERNAL_DEPENDS_ON))
 LIB_TOOL_STATIC := ar rcs
-LIB_TOOL_DYNAMIC := gfortran -shared $(FLAGS_OPENMP) $(FLAGS_COVERAGE)
+LIB_TOOL_DYNAMIC := gfortran -shared $(FLAGS_OPENMP) $(FLAGS_COVERAGE) -o
 EXECUTABLE := gfortran $(FLAGS_OPENMP) $(FLAGS_COVERAGE)

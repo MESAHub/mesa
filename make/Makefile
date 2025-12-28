@@ -36,11 +36,7 @@ ifeq ($(NOCOMPILE),)
   include $(MAKE_DIR)/install-commands.mk
 
   ifeq ($(BINTYPE), lib)
-    ifeq ($(DYNAMIC),yes)
-      include $(MAKE_DIR)/link-dynamic.mk
-    else
-      include $(MAKE_DIR)/link-static.mk
-    endif
+    include $(MAKE_DIR)/link-library.mk
   else ifeq ($(BINTYPE), executable)
     include $(MAKE_DIR)/link-exec.mk
   else ifeq ($(BINTYPE), manual)
