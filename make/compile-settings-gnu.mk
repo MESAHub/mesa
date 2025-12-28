@@ -37,8 +37,8 @@ endif
 
 # no-sign-zero only affects output formatting
 FFLAGS_COMPAT := -fno-sign-zero
-FFLAGS_FREE :=  -ffree-form -x f95-cpp-input -fimplicit-none
-FFLAGS_FIXED := -ffixed-form -x f77-cpp-input
+FFLAGS_FREE := -ffree-form -fimplicit-none
+FFLAGS_FIXED := -ffixed-form
 FLAGS_DEPS := $(call pkg-config,--cflags,$(EXTERNAL_DEPENDS_ON) $(INTERNAL_DEPENDS_ON)) $(INCLUDE_DIRS)
 
 ifeq ($(WITH_COVERAGE),yes)

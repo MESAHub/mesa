@@ -7,8 +7,7 @@ SRCS :=
 SRCS_CHECK :=
 INTERNAL_DEPENDS_ON :=
 EXTERNAL_DEPENDS_ON := hdf5_fortran
-BINTYPE := manual
-LIB_NAMES = forum
+BINTYPE := lib
 INCLUDE_DIRS :=
 
 # Testing
@@ -21,7 +20,6 @@ MODULES := forum_m.mod
 INSTALL_INCLUDES :=
 
 include $(MAKE_DIR)/Makefile
-include $(MAKE_DIR)/pkg-config.mk
 
 ifeq ($(PROFILE),debug)
   FORUM_DEBUG = yes
@@ -35,14 +33,6 @@ else
   FPP= PYTHONPATH=$(MESASDK_ROOT)/lib/python ./fypp_deps
 endif
 
-ifeq ($(DYNAMIC),yes)
-  EXT = so
-else
-  EXT = a
-endif
-
-OBJ_OUT := $(BUILD_DIR_MODULE)/lib/libforum.$(EXT)
-
 BUILD_DIR_FORUM_BUILD := $(BUILD_DIR_MODULE)/src
 INSTALL_INCLUDES_BUILD += $(BUILD_DIR_MODULE)/include/forum.inc
 
@@ -51,7 +41,7 @@ $(BUILD_DIR_FORUM_BUILD): forum-1.0.4.tar.gz | $(BUILD_DIR_FORUM_BUILD)/. $(BUIL
 	cp $(BUILD_DIR_FORUM_BUILD)/src/include/forum.inc $(BUILD_DIR_MODULE)/include/forum.inc
 
 $(BUILD_DIR_FORUM_BUILD)/build-complete: $(BUILD_DIR_FORUM_BUILD)
-	$(MAKE) -C $(BUILD_DIR_FORUM_BUILD) SHARED=$(DYNAMIC) DEBUG=$(FORUM_DEBUG) OMP=$(WITH_OPENMP) FPE=yes VERSION_CHECK=passed FPP="$(FPP)" LDFLAGS="$(LIB_DEP_ARGS)" FFLAGS="$(FLAGS_DEPS) -fPIC"
+	$(MAKE) -C $(BUILD_DIR_FORUM_BUILD) SHARED=$(DYNAMIC) DEBUG=$(FORUM_DEBUG) OMP=$(WITH_OPENMP) FPE=no VERSION_CHECK=passed FPP="$(FPP)" LDFLAGS="$(LIB_DEP_ARGS)" FFLAGS="$(_FFLAGS) -std=f2018"
 	touch $@
 
 $(OBJ_OUT): $(BUILD_DIR_FORUM_BUILD)/build-complete | $(BUILD_DIR_MODULE)/lib/.
