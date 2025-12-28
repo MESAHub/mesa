@@ -31,7 +31,7 @@ c
       sum=0.d0
       do 12 i=n1,n2
    12 sum=sum+a(i)
-      amean=sum/dfloat(n2-n1+1)
+      amean=sum/dble(n2-n1+1)
       ii=n1-1
       jj=n2+1
       go to 16
