@@ -81,7 +81,6 @@ SRCS := adipack.c/adipls/adipls.c.d.f \
         adipack.c/gensr/notwni.f \
         adipack.c/gensr/nrk.d.f \
         adipack.c/gensr/ofiles.c.f \
-        adipack.c/gensr/ofiles.f \
         adipack.c/gensr/rdilst.f \
         adipack.c/gensr/rnmean.d.f \
         adipack.c/gensr/skpcom.f \
@@ -93,20 +92,12 @@ SRCS := adipack.c/adipls/adipls.c.d.f \
         adipack.c/gensr/vinta.d.f \
         adipack.c/gensr/vintk.new.d.f \
         adipack.c/gensr/zero.d.f \
-        adipack.c/adiajobs/sr/inrnge.f \
-        adipack.c/adiajobs/sr/intmdl.d.f \
-        adipack.c/adiajobs/sr/rdamdl.n.d.f \
-        adipack.c/adiajobs/sr/rdfreq.d.f \
-        adipack.c/adiajobs/sr/rdfrqe.d.f \
-        adipack.c/adiajobs/sr/rdfrqm.d.f \
-        adipack.c/adiajobs/sr/rseta4.c.d.f \
-        adipack.c/adiajobs/sr/setssm.d.f \
         adipack.c/adiajobs/sr/srdist.c.d.f \
-        adipack.c/adiajobs/sr/wrfreq.d.f \
+        adipack.c/adiajobs/sr/rseta4.c.d.f \
         src/callbacks.f90
 
 SRCS_CHECK :=
-INTERNAL_DEPENDS_ON := const
+INTERNAL_DEPENDS_ON := const utils
 EXTERNAL_DEPENDS_ON :=
 BINTYPE = static-lib
 INCLUDE_DIRS := -Iadipack.c/adipls
