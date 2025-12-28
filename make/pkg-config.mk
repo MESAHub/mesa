@@ -10,7 +10,7 @@ Name: mesa-$(MODULE_NAME)
 Requires.private: $(INTERNAL_DEPENDS_ON)
 Description: MESA $(MODULE_NAME) module
 Cflags: -I$${prefix}/include
-Libs: -L$${prefix}/lib $(addprefix -l,$(LIB_NAMES))
+Libs: -L$${prefix}/lib $(addprefix -l,$(LIB_NAMES)) -Wl,-rpath,$${prefix}/lib
 Libs.private: $(call pkg-config, --libs,$(EXTERNAL_DEPENDS_ON))
 endef
 

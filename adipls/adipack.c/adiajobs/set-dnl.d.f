@@ -160,9 +160,9 @@ c
 	  if(isetdf.eq.1) then
 c
             if(iscale.eq.1) then
-              dfreq=3.d0*dfreq/dfloat(2*ls(n1)+3)
+              dfreq=3.d0*dfreq/dble(2*ls(n1)+3)
             else if(iscale.eq.2) then
-              dfreq=2.d0*dfreq/dfloat(ls(n1)+2)
+              dfreq=2.d0*dfreq/dble(ls(n1)+2)
             end if
 c
 c  test for setting error
@@ -172,7 +172,7 @@ c
               write(6,140) ls(n1),ns(n1), freqs(n1), dfreq
             else
               errdnl=sqrt(errfrs(n1)*errfrs(n1)+errfrs(n2)*errfrs(n2))
-              if(iscale.eq.1) errdnl=errdnl*3.d0/dfloat(2*ls(n1)+3)
+              if(iscale.eq.1) errdnl=errdnl*3.d0/dble(2*ls(n1)+3)
               write(10,140) ls(n1),ns(n1), freqs(n1), dfreq, errdnl
               write(6,140) ls(n1),ns(n1), freqs(n1), dfreq, errdnl
             end if

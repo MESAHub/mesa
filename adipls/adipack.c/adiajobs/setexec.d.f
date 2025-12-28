@@ -115,7 +115,7 @@ c
 c..      write(6,100)
 c
       interp=l2.gt.0
-      if(interp) nsel=max(0.5d0+dfloat(l2-l1-1)/dels,1.d0)
+      if(interp) nsel=max(0.5d0+dble(l2-l1-1)/dels,1.d0)
 c
 c..      write(6,exec)
 c

@@ -14,7 +14,7 @@ INTERNAL_DEPENDS_ON := const utils auto_diff num chem
 # Test dependency
 INTERNAL_DEPENDS_ON += math
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 
