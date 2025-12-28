@@ -106,7 +106,7 @@
    RSP_nz_outer = 60 ! number of zones in outer region of static model
    RSP_T_anchor = 11d3 ! approx temperature at base of outer region
    RSP_max_num_periods = 2000
-   RSP_min_deltaR_for_periods = 0.3
+   RSP_min_deltaR_for_periods = 0.2
 
 
 ! output controls
