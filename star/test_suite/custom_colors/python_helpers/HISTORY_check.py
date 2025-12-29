@@ -1,24 +1,18 @@
 #!/usr/bin/env python3
 import glob
 import os
-import matplotlib.pyplot as plt
-import mesa_reader as mr
-import numpy as np
-from matplotlib.animation import FuncAnimation
-
-# Import functions from static version for consistency
-from static_HISTORY_check import (
-    # get_mesa_phase_info,
-    read_header_columns,
-    setup_hr_diagram_params,
-    MesaView,
-)
-
 
 # ---------------------------
 # Insert after imports (HISTORY_check.py)
 # ---------------------------
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+import mesa_reader as mr
+import numpy as np
+from matplotlib.animation import FuncAnimation
+# Import functions from static version for consistency
+from static_HISTORY_check import (MesaView,  # get_mesa_phase_info,
+                                  read_header_columns, setup_hr_diagram_params)
 
 
 def age_colormap_colors(ages, cmap_name="inferno", recent_fraction=0.25, stretch=5.0):

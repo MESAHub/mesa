@@ -1,7 +1,19 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2025  Niall Miller & The MESA Team
-!   Modified to include AB and ST magnitude systems.
+!   Copyright (C) 2025  The MESA Team
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Lesser General Public License for more details.
+!
+!   You should have received a copy of the GNU Lesser General Public License
+!   along with this program. If not, see <https://www.gnu.org/licenses/>.
 !
 ! ***********************************************************************
 
@@ -86,9 +98,6 @@ contains
          close (10)
       end if
 
-      ! ------------------------------------------------------------------
-      ! Calculate Zero Point Flux based on System Selection
-      ! ------------------------------------------------------------------
       select case (trim(mag_system))
       case ('VEGA', 'Vega', 'vega')
          zero_point_flux = calculate_vega_flux(vega_filepath, filter_wavelengths, filter_trans, &
@@ -103,11 +112,9 @@ contains
          return
       end select
 
-      ! Calculate synthetic flux (Source Object)
       call calculate_synthetic_flux(wavelengths, convolved_flux, synthetic_flux, &
                                     filter_wavelengths, filter_trans)
 
-      ! Calculate magnitude using the selected zero point
       if (zero_point_flux > 0.0_dp) then
          calculate_synthetic = -2.5d0*log10(synthetic_flux/zero_point_flux)
       else
@@ -118,10 +125,6 @@ contains
       ! Clean up
       deallocate (convolved_flux)
    end function calculate_synthetic
-
-   !-----------------------------------------------------------------------
-   ! Internal functions for synthetic photometry
-   !-----------------------------------------------------------------------
 
    !****************************
    ! Convolve SED With Filter
@@ -152,6 +155,10 @@ contains
       integer :: i
       real(dp) :: integrated_flux, integrated_filter
 
+      real(dp), dimension(:), allocatable :: filter_on_sed_grid
+
+      allocate (filter_on_sed_grid(size(wavelengths)))
+
       ! Validate inputs
       do i = 1, size(wavelengths) - 1
          if (wavelengths(i) <= 0.0_dp .or. fluxes(i) < 0.0_dp) then
@@ -160,9 +167,10 @@ contains
          end if
       end do
 
+      call interpolate_array(filter_wavelengths, filter_trans, wavelengths, filter_on_sed_grid)
+
       call romberg_integration(wavelengths, fluxes*wavelengths, integrated_flux)
-      call romberg_integration(filter_wavelengths, &
-                               filter_trans*filter_wavelengths, integrated_filter)
+      call romberg_integration(wavelengths, filter_on_sed_grid*wavelengths, integrated_filter)
 
       if (integrated_filter > 0.0_dp) then
          synthetic_flux = integrated_flux/integrated_filter
@@ -172,10 +180,6 @@ contains
          return
       end if
    end subroutine calculate_synthetic_flux
-
-
-
-
 
    function calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
                                 filter_name, make_sed, colors_results_directory) result(vega_flux)
@@ -191,20 +195,16 @@ contains
       real(dp) :: wv, fl, cf, fwv, ftr
       character(len=1000) :: line
 
-      ! Load the Vega SED
       call load_vega_sed(vega_filepath, vega_wave, vega_flux_arr)
 
-      ! Convolve the Vega SED with the filter transmission
       allocate (conv_flux(size(vega_wave)))
       call convolve_sed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
-      
-      ! ← NEW: Interpolate filter transmission onto vega wavelength grid
-      allocate(filt_trans_on_vega_grid(size(vega_wave)))
+
+      allocate (filt_trans_on_vega_grid(size(vega_wave)))
       call interpolate_array(filt_wave, filt_trans, vega_wave, filt_trans_on_vega_grid)
 
-      ! Integrate - NOW BOTH USE vega_wave GRID
       call romberg_integration(vega_wave, vega_wave*conv_flux, int_flux)
-      call romberg_integration(vega_wave, vega_wave*filt_trans_on_vega_grid, int_filter)  ! ← FIXED
+      call romberg_integration(vega_wave, vega_wave*filt_trans_on_vega_grid, int_filter)
 
       if (int_filter > 0.0_dp) then
          vega_flux = int_flux/int_filter
@@ -257,35 +257,30 @@ contains
       real(dp), allocatable :: ab_sed_flux(:)
       integer :: i
 
-      allocate(ab_sed_flux(size(filt_wave)))
+      allocate (ab_sed_flux(size(filt_wave)))
 
       ! Construct AB Spectrum (f_lambda) on the filter wavelength grid
       ! Assumes wavelengths are in Angstroms and clight is in Angstroms/sec
       ! 3631 Jy = 3.631E-20 erg/s/cm^2/Hz
       do i = 1, size(filt_wave)
          if (filt_wave(i) > 0.0_dp) then
-            ab_sed_flux(i) = 3.631d-20 * ((clight * 1.0e8) / (filt_wave(i)**2))
+            ab_sed_flux(i) = 3.631d-20*((clight*1.0e8)/(filt_wave(i)**2))
          else
             ab_sed_flux(i) = 0.0_dp
-         endif
+         end if
       end do
 
-      ! Integrate using same method as source (f_lambda * T * lambda)
-      ! Note: We multiply by filt_wave inside the integration because the
-      ! romberg helper expects (flux * lambda)
-      call romberg_integration(filt_wave, ab_sed_flux * filt_trans * filt_wave, int_flux)
-      call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
+      call romberg_integration(filt_wave, ab_sed_flux*filt_trans*filt_wave, int_flux)
+      call romberg_integration(filt_wave, filt_wave*filt_trans, int_filter)
 
       if (int_filter > 0.0_dp) then
-         ab_flux = int_flux / int_filter
+         ab_flux = int_flux/int_filter
       else
          ab_flux = -1.0_dp
       end if
 
-      deallocate(ab_sed_flux)
+      deallocate (ab_sed_flux)
    end function calculate_ab_zero_point
-
-
 
    !****************************
    ! Calculate ST Zero Point Flux
@@ -297,23 +292,19 @@ contains
       real(dp) :: int_flux, int_filter
       real(dp), allocatable :: st_sed_flux(:)
 
-      ! For ST system, flux is constant in wavelength
-      ! However, to maintain exact consistency with how the source is integrated
-      ! (numerical integration over the filter grid), we integrate the constant array.
-
-      allocate(st_sed_flux(size(filt_wave)))
+      allocate (st_sed_flux(size(filt_wave)))
       st_sed_flux = 3.63d-9
 
-      call romberg_integration(filt_wave, st_sed_flux * filt_trans * filt_wave, int_flux)
-      call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
+      call romberg_integration(filt_wave, st_sed_flux*filt_trans*filt_wave, int_flux)
+      call romberg_integration(filt_wave, filt_wave*filt_trans, int_filter)
 
       if (int_filter > 0.0_dp) then
-         st_flux = int_flux / int_filter
+         st_flux = int_flux/int_filter
       else
          st_flux = -1.0_dp
       end if
 
-      deallocate(st_sed_flux)
+      deallocate (st_sed_flux)
    end function calculate_st_zero_point
 
 end module synthetic

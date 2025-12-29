@@ -69,7 +69,6 @@ contains
 
       real(dp), dimension(:), allocatable :: wavelengths, fluxes, filter_wavelengths, filter_trans
 
-
       !mag_system = "ST"
       ierr = 0
       call get_colors_ptr(colors_handle, colors_settings, ierr)

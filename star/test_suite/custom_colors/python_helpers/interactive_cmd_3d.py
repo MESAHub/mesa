@@ -2,11 +2,12 @@
 
 import glob
 import textwrap
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-import mesa_reader as mr
 
-from static_HISTORY_check import MesaView, read_header_columns, setup_hr_diagram_params
+import matplotlib.pyplot as plt
+import mesa_reader as mr
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+from static_HISTORY_check import (MesaView, read_header_columns,
+                                  setup_hr_diagram_params)
 
 
 def get_z_axis_selection(available_columns, default="Interp_rad"):

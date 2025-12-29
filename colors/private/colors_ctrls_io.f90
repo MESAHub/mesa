@@ -160,7 +160,6 @@ contains
       rq%use_colors = use_colors
       rq%mag_system = mag_system
 
-
    end subroutine store_controls
 
    subroutine write_namelist(handle, filename, ierr)

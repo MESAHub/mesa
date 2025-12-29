@@ -22,8 +22,8 @@ module bolometric
    use const_def, only: dp
    use colors_utils, only: romberg_integration, load_lookup_table
    use hermite_interp, only: construct_sed_hermite
-   use linear_interp,  only: construct_sed_linear
-   use knn_interp,     only: construct_sed_knn
+   use linear_interp, only: construct_sed_linear
+   use knn_interp, only: construct_sed_knn
 
    implicit none
 
@@ -49,8 +49,6 @@ contains
       character(len=256) :: lookup_file
       character(len=32) :: interpolation_method
 
-
-
       lookup_file = trim(sed_filepath)//'/lookup_table.csv'
 
       call load_lookup_table(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
@@ -59,20 +57,20 @@ contains
 
       ! Quantify how far (teff, log_g, metallicity) is from the grid points
       interpolation_radius = compute_interp_radius(teff, log_g, metallicity, &
-                                            lu_teff, lu_logg, lu_meta)
+                                                   lu_teff, lu_logg, lu_meta)
 
       select case (interpolation_method)
-      case ('Hermite','hermite','HERMITE')
+      case ('Hermite', 'hermite', 'HERMITE')
          call construct_sed_hermite(teff, log_g, metallicity, R, d, file_names, &
                                     lu_teff, lu_logg, lu_meta, sed_filepath, &
                                     wavelengths, fluxes)
 
-      case ('Linear','linear','LINEAR')
+      case ('Linear', 'linear', 'LINEAR')
          call construct_sed_linear(teff, log_g, metallicity, R, d, file_names, &
                                    lu_teff, lu_logg, lu_meta, sed_filepath, &
                                    wavelengths, fluxes)
 
-      case ('KNN','knn','Knn')
+      case ('KNN', 'knn', 'Knn')
          call construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
                                 lu_teff, lu_logg, lu_meta, sed_filepath, &
                                 wavelengths, fluxes)
@@ -87,7 +85,6 @@ contains
       ! Calculate bolometric flux and magnitude
       call calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
    end subroutine calculate_bolometric
-
 
    !****************************
    ! Calculate Bolometric Magnitude and Flux
@@ -139,13 +136,6 @@ contains
       end if
    end function flux_to_magnitude
 
-
-
-
-
-
-
-
    !--------------------------------------------------------------------
    ! Scalar metric: distance to nearest grid point in normalized space
    !
@@ -159,7 +149,7 @@ contains
    !--------------------------------------------------------------------
 
    real(dp) function compute_interp_radius(teff, log_g, metallicity, &
-                                          lu_teff, lu_logg, lu_meta)
+                                           lu_teff, lu_logg, lu_meta)
 
       real(dp), intent(in) :: teff, log_g, metallicity
       real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
@@ -177,17 +167,17 @@ contains
       ! ---------------------------------------------------------
       ! Detect dummy columns (entire axis is 0 or 999 or -999)
       ! ---------------------------------------------------------
-      use_teff = .not. ( all(lu_teff == 0.0d0)   .or. &
-                         all(lu_teff == 999.0d0) .or. &
-                         all(lu_teff == -999.0d0) )
+      use_teff = .not. (all(lu_teff == 0.0d0) .or. &
+                        all(lu_teff == 999.0d0) .or. &
+                        all(lu_teff == -999.0d0))
 
-      use_logg = .not. ( all(lu_logg == 0.0d0)   .or. &
-                         all(lu_logg == 999.0d0) .or. &
-                         all(lu_logg == -999.0d0) )
+      use_logg = .not. (all(lu_logg == 0.0d0) .or. &
+                        all(lu_logg == 999.0d0) .or. &
+                        all(lu_logg == -999.0d0))
 
-      use_meta = .not. ( all(lu_meta == 0.0d0)   .or. &
-                         all(lu_meta == 999.0d0) .or. &
-                         all(lu_meta == -999.0d0) )
+      use_meta = .not. (all(lu_meta == 0.0d0) .or. &
+                        all(lu_meta == 999.0d0) .or. &
+                        all(lu_meta == -999.0d0))
 
       ! ---------------------------------------------------------
       ! Compute min/max only for VALID axes
@@ -198,27 +188,27 @@ contains
          teff_max = maxval(lu_teff)
          teff_range = max(teff_max - teff_min, eps)
          norm_teff = (teff - teff_min)/teff_range
-      endif
+      end if
 
       if (use_logg) then
          logg_min = minval(lu_logg)
          logg_max = maxval(lu_logg)
          logg_range = max(logg_max - logg_min, eps)
          norm_logg = (log_g - logg_min)/logg_range
-      endif
+      end if
 
       if (use_meta) then
          meta_min = minval(lu_meta)
          meta_max = maxval(lu_meta)
          meta_range = max(meta_max - meta_min, eps)
          norm_meta = (metallicity - meta_min)/meta_range
-      endif
+      end if
 
       ! ---------------------------------------------------------
       ! Compute minimum distance with dimension-dropping
       ! ---------------------------------------------------------
       d_min = huge(1.0d0)
-      n    = size(lu_teff)
+      n = size(lu_teff)
 
       do i = 1, n
 
@@ -247,9 +237,5 @@ contains
       compute_interp_radius = d_min
 
    end function compute_interp_radius
-
-
-
-
 
 end module bolometric
