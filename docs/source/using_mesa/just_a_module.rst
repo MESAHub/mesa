@@ -112,13 +112,13 @@ As mentioned in sample_eos.f90, it can be useful to look at the integer indices 
 
 Edit sample_kap.f90 and change the variable
 
-.. code-block:: console
+.. code-block:: fortran
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
+to your ``$MESA_DIR``, or use a blank string, in which case your ``$MESA_DIR`` is automagically used
 
-.. code-block:: console
+.. code-block:: fortran
 
   my_mesa_dir = ''
 
@@ -168,13 +168,13 @@ Explore the output with, for example,
 
 Edit sample_net.f90 and change the variable
 
-.. code-block:: console
+.. code-block:: fortran
 
   my_mesa_dir = '../..'
 
-to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
+to your ``$MESA_DIR``, or use a blank string, in which case your ``$MESA_DIR`` is automagically used
 
-.. code-block:: console
+.. code-block:: fortran
 
   my_mesa_dir = ''
 

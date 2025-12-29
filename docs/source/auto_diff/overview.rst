@@ -1,8 +1,12 @@
-Overview of auto_diff module
-============================
+Overview of ``auto_diff`` module
+================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :hidden:
+
+   example
+   more_detail
 
 The ``auto_diff`` module provides Fortran derived types that support automatic
 differentiation via operator overloading. Users will not generally

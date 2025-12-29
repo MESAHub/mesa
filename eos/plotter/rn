@@ -1,1 +1,0 @@
-./plotter && ./regions.py && ./plotter.py

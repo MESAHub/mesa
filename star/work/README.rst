@@ -12,14 +12,7 @@ These directions assume you have already installed MESA.
 Copy this work directory to somewhere outside the mesa directory tree
 and name it anything you like.
 
-Compile by executing the ``mk`` script::
-
-    ./mk
-
-This compiles the files in ``src/``, links them against MESA, and
-produces the ``star`` executable file.
-
-By convention, run the program using the  ``rn`` script::
+Compile and run the star program using the  ``rn`` script::
 
     ./rn
 
@@ -43,6 +36,4 @@ where ``[photo]`` is one of the saved snapshot files in ``photos``.
 If no file is specified, MESA restarts from the most recent photo.
 
 You can remove the compiled files and the star program by executing
-the ``clean`` script::
-
-    ./clean
+``make clean``.

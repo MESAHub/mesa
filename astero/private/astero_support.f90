@@ -81,7 +81,7 @@
                ierr = -1
                write(*,'(A)')
                write(*,'(a)') 'gyre is not currently enabled in your configuration of mesa.'
-               write(*,'(a)') 'check that your utils/makefile_header has USE_GYRE = YES'
+               write(*,'(a)') 'check that your make/defaults-module.mk has WITH_GYRE = YES'
                write(*,'(A)')
                return
             end if
@@ -101,7 +101,7 @@
                ierr = -1
                write(*,'(A)')
                write(*,'(a)') 'adipls is not currently enabled in your configuration of mesa.'
-               write(*,'(a)') 'check that your utils/makefile_header has USE_ADIPLS = YES'
+               write(*,'(a)') 'check that your make/defaults-module.mk has WITH_ADIPLS = YES'
                write(*,'(A)')
                return
             end if

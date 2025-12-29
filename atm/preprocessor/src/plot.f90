@@ -37,7 +37,7 @@ contains
       real(dp) :: Teff_array(nT), logg_array(ng), Teff_bound(ng)
       real(dp) :: logZ(nZ), alphaFe(nZ), Pgas(ng, nT, nZ)
       real(dp) :: Teff_tmp(nT), logg_tmp(ng)
-      integer :: ierr, iounit, i, j, ii, jj, ibound_tmp(ng), nZ_tmp, nT_tmp, ng_tmp, &
+      integer :: ierr, iounit, i, j, ibound_tmp(ng), nZ_tmp, nT_tmp, ng_tmp, &
                  tmp_version(nZ), ibound(ng, nZ), iZ, text_file_version
 
       real(dp), parameter :: Pfill = 1d2 !used for interpolation in filling missing values

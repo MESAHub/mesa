@@ -21,8 +21,8 @@ community.
 First Steps
 -----------
 
-Activate run_star_extras.f90
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Activate ``run_star_extras.f90``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The first step in making use of these capabilities is to activate them.
 In the MESA work directory you made as part of the tutorial, navigate to
@@ -32,8 +32,8 @@ the src directory
 
    cd tutorial/src
 
-and open up run_star_extras.f90 in your text editor of choice. The stock
-version of run_star_extras.f90 is quite boring. It “includes” another file
+and open up ``run_star_extras.f90`` in your text editor of choice. The stock
+version of ``run_star_extras.f90`` is quite boring. It “includes” another file
 which holds the default set of routines.
 
 .. code-block:: fortran
@@ -46,14 +46,14 @@ working copy of MESA, and not to MESA as a whole, we want to replace
 this include statement with the contents of the included file.
 
 Delete the aforementioned include line and insert the contents of
-$MESA_DIR/include/standard_run_star_extras.inc.
+``$MESA_DIR/include/standard_run_star_extras.inc``.
 
 Before we make any changes, we should check that the code compiles.
 
 .. code-block:: console
 
    cd ..
-   ./mk
+   make
 
 If it doesn't compile, make sure that you cleanly inserted the file and
 removed the include line.
@@ -61,7 +61,7 @@ removed the include line.
 Control flow
 ^^^^^^^^^^^^
 
-The different run_star_extras.f90 routines get called at different
+The different ``run_star_extras.f90`` routines get called at different
 points during MESA execution.  Here is a flowchart summarizing this.
 
 |flowchart|
@@ -80,13 +80,13 @@ stellar structure.
 When writing Fortran code for run_star_extras.f90, here are a few
 important and useful things to know.
 
-The star_info structure
-^^^^^^^^^^^^^^^^^^^^^^^
+The ``star_info`` structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``star_info`` structure contains all the information about the star
 that is being evolved.  By convention, the variable name ``s`` is used
 throughout ``run_star_extras.f90`` to refer to this structure.  In
-Fortran, the percent (%) operator is used to access the components of
+Fortran, the percent (``%``) operator is used to access the components of
 the structure.  (So you can read ``s% x = 3`` in the same way that you
 would read ``s.x = 3`` in C.)
 
@@ -98,7 +98,7 @@ different categories documented in the ``star_data.inc`` file.  In addition, ``s
 contains the values for the parameters that you set in your ``controls``
 inlist (i.e., ``initial_mass``, ``xa_central_lower_limit``).  Recall that
 the list of controls is located in
-$MESA_DIR/star/defaults/controls.defaults.
+``$MESA_DIR/star/defaults/controls.defaults``.
 
 The ``s% xtra(1:30)`` array is a place to write temporary data of type ``real(dp)``
 which follow the logic of a time-step and so get carried over across restarts, restored in retries, etc.
@@ -290,8 +290,8 @@ of milestones along the way. This is especially true for the profiles,
 when it's not possible (or even desirable) to save and store a profile
 every few steps.
 
-The star_info structure has a couple of flags –
-need_to_save_profiles_now and need_to_update_history_now – that let you
+The ``star_info`` structure has a couple of flags –
+``need_to_save_profiles_now`` and ``need_to_update_history_now`` – that let you
 tell MESA that it is time to output data.
 
 The place to set these is in the function extras_finish_step which will
@@ -362,11 +362,11 @@ discuss some useful MESA features.
 
 To prevent you from filling up your disk, MESA will only save a
 limited number of profiles. The default is 100.  If you want to be
-sure the profiles that you're triggering in extras_finish_step stick
+sure the profiles that you're triggering in ``extras_finish_step`` stick
 around – perhaps you're making a movie – you should set
-max_num_profile_models to be greater that the number of profiles you
+``max_num_profile_models`` to be greater that the number of profiles you
 anticipate generating. You might also want to crank up the priority
-which with they are saved by setting save_profiles_model_priority to
+which with they are saved by setting ``save_profiles_model_priority`` to
 be 10. This will prevent MESA from discarding them in lieu of other
 automatically saved profiles.
 
@@ -439,7 +439,7 @@ Using the "other" hooks
 -----------------------
 
 MESA provides a way to override most of the physics routines with no
-need to modify anything more than run_star_extras. There are two main
+need to modify anything more than ``run_star_extras``. There are two main
 steps needed to take advantage of this functionality. In the following
 example, we will add controls that allow us to control the various
 non-nuclear neutrino losses (e.g., plasmon, bremsstrahlung) in our
@@ -448,7 +448,7 @@ massive star.
 Writing a routine
 ^^^^^^^^^^^^^^^^^
 
-Navigate to $MESA_DIR/star/other, where you will see a set of files
+Navigate to ``$MESA_DIR/star/other``, where you will see a set of files
 named with the pattern ``other_*.f90``.  The routines in this directory
 allow you to override/modify many physical and numerical aspects of
 MESA.
@@ -531,14 +531,14 @@ There are two things that you must do in order to have MESA execute your
 people encounter when using the ``other_*`` hooks.
 
 First, edit the controls section of your inlist to set the appropriate
-``use_other_*`` flag to .true. . In our example, this means adding the line
+``use_other_*`` flag to ``.true.``. In our example, this means adding the line
 
 .. code-block:: fortran
 
    use_other_neu = .true.
 
-Second, edit the extras_controls routine in run_star_extras.f90 to point
-the other_neu at the routine you want to be executed.
+Second, edit the ``extras_controls`` routine in ``run_star_extras.f90`` to point
+the ``other_neu`` at the routine you want to be executed.
 
 .. code-block:: fortran
   :emphasize-lines: 11
@@ -557,10 +557,4 @@ the other_neu at the routine you want to be executed.
 
   end subroutine extras_controls
 
-Now, recompile your working directory
-
-.. code-block:: console
-
-   ./mk
-
-and run MESA as usual.
+Now, run MESA as usual. This will first recompile the code and then start the simulation.

@@ -52,8 +52,8 @@ program main
    !
    ! read in directory and assign file names for output
    !
-   if (iargc() /= 1) call alert(1, '(main) tfdh takes 1 argument - an output directory')
-   call getarg(1, dir)
+   if (command_argument_count() /= 1) call alert(1, '(main) tfdh takes 1 argument - an output directory')
+   call get_command_argument(1, dir)
 
    file_profile = trim(dir)//'/'//'profile'
    file_z = trim(dir)//'/'//'z_table'

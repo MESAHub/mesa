@@ -191,7 +191,7 @@
             write(*,*) "See $MESA_DIR/star/job/standard_run_star_extras.inc for the standard example."
             write(*,'(A)')
             write(*,*) "This error can also occur if you switched MESA versions without recompiling."
-            write(*,*) "Do a ./clean and ./mk in your work directory to get recompiled."
+            write(*,*) "Do a make clean in your work directory to get recompiled."
             write(*,'(A)')
             write(*,*) "To disable this warning set"
             write(*,*) "    warn_run_star_extras = .false."

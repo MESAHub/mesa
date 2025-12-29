@@ -144,7 +144,7 @@ Hands-on Tutorial
    Go to the directory, mesa/star/test_suite/1M_pre_ms_to_wd, and open
    "inlist_1.0" in your text editor.  Set pgstar_flag = .true. and
    check the &pgstar section to make sure it starts empty.
-   Then do the usual ./mk and ./rn to start the test case.
+   Then do the usual ./rn to start the test case.
 
    First, open some plot windows and take a look at what's available.
    Just edit your pgstar inlist to set the "win_flag" for the plot;

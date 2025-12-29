@@ -38,7 +38,7 @@ module ferg_logP
 
    real :: logP_logTs(logP_num_logTs)
    real :: logP_logRs(logP_num_logRs)
-   real :: logPs(4, logP_num_logRs, logP_num_logTs)
+   real, target :: logPs(4, logP_num_logRs, logP_num_logTs)
 
    ! range of (logP,logT) in logK data file
    real, parameter :: logK_logT_min = 2.70
@@ -53,7 +53,7 @@ module ferg_logP
 
    real :: logK_logTs(logK_num_logTs)
    real :: logK_logPs(logK_num_logPs)
-   real :: logKs(4, logK_num_logPs, logK_num_logTs)
+   real, target :: logKs(4, logK_num_logPs, logK_num_logTs)
 
 contains
 
@@ -114,6 +114,7 @@ contains
       integer :: ili_logPs
       integer :: ili_logTs
       integer :: ier                       ! =0 on exit if there is no error.
+      real, pointer :: logKs_p(:)
 
       io_logK = 40
       open (unit=io_logK, file=trim(fname), action='read', status='old', iostat=ios)
@@ -148,7 +149,8 @@ contains
       ibcymin = 0; bcymin(1:logK_num_logPs) = 0
       ibcymax = 0; bcymax(1:logK_num_logPs) = 0
 
-      call interp_mkbicub_sg(logK_logPs, logK_num_logPs, logK_logTs, logK_num_logTs, logKs, logK_num_logPs, &
+      logKs_p(1:4 * logK_num_logPs * logK_num_logTs) => logKs
+      call interp_mkbicub_sg(logK_logPs, logK_num_logPs, logK_logTs, logK_num_logTs, logKs_p, logK_num_logPs, &
                              ibcxmin, bcxmin, ibcxmax, bcxmax, &
                              ibcymin, bcymin, ibcymax, bcymax, &
                              ili_logPs, ili_logTs, ier)
@@ -163,10 +165,13 @@ contains
       real, intent(IN) :: logR, logT
       real :: fval(6)
       integer :: ict(6), ier
+      real, pointer :: logPs_p(:)
 
       ict = 0; ict(1) = 1
-      call evbicub(logR, logT, logP_logRs, logP_num_logRs, logP_logTs, logP_num_logTs, &
-                   0, 0, logPs, logP_num_logRs, ict, fval, ier)
+
+      logPs_p(1:4 * logP_num_logRs * logP_num_logTs) => logPs
+      call interp_evbicub_sg(logR, logT, logP_logRs, logP_num_logRs, logP_logTs, logP_num_logTs, &
+                   0, 0, logPs_p, logP_num_logRs, ict, fval, ier)
       Find_logP = fval(1)
 
    end function Find_logP
@@ -175,10 +180,13 @@ contains
       real, intent(IN) :: logP, logT
       real :: fval(6)
       integer :: ict(6), ier
+      real, pointer :: logKs_p(:)
 
       ict = 0; ict(1) = 1
-      call evbicub(logP, logT, logK_logPs, logK_num_logPs, logK_logTs, logK_num_logTs, &
-                   0, 0, logKs, logK_num_logPs, ict, fval, ier)
+
+      logKs_p(1:4 * logK_num_logPs * logK_num_logTs) => logKs
+      call interp_evbicub_sg(logP, logT, logK_logPs, logK_num_logPs, logK_logTs, logK_num_logTs, &
+                   0, 0, logKs_p, logK_num_logPs, ict, fval, ier)
       Eval_lowTemp_logK = fval(1)
 
    end function Eval_lowTemp_logK
@@ -204,6 +212,7 @@ contains
       integer :: ili_logRs                     ! =1: logRho grid is "nearly" equally spaced
       integer :: ili_logTs                     ! =1: logT grid is "nearly" equally spaced
       integer :: ier                       ! =0 on exit if there is no error.
+      real, pointer :: logPs_p(:)
 
       iz = int(Z*1d3 + 0.1d0)
       ix = int(X*1d2 + 0.1d0)
@@ -284,7 +293,8 @@ contains
       ibcymin = 0; bcymin(1:logP_num_logRs) = 0
       ibcymax = 0; bcymax(1:logP_num_logRs) = 0
 
-      call interp_mkbicub_sg(logP_logRs, logP_num_logRs, logP_logTs, logP_num_logTs, logPs, logP_num_logRs, &
+      logPs_p(1:4 * logP_num_logRs * logP_num_logTs) => logPs
+      call interp_mkbicub_sg(logP_logRs, logP_num_logRs, logP_logTs, logP_num_logTs, logPs_p, logP_num_logRs, &
                              ibcxmin, bcxmin, ibcxmax, bcxmax, &
                              ibcymin, bcymin, ibcymax, bcymax, &
                              ili_logRs, ili_logTs, ier)

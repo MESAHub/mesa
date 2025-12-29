@@ -1,10 +1,7 @@
 .. _autodiff example:
 
-Example of auto_diff in run_star_extras
-=======================================
-
-.. toctree::
-   :maxdepth: 1
+Example of ``auto_diff`` in ``run_star_extras``
+===============================================
 
 The ``auto_diff`` module simplifies using ``run_star_extras`` hooks that
 need to provide partial derivatives.

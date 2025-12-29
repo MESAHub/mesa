@@ -1,9 +1,9 @@
-! kap module controls
-! ===================
+! ``kap`` module controls
+! =======================
 
    ! The MESA/kap parameters are given default values here.
-   ! The actual values as modified by your inlist are stored in the Kap_General_Info data structure.
-   ! They can be accessed by code at runtime using the kap_handle to get a pointer to it.
+   ! The actual values as modified by your inlist are stored in the ``Kap_General_Info`` data structure.
+   ! They can be accessed by code at runtime using the ``kap_handle`` to get a pointer to it.
 
 
 ! Base metallicity
@@ -61,17 +61,17 @@
    !The OPLIB Type1 tables offer additional table density, for 1194 (X,Z) pairs from the following sets:
    !
    ! + X:  0.0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.05, 0.1,
-   ! + 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
-   ! + 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
-   ! + 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97,
-   ! + 0.98, 0.99, 1-Z
+   !   0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
+   !   0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
+   !   0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97,
+   !   0.98, 0.99, 1-Z
 
    ! + Z: 0.0, 0.000001, 0.00001, 0.00003, 0.00007, 0.0001,
-   ! + 0.0003, 0.0007, 0.001, 0.002, 0.003, 0.004,0.006,
-   ! + 0.008, 0.01, 0.012, 0.014, 0.015, 0.016, 0.017, 0.018,
-   ! + 0.019, 0.02, 0.021, 0.022, 0.023, 0.024, 0.025, 0.026,
-   ! + 0.028, 0.03, 0.035, 0.04, 0.05, 0.06, 0.07, 0.08,
-   ! + 0.09, 0.1, 0.15, 0.2
+   !   0.0003, 0.0007, 0.001, 0.002, 0.003, 0.004,0.006,
+   !   0.008, 0.01, 0.012, 0.014, 0.015, 0.016, 0.017, 0.018,
+   !   0.019, 0.02, 0.021, 0.022, 0.023, 0.024, 0.025, 0.026,
+   !   0.028, 0.03, 0.035, 0.04, 0.05, 0.06, 0.07, 0.08,
+   !   0.09, 0.1, 0.15, 0.2
 
 
    ! Available options:
@@ -166,8 +166,8 @@
 ! Blend controls
 ! --------------
 
-   ! use_Zbase_for_Type1
-   ! ~~~~~~~~~~~~~~~~~~~
+   ! ``use_Zbase_for_Type1``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~
    ! If true, then if ``use_Type2_opacities = .true.``, Type1 opacities will be computed
    ! using ``Zbase`` instead of ``Z`` when Z > Zbase. This helps with blending from Type1 to Type2.
    ! Ignored if ``use_Type2_opacities = .false.``.
@@ -176,8 +176,8 @@
       use_Zbase_for_Type1 = .true.
 
 
-   ! use_Type2_opacities
-   ! ~~~~~~~~~~~~~~~~~~~
+   ! ``use_Type2_opacities``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~
    ! Select whether to use Type2 opacity tables (see :ref:`kap/defaults:kap_CO_prefix`).
    ! Even when true, in regions where hydrogen is
    ! above a given threshold, or the metallicity is not significantly higher than
@@ -189,10 +189,10 @@
       use_Type2_opacities = .true.
 
 
-   ! kap_Type2_full_off_X
-   ! ~~~~~~~~~~~~~~~~~~~~
-   ! kap_Type2_full_on_X
-   ! ~~~~~~~~~~~~~~~~~~~
+   ! ``kap_Type2_full_off_X``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``kap_Type2_full_on_X``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~
    ! Switch to Type1 if X too large.
    ! Type2 is full off for ``X >= kap_Type2_full_off_X``
    ! Type2 can be full on for ``X <= kap_Type2_full_on_X``.
@@ -202,10 +202,10 @@
       kap_Type2_full_on_X = 1d-6
 
 
-   ! kap_Type2_full_off_dZ
-   ! ~~~~~~~~~~~~~~~~~~~~~
-   ! kap_Type2_full_on_dZ
-   ! ~~~~~~~~~~~~~~~~~~~~
+   ! ``kap_Type2_full_off_dZ``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``kap_Type2_full_on_dZ``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
    ! Switch to Type1 if dZ too small ``(dZ = Z - Zbase)``.
    ! Type2 is full off for ``dZ <= kap_Type2_full_off_dZ``.
    ! Type2 can be full on for ``dZ >= kap_Type2_full_on_dZ``.
@@ -223,10 +223,10 @@
    ! Add ``kap_frac_Type2`` to your profile columns list to see ``frac_Type2`` for each cell.
 
 
-   ! kap_blend_logT_upper_bdy
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~
-   ! kap_blend_logT_lower_bdy
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``kap_blend_logT_upper_bdy``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``kap_blend_logT_lower_bdy``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Region to blend between higher temperature tables
    ! (see :ref:`kap/defaults:kap_file_prefix` and :ref:`kap/defaults:kap_CO_prefix`) and lower
    ! temperature tables (see :ref:`kap/defaults:kap_lowT_prefix`).
@@ -250,8 +250,8 @@
 ! Interpolation options
 ! ---------------------
 
-   ! cubic_interpolation_in_X
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``cubic_interpolation_in_X``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! type of interpolation in X.
    ! true is cubic; false is linear.
    ! ::
@@ -259,8 +259,8 @@
       cubic_interpolation_in_X = .false.
 
 
-   ! cubic_interpolation_in_Z
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``cubic_interpolation_in_Z``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! type of interpolation in Z.
    ! true is cubic; false is linear.
    ! ::
@@ -278,16 +278,16 @@
 
    ! Separate controls exist for each class of prefix.
 
-   ! user_num_kap_Xs
-   ! ~~~~~~~~~~~~~~~
+   ! ``user_num_kap_Xs``
+   ! ~~~~~~~~~~~~~~~~~~~
    ! Number of X values.
    ! ::
 
       !! user_num_kap_Xs = 10
 
 
-   ! user_kap_Xs
-   ! ~~~~~~~~~~~
+   ! ``user_kap_Xs``
+   ! ~~~~~~~~~~~~~~~
 
    ! X values for the tables (length ``user_num_kap_Xs``).
    ! Values such that X + Z > 1 will have X reduced to 1-Z.
@@ -297,24 +297,24 @@
       !! user_kap_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0, 0.95d0, 1.0d0
 
 
-   ! user_num_kap_Zs
-   ! ~~~~~~~~~~~~~~~
+   ! ``user_num_kap_Zs``
+   ! ~~~~~~~~~~~~~~~~~~~
    ! Number of Z values.
    ! ::
 
       !! user_num_kap_Zs = 13
 
 
-   ! user_kap_Zs
-   ! ~~~~~~~~~~~
+   ! ``user_kap_Zs``
+   ! ~~~~~~~~~~~~~~~
    ! Z values for the tables (length ``user_num_kap_Zs``).
    ! ::
 
       !! user_kap_Zs = 0.000d0, 0.0001d0, 0.0003d0, 0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, 0.04d0, 0.06d0, 0.08d0, 0.100d0
 
 
-   ! user_num_kap_Xs_for_this_Z
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_Xs_for_this_Z``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
    ! Use the first N (``<= user_num_kap_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_Zs``).
@@ -323,8 +323,8 @@
       !! user_num_kap_Xs_for_this_Z = 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 8
 
 
-   ! user_num_kap_CO_Xs
-   ! ~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_CO_Xs``
+   ! ~~~~~~~~~~~~~~~~~~~~~~
 
    ! Number of X values.
    ! ::
@@ -332,32 +332,32 @@
       !! user_num_kap_CO_Xs = 5
 
 
-   ! user_kap_CO_Xs
-   ! ~~~~~~~~~~~~~~
+   ! ``user_kap_CO_Xs``
+   ! ~~~~~~~~~~~~~~~~~~
    ! X values for the tables (length ``user_num_kap_CO_Xs``).
    ! ::
 
       !! user_kap_CO_Xs = 0.00d0, 0.03d0, 0.10d0, 0.35d0, 0.70d0
 
 
-   ! user_num_kap_CO_Zs
-   ! ~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_CO_Zs``
+   ! ~~~~~~~~~~~~~~~~~~~~~~
    ! Number of Z values.
    ! ::
 
       !! user_num_kap_CO_Zs = 8
 
 
-   ! user_kap_CO_Zs
-   ! ~~~~~~~~~~~~~~
+   ! ``user_kap_CO_Zs``
+   ! ~~~~~~~~~~~~~~~~~~
    ! Z values for the tables (length ``user_num_kap_CO_Zs``).
    ! ::
 
       !! user_kap_CO_Zs = 0.000d0, 0.001d0, 0.004d0, 0.010d0, 0.020d0, 0.030d0, 0.050d0, 0.100d0
 
 
-   ! user_num_kap_CO_Xs_for_this_Z
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_CO_Xs_for_this_Z``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
    ! Use the first N (``<= user_num_kap_CO_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_CO_Zs``).
    ! ::
@@ -365,16 +365,16 @@
       !! user_num_kap_CO_Xs_for_this_Z = 5, 5, 5, 5, 5, 5, 5, 5
 
 
-   ! user_num_kap_lowT_Xs
-   ! ~~~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_lowT_Xs``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
    ! Number of X values.
    ! ::
 
       !! user_num_kap_lowT_Xs = 10
 
 
-   ! user_kap_lowT_Xs
-   ! ~~~~~~~~~~~~~~~~
+   ! ``user_kap_lowT_Xs``
+   ! ~~~~~~~~~~~~~~~~~~~~
    ! X values for the tables (length ``user_num_kap_lowT_Xs``).
    ! Values such that X + Z > 1 will have X reduced to 1-Z.
    ! Choose ``user_num_kap_lowT_Xs_for_this_Z`` such that at most 1 X value for each Z will be reduced in this way.
@@ -383,24 +383,24 @@
       !! user_kap_lowT_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0, 0.95d0, 1.0d0
 
 
-   ! user_num_kap_lowT_Zs
-   ! ~~~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_lowT_Zs``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~
    ! Number of Z values.
    ! ::
 
       !! user_num_kap_lowT_Zs = 13
 
 
-   ! user_kap_lowT_Zs
-   ! ~~~~~~~~~~~~~~~~
+   ! ``user_kap_lowT_Zs``
+   ! ~~~~~~~~~~~~~~~~~~~~
    ! Z values for the tables (length ``user_num_kap_lowT_Zs``).
    ! ::
 
       !! user_kap_lowT_Zs = 0.000d0, 0.0001d0, 0.0003d0, 0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, 0.04d0, 0.06d0, 0.08d0, 0.100d0
 
 
-   ! user_num_kap_lowT_Xs_for_this_Z
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``user_num_kap_lowT_Xs_for_this_Z``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
    ! Use the first N (``<= user_num_kap_lowT_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_lowT_Zs``).
    ! ::
@@ -411,8 +411,8 @@
 ! Conductive opacity options
 ! --------------------------
 
-   ! include_electron_conduction
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``include_electron_conduction``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! add conduction opacities to radiative opacities
    ! ::
@@ -420,8 +420,8 @@
       include_electron_conduction = .true.
 
 
-   ! use_blouin_conductive_opacities
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``use_blouin_conductive_opacities``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Use fits from Blouin et al. (2020) for H and He in the regime of
    ! moderate coupling and moderate degeneracy.
    ! ::
@@ -432,8 +432,8 @@
 ! Miscellaneous controls
 ! ----------------------
 
-   ! show_info
-   ! ~~~~~~~~~
+   ! ``show_info``
+   ! ~~~~~~~~~~~~~
    ! if true, then output additional information as the opacities are loaded.
    ! this is particularly useful to see the detailed composition coverage of
    ! the AESOPUS opacity files.
@@ -447,24 +447,24 @@
 
    ! Control whether to use other hooks.  See ``kap/other``.
 
-   ! use_other_elect_cond_opacity
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``use_other_elect_cond_opacity``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Replace electron conduction opacity routine
    ! ::
 
       use_other_elect_cond_opacity = .false.
 
 
-   ! use_other_compton_opacity
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``use_other_compton_opacity``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Replace Compton opacity routine
    ! ::
 
       use_other_compton_opacity = .false.
 
 
-   ! use_other_radiative_opacity
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``use_other_radiative_opacity``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Replace radiative opacity routine.
    ! The standard routine evaluates the opacity using the low-T and high-T tables.
    ! ::
@@ -491,10 +491,10 @@
    ! It works recursively, so the extras can read extras too.
 
 
-   ! read_extra_kap_inlist(1..5)
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_kap_inlist_name(1..5)
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``read_extra_kap_inlist(1..5)``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ``extra_kap_inlist_name(1..5)``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! If ``read_extra_kap_inlist(i)`` is true, then read ``&eos`` from the file ``extra_kap_inlist_name(i)``.
    ! ::

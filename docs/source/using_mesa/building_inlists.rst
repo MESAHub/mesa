@@ -6,8 +6,8 @@ Inlists for MESA are composed of five main sections labeled ``&star_job``, ``&co
 ``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state, respectively.
 The ``&pgstar`` section contains the commands for creating pgstar plots.
 
-&star_job
-=========
+``&star_job``
+=============
 
 The main modules of MESA (other than **star**) are the :ref:`eos`, the :ref:`kap`, the :ref:`atm`, the nuclear reactions.
 In this section of the inlist, you'll have to make choices for which atmosphere and nuclear reactions network you want to use, as well as which nuclear reactions rates you want to use.
@@ -77,8 +77,8 @@ For example when evolving a stellar model on the horizontal branch (helium burni
    :end-before: ! eos
 
 
-&controls
-=========
+``&controls``
+=============
 
 Energy equation
 ---------------
@@ -152,14 +152,14 @@ Overshooting
 Timestep and grid controls
 --------------------------
 
-&kap
-====
+``&kap``
+========
 
-&eos
-====
+``&eos``
+========
 
-&colors
-=======
+``&colors``
+===========
 
 The ``&colors`` section configures the custom colors module for calculating synthetic photometry during stellar evolution. This module interpolates stellar atmosphere models to compute bolometric magnitudes and synthetic magnitudes in specified photometric filters, adding these as extra history columns.
 

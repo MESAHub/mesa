@@ -1,11 +1,11 @@
-===================================
-More detail on the auto_diff module
-===================================
+=======================================
+More detail on the ``auto_diff`` module
+=======================================
 
 Adapted from a `post <https://adamjermyn.com/posts/auto_diff_mesa/>`_ on Adam Jermyn's website describing the implementation of ``auto_diff`` in MESA.
 
-What is auto_diff?
-==================
+What is ``auto_diff``?
+======================
 
 Forward-mode automatic differentiation via operator overloading:
 
@@ -309,7 +309,7 @@ Config Files
 In ``MESA/auto_diff/config`` there are a bunch of files, one per
 ``auto_diff`` type. These are yaml files, and look like:
 
-::
+.. code:: yaml
 
    name: auto_diff_real_2var_order1
    orders: [[1,0],[0,1]]
@@ -324,7 +324,7 @@ This says:
 
 Another example:
 
-::
+.. code:: yaml
 
    name: auto_diff_real_2var_order3
    orders: [[3,0],[2,1],[1,2],[0,3]]
@@ -340,7 +340,7 @@ which says
 
 Finally, the star example:
 
-::
+.. code:: yaml
 
    name: auto_diff_real_star_order1
    orders: [[1]]
@@ -435,8 +435,8 @@ them to the ``compilation_list`` and ``use_list``:
    compilation_list.append(data['name'] + '.f90')
    use_list.append(tab + 'use ' + data['name'] + '_module')
 
-AutoDiffType
-------------
+``AutoDiffType``
+----------------
 
 The ``AutoDiffType`` class lives in ``auto_diff_type.py``. This type is
 the internal representation of an ``auto_diff`` Fortran type on the
@@ -532,8 +532,8 @@ constructed in
 ``unary_specific_chain_rule(self, operator, fixed_length=self.array_length)``
 (and there are equivalent functions for binary operators).
 
-chain_rule
-----------
+``chain_rule``
+--------------
 
 The real magic on the Python side all happens in ``chain_rule.py``.
 That’s where functions like
@@ -706,8 +706,8 @@ code for this dummy operator, and that gets everything in terms of the
 partial derivatives of ``z(x)``, which we can then supply as inputs to
 the custom operator builders.
 
-make_auto_diff_type
--------------------
+``make_auto_diff_type``
+-----------------------
 
 This file puts it all together, going over all the functions and all the
 Fortran boiler plate and doing a bunch of accounting to make sure every

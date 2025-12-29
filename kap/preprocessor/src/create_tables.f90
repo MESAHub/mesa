@@ -31,7 +31,7 @@ program create_tables
 
    double precision :: which_z, which_x
    integer :: io_unit, ios, ilgT, cnt, len, status
-   character(len=64) :: inlist_fname, whichz_str, whichx_str
+   character(len=512) :: inlist_fname, whichz_str, whichx_str
 
    status = 0
    call get_command_argument(1, inlist_fname, len, status)

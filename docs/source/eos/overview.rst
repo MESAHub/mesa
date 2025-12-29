@@ -1,6 +1,13 @@
-======================
-Overview of eos module
-======================
+==========================
+Overview of ``eos`` module
+==========================
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   defaults
+   interface
 
 The equation of state (EOS) is delivered by the ``eos`` module.  The
 MESA EOS combines different input sources in order to cover the wide

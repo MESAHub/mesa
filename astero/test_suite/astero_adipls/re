@@ -28,6 +28,4 @@ then
     exit 1
 fi
 
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-./star
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+make run
