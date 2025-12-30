@@ -15,7 +15,7 @@ rm -rf data/eosDT_data
 rm -rf data/kap_data
 rm -rf data/ionization_data
 rm -rf data/chem_data
-rm -rf data/colors_data
+rm -rf data/colors_data/filters data/colors_data/stellar_models data/colors_data/.extraction_complete
 rm -rf data/rates_data/cache
 
 rm -rf data/rates_data/cache/*
