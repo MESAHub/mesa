@@ -51,13 +51,13 @@
       use_colors = .true.                      ! Activate synthetic photometry calculations
       
       ! Filter transmission curves directory
-      instrument = '/colors/data/filters/GAIA/GAIA'
+      instrument = '/data/colors_data/filters/GAIA/GAIA'
       
       ! Vega spectrum for zero-point magnitude calibration
-      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
       
       ! Directory containing stellar atmosphere SEDs for interpolation
-      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
       
       distance = 3.0857d19         ! Distance to star in cm
       

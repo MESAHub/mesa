@@ -10,8 +10,8 @@ function check_okay {
 }
 
 # Create working directory
-mkdir -p data
-cd data
+mkdir -p ../data/colors_data
+cd ../data/colors_data
 
 # Variables
 ARCHIVE_NAME="colors_data.txz"

@@ -115,6 +115,6 @@ TAGS
 *~
 
 ## Colors
-**/colors/data/.extraction_complete
-colors/data/filters/
-colors/data/stellar_models/
+**/data/colors_data/.extraction_complete
+data/colors_data/filters/
+data/colors_data/stellar_models/
