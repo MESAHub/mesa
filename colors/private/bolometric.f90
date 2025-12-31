@@ -20,7 +20,7 @@
 module bolometric
 
    use const_def, only: dp
-   use colors_utils, only: romberg_integration, load_lookup_table
+   use colors_utils, only: romberg_integration
    use hermite_interp, only: construct_sed_hermite
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
@@ -34,24 +34,21 @@ contains
 
    !****************************
    ! Calculate Bolometric Photometry Using Multiple SEDs
+   ! Now accepts cached lookup table data instead of loading from file
    !****************************
    subroutine calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
-                                   bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius)
+                                   bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius, &
+                                   lu_file_names, lu_teff, lu_logg, lu_meta)
       real(dp), intent(in) :: teff, log_g, metallicity, R, d
       character(len=*), intent(in) :: sed_filepath
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux, interpolation_radius
       real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
 
-      real(dp), allocatable :: lu_logg(:), lu_meta(:), lu_teff(:)
+      ! Cached lookup table data (passed in from colors_settings)
+      character(len=100), intent(in) :: lu_file_names(:)
+      real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
 
-      REAL, dimension(:, :), allocatable :: lookup_table
-      character(len=100), allocatable :: file_names(:)
-      character(len=256) :: lookup_file
       character(len=32) :: interpolation_method
-
-      lookup_file = trim(sed_filepath)//'/lookup_table.csv'
-
-      call load_lookup_table(lookup_file, lookup_table, file_names, lu_logg, lu_meta, lu_teff)
 
       interpolation_method = 'Hermite'   ! or 'Linear' / 'KNN' later
 
@@ -61,23 +58,23 @@ contains
 
       select case (interpolation_method)
       case ('Hermite', 'hermite', 'HERMITE')
-         call construct_sed_hermite(teff, log_g, metallicity, R, d, file_names, &
+         call construct_sed_hermite(teff, log_g, metallicity, R, d, lu_file_names, &
                                     lu_teff, lu_logg, lu_meta, sed_filepath, &
                                     wavelengths, fluxes)
 
       case ('Linear', 'linear', 'LINEAR')
-         call construct_sed_linear(teff, log_g, metallicity, R, d, file_names, &
+         call construct_sed_linear(teff, log_g, metallicity, R, d, lu_file_names, &
                                    lu_teff, lu_logg, lu_meta, sed_filepath, &
                                    wavelengths, fluxes)
 
       case ('KNN', 'knn', 'Knn')
-         call construct_sed_knn(teff, log_g, metallicity, R, d, file_names, &
+         call construct_sed_knn(teff, log_g, metallicity, R, d, lu_file_names, &
                                 lu_teff, lu_logg, lu_meta, sed_filepath, &
                                 wavelengths, fluxes)
 
       case default
          ! Fallback: Hermite
-         call construct_sed_hermite(teff, log_g, metallicity, R, d, file_names, &
+         call construct_sed_hermite(teff, log_g, metallicity, R, d, lu_file_names, &
                                     lu_teff, lu_logg, lu_meta, sed_filepath, &
                                     wavelengths, fluxes)
       end select

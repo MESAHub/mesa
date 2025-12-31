@@ -19,10 +19,10 @@
 
 module colors_lib
 
-   use const_def, only: dp, strlen
+   use const_def, only: dp, strlen, mesa_dir
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
-   use colors_utils, only: read_strings_from_file
+   use colors_utils, only: read_strings_from_file, load_lookup_table, load_filter, load_vega_sed
    use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
 
    implicit none
@@ -117,22 +117,59 @@ contains
    end subroutine colors_ptr
 
    subroutine colors_setup_tables(handle, ierr)
-      use colors_def, only: colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
-      ! TODO: use load_colors, only: Setup_colors_Tables
+      use colors_def, only: Colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
       integer, intent(in) :: handle
       integer, intent(out):: ierr
 
-      type(colors_General_Info), pointer :: rq
-      logical, parameter :: use_cache = .true.
-      logical, parameter :: load_on_demand = .true.
+      type(Colors_General_Info), pointer :: rq
+      character(len=256) :: lookup_file, filter_dir, filter_filepath, vega_filepath
+      REAL, allocatable :: lookup_table(:,:)  ! unused but required by load_lookup_table
+      integer :: i
 
       ierr = 0
       call get_colors_ptr(handle, rq, ierr)
-      ! TODO: call Setup_colors_Tables(rq, use_cache, load_on_demand, ierr)
+      if (ierr /= 0) return
 
-      ! TODO: For now, don't use cache (future feature)
-      ! but rely on user specifying a single filters directory, and read it here
+      ! Read filter names from instrument directory
       call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)
+      if (ierr /= 0) return
+
+      ! =========================================
+      ! Load lookup table (stellar atmosphere grid)
+      ! =========================================
+      if (.not. rq%lookup_loaded) then
+         lookup_file = trim(mesa_dir)//trim(rq%stellar_atm)//'/lookup_table.csv'
+         call load_lookup_table(lookup_file, lookup_table, &
+                                rq%lu_file_names, rq%lu_logg, rq%lu_meta, rq%lu_teff)
+         rq%lookup_loaded = .true.
+         if (allocated(lookup_table)) deallocate(lookup_table)
+      end if
+
+      ! =========================================
+      ! Load Vega SED (if using Vega mag system)
+      ! =========================================
+      if (.not. rq%vega_loaded) then
+         vega_filepath = trim(mesa_dir)//trim(rq%vega_sed)
+         call load_vega_sed(vega_filepath, rq%vega_wavelengths, rq%vega_fluxes)
+         rq%vega_loaded = .true.
+      end if
+
+      ! =========================================
+      ! Load all filter transmission curves
+      ! =========================================
+      if (.not. rq%filters_loaded) then
+         filter_dir = trim(mesa_dir)//trim(rq%instrument)
+
+         allocate(rq%filters(num_color_filters))
+
+         do i = 1, num_color_filters
+            rq%filters(i)%name = color_filter_names(i)
+            filter_filepath = trim(filter_dir)//'/'//trim(color_filter_names(i))
+            call load_filter(filter_filepath, rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+         end do
+
+         rq%filters_loaded = .true.
+      end if
 
    end subroutine colors_setup_tables
 

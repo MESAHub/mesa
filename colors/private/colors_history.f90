@@ -64,12 +64,11 @@ contains
       type(Colors_General_Info), pointer :: colors_settings
       integer :: i, filter_offset
       real(dp) :: d, bolometric_magnitude, bolometric_flux, interpolation_radius
-      character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath!, mag_system
+      character(len=256) :: sed_filepath, filter_name
       logical :: make_sed
 
-      real(dp), dimension(:), allocatable :: wavelengths, fluxes, filter_wavelengths, filter_trans
+      real(dp), dimension(:), allocatable :: wavelengths, fluxes
 
-      !mag_system = "ST"
       ierr = 0
       call get_colors_ptr(colors_handle, colors_settings, ierr)
       if (ierr /= 0) then
@@ -77,15 +76,19 @@ contains
          return
       end if
 
-      !metallicity = colors_settings% metallicity
       d = colors_settings%distance
       sed_filepath = trim(mesa_dir)//colors_settings%stellar_atm
-      filter_dir = trim(mesa_dir)//colors_settings%instrument
-      vega_filepath = trim(mesa_dir)//colors_settings%vega_sed
       make_sed = colors_settings%make_csv
 
+      ! Use cached lookup table data
       call calculate_bolometric(t_eff, log_g, metallicity, R, d, &
-                                bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius)
+                                bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
+                                sed_filepath, interpolation_radius, &
+                                colors_settings%lu_file_names, &
+                                colors_settings%lu_teff, &
+                                colors_settings%lu_logg, &
+                                colors_settings%lu_meta)
+
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude
       names(2) = "Flux_bol"
@@ -99,12 +102,15 @@ contains
             filter_name = trim(remove_dat(color_filter_names(i)))
             names(i + filter_offset) = filter_name
 
-            filter_filepath = trim(filter_dir)//"/"//color_filter_names(i)
-
             if (t_eff >= 0 .and. metallicity >= 0) then
+               ! Use cached filter and Vega data
                vals(i + filter_offset) = calculate_synthetic(t_eff, log_g, metallicity, ierr, &
-                                                             wavelengths, fluxes, filter_wavelengths, filter_trans, &
-                                                             filter_filepath, vega_filepath, color_filter_names(i), &
+                                                             wavelengths, fluxes, &
+                                                             colors_settings%filters(i)%wavelengths, &
+                                                             colors_settings%filters(i)%transmission, &
+                                                             colors_settings%vega_wavelengths, &
+                                                             colors_settings%vega_fluxes, &
+                                                             color_filter_names(i), &
                                                              make_sed, colors_settings%colors_results_directory, &
                                                              colors_settings%mag_system)
                if (ierr /= 0) vals(i + filter_offset) = -1.0_dp

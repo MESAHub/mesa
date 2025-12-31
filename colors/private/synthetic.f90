@@ -22,7 +22,7 @@ module synthetic
    ! Added clight for AB conversions
    use const_def, only: dp, clight
    use utils_lib, only: mkdir, folder_exists
-   use colors_utils, only: remove_dat, romberg_integration, load_filter, load_vega_sed, load_lookup_table
+   use colors_utils, only: remove_dat, romberg_integration
    use knn_interp, only: interpolate_array
 
    implicit none
@@ -34,26 +34,33 @@ contains
 
    !****************************
    ! Calculate Synthetic Photometry Using SED and Filter
+   ! Now accepts cached filter and Vega data instead of file paths
    !****************************
    real(dp) function calculate_synthetic(temperature, gravity, metallicity, ierr, &
-                                         wavelengths, fluxes, filter_wavelengths, &
-                                         filter_trans, &
-                                         filter_filepath, vega_filepath, &
+                                         wavelengths, fluxes, &
+                                         filter_wavelengths, filter_trans, &
+                                         vega_wavelengths, vega_fluxes, &
                                          filter_name, make_sed, colors_results_directory, &
                                          mag_system)
       ! Input arguments
       real(dp), intent(in) :: temperature, gravity, metallicity
-      character(len=*), intent(in) :: filter_filepath, filter_name, vega_filepath, colors_results_directory
-      character(len=*), intent(in) :: mag_system  ! NEW: Arguments for 'Vega', 'AB', or 'ST'
+      character(len=*), intent(in) :: filter_name, colors_results_directory
+      character(len=*), intent(in) :: mag_system  ! 'Vega', 'AB', or 'ST'
       integer, intent(out) :: ierr
       character(len=1000) :: line
 
-      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
-      real(dp), dimension(:), allocatable, intent(inout) :: filter_wavelengths, filter_trans
+      real(dp), dimension(:), intent(in) :: wavelengths, fluxes
+      ! Cached filter data (passed in from colors_settings)
+      real(dp), dimension(:), intent(in) :: filter_wavelengths, filter_trans
+      ! Cached Vega SED (passed in from colors_settings)
+      real(dp), dimension(:), intent(in) :: vega_wavelengths, vega_fluxes
       logical, intent(in) :: make_sed
 
       ! Local variables
       real(dp), dimension(:), allocatable :: convolved_flux
+      ! Local copies for routines that need intent(inout)
+      real(dp), dimension(:), allocatable :: local_filt_wave, local_filt_trans
+      real(dp), dimension(:), allocatable :: local_wavelengths, local_fluxes
       character(len=100) :: csv_file
       real(dp) :: synthetic_flux, zero_point_flux
       integer :: max_size, i
@@ -63,12 +70,19 @@ contains
       csv_file = trim(colors_results_directory)//'/'//trim(remove_dat(filter_name))//'_SED.csv'
       ierr = 0
 
-      ! Load filter data
-      call load_filter(filter_filepath, filter_wavelengths, filter_trans)
+      ! Make local copies since some routines need intent(inout)
+      allocate(local_wavelengths(size(wavelengths)))
+      allocate(local_fluxes(size(fluxes)))
+      allocate(local_filt_wave(size(filter_wavelengths)))
+      allocate(local_filt_trans(size(filter_trans)))
+      local_wavelengths = wavelengths
+      local_fluxes = fluxes
+      local_filt_wave = filter_wavelengths
+      local_filt_trans = filter_trans
 
       ! Perform SED convolution (Source Object)
-      allocate (convolved_flux(size(wavelengths)))
-      call convolve_sed(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
+      allocate(convolved_flux(size(wavelengths)))
+      call convolve_sed(local_wavelengths, local_fluxes, local_filt_wave, local_filt_trans, convolved_flux)
 
       ! Write SED to CSV if requested
       if (make_sed) then
@@ -100,20 +114,21 @@ contains
 
       select case (trim(mag_system))
       case ('VEGA', 'Vega', 'vega')
-         zero_point_flux = calculate_vega_flux(vega_filepath, filter_wavelengths, filter_trans, &
+         zero_point_flux = calculate_vega_flux(vega_wavelengths, vega_fluxes, &
+                                               local_filt_wave, local_filt_trans, &
                                                filter_name, make_sed, colors_results_directory)
       case ('AB', 'ab')
-         zero_point_flux = calculate_ab_zero_point(filter_wavelengths, filter_trans)
+         zero_point_flux = calculate_ab_zero_point(local_filt_wave, local_filt_trans)
       case ('ST', 'st')
-         zero_point_flux = calculate_st_zero_point(filter_wavelengths, filter_trans)
+         zero_point_flux = calculate_st_zero_point(local_filt_wave, local_filt_trans)
       case default
          print *, "Error: Unknown magnitude system: ", mag_system
          calculate_synthetic = huge(1.0_dp)
          return
       end select
 
-      call calculate_synthetic_flux(wavelengths, convolved_flux, synthetic_flux, &
-                                    filter_wavelengths, filter_trans)
+      call calculate_synthetic_flux(local_wavelengths, convolved_flux, synthetic_flux, &
+                                    local_filt_wave, local_filt_trans)
 
       if (zero_point_flux > 0.0_dp) then
          calculate_synthetic = -2.5d0*log10(synthetic_flux/zero_point_flux)
@@ -123,7 +138,9 @@ contains
       end if
 
       ! Clean up
-      deallocate (convolved_flux)
+      deallocate(convolved_flux)
+      deallocate(local_wavelengths, local_fluxes)
+      deallocate(local_filt_wave, local_filt_trans)
    end function calculate_synthetic
 
    !****************************
@@ -181,30 +198,41 @@ contains
       end if
    end subroutine calculate_synthetic_flux
 
-   function calculate_vega_flux(vega_filepath, filt_wave, filt_trans, &
+   !****************************
+   ! Calculate Vega Flux for Zero Point
+   ! Now accepts cached Vega SED instead of file path
+   !****************************
+   function calculate_vega_flux(vega_wave, vega_flux_arr, filt_wave, filt_trans, &
                                 filter_name, make_sed, colors_results_directory) result(vega_flux)
-      character(len=*), intent(in) :: vega_filepath, filter_name, colors_results_directory
-      character(len=100) :: output_csv
+      real(dp), dimension(:), intent(in) :: vega_wave, vega_flux_arr
       real(dp), dimension(:), intent(inout) :: filt_wave, filt_trans
+      character(len=*), intent(in) :: filter_name, colors_results_directory
+      logical, intent(in) :: make_sed
+
       real(dp) :: vega_flux
       real(dp) :: int_flux, int_filter
-      real(dp), allocatable :: vega_wave(:), vega_flux_arr(:), conv_flux(:)
-      real(dp), allocatable :: filt_trans_on_vega_grid(:)  ! ← NEW
-      logical, intent(in) :: make_sed
+      real(dp), allocatable :: conv_flux(:)
+      real(dp), allocatable :: filt_trans_on_vega_grid(:)
+      real(dp), allocatable :: local_vega_wave(:), local_vega_flux(:)
+      character(len=100) :: output_csv
       integer :: i, max_size, ierr
       real(dp) :: wv, fl, cf, fwv, ftr
       character(len=1000) :: line
 
-      call load_vega_sed(vega_filepath, vega_wave, vega_flux_arr)
+      ! Make local copies for routines that need intent(inout)
+      allocate(local_vega_wave(size(vega_wave)))
+      allocate(local_vega_flux(size(vega_flux_arr)))
+      local_vega_wave = vega_wave
+      local_vega_flux = vega_flux_arr
 
-      allocate (conv_flux(size(vega_wave)))
-      call convolve_sed(vega_wave, vega_flux_arr, filt_wave, filt_trans, conv_flux)
+      allocate(conv_flux(size(vega_wave)))
+      call convolve_sed(local_vega_wave, local_vega_flux, filt_wave, filt_trans, conv_flux)
 
-      allocate (filt_trans_on_vega_grid(size(vega_wave)))
-      call interpolate_array(filt_wave, filt_trans, vega_wave, filt_trans_on_vega_grid)
+      allocate(filt_trans_on_vega_grid(size(vega_wave)))
+      call interpolate_array(filt_wave, filt_trans, local_vega_wave, filt_trans_on_vega_grid)
 
-      call romberg_integration(vega_wave, vega_wave*conv_flux, int_flux)
-      call romberg_integration(vega_wave, vega_wave*filt_trans_on_vega_grid, int_filter)
+      call romberg_integration(local_vega_wave, local_vega_wave*conv_flux, int_flux)
+      call romberg_integration(local_vega_wave, local_vega_wave*filt_trans_on_vega_grid, int_filter)
 
       if (int_filter > 0.0_dp) then
          vega_flux = int_flux/int_filter
@@ -242,7 +270,8 @@ contains
          end do
          close (10)
       end if
-      deallocate (conv_flux, vega_wave, vega_flux_arr)
+
+      deallocate(conv_flux, local_vega_wave, local_vega_flux, filt_trans_on_vega_grid)
    end function calculate_vega_flux
 
    !****************************
