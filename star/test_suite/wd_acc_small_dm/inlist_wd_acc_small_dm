@@ -59,7 +59,7 @@
 
       mix_factor = 0
 
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
       varcontrol_target = 1d-3
       max_timestep_factor = 1.1d0

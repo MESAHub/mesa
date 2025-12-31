@@ -55,7 +55,7 @@
    limit_for_rel_error_in_energy_conservation = 1d99
    hard_limit_for_rel_error_in_energy_conservation = 1d99
 
-   convergence_ignore_equL_residuals = .true.
+   convergence_ignore_equL_residuals = .false.
 
    max_model_number = 1
 
