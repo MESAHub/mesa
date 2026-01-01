@@ -118,6 +118,7 @@ contains
 
    subroutine colors_setup_tables(handle, ierr)
       use colors_def, only: Colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
+      use synthetic, only: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
       integer, intent(in) :: handle
       integer, intent(out):: ierr
 
@@ -146,7 +147,7 @@ contains
       end if
 
       ! =========================================
-      ! Load Vega SED (if using Vega mag system)
+      ! Load Vega SED (needed for Vega mag system)
       ! =========================================
       if (.not. rq%vega_loaded) then
          vega_filepath = trim(mesa_dir)//trim(rq%vega_sed)
@@ -155,7 +156,7 @@ contains
       end if
 
       ! =========================================
-      ! Load all filter transmission curves
+      ! Load all filter transmission curves and precompute zero-points
       ! =========================================
       if (.not. rq%filters_loaded) then
          filter_dir = trim(mesa_dir)//trim(rq%instrument)
@@ -166,6 +167,18 @@ contains
             rq%filters(i)%name = color_filter_names(i)
             filter_filepath = trim(filter_dir)//'/'//trim(color_filter_names(i))
             call load_filter(filter_filepath, rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+
+            ! Precompute zero-points for all magnitude systems
+            ! These are constant for each filter and never need recalculation
+            rq%filters(i)%vega_zero_point = compute_vega_zero_point( &
+               rq%vega_wavelengths, rq%vega_fluxes, &
+               rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+
+            rq%filters(i)%ab_zero_point = compute_ab_zero_point( &
+               rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+
+            rq%filters(i)%st_zero_point = compute_st_zero_point( &
+               rq%filters(i)%wavelengths, rq%filters(i)%transmission)
          end do
 
          rq%filters_loaded = .true.

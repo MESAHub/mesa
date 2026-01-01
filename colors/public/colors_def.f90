@@ -31,6 +31,10 @@ module colors_def
       character(len=100) :: name
       real(dp), allocatable :: wavelengths(:)
       real(dp), allocatable :: transmission(:)
+      ! Precomputed zero-point fluxes (computed once at initialization)
+      real(dp) :: vega_zero_point = -1.0_dp
+      real(dp) :: ab_zero_point = -1.0_dp
+      real(dp) :: st_zero_point = -1.0_dp
    end type filter_data
 
    ! Colors Module control parameters
@@ -60,14 +64,13 @@ module colors_def
       real(dp), allocatable :: vega_wavelengths(:)
       real(dp), allocatable :: vega_fluxes(:)
 
-      ! Cached filter data
+      ! Cached filter data (includes precomputed zero-points)
       logical :: filters_loaded = .false.
       type(filter_data), allocatable :: filters(:)
 
    end type Colors_General_Info
 
-   ! TODO: Use handles/caching in the future once we have more colors tables
-   ! For now, we will just point to a single file
+   ! Global filter name list (shared across handles)
    integer :: num_color_filters
    character(len=100), allocatable :: color_filter_names(:)
 
