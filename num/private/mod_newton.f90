@@ -639,11 +639,11 @@ contains
             exit
          end if
          if (is_bad(residual_norm)) then
-            call oops('residual_norm is a a bad number (NaN or Infinity)')
+            call oops('residual_norm is a bad number (NaN or Infinity)')
             exit
          end if
          if (is_bad(max_residual)) then
-            call oops('max_residual is a a bad number (NaN or Infinity)')
+            call oops('max_residual is a bad number (NaN or Infinity)')
             exit
          end if
          residual_norm = abs(residual_norm)
