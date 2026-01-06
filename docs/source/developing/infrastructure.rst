@@ -37,7 +37,7 @@ mesastar.org
 ------------
 
 This is a long-standing domain name used by MESA.
-The main website redirects to a landing page hosted on `GitHub Pages <https://mesastar.org>`__
+The `https://mesastar.org <https://mesastar.org>`__ redirects to a landing page hosted on `GitHub Pages <https://github.com/MESAHub/MESAHub.github.io>`__
 
 Domain Name
 ^^^^^^^^^^^
@@ -66,8 +66,9 @@ Marketplace
 ^^^^^^^^^^^
 
 The `MESA marketplace
-<https://mesastar.org/marketplace/>`__ is controlled and
-hosted by Frank at ASU.
+<https://mesastar.org/marketplace/>`__ is an archive of shared resources prior to 2022,
+hosted on `GitHub Pages <https://github.com/mesahub/marketplace>`__.
+For more recent contributions, see the `MESA Zenodo Community <https://zenodo.org/communities/mesa/>`__.
 
 
 ReadTheDocs
@@ -130,12 +131,12 @@ We have multiple resources archived on Zenodo. This is a free service.
 Community
 ^^^^^^^^^
 
-The `MESA community <https://zenodo.org/communities/mesa/>`__ on Zenodo
+The `MESA Zenodo Community <https://zenodo.org/communities/mesa/>`__ on Zenodo
 is controlled by Philip.
 
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/records/13353788>`__ is controlled by Philip.
+* The `record for MESA releases <https://zenodo.org/records/18023257>`__ is controlled by Philip.
 * The records for MESA SDK releases (`macOS <https://zenodo.org/records/13768941>`__, `linux <https://zenodo.org/records/13768913>`__) are controlled by Philip.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
