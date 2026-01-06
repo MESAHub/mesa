@@ -37,11 +37,11 @@ Bug Fixes
 
 
 Changes in r25.12.1
-=======================
+===================
 
 Upgraded software license from LGPL-v2.1 to LGPL-v3.0
 
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r25.12.1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -60,7 +60,7 @@ counter part. See below :
 - ``alpha_TDC_DAMPR`` has been renamed to ``TDC_alpha_R`` and is analogous to ``RSP_gammar``
 - ``alpha_TDC_PtdVdt`` has been renamed to ``TDC_alpha_Pt`` and is analogous to ``RSP_alfap``
 
-.. _New Features main:
+.. _New Features r25.12.1:
 
 New Features
 ------------
@@ -146,7 +146,7 @@ See the ``&controls`` for further details.
 L2 mass-loss fraction according to Lu et al. (2023) is available as a public function in the binary module:
 ``binary_L2_mass_loss_fraction(donor_mass, accretor_mass, mass_transfer_rate, orbital_separation, disk_alpha, disk_mu, ierr)``.
 
-.. _Bug Fixes main:
+.. _Bug Fixes r25.12.1:
 
 Bug Fixes
 ---------
@@ -159,7 +159,7 @@ Fixed bug in binary photos. They were not saving the variables: ``CE_years_detac
 
 Fixed bug that ``Orbit_win_flag = .true.`` was not showing Orbit plot (pgbinary)
 
-Fixed a bug in ``other_mlt_results`` which resulted in the pre-ms model builder reporting a segfault. ``other_mlt_results`` should now support ``mlt_option = TDC`` as well. see `gh-874 <https://github.com/MESAHub/mesa/issues/874`_.
+Fixed a bug in ``other_mlt_results`` which resulted in the pre-ms model builder reporting a segfault. ``other_mlt_results`` should now support ``mlt_option = TDC`` as well. see `gh-874 <https://github.com/MESAHub/mesa/issues/874>`_.
 
 Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 

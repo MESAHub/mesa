@@ -1,4 +1,4 @@
-"""This python file was made exlusively for calulcating bi-cubic splines of LANL ATOMIC OPLIB opacity tables, not OPAL or OP (which contain 9.999 values in different table locations)"""
+"""This python file was made exclusively for calulcating bi-cubic splines of LANL ATOMIC OPLIB opacity tables, not OPAL or OP (which contain 9.999 values in different table locations)"""
 
 from pathlib import Path
 import numpy as np

@@ -197,7 +197,7 @@
             call set_qs(s, s% nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
                write(*,*) 'set_current_to_old failed in set_qs'
-               stop
+               call mesa_error(__FILE__,__LINE__,'set_current_to_old')
             end if
             call set_m_and_dm(s)
             call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
@@ -212,7 +212,7 @@
                   if (is_bad_num(s% omega(k)) .or. abs(s% omega(k)) > 1d50) then
                      if (s% stop_for_bad_nums) then
                         write(*,2) 's% omega(k)', k, s% omega(k)
-                        stop 'set_current_to_old'
+                        call mesa_error(__FILE__,__LINE__,'set_current_to_old')
                      end if
                   end if
                end do

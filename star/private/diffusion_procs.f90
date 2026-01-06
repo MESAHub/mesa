@@ -1447,7 +1447,7 @@
             return
          end if
 
-         if (ierr /= 0) stop 'set1_g_rad'  !return
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'set1_g_rad')  !return
 
          do ii = 1, 17  !kk
             do i = 1, nc

@@ -17,7 +17,7 @@ make data/version_number
 # at the end of the file
 {
 
-# Block sudo access, this check should come first as if a user blindly types "sudo ./install" then MESA_DIR wont be set
+# Block sudo access, this check should come first as if a user blindly types "sudo ./install" then MESA_DIR won't be set
 # So lets catch this error first rather then forcing them to set MESA_DIR under sudo
 if  [ ${EUID:-$(id -u)} -eq 0 ];
 then
@@ -179,7 +179,7 @@ if [ ! -z "$MESASDK_ROOT" ]; then
 	    exit 1
         fi
     else
-	echo MESASDK_ROOT enviroment variable is not set. See https://docs.mesastar.org/en/latest/installation.html#set-your-environment-variables
+	echo MESASDK_ROOT environment variable is not set. See https://docs.mesastar.org/en/latest/installation.html#set-your-environment-variables
 	exit 1
     fi
 fi

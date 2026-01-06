@@ -344,14 +344,14 @@
                density_new, energy_new, op_err)
             if (op_err /= 0) then
                write(*,2) 'failed for do1_lnT', k
-               stop
                write(message,*) 'do1_lnT for k', k
                ierr = op_err
+               call mesa_error(__FILE__,__LINE__,'mesh adjust: do1_lnT')
             end if
             if (is_bad(energy_new(k)) .or. is_bad(dq(k))) then
                write(*,2) 'energy_new', k, energy_new(k)
                write(*,2) 'dq', k, dq(k)
-               stop ''
+               call mesa_error(__FILE__,__LINE__,'mesh adjust: bad energy_new or dq')
             end if
 
          end do

@@ -1,5 +1,5 @@
 ifeq ($(MESA_DIR),)
-  $(error MESA_DIR enviroment variable is not set)
+  $(error MESA_DIR environment variable is not set)
 endif
 
 include $(MESA_DIR)/make/defaults-module.mk

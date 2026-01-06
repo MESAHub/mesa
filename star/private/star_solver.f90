@@ -465,7 +465,7 @@
                end if
 
                if (is_bad_num(residual_norm)) then
-                  call oops('residual_norm is a a bad number (NaN or Infinity)')
+                  call oops('residual_norm is a bad number (NaN or Infinity)')
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'residual_norm', residual_norm
                      call mesa_error(__FILE__,__LINE__,'solver')
@@ -474,7 +474,7 @@
                end if
 
                if (is_bad_num(max_residual)) then
-                  call oops('max_residual is a a bad number (NaN or Infinity)')
+                  call oops('max_residual is a bad number (NaN or Infinity)')
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'max_residual', max_residual
                      call mesa_error(__FILE__,__LINE__,'solver')
