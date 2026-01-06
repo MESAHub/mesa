@@ -74,6 +74,7 @@ extend-ignore-identifiers-re = [
     "antia",
     "accpt",
     "Ser",
+    "anc",
 ]
 
 [files]
