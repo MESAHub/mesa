@@ -731,7 +731,7 @@ contains
        if (in_conv .AND. s%mlt_mixing_type(kf) /= convective_mixing) then
 
           ! Transitioning out of a convective zone; complete
-          ! definition of new zone info and add to to the table
+          ! definition of new zone info and add to the table
 
           zi_new%kc_t = kf
           zi_new%vc_t = s%mlt_vc(kf+1)
