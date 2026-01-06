@@ -16,7 +16,7 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :target: https://docs.mesastar.org/en/latest/
 .. image:: https://img.shields.io/github/v/release/MESAHub/mesa
     :alt: GitHub release (latest by date)
-    :target: https://zenodo.org/records/13353788
+    :target: https://zenodo.org/records/18023257
 .. image:: https://img.shields.io/badge/zenodo-community-blue
     :alt: Zenodo
     :target: https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10
@@ -40,7 +40,7 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 
    **WARNING**: The default ``main`` branch is the development version of
    MESA and is not guaranteed to function correctly.  If you are using
-   MESA, you should use an `official release version <https://zenodo.org/records/13353788>`__.
+   MESA, you should use an `official release version <https://zenodo.org/records/18023257>`__.
 
 
 Overview
@@ -86,7 +86,7 @@ Links
 Download
 ========
 
-* `MESA Official Release Version <https://zenodo.org/records/13353788>`__ for the latest release of MESA.
+* `MESA Official Release Version <https://zenodo.org/records/18023257>`__ for the latest release of MESA.
 * `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for: `MacOS (ARM) <https://zenodo.org/records/13769017>`__, `MacOS (Intel) <https://zenodo.org/records/13768941>`__, `Linux (Intel/AMD) <https://zenodo.org/records/13768913>`__.
 
 
