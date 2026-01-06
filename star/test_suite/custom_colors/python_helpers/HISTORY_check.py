@@ -382,9 +382,8 @@ class HistoryChecker:
         else:
             self.axes[1, 0].plot(self.Star_Age, self.color_index, "kx")
 
-        # Bottom-right plot: Age vs. All Filter Magnitudes with filter-specific colors
+
         for i, filt in enumerate(self.filter_columns):
-            # Retrieve filter magnitude data
             try:
                 col_data = getattr(self.md, filt)
             except AttributeError:
@@ -394,12 +393,26 @@ class HistoryChecker:
                     print(f"Warning: Could not retrieve data for filter {filt}")
                     continue
 
-            # Use filter-specific color
+            col_data = np.asarray(col_data, dtype=float)
+            age = np.asarray(self.Star_Age, dtype=float)
+
+            # --- physical mask ---
+            mask = (
+                np.isfinite(col_data) &
+                np.isfinite(age) &
+                (col_data < 90.0) &      # magnitude sanity bound
+                (col_data > -50.0)       # avoid garbage negatives
+            )
+
+            if not np.any(mask):
+                # Entire column is non-physical → skip it
+                continue
+
             color = self.filter_colors[i] if i < len(self.filter_colors) else "black"
 
             self.axes[1, 1].plot(
-                self.Star_Age,
-                col_data,
+                age[mask],
+                col_data[mask],
                 marker="o",
                 linestyle="-",
                 label=filt,
@@ -407,6 +420,7 @@ class HistoryChecker:
                 markersize=3,
                 alpha=0.8,
             )
+
 
         # Add evolutionary phase legend at the top of the figure
         if len(self.phases) > 1:

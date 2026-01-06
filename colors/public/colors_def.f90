@@ -26,7 +26,7 @@ module colors_def
    ! Make everything in this module public by default
    public
 
-   ! Type to hold individual filter data (cached)
+   ! Type to hold individual filter data
    type :: filter_data
       character(len=100) :: name
       real(dp), allocatable :: wavelengths(:)
@@ -48,7 +48,6 @@ module colors_def
       real(dp) :: distance
       logical :: make_csv
       logical :: use_colors
-      ! bookkeeping
       integer :: handle
       logical :: in_use
 

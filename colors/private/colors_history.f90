@@ -77,7 +77,7 @@ contains
          return
       end if
 
-      ! Safety check: verify data was loaded at initialization
+      ! verify data was loaded at initialization
       if (.not. cs%lookup_loaded) then
          write (*, *) 'colors error: lookup table not loaded'
          ierr = -1
