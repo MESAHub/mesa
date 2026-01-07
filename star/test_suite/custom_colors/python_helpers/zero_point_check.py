@@ -70,9 +70,9 @@ def modify_for_fast_run(content):
 
 def run_mesa(mag_system, run_dir):
     """Run MESA with specified mag_system, saving LOGS to run_dir."""
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Running MESA with mag_system = {mag_system}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Backup original inlist
     original_content = read_inlist(INLIST_COLORS)
@@ -90,7 +90,10 @@ def run_mesa(mag_system, run_dir):
     # Run MESA
     try:
         result = subprocess.run(
-            ["./rn"], capture_output=True, text=True, timeout=3600  # 1 hour timeout
+            ["./rn"],
+            capture_output=True,
+            text=True,
+            timeout=3600,  # 1 hour timeout
         )
         if result.returncode != 0:
             print(f"MESA run failed for {mag_system}")
