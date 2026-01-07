@@ -10,9 +10,13 @@ import matplotlib.pyplot as plt
 import mesa_reader as mr
 import numpy as np
 from matplotlib.animation import FuncAnimation
+
 # Import functions from static version for consistency
-from static_HISTORY_check import (MesaView,  # get_mesa_phase_info,
-                                  read_header_columns, setup_hr_diagram_params)
+from static_HISTORY_check import (
+    MesaView,  # get_mesa_phase_info,
+    read_header_columns,
+    setup_hr_diagram_params,
+)
 
 
 def age_colormap_colors(ages, cmap_name="inferno", recent_fraction=0.25, stretch=5.0):
@@ -382,7 +386,6 @@ class HistoryChecker:
         else:
             self.axes[1, 0].plot(self.Star_Age, self.color_index, "kx")
 
-
         for i, filt in enumerate(self.filter_columns):
             try:
                 col_data = getattr(self.md, filt)
@@ -398,10 +401,10 @@ class HistoryChecker:
 
             # --- physical mask ---
             mask = (
-                np.isfinite(col_data) &
-                np.isfinite(age) &
-                (col_data < 90.0) &      # magnitude sanity bound
-                (col_data > -50.0)       # avoid garbage negatives
+                np.isfinite(col_data)
+                & np.isfinite(age)
+                & (col_data < 90.0)  # magnitude sanity bound
+                & (col_data > -50.0)  # avoid garbage negatives
             )
 
             if not np.any(mask):
@@ -420,7 +423,6 @@ class HistoryChecker:
                 markersize=3,
                 alpha=0.8,
             )
-
 
         # Add evolutionary phase legend at the top of the figure
         if len(self.phases) > 1:

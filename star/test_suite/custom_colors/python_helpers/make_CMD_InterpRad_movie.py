@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 import mesa_reader as mr
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-from static_HISTORY_check import (MesaView, read_header_columns,
-                                  setup_hr_diagram_params)
+from static_HISTORY_check import MesaView, read_header_columns, setup_hr_diagram_params
 
 
 def make_cmd_rotation_video(

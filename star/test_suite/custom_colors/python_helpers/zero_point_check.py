@@ -204,7 +204,7 @@ def plot_cmd_comparison(results):
     output_file = "mag_system_comparison.png"
     plt.savefig(output_file, dpi=150, bbox_inches="tight")
     print(f"\nPlot saved to {output_file}")
-    #plt.show()
+    # plt.show()
 
 
 def main():
