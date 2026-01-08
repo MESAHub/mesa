@@ -65,7 +65,6 @@ CONTAINS
    END SUBROUTINE trapezoidalintegration
 
    SUBROUTINE SimpsonIntegration(x, y, result)
-      INTEGER, PARAMETER :: DP = KIND(1.0D0)
       REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
       REAL(DP), INTENT(OUT) :: result
 
@@ -108,7 +107,6 @@ CONTAINS
    END SUBROUTINE SimpsonIntegration
 
    SUBROUTINE rombergintegration(x, y, result)
-      INTEGER, PARAMETER :: DP = KIND(1.0D0)
       REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
       REAL(DP), INTENT(OUT) :: result
 
