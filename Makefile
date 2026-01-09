@@ -19,4 +19,4 @@ clean:
 
 all: $(SUBDIRS) $(addsuffix -extract-data,$(SUBDIRS)) $(addsuffix -check,$(SUBDIRS))
 
-.PHONY: all $(SUBDIRS) $(addsuffix -extract-data,$(SUBDIRS)) $(addsuffix -check,$(SUBDIRS)) $(addsuffix -install,$(SUBDIRS)) clean install
+.PHONY: all $(SUBDIRS) $(addsuffix -extract-data,$(SUBDIRS)) $(addsuffix -check,$(SUBDIRS)) $(addsuffix -install,$(SUBDIRS)) clean
