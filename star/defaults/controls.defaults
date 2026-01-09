@@ -4072,8 +4072,9 @@
       ! w_div_wcrit_max
       ! ~~~~~~~~~~~~~~~
 
-      ! When fitted_fp_ft_i_rot = .true., limit fp and ft to their values at this
-      ! w_div_wcrit
+      ! Maximum value for ``w_div_w_crit_roche``. When ``w_div_wc_flag`` is false (default),
+      ! this is a hard limit. When ``w_div_wc_flag`` is true, this works together with
+      ! ``w_div_wcrit_max2`` to provide a smooth transition (see below).
 
       ! ::
 
