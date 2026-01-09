@@ -69,7 +69,7 @@ runs:
     - name: Get SDK ${{ runner.os }} '25.12.1'
       if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '25.12.1') }}
       run: |
-        wget --user-agent="" -q http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-25.12.1.tar.gz
+        wget -q https://zenodo.org/records/18163992/files/mesasdk-x86_64-linux-25.12.1.tar.gz
       shell: bash
 
     - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
