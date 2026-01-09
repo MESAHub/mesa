@@ -255,9 +255,9 @@ Change the nuclear reaction network
 
  It is usually useful to examine history and profile quantities.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_network_name``` where NN is your table number and network_name is one of the choices above,
- for example, ``log_directory = `Table08_approx21```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_network_name'`` where NN is your table number and network_name is one of the choices above,
+ for example, ``log_directory = 'Table08_approx21'``.
 
  After the runs, each table should upload their ``log_directory``
  to our shared Dropbox directory timmes/Experiment01.
@@ -279,9 +279,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpN``` where NN is your table number and NpN is your value,
- for example, ``log_directory = `Table03_1p8```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpN'`` where NN is your table number and NpN is your value,
+ for example, ``log_directory = 'Table03_1p8'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment02.
 
@@ -303,9 +303,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpNN``` where NN is your table number and NpNN is your value,
- for example, ``log_directory = `Table11_1p80```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpNN'`` where NN is your table number and NpNN is your value,
+ for example, ``log_directory = 'Table11_1p80'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment03.
 
@@ -329,9 +329,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpNNN is your value,
- for example, ``log_directory = `Table05_0p002```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpNNN'`` where NN is your table number and NpNNN is your value,
+ for example, ``log_directory = 'Table05_0p002'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment04.
 
@@ -352,9 +352,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpN is your value,
- for example, ``log_directory = `Table08_1p2```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpNNN'`` where NN is your table number and NpN is your value,
+ for example, ``log_directory = 'Table08_1p2'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment05.
 
@@ -375,9 +375,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NeN``` where NN is your table number and NeN is your value,
- for example, ``log_directory = `Table01_2e7```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NeN'`` where NN is your table number and NeN is your value,
+ for example, ``log_directory = 'Table01_2e7'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment06.
 

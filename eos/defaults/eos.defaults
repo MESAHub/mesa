@@ -1,5 +1,5 @@
-! ``eos`` module controls
-! =======================
+! eos module controls
+! ===================
 
    ! The MESA/eos parameters are given default values here.
    ! The actual values as modified by your inlist are stored in the EoS_General_Info data structure.

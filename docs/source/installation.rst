@@ -79,7 +79,7 @@ free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
 You can also download zip files of `older MESA releases <https://doi.org/10.5281/zenodo.2602941>`__.
-If you plan to do so, please read :ref:`this FAQ entry <faq:Installing Older Versions of MESA>`.
+If you plan to do so, please read :ref:`this FAQ entry <faq:Installing Older (before 25.XX) Versions of MESA>`.
 
 .. _environment:
 

@@ -1,4 +1,4 @@
-3.. _custom_colors:
+.. _custom_colors:
 
 *************
 custom_colors

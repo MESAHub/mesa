@@ -1,6 +1,6 @@
-==========================
-Overview of ``eos`` module
-==========================
+======================
+Overview of eos module
+======================
 
 .. toctree::
    :maxdepth: 1
@@ -129,7 +129,6 @@ Component EOSes
 ===============
 
 
-
 OPAL/SCVH
 ---------
 
@@ -212,7 +211,6 @@ CMS
    This EOS is experimental.
 
 CMS is the EOS for dense H/He mixtures of |CMS|.
-
 
 
 .. |CMS| replace:: `Chabrier, Mazevet, & Soubiran (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...872...51C>`__

@@ -32,7 +32,7 @@ Bug Fixes
 ---------
 
 
-.. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
+.. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
 
 
@@ -51,10 +51,10 @@ Backwards-incompatible changes
 
 Removed ``file_extension`` option because it is redundant with ``file_device``. Delete ``file_extension`` from your inlists.
 
-Renamed pgstar ``pause``` option to ``pause_flag``` because pause is a reserved Fortran 77 keyword.
+Renamed pgstar ``pause`` option to ``pause_flag`` because pause is a reserved Fortran 77 keyword.
 
-For greater consistency and clarity between ``TDC`` and ``RSP``, the controls for ``mlt_option = TDC`` have been renamed to match their respective ``RSP``
-counter part. See below :
+For greater consistency and clarity between ``TDC`` and ``RSP``, the controls for ``MLT_option = TDC`` have been renamed to match their respective ``RSP``
+counterpart. See below:
 
 - ``alpha_TDC_DAMP`` has been renamed to ``TDC_alpha_D`` and is analogous to ``RSP_alfad``
 - ``alpha_TDC_DAMPR`` has been renamed to ``TDC_alpha_R`` and is analogous to ``RSP_gammar``
@@ -159,13 +159,11 @@ Fixed bug in binary photos. They were not saving the variables: ``CE_years_detac
 
 Fixed bug that ``Orbit_win_flag = .true.`` was not showing Orbit plot (pgbinary)
 
-Fixed a bug in ``other_mlt_results`` which resulted in the pre-ms model builder reporting a segfault. ``other_mlt_results`` should now support ``mlt_option = TDC`` as well. see `gh-874 <https://github.com/MESAHub/mesa/issues/874>`_.
+Fixed a bug in ``other_mlt_results`` which resulted in the pre-ms model builder reporting a segfault. ``other_mlt_results`` should now support ``MLT_option = TDC`` as well. See `gh-874 <https://github.com/MESAHub/mesa/issues/874>`_.
 
 Removed unused parameters: ``fp_error_limit``, ``fp_min``, ``ft_error_limit``, ``ft_min``, ``retain_fallback_at_each_step``.
 
 Fixed bug in residual calculation near P = 1, or T = 1
-
-.. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
 
 
 Changes in r24.08.1
@@ -498,7 +496,7 @@ near 0.697.
 
 The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
 atmosphere options were removed in r15140. We have reimplemented them although we
-caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+caution users that their implementation could conflict with ``MLT_option = 'TDC'``.
 
 The EOS coverage regions have been updated to fall back to ideal gas in a region
 previously covered by HELM where it returned unphysical floor values of ``1e-20``
