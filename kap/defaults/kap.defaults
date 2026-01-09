@@ -1,5 +1,5 @@
-! ``kap`` module controls
-! =======================
+! kap module controls
+! ===================
 
    ! The MESA/kap parameters are given default values here.
    ! The actual values as modified by your inlist are stored in the ``Kap_General_Info`` data structure.
