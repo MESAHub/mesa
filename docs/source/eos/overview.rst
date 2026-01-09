@@ -1,6 +1,6 @@
-==========================
-Overview of ``eos`` module
-==========================
+======================
+Overview of eos module
+======================
 
 The equation of state (EOS) is delivered by the ``eos`` module.  The
 MESA EOS combines different input sources in order to cover the wide
@@ -122,7 +122,6 @@ Component EOSes
 ===============
 
 
-
 OPAL/SCVH
 ---------
 
@@ -205,7 +204,6 @@ CMS
    This EOS is experimental.
 
 CMS is the EOS for dense H/He mixtures of |CMS|.
-
 
 
 .. |CMS| replace:: `Chabrier, Mazevet, & Soubiran (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...872...51C>`__
