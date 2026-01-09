@@ -2274,7 +2274,7 @@
       ! mlt_use_rotation_correction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! When doing rotation, multiply ``grad_rad`` by ``ft_rot/ft_rot`` if this flag is true.
+      ! When doing rotation, multiply ``grad_rad`` by ``ft_rot/fp_rot`` if this flag is true.
 
       ! ::
 
@@ -3721,7 +3721,7 @@
       ! ::
 
       !     f = 1  when logT <= D_mix_rotation_max_logT_full_on = full_on
-      !       = 0  when logT >= D_mix_rotation_min_logT_full_on = full_off
+      !       = 0  when logT >= D_mix_rotation_min_logT_full_off = full_off
       !       = (log(T)-full_on)/(full_off-full_on) else
 
       ! note that for regions with brunt N^2 < 0, we set Richardson number to 1
@@ -4127,7 +4127,7 @@
 
     D_mix_rotation_min_tau_full_off = 0d0
 
-      ! D_mix_rotation_max_tau_full_on
+      ! D_mix_rotation_min_tau_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use rotational components of ``D_mix`` for locations where tau >= this.
@@ -4179,12 +4179,12 @@
 
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
       ! setting up outer boundary conditions. We caution that the use of ``'fixed_'`` atmosphere
-      ! options might conflict with mlt_option = ``TDC``.
+      ! options might conflict with MLT_option = ``TDC``.
 
       ! + ``'T_tau'``:
       !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
       !   The choice of relation is set by the ``atm_T_tau_relation`` control. See also
-      !   the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_tries`` and
+      !   the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_iters`` and
       !   ``atm_T_tau_max_steps`` controls.
       !
       ! + ``'table'``:
@@ -4202,8 +4202,8 @@
       !   set Tsurf by solving for the atmosphere structure given the irradiated-grey
       !   T(tau) relation of Guillot, T, and Havel, M., A&A 527, A20 (2011).
       !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
-      !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
-      !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      !   ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
+      !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_iters`` controls.
       !
       ! + ``'fixed_Teff'`` :
       !    set Tsurf from Eddington T(tau) relation
@@ -4291,7 +4291,7 @@
       ! e.g. try ``Pextra_factor = 2``
 
       ! Note that ``Pextra_factor`` is only applied when ``atm_option`` = ``'T_tau'``
-      ! and ``atm_T_tau_opacity`` = ``'fixed'`` or '``iterated'``.
+      ! and ``atm_T_tau_opacity`` = ``'fixed'`` or ``'iterated'``.
 
       ! ::
 
