@@ -10,8 +10,8 @@ function check_okay {
 }
 
 # Create working directory
-mkdir -p data
-cd data
+mkdir -p ../data/colors_data
+cd ../data/colors_data
 
 # Variables
 ARCHIVE_NAME="colors_data.txz"
@@ -29,16 +29,20 @@ if [ ! -f "$EXTRACTED_FLAG" ]; then
     # If the archive is missing
     if [ ! -f "$ARCHIVE_NAME" ]; then
         echo "Archive $ARCHIVE_NAME is missing."
-        echo "Please ensure it is downloaded or available in this directory."
+        echo "Please ensure $ARCHIVE_NAME is downloaded or available in this directory."
         # it should now auto-download from a LFS pointer... i think?
-
-        exit 1
+        git -C "$MESA_DIR" lfs pull --include="data/colors_data/colors_data.txz"   #like this
+        
+        if [ ! -f "$ARCHIVE_NAME" ]; then
+            echo "Archive $ARCHIVE_NAME is still missing."
+            exit 1
+        fi
     fi
 
     # Validate it
     if ! validate_archive; then
         echo "Archive $ARCHIVE_NAME is invalid."
-        # try again to download or something?
+        git -C "$MESA_DIR" lfs pull --include="data/colors_data/colors_data.txz"   #and again...
 
         # Validate it
         if ! validate_archive; then

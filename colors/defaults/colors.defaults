@@ -31,13 +31,13 @@
    ! ::
 
       use_colors = .false.
-      instrument = '/colors/data/filters/Generic/Johnson'
-      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      instrument = '/data/colors_data/filters/Generic/Johnson'
+      stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
       distance = 3.0857d19
       make_csv = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
-      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
 
 
 ! Extra inlist controls

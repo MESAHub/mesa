@@ -174,22 +174,17 @@ contains
             meta_dist = scaled_lu_meta(i) - norm_meta
          end if
 
-
          ! Detect dummy axes once
 
-         use_teff_dim = .not.(all(lu_teff == 0.0_dp)  .or. all(lu_teff == 999.0_dp)  .or. all(lu_teff == -999.0_dp))
-         use_logg_dim = .not.(all(lu_logg == 0.0_dp)  .or. all(lu_logg == 999.0_dp)  .or. all(lu_logg == -999.0_dp))
-         use_meta_dim = .not.(all(lu_meta == 0.0_dp)  .or. all(lu_meta == 999.0_dp)  .or. all(lu_meta == -999.0_dp))
-
-
+         use_teff_dim = .not. (all(lu_teff == 0.0_dp) .or. all(lu_teff == 999.0_dp) .or. all(lu_teff == -999.0_dp))
+         use_logg_dim = .not. (all(lu_logg == 0.0_dp) .or. all(lu_logg == 999.0_dp) .or. all(lu_logg == -999.0_dp))
+         use_meta_dim = .not. (all(lu_meta == 0.0_dp) .or. all(lu_meta == 999.0_dp) .or. all(lu_meta == -999.0_dp))
 
          ! Inside the loop:
          distance = 0.0_dp
          if (use_teff_dim) distance = distance + teff_dist**2
          if (use_logg_dim) distance = distance + logg_dist**2
          if (use_meta_dim) distance = distance + meta_dist**2
-
-
 
          distance = teff_dist**2 + logg_dist**2 + meta_dist**2
 

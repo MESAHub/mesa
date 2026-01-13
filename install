@@ -2,12 +2,6 @@
 
 set -o pipefail
 
-# Get version number from git
-if [ -d ".git" ] || [ -f ".git" ]; then
-    # Limits hashes to 7 characters
-    version=$(git rev-parse HEAD)
-    printf "%s" "${version:0:7}" > data/version_number
-fi
 
 # Create file for TestHub
 # This file will be populated during math/test
@@ -100,55 +94,6 @@ then
     echo "****************************************************************"
     echo
     exit 1
-fi
-
-# Check we are on git and if so did git lfs work?
-if [ -d ".git" ] || [ -f ".git" ]
-then
-	# First check if git lfs is installed
-	if ! command -v git-lfs >/dev/null 2>&1
-	then
-		echo
-		echo "****************************************************************"
-		echo "*                     git lfs is not installed                 *"
-		echo "*                                                              *"
-		echo "****************************************************************"
-		echo
-		exit 1
-	fi
-
-        # empirically on lustre filesystems the LFS files don't immediately appear
-        # if requested, sleep for a bit before proceeding and doing the check
-        if [ -n "${MESA_GIT_LFS_SLEEP}" ]; then
-            sleep "${MESA_GIT_LFS_SLEEP}"
-        fi
-
-        # check that each LFS file has a full copy on disk
-        FILE_LIST=$(git-lfs ls-files | awk '{print $NF}')
-        for LFS_FILE in ${FILE_LIST}; do
-            # the checks have this form to handle uncommitted changes to LFS files
-            # if no file exists, that means the file was probably deleted and that's OK
-            # if the file exists, but is short, then it is probably the bare LFS pointer
-            #   and that indicates a problem retrieving the file
-            if [ -f "${LFS_FILE}" ] && [ $(du -k "${LFS_FILE}" | cut -f1) -le 4 ];
-            then
-                echo
-                echo "${LFS_FILE} is smaller than expected for a file tracked by git LFS"
-                echo
-                echo "****************************************************************"
-                echo "*        Some data files were not successfully retrieved       *"
-                echo "*                                                              *"
-                echo "*                         Try running:                         *"
-                echo "*                   git lfs install --force                    *"
-                echo "*                           and then                           *"
-                echo "*                         git lfs pull                         *"
-                echo "*                                                              *"
-                echo "****************************************************************"
-                echo
-                exit 1
-            fi
-        done
-
 fi
 
 
@@ -323,7 +268,7 @@ then
 fi
 do_one_parallel chem
 
-if [ ! -r data/colors_data ]
+if [ ! -r data/colors_data/.extraction_complete ]
 then
 	do_input_data colors
 fi
