@@ -105,6 +105,26 @@ If set to ``.true.``, the module exports the full calculated SED at every profil
       make_csv = .true.
 
 
+sed_per_model
+--------
+
+**Default:** `.false.`
+
+If set to ``.true.`` AND ``make_csv`` set to ``.true.``, the module exports the full calculated SED at every profile interval WITH the model number suffix.
+
+!!!WARNING: Enabling this feature will cause the colors_results_directory to drastically increase in size. DO NOT enable this without first ensureing you have appropriate storage. !!!
+
+* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
+* **Format:** CSV files containing Wavelength vs. Flux with model number suffic on file name. 
+* **Use Case:** useful for seeing SED evolution.
+
+**Example:**
+
+.. code-block:: fortran
+
+      sed_per_model = .true.      
+
+
 colors_results_directory
 ------------------------
 

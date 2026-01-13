@@ -111,49 +111,106 @@ def read_header_columns(history_file):
     return all_cols, filter_columns
 
 
+
 def setup_hr_diagram_params(md, filter_columns):
     """Set up parameters for HR diagram based on available filters."""
-    if "Gbp" in filter_columns and "Grp" in filter_columns and "G" in filter_columns:
-        hr_color = md.Gbp - md.Grp
-        hr_mag = md.G
+
+    # Normalize filter names for case-insensitive matching
+    fc_lower = [f.lower() for f in filter_columns]
+
+    def has(name):
+        return name.lower() in fc_lower
+
+    def get(name):
+        # return actual filter name (case preserved) if present
+        for f in filter_columns:
+            if f.lower() == name.lower():
+                try:
+                    return getattr(md, f)
+                except AttributeError:
+                    return md.data(f)
+        return None
+
+    # --- Gaia-like (Gbp, Grp, G) ---
+    if has("gbp") and has("grp") and has("g"):
+        hr_color = get("gbp") - get("grp")
+        hr_mag   = get("g")
         hr_xlabel = "Gbp - Grp"
         hr_ylabel = "G"
         color_index = hr_color
-    elif "V" in filter_columns and "B" in filter_columns and "R" in filter_columns:
-        hr_color = md.B - md.R
-        hr_mag = md.V
-        hr_xlabel = "B - R"
-        hr_ylabel = "V"
-        color_index = hr_color
-    else:
-        if len(filter_columns) >= 2:
-            # Use the first two filters
-            f1 = filter_columns[0]
-            f2 = filter_columns[1]
 
-            # Retrieve the data using getattr or data method
-            try:
-                col1 = getattr(md, f1)
-                col2 = getattr(md, f2)
-            except AttributeError:
-                col1 = md.data(f1)
-                col2 = md.data(f2)
-
-            hr_color = col1 - col2
-            hr_mag = col1
-            hr_xlabel = f"{f1} - {f2}"
-            hr_ylabel = f1
+    # --- Johnson-like broadbands ---
+    elif has("v"):
+        # B-R if present
+        if has("b") and has("r"):
+            hr_color = get("b") - get("r")
+            hr_mag   = get("v")
+            hr_xlabel = "B - R"
+            hr_ylabel = "V"
+            color_index = hr_color
+        # B-V if only B present
+        elif has("b"):
+            hr_color = get("b") - get("v")
+            hr_mag   = get("v")
+            hr_xlabel = "B - V"
+            hr_ylabel = "V"
+            color_index = hr_color
+        # V-R if only R present
+        elif has("r"):
+            hr_color = get("v") - get("r")
+            hr_mag   = get("v")
+            hr_xlabel = "V - R"
+            hr_ylabel = "V"
             color_index = hr_color
         else:
-            # Default values if not enough filters
-            print("Warning: Not enough filter columns to construct color index")
-            hr_color = np.zeros_like(md.Teff)
-            hr_mag = np.zeros_like(md.Teff)
-            hr_xlabel = "Color Index"
-            hr_ylabel = "Magnitude"
-            color_index = hr_color
+            # no recognized pair with V
+            hr_color = None
+
+    # --- Sloan-like g-r if no V branch matched ---
+    elif has("g") and has("r"):
+        hr_color = get("g") - get("r")
+        hr_mag   = get("g")
+        hr_xlabel = "g - r"
+        hr_ylabel = "g"
+        color_index = hr_color
+
+    else:
+        hr_color = None
+
+    # If we matched a branch with a valid hr_color
+    if hr_color is not None:
+        return hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index
+
+    # --- FALLBACK: use first and last filter if nothing above matched ---
+    if len(filter_columns) >= 2:
+        f1 = filter_columns[0]
+        f2 = filter_columns[-1]
+        try:
+            col1 = getattr(md, f1)
+        except AttributeError:
+            col1 = md.data(f1)
+        try:
+            col2 = getattr(md, f2)
+        except AttributeError:
+            col2 = md.data(f2)
+
+        hr_color = col1 - col2
+        hr_mag   = col1
+        hr_xlabel = f"{f1} - {f2}"
+        hr_ylabel = f1
+        color_index = hr_color
+
+    else:
+        # Not enough filters, fallback to flat arrays
+        print("Warning: Not enough filter columns to construct color index")
+        hr_color = np.zeros_like(md.Teff)
+        hr_mag   = np.zeros_like(md.Teff)
+        hr_xlabel = "Color Index"
+        hr_ylabel = "Magnitude"
+        color_index = hr_color
 
     return hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index
+
 
 
 def create_phase_plots(history_file="../LOGS/history.data"):

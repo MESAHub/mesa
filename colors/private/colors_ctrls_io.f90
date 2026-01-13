@@ -39,6 +39,7 @@ module colors_ctrls_io
 
    real(dp) :: distance
    logical :: make_csv
+   logical :: sed_per_model
    logical :: use_colors
 
    namelist /colors/ &
@@ -47,6 +48,7 @@ module colors_ctrls_io
       stellar_atm, &
       distance, &
       make_csv, &
+      sed_per_model, &
       mag_system, &
       colors_results_directory, &
       use_colors, &
@@ -156,6 +158,7 @@ contains
       rq%stellar_atm = stellar_atm
       rq%distance = distance
       rq%make_csv = make_csv
+      rq%sed_per_model = sed_per_model
       rq%colors_results_directory = colors_results_directory
       rq%use_colors = use_colors
       rq%mag_system = mag_system
@@ -192,6 +195,7 @@ contains
       stellar_atm = rq%stellar_atm
       distance = rq%distance
       make_csv = rq%make_csv
+      sed_per_model = rq%sed_per_model
       colors_results_directory = rq%colors_results_directory
       use_colors = rq%use_colors
       mag_system = rq%mag_system
