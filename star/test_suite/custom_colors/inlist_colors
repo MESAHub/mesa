@@ -74,6 +74,10 @@
       make_csv = .true.            ! Write detailed SED files showing filter convolution  -- This is also needed for plotting the SED.
                                    ! Creates files like: SED/B_SED.csv, SED/VEGA_B_SED.csv
 
+      !enable to add a model number suffix to SED files. 
+      sed_per_model = .true.
+
+
       !zero point. Select between: Vega, AB, ST
       mag_system = 'Vega'
 

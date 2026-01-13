@@ -47,6 +47,7 @@ module colors_def
       real(dp) :: metallicity
       real(dp) :: distance
       logical :: make_csv
+      logical :: sed_per_model
       logical :: use_colors
       integer :: handle
       logical :: in_use

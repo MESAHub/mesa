@@ -52,14 +52,15 @@ contains
       how_many_colors_history_columns = num_cols
    end function how_many_colors_history_columns
 
-   subroutine data_for_colors_history_columns( &
-      t_eff, log_g, R, metallicity, &
-      colors_handle, n, names, vals, ierr)
+subroutine data_for_colors_history_columns( &
+   t_eff, log_g, R, metallicity, model_number, &
+   colors_handle, n, names, vals, ierr)
       real(dp), intent(in) :: t_eff, log_g, R, metallicity
       integer, intent(in) :: colors_handle, n
       character(len=80) :: names(n)
       real(dp) :: vals(n)
       integer, intent(out) :: ierr
+      integer, intent(in) :: model_number
 
       type(Colors_General_Info), pointer :: cs  ! colors_settings
       integer :: i, filter_offset
@@ -126,14 +127,15 @@ contains
                   zero_point = -1.0_dp
                end select
 
-               ! Calculate synthetic magnitude using cached filter data and precomputed zero-point
                vals(i + filter_offset) = calculate_synthetic(t_eff, log_g, metallicity, ierr, &
                                                              wavelengths, fluxes, &
                                                              cs%filters(i)%wavelengths, &
                                                              cs%filters(i)%transmission, &
                                                              zero_point, &
                                                              color_filter_names(i), &
-                                                             make_sed, cs%colors_results_directory)
+                                                             make_sed, cs%sed_per_model, &
+                                                             cs%colors_results_directory, model_number)
+               
                if (ierr /= 0) vals(i + filter_offset) = -1.0_dp
             else
                vals(i + filter_offset) = -1.0_dp

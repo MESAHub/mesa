@@ -9,7 +9,7 @@ This test suite was tested against SDK 25.12.1
 This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
 
 What is MESA colors?
-====================
+=======================
 
 MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
 
@@ -20,7 +20,7 @@ MESA colors is a post-processing and runtime module that allows users to generat
 This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
 
 How does the MESA colors module work?
-=====================================
+========================================
 
 The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
 
@@ -31,7 +31,7 @@ The module operates by coupling the stellar structure model with pre-computed gr
 3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
 
 The Test Suite
-==============
+=========================
 
 This test suite evolves a complete stellar model (from the pre–main sequence onward) while the ``colors`` module runs *continuously* in the background.
 At every timestep, MESA computes synthetic photometry by interpolating a stellar atmosphere grid and convolving the resulting SED with the filters you specify in the inlist.
@@ -111,7 +111,7 @@ This test problem is designed to demonstrate:
 
 
 Inlist Options & Parameters
-===========================
+==============================
 
 The colors module is controlled via the ``&colors`` namelist. Below is a detailed guide to the key parameters.
 
@@ -133,7 +133,6 @@ This points to the directory containing the filter transmission curves you wish 
 
 stellar_atm
 -----------
-
 **Default:** `'/data/colors_data/stellar_models/Kurucz2003all/'`
 
 Specifies the path to the directory containing the grid of stellar atmosphere models. This directory must contain:
@@ -153,7 +152,6 @@ The module queries this grid using the star's current parameters. If the star ev
 
 distance
 --------
-
 **Default:** `3.0857d19` (10 parsecs in cm)
 
 The distance to the star in centimeters.
@@ -170,7 +168,6 @@ The distance to the star in centimeters.
 
 make_csv
 --------
-
 **Default:** `.false.`
 
 If set to ``.true.``, the module exports the full calculated SED at every profile interval.
@@ -186,9 +183,28 @@ If set to ``.true.``, the module exports the full calculated SED at every profil
       make_csv = .true.
 
 
+sed_per_model
+--------
+
+**Default:** `.false.`
+
+If set to ``.true.`` AND ``make_csv`` set to ``.true.``, the module exports the full calculated SED at every profile interval WITH the model number suffix.
+
+!!!WARNING: Enabling this feature will cause the colors_results_directory to drastically increase in size. DO NOT enable this without first ensureing you have appropriate storage. !!!
+
+* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
+* **Format:** CSV files containing Wavelength vs. Flux with model number suffic on file name. 
+* **Use Case:** useful for seeing SED evolution.
+
+**Example:**
+
+.. code-block:: fortran
+
+      sed_per_model = .true.      
+
+
 colors_results_directory
 ------------------------
-
 **Default:** `'SED'`
 
 The folder where csv files (if ``make_csv = .true.``) and other debug outputs are saved.
@@ -202,7 +218,6 @@ The folder where csv files (if ``make_csv = .true.``) and other debug outputs ar
 
 mag_system
 ----------
-
 **Default:** `'Vega'`
 
 Defines the zero-point system for magnitude calculations. Options are:
@@ -220,7 +235,6 @@ Defines the zero-point system for magnitude calculations. Options are:
 
 vega_sed
 --------
-
 **Default:** `'/data/colors_data/stellar_models/vega_flam.csv'`
 
 Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
@@ -233,7 +247,7 @@ Required only if ``mag_system = 'Vega'``. This points to the reference SED file 
 
 
 Data Preparation (SED_Tools)
-============================
+===============================
 
 The ``colors`` module requires pre-processed stellar atmospheres and filter
 profiles organized in a very specific directory structure. To automate this
@@ -286,7 +300,7 @@ This server provides a live view of:
 
 
 Defaults Reference
-==================
+=====================
 
 Below are the default values for the colors module parameters as defined in ``colors.defaults``. These are used if you do not override them in your inlist.
 
@@ -301,7 +315,6 @@ Below are the default values for the colors module parameters as defined in ``co
       colors_results_directory = 'SED'
       mag_system = 'Vega'
       vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
-
 Visual Summary of Data Flow
 ===========================
 
@@ -333,8 +346,12 @@ Visual Summary of Data Flow
 
 
 
+
+================================================
+================================================
+
 Python Helper Scripts
-=====================
+========================
 
 A collection of Python scripts is provided in the ``python_helpers/`` directory to assist with real-time monitoring, visualization, and analysis of the colors module output.
 
@@ -346,7 +363,6 @@ Dependencies:
 
 HISTORY_check.py
 ----------------
-
 **Usage:** ``python python_helpers/HISTORY_check.py``
 
 A real-time dashboard that monitors your ``history.data`` file as MESA runs. It automatically refreshes when new data is written.
@@ -373,7 +389,6 @@ Monitors the ``colors_results_directory`` (default: ``SED/``) for new CSV output
 
 interactive_cmd_3d.py
 ---------------------
-
 **Usage:** ``python python_helpers/interactive_cmd_3d.py``
 
 Generates an interactive 3D Color-Magnitude Diagram.
@@ -384,7 +399,6 @@ Generates an interactive 3D Color-Magnitude Diagram.
 
 Movie Makers
 ------------
-
 Scripts to generate MP4 animations of your run. Requires ``ffmpeg``.
 
 * **make_history_movie.py**: Creates ``history.mp4``, an animated version of the ``HISTORY_check.py`` dashboard showing the evolution over time.

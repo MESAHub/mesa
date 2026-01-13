@@ -19,6 +19,8 @@
    ! ~~~~~~~~~~~~
    ! ``make_csv``
    ! ~~~~~~~~~~~~
+   ! ``sed_per_model``
+   ! ~~~~~~~~~~~~   
    ! ``colors_results_directory``
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! ``mag_system``
@@ -35,6 +37,7 @@
       stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
       distance = 3.0857d19
       make_csv = .false.
+      sed_per_model = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
       vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'

@@ -31,17 +31,24 @@ module synthetic
    ! Export zero-point computation functions for precomputation at initialization
    public :: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
 
+   ! ============================================================
+   ! INTERNAL SWITCH: Set to .true. to write unique SED files for 
+   ! each history row. Each SED file will have _NNNNNN suffix 
+   ! matching model_number, allowing linking to history file rows.
+   ! ============================================================
+character(len=256), save :: first_filter_name = ''
+
 contains
 
    !****************************
    ! Calculate Synthetic Photometry Using SED and Filter
    ! Uses precomputed zero-point from filter data
    !****************************
-   real(dp) function calculate_synthetic(temperature, gravity, metallicity, ierr, &
-                                         wavelengths, fluxes, &
-                                         filter_wavelengths, filter_trans, &
-                                         zero_point_flux, &
-                                         filter_name, make_sed, colors_results_directory)
+real(dp) function calculate_synthetic(temperature, gravity, metallicity, ierr, &
+                                      wavelengths, fluxes, &
+                                      filter_wavelengths, filter_trans, &
+                                      zero_point_flux, &
+                                      filter_name, make_sed, sed_per_model, colors_results_directory, model_number)
       ! Input arguments
       real(dp), intent(in) :: temperature, gravity, metallicity
       character(len=*), intent(in) :: filter_name, colors_results_directory
@@ -50,11 +57,13 @@ contains
       real(dp), dimension(:), intent(in) :: wavelengths, fluxes
       real(dp), dimension(:), intent(in) :: filter_wavelengths, filter_trans
       real(dp), intent(in) :: zero_point_flux  ! precomputed at initialization
-      logical, intent(in) :: make_sed
+      logical, intent(in) :: make_sed, sed_per_model
+      integer, intent(in) :: model_number
 
       ! Local variables
       real(dp), dimension(:), allocatable :: convolved_flux, filter_on_sed_grid
       character(len=256) :: csv_file
+      character(len=20) :: model_str
       character(len=1000) :: line
       real(dp) :: synthetic_flux
       integer :: max_size, i
@@ -75,7 +84,16 @@ contains
       ! Write SED to CSV if requested
       if (make_sed) then
          if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
-         csv_file = trim(colors_results_directory)//'/'//trim(remove_dat(filter_name))//'_SED.csv'
+         
+         ! Track model number internally when write_sed_per_model is enabled
+         if (sed_per_model) then
+            
+               write(model_str, '(I8.8)') model_number
+               csv_file = trim(colors_results_directory)//'/'//trim(remove_dat(filter_name))//'_SED_'//trim(model_str)//'.csv'
+
+         else
+            csv_file = trim(colors_results_directory)//'/'//trim(remove_dat(filter_name))//'_SED.csv'
+         end if
 
          max_size = max(size(wavelengths), size(filter_wavelengths))
 
