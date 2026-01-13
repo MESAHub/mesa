@@ -8,6 +8,7 @@
 #
 ####################################################
 import glob
+
 import matplotlib.pyplot as plt
 import mesa_reader as mr
 import numpy as np

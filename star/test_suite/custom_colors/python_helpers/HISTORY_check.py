@@ -1,24 +1,19 @@
 #!/usr/bin/env python3
 import glob
 import os
+
+# ---------------------------
+# Insert after imports (HISTORY_check.py)
+# ---------------------------
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import mesa_reader as mr
 import numpy as np
 from matplotlib.animation import FuncAnimation
 
 # Import functions from static version for consistency
-from static_HISTORY_check import (
-    # get_mesa_phase_info,
-    read_header_columns,
-    setup_hr_diagram_params,
-    MesaView,
-)
-
-
-# ---------------------------
-# Insert after imports (HISTORY_check.py)
-# ---------------------------
-import matplotlib as mpl
+from static_HISTORY_check import MesaView  # get_mesa_phase_info,
+from static_HISTORY_check import read_header_columns, setup_hr_diagram_params
 
 
 def age_colormap_colors(ages, cmap_name="inferno", recent_fraction=0.25, stretch=5.0):
@@ -388,9 +383,7 @@ class HistoryChecker:
         else:
             self.axes[1, 0].plot(self.Star_Age, self.color_index, "kx")
 
-        # Bottom-right plot: Age vs. All Filter Magnitudes with filter-specific colors
         for i, filt in enumerate(self.filter_columns):
-            # Retrieve filter magnitude data
             try:
                 col_data = getattr(self.md, filt)
             except AttributeError:
@@ -400,12 +393,26 @@ class HistoryChecker:
                     print(f"Warning: Could not retrieve data for filter {filt}")
                     continue
 
-            # Use filter-specific color
+            col_data = np.asarray(col_data, dtype=float)
+            age = np.asarray(self.Star_Age, dtype=float)
+
+            # --- physical mask ---
+            mask = (
+                np.isfinite(col_data)
+                & np.isfinite(age)
+                & (col_data < 90.0)  # magnitude sanity bound
+                & (col_data > -50.0)  # avoid garbage negatives
+            )
+
+            if not np.any(mask):
+                # Entire column is non-physical → skip it
+                continue
+
             color = self.filter_colors[i] if i < len(self.filter_colors) else "black"
 
             self.axes[1, 1].plot(
-                self.Star_Age,
-                col_data,
+                age[mask],
+                col_data[mask],
                 marker="o",
                 linestyle="-",
                 label=filt,

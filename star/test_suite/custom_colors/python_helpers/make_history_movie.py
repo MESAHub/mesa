@@ -2,11 +2,10 @@
 # Make a movie that visually matches the live HISTORY_check viewer.
 # One frame per row; each frame shows the full chain up to that row.
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FFMpegWriter
+import numpy as np
 from HISTORY_check import HistoryChecker  # uses static_HISTORY_check under the hood
-
+from matplotlib.animation import FFMpegWriter
 
 do_tqdm = True
 try:

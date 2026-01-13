@@ -4,6 +4,8 @@
 custom_colors
 *************
 
+This test suite was tested against SDK 25.12.1
+
 This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
 
 What is MESA colors?
@@ -115,7 +117,7 @@ The colors module is controlled via the ``&colors`` namelist. Below is a detaile
 
 instrument
 ----------
-**Default:** `'/colors/data/filters/Generic/Johnson'`
+**Default:** `'/data/colors_data/filters/Generic/Johnson'`
 
 This points to the directory containing the filter transmission curves you wish to use. The path must be structured as ``facility/instrument``.
 
@@ -126,12 +128,13 @@ This points to the directory containing the filter transmission curves you wish 
 
 .. code-block:: fortran
 
-   instrument = '/colors/data/filters/GAIA/GAIA'
+   instrument = '/data/colors_data/filters/GAIA/GAIA'
 
 
 stellar_atm
 -----------
-**Default:** `'/colors/data/stellar_models/Kurucz2003all/'`
+
+**Default:** `'/data/colors_data/stellar_models/Kurucz2003all/'`
 
 Specifies the path to the directory containing the grid of stellar atmosphere models. This directory must contain:
 
@@ -145,11 +148,12 @@ The module queries this grid using the star's current parameters. If the star ev
 
 .. code-block:: fortran
 
-   stellar_atm = '/colors/data/stellar_models/sg-SPHINX/'
+   stellar_atm = '/data/colors_data/stellar_models/sg-SPHINX/'
 
 
 distance
 --------
+
 **Default:** `3.0857d19` (10 parsecs in cm)
 
 The distance to the star in centimeters.
@@ -217,7 +221,7 @@ Defines the zero-point system for magnitude calculations. Options are:
 vega_sed
 --------
 
-**Default:** `'/colors/data/stellar_models/vega_flam.csv'`
+**Default:** `'/data/colors_data/stellar_models/vega_flam.csv'`
 
 Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
 
@@ -289,14 +293,14 @@ Below are the default values for the colors module parameters as defined in ``co
 .. code-block:: fortran
 
       use_colors = .false.
-      instrument = '/colors/data/filters/Generic/Johnson'
-      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
-      stellar_atm = '/colors/data/stellar_models/Kurucz2003all/'
+      instrument = '/data/colors_data/filters/Generic/Johnson'
+      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
+      stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
       make_csv = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
-      vega_sed = '/colors/data/stellar_models/vega_flam.csv'
+      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
 
 Visual Summary of Data Flow
 ===========================
@@ -328,6 +332,7 @@ Visual Summary of Data Flow
    +----------------------+
 
 
+
 Python Helper Scripts
 =====================
 
@@ -356,7 +361,6 @@ A real-time dashboard that monitors your ``history.data`` file as MESA runs. It 
 
 SED_check.py
 ------------
-
 **Usage:** ``python python_helpers/SED_check.py``
 
 Monitors the ``colors_results_directory`` (default: ``SED/``) for new CSV output.

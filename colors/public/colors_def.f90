@@ -26,6 +26,17 @@ module colors_def
    ! Make everything in this module public by default
    public
 
+   ! Type to hold individual filter data
+   type :: filter_data
+      character(len=100) :: name
+      real(dp), allocatable :: wavelengths(:)
+      real(dp), allocatable :: transmission(:)
+      ! Precomputed zero-point fluxes (computed once at initialization)
+      real(dp) :: vega_zero_point = -1.0_dp
+      real(dp) :: ab_zero_point = -1.0_dp
+      real(dp) :: st_zero_point = -1.0_dp
+   end type filter_data
+
    ! Colors Module control parameters
    type :: Colors_General_Info
       character(len=256) :: instrument
@@ -37,13 +48,28 @@ module colors_def
       real(dp) :: distance
       logical :: make_csv
       logical :: use_colors
-      ! bookkeeping
       integer :: handle
       logical :: in_use
+
+      ! Cached lookup table data
+      logical :: lookup_loaded = .false.
+      character(len=100), allocatable :: lu_file_names(:)
+      real(dp), allocatable :: lu_logg(:)
+      real(dp), allocatable :: lu_meta(:)
+      real(dp), allocatable :: lu_teff(:)
+
+      ! Cached Vega SED
+      logical :: vega_loaded = .false.
+      real(dp), allocatable :: vega_wavelengths(:)
+      real(dp), allocatable :: vega_fluxes(:)
+
+      ! Cached filter data (includes precomputed zero-points)
+      logical :: filters_loaded = .false.
+      type(filter_data), allocatable :: filters(:)
+
    end type Colors_General_Info
 
-   ! TODO: Use handles/caching in the future once we have more colors tables
-   ! For now, we will just point to a single file
+   ! Global filter name list (shared across handles)
    integer :: num_color_filters
    character(len=100), allocatable :: color_filter_names(:)
 
@@ -75,6 +101,9 @@ contains
       do i = 1, max_colors_handles
          colors_handles(i)%handle = i
          colors_handles(i)%in_use = .false.
+         colors_handles(i)%lookup_loaded = .false.
+         colors_handles(i)%vega_loaded = .false.
+         colors_handles(i)%filters_loaded = .false.
       end do
 
       colors_temp_cache_dir = trim(mesa_temp_caches_dir)//'/colors_cache'
@@ -108,9 +137,49 @@ contains
 
    subroutine do_free_colors(handle)
       integer, intent(in) :: handle
-      if (handle >= 1 .and. handle <= max_colors_handles) &
+      if (handle >= 1 .and. handle <= max_colors_handles) then
          colors_handles(handle)%in_use = .false.
+         call free_colors_cache(handle)
+      end if
    end subroutine do_free_colors
+
+   subroutine free_colors_cache(handle)
+      integer, intent(in) :: handle
+      integer :: i
+
+      if (handle < 1 .or. handle > max_colors_handles) return
+
+      ! Free lookup table arrays
+      if (allocated(colors_handles(handle)%lu_file_names)) &
+         deallocate(colors_handles(handle)%lu_file_names)
+      if (allocated(colors_handles(handle)%lu_logg)) &
+         deallocate(colors_handles(handle)%lu_logg)
+      if (allocated(colors_handles(handle)%lu_meta)) &
+         deallocate(colors_handles(handle)%lu_meta)
+      if (allocated(colors_handles(handle)%lu_teff)) &
+         deallocate(colors_handles(handle)%lu_teff)
+      colors_handles(handle)%lookup_loaded = .false.
+
+      ! Free Vega SED arrays
+      if (allocated(colors_handles(handle)%vega_wavelengths)) &
+         deallocate(colors_handles(handle)%vega_wavelengths)
+      if (allocated(colors_handles(handle)%vega_fluxes)) &
+         deallocate(colors_handles(handle)%vega_fluxes)
+      colors_handles(handle)%vega_loaded = .false.
+
+      ! Free filter data arrays
+      if (allocated(colors_handles(handle)%filters)) then
+         do i = 1, size(colors_handles(handle)%filters)
+            if (allocated(colors_handles(handle)%filters(i)%wavelengths)) &
+               deallocate(colors_handles(handle)%filters(i)%wavelengths)
+            if (allocated(colors_handles(handle)%filters(i)%transmission)) &
+               deallocate(colors_handles(handle)%filters(i)%transmission)
+         end do
+         deallocate(colors_handles(handle)%filters)
+      end if
+      colors_handles(handle)%filters_loaded = .false.
+
+   end subroutine free_colors_cache
 
    subroutine get_colors_ptr(handle, rq, ierr)
       integer, intent(in) :: handle
@@ -125,11 +194,15 @@ contains
    end subroutine get_colors_ptr
 
    subroutine do_free_colors_tables
+      integer :: i
 
-      ! TODO: implement me if needed, see kap
+      ! Free the filter names array
+      if (allocated(color_filter_names)) deallocate(color_filter_names)
 
-      ! for now, free the strings tables
-      if (allocated(color_filter_names)) deallocate (color_filter_names)
+      ! Free cached data for all handles
+      do i = 1, max_colors_handles
+         call free_colors_cache(i)
+      end do
 
    end subroutine do_free_colors_tables
 

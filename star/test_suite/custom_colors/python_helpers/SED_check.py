@@ -1,5 +1,6 @@
-import os
 import csv
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FFMpegWriter, FuncAnimation
@@ -52,6 +53,7 @@ class SEDChecker:
         # keep track of file changes for monitoring
         self.file_timestamps = {}
         self.full_sed_plotted = False
+        self.vega_sed_plotted = False
 
         # set up the matplotlib figure
         self.fig, self.ax = plt.subplots(figsize=(12, 6))
@@ -413,6 +415,7 @@ class SEDChecker:
         # clear the plot and reset flags
         self.ax.clear()
         self.full_sed_plotted = False
+        self.vega_sed_plotted = False
 
         # find all the CSV files
         output_files = self.find_output_files()
@@ -452,12 +455,41 @@ class SEDChecker:
 
         # process each CSV file
         for file_path in output_files:
+            # Handle VEGA files - plot the Vega SED once
             if (
-                "VEGA" not in file_path
+                "VEGA" in file_path
                 and "bright" not in file_path
                 and "faint" not in file_path
             ):
-                linestyle = "--" if "VEGA" in file_path else "-"
+                if not self.vega_sed_plotted:
+                    try:
+                        data_dict = self.read_csv_file(
+                            os.path.join(self.directory, file_path)
+                        )
+                        if data_dict:
+                            vega_wavelengths = self.ensure_numeric(
+                                data_dict.get("wavelengths", [])
+                            )
+                            vega_flux = self.ensure_numeric(data_dict.get("fluxes", []))
+
+                            if len(vega_wavelengths) > 0 and len(vega_flux) > 0:
+                                line = self.ax.plot(
+                                    vega_wavelengths,
+                                    vega_flux,
+                                    color="purple",
+                                    linewidth=1.5,
+                                    linestyle="--",
+                                    alpha=0.7,
+                                )[0]
+                                legend_handles.append(line)
+                                legend_labels_list.append("Vega SED")
+                                self.vega_sed_plotted = True
+                    except Exception:
+                        pass
+                continue
+
+            if "bright" not in file_path and "faint" not in file_path:
+                linestyle = "-"
 
                 try:
                     data_dict = self.read_csv_file(

@@ -27,3 +27,4 @@ star/dev_cases_star_to_RSP2 export-ignore
 star/dev_cases_test_RSP2 export-ignore
 star/dev_cases_test_TDC export-ignore
 star/rsp2_utils export-ignore
+data/colors_data/colors_data.txz filter=lfs diff=lfs merge=lfs -text
