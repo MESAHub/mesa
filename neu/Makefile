@@ -9,7 +9,7 @@ SRCS := public/neu_def.f90 \
 SRCS_CHECK := test/src/test_neu.f90 test/src/neu_support.f90
 INTERNAL_DEPENDS_ON := const utils math
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 
