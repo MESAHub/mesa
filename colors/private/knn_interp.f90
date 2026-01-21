@@ -24,6 +24,7 @@
 module knn_interp
    use const_def, only: dp
    use colors_utils, only: dilute_flux, load_sed
+   use utils_lib, only: mesa_error
    implicit none
 
    private
@@ -80,8 +81,8 @@ contains
          distances(i) = sqrt((lu_teff(closest_indices(i)) - teff)**2 + &
                              (lu_logg(closest_indices(i)) - log_g)**2 + &
                              (lu_meta(closest_indices(i)) - metallicity)**2)
-         if (distances(i) == 0.0) distances(i) = 1.0d-10  ! Prevent division by zero
-         weights(i) = 1.0/distances(i)
+         if (distances(i) == 0.0_dp) distances(i) = 1.0d-10  ! Prevent division by zero
+         weights(i) = 1.0_dp/distances(i)
       end do
 
       ! Normalize weights
@@ -91,7 +92,7 @@ contains
       ! Allocate output arrays
       allocate (wavelengths(n_points), fluxes(n_points))
       wavelengths = common_wavelengths
-      fluxes = 0.0
+      fluxes = 0.0_dp
 
       ! Perform weighted combination of the model fluxes (still at the stellar surface)
       do i = 1, 4
@@ -139,15 +140,15 @@ contains
       ! Allocate and scale lookup table values
       allocate (scaled_lu_teff(n), scaled_lu_logg(n), scaled_lu_meta(n))
 
-      if (teff_max - teff_min > 0.00) then
+      if (teff_max - teff_min > 0.0_dp) then
          scaled_lu_teff = (lu_teff - teff_min)/(teff_max - teff_min)
       end if
 
-      if (logg_max - logg_min > 0.00) then
+      if (logg_max - logg_min > 0.0_dp) then
          scaled_lu_logg = (lu_logg - logg_min)/(logg_max - logg_min)
       end if
 
-      if (meta_max - meta_min > 0.00) then
+      if (meta_max - meta_min > 0.0_dp) then
          scaled_lu_meta = (lu_meta - meta_min)/(meta_max - meta_min)
       end if
 
@@ -156,37 +157,34 @@ contains
       norm_logg = (log_g - logg_min)/(logg_max - logg_min)
       norm_meta = (metallicity - meta_min)/(meta_max - meta_min)
 
+      ! Detect dummy axes once (outside the loop)
+      use_teff_dim = .not. (all(lu_teff == 0.0_dp) .or. all(lu_teff == 999.0_dp) .or. all(lu_teff == -999.0_dp))
+      use_logg_dim = .not. (all(lu_logg == 0.0_dp) .or. all(lu_logg == 999.0_dp) .or. all(lu_logg == -999.0_dp))
+      use_meta_dim = .not. (all(lu_meta == 0.0_dp) .or. all(lu_meta == 999.0_dp) .or. all(lu_meta == -999.0_dp))
+
       ! Find closest models
       do i = 1, n
-         teff_dist = 0.0
-         logg_dist = 0.0
-         meta_dist = 0.0
+         teff_dist = 0.0_dp
+         logg_dist = 0.0_dp
+         meta_dist = 0.0_dp
 
-         if (teff_max - teff_min > 0.00) then
+         if (teff_max - teff_min > 0.0_dp) then
             teff_dist = scaled_lu_teff(i) - norm_teff
          end if
 
-         if (logg_max - logg_min > 0.00) then
+         if (logg_max - logg_min > 0.0_dp) then
             logg_dist = scaled_lu_logg(i) - norm_logg
          end if
 
-         if (meta_max - meta_min > 0.00) then
+         if (meta_max - meta_min > 0.0_dp) then
             meta_dist = scaled_lu_meta(i) - norm_meta
          end if
 
-         ! Detect dummy axes once
-
-         use_teff_dim = .not. (all(lu_teff == 0.0_dp) .or. all(lu_teff == 999.0_dp) .or. all(lu_teff == -999.0_dp))
-         use_logg_dim = .not. (all(lu_logg == 0.0_dp) .or. all(lu_logg == 999.0_dp) .or. all(lu_logg == -999.0_dp))
-         use_meta_dim = .not. (all(lu_meta == 0.0_dp) .or. all(lu_meta == 999.0_dp) .or. all(lu_meta == -999.0_dp))
-
-         ! Inside the loop:
+         ! Compute distance using only valid dimensions
          distance = 0.0_dp
          if (use_teff_dim) distance = distance + teff_dist**2
          if (use_logg_dim) distance = distance + logg_dist**2
          if (use_meta_dim) distance = distance + meta_dist**2
-
-         distance = teff_dist**2 + logg_dist**2 + meta_dist**2
 
          do j = 1, 4
             if (distance < min_distances(j)) then
@@ -262,17 +260,17 @@ contains
       ! Validate input sizes
       if (size(x_in) < 2 .or. size(y_in) < 2) then
          print *, "Error: x_in or y_in arrays have fewer than 2 points."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       if (size(x_in) /= size(y_in)) then
          print *, "Error: x_in and y_in arrays have different sizes."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       if (size(x_out) <= 0) then
          print *, "Error: x_out array is empty."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       do i = 1, size(x_out)
