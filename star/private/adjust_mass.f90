@@ -20,7 +20,7 @@
       module adjust_mass
 
       use star_private_def
-      use const_def, only: dp, i8, ln10, msun, msun, secyer, one_third, four_thirds_pi
+      use const_def, only: dp, i8, ln10, msun, secyer, one_third, four_thirds_pi
       use utils_lib
 
       implicit none
