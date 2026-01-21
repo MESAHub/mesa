@@ -24,6 +24,7 @@
 module linear_interp
    use const_def, only: dp
    use colors_utils, only: dilute_flux
+   use utils_lib, only: mesa_error
    implicit none
 
    private
@@ -68,7 +69,8 @@ contains
       INQUIRE (file=bin_filename, EXIST=file_exists)
 
       if (.not. file_exists) then
-         stop 'Missing required binary file for interpolation'
+         print *, 'Missing required binary file for interpolation'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Load the data from binary file
@@ -76,7 +78,8 @@ contains
                             wavelengths, precomputed_flux_cube, status)
 
       if (status /= 0) then
-         stop 'Binary data loading error'
+         print *, 'Binary data loading error'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       n_teff = size(teff_grid)

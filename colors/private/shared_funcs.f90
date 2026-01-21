@@ -1,6 +1,7 @@
 
 MODULE shared_funcs
    USE const_def, ONLY: dp, strlen
+   USE utils_lib, ONLY: mesa_error
    IMPLICIT NONE
 
    PRIVATE
@@ -20,7 +21,7 @@ CONTAINS
       ! Check that the output array has the same size as the input
       IF (SIZE(calibrated_flux) /= SIZE(surface_flux)) THEN
          PRINT *, "Error in dilute_flux: Output array must have the same size as input array."
-         STOP 1
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Apply the dilution factor (R/d)^2 to each element
@@ -40,25 +41,25 @@ CONTAINS
       REAL(DP), INTENT(OUT) :: result
 
       INTEGER :: i, n
-      REAL :: sum
+      REAL(DP) :: sum
 
       n = SIZE(x)
-      sum = 0.0
+      sum = 0.0_dp
 
       ! Validate input sizes
       IF (SIZE(x) /= SIZE(y)) THEN
          PRINT *, "Error: x and y arrays must have the same size."
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       IF (SIZE(x) < 2) THEN
          PRINT *, "Error: x and y arrays must have at least 2 elements."
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Perform trapezoidal integration
       DO i = 1, n - 1
-         sum = sum + 0.5*(x(i + 1) - x(i))*(y(i + 1) + y(i))
+         sum = sum + 0.5_dp*(x(i + 1) - x(i))*(y(i + 1) + y(i))
       END DO
 
       result = sum
@@ -77,15 +78,15 @@ CONTAINS
       ! Validate input sizes
       IF (SIZE(x) /= SIZE(y)) THEN
          PRINT *, "Error: x and y arrays must have the same size."
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       IF (SIZE(x) < 2) THEN
          PRINT *, "Error: x and y arrays must have at least 2 elements."
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
-      ! Perform adaptive Simpson’s rule
+      ! Perform adaptive Simpson's rule
       DO i = 1, n - 2, 2
          h1 = x(i + 1) - x(i)       ! Step size for first interval
          h2 = x(i + 2) - x(i + 1)     ! Step size for second interval
@@ -120,12 +121,12 @@ CONTAINS
       ! Validate input sizes
       IF (SIZE(x) /= SIZE(y)) THEN
          PRINT *, "Error: x and y arrays must have the same size."
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       IF (n < 2) THEN
          PRINT *, "Error: x and y arrays must have at least 2 elements."
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ALLOCATE (R(m))
@@ -174,14 +175,14 @@ CONTAINS
       OPEN (unit, FILE=TRIM(filepath), STATUS='OLD', ACTION='READ', IOSTAT=status)
       IF (status /= 0) THEN
          PRINT *, "Error: Could not open Vega SED file ", TRIM(filepath)
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Skip header line
       READ (unit, '(A)', IOSTAT=status) line
       IF (status /= 0) THEN
          PRINT *, "Error: Could not read header from Vega SED file ", TRIM(filepath)
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Count the number of data lines
@@ -219,21 +220,21 @@ CONTAINS
 
       CHARACTER(LEN=512) :: line
       INTEGER :: unit, n_rows, status, i
-      REAL :: temp_wavelength, temp_trans
+      REAL(dp) :: temp_wavelength, temp_trans
 
       ! Open the file
       unit = 20
       OPEN (unit, FILE=TRIM(directory), STATUS='OLD', ACTION='READ', IOSTAT=status)
       IF (status /= 0) THEN
          PRINT *, "Error: Could not open file ", TRIM(directory)
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Skip header line
       READ (unit, '(A)', IOSTAT=status) line
       IF (status /= 0) THEN
          PRINT *, "Error: Could not read the file", TRIM(directory)
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Count rows in the file
@@ -254,7 +255,7 @@ CONTAINS
          READ (unit, '(A)', IOSTAT=status) line
          IF (status /= 0) THEN
             PRINT *, "Error: Could not rewind file", TRIM(directory)
-            STOP
+            CALL mesa_error(__FILE__, __LINE__)
          END IF
          IF (line(1:1) /= "#") EXIT
       END DO
@@ -293,14 +294,14 @@ CONTAINS
       OPEN (unit, FILE=lookup_file, STATUS='old', ACTION='read', IOSTAT=status)
       IF (status /= 0) THEN
          PRINT *, "Error: Could not open file", lookup_file
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Read header line
       READ (unit, '(A)', IOSTAT=status) line
       IF (status /= 0) THEN
          PRINT *, "Error: Could not read header line"
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       CALL splitline(line, delimiter, headers)
@@ -454,7 +455,7 @@ CONTAINS
       OPEN (unit, FILE=TRIM(directory), STATUS='OLD', ACTION='READ', IOSTAT=status)
       IF (status /= 0) THEN
          PRINT *, "Error: Could not open file ", TRIM(directory)
-         STOP
+         CALL mesa_error(__FILE__, __LINE__)
       END IF
 
       ! Skip header lines
@@ -462,7 +463,7 @@ CONTAINS
          READ (unit, '(A)', IOSTAT=status) line
          IF (status /= 0) THEN
             PRINT *, "Error: Could not read the file", TRIM(directory)
-            STOP
+            CALL mesa_error(__FILE__, __LINE__)
          END IF
          IF (line(1:1) /= "#") EXIT
       END DO
@@ -485,7 +486,7 @@ CONTAINS
          READ (unit, '(A)', IOSTAT=status) line
          IF (status /= 0) THEN
             PRINT *, "Error: Could not rewind file", TRIM(directory)
-            STOP
+            CALL mesa_error(__FILE__, __LINE__)
          END IF
          IF (line(1:1) /= "#") EXIT
       END DO
