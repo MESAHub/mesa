@@ -1,0 +1,46 @@
+---
+name: 'install-sdk-macos'
+description: 'Download and unpack the MacOS MESA SDK and its required dependencies'
+
+inputs:
+  sdk:
+    description: 'The version of the MESA SDK to install'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install dependencies
+      run: |
+        brew install --cask xquartz
+        brew install gnu-sed bash
+      shell: bash
+
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        path: |
+          mesasdk-aarch64-macos-${{inputs.sdk}}.tar.gz
+        key: macos-${{inputs.sdk}}
+
+    - name: Download SDK
+      shell: bash
+      if: ${{ (steps.cache.outputs.cache-hit != 'true') }}
+      run: |
+        declare -A version
+        version[24.7.1]="https://zenodo.org/records/13769017/files"
+        version[25.12.1]="http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/"
+        version[26.3.2]="https://zenodo.org/records/19210744/files"
+
+        curl -O ${version[${{inputs.sdk}}]}/mesasdk-aarch64-macos-${{inputs.sdk}}.pkg
+
+    - name: Unpack SDK
+      run: |
+        sudo installer -pkg mesasdk-aarch64-macos-${{inputs.sdk}}.pkg -target /
+        ln -s /Applications/mesasdk mesasdk
+      shell: bash
+
+    - name: Set SDK environment
+      run: |
+        echo "MESASDK_ROOT=$(readlink -f mesasdk)" >> $GITHUB_ENV
+      shell: bash
