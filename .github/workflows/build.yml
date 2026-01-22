@@ -1,5 +1,5 @@
 ---
-name: Build on Linux with SDK
+name: Build with SDK
 
 on:
   workflow_dispatch:
@@ -15,12 +15,16 @@ jobs:
       fail-fast: false
       matrix:
         sdk: ["25.12.1"]  # pick 2 or 3 most recent.
-    runs-on: ubuntu-latest
+        os: [ubuntu-latest, macos-latest]
+        dynamic: ["yes", "no"]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install MESA on ${{ runner.os }} with SDK ${{matrix.sdk}}
         uses: ./.github/actions/install-mesa
+        env:
+          DYNAMIC: ${{ matrix.dynamic }}
         with:
           sdk: ${{matrix.sdk}}
