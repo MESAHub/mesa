@@ -8,6 +8,8 @@ The MESA build system uses ``make``, with some additional (shell) scripts. All r
 
 Running ``make`` in the root folder will build all the modules, install relevant files, and run all the associated module tests (test suite tests will not be run). To build an individual module and all its dependencies, run ``make MODULE_NAME``. Append ``-install`` or ``-check`` to run those steps. If you don't want to try to build the dependencies, ``cd`` to the folder of that module and run ``make`` there.
 
+If you don't want to run any tests, but compile all the modules and extract all the necessary data, run `make all-build all-extract-data`.
+
 Build options
 =============
 
