@@ -11,7 +11,11 @@ Running ``make`` in the root folder will build all the modules, install relevant
 Build options
 =============
 
-The build system exposes several options to control the build process. If you want to change these options, give them as arguments to make, e.g. ``make BUILD_DIR=my_build_dir``.
+The build system exposes several options to control the build process. If you want to change these options, give them as arguments to make, e.g. ``make BUILD_DIR=my_build_dir`` or set them in your environment.
+
+.. warning::
+
+   If you change any of these options, make sure the clean the build outputs with `make clean`. Otherwise the change to the option may not apply at all, or even causing a weird hybrid build.
 
 * **BUILD_DIR**: Where all compiled files will end up, default is ``build``. The output from each module's build will be in a subfolder with the module's name.
 * **COMPILER**: Which compiler to use. Supported options are ``gfortran`` (default).
