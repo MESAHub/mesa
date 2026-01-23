@@ -17,7 +17,7 @@ ${subdir}-install: ${subdir}
 ${subdir}-check: ${subdir} ${subdir}-extract-data \$(addsuffix -extract-data,${DEPS})
 	\$(MAKE) -C ${subdir} check BUILD_DIR=\$(BUILD_DIR)
 
-${subdir}-extract-data: ${subdir}
+${subdir}-extract-data:
 	\$(MAKE) -C ${subdir} extract-data BUILD_DIR=\$(BUILD_DIR)
 EOF
 done
