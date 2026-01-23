@@ -61,25 +61,85 @@ contains
 
    end subroutine extras_controls
 
+
    subroutine extras_startup(id, restart, ierr)
-      integer, intent(in) :: id
-      logical, intent(in) :: restart
-      integer, intent(out) :: ierr
-      type(star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
+       use colors_lib, only: colors_ptr
+       use colors_def, only: Colors_General_Info
+       integer, intent(in) :: id
+       logical, intent(in) :: restart
+       integer, intent(out) :: ierr
+       type(star_info), pointer :: s
+       type(Colors_General_Info), pointer :: cs
+
+       ierr = 0
+       call star_ptr(id, s, ierr)
+       if (ierr /= 0) return
+
+       write(*,*) 'DEBUG extras_startup: colors_handle =', s% colors_handle
+       
+       ! Set up per-iteration colors hook HERE - after all init is complete
+       if (s% colors_handle > 0) then
+           call colors_ptr(s% colors_handle, cs, ierr)
+           write(*,*) 'DEBUG: colors_per_iteration =', cs% colors_per_iteration
+           write(*,*) 'DEBUG: use_colors =', cs% use_colors
+           if (ierr == 0 .and. cs% colors_per_iteration .and. cs% use_colors) then
+               s% use_other_solver_monitor = .true.
+               s% other_solver_monitor => colors_solver_monitor
+               write(*,*) 'Colors: per-iteration output enabled'
+           end if
+       end if
+
    end subroutine extras_startup
 
-   integer function extras_start_step(id)
-      integer, intent(in) :: id
-      integer :: ierr
-      type(star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      extras_start_step = 0
-   end function extras_start_step
+
+    ! The wrapper that gets called each Newton iteration
+    subroutine colors_solver_monitor( &
+          id, iter, passed_tol_tests, &
+          correction_norm, max_correction, &
+          residual_norm, max_residual, ierr)
+       use colors_lib, only: write_iteration_colors
+       integer, intent(in) :: id, iter
+       logical, intent(in) :: passed_tol_tests
+       real(dp), intent(in) :: correction_norm, max_correction
+       real(dp), intent(in) :: residual_norm, max_residual
+       integer, intent(out) :: ierr
+       type(star_info), pointer :: s
+       
+       ierr = 0
+       call star_ptr(id, s, ierr)
+       if (ierr /= 0) return
+       if (s% colors_handle <= 0) return
+       
+       call write_iteration_colors( &
+          s% colors_handle, &
+          s% model_number, &
+          iter, &
+          s% star_age, &
+          s% dt, &
+          s% Teff, &
+          s% grav(1), &
+          s% photosphere_r, &
+          s% initial_z, &
+          ierr)
+    end subroutine colors_solver_monitor
+
+
+
+    integer function extras_start_step(id)
+        integer, intent(in) :: id
+        integer :: ierr
+        type (star_info), pointer :: s
+
+        extras_start_step = 0
+        ierr = 0
+        call star_ptr(id, s, ierr)
+        if (ierr /= 0) return
+
+    end function extras_start_step
+
+
+
+
 
    ! returns either keep_going, retry, or terminate.
    integer function extras_check_model(id)

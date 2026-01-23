@@ -52,6 +52,10 @@ module colors_def
       integer :: handle
       logical :: in_use
 
+      logical :: colors_per_iteration
+      integer :: iteration_output_unit
+      logical :: iteration_file_open
+
       ! Cached lookup table data
       logical :: lookup_loaded = .false.
       character(len=100), allocatable :: lu_file_names(:)

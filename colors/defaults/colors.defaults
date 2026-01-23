@@ -33,6 +33,7 @@
    ! ::
 
       use_colors = .false.
+      colors_per_iteration = .false.
       instrument = '/data/colors_data/filters/Generic/Johnson'
       stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
       distance = 3.0857d19

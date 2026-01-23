@@ -41,6 +41,7 @@ module colors_ctrls_io
    logical :: make_csv
    logical :: sed_per_model
    logical :: use_colors
+   logical :: colors_per_iteration
 
    namelist /colors/ &
       instrument, &
@@ -52,6 +53,7 @@ module colors_ctrls_io
       mag_system, &
       colors_results_directory, &
       use_colors, &
+      colors_per_iteration, &
       read_extra_colors_inlist, &
       extra_colors_inlist_name
 
@@ -161,6 +163,7 @@ contains
       rq%sed_per_model = sed_per_model
       rq%colors_results_directory = colors_results_directory
       rq%use_colors = use_colors
+      rq%colors_per_iteration = colors_per_iteration
       rq%mag_system = mag_system
 
    end subroutine store_controls
@@ -198,6 +201,7 @@ contains
       sed_per_model = rq%sed_per_model
       colors_results_directory = rq%colors_results_directory
       use_colors = rq%use_colors
+      colors_per_iteration = rq%colors_per_iteration
       mag_system = rq%mag_system
 
    end subroutine set_controls_for_writing

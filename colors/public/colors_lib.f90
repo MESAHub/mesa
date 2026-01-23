@@ -24,6 +24,7 @@ module colors_lib
    use synthetic, only: calculate_synthetic
    use colors_utils, only: read_strings_from_file, load_lookup_table, load_filter, load_vega_sed
    use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
+   use colors_iteration, only: write_iteration_colors, open_iteration_file, close_iteration_file
 
    implicit none
 
@@ -33,6 +34,8 @@ module colors_lib
    public :: alloc_colors_handle, alloc_colors_handle_using_inlist, free_colors_handle
    public :: colors_ptr
    public :: colors_setup_tables, colors_setup_hooks
+   ! Per-iteration colors routines (called from star)
+   public :: write_iteration_colors, open_iteration_file, close_iteration_file
    ! Main functions
    public :: calculate_bolometric, calculate_synthetic
    public :: how_many_colors_history_columns, data_for_colors_history_columns
@@ -41,6 +44,7 @@ module colors_lib
    public :: get_bc_by_id, get_bc_name_by_id, get_bc_by_name
    public :: get_abs_bolometric_mag, get_abs_mag_by_name, get_bcs_all
    public :: get_lum_band_by_name
+
 contains
 
    ! call this routine to initialize the colors module.
