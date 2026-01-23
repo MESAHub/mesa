@@ -52,7 +52,8 @@
 &colors
       ! Enable the colors module
       use_colors = .true.
-            
+      
+      colors_per_iteration = .true.            
       ! Filter system specification
       ! This points to a directory containing Johnson filter transmission curves.
       ! The Johnson directory should contain files like:
@@ -75,7 +76,7 @@
                                    ! Creates files like: SED/B_SED.csv, SED/VEGA_B_SED.csv
 
       !enable to add a model number suffix to SED files. 
-      sed_per_model = .true.
+      sed_per_model = .false.
 
 
       !zero point. Select between: Vega, AB, ST
@@ -86,6 +87,7 @@
       ! Used to define the zero-point of the magnitude system (Vega = 0.0 mag)
       vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
 
+      colors_per_iteration = .true.
 
 / ! end of colors namelist
 
