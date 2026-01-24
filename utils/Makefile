@@ -23,7 +23,7 @@ endif
 SRCS_CHECK = test/src/test_utils.f90
 INTERNAL_DEPENDS_ON := const
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 
