@@ -31,6 +31,7 @@
       public :: do_starlib_shutdown
       public :: set_kap_and_eos_handles
       public :: set_colors_handles
+      public :: setup_colors_iteration_hook
       public :: load_zams_model
       public :: create_pre_ms_model
       public :: create_initial_model
@@ -115,6 +116,73 @@
             end if
          end if
       end subroutine set_colors_handles
+
+
+      subroutine colors_solver_monitor_wrapper( &
+            id, iter, passed_tol_tests, &
+            correction_norm, max_correction, &
+            residual_norm, max_residual, ierr)
+         use colors_lib, only: write_iteration_colors
+         use const_def, only: dp
+         integer, intent(in) :: id, iter
+         logical, intent(in) :: passed_tol_tests
+         real(dp), intent(in) :: correction_norm, max_correction
+         real(dp), intent(in) :: residual_norm, max_residual
+         integer, intent(out) :: ierr
+         type(star_info), pointer :: s
+
+         ierr = 0
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         if (s% colors_handle <= 0) return
+
+         call write_iteration_colors( &
+            s% colors_handle, &
+            s% model_number, &
+            iter, &
+            s% star_age, &
+            s% dt, &
+            s% Teff, &
+            safe_log10(s% grav(1)), &
+            s% R(1), &
+            s%kap_rq%Zbase, &
+            ierr)
+      end subroutine colors_solver_monitor_wrapper
+
+
+
+!call data_for_colors_history_columns(s%T(1), safe_log10(s%grav(1)), s%R(1), s%kap_rq%Zbase, &
+!s% model_number, s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
+
+
+
+
+
+      subroutine setup_colors_iteration_hook(id, ierr)
+         use colors_lib, only: colors_ptr
+         use colors_def, only: Colors_General_Info
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type(star_info), pointer :: s
+         type(Colors_General_Info), pointer :: cs
+
+         ierr = 0
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         if (s% colors_handle > 0) then
+            call colors_ptr(s% colors_handle, cs, ierr)
+            if (ierr /= 0) return
+            if (cs% colors_per_iteration .and. cs% use_colors) then
+               s% use_other_solver_monitor = .true.
+               s% other_solver_monitor => colors_solver_monitor_wrapper
+            end if
+         end if
+      end subroutine setup_colors_iteration_hook
+
+
+
+
 
       subroutine do_star_init( &
             my_mesa_dir, chem_isotopes_filename, &
