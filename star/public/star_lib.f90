@@ -298,6 +298,14 @@
       end subroutine star_set_colors_handles
 
 
+      subroutine star_setup_colors_iteration_hook(id, ierr)
+         use init, only: setup_colors_iteration_hook
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         call setup_colors_iteration_hook(id, ierr)
+      end subroutine star_setup_colors_iteration_hook
+
+
       subroutine star_set_net(id, new_net_name, ierr)
          use net, only: set_net
          integer, intent(in) :: id

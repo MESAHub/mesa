@@ -82,7 +82,7 @@ contains
       real(dp) :: magnitude, d, zero_point
       character(len=256) :: sed_filepath
       real(dp), dimension(:), allocatable :: wavelengths, fluxes
-      integer :: i, iounit, local_ierr
+      integer :: i, iounit
       logical :: make_sed
 
       ierr = 0
@@ -118,7 +118,7 @@ contains
       sed_filepath = trim(mesa_dir)//cs%stellar_atm
       make_sed = .false.  ! Don't write individual SEDs for iteration output
 
-      write(*,*) 'hello, it is is, newton solver'
+      write(*,*) 'hello, it is I, newton solver'
 
       ! Calculate bolometric magnitude using cached lookup table
       ! Must pass the cached lookup arrays for atmosphere interpolation
@@ -166,7 +166,7 @@ contains
 
 
 
-            if (local_ierr /= 0) magnitude = -99.0_dp
+            if (ierr /= 0) magnitude = -99.0_dp
          else
             magnitude = -99.0_dp
          end if
