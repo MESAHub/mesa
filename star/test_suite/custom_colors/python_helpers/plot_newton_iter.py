@@ -21,6 +21,12 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from matplotlib import cm
 
+try:
+    import mesa_reader as mr
+    MESA_READER_AVAILABLE = True
+except ImportError:
+    MESA_READER_AVAILABLE = False
+
 
 # ============================================================================
 #                              TERMINAL UI
@@ -260,6 +266,59 @@ def load_iteration_data(filepath: str) -> Tuple[List[str], np.ndarray]:
     return column_names, data
 
 
+def load_history_data(history_file: str = "../LOGS/history.data") -> Optional[mr.MesaData]:
+    """Load MESA history file using mesa_reader."""
+    if not MESA_READER_AVAILABLE:
+        print_error("mesa_reader not available. Cannot load history file.")
+        return None
+    
+    if not os.path.exists(history_file):
+        # Try alternative paths
+        alt_paths = ["LOGS/history.data", "./history.data"]
+        for alt in alt_paths:
+            if os.path.exists(alt):
+                history_file = alt
+                break
+        else:
+            print_error(f"History file not found: {history_file}")
+            return None
+    
+    try:
+        md = mr.MesaData(history_file)
+        print_success(f"Loaded history file: {history_file} ({len(md.model_number)} models)")
+        return md
+    except Exception as e:
+        print_error(f"Failed to load history file: {e}")
+        return None
+
+
+def get_history_column(md: mr.MesaData, col_name: str) -> Optional[np.ndarray]:
+    """Get a column from the history data, trying various name mappings."""
+    # Direct match
+    try:
+        return getattr(md, col_name)
+    except AttributeError:
+        pass
+    
+    # Try common name mappings between iteration_colors and history
+    name_mappings = {
+        'Teff': ['Teff', 'log_Teff'],
+        'log_Teff': ['log_Teff', 'Teff'],
+        'log_g': ['log_g', 'log_surf_g'],
+        'R': ['radius', 'log_R'],
+        'L': ['luminosity', 'log_L'],
+    }
+    
+    if col_name in name_mappings:
+        for alt_name in name_mappings[col_name]:
+            try:
+                return getattr(md, alt_name)
+            except AttributeError:
+                continue
+    
+    return None
+
+
 # ============================================================================
 #                        EXPRESSION PARSING
 # ============================================================================
@@ -405,42 +464,78 @@ def resolve_axis(
     return parse_expression(spec, column_names, data)
 
 
+def resolve_history_axis(
+    spec: str,
+    md: mr.MesaData,
+) -> Optional[np.ndarray]:
+    """
+    Resolve an axis specification to history data array.
+    Handles simple columns and expressions like "V-U".
+    """
+    spec = str(spec).strip()
+    
+    # Check if it's an expression (contains operators)
+    if is_expression(spec):
+        # Parse expression for history data
+        return parse_history_expression(spec, md)
+    
+    # Simple column name
+    return get_history_column(md, spec)
+
+
+def parse_history_expression(expr: str, md: mr.MesaData) -> Optional[np.ndarray]:
+    """Parse and evaluate an expression using history data."""
+    original_expr = expr
+    expr = expr.strip()
+    
+    # Get all available column names from history
+    history_cols = md.bulk_names
+    
+    # Build namespace
+    namespace = {}
+    
+    # Sort column names by length (longest first) to avoid partial matches
+    sorted_names = sorted(history_cols, key=len, reverse=True)
+    
+    # Replace column names with placeholder variable names
+    for name in sorted_names:
+        var_name = f"__hist_{name}__"
+        pattern = r'\b' + re.escape(name) + r'\b'
+        if re.search(pattern, expr):
+            try:
+                namespace[var_name] = getattr(md, name)
+                expr = re.sub(pattern, var_name, expr)
+            except AttributeError:
+                continue
+    
+    # Add safe math functions
+    safe_funcs = {
+        'abs': np.abs,
+        'sqrt': np.sqrt,
+        'log': np.log,
+        'log10': np.log10,
+        'exp': np.exp,
+        'sin': np.sin,
+        'cos': np.cos,
+        'tan': np.tan,
+        'pi': np.pi,
+    }
+    namespace.update(safe_funcs)
+    
+    # Validate and evaluate
+    if not re.match(r'^[\w\s\+\-\*/\(\)\.\,]+$', expr):
+        return None
+    
+    try:
+        result = eval(expr, {"__builtins__": {}}, namespace)
+        return result
+    except Exception:
+        return None
+
+
 # ============================================================================
 #                              PLOTTING
 # ============================================================================
-
-
-
-
-def get_final_iteration_mask(model_data: np.ndarray, iter_data: np.ndarray) -> np.ndarray:
-    """
-    Identify the final Newton iteration for each timestep (model).
-    
-    Args:
-        model_data: Array of model numbers
-        iter_data: Array of iteration numbers
-    
-    Returns:
-        Boolean mask where True indicates the final iteration for that model
-    """
-    mask = np.zeros(len(model_data), dtype=bool)
-    
-    # Get unique models
-    unique_models = np.unique(model_data)
-    
-    for model in unique_models:
-        # Find indices for this model
-        model_mask = model_data == model
-        model_indices = np.where(model_mask)[0]
-        
-        # Find the index with maximum iteration for this model
-        iters_for_model = iter_data[model_mask]
-        max_iter_local_idx = np.argmax(iters_for_model)
-        final_idx = model_indices[max_iter_local_idx]
-        
-        mask[final_idx] = True
-    
-    return mask
 
 
 def create_plot(
@@ -456,12 +551,14 @@ def create_plot(
     point_size: int = 20,
     alpha: float = 0.7,
     flip_y: bool = False,
-    final_iter_mask: Optional[np.ndarray] = None,
+    history_x: Optional[np.ndarray] = None,
+    history_y: Optional[np.ndarray] = None,
+    history_z: Optional[np.ndarray] = None,
 ) -> plt.Figure:
     """Create the plot with the provided data arrays.
     
     Args:
-        final_iter_mask: Boolean mask indicating final iterations to mark with black X
+        history_x, history_y, history_z: Data from MESA history file to overlay
     """
     
     # Create figure
@@ -476,14 +573,14 @@ def create_plot(
             s=point_size, alpha=alpha
         )
         
-        # Plot final iterations with black X markers
-        if final_iter_mask is not None and np.any(final_iter_mask):
+        # Plot history data with black X markers
+        if history_x is not None and history_y is not None and history_z is not None:
             ax.scatter(
-                x_data[final_iter_mask], 
-                y_data[final_iter_mask], 
-                z_data[final_iter_mask],
-                c='black', marker='x', s=point_size*3, 
-                linewidths=2, label='Final iteration', zorder=10
+                history_x, 
+                history_y, 
+                history_z,
+                c='black', marker='x', s=point_size*0.5, 
+                linewidths=2, label='History', zorder=10
             )
             ax.legend(loc='best')
         
@@ -503,13 +600,13 @@ def create_plot(
             s=point_size, alpha=alpha
         )
         
-        # Plot final iterations with black X markers
-        if final_iter_mask is not None and np.any(final_iter_mask):
+        # Plot history data with black X markers
+        if history_x is not None and history_y is not None:
             ax.scatter(
-                x_data[final_iter_mask], 
-                y_data[final_iter_mask],
+                history_x, 
+                history_y,
                 c='black', marker='x', s=point_size*1.1, 
-                linewidths=1, label='Final iteration', zorder=10
+                linewidths=1, label='History', zorder=10
             )
             ax.legend(loc='best')
         
@@ -584,7 +681,7 @@ def prompt_axis_or_expr(
     N = len(column_names)
     max_label_len = max(len(s) for s in column_names) + 2
     
-    def grid_print():
+    def grid_print() -> None:
         width = max(70, term_width())
         col_w = 8 + max_label_len
         cols = max(1, min(3, width // col_w))
@@ -606,13 +703,10 @@ def prompt_axis_or_expr(
     while True:
         grid_print()
         
-        # Show controls with expression hint
-        print(f"\n{DIM}Enter: column number | column name | expression (e.g. V-U, [15]-[14], Teff/1000){RESET}")
-        controls = f"{DIM}"
-        if allow_back:
-            controls += "b=back | "
-        controls += f"q=quit{RESET}"
-        print(controls)
+        print(f"\n{DIM}Enter column number, name, or expression (e.g., B-V)")
+        controls = "b=back | " if allow_back else ""
+        controls += "q=quit"
+        print(f"{controls}{RESET}")
         
         inp = input(f"{CYAN}>{RESET} ").strip()
         
@@ -627,39 +721,64 @@ def prompt_axis_or_expr(
         if inp.lower() == "b" and allow_back:
             return "back"
         
-        # Try to resolve as axis (column or expression)
+        # Try to parse as number (column index)
         try:
-            arr, lbl = resolve_axis(inp, column_names, data)
-            return arr, lbl
-        except ValueError as e:
-            print_error(str(e))
-            continue
+            idx = int(inp)
+            if 0 <= idx < N:
+                return data[:, idx], column_names[idx]
+            else:
+                print_error(f"Index must be between 0 and {N-1}")
+                continue
+        except ValueError:
+            pass
+        
+        # Try exact column name match
+        if inp in column_names:
+            idx = column_names.index(inp)
+            return data[:, idx], column_names[idx]
+        
+        # Try case-insensitive column name match
+        for i, name in enumerate(column_names):
+            if name.lower() == inp.lower():
+                return data[:, i], name
+        
+        # Try as expression
+        if is_expression(inp):
+            try:
+                result_data, result_label = parse_expression(inp, column_names, data)
+                return result_data, result_label
+            except ValueError as e:
+                print_error(str(e))
+                continue
+        
+        print_error(f"Invalid input: '{inp}'")
 
 
-def run_interactive(filepath: str) -> None:
-    """Run the interactive plotting workflow."""
+def run_interactive(filepath: str, history_file: str = "../LOGS/history.data") -> None:
+    """Run the interactive column picker and plotting workflow."""
     
-    print_header("MESA Colors — Newton Iteration Plotter")
-    
-    # Load data
+    print_header("MESA Colors Newton Iteration Plotter")
     print_info(f"Loading: {filepath}")
-    try:
-        column_names, data = load_iteration_data(filepath)
-    except Exception as e:
-        print_error(f"Failed to load file: {e}")
-        sys.exit(1)
     
-    print_success(f"Loaded {data.shape[0]} data points, {data.shape[1]} columns")
+    # Load iteration data
+    column_names, data = load_iteration_data(filepath)
+    print_success(f"Loaded {data.shape[0]} rows, {len(column_names)} columns")
+    
+    # Load history file
+    md = load_history_data(history_file)
     
     # Select plot type
-    print_subheader("Plot Type")
-    print(f"  [{GREEN}2{RESET}] 2D scatter plot (x, y)")
-    print(f"  [{GREEN}3{RESET}] 3D scatter plot (x, y, z)")
+    print_subheader("Select Plot Type")
+    print(f"  [{GREEN}2{RESET}] 2D scatter plot")
+    print(f"  [{GREEN}3{RESET}] 3D scatter plot")
     
     while True:
-        inp = input(f"\n{CYAN}>{RESET} ").strip()
-        if inp in ("2", "3"):
-            plot_type = int(inp)
+        inp = input(f"{CYAN}>{RESET} ").strip()
+        if inp == "2":
+            plot_type = 2
+            break
+        elif inp == "3":
+            plot_type = 3
             break
         elif inp.lower() == "q":
             print("Goodbye!")
@@ -678,7 +797,7 @@ def run_interactive(filepath: str) -> None:
     if result is None:
         return
     if result == "back":
-        return run_interactive(filepath)
+        return run_interactive(filepath, history_file)
     y_data, y_label = result
     print_success(f"Y-axis: {y_label}")
     
@@ -692,7 +811,7 @@ def run_interactive(filepath: str) -> None:
         if result is None:
             return
         if result == "back":
-            return run_interactive(filepath)
+            return run_interactive(filepath, history_file)
         z_data, z_label = result
         print_success(f"Z-axis: {z_label}")
     
@@ -701,7 +820,7 @@ def run_interactive(filepath: str) -> None:
     if result is None:
         return
     if result == "back":
-        return run_interactive(filepath)
+        return run_interactive(filepath, history_file)
     color_data, color_label = result
     print_success(f"Color: {color_label}")
     
@@ -717,19 +836,31 @@ def run_interactive(filepath: str) -> None:
     # Create and save plot
     print_subheader("Generating Plot")
     
-    # Compute final iteration mask if model and iter columns exist
-    final_iter_mask = None
-    if 'model' in column_names and 'iter' in column_names:
-        model_idx = column_names.index('model')
-        iter_idx = column_names.index('iter')
-        final_iter_mask = get_final_iteration_mask(data[:, model_idx], data[:, iter_idx])
-        print_info(f"Identified {np.sum(final_iter_mask)} final iterations (marked with black X)")
+    # Get history data for overlay
+    history_x, history_y, history_z = None, None, None
+    if md is not None:
+        history_x = resolve_history_axis(x_label, md)
+        history_y = resolve_history_axis(y_label, md)
+        if z_label is not None:
+            history_z = resolve_history_axis(z_label, md)
+        
+        if history_x is not None and history_y is not None:
+            print_info(f"History data: {len(history_x)} points will be overlaid")
+        else:
+            missing = []
+            if history_x is None:
+                missing.append(x_label)
+            if history_y is None:
+                missing.append(y_label)
+            print_info(f"Could not find history columns for: {', '.join(missing)}")
     
     fig = create_plot(
         x_data, y_data, color_data, 
         x_label, y_label, color_label,
         z_data, z_label, flip_y=flip_y,
-        final_iter_mask=final_iter_mask
+        history_x=history_x,
+        history_y=history_y,
+        history_z=history_z,
     )
     save_figure(fig, base_name, ["pdf", "jpg"])
     
@@ -750,11 +881,15 @@ def run_batch(
     formats: List[str] = ["pdf", "jpg"],
     no_show: bool = False,
     cmap: str = "viridis",
+    history_file: str = "../LOGS/history.data",
 ) -> None:
     """Run in batch mode with specified columns or expressions."""
     
     # Load data
     column_names, data = load_iteration_data(filepath)
+    
+    # Load history file
+    md = load_history_data(history_file)
     
     # Resolve each axis (supports columns and expressions)
     x_data, x_label = resolve_axis(x_col, column_names, data)
@@ -774,12 +909,13 @@ def run_batch(
         safe_axes = [re.sub(r'[^\w\-]', '_', a) for a in reversed(axes)]
         output = "newton_iter_" + "_vs_".join(safe_axes)
     
-    # Compute final iteration mask if model and iter columns exist
-    final_iter_mask = None
-    if 'model' in column_names and 'iter' in column_names:
-        model_idx = column_names.index('model')
-        iter_idx = column_names.index('iter')
-        final_iter_mask = get_final_iteration_mask(data[:, model_idx], data[:, iter_idx])
+    # Get history data for overlay
+    history_x, history_y, history_z = None, None, None
+    if md is not None:
+        history_x = resolve_history_axis(x_label, md)
+        history_y = resolve_history_axis(y_label, md)
+        if z_label is not None:
+            history_z = resolve_history_axis(z_label, md)
     
     # Create plot
     fig = create_plot(
@@ -787,7 +923,9 @@ def run_batch(
         x_label, y_label, color_label,
         z_data, z_label,
         cmap=cmap,
-        final_iter_mask=final_iter_mask
+        history_x=history_x,
+        history_y=history_y,
+        history_z=history_z,
     )
     save_figure(fig, output, formats)
     
@@ -830,6 +968,12 @@ Supported expression syntax:
         "-f", "--file",
         default="SED/iteration_colors.data",
         help="Path to iteration colors data file (default: SED/iteration_colors.data)"
+    )
+    
+    parser.add_argument(
+        "--history",
+        default="../LOGS/history.data",
+        help="Path to MESA history file (default: ../LOGS/history.data)"
     )
     
     parser.add_argument(
@@ -915,10 +1059,11 @@ Supported expression syntax:
             formats=formats,
             no_show=args.no_show,
             cmap=args.cmap,
+            history_file=args.history,
         )
     else:
         # Interactive mode
-        run_interactive(args.file)
+        run_interactive(args.file, args.history)
 
 
 if __name__ == "__main__":
