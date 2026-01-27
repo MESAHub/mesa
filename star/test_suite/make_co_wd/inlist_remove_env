@@ -22,7 +22,7 @@
       remove_surface_turn_off_energy_sources_and_sinks = .true.
 
       set_initial_dt = .true.
-      years_for_initial_dt = 1d-9 ! can aid convergence after relaxation phase
+      years_for_initial_dt = 1d-4 !can aid convergence after relaxation phase
 
       !pgstar_flag = .true.
 
@@ -66,8 +66,10 @@
       thermohaline_coeff = 1000
 
 ! solver controls
+      use_gold2_tolerances = .false.
+      gold_tol_max_residual3 = 1d-3 ! necessary for post relax 
       ignore_too_large_correction = .true.
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
       ! max_resid_jump_limit = 1d9
       relax_max_number_retries = 3000
 
