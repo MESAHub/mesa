@@ -880,7 +880,7 @@
          ! logRho blend
          if (logRho_auto < rq% logRho_min_FreeEOS_lo) then
             blend_logRho = 0d0
-         else if (logRho_auto < rq% logRho_min_FreeEOS_lo) then
+         else if (logRho_auto < rq% logRho_min_FreeEOS_hi) then
             blend_logRho = (logRho_auto - rQ% logRho_min_FreeEOS_lo) / (rq% logRho_min_FreeEOS_hi - rq% logRho_min_FreeEOS_lo)
          else if (logRho_auto < rq% logRho_max_FreeEOS_lo) then
             blend_logRho = 1d0
