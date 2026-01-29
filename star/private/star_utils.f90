@@ -2197,7 +2197,7 @@
          if (s% u_flag) then
             v0 = s% u(k)
             cell_specific_KE_qp = qhalf*Mbar*v0**2
-            d_dv00 = s% u(k)
+            d_dv00 = Mbar*s% u(k)
             d_dvp1 = 0d0
          else if (s% v_flag) then
             v0 = s% v(k)
