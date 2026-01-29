@@ -1281,7 +1281,7 @@ neu
 The call signature of other_neu has changed. You no longer need to pass in z2bar
 
 
-The value of the Weinberg angle was updated to be be consistent with CODATA 2018.
+The value of the Weinberg angle was updated to be consistent with CODATA 2018.
 
 
 net

@@ -40,7 +40,7 @@ both results are evaluated, blended, and returned.  Smooth blends are
 assured via the smoothness of the functions that define the component
 fractions.
 
-This approach means that that EOS components have an order of
+This approach means that EOS components have an order of
 precedence:
 
     (CMS) > Skye > PC > FreeEOS > OPAL/SCVH > HELM.
