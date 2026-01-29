@@ -336,6 +336,10 @@
             end if
          end do
 
+         ! Deallocate arrays
+         deallocate(i_min, i_max, pf)
+         deallocate(j_min, j_max)
+
       end subroutine leak_control
 
 
@@ -466,6 +470,9 @@
             end if
             i = i + direction
          end do
+
+         ! Deallocate array
+         deallocate(excess)
 
       end subroutine leak
 
@@ -700,6 +707,22 @@
             write(*,*) 'Err:', err, err / abs_err, err / delta_m, delta_m / s%m(1), abs_err, s%mdot_acoustic_surface*dt
          end if
 
+         ! Deallocate arrays
+         deallocate(prev_mesh_dm, dm, change_in_dm)
+         deallocate(mass_flux)
+         deallocate(mesh_intersects)
+         deallocate(ranges)
+         deallocate(density_weighted_flux)
+         deallocate(total_mass_through_cell)
+         deallocate(te)
+         deallocate(p_bar)
+         deallocate(rho_bar)
+         deallocate(te_bar)
+         deallocate(grad_r_sub_grad_a)
+         deallocate(thermal_energy)
+         deallocate(eps_mdot_per_total_mass)
+         deallocate(leak_frac)
+         deallocate(accumulated)
 
       end subroutine calculate_eps_mdot
 

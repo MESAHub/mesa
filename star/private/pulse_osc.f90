@@ -240,6 +240,8 @@ contains
        deallocate(s%atm_structure)
     end if
 
+    deallocate(k_a, k_b)
+
     return
 
   contains
