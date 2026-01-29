@@ -105,18 +105,6 @@ inlist file. This will also override the environment variable ``$MESA_INLIST``. 
 
     ./build/bin/star some_other_inlist_file
 
-``skip_build``
-~~~~~~~~~~~~~~
-
-Empty file.  If present in ``$MESA_DIR`` then no compiling is done when ``./install`` is invoked.
-If present in a sub folder (e.g ``$MESA_DIR/eos``) then no compiling is done in the sub-folder.
-
-``skip_test``
-~~~~~~~~~~~~~
-
-Empty file.  Similar to ``skip_build``, but this will skip the compile time tests.
-If placed in a sub-folder, then only the tests in that folder are skipped.
-
 
 Private
 -------

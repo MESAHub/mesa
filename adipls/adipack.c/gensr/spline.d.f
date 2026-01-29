@@ -30,6 +30,7 @@
       return
       end
       subroutine splint(xa,ya,y2a,n,x,y)
+        use utils_lib, only: mesa_error
       implicit double precision(a-h,o-z)
       dimension xa(n),ya(n),y2a(n)
       klo=1

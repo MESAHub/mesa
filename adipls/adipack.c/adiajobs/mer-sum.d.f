@@ -120,7 +120,7 @@ c
       else if(icasin.eq.2) then
         xl1=cs1(1)
       else
-        xl1=dfloat(l1)
+        xl1=dble(l1)
       end if
 c
 c  test for the same mode
@@ -176,7 +176,7 @@ c
       else if(icasin.eq.2) then
         xl2=cs2(1)
       else
-        xl2=dfloat(l2)
+        xl2=dble(l2)
       end if
 c
 c  test for the same mode

@@ -7,6 +7,7 @@ include $(MESA_DIR)/make/defaults-module.mk
 MODULE_NAME := star
 SRCS := \
    src/run.f90 \
+   $(MESA_DIR)/star/job/run_star.f90
 
 ifeq ($(WITH_GYRE),yes)
   SRCS += src/run_star_extras.f90

@@ -18,7 +18,7 @@ SRCS_CHECK := test/src/test_colors.f90
 INTERNAL_DEPENDS_ON := const utils math
 EXTERNAL_DEPENDS_ON :=
 INCLUDE_DIRS := -Idefaults -Ipublic -Iprivate
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 

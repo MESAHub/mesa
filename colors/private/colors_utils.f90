@@ -20,6 +20,7 @@
 module colors_utils
    use const_def, only: dp, strlen, mesa_dir
    use colors_def, only: Colors_General_Info
+   use utils_lib, only: mesa_error
 
    implicit none
 
@@ -39,7 +40,7 @@ contains
       ! Check that the output array has the same size as the input
       if (size(calibrated_flux) /= size(surface_flux)) then
          print *, "Error in dilute_flux: Output array must have the same size as input array."
-         stop 1
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Apply the dilution factor (R/d)^2 to each element
@@ -59,25 +60,25 @@ contains
       real(dp), intent(out) :: result
 
       integer :: i, n
-      REAL :: sum
+      real(dp) :: sum
 
       n = size(x)
-      sum = 0.0
+      sum = 0.0_dp
 
       ! Validate input sizes
       if (size(x) /= size(y)) then
          print *, "Error: x and y arrays must have the same size."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       if (size(x) < 2) then
          print *, "Error: x and y arrays must have at least 2 elements."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Perform trapezoidal integration
       do i = 1, n - 1
-         sum = sum + 0.5*(x(i + 1) - x(i))*(y(i + 1) + y(i))
+         sum = sum + 0.5_dp*(x(i + 1) - x(i))*(y(i + 1) + y(i))
       end do
 
       result = sum
@@ -96,15 +97,15 @@ contains
       ! Validate input sizes
       if (size(x) /= size(y)) then
          print *, "Error: x and y arrays must have the same size."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       if (size(x) < 2) then
          print *, "Error: x and y arrays must have at least 2 elements."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
-      ! Perform adaptive Simpson’s rule
+      ! Perform adaptive Simpson's rule
       do i = 1, n - 2, 2
          h1 = x(i + 1) - x(i)       ! Step size for first interval
          h2 = x(i + 2) - x(i + 1)     ! Step size for second interval
@@ -139,12 +140,12 @@ contains
       ! Validate input sizes
       if (size(x) /= size(y)) then
          print *, "Error: x and y arrays must have the same size."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       if (n < 2) then
          print *, "Error: x and y arrays must have at least 2 elements."
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       allocate (R(m))
@@ -192,14 +193,14 @@ contains
       open (unit, file=trim(filepath), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open Vega SED file ", trim(filepath)
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Skip header line
       read (unit, '(A)', iostat=status) line
       if (status /= 0) then
          print *, "Error: Could not read header from Vega SED file ", trim(filepath)
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Count the number of data lines
@@ -237,21 +238,21 @@ contains
 
       character(len=512) :: line
       integer :: unit, n_rows, status, i
-      REAL :: temp_wavelength, temp_trans
+      real(dp) :: temp_wavelength, temp_trans
 
       ! Open the file
       unit = 20
       open (unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file ", trim(directory)
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Skip header line
       read (unit, '(A)', iostat=status) line
       if (status /= 0) then
          print *, "Error: Could not read the file", trim(directory)
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Count rows in the file
@@ -272,7 +273,7 @@ contains
          read (unit, '(A)', iostat=status) line
          if (status /= 0) then
             print *, "Error: Could not rewind file", trim(directory)
-            stop
+            call mesa_error(__FILE__, __LINE__)
          end if
          if (line(1:1) /= "#") exit
       end do
@@ -313,14 +314,14 @@ contains
       open (unit, file=lookup_file, status='old', action='read', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file", lookup_file
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Read header line
       read (unit, '(A)', iostat=status) line
       if (status /= 0) then
          print *, "Error: Could not read header line"
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       call split_line(line, delimiter, headers)
@@ -474,7 +475,7 @@ contains
       open (unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file ", trim(directory)
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Skip header lines
@@ -482,7 +483,7 @@ contains
          read (unit, '(A)', iostat=status) line
          if (status /= 0) then
             print *, "Error: Could not read the file", trim(directory)
-            stop
+            call mesa_error(__FILE__, __LINE__)
          end if
          if (line(1:1) /= "#") exit
       end do
@@ -505,7 +506,7 @@ contains
          read (unit, '(A)', iostat=status) line
          if (status /= 0) then
             print *, "Error: Could not rewind file", trim(directory)
-            stop
+            call mesa_error(__FILE__, __LINE__)
          end if
          if (line(1:1) /= "#") exit
       end do
@@ -584,7 +585,7 @@ contains
       if (status /= 0) then
          ierr = -1
          print *, "Error: Could not open file", filename
-         stop
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       do

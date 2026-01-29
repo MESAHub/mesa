@@ -148,7 +148,7 @@ and this name should differ from any other code entities (e.g. subroutines).
 
 Each named critical block will be executed by one thread at a time. Different named critical blocks can be executed
 at the same time. However, all unnamed critical blocks act like one block and thus can not be executed in parallel.
-Therefore you should always named your OMP critical blocks to ensure the best performance.
+Therefore you should always name your OMP critical blocks to ensure the best performance.
 
 Do not name your OMP critical block with a name that has already been used for a variable, procedure, module or any other object.
 

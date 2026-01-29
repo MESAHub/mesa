@@ -119,7 +119,7 @@ then
 	echo "*                                                              *"
 	echo "*               MESA_DIR can not contain whitespace            *"
 	echo "*              Please move your MESA_DIR to a folder           *"
-	echo "*	                    without spaces in its name               *"
+	echo "*                     without spaces in its name               *"
 	echo "*                                                              *"
 	echo "****************************************************************"
 	echo

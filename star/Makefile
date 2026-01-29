@@ -162,8 +162,7 @@ SRCS := \
    private/winds.f90 \
    private/write_model.f90 \
    public/star_def.f90 \
-   public/star_lib.f90 \
-   job/run_star.f90
+   public/star_lib.f90
 
 ifeq ($(WITH_PGSTAR),yes)
 SRCS += \
@@ -211,9 +210,9 @@ SRCS += private/pgstar_stub.f90
 EXTERNAL_DEPENDS_ON :=
 endif
 
-SRCS_CHECK = test/src/run.f90 test/src/run_star_extras.f90
+SRCS_CHECK = job/run_star.f90 test/src/run.f90 test/src/run_star_extras.f90
 INTERNAL_DEPENDS_ON := const utils math mtx neu num colors kap eos rates net chem interp_1d interp_2d star_data ionization atm turb auto_diff forum
-BINTYPE := static-lib
+BINTYPE := lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults -Ijob
 CHECK_FILTER_PROG := grep 'stop because star_age >= max_age'
 
@@ -225,7 +224,6 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := star_lib.mod \
            star_def.mod \
-           run_star.mod \
            run_star_support.mod \
            other_extras.mod \
            pgstar.mod \

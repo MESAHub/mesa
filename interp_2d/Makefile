@@ -21,7 +21,7 @@ SRCS_CHECK = test/src/interp_2d_support.f90 \
              test/src/test_renka790_sg.f
 INTERNAL_DEPENDS_ON := const utils math num interp_1d
 EXTERNAL_DEPENDS_ON :=
-BINTYPE := static-lib
+BINTYPE := lib
 
 # Testing
 

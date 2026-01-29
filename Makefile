@@ -17,6 +17,8 @@ include $(MAKE_DIR)/subdir-deps.mk
 clean:
 	@rm -rf $(BUILD_DIR_)
 
-all: $(SUBDIRS) $(addsuffix -extract-data,$(SUBDIRS)) $(addsuffix -check,$(SUBDIRS))
+all-build: $(SUBDIRS)
+all-extract-data: $(addsuffix -extract-data,$(SUBDIRS))
+all: $(addsuffix -check,$(SUBDIRS))
 
-.PHONY: all $(SUBDIRS) $(addsuffix -extract-data,$(SUBDIRS)) $(addsuffix -check,$(SUBDIRS)) $(addsuffix -install,$(SUBDIRS)) clean install
+.PHONY: all all-build all-extract-data $(SUBDIRS) $(addsuffix -extract-data,$(SUBDIRS)) $(addsuffix -check,$(SUBDIRS)) $(addsuffix -install,$(SUBDIRS)) clean

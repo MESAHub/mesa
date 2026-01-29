@@ -24,6 +24,7 @@
 module linear_interp
    use const_def, only: dp
    use colors_utils, only: dilute_flux
+   use utils_lib, only: mesa_error
    implicit none
 
    private
@@ -68,7 +69,8 @@ contains
       INQUIRE (file=bin_filename, EXIST=file_exists)
 
       if (.not. file_exists) then
-         stop 'Missing required binary file for interpolation'
+         print *, 'Missing required binary file for interpolation'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       ! Load the data from binary file
@@ -76,7 +78,8 @@ contains
                             wavelengths, precomputed_flux_cube, status)
 
       if (status /= 0) then
-         stop 'Binary data loading error'
+         print *, 'Binary data loading error'
+         call mesa_error(__FILE__, __LINE__)
       end if
 
       n_teff = size(teff_grid)
@@ -86,20 +89,21 @@ contains
 
       ! Allocate space for interpolated flux
       allocate (interp_flux(n_lambda))
+      allocate (flux_cube_lambda(n_teff, n_logg, n_meta))
 
       ! Perform trilinear interpolation for each wavelength
       do i = 1, n_lambda
-         ! !print progress updates at regular intervals
 
          ! Extract the 3D grid for this wavelength
-         allocate (flux_cube_lambda(n_teff, n_logg, n_meta))
          flux_cube_lambda = precomputed_flux_cube(:, :, :, i)
 
          ! Simple trilinear interpolation at the target parameters
          interp_flux(i) = trilinear_interp(teff, log_g, metallicity, &
                                            teff_grid, logg_grid, meta_grid, flux_cube_lambda)
-
       end do
+
+
+      deallocate(flux_cube_lambda)
 
       ! Calculate statistics for validation
       min_flux = minval(interp_flux)
@@ -257,12 +261,12 @@ contains
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
       ! Boundary safety check
-      if (i_x < 1) i_x = 1
-      if (i_y < 1) i_y = 1
-      if (i_z < 1) i_z = 1
-      if (i_x >= size(x_grid)) i_x = size(x_grid) - 1
-      if (i_y >= size(y_grid)) i_y = size(y_grid) - 1
-      if (i_z >= size(z_grid)) i_z = size(z_grid) - 1
+      if (i_x < lbound(x_grid,1)) i_x = lbound(x_grid,1)
+      if (i_y < lbound(y_grid,1)) i_y = lbound(y_grid,1)
+      if (i_z < lbound(z_grid,1)) i_z = lbound(z_grid,1)
+      if (i_x >= ubound(x_grid,1)) i_x = ubound(x_grid,1) - 1
+      if (i_y >= ubound(y_grid,1)) i_y = ubound(y_grid,1) - 1
+      if (i_z >= ubound(z_grid,1)) i_z = ubound(z_grid,1) - 1
 
       ! Force interpolation parameters to be in [0,1]
       t_x = max(0.0_dp, MIN(1.0_dp, t_x))

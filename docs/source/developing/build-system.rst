@@ -8,14 +8,21 @@ The MESA build system uses ``make``, with some additional (shell) scripts. All r
 
 Running ``make`` in the root folder will build all the modules, install relevant files, and run all the associated module tests (test suite tests will not be run). To build an individual module and all its dependencies, run ``make MODULE_NAME``. Append ``-install`` or ``-check`` to run those steps. If you don't want to try to build the dependencies, ``cd`` to the folder of that module and run ``make`` there.
 
+If you don't want to run any tests, but compile all the modules and extract all the necessary data, run `make all-build all-extract-data`.
+
 Build options
 =============
 
-The build system exposes several options to control the build process. If you want to change these options, give them as arguments to make, e.g. ``make BUILD_DIR=my_build_dir``.
+The build system exposes several options to control the build process. If you want to change these options, give them as arguments to make, e.g. ``make BUILD_DIR=my_build_dir`` or set them in your environment.
+
+.. warning::
+
+   If you change any of these options, make sure the clean the build outputs with `make clean`. Otherwise the change to the option may not apply at all, or even causing a weird hybrid build.
 
 * **BUILD_DIR**: Where all compiled files will end up, default is ``build``. The output from each module's build will be in a subfolder with the module's name.
 * **COMPILER**: Which compiler to use. Supported options are ``gfortran`` (default).
 * **PROFILE**: Which set of compiler flags to use, mostly to control optimizations. Supported options are ``release`` (enable optimizations), ``release-with-dbg-info`` (enable optimizations, but keep debug info, default), and ``debug`` (disable most optimizations, keep debug info).
+* **DYNAMIC**: Whether to generate dynamic or static libraries for each of the modules. Defaults to ``no`` (set to ``yes`` to enable).
 * **WITH_OPENMP**: Whether to use openmp. Defaults to ``yes`` (any other value will disable openmp).
 * **WITH_CRLIBM**: Whether to use crlibm for certain math operations. Defaults to ``yes`` (any other value will disable crlibm).
 * **WITH_FPE_CHECKS**: Whether to enable FPE checks for NaNs, overflows, and division by zero. Defaults to ``no`` (set to ``yes`` to enable).
@@ -34,7 +41,7 @@ The following properties control the main compilation of the module:
 * **SRCS**: Source files (.f, .f90) that are part of this module. Include files (.inc, .dek) should not be included in this list.
 * **INTERNAL_DEPENDS_ON**: Which MESA modules this module directly depends on. Transitive dependencies do not need to be filled in here.
 * **EXTERNAL_DEPENDS_ON**: Which external packages (e.g. lapack) this module depends on.
-* **BINTYPE**: What the eventual output of the build should be, can be ``static-lib``, ``dynamic-lib``, ``executable`` or ``manual``. The ``manual`` option skips the generation of the final binary object. This is used in the gyre module, as more than one library is created.
+* **BINTYPE**: What the eventual output of the build should be, can be ``lib``, ``executable`` or ``manual``. The ``manual`` option skips the generation of the final binary object. This is used in the gyre module, as more than one library is created.
 * **LIB_NAMES**: Which output libraries are produced in case ``BINTYPE`` is set to ``manual``.
 * **INCLUDE_DIRS**: In which directories are the source files found, prefixed by ``-I``. By default, this is ``-Ipublic -Iprivate``.
 
