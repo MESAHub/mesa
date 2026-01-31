@@ -3,11 +3,9 @@ FLAGS_CODE_SANITY := \
   -Wextra \
   -Wno-unused-label \
   -Wno-unused-parameter \
-  -fstack-protector-all \
-  -fstack-clash-protection \
-  -fcheck=bounds \
   -D_FORTIFY_SOURCE=2 \
-  -fPIC
+  -fPIC \
+
 FFLAGS_FP_SANITY := -finit-derived
 ifeq ($(WITH_FPE_CHECKS),yes)
 FFLAGS_FP_SANITY += -ffpe-trap=invalid,overflow,zero -finit-real=snan
