@@ -15,10 +15,10 @@ FLAGS_REPRO := -ffp-contract=off
 FFLAGS_PREPROCESSOR := -cpp
 
 ifeq ($(PROFILE),release)
-  FLAGS_OPT := -O2 -ftree-vectorize
+  FLAGS_OPT := -O2
   FLAGS_DEBUG :=
 else ifeq ($(PROFILE),release-with-dbg-info)
-  FLAGS_OPT := -O2 -ftree-vectorize
+  FLAGS_OPT := -O2
   FLAGS_DEBUG := -ggdb
 else ifeq ($(PROFILE),debug)
   FLAGS_OPT := -Og
