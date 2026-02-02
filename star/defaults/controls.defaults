@@ -7760,6 +7760,15 @@
     calculate_Brunt_B = .true.
     calculate_Brunt_N2 = .true.
 
+      ! calculate_Brunt_N2
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! If true calculate B using equation 6 in MESA II, otherwise use equation 8 
+
+
+      ! ::
+
+    use_eos_partials_for_Brunt = .true.
 
       ! brunt_N2_coefficient
       ! ~~~~~~~~~~~~~~~~~~~~
