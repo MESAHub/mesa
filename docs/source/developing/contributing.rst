@@ -13,7 +13,7 @@ There are two ways to submit changes to MESA, depending on who you are.
 MESA developer
 --------------
 
-If you are a MESA developer then you will have commit access to the MESA repository on Github.
+If you are a MESA developer then you will have commit access to the MESA repository on GitHub.
 You must create an account on `GitHub <https://github.com/>`__.  The
 MESA organization is called `MESAHub <https://github.com/MESAHub/>`__.
 After you are registered on GitHub, you can be invited to the
@@ -63,11 +63,11 @@ clone over SSH, do::
 
 This will create the MESA repository in a directory named ``mesa``.
 
-For this to work you will need to have setup ssh keys and added them to your github account:
+For this to work you will need to have set up SSH keys and added them to your GitHub account:
 
-#. `Generate a ssh key <https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>`__
+#. `Generate an SSH key <https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>`__
 
-#. `Add a ssh key to Github <https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account>`__
+#. `Add an SSH key to GitHub <https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account>`__
 
 #. `Verify it works <https://docs.github.com/en/github/authenticating-to-github/testing-your-ssh-connection>`__
 
