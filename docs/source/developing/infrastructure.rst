@@ -15,20 +15,20 @@ this currently grants us a 100% discount, meaning this costs $0/yr.
 Unsubsidized, it would cost about $1200/yr.
 
 To classify MESAHub as an education account requires someone in the MESAHub
-organization to sign up for a education plan. This requires that the user has
-an University ID card with an expiry date (this is important). Steps to get
+organization to sign up for an education plan. This requires that the user has
+a university ID card with an expiry date (this is important). Steps to get
 access to this:
 
-- Add your university email address to Github.
-- Follow instructions `Apply to Github Global campus <https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-global-campus-for-teachers/apply-to-github-global-campus-as-a-teacher>`__
+- Add your university email address to GitHub.
+- Follow instructions `Apply to GitHub Global campus <https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-global-campus-for-teachers/apply-to-github-global-campus-as-a-teacher>`__
 - It is set up, if you have access to the `Global-Campus-Teachers repository <https://github.com/community/Global-Campus-Teachers>`__
-- Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
+- GitHub claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
 If MESAHub gets unsynced from this and is no longer on the education plan:
 
-- Goto `Global campus <https://education.github.com/globalcampus/teacher#>`__
+- Go to `Global Campus <https://education.github.com/globalcampus/teacher#>`__
 - Find ``Upgrade your academic organizations``
-- Click ``Upgrade to Github Team``
+- Click ``Upgrade to GitHub Team``
 - Upgrade ``MESAHub``
 
 This is currently tied to Rob's account.

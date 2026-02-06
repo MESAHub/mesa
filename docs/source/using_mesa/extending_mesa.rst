@@ -302,7 +302,7 @@ intervals in central density. We will let the user specify the number of
 divisions per decade. We need to be careful, because the trajectory in
 rho-T space is not guaranteed to be monotonic.
 
-Here's some code to do just that. Again, read though it as the comments
+Here's some code to do just that. Again, read through it as the comments
 discuss some useful MESA features.
 
 .. code-block:: fortran
