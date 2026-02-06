@@ -502,7 +502,7 @@ It is necessary to take the following actions on recent versions of OS X
 previous version of OS X.
 
 -  Install or reinstall the current version of
-   `Xquartz <http://xquartz.macosforge.org/landing/>`__.
+   `Xquartz <http://https://www.xquartz.org/>`__.
 
 -  Install the `command line
    tools <https://developer.apple.com/library/ios/technotes/tn2339/_index.html#//apple_ref/doc/uid/DTS40014588-CH1-WHAT_IS_THE_COMMAND_LINE_TOOLS_PACKAGE_>`__,
@@ -515,7 +515,7 @@ previous version of OS X.
    the `Xcode 10 release
    notes <https://developer.apple.com/documentation/xcode_release_notes/xcode_10_release_notes>`__).
    As a workaround, Apple provides an extra package that will install
-   the headers to the base system. At present, one must do this:::
+   the headers to the base system. At present, one must do this::
 
     open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 
