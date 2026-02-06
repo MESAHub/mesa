@@ -151,7 +151,7 @@ This test suite evolves a 12 |MSun| model from the pre-ms to core collapse.
 :ref:`20M_pre_ms_to_core_collapse`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test suite evolves a low metalicity 20 |MSun| model from the pre-ms to core collapse.
+This test suite evolves a low metallicity 20 |MSun| model from the pre-ms to core collapse.
 
 
 :ref:`20M_z2m2_high_rotation`
@@ -582,22 +582,22 @@ III|.
 :ref:`wd_c_core_ignition`
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case the checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carobon-oxygen white dwarf.
+This test case checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carbon-oxygen white dwarf.
 
 :ref:`wd_cool_0.6M`
 ^^^^^^^^^^^^^^^^^^^
 
-This test case the checks the evolution of a cooling, element diffusing 0.6 |Msun| white dwarf.
+This test case checks the evolution of a cooling, element diffusing 0.6 |Msun| white dwarf.
 
 :ref:`wd_diffusion`
 ^^^^^^^^^^^^^^^^^^^
 
-This test case the checks element diffusion in a 0.6 |Msun| carbon-oxygen white dwarf.
+This test case checks element diffusion in a 0.6 |Msun| carbon-oxygen white dwarf.
 
 :ref:`wd_he_shell_ignition`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case the ignition of a helium layer in an accreting in a 0.96 |Msun| carbon-oxygen white dwarf model.
+This test case checks the ignition of a helium layer in an accreting 0.96 |Msun| carbon-oxygen white dwarf model.
 
 :ref:`wd_nova_burst`
 ^^^^^^^^^^^^^^^^^^^^
