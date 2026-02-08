@@ -58,7 +58,7 @@ contains
    !! @param eta Magnetic diffusivity.
    !! @param thermohaline_coeff Free parameter multiplying the thermohaline diffusivity.
    !! @param thermohaline_mag_B Magnetic field strength (guass) for HG19 and FRG24 prescriptions.
-   !! @param thermohaline_r_ext Reduced density ratio at which to switch to extrapolation for HG19 and FRG24 prescriptions.
+   !! @param thermohaline_r_ext Reduced density ratio at which to switch to extrapolation for BGS13, HG19 and FRG24 prescriptions.
    !! @param thermohaline_FRG24_safety Safety parameter for choosing approximations in FRG24 prescription.
    !! @param thermohaline_FRG24_nks Number of vertical wavenumbers to search over in FRG24 prescription.
    !! @param thermohaline_FRG24_N Maximal mode index in FRG24 prescription.
@@ -114,6 +114,8 @@ contains
 
       select case (thermohaline_option)
       case ('Kippenhahn')
+      case ('Brown_Garaud_Stellmach_13')
+         if (th_info%r_prime >= 1._dp) return
       case ('Harrington_Garaud_19')
          if (th_info%r_prime >= 1._dp) return
       case ('Fraser_Reifenstein_Garaud_24')
@@ -342,11 +344,13 @@ contains
       ! Set components of th_info following Brown, Garaud, &
       ! Stellmach, ApJ 768:34 (2013)
 
-      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
+      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0_prime, th_info%lam_hat, th_info%l2_hat, ierr)
+!      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
       if (ierr /= 0) return
 
       th_info%Nu_C = Nu_C_brown(th_info%tau, th_info%l2_hat, th_info%lam_hat)
-      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*th_info%R_0_prime/th_info%R_0
+!      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
 
    end subroutine set_info_BGS13
 
@@ -382,8 +386,8 @@ contains
       ! Evaluate Nu_C and D_thrm
 
       th_info%Nu_C = Nu_C(th_info%tau, th_info%w, th_info%lam_hat, th_info%l2_hat, K_B)
-!      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*th_info%R_0_prime/th_info%R_0
-      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*exp(-(th_info%r - th_info%r_prime))
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*th_info%R_0_prime/th_info%R_0
+!      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)*exp(-(th_info%r - th_info%r_prime))
 
    end subroutine set_info_HG19
 
