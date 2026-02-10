@@ -107,7 +107,7 @@ TestHub
 The MESA TestHub runs on Heroku and the account is controlled by Bill
 Wolf. It is funded by Frank and Bill W. The Heroku account costs
 around $600/yr, though its cost has been higher during the GitHub
-transition.
+transition. Contact Bill for any help with setting up an account.
 
 The testing `log archive <https://mesa-logs.flatironinstitute.org/>`__ lives on a
 server at the Flatiron Institute, with Matteo as a point of contact.
