@@ -75,7 +75,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs <https://readthedocs.org/>`__.
-Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it). This is
+Rich controls the account (and Earl, Joey, and Meridith have access to it). This is
 currently free for open source software.
 
 
@@ -110,7 +110,7 @@ around $600/yr, though its cost has been higher during the GitHub
 transition.
 
 The testing `log archive <https://mesa-logs.flatironinstitute.org/>`__ lives on a
-server at the Flatiron Institute, with Philip Mocz as a point of contact.
+server at the Flatiron Institute, with Matteo as a point of contact.
 
 Jenkins
 ^^^^^^^
@@ -119,7 +119,7 @@ The Flatiron `Scientific Computing Core <https://www.simonsfoundation.org/flatir
 provides continuous integration testing for MESA via Jenkins.
 This was set up in 2021 by Dylan Simon (Flatiron) and Josiah.
 The configuration lives in the ``jenkins`` directory.
-Matteo and Philip serve as the point of contact at Flatiron.
+Matteo serves as the point of contact at Flatiron.
 View the `Jenkins test results <https://jenkins.flatironinstitute.org/job/mesa/job/main/>`__
 
 
@@ -132,7 +132,7 @@ Community
 ^^^^^^^^^
 
 The `MESA Zenodo Community <https://zenodo.org/communities/mesa/>`__ on Zenodo
-is controlled by Philip.
+is controlled by Eb.
 
 Records
 ^^^^^^^
