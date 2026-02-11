@@ -621,10 +621,10 @@
                j=j+1; j_rot(k) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1;  ! skip saving the file data
+               j=j+1  ! skip saving the file data
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1;  ! skip saving the file data
+               j=j+1  ! skip saving the file data
             end if
             if (s% u_flag) then
                j=j+1; xh(i_u,k) = vec(j)

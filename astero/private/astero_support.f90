@@ -23,7 +23,7 @@
       use astero_def
       use star_lib
       use star_def
-      use const_def, only: dp, Rsun, standard_cgrav
+      use const_def, only: dp, Rsun, standard_cgrav, pi
       use math_lib
       use utils_lib
       use auto_diff

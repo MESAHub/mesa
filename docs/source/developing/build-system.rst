@@ -33,7 +33,7 @@ The build system exposes several options to control the build process. If you wa
 Module build configuration
 ==========================
 
-Each MESA module has its own configuration Makefile. This make file is located in the root directory of the module. For example, inn the case of the ``eos`` module, this make file is ``eos/Makefile``. This make file includes configurations for how to build, test, and install the module. This can be both in the form of make variables and rules.
+Each MESA module has its own configuration Makefile. This make file is located in the root directory of the module. For example, in the case of the ``eos`` module, this make file is ``eos/Makefile``. This make file includes configurations for how to build, test, and install the module. This can be both in the form of make variables and rules.
 
 The following properties control the main compilation of the module:
 

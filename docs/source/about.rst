@@ -128,7 +128,7 @@ Past Developers
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
 * `Aaron Dotter <https://aarondotter.github.io/>`__
-* Robert Farmer
+* `Robert Farmer <https://www.linkedin.com/in/rob-farmer-2a9781287/>`__
 * `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
