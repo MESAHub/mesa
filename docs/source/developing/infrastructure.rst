@@ -33,6 +33,7 @@ If MESAHub gets unsynced from this and is no longer on the education plan:
 
 This is currently tied to Rob's account.
 
+
 mesastar.org
 ------------
 
@@ -49,7 +50,7 @@ DNS Servers
 ^^^^^^^^^^^
 
 The mesastar.org domain is configured to use `Cloudflare <https://cloudflare.com>`__ nameservers
-and the DNS records are managed by Philip.
+and the DNS records are managed by Matteo.
 
 Mailing lists
 ^^^^^^^^^^^^^
@@ -75,7 +76,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs <https://readthedocs.org/>`__.
-Rich controls the account (and Earl, Joey, and Meridith have access to it). This is
+Rich controls the account (and Earl, Joey, Meridith, and Eb have access to it). This is
 currently free for open source software.
 
 
@@ -93,6 +94,7 @@ redirect to docs.mesastar.org.
 
 The source code for the old sourceforge site lives at
 `<https://github.com/MESAHub/mesa-website>`__.
+
 
 Slack
 -----
@@ -132,11 +134,11 @@ Community
 ^^^^^^^^^
 
 The `MESA Zenodo Community <https://zenodo.org/communities/mesa/>`__ on Zenodo
-is controlled by Eb.
+is controlled by Eb and Mathieu.
 
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/records/18023257>`__ is controlled by Philip.
-* The records for MESA SDK releases (`macOS <https://zenodo.org/records/13768941>`__, `linux <https://zenodo.org/records/13768913>`__) are controlled by Philip.
+* The `record for MESA releases <https://zenodo.org/records/18023257>`__ is controlled by Matteo.
+* The records for MESA SDK releases (`macOS <https://zenodo.org/records/13768941>`__, `linux <https://zenodo.org/records/13768913>`__) are controlled by Matteo.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
