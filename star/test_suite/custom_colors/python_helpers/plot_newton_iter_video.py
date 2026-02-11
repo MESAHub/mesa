@@ -315,8 +315,9 @@ def create_video(
         # Count how many models have completed (for incremental history)
         n_history_show = 0
         if has_history:
-            # A model is complete when we've shown past its completion index
-            n_history_show = np.sum(model_completion_indices < n_show)
+            # A model is complete when we've shown PAST its completion index
+            # (history X appears one point after the model's last iteration)
+            n_history_show = np.sum(model_completion_indices < n_show - 1)
             
             if n_history_show > 0:
                 scatter_history.set_offsets(np.column_stack([

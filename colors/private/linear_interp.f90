@@ -348,35 +348,32 @@ contains
       real(dp), intent(in) :: x(:), val
       integer, intent(out) :: i
       real(dp), intent(out) :: t
-
-      integer :: n, lo, hi, mid
+      integer :: n, lo, hi, mid, lb
       logical :: dummy_axis
-
+      
       n = size(x)
-
+      lb = lbound(x, 1)
+      
       ! Detect dummy axis
       dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
-
       if (dummy_axis) then
-         ! Collapse: use the first element of the axis, no interpolation
-         i = 1
+         i = lb
          t = 0.0_dp
          return
       end if
-
-      ! --- ORIGINAL CODE BELOW ---
-      if (val <= x(1)) then
-         i = 1
+      
+      if (val <= x(lb)) then
+         i = lb
          t = 0.0_dp
          return
-      else if (val >= x(n)) then
-         i = n - 1
+      else if (val >= x(ubound(x,1))) then
+         i = ubound(x,1) - 1
          t = 1.0_dp
          return
       end if
-
-      lo = 1
-      hi = n
+      
+      lo = lb
+      hi = ubound(x,1)
       do while (hi - lo > 1)
          mid = (lo + hi)/2
          if (val >= x(mid)) then
@@ -385,49 +382,48 @@ contains
             hi = mid
          end if
       end do
-
+      
       i = lo
       t = (val - x(i))/(x(i + 1) - x(i))
    end subroutine find_interval
 
-   !---------------------------------------------------------------------------
-   ! Find the nearest grid point
-   !---------------------------------------------------------------------------
    subroutine find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                  i_x, i_y, i_z)
       real(dp), intent(in) :: x_val, y_val, z_val
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
       integer, intent(out) :: i_x, i_y, i_z
-
-      integer :: i
+      integer :: i, lb
       real(dp) :: min_dist, dist
-
+      
       ! Find nearest x grid point
-      min_dist = abs(x_val - x_grid(1))
-      i_x = 1
-      do i = 2, size(x_grid)
+      lb = lbound(x_grid, 1)
+      min_dist = abs(x_val - x_grid(lb))
+      i_x = lb
+      do i = lb + 1, ubound(x_grid, 1)
          dist = abs(x_val - x_grid(i))
          if (dist < min_dist) then
             min_dist = dist
             i_x = i
          end if
       end do
-
+      
       ! Find nearest y grid point
-      min_dist = abs(y_val - y_grid(1))
-      i_y = 1
-      do i = 2, size(y_grid)
+      lb = lbound(y_grid, 1)
+      min_dist = abs(y_val - y_grid(lb))
+      i_y = lb
+      do i = lb + 1, ubound(y_grid, 1)
          dist = abs(y_val - y_grid(i))
          if (dist < min_dist) then
             min_dist = dist
             i_y = i
          end if
       end do
-
+      
       ! Find nearest z grid point
-      min_dist = abs(z_val - z_grid(1))
-      i_z = 1
-      do i = 2, size(z_grid)
+      lb = lbound(z_grid, 1)
+      min_dist = abs(z_val - z_grid(lb))
+      i_z = lb
+      do i = lb + 1, ubound(z_grid, 1)
          dist = abs(z_val - z_grid(i))
          if (dist < min_dist) then
             min_dist = dist
