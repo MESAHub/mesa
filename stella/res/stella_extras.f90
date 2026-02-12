@@ -17,7 +17,7 @@ program main
       r, v, temp, den, kap, tempr, xm, smooth, tau, lum, n_bar, n_e
    real(dp), allocatable, dimension(:) :: &
       t, m, dm, h, he, c, n, o, ne, na, mg, al, si, s, ar, ca, fe, ni
-   real(dp) :: dum, time, X, sum_tau, tauph, tau_extra, gdepos
+   real(dp) :: dum, time, sum_tau, tauph, tau_extra, gdepos
    character(len=132) :: filestr, fname, test_str
    character(len=256) :: line, my_mesa_dir
 
@@ -25,7 +25,7 @@ program main
       A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023d0, Z_div_X_solar = 0.02293d0, &
       tau_sob_hi = 2d0, tau_sob_med = 1d0, tau_sob_lo = 0.2d0
    integer, parameter :: num_logRhos = 41, num_logTs = 117, iounit = 33, &
-                         max_lbol = 10000, n_colors = 5
+                         max_lbol = 10000
    integer :: ilinx, iliny, ibcxmin, ibcxmax, ibcymin, ibcymax, ict(6), num_lbol, num_lbol_max
    real(dp) :: bcxmin(num_logTs), bcxmax(num_logTs), Ts(num_logTs)
    real(dp) :: bcymin(num_logRhos), bcymax(num_logRhos)
@@ -52,9 +52,7 @@ program main
 
    call math_init()
 
-   call colors_init(1, &
-                    [trim(my_mesa_dir)//'/data/colors_data/blackbody_johnson.dat'], &
-                    [n_colors], ierr)
+   call colors_init(.false., '', ierr)
    if (ierr /= 0) then
       write (*, *) 'colors_init failed during initialization'
       call mesa_error(__FILE__,__LINE__)
@@ -358,6 +356,8 @@ program main
                Zsurf = max(1d-99, min(1d0, 1d0 - (Xsurf + Ysurf)))
                Z_div_X = Zsurf/max(1d-99, Xsurf)
                Fe_H = log10(Z_div_X/Z_div_X_solar)
+               ! TODO: use new colors module/filters to get color magnitude
+               ! The below are stubs from the old colors module, and just return -99
                bb_magU = get1_synthetic_color_abs_mag('bb_U')
                bb_magB = get1_synthetic_color_abs_mag('bb_B')
                bb_magV = get1_synthetic_color_abs_mag('bb_V')
