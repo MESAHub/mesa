@@ -82,7 +82,7 @@ is appropriate and documented, and communicating individual developer
 contributions to the astrophysics community so that the careers of
 developers are enhanced by their engagement.
 
-Currently, the MAC is Lars, Rich, and Frank.
+Currently, the MAC is Rich, Meridith, Bill (Wolf) and Jared.
 
 **Onboarding and offboarding processes**
 
