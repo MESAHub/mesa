@@ -215,7 +215,6 @@
          real(dp) :: temp
          integer :: i, k
          info = 0
-         !$omp simd private(temp)
          do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
@@ -251,7 +250,6 @@
          real(dp) :: temp
          integer :: i, k
          info = 0
-         !$omp simd private(temp)
          do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
@@ -287,7 +285,6 @@
          real(dp) :: temp
          integer :: i, k
          info = 0
-         !$omp simd private(temp)
          do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
