@@ -335,7 +335,7 @@
 
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -426,7 +426,7 @@
    History_Track1_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -512,7 +512,7 @@
    History_Track2_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -598,7 +598,7 @@
    History_Track3_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -684,7 +684,7 @@
    History_Track4_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -770,7 +770,7 @@
    History_Track5_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -856,7 +856,7 @@
    History_Track6_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -942,7 +942,7 @@
    History_Track7_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1028,7 +1028,7 @@
    History_Track8_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1114,7 +1114,7 @@
    History_Track9_fname = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1206,7 +1206,7 @@
    History_Panels1_dymin(1) = -1
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1285,7 +1285,7 @@
    History_Panels2_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1364,7 +1364,7 @@
    History_Panels3_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1443,7 +1443,7 @@
    History_Panels4_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1530,7 +1530,7 @@
    History_Panels5_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1608,7 +1608,7 @@
    History_Panels6_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1687,7 +1687,7 @@
    History_Panels7_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1766,7 +1766,7 @@
    History_Panels8_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 
@@ -1845,7 +1845,7 @@
    History_Panels9_points_name(:) = ''
 
       ! Enables calling a subroutine to add extra information to a plot
-      ! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+      ! see ``$MESA_DIR/binary/public/binary_pgbinary.f90``
 
       ! ::
 

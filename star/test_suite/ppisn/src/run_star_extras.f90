@@ -1334,12 +1334,6 @@
          res = keep_going
       end subroutine my_before_struct_burn_mix
 
-      subroutine null_binary_controls(id, binary_id, ierr)
-         integer, intent(in) :: id, binary_id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine null_binary_controls
-
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          use run_star_support
