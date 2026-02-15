@@ -162,7 +162,7 @@
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 5d-4
 
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
       make_gradr_sticky_in_solver_iters = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
