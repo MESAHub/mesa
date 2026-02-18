@@ -6,7 +6,7 @@ FLAGS_CODE_SANITY := \
   -D_FORTIFY_SOURCE=2 \
   -fPIC \
 
-FFLAGS_FP_SANITY := -finit-derived
+FFLAGS_FP_SANITY :=
 ifeq ($(WITH_FPE_CHECKS),yes)
 FFLAGS_FP_SANITY += -ffpe-trap=invalid,overflow,zero -finit-real=snan
 endif
