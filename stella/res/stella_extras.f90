@@ -42,6 +42,7 @@ program main
                rphot, mphot, log_g, Xsurf, Ysurf, Zsurf, Fe_H, Z_div_X, &
                bb_magU, bb_magB, bb_magV, bb_magR, bb_magI
    integer :: nm, num_models, k_phot, iday
+   integer :: colors_handle
 
    my_mesa_dir = '../..'
    call const_init(my_mesa_dir, ierr)
@@ -57,6 +58,9 @@ program main
       write (*, *) 'colors_init failed during initialization'
       call mesa_error(__FILE__,__LINE__)
    end if
+
+   colors_handle = alloc_colors_handle_using_inlist('inlist_colors', ierr)
+   if (ierr /= 0) stop 'alloc_colors_handle_using_inlist failed'
 
    ! setup interpolation table for tau sob eta
    open (unit=iounit, file='FeII_5169_eta.dat', action='read')
@@ -491,6 +495,9 @@ program main
    write (*, *) 'write '//trim(filestr)//'.lbol_lnuc.txt'
    write (*, *) 'write '//trim(filestr)//'.inner_boundary.txt'
    write (*, *) 'done'
+
+   call free_colors_handle(colors_handle)
+   call colors_shutdown
 
 contains
 
