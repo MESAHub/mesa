@@ -143,7 +143,7 @@
       ! Can't handle large residuals at this low of numerical resolution, so we need help.
       use_gold_tolerances = .true.
       use_gold2_tolerances = .true.
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
       make_gradr_sticky_in_solver_iters = .true. ! impossible without this.
       mlt_make_surface_no_mixing = .true.
       energy_eqn_option = 'dedt'

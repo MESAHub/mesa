@@ -105,7 +105,7 @@
       num_steps_to_hold_mesh_after_retry = 1
 
       make_gradr_sticky_in_solver_iters = .true.
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
       varcontrol_target=1d-3
       time_delta_coeff=1.0

@@ -84,7 +84,7 @@
 
       mass_change = 1d-9 ! rate of accretion (Msun/year)
 
-      convergence_ignore_equL_residuals = .true.
+      convergence_ignore_equL_residuals = .false.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

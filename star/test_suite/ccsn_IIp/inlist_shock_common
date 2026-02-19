@@ -104,7 +104,7 @@
       tiny_corr_coeff_limit = 999999
       solver_itermin_until_reduce_min_corr_coeff = 999999
       max_resid_jump_limit = 1d99 ! turn this off until fix residuals
-      convergence_ignore_equL_residuals = .true.   
+      convergence_ignore_equL_residuals = .false.   
 
 ! output controls
 
