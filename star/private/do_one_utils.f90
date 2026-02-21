@@ -146,7 +146,7 @@
             '___________________________________________________________________________'
          write(io,'(A)')
          write(io,'(a)') &
-            '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc_tot     Mass       ' // &
+            '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc_tot Mass       ' // &
             'H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry'
 
          ! note that if the age is in days, then the timestep is automatically in seconds.
