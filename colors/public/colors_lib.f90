@@ -22,7 +22,7 @@ module colors_lib
    use const_def, only: dp, strlen, mesa_dir
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
-   use colors_utils, only: read_strings_from_file, load_lookup_table, load_filter, load_vega_sed
+   use colors_utils, only: read_strings_from_file, load_lookup_table, load_filter, load_vega_sed, resolve_path
    use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
    use colors_iteration, only: write_iteration_colors, open_iteration_file, close_iteration_file
 
@@ -143,7 +143,7 @@ contains
       ! Load lookup table (stellar atmosphere grid)
       ! =========================================
       if (.not. rq%lookup_loaded) then
-         lookup_file = trim(mesa_dir)//trim(rq%stellar_atm)//'/lookup_table.csv'
+         lookup_file = trim(resolve_path(rq%stellar_atm))//'/lookup_table.csv'
          call load_lookup_table(lookup_file, lookup_table, &
                                 rq%lu_file_names, rq%lu_logg, rq%lu_meta, rq%lu_teff)
          rq%lookup_loaded = .true.
@@ -154,7 +154,7 @@ contains
       ! Load Vega SED (needed for Vega mag system)
       ! =========================================
       if (.not. rq%vega_loaded) then
-         vega_filepath = trim(mesa_dir)//trim(rq%vega_sed)
+         vega_filepath = trim(resolve_path(rq%vega_sed))
          call load_vega_sed(vega_filepath, rq%vega_wavelengths, rq%vega_fluxes)
          rq%vega_loaded = .true.
       end if
@@ -163,7 +163,7 @@ contains
       ! Load all filter transmission curves and precompute zero-points
       ! =========================================
       if (.not. rq%filters_loaded) then
-         filter_dir = trim(mesa_dir)//trim(rq%instrument)
+         filter_dir = trim(resolve_path(rq%instrument))
 
          allocate(rq%filters(num_color_filters))
 

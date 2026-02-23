@@ -564,6 +564,32 @@ contains
       name = path(i + 1:)
    end function basename
 
+
+   function resolve_path(path) result(full_path)
+      use const_def, only: mesa_dir
+      character(len=*), intent(in) :: path
+      character(len=512) :: full_path
+      logical :: exists
+
+      if (path(1:2) == './' .or. path(1:3) == '../') then
+         ! Explicitly CWD-relative: use as-is
+         full_path = trim(path)
+      else if (path(1:1) == '/') then
+         ! Starts with /: could be a true absolute user path OR a mesa_dir-relative
+         ! path like /colors/data/... Check whether it exists as a standalone path.
+         inquire(file=trim(path), exist=exists)
+         if (exists) then
+            full_path = trim(path)
+         else
+            full_path = trim(mesa_dir)//trim(path)
+         end if
+      else
+         ! No leading slash and not ./ or ../: prepend mesa_dir with separator
+         full_path = trim(mesa_dir)//'/'//trim(path)
+      end if
+
+   end function resolve_path
+
    subroutine read_strings_from_file(colors_settings, strings, n, ierr)
       character(len=512) :: filename
       character(len=100), allocatable, intent(out) :: strings(:)
@@ -574,8 +600,12 @@ contains
 
       ierr = 0
 
-      filename = trim(mesa_dir)//trim(colors_settings%instrument)//"/"// &
+
+      filename = trim(resolve_path(colors_settings%instrument))//"/"// &
                  trim(basename(colors_settings%instrument))
+
+      !filename = trim(mesa_dir)//trim(colors_settings%instrument)//"/"// &
+      !           trim(basename(colors_settings%instrument))
 
       !filename = trim(mesa_dir)//trim(colors_settings%instrument)//"/"
 
