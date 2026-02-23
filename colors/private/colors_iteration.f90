@@ -118,8 +118,6 @@ contains
       sed_filepath = trim(mesa_dir)//cs%stellar_atm
       make_sed = .false.  ! Don't write individual SEDs for iteration output
 
-      write(*,*) 'hello, it is I, newton solver'
-
       ! Calculate bolometric magnitude using cached lookup table
       ! Must pass the cached lookup arrays for atmosphere interpolation
       call calculate_bolometric(t_eff, log_g, metallicity, R, d, &

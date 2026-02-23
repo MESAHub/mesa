@@ -118,3 +118,4 @@ TAGS
 **/data/colors_data/.extraction_complete
 data/colors_data/filters/
 data/colors_data/stellar_models/
+star/test_suite/custom_colors/python_helpers/newton_iter_*
