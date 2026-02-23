@@ -5,15 +5,19 @@ program main
    use interp_1d_def, only: pm_work_size
    use const_def
    use const_lib, only: const_init
-   use colors_def
-   use colors_lib
+   use colors_def, only: Colors_General_Info, get_colors_ptr
+   use colors_lib, only: colors_init
+   use colors_ctrls_io, only: set_colors_controls
+   use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
    use math_lib
    use utils_lib, only: mesa_error, mkdir, is_bad
 
    implicit none
 
    integer :: i, j, k, zone, idum, ierr
-   real(dp), allocatable, dimension(:, :) :: &
+   
+   integer :: colors_handle
+   type(Colors_General_Info), pointer :: cs
       r, v, temp, den, kap, tempr, xm, smooth, tau, lum, n_bar, n_e
    real(dp), allocatable, dimension(:) :: &
       t, m, dm, h, he, c, n, o, ne, na, mg, al, si, s, ar, ca, fe, ni
@@ -52,11 +56,27 @@ program main
 
    call math_init()
 
-   call colors_init(.false., '', ierr)
+   colors_handle = 1
+
+   ! Initialize the (new) MESA colors module.
+   call colors_init(colors_handle, ierr)
    if (ierr /= 0) then
       write (*, *) 'colors_init failed during initialization'
-      call mesa_error(__FILE__,__LINE__)
+      call mesa_error(__FILE__, __LINE__)
    end if
+
+   ! Turn colors on (defaults have use_colors = .false.).
+   call get_colors_ptr(colors_handle, cs, ierr)
+   if (ierr /= 0) then
+      write (*, *) 'failed in get_colors_ptr (colors_handle)'
+      call mesa_error(__FILE__, __LINE__)
+   end if
+   call set_colors_controls(cs, 'use_colors', '.true.', ierr)
+   if (ierr /= 0) then
+      write (*, *) 'failed to set use_colors'
+      call mesa_error(__FILE__, __LINE__)
+   end if
+
 
    ! setup interpolation table for tau sob eta
    open (unit=iounit, file='FeII_5169_eta.dat', action='read')
@@ -356,13 +376,7 @@ program main
                Zsurf = max(1d-99, min(1d0, 1d0 - (Xsurf + Ysurf)))
                Z_div_X = Zsurf/max(1d-99, Xsurf)
                Fe_H = log10(Z_div_X/Z_div_X_solar)
-               ! TODO: use new colors module/filters to get color magnitude
-               ! The below are stubs from the old colors module, and just return -99
-               bb_magU = get1_synthetic_color_abs_mag('bb_U')
-               bb_magB = get1_synthetic_color_abs_mag('bb_B')
-               bb_magV = get1_synthetic_color_abs_mag('bb_V')
-               bb_magR = get1_synthetic_color_abs_mag('bb_R')
-               bb_magI = get1_synthetic_color_abs_mag('bb_I')
+               call get_bb_mags(10d0**logT, log_g, rphot, Fe_H, colors_handle, bb_magU, bb_magB, bb_magV, bb_magR, bb_magI, ierr)
                write (23, '(i5,99(1pe18.6,1x))') j, time - t0, &
                   rphot, (alfa*v(j, nm) + beta*v(j - 1, nm))*1d3, mphot, logT, &
                   alfa*den(j, nm) + beta*den(j - 1, nm), alfa*kap(j, nm) + beta*kap(j - 1, nm), &
@@ -491,8 +505,62 @@ program main
    write (*, *) 'write '//trim(filestr)//'.lbol_lnuc.txt'
    write (*, *) 'write '//trim(filestr)//'.inner_boundary.txt'
    write (*, *) 'done'
-
 contains
+
+   subroutine get_bb_mags(t_eff, log_g, R, metallicity, colors_handle, bb_magU, bb_magB, bb_magV, bb_magR, bb_magI, ierr)
+      real(dp), intent(in) :: t_eff, log_g, R, metallicity
+      integer, intent(in) :: colors_handle
+      real(dp), intent(out) :: bb_magU, bb_magB, bb_magV, bb_magR, bb_magI
+      integer, intent(out) :: ierr
+
+      integer :: n, i
+      character(len=80), allocatable :: names(:)
+      real(dp), allocatable :: vals(:)
+
+      ierr = 0
+      n = how_many_colors_history_columns(colors_handle)
+      if (n <= 0) then
+         bb_magU = 0d0; bb_magB = 0d0; bb_magV = 0d0; bb_magR = 0d0; bb_magI = 0d0
+         return
+      end if
+
+      allocate(names(n), vals(n))
+      call data_for_colors_history_columns(t_eff, log_g, R, metallicity, colors_handle, n, names, vals, ierr)
+      if (ierr /= 0) then
+         deallocate(names, vals)
+         return
+      end if
+
+      ! Try a few common name variants (the filter name comes from the instrument directory).
+      bb_magU = lookup_mag(names, vals, n, 'bb_U', 'U', 'Johnson_U', 'Uband')
+      bb_magB = lookup_mag(names, vals, n, 'bb_B', 'B', 'Johnson_B', 'Bband')
+      bb_magV = lookup_mag(names, vals, n, 'bb_V', 'V', 'Johnson_V', 'Vband')
+      bb_magR = lookup_mag(names, vals, n, 'bb_R', 'R', 'Johnson_R', 'Rband')
+      bb_magI = lookup_mag(names, vals, n, 'bb_I', 'I', 'Johnson_I', 'Iband')
+
+      deallocate(names, vals)
+   end subroutine get_bb_mags
+
+   real(dp) function lookup_mag(names, vals, n, c1, c2, c3, c4)
+      character(len=80), intent(in) :: names(n)
+      real(dp), intent(in) :: vals(n)
+      integer, intent(in) :: n
+      character(len=*), intent(in) :: c1, c2, c3, c4
+
+      integer :: i
+      lookup_mag = 0d0
+
+      do i = 1, n
+         if (trim(names(i)) == trim(c1) .or. &
+             trim(names(i)) == trim(c2) .or. &
+             trim(names(i)) == trim(c3) .or. &
+             trim(names(i)) == trim(c4)) then
+            lookup_mag = vals(i)
+            return
+         end if
+      end do
+   end function lookup_mag
+
 
    real(dp) function interp_logLbol(time)
       real(dp), intent(in) :: time  ! time since start of run
@@ -509,15 +577,6 @@ contains
       interp_logLbol = logL_lbol(num_lbol)
    end function interp_logLbol
 
-   real(dp) function get1_synthetic_color_abs_mag(name) result(mag)
-      character(len=*) :: name
-      mag = get_abs_mag_by_name(name, logT, log_g, Fe_H, L_div_Lsun, ierr)
-      if (ierr /= 0) then
-         write (*, *) 'failed in get_abs_mag_by_id '//trim(name), &
-            time, logT, log_g, Fe_H, Lbol
-         call mesa_error(__FILE__, __LINE__)
-      end if
-   end function get1_synthetic_color_abs_mag
 
    subroutine save_day_post_Lbol_max(day, t0, zone, star_mass, mass_IB, daystr)
       real(dp), intent(in) :: day, t0, star_mass, mass_IB
