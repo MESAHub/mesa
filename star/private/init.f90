@@ -165,7 +165,7 @@
          if (s% colors_handle > 0) then
             call colors_ptr(s% colors_handle, cs, ierr)
             if (ierr /= 0) return
-            if (cs% colors_per_iteration .and. cs% use_colors) then
+            if (cs% colors_per_newton_step .and. cs% use_colors) then
                s% use_other_solver_monitor = .true.
                s% other_solver_monitor => colors_solver_monitor_wrapper
             end if

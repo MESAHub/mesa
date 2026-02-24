@@ -65,7 +65,7 @@
    ! ::
 
       use_colors = .false.
-      colors_per_iteration = .false.
+      colors_per_newton_step = .false.
       instrument = 'data/colors_data/filters/Generic/Johnson'
       stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
       vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'

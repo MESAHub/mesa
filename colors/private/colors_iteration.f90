@@ -90,7 +90,7 @@ contains
       if (ierr /= 0) return
 
       ! Check if per-iteration colors is enabled
-      if (.not. cs%colors_per_iteration) return
+      if (.not. cs%colors_per_newton_step) return
       if (.not. cs%use_colors) return
 
       ! Verify data was loaded at initialization

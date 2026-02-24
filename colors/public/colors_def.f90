@@ -52,7 +52,7 @@ module colors_def
       integer :: handle
       logical :: in_use
 
-      logical :: colors_per_iteration
+      logical :: colors_per_newton_step
       integer :: iteration_output_unit
       logical :: iteration_file_open
 
