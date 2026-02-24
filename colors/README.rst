@@ -9,10 +9,10 @@ This test suite case demonstrates the functionality of the MESA ``colors`` modul
 What is MESA colors?
 ====================
 
-MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
+MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L`) and Surface Temperature (T_eff), the colors module computes:
 
-* **Bolometric Magnitude** (:math:`M_{\rm bol}`)
-* **Bolometric Flux** (:math:`F_{\rm bol}`)
+* **Bolometric Magnitude** (M_bol)
+* **Bolometric Flux** (F_bol)
 * **Synthetic Magnitudes** in specific photometric filters (e.g., Johnson V, Gaia G, 2MASS J).
 
 This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
@@ -22,7 +22,7 @@ How does the MESA colors module work?
 
 The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
 
-1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
+1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (T_eff), Surface Gravity (log g), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
 
 2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
@@ -85,7 +85,7 @@ stellar_atm
 
 Path to the directory containing the grid of stellar atmosphere models. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute. This directory must contain:
 
-1.  **lookup_table.csv**: A map linking filenames to physical parameters (:math:`T_{\rm eff}`, :math:`\log g`, [M/H]).
+1.  **lookup_table.csv**: A map linking filenames to physical parameters (T_eff`, log g, [M/H]).
 2.  **SED files**: The actual spectra (text or binary format).
 3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
 
@@ -105,7 +105,7 @@ distance
 
 The distance to the star in centimetres, used to convert surface flux to observed flux.
 
-* **Default Behaviour:** At 10 parsecs (:math:`3.0857 \times 10^{19}` cm) the output is **Absolute Magnitudes**.
+* **Default Behaviour:** At 10 parsecs (3.0857 * 10^19 cm) the output is **Absolute Magnitudes**.
 * **Custom Usage:** Set this to a specific source distance to calculate Apparent Magnitudes.
 
 **Example:**
