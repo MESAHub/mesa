@@ -19,10 +19,10 @@
 
 module colors_history
 
-   use const_def, only: dp, mesa_dir
+   use const_def, only: dp
    use utils_lib, only: mesa_error
    use colors_def, only: Colors_General_Info, get_colors_ptr, num_color_filters, color_filter_names
-   use colors_utils, only: remove_dat
+   use colors_utils, only: remove_dat, resolve_path
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
 
@@ -91,7 +91,7 @@ subroutine data_for_colors_history_columns( &
       end if
 
       d = cs%distance
-      sed_filepath = trim(mesa_dir)//cs%stellar_atm
+      sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = cs%make_csv
 
       ! Calculate bolometric magnitude using cached lookup table

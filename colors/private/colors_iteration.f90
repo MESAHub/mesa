@@ -19,9 +19,9 @@
 
 module colors_iteration
 
-   use const_def, only: dp, mesa_dir
+   use const_def, only: dp
    use colors_def
-   use colors_utils, only: remove_dat
+   use colors_utils, only: remove_dat, resolve_path
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
 
@@ -115,7 +115,7 @@ contains
 
       ! Get paths and settings from colors_settings
       d = cs%distance
-      sed_filepath = trim(mesa_dir)//cs%stellar_atm
+      sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = .false.  ! Don't write individual SEDs for iteration output
 
       ! Calculate bolometric magnitude using cached lookup table
