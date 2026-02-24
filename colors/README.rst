@@ -52,11 +52,24 @@ instrument
 
 **Default:** ``'data/colors_data/filters/Generic/Johnson'``
 
-Path to the directory containing the filter transmission curves to use. The path must be structured as ``facility/instrument``.
+Path to the filter instrument directory, structured as ``facility/instrument``.
 
-* Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute.
-* The directory must contain a file named after the instrument (e.g., ``Johnson``) which acts as an index listing the filters to load.
-* The module will read every ``.dat`` file listed in that index and create a corresponding history column for it.
+* The directory must contain an index file with the same name as the instrument
+  (e.g., ``Johnson``), listing one filter filename per line.
+* The module loads every ``.dat`` transmission curve listed in that index and
+  creates a corresponding history column for each.
+
+.. rubric:: Note on paths
+
+All path parameters (``instrument``, ``stellar_atm``, ``vega_sed``) are resolved
+using the same logic:
+
+* ``'data/colors_data/...'`` — no leading slash; ``$MESA_DIR`` is prepended. This
+  is the recommended form for all standard data paths.
+* ``'/absolute/path/...'`` — tested on disk first; if found, used as-is. If not
+  found, ``$MESA_DIR`` is prepended (preserves backwards compatibility).
+* ``'./local/path/...'`` or ``'../up/one/...'`` — used exactly as supplied,
+  relative to the MESA working directory.
 
 **Example:**
 
