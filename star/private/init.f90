@@ -150,14 +150,6 @@
       end subroutine colors_solver_monitor_wrapper
 
 
-
-!call data_for_colors_history_columns(s%T(1), safe_log10(s%grav(1)), s%R(1), s%kap_rq%Zbase, &
-!s% model_number, s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
-
-
-
-
-
       subroutine setup_colors_iteration_hook(id, ierr)
          use colors_lib, only: colors_ptr
          use colors_def, only: Colors_General_Info
