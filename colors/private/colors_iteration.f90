@@ -46,6 +46,7 @@ contains
       if (cs%iteration_file_open) return  ! already open
 
       filename = trim(cs%colors_results_directory)//'/iteration_colors.data'
+      call execute_command_line('mkdir -p "'//trim(cs%colors_results_directory)//'"', wait=.true.)
       open(newunit=cs%iteration_output_unit, file=trim(filename), &
            status='replace', action='write', iostat=ierr)
       if (ierr /= 0) then
