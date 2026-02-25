@@ -201,6 +201,51 @@ Required only if ``mag_system = 'Vega'``. Points to the reference SED file for V
    vega_sed = '/path/to/my/vega_SED.csv'
 
 
+colors_per_newton_step
+----------------------
+
+**Default:** ``.false.``
+
+If set to ``.true.``, the colors module computes synthetic photometry at every Newton iteration within each timestep, rather than only once per converged model. This is useful for studying rapid stellar variability or evolutionary phases where the stellar parameters change significantly within a single timestep (e.g., thermal pulses, shell flashes).
+
+.. warning::
+
+   Enabling this feature substantially increases the computational cost of the run, as photometric calculations are performed multiple times per timestep. It should only be used when sub-timestep resolution is scientifically required.
+
+**Example:**
+
+.. code-block:: fortran
+
+   colors_per_newton_step = .true.
+
+
+Splitting the Colors Inlist
+---------------------------
+
+The ``&colors`` namelist can be split across multiple files using the following parameters. This is useful for managing large or modular inlist configurations. The mechanism works recursively, so extra inlists can themselves read further extra inlists.
+
+read_extra_colors_inlist(1..5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default:** ``.false.``
+
+If ``read_extra_colors_inlist(i)`` is set to ``.true.``, the module will read an additional ``&colors`` namelist from the file named by ``extra_colors_inlist_name(i)``.
+
+extra_colors_inlist_name(1..5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default:** ``'undefined'``
+
+The filename of the extra colors inlist to read when the corresponding ``read_extra_colors_inlist(i)`` is ``.true.``.
+
+**Example:**
+
+.. code-block:: fortran
+
+   read_extra_colors_inlist(1) = .true.
+   extra_colors_inlist_name(1) = 'inlist_my_filters'
+
+
 Data Preparation (SED_Tools)
 ============================
 
@@ -261,6 +306,7 @@ Below are the default values for all user-facing ``colors`` module parameters as
 .. code-block:: fortran
 
       use_colors = .false.
+      colors_per_newton_step = .false.
       instrument = 'data/colors_data/filters/Generic/Johnson'
       stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
       vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
@@ -269,6 +315,8 @@ Below are the default values for all user-facing ``colors`` module parameters as
       sed_per_model = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
+      read_extra_colors_inlist(:) = .false.
+      extra_colors_inlist_name(:) = 'undefined'
 
 Visual Summary of Data Flow
 ===========================

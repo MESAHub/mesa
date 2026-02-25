@@ -6,6 +6,30 @@ Colors
 
 This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
 
+Running the Test Suite
+======================
+
+The ``custom_colors`` test suite is a standard MESA work directory. Before running it for the first time—or after making changes to the ``colors`` module source—the binary must be compiled.
+
+``make clean``
+   Removes all previously compiled object files and binaries from the ``build/`` directory. Run this before recompiling to ensure a clean state, particularly after switching MESA versions or modifying source files.
+
+``make``
+   Compiles the test suite and links it against the installed MESA libraries (including ``libcolors``). When it completes successfully it produces the ``build/bin/star`` executable. You do not need to understand the full compiler invocation—``make`` handles it automatically based on the module dependencies declared in the Makefile.
+
+``./rn``
+   Runs the compiled stellar evolution model. MESA evolves the star according to the parameters in ``inlist_colors``, writing history and profile data to ``LOGS/`` and photometric outputs to ``SED/``.
+
+A typical first-run workflow is:
+
+.. code-block:: bash
+
+   make clean   # wipe any previous build (optional but recommended)
+   make         # compile
+   ./rn         # run
+
+If ``make`` completes without errors and ``./rn`` begins printing timestep output, the colors module is working correctly.
+
 What is MESA colors?
 ====================
 
@@ -85,7 +109,7 @@ stellar_atm
 
 Path to the directory containing the grid of stellar atmosphere models. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute. This directory must contain:
 
-1.  **lookup_table.csv**: A map linking filenames to physical parameters (:math:`T_{\rm eff}`, :math:`\log g`, [M/H]).
+1.  **lookup_table.csv**: A map linking filenames to physical parameters (T_eff`, log g, [M/H]).
 2.  **SED files**: The actual spectra (text or binary format).
 3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
 
@@ -105,7 +129,7 @@ distance
 
 The distance to the star in centimetres, used to convert surface flux to observed flux.
 
-* **Default Behaviour:** At 10 parsecs (:math:`3.0857 \times 10^{19}` cm) the output is **Absolute Magnitudes**.
+* **Default Behaviour:** At 10 parsecs (3.0857 * 10^19 cm) the output is **Absolute Magnitudes**.
 * **Custom Usage:** Set this to a specific source distance to calculate Apparent Magnitudes.
 
 **Example:**
@@ -199,6 +223,52 @@ Required only if ``mag_system = 'Vega'``. Points to the reference SED file for V
 .. code-block:: fortran
 
    vega_sed = '/path/to/my/vega_SED.csv'
+
+
+colors_per_newton_step
+----------------------
+
+**Default:** ``.false.``
+
+If set to ``.true.``, the colors module computes synthetic photometry at every Newton iteration within each timestep, rather than only once per converged model. This is useful for studying rapid stellar variability or evolutionary phases where the stellar parameters change significantly within a single timestep (e.g., thermal pulses, shell flashes).
+
+.. warning::
+
+   Enabling this feature substantially increases the computational cost of the run, as photometric calculations are performed multiple times per timestep. It should only be used when sub-timestep resolution is scientifically required.
+
+**Example:**
+
+.. code-block:: fortran
+
+   colors_per_newton_step = .true.
+
+
+Splitting the Colors Inlist
+---------------------------
+
+The ``&colors`` namelist can be split across multiple files using the following parameters. This is useful for managing large or modular inlist configurations. The mechanism works recursively, so extra inlists can themselves read further extra inlists.
+
+read_extra_colors_inlist(1..5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default:** ``.false.``
+
+If ``read_extra_colors_inlist(i)`` is set to ``.true.``, the module will read an additional ``&colors`` namelist from the file named by ``extra_colors_inlist_name(i)``.
+
+extra_colors_inlist_name(1..5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Default:** ``'undefined'``
+
+The filename of the extra colors inlist to read when the corresponding ``read_extra_colors_inlist(i)`` is ``.true.``.
+
+**Example:**
+
+.. code-block:: fortran
+
+   read_extra_colors_inlist(1) = .true.
+   extra_colors_inlist_name(1) = 'inlist_my_filters'
+
 
 
 Data Preparation (SED_Tools)

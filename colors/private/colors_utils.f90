@@ -574,10 +574,10 @@ contains
       if (path(1:2) == './' .or. path(1:3) == '../') then
          ! Explicitly CWD-relative: use as-is
          full_path = trim(path)
+
       else if (path(1:1) == '/') then
-         ! Starts with /: could be a true absolute user path OR a mesa_dir-relative
-         ! path like /colors/data/... Check whether it exists as a standalone path.
          inquire(file=trim(path), exist=exists)
+         if (.not. exists) inquire(file=trim(path)//'/.', exist=exists)
          if (exists) then
             full_path = trim(path)
          else
