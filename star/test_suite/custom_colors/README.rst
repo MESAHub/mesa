@@ -419,8 +419,8 @@ Python Helper Scripts
 All Python helpers live in ``python_helpers/`` and are run from that directory.
 All paths default to ``../LOGS/`` and ``../SED/`` relative to that location, matching the standard test suite layout.
 
-HISTORY_check.py
-----------------
+plot_history_live.py
+--------------------
 
 **Purpose:** Live-updating four-panel diagnostic viewer for ``history.data``, designed to run *during* a MESA simulation.
 
@@ -438,30 +438,30 @@ All four panels are color-coded by MESA's ``phase_of_evolution`` integer if that
 .. code-block:: bash
 
    cd python_helpers
-   python HISTORY_check.py
+   python plot_history_live.py
 
 The script polls ``../LOGS/history.data`` every 0.1 seconds and updates the plot whenever the file changes. It will print a change notification for the first five updates, then go silent to avoid log spam. Close the window to exit.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``. Imports shared logic from ``static_HISTORY_check.py``.
+**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``. Imports shared logic from ``plot_history.py``.
 
-static_HISTORY_check.py
-------------------------
+plot_history.py
+---------------
 
-**Purpose:** Single-shot (non-live) version of the history viewer. Reads the completed ``history.data`` once and renders the same four-panel figure. Intended for post-run analysis and as a shared library imported by ``HISTORY_check.py``, ``make_history_movie.py``, and ``make_CMD_InterpRad_movie.py``.
+**Purpose:** Single-shot (non-live) version of the history viewer. Reads the completed ``history.data`` once and renders the same four-panel figure. Intended for post-run analysis and as a shared library imported by ``plot_history_live.py``, ``movie_history.py``, and ``movie_cmd_3d.py``.
 
 **How to use:**
 
 .. code-block:: bash
 
    cd python_helpers
-   python static_HISTORY_check.py
+   python plot_history.py
 
 Produces a static figure and then calls ``plt.show()``. The script also exports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` for use by the other scripts.
 
 **Note:** The first 5 model rows are skipped (``MesaView`` skip=5) to avoid noisy pre-MS relaxation artifacts at the very start of the run.
 
-SED_check.py
-------------
+plot_sed_live.py
+----------------
 
 **Purpose:** Live-updating SED viewer that monitors the ``SED/`` directory for CSV files written by the colors module (requires ``make_csv = .true.`` in ``inlist_colors``).
 
@@ -480,30 +480,30 @@ The x-axis auto-scales to the wavelength range where the SED has flux above 1% o
 .. code-block:: bash
 
    cd python_helpers
-   python SED_check.py
+   python plot_sed_live.py
 
 Runs live, refreshing every 0.1 s. Close the window or press Ctrl-C to stop. Can also be configured to save a video instead of displaying live by setting ``save_video=True`` in the ``SEDChecker`` constructor.
 
 **Requirements:** ``matplotlib``, ``numpy``.
 
-static_SED_check.py
---------------------
+plot_sed.py
+-----------
 
-**Purpose:** Single-shot SED plot that reads all ``*SED.csv`` files in ``../SED/`` and overlays them in one figure. Simpler than ``SED_check.py``—no live monitoring, no EM region shading, no inlist parsing.
+**Purpose:** Single-shot SED plot that reads all ``*SED.csv`` files in ``../SED/`` and overlays them in one figure. Simpler than ``plot_sed_live.py``—no live monitoring, no EM region shading, no inlist parsing.
 
 **How to use:**
 
 .. code-block:: bash
 
    cd python_helpers
-   python static_SED_check.py
+   python plot_sed.py
 
 Displays the combined SED figure. The x-axis is cropped to 0–60000 Å by default; edit the ``xlim`` argument in ``main()`` to change this.
 
 **Requirements:** ``matplotlib``, ``numpy``, ``pandas``.
 
-interactive_cmd_3d.py
----------------------
+plot_cmd_3d.py
+--------------
 
 **Purpose:** Interactive 3D scatter plot of the CMD with a user-selectable third axis. Useful for visualising how any history column correlates with the photometric evolution of the star.
 
@@ -512,30 +512,30 @@ interactive_cmd_3d.py
 .. code-block:: bash
 
    cd python_helpers
-   python interactive_cmd_3d.py
+   python plot_cmd_3d.py
 
 On launch, the script prints all available columns from ``history.data`` and prompts you to type the name of the column to use for the Z axis (default: ``Interp_rad``, the interpolation radius in the atmosphere grid). Press Enter to accept the default or type any other column name. A rotatable 3D matplotlib window then opens showing color index vs. magnitude vs. your chosen column.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``. Imports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` from ``static_HISTORY_check.py``.
+**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``. Imports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` from ``plot_history.py``.
 
-make_history_movie.py
----------------------
+movie_history.py
+----------------
 
-**Purpose:** Renders the same four-panel display as ``HISTORY_check.py`` into an MP4 video, with one frame per model row. Points accumulate from left to right in time, so the full evolutionary track builds up across the video.
+**Purpose:** Renders the same four-panel display as ``plot_history_live.py`` into an MP4 video, with one frame per model row. Points accumulate from left to right in time, so the full evolutionary track builds up across the video.
 
 **How to use:**
 
 .. code-block:: bash
 
    cd python_helpers
-   python make_history_movie.py
+   python movie_history.py
 
 Writes ``history.mp4`` in the current directory at 24 fps, 150 dpi. Requires ``ffmpeg`` to be installed and accessible on ``$PATH``. Progress is shown with a ``tqdm`` progress bar if that package is available.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``, ``ffmpeg``. Optionally ``tqdm``. Imports the ``HistoryChecker`` class from ``HISTORY_check.py`` so that axis formatting and phase-legend logic remain identical to the live viewer.
+**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``, ``ffmpeg``. Optionally ``tqdm``. Imports the ``HistoryChecker`` class from ``plot_history_live.py`` so that axis formatting and phase-legend logic remain identical to the live viewer.
 
-make_CMD_InterpRad_movie.py
----------------------------
+movie_cmd_3d.py
+---------------
 
 **Purpose:** Creates a 3D rotation video that starts looking straight down the ``Interp_rad`` axis (showing a plain CMD) and rotates to an oblique 3D perspective over 10 seconds, with 1-second holds at each end.
 
@@ -544,11 +544,11 @@ make_CMD_InterpRad_movie.py
 .. code-block:: bash
 
    cd python_helpers
-   python make_CMD_InterpRad_movie.py
+   python movie_cmd_3d.py
 
 Writes ``cmd_interp_rad_rotation.mp4`` in the current directory at 30 fps. Requires ``ffmpeg``.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``, ``ffmpeg``. Imports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` from ``static_HISTORY_check.py``.
+**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``, ``ffmpeg``. Imports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` from ``plot_history.py``.
 
 plot_newton_iter.py
 -------------------
@@ -586,8 +586,8 @@ Key flags:
 
 **Requirements:** ``matplotlib``, ``numpy``. Optionally ``mesa_reader`` for history overlay.
 
-plot_newton_iter_video.py
--------------------------
+movie_newton_iter.py
+--------------------
 
 **Purpose:** Creates an animated MP4 showing the Newton iteration data accumulating point by point over time. Iterations are sorted by model number then iteration number, so the animation follows the physical sequence of the simulation. History file points are overlaid incrementally—a new history point appears each time a model's full set of iterations is complete. Outliers are removed via iterative sigma clipping before rendering. Axis limits expand smoothly as new data arrives.
 
@@ -598,7 +598,7 @@ The script supports the same interactive and batch modes as ``plot_newton_iter.p
 .. code-block:: bash
 
    cd python_helpers
-   python plot_newton_iter_video.py
+   python movie_newton_iter.py
 
 You will be prompted for X, Y, and color axes, video duration, FPS, output filename, and sigma-clipping threshold.
 
@@ -606,8 +606,8 @@ You will be prompted for X, Y, and color axes, video duration, FPS, output filen
 
 .. code-block:: bash
 
-   python plot_newton_iter_video.py -x Teff -y V -c model
-   python plot_newton_iter_video.py -x Teff -y "B-V" -c iter --flip-y -d 60
+   python movie_newton_iter.py -x Teff -y V -c model
+   python movie_newton_iter.py -x Teff -y "B-V" -c iter --flip-y -d 60
 
 Key flags:
 
@@ -624,7 +624,7 @@ Requires ``ffmpeg``. For GIF output, ``pillow`` can be used instead by changing 
 
 **Requirements:** ``matplotlib``, ``numpy``, ``ffmpeg``. Optionally ``mesa_reader``. Imports from ``plot_newton_iter.py``.
 
-zero_point_check.py
+plot_zero_points.py
 -------------------
 
 **Purpose:** Runs MESA three times in sequence with ``mag_system`` set to ``'Vega'``, ``'AB'``, and ``'ST'`` respectively, then overlays the resulting CMDs in a single comparison figure. Useful for quantifying the offsets between magnitude systems for a given set of filters.
@@ -634,7 +634,7 @@ zero_point_check.py
 .. code-block:: bash
 
    cd python_helpers
-   python zero_point_check.py
+   python plot_zero_points.py
 
 The script must be run from within ``python_helpers/`` (it changes directory to ``../`` before calling ``./rn``). It temporarily modifies ``inlist_colors`` to set the magnitude system and to disable PGstar, restores the original file after each run, and saves each LOGS directory as ``LOGS_Vega``, ``LOGS_AB``, and ``LOGS_ST``. The comparison figure is saved to ``mag_system_comparison.png``.
 
@@ -644,7 +644,7 @@ The script must be run from within ``python_helpers/`` (it changes directory to 
 
 **Requirements:** ``matplotlib``, ``numpy``, ``re``, ``shutil``, ``subprocess``. No ``mesa_reader`` needed.
 
-batch_run.py
+run_batch.py
 ------------
 
 **Purpose:** Runs MESA in batch over a list of parameter files, each of which defines a different stellar type (M dwarf, Pop III, OB star, etc.). After each run, the history file is renamed to avoid being overwritten by the next run.
@@ -656,10 +656,10 @@ Edit ``param_options`` at the top of the script to list the ``extra_controls_inl
 .. code-block:: bash
 
    cd python_helpers
-   python batch_run.py
+   python run_batch.py
 
 The script: (1) comments out all parameter entries in ``inlist_1.0``, (2) uncomments one entry at a time, (3) runs ``./clean``, ``./mk``, and ``./rn`` in the MESA work directory, (4) renames the resulting ``history.data`` to ``history_<param_name>.data``, and (5) re-comments all entries at the end. If a run fails, a warning is printed and the loop continues with the next parameter set.
 
-**Note:** The MESA work directory is assumed to be one level above the location of ``batch_run.py`` (i.e., ``../``). The inlist to modify is ``inlist_1.0``. Adjust these paths at the top of the script if your layout differs.
+**Note:** The MESA work directory is assumed to be one level above the location of ``run_batch.py`` (i.e., ``../``). The inlist to modify is ``inlist_1.0``. Adjust these paths at the top of the script if your layout differs.
 
 **Requirements:** ``os``, ``re``, ``shutil``, ``subprocess`` (all standard library).
