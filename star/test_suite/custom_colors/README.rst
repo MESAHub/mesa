@@ -21,16 +21,16 @@ The ``custom_colors`` test suite is a standard MESA work directory. Before runni
    Removes all previously compiled object files and binaries from the ``build/`` directory. Run this before recompiling to ensure a clean state, particularly after switching MESA versions or modifying source files.
 
 ``make``
-   Compiles the test suite and links it against the installed MESA libraries (including ``libcolors``). When it completes successfully it produces the ``build/bin/star`` executable. You do not need to understand the full compiler invocation—``make`` handles it automatically based on the module dependencies declared in the Makefile.
+   Compiles the test suite and links it against the installed MESA libraries (including ``libcolors``). When it completes successfully it produces the ``build/bin/star`` executable.
 
 ``./rn``
    Runs the compiled stellar evolution model. MESA evolves the star according to the parameters in ``inlist_colors``, writing history and profile data to ``LOGS/`` and photometric outputs to ``SED/``.
 
-A typical first-run workflow is:
+A typical run workflow is:
 
 .. code-block:: bash
 
-   make clean   # wipe any previous build (optional but recommended)
+   make clean   # wipe any previous build
    make         # compile
    ./rn         # run
 
@@ -41,7 +41,7 @@ If ``make`` completes without errors and ``./rn`` begins printing timestep outpu
 What is MESA colors?
 ====================
 
-MESA colors is a runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L) and Surface Temperature (T_eff), the colors module computes:
+MESA colors is a runtime module that allows users to generate observer-ready data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L) and Surface Temperature (T_eff), the colors module computes:
 
 * **Bolometric Magnitude** (M_bol)
 * **Bolometric Flux** (F_bol)
