@@ -9,6 +9,12 @@ This test suite case demonstrates the functionality of the MESA ``colors`` modul
 Running the Test Suite
 ======================
 
+
+The ``custom_colors`` test suite case evolves a 7 :math:`M_\odot` star from the pre-main sequence through core hydrogen burning, up to the point of helium exhaustion (:math:`X_{\rm He,c} < 0.01`). 
+
+The test is not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (:math:`T_{\rm eff}`, :math:`\log g`) in a reasonable wall-clock time.
+
+
 The ``custom_colors`` test suite is a standard MESA work directory. Before running it for the first time—or after making changes to the ``colors`` module source—the binary must be compiled.
 
 ``make clean``
@@ -29,6 +35,8 @@ A typical first-run workflow is:
    ./rn         # run
 
 If ``make`` completes without errors and ``./rn`` begins printing timestep output, the colors module is working correctly.
+
+
 
 What is MESA colors?
 ====================
@@ -296,20 +304,6 @@ Visual Summary of Data Flow
    | Mag_bol, Flux_bol    |
    | V, B, I, ...         |
    +----------------------+
-
-
-Test Suite Case
-===============
-
-Overview
---------
-
-The ``custom_colors`` test suite case evolves a 7 :math:`M_\odot` star from the pre-main sequence through core hydrogen burning, up to the point of helium exhaustion (:math:`X_{\rm He,c} < 0.01`). The 7 :math:`M_\odot` initial mass is chosen deliberately: it produces a prominent Blue Loop during core helium burning, causing the star to traverse the HR diagram from the red giant branch back toward high temperatures and then return, generating large and rapid variations in all synthetic photometric bands. This makes it an ideal demonstration case for the colors module's ability to track photometric evolution in real time.
-
-The test is not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (:math:`T_{\rm eff}`, :math:`\log g`) in a reasonable wall-clock time.
-
-
-Run from the ``custom_colors/`` directory with ``make clean``, ``make`` then ``./rn``.
 
 
 =====================
