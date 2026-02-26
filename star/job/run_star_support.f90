@@ -482,7 +482,7 @@
          if (failed('extras_startup',ierr)) return
 
          call star_setup_colors_iteration_hook(id, ierr)
-         if (ierr /= 0) ierr = 0  ! Colors hook should be non-fatal as the colors hook is optional
+         if (ierr /= 0) ierr = 0  ! Colors hook should not be fatal as the colors hook is optional
 
          if (s% job% profile_starting_model .and. .not. restart) then
             call star_set_vars(id, 0d0, ierr)

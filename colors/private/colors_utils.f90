@@ -600,14 +600,8 @@ contains
 
       ierr = 0
 
-
       filename = trim(resolve_path(colors_settings%instrument))//"/"// &
                  trim(basename(colors_settings%instrument))
-
-      !filename = trim(mesa_dir)//trim(colors_settings%instrument)//"/"// &
-      !           trim(basename(colors_settings%instrument))
-
-      !filename = trim(mesa_dir)//trim(colors_settings%instrument)//"/"
 
       n = 0
       unit = 10

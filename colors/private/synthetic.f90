@@ -31,11 +31,6 @@ module synthetic
    ! Export zero-point computation functions for precomputation at initialization
    public :: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
 
-   ! ============================================================
-   ! INTERNAL SWITCH: Set to .true. to write unique SED files for 
-   ! each history row. Each SED file will have _NNNNNN suffix 
-   ! matching model_number, allowing linking to history file rows.
-   ! ============================================================
 character(len=256), save :: first_filter_name = ''
 
 contains

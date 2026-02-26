@@ -173,9 +173,6 @@
       end subroutine setup_colors_iteration_hook
 
 
-
-
-
       subroutine do_star_init( &
             my_mesa_dir, chem_isotopes_filename, &
             net_reaction_filename, jina_reaclib_filename, &

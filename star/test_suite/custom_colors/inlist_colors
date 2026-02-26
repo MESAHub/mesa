@@ -105,7 +105,7 @@
       xa_central_lower_limit(1) = 1d-2  
 
       ! Fail-safe max age (just in case)
-      max_age = 1d4               
+      max_age = 1d8               
 
       ! --- OUTPUT CONTROL ---
       ! High resolution history for smooth light curves
