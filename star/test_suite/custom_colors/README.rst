@@ -4,7 +4,7 @@
 Colors
 ******
 
-This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
+This test suite case demonstrates the functionality of the MESA ``colors`` module.
 
 Running the Test Suite
 ======================
