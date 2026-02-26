@@ -10,9 +10,9 @@ Running the Test Suite
 ======================
 
 
-The ``custom_colors`` test suite case evolves a 7 :math:`M_\odot` star from the pre-main sequence through core hydrogen burning, up to the point of helium exhaustion (:math:`X_{\rm He,c} < 0.01`). 
+The ``custom_colors`` test suite case evolves a 7 M☉ star from the pre-main sequence through core hydrogen burning, up to the point of helium exhaustion (X_He,c < 0.01). 
 
-The test is not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (:math:`T_{\rm eff}`, :math:`\log g`) in a reasonable wall-clock time.
+The test is not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (T_eff, log g) in a reasonable wall-clock time.
 
 
 The ``custom_colors`` test suite is a standard MESA work directory. Before running it for the first time—or after making changes to the ``colors`` module source—the binary must be compiled.
@@ -41,16 +41,16 @@ If ``make`` completes without errors and ``./rn`` begins printing timestep outpu
 What is MESA colors?
 ====================
 
-MESA colors is a runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
+MESA colors is a runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L) and Surface Temperature (T_eff), the colors module computes:
 
-* **Bolometric Magnitude** (:math:`M_{\rm bol}`)
-* **Bolometric Flux** (:math:`F_{\rm bol}`)
+* **Bolometric Magnitude** (M_bol)
+* **Bolometric Flux** (F_bol)
 * **Synthetic Magnitudes** in specific photometric filters (e.g., Johnson V, Gaia G, 2MASS J).
 
 How does the MESA colors module work?
 =====================================
 
-1.  At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
+1.  At each timestep, the module takes the star's current surface parameters—Effective Temperature (T_eff), Surface Gravity (log g), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
 
 2.  This SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
