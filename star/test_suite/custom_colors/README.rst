@@ -33,24 +33,20 @@ If ``make`` completes without errors and ``./rn`` begins printing timestep outpu
 What is MESA colors?
 ====================
 
-MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
+MESA colors is a runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
 
 * **Bolometric Magnitude** (:math:`M_{\rm bol}`)
 * **Bolometric Flux** (:math:`F_{\rm bol}`)
 * **Synthetic Magnitudes** in specific photometric filters (e.g., Johnson V, Gaia G, 2MASS J).
 
-This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
-
 How does the MESA colors module work?
 =====================================
 
-The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
+1.  At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
 
-1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
+2.  This SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
-2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
-
-3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
+3.  The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
 
 Inlist Options & Parameters
 ===========================
@@ -157,28 +153,6 @@ If set to ``.true.``, the module exports the full calculated SED at every profil
    make_csv = .true.
 
 
-sed_per_model
--------------
-
-**Default:** ``.false.``
-
-Requires ``make_csv = .true.``. If set to ``.true.``, each exported SED file is stamped with the model number, preserving one SED file per model rather than overwriting a single file.
-
-.. warning::
-
-   Enabling this feature will cause the ``colors_results_directory`` to grow very rapidly. Do not enable it without first ensuring you have sufficient storage.
-
-* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
-* **Format:** CSV files containing Wavelength vs. Flux, with the model number as a filename suffix.
-* **Use Case:** Useful for tracking the full SED evolution of the star over time.
-
-**Example:**
-
-.. code-block:: fortran
-
-   sed_per_model = .true.
-
-
 colors_results_directory
 ------------------------
 
@@ -223,52 +197,6 @@ Required only if ``mag_system = 'Vega'``. Points to the reference SED file for V
 .. code-block:: fortran
 
    vega_sed = '/path/to/my/vega_SED.csv'
-
-
-colors_per_newton_step
-----------------------
-
-**Default:** ``.false.``
-
-If set to ``.true.``, the colors module computes synthetic photometry at every Newton iteration within each timestep, rather than only once per converged model. This is useful for studying rapid stellar variability or evolutionary phases where the stellar parameters change significantly within a single timestep (e.g., thermal pulses, shell flashes).
-
-.. warning::
-
-   Enabling this feature substantially increases the computational cost of the run, as photometric calculations are performed multiple times per timestep. It should only be used when sub-timestep resolution is scientifically required.
-
-**Example:**
-
-.. code-block:: fortran
-
-   colors_per_newton_step = .true.
-
-
-Splitting the Colors Inlist
----------------------------
-
-The ``&colors`` namelist can be split across multiple files using the following parameters. This is useful for managing large or modular inlist configurations. The mechanism works recursively, so extra inlists can themselves read further extra inlists.
-
-read_extra_colors_inlist(1..5)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Default:** ``.false.``
-
-If ``read_extra_colors_inlist(i)`` is set to ``.true.``, the module will read an additional ``&colors`` namelist from the file named by ``extra_colors_inlist_name(i)``.
-
-extra_colors_inlist_name(1..5)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Default:** ``'undefined'``
-
-The filename of the extra colors inlist to read when the corresponding ``read_extra_colors_inlist(i)`` is ``.true.``.
-
-**Example:**
-
-.. code-block:: fortran
-
-   read_extra_colors_inlist(1) = .true.
-   extra_colors_inlist_name(1) = 'inlist_my_filters'
-
 
 
 Data Preparation (SED_Tools)
@@ -378,41 +306,14 @@ Overview
 
 The ``custom_colors`` test suite case evolves a 7 :math:`M_\odot` star from the pre-main sequence through core hydrogen burning, up to the point of helium exhaustion (:math:`X_{\rm He,c} < 0.01`). The 7 :math:`M_\odot` initial mass is chosen deliberately: it produces a prominent Blue Loop during core helium burning, causing the star to traverse the HR diagram from the red giant branch back toward high temperatures and then return, generating large and rapid variations in all synthetic photometric bands. This makes it an ideal demonstration case for the colors module's ability to track photometric evolution in real time.
 
-The test is intentionally not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (:math:`T_{\rm eff}`, :math:`\log g`) in a reasonable wall-clock time.
-
-Key Inlist Settings
--------------------
-
-The test case is split across two inlist files: ``inlist`` (the top-level MESA inlist that calls ``inlist_colors``) and ``inlist_colors`` (where the stellar physics and colors configuration live). The key settings are described below.
-
-**Star Job** (``&star_job``):
-
-The model is started from the pre-main sequence (``create_pre_main_sequence_model = .true.``). The pre-MS relaxation is set to a minimal 10 steps to get to the main sequence quickly; this is not physically careful but is sufficient for a photometry test. A custom history columns file (``custom_colors_history_columns.list``) is loaded to include the ``phase_of_evolution`` integer alongside the standard output, which the Python helpers use for phase-coloured plotting. PGstar is enabled so that live light-curve and CMD windows appear during the run.
-
-**Opacities** (``&kap``):
-
-Grevesse & Sauval 1998 (``gs98``) opacity tables are used with a base metallicity of :math:`Z_{\rm base} = 0.02`.
-
-**Colors** (``&colors``):
-
-The colors module is enabled (``use_colors = .true.``). The test case as committed points ``instrument`` and ``stellar_atm`` to absolute paths under ``SED_Tools``; before running, update these to match the location of your processed atmosphere and filter data. The magnitude system is set to Vega. CSV output is enabled (``make_csv = .true.``), which writes per-filter SED files to the ``SED/`` directory at every profile interval and is required for the SED viewer scripts. The distance is set to 10 pc, yielding absolute magnitudes.
-
-**Controls** (``&controls``):
-
-The simulation stops when the central helium mass fraction falls below 1% (``xa_central_lower_limit``), capturing the full main sequence and the onset of the Blue Loop. History is written every model (``history_interval = 1``) for smooth light curves, and profiles are saved every 50 models. A fine mesh (``mesh_delta_coeff = 0.5``) and tight timestep control (``varcontrol_target = 1d-3``) are used to resolve the Blue Loop cleanly.
-
-**PGstar** (``&pgstar``):
-
-Three live windows are configured: a V-band light curve (age vs. V magnitude), a B vs. R CMD, and a U vs. I CMD. These update every 10 models during the run.
-
-Before Running
---------------
-
-1. Update ``instrument`` and ``stellar_atm`` in ``inlist_colors`` to point to your local SED_Tools data directory.
-2. Ensure ``phase_of_evolution`` is listed in ``custom_colors_history_columns.list`` (it is by default).
-3. Run from the ``custom_colors/`` directory with ``./rn``.
+The test is not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (:math:`T_{\rm eff}`, :math:`\log g`) in a reasonable wall-clock time.
 
 
+Run from the ``custom_colors/`` directory with ``make clean``, ``make`` then ``./rn``.
+
+
+=====================
+=====================
 Python Helper Scripts
 =====================
 
@@ -442,7 +343,6 @@ All four panels are color-coded by MESA's ``phase_of_evolution`` integer if that
 
 The script polls ``../LOGS/history.data`` every 0.1 seconds and updates the plot whenever the file changes. It will print a change notification for the first five updates, then go silent to avoid log spam. Close the window to exit.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``. Imports shared logic from ``plot_history.py``.
 
 plot_history.py
 ---------------
@@ -484,7 +384,6 @@ The x-axis auto-scales to the wavelength range where the SED has flux above 1% o
 
 Runs live, refreshing every 0.1 s. Close the window or press Ctrl-C to stop. Can also be configured to save a video instead of displaying live by setting ``save_video=True`` in the ``SEDChecker`` constructor.
 
-**Requirements:** ``matplotlib``, ``numpy``.
 
 plot_sed.py
 -----------
@@ -500,7 +399,6 @@ plot_sed.py
 
 Displays the combined SED figure. The x-axis is cropped to 0–60000 Å by default; edit the ``xlim`` argument in ``main()`` to change this.
 
-**Requirements:** ``matplotlib``, ``numpy``, ``pandas``.
 
 plot_cmd_3d.py
 --------------
@@ -516,7 +414,6 @@ plot_cmd_3d.py
 
 On launch, the script prints all available columns from ``history.data`` and prompts you to type the name of the column to use for the Z axis (default: ``Interp_rad``, the interpolation radius in the atmosphere grid). Press Enter to accept the default or type any other column name. A rotatable 3D matplotlib window then opens showing color index vs. magnitude vs. your chosen column.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``. Imports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` from ``plot_history.py``.
 
 movie_history.py
 ----------------
@@ -532,7 +429,6 @@ movie_history.py
 
 Writes ``history.mp4`` in the current directory at 24 fps, 150 dpi. Requires ``ffmpeg`` to be installed and accessible on ``$PATH``. Progress is shown with a ``tqdm`` progress bar if that package is available.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``, ``ffmpeg``. Optionally ``tqdm``. Imports the ``HistoryChecker`` class from ``plot_history_live.py`` so that axis formatting and phase-legend logic remain identical to the live viewer.
 
 movie_cmd_3d.py
 ---------------
@@ -548,7 +444,6 @@ movie_cmd_3d.py
 
 Writes ``cmd_interp_rad_rotation.mp4`` in the current directory at 30 fps. Requires ``ffmpeg``.
 
-**Requirements:** ``mesa_reader``, ``matplotlib``, ``numpy``, ``ffmpeg``. Imports ``MesaView``, ``read_header_columns``, and ``setup_hr_diagram_params`` from ``plot_history.py``.
 
 plot_newton_iter.py
 -------------------
@@ -584,7 +479,6 @@ Key flags:
 * ``--no-show``: suppress the interactive window (save only)
 * ``--list-columns``: print available columns and exit
 
-**Requirements:** ``matplotlib``, ``numpy``. Optionally ``mesa_reader`` for history overlay.
 
 movie_newton_iter.py
 --------------------
@@ -622,7 +516,6 @@ Key flags:
 
 Requires ``ffmpeg``. For GIF output, ``pillow`` can be used instead by changing the writer in the source.
 
-**Requirements:** ``matplotlib``, ``numpy``, ``ffmpeg``. Optionally ``mesa_reader``. Imports from ``plot_newton_iter.py``.
 
 plot_zero_points.py
 -------------------
@@ -642,7 +535,6 @@ The script must be run from within ``python_helpers/`` (it changes directory to 
 
    This script runs the full simulation three times. For large or slow models, consider reducing ``initial_mass`` or loosening ``varcontrol_target`` and ``mesh_delta_coeff`` inside the ``FAST_RUN_OVERRIDES`` dictionary at the top of the script before running.
 
-**Requirements:** ``matplotlib``, ``numpy``, ``re``, ``shutil``, ``subprocess``. No ``mesa_reader`` needed.
 
 run_batch.py
 ------------
@@ -661,5 +553,3 @@ Edit ``param_options`` at the top of the script to list the ``extra_controls_inl
 The script: (1) comments out all parameter entries in ``inlist_1.0``, (2) uncomments one entry at a time, (3) runs ``./clean``, ``./mk``, and ``./rn`` in the MESA work directory, (4) renames the resulting ``history.data`` to ``history_<param_name>.data``, and (5) re-comments all entries at the end. If a run fails, a warning is printed and the loop continues with the next parameter set.
 
 **Note:** The MESA work directory is assumed to be one level above the location of ``run_batch.py`` (i.e., ``../``). The inlist to modify is ``inlist_1.0``. Adjust these paths at the top of the script if your layout differs.
-
-**Requirements:** ``os``, ``re``, ``shutil``, ``subprocess`` (all standard library).
