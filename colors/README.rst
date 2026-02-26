@@ -277,17 +277,15 @@ Below are the default values for all user-facing ``colors`` module parameters as
 .. code-block:: fortran
 
       use_colors = .false.
-      colors_per_newton_step = .false.
       instrument = 'data/colors_data/filters/Generic/Johnson'
       stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
       vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
       make_csv = .false.
-      sed_per_model = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
-      read_extra_colors_inlist(:) = .false.
-      extra_colors_inlist_name(:) = 'undefined'
+      sed_per_model = .false.
+      colors_per_newton_step = .false.
 
 Visual Summary of Data Flow
 ===========================
