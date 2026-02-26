@@ -80,7 +80,7 @@
       ! Vega spectrum for zero-point calibration
       ! This file should contain wavelength (Å) and flux (erg/s/cm²/Å) columns
       ! Used to define the zero-point of the magnitude system (Vega = 0.0 mag)
-      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
+      vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
 
 
 / ! end of colors namelist

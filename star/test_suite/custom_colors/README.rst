@@ -272,7 +272,6 @@ Below are the default values for all user-facing ``colors`` module parameters as
       vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
       make_csv = .false.
-      sed_per_model = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
 
@@ -455,24 +454,6 @@ The script supports both an **interactive mode** (a terminal UI with a filterabl
 
 You will be prompted to select the plot type (2D scatter, 2D line, or 3D scatter), then the X, Y, (optionally Z), and color axes from a grid display. The picker supports substring filtering (``/text``), negative filtering (``!text``), and regex filtering (``//pattern``). You can also type a column name directly.
 
-**Batch mode:**
-
-.. code-block:: bash
-
-   python plot_newton_iter.py -x iter -y V -c model
-   python plot_newton_iter.py -x Teff -y "B-V" -c "U-B"
-   python plot_newton_iter.py -x iter -y V -z R -c model       # 3D
-   python plot_newton_iter.py --list-columns                   # show columns and exit
-
-Key flags:
-
-* ``-f`` / ``--file``: path to the iteration data file (default: ``SED/iteration_colors.data``)
-* ``--history``: path to history file for overlay (default: ``../LOGS/history.data``)
-* ``-x``, ``-y``, ``-z``, ``-c``: axis column names or expressions
-* ``--cmap``: matplotlib colormap (default: ``viridis``)
-* ``--no-show``: suppress the interactive window (save only)
-* ``--list-columns``: print available columns and exit
-
 
 movie_newton_iter.py
 --------------------
@@ -489,24 +470,6 @@ The script supports the same interactive and batch modes as ``plot_newton_iter.p
    python movie_newton_iter.py
 
 You will be prompted for X, Y, and color axes, video duration, FPS, output filename, and sigma-clipping threshold.
-
-**Batch mode:**
-
-.. code-block:: bash
-
-   python movie_newton_iter.py -x Teff -y V -c model
-   python movie_newton_iter.py -x Teff -y "B-V" -c iter --flip-y -d 60
-
-Key flags:
-
-* ``-f`` / ``--file``: path to iteration data file (default: ``SED/iteration_colors.data``)
-* ``--history``: path to history file (default: ``../LOGS/history.data``)
-* ``-x``, ``-y``, ``-c``: axis column names or expressions
-* ``-d`` / ``--duration``: target video duration in seconds (default: 30)
-* ``--fps``: frames per second (default: 30)
-* ``--flip-y``: invert the Y axis (useful for magnitude axes)
-* ``--sigma``: sigma-clipping threshold (default: 3.0)
-* ``--cmap``: matplotlib colormap (default: ``viridis``)
 
 Requires ``ffmpeg``. For GIF output, ``pillow`` can be used instead by changing the writer in the source.
 

@@ -1,20 +1,13 @@
 ! ``colors`` module controls
 ! ==========================
 
-   ! The MESA/colors parameters are given default values here.
-   ! Paths for ``instrument``, ``stellar_atm``, and ``vega_sed`` may be:
-   !   - Relative to ``$MESA_DIR`` (e.g., ``'data/colors_data/...'``)
-   !   - Absolute (e.g., ``'/home/user/my_filters/...'``)
-   !   - Relative to the working directory (e.g., ``'my_local_filters/...'``)
-   ! The module resolves these in that order of precedence.
-
 
 ! Colors User Parameters
 ! ----------------------
 
    ! ``use_colors``
    ! ~~~~~~~~~~~~~~
-   ! Master switch. Set to .true. to enable bolometric and synthetic photometry output.
+   ! Set to .true. to enable bolometric and synthetic photometry output.
 
    ! ``instrument``
    ! ~~~~~~~~~~~~~~
@@ -42,12 +35,6 @@
    ! If .true., exports the full SED as a CSV file at every profile interval.
    ! Files are written to colors_results_directory.
 
-   ! ``sed_per_model``
-   ! ~~~~~~~~~~~~~~~~~
-   ! Requires make_csv = .true. If .true., each SED output file is suffixed with
-   ! the model number, preserving the full SED history rather than overwriting.
-   ! WARNING: can produce very large numbers of files. Ensure adequate storage.
-
    ! ``colors_results_directory``
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! Directory where CSV outputs (make_csv, sed_per_model) are saved.
@@ -59,21 +46,35 @@
    !   AB   : zero-point based on flat f_nu = 3631 Jy.
    !   ST   : zero-point based on flat f_lambda per unit wavelength.
 
+   ! ``sed_per_model``
+   ! ~~~~~~~~~~~~~~~~~
+   ! Requires make_csv = .true. If .true., each SED output file is suffixed with
+   ! the model number, preserving the full SED history rather than overwriting.
+   ! WARNING: can produce very large numbers of files. Ensure adequate storage.
+
+   ! ``colors_per_newton_step``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! If .true., computes synthetic photometry at every Newton iteration within
+   ! each timestep rather than once per converged model. Useful for capturing
+   ! rapid parameter changes (e.g., thermal pulses, shell flashes).
+   ! WARNING: substantially increases computational cost. Only enable when
+   ! sub-timestep resolution is scientifically required.
+
    ! If ``use_colors`` is true, the colors module computes bolometric and synthetic
    ! magnitudes by interpolating stellar atmosphere model grids and convolving with
    ! photometric filter transmission curves. Output is appended to history.data.
    ! ::
 
       use_colors = .false.
-      colors_per_newton_step = .false.
       instrument = 'data/colors_data/filters/Generic/Johnson'
       stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
       vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
       distance = 3.0857d19     ! 10 parsecs in cm -> Absolute Magnitudes
       make_csv = .false.
-      sed_per_model = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
+      sed_per_model = .false.
+      colors_per_newton_step = .false.
 
 
 ! Extra inlist controls

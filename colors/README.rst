@@ -1,15 +1,15 @@
-.. _custom_colors:
+.. _colors:
 
 ******
 Colors
 ******
 
-This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
+The MESA ``colors`` module calculates synthetic photometry and bolometric quantities during stellar evolution.
 
 What is MESA colors?
 ====================
 
-MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L`) and Surface Temperature (T_eff), the colors module computes:
+MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L) and Surface Temperature (T_eff), the colors module computes:
 
 * **Bolometric Magnitude** (M_bol)
 * **Bolometric Flux** (F_bol)
@@ -19,8 +19,6 @@ This bridges the gap between theoretical evolutionary tracks and observational c
 
 How does the MESA colors module work?
 =====================================
-
-The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
 
 1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (T_eff), Surface Gravity (log g), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
 
@@ -85,7 +83,7 @@ stellar_atm
 
 Path to the directory containing the grid of stellar atmosphere models. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute. This directory must contain:
 
-1.  **lookup_table.csv**: A map linking filenames to physical parameters (T_eff`, log g, [M/H]).
+1.  **lookup_table.csv**: A map linking filenames to physical parameters (T_eff, log g, [M/H]).
 2.  **SED files**: The actual spectra (text or binary format).
 3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
 
@@ -133,27 +131,6 @@ If set to ``.true.``, the module exports the full calculated SED at every profil
    make_csv = .true.
 
 
-sed_per_model
--------------
-
-**Default:** ``.false.``
-
-Requires ``make_csv = .true.``. If set to ``.true.``, each exported SED file is stamped with the model number, preserving one SED file per model rather than overwriting a single file.
-
-.. warning::
-
-   Enabling this feature will cause the ``colors_results_directory`` to grow very rapidly. Do not enable it without first ensuring you have sufficient storage.
-
-* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
-* **Format:** CSV files containing Wavelength vs. Flux, with the model number as a filename suffix.
-* **Use Case:** Useful for tracking the full SED evolution of the star over time.
-
-**Example:**
-
-.. code-block:: fortran
-
-   sed_per_model = .true.
-
 
 colors_results_directory
 ------------------------
@@ -200,6 +177,27 @@ Required only if ``mag_system = 'Vega'``. Points to the reference SED file for V
 
    vega_sed = '/path/to/my/vega_SED.csv'
 
+sed_per_model
+-------------
+
+**Default:** ``.false.``
+
+Requires ``make_csv = .true.``. If set to ``.true.``, each exported SED file is stamped with the model number, preserving one SED file per model rather than overwriting a single file.
+
+.. warning::
+
+   Enabling this feature will cause the ``colors_results_directory`` to grow very rapidly. Do not enable it without first ensuring you have sufficient storage.
+
+* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
+* **Format:** CSV files containing Wavelength vs. Flux, with the model number as a filename suffix.
+* **Use Case:** Useful for tracking the full SED evolution of the star over time.
+
+**Example:**
+
+.. code-block:: fortran
+
+   sed_per_model = .true.
+
 
 colors_per_newton_step
 ----------------------
@@ -217,33 +215,6 @@ If set to ``.true.``, the colors module computes synthetic photometry at every N
 .. code-block:: fortran
 
    colors_per_newton_step = .true.
-
-
-Splitting the Colors Inlist
----------------------------
-
-The ``&colors`` namelist can be split across multiple files using the following parameters. This is useful for managing large or modular inlist configurations. The mechanism works recursively, so extra inlists can themselves read further extra inlists.
-
-read_extra_colors_inlist(1..5)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Default:** ``.false.``
-
-If ``read_extra_colors_inlist(i)`` is set to ``.true.``, the module will read an additional ``&colors`` namelist from the file named by ``extra_colors_inlist_name(i)``.
-
-extra_colors_inlist_name(1..5)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Default:** ``'undefined'``
-
-The filename of the extra colors inlist to read when the corresponding ``read_extra_colors_inlist(i)`` is ``.true.``.
-
-**Example:**
-
-.. code-block:: fortran
-
-   read_extra_colors_inlist(1) = .true.
-   extra_colors_inlist_name(1) = 'inlist_my_filters'
 
 
 Data Preparation (SED_Tools)
