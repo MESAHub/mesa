@@ -1072,8 +1072,8 @@
     log_center_temp_lower_limit = -1d99
 
 
-      ! surface_accel_div_grav_limit = -1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! surface_accel_div_grav_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! This is used when do not have a velocity variable.
       ! The acceleration ratio is ``abs(accel)/grav`` at surface,
@@ -1747,6 +1747,8 @@
 
     max_number_retries = -1
 
+      ! relax_max_number_retries
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! ::
 
     relax_max_number_retries = 300
@@ -2561,9 +2563,10 @@
     gradT_excess_max_log_tau_full_off = -99
 
 
-         !### max_logT_for_mlt
+      ! max_logT_for_mlt
+      ! ~~~~~~~~~~~~~~~~
 
-         ! No mlt at cell if local logT > this limit.
+      ! No MLT at cell if local logT > this limit.
 
       max_logT_for_mlt = 99
 
@@ -2580,7 +2583,7 @@
       ! superad_reduction_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Implicit alternative to okay_to_reduce_gradT_excess
+      ! Implicit alternative to ``okay_to_reduce_gradT_excess``
 
       ! ::
 
@@ -3481,8 +3484,11 @@
     redo_conv_for_dr_lt_mixing_length = .false.
 
 
-      ! smooth_convective_bdy has been deleted.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! smooth_convective_bdy
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+      ! ``smooth_convective_bdy`` has been removed.
+
       ! remove_mixing_glitches
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3989,6 +3995,10 @@
       ! ~~~~~~~~~~~~~~~~
       ! adjust_J_fraction
       ! ~~~~~~~~~~~~~~~~~
+      ! min_q_for_adjust_J_lost
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_J_div_delta_J
+      ! ~~~~~~~~~~~~~~~~~
 
       ! adjust angular momentum
       ! With do_adjust_J_lost = .false., the angular momentum removed via winds
@@ -4047,8 +4057,8 @@
 
       ! angular_momentum_error_warn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! angular_momentum_error_stop
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! angular_momentum_error_retry
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if the relative change in total angular momentum exceeds these values,
       ! then a warning is given on the terminal output, or the simulation is stopped
@@ -4138,14 +4148,14 @@
     D_mix_rotation_min_tau_full_on = 0d0
 
 
-      ! D_omega_max_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! D_omega_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~
-      ! D_omega_mixing_across_convection_boundary (previously called D_omega_mixing_in_convection_regions)
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! D_omega_mixing_across_convection_boundary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_D_omega_zero_in_convection_region
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ``D_omega_mixing_across_convection_boundary`` was previously called ``D_omega_mixing_in_convection_regions``.
 
       ! ::
 
@@ -4154,14 +4164,12 @@
     max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 
-      ! nu_omega_max_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! nu_omega_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_across_convection_boundary
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_nu_omega_zero_in_convection_region
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -4925,8 +4933,8 @@
     Reimers_scaling_factor = 0
 
 
-      ! Blocker_scaling_factor = 0
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Blocker_scaling_factor
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! Blocker's mass loss for AGB stars.
 
@@ -5064,6 +5072,8 @@
 
       ! use_accreted_material_j
       ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! accreted_material_j
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! Angular momentum of accreted material.
 
@@ -5564,8 +5574,8 @@
     accretion_he4 = 0
 
 
-      ! accretion_zfracs =
-      ! ~~~~~~~~~~~~~~~~~~
+      ! accretion_zfracs
+      ! ~~~~~~~~~~~~~~~~
 
       ! One of the following identifiers for different Z fractions from ``chem_def``.
 
@@ -5770,6 +5780,9 @@
 
     min_dq = 1d-14
 
+      ! min_dq_for_split
+      ! ~~~~~~~~~~~~~~~~
+
       ! Min size for cell to be split.
 
       ! ::
@@ -5797,6 +5810,9 @@
       ! ::
 
     min_dq_for_xa_convective = 1d-6
+
+      ! min_dq_for_log_T
+      ! ~~~~~~~~~~~~~~~~
 
       ! Min size for cell to be split because of jump in logT.
 
@@ -5943,6 +5959,8 @@
 
       ! E_function_weight
       ! ~~~~~~~~~~~~~~~~~
+      ! E_function_param
+      ! ~~~~~~~~~~~~~~~~
 
       ! internal energy gradient, ``E_function = E_function_weight*max(E_function_param,log10(energy))``.
 
@@ -7487,8 +7505,8 @@
 
       ! min_logT_for_opacity_factor_off
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! min_logT_for_opacity_factor_on  and
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_logT_for_opacity_factor_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_logT_for_opacity_factor_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_logT_for_opacity_factor_off
@@ -7937,10 +7955,10 @@
     use_time_centered_eps_grav = .true.
 
 
-      ! Gamma_lnS_eps_grav_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! Gamma_lnS_eps_grav_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Gamma_lnS_eps_grav_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Automatic switch to lnS form for eps_grav (:math:`\epsilon_{\rm grav} = -T\frac{Ds}{Dt}`) in regions with high Gamma (plasma interaction parameter).
       ! These controls only apply when using the PC EOS.  This is necessary to get the
@@ -8321,6 +8339,8 @@
 ! Hydrodynamic drag
 ! =================
 
+      ! use_drag_energy
+      ! ~~~~~~~~~~~~~~~
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
       ! min_q_for_drag
@@ -8390,16 +8410,16 @@
       ! ~~~~~
       ! RTI_D
       ! ~~~~~
+      ! RTI_C_X0_frac
+      ! ~~~~~~~~~~~~~
       ! RTI_C_X_factor
       ! ~~~~~~~~~~~~~~
-      ! RTI_C_X0
-      ! ~~~~~~~~
       ! RTI_max_alpha
       ! ~~~~~~~~~~~~~
       ! RTI_min_dm_behind_shock_for_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! RTI_dm_for_center_alpha_nondecreasing
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! RTI_dm_for_center_eta_nondecreasing
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! RTI_energy_floor
       ! ~~~~~~~~~~~~~~~~
       ! RTI_D_mix_floor
@@ -9015,8 +9035,8 @@
     min_xa_hard_limit_for_highT = -3d-5
 
 
-      ! logT_max_for_xa_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! logT_max_for_min_xa_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use ``min_xa_hard_limit`` for center logT <= this.
 
@@ -9025,8 +9045,8 @@
     logT_max_for_min_xa_hard_limit = 9.49d0
 
 
-      ! logT_min_for_xa_hard_limit_for_highT
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! logT_min_for_min_xa_hard_limit_for_highT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use ``min_xa_hard_limit_for_highT`` for center logT >= this.
       ! Linear interpolate in logT for intermediate center temperatures.
@@ -9138,6 +9158,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold_tol_residual_norm1
       ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! gold_tol_max_residual1
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! gold_iter_for_resid_tol2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold_tol_residual_norm2
@@ -9190,6 +9212,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_tol_residual_norm1
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! gold2_tol_max_residual1
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_iter_for_resid_tol2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_tol_residual_norm2
@@ -9230,8 +9254,8 @@
 
       ! include_rotation_in_total_energy
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! previously called `include_rotation_in_energy_error_report`
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! previously called ``include_rotation_in_energy_error_report``
 
       ! ::
 
@@ -9565,8 +9589,8 @@
     neg_mass_fraction_hold = 2
 
 
-      ! timestep_dt_factor = 0.9
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! timestep_dt_factor
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! dt reduction factor exceed timestep limits.
 
@@ -9991,8 +10015,8 @@
     delta_lgRho_limit = 1
 
 
-      ! delta_lgRho_hard_limit = -1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lgRho_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! If max ``delta_lgRho`` is greater than ``delta_lgRho_hard_limit``,
       ! retry with smaller timestep.
@@ -10119,6 +10143,9 @@
       ! reduce the next timestep by ``delta_Ye_highT_limit``/``max_delta_Ye``.
 
       ! ::
+
+      ! delta_Ye_highT_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delta_Ye_highT_hard_limit = -1
 
@@ -10553,10 +10580,10 @@
     check_remnant_only_for_dt_div_min_dr_div_cs_limit = .false.
 
 
-      ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! only use ``dt_div_min_dr_div_cs_limit`` at cells where
       ! ``abs_du_div_cs`` > ``min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit`` and
@@ -11194,6 +11221,11 @@
     delta_lg_star_mass_limit = 5d-3
     delta_lg_star_mass_hard_limit = -1
 
+      ! delta_mdot_atol
+      ! ~~~~~~~~~~~~~~~
+      ! delta_mdot_rtol
+      ! ~~~~~~~~~~~~~~~
+
       ! limit for change in mdot in Msun/yr
       ! + ``delta_mdot_atol`` tolerance for absolute changes
       ! + ``delta_mdot_rtol`` tolerance for relative changes
@@ -11420,6 +11452,8 @@
 
       ! warn_rates_for_high_temp
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_safe_logT_for_rates
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, then when any zone tries to evaluate a rate above ``max_safe_logT_for_rates``
       ! it generates a warning message. The code will cap the rate at the value
@@ -11458,8 +11492,6 @@
     absolute_cumulative_energy_err = .true.
 
 
-      ! warn_when_stop_checking_residuals    obsolete
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! warning_limit_for_max_residual
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11528,6 +11560,9 @@
       ! ::
 
     zams_filename = 'zams_z2m2_y28.data'
+
+      ! set_rho_to_dm_div_dV
+      ! ~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
