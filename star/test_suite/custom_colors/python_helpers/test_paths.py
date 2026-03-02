@@ -462,7 +462,7 @@ def plot_newton_iter_result(test_name, out_path, success):
 
     if iter_col is None or teff_col is None or model_col is None:
         print(
-            f"  [proof_newton] Expected columns (model/iter/Teff) not found — skipping."
+            "  [proof_newton] Expected columns (model/iter/Teff) not found — skipping."
         )
         return
 

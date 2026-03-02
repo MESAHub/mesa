@@ -4,8 +4,8 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from plot_history_live import HistoryChecker  # uses static_HISTORY_check under the hood
 from matplotlib.animation import FFMpegWriter
+from plot_history_live import HistoryChecker  # uses static_HISTORY_check under the hood
 
 do_tqdm = True
 try:

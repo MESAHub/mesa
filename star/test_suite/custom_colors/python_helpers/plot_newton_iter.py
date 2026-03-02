@@ -9,17 +9,14 @@ Author: Niall Miller (2025)
 """
 
 import argparse
-import math
 import os
 import re
 import shutil
 import sys
 from typing import List, Optional, Sequence, Tuple, Union
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
-from matplotlib import cm
+import numpy as np
 
 try:
     import mesa_reader as mr
@@ -492,7 +489,6 @@ def resolve_history_axis(
 
 def parse_history_expression(expr: str, md: mr.MesaData) -> Optional[np.ndarray]:
     """Parse and evaluate an expression using history data."""
-    original_expr = expr
     expr = expr.strip()
 
     # Get all available column names from history

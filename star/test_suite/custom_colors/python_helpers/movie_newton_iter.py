@@ -15,42 +15,30 @@ import re
 import sys
 from typing import List, Optional, Tuple
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, FFMpegWriter, PillowWriter
-from matplotlib.colors import Normalize
+import numpy as np
 from matplotlib import cm
+from matplotlib.animation import FFMpegWriter, FuncAnimation, PillowWriter
+from matplotlib.colors import Normalize
 
 # Import shared functionality from static plotter
 from plot_newton_iter import (
-    # Terminal UI
-    use_color,
-    term_width,
-    BOLD,
+    CYAN,  # Terminal UI; Data loading; Prompting
     DIM,
-    CYAN,
-    YELL,
     GREEN,
-    RED,
     RESET,
+    load_history_data,
+    load_iteration_data,
+    print_error,
     print_header,
+    print_info,
     print_subheader,
     print_success,
-    print_error,
-    print_info,
-    # Data loading
-    load_iteration_data,
-    load_history_data,
-    resolve_history_axis,
-    MESA_READER_AVAILABLE,
-    # Expression parsing
-    is_expression,
-    parse_expression,
-    resolve_axis,
-    # Prompting
     prompt_yes_no,
+    resolve_axis,
+    resolve_history_axis,
+    term_width,
 )
-
 
 # ============================================================================
 #                              SIGMA CLIPPING
