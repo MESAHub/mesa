@@ -94,11 +94,10 @@ subroutine data_for_colors_history_columns( &
       sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = cs%make_csv
 
-      ! Calculate bolometric magnitude using cached lookup table
-      call calculate_bolometric(t_eff, log_g, metallicity, R, d, &
+      ! Calculate bolometric magnitude using cached data on handle
+      call calculate_bolometric(cs, t_eff, log_g, metallicity, R, d, &
                                 bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
-                                sed_filepath, interpolation_radius, &
-                                cs%lu_file_names, cs%lu_teff, cs%lu_logg, cs%lu_meta)
+                                sed_filepath, interpolation_radius)
 
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude

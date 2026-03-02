@@ -119,12 +119,10 @@ contains
       sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = .false.  ! Don't write individual SEDs for iteration output
 
-      ! Calculate bolometric magnitude using cached lookup table
-      ! Must pass the cached lookup arrays for atmosphere interpolation
-      call calculate_bolometric(t_eff, log_g, metallicity, R, d, &
+      ! Calculate bolometric magnitude using cached data on handle
+      call calculate_bolometric(cs, t_eff, log_g, metallicity, R, d, &
                                 bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
-                                sed_filepath, interpolation_radius, &
-                                cs%lu_file_names, cs%lu_teff, cs%lu_logg, cs%lu_meta)
+                                sed_filepath, interpolation_radius)
 
       ! Write basic data
       write(iounit, '(i8, i6)', advance='no') model_number, iter

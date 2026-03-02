@@ -26,6 +26,12 @@ module colors_def
    ! Make everything in this module public by default
    public
 
+   ! Maximum number of SEDs to keep in the memory cache.
+   ! Each slot holds one wavelength array (~1200 doubles ~ 10 KB),
+   ! so 256 slots ~ 2.5 MB -- negligible even when the full cube
+   ! cannot be allocated.
+   integer, parameter :: sed_mem_cache_cap = 256
+
    ! Type to hold individual filter data
    type :: filter_data
       character(len=100) :: name
@@ -72,6 +78,57 @@ module colors_def
       logical :: filters_loaded = .false.
       type(filter_data), allocatable :: filters(:)
 
+      ! Cached flux cube data (loaded at initialization)
+      logical :: cube_loaded = .false.
+      real(dp), allocatable :: cube_flux(:,:,:,:)    ! (n_teff, n_logg, n_meta, n_lambda)
+      real(dp), allocatable :: cube_teff_grid(:)
+      real(dp), allocatable :: cube_logg_grid(:)
+      real(dp), allocatable :: cube_meta_grid(:)
+      real(dp), allocatable :: cube_wavelengths(:)
+
+      ! Cached unique sorted grids (built once from lookup table at init)
+      logical :: unique_grids_built = .false.
+      real(dp), allocatable :: u_teff(:), u_logg(:), u_meta(:)
+
+      ! Grid-to-lookup-table mapping (built once at init).
+      ! grid_to_lu(i_t, i_g, i_m) = lookup-table row index for the
+      ! unique-grid combination (u_teff(i_t), u_logg(i_g), u_meta(i_m)).
+      ! Eliminates O(n_lu) nearest-neighbour searches at runtime.
+      logical :: grid_map_built = .false.
+      integer, allocatable :: grid_to_lu(:,:,:)
+
+      ! ---------------------------------------------------------------
+      ! Fallback-path caches (used only when cube_loaded == .false.)
+      ! ---------------------------------------------------------------
+
+      ! Stencil cache: the extended neighbourhood around the current
+      ! interpolation cell.  Includes derivative-context points
+      ! (i-1 .. i+2 per axis, clamped to grid boundaries) so that
+      ! hermite_tensor_interp3d produces results identical to the
+      ! cube path.
+      logical :: stencil_valid = .false.
+      integer :: stencil_i_t = -1, stencil_i_g = -1, stencil_i_m = -1
+      real(dp), allocatable :: stencil_fluxes(:,:,:,:)   ! (st, sg, sm, n_lambda)
+      real(dp), allocatable :: stencil_wavelengths(:)     ! (n_lambda)
+      real(dp), allocatable :: stencil_teff(:)            ! subgrid values (st)
+      real(dp), allocatable :: stencil_logg(:)            ! subgrid values (sg)
+      real(dp), allocatable :: stencil_meta(:)            ! subgrid values (sm)
+
+      ! Canonical wavelength grid for fallback SED files (set once on
+      ! first disk read, then reused — all SEDs in a given atmosphere
+      ! grid share the same wavelength array).
+      logical :: fallback_wavelengths_set = .false.
+      real(dp), allocatable :: fallback_wavelengths(:)    ! (n_lambda)
+
+      ! Bounded SED memory cache (circular buffer, keyed by lu index).
+      ! Avoids re-reading text files for SEDs we have already parsed.
+      logical :: sed_mcache_init = .false.
+      integer :: sed_mcache_count = 0
+      integer :: sed_mcache_next = 1
+      integer :: sed_mcache_nlam = 0
+      integer, allocatable :: sed_mcache_keys(:)          ! (sed_mem_cache_cap)
+      real(dp), allocatable :: sed_mcache_data(:,:)       ! (n_lambda, sed_mem_cache_cap)
+
    end type Colors_General_Info
 
    ! Global filter name list (shared across handles)
@@ -109,6 +166,18 @@ contains
          colors_handles(i)%lookup_loaded = .false.
          colors_handles(i)%vega_loaded = .false.
          colors_handles(i)%filters_loaded = .false.
+         colors_handles(i)%cube_loaded = .false.
+         colors_handles(i)%unique_grids_built = .false.
+         colors_handles(i)%grid_map_built = .false.
+         colors_handles(i)%stencil_valid = .false.
+         colors_handles(i)%stencil_i_t = -1
+         colors_handles(i)%stencil_i_g = -1
+         colors_handles(i)%stencil_i_m = -1
+         colors_handles(i)%sed_mcache_init = .false.
+         colors_handles(i)%sed_mcache_count = 0
+         colors_handles(i)%sed_mcache_next = 1
+         colors_handles(i)%sed_mcache_nlam = 0
+         colors_handles(i)%fallback_wavelengths_set = .false.
       end do
 
       colors_temp_cache_dir = trim(mesa_temp_caches_dir)//'/colors_cache'
@@ -183,6 +252,64 @@ contains
          deallocate(colors_handles(handle)%filters)
       end if
       colors_handles(handle)%filters_loaded = .false.
+
+      ! Free flux cube data
+      if (allocated(colors_handles(handle)%cube_flux)) &
+         deallocate(colors_handles(handle)%cube_flux)
+      if (allocated(colors_handles(handle)%cube_teff_grid)) &
+         deallocate(colors_handles(handle)%cube_teff_grid)
+      if (allocated(colors_handles(handle)%cube_logg_grid)) &
+         deallocate(colors_handles(handle)%cube_logg_grid)
+      if (allocated(colors_handles(handle)%cube_meta_grid)) &
+         deallocate(colors_handles(handle)%cube_meta_grid)
+      if (allocated(colors_handles(handle)%cube_wavelengths)) &
+         deallocate(colors_handles(handle)%cube_wavelengths)
+      colors_handles(handle)%cube_loaded = .false.
+
+      ! Free unique grid cache
+      if (allocated(colors_handles(handle)%u_teff)) &
+         deallocate(colors_handles(handle)%u_teff)
+      if (allocated(colors_handles(handle)%u_logg)) &
+         deallocate(colors_handles(handle)%u_logg)
+      if (allocated(colors_handles(handle)%u_meta)) &
+         deallocate(colors_handles(handle)%u_meta)
+      colors_handles(handle)%unique_grids_built = .false.
+
+      ! Free grid-to-lu mapping
+      if (allocated(colors_handles(handle)%grid_to_lu)) &
+         deallocate(colors_handles(handle)%grid_to_lu)
+      colors_handles(handle)%grid_map_built = .false.
+
+      ! Free stencil cache
+      if (allocated(colors_handles(handle)%stencil_fluxes)) &
+         deallocate(colors_handles(handle)%stencil_fluxes)
+      if (allocated(colors_handles(handle)%stencil_wavelengths)) &
+         deallocate(colors_handles(handle)%stencil_wavelengths)
+      if (allocated(colors_handles(handle)%stencil_teff)) &
+         deallocate(colors_handles(handle)%stencil_teff)
+      if (allocated(colors_handles(handle)%stencil_logg)) &
+         deallocate(colors_handles(handle)%stencil_logg)
+      if (allocated(colors_handles(handle)%stencil_meta)) &
+         deallocate(colors_handles(handle)%stencil_meta)
+      colors_handles(handle)%stencil_valid = .false.
+      colors_handles(handle)%stencil_i_t = -1
+      colors_handles(handle)%stencil_i_g = -1
+      colors_handles(handle)%stencil_i_m = -1
+
+      ! Free SED memory cache
+      if (allocated(colors_handles(handle)%sed_mcache_keys)) &
+         deallocate(colors_handles(handle)%sed_mcache_keys)
+      if (allocated(colors_handles(handle)%sed_mcache_data)) &
+         deallocate(colors_handles(handle)%sed_mcache_data)
+      colors_handles(handle)%sed_mcache_init = .false.
+      colors_handles(handle)%sed_mcache_count = 0
+      colors_handles(handle)%sed_mcache_next = 1
+      colors_handles(handle)%sed_mcache_nlam = 0
+
+      ! Free fallback wavelength cache
+      if (allocated(colors_handles(handle)%fallback_wavelengths)) &
+         deallocate(colors_handles(handle)%fallback_wavelengths)
+      colors_handles(handle)%fallback_wavelengths_set = .false.
 
    end subroutine free_colors_cache
 

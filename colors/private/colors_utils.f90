@@ -26,7 +26,8 @@ module colors_utils
 
    public :: dilute_flux, trapezoidal_integration, romberg_integration, &
              simpson_integration, load_sed, load_filter, load_vega_sed, &
-             load_lookup_table, remove_dat
+             load_lookup_table, remove_dat, load_flux_cube, build_unique_grids, &
+             build_grid_to_lu_map
 contains
 
    !---------------------------------------------------------------------------
@@ -189,8 +190,7 @@ contains
       integer :: unit, n_rows, status, i
       real(dp) :: temp_wave, temp_flux
 
-      unit = 20
-      open (unit, file=trim(filepath), status='OLD', action='READ', iostat=status)
+      open (newunit=unit, file=trim(filepath), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open Vega SED file ", trim(filepath)
          call mesa_error(__FILE__, __LINE__)
@@ -241,8 +241,7 @@ contains
       real(dp) :: temp_wavelength, temp_trans
 
       ! Open the file
-      unit = 20
-      open (unit, file=trim(directory), status='OLD', action='READ', iostat=status)
+      open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file ", trim(directory)
          call mesa_error(__FILE__, __LINE__)
@@ -310,8 +309,7 @@ contains
       integer :: logg_col, meta_col, teff_col
 
       ! Open the file
-      unit = 10
-      open (unit, file=lookup_file, status='old', action='read', iostat=status)
+      open (newunit=unit, file=lookup_file, status='old', action='read', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file", lookup_file
          call mesa_error(__FILE__, __LINE__)
@@ -328,12 +326,28 @@ contains
 
       ! Determine column indices for logg, meta, and teff
       logg_col = get_column_index(headers, "logg")
+      if (logg_col < 0) logg_col = get_column_index(headers, "log_g")
+      if (logg_col < 0) logg_col = get_column_index(headers, "log(g)")
+      if (logg_col < 0) logg_col = get_column_index(headers, "log10g")
+      if (logg_col < 0) logg_col = get_column_index(headers, "log10_g")
+
       teff_col = get_column_index(headers, "teff")
+      if (teff_col < 0) teff_col = get_column_index(headers, "t_eff")
+      if (teff_col < 0) teff_col = get_column_index(headers, "t(eff)")
+      if (teff_col < 0) teff_col = get_column_index(headers, "temperature")
+      if (teff_col < 0) teff_col = get_column_index(headers, "temp")
 
       meta_col = get_column_index(headers, "meta")
-      if (meta_col < 0) then
-         meta_col = get_column_index(headers, "feh")
-      end if
+      if (meta_col < 0) meta_col = get_column_index(headers, "feh")
+      if (meta_col < 0) meta_col = get_column_index(headers, "fe_h")
+      if (meta_col < 0) meta_col = get_column_index(headers, "[fe/h]")
+      if (meta_col < 0) meta_col = get_column_index(headers, "mh")
+      if (meta_col < 0) meta_col = get_column_index(headers, "[m/h]")
+      if (meta_col < 0) meta_col = get_column_index(headers, "m_h")
+      if (meta_col < 0) meta_col = get_column_index(headers, "z")
+      if (meta_col < 0) meta_col = get_column_index(headers, "logz")
+      if (meta_col < 0) meta_col = get_column_index(headers, "metallicity")
+      if (meta_col < 0) meta_col = get_column_index(headers, "metals")
 
       n_rows = 0
       do
@@ -471,8 +485,7 @@ contains
       real(dp) :: temp_wavelength, temp_flux
 
       ! Open the file
-      unit = 20
-      open (unit, file=trim(directory), status='OLD', action='READ', iostat=status)
+      open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file ", trim(directory)
          call mesa_error(__FILE__, __LINE__)
@@ -564,31 +577,38 @@ contains
       name = path(i + 1:)
    end function basename
 
+function resolve_path(path) result(full_path)
+   use const_def, only: mesa_dir
+   character(len=*), intent(in) :: path
+   character(len=512) :: full_path
+   character(len=:), allocatable :: p
+   logical :: exists
+   integer :: n
 
-   function resolve_path(path) result(full_path)
-      use const_def, only: mesa_dir
-      character(len=*), intent(in) :: path
-      character(len=512) :: full_path
-      logical :: exists
+   exists = .false.
+   p = trim(adjustl(path))
+   n = len_trim(p)
 
-      if (path(1:2) == './' .or. path(1:3) == '../') then
-         ! Explicitly CWD-relative: use as-is
-         full_path = trim(path)
+   if (n >= 2 .and. p(1:2) == './') then
+      full_path = p
+   else if (n >= 3 .and. p(1:3) == '../') then
+      full_path = p
 
-      else if (path(1:1) == '/') then
-         inquire(file=trim(path), exist=exists)
-         if (.not. exists) inquire(file=trim(path)//'/.', exist=exists)
-         if (exists) then
-            full_path = trim(path)
-         else
-            full_path = trim(mesa_dir)//trim(path)
-         end if
+   else if (n >= 1 .and. p(1:1) == '/') then
+      inquire(file=p, exist=exists)
+      if (.not. exists) inquire(file=p//'/.', exist=exists)
+
+      if (exists) then
+         full_path = p
       else
-         ! No leading slash and not ./ or ../: prepend mesa_dir with separator
-         full_path = trim(mesa_dir)//'/'//trim(path)
+         write(*,*) trim(p), " not found. Trying ", trim(mesa_dir)//trim(p)
+         full_path = trim(mesa_dir)//trim(p)
       end if
 
-   end function resolve_path
+   else
+      full_path = trim(mesa_dir)//'/'//trim(p)
+   end if
+end function resolve_path
 
    subroutine read_strings_from_file(colors_settings, strings, n, ierr)
       character(len=512) :: filename
@@ -604,8 +624,7 @@ contains
                  trim(basename(colors_settings%instrument))
 
       n = 0
-      unit = 10
-      open (unit, file=filename, status='old', action='read', iostat=status)
+      open (newunit=unit, file=filename, status='old', action='read', iostat=status)
       if (status /= 0) then
          ierr = -1
          print *, "Error: Could not open file", filename
@@ -625,5 +644,225 @@ contains
       end do
       close (unit)
    end subroutine read_strings_from_file
+
+   !---------------------------------------------------------------------------
+   ! Load flux cube from binary file into handle at initialization.
+   ! If the file cannot be opened or the large flux_cube array cannot be
+   ! allocated, sets cube_loaded = .false. so the runtime path will fall
+   ! back to loading individual SED files via the lookup table.
+   ! Grids and wavelengths are always loaded (small); only the 4-D cube
+   ! allocation is treated as the fallback trigger.
+   !---------------------------------------------------------------------------
+   subroutine load_flux_cube(rq, stellar_model_dir)
+      type(Colors_General_Info), intent(inout) :: rq
+      character(len=*), intent(in) :: stellar_model_dir
+
+      character(len=512) :: bin_filename
+      integer :: unit, status, n_teff, n_logg, n_meta, n_lambda
+      real(dp) :: cube_mb
+
+      rq%cube_loaded = .false.
+
+      bin_filename = trim(resolve_path(stellar_model_dir))//'/flux_cube.bin'
+
+      open (newunit=unit, file=trim(bin_filename), status='OLD', &
+            access='STREAM', form='UNFORMATTED', iostat=status)
+      if (status /= 0) then
+         ! No binary cube available — will use individual SED files
+         write (*, '(a)') 'colors: no flux_cube.bin found; using per-file SED loading'
+         return
+      end if
+
+      ! Read dimensions
+      read (unit, iostat=status) n_teff, n_logg, n_meta, n_lambda
+      if (status /= 0) then
+         close (unit)
+         return
+      end if
+
+      ! Attempt the large allocation first — this is the one that may fail.
+      ! Doing it before the small grid allocations avoids partial cleanup.
+      allocate (rq%cube_flux(n_teff, n_logg, n_meta, n_lambda), stat=status)
+      if (status /= 0) then
+         cube_mb = real(n_teff, dp) * n_logg * n_meta * n_lambda * 8.0_dp / (1024.0_dp**2)
+         write (*, '(a,f0.1,a)') &
+            'colors: flux cube allocation failed (', cube_mb, &
+            ' MB); falling back to per-file SED loading'
+         close (unit)
+         return
+      end if
+
+      ! Allocate grid arrays (small — always expected to succeed)
+      allocate (rq%cube_teff_grid(n_teff), stat=status)
+      if (status /= 0) goto 900
+
+      allocate (rq%cube_logg_grid(n_logg), stat=status)
+      if (status /= 0) goto 900
+
+      allocate (rq%cube_meta_grid(n_meta), stat=status)
+      if (status /= 0) goto 900
+
+      allocate (rq%cube_wavelengths(n_lambda), stat=status)
+      if (status /= 0) goto 900
+
+      ! Read grid arrays
+      read (unit, iostat=status) rq%cube_teff_grid
+      if (status /= 0) goto 900
+
+      read (unit, iostat=status) rq%cube_logg_grid
+      if (status /= 0) goto 900
+
+      read (unit, iostat=status) rq%cube_meta_grid
+      if (status /= 0) goto 900
+
+      read (unit, iostat=status) rq%cube_wavelengths
+      if (status /= 0) goto 900
+
+      ! Read the flux cube
+      read (unit, iostat=status) rq%cube_flux
+      if (status /= 0) goto 900
+
+      close (unit)
+      rq%cube_loaded = .true.
+
+      cube_mb = real(n_teff, dp) * n_logg * n_meta * n_lambda * 8.0_dp / (1024.0_dp**2)
+      write (*, '(a,i0,a,i0,a,i0,a,i0,a,f0.1,a)') &
+         'colors: flux cube loaded (', &
+         n_teff, ' x ', n_logg, ' x ', n_meta, ' x ', n_lambda, &
+         ', ', cube_mb, ' MB)'
+      return
+
+      ! Error cleanup — deallocate everything that may have been allocated
+900   continue
+      write (*, '(a)') 'colors: error reading flux_cube.bin; falling back to per-file SED loading'
+      if (allocated(rq%cube_flux))         deallocate (rq%cube_flux)
+      if (allocated(rq%cube_teff_grid))    deallocate (rq%cube_teff_grid)
+      if (allocated(rq%cube_logg_grid))    deallocate (rq%cube_logg_grid)
+      if (allocated(rq%cube_meta_grid))    deallocate (rq%cube_meta_grid)
+      if (allocated(rq%cube_wavelengths))  deallocate (rq%cube_wavelengths)
+      close (unit)
+
+   end subroutine load_flux_cube
+
+   !---------------------------------------------------------------------------
+   ! Build unique sorted grids from lookup table and store on handle.
+   ! Called once at initialization so the fallback interpolation path
+   ! never has to rebuild these at runtime.
+   !---------------------------------------------------------------------------
+   subroutine build_unique_grids(rq)
+      type(Colors_General_Info), intent(inout) :: rq
+      real(dp), allocatable :: tmp(:)
+      integer :: i, j, n, nu
+      real(dp) :: swap
+      logical :: found
+
+      if (rq%unique_grids_built) return
+      if (.not. rq%lookup_loaded) return
+
+      ! Build unique sorted grid for teff
+      call extract_unique_sorted(rq%lu_teff, rq%u_teff)
+      call extract_unique_sorted(rq%lu_logg, rq%u_logg)
+      call extract_unique_sorted(rq%lu_meta, rq%u_meta)
+
+      rq%unique_grids_built = .true.
+
+   contains
+
+      subroutine extract_unique_sorted(arr, unique)
+         real(dp), intent(in) :: arr(:)
+         real(dp), allocatable, intent(out) :: unique(:)
+         real(dp), allocatable :: buf(:)
+         integer :: ii, jj, nn, nnu
+         real(dp) :: sw
+
+         nn = size(arr)
+         allocate (buf(nn))
+         nnu = 0
+
+         do ii = 1, nn
+            found = .false.
+            do jj = 1, nnu
+               if (abs(arr(ii) - buf(jj)) < 1.0e-10_dp) then
+                  found = .true.
+                  exit
+               end if
+            end do
+            if (.not. found) then
+               nnu = nnu + 1
+               buf(nnu) = arr(ii)
+            end if
+         end do
+
+         ! Insertion sort (grids are small)
+         do ii = 2, nnu
+            sw = buf(ii)
+            jj = ii - 1
+            do while (jj >= 1 .and. buf(jj) > sw)
+               buf(jj + 1) = buf(jj)
+               jj = jj - 1
+            end do
+            buf(jj + 1) = sw
+         end do
+
+         allocate (unique(nnu))
+         unique = buf(1:nnu)
+         deallocate (buf)
+      end subroutine extract_unique_sorted
+
+   end subroutine build_unique_grids
+
+   !---------------------------------------------------------------------------
+   ! Build a 3-D mapping from unique-grid indices to lookup-table rows.
+   !
+   ! grid_to_lu(i_t, i_g, i_m) = row in lu_teff / lu_logg / lu_meta
+   ! whose parameter values match (u_teff(i_t), u_logg(i_g), u_meta(i_m)).
+   !
+   ! This is called once at initialisation and replaces the O(n_lu)
+   ! nearest-neighbour scan that previously ran per corner at runtime.
+   !---------------------------------------------------------------------------
+   subroutine build_grid_to_lu_map(rq)
+      type(Colors_General_Info), intent(inout) :: rq
+
+      integer :: nt, ng, nm, n_lu
+      integer :: it, ig, im, idx
+      integer :: best_idx
+      real(dp) :: best_dist, dist
+      real(dp), parameter :: tol = 1.0e-10_dp
+
+      if (rq%grid_map_built) return
+      if (.not. rq%unique_grids_built) return
+      if (.not. rq%lookup_loaded) return
+
+      nt = size(rq%u_teff)
+      ng = size(rq%u_logg)
+      nm = size(rq%u_meta)
+      n_lu = size(rq%lu_teff)
+
+      allocate (rq%grid_to_lu(nt, ng, nm))
+      rq%grid_to_lu = 0
+
+      do it = 1, nt
+         do ig = 1, ng
+            do im = 1, nm
+               best_idx = 1
+               best_dist = huge(1.0_dp)
+               do idx = 1, n_lu
+                  dist = abs(rq%lu_teff(idx) - rq%u_teff(it)) + &
+                         abs(rq%lu_logg(idx) - rq%u_logg(ig)) + &
+                         abs(rq%lu_meta(idx) - rq%u_meta(im))
+                  if (dist < best_dist) then
+                     best_dist = dist
+                     best_idx = idx
+                  end if
+                  if (best_dist < tol) exit  ! exact match found
+               end do
+               rq%grid_to_lu(it, ig, im) = best_idx
+            end do
+         end do
+      end do
+
+      rq%grid_map_built = .true.
+
+   end subroutine build_grid_to_lu_map
 
 end module colors_utils

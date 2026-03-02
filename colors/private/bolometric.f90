@@ -20,6 +20,7 @@
 module bolometric
 
    use const_def, only: dp
+   use colors_def, only: Colors_General_Info
    use colors_utils, only: romberg_integration
    use hermite_interp, only: construct_sed_hermite
    use linear_interp, only: construct_sed_linear
@@ -34,19 +35,15 @@ contains
 
    !****************************
    ! Calculate Bolometric Photometry Using Multiple SEDs
-   ! Accepts cached lookup table data instead of loading from file
+   ! rq carries cached lookup table data AND the preloaded flux cube (if available)
    !****************************
-   subroutine calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
-                                   bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius, &
-                                   lu_file_names, lu_teff, lu_logg, lu_meta)
+   subroutine calculate_bolometric(rq, teff, log_g, metallicity, R, d, bolometric_magnitude, &
+                                   bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius)
+      type(Colors_General_Info), intent(inout) :: rq
       real(dp), intent(in) :: teff, log_g, metallicity, R, d
       character(len=*), intent(in) :: sed_filepath
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux, interpolation_radius
       real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
-
-      ! Cached lookup table data (passed in from colors_settings)
-      character(len=100), intent(in) :: lu_file_names(:)
-      real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
 
       character(len=32) :: interpolation_method
 
@@ -54,29 +51,27 @@ contains
 
       ! Quantify how far (teff, log_g, metallicity) is from the grid points
       interpolation_radius = compute_interp_radius(teff, log_g, metallicity, &
-                                                   lu_teff, lu_logg, lu_meta)
+                                                   rq%lu_teff, rq%lu_logg, rq%lu_meta)
 
       select case (interpolation_method)
       case ('Hermite', 'hermite', 'HERMITE')
-         call construct_sed_hermite(teff, log_g, metallicity, R, d, lu_file_names, &
-                                    lu_teff, lu_logg, lu_meta, sed_filepath, &
-                                    wavelengths, fluxes)
+         call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
+                                    sed_filepath, wavelengths, fluxes)
 
       case ('Linear', 'linear', 'LINEAR')
-         call construct_sed_linear(teff, log_g, metallicity, R, d, lu_file_names, &
-                                   lu_teff, lu_logg, lu_meta, sed_filepath, &
+         call construct_sed_linear(teff, log_g, metallicity, R, d, rq%lu_file_names, &
+                                   rq%lu_teff, rq%lu_logg, rq%lu_meta, sed_filepath, &
                                    wavelengths, fluxes)
 
       case ('KNN', 'knn', 'Knn')
-         call construct_sed_knn(teff, log_g, metallicity, R, d, lu_file_names, &
-                                lu_teff, lu_logg, lu_meta, sed_filepath, &
+         call construct_sed_knn(teff, log_g, metallicity, R, d, rq%lu_file_names, &
+                                rq%lu_teff, rq%lu_logg, rq%lu_meta, sed_filepath, &
                                 wavelengths, fluxes)
 
       case default
          ! Fallback: Hermite
-         call construct_sed_hermite(teff, log_g, metallicity, R, d, lu_file_names, &
-                                    lu_teff, lu_logg, lu_meta, sed_filepath, &
-                                    wavelengths, fluxes)
+         call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
+                                    sed_filepath, wavelengths, fluxes)
       end select
 
       ! Calculate bolometric flux and magnitude

@@ -22,7 +22,7 @@ module colors_lib
    use const_def, only: dp, strlen, mesa_dir
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
-   use colors_utils, only: read_strings_from_file, load_lookup_table, load_filter, load_vega_sed, resolve_path
+   use colors_utils, only: read_strings_from_file, load_lookup_table, load_filter, load_vega_sed, resolve_path, load_flux_cube, build_unique_grids, build_grid_to_lu_map
    use colors_history, only: how_many_colors_history_columns, data_for_colors_history_columns
    use colors_iteration, only: write_iteration_colors, open_iteration_file, close_iteration_file
 
@@ -148,6 +148,12 @@ contains
                                 rq%lu_file_names, rq%lu_logg, rq%lu_meta, rq%lu_teff)
          rq%lookup_loaded = .true.
          if (allocated(lookup_table)) deallocate(lookup_table)
+
+         ! Build unique sorted grids once for fallback interpolation
+         call build_unique_grids(rq)
+
+         ! Build grid-to-lookup-table mapping for O(1) stencil lookups
+         call build_grid_to_lu_map(rq)
       end if
 
       ! =========================================
@@ -186,6 +192,15 @@ contains
          end do
 
          rq%filters_loaded = .true.
+      end if
+
+      ! =========================================
+      ! Attempt to load flux cube into memory
+      ! If allocation fails, cube_loaded stays .false. and
+      ! runtime will fall back to loading individual SED files
+      ! =========================================
+      if (.not. rq%cube_loaded) then
+         call load_flux_cube(rq, rq%stellar_atm)
       end if
 
    end subroutine colors_setup_tables
