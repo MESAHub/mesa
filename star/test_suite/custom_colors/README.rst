@@ -10,7 +10,7 @@ Running the Test Suite
 ======================
 
 
-The ``custom_colors`` test suite case evolves a 7 M☉ star from the pre-main sequence through core hydrogen burning, up to the point of X_He,c < 0.01. 
+The ``custom_colors`` test suite case evolves a 7 M☉ star from the pre-main sequence through core hydrogen burning, up to the point of X_He,c < 0.01.
 
 The test is not scientifically rigorous—the pre-MS relaxation settings are aggressive and the mesh is fine—its purpose is solely to exercise the colors module across a wide range of stellar parameters (T_eff, log g) in a reasonable wall-clock time.
 
