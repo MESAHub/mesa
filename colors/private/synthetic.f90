@@ -79,10 +79,10 @@ real(dp) function calculate_synthetic(temperature, gravity, metallicity, ierr, &
       ! Write SED to CSV if requested
       if (make_sed) then
          if (.not. folder_exists(trim(colors_results_directory))) call mkdir(trim(colors_results_directory))
-         
+
          ! Track model number internally when write_sed_per_model is enabled
          if (sed_per_model) then
-            
+
                write(model_str, '(I8.8)') model_number
                csv_file = trim(colors_results_directory)//'/'//trim(remove_dat(filter_name))//'_SED_'//trim(model_str)//'.csv'
 

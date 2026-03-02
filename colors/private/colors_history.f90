@@ -134,7 +134,7 @@ subroutine data_for_colors_history_columns( &
                                                              color_filter_names(i), &
                                                              make_sed, cs%sed_per_model, &
                                                              cs%colors_results_directory, model_number)
-               
+
                if (ierr /= 0) vals(i + filter_offset) = -1.0_dp
             else
                vals(i + filter_offset) = -1.0_dp

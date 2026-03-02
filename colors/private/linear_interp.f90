@@ -350,10 +350,10 @@ contains
       real(dp), intent(out) :: t
       integer :: n, lo, hi, mid, lb
       logical :: dummy_axis
-      
+
       n = size(x)
       lb = lbound(x, 1)
-      
+
       ! Detect dummy axis
       dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
       if (dummy_axis) then
@@ -361,7 +361,7 @@ contains
          t = 0.0_dp
          return
       end if
-      
+
       if (val <= x(lb)) then
          i = lb
          t = 0.0_dp
@@ -371,7 +371,7 @@ contains
          t = 1.0_dp
          return
       end if
-      
+
       lo = lb
       hi = ubound(x,1)
       do while (hi - lo > 1)
@@ -382,7 +382,7 @@ contains
             hi = mid
          end if
       end do
-      
+
       i = lo
       t = (val - x(i))/(x(i + 1) - x(i))
    end subroutine find_interval
@@ -394,7 +394,7 @@ contains
       integer, intent(out) :: i_x, i_y, i_z
       integer :: i, lb
       real(dp) :: min_dist, dist
-      
+
       ! Find nearest x grid point
       lb = lbound(x_grid, 1)
       min_dist = abs(x_val - x_grid(lb))
@@ -406,7 +406,7 @@ contains
             i_x = i
          end if
       end do
-      
+
       ! Find nearest y grid point
       lb = lbound(y_grid, 1)
       min_dist = abs(y_val - y_grid(lb))
@@ -418,7 +418,7 @@ contains
             i_y = i
          end if
       end do
-      
+
       ! Find nearest z grid point
       lb = lbound(z_grid, 1)
       min_dist = abs(z_val - z_grid(lb))
