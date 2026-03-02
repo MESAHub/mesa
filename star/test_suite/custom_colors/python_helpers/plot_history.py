@@ -111,7 +111,6 @@ def read_header_columns(history_file):
     return all_cols, filter_columns
 
 
-
 def setup_hr_diagram_params(md, filter_columns):
     """Set up parameters for HR diagram based on available filters."""
 
@@ -134,7 +133,7 @@ def setup_hr_diagram_params(md, filter_columns):
     # --- Gaia-like (Gbp, Grp, G) ---
     if has("gbp") and has("grp") and has("g"):
         hr_color = get("gbp") - get("grp")
-        hr_mag   = get("g")
+        hr_mag = get("g")
         hr_xlabel = "Gbp - Grp"
         hr_ylabel = "G"
         color_index = hr_color
@@ -144,21 +143,21 @@ def setup_hr_diagram_params(md, filter_columns):
         # B-R if present
         if has("b") and has("r"):
             hr_color = get("b") - get("r")
-            hr_mag   = get("v")
+            hr_mag = get("v")
             hr_xlabel = "B - R"
             hr_ylabel = "V"
             color_index = hr_color
         # B-V if only B present
         elif has("b"):
             hr_color = get("b") - get("v")
-            hr_mag   = get("v")
+            hr_mag = get("v")
             hr_xlabel = "B - V"
             hr_ylabel = "V"
             color_index = hr_color
         # V-R if only R present
         elif has("r"):
             hr_color = get("v") - get("r")
-            hr_mag   = get("v")
+            hr_mag = get("v")
             hr_xlabel = "V - R"
             hr_ylabel = "V"
             color_index = hr_color
@@ -169,7 +168,7 @@ def setup_hr_diagram_params(md, filter_columns):
     # --- Sloan-like g-r if no V branch matched ---
     elif has("g") and has("r"):
         hr_color = get("g") - get("r")
-        hr_mag   = get("g")
+        hr_mag = get("g")
         hr_xlabel = "g - r"
         hr_ylabel = "g"
         color_index = hr_color
@@ -195,7 +194,7 @@ def setup_hr_diagram_params(md, filter_columns):
             col2 = md.data(f2)
 
         hr_color = col1 - col2
-        hr_mag   = col1
+        hr_mag = col1
         hr_xlabel = f"{f1} - {f2}"
         hr_ylabel = f1
         color_index = hr_color
@@ -204,13 +203,12 @@ def setup_hr_diagram_params(md, filter_columns):
         # Not enough filters, fallback to flat arrays
         print("Warning: Not enough filter columns to construct color index")
         hr_color = np.zeros_like(md.Teff)
-        hr_mag   = np.zeros_like(md.Teff)
+        hr_mag = np.zeros_like(md.Teff)
         hr_xlabel = "Color Index"
         hr_ylabel = "Magnitude"
         color_index = hr_color
 
     return hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index
-
 
 
 def create_phase_plots(history_file="../LOGS/history.data"):

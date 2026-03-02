@@ -35,12 +35,14 @@ import time
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
 try:
     import pandas as pd
+
     HAVE_PD = True
 except ImportError:
     HAVE_PD = False
@@ -48,6 +50,7 @@ except ImportError:
 
 try:
     import mesa_reader as mr
+
     HAVE_MR = True
 except ImportError:
     HAVE_MR = False
@@ -56,22 +59,29 @@ except ImportError:
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
-os.chdir("../")  
+os.chdir("../")
 
 _mesa = os.environ.get("MESA_DIR", "")
 
-SOURCE_INSTRUMENT  = os.path.join(_mesa, "data/colors_data/filters/Generic/Johnson")
-SOURCE_STELLAR_ATM = os.path.join(_mesa, "data/colors_data/stellar_models/Kurucz2003all")
-SOURCE_VEGA_SED    = os.path.join(_mesa, "data/colors_data/stellar_models/vega_flam.csv")
+SOURCE_INSTRUMENT = os.path.join(_mesa, "data/colors_data/filters/Generic/Johnson")
+SOURCE_STELLAR_ATM = os.path.join(
+    _mesa, "data/colors_data/stellar_models/Kurucz2003all"
+)
+SOURCE_VEGA_SED = os.path.join(_mesa, "data/colors_data/stellar_models/vega_flam.csv")
 
 INLIST_COLORS = "inlist_colors"
-LOGS_DIR      = "LOGS"
-RUN_TIMEOUT   = 45
+LOGS_DIR = "LOGS"
+RUN_TIMEOUT = 45
 
 SUCCESS_MARKERS = ["step    1", "step      1", "      1   "]
 FAILURE_MARKERS = [
-    "Error: Could not open file", "colors_utils.f90",
-    "ERROR STOP", "STOP 1", "Backtrace", "failed to find", "ERROR: failed",
+    "Error: Could not open file",
+    "colors_utils.f90",
+    "ERROR STOP",
+    "STOP 1",
+    "Backtrace",
+    "failed to find",
+    "ERROR: failed",
 ]
 
 # =============================================================================
@@ -113,9 +123,9 @@ def patch_inlist(instrument, stellar_atm, vega_sed, colors_results_directory):
             raise ValueError(f"Could not find parameter '{key}' in {INLIST_COLORS}")
         return new_text
 
-    text = replace_param(text, "instrument",               instrument)
-    text = replace_param(text, "stellar_atm",              stellar_atm)
-    text = replace_param(text, "vega_sed",                 vega_sed)
+    text = replace_param(text, "instrument", instrument)
+    text = replace_param(text, "stellar_atm", stellar_atm)
+    text = replace_param(text, "vega_sed", vega_sed)
     text = replace_param(text, "colors_results_directory", colors_results_directory)
 
     with open(INLIST_COLORS, "w") as f:
@@ -134,7 +144,9 @@ def run_star(timeout):
     try:
         proc = subprocess.Popen(
             ["make", "run"],
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
         )
         try:
             output, _ = proc.communicate(timeout=timeout)
@@ -151,15 +163,28 @@ def run_star(timeout):
 
 def print_result(name, success, output):
     status = "✓ PASS" if success else "✗ FAIL"
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"  {status}  |  {name}")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     lines = output.strip().splitlines()
-    relevant = [l for l in lines if any(
-        kw.lower() in l.lower() for kw in
-        ["color", "filter", "error", "step", "instrument",
-         "could not open", "backtrace", "stop", "results"]
-    )]
+    relevant = [
+        l
+        for l in lines
+        if any(
+            kw.lower() in l.lower()
+            for kw in [
+                "color",
+                "filter",
+                "error",
+                "step",
+                "instrument",
+                "could not open",
+                "backtrace",
+                "stop",
+                "results",
+            ]
+        )
+    ]
     if relevant:
         print("  Relevant output:")
         for l in relevant[:25]:
@@ -175,18 +200,18 @@ def print_result(name, success, output):
 # =============================================================================
 
 _PHASE_MAP = {
-    -1: ("Relax",    "#C0C0C0"),
-     1: ("Starting", "#E6E6FA"),
-     2: ("Pre-MS",   "#FF69B4"),
-     3: ("ZAMS",     "#00FF00"),
-     4: ("IAMS",     "#0000FF"),
-     5: ("TAMS",     "#FF8C00"),
-     6: ("He-Burn",  "#8A2BE2"),
-     7: ("ZACHeB",   "#9932CC"),
-     8: ("TACHeB",   "#BA55D3"),
-     9: ("TP-AGB",   "#8B0000"),
-    10: ("C-Burn",   "#FF4500"),
-    14: ("WDCS",     "#708090"),
+    -1: ("Relax", "#C0C0C0"),
+    1: ("Starting", "#E6E6FA"),
+    2: ("Pre-MS", "#FF69B4"),
+    3: ("ZAMS", "#00FF00"),
+    4: ("IAMS", "#0000FF"),
+    5: ("TAMS", "#FF8C00"),
+    6: ("He-Burn", "#8A2BE2"),
+    7: ("ZACHeB", "#9932CC"),
+    8: ("TACHeB", "#BA55D3"),
+    9: ("TP-AGB", "#8B0000"),
+    10: ("C-Burn", "#FF4500"),
+    14: ("WDCS", "#708090"),
 }
 
 
@@ -197,7 +222,7 @@ def _read_filter_columns(history_file):
                 cols = line.split()
                 try:
                     idx = cols.index("Interp_rad")
-                    return cols[idx + 1:]
+                    return cols[idx + 1 :]
                 except ValueError:
                     pass
     return []
@@ -208,7 +233,7 @@ def _phase_colors(md_raw, skip):
         codes = md_raw.phase_of_evolution[skip:]
     else:
         codes = np.zeros(len(md_raw.model_number) - skip, dtype=int)
-    names  = [_PHASE_MAP.get(int(c), ("Unknown", "#808080"))[0] for c in codes]
+    names = [_PHASE_MAP.get(int(c), ("Unknown", "#808080"))[0] for c in codes]
     colors = [_PHASE_MAP.get(int(c), ("Unknown", "#808080"))[1] for c in codes]
     return names, colors
 
@@ -230,8 +255,11 @@ def _best_color_pair(filter_columns, md_raw, skip):
         return v[skip:] if isinstance(v, np.ndarray) and len(v) > skip else v
 
     for blue, red, mag_name in [
-        ("gbp", "grp", "g"), ("b", "r", "v"), ("b", "v", "v"),
-        ("v", "r", "v"), ("g", "r", "g"),
+        ("gbp", "grp", "g"),
+        ("b", "r", "v"),
+        ("b", "v", "v"),
+        ("v", "r", "v"),
+        ("g", "r", "g"),
     ]:
         b, r, m = get(blue), get(red), get(mag_name)
         if b is not None and r is not None and m is not None:
@@ -240,7 +268,12 @@ def _best_color_pair(filter_columns, md_raw, skip):
     if len(filter_columns) >= 2:
         d0, d1 = get(filter_columns[0]), get(filter_columns[-1])
         if d0 is not None and d1 is not None:
-            return d0 - d1, d0, f"{filter_columns[0]} − {filter_columns[-1]}", filter_columns[0]
+            return (
+                d0 - d1,
+                d0,
+                f"{filter_columns[0]} − {filter_columns[-1]}",
+                filter_columns[0],
+            )
 
     return None, None, "Color", "Mag"
 
@@ -267,7 +300,7 @@ def plot_history_result(test_name, out_path, success):
         return
 
     skip = 5
-    filter_columns      = _read_filter_columns(history_file)
+    filter_columns = _read_filter_columns(history_file)
     phase_names, p_cols = _phase_colors(md_raw, skip)
     color_idx, mag, xlabel, ylabel = _best_color_pair(filter_columns, md_raw, skip)
 
@@ -283,23 +316,37 @@ def plot_history_result(test_name, out_path, success):
         ax.xaxis.set_ticks_position("top")
         ax.xaxis.set_label_position("top")
     else:
-        ax.text(0.5, 0.5, "No colour pair", ha="center", va="center",
-                transform=ax.transAxes)
+        ax.text(
+            0.5, 0.5, "No colour pair", ha="center", va="center", transform=ax.transAxes
+        )
     ax.set_title("Colour–Magnitude", fontsize=11)
     ax.grid(True, alpha=0.3)
 
     ax = axes[1]
     try:
-        ax.scatter(md_raw.Teff[skip:], md_raw.log_L[skip:],
-                   c=p_cols, s=15, alpha=0.7, edgecolors="none")
+        ax.scatter(
+            md_raw.Teff[skip:],
+            md_raw.log_L[skip:],
+            c=p_cols,
+            s=15,
+            alpha=0.7,
+            edgecolors="none",
+        )
         ax.set_xlabel("Teff (K)", fontsize=11)
         ax.set_ylabel("log L/L☉", fontsize=11)
         ax.invert_xaxis()
         ax.xaxis.set_ticks_position("top")
         ax.xaxis.set_label_position("top")
     except Exception as e:
-        ax.text(0.5, 0.5, f"HR error:\n{e}", ha="center", va="center",
-                transform=ax.transAxes, fontsize=8)
+        ax.text(
+            0.5,
+            0.5,
+            f"HR error:\n{e}",
+            ha="center",
+            va="center",
+            transform=ax.transAxes,
+            fontsize=8,
+        )
     ax.set_title("HR Diagram", fontsize=11)
     ax.grid(True, alpha=0.3)
 
@@ -321,13 +368,26 @@ def plot_history_result(test_name, out_path, success):
             ax.invert_yaxis()
             ax.legend(fontsize=8, ncol=2)
         else:
-            ax.text(0.5, 0.5, "No filter data", ha="center", va="center",
-                    transform=ax.transAxes)
+            ax.text(
+                0.5,
+                0.5,
+                "No filter data",
+                ha="center",
+                va="center",
+                transform=ax.transAxes,
+            )
         ax.set_xlabel("Age (yr)", fontsize=11)
         ax.set_ylabel("Magnitude", fontsize=11)
     except Exception as e:
-        ax.text(0.5, 0.5, f"LC error:\n{e}", ha="center", va="center",
-                transform=ax.transAxes, fontsize=8)
+        ax.text(
+            0.5,
+            0.5,
+            f"LC error:\n{e}",
+            ha="center",
+            va="center",
+            transform=ax.transAxes,
+            fontsize=8,
+        )
     ax.set_title("Light Curves", fontsize=11)
     ax.grid(True, alpha=0.3)
 
@@ -335,13 +395,27 @@ def plot_history_result(test_name, out_path, success):
     for name, color in zip(phase_names, p_cols):
         seen.setdefault(name, color)
     legend_handles = [
-        plt.Line2D([0], [0], marker="o", color="w",
-                   markerfacecolor=c, markersize=8, label=n, markeredgecolor="none")
+        plt.Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            markerfacecolor=c,
+            markersize=8,
+            label=n,
+            markeredgecolor="none",
+        )
         for n, c in seen.items()
     ]
-    fig.legend(handles=legend_handles, loc="lower center", ncol=len(seen),
-               fontsize=9, title="Evolutionary phase", title_fontsize=9,
-               bbox_to_anchor=(0.5, -0.04))
+    fig.legend(
+        handles=legend_handles,
+        loc="lower center",
+        ncol=len(seen),
+        fontsize=9,
+        title="Evolutionary phase",
+        title_fontsize=9,
+        bbox_to_anchor=(0.5, -0.04),
+    )
 
     plt.tight_layout(rect=[0, 0.06, 1, 1])
     out_png = out_path / "proof_plot.png"
@@ -383,21 +457,23 @@ def plot_newton_iter_result(test_name, out_path, success):
             return None
 
     model_col = col("model")
-    iter_col  = col("iter")
-    teff_col  = col("Teff")
+    iter_col = col("iter")
+    teff_col = col("Teff")
 
     if iter_col is None or teff_col is None or model_col is None:
-        print(f"  [proof_newton] Expected columns (model/iter/Teff) not found — skipping.")
+        print(
+            f"  [proof_newton] Expected columns (model/iter/Teff) not found — skipping."
+        )
         return
 
     # First non-sentinel filter magnitude column (after Flux_bol)
     mag_col_data, mag_col_label = None, None
     try:
         flux_idx = col_names.index("Flux_bol")
-        for candidate in col_names[flux_idx + 1:]:
+        for candidate in col_names[flux_idx + 1 :]:
             c = col(candidate)
             if c is not None and not np.all(c == -99.0):
-                mag_col_data  = c
+                mag_col_data = c
                 mag_col_label = candidate
                 break
     except ValueError:
@@ -407,11 +483,20 @@ def plot_newton_iter_result(test_name, out_path, success):
     fig, axes = plt.subplots(1, n_panels, figsize=(6 * n_panels, 5))
     if n_panels == 1:
         axes = [axes]
-    fig.suptitle(f"Newton Iterations  |  {test_name}  —  "
-                 f"{'PASS ✓' if success else 'FAIL ✗'}", fontsize=12)
+    fig.suptitle(
+        f"Newton Iterations  |  {test_name}  —  {'PASS ✓' if success else 'FAIL ✗'}",
+        fontsize=12,
+    )
 
-    sc = axes[0].scatter(iter_col, teff_col, c=model_col, cmap="viridis",
-                         s=15, alpha=0.7, edgecolors="none")
+    sc = axes[0].scatter(
+        iter_col,
+        teff_col,
+        c=model_col,
+        cmap="viridis",
+        s=15,
+        alpha=0.7,
+        edgecolors="none",
+    )
     axes[0].set_xlabel("Newton iteration", fontsize=11)
     axes[0].set_ylabel("Teff (K)", fontsize=11)
     axes[0].set_title("Teff per Newton iteration", fontsize=11)
@@ -419,8 +504,15 @@ def plot_newton_iter_result(test_name, out_path, success):
     plt.colorbar(sc, ax=axes[0], label="model number")
 
     if mag_col_data is not None:
-        sc2 = axes[1].scatter(iter_col, mag_col_data, c=model_col, cmap="plasma",
-                              s=15, alpha=0.7, edgecolors="none")
+        sc2 = axes[1].scatter(
+            iter_col,
+            mag_col_data,
+            c=model_col,
+            cmap="plasma",
+            s=15,
+            alpha=0.7,
+            edgecolors="none",
+        )
         axes[1].set_xlabel("Newton iteration", fontsize=11)
         axes[1].set_ylabel(f"{mag_col_label} (mag)", fontsize=11)
         axes[1].set_title(f"{mag_col_label} per Newton iteration", fontsize=11)
@@ -443,41 +535,55 @@ def plot_sed_result(test_name, out_path, success):
     if not HAVE_PD:
         return
 
-    sed_files = sorted([
-        f for f in out_path.iterdir()
-        if f.name.endswith("_SED.csv") and not f.name.startswith("VEGA")
-    ])
+    sed_files = sorted(
+        [
+            f
+            for f in out_path.iterdir()
+            if f.name.endswith("_SED.csv") and not f.name.startswith("VEGA")
+        ]
+    )
 
     if not sed_files:
         print(f"  [proof_sed]    No *_SED.csv files in {out_path} — skipping.")
         return
 
     fig, ax = plt.subplots(figsize=(10, 5))
-    fig.suptitle(f"SED Sample  |  {test_name}  —  "
-                 f"{'PASS ✓' if success else 'FAIL ✗'}", fontsize=12)
+    fig.suptitle(
+        f"SED Sample  |  {test_name}  —  {'PASS ✓' if success else 'FAIL ✗'}",
+        fontsize=12,
+    )
 
     sed_plotted = False
     for f in sed_files[:5]:
         try:
-            df = (pd.read_csv(f, delimiter=",", header=0)
-                    .rename(columns=str.strip)
-                    .dropna())
+            df = (
+                pd.read_csv(f, delimiter=",", header=0)
+                .rename(columns=str.strip)
+                .dropna()
+            )
         except Exception as e:
             print(f"  [proof_sed]    Could not read {f.name}: {e}")
             continue
 
-        wavelengths    = df.get("wavelengths",   pd.Series()).to_numpy()
-        flux           = df.get("fluxes",        pd.Series()).to_numpy()
+        wavelengths = df.get("wavelengths", pd.Series()).to_numpy()
+        flux = df.get("fluxes", pd.Series()).to_numpy()
         convolved_flux = df.get("convolved_flux", pd.Series()).to_numpy()
 
         if not sed_plotted and len(wavelengths) > 0 and len(flux) > 0:
-            ax.plot(wavelengths, flux, color="black", lw=1.5, label="Full SED", zorder=5)
+            ax.plot(
+                wavelengths, flux, color="black", lw=1.5, label="Full SED", zorder=5
+            )
             sed_plotted = True
 
         filter_label = f.stem.replace("_SED", "")
         if len(wavelengths) > 0 and len(convolved_flux) > 0:
-            ax.plot(wavelengths, convolved_flux, lw=1.2,
-                    label=f"{filter_label} (convolved)", alpha=0.85)
+            ax.plot(
+                wavelengths,
+                convolved_flux,
+                lw=1.2,
+                label=f"{filter_label} (convolved)",
+                alpha=0.85,
+            )
 
     ax.set_xlabel("Wavelength (Å)", fontsize=11)
     ax.set_ylabel("Flux", fontsize=11)
@@ -506,9 +612,9 @@ def run_all_proof_plots(test_name, output_dir, success):
 # DEFAULT INPUT PATHS
 # =============================================================================
 
-_DEFAULT_INSTRUMENT  = "data/colors_data/filters/Generic/Johnson"
+_DEFAULT_INSTRUMENT = "data/colors_data/filters/Generic/Johnson"
 _DEFAULT_STELLAR_ATM = "data/colors_data/stellar_models/Kurucz2003all/"
-_DEFAULT_VEGA_SED    = "data/colors_data/stellar_models/vega_flam.csv"
+_DEFAULT_VEGA_SED = "data/colors_data/stellar_models/vega_flam.csv"
 
 
 def _run_test(name, instrument, stellar_atm, vega_sed, out):
@@ -525,6 +631,7 @@ def _run_test(name, instrument, stellar_atm, vega_sed, out):
 # INPUT PATH TESTS
 # =============================================================================
 
+
 def test01_input_mesa_dir_relative():
     return _run_test(
         "INPUT: MESA_DIR-relative",
@@ -537,9 +644,9 @@ def test01_input_mesa_dir_relative():
 
 def test02_input_cwd_dotslash():
     stage = "./test_staged/test02_input_cwd_dotslash"
-    copy_data(SOURCE_INSTRUMENT,  f"{stage}/filters/Generic/Johnson")
+    copy_data(SOURCE_INSTRUMENT, f"{stage}/filters/Generic/Johnson")
     copy_data(SOURCE_STELLAR_ATM, f"{stage}/stellar_models/Kurucz2003all")
-    copy_data(SOURCE_VEGA_SED,    f"{stage}/stellar_models/vega_flam.csv")
+    copy_data(SOURCE_VEGA_SED, f"{stage}/stellar_models/vega_flam.csv")
     return _run_test(
         "INPUT: CWD-relative (./)",
         f"{stage}/filters/Generic/Johnson",
@@ -551,9 +658,9 @@ def test02_input_cwd_dotslash():
 
 def test03_input_cwd_dotdotslash():
     stage = "../test_staged/test03_input_cwd_dotdotslash"
-    copy_data(SOURCE_INSTRUMENT,  f"{stage}/filters/Generic/Johnson")
+    copy_data(SOURCE_INSTRUMENT, f"{stage}/filters/Generic/Johnson")
     copy_data(SOURCE_STELLAR_ATM, f"{stage}/stellar_models/Kurucz2003all")
-    copy_data(SOURCE_VEGA_SED,    f"{stage}/stellar_models/vega_flam.csv")
+    copy_data(SOURCE_VEGA_SED, f"{stage}/stellar_models/vega_flam.csv")
     return _run_test(
         "INPUT: CWD-relative (../)",
         f"{stage}/filters/Generic/Johnson",
@@ -565,9 +672,9 @@ def test03_input_cwd_dotdotslash():
 
 def test04_input_absolute():
     stage = os.path.join(CWD, "test_staged/test04_input_absolute")
-    copy_data(SOURCE_INSTRUMENT,  os.path.join(stage, "filters/Generic/Johnson"))
+    copy_data(SOURCE_INSTRUMENT, os.path.join(stage, "filters/Generic/Johnson"))
     copy_data(SOURCE_STELLAR_ATM, os.path.join(stage, "stellar_models/Kurucz2003all"))
-    copy_data(SOURCE_VEGA_SED,    os.path.join(stage, "stellar_models/vega_flam.csv"))
+    copy_data(SOURCE_VEGA_SED, os.path.join(stage, "stellar_models/vega_flam.csv"))
     return _run_test(
         "INPUT: Absolute path",
         os.path.join(stage, "filters/Generic/Johnson"),
@@ -591,34 +698,55 @@ def test05_input_slash_mesa_fallback():
 # OUTPUT PATH TESTS
 # =============================================================================
 
+
 def test06_output_plain_relative():
-    return _run_test("OUTPUT: Plain relative",
-                     _DEFAULT_INSTRUMENT, _DEFAULT_STELLAR_ATM, _DEFAULT_VEGA_SED,
-                     "test_results/test06_output")
+    return _run_test(
+        "OUTPUT: Plain relative",
+        _DEFAULT_INSTRUMENT,
+        _DEFAULT_STELLAR_ATM,
+        _DEFAULT_VEGA_SED,
+        "test_results/test06_output",
+    )
 
 
 def test07_output_cwd_dotslash():
-    return _run_test("OUTPUT: CWD-relative (./)",
-                     _DEFAULT_INSTRUMENT, _DEFAULT_STELLAR_ATM, _DEFAULT_VEGA_SED,
-                     "./test_results/test07_output")
+    return _run_test(
+        "OUTPUT: CWD-relative (./)",
+        _DEFAULT_INSTRUMENT,
+        _DEFAULT_STELLAR_ATM,
+        _DEFAULT_VEGA_SED,
+        "./test_results/test07_output",
+    )
 
 
 def test08_output_dotdotslash():
-    return _run_test("OUTPUT: CWD-relative (../)",
-                     _DEFAULT_INSTRUMENT, _DEFAULT_STELLAR_ATM, _DEFAULT_VEGA_SED,
-                     "../test_results_parent/test08_output")
+    return _run_test(
+        "OUTPUT: CWD-relative (../)",
+        _DEFAULT_INSTRUMENT,
+        _DEFAULT_STELLAR_ATM,
+        _DEFAULT_VEGA_SED,
+        "../test_results_parent/test08_output",
+    )
 
 
 def test09_output_absolute():
-    return _run_test("OUTPUT: Absolute path",
-                     _DEFAULT_INSTRUMENT, _DEFAULT_STELLAR_ATM, _DEFAULT_VEGA_SED,
-                     os.path.join(CWD, "test_results/test09_output"))
+    return _run_test(
+        "OUTPUT: Absolute path",
+        _DEFAULT_INSTRUMENT,
+        _DEFAULT_STELLAR_ATM,
+        _DEFAULT_VEGA_SED,
+        os.path.join(CWD, "test_results/test09_output"),
+    )
 
 
 def test10_output_nested_subdir():
-    return _run_test("OUTPUT: Nested subdirectory",
-                     _DEFAULT_INSTRUMENT, _DEFAULT_STELLAR_ATM, _DEFAULT_VEGA_SED,
-                     "test_results/test10_output/nested/SED")
+    return _run_test(
+        "OUTPUT: Nested subdirectory",
+        _DEFAULT_INSTRUMENT,
+        _DEFAULT_STELLAR_ATM,
+        _DEFAULT_VEGA_SED,
+        "test_results/test10_output/nested/SED",
+    )
 
 
 # =============================================================================
@@ -626,20 +754,21 @@ def test10_output_nested_subdir():
 # =============================================================================
 
 TESTS = [
-    ("INPUT: MESA_DIR-relative",        test01_input_mesa_dir_relative),
-    ("INPUT: CWD-relative (./)",        test02_input_cwd_dotslash),
-    ("INPUT: CWD-relative (../)",       test03_input_cwd_dotdotslash),
-    ("INPUT: Absolute path",            test04_input_absolute),
+    ("INPUT: MESA_DIR-relative", test01_input_mesa_dir_relative),
+    ("INPUT: CWD-relative (./)", test02_input_cwd_dotslash),
+    ("INPUT: CWD-relative (../)", test03_input_cwd_dotdotslash),
+    ("INPUT: Absolute path", test04_input_absolute),
     ("INPUT: /-prefixed MESA fallback", test05_input_slash_mesa_fallback),
-    ("OUTPUT: Plain relative",          test06_output_plain_relative),
-    ("OUTPUT: CWD-relative (./)",       test07_output_cwd_dotslash),
-    ("OUTPUT: CWD-relative (../)",      test08_output_dotdotslash),
-    ("OUTPUT: Absolute path",           test09_output_absolute),
-    ("OUTPUT: Nested subdirectory",     test10_output_nested_subdir),
+    ("OUTPUT: Plain relative", test06_output_plain_relative),
+    ("OUTPUT: CWD-relative (./)", test07_output_cwd_dotslash),
+    ("OUTPUT: CWD-relative (../)", test08_output_dotdotslash),
+    ("OUTPUT: Absolute path", test09_output_absolute),
+    ("OUTPUT: Nested subdirectory", test10_output_nested_subdir),
 ]
 
 if __name__ == "__main__":
-    print(textwrap.dedent(f"""
+    print(
+        textwrap.dedent(f"""
         MESA Colors — Path Resolution Test Suite
         =========================================
         Work directory : {CWD}
@@ -655,7 +784,8 @@ if __name__ == "__main__":
           proof_plot.png   — CMD + HR diagram + filter light curves
           proof_newton.png — Teff and filter mag vs Newton iteration
           proof_sed.png    — filter SED convolution sample
-    """))
+    """)
+    )
 
     backup_inlist()
 
@@ -676,22 +806,24 @@ if __name__ == "__main__":
         if os.path.exists(INLIST_BACKUP):
             os.remove(INLIST_BACKUP)
 
-    print(f"\n\n{'='*70}")
+    print(f"\n\n{'=' * 70}")
     print("  SUMMARY")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     for name, passed in results.items():
         status = "✓ PASS" if passed else "✗ FAIL"
         print(f"  {status}  {name}")
-    total  = len(results)
+    total = len(results)
     passed = sum(results.values())
     print(f"\n  {passed}/{total} tests passed")
-    print(f"{'='*70}")
-    print(textwrap.dedent(f"""
+    print(f"{'=' * 70}")
+    print(
+        textwrap.dedent(f"""
         Directories to inspect:
           Input staging  : {CWD}/test_staged/
                            {os.path.dirname(CWD)}/test_staged/
           Output + plots : {CWD}/test_results/
                            {os.path.dirname(CWD)}/test_results_parent/
-    """))
+    """)
+    )
 
     exit(0 if passed == total else 1)
