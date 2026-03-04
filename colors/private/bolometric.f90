@@ -59,14 +59,12 @@ contains
                                     sed_filepath, wavelengths, fluxes)
 
       case ('Linear', 'linear', 'LINEAR')
-         call construct_sed_linear(teff, log_g, metallicity, R, d, rq%lu_file_names, &
-                                   rq%lu_teff, rq%lu_logg, rq%lu_meta, sed_filepath, &
-                                   wavelengths, fluxes)
+         call construct_sed_linear(rq, teff, log_g, metallicity, R, d, &
+                                   sed_filepath, wavelengths, fluxes)
 
       case ('KNN', 'knn', 'Knn')
-         call construct_sed_knn(teff, log_g, metallicity, R, d, rq%lu_file_names, &
-                                rq%lu_teff, rq%lu_logg, rq%lu_meta, sed_filepath, &
-                                wavelengths, fluxes)
+         call construct_sed_knn(rq, teff, log_g, metallicity, R, d, &
+                                sed_filepath, wavelengths, fluxes)
 
       case default
          ! Fallback: Hermite

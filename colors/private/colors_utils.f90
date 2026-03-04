@@ -19,7 +19,7 @@
 
 module colors_utils
    use const_def, only: dp, strlen, mesa_dir
-   use colors_def, only: Colors_General_Info
+   use colors_def, only: Colors_General_Info, sed_mem_cache_cap
    use utils_lib, only: mesa_error
 
    implicit none
@@ -27,7 +27,9 @@ module colors_utils
    public :: dilute_flux, trapezoidal_integration, romberg_integration, &
              simpson_integration, load_sed, load_filter, load_vega_sed, &
              load_lookup_table, remove_dat, load_flux_cube, build_unique_grids, &
-             build_grid_to_lu_map
+             build_grid_to_lu_map, &
+             find_containing_cell, find_interval, find_nearest_point, &
+             find_bracket_index, load_sed_cached, load_stencil
 contains
 
    !---------------------------------------------------------------------------
@@ -864,5 +866,256 @@ end function resolve_path
       rq%grid_map_built = .true.
 
    end subroutine build_grid_to_lu_map
+
+   !###########################################################
+   !## GRID-SEARCH UTILITIES (shared by hermite, linear, knn)
+   !###########################################################
+
+   !---------------------------------------------------------------------------
+   ! Find the cell containing the interpolation point
+   !---------------------------------------------------------------------------
+   subroutine find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                   i_x, i_y, i_z, t_x, t_y, t_z)
+      real(dp), intent(in) :: x_val, y_val, z_val
+      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
+      integer, intent(out) :: i_x, i_y, i_z
+      real(dp), intent(out) :: t_x, t_y, t_z
+
+      call find_interval(x_grid, x_val, i_x, t_x)
+      call find_interval(y_grid, y_val, i_y, t_y)
+      call find_interval(z_grid, z_val, i_z, t_z)
+   end subroutine find_containing_cell
+
+   !---------------------------------------------------------------------------
+   ! Find the interval in a sorted array containing a value.
+   ! Returns index i such that x(i) <= val <= x(i+1), and the fractional
+   ! position t in [0,1].  Detects "dummy" axes (all zeros / 999 / -999)
+   ! and collapses them to i=1, t=0.
+   !---------------------------------------------------------------------------
+   subroutine find_interval(x, val, i, t)
+      real(dp), intent(in) :: x(:), val
+      integer, intent(out) :: i
+      real(dp), intent(out) :: t
+
+      integer :: n, lo, hi, mid
+      logical :: dummy_axis
+
+      n = size(x)
+
+      ! Detect dummy axis: all values == 0, 999, or -999
+      dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
+
+      if (dummy_axis) then
+         i = 1
+         t = 0.0_dp
+         return
+      end if
+
+      if (val <= x(1)) then
+         i = 1
+         t = 0.0_dp
+         return
+      else if (val >= x(n)) then
+         i = n - 1
+         t = 1.0_dp
+         return
+      end if
+
+      lo = 1
+      hi = n
+      do while (hi - lo > 1)
+         mid = (lo + hi)/2
+         if (val >= x(mid)) then
+            lo = mid
+         else
+            hi = mid
+         end if
+      end do
+
+      i = lo
+      if (abs(x(i + 1) - x(i)) < 1.0e-30_dp) then
+         t = 0.0_dp  ! degenerate interval — no interpolation needed
+      else
+         t = (val - x(i))/(x(i + 1) - x(i))
+      end if
+   end subroutine find_interval
+
+   !---------------------------------------------------------------------------
+   ! Find the nearest grid point (3-D)
+   !---------------------------------------------------------------------------
+   subroutine find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                 i_x, i_y, i_z)
+      real(dp), intent(in) :: x_val, y_val, z_val
+      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
+      integer, intent(out) :: i_x, i_y, i_z
+
+      i_x = minloc(abs(x_val - x_grid), 1)
+      i_y = minloc(abs(y_val - y_grid), 1)
+      i_z = minloc(abs(z_val - z_grid), 1)
+   end subroutine find_nearest_point
+
+   !---------------------------------------------------------------------------
+   ! Find the bracketing index in a unique sorted grid.
+   ! Returns idx such that grid(idx) <= val < grid(idx+1), clamped.
+   !---------------------------------------------------------------------------
+   subroutine find_bracket_index(grid, val, idx)
+      real(dp), intent(in) :: grid(:), val
+      integer, intent(out) :: idx
+
+      integer :: n, lo, hi, mid
+
+      n = size(grid)
+      if (n < 2) then
+         idx = 1
+         return
+      end if
+
+      if (val <= grid(1)) then
+         idx = 1
+         return
+      else if (val >= grid(n)) then
+         idx = n - 1
+         return
+      end if
+
+      lo = 1
+      hi = n
+      do while (hi - lo > 1)
+         mid = (lo + hi)/2
+         if (val >= grid(mid)) then
+            lo = mid
+         else
+            hi = mid
+         end if
+      end do
+      idx = lo
+   end subroutine find_bracket_index
+
+   !###########################################################
+   !## FALLBACK SED CACHE & STENCIL LOADER
+   !###########################################################
+
+   !---------------------------------------------------------------------------
+   ! Load a stencil sub-cube of SED fluxes for the given index ranges.
+   ! Uses load_sed_cached so that repeated visits to the same grid point
+   ! are served from the in-memory cache rather than from disk.
+   !---------------------------------------------------------------------------
+   subroutine load_stencil(rq, resolved_dir, lo_t, hi_t, lo_g, hi_g, lo_m, hi_m)
+      type(Colors_General_Info), intent(inout) :: rq
+      character(len=*), intent(in) :: resolved_dir
+      integer, intent(in) :: lo_t, hi_t, lo_g, hi_g, lo_m, hi_m
+
+      integer :: st, sg, sm, n_lambda, lu_idx
+      integer :: it, ig, im
+      real(dp), dimension(:), allocatable :: sed_flux
+
+      st = hi_t - lo_t + 1
+      sg = hi_g - lo_g + 1
+      sm = hi_m - lo_m + 1
+
+      ! Free previous stencil flux data
+      if (allocated(rq%stencil_fluxes)) deallocate(rq%stencil_fluxes)
+
+      n_lambda = 0
+
+      do it = lo_t, hi_t
+         do ig = lo_g, hi_g
+            do im = lo_m, hi_m
+               lu_idx = rq%grid_to_lu(it, ig, im)
+
+               call load_sed_cached(rq, resolved_dir, lu_idx, sed_flux)
+
+               if (n_lambda == 0) then
+                  n_lambda = size(sed_flux)
+                  allocate (rq%stencil_fluxes(st, sg, sm, n_lambda))
+               end if
+
+               rq%stencil_fluxes(it - lo_t + 1, ig - lo_g + 1, im - lo_m + 1, :) = &
+                  sed_flux(1:n_lambda)
+
+               if (allocated(sed_flux)) deallocate(sed_flux)
+            end do
+         end do
+      end do
+
+      ! Set stencil wavelengths from the canonical copy on the handle
+      if (allocated(rq%stencil_wavelengths)) deallocate(rq%stencil_wavelengths)
+      allocate (rq%stencil_wavelengths(n_lambda))
+      rq%stencil_wavelengths = rq%fallback_wavelengths(1:n_lambda)
+
+   end subroutine load_stencil
+
+   !---------------------------------------------------------------------------
+   ! Retrieve an SED flux from the memory cache, or load from disk on miss.
+   ! Uses a bounded circular buffer (sed_mem_cache_cap slots).
+   !
+   ! On the first disk read, the wavelength array is stored once on the
+   ! handle as rq%fallback_wavelengths (all SEDs in a given atmosphere
+   ! grid share the same wavelength array).  Only the flux is cached
+   ! and returned.
+   !---------------------------------------------------------------------------
+   subroutine load_sed_cached(rq, resolved_dir, lu_idx, flux)
+      type(Colors_General_Info), intent(inout) :: rq
+      character(len=*), intent(in) :: resolved_dir
+      integer, intent(in) :: lu_idx
+      real(dp), dimension(:), allocatable, intent(out) :: flux
+
+      integer :: slot, n_lam
+      character(len=512) :: filepath
+      real(dp), dimension(:), allocatable :: sed_wave
+
+      ! Initialise the cache on first call
+      if (.not. rq%sed_mcache_init) then
+         allocate (rq%sed_mcache_keys(sed_mem_cache_cap))
+         rq%sed_mcache_keys = 0   ! 0 means empty slot
+         rq%sed_mcache_count = 0
+         rq%sed_mcache_next = 1
+         rq%sed_mcache_nlam = 0
+         rq%sed_mcache_init = .true.
+      end if
+
+      ! Search for a cache hit (linear scan over a small array)
+      do slot = 1, rq%sed_mcache_count
+         if (rq%sed_mcache_keys(slot) == lu_idx) then
+            ! Hit -- return cached flux
+            n_lam = rq%sed_mcache_nlam
+            allocate (flux(n_lam))
+            flux = rq%sed_mcache_data(:, slot)
+            return
+         end if
+      end do
+
+      ! Miss -- load from disk
+      filepath = trim(resolved_dir)//'/'//trim(rq%lu_file_names(lu_idx))
+      call load_sed(filepath, lu_idx, sed_wave, flux)
+
+      ! Store the canonical wavelength array on the handle (once only)
+      if (.not. rq%fallback_wavelengths_set) then
+         n_lam = size(sed_wave)
+         allocate (rq%fallback_wavelengths(n_lam))
+         rq%fallback_wavelengths = sed_wave
+         rq%fallback_wavelengths_set = .true.
+      end if
+      if (allocated(sed_wave)) deallocate(sed_wave)
+
+      ! Store flux in the cache
+      n_lam = size(flux)
+      if (rq%sed_mcache_nlam == 0) then
+         ! First SED ever loaded -- set the wavelength count and allocate data
+         rq%sed_mcache_nlam = n_lam
+         allocate (rq%sed_mcache_data(n_lam, sed_mem_cache_cap))
+      end if
+
+      ! Write to the next slot (circular)
+      slot = rq%sed_mcache_next
+      rq%sed_mcache_keys(slot) = lu_idx
+      rq%sed_mcache_data(:, slot) = flux(1:n_lam)
+
+      ! Advance the circular pointer
+      if (rq%sed_mcache_count < sed_mem_cache_cap) &
+         rq%sed_mcache_count = rq%sed_mcache_count + 1
+      rq%sed_mcache_next = mod(slot, sed_mem_cache_cap) + 1
+
+   end subroutine load_sed_cached
 
 end module colors_utils
