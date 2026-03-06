@@ -2,6 +2,8 @@ INTERNAL_DEPENDS_ON := $(addprefix mesa-,$(INTERNAL_DEPENDS_ON))
 
 include $(MAKE_DIR)/subdirs.mk
 
+PKG_CONFIG_FLAGS =
+
 ifneq ($(MESASDK_ROOT),)
   ifeq ($(WITH_CRLIBM),yes)
     PKG_CONFIG_FLAGS += --define-variable=math_slot=crmath
