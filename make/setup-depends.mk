@@ -4,9 +4,11 @@ include $(MAKE_DIR)/subdirs.mk
 
 ifneq ($(MESASDK_ROOT),)
   ifeq ($(WITH_CRLIBM),yes)
-    PKG_CONFIG_PATH := $(MESASDK_ROOT)/math-slots/crmath/lib/pkgconfig:$(PKG_CONFIG_PATH)
+    PKG_CONFIG_FLAGS += --define-variable=math_slot=crmath
+    MESASDK_MATH_SLOT = crmath
   else
-    PKG_CONFIG_PATH := $(MESASDK_ROOT)/math-slots/default/lib/pkgconfig:$(PKG_CONFIG_PATH)
+    PKG_CONFIG_FLAGS += --define-variable=math_slot=default
+    MESASDK_MATH_SLOT = default
   endif
 endif
 
