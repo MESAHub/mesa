@@ -39,7 +39,7 @@ contains
       call get_colors_ptr(colors_handle, colors_settings, ierr)
       if (ierr /= 0) then
          write (*, *) 'failed in colors_ptr'
-         num_cols = 0
+         how_many_colors_history_columns = 0
          return
       end if
 
@@ -52,9 +52,9 @@ contains
       how_many_colors_history_columns = num_cols
    end function how_many_colors_history_columns
 
-subroutine data_for_colors_history_columns( &
-   t_eff, log_g, R, metallicity, model_number, &
-   colors_handle, n, names, vals, ierr)
+   subroutine data_for_colors_history_columns( &
+      t_eff, log_g, R, metallicity, model_number, &
+      colors_handle, n, names, vals, ierr)
       real(dp), intent(in) :: t_eff, log_g, R, metallicity
       integer, intent(in) :: colors_handle, n
       character(len=80) :: names(n)
@@ -66,7 +66,8 @@ subroutine data_for_colors_history_columns( &
       integer :: i, filter_offset
       real(dp) :: d, bolometric_magnitude, bolometric_flux, interpolation_radius
       real(dp) :: zero_point
-      character(len=256) :: sed_filepath, filter_name
+      character(len=256) :: sed_filepath
+      character(len=80) :: filter_name
       logical :: make_sed
 
       real(dp), dimension(:), allocatable :: wavelengths, fluxes
@@ -94,7 +95,6 @@ subroutine data_for_colors_history_columns( &
       sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = cs%make_csv
 
-      ! Calculate bolometric magnitude using cached data on handle
       call calculate_bolometric(cs, t_eff, log_g, metallicity, R, d, &
                                 bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
                                 sed_filepath, interpolation_radius)
@@ -113,7 +113,7 @@ subroutine data_for_colors_history_columns( &
             names(i + filter_offset) = filter_name
 
             if (t_eff >= 0 .and. metallicity >= 0) then
-               ! Select precomputed zero-point based on magnitude system
+               ! pick the precomputed zero-point for the requested mag system
                select case (trim(cs%mag_system))
                case ('VEGA', 'Vega', 'vega')
                   zero_point = cs%filters(i)%vega_zero_point
@@ -146,9 +146,9 @@ subroutine data_for_colors_history_columns( &
          call mesa_error(__FILE__, __LINE__, 'colors: data_for_colors_history_columns array size mismatch')
       end if
 
-      ! Clean up allocated arrays from calculate_bolometric
-      if (allocated(wavelengths)) deallocate(wavelengths)
-      if (allocated(fluxes)) deallocate(fluxes)
+      ! clean up
+      if (allocated(wavelengths)) deallocate (wavelengths)
+      if (allocated(fluxes)) deallocate (fluxes)
 
    end subroutine data_for_colors_history_columns
 

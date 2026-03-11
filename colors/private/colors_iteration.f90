@@ -47,32 +47,31 @@ contains
 
       filename = trim(cs%colors_results_directory)//'/iteration_colors.data'
       call execute_command_line('mkdir -p "'//trim(cs%colors_results_directory)//'"', wait=.true.)
-      open(newunit=cs%iteration_output_unit, file=trim(filename), &
-           status='replace', action='write', iostat=ierr)
+      open (newunit=cs%iteration_output_unit, file=trim(filename), &
+            status='replace', action='write', iostat=ierr)
       if (ierr /= 0) then
-         write(*,*) 'Error opening iteration colors file: ', trim(filename)
+         write (*, *) 'Error opening iteration colors file: ', trim(filename)
          return
       end if
 
       ! Write header
-      write(cs%iteration_output_unit, '(a)', advance='no') &
+      write (cs%iteration_output_unit, '(a)', advance='no') &
          '#  model  iter       star_age             dt           Teff'
-      write(cs%iteration_output_unit, '(a)', advance='no') &
+      write (cs%iteration_output_unit, '(a)', advance='no') &
          '          log_g              R       Mag_bol      Flux_bol'
       do i = 1, num_color_filters
          filter_name = trim(remove_dat(color_filter_names(i)))
-         write(cs%iteration_output_unit, '(2x,a14)', advance='no') trim(filter_name)
+         write (cs%iteration_output_unit, '(2x,a14)', advance='no') trim(filter_name)
       end do
-      write(cs%iteration_output_unit, *)
+      write (cs%iteration_output_unit, *)
 
       cs%iteration_file_open = .true.
 
    end subroutine open_iteration_file
 
-
    subroutine write_iteration_colors( &
-         colors_handle, model_number, iter, star_age, dt, &
-         t_eff, log_g, R, metallicity, ierr)
+      colors_handle, model_number, iter, star_age, dt, &
+      t_eff, log_g, R, metallicity, ierr)
 
       integer, intent(in) :: colors_handle, model_number, iter
       real(dp), intent(in) :: star_age, dt, t_eff, log_g, R, metallicity
@@ -90,18 +89,18 @@ contains
       call get_colors_ptr(colors_handle, cs, ierr)
       if (ierr /= 0) return
 
-      ! Check if per-iteration colors is enabled
+      ! check if per-iteration colors is enabled
       if (.not. cs%colors_per_newton_step) return
       if (.not. cs%use_colors) return
 
-      ! Verify data was loaded at initialization
+      ! verify data was loaded at initialization
       if (.not. cs%lookup_loaded) then
-         write(*,*) 'colors_iteration error: lookup table not loaded'
+         write (*, *) 'colors_iteration error: lookup table not loaded'
          ierr = -1
          return
       end if
       if (.not. cs%filters_loaded) then
-         write(*,*) 'colors_iteration error: filter data not loaded'
+         write (*, *) 'colors_iteration error: filter data not loaded'
          ierr = -1
          return
       end if
@@ -114,28 +113,26 @@ contains
 
       iounit = cs%iteration_output_unit
 
-      ! Get paths and settings from colors_settings
       d = cs%distance
       sed_filepath = trim(resolve_path(cs%stellar_atm))
-      make_sed = .false.  ! Don't write individual SEDs for iteration output
+      make_sed = .false.  ! don't write individual SEDs for iteration output
 
-      ! Calculate bolometric magnitude using cached data on handle
       call calculate_bolometric(cs, t_eff, log_g, metallicity, R, d, &
                                 bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
                                 sed_filepath, interpolation_radius)
 
       ! Write basic data
-      write(iounit, '(i8, i6)', advance='no') model_number, iter
-      write(iounit, '(6(1pe15.7))', advance='no') &
+      write (iounit, '(i8, i6)', advance='no') model_number, iter
+      write (iounit, '(6(1pe15.7))', advance='no') &
          star_age, dt, t_eff, log_g, R, bolometric_magnitude
-      write(iounit, '(1pe15.7)', advance='no') bolometric_flux
+      write (iounit, '(1pe15.7)', advance='no') bolometric_flux
 
-      ! Calculate and write each filter magnitude using cached filter data
+      ! calculate and write each filter magnitude
       do i = 1, num_color_filters
          if (t_eff >= 0 .and. metallicity >= 0 .and. &
              allocated(wavelengths) .and. allocated(fluxes)) then
 
-            ! Select precomputed zero-point based on magnitude system
+            ! pick the precomputed zero-point for the requested mag system
             select case (trim(cs%mag_system))
             case ('VEGA', 'Vega', 'vega')
                zero_point = cs%filters(i)%vega_zero_point
@@ -147,38 +144,30 @@ contains
                zero_point = cs%filters(i)%vega_zero_point
             end select
 
-            ! Calculate synthetic magnitude using cached filter data and precomputed zero-point
-            ! Arguments: Teff, log_g, metallicity, ierr, SED wavelengths, SED fluxes,
-            !            filter wavelengths, filter transmission, zero_point,
-            !            filter_name, make_sed_file, output_directory
             magnitude = calculate_synthetic(t_eff, log_g, metallicity, ierr, &
-                                                             wavelengths, fluxes, &
-                                                             cs%filters(i)%wavelengths, &
-                                                             cs%filters(i)%transmission, &
-                                                             zero_point, &
-                                                             color_filter_names(i), &
-                                                             make_sed, cs%sed_per_model, &
-                                                             cs%colors_results_directory, model_number)
-
-
-
+                                            wavelengths, fluxes, &
+                                            cs%filters(i)%wavelengths, &
+                                            cs%filters(i)%transmission, &
+                                            zero_point, &
+                                            color_filter_names(i), &
+                                            make_sed, cs%sed_per_model, &
+                                            cs%colors_results_directory, model_number)
 
             if (ierr /= 0) magnitude = -99.0_dp
          else
             magnitude = -99.0_dp
          end if
 
-         write(iounit, '(1pe15.7)', advance='no') magnitude
+         write (iounit, '(1pe15.7)', advance='no') magnitude
       end do
 
-      write(iounit, *)  ! newline
+      write (iounit, *)  ! newline
 
-      ! Clean up allocated arrays from calculate_bolometric
-      if (allocated(wavelengths)) deallocate(wavelengths)
-      if (allocated(fluxes)) deallocate(fluxes)
+      ! clean up
+      if (allocated(wavelengths)) deallocate (wavelengths)
+      if (allocated(fluxes)) deallocate (fluxes)
 
    end subroutine write_iteration_colors
-
 
    subroutine close_iteration_file(colors_handle, ierr)
       integer, intent(in) :: colors_handle
@@ -190,7 +179,7 @@ contains
       if (ierr /= 0) return
 
       if (cs%iteration_file_open) then
-         close(cs%iteration_output_unit)
+         close (cs%iteration_output_unit)
          cs%iteration_file_open = .false.
       end if
    end subroutine close_iteration_file

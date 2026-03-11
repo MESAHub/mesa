@@ -35,7 +35,7 @@ module colors_ctrls_io
    character(len=256) :: vega_sed
    character(len=256) :: stellar_atm
    character(len=256) :: colors_results_directory
-   character(len=32) :: mag_system
+   character(len=256) :: mag_system
 
    real(dp) :: distance
    logical :: make_csv
@@ -59,7 +59,6 @@ module colors_ctrls_io
 
 contains
 
-! read a "namelist" file and set parameters
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
       character(len=*), intent(in) :: inlist
@@ -152,7 +151,6 @@ contains
    subroutine store_controls(rq, ierr)
       type(Colors_General_Info), pointer, intent(inout) :: rq
 
-      integer :: i
       integer, intent(out) :: ierr
 
       rq%instrument = instrument
@@ -219,18 +217,17 @@ contains
 
       ierr = 0
 
-      ! First save current controls
+      ! save current controls
       call set_controls_for_writing(rq)
 
-      ! Write namelist to temporary file
+      ! write namelist to temporary file
       open (newunit=iounit, status='scratch')
       write (iounit, nml=colors)
       rewind (iounit)
 
-      ! Namelists get written in capitals
+      ! namelists get written in capitals
       upper_name = trim(StrUpCase(name))//'='
       val = ''
-      ! Search for name inside namelist
       do
          read (iounit, '(A)', iostat=iostat) str
          ind = index(trim(str), trim(upper_name))
@@ -258,16 +255,14 @@ contains
 
       ierr = 0
 
-      ! First save current colors_controls
+      ! save current controls
       call set_controls_for_writing(rq)
 
       tmp = ''
       tmp = '&colors '//trim(name)//'='//trim(val)//' /'
 
-      ! Load into namelist
       read (tmp, nml=colors)
 
-      ! Add to colors
       call store_controls(rq, ierr)
       if (ierr /= 0) return
 
