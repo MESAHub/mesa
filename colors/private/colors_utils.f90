@@ -274,7 +274,7 @@ contains
       character(len=100), allocatable :: columns(:), headers(:)
       character(len=256) :: token
       integer :: logg_col, meta_col, teff_col
-      
+
       open (newunit=unit, file=lookup_file, status='old', action='read', iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file", lookup_file
@@ -634,7 +634,7 @@ contains
       ! doing it before the small grid allocations avoids partial cleanup.
       allocate (rq%cube_flux(n_teff, n_logg, n_meta, n_lambda), stat=status)
       if (status /= 0) then
-         if (allocated(rq%cube_flux)) deallocate (rq%cube_flux) 
+         if (allocated(rq%cube_flux)) deallocate (rq%cube_flux)
          cube_mb = real(n_teff, dp)*n_logg*n_meta*n_lambda*8.0_dp/(1024.0_dp**2)
          write (*, '(a,f0.1,a)') &
             'colors: flux cube allocation failed (', cube_mb, &
