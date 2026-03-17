@@ -10,7 +10,7 @@ requires to capture with some degree of accuracy the energy generation
 by thermonuclear processes. This is generally sufficient for stellar
 structure calculations, but not for detailed nucleosynthesis studies.
 
-The default behavior is:
+The default behavior (see ``auto_extend_net`` in ``star_job``) is:
 - include only 8 isotopes (h1, he3, he4, c12, n14, o16, ne20, mg24)
   until central depletion of helium (``basic.net``)
 - add si28 (``co_burn.net``) until central depletion of carbon
