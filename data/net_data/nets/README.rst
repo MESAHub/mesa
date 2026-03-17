@@ -2,6 +2,29 @@
 Reaction Networks
 =================
 
+Default treatment of nuclear energy generation
+----------------------------------------------
+
+By default, MESA tries to include the minimum number of isotopes
+requires to capture with some degree of accuracy the energy generation
+by thermonuclear processes. This is generally sufficient for stellar
+structure calculations, but not for detailed nucleosynthesis studies.
+
+The default behavior is:
+- include only 8 isotopes (h1, he3, he4, c12, n14, o16, ne20, mg24)
+  until central depletion of helium (``basic.net``)
+- add si28 (``co_burn.net``) until central depletion of carbon
+- extend to a 21-isotope nuclear reaction network (``approx21.net``)
+  beyond carbon core burning, including a compound weak reaction that
+  allows for approximate treatment of electron captures and
+  deleptonization when approaching core-collapse.
+
+Each time isotopes and reactions are added to the network, by default
+abundances are re-scaled (see ``adjust_abundances_for_new_isos``).
+
+This default behavior can be changed using the ``change_net`` option
+in ``star_job``, see also ``default_net_name`` in ``controls``.
+
 Summary of available nets
 -------------------------
 

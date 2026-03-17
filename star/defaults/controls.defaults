@@ -6594,10 +6594,13 @@
       ! default_net_name
       ! ~~~~~~~~~~~~~~~~
 
-      ! Name of base reaction network.
-      ! Each net corresponds to a file in ``$MESA_DIR/data/net_data/nets``.
-      ! Look in that directory to see your network options,
-      ! or learn how to create your own net.
+      ! Name of base reaction network (including 8 isotopes to capture energy release)
+      ! Will auto-extend to ``co_burn.net`` (adding si28) at He depletion, and to
+      ! ``approx21.net`` (adding 21 isotopes and a "fake" electron capture reaction for
+      ! deleptonization, see ``fe56ec_fake_factor`` below). Each net corresponds to a
+      ! file in ``$MESA_DIR/data/net_data/nets``. Look in that directory to see
+      ! your network options, or learn how to create your own net.
+      ! See also ``change_net`` and related options in ``star_job.defaults``.
 
       ! ::
 
