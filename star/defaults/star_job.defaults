@@ -2386,8 +2386,15 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! For switching reaction networks.
-      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`.
-
+      ! ``new_net_name`` only used if ``change_net`` if true.
+      ! If not specifying a new_net name, the default is to start with
+      ! ``basic.net`` (8 isotopes), extended to the ``co_burn.net`` (adding si28)
+      ! at helium depletion, and ``approx21.net`` (21 isotopes, including
+      ! compound reaction for electron captures) beyond carbon depletion.
+      ! The full list of network names and the isotopes and reactions
+      ! they include can be found in `$MESA_DIR/data/net_data/nets`.
+      ! See also ``enable_adaptive_network`` and ``auto_extend_net`` below,
+      ! and ``default_net_name`` in ``controls.defaults``
       ! ::
 
     change_net = .false.
