@@ -324,10 +324,6 @@ def run_config(label: str, params: dict) -> dict:
     try:
         patch_inlist_colors(params)
 
-        with open(INLIST_COLORS, "r") as fh:
-            print(fh.read())
-
-
         t0 = time.perf_counter()
         proc = subprocess.run(
             ["./rn"],
