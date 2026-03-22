@@ -4,9 +4,6 @@ Changelog
 
 .. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) be installed.
 
-.. note:: This section describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-
 Changes in main
 ===============
 
@@ -34,12 +31,46 @@ New Features
 Bug Fixes
 ---------
 
-stella install was broken in the previous release version and is now patched
-
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
+Changes in r25.12.2
+===================
 
+.. _Backwards-incompatible changes r25.12.2:
+
+Colors data is no longer located in ``colors/data`` and has moved to ``data/colors``.
+
+Backwards-incompatible changes
+------------------------------
+
+.. _New Features r25.12.2:
+
+New Features
+------------
+
+Various documentation pages have received updates, fixing typos, cleaning up formatting, and fixing broken links. Notably, a description of the default nuclear network and its dynamic nature have been added.
+
+Support for SDK version 26.3.2.
+
+
+.. _Bug Fixes r25.12.2:
+
+Bug Fixes
+---------
+
+Colors
+~~~~~~
+
+- Fix wrong scale used in AB zero-point.
+
+Other
+~~~~~
+
+- stella install has been updated to work with the new colors module
+- realigned first row of headers in terminal output after changing ``lg_Lnuc`` to ``lg_Lnuc_tot``
+- incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
+- kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
 
 Changes in r25.12.1
 ===================
