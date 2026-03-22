@@ -2362,7 +2362,7 @@
 
       ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
+
       ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, ``mlt_vc_old`` (the start of step value)
       ! is used in place of the current solver iterate ``mlt_vc_ad`` inside the hydro momentum equation. This option can
       ! provide greater numerical stability in extremely dynamic situations, with very little loss in accuracy.
@@ -6527,7 +6527,7 @@
       ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
       ! that each zone increases in mass inward following a power law, similar to RSP's static model builder.
 
-      ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and 
+      ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
       ! ``TDC_hydro_T_anchor``, and increasing spacing in mass between the anchor and the inner boundary condition.
       ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
       ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
@@ -6547,7 +6547,6 @@
     TDC_hydro_nz_outer = 40
     TDC_hydro_T_anchor = 11d3
     TDC_hydro_dq_1_factor = 2d0
-
 
 
       ! use_split_merge_amr
