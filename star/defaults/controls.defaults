@@ -2332,14 +2332,96 @@
       ! + ``TDC_alpha_D`` : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to ``RSP_alfad``, and previously called ``alpha_TDC_DAMP``
       ! + ``TDC_alpha_R`` : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to ``RSP_gammar``, and previously called ``alpha_TDC_DAMPR``
       ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. This control is analogous to ``RSP_alfap``, and previously called ``alpha_TDC_PtdVdt``
+      ! + ``TDC_alpha_M`` : The prefactor on the term accounting for eddy viscous dissipation. This control is analogous to ``RSP_alfam``.
+      ! + ``TDC_alpha_C`` : The prefactor on the convective flux. This control is analogous to ``RSP_alfac``
+      ! + ``TDC_alpha_S`` : The prefactor on the convective source term, S . This control is analogous to ``RSP_alfas``
+
       ! + ``steps_before_use_TDC`` : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
 
       ! ::
 
-      TDC_alpha_D = 1d0
-      TDC_alpha_R = 0d0
-      TDC_alpha_Pt = 0d0
-      steps_before_use_TDC = 0
+     TDC_alpha_D = 1d0
+     TDC_alpha_R = 0d0
+     TDC_alpha_Pt = 0d0
+     TDC_alpha_C = 1d0
+     TDC_alpha_S = 1d0
+     steps_before_use_TDC = 0
+
+
+      ! If ``TDC_alpha_M > 0``, then include eddy viscous damping in TDC ``TDC_alpha_M``
+      ! This control is analogous to ``RSP_alfam``, where the default is ``RSP_alfam = 0.25d0``.
+
+      ! If hydrostatic (``v_flag``, ``u_flag = .false.``, ``v = 0`` ) there are no velocity gradients,
+      ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
+      ! Details on the implementation of ``TDC_alpha_M`` can be found in `Farag et al. (2026) <https://arxiv.org/abs/2603.15766>`_
+
+      ! ::
+
+     TDC_alpha_M = 0d0
+
+
+      ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, ``mlt_vc_old`` (the start of step value)
+      ! is used in place of the current solver iterate ``mlt_vc_ad`` inside the hydro momentum equation. This option can
+      ! provide greater numerical stability in extremely dynamic situations, with very little loss in accuracy.
+
+      ! ::
+
+     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
+
+
+      ! include_mlt_corr_to_TDC
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If include_mlt_corr_to_TDC = .true. , mlt correction to TDC follows MESA VI (Jermyn et a. 2023)
+      ! in which we correct TDC on long timescales with Y_face ~ Y*Gamma/(1+Gamma). If .false., abandon
+      ! mlt limit of tdc and adopt original form of (Kuhfuß 1986) convection model in the local limit.
+
+      ! ::
+
+     include_mlt_corr_to_TDC = .true.
+
+      ! TDC_include_eturb_in_energy_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! While ``TDC`` is already implicitly coupled to the total energy equation, this
+      ! controls feedsback the turbulent energy into the total energy equation by
+      ! calculating and incorporating det/dt from TDC as a negative source term in
+      ! the total energy equation, along with the eddy viscous heating Eq. This comes
+      ! at the cost of numerical stability on long timescales, be warned.
+
+      ! ::
+
+     TDC_include_eturb_in_energy_equation = .false.
+
+
+      ! use_rsp_form_of_scale_height
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! calculate scale height by averaging P/rho onto faces together instead
+      ! of of wrapping P and rho separately by default. Both forms assume HSE.
+
+      ! ::
+
+     use_rsp_form_of_scale_height = .false.
+
+
+      ! TDC_num_innermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_num_outermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent or
+      ! TDC_num_outermost_cells_forced_nonturbulent cells
+      ! to be nonturbulent, and sets gradT = gradr in these cells.
+      ! Useful for pulsation models in TDC.
+
+      ! ::
+
+     TDC_num_innermost_cells_forced_nonturbulent = 0
+     TDC_num_outermost_cells_forced_nonturbulent = 0
 
 
       ! Henyey_MLT_y_param
@@ -4566,6 +4648,21 @@
     use_zero_Pgas_outer_BC = .false.
 
 
+      ! use_RSP_L_eqn_outer_BC
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use RSP2 luminosity equation
+      ! as the outer boundary condition on L rather than the
+      ! default atmospheric BC for temperature.
+      ! solves L1 - s% RSP2_Lsurf_factor*4*pi*r^2*c*a*T1^4 = 0
+      ! uses dev control s% RSP2_Lsurf_factor  = 0.5 (default),
+      ! see controls_dev.defaults.list
+
+      ! ::
+
+     use_RSP_L_eqn_outer_BC = .false.
+
+
       ! use_fixed_vsurf_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! fixed_vsurf
@@ -6411,6 +6508,45 @@
       ! ::
 
     remesh_dt_limit = -1
+
+
+      ! TDC_hydro_nz
+      ! ~~~~~~~~~~~~
+      ! TDC_hydro_nz_outer
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_T_anchor
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_dq_1_factor
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_use_mass_interp_face_values
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remesh_for_TDC_pulsations_log_core_zoning
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If calling the public ``remesh_for_TDC_pulsations`` function, the model will be rezoned below ``TDC_hydro_T_anchor`` with logarithmic
+      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
+      ! that each zone increases in mass inward following a power law, similar to RSP's static model builder.
+
+      ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
+      ! ``TDC_hydro_T_anchor``, and increasing spacing in mass between the anchor and the inner boundary condition.
+      ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
+      ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
+      ! The ``TDC_hydro_dq_1_factor`` sets the dq of the surface cell to this multiple of the cell beneath it, k = 2.
+
+      ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
+      ! mass weighted averaging.
+
+      ! This remeshing scheme works well for most Cepheid envelopes, but it is not designed for AGB stars with deep convective envelopes.
+
+      ! ::
+
+    remesh_for_TDC_pulsations_log_core_zoning = .false.
+    TDC_hydro_use_mass_interp_face_values = .false.
+
+    TDC_hydro_nz = 150
+    TDC_hydro_nz_outer = 40
+    TDC_hydro_T_anchor = 11d3
+    TDC_hydro_dq_1_factor = 2d0
 
 
       ! use_split_merge_amr
