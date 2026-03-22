@@ -34,27 +34,52 @@ Bug Fixes
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
-Changes in r25.12.2
+Changes in r26.3.1
 ===================
 
-.. _Backwards-incompatible changes r25.12.2:
+.. _Backwards-incompatible changes r26.3.1:
 
 Colors data is no longer located in ``colors/data`` and has moved to ``data/colors``.
 
 Backwards-incompatible changes
 ------------------------------
 
-.. _New Features r25.12.2:
+.. _New Features r26.3.1:
 
 New Features
 ------------
+
+``TDC`` now contains new controls and physics bringing it into closer alignment with the Radial Stellar Pulsation module ``RSP``:
+
+-  ``TDC_alpha_M`` : The prefactor on the term accounting for hydrodynamic eddy viscous dissipation. This control is analogous to ``RSP_alfam``.
+-  ``TDC_alpha_C`` : The prefactor on the convective flux. This control is analogous to ``RSP_alfac``
+-  ``TDC_alpha_S`` : The prefactor on the convective source term, S . This control is analogous to ``RSP_alfas``
+-  ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation`` : A more numerically stable stencil for ``TDC_alpha_M`` in MESA's momentum equation.
+-  ``TDC_include_eturb_in_energy_equation`` : The option to include turbulent energy and eddy viscosity into MESA's energy equation.
+-  ``include_mlt_corr_to_TDC`` : The option to remove the Gamma/(1+Gamma) mlt correction to TDC, yielding the pure (Kuhfuß 1986) local convection model.
+-  ``use_rsp_form_of_scale_height`` : The option to calculate scale height by averaging P/rho onto faces together, similar to  ``RSP``.
+-  ``TDC_num_innermost_cells_forced_nonturbulent`` : An optional control for forcing central zones to be radiative.
+-  ``TDC_num_outermost_cells_forced_nonturbulent`` : An optional control for forcing surface zones to be radiative.
+
+``star`` now contains optional controls allowing one to remesh an envelope model similar to ``RSP``, by calling the public ``remesh_for_TDC_pulsation`` function contained within ``$MESA_DIR/star/public/star_lib.f90`` :
+
+-  ``TDC_hydro_nz`` : Analogous to ``RSP_nz``
+-  ``TDC_hydro_nz_outer`` : Analogous to ``RSP_nz_outer``
+-  ``TDC_hydro_T_anchor`` : Analogous to ``RSP_T_anchor``
+-  ``TDC_hydro_dq_1_factor`` : Analogous to ``RSP_dq_1_factor``
+-  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantites are computed from simple averages or mass weighted averaging.
+-  ``remesh_for_TDC_pulsations_log_core_zoning`` : This option allows log zoning in the interior as opposed to a power law ( similar to ``RSP``).
+
+A new optional boundary condition ``use_RSP_L_eqn_outer_BC`` is available.
+
+Further details on the changes to ``TDC`` can be found in `Farag et al. (2026) <https://arxiv.org/abs/2603.15766>`_
 
 Various documentation pages have received updates, fixing typos, cleaning up formatting, and fixing broken links. Notably, a description of the default nuclear network and its dynamic nature have been added.
 
 Support for SDK version 26.3.2.
 
 
-.. _Bug Fixes r25.12.2:
+.. _Bug Fixes r26.3.1:
 
 Bug Fixes
 ---------
