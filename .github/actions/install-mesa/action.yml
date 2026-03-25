@@ -70,6 +70,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         tar xvf mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
+        ln -s mesasdk-${{inputs.sdk}} mesasdk
       shell: bash
 
     - name: Get SDK ${{ runner.os }} '26.3.2'
