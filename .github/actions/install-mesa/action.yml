@@ -7,7 +7,7 @@ inputs:
   sdk:
     description: 'The version of the MESA SDK to install'
     required: false
-    default: '25.12.1'
+    default: '26.3.2'
 
 
 runs:
@@ -60,10 +60,10 @@ runs:
           mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
         key: ${{ runner.os }}-${{inputs.sdk}}
 
-    - name: Get SDK ${{ runner.os }} '25.12.1'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '25.12.1') && (runner.os == 'Linux') }}
+    - name: Get SDK ${{ runner.os }} '26.3.2'
+      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '26.3.2') && (runner.os == 'Linux') }}
       run: |
-        wget -q https://zenodo.org/records/18163992/files/mesasdk-x86_64-linux-25.12.1.tar.gz
+        wget -q https://zenodo.org/records/19210930/files/mesasdk-x86_64-linux-26.3.2.tar.gz
       shell: bash
 
     - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
@@ -72,16 +72,16 @@ runs:
         tar xvf mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
       shell: bash
 
-    - name: Get SDK ${{ runner.os }} '25.12.1'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '25.12.1') && (runner.os == 'macOS') }}
+    - name: Get SDK ${{ runner.os }} '26.3.2'
+      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '26.3.2') && (runner.os == 'macOS') }}
       run: |
-        wget --user-agent="" -q http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-aarch64-macos-25.12.1.pkg
+        wget -q https://zenodo.org/records/19210744/files/mesasdk-aarch64-macos-26.3.2.pkg
       shell: bash
 
     - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
       if: runner.os == 'macOS'
       run: |
-        sudo installer -pkg mesasdk-aarch64-macos-25.12.1.pkg -target /
+        sudo installer -pkg mesasdk-aarch64-macos-26.3.2.pkg -target /
         ln -s /Applications/mesasdk mesasdk
       shell: bash
 

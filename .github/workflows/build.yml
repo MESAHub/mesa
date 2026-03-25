@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["25.12.1"]  # pick 2 or 3 most recent.
+        sdk: ["26.3.2"]  # pick 2 or 3 most recent.
         os: [ubuntu-latest, macos-latest]
         dynamic: ["yes", "no"]
     runs-on: ${{ matrix.os }}
