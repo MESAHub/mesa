@@ -38,6 +38,7 @@ module colors_ctrls_io
    character(len=256) :: mag_system
 
    real(dp) :: distance
+   real(dp) :: z_over_x_ref
    logical :: make_csv
    logical :: sed_per_model
    logical :: use_colors
@@ -47,6 +48,7 @@ module colors_ctrls_io
       vega_sed, &
       stellar_atm, &
       distance, &
+      z_over_x_ref, &
       make_csv, &
       sed_per_model, &
       mag_system, &
@@ -155,6 +157,7 @@ contains
       rq%vega_sed = vega_sed
       rq%stellar_atm = stellar_atm
       rq%distance = distance
+      rq%z_over_x_ref = z_over_x_ref
       rq%make_csv = make_csv
       rq%sed_per_model = sed_per_model
       rq%colors_results_directory = colors_results_directory
@@ -192,6 +195,7 @@ contains
       vega_sed = rq%vega_sed
       stellar_atm = rq%stellar_atm
       distance = rq%distance
+      z_over_x_ref = rq%z_over_x_ref
       make_csv = rq%make_csv
       sed_per_model = rq%sed_per_model
       colors_results_directory = rq%colors_results_directory
