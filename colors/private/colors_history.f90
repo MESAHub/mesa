@@ -112,8 +112,10 @@ contains
             filter_name = trim(remove_dat(color_filter_names(i)))
             names(i + filter_offset) = filter_name
 
-            if (t_eff >= 0 .and. metallicity >= 0) then
-               ! pick the precomputed zero-point for the requested mag system
+            ! Negative [M/H] values are valid for metal-poor atmosphere grids.
+            ! so we do not apply a limit on the "metallicity" parameter.
+            if (t_eff >= 0) then
+               ! Select precomputed zero-point based on magnitude system
                select case (trim(cs%mag_system))
                case ('VEGA', 'Vega', 'vega')
                   zero_point = cs%filters(i)%vega_zero_point
