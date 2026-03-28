@@ -49,6 +49,7 @@ module colors_def
       character(len=256) :: mag_system
       real(dp) :: metallicity
       real(dp) :: distance
+      real(dp) :: z_over_x_ref
       logical :: make_csv
       logical :: sed_per_model
       logical :: use_colors
