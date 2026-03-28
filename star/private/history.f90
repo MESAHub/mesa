@@ -70,7 +70,8 @@ contains
          num_extra_cols, num_binary_cols, num_extra_binary_cols, num_colors_cols,num_extra_header_items, n
       integer, parameter :: num_epsnuc_out = 12
       real(dp) :: &
-         epsnuc_out(num_epsnuc_out), csound_surf, v_surf, envelope_fraction_left
+         epsnuc_out(num_epsnuc_out), csound_surf, v_surf, envelope_fraction_left, m_div_h, &
+         min_m_div_h, max_m_div_h
       integer :: mixing_regions, mix_relr_regions, burning_regions, burn_relr_regions
       integer, pointer :: mixing_type(:), mix_relr_type(:), burning_type(:), burn_relr_type(:)
       character (len = maxlen_history_column_name), pointer, dimension(:) :: &
@@ -267,7 +268,27 @@ contains
          end if
          colors_col_names(1:num_colors_cols) = 'unknown'
          colors_col_vals(1:num_colors_cols) = -1d99
-         call data_for_colors_history_columns(s%T(1), log10(s%grav(1)), s%R(1), s%kap_rq%Zbase, &
+
+         if (colors_settings% z_over_x_ref <= 0d0) then
+            write(*, *) 'colors error: z_over_x_ref must be positive'
+            ierr = -1
+            call dealloc
+            return
+         end if
+
+         min_m_div_h = minval(colors_settings% lu_meta)
+         max_m_div_h = maxval(colors_settings% lu_meta)
+
+         ! Map the current photospheric Z/X onto the atmosphere-table metallicity axis.
+         if (s% X(s% photosphere_cell_k) > 0d0 .and. s% Z(s% photosphere_cell_k) > 0d0) then
+            m_div_h = log10((s% Z(s% photosphere_cell_k)/s% X(s% photosphere_cell_k)) / &
+               colors_settings% z_over_x_ref)
+            m_div_h = max(min_m_div_h, min(max_m_div_h, m_div_h))
+         else
+            m_div_h = min_m_div_h
+         end if
+
+         call data_for_colors_history_columns(s%T(1), log10(s%grav(1)), s%R(1), m_div_h, &
             s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
          if (ierr /= 0) then
             call dealloc

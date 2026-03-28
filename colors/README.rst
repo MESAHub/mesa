@@ -22,7 +22,7 @@ How does the MESA colors module work?
 
 The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
 
-1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the stars current features.
+1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters, Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([Fe/H]), and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the stars current features.
 
 2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
@@ -57,7 +57,7 @@ stellar_atm
 
 Specifies the path to the directory containing the grid of stellar atmosphere models. This directory must contain:
 
-1.  **lookup_table.csv**: A map linking filenames to physical parameters (:math:`T_{\rm eff}`, :math:`\log g`, [M/H]).
+1.  **lookup_table.csv**: A map linking filenames to physical parameters (:math:`T_{\rm eff}`, :math:`\log g`, [Fe/H]).
 2.  **SED files**: The actual spectra (text or binary format).
 3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
 
@@ -86,6 +86,51 @@ The distance to the star in centimeters.
 .. code-block:: fortran
 
     distance = 5.1839d20
+
+
+z_over_x_ref
+------------
+
+**Default:** ``0.0230057173972`` (the GS98 solar :math:`Z/X` ratio)
+
+Reference metal-to-hydrogen ratio used to convert the model photospheric
+composition into the metallicity coordinate passed to the atmosphere grid:
+
+.. math::
+
+   [Fe/H] = \log_{10}\left(\frac{(Z/X)_\mathrm{phot}}{(Z/X)_\mathrm{ref}}\right)
+
+The default is chosen to match the default ``stellar_atm =
+'/data/colors_data/stellar_models/Kurucz2003all/'`` grid, which is based on
+ATLAS9 models using the Grevesse & Sauval (1998) solar abundance scale. The
+numeric value ``0.0230057173972`` is computed from the MESA GS98 constants
+``Z_solar = 0.0169`` and ``Y_solar = 0.2485``, so
+``(Z/X)_ref = 0.0169 / (1 - 0.0169 - 0.2485)``.
+
+If you switch to a different atmosphere library, you must set ``z_over_x_ref``
+so that its reference composition matches the metallicity labels in that
+library's ``lookup_table.csv``. For custom abundance patterns, making this
+choice is the responsibility of the user.
+
+If the photospheric metallicity, expressed in terms of ``Z/X``, falls outside
+the metallicity range available in the tabulated atmosphere lookup table, then
+MESA uses the nearest metallicity in the table for the atmosphere
+interpolation. If the photospheric hydrogen mass fraction or metal mass
+fraction is not positive, then MESA cannot form
+``[Fe/H] = log10((Z/X)/(Z/X)_ref)``, and so it uses the lowest metallicity in
+the table instead. This is a fallback safeguard and not a dedicated treatment
+for H-free atmospheres.
+
+For the shipped ``Kurucz2003all`` table in this checkout, the tabulated
+metallicity range is ``[Fe/H] = -2.5`` to ``[Fe/H] = 4.0``. With the default
+``z_over_x_ref = 2.30057173972d-2``, the lower edge corresponds to an adopted
+``Z/X`` of about ``7.275d-5``.
+
+**Example:**
+
+.. code-block:: fortran
+
+      z_over_x_ref = 2.30057173972d-2
 
 make_csv
 --------
@@ -216,10 +261,10 @@ Below are the default values for the colors module parameters as defined in ``co
       vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
       stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
+      z_over_x_ref = 2.30057173972d-2  ! GS98 solar Z/X for Kurucz2003all
       make_csv = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
-      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
 
 Visual Summary of Data Flow
 ===========================

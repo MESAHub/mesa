@@ -112,7 +112,8 @@ contains
             filter_name = trim(remove_dat(color_filter_names(i)))
             names(i + filter_offset) = filter_name
 
-            if (t_eff >= 0 .and. metallicity >= 0) then
+            ! Negative [M/H] values are valid for metal-poor atmosphere grids.
+            if (t_eff >= 0) then
                ! Select precomputed zero-point based on magnitude system
                select case (trim(cs%mag_system))
                case ('VEGA', 'Vega', 'vega')
