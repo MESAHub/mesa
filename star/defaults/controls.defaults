@@ -2329,12 +2329,12 @@
 
       ! TDC options
       ! ~~~~~~~~~~~
-      ! + ``TDC_alpha_D``  : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_alfad, and previously called alpha_TDC_DAMP
-      ! + ``TDC_alpha_R``  : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_gammar, and previously called alpha_TDC_DAMPR
-      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. This control is analogous to RSP_alfap, and previously called alpha_TDC_PtdVdt
+      ! + ``TDC_alpha_D``  : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_alfad, and previously called alpha_TDC_DAMP.
+      ! + ``TDC_alpha_R``  : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_gammar, and previously called alpha_TDC_DAMPR.
+      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. Turbulent pressure effects on the momentum equations are set by ``mlt_Pturb_factor``. Together, These controls are analogous to RSP_alfap, and previously called alpha_TDC_PtdVdt.
       ! + ``TDC_alpha_M``  : The prefactor on the term accounting for eddy viscous dissipation. This control is analogous to RSP_alfam.
-      ! + ``TDC_alpha_C``  : The prefactor on the convective flux. This control is analogous to RSP_alfac
-      ! + ``TDC_alpha_S``  : The prefactor on the convective source term, S . This control is analogous to RSP_alfas
+      ! + ``TDC_alpha_C``  : The prefactor on the convective flux. This control is analogous to RSP_alfac.
+      ! + ``TDC_alpha_S``  : The prefactor on the convective source term, S . This control is analogous to RSP_alfas.
 
       ! + ``steps_before_use_TDC`` : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
 
