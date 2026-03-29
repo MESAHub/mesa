@@ -2329,12 +2329,12 @@
 
       ! TDC options
       ! ~~~~~~~~~~~
-      ! + ``TDC_alpha_D`` : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to ``RSP_alfad``, and previously called ``alpha_TDC_DAMP``
-      ! + ``TDC_alpha_R`` : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to ``RSP_gammar``, and previously called ``alpha_TDC_DAMPR``
-      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. This control is analogous to ``RSP_alfap``, and previously called ``alpha_TDC_PtdVdt``
-      ! + ``TDC_alpha_M`` : The prefactor on the term accounting for eddy viscous dissipation. This control is analogous to ``RSP_alfam``.
-      ! + ``TDC_alpha_C`` : The prefactor on the convective flux. This control is analogous to ``RSP_alfac``
-      ! + ``TDC_alpha_S`` : The prefactor on the convective source term, S . This control is analogous to ``RSP_alfas``
+      ! + ``TDC_alpha_D``  : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_alfad, and previously called alpha_TDC_DAMP.
+      ! + ``TDC_alpha_R``  : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_gammar, and previously called alpha_TDC_DAMPR.
+      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. Turbulent pressure effects on the momentum equations are set by ``mlt_Pturb_factor``. Together, These controls are analogous to RSP_alfap, and previously called alpha_TDC_PtdVdt.
+      ! + ``TDC_alpha_M``  : The prefactor on the term accounting for eddy viscous dissipation. This control is analogous to RSP_alfam.
+      ! + ``TDC_alpha_C``  : The prefactor on the convective flux. This control is analogous to RSP_alfac.
+      ! + ``TDC_alpha_S``  : The prefactor on the convective source term, S . This control is analogous to RSP_alfas.
 
       ! + ``steps_before_use_TDC`` : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
 
@@ -2351,8 +2351,8 @@
       ! If ``TDC_alpha_M > 0``, then include eddy viscous damping in TDC ``TDC_alpha_M``
       ! This control is analogous to ``RSP_alfam``, where the default is ``RSP_alfam = 0.25d0``.
 
-      ! If hydrostatic (``v_flag``, ``u_flag = .false.``, ``v = 0`` ) there are no velocity gradients,
-      ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
+      ! If hydrostatic (``v_flag = .false.```, ``u_flag = .false.``, v = 0) there will be no velocity gradients,
+      ! and thus no shear to drive turbulence, hence the eddy viscosity term will become zero.
       ! Details on the implementation of ``TDC_alpha_M`` can be found in `Farag et al. (2026) <https://arxiv.org/abs/2603.15766>`_
 
       ! ::
@@ -2363,9 +2363,9 @@
       ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, ``mlt_vc_old`` (the start of step value)
-      ! is used in place of the current solver iterate ``mlt_vc_ad`` inside the hydro momentum equation. This option can
-      ! provide greater numerical stability in extremely dynamic situations, with very little loss in accuracy.
+      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, mlt_vc_old (the start of step value)
+      ! is used in place of the current solver iterate mlt_vc_ad inside the hydro momentum equation. This option can
+      ! provide greater numerical stability in extremely dynamic models.
 
       ! ::
 
@@ -2388,7 +2388,7 @@
 
       ! While ``TDC`` is already implicitly coupled to the total energy equation, this
       ! controls feedsback the turbulent energy into the total energy equation by
-      ! calculating and incorporating det/dt from TDC as a negative source term in
+      ! calculating and incorporating det/dt from TDC as a source term in
       ! the total energy equation, along with the eddy viscous heating Eq. This comes
       ! at the cost of numerical stability on long timescales, be warned.
 
@@ -2400,8 +2400,9 @@
       ! use_rsp_form_of_scale_height
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! calculate scale height by averaging P/rho onto faces together instead
+      ! Calculate scale height by averaging P/rho onto faces together instead
       ! of of wrapping P and rho separately by default. Both forms assume HSE.
+      ! Not compatible with alt_scale_height_flag.
 
       ! ::
 
@@ -2416,7 +2417,8 @@
       ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent or
       ! TDC_num_outermost_cells_forced_nonturbulent cells
       ! to be nonturbulent, and sets gradT = gradr in these cells.
-      ! Useful for pulsation models in TDC.
+      ! Useful for pulsation models in TDC. This control
+      ! supports all mlt options as well.
 
       ! ::
 
