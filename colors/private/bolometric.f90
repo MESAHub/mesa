@@ -72,7 +72,6 @@ subroutine calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magni
 
    end subroutine calculate_bolometric
 
-
    !****************************
    ! Convert Flux to Magnitude
    !****************************

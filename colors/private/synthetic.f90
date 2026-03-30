@@ -21,7 +21,7 @@ module synthetic
 
    use const_def, only: dp, clight
    use utils_lib, only: mkdir, folder_exists
-   use colors_utils, only: remove_dat, romberg_integration
+   use colors_utils, only: remove_dat, simpson_integration
    use knn_interp, only: interpolate_array
 
    implicit none
@@ -132,8 +132,8 @@ contains
       real(dp) :: integrated_flux, integrated_filter
 
       ! Photon-counting: weight by wavelength
-      call romberg_integration(wavelengths, convolved_flux * wavelengths, integrated_flux)
-      call romberg_integration(wavelengths, filter_on_sed_grid * wavelengths, integrated_filter)
+      call simpson_integration(wavelengths, convolved_flux * wavelengths, integrated_flux)
+      call simpson_integration(wavelengths, filter_on_sed_grid * wavelengths, integrated_filter)
 
       if (integrated_filter > 0.0_dp) then
          synthetic_flux = integrated_flux / integrated_filter
@@ -164,8 +164,8 @@ contains
       conv_flux = vega_flux * filt_on_vega_grid
 
       ! Photon-counting integration
-      call romberg_integration(vega_wave, vega_wave * conv_flux, int_flux)
-      call romberg_integration(vega_wave, vega_wave * filt_on_vega_grid, int_filter)
+      call simpson_integration(vega_wave, vega_wave * conv_flux, int_flux)
+      call simpson_integration(vega_wave, vega_wave * filt_on_vega_grid, int_filter)
 
       if (int_filter > 0.0_dp) then
          compute_vega_zero_point = int_flux / int_filter
@@ -203,8 +203,8 @@ contains
       end do
 
       ! Photon-counting integration
-      call romberg_integration(filt_wave, ab_sed_flux * filt_trans * filt_wave, int_flux)
-      call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
+      call simpson_integration(filt_wave, ab_sed_flux * filt_trans * filt_wave, int_flux)
+      call simpson_integration(filt_wave, filt_wave * filt_trans, int_filter)
 
       if (int_filter > 0.0_dp) then
          compute_ab_zero_point = int_flux / int_filter
@@ -230,8 +230,8 @@ contains
       st_sed_flux = 3.63d-9
 
       ! Photon-counting integration
-      call romberg_integration(filt_wave, st_sed_flux * filt_trans * filt_wave, int_flux)
-      call romberg_integration(filt_wave, filt_wave * filt_trans, int_filter)
+      call simpson_integration(filt_wave, st_sed_flux * filt_trans * filt_wave, int_flux)
+      call simpson_integration(filt_wave, filt_wave * filt_trans, int_filter)
 
       if (int_filter > 0.0_dp) then
          compute_st_zero_point = int_flux / int_filter
