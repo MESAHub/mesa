@@ -19,8 +19,7 @@
 
 module bolometric
 
-   use const_def, only: dp
-   use colors_utils, only: simpson_integration
+   use const_def, only: dp, boltz_sigma
    use hermite_interp, only: construct_sed_hermite
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
@@ -32,27 +31,19 @@ module bolometric
 
 contains
 
-   !****************************
-   ! Calculate Bolometric Photometry Using Multiple SEDs
-   ! Accepts cached lookup table data instead of loading from file
-   !****************************
-   subroutine calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
+subroutine calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, &
                                    bolometric_flux, wavelengths, fluxes, sed_filepath, interpolation_radius, &
                                    lu_file_names, lu_teff, lu_logg, lu_meta)
       real(dp), intent(in) :: teff, log_g, metallicity, R, d
       character(len=*), intent(in) :: sed_filepath
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux, interpolation_radius
       real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
-
-      ! Cached lookup table data (passed in from colors_settings)
       character(len=100), intent(in) :: lu_file_names(:)
       real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
-
       character(len=32) :: interpolation_method
 
-      interpolation_method = 'Hermite'   ! or 'Linear' / 'KNN' later
+      interpolation_method = 'Hermite'
 
-      ! Quantify how far (teff, log_g, metallicity) is from the grid points
       interpolation_radius = compute_interp_radius(teff, log_g, metallicity, &
                                                    lu_teff, lu_logg, lu_meta)
 
@@ -61,57 +52,26 @@ contains
          call construct_sed_hermite(teff, log_g, metallicity, R, d, lu_file_names, &
                                     lu_teff, lu_logg, lu_meta, sed_filepath, &
                                     wavelengths, fluxes)
-
       case ('Linear', 'linear', 'LINEAR')
          call construct_sed_linear(teff, log_g, metallicity, R, d, lu_file_names, &
                                    lu_teff, lu_logg, lu_meta, sed_filepath, &
                                    wavelengths, fluxes)
-
       case ('KNN', 'knn', 'Knn')
          call construct_sed_knn(teff, log_g, metallicity, R, d, lu_file_names, &
                                 lu_teff, lu_logg, lu_meta, sed_filepath, &
                                 wavelengths, fluxes)
-
       case default
-         ! Fallback: Hermite
          call construct_sed_hermite(teff, log_g, metallicity, R, d, lu_file_names, &
                                     lu_teff, lu_logg, lu_meta, sed_filepath, &
                                     wavelengths, fluxes)
       end select
 
-      ! Calculate bolometric flux and magnitude
-      call calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
+      ! bolometric flux is sigma*Teff^4 by definition, diluted by (R/d)^2
+      bolometric_flux = boltz_sigma * teff**4 * (R/d)**2
+      bolometric_magnitude = flux_to_magnitude(bolometric_flux)
+
    end subroutine calculate_bolometric
 
-   !****************************
-   ! Calculate Bolometric Magnitude and Flux
-   !****************************
-   subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
-      real(dp), intent(out) :: bolometric_magnitude, bolometric_flux
-      integer :: i
-
-      ! Validate inputs and replace invalid values with 0
-      do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0d0 .or. fluxes(i) < 0.0d0) then
-            fluxes(i) = 0.0d0
-         end if
-      end do
-
-      ! Integrate to get bolometric flux
-      call simpson_integration(wavelengths, fluxes, bolometric_flux)
-
-      ! Validate and calculate magnitude
-      if (bolometric_flux <= 0.0d0) then
-         print *, "Error: Flux integration resulted in non-positive value."
-         bolometric_magnitude = 99.0d0
-         return
-      else if (bolometric_flux < 1.0d-10) then
-         print *, "Warning: Flux value is very small, precision might be affected."
-      end if
-
-      bolometric_magnitude = flux_to_magnitude(bolometric_flux)
-   end subroutine calculate_bolometric_phot
 
    !****************************
    ! Convert Flux to Magnitude
