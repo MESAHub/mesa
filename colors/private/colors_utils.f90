@@ -24,8 +24,8 @@ module colors_utils
 
    implicit none
 
-   public :: dilute_flux, trapezoidal_integration, romberg_integration, &
-             simpson_integration, load_sed, load_filter, load_vega_sed, &
+   public :: dilute_flux, trapezoidal_integration, simpson_integration, &
+             load_sed, load_filter, load_vega_sed, &
              load_lookup_table, remove_dat
 contains
 
@@ -115,7 +115,11 @@ contains
          f2 = y(i + 2)
 
          ! Simpson's rule: (h/3) * (f0 + 4f1 + f2)
-         sum = sum + (h1 + h2)/6.0_dp*(f0 + 4.0_dp*f1 + f2)
+         ! non-uniform Simpson's rule (quadratic fit over three points)
+         sum = sum + (h1 + h2)/6.0_dp * ( &
+            f0*(2.0_dp*h1 - h2)/h1 + &
+            f1*(h1 + h2)**2/(h1*h2) + &
+            f2*(2.0_dp*h2 - h1)/h2)
       end do
 
       ! Handle the case where n is odd (last interval)
@@ -125,55 +129,6 @@ contains
 
       result = sum
    end subroutine simpson_integration
-
-   subroutine romberg_integration(x, y, result)
-      real(dp), dimension(:), intent(in) :: x, y
-      real(dp), intent(out) :: result
-
-      integer :: i, j, k, n, m
-      real(dp), dimension(:), allocatable :: R
-      real(dp) :: h, sum, factor
-
-      n = size(x)
-      m = int(log(real(n, DP))/log(2.0_dp)) + 1  ! Number of refinement levels
-
-      ! Validate input sizes
-      if (size(x) /= size(y)) then
-         print *, "Error: x and y arrays must have the same size."
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      if (n < 2) then
-         print *, "Error: x and y arrays must have at least 2 elements."
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      allocate (R(m))
-
-      ! Compute initial trapezoidal rule estimate
-      h = x(n) - x(1)
-      R(1) = 0.5_dp*h*(y(1) + y(n))
-
-      ! Refinement using Romberg's method
-      do j = 2, m
-         sum = 0.0_dp
-         do i = 1, 2**(j - 2)
-            sum = sum + y(1 + (2*i - 1)*(n - 1)/(2**(j - 1)))
-         end do
-
-         h = h/2.0_dp
-         R(j) = 0.5_dp*R(j - 1) + h*sum
-
-         ! Richardson extrapolation
-         factor = 4.0_dp
-         do k = j, 2, -1
-            R(k - 1) = (factor*R(k) - R(k - 1))/(factor - 1.0_dp)
-            factor = factor*4.0_dp
-         end do
-      end do
-
-      result = R(1)
-   end subroutine romberg_integration
 
    !-----------------------------------------------------------------------
    ! File I/O functions
