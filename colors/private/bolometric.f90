@@ -73,35 +73,6 @@ subroutine calculate_bolometric(teff, log_g, metallicity, R, d, bolometric_magni
 
    end subroutine calculate_bolometric
 
-   !****************************
-   ! Calculate Bolometric Magnitude and Flux
-   !****************************
-   subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
-      real(dp), intent(out) :: bolometric_magnitude, bolometric_flux
-      integer :: i
-
-      ! Validate inputs and replace invalid values with 0
-      do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0d0 .or. fluxes(i) < 0.0d0) then
-            fluxes(i) = 0.0d0
-         end if
-      end do
-
-      ! Integrate to get bolometric flux
-      call romberg_integration(wavelengths, fluxes, bolometric_flux)
-
-      ! Validate and calculate magnitude
-      if (bolometric_flux <= 0.0d0) then
-         print *, "Error: Flux integration resulted in non-positive value."
-         bolometric_magnitude = 99.0d0
-         return
-      else if (bolometric_flux < 1.0d-10) then
-         print *, "Warning: Flux value is very small, precision might be affected."
-      end if
-
-      bolometric_magnitude = flux_to_magnitude(bolometric_flux)
-   end subroutine calculate_bolometric_phot
 
    !****************************
    ! Convert Flux to Magnitude
