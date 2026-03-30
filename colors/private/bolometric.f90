@@ -20,7 +20,7 @@
 module bolometric
 
    use const_def, only: dp
-   use colors_utils, only: romberg_integration
+   use colors_utils, only: simpson_integration
    use hermite_interp, only: construct_sed_hermite
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
@@ -99,7 +99,7 @@ contains
       end do
 
       ! Integrate to get bolometric flux
-      call romberg_integration(wavelengths, fluxes, bolometric_flux)
+      call simpson_integration(wavelengths, fluxes, bolometric_flux)
 
       ! Validate and calculate magnitude
       if (bolometric_flux <= 0.0d0) then
