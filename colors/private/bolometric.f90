@@ -20,7 +20,6 @@
 module bolometric
 
    use const_def, only: dp, boltz_sigma
-   use colors_utils, only: romberg_integration
    use hermite_interp, only: construct_sed_hermite
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
