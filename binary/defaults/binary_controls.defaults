@@ -1513,6 +1513,8 @@
    use_other_CE_binary_finish_step = .false.
    use_other_e2 = .false.
 
+! x_ctrl
+! ~~~~~~
 
 ! extra params as a convenience for developing new features
 ! note: the parameter ``num_x_ctrls`` is defined in ``binary_def.f90``

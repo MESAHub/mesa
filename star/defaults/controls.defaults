@@ -11910,6 +11910,10 @@
 
     delta_m_lower_for_sig_min_factor = 0.1d0
 
+
+      ! x_ctrl
+      ! ~~~~~~
+
       ! extra params as a convenience for developing new features
       ! note: the parameter ``num_x_ctrls`` is defined in ``star_def.inc``
 
