@@ -16,7 +16,7 @@ SRCS_CHECK := test/src/test_mtx.f90 \
               test/src/test_block_tridiagonal.f90
 # TODO: Also contains test dependencies sadly, I should fix this at some point
 INTERNAL_DEPENDS_ON := const utils math
-EXTERNAL_DEPENDS_ON := lapack
+EXTERNAL_DEPENDS_ON := lapack blas
 BINTYPE := lib
 
 # Testing

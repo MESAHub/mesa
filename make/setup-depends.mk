@@ -6,13 +6,10 @@ PKG_CONFIG_FLAGS =
 
 ifneq ($(MESASDK_ROOT),)
   ifeq ($(WITH_CRLIBM),yes)
-    PKG_CONFIG_FLAGS += --define-variable=MATH_SLOT=crmath
-    MESASDK_MATH_SLOT = crmath
+    PKG_CONFIG_FLAGS += --define-variable=math_slot=crmath
   else
-    PKG_CONFIG_FLAGS += --define-variable=MATH_SLOT=default
-    MESASDK_MATH_SLOT = default
+    PKG_CONFIG_FLAGS += --define-variable=math_slot=default
   endif
-  export MESASDK_MATH_SLOT
 endif
 
 PKG_CONFIG_PATH := $(shell BUILD_DIR=$(BUILD_DIR_) $(MAKE_DIR)/gen-pkgconfig-path $(SUBDIRS)):$(PKG_CONFIG_PATH)

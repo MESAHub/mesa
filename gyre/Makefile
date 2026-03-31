@@ -8,7 +8,7 @@ ifeq ($(WITH_GYRE),yes)
 SRCS :=
 SRCS_CHECK := test/src/test_gyre.f90
 INTERNAL_DEPENDS_ON := forum const
-EXTERNAL_DEPENDS_ON := hdf5_fortran lapack95 lapack
+EXTERNAL_DEPENDS_ON := hdf5_fortran lapack95 lapack blas
 CHECK_RESULTS_GOLDEN := test/test_output
 CHECK_DIFF_PROG := ndiff -quiet -relerr 1.0e-6
 BINTYPE := lib
