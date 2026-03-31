@@ -171,7 +171,7 @@ fi
 # Check mesasdk version
 if [ ! -z "$MESASDK_ROOT" ]; then
     if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
-	MINIMUM_VERSION=25.12.1
+	MINIMUM_VERSION=26.3.2
 	VERSION_CHECK=$(echo $($MESA_DIR/scripts/check_sdk_version $MINIMUM_VERSION))
 	echo MESASDK version check $VERSION_CHECK
 	if [ $VERSION_CHECK != "passed" ]; then
