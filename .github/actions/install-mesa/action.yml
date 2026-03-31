@@ -89,7 +89,9 @@ runs:
     - name: Set MESA environment variables
       shell: bash
       run: |
-        echo "MESASDK_ROOT=$(readlink -f mesasdk)" >> $GITHUB_ENV
+        MESASDK_ROOT=$(readlink -f mesasdk)
+        echo "MESASDK_ROOT=$MESASDK_ROOT" >> $GITHUB_ENV
+        echo "$MESASDK_ROOT/bin" >> $GITHUB_PATH
         echo "MESA_DIR=$PWD" >> $GITHUB_ENV
 
     - name: Setup environment Linux
