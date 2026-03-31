@@ -27,7 +27,7 @@ module hermite_interp
    implicit none
 
    private
-   public :: construct_sed_hermite, hermite_tensor_interp3d
+   public :: construct_sed_hermite, hermite_tensor_interp3d, hermite_interp_vector
 
 contains
 
@@ -43,10 +43,9 @@ contains
       character(len=100), intent(in) :: file_names(:)
       real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
 
-      integer :: i, n_lambda, status, n_teff, n_logg, n_meta
+      integer :: n_lambda, status
       real(dp), dimension(:), allocatable :: interp_flux, diluted_flux
       real(dp), dimension(:, :, :, :), allocatable :: precomputed_flux_cube
-      real(dp), dimension(:, :, :), allocatable :: flux_cube_lambda
 
       ! Parameter grids
       real(dp), allocatable :: teff_grid(:), logg_grid(:), meta_grid(:)
@@ -59,24 +58,16 @@ contains
       call load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
                             wavelengths, precomputed_flux_cube, status)
 
-      n_teff = size(teff_grid)
-      n_logg = size(logg_grid)
-      n_meta = size(meta_grid)
       n_lambda = size(wavelengths)
 
       ! Allocate space for interpolated flux
       allocate (interp_flux(n_lambda))
 
-      ! Process each wavelength point
-      do i = 1, n_lambda
-         allocate (flux_cube_lambda(n_teff, n_logg, n_meta))
-         flux_cube_lambda = precomputed_flux_cube(:, :, :, i)
-
-         interp_flux(i) = hermite_tensor_interp3d(teff, log_g, metallicity, &
-                                                  teff_grid, logg_grid, meta_grid, flux_cube_lambda)
-
-         deallocate (flux_cube_lambda)
-      end do
+      ! Interpolate all wavelengths in one call — cell search and basis functions
+      ! are computed once and reused across the wavelength loop inside the subroutine
+      call hermite_interp_vector(teff, log_g, metallicity, &
+                                 teff_grid, logg_grid, meta_grid, &
+                                 precomputed_flux_cube, n_lambda, interp_flux)
 
       ! Apply distance dilution to get observed flux
       allocate (diluted_flux(n_lambda))
@@ -268,6 +259,98 @@ contains
 
       f_interp = sum
    end function hermite_tensor_interp3d
+
+   !---------------------------------------------------------------------------
+   ! Vectorized Hermite interpolation over all wavelengths.
+   ! The cell search and basis function evaluation depend only on
+   ! (teff, logg, meta) and the sub-grids — not on wavelength. Computing
+   ! them once and reusing across all n_lambda samples eliminates redundant
+   ! binary searches and basis-function evaluations.
+   !---------------------------------------------------------------------------
+   subroutine hermite_interp_vector(x_val, y_val, z_val, &
+                                     x_grid, y_grid, z_grid, &
+                                     f_values_4d, n_lambda, result_flux)
+      real(dp), intent(in) :: x_val, y_val, z_val
+      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
+      real(dp), intent(in) :: f_values_4d(:,:,:,:)   ! (nx, ny, nz, n_lambda)
+      integer, intent(in) :: n_lambda
+      real(dp), intent(out) :: result_flux(n_lambda)
+
+      integer :: i_x, i_y, i_z
+      real(dp) :: t_x, t_y, t_z
+      real(dp) :: dx, dy, dz
+      integer :: nx, ny, nz
+      integer :: ix, iy, iz, lam
+      real(dp) :: h_x(2), h_y(2), h_z(2)
+      real(dp) :: hx_d(2), hy_d(2), hz_d(2)
+      real(dp) :: val, df_dx, df_dy, df_dz, s
+      real(dp) :: wx, wy, wz, wxd, wyd, wzd
+
+      nx = size(x_grid)
+      ny = size(y_grid)
+      nz = size(z_grid)
+
+      ! find containing cell (done once for all wavelengths)
+      call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                i_x, i_y, i_z, t_x, t_y, t_z)
+
+      ! if outside grid, use nearest point for all wavelengths
+      if (i_x < 1 .or. i_x >= nx .or. &
+          i_y < 1 .or. i_y >= ny .or. &
+          i_z < 1 .or. i_z >= nz) then
+
+         call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                 i_x, i_y, i_z)
+         do lam = 1, n_lambda
+            result_flux(lam) = f_values_4d(i_x, i_y, i_z, lam)
+         end do
+         return
+      end if
+
+      ! grid cell spacing
+      dx = x_grid(i_x + 1) - x_grid(i_x)
+      dy = y_grid(i_y + 1) - y_grid(i_y)
+      dz = z_grid(i_z + 1) - z_grid(i_z)
+
+      ! precompute Hermite basis functions (same for all wavelengths)
+      h_x  = [h00(t_x), h01(t_x)]
+      hx_d = [h10(t_x), h11(t_x)]
+      h_y  = [h00(t_y), h01(t_y)]
+      hy_d = [h10(t_y), h11(t_y)]
+      h_z  = [h00(t_z), h01(t_z)]
+      hz_d = [h10(t_z), h11(t_z)]
+
+      ! loop over wavelengths — the hot loop
+      do lam = 1, n_lambda
+         s = 0.0_dp
+         do iz = 0, 1
+            wz  = h_z(iz + 1)
+            wzd = hz_d(iz + 1)
+            do iy = 0, 1
+               wy  = h_y(iy + 1)
+               wyd = hy_d(iy + 1)
+               do ix = 0, 1
+                  wx  = h_x(ix + 1)
+                  wxd = hx_d(ix + 1)
+
+                  val = f_values_4d(i_x + ix, i_y + iy, i_z + iz, lam)
+
+                  call compute_derivatives_at_point(f_values_4d(:, :, :, lam), &
+                       i_x + ix, i_y + iy, i_z + iz, &
+                       nx, ny, nz, dx, dy, dz, &
+                       df_dx, df_dy, df_dz)
+
+                  s = s + wx*wy*wz*val &
+                        + wxd*wy*wz*dx*df_dx &
+                        + wx*wyd*wz*dy*df_dy &
+                        + wx*wy*wzd*dz*df_dz
+               end do
+            end do
+         end do
+         result_flux(lam) = s
+      end do
+
+   end subroutine hermite_interp_vector
 
    !---------------------------------------------------------------------------
    ! Find the cell containing the interpolation point

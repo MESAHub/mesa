@@ -28,7 +28,7 @@ module linear_interp
    implicit none
 
    private
-   public :: construct_sed_linear, trilinear_interp
+   public :: construct_sed_linear, trilinear_interp, trilinear_interp_vector
 
 contains
 
@@ -46,10 +46,9 @@ contains
       character(len=100), intent(in) :: file_names(:)
       real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
 
-      integer :: i, n_lambda, status, n_teff, n_logg, n_meta
+      integer :: n_lambda, status, n_teff, n_logg, n_meta
       real(dp), dimension(:), allocatable :: interp_flux, diluted_flux
       real(dp), dimension(:, :, :, :), allocatable :: precomputed_flux_cube
-      real(dp), dimension(:, :, :), allocatable :: flux_cube_lambda
       real(dp) :: min_flux, max_flux, mean_flux, progress_pct
 
       ! Parameter grids
@@ -89,21 +88,13 @@ contains
 
       ! Allocate space for interpolated flux
       allocate (interp_flux(n_lambda))
-      allocate (flux_cube_lambda(n_teff, n_logg, n_meta))
 
-      ! Perform trilinear interpolation for each wavelength
-      do i = 1, n_lambda
-
-         ! Extract the 3D grid for this wavelength
-         flux_cube_lambda = precomputed_flux_cube(:, :, :, i)
-
-         ! Simple trilinear interpolation at the target parameters
-         interp_flux(i) = trilinear_interp(teff, log_g, metallicity, &
-                                           teff_grid, logg_grid, meta_grid, flux_cube_lambda)
-      end do
-
-
-      deallocate(flux_cube_lambda)
+      ! Interpolate all wavelengths in one call — cell search and boundary
+      ! clamping are performed once and reused across the wavelength loop
+      ! inside the subroutine
+      call trilinear_interp_vector(teff, log_g, metallicity, &
+                                   teff_grid, logg_grid, meta_grid, &
+                                   precomputed_flux_cube, n_lambda, interp_flux)
 
       ! Calculate statistics for validation
       min_flux = minval(interp_flux)
@@ -238,11 +229,92 @@ contains
    end subroutine load_binary_data
 
    !---------------------------------------------------------------------------
-   ! Simple trilinear interpolation function
+   ! Vectorized trilinear interpolation over all wavelengths.
+   ! The cell search and boundary clamping depend only on (teff, logg, meta)
+   ! and the sub-grids — not on wavelength. Computing them once and reusing
+   ! across all n_lambda samples eliminates redundant binary searches.
    !---------------------------------------------------------------------------
-!---------------------------------------------------------------------------
-! Log-space trilinear interpolation function with normalization
-!---------------------------------------------------------------------------
+   subroutine trilinear_interp_vector(x_val, y_val, z_val, &
+                                       x_grid, y_grid, z_grid, &
+                                       f_values_4d, n_lambda, result_flux)
+      real(dp), intent(in) :: x_val, y_val, z_val
+      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
+      real(dp), intent(in) :: f_values_4d(:,:,:,:)   ! (nx, ny, nz, n_lambda)
+      integer, intent(in) :: n_lambda
+      real(dp), intent(out) :: result_flux(n_lambda)
+
+      integer :: i_x, i_y, i_z, lam
+      real(dp) :: t_x, t_y, t_z
+      real(dp) :: c000, c001, c010, c011, c100, c101, c110, c111
+      real(dp) :: c00, c01, c10, c11, c0, c1
+      real(dp) :: log_result, lin_result
+      real(dp), parameter :: tiny_value = 1.0e-10_dp
+
+      ! find containing cell (done once for all wavelengths)
+      call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                i_x, i_y, i_z, t_x, t_y, t_z)
+
+      ! boundary clamping (done once for all wavelengths)
+      if (i_x < lbound(x_grid,1)) i_x = lbound(x_grid,1)
+      if (i_y < lbound(y_grid,1)) i_y = lbound(y_grid,1)
+      if (i_z < lbound(z_grid,1)) i_z = lbound(z_grid,1)
+      if (i_x >= ubound(x_grid,1)) i_x = ubound(x_grid,1) - 1
+      if (i_y >= ubound(y_grid,1)) i_y = ubound(y_grid,1) - 1
+      if (i_z >= ubound(z_grid,1)) i_z = ubound(z_grid,1) - 1
+
+      t_x = max(0.0_dp, min(1.0_dp, t_x))
+      t_y = max(0.0_dp, min(1.0_dp, t_y))
+      t_z = max(0.0_dp, min(1.0_dp, t_z))
+
+      ! loop over wavelengths — the hot loop
+      do lam = 1, n_lambda
+
+         c000 = max(tiny_value, f_values_4d(i_x,     i_y,     i_z,     lam))
+         c001 = max(tiny_value, f_values_4d(i_x,     i_y,     i_z + 1, lam))
+         c010 = max(tiny_value, f_values_4d(i_x,     i_y + 1, i_z,     lam))
+         c011 = max(tiny_value, f_values_4d(i_x,     i_y + 1, i_z + 1, lam))
+         c100 = max(tiny_value, f_values_4d(i_x + 1, i_y,     i_z,     lam))
+         c101 = max(tiny_value, f_values_4d(i_x + 1, i_y,     i_z + 1, lam))
+         c110 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z,     lam))
+         c111 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z + 1, lam))
+
+         ! linear interpolation first (safer)
+         c00 = c000*(1.0_dp - t_x) + c100*t_x
+         c01 = c001*(1.0_dp - t_x) + c101*t_x
+         c10 = c010*(1.0_dp - t_x) + c110*t_x
+         c11 = c011*(1.0_dp - t_x) + c111*t_x
+         c0  = c00*(1.0_dp - t_y)  + c10*t_y
+         c1  = c01*(1.0_dp - t_y)  + c11*t_y
+         lin_result = c0*(1.0_dp - t_z) + c1*t_z
+
+         ! if valid, try log-space interpolation
+         if (lin_result > tiny_value) then
+            c00 = log(c000)*(1.0_dp - t_x) + log(c100)*t_x
+            c01 = log(c001)*(1.0_dp - t_x) + log(c101)*t_x
+            c10 = log(c010)*(1.0_dp - t_x) + log(c110)*t_x
+            c11 = log(c011)*(1.0_dp - t_x) + log(c111)*t_x
+            c0  = c00*(1.0_dp - t_y) + c10*t_y
+            c1  = c01*(1.0_dp - t_y) + c11*t_y
+            log_result = c0*(1.0_dp - t_z) + c1*t_z
+            if (log_result == log_result) lin_result = exp(log_result)  ! NaN check
+         end if
+
+         ! final sanity check — fall back to nearest neighbour if still bad
+         if (lin_result /= lin_result .or. lin_result <= 0.0_dp) then
+            call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                    i_x, i_y, i_z)
+            lin_result = max(tiny_value, f_values_4d(i_x, i_y, i_z, lam))
+         end if
+
+         result_flux(lam) = lin_result
+
+      end do
+
+   end subroutine trilinear_interp_vector
+
+   !---------------------------------------------------------------------------
+   ! Log-space trilinear interpolation function with normalization
+   !---------------------------------------------------------------------------
    function trilinear_interp(x_val, y_val, z_val, x_grid, y_grid, z_grid, f_values) result(f_interp)
       real(dp), intent(in) :: x_val, y_val, z_val
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
