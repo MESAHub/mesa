@@ -36,7 +36,7 @@ endif
 BUILD_DIR_FORUM_BUILD := $(BUILD_DIR_MODULE)/src
 INSTALL_INCLUDES_BUILD += $(BUILD_DIR_MODULE)/include/forum.inc
 
-$(BUILD_DIR_FORUM_BUILD): forum-1.2.2.tar.gz | $(BUILD_DIR_FORUM_BUILD)/. $(BUILD_DIR_MODULE)/include/.
+$(BUILD_DIR_FORUM_BUILD): forum-1.2.3.tar.gz | $(BUILD_DIR_FORUM_BUILD)/. $(BUILD_DIR_MODULE)/include/.
 	tar --strip-components=1 -xf $< -C $(BUILD_DIR_FORUM_BUILD)
 	cp $(BUILD_DIR_FORUM_BUILD)/src/include/forum.inc $(BUILD_DIR_MODULE)/include/forum.inc
 
