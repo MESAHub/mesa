@@ -47,7 +47,7 @@
       end type create_star_info
 
       integer, parameter :: max_create_star_handles = 3
-      type (create_star_info), target, save :: &
+      type (create_star_info), target :: &
          create_star_handles(max_create_star_handles)
 
       contains

@@ -91,7 +91,7 @@ module atm_def
 
   ! Atmosphere tables
 
-  type (Atm_Info), target, save :: &
+  type (Atm_Info), target :: &
        ai_two_thirds, ai_100, ai_10, ai_1, &
        ai_1m1, ai_wd_25, ai_db_wd_25
 

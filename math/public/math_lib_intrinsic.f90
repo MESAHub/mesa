@@ -86,7 +86,7 @@ module math_lib
      module procedure atanpi_
   end interface atanpi
 
-  real(dp), save :: ln10_m
+  real(dp) :: ln10_m
 
   private
 
