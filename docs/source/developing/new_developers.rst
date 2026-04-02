@@ -57,10 +57,10 @@ Assuming the new developer has been accepted, the nominator:
 
 The relevant onboarding contacts are:
 
-* Mentor and primary onboarding contact: the nominator.
-* GitHub maintainer and contact for GitHub access: Matteo Cantiello.
-* Slack maintainer and contact for Slack access: Rich Townsend.
-* testhub maintainer and contact for testhub access: Bill Wold.
+* Mentor and primary onboarding contact: the nominator
+* GitHub maintainer and contact for GitHub access: Matteo Cantiello
+* Slack maintainer and contact for Slack access: Rich Townsend
+* testhub maintainer and contact for testhub access: Bill Wolf
 
 Infrastructure Access for Collaborators
 ---------------------------------------
