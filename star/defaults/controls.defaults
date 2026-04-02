@@ -11914,7 +11914,9 @@
       ! x_ctrl
       ! ~~~~~~
 
-      ! extra params as a convenience for developing new features
+      ! extra params as a convenience for developing new features.
+      ! use ``x_ctrl`` for floats, ``x_integer_ctrl`` for integers, ``x_logical_ctrl`` for booleans,
+      ! and ``x_character_ctrl`` for strings.
       ! note: the parameter ``num_x_ctrls`` is defined in ``star_def.inc``
 
       ! ::
