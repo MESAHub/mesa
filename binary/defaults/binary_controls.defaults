@@ -1513,9 +1513,13 @@
    use_other_CE_binary_finish_step = .false.
    use_other_e2 = .false.
 
+! x_ctrl
+! ~~~~~~
 
 ! extra params as a convenience for developing new features
-! note: the parameter ``num_x_ctrls`` is defined in ``binary_def.f90``
+! use ``x_ctrl`` for floats, ``x_integer_ctrl`` for integers, ``x_logical_ctrl`` for booleans,
+! and ``x_character_ctrl`` for strings.
+! note: the parameter ``binary_num_x_ctrls`` is defined in ``binary_def.f90``
 
 ! ::
 
