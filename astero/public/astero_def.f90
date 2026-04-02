@@ -67,7 +67,7 @@
 
       end type astero_info
 
-      type (astero_info), save :: astero_other_procs
+      type (astero_info) :: astero_other_procs
 
       logical :: use_other_after_get_chi2 = .false.
       logical :: use_other_adipls_mode_info = .false.
@@ -650,8 +650,7 @@
             data_for_extra_profile_columns
       end type astero_procs
 
-      type (astero_procs), target, save :: star_astero_procs
-         ! gfortran seems to require "save" here.  at least it did once upon a time.
+      type (astero_procs), target :: star_astero_procs
 
       contains
 

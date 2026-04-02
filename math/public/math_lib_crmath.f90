@@ -32,7 +32,7 @@ module math_lib
 
   character(LEN=16), parameter :: MATH_BACKEND = 'CRMATH'
 
-  real(dp), save :: ln10_m
+  real(dp) :: ln10_m
 
   interface safe_sqrt
      module procedure safe_sqrt_
