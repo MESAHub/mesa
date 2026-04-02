@@ -19,10 +19,10 @@
 
 module colors_history
 
-   use const_def, only: dp, mesa_dir
+   use const_def, only: dp
    use utils_lib, only: mesa_error
    use colors_def, only: Colors_General_Info, get_colors_ptr, num_color_filters, color_filter_names
-   use colors_utils, only: remove_dat
+   use colors_utils, only: remove_dat, resolve_path
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
 
@@ -39,7 +39,7 @@ contains
       call get_colors_ptr(colors_handle, colors_settings, ierr)
       if (ierr /= 0) then
          write (*, *) 'failed in colors_ptr'
-         num_cols = 0
+         how_many_colors_history_columns = 0
          return
       end if
 
@@ -53,19 +53,21 @@ contains
    end function how_many_colors_history_columns
 
    subroutine data_for_colors_history_columns( &
-      t_eff, log_g, R, metallicity, &
+      t_eff, log_g, R, metallicity, model_number, &
       colors_handle, n, names, vals, ierr)
       real(dp), intent(in) :: t_eff, log_g, R, metallicity
       integer, intent(in) :: colors_handle, n
       character(len=80) :: names(n)
       real(dp) :: vals(n)
       integer, intent(out) :: ierr
+      integer, intent(in) :: model_number
 
       type(Colors_General_Info), pointer :: cs  ! colors_settings
       integer :: i, filter_offset
       real(dp) :: d, bolometric_magnitude, bolometric_flux, interpolation_radius
       real(dp) :: zero_point
-      character(len=256) :: sed_filepath, filter_name
+      character(len=256) :: sed_filepath
+      character(len=80) :: filter_name
       logical :: make_sed
 
       real(dp), dimension(:), allocatable :: wavelengths, fluxes
@@ -90,14 +92,12 @@ contains
       end if
 
       d = cs%distance
-      sed_filepath = trim(mesa_dir)//cs%stellar_atm
+      sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = cs%make_csv
 
-      ! Calculate bolometric magnitude using cached lookup table
-      call calculate_bolometric(t_eff, log_g, metallicity, R, d, &
+      call calculate_bolometric(cs, t_eff, log_g, metallicity, R, d, &
                                 bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
-                                sed_filepath, interpolation_radius, &
-                                cs%lu_file_names, cs%lu_teff, cs%lu_logg, cs%lu_meta)
+                                sed_filepath, interpolation_radius)
 
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude
@@ -113,7 +113,7 @@ contains
             names(i + filter_offset) = filter_name
 
             if (t_eff >= 0 .and. metallicity >= 0) then
-               ! Select precomputed zero-point based on magnitude system
+               ! pick the precomputed zero-point for the requested mag system
                select case (trim(cs%mag_system))
                case ('VEGA', 'Vega', 'vega')
                   zero_point = cs%filters(i)%vega_zero_point
@@ -126,14 +126,15 @@ contains
                   zero_point = -1.0_dp
                end select
 
-               ! Calculate synthetic magnitude using cached filter data and precomputed zero-point
                vals(i + filter_offset) = calculate_synthetic(t_eff, log_g, metallicity, ierr, &
                                                              wavelengths, fluxes, &
                                                              cs%filters(i)%wavelengths, &
                                                              cs%filters(i)%transmission, &
                                                              zero_point, &
                                                              color_filter_names(i), &
-                                                             make_sed, cs%colors_results_directory)
+                                                             make_sed, cs%sed_per_model, &
+                                                             cs%colors_results_directory, model_number)
+
                if (ierr /= 0) vals(i + filter_offset) = -1.0_dp
             else
                vals(i + filter_offset) = -1.0_dp
@@ -145,9 +146,9 @@ contains
          call mesa_error(__FILE__, __LINE__, 'colors: data_for_colors_history_columns array size mismatch')
       end if
 
-      ! Clean up allocated arrays from calculate_bolometric
-      if (allocated(wavelengths)) deallocate(wavelengths)
-      if (allocated(fluxes)) deallocate(fluxes)
+      ! clean up
+      if (allocated(wavelengths)) deallocate (wavelengths)
+      if (allocated(fluxes)) deallocate (fluxes)
 
    end subroutine data_for_colors_history_columns
 

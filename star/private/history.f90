@@ -267,8 +267,10 @@ contains
          end if
          colors_col_names(1:num_colors_cols) = 'unknown'
          colors_col_vals(1:num_colors_cols) = -1d99
-         call data_for_colors_history_columns(s%T(1), log10(s%grav(1)), s%R(1), s%kap_rq%Zbase, &
-            s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
+
+         call data_for_colors_history_columns(s%T(1), safe_log10(s%grav(1)), s%R(1), s%kap_rq%Zbase, &
+            s% model_number, s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
+
          if (ierr /= 0) then
             call dealloc
             return
@@ -279,6 +281,7 @@ contains
             end if
          end do
       end if
+
 
       i0 = 1
       if (write_flag .and. (open_close_log .or. s% model_number == -100)) then

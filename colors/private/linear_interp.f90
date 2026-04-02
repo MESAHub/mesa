@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2025  Niall Miller & The MESA Team
+!   Copyright (C) 2026  Niall Miller & The MESA Team
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU Lesser General Public License
@@ -17,289 +17,240 @@
 !
 ! ***********************************************************************
 
-! ***********************************************************************
-! Linear interpolation module for spectral energy distributions (SEDs)
-! ***********************************************************************
+! linear interpolation for SEDs
+!
+! data-loading strategy selected by rq%cube_loaded:
+!   .true.  -> use the preloaded 4-D flux cube on the handle
+!   .false. -> load individual SED files via the lookup table (fallback)
 
 module linear_interp
    use const_def, only: dp
-   use colors_utils, only: dilute_flux
+   use colors_def, only: Colors_General_Info
+   use colors_utils, only: dilute_flux, find_containing_cell, find_interval, &
+                           find_nearest_point, find_bracket_index, &
+                           load_sed_cached, load_stencil
    use utils_lib, only: mesa_error
    implicit none
 
    private
-   public :: construct_sed_linear, trilinear_interp, trilinear_interp_vector
+   public :: construct_sed_linear, trilinear_interp
 
 contains
 
-   !---------------------------------------------------------------------------
-   ! Main entry point: Construct a SED using linear interpolation
-   !---------------------------------------------------------------------------
-
-   subroutine construct_sed_linear(teff, log_g, metallicity, R, d, file_names, &
-                                   lu_teff, lu_logg, lu_meta, stellar_model_dir, &
-                                   wavelengths, fluxes)
-
+   ! main entry point -- construct a SED using trilinear interpolation
+   ! strategy controlled by rq%cube_loaded (set at init)
+   subroutine construct_sed_linear(rq, teff, log_g, metallicity, R, d, &
+                                   stellar_model_dir, wavelengths, fluxes)
+      type(Colors_General_Info), intent(inout) :: rq
       real(dp), intent(in) :: teff, log_g, metallicity, R, d
-      real(dp), intent(in) :: lu_teff(:), lu_logg(:), lu_meta(:)
       character(len=*), intent(in) :: stellar_model_dir
-      character(len=100), intent(in) :: file_names(:)
       real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
 
-      integer :: n_lambda, status, n_teff, n_logg, n_meta
+      integer :: n_lambda
       real(dp), dimension(:), allocatable :: interp_flux, diluted_flux
-      real(dp), dimension(:, :, :, :), allocatable :: precomputed_flux_cube
-      real(dp) :: min_flux, max_flux, mean_flux, progress_pct
 
-      ! Parameter grids
-      real(dp), allocatable :: teff_grid(:), logg_grid(:), meta_grid(:)
-      character(len=256) :: bin_filename, clean_path
-      logical :: file_exists
+      if (rq%cube_loaded) then
+         ! fast path: use preloaded cube from handle
+         n_lambda = size(rq%cube_wavelengths)
 
-      ! Clean up any double slashes in the path
-      clean_path = trim(stellar_model_dir)
-      if (clean_path(len_trim(clean_path):len_trim(clean_path)) == '/') then
-         bin_filename = trim(clean_path)//'flux_cube.bin'
+         allocate (wavelengths(n_lambda))
+         wavelengths = rq%cube_wavelengths
+
+         ! vectorised interpolation -- cell location computed once, reused across n_lambda
+         allocate (interp_flux(n_lambda))
+         call trilinear_interp_vector(teff, log_g, metallicity, &
+                                      rq%cube_teff_grid, rq%cube_logg_grid, &
+                                      rq%cube_meta_grid, &
+                                      rq%cube_flux, n_lambda, interp_flux)
       else
-         bin_filename = trim(clean_path)//'/flux_cube.bin'
+         ! fallback path: load individual SED files from lookup table
+         call construct_sed_from_files(rq, teff, log_g, metallicity, &
+                                       stellar_model_dir, interp_flux, wavelengths)
+         n_lambda = size(wavelengths)
       end if
 
-      ! Check if file exists first
-      INQUIRE (file=bin_filename, EXIST=file_exists)
-
-      if (.not. file_exists) then
-         print *, 'Missing required binary file for interpolation'
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      ! Load the data from binary file
-      call load_binary_data(bin_filename, teff_grid, logg_grid, meta_grid, &
-                            wavelengths, precomputed_flux_cube, status)
-
-      if (status /= 0) then
-         print *, 'Binary data loading error'
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      n_teff = size(teff_grid)
-      n_logg = size(logg_grid)
-      n_meta = size(meta_grid)
-      n_lambda = size(wavelengths)
-
-      ! Allocate space for interpolated flux
-      allocate (interp_flux(n_lambda))
-
-      ! Interpolate all wavelengths in one call — cell search and boundary
-      ! clamping are performed once and reused across the wavelength loop
-      ! inside the subroutine
-      call trilinear_interp_vector(teff, log_g, metallicity, &
-                                   teff_grid, logg_grid, meta_grid, &
-                                   precomputed_flux_cube, n_lambda, interp_flux)
-
-      ! Calculate statistics for validation
-      min_flux = minval(interp_flux)
-      max_flux = maxval(interp_flux)
-      mean_flux = sum(interp_flux)/n_lambda
-
-      ! Apply distance dilution to get observed flux
       allocate (diluted_flux(n_lambda))
       call dilute_flux(interp_flux, R, d, diluted_flux)
       fluxes = diluted_flux
 
-      ! Calculate statistics after dilution
-      min_flux = minval(diluted_flux)
-      max_flux = maxval(diluted_flux)
-      mean_flux = sum(diluted_flux)/n_lambda
-
    end subroutine construct_sed_linear
 
-   !---------------------------------------------------------------------------
-   ! Load data from binary file
-   !---------------------------------------------------------------------------
-   subroutine load_binary_data(filename, teff_grid, logg_grid, meta_grid, &
-                               wavelengths, flux_cube, status)
-      character(len=*), intent(in) :: filename
-      real(dp), allocatable, intent(out) :: teff_grid(:), logg_grid(:), meta_grid(:)
-      real(dp), allocatable, intent(out) :: wavelengths(:)
-      real(dp), allocatable, intent(out) :: flux_cube(:, :, :, :)
-      integer, intent(out) :: status
+   ! fallback: build a 2x2x2 sub-cube from SED files, then trilinear-interpolate
+   ! unlike hermite, no derivative context needed -- stencil is exactly the 2x2x2 cell corners
+   subroutine construct_sed_from_files(rq, teff, log_g, metallicity, &
+                                       stellar_model_dir, interp_flux, wavelengths)
+      use colors_utils, only: resolve_path, build_grid_to_lu_map
+      type(Colors_General_Info), intent(inout) :: rq
+      real(dp), intent(in) :: teff, log_g, metallicity
+      character(len=*), intent(in) :: stellar_model_dir
+      real(dp), dimension(:), allocatable, intent(out) :: interp_flux, wavelengths
 
-      integer :: unit, n_teff, n_logg, n_meta, n_lambda
+      integer :: i_t, i_g, i_m   ! bracketing indices in unique grids
+      integer :: lo_t, hi_t, lo_g, hi_g, lo_m, hi_m   ! stencil bounds
+      integer :: nt, ng, nm, n_lambda
+      character(len=512) :: resolved_dir
+      logical :: need_reload
 
-      unit = 99
-      status = 0
+      resolved_dir = trim(resolve_path(stellar_model_dir))
 
-      ! Open the binary file
-      open (unit=unit, file=filename, status='OLD', ACCESS='STREAM', FORM='UNFORMATTED', iostat=status)
-      if (status /= 0) then
-         !print *, 'Error opening binary file:', trim(filename)
-         return
+      ! ensure the grid-to-lu mapping exists (built once, then reused)
+      if (.not. rq%grid_map_built) call build_grid_to_lu_map(rq)
+
+      ! find bracketing cell in the unique grids
+      call find_bracket_index(rq%u_teff, teff, i_t)
+      call find_bracket_index(rq%u_logg, log_g, i_g)
+      call find_bracket_index(rq%u_meta, metallicity, i_m)
+
+      ! check if the stencil cache is still valid for this cell
+      need_reload = .true.
+      if (rq%stencil_valid .and. &
+          i_t == rq%stencil_i_t .and. &
+          i_g == rq%stencil_i_g .and. &
+          i_m == rq%stencil_i_m) then
+         need_reload = .false.
       end if
 
-      ! Read dimensions
-      read (unit, iostat=status) n_teff, n_logg, n_meta, n_lambda
-      if (status /= 0) then
-         !print *, 'Error reading dimensions from binary file'
-         close (unit)
-         return
+      if (need_reload) then
+         ! trilinear needs exactly the 2x2x2 cell corners -- no extension
+         nt = size(rq%u_teff)
+         ng = size(rq%u_logg)
+         nm = size(rq%u_meta)
+
+         if (nt < 2) then
+            lo_t = 1; hi_t = 1
+         else
+            lo_t = i_t
+            hi_t = min(nt, i_t + 1)
+         end if
+
+         if (ng < 2) then
+            lo_g = 1; hi_g = 1
+         else
+            lo_g = i_g
+            hi_g = min(ng, i_g + 1)
+         end if
+
+         if (nm < 2) then
+            lo_m = 1; hi_m = 1
+         else
+            lo_m = i_m
+            hi_m = min(nm, i_m + 1)
+         end if
+
+         ! load SEDs for every stencil point (using memory cache)
+         call load_stencil(rq, resolved_dir, lo_t, hi_t, lo_g, hi_g, lo_m, hi_m)
+
+         ! store subgrid arrays on the handle
+         if (allocated(rq%stencil_teff)) deallocate (rq%stencil_teff)
+         if (allocated(rq%stencil_logg)) deallocate (rq%stencil_logg)
+         if (allocated(rq%stencil_meta)) deallocate (rq%stencil_meta)
+
+         allocate (rq%stencil_teff(hi_t - lo_t + 1))
+         allocate (rq%stencil_logg(hi_g - lo_g + 1))
+         allocate (rq%stencil_meta(hi_m - lo_m + 1))
+         rq%stencil_teff = rq%u_teff(lo_t:hi_t)
+         rq%stencil_logg = rq%u_logg(lo_g:hi_g)
+         rq%stencil_meta = rq%u_meta(lo_m:hi_m)
+
+         rq%stencil_i_t = i_t
+         rq%stencil_i_g = i_g
+         rq%stencil_i_m = i_m
+         rq%stencil_valid = .true.
       end if
 
-      ! Allocate arrays based on dimensions
-      allocate (teff_grid(n_teff), STAT=status)
-      if (status /= 0) then
-         !print *, 'Error allocating teff_grid array'
-         close (unit)
-         return
-      end if
+      n_lambda = size(rq%stencil_wavelengths)
+      allocate (wavelengths(n_lambda))
+      wavelengths = rq%stencil_wavelengths
 
-      allocate (logg_grid(n_logg), STAT=status)
-      if (status /= 0) then
-         !print *, 'Error allocating logg_grid array'
-         close (unit)
-         return
-      end if
+      allocate (interp_flux(n_lambda))
+      call trilinear_interp_vector(teff, log_g, metallicity, &
+                                   rq%stencil_teff, rq%stencil_logg, rq%stencil_meta, &
+                                   rq%stencil_fluxes, n_lambda, interp_flux)
 
-      allocate (meta_grid(n_meta), STAT=status)
-      if (status /= 0) then
-         !print *, 'Error allocating meta_grid array'
-         close (unit)
-         return
-      end if
+   end subroutine construct_sed_from_files
 
-      allocate (wavelengths(n_lambda), STAT=status)
-      if (status /= 0) then
-         !print *, 'Error allocating wavelengths array'
-         close (unit)
-         return
-      end if
-
-      allocate (flux_cube(n_teff, n_logg, n_meta, n_lambda), STAT=status)
-      if (status /= 0) then
-         !print *, 'Error allocating flux_cube array'
-         close (unit)
-         return
-      end if
-
-      ! Read grid arrays
-      read (unit, iostat=status) teff_grid
-      if (status /= 0) then
-         !print *, 'Error reading teff_grid'
-         GOTO 999  ! Cleanup and return
-      end if
-
-      read (unit, iostat=status) logg_grid
-      if (status /= 0) then
-         !print *, 'Error reading logg_grid'
-         GOTO 999  ! Cleanup and return
-      end if
-
-      read (unit, iostat=status) meta_grid
-      if (status /= 0) then
-         !print *, 'Error reading meta_grid'
-         GOTO 999  ! Cleanup and return
-      end if
-
-      read (unit, iostat=status) wavelengths
-      if (status /= 0) then
-         !print *, 'Error reading wavelengths'
-         GOTO 999  ! Cleanup and return
-      end if
-
-      ! Read flux cube
-      read (unit, iostat=status) flux_cube
-      if (status /= 0) then
-         !print *, 'Error reading flux_cube'
-         GOTO 999  ! Cleanup and return
-      end if
-
-      ! Close file and return success
-      close (unit)
-      return
-
-999   CONTINUE
-      ! Cleanup on error
-      close (unit)
-      return
-
-! After reading the grid arrays
-!print *, 'Teff grid min/max:', minval(teff_grid), maxval(teff_grid)
-!print *, 'logg grid min/max:', minval(logg_grid), maxval(logg_grid)
-!print *, 'meta grid min/max:', minval(meta_grid), maxval(meta_grid)
-
-   end subroutine load_binary_data
-
-   !---------------------------------------------------------------------------
-   ! Vectorized trilinear interpolation over all wavelengths.
-   ! The cell search and boundary clamping depend only on (teff, logg, meta)
-   ! and the sub-grids — not on wavelength. Computing them once and reusing
-   ! across all n_lambda samples eliminates redundant binary searches.
-   !---------------------------------------------------------------------------
+   ! vectorised trilinear interpolation over all wavelengths
+   ! cell location depends only on (teff, logg, meta) -- computed once, reused across n_lambda
    subroutine trilinear_interp_vector(x_val, y_val, z_val, &
-                                       x_grid, y_grid, z_grid, &
-                                       f_values_4d, n_lambda, result_flux)
+                                      x_grid, y_grid, z_grid, &
+                                      f_values_4d, n_lambda, result_flux)
       real(dp), intent(in) :: x_val, y_val, z_val
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      real(dp), intent(in) :: f_values_4d(:,:,:,:)   ! (nx, ny, nz, n_lambda)
+      real(dp), intent(in) :: f_values_4d(:, :, :, :)   ! (nx, ny, nz, n_lambda)
       integer, intent(in) :: n_lambda
       real(dp), intent(out) :: result_flux(n_lambda)
 
       integer :: i_x, i_y, i_z, lam
       real(dp) :: t_x, t_y, t_z
+      integer :: nx, ny, nz
       real(dp) :: c000, c001, c010, c011, c100, c101, c110, c111
       real(dp) :: c00, c01, c10, c11, c0, c1
-      real(dp) :: log_result, lin_result
+      real(dp) :: lin_result, log_result
       real(dp), parameter :: tiny_value = 1.0e-10_dp
 
-      ! find containing cell (done once for all wavelengths)
+      nx = size(x_grid)
+      ny = size(y_grid)
+      nz = size(z_grid)
+
+      ! locate the cell once
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
-      ! boundary clamping (done once for all wavelengths)
-      if (i_x < lbound(x_grid,1)) i_x = lbound(x_grid,1)
-      if (i_y < lbound(y_grid,1)) i_y = lbound(y_grid,1)
-      if (i_z < lbound(z_grid,1)) i_z = lbound(z_grid,1)
-      if (i_x >= ubound(x_grid,1)) i_x = ubound(x_grid,1) - 1
-      if (i_y >= ubound(y_grid,1)) i_y = ubound(y_grid,1) - 1
-      if (i_z >= ubound(z_grid,1)) i_z = ubound(z_grid,1) - 1
+      ! boundary safety check
+      if (i_x < 1) i_x = 1
+      if (i_y < 1) i_y = 1
+      if (i_z < 1) i_z = 1
+      if (i_x >= nx) i_x = max(1, nx - 1)
+      if (i_y >= ny) i_y = max(1, ny - 1)
+      if (i_z >= nz) i_z = max(1, nz - 1)
 
+      ! clamp interpolation parameters to [0,1]
       t_x = max(0.0_dp, min(1.0_dp, t_x))
       t_y = max(0.0_dp, min(1.0_dp, t_y))
       t_z = max(0.0_dp, min(1.0_dp, t_z))
 
-      ! loop over wavelengths — the hot loop
+      ! loop over wavelengths with the same cell location
       do lam = 1, n_lambda
-
-         c000 = max(tiny_value, f_values_4d(i_x,     i_y,     i_z,     lam))
-         c001 = max(tiny_value, f_values_4d(i_x,     i_y,     i_z + 1, lam))
-         c010 = max(tiny_value, f_values_4d(i_x,     i_y + 1, i_z,     lam))
-         c011 = max(tiny_value, f_values_4d(i_x,     i_y + 1, i_z + 1, lam))
-         c100 = max(tiny_value, f_values_4d(i_x + 1, i_y,     i_z,     lam))
-         c101 = max(tiny_value, f_values_4d(i_x + 1, i_y,     i_z + 1, lam))
-         c110 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z,     lam))
+         ! get the 8 corners of the cube with safety floor
+         c000 = max(tiny_value, f_values_4d(i_x, i_y, i_z, lam))
+         c001 = max(tiny_value, f_values_4d(i_x, i_y, i_z + 1, lam))
+         c010 = max(tiny_value, f_values_4d(i_x, i_y + 1, i_z, lam))
+         c011 = max(tiny_value, f_values_4d(i_x, i_y + 1, i_z + 1, lam))
+         c100 = max(tiny_value, f_values_4d(i_x + 1, i_y, i_z, lam))
+         c101 = max(tiny_value, f_values_4d(i_x + 1, i_y, i_z + 1, lam))
+         c110 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z, lam))
          c111 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z + 1, lam))
 
-         ! linear interpolation first (safer)
+         ! standard linear interpolation first (safer)
          c00 = c000*(1.0_dp - t_x) + c100*t_x
          c01 = c001*(1.0_dp - t_x) + c101*t_x
          c10 = c010*(1.0_dp - t_x) + c110*t_x
          c11 = c011*(1.0_dp - t_x) + c111*t_x
-         c0  = c00*(1.0_dp - t_y)  + c10*t_y
-         c1  = c01*(1.0_dp - t_y)  + c11*t_y
+
+         c0 = c00*(1.0_dp - t_y) + c10*t_y
+         c1 = c01*(1.0_dp - t_y) + c11*t_y
+
          lin_result = c0*(1.0_dp - t_z) + c1*t_z
 
-         ! if valid, try log-space interpolation
+         ! if valid, try log-space interpolation (smoother for flux)
          if (lin_result > tiny_value) then
             c00 = log(c000)*(1.0_dp - t_x) + log(c100)*t_x
             c01 = log(c001)*(1.0_dp - t_x) + log(c101)*t_x
             c10 = log(c010)*(1.0_dp - t_x) + log(c110)*t_x
             c11 = log(c011)*(1.0_dp - t_x) + log(c111)*t_x
-            c0  = c00*(1.0_dp - t_y) + c10*t_y
-            c1  = c01*(1.0_dp - t_y) + c11*t_y
+
+            c0 = c00*(1.0_dp - t_y) + c10*t_y
+            c1 = c01*(1.0_dp - t_y) + c11*t_y
+
             log_result = c0*(1.0_dp - t_z) + c1*t_z
-            if (log_result == log_result) lin_result = exp(log_result)  ! NaN check
+
+            ! only use log-space result if valid
+            if (log_result == log_result) then  ! NaN check
+               lin_result = exp(log_result)
+            end if
          end if
 
-         ! final sanity check — fall back to nearest neighbour if still bad
+         ! final sanity check -- fall back to nearest neighbour
          if (lin_result /= lin_result .or. lin_result <= 0.0_dp) then
             call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                     i_x, i_y, i_z)
@@ -307,20 +258,17 @@ contains
          end if
 
          result_flux(lam) = lin_result
-
       end do
 
    end subroutine trilinear_interp_vector
 
-   !---------------------------------------------------------------------------
-   ! Log-space trilinear interpolation function with normalization
-   !---------------------------------------------------------------------------
+   ! scalar trilinear interpolation (external callers / single-wavelength use)
+   ! retained for backward compatibility
    function trilinear_interp(x_val, y_val, z_val, x_grid, y_grid, z_grid, f_values) result(f_interp)
       real(dp), intent(in) :: x_val, y_val, z_val
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
       real(dp), intent(in) :: f_values(:, :, :)
       real(dp) :: f_interp
-      ! Compute log-space result
       real(dp) :: log_result
       integer :: i_x, i_y, i_z
       real(dp) :: t_x, t_y, t_z
@@ -328,24 +276,24 @@ contains
       real(dp) :: c00, c01, c10, c11, c0, c1
       real(dp), parameter :: tiny_value = 1.0e-10_dp
 
-      ! Find containing cell and parameter values using binary search
+      ! find containing cell and parameter values using binary search
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
-      ! Boundary safety check
-      if (i_x < lbound(x_grid,1)) i_x = lbound(x_grid,1)
-      if (i_y < lbound(y_grid,1)) i_y = lbound(y_grid,1)
-      if (i_z < lbound(z_grid,1)) i_z = lbound(z_grid,1)
-      if (i_x >= ubound(x_grid,1)) i_x = ubound(x_grid,1) - 1
-      if (i_y >= ubound(y_grid,1)) i_y = ubound(y_grid,1) - 1
-      if (i_z >= ubound(z_grid,1)) i_z = ubound(z_grid,1) - 1
+      ! boundary safety check
+      if (i_x < lbound(x_grid, 1)) i_x = lbound(x_grid, 1)
+      if (i_y < lbound(y_grid, 1)) i_y = lbound(y_grid, 1)
+      if (i_z < lbound(z_grid, 1)) i_z = lbound(z_grid, 1)
+      if (i_x >= ubound(x_grid, 1)) i_x = ubound(x_grid, 1) - 1
+      if (i_y >= ubound(y_grid, 1)) i_y = ubound(y_grid, 1) - 1
+      if (i_z >= ubound(z_grid, 1)) i_z = ubound(z_grid, 1) - 1
 
-      ! Force interpolation parameters to be in [0,1]
+      ! clamp interpolation parameters to [0,1]
       t_x = max(0.0_dp, MIN(1.0_dp, t_x))
       t_y = max(0.0_dp, MIN(1.0_dp, t_y))
       t_z = max(0.0_dp, MIN(1.0_dp, t_z))
 
-      ! Get the corners of the cube with safety checks
+      ! get the corners of the cube with safety checks
       c000 = max(tiny_value, f_values(i_x, i_y, i_z))
       c001 = max(tiny_value, f_values(i_x, i_y, i_z + 1))
       c010 = max(tiny_value, f_values(i_x, i_y + 1, i_z))
@@ -355,7 +303,7 @@ contains
       c110 = max(tiny_value, f_values(i_x + 1, i_y + 1, i_z))
       c111 = max(tiny_value, f_values(i_x + 1, i_y + 1, i_z + 1))
 
-      ! Try standard linear interpolation first (safer)
+      ! try standard linear interpolation first (safer)
       c00 = c000*(1.0_dp - t_x) + c100*t_x
       c01 = c001*(1.0_dp - t_x) + c101*t_x
       c10 = c010*(1.0_dp - t_x) + c110*t_x
@@ -366,9 +314,8 @@ contains
 
       f_interp = c0*(1.0_dp - t_z) + c1*t_z
 
-      ! If the linear result is valid and non-zero, try log space
+      ! if valid, try log-space interpolation (smoother for flux)
       if (f_interp > tiny_value) then
-         ! Perform log-space interpolation
          c00 = log(c000)*(1.0_dp - t_x) + log(c100)*t_x
          c01 = log(c001)*(1.0_dp - t_x) + log(c101)*t_x
          c10 = log(c010)*(1.0_dp - t_x) + log(c110)*t_x
@@ -379,133 +326,17 @@ contains
 
          log_result = c0*(1.0_dp - t_z) + c1*t_z
 
-         ! Only use the log-space result if it's valid
+         ! only use the log-space result if it's valid
          if (log_result == log_result) then  ! NaN check
             f_interp = EXP(log_result)
          end if
       end if
 
-      ! Final sanity check
+      ! final sanity check
       if (f_interp /= f_interp .or. f_interp <= 0.0_dp) then
-         ! If we somehow still got an invalid result, use nearest neighbor
          call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, i_x, i_y, i_z)
          f_interp = max(tiny_value, f_values(i_x, i_y, i_z))
       end if
    end function trilinear_interp
-
-   !---------------------------------------------------------------------------
-   ! Find the cell containing the interpolation point
-   !---------------------------------------------------------------------------
-   subroutine find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                   i_x, i_y, i_z, t_x, t_y, t_z)
-      real(dp), intent(in) :: x_val, y_val, z_val
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      integer, intent(out) :: i_x, i_y, i_z
-      real(dp), intent(out) :: t_x, t_y, t_z
-
-      ! Find x interval
-      call find_interval(x_grid, x_val, i_x, t_x)
-
-      ! Find y interval
-      call find_interval(y_grid, y_val, i_y, t_y)
-
-      ! Find z interval
-      call find_interval(z_grid, z_val, i_z, t_z)
-   end subroutine find_containing_cell
-
-   !---------------------------------------------------------------------------
-   ! Find the interval in a sorted array containing a value
-   !---------------------------------------------------------------------------
-   subroutine find_interval(x, val, i, t)
-      real(dp), intent(in) :: x(:), val
-      integer, intent(out) :: i
-      real(dp), intent(out) :: t
-
-      integer :: n, lo, hi, mid
-      logical :: dummy_axis
-
-      n = size(x)
-
-      ! Detect dummy axis
-      dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
-
-      if (dummy_axis) then
-         ! Collapse: use the first element of the axis, no interpolation
-         i = 1
-         t = 0.0_dp
-         return
-      end if
-
-      ! --- ORIGINAL CODE BELOW ---
-      if (val <= x(1)) then
-         i = 1
-         t = 0.0_dp
-         return
-      else if (val >= x(n)) then
-         i = n - 1
-         t = 1.0_dp
-         return
-      end if
-
-      lo = 1
-      hi = n
-      do while (hi - lo > 1)
-         mid = (lo + hi)/2
-         if (val >= x(mid)) then
-            lo = mid
-         else
-            hi = mid
-         end if
-      end do
-
-      i = lo
-      t = (val - x(i))/(x(i + 1) - x(i))
-   end subroutine find_interval
-
-   !---------------------------------------------------------------------------
-   ! Find the nearest grid point
-   !---------------------------------------------------------------------------
-   subroutine find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                 i_x, i_y, i_z)
-      real(dp), intent(in) :: x_val, y_val, z_val
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      integer, intent(out) :: i_x, i_y, i_z
-
-      integer :: i
-      real(dp) :: min_dist, dist
-
-      ! Find nearest x grid point
-      min_dist = abs(x_val - x_grid(1))
-      i_x = 1
-      do i = 2, size(x_grid)
-         dist = abs(x_val - x_grid(i))
-         if (dist < min_dist) then
-            min_dist = dist
-            i_x = i
-         end if
-      end do
-
-      ! Find nearest y grid point
-      min_dist = abs(y_val - y_grid(1))
-      i_y = 1
-      do i = 2, size(y_grid)
-         dist = abs(y_val - y_grid(i))
-         if (dist < min_dist) then
-            min_dist = dist
-            i_y = i
-         end if
-      end do
-
-      ! Find nearest z grid point
-      min_dist = abs(z_val - z_grid(1))
-      i_z = 1
-      do i = 2, size(z_grid)
-         dist = abs(z_val - z_grid(i))
-         if (dist < min_dist) then
-            min_dist = dist
-            i_z = i
-         end if
-      end do
-   end subroutine find_nearest_point
 
 end module linear_interp
