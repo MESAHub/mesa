@@ -45,9 +45,22 @@ Post Acceptance
 
 Assuming the new developer has been accepted, the nominator:
 
-* Makes sure the new developer agrees to the code of conduct and knows that discussions on dev channels should be considered private and may include work in progress and thus should not be shared.
-* Makes sure the new developer gets access to the infrastructure (github, slack, mesa-dev, testhub).
-* Acts as a mentor to the new developer, helping them to get used to the system and the way things are done. This includes making commits, merging PR's, and general development tasks.
+* Makes sure the new developer agrees to the code of conduct and knows that discussions on developer channels should be considered private and may include work in progress that should not be shared.
+* Makes sure the new developer gets access to the relevant infrastructure. This includes adding them to the MESAHub GitHub organization with appropriate permissions, adding them to Slack and any relevant private channels, and arranging access to mesa-dev and testhub.
+* Points the new developer to the existing documentation for development workflows. This includes contributing code through branches, making commits, opening pull requests, using the testing infrastructure, and identifying the points of contact for different parts of the infrastructure.
+* Acts as the primary mentor for the new developer during onboarding, helping them to get used to the system and the way things are done. The nominator should make time to answer questions and help the new developer become comfortable with day to day development tasks.
+* Helps the new developer learn the expected GitHub workflow, including when and how to create branches, make commits, open pull requests, respond to review, and, where appropriate, merge pull requests.
+* Remains involved in reviewing and guiding the new developer's contributions for an initial onboarding period of at least six months, so that the new developer receives the attention and mentorship needed to become a routine contributor to MESA.
+* Helps connect the new developer with other existing developers whose expertise or responsibilities are particularly relevant to the new developer's interests and planned areas of contribution.
+* If the new developer expects to work on backward incompatible changes, encourages them to raise those plans with the broader developer team before substantial development begins.
+* As the new developer becomes established, discusses with them whether they would like to take on additional project maintenance responsibilities. Such responsibilities are optional and are not a required part of onboarding.
+
+The relevant onboarding contacts are:
+
+* Mentor and primary onboarding contact: the nominator.
+* GitHub maintainer and contact for GitHub access: Matteo Cantiello.
+* Slack maintainer and contact for Slack access: Rich Townsend.
+* testhub maintainer and contact for testhub access: Bill Wold.
 
 Infrastructure Access for Collaborators
 ---------------------------------------
