@@ -9,204 +9,179 @@ The MESA ``colors`` module calculates synthetic photometry and bolometric quanti
 What is MESA colors?
 ====================
 
-MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L) and Surface Temperature (T_eff), the colors module computes:
+MESA colors is a runtime module that generates observer-frame photometry directly from a running stellar evolution model. At each timestep it interpolates a pre-computed stellar atmosphere grid to construct a Spectral Energy Distribution (SED) for the star's current parameters, convolves that SED with photometric filter transmission curves, and writes synthetic magnitudes and bolometric quantities to ``history.data``.
 
-* **Bolometric Magnitude** (M_bol)
-* **Bolometric Flux** (F_bol)
-* **Synthetic Magnitudes** in specific photometric filters (e.g., Johnson V, Gaia G, 2MASS J).
+The outputs are:
 
-This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
+* **Mag_bol** — bolometric magnitude, derived directly from the stellar luminosity
+* **Flux_bol** — bolometric flux at the specified distance
+* **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (diagnostic for interpolation quality)
+* **One column per filter** — synthetic magnitude in every filter listed in the instrument index file, named by the filter filename (``*.dat`` suffix stripped)
 
-How does the MESA colors module work?
-=====================================
+This is fundamentally different from the pre-existing bolometric correction (BC) interface in MESA. The old BC approach interpolates a table of pre-computed magnitude offsets. The colors module instead constructs a full SED at the stellar parameters and performs the photometry in full—there is no intermediate bolometric correction step. The old BC interface functions (``get_bc_by_name``, ``get_abs_mag_by_id``, etc.) are retained as stubs in ``colors_lib.f90`` that return ``-99.9`` solely to satisfy the MESA interface; they are not called by the colors module itself.
 
-1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (T_eff), Surface Gravity (log g), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
+How it works
+============
 
-2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
+Initialisation (once per run)
+------------------------------
 
-3.  **Integration**: The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
+On startup, ``colors_setup_tables`` loads all data that will be needed at runtime:
 
-Inlist Options & Parameters
-===========================
+1. **Atmosphere grid** — reads ``lookup_table.csv`` from the ``stellar_atm`` directory. This maps every SED filename in the grid to its (T_eff, log g, [M/H]) coordinates. Unique sorted grids and an O(1) ``grid_to_lu`` index map are built from this table.
 
-The colors module is controlled via the ``&colors`` namelist. Below is a detailed guide to the key parameters.
+2. **Flux cube** — attempts to load ``flux_cube.bin``, a pre-built 4D binary array of shape ``(n_T_eff, n_log_g, n_[M/H], n_λ)``. If the allocation succeeds, the entire atmosphere grid is held in RAM and all subsequent interpolation is done in memory. If the allocation fails (insufficient RAM), the module falls back to the per-file stencil path described below.
 
-use_colors
-----------
+3. **Filter transmission curves** — loads every ``*.dat`` file listed in the instrument index file. Each filter's wavelength and transmission arrays are stored on the handle.
 
-**Default:** ``.false.``
+4. **Zero-points** — for each filter, all three zero-points (Vega, AB, ST) are computed once from the filter transmission and the Vega reference SED (``vega_sed``). The selected zero-point is then looked up at runtime rather than recomputed.
 
-Master switch for the module. Must be set to ``.true.`` to enable any photometric output.
+Per-timestep computation
+-------------------------
 
-**Example:**
+At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d.
 
-.. code-block:: fortran
+**Step 1 — SED interpolation**
 
-   use_colors = .true.
+The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. Two paths exist:
 
+* **Flux cube path** (preferred): hermite tensor interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
+* **Stencil fallback path** (low-RAM): an extended neighbourhood of SED files around the current grid cell is loaded on demand. Individual SED files are served from a bounded memory cache (256-slot circular buffer, ``sed_mem_cache_cap`` in ``colors_def.f90``) to avoid redundant disk reads. The stencil is invalidated and reloaded whenever the star moves into a new grid cell.
 
-instrument
-----------
+**Step 2 — Distance dilution**
 
-**Default:** ``'data/colors_data/filters/Generic/Johnson'``
+The surface flux is scaled to the observer:
 
-Path to the filter instrument directory, structured as ``facility/instrument``.
+.. code-block:: text
 
-* The directory must contain an index file with the same name as the instrument
-  (e.g., ``Johnson``), listing one filter filename per line.
-* The module loads every ``.dat`` transmission curve listed in that index and
-  creates a corresponding history column for each.
+   F_observed(λ) = F_surface(λ) × (R / d)²
 
-.. rubric:: Note on paths
+where R is the stellar radius and d is ``distance`` (default 10 pc, giving absolute magnitudes).
 
-All path parameters (``instrument``, ``stellar_atm``, ``vega_sed``) are resolved
-using the same logic:
+**Step 3 — Bolometric quantities**
 
-* ``'data/colors_data/...'`` — no leading slash; ``$MESA_DIR`` is prepended. This
-  is the recommended form for all standard data paths.
-* ``'/absolute/path/...'`` — tested on disk first; if found, used as-is. If not
-  found, ``$MESA_DIR`` is prepended (preserves backwards compatibility).
-* ``'./local/path/...'`` or ``'../up/one/...'`` — used exactly as supplied,
-  relative to the MESA working directory.
+The bolometric flux is obtained by integrating the diluted SED over all wavelengths using adaptive Simpson's rule (falling back to the trapezoid rule for even-length arrays). The bolometric magnitude follows from the standard relation using the solar bolometric absolute magnitude.
 
-**Example:**
+**Step 4 — Synthetic photometry**
 
-.. code-block:: fortran
+For each filter, the in-band flux is computed by integrating the product of the diluted SED and the filter transmission curve:
 
-   instrument = 'data/colors_data/filters/GAIA/GAIA'
+.. code-block:: text
 
+   F_band = ∫ F_observed(λ) × T(λ) dλ  /  ∫ T(λ) dλ
 
-stellar_atm
------------
+The synthetic magnitude is then:
 
-**Default:** ``'data/colors_data/stellar_models/Kurucz2003all/'``
+.. code-block:: text
 
-Path to the directory containing the grid of stellar atmosphere models. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute. This directory must contain:
+   m = -2.5 × log10(F_band / F_zp)
 
-1.  **lookup_table.csv**: A map linking filenames to physical parameters (T_eff, log g, [M/H]).
-2.  **SED files**: The actual spectra (text or binary format).
-3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
+where F_zp is the precomputed zero-point for the selected magnitude system (Vega, AB, or ST).
 
-The module queries this grid using the star's current parameters. If the star evolves outside the grid boundaries, the module will clamp to the nearest edge.
+If the star's parameters fall outside the atmosphere grid, the module clamps to the nearest grid boundary. The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point.
 
-**Example:**
+Source files
+============
 
-.. code-block:: fortran
+.. code-block:: text
 
-   stellar_atm = 'data/colors_data/stellar_models/sg-SPHINX/'
+   colors/
+   ├── public/
+   │   ├── colors_def.f90       — data structures (Colors_General_Info, filter_data),
+   │   │                          handle management, memory layout
+   │   └── colors_lib.f90       — public API: colors_init, colors_shutdown,
+   │                              alloc_colors_handle, colors_setup_tables,
+   │                              history column interface, legacy BC stubs
+   ├── private/
+   │   ├── bolometric.f90       — bolometric magnitude and flux calculation
+   │   ├── synthetic.f90        — per-filter convolution and magnitude calculation,
+   │   │                          SED CSV output (make_csv / sed_per_model)
+   │   ├── hermite_interp.f90   — hermite tensor interpolation (cube path)
+   │   ├── linear_interp.f90    — trilinear interpolation (cube path fallback)
+   │   ├── knn_interp.f90       — k-nearest-neighbour interpolation
+   │   ├── colors_utils.f90     — I/O (SED, filter, lookup table, flux cube),
+   │   │                          numerical integration, flux dilution,
+   │   │                          stencil and SED memory cache management
+   │   ├── colors_history.f90   — MESA history column interface
+   │   ├── colors_ctrls_io.f90  — &colors namelist I/O
+   │   └── colors_iteration.f90 — Newton iteration monitor hook
+   └── defaults/
+       └── colors.defaults      — default values for all &colors parameters
 
+File Formats
+============
 
-distance
---------
+All file formats used by the module are plain text or simple unformatted binary, with no external library dependencies.
 
-**Default:** ``3.0857d19`` (10 parsecs in cm)
+lookup_table.csv
+----------------
 
-The distance to the star in centimetres, used to convert surface flux to observed flux.
+A CSV file located at ``<stellar_atm>/lookup_table.csv``. One row per atmosphere model in the grid. Column names are read from the header and matched by name, so column order is flexible. The required columns are:
 
-* **Default Behaviour:** At 10 parsecs (3.0857 * 10^19 cm) the output is **Absolute Magnitudes**.
-* **Custom Usage:** Set this to a specific source distance to calculate Apparent Magnitudes.
+.. code-block:: text
 
-**Example:**
+   filename, Teff, logg, MH
 
-.. code-block:: fortran
+where ``filename`` is the path to the SED file relative to the ``stellar_atm`` directory, ``Teff`` is in Kelvin, ``logg`` is log₁₀(g / cm s⁻²), and ``MH`` is [M/H].
 
-   distance = 5.1839d20
+SED files (atmosphere grid)
+----------------------------
 
+Plain two-column text files, one row per wavelength point:
 
-make_csv
---------
+.. code-block:: text
 
-**Default:** ``.false.``
+   wavelength(Å)   flux(erg/s/cm²/Å)
 
-If set to ``.true.``, the module exports the full calculated SED at every profile interval.
+No header is required. All SED files within a given atmosphere grid must share the same wavelength grid; if they do not (e.g. BT-Settl), the stencil loader will interpolate non-conforming files onto the canonical wavelength grid of the first file loaded.
 
-* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
-* **Format:** CSV files containing Wavelength vs. Flux.
-* **Use Case:** Useful for debugging or plotting the full spectrum of the star at a specific evolutionary age.
-
-**Example:**
-
-.. code-block:: fortran
-
-   make_csv = .true.
-
-
-
-colors_results_directory
-------------------------
-
-**Default:** ``'SED'``
-
-The folder where CSV files (if ``make_csv = .true.``) and other outputs are saved.
-
-**Example:**
-
-.. code-block:: fortran
-
-   colors_results_directory = 'sed'
-
-
-mag_system
-----------
-
-**Default:** ``'Vega'``
-
-Defines the zero-point system for magnitude calculations. Options are:
-
-* ``'AB'``: Based on a flat spectral flux density of 3631 Jy.
-* ``'ST'``: Based on a flat spectral flux density per unit wavelength.
-* ``'Vega'``: Calibrated such that Vega has magnitude 0 in all bands.
-
-**Example:**
-
-.. code-block:: fortran
-
-   mag_system = 'AB'
-
-
-vega_sed
---------
-
-**Default:** ``'data/colors_data/stellar_models/vega_flam.csv'``
-
-Required only if ``mag_system = 'Vega'``. Points to the reference SED file for Vega, used to compute photometric zero-points. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute.
-
-**Example:**
-
-.. code-block:: fortran
-
-   vega_sed = '/path/to/my/vega_SED.csv'
-
-sed_per_model
+flux_cube.bin
 -------------
 
-**Default:** ``.false.``
+An unformatted Fortran binary file produced by SED_Tools. It encodes the full atmosphere grid as a contiguous 4D array ``(n_Teff, n_logg, n_MH, n_λ)`` plus the corresponding axis coordinate arrays. Loading this file at startup eliminates all per-timestep disk I/O for the flux cube path. The file is optional; if absent, the module uses the stencil fallback path.
 
-Requires ``make_csv = .true.``. If set to ``.true.``, each exported SED file is stamped with the model number, preserving one SED file per model rather than overwriting a single file.
+Filter files (.dat)
+-------------------
 
-.. warning::
+Two-column text files, one row per wavelength point. Lines beginning with ``#`` are treated as comments and skipped:
 
-   Enabling this feature will cause the ``colors_results_directory`` to grow very rapidly. Do not enable it without first ensuring you have sufficient storage.
+.. code-block:: text
 
-* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
-* **Format:** CSV files containing Wavelength vs. Flux, with the model number as a filename suffix.
-* **Use Case:** Useful for tracking the full SED evolution of the star over time.
+   # optional comment lines
+   wavelength(Å)   transmission(0–1)
 
-**Example:**
+The instrument directory must also contain an index file whose name matches the instrument (e.g. ``Johnson``), listing one filter filename per line. The module loads every filter listed in this index.
 
-.. code-block:: fortran
+Vega reference SED (vega_flam.csv)
+------------------------------------
 
-   sed_per_model = .true.
+A two-column CSV with a single header line:
 
+.. code-block:: text
+
+   wavelength,flux
+   ...
+
+Wavelengths in Å, flux in erg/s/cm²/Å. Only the first two columns are read; additional columns are ignored. This file is required when ``mag_system = 'Vega'`` and is used solely to precompute filter zero-points at initialisation.
+
+SED output files (make_csv)
+----------------------------
+
+When ``make_csv = .true.``, the module writes one CSV file per profile interval to ``colors_results_directory``. Each file contains the diluted (observer-frame) SED at that timestep:
+
+.. code-block:: text
+
+   wavelength(Å),flux(erg/s/cm²/Å)
+
+If ``sed_per_model = .true.``, filenames are suffixed with the model number (e.g. ``SED_00042.csv``); otherwise the same filename is overwritten at each interval.
 
 Data Preparation (SED_Tools)
 ============================
 
-The ``colors`` module requires pre-processed stellar atmospheres and filter
-profiles organised in a specific directory structure. To automate this
-entire workflow, we provide the dedicated repository:
-
-**Repository:** `SED_Tools <https://github.com/nialljmiller/SED_Tools>`_
+The ``colors`` module requires pre-processed stellar atmosphere grids and filter
+profiles organised in a specific directory structure. The dedicated repository
+`SED_Tools <https://github.com/nialljmiller/SED_Tools>`_ automates this entire
+workflow.
 
 SED_Tools downloads, validates, and converts raw spectral atmosphere grids and
 filter transmission curves from the following public archives:
@@ -215,84 +190,25 @@ filter transmission curves from the following public archives:
 * `MAST BOSZ Stellar Atmosphere Library <https://archive.stsci.edu/prepds/bosz/>`_
 * `MSG / Townsend Atmosphere Grids <https://www.astro.wisc.edu/~townsend/msg/>`_
 
-These sources provide heterogeneous formats and file organisations. SED_Tools
-standardises them into the exact structure required by MESA:
-
-* ``lookup_table.csv``
-* Raw SED files (text and/or HDF5)
-* ``flux_cube.bin`` (binary cube for fast interpolation)
-* Filter index files and ``*.dat`` transmission curves
-
-SED_Tools produces:
+SED_Tools standardises these heterogeneous sources into the directory structure
+and file formats required by MESA:
 
 .. code-block:: text
 
     data/
     ├── stellar_models/<ModelName>/
-    │   ├── flux_cube.bin
     │   ├── lookup_table.csv
-    │   ├── *.txt / *.h5
+    │   ├── flux_cube.bin
+    │   └── *.txt / *.h5
     └── filters/<Facility>/<Instrument>/
-        ├── *.dat
-        └── <Instrument>
+        ├── <Instrument>        ← index file
+        └── *.dat
 
-These directories can be copied or symlinked directly into your MESA
-installation.
+The resulting ``data/`` tree can be copied or symlinked directly into
+``$MESA_DIR``, after which the default path values in ``colors.defaults`` will
+resolve correctly without any further configuration.
 
-A browsable online mirror of the processed SED_Tools output is also available:
-
-`SED Tools Web Interface (mirror) <https://nillmill.ddns.net/sed_tools/>`_
-
-This server provides a live view of:
-
-* All downloaded stellar atmosphere grids
-* All available filter facilities and instruments
-* File counts, disk usage, and metadata
-* Direct links to the directory structure used by MESA
-
-
-Defaults Reference
-==================
-
-Below are the default values for all user-facing ``colors`` module parameters as defined in ``colors.defaults``.
-
-.. code-block:: fortran
-
-      use_colors = .false.
-      instrument = 'data/colors_data/filters/Generic/Johnson'
-      stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
-      vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
-      distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
-      make_csv = .false.
-      colors_results_directory = 'SED'
-      mag_system = 'Vega'
-      sed_per_model = .false.
-
-Visual Summary of Data Flow
-===========================
-
-.. code-block:: text
-
-   +----------------+
-   |   MESA Model   |
-   | (Teff, logg, Z)|
-   +----------------+
-           |
-           v
-   +-------------------------------------------------------------------------+
-   |                        MESA COLORS MODULE                               |
-   | 1. Query Stellar Atmosphere Grid with input model                       |
-   | 2. Interpolate grid to construct specific SED                           |
-   | 3. Convolve SED with filters to generate band flux                      |
-   | 4. Apply distance flux dilution to generate bolometric flux -> Flux_bol |
-   | 5. Apply zero point (Vega/AB/ST) to generate magnitudes                 |
-   |                                    (Both bolometric and per filter)     |
-   +-------------------------------------------------------------------------+
-           |
-           v
-   +----------------------+
-   |    history.data      |
-   | age, Teff, ...       |
-   | Mag_bol, Flux_bol    |
-   | V, B, I, ...         |
-   +----------------------+
+A browsable mirror of the processed SED_Tools output is available at
+`https://nillmill.ddns.net/sed_tools/ <https://nillmill.ddns.net/sed_tools/>`_,
+providing a live view of all available atmosphere grids and filter facilities
+along with file counts, disk usage, and metadata.
