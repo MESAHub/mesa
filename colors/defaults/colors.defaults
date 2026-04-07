@@ -17,7 +17,9 @@
 
    ! ``stellar_atm``
    ! ~~~~~~~~~~~~~~~
-   ! Path to the stellar atmosphere model grid directory.
+   ! Path to the directory containing the stellar atmosphere lookup table and
+   ! spectra used by the colors module. The default
+   ! uses the ``Kurucz2003all`` ATLAS9 atmosphere grid shipped with MESA.
    ! Must contain: lookup_table.csv, SED files, and optionally flux_cube.bin.
 
    ! ``vega_sed``
@@ -67,19 +69,6 @@
       colors_results_directory = 'SED'
       mag_system = 'Vega'
       sed_per_model = .false.
-
-
-   ! ``stellar_atm``
-   ! ~~~~~~~~~~~~~~~
-
-   ! Path to the directory containing the stellar atmosphere lookup table and
-   ! spectra used by the colors module. This directory should contain a
-   ! ``lookup_table.csv`` file and the corresponding SED files. The default
-   ! uses the ``Kurucz2003all`` ATLAS9 atmosphere grid shipped with MESA.
-   
-   ! ::
-
-      stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
 
 
    ! ``z_over_x_ref``
