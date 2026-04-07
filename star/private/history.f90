@@ -290,7 +290,7 @@ contains
          end if
 
          call data_for_colors_history_columns(s%T(1), log10(s%grav(1)), s%R(1), m_div_h, &
-            s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
+            s% model_number, s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
          if (ierr /= 0) then
             call dealloc
             return
