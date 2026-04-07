@@ -12,8 +12,15 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 
 # Import functions from static version for consistency
-from static_HISTORY_check import MesaView  # get_mesa_phase_info,
-from static_HISTORY_check import read_header_columns, setup_hr_diagram_params
+from plot_history import MesaView  # get_mesa_phase_info,
+from plot_history import read_header_columns, setup_hr_diagram_params
+
+
+NEWTON_ITER_PATHS = [
+    "../SED/iteration_colors.data",
+    "SED/iteration_colors.data",
+    "iteration_colors.data",
+]
 
 
 def age_colormap_colors(ages, cmap_name="inferno", recent_fraction=0.25, stretch=5.0):
@@ -163,8 +170,11 @@ class HistoryChecker:
         )
 
         self.update_flag = 0
+        self._iter_warn_issued = False
         # Initial setup
         self.filter_columns = []
+        self.iter_col_names = None
+        self.iter_data = None
         self.phases = []
         self.phase_colors = []
         self.filter_colors = []
@@ -267,6 +277,95 @@ class HistoryChecker:
         except Exception as e:
             print(f"Error reading history data: {e}")
 
+        self.load_newton_iter_data()
+
+    def load_newton_iter_data(self):
+        """Try to load Newton iteration data from the Colors SED output.
+        Sets self.iter_col_names / self.iter_data, or None if unavailable.
+        Warns once to terminal if the file cannot be found."""
+        for path in NEWTON_ITER_PATHS:
+            if os.path.exists(path):
+                try:
+                    with open(path, "r") as f:
+                        header = f.readline().strip()
+                    if header.startswith("#"):
+                        header = header[1:].strip()
+                    col_names = header.split()
+                    data = np.loadtxt(path, comments="#")
+                    if data.ndim == 1:
+                        data = data.reshape(1, -1)
+                    self.iter_col_names = col_names
+                    self.iter_data = data
+                    return
+                except Exception as e:
+                    if not self._iter_warn_issued:
+                        print(f"Warning: found {path} but failed to load Newton iteration data: {e}")
+                        self._iter_warn_issued = True
+                    self.iter_col_names = None
+                    self.iter_data = None
+                    return
+        if not self._iter_warn_issued:
+            print("Warning: Newton iteration data not found "
+                  "(searched SED/iteration_colors.data). Skipping overlay.")
+            self._iter_warn_issued = True
+        self.iter_col_names = None
+        self.iter_data = None
+
+    def get_iter_col(self, name):
+        """Return a column array from the iteration data by column name, or None."""
+        if self.iter_col_names is None or self.iter_data is None:
+            return None
+        try:
+            idx = self.iter_col_names.index(name)
+            return self.iter_data[:, idx]
+        except (ValueError, IndexError):
+            return None
+
+    def overlay_newton_iters(self, ax, x_data, y_data, label="Newton iter"):
+        """Overlay Newton iteration points on an axis if both arrays are non-None."""
+        if x_data is None or y_data is None:
+            return
+        x = np.asarray(x_data, dtype=float)
+        y = np.asarray(y_data, dtype=float)
+        mask = np.isfinite(x) & np.isfinite(y)
+        if not np.any(mask):
+            return
+        ax.scatter(
+            x[mask], y[mask],
+            marker="x", s=40, linewidths=1.5,
+            color="orange", alpha=0.85, label=label, zorder=5,
+        )
+
+    def resolve_iter_color_index(self):
+        """Attempt to compute the same color index used for hr_color from iteration data.
+        Parses hr_xlabel (e.g. 'B-V') into two filter column names and subtracts them."""
+        xlabel = getattr(self, "hr_xlabel", "")
+        # Strip surrounding parens if present
+        xlabel = xlabel.strip("()")
+        if "-" not in xlabel:
+            return None
+        parts = xlabel.split("-", 1)
+        col_a = self.get_iter_col(parts[0].strip())
+        col_b = self.get_iter_col(parts[1].strip())
+        if col_a is None or col_b is None:
+            return None
+        return col_a - col_b
+
+    def resolve_iter_hr_mag(self):
+        """Attempt to get the hr magnitude column from iteration data using hr_ylabel."""
+        ylabel = getattr(self, "hr_ylabel", "")
+        # ylabel might be e.g. "V" or "Mv" — try direct lookup
+        col = self.get_iter_col(ylabel.strip())
+        if col is not None:
+            return col
+        # Also strip common magnitude prefixes
+        for prefix in ("M_", "Mv", "m_"):
+            stripped = ylabel.replace(prefix, "").strip()
+            col = self.get_iter_col(stripped)
+            if col is not None:
+                return col
+        return None
+
     def create_phase_legend(self):
         unique_phases, unique_colors = [], []
         for phase, color in zip(self.phases, self.phase_colors):
@@ -336,6 +435,13 @@ class HistoryChecker:
         else:
             self.axes[0, 0].plot(self.hr_color, self.hr_mag, "go")
 
+        # Overlay Newton iteration data on HR diagram
+        self.overlay_newton_iters(
+            self.axes[0, 0],
+            self.resolve_iter_color_index(),
+            self.resolve_iter_hr_mag(),
+        )
+
         # Top-right plot: Teff vs. Log_L with phase colors
         if len(self.phases) > 0:
             self.axes[0, 1].plot(
@@ -358,6 +464,13 @@ class HistoryChecker:
             )
         else:
             self.axes[0, 1].plot(self.Teff, self.Log_L, "go")
+
+        # Overlay Newton iteration data on Teff vs log_L
+        self.overlay_newton_iters(
+            self.axes[0, 1],
+            self.get_iter_col("Teff"),
+            self.get_iter_col("log_L"),
+        )
 
         # Bottom-left plot: Age vs. Color Index with phase colors
         if len(self.phases) > 0:
