@@ -24,10 +24,15 @@
 ! a known-good state of the code.  run via ./ck, which invokes ./rn and
 ! compares stdout against test_output using ndiff -relerr 1.0e-6.
 !
-! three stellar test cases are exercised:
+! group 1 - representative stellar types:
 !   solar      Teff = 5778 K,  log g = 4.44,  [M/H] = 0.0
 !   hot_ms     Teff = 15000 K, log g = 4.00,  [M/H] = 0.0
 !   cool_giant Teff = 4000 K,  log g = 2.00,  [M/H] = 0.0
+!
+! group 2 - grid sweeps (exercises each table dimension independently):
+!   vary [M/H]:  Teff = 5778, log g = 4.44, [M/H] = -2.0, -1.0, 0.0, 0.5
+!   vary log g:  Teff = 5778, [M/H] = 0.0,  log g = 1.0, 2.5, 4.0, 5.0
+!   vary Teff:   log g = 4.0, [M/H] = 0.0,  Teff = 3500, 6000, 10000, 20000
 
 program test_colors
 
@@ -44,25 +49,57 @@ program test_colors
 
    implicit none
 
+   ! -----------------------------------------------------------------------
+   ! group 1: representative stellar types
+   ! -----------------------------------------------------------------------
+
    integer, parameter :: n_cases = 3
 
-   ! stellar parameters for each test case
-   real(dp), parameter :: test_teff(n_cases) = [5778d0,   15000d0,  4000d0 ]
-   real(dp), parameter :: test_logg(n_cases) = [4.44d0,   4.0d0,    2.0d0  ]
-   real(dp), parameter :: test_meta(n_cases) = [0.0d0,    0.0d0,    0.0d0  ]
+   real(dp), parameter :: test_teff(n_cases) = [5778d0,   15000d0,  4000d0  ]
+   real(dp), parameter :: test_logg(n_cases) = [4.44d0,   4.0d0,    2.0d0   ]
+   real(dp), parameter :: test_meta(n_cases) = [0.0d0,    0.0d0,    0.0d0   ]
    real(dp), parameter :: test_R(n_cases)    = [rsun,     5d0*rsun, 20d0*rsun]
-
-   ! 10 parsecs in cm -> absolute magnitudes
-   real(dp), parameter :: d_10pc = 3.0857d19
 
    character(len=12), parameter :: labels(n_cases) = &
       ['solar       ', 'hot_ms      ', 'cool_giant  ']
+
+   ! -----------------------------------------------------------------------
+   ! group 2a: fixed Teff=5778, fixed log g=4.44, varying [M/H]
+   ! -----------------------------------------------------------------------
+
+   integer, parameter :: n_meta = 4
+
+   real(dp), parameter :: sweep_meta(n_meta) = [-2.0d0, -1.0d0, 0.0d0, 0.5d0]
+
+   ! -----------------------------------------------------------------------
+   ! group 2b: fixed Teff=5778, fixed [M/H]=0.0, varying log g
+   ! -----------------------------------------------------------------------
+
+   integer, parameter :: n_logg = 4
+
+   real(dp), parameter :: sweep_logg(n_logg) = [1.0d0, 2.5d0, 4.0d0, 5.0d0]
+
+   ! -----------------------------------------------------------------------
+   ! group 2c: fixed log g=4.0, fixed [M/H]=0.0, varying Teff
+   ! -----------------------------------------------------------------------
+
+   integer, parameter :: n_teff = 4
+
+   real(dp), parameter :: sweep_teff(n_teff) = [3500d0, 6000d0, 10000d0, 20000d0]
+
+   ! -----------------------------------------------------------------------
+   ! shared
+   ! -----------------------------------------------------------------------
+
+   ! 10 parsecs in cm -> absolute magnitudes
+   real(dp), parameter :: d_10pc = 3.0857d19
 
    ! number of sampled SED points printed for the SED comparison
    integer, parameter :: n_sed_samples = 20
 
    character(len=32) :: my_mesa_dir
    integer :: handle, ierr, n_cols, i, j, k
+   integer :: model_num
    type(Colors_General_Info), pointer :: cs
    character(len=80), allocatable :: col_names(:)
    real(dp), allocatable :: col_vals(:)
@@ -117,21 +154,83 @@ program test_colors
    end if
 
    allocate(col_names(n_cols), col_vals(n_cols))
+   model_num = 0
 
    ! -----------------------------------------------------------------------
-   ! magnitude comparison
+   ! group 1: representative stellar types
    ! -----------------------------------------------------------------------
 
-   write(*,'(a)') '# magnitudes  system=Vega  grid=Kurucz2003  filters=Johnson'
+   write(*,'(a)') '# group1  system=Vega  grid=Kurucz2003  filters=Johnson'
    do j = 1, n_cases
+      model_num = model_num + 1
       call data_for_colors_history_columns( &
-         test_teff(j), test_logg(j), test_R(j), test_meta(j), j, &
+         test_teff(j), test_logg(j), test_R(j), test_meta(j), model_num, &
          handle, n_cols, col_names, col_vals, ierr)
       if (ierr /= 0) then
-         write(*,*) 'data_for_colors_history_columns failed, case', j, ', ierr =', ierr
+         write(*,*) 'data_for_colors_history_columns failed, group1 case', j, ', ierr =', ierr
          stop 1
       end if
       write(*,'(a, a)') '# case: ', trim(adjustl(labels(j)))
+      do k = 1, n_cols
+         write(*,'(a40, 1pe26.16)') trim(col_names(k)), col_vals(k)
+      end do
+   end do
+
+   ! -----------------------------------------------------------------------
+   ! group 2a: vary [M/H]
+   ! -----------------------------------------------------------------------
+
+   write(*,'(a)') '# group2a  vary_MH  Teff=5778  logg=4.44'
+   do j = 1, n_meta
+      model_num = model_num + 1
+      call data_for_colors_history_columns( &
+         5778d0, 4.44d0, rsun, sweep_meta(j), model_num, &
+         handle, n_cols, col_names, col_vals, ierr)
+      if (ierr /= 0) then
+         write(*,*) 'data_for_colors_history_columns failed, group2a case', j, ', ierr =', ierr
+         stop 1
+      end if
+      write(*,'(a, f6.2)') '# MH= ', sweep_meta(j)
+      do k = 1, n_cols
+         write(*,'(a40, 1pe26.16)') trim(col_names(k)), col_vals(k)
+      end do
+   end do
+
+   ! -----------------------------------------------------------------------
+   ! group 2b: vary log g
+   ! -----------------------------------------------------------------------
+
+   write(*,'(a)') '# group2b  vary_logg  Teff=5778  MH=0.0'
+   do j = 1, n_logg
+      model_num = model_num + 1
+      call data_for_colors_history_columns( &
+         5778d0, sweep_logg(j), rsun, 0.0d0, model_num, &
+         handle, n_cols, col_names, col_vals, ierr)
+      if (ierr /= 0) then
+         write(*,*) 'data_for_colors_history_columns failed, group2b case', j, ', ierr =', ierr
+         stop 1
+      end if
+      write(*,'(a, f6.2)') '# logg= ', sweep_logg(j)
+      do k = 1, n_cols
+         write(*,'(a40, 1pe26.16)') trim(col_names(k)), col_vals(k)
+      end do
+   end do
+
+   ! -----------------------------------------------------------------------
+   ! group 2c: vary Teff
+   ! -----------------------------------------------------------------------
+
+   write(*,'(a)') '# group2c  vary_Teff  logg=4.0  MH=0.0'
+   do j = 1, n_teff
+      model_num = model_num + 1
+      call data_for_colors_history_columns( &
+         sweep_teff(j), 4.0d0, rsun, 0.0d0, model_num, &
+         handle, n_cols, col_names, col_vals, ierr)
+      if (ierr /= 0) then
+         write(*,*) 'data_for_colors_history_columns failed, group2c case', j, ', ierr =', ierr
+         stop 1
+      end if
+      write(*,'(a, f10.1)') '# Teff= ', sweep_teff(j)
       do k = 1, n_cols
          write(*,'(a40, 1pe26.16)') trim(col_names(k)), col_vals(k)
       end do
