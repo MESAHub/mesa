@@ -21,6 +21,10 @@
    ! spectra used by the colors module. The default
    ! uses the ``Kurucz2003all`` ATLAS9 atmosphere grid shipped with MESA.
    ! Must contain: lookup_table.csv, SED files, and optionally flux_cube.bin.
+   !Castelli & Kurucz 2003 -- https://arxiv.org/abs/astro-ph/0405087
+   !SVO model -- https://svo2.cab.inta-csic.es/theory/newov2/index.php?models=Kurucz2003all
+
+
 
    ! ``vega_sed``
    ! ~~~~~~~~~~~~
