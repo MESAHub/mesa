@@ -121,12 +121,52 @@ Path to the directory containing the grid of stellar atmosphere models. Paths ma
 
 The module queries this grid using the star's current parameters. If the star evolves outside the grid boundaries, the module will clamp to the nearest edge.
 
+No header is required. All SED files within a given atmosphere grid must share the same wavelength grid; if they do not (e.g. BT-Settl), the stencil loader will interpolate non-conforming files onto the canonical wavelength grid of the first file loaded.
+
+The colors data ships with the Kurucz2003 models for solar alpha and alpha = 0.4.
+
+Spectral Grid Variants
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 24 8 10 18 16 16 20
+   :header-rows: 1
+
+   * - Name
+     - [α/Fe]
+     - N Spectra
+     - Teff (K)
+     - logg
+     - [M/H]
+     - Wavelength (Å)
+   * - Kurucz2003all
+     - 0.0
+     - 3808
+     - 3500-50000 (76 pt)
+     - 0.00-5.00 (11 pt)
+     - -2.50-0.50 (8 pt)
+     - 147-1600000 (1199 pt)
+   * - Kurucz2003all__alpha_04
+     - 0.4
+     - 4284
+     - 3500-50000 (76 pt)
+     - 0.00-5.00 (11 pt)
+     - -4.00-0.50 (9 pt)
+     - 147-1600000 (1199 pt)
+
+**[α/Fe]** is the alpha-element enhancement - the abundance of O, Ne, Mg, Si, S, Ar, Ca, and Ti relative to iron compared to solar.
+A value of 0.4 means those elements are enhanced by 0.4 dex above solar relative to iron.
+The alpha-enhanced grid goes down to lower metallicity (-4.00 vs -2.50) because alpha-enhanced stars are usually old, metal-poor Pop II stars.
+
+`Castelli & Kurucz 2003 <https://arxiv.org/abs/astro-ph/0405087>`__
+
+`SVO model <https://svo2.cab.inta-csic.es/theory/newov2/index.php?models=Kurucz2003all>`__
+
 **Example:**
 
 .. code-block:: fortran
 
    stellar_atm = 'data/colors_data/stellar_models/sg-SPHINX/'
-
 
 distance
 --------
