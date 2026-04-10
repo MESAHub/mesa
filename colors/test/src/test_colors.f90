@@ -172,7 +172,7 @@ program test_colors
       end if
       write(*,'(a, a)') '# case: ', trim(adjustl(labels(j)))
       do k = 1, n_cols
-         write(*,'(a40, 1pe24.14)') trim(col_names(k)), col_vals(k)
+         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -192,7 +192,7 @@ program test_colors
       end if
       write(*,'(a, f6.2)') '# MH= ', sweep_meta(j)
       do k = 1, n_cols
-         write(*,'(a40, 1pe24.14)') trim(col_names(k)), col_vals(k)
+         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -212,7 +212,7 @@ program test_colors
       end if
       write(*,'(a, f6.2)') '# logg= ', sweep_logg(j)
       do k = 1, n_cols
-         write(*,'(a40, 1pe24.14)') trim(col_names(k)), col_vals(k)
+         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -232,7 +232,7 @@ program test_colors
       end if
       write(*,'(a, f10.1)') '# Teff= ', sweep_teff(j)
       do k = 1, n_cols
-         write(*,'(a40, 1pe24.14)') trim(col_names(k)), col_vals(k)
+         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -250,7 +250,7 @@ program test_colors
 
    write(*,'(a)') '# SED sample  case=solar  columns=wavelength_AA  flux_erg_s_cm2_AA'
    do i = 1, n_wav, stride
-      write(*,'(1pe24.14, 1x, 1pe24.14)') wavelengths(i), fluxes(i)
+      write(*,'(1pe23.13, 1x, 1pe23.13)') wavelengths(i), fluxes(i)
    end do
 
    ! -----------------------------------------------------------------------
