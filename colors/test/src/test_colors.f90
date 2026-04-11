@@ -44,8 +44,9 @@ program test_colors
       how_many_colors_history_columns, data_for_colors_history_columns, &
       calculate_bolometric
    use colors_def, only: Colors_General_Info
-   use const_def,  only: dp, rsun, mesa_dir
+   use const_def,  only: dp, rsun, boltz_sigma
    use utils_lib,  only: mesa_error
+   use colors_utils, only: resolve_path
 
    implicit none
 
@@ -96,6 +97,11 @@ program test_colors
 
    ! number of sampled SED points printed for the SED comparison
    integer, parameter :: n_sed_samples = 20
+
+   ! require the integrated SED flux to stay close to sigma*T^4 scaled to
+   ! the test distance. large deficits usually mean the wavelength coverage
+   ! is missing too much UV or IR flux.
+   real(dp), parameter :: bol_flux_rel_tol = 5d-3
 
    character(len=32) :: my_mesa_dir
    integer :: handle, ierr, n_cols, i, j, k
@@ -160,7 +166,7 @@ program test_colors
    ! group 1: representative stellar types
    ! -----------------------------------------------------------------------
 
-   write(*,'(a)') '# group1  system=Vega  grid=Kurucz2003  filters=Johnson'
+   call write_section_header('# Group1  system=Vega  grid=Kurucz2003  filters=Johnson')
    do j = 1, n_cases
       model_num = model_num + 1
       call data_for_colors_history_columns( &
@@ -180,7 +186,7 @@ program test_colors
    ! group 2a: vary [M/H]
    ! -----------------------------------------------------------------------
 
-   write(*,'(a)') '# group2a  vary_MH  Teff=5778  logg=4.44'
+   call write_section_header('# Group2a  vary_MH  Teff=5778  logg=4.44')
    do j = 1, n_meta
       model_num = model_num + 1
       call data_for_colors_history_columns( &
@@ -200,7 +206,7 @@ program test_colors
    ! group 2b: vary log g
    ! -----------------------------------------------------------------------
 
-   write(*,'(a)') '# group2b  vary_logg  Teff=5778  MH=0.0'
+   call write_section_header('# Group2b  vary_logg  Teff=5778  MH=0.0')
    do j = 1, n_logg
       model_num = model_num + 1
       call data_for_colors_history_columns( &
@@ -220,7 +226,7 @@ program test_colors
    ! group 2c: vary Teff
    ! -----------------------------------------------------------------------
 
-   write(*,'(a)') '# group2c  vary_Teff  logg=4.0  MH=0.0'
+   call write_section_header('# Group2c  vary_Teff  logg=4.0  MH=0.0')
    do j = 1, n_teff
       model_num = model_num + 1
       call data_for_colors_history_columns( &
@@ -236,11 +242,14 @@ program test_colors
       end do
    end do
 
+   sed_filepath = trim(resolve_path(cs%stellar_atm))
+
    ! -----------------------------------------------------------------------
-   ! SED comparison: solar case, n_sed_samples evenly spaced wavelength/flux
+   ! group 3: solar SED sample plus wavelength-coverage sanity checks
    ! -----------------------------------------------------------------------
 
-   sed_filepath = trim(mesa_dir)//trim(cs%stellar_atm)
+   call write_section_header('# Group3  SED sample + wavelength_coverage_sanity')
+   write(*,'(a)') '# SED sample  case=solar  Teff=5778  logg=4.44  FeH=0.0  columns=wavelength_AA  flux_erg_s_cm2_AA'
    call calculate_bolometric( &
       cs, test_teff(1), test_logg(1), test_meta(1), test_R(1), d_10pc, &
       bol_mag, bol_flux, wavelengths, fluxes, sed_filepath, interp_rad)
@@ -248,9 +257,15 @@ program test_colors
    n_wav = size(wavelengths)
    stride = max(1, n_wav / n_sed_samples)
 
-   write(*,'(a)') '# SED sample  case=solar  columns=wavelength_AA  flux_erg_s_cm2_AA'
    do i = 1, n_wav, stride
       write(*,'(1pe23.13, 1x, 1pe23.13)') wavelengths(i), fluxes(i)
+   end do
+
+   write(*,'(a)') ''
+   write(*,'(a, 1pe10.2)') '# wavelength_coverage_sanity  logg=4.0  FeH=0.0  rel_tol=', bol_flux_rel_tol
+   do j = 1, n_teff
+      call check_bolometric_coverage( &
+         cs, sed_filepath, 'Teff', sweep_teff(j), 4.0d0, 0.0d0, rsun, bol_flux_rel_tol)
    end do
 
    ! -----------------------------------------------------------------------
@@ -266,4 +281,46 @@ program test_colors
 
    write(*,*) 'test_colors: passed'
 
+contains
+
+   subroutine write_section_header(title)
+      character(len=*), intent(in) :: title
+
+      write(*,'(a)') ''
+      write(*,'(a)') trim(title)
+      write(*,'(a)') ''
+   end subroutine write_section_header
+
+   subroutine check_bolometric_coverage(rq, sed_path, label, teff, log_g, metallicity, radius, rel_tol)
+      type(Colors_General_Info), intent(inout) :: rq
+      character(len=*), intent(in) :: sed_path, label
+      real(dp), intent(in) :: teff, log_g, metallicity, radius, rel_tol
+
+      real(dp), allocatable :: local_wavelengths(:), local_fluxes(:)
+      real(dp) :: local_mag, local_flux, local_interp_rad
+      real(dp) :: expected_flux, abs_err, rel_err
+
+      call calculate_bolometric( &
+         rq, teff, log_g, metallicity, radius, d_10pc, &
+         local_mag, local_flux, local_wavelengths, local_fluxes, sed_path, local_interp_rad)
+
+      expected_flux = boltz_sigma*teff**4*(radius/d_10pc)**2
+      abs_err = abs(local_flux - expected_flux)
+      rel_err = abs(local_flux - expected_flux)/expected_flux
+
+      write(*,'(a, a, a, f10.1)') '# case: ', trim(label), '=', teff
+      write(*,'(a40, 1pe23.13)') 'Wav_min_AA', minval(local_wavelengths)
+      write(*,'(a40, 1pe23.13)') 'Wav_max_AA', maxval(local_wavelengths)
+      write(*,'(a40, 1pe23.13)') 'Flux_actual', local_flux
+      write(*,'(a40, 1pe23.13)') 'Flux_expected', expected_flux
+      write(*,'(a40, 1pe23.13)') 'Flux_abserr', abs_err
+      write(*,'(a40, 1pe23.13)') 'Flux_relerr', rel_err
+
+      if (rel_err > rel_tol) then
+         write(*,'(a, a, a, 1pe11.3, a, 1pe11.3)') &
+            'wavelength coverage sanity check failed for ', trim(label), &
+            ': rel_err=', rel_err, ' > rel_tol=', rel_tol
+         stop 1
+      end if
+   end subroutine check_bolometric_coverage
 end program test_colors
