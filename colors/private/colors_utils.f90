@@ -487,6 +487,9 @@ contains
       name = path(i + 1:)
    end function basename
 
+   ! resolve a path relative to mesa_dir unless it is already explicit.
+   ! legacy colors defaults used '/data/...'; if that absolute-looking path
+   ! does not exist on disk, warn and retry relative to mesa_dir.
    function resolve_path(path) result(full_path)
       use const_def, only: mesa_dir
       character(len=*), intent(in) :: path
@@ -511,10 +514,8 @@ contains
          if (exists) then
             full_path = p
          else
-            !it might be nice to warn the user that their filepath implies absolute
-            !silently correcting this WILL lead to confusion
-            !warning every step seems a smidge over the top though
-            !write (*, *) trim(p), " not found. Trying ", trim(mesa_dir)//trim(p)
+            write (*, '(5a)') 'colors: path ', trim(p), &
+               ' not found; trying ', trim(mesa_dir)//trim(p), ' instead'
             full_path = trim(mesa_dir)//trim(p)
          end if
 
@@ -559,17 +560,19 @@ contains
    end subroutine read_strings_from_file
 
    ! load flux cube from binary file into handle at initialization.
-   ! if the file cannot be opened or the large flux_cube array cannot be
-   ! allocated, sets cube_loaded = .false. so the runtime will fall back to
-   ! loading individual SED files via the lookup table.
-   ! grids and wavelengths are always loaded (small); only the 4-D cube
-   ! allocation is treated as the fallback trigger.
+   ! if the cube is missing, malformed, or too large to allocate, keep
+   ! cube_loaded = .false. and fall back to loading individual SED files.
+   ! validate the header and on-disk size before reading the large 4-D payload
+   ! so a stale or truncated cube reports a clear message instead of failing
+   ! later inside the Fortran runtime.
    subroutine load_flux_cube(rq, stellar_model_dir)
+      use iso_fortran_env, only: int64
       type(Colors_General_Info), intent(inout) :: rq
       character(len=*), intent(in) :: stellar_model_dir
 
       character(len=512) :: bin_filename
       integer :: unit, status, n_teff, n_logg, n_meta, n_lambda
+      integer(int64) :: file_bytes, expected_bytes, header_bytes, real_bytes
       real(dp) :: cube_mb
 
       rq%cube_loaded = .false.
@@ -580,14 +583,38 @@ contains
             access='STREAM', form='UNFORMATTED', iostat=status)
       if (status /= 0) then
          ! no binary cube available -- will use individual SED files
-         write (*, '(a)') 'colors: no flux_cube.bin found; using per-file SED loading'
+         write (*, '(a)') 'colors: no flux_cube.bin found; using slower per-file SED loading'
          return
       end if
 
       read (unit, iostat=status) n_teff, n_logg, n_meta, n_lambda
       if (status /= 0) then
+         write (*, '(a)') 'colors: could not read flux_cube.bin header; falling back to slower per-file SED loading'
          close (unit)
          return
+      end if
+
+      if (n_teff <= 0 .or. n_logg <= 0 .or. n_meta <= 0 .or. n_lambda <= 0) then
+         write (*, '(a)') 'colors: invalid flux_cube.bin header; falling back to slower per-file SED loading'
+         close (unit)
+         return
+      end if
+
+      inquire (file=trim(bin_filename), size=file_bytes, iostat=status)
+      if (status == 0) then
+         header_bytes = 4_int64*int(storage_size(n_teff)/8, int64)
+         real_bytes = int(storage_size(1.0_dp)/8, int64)
+         expected_bytes = header_bytes + real_bytes*( &
+            int(n_teff, int64) + int(n_logg, int64) + int(n_meta, int64) + int(n_lambda, int64) + &
+            int(n_teff, int64)*int(n_logg, int64)*int(n_meta, int64)*int(n_lambda, int64))
+         if (file_bytes /= expected_bytes) then
+            write (*, '(a,i0,a,i0,a)') &
+               'colors: flux_cube.bin size mismatch (', file_bytes, &
+               ' bytes, expected ', expected_bytes, &
+               '); falling back to slower per-file SED loading'
+            close (unit)
+            return
+         end if
       end if
 
       ! attempt the large allocation first -- this is the one that may fail.
@@ -598,7 +625,7 @@ contains
          cube_mb = real(n_teff, dp)*n_logg*n_meta*n_lambda*8.0_dp/(1024.0_dp**2)
          write (*, '(a,f0.1,a)') &
             'colors: flux cube allocation failed (', cube_mb, &
-            ' MB); falling back to per-file SED loading'
+            ' MB); falling back to slower per-file SED loading'
          close (unit)
          return
       end if
@@ -643,7 +670,7 @@ contains
 
       ! error cleanup -- deallocate everything that may have been allocated
 900   continue
-      write (*, '(a)') 'colors: error reading flux_cube.bin; falling back to per-file SED loading'
+      write (*, '(a)') 'colors: error reading flux_cube.bin; falling back to slower per-file SED loading'
       if (allocated(rq%cube_flux)) deallocate (rq%cube_flux)
       if (allocated(rq%cube_teff_grid)) deallocate (rq%cube_teff_grid)
       if (allocated(rq%cube_logg_grid)) deallocate (rq%cube_logg_grid)

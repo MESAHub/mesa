@@ -5,20 +5,32 @@ Changelog
 .. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) be installed.
 
 
-Changes in r26.3.1
+Changes in r26.4.1
 ===================
 
-.. _Backwards-incompatible changes r26.3.1:
+Important bug fix for ``r25.12.1`` raised by Jake B. Hassan: the colors module could select atmosphere metallicity from ``Zbase`` instead of photospheric ``[M/H]``. This could return solar-metallicity colors and SEDs for non-solar models. See :ref:`the known bugs entry <colors_zbase_bug>` and `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_.
 
-Colors data is no longer located in ``colors/data`` and has moved to ``data/colors``.
+.. _Backwards-incompatible changes r26.4.1:
 
 Backwards-incompatible changes
 ------------------------------
 
-.. _New Features r26.3.1:
+Colors
+~~~~~~
+
+- Colors data has moved from ``colors/data`` to ``data/colors_data``.
+- Colors paths now support repo-relative inputs such as ``data/colors_data/...``.
+
+.. _New Features r26.4.1:
 
 New Features
 ------------
+
+Colors
+~~~~~~
+
+- Added ``Interp_rad`` to colors history output.
+- Added ``colors/test`` for colors unit tests.
 
 ``TDC`` now contains new controls and physics bringing it into closer alignment with the Radial Stellar Pulsation module ``RSP``:
 
@@ -50,7 +62,7 @@ Various documentation pages have received updates, fixing typos, cleaning up for
 Support for SDK version 26.3.2.
 
 
-.. _Bug Fixes r26.3.1:
+.. _Bug Fixes r26.4.1:
 
 Bug Fixes
 ---------
@@ -58,12 +70,17 @@ Bug Fixes
 Colors
 ~~~~~~
 
-- Fix wrong scale used in AB zero-point.
+- Fixed wrong scale used in AB zero-point.
+- Fixed colors atmosphere metallicity selection to use photospheric ``[M/H]`` from ``Z/X`` instead of ``Zbase``. See `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_.
+- Added a new control ``z_over_x_ref`` for the reference ``Z/X`` used in the ``[M/H]`` calculation.
+- ``instrument``, ``stellar_atm``, and ``vega_sed`` now support relative paths.
+- Stella has been updated to work with the new colors module interface.
+- The centered finite difference approximations used in colors Hermite interpolation were improved to support non-uniform grids.
+- Active colors bolometric and photometry calculations now use Simpson integration instead of the old Romberg path.
 
 Other
 ~~~~~
 
-- stella install has been updated to work with the new colors module
 - realigned first row of headers in terminal output after changing ``lg_Lnuc`` to ``lg_Lnuc_tot``
 - incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
 - kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
