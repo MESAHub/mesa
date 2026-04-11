@@ -92,7 +92,7 @@ contains
 
       ynew(1) = yget
       if (jy == 1) then
-         jlo = 1; ; ii = 1
+         jlo = 1;  ii = 1
       else if (jy >= ny - 1) then
          jlo = jy - 2; ii = 3
       else
