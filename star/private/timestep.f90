@@ -1619,26 +1619,26 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
          real(dp) :: relative_excess, lg_XNe_cntr, lg_XNe_cntr_old
-         integer :: h1, he4, c12, o16, nz
-         real(dp) :: xh1, xhe4, xc12, XNe16
+         integer :: h1, he4, c12, ne20, nz
+         real(dp) :: xh1, xhe4, xc12, xne20
          include 'formats'
          check_lg_XNe_cntr = keep_going
          if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          c12 = s% net_iso(ic12)
-         o16 = s% net_iso(io16)
-         if (h1 == 0 .or. he4 == 0 .or. c12 == 0 .or. o16 == 0) return
+         ne20 = s% net_iso(ine20)
+         if (h1 == 0 .or. he4 == 0 .or. c12 == 0 .or. ne20 == 0) return
          nz = s% nz
          xh1 = s% xa(h1,nz)
          xhe4 = s% xa(he4,nz)
          xc12 = s% xa(c12,nz)
-         XNe16 = s% xa(o16,nz)
-         if (XNe16 < max(xh1, xhe4, xc12, 1d-10)) return
-         lg_XNe_cntr = log10(XNe16)
+         xne20 = s% xa(ne20,nz)
+         if (xne20 < max(xh1, xhe4, xc12, 1d-10)) return
+         lg_XNe_cntr = log10(xne20)
          if (lg_XNe_cntr > s% delta_lg_XNe_cntr_max) return
          if (lg_XNe_cntr < s% delta_lg_XNe_cntr_min) return
-         lg_XNe_cntr_old = safe_log10(s% xa_old(o16,nz))
+         lg_XNe_cntr_old = safe_log10(s% xa_old(ne20,nz))
          if (s% delta_lg_XNe_drop_only .and. lg_XNe_cntr >= lg_XNe_cntr_old) return
          check_lg_XNe_cntr = check_change(s, lg_XNe_cntr - lg_XNe_cntr_old, &
             s% delta_lg_XNe_cntr_limit, s% delta_lg_XNe_cntr_hard_limit, &
@@ -1693,26 +1693,26 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
          real(dp) :: relative_excess, lg_XSi_cntr, lg_XSi_cntr_old
-         integer :: h1, he4, c12, o16, nz
-         real(dp) :: xh1, xhe4, xc12, XSi16
+         integer :: h1, he4, c12, si28, nz
+         real(dp) :: xh1, xhe4, xc12, xsi28
          include 'formats'
          check_lg_XSi_cntr = keep_going
          if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          c12 = s% net_iso(ic12)
-         o16 = s% net_iso(io16)
-         if (h1 == 0 .or. he4 == 0 .or. c12 == 0 .or. o16 == 0) return
+         si28 = s% net_iso(isi28)
+         if (h1 == 0 .or. he4 == 0 .or. c12 == 0 .or. si28 == 0) return
          nz = s% nz
          xh1 = s% xa(h1,nz)
          xhe4 = s% xa(he4,nz)
          xc12 = s% xa(c12,nz)
-         XSi16 = s% xa(o16,nz)
-         if (XSi16 < max(xh1, xhe4, xc12, 1d-10)) return
-         lg_XSi_cntr = log10(XSi16)
+         xsi28 = s% xa(si28,nz)
+         if (xsi28 < max(xh1, xhe4, xc12, 1d-10)) return
+         lg_XSi_cntr = log10(xsi28)
          if (lg_XSi_cntr > s% delta_lg_XSi_cntr_max) return
          if (lg_XSi_cntr < s% delta_lg_XSi_cntr_min) return
-         lg_XSi_cntr_old = safe_log10(s% xa_old(o16,nz))
+         lg_XSi_cntr_old = safe_log10(s% xa_old(si28,nz))
          if (s% delta_lg_XSi_drop_only .and. lg_XSi_cntr >= lg_XSi_cntr_old) return
          check_lg_XSi_cntr = check_change(s, lg_XSi_cntr - lg_XSi_cntr_old, &
             s% delta_lg_XSi_cntr_limit, s% delta_lg_XSi_cntr_hard_limit, &
