@@ -566,7 +566,7 @@ contains
    ! so a stale or truncated cube reports a clear message instead of failing
    ! later inside the Fortran runtime.
    subroutine load_flux_cube(rq, stellar_model_dir)
-      use iso_fortran_env, only: int64
+      use, intrinsic :: iso_fortran_env, only: int64
       type(Colors_General_Info), intent(inout) :: rq
       character(len=*), intent(in) :: stellar_model_dir
 
