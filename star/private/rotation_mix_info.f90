@@ -1172,7 +1172,7 @@
 
          xmageta0 = 0; xmageta1 = 0; xmagetam = 0
          xmagq0 = 0; xmagq1 = 0; xmagqm = 0
-         xmags0 = 0; xmags1 = 0; xmagsm = 0;
+         xmags0 = 0; xmags1 = 0; xmagsm = 0
 
          do k = 2, nz-1
 
