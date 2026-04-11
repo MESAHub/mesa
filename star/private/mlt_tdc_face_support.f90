@@ -70,6 +70,8 @@ contains
     end if
   end subroutine get_mlt_face_state_ad
 
+  ! Reconstructs the face composition from either the current or the
+  ! start-of-step composition and renormalizes xa_face.
   subroutine get_face_composition(s, k, use_starting_comp, zbar_face, xa_face, ierr)
     use star_utils, only: get_face_weights
 
@@ -103,12 +105,19 @@ contains
     sum_xa = sum(xa_face)
     if (sum_xa <= 0d0) then
       ierr = -1
+      if (s%report_ierr) then
+         !$OMP critical (mlt_tdc_face_report_ierr)
+         write(*,*) 'get_face_composition: sum_xa <= 0 for k', k
+         !$OMP end critical (mlt_tdc_face_report_ierr)
+      end if
       return
     end if
     xa_face = xa_face/sum_xa
   end subroutine get_face_composition
 
 
+  ! Builds the recomputed face EOS input state by wrapping T and rho to the
+  ! face, reconstructing the face composition, and evaluating the EOS there.
   subroutine get_face_eos_inputs( &
        s, k, T_face, rho_face, eos_res, d_dlnd, d_dlnT, ierr)
     use eos_support, only: get_eos
@@ -130,6 +139,11 @@ contains
     rho_face = get_rho_face(s, k)
     if (T_face%val <= 0d0 .or. rho_face%val <= 0d0) then
        ierr = -1
+       if (s%report_ierr) then
+          !$OMP critical (mlt_tdc_face_report_ierr)
+          write(*,*) 'get_face_eos_inputs: bad face T or rho for k', k, T_face%val, rho_face%val
+          !$OMP end critical (mlt_tdc_face_report_ierr)
+       end if
        return
     end if
 
@@ -142,10 +156,15 @@ contains
     call get_eos( &
        s, k, eos_xa_face, rho_face%val, log10_rho, T_face%val, log10_T, &
        eos_res, d_dlnd, d_dlnT, d_dxa, ierr)
-    if (ierr /= 0) return
+    if (ierr /= 0) then
+       if (s%report_ierr) call write_face_eos_call_info(s, k, T_face, rho_face, zbar_face, eos_xa_face)
+       return
+    end if
   end subroutine get_face_eos_inputs
 
 
+  ! Interpolates extra_opacity_factor to the face and applies the existing
+  ! logT taper used to turn that factor on and off.
   subroutine get_face_opacity_factor(s, k, log10_T, opacity_factor_face)
     use star_utils, only: get_face_weights
 
@@ -182,34 +201,6 @@ contains
   end subroutine get_face_opacity_factor
 
 
-  subroutine set_face_ad_from_value(value, dvalue_dlnd, dvalue_dlnT, T_face, rho_face, quantity_ad)
-    type(auto_diff_real_star_order1), intent(in) :: T_face, rho_face
-    real(dp), intent(in) :: value, dvalue_dlnd, dvalue_dlnT
-    type(auto_diff_real_star_order1), intent(out) :: quantity_ad
-    type(auto_diff_real_star_order1) :: lnT_face, lnd_face
-    integer :: j
-
-    lnd_face = log(rho_face)
-    lnT_face = log(T_face)
-    quantity_ad = 0d0
-    quantity_ad%val = value
-    do j = 1, size(quantity_ad%d1Array)
-       quantity_ad%d1Array(j) = dvalue_dlnd*lnd_face%d1Array(j) + dvalue_dlnT*lnT_face%d1Array(j)
-    end do
-  end subroutine set_face_ad_from_value
-
-
-  subroutine set_face_ad_from_log(log_value, dlog_dlnd, dlog_dlnT, T_face, rho_face, quantity_ad)
-    type(auto_diff_real_star_order1), intent(in) :: T_face, rho_face
-    real(dp), intent(in) :: log_value, dlog_dlnd, dlog_dlnT
-    type(auto_diff_real_star_order1), intent(out) :: quantity_ad
-    real(dp) :: value
-
-    value = exp(log_value)
-    call set_face_ad_from_value(value, value*dlog_dlnd, value*dlog_dlnT, T_face, rho_face, quantity_ad)
-  end subroutine set_face_ad_from_log
-
-
   ! Recomputes the face EOS and opacity state as
   ! auto_diff_real_star_order1 quantities for the MLT/TDC solve,
   ! instead of using the stored face quantities.
@@ -225,6 +216,7 @@ contains
 
     real(dp) :: log10_T, log10_rho, kap_zbar_face, opacity_factor_face
     real(dp) :: eos_res(num_eos_basic_results), d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results)
+    real(dp) :: dlnT_face(auto_diff_star_num_vars), dlnd_face(auto_diff_star_num_vars)
     real(dp) :: kap, dlnkap_dlnd, dlnkap_dlnT
     real(dp) :: kap_fracs(num_kap_fracs), kap_xa_face(s%species)
     type(auto_diff_real_star_order1) :: Pgas_face, gamma1_face, mlt_Pturb_ad, alpha
@@ -235,14 +227,15 @@ contains
     if (ierr /= 0) return
     log10_T = log10(T_face%val)
     log10_rho = log10(rho_face%val)
+    call set_face_log_partials(T_face, rho_face, dlnT_face, dlnd_face)
 
-    call set_face_ad_from_log(eos_res(i_lnPgas), d_dlnd(i_lnPgas), d_dlnT(i_lnPgas), T_face, rho_face, Pgas_face)
+    call set_face_ad_from_log(eos_res(i_lnPgas), d_dlnd(i_lnPgas), d_dlnT(i_lnPgas), dlnd_face, dlnT_face, Pgas_face)
     P_face = Pgas_face + crad*pow4(T_face)/3d0
-    call set_face_ad_from_value(eos_res(i_Cp), d_dlnd(i_Cp), d_dlnT(i_Cp), T_face, rho_face, Cp_face)
-    call set_face_ad_from_value(eos_res(i_chiRho), d_dlnd(i_chiRho), d_dlnT(i_chiRho), T_face, rho_face, ChiRho_face)
-    call set_face_ad_from_value(eos_res(i_chiT), d_dlnd(i_chiT), d_dlnT(i_chiT), T_face, rho_face, ChiT_face)
-    call set_face_ad_from_value(eos_res(i_grad_ad), d_dlnd(i_grad_ad), d_dlnT(i_grad_ad), T_face, rho_face, grada_face)
-    call set_face_ad_from_value(eos_res(i_gamma1), d_dlnd(i_gamma1), d_dlnT(i_gamma1), T_face, rho_face, gamma1_face)
+    call set_face_ad_from_value(eos_res(i_Cp), d_dlnd(i_Cp), d_dlnT(i_Cp), dlnd_face, dlnT_face, Cp_face)
+    call set_face_ad_from_value(eos_res(i_chiRho), d_dlnd(i_chiRho), d_dlnT(i_chiRho), dlnd_face, dlnT_face, ChiRho_face)
+    call set_face_ad_from_value(eos_res(i_chiT), d_dlnd(i_chiT), d_dlnT(i_chiT), dlnd_face, dlnT_face, ChiT_face)
+    call set_face_ad_from_value(eos_res(i_grad_ad), d_dlnd(i_grad_ad), d_dlnT(i_grad_ad), dlnd_face, dlnT_face, grada_face)
+    call set_face_ad_from_value(eos_res(i_gamma1), d_dlnd(i_gamma1), d_dlnT(i_gamma1), dlnd_face, dlnT_face, gamma1_face)
 
     call get_face_composition(s, k, s% use_starting_composition_for_kap, kap_zbar_face, kap_xa_face, ierr)
     if (ierr /= 0) return
@@ -253,7 +246,21 @@ contains
        eos_res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
        eos_res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
        kap_fracs, kap, dlnkap_dlnd, dlnkap_dlnT, ierr)
-    if (ierr /= 0 .or. is_bad_num(kap) .or. kap <= 0d0) return
+    if (ierr /= 0) then
+       if (s%report_ierr) call write_face_kap_call_info( &
+          s, k, T_face, rho_face, kap_zbar_face, kap_xa_face, opacity_factor_face)
+       return
+    end if
+    if (is_bad_num(kap) .or. kap <= 0d0) then
+       ierr = -1
+       if (s%report_ierr) then
+          !$OMP critical (mlt_tdc_face_report_ierr)
+          write(*,*) 'get_face_eos_kap_ad: bad face opacity for k', k, kap
+          !$OMP end critical (mlt_tdc_face_report_ierr)
+          call write_face_kap_call_info(s, k, T_face, rho_face, kap_zbar_face, kap_xa_face, opacity_factor_face)
+       end if
+       return
+    end if
 
     kap = kap*opacity_factor_face
     if (s%opacity_max > 0d0 .and. kap > s%opacity_max) then
@@ -266,7 +273,7 @@ contains
        dlnkap_dlnd = 0d0
        dlnkap_dlnT = 0d0
     end if
-    call set_face_ad_from_value(kap, kap*dlnkap_dlnd, kap*dlnkap_dlnT, T_face, rho_face, opacity_face)
+    call set_face_ad_from_value(kap, kap*dlnkap_dlnd, kap*dlnkap_dlnT, dlnd_face, dlnT_face, opacity_face)
 
     if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
        .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
@@ -288,14 +295,16 @@ contains
     integer, intent(out) :: ierr
 
     real(dp) :: eos_res(num_eos_basic_results), d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results)
+    real(dp) :: dlnT_face(auto_diff_star_num_vars), dlnd_face(auto_diff_star_num_vars)
     type(auto_diff_real_star_order1) :: T_face, rho_face, Pgas_face, P_face
 
     ierr = 0
     call get_face_eos_inputs( &
        s, k, T_face, rho_face, eos_res, d_dlnd, d_dlnT, ierr)
     if (ierr /= 0) return
+    call set_face_log_partials(T_face, rho_face, dlnT_face, dlnd_face)
 
-    call set_face_ad_from_log(eos_res(i_lnPgas), d_dlnd(i_lnPgas), d_dlnT(i_lnPgas), T_face, rho_face, Pgas_face)
+    call set_face_ad_from_log(eos_res(i_lnPgas), d_dlnd(i_lnPgas), d_dlnT(i_lnPgas), dlnd_face, dlnT_face, Pgas_face)
     P_face = Pgas_face + crad*pow4(T_face)/3d0
 
     call set_scale_height_from_face_state(s, k, P_face, rho_face, scale_height_face)
@@ -350,5 +359,97 @@ contains
     Pr_face = crad*pow4(T_face)/3d0
     gradr_face = P_face*opacity_face*L_face/(4d0*pi4*clight*s%m_grav(k)*s%cgrav(k)*Pr_face)
   end subroutine set_gradr_from_face_state
+
+  ! Precomputes dlnT_face and dlnd_face for converting scalar d/dlnT and
+  ! d/dlnd microphysics partials into star-order1 autodiff derivatives.
+  subroutine set_face_log_partials(T_face, rho_face, dlnT_face, dlnd_face)
+    type(auto_diff_real_star_order1), intent(in) :: T_face, rho_face
+    real(dp), intent(out) :: dlnT_face(auto_diff_star_num_vars), dlnd_face(auto_diff_star_num_vars)
+
+    dlnT_face = T_face%d1Array/T_face%val
+    dlnd_face = rho_face%d1Array/rho_face%val
+  end subroutine set_face_log_partials
+
+
+  ! Converts a scalar value with d/dlnd and d/dlnT partials into an
+  ! auto_diff_real_star_order1 quantity using the face chain rule.
+  subroutine set_face_ad_from_value(value, dvalue_dlnd, dvalue_dlnT, dlnd_face, dlnT_face, quantity_ad)
+    real(dp), intent(in) :: value, dvalue_dlnd, dvalue_dlnT
+    real(dp), intent(in) :: dlnd_face(auto_diff_star_num_vars), dlnT_face(auto_diff_star_num_vars)
+    type(auto_diff_real_star_order1), intent(out) :: quantity_ad
+
+    quantity_ad = 0d0
+    quantity_ad%val = value
+    quantity_ad%d1Array = dvalue_dlnd*dlnd_face + dvalue_dlnT*dlnT_face
+  end subroutine set_face_ad_from_value
+
+
+  ! Same as set_face_ad_from_value, but for a quantity returned in
+  ! logarithmic form by the microphysics routine.
+  subroutine set_face_ad_from_log(log_value, dlog_dlnd, dlog_dlnT, dlnd_face, dlnT_face, quantity_ad)
+    real(dp), intent(in) :: log_value, dlog_dlnd, dlog_dlnT
+    real(dp), intent(in) :: dlnd_face(auto_diff_star_num_vars), dlnT_face(auto_diff_star_num_vars)
+    type(auto_diff_real_star_order1), intent(out) :: quantity_ad
+    real(dp) :: value
+
+    value = exp(log_value)
+    call set_face_ad_from_value(value, value*dlog_dlnd, value*dlog_dlnT, dlnd_face, dlnT_face, quantity_ad)
+  end subroutine set_face_ad_from_log
+
+
+  ! Writes the recomputed face EOS inputs that were passed to get_eos.
+  subroutine write_face_eos_call_info(s, k, T_face, rho_face, zbar_face, xa_face)
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    type(auto_diff_real_star_order1), intent(in) :: T_face, rho_face
+    real(dp), intent(in) :: zbar_face
+    real(dp), intent(in) :: xa_face(:)
+
+    integer :: j
+    include 'formats'
+
+    !$OMP critical (mlt_tdc_face_eos_call_info)
+    write(*,'(A)')
+    write(*,*) 'face EOS input info for k', k
+    write(*,1) 'T_face', T_face%val
+    write(*,1) 'rho_face', rho_face%val
+    write(*,1) 'log10_T_face', log10(T_face%val)
+    write(*,1) 'log10_rho_face', log10(rho_face%val)
+    write(*,1) 'zbar_face', zbar_face
+    write(*,1) 'sum(xa_face)', sum(xa_face)
+    do j = 1, s%species
+       write(*,2) 'xa_face ' // trim(s%nameofequ(j+s%nvar_hydro)), j, xa_face(j)
+    end do
+    !$OMP end critical (mlt_tdc_face_eos_call_info)
+  end subroutine write_face_eos_call_info
+
+
+  ! Writes the recomputed face opacity inputs that were passed to get_kap.
+  subroutine write_face_kap_call_info(s, k, T_face, rho_face, zbar_face, xa_face, opacity_factor_face)
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    type(auto_diff_real_star_order1), intent(in) :: T_face, rho_face
+    real(dp), intent(in) :: zbar_face
+    real(dp), intent(in) :: xa_face(:)
+    real(dp), intent(in) :: opacity_factor_face
+
+    integer :: j
+    include 'formats'
+
+    !$OMP critical (mlt_tdc_face_kap_call_info)
+    write(*,'(A)')
+    write(*,*) 'face opacity input info for k', k
+    write(*,1) 'T_face', T_face%val
+    write(*,1) 'rho_face', rho_face%val
+    write(*,1) 'log10_T_face', log10(T_face%val)
+    write(*,1) 'log10_rho_face', log10(rho_face%val)
+    write(*,1) 'zbar_face', zbar_face
+    write(*,1) 'opacity_factor_face', opacity_factor_face
+    write(*,1) 'sum(xa_face)', sum(xa_face)
+    do j = 1, s%species
+       write(*,2) 'xa_face ' // trim(s%nameofequ(j+s%nvar_hydro)), j, xa_face(j)
+    end do
+    !$OMP end critical (mlt_tdc_face_kap_call_info)
+  end subroutine write_face_kap_call_info
 
 end module mlt_tdc_face_support
