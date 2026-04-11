@@ -81,9 +81,10 @@ Colors
 Other
 ~~~~~
 
-- realigned first row of headers in terminal output after changing ``lg_Lnuc`` to ``lg_Lnuc_tot``
-- incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
-- kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
+- Realigned first row of headers in terminal output after changing ``lg_Lnuc`` to ``lg_Lnuc_tot``
+- Incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
+- Kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
+- Fixed a bug in ``star/private/timestep.f90`` where the ``delta_lg_XNe_cntr`` and ``delta_lg_XSi_cntr`` timestep controls were incorrectly checking the central ``o16`` abundance instead of ``ne20`` and ``si28``. See `gh-963 <https://github.com/MESAHub/mesa/pull/963>`_.
 
 Changes in r25.12.1
 ===================
