@@ -91,9 +91,10 @@
    ! then MESA uses the nearest metallicity in the table for the atmosphere
    ! interpolation. If the photospheric hydrogen mass fraction or metal mass
    ! fraction is not positive, then MESA cannot form
-   ! log10((Z/X)/z_over_x_ref), so it uses the lowest metallicity in the
-   ! table instead. This is a fallback safeguard and not a dedicated treatment
-   ! for H-free atmospheres.
+   ! log10((Z/X)/z_over_x_ref). In that case the module still returns colors
+   ! and SEDs, but it does so by using the lowest metallicity in the table.
+   ! This is a fallback safeguard and not a dedicated treatment for H-free
+   ! atmospheres.
    
    ! For the shipped Kurucz2003all table in this checkout, the
    ! metallicity range is [Fe/H] = -2.5 to [Fe/H] = 4.0. With the
