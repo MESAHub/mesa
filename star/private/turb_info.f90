@@ -22,6 +22,7 @@
 
       use star_private_def
       use const_def, only: dp, i8, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
+      use mlt_tdc_face_support, only: get_mlt_face_state_ad
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -90,7 +91,8 @@
          real(dp) :: crystal_pad
          logical :: no_mix
          type(auto_diff_real_star_order1) :: &
-            grada_face_ad, scale_height_ad, gradr_ad, rho_face_ad, &
+            T_face_ad, P_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
+            grada_face_ad, scale_height_ad, gradr_ad, &
             gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad
          include 'formats'
 
@@ -118,9 +120,14 @@
             gradL_composition_term = 0d0
          end if
 
-         grada_face_ad = get_grada_face(s,k)
-         scale_height_ad = get_scale_height_face(s,k)
-         gradr_ad = get_gradr_face(s,k)
+         ! Assemble the full face-state thermo bundle for the MLT/TDC solve.
+         ! This helper either computes EOS and kap on faces directly or
+         ! recomputes them from face wrapped primitives, and returns consistent
+         ! T, P, rho, kap, Cp, chiRho, chiT, grada, gradr, and scale height values.
+         call get_mlt_face_state_ad( &
+            s, k, T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, chiRho_face_ad, chiT_face_ad, &
+            grada_face_ad, opacity_face_ad, scale_height_ad, gradr_ad, ierr)
+         if (ierr /= 0) return
 
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
@@ -223,6 +230,7 @@
          end if
 
          call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
+            T_face_ad, P_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          if (ierr /= 0) then

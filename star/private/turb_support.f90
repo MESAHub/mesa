@@ -110,6 +110,7 @@ contains
 
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
+         T_in, P_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
@@ -118,7 +119,9 @@ contains
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
-      type(auto_diff_real_star_order1), intent(in) :: gradr_in, grada, scale_height
+      type(auto_diff_real_star_order1), intent(in) :: &
+         T_in, P_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
+         gradr_in, grada, scale_height
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
@@ -133,7 +136,7 @@ contains
       ierr = 0
 
 
-      P = get_Peos_face(s,k) ! if u_flag, should this be P_face_ad? (time centered in riemann)
+      P = P_in ! if u_flag, should this be P_face_ad? (time centered in riemann)
       if (s% include_mlt_in_velocity_time_centering) then
           ! could be cleaner with a wrapper for time_centered P and L
           if (s% using_velocity_time_centering .and. &
@@ -161,14 +164,14 @@ contains
       gradr = gradr_in
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
-      T = get_T_face(s,k)
-      opacity = get_kap_face(s,k)
-      rho = get_rho_face(s,k)
+      T = T_in
+      opacity = opacity_in
+      rho = rho_in
       rho_start = get_rho_start_face(s,k)
       dV = 1d0/rho - 1d0/rho_start ! both variables are face wrapped.
-      chiRho = get_ChiRho_face(s,k)
-      chiT = get_ChiT_face(s,k)
-      Cp = get_Cp_face(s,k)
+      chiRho = chiRho_in
+      chiT = chiT_in
+      Cp = Cp_in
       energy = get_e_face(s,k)
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
@@ -222,8 +225,7 @@ contains
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC
-      logical, parameter :: report = .false.
+      logical ::  test_partials, using_TDC, report
       include 'formats'
 
       ! check if this particular k can be done with TDC
@@ -232,6 +234,8 @@ contains
       if (.not. s% have_mlt_vc) using_TDC = .false.
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
+
+      report = .false.
 
       ! Pre-calculate some things.
       Eq_div_w = 0d0
@@ -316,7 +320,6 @@ contains
          else
             conv_vel_start = s% mlt_vc(k)
          end if
-
          ! Set scale for judging the TDC luminosity equation Q(Y)=0.
          ! Q has units of a luminosity, so the scale should be a luminosity.
          if (s% solver_iter == 0) then
@@ -326,12 +329,14 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
+            conv_vel_start, s%Y_face_start(k), mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
-            s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
+            s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, &
+            s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, s% use_TDC_Af_split, s% TDC_arnett_growth_target, &
+            energy, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -347,12 +352,14 @@ contains
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
                call set_TDC(&
-                  conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
+                  conv_vel_start, s%Y_face_start(k), mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
-                  s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
+                  s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, &
+                  s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, s% use_TDC_Af_split, s% TDC_arnett_growth_target, &
+                  energy, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

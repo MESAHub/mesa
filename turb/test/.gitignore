@@ -1,0 +1,5 @@
+!/plotter/
+!/plotter/**
+/plotter/__pycache__/
+/plotter/*.csv
+/plotter/plots/*.pdf

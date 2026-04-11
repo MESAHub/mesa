@@ -20,7 +20,7 @@
       module adjust_mesh_split_merge
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4, four_thirds_pi
+      use const_def, only: dp, qp, ln10, pi4, four_thirds_pi
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
       use auto_diff_support
@@ -832,6 +832,7 @@
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
+         real(qp) :: L_inner, dLdq_parent
          logical :: done, use_new_grad_rho
          include 'formats'
 
@@ -1281,12 +1282,27 @@
          end if
 
          if (s% i_lum /= 0) then
-            if (ip < nz_old) then
-               s% xh(s% i_lum,ip) = &
-                  0.5d0*(s% xh(s% i_lum,i) + s% xh(s% i_lum,ip+1))
+            ! Keep the legacy split-face average unless the conservative L remap
+            ! option is enabled.
+            if (.not. s% use_conservative_L_remesh) then
+               if (ip < nz_old) then
+                  s% xh(s% i_lum,ip) = &
+                     0.5d0*(s% xh(s% i_lum,i) + s% xh(s% i_lum,ip+1))
+               else
+                  s% xh(s% i_lum,ip) = &
+                     0.5d0*(s% xh(s% i_lum,i) + s% L_center)
+               end if
             else
-               s% xh(s% i_lum,ip) = &
-                  0.5d0*(s% xh(s% i_lum,i) + s% L_center)
+               if (ip < nz_old) then
+                  L_inner = real(s% xh(s% i_lum,ip+1), qp)
+               else
+                  L_inner = real(s% L_center, qp)
+               end if
+               ! Preserve the parent cell luminosity increment across the two
+               ! child cells instead of inserting the new face by averaging.
+               dLdq_parent = (real(s% xh(s% i_lum,i), qp) - L_inner)/ &
+                  real(s% dq(i) + s% dq(ip), qp)
+               s% xh(s% i_lum,ip) = real(L_inner + dLdq_parent*real(s% dq(ip), qp), dp)
             end if
          end if
 

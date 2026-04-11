@@ -4,12 +4,23 @@ program test_turb
    use auto_diff
    use const_def, only: dp, pi, rsun, lsun, msun, kerg, mp, boltz_sigma, standard_cgrav
    use turb
+   use test_time_dependence_support, only: check_time_dependence, write_time_dependence_csv
 
    implicit none
+
+   integer, parameter :: num_tdc_modes = 4
+   character(len=32), parameter :: tdc_mode_names(num_tdc_modes) = [character(len=32) :: &
+      'plain TDC', 'TDC + Af split', 'TDC + Arnett closure', 'TDC + acceleration limit']
+   logical, parameter :: tdc_mode_use_arnett(num_tdc_modes) = [.false., .false., .true., .false.]
+   logical, parameter :: tdc_mode_use_accel(num_tdc_modes) = [.false., .false., .false., .true.]
+   logical, parameter :: tdc_mode_use_split(num_tdc_modes) = [.false., .true., .false., .false.]
 
    call check_efficient_MLT_scaling()
    call check_TDC()
    call compare_TDC_and_Cox_MLT()
+   call header('Test Time Dependence')
+   call check_time_dependence()
+   call write_test_time_dependence_csv()
 
 contains
 
@@ -81,19 +92,19 @@ contains
 
    subroutine compare_TDC_and_Cox_MLT()
       real(dp) :: mixing_length_alpha, conv_vel_start, &
-         TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, L_start, TDC_alpha_C, TDC_alpha_S
+         TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma, Eq_div_w, energy
       real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
 
       character(len=3) :: MLT_option
-      integer :: mixing_type, ierr, tdc_num_iters
+      integer :: mixing_type, ierr, tdc_num_iters, mode_i
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
 
       include 'formats'
 
-      call header('Compare TDC with MLT Cox')
+      call header('Compare MLT and TDC Modes')
 
       ! For limiting the conv_vel coming out of mlt/TDC with Csound.
       max_conv_vel = 1d99 ! we don't limit the conv_vel for testing.
@@ -138,7 +149,6 @@ contains
       Eq_div_w = 0d0 ! TDC_alpha_M is implicit in this term
       include_mlt_corr_to_TDC = .true.
       use_TDC_enthalpy_flux_limiter = .false.
-
       ! MLT
       MLT_option = 'Cox'
       Henyey_MLT_nu_param = 0d0
@@ -146,38 +156,42 @@ contains
 
       write (*, 1) 'gradR - gradA', gradr%val - grada%val
 
-      call set_TDC( &
-         conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
-         mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
-         Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
-         energy, ierr)
-
-
-      write (*, 1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel%val, dt
-
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                    chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                    gradr, grada, gradL, &
                    Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
 
-      write (*, 1) 'MLT: Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel%val, Gamma%val
+      write (*, '(a)') 'Mode: MLT'
+      write (*, 1) 'Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel%val, Gamma%val
+
+      do mode_i = 1, num_tdc_modes
+         conv_vel_start = 0d0
+         call set_TDC( &
+            conv_vel_start, 0d0, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
+            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
+            Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
+            tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), TDC_arnett_growth_target_mlt, energy, ierr)
+         write (*, '(a)') 'Mode: ' // trim(tdc_mode_names(mode_i))
+         write (*, 1) 'Y, conv_vel_start, conv_vel, dt', Y_face%val, conv_vel_start, conv_vel%val, dt
+      end do
 
    end subroutine compare_TDC_and_Cox_MLT
 
    subroutine check_TDC()
       real(dp) :: mixing_length_alpha, conv_vel_start
-      real(dp) :: TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, max_conv_vel, L_start, TDC_alpha_C, TDC_alpha_S
+      real(dp) :: TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, max_conv_vel, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Eq_div_w, grav, energy
-      integer :: mixing_type, ierr, tdc_num_iters
+      integer :: mixing_type, ierr, tdc_num_iters, mode_i
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       integer :: j
+      real(dp), parameter :: gradT_start_old = 2.5204370043250246d-01
 
       include 'formats'
 
-      call header('Test TDC')
+      call header('Test TDC Modes')
 
       ! For limiting the conv_vel coming out of mlt/TDC with Csound.
       max_conv_vel = 1d99 ! we don't limit the conv_vel for testing.
@@ -214,24 +228,32 @@ contains
       energy = 0d0
       include_mlt_corr_to_TDC = .true.
       use_TDC_enthalpy_flux_limiter = .false.
+      do mode_i = 1, num_tdc_modes
+         write (*, '(a)') '####################################'
+         write (*, '(a)') 'Mode: ' // trim(tdc_mode_names(mode_i))
+         write (*, '(a)') 'Running dt test'
 
-      write (*, *) "####################################"
-      write (*, *) "Running dt test"
+         do j = 0, 30
+            dt = 500d0*pow(1.02d0, j)
+            call set_TDC( &
+               conv_vel_start, gradT_start_old - gradL%val, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
+               mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
+               scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
+               Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
+               tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), TDC_arnett_growth_target_mlt, energy, ierr)
 
-      do j = 0, 30
-         dt = 500d0*pow(1.02d0, j)
-         call set_TDC( &
-            conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
-            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
-            Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
-            energy, ierr)
-
-
-         write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
-         if (report) stop
+            write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
+            if (report) stop
+         end do
       end do
 
    end subroutine check_TDC
+
+   subroutine write_test_time_dependence_csv()
+      integer :: ierr
+
+      call write_time_dependence_csv('plotter/time_dependence.csv', ierr)
+      if (ierr /= 0) stop 1
+   end subroutine write_test_time_dependence_csv
 
 end program test_turb

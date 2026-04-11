@@ -22,6 +22,8 @@ module turb
    use num_lib
    use utils_lib
    use auto_diff
+   use tdc_support, only: TDC_arnett_growth_target_mlt, TDC_arnett_growth_target_tdc_no_mlt_corr, &
+      TDC_arnett_growth_target_tdc_with_mlt_corr
 
    implicit none
 
@@ -30,6 +32,9 @@ module turb
    public :: set_mlt
    public :: set_tdc
    public :: set_semiconvection
+   public :: TDC_arnett_growth_target_mlt
+   public :: TDC_arnett_growth_target_tdc_no_mlt_corr
+   public :: TDC_arnett_growth_target_tdc_with_mlt_corr
 
    contains
 
@@ -81,7 +86,15 @@ module turb
    !!
    !! Internally this solves the equation L = L_conv + L_rad.
    !!
+   !! When use_TDC_arnett_velocity_closure is enabled, the velocity closure uses
+   !! the Arnett 1969 closure in the form presented in Renzo et al. 2020
+   !! (ADS: https://ui.adsabs.harvard.edu/abs/2020MNRAS.493.4333R/abstract),
+   !! which points to equation 11 of Arnett 1969
+   !! (ADS: https://ui.adsabs.harvard.edu/abs/1969Ap%26SS...5..180A/abstract).
+   !!
    !! @param conv_vel_start The convection speed at the start of the step.
+   !! @param Y_face_start Start-of-step superadiabaticity, used by the optional split-step A_f closure
+   !!        and by the stable-side decay branch of the post-solve acceleration limiter.
    !! @param mixing_length_alpha The mixing length parameter.
    !! @param TDC_alpha_D TDC turbulent damping parameter
    !! @param TDC_alpha_R TDC radiative damping parameter
@@ -110,24 +123,31 @@ module turb
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param gradT The temperature gradient dlnT/dlnP (output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
+   !! @param use_TDC_Af_split If true, use the split-step A_f closure when the start/end
+   !!        thermal states lie on opposite sides of Y = 0.
+   !! @param TDC_arnett_growth_target Unstable-side steady-state target for David Arnett's
+   !!        convection model in this implementation.
    !! @param ierr Tracks errors (output).
    subroutine set_TDC( &
-            conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
+            conv_vel_start, Y_face_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
             max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
-            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, ierr)
+            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split, &
+            TDC_arnett_growth_target, energy, ierr)
       use tdc
       use tdc_support
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
+      real(dp), intent(in) :: conv_vel_start, Y_face_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
       real(dp), intent(in) :: dt, cgrav, m, scale, max_conv_vel, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav, energy
       logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
+      logical, intent(in) :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split
+      integer, intent(in) :: TDC_arnett_growth_target
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
-      type(auto_diff_real_star_order1) :: L, Lambda, Gamma, h
+      type(auto_diff_real_star_order1) :: L, Lambda, Gamma
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
@@ -144,11 +164,13 @@ module turb
                      gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type,1d99, ierr)
 
-
-      ! Pack TDC info
       info%report = report
       info%include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
       info%use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
+      info%use_TDC_arnett_velocity_closure = use_TDC_arnett_velocity_closure
+      info%use_TDC_acceleration_limit = use_TDC_acceleration_limit
+      info%use_TDC_Af_split = use_TDC_Af_split
+      info%TDC_arnett_growth_target = TDC_arnett_growth_target
       info%mixing_length_alpha = mixing_length_alpha
       info%TDC_alpha_D = TDC_alpha_D
       info%TDC_alpha_R = TDC_alpha_R
@@ -157,9 +179,11 @@ module turb
       info%L = convert(L)
       info%gradL = convert(gradL)
       info%grada = convert(grada)
+      info%Y_start = Y_face_start
       info%c0 = convert(TDC_alpha_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
       info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm
       info%A0 = conv_vel_start/sqrt_2_div_3
+      info%A_mlt = convert(conv_vel/sqrt_2_div_3)
       info%h = energy + P/rho ! actual enthalpy
       info%T = T
       info%rho = rho
@@ -169,6 +193,9 @@ module turb
       info%Hp = scale_height
       info%Gamma = Gamma
       info%Eq_div_w = Eq_div_w
+      info%grav = grav
+      info%chiT = chiT
+      info%chiRho = chiRho
       info%TDC_alpha_C = TDC_alpha_C
       info%TDC_alpha_S = TDC_alpha_S
 
@@ -180,13 +207,11 @@ module turb
       ! Cap conv_vel at max_conv_vel_div_csound*cs
       if (conv_vel%val > max_conv_vel) then
          conv_vel = max_conv_vel
-         ! if max_conv_vel = csound,
-         ! L = L0 * (gradL + Y) + c0 * Af * Y_env
-         ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
-         ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
+         ! If conv_vel is capped, recompute Y_face from the uncapped luminosity balance.
          if (include_mlt_corr_to_TDC) then
             Y_face = unconvert(info%L - info%L0 * info%gradL) / &
-               (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
+               (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * &
+               (info%Gamma / (1d0 + info%Gamma)))
          else
             Y_face = unconvert(info%L - info%L0 * info%gradL) / &
                (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel)

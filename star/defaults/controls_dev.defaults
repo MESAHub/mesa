@@ -200,6 +200,102 @@
     use_TDC_enthalpy_flux_limiter = .false.
 
 
+      ! use_TDC_arnett_velocity_closure
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_arnett_velocity_closure = .true., use the Arnett 1969
+      ! closure for the face convective velocity, in the form presented in Renzo et al.
+      ! 2020 (ADS: https://ui.adsabs.harvard.edu/abs/2020MNRAS.493.4333R/abstract),
+      ! which points to equation 11 of Arnett 1969
+      ! (ADS: https://ui.adsabs.harvard.edu/abs/1969Ap%26SS...5..180A/abstract).
+      ! This replaces the Kuhfuss 1986 closure inside TDC, while keeping the
+      ! same luminosity-balance solve for Y = gradT - gradL. TDC implicitly solves
+      ! the Arnett 1969 closure in place of the Kuhfuss 1986 closure.
+
+      ! ::
+
+    use_TDC_arnett_velocity_closure = .false.
+
+
+      ! TDC_arnett_growth_target
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Unstable-side steady-state target used by the Arnett 1969 closure in
+      ! this implementation:
+      ! 0 = steady-state MLT convective velocity
+      ! 1 = steady-state Kuhfuss 1986 closure velocity without the MLT correction
+      ! 2 = steady-state Kuhfuss 1986 closure velocity with the MLT correction
+
+      ! ::
+
+    TDC_arnett_growth_target = 0
+
+
+      ! use_TDC_acceleration_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_acceleration_limit = .true., apply a post-solve limit to the
+      ! TDC convective velocity over a single step:
+      ! growth is capped by the Kuhfuss 1986 closure steady-state velocity at the
+      ! solved thermal state, while decay is bounded by the Arnett/Wood stable-side
+      ! decay law.
+
+      ! ::
+
+    use_TDC_acceleration_limit = .false.
+
+
+      ! use_TDC_Af_split
+      ! ~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_Af_split = .true., use a split-step closure for the TDC
+      ! convective velocity when the start-of-step and end-of-step thermal states
+      ! lie on opposite sides of Y = gradT - gradL = 0.
+      !
+      ! This keeps the TDC solve implicit in the end-of-step Y, but changes the
+      ! A_f(Y) closure so that late stabilization and late destabilization do not
+      ! use one branch over the full timestep.
+
+      ! ::
+
+    use_TDC_Af_split = .false.
+
+
+      ! use_conservative_L_remesh
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_conservative_L_remesh = .true., remesh luminosity by
+      ! conservatively remapping the cell-centered luminosity increment
+      ! dL/dq and then reconstructing face L from L_center.
+      !
+      ! This applies to both the standard mesh-adjust path and the
+      ! split-AMR path. The default behavior remains the legacy direct
+      ! interpolation/averaging of face L.
+      ! Default = .false. keeps the old behavior.
+
+      ! ::
+
+    use_conservative_L_remesh = .false.
+
+
+      ! use_face_values_eos_and_kap_mlt_tdc
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_face_values_eos_and_kap_mlt_tdc = .true., evaluate the current
+      ! MLT/TDC thermodynamic bundle from a face-centered state. Face T and rho
+      ! are still built by wrapping the cell-centered primitives to the face,
+      ! but then a single EOS call at that face state is used to obtain P, Cp,
+      ! chiRho, chiT, grad_ad, lnfree_e, eta, and opacity. Those face-EOS
+      ! quantities are then used directly in the local gradr seen by MLT/TDC.
+      ! Wrapped rho and wrapped specific energy are still used in the MLT/TDC
+      ! call, so this is a local thermodynamic-bundle change, not a full
+      ! face-state reformulation of the whole star solve.
+
+      ! ::
+
+    use_face_values_eos_and_kap_mlt_tdc = .false.
+
+
       ! include_mlt_Pturb_in_thermodynamic_gradients
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -218,6 +314,7 @@
       ! If doing velocity time_centering, include time centering in mlt. Depending on the time
       ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
       ! for P, L, and r in geff, gradr, grada, and mlt.
+      ! Currently not supported together with ``use_face_values_eos_and_kap_mlt_tdc``.
 
       ! ::
 

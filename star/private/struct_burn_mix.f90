@@ -305,6 +305,7 @@
             s% u_face_start(k) = 0d0  ! s% u_face_ad(k)%val
             s% P_face_start(k) = -1d0  ! mark as unset s% P_face_ad(k)%val
             s% L_start(k) = s% L(k)
+            s% Y_face_start(k) = s% Y_face(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)
             s% j_rot_start(k) = s% j_rot(k)
@@ -1209,5 +1210,3 @@
 
 
       end module struct_burn_mix
-
-

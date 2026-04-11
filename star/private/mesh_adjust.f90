@@ -19,7 +19,7 @@
 
       module mesh_adjust
 
-      use const_def, only: dp, ln10, one_third, four_thirds_pi
+      use const_def, only: dp, qp, ln10, one_third, four_thirds_pi
       use star_private_def
       use chem_def
       use interp_1d_def, only: pm_work_size
@@ -170,7 +170,7 @@
          if (dbg) write(*,*) 'call do_L'
          call do_L( &
             s, nz, nz_old, nzlo, nzhi, comes_from, &
-            xh, xh_old, xq, xq_old_plus1, xq_new, &
+            xh, xh_old, dq, dq_old, xq, xq_old_plus1, xq_new, &
             work, tmp1, tmp2, ierr)
          if (failed('do_L')) return
 
@@ -697,7 +697,7 @@
 
       subroutine do_L( &
             s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, L_old_plus1, L_new, ierr)
+            dq, dq_old, xq, xq_old_plus1, xq_new, work, old_dLdq, new_dLdq, ierr)
          use interp_1d_def
          use interp_1d_lib
          type (star_info), pointer :: s
@@ -705,51 +705,96 @@
          real(dp), dimension(:,:), pointer :: xh, xh_old
          real(dp), dimension(:), pointer :: work
          real(dp), dimension(:) :: &
-            xq, xq_old_plus1, L_old_plus1, L_new, xq_new
+            dq, dq_old, xq, xq_old_plus1, old_dLdq, new_dLdq, xq_new
          integer, intent(out) :: ierr
 
-         integer :: n, i_lum, k
+         integer :: n, i_lum, k, k_old
+         real(qp) :: dLdq_integral, L_face
 
          include 'formats'
 
          ierr = 0
          i_lum = s% i_lum
          if (i_lum == 0) return
-         n = nzhi - nzlo + 1
 
-         do k=1,nz_old
-            L_old_plus1(k) = xh_old(i_lum,k)
-         end do
-         L_old_plus1(nz_old+1) = s% L_center
+         ! Preserve the historical face-L remap unless the new option is enabled.
+         if (.not. s% use_conservative_L_remesh) then
+            n = nzhi - nzlo + 1
 
-         call interpolate_vector( &
-               nz_old+1, xq_old_plus1, n, xq_new, &
-               L_old_plus1, L_new, interp_pm, nwork, work, &
-               'mesh_adjust do_L', ierr)
-         if (ierr /= 0) then
+            do k=1,nz_old
+               old_dLdq(k) = xh_old(i_lum,k)
+            end do
+            old_dLdq(nz_old+1) = s% L_center
+
+            call interpolate_vector( &
+                  nz_old+1, xq_old_plus1, n, xq_new, &
+                  old_dLdq, new_dLdq, interp_pm, nwork, work, &
+                  'mesh_adjust do_L', ierr)
+            if (ierr /= 0) then
+               return
+
+               write(*,*) 'interpolate_vector failed in do_L for remesh'
+               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_L')
+            end if
+
+            do k=nzlo,nzhi
+               xh(i_lum,k) = new_dLdq(k+1-nzlo)
+            end do
+
+            n = nzlo - 1
+            if (n > 0) then
+               do k=1,n
+                  xh(i_lum,k) = xh_old(i_lum,k)
+               end do
+            end if
+
+            if (nzhi < nz) then
+               n = nz - nzhi - 1  ! nz-n = nzhi+1
+               do k=0,n
+                  xh(i_lum,nz-k) = xh_old(i_lum,nz_old-k)
+               end do
+            end if
+
             return
-
-            write(*,*) 'interpolate_vector failed in do_L for remesh'
-            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_L')
          end if
+
+         ! Conservative option: remap the cell quantity dL/dq, then rebuild the
+         ! cumulative face luminosity profile from the center outward.
+         do k=1,nz_old
+            if (k < nz_old) then
+               old_dLdq(k) = (xh_old(i_lum,k) - xh_old(i_lum,k+1))/dq_old(k)
+            else
+               old_dLdq(k) = (xh_old(i_lum,k) - s% L_center)/dq_old(k)
+            end if
+         end do
+
+         do k=1,nz
+            k_old = comes_from(k)
+            if (k_old < 1 .or. k_old > nz_old) then
+               ierr = -1
+               return
+            end if
+            new_dLdq(k) = old_dLdq(k_old)
+         end do
 
          do k=nzlo,nzhi
-            xh(i_lum,k) = L_new(k+1-nzlo)
+            k_old = comes_from(k)
+            if (k_old < 1 .or. k_old > nz_old) then
+               ierr = -1
+               return
+            end if
+            call get_old_value_integral_qp( &
+               k, k_old, nz_old, xq_old_plus1, dq_old, xq(k), dq(k), &
+               old_dLdq, dLdq_integral, dbg, ierr)
+            if (ierr /= 0) return
+            new_dLdq(k) = real(dLdq_integral/real(dq(k),qp), dp)
          end do
 
-         n = nzlo - 1
-         if (n > 0) then
-            do k=1,n
-               xh(i_lum,k) = xh_old(i_lum,k)
-            end do
-         end if
-
-         if (nzhi < nz) then
-            n = nz - nzhi - 1  ! nz-n = nzhi+1
-            do k=0,n
-               xh(i_lum,nz-k) = xh_old(i_lum,nz_old-k)
-            end do
-         end if
+         L_face = real(s% L_center, qp)
+         do k=nz,1,-1
+            L_face = L_face + real(new_dLdq(k),qp)*real(dq(k),qp)
+            xh(i_lum,k) = real(L_face, dp)
+         end do
 
       end subroutine do_L
 
@@ -1525,6 +1570,99 @@
             k_new, k_old_in, nz_old, xq_old, dq_old, xq_outer, dq_range, &
             value_old, p, integral, dbg, ierr)
       end subroutine get_old_value_integral
+
+
+      subroutine get_old_value_integral_qp( &
+            k_new, k_old_in, nz_old, xq_old, dq_old, xq_outer, dq_range, &
+            value_old, integral, dbg, ierr)
+         integer, intent(in) :: k_new, k_old_in, nz_old
+         real(dp), intent(in) :: xq_old(:), dq_old(:), xq_outer, dq_range
+         real(dp), intent(in), dimension(:) :: value_old
+         real(qp), intent(out) :: integral
+         logical, intent(in) :: dbg
+         integer, intent(out) :: ierr
+
+         integer :: k, k_old
+         real(qp) :: xq_inner, sum_dqs, old_xq_outer, old_xq_inner, &
+            dq_overlap, val, xq_outer_qp, dq_range_qp
+
+         include 'formats'
+
+         ! Use qp for the overlap geometry and accumulation because sign-changing
+         ! luminosity shells can make the reconstructed face L a small residual.
+         ierr = 0
+         k_old = k_old_in
+         xq_outer_qp = real(xq_outer, qp)
+         dq_range_qp = real(dq_range, qp)
+
+         do
+            if (k_old <= 1) exit
+            if (xq_old(k_old) <= xq_outer) exit
+            k_old = k_old - 1
+         end do
+
+         xq_inner = xq_outer_qp + dq_range_qp
+         old_xq_inner = real(xq_old(k_old), qp)
+         sum_dqs = 0.0_qp
+         integral = 0.0_qp
+
+         if (dbg) write(*,*)
+         if (dbg) write(*,3) 'k_new k_old xq_outer xq_inner dq_range', &
+            k_new, k_old, xq_outer_qp, xq_inner, dq_range_qp
+
+         do k = k_old, nz_old
+
+            if (dq_range_qp <= sum_dqs) exit
+            old_xq_outer = old_xq_inner
+            if (k == nz_old) then
+               old_xq_inner = 1.0_qp
+            else
+               old_xq_inner = real(xq_old(k+1), qp)
+            end if
+
+            if (dbg) write(*,3) 'k_new k_old old_xq_outer old_xq_inner', &
+               k_new, k, old_xq_outer, old_xq_inner
+
+            val = real(value_old(k), qp)
+
+            if (old_xq_inner <= xq_inner .and. old_xq_outer >= xq_outer_qp) then
+
+               if (dbg) write(*,1) 'entire old cell is in new range'
+
+               sum_dqs = sum_dqs + real(dq_old(k), qp)
+               integral = integral + val*real(dq_old(k), qp)
+
+            else if (old_xq_inner >= xq_inner .and. old_xq_outer <= xq_outer_qp) then
+
+               if (dbg) write(*,1) 'entire new range is in this old cell'
+
+               sum_dqs = dq_range_qp
+               integral = val*dq_range_qp
+
+            else
+
+               if (xq_inner <= old_xq_inner) then
+
+                  if (dbg) write(*,1) 'last part of the new range'
+
+                  integral = integral + val*(dq_range_qp - sum_dqs)
+                  sum_dqs = dq_range_qp
+
+               else
+
+                  dq_overlap = max(0.0_qp, old_xq_inner - xq_outer_qp)
+                  sum_dqs = sum_dqs + dq_overlap
+                  integral = integral + val*dq_overlap
+
+                  if (dbg) write(*,1) 'partial overlap'
+
+               end if
+
+            end if
+
+         end do
+
+      end subroutine get_old_value_integral_qp
 
 
       subroutine get_old_integral( &

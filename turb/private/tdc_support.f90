@@ -26,6 +26,10 @@ use auto_diff
 
 implicit none
 
+integer, parameter :: TDC_arnett_growth_target_mlt = 0
+integer, parameter :: TDC_arnett_growth_target_tdc_no_mlt_corr = 1
+integer, parameter :: TDC_arnett_growth_target_tdc_with_mlt_corr = 2
+
 private
 public :: set_Y
 public :: Q_bisection_search
@@ -38,6 +42,10 @@ public :: tdc_info
 public :: eval_Af
 public :: eval_xis
 public :: compute_Q
+public :: apply_postsolve_TDC_acceleration_limit
+public :: TDC_arnett_growth_target_mlt
+public :: TDC_arnett_growth_target_tdc_no_mlt_corr
+public :: TDC_arnett_growth_target_tdc_with_mlt_corr
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.
@@ -63,12 +71,61 @@ public :: compute_Q
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
+      logical :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split
+      integer :: TDC_arnett_growth_target
       real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
-      type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h
+      type(auto_diff_real_tdc) :: A0, A_mlt, c0, L, L0, gradL, grada, Y_start
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h, grav, chiT, chiRho
    end type tdc_info
 
 contains
+
+   subroutine eval_Af_state(dt, A0, xi0, xi1, xi2, Af)
+      type(auto_diff_real_tdc), intent(in) :: dt, A0, xi0, xi1, xi2
+      type(auto_diff_real_tdc), intent(out) :: Af
+
+      type(auto_diff_real_tdc) :: J, J2, Jt4, num, den, y_for_atan, root
+
+      if (dt%val <= 0d0) then
+         Af = A0
+         return
+      end if
+
+      J2 = pow2(xi1) - 4d0 * xi0 * xi2
+
+      if (J2 > 0d0) then
+         J = sqrt(abs(J2))
+         Jt4 = 0.25d0 * dt * J
+         num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
+         den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
+         Af = num / den
+         if (Af < 0d0) Af = -Af
+      else if (J2 < 0d0) then
+         J = sqrt(abs(J2))
+         Jt4 = 0.25d0 * dt * J
+
+         y_for_atan = xi1 + 2d0 * A0 * xi2
+         root = atan(xi1 / J) - atan(y_for_atan / J)
+
+         if (root > pi) then
+            root = root - pi
+         else if (root < -pi) then
+            root = root + 2d0*pi
+         else if (root < 0d0) then
+            root = root + pi
+         end if
+
+         if (Jt4 < root) then
+            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J))
+            den = 2d0 * xi2
+            Af = num / den
+         else
+            Af = 0d0
+         end if
+      else
+         Af = A0
+      end if
+   end subroutine eval_Af_state
 
    !> Y = +- exp(Z)
    !! If Y > 0, Y = exp(Z)
@@ -446,9 +503,100 @@ contains
       K%d1Array = K_in%d1Array(1:SIZE(K%d1Array))
    end function unconvert
 
+   type(auto_diff_real_tdc) function eval_A_target_arnett_growth(info, Y) result(A_target)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y
+
+      select case (info%TDC_arnett_growth_target)
+      case (TDC_arnett_growth_target_mlt)
+         A_target = info%A_mlt
+      case (TDC_arnett_growth_target_tdc_no_mlt_corr)
+         A_target = eval_Af_tdc_steady_state(info, Y, .false.)
+      case (TDC_arnett_growth_target_tdc_with_mlt_corr)
+         A_target = eval_Af_tdc_steady_state(info, Y, .true.)
+      case default
+         call mesa_error(__FILE__,__LINE__,'bad TDC_arnett_growth_target')
+      end select
+   end function eval_A_target_arnett_growth
+
+   type(auto_diff_real_tdc) function eval_Af_single_state(info, Y, A_start, dt_step) result(Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y, A_start, dt_step
+      type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env, A_target
+
+      if (dt_step%val <= 0d0) then
+         Af = A_start
+         return
+      end if
+
+      if (info%use_TDC_arnett_velocity_closure) then
+         if (Y > 0d0) then
+            A_target = eval_A_target_arnett_growth(info, Y)
+            Af = eval_Af_arnett_growth_to_target_step(info, dt_step, A_start, A_target)
+         else
+            Af = eval_Af_arnett_decay_from_state_step(info, dt_step, Y, A_start)
+         end if
+      else
+         if (Y > 0d0 .and. info%include_mlt_corr_to_TDC) then
+            Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
+         else
+            Y_env = Y
+         end if
+         call eval_xis(info, Y_env, xi0, xi1, xi2)
+         Af = eval_Af_ad(dt_step, A_start, xi0, xi1, xi2)
+      end if
+   end function eval_Af_single_state
+
+   type(auto_diff_real_tdc) function eval_Af_split(info, Y) result(Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y
+      type(auto_diff_real_tdc) :: dt_full, dt1, dt2, A1
+      real(dp), parameter :: tiny = 1d-30
+
+      dt_full = info%dt
+
+      ! Exact-boundary cases are handled by the limiting split:
+      ! if Y_start = 0, the crossing is at t = 0 and the end-state branch
+      ! applies for the full step; if Y = 0, the crossing is at t = dt and
+      ! the start-state branch applies for the full step.
+      if (abs(info%Y_start%val) <= tiny) then
+         Af = eval_Af_single_state(info, Y, info%A0, dt_full)
+         return
+      else if (abs(Y%val) <= tiny) then
+         Af = eval_Af_single_state(info, info%Y_start, info%A0, dt_full)
+         return
+      end if
+
+      if ((info%Y_start > 0d0 .and. Y > 0d0) .or. (info%Y_start < 0d0 .and. Y < 0d0)) then
+         Af = eval_Af_single_state(info, Y, info%A0, dt_full)
+         return
+      end if
+
+      dt1 = dt_full * info%Y_start / (info%Y_start - Y)
+      dt2 = dt_full - dt1
+
+      if (dt1%val <= tiny) then
+         Af = eval_Af_single_state(info, Y, info%A0, dt2)
+         return
+      else if (dt2%val <= tiny) then
+         Af = eval_Af_single_state(info, info%Y_start, info%A0, dt1)
+         return
+      end if
+
+      if (info%Y_start < 0d0 .and. Y > 0d0) then
+         A1 = eval_Af_single_state(info, info%Y_start, info%A0, dt1)
+         Af = eval_Af_single_state(info, Y, A1, dt2)
+      else if (info%Y_start > 0d0 .and. Y < 0d0) then
+         A1 = eval_Af_single_state(info, info%Y_start, info%A0, dt1)
+         Af = eval_Af_single_state(info, Y, A1, dt2)
+      else
+         Af = eval_Af_single_state(info, Y, info%A0, dt_full)
+      end if
+   end function eval_Af_split
+
    !> Q is the residual in the TDC equation, namely:
    !!
-   !! Q = (L - L0 * gradL) - (L0 + c0 * Af) * Y
+   !! Q = (L - L0 * gradL) - L0 * Y - c0 * Af * Y_env
    !!
    !! @param info tdc_info type storing various quantities that are independent of Y.
    !! @param Y superadiabaticity
@@ -458,8 +606,7 @@ contains
       type(tdc_info), intent(in) :: info
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: Q, Af
-      type(auto_diff_real_tdc) :: xi0, xi1, xi2, Y_env
-      real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
+      type(auto_diff_real_tdc) :: Y_env, dt_step
 
       ! Y = grad-gradL
       ! Gamma=(grad-gradE)/(gradE-gradL)
@@ -470,15 +617,18 @@ contains
       ! We only use Y_env /= Y when Y > 0 (i.e. the system is convectively unstable)
       ! because we only have a Gamma from MLT in that case.
       ! so when Y < 0 we just use Y_env = Y.
-      if (Y > 0 .and. info%include_mlt_corr_to_TDC) then
+      if (Y > 0d0 .and. info%include_mlt_corr_to_TDC) then
          Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
       else
          Y_env = Y
       end if
+      dt_step = info%dt
 
-      ! Y_env sets the acceleration of blobs.
-      call eval_xis(info, Y_env, xi0, xi1, xi2)
-      Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
+      if (info%use_TDC_Af_split) then
+         Af = eval_Af_split(info, Y)
+      else
+         Af = eval_Af_single_state(info, Y, info%A0, dt_step)
+      end if
 
       ! Y_env sets the convective flux but not the radiative flux.
       Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env
@@ -630,52 +780,180 @@ contains
       real(dp), intent(in) :: dt
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af  ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root
+      type(auto_diff_real_tdc) :: dt_ad
 
-      J2 = pow2(xi1) - 4d0 * xi0 * xi2
+      dt_ad = dt
+      Af = eval_Af_ad(dt_ad, A0, xi0, xi1, xi2)
+   end function eval_Af
 
-      if (J2 > 0d0) then  ! Hyperbolic branch
-         J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
-         Jt4 = 0.25d0 * dt * J
-         num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
-         den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
-         Af = num / den
-         if (Af < 0d0) then
-            Af = -Af
-         end if
-      else if (J2 < 0d0) then  ! Trigonometric branch
-         J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
-         Jt4 = 0.25d0 * dt * J
+   type(auto_diff_real_tdc) function eval_Af_ad(dt, A0, xi0, xi1, xi2) result(Af)
+      type(auto_diff_real_tdc), intent(in) :: dt, A0, xi0, xi1, xi2
 
-         ! This branch contains decaying solutions that reach A = 0, at which point
-         ! they switch onto the 'zero' branch. So we have to calculate the position of
-         ! the first root to check it against dt.
-         y_for_atan = xi1 + 2d0 * A0 * xi2
-         root = atan(xi1 / J) - atan(y_for_atan / J)
+      call eval_Af_state(dt, A0, xi0, xi1, xi2, Af)
 
-         ! The root enters into a tangent, so we can freely shift it by pi and
-         ! get another root. We care about the first positive root, and the above prescription
-         ! is guaranteed to give an answer between (-2*pi,2*pi) because atan produces an answer in [-pi,pi],
-         ! so we add/subtract a multiple of pi to get the root into [0,pi).
-         if (root > pi) then
-            root = root - pi
-         else if (root < -pi) then
-            root = root + 2d0*pi
-         else if (root < 0d0) then
-            root = root + pi
-         end if
+   end function eval_Af_ad
 
-         if (Jt4 < root) then
-            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J))
-            den = 2d0 * xi2
-            Af = num / den
-         else
-            Af = 0d0
-         end if
-      else  ! if (J2 == 0d0) then
-         Af = A0
+   !> Calculates the end-of-step convective speed on the unstable side for
+   !! the Arnett 1969 closure, given a steady-state target speed.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param A_target The steady-state target convective speed.
+   type(auto_diff_real_tdc) function eval_Af_arnett_growth_to_target(info, A_target) result(Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: A_target
+      type(auto_diff_real_tdc) :: dt_step
+
+      dt_step = info%dt
+      Af = eval_Af_arnett_growth_to_target_step(info, dt_step, info%A0, A_target)
+   end function eval_Af_arnett_growth_to_target
+
+   type(auto_diff_real_tdc) function eval_Af_arnett_growth_to_target_step(info, dt_step, A_start, A_target) result(Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: dt_step, A_start, A_target
+      type(auto_diff_real_tdc) :: Lambda, eta, coeff, disc
+      real(dp), parameter :: tiny = 1d-30
+
+      Lambda = convert(info%mixing_length_alpha*info%Hp)
+      if (Lambda%val <= tiny .or. dt_step%val <= 0d0) then
+         Af = A_start
+         return
       end if
 
-   end function eval_Af
+      eta = dt_step/Lambda
+      coeff = A_start + eta*pow2(A_target)
+      if (coeff%val <= 0d0) then
+         Af = 0d0
+      else
+         disc = sqrt(1d0 + 4d0*eta*coeff)
+         Af = 2d0*coeff/(1d0 + disc)
+      end if
+   end function eval_Af_arnett_growth_to_target_step
+
+   !> Calculates the end-of-step convective speed on the stable side for
+   !! the Arnett 1969 closure, given a reference buoyancy state and
+   !! a starting convective speed.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param Y_ref Reference superadiabaticity used to set the stable-side decay rate.
+   !! @param A_start Starting convective speed for the decay step.
+   type(auto_diff_real_tdc) function eval_Af_arnett_decay_from_state(info, Y_ref, A_start) result(Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y_ref
+      type(auto_diff_real_tdc), intent(in) :: A_start
+      type(auto_diff_real_tdc) :: dt_step
+
+      dt_step = info%dt
+      Af = eval_Af_arnett_decay_from_state_step(info, dt_step, Y_ref, A_start)
+   end function eval_Af_arnett_decay_from_state
+
+   type(auto_diff_real_tdc) function eval_Af_arnett_decay_from_state_step(info, dt_step, Y_ref, A_start) result(Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: dt_step, Y_ref, A_start
+      type(auto_diff_real_tdc) :: Lambda, eta, coeff, disc, N2, N
+      real(dp), parameter :: tiny = 1d-30
+
+      Lambda = convert(info%mixing_length_alpha*info%Hp)
+      if (Lambda%val <= tiny .or. dt_step%val <= 0d0) then
+         Af = A_start
+         return
+      end if
+
+      eta = dt_step/Lambda
+      N2 = -Y_ref*convert(info%chiT/info%chiRho*info%grav/info%Hp)
+      if (N2 > 0d0) then
+         N = sqrt(N2)
+      else
+         N = 0d0
+      end if
+      coeff = 1d0 + dt_step*N
+      if (A_start%val <= 0d0) then
+         Af = 0d0
+      else
+         disc = sqrt(pow2(coeff) + 4d0*eta*A_start)
+         Af = 2d0*A_start/(coeff + disc)
+      end if
+   end function eval_Af_arnett_decay_from_state_step
+
+   !> Calculates the steady-state convective speed for the Kuhfuss 1986
+   !! closure at fixed Y.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param Y Superadiabaticity.
+   !! @param use_mlt_corr If true, use the MLT Gamma correction when forming Y_env.
+   type(auto_diff_real_tdc) function eval_Af_tdc_steady_state(info, Y, use_mlt_corr) result(Af_ss)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y
+      logical, intent(in) :: use_mlt_corr
+      type(auto_diff_real_tdc) :: Y_env, xi0, xi1, xi2, J2, J, root1, root2
+      real(dp), parameter :: tiny = 1d-30
+
+      if (use_mlt_corr) then
+         if (Y > 0d0 .and. info%include_mlt_corr_to_TDC) then
+            Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
+         else
+            Y_env = Y
+         end if
+      else
+         Y_env = Y
+      end if
+
+      call eval_xis(info, Y_env, xi0, xi1, xi2)
+
+      Af_ss = 0d0
+      if (abs(xi2%val) <= tiny) then
+         if (abs(xi1%val) > tiny) then
+            root1 = -xi0/xi1
+            if (root1 > Af_ss) Af_ss = root1
+         end if
+         return
+      end if
+
+      J2 = pow2(xi1) - 4d0*xi0*xi2
+      if (J2 <= 0d0) return
+
+      J = sqrt(J2)
+      root1 = (-xi1 + J)/(2d0*xi2)
+      root2 = (-xi1 - J)/(2d0*xi2)
+      if (root1 > Af_ss) Af_ss = root1
+      if (root2 > Af_ss) Af_ss = root2
+   end function eval_Af_tdc_steady_state
+
+   !> Applies the optional post-solve acceleration limit to the TDC convective
+   !! speed and then recomputes Y from the luminosity balance at fixed Af.
+   !!
+   !! On the growth side the target is evaluated from the end-of-step TDC state.
+   !! On the decay side the target uses the explicit start-of-step thermal state.
+   !!
+   !! @param info tdc_info type storing various quantities that are independent of Y.
+   !! @param Y On input, the solved superadiabaticity. On output, the value
+   !!          consistent with the limited convective speed.
+   !! @param Af On input, the solved convective speed variable. On output, the
+   !!           limited convective speed variable.
+   subroutine apply_postsolve_TDC_acceleration_limit(info, Y, Af)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(inout) :: Y, Af
+      type(auto_diff_real_tdc) :: Af_bound, Af_target, Af_excess0, numer, denom, Y_env_factor
+      real(dp), parameter :: tiny = 1d-30
+
+      Af_target = eval_Af_tdc_steady_state(info, Y, info%include_mlt_corr_to_TDC)
+
+      if (Af_target > info%A0 + tiny) then
+         Af_bound = eval_Af_arnett_growth_to_target(info, Af_target)
+         if (Af_bound < Af) Af = max(0d0, Af_bound)
+      else if (Af_target < info%A0 - tiny) then
+         Af_excess0 = info%A0 - Af_target
+         Af_bound = Af_target + eval_Af_arnett_decay_from_state(info, info%Y_start, Af_excess0)
+         if (Af_bound > Af) Af = max(0d0, Af_bound)
+      end if
+
+      numer = info%L - info%L0*info%gradL
+      if (numer > 0d0 .and. info%include_mlt_corr_to_TDC) then
+         Y_env_factor = convert(info%Gamma/(1d0+info%Gamma))
+      else
+         Y_env_factor = 1d0
+      end if
+      denom = info%L0 + info%c0*Af*Y_env_factor
+      Y = numer/denom
+   end subroutine apply_postsolve_TDC_acceleration_limit
 
 end module tdc_support

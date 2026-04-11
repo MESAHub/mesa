@@ -4,6 +4,12 @@
          logical :: TDC_use_density_form_for_eddy_viscosity
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
          logical :: use_TDC_enthalpy_flux_limiter
+         logical :: use_TDC_arnett_velocity_closure
+         logical :: use_TDC_acceleration_limit
+         logical :: use_TDC_Af_split
+         logical :: use_conservative_L_remesh
+         logical :: use_face_values_eos_and_kap_mlt_tdc
+         integer :: TDC_arnett_growth_target
          logical :: include_mlt_in_velocity_time_centering
          logical :: use_hydro_merge_limits_in_mesh_plan
 

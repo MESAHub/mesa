@@ -98,6 +98,7 @@ SRCS := \
    private/init_model.f90 \
    private/ionization_potentials.f90 \
    private/kap_support.f90 \
+   private/mlt_tdc_face_support.f90 \
    private/magnetic_diffusion.f90 \
    private/mass_utils.f90 \
    private/mesh_adjust.f90 \

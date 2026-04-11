@@ -1,0 +1,46 @@
+# matplotlib style sheet for MESA Instrument Papers
+
+#figure.figsize		: 3.38, 2.535 # 4x3 with width=apjcolwidth
+#figure.figsize     : 14,14
+lines.markersize	: 8
+lines.linewidth		: 1.5
+axes.linewidth		: 2.0
+text.usetex		: True
+font.size		: 24
+font.family		: sans
+# Not sure about the right font to use...
+font.serif		: Computer Modern Roman # Times Roman?
+axes.titlesize		: large
+axes.labelsize		: large
+legend.fontsize		: 18
+legend.frameon		: False
+figure.dpi 		: 500
+
+# New commandments from Rich for MESA4
+xtick.minor.visible     : True
+ytick.minor.visible     : True
+
+# Some other things we should agree on.
+savefig.bbox		: tight # standard
+savefig.pad_inches	: 0.15 # Padding when bbox is tight.
+savefig.dpi		: 300
+savefig.format		: pdf
+
+# Tweaks to get rid of some matplotlib 2.0 default changes I don't like.
+xtick.direction	    : in
+xtick.top	    : True
+ytick.direction	    : in
+ytick.right	    : True
+
+# Miscellanious
+axes.formatter.use_mathtext : True
+#figure.autolayout	    : True
+
+xtick.major.size     : 14#10      # major tick size in points
+xtick.minor.size     : 12#8      # minor tick size in points
+xtick.major.width    : 1.75    # major tick width in points
+xtick.minor.width    : 1.5    # minor tick width in points
+ytick.major.size     : 14#10      # major tick size in points
+ytick.minor.size     : 10#8 # minor tick size in points
+ytick.major.width    : 1.75    # major tick width in points
+ytick.minor.width    : 1.5    # minor tick width in points

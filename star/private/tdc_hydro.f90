@@ -26,6 +26,7 @@ module tdc_hydro
    use auto_diff_support
    use accurate_sum_auto_diff_star_order1
    use star_utils
+   use mlt_tdc_face_support, only: get_face_scale_height_ad
 
    implicit none
 
@@ -60,7 +61,8 @@ contains
          ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
          if (s%Hp_face(k) <= 0) then
             ! this scale height for face is already calculated in TDC
-            s%Hp_face(k) = get_scale_height_face_val(s, k) ! because this is called before s% scale_height(k) is updated in mlt_vars.
+            s%Hp_face(k) = get_TDC_alpha_M_Hp_face_val(s, k, op_err) ! because this is called before s% scale_height(k) is updated in mlt_vars.
+            if (op_err /= 0) ierr = op_err
          end if
       end do
       !$OMP END PARALLEL DO
@@ -104,14 +106,48 @@ contains
    end subroutine get_TDC_alfa_beta_face_weights
 
 
+   function get_TDC_alpha_M_Hp_face(s, k, ierr) result(Hp_face)
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: Hp_face
+
+      ierr = 0
+      if (s%use_face_values_eos_and_kap_mlt_tdc) then
+         call get_face_scale_height_ad(s, k, Hp_face, ierr)
+      else
+         Hp_face = get_scale_height_face(s, k)
+      end if
+   end function get_TDC_alpha_M_Hp_face
+
+
+   real(dp) function get_TDC_alpha_M_Hp_face_val(s, k, ierr) result(Hp_face)
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: Hp_face_ad
+
+      Hp_face_ad = get_TDC_alpha_M_Hp_face(s, k, ierr)
+      if (ierr /= 0) then
+         Hp_face = -1d0
+      else
+         Hp_face = Hp_face_ad%val
+      end if
+   end function get_TDC_alpha_M_Hp_face_val
+
+
    function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm , different than rsp2
       type(star_info), pointer :: s
       integer, intent(in) :: k
+      integer :: ierr
       type(auto_diff_real_star_order1) :: Hp1, Hp0, Hp_cell
-      Hp0 = get_scale_height_face(s,k)
+      ierr = 0
+      Hp0 = get_TDC_alpha_M_Hp_face(s, k, ierr)
+      if (ierr /= 0) return
       Hp1 = 0d0
       if (k+1 < s%nz) then
-         Hp1 = shift_p1(get_scale_height_face(s,k+1))
+         Hp1 = shift_p1(get_TDC_alpha_M_Hp_face(s, k+1, ierr))
+         if (ierr /= 0) return
       end if
       Hp_cell = 0.5d0*(Hp0 + Hp1)
       !0.5d0*(wrap_Hp_00(s, k) + wrap_Hp_p1(s, k))
@@ -256,7 +292,7 @@ contains
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
    else
-      Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
+      Hp_face = get_TDC_alpha_M_Hp_face(s, k, ierr) !Hp_cell_for_Chi(s, k, ierr)
       if (ierr /= 0) return
       if (s%TDC_use_density_form_for_eddy_viscosity) then
          ! new density derivative form
@@ -451,7 +487,7 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1, term1, term2
+      type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
       logical :: dbg
       include 'formats'
       ierr = 0
@@ -472,6 +508,8 @@ contains
       end if
    end function compute_d_v_div_r
 
+   ! Currently unused. Kept as the cell-centered opt-time-centered counterpart
+   ! to the face version below in case that path is revived later.
    function compute_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r)  ! s^-1
       type(star_info), pointer :: s
       integer, intent(in) :: k
@@ -580,7 +618,7 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1, term1, term2
+      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1
       logical :: dbg
       include 'formats'
       ierr = 0
@@ -620,7 +658,7 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1, term1, term2
+      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1
       logical :: dbg
       include 'formats'
       ierr = 0

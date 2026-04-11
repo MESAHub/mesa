@@ -210,6 +210,7 @@ contains
 
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
+      if (info%use_TDC_acceleration_limit) call apply_postsolve_TDC_acceleration_limit(info, Y, Af)
       Y_face = unconvert(Y)
       conv_vel = sqrt_2_div_3*unconvert(Af)
 
