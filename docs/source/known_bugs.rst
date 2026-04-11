@@ -10,6 +10,22 @@ we will also list workarounds, but for some bugs the only option will be to upda
 a newer version of MESA. Note this list is NOT comprehensive; users should check this first if they have an
 issue, but it may not be complete.
 
+r25.12.1
+========
+
+.. _colors_zbase_bug:
+
+Colors: atmosphere metallicity selected from ``Zbase``
+------------------------------------------------------
+
+In ``r25.12.1``, the new colors module could select atmosphere metallicity from ``Zbase`` instead
+of the current photospheric ``[M/H]`` from ``Z/X``. This could return solar-metallicity colors and
+SEDs for non-solar models, especially for metal-poor stars.
+
+This is fixed in ``r26.4.1``. Update to ``r26.4.1`` or newer.
+
+See `gh-938 <https://github.com/MESAHub/mesa/issues/938>`_.
+
 r23.05.1
 ========
 
@@ -181,5 +197,3 @@ r12778
 
 r12115
 ======
-
-

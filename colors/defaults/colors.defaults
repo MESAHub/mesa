@@ -81,25 +81,26 @@
    ! ``z_over_x_ref`` is the reference metal-to-hydrogen ratio used to map
    ! the photospheric composition onto the atmosphere-table metallicity axis:
    ! [Fe/H] = log10((Z/X)/z_over_x_ref).
-   
+
    ! The default matches the GS98 solar mixture used by the default
    ! Kurucz2003all ATLAS9 atmosphere grid and equals
    ! 0.0169/(1 - 0.0169 - 0.2485) = 2.30057173972d-2.
-   
+
    ! If the photospheric metallicity, expressed as Z/X, falls outside the
    ! metallicity range available in the tabulated atmosphere lookup table,
    ! then MESA uses the nearest metallicity in the table for the atmosphere
    ! interpolation. If the photospheric hydrogen mass fraction or metal mass
    ! fraction is not positive, then MESA cannot form
-   ! log10((Z/X)/z_over_x_ref), so it uses the lowest metallicity in the
-   ! table instead. This is a fallback safeguard and not a dedicated treatment
-   ! for H-free atmospheres.
-   
+   ! log10((Z/X)/z_over_x_ref). In that case the module still returns colors
+   ! and SEDs, but it does so by using the lowest metallicity in the table.
+   ! This is a fallback safeguard and not a dedicated treatment for H-free
+   ! atmospheres.
+
    ! For the shipped Kurucz2003all table in this checkout, the
    ! metallicity range is [Fe/H] = -2.5 to [Fe/H] = 4.0. With the
    ! default ``z_over_x_ref``, the lower edge corresponds to
    ! Z/X ~ 7.275d-5.
-   
+
    ! ::
 
       z_over_x_ref = 2.30057173972d-2
@@ -119,7 +120,7 @@
    ! If ``read_extra_colors_inlist(i)`` is true, then read ``&colors``
    ! from the file ``extra_colors_inlist_name(i)``.
    !
-   
+
    ! ::
 
       read_extra_colors_inlist(:) = .false.
