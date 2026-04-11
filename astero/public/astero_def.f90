@@ -839,73 +839,39 @@
 
 
       subroutine read_astero_search_controls(filename, ierr)
+         use utils_namelist, only: read_namelist, missing_namelist_error
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
+
          ! initialize controls to default values
          include 'astero_search.defaults'
-         ierr = 0
-         call read1_astero_search_inlist(filename, 1, ierr)
+
+         call read_namelist(filename, read_astero_search_file, "astero_search_controls", ierr, missing_namelist_error)
       end subroutine read_astero_search_controls
 
+      subroutine read_astero_search_file(unit, iostat, iomsg, extra_inlists, extra_inlists_mask)
+         use const_def, only: strlen, max_extra_inlists
 
-      recursive subroutine read1_astero_search_inlist(filename, level, ierr)
-         character (len=*), intent(in) :: filename
-         integer, intent(in) :: level
-         integer, intent(out) :: ierr
+         integer, intent(in) :: unit
+         integer, intent(out) :: iostat
+         character(len=strlen), intent(out) :: iomsg
+         character(len=strlen), dimension(max_extra_inlists), intent(out) :: extra_inlists
+         logical, dimension(max_extra_inlists), intent(out) :: extra_inlists_mask
 
-         logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen) :: message
-         character (len=strlen), dimension(max_extra_inlists) :: extra
-         integer :: unit, i
+         integer :: i
 
-         if (level >= 10) then
-            write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
-            ierr = -1
+         read(unit, nml=astero_search_controls, iostat=iostat, iomsg=iomsg)
+
+         if (iostat /= 0) then
             return
          end if
 
-         ierr = 0
-         unit=alloc_iounit(ierr)
-         if (ierr /= 0) return
-
-         open(unit=unit, file=trim(filename), action='read', delim='quote', iostat=ierr)
-         if (ierr /= 0) then
-            write(*, *) 'Failed to open astero search inlist file ', trim(filename)
-         else
-            read(unit, nml=astero_search_controls, iostat=ierr)
-            close(unit)
-            if (ierr /= 0) then
-               write(*, *) &
-                  'Failed while trying to read astero search inlist file ', trim(filename)
-               write(*, '(a)') trim(message)
-               write(*, '(a)') &
-                  'The following runtime error message might help you find the problem'
-               write(*, *)
-               open(unit=unit, file=trim(filename), &
-                  action='read', delim='quote', status='old', iostat=ierr)
-               read(unit, nml=astero_search_controls)
-               close(unit)
-            end if
-         end if
-         call free_iounit(unit)
-         if (ierr /= 0) return
-
-         ! recursive calls to read other inlists
          do i=1, max_extra_inlists
-            read_extra(i) = read_extra_astero_search_inlist(i)
-            read_extra_astero_search_inlist(i) = .false.
-            extra(i) = extra_astero_search_inlist_name(i)
-            extra_astero_search_inlist_name(i) = 'undefined'
-
-            if (read_extra(i)) then
-               call read1_astero_search_inlist(extra(i), level+1, ierr)
-               if (ierr /= 0) return
-            end if
+            extra_inlists(i) = extra_astero_search_inlist_name(i)
+            extra_inlists_mask(i) = read_extra_astero_search_inlist(i)
          end do
 
-
-      end subroutine read1_astero_search_inlist
-
+      end subroutine read_astero_search_file
 
       subroutine write_astero_search_controls(filename_in, ierr)
          use utils_lib
@@ -938,75 +904,40 @@
 
       end subroutine write_astero_search_controls
 
-
       subroutine read_astero_pgstar_controls(filename, ierr)
+         use utils_namelist, only: read_namelist, missing_namelist_error
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
 
          ! initialize controls to default values
          include 'astero_pgstar.defaults'
 
-         ierr = 0
-         call read1_astero_pgstar_inlist(filename, 1, ierr)
-
+         call read_namelist(filename, read_astero_pgstar_file, "astero_pgstar_controls", ierr, missing_namelist_error)
       end subroutine read_astero_pgstar_controls
 
+      subroutine read_astero_pgstar_file(unit, iostat, iomsg, extra_inlists, extra_inlists_mask)
+         use const_def, only: strlen, max_extra_inlists
 
-      recursive subroutine read1_astero_pgstar_inlist(filename, level, ierr)
-         character (len=*), intent(in) :: filename
-         integer, intent(in) :: level
-         integer, intent(out) :: ierr
+         integer, intent(in) :: unit
+         integer, intent(out) :: iostat
+         character(len=strlen), intent(out) :: iomsg
+         character(len=strlen), dimension(max_extra_inlists), intent(out) :: extra_inlists
+         logical, dimension(max_extra_inlists), intent(out) :: extra_inlists_mask
 
-         logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen), dimension(max_extra_inlists) :: extra
-         integer :: unit, i
+         integer :: i
 
-         if (level >= 10) then
-            write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
-            ierr = -1
+         read(unit, nml=astero_pgstar_controls, iostat=iostat, iomsg=iomsg)
+
+         if (iostat /= 0) then
             return
          end if
 
-         ierr = 0
-         unit=alloc_iounit(ierr)
-         if (ierr /= 0) return
-
-         open(unit=unit, file=trim(filename), action='read', delim='quote', iostat=ierr)
-         if (ierr /= 0) then
-            write(*, *) 'Failed to open astero pgstar inlist file ', trim(filename)
-         else
-            read(unit, nml=astero_pgstar_controls, iostat=ierr)
-            close(unit)
-            if (ierr /= 0) then
-               write(*, *) &
-                  'Failed while trying to read astero pgstar inlist file ', trim(filename)
-               write(*, '(a)') &
-                  'The following runtime error message might help you find the problem'
-               write(*, *)
-               open(unit=unit, file=trim(filename), &
-                  action='read', delim='quote', status='old', iostat=ierr)
-               read(unit, nml=astero_pgstar_controls)
-               close(unit)
-            end if
-         end if
-         call free_iounit(unit)
-         if (ierr /= 0) return
-
-                  ! recursive calls to read other inlists
          do i=1, max_extra_inlists
-            read_extra(i) = read_extra_astero_pgstar_inlist(i)
-            read_extra_astero_pgstar_inlist(i) = .false.
-            extra(i) = extra_astero_pgstar_inlist_name(i)
-            extra_astero_pgstar_inlist_name(i) = 'undefined'
-
-            if (read_extra(i)) then
-               call read1_astero_pgstar_inlist(extra(i), level+1, ierr)
-               if (ierr /= 0) return
-            end if
+            extra_inlists(i) = extra_astero_pgstar_inlist_name(i)
+            extra_inlists_mask(i) = read_extra_astero_pgstar_inlist(i)
          end do
 
-      end subroutine read1_astero_pgstar_inlist
-
+      end subroutine read_astero_pgstar_file
 
       subroutine save_sample_results_to_file(i_total, results_fname, ierr)
          use utils_lib
