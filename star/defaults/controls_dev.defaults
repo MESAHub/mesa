@@ -281,15 +281,16 @@
       ! use_face_values_eos_and_kap_mlt_tdc
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If use_face_values_eos_and_kap_mlt_tdc = .true., evaluate the current
-      ! MLT/TDC thermodynamic bundle from a face-centered state. Face T and rho
-      ! are still built by wrapping the cell-centered primitives to the face,
-      ! but then a single EOS call at that face state is used to obtain P, Cp,
-      ! chiRho, chiT, grad_ad, lnfree_e, eta, and opacity. Those face-EOS
-      ! quantities are then used directly in the local gradr seen by MLT/TDC.
-      ! Wrapped rho and wrapped specific energy are still used in the MLT/TDC
-      ! call, so this is a local thermodynamic-bundle change, not a full
-      ! face-state reformulation of the whole star solve.
+      ! MESA interpolates primitive solver variables such as T, rho, L, and
+      ! composition, together with constructed quantities such as opacity,
+      ! pressure, and other EOS results, onto cell faces for use in MLT and
+      ! TDC. If use_face_values_eos_and_kap_mlt_tdc = .true., this option
+      ! instead reconstructs only the primitive face variables and then makes
+      ! additional EOS and opacity calls to obtain the thermodynamic quantities
+      ! corresponding to that face state. Despite the cost of the extra EOS and
+      ! opacity work, this can improve accuracy on coarse meshes, especially in
+      ! unresolved opacity bumps in pulsating envelopes, and is a potential
+      ! candidate for becoming the default mode, pending further testing.
 
       ! ::
 
