@@ -378,6 +378,12 @@
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
+         logical, pointer :: have_mlt_tdc_face_state(:)
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            mlt_tdc_T_face_ad, mlt_tdc_rho_face_ad, mlt_tdc_P_face_ad, &
+            mlt_tdc_Cp_face_ad, mlt_tdc_ChiRho_face_ad, mlt_tdc_ChiT_face_ad, &
+            mlt_tdc_grada_face_ad, mlt_tdc_opacity_face_ad, &
+            mlt_tdc_scale_height_face_ad, mlt_tdc_gradr_face_ad
 
 
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
@@ -386,6 +392,8 @@
 
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             PII_ad, Chi_ad, Eq_ad, COUPL_ad, Lr_ad, Lc_ad, Lt_ad
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            tdc_Chi_div_w_face_ad, tdc_Eq_div_w_face_ad, tdc_Chi_div_w_cell_ad
          real(dp), pointer, dimension(:) :: &
             Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
             SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start
@@ -812,6 +820,7 @@
          real(dp), pointer :: lnd_start(:) ! (nz)
          real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: Peos_face_start(:) ! (nz)
+         real(dp), pointer :: mlt_tdc_P_face_start(:) ! (nz)
          real(dp), pointer :: lnPeos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)

@@ -261,6 +261,46 @@
     use_TDC_Af_split = .false.
 
 
+      ! use_TDC_enhanced_dissipation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_enhanced_dissipation = .true., replace the baseline Kuhfuss
+      ! local-TDC dissipation length in the xi2 damping term by a reduced
+      ! dissipation length following the Ahlborn/Kupka harmonic-sum correction.
+      !
+      ! This change applies only to the Kuhfuss local-TDC closure. It does not
+      ! modify the optional Arnett velocity closure.
+
+      ! ::
+
+    use_TDC_enhanced_dissipation = .false.
+
+
+      ! TDC_enhanced_dissipation_c4
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Effective stable-side dissipation-length coefficient c4 used in the
+      ! Ahlborn/Kupka reduction factor for the Kuhfuss local-TDC dissipation
+      ! length. Larger values give a shorter dissipation length in stable
+      ! regions and therefore stronger damping.
+
+      ! ::
+
+    TDC_enhanced_dissipation_c4 = 0.072d0
+
+
+      ! TDC_enhanced_dissipation_v_floor
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Speed floor in cm s^-1 used together with the lagged start-of-step
+      ! convective speed when evaluating the Ahlborn/Kupka stable-side
+      ! dissipation-length correction for local TDC.
+
+      ! ::
+
+    TDC_enhanced_dissipation_v_floor = 1d0
+
+
       ! use_conservative_L_remesh
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 

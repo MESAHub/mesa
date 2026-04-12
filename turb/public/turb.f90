@@ -125,6 +125,13 @@ module turb
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param use_TDC_Af_split If true, use the split-step A_f closure when the start/end
    !!        thermal states lie on opposite sides of Y = 0.
+   !! @param use_TDC_enhanced_dissipation If true, replace the baseline Kuhfuss
+   !!        local-TDC dissipation length in xi2 by the Ahlborn/Kupka harmonic-sum
+   !!        dissipation length.
+   !! @param TDC_enhanced_dissipation_c4 Stable-side dissipation-length coefficient
+   !!        used in the Ahlborn/Kupka reduction factor.
+   !! @param TDC_enhanced_dissipation_v_floor Speed floor used with the lagged
+   !!        start-of-step convective speed in the stable-side reduction factor.
    !! @param TDC_arnett_growth_target Unstable-side steady-state target for David Arnett's
    !!        convection model in this implementation.
    !! @param ierr Tracks errors (output).
@@ -134,6 +141,7 @@ module turb
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
             max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
             TDC_alpha_S, use_TDC_enthalpy_flux_limiter, use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split, &
+            use_TDC_enhanced_dissipation, TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor, &
             TDC_arnett_growth_target, energy, ierr)
       use tdc
       use tdc_support
@@ -143,8 +151,10 @@ module turb
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav, energy
       logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       logical, intent(in) :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split
+      logical, intent(in) :: use_TDC_enhanced_dissipation
       integer, intent(in) :: TDC_arnett_growth_target
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
+      real(dp), intent(in) :: TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
       type(auto_diff_real_star_order1) :: L, Lambda, Gamma
@@ -170,11 +180,14 @@ module turb
       info%use_TDC_arnett_velocity_closure = use_TDC_arnett_velocity_closure
       info%use_TDC_acceleration_limit = use_TDC_acceleration_limit
       info%use_TDC_Af_split = use_TDC_Af_split
+      info%use_TDC_enhanced_dissipation = use_TDC_enhanced_dissipation
       info%TDC_arnett_growth_target = TDC_arnett_growth_target
       info%mixing_length_alpha = mixing_length_alpha
       info%TDC_alpha_D = TDC_alpha_D
       info%TDC_alpha_R = TDC_alpha_R
       info%TDC_alpha_Pt = TDC_alpha_Pt
+      info%TDC_enhanced_dissipation_c4 = TDC_enhanced_dissipation_c4
+      info%TDC_enhanced_dissipation_v_floor = TDC_enhanced_dissipation_v_floor
       info%dt = dt
       info%L = convert(L)
       info%gradL = convert(gradL)
@@ -187,6 +200,7 @@ module turb
       info%h = energy + P/rho ! actual enthalpy
       info%T = T
       info%rho = rho
+      info%r = r
       info%dV = dV
       info%Cp = Cp
       info%kap = opacity

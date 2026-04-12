@@ -72,13 +72,68 @@ public :: TDC_arnett_growth_target_tdc_with_mlt_corr
    type tdc_info
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       logical :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split
+      logical :: use_TDC_enhanced_dissipation
       integer :: TDC_arnett_growth_target
       real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
+      real(dp) :: TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor
       type(auto_diff_real_tdc) :: A0, A_mlt, c0, L, L0, gradL, grada, Y_start
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h, grav, chiT, chiRho
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h, grav, chiT, chiRho, r
    end type tdc_info
 
 contains
+
+   ! Returns the dissipation length used in the Kuhfuss local-TDC damping term.
+   ! With the control on, this uses the Ahlborn/Kupka harmonic-sum length:
+   ! the geometric Wuchterl baseline for Y >= 0 and the stable-side reduced
+   ! length for Y < 0 using the lagged start-of-step convection speed scale.
+   type(auto_diff_real_tdc) function eval_tdc_dissipation_length(info, Y) result(Lambda_diss)
+      type(tdc_info), intent(in) :: info
+      type(auto_diff_real_tdc), intent(in) :: Y
+      type(auto_diff_real_tdc) :: Lambda0, Lambda_geom, radius, N2_loc, N_loc, a_quad, b_quad, v_lag
+      real(dp) :: v_floor
+      real(dp), parameter :: tiny_len = 1d-30
+      real(dp), parameter :: tiny_speed = 1d-30
+
+      Lambda0 = convert(info%mixing_length_alpha*info%Hp)
+      if (.not. info%use_TDC_enhanced_dissipation) then
+         Lambda_diss = Lambda0
+         return
+      end if
+
+      radius = convert(info%r)
+      if (Lambda0%val <= tiny_len .or. radius%val <= tiny_len) then
+         Lambda_diss = Lambda0
+         return
+      end if
+
+      ! Source-model baseline in the convection zone: the Wuchterl harmonic sum
+      ! between the mixing length and the local radius.
+      Lambda_geom = 1d0/(1d0/Lambda0 + 1d0/radius)
+
+      if (Y%val >= 0d0 .or. info%TDC_enhanced_dissipation_c4 <= 0d0) then
+         Lambda_diss = Lambda_geom
+         return
+      end if
+
+      N2_loc = -Y*convert(info%chiT/info%chiRho*info%grav/info%Hp)
+      if (N2_loc%val <= 0d0) then
+         Lambda_diss = Lambda_geom
+         return
+      end if
+
+      N_loc = sqrt(N2_loc)
+      v_floor = max(info%TDC_enhanced_dissipation_v_floor, tiny_speed)
+      v_lag = sqrt(pow2(info%A0) + pow2(v_floor))
+
+      a_quad = info%TDC_enhanced_dissipation_c4*N_loc/(v_lag*radius)
+      if (a_quad%val <= 0d0) then
+         Lambda_diss = Lambda_geom
+         return
+      end if
+
+      b_quad = 1d0/Lambda0 + 1d0/radius
+      Lambda_diss = 2d0/(b_quad + sqrt(pow2(b_quad) + 4d0*a_quad))
+   end function eval_tdc_dissipation_length
 
    subroutine eval_Af_state(dt, A0, xi0, xi1, xi2, Af)
       type(auto_diff_real_tdc), intent(in) :: dt, A0, xi0, xi1, xi2
@@ -666,7 +721,7 @@ contains
       type(tdc_info), intent(in) :: info
       type(auto_diff_real_tdc), intent(in) :: Y
       type(auto_diff_real_tdc), intent(out) :: xi0, xi1, xi2
-      type(auto_diff_real_tdc) :: S0, D0, DR0
+      type(auto_diff_real_tdc) :: S0, D0, DR0, Lambda_diss
       type(auto_diff_real_star_order1) :: gammar_div_alfa, Pt0, dVdt
       type(auto_diff_real_tdc) :: X, FL, scale
       real(dp), parameter :: x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3
@@ -701,7 +756,8 @@ contains
          S0 = S0*Y + convert(info%Eq_div_w)
       end if
 
-      D0 = convert(info%TDC_alpha_D*x_CEDE/(info%mixing_length_alpha*info%Hp))
+      Lambda_diss = eval_tdc_dissipation_length(info, Y)
+      D0 = info%TDC_alpha_D*x_CEDE/Lambda_diss
       gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
       Pt0 = info%TDC_alpha_Pt*x_ALFAP*info%rho

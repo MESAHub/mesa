@@ -740,6 +740,20 @@
    !Uq
    !Y_face
 
+   !mlt_tdc_T_face
+   !mlt_tdc_rho_face
+   !mlt_tdc_P_face
+   !mlt_tdc_Cp_face
+   !mlt_tdc_ChiRho_face
+   !mlt_tdc_ChiT_face
+   !mlt_tdc_grada_face
+   !mlt_tdc_opacity_face
+   !mlt_tdc_scale_height_face
+   !mlt_tdc_gradr_face
+   !tdc_Chi_div_w_face
+   !tdc_Eq_div_w_face
+   !tdc_Chi_div_w_cell
+
 !# RTI
 
    !RTI_du_diffusion_kick

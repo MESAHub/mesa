@@ -1339,6 +1339,13 @@ contains
     kf_t = kc_t
     kf_b = kc_b + 1
 
+    if (s% use_face_values_eos_and_kap_mlt_tdc) then
+       ! update_model_ changed the local composition and refreshed EOS and kap
+       ! on kc_t:kc_b, so the cached face thermo bundle must be rebuilt for the
+       ! interior faces before set_mlt_vars uses it.
+       s% have_mlt_tdc_face_state(kf_t+1:kf_b-1) = .false.
+    end if
+
     call set_mlt_vars(s, kf_t+1, kf_b-1, ierr)
     if (ierr /= 0) then
        write(*,*) 'conv_premix: failed in call to set_mlt_vars during update_model_'

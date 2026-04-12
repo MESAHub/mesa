@@ -21,6 +21,7 @@
 
       use star_private_def
       use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
+      use mlt_tdc_face_support, only: get_face_eos_kap_ad
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -51,6 +52,7 @@
          type(auto_diff_real_star_order1) :: L_ad, r_00, area, area2, Lrad_ad, &
             kap_00, kap_m1, kap_face, d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
             P_rad_m1, P_rad_00, d_P_rad_actual_ad, resid
+         type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face
          type(auto_diff_real_star_order1) :: flxR, flxLambda
 
          integer :: i_equL
@@ -88,9 +90,19 @@
             Lrad_ad = L_ad
          end if
 
-         kap_00 = wrap_kap_00(s,k)
-         kap_m1 = wrap_kap_m1(s,k)
-         kap_face = alfa*kap_00 + beta*kap_m1
+         if (s% use_face_values_eos_and_kap_mlt_tdc) then
+            if (s% have_mlt_tdc_face_state(k)) then
+               kap_face = s% mlt_tdc_opacity_face_ad(k)
+            else
+               call get_face_eos_kap_ad( &
+                  s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, kap_face, ierr)
+               if (ierr /= 0) return
+            end if
+         else
+            kap_00 = wrap_kap_00(s,k)
+            kap_m1 = wrap_kap_m1(s,k)
+            kap_face = alfa*kap_00 + beta*kap_m1
+         end if
          if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) &
             kap_face = s% min_kap_for_dPrad_dm_eqn
 
@@ -397,7 +409,8 @@
          integer, intent(out) :: ierr
 
          real(dp) :: alfa
-         type(auto_diff_real_star_order1) :: grav, area, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1
+         type(auto_diff_real_star_order1) :: grav, area, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1, mlt_Ptrb_face
+         type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
          include 'formats'
 
          ierr = 0
@@ -408,37 +421,59 @@
          ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
          call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
 
-         ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
-         ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
-         if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
-            .and. s% mlt_Pturb_factor > 0d0) then
-            if (k ==1) then
-               mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-               mlt_Ptrbm1 = 0d0
+         if (s% use_face_values_eos_and_kap_mlt_tdc) then
+            if (s% have_mlt_tdc_face_state(k)) then
+               rho_face = s% mlt_tdc_rho_face_ad(k)
+               Ppoint = s% mlt_tdc_P_face_ad(k)
             else
-               mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-               mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
+               call get_face_eos_kap_ad( &
+                  s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
+               if (ierr /= 0) return
+               Ppoint = P_face
             end if
-         else ! no mlt_pturb
-            mlt_Ptrb00 = 0d0
-            mlt_Ptrbm1 = 0d0
-         end if
-
-         P00 = wrap_Peos_00(s,k)
-
-         ! mlt Pturb doesn't support time centering yet.
-         if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
-
-         if (k == 1) then
-            Pm1 = 0d0
-            Ppoint = P00 + mlt_Ptrb00
+            if (s% using_velocity_time_centering) then
+               Ppoint = 0.5d0*(Ppoint + s% mlt_tdc_P_face_start(k))
+            end if
+            if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+               .and. s% mlt_Pturb_factor > 0d0) then
+               ! Keep the lagged convective velocity, but form the pressure term from the same
+               ! face density used by the reconstructed face thermodynamic quantities.
+               mlt_Ptrb_face = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face/3d0
+               Ppoint = Ppoint + mlt_Ptrb_face
+            end if
          else
-            Pm1 = wrap_Peos_m1(s,k)
-            if (s% using_velocity_time_centering) Pm1 = 0.5d0*(Pm1 + s% Peos_start(k-1)) ! pm1 wasn't time centered until now
-            Pm1 = Pm1 + mlt_Ptrbm1 ! include mlt Ptrb in k-1
-            P00 = P00 + mlt_Ptrb00 ! include mlt Ptrb in k
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            Ppoint = alfa*P00 + (1d0-alfa)*Pm1
+            ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
+            ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
+            if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+               .and. s% mlt_Pturb_factor > 0d0) then
+               if (k ==1) then
+                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+                  mlt_Ptrbm1 = 0d0
+               else
+                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+                  mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
+               end if
+            else ! no mlt_pturb
+               mlt_Ptrb00 = 0d0
+               mlt_Ptrbm1 = 0d0
+            end if
+
+            P00 = wrap_Peos_00(s,k)
+
+            ! mlt Pturb doesn't support time centering yet.
+            if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
+
+            if (k == 1) then
+               Pm1 = 0d0
+               Ppoint = P00 + mlt_Ptrb00
+            else
+               Pm1 = wrap_Peos_m1(s,k)
+               if (s% using_velocity_time_centering) Pm1 = 0.5d0*(Pm1 + s% Peos_start(k-1)) ! pm1 wasn't time centered until now
+               Pm1 = Pm1 + mlt_Ptrbm1 ! include mlt Ptrb in k-1
+               P00 = P00 + mlt_Ptrb00 ! include mlt Ptrb in k
+               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+               Ppoint = alfa*P00 + (1d0-alfa)*Pm1
+            end if
          end if
 
          dlnPdm_qhse = grav/(area*Ppoint)  ! note that expected_HSE_grav_term is negative

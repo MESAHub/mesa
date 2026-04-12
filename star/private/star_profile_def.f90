@@ -599,7 +599,21 @@
       integer, parameter :: p_Lt = p_Lc_div_L + 1
       integer, parameter :: p_Lt_div_L = p_Lt + 1
 
-      integer, parameter :: p_rsp_log_erad = p_Lt_div_L + 1
+      integer, parameter :: p_mlt_tdc_T_face = p_Lt_div_L + 1
+      integer, parameter :: p_mlt_tdc_rho_face = p_mlt_tdc_T_face + 1
+      integer, parameter :: p_mlt_tdc_P_face = p_mlt_tdc_rho_face + 1
+      integer, parameter :: p_mlt_tdc_Cp_face = p_mlt_tdc_P_face + 1
+      integer, parameter :: p_mlt_tdc_ChiRho_face = p_mlt_tdc_Cp_face + 1
+      integer, parameter :: p_mlt_tdc_ChiT_face = p_mlt_tdc_ChiRho_face + 1
+      integer, parameter :: p_mlt_tdc_grada_face = p_mlt_tdc_ChiT_face + 1
+      integer, parameter :: p_mlt_tdc_opacity_face = p_mlt_tdc_grada_face + 1
+      integer, parameter :: p_mlt_tdc_scale_height_face = p_mlt_tdc_opacity_face + 1
+      integer, parameter :: p_mlt_tdc_gradr_face = p_mlt_tdc_scale_height_face + 1
+      integer, parameter :: p_tdc_Chi_div_w_face = p_mlt_tdc_gradr_face + 1
+      integer, parameter :: p_tdc_Eq_div_w_face = p_tdc_Chi_div_w_face + 1
+      integer, parameter :: p_tdc_Chi_div_w_cell = p_tdc_Eq_div_w_face + 1
+
+      integer, parameter :: p_rsp_log_erad = p_tdc_Chi_div_w_cell + 1
       integer, parameter :: p_rsp_erad = p_rsp_log_erad + 1
       integer, parameter :: p_rsp_logEt = p_rsp_erad + 1
       integer, parameter :: p_rsp_Et = p_rsp_logEt + 1
@@ -1277,6 +1291,19 @@
          profile_column_name(p_Lc_div_L) = 'Lc_div_L'
          profile_column_name(p_Lt) = 'Lt'
          profile_column_name(p_Lt_div_L) = 'Lt_div_L'
+         profile_column_name(p_mlt_tdc_T_face) = 'mlt_tdc_T_face'
+         profile_column_name(p_mlt_tdc_rho_face) = 'mlt_tdc_rho_face'
+         profile_column_name(p_mlt_tdc_P_face) = 'mlt_tdc_P_face'
+         profile_column_name(p_mlt_tdc_Cp_face) = 'mlt_tdc_Cp_face'
+         profile_column_name(p_mlt_tdc_ChiRho_face) = 'mlt_tdc_ChiRho_face'
+         profile_column_name(p_mlt_tdc_ChiT_face) = 'mlt_tdc_ChiT_face'
+         profile_column_name(p_mlt_tdc_grada_face) = 'mlt_tdc_grada_face'
+         profile_column_name(p_mlt_tdc_opacity_face) = 'mlt_tdc_opacity_face'
+         profile_column_name(p_mlt_tdc_scale_height_face) = 'mlt_tdc_scale_height_face'
+         profile_column_name(p_mlt_tdc_gradr_face) = 'mlt_tdc_gradr_face'
+         profile_column_name(p_tdc_Chi_div_w_face) = 'tdc_Chi_div_w_face'
+         profile_column_name(p_tdc_Eq_div_w_face) = 'tdc_Eq_div_w_face'
+         profile_column_name(p_tdc_Chi_div_w_cell) = 'tdc_Chi_div_w_cell'
 
          profile_column_name(p_rsp_Et) = 'rsp_Et'
          profile_column_name(p_rsp_logEt) = 'rsp_logEt'

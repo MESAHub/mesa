@@ -51,11 +51,18 @@ contains
 
     ierr = 0
     if (s%use_face_values_eos_and_kap_mlt_tdc) then
-       call get_face_eos_kap_ad( &
-          s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
+       call ensure_mlt_tdc_face_state_ad(s, k, ierr)
        if (ierr /= 0) return
-       call set_scale_height_from_face_state(s, k, P_face, rho_face, scale_height_face)
-       call set_gradr_from_face_state(s, k, P_face, opacity_face, T_face, gradr_face)
+       T_face = s%mlt_tdc_T_face_ad(k)
+       rho_face = s%mlt_tdc_rho_face_ad(k)
+       P_face = s%mlt_tdc_P_face_ad(k)
+       Cp_face = s%mlt_tdc_Cp_face_ad(k)
+       ChiRho_face = s%mlt_tdc_ChiRho_face_ad(k)
+       ChiT_face = s%mlt_tdc_ChiT_face_ad(k)
+       grada_face = s%mlt_tdc_grada_face_ad(k)
+       opacity_face = s%mlt_tdc_opacity_face_ad(k)
+       scale_height_face = s%mlt_tdc_scale_height_face_ad(k)
+       gradr_face = s%mlt_tdc_gradr_face_ad(k)
     else
        T_face = get_T_face(s, k)
        P_face = get_Peos_face(s, k)
@@ -69,6 +76,39 @@ contains
        gradr_face = get_gradr_face(s, k)
     end if
   end subroutine get_mlt_face_state_ad
+
+
+  ! Ensures that the recomputed MLT and TDC face thermodynamic quantities have
+  ! been assembled and cached for face k.
+  subroutine ensure_mlt_tdc_face_state_ad(s, k, ierr)
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    integer, intent(out) :: ierr
+
+    type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face
+    type(auto_diff_real_star_order1) :: ChiRho_face, ChiT_face, grada_face, opacity_face
+    type(auto_diff_real_star_order1) :: scale_height_face, gradr_face
+
+    ierr = 0
+    if (s%have_mlt_tdc_face_state(k)) return
+
+    call build_mlt_tdc_face_state_ad( &
+       s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, &
+       opacity_face, scale_height_face, gradr_face, ierr)
+    if (ierr /= 0) return
+
+    s%mlt_tdc_T_face_ad(k) = T_face
+    s%mlt_tdc_rho_face_ad(k) = rho_face
+    s%mlt_tdc_P_face_ad(k) = P_face
+    s%mlt_tdc_Cp_face_ad(k) = Cp_face
+    s%mlt_tdc_ChiRho_face_ad(k) = ChiRho_face
+    s%mlt_tdc_ChiT_face_ad(k) = ChiT_face
+    s%mlt_tdc_grada_face_ad(k) = grada_face
+    s%mlt_tdc_opacity_face_ad(k) = opacity_face
+    s%mlt_tdc_scale_height_face_ad(k) = scale_height_face
+    s%mlt_tdc_gradr_face_ad(k) = gradr_face
+    s%have_mlt_tdc_face_state(k) = .true.
+  end subroutine ensure_mlt_tdc_face_state_ad
 
   ! Reconstructs the face composition from either the current or the
   ! start-of-step composition and renormalizes xa_face.
@@ -201,17 +241,44 @@ contains
   end subroutine get_face_opacity_factor
 
 
-  ! Recomputes the face EOS and opacity state as
+  ! Returns the cached or newly built face EOS and opacity state as
   ! auto_diff_real_star_order1 quantities for the MLT/TDC solve,
   ! instead of using the stored face quantities.
   subroutine get_face_eos_kap_ad( &
        s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    type(auto_diff_real_star_order1), intent(out) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
+    integer, intent(out) :: ierr
+
+    ierr = 0
+    call ensure_mlt_tdc_face_state_ad(s, k, ierr)
+    if (ierr /= 0) return
+
+    T_face = s%mlt_tdc_T_face_ad(k)
+    rho_face = s%mlt_tdc_rho_face_ad(k)
+    P_face = s%mlt_tdc_P_face_ad(k)
+    Cp_face = s%mlt_tdc_Cp_face_ad(k)
+    ChiRho_face = s%mlt_tdc_ChiRho_face_ad(k)
+    ChiT_face = s%mlt_tdc_ChiT_face_ad(k)
+    grada_face = s%mlt_tdc_grada_face_ad(k)
+    opacity_face = s%mlt_tdc_opacity_face_ad(k)
+  end subroutine get_face_eos_kap_ad
+
+
+  ! Builds the full set of recomputed face thermodynamic quantities for the
+  ! MLT and TDC solve from one EOS call and one opacity call at face k.
+  subroutine build_mlt_tdc_face_state_ad( &
+       s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, &
+       opacity_face, scale_height_face, gradr_face, ierr)
     use eos_def, only: num_eos_basic_results, i_lnPgas, i_grad_ad, i_gamma1, i_Cp, i_chiRho, i_chiT, i_eta, i_lnfree_e
     use kap_def, only: num_kap_fracs
 
     type(star_info), pointer :: s
     integer, intent(in) :: k
-    type(auto_diff_real_star_order1), intent(out) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
+    type(auto_diff_real_star_order1), intent(out) :: &
+       T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, &
+       opacity_face, scale_height_face, gradr_face
     integer, intent(out) :: ierr
 
     real(dp) :: log10_T, log10_rho, kap_zbar_face, opacity_factor_face
@@ -281,33 +348,24 @@ contains
        alpha = mlt_Pturb_ad/(P_face*gamma1_face)
        grada_face = grada_face*(P_face + mlt_Pturb_ad)/(P_face*(1d0 + alpha))
     end if
-  end subroutine get_face_eos_kap_ad
+
+    call set_scale_height_from_face_state(s, k, P_face, rho_face, scale_height_face)
+    call set_gradr_from_face_state(s, k, P_face, opacity_face, T_face, gradr_face)
+  end subroutine build_mlt_tdc_face_state_ad
 
 
-  ! Recomputes the face pressure scale height as an
-  ! auto_diff_real_star_order1 quantity from the recomputed face state.
+  ! Returns the cached or newly built face pressure scale height as an
+  ! auto_diff_real_star_order1 quantity from the face EOS state.
   subroutine get_face_scale_height_ad(s, k, scale_height_face, ierr)
-    use eos_def, only: num_eos_basic_results, i_lnPgas
-
     type(star_info), pointer :: s
     integer, intent(in) :: k
     type(auto_diff_real_star_order1), intent(out) :: scale_height_face
     integer, intent(out) :: ierr
 
-    real(dp) :: eos_res(num_eos_basic_results), d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results)
-    real(dp) :: dlnT_face(auto_diff_star_num_vars), dlnd_face(auto_diff_star_num_vars)
-    type(auto_diff_real_star_order1) :: T_face, rho_face, Pgas_face, P_face
-
     ierr = 0
-    call get_face_eos_inputs( &
-       s, k, T_face, rho_face, eos_res, d_dlnd, d_dlnT, ierr)
+    call ensure_mlt_tdc_face_state_ad(s, k, ierr)
     if (ierr /= 0) return
-    call set_face_log_partials(T_face, rho_face, dlnT_face, dlnd_face)
-
-    call set_face_ad_from_log(eos_res(i_lnPgas), d_dlnd(i_lnPgas), d_dlnT(i_lnPgas), dlnd_face, dlnT_face, Pgas_face)
-    P_face = Pgas_face + crad*pow4(T_face)/3d0
-
-    call set_scale_height_from_face_state(s, k, P_face, rho_face, scale_height_face)
+    scale_height_face = s%mlt_tdc_scale_height_face_ad(k)
   end subroutine get_face_scale_height_ad
 
 

@@ -120,7 +120,8 @@
             gradL_composition_term = 0d0
          end if
 
-         ! Assemble the full face-state thermo bundle for the MLT/TDC solve.
+         ! Assemble the full set of face thermodynamic quantities for the
+         ! MLT/TDC solve.
          ! This helper either computes EOS and kap on faces directly or
          ! recomputes them from face wrapped primitives, and returns consistent
          ! T, P, rho, kap, Cp, chiRho, chiT, grada, gradr, and scale height values.

@@ -155,7 +155,11 @@ contains
              L_theta = 1d0
           end if
           L = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
-          P = P_theta*P + (1d0-P_theta)*s% Peos_face_start(k)
+          if (s% use_face_values_eos_and_kap_mlt_tdc) then
+             P = P_theta*P + (1d0-P_theta)*s% mlt_tdc_P_face_start(k)
+          else
+             P = P_theta*P + (1d0-P_theta)*s% Peos_face_start(k)
+          end if
           r = wrap_opt_time_center_r_00(s,k)
       else
           L = wrap_L_00(s,k)
@@ -335,7 +339,9 @@ contains
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
             s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, &
-            s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, s% use_TDC_Af_split, s% TDC_arnett_growth_target, &
+            s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, s% use_TDC_Af_split, &
+            s% use_TDC_enhanced_dissipation, s% TDC_enhanced_dissipation_c4, s% TDC_enhanced_dissipation_v_floor, &
+            s% TDC_arnett_growth_target, &
             energy, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
@@ -358,7 +364,9 @@ contains
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
                   s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, &
-                  s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, s% use_TDC_Af_split, s% TDC_arnett_growth_target, &
+                  s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, s% use_TDC_Af_split, &
+                  s% use_TDC_enhanced_dissipation, s% TDC_enhanced_dissipation_c4, s% TDC_enhanced_dissipation_v_floor, &
+                  s% TDC_arnett_growth_target, &
                   energy, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then

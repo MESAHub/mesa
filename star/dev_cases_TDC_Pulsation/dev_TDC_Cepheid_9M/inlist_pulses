@@ -90,7 +90,7 @@ Zbase = 0.004d0
 
 
    ! limit max model number as part of test suite.
-   !max_model_number = 3000
+   max_model_number = 2000 !3000
 
    ! controls for analyzing pulsations using GYRE in MESA
    x_integer_ctrl(1) = 1000 ! gyre interval to check
