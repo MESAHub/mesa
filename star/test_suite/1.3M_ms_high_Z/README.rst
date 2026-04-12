@@ -47,4 +47,4 @@ The Python script used to create the figures above:
 
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
 
-Last-Run: 22Dec2025 (MESA fede5937) by pmocz on C916PXT6XW in 252 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 268 seconds using 8 threads.
