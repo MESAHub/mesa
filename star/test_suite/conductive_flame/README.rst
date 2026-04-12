@@ -48,7 +48,7 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
 
 
 
-.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000597.png
+.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000598.png
    :width: 100%
 
 pgstar commands used for the plots above:
@@ -66,4 +66,4 @@ pgstar commands used for the plots above:
 
 Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab, + documentation 2024-01-22 EbF
 
-Last-Run: 06Oct2025 (MESA 367d7a25) by pmocz on C916PXT6XW in 471 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 505 seconds using 8 threads.
