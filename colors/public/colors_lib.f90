@@ -133,6 +133,7 @@ contains
       ierr = 0
       call get_colors_ptr(handle, rq, ierr)
       if (ierr /= 0) return
+      if (.not. rq%use_colors) return
 
       call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)
       if (ierr /= 0) return
