@@ -20,7 +20,7 @@
 module colors_ctrls_io
 
    use const_def, only: dp, strlen, max_extra_inlists
-   use colors_def, only: Colors_General_Info, get_colors_ptr
+   use colors_def, only: Colors_General_Info, get_colors_ptr, max_num_color_files
 
    implicit none
 
@@ -43,6 +43,13 @@ module colors_ctrls_io
    logical :: sed_per_model
    logical :: use_colors
 
+   !photometric pre compute
+   logical :: photo_precompute
+   integer :: color_num_files
+   integer, dimension(max_num_color_files) :: color_num_colors
+   character(len=256), dimension(max_num_color_files) :: color_file_names
+
+
    namelist /colors/ &
       instrument, &
       vega_sed, &
@@ -53,6 +60,10 @@ module colors_ctrls_io
       sed_per_model, &
       mag_system, &
       colors_results_directory, &
+      photo_precompute, &
+      color_num_files, &
+      color_num_colors, &
+      color_file_names, &
       use_colors, &
       read_extra_colors_inlist, &
       extra_colors_inlist_name
@@ -161,6 +172,10 @@ contains
       rq%make_csv = make_csv
       rq%sed_per_model = sed_per_model
       rq%colors_results_directory = colors_results_directory
+      rq%photo_precompute = photo_precompute
+      rq%color_num_files = color_num_files
+      rq%color_num_colors = color_num_colors
+      rq%color_file_names = color_file_names
       rq%use_colors = use_colors
       rq%mag_system = mag_system
 
@@ -199,6 +214,10 @@ contains
       make_csv = rq%make_csv
       sed_per_model = rq%sed_per_model
       colors_results_directory = rq%colors_results_directory
+      photo_precompute = rq%photo_precompute
+      color_num_files = rq%color_num_files
+      color_num_colors = rq%color_num_colors
+      color_file_names = rq%color_file_names
       use_colors = rq%use_colors
       mag_system = rq%mag_system
 

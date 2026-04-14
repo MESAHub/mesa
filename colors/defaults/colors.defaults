@@ -73,7 +73,10 @@
       colors_results_directory = 'SED'
       mag_system = 'Vega'
       sed_per_model = .false.
-
+      photo_precompute = .false.
+      color_num_files = 0
+      color_num_colors = 0
+      color_file_names = ''
 
    ! ``z_over_x_ref``
    ! ~~~~~~~~~~~~~~~~

@@ -1,0 +1,126 @@
+! MESA inlist for stellar evolution with precomputed photometry tables
+! Uses the photo_precompute mode of the colors module, which reads
+! pre-computed bolometric correction tables rather than performing
+! on-the-fly SED convolution.
+
+! Niall Miller (2025)
+
+! =============================================================================
+! STAR_JOB NAMELIST - Controls model creation and global job settings
+! =============================================================================
+&star_job
+      ! Model creation settings
+      create_pre_main_sequence_model = .true.  ! Start from pre-MS rather than ZAMS
+
+      ! Termination conditions
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+      ! Custom output files
+      history_columns_file = 'custom_colors_history_columns.list'
+
+      ! Verbosity and debugging
+      show_log_description_at_start = .true.
+
+      ! Pre-MS model settings
+      pre_ms_relax_to_start_radiative_core = .false.
+      initial_model_relax_num_steps = 10
+      pre_ms_relax_num_steps = 10
+
+      pgstar_flag = .true.
+/
+
+! =============================================================================
+! EOS NAMELIST
+! =============================================================================
+&eos
+/
+
+! =============================================================================
+! KAP NAMELIST
+! =============================================================================
+&kap
+      Zbase = 0.02d0
+      kap_file_prefix = 'gs98'
+/
+
+! =============================================================================
+! COLORS NAMELIST - Precomputed photometry table mode
+! =============================================================================
+&colors
+      use_colors = .true.
+
+      ! Enable precomputed BC table mode.
+      ! When .true., the colors module reads pre-computed bolometric correction
+      ! tables directly rather than convolving SEDs with filter transmission curves.
+      photo_precompute = .true.
+
+      ! Distance for apparent magnitude conversion
+      distance = 3.0857d19         ! 1 pc in cm
+
+      ! Number of BC table files to load
+      color_num_files = 2
+
+      ! Lejeune, Cuisinier & Buser (1998) bolometric corrections
+      ! Covers Teff 2000-50000 K, log g -1 to 5.5, [Fe/H] -5 to +1
+      ! Contains: U B V R I J H K L M  (10 colors)
+      color_file_names(1) = 'lcb98cor.dat'
+      color_num_colors(1) = 11
+
+      ! Blackbody Johnson filter bolometric corrections
+      ! Contains: U B V R I  (5 colors)
+      color_file_names(2) = 'blackbody_johnson.dat'
+      color_num_colors(2) = 5
+
+/ ! end of colors namelist
+
+
+! =============================================================================
+! CONTROLS NAMELIST
+! =============================================================================
+&controls
+      initial_mass = 7.0d0
+      initial_z = 0.02d0
+
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 1d-2
+
+      max_age = 1d12
+
+      history_interval = 1
+      profile_interval = 50
+
+      varcontrol_target = 1d-3
+      mesh_delta_coeff = 0.5
+/
+
+
+! =============================================================================
+! PGSTAR NAMELIST
+! =============================================================================
+&pgstar
+  pgstar_interval = 10
+
+  History_Track2_win_flag = .true.
+  History_Track2_xname = 'star_age'
+  History_Track2_yname = 'V'
+  History_Track2_title = 'V Light Curve'
+  History_Track2_xaxis_label = 'Age (yr)'
+  History_Track2_yaxis_label = 'V mag'
+
+  History_Track3_win_flag = .true.
+  History_Track3_xname = 'R'
+  History_Track3_yname = 'B'
+  History_Track3_title = 'B-R'
+  History_Track3_xaxis_label = 'R mag'
+  History_Track3_yaxis_label = 'B mag'
+  History_Track3_reverse_yaxis = .true.
+
+  History_Track4_win_flag = .true.
+  History_Track4_xname = 'U'
+  History_Track4_yname = 'I'
+  History_Track4_title = 'U-I'
+  History_Track4_xaxis_label = 'U mag'
+  History_Track4_yaxis_label = 'I mag'
+  History_Track4_reverse_yaxis = .true.
+/

@@ -1,0 +1,48 @@
+! history_columns.list -- determines the contents of star history logs
+! you can use a non-standard version by setting history_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+!----------------------------------------------------------------------------------------------
+
+!# general info about the model
+
+      model_number ! counting from the start of the run
+      num_zones ! number of zones in the model
+      phase_of_evolution
+
+   !## age
+
+      star_age ! elapsed simulated time in years since the start of the run
+
+   !## timestep
+      log_dt ! log10 time_step in years
+      
+   !## mass
+
+      star_mass ! in Msun units
+
+!----------------------------------------------------------------------------------------------
+
+!# Color output
+
+      ! Note the filter names are case sensitive and must match what is used in your color
+      ! data file
+      star_age
+      Teff
+      log_Teff
+      log_L
+      log_R
+      log_g
+      !Custom Av values are handled in the run_star_extras
+
+!----------------------------------------------------------------------------------------------
+
+!# debugging
+
+      num_retries ! total during the run
+
+   !## solver iterations
+
+      num_iters ! same as num_newton_iterations
+

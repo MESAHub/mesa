@@ -19,11 +19,13 @@
 
 module colors_def
 
-   use const_def, only: dp
+   use const_def, only: dp, strlen
 
    implicit none
 
    public
+
+   integer, parameter :: max_num_color_files = 10
 
    ! max number of SEDs to keep in the memory cache
    ! each slot holds one wavelength array (~1200 doubles ~ 10 KB),
@@ -55,6 +57,12 @@ module colors_def
       logical :: use_colors
       integer :: handle
       logical :: in_use
+
+      ! photo pre compute
+      logical :: photo_precompute = .false.
+      integer :: color_num_files = 0
+      integer, dimension(max_num_color_files) :: color_num_colors = 0
+      character(len=strlen), dimension(max_num_color_files) :: color_file_names = ''
 
       ! cached lookup table data
       logical :: lookup_loaded = .false.

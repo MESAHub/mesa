@@ -119,20 +119,46 @@ contains
 
    end subroutine colors_ptr
 
+
    subroutine colors_setup_tables(handle, ierr)
       use colors_def, only: Colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
+      use mod_colors, only: do_colors_init, bc_total_num_colors, thead_all, num_thead  ! add this
       use synthetic, only: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
       integer, intent(in) :: handle
       integer, intent(out):: ierr
 
       type(Colors_General_Info), pointer :: rq
       character(len=256) :: lookup_file, filter_dir, filter_filepath, vega_filepath
-      REAL, allocatable :: lookup_table(:, :)  ! unused but required by load_lookup_table
-      integer :: i
+      REAL, allocatable :: lookup_table(:, :)
+      integer :: i, j, k   ! add j, k
 
       ierr = 0
       call get_colors_ptr(handle, rq, ierr)
       if (ierr /= 0) return
+
+      if (rq%photo_precompute) then
+         call do_colors_init(rq%color_num_files, rq%color_file_names, rq%color_num_colors, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'colors error: failed to load precomputed BC tables'
+            return
+         end if
+         num_color_filters = bc_total_num_colors
+         allocate(color_filter_names(num_color_filters))
+         k = 0
+         do i = 1, num_thead
+            do j = 1, thead_all(i)%n_colors
+               k = k + 1
+               color_filter_names(k) = trim(thead_all(i)%color_names(j))
+            end do
+         end do
+         ! lu_meta is accessed by MESA's history code for metallicity clamping.
+         ! Populate with the range of the loaded BC tables.
+         allocate(rq%lu_meta(2))
+         rq%lu_meta(1) = -5.0_dp   ! minimum [Fe/H] in standard BC tables
+         rq%lu_meta(2) =  1.0_dp   ! maximum [Fe/H] in standard BC tables
+         rq%lookup_loaded = .true.
+         return
+      end if
 
       call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)
       if (ierr /= 0) return
