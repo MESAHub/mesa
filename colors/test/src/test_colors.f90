@@ -41,8 +41,8 @@ program test_colors
    use colors_lib, only: &
       colors_init, colors_shutdown, &
       alloc_colors_handle_using_inlist, free_colors_handle, colors_ptr, &
-      how_many_colors_history_columns, data_for_colors_history_columns, &
-      calculate_bolometric
+      colors_setup_tables, colors_setup_hooks, how_many_colors_history_columns, &
+      data_for_colors_history_columns, calculate_bolometric
    use colors_def, only: Colors_General_Info
    use const_def,  only: dp, rsun, boltz_sigma
    use utils_lib,  only: mesa_error
@@ -149,9 +149,23 @@ program test_colors
       stop 1
    end if
 
-   ! enable photometry so how_many_colors_history_columns returns > 0
+   ! enable photometry and explicitly load colors data, since the default
+   ! namelist leaves use_colors = .false. and skips setup at handle.
+   ! To do : This could be replaced by reading from an inlist instead in the future.
    cs%use_colors = .true.
    cs%mag_system = 'Vega'
+   call colors_setup_tables(handle, ierr)
+   if (ierr /= 0) then
+      write(*,*) 'colors_setup_tables failed, ierr =', ierr
+      stop 1
+   end if
+
+   ! probably unecessary since this is empty right now.
+   call colors_setup_hooks(handle, ierr)
+   if (ierr /= 0) then
+      write(*,*) 'colors_setup_hooks failed, ierr =', ierr
+      stop 1
+   end if
 
    n_cols = how_many_colors_history_columns(handle)
    if (n_cols == 0) then
