@@ -4694,8 +4694,8 @@
       ! Tsurf_factor
       ! ~~~~~~~~~~~~
 
-      ! used when ``use_momentum_outer_BC``
-      ! ``T_surf`` is set to ``Tsurf_factor*T_black_body(L_surf,R_surf)``
+      ! Not used by the default outer BCs.
+      ! ``T_surf`` comes from atm or ``other_surface_PT``.
 
       ! ::
 
