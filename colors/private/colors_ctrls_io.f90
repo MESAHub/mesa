@@ -35,11 +35,13 @@ module colors_ctrls_io
    character(len=256) :: vega_sed
    character(len=256) :: stellar_atm
    character(len=256) :: colors_results_directory
-   character(len=32) :: mag_system
+   character(len=256) :: mag_system
 
    real(dp) :: distance
    logical :: make_csv
+   logical :: sed_per_model
    logical :: use_colors
+   logical :: colors_per_newton_step
 
    namelist /colors/ &
       instrument, &
@@ -47,15 +49,16 @@ module colors_ctrls_io
       stellar_atm, &
       distance, &
       make_csv, &
+      sed_per_model, &
       mag_system, &
       colors_results_directory, &
       use_colors, &
+      colors_per_newton_step, &
       read_extra_colors_inlist, &
       extra_colors_inlist_name
 
 contains
 
-! read a "namelist" file and set parameters
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
       character(len=*), intent(in) :: inlist
@@ -148,7 +151,6 @@ contains
    subroutine store_controls(rq, ierr)
       type(Colors_General_Info), pointer, intent(inout) :: rq
 
-      integer :: i
       integer, intent(out) :: ierr
 
       rq%instrument = instrument
@@ -156,8 +158,10 @@ contains
       rq%stellar_atm = stellar_atm
       rq%distance = distance
       rq%make_csv = make_csv
+      rq%sed_per_model = sed_per_model
       rq%colors_results_directory = colors_results_directory
       rq%use_colors = use_colors
+      rq%colors_per_newton_step = colors_per_newton_step
       rq%mag_system = mag_system
 
    end subroutine store_controls
@@ -192,8 +196,10 @@ contains
       stellar_atm = rq%stellar_atm
       distance = rq%distance
       make_csv = rq%make_csv
+      sed_per_model = rq%sed_per_model
       colors_results_directory = rq%colors_results_directory
       use_colors = rq%use_colors
+      colors_per_newton_step = rq%colors_per_newton_step
       mag_system = rq%mag_system
 
    end subroutine set_controls_for_writing
@@ -211,18 +217,17 @@ contains
 
       ierr = 0
 
-      ! First save current controls
+      ! save current controls
       call set_controls_for_writing(rq)
 
-      ! Write namelist to temporary file
+      ! write namelist to temporary file
       open (newunit=iounit, status='scratch')
       write (iounit, nml=colors)
       rewind (iounit)
 
-      ! Namelists get written in capitals
+      ! namelists get written in capitals
       upper_name = trim(StrUpCase(name))//'='
       val = ''
-      ! Search for name inside namelist
       do
          read (iounit, '(A)', iostat=iostat) str
          ind = index(trim(str), trim(upper_name))
@@ -250,16 +255,14 @@ contains
 
       ierr = 0
 
-      ! First save current colors_controls
+      ! save current controls
       call set_controls_for_writing(rq)
 
       tmp = ''
       tmp = '&colors '//trim(name)//'='//trim(val)//' /'
 
-      ! Load into namelist
       read (tmp, nml=colors)
 
-      ! Add to colors
       call store_controls(rq, ierr)
       if (ierr /= 0) return
 

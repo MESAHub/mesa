@@ -1,18 +1,18 @@
-.. _custom_colors:
+.. _colors:
 
 ******
 Colors
 ******
 
-This test suite case demonstrates the functionality of the MESA ``colors`` module, a framework introduced in MESA r25.10.1 for calculating synthetic photometry and bolometric quantities during stellar evolution.
+The MESA ``colors`` module calculates synthetic photometry and bolometric quantities during stellar evolution.
 
 What is MESA colors?
 ====================
 
-MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (:math:`L`) and Surface Temperature (:math:`T_{\rm eff}`), the colors module computes:
+MESA colors is a post-processing and runtime module that allows users to generate "observer-ready" data directly from stellar evolution models. Instead of limiting output to theoretical quantities like Luminosity (L) and Surface Temperature (T_eff), the colors module computes:
 
-* **Bolometric Magnitude** (:math:`M_{\rm bol}`)
-* **Bolometric Flux** (:math:`F_{\rm bol}`)
+* **Bolometric Magnitude** (M_bol)
+* **Bolometric Flux** (F_bol)
 * **Synthetic Magnitudes** in specific photometric filters (e.g., Johnson V, Gaia G, 2MASS J).
 
 This bridges the gap between theoretical evolutionary tracks and observational color-magnitude diagrams (CMDs).
@@ -20,9 +20,7 @@ This bridges the gap between theoretical evolutionary tracks and observational c
 How does the MESA colors module work?
 =====================================
 
-The module operates by coupling the stellar structure model with pre-computed grids of stellar atmospheres.
-
-1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (:math:`T_{\rm eff}`), Surface Gravity (:math:`\log g`), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the stars current features.
+1.  **Interpolation**: At each timestep, the module takes the star's current surface parameters—Effective Temperature (T_eff), Surface Gravity (log g), and Metallicity ([M/H])—and queries a user-specified library of stellar atmospheres (defined in ``stellar_atm``). It interpolates within this grid to construct a specific Spectral Energy Distribution (SED) for the star's current parameters.
 
 2.  **Convolution**: This specific SED is then convolved with filter transmission curves (defined in ``instrument``) to calculate the flux passing through each filter.
 
@@ -33,129 +31,197 @@ Inlist Options & Parameters
 
 The colors module is controlled via the ``&colors`` namelist. Below is a detailed guide to the key parameters.
 
-instrument
+use_colors
 ----------
 
-**Default:** `'/data/colors_data/filters/Generic/Johnson'`
+**Default:** ``.false.``
 
-This points to the directory containing the filter transmission curves you wish to use. The path must be structured as ``facility/instrument``.
-
-* The directory must contain a file named after the instrument (e.g., ``Johnson``) which acts as an index.
-* The module will read every ``.dat`` file listed in that directory and create a corresponding history column for it.
+Master switch for the module. Must be set to ``.true.`` to enable any photometric output.
 
 **Example:**
 
 .. code-block:: fortran
 
-   instrument = '/data/colors_data/filters/GAIA/GAIA'
+   use_colors = .true.
+
+
+instrument
+----------
+
+**Default:** ``'data/colors_data/filters/Generic/Johnson'``
+
+Path to the filter instrument directory, structured as ``facility/instrument``.
+
+* The directory must contain an index file with the same name as the instrument
+  (e.g., ``Johnson``), listing one filter filename per line.
+* The module loads every ``.dat`` transmission curve listed in that index and
+  creates a corresponding history column for each.
+
+.. rubric:: Note on paths
+
+All path parameters (``instrument``, ``stellar_atm``, ``vega_sed``) are resolved
+using the same logic:
+
+* ``'data/colors_data/...'`` — no leading slash; ``$MESA_DIR`` is prepended. This
+  is the recommended form for all standard data paths.
+* ``'/absolute/path/...'`` — tested on disk first; if found, used as-is. If not
+  found, ``$MESA_DIR`` is prepended (preserves backwards compatibility).
+* ``'./local/path/...'`` or ``'../up/one/...'`` — used exactly as supplied,
+  relative to the MESA working directory.
+
+**Example:**
+
+.. code-block:: fortran
+
+   instrument = 'data/colors_data/filters/GAIA/GAIA'
 
 
 stellar_atm
 -----------
 
-**Default:** `'/data/colors_data/stellar_models/Kurucz2003all/'`
+**Default:** ``'data/colors_data/stellar_models/Kurucz2003all/'``
 
-Specifies the path to the directory containing the grid of stellar atmosphere models. This directory must contain:
+Path to the directory containing the grid of stellar atmosphere models. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute. This directory must contain:
 
-1.  **lookup_table.csv**: A map linking filenames to physical parameters (:math:`T_{\rm eff}`, :math:`\log g`, [M/H]).
+1.  **lookup_table.csv**: A map linking filenames to physical parameters (T_eff, log g, [M/H]).
 2.  **SED files**: The actual spectra (text or binary format).
 3.  **flux_cube.bin**: (Optional but recommended) A binary cube for rapid interpolation.
 
-The module queries this grid using the star's current parameters. If the star evolves outside the grid boundaries, the module may clamp to the nearest edge or extrapolate, depending on internal settings.
+The module queries this grid using the star's current parameters. If the star evolves outside the grid boundaries, the module will clamp to the nearest edge.
 
 **Example:**
 
 .. code-block:: fortran
 
-   stellar_atm = '/data/colors_data/stellar_models/sg-SPHINX/'
+   stellar_atm = 'data/colors_data/stellar_models/sg-SPHINX/'
 
 
 distance
 --------
 
-**Default:** `3.0857d19` (10 parsecs in cm)
+**Default:** ``3.0857d19`` (10 parsecs in cm)
 
-The distance to the star in centimeters.
+The distance to the star in centimetres, used to convert surface flux to observed flux.
 
-* This value is used to convert surface flux to observed flux.
-* **Default Behavior:** It defaults to 10 parsecs (:math:`3.0857 \times 10^{19}` cm), resulting in **Absolute Magnitudes**.
-* **Custom Usage:** You can set this to a specific source distance (e.g., distance to Betelgeuse) to calculate Apparent Magnitudes.
+* **Default Behaviour:** At 10 parsecs (3.0857 * 10^19 cm) the output is **Absolute Magnitudes**.
+* **Custom Usage:** Set this to a specific source distance to calculate Apparent Magnitudes.
 
 **Example:**
 
 .. code-block:: fortran
 
-    distance = 5.1839d20
+   distance = 5.1839d20
+
 
 make_csv
 --------
 
-**Default:** `.false.`
+**Default:** ``.false.``
 
 If set to ``.true.``, the module exports the full calculated SED at every profile interval.
 
 * **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
 * **Format:** CSV files containing Wavelength vs. Flux.
-* **Use Case:** useful for debugging or plotting the full spectrum of the star at a specific age.
+* **Use Case:** Useful for debugging or plotting the full spectrum of the star at a specific evolutionary age.
 
 **Example:**
 
 .. code-block:: fortran
 
-      make_csv = .true.
+   make_csv = .true.
+
 
 
 colors_results_directory
 ------------------------
 
-**Default:** `'SED'`
+**Default:** ``'SED'``
 
-The folder where csv files (if ``make_csv = .true.``) and other debug outputs are saved.
+The folder where CSV files (if ``make_csv = .true.``) and other outputs are saved.
 
 **Example:**
 
 .. code-block:: fortran
 
-      colors_results_directory = 'sed'
+   colors_results_directory = 'sed'
 
 
 mag_system
 ----------
 
-**Default:** `'Vega'`
+**Default:** ``'Vega'``
 
 Defines the zero-point system for magnitude calculations. Options are:
 
 * ``'AB'``: Based on a flat spectral flux density of 3631 Jy.
 * ``'ST'``: Based on a flat spectral flux density per unit wavelength.
-* ``'Vega'``: Calibrated such that the star Vega has magnitude 0 in all bands.
+* ``'Vega'``: Calibrated such that Vega has magnitude 0 in all bands.
 
 **Example:**
 
 .. code-block:: fortran
 
-      mag_system = 'AB'
+   mag_system = 'AB'
 
 
 vega_sed
 --------
 
-**Default:** `'/data/colors_data/stellar_models/vega_flam.csv'`
+**Default:** ``'data/colors_data/stellar_models/vega_flam.csv'``
 
-Required only if ``mag_system = 'Vega'``. This points to the reference SED file for Vega. The default path points to a file provided with the MESA data distribution.
+Required only if ``mag_system = 'Vega'``. Points to the reference SED file for Vega, used to compute photometric zero-points. Paths may be relative to ``$MESA_DIR``, relative to the working directory, or absolute.
 
 **Example:**
 
 .. code-block:: fortran
 
-      vega_sed = '/another/file/for/vega_SED.csv'
+   vega_sed = '/path/to/my/vega_SED.csv'
+
+sed_per_model
+-------------
+
+**Default:** ``.false.``
+
+Requires ``make_csv = .true.``. If set to ``.true.``, each exported SED file is stamped with the model number, preserving one SED file per model rather than overwriting a single file.
+
+.. warning::
+
+   Enabling this feature will cause the ``colors_results_directory`` to grow very rapidly. Do not enable it without first ensuring you have sufficient storage.
+
+* **Destination:** Files are saved to the directory defined by ``colors_results_directory``.
+* **Format:** CSV files containing Wavelength vs. Flux, with the model number as a filename suffix.
+* **Use Case:** Useful for tracking the full SED evolution of the star over time.
+
+**Example:**
+
+.. code-block:: fortran
+
+   sed_per_model = .true.
+
+
+colors_per_newton_step
+----------------------
+
+**Default:** ``.false.``
+
+If set to ``.true.``, the colors module computes synthetic photometry at every Newton iteration within each timestep, rather than only once per converged model. This is useful for studying rapid stellar variability or evolutionary phases where the stellar parameters change significantly within a single timestep (e.g., thermal pulses, shell flashes).
+
+.. warning::
+
+   Enabling this feature substantially increases the computational cost of the run, as photometric calculations are performed multiple times per timestep. It should only be used when sub-timestep resolution is scientifically required.
+
+**Example:**
+
+.. code-block:: fortran
+
+   colors_per_newton_step = .true.
 
 
 Data Preparation (SED_Tools)
 ============================
 
 The ``colors`` module requires pre-processed stellar atmospheres and filter
-profiles organized in a very specific directory structure. To automate this
+profiles organised in a specific directory structure. To automate this
 entire workflow, we provide the dedicated repository:
 
 **Repository:** `SED_Tools <https://github.com/nialljmiller/SED_Tools>`_
@@ -167,14 +233,13 @@ filter transmission curves from the following public archives:
 * `MAST BOSZ Stellar Atmosphere Library <https://archive.stsci.edu/prepds/bosz/>`_
 * `MSG / Townsend Atmosphere Grids <https://www.astro.wisc.edu/~townsend/msg/>`_
 
-These sources provide heterogeneous formats and file organizations. SED_Tools
-standardizes them into the exact structure required by MESA:
+These sources provide heterogeneous formats and file organisations. SED_Tools
+standardises them into the exact structure required by MESA:
 
 * ``lookup_table.csv``
-* Raw SED files (text or/and HDF5)
+* Raw SED files (text and/or HDF5)
 * ``flux_cube.bin`` (binary cube for fast interpolation)
 * Filter index files and ``*.dat`` transmission curves
-
 
 SED_Tools produces:
 
@@ -207,19 +272,20 @@ This server provides a live view of:
 Defaults Reference
 ==================
 
-Below are the default values for the colors module parameters as defined in ``colors.defaults``. These are used if you do not override them in your inlist.
+Below are the default values for all user-facing ``colors`` module parameters as defined in ``colors.defaults``.
 
 .. code-block:: fortran
 
       use_colors = .false.
-      instrument = '/data/colors_data/filters/Generic/Johnson'
-      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
-      stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
+      instrument = 'data/colors_data/filters/Generic/Johnson'
+      stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
+      vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
       distance = 3.0857d19  ! 10 parsecs in cm (Absolute Magnitude)
       make_csv = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
-      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
+      sed_per_model = .false.
+      colors_per_newton_step = .false.
 
 Visual Summary of Data Flow
 ===========================
@@ -237,8 +303,8 @@ Visual Summary of Data Flow
    | 1. Query Stellar Atmosphere Grid with input model                       |
    | 2. Interpolate grid to construct specific SED                           |
    | 3. Convolve SED with filters to generate band flux                      |
-   | 2. Apply distance flux dilution to generate bolometric flux -> Flux_bol |
-   | 4. Apply zero point (Vega/AB/ST) to  generate magnitudes                |
+   | 4. Apply distance flux dilution to generate bolometric flux -> Flux_bol |
+   | 5. Apply zero point (Vega/AB/ST) to generate magnitudes                 |
    |                                    (Both bolometric and per filter)     |
    +-------------------------------------------------------------------------+
            |

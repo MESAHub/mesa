@@ -1,43 +1,80 @@
 ! ``colors`` module controls
 ! ==========================
 
-   ! The MESA/colors parameters are given default values here.
-
 
 ! Colors User Parameters
 ! ----------------------
 
    ! ``use_colors``
    ! ~~~~~~~~~~~~~~
+   ! Set to .true. to enable bolometric and synthetic photometry output.
+
    ! ``instrument``
    ! ~~~~~~~~~~~~~~
-   ! ``vega_sed``
-   ! ~~~~~~~~~~~~
+   ! Path to the filter instrument directory (structured as facility/instrument).
+   ! The directory must contain an index file named after the instrument and
+   ! one .dat transmission curve per filter. Each filter becomes a history column.
+
    ! ``stellar_atm``
    ! ~~~~~~~~~~~~~~~
+   ! Path to the stellar atmosphere model grid directory.
+   ! Must contain: lookup_table.csv, SED files, and optionally flux_cube.bin.
+
+   ! ``vega_sed``
+   ! ~~~~~~~~~~~~
+   ! Path to the Vega reference SED file. Required when mag_system = 'Vega'.
+   ! Used to compute photometric zero-points for all filters.
+
    ! ``distance``
    ! ~~~~~~~~~~~~
+   ! Distance to the star in cm. Determines whether output magnitudes are
+   ! absolute (default: 10 pc = 3.0857e19 cm) or apparent (set to source distance).
+
    ! ``make_csv``
    ! ~~~~~~~~~~~~
+   ! If .true., exports the full SED as a CSV file at every profile interval.
+   ! Files are written to colors_results_directory.
+
    ! ``colors_results_directory``
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! Directory where CSV outputs (make_csv, sed_per_model) are saved.
+
    ! ``mag_system``
    ! ~~~~~~~~~~~~~~
+   ! Photometric zero-point system. Options: 'Vega', 'AB', 'ST'.
+   !   Vega : zero-point set so Vega has magnitude 0 in all bands.
+   !   AB   : zero-point based on flat f_nu = 3631 Jy.
+   !   ST   : zero-point based on flat f_lambda per unit wavelength.
 
-   ! If ``use_colors`` is true, the colors module is turned on, which will calculate
-   ! bolometric and synthetic magnitudes by interpolating stellar atmosphere model grids and convolving with photometric filter transmission curves.
-   ! Vega SED for Vega photometric system is used for photometric zero points.
-   ! Stellar distance is given in cm.
+   ! ``sed_per_model``
+   ! ~~~~~~~~~~~~~~~~~
+   ! Requires make_csv = .true. If .true., each SED output file is suffixed with
+   ! the model number, preserving the full SED history rather than overwriting.
+   ! WARNING: can produce very large numbers of files. Ensure adequate storage.
+
+   ! ``colors_per_newton_step``
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! If .true., computes synthetic photometry at every Newton iteration within
+   ! each timestep rather than once per converged model. Useful for capturing
+   ! rapid parameter changes (e.g., thermal pulses, shell flashes).
+   ! WARNING: substantially increases computational cost. Only enable when
+   ! sub-timestep resolution is scientifically required.
+
+   ! If ``use_colors`` is true, the colors module computes bolometric and synthetic
+   ! magnitudes by interpolating stellar atmosphere model grids and convolving with
+   ! photometric filter transmission curves. Output is appended to history.data.
    ! ::
 
       use_colors = .false.
-      instrument = '/data/colors_data/filters/Generic/Johnson'
-      stellar_atm = '/data/colors_data/stellar_models/Kurucz2003all/'
-      distance = 3.0857d19
+      instrument = 'data/colors_data/filters/Generic/Johnson'
+      stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
+      vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
+      distance = 3.0857d19     ! 10 parsecs in cm -> Absolute Magnitudes
       make_csv = .false.
       colors_results_directory = 'SED'
       mag_system = 'Vega'
-      vega_sed = '/data/colors_data/stellar_models/vega_flam.csv'
+      sed_per_model = .false.
+      colors_per_newton_step = .false.
 
 
 ! Extra inlist controls
@@ -45,7 +82,6 @@
 
    ! One can split a colors inlist into pieces using the following parameters.
    ! It works recursively, so the extras can read extras too.
-
 
          ! ``read_extra_colors_inlist(1..5)``
          ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
