@@ -12,7 +12,8 @@ SRCS := public/utils_def.f90 \
 	private/utils_nan.f90 \
 	private/utils_nan_qp.f90 \
 	private/utils_nan_sp.f90 \
-	private/utils_system.f90
+	private/utils_system.f90 \
+	private/namelist.f90 \
 
 ifeq ($(WITH_OPENMP),yes)
   SRCS += private/utils_openmp.f90
@@ -31,7 +32,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 # Install
 
-MODULES := utils_def.mod utils_lib.mod
+MODULES := utils_def.mod utils_lib.mod utils_namelist.mod
 INSTALL_INCLUDES := formats
 
 include $(MAKE_DIR)/Makefile

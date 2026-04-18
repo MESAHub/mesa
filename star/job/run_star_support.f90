@@ -1746,8 +1746,7 @@
          if (failed('set_star_kap_and_eos_handles',ierr)) return
          call star_set_colors_handles(id_aux, ierr)
          if (failed('star_set_colors_handles',ierr)) return
-         call store_controls(s_aux, ierr)
-         if (failed('store_controls',ierr)) return
+         call store_controls(s_aux)
          call do_star_job_controls_before(id_aux, s_aux, .false., ierr)
          if (ierr /= 0) return
          call star_read_model(id_aux, s% job% saved_model_for_merger_2, ierr)

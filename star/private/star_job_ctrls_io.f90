@@ -533,89 +533,47 @@
 
 
       subroutine do_read_star_job(s, filename, ierr)
+         use utils_namelist, only: read_namelist, missing_namelist_error
          use star_private_def
-         use utils_lib
          type (star_info), pointer :: s
          character(*), intent(in) :: filename
          integer, intent(out) :: ierr
-         character (len=strlen) :: star_job_namelist_name
-         star_job_namelist_name = ''
-         ierr = 0
+
          call set_default_star_job_controls
-         call read_star_job_file(s, filename, 1, ierr)
+         call read_namelist(filename, read_star_job_file, "star_job", ierr, missing_namelist_error)
+
+         if (ierr /= 0) return
+         call store_star_job_controls(s)
          call check_star_job_controls(s, ierr)
       end subroutine do_read_star_job
 
+      subroutine read_star_job_file(unit, iostat, iomsg, extra_inlists, extra_inlists_mask)
+         use const_def, only: strlen, max_extra_inlists
 
-      recursive subroutine read_star_job_file(s, filename, level, ierr)
-         use star_private_def
-         use utils_lib
-         character(*), intent(in) :: filename
-         type (star_info), pointer :: s
-         integer, intent(in) :: level
-         integer, intent(out) :: ierr
-         logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen), dimension(max_extra_inlists) :: extra
-         integer :: unit, i
+         integer, intent(in) :: unit
+         integer, intent(out) :: iostat
+         character(len=strlen), intent(out) :: iomsg
+         character(len=strlen), dimension(max_extra_inlists), intent(out) :: extra_inlists
+         logical, dimension(max_extra_inlists), intent(out) :: extra_inlists_mask
 
-         ierr = 0
+         integer :: i
 
-         if (level >= 10) then
-            write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
-            ierr = -1
+         read(unit, nml=star_job, iostat=iostat, iomsg=iomsg)
+
+         if (iostat /= 0) then
             return
          end if
 
-         if (len_trim(filename) > 0) then
-            open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-            if (ierr /= 0) then
-               write(*, *) 'Failed to open control namelist file "'//trim(filename)//'"'
-               return
-            end if
-            read(unit, nml=star_job, iostat=ierr)
-            close(unit)
-            if (ierr /= 0) then
-               write(*, *)
-               write(*, *)
-               write(*, *)
-               write(*, *)
-               write(*, '(a)') &
-                  'Failed while trying to read control namelist file: ' // trim(filename)
-               write(*, '(a)') &
-                  'Perhaps the following runtime error message will help you find the problem.'
-               write(*, *)
-               open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-               read(unit, nml=star_job)
-               close(unit)
-               return
-            end if
-         end if
-
-         call store_star_job_controls(s, ierr)
-
-         ! recursive calls to read other inlists
          do i=1, max_extra_inlists
-            read_extra(i) = read_extra_star_job_inlist(i)
-            read_extra_star_job_inlist(i) = .false.
-            extra(i) = extra_star_job_inlist_name(i)
-            extra_star_job_inlist_name(i) = 'undefined'
-
-            if (read_extra(i)) then
-               call read_star_job_file(s, extra(i), level+1, ierr)
-               if (ierr /= 0) return
-            end if
+            extra_inlists(i) = extra_star_job_inlist_name(i)
+            extra_inlists_mask(i) = read_extra_star_job_inlist(i)
          end do
-
 
       end subroutine read_star_job_file
 
-
-      subroutine store_star_job_controls(s, ierr)
+      subroutine store_star_job_controls(s)
          use star_private_def
          type (star_info), pointer :: s
-         integer, intent(out) :: ierr
-
-         ierr = 0
 
          s% job% mesa_dir = mesa_dir
          s% job% eosDT_cache_dir = eosDT_cache_dir
@@ -1754,7 +1712,7 @@
          read(tmp, nml=star_job)
 
          ! Add to star
-         call store_star_job_controls(s, ierr)
+         call store_star_job_controls(s)
          if(ierr/=0) return
 
       end subroutine set_star_job
