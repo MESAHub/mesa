@@ -112,7 +112,7 @@ sub output_make ($filename, $output_files, $not_found_mod_dependency, $dependenc
     $obj.anc : $filename ${ \join(" ", @dependency) } | \$(MODULE_DIR)/. $obj_dir/.
     \t\@touch \$@
     \t\@echo $module_compiler $filename && \$($module_compiler) $filename -J \$(MODULE_DIR)
-    ${ \join(" ", @output_files) } : $obj.anc
+    ${ \join(" ", @output_files) } : $obj.anc ;
     $obj :  $filename ${ \join(" ", @dependency) } | \$(SCRATCH_DIR)/. $obj_dir/. \$(MODULE_DIR)/.
     \t\@rm -rf \$(SCRATCH_DIR)/$obj_fname/
     \t\@mkdir \$(SCRATCH_DIR)/$obj_fname/
