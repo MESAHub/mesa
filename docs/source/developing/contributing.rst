@@ -103,6 +103,8 @@ MESA development uses the following branching model:
 
 The line between what should be a feature branch / pull request and what's committed straight onto the main branch can be drawn based on how disruptive a change is expected to be. If it has the potential to break test suite cases, don't commit it directly to main.  Use a branch.
 
+If you are planning a backward-incompatible change, discuss it with with the broader developer team before substantial development begins.
+
 
 Making a commit
 ---------------
