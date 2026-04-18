@@ -23,6 +23,8 @@ The build system scripts have been modernized. This has lead to the following ch
 
 For a more in-depth look at the new build system, see :doc:`developing/build-system`. If you change the build system in any way (e.g. skipping tests, building dynamic/shared libraries), it is highly recommended to have a look at this document.
 
+``Tsurf_factor`` was deprecated, and the associated controls and history column have been removed.
+
 .. _New Features main:
 
 New Features

@@ -1092,29 +1092,6 @@
          end if
       end subroutine relax_tau_factor
 
-
-      subroutine relax_Tsurf_factor(s)
-         type (star_info), pointer :: s
-         real(dp) :: next
-         include 'formats'
-         write(*,*) 'relax_to_this_Tsurf_factor < s% Tsurf_factor', &
-            s% job% relax_to_this_Tsurf_factor < s% Tsurf_factor
-         write(*,1) 'relax_to_this_Tsurf_factor', s% job% relax_to_this_Tsurf_factor
-         write(*,1) 's% Tsurf_factor', s% Tsurf_factor
-         if (s% job% relax_to_this_Tsurf_factor < s% Tsurf_factor) then
-            next = exp10(safe_log10(s% Tsurf_factor) - s% job% dlogTsurf_factor)
-            if (next < s% job% relax_to_this_Tsurf_factor) &
-               next = s% job% relax_to_this_Tsurf_factor
-         else
-            next = exp10(safe_log10(s% Tsurf_factor) + s% job% dlogTsurf_factor)
-            if (next > s% job% relax_to_this_Tsurf_factor) &
-               next = s% job% relax_to_this_Tsurf_factor
-         end if
-         s% Tsurf_factor = next
-         write(*,1) 'relax_Tsurf_factor', next, s% job% relax_to_this_Tsurf_factor
-      end subroutine relax_Tsurf_factor
-
-
       subroutine check_if_want_to_stop_warnings(s)
          use utils_lib
          type (star_info), pointer :: s
@@ -1953,12 +1930,6 @@
             s% tau_factor = s% job% set_to_this_tau_factor
          end if
 
-         if (s% job% set_Tsurf_factor .or. &
-               (s% job% set_initial_Tsurf_factor .and. .not. restart)) then
-            write(*,1) 'set_Tsurf_factor', s% job% set_to_this_Tsurf_factor
-            s% Tsurf_factor = s% job% set_to_this_Tsurf_factor
-         end if
-
          if (s% job% set_initial_age .and. .not. restart) then
             write(*,1) 'set_initial_age', s% job% initial_age  ! in years
             call star_set_age(id, s% job% initial_age, ierr)
@@ -2530,14 +2501,6 @@
             call star_relax_L_center( &
                id, s% job% new_L_center, s% job% dlgL_per_step, s% job% relax_L_center_dt, ierr)
             if (failed('star_relax_L_center',ierr)) return
-         end if
-
-         if (s% job% relax_Tsurf_factor .or. &
-               (s% job% relax_initial_Tsurf_factor .and. .not. restart)) then
-            write(*,1) 'relax_Tsurf_factor', s% job% relax_to_this_Tsurf_factor
-            call star_relax_Tsurf_factor( &
-               id, s% job% relax_to_this_Tsurf_factor, s% job% dlogTsurf_factor, ierr)
-            if (failed('star_relax_Tsurf_factor',ierr)) return
          end if
 
          if (s% job% relax_tau_factor .or. &
