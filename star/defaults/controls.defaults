@@ -4690,18 +4690,6 @@
     use_fixed_Psurf_outer_BC = .false.
     fixed_Psurf = 0
 
-
-      ! Tsurf_factor
-      ! ~~~~~~~~~~~~
-
-      ! used when ``use_momentum_outer_BC``
-      ! ``T_surf`` is set to ``Tsurf_factor*T_black_body(L_surf,R_surf)``
-
-      ! ::
-
-    Tsurf_factor = 1
-
-
       ! irradiation_flux
       ! ~~~~~~~~~~~~~~~~
       ! column_depth_for_irradiation

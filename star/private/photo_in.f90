@@ -86,7 +86,7 @@
             s% astero_revised_max_yr_dt, &
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
-            s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor, &
+            s% force_tau_factor, s% force_opacity_factor, &
             s% crystal_core_boundary_mass
 
          if (failed('initial_y')) return
@@ -96,12 +96,6 @@
                s% tau_factor /= s% job% set_to_this_tau_factor) then
             s% tau_factor = s% force_tau_factor
             write(*,1) 'set tau_factor to photo value', s% tau_factor
-         end if
-
-         if (s% force_Tsurf_factor > 0 .and. s% Tsurf_factor /= s% force_Tsurf_factor .and. &
-               s% Tsurf_factor /= s% job% set_to_this_Tsurf_factor) then
-            s% Tsurf_factor = s% force_Tsurf_factor
-            write(*,1) 'set Tsurf_factor to photo value', s% Tsurf_factor
          end if
 
          if (s% force_opacity_factor > 0 .and. s% opacity_factor /= s% force_opacity_factor .and. &

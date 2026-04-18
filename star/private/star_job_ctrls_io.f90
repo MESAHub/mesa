@@ -262,14 +262,6 @@
          adjust_tau_factor_to_surf_density, &
          base_for_adjust_tau_factor_to_surf_density, &
 
-         relax_Tsurf_factor, &
-         relax_initial_Tsurf_factor, &
-         set_Tsurf_factor, &
-         set_initial_Tsurf_factor, &
-         relax_to_this_Tsurf_factor, &
-         set_to_this_Tsurf_factor, &
-         dlogTsurf_factor, &
-
          relax_irradiation, &
          relax_initial_irradiation, &
          set_irradiation, &
@@ -853,14 +845,6 @@
          s% job% relax_opacity_factor = relax_opacity_factor
          s% job% relax_initial_opacity_factor = relax_initial_opacity_factor
 
-         s% job% relax_Tsurf_factor = relax_Tsurf_factor
-         s% job% relax_initial_Tsurf_factor = relax_initial_Tsurf_factor
-         s% job% set_Tsurf_factor = set_Tsurf_factor
-         s% job% set_initial_Tsurf_factor = set_initial_Tsurf_factor
-         s% job% relax_to_this_Tsurf_factor = relax_to_this_Tsurf_factor
-         s% job% set_to_this_Tsurf_factor = set_to_this_Tsurf_factor
-         s% job% dlogTsurf_factor = dlogTsurf_factor
-
          s% job% relax_irradiation = relax_irradiation
          s% job% relax_initial_irradiation = relax_initial_irradiation
          s% job% set_irradiation = set_irradiation
@@ -1399,14 +1383,6 @@
          d_opacity_factor = s% job% d_opacity_factor
          relax_opacity_factor = s% job% relax_opacity_factor
          relax_initial_opacity_factor = s% job% relax_initial_opacity_factor
-
-         relax_Tsurf_factor = s% job% relax_Tsurf_factor
-         relax_initial_Tsurf_factor = s% job% relax_initial_Tsurf_factor
-         set_Tsurf_factor = s% job% set_Tsurf_factor
-         set_initial_Tsurf_factor = s% job% set_initial_Tsurf_factor
-         relax_to_this_Tsurf_factor = s% job% relax_to_this_Tsurf_factor
-         set_to_this_Tsurf_factor = s% job% set_to_this_Tsurf_factor
-         dlogTsurf_factor = s% job% dlogTsurf_factor
 
          relax_irradiation = s% job% relax_irradiation
          relax_initial_irradiation = s% job% relax_initial_irradiation

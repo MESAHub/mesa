@@ -1461,8 +1461,6 @@ contains
          case(h_species)
             int_val = s% species
             is_int_val = .true.
-         case(h_Tsurf_factor)
-            val = s% Tsurf_factor
          case(h_tau_factor)
             val = s% tau_factor
          case(h_tau_surface)

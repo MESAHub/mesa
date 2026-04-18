@@ -1518,18 +1518,6 @@
          call do_relax_opacity_factor(id, new_opacity_factor, dopacity_factor, ierr)
       end subroutine star_relax_opacity_factor
 
-
-      subroutine star_relax_Tsurf_factor(id, new_Tsurf_factor, dlogTsurf_factor, ierr)
-         use relax, only: do_relax_Tsurf_factor
-         integer, intent(in) :: id
-         real(dp), intent(in) :: new_Tsurf_factor
-         real(dp), intent(in) :: dlogTsurf_factor
-            ! change log10(Tsurf_factor) by at most this amount per step
-         integer, intent(out) :: ierr
-         call do_relax_Tsurf_factor(id, new_Tsurf_factor, dlogTsurf_factor, ierr)
-      end subroutine star_relax_Tsurf_factor
-
-
       ! kind_of_relax = 0 => target = new_omega
       ! kind_of_relax = 1 => target = new_omega_div_omega_crit
       ! kind_of_relax = 2 => target = new_surface_rotation_v
