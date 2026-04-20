@@ -432,7 +432,7 @@
             ict = 0
             ict(1) = 1
             iounit=999
-      ! setup interpolation table for x1 x2 dx1
+            ! setup interpolation table for x1 x2 dx1
             if (components=='CONe') then
                open(unit=iounit, file='CONe_deltaC.dat', action='read',status='old')
             else if  (components=='NeOMg') then
@@ -446,45 +446,45 @@
             deltax1_sob_f1(4*num_x1*num_x2))
             deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
             deltax1_sob_f1(1:4*num_x1*num_x2)
-   do j=1,num_x1
-      do i=1,num_x2
-         read(iounit,*) x1l, x2l, deltax1
-         x1_l(j)=x1l
-         if (j == 1) then
-            x2_l(i) =x2l
-         end if
-         deltax1_sob_f(1,j,i) = deltax1
-      end do
-   end do
-   close(iounit)
-   ! just use "not a knot" bc's at edges of tables
-   ibcxmin = 0; bcxmin(1:num_x1) = 0
-   ibcxmax = 0; bcxmax(1:num_x1) = 0
-   ibcymin = 0; bcymin(1:num_x2) = 0
-   ibcymax = 0; bcymax(1:num_x2) = 0
-   call interp_mkbicub_db( &
-      x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
-      ibcxmin,bcxmin,ibcxmax,bcxmax, &
-      ibcymin,bcymin,ibcymax,bcymax, &
-      ilinx,iliny,ierr)
-   if (ierr /= 0) then
-      write(*,*) 'interp_mkbicub_db error'
-      ierr = -1
-      call mesa_error(__FILE__,__LINE__)
-   end if
-   do j=1,num_x1
-      do i=1,num_x2
-         do k=1,4
-            if (is_bad(deltax1_sob_f(k,j,i))) then
-            write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
+            do j=1,num_x1
+               do i=1,num_x2
+                  read(iounit,*) x1l, x2l, deltax1
+                  x1_l(j)=x1l
+                  if (j == 1) then
+                     x2_l(i) =x2l
+                  end if
+                  deltax1_sob_f(1,j,i) = deltax1
+               end do
+            end do
+            close(iounit)
+            ! just use "not a knot" bc's at edges of tables
+            ibcxmin = 0; bcxmin(1:num_x1) = 0
+            ibcxmax = 0; bcxmax(1:num_x1) = 0
+            ibcymin = 0; bcymin(1:num_x2) = 0
+            ibcymax = 0; bcymax(1:num_x2) = 0
+            call interp_mkbicub_db( &
+                 x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
+                 ibcxmin,bcxmin,ibcxmax,bcxmax, &
+                 ibcymin,bcymin,ibcymax,bcymax, &
+                 ilinx,iliny,ierr)
+            if (ierr /= 0) then
+               write(*,*) 'interp_mkbicub_db error'
+               ierr = -1
+               call mesa_error(__FILE__,__LINE__)
             end if
-         end do
-      end do
-   end do
-   call interp_evbicub_db( &
-            x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
-            ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
-    dx1_=fval(1)  ! delta_x1 from 2d interpolation
+            do j=1,num_x1
+               do i=1,num_x2
+                  do k=1,4
+                     if (is_bad(deltax1_sob_f(k,j,i))) then
+                        write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
+                     end if
+                  end do
+               end do
+            end do
+            call interp_evbicub_db( &
+                 x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
+                 ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
+            dx1_=fval(1)  ! delta_x1 from 2d interpolation
       end subroutine tab_interp_medin_cumming_dx1
 
 
@@ -510,7 +510,7 @@
             ict = 0
             ict(1) = 1
             iounit=998
-      ! setup interpolation table for tau sob eta
+            ! setup interpolation table for tau sob eta
             if (components=='CONe') then
                open(unit=iounit, file='CONe_deltaO.dat', action='read',status='old')
             else if  (components=='NeOMg') then
@@ -521,48 +521,48 @@
                open(unit=iounit, file='COMg_deltaMg.dat', action='read',status='old')
             end if
             allocate(x1_l(num_x1), x2_l(num_x2), &
-            deltax1_sob_f1(4*num_x1*num_x2))
+                 deltax1_sob_f1(4*num_x1*num_x2))
             deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
-            deltax1_sob_f1(1:4*num_x1*num_x2)
-   do j=1,num_x1
-      do i=1,num_x2
-         read(iounit,*) x1l, x2l, deltax1
-         x1_l(j)=x1l
-         if (j == 1) then
-            x2_l(i) =x2l
-         end if
-         deltax1_sob_f(1,j,i) = deltax1
-      end do
-   end do
-   close(iounit)
-   ! just use "not a knot" bc's at edges of tables
-   ibcxmin = 0; bcxmin(1:num_x1) = 0
-   ibcxmax = 0; bcxmax(1:num_x1) = 0
-   ibcymin = 0; bcymin(1:num_x2) = 0
-   ibcymax = 0; bcymax(1:num_x2) = 0
-   call interp_mkbicub_db( &
-      x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
-      ibcxmin,bcxmin,ibcxmax,bcxmax, &
-      ibcymin,bcymin,ibcymax,bcymax, &
-      ilinx,iliny,ierr)
-   if (ierr /= 0) then
-      write(*,*) 'interp_mkbicub_db error'
-      ierr = -1
-      call mesa_error(__FILE__,__LINE__)
-   end if
-   do j=1,num_x1
-      do i=1,num_x2
-         do k=1,4
-            if (is_bad(deltax1_sob_f(k,j,i))) then
-            write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
+                 deltax1_sob_f1(1:4*num_x1*num_x2)
+            do j=1,num_x1
+               do i=1,num_x2
+                  read(iounit,*) x1l, x2l, deltax1
+                  x1_l(j)=x1l
+                  if (j == 1) then
+                     x2_l(i) =x2l
+                  end if
+                  deltax1_sob_f(1,j,i) = deltax1
+               end do
+            end do
+            close(iounit)
+            ! just use "not a knot" bc's at edges of tables
+            ibcxmin = 0; bcxmin(1:num_x1) = 0
+            ibcxmax = 0; bcxmax(1:num_x1) = 0
+            ibcymin = 0; bcymin(1:num_x2) = 0
+            ibcymax = 0; bcymax(1:num_x2) = 0
+            call interp_mkbicub_db( &
+                 x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
+                 ibcxmin,bcxmin,ibcxmax,bcxmax, &
+                 ibcymin,bcymin,ibcymax,bcymax, &
+                 ilinx,iliny,ierr)
+            if (ierr /= 0) then
+               write(*,*) 'interp_mkbicub_db error'
+               ierr = -1
+               call mesa_error(__FILE__,__LINE__)
             end if
-         end do
-      end do
-   end do
-   call interp_evbicub_db( &
-            x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
-            ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
-    dx2_=fval(1)  ! delta_x2 from 2d interpolation
+            do j=1,num_x1
+               do i=1,num_x2
+                  do k=1,4
+                     if (is_bad(deltax1_sob_f(k,j,i))) then
+                        write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
+                     end if
+                  end do
+               end do
+            end do
+            call interp_evbicub_db( &
+                 x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
+                 ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
+            dx2_=fval(1)  ! delta_x2 from 2d interpolation
       end subroutine tab_interp_medin_cumming_dx2
 
 
@@ -748,4 +748,5 @@
         ! Finish
         return
       end subroutine update_model_
-end module phase_separation
+      
+    end module phase_separation
