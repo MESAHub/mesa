@@ -46,6 +46,7 @@
             call do_2component_phase_separation(s, dt, 'ONe', ierr)
          else if(s% phase_separation_option == '3c') then
             call do_2component_phase_separation(s, dt, '3c', ierr)
+            call smooth_eps_phase_sep(s, dt, ierr)
          else
             write(*,*) 'invalid phase_separation_option'
             stop
@@ -745,5 +746,29 @@
         ! Finish
         return
       end subroutine update_model_
+
+      subroutine smooth_eps_phase_sep(s,dt,ierr)
+        type (star_info), pointer :: s
+        real(dp), intent(in) :: dt
+        integer, intent(out) :: ierr
+
+        real(dp) :: integrated_luminosity
+        integer :: k, kmid
+
+        integrated_luminosity = dot_product(s% dm(1:s%nz), s% eps_phase_separation(1:s%nz))
+
+        ! redistribute evenly through the inner half of the star
+        kmid = s%nz / 2
+        do k = 1,s%nz
+           if(s% q(k) < 0.5d0) then
+              kmid = k
+              exit
+           end if
+        end do
+
+        s% eps_phase_separation(:) = 0d0
+        s% eps_phase_separation(kmid:s%nz) = integrated_luminosity/s% m(kmid)
+
+      end subroutine smooth_eps_phase_sep
 
     end module phase_separation
