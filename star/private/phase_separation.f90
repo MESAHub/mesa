@@ -67,14 +67,9 @@
          ! Set phase separation mixing mass negative at beginning of phase separation
          s% phase_sep_mixing_mass = -1d0
          s% eps_phase_separation(1:s%nz) = 0d0
-         if(s% phase(s% nz) < eos_phase_boundary) then !!! prevent to move the core size inwards if the core is suddently "melted" leaving everything liquid under phi<0.9
-            if (s% crystal_core_boundary_mass>0d0)then
-               s% crystal_core_boundary_mass=s% crystal_core_boundary_mass
-               return
-            else
-               s% crystal_core_boundary_mass = 0d0
-               return
-            end if
+         if(s% phase(s% nz) < eos_phase_boundary) then
+            s% crystal_core_boundary_mass = 0d0
+            return
          end if
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
