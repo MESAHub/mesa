@@ -24,13 +24,14 @@
 
       implicit none
 
+      private
+      public :: do_phase_separation
+
       logical, parameter :: dbg = .false.
 
       ! offset to higher phase than 0.5 to avoid interference
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
-      private
-      public :: do_phase_separation
 
       contains
 
@@ -67,16 +68,19 @@
          ! Set phase separation mixing mass negative at beginning of phase separation
          s% phase_sep_mixing_mass = -1d0
          s% eps_phase_separation(1:s%nz) = 0d0
+
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
+
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
          net_ine20 = s% net_iso(ine20)
          net_ine22 = s% net_iso(ine22)
          net_ina23 = s% net_iso(ina23)
          net_img24 = s% net_iso(img24)
+
          ! Find zone of phase transition from liquid to solid
          k_bound = -1
          do k = s%nz,1,-1
@@ -85,6 +89,7 @@
                exit
             end if
          end do
+
          XC = s% xa(net_ic12,k_bound)
          XO = s% xa(net_io16,k_bound)
          XNe20 = s% xa(net_ine20,k_bound)
@@ -108,6 +113,7 @@
                   exit
                end if
             end do
+
             ! calculate energy associated with phase separation, ignoring the ionization
             ! energy term that Skye sometimes calculates
             save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
@@ -116,17 +122,13 @@
             do k=1,s% nz
                s% eps_phase_separation(k) = s% energy(k)
             end do
+
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
                if(s% phase(k) <= eos_phase_boundary) then
-                  if (s% crystal_core_boundary_mass>s% m(k+1)) then
-                     s% crystal_core_boundary_mass=s% crystal_core_boundary_mass
-                      exit
-                  else
-                     s% crystal_core_boundary_mass = s% m(k+1)
-                     exit
-                  end if
+                  s% crystal_core_boundary_mass = s% m(k+1)
+                  exit
                end if
                call move_one_zone(s,k,components)
                ! crystallized out to k now, liquid starts at k-1.
@@ -134,6 +136,8 @@
                call mix_outward(s, k-1, 0)
             end do
             call update_model_(s,1,s%nz,.false.)
+
+            ! phase separation heating term for use by energy equation
             do k=1,s% nz
                s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
             end do
@@ -173,9 +177,12 @@
            Xfac = XO + XC
            XO = XO/Xfac
            XC = XC/Xfac
+
            dXO = blouin_delta_xo(XO)
+
            s% xa(net_io16,k) = Xfac*(XO + dXO)
            s% xa(net_ic12,k) = Xfac*(XC - dXO)
+
            ! Redistribute change in C,O into zone k-1,
            ! conserving total mass of C,O
            XC1 = s% xa(net_ic12,k-1)
