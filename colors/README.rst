@@ -103,8 +103,7 @@ Source files
    │   │                          numerical integration, flux dilution,
    │   │                          stencil and SED memory cache management
    │   ├── colors_history.f90   — MESA history column interface
-   │   ├── colors_ctrls_io.f90  — &colors namelist I/O
-   │   └── colors_iteration.f90 — Newton iteration monitor hook
+   │   └── colors_ctrls_io.f90  — &colors namelist I/O
    └── defaults/
        └── colors.defaults      — default values for all &colors parameters
 
