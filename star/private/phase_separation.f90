@@ -53,7 +53,7 @@
       end subroutine do_phase_separation
 
       subroutine do_2component_phase_separation(s, dt, components, ierr)
-         use chem_def, only: chem_isos, ic12, io16, ine20, ine22, ina23, img24
+         use chem_def, only: ic12, io16, ine20, ine22, ina23, img24
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
@@ -100,7 +100,7 @@
          ! otherwise skip phase separation
          if(components == 'CO' .and. XO + XC < 0.9d0) return
          if(components == 'ONe' .and. XNe20 + XNe22 + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
-         
+
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
@@ -148,13 +148,12 @@
       end subroutine do_2component_phase_separation
 
       subroutine move_one_zone(s,k,components)
-        use chem_def, only: chem_isos, ic12, io16, ine20, ine22, ina23, img24
+        use chem_def, only: ic12, io16, ine20, ine22, ina23, img24
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
         real(dp), dimension(2) :: dXNe
         real(dp), dimension(4) :: Dd
-        real(dp) :: dx1_
         character (len=*), intent(in) :: components
         real(dp) :: XC, XO, XNe20, XNe22, XNa, XMg, XC1, XO1, XNe120, XNe122, XNa1, XMg1, dXO, Xfac
         integer :: net_ic12, net_io16, net_ine20, net_ine22, net_ina23, net_img24
@@ -413,14 +412,13 @@
 
      subroutine tab_interp_medin_cumming_dx1(x1_,x2_,components,dx1_)
             use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
-            use const_def, only: mesa_data_dir
             use utils_lib, only: mesa_error, mkdir, is_bad
             implicit none
             integer, parameter :: num_x1 = 998, num_x2 = 998
             integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
             real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
             real(dp) :: bcymin(num_x2), bcymax(num_x2)
-            real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1, deltax1_sob_values
+            real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
             real(dp), pointer :: deltax1_sob_f(:,:,:)
             real(dp) :: deltax1,x1l,x2l
             real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
@@ -491,14 +489,13 @@
       subroutine tab_interp_medin_cumming_dx2(x1_,x2_,components,dx2_)
             !use utils_lib
             use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
-            use const_def, only: mesa_data_dir
             use utils_lib, only: mesa_error, mkdir, is_bad
             implicit none
             integer, parameter :: num_x1 = 998, num_x2 = 998
             integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
             real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
             real(dp) :: bcymin(num_x2), bcymax(num_x2)
-            real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1, deltax1_sob_values
+            real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
             real(dp), pointer :: deltax1_sob_f(:,:,:)
             real(dp) :: deltax1,x1l,x2l
             real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
@@ -748,5 +745,5 @@
         ! Finish
         return
       end subroutine update_model_
-      
+
     end module phase_separation
