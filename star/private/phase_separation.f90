@@ -95,6 +95,12 @@
          XNe22 = s% xa(net_ine22,k_bound)
          XNa = s% xa(net_ina23,k_bound)
          XMg = s% xa(net_img24,k_bound)
+
+         ! Check that we're still in C/O or O/Ne dominated material as appropriate,
+         ! otherwise skip phase separation
+         if(components == 'CO' .and. XO + XC < 0.9d0) return
+         if(components == 'ONe' .and. XNe20 + XNe22 + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
+         
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
@@ -566,7 +572,6 @@
         real(dp) :: Xnew1, Xnew2, Xnew3_1, Xnew3_2, Xfac ! mass fraction
         real(dp) :: xc, dxc, xo, dxo, xne1, xne2 ! number fractions
         real(dp) :: dx1_,dx2_
-        integer :: i,j
 
         Xfac = X1 + X2 + X3_1 + X3_2
         xc = (X1/12)/(X1/12 + X2/16 + X3_1/20 + X3_2/22)
@@ -601,7 +606,6 @@
         real(dp) :: Xnew1, Xnew2, Xnew3_1, Xnew3_2, Xfac ! mass fraction
         real(dp) :: xmg, dxmg, xo, dxo, xne1, xne2 ! number fractions
         real(dp) :: dx1_,dx2_
-        integer :: i,j
 
         Xfac = X1 + X2 + X3_1 + X3_2
         xmg = (X1/24)/(X1/24 + X2/16 + X3_1/20 + X3_2/22)
@@ -635,7 +639,6 @@
         real(dp) :: Xnew1, Xnew2, Xnew3_1, Xnew3_2, Xfac ! mass fraction
         real(dp) :: xna, dxna, xo, dxo, xne1, xne2 ! number fractions
         real(dp) :: dx1_,dx2_
-        integer :: i,j
 
         Xfac = X1 + X2 + X3_1 + X3_2
         xna = (X1/23)/(X1/23 + X2/16 + X3_1/20 + X3_2/22)
@@ -671,7 +674,6 @@
         real(dp) :: Xnew1, Xnew2, Xfac ! mass fraction
         real(dp) :: xc, dxc, xmg, dxmg, xo ! number fractions
         real(dp) :: dx1_,dx2_
-        integer :: i,j
 
         Xfac = X1 + X2 + X3
         xc = (X1/12)/(X1/12 + X2/24 + X3/16)
@@ -718,7 +720,7 @@
         ! Update opacities across cells kc_t:kc_b (this also sets rho_face
         ! and related quantities on faces kc_t:kc_b)
         call set_micro_vars(s, kc_t, kc_b, &
-             skip_eos=.TRUE., skip_net=.TRUE., skip_neu=.TRUE., skip_kap=.TRUE., ierr=ierr)
+             skip_eos=.TRUE., skip_net=.TRUE., skip_neu=.TRUE., skip_kap=.FALSE., ierr=ierr)
         if (ierr /= 0) then
            write(*,*) 'phase_separation: error from call to set_micro_vars'
            stop
