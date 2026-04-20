@@ -27,13 +27,12 @@ module math_lib
   use math_def
 
   use crmath
-  use IEEE_ARITHMETIC
 
   implicit none
 
   character(LEN=16), parameter :: MATH_BACKEND = 'CRMATH'
 
-  real(dp), save :: ln10_m
+  real(dp) :: ln10_m
 
   interface safe_sqrt
      module procedure safe_sqrt_
@@ -130,7 +129,7 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: log_x
 
-    if (.NOT. IEEE_IS_FINITE(x)) then
+    if (is_nan(x) .or. is_inf(x)) then
 
        log_x = -99._dp
 
@@ -148,7 +147,7 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: log10_x
 
-    if (.NOT. IEEE_IS_FINITE(x)) then
+    if (is_nan(x) .or. is_inf(x)) then
 
        log10_x = -99._dp
 

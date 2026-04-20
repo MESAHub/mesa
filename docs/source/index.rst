@@ -2,18 +2,75 @@
 Modules for Experiments in Stellar Astrophysics
 ###############################################
 
-Modules for Experiments in Stellar Astrophysics (MESA) is an advanced, open-source 1D stellar evolution code.
-The code is developed and maintained by a globally distributed team of researchers.
-MESA is written primarily in Fortran with a modular, flexible design that facilitates easy interfacing.
+.. grid:: 1
+    :class-container: color-cards
 
-🚀 New to MESA? Start with the :ref:`Quickstart<quickstart:Quickstart>` guide to set up and run your first models.
+    .. grid-item-card:: Modules for Experiments in Stellar Astrophysics (MESA)
+      :columns: 12 12 12 12
+      :class-card: mesa-summary
 
-📖 Experienced users may find the :ref:`Reference and Defaults<reference:Reference and Defaults>`
-page most useful for exploring the code's features and input parameters.
-The :ref:`Test Suite<test_suite:Test Suite>` provides example problems for testing and showcasing MESA,
-serving as a project starting point but often requiring modifications for science-grade accuracy.
+      .. image:: assets/logo/mesa-logo.png
+         :alt: MESA logo
+         :width: 96px
+         :align: left
 
-Check out the full documentation below.
+      **MESA** is an advanced, open-source 1D stellar evolution code. The code is developed and maintained by a globally distributed team of researchers. MESA is written primarily in Fortran with a modular, flexible design that facilitates easy interfacing.
+
+.. grid:: 3
+   :class-container: product-offerings
+   :margin: 0
+   :padding: 0
+   :gutter: 0
+
+   .. grid-item-card:: Stellar Physics
+      :columns: 12 6 6 4
+      :class-card: sd-border-0
+      :shadow: None
+
+      MESA implements tested, peer-reviewed physics and numerical methods for modeling stellar structure and evolution across a wide range of masses and evolutionary stages.
+
+   .. grid-item-card:: Open-source
+      :columns: 12 6 6 4
+      :class-card: sd-border-0
+      :shadow: None
+
+      Freely available with an active global developer and user community, documentation, and examples to help drive new scientific results.
+
+   .. grid-item-card:: Modular
+      :columns: 12 6 6 4
+      :class-card: sd-border-0
+      :shadow: None
+
+      A modular Fortran codebase with configurable physics modules, user hooks, and flexible inlists that make it easy to customize problem setups.
+
+
+.. grid:: 3
+    :class-container: color-cards
+
+    .. grid-item-card:: :material-regular:`rocket_launch;2em` Quickstart
+      :columns: 12 6 6 4
+      :link: quickstart
+      :link-type: doc
+      :class-card: quickstart
+
+    .. grid-item-card:: :material-regular:`library_books;2em` Reference and Defaults
+      :columns: 12 6 6 4
+      :link: reference
+      :link-type: doc
+      :class-card: reference
+
+    .. grid-item-card:: :material-regular:`laptop_chromebook;2em` Test Suite
+      :columns: 12 6 6 4
+      :link: test_suite
+      :link-type: doc
+      :class-card: quickstart
+
+
+.. image:: assets/demo.gif
+    :alt: MESA demo
+    :align: center
+    :width: 480px
+
 
 .. toctree::
    :maxdepth: 1

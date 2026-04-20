@@ -1,5 +1,11 @@
+         
+         logical :: compare_TDC_to_MLT 
 
-         logical :: compare_TDC_to_MLT
+         logical :: TDC_use_density_form_for_eddy_viscosity
+         logical :: include_mlt_Pturb_in_thermodynamic_gradients
+         logical :: use_TDC_enthalpy_flux_limiter
+         logical :: include_mlt_in_velocity_time_centering
+         logical :: use_hydro_merge_limits_in_mesh_plan
 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap

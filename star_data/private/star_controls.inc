@@ -255,9 +255,17 @@
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
          integer :: steps_before_use_TDC
-         real(dp) :: alpha_TDC_DAMP   ! ~ RSP2_alfad
-         real(dp) :: alpha_TDC_DAMPR  ! ~ RSP2_alfar
-         real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
+         real(dp) :: TDC_alpha_D   ! ~ RSP2_alfad
+         real(dp) :: TDC_alpha_R  ! ~ RSP2_alfar
+         real(dp) :: TDC_alpha_Pt  ! RSP2_alfap
+         real(dp) :: TDC_alpha_M
+         real(dp) :: TDC_alpha_C
+         real(dp) :: TDC_alpha_S
+         logical :: TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+         logical :: include_mlt_corr_to_TDC
+         logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
+         real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
+         real(dp) :: TDC_num_outermost_cells_forced_nonturbulent
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag
@@ -421,6 +429,7 @@
          real(dp) :: fixed_vsurf
          logical :: use_fixed_Psurf_outer_BC
          real(dp) :: fixed_Psurf
+         logical :: use_RSP_L_eqn_outer_BC
 
          real(dp) :: Tsurf_factor
 
@@ -593,8 +602,10 @@
 
          real(dp) :: max_center_cell_dq
          real(dp) :: max_surface_cell_dq
+         real(dp) :: min_surface_cell_dq
          integer :: max_num_subcells
          integer :: max_num_merge_cells
+         integer :: max_num_merge_surface_cells
 
 
          character (len=iso_name_length) :: mesh_logX_species(num_mesh_logX)
@@ -682,14 +693,23 @@
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
+            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff, &
+            merge_amr_logT_for_ignore_core_cells, split_amr_logT_for_ignore_core_cells
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells
+         logical :: merge_amr_ignore_core_cells
+         logical :: split_amr_ignore_core_cells
+
          logical :: merge_amr_du_div_cs_limit_only_for_compression
 
          logical :: split_merge_amr_avoid_repeated_remesh
 
+         logical :: remesh_for_TDC_pulsations_log_core_zoning
+         logical :: TDC_hydro_use_mass_interp_face_values
+         integer :: TDC_hydro_nz, TDC_hydro_nz_outer
+         real(dp) :: TDC_hydro_T_anchor, TDC_hydro_dq_1_factor
+         
       ! nuclear reaction parameters
 
          character (len=strlen) :: screening_mode, default_net_name
@@ -833,7 +853,7 @@
             use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
          real(dp) :: P_theta_for_velocity_time_centering, &
-            L_theta_for_velocity_time_centering
+            L_theta_for_velocity_time_centering, max_logT_for_include_P_and_L_in_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
          logical :: use_drag_energy, report_max_infall_inside_fe_core

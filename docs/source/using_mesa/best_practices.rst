@@ -54,15 +54,9 @@ Now clean the directory,
 
 .. code-block:: console
 
-   ./clean
+   make clean
 
-build the executable,
-
-.. code-block:: console
-
-   ./mk
-
-and run the executable
+and run the test case
 
 .. code-block:: console
 
@@ -107,81 +101,95 @@ First, copy the default ``history_columns.list`` to your work directory
 
 and modify your local ``history_columns.list``
 
-.. code-block:: console
 
-  add
+* add
 
-      mixing_regions 20
-      burning_regions 20
+  .. code-block:: fortran
 
- change
+        mixing_regions 20
+        burning_regions 20
 
-      !log_center_T ! temperature
-      !log_center_Rho ! density
+* change
 
- to
+  .. code-block:: fortran
 
-      log_center_T ! temperature
-      log_center_Rho ! density
-
-   and save the file changes.
-
-
-Second, modify ``inlist_semiconvection_header``
-
-.. code-block:: console
-
-  change
-
-      !read_extra_pgstar_inlist(1) = .true.
-      !extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
+    !log_center_T ! temperature
+    !log_center_Rho ! density
 
   to
-      read_extra_pgstar_inlist(1) = .true.
-      extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
 
-   and save the file changes.
+  .. code-block:: fortran
+
+    log_center_T ! temperature
+    log_center_Rho ! density
+
+  and save the file changes.
+
+
+Second, modify ``inlist_semiconvection_header``:
+
+
+* change
+
+  .. code-block:: fortran
+
+        !read_extra_pgstar_inlist(1) = .true.
+        !extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
+
+  to
+
+  .. code-block:: fortran
+
+        read_extra_pgstar_inlist(1) = .true.
+        extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
+
+  and save the file changes.
 
 
 Third, modify ``inlist_semiconvection`` to change the pgstar namelist to
 
-.. code-block:: console
 
-  add to the star_job namelist:
+* add to the ``star_job`` namelist:
 
-      pgstar_flag = .true.
-      save_pgstar_files_when_terminate = .true.
+  .. code-block:: fortran
+
+        pgstar_flag = .true.
+        save_pgstar_files_when_terminate = .true.
 
 
-  and to make the stopping condition more precise, add to the controls namelist:
+* and to make the stopping condition more precise, add to the ``controls`` namelist:
 
-      when_to_stop_rtol = 1e-4
-      when_to_stop_atol = 1e-4
+  .. code-block:: fortran
 
-  and finally replace the pgstar namelist with
+        when_to_stop_rtol = 1e-4
+        when_to_stop_atol = 1e-4
 
-  &pgstar
+* and finally replace the ``pgstar`` namelist with
 
-      pgstar_interval = 1
+  .. code-block:: fortran
 
-      Grid4_win_flag = .true.
-      Grid4_win_width = 8
-      Kipp_mass_max = 0.2 ! (Msun units) negative means use default
-      Kipp_show_mixing = .true.
-      Kipp_show_burn = .false.
-      Kipp_show_luminosities = .true.
-      Kipp_show_mass_boundaries = .false.
+    &pgstar
 
-      Grid4_file_flag = .true.
-      Grid4_file_dir = 'pgstar_out'
-      Grid4_file_prefix = 'grid4_'
-      Grid4_file_interval = 10
-      Grid4_file_width = -1
-      Grid4_file_aspect_ratio = -1
+        pgstar_interval = 1
 
-  / ! end of pgstar namelist
+        Grid4_win_flag = .true.
+        Grid4_win_width = 8
+        Kipp_mass_max = 0.2 ! (Msun units) negative means use default
+        Kipp_show_mixing = .true.
+        Kipp_show_burn = .false.
+        Kipp_show_luminosities = .true.
+        Kipp_show_mass_boundaries = .false.
 
-   and save the file changes.
+        Grid4_file_flag = .true.
+        Grid4_file_dir = 'pgstar_out'
+        Grid4_file_prefix = 'grid4_'
+        Grid4_file_interval = 10
+        Grid4_file_width = -1
+        Grid4_file_aspect_ratio = -1
+
+    / ! end of pgstar namelist
+
+  and save the file changes.
 
 
 Now run the executable egain
@@ -202,21 +210,28 @@ Explore Physics Variations
 
 Make the following changes to your ``inlist_semiconvection``:
 
-.. code-block:: console
 
-    change
+* change
+
+  .. code-block:: fortran
 
       max_model_number = 1000
 
-    to
+  to
+
+  .. code-block:: fortran
 
       max_model_number = 40000
 
-    and change
+* and change
+
+  .. code-block:: fortran
 
       history_interval = 10
 
-    to
+  to
+
+  .. code-block:: fortran
 
       history_interval = 1
 
@@ -240,9 +255,9 @@ Change the nuclear reaction network
 
  It is usually useful to examine history and profile quantities.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_network_name``` where NN is your table number and network_name is one of the choices above,
- for example, ``log_directory = `Table08_approx21```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_network_name'`` where NN is your table number and network_name is one of the choices above,
+ for example, ``log_directory = 'Table08_approx21'``.
 
  After the runs, each table should upload their ``log_directory``
  to our shared Dropbox directory timmes/Experiment01.
@@ -264,9 +279,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpN``` where NN is your table number and NpN is your value,
- for example, ``log_directory = `Table03_1p8```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpN'`` where NN is your table number and NpN is your value,
+ for example, ``log_directory = 'Table03_1p8'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment02.
 
@@ -288,9 +303,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpNN``` where NN is your table number and NpNN is your value,
- for example, ``log_directory = `Table11_1p80```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpNN'`` where NN is your table number and NpNN is your value,
+ for example, ``log_directory = 'Table11_1p80'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment03.
 
@@ -306,7 +321,7 @@ Experiment with the mass resolution I
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Change the mass resolution setting
-``max_dq`` = 5.0e-2, 2.0e-2, 1.0e-2 (default), 5.0e-3, 2.0e-3, and 1.0e-3.
+``max_dq`` = ``5.0e-2``, ``2.0e-2``, ``1.0e-2`` (default), ``5.0e-3``, ``2.0e-3``, and ``1.0e-3``.
 Repeat answering the questions above.
 
 .. note::
@@ -314,9 +329,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpNNN is your value,
- for example, ``log_directory = `Table05_0p002```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpNNN'`` where NN is your table number and NpNNN is your value,
+ for example, ``log_directory = 'Table05_0p002'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment04.
 
@@ -337,9 +352,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NpNNN``` where NN is your table number and NpN is your value,
- for example, ``log_directory = `Table08_1p2```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NpNNN'`` where NN is your table number and NpN is your value,
+ for example, ``log_directory = 'Table08_1p2'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment05.
 
@@ -352,7 +367,7 @@ Experiment with the temporal resolution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Change the temporal resolution setting
-``max_years_for_timestep`` = 1.0e8, 5.0e7, 2.0e7, 1.0e7, 5.0e6, 2.0e6, and 1.0e6.
+``max_years_for_timestep`` = ``1.0e8``, ``5.0e7``, ``2.0e7``, ``1.0e7``, ``5.0e6``, ``2.0e6``, and ``1.0e6``.
 Repeat answering the questions above.
 
 .. note::
@@ -360,9 +375,9 @@ Repeat answering the questions above.
  For the 2021 MESA Summer School, each TA will be given a block of 4 values, one for each participant at their table.
  The TA will then distribute the values to the team.
 
- Change the default control namelist parameter ``log_directory = `LOGS``` to the more descriptive
- ``log_directory = `TableNN_NeN``` where NN is your table number and NeN is your value,
- for example, ``log_directory = `Table01_2e7```.
+ Change the default control namelist parameter ``log_directory = 'LOGS'`` to the more descriptive
+ ``log_directory = 'TableNN_NeN'`` where NN is your table number and NeN is your value,
+ for example, ``log_directory = 'Table01_2e7'``.
 
  After a run is complete, each participant should upload a ``log_directory`` to our shared Dropbox directory timmes/Experiment06.
 

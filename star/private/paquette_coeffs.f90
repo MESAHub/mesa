@@ -101,7 +101,7 @@
       LAMBDA2 = MAX(LAMBDA_D2, LAMBDA_I2)
 
       F22 = 1d0
-! First evaluate the collision intergrals OMEGA22_SS, that appear in Ps (eq (9) of Paquette 1986)
+! First evaluate the collision integrals OMEGA22_SS, that appear in Ps (eq (9) of Paquette 1986)
       do I = 1, NN
          NREF = I
          GAMMA2 = pow2(4.0D0*KT/(qe*qe*KZN1(NREF)))*LAMBDA2

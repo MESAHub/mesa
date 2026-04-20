@@ -39,7 +39,8 @@ contains
    !! @param opacity opacity (cm^2/g).
    !! @param rho density (g/cm^3).
    !! @param alpha_semiconvection The semiconvective alpha parameter.
-   !! @param semiconvection_option A string specifying which semiconvection theory to use. Currently supported are 'Langer_85 mixing; gradT = gradr' and 'Langer_85'.
+   !! @param semiconvection_option A string specifying which semiconvection theory to use.
+   !!                              Currently supported are 'Langer_85 mixing; gradT = gradr' and 'Langer_85'.
    !! @param cgrav gravitational constant (erg*cm/g^2).
    !! @param Cp Specific heat at constant pressure (erg/g/K).
    !! @param gradr The radiative temperature gradient dlnT/dlnP_{rad}

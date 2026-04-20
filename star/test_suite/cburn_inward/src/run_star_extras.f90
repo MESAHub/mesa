@@ -27,7 +27,7 @@
 
       implicit none
 
-      ! Tracks quanties when the flame ignited
+      ! Tracks quantities when the flame ignited
       real(dp) :: ign_mass, ign_density, ign_co_core_mass, flame_mass
 
       include "test_suite_extras_def.inc"

@@ -20,7 +20,7 @@
       module adjust_mass
 
       use star_private_def
-      use const_def, only: dp, i8, ln10, msun, msun, secyer, one_third, four_thirds_pi
+      use const_def, only: dp, i8, ln10, msun, secyer, one_third, four_thirds_pi
       use utils_lib
 
       implicit none
@@ -1252,7 +1252,7 @@
                s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end if
 
-         call eval_i_rot(s, k, r00, w_div_wcrit_roche, s% i_rot(k))
+         call eval_i_rot(s% id, r00, w_div_wcrit_roche, s% i_rot(k))
 
       end subroutine set1_irot
 

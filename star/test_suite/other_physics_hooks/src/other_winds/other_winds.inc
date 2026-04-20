@@ -502,7 +502,7 @@
 
       real(dp) function vtherm(t,xmue)
          real(dp), intent(in) :: t,xmue
-         ! THERMAL VELOCITY OF ATOM WITH ATOMIC WHEIGHT XMUE
+         ! THERMAL VELOCITY OF ATOM WITH ATOMIC WEIGHT XMUE
          vtherm=1.2848d4*sqrt(t/xmue)
       end function vtherm
 

@@ -30,6 +30,7 @@
       return
       end
       subroutine splint(xa,ya,y2a,n,x,y)
+        use utils_lib, only: mesa_error
       implicit double precision(a-h,o-z)
       dimension xa(n),ya(n),y2a(n)
       klo=1
@@ -44,7 +45,10 @@
       goto 1
       endif
       h=xa(khi)-xa(klo)
-      if (h.eq.0.d0) pause 'bad xa input.'
+      if (h.eq.0.d0) then
+         write(*,*) 'Bad XA input.'
+         call mesa_error(__FILE__,__LINE__)
+      endif
       a=(xa(khi)-x)/h
       b=(x-xa(klo))/h
       y=a*ya(klo)+b*ya(khi)+

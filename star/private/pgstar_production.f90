@@ -292,7 +292,7 @@
                end if
 
                !When we have more than one isotope per element we draw a line, this marks the last
-               ! x cordinate we "saw" for an element
+               ! x coordinate we "saw" for an element
                last_x=-HUGE(last_x)
                last_y=-HUGE(last_y)
 

@@ -23,7 +23,7 @@
       use astero_def
       use star_lib
       use star_def
-      use const_def, only: dp, Rsun, standard_cgrav
+      use const_def, only: dp, Rsun, standard_cgrav, pi
       use math_lib
       use utils_lib
       use auto_diff
@@ -81,7 +81,7 @@
                ierr = -1
                write(*,'(A)')
                write(*,'(a)') 'gyre is not currently enabled in your configuration of mesa.'
-               write(*,'(a)') 'check that your utils/makefile_header has USE_GYRE = YES'
+               write(*,'(a)') 'check that your make/defaults-module.mk has WITH_GYRE = YES'
                write(*,'(A)')
                return
             end if
@@ -101,7 +101,7 @@
                ierr = -1
                write(*,'(A)')
                write(*,'(a)') 'adipls is not currently enabled in your configuration of mesa.'
-               write(*,'(a)') 'check that your utils/makefile_header has USE_ADIPLS = YES'
+               write(*,'(a)') 'check that your make/defaults-module.mk has WITH_ADIPLS = YES'
                write(*,'(A)')
                return
             end if

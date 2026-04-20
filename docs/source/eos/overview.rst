@@ -2,6 +2,13 @@
 Overview of eos module
 ======================
 
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   defaults
+   interface
+
 The equation of state (EOS) is delivered by the ``eos`` module.  The
 MESA EOS combines different input sources in order to cover the wide
 range of conditions encountered during stellar evolution.  The most
@@ -33,7 +40,7 @@ both results are evaluated, blended, and returned.  Smooth blends are
 assured via the smoothness of the functions that define the component
 fractions.
 
-This approach means that that EOS components have an order of
+This approach means that EOS components have an order of
 precedence:
 
     (CMS) > Skye > PC > FreeEOS > OPAL/SCVH > HELM.
@@ -122,7 +129,6 @@ Component EOSes
 ===============
 
 
-
 OPAL/SCVH
 ---------
 
@@ -205,7 +211,6 @@ CMS
    This EOS is experimental.
 
 CMS is the EOS for dense H/He mixtures of |CMS|.
-
 
 
 .. |CMS| replace:: `Chabrier, Mazevet, & Soubiran (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...872...51C>`__

@@ -40,12 +40,13 @@
             if (izz(k) == kz(m)) then
                amamu(k) = amass(m)
                nkz(k) = m
-               cycle
+            GOTO 1
             end if
-            write(*,*) ' k=',k,', izz(k)=',izz(k)
-            write(*,*) ' kz(m) not found'
-            stop
          end do
+         write(*,*) ' k=',k,', izz(k)=',izz(k)
+         write(*,*) ' kz(m) not found'
+         stop
+    1    continue
       end do
 
 !  Mean atomic weight = fmu
@@ -148,10 +149,12 @@
          do jh = jhmin, jhmax
             if (efa(i, jh) <= 0.) then
                jm = jh - 1
-               jhmax = min(jhmax, jm)
-               cycle
+               GOTO 3
             end if
          end do
+         GOTO 4
+    3    jhmax = min(jhmax, jm)
+    4    continue
       end do
 
 ! Get flrh
@@ -179,13 +182,13 @@
       do jh = jhmin, jhmax
          if (flrh(2,jh) > flrho) then
             jm = jh - 1
-            cycle
+            GOTO 5
          end if
-         write(*,*) ' Interpolations in j for flne'
-         write(*,*) ' Not found, i=',i
-         stop
       end do
-      jm=max(jm,jhmin+1)
+      write(*,*) ' Interpolations in j for flne'
+      write(*,*) ' Not found, i=',i
+      stop
+    5 jm=max(jm,jhmin+1)
       jm=min(jm,jhmax-2)
 
       do i = 1, 4
@@ -250,7 +253,7 @@
 ! *********************************************************************
       subroutine rd(nel, nkz, izz, ilab, jh, n_tot, ff, rr, i3, umesh, fac)
       implicit none
-      integer, intent(in) :: nel,nkz(ipe),izz(ipe),ilab(0:5),jh(0:5),n_tot,i3
+      integer, intent(in) :: nel, nkz(ipe), izz(ipe), ilab(0:5), jh(0:5), n_tot, i3
       real, intent(in) :: umesh(nptot)
       real(dp), intent(in) :: fac(nel)
       real, intent(out) :: ff(:,:,0:,0:)  ! (nptot, ipe, 6, 6)
@@ -559,7 +562,7 @@
 !
 !  SIMPLIFIED CODE FOR SPLINE COEFFICIENTS, FOR CASE OF INTERVALS
 !  OF UNITY.
-!  returnS DERIVATIVES OF ORIGINAL F IN LOCATION F
+!  RETURNS DERIVATIVES OF ORIGINAL F IN LOCATION F
 !
 !  REVISED 5.5.95
 !
@@ -767,7 +770,7 @@
       integer, intent(inout) :: ierr
       dimension rion(28, 0:5, 0:5),uf(0:100),f(nptot,0:5,0:5),umesh(nptot),
      &  semesh(nptot),fscat(0:100),p(nptot),rr(28),ih(0:5),jh(0:5)
-      integer::  i,j,k,n
+        integer :: i,j,k,n
 ! HH: always use meshtype q='m'
       ite3=2
       umin=umesh(1)
@@ -812,7 +815,7 @@
 ! **********************************************************************
       subroutine screen1(ih,jh,rion,umesh,ntot,epa,f)
       use op_load, only: screen2
-      dimension uf(0:100), umesh(nptot),fscat(0:100), ih(0:5), jh(0:5)
+      dimension uf(0:100), umesh(nptot), fscat(0:100), ih(0:5), jh(0:5)
       real, target :: f(nptot, 0:5, 0:5), rion(28, 0:5, 0:5)
       integer :: i, j, k, m
       real, pointer :: p(:), rr(:)

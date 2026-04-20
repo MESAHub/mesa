@@ -322,6 +322,7 @@
               binary_controls, extras_controls, &
               id_from_read_star_job, inlist_fname, restart_filename, &
               dbg, binary_id, id, ierr)
+         use utils_lib, only: utils_OMP_SET_NUM_THREADS
          logical, intent(in) :: do_alloc_star, okay_to_restart, pgstar_ok
          logical :: restart
          interface
@@ -400,7 +401,7 @@
                s% solver_test_kap_partials .or. s% solver_test_net_partials) then
             if (s% solver_test_partials_k > 0 .and. s% solver_test_partials_dx_0 > 0) then
                write(*,*) 'Forcing single-thread mode for testing of module-level partials'
-               call omp_set_num_threads(1)
+               call utils_OMP_SET_NUM_THREADS(1)
             end if
          end if
 

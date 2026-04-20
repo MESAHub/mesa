@@ -336,8 +336,8 @@
     profiles_index_name = 'profiles.index'
 
 
-      ! profiles_data_prefix
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! profile_data_prefix
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! prefix of the profile data
 
@@ -346,8 +346,8 @@
     profile_data_prefix = 'profile'
 
 
-      ! profiles_data_suffix
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! profile_data_suffix
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! suffix of the profile data
 
@@ -1072,8 +1072,8 @@
     log_center_temp_lower_limit = -1d99
 
 
-      ! surface_accel_div_grav_limit = -1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! surface_accel_div_grav_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! This is used when do not have a velocity variable.
       ! The acceleration ratio is ``abs(accel)/grav`` at surface,
@@ -1747,6 +1747,8 @@
 
     max_number_retries = -1
 
+      ! relax_max_number_retries
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! ::
 
     relax_max_number_retries = 300
@@ -1950,7 +1952,6 @@
       ! Definitions for stop_at_phase_* can be found in
       ! $MESA_DIR/star/private/star_utils.f90 inside the
       ! subroutine ``set_phase_of_evolution``
-      ! ::
 
       ! ::
 
@@ -2274,7 +2275,7 @@
       ! mlt_use_rotation_correction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! When doing rotation, multiply ``grad_rad`` by ``ft_rot/ft_rot`` if this flag is true.
+      ! When doing rotation, multiply ``grad_rad`` by ``ft_rot/fp_rot`` if this flag is true.
 
       ! ::
 
@@ -2284,8 +2285,9 @@
       ! mlt_Pturb_factor
       ! ~~~~~~~~~~~~~~~~
 
-      ! include MLT turbulent pressure at face k = mlt_Pturb_factor*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
-      ! MLT turbulent pressure for cell k = avg of values at faces.
+      ! For MESA's momentum equation, include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
+      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 2d0
+      ! corresponds to TDC_alpha_Pt = 1d0, where Pt = (2/3)*rho(k)*(mlt_vc(k)/sqrt(2/3))**2
 
       ! this replaces conv_dP_term_factor.   also see extra_pressure vector and other_pressure routine
 
@@ -2327,17 +2329,101 @@
 
       ! TDC options
       ! ~~~~~~~~~~~
-      ! + ``alpha_TDC_DAMP`` : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
-      ! + ``alpha_TDC_DAMPR`` : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds.
-      ! + ``alpha_TDC_PtdVdt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity.
+      ! + ``TDC_alpha_D``  : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_alfad, and previously called alpha_TDC_DAMP.
+      ! + ``TDC_alpha_R``  : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_gammar, and previously called alpha_TDC_DAMPR.
+      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. Turbulent pressure effects on the momentum equations are set by ``mlt_Pturb_factor``. Together, These controls are analogous to RSP_alfap, and previously called alpha_TDC_PtdVdt.
+      ! + ``TDC_alpha_M``  : The prefactor on the term accounting for eddy viscous dissipation. This control is analogous to RSP_alfam.
+      ! + ``TDC_alpha_C``  : The prefactor on the convective flux. This control is analogous to RSP_alfac.
+      ! + ``TDC_alpha_S``  : The prefactor on the convective source term, S . This control is analogous to RSP_alfas.
+
       ! + ``steps_before_use_TDC`` : TDC often struggles with models on the pre-main-sequence. Set this option to pick MLT_option='Cox' for the first several steps to get past the pre-MS. Note that if this option is positive then only either TDC or Cox will be used (depending on model number). THIS OVERRIDES MLT_option!
 
       ! ::
 
-      alpha_TDC_DAMP = 1d0
-      alpha_TDC_DAMPR = 0d0
-      alpha_TDC_PtdVdt = 0d0
-      steps_before_use_TDC = 0
+     TDC_alpha_D = 1d0
+     TDC_alpha_R = 0d0
+     TDC_alpha_Pt = 0d0
+     TDC_alpha_C = 1d0
+     TDC_alpha_S = 1d0
+     steps_before_use_TDC = 0
+
+
+      ! If ``TDC_alpha_M > 0``, then include eddy viscous damping in TDC ``TDC_alpha_M``
+      ! This control is analogous to ``RSP_alfam``, where the default is ``RSP_alfam = 0.25d0``.
+
+      ! If hydrostatic (``v_flag = .false.```, ``u_flag = .false.``, v = 0) there will be no velocity gradients,
+      ! and thus no shear to drive turbulence, hence the eddy viscosity term will become zero.
+      ! Details on the implementation of ``TDC_alpha_M`` can be found in `Farag et al. (2026) <https://arxiv.org/abs/2603.15766>`_
+
+      ! ::
+
+     TDC_alpha_M = 0d0
+
+
+      ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, mlt_vc_old (the start of step value)
+      ! is used in place of the current solver iterate mlt_vc_ad inside the hydro momentum equation. This option can
+      ! provide greater numerical stability in extremely dynamic models.
+
+      ! ::
+
+     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
+
+
+      ! include_mlt_corr_to_TDC
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If include_mlt_corr_to_TDC = .true. , mlt correction to TDC follows MESA VI (Jermyn et a. 2023)
+      ! in which we correct TDC on long timescales with Y_face ~ Y*Gamma/(1+Gamma). If .false., abandon
+      ! mlt limit of tdc and adopt original form of (Kuhfuß 1986) convection model in the local limit.
+
+      ! ::
+
+     include_mlt_corr_to_TDC = .true.
+
+      ! TDC_include_eturb_in_energy_equation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! While ``TDC`` is already implicitly coupled to the total energy equation, this
+      ! controls feedsback the turbulent energy into the total energy equation by
+      ! calculating and incorporating det/dt from TDC as a source term in
+      ! the total energy equation, along with the eddy viscous heating Eq. This comes
+      ! at the cost of numerical stability on long timescales, be warned.
+
+      ! ::
+
+     TDC_include_eturb_in_energy_equation = .false.
+
+
+      ! use_rsp_form_of_scale_height
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Calculate scale height by averaging P/rho onto faces together instead
+      ! of of wrapping P and rho separately by default. Both forms assume HSE.
+      ! Not compatible with alt_scale_height_flag.
+
+      ! ::
+
+     use_rsp_form_of_scale_height = .false.
+
+
+      ! TDC_num_innermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_num_outermost_cells_forced_nonturbulent
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Forces innermost TDC_num_innermost_cells_forced_nonturbulent or
+      ! TDC_num_outermost_cells_forced_nonturbulent cells
+      ! to be nonturbulent, and sets gradT = gradr in these cells.
+      ! Useful for pulsation models in TDC. This control
+      ! supports all mlt options as well.
+
+      ! ::
+
+     TDC_num_innermost_cells_forced_nonturbulent = 0
+     TDC_num_outermost_cells_forced_nonturbulent = 0
 
 
       ! Henyey_MLT_y_param
@@ -2560,9 +2646,10 @@
     gradT_excess_max_log_tau_full_off = -99
 
 
-         !### max_logT_for_mlt
+      ! max_logT_for_mlt
+      ! ~~~~~~~~~~~~~~~~
 
-         ! No mlt at cell if local logT > this limit.
+      ! No MLT at cell if local logT > this limit.
 
       max_logT_for_mlt = 99
 
@@ -2579,7 +2666,7 @@
       ! superad_reduction_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Implicit alternative to okay_to_reduce_gradT_excess
+      ! Implicit alternative to ``okay_to_reduce_gradT_excess``
 
       ! ::
 
@@ -3480,8 +3567,11 @@
     redo_conv_for_dr_lt_mixing_length = .false.
 
 
-      ! smooth_convective_bdy has been deleted.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! smooth_convective_bdy
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+      ! ``smooth_convective_bdy`` has been removed.
+
       ! remove_mixing_glitches
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3720,7 +3810,7 @@
       ! ::
 
       !     f = 1  when logT <= D_mix_rotation_max_logT_full_on = full_on
-      !       = 0  when logT >= D_mix_rotation_min_logT_full_on = full_off
+      !       = 0  when logT >= D_mix_rotation_min_logT_full_off = full_off
       !       = (log(T)-full_on)/(full_off-full_on) else
 
       ! note that for regions with brunt N^2 < 0, we set Richardson number to 1
@@ -3988,6 +4078,10 @@
       ! ~~~~~~~~~~~~~~~~
       ! adjust_J_fraction
       ! ~~~~~~~~~~~~~~~~~
+      ! min_q_for_adjust_J_lost
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_J_div_delta_J
+      ! ~~~~~~~~~~~~~~~~~
 
       ! adjust angular momentum
       ! With do_adjust_J_lost = .false., the angular momentum removed via winds
@@ -4046,8 +4140,8 @@
 
       ! angular_momentum_error_warn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! angular_momentum_error_stop
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! angular_momentum_error_retry
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if the relative change in total angular momentum exceeds these values,
       ! then a warning is given on the terminal output, or the simulation is stopped
@@ -4071,8 +4165,9 @@
       ! w_div_wcrit_max
       ! ~~~~~~~~~~~~~~~
 
-      ! When fitted_fp_ft_i_rot = .true., limit fp and ft to their values at this
-      ! w_div_wcrit
+      ! Maximum value for ``w_div_w_crit_roche``. When ``w_div_wc_flag`` is false (default),
+      ! this is a hard limit. When ``w_div_wc_flag`` is true, this works together with
+      ! ``w_div_wcrit_max2`` to provide a smooth transition (see below).
 
       ! ::
 
@@ -4125,7 +4220,7 @@
 
     D_mix_rotation_min_tau_full_off = 0d0
 
-      ! D_mix_rotation_max_tau_full_on
+      ! D_mix_rotation_min_tau_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use rotational components of ``D_mix`` for locations where tau >= this.
@@ -4136,14 +4231,14 @@
     D_mix_rotation_min_tau_full_on = 0d0
 
 
-      ! D_omega_max_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! D_omega_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~
-      ! D_omega_mixing_across_convection_boundary (previously called D_omega_mixing_in_convection_regions)
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! D_omega_mixing_across_convection_boundary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_D_omega_zero_in_convection_region
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ``D_omega_mixing_across_convection_boundary`` was previously called ``D_omega_mixing_in_convection_regions``.
 
       ! ::
 
@@ -4152,14 +4247,12 @@
     max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 
-      ! nu_omega_max_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! nu_omega_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_across_convection_boundary
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_nu_omega_zero_in_convection_region
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -4177,12 +4270,12 @@
 
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
       ! setting up outer boundary conditions. We caution that the use of ``'fixed_'`` atmosphere
-      ! options might conflict with mlt_option = ``TDC``.
+      ! options might conflict with MLT_option = ``TDC``.
 
       ! + ``'T_tau'``:
       !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
       !   The choice of relation is set by the ``atm_T_tau_relation`` control. See also
-      !   the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_tries`` and
+      !   the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_iters`` and
       !   ``atm_T_tau_max_steps`` controls.
       !
       ! + ``'table'``:
@@ -4200,8 +4293,8 @@
       !   set Tsurf by solving for the atmosphere structure given the irradiated-grey
       !   T(tau) relation of Guillot, T, and Havel, M., A&A 527, A20 (2011).
       !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
-      !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
-      !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      !   ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
+      !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_iters`` controls.
       !
       ! + ``'fixed_Teff'`` :
       !    set Tsurf from Eddington T(tau) relation
@@ -4289,7 +4382,7 @@
       ! e.g. try ``Pextra_factor = 2``
 
       ! Note that ``Pextra_factor`` is only applied when ``atm_option`` = ``'T_tau'``
-      ! and ``atm_T_tau_opacity`` = ``'fixed'`` or '``iterated'``.
+      ! and ``atm_T_tau_opacity`` = ``'fixed'`` or ``'iterated'``.
 
       ! ::
 
@@ -4555,6 +4648,21 @@
       ! ::
 
     use_zero_Pgas_outer_BC = .false.
+
+
+      ! use_RSP_L_eqn_outer_BC
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use RSP2 luminosity equation
+      ! as the outer boundary condition on L rather than the
+      ! default atmospheric BC for temperature.
+      ! solves L1 - s% RSP2_Lsurf_factor*4*pi*r^2*c*a*T1^4 = 0
+      ! uses dev control s% RSP2_Lsurf_factor  = 0.5 (default),
+      ! see controls_dev.defaults.list
+
+      ! ::
+
+     use_RSP_L_eqn_outer_BC = .false.
 
 
       ! use_fixed_vsurf_outer_BC
@@ -4923,8 +5031,8 @@
     Reimers_scaling_factor = 0
 
 
-      ! Blocker_scaling_factor = 0
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Blocker_scaling_factor
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! Blocker's mass loss for AGB stars.
 
@@ -5062,6 +5170,8 @@
 
       ! use_accreted_material_j
       ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! accreted_material_j
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! Angular momentum of accreted material.
 
@@ -5562,8 +5672,8 @@
     accretion_he4 = 0
 
 
-      ! accretion_zfracs =
-      ! ~~~~~~~~~~~~~~~~~~
+      ! accretion_zfracs
+      ! ~~~~~~~~~~~~~~~~
 
       ! One of the following identifiers for different Z fractions from ``chem_def``.
 
@@ -5768,6 +5878,9 @@
 
     min_dq = 1d-14
 
+      ! min_dq_for_split
+      ! ~~~~~~~~~~~~~~~~
+
       ! Min size for cell to be split.
 
       ! ::
@@ -5795,6 +5908,9 @@
       ! ::
 
     min_dq_for_xa_convective = 1d-6
+
+      ! min_dq_for_log_T
+      ! ~~~~~~~~~~~~~~~~
 
       ! Min size for cell to be split because of jump in logT.
 
@@ -5880,11 +5996,15 @@
       ! max_surface_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~
 
+      ! min_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~
+
       ! Largest allowed dq at surface.
 
       ! ::
 
     max_surface_cell_dq = 1d-12
+    min_surface_cell_dq = 1d-99
 
 
       ! max_num_subcells
@@ -5899,12 +6019,15 @@
 
       ! max_num_merge_cells
       ! ~~~~~~~~~~~~~~~~~~~
+      ! max_num_merge_surface_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Limits number of old cells to merge into 1 new one.
 
       ! ::
 
     max_num_merge_cells = 2
+    max_num_merge_surface_cells = 2
 
 
       ! mesh_adjust_get_T_from_E
@@ -5934,6 +6057,8 @@
 
       ! E_function_weight
       ! ~~~~~~~~~~~~~~~~~
+      ! E_function_param
+      ! ~~~~~~~~~~~~~~~~
 
       ! internal energy gradient, ``E_function = E_function_weight*max(E_function_param,log10(energy))``.
 
@@ -6387,6 +6512,45 @@
     remesh_dt_limit = -1
 
 
+      ! TDC_hydro_nz
+      ! ~~~~~~~~~~~~
+      ! TDC_hydro_nz_outer
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_T_anchor
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_dq_1_factor
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_use_mass_interp_face_values
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remesh_for_TDC_pulsations_log_core_zoning
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If calling the public ``remesh_for_TDC_pulsations`` function, the model will be rezoned below ``TDC_hydro_T_anchor`` with logarithmic
+      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
+      ! that each zone increases in mass inward following a power law, similar to RSP's static model builder.
+
+      ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
+      ! ``TDC_hydro_T_anchor``, and increasing spacing in mass between the anchor and the inner boundary condition.
+      ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
+      ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
+      ! The ``TDC_hydro_dq_1_factor`` sets the dq of the surface cell to this multiple of the cell beneath it, k = 2.
+
+      ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
+      ! mass weighted averaging.
+
+      ! This remeshing scheme works well for most Cepheid envelopes, but it is not designed for AGB stars with deep convective envelopes.
+
+      ! ::
+
+    remesh_for_TDC_pulsations_log_core_zoning = .false.
+    TDC_hydro_use_mass_interp_face_values = .false.
+
+    TDC_hydro_nz = 150
+    TDC_hydro_nz_outer = 40
+    TDC_hydro_T_anchor = 11d3
+    TDC_hydro_dq_1_factor = 2d0
+
+
       ! use_split_merge_amr
       ! ~~~~~~~~~~~~~~~~~~~
 
@@ -6492,6 +6656,28 @@
     merge_amr_k_for_ignore_surface_cells = 2
 
 
+      ! merge_amr_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! merge_amr_logT_for_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_amr_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_amr_logT_for_ignore_core_cells
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! For pulsation calculations, splitting and merging core cells can cause problems.
+      ! If merge_amr_ignore_core_cells or split_amr_ignore_surface_cells is true,
+      ! then the innermost cells above merge_amr_logT_for_ignore_core_cells or
+      ! split_amr_logT_for_ignore_core_cells  cells are ignored for split/merge.
+
+      ! ::
+
+    merge_amr_ignore_core_cells = .false.
+    merge_amr_logT_for_ignore_core_cells = 1d99
+    split_amr_ignore_core_cells = .false.
+    split_amr_logT_for_ignore_core_cells = 1d99
+
+
       ! split_merge_amr_avoid_repeated_remesh
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -6563,10 +6749,13 @@
       ! default_net_name
       ! ~~~~~~~~~~~~~~~~
 
-      ! Name of base reaction network.
-      ! Each net corresponds to a file in ``$MESA_DIR/data/net_data/nets``.
-      ! Look in that directory to see your network options,
-      ! or learn how to create your own net.
+      ! Name of base reaction network (including 8 isotopes to capture energy release)
+      ! Will auto-extend to ``co_burn.net`` (adding si28) at He depletion, and to
+      ! ``approx21.net`` (adding 21 isotopes and a "fake" electron capture reaction for
+      ! deleptonization, see ``fe56ec_fake_factor`` below). Each net corresponds to a
+      ! file in ``$MESA_DIR/data/net_data/nets``. Look in that directory to see
+      ! your network options, or learn how to create your own net.
+      ! See also ``change_net`` and related options in ``star_job.defaults``.
 
       ! ::
 
@@ -7456,8 +7645,8 @@
 
       ! min_logT_for_opacity_factor_off
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! min_logT_for_opacity_factor_on  and
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_logT_for_opacity_factor_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_logT_for_opacity_factor_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_logT_for_opacity_factor_off
@@ -7629,14 +7818,6 @@
       ! ::
 
     use_op_mono_alt_get_kap = .false.
-
-
-      ! min_kap_for_dPrad_dm_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    min_kap_for_dPrad_dm_eqn = 1d-4
 
 ! asteroseismology controls
 ! =========================
@@ -7914,10 +8095,10 @@
     use_time_centered_eps_grav = .true.
 
 
-      ! Gamma_lnS_eps_grav_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! Gamma_lnS_eps_grav_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Gamma_lnS_eps_grav_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Automatic switch to lnS form for eps_grav (:math:`\epsilon_{\rm grav} = -T\frac{Ds}{Dt}`) in regions with high Gamma (plasma interaction parameter).
       ! These controls only apply when using the PC EOS.  This is necessary to get the
@@ -8220,6 +8401,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_logT_for_include_P_and_L_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -8229,6 +8412,8 @@
       ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
       ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
+      ! Above ``max_logT_for_include_P_and_L_in_velocity_time_centering``, P and L are not time centered
+      ! to aid in damping spurious modes in the core.
 
       ! ::
 
@@ -8238,7 +8423,7 @@
     include_L_in_velocity_time_centering = .false.
     L_theta_for_velocity_time_centering = 0.5d0
     use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
-
+    max_logT_for_include_P_and_L_in_velocity_time_centering = 1d99
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8246,6 +8431,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_kap_for_dPrad_dm_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
       ! These are for alternatives ways to determine the T gradient.
@@ -8284,6 +8471,7 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    min_kap_for_dPrad_dm_eqn = 1d-4
     use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
@@ -8291,6 +8479,8 @@
 ! Hydrodynamic drag
 ! =================
 
+      ! use_drag_energy
+      ! ~~~~~~~~~~~~~~~
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
       ! min_q_for_drag
@@ -8360,16 +8550,16 @@
       ! ~~~~~
       ! RTI_D
       ! ~~~~~
+      ! RTI_C_X0_frac
+      ! ~~~~~~~~~~~~~
       ! RTI_C_X_factor
       ! ~~~~~~~~~~~~~~
-      ! RTI_C_X0
-      ! ~~~~~~~~
       ! RTI_max_alpha
       ! ~~~~~~~~~~~~~
       ! RTI_min_dm_behind_shock_for_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! RTI_dm_for_center_alpha_nondecreasing
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! RTI_dm_for_center_eta_nondecreasing
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! RTI_energy_floor
       ! ~~~~~~~~~~~~~~~~
       ! RTI_D_mix_floor
@@ -8747,7 +8937,7 @@
 
       ! ::
 
-    max_corr_jump_limit = 1d6
+    max_corr_jump_limit = 1d12
 
 
       ! resid_norm_jump_limit
@@ -8767,7 +8957,7 @@
 
       ! ::
 
-    max_resid_jump_limit = 1d6
+    max_resid_jump_limit = 1d12
 
 
       ! convergence_ignore_equL_residuals
@@ -8985,8 +9175,8 @@
     min_xa_hard_limit_for_highT = -3d-5
 
 
-      ! logT_max_for_xa_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! logT_max_for_min_xa_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use ``min_xa_hard_limit`` for center logT <= this.
 
@@ -8995,8 +9185,8 @@
     logT_max_for_min_xa_hard_limit = 9.49d0
 
 
-      ! logT_min_for_xa_hard_limit_for_highT
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! logT_min_for_min_xa_hard_limit_for_highT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Use ``min_xa_hard_limit_for_highT`` for center logT >= this.
       ! Linear interpolate in logT for intermediate center temperatures.
@@ -9108,6 +9298,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold_tol_residual_norm1
       ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! gold_tol_max_residual1
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! gold_iter_for_resid_tol2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold_tol_residual_norm2
@@ -9160,6 +9352,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_tol_residual_norm1
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! gold2_tol_max_residual1
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_iter_for_resid_tol2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_tol_residual_norm2
@@ -9200,8 +9394,8 @@
 
       ! include_rotation_in_total_energy
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! previously called `include_rotation_in_energy_error_report`
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! previously called ``include_rotation_in_energy_error_report``
 
       ! ::
 
@@ -9535,8 +9729,8 @@
     neg_mass_fraction_hold = 2
 
 
-      ! timestep_dt_factor = 0.9
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! timestep_dt_factor
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! dt reduction factor exceed timestep limits.
 
@@ -9961,8 +10155,8 @@
     delta_lgRho_limit = 1
 
 
-      ! delta_lgRho_hard_limit = -1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lgRho_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! If max ``delta_lgRho`` is greater than ``delta_lgRho_hard_limit``,
       ! retry with smaller timestep.
@@ -10089,6 +10283,9 @@
       ! reduce the next timestep by ``delta_Ye_highT_limit``/``max_delta_Ye``.
 
       ! ::
+
+      ! delta_Ye_highT_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delta_Ye_highT_hard_limit = -1
 
@@ -10523,10 +10720,10 @@
     check_remnant_only_for_dt_div_min_dr_div_cs_limit = .false.
 
 
-      ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! only use ``dt_div_min_dr_div_cs_limit`` at cells where
       ! ``abs_du_div_cs`` > ``min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit`` and
@@ -11164,6 +11361,11 @@
     delta_lg_star_mass_limit = 5d-3
     delta_lg_star_mass_hard_limit = -1
 
+      ! delta_mdot_atol
+      ! ~~~~~~~~~~~~~~~
+      ! delta_mdot_rtol
+      ! ~~~~~~~~~~~~~~~
+
       ! limit for change in mdot in Msun/yr
       ! + ``delta_mdot_atol`` tolerance for absolute changes
       ! + ``delta_mdot_rtol`` tolerance for relative changes
@@ -11390,6 +11592,8 @@
 
       ! warn_rates_for_high_temp
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_safe_logT_for_rates
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, then when any zone tries to evaluate a rate above ``max_safe_logT_for_rates``
       ! it generates a warning message. The code will cap the rate at the value
@@ -11428,8 +11632,6 @@
     absolute_cumulative_energy_err = .true.
 
 
-      ! warn_when_stop_checking_residuals    obsolete
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! warning_limit_for_max_residual
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -11498,6 +11700,9 @@
       ! ::
 
     zams_filename = 'zams_z2m2_y28.data'
+
+      ! set_rho_to_dm_div_dV
+      ! ~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -11705,7 +11910,13 @@
 
     delta_m_lower_for_sig_min_factor = 0.1d0
 
-      ! extra params as a convenience for developing new features
+
+      ! x_ctrl
+      ! ~~~~~~
+
+      ! extra params as a convenience for developing new features.
+      ! use ``x_ctrl`` for floats, ``x_integer_ctrl`` for integers, ``x_logical_ctrl`` for booleans,
+      ! and ``x_character_ctrl`` for strings.
       ! note: the parameter ``num_x_ctrls`` is defined in ``star_def.inc``
 
       ! ::

@@ -1,8 +1,0 @@
-cd make; make clean
-
-for i in eosDT_builder eosFreeEOS_builder
-do
-	cd ../$i
-	./clean
-done
-cd ../test/make; make clean

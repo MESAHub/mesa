@@ -855,6 +855,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_composition_filename
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! timescale_for_relax_composition
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! relax composition from current to specified over number of steps.
       ! ``relax_composition_filename`` holds the desired composition profile information
@@ -2007,11 +2009,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_delta_mass_gm
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_initial_center_by_delta_mass_msun
+      ! remove_initial_center_by_delta_mass_Msun
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_mass_gm
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_initial_center_by_mass_msun
+      ! remove_initial_center_by_mass_Msun
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_center_by_radius_cm
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2182,7 +2184,7 @@
     limit_center_logP_at_each_step = -1d99
 
 
-      ! zero_initial_inner_v_by_mass_msun
+      ! zero_initial_inner_v_by_mass_Msun
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! zero_inner_v_by_mass_Msun
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2215,7 +2217,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_mass_gm
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_initial_surface_by_mass_msun
+      ! remove_initial_surface_by_mass_Msun
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_radius_cm
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2351,8 +2353,12 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! set_cumulative_energy_error_at_step
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! set_cumulative_energy_error_each_step_if_age_less_than
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! set_cumulative_energy_error_each_relax
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! new_cumulative_energy_error
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! set_initial_cumulative_energy_error is done when execute rn script
       ! set_cumulative_energy_error is done when execute rn script or re script
@@ -2380,8 +2386,15 @@
       ! ~~~~~~~~~~~~~~~~~~
 
       ! For switching reaction networks.
-      ! ``new_net_name`` only used if ``change_net`` if true. The list of network names can be found in `$MESA_DIR/data/net_data/nets`.
-
+      ! ``new_net_name`` only used if ``change_net`` if true.
+      ! If not specifying a new_net name, the default is to start with
+      ! ``basic.net`` (8 isotopes), extended to the ``co_burn.net`` (adding si28)
+      ! at helium depletion, and ``approx21.net`` (21 isotopes, including
+      ! compound reaction for electron captures) beyond carbon depletion.
+      ! The full list of network names and the isotopes and reactions
+      ! they include can be found in `$MESA_DIR/data/net_data/nets`.
+      ! See also ``enable_adaptive_network`` and ``auto_extend_net`` below,
+      ! and ``default_net_name`` in ``controls.defaults``
       ! ::
 
     change_net = .false.

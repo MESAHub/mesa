@@ -22,7 +22,7 @@ module run_star_extras
       use star_lib
       use star_def
       use const_def
-      use gyre_lib
+      use gyre_mesa_m
       use math_lib
 
       implicit none

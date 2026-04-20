@@ -67,7 +67,7 @@
    !logR_cm ! log10 radius at outer boundary of zone (in centimeters)
    !rmid ! radius at center by mass of zone (in Rsun units)
    !r_div_R ! fraction of total radius
-
+   !psi_roche  ! dimensionless Roche potential at outer boundary of zone (only works if in a binary model and b% use_tidal_deformation is used; else is -99)
    !velocity   ! velocity at outer boundary of zone (cm/s) -- 0 if no velocity variable
    !v_div_r ! velocity divided by radius
    !v_times_t_div_r
@@ -420,6 +420,7 @@
    !cell_internal_energy_fraction
    !cell_internal_energy_fraction_start
    !cell_specific_PE
+   !dwork_dm ! cell specific work per unit time, Work = dwork_dm*dm*dt
 
    !log_cell_ie_div_star_ie
    !log_cell_specific_IE
@@ -883,7 +884,8 @@
    !log_du_kick_div_du
    !du
    !dvdt_dPdm
-   !dvdt_grav
+   !dvdt_grav ! gravity = -grav = -Gm/r^2
+   !grav_eff ! effective gravity = -(grav - dvdt)
 
    !tau_conv
    !tau_cool

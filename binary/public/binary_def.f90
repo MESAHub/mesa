@@ -142,6 +142,15 @@
             integer, intent(out) :: ierr
          end subroutine other_edot_interface
 
+         subroutine other_tidal_deformation_switch_function_interface(id, k, omega_in, f_switch, ierr)
+            use const_def, only: dp
+            implicit none
+            integer, intent(in) :: id, k
+            real(dp), intent(in) :: omega_in
+            real(dp), intent(out) :: f_switch
+            integer, intent(out) :: ierr
+         end subroutine other_tidal_deformation_switch_function_interface
+
          subroutine other_CE_init_interface(binary_id, restart, ierr)
             implicit none
             integer, intent(in) :: binary_id
@@ -243,9 +252,7 @@
 
       logical :: have_initialized_binary_handles = .false.
       integer, parameter :: max_binary_handles = 10  ! this can be increased as necessary
-      type (binary_info), target, save :: binary_handles(max_binary_handles)
-         ! gfortran seems to require "save" here.  at least it did once upon a time.
-
+      type (binary_info), target :: binary_handles(max_binary_handles)
 
       contains
 

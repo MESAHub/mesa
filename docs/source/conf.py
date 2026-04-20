@@ -92,7 +92,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "Official Release Version",
-            "url": "https://zenodo.org/records/13353788",
+            "url": "https://zenodo.org/records/18023257",
             "icon": "fa-solid fa-star",
         },
         {

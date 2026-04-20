@@ -1,0 +1,9 @@
+#!/bin/bash
+rm -f restart_photo
+echo $1
+
+make
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+./build/bin/star $1
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

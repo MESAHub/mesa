@@ -193,8 +193,6 @@ contains
       close (unit)
    end subroutine load_binary_data
 
-
-
    function hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
                                     z_grid, f_values) result(f_interp)
       real(dp), intent(in) :: x_val, y_val, z_val
@@ -248,11 +246,11 @@ contains
       end do
 
       ! Precompute Hermite basis functions and derivatives
-      h_x  = [h00(t_x), h01(t_x)]
+      h_x = [h00(t_x), h01(t_x)]
       hx_d = [h10(t_x), h11(t_x)]
-      h_y  = [h00(t_y), h01(t_y)]
+      h_y = [h00(t_y), h01(t_y)]
       hy_d = [h10(t_y), h11(t_y)]
-      h_z  = [h00(t_z), h01(t_z)]
+      h_z = [h00(t_z), h01(t_z)]
       hz_d = [h10(t_z), h11(t_z)]
 
       ! Final interpolation sum
@@ -260,18 +258,16 @@ contains
       do iz = 1, 2
          do iy = 1, 2
             do ix = 1, 2
-               sum = sum + h_x(ix)*h_y(iy)*h_z(iz)     * values(ix, iy, iz)
-               sum = sum + hx_d(ix)*h_y(iy)*h_z(iz)    * dx * dx_values(ix, iy, iz)
-               sum = sum + h_x(ix)*hy_d(iy)*h_z(iz)    * dy * dy_values(ix, iy, iz)
-               sum = sum + h_x(ix)*h_y(iy)*hz_d(iz)    * dz * dz_values(ix, iy, iz)
+               sum = sum + h_x(ix)*h_y(iy)*h_z(iz)*values(ix, iy, iz)
+               sum = sum + hx_d(ix)*h_y(iy)*h_z(iz)*dx*dx_values(ix, iy, iz)
+               sum = sum + h_x(ix)*hy_d(iy)*h_z(iz)*dy*dy_values(ix, iy, iz)
+               sum = sum + h_x(ix)*h_y(iy)*hz_d(iz)*dz*dz_values(ix, iy, iz)
             end do
          end do
       end do
 
       f_interp = sum
    end function hermite_tensor_interp3d
-
-
 
    !---------------------------------------------------------------------------
    ! Find the cell containing the interpolation point
@@ -296,16 +292,29 @@ contains
    !---------------------------------------------------------------------------
    ! Find the interval in a sorted array containing a value
    !---------------------------------------------------------------------------
+
    subroutine find_interval(x, val, i, t)
       real(dp), intent(in) :: x(:), val
       integer, intent(out) :: i
       real(dp), intent(out) :: t
 
       integer :: n, lo, hi, mid
+      logical :: dummy_axis
 
       n = size(x)
 
-      ! Handle out-of-bounds cases
+      ! Detect dummy axis: all values == 0, 999, or -999
+      dummy_axis = all(x == 0.0_dp) .or. all(x == 999.0_dp) .or. all(x == -999.0_dp)
+
+      if (dummy_axis) then
+         ! Collapse axis: always use first point, no interpolation
+         i = 1
+         t = 0.0_dp
+         return
+      end if
+
+      ! ---------- ORIGINAL CODE BELOW ----------------
+
       if (val <= x(1)) then
          i = 1
          t = 0.0_dp
@@ -316,7 +325,6 @@ contains
          return
       end if
 
-! Binary search to find interval
       lo = 1
       hi = n
       do while (hi - lo > 1)

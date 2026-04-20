@@ -73,6 +73,7 @@
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
          use hydro_RSP2, only: set_RSP2_vars
+         use tdc_hydro, only: set_viscosity_vars_TDC
          use RSP, only: RSP_setup_part1, RSP_setup_part2
          use report, only: do_report
          use alloc, only: fill_ad_with_zeros
@@ -160,6 +161,10 @@
          s% doing_finish_load_model = .true.
          call set_vars(s, s% dt, ierr)
          if (ierr == 0 .and. s% RSP2_flag) call set_RSP2_vars(s,ierr)
+         if (ierr == 0 .and. s% TDC_alpha_M > 0 &
+               .and. s% MLT_option == 'TDC' &
+               .and. .not. (s% RSP2_flag .or. s% RSP_flag)) &
+            call set_viscosity_vars_TDC(s,ierr)
          s% doing_finish_load_model = .false.
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in set_vars'
@@ -616,10 +621,10 @@
                j=j+1; j_rot(k) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1;  ! skip saving the file data
+               j=j+1  ! skip saving the file data
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1;  ! skip saving the file data
+               j=j+1  ! skip saving the file data
             end if
             if (s% u_flag) then
                j=j+1; xh(i_u,k) = vec(j)

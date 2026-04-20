@@ -84,7 +84,8 @@
       integer, parameter :: p_radius_cm = p_radius_km + 1
       integer, parameter :: p_radius = p_radius_cm + 1
       integer, parameter :: p_logR = p_radius + 1
-      integer, parameter :: p_log_q = p_logR + 1
+      integer, parameter :: p_psi_roche = p_logR + 1
+      integer, parameter :: p_log_q = p_psi_roche + 1
       integer, parameter :: p_q = p_log_q + 1
       integer, parameter :: p_log_dq = p_q + 1
       integer, parameter :: p_dq = p_log_dq + 1
@@ -378,7 +379,8 @@
       integer, parameter :: p_d_v_div_r_dr = p_d_v_div_r_dm + 1
 
       integer, parameter :: p_dvdt_grav = p_d_v_div_r_dr + 1
-      integer, parameter :: p_dvdt_dPdm = p_dvdt_grav + 1
+      integer, parameter :: p_grav_eff = p_dvdt_grav + 1
+      integer, parameter :: p_dvdt_dPdm = p_grav_eff + 1
       integer, parameter :: p_du = p_dvdt_dPdm + 1
       integer, parameter :: p_P_face = p_du + 1
 
@@ -571,8 +573,9 @@
 
       integer, parameter :: p_total_energy_sign = p_cs_at_cell_bdy + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
+      integer, parameter :: p_dwork_dm = p_total_energy + 1
 
-      integer, parameter :: p_Ptrb = p_total_energy + 1
+      integer, parameter :: p_Ptrb = p_dwork_dm + 1
       integer, parameter :: p_log_Ptrb = p_Ptrb + 1
       integer, parameter :: p_log_w = p_log_Ptrb + 1
       integer, parameter :: p_w = p_log_w + 1
@@ -781,6 +784,7 @@
          profile_column_name(p_rmid) = 'rmid'
          profile_column_name(p_logR_cm) = 'logR_cm'
          profile_column_name(p_logR) = 'logR'
+         profile_column_name(p_psi_roche) = 'psi_roche'
          profile_column_name(p_log_q) = 'log_q'
          profile_column_name(p_q) = 'q'
          profile_column_name(p_dq) = 'dq'
@@ -1071,6 +1075,7 @@
          profile_column_name(p_d_v_div_r_dm) = 'd_v_div_r_dm'
          profile_column_name(p_d_v_div_r_dr) = 'd_v_div_r_dr'
          profile_column_name(p_dvdt_grav) = 'dvdt_grav'
+         profile_column_name(p_grav_eff) = 'grav_eff'
          profile_column_name(p_dvdt_dPdm) = 'dvdt_dPdm'
          profile_column_name(p_du) = 'du'
          profile_column_name(p_P_face) = 'P_face'
@@ -1247,6 +1252,7 @@
 
          profile_column_name(p_total_energy_sign) = 'total_energy_sign'
          profile_column_name(p_total_energy) = 'total_energy'
+         profile_column_name(p_dwork_dm) = 'dwork_dm'
 
          profile_column_name(p_Ptrb) = 'Ptrb'
          profile_column_name(p_log_Ptrb) = 'log_Ptrb'

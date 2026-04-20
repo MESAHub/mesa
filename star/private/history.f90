@@ -2704,7 +2704,7 @@ contains
             val = 0
             do k = 2, nz
                if (s% q(k) > s% max_conv_vel_div_csound_maxq .or. s% csound(k) == 0) cycle
-               if (s% conv_vel(k) / s% csound(k) > val) val = s% conv_vel(k) / s% csound(k)
+               if (s% conv_vel(k) / s% csound(k) > val) val = s% conv_vel(k) / s% csound_face(k)
             end do
 
          case(h_min_t_eddy)

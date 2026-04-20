@@ -34,7 +34,7 @@
       public :: setup_struct_info
 
       integer, parameter :: ngp = 2
-      real(dp), public, save :: fk_gam_old(ngp,17)
+      real(dp), public :: fk_gam_old(ngp,17)
       logical :: initialize_gamma_grid = .true.
 
       contains
@@ -1447,7 +1447,7 @@
             return
          end if
 
-         if (ierr /= 0) stop 'set1_g_rad'  !return
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'set1_g_rad')  !return
 
          do ii = 1, 17  !kk
             do i = 1, nc

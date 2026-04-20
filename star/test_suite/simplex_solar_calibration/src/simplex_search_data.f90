@@ -461,9 +461,7 @@
          procedure(extras_after_evolve_interface), pointer, nopass :: extras_after_evolve
       end type simplex_procs
 
-      type (simplex_procs), target, save :: star_simplex_procs
-         ! gfortran seems to require "save" here.  at least it did once upon a time.
-
+      type (simplex_procs), target :: star_simplex_procs
 
       contains
 

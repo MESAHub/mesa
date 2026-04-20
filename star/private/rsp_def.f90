@@ -101,7 +101,7 @@
       real(dp), pointer :: xa(:)
       real(dp) :: X, Z, Y, abar, zbar, z53bar, XC, XN, XO, Xne
 
-      ! these for for rsp.f90 period and work calculations
+      ! these are for rsp.f90 period and work calculations
       real(dp) :: ETOT, EGRV, ETHE, EKIN, EDE_start, ECON, &
          TE, ELSTA, TEFF, E0, TT1, TE_start, T0, UN, ULL, &
          VMAX, RMAX, LMAX, LMIN, EKMAX, EKMIN, EKMAXL, EKDEL, &

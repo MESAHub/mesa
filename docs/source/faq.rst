@@ -502,7 +502,7 @@ It is necessary to take the following actions on recent versions of OS X
 previous version of OS X.
 
 -  Install or reinstall the current version of
-   `Xquartz <http://xquartz.macosforge.org/landing/>`__.
+   `Xquartz <http://https://www.xquartz.org/>`__.
 
 -  Install the `command line
    tools <https://developer.apple.com/library/ios/technotes/tn2339/_index.html#//apple_ref/doc/uid/DTS40014588-CH1-WHAT_IS_THE_COMMAND_LINE_TOOLS_PACKAGE_>`__,
@@ -515,7 +515,7 @@ previous version of OS X.
    the `Xcode 10 release
    notes <https://developer.apple.com/documentation/xcode_release_notes/xcode_10_release_notes>`__).
    As a workaround, Apple provides an extra package that will install
-   the headers to the base system. At present, one must do this:::
+   the headers to the base system. At present, one must do this::
 
     open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 
@@ -629,8 +629,8 @@ install step to give time for the files transferred by git lfs to properly sync.
 
 
 
-Installing Older Versions of MESA
-=================================
+Installing Older (before 25.XX) Versions of MESA
+================================================
 
 Older versions of MESA may fail to compile with more recent versions of
 the MESA SDK. There are a few possible solutions:
@@ -652,7 +652,7 @@ the MESA SDK. There are a few possible solutions:
     handful to work through). The basic workflow is
 
 -  ./install until an error turns up,
--  cd to that module and edit and ./mk until it compiles, then
+-  cd to that module and edit and make until it compiles, then
 -  go back to ./install and repeat until everything works before
 -  a final ./touch and ./install.
 
@@ -741,9 +741,8 @@ Why don't I see any PGPLOT output when I run MESA?
 --------------------------------------------------
 
 Make sure you have the option pgstar_flag = .TRUE. in the &star_job
-section of your input file. Also, if you're not using the SDK, make sure
-you enabled PGPLOT in your utils/makefile_header file (when using the
-SDK, PGPLOT is enabled by default).
+section of your input file. Also, if you are building without the SDK,
+make sure that you haven't disabled pgplot in ``make/defaults-module.mk``.
 
 How can I make a movie from my pgstar output?
 ---------------------------------------------

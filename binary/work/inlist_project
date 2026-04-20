@@ -1,6 +1,6 @@
 &binary_job
 
-   inlist_names(1) = 'inlist1' 
+   inlist_names(1) = 'inlist1'
    inlist_names(2) = 'inlist2'
 
    evolve_both_stars = .false.
@@ -19,3 +19,7 @@
    max_tries_to_achieve = 20
 
 / ! end of binary_controls namelist
+
+&pgbinary
+
+/ ! end of pgbinary namelist

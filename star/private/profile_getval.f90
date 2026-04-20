@@ -277,7 +277,7 @@
             r00, rp1, v00, vp1, Ap1, &
             r00_start, rp1_start, dr3, dr3_start, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
-         integer :: j, nz, ionization_k, klo, khi, i, ii
+         integer :: j, nz, ionization_k, klo, khi, i, ii, ierr
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor
          logical :: rsp_or_w
          include 'formats'
@@ -554,6 +554,12 @@
                val = safe_log10(s% r(k))
             case (p_logR)
                val = safe_log10(s% r(k)/Rsun)
+            case (p_psi_roche)
+               if (.not. associated(s% binary_get_roche_potential)) then
+                  val = -99d0
+               else
+                  call s% binary_get_roche_potential(s% id, s% r(k), val, ierr)
+               end if
 
             case (p_q)
                val = s% q(k)
@@ -1186,7 +1192,10 @@
                if (k > 1) val = log(s% rho_face(k-1)/s% rho_face(k)) / (s% lnR(k-1) - s% lnR(k))
 
             case (p_dvdt_grav)
-               val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
+                  val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
+            case (p_grav_eff)
+                  int_val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
+                  val = s% dxh_v(k)/s%dt / (int_val * s% cgrav(k) * s% m(k) /(s% r(k)*s% r(k)))
             case (p_dvdt_dPdm)
                if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% Peos(k-1) - s% Peos(k))/s% dm_bar(k)
 
@@ -1216,9 +1225,10 @@
                if (abs(s% gradr(k) - s% grada_face(k)) > 1d-20) &
                   val = (s% gradr(k) - s% gradT(k))/(s% gradr(k) - s% grada_face(k))
             case (p_mlt_Pturb)
-               if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
+               if (s% mlt_Pturb_factor > 0d0 .and. s% okay_to_set_mlt_vc) then
+                if (s% mlt_vc_old(k) > 0d0) &
                   val = s% mlt_Pturb_factor*pow2(s% mlt_vc(k))*get_rho_face_val(s,k)/3d0
-
+               end if
             case (p_grad_density)
                val = s% grad_density(k)
             case (p_grad_temperature)
@@ -1386,7 +1396,7 @@
             case (p_conv_vel_div_L_vel)
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
-               val = s% conv_vel(k)/s% csound(k)
+               val = s% conv_vel(k)/s% csound_face(k)
             case (p_dvc_dt_TDC_div_g)
                val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
@@ -1892,11 +1902,11 @@
             case(p_PII_face)
                if (rsp_or_w) val = s% PII(k)
             case(p_Chi)
-               if (rsp_or_w) val = s% Chi(k)
+                val = s% Chi(k)
             case(p_Eq)
-               if (rsp_or_w) val = s% Eq(k)
+               val = s% Eq(k)
             case(p_Uq)
-               if (rsp_or_w) val = s% Uq(k)
+               val = s% Uq(k)
             case(p_Lr)
                val = get_Lrad(s,k)
             case(p_Lr_div_L)
@@ -2022,6 +2032,10 @@
                end if
                val = dble(int_val)
                int_flag = .true.
+            case (p_dwork_dm)
+               ! differential work per unit mass per unit mass*time dW/dm
+               ! W = dwork_dm*dm*dt
+               val = s% dwork_dm(k) ! returns (dw/dt)/dm
 
             case (p_cell_specific_IE)
                val = s% energy(k)

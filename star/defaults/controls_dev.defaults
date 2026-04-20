@@ -174,3 +174,67 @@
       ! ::
 
     op_split_burn_min_T_for_variable_T_solver = 1d99
+
+
+! TDC
+! ===
+
+
+      ! TDC_use_density_form_for_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
+      ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
+
+    TDC_use_density_form_for_eddy_viscosity = .false.
+
+
+      ! use_TDC_enthalpy_flux_limiter
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC
+      ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
+
+      ! ::
+
+    use_TDC_enthalpy_flux_limiter = .false.
+
+
+      ! include_mlt_Pturb_in_thermodynamic_gradients
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If mlt_Pturb_factor > 0, includes the effect of turbulent pressure Pturb
+      ! on thermodynamic gradients gradr, grada, and hence gradT.
+      ! Not supported by other_alpha_mlt or starspots
+
+      ! ::
+
+    include_mlt_Pturb_in_thermodynamic_gradients = .false.
+
+
+      ! include_mlt_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If doing velocity time_centering, include time centering in mlt. Depending on the time
+      ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
+      ! for P, L, and r in geff, gradr, grada, and mlt.
+
+      ! ::
+
+    include_mlt_in_velocity_time_centering = .false.
+
+
+! Remeshing
+! =========
+
+
+      ! use_hydro_merge_limits_in_mesh_plan
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Allows use of ``merge_amr_max_abs_du_div_cs``, ``merge_amr_du_div_cs_limit_only_for_compression``,
+      ! and ``merge_amr_inhibit_at_jumps`` in default mesh_plan when ``use_split_merge_amr = .false.``.
+      ! Only supports ``v_flag``.
+
+      ! ::
+
+    use_hydro_merge_limits_in_mesh_plan = .false.

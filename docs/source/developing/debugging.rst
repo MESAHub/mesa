@@ -74,8 +74,7 @@ After you've make this change, in ``kap`` do
 
 .. code-block:: console
 
-    ./mk
-    ./export
+    make
 
 to recompile and export the module.
 
@@ -406,9 +405,9 @@ Again, the key point of this step is that we're passing up a value
 (``kap_rad``) that we wouldn't normally have access to from star.
 This procedure allows you to debug deep within a module from star.
 
-We changed code in ``kap``, so we need to do ``./mk && ./export`` in
+We changed code in ``kap``, so we need to do ``make`` in
 ``star`` and then in the work directory also recompile before we
-restart ``./mk && ./re``.
+restart ``make clean && ./re``.
 
 The output should clearly illustrate that this derivative has the
 wrong sign.  Before making a change that corrects the value of
@@ -553,10 +552,9 @@ analytic derivative.
          write(*,*) 'set_Psurf_BC', s% solver_test_partials_var
       end if
 
-
-We changed code in star, so we need to do ``./mk && ./export`` in
+We changed code in star, so we need to do ``make`` in
 ``star`` and then in the work directory also recompile before we
-restart ``./mk && ./re``.  We will repeat this recompilation/restart
+restart ``make clean && ./re``. We will repeat this recompilation/restart
 process many times, so do it in a way that makes it easy for you do
 over and over.
 
@@ -819,13 +817,13 @@ Set the environment variable
 
     MESA_FPE_CHECKS_ON=1
 
-Then run ./clean and ./install in MESA_DIR.
+Then run ``./clean`` and ``./install`` in MESA_DIR.
 
-This setting adds the following options in ``utils/makefile_header``
+This setting adds the following options in ``make/compile-settings-gnu.mk``
 
-.. literalinclude:: ../../../utils/makefile_header
+.. literalinclude:: ../../../make/compile-settings-gnu.mk
    :language: makefile
-   :start-after: ifeq ($(MESA_FPE_CHECKS_ON),1)
+   :start-after: ifeq ($(WITH_FPE_CHECKS),yes)
    :end-before: endif
 
 and acts as if you set the controls inlist option
@@ -851,7 +849,7 @@ Alter star/test_suite/1.3M_ms_high_Z/src/run_star_extras.f90 and in extras_finis
 Step 0: Notice your code has a problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Run ./mk and ./rn to run the test case and you'll get the following output:
+Run ``./rn`` to run the test case and you'll get the following output:
 
 .. code-block:: console
 

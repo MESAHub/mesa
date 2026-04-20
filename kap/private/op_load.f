@@ -162,8 +162,8 @@
          ierr=3
          GOTO 1001
       end if
-!      ITE1=MAX(ITE1,ITTE1)
-!      ITE2=MIN(ITE2,ITTE2)
+!      ITE1=max(ITE1,ITTE1)
+!      ITE2=min(ITE2,ITTE2)
 !
 !  READ MESH FILES
       OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.mesh',status='old',form='unformatted',iostat=ios)
@@ -196,8 +196,8 @@
             ierr=4
             GOTO 1001
          end if
-!         ITE1=MAX(ITE1,ITE11)
-!         ITE2=MIN(ITE2,ITE22)
+!         ITE1=max(ITE1,ITE11)
+!         ITE2=min(ITE2,ITE22)
          if (IZZ /= KZ(N)) then
             write(6,6001)zlab(n),izz,nn,kz(nn)
             ierr=5
@@ -275,8 +275,8 @@
               ierr=9
               GOTO 1001
             end if
-            JNE1=MAX(JNE1,JNE11)
-            JNE2=MIN(JNE2,JNE22)
+            JNE1=max(JNE1,JNE11)
+            JNE2=min(JNE2,JNE22)
          end do
          itt=(it-ite1)/2+1
          jn1(itt)=jne1

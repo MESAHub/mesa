@@ -80,14 +80,16 @@ contains
    end subroutine check_efficient_MLT_scaling
 
    subroutine compare_TDC_and_Cox_MLT()
-      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+      real(dp) :: mixing_length_alpha, conv_vel_start, &
+         TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, L_start, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma, Eq_div_w, energy
       real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
+
       character(len=3) :: MLT_option
       integer :: mixing_type, ierr, tdc_num_iters
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
 
       include 'formats'
 
@@ -122,14 +124,20 @@ contains
       gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*grav*pow2(r))
 
       ! TDC
-      alpha_TDC_DAMP = 1.0d0
-      alpha_TDC_DAMPR = 0.0d0
-      alpha_TDC_PtdVdt = 0.0d0
+      TDC_alpha_D = 1.0d0
+      TDC_alpha_R = 0.0d0
+      TDC_alpha_Pt = 0.0d0
+      TDC_alpha_C = 1.0d0
+      TDC_alpha_S = 1.0d0
       dV = 0d0
+      energy = 0d0
       conv_vel_start = 0d0  !1d10
       scale = L%val*1d-3
       report = .false.
-      dt = 1d40  ! Long time-step so we get into equilibrium
+      dt = 1d40 ! Long time-step so we get into equilibrium
+      Eq_div_w = 0d0 ! TDC_alpha_M is implicit in this term
+      include_mlt_corr_to_TDC = .true.
+      use_TDC_enthalpy_flux_limiter = .false.
 
       ! MLT
       MLT_option = 'Cox'
@@ -139,9 +147,12 @@ contains
       write (*, 1) 'gradR - gradA', gradr%val - grada%val
 
       call set_TDC( &
-         conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+         conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
+         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
+         Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
+         energy, ierr)
+
 
       write (*, 1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel%val, dt
 
@@ -156,12 +167,12 @@ contains
 
    subroutine check_TDC()
       real(dp) :: mixing_length_alpha, conv_vel_start
-      real(dp) :: alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
+      real(dp) :: TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, max_conv_vel, L_start, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Eq_div_w, grav, energy
       integer :: mixing_type, ierr, tdc_num_iters
-      logical :: report
+      logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       integer :: j
 
       include 'formats'
@@ -174,9 +185,11 @@ contains
       conv_vel_start = 52320587.415154047d0
 
       mixing_length_alpha = 2.0d0
-      alpha_TDC_DAMP = 1.0d0
-      alpha_TDC_DAMPR = 0.0d0
-      alpha_TDC_PtdVdt = 0.0d0
+      TDC_alpha_D = 1.0d0
+      TDC_alpha_R = 0.0d0
+      TDC_alpha_Pt = 0.0d0
+      TDC_alpha_C = 1.0d0
+      TDC_alpha_S = 1.0d0
       cgrav = 6.6743000000000004d-8
       m = 5.8707400456875664d34
       scale = 5.0386519362246294d45
@@ -194,7 +207,13 @@ contains
       report = .false.
       chiT = 1d0
       chiRho = 1d0
-      gradr = 3d0*P*opacity*L/(64*pi*boltz_sigma*pow4(T)*cgrav*m)
+
+      gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * cgrav * m)
+      grav = m * cgrav / pow2(r)
+      Eq_div_w = 0d0 ! TDC_alpha_M is implicit in this term
+      energy = 0d0
+      include_mlt_corr_to_TDC = .true.
+      use_TDC_enthalpy_flux_limiter = .false.
 
       write (*, *) "####################################"
       write (*, *) "Running dt test"
@@ -202,9 +221,12 @@ contains
       do j = 0, 30
          dt = 500d0*pow(1.02d0, j)
          call set_TDC( &
-            conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
+            conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
+            Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
+            energy, ierr)
+
 
          write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
          if (report) stop

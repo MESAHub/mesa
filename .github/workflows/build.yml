@@ -1,0 +1,30 @@
+---
+name: Build with SDK
+
+on:
+  workflow_dispatch:
+  release:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  build:
+    if: |
+      !(github.event_name == 'pull_request' && ${{ contains(github.event.commits[0].message, 'ci skip') }})
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: ["26.3.2"]  # pick 2 or 3 most recent.
+        os: [ubuntu-latest, macos-latest]
+        dynamic: ["yes", "no"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install MESA on ${{ runner.os }} with SDK ${{matrix.sdk}}
+        uses: ./.github/actions/install-mesa
+        env:
+          DYNAMIC: ${{ matrix.dynamic }}
+        with:
+          sdk: ${{matrix.sdk}}

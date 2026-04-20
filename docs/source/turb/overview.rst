@@ -2,9 +2,6 @@
 Overview of turb module
 =======================
 
-.. toctree::
-   :maxdepth: 1
-
 The ``turb`` module provides routines for computing properties of turbulence
 under local theories, including ``mlt`` (mixing-length theory), ``tdc`` (time-dependent convection),
 semiconvection, and thermohaline turbulence.

@@ -85,10 +85,13 @@
       public :: weighted_smoothing
       public :: get_kap_face
       public :: get_rho_face
-      public :: get_chirho_face
-      public :: get_chit_face
-      public :: get_t_face
-      public :: get_peos_face
+      public :: get_rho_start_face
+      public :: get_e_face
+      public :: get_ChiRho_face
+      public :: get_ChiT_face
+      public :: get_T_face
+      public :: get_Peos_face
+      public :: get_Peos_face_val
       public :: get_cp_face
       public :: get_grada_face
       public :: get_gradr_face
@@ -2194,7 +2197,7 @@
          if (s% u_flag) then
             v0 = s% u(k)
             cell_specific_KE_qp = qhalf*Mbar*v0**2
-            d_dv00 = s% u(k)
+            d_dv00 = Mbar*s% u(k)
             d_dvp1 = 0d0
          else if (s% v_flag) then
             v0 = s% v(k)
@@ -2449,7 +2452,7 @@
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
          integer :: k
-         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, alfa, beta,TDC_eturb_cell
          include 'formats'
 
          total_internal_energy = 0d0
@@ -2486,6 +2489,17 @@
             end if
             if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
+               cell_total = cell_total + cell1
+               total_turbulent_energy = total_turbulent_energy + cell1
+            else if ( s% MLT_option == 'TDC' .and. &
+               s% TDC_include_eturb_in_energy_equation) then ! needs corrected s% mlt_vc(k) >= 0 causes failures.
+               if (k < s% nz) then
+                  TDC_eturb_cell = 0.75d0*(pow2(s% mlt_vc(k)) + &
+                     pow2(s% mlt_vc(k+1)))
+               else ! k == s% nz
+                  TDC_eturb_cell = 0.75d0*pow2(s% mlt_vc(k))
+               end if
+               cell1 = dm*TDC_eturb_cell
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -3374,7 +3388,8 @@
          d_Ptot_dxa = 0d0
 
          time_center = (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering)
+                  s% include_P_in_velocity_time_centering .and. &
+                  s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering)
          if (time_center) then
             alfa = s% P_theta_for_velocity_time_centering
          else
@@ -3793,6 +3808,18 @@
          rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
       end function get_rho_face_val
 
+      function get_rho_start_face(s,k) result(rho_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: rho_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            rho_face = wrap_d_00_start(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*wrap_d_00_start(s,k) + beta*wrap_d_m1_start(s,k)
+      end function get_rho_start_face
 
       function get_T_face(s,k) result(T_face)
          type (star_info), pointer :: s
@@ -3829,6 +3856,31 @@
          Peos_face = alfa*wrap_Peos_00(s,k) + beta*wrap_Peos_m1(s,k)
       end function get_Peos_face
 
+      function get_Peos_face_val(s,k) result(Peos_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: Peos_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            Peos_face = s% Peos(k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         Peos_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
+      end function get_Peos_face_val
+
+      function get_e_face(s,k) result(e_face) ! specific energy on face
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: e_face
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            e_face = wrap_e_00(s,k)
+            return
+         end if
+         call get_face_weights(s, k, alfa, beta)
+         e_face = alfa*wrap_e_00(s,k) + beta*wrap_e_m1(s,k)
+      end function get_e_face
 
       function get_Cp_face(s,k) result(Cp_face)
          type (star_info), pointer :: s
@@ -3889,14 +3941,22 @@
       function get_grada_face(s,k) result(grada_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: grada_face
+         type(auto_diff_real_star_order1) :: grada_face, mlt_Pturb_ad, P, gamma1_face, alpha
          real(dp) :: alfa, beta
+         P = get_Peos_face(s,k)
          if (k == 1) then
             grada_face = wrap_grad_ad_00(s,k)
             return
          end if
          call get_face_weights(s, k, alfa, beta)
          grada_face = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
+         if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+            .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+            gamma1_face = alfa*wrap_gamma1_00(s,k) + beta*wrap_gamma1_m1(s,k)
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            alpha = mlt_Pturb_ad/ (P*gamma1_face)
+            grada_face = grada_face*(P+mlt_Pturb_ad) / (P * (1d0 + alpha))
+         end if
       end function get_grada_face
 
 
@@ -3904,11 +3964,27 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: gradr
-         type(auto_diff_real_star_order1) :: P, opacity, L, Pr
+         type(auto_diff_real_star_order1) :: P, opacity, L, Pr, r
+         real(dp) :: L_theta
          !include 'formats'
          P = get_Peos_face(s,k)
          opacity = get_kap_face(s,k)
-         L = wrap_L_00(s,k)
+
+         if (s% include_mlt_in_velocity_time_centering) then
+            ! consider building a wrapper : wrap_opt_time_center_L_00(s,k)
+            if (s% using_velocity_time_centering .and. &
+              s% include_L_in_velocity_time_centering .and. &
+              s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+               L_theta = s% L_theta_for_velocity_time_centering
+            else
+               L_theta = 1d0
+            end if
+            L = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
+            r = wrap_opt_time_center_r_00(s,k)
+         else
+            L = wrap_L_00(s,k)
+            r = wrap_r_00(s,k)
+         end if
          Pr = get_Prad_face(s,k)
          gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr)
       end function get_gradr_face
@@ -3919,13 +3995,18 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: scale_height
          type(auto_diff_real_star_order1) :: grav, scale_height2, P, rho
-         real(dp) :: G
+         real(dp) :: G, alfa, beta
          include 'formats'
          G = s% cgrav(k)
-         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k))
-         P = get_Peos_face(s,k)
-         rho = get_rho_face(s,k)
-         scale_height = P/(grav*rho)  ! this assumes HSE
+         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k)) ! try geff later.
+         if (s% use_rsp_form_of_scale_height .and. k >1) then ! use rsp form of Hp, assumes HSE, wraps P/rho together.
+            call get_face_weights(s, k, alfa, beta)
+            scale_height = (alfa*(wrap_Peos_00(s,k))/wrap_d_00(s,k) + beta*(wrap_Peos_m1(s,k))/wrap_d_m1(s,k))/grav
+         else
+            P = get_Peos_face(s,k)
+            rho = get_rho_face(s,k)
+            scale_height = P/(grav*rho)  ! this assumes HSE
+         end if
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)
@@ -3940,15 +4021,20 @@
       real(dp) function get_scale_height_face_val(s,k) result(scale_height)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: G, grav, scale_height2, P, rho
-         type(auto_diff_real_star_order1) :: P_face, rho_face
+         real(dp) :: G, scale_height2, P, rho, alfa, beta
+         type(auto_diff_real_star_order1) :: P_face, rho_face, grav
          G = s% cgrav(k)
-         grav = G*s% m_grav(k)/pow2(s% r(k))
-         P_face = get_Peos_face(s,k)
-         P = P_face%val
-         rho_face = get_rho_face(s,k)
-         rho = rho_face%val
-         scale_height = P/(grav*rho)  ! this assumes HSE
+         grav = G*s% m_grav(k)/pow2(wrap_r_00(s,k))! try geff later
+         if (s% use_rsp_form_of_scale_height .and. k >1) then ! use rsp form of Hp, assumes HSE, wraps P/rho together.
+            call get_face_weights(s, k, alfa, beta)
+            scale_height = (alfa*(s% Peos(k)/s% rho(k)) + beta*(s% Peos(k-1)/s% rho(k-1)))/grav%val
+         else
+            P_face = get_Peos_face(s,k)
+            P = P_face%val
+            rho_face = get_rho_face(s,k)
+            rho = rho_face%val
+            scale_height = P/(grav%val*rho)  ! this assumes HSE
+         end if
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
             ! (this comes from Eggleton's code.)

@@ -53,11 +53,6 @@ also an option, so long as you use ifort 14 or later. Even if you choose
 to use ifort, you should still visit the MESA SDK website to get a feel
 for the other MESA requirements.
 
-Not using the MESA SDK means you'll need to replace the file
-:file:`$MESA_DIR/utils/makefile_header` with a version customized to your
-system. There's a template to get you started at
-:file:`$MESA_DIR/utils/makefile_header_non_mesasdk`.
-
 Regardless of whether you use the MESA SDK or ifort, and whether your
 machine runs macOS or Linux, the output of MESA should be bit-for-bit
 identical.  If it's not, this is considered to be a bug. (This has
@@ -84,7 +79,7 @@ free to rename it, just make sure to set MESA_DIR accordingly (see the
 next section).
 
 You can also download zip files of `older MESA releases <https://doi.org/10.5281/zenodo.2602941>`__.
-If you plan to do so, please read :ref:`this FAQ entry <faq:Installing Older Versions of MESA>`.
+If you plan to do so, please read :ref:`this FAQ entry <faq:Installing Older (before 25.XX) Versions of MESA>`.
 
 .. _environment:
 
@@ -93,8 +88,8 @@ Set your environment variables
 
 The easiest way to make sure that your system is always configured
 appropriately is to define the necessary environment variables in
-your `shell start-up file <https://kb.iu.edu/d/abdy>`__. The file that
-you need to edit will depend on `which shell you're using
+your `shell start-up file <https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0023946>`__.
+The file that you need to edit will depend on `which shell you're using
 <https://askubuntu.com/questions/590899/how-do-i-check-which-shell-i-am-using>`__.
 You can find out by running ``echo $0``. The default on most Linux
 distros is bash, in which case you need to edit ``$HOME/.bashrc``. If
