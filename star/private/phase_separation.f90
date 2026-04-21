@@ -61,7 +61,7 @@
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
          integer, intent(out) :: ierr
-         real(dp) :: XNe20, XNe22, XO, XC, XNa, XMg , pad
+         real(dp) :: XNe20, XNe22, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20, net_ine22, net_ina23, net_img24
          logical :: save_Skye_use_ion_offsets
 
@@ -94,8 +94,6 @@
          XO = s% xa(net_io16,k_bound)
          XNe20 = s% xa(net_ine20,k_bound)
          XNe22 = s% xa(net_ine22,k_bound)
-         XNa = s% xa(net_ina23,k_bound)
-         XMg = s% xa(net_img24,k_bound)
 
          ! Check that we're still in C/O or O/Ne dominated material as appropriate,
          ! otherwise skip phase separation
