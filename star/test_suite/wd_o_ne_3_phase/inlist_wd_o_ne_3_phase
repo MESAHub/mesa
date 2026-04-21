@@ -82,7 +82,7 @@
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_eel_run_e_err'
+      trace_history_value_name(2) = 'log_rel_run_e_err'
 
       energy_eqn_option = 'eps_grav'
       use_time_centered_eps_grav = .true.
@@ -182,12 +182,6 @@
 
 &pgstar
 
- file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
- file_device = 'png'            ! png
- file_extension = 'png'
-
- !file_device = 'vcps'          ! postscript
- !file_extension = 'ps'
 
         !Grid2_win_flag = .true.
         Grid2_win_width = 20
@@ -199,7 +193,7 @@
          !Abundance_file_flag = .true.
      
 
-          TRho_Profile_win_flag = .true.
+         !TRho_Profile_win_flag = .true.
          show_TRho_Profile_kap_regions = .false.
          show_TRho_Profile_eos_regions = .true.
          !show_TRho_Profile_degeneracy_line = .true.
@@ -208,7 +202,7 @@
          show_TRho_Profile_burn_labels = .true.
          show_TRho_Profile_text_info = .false.
 
-         Abundance_win_flag = .true.
+         !Abundance_win_flag = .true.
          Abundance_xaxis_name = 'logxm'
          Abundance_xaxis_reversed = .true.
          Abundance_xmin = -7
