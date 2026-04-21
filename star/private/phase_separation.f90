@@ -469,156 +469,156 @@
         blouin_delta_xne(2) = Xnew22 - Xin22
       end function blouin_delta_xne
 
-     subroutine tab_interp_medin_cumming_dx1(x1_,x2_,components,dx1_)
-            use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
-            use utils_lib, only: mesa_error, mkdir, is_bad
-            implicit none
-            integer, parameter :: num_x1 = 998, num_x2 = 998
-            integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
-            real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
-            real(dp) :: bcymin(num_x2), bcymax(num_x2)
-            real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
-            real(dp), pointer :: deltax1_sob_f(:,:,:)
-            real(dp) :: deltax1,x1l,x2l
-            real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
-            character (len=*), intent(in) :: components
-            real(dp) :: fval(6)         ! output data
-            real(dp), intent(out) :: dx1_
-            integer :: ier
+      subroutine tab_interp_medin_cumming_dx1(x1_,x2_,components,dx1_)
+        use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
+        use utils_lib, only: mesa_error, mkdir, is_bad
+        implicit none
+        integer, parameter :: num_x1 = 998, num_x2 = 998
+        integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
+        real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
+        real(dp) :: bcymin(num_x2), bcymax(num_x2)
+        real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
+        real(dp), pointer :: deltax1_sob_f(:,:,:)
+        real(dp) :: deltax1,x1l,x2l
+        real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
+        character (len=*), intent(in) :: components
+        real(dp) :: fval(6)         ! output data
+        real(dp), intent(out) :: dx1_
+        integer :: ier
 
-            ict = 0
-            ict(1) = 1
-            iounit=999
-            ! setup interpolation table for x1 x2 dx1
-            if (components=='CONe') then
-               open(unit=iounit, file='CONe_deltaC.dat', action='read',status='old')
-            else if  (components=='NeOMg') then
-               open(unit=iounit, file='NeOMg_deltaMg.dat', action='read',status='old')
-            else if  (components=='ONeNa') then
-               open(unit=iounit, file='ONeNa_deltaNa.dat', action='read',status='old')
-            else if  (components=='COMg') then
-               open(unit=iounit, file='COMg_deltaC.dat', action='read',status='old')
-            end if
-            allocate(x1_l(num_x1), x2_l(num_x2), &
-            deltax1_sob_f1(4*num_x1*num_x2))
-            deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
-            deltax1_sob_f1(1:4*num_x1*num_x2)
-            do j=1,num_x1
-               do i=1,num_x2
-                  read(iounit,*) x1l, x2l, deltax1
-                  x1_l(j)=x1l
-                  if (j == 1) then
-                     x2_l(i) =x2l
-                  end if
-                  deltax1_sob_f(1,j,i) = deltax1
-               end do
-            end do
-            close(iounit)
-            ! just use "not a knot" bc's at edges of tables
-            ibcxmin = 0; bcxmin(1:num_x1) = 0
-            ibcxmax = 0; bcxmax(1:num_x1) = 0
-            ibcymin = 0; bcymin(1:num_x2) = 0
-            ibcymax = 0; bcymax(1:num_x2) = 0
-            call interp_mkbicub_db( &
-                 x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
-                 ibcxmin,bcxmin,ibcxmax,bcxmax, &
-                 ibcymin,bcymin,ibcymax,bcymax, &
-                 ilinx,iliny,ierr)
-            if (ierr /= 0) then
-               write(*,*) 'interp_mkbicub_db error'
-               ierr = -1
-               call mesa_error(__FILE__,__LINE__)
-            end if
-            do j=1,num_x1
-               do i=1,num_x2
-                  do k=1,4
-                     if (is_bad(deltax1_sob_f(k,j,i))) then
-                        write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
-                     end if
-                  end do
-               end do
-            end do
-            call interp_evbicub_db( &
-                 x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
-                 ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
-            dx1_=fval(1)  ! delta_x1 from 2d interpolation
+        ict = 0
+        ict(1) = 1
+        iounit=999
+        ! setup interpolation table for x1 x2 dx1
+        if (components=='CONe') then
+           open(unit=iounit, file='CONe_deltaC.dat', action='read',status='old')
+        else if  (components=='NeOMg') then
+           open(unit=iounit, file='NeOMg_deltaMg.dat', action='read',status='old')
+        else if  (components=='ONeNa') then
+           open(unit=iounit, file='ONeNa_deltaNa.dat', action='read',status='old')
+        else if  (components=='COMg') then
+           open(unit=iounit, file='COMg_deltaC.dat', action='read',status='old')
+        end if
+        allocate(x1_l(num_x1), x2_l(num_x2), &
+             deltax1_sob_f1(4*num_x1*num_x2))
+        deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
+             deltax1_sob_f1(1:4*num_x1*num_x2)
+        do j=1,num_x1
+           do i=1,num_x2
+              read(iounit,*) x1l, x2l, deltax1
+              x1_l(j)=x1l
+              if (j == 1) then
+                 x2_l(i) =x2l
+              end if
+              deltax1_sob_f(1,j,i) = deltax1
+           end do
+        end do
+        close(iounit)
+        ! just use "not a knot" bc's at edges of tables
+        ibcxmin = 0; bcxmin(1:num_x1) = 0
+        ibcxmax = 0; bcxmax(1:num_x1) = 0
+        ibcymin = 0; bcymin(1:num_x2) = 0
+        ibcymax = 0; bcymax(1:num_x2) = 0
+        call interp_mkbicub_db( &
+             x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
+             ibcxmin,bcxmin,ibcxmax,bcxmax, &
+             ibcymin,bcymin,ibcymax,bcymax, &
+             ilinx,iliny,ierr)
+        if (ierr /= 0) then
+           write(*,*) 'interp_mkbicub_db error'
+           ierr = -1
+           call mesa_error(__FILE__,__LINE__)
+        end if
+        do j=1,num_x1
+           do i=1,num_x2
+              do k=1,4
+                 if (is_bad(deltax1_sob_f(k,j,i))) then
+                    write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
+                 end if
+              end do
+           end do
+        end do
+        call interp_evbicub_db( &
+             x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
+             ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
+        dx1_=fval(1)  ! delta_x1 from 2d interpolation
       end subroutine tab_interp_medin_cumming_dx1
 
 
       subroutine tab_interp_medin_cumming_dx2(x1_,x2_,components,dx2_)
-            !use utils_lib
-            use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
-            use utils_lib, only: mesa_error, mkdir, is_bad
-            implicit none
-            integer, parameter :: num_x1 = 998, num_x2 = 998
-            integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
-            real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
-            real(dp) :: bcymin(num_x2), bcymax(num_x2)
-            real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
-            real(dp), pointer :: deltax1_sob_f(:,:,:)
-            real(dp) :: deltax1,x1l,x2l
-            real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
-            character (len=*), intent(in) :: components
-            real(dp) :: fval(6)         ! output data
-            real(dp), intent(out) :: dx2_
-            integer :: ier
+        !use utils_lib
+        use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
+        use utils_lib, only: mesa_error, mkdir, is_bad
+        implicit none
+        integer, parameter :: num_x1 = 998, num_x2 = 998
+        integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
+        real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
+        real(dp) :: bcymin(num_x2), bcymax(num_x2)
+        real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
+        real(dp), pointer :: deltax1_sob_f(:,:,:)
+        real(dp) :: deltax1,x1l,x2l
+        real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
+        character (len=*), intent(in) :: components
+        real(dp) :: fval(6)         ! output data
+        real(dp), intent(out) :: dx2_
+        integer :: ier
 
-            ict = 0
-            ict(1) = 1
-            iounit=998
-            ! setup interpolation table for tau sob eta
-            if (components=='CONe') then
-               open(unit=iounit, file='CONe_deltaO.dat', action='read',status='old')
-            else if  (components=='NeOMg') then
-               open(unit=iounit, file='NeOMg_deltaO.dat', action='read',status='old')
-            else if  (components=='ONeNa') then
-               open(unit=iounit, file='ONeNa_deltaO.dat', action='read',status='old')
-            else if  (components=='COMg') then
-               open(unit=iounit, file='COMg_deltaMg.dat', action='read',status='old')
-            end if
-            allocate(x1_l(num_x1), x2_l(num_x2), &
-                 deltax1_sob_f1(4*num_x1*num_x2))
-            deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
-                 deltax1_sob_f1(1:4*num_x1*num_x2)
-            do j=1,num_x1
-               do i=1,num_x2
-                  read(iounit,*) x1l, x2l, deltax1
-                  x1_l(j)=x1l
-                  if (j == 1) then
-                     x2_l(i) =x2l
-                  end if
-                  deltax1_sob_f(1,j,i) = deltax1
-               end do
-            end do
-            close(iounit)
-            ! just use "not a knot" bc's at edges of tables
-            ibcxmin = 0; bcxmin(1:num_x1) = 0
-            ibcxmax = 0; bcxmax(1:num_x1) = 0
-            ibcymin = 0; bcymin(1:num_x2) = 0
-            ibcymax = 0; bcymax(1:num_x2) = 0
-            call interp_mkbicub_db( &
-                 x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
-                 ibcxmin,bcxmin,ibcxmax,bcxmax, &
-                 ibcymin,bcymin,ibcymax,bcymax, &
-                 ilinx,iliny,ierr)
-            if (ierr /= 0) then
-               write(*,*) 'interp_mkbicub_db error'
-               ierr = -1
-               call mesa_error(__FILE__,__LINE__)
-            end if
-            do j=1,num_x1
-               do i=1,num_x2
-                  do k=1,4
-                     if (is_bad(deltax1_sob_f(k,j,i))) then
-                        write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
-                     end if
-                  end do
-               end do
-            end do
-            call interp_evbicub_db( &
-                 x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
-                 ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
-            dx2_=fval(1)  ! delta_x2 from 2d interpolation
+        ict = 0
+        ict(1) = 1
+        iounit=998
+        ! setup interpolation table for tau sob eta
+        if (components=='CONe') then
+           open(unit=iounit, file='CONe_deltaO.dat', action='read',status='old')
+        else if  (components=='NeOMg') then
+           open(unit=iounit, file='NeOMg_deltaO.dat', action='read',status='old')
+        else if  (components=='ONeNa') then
+           open(unit=iounit, file='ONeNa_deltaO.dat', action='read',status='old')
+        else if  (components=='COMg') then
+           open(unit=iounit, file='COMg_deltaMg.dat', action='read',status='old')
+        end if
+        allocate(x1_l(num_x1), x2_l(num_x2), &
+             deltax1_sob_f1(4*num_x1*num_x2))
+        deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
+             deltax1_sob_f1(1:4*num_x1*num_x2)
+        do j=1,num_x1
+           do i=1,num_x2
+              read(iounit,*) x1l, x2l, deltax1
+              x1_l(j)=x1l
+              if (j == 1) then
+                 x2_l(i) =x2l
+              end if
+              deltax1_sob_f(1,j,i) = deltax1
+           end do
+        end do
+        close(iounit)
+        ! just use "not a knot" bc's at edges of tables
+        ibcxmin = 0; bcxmin(1:num_x1) = 0
+        ibcxmax = 0; bcxmax(1:num_x1) = 0
+        ibcymin = 0; bcymin(1:num_x2) = 0
+        ibcymax = 0; bcymax(1:num_x2) = 0
+        call interp_mkbicub_db( &
+             x1_l, num_x1, x2_l, num_x2, deltax1_sob_f1, num_x1, &
+             ibcxmin,bcxmin,ibcxmax,bcxmax, &
+             ibcymin,bcymin,ibcymax,bcymax, &
+             ilinx,iliny,ierr)
+        if (ierr /= 0) then
+           write(*,*) 'interp_mkbicub_db error'
+           ierr = -1
+           call mesa_error(__FILE__,__LINE__)
+        end if
+        do j=1,num_x1
+           do i=1,num_x2
+              do k=1,4
+                 if (is_bad(deltax1_sob_f(k,j,i))) then
+                    write(*,*) 'deltax1_sob_f', i, j, k, deltax1_sob_f(k,j,i)
+                 end if
+              end do
+           end do
+        end do
+        call interp_evbicub_db( &
+             x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
+             ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
+        dx2_=fval(1)  ! delta_x2 from 2d interpolation
       end subroutine tab_interp_medin_cumming_dx2
 
 
@@ -648,12 +648,12 @@
              /(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
         Xnew3_2 = (22*(1-xc-xo)*(xne2)/(xne1+xne2))/(12*xc + 16*xo + 20*(1-xc-xo)*(xne1) &
              /(xne1+xne2)+22*(1-xc-xo)*(xne2)/(xne1+xne2))
-         Dd=[0,0,0,0]
-         Dd(1)= Xnew1 - X1
-         Dd(2)= Xnew2 - X2
-         Dd(3)= Xnew3_1 - X3_1
-         Dd(4)= Xnew3_2 - X3_2
-         !write(*,*) 'delta_XC: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
+        Dd=[0,0,0,0]
+        Dd(1)= Xnew1 - X1
+        Dd(2)= Xnew2 - X2
+        Dd(3)= Xnew3_1 - X3_1
+        Dd(4)= Xnew3_2 - X3_2
+        !write(*,*) 'delta_XC: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
       end subroutine medin_cumming_3p_d_cone
 
       subroutine medin_cumming_3p_d_neomg(X1,X2,X3_1,X3_2,Dd)
@@ -681,12 +681,12 @@
              /(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
         Xnew3_2 = (22*(1-xmg-xo)*(xne2)/(xne1+xne2))/(24*xmg + 16*xo + 20*(1-xmg-xo)*(xne1) &
              /(xne1+xne2)+22*(1-xmg-xo)*(xne2)/(xne1+xne2))
-         Dd=[0,0,0,0]
-         Dd(1)= Xnew1 - X1
-         Dd(2)= Xnew2 - X2
-         Dd(3)= Xnew3_1 - X3_1
-         Dd(4)= Xnew3_2 - X3_2
-         !write(*,*) 'delta_XMg: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
+        Dd=[0,0,0,0]
+        Dd(1)= Xnew1 - X1
+        Dd(2)= Xnew2 - X2
+        Dd(3)= Xnew3_1 - X3_1
+        Dd(4)= Xnew3_2 - X3_2
+        !write(*,*) 'delta_XMg: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
       end subroutine medin_cumming_3p_d_neomg
 
       subroutine medin_cumming_3p_d_onena(X1,X2,X3_1,X3_2,Dd)
@@ -716,12 +716,12 @@
              /(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
         Xnew3_2 = (22*(1-xna-xo)*(xne2)/(xne1+xne2))/(23*xna + 16*xo + 20*(1-xna-xo)*(xne1) &
              /(xne1+xne2)+22*(1-xna-xo)*(xne2)/(xne1+xne2))
-         Dd=[0,0,0,0]
-         Dd(1)= Xnew1 - X1
-         Dd(2)= Xnew2 - X2
-         Dd(3)= Xnew3_1 - X3_1
-         Dd(4)= Xnew3_2 - X3_2
-         !write(*,*) 'delta_XNa: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
+        Dd=[0,0,0,0]
+        Dd(1)= Xnew1 - X1
+        Dd(2)= Xnew2 - X2
+        Dd(3)= Xnew3_1 - X3_1
+        Dd(4)= Xnew3_2 - X3_2
+        !write(*,*) 'delta_XNa: ',Dd(1),' delta_XO: ', Dd(2), 'delta_XNe:', Dd(3)+Dd(4)
       end subroutine medin_cumming_3p_d_onena
 
       subroutine medin_cumming_3p_d_comg(X1,X2,X3,Dd)
@@ -744,25 +744,30 @@
         ! convert deltas in number fraction to mass fraction
         Xnew1 = 12*xc/(12*xc + 24*xmg + 16*(1-xc-xmg))
         Xnew2 = 24*xmg/(12*xc + 24*xmg + 16*(1-xc-xmg))
-         Dd=[0,0,0,0]
-         Dd(1)= Xnew1 - X1
-         Dd(2)= Xnew2 - X2
+        Dd=[0,0,0,0]
+        Dd(1)= Xnew1 - X1
+        Dd(2)= Xnew2 - X2
       end subroutine medin_cumming_3p_d_comg
 
       subroutine update_model_ (s, kc_t, kc_b, do_brunt)
+
         use turb_info, only: set_mlt_vars
         use brunt, only: do_brunt_B
         use micro
+
         type(star_info), pointer :: s
         integer, intent(in)      :: kc_t
         integer, intent(in)      :: kc_b
         logical, intent(in)      :: do_brunt
+
         integer  :: ierr
         integer  :: kf_t
         integer  :: kf_b
+
         logical :: mask(s%nz)
 
         mask(:) = .true.
+
         ! Update the model to reflect changes in the abundances across
         ! cells kc_t:kc_b (the mask part of this call is unused, mask=true for all zones).
         ! Do updates at constant (P,T) rather than constant (rho,T).
@@ -773,6 +778,7 @@
            stop
         end if
         s%fix_Pgas = .false.
+
         ! Update opacities across cells kc_t:kc_b (this also sets rho_face
         ! and related quantities on faces kc_t:kc_b)
         call set_micro_vars(s, kc_t, kc_b, &
@@ -781,6 +787,7 @@
            write(*,*) 'phase_separation: error from call to set_micro_vars'
            stop
         end if
+
         ! This is expensive, so only do it if we really need to.
         if(do_brunt) then
            ! Need to make sure we can set brunt for mix_outward calculation.
@@ -793,16 +800,22 @@
               stop
            end if
         end if
+
         ! Finally update MLT for interior faces
+
         kf_t = kc_t
         kf_b = kc_b + 1
+
         call set_mlt_vars(s, kf_t+1, kf_b-1, ierr)
         if (ierr /= 0) then
            write(*,*) 'phase_separation: failed in call to set_mlt_vars during update_model_'
            stop
         endif
+
         ! Finish
+
         return
+
       end subroutine update_model_
 
       subroutine smooth_eps_phase_sep(s,dt,ierr)
