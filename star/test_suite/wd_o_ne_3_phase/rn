@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+do_one inlist_wd_o_ne_3_phase_header final.mod
+
