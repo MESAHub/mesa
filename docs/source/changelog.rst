@@ -10,6 +10,8 @@ Changes in r26.4.1
 
 Important bug fix for ``r25.12.1`` raised by Jake B. Hassan: the colors module could select atmosphere metallicity from ``Zbase`` instead of photospheric ``[M/H]``. This could return solar-metallicity colors and SEDs for non-solar models. See :ref:`the known bugs entry <colors_zbase_bug>` and `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_. We recommend that users using the new color module upgrade to this release.
 
+Important bug fix for ``r24.03.1``, ``r24.08.1``, and ``r25.12.1`` identified by Haakon Dahle: a bug in the reverse reaction rates module, introduced in ``r24.03.1``, used an incorrect mass exponent factor in some reverse detailed-balance rates. See :ref:`the known bugs entry <reverse_rate_mass_exponent_bug>`, `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_, and `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. Users who rely on reverse reaclib rates should update to this release, or refer to the known bugs page for directions on how to fix it.
+
 .. _Backwards-incompatible changes r26.4.1:
 
 Backwards-incompatible changes
@@ -83,6 +85,12 @@ Colors
 - Stella has been updated to work with the new colors module interface.
 - The centered finite difference approximations used in colors Hermite interpolation were improved to support non-uniform grids.
 - Active colors bolometric and photometry calculations now use Simpson integration instead of the old Romberg path.
+
+Rates
+~~~~~
+
+- Fixed a bug introduced in ``r24.03.1`` in the reverse reaction rates module that used an incorrect mass exponent factor in some reverse detailed-balance rates. This fixes an issue in ``r24.03.1``, ``r24.08.1``, and ``r25.12.1``. See `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_ and `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_.
+- Added a rates test covering representative reverse-rate cases with different ``Ni`` and ``No``.
 
 Other
 ~~~~~
