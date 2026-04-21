@@ -405,12 +405,14 @@
 
         ! Convert input mass fraction to number fraction, assuming C/O mixture
         xo = (Xin/16d0)/(Xin/16d0 + (1d0 - Xin)/12d0)
+
         a0 = 0d0
         a1 = -0.311540d0
         a2 = 2.114743d0
         a3 = -1.661095d0
         a4 = -1.406005d0
         a5 = 1.263897d0
+
         dxo = &
              a0 + &
              a1*xo + &
@@ -418,9 +420,12 @@
              a3*xo*xo*xo + &
              a4*xo*xo*xo*xo + &
              a5*xo*xo*xo*xo*xo
+
         xo = xo + dxo
+
         ! Convert back to mass fraction
         Xnew = 16d0*xo/(16d0*xo + 12d0*(1d0-xo))
+
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
 
