@@ -28,6 +28,7 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
+MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
 .. _Bug Fixes main:
 
