@@ -55,14 +55,14 @@
       end subroutine do_phase_separation
 
       subroutine separate_mix_and_heat(s, dt, components, ierr)
-         use chem_def, only: ic12, io16, ine20, ine22, ina23, img24
+         use chem_def, only: ic12, io16, ine20, ine22
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
          integer, intent(out) :: ierr
          real(dp) :: XNe20, XNe22, XO, XC, pad
-         integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20, net_ine22, net_ina23, net_img24
+         integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20, net_ine22
          logical :: save_Skye_use_ion_offsets
 
          ! Set phase separation mixing mass negative at beginning of phase separation
@@ -78,8 +78,6 @@
          net_io16 = s% net_iso(io16)
          net_ine20 = s% net_iso(ine20)
          net_ine22 = s% net_iso(ine22)
-         net_ina23 = s% net_iso(ina23)
-         net_img24 = s% net_iso(img24)
 
          ! Find zone of phase transition from liquid to solid
          k_bound = -1
