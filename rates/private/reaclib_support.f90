@@ -211,7 +211,8 @@
 
             ! log(prefactor of reverse_ratio)
             tmp = product(mass(1:Ni))/product(mass(Ni+1:Nt))
-            rates% inverse_coefficients(1,i) = pow(tmp,1.5d0*(Ni-No))*(product(g(1:Ni))/product(g(Ni+1:Nt)))
+            ! The reactant/product mass ratio always enters with a fixed 3/2 power.
+            rates% inverse_coefficients(1,i) = pow(tmp,1.5d0)*(product(g(1:Ni))/product(g(Ni+1:Nt)))
 
             ! -Q/(kB*10**9)
             sum1 = sum(winvn% binding_energy(ps(1:Ni)))
@@ -220,10 +221,9 @@
 
             ! see equation 21 in Reichert et al. 2023 (https://doi.org/10.3847/1538-4365/acf033)
             ! delta_reactants/delta_products is handled in net.
-            ! fac == (mu * kb * T / (2 * pi * hbar^2))^3/2 term with out a T^3/2.
-            ! fac shows up as fac^(Ni-No) in rates% inverse_coefficients(1,i)
-            ! so rates% inverse_coefficients(1,i)  contains terms for
-            ! fac^(n) == fac^(Ni-No), where n = Ni - No.
+            ! fac == (mu * kb * T / (2 * pi * hbar^2))^3/2 term without a T^3/2.
+            ! The n-dependent phase-space factor enters as fac^(Ni-No), where
+            ! n = Ni - No. The mass ratio above remains a separate fixed 3/2 term.
 
             ! The T makes its way back into our expression inside
             ! the subroutine compute_some_inverse_lambdas, in reaclib_eval.f90.
