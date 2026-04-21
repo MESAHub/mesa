@@ -794,7 +794,7 @@
            if(.not. s% calculate_Brunt_B) then
               stop "phase separation requires s% calculate_Brunt_B = .true."
            end if
-           call do_brunt_B(s, kc_t, kc_b, ierr) ! for unsmoothed_brunt_B
+           call do_brunt_B(s, kc_t, kc_b, ierr)  ! for unsmoothed_brunt_B
            if (ierr /= 0) then
               write(*,*) 'phase_separation: error from call to do_brunt_B'
               stop
@@ -810,9 +810,7 @@
         if (ierr /= 0) then
            write(*,*) 'phase_separation: failed in call to set_mlt_vars during update_model_'
            stop
-        endif
-
-        ! Finish
+        end if
 
         return
 
