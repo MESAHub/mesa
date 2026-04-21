@@ -42,11 +42,11 @@
 
          ! 'CO' or 'ONe' will implement 2-species phase separation, for 'ONe' 22Ne is included
          if(s% phase_separation_option == 'CO') then
-            call do_2component_phase_separation(s, dt, 'CO', ierr)
+            call separate_mix_and_heat(s, dt, 'CO', ierr)
          else if(s% phase_separation_option == 'ONe') then
-            call do_2component_phase_separation(s, dt, 'ONe', ierr)
+            call separate_mix_and_heat(s, dt, 'ONe', ierr)
          else if(s% phase_separation_option == '3c') then
-            call do_2component_phase_separation(s, dt, '3c', ierr)
+            call separate_mix_and_heat(s, dt, '3c', ierr)
             call smooth_eps_phase_sep(s, dt, ierr)
          else
             write(*,*) 'invalid phase_separation_option'
@@ -54,7 +54,7 @@
          end if
       end subroutine do_phase_separation
 
-      subroutine do_2component_phase_separation(s, dt, components, ierr)
+      subroutine separate_mix_and_heat(s, dt, components, ierr)
          use chem_def, only: ic12, io16, ine20, ine22, ina23, img24
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
@@ -155,7 +155,7 @@
          end if
 
          ierr = 0
-      end subroutine do_2component_phase_separation
+      end subroutine separate_mix_and_heat
 
       subroutine move_one_zone_for_2comp(s,k,components)
         use chem_def, only: ic12, io16, ine20, ine22
