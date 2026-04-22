@@ -212,6 +212,8 @@
             ! log(prefactor of reverse_ratio)
             tmp = product(mass(1:Ni))/product(mass(Ni+1:Nt))
             ! The reactant/product mass ratio always enters with a fixed 3/2 power.
+            ! This follows standard detailed-balance derivations such as
+            ! Fowler et al. 1967 and Smith Clark et al. 2023 Appendix B.
             rates% inverse_coefficients(1,i) = pow(tmp,1.5d0)*(product(g(1:Ni))/product(g(Ni+1:Nt)))
 
             ! -Q/(kB*10**9)
@@ -219,7 +221,10 @@
             sum2 = sum(winvn% binding_energy(ps(Ni+1:Nt)))
             rates% inverse_coefficients(2,i) = (sum1-sum2)*conv/kB/1d9
 
-            ! see equation 21 in Reichert et al. 2023 (https://doi.org/10.3847/1538-4365/acf033)
+            ! Reichert et al. 2023 Eq. 21 is the source for the fac^(Ni-No) term,
+            ! but the fixed 3/2 mass exponent above follows Fowler et al. 1967 and
+            ! Smith Clark et al. 2023 Appendix B. The current WinNet implementation
+            ! also uses the fixed 3/2 mass exponent.
             ! delta_reactants/delta_products is handled in net.
             ! fac == (mu * kb * T / (2 * pi * hbar^2))^3/2 term without a T^3/2.
             ! The n-dependent phase-space factor enters as fac^(Ni-No), where
