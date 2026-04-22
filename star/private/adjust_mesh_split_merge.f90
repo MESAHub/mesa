@@ -1175,11 +1175,9 @@
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
 
-         if (i == 1) then
-            s% mlt_vc(ip) = s% mlt_vc(i)
-         else
-            s% mlt_vc(ip) = (mlt_vcL*dML + mlt_vcR*dMR)/dM
-         end if
+         ! mlt_vc is face-based, so a split creates a new interior face value here.
+         ! Interpolate using the same left/right orientation as tau(ip).
+         s% mlt_vc(ip) = mlt_vcR + (mlt_vcL - mlt_vcR)*dMR/dM
 
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then
@@ -1242,7 +1240,6 @@
          s% lnT(ip) = s% lnT(i)
          s% T(ip) = s% T(i)
          s% D_mix(ip) = s% D_mix(i)
-         s% mlt_vc(ip) = s% mlt_vc(i)
          s% csound(ip) = s% csound(i)
          s% opacity(ip) = s% opacity(i)
          if (s% RTI_flag) s% alpha_RTI(ip) = s% alpha_RTI(i)

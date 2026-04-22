@@ -98,6 +98,7 @@ Other
 - Incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
 - Kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
 - Fixed a bug in ``star/private/timestep.f90`` where the ``delta_lg_XNe_cntr`` and ``delta_lg_XSi_cntr`` timestep controls were incorrectly checking the central ``o16`` abundance instead of ``ne20`` and ``si28``. See `gh-963 <https://github.com/MESAHub/mesa/pull/963>`_.
+- Fixed a bug in ``split_merge_amr`` where the convective velocity ``mlt_vc`` was not being interpolated correctly during mesh splitting, see `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. 
 
 Changes in r25.12.1
 ===================
