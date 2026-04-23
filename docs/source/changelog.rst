@@ -10,6 +10,8 @@ Changes in r26.4.1
 
 Important bug fix for ``r25.12.1`` raised by Jake B. Hassan: the colors module could select atmosphere metallicity from ``Zbase`` instead of photospheric ``[M/H]``. This could return solar-metallicity colors and SEDs for non-solar models. See :ref:`the known bugs entry <colors_zbase_bug>` and `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_. We recommend that users using the new color module upgrade to this release.
 
+Important bug fix for ``r24.08.1`` and ``r25.12.1`` identified by Haakon Andresen: a bug in the reverse reaction rates module, introduced in ``r24.08.1``, used an incorrect mass exponent factor in some reverse detailed-balance rates. This is most relevant at higher temperatures in excess of ``2 GK`` during advanced burning stages, when reverse detailed-balance rates become important. See :ref:`the known bugs entry <reverse_rate_mass_exponent_bug>`, `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_, and `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. We recommend that all users affected by this issue apply the fix or update to this release.
+
 .. _Backwards-incompatible changes r26.4.1:
 
 Backwards-incompatible changes
@@ -84,6 +86,11 @@ Colors
 - The centered finite difference approximations used in colors Hermite interpolation were improved to support non-uniform grids.
 - Active colors bolometric and photometry calculations now use Simpson integration instead of the old Romberg path.
 
+Rates
+~~~~~
+
+- Fixed a bug introduced in ``r24.08.1`` in the reverse reaction rates module that used an incorrect mass exponent factor in some reverse detailed-balance rates. This fixes an issue in ``r24.08.1`` and ``r25.12.1``. See `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_ and `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_.
+
 Other
 ~~~~~
 
@@ -91,6 +98,7 @@ Other
 - Incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
 - Kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
 - Fixed a bug in ``star/private/timestep.f90`` where the ``delta_lg_XNe_cntr`` and ``delta_lg_XSi_cntr`` timestep controls were incorrectly checking the central ``o16`` abundance instead of ``ne20`` and ``si28``. See `gh-963 <https://github.com/MESAHub/mesa/pull/963>`_.
+- Fixed a bug in ``split_merge_amr`` where the convective velocity ``mlt_vc`` was not being interpolated correctly during mesh splitting, see `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. 
 
 Changes in r25.12.1
 ===================

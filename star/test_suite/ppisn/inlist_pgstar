@@ -1,6 +1,6 @@
 
 &pgstar
-   pgstar_interval = 1
+   pgstar_interval = 10
    !pause_flag = .true.
 
    pgstar_age_disp = 2.5
@@ -48,6 +48,8 @@
    Grid2_txt_scale_factor(5) = 0.65 ! multiply txt_scale for subplot by this
    Kipp_title = ''
    Kipp_show_mass_boundaries = .false.
+   Kipp_show_luminosities = .true.
+   Kipp_luminosities_line_weight = 8
 
    Grid2_plot_name(6) = 'History_Panels1'
    Grid2_plot_row(6) = 6 ! number from 1 at top
@@ -159,7 +161,8 @@
 
    Profile_Panels1_title = ''
 
-   Profile_Panels1_xaxis_name = 'mass'
+   Profile_Panels1_xaxis_name = 'logtau'
+   Profile_Panels1_xaxis_reversed = .true.
 
    Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
    Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
