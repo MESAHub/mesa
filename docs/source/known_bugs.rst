@@ -26,6 +26,17 @@ This is fixed in ``r26.4.1``. Update to ``r26.4.1`` or newer.
 
 See `gh-938 <https://github.com/MESAHub/mesa/issues/938>`_.
 
+.. _reverse_rate_mass_exponent_bug:
+
+Rates: incorrect mass exponent in reverse detailed balance
+----------------------------------------------------------
+
+Versions ``r24.08.1`` and ``r25.12.1`` could use an incorrect exponent on the reactant/product mass ratio when computing reverse rates from detailed balance in ``rates/private/reaclib_support.f90``. The mass ratio should always enter as ``(m_in/m_out)^(3/2)``. This is most relevant at higher temperatures in excess of ``2 GK`` during advanced burning stages, when reverse detailed-balance rates become important.
+
+This affects reactions with ``Ni-No`` not equal to 1, including common ``Ni-No = 0`` cases and photodisintegration cases. In practice, common ``2 <-> 2`` exchange reactions and ``3 <-> 1`` reverse rates are affected. Standard ``2 <-> 1`` capture and photo pairs are not changed by this specific exponent bug.
+
+This is fixed in ``r26.4.1``. Update to ``r26.4.1`` or newer. Users who need the patch directly can also refer to `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. See also `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_.
+
 r23.05.1
 ========
 
