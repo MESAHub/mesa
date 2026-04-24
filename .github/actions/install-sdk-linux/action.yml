@@ -1,0 +1,45 @@
+---
+name: 'install-sdk-linux'
+description: 'Download and unpack the Linux MESA SDK and its required dependencies'
+
+inputs:
+  sdk:
+    description: 'The version of the MESA SDK to install'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install wget binutils make perl libx11-6 libx11-dev zlib1g zlib1g-dev tcsh
+        sudo apt-get -y autoremove
+        sudo apt-get clean
+      shell: bash
+
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        path: |
+          mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
+        key: linux-${{inputs.sdk}}
+
+    - name: Download SDK '${{ inputs.sdk }}'
+      shell: bash
+      if: ${{ (steps.cache.outputs.cache-hit != 'true') }}
+      run: |
+        declare -A version
+        version[26.3.2]="https://zenodo.org/records/19210930"
+
+        curl -O ${version[${{inputs.sdk}}]}/files/mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
+
+    - name: Unpack SDK
+      run: |
+        tar xvf mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
+      shell: bash
+
+    - name: Set SDK environment
+      run: |
+        echo "MESASDK_ROOT=$(readlink -f mesasdk-${{ inputs.sdk }})" >> $GITHUB_ENV
+      shell: bash

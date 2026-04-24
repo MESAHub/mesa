@@ -4,9 +4,6 @@ Changelog
 
 .. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) be installed.
 
-.. note:: This section describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-
 Changes in main
 ===============
 
@@ -34,12 +31,103 @@ New Features
 Bug Fixes
 ---------
 
-stella install was broken in the previous release version and is now patched
-
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
+Changes in r26.4.1
+===================
 
+Important bug fix for ``r25.12.1`` raised by Jake B. Hassan: the colors module could select atmosphere metallicity from ``Zbase`` instead of photospheric ``[M/H]``. This could return solar-metallicity colors and SEDs for non-solar models. See :ref:`the known bugs entry <colors_zbase_bug>` and `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_. We recommend that users using the new color module upgrade to this release.
+
+Important bug fix for ``r24.08.1`` and ``r25.12.1`` identified by Haakon Andresen: a bug in the reverse reaction rates module, introduced in ``r24.08.1``, used an incorrect mass exponent factor in some reverse detailed-balance rates. This is most relevant at higher temperatures in excess of ``2 GK`` during advanced burning stages, when reverse detailed-balance rates become important. See :ref:`the known bugs entry <reverse_rate_mass_exponent_bug>`, `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_, and `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. We recommend that all users affected by this issue apply the fix or update to this release.
+
+.. _Backwards-incompatible changes r26.4.1:
+
+Backwards-incompatible changes
+------------------------------
+
+Colors
+~~~~~~
+
+- Colors data has moved from ``colors/data`` to ``data/colors_data``.
+- Colors paths now support repo-relative inputs such as ``data/colors_data/...``.
+
+.. _New Features r26.4.1:
+
+New Features
+------------
+
+Colors
+~~~~~~
+
+- Added ``Interp_rad`` to colors history output.
+- Added ``colors/test`` for colors unit tests.
+
+TDC
+~~~
+
+``TDC`` now contains new controls and physics bringing it into closer alignment with the Radial Stellar Pulsation module ``RSP``:
+
+-  ``TDC_alpha_M`` : The prefactor on the term accounting for hydrodynamic eddy viscous dissipation. This control is analogous to ``RSP_alfam``.
+-  ``TDC_alpha_C`` : The prefactor on the convective flux. This control is analogous to ``RSP_alfac``
+-  ``TDC_alpha_S`` : The prefactor on the convective source term, S . This control is analogous to ``RSP_alfas``
+-  ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation`` : A more numerically stable stencil for ``TDC_alpha_M`` in MESA's momentum equation.
+-  ``TDC_include_eturb_in_energy_equation`` : The option to include turbulent energy and eddy viscosity into MESA's energy equation.
+-  ``include_mlt_corr_to_TDC`` : The option to remove the Gamma/(1+Gamma) mlt correction to TDC, yielding the pure (Kuhfuß 1986) local convection model.
+-  ``use_rsp_form_of_scale_height`` : The option to calculate scale height by averaging P/rho onto faces together, similar to  ``RSP``.
+-  ``TDC_num_innermost_cells_forced_nonturbulent`` : An optional control for forcing central zones to be radiative.
+-  ``TDC_num_outermost_cells_forced_nonturbulent`` : An optional control for forcing surface zones to be radiative.
+
+``star`` now contains optional controls allowing one to remesh an envelope model similar to ``RSP``, by calling the public ``remesh_for_TDC_pulsation`` function contained within ``$MESA_DIR/star/public/star_lib.f90`` :
+
+-  ``TDC_hydro_nz`` : Analogous to ``RSP_nz``
+-  ``TDC_hydro_nz_outer`` : Analogous to ``RSP_nz_outer``
+-  ``TDC_hydro_T_anchor`` : Analogous to ``RSP_T_anchor``
+-  ``TDC_hydro_dq_1_factor`` : Analogous to ``RSP_dq_1_factor``
+-  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantites are computed from simple averages or mass weighted averaging.
+-  ``remesh_for_TDC_pulsations_log_core_zoning`` : This option allows log zoning in the interior as opposed to a power law ( similar to ``RSP``).
+
+A new optional boundary condition ``use_RSP_L_eqn_outer_BC`` is available.
+
+Further details on the changes to ``TDC`` can be found in `Farag et al. (2026) <https://arxiv.org/abs/2603.15766>`_
+
+Other
+~~~~~
+
+Various documentation pages have received updates, fixing typos, cleaning up formatting, and fixing broken links. Notably, a description of the default nuclear network and its dynamic nature have been added.
+
+Support for SDK version 26.3.2.
+
+
+.. _Bug Fixes r26.4.1:
+
+Bug Fixes
+---------
+
+Colors
+~~~~~~
+
+- Fixed wrong scale used in AB zero-point.
+- Fixed colors atmosphere metallicity selection to use photospheric ``[M/H]`` from ``Z/X`` instead of ``Zbase``. See `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_.
+- Added a new control ``z_over_x_ref`` for the reference ``Z/X`` used in the ``[M/H]`` calculation.
+- ``instrument``, ``stellar_atm``, and ``vega_sed`` now support relative paths.
+- Stella has been updated to work with the new colors module interface.
+- The centered finite difference approximations used in colors Hermite interpolation were improved to support non-uniform grids.
+- Active colors bolometric and photometry calculations now use Simpson integration instead of the old Romberg path.
+
+Rates
+~~~~~
+
+- Fixed a bug introduced in ``r24.08.1`` in the reverse reaction rates module that used an incorrect mass exponent factor in some reverse detailed-balance rates. This fixes an issue in ``r24.08.1`` and ``r25.12.1``. See `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_ and `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_.
+
+Other
+~~~~~
+
+- Realigned first row of headers in terminal output after changing ``lg_Lnuc`` to ``lg_Lnuc_tot``
+- Incorrect EoS blending near some FreeEoS edges `(gh-911) <https://github.com/MESAHub/mesa/issues/911>`_.
+- Kinetic energy calculations did not take ``mass_correction`` fully into account `(gh-913) <https://github.com/MESAHub/mesa/issues/913>`_.
+- Fixed a bug in ``star/private/timestep.f90`` where the ``delta_lg_XNe_cntr`` and ``delta_lg_XSi_cntr`` timestep controls were incorrectly checking the central ``o16`` abundance instead of ``ne20`` and ``si28``. See `gh-963 <https://github.com/MESAHub/mesa/pull/963>`_.
+- Fixed a bug in ``split_merge_amr`` where the convective velocity ``mlt_vc`` was not being interpolated correctly during mesh splitting, see `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. 
 
 Changes in r25.12.1
 ===================

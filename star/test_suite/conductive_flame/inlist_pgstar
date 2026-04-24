@@ -92,7 +92,7 @@
 
    ! file output
    Grid1_file_flag = .true.
-   Grid1_file_dir = 'png'
+   Grid1_file_dir = 'pgstar_out'
    Grid1_file_prefix = 'grid1'
    Grid1_file_interval = 10000 ! output when mod(model_number,Grid1_file_interval)==0
    Grid1_file_width = 16 ! negative means use same value as for window

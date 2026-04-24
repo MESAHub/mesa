@@ -10,7 +10,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 
 * Part 1 (``inlist_make_brown_dwarf``) creates a 1.05 Mjup, Z=1e-4 metallicity model, using the less frequently deployed ``create_initial_model`` capability, and evolves the brown drawf model for 20 billion years.
 
-.. image:: ../../../star/test_suite/make_brown_dwarf/docs/grid1_000237.svg
+.. image:: ../../../star/test_suite/make_brown_dwarf/docs/grid1_000238.svg
    :width: 100%
 
 pgstar commands used for the plots above:
@@ -21,4 +21,4 @@ pgstar commands used for the plots above:
 
 Last-Updated: 17Jun2021 (MESA e2acbc2) by fxt.
 
-Last-Run: 06Oct2025 (MESA 367d7a25) by pmocz on C916PXT6XW in 572 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 292 seconds using 8 threads.

@@ -10,26 +10,23 @@ inputs:
     default: '26.3.2'
 
 
+
 runs:
 
   using: 'composite'
 
   steps:
-    - name: Install dependencies Linux
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get -y update
-        sudo apt-get -y install wget binutils make perl libx11-6 libx11-dev zlib1g zlib1g-dev tcsh
-        sudo apt-get -y autoremove
-        sudo apt-get clean
-      shell: bash
+    - name: Install SDK Linux
+      if: ${{ (runner.os == 'Linux') }}
+      uses: ./.github/actions/install-sdk-linux
+      with:
+        sdk: ${{inputs.sdk}}
 
-    - name: Install dependencies MacOS
-      if: runner.os == 'macOS'
-      run: |
-        brew install --cask xquartz
-        brew install gnu-sed
-      shell: bash
+    - name: Install SDK MacOS
+      if: ${{ (runner.os == 'Macos') }}
+      uses: ./.github/actions/install-sdk-macos
+      with:
+        sdk: ${{inputs.sdk}}
 
     - name: Create LFS file list
       run: |
@@ -53,44 +50,9 @@ runs:
       shell: bash
       if: steps.lfs-cache.outputs.cache-hit == 'true'
 
-    - uses: actions/cache@v4
-      id: cache
-      with:
-        path: |
-          mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
-        key: ${{ runner.os }}-${{inputs.sdk}}
-
-    - name: Get SDK ${{ runner.os }} '26.3.2'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '26.3.2') && (runner.os == 'Linux') }}
-      run: |
-        wget -q https://zenodo.org/records/19210930/files/mesasdk-x86_64-linux-26.3.2.tar.gz
-      shell: bash
-
-    - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
-      if: runner.os == 'Linux'
-      run: |
-        tar xvf mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
-        ln -s mesasdk-${{inputs.sdk}} mesasdk
-      shell: bash
-
-    - name: Get SDK ${{ runner.os }} '26.3.2'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '26.3.2') && (runner.os == 'macOS') }}
-      run: |
-        wget -q https://zenodo.org/records/19210744/files/mesasdk-aarch64-macos-26.3.2.pkg
-      shell: bash
-
-    - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
-      if: runner.os == 'macOS'
-      run: |
-        sudo installer -pkg mesasdk-aarch64-macos-26.3.2.pkg -target /
-        ln -s /Applications/mesasdk mesasdk
-      shell: bash
-
     - name: Set MESA environment variables
       shell: bash
       run: |
-        MESASDK_ROOT=$(readlink -f mesasdk)
-        echo "MESASDK_ROOT=$MESASDK_ROOT" >> $GITHUB_ENV
         echo "$MESASDK_ROOT/bin" >> $GITHUB_PATH
         echo "MESA_DIR=$PWD" >> $GITHUB_ENV
 
