@@ -37,7 +37,7 @@ Bug Fixes
 Changes in r26.4.1
 ===================
 
-Important bug fix for ``r25.12.1`` raised by Jake B. Hassan: the colors module could select atmosphere metallicity from ``Zbase`` instead of photospheric ``[M/H]``. This could return solar-metallicity colors and SEDs for non-solar models. See :ref:`the known bugs entry <colors_zbase_bug>` and `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_.
+Important bug fix for ``r25.12.1`` raised by Jake B. Hassan: the colors module could select atmosphere metallicity from ``Zbase`` instead of photospheric ``[M/H]``. This could return solar-metallicity colors and SEDs for non-solar models. See :ref:`the known bugs entry <colors_zbase_bug>` and `gh-939 <https://github.com/MESAHub/mesa/pull/939>`_. We recommend that users using the new color module upgrade to this release.
 
 .. _Backwards-incompatible changes r26.4.1:
 
@@ -60,6 +60,9 @@ Colors
 
 - Added ``Interp_rad`` to colors history output.
 - Added ``colors/test`` for colors unit tests.
+
+TDC
+~~~
 
 ``TDC`` now contains new controls and physics bringing it into closer alignment with the Radial Stellar Pulsation module ``RSP``:
 
@@ -85,6 +88,9 @@ Colors
 A new optional boundary condition ``use_RSP_L_eqn_outer_BC`` is available.
 
 Further details on the changes to ``TDC`` can be found in `Farag et al. (2026) <https://arxiv.org/abs/2603.15766>`_
+
+Other
+~~~~~
 
 Various documentation pages have received updates, fixing typos, cleaning up formatting, and fixing broken links. Notably, a description of the default nuclear network and its dynamic nature have been added.
 
