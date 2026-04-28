@@ -171,7 +171,8 @@ contains
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
             Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
-            tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), TDC_arnett_growth_target_mlt, energy, ierr)
+            tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), &
+            .false., 0d0, 0d0, TDC_arnett_growth_target_mlt, energy, ierr)
          write (*, '(a)') 'Mode: ' // trim(tdc_mode_names(mode_i))
          write (*, 1) 'Y, conv_vel_start, conv_vel, dt', Y_face%val, conv_vel_start, conv_vel%val, dt
       end do
@@ -240,7 +241,8 @@ contains
                mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
                scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
                Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
-               tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), TDC_arnett_growth_target_mlt, energy, ierr)
+               tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), &
+               .false., 0d0, 0d0, TDC_arnett_growth_target_mlt, energy, ierr)
 
             write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
             if (report) stop

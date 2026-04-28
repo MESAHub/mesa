@@ -773,7 +773,8 @@ contains
          case_data%T, case_data%rho, case_data%dV, case_data%Cp, case_data%opacity, case_data%scale_height, &
          case_data%gradL, case_data%grada, conv_vel, D, Y_face, gradT, tdc_num_iters, case_data%max_conv_vel, &
          case_data%Eq_div_w, case_data%grav, mode%include_mlt_correction, case_data%TDC_alpha_C, case_data%TDC_alpha_S, &
-         case_data%use_TDC_enthalpy_flux_limiter, mode%use_arnett, mode%use_acceleration_limit, mode%use_Af_split, mode%growth_target, &
+         case_data%use_TDC_enthalpy_flux_limiter, mode%use_arnett, mode%use_acceleration_limit, mode%use_Af_split, &
+         .false., 0d0, 0d0, mode%growth_target, &
          case_data%energy, ierr)
    end subroutine call_tdc
 

@@ -669,7 +669,7 @@ Convection model: tdc_with_acceleration_limit
       tau_phys[s]   5.1712339439846779E+04
 
 
-Carbon Burning
+Carbon Burning Growth
 
       T[K] =   8.9448446840612292E+08 rho[g/cm^3] =   1.6585817351580659E+05
       P[dyn/cm^2] =   8.7371150320499226E+21 L[erg/s] =   3.9705227734938969E+39
