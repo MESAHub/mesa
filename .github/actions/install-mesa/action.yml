@@ -58,7 +58,10 @@ runs:
       with:
         path: |
           mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
-        key: ${{ runner.os }}-${{inputs.sdk}}
+          mesasdk-aarch64-macos-${{inputs.sdk}}.pkg
+        # If this key changes, run the workflow once to seed the new caches and
+        # again to verify cache-hit behavior.
+        key: ${{ runner.os }}-${{inputs.sdk}}${{ env.DYNAMIC && format('-{0}', env.DYNAMIC) || '' }}
 
     - name: Get SDK ${{ runner.os }} '26.3.2'
       if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '26.3.2') && (runner.os == 'Linux') }}
