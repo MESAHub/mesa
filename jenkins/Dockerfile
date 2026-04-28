@@ -18,7 +18,7 @@ RUN apt-get update && \
     apt-get autoremove --purge -y && \
     apt-get autoclean -y && \
     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-RUN curl -L http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-25.12.1.tar.gz | \
+RUN curl -L http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-26.3.2.tar.gz | \
     tar xzf - -C /opt/
 ENV MESASDK_ROOT=/opt/mesasdk
 RUN bash $MESASDK_ROOT/bin/mesasdk_init.sh
