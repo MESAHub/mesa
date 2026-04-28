@@ -58,6 +58,7 @@ runs:
       with:
         path: |
           mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
+          mesasdk-aarch64-macos-${{inputs.sdk}}.pkg
         key: ${{ runner.os }}-${{inputs.sdk}}-${{ env.DYNAMIC }}
 
     - name: Get SDK ${{ runner.os }} '26.3.2'
