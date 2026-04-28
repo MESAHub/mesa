@@ -408,7 +408,7 @@
          type(auto_diff_real_star_order1), intent(out) :: dlnPdm_qhse, Ppoint
          integer, intent(out) :: ierr
 
-         real(dp) :: alfa
+         real(dp) :: alfa, P_theta
          type(auto_diff_real_star_order1) :: grav, area, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1, mlt_Ptrb_face
          type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
          include 'formats'
@@ -421,6 +421,14 @@
          ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
          call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
 
+         if (s% using_velocity_time_centering .and. &
+               s% include_P_in_velocity_time_centering .and. &
+               s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+            P_theta = s% P_theta_for_velocity_time_centering
+         else
+            P_theta = 1d0
+         end if
+
          if (s% use_face_values_eos_and_kap_mlt_tdc) then
             if (s% have_mlt_tdc_face_state(k)) then
                rho_face = s% mlt_tdc_rho_face_ad(k)
@@ -431,8 +439,8 @@
                if (ierr /= 0) return
                Ppoint = P_face
             end if
-            if (s% using_velocity_time_centering) then
-               Ppoint = 0.5d0*(Ppoint + s% mlt_tdc_P_face_start(k))
+            if (P_theta /= 1d0) then
+               Ppoint = P_theta*Ppoint + (1d0 - P_theta)*s% mlt_tdc_P_face_start(k)
             end if
             if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
                .and. s% mlt_Pturb_factor > 0d0) then
@@ -461,14 +469,14 @@
             P00 = wrap_Peos_00(s,k)
 
             ! mlt Pturb doesn't support time centering yet.
-            if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
+            if (P_theta /= 1d0) P00 = P_theta*P00 + (1d0 - P_theta)*s% Peos_start(k)
 
             if (k == 1) then
                Pm1 = 0d0
                Ppoint = P00 + mlt_Ptrb00
             else
                Pm1 = wrap_Peos_m1(s,k)
-               if (s% using_velocity_time_centering) Pm1 = 0.5d0*(Pm1 + s% Peos_start(k-1)) ! pm1 wasn't time centered until now
+               if (P_theta /= 1d0) Pm1 = P_theta*Pm1 + (1d0 - P_theta)*s% Peos_start(k-1)
                Pm1 = Pm1 + mlt_Ptrbm1 ! include mlt Ptrb in k-1
                P00 = P00 + mlt_Ptrb00 ! include mlt Ptrb in k
                alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))

@@ -8,7 +8,6 @@
          logical :: use_TDC_acceleration_limit
          logical :: use_TDC_Af_split
          logical :: use_TDC_enhanced_dissipation
-         logical :: use_conservative_L_remesh
          logical :: use_face_values_eos_and_kap_mlt_tdc
          integer :: TDC_arnett_growth_target
          logical :: include_mlt_in_velocity_time_centering

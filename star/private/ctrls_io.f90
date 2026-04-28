@@ -114,7 +114,6 @@
     include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, use_TDC_arnett_velocity_closure, &
     TDC_arnett_growth_target, use_TDC_acceleration_limit, use_TDC_Af_split, &
     use_TDC_enhanced_dissipation, TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor, &
-    use_conservative_L_remesh, &
     use_face_values_eos_and_kap_mlt_tdc, &
     TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
@@ -2109,7 +2108,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_TDC_enhanced_dissipation = use_TDC_enhanced_dissipation
  s% TDC_enhanced_dissipation_c4 = TDC_enhanced_dissipation_c4
  s% TDC_enhanced_dissipation_v_floor = TDC_enhanced_dissipation_v_floor
- s% use_conservative_L_remesh = use_conservative_L_remesh
  s% use_face_values_eos_and_kap_mlt_tdc = use_face_values_eos_and_kap_mlt_tdc
  s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
@@ -3829,7 +3827,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_TDC_enhanced_dissipation = s% use_TDC_enhanced_dissipation
  TDC_enhanced_dissipation_c4 = s% TDC_enhanced_dissipation_c4
  TDC_enhanced_dissipation_v_floor = s% TDC_enhanced_dissipation_v_floor
- use_conservative_L_remesh = s% use_conservative_L_remesh
  use_face_values_eos_and_kap_mlt_tdc = s% use_face_values_eos_and_kap_mlt_tdc
  TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height

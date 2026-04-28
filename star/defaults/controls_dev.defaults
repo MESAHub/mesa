@@ -301,23 +301,6 @@
     TDC_enhanced_dissipation_v_floor = 1d0
 
 
-      ! use_conservative_L_remesh
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If use_conservative_L_remesh = .true., remesh luminosity by
-      ! conservatively remapping the cell-centered luminosity increment
-      ! dL/dq and then reconstructing face L from L_center.
-      !
-      ! This applies to both the standard mesh-adjust path and the
-      ! split-AMR path. The default behavior remains the legacy direct
-      ! interpolation/averaging of face L.
-      ! Default = .false. keeps the old behavior.
-
-      ! ::
-
-    use_conservative_L_remesh = .false.
-
-
       ! use_face_values_eos_and_kap_mlt_tdc
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
