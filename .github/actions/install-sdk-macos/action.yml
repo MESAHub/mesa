@@ -20,8 +20,8 @@ runs:
       id: cache
       with:
         path: |
-          mesasdk-aarch64-macos-${{inputs.sdk}}.tar.gz
-        key: macos-${{inputs.sdk}}
+          mesasdk-aarch64-macos-${{inputs.sdk}}.pkg
+        key: sdk-macos-${{inputs.sdk}}
 
     - name: Download SDK
       shell: bash
