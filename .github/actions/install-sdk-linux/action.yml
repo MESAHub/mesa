@@ -23,7 +23,7 @@ runs:
       with:
         path: |
           mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
-        key: linux-${{inputs.sdk}}
+        key: sdk-linux-${{inputs.sdk}}
 
     - name: Download SDK '${{ inputs.sdk }}'
       shell: bash
