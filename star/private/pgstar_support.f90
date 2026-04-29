@@ -742,24 +742,30 @@ contains
       ! use given if it isn't = 101
       use_given_xmin = abs(given_xmin + 101.0) > 1e-6
       if (xaxis_by == 'mass' .and. given_xmin < 0 .and. use_given_xmin) then
-         xmin = maxval(xvec(1:nz)) + given_xmin
+         xmin = maxval(xvec(1:nz), mask=.not. is_bad(xvec(1:nz))) + given_xmin
       else if (use_given_xmin) then
          xmin = given_xmin
       else if (xaxis_by == 'logxm' .or. xaxis_by == 'logxq') then
-         xmin = minval(xvec(2:nz))
+         xmin = minval(xvec(2:nz), mask=.not. is_bad(xvec(2:nz)))
       else
-         xmin = minval(xvec(1:nz))
+         xmin = minval(xvec(1:nz), mask=.not. is_bad(xvec(1:nz)))
       end if
 
       use_given_xmax = abs(given_xmax + 101.0) > 1e-6
       if (xaxis_by == 'mass' .and. given_xmax < 0 .and. use_given_xmax) then
-         xmax = maxval(xvec(1:nz)) + given_xmax
+         xmax = maxval(xvec(1:nz), mask=.not. is_bad(xvec(1:nz))) + given_xmax
       else if (use_given_xmax) then
          xmax = given_xmax
       else
-         xmax = maxval(xvec(1:nz))
+         xmax = maxval(xvec(1:nz), mask=.not. is_bad(xvec(1:nz)))
       end if
       dx = xmax - xmin
+
+      if (is_bad(dx)) then
+         xmax = given_xmax
+         xmin = given_xmin
+         dx = xmax - xmin
+      end if
 
       if (.not. use_given_xmin) xmin = xmin - margin * dx
       if (.not. use_given_xmax) xmax = xmax + margin * dx
@@ -854,16 +860,22 @@ contains
       if (use_given_ymin) then
          ymin = given_ymin
       else
-         ymin = minval(yvec(1:npts))
+         ymin = minval(yvec(1:npts), mask=.not. is_bad(yvec(1:npts)))
       end if
 
       use_given_ymax = abs(given_ymax + 101.0) > 1e-6
       if (use_given_ymax) then
          ymax = given_ymax
       else
-         ymax = maxval(yvec(1:npts))
+         ymax = maxval(yvec(1:npts), mask=.not. is_bad(yvec(1:npts)))
       end if
       dy = ymax - ymin
+
+      if (is_bad(dy)) then
+         ymax = given_ymax
+         ymin = given_ymin
+         dy = ymax - ymin
+      end if
 
       if (.not. use_given_ymin) ymin = ymin - ymargin * dy
       if (.not. use_given_ymax) ymax = ymax + ymargin * dy
