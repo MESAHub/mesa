@@ -365,7 +365,7 @@
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
-    retry_for_v_above_clight, &
+    report_max_infall_inside_fe_core, retry_for_v_above_clight, &
 
     ! hydro solver
     use_gold2_tolerances, gold2_solver_iters_timestep_limit, steps_before_use_gold2_tolerances, &
