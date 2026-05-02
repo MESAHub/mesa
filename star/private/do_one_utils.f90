@@ -1101,12 +1101,8 @@
          else if (s% fe_core_infall > s% fe_core_infall_limit) then
             if (abs(s% error_in_energy_conservation/s% total_energy_end) < &
                   s% hard_limit_for_rel_error_in_energy_conservation) then
-               do_check_limits = terminate
-               s% result_reason = result_reason_normal
-               s% termination_code = t_fe_core_infall_limit
-               write(*, '(/,a,/, 99e20.10)') &
-                  'stop because fe_core_infall > fe_core_infall_limit', &
-                  s% fe_core_infall, s% fe_core_infall_limit
+               call compare_to_target('fe_core_infall > fe_core_infall_limit', &
+               s% fe_core_infall, s% fe_core_infall_limit, t_fe_core_infall_limit)
             else
                write(*,2) 'rel_E_err too large for fe_core_infall termination', &
                   s% model_number, s% error_in_energy_conservation/abs(s% total_energy_end)
