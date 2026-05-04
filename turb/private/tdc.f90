@@ -47,17 +47,12 @@ contains
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   !! @param have_Y_face_guess If true, use Y_face_guess to try a small local positive-Y bracket.
-   !! @param Y_face_guess Candidate superadiabaticity for the local solve.
-   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr, &
-         have_Y_face_guess, Y_face_guess)
+   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
       type(tdc_info), intent(in) :: info
       real(dp), intent(in) :: scale
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
-      logical, intent(in), optional :: have_Y_face_guess
-      real(dp), intent(in), optional :: Y_face_guess
 
       logical :: Y_is_positive
       type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
@@ -100,10 +95,9 @@ contains
       ! Start down the chain of logic...
       if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
-         call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr, &
-            have_Y_face_guess, Y_face_guess)
-         if (ierr /= 0) return
+         call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
          Y = convert(Y_face)
+         if (ierr /= 0) return
          if (info%report) write(*,*) 'Y is positive, Y=',Y_face%val
       else
          if (info%report) write(*,*) 'Y is negative.'
@@ -216,7 +210,6 @@ contains
 
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
-      if (info%use_TDC_acceleration_limit) call apply_postsolve_TDC_acceleration_limit(info, Y, Af)
       Y_face = unconvert(Y)
       conv_vel = sqrt_2_div_3*unconvert(Af)
 
@@ -234,10 +227,7 @@ contains
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   !! @param have_Y_face_guess If true, use Y_face_guess to try a small local positive-Y bracket.
-   !! @param Y_face_guess Candidate superadiabaticity for the local solve.
-   subroutine bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr, &
-         have_Y_face_guess, Y_face_guess)
+   subroutine bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr)
       type(tdc_info), intent(in) :: info
       logical, intent(in) :: Y_is_positive
       real(dp), intent(in) :: scale
@@ -246,163 +236,117 @@ contains
       type(auto_diff_real_tdc), intent(out) :: Af
       integer, intent(out) :: tdc_num_iters
       integer, intent(out) :: ierr
-      logical, intent(in), optional :: have_Y_face_guess
-      real(dp), intent(in), optional :: Y_face_guess
 
-      type(auto_diff_real_tdc) :: Y, Z, Q, Qc, Q_lb, Q_ub, Z_new, correction, lower_bound_Z, upper_bound_Z, &
-         Z_seed, Z_seed_lb, Z_seed_ub
+      type(auto_diff_real_tdc) :: Y, Z, Q, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ
-      integer :: iter, line_iter, i_try, num_tries
-      logical :: converged, have_derivatives, corr_has_derivatives, use_seed, doing_seed, bad_seed_bracket
+      integer :: iter, line_iter
+      logical :: converged, have_derivatives, corr_has_derivatives
       real(dp), parameter :: correction_tolerance = 1d-13
       real(dp), parameter :: residual_tolerance = 1d-8
-      real(dp), parameter :: seed_bracket_half_width = 3d0
       integer, parameter :: max_iter = 200
       integer, parameter :: max_line_search_iter = 5
       include 'formats'
 
       ierr = 0
-      use_seed = .false.
-      if (Y_is_positive .and. present(have_Y_face_guess) .and. present(Y_face_guess)) then
-         if (have_Y_face_guess .and. .not. is_bad(Y_face_guess) .and. Y_face_guess > 0d0) then
-            Z_seed = log(Y_face_guess)
-            use_seed = .not. is_bad(Z_seed%val) .and. Z_seed%val >= Zlb%val .and. Z_seed%val <= Zub%val
+
+      ! We start by bisecting to find a narrow interval around the root.
+      lower_bound_Z = Zlb
+      upper_bound_Z = Zub
+
+      ! Perform bisection search.
+      call Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
+      if (ierr /= 0) return
+
+      ! Set up Z from bisection search
+      Z%d1val1 = 1d0  ! Set derivative dZ/dZ=1 for Newton iterations.
+      if (info%report) write(*,*) 'Z from bisection search', Z%val
+      if (info%report) write(*,*) 'lower_bound_Z, upper_bound_Z',lower_bound_Z%val,upper_bound_Z%val
+
+      ! Now we refine the solution with a Newton solve.
+      ! This also let's us pick up the derivative of the solution with respect to input parameters.
+
+      ! Initialize starting values for TDC Newton iterations.
+      dQdz = 0d0
+      converged = .false.
+      have_derivatives = .false.  ! Tracks if we've done at least one Newton iteration.
+                                 ! Need to do this before returning to endow Y with partials
+                                 ! with respect to the structure variables.
+      do iter = 1, max_iter
+         Y = set_Y(Y_is_positive, Z)
+         call compute_Q(info, Y, Q, Af)
+
+         if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
+            ! Can't exit on the first iteration, otherwise we have no derivative information.
+            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
+            converged = .true.
+            exit
          end if
-      end if
-      if (use_seed) then
-         Z_seed_lb = max(Zlb%val, Z_seed%val - seed_bracket_half_width)
-         Z_seed_ub = min(Zub%val, Z_seed%val + seed_bracket_half_width)
-      end if
 
-      num_tries = 1
-      if (use_seed) num_tries = 2
-
-      attempt_loop: do i_try = 1, num_tries
-         doing_seed = use_seed .and. i_try == 1
-
-         ! Try a small bracket around the Y_face guess, or
-         ! use the full interval if that does not bracket the current root.
-         ierr = 0
-         if (doing_seed) then
-            lower_bound_Z = Z_seed_lb
-            upper_bound_Z = Z_seed_ub
-            Y = set_Y(Y_is_positive, lower_bound_Z)
-            call compute_Q(info, Y, Q_lb, Af)
-            Y = set_Y(Y_is_positive, upper_bound_Z)
-            call compute_Q(info, Y, Q_ub, Af)
-            bad_seed_bracket = is_bad(Q_lb%val) .or. is_bad(Q_ub%val)
-            if (.not. bad_seed_bracket) bad_seed_bracket = Q_lb * Q_ub > 0d0
-            if (bad_seed_bracket) cycle attempt_loop
-            Z = Z_seed
-            if (info%report) write(*,*) 'Z from Y_face guess', Z%val
+         ! We use the fact that Q(Y) is monotonic to iteratively refined bounds on Q.
+         dQdZ = differentiate_1(Q)
+         if (Q > 0d0 .and. dQdZ < 0d0) then
+            lower_bound_Z = Z
+         else if (Q > 0d0 .and. dQdZ > 0d0) then
+            upper_bound_Z = Z
+         else if (Q < 0d0 .and. dQdZ < 0d0) then
+            upper_bound_Z = Z
          else
-            lower_bound_Z = Zlb
-            upper_bound_Z = Zub
-            call Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
-            if (ierr /= 0) return
-            if (info%report) write(*,*) 'Z from bisection search', Z%val
+            lower_bound_Z = Z
          end if
 
-         Z%d1val1 = 1d0  ! Set derivative dZ/dZ=1 for Newton iterations.
-         if (info%report) write(*,*) 'lower_bound_Z, upper_bound_Z',lower_bound_Z%val,upper_bound_Z%val
+         if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+            ierr = 1
+            exit
+         end if
 
-         ! Now we refine the solution with a Newton solve.
-         ! This also lets us pick up the derivative of the solution with respect to input parameters.
-         dQdz = 0d0
-         converged = .false.
-         have_derivatives = .false.  ! Tracks if we've done at least one Newton iteration.
-                                    ! Need to do this before returning to endow Y with partials
-                                    ! with respect to the structure variables.
-         do iter = 1, max_iter
-            Y = set_Y(Y_is_positive, Z)
-            call compute_Q(info, Y, Q, Af)
-            if (is_bad(Q%val)) then
-               ierr = 1
-               exit
-            end if
+         correction = -Q/dQdz
+         corr_has_derivatives = .true.
 
-            if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
-               ! Can't exit on the first iteration, otherwise we have no derivative information.
-               if (info%report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
+         ! Do a line search to avoid steps that are too big.
+         do line_iter=1,max_line_search_iter
+
+            if (abs(correction) < correction_tolerance .and. have_derivatives) then
+               ! Can't get much more precision than this.
                converged = .true.
                exit
             end if
 
-            ! We use the fact that Q(Y) is monotonic to iteratively refined bounds on Q.
-            dQdZ = differentiate_1(Q)
-            if (Q > 0d0 .and. dQdZ < 0d0) then
-               lower_bound_Z = Z
-            else if (Q > 0d0 .and. dQdZ > 0d0) then
-               upper_bound_Z = Z
-            else if (Q < 0d0 .and. dQdZ < 0d0) then
-               upper_bound_Z = Z
-            else
-               lower_bound_Z = Z
+            Z_new = Z + correction
+            if (corr_has_derivatives) then
+               have_derivatives = .true.
             end if
 
-            if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
-               ierr = 1
+            ! If the correction pushes the solution out of bounds then we know
+            ! that was a bad step. Bad steps are still in the same direction, they just
+            ! go too far, so we replace that result with one that's halfway to the relevant bound.
+            if (Z_new > upper_bound_Z) then
+               Z_new = (Z + upper_bound_Z) / 2d0
+            else if (Z_new < lower_bound_Z) then
+               Z_new = (Z + lower_bound_Z) / 2d0
+            end if
+
+            Y = set_Y(Y_is_positive,Z_new)
+
+            call compute_Q(info, Y, Qc, Af)
+
+            if (abs(Qc) < abs(Q)) then
                exit
+            else
+               correction = 0.5d0 * correction
             end if
-
-            correction = -Q/dQdz
-            corr_has_derivatives = .true.
-
-            ! Do a line search to avoid steps that are too big.
-            do line_iter=1,max_line_search_iter
-
-               if (abs(correction) < correction_tolerance .and. have_derivatives) then
-                  ! Can't get much more precision than this.
-                  converged = .true.
-                  exit
-               end if
-
-               Z_new = Z + correction
-               if (corr_has_derivatives) then
-                  have_derivatives = .true.
-               end if
-
-               ! If the correction pushes the solution out of bounds then we know
-               ! that was a bad step. Bad steps are still in the same direction, they just
-               ! go too far, so we replace that result with one that's halfway to the relevant bound.
-               if (Z_new > upper_bound_Z) then
-                  Z_new = (Z + upper_bound_Z) / 2d0
-               else if (Z_new < lower_bound_Z) then
-                  Z_new = (Z + lower_bound_Z) / 2d0
-               end if
-
-               Y = set_Y(Y_is_positive,Z_new)
-
-               call compute_Q(info, Y, Qc, Af)
-
-               if (is_bad(Qc%val)) then
-                  correction = 0.5d0 * correction
-               else if (abs(Qc) < abs(Q)) then
-                  exit
-               else
-                  correction = 0.5d0 * correction
-               end if
-            end do
-
-            if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
-               Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, correction%val
-            Z_new%d1val1 = 1d0  ! Ensures that dZ/dZ = 1.
-            Z = Z_new
-
-            Y = set_Y(Y_is_positive,Z)
-            if (converged) exit
-
          end do
 
-         if (converged .and. doing_seed) then
-            call compute_Q(info, Y, Q, Af)
-            if (abs(Q%val)/scale > residual_tolerance) converged = .false.
-            if (is_bad(Y%val) .or. any(is_bad(Y%d1Array)) .or. &
-                  is_bad(Af%val) .or. any(is_bad(Af%d1Array))) converged = .false.
-         end if
-         if (converged) exit attempt_loop
-         if (doing_seed) cycle attempt_loop
+         if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
+            Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, correction%val
+         Z_new%d1val1 = 1d0  ! Ensures that dZ/dZ = 1.
+         Z = Z_new
 
+         Y = set_Y(Y_is_positive,Z)
+         if (converged) exit
+
+      end do
+
+      if (.not. converged) then
          ierr = 1
          if (info%report) then
          !$OMP critical (tdc_crit0)
@@ -427,7 +371,7 @@ contains
          !$OMP end critical (tdc_crit0)
          end if
          return
-      end do attempt_loop
+      end if
 
       ! Unpack output
       Y_face = unconvert(Y)

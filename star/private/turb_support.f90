@@ -38,9 +38,9 @@ contains
 
    !> Determines if it is safe (physically) to use TDC instead of MLT.
    !!
-   !! By default, fall back to MLT in cells that get touched by adjust_mass,
-   !! because there the convection speeds at the start of the step can be
-   !! badly out of whack.
+   !! Currently we only know we have to fall back to MLT in cells that get touched
+   !! by adjust_mass, because there the convection speeds at the start of the
+   !! step can be badly out of whack.
    !!
    !! @param s star pointer
    !! @param k face index
@@ -50,7 +50,7 @@ contains
       integer, intent(in) :: k
 
       fallback = .false.
-      if (s% TDC_adjust_mass_fallback_to_mlt .and. abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
+      if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
          fallback = .true.
       end if
    end function check_if_must_fall_back_to_MLT
@@ -223,13 +223,14 @@ contains
       integer, intent(out) :: ierr
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
-      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
+      real(dp) :: conv_vel_start, scale, max_conv_vel
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC, report, have_Y_face_guess
+      logical ::  test_partials, using_TDC
+      logical, parameter :: report = .false.
       include 'formats'
 
       ! check if this particular k can be done with TDC
@@ -238,8 +239,6 @@ contains
       if (.not. s% have_mlt_vc) using_TDC = .false.
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
-
-      report = .false.
 
       ! Pre-calculate some things.
       Eq_div_w = 0d0
@@ -324,16 +323,7 @@ contains
          else
             conv_vel_start = s% mlt_vc(k)
          end if
-         have_Y_face_guess = s% use_TDC_Y_face_seeded_newton .and. s% doing_solver_iterations
-         if (have_Y_face_guess) then
-            if (s% solver_iter == 0) then
-               Y_face_guess = s% Y_face_start(k)
-            else
-               Y_face_guess = s% Y_face(k)
-            end if
-         else
-            Y_face_guess = 0d0
-         end if
+
          ! Set scale for judging the TDC luminosity equation Q(Y)=0.
          ! Q has units of a luminosity, so the scale should be a luminosity.
          if (s% solver_iter == 0) then
@@ -343,21 +333,18 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, s%Y_face_start(k), mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
+            conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
-            s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, &
-            s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, &
-            s% TDC_arnett_growth_target, &
-            energy, ierr, have_Y_face_guess, Y_face_guess)
-
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'ierr from set_TDC'
-            return
-         end if
+            s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
+
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'ierr from set_TDC'
+               return
+            end if
 
          ! Experimental method to lower superadiabaticity. Call TDC again with an artificially reduced
          ! gradr if the resulting gradT would lead to the radiative luminosity approaching the Eddington
@@ -367,20 +354,17 @@ contains
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
                call set_TDC(&
-                  conv_vel_start, s%Y_face_start(k), mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
+                  conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
-                  s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, &
-                  s% use_TDC_arnett_velocity_closure, s% use_TDC_acceleration_limit, &
-                  s% TDC_arnett_growth_target, &
-                  energy, ierr, have_Y_face_guess, Y_face_guess)
+                  s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
+               s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
                   return
                end if
-               s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
             end if
          end if
 

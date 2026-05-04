@@ -715,7 +715,6 @@
          ierr = 0
          i_lum = s% i_lum
          if (i_lum == 0) return
-
          n = nzhi - nzlo + 1
 
          do k=1,nz_old
@@ -751,7 +750,6 @@
                xh(i_lum,nz-k) = xh_old(i_lum,nz_old-k)
             end do
          end if
-
 
       end subroutine do_L
 
@@ -1527,6 +1525,7 @@
             k_new, k_old_in, nz_old, xq_old, dq_old, xq_outer, dq_range, &
             value_old, p, integral, dbg, ierr)
       end subroutine get_old_value_integral
+
 
       subroutine get_old_integral( &
             k_new, k_old_in, nz_old, xq_old, dq_old, xq_outer, dq_range, &

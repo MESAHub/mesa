@@ -108,11 +108,10 @@
     TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
     TDC_alpha_C, TDC_alpha_S, &
     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
-    TDC_use_density_form_for_eddy_viscosity, TDC_adjust_mass_fallback_to_mlt, &
+    TDC_use_density_form_for_eddy_viscosity, &
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
-    include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, use_TDC_arnett_velocity_closure, &
-    TDC_arnett_growth_target, use_TDC_acceleration_limit, use_TDC_Y_face_seeded_newton, &
+    include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, &
     use_face_values_eos_and_kap_mlt_tdc, &
     TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
@@ -2095,16 +2094,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_alpha_S = TDC_alpha_S
  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
- s% TDC_adjust_mass_fallback_to_mlt = TDC_adjust_mass_fallback_to_mlt
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
  s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
  s% use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
- s% use_TDC_arnett_velocity_closure = use_TDC_arnett_velocity_closure
- s% TDC_arnett_growth_target = TDC_arnett_growth_target
- s% use_TDC_acceleration_limit = use_TDC_acceleration_limit
- s% use_TDC_Y_face_seeded_newton = use_TDC_Y_face_seeded_newton
  s% use_face_values_eos_and_kap_mlt_tdc = use_face_values_eos_and_kap_mlt_tdc
  s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
@@ -3812,16 +3806,11 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alpha_S = s% TDC_alpha_S
  TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
- TDC_adjust_mass_fallback_to_mlt = s% TDC_adjust_mass_fallback_to_mlt
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
  include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
  use_TDC_enthalpy_flux_limiter = s% use_TDC_enthalpy_flux_limiter
- use_TDC_arnett_velocity_closure = s% use_TDC_arnett_velocity_closure
- TDC_arnett_growth_target = s% TDC_arnett_growth_target
- use_TDC_acceleration_limit = s% use_TDC_acceleration_limit
- use_TDC_Y_face_seeded_newton = s% use_TDC_Y_face_seeded_newton
  use_face_values_eos_and_kap_mlt_tdc = s% use_face_values_eos_and_kap_mlt_tdc
  TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
