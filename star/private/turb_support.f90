@@ -38,9 +38,8 @@ contains
 
    !> Determines if it is safe (physically) to use TDC instead of MLT.
    !!
-   !! Currently we only know we have to fall back to MLT in cells that get touched
-   !! by adjust_mass, because there the convection speeds at the start of the
-   !! step can be badly out of whack.
+   !! By default, fall back to MLT in cells that get touched by adjust_mass.
+   !! This can be disabled to let those cells use TDC.
    !!
    !! @param s star pointer
    !! @param k face index
@@ -50,7 +49,7 @@ contains
       integer, intent(in) :: k
 
       fallback = .false.
-      if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
+      if (s% TDC_adjust_mass_fallback_to_mlt .and. abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
          fallback = .true.
       end if
    end function check_if_must_fall_back_to_MLT
