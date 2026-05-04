@@ -50,7 +50,7 @@ contains
       integer, intent(in) :: k
 
       fallback = .false.
-      if (s% TDC_adjust_mass_fallback_to_mlt .and. s%mstar_dot > 1d-99 .and. k < s% k_const_mass) then
+      if (s% TDC_adjust_mass_fallback_to_mlt .and. abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
          fallback = .true.
       end if
    end function check_if_must_fall_back_to_MLT

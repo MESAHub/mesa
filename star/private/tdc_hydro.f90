@@ -61,6 +61,7 @@ contains
          if (s%use_face_values_eos_and_kap_mlt_tdc) then
             x = get_TDC_alpha_M_Hp_face(s, k, op_err)
             if (op_err /= 0) then
+               !$OMP ATOMIC WRITE
                ierr = op_err
             else if (s%Hp_face(k) <= 0d0) then
                s%Hp_face(k) = x%val
@@ -68,7 +69,10 @@ contains
          else if (s%Hp_face(k) <= 0d0) then
             ! this scale height for face is already calculated in TDC
             s%Hp_face(k) = get_TDC_alpha_M_Hp_face_val(s, k, op_err) ! because this is called before s% scale_height(k) is updated in mlt_vars.
-            if (op_err /= 0) ierr = op_err
+            if (op_err /= 0) then
+               !$OMP ATOMIC WRITE
+               ierr = op_err
+            end if
          end if
       end do
       !$OMP END PARALLEL DO
@@ -79,12 +83,21 @@ contains
       !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
          call build_tdc_Chi_div_w_face_ad(s, k, s%tdc_Chi_div_w_face_ad(k), op_err)
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          call build_tdc_Eq_div_w_face_ad(s, k, s%tdc_Eq_div_w_face_ad(k), op_err)
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          if (s%v_flag) then
             call build_tdc_Chi_div_w_cell_ad(s, k, s%tdc_Chi_div_w_cell_ad(k), op_err)
-            if (op_err /= 0) ierr = op_err
+            if (op_err /= 0) then
+               !$OMP ATOMIC WRITE
+               ierr = op_err
+            end if
          else
             s%tdc_Chi_div_w_cell_ad(k) = 0d0
          end if
@@ -97,15 +110,24 @@ contains
       !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
          x = compute_Chi_div_w_face(s, k, op_err) ! Sets Chi_face
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          x = compute_tdc_Eq_div_w_face(s, k, op_err) ! Sets Eq_face
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          if (s% v_flag) then
             x = compute_tdc_Uq_face(s, k, op_err)
          else if (s% u_flag) then
             x = compute_tdc_Uq_dm_cell(s, k, op_err)
          end if
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
       end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) then
