@@ -40,7 +40,6 @@ known_false_positives = {
     "max_years_for_timestep",
     "history_names_dict",
     "report_ierr",
-    "Tsurf_factor",
     "other_photo_read",
     "job",
     "tau_factor",

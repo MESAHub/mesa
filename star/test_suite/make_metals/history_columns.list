@@ -79,7 +79,6 @@
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
-      !Tsurf_factor
       !tau_factor
       !tau_surface
 

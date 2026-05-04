@@ -431,8 +431,6 @@
          real(dp) :: fixed_Psurf
          logical :: use_RSP_L_eqn_outer_BC
 
-         real(dp) :: Tsurf_factor
-
       ! create atmosphere
 
          real(dp) :: atm_build_tau_outer
