@@ -1115,12 +1115,6 @@
             if (failed('Chi_ad')) exit
             call do1_ad(s% Eq_ad, c% Eq_ad)
             if (failed('Eq_ad')) exit
-            call do1_ad(s% tdc_Chi_div_w_face_ad, c% tdc_Chi_div_w_face_ad)
-            if (failed('tdc_Chi_div_w_face_ad')) exit
-            call do1_ad(s% tdc_Eq_div_w_face_ad, c% tdc_Eq_div_w_face_ad)
-            if (failed('tdc_Eq_div_w_face_ad')) exit
-            call do1_ad(s% tdc_Chi_div_w_cell_ad, c% tdc_Chi_div_w_cell_ad)
-            if (failed('tdc_Chi_div_w_cell_ad')) exit
             call do1_ad(s% COUPL_ad, c% COUPL_ad)
             if (failed('COUPL_ad')) exit
             call do1_ad(s% Lr_ad, c% Lr_ad)

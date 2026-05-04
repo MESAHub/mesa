@@ -750,9 +750,6 @@
    !mlt_tdc_opacity_face
    !mlt_tdc_scale_height_face
    !mlt_tdc_gradr_face
-   !tdc_Chi_div_w_face
-   !tdc_Eq_div_w_face
-   !tdc_Chi_div_w_cell
 
 !# RTI
 

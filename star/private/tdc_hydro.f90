@@ -59,7 +59,7 @@ contains
       !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
          if (s%use_face_values_eos_and_kap_mlt_tdc) then
-            x = get_TDC_alpha_M_Hp_face(s, k, op_err)
+            x = get_TDC_Hp_face(s, k, op_err)
             if (op_err /= 0) then
                !$OMP ATOMIC WRITE
                ierr = op_err
@@ -68,43 +68,12 @@ contains
             end if
          else if (s%Hp_face(k) <= 0d0) then
             ! this scale height for face is already calculated in TDC
-            s%Hp_face(k) = get_TDC_alpha_M_Hp_face_val(s, k, op_err) ! because this is called before s% scale_height(k) is updated in mlt_vars.
-            if (op_err /= 0) then
-               !$OMP ATOMIC WRITE
-               ierr = op_err
-            end if
+            s%Hp_face(k) = get_scale_height_face_val(s, k) ! because this is called before s% scale_height(k) is updated in mlt_vars.
          end if
       end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) then
          if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 1', s%model_number
-         return
-      end if
-      !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
-      do k = 1, s%nz
-         call build_tdc_Chi_div_w_face_ad(s, k, s%tdc_Chi_div_w_face_ad(k), op_err)
-         if (op_err /= 0) then
-            !$OMP ATOMIC WRITE
-            ierr = op_err
-         end if
-         call build_tdc_Eq_div_w_face_ad(s, k, s%tdc_Eq_div_w_face_ad(k), op_err)
-         if (op_err /= 0) then
-            !$OMP ATOMIC WRITE
-            ierr = op_err
-         end if
-         if (s%v_flag) then
-            call build_tdc_Chi_div_w_cell_ad(s, k, s%tdc_Chi_div_w_cell_ad(k), op_err)
-            if (op_err /= 0) then
-               !$OMP ATOMIC WRITE
-               ierr = op_err
-            end if
-         else
-            s%tdc_Chi_div_w_cell_ad(k) = 0d0
-         end if
-      end do
-      !$OMP END PARALLEL DO
-      if (ierr /= 0) then
-         if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 2', s%model_number
          return
       end if
       !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
@@ -131,7 +100,7 @@ contains
       end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) then
-         if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 3', s%model_number
+         if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 2', s%model_number
          return
       end if
    end subroutine set_viscosity_vars_TDC
@@ -152,7 +121,7 @@ contains
    end subroutine get_TDC_alfa_beta_face_weights
 
 
-   function get_TDC_alpha_M_Hp_face(s, k, ierr) result(Hp_face)
+   function get_TDC_Hp_face(s, k, ierr) result(Hp_face)
       type(star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
@@ -164,72 +133,20 @@ contains
       else
          Hp_face = get_scale_height_face(s, k)
       end if
-   end function get_TDC_alpha_M_Hp_face
+   end function get_TDC_Hp_face
 
 
-   real(dp) function get_TDC_alpha_M_Hp_face_val(s, k, ierr) result(Hp_face)
+   function wrap_Hp_cell(s, k, ierr) result(Hp_cell)  ! cm , different than rsp2
       type(star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Hp_face_ad
-
-      Hp_face_ad = get_TDC_alpha_M_Hp_face(s, k, ierr)
-      if (ierr /= 0) then
-         Hp_face = -1d0
-      else
-         Hp_face = Hp_face_ad%val
-      end if
-   end function get_TDC_alpha_M_Hp_face_val
-
-
-   function get_tdc_face_velocity_ad(s, k) result(w_00)
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      type(auto_diff_real_star_order1) :: w_00
-
-      if (s%okay_to_set_mlt_vc .and. &
-         s%TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-         w_00 = s%mlt_vc_old(k)/sqrt_2_div_3
-      else
-         w_00 = s%mlt_vc_ad(k)/sqrt_2_div_3
-      end if
-   end function get_tdc_face_velocity_ad
-
-
-   function get_tdc_cell_velocity_ad(s, k) result(w_00)
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      type(auto_diff_real_star_order1) :: w_00
-
-      if (k < s%nz) then
-         if (s%okay_to_set_mlt_vc .and. &
-            s%TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-            w_00 = 0.5d0*(s%mlt_vc_old(k) + s%mlt_vc_old(k+1))/sqrt_2_div_3
-         else
-            w_00 = 0.5d0*(s%mlt_vc_ad(k) + shift_p1(s%mlt_vc_ad(k+1)))/sqrt_2_div_3
-         end if
-      else
-         if (s%okay_to_set_mlt_vc .and. &
-            s%TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-            w_00 = 0.5d0*s%mlt_vc_old(k)/sqrt_2_div_3
-         else
-            w_00 = 0.5d0*s%mlt_vc_ad(k)/sqrt_2_div_3
-         end if
-      end if
-   end function get_tdc_cell_velocity_ad
-
-
-   function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm , different than rsp2
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      integer :: ierr
       type(auto_diff_real_star_order1) :: Hp1, Hp0, Hp_cell
       ierr = 0
-      Hp0 = get_TDC_alpha_M_Hp_face(s, k, ierr)
+      Hp0 = get_TDC_Hp_face(s, k, ierr)
       if (ierr /= 0) return
       Hp1 = 0d0
       if (k+1 < s%nz) then
-         Hp1 = shift_p1(get_TDC_alpha_M_Hp_face(s, k+1, ierr))
+         Hp1 = shift_p1(get_TDC_Hp_face(s, k+1, ierr))
          if (ierr /= 0) return
       end if
       Hp_cell = 0.5d0*(Hp0 + Hp1)
@@ -246,7 +163,8 @@ contains
       include 'formats'
       ierr = 0
 
-      Hp_cell = wrap_Hp_cell(s, k)
+      Hp_cell = wrap_Hp_cell(s, k, ierr)
+      if (ierr /= 0) return
       return ! below is skipped, for now.
 
       d_00 = wrap_d_00(s, k)
@@ -266,39 +184,6 @@ contains
       end if
    end function Hp_cell_for_Chi
 
-
-   function get_tdc_Chi_div_w_cell_ad(s, k, ierr) result(Chi_div_w_cell)
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Chi_div_w_cell
-
-      ierr = 0
-      Chi_div_w_cell = s%tdc_Chi_div_w_cell_ad(k)
-   end function get_tdc_Chi_div_w_cell_ad
-
-
-   function get_tdc_Chi_div_w_face_ad(s, k, ierr) result(Chi_div_w_face)
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Chi_div_w_face
-
-      ierr = 0
-      Chi_div_w_face = s%tdc_Chi_div_w_face_ad(k)
-   end function get_tdc_Chi_div_w_face_ad
-
-
-   function get_tdc_Eq_div_w_face_ad(s, k, ierr) result(Eq_div_w_face)
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Eq_div_w_face
-
-      ierr = 0
-      Eq_div_w_face = s%tdc_Eq_div_w_face_ad(k)
-   end function get_tdc_Eq_div_w_face_ad
-
    ! this function is only called internally in TDC_Uq_face, and for v_flag only.
    function compute_Chi_cell(s, k, ierr) result(Chi_cell) ! does not update s% Chi or Chi_ad
       ! eddy viscosity energy (Kuhfuss 1986) [erg]
@@ -306,57 +191,81 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: Chi_cell
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: w_00
-
-      ierr = 0
-      Chi_cell = get_tdc_Chi_div_w_cell_ad(s, k, ierr)
-      if (ierr /= 0) return
-      w_00 = get_tdc_cell_velocity_ad(s, k)
-      Chi_cell = Chi_cell*w_00
-   end function compute_Chi_cell
-
-
-   subroutine build_tdc_Chi_div_w_cell_ad(s, k, Chi_div_w_cell, ierr)
-      ! Cell-centered eddy viscosity energy divided by the local velocity factor.
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      type(auto_diff_real_star_order1), intent(out) :: Chi_div_w_cell
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: rho2, r6_cell, d_v_div_r, Hp_cell, d_00, r_00, r_p1
+      type(auto_diff_real_star_order1) :: &
+         rho2, r6_cell, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
       real(dp) :: f, ALFAM_ALFA
-
+      logical :: dbg
+      include 'formats'
       ierr = 0
+      dbg = .false.
 
+      ! check where we are getting alfam from.
       if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
          ALFAM_ALFA = s%TDC_alpha_M*s%mixing_length_alpha
-      else
+      else ! this is for safety, but probably is never called.
          ALFAM_ALFA = 0d0
       end if
 
       if (ALFAM_ALFA == 0d0 .or. &
-          k <= s%TDC_num_outermost_cells_forced_nonturbulent .or. &
-          k > s%nz - s%TDC_num_innermost_cells_forced_nonturbulent) then
-         Chi_div_w_cell = 0d0
-         return
-      end if
-
-      Hp_cell = Hp_cell_for_Chi(s, k, ierr)
-      if (ierr /= 0) return
-      if (s%TDC_use_density_form_for_eddy_viscosity) then
-         d_v_div_r = compute_rho_form_of_d_v_div_r(s, k, ierr)
+          k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+          k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+         Chi_cell = 0d0
       else
-         d_v_div_r = compute_d_v_div_r(s, k, ierr)
-      end if
-      if (ierr /= 0) return
+         Hp_cell = Hp_cell_for_Chi(s, k, ierr)
+         if (ierr /= 0) return
+         if (s%TDC_use_density_form_for_eddy_viscosity) then
+            ! new density derivative term
+            d_v_div_r = compute_rho_form_of_d_v_div_r(s, k, ierr)
+         else
+            d_v_div_r = compute_d_v_div_r(s, k, ierr)
+         end if
+         if (ierr /= 0) return
 
-      d_00 = wrap_d_00(s, k)
-      f = (16d0/3d0)*pi*ALFAM_ALFA/s%dm(k)
-      rho2 = pow2(d_00)
-      r_00 = wrap_r_00(s, k)
-      r_p1 = wrap_r_p1(s, k)
-      r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
-      Chi_div_w_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell
-   end subroutine build_tdc_Chi_div_w_cell_ad
+         ! don't need to check if mlt_vc > 0 here.
+         if (k < s% nz) then
+            if (s% okay_to_set_mlt_vc .and. &
+               s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then !add option for explicit mlt_vc, operator split in momentum eq.
+               w_00 = 0.5d0*(s% mlt_vc_old(k) + s% mlt_vc_old(k+1))/sqrt_2_div_3! same as info%A0 from TDC
+            else
+               w_00 = 0.5d0*(s% mlt_vc_ad(k) + shift_p1(s% mlt_vc_ad(k+1)))/sqrt_2_div_3! same as info%A0 from TDC
+            end if
+         else
+            if (s% okay_to_set_mlt_vc .and. &
+                s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then !add option for explicit mlt_vc, operator split in momentum eq.
+               w_00 = 0.5d0*s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+            else
+               w_00 = 0.5d0*s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
+            end if
+         end if
+         d_00 = wrap_d_00(s, k)
+         f = (16d0/3d0)*pi*ALFAM_ALFA/s%dm(k)
+         rho2 = pow2(d_00)
+         r_00 = wrap_r_00(s, k)
+         r_p1 = wrap_r_p1(s, k)
+         r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
+         Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
+         ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
+         !       = g cm^2 s^-2
+         !       = erg
+
+      end if
+      ! this is set in Chi_div_w_face
+      !s%Chi(k) = Chi_cell%val
+      !s%Chi_ad(k) = Chi_cell
+
+      if (dbg .and. k == -100) then
+         write (*, *) ' s% ALFAM_ALFA', ALFAM_ALFA
+         write (*, *) 'Hp_cell', Hp_cell%val
+         write (*, *) 'd_v_div_r', d_v_div_r%val
+         write (*, *) ' f', f
+         write (*, *) 'w_00', w_00%val
+         write (*, *) 'd_00 ', d_00%val
+         write (*, *) 'rho2 ', rho2%val
+         write (*, *) 'r_00', r_00%val
+         write (*, *) 'r_p1 ', r_p1%val
+         write (*, *) 'r6_cell', r6_cell%val
+      end if
+   end function compute_Chi_cell
 
   ! face centered variables for tdc update below
    function compute_Chi_div_w_face(s, k, ierr) result(Chi_face)
@@ -365,44 +274,29 @@ contains
    integer, intent(in) :: k
    type(auto_diff_real_star_order1) :: Chi_face
    integer, intent(out) :: ierr
-   type(auto_diff_real_star_order1) :: w_00
+   type(auto_diff_real_star_order1) :: &
+   rho2, r6_face, d_v_div_r, Hp_face, w_00, d_00, r_00, r_p1
+   real(dp) :: f, ALFAM_ALFA, dmbar
+   logical :: dbg
+   include 'formats'
    ierr = 0
-   Chi_face = get_tdc_Chi_div_w_face_ad(s, k, ierr)
-   if (ierr /= 0) return
+   dbg = .false.
 
-   ! Chi_cell does not set Chi, we store Chi_face in s% Chi and s% Chi_ad
-      w_00 = get_tdc_face_velocity_ad(s, k)
-      s%Chi(k) = Chi_face%val*w_00%val
-      s%Chi_ad(k) = Chi_face*w_00
-   end function compute_Chi_div_w_face
+   ! check where we are getting alfam from.
+   if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
+      ALFAM_ALFA = s%TDC_alpha_M*s%mixing_length_alpha
+   else ! this is for safety, but probably is never called.
+      ALFAM_ALFA = 0d0
+   end if
 
-
-   subroutine build_tdc_Chi_div_w_face_ad(s, k, Chi_div_w_face, ierr)
-      ! Face-centered eddy viscosity energy divided by the local velocity factor.
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      type(auto_diff_real_star_order1), intent(out) :: Chi_div_w_face
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: rho2, r6_face, d_v_div_r, Hp_face, d_00, r_00
-      real(dp) :: f, ALFAM_ALFA, dmbar
-
-      ierr = 0
-
-      if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
-         ALFAM_ALFA = s%TDC_alpha_M*s%mixing_length_alpha
-      else
-         ALFAM_ALFA = 0d0
-      end if
-
-      if (ALFAM_ALFA == 0d0 .or. &
-         k > s%nz - s%TDC_num_innermost_cells_forced_nonturbulent) then
-         Chi_div_w_face = 0d0
-         return
-      end if
-
-      Hp_face = get_TDC_alpha_M_Hp_face(s, k, ierr)
+   if (ALFAM_ALFA == 0d0 .or. &
+      k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+      Chi_face = 0d0
+   else
+      Hp_face = get_TDC_Hp_face(s, k, ierr)
       if (ierr /= 0) return
       if (s%TDC_use_density_form_for_eddy_viscosity) then
+         ! new density derivative form
          d_v_div_r = compute_rho_form_of_d_v_div_r_face(s, k, ierr)
       else
          d_v_div_r = compute_d_v_div_r_face(s, k, ierr)
@@ -410,69 +304,92 @@ contains
       if (ierr /= 0) return
 
       if (k >= 2) then
-         dmbar = 0.5d0*(s%dm(k) + s%dm(k-1))
+         dmbar = 0.5d0*(s% dm(k) + s% dm(k-1))
       else
-         dmbar = 0.5d0*s%dm(k)
+         dmbar = 0.5d0*s% dm(k)
       end if
       d_00 = get_rho_face(s, k)
       f = (16d0/3d0)*pi*ALFAM_ALFA/dmbar
       rho2 = pow2(d_00)
       r_00 = wrap_r_00(s, k)
-      r6_face = pow6(r_00)
-      Chi_div_w_face = f*rho2*r6_face*d_v_div_r*Hp_face
-   end subroutine build_tdc_Chi_div_w_face_ad
+      !r_p1 = wrap_r_p1(s, k)
+      r6_face = pow6(r_00) !0.5d0*(pow6(r_00) + pow6(r_p1))
+      Chi_face = f*rho2*r6_face*d_v_div_r*Hp_face!*w_00
+      ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm * [s/cm] ! [1/w_00] = [s/cm]
+      !       = g cm^2 s^-2 * [s/cm]
+      !       = erg ! * [s / cm] - > [erg] * [s/cm]
+
+   end if
+
+   ! Chi_cell does not set Chi, we store Chi_face in s% Chi and s% Chi_ad
+      if (s% okay_to_set_mlt_vc .and. &
+         s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then !add option for explicit mlt_vc, operator split in momentum eq.
+         w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+      else
+         w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
+      end if
+      s%Chi(k) = Chi_face%val*w_00%val
+      s%Chi_ad(k) = Chi_face*w_00
+
+      if (dbg .and. k == -100) then
+      write (*, *) ' s% ALFAM_ALFA', ALFAM_ALFA
+      write (*, *) 'Hp_face', Hp_face%val
+      write (*, *) 'd_v_div_r', d_v_div_r%val
+      write (*, *) ' f', f
+      write (*, *) 'w_00', w_00%val
+      write (*, *) 'd_00 ', d_00%val
+      write (*, *) 'rho2 ', rho2%val
+      write (*, *) 'r_00', r_00%val
+      write (*, *) 'r_p1 ', r_p1%val
+      write (*, *) 'r6_cell', r6_face%val
+      end if
+   end function compute_Chi_div_w_face
 
    function compute_tdc_Eq_div_w_face(s, k, ierr) result(Eq_face)  ! erg g^-1 s^-1 * (cm^-1 s^1)
    type(star_info), pointer :: s
    integer, intent(in) :: k
    type(auto_diff_real_star_order1) :: Eq_face
    integer, intent(out) :: ierr
-   type(auto_diff_real_star_order1) :: w_00
+   type(auto_diff_real_star_order1) :: d_v_div_r, Chi_face, w_00
+   real(dp) :: dmbar
+   include 'formats'
    ierr = 0
-   Eq_face = get_tdc_Eq_div_w_face_ad(s, k, ierr)
-   if (ierr /= 0) return
-
-   ! only for output, really only used for returning Eq to star pointers.
-   w_00 = get_tdc_face_velocity_ad(s, k)
-
-   s%Eq(k) = Eq_face%val * w_00%val
-   s%Eq_ad(k) = Eq_face * w_00
-   end function compute_tdc_Eq_div_w_face
-
-
-   subroutine build_tdc_Eq_div_w_face_ad(s, k, Eq_div_w_face, ierr)
-      type(star_info), pointer :: s
-      integer, intent(in) :: k
-      type(auto_diff_real_star_order1), intent(out) :: Eq_div_w_face
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r, Chi_div_w_face
-      real(dp) :: dmbar
-
-      ierr = 0
-      if (s%mixing_length_alpha == 0d0 .or. &
-         k > s%nz - s%TDC_num_innermost_cells_forced_nonturbulent) then
-         Eq_div_w_face = 0d0
-         return
-      end if
-
-      Chi_div_w_face = get_tdc_Chi_div_w_face_ad(s, k, ierr)
+   if (s%mixing_length_alpha == 0d0 .or. &
+   k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+      Eq_face = 0d0
+      if (k >= 1 .and. k <= s%nz) s%Eq_ad(k) = 0d0
+   else
+      Chi_face = compute_Chi_div_w_face(s,k,ierr)
       if (ierr /= 0) return
 
       if (s%TDC_use_density_form_for_eddy_viscosity) then
+         ! new density derivative term
          d_v_div_r = compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr)
       else
          d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
       end if
-      if (ierr /= 0) return
 
       if (k >= 2) then
-         dmbar = 0.5d0*(s%dm(k) + s%dm(k-1))
+         dmbar = 0.5d0*(s% dm(k) + s% dm(k-1))
       else
-         dmbar = 0.5d0*s%dm(k)
+         dmbar = 0.5d0*s% dm(k)
       end if
 
-      Eq_div_w_face = 4d0*pi*Chi_div_w_face*d_v_div_r/dmbar
-   end subroutine build_tdc_Eq_div_w_face_ad
+      if (ierr /= 0) return
+      Eq_face = 4d0*pi*Chi_face*d_v_div_r/dmbar  ! erg s^-1 g^-1 * (cm^-1 s^1)
+   end if
+
+   ! only for output, really only used for returning Eq to star pointers.
+   if (s% okay_to_set_mlt_vc .and. &
+      s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then !add option for explicit mlt_vc, operator split in momentum eq.
+      w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+   else
+      w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3! same as info%A0 from TDC
+   end if
+
+   s%Eq(k) = Eq_face%val * w_00%val
+   s%Eq_ad(k) = Eq_face * w_00
+   end function compute_tdc_Eq_div_w_face
 
    ! for v_flag only. face centered Uq for hydro_momentum
    function compute_tdc_Uq_face(s, k, ierr) result(Uq_face) !(v_flag only)  ! cm s^-2, acceleration
@@ -528,12 +445,24 @@ contains
          r_p1 = wrap_opt_time_center_r_p1(s, k)
          r_cell = 0.5d0*(r_00+r_p1) ! not staggered unlike terms inside chi_div_w_face
 
-         w_00 = get_tdc_face_velocity_ad(s, k)
-         Chi_00 = get_tdc_Chi_div_w_face_ad(s, k, ierr) * w_00
+         if (s% okay_to_set_mlt_vc .and. &
+            s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
+            w_00 = s% mlt_vc_old(k)/sqrt_2_div_3
+         else
+            w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3
+         end if
+
+         Chi_00 = compute_Chi_div_w_face(s, k, ierr) * w_00
 
          if (k < s% nz) then
-            w_p1 = shift_p1(get_tdc_face_velocity_ad(s, k+1))
-            Chi_p1 = shift_p1(get_tdc_Chi_div_w_face_ad(s, k+1, ierr))*w_p1
+            if (s% okay_to_set_mlt_vc .and. &
+               s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
+               w_p1 = s% mlt_vc_old(k+1)/sqrt_2_div_3
+            else
+               w_p1 = shift_p1(s% mlt_vc_ad(k+1))/sqrt_2_div_3
+            end if
+
+            Chi_p1 = shift_p1(compute_Chi_div_w_face(s, k+1, ierr))*w_p1
             if (ierr /= 0) return
          else
             Chi_p1 = 0d0
@@ -559,7 +488,7 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
+      type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1, term1, term2
       logical :: dbg
       include 'formats'
       ierr = 0
@@ -580,8 +509,6 @@ contains
       end if
    end function compute_d_v_div_r
 
-   ! Currently unused. Kept as the cell-centered opt-time-centered counterpart
-   ! to the face version below in case that path is revived later.
    function compute_d_v_div_r_opt_time_center(s, k, ierr) result(d_v_div_r)  ! s^-1
       type(star_info), pointer :: s
       integer, intent(in) :: k
@@ -690,7 +617,7 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1
+      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1, term1, term2
       logical :: dbg
       include 'formats'
       ierr = 0
@@ -730,7 +657,7 @@ contains
       integer, intent(in) :: k
       type(auto_diff_real_star_order1) :: d_v_div_r
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1
+      type(auto_diff_real_star_order1) :: v_00, v_m1, r_00, r_m1, term1, term2
       logical :: dbg
       include 'formats'
       ierr = 0

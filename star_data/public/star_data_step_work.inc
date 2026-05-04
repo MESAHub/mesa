@@ -392,8 +392,6 @@
 
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             PII_ad, Chi_ad, Eq_ad, COUPL_ad, Lr_ad, Lc_ad, Lt_ad
-         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
-            tdc_Chi_div_w_face_ad, tdc_Eq_div_w_face_ad, tdc_Chi_div_w_cell_ad
          real(dp), pointer, dimension(:) :: &
             Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
             SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start
