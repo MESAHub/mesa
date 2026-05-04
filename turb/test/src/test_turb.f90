@@ -8,12 +8,11 @@ program test_turb
 
    implicit none
 
-   integer, parameter :: num_tdc_modes = 4
+   integer, parameter :: num_tdc_modes = 3
    character(len=32), parameter :: tdc_mode_names(num_tdc_modes) = [character(len=32) :: &
-      'plain TDC', 'TDC + Af split', 'TDC + Arnett closure', 'TDC + acceleration limit']
-   logical, parameter :: tdc_mode_use_arnett(num_tdc_modes) = [.false., .false., .true., .false.]
-   logical, parameter :: tdc_mode_use_accel(num_tdc_modes) = [.false., .false., .false., .true.]
-   logical, parameter :: tdc_mode_use_split(num_tdc_modes) = [.false., .true., .false., .false.]
+      'plain TDC', 'TDC + Arnett closure', 'TDC + acceleration limit']
+   logical, parameter :: tdc_mode_use_arnett(num_tdc_modes) = [.false., .true., .false.]
+   logical, parameter :: tdc_mode_use_accel(num_tdc_modes) = [.false., .false., .true.]
 
    call check_efficient_MLT_scaling()
    call check_TDC()
@@ -171,8 +170,8 @@ contains
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
             Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
-            tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), &
-            .false., 0d0, 0d0, TDC_arnett_growth_target_mlt, energy, ierr)
+            tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), &
+            TDC_arnett_growth_target_mlt, energy, ierr)
          write (*, '(a)') 'Mode: ' // trim(tdc_mode_names(mode_i))
          write (*, 1) 'Y, conv_vel_start, conv_vel, dt', Y_face%val, conv_vel_start, conv_vel%val, dt
       end do
@@ -241,8 +240,8 @@ contains
                mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
                scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
                Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
-               tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), tdc_mode_use_split(mode_i), &
-               .false., 0d0, 0d0, TDC_arnett_growth_target_mlt, energy, ierr)
+               tdc_mode_use_arnett(mode_i), tdc_mode_use_accel(mode_i), &
+               TDC_arnett_growth_target_mlt, energy, ierr)
 
             write (*, 1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel%val
             if (report) stop

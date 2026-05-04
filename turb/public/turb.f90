@@ -93,8 +93,8 @@ module turb
    !! (ADS: https://ui.adsabs.harvard.edu/abs/1969Ap%26SS...5..180A/abstract).
    !!
    !! @param conv_vel_start The convection speed at the start of the step.
-   !! @param Y_face_start Start-of-step superadiabaticity, used by the optional split-step A_f closure
-   !!        and by the stable-side decay branch of the post-solve acceleration limiter.
+   !! @param Y_face_start Start-of-step superadiabaticity, used by the stable-side
+   !!        decay branch of the post-solve acceleration limiter.
    !! @param mixing_length_alpha The mixing length parameter.
    !! @param TDC_alpha_D TDC turbulent damping parameter
    !! @param TDC_alpha_R TDC radiative damping parameter
@@ -123,26 +123,20 @@ module turb
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param gradT The temperature gradient dlnT/dlnP (output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
-   !! @param use_TDC_Af_split If true, use the split-step A_f closure when the start/end
-   !!        thermal states lie on opposite sides of Y = 0.
-   !! @param use_TDC_enhanced_dissipation If true, replace the baseline Kuhfuss
-   !!        local-TDC dissipation length in xi2 by the Ahlborn/Kupka harmonic-sum
-   !!        dissipation length.
-   !! @param TDC_enhanced_dissipation_c4 Stable-side dissipation-length coefficient
-   !!        used in the Ahlborn/Kupka reduction factor.
-   !! @param TDC_enhanced_dissipation_v_floor Speed floor used with the lagged
-   !!        start-of-step convective speed in the stable-side reduction factor.
    !! @param TDC_arnett_growth_target Unstable-side steady-state target for David Arnett's
    !!        convection model in this implementation.
+   !! @param have_Y_face_guess If true, use Y_face_guess to try a small local
+   !!        bracket before the usual positive-Y luminosity-balance bracketing.
+   !! @param Y_face_guess Candidate superadiabaticity used only to
+   !!        seed the local solve.
    !! @param ierr Tracks errors (output).
    subroutine set_TDC( &
             conv_vel_start, Y_face_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
             max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
-            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split, &
-            use_TDC_enhanced_dissipation, TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor, &
-            TDC_arnett_growth_target, energy, ierr)
+            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, &
+            TDC_arnett_growth_target, energy, ierr, have_Y_face_guess, Y_face_guess)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, Y_face_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
@@ -150,11 +144,11 @@ module turb
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav, energy
       logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
-      logical, intent(in) :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split
-      logical, intent(in) :: use_TDC_enhanced_dissipation
+      logical, intent(in) :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit
+      logical, intent(in), optional :: have_Y_face_guess
       integer, intent(in) :: TDC_arnett_growth_target
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
-      real(dp), intent(in) :: TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor
+      real(dp), intent(in), optional :: Y_face_guess
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
       type(auto_diff_real_star_order1) :: L, Lambda, Gamma
@@ -163,31 +157,42 @@ module turb
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
       type(auto_diff_real_tdc) :: Zub, Zlb
+      logical :: need_cox_mlt
       include 'formats'
 
-      ! Do a call to MLT
       !grav = cgrav * m / pow2(r)
       L = 64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
       Lambda = mixing_length_alpha * scale_height
-      call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type,1d99, ierr)
+      need_cox_mlt = include_mlt_corr_to_TDC .or. &
+         (use_TDC_arnett_velocity_closure .and. &
+          TDC_arnett_growth_target == TDC_arnett_growth_target_mlt)
+      if (need_cox_mlt) then
+         call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
+                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                        gradr, grada, gradL, &
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type,1d99, ierr)
+      else
+         ! set_MLT would normally initialize these.  These quantities only
+         ! fill inactive entries in info, and get_TDC_solution overwrites them.
+         Gamma = 0d0
+         gradT = gradr
+         Y_face = gradT - gradL
+         conv_vel = 0d0
+         D = 0d0
+         mixing_type = no_mixing
+         ierr = 0
+      end if
 
       info%report = report
       info%include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
       info%use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
       info%use_TDC_arnett_velocity_closure = use_TDC_arnett_velocity_closure
       info%use_TDC_acceleration_limit = use_TDC_acceleration_limit
-      info%use_TDC_Af_split = use_TDC_Af_split
-      info%use_TDC_enhanced_dissipation = use_TDC_enhanced_dissipation
       info%TDC_arnett_growth_target = TDC_arnett_growth_target
       info%mixing_length_alpha = mixing_length_alpha
       info%TDC_alpha_D = TDC_alpha_D
       info%TDC_alpha_R = TDC_alpha_R
       info%TDC_alpha_Pt = TDC_alpha_Pt
-      info%TDC_enhanced_dissipation_c4 = TDC_enhanced_dissipation_c4
-      info%TDC_enhanced_dissipation_v_floor = TDC_enhanced_dissipation_v_floor
       info%dt = dt
       info%L = convert(L)
       info%gradL = convert(gradL)
@@ -216,7 +221,12 @@ module turb
       ! Get solution
       Zub = upper_bound_Z
       Zlb = lower_bound_Z
-      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
+      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr, &
+         have_Y_face_guess, Y_face_guess)
+      if (ierr /= 0) then
+         if (report) write(*,*) 'ierr from get_TDC_solution'
+         return
+      end if
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs
       if (conv_vel%val > max_conv_vel) then

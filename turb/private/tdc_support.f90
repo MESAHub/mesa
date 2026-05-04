@@ -71,69 +71,14 @@ public :: TDC_arnett_growth_target_tdc_with_mlt_corr
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
-      logical :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit, use_TDC_Af_split
-      logical :: use_TDC_enhanced_dissipation
+      logical :: use_TDC_arnett_velocity_closure, use_TDC_acceleration_limit
       integer :: TDC_arnett_growth_target
       real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
-      real(dp) :: TDC_enhanced_dissipation_c4, TDC_enhanced_dissipation_v_floor
       type(auto_diff_real_tdc) :: A0, A_mlt, c0, L, L0, gradL, grada, Y_start
       type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h, grav, chiT, chiRho, r
    end type tdc_info
 
 contains
-
-   ! Returns the dissipation length used in the Kuhfuss local-TDC damping term.
-   ! With the control on, this uses the Ahlborn/Kupka harmonic-sum length:
-   ! the geometric Wuchterl baseline for Y >= 0 and the stable-side reduced
-   ! length for Y < 0 using the lagged start-of-step convection speed scale.
-   type(auto_diff_real_tdc) function eval_tdc_dissipation_length(info, Y) result(Lambda_diss)
-      type(tdc_info), intent(in) :: info
-      type(auto_diff_real_tdc), intent(in) :: Y
-      type(auto_diff_real_tdc) :: Lambda0, Lambda_geom, radius, N2_loc, N_loc, a_quad, b_quad, v_lag
-      real(dp) :: v_floor
-      real(dp), parameter :: tiny_len = 1d-30
-      real(dp), parameter :: tiny_speed = 1d-30
-
-      Lambda0 = convert(info%mixing_length_alpha*info%Hp)
-      if (.not. info%use_TDC_enhanced_dissipation) then
-         Lambda_diss = Lambda0
-         return
-      end if
-
-      radius = convert(info%r)
-      if (Lambda0%val <= tiny_len .or. radius%val <= tiny_len) then
-         Lambda_diss = Lambda0
-         return
-      end if
-
-      ! Source-model baseline in the convection zone: the Wuchterl harmonic sum
-      ! between the mixing length and the local radius.
-      Lambda_geom = 1d0/(1d0/Lambda0 + 1d0/radius)
-
-      if (Y%val >= 0d0 .or. info%TDC_enhanced_dissipation_c4 <= 0d0) then
-         Lambda_diss = Lambda_geom
-         return
-      end if
-
-      N2_loc = -Y*convert(info%chiT/info%chiRho*info%grav/info%Hp)
-      if (N2_loc%val <= 0d0) then
-         Lambda_diss = Lambda_geom
-         return
-      end if
-
-      N_loc = sqrt(N2_loc)
-      v_floor = max(info%TDC_enhanced_dissipation_v_floor, tiny_speed)
-      v_lag = sqrt(pow2(info%A0) + pow2(v_floor))
-
-      a_quad = info%TDC_enhanced_dissipation_c4*N_loc/(v_lag*radius)
-      if (a_quad%val <= 0d0) then
-         Lambda_diss = Lambda_geom
-         return
-      end if
-
-      b_quad = 1d0/Lambda0 + 1d0/radius
-      Lambda_diss = 2d0/(b_quad + sqrt(pow2(b_quad) + 4d0*a_quad))
-   end function eval_tdc_dissipation_length
 
    subroutine eval_Af_state(dt, A0, xi0, xi1, xi2, Af)
       type(auto_diff_real_tdc), intent(in) :: dt, A0, xi0, xi1, xi2
@@ -240,6 +185,11 @@ contains
       Y = set_Y(Y_is_positive, upper_bound_Z)
       call compute_Q(info, Y, Q_ub, Af)
 
+      if (is_bad(Q_lb%val) .or. is_bad(Q_ub%val)) then
+         ierr = 1
+         return
+      end if
+
       ! Check to make sure that the lower and upper bounds on Z actually bracket
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
@@ -269,6 +219,10 @@ contains
          Y = set_Y(Y_is_positive, Z)
 
          call compute_Q(info, Y, Q, Af)
+         if (is_bad(Q%val)) then
+            ierr = 1
+            return
+         end if
 
          if (Q > 0d0 .and. Q_ub > 0d0) then
             upper_bound_Z = Z
@@ -602,53 +556,6 @@ contains
       end if
    end function eval_Af_single_state
 
-   type(auto_diff_real_tdc) function eval_Af_split(info, Y) result(Af)
-      type(tdc_info), intent(in) :: info
-      type(auto_diff_real_tdc), intent(in) :: Y
-      type(auto_diff_real_tdc) :: dt_full, dt1, dt2, A1
-      real(dp), parameter :: tiny = 1d-30
-
-      dt_full = info%dt
-
-      ! Exact-boundary cases are handled by the limiting split:
-      ! if Y_start = 0, the crossing is at t = 0 and the end-state branch
-      ! applies for the full step; if Y = 0, the crossing is at t = dt and
-      ! the start-state branch applies for the full step.
-      if (abs(info%Y_start%val) <= tiny) then
-         Af = eval_Af_single_state(info, Y, info%A0, dt_full)
-         return
-      else if (abs(Y%val) <= tiny) then
-         Af = eval_Af_single_state(info, info%Y_start, info%A0, dt_full)
-         return
-      end if
-
-      if ((info%Y_start > 0d0 .and. Y > 0d0) .or. (info%Y_start < 0d0 .and. Y < 0d0)) then
-         Af = eval_Af_single_state(info, Y, info%A0, dt_full)
-         return
-      end if
-
-      dt1 = dt_full * info%Y_start / (info%Y_start - Y)
-      dt2 = dt_full - dt1
-
-      if (dt1%val <= tiny) then
-         Af = eval_Af_single_state(info, Y, info%A0, dt2)
-         return
-      else if (dt2%val <= tiny) then
-         Af = eval_Af_single_state(info, info%Y_start, info%A0, dt1)
-         return
-      end if
-
-      if (info%Y_start < 0d0 .and. Y > 0d0) then
-         A1 = eval_Af_single_state(info, info%Y_start, info%A0, dt1)
-         Af = eval_Af_single_state(info, Y, A1, dt2)
-      else if (info%Y_start > 0d0 .and. Y < 0d0) then
-         A1 = eval_Af_single_state(info, info%Y_start, info%A0, dt1)
-         Af = eval_Af_single_state(info, Y, A1, dt2)
-      else
-         Af = eval_Af_single_state(info, Y, info%A0, dt_full)
-      end if
-   end function eval_Af_split
-
    !> Q is the residual in the TDC equation, namely:
    !!
    !! Q = (L - L0 * gradL) - L0 * Y - c0 * Af * Y_env
@@ -678,12 +585,7 @@ contains
          Y_env = Y
       end if
       dt_step = info%dt
-
-      if (info%use_TDC_Af_split) then
-         Af = eval_Af_split(info, Y)
-      else
-         Af = eval_Af_single_state(info, Y, info%A0, dt_step)
-      end if
+      Af = eval_Af_single_state(info, Y, info%A0, dt_step)
 
       ! Y_env sets the convective flux but not the radiative flux.
       Q = (info%L - info%L0*info%gradL) - info%L0 * Y - info%c0*Af*Y_env
@@ -756,7 +658,7 @@ contains
          S0 = S0*Y + convert(info%Eq_div_w)
       end if
 
-      Lambda_diss = eval_tdc_dissipation_length(info, Y)
+      Lambda_diss = convert(info%mixing_length_alpha*info%Hp)
       D0 = info%TDC_alpha_D*x_CEDE/Lambda_diss
       gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))

@@ -12,7 +12,6 @@ module test_time_dependence_support
       character(len=48) :: name
       logical :: use_arnett
       logical :: use_acceleration_limit
-      logical :: use_Af_split
       logical :: include_mlt_correction
       integer :: growth_target
    end type tdc_mode_data
@@ -27,15 +26,14 @@ module test_time_dependence_support
          gradr, grada, scale_height, gradL, Eq_div_w, grav, energy
    end type tdc_case_data
 
-   integer, parameter :: num_tdc_modes = 7
+   integer, parameter :: num_tdc_modes = 6
    type(tdc_mode_data), parameter :: tdc_modes(num_tdc_modes) = [ &
-      tdc_mode_data('tdc', .false., .false., .false., .false., TDC_arnett_growth_target_mlt), &
-      tdc_mode_data('tdc_with_Af_split', .false., .false., .true., .false., TDC_arnett_growth_target_mlt), &
-      tdc_mode_data('tdc_with_mlt_corr', .false., .false., .false., .true., TDC_arnett_growth_target_mlt), &
-      tdc_mode_data('tdc_with_arnett_closure', .true., .false., .false., .true., TDC_arnett_growth_target_mlt), &
-      tdc_mode_data('tdc_with_arnett_closure_tdc_ss', .true., .false., .false., .false., TDC_arnett_growth_target_tdc_no_mlt_corr), &
-      tdc_mode_data('tdc_with_arnett_closure_tdc_ss_mlt_corr', .true., .false., .false., .true., TDC_arnett_growth_target_tdc_with_mlt_corr), &
-      tdc_mode_data('tdc_with_acceleration_limit', .false., .true., .false., .false., TDC_arnett_growth_target_mlt) ]
+      tdc_mode_data('tdc', .false., .false., .false., TDC_arnett_growth_target_mlt), &
+      tdc_mode_data('tdc_with_mlt_corr', .false., .false., .true., TDC_arnett_growth_target_mlt), &
+      tdc_mode_data('tdc_with_arnett_closure', .true., .false., .true., TDC_arnett_growth_target_mlt), &
+      tdc_mode_data('tdc_with_arnett_closure_tdc_ss', .true., .false., .false., TDC_arnett_growth_target_tdc_no_mlt_corr), &
+      tdc_mode_data('tdc_with_arnett_closure_tdc_ss_mlt_corr', .true., .false., .true., TDC_arnett_growth_target_tdc_with_mlt_corr), &
+      tdc_mode_data('tdc_with_acceleration_limit', .false., .true., .false., TDC_arnett_growth_target_mlt) ]
 
    private
    public :: write_time_dependence_csv
@@ -773,9 +771,8 @@ contains
          case_data%T, case_data%rho, case_data%dV, case_data%Cp, case_data%opacity, case_data%scale_height, &
          case_data%gradL, case_data%grada, conv_vel, D, Y_face, gradT, tdc_num_iters, case_data%max_conv_vel, &
          case_data%Eq_div_w, case_data%grav, mode%include_mlt_correction, case_data%TDC_alpha_C, case_data%TDC_alpha_S, &
-         case_data%use_TDC_enthalpy_flux_limiter, mode%use_arnett, mode%use_acceleration_limit, mode%use_Af_split, &
-         .false., 0d0, 0d0, mode%growth_target, &
-         case_data%energy, ierr)
+         case_data%use_TDC_enthalpy_flux_limiter, mode%use_arnett, mode%use_acceleration_limit, &
+         mode%growth_target, case_data%energy, ierr)
    end subroutine call_tdc
 
 
@@ -976,11 +973,6 @@ contains
          write(*, '(a)') '      use_TDC_acceleration_limit = .true.'
       else
          write(*, '(a)') '      use_TDC_acceleration_limit = .false.'
-      end if
-      if (mode%use_Af_split) then
-         write(*, '(a)') '      use_TDC_Af_split = .true.'
-      else
-         write(*, '(a)') '      use_TDC_Af_split = .false.'
       end if
       write(*, '(a,a)') '      TDC_arnett_growth_target = ', trim(growth_target_name(mode%growth_target))
    end subroutine print_mode_controls

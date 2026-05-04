@@ -47,40 +47,6 @@ Running dt test
                     dt, gradT, conv_vel_start, conv_vel    8.8792234514870324D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
                     dt, gradT, conv_vel_start, conv_vel    9.0568079205167737D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
 ####################################
-Mode: TDC + Af split
-Running dt test
-                    dt, gradT, conv_vel_start, conv_vel    5.0000000000000000D+02    2.5204370043250246D-01    5.2320587415154047D+07    6.0597238914198903D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.1000000000000000D+02    2.5204285749162930D-01    5.2320587415154047D+07    5.9050075093203261D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.2020000000000005D+02    2.5204196393651124D-01    5.2320587415154047D+07    5.7494001285570739D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.3060399999999993D+02    2.5204101302204984D-01    5.2320587415154047D+07    5.5925658656495046D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.4121608000000003D+02    2.5203999647052466D-01    5.2320587415154047D+07    5.4341006185611701D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.5204040160000000D+02    2.5203890395733641D-01    5.2320587415154047D+07    5.2735100646096319D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.6308120963200008D+02    2.5203772235599331D-01    5.2320587415154047D+07    5.1101775684554409D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.7434283382464002D+02    2.5203643459023894D-01    5.2320587415154047D+07    4.9433157147388468D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.8582969050113286D+02    2.5203501781331550D-01    5.2320587415154047D+07    4.7718899504500106D+06
-                    dt, gradT, conv_vel_start, conv_vel    5.9754628431115555D+02    2.5203344036462588D-01    5.2320587415154047D+07    4.5944918361562928D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.0949720999737872D+02    2.5203165633254127D-01    5.2320587415154047D+07    4.4091141978058126D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.2168715419732621D+02    2.5202959494944044D-01    5.2320587415154047D+07    4.2127157422839301D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.3412089728127273D+02    2.5202713722579184D-01    5.2320587415154047D+07    4.0002689176325197D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.4680331522689812D+02    2.5202405410296042D-01    5.2320587415154047D+07    3.7622592559380517D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.5973938153143615D+02    2.5201978092426058D-01    5.2320587415154047D+07    3.4756430172060304D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.7293416916206490D+02    2.5201140133059619D-01    5.2320587415154047D+07    3.0239000429141554D+06
-                    dt, gradT, conv_vel_start, conv_vel    6.8639285254530625D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.0012070959621246D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.1412312378813670D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.2840558626389941D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.4297369798917748D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.5783317194896108D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.7298983538794027D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    7.8844963209569903D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    8.0421862473761303D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    8.2030299723236533D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    8.3670905717701260D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    8.5344323832055295D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    8.7051210308696398D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    8.8792234514870324D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-                    dt, gradT, conv_vel_start, conv_vel    9.0568079205167737D+02   -1.2020505435123705D+05    5.2320587415154047D+07    0.0000000000000000D+00
-####################################
 Mode: TDC + Arnett closure
 Running dt test
                     dt, gradT, conv_vel_start, conv_vel    5.0000000000000000D+02    2.5206418300800154D-01    5.2320587415154047D+07    1.6677542875162063D+07
@@ -158,8 +124,6 @@ Mode: MLT
                      Y, conv_vel_start, conv_vel, Gamma    3.9999830300230244D-06    0.0000000000000000D+00    1.5051080930415759D+02    1.3740991947818479D-03
 Mode: plain TDC
                         Y, conv_vel_start, conv_vel, dt    3.9999852208023926D-06    0.0000000000000000D+00    1.5051085052069075D+02    1.0000000000000000D+40
-Mode: TDC + Af split
-                        Y, conv_vel_start, conv_vel, dt    3.9999852208023926D-06    0.0000000000000000D+00    1.5051085052069075D+02    1.0000000000000000D+40
 Mode: TDC + Arnett closure
                         Y, conv_vel_start, conv_vel, dt    3.9999852207537568D-06    0.0000000000000000D+00    1.5051080930415756D+02    1.0000000000000000D+40
 Mode: TDC + acceleration limit
@@ -183,29 +147,6 @@ Convection model: tdc
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
-      TDC_arnett_growth_target = mlt
-      step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
-         0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
-         1   1.9952623149688782E+02   1.9952623149688782E+02   2.5206216661731234E-01  -1.3706056122687329E-05   5.2320587415154047E+07   1.4223996656248299E+07   1.0000020969348418E+00
-         2   3.9905246299377563E+02   1.9952623149688782E+02   2.5205110632014682E-01  -2.4766353288167702E-05   1.4223996656248299E+07   7.8717643317566449E+06   1.0000020968428298E+00
-         3   5.9857869449066345E+02   1.9952623149688782E+02   2.5203572180572381E-01  -4.0150867711182339E-05   7.8717643317566449E+06   4.8555587348417640E+06   1.0000020967148442E+00
-         4   7.9810492598755127E+02   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   4.8555587348417640E+06   0.0000000000000000E+00  -6.6613381477509392E-16
-         5   9.9763115748443909E+02   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-         6   1.1971573889813269E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-         7   1.3966836204782148E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-         8   1.5962098519751025E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-         9   1.7957360834719902E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-        10   1.9952623149688782E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-        11   2.1947885464657661E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-        12   2.3943147779626538E+03   1.9952623149688782E+02  -1.2020505435123705E+05  -1.2020530642710972E+05   0.0000000000000000E+00   0.0000000000000000E+00  -6.6613381477509392E-16
-      tau_phys[s]   2.4407158796310516E-02
-
-Convection model: tdc_with_Af_split
-      include_mlt_corr_to_tdc = .false.
-      use_TDC_arnett_velocity_closure = .false.
-      use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .true.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
@@ -227,7 +168,6 @@ Convection model: tdc_with_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
@@ -249,7 +189,6 @@ Convection model: tdc_with_arnett_closure
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
@@ -271,7 +210,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_no_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
@@ -293,7 +231,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_with_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
@@ -315,7 +252,6 @@ Convection model: tdc_with_acceleration_limit
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .true.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   1.9952623149688782E+02   2.5204370043250246E-01  -3.2172240932548668E-05   5.2320587415154047E+07   5.2320587415154047E+07   1.0000020967812193E+00
@@ -347,30 +283,6 @@ Convection model: tdc
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
-      TDC_arnett_growth_target = mlt
-      step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
-         0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
-         1   7.7007392204799953E+03   7.7007392204799953E+03   4.0000397716939257E-01   3.9771693925558278E-06   0.0000000000000000E+00   2.7948760309172320E+02   7.1495234560010973E-02   5.7075947856866094E-08
-         2   1.5401478440959991E+04   7.7007392204799953E+03   4.0000395493296970E-01   3.9549329696727386E-06   2.7948760309172320E+02   5.5477497861836196E+02   1.4191601625825195E-01   1.1266644917018453E-07
-         3   2.3102217661439987E+04   7.7007392204799953E+03   4.0000393347167013E-01   3.9334716701094930E-06   5.5477497861836196E+02   8.2341845398708051E+02   2.1063723348590743E-01   1.6631916155418483E-07
-         4   3.0802956881919981E+04   7.7007392204799953E+03   4.0000391293777982E-01   3.9129377797828441E-06   8.2341845398708051E+02   1.0832121431338355E+03   2.7709460238989475E-01   2.1765337399060058E-07
-         5   3.8503696102399976E+04   7.7007392204799953E+03   4.0000389344979725E-01   3.8934497972205580E-06   1.0832121431338355E+03   1.3322532528000313E+03   3.4080137275718969E-01   2.6637284322728050E-07
-         6   4.6204435322879974E+04   7.7007392204799953E+03   4.0000387510756641E-01   3.8751075663634162E-06   1.3322532528000313E+03   1.5689873926498860E+03   4.0135991871664384E-01   3.1222796181840096E-07
-         7   5.3905174543359964E+04   7.7007392204799953E+03   4.0000385796830107E-01   3.8579683010650897E-06   1.5689873926498860E+03   1.7922298853375303E+03   4.5846719002995001E-01   3.5507569662307498E-07
-         8   6.1605913763839962E+04   7.7007392204799953E+03   4.0000384206410128E-01   3.8420641012738213E-06   1.7922298853375303E+03   2.0011670228765338E+03   5.1191503348133172E-01   3.9483579850063677E-07
-         9   6.9306652984319953E+04   7.7007392204799953E+03   4.0000382740094365E-01   3.8274009436087563E-06   2.0011670228765338E+03   2.1953387606570254E+03   5.6158576586435349E-01   4.3149332606962082E-07
-        10   7.7007392204799951E+04   7.7007392204799953E+03   4.0000381396225176E-01   3.8139622517159853E-06   2.1953387606570254E+03   2.3746071539845266E+03   6.0744409978816527E-01   4.6508971973668878E-07
-        11   8.4708131425279949E+04   7.7007392204799953E+03   4.0000380171283689E-01   3.8017128368745924E-06   2.3746071539845266E+03   2.5391150402843618E+03   6.4952657424453109E-01   4.9571295068773225E-07
-        12   9.2408870645759947E+04   7.7007392204799953E+03   4.0000379060290026E-01   3.7906029002259580E-06   2.5391150402843618E+03   2.6892393632450708E+03   6.8792961453865198E-01   5.2348751455877363E-07
-      tau_phys[s]   1.5401478440959990E+05
-      conv_vel_eq[cm/s]   3.9091780705625856E+03
-
-Convection model: tdc_with_Af_split
-      include_mlt_corr_to_tdc = .false.
-      use_TDC_arnett_velocity_closure = .false.
-      use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .true.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
@@ -393,7 +305,6 @@ Convection model: tdc_with_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
@@ -416,7 +327,6 @@ Convection model: tdc_with_arnett_closure
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
@@ -439,7 +349,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_no_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
@@ -462,7 +371,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_with_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
@@ -485,7 +393,6 @@ Convection model: tdc_with_acceleration_limit
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .true.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   7.7007392204799953E+03   4.0000400000000003E-01   4.0000000000040004E-06   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00   0.0000000000000000E+00
@@ -518,7 +425,6 @@ Convection model: tdc
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
@@ -536,33 +442,10 @@ Convection model: tdc
         12   3.1027403663908070E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
       tau_phys[s]   5.1712339439846779E+04
 
-Convection model: tdc_with_Af_split
-      include_mlt_corr_to_tdc = .false.
-      use_TDC_arnett_velocity_closure = .false.
-      use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .true.
-      TDC_arnett_growth_target = mlt
-      step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
-         0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
-         1   2.5856169719923391E+03   2.5856169719923391E+03   3.9999601233828330E-01  -3.9876617167210728E-06   1.5051080930415759E+02   1.5062723972850915E+02  -3.0846016851882041E-08
-         2   5.1712339439846783E+03   2.5856169719923391E+03   3.9999600460753221E-01  -3.9953924678421233E-06   1.5062723972850915E+02   5.6140482309923982E+01  -1.1518945797206470E-08
-         3   7.7568509159770174E+03   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   5.6140482309923982E+01   0.0000000000000000E+00  -2.2204460492503131E-16
-         4   1.0342467887969357E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-         5   1.2928084859961695E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-         6   1.5513701831954035E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-         7   1.8099318803946375E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-         8   2.0684935775938713E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-         9   2.3270552747931051E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-        10   2.5856169719923389E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-        11   2.8441786691915731E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-        12   3.1027403663908070E+04   2.5856169719923391E+03   3.9999600000000002E-01  -3.9999999999773197E-06   0.0000000000000000E+00   0.0000000000000000E+00  -2.2204460492503131E-16
-      tau_phys[s]   5.1712339439846779E+04
-
 Convection model: tdc_with_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
@@ -584,7 +467,6 @@ Convection model: tdc_with_arnett_closure
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
@@ -606,7 +488,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_no_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
@@ -628,7 +509,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_with_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
@@ -650,7 +530,6 @@ Convection model: tdc_with_acceleration_limit
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .true.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]                L_conv/L
          0   0.0000000000000000E+00   2.5856169719923391E+03   4.0000399998303005E-01   3.9999830300230244E-06   1.5051080930415759E+02   1.5051080930415759E+02  -2.0000157576749444E-05
@@ -682,30 +561,6 @@ Convection model: tdc
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
-      TDC_arnett_growth_target = mlt
-      step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
-         0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356512E-01   9.5746449299924841E-01
-         1   6.8464327200506989E+02   6.8464327200506989E+02   2.7977744393250170E-01   8.9397611087579920E-08   5.0383392852019933E+04   5.2121418074864210E+04   8.6482708264866570E-01   9.5759066825599037E-01
-         2   1.3692865440101398E+03   6.8464327200506989E+02   2.7977744154258327E-01   8.7007692642466247E-08   5.2121418074864210E+04   5.3553083901440143E+04   8.8858206526151517E-01   9.5759066861825992E-01
-         3   2.0539298160152098E+03   6.8464327200506989E+02   2.7977743966686153E-01   8.5131970906460151E-08   5.3553083901440143E+04   5.4733024690056111E+04   9.0816028833386531E-01   9.5759066890258626E-01
-         4   2.7385730880202796E+03   6.8464327200506989E+02   2.7977743818030582E-01   8.3645415219367943E-08   5.4733024690056111E+04   5.5705746147751015E+04   9.2430021490454561E-01   9.5759066912792190E-01
-         5   3.4232163600253493E+03   6.8464327200506989E+02   2.7977743699319907E-01   8.2458308462769200E-08   5.5705746147751015E+04   5.6507711040586320E+04   9.3760685513565400E-01   9.5759066930786640E-01
-         6   4.1078596320304196E+03   6.8464327200506989E+02   2.7977743603953487E-01   8.1504644270383458E-08   5.6507711040586320E+04   5.7168892765873708E+04   9.4857754403286687E-01   9.5759066945242499E-01
-         7   4.7925029040354893E+03   6.8464327200506989E+02   2.7977743526975762E-01   8.0734867018686773E-08   5.7168892765873708E+04   5.7713977130908381E+04   9.5762188201563703E-01   9.5759066956910988E-01
-         8   5.4771461760405591E+03   6.8464327200506989E+02   2.7977743464604299E-01   8.0111152384924902E-08   5.7713977130908381E+04   5.8163315974492507E+04   9.6507755792720606E-01   9.5759066966365392E-01
-         9   6.1617894480456289E+03   6.8464327200506989E+02   2.7977743413912803E-01   7.9604237436080674E-08   5.8163315974492507E+04   5.8533696442506945E+04   9.7122311327573652E-01   9.5759066974049312E-01
-        10   6.8464327200506987E+03   6.8464327200506989E+02   2.7977743372612102E-01   7.9191230398618388E-08   5.8533696442506945E+04   5.8838967982603062E+04   9.7628834567324707E-01   9.5759066980309782E-01
-        11   7.5310759920557684E+03   6.8464327200506989E+02   2.7977743338895023E-01   7.8854059604312865E-08   5.8838967982603062E+04   5.9090556574501214E+04   9.8046284122604344E-01   9.5759066985420704E-01
-        12   8.2157192640608391E+03   6.8464327200506989E+02   2.7977743311324182E-01   7.8578351207862593E-08   5.9090556574501214E+04   5.9297888015708093E+04   9.8390299792290736E-01   9.5759066989599950E-01
-      tau_phys[s]   1.3692865440101397E+04
-      conv_vel_eq[cm/s]   6.0268022499057690E+04
-
-Convection model: tdc_with_Af_split
-      include_mlt_corr_to_tdc = .false.
-      use_TDC_arnett_velocity_closure = .false.
-      use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .true.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356512E-01   9.5746449299924841E-01
@@ -728,7 +583,6 @@ Convection model: tdc_with_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356567E-01   9.5746449299924841E-01
@@ -751,7 +605,6 @@ Convection model: tdc_with_arnett_closure
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356745E-01   9.5746449299924841E-01
@@ -774,7 +627,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_no_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356512E-01   9.5746449299924841E-01
@@ -797,7 +649,6 @@ Convection model: tdc_with_arnett_closure_tdc_ss_mlt_corr
       include_mlt_corr_to_tdc = .true.
       use_TDC_arnett_velocity_closure = .true.
       use_TDC_acceleration_limit = .false.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = tdc_with_mlt_corr
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356567E-01   9.5746449299924841E-01
@@ -820,7 +671,6 @@ Convection model: tdc_with_acceleration_limit
       include_mlt_corr_to_tdc = .false.
       use_TDC_arnett_velocity_closure = .false.
       use_TDC_acceleration_limit = .true.
-      use_TDC_Af_split = .false.
       TDC_arnett_growth_target = mlt
       step                 time[s]                   dt[s]                   gradT                  Y_face      conv_vel_start[cm/s]           conv_vel[cm/s]           conv_vel/conv_vel_eq                L_conv/L
          0   0.0000000000000000E+00   6.8464327200506989E+02   2.8060983127196415E-01   8.3247673707353975E-04   5.0383392852019933E+04   5.0383392852019933E+04   8.3598881733356512E-01   9.5746449299924841E-01
