@@ -237,8 +237,8 @@
       ! Unstable-side steady-state target used by the Arnett 1969 closure in
       ! this implementation:
       ! 0 = steady-state MLT convective velocity
-      ! 1 = steady-state Kuhfuss 1986 closure velocity without the MLT correction
-      ! 2 = steady-state Kuhfuss 1986 closure velocity with the MLT correction
+      ! 1 = steady-state Kuhfuss 1986 closure velocity, using the active
+      !     include_mlt_corr_to_TDC setting
 
       ! ::
 

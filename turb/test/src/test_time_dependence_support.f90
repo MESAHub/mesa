@@ -3,8 +3,7 @@ module test_time_dependence_support
    use math_lib
    use auto_diff
    use const_def, only: dp, pi, rsun, lsun, msun, kerg, mp, boltz_sigma, standard_cgrav, sqrt_2_div_3
-   use turb, only: set_MLT, set_TDC, TDC_arnett_growth_target_mlt, &
-      TDC_arnett_growth_target_tdc_no_mlt_corr, TDC_arnett_growth_target_tdc_with_mlt_corr
+   use turb, only: set_MLT, set_TDC, TDC_arnett_growth_target_mlt, TDC_arnett_growth_target_tdc
 
    implicit none
 
@@ -31,8 +30,8 @@ module test_time_dependence_support
       tdc_mode_data('tdc', .false., .false., .false., TDC_arnett_growth_target_mlt), &
       tdc_mode_data('tdc_with_mlt_corr', .false., .false., .true., TDC_arnett_growth_target_mlt), &
       tdc_mode_data('tdc_with_arnett_closure', .true., .false., .true., TDC_arnett_growth_target_mlt), &
-      tdc_mode_data('tdc_with_arnett_closure_tdc_ss', .true., .false., .false., TDC_arnett_growth_target_tdc_no_mlt_corr), &
-      tdc_mode_data('tdc_with_arnett_closure_tdc_ss_mlt_corr', .true., .false., .true., TDC_arnett_growth_target_tdc_with_mlt_corr), &
+      tdc_mode_data('tdc_with_arnett_closure_tdc_ss', .true., .false., .false., TDC_arnett_growth_target_tdc), &
+      tdc_mode_data('tdc_with_arnett_closure_tdc_ss_mlt_corr', .true., .false., .true., TDC_arnett_growth_target_tdc), &
       tdc_mode_data('tdc_with_acceleration_limit', .false., .true., .false., TDC_arnett_growth_target_mlt) ]
 
    private
@@ -1008,10 +1007,8 @@ contains
       select case (growth_target)
       case (TDC_arnett_growth_target_mlt)
          name = 'mlt'
-      case (TDC_arnett_growth_target_tdc_no_mlt_corr)
-         name = 'tdc_no_mlt_corr'
-      case (TDC_arnett_growth_target_tdc_with_mlt_corr)
-         name = 'tdc_with_mlt_corr'
+      case (TDC_arnett_growth_target_tdc)
+         name = 'tdc'
       case default
          name = 'unknown'
       end select

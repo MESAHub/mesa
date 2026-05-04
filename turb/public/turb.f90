@@ -22,8 +22,7 @@ module turb
    use num_lib
    use utils_lib
    use auto_diff
-   use tdc_support, only: TDC_arnett_growth_target_mlt, TDC_arnett_growth_target_tdc_no_mlt_corr, &
-      TDC_arnett_growth_target_tdc_with_mlt_corr
+   use tdc_support, only: TDC_arnett_growth_target_mlt, TDC_arnett_growth_target_tdc
 
    implicit none
 
@@ -33,8 +32,7 @@ module turb
    public :: set_tdc
    public :: set_semiconvection
    public :: TDC_arnett_growth_target_mlt
-   public :: TDC_arnett_growth_target_tdc_no_mlt_corr
-   public :: TDC_arnett_growth_target_tdc_with_mlt_corr
+   public :: TDC_arnett_growth_target_tdc
 
    contains
 

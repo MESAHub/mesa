@@ -27,8 +27,7 @@ use auto_diff
 implicit none
 
 integer, parameter :: TDC_arnett_growth_target_mlt = 0
-integer, parameter :: TDC_arnett_growth_target_tdc_no_mlt_corr = 1
-integer, parameter :: TDC_arnett_growth_target_tdc_with_mlt_corr = 2
+integer, parameter :: TDC_arnett_growth_target_tdc = 1
 
 private
 public :: set_Y
@@ -44,8 +43,7 @@ public :: eval_xis
 public :: compute_Q
 public :: apply_postsolve_TDC_acceleration_limit
 public :: TDC_arnett_growth_target_mlt
-public :: TDC_arnett_growth_target_tdc_no_mlt_corr
-public :: TDC_arnett_growth_target_tdc_with_mlt_corr
+public :: TDC_arnett_growth_target_tdc
 
    !> Stores the information which is required to evaluate TDC-related quantities and which
    !! do not depend on Y.
@@ -519,10 +517,8 @@ contains
       select case (info%TDC_arnett_growth_target)
       case (TDC_arnett_growth_target_mlt)
          A_target = info%A_mlt
-      case (TDC_arnett_growth_target_tdc_no_mlt_corr)
-         A_target = eval_Af_tdc_steady_state(info, Y, .false.)
-      case (TDC_arnett_growth_target_tdc_with_mlt_corr)
-         A_target = eval_Af_tdc_steady_state(info, Y, .true.)
+      case (TDC_arnett_growth_target_tdc)
+         A_target = eval_Af_tdc_steady_state(info, Y)
       case default
          call mesa_error(__FILE__,__LINE__,'bad TDC_arnett_growth_target')
       end select
@@ -837,20 +833,14 @@ contains
    !!
    !! @param info tdc_info type storing various quantities that are independent of Y.
    !! @param Y Superadiabaticity.
-   !! @param use_mlt_corr If true, use the MLT Gamma correction when forming Y_env.
-   type(auto_diff_real_tdc) function eval_Af_tdc_steady_state(info, Y, use_mlt_corr) result(Af_ss)
+   type(auto_diff_real_tdc) function eval_Af_tdc_steady_state(info, Y) result(Af_ss)
       type(tdc_info), intent(in) :: info
       type(auto_diff_real_tdc), intent(in) :: Y
-      logical, intent(in) :: use_mlt_corr
       type(auto_diff_real_tdc) :: Y_env, xi0, xi1, xi2, J2, J, root1, root2
       real(dp), parameter :: tiny = 1d-30
 
-      if (use_mlt_corr) then
-         if (Y > 0d0 .and. info%include_mlt_corr_to_TDC) then
-            Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
-         else
-            Y_env = Y
-         end if
+      if (Y > 0d0 .and. info%include_mlt_corr_to_TDC) then
+         Y_env = Y * convert(info%Gamma/(1d0+info%Gamma))
       else
          Y_env = Y
       end if
@@ -893,7 +883,7 @@ contains
       type(auto_diff_real_tdc) :: Af_bound, Af_target, Af_excess0, numer, denom, Y_env_factor
       real(dp), parameter :: tiny = 1d-30
 
-      Af_target = eval_Af_tdc_steady_state(info, Y, info%include_mlt_corr_to_TDC)
+      Af_target = eval_Af_tdc_steady_state(info, Y)
 
       if (Af_target > info%A0 + tiny) then
          Af_bound = eval_Af_arnett_growth_to_target(info, Af_target)
