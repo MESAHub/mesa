@@ -211,7 +211,7 @@ contains
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
-      
+
       ! we want to ignore T gradient equation for a few steps after remesh
       if (s%model_number < initial_model_number + 10 .and. in_inlist_pulses) then
          s%convergence_ignore_equL_residuals = .true.
