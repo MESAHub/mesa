@@ -10,6 +10,16 @@ we will also list workarounds, but for some bugs the only option will be to upda
 a newer version of MESA. Note this list is NOT comprehensive; users should check this first if they have an
 issue, but it may not be complete.
 
+r26.4.1
+=======
+
+.. _report_max_infall_inside_fe_core_bug:
+
+Controls: ``report_max_infall_inside_fe_core`` is ignored
+---------------------------------------------------------
+
+The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 <https://github.com/MESAHub/mesa/pull/981>`_.
+
 r25.12.1
 ========
 
