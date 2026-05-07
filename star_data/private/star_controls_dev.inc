@@ -1,5 +1,7 @@
          
          logical :: compare_TDC_to_MLT 
+         logical :: use_TDC_Y_face_seeded_newton
+         character(32) :: hydro_matrix_solver
 
          logical :: TDC_use_density_form_for_eddy_viscosity
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
