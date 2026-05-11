@@ -43,19 +43,19 @@ contains
       integer :: iz
       iz = floor(Z*1d5 + 0.1d0)
       select case (iz)
-      case (1000)
+      case (700)
          fname = trim(data_dir)//'/m0.3.txt'
-      case (2000)
+      case (1500)
          fname = trim(data_dir)//'/p0.0.txt'
-      case (4000)
+      case (2900)
          fname = trim(data_dir)//'/p0.3.txt'
-      case (10000)
+      case (7000)
          fname = trim(data_dir)//'/p0.7.txt'
-      case (20000)
+      case (13000)
          fname = trim(data_dir)//'/p1.0.txt'
-      case (63000)
+      case (32100)
          fname = trim(data_dir)//'/p1.5.txt'
-      case (100000)
+      case (42900)
          fname = trim(data_dir)//'/p1.7.txt'
       case default
          write (*, *) 'get_Freedman_fname: unexpected Z value for Freedman data', Z
