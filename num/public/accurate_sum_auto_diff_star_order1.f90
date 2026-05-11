@@ -135,8 +135,8 @@ contains
       type(accurate_auto_diff_real_star_order1), intent(in) :: op1
       real(dp), intent(in) :: op2
 
-      ret%sum = op1%sum*op1
-      ret%compensator = op1%compensator*op1
+      ret%sum = op1%sum*op2
+      ret%compensator = op1%compensator*op2
 
    end function mult_acc_rdp
 
