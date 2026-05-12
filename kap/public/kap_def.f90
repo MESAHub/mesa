@@ -618,7 +618,8 @@ contains
           kap_lowT_Xs(1:num_kap_lowT_Xs(i), i) = [ 0.00d0 ]
           num_kap_lowT_Zs(i) = 7
           kap_lowT_Zs(1:num_kap_lowT_Zs(i), i) = &
-             [ 0.007d0, 0.015d0, 0.029d0, 0.07d0,  0.13d0,  0.321d0, 0.429d0 ]
+             [ 0.007452d0, 0.014760d0, 0.029024d0, 0.069840d0, &
+               0.130292d0, 0.321456d0, 0.428844d0 ]
           num_kap_lowT_Xs_for_this_Z(1:num_kap_lowT_Zs(i), i) = num_kap_lowT_Xs(i)
        case DEFAULT
           num_kap_lowT_Xs(i) = 10

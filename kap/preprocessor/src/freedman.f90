@@ -41,21 +41,21 @@ contains
       character(len=*), intent(in) :: data_dir
       character(len=*), intent(out) :: fname
       integer :: iz
-      iz = floor(Z*1d5 + 0.1d0)
+      iz = nint(Z*1d6)
       select case (iz)
-      case (700)
+      case (7452)
          fname = trim(data_dir)//'/m0.3.txt'
-      case (1500)
+      case (14760)
          fname = trim(data_dir)//'/p0.0.txt'
-      case (2900)
+      case (29024)
          fname = trim(data_dir)//'/p0.3.txt'
-      case (7000)
+      case (69840)
          fname = trim(data_dir)//'/p0.7.txt'
-      case (13000)
+      case (130292)
          fname = trim(data_dir)//'/p1.0.txt'
-      case (32100)
+      case (321456)
          fname = trim(data_dir)//'/p1.5.txt'
-      case (42900)
+      case (428844)
          fname = trim(data_dir)//'/p1.7.txt'
       case default
          write (*, *) 'get_Freedman_fname: unexpected Z value for Freedman data', Z
