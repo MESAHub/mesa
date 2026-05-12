@@ -1,0 +1,15 @@
+      runtime_minutes:  16.71
+      model_number:         2344
+      star_age:     1.0136396734299462E+07
+      num_retries:           11
+      log_rel_run_E_err:        -4.5194878652040105
+      steps:          266
+      retries:           11
+      redos:            0
+      solver_calls_made:          277
+      solver_calls_failed:           11
+      solver_iterations:         2052
+      extra_testhub_names:
+            - 'fe_core_mass'
+      extra_testhub_vals:
+            -     1.6762420545401346E+00

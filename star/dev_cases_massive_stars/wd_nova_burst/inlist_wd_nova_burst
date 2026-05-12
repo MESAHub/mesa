@@ -1,0 +1,237 @@
+
+! inlist_wd_nova_burst
+
+
+&star_job
+
+   show_log_description_at_start = .false.
+
+   load_saved_model = .true.
+   load_model_filename = 'ready.mod' ! from running inlist_setup
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+   required_termination_code_string = 'extras_check_model'
+
+!      save_model_when_terminate = .true.
+!      save_model_filename = 'start_of_wd_nova_burst.mod'
+!      required_termination_code_string = 'max_model_number'
+
+   set_initial_age = .true.
+   initial_age = 0
+
+   set_initial_model_number = .true.
+   initial_model_number = 0
+
+relax_tau_factor = .true.
+relax_to_this_tau_factor = 1d0
+dlogtau_factor = 0.1d0
+
+   set_tau_factor = .false.
+   !set_to_this_tau_factor = 30
+
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
+   set_initial_dt = .true.
+   years_for_initial_dt = 1d0 !1d-5
+
+   change_v_flag = .true.
+   new_v_flag = .true.
+
+   pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+     mass_fraction_limit_for_Skye = 1d-16 
+
+/ ! end of eos namelist
+
+
+&kap
+   Zbase = 0.02d0
+
+   use_Type2_opacities = .true.
+
+/ ! end of kap namelist
+
+
+&controls
+
+   ! limit max_model_number as part of test_suite
+   !max_model_number = 223
+   !max_model_number = 2250
+
+! solver
+   min_dq = 1d-26
+   min_dq_for_split = 1d-24
+   max_surface_cell_dq = 1d0
+   min_dq_for_xa = 1d-4
+
+
+   ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
+   dt_div_min_dr_div_cs_limit = 5d3 !500d0 !50d0 ! 100d0
+   dt_div_min_dr_div_cs_hard_limit = -1 !10d0! i don't like hard limits ~ EbF
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0d0 !0.8d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0d0 !0d0
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1 
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0 ! lower to 1d-4 for massive stars.
+
+   report_solver_progress = .false.
+
+   energy_eqn_option = 'dedt'
+
+   use_gold2_tolerances = .false.
+
+   limit_for_rel_error_in_energy_conservation = 1d-5
+   hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+   warning_limit_for_max_residual = 1d99
+   convergence_ignore_equL_residuals = .true.
+   make_gradr_sticky_in_solver_iters = .true.      
+
+
+   mass_change_full_on_dt = 1d-6 ! (seconds)
+   mass_change_full_off_dt = 1d-6 ! (seconds)
+
+   ! NOTE: for super eddington wind,
+   ! we use Ledd averaged over mass to optical depth tau = 100
+   !super_eddington_scaling_factor = 0
+   ! parameter for mass loss driven by super Eddington luminosity
+   !super_eddington_wind_Ledd_factor = 1
+   ! multiply Ledd by this factor when computing super Eddington wind
+   ! e.g., if this is 2, then only get wind when L > 2*Ledd
+
+   use_other_wind = .true.
+   max_tries_for_implicit_wind = 10
+   !surf_avg_tau = 10
+   !eps_mdot_leak_frac_factor = 0d0 !1d0
+
+   mixing_length_alpha = 1.9
+   MLT_option = 'TDC'
+   include_mlt_corr_to_TDC = .false. ! true K. 1986 model, no mlt limiting
+   TDC_include_eturb_in_energy_equation = .true.
+   TDC_alpha_M = 0.25d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   use_superad_reduction = .false.
+   okay_to_reduce_gradT_excess = .false.
+
+   !set_rho_to_dm_div_dV = .false.
+
+   !include_mlt_Pturb_in_thermodynamic_gradients = .false.
+
+   
+   ! artificial viscosity if necessary, v_flag only
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 4.0d0 ! try 100d0 if shocks become an issue.
+   Pvsc_zsh = 0.1d0
+
+   max_num_merge_surface_cells = 30
+   P_function_weight = 0 ! must be set 0 if doing remesh, when using Pvsc, or risk resolving single zone art visc P.
+   !log_tau_function_weight = 40
+
+okay_to_remesh = .true.
+max_conv_vel_div_csound = 1d0
+max_conv_vel_div_csound_maxq = 1d0
+
+! controls for shock capturing, relaxed for pulsations
+   ! main purpose is to force radiative in shock face
+    max_abs_du_div_cs_for_convection = 1d1 !0.03d0
+    max_v_div_cs_for_convection = 1d2
+    max_v_for_convection = 1d4
+
+
+   use_Ledoux_criterion = .true.
+   alpha_semiconvection = 1d-3
+   thermohaline_coeff = 1d3
+
+   ! we only include a bit of exponential overshooting to smooth things out
+
+   mass_change = 1d-9!1d-9
+   accrete_same_as_surface = .false.
+   accretion_h1 = 0.7000 ! Estimate Nomoto 2007
+   accretion_h2 = 0
+   accretion_he3 = 0.292910D-04
+   accretion_he4 = 0.279971 ! Estimated Nomoto 2007
+   accretion_zfracs = 4 ! Lodders 03
+
+   min_timestep_limit = 1d-12
+
+   xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
+   xa_function_weight(1) = 20
+   xa_function_param(1) = 1d-6
+   xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
+   xa_function_weight(2) = 20
+   xa_function_param(2) = 1d-2
+
+   delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
+   lgL_H_burn_min = -0.5 ! ignore changes in lgL_H if value is less than this
+
+   delta_lgL_He_limit = 0.25 ! limit for magnitude of change in lgL_He
+   lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+
+   delta_lgRho_limit = 1 ! limit for magnitude of max change in log10 density at any point
+   delta_lgRho_hard_limit = -1
+
+   delta_lgRho_cntr_limit = 1d-2
+
+   delta_lgT_limit = 0.5
+   delta_lgL_limit = 0.1d0 !0.05
+   delta_lgTeff_limit = 0.10
+
+   delta_lgL_nuc_limit = 0.02
+   delta_lgL_nuc_hard_limit = 0.20
+   lgL_nuc_burn_min = -3d0
+
+   delta_lgR_limit = 1d-1
+   delta_lgR_limit_min_lgR = 1d-1
+
+   atm_option = 'T_tau'
+   atm_T_tau_relation = 'Eddington'
+   atm_T_tau_opacity = 'fixed'
+   Pextra_factor = 1.1d0 ! 4 * tau_factor
+   use_momentum_outer_BC = .true.
+
+   !varcontrol_target = 3d-4
+
+   max_q_for_conv_timescale = 0.999999999d0
+
+   mesh_delta_coeff = 1.0
+   max_allowed_nz = 20000
+
+   num_trace_history_values = 2
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+
+   photo_interval = 100
+   profile_interval = 50
+   history_interval = 1
+   photo_digits = 8
+   terminal_interval = 1
+   write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+  ! Grid8_win_flag = .true.
+  ! Grid8_win_width = 7
+  ! Summary_Burn_xaxis_name = 'logxq'
+  ! Summary_Burn_xaxis_reversed = .true.
+  ! Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
+  ! Summary_Burn_xmax = -3 ! -101d0 ! only used if /= -101d0
+  ! Abundance_xaxis_name = 'logxq'
+  ! Abundance_xaxis_reversed = .true.
+  ! Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
+  ! Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
+
+  ! Text_Summary1_name(5,2) = 'time_step_sec'
+  ! Text_Summary1_name(6,2) = 'max_tau_conv'
+   !Text_Summary1_name(7,2) = 'cz_bot_radius'
+   !Text_Summary1_name(8,2) = 'cz_top_radius'
+
+/ ! end of pgstar namelist

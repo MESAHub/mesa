@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+make run
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'
