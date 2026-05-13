@@ -38,8 +38,10 @@ contains
 
    !> Determines if it is safe (physically) to use TDC instead of MLT.
    !!
-   !! By default, fall back to MLT in cells that get touched by adjust_mass.
-   !! This can be disabled to let those cells use TDC.
+   !! Currently we only know we have to fall back to MLT in cells that get touched
+   !! by adjust_mass, because there the convection speeds at the start of the
+   !! step can be badly out of whack. This can be disabled with TDC_adjust_mass_fallback_to_mlt
+   !! to let those cells use TDC.
    !!
    !! @param s star pointer
    !! @param k face index
