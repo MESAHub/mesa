@@ -111,14 +111,13 @@ module turb
    !! @param gradT The temperature gradient dlnT/dlnP (output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   !! @param have_Y_face_guess If true, use Y_face_guess to try a small local positive-Y bracket.
-   !! @param Y_face_guess Candidate superadiabaticity for the local solve.
+   !! @param Y_face_guess Candidate superadiabaticity for the local solve. Non-positive values disable seeding.
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
             max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
-            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, ierr, have_Y_face_guess, Y_face_guess)
+            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, ierr, Y_face_guess)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
@@ -126,8 +125,7 @@ module turb
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav, energy
       logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
-      logical, intent(in), optional :: have_Y_face_guess
-      real(dp), intent(in), optional :: Y_face_guess
+      real(dp), intent(in) :: Y_face_guess
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
@@ -188,8 +186,7 @@ module turb
       ! Get solution
       Zub = upper_bound_Z
       Zlb = lower_bound_Z
-      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr, &
-         have_Y_face_guess, Y_face_guess)
+      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr, Y_face_guess)
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs
       if (conv_vel%val > max_conv_vel) then

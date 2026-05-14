@@ -47,17 +47,14 @@ contains
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   !! @param have_Y_face_guess If true, use Y_face_guess to try a small local positive-Y bracket.
-   !! @param Y_face_guess Candidate superadiabaticity for the local solve.
-   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr, &
-         have_Y_face_guess, Y_face_guess)
+   !! @param Y_face_guess Candidate superadiabaticity for the local solve. Non-positive values disable seeding.
+   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr, Y_face_guess)
       type(tdc_info), intent(in) :: info
       real(dp), intent(in) :: scale
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
-      logical, intent(in), optional :: have_Y_face_guess
-      real(dp), intent(in), optional :: Y_face_guess
+      real(dp), intent(in) :: Y_face_guess
 
       logical :: Y_is_positive
       type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
@@ -101,7 +98,7 @@ contains
       if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
          call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr, &
-            have_Y_face_guess, Y_face_guess)
+            Y_face_guess)
          if (ierr /= 0) return
          Y = convert(Y_face)
          if (info%report) write(*,*) 'Y is positive, Y=',Y_face%val
@@ -185,14 +182,16 @@ contains
                      if (info%report) write(*,*) 'Root has Q>0. Q(Y1)=',Q%val
                      ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
                      if (info%report) write(*,*) 'Searching from Y=',-exp(Zlb%val),'to Y=',-exp(Z1%val)
-                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, ierr)
+                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, &
+                        ierr, 0d0)
                      Y = convert(Y_face)
                      if (info%report) write(*,*) 'ierr',ierr, tdc_num_iters
                      if (ierr /= 0) then
                         if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(Z1%val),'to Y=',-exp(Z0%val)
                         ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
                         ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
-                        call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, ierr)
+                        call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, &
+                           ierr, 0d0)
                         Y = convert(Y_face)
                      end if
                      if (info%report) write(*,*) 'Y=',Y%val
@@ -201,7 +200,8 @@ contains
                   if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
                   call compute_Q(info, Y0, Q, Af)
                   if (Q > 0) then  ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
-                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
+                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, &
+                        ierr, 0d0)
                      Y = convert(Y_face)
                      if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
                   else  ! Means there's no root in [Y0,0] so the only root is radY.
@@ -233,10 +233,9 @@ contains
    !! @param Y_face The superadiabaticity (dlnT/dlnP - grada, output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
-   !! @param have_Y_face_guess If true, use Y_face_guess to try a small local positive-Y bracket.
-   !! @param Y_face_guess Candidate superadiabaticity for the local solve.
+   !! @param Y_face_guess Candidate superadiabaticity for the local solve. Non-positive values disable seeding.
    subroutine bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, ierr, &
-         have_Y_face_guess, Y_face_guess)
+         Y_face_guess)
       type(tdc_info), intent(in) :: info
       logical, intent(in) :: Y_is_positive
       real(dp), intent(in) :: scale
@@ -245,8 +244,7 @@ contains
       type(auto_diff_real_tdc), intent(out) :: Af
       integer, intent(out) :: tdc_num_iters
       integer, intent(out) :: ierr
-      logical, intent(in), optional :: have_Y_face_guess
-      real(dp), intent(in), optional :: Y_face_guess
+      real(dp), intent(in) :: Y_face_guess
 
       type(auto_diff_real_tdc) :: Y, Z, Q, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ
@@ -264,8 +262,7 @@ contains
       lower_bound_Z = Zlb
       upper_bound_Z = Zub
 
-      call try_seeded_positive_Y_bracket(info, Y_is_positive, Zlb, Zub, lower_bound_Z, upper_bound_Z, &
-         have_Y_face_guess, Y_face_guess)
+      call try_seeded_positive_Y_bracket(info, Y_is_positive, Zlb, Zub, lower_bound_Z, upper_bound_Z, Y_face_guess)
 
       ! Perform bisection search.
       call Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
@@ -399,23 +396,18 @@ contains
    end subroutine bracket_plus_Newton_search
 
 
-   subroutine try_seeded_positive_Y_bracket(info, Y_is_positive, Zlb, Zub, lower_bound_Z, upper_bound_Z, &
-         have_Y_face_guess, Y_face_guess)
+   subroutine try_seeded_positive_Y_bracket(info, Y_is_positive, Zlb, Zub, lower_bound_Z, upper_bound_Z, Y_face_guess)
       type(tdc_info), intent(in) :: info
       logical, intent(in) :: Y_is_positive
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_tdc), intent(inout) :: lower_bound_Z, upper_bound_Z
-      logical, intent(in), optional :: have_Y_face_guess
-      real(dp), intent(in), optional :: Y_face_guess
+      real(dp), intent(in) :: Y_face_guess
 
       type(auto_diff_real_tdc) :: Af, Q_lb, Q_ub, Y, Z_seed, Z_seed_lb, Z_seed_ub
       ! Try a local bracket within a factor exp(seed_bracket_half_width) of the seed.
       real(dp), parameter :: seed_bracket_half_width = 3d0
 
       if (.not. Y_is_positive) return
-      if (.not. present(have_Y_face_guess)) return
-      if (.not. present(Y_face_guess)) return
-      if (.not. have_Y_face_guess) return
       if (is_bad(Y_face_guess) .or. Y_face_guess <= 0d0) return
 
       Z_seed = log(Y_face_guess)

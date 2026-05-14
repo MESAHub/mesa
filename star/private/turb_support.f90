@@ -327,12 +327,9 @@ contains
 
          have_Y_face_guess = s% use_TDC_Y_face_seeded_newton .and. s% doing_solver_iterations
          if (have_Y_face_guess) then
-            if (s% solver_iter == 0) then
-               Y_face_guess = s% Y_face_start(k)
-            else
-               Y_face_guess = s% Y_face(k)
-            end if
+            Y_face_guess = s% Y_face(k)
          else
+            ! Non-positive Y_face_guess values are ignored by the TDC seeded bracket.
             Y_face_guess = 0d0
          end if
 
@@ -343,7 +340,7 @@ contains
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
             s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr, &
-            have_Y_face_guess, Y_face_guess)
+            Y_face_guess)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -365,7 +362,7 @@ contains
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
                   s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr, &
-                  have_Y_face_guess, Y_face_guess)
+                  Y_face_guess)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

@@ -1025,9 +1025,9 @@
             end if
 
             select case (trim(s% hydro_matrix_solver))
-            case ('', 'bcyclic')
-               call factor_mtx(ierr)
-               if (ierr == 0) call solve_mtx(ierr)
+            case ('bcyclic')
+               call factor_bcyclic_mtx(ierr)
+               if (ierr == 0) call solve_bcyclic_mtx(ierr)
             case ('banded')
                call solve_banded_mtx(ierr)
             case default
@@ -1057,30 +1057,29 @@
          end function solve_equ
 
 
-         subroutine factor_mtx(ierr)
+         subroutine factor_bcyclic_mtx(ierr)
             use star_bcyclic, only: bcyclic_factor
             integer, intent(out) :: ierr
             call bcyclic_factor( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, row_scale_factors1, col_scale_factors1, &
                equed1, iter, ierr)
-         end subroutine factor_mtx
+         end subroutine factor_bcyclic_mtx
 
 
-         subroutine solve_mtx(ierr)
+         subroutine solve_bcyclic_mtx(ierr)
             use star_bcyclic, only: bcyclic_solve
             integer, intent(out) :: ierr
             call bcyclic_solve( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
                iter, ierr)
-         end subroutine solve_mtx
+         end subroutine solve_bcyclic_mtx
 
 
          subroutine solve_banded_mtx(ierr)
             integer, intent(out) :: ierr
             integer :: info, k, i_equ, i_var, irow, jcol, row0, col0, iband
-            include 'formats'
 
             ierr = 0
             if (.not. associated(band)) then
@@ -1143,7 +1142,7 @@
 
             call DGBTRF(neq, neq, band_kl, band_ku, band, band_ldab, ipiv1, info)
             if (info /= 0) then
-               write(*,2) 'hydro banded DGBTRF failed', info
+               write(*,*) 'hydro banded DGBTRF failed', info
                ierr = info
                return
             end if
@@ -1151,7 +1150,7 @@
             call DGBTRS('N', neq, band_kl, band_ku, 1, band, band_ldab, &
                ipiv1, soln1, neq, info)
             if (info /= 0) then
-               write(*,2) 'hydro banded DGBTRS failed', info
+               write(*,*) 'hydro banded DGBTRS failed', info
                ierr = info
                return
             end if
@@ -2007,8 +2006,7 @@
             nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
                      soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
                      col_scale_factors1, save_ublk1, save_dblk1, save_lblk1, band1,&
-                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1)
-            nullify(band)
+                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1, band)
 
          end subroutine cleanup
 
