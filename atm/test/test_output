@@ -85,7 +85,7 @@
 
  test_irradiated
 
-                              test_grey_irradiated: kap    4.3649748642304882D-03
+                              test_grey_irradiated: kap    4.3649748858080083D-03
                                             M/M_jupiter    1.4999999999999998D+00
                                             R/R_jupiter    1.5743735095633800D+00
                                                  R/Rsun    1.6178684913857289D-01
@@ -98,3 +98,4 @@
                                                   T_int    9.0000000000000000D+02
                                                       T    1.2929349615774468D+03
                                                    logT    3.1115766791430097D+00
+
