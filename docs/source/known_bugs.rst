@@ -13,6 +13,17 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _freeeos_fallback_log_units_bug:
+
+EOS: FreeEOS fallback rows use the wrong logarithm base
+------------------------------------------------------
+
+Fixed an issue in the FreeEOS table builder where fallback rows marked by
+``MESA = 1`` could write the MESA EOS values ``lnPgas``, ``lnE``, and ``lnS``
+into table columns that are read as base-10 logarithms. This could create
+discontinuities in the FreeEOS support table and noisy EOS partial derivatives,
+including near the low-density ``logT = 3.0 - 3.1`` FreeEOS boundary.
+
 .. _report_max_infall_inside_fe_core_bug:
 
 Controls: ``report_max_infall_inside_fe_core`` is ignored
