@@ -111,12 +111,13 @@ module turb
    !! @param gradT The temperature gradient dlnT/dlnP (output).
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
+   !! @param Y_face_guess Candidate superadiabaticity for the local solve. Non-positive values disable seeding.
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
             max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
-            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, ierr)
+            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, Y_face_guess, ierr)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
@@ -124,6 +125,7 @@ module turb
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada, Eq_div_w, grav, energy
       logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
+      real(dp), intent(in) :: Y_face_guess
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
@@ -135,14 +137,23 @@ module turb
       type(auto_diff_real_tdc) :: Zub, Zlb
       include 'formats'
 
-      ! Do a call to MLT
       !grav = cgrav * m / pow2(r)
       L = 64d0 * pi * boltz_sigma * pow4(T) * grav * pow2(r) * gradr / (3d0 * P * opacity)
-      Lambda = mixing_length_alpha * scale_height
-      call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type,1d99, ierr)
+      if (include_mlt_corr_to_TDC) then
+         Lambda = mixing_length_alpha * scale_height
+         call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
+                        chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+                        gradr, grada, gradL, &
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type,1d99, ierr)
+      else
+         Gamma = 0d0
+         gradT = gradr
+         Y_face = gradT - gradL
+         conv_vel = 0d0
+         D = 0d0
+         mixing_type = no_mixing
+         ierr = 0
+      end if
 
 
       ! Pack TDC info
@@ -175,7 +186,7 @@ module turb
       ! Get solution
       Zub = upper_bound_Z
       Zlb = lower_bound_Z
-      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
+      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, Y_face_guess, ierr)
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs
       if (conv_vel%val > max_conv_vel) then
