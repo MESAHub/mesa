@@ -13,6 +13,27 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _freedman_lowt_z_bug:
+
+Kap: ``lowT_Freedman11`` used ``[M/H]`` labels as ``Z``
+-------------------------------------------------------
+
+The ``lowT_Freedman11`` opacity option used the Freedman table labels
+``0.01``, ``0.02``, ``0.04``, ``0.10``, ``0.20``, ``0.63``, and ``1.00`` as
+metal mass fractions.  These labels correspond to ``[M/H]`` not
+MESA's metal mass fraction ``Z``.  The opacity routines incorrectly interpolated in ``Z``,
+using the ``[M/H]`` labels as the interpolation grid.
+
+This has been fixed in the main branch after ``r26.4.1``.  The fix updates the
+``lowT_Freedman11`` ``Z`` grid to use the correct corresponding metal mass fractions.
+See `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
+If applying these fixes to an existing checkout, rerun the opacity preprocessor
+to regenerate the tables; this is not done by a normal MESA install::
+
+   cd $MESA_DIR/kap/preprocessor
+   ./build_data_and_export
+
 .. _report_max_infall_inside_fe_core_bug:
 
 Controls: ``report_max_infall_inside_fe_core`` is ignored

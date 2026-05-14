@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"
+
+kap_data_dir="../../build/kap-preprocessor/data/kap_data"
+
+rm -rf "$kap_data_dir"
+mkdir -p "$kap_data_dir"
+make build-data build-aesopus export-data
