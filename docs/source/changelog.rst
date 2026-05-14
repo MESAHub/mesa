@@ -48,6 +48,16 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
 
+Fixed a bug in the FreeEOS table builder where MESA fallback rows could write
+``lnPgas``, ``lnE``, and ``lnS`` values into table columns that are read as
+base-10 logarithms. This could create discontinuities and noisy EOS partial
+derivatives.
+
+The regenerated eosDT tables now also include an analytic low-pressure SCVH
+tail matched to the SCVH table edge where OPAL/SCVH previously hit table edge
+limits and fell back to HELM. The SCVH region has been extended toward
+:math:`\log_{10}\rho \simeq -14.9`.
+
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
