@@ -35,6 +35,7 @@
       real(dp), parameter :: cvp   = 1.0d0 - cv
       real(dp), parameter :: ca    = 0.5d0
       real(dp), parameter :: cap   = 1.0d0 - ca
+      real(dp), parameter :: tfac0 = cv*cv + (num_neu_fam-1.0d0) * (cvp*cvp)
       real(dp), parameter :: tfac1 = cv*cv + ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp+cap*cap)
       real(dp), parameter :: tfac2 = cv*cv - ca*ca + (num_neu_fam-1.0d0) * (cvp*cvp - cap*cap)
       real(dp), parameter :: tfac3 = tfac2/tfac1
@@ -237,13 +238,13 @@
          temp = T
       end if
 
-      if (T <= 0) then
+      if (temp <= 0) then
          info = -1
          return
       end if
 
       if (logT == arg_not_provided) then
-         logtemp = log10(T)
+         logtemp = log10(temp)
       else
          logtemp = logT
       end if
@@ -263,13 +264,13 @@
          den = Rho
       end if
 
-      if (Rho <= 0) then
+      if (den <= 0) then
          info = -1
          return
       end if
 
       if (logRho == arg_not_provided) then
-         logden = log10(Rho)
+         logden = log10(den)
       else
          logden = logRho
       end if
@@ -1579,8 +1580,8 @@
          splasdz = a2*splasdz + a3*gl2dz*a1
 
 
-         a2      = 0.93153d0 * 3.0d21 * input% xl9
-         a3      = 0.93153d0 * 3.0d21 * 9.0d0*input% xl8*input% xldt
+         a2      = tfac0 * 3.0d21 * input% xl9
+         a3      = tfac0 * 3.0d21 * 9.0d0*input% xl8*input% xldt
 
          a1      = splas
          splas   = a2*a1
