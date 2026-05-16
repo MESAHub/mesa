@@ -37,7 +37,7 @@ Bug Fixes
 
 The plasma neutrino cooling rate was using an hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290.
 Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasma neutrinos.
-This was the case in all previous MESA versions, and was found and fixed by user Garv Chauhan. Plasma neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate.
+This was the case in all previous MESA versions, and was found and fixed by user Garv Chauhan, see `gh-998 https://github.com/MESAHub/mesa/pull/998`_. Plasma neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate.
 The change in default Weinberg angle results in small numerical differences for stars where plasma neutrino cooling is significant.
 
 
