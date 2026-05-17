@@ -1,0 +1,68 @@
+&star_job
+
+read_extra_star_job_inlist(1) = .true.
+extra_star_job_inlist_name(1) = 'inlist_both'
+
+save_model_filename           = 'accretor_final.mod'
+
+!pgstar_flag                  = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+read_extra_eos_inlist(1)      = .true.
+extra_eos_inlist_name(1)      = 'inlist_both'
+
+/ ! end of eos namelist
+
+
+&kap
+
+read_extra_kap_inlist(1)      = .true.
+extra_kap_inlist_name(1)      = 'inlist_both'
+
+/ ! end of kap namelist
+
+
+&controls
+
+read_extra_controls_inlist(1) = .true.
+extra_controls_inlist_name(1) = 'inlist_both'
+
+! extra_terminal_output_file  = 'log2'
+log_directory                 = 'LOGS2'
+
+
+! If doing accretor star models without rotation
+! the settings below will enforce non-conservative evolution
+! If also having rotation, these will help with convergence
+! assuming rotationally-limited accretion efficienty
+
+! max_mdot_redo_cnt             = 100
+! min_years_dt_for_redo_mdot    = 1d-2
+! !surf_w_div_w_crit_limit      = 0.95d0
+! !surf_w_div_w_crit_tol        = 0.05d0
+! rotational_mdot_boost_fac     = 1.2d10
+! rotational_mdot_kh_fac        = 1d10
+! mdot_revise_factor            = 1.2
+! implicit_mdot_boost           = 0.1
+! max_mdot_jump_for_rotation    = 10d0
+
+!max_num_profile_models       = 100000
+!profile_interval             = 100
+!photo_interval               = 500
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+read_extra_pgstar_inlist(1)   = .true.
+extra_pgstar_inlist_name(1)   = 'inlist_pgstar'
+
+! ! filenames to avoid overlap with accretor
+! HR_file_prefix                = 'hr_accretor_'
+! Grid2_file_prefix             = 'accretor_'
+
+/ ! end of pgstar namelist

@@ -103,7 +103,7 @@
 
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'TDC'
+      MLT_option = 'Henyey'
       use_Ledoux_criterion = .true.
 
       use_other_alpha_mlt = .true. ! implemented in run_star_extras

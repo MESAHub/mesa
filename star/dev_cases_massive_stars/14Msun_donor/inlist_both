@@ -1,0 +1,315 @@
+&star_job
+
+! local directories data: this is done to use some custom rates, see rate_tables/rate_list.txt
+! Specifically we adopt the median c12(a,g)o16 rate from deBoer+17, other estimates
+! are available in $MESA_DIR/data/rates_data/rate_tables
+rate_tables_dir                                 = './rate_tables'
+rates_cache_dir                                 = './rates_cache'
+eosDT_cache_dir                                 = './eosDT_cache'
+kap_cache_dir                                   = './kap_cache'
+
+! messages and info
+echo_at_start                                   = 'MESA model has begun running'
+echo_at_end                                     = 'MESA model has finished running'
+show_retry_counts_when_terminate                = .true.
+
+show_log_description_at_start                   = .false.
+show_timestep_limit_counts_when_terminate       = .true.
+save_model_when_terminate                       = .false.
+
+! initial model: we do not generate a pre_ms model here.
+load_saved_model                                = .false.
+! load_model_filename                           = 'zams.mod'
+
+! change initial Z but don't relax.
+change_initial_Z                                = .true.
+new_Z                                           = 0.02d0
+
+! network
+change_net                                      = .true.
+change_initial_net                              = .true.
+new_net_name                                    = 'approx21_cr60_plus_co56.net' ! "approx21_plus_co56.net" ! "mesa_128.net" ! 'mesa_206.net'
+!dump_missing_metals_into_heaviest              = .true.
+
+! we want to use weaklib all the time, so we toggle at lowT.
+T9_weaklib_full_off                             = 0.0001d0
+T9_weaklib_full_on                              = 0.00011d0
+
+change_v_flag                                   = .true.
+new_v_flag                                      = .true.
+
+set_initial_age                                 = .true.
+initial_age                                     = 0
+
+set_initial_model_number                        = .true.
+initial_model_number                            = 0
+
+! rotation
+! change_rotation_flag                          = .true.
+! change_initial_rotation_flag                  = .true.
+! new_rotation_flag                             = .true.
+
+! set_omega_div_omega_crit                      = .true.
+! set_initial_omega_div_omega_crit              = .true.
+! new_omega_div_omega_crit                      = 0
+
+show_retry_counts_when_terminate                = .true.
+show_timestep_limit_counts_when_terminate       = .true.
+
+pgstar_flag                                     = .true.
+save_pgstar_files_when_terminate                = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+
+/ ! end of eos namelist
+
+
+&kap
+
+! MESA offers newer opacity tables for differing abundances, see kap controls.
+kap_file_prefix                                 = 'gs98'    ! 'oplib_gs98'
+kap_CO_prefix                                   = 'gs98_co' ! 'gs98_co'
+kap_lowT_prefix                                 = 'lowT_fa05_gs98'
+use_Type2_opacities                             = .true.
+Zbase                                           = 0.02
+
+! Zbase set in inlist_extra
+/
+
+&controls
+
+! set approx22 fake factor to reproduce Ye ~ 0.43-0.44 at CC.
+fe56ec_fake_factor                              = 1d-4
+min_T_for_fe56ec_fake_factor                    = 3d9
+
+! to stop at C depletion
+x_logical_ctrl(2)                               = .true.
+max_model_number                                = 50000 ! if true above, and the binary detaches, this will be overwritten in run_star_extras.f90
+redo_limit                                      = 300
+
+
+! atmosphere
+! 1 for isotropic radiation field, and 1.5 for radial radiation field?
+Pextra_factor                                   = 2 ! <= 1.5 to stay physical
+atm_option                                      = 'T_tau'
+atm_T_tau_relation                              = 'Eddington'
+atm_T_tau_opacity                               = 'fixed' ! next best is 'iterated'
+
+!wind
+hot_wind_scheme                                 = 'Dutch'
+cool_wind_RGB_scheme                            = 'Dutch'
+cool_wind_AGB_scheme                            = 'Dutch'
+Dutch_scaling_factor                            = 1.0  ! this is LARGE, should try <0.8 (probably 0.5-0.3)
+max_T_center_for_any_mass_loss                  = 1.1d9
+
+! if doing rotation, uncomment below for rotational boost
+! mdot_omega_power                              = 0.43d0
+! max_tries_for_implicit_wind                   = 10
+
+! mlt
+MLT_option                                      = 'TDC'
+mixing_length_alpha                             = 1.5d0
+
+! mixing
+use_ledoux_criterion                            = .true.
+alpha_semiconvection                            = 1.0d0
+thermohaline_coeff                              = 1.0d0
+semiconvection_option                           = 'Langer_85 mixing; gradT = gradr'
+thermohaline_option                             = 'Kippenhahn'
+
+!! superadiabatic convection routines, it's a choice:
+! superadiabatic reduction, implicit, new
+use_superad_reduction                           = .true.
+superad_reduction_Gamma_limit                   = 0.5d0 ! default is 0.5d0
+superad_reduction_Gamma_limit_scale             = 5d0
+superad_reduction_Gamma_inv_scale               = 5d0
+superad_reduction_limit                         = -1d0
+superad_reduction_diff_grads_limit              = 1d-2 ! default is 1d-3
+
+! MLT ++, explicit, well tested
+okay_to_reduce_gradT_excess                     = .false.
+gradT_excess_f1                                 = 1d-4
+gradT_excess_f2                                 = 1d-2
+gradT_excess_lambda1                            = -1d0 ! full on
+
+! drag to prevent the development of radial pulses.
+use_drag_energy                                 = .false.
+drag_coefficient                                = 0.9d0
+min_q_for_drag                                  = 0.8d0
+
+! overshoot controls , lowest (#) take priority
+overshoot_scheme(1)                             = 'exponential'
+overshoot_zone_type(1)                          = 'any'
+overshoot_zone_loc(1)                           = 'core'
+overshoot_bdy_loc(1)                            = 'any'
+overshoot_f(1)                                  = 4.15d-2
+overshoot_f0(1)                                 = 0.008d0
+
+overshoot_scheme(2)                             = 'exponential'
+overshoot_zone_type(2)                          = 'any'
+overshoot_zone_loc(2)                           = 'any'
+overshoot_bdy_loc(2)                            = 'any'
+overshoot_f(2)                                  = 0.005d0
+overshoot_f0(2)                                 = 0.001d0
+
+! Alternative overshooting: step function similar to Brott+11
+! overshoot_scheme(1)                           = 'step'
+! overshoot_zone_type(1)                        = 'any'
+! overshoot_zone_loc(1)                         = 'core'
+! overshoot_bdy_loc(1)                          = 'any'
+! overshoot_f(1)                                = 0.345d0
+! overshoot_f0(1)                               = 0.01d0
+
+dX_nuc_drop_limit                               = 1d-2 ! 1d-3 for production
+dX_nuc_drop_limit_at_high_T                     = 2d-2 ! 1d-2 for production ! for center logT > 9.45
+dX_nuc_drop_min_X_limit                         = 1d-4 !1d-3 ! try decreasing to 1d-4 or 1d-5 in a production run
+dX_nuc_drop_max_A_limit                         = 70   ! try increasing beyond 60 in a big network run
+dX_nuc_drop_hard_limit                          = 1d99
+
+delta_Ye_highT_limit                            = 1d-3
+
+! Ignore cumulative energy residuals for the entire run to avoid premature exits
+hard_limit_for_rel_error_in_energy_conservation = -1d0
+! MESA will still warn if it grows above ~1%
+max_abs_rel_run_E_err                           = 1d-2 ! maximum energy error before model is terminated.
+
+
+! The following controls below for rotation are untested in these inlists
+! but they should work in theory, if one turns them on and turns on rotation
+! in starjob.
+! ! rotation and mixing:
+! ! rotation is initialized by orbital synchronization
+! am_nu_ST_factor                               = 1.0 !! 1.0 !default
+! D_visc_factor                                 = 0.0
+! am_nu_SH_factor                               = 0.0
+! D_ST_factor                                   = 0.0
+! D_SH_factor                                   = 0.0
+! D_GSF_factor                                  = 1.0
+! D_ES_factor                                   = 1.0
+! D_SSI_factor                                  = 1.0
+! D_DSI_factor                                  = 1.0
+! am_D_mix_factor                               = 0.03333d0
+! am_gradmu_factor                              = 0.1d0
+! premix_omega                                  = .true.
+! remove_small_D_limit                          = 1d-10
+! mixing_D_limit_for_log                        = 1d-10
+! max_mdot_jump_for_rotation                    = 1d99
+
+! max_mdot_redo_cnt                             = 100
+! min_years_dt_for_redo_mdot                    = 1d-2
+! !surf_w_div_w_crit_limit                      = 0.95d0
+! !surf_w_div_w_crit_tol                        = 0.05d0
+! rotational_mdot_boost_fac                     = 1.2d10
+! rotational_mdot_kh_fac                        = 1d10
+! mdot_revise_factor                            = 1.2
+! implicit_mdot_boost                           = 0.1
+! max_mdot_jump_for_rotation                    = 10d0
+
+! mesh
+max_dq                                          = 5d-3!1d-3 ! lower for production runs
+max_allowed_nz                                  = 50000
+mesh_delta_coeff                                = 1.5d0 ! 1.0 for a production.
+mesh_delta_coeff_for_highT                      = 1.5d0 !1.5 ! try 1.0 or below in production run
+logT_max_for_standard_mesh_delta_coeff          = 9.0
+logT_min_for_highT_mesh_delta_coeff             = 9.5
+
+! timesteps
+time_delta_coeff                                = 1d0
+min_timestep_limit                              = 1e-20 !sec ! 1e-10 !to be able to reach CC
+varcontrol_target                               = 1d-3 !1d-4
+max_timestep_factor                             = 1.05d0
+retry_hold                                      = 2
+min_J_div_delta_J                               = 5d0
+
+! time step resolution on fuel depletion
+delta_lg_XH_cntr_limit                          = 0.01d0
+delta_lg_XH_cntr_max                            = 0.0d0
+delta_lg_XH_cntr_min                            = -4.0d0
+delta_lg_XH_cntr_hard_limit                     = 0.02d0
+delta_lg_XHe_cntr_limit                         = 0.01d0
+delta_lg_XHe_cntr_max                           = 0.0d0
+delta_lg_XHe_cntr_min                           = -4.0d0
+delta_lg_XHe_cntr_hard_limit                    = 0.02d0
+delta_lg_XC_cntr_limit                          = 0.02d0
+delta_lg_XC_cntr_max                            = 0.2d0
+delta_lg_XC_cntr_min                            = -2.0d0 ! -3.0d0
+delta_lg_XC_cntr_hard_limit                     = 0.02d0
+delta_lg_XO_cntr_limit                          = 0.01d0
+delta_lg_XO_cntr_max                            = 0.0d0
+delta_lg_XO_cntr_min                            = -3.0d0
+delta_lg_XO_cntr_hard_limit                     = 0.02d0
+
+delta_lgL_limit                                 = 0.01d0
+delta_lgL_hard_limit                            = 0.1d0
+
+delta_lgTeff_limit                              = 0.008d0
+delta_lgTeff_hard_limit                         = 0.01d0
+
+
+! Recommend decreasing all three Rho, T, Tmax
+! to 1d-3 or lower in production runs
+delta_lgRho_cntr_limit                          = 2.5d-3 !0.03 ! 1d-3
+delta_lgRho_cntr_hard_limit                     = 0.1
+delta_lgRho_limit                               = 0.1
+
+delta_lgT_cntr_limit_only_after_near_zams       = .true.
+delta_lgT_cntr_limit                            = 2d-3 !0.002  ! 1d-3
+delta_lgT_cntr_hard_limit                       = 0.1
+
+delta_lgT_max_limit_only_after_near_zams        = .true.
+delta_lgT_max_limit                             = 2d-3 !0.002   ! 1d-3
+delta_lgT_max_hard_limit                        = 0.1
+
+delta_lgT_limit                                 = 0.025d0         ! default 0.5
+delta_lgRho_limit                               = 0.5d0          ! default 1.0
+
+delta_lgL_He_limit                              = 0.01d0
+delta_lgL_He_hard_limit                         = 0.025d0
+delta_HR_ds_Teff                                = 1d-5
+
+delta_lgL_H_limit                               = 0.01d0
+delta_lgL_H_hard_limit                          = 0.025d0
+
+! spatial increase resolution during He core burning
+!T_function2_weight                             = 100d0
+!T_function2_param                              = 2.4d8
+
+! increase resolution for omega
+! omega_function_weight                         = 100d0
+
+! Jim Fuller's suggestion
+set_min_D_mix                                   = .true.
+min_D_mix                                       =1d-2
+
+! solver controls
+energy_eqn_option                               = 'dedt'
+use_gold2_tolerances                            = .true.
+gold2_tol_max_residual2                         = 5d-7
+gold2_tol_max_residual3                         = 5d-4
+
+! gold solver
+use_gold_tolerances                             = .true.
+gold_tol_max_residual2                          = 5d-4
+!gold_tol_max_residual3                         = 1d-4 ! Default in controls is 1d-5
+tol_correction_high_T_limit                     = 1d9 ! Switch to lower tol at high temp for large Mass
+solver_iters_timestep_limit                     = 20
+gold_solver_iters_timestep_limit                = 20
+iter_for_resid_tol2                             = 10
+
+convergence_ignore_equL_residuals               = .true.
+make_gradr_sticky_in_solver_iters               = .true.
+xa_scale                                        = 1d-5
+iter_for_resid_tol2                             = 10
+
+! output
+photo_interval                                  = -1 ! photos are saved from inlist_binary
+profile_interval                                = 1000
+max_num_profile_models                          = 52
+history_interval                                = 1
+write_header_frequency                          = 10
+terminal_interval                               = 10
+
+/ ! end of controls namelist

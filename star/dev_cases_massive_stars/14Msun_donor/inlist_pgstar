@@ -1,0 +1,356 @@
+&pgstar
+
+! this updates the panels for each star but not the binary panel on the right, see inlist_pgbinary
+pgstar_interval                         = 10
+!pause                                  = .true.
+
+pgstar_age_disp                         = 2.5
+pgstar_model_disp                       = 2.5
+
+!### scale for axis labels
+pgstar_xaxis_label_scale                = 1.
+pgstar_left_yaxis_label_scale           = 1.
+pgstar_right_yaxis_label_scale          = 1.
+
+Grid2_num_cols                          = 4 ! divide plotting region into this many equal width cols
+Grid2_num_rows                          = 8 ! divide plotting region into this many equal height rows
+
+Grid2_num_plots                         = 7 ! <= 10
+
+Grid2_plot_name(1)                      = 'Profile_Panels1'
+Grid2_plot_row(1)                       = 1 ! number from 1 at top
+Grid2_plot_rowspan(1)                   = 2 ! plot spans this number of rows
+Grid2_plot_col(1)                       = 1 ! number from 1 at left
+Grid2_plot_colspan(1)                   = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(1)                  = 0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(1)                 = 0.05 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(1)                   = 0.01 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(1)                   = 0.02 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(1)               = 0.7 ! multiply txt_scale for subplot by this
+
+Profile_Panels1_title                   = ''
+Profile_Panels1_num_panels              = 1
+Profile_Panels1_xaxis_name              = 'zone'!'mass' ! 'logtau'
+Profile_Panels1_yaxis_name(1)           = 'vel_km_per_s' !'vel_km_per_s' ! 'opacity'
+Profile_Panels1_other_yaxis_name(1)     = 'logdq'!'v_div_csound' !'conv_L_div_L'
+Profile_Panels1_xaxis_reversed          = .true. ! .false.
+Profile_Panels1_dymin(1)                = 0.05
+Profile_Panels1_other_dymin(1)          = 0.01
+
+
+!Profile_Panels1_other_yaxis_name(2)    = 'Y_mass_fraction_He'
+!   Profile_Panels1_yaxis_name(3)       = 'log'
+!   Profile_Panels1_other_yaxis_name(3) = 'ft_rot'
+
+
+Grid2_plot_name(2)                      = 'Kipp'
+Grid2_plot_row(2)                       = 3 ! number from 1 at top
+Grid2_plot_rowspan(2)                   = 3 ! plot spans this number of rows
+Grid2_plot_col(2)                       = 1 ! number from 1 at left
+Grid2_plot_colspan(2)                   = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(2)                  = 0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(2)                 = 0.05 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(2)                   = 0.03 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(2) = 0.04 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
+
+
+!------------------------------------------------------------------------------------
+
+! Kippenhahn diagram history plot
+
+Kipp_win_flag = .false.
+
+! window properties
+Kipp_win_width = 16
+Kipp_win_aspect_ratio = 0.75
+Kipp_txt_scale = 0.9
+Kipp_title = ''
+
+! y axis limits
+Kipp_mass_max = -101d0
+Kipp_mass_min = 0
+Kipp_show_mass_boundaries = .true.
+
+! x axis limits
+Kipp_xmax = -101              ! maximum step number.  negative means use default.
+Kipp_xmin = 0         ! minimum step number.  negative means use default.
+Kipp_max_width = 2000         ! only used if > 0.  causes xmin to move with xmax.
+
+Kipp_show_mixing = .true.
+Kipp_show_burn = .true.
+Kipp_show_luminosities = .true.
+Kipp_mix_interval = 4
+
+! file output
+Kipp_file_flag = .false.
+Kipp_file_dir = 'kipp_png'
+Kipp_file_prefix = 'kipp_'
+Kipp_file_interval = 10     ! output when mod(model_number,file_interval)==0
+!Kipp_file_width = -1        ! (inches) negative means use same value as for window
+Kipp_file_width = 16        ! (inches) negative means use same value as for window
+Kipp_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+!------------------------------------------------------------------------------------
+
+
+
+
+
+
+!Mixing_title = ''
+
+Grid2_plot_name(3) = 'TRho_profile'
+Grid2_plot_row(3) = 6 ! number from 1 at top
+Grid2_plot_rowspan(3) = 2 ! plot spans this number of rows
+Grid2_plot_col(3) = 1 ! number from 1 at left
+Grid2_plot_colspan(3) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(3) = 0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(3) = 0.03 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(3) = 0.01 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(3) = 0.02 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(3) = 0.7 ! multiply txt_scale for subplot by this
+
+TRho_Profile_title = ''
+
+! TRho axis limits
+TRho_Profile_xmin = -12.0
+TRho_Profile_xmax = 10.0
+TRho_Profile_ymin = 3.0
+TRho_Profile_ymax = 10.0
+
+
+
+Grid2_plot_name(5) = 'HR'
+HR_title = ''
+Grid2_plot_row(5) = 6 ! number from 1 at top
+Grid2_plot_rowspan(5) = 2 ! plot spans this number of rows
+Grid2_plot_col(5) = 3 ! number from 1 at left
+Grid2_plot_colspan(5) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(5) = 0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(5) = 0.01 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(5) = 0.01 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(5) = 0.02 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(5) = 0.7 ! multiply txt_scale for subplot by this
+
+Grid2_plot_name(4) = 'TRho'!'History_Panels1'
+Grid2_plot_row(4) = 1 ! number from 1 at top
+Grid2_plot_rowspan(4) = 2 ! plot spans this number of rows
+Grid2_plot_col(4) = 3 ! number from 1 at left
+Grid2_plot_colspan(4) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(4) = 0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(4) = 0.01 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(4) = 0.01 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(4) = 0.02 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(4) = 0.7 ! multiply txt_scale for subplot by this
+
+History_Panels1_title = ''
+History_Panels1_num_panels = 1
+History_Panels1_max_width = -1
+History_Panels1_xaxis_name = 'model_number'
+
+History_Panels1_yaxis_name(1) = 'surface_h1'!'log_R'
+History_Panels1_other_yaxis_name(1) = 'surface_he4'! 'log_L'
+History_Panels1_ymin(1) = 0.9
+History_Panels1_ymax(1) = 0
+History_Panels1_other_ymin(1) = 0.9
+History_Panels1_other_ymax(1) = 0
+
+
+!History_Panels1_yaxis_name(2) = 'surface_h1'
+!History_Panels1_other_yaxis_name(2) = 'surface_he4'
+
+Grid2_plot_name(6) = 'Text_Summary1'
+Grid2_plot_row(6) = 8 ! number from 1 at top
+Grid2_plot_rowspan(6) = 1 ! plot spans this number of rows
+Grid2_plot_col(6) = 1 ! number from 1 at left
+Grid2_plot_colspan(6) = 4 ! plot spans this number of columns
+Grid2_plot_pad_left(6) = -0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(6) = -0.01 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(6) = 0.01 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(6) = 0.00 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(6) = 0.2 ! multiply txt_scale for subplot by this
+
+
+
+
+
+! abundance plots
+Grid2_plot_name(7) = 'Abundance'
+
+Grid2_plot_row(7) = 3 ! number from 1 at top
+Grid2_plot_rowspan(7) = 3 ! plot spans this number of rows
+Grid2_plot_col(7) = 3 ! number from 1 at left
+Grid2_plot_colspan(7) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(7) = 0.01 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(7) = 0.01 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(7) = 0.01 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(7) = 0.02 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(7) = 0.7 ! multiply txt_scale for subplot by this
+
+
+
+
+!------------------------------------------------------------------------------------
+
+! Abundance profile plot
+
+Abundance_win_flag = .false.
+
+! window properties
+Abundance_win_width = 10
+Abundance_win_aspect_ratio = 0.75
+
+Abundance_xleft = 0.15
+Abundance_xright = 0.85
+Abundance_ybot = 0.15
+Abundance_ytop = 0.85
+Abundance_txt_scale = 0.8
+Abundance_title = ''
+
+! isotopes to plot
+
+Abundance_num_isos_to_show = 20
+
+Abundance_which_isos_to_show(1)  = 'h1'
+Abundance_which_isos_to_show(2)  = 'he3'
+Abundance_which_isos_to_show(3)  = 'he4'
+Abundance_which_isos_to_show(4)  = 'c12'
+Abundance_which_isos_to_show(5)  = 'n14'
+Abundance_which_isos_to_show(6)  = 'o16'
+Abundance_which_isos_to_show(7)  = 'ne20'
+Abundance_which_isos_to_show(8)  = 'mg24'
+Abundance_which_isos_to_show(9) = 'si28'
+Abundance_which_isos_to_show(10) = 's32'
+Abundance_which_isos_to_show(11) = 'ar36'
+Abundance_which_isos_to_show(12) = 'ca40'
+Abundance_which_isos_to_show(13) = 'ti44'
+Abundance_which_isos_to_show(14) = 'cr48'
+Abundance_which_isos_to_show(15) = 'cr56'
+Abundance_which_isos_to_show(16) = 'fe52'
+Abundance_which_isos_to_show(17) = 'fe54'
+Abundance_which_isos_to_show(18) = 'fe56'
+Abundance_which_isos_to_show(19) = 'ni56'
+Abundance_which_isos_to_show(20) = 'neut'
+!Abundance_which_isos_to_show(22) = 'ne22'
+
+!Abundance_which_isos_to_show(1)  = 'h1'
+!Abundance_which_isos_to_show(2)  = 'h2'
+!Abundance_which_isos_to_show(3)  = 'he3'
+!Abundance_which_isos_to_show(4)  = 'he4'
+!Abundance_which_isos_to_show(5)  = 'li7'
+!Abundance_which_isos_to_show(6)  = 'be7'
+!Abundance_which_isos_to_show(7)  = 'be9'
+!Abundance_which_isos_to_show(8)  = 'be10'
+!Abundance_which_isos_to_show(9)  = 'b8'
+!Abundance_which_isos_to_show(10) = 'c12'
+!Abundance_which_isos_to_show(11) = 'c12'
+!Abundance_which_isos_to_show(12) = 'c13'
+!Abundance_which_isos_to_show(13) = 'n13'
+!Abundance_which_isos_to_show(14) = 'n14'
+!Abundance_which_isos_to_show(15) = 'n15'
+!Abundance_which_isos_to_show(16) = 'o14'
+!Abundance_which_isos_to_show(17) = 'o15'
+!Abundance_which_isos_to_show(18) = 'o16'
+!Abundance_which_isos_to_show(19) = 'o17'
+!Abundance_which_isos_to_show(20) = 'o18'
+!Abundance_which_isos_to_show(21) = 'ne22'
+!Abundance_which_isos_to_show(21)  = 'ne20'
+!Abundance_which_isos_to_show(22)  = 'mg24'
+
+
+!Abundance_which_isos_to_show(1)  = 'neut'
+!Abundance_which_isos_to_show(2)  = 'h1'
+!Abundance_which_isos_to_show(3)  = 'h2'
+!Abundance_which_isos_to_show(4)  = 'he3'
+!Abundance_which_isos_to_show(5)  = 'he4'
+!Abundance_which_isos_to_show(6)  = 'li7'
+!Abundance_which_isos_to_show(7)  = 'be7'
+!Abundance_which_isos_to_show(8)  = 'be9'
+!Abundance_which_isos_to_show(9)  = 'be10'
+!Abundance_which_isos_to_show(10) = 'b8'
+!Abundance_which_isos_to_show(11) = 'c12'
+!Abundance_which_isos_to_show(12) = 'c13'
+!Abundance_which_isos_to_show(13) = 'n13'
+!Abundance_which_isos_to_show(14) = 'n14'
+!Abundance_which_isos_to_show(15) = 'n15'
+!Abundance_which_isos_to_show(16) = 'o14'
+!Abundance_which_isos_to_show(17) = 'o15'
+!Abundance_which_isos_to_show(18) = 'o16'
+!Abundance_which_isos_to_show(19) = 'o17'
+!Abundance_which_isos_to_show(20) = 'o18'
+!Abundance_which_isos_to_show(21) = 'f17'
+!Abundance_which_isos_to_show(22) = 'f18'
+!Abundance_which_isos_to_show(23) = 'f19'
+!Abundance_which_isos_to_show(24) = 'ne18'
+!Abundance_which_isos_to_show(25) = 'ne19'
+!Abundance_which_isos_to_show(26) = 'ne20'
+!Abundance_which_isos_to_show(27) = 'ne21'
+!Abundance_which_isos_to_show(28) = 'ne22'
+!Abundance_which_isos_to_show(29) = 'na21'
+!Abundance_which_isos_to_show(30) = 'na22'
+!Abundance_which_isos_to_show(31) = 'na23'
+!Abundance_which_isos_to_show(32) = 'na24'
+!Abundance_which_isos_to_show(33) = 'mg23'
+!Abundance_which_isos_to_show(34) = 'mg24'
+!Abundance_which_isos_to_show(35) = 'mg25'
+!Abundance_which_isos_to_show(36) = 'mg26'
+!Abundance_which_isos_to_show(37) = 'al25'
+!Abundance_which_isos_to_show(38) = 'al26'
+!Abundance_which_isos_to_show(39) = 'al27'
+!Abundance_which_isos_to_show(40) = 'si27'
+!Abundance_which_isos_to_show(41) = 'si28'
+!Abundance_which_isos_to_show(42) = 'p30'
+!Abundance_which_isos_to_show(43) = 'p31'
+!Abundance_which_isos_to_show(44) = 's31'
+!Abundance_which_isos_to_show(45) = 's32'
+
+
+
+
+! number and size of isotope labels along curves
+num_abundance_line_labels = 4
+Abundance_line_txt_scale_factor = 0.8
+
+
+! number and size of isotopes on legend
+Abundance_legend_max_cnt = 0
+Abundance_legend_txt_scale_factor = 0.6
+
+! xaxis name and orientation
+Abundance_xaxis_name = 'mass'
+Abundance_xaxis_reversed = .false.
+
+! xaxis limits
+Abundance_xmin = 0.0
+Abundance_xmax = -101d0
+
+! yaxis limits
+Abundance_log_mass_frac_min = -4.0
+Abundance_log_mass_frac_max =  0.3
+
+
+! file output
+Abundance_file_flag = .false.
+Abundance_file_dir = 'abund_png'
+Abundance_file_prefix = 'abund_'
+Abundance_file_interval = 10     ! output when mod(model_number,file_interval)==0
+!Abundance_file_width = -1        ! (inches) negative means use same value as for window
+Abundance_file_width = 16        ! (inches) negative means use same value as for window
+Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
+
+! TRho window
+! history of central temperature vs. density
+
+TRho_txt_scale = 0.7
+TRho_title = ''
+
+TRho_logT_min = 8.8d0
+TRho_logT_max = 10.2d0
+TRho_logRho_min = 5d0
+TRho_logRho_max = 10d0
+show_TRho_degeneracy_line = .true.
+
+
+/

@@ -1,0 +1,85 @@
+&binary_job
+
+inlist_names(1)              = 'inlist1'
+inlist_names(2)              = 'inlist2'
+
+evolve_both_stars            = .false.
+pgbinary_flag                = .true.
+
+/ ! end of binary_job namelist
+
+&binary_controls
+
+m1                           = 15.0d0  ! donor mass in Msun
+m2                           = 12.0d0  ! companion mass in Msun
+initial_period_in_days       = 20.0d0
+
+limit_retention_by_mdot_edd  = .false. ! this is for BH secondaries
+mass_transfer_alpha          = 0.0d0
+mass_transfer_beta           = 0.0d0
+mass_transfer_delta          = 0.0d0
+mass_transfer_gamma          = 0.0d0
+
+mdot_scheme                  = "Kolb"  ! !"Ritter" !
+initial_change_factor        = 1.2d0
+change_factor_fraction       = 0.8d0
+min_mdot_for_implicit        = 1d-10
+implicit_scheme_tiny_factor  = 1d-6
+! report_rlo_solver_progress = .true.
+do_tidal_sync                = .true.
+do_j_accretion               = .false. ! if .true. use A.3.3 of de Mink et al. 2013, ApJ, 764, 166
+! be 100% sure MB is always off
+do_jdot_mb                   = .false.
+do_jdot_missing_wind         = .true.
+
+! ! timestep controls
+varcontrol_case_a            = 1d-4
+varcontrol_case_b            = 2.5d-4
+varcontrol_ms                = 1d-3
+varcontrol_post_ms           = 5d-3
+
+fr                           = 1d-2
+fr_limit                     = 0.025d0
+fr_dt_limit                  = 10d0
+fa                           = 0.01d0
+fa_hard                      = 0.02d0
+fm                           = 0.01d0
+fm_limit                     = 1d-1
+fj                           = 0.001d0
+fj_hard                      = 1d-2
+dt_softening_factor          = 0.1d0
+
+implicit_scheme_tolerance    = 2.5d-4
+max_tries_to_achieve         = 200
+min_change_factor            = 1.02d0
+max_change_factor            = 1.2d0
+initial_change_factor        = 1.2d0
+change_factor_fraction       = 0.8d0
+implicit_lambda              = 0.4d0
+
+min_mdot_for_implicit        = 1d-10
+
+sync_mode_1                  = "Uniform"
+sync_type_1                  = "Hut_rad"
+Ftid_1                       = 1
+sync_mode_2                  = "Uniform"
+sync_type_2                  = "Hut_rad"
+Ftid_2                       = 1
+do_initial_orbit_sync_1      = .true.
+do_initial_orbit_sync_2      = .true.
+
+accretor_overflow_terminate  = 2d0
+
+photo_interval               = 200
+!photo_digits                = 8
+append_to_star_history       = .false.
+
+! terminal output
+write_header_frequency       = 100     !1
+history_interval             = 1
+terminal_interval            = 10
+
+
+
+
+/ ! end of binary_controls namelist

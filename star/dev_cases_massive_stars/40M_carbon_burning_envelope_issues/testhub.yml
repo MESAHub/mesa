@@ -13,3 +13,18 @@
             - 'fe_core_mass'
       extra_testhub_vals:
             -     1.6762420545401346E+00
+      runtime_minutes:  50.66
+      model_number:        10000
+      star_age:     4.8397508405607743E+06
+      num_retries:         1483
+      log_rel_run_E_err:        -7.6182935365022955
+      steps:        10000
+      retries:         1483
+      redos:            0
+      solver_calls_made:        11483
+      solver_calls_failed:         1483
+      solver_iterations:        96320
+      extra_testhub_names:
+            - 'fe_core_mass'
+      extra_testhub_vals:
+            -     0.0000000000000000E+00

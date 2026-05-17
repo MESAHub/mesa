@@ -1,0 +1,8 @@
+*.mod
+*.data
+*.dat
+png/*
+LOGS*/*
+photos/*
+*cache*
+build/*
