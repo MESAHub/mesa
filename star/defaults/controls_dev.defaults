@@ -13,6 +13,27 @@
 
       compare_TDC_to_MLT = .false.
 
+      ! use_TDC_Y_face_seeded_newton
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, use the start-of-step TDC Y_face on the first solver
+      ! iteration, and the previous solver iteration's TDC Y_face thereafter,
+      ! to try a small local positive-Y bracket before the full bracketing path.
+      ! The seed is only used during structural solver iterations.
+      !
+      ! ::
+
+      use_TDC_Y_face_seeded_newton = .false.
+
+      ! Hydro matrix solver options
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! hydro_matrix_solver selects the mesa-star hydro matrix solve.
+      ! Options are 'bcyclic' for the existing block cyclic reduction solver
+      ! and 'banded' for an RSP-like DGBTRF/DGBTRS banded solve.
+      !
+      ! ::
+
+      hydro_matrix_solver = 'bcyclic'
+
       ! RSP2 parameters
       ! ~~~~~~~~~~~~~~~
 
@@ -187,6 +208,19 @@
       ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
 
     TDC_use_density_form_for_eddy_viscosity = .false.
+
+
+      ! TDC_adjust_mass_fallback_to_mlt
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If TDC_adjust_mass_fallback_to_mlt = .true., cells touched by
+      ! adjust_mass use MLT instead of TDC. This matches the previous behavior.
+      ! If false, TDC remains enabled in those cells and uses the TDC
+      ! convective velocity for the zone.
+
+      ! ::
+
+    TDC_adjust_mass_fallback_to_mlt = .true.
 
 
       ! use_TDC_enthalpy_flux_limiter

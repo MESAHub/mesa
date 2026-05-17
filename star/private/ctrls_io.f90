@@ -108,7 +108,7 @@
     TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
     TDC_alpha_C, TDC_alpha_S, &
     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
-    TDC_use_density_form_for_eddy_viscosity, &
+    TDC_use_density_form_for_eddy_viscosity, TDC_adjust_mass_fallback_to_mlt, &
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
     include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, TDC_include_eturb_in_energy_equation, &
@@ -361,6 +361,8 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     max_logT_for_include_P_and_L_in_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
+    use_TDC_Y_face_seeded_newton, &
+    hydro_matrix_solver, &
     remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
@@ -2091,6 +2093,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_alpha_S = TDC_alpha_S
  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
+ s% TDC_adjust_mass_fallback_to_mlt = TDC_adjust_mass_fallback_to_mlt
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
@@ -2100,6 +2103,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
+ s% use_TDC_Y_face_seeded_newton = use_TDC_Y_face_seeded_newton
+ s% hydro_matrix_solver = hydro_matrix_solver
  s% TDC_hydro_use_mass_interp_face_values = TDC_hydro_use_mass_interp_face_values
  s% TDC_hydro_nz = TDC_hydro_nz
  s% TDC_hydro_nz_outer = TDC_hydro_nz_outer
@@ -3801,6 +3806,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alpha_S = s% TDC_alpha_S
  TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
+ TDC_adjust_mass_fallback_to_mlt = s% TDC_adjust_mass_fallback_to_mlt
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
@@ -3810,6 +3816,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
+ use_TDC_Y_face_seeded_newton = s% use_TDC_Y_face_seeded_newton
+ hydro_matrix_solver = s% hydro_matrix_solver
  TDC_hydro_use_mass_interp_face_values = s% TDC_hydro_use_mass_interp_face_values
  TDC_hydro_nz = s% TDC_hydro_nz
  TDC_hydro_nz_outer = s% TDC_hydro_nz_outer
