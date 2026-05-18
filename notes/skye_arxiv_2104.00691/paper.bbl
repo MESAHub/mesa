@@ -1,0 +1,454 @@
+\begin{thebibliography}{}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\href{#1}{#1}}
+\providecommand{\dodoi}[1]{doi:~\href{http://doi.org/#1}{\nolinkurl{#1}}}
+\providecommand{\doeprint}[1]{\href{http://ascl.net/#1}{\nolinkurl{http://ascl.net/#1}}}
+\providecommand{\doarXiv}[1]{\href{https://arxiv.org/abs/#1}{\nolinkurl{https://arxiv.org/abs/#1}}}
+
+\bibitem[{{Alastuey} \& {Ballenegger}(2012)}]{alastuey_2012_aa}
+{Alastuey}, A., \& {Ballenegger}, V. 2012, \pre, 86, 066402,
+  \dodoi{10.1103/PhysRevE.86.066402}
+
+\bibitem[{{Alastuey} {et~al.}(2020){Alastuey}, {Ballenegger}, \&
+  {Wendland}}]{alastuey_2020_aa}
+{Alastuey}, A., {Ballenegger}, V., \& {Wendland}, D. 2020, \pre, 102, 023203,
+  \dodoi{10.1103/PhysRevE.102.023203}
+
+\bibitem[{{Angulo} {et~al.}(1999){Angulo}, {Arnould}, {Rayet}, {Descouvemont},
+  {Baye}, {Leclercq-Willain}, {Coc}, {Barhoumi}, {Aguer}, {Rolfs}, {Kunz},
+  {Hammer}, {Mayer}, {Paradellis}, {Kossionides}, {Chronidou}, {Spyrou},
+  {degl'Innocenti}, {Fiorentini}, {Ricci}, {Zavatarelli}, {Providencia},
+  {Wolters}, {Soares}, {Grama}, {Rahighi}, {Shotter}, \& {Lamehi
+  Rachti}}]{Angulo1999}
+{Angulo}, C., {Arnould}, M., {Rayet}, M., {et~al.} 1999, Nuclear Physics A,
+  656, 3, \dodoi{10.1016/S0375-9474(99)00030-5}
+
+\bibitem[{{Aparicio}(1998)}]{aparicio_1998_aa}
+{Aparicio}, J.~M. 1998, \apjs, 117, 627
+
+\bibitem[{{Baiko}(2019)}]{2019MNRAS.488.5042B}
+{Baiko}, D.~A. 2019, \mnras, 488, 5042, \dodoi{10.1093/mnras/stz2041}
+
+\bibitem[{Baiko {et~al.}(2001)Baiko, Potekhin, \&
+  Yakovlev}]{PhysRevE.64.057402}
+Baiko, D.~A., Potekhin, A.~Y., \& Yakovlev, D.~G. 2001, Phys. Rev. E, 64,
+  057402, \dodoi{10.1103/PhysRevE.64.057402}
+
+\bibitem[{{Baiko} \& {Yakovlev}(2019)}]{2019MNRAS.490.5839B}
+{Baiko}, D.~A., \& {Yakovlev}, D.~G. 2019, \mnras, 490, 5839,
+  \dodoi{10.1093/mnras/stz3029}
+
+\bibitem[{{Ballenegger} {et~al.}(2018){Ballenegger}, {Alastuey}, \&
+  {Wendland}}]{ballenegger_2018_aa}
+{Ballenegger}, V., {Alastuey}, A., \& {Wendland}, D. 2018, Contributions to
+  Plasma Physics, 58, 114, \dodoi{10.1002/ctpp.201700189}
+
+\bibitem[{{Bartholomew-Biggs} {et~al.}(2000){Bartholomew-Biggs}, {Brown},
+  {Christianson}, \& {Dixon}}]{2000JCoAM.124..171B}
+{Bartholomew-Biggs}, M., {Brown}, S., {Christianson}, B., \& {Dixon}, L. 2000,
+  Journal of Computational and Applied Mathematics, 124, 171,
+  \dodoi{10.1016/S0377-0427(00)00422-2}
+
+\bibitem[{{Baturin} {et~al.}(2019){Baturin}, {D{\"a}ppen}, {Oreshina},
+  {Ayukov}, \& {Gorshkov}}]{baturin_2019_aa}
+{Baturin}, V.~A., {D{\"a}ppen}, W., {Oreshina}, A.~V., {Ayukov}, S.~V., \&
+  {Gorshkov}, A.~B. 2019, \aap, 626, A108, \dodoi{10.1051/0004-6361/201935669}
+
+\bibitem[{{Bauer} {et~al.}(2020){Bauer}, {Schwab}, {Bildsten}, \&
+  {Cheng}}]{Bauer2020}
+{Bauer}, E.~B., {Schwab}, J., {Bildsten}, L., \& {Cheng}, S. 2020, \apj, 902,
+  93, \dodoi{10.3847/1538-4357/abb5a5}
+
+\bibitem[{{Becker} {et~al.}(2014){Becker}, {Lorenzen}, {Fortney}, {Nettelmann},
+  {Sch{\"o}ttler}, \& {Redmer}}]{2014ApJS..215...21B}
+{Becker}, A., {Lorenzen}, W., {Fortney}, J.~J., {et~al.} 2014, \apjs, 215, 21,
+  \dodoi{10.1088/0067-0049/215/2/21}
+
+\bibitem[{{Blinnikov} {et~al.}(1996){Blinnikov}, {Dunina-Barkovskaya}, \&
+  {Nadyozhin}}]{blinnikov_1996_aa}
+{Blinnikov}, S.~I., {Dunina-Barkovskaya}, N.~V., \& {Nadyozhin}, D.~K. 1996,
+  \apjs, 106, 171, \dodoi{10.1086/192334}
+
+\bibitem[{{Blouin} {et~al.}(2020){Blouin}, {Daligault}, {Saumon}, {B{\'e}dard},
+  \& {Brassard}}]{Blouin2020}
+{Blouin}, S., {Daligault}, J., {Saumon}, D., {B{\'e}dard}, A., \& {Brassard},
+  P. 2020, \aap, 640, L11, \dodoi{10.1051/0004-6361/202038879}
+
+\bibitem[{{Bludman} \& {van Riper}(1977)}]{bludman_1977_aa}
+{Bludman}, S.~A., \& {van Riper}, K.~A. 1977, \apj, 212, 859,
+  \dodoi{10.1086/155110}
+
+\bibitem[{{Caillol}(1999)}]{1999JChPh.111.9695C}
+{Caillol}, J.~M. 1999, \jcp, 111, 9695, \dodoi{10.1063/1.480302}
+
+\bibitem[{{Camisassa} {et~al.}(2019){Camisassa}, {Althaus}, {C{\'o}rsico}, {De
+  Ger{\'o}nimo}, {Miller Bertolami}, {Novarino}, {Rohrmann}, {Wachlin}, \&
+  {Garc{\'\i}a-Berro}}]{Camisassa2019}
+{Camisassa}, M.~E., {Althaus}, L.~G., {C{\'o}rsico}, A.~H., {et~al.} 2019,
+  \aap, 625, A87, \dodoi{10.1051/0004-6361/201833822}
+
+\bibitem[{{Carr} {et~al.}(1961){Carr}, {Coldwell-Horsfall}, \&
+  {Fein}}]{1961PhRv..124..747C}
+{Carr}, W.~J., {Coldwell-Horsfall}, R.~A., \& {Fein}, A.~E. 1961, Physical
+  Review, 124, 747, \dodoi{10.1103/PhysRev.124.747}
+
+\bibitem[{{Cassisi} {et~al.}(2007){Cassisi}, {Potekhin}, {Pietrinferni},
+  {Catelan}, \& {Salaris}}]{Cassisi2007}
+{Cassisi}, S., {Potekhin}, A.~Y., {Pietrinferni}, A., {Catelan}, M., \&
+  {Salaris}, M. 2007, \apj, 661, 1094, \dodoi{10.1086/516819}
+
+\bibitem[{Ceperley(1978)}]{PhysRevB.18.3126}
+Ceperley, D. 1978, Phys. Rev. B, 18, 3126, \dodoi{10.1103/PhysRevB.18.3126}
+
+\bibitem[{{Chabrier}(1990)}]{1990JPhys..51.1607C}
+{Chabrier}, G. 1990, Journal de Physique, 51, 1607
+
+\bibitem[{{Chabrier}(1993)}]{1993ApJ...414..695C}
+---. 1993, \apj, 414, 695, \dodoi{10.1086/173115}
+
+\bibitem[{{Chabrier} \& {Potekhin}(1998)}]{CP1998}
+{Chabrier}, G., \& {Potekhin}, A.~Y. 1998, \pre, 58, 4941,
+  \dodoi{10.1103/PhysRevE.58.4941}
+
+\bibitem[{{Chugunov} {et~al.}(2007){Chugunov}, {DeWitt}, \&
+  {Yakovlev}}]{Chugunov2007}
+{Chugunov}, A.~I., {DeWitt}, H.~E., \& {Yakovlev}, D.~G. 2007, \prd, 76,
+  025028, \dodoi{10.1103/PhysRevD.76.025028}
+
+\bibitem[{{Cloutman}(1989)}]{cloutman_1989_aa}
+{Cloutman}, L.~D. 1989, \apjs, 71, 677, \dodoi{10.1086/191393}
+
+\bibitem[{Cowan \& Kirkwood(1958)}]{PhysRev.111.1460}
+Cowan, R.~D., \& Kirkwood, J.~G. 1958, Phys. Rev., 111, 1460,
+  \dodoi{10.1103/PhysRev.111.1460}
+
+\bibitem[{{Cox} \& {Giuli}(1968)}]{1968pss..book.....C}
+{Cox}, J.~P., \& {Giuli}, R.~T. 1968, {Principles of stellar structure}
+
+\bibitem[{{Cyburt} {et~al.}(2010){Cyburt}, {Amthor}, {Ferguson}, {Meisel},
+  {Smith}, {Warren}, {Heger}, {Hoffman}, {Rauscher}, {Sakharuk}, {Schatz},
+  {Thielemann}, \& {Wiescher}}]{Cyburt2010}
+{Cyburt}, R.~H., {Amthor}, A.~M., {Ferguson}, R., {et~al.} 2010, \apjs, 189,
+  240, \dodoi{10.1088/0067-0049/189/1/240}
+
+\bibitem[{{Daeppen} {et~al.}(1990){Daeppen}, {Lebreton}, \&
+  {Rogers}}]{daeppen_1990_aa}
+{Daeppen}, W., {Lebreton}, Y., \& {Rogers}, F. 1990, \solphys, 128, 35,
+  \dodoi{10.1007/BF00154145}
+
+\bibitem[{{D{\"a}ppen}(2010)}]{dappen_2010_aa}
+{D{\"a}ppen}, W. 2010, \apss, 328, 139, \dodoi{10.1007/s10509-010-0269-2}
+
+\bibitem[{Daramy-Loirat {et~al.}(2006)Daramy-Loirat, Defour, de~Dinechin,
+  Gallet, Gast, Lauter, \& Muller}]{CR-LIBM}
+Daramy-Loirat, C., Defour, D., de~Dinechin, F., {et~al.} 2006, {CR-LIBM A
+  library of correctly rounded elementary functions in double-precision},
+  Research report, {LIP,}.
+\newblock \url{https://hal-ens-lyon.archives-ouvertes.fr/ensl-01529804}
+
+\bibitem[{{DeWitt} \& {Slattery}(1999)}]{1999CoPP...39...97D}
+{DeWitt}, H., \& {Slattery}, W. 1999, Contributions to Plasma Physics, 39, 97,
+  \dodoi{10.1002/ctpp.2150390124}
+
+\bibitem[{{DeWitt} \& {Slattery}(2003)}]{2003CoPP...43..279D}
+---. 2003, Contributions to Plasma Physics, 43, 279,
+  \dodoi{10.1002/ctpp.200310027}
+
+\bibitem[{{Eggleton} {et~al.}(1973){Eggleton}, {Faulkner}, \&
+  {Flannery}}]{eggleton_1973_aa}
+{Eggleton}, P.~P., {Faulkner}, J., \& {Flannery}, B.~P. 1973, \aap, 23, 325
+
+\bibitem[{Farouki \& Hamaguchi(1993)}]{PhysRevE.47.4330}
+Farouki, R.~T., \& Hamaguchi, S. 1993, Phys. Rev. E, 47, 4330,
+  \dodoi{10.1103/PhysRevE.47.4330}
+
+\bibitem[{{Fattoyev} {et~al.}(2010){Fattoyev}, {Horowitz}, {Piekarewicz}, \&
+  {Shen}}]{fattoyev_2010_aa}
+{Fattoyev}, F.~J., {Horowitz}, C.~J., {Piekarewicz}, J., \& {Shen}, G. 2010,
+  \prc, 82, 055803, \dodoi{10.1103/PhysRevC.82.055803}
+
+\bibitem[{{Ferguson} {et~al.}(2005){Ferguson}, {Alexander}, {Allard}, {Barman},
+  {Bodnarik}, {Hauschildt}, {Heffner-Wong}, \& {Tamanai}}]{Ferguson2005}
+{Ferguson}, J.~W., {Alexander}, D.~R., {Allard}, F., {et~al.} 2005, \apj, 623,
+  585, \dodoi{10.1086/428642}
+
+\bibitem[{{Fuller} {et~al.}(1985){Fuller}, {Fowler}, \& {Newman}}]{Fuller1985}
+{Fuller}, G.~M., {Fowler}, W.~A., \& {Newman}, M.~J. 1985, \apj, 293, 1,
+  \dodoi{10.1086/163208}
+
+\bibitem[{{Galam} \& {Hansen}(1976)}]{1976PhRvA..14..816G}
+{Galam}, S., \& {Hansen}, J.-P. 1976, \pra, 14, 816,
+  \dodoi{10.1103/PhysRevA.14.816}
+
+\bibitem[{{Gong} {et~al.}(2001{\natexlab{a}}){Gong}, {D{\"a}ppen}, \&
+  {Zejda}}]{gong_2001_ab}
+{Gong}, Z., {D{\"a}ppen}, W., \& {Zejda}, L. 2001{\natexlab{a}}, \apj, 546,
+  1178, \dodoi{10.1086/318307}
+
+\bibitem[{{Gong} {et~al.}(2001{\natexlab{b}}){Gong}, {Zejda}, {D{\"a}ppen}, \&
+  {Aparicio}}]{gong_2001_aa}
+{Gong}, Z., {Zejda}, L., {D{\"a}ppen}, W., \& {Aparicio}, J.~M.
+  2001{\natexlab{b}}, Computer Physics Communications, 136, 294
+
+\bibitem[{Hansen \& Vieillefosse(1975)}]{HANSEN1975187}
+Hansen, J., \& Vieillefosse, P. 1975, Physics Letters A, 53, 187 ,
+  \dodoi{https://doi.org/10.1016/0375-9601(75)90523-X}
+
+\bibitem[{{Hempel} {et~al.}(2012){Hempel}, {Fischer}, {Schaffner-Bielich}, \&
+  {Liebend{\"o}rfer}}]{hempel_2012_aa}
+{Hempel}, M., {Fischer}, T., {Schaffner-Bielich}, J., \& {Liebend{\"o}rfer}, M.
+  2012, \apj, 748, 70, \dodoi{10.1088/0004-637X/748/1/70}
+
+\bibitem[{Hunter(2007)}]{hunter_2007_aa}
+Hunter, J.~D. 2007, Computing In Science \&amp; Engineering, 9, 90
+
+\bibitem[{Ichimaru {et~al.}(1987)Ichimaru, Iyetomi, \& Tanaka}]{ICHIMARU198791}
+Ichimaru, S., Iyetomi, H., \& Tanaka, S. 1987, Physics Reports, 149, 91 ,
+  \dodoi{https://doi.org/10.1016/0370-1573(87)90125-6}
+
+\bibitem[{{Iglesias} \& {Rogers}(1993)}]{Iglesias1993}
+{Iglesias}, C.~A., \& {Rogers}, F.~J. 1993, \apj, 412, 752,
+  \dodoi{10.1086/172958}
+
+\bibitem[{{Iglesias} \& {Rogers}(1996)}]{Iglesias1996}
+---. 1996, \apj, 464, 943, \dodoi{10.1086/177381}
+
+\bibitem[{{Irwin}(2004)}]{Irwin2004}
+{Irwin}, A.~W. 2004, The FreeEOS Code for Calculating the Equation of State for
+  Stellar Interiors.
+\newblock \url{http://freeeos.sourceforge.net/}
+
+\bibitem[{{Itoh} {et~al.}(1996){Itoh}, {Hayashi}, {Nishikawa}, \&
+  {Kohyama}}]{Itoh1996}
+{Itoh}, N., {Hayashi}, H., {Nishikawa}, A., \& {Kohyama}, Y. 1996, \apjs, 102,
+  411, \dodoi{10.1086/192264}
+
+\bibitem[{Jermyn {et~al.}(2021{\natexlab{a}})Jermyn, Schwab, Bauer, Timmes, \&
+  Potekhin}]{adam_s_jermyn_2021_4641111}
+Jermyn, A.~S., Schwab, J., Bauer, E., Timmes, F.~X., \& Potekhin, A.~Y.
+  2021{\natexlab{a}}, {Supporting data for paper 'Skye: A Differentiable
+  Equation of State'}, 1.1,  Zenodo, \dodoi{10.5281/zenodo.4641111}
+
+\bibitem[{Jermyn {et~al.}(2021{\natexlab{b}})Jermyn, Schwab, Bauer, Timmes, \&
+  Potekhin}]{adam_s_jermyn_2021_4639793}
+---. 2021{\natexlab{b}}, {Supporting data for paper 'Skye: A Differentiable
+  Equation of State'}, 1,  Zenodo, \dodoi{10.5281/zenodo.4639793}
+
+\bibitem[{Jones \& Ceperley(1996)}]{PhysRevLett.76.4572}
+Jones, M.~D., \& Ceperley, D.~M. 1996, Phys. Rev. Lett., 76, 4572,
+  \dodoi{10.1103/PhysRevLett.76.4572}
+
+\bibitem[{Kothari(1938)}]{doi:10.1098/rspa.1938.0073}
+Kothari, D.~S. 1938, Proceedings of the Royal Society A: Mathematical, Physical
+  and Engineering Sciences, 165, 486, \dodoi{10.1098/rspa.1938.0073}
+
+\bibitem[{{Langanke} \& {Mart{\'{\i}}nez-Pinedo}(2000)}]{Langanke2000}
+{Langanke}, K., \& {Mart{\'{\i}}nez-Pinedo}, G. 2000, Nuclear Physics A, 673,
+  481, \dodoi{10.1016/S0375-9474(00)00131-7}
+
+\bibitem[{Lattimer \& Swesty(1991)}]{lattimer_1991_aa}
+Lattimer, J.~M., \& Swesty, F.~D. 1991, Nuclear Physics A, 535, 331 ,
+  \dodoi{http://dx.doi.org/10.1016/0375-9474(91)90452-C}
+
+\bibitem[{{Mazzola} {et~al.}(2018){Mazzola}, {Helled}, \&
+  {Sorella}}]{mazzola_2018_aa}
+{Mazzola}, G., {Helled}, R., \& {Sorella}, S. 2018, \prl, 120, 025701,
+  \dodoi{10.1103/PhysRevLett.120.025701}
+
+\bibitem[{{Medin} \& {Cumming}(2010)}]{2010PhRvE..81c6107M}
+{Medin}, Z., \& {Cumming}, A. 2010, \pre, 81, 036107,
+  \dodoi{10.1103/PhysRevE.81.036107}
+
+\bibitem[{Meurer {et~al.}(2017)Meurer, Smith, Paprocki, \v{C}ert\'{i}k,
+  Kirpichev, Rocklin, Kumar, Ivanov, Moore, Singh, Rathnayake, Vig, Granger,
+  Muller, Bonazzi, Gupta, Vats, Johansson, Pedregosa, Curry, Terrel,
+  Rou\v{c}ka, Saboo, Fernando, Kulal, Cimrman, \&
+  Scopatz}]{10.7717/peerj-cs.103}
+Meurer, A., Smith, C.~P., Paprocki, M., {et~al.} 2017, PeerJ Computer Science,
+  3, e103, \dodoi{10.7717/peerj-cs.103}
+
+\bibitem[{{Militzer} \& {Ceperley}(2001)}]{militzer_2001_aa}
+{Militzer}, B., \& {Ceperley}, D.~M. 2001, \pre, 63, 066404,
+  \dodoi{10.1103/PhysRevE.63.066404}
+
+\bibitem[{{Militzer} \& {Hubbard}(2013)}]{militzer_2013_aa}
+{Militzer}, B., \& {Hubbard}, W.~B. 2013, \apj, 774, 148,
+  \dodoi{10.1088/0004-637X/774/2/148}
+
+\bibitem[{Nagara {et~al.}(1987)Nagara, Nagata, \& Nakamura}]{PhysRevA.36.1859}
+Nagara, H., Nagata, Y., \& Nakamura, T. 1987, Phys. Rev. A, 36, 1859,
+  \dodoi{10.1103/PhysRevA.36.1859}
+
+\bibitem[{{Oda} {et~al.}(1994){Oda}, {Hino}, {Muto}, {Takahara}, \&
+  {Sato}}]{Oda1994}
+{Oda}, T., {Hino}, M., {Muto}, K., {Takahara}, M., \& {Sato}, K. 1994, Atomic
+  Data and Nuclear Data Tables, 56, 231, \dodoi{10.1006/adnd.1994.1007}
+
+\bibitem[{{Ogata} {et~al.}(1993){Ogata}, {Iyetomi}, {Ichimaru}, \& {van
+  Horn}}]{1993PhRvE..48.1344O}
+{Ogata}, S., {Iyetomi}, H., {Ichimaru}, S., \& {van Horn}, H.~M. 1993, \pre,
+  48, 1344, \dodoi{10.1103/PhysRevE.48.1344}
+
+\bibitem[{{Omarbakiyeva} {et~al.}(2015){Omarbakiyeva}, {Reinholz}, \&
+  {R{\"o}pke}}]{omarbakiyeva_2015_aa}
+{Omarbakiyeva}, Y.~A., {Reinholz}, H., \& {R{\"o}pke}, G. 2015, \pre, 91,
+  043103, \dodoi{10.1103/PhysRevE.91.043103}
+
+\bibitem[{{Paxton} {et~al.}(2011){Paxton}, {Bildsten}, {Dotter}, {Herwig},
+  {Lesaffre}, \& {Timmes}}]{Paxton2011}
+{Paxton}, B., {Bildsten}, L., {Dotter}, A., {et~al.} 2011, \apjs, 192, 3,
+  \dodoi{10.1088/0067-0049/192/1/3}
+
+\bibitem[{{Paxton} {et~al.}(2013){Paxton}, {Cantiello}, {Arras}, {Bildsten},
+  {Brown}, {Dotter}, {Mankovich}, {Montgomery}, {Stello}, {Timmes}, \&
+  {Townsend}}]{Paxton2013}
+{Paxton}, B., {Cantiello}, M., {Arras}, P., {et~al.} 2013, \apjs, 208, 4,
+  \dodoi{10.1088/0067-0049/208/1/4}
+
+\bibitem[{{Paxton} {et~al.}(2015){Paxton}, {Marchant}, {Schwab}, {Bauer},
+  {Bildsten}, {Cantiello}, {Dessart}, {Farmer}, {Hu}, {Langer}, {Townsend},
+  {Townsley}, \& {Timmes}}]{Paxton2015}
+{Paxton}, B., {Marchant}, P., {Schwab}, J., {et~al.} 2015, \apjs, 220, 15,
+  \dodoi{10.1088/0067-0049/220/1/15}
+
+\bibitem[{{Paxton} {et~al.}(2018){Paxton}, {Schwab}, {Bauer}, {Bildsten},
+  {Blinnikov}, {Duffell}, {Farmer}, {Goldberg}, {Marchant}, {Sorokina},
+  {Thoul}, {Townsend}, \& {Timmes}}]{Paxton2018}
+{Paxton}, B., {Schwab}, J., {Bauer}, E.~B., {et~al.} 2018, \apjs, 234, 34,
+  \dodoi{10.3847/1538-4365/aaa5a8}
+
+\bibitem[{{Paxton} {et~al.}(2019){Paxton}, {Smolec}, {Schwab}, {Gautschy},
+  {Bildsten}, {Cantiello}, {Dotter}, {Farmer}, {Goldberg}, {Jermyn}, {Kanbur},
+  {Marchant}, {Thoul}, {Townsend}, {Wolf}, {Zhang}, \& {Timmes}}]{Paxton2019}
+{Paxton}, B., {Smolec}, R., {Schwab}, J., {et~al.} 2019, \apjs, 243, 10,
+  \dodoi{10.3847/1538-4365/ab2241}
+
+\bibitem[{{Pols} {et~al.}(1995){Pols}, {Tout}, {Eggleton}, \&
+  {Han}}]{pols_1995_aa}
+{Pols}, O.~R., {Tout}, C.~A., {Eggleton}, P.~P., \& {Han}, Z. 1995, \mnras,
+  274, 964, \dodoi{10.1093/mnras/274.3.964}
+
+\bibitem[{Potekhin \& Chabrier(2000)}]{PhysRevE.62.8554}
+Potekhin, A.~Y., \& Chabrier, G. 2000, Phys. Rev. E, 62, 8554,
+  \dodoi{10.1103/PhysRevE.62.8554}
+
+\bibitem[{{Potekhin} \& {Chabrier}(2010)}]{Potekhin2010}
+{Potekhin}, A.~Y., \& {Chabrier}, G. 2010, Contributions to Plasma Physics, 50,
+  82, \dodoi{10.1002/ctpp.201010017}
+
+\bibitem[{{Potekhin} \& {Chabrier}(2013)}]{2013A&A...550A..43P}
+---. 2013, \aap, 550, A43, \dodoi{10.1051/0004-6361/201220082}
+
+\bibitem[{{Potekhin} {et~al.}(2009){Potekhin}, {Chabrier}, {Chugunov},
+  {DeWitt}, \& {Rogers}}]{2009PhRvE..80d7401P}
+{Potekhin}, A.~Y., {Chabrier}, G., {Chugunov}, A.~I., {DeWitt}, H.~E., \&
+  {Rogers}, F.~J. 2009, \pre, 80, 047401, \dodoi{10.1103/PhysRevE.80.047401}
+
+\bibitem[{Potekhin {et~al.}(2009)Potekhin, Chabrier, \&
+  Rogers}]{PhysRevE.79.016411}
+Potekhin, A.~Y., Chabrier, G., \& Rogers, F.~J. 2009, Phys. Rev. E, 79, 016411,
+  \dodoi{10.1103/PhysRevE.79.016411}
+
+\bibitem[{{Poutanen}(2017)}]{Poutanen2017}
+{Poutanen}, J. 2017, \apj, 835, 119, \dodoi{10.3847/1538-4357/835/2/119}
+
+\bibitem[{{Press} {et~al.}(1992){Press}, {Teukolsky}, {Vetterling}, \&
+  {Flannery}}]{press_1992_aa}
+{Press}, W.~H., {Teukolsky}, S.~A., {Vetterling}, W.~T., \& {Flannery}, B.~P.
+  1992, {Numerical recipes in FORTRAN. The art of scientific computing}, Vol.
+  {2nd ed.; Cambridge: Cambridge Univ. Press} ({Cambridge: University Press})
+
+\bibitem[{{Rakavy} \& {Shaviv}(1967)}]{1967ApJ...148..803R}
+{Rakavy}, G., \& {Shaviv}, G. 1967, \apj, 148, 803, \dodoi{10.1086/149204}
+
+\bibitem[{Ridders(1982)}]{ridders_1982_aa}
+Ridders, C. 1982, Advances in Engineering Software (1978), 4, 75 ,
+  \dodoi{https://doi.org/10.1016/S0141-1195(82)80057-0}
+
+\bibitem[{{Rogers}(1974)}]{rogers_1974_aa}
+{Rogers}, F.~J. 1974, \pra, 10, 2441, \dodoi{10.1103/PhysRevA.10.2441}
+
+\bibitem[{{Rogers}(1981)}]{rogers_1981_aa}
+---. 1981, \pra, 24, 1531, \dodoi{10.1103/PhysRevA.24.1531}
+
+\bibitem[{{Rogers} \& {Nayfonov}(2002)}]{Rogers2002}
+{Rogers}, F.~J., \& {Nayfonov}, A. 2002, \apj, 576, 1064,
+  \dodoi{10.1086/341894}
+
+\bibitem[{{Rogers} {et~al.}(1996){Rogers}, {Swenson}, \&
+  {Iglesias}}]{rogers_1996_aa}
+{Rogers}, F.~J., {Swenson}, F.~J., \& {Iglesias}, C.~A. 1996, \apj, 456, 902,
+  \dodoi{10.1086/176705}
+
+\bibitem[{{Rohrmann} {et~al.}(2012){Rohrmann}, {Althaus},
+  {Garc{\'{\i}}a-Berro}, {C{\'o}rsico}, \& {Miller Bertolami}}]{Rohrmann12}
+{Rohrmann}, R.~D., {Althaus}, L.~G., {Garc{\'{\i}}a-Berro}, E., {C{\'o}rsico},
+  A.~H., \& {Miller Bertolami}, M.~M. 2012, \aap, 546, A119,
+  \dodoi{10.1051/0004-6361/201219292}
+
+\bibitem[{{Salaris} {et~al.}(2000){Salaris}, {Garc{\'\i}a-Berro}, {Hernanz},
+  {Isern}, \& {Saumon}}]{Salaris2000}
+{Salaris}, M., {Garc{\'\i}a-Berro}, E., {Hernanz}, M., {Isern}, J., \&
+  {Saumon}, D. 2000, \apj, 544, 1036, \dodoi{10.1086/317235}
+
+\bibitem[{{Salpeter}(1961)}]{1961ApJ...134..669S}
+{Salpeter}, E.~E. 1961, \apj, 134, 669, \dodoi{10.1086/147194}
+
+\bibitem[{{Saumon} {et~al.}(1995){Saumon}, {Chabrier}, \& {van
+  Horn}}]{Saumon1995}
+{Saumon}, D., {Chabrier}, G., \& {van Horn}, H.~M. 1995, \apjs, 99, 713,
+  \dodoi{10.1086/192204}
+
+\bibitem[{{Schneider} {et~al.}(2017){Schneider}, {Roberts}, \&
+  {Ott}}]{schneider_2017_aa}
+{Schneider}, A.~S., {Roberts}, L.~F., \& {Ott}, C.~D. 2017, \prc, 96, 065802,
+  \dodoi{10.1103/PhysRevC.96.065802}
+
+\bibitem[{{Shen} {et~al.}(1998){Shen}, {Toki}, {Oyamatsu}, \&
+  {Sumiyoshi}}]{shen_1998_aa}
+{Shen}, H., {Toki}, H., {Oyamatsu}, K., \& {Sumiyoshi}, K. 1998, Progress of
+  Theoretical Physics, 100, 1013, \dodoi{10.1143/PTP.100.1013}
+
+\bibitem[{{Steiner} {et~al.}(2013){Steiner}, {Hempel}, \&
+  {Fischer}}]{steiner_2013_aa}
+{Steiner}, A.~W., {Hempel}, M., \& {Fischer}, T. 2013, \apj, 774, 17,
+  \dodoi{10.1088/0004-637X/774/1/17}
+
+\bibitem[{{Sugahara} \& {Toki}(1994)}]{sugahara_1994_aa}
+{Sugahara}, Y., \& {Toki}, H. 1994, \nphysa, 579, 557,
+  \dodoi{10.1016/0375-9474(94)90923-7}
+
+\bibitem[{{Timmes} \& {Arnett}(1999)}]{timmes_1999_aa}
+{Timmes}, F.~X., \& {Arnett}, D. 1999, \apjs, 125, 277
+
+\bibitem[{{Timmes} \& {Swesty}(2000)}]{Timmes2000}
+{Timmes}, F.~X., \& {Swesty}, F.~D. 2000, \apjs, 126, 501,
+  \dodoi{10.1086/313304}
+
+\bibitem[{{Togashi} {et~al.}(2017){Togashi}, {Nakazato}, {Takehara},
+  {Yamamuro}, {Suzuki}, \& {Takano}}]{togashi_2017_aa}
+{Togashi}, H., {Nakazato}, K., {Takehara}, Y., {et~al.} 2017, \nphysa, 961, 78,
+  \dodoi{10.1016/j.nuclphysa.2017.02.010}
+
+\bibitem[{{Townsend}(2019{\natexlab{a}})}]{mesasdk_linux}
+{Townsend}, R.~H.~D. 2019{\natexlab{a}}, {MESA SDK for Linux}, 20190503,
+  Zenodo, \dodoi{10.5281/zenodo.2669541}
+
+\bibitem[{{Townsend}(2019{\natexlab{b}})}]{mesasdk_macos}
+---. 2019{\natexlab{b}}, MESA SDK for Mac OS, 20190503,  Zenodo,
+  \dodoi{10.5281/zenodo.2669543}
+
+\bibitem[{{Typel} {et~al.}(2010){Typel}, {R{\"o}pke}, {Kl{\"a}hn}, {Blaschke},
+  \& {Wolter}}]{typel_2010_aa}
+{Typel}, S., {R{\"o}pke}, G., {Kl{\"a}hn}, T., {Blaschke}, D., \& {Wolter},
+  H.~H. 2010, \prc, 81, 015803, \dodoi{10.1103/PhysRevC.81.015803}
+
+\bibitem[{van~der Walt {et~al.}(2011)van~der Walt, Colbert, \&
+  Varoquaux}]{der_walt_2011_aa}
+van~der Walt, S., Colbert, S.~C., \& Varoquaux, G. 2011, Computing in Science
+  Engineering, 13, 22, \dodoi{10.1109/MCSE.2011.37}
+
+\bibitem[{{Yakovlev} \& {Shalybkov}(1989)}]{Yakovlev1989}
+{Yakovlev}, D.~G., \& {Shalybkov}, D.~A. 1989, \apspr, 7, 311
+
+\end{thebibliography}

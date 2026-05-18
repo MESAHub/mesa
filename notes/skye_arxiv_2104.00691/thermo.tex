@@ -1,0 +1,105 @@
+\section{Thermodynamics} \label{sec:thermo}
+
+\skye\ computes thermodynamic quantities from derivatives of the free energy $F=e-Ts$.
+The entropy, pressure, and internal energy are given by
+\begin{align}
+	s &= -\left.\frac{\partial F}{\partial T}\right|_\rho\\
+	e &= F + T s\\
+	p &= \rho^2 \left.\frac{\partial F}{\partial \rho}\right|_T.
+\end{align}
+From the internal energy we obtain the specific heat at constant volume
+\begin{align}
+	c_v &= \left.\frac{\partial e}{\partial T}\right|_{\rho}
+\end{align}
+From the pressure we find the susceptibilities
+\begin{align}
+	\chi_T &\equiv \left.\frac{\partial \ln p}{\partial \ln T}\right|_{\rho}\\
+	\chi_\rho &\equiv \left.\frac{\partial \ln p}{\partial \ln \rho}\right|_{T},
+\end{align}
+which then form the adiabatic indices and gradient~\citep{1968pss..book.....C}
+\begin{align}
+	\Gamma_3 \equiv 1 + \frac{p}{\rho c_v T} \chi_T\\
+	\Gamma_1 \equiv \chi_\rho + (\Gamma_3 - 1)\chi_T\\
+	\nabla_{\rm ad} \equiv \frac{\Gamma_3 - 1}{\Gamma_1}\\
+	\Gamma_2 = 1 - \nabla_{\rm ad}.
+\end{align}
+Note that $\Gamma_{1,2,3}$ are \emph{not} ion interaction parameters but rather adiabatic indices.
+From these we find the specific heat at constant pressure
+\begin{align}
+	c_p &= c_v \frac{\Gamma_1}{\chi_\rho}
+\end{align}	
+and the sound speed accounting for relativity~\citep{1968pss..book.....C}
+\begin{align}
+	c_s &= c \sqrt{\frac{\Gamma_1}{1 + \frac{\rho}{p}(e + c^2)}},
+\end{align}
+where $c$ is the speed of light.
+
+\skye\ further reports several auxiliary quantities meant to help with calculations which cross the liquid-solid phase boundary.
+Derivatives of the free energy may be discontinuous across the phase transition, which means that $s$, $e$, and $p$ may be discontinuous there.
+This is a particular problem for stellar evolution calculations.
+
+To understand the problem consider the term
+\begin{align}
+	\epsilon_{\rm grav} \equiv -T \frac{ds}{dt},
+\end{align}
+which commonly appears in the energy or heat equation in stellar evolution software instruments.
+Here $d/dt$ denotes a Lagrangian derivative.
+If $ds/dt$ is evaluated by finite differences then no time step will be small enough to produce a converged result across the phase transition because $s$ is genuinely discontinuous there.
+
+On the other hand, if we write
+\begin{align}
+	\frac{ds}{dt} = \left.\frac{\partial s}{\partial T}\right|_\rho \frac{dT}{dt} + \left.\frac{\partial s}{\partial \rho}\right|_T \frac{d\rho}{dt},
+\end{align}
+then we miss the latent heat of the phase transition because, except for a set in $(\rho,T)$ of measure zero, $\partial s/\partial T$ and $\partial s/\partial \rho$ contain no information about the transition.
+This is not a mathematical problem: near the phase transition $\partial s/\partial T \propto \delta(T-T_{\rm transition})$, and likewise for $\partial s/\partial \rho$.
+The problem is that we cannot directly implement a Dirac delta function in numerical calculations, and neglecting this term means neglecting the latent heat of the transition.
+
+To address this, in addition to equation~\eqref{eq:fmin} we also compute a smoothed version of the free energy
+\begin{align}
+	f_{\rm i, smooth} =  \phi f_{\rm i, liquid}+ (1-\phi) f_{\rm i, solid},
+	\label{eq:phase_mix}
+\end{align}
+where
+\begin{align}
+	\phi = \frac{e^{\Delta f/w}}{e^{\Delta f/w} + 1}
+	\label{eq:phi}
+\end{align}
+measures which phase the system is in, and smoothly transitions from the liquid phase to the solid phase across the crystallization boundary.
+Here $w$ is a blurring parameter, which we choose to be $10^{-2}$ to ensure a narrow transition, and
+\begin{align}
+	\Delta f = f_{\rm i,liquid} - f_{\rm i,solid}.
+\end{align}
+
+The delta functions which appear in derivatives of $f_{\rm i}$ appear as smooth functions with broad support in $f_{\rm i, smooth}$.
+Unfortunately this smoothed free energy also produces unphysical properties, such as negative sound speeds and entropies.
+So we cannot use thermodynamic quantities derived from $f_{\rm i,smooth}$ directly in place of those derived from $f_{\rm i}$.
+However, we can use $f_{\rm i,smooth}$ to calculate an additional heating term which compensates for the missing latent heat.
+
+To see this let $T_s$ be the temperature where $\phi=\epsilon \ll 1$, let $T_t$ be the temperature where $\phi=1/2$, and let $T_l$ be the temperature where $\phi = 1 - \epsilon$.
+The entropy difference between $T_s$ and $T_t$ is similar for both $s$ and $s_{\rm smooth}$, i.e.
+\begin{align}
+	s_{\rm smooth}(T_t) - s_{\rm smooth}(T_s) &\approx s(T_t) - s(T_s) + \mathcal{O}(\epsilon).
+\end{align}
+We can rewrite this in the form
+\begin{align}
+	\int_{T_s}^{T_l} \left.\frac{\partial s_{\rm smooth}}{\partial T}\right|_{\rho} - \left.\frac{\partial s_{\rm regular}}{\partial T}\right|_{\rho} - \Delta s \delta(T-T_{t}) dT &\approx \mathcal{O}\left(\epsilon\right),
+\end{align}
+where here the subscript ``regular'' means the part of the derivative excluding the Dirac delta, which we have included explicitly in the third term.
+Rearranging this we find
+\begin{align}
+	\Delta s \approx \int_{T_s}^{T_l} \left.\frac{\partial s_{\rm smooth}}{\partial T}\right|_{\rho} - \left.\frac{\partial s_{\rm regular}}{\partial T}\right|_{\rho} dT +\mathcal{O}\left(\epsilon\right).
+\end{align}
+
+Using this formalism, we can write the latent heat which ought to appear in $\epsilon_{\rm grav}$ but which we would otherwise miss as
+\begin{align}
+	\epsilon_{\rm latent} &= T \left(\left.\frac{\partial s_{\rm smooth}}{\partial T}\right|_\rho-\left.\frac{\partial s_{\rm regular}}{\partial T}\right|_\rho\right) \frac{dT}{dt} \nonumber\\
+	&+ T\left(\left.\frac{\partial s_{\rm smooth}}{\partial \rho}\right|_T-\left.\frac{\partial s_{\rm regular}}{\partial \rho}\right|_T\right) \frac{d\rho}{dt}
+	\label{eq:Ls}
+\end{align}
+where $s_{\rm smooth}$ is the entropy calculated from the smoothed free energy.
+To facilitate calculating $\epsilon_{\rm latent}$, \skye\ reports
+\begin{align}
+	L_T &\equiv T \left(\left.\frac{\partial s_{\rm smooth}}{\partial \ln T}\right|_\rho-\left.\frac{\partial s_{\rm regular}}{\partial \ln T}\right|_\rho\right)\\
+	L_\rho &\equiv T \left(\left.\frac{\partial s_{\rm smooth}}{\partial \ln \rho}\right|_T-\left.\frac{\partial s_{\rm regular}}{\partial\ln  \rho}\right|_T\right),
+\end{align}	
+as well as the smoothed phase $\phi$ for diagnostic purposes.

@@ -464,6 +464,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action
+         integer :: num_eos_dxa_results
          type (star_info), pointer :: c
          character (len=128) :: null_str
 
@@ -478,6 +479,8 @@
          nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nvar_chem = s% nvar_chem
+         num_eos_dxa_results = num_eos_d_dxa_results
+         if (s% include_eos_composition_partials) num_eos_dxa_results = num_eos_basic_results
 
          c => s
          action = action_in
@@ -719,7 +722,7 @@
             if (failed('d_eos_dlnd')) exit
             call do2(s% d_eos_dlnT, c% d_eos_dlnT, num_eos_basic_results, 'd_eos_dlnT')
             if (failed('d_eos_dlnT')) exit
-            call do3(s% d_eos_dxa, c% d_eos_dxa, num_eos_d_dxa_results, species)
+            call do3(s% d_eos_dxa, c% d_eos_dxa, num_eos_dxa_results, species)
             if (failed('d_eos_dxa')) exit
 
             call do1(s% chiRho_for_partials, c% chiRho_for_partials)
@@ -872,6 +875,12 @@
             if (failed('d_dxdt_mix_dx00')) exit
             call do1(s% d_dxdt_mix_dxm1, c% d_dxdt_mix_dxm1)
             if (failed('d_dxdt_mix_dxm1')) exit
+            call do2(s% d_sig_dxa_m1, c% d_sig_dxa_m1, species, null_str)
+            if (failed('d_sig_dxa_m1')) exit
+            call do2(s% d_sig_dxa_00, c% d_sig_dxa_00, species, null_str)
+            if (failed('d_sig_dxa_00')) exit
+            call do1_ad(s% sig_implicit_ad, c% sig_implicit_ad)
+            if (failed('sig_implicit_ad')) exit
 
             if (action /= do_check_size) then
                call do2(s% eps_nuc_categories, c% eps_nuc_categories, num_categories, null_str)
@@ -1060,6 +1069,10 @@
 
             call do1(s% D_mix, c% D_mix)
             if (failed('D_mix')) exit
+            call do1(s% Dmix_explicit, c% Dmix_explicit)
+            if (failed('Dmix_explicit')) exit
+            call do1_ad(s% Dmix_implicit, c% Dmix_implicit)
+            if (failed('Dmix_implicit')) exit
 
             call do1_integer(s% mixing_type, c% mixing_type)
             if (failed('mixing_type')) exit
@@ -1115,6 +1128,8 @@
             if (failed('gradL')) exit
             call do1(s% gradL_composition_term, c% gradL_composition_term)
             if (failed('gradL_composition_term')) exit
+            call do1_ad(s% gradL_composition_term_ad, c% gradL_composition_term_ad)
+            if (failed('gradL_composition_term_ad')) exit
 
             call do1_integer( &
                s% dominant_iso_for_thermohaline, c% dominant_iso_for_thermohaline)
@@ -1131,6 +1146,12 @@
             if (failed('brunt_N2_composition_term')) exit
             call do1(s% brunt_B, c% brunt_B)
             if (failed('brunt_B')) exit
+            call do1_ad(s% brunt_B_ad, c% brunt_B_ad)
+            if (failed('brunt_B_ad')) exit
+            call do2(s% d_brunt_B_dxa_m1, c% d_brunt_B_dxa_m1, species, null_str)
+            if (failed('d_brunt_B_dxa_m1')) exit
+            call do2(s% d_brunt_B_dxa_00, c% d_brunt_B_dxa_00, species, null_str)
+            if (failed('d_brunt_B_dxa_00')) exit
             call do1(s% unsmoothed_brunt_B, c% unsmoothed_brunt_B)
             if (failed('unsmoothed_brunt_B')) exit
             call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)

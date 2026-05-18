@@ -19,7 +19,7 @@
 
 module eos_support
 
-  use const_def, only: dp, ln10, arg_not_provided
+  use const_def, only: dp, i8, ln10, arg_not_provided
   use star_private_def
   use utils_lib, only : is_bad, mesa_error
 
@@ -27,6 +27,10 @@ module eos_support
 
   private
   public :: get_eos
+  public :: get_eos_star_dxa
+  public :: get_eos_brunt_dxa
+  public :: get_eos_brunt_dxa_with_moments
+  public :: get_eos_full_dxa
   public :: solve_eos_given_DE
   public :: solve_eos_given_DEgas
   public :: solve_eos_given_DP
@@ -99,6 +103,323 @@ contains
     end if
 
   end subroutine get_eos
+
+
+  subroutine start_eos_dxa_timing(s, time0, clock_rate)
+    type (star_info), pointer :: s
+    integer(i8), intent(out) :: time0, clock_rate
+
+    if (.not. s% doing_timing) return
+
+    !$OMP atomic
+    s% timing_num_get_eos_calls = s% timing_num_get_eos_calls + 1
+    !$OMP atomic
+    s% timing_num_get_eos_dxa_calls = s% timing_num_get_eos_dxa_calls + 1
+    call system_clock(time0, clock_rate)
+
+  end subroutine start_eos_dxa_timing
+
+
+  subroutine update_eos_dxa_timing(s, time0, clock_rate, res, ierr)
+    use eos_def, only: num_eos_basic_results, i_frac_Skye
+
+    type (star_info), pointer :: s
+    integer(i8), intent(in) :: time0, clock_rate
+    real(dp), intent(in) :: res(num_eos_basic_results)
+    integer, intent(in) :: ierr
+
+    integer(i8) :: time1
+    real(dp) :: dt
+
+    if (.not. s% doing_timing) return
+
+    call system_clock(time1)
+    dt = dble(time1 - time0)/dble(clock_rate)
+    !$OMP atomic
+    s% time_eos_dxa = s% time_eos_dxa + dt
+
+    if (ierr == 0 .and. res(i_frac_Skye) > 0d0) then
+       !$OMP atomic
+       s% timing_num_get_eos_dxa_skye_calls = s% timing_num_get_eos_dxa_skye_calls + 1
+       !$OMP atomic
+       s% timing_sum_get_eos_dxa_frac_Skye = &
+          s% timing_sum_get_eos_dxa_frac_Skye + res(i_frac_Skye)
+    end if
+
+  end subroutine update_eos_dxa_timing
+
+
+  subroutine get_eos_full_dxa( &
+       s, k, xa, &
+       Rho, logRho, T, logT, &
+       res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, ierr)
+
+    use eos_lib, only: eosDT_get_full_dxa
+    use eos_def, only: num_eos_basic_results
+
+    type (star_info), pointer :: s
+    integer, intent(in) :: k  ! 0 means not being called for a particular cell
+    real(dp), intent(in) :: xa(:), Rho, logRho, T, logT
+    real(dp), dimension(num_eos_basic_results), intent(out) :: &
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_basic_results,s% species)
+    integer, intent(out) :: ierr
+
+    integer :: j
+    integer(i8) :: time0, clock_rate
+
+    include 'formats'
+
+    ierr = 0
+
+    if(logRho < -25) then
+      s% retry_message = 'eos evaluated at too low a density'
+      ierr = -1
+      return
+    end if
+
+    call start_eos_dxa_timing(s, time0, clock_rate)
+    call eosDT_get_full_dxa( &
+       s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+       Rho, logRho, T, logT, &
+       res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+    call update_eos_dxa_timing(s, time0, clock_rate, res, ierr)
+
+    if (ierr /= 0) then
+       s% retry_message = 'get_eos_full_dxa failed'
+       if (s% report_ierr) then
+          !$OMP critical (get_eos_critical)
+          write(*,*) 'get_eos_full_dxa ierr', ierr
+          write(*,2) 'k', k
+          do j=1,s% species
+             write(*,2) 'xa(j) ' // trim(s% nameofequ(j+s% nvar_hydro)), j, xa(j)
+          end do
+          write(*,1) 'log10Rho', logRho
+          write(*,1) 'log10T', logT
+          if (s% stop_for_bad_nums .and. &
+               is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+          !$OMP end critical (get_eos_critical)
+       end if
+       return
+    end if
+
+  end subroutine get_eos_full_dxa
+
+  subroutine get_eos_star_dxa( &
+       s, k, xa, &
+       Rho, logRho, T, logT, &
+       X, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+       res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, ierr)
+
+    use eos_lib, only: eosDT_get_dxa_rows_with_moments
+    use eos_def, only: num_eos_basic_results, i_lnPgas, i_lnE
+
+    type (star_info), pointer :: s
+    integer, intent(in) :: k  ! 0 means not being called for a particular cell
+    real(dp), intent(in) :: xa(:), Rho, logRho, T, logT
+    real(dp), intent(in) :: X, Z, abar, zbar, z2bar, z53bar, ye
+    real(dp), intent(in) :: mass_correction, sumx
+    real(dp), dimension(num_eos_basic_results), intent(out) :: &
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_basic_results,s% species)
+    integer, intent(out) :: ierr
+
+    integer :: j
+    integer(i8) :: time0, clock_rate
+    integer, parameter :: dxa_rows(2) = (/ i_lnPgas, i_lnE /)
+
+    include 'formats'
+
+    ierr = 0
+
+    if(logRho < -25) then
+      s% retry_message = 'eos evaluated at too low a density'
+      ierr = -1
+      return
+    end if
+
+    ! cheaper wrapper: request only the composition rows needed by star.
+    call start_eos_dxa_timing(s, time0, clock_rate)
+    call eosDT_get_dxa_rows_with_moments( &
+       s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+       Rho, logRho, T, logT, &
+       X, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+       dxa_rows, &
+       res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+    call update_eos_dxa_timing(s, time0, clock_rate, res, ierr)
+
+    if (ierr /= 0) then
+       s% retry_message = 'get_eos_star_dxa failed'
+       if (s% report_ierr) then
+          !$OMP critical (get_eos_critical)
+          write(*,*) 'get_eos_star_dxa ierr', ierr
+          write(*,2) 'k', k
+          do j=1,s% species
+             write(*,2) 'xa(j) ' // trim(s% nameofequ(j+s% nvar_hydro)), j, xa(j)
+          end do
+          write(*,1) 'log10Rho', logRho
+          write(*,1) 'log10T', logT
+          if (s% stop_for_bad_nums .and. &
+               is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+          !$OMP end critical (get_eos_critical)
+       end if
+       return
+    end if
+
+  end subroutine get_eos_star_dxa
+
+
+  subroutine get_eos_brunt_dxa( &
+       s, k, xa, &
+       Rho, logRho, T, logT, include_chi_partials, &
+       res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, ierr)
+
+    use eos_lib, only: eosDT_get_dxa_rows
+    use eos_def, only: num_eos_basic_results, i_lnPgas, i_chiT, i_chiRho
+
+    type (star_info), pointer :: s
+    integer, intent(in) :: k  ! 0 means not being called for a particular cell
+    real(dp), intent(in) :: xa(:), Rho, logRho, T, logT
+    logical, intent(in) :: include_chi_partials
+    real(dp), dimension(num_eos_basic_results), intent(out) :: &
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_basic_results,s% species)
+    integer, intent(out) :: ierr
+
+    integer :: j
+    integer(i8) :: time0, clock_rate
+    integer :: dxa_rows(3)
+
+    include 'formats'
+
+    ierr = 0
+
+    if(logRho < -25) then
+      s% retry_message = 'eos evaluated at too low a density'
+      ierr = -1
+      return
+    end if
+
+    call start_eos_dxa_timing(s, time0, clock_rate)
+    dxa_rows(1) = i_lnPgas
+    if (include_chi_partials) then
+       dxa_rows(2) = i_chiT
+       dxa_rows(3) = i_chiRho
+       ! cheaper wrapper: request only the composition rows needed by brunt.
+       call eosDT_get_dxa_rows( &
+          s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+          Rho, logRho, T, logT, dxa_rows(1:3), &
+          res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+    else
+       ! cheaper wrapper: request only the composition rows needed by brunt.
+       call eosDT_get_dxa_rows( &
+          s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+          Rho, logRho, T, logT, dxa_rows(1:1), &
+          res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+    end if
+    call update_eos_dxa_timing(s, time0, clock_rate, res, ierr)
+
+    if (ierr /= 0) then
+       s% retry_message = 'get_eos_brunt_dxa failed'
+       if (s% report_ierr) then
+          !$OMP critical (get_eos_critical)
+          write(*,*) 'get_eos_brunt_dxa ierr', ierr
+          write(*,2) 'k', k
+          do j=1,s% species
+             write(*,2) 'xa(j) ' // trim(s% nameofequ(j+s% nvar_hydro)), j, xa(j)
+          end do
+          write(*,1) 'log10Rho', logRho
+          write(*,1) 'log10T', logT
+          if (s% stop_for_bad_nums .and. &
+               is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+          !$OMP end critical (get_eos_critical)
+       end if
+       return
+    end if
+
+  end subroutine get_eos_brunt_dxa
+
+
+  subroutine get_eos_brunt_dxa_with_moments( &
+       s, k, xa, &
+       Rho, logRho, T, logT, include_chi_partials, &
+       X, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+       res, dres_dlnRho, dres_dlnT, &
+       dres_dxa, ierr)
+
+    use eos_lib, only: eosDT_get_dxa_rows_with_moments
+    use eos_def, only: num_eos_basic_results, i_lnPgas, i_chiT, i_chiRho
+
+    type (star_info), pointer :: s
+    integer, intent(in) :: k  ! 0 means not being called for a particular cell
+    real(dp), intent(in) :: xa(:), Rho, logRho, T, logT
+    logical, intent(in) :: include_chi_partials
+    real(dp), intent(in) :: X, Z, abar, zbar, z2bar, z53bar, ye
+    real(dp), intent(in) :: mass_correction, sumx
+    real(dp), dimension(num_eos_basic_results), intent(out) :: &
+         res, dres_dlnRho, dres_dlnT
+    real(dp), intent(out) :: dres_dxa(num_eos_basic_results,s% species)
+    integer, intent(out) :: ierr
+
+    integer :: j
+    integer(i8) :: time0, clock_rate
+    integer :: dxa_rows(3)
+
+    include 'formats'
+
+    ierr = 0
+
+    if(logRho < -25) then
+      s% retry_message = 'eos evaluated at too low a density'
+      ierr = -1
+      return
+    end if
+
+    call start_eos_dxa_timing(s, time0, clock_rate)
+    dxa_rows(1) = i_lnPgas
+    if (include_chi_partials) then
+       dxa_rows(2) = i_chiT
+       dxa_rows(3) = i_chiRho
+       ! cheaper wrapper: reuse caller's moments and request brunt dxa rows.
+       call eosDT_get_dxa_rows_with_moments( &
+          s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+          Rho, logRho, T, logT, &
+          X, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+          dxa_rows(1:3), &
+          res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+    else
+       ! cheaper wrapper: reuse caller's moments and request brunt dxa rows.
+       call eosDT_get_dxa_rows_with_moments( &
+          s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
+          Rho, logRho, T, logT, &
+          X, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+          dxa_rows(1:1), &
+          res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
+    end if
+    call update_eos_dxa_timing(s, time0, clock_rate, res, ierr)
+
+    if (ierr /= 0) then
+       s% retry_message = 'get_eos_brunt_dxa_with_moments failed'
+       if (s% report_ierr) then
+          !$OMP critical (get_eos_critical)
+          write(*,*) 'get_eos_brunt_dxa_with_moments ierr', ierr
+          write(*,2) 'k', k
+          do j=1,s% species
+             write(*,2) 'xa(j) ' // trim(s% nameofequ(j+s% nvar_hydro)), j, xa(j)
+          end do
+          write(*,1) 'log10Rho', logRho
+          write(*,1) 'log10T', logT
+          if (s% stop_for_bad_nums .and. &
+               is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+          !$OMP end critical (get_eos_critical)
+       end if
+       return
+    end if
+
+  end subroutine get_eos_brunt_dxa_with_moments
 
 
   ! Solve for temperature & eos results data given density & energy

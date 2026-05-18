@@ -27,6 +27,15 @@ module ion_offset
 
       private
       public :: compute_ion_offset
+      public :: compute_ion_offset_partials
+
+      ! First 28 ionization energies, same species as used in FreeEOS, obtained from
+      ! NIST (https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html)
+      ! using the query 'H-Ni' asking for 'Total binding energy'.
+      real(dp), parameter :: ionization_table(28) = [13.598434599702,79.0051545,203.4861711,399.14864,670.9809,&
+                                                   1030.1085,1486.058,2043.8428,2715.89,3511.696,4420.0,5451.06,6604.95,&
+                                                   7888.53,9305.8,10859.7,12556.4,14400.8,16382.0,18510.0,20788.0,&
+                                                   23221.0,25820.0,28582.0,31514.0,34619.0,37899.0,41356.0]
 
       contains
 
@@ -42,14 +51,6 @@ module ion_offset
          integer, intent(in) :: species
          real(dp), intent(in) :: xa(species)
          integer, pointer :: chem_id(:)
-
-         ! First 28 ionization energies, same species as used in FreeEOS, obtained from
-         ! NIST (https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html)
-         ! using the query 'H-Ni' asking for 'Total binding energy'.
-         real(dp), parameter :: ionization_table(28) = [13.598434599702,79.0051545,203.4861711,399.14864,670.9809,&
-                                                   1030.1085,1486.058,2043.8428,2715.89,3511.696,4420.0,5451.06,6604.95,&
-                                                   7888.53,9305.8,10859.7,12556.4,14400.8,16382.0,18510.0,20788.0,&
-                                                   23221.0,25820.0,28582.0,31514.0,34619.0,37899.0,41356.0]
 
          integer :: k, Z(species)
          real(dp) :: A(species), ya(species), norm
@@ -80,5 +81,41 @@ module ion_offset
          offset = offset * ev2erg / amu
 
       end function compute_ion_offset
+
+
+      subroutine compute_ion_offset_partials(species, xa, chem_id, doffset_dxa)
+         use chem_def, only: chem_isos
+         integer, intent(in) :: species
+         real(dp), intent(in) :: xa(species)
+         integer, pointer :: chem_id(:)
+         real(dp), intent(out) :: doffset_dxa(species)
+
+         integer :: k, Z(species)
+         real(dp) :: A(species), ya(species), norm, ion(species), avg
+
+         doffset_dxa = 0d0
+         norm = 0d0
+         do k=1,species
+            A(k) = chem_isos% Z_plus_N(chem_id(k))
+            Z(k) = chem_isos% Z(chem_id(k))
+            ya(k) = xa(k) / A(k)
+            norm = norm + ya(k)
+            ion(k) = 0d0
+            if (Z(k) <= 28 .and. Z(k) >= 1) ion(k) = ionization_table(Z(k))
+         end do
+         if (norm <= 0d0) return
+
+         avg = 0d0
+         do k=1,species
+            ya(k) = ya(k) / norm
+            avg = avg + ion(k)*ya(k)
+         end do
+
+         do k=1,species
+            doffset_dxa(k) = (ion(k) - avg)/(A(k)*norm)
+         end do
+         doffset_dxa = doffset_dxa * ev2erg / amu
+
+      end subroutine compute_ion_offset_partials
 
 end module ion_offset

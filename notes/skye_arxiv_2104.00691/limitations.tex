@@ -1,0 +1,66 @@
+\section{Limitations} \label{sec:limitations}
+
+The physics in \skye\ models a fully-ionized multi-component quantum ion plasma, quantum and relativistic ideal electrons with non-ideal electron-electron interactions, and ideal radiation.
+These components carry with them limitations.
+\skye\ is not applicable in the limit of nuclear densities or temperatures: ions are treated as charged point particles and all nuclear interactions are ignored.
+Several finite-temperature, composition-dependent, hot nuclear matter EOSs 
+have been developed for this regime, including those based on nonrelativistic Skyrme parametrizations
+\citep{lattimer_1991_aa,schneider_2017_aa}, variational approaches \citep{togashi_2017_aa} 
+and relativistic mean fields \citep{sugahara_1994_aa,shen_1998_aa,typel_2010_aa,fattoyev_2010_aa,steiner_2013_aa}.
+
+
+Along similar lines at low temperatures and densities, where $T \lesssim 10^{5}\,\mathrm{K}$ and $\rho \lesssim 10^3\,\mathrm{g\,cm^{-3}}$, our ion-ion interaction term becomes large and negative, resulting in unphysical results such as negative entropy.
+This reflects the fact that matter is not fully ionized in this limit.
+In reality bound states form, reducing the mean ion charge and so reducing the ion-ion interactions.
+For very low densities this results in an ideal gas with a different mean molecular weight.
+Several EOSs have been developed for this regime, including those based on 
+free energy minimization \citep{Saumon1995,Irwin2004},
+cluster activity expansions \citep{rogers_1974_aa,rogers_1981_aa,Rogers2002},
+cluster viral expansions \citep{omarbakiyeva_2015_aa,ballenegger_2018_aa},
+density-functional theory molecular dynamics \citep{militzer_2013_aa,2014ApJS..215...21B}, 
+path integral Monte Carlo \citep{militzer_2001_aa}, 
+quantum Monte Carlo \citep{mazzola_2018_aa},
+Feynman-Kac path integral representations \citep{alastuey_2020_aa}, and
+asymptotic expansions \citep{alastuey_2012_aa}.
+Using these EOSs in stellar evolution calculations typically requires 
+pre-tabulating results for fixed compositions due to the computational cost of solving for ionization equilibrium.
+
+In principle partial ionization could be included in \skye\ in a variety of ways.
+For instance we could add terms accounting for electron-ion interactions, but unfortunately we are not aware of robust prescriptions for the interaction free energy $F_{j-e}$ in this limit.
+The challenge is that existing prescriptions are based on perturbation expansions~\citep{1961ApJ...134..669S,Potekhin2010}, but these break down well before the formation of bound states~\citep{1976PhRvA..14..816G}.
+Variational approaches seem more promising in this limit, but are more computationally expensive to implement because they involve minimizing the free energy with respect to a variational parameter~\citep{1976PhRvA..14..816G}.
+The same is true for direct solutions to the Saha equation, which are generally quite expensive.
+
+A further limitation concerns our understanding of high density
+quantum melts.  The physics is not as well understood as for lower
+densities or higher temperatures. We think this is a fruitful area 
+for further study, particularly given that the quantum melt line
+\skye\ currently predicts disagrees with calculations based
+on the Lindemann criterion~\citep{1993ApJ...414..695C,PhysRevB.18.3126,PhysRevLett.76.4572}.
+
+Putting these limitations together, we recommend that \skye\ not be used for densities above $0.1 \rho_{j,\rm nuclear} \approx A_j 10^{13}\mathrm{g\,cm^{-3}}$, where $A_j$ is the number of baryons per ion, or for temperatures above the proton rest mass-energy $T_{\rm QCD} \approx 10^{13}\,\mathrm{K}$.
+We further recommend that \skye\ not be used in the joint limit $T < T_{j}^{\rm ion}$ and $\rho < \rho_{j}^{\rm ion}$.
+Here $T_{j}^{\rm ion}$ is the temperature above which a dilute gas is fully ionized.
+Neglecting degeneracy factors, we may solve for this using the Saha equation
+\begin{align}
+	\frac{n_{j,Z_j}}{n_{j,Z_j-1}} = \frac{2 n_{Q,e}}{n_e} e^{-\psi_{f,j} / k_{\rm B} T},
+\end{align}
+where $\psi_{f,j}$ is the final ionization potential of a species of charge $Z_{j}$, and  $n_{j,Z}$ is the number density of fully ionized ions of species $j$ and charge $Z$.
+As a rough heuristic we require $n_{j,Z_j} > 10 n_{n_{j,Z_j-1}}$ to ensure that full ionization is a good approximation.
+With this we find
+\begin{align}
+	k_{\rm B} T_{j}^{\rm ion} \approx \frac{\psi_{f,j}}{\frac{3}{2} \ln (T_{j}^{\rm ion}/10^4\,\mathrm{K}) - \ln (Z_j \rho / A_j \mathrm{g\,cm^3}) - 7}.
+\end{align} 
+If we approximate $\psi_{f,j} \approx \mathrm{Ry} Z_j^2$ we then find
+\begin{align}
+	T_{j}^{\rm ion} \approx \frac{10^5\,\mathrm{K} Z_j^2}{\frac{3}{2} \ln (T_{j}^{\rm ion}/10^4\,\mathrm{K}) - \ln (Z_j \rho / A_j \mathrm{g\,cm^3}) - 7}.
+\end{align} 
+For densities below that of pressure ionization this typically gives $T_{j}^{\rm ion} \approx 10^4\,\mathrm{K} Z_j^2$.
+Along similar lines, $\rho_{j}^{\rm ion}$ is the density above which a low-temperature system is fully ionized, given approximately by~\citep{doi:10.1098/rspa.1938.0073}
+\begin{align}
+	\rho_{j}^{\rm ion} &= \frac{3 m_{j}}{\pi \sqrt{2}} \left(\frac{\psi_{f,j}}{e^2 a_0}\right)^{3/2}\\
+	&\approx 3 \frac{m_j}{m_p} Z_j^{3} \mathrm{g\,cm^{-3}}\approx 3 A_j Z_j^{3} \mathrm{g\,cm^{-3}},
+\end{align}
+where $a_0 = \hbar^2 / m_e e^2$ is the Bohr radius.
+For mixtures of ions we recommend averaging $\rho_j^{\rm ion}$ and $T_j^{\rm ion}$ weighted by number density to determine the appropriate limits.
+Finally, we recommend caution in interpreting results in the quantum melt limit, which occurs in the joint limit of $\rho > (A_j/12)^4 (Z_j/6)^6 10^9 \mathrm{g\,cm^{-3}}$ and $T < (A_j/12)(Z_j/6)^4 10^7\mathrm{K}$.

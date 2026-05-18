@@ -1,0 +1,16 @@
+\section{Future Work}\label{sec:conc}
+
+Because \skye\ is a framework for developing new EOS physics we expect future work to bring several key improvements.
+First, and most pressing, is handling of partial ionization and neutral matter.
+With that \skye\ could be used across the entire range of densities and temperatures which arise in stellar evolution calculations.
+This could be done in a Debye-Huckle-Thomas-Fermi formalism~\citep{PhysRev.111.1460} or other approaches in the physical picture~\citep{Rogers2002}, or else via free energy minimization~\citep{Irwin2004} in the chemical picture~\citep{Saumon1995}.
+The key constraint in each of these approaches is that \skye\ needs to remain fast enough to use in practical stellar evolution calculations.
+Our hope is that the flexibility afforded to \skye\ by its automatic differentiation machinery will allow us to rapidly prototype and test these various possibilities.
+
+Along similar lines, \skye\ could be made to support phase separation by minimizing the free energy with respect to the compositions of the liquid and solid phases.
+The major bottleneck to supporting this is the current lack of Fortran compiler support for parameterized derived types.
+Once this compiler challenge is resolved, phase separation physics  should not be difficult to implement.
+
+More broadly, we make \skye\ openly available with the hope that it will grow into a community resource
+to use automatic differentiation to explore analytic free energy terms that captures improvements in
+existing physics and development of new or not yet considered physics.

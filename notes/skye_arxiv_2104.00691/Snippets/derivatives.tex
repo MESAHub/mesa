@@ -1,0 +1,33 @@
+% $Id: derivatives.tex 385 2008-07-13 20:07:02Z efb $
+
+%differential operators, roman typeface
+\newcommand{\dif}{\ensuremath{\mathrm{d}}}
+\newcommand{\Dif}{\ensuremath{\mathrm{D}}}
+
+%derivatives
+\newcommand{\D}{{\mathrm d}}
+\newcommand{\DD}{{\,\D\!\!\;}}
+\newcommand{\dd}[2]{\frac{\partial #1}{\partial #1}} %partialderivative 
+\newcommand{\ddt}[1]{\frac{\partial #1}{\partial t}} %partial time derivative 
+%\newcommand{\DDt}[1]{\frac{\dif #1}{\dif t}} %total time derivative
+\newcommand{\DDt}[1]{\frac{\Dif #1}{\Dif t}} % Lagrangian time derivative
+\newcommand{\ddm}[1]{\frac{\partial #1}{\partial m}} %partial derivative wrt m 
+\newcommand{\ddr}[1]{\frac{\partial #1}{\partial r}} %partial derivative wrt r
+\newcommand{\ddx}[1]{\frac{\partial #1}{\partial x}} %partial derivative wrt x 
+\newcommand{\ddy}[1]{\frac{\partial #1}{\partial y}} %partial derivative wrt y 
+\newcommand{\DDy}[1]{\frac{\dif #1}{\dif y}} %total derivative wrt y
+\newcommand{\ddz}[1]{\frac{\partial #1}{\partial z}} %partial derivative wrt z 
+\newcommand{\ppl}[2]{\left(\frac{\partial\ln #1}{\partial\ln
+      #2}\right)_{\rho,T}}
+\newcommand{\ppll}[2]{\left(\frac{\partial\ln #1}{\partial\ln
+      #2}\right)_{\rho,T,\{X_{j\neq i}\}}}
+\newcommand{\ddl}[2]{\frac{{\rm d}\ln #1}{{\rm d}\ln #2}}
+\newcommand{\DxDy}[2]{{\frac{\D{#1}}{\D{#2}}}}
+\newcommand{\dxdy}[2]{{\frac{\partial{#1}}{\partial{#2}}}}
+\newcommand{\dxdyind}[3]{{\Brak{\frac{\D{#1}}{\D{#2}}}_{{#3}}}}
+\newcommand{\dxdycz}[3]{{\Brak{\frac{\partial{#1}}{\partial{#2}}}_{{#3}}}}
+%Misc
+\newcommand{\Av}[1]{{\left\langle{#1}\right\rangle}}
+\newcommand{\av}[1]{{\langle{#1}\rangle}}
+\newcommand{\Frac}[2]{{\Brak{#1}/\Brak{#2}}}
+\newcommand{\abs}[1]{{\left|{#1}\right|}}

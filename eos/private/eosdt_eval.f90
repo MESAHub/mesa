@@ -24,6 +24,9 @@
       use utils_lib, only: is_bad, mesa_error
       use math_lib
       use eosDT_load_tables, only: load_single_eosDT_table_by_id
+      use eos_timing, only: eos_timing_start, eos_timing_record_component, &
+         eos_timing_record_table_eval, eos_timing_record_table_expand, &
+         eos_timing_record_moments, eos_timing_record_blend, eos_timing_record_check
       use eos_HELM_eval
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
       use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
@@ -48,7 +51,8 @@
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, remaining_fraction, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
             use const_def, only: dp
             use eos_def, only: nv
             implicit none
@@ -63,8 +67,13 @@
             real(dp), intent(inout), dimension(nv) :: &
                res, d_dlnd, d_dlnT
             real(dp), intent(inout), dimension(nv, species) :: d_dxa
+            logical, intent(in) :: include_composition_partials
             logical, intent(out) :: skip
             integer, intent(out) :: ierr
+            integer, intent(in), optional :: dxa_rows(:)
+            real(dp), intent(in), optional :: &
+               dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+               dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
          end subroutine get_values_for_eosdt_interface
       end interface
 
@@ -127,49 +136,49 @@
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case(i_eos_OPAL_SCVH)
             call get_opal_scvh_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case(i_eos_FreeEOS)
             call get_FreeEOS_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case(i_eos_PC)
             call get_PC_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case(i_eos_Skye)
             call get_Skye_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case(i_eos_CMS)
             call get_CMS_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case(i_eos_ideal)
             call get_ideal_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
+               .false., skip, ierr)
          case default
             ierr = -1
          end select
@@ -191,7 +200,11 @@
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             arho, alogrho, atemp, alogtemp, &
-            res, d_dlnd, d_dlnT, d_dxa, ierr)
+            res, d_dlnd, d_dlnT, d_dxa, ierr, include_composition_partials, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
+         use chem_lib, only: basic_composition_info
+         use eos_composition_partials, only: get_eos_composition_partials
+         use utils_lib, only: is_bad
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X, abar, zbar
          integer, intent(in) :: species
@@ -201,9 +214,19 @@
          real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: include_composition_partials
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: rho, logRho, T, logT
-         logical :: skip, dbg
+         real(dp) :: X_tmp, Y_tmp, Z_tmp, abar_tmp, zbar_tmp
+         real(dp) :: z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: dabar_dxa(species), dzbar_dxa(species), dz2bar_dxa(species)
+         real(dp) :: dz53bar_dxa(species), dye_dxa(species), dmc_dxa(species)
+         integer :: irow, j, row, time0, clock_rate
+         logical :: skip, dbg, do_composition_partials
 
          include 'formats'
 
@@ -237,18 +260,54 @@
          end if
 
          dbg = rq% dbg
+         do_composition_partials = .false.
+         if (present(include_composition_partials)) &
+            do_composition_partials = include_composition_partials
          if (dbg) dbg = &  ! check limits
             logT >= rq% logT_lo .and. logT <= rq% logT_hi .and. &
             logRho >= rq% logRho_lo .and. logRho <= rq% logRho_hi .and. &
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
             Z >= rq% Z_lo .and. Z <= rq% Z_hi
+         d_dxa(:,:) = 0d0
 
-         call get_level0_for_eosdt( &
-            rq% handle, dbg, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            rho, logRho, T, logT, 1d0, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+         if (do_composition_partials) then
+            call eos_timing_start(time0, clock_rate)
+            if (present(dabar_dxa_in) .and. present(dzbar_dxa_in) .and. &
+                  present(dz2bar_dxa_in) .and. present(dz53bar_dxa_in) .and. &
+                  present(dye_dxa_in) .and. present(dmc_dxa_in)) then
+               dabar_dxa = dabar_dxa_in
+               dzbar_dxa = dzbar_dxa_in
+               dz2bar_dxa = dz2bar_dxa_in
+               dz53bar_dxa = dz53bar_dxa_in
+               dye_dxa = dye_dxa_in
+               dmc_dxa = dmc_dxa_in
+            else
+               call basic_composition_info( &
+                  species, chem_id, xa, X_tmp, Y_tmp, Z_tmp, &
+                  abar_tmp, zbar_tmp, z2bar, z53bar, ye, mass_correction, sumx)
+               call get_eos_composition_partials( &
+                  species, chem_id, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+                  dabar_dxa, dzbar_dxa, dz2bar_dxa, dz53bar_dxa, dye_dxa, dmc_dxa)
+            end if
+            call eos_timing_record_moments(time0, clock_rate)
+         end if
+
+         if (do_composition_partials) then
+            call get_level0_for_eosdt( &
+               rq% handle, dbg, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, 1d0, &
+               res, d_dlnd, d_dlnT, d_dxa, &
+               do_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa, dzbar_dxa, dz2bar_dxa, dz53bar_dxa, dye_dxa, dmc_dxa)
+         else
+            call get_level0_for_eosdt( &
+               rq% handle, dbg, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, 1d0, &
+               res, d_dlnd, d_dlnT, d_dxa, &
+               do_composition_partials, skip, ierr, dxa_rows)
+         end if
          if (skip) ierr = -1
          if (ierr /= 0) return
 
@@ -259,6 +318,32 @@
                species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
+         end if
+
+         if (do_composition_partials) then
+            call eos_timing_start(time0, clock_rate)
+            if (present(dxa_rows)) then
+               do irow = 1, size(dxa_rows)
+                  row = dxa_rows(irow)
+                  if (row < 1 .or. row > nv) cycle
+                  do j = 1, species
+                     if (is_bad(d_dxa(row,j))) then
+                        ierr = -1
+                        return
+                     end if
+                  end do
+               end do
+            else
+               do row = 1, nv
+                  do j = 1, species
+                     if (is_bad(d_dxa(row,j))) then
+                        ierr = -1
+                        return
+                     end if
+                  end do
+               end do
+            end if
+            call eos_timing_record_check(time0, clock_rate)
          end if
 
          if (eos_test_partials) then
@@ -275,7 +360,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -287,8 +373,13 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          type (EoS_General_Info), pointer :: rq
 
@@ -307,6 +398,7 @@
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          skip = .false.
 
@@ -318,7 +410,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: Z, X, abar, zbar, remaining_fraction
@@ -329,8 +422,13 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: frac, d_frac_dlogT, d_frac_dlogRho
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
@@ -370,7 +468,10 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows=dxa_rows, &
+            dabar_dxa_in=dabar_dxa_in, dzbar_dxa_in=dzbar_dxa_in, &
+            dz2bar_dxa_in=dz2bar_dxa_in, dz53bar_dxa_in=dz53bar_dxa_in, &
+            dye_dxa_in=dye_dxa_in, dmc_dxa_in=dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -384,7 +485,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
@@ -396,8 +498,13 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
          type (EoS_General_Info), pointer :: rq
@@ -431,7 +538,10 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows=dxa_rows, &
+            dabar_dxa_in=dabar_dxa_in, dzbar_dxa_in=dzbar_dxa_in, &
+            dz2bar_dxa_in=dz2bar_dxa_in, dz53bar_dxa_in=dz53bar_dxa_in, &
+            dye_dxa_in=dye_dxa_in, dmc_dxa_in=dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -445,7 +555,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: Z, X, abar, zbar, remaining_fraction
@@ -456,10 +567,16 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         real(dp) :: d_alfa_dabar, d_alfa_dzbar, d_alfa_dxa(species)
          type (EoS_General_Info), pointer :: rq
          procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
 
@@ -474,17 +591,30 @@
                   rq, logRho, logT, Z, abar, zbar, &
                   alfa, d_alfa_dlogT, d_alfa_dlogRho, &
                   ierr)
+               d_alfa_dxa = 0d0
             else
-               call Get_Skye_alfa( &
-                  rq, logRho, logT, Z, abar, zbar, &
-                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-                  ierr)
+               if (include_composition_partials) then
+                  call Get_Skye_alfa( &
+                     rq, logRho, logT, Z, abar, zbar, &
+                     alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                     ierr, d_alfa_dabar, d_alfa_dzbar)
+                  call set_moment_alfa_partials( &
+                     species, chem_id, xa, abar, zbar, &
+                     d_alfa_dabar, d_alfa_dzbar, d_alfa_dxa, &
+                     dabar_dxa_in, dzbar_dxa_in)
+               else
+                  call Get_Skye_alfa( &
+                     rq, logRho, logT, Z, abar, zbar, &
+                     alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
+                  d_alfa_dxa = 0d0
+               end if
             end if
             if (ierr /= 0) return
          else
             alfa = 1d0  ! no Skye
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
+            d_alfa_dxa = 0d0
          end if
 
          if (dbg) write(*,1) 'Skye', (1d0 - alfa)*remaining_fraction
@@ -498,7 +628,9 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, d_alfa_dxa, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+            dye_dxa_in, dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -512,7 +644,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          use eospc_eval, only: Get_PC_alfa, get_PC_for_eosdt
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
@@ -524,10 +657,16 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         real(dp) :: d_alfa_dabar, d_alfa_dzbar, d_alfa_dxa(species)
          type (EoS_General_Info), pointer :: rq
          procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
 
@@ -537,15 +676,27 @@
          rq => eos_handles(handle)
 
          if (rq% use_PC) then
-            call Get_PC_alfa( &
-               rq, logRho, logT, Z, abar, zbar, &
-               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-               ierr)
+            if (include_composition_partials) then
+               call Get_PC_alfa( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr, d_alfa_dabar, d_alfa_dzbar)
+               call set_moment_alfa_partials( &
+                  species, chem_id, xa, abar, zbar, &
+                  d_alfa_dabar, d_alfa_dzbar, d_alfa_dxa, &
+                  dabar_dxa_in, dzbar_dxa_in)
+            else
+               call Get_PC_alfa( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
+               d_alfa_dxa = 0d0
+            end if
             if (ierr /= 0) return
          else
             alfa = 1d0  ! no PC
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
+            d_alfa_dxa = 0d0
          end if
 
          if (dbg) write(*,1) 'PC', (1d0 - alfa)*remaining_fraction
@@ -559,7 +710,9 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, d_alfa_dxa, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+            dye_dxa_in, dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -573,7 +726,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          use skye, only: get_Skye_for_eosdt, get_Skye_alfa
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
@@ -585,8 +739,13 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
          type (EoS_General_Info), pointer :: rq
@@ -620,7 +779,10 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows=dxa_rows, &
+            dabar_dxa_in=dabar_dxa_in, dzbar_dxa_in=dzbar_dxa_in, &
+            dz2bar_dxa_in=dz2bar_dxa_in, dz53bar_dxa_in=dz53bar_dxa_in, &
+            dye_dxa_in=dye_dxa_in, dmc_dxa_in=dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -634,7 +796,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T_in, logT_in, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -646,11 +809,17 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             logT_HELM, T_HELM, logQ, logQ2, T, logT
+         real(dp) :: d_alfa_dZ, d_alfa_dxa(species)
          type (EoS_General_Info), pointer :: rq
          procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
 
@@ -663,14 +832,23 @@
          logT = logT_in
 
          if (rq% use_OPAL_SCVH) then
-            call get_opal_scvh_alfa_and_partials( &
-               rq, logT, logRho, Z, &
-               alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr)
+            if (include_composition_partials) then
+               call get_opal_scvh_alfa_and_partials( &
+                  rq, logT, logRho, Z, &
+                  alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr, d_alfa_dZ)
+               call set_XZ_alfa_partials(species, chem_id, 0d0, d_alfa_dZ, d_alfa_dxa)
+            else
+               call get_opal_scvh_alfa_and_partials( &
+                  rq, logT, logRho, Z, &
+                  alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr)
+               d_alfa_dxa = 0d0
+            end if
             if (ierr /= 0) return
          else
             alfa = 1d0  ! no OPAL_SCVH
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0d0
+            d_alfa_dxa = 0d0
          end if
 
          if (dbg) write(*,1) 'OPAL/SCVH', (1d0 - alfa)*remaining_fraction
@@ -684,7 +862,9 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, d_alfa_dxa, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+            dye_dxa_in, dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -697,7 +877,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T_in, logT_in, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -709,8 +890,13 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             logT_HELM, T_HELM, logQ, logQ2, T, logT
@@ -738,7 +924,10 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows=dxa_rows, &
+            dabar_dxa_in=dabar_dxa_in, dzbar_dxa_in=dzbar_dxa_in, &
+            dz2bar_dxa_in=dz2bar_dxa_in, dz53bar_dxa_in=dz53bar_dxa_in, &
+            dye_dxa_in=dye_dxa_in, dmc_dxa_in=dmc_dxa_in)
          if (ierr /= 0 .and. rq% okay_to_convert_ierr_to_skip) then
             skip = .true.
             ierr = 0
@@ -978,7 +1167,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -990,28 +1180,39 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
+         integer :: time0, clock_rate
+         if (include_composition_partials) call eos_timing_start(time0, clock_rate)
          call get1_for_eosdt( &
             handle, eosdt_OPAL_SCVH, dbg, &
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            skip, ierr, dxa_rows)
 
          ! zero phase information
          res(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
+         d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
 
          ! zero all components
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          ! mark this one
          res(i_frac_OPAL_SCVH) = 1.0d0
+         if (include_composition_partials) call eos_timing_record_component( &
+            i_eos_OPAL_SCVH, time0, clock_rate)
 
       end subroutine get_opal_scvh_for_eosdt
 
@@ -1021,7 +1222,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -1033,37 +1235,49 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
+         integer :: time0, clock_rate
+         if (include_composition_partials) call eos_timing_start(time0, clock_rate)
          call get1_for_eosdt( &
             handle, eosdt_max_FreeEOS, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            skip, ierr, dxa_rows)
 
          ! zero phase information
          res(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
+         d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
 
          ! zero all components
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          ! mark this one
          res(i_frac_FreeEOS) = 1.0d0
+         if (include_composition_partials) call eos_timing_record_component( &
+            i_eos_FreeEOS, time0, clock_rate)
 
       end subroutine get_FreeEOS_for_eosdt
 
 
       subroutine get_opal_scvh_alfa_and_partials( &
-         rq, logT, logRho, Z, alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr)
+         rq, logT, logRho, Z, alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr, d_alfa_dZ)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logT, logRho, Z
          real(dp), intent(out) :: alfa, d_alfa_dlogRho, d_alfa_dlogT
          integer, intent(out) :: ierr
+         real(dp), intent(out), optional :: d_alfa_dZ
 
          integer :: iregion
          real(dp) :: logRho1_max, logRho1, logRho2, logRho5, logRho6, logRho7, &
@@ -1076,6 +1290,9 @@
          real(dp), parameter :: tiny = 1d-20
 
          include 'formats'
+
+         ierr = 0
+         if (present(d_alfa_dZ)) d_alfa_dZ = 0d0
 
          logRho1_max = 3.71d0
 
@@ -1393,7 +1610,7 @@
          subroutine set_alfa_and_partials  ! alfa = fraction other
             logical, parameter :: dbg = .false.
 
-            real(dp) :: zfactor
+            real(dp) :: base_alfa, zden, zfactor
 
             include 'formats'
 
@@ -1449,10 +1666,13 @@
 
             if (Z > Z_no_HELM .and. Z < Z_all_HELM .and. alfa < 1d0) then
                ! reduce alfa to reduce the HELM fraction
-               zfactor = (Z - Z_no_HELM)/(Z_all_HELM - Z_no_HELM)
-               alfa = alfa*zfactor
+               base_alfa = alfa
+               zden = Z_all_HELM - Z_no_HELM
+               zfactor = (Z - Z_no_HELM)/zden
+               alfa = base_alfa*zfactor
                d_alfa_dlogRho = d_alfa_dlogRho*zfactor
                d_alfa_dlogT = d_alfa_dlogT*zfactor
+               if (present(d_alfa_dZ)) d_alfa_dZ = base_alfa/zden
             end if
 
          end subroutine set_alfa_and_partials
@@ -1468,7 +1688,8 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, d_alfa_dxa_in, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, dye_dxa_in, dmc_dxa_in)
          use eosdt_support, only : Do_Blend
          procedure (get_values_for_eosdt_interface), pointer :: get_1st, get_2nd
          type (EoS_General_Info), pointer :: rq
@@ -1481,26 +1702,37 @@
          real(dp), intent(in) :: rho, logRho, T, logT
          real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         real(dp), intent(in), optional :: d_alfa_dxa_in(:)
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
 
          real(dp), dimension(nv) :: &
             res_1, d_dlnd_1, d_dlnT_1, res_2, d_dlnd_2, d_dlnT_2
-         real(dp), dimension(:,:), allocatable :: d_dxa_1, d_dxa_2
+         real(dp), dimension(nv, species) :: d_dxa_1, d_dxa_2
+         real(dp) :: d_alfa_dxa(species)
          real(dp) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
          logical :: skip_1st, skip_2nd
          logical, parameter :: linear_blend = .false.
+         integer :: time0, clock_rate
 
          include 'formats'
 
          ierr = 0
          skip = .false.
 
-         allocate(d_dxa_1(nv, species), d_dxa_2(nv, species))
-
          alfa = alfa_in
          d_alfa_dlogT = d_alfa_dlogT_in
          d_alfa_dlogRho = d_alfa_dlogRho_in
+         if (present(d_alfa_dxa_in)) then
+            d_alfa_dxa = d_alfa_dxa_in
+         else
+            d_alfa_dxa = 0d0
+         end if
 
          if (alfa == 0d0) then  ! pure 1st
             call get_1st(rq% handle, dbg, &
@@ -1508,7 +1740,9 @@
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, remaining_fraction, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip_1st, ierr)
+               include_composition_partials, skip_1st, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+               dye_dxa_in, dmc_dxa_in)
             if (ierr /= 0) then
                if (.not. rq% okay_to_convert_ierr_to_skip) return
                if (dbg) write(*,*) 'ierr => skip 1st in combine_for_eosdt'
@@ -1516,6 +1750,7 @@
             end if
             if (skip_1st) then  ! switch to pure 2nd
                alfa = 1d0; d_alfa_dlogT = 0d0; d_alfa_dlogRho = 0d0
+               d_alfa_dxa = 0d0
             else
                return
             end if
@@ -1527,7 +1762,9 @@
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, remaining_fraction, &
                res_2, d_dlnd_2, d_dlnT_2, d_dxa_2, &
-               skip_1st, ierr)
+               include_composition_partials, skip_1st, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+               dye_dxa_in, dmc_dxa_in)
             if (ierr /= 0) then
                if (.not. rq% okay_to_convert_ierr_to_skip) return
                if (dbg) write(*,*) 'ierr => skip 1st in combine_for_eosdt'
@@ -1535,6 +1772,7 @@
             end if
             if (skip_1st) then  ! switch to pure 2nd
                alfa = 1d0; d_alfa_dlogT = 0d0; d_alfa_dlogRho = 0d0
+               d_alfa_dxa = 0d0
             end if
          end if
 
@@ -1544,7 +1782,9 @@
                species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, remaining_fraction, &
                res, d_dlnd, d_dlnT, d_dxa, &
-               skip_2nd, ierr)
+               include_composition_partials, skip_2nd, ierr, dxa_rows, &
+               dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+               dye_dxa_in, dmc_dxa_in)
             if (ierr /= 0) then
                if (.not. rq% okay_to_convert_ierr_to_skip) return
                if (dbg) write(*,*) 'ierr => skip 2nd in combine_for_eosdt'
@@ -1561,7 +1801,9 @@
             species, chem_id, net_iso, xa, &
             Rho, logRho, T, logT, remaining_fraction, &
             res_1, d_dlnd_1, d_dlnT_1, d_dxa_1, &
-            skip_2nd, ierr)
+            include_composition_partials, skip_2nd, ierr, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+            dye_dxa_in, dmc_dxa_in)
          if (ierr /= 0) then
             if (.not. rq% okay_to_convert_ierr_to_skip) return
             if (dbg) write(*,*) 'ierr => skip 2nd in combine_for_eosdt'
@@ -1571,23 +1813,142 @@
             skip = .true.
             return
          end if
+         if (include_composition_partials) call eos_timing_start(time0, clock_rate)
          call Do_Blend( &
             rq, species, Rho, logRho, T, logT, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, linear_blend, &
+            d_alfa_dxa, &
             res_1, d_dlnd_1, d_dlnT_1, d_dxa_1, &
             res_2, d_dlnd_2, d_dlnT_2, d_dxa_2, &
-            res, d_dlnd, d_dlnT, d_dxa)
+            res, d_dlnd, d_dlnT, d_dxa, dxa_rows)
+         if (include_composition_partials) call eos_timing_record_blend(time0, clock_rate)
 
       end subroutine combine_for_eosdt
 
 
+      subroutine set_moment_alfa_partials( &
+            species, chem_id, xa, abar, zbar, d_alfa_dabar, d_alfa_dzbar, &
+            d_alfa_dxa, dabar_dxa_in, dzbar_dxa_in)
+         use chem_lib, only: basic_composition_info
+         use eos_composition_partials, only: get_eos_composition_partials
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:)
+         real(dp), intent(in) :: xa(:), abar, zbar, d_alfa_dabar, d_alfa_dzbar
+         real(dp), intent(out) :: d_alfa_dxa(species)
+         real(dp), intent(in), optional :: dabar_dxa_in(:), dzbar_dxa_in(:)
+
+         real(dp) :: X_tmp, Y_tmp, Z_tmp, abar_tmp, zbar_tmp, z2bar, z53bar
+         real(dp) :: ye, mass_correction, sumx
+         real(dp) :: dabar_dxa(species), dzbar_dxa(species), dz2bar_dxa(species)
+         real(dp) :: dz53bar_dxa(species), dye_dxa(species), dmc_dxa(species)
+
+         if (d_alfa_dabar == 0d0 .and. d_alfa_dzbar == 0d0) then
+            d_alfa_dxa = 0d0
+            return
+         end if
+
+         if (present(dabar_dxa_in) .and. present(dzbar_dxa_in)) then
+            d_alfa_dxa = d_alfa_dabar*dabar_dxa_in + d_alfa_dzbar*dzbar_dxa_in
+            return
+         end if
+
+         call basic_composition_info( &
+            species, chem_id, xa, X_tmp, Y_tmp, Z_tmp, &
+            abar_tmp, zbar_tmp, z2bar, z53bar, ye, mass_correction, sumx)
+         call get_eos_composition_partials( &
+            species, chem_id, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+            dabar_dxa, dzbar_dxa, dz2bar_dxa, dz53bar_dxa, dye_dxa, dmc_dxa)
+
+         d_alfa_dxa = d_alfa_dabar*dabar_dxa + d_alfa_dzbar*dzbar_dxa
+
+      end subroutine set_moment_alfa_partials
+
+
+      subroutine set_XZ_alfa_partials(species, chem_id, d_alfa_dX, d_alfa_dZ, d_alfa_dxa)
+         use chem_def, only: chem_isos
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:)
+         real(dp), intent(in) :: d_alfa_dX, d_alfa_dZ
+         real(dp), intent(out) :: d_alfa_dxa(species)
+
+         integer :: i
+
+         do i = 1, species
+            select case(chem_isos% Z(chem_id(i)))
+            case (1)
+               d_alfa_dxa(i) = d_alfa_dX
+            case (2)
+               d_alfa_dxa(i) = 0d0
+            case default
+               d_alfa_dxa(i) = d_alfa_dZ
+            end select
+         end do
+
+      end subroutine set_XZ_alfa_partials
+
+
+      subroutine set_table_dxa_from_XZ(species, chem_id, d_dX, d_dZ, d_dxa, dxa_rows)
+         use chem_def, only: chem_isos
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:)
+         real(dp), intent(in) :: d_dX(:), d_dZ(:)
+         real(dp), intent(inout) :: d_dxa(:,:)
+         integer, intent(in), optional :: dxa_rows(:)
+
+         integer :: i, irow, row
+
+         if (present(dxa_rows)) then
+            do irow = 1, size(dxa_rows)
+               row = dxa_rows(irow)
+               if (row < 1 .or. row > size(d_dxa, dim=1)) cycle
+               d_dxa(row,:) = 0d0
+            end do
+         else
+            d_dxa = 0d0
+         end if
+
+         do i = 1, species
+            select case(chem_isos% Z(chem_id(i)))
+            case (1)
+               if (present(dxa_rows)) then
+                  do irow = 1, size(dxa_rows)
+                     row = dxa_rows(irow)
+                     if (row < 1 .or. row > size(d_dxa, dim=1)) cycle
+                     d_dxa(row,i) = d_dX(row) - d_dZ(row)
+                  end do
+               else
+                  do row = 1, size(d_dxa, dim=1)
+                     d_dxa(row,i) = d_dX(row) - d_dZ(row)
+                  end do
+               end if
+            case (2)
+               if (present(dxa_rows)) then
+                  do irow = 1, size(dxa_rows)
+                     row = dxa_rows(irow)
+                     if (row < 1 .or. row > size(d_dxa, dim=1)) cycle
+                     d_dxa(row,i) = -d_dZ(row)
+                  end do
+               else
+                  do row = 1, size(d_dxa, dim=1)
+                     d_dxa(row,i) = -d_dZ(row)
+                  end do
+               end if
+            case default
+               cycle
+            end select
+         end do
+
+      end subroutine set_table_dxa_from_XZ
+
+
+      ! FreeEOS and OPAL/SCVH keep their native X,Z derivative basis until
+      ! this wrapper expands it to the constrained isotope-column gauge.
       subroutine get1_for_eosdt( &
             handle, which_eosdt, dbg, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
-         use chem_def, only: chem_isos
+            skip, ierr, dxa_rows)
          integer, intent(in) :: handle
          integer, intent(in) :: which_eosdt
          logical, intent(in) :: dbg
@@ -1603,29 +1964,30 @@
          real(dp), dimension(nv) :: d_dX, d_dZ
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
          type (EoS_General_Info), pointer :: rq
          type (DT_xz_Info), pointer :: xz
-         integer :: i
+         integer :: which_component, time0, clock_rate
          rq => eos_handles(handle)
          if (which_eosdt == eosdt_max_FreeEOS) then
             xz => FreeEOS_xz_struct
+            which_component = i_eos_FreeEOS
          else
             xz => eosDT_xz_struct
+            which_component = i_eos_OPAL_SCVH
          end if
+         skip = .false.
+         if (present(dxa_rows)) call eos_timing_start(time0, clock_rate)
          call Get1_eosdt_Results( &
             rq, which_eosdt, xz, Z, X, Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dX, d_dZ, ierr)
-         do i=1,species
-            select case(chem_isos% Z(chem_id(i)))  ! charge
-            case (1)  ! X
-               d_dxa(:,i) = d_dX
-            case (2)  ! Y
-               d_dxa(:,i) = 0
-            case default  ! Z
-               d_dxa(:,i) = d_dZ
-            end select
-         end do
-         skip = .false.
+         if (ierr /= 0) return
+         if (present(dxa_rows)) call eos_timing_record_table_eval( &
+            which_component, time0, clock_rate)
+         if (present(dxa_rows)) call eos_timing_start(time0, clock_rate)
+         call set_table_dxa_from_XZ(species, chem_id, d_dX, d_dZ, d_dxa, dxa_rows)
+         if (present(dxa_rows)) call eos_timing_record_table_expand( &
+            which_component, time0, clock_rate)
       end subroutine get1_for_eosdt
 
 

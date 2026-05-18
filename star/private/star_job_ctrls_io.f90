@@ -315,6 +315,10 @@
          new_am_nu_rot_flag, &
 
          use_D_omega_for_am_nu_rot, &
+         implicit_diffusion_flag, &
+         implicit_diffusion_include_dsig_structure, &
+         implicit_diffusion_include_dsig_dxa, &
+         implicit_diffusion_use_brunt_gauss_path, &
 
          change_u_flag, &
          change_initial_u_flag, &
@@ -890,6 +894,16 @@
          s% job% change_initial_am_nu_rot_flag = change_initial_am_nu_rot_flag
          s% job% new_am_nu_rot_flag = new_am_nu_rot_flag
          s% job% use_D_omega_for_am_nu_rot = use_D_omega_for_am_nu_rot
+         s% job% implicit_diffusion_flag = implicit_diffusion_flag
+         s% job% implicit_diffusion_include_dsig_structure = &
+            implicit_diffusion_include_dsig_structure
+         s% job% implicit_diffusion_include_dsig_dxa = &
+            implicit_diffusion_include_dsig_dxa
+         s% job% implicit_diffusion_use_brunt_gauss_path = &
+            implicit_diffusion_use_brunt_gauss_path
+         if (s% job% implicit_diffusion_flag .and. &
+               s% job% implicit_diffusion_include_dsig_dxa) &
+            s% include_eos_composition_partials = .true.
 
          s% job% change_u_flag = change_u_flag
          s% job% change_initial_u_flag = change_initial_u_flag
@@ -1120,6 +1134,10 @@
          integer, intent(out) :: ierr
 
          ierr = 0
+
+         if (s% job% implicit_diffusion_flag .and. &
+               s% job% implicit_diffusion_include_dsig_dxa) &
+            s% include_eos_composition_partials = .true.
 
          if (s% job% write_profile_when_terminate) then
             if (len_trim(s% job% filename_for_profile_when_terminate) == 0) then
@@ -1428,6 +1446,13 @@
          change_initial_am_nu_rot_flag = s% job% change_initial_am_nu_rot_flag
          new_am_nu_rot_flag = s% job% new_am_nu_rot_flag
          use_D_omega_for_am_nu_rot = s% job% use_D_omega_for_am_nu_rot
+         implicit_diffusion_flag = s% job% implicit_diffusion_flag
+         implicit_diffusion_include_dsig_structure = &
+            s% job% implicit_diffusion_include_dsig_structure
+         implicit_diffusion_include_dsig_dxa = &
+            s% job% implicit_diffusion_include_dsig_dxa
+         implicit_diffusion_use_brunt_gauss_path = &
+            s% job% implicit_diffusion_use_brunt_gauss_path
 
          change_u_flag = s% job% change_u_flag
          change_initial_u_flag = s% job% change_initial_u_flag

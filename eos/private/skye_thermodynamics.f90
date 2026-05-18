@@ -25,7 +25,8 @@ module skye_thermodynamics
 
    private
 
-   public :: compute_derived_quantities, pack_for_export, thermodynamics_from_free_energy
+   public :: compute_derived_quantities, pack_for_export, pack_composition_partials, &
+      thermodynamics_from_free_energy
 
    contains
 
@@ -235,6 +236,141 @@ module skye_thermodynamics
       d_dlnRho(i_latent_ddlnRho) = latent_ddlnRho%d1val2 * dens%val
 
    end subroutine pack_for_export
+
+
+   subroutine pack_composition_partials( &
+         F_gas_x, F_ideal_ion, F_coul, F_ele, temp, dens, xnefer, abar, zbar, &
+         dabar_dxa, dzbar_dxa, phase_x, latent_ddlnT_x, latent_ddlnRho_x, d_dxa, ierr, &
+         dxa_rows)
+      use const_def, only: dp, crad
+      use eos_def
+      use eos_composition_partials, only: want_eos_dxa_row
+      type(auto_diff_real_2var_order3), intent(in) :: F_gas_x(:)
+      type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_ele
+      type(auto_diff_real_2var_order3), intent(in) :: temp, dens, xnefer
+      real(dp), intent(in) :: abar, zbar, dabar_dxa(:), dzbar_dxa(:)
+      type(auto_diff_real_2var_order3), intent(in) :: phase_x(:), latent_ddlnT_x(:), latent_ddlnRho_x(:)
+      real(dp), intent(inout) :: d_dxa(:,:)
+      integer, intent(out) :: ierr
+      integer, intent(in), optional :: dxa_rows(:)
+
+      integer :: j, species
+      real(dp) :: dmu
+      type(auto_diff_real_2var_order3) :: srad, erad, prad, sgas, egas, pgas, p, e, s
+      type(auto_diff_real_2var_order3) :: F_gas, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
+      type(auto_diff_real_2var_order3) :: s_x, e_x, p_x, cv_x, chiT_x, chiRho_x
+      type(auto_diff_real_2var_order3) :: gamma1_x, gamma3_x, grad_ad_x, cp_x
+      type(auto_diff_real_2var_order3) :: de_x_drho, ds_x_dT, ds_x_drho
+      logical :: need_lnS, need_lnE, need_lnPgas, need_derived
+      logical :: need_chiRho, need_chiT, need_Cp, need_Cv, need_dE_dRho
+      logical :: need_dS_dT, need_dS_dRho, need_gamma1, need_gamma3, need_grad_ad
+      logical :: need_mu, need_lnfree_e, need_eta, need_phase, need_latent_T, need_latent_Rho
+      logical :: need_s_x, need_e_x, need_p_x
+
+      ierr = 0
+      species = size(d_dxa, dim=2)
+      if (present(dxa_rows)) then
+         do j = 1, size(dxa_rows)
+            if (dxa_rows(j) < 1 .or. dxa_rows(j) > size(d_dxa, dim=1)) cycle
+            d_dxa(dxa_rows(j),:) = 0d0
+         end do
+      else
+         d_dxa(:,:) = 0d0
+      end if
+
+      need_lnS = want_eos_dxa_row(i_lnS, dxa_rows)
+      need_lnE = want_eos_dxa_row(i_lnE, dxa_rows)
+      need_lnPgas = want_eos_dxa_row(i_lnPgas, dxa_rows)
+      need_chiRho = want_eos_dxa_row(i_chiRho, dxa_rows)
+      need_chiT = want_eos_dxa_row(i_chiT, dxa_rows)
+      need_Cp = want_eos_dxa_row(i_Cp, dxa_rows)
+      need_Cv = want_eos_dxa_row(i_Cv, dxa_rows)
+      need_dE_dRho = want_eos_dxa_row(i_dE_dRho, dxa_rows)
+      need_dS_dT = want_eos_dxa_row(i_dS_dT, dxa_rows)
+      need_dS_dRho = want_eos_dxa_row(i_dS_dRho, dxa_rows)
+      need_gamma1 = want_eos_dxa_row(i_gamma1, dxa_rows)
+      need_gamma3 = want_eos_dxa_row(i_gamma3, dxa_rows)
+      need_grad_ad = want_eos_dxa_row(i_grad_ad, dxa_rows)
+      need_mu = want_eos_dxa_row(i_mu, dxa_rows)
+      need_lnfree_e = want_eos_dxa_row(i_lnfree_e, dxa_rows)
+      need_eta = want_eos_dxa_row(i_eta, dxa_rows)
+      need_phase = want_eos_dxa_row(i_phase, dxa_rows)
+      need_latent_T = want_eos_dxa_row(i_latent_ddlnT, dxa_rows)
+      need_latent_Rho = want_eos_dxa_row(i_latent_ddlnRho, dxa_rows)
+      need_derived = need_chiRho .or. need_chiT .or. need_Cp .or. need_Cv .or. &
+         need_dE_dRho .or. need_dS_dT .or. need_dS_dRho .or. &
+         need_gamma1 .or. need_gamma3 .or. need_grad_ad
+      need_s_x = need_lnS .or. need_lnE .or. need_derived
+      need_e_x = need_lnE .or. need_derived
+      need_p_x = need_lnPgas .or. need_derived
+
+      F_gas = F_ideal_ion + F_coul + F_ele
+      call thermodynamics_from_free_energy(F_gas, temp, dens, sgas, egas, pgas)
+
+      prad = crad * pow4(temp) / 3d0
+      erad = crad * pow4(temp) / dens
+      srad = 4d0 * crad * pow3(temp) / (3d0 * dens)
+
+      p = prad + pgas
+      e = erad + egas
+      s = srad + sgas
+
+      if(s<0 .or. e<0 .or. pgas<0) then
+         ierr = -1
+         return
+      end if
+
+      if (need_derived) &
+         call compute_derived_quantities(temp, dens, s, e, p, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs)
+
+      do j = 1, species
+         if (need_s_x) s_x = -differentiate_1(F_gas_x(j))
+         if (need_p_x) p_x = pow2(dens) * differentiate_2(F_gas_x(j))
+         if (need_e_x) e_x = F_gas_x(j) + temp*s_x
+
+         if (need_lnS) d_dxa(i_lnS,j) = s_x%val/s%val
+         if (need_lnE) d_dxa(i_lnE,j) = e_x%val/e%val
+         if (need_lnPgas) d_dxa(i_lnPgas,j) = p_x%val/pgas%val
+
+         if (need_derived) then
+            cv_x = differentiate_1(e_x)
+            chiT_x = temp*differentiate_1(p_x)/p - chit*p_x/p
+            chiRho_x = dens*differentiate_2(p_x)/p - chid*p_x/p
+            gamma3_x = (gam3 - 1d0)*(p_x/p + chiT_x/chit - cv_x/cv)
+            gamma1_x = chiRho_x + gamma3_x*chit + (gam3 - 1d0)*chiT_x
+            grad_ad_x = (gamma3_x*gam1 - (gam3 - 1d0)*gamma1_x)/pow2(gam1)
+            cp_x = cp*(cv_x/cv + gamma1_x/gam1 - chiRho_x/chid)
+            de_x_drho = differentiate_2(e_x)
+            ds_x_dT = differentiate_1(s_x)
+            ds_x_drho = differentiate_2(s_x)
+
+            if (need_chiRho) d_dxa(i_chiRho,j) = chiRho_x%val
+            if (need_chiT) d_dxa(i_chiT,j) = chiT_x%val
+            if (need_Cp) d_dxa(i_Cp,j) = cp_x%val
+            if (need_Cv) d_dxa(i_Cv,j) = cv_x%val
+            if (need_dE_dRho) d_dxa(i_dE_dRho,j) = de_x_drho%val
+            if (need_dS_dT) d_dxa(i_dS_dT,j) = ds_x_dT%val
+            if (need_dS_dRho) d_dxa(i_dS_dRho,j) = ds_x_drho%val
+            if (need_gamma1) d_dxa(i_gamma1,j) = gamma1_x%val
+            if (need_gamma3) d_dxa(i_gamma3,j) = gamma3_x%val
+            if (need_grad_ad) d_dxa(i_grad_ad,j) = grad_ad_x%val
+         end if
+
+         if (need_mu) then
+            dmu = (dabar_dxa(j)*(1d0 + zbar) - abar*dzbar_dxa(j))/pow2(1d0 + zbar)
+            d_dxa(i_mu,j) = dmu
+         end if
+         if (need_lnfree_e .and. xnefer%val > 1d-99 .and. zbar > 0d0 .and. abar > 0d0) then
+            d_dxa(i_lnfree_e,j) = dzbar_dxa(j)/zbar - dabar_dxa(j)/abar
+         end if
+
+         if (need_eta) d_dxa(i_eta,j) = 0d0
+         if (need_phase) d_dxa(i_phase,j) = phase_x(j)%val
+         if (need_latent_T) d_dxa(i_latent_ddlnT,j) = latent_ddlnT_x(j)%val
+         if (need_latent_Rho) d_dxa(i_latent_ddlnRho,j) = latent_ddlnRho_x(j)%val
+      end do
+
+   end subroutine pack_composition_partials
 
 
 

@@ -10,6 +10,8 @@ SRCS := public/eos_def.f90 \
         private/eos_blend.f90 \
         private/eoscms_eval.f90 \
         private/eos_ctrls_io.f90 \
+        private/eos_composition_partials.f90 \
+        private/eos_timing.f90 \
         private/eosde_eval.f90 \
         private/eosdt_eval.f90 \
         private/eosdt_load_tables.f90 \
@@ -26,6 +28,7 @@ SRCS := public/eos_def.f90 \
         private/ion_offset.f90 \
         private/pc_eos.f90 \
         private/pc_support.f90 \
+        private/skye_composition_ad.f90 \
         private/skye_coulomb.f90 \
         private/skye_coulomb_liquid.f90 \
         private/skye_coulomb_solid.f90 \

@@ -54,6 +54,7 @@
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
          use auto_diff_support, only: get_RSP2_conv_velocity
+         use implicit_Dmix, only: set_Dmix_components
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -374,6 +375,11 @@
          s% mixing_type(1) = s% mixing_type(2)
          s% D_mix(1) = s% D_mix(2)
          s% conv_vel(1) = 0d0
+         if (s% job% implicit_diffusion_flag) then
+            ! Full mixing-info pass: split current MESA D_mix into
+            ! Dmix_implicit and Dmix_explicit, then rebuild total D_mix.
+            call set_Dmix_components(s, .true.)
+         end if
 
          call check('final')
          if (failed('set_mixing_info')) return
@@ -1382,6 +1388,8 @@
 
 
       subroutine get_convection_sigmas(s, dt, ierr)
+         use auto_diff_support
+         use star_utils, only: get_rho_face
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
@@ -1392,7 +1400,10 @@
          real(dp) :: siglim, xmstar, dq00, dqm1, cdcterm, dmavg, rho_face, &
             cdc, max_sig, D, xm1, x00, dm, dX, X, cushion, limit, &
             Tc, full_off, full_on, qbot, qtop, f1, f, alfa
-         real(dp), dimension(:), pointer :: sig, D_mix
+         real(dp) :: dD_dB, dsig_factor
+         real(dp), dimension(:), pointer :: sig
+         type(auto_diff_real_star_order1) :: rho_face_ad, r_ad, f_ad
+         logical :: do_implicit_diffusion, do_implicit_dsig_structure, do_implicit_dsig_dxa
 
          include 'formats'
 
@@ -1400,13 +1411,28 @@
 
          ierr = 0
          nz = s% nz
+         species = s% species
          xmstar = s% xmstar
          sig => s% sig
-         D_mix => s% D_mix
+         do_implicit_diffusion = s% job% implicit_diffusion_flag
+         do_implicit_dsig_structure = do_implicit_diffusion .and. &
+            s% job% implicit_diffusion_include_dsig_structure
+         do_implicit_dsig_dxa = do_implicit_diffusion .and. &
+            s% use_Ledoux_criterion .and. &
+            s% job% implicit_diffusion_include_dsig_dxa
+         if (do_implicit_dsig_dxa) then
+            s% d_sig_dxa_m1(1:species,1:nz) = 0d0
+            s% d_sig_dxa_00(1:species,1:nz) = 0d0
+         end if
+         if (do_implicit_dsig_structure) then
+            do k = 1, nz
+               s% sig_implicit_ad(k) = 0d0
+            end do
+         end if
 
          sig(1) = 0d0
          do k = 2, nz
-            D = D_mix(k)
+            D = s% D_mix(k)
             if (D == 0) then
                sig(k) = 0d0
                cycle
@@ -1421,6 +1447,24 @@
             dqm1 = s% dq(k-1)
             dmavg = xmstar*(dq00+dqm1)/2
             sig(k) = cdcterm/dmavg
+            if (do_implicit_dsig_structure) then
+               ! Value uses total D_mix; derivatives come only from implicit Dmix.
+               rho_face_ad = get_rho_face(s,k)
+               r_ad = wrap_r_00(s,k)
+               f_ad = pi4*pow2(r_ad)*rho_face_ad
+               f_ad = f_ad*f_ad
+               s% sig_implicit_ad(k) = &
+                  s% mix_factor*s% Dmix_implicit(k)*f_ad/dmavg
+               s% sig_implicit_ad(k)%val = sig(k)
+            end if
+            if (do_implicit_dsig_dxa) then
+               dD_dB = s% Dmix_implicit(k)%d1Array(i_xtra2_00)
+               dsig_factor = s% mix_factor*f*dD_dB/dmavg
+               s% d_sig_dxa_m1(1:species,k) = &
+                  dsig_factor*s% d_brunt_B_dxa_m1(1:species,k)
+               s% d_sig_dxa_00(1:species,k) = &
+                  dsig_factor*s% d_brunt_B_dxa_00(1:species,k)
+            end if
             if (is_bad_num(sig(k))) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 'sig(k)', k, sig(k)
@@ -1441,10 +1485,19 @@
             else
                siglim = sig_term_limit*xmstar*s% dq(k)/dt
             end if
-            if (sig(k) > siglim) sig(k) = siglim
+            if (sig(k) > siglim) then
+               sig(k) = siglim
+               if (do_implicit_dsig_structure) then
+                  s% sig_implicit_ad(k) = 0d0
+                  s% sig_implicit_ad(k)%val = sig(k)
+               end if
+               if (do_implicit_dsig_dxa) then
+                  s% d_sig_dxa_m1(1:species,k) = 0d0
+                  s% d_sig_dxa_00(1:species,k) = 0d0
+               end if
+            end if
          end do
 
-         species = s% species
          ! limit sigma to avoid negative mass fractions
          cushion = 10d0
          Tc = s% T(s% nz)
@@ -1549,8 +1602,26 @@
             end do
             if (siglim > lim*sig(k)) then
                sig(k) = siglim
+               if (do_implicit_dsig_structure) then
+                  s% sig_implicit_ad(k) = 0d0
+                  s% sig_implicit_ad(k)%val = sig(k)
+               end if
+               if (do_implicit_dsig_dxa) then
+                  s% d_sig_dxa_m1(1:species,k) = 0d0
+                  s% d_sig_dxa_00(1:species,k) = 0d0
+               end if
             else
                sig(k) = lim*sig(k)
+               if (do_implicit_dsig_structure) then
+                  s% sig_implicit_ad(k) = lim*s% sig_implicit_ad(k)
+                  s% sig_implicit_ad(k)%val = sig(k)
+               end if
+               if (do_implicit_dsig_dxa) then
+                  s% d_sig_dxa_m1(1:species,k) = &
+                     lim*s% d_sig_dxa_m1(1:species,k)
+                  s% d_sig_dxa_00(1:species,k) = &
+                     lim*s% d_sig_dxa_00(1:species,k)
+               end if
             end if
          end subroutine do1
 

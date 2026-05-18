@@ -1,0 +1,121 @@
+\documentclass[twocolumn]{aastex631}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\input{commands.tex}
+
+% Journal Data
+\submitjournal{ApJ}
+\shorttitle{Skye EOS}
+\shortauthors{Jermyn et al.}
+\newcommand{\skye}{Skye}
+
+\newcommand{\shortcomment}[3]{\textcolor{#1}{[#2: #3]}}
+\newcommand{\fxtcom}[1]{\shortcomment{red}{fxt}{#1}}  % for Frank's comments
+\newcommand{\jwscom}[1]{\authorcomment1{[JWS] #1}}  % for Josiah's comments
+\newcommand{\asjcom}[1]{\shortcomment{darkgreen}{asj}{#1}}  % for Adam's comments
+\newcommand{\ebcom}[1]{\shortcomment{purple}{EB}{#1}}  % for Evan's comments
+
+\begin{document}
+
+\title{Skye: A Differentiable Equation of State}
+
+%% Note that the corresponding author command and emails has to come
+%% before everything else. Also place all the emails in the \email
+%% command instead of using multiple \email calls.
+\correspondingauthor{Adam S. Jermyn}
+\email{adamjermyn@gmail.com}
+
+\author[0000-0001-5048-9973]{Adam S. Jermyn}
+\affiliation{\input{affiliations}}
+
+\author[0000-0002-4870-8855]{Josiah Schwab}
+\affiliation{Department of Astronomy and Astrophysics, University of California, Santa Cruz, CA 95064, USA}
+
+\author[0000-0002-4791-6724]{Evan Bauer}
+\affiliation{Center for Astrophysics $\vert$ Harvard \& Smithsonian, 60 Garden St Cambridge, MA 02138, USA}
+
+\author[0000-0002-0474-159X]{F.X.~Timmes}
+\affiliation{School of Earth and Space Exploration, Arizona State University, Tempe, AZ 85287, USA}
+\affiliation{Joint Institute for Nuclear Astrophysics - Center for the Evolution of the Elements, USA}
+
+\author[0000-0001-9955-4684]{Alexander Y. Potekhin}
+\affiliation{Ioffe Institute, Politekhnicheskaya 26, Saint Petersburg 194021, Russia}
+
+
+\begin{abstract}
+Stellar evolution and numerical hydrodynamics simulations depend critically on access to fast, accurate, thermodynamically consistent equations of state.
+We present \skye, a new equation of state for fully-ionized matter.
+\skye\ includes the effects of positrons, relativity, electron degeneracy, Coulomb interactions, non-linear mixing effects, and quantum corrections.
+\skye\ determines the point of Coulomb crystallization in a self-consistent manner, accounting for mixing and composition effects automatically.
+A defining feature of this equation of state is that it uses analytic free energy terms and provides thermodynamic quantities using automatic differentiation machinery.
+Because of this, \skye\ is easily extended to include new effects by simply writing new terms in the free energy.
+We also introduce a novel \emph{thermodynamic extrapolation} scheme for extending analytic fits to the free energy beyond the range of the fitting data while preserving desirable properties like positive entropy and sound speed.
+We demonstrate \skye\ in action in the \code{MESA} stellar evolution software instrument by computing white dwarf cooling curves.
+\end{abstract}
+
+\keywords{Stellar physics (1621); Stellar evolutionary models (2046); Publicly available software (1864)}
+
+\input{intro.tex}
+
+\input{free.tex}
+
+\input{thermo.tex}
+
+\input{limitations.tex}
+
+\input{autodiff.tex}
+
+\input{examples.tex}
+
+\input{distribution.tex}
+
+\input{conclusions.tex}
+
+\begin{acknowledgments}
+
+\input{acknowledgements}
+We thank Lars Bildsten for conversations and thoughts on equations of state,
+and Simon Blouin for providing the phase curve results from \citet{Blouin2020} in machine-readable form.
+We are grateful to Gilles Chabrier for helpful comments on this manuscript and for his contribution to the PC EOS, and some of the routines in \skye\ are based on routines from PC.
+ASJ is grateful to Dan Foreman-Mackey for early conversations on automatic differentiation.
+FXT is indebted to Werner D\"{a}ppen, and Doug Swesty for sharing their knowledge and source codes on equations of state over the years.
+ASJ and EB thank the Gordon and Betty Moore Foundation (Grant GBMF7392) and the National Science Foundation (Grant No. NSF PHY-1748958) for supporting this work.
+The MESA project is supported by the National Science Foundation (NSF) under the Software Infrastructure for Sustained Innovation
+program grants (ACI-1663684, ACI-1663688, ACI-1663696).
+This research was also supported by the NSF under grant PHY-1430152 for the Physics Frontier Center
+``Joint Institute for Nuclear Astrophysics - Center for the Evolution of the Elements'' (JINA-CEE).
+The work of AYP was partially supported by The Ministry of Science and Higher Education of the Russian Federation
+(Agreement with Joint Institute for High Temperatures RAS No.\,075-15-2020-785).
+
+\end{acknowledgments}
+
+\software{
+\texttt{Skye} \url{https://github.com/adamjermyn/Skye},
+\texttt{PC} \citep[][\url{http://www.ioffe.ru/astro/EIP/index.html}]{CP1998,PhysRevE.62.8554,PhysRevE.79.016411,Potekhin2010},
+\texttt{HELM} \citep[][\url{http://cococubed.asu.edu/code_pages/eos.shtml}]{Timmes2000},
+\texttt{MESA} \citep[][\url{http://mesa.sourceforge.net}]{Paxton2011,Paxton2013,Paxton2015,Paxton2018,Paxton2019},
+\texttt{MESASDK} 20190830 \citep{mesasdk_linux,mesasdk_macos},
+\texttt{CR-LIBM} \citep[][\url{http://www.ens-lyon.fr/LIP/AriC/ware}]{CR-LIBM}, 
+\texttt{matplotlib} \citep{hunter_2007_aa}, 
+\texttt{NumPy} \citep{der_walt_2011_aa}, and
+\texttt{SymPy} \citep{10.7717/peerj-cs.103}.
+         }
+
+\clearpage
+
+\appendix
+
+\input{mesa.tex}
+
+\input{quantum_melts.tex}
+
+
+\bibliography{refs}
+\bibliographystyle{aasjournal}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

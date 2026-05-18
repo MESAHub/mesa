@@ -28,6 +28,7 @@ module skye_ideal
    private
    public :: compute_F_rad
    public :: compute_F_ideal_ion
+   public :: compute_F_ideal_ion_partials
    public :: compute_xne
    public :: compute_ideal_ele
 
@@ -70,6 +71,51 @@ module skye_ideal
 
    end function compute_F_ideal_ion
 
+   subroutine compute_F_ideal_ion_partials( &
+         temp, den, abar, species, relevant_species, lookup, weights, aion, ya, active_ytot, &
+         dabar_dxa, F_ideal_ion_dxa)
+
+      use eos_composition_partials, only: get_active_number_fraction_partial
+
+      type(auto_diff_real_2var_order3), intent(in) :: temp, den
+      integer, intent(in) :: species, relevant_species
+      integer, intent(in) :: lookup(species)
+      real(dp), intent(in) :: abar, weights(relevant_species), aion(relevant_species)
+      real(dp), intent(in) :: ya(relevant_species), active_ytot, dabar_dxa(species)
+      type(auto_diff_real_2var_order3), intent(out) :: F_ideal_ion_dxa(species)
+
+      integer :: i, j
+      real(dp) :: dya_dxa_j(relevant_species)
+      type(auto_diff_real_2var_order3) :: kt, n, nj, nQ, nQj, Phi, dPhi
+      type(auto_diff_real_2var_order3) :: ln_nj_over_nQj(relevant_species)
+
+      kt = kerg * temp
+      n = den / (amu * abar)
+      nQ = pow(kt, 1.5d0) / sifac
+
+      Phi = 0d0
+      do i = 1, relevant_species
+         nj = ya(i) * n
+         nQj = nQ * pow(weights(i), 1.5d0)
+         ln_nj_over_nQj(i) = log(nj/nQj)
+         Phi = Phi + ya(i) * (ln_nj_over_nQj(i) - 1d0)
+      end do
+
+      do j = 1, species
+         F_ideal_ion_dxa(j) = 0d0
+         dPhi = -dabar_dxa(j)/abar
+         if (lookup(j) > 0 .and. active_ytot > 0d0) then
+            call get_active_number_fraction_partial( &
+               relevant_species, lookup(j), aion, ya, active_ytot, dya_dxa_j)
+            do i = 1, relevant_species
+               dPhi = dPhi + dya_dxa_j(i)*ln_nj_over_nQj(i)
+            end do
+         end if
+         F_ideal_ion_dxa(j) = kt/amu*(dPhi/abar - Phi*dabar_dxa(j)/pow2(abar))
+      end do
+
+   end subroutine compute_F_ideal_ion_partials
+
    type(auto_diff_real_2var_order3) function compute_xne(den, ytot1, zbar) result(xne)
       type(auto_diff_real_2var_order3), intent(in) :: den
       real(dp), intent(in) :: ytot1, zbar
@@ -83,7 +129,8 @@ module skye_ideal
    end function compute_xne
 
    subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, &
-                                zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
+                                zbar, ytot1, ye, ht, F, F_dye, adr_etaele, &
+                                adr_etaele_dye, adr_xnefer, ierr)
       use helm_polynomials
       use eos_def
       real(dp), intent(in) :: temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye
@@ -113,7 +160,9 @@ module skye_ideal
                        dddsi0t, dddsi1t, dddsi2t, &
                        dddsi0mt, dddsi1mt, dddsi2mt, &
                        dddsi0d, dddsi1d, dddsi2d, &
-                       dddsi0md, dddsi1md, dddsi2md
+                       dddsi0md, dddsi1md, dddsi2md, &
+                       ddddsi0d, ddddsi1d, ddddsi2d, &
+                       ddddsi0md, ddddsi1md, ddddsi2md
 
       ! For some results we don't need, but which helm_electron_positron.dek computes
       integer :: elemult
@@ -186,10 +235,12 @@ module skye_ideal
 
       ! Results we do need
       real(dp) :: free, df_d, df_t, df_dd, df_tt, df_dt, &
-                       df_ttt, df_dtt, df_ddt, df_ddd
+                       df_ttt, df_dtt, df_ddt, df_ddd, &
+                       df_dttt, df_ddtt, df_dddt, df_dddd
       real(dp) :: etaele,detadd,detadt
       real(dp) :: detaddd,detaddt,detadtt
-      type(auto_diff_real_2var_order3), intent(out) :: adr_etaele, adr_xnefer, F
+      type(auto_diff_real_2var_order3), intent(out) :: &
+         adr_etaele, adr_etaele_dye, adr_xnefer, F, F_dye
 
       integer, intent(out) :: ierr
 
@@ -334,6 +385,17 @@ module skye_ideal
         dddsi1md =  dddpsi1(mxd) * ht% dd2i_sav(iat)
         dddsi2md = -dddpsi2(mxd) * ht% ddi_sav(iat)
 
+!..fourth density derivatives of the weight functions
+        ddddsi0d = ddddpsi0(xd) * &
+           ht% dd3i_sav(iat) * ht% ddi_sav(iat)
+        ddddsi1d = ddddpsi1(xd) * ht% dd3i_sav(iat)
+        ddddsi2d = ddddpsi2(xd) * ht% dd2i_sav(iat)
+
+        ddddsi0md = ddddpsi0(mxd) * &
+           ht% dd3i_sav(iat) * ht% ddi_sav(iat)
+        ddddsi1md = -ddddpsi1(mxd) * ht% dd3i_sav(iat)
+        ddddsi2md = ddddpsi2(mxd) * ht% dd2i_sav(iat)
+
 
 !..the free energy
         free  = h5(iat,jat,fi, &
@@ -384,6 +446,24 @@ module skye_ideal
         df_ddd = h5(iat,jat,fi, &
                 si0t, si1t, si2t, si0mt, si1mt, si2mt, &
                 dddsi0d, dddsi1d, dddsi2d, dddsi0md, dddsi1md, dddsi2md)
+
+!..fourth derivatives needed by the Ye chain rule
+        df_dttt = h5(iat,jat,fi, &
+                dddsi0t, dddsi1t, dddsi2t, dddsi0mt, dddsi1mt, dddsi2mt, &
+                dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md)
+
+        df_ddtt = h5(iat,jat,fi, &
+                ddsi0t, ddsi1t, ddsi2t, ddsi0mt, ddsi1mt, ddsi2mt, &
+                ddsi0d, ddsi1d, ddsi2d, ddsi0md, ddsi1md, ddsi2md)
+
+        df_dddt = h5(iat,jat,fi, &
+                dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt, &
+                dddsi0d, dddsi1d, dddsi2d, dddsi0md, dddsi1md, dddsi2md)
+
+        df_dddd = h5(iat,jat,fi, &
+                si0t, si1t, si2t, si0mt, si1mt, si2mt, &
+                ddddsi0d, ddddsi1d, ddddsi2d, &
+                ddddsi0md, ddddsi1md, ddddsi2md)
 
 !..now get the pressure derivative with density, chemical potential, and
 !..electron positron number densities
@@ -646,9 +726,21 @@ module skye_ideal
       F%d1val1_d2val2 = df_ddt * pow3(ye)
       F%d3val2 = df_ddd * pow4(ye)
 
+      F_dye%val = free + ye*den*df_d
+      F_dye%d1val1 = df_t + ye*den*df_dt
+      F_dye%d1val2 = 2d0*ye*df_d + den*pow2(ye)*df_dd
+      F_dye%d2val1 = df_tt + ye*den*df_dtt
+      F_dye%d1val1_d1val2 = 2d0*ye*df_dt + den*pow2(ye)*df_ddt
+      F_dye%d2val2 = 3d0*pow2(ye)*df_dd + den*pow3(ye)*df_ddd
+      F_dye%d3val1 = df_ttt + ye*den*df_dttt
+      F_dye%d2val1_d1val2 = 2d0*ye*df_dtt + den*pow2(ye)*df_ddtt
+      F_dye%d1val1_d2val2 = 3d0*pow2(ye)*df_ddt + den*pow3(ye)*df_dddt
+      F_dye%d3val2 = 4d0*pow3(ye)*df_ddd + den*pow4(ye)*df_dddd
+
 
       ! Electron chemical potential
       adr_etaele = etaele
+      adr_etaele_dye = den*detadd
 
       adr_etaele%d1val1 = detadt
       adr_etaele%d1val2 = detadd

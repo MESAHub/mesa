@@ -91,7 +91,8 @@
          logical :: no_mix
          type(auto_diff_real_star_order1) :: &
             grada_face_ad, scale_height_ad, gradr_ad, rho_face_ad, &
-            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad
+            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, &
+            gradL_composition_term_ad
          include 'formats'
 
          ierr = 0
@@ -112,10 +113,17 @@
 
          if (present(gradL_composition_term_in)) then
             gradL_composition_term = gradL_composition_term_in
+            gradL_composition_term_ad = gradL_composition_term
          else if (s% use_Ledoux_criterion) then
             gradL_composition_term = s% gradL_composition_term(k)
+            if (s% job% implicit_diffusion_flag) then
+               gradL_composition_term_ad = s% gradL_composition_term_ad(k)
+            else
+               gradL_composition_term_ad = gradL_composition_term
+            end if
          else
             gradL_composition_term = 0d0
+            gradL_composition_term_ad = 0d0
          end if
 
          grada_face_ad = get_grada_face(s,k)
@@ -222,7 +230,7 @@
             return
          end if
 
-         call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
+         call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term_ad, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          if (ierr /= 0) then
@@ -277,7 +285,7 @@
             s% gradr_ad(k) = gradr_ad
             s% gradr(k) = s% gradr_ad(k)%val
 
-            s% gradL_ad(k) = s% grada_face_ad(k) + gradL_composition_term
+            s% gradL_ad(k) = s% grada_face_ad(k) + gradL_composition_term_ad
             s% gradL(k) = s% gradL_ad(k)%val
 
             s% scale_height_ad(k) = scale_height_ad

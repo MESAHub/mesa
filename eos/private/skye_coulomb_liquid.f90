@@ -21,6 +21,7 @@ module skye_coulomb_liquid
    use math_lib
    use math_def
    use auto_diff
+   use skye_composition_ad
    use const_def, only: dp, me, amu, fine, pi, ev2erg
 
    implicit none
@@ -63,6 +64,30 @@ module skye_coulomb_liquid
    end function classical_ocp_liquid_free_energy
 
 
+   function classical_ocp_liquid_free_energy_dxa(g) result(F)
+      type(skye_composition_ad_real), intent(in) :: g
+      type(skye_composition_ad_real) :: FA, FB
+      type(skye_composition_ad_real) :: F
+
+      real(dp), parameter :: SQ32=sqrt(3d0) / 2d0
+
+      real(dp), parameter :: A1=-0.9070d0
+      real(dp), parameter :: A2=0.62954d0
+      real(dp), parameter :: A3 = -SQ32 - A1 / sqrt(A2)
+
+      real(dp), parameter :: B1 = 4.56d-3
+      real(dp), parameter :: B2 = 211.6d0
+      real(dp), parameter :: B3 = -1d-4
+      real(dp), parameter :: B4 = 4.62d-3
+
+      FA = A1 * (sqrt(g * (A2 + g)) - A2 * log(sqrt(g / A2) +  sqrt(1 + g / A2))) &
+            + 2d0 * A3 * (sqrt(g) - atan(sqrt(g)))
+      FB = B1 * (g - B2 * log(1d0 + g / B2)) + 0.5d0 * B3 * log(1d0 + pow2(g) / B4)
+      F = FA + FB
+
+   end function classical_ocp_liquid_free_energy_dxa
+
+
    !> Calculates the quantum corrections to the free energy of a
    !! one-component plasma in the liquid phase using the fits due to
    !! Baiko & Yakovlev 2019.
@@ -83,6 +108,23 @@ module skye_coulomb_liquid
 
          F = Q1 * eta - Q1 * Q2 * log(1d0 + eta / Q2) + 0.5d0 * Q3 * log(1d0 + pow2(eta) / Q4)
    end function quantum_ocp_liquid_free_energy_correction
+
+
+   function quantum_ocp_liquid_free_energy_correction_dxa(TPT) result(F)
+         type(skye_composition_ad_real), intent(in) :: TPT
+         type(skye_composition_ad_real) :: eta
+         type(skye_composition_ad_real) :: F
+
+         real(dp), parameter :: Q1 = 5.994d0
+         real(dp), parameter :: Q2 = 70.3d0
+         real(dp), parameter :: Q4 = 22.7d0
+         real(dp), parameter :: Q3 = (0.25d0 - Q1 / Q2) * Q4
+
+         eta = TPT / sqrt(3d0)
+
+         F = Q1 * eta - Q1 * Q2 * log(1d0 + eta / Q2) + 0.5d0 * Q3 * log(1d0 + pow2(eta) / Q4)
+   end function quantum_ocp_liquid_free_energy_correction_dxa
+
 
    !> Calculates the electron-ion screening corrections to the free energy
    !! of a one-component plasma in the liquid phase using the fits of Potekhin & Chabrier 2013.
@@ -122,6 +164,42 @@ module skye_coulomb_liquid
          F = -ge * (cDH * sqrt(ge) + cTF * a * pow(ge, nu) * g1 * h) / (1d0 + (b * sqrt(ge) + a * g2 * pow(ge, nu) / rs) / gr)
 
    end function ocp_liquid_screening_free_energy_correction
+
+
+   function ocp_liquid_screening_free_energy_correction_dxa(Z, mi, ge, rs) result(F)
+         real(dp), intent(in) :: Z, mi
+         type(skye_composition_ad_real), intent(in) :: ge, rs
+
+         real(dp) :: cDH, cTF, a, b, nu, COTPT
+
+         type(skye_composition_ad_real) :: TPT, g, g1, g2, h, gr, xr
+         type(skye_composition_ad_real) :: F
+
+         a = 1.11d0 * pre_z(int(Z))% z0p475
+         b = 0.2d0 + 0.078d0 * pre_z(int(Z))% sqlogz
+         nu = 1.16d0 + 0.08d0 * pre_z(int(Z))% logz
+         cDH = (Z / sqrt(3d0)) * (pre_z(int(Z))% zp1_3_2 - 1d0 - pre_z(int(Z))% z3_2)
+         cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pre_z(int(Z))% z7_3 &
+               * (1d0 - pre_z(int(Z))% zm1_3 + 0.2d0 * pre_z(int(Z))% zm1_2)
+
+         g = ge * pre_z(int(Z))% z5_3
+         COTPT = sqrt(3d0 * me_in_amu / mi) / pre_z(int(Z))% z7_6
+         TPT = g * COTPT / sqrt(rs)
+
+         xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
+         gr = sqrt(1d0 + pow2(xr))
+         g1 = 1d0 + 0.78d0 * sqrt(ge / z) / (21d0 + ge * pow3(Z / rs))
+         g2 = 1d0 + ((Z - 1d0) / 9d0) * (1d0 + 1d0 / &
+              (0.001d0 * pre_z(int(Z))% z2 + 2d0 * ge)) * &
+              (pow3(rs) / (1d0 + 6d0 * pow2(rs)))
+         h = (1d0 + 0.2d0 * pow2(xr)) / &
+             (1d0 + 0.18d0 * xr * pre_z(int(Z))% zm1_4 + &
+              0.37d0 * pre_z(int(Z))% zm1_2 * pow2(xr) + 0.2d0 * pow2(xr))
+
+         F = -ge * (cDH * sqrt(ge) + cTF * a * pow(ge, nu) * g1 * h) / &
+             (1d0 + (b * sqrt(ge) + a * g2 * pow(ge, nu) / rs) / gr)
+
+   end function ocp_liquid_screening_free_energy_correction_dxa
 
 
    !> Calculates the correction to the linear mixing rule for a Coulomb liquid mixture.
@@ -177,5 +255,46 @@ module skye_coulomb_liquid
       FMIX=FMIX0/pow(1d0+GQ,R)
    end function liquid_mixing_rule_correction
 
-end module skye_coulomb_liquid
 
+   function liquid_mixing_rule_correction_dxa(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321) result(FMIX)
+      type(skye_composition_ad_real), intent(in) :: RS,GAME
+      type(skye_composition_ad_real), intent(in) :: Zmean,Z2mean,Z52,Z53,Z321
+
+      type(skye_composition_ad_real) :: GAMImean, Dif0, DifR, DifFDH, D
+      type(skye_composition_ad_real) :: P3, D0, GP, FMIX0, Q, R, GQ
+
+      type(skye_composition_ad_real) :: FMIX
+
+      real(dp), parameter :: TINY = 1d-9
+
+
+      if (Zmean == 0d0) then
+         FMIX=0d0
+         return
+      end if
+
+      GAMImean=GAME*Z53
+      if (RS<TINY) then
+         Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
+      else
+         Dif0=Z321-sqrt((Z2mean+Zmean)*(Z2mean+Zmean)*(Z2mean+Zmean)/Zmean)
+      end if
+      DifR=Dif0/Z52
+      DifFDH=Dif0*GAME*sqrt(GAME/3d0)
+      D=Z2mean/(Zmean*Zmean)
+      if (abs(D-1.d0)<TINY) then
+         FMIX=0d0
+         return
+      end if
+      P3=pow(D,-0.2d0)
+      D0=(2.6d0*DifR+14d0*DifR*DifR*DifR)/(1.d0-P3)
+      GP=D0*pow(GAMImean,P3)
+      FMIX0=DifFDH/(1d0+GP)
+
+      Q=D*D*0.0117d0
+      R=1.5d0/P3-1d0
+      GQ=Q*GP
+      FMIX=FMIX0/pow(1d0+GQ,R)
+   end function liquid_mixing_rule_correction_dxa
+
+end module skye_coulomb_liquid

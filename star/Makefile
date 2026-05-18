@@ -67,6 +67,7 @@ SRCS := \
    private/atm_support.f90 \
    private/auto_diff_support.f90 \
    private/brunt.f90 \
+   private/implicit_brunt.f90 \
    private/conv_premix.f90 \
    private/create_initial_model.f90 \
    private/ctrls_io.f90 \
@@ -94,6 +95,7 @@ SRCS := \
    private/hydro_rsp2_support.f90 \
    private/hydro_temperature.f90 \
    private/hydro_vars.f90 \
+   private/implicit_Dmix.f90 \
    private/init.f90 \
    private/init_model.f90 \
    private/ionization_potentials.f90 \

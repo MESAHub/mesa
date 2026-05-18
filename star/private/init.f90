@@ -21,6 +21,7 @@
 
       use star_private_def
       use const_def, only: dp, msun, secyer
+      use eos_lib, only: eos_reset_dxa_timing
 
       implicit none
 
@@ -313,6 +314,7 @@
          s% time_solve_burn = 0
          s% time_solve_omega_mix = 0
          s% time_eos = 0
+         s% time_eos_dxa = 0
          s% time_neu_kap = 0
          s% time_nonburn_net = 0
          s% time_mlt = 0
@@ -323,6 +325,10 @@
          s% timing_num_get_eos_calls = 0
          s% timing_num_solve_eos_calls = 0
          s% timing_num_get_kap_calls = 0
+         s% timing_num_get_eos_dxa_calls = 0
+         s% timing_num_get_eos_dxa_skye_calls = 0
+         s% timing_sum_get_eos_dxa_frac_Skye = 0
+         call eos_reset_dxa_timing
 
          s% model_profile_filename = ''
          s% most_recent_profile_filename = ''

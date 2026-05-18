@@ -46,6 +46,45 @@
       end subroutine eos_shutdown
 
 
+      subroutine eos_set_dxa_timing_enabled(enabled)
+         use eos_timing, only: eos_timing_set_dxa_enabled
+         logical, intent(in) :: enabled
+         call eos_timing_set_dxa_enabled(enabled)
+      end subroutine eos_set_dxa_timing_enabled
+
+
+      subroutine eos_reset_dxa_timing
+         use eos_timing, only: eos_timing_reset_dxa
+         call eos_timing_reset_dxa
+      end subroutine eos_reset_dxa_timing
+
+
+      subroutine eos_get_dxa_timing( &
+            component_time, component_count, table_eval_time, table_eval_count, &
+            table_expand_time, table_expand_count, skye_time, skye_count, &
+            moments_time, moments_count, blend_time, blend_count, &
+            check_time, check_count)
+         use eos_def, only: num_eos_frac_results
+         use eos_timing, only: eos_timing_get_dxa, num_skye_dxa_timing_parts
+         real(dp), intent(out) :: component_time(num_eos_frac_results)
+         real(dp), intent(out) :: table_eval_time(num_eos_frac_results)
+         real(dp), intent(out) :: table_expand_time(num_eos_frac_results)
+         real(dp), intent(out) :: skye_time(num_skye_dxa_timing_parts)
+         real(dp), intent(out) :: moments_time, blend_time, check_time
+         integer, intent(out) :: component_count(num_eos_frac_results)
+         integer, intent(out) :: table_eval_count(num_eos_frac_results)
+         integer, intent(out) :: table_expand_count(num_eos_frac_results)
+         integer, intent(out) :: skye_count(num_skye_dxa_timing_parts)
+         integer, intent(out) :: moments_count, blend_count, check_count
+
+         call eos_timing_get_dxa( &
+            component_time, component_count, table_eval_time, table_eval_count, &
+            table_expand_time, table_expand_count, skye_time, skye_count, &
+            moments_time, moments_count, blend_time, blend_count, &
+            check_time, check_count)
+      end subroutine eos_get_dxa_timing
+
+
       ! after eos_init has finished, you can allocate a "handle"
       ! and set control parameter values using an inlist
 
@@ -124,7 +163,7 @@
          real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_d_dxa_results,species)
          integer, intent(out) :: ierr  ! 0 means AOK.
-         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
+         real(dp) :: d_dxa_eos(num_eos_basic_results, species)  ! internal full-row scratch
          type (EoS_General_Info), pointer :: rq
          real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)
@@ -135,15 +174,159 @@
          call basic_composition_info( &
             species, chem_id, xa, X, Y, Z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-         allocate(d_dxa_eos(num_eos_basic_results, species))
          call Get_eosDT_Results( &
             rq, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             Rho, logRho, T, logT, &
-            res, d_dlnd, d_dlnT, d_dxa_eos, ierr)
+            res, d_dlnd, d_dlnT, d_dxa_eos, ierr, &
+            include_composition_partials=.false.)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
       end subroutine eosDT_get
+
+
+      subroutine eosDT_get_full_dxa( &
+               handle, species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, &
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
+         use eos_def
+         use eosDT_eval, only: Get_eosDT_Results
+         use chem_lib, only: basic_composition_info
+         use eos_composition_partials, only: get_eos_composition_partials
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, logRho  ! the density
+         real(dp), intent(in) :: T, logT  ! the temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_basic_results,species)
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         type (EoS_General_Info), pointer :: rq
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: dabar_dxa(species), dzbar_dxa(species), dz2bar_dxa(species)
+         real(dp) :: dz53bar_dxa(species), dye_dxa(species), dmc_dxa(species)
+         call get_eos_ptr(handle,rq,ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
+            return
+         end if
+         call basic_composition_info( &
+            species, chem_id, xa, X, Y, Z, &
+            abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
+         call get_eos_composition_partials( &
+            species, chem_id, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+            dabar_dxa, dzbar_dxa, dz2bar_dxa, dz53bar_dxa, dye_dxa, dmc_dxa)
+         call Get_eosDT_Results( &
+            rq, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, ierr, &
+            include_composition_partials=.true., &
+            dabar_dxa_in=dabar_dxa, dzbar_dxa_in=dzbar_dxa, &
+            dz2bar_dxa_in=dz2bar_dxa, dz53bar_dxa_in=dz53bar_dxa, &
+            dye_dxa_in=dye_dxa, dmc_dxa_in=dmc_dxa)
+      end subroutine eosDT_get_full_dxa
+
+
+      subroutine eosDT_get_dxa_rows( &
+               handle, species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, dxa_rows, &
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
+         use eos_def
+         use eosDT_eval, only: Get_eosDT_Results
+         use chem_lib, only: basic_composition_info
+         use eos_composition_partials, only: get_eos_composition_partials
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, logRho  ! the density
+         real(dp), intent(in) :: T, logT  ! the temperature
+         integer, intent(in) :: dxa_rows(:)
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_basic_results,species)
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         type (EoS_General_Info), pointer :: rq
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: dabar_dxa(species), dzbar_dxa(species), dz2bar_dxa(species)
+         real(dp) :: dz53bar_dxa(species), dye_dxa(species), dmc_dxa(species)
+         call get_eos_ptr(handle,rq,ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
+            return
+         end if
+         call basic_composition_info( &
+            species, chem_id, xa, X, Y, Z, &
+            abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
+         call get_eos_composition_partials( &
+            species, chem_id, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+            dabar_dxa, dzbar_dxa, dz2bar_dxa, dz53bar_dxa, dye_dxa, dmc_dxa)
+         ! cheaper wrapper: request only the selected composition rows.
+         call Get_eosDT_Results( &
+            rq, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, ierr, &
+            include_composition_partials=.true., dxa_rows=dxa_rows, &
+            dabar_dxa_in=dabar_dxa, dzbar_dxa_in=dzbar_dxa, &
+            dz2bar_dxa_in=dz2bar_dxa, dz53bar_dxa_in=dz53bar_dxa, &
+            dye_dxa_in=dye_dxa, dmc_dxa_in=dmc_dxa)
+      end subroutine eosDT_get_dxa_rows
+
+
+      subroutine eosDT_get_dxa_rows_with_moments( &
+               handle, species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, &
+               X, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+               dxa_rows, res, d_dlnd, d_dlnT, d_dxa, ierr)
+         use eos_def
+         use eosDT_eval, only: Get_eosDT_Results
+         use eos_composition_partials, only: get_eos_composition_partials
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, logRho  ! the density
+         real(dp), intent(in) :: T, logT  ! the temperature
+         real(dp), intent(in) :: X, Z, abar, zbar, z2bar, z53bar, ye
+         real(dp), intent(in) :: mass_correction, sumx
+         integer, intent(in) :: dxa_rows(:)
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_basic_results,species)
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         type (EoS_General_Info), pointer :: rq
+         real(dp) :: dabar_dxa(species), dzbar_dxa(species), dz2bar_dxa(species)
+         real(dp) :: dz53bar_dxa(species), dye_dxa(species), dmc_dxa(species)
+
+         call get_eos_ptr(handle,rq,ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
+            return
+         end if
+         call get_eos_composition_partials( &
+            species, chem_id, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
+            dabar_dxa, dzbar_dxa, dz2bar_dxa, dz53bar_dxa, dye_dxa, dmc_dxa)
+         ! cheaper wrapper: request only the selected composition rows.
+         call Get_eosDT_Results( &
+            rq, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            Rho, logRho, T, logT, &
+            res, d_dlnd, d_dlnT, d_dxa, ierr, &
+            include_composition_partials=.true., dxa_rows=dxa_rows, &
+            dabar_dxa_in=dabar_dxa, dzbar_dxa_in=dzbar_dxa, &
+            dz2bar_dxa_in=dz2bar_dxa, dz53bar_dxa_in=dz53bar_dxa, &
+            dye_dxa_in=dye_dxa, dmc_dxa_in=dmc_dxa)
+      end subroutine eosDT_get_dxa_rows_with_moments
 
 
       subroutine eosDT_get_component( &
@@ -191,7 +374,7 @@
 
          integer, intent(out) :: ierr  ! 0 means AOK.
 
-         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
+         real(dp) :: d_dxa_eos(num_eos_basic_results, species)  ! internal full-row scratch
 
          type (EoS_General_Info), pointer :: rq
 
@@ -206,8 +389,6 @@
          call basic_composition_info( &
             species, chem_id, xa, X, Y, Z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-
-         allocate(d_dxa_eos(num_eos_basic_results,species))
 
          call Test_one_eosDT_component( &
                rq, which_eos, Z, X, abar, zbar, &
@@ -293,7 +474,7 @@
          real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
          ! d_dxa_const_TRho(i) = d(res(i))/X|T,Rho,X where X = composition
 
-         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
+         real(dp) :: d_dxa_eos(num_eos_basic_results, species)  ! internal full-row scratch
 
          integer, intent(out) :: ierr  ! 0 means AOK.
 
@@ -310,8 +491,6 @@
          call basic_composition_info( &
             species, chem_id, xa, X, Y, Z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-
-         allocate(d_dxa_eos(num_eos_basic_results, species))
 
          call Get_eosPT_Results( &
                   rq, Z, X, abar, zbar, &
@@ -665,7 +844,7 @@
          real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
-         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
+         real(dp) :: d_dxa_eos(num_eos_basic_results, species)  ! internal full-row scratch
 
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr  ! 0 means AOK.
@@ -677,8 +856,6 @@
             species, chem_id, xa, X, Y, Z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
 
-         allocate(d_dxa_eos(num_eos_basic_results, species))
-
          call get_T( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -689,8 +866,6 @@
                d_dxa_eos, eos_calls, ierr)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
-
-         deallocate(d_dxa_eos)
 
       end subroutine eosDT_get_T
 
@@ -748,7 +923,7 @@
          real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
-         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
+         real(dp) :: d_dxa_eos(num_eos_basic_results, species)  ! internal full-row scratch
 
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr  ! 0 means AOK.
@@ -760,8 +935,6 @@
             species, chem_id, xa, X, Y, Z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
 
-         allocate(d_dxa_eos(num_eos_basic_results, species))
-
          call get_Rho( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
@@ -772,8 +945,6 @@
                d_dxa_eos, eos_calls, ierr)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
-
-         deallocate(d_dxa_eos)
 
       end subroutine eosDT_get_Rho
 
@@ -838,7 +1009,7 @@
          real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
-         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
+         real(dp) :: d_dxa_eos(num_eos_basic_results, species)  ! internal full-row scratch
 
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr  ! 0 means AOK.
@@ -849,8 +1020,6 @@
          call basic_composition_info( &
             species, chem_id, xa, X, Y, Z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-
-         allocate(d_dxa_eos(num_eos_basic_results, species))
 
          call get_T( &
                handle, Z, X, abar, zbar, &
@@ -863,8 +1032,6 @@
                eos_calls, ierr)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
-
-         deallocate(d_dxa_eos)
 
       end subroutine eosPT_get_T
 

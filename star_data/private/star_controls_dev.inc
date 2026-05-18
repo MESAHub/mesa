@@ -44,6 +44,7 @@
 
 
          logical :: use_mass_corrections
+         logical :: include_eos_composition_partials
 
          real(dp) :: op_split_burn_min_T_for_variable_T_solver
 

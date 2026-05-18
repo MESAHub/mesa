@@ -1,0 +1,62 @@
+%=======================================================================
+%
+% formatting.tex --- Formatting Macros
+%
+%=======================================================================
+
+%References
+
+\newcommand{\lSect}[1]{{\label{sec:#1}}}
+\newcommand{\lFig}[1]{{\label{fig:#1}}}
+\newcommand{\lEq}[1]{{\label{eq:#1}}}
+\newcommand{\lTab}[1]{{\label{tab:#1}}}
+\newcommand{\pFig}[1]{{\placefigure{fig:#1}}}
+\newcommand{\pTab}[1]{{\placetable{tab:#1}}}
+\newcommand{\Tabff}[1]{{\ref{tab:#1}}}
+\newcommand{\Tab}[1]{{Table~\Tabff{#1}}}
+\newcommand{\Tabs}[1]{{Tables~\Tabff{#1}}}
+\newcommand{\TabRange}[2]{{Tables~\Tabff{#1} - \Tabff{#2}}}
+\newcommand{\TabTwo}[2]{{Tables~\Tabff{#1} and \Tabff{#2}}}
+\newcommand{\pan}[1]{{\textit{#1}}}
+\newcommand{\Pan}[1]{{Panel~\pan{#1}}}
+\newcommand{\Pans}[1]{{Panels~\pan{#1}}}
+\newcommand{\FIGFF}[2]{{\ref{fig:#2}\pan{#1}}}
+\newcommand{\Figff}[1]{{\FIGFF{}{#1}}}
+\newcommand{\FIG}[2]{{Fig.~\FIGFF{#1}{#2}}}
+\newcommand{\Fig}[1]{{\FIG{}{#1}}}
+\newcommand{\FigTwo}[2]{{\FIGS{}{#1} and \FIGFF{}{#2}}}
+\newcommand{\FIGS}[2]{{Figs.~\FIGFF{#1}{#2}}}
+\newcommand{\Figs}[1]{{\FIGS{}{#1}}}
+\newcommand{\Figure}[1]{{Figure~\FIGFF{}{#1}}}
+\newcommand{\Figures}[1]{{Figures~\FIGFF{}{#1}}}
+\newcommand{\Sectff}[1]{{\ref{sec:#1}}}
+\newcommand{\Sect}[1]{{\S\Sectff{#1}}}
+\newcommand{\Appendix}[1]{{Appendix~\Sectff{#1}}}
+\newcommand{\Appendices}[1]{{Appendices~\Sectff{#1}}}
+\newcommand{\Sects}[1]{{\S\S\Sectff{#1}}}
+\newcommand{\Eqref}[1]{{\ref{eq:#1}}}
+\newcommand{\Eqff}[1]{{(\Eqref{#1})}}
+\newcommand{\EQ}[1]{{Equation~\Eqff{#1}}}
+\newcommand{\Equation}[1]{{Equation~\Eqff{#1}}}
+\newcommand{\Eq}[1]{{Eq.~\Eqff{#1}}}
+\newcommand{\Eqs}[1]{{Eqs.~\Eqff{#1}}}
+\newcommand{\Leg}[1]{{\textit{#1}}}
+
+% formatting macros
+
+\newcommand{\isofont}[1]{{\mathrm{#1}}}
+\newcommand{\isomass}[1]{{\ensuremath{\isofont{^{#1}}}}}
+\newcommand{\isocharge}[1]{{\ensuremath{\isofont{_{#1}}}}}
+\newcommand{\isotope}[3]{{\ensuremath{\isocharge{#1}\isomass{#2}\isofont{#3}}}}
+\newcommand{\Solar}[1]{{\ensuremath{\left[\right.}#1\ensuremath{\right.\left]}}}
+\newcommand{\I}[2]{{\isotope{}{#1}{#2}}}
+\newcommand{\El}[1]{{\I{}{#1}}}
+\newcommand{\Rat}[4]{{\I{#1}{#2}/\I{#3}{#4}}}
+\newcommand{\SolRatI}[4]{{\Solar{\Rat{#1}{#2}{#3}{#4}}}}
+\newcommand{\SolI}[2]{{\Solar{\I{#1}{#2}}}} \newcommand{\SolEl}[1]{{\Solar{\El{#1}}}} 
+\newcommand{\Ep}[1]{{\ensuremath{10^{#1}}}}
+\newcommand{\E}[1]{{\ensuremath{\powersep\Ep{#1}}}}
+\newcommand{\EE}[2]{{\ensuremath{\powersep\Ep{#1#2}}}}
+\newcommand{\powersep}{\times}
+\newcommand{\Brak}[1]{{\left({#1}\right)}}
+\newcommand{\SBrak}[1]{{\left[{#1}\right]}}

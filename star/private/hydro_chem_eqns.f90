@@ -53,6 +53,7 @@
          use net_lib, only: show_net_reactions, show_net_params
          use rates_def, only: i_rate
          use star_utils, only: em1, e00, ep1
+         use auto_diff_support
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -67,8 +68,11 @@
             d_dxdt_mix_dx00, d_dxdt_mix_dxm1, d_dxdt_mix_dxp1, &
             sum_dx_burning, sum_dx_mixing, residual, &
             dxdt_factor, eqn_scale, &
-            dequ_dlnd, dequ_dlnT
+            dequ_dlnd, dequ_dlnT, dx00, dxp1
+         type(auto_diff_real_star_order1) :: &
+            sig00_ad, sigp1_ad
          logical :: test_partials, doing_op_split_burn
+         logical :: do_implicit_dsig_structure, do_implicit_dsig_dxa
          logical, parameter :: checking = .false.
 
          include 'formats'
@@ -77,6 +81,11 @@
 
          species = s% species
          nz = s% nz
+         do_implicit_dsig_structure = s% job% implicit_diffusion_flag .and. &
+            s% job% implicit_diffusion_include_dsig_structure
+         do_implicit_dsig_dxa = s% job% implicit_diffusion_flag .and. &
+            s% use_Ledoux_criterion .and. &
+            s% job% implicit_diffusion_include_dsig_dxa
 
          dq = s% dq(k)
          dm = s% dm(k)
@@ -191,6 +200,50 @@
                   call ep1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
 
+               if (do_implicit_dsig_structure .or. do_implicit_dsig_dxa) then
+                  if (k > 1) then
+                     dx00 = s% xa(j,k-1) - s% xa(j,k)
+                     if (do_implicit_dsig_structure) sig00_ad = s% sig_implicit_ad(k)
+                  else
+                     dx00 = 0d0
+                     if (do_implicit_dsig_structure) sig00_ad = 0d0
+                  end if
+                  if (k < nz) then
+                     dxp1 = s% xa(j,k) - s% xa(j,k+1)
+                     if (do_implicit_dsig_structure) &
+                        sigp1_ad = shift_p1(s% sig_implicit_ad(k+1))
+                  else
+                     dxp1 = 0d0
+                     if (do_implicit_dsig_structure) sigp1_ad = 0d0
+                  end if
+                  if (do_implicit_dsig_structure) &
+                     call save_sig_ad_partials( &
+                        dx00/(dm*eqn_scale), -dxp1/(dm*eqn_scale))
+                  if (do_implicit_dsig_dxa) then
+                     do jj=1,species
+                        ii = s% nvar_hydro+jj
+                        if (k > 1) then
+                           dequ = s% d_sig_dxa_m1(jj,k)*dx00/(dm*eqn_scale)
+                           if (checking) call check_dequ(dequ,'d_sig_dxa_m1')
+                           call em1(s, i, ii, k, nvar, dxdt_factor*dequ)
+                        end if
+                        dequ = 0d0
+                        if (k > 1) dequ = dequ + &
+                           s% d_sig_dxa_00(jj,k)*dx00/dm
+                        if (k < nz) dequ = dequ - &
+                           s% d_sig_dxa_m1(jj,k+1)*dxp1/dm
+                        dequ = dequ/eqn_scale
+                        if (checking) call check_dequ(dequ,'d_sig_dxa_00')
+                        call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
+                        if (k < nz) then
+                           dequ = -s% d_sig_dxa_00(jj,k+1)*dxp1/(dm*eqn_scale)
+                           if (checking) call check_dequ(dequ,'d_sig_dxa_p1')
+                           call ep1(s, i, ii, k, nvar, dxdt_factor*dequ)
+                        end if
+                     end do
+                  end if
+               end if
+
             end if
 
             if (test_partials) then
@@ -218,6 +271,57 @@
                return
             end if
          end subroutine check_dequ
+
+
+         subroutine save_sig_ad_partials(sig00_factor, sigp1_factor)
+            real(dp), intent(in) :: sig00_factor, sigp1_factor
+
+            call add_sig_ad_var(s% i_lnd, i_lnd_m1, i_lnd_00, i_lnd_p1, &
+               sig00_factor, sigp1_factor)
+            call add_sig_ad_var(s% i_lnT, i_lnT_m1, i_lnT_00, i_lnT_p1, &
+               sig00_factor, sigp1_factor)
+            call add_sig_ad_var(s% i_lnR, i_lnR_m1, i_lnR_00, i_lnR_p1, &
+               sig00_factor, sigp1_factor)
+            if (s% i_v /= 0) call add_sig_ad_var( &
+               s% i_v, i_v_m1, i_v_00, i_v_p1, sig00_factor, sigp1_factor)
+            if (s% i_u /= 0) call add_sig_ad_var( &
+               s% i_u, i_v_m1, i_v_00, i_v_p1, sig00_factor, sigp1_factor)
+            if (s% i_lum /= 0) call add_sig_ad_var( &
+               s% i_lum, i_L_m1, i_L_00, i_L_p1, sig00_factor, sigp1_factor)
+            if (s% i_w /= 0) call add_sig_ad_var( &
+               s% i_w, i_w_m1, i_w_00, i_w_p1, sig00_factor, sigp1_factor)
+            if (s% i_Hp /= 0) call add_sig_ad_var( &
+               s% i_Hp, i_Hp_m1, i_Hp_00, i_Hp_p1, sig00_factor, sigp1_factor)
+            if (s% i_w_div_wc /= 0) call add_sig_ad_var( &
+               s% i_w_div_wc, i_w_div_wc_m1, i_w_div_wc_00, i_w_div_wc_p1, &
+               sig00_factor, sigp1_factor)
+            if (s% i_j_rot /= 0) call add_sig_ad_var( &
+               s% i_j_rot, i_jrot_m1, i_jrot_00, i_jrot_p1, &
+               sig00_factor, sigp1_factor)
+
+         end subroutine save_sig_ad_partials
+
+
+         subroutine add_sig_ad_var(i_var, i_m1, i_00, i_p1, sig00_factor, sigp1_factor)
+            integer, intent(in) :: i_var, i_m1, i_00, i_p1
+            real(dp), intent(in) :: sig00_factor, sigp1_factor
+
+            real(dp) :: d_m1, d_00, d_p1
+
+            if (i_var == 0) return
+
+            d_m1 = sig00_factor*sig00_ad%d1Array(i_m1) + &
+               sigp1_factor*sigp1_ad%d1Array(i_m1)
+            d_00 = sig00_factor*sig00_ad%d1Array(i_00) + &
+               sigp1_factor*sigp1_ad%d1Array(i_00)
+            d_p1 = sig00_factor*sig00_ad%d1Array(i_p1) + &
+               sigp1_factor*sigp1_ad%d1Array(i_p1)
+
+            if (d_m1 /= 0d0) call em1(s, i, i_var, k, nvar, d_m1)
+            if (d_00 /= 0d0) call e00(s, i, i_var, k, nvar, d_00)
+            if (d_p1 /= 0d0) call ep1(s, i, i_var, k, nvar, d_p1)
+
+         end subroutine add_sig_ad_var
 
       end subroutine do1_chem_eqns
 

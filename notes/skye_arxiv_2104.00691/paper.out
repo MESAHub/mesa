@@ -1,0 +1,23 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Helmholtz Free Energy}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Ideal Terms}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Non-Ideal Terms}{section.2}% 4
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Liquid Phase}{subsection.2.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.2.2}{Solid Phase}{subsection.2.2}% 6
+\BOOKMARK [2][-]{subsection.2.3}{Thermodynamic Extrapolation}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{Thermodynamics}{}% 8
+\BOOKMARK [1][-]{section.4}{Limitations}{}% 9
+\BOOKMARK [1][-]{section.5}{Thermodynamics via Automatic Differentiation}{}% 10
+\BOOKMARK [1][-]{section.6}{Applications}{}% 11
+\BOOKMARK [2][-]{subsection.6.1}{Derivative Quality}{section.6}% 12
+\BOOKMARK [2][-]{subsection.6.2}{Thermodynamic Consistency}{section.6}% 13
+\BOOKMARK [2][-]{subsection.6.3}{Crystallization Curves}{section.6}% 14
+\BOOKMARK [2][-]{subsection.6.4}{Comparison with Other EOS}{section.6}% 15
+\BOOKMARK [2][-]{subsection.6.5}{White Dwarf Cooling Curves}{section.6}% 16
+\BOOKMARK [1][-]{section.7}{Execution Efficiency}{}% 17
+\BOOKMARK [1][-]{section.8}{Availability}{}% 18
+\BOOKMARK [1][-]{section.9}{Future Work}{}% 19
+\BOOKMARK [1][-]{appendix.A}{MESA}{}% 20
+\BOOKMARK [1][-]{appendix.B}{EOS Comparisons}{}% 21
+\BOOKMARK [1][-]{appendix.C}{Data Availability}{}% 22
+\BOOKMARK [1][-]{appendix.D}{Phase Transitions and Quantum Corrections}{}% 23

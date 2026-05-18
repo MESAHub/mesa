@@ -46,6 +46,11 @@ module helm_polynomials
         dddpsi0 = z* ( -360.0d0*z + 360.0d0) - 60.0d0
       end function dddpsi0
 
+      pure real(dp) function ddddpsi0(z)
+        real(dp), intent(in) :: z
+        ddddpsi0 = 360.0d0 - 720.0d0*z
+      end function ddddpsi0
+
 
 !..psi1 and its derivatives
 
@@ -69,6 +74,11 @@ module helm_polynomials
         dddpsi1 = z * (-180.0d0*z + 192.0d0) - 36.0d0
       end function dddpsi1
 
+      pure real(dp) function ddddpsi1(z)
+        real(dp), intent(in) :: z
+        ddddpsi1 = 192.0d0 - 360.0d0*z
+      end function ddddpsi1
+
 !..psi2  and its derivatives
 
       pure real(dp) function psi2(z)
@@ -90,6 +100,11 @@ module helm_polynomials
         real(dp), intent(in) :: z
         dddpsi2 = 0.5d0*(z * (-60.0d0*z + 72.0d0) - 18.0d0)
       end function dddpsi2
+
+      pure real(dp) function ddddpsi2(z)
+        real(dp), intent(in) :: z
+        ddddpsi2 = 36.0d0 - 60.0d0*z
+      end function ddddpsi2
 
 !..biquintic hermite polynomial statement function
 

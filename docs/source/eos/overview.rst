@@ -40,6 +40,14 @@ both results are evaluated, blended, and returned.  Smooth blends are
 assured via the smoothness of the functions that define the component
 fractions.
 
+When EOS composition partials are requested, the component EOS
+composition derivatives are combined using the current blend weights,
+but the blend weights themselves are held fixed with respect to
+composition.  The blend regions are numerical EOS selectors rather than
+physical composition terms in the component EOS.  Derivatives with
+respect to :math:`\rho` and :math:`T` still include the usual blend
+weight derivatives.
+
 This approach means that EOS components have an order of
 precedence:
 

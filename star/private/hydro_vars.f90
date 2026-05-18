@@ -483,6 +483,9 @@
             set_abs_du_div_cs, set_conv_time_scales
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
          use brunt, only: do_brunt_B, do_brunt_N2
+         use implicit_brunt, only: &
+            do_implicit_brunt_B, set_implicit_gradL_composition_term_ad
+         use implicit_Dmix, only: set_Dmix_components
          use mix_info, only: set_mixing_info
          use hydro_rsp2, only: set_RSP2_vars
          use tdc_hydro, only: set_viscosity_vars_TDC
@@ -499,6 +502,7 @@
          integer :: nz, k, T_tau_id
          integer(i8) :: time0
          logical, parameter :: dbg = .false.
+         logical :: use_implicit_brunt, do_implicit_sigma_refresh
          real(dp) :: total
 
          include 'formats'
@@ -508,6 +512,9 @@
 
          ierr = 0
          nz = s% nz
+         use_implicit_brunt = s% job% implicit_diffusion_flag .and. &
+            s% use_Ledoux_criterion
+         do_implicit_sigma_refresh = s% job% implicit_diffusion_flag
 
          if (.not. skip_basic_vars) then
             if (dbg) write(*,*) 'call set_basic_vars'
@@ -543,13 +550,25 @@
          end if
 
          if (.not. skip_grads) then
-            if (dbg) write(*,*) 'call do_brunt_B'
-            call do_brunt_B(s, nzlo, nzhi, ierr)  ! for unsmoothed_brunt_B
-            if (failed('do_brunt_B')) return
+            if (use_implicit_brunt) then
+               if (dbg) write(*,*) 'call do_implicit_brunt_B'
+               call do_implicit_brunt_B(s, nzlo, nzhi, ierr)
+               if (failed('do_implicit_brunt_B')) return
+            else
+               if (dbg) write(*,*) 'call do_brunt_B'
+               call do_brunt_B(s, nzlo, nzhi, ierr)  ! for unsmoothed_brunt_B
+               if (failed('do_brunt_B')) return
+            end if
             if (dbg) write(*,*) 'call set_grads'
             call set_grads(s, ierr)
             if (failed('set_grads')) return
+            if (s% job% implicit_diffusion_flag) &
+               call set_implicit_gradL_composition_term_ad(s, use_implicit_brunt)
             call set_conv_time_scales(s)  ! uses brunt_B
+         else if (use_implicit_brunt) then
+            if (dbg) write(*,*) 'call do_implicit_brunt_B'
+            call do_implicit_brunt_B(s, nzlo, nzhi, ierr)
+            if (failed('do_implicit_brunt_B')) return
          end if
 
          if (.not. skip_mixing_info) then
@@ -615,6 +634,13 @@
 
             call check_for_redo_MLT(s, nzlo, nzhi, ierr)
             if (failed('check_for_redo_MLT')) return
+
+            if (do_implicit_sigma_refresh .and. skip_mixing_info) then
+               ! Solver iteration: set_mixing_info is skipped, so keep
+               ! Dmix_explicit from the last full pass and refresh only
+               ! Dmix_implicit from the current MLT/TDC result.
+               call set_Dmix_components(s, .false.)
+            end if
 
          end if
 
@@ -1039,11 +1065,14 @@
          integer :: k, nz, j, cid, max_cid
          real(dp) :: val, max_val, A, Z
          real(dp), pointer, dimension(:) :: dlnP, dlnd, dlnT
+         logical :: use_implicit_brunt
 
          include 'formats'
 
          ierr = 0
          nz = s% nz
+         use_implicit_brunt = s% job% implicit_diffusion_flag .and. &
+            s% use_Ledoux_criterion
          call do_alloc(ierr)
          if (ierr /= 0) return
 
@@ -1080,7 +1109,7 @@
             do k=1,nz
                s% smoothed_brunt_B(k) = s% unsmoothed_brunt_B(k)
             end do
-            call compute_smoothed_brunt_B
+            if (.not. use_implicit_brunt) call compute_smoothed_brunt_B
          else
             s% smoothed_brunt_B(:) = 0d0
          end if

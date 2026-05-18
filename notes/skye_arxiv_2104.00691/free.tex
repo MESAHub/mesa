@@ -1,0 +1,233 @@
+\section{Helmholtz Free Energy} \label{sec:free}
+
+The \skye\ equation of state is based on a Helmholtz free energy $F(\rho,T,\{n_j\})$ given by
+\begin{align}
+	F = F_{\rm ideal} + F_{\textrm{non-ideal}},
+\end{align}
+where $n_j$ is the number density of species $j$.
+Here $F$ is in terms of energy per unit mass.
+The ideal term incorporates all non-interacting contributions of relativistic electrons and positrons, non-relativistic non-degenerate ions, and photons.
+The non-ideal term contains the contributions of Coulomb interactions among and between electrons and ions.
+
+\subsection{Ideal Terms}\label{sec:ideal}
+
+The ideal free energy is
+\begin{align}
+	F_{\rm ideal} = F_{\rm rad} + F_{\rm ideal \ e^- e^+} + F_{\rm ideal\ ion} + F_{\rm ideal\ mix}.
+\end{align}
+
+$F_{\rm rad}$ is the free energy of an ideal gas of photons, 
+\begin{align}
+	F_{\rm rad} = -\frac{a T^4}{3 \rho},
+\end{align}
+where $a$ is the radiation gas constant.
+
+$F_{\rm ideal\ e^- e^+}$ represents an ideal gas of non-interacting electrons and positrons, 
+obtained from biquintic Hermite polynomial interpolation of a table (\citealt{Timmes2000}, also see \citealt{baturin_2019_aa}).
+This single table captures both relativistic and degeneracy effects and is valid for any 
+fully ionized composition.
+
+$F_{\rm ideal\ ion}$ represents an ideal gas of non-degenerate ions and is given by~\citep[see e.g.][]{Potekhin2010}
+\begin{align}
+	F_{\rm ideal\ ion} = \frac{k_{\rm B} T}{\bar{m}} \sum_j y_j \left[\ln \left(\frac{n_j}{n_{Q,j}}\right) - 1\right],
+	\label{eq:Fidealion}
+\end{align}
+where $y_j$ is the number fraction of species $j$,
+\begin{align}
+	\bar{m} \equiv \sum_y y_j m_j
+\end{align}
+is the mean ionic mass in $\mathrm{g}$, $m_j$ is the mass of ion species $j$, and
+\begin{align}
+	n_{Q,j} \equiv M_{\rm spin,j}\left(\frac{2\pi \hbar^2}{m_j k_{\rm B} T}\right)^{-3/2}.
+\end{align}
+Here $M_{\rm spin,j}$ is the spin multiplicity of the ion.
+The effect of $M_{\rm spin,j}$ is to introduce a composition-dependent offset in the entropy and so for simplicity we neglect it, setting $M_{\rm spin,j}=1$.
+
+$F_{\rm ideal\ mix}$ captures the ideal free energy of mixing for ions, given by
+\begin{align}
+	F_{\rm ideal\ mix} = \frac{k_{\rm B} T}{\bar{m}} \sum_j y_j \ln y_j.
+\end{align}
+
+\subsection{Non-Ideal Terms}\label{sec:non-ideal}
+
+The non-ideal free energy of electron interactions is commonly written in terms of the electron interaction strength
+\begin{align}
+	\Gamma_e \equiv \frac{e^2}{a_e k_{\rm B} T},
+\end{align}
+where
+\begin{align}
+	a_e \equiv \left(\frac{4}{3} \pi n_e\right)^{-1/3},
+\end{align}
+and $n_e$ is the electron number density.
+Likewise the ion interaction free energy is given in terms of the ion interaction strength
+\begin{align}
+	\Gamma_j \equiv \Gamma_e Z_j^{5/3},
+\end{align}
+where $Z_j$ is the charge of ion species $j$.
+The average Coulomb parameter is
+\begin{align}
+	\langle \Gamma \rangle = \sum_j y_j \Gamma_j .
+\end{align}
+Finally, quantum effects enter for ions via the parameter
+\begin{align}
+	\eta_j \equiv \frac{T_{{\rm p},j}}{T} = \frac{\hbar}{k_{\rm B}T}\sqrt{\frac{4\pi e^2 n_j Z_j^2}{m_j}},
+	\label{eq:eta}
+\end{align}
+which is proportional to $\Gamma_j \lambda / a_j$, where $\lambda$ is the De-Broglie wavelength of a non-relativistic particle.
+In these terms we write
+\begin{align}
+	F_{\textrm{non-ideal}} = \frac{k_{\rm B} T}{\bar{m}}&\left[f_{\rm e-e}(\Gamma_e, \eta_e) \right.\\
+	& \left. + f_{\rm i}(\{Z_j\}, \{m_j\}, \{\Gamma_j\},\{\eta_j\})\right]\nonumber,
+\end{align}	
+where each $f$ is a free energy per ion per $k_{\rm B} T$ and $\eta_e$ is the electronic quantum parameter, given by using the electron mass and $Z_e=1$ in equation~\eqref{eq:eta}.
+While the symbol $\eta$ or $\eta_e$ is also commonly used to represent the electron degeneracy, we never do so in this paper.
+
+$f_{\rm e-e}$ is the free energy of Coulomb interactions between electrons, also known as the electron-exchange energy.
+We implement this via the non-relativistic formula of~\citet{ICHIMARU198791}, which~\citet{Potekhin2010} argued should suffice because in highly relativistic scenarios the electron-exchange energy is a small part of the total.
+
+$f_{\rm i}$ captures non-ideal effects associated with mixing, Coulomb interaction among ions, and Coulomb interactions between ions and electrons (i.e., polarization or screening).
+Because an interacting Coulomb gas can crystallize, we compute this term twice, once assuming the liquid phase and once assuming the solid phase.
+We then take
+\begin{align}
+	f_{\rm i} = \min(f_{\rm i}^{\rm liquid}, f_{\rm i}^{\rm solid}),
+	\label{eq:fmin}
+\end{align}
+so as to minimize the free energy across the possible options.%
+\footnote{In stars, the phase transition technically occurs at constant pressure rather than
+  constant volume and so minimizes the Gibbs free energy.
+  Appendix~A in \citet{2010PhRvE..81c6107M} demonstrates that minimizing the Helmholtz free energy instead
+  does not significantly affect the phase diagram.}
+
+\subsubsection{Liquid Phase}
+
+In the liquid phase we decompose $f_{\rm i}$ as
+\begin{align}
+	f_{\rm i}^{\rm liquid} = f_{\rm mix}^{\rm liquid} + \sum_j y_j (f_{\rm OCP, j}^{\rm classical} + f_{\rm OCP, j}^{\rm quantum} + f_{\rm i-e, j}^{\rm liquid}),
+	\label{eq:liq_f}
+\end{align}
+where $f_{\rm mix}^{\rm liquid}$ captures non-ideal corrections to the mixing free energy in the liquid phase, the $f_{\rm OCP,j}$ terms represent the free energy of a one-component plasma (OCP) made entirely of species $j$, and $f_{\rm i-e,j}$ accuonts for electron-ion interactions for species $j$.
+
+We obtain $f_{\rm OCP, j}^{\rm classical}$ from the fit of~\citet{PhysRevE.62.8554} with the parameter set matching the Monte Carlo calculations of~\citet{1999CoPP...39...97D}, which were performed over $1 \leq \Gamma_j \leq 200$.
+This fit matches the Debye-H\"{u}ckel approximation at low $\Gamma_j$ as well as leading-order corrections to this approximation, so these fits are valid for $\Gamma_j \leq 200$.
+
+We chose this particular classical fit because it is the same one~\citet{2019MNRAS.490.5839B} used to derive the quantum correction $f_{\rm OCP, j}^{\rm quantum}$, which was fit to path-integral Monte Carlo calculations performed over $1 \leq \Gamma_j \leq 175$ and $600 \leq r_{s,j} \leq 120,000$~\citep{2019MNRAS.488.5042B}, where
+\begin{align}
+	r_{s,j} \equiv \frac{m_j Z_j^2 e^2}{\hbar^2}\left(\frac{4}{3} \pi n_j\right)^{-1/3}
+\end{align}
+is the dimensionless ion sphere radius.
+
+We obtain $f_{\rm i-e,j}^{\rm liquid}$ using the formula of~\citet{PhysRevE.62.8554}, which was chosen to fit Hypernetted Chain calculations on the range $0 < \Gamma \la 300$ and $0 < r_{s,e} < 1$, where
+\begin{align}
+	r_{s,e} \equiv \frac{m_j e^2}{\hbar^2}\left(\frac{4}{3} \pi n_e\right)^{-1/3}
+\end{align}
+is the dimensionless electron sphere radius.
+
+
+\citet{2009PhRvE..80d7401P} computed classical corrections to the linear mixing rule using Hypernetted Chain calculations.
+These were combined with the Monte Carlo calculations of~\citet{1999JChPh.111.9695C} to produce a data set spanning $10^{-3} < \Gamma_j < 10^2$.
+\citet{2009PhRvE..80d7401P} then produced an analytic fitting formula matching these data.
+The form was chosen to reproduce analytic expectations in the limits of both large and small $\Gamma_j$.
+We use this fit for $f_{\rm mix}^{\rm liquid}$.
+
+\subsubsection{Solid Phase}
+
+In the solid phase we use a similar decomposition:
+\begin{align}
+	f_{\rm i}^{\rm solid} = f_{\rm mix}^{\rm solid} + \sum_j y_j (f_{\rm OCP, j}^{\rm harmonic} + f_{\rm OCP, j}^{\rm anharmonic} + f_{\rm i-e,j}^{\rm solid}),
+	\label{eq:sol_f}
+\end{align}
+where $f_{\rm mix}^{\rm solid}$ captures non-ideal corrections to the mixing free energy in the solid phase and is formed by summing contributions pairwise between species, $f_{\rm OCP, j}^{\rm harmonic}$ represents the harmonic crystal free energy (i.e., phonons), $f_{\rm OCP, j}^{\rm anharmonic}$ captures anharmonic corrections, and $f_{\rm i-e,j}^{\rm solid}$ provides the free energy of electron-ion interactions (i.e., screening/polarization).
+
+The harmonic free energy is given by calculations due to~\citet{PhysRevE.64.057402} and is valid at any $\Gamma_j$ where the system takes on a crystal structure.
+Because the body centered cubic (BCC) lattice has the lowest free energy of the ones they consider we use their BCC coefficients.
+
+The anharmonic free energy is given by a sum of a classical term from~\citet{PhysRevE.47.4330} and quantum corrections from~\citet{Potekhin2010}.
+The classical term is an analytic fit to Monte Carlo data over the range $170 \leq \Gamma_j \leq 2000$, and the form of the fit was chosen to match expectations from perturbation theory in the large-$\Gamma_j$ limit, so this term should be valid for $\Gamma_j \geq 170$.
+The quantum corrections are a combination of terms meant to reproduce analytic expansions about the classical~\citep[$\eta_j\rightarrow 0$]{HANSEN1975187} and zero-temperature~\citep[$\Gamma_j/\sqrt{\eta_j} \rightarrow \infty$]{PhysRevA.36.1859,1961PhRv..124..747C} limits.
+At fixed $\Gamma_j$ these are opposing limits in $\eta_j$, so in principle these corrections may be used at any $\eta_j$.
+
+For the solid mixing free energy we support the formulas of either~\citet{1993PhRvE..48.1344O} or~\citet{2013A&A...550A..43P}, extended from the three-component case to many component plasmas following~\citet{2010PhRvE..81c6107M}.
+The formula of~\citet{1993PhRvE..48.1344O} was produced to match Monte Carlo calculations of crystals performed at charge ratios $4/3 \leq R \leq 4$, where $R$ is the ratio of the charge of the higher-$Z$ species to that of the lower-$Z$ one, while that of~\citet{2013A&A...550A..43P} was designed to match both the results of~\citet{1993PhRvE..48.1344O} and~\citet{2003CoPP...43..279D}.
+In either case the fit is linear in $\Gamma$ because only the Madelung energy is considered in the Monte Carlo calculations, and this is linear in $\Gamma$ by construction.
+We apply this formula by grouping all species of a given charge together, because the scheme of~\citet{2010PhRvE..81c6107M} is independent of species mass and just captures corrections to the potential energy of a multicomponent plasma.
+
+We obtain $f_{\rm i-e,j}^{\rm solid}$ using the formula of~\citet{Potekhin2010}, which was fitted to numerical calculations by~\citet{PhysRevE.62.8554} on the range $80 < \Gamma \la 3\times 10^4$ and $10^{-2} < x_r < 10^2$, where $x_r$ is the relativity parameter
+\begin{align}
+	x_r \equiv \frac{p_{\rm F}}{m_e c}
+\end{align}
+for Fermi momentum $p_{\rm F}$, electron mass $m_e$, and speed of light $c$.
+This formula is based on a perturbation expansion which is known to break down at low densities~\citep{1976PhRvA..14..816G}.
+In particular, the expression for $f_{\rm i-e,j}^{\rm solid}$ in the solid phase was tested up to $x_r \ga 10^{-2}$, corresponding to densities of $\rho \ga 1\,\mathrm{g\,cm^{-3}} (m_j / Z_j m_p)$.
+Unlike the liquid phase formula, however, this one does not reproduce the Debye-H\"{u}ckel limit at low densities, and rises without bound like $\rho^{-1/3}$ towards low densities.
+Moreover it diverges at low $\Gamma$ and so cannot be used for $\Gamma \la 80$.
+
+To remedy this we smoothly transition from the solid screening formula to the liquid screening formula, which reproduces the appropriate high-temperature and low-density limits.
+We do this by writing
+\begin{align}
+	f_{\rm i-e,j}^{\rm solid} =  h(\alpha) f_{\rm i-e,j}^{\rm liquid} + (1-h(\alpha)) f_{\rm i-e,j}^{\rm solid, original},
+\end{align}
+where
+\begin{align}
+	h(\alpha) \equiv \tanh^3(2\alpha)
+\end{align}
+is a smooth switch function and
+\begin{align}
+	\alpha \equiv \frac{3 k_{\rm B} T \gamma}{2 E_{\rm F}^{\rm NR}} = 3\left(\frac{4}{9\pi}\right)^{2/3} \frac{r_s}{\Gamma_e} \gamma
+\end{align}
+measures the degeneracy of the system, becoming large in the Debye-H\"{u}ckel limit and small in the Thomas-Fermi limit.
+Here $E_{\rm F}^{\rm NR}$ is the non-relativistic Fermi energy and $\gamma = \sqrt{1 + x_r^2}$ is the Lorentz parameter at the Fermi momentum.
+We choose $\alpha$ for our switch because it controls whether the dielectric function more closely resembles the Debye-H\"{u}ckel or Thomas-Fermi limits.
+
+\subsection{Thermodynamic Extrapolation}\label{sec:extrapolate}
+
+In order to implement equation~\eqref{eq:fmin} we need to be able to evaluate all components of the free energy at any point in the $(\rho,T)$ plane.
+Unfortunately, the fits we use for the one-component plasma $f_{\rm OCP}$ have limited ranges of validity.
+For instance the classical liquid free energy was fit to Monte Carlo simulations in the range $1 \leq \Gamma_j \leq 200$.
+The low-$\Gamma_j$ asymptotic behavior is known analytically and enforced by the fitting formula, but the high-$\Gamma_j$ behavior ($\Gamma_j > 200$) is in a sense undefined: beyond crystallization it is not obvious what it means to speak of a liquid free energy.
+The same is true of the solid phase free energy formula, which was computed via a perturbation expansion in $1/\Gamma_j$ and diverges at small $\Gamma_j$.
+
+This problem is not just mathematical, it is conceptual: any scheme which extends these formulas beyond their range of validity makes implicit assumptions about the physical behavior of the system, and there is no guarantee that following the analytic behavior of the fitting formulas will happen to capture the right physics.
+Indeed, as mentioned, many of these fitting formulae diverge away from the limits for which they were designed.
+
+To address this we make our choice of physics explicit.
+For the liquid phase free energy we assume that the probability distribution over microscopic states is fixed for $\Gamma_j > \Gamma_{\rm max}^{\rm liquid}=200$.
+For the solid phase free energy we make the same assumption when $\Gamma_j < \Gamma_{\rm min}^{\rm solid}=170$.
+This assumption amounts to an ansatz: we \emph{define} a high-$\Gamma_j$ liquid to be characterized by the probability distribution of $\Gamma_{\rm max}^{\rm liquid}$, and likewise for a low-$\Gamma_j$ solid with $\Gamma_{\rm min}^{\rm solid}$.
+These ranges were chosen to permit using the OCP terms over the widest range over which each free energy component in equations~\eqref{eq:liq_f} and~\eqref{eq:sol_f} are known to be accurate.
+
+Because the energy is given by the ensemble average
+\begin{align}
+	e(\Gamma,\eta) = \sum_s p_s(\Gamma_j,\eta_j) e_s,
+\end{align}
+where $p_s$ and $e_s$ are the probability and energy of microstate $s$, an immediate consequence of our choice to fix $p_s$ out-of-bounds is that the energy must be constant.
+Similarly the specific entropy
+\begin{align}
+	s = -\frac{k_{\rm B} T}{\bar{m}}\sum_s p_s \ln p_s
+\end{align}
+is constant out-of-bounds because $p_s$ is fixed.
+
+That is,
+\begin{align}
+	\left.\frac{\partial s}{\partial T}\right|_{\rho} = -\frac{\partial^2 F}{\partial T^2} = 0.
+\end{align}
+This condition combined with continuity of entropy and free energy at the boundary allows us to uniquely define an extrapolated free energy
+\begin{align}
+	F_{\rm ext.}(\rho,T) = F(\rho,T_{\rm b}(\rho)) + (T_{\rm b}(\rho)-T) s_{\rm b}(\rho),
+\end{align}
+where the subscript ``b'' denotes a quantity evaluated at the boundary.
+Note that by construction this form also enforces $\partial e/\partial T=0$ out-of-bounds.
+
+This prescription provides a robust extrapolation far beyond the limits of the original fitting formulas which avoids common extrapolation pitfalls such as negative entropies or sound speeds.
+However, because $\partial s/\partial T$ and $\partial e/\partial T$ are forced to zero, this extrapolation scheme does produce discontinuities in quantities like the heat capacity.
+We encounter these discontinuities in Section~\ref{sec:cooling} and, while they do not cause a problem there, in some applications it may be desirable to continue to apply the original fitting formulas slightly beyond the data on which they were based.
+
+We currently apply this extrapolation scheme just to the classical and quantum ion-ion OCP terms and \emph{not} to the mixing corrections $f_{\rm mix}^{\rm liquid}$ and $f_{\rm mix}^{\rm solid}$ or to the electron-ion screening terms $f_{\rm i-e,j}^{\rm solid}$ and $f_{\rm i-e,j}^{\rm liquid}$.
+The liquid mixing corrections are constructed to match analytic expectations in the limits of both large and small $\Gamma_j$, and the solid mixing corrections are linear in $\Gamma_j$ by construction because they only consider the Madelung energy.
+As a result neither mixing correction requires extrapolation in $\Gamma_j$.
+Likewise both sets of screening corrections obey the correct asymptotic limits at both large and small $\Gamma_j$ and so neither requires extrapolation.
+
+Note that while this extrapolation scheme ensures that the relevant free energy terms are well-behaved in $\Gamma_j$, they may still exhibit unphysical asymptotic behaviour in $\eta_j$, i.e. towards very large or small densities.
+This may be the cause of some of the unusual features we see in the phase diagram in Appendix~\ref{sec:quantum}.
+
+
+

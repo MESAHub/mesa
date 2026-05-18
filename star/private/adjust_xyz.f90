@@ -83,7 +83,7 @@
          integer :: old_num_isos, old_num_reactions
          integer :: old_net_iso(num_chem_isos)
          integer :: old_chem_id(num_chem_isos)
-         integer :: species, nz, num_reactions
+         integer :: species, nz, num_reactions, num_eos_dxa_results
          integer, pointer :: chem_id(:)
          character (len=net_name_len) :: old_net_name
 
@@ -109,6 +109,8 @@
          nz = max(s% nz, s% prev_mesh_nz)
          chem_id => s% chem_id
          num_reactions = s% num_reactions
+         num_eos_dxa_results = num_eos_d_dxa_results
+         if (s% include_eos_composition_partials) num_eos_dxa_results = num_eos_basic_results
 
          write(*,*) 'change to "' // trim(new_net_name)//'"'
          write(*,*) 'number of species', s% species
@@ -138,7 +140,7 @@
          if (ierr /= 0) return
 
          if (associated(s% d_eos_dxa)) deallocate(s% d_eos_dxa)
-         allocate(s% d_eos_dxa(num_eos_d_dxa_results, species, nz + nz_alloc_extra), stat=ierr)
+         allocate(s% d_eos_dxa(num_eos_dxa_results, species, nz + nz_alloc_extra), stat=ierr)
          if (ierr /= 0) return
 
          call realloc(s% xa_sub_xa_start); if (ierr /= 0) return

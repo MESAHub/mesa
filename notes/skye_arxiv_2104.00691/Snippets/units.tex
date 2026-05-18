@@ -1,0 +1,99 @@
+% $Id: units.tex 385 2008-07-13 20:07:02Z efb $
+
+%------------------------------------------------------------------------
+% typesetting of units
+% 
+% Note that this doesn't prevent linebreaking between symbol and unit.
+% A more sophisticated system is available from CTAN asa units.sty
+%------------------------------------------------------------------------
+
+% basic unit typesetteing
+\newcommand{\unitspace}{\ensuremath{\,}}
+\newcommand{\usp}{\unitspace}
+\newcommand{\numberspace}{\ensuremath{\;}}
+\newcommand{\nsp}{\numberspace}
+\newcommand{\unitstyle}[1]{\ensuremath{\mathrm{#1}}}
+\newcommand{\power}[2]{\ensuremath{{#1}^{#2}}}
+
+\newcommand{\ee}[1]{\ensuremath{\times 10^{#1}}}
+
+% prefixes
+\newcommand{\nano}{\unitstyle{n}}
+\newcommand{\milli}{\unitstyle{m}}
+\newcommand{\centi}{\unitstyle{c}}
+\newcommand{\kilo}{\unitstyle{k}}
+\newcommand{\Mega}{\unitstyle{M}}
+\newcommand{\Giga}{\unitstyle{G}}
+
+% base units, mks
+\newcommand{\meter}{\unitstyle{m}}
+\newcommand{\kilogram}{\kilo\gram}
+\newcommand{\second}{\unitstyle{s}}
+
+\newcommand{\Kelvin}{\unitstyle{K}}
+\newcommand{\K}{\Kelvin}  %degrees Kelvin
+
+% base units, cgs
+\newcommand{\cm}{\centi\meter}
+\newcommand{\gram}{\unitstyle{g}}
+
+% derived units
+\newcommand{\grampercc}{\gram\usp\power{\cm}{-3}} %mass density
+\newcommand{\grampersquarecm}{\gram\usp\power{\cm}{-2}} %column depth
+\newcommand{\squarecmpergram}{\power{\cm}{2}\usp\power{\gram}{-1}} %opacity
+\newcommand{\GramPerCc}{\grampercc}
+\newcommand{\GramPerSc}{\grampersquarecm}
+\newcommand{\columnunit}{\grampersquarecm}
+\newcommand{\dyne}{\unitstyle{dyn}} %dyne
+\newcommand{\erg}{\unitstyle{erg}} %erg 
+\newcommand{\ergs}{\erg}
+\newcommand{\gauss}{\unitstyle{G}} %gauss
+\newcommand{\ergspersecond}{\erg\unitspace\power{\second}{-1}}
+\newcommand{\ergspergram}{\erg\unitspace\power{\gram}{-1}}
+\newcommand{\ergspergs}{\erg\unitspace\power{\gram}{-1}\unitspace\power{\second}{-1}} %angular momentum
+\newcommand{\ergssecond}{\erg\unitspace\second}
+\newcommand{\cgsflux}{\erg\unitspace\power{\cm}{-2}\usp\power{\second}{-1}}
+\newcommand{\cmpersecond}{\cm\usp\power{\second}{-1}} %velocity
+\newcommand{\cmpersecondSc}{\cm\usp\power{\second}{-2}} %acceleration
+\newcommand{\cmSqpersecond}{\power{\cm}{2}\usp\power{\second}{-1}}%mixing
+
+% Nuclear and atomic units
+\newcommand{\amu}{\unitstyle{u}} %atomic mass unit
+\newcommand{\angstrom}{\mbox{\AA}} %Angstrom
+\newcommand{\fermi}{\unitstyle{fm}} %fermi
+\newcommand{\eV}{\unitstyle{eV}}        %eV
+\newcommand{\keV}{\kilo\eV} %Kev
+\newcommand{\MeV}{\Mega\eV} %MeV
+
+% solar and astronomical units
+\newcommand{\Msun}{\ensuremath{\unitstyle{M}_\odot}}
+\newcommand{\Lsun}{\ensuremath{\unitstyle{L}_{\odot}}}
+\newcommand{\Rsun}{\ensuremath{\unitstyle{R}_{\odot}}}
+\newcommand{\Zsun}{\ensuremath{Z_{\odot}}}
+\newcommand{\Myr}{\Mega\yr}
+\newcommand{\Gyr}{\Giga\yr}
+\newcommand{\parsec}{\unitstyle{pc}}
+\newcommand{\kpc}{\kilo\parsec} %kiloparsec
+\newcommand{\mJy}{\unitstyle{\mu Jy}} %micro Jansky
+\newcommand{\Msunyr}{\Msun\,\power{\yr}{-1}}
+\newcommand{\MJ}{\ensuremath{\mathrm{M_J}}}
+\newcommand{\RJ}{\ensuremath{\mathrm{R_J}}}
+\newcommand{\Mearth}{\ensuremath{\mathrm{M_{\oplus}}}}
+\newcommand{\AU}{\unitstyle{AU}}
+
+% misc. units
+\newcommand{\minute}{\unitstyle{min}} %minute
+\newcommand{\hour}{\unitstyle{hr}} %hour
+\newcommand{\yr}{\unitstyle{yr}}        %year
+\newcommand{\km}{\kilo\meter}   %kilometers
+\newcommand{\Hz}{\unitstyle{Hz}}        %Hertz
+\newcommand{\ksec}{\kilo\second} %kilosecond
+\newcommand{\kms}{\ensuremath{\mathrm{km}\,\second^{-1}}}
+\newcommand{\vcrit}{{\varv_{\mathrm{crit}}}}
+\newcommand{\vkep}{{\varv_{\mathrm{kep}}}}
+\newcommand{\vsurf}{{\varv_{\mathrm{surf}}}}
+\newcommand{\mol}{\unitstyle{mol}}% mole
+\newcommand{\barn}{\unitstyle{b}} %barn
+
+% command to include values
+\newcommand{\unit}[2]{\ensuremath{#1\numberspace\mathrm{#2}}}

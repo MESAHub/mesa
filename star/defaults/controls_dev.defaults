@@ -170,6 +170,26 @@
     use_mass_corrections = .false.
 
 
+      ! include_eos_composition_partials
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If false, preserve the current EOS wrapper behavior.  This does
+      ! not mean composition partials are suppressed; it means MESA uses
+      ! the same EOS partials it currently requests and stores.
+      !
+      ! If true, enable the new analytic/expanded EOS composition-partial
+      ! path for star-side uses that need derivatives with respect to
+      ! composition.  This is dev-only while the Skye/eosDT composition
+      ! derivatives and implicit diffusion coupling are under development.
+      !
+      ! ``implicit_diffusion_flag`` does not force this on unless
+      ! ``implicit_diffusion_include_dsig_dxa`` is also true.
+
+      ! ::
+
+    include_eos_composition_partials = .false.
+
+
       ! phase_separation_no_diffusion
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

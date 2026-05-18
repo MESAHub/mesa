@@ -117,7 +117,7 @@
 
       real(dp), pointer :: d_eos_dlnd(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dlnT(:,:) ! (num_eos_basic_results,nz)
-      real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz)
+      real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz); full EOS rows for dev partials
 
       ! eos partials for use in calculating equation partials for Jacobian matrix
       ! calculated using partials of interpolating polynomials of lnPgas, lnE, lnS where appropriate
@@ -252,6 +252,12 @@
       real(dp), pointer :: d_dxdt_mix_dx00(:) ! (nz)
       real(dp), pointer :: d_dxdt_mix_dxp1(:) ! (nz)
          ! partial of dxdt_mix(k) wrt to abundance in cell k and neighboring cells
+      real(dp), pointer :: d_sig_dxa_m1(:,:) ! (species,nz)
+      real(dp), pointer :: d_sig_dxa_00(:,:) ! (species,nz)
+         ! partial of sig(k) wrt abundance in cells k-1 and k
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+         sig_implicit_ad
+         ! implicit part of sig(k), for structure partials in the mix residual
 
       ! integrated eps_nuc_categories (ergs/sec)
       real(dp), pointer :: luminosity_by_category(:,:) ! (num_categories, nz)
@@ -409,6 +415,9 @@
 
          real(dp), pointer :: cdc(:) ! convective diffusion coeff. (gm^2/sec)
          real(dp), pointer :: D_mix(:) ! diffusion coeff. (cm^2/sec)
+         real(dp), pointer :: Dmix_explicit(:) ! explicit part of D_mix (cm^2/sec)
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            Dmix_implicit ! implicit part of D_mix (cm^2/sec)
          integer, pointer :: mixing_type(:) ! mixing types are defined in mesa/mlt
          real(dp), pointer :: cz_bdy_dq(:) ! sub-cell location of convection boundary
             ! gives dq distance inward from outer edge of cell(k)
@@ -453,6 +462,8 @@
       real(dp), pointer :: gradL(:) ! Ledoux gradient at cell boundary
          ! gradL = grada + brunt_B
       real(dp), pointer :: gradL_composition_term(:)
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+         gradL_composition_term_ad
       integer, pointer :: dominant_iso_for_thermohaline(:)
          ! chem id for dominant isotope in setting chemical gradient term.
          ! i.e. iso with largest local dX*(1+Z)/A
@@ -498,6 +509,10 @@
       real(dp), pointer :: brunt_N2_composition_term(:)
       real(dp), pointer :: brunt_B(:) ! (at points)
          ! this is the Brassard et al B := -(chiY/chiT)*(dlnY/dlnP)
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: brunt_B_ad
+      real(dp), pointer :: d_brunt_B_dxa_m1(:,:) ! (species,nz)
+      real(dp), pointer :: d_brunt_B_dxa_00(:,:) ! (species,nz)
+         ! partial of brunt_B(k) wrt abundance in cells k-1 and k
       real(dp), pointer :: unsmoothed_brunt_B(:) ! pre-smoothing
       real(dp), pointer :: smoothed_brunt_B(:) ! with smoothing applied for gradL
 
@@ -1187,6 +1202,9 @@
             time_set_mixing_info, &
             time_total
             ! change total_times function in star_utils if change this list
+         real(dp) :: time_eos_dxa  ! subset of time_eos
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
+         integer :: timing_num_get_eos_dxa_calls, timing_num_get_eos_dxa_skye_calls
+         real(dp) :: timing_sum_get_eos_dxa_frac_Skye
 
          real(dp), dimension(:,:),pointer :: raw_rate, screened_rate, eps_neu_rate, eps_nuc_rate !(num_reactions, nz)

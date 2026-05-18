@@ -1497,6 +1497,8 @@
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -8) then  ! 'grad_ad'
+               ! The star EOS call only requests lnPgas and lnE dxa rows.
+               ! grad_ad abundance solver_test_partials needs full EOS dxa rows.
                call get_grad_ad_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)

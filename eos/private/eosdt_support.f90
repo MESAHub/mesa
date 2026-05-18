@@ -175,24 +175,28 @@
       subroutine Do_Blend( &
             rq, species, Rho, logRho, T, logT, &
             alfa_in, d_alfa_dlogT_in, d_alfa_dlogRho_in, linear_blend, &
+            d_alfa_dxa_in, &
             res_1, d_dlnd_1, d_dlnT_1, d_dxa_1, &
             res_2, d_dlnd_2, d_dlnT_2, d_dxa_2, &
-            res, dlnd, dlnT, d_dxa)
+            res, dlnd, dlnT, d_dxa, dxa_rows)
          type (EoS_General_Info), pointer :: rq
          integer, intent(in) :: species
          real(dp), intent(in) :: Rho, logRho, T, logT, &
             alfa_in, d_alfa_dlogT_in, d_alfa_dlogRho_in
          logical, intent(in) :: linear_blend
+         real(dp), intent(in), dimension(species) :: d_alfa_dxa_in
          real(dp), intent(in), dimension(nv) :: res_1, d_dlnd_1, d_dlnT_1, res_2, d_dlnd_2, d_dlnT_2
          real(dp), intent(in), dimension(nv, species) :: d_dxa_1, d_dxa_2
          real(dp), intent(out), dimension(nv) :: res, dlnd, dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
+         integer, intent(in), optional :: dxa_rows(:)
 
          real(dp) :: alfa0, d_alfa0_dlnT, d_alfa0_dlnd
          real(dp) :: alfa, beta, A, &
             d_alfa_dlnd, d_alfa_dlnT, &
             d_beta_dlnd, d_beta_dlnT
-         integer :: j, k
+         real(dp) :: d_alfa_dxa(species), d_beta_dxa(species)
+         integer :: irow, j, k, row
 
          if (.not. linear_blend) then
 
@@ -206,18 +210,27 @@
             A = 30d0*(alfa0 - 1d0)*(alfa0 - 1d0)*alfa0*alfa0
             d_alfa_dlnd = A*d_alfa0_dlnd
             d_alfa_dlnT = A*d_alfa0_dlnT
+            d_alfa_dxa = A*d_alfa_dxa_in
 
          else
 
             alfa = alfa_in
             d_alfa_dlnT = d_alfa_dlogT_in/ln10
             d_alfa_dlnd = d_alfa_dlogRho_in/ln10
+            d_alfa_dxa = d_alfa_dxa_in
 
          end if
 
          beta = 1d0 - alfa
          d_beta_dlnT = -d_alfa_dlnT
          d_beta_dlnd = -d_alfa_dlnd
+         d_beta_dxa = -d_alfa_dxa
+
+         ! composition partials are taken at fixed EOS blend weights.
+         ! the blend regions are numerical selectors, not physical
+         ! composition terms in the component EOS.
+         d_alfa_dxa = 0d0
+         d_beta_dxa = 0d0
 
          do j=1,nv
             res(j) = alfa*res_1(j) + beta*res_2(j)
@@ -229,12 +242,30 @@
                d_alfa_dlnT*res_1(j) + d_beta_dlnT*res_2(j)
          end do
 
-         do k = 1, species
-            do j = 1, nv
-               d_dxa(j,k) = &
-                  alfa*d_dxa_1(j,k) + beta*d_dxa_2(j,k)  ! ignores blend derivatives
+         if (present(dxa_rows)) then
+            do irow = 1, size(dxa_rows)
+               row = dxa_rows(irow)
+               if (row < 1 .or. row > size(d_dxa, dim=1)) cycle
+               d_dxa(row,:) = 0d0
             end do
-         end do
+            do k = 1, species
+               do irow = 1, size(dxa_rows)
+                  row = dxa_rows(irow)
+                  if (row < 1 .or. row > size(d_dxa, dim=1)) cycle
+                  d_dxa(row,k) = &
+                     alfa*d_dxa_1(row,k) + beta*d_dxa_2(row,k) + &
+                     d_alfa_dxa(k)*res_1(row) + d_beta_dxa(k)*res_2(row)
+               end do
+            end do
+         else
+            do k = 1, species
+               do j = 1, nv
+                  d_dxa(j,k) = &
+                     alfa*d_dxa_1(j,k) + beta*d_dxa_2(j,k) + &
+                     d_alfa_dxa(k)*res_1(j) + d_beta_dxa(k)*res_2(j)
+               end do
+            end do
+         end if
 
       end subroutine Do_Blend
 

@@ -131,6 +131,15 @@
          ! clear some just to avoid getting NaNs at start
          ! e.g., from profile_starting_model
          s% D_mix(1:nz) = 0
+         s% Dmix_explicit(1:nz) = 0
+         call fill_ad_with_zeros(s% Dmix_implicit,1,-1)
+         call fill_ad_with_zeros(s% brunt_B_ad,1,-1)
+         call fill_ad_with_zeros(s% gradL_composition_term_ad,1,-1)
+         s% d_brunt_B_dxa_m1(1:s% species,1:nz) = 0
+         s% d_brunt_B_dxa_00(1:s% species,1:nz) = 0
+         s% d_sig_dxa_m1(1:s% species,1:nz) = 0
+         s% d_sig_dxa_00(1:s% species,1:nz) = 0
+         call fill_ad_with_zeros(s% sig_implicit_ad,1,-1)
          s% adjust_mlt_gradT_fraction(1:nz) = -1
          s% eps_mdot(1:nz) = 0
          s% dvc_dt_TDC(1:nz) = 0

@@ -1,0 +1,36 @@
+\section{Thermodynamics via Automatic Differentiation} \label{sec:autodiff}
+
+\skye\ computes thermodynamic quantities from a free energy and its derivatives.
+Modern stellar evolution software instruments require not only the first derivatives, which supply the energy, entropy, and pressure, but also second derivatives, which supply specific heats and susceptibilities.
+Moreover because stellar evolution is often numerically stiff it is generally solved implicitly with a Newton-Raphson method.
+The Jacobian of that method then requires derivatives of each of these thermodynamic quantities and so requires third derivatives of the free energy.
+Because of this, the performance and convergence of stellar evolution calculations depends strongly on being able to compute high-quality derivatives of the structure equations with respect to the structure variables ($\rho, T, \{y_j\}, ...$ in each cell).
+These derivatives in turn depend on derivatives from the equation of state, and so it is important that the derivatives reported by the EOS actually be derivatives of the corresponding quantities (i.e., $\partial p/\partial \rho$ should be a good approximation to the variation of $p$ with $\rho$).
+
+To supply these derivatives we compute the analytic free energy using forward-mode operator-overloaded automatic differentiation~\citep{2000JCoAM.124..171B}.
+Specifically, we define a numeric Fortran type \code{auto\_diff\_real\_2var\_order3} which contains a floating-point number as well as its first, second, and third partial derivatives with respect to two independent variables, temperature and density.
+For example, if \code{x} is of this type then it contains elements \code{x\%val} representing the value of \code{x}, \code{x\%d1val1} for the value of $\partial x/\partial T|_\rho$, \code{x\%d1val2} for $\partial x/\partial \rho|_T$, \code{x\%d1val1\_d1val2} for $\partial^2 x/\partial \rho \partial T$, and so on.
+
+This new numeric type overloads operators to implement the chain rule.
+So in the code a line such as \code{f = x * y} is overloaded to set
+\begin{align}
+	\code{f\%val} &= \code{x\%val * y\%val} \\
+	\code{f\%d1val1} &= \code{x\%d1val1 * y\%val + y\%d1val1 * x\%val} \\
+	\code{f\%d1val2} &= \code{x\%d1val2 * y\%val + y\%d1val2 * x\%val} 
+\end{align}
+and so on.
+These expressions rapidly become more complicated for higher-order derivatives, but the basic principle is the same.
+We generate the overloaded operators using a \code{Python} program which computes power series using \code{SymPy}~\citep{10.7717/peerj-cs.103} and extracts chain-rule expressions.
+These are then optimized to eliminate common sub-expressions and to minimize the number of division operators, and then translated into \code{Fortran}.
+All of this functionality is built on top of the CR-LIBM software package \citep{CR-LIBM}, which enables bit-for-bit identical results across all platforms.
+
+With this numeric type, modifying the \skye\ free energy is simple: translate analytic formulas into \code{Fortran}.
+Additional terms such as
+\begin{align}
+	\delta F = k \rho e^{T / \sqrt{\rho}} \rightarrow \code{k * rho * exp(T / sqrt(rho))}
+\end{align}
+can be written as-is, and all derivatives are provided automatically.
+
+We have developed further machinery to support derivatives with respect to a variable number of ion abundances, built using the parameterized derived type feature of  \code{Fortran} 2003.
+Unfortunately compiler support for this feature is lacking, and neither \code{gfortran} v10.2.0 nor \code{ifort} v19.0.1.144 fully implement it.
+Future \code{Fortran} compilers may implement this feature, at which point \skye\ will be able to provide derivatives with respect to composition in addition to the usual $\rho$ and $T$ derivatives.

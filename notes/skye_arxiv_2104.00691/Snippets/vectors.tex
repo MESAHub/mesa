@@ -1,0 +1,20 @@
+%=======================================================================
+%
+% vectors.tex---some basic vector operators
+%
+% Requires package bm.sty
+%
+%=======================================================================
+
+\RequirePackage{bm}
+%\RequirePackage{amssymb}
+%\RequirePackage{amsbsy}
+\newcommand{\bvec}[1]{\ensuremath{\boldsymbol{#1}}} %boldface vector style
+\newcommand{\grad}{\bvec{\nabla}} %gradient
+\newcommand{\divr}{\bvec{\nabla} \cdot} %divergence
+\newcommand{\curl}{\bvec{\nabla \times}} %curl
+\newcommand{\lap}{\ensuremath{\nabla^2}} %Laplacian
+\newcommand{\btens}[1]{\ensuremath{\boldsymbol{\mathsf{#1}}}}
+\newcommand{\vcross}{\bvec{\times}}
+\newcommand{\vdot}{\bvec{\cdot}}
+% end vectors.tex

@@ -348,7 +348,8 @@
     max_logT_for_opacity_factor_on, max_logT_for_opacity_factor_off, &
     non_nuc_neu_factor, &
     use_time_centered_eps_grav, &
-    use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
+    use_mass_corrections, include_eos_composition_partials, &
+    use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
     include_composition_in_eps_grav, no_dedt_form_during_relax, &
     max_abs_rel_change_surf_lnS, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
@@ -646,6 +647,35 @@
        write(*,'(A)')
        ierr = -1
        return
+    end if
+
+    if (s% job% implicit_diffusion_flag) then
+       if (s% job% implicit_diffusion_include_dsig_dxa) &
+          s% include_eos_composition_partials = .true.
+       if (s% use_other_brunt) then
+          write(*,'(A)')
+          write(*,*) "Invalid controls: implicit_diffusion_flag is not compatible " // &
+             "with use_other_brunt"
+          write(*,'(A)')
+          ierr = -1
+          return
+       end if
+       if (s% use_other_brunt_smoothing) then
+          write(*,'(A)')
+          write(*,*) "Invalid controls: implicit_diffusion_flag is not compatible " // &
+             "with use_other_brunt_smoothing"
+          write(*,'(A)')
+          ierr = -1
+          return
+       end if
+       if (s% use_other_mlt_results) then
+          write(*,'(A)')
+          write(*,*) "Invalid controls: implicit_diffusion_flag is not compatible " // &
+             "with use_other_mlt_results"
+          write(*,'(A)')
+          ierr = -1
+          return
+       end if
     end if
 
  end subroutine check_controls
@@ -1859,6 +1889,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
  s% dedt_eqn_r_scale = dedt_eqn_r_scale
  s% use_mass_corrections = use_mass_corrections
+ s% include_eos_composition_partials = include_eos_composition_partials
  s% use_gravity_rotation_correction = use_gravity_rotation_correction
  s% eps_grav_factor = eps_grav_factor
  s% eps_mdot_factor = eps_mdot_factor
@@ -3573,6 +3604,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
  dedt_eqn_r_scale = s% dedt_eqn_r_scale
  use_mass_corrections = s% use_mass_corrections
+ include_eos_composition_partials = s% include_eos_composition_partials
  use_gravity_rotation_correction = s% use_gravity_rotation_correction
  eps_grav_factor = s% eps_grav_factor
  eps_mdot_factor = s% eps_mdot_factor
