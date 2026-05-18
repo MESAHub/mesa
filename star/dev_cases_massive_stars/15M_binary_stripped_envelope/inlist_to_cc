@@ -21,8 +21,13 @@ save_model_filename                             = 'CC.mod'
 ! change_v_flag                                 = .true.
 ! new_v_flag                                    = .true.
 
+
 / ! end of star_job namelist
 
+&eos
+mass_fraction_limit_for_Skye                    = 1d-16
+
+/
 
 &controls
 
@@ -42,10 +47,10 @@ min_D_mix                                       = 1d-2
 ! 4d9 has been well tested with the approx21 network
 ! lower to 2.5d9 or worst case 1d9 for large networks to help with
 ! numerical stability and speed, see MESA VI (Jermyn 2023)
-op_split_burn                                   = .true.
-op_split_burn_min_T                             = 4d9
-burn_steps_limit                                = 150
-burn_steps_hard_limit                           = 250
+op_split_burn                                   = .false.
+! op_split_burn_min_T                             = 4d9
+! burn_steps_limit                                = 150
+! burn_steps_hard_limit                           = 250
 
 ! tightening either of the two controls below will substantially increase the runtime,
 ! but should improve the network accuracy.
@@ -152,24 +157,23 @@ min_q_for_k_const_mass                          = 0.98
 
 ! solver and Equations
 ! damped newton and structure only
-scale_max_correction                            = 0.1d0
-ignore_species_in_max_correction                = .true.
-
+! scale_max_correction                            = 0.1d0
+ignore_species_in_max_correction                = .false.
+fix_d_eos_dxa_partials                          = .false.
 
 xa_scale                                        = 1d-5
-iter_for_resid_tol2                             = 10
 
 use_gold_tolerances                             = .true.
-gold_tol_max_residual2                          = 5d-4
-!gold_tol_max_residual3                         = 1d-4 ! Default in controls is 1d-5
 tol_correction_high_T_limit                     = 1d9 ! Switch to lower tol at high temp for large Mass
 solver_iters_timestep_limit                     = 20
 gold_solver_iters_timestep_limit                = 20
-iter_for_resid_tol2                             = 10
 
-use_gold2_tolerances                            = .false.
-gold2_tol_max_residual2                         = 5d-7
-gold2_tol_max_residual3                         = 5d-4
+use_gold2_tolerances = .false.
+gold_iter_for_resid_tol3 = 10
+gold_tol_residual_norm3 = 1d-5
+gold_tol_max_residual3 = 1d-3
+
+
 
 !defaults
 when_to_stop_rtol                               = 1d-3
