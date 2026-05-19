@@ -4,6 +4,8 @@
 other_physics_hooks
 *******************
 
+.. tags:: star, eos, kap, rates, custom-physics-hooks, opacity, equation-of-state, stellar-winds, mesh-controls, timestep-controls, overshooting
+
 This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 |Msun|, Z=0.02 metallicity, model.
 It provides an example of how to include your own physics code into a MESA run.
 

@@ -4,6 +4,8 @@
 evolve_both_stars
 *****************
 
+.. tags:: binary, binary-evolution, dual-star-evolution, mass-transfer, roche-lobe-overflow, low-mass, main-sequence
+
 This test case checks the evolution of two stars simultaneously including mass transfer.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -277,4 +279,3 @@ pgstar commands used for the star2 plot above:
  / ! end of pgstar namelist
 
 Last-Updated: 11Jul2021 (MESA 094ff71) by fxt.
-

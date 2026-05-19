@@ -4,6 +4,8 @@
 jdot_ml_check
 *************
 
+.. tags:: binary, angular-momentum, orbital-angular-momentum, mass-loss, mass-transfer, roche-lobe-overflow, analytic-check, point-mass, low-mass
+
 This test case checks the evolution of one star plus a point mass, including mass transfer to the point mass.
 Using pre-specified efficiency options, verifies that the binary evolution, including mass transfer to the point mass,
 follows the analytical result of `Tauris & van den Heuvel (2006)
@@ -240,4 +242,3 @@ pgstar commands used for the binary and star1 plots above:
  / ! end of pgstar namelist
 
 Last-Updated: 12Jul2021 (MESA 094ff71) by fxt.
-

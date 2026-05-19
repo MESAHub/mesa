@@ -4,6 +4,8 @@
 16M_conv_premix
 ***************
 
+.. tags:: star, convective-premixing, convective-core, ledoux-criterion, massive-star, main-sequence
+
 This test suite example re-creates the 16-solar mass main-sequence
 evolution with the inclusion of convective premixing (using the Ledoux
 criterion), as detailed in Section 5.3 of the MESA V instrument paper

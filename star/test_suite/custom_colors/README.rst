@@ -4,6 +4,8 @@
 Colors
 ******
 
+.. tags:: star, colors
+
 This test suite case demonstrates the functionality of the MESA ``colors`` module.
 
 Running the Test Suite
@@ -530,5 +532,3 @@ This server provides a live view of:
 * All available filter facilities and instruments
 * File counts, disk usage, and metadata
 * Direct links to the directory structure used by MESA
-
-

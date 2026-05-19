@@ -4,6 +4,8 @@
 gyre_in_mesa_envelope
 *********************
 
+.. tags:: star, gyre, asteroseismology, p-mode, stellar-envelope, massive-star
+
 This test case checks the implementation of GYRE in MESA for the envelope of a 12 |Msun|, Z=0.02 metallicity, model.
 
 This test case has 4 parts.

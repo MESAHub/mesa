@@ -4,6 +4,8 @@
 hb_2M
 *****
 
+.. tags:: star, kap, horizontal-branch, helium-flash, core-helium-burning, type2-opacity, convective-core, breathing-pulses
+
 This test case shows a 2 solar mass stellar model evolving on the Horizontal Branch,
 from ZACHeB (Zero Age Core Helium Burning) to TACHeB (Terminal Age Core Helium Burning).
 The convective core boundary is determined using predictive mixing (see |MESA IV|).
@@ -265,4 +267,3 @@ Comparing results obtained with CPM and Predictive mixing
 =========================================================
 
 In the figure below we show the evolution of the convective core boundary and of the central helium abundance along the CHeB, using the CPM and the Predictive schemes.
-

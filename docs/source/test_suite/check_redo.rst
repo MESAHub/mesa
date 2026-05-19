@@ -1,0 +1,1 @@
+../../../star/test_suite/check_redo/README.rst

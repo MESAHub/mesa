@@ -4,6 +4,8 @@
 simplex_solar_calibration
 *************************
 
+.. tags:: star, optimization, simplex, solar-calibration, solar-model, helioseismology
+
 This test case exercises the simplex framework with a check of the chi^2 value for 1.0 |Msun|, Z=0.02 metallicity, solar model.
 
 This test case has 2 parts. Click to see a larger version of a plot.
