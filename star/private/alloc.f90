@@ -1086,6 +1086,28 @@
             if (failed('mlt_D_ad')) exit
             call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
             if (failed('mlt_Gamma_ad')) exit
+            call do1_logical(s% have_mlt_tdc_face_state, c% have_mlt_tdc_face_state)
+            if (failed('have_mlt_tdc_face_state')) exit
+            call do1_ad(s% mlt_tdc_T_face_ad, c% mlt_tdc_T_face_ad)
+            if (failed('mlt_tdc_T_face_ad')) exit
+            call do1_ad(s% mlt_tdc_rho_face_ad, c% mlt_tdc_rho_face_ad)
+            if (failed('mlt_tdc_rho_face_ad')) exit
+            call do1_ad(s% mlt_tdc_P_face_ad, c% mlt_tdc_P_face_ad)
+            if (failed('mlt_tdc_P_face_ad')) exit
+            call do1_ad(s% mlt_tdc_Cp_face_ad, c% mlt_tdc_Cp_face_ad)
+            if (failed('mlt_tdc_Cp_face_ad')) exit
+            call do1_ad(s% mlt_tdc_ChiRho_face_ad, c% mlt_tdc_ChiRho_face_ad)
+            if (failed('mlt_tdc_ChiRho_face_ad')) exit
+            call do1_ad(s% mlt_tdc_ChiT_face_ad, c% mlt_tdc_ChiT_face_ad)
+            if (failed('mlt_tdc_ChiT_face_ad')) exit
+            call do1_ad(s% mlt_tdc_grada_face_ad, c% mlt_tdc_grada_face_ad)
+            if (failed('mlt_tdc_grada_face_ad')) exit
+            call do1_ad(s% mlt_tdc_opacity_face_ad, c% mlt_tdc_opacity_face_ad)
+            if (failed('mlt_tdc_opacity_face_ad')) exit
+            call do1_ad(s% mlt_tdc_scale_height_face_ad, c% mlt_tdc_scale_height_face_ad)
+            if (failed('mlt_tdc_scale_height_face_ad')) exit
+            call do1_ad(s% mlt_tdc_gradr_face_ad, c% mlt_tdc_gradr_face_ad)
+            if (failed('mlt_tdc_gradr_face_ad')) exit
 
             call do1_ad(s% PII_ad, c% PII_ad)
             if (failed('PII_ad')) exit
@@ -1198,6 +1220,8 @@
             if (failed('Peos_start')) exit
             call do1(s% Peos_face_start, c% Peos_face_start)
             if (failed('Peos_face_start')) exit
+            call do1(s% mlt_tdc_P_face_start, c% mlt_tdc_P_face_start)
+            if (failed('mlt_tdc_P_face_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
             call do1(s% energy_start, c% energy_start)
