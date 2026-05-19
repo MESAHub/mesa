@@ -494,9 +494,9 @@ contains
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
                   if (alfa0 < 1d0) then
-                     Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
+                     Gamma_term = Gamma_term + scale_value2*(0.5d0*alfa0*alfa0)
                   else
-                     Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
+                     Gamma_term = Gamma_term + scale_value2*(alfa0-0.5d0)
                   end if
                   !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
