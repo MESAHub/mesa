@@ -2655,27 +2655,91 @@
 
       ! use_superad_reduction
       ! ~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_inv_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_diff_grads_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Implicit alternative to ``okay_to_reduce_gradT_excess``
+      ! Implicit alternative to ``okay_to_reduce_gradT_excess`` (MLT++).
+      ! When ``.true.``, throttles the radiative gradient ``gradr`` in
+      ! convective cells that either (a) carry a radiative luminosity
+      ! approaching the Eddington limit, or (b) sit in the density-
+      ! inversion regime (Joss--Salpeter--Ostriker). MLT/TDC is then
+      ! re-solved on the throttled ``gradr``, so the final ``gradT`` is
+      ! self-consistent with MLT for the reduced radiative input.
+      ! Acts on the *input* to MLT, not the output --- unlike MLT++.
 
       ! ::
 
       use_superad_reduction = .false.
+
+
+      ! superad_reduction_Gamma_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Radiative-Eddington trigger threshold:
+      ! ``Lrad/Ledd = (4 a T^4 / 3 P) * gradT``.
+      ! When this ratio exceeds ``Gamma_limit`` in a convective cell,
+      ! the Eddington-proximity contribution to the throttle activates.
+
+      ! ::
+
       superad_reduction_Gamma_limit = 0.5d0
+
+
+      ! superad_reduction_Gamma_limit_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Sensitivity of the throttle to ``Lrad/Ledd`` excess above
+      ! ``Gamma_limit``. The Eddington contribution to ``Gamma_factor``
+      ! grows quadratically (then linearly) with the fractional excess;
+      ! ``Gamma_limit_scale`` is the proportionality constant. Larger
+      ! values produce stronger throttling for a given excess.
+
+      ! ::
+
       superad_reduction_Gamma_limit_scale = 5d0
+
+
+      ! superad_reduction_Gamma_inv_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Sensitivity of the throttle to the density-inversion criterion
+      ! ``Lrad/Ledd > 4(1-beta)/(4-3 beta)``, where ``beta = Pgas/Ptot``.
+      ! Analogous to ``Gamma_limit_scale`` but for the inversion term.
+      ! Tune independently when inversion proximity dominates over
+      ! Eddington proximity (or vice versa).
+
+      ! ::
+
       superad_reduction_Gamma_inv_scale = 5d0
+
+
+      ! superad_reduction_diff_grads_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Superadiabaticity floor below which the throttle is silenced.
+      ! When ``gradT - gradL < diff_grads_limit``, the cell is treated
+      ! as essentially adiabatic and the throttle contribution drops
+      ! smoothly to zero (quintic smoothstep). Prevents the throttle
+      ! from amplifying numerical noise in nearly-adiabatic cells.
+
+      ! ::
+
       superad_reduction_diff_grads_limit = 1d-3
-      superad_reduction_limit = -1d0
+
+
+      ! superad_reduction_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Upper saturation cap on the throttle multiplier ``Gamma_factor``.
+      ! The raw ``Gamma_factor`` includes a ``1/sqrt(beta)`` boost that
+      ! can blow up in radiation-dominated cells; this control imposes
+      ! a logistic squash so ``Gamma_factor -> reduction_limit`` as the
+      ! raw value diverges. Set ``-1d0`` to disable the cap (legacy
+      ! behavior); finite values guard against the second MLT call
+      ! seeing ``gradr_scaled`` jumping all the way to ``gradL`` in a
+      ! single Newton iteration.
+
+      ! ::
+
+      superad_reduction_limit = 100d0
 
 
    ! overshooting
