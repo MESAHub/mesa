@@ -522,7 +522,7 @@
          end if
 
          write(*,*) 'Central He abundance:', s% center_he4
-         write(*,*) 'Central He abundance:', s% center_c12
+         write(*,*) 'Central C12 abundance:', s% center_c12
       
          ! if (s% center_he4 < 1d-3 .and. s% center_c12 < 1d-2) then
          !    s% need_to_save_profiles_now = .true.
