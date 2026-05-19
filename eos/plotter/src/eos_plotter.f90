@@ -4,6 +4,7 @@ program eos_plotter
    use eos_lib, only: eos_ptr, eosDT_get
    use chem_def
    use chem_lib
+   use const_def, only: crad, ln10
    use const_lib, only: const_init
    use math_lib
    use num_lib, only : dfridr
@@ -402,8 +403,8 @@ program eos_plotter
          end if
 
 
-         if (only_blend_regions .and. .not. in_eos_blend(res)) then
-            call set_nan(res1)
+         if (only_blend_regions) then
+            if (.not. in_eos_blend(res)) call set_nan(res1)
          end if
 
          write(iounit,*) kval, jval, res1

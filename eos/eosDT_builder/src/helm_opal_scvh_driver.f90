@@ -151,7 +151,7 @@ contains
       use helm
       use opal_scvh_driver
       use utils_lib, only: is_bad_num
-      use const_def, only: crad, ln10
+      use const_def, only: crad, kerg, amu
 
 !..logT and logRho are log10's of temp and den
       implicit none
@@ -371,6 +371,10 @@ contains
 
       subroutine check_results
          include 'formats'
+
+         ! Only reject non-finite or unphysical OPAL/SCVH support points.
+         ! Falling back to HELM for finite pressure-ionization structure
+         ! causes noisy mu features in regenerated tables.
          if (is_bad_num(logPgas_opalscvh) .or. is_bad_num(logE_opalscvh) .or. is_bad_num(logS_opalscvh) .or. &
              is_bad_num(chiRho_opalscvh) .or. is_bad_num(chiT_opalscvh) .or. is_bad_num(Cp_opalscvh) .or. &
              is_bad_num(Cv_opalscvh) .or. is_bad_num(dE_dRho_opalscvh) .or. is_bad_num(dS_dT_opalscvh) .or. &
@@ -378,7 +382,7 @@ contains
              is_bad_num(gamma1_opalscvh) .or. is_bad_num(gamma3_opalscvh) .or. is_bad_num(grad_ad_opalscvh) .or. &
              is_bad_num(eta_opalscvh) .or. Cv_opalscvh <= 0d0 .or. logPgas_opalscvh <= -50d0 .or. &
              logE_opalscvh <= -50d0 .or. logS_opalscvh <= -50d0 .or. logPgas_opalscvh <= -50d0 .or. &
-             gamma1_opalscvh <= 1d0 .or. gamma1_opalscvh >= 2d0 .or. grad_ad_opalscvh >= 50d0) then
+             gamma1_opalscvh <= 0d0) then
             ierr = -1
             !write(*,*) 'bail to HELM for logT logRho logQ', logT, logRho, logRho - 2*logT + 12
             if (.false.) then
@@ -414,19 +418,14 @@ contains
          call helmeos2(temp, logT, den, logRho, abar, zbar, 1d6, 1d3, &
                        helm_res, clip_to_table_boundaries, .true., include_elec_pos, off_table, ierr)
          if (ierr /= 0) then
-            write (*, *) 'failed in helmeos2'
-            write (*, 1) 'temp', temp
-            write (*, 1) 'logT', logT
-            write (*, 1) 'den', den
-            write (*, 1) 'logRho', logRho
-            write (*, 1) 'Z', Z
-            write (*, 1) 'X', X
-            write (*, 1) 'abar', abar
-            write (*, 1) 'zbar', zbar
-            write (*, *) 'clip_to_table_boundaries', clip_to_table_boundaries
-            write (*, *) 'include_radiation', include_radiation
-            write (*, *) 'stop in get_helmeos'
-            stop 1
+            call helmeos2(temp, logT, den, logRho, abar, zbar, 1d6, 1d3, &
+                          helm_res, clip_to_table_boundaries, .true., .false., off_table, ierr)
+         end if
+         if (ierr /= 0) then
+            ! Last resort for rectangular eosDT support points outside HELM coverage.
+            call get_ideal_helmeos(include_radiation)
+            ierr = 0
+            return
          end if
 
          logPgas_helm = log10(helm_res(h_pgas))
@@ -459,6 +458,63 @@ contains
          end if
 
       end subroutine get_helmeos
+
+      ! Used only when HELM cannot fill an eosDT support point.
+      subroutine get_ideal_helmeos(include_radiation)
+         logical, intent(in) :: include_radiation
+         double precision :: mu_ideal, Rgas, Pgas, Prad, P, egas, erad, ener, &
+            sgas, srad, entr, dpressdd, dpressdt, dedt, dedd, dsdt, dsdd, &
+            gamma3_minus1
+
+         mu_ideal = abar/(1d0 + zbar)
+         Rgas = kerg/(mu_ideal*amu)
+
+         Pgas = den*Rgas*temp
+         egas = 1.5d0*Rgas*temp
+         sgas = Rgas*(1.5d0*log(temp) - log(den) + 50d0)
+
+         Prad = 0d0
+         erad = 0d0
+         srad = 0d0
+         if (include_radiation) then
+            Prad = crad*temp**4/3d0
+            erad = 3d0*Prad/den
+            srad = 4d0*Prad/(den*temp)
+         end if
+
+         P = Pgas + Prad
+         ener = egas + erad
+         entr = sgas + srad
+
+         dpressdd = Rgas*temp
+         dpressdt = den*Rgas + 4d0*Prad/temp
+
+         dedt = 1.5d0*Rgas + 4d0*erad/temp
+         dedd = -erad/den
+
+         dsdt = 1.5d0*Rgas/temp + 3d0*srad/temp
+         dsdd = -(Rgas + srad)/den
+
+         logPgas_helm = log10(Pgas)
+         logE_helm = log10(ener)
+         logS_helm = log10(entr)
+
+         chiRho_helm = dpressdd*den/P
+         chiT_helm = dpressdt*temp/P
+         Cv_helm = dedt
+         Cp_helm = Cv_helm + P*chiT_helm**2/(den*temp*chiRho_helm)
+         gamma3_minus1 = dpressdt/(den*dedt)
+         gamma3_helm = 1d0 + gamma3_minus1
+         gamma1_helm = chiRho_helm + chiT_helm*gamma3_minus1
+         grad_ad_helm = gamma3_minus1/gamma1_helm
+         dE_dRho_helm = dedd
+         dS_dRho_helm = dsdd
+         dS_dT_helm = dsdt
+         logNe_helm = log10(max(1d-99, den*avo*zbar/abar))
+         mu_helm = mu_ideal
+         eta_helm = -20d0
+
+      end subroutine get_ideal_helmeos
 
    end subroutine helm_opal_scvh
 

@@ -32,7 +32,7 @@ program create_eosDT_files
    real(dp) :: logQ_min = -10.09d0, logQ_max = 5.69d0, logRho_min = -14d0
    real(dp) :: logT_max
 
-   integer, parameter :: version_number = 51 ! update this to force rebuilding of caches
+   integer, parameter :: version_number = 52 ! update this to force rebuilding of caches
    ! update min_version in eosDT_load_tables to force rebuild of data files
 
    integer :: ix, io_unit, ios, info, irad
@@ -97,7 +97,8 @@ contains
                        opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
 
       !opal_only = .true.
-      scvh_only = .true.
+      opal_scvh_only = .true.
+      scvh_only = .false.
 
       dir = 'data' ! where to put the new data files
       io_unit = 40
@@ -178,7 +179,7 @@ contains
                call do_stop('failed in helm_opal_scvh')
             end if
 
-            write (io_unit, '(f4.2,3(f10.5),7(1pe13.5),1(0pf9.5),4(0pf10.5),2(0pf11.5))') &
+            write (io_unit, '(f4.2,3(1x,f10.5),7(1x,1pe13.5),1x,0pf9.5,1x,f12.5,3(1x,1pe13.5),2(1x,0pf12.5))') &
                logT, logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, &
                log10(max(1d-99, free_e)), gamma1, gamma3, grad_ad, eta, HELM_fraction
          end do
