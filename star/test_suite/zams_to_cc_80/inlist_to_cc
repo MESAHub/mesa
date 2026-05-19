@@ -31,7 +31,7 @@ op_split_burn_min_T = 1d9
       set_min_D_mix = .true.
       min_D_mix = 1d-2
 
-      fe_core_infall_limit = 3d7
+      fe_core_infall_limit = 3d8
 
       ! limit max_model_number as part of test_suite
       max_model_number = 6000
