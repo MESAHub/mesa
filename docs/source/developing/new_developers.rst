@@ -37,17 +37,25 @@ Process:
 
 If after the minimum time has elapsed there are insufficient objections, then the new developer is approved.
 
-.. note::
-    With this process we are attempting to balance having a flexible procedure for bringing in new developers while providing an environment that all developers can work safely in. There may be reasons why someone does not want to share the reasons for vetoing someone. However we also want to balance the possibility for abuse of the system by allowing arbitrary vetoes, which may preclude people from certain groups. We are adopting this process through the calendar year 2023, and plan to evaluate and vote on whether to make it permanent at the beginning of 2024.
-
 Post Acceptance
 ---------------
 
 Assuming the new developer has been accepted, the nominator:
 
-* Makes sure the new developer agrees to the code of conduct and knows that discussions on dev channels should be considered private and may include work in progress and thus should not be shared.
-* Makes sure the new developer gets access to the infrastructure (github, slack, mesa-dev, testhub).
-* Acts as a mentor to the new developer, helping them to get used to the system and the way things are done. This includes making commits, merging PR's, and general development tasks.
+* Makes sure the new developer agrees to the code of conduct and knows that discussions on developer channels should be considered private and may include work in progress that should not be shared.
+* Makes sure the new developer gets access to the relevant infrastructure. This includes adding them to the MESAHub GitHub organization with permissions appropriate to their role, adding them to Slack and any relevant private channels, and arranging access to testhub.
+* Points the new developer to the existing documentation for development workflows and helps them learn the expected GitHub workflow, including branches, commits, pull requests, responding to review, use of the testing infrastructure, and, where appropriate, merge procedures.
+* Acts as the primary mentor for the new developer during onboarding and coordinates a backup mentor in case the nominator becomes unavailable during the onboarding period. The nominator should make time to answer questions and help the new developer become comfortable with day-to-day development tasks.
+* Remains involved in reviewing and guiding the new developer's contributions for an initial onboarding period of at least six months, so that the new developer receives the attention and mentorship needed to become a routine contributor to MESA.
+* Helps connect the new developer with other existing developers whose expertise or responsibilities are particularly relevant to the new developer's interests and planned areas of contribution.
+* As the new developer becomes established, discusses with them whether they would like to take on additional project maintenance responsibilities. Such responsibilities are optional and are not a required part of onboarding.
+
+The relevant onboarding contacts are:
+
+* Mentor and primary onboarding contact: the nominator
+* GitHub maintainer and contact for GitHub access: Matteo Cantiello
+* Slack maintainer and contact for Slack access: Rich Townsend
+* testhub maintainer and contact for testhub access: Bill Wolf
 
 Infrastructure Access for Collaborators
 ---------------------------------------
