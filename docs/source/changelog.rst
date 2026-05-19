@@ -30,6 +30,8 @@ New Features
 
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
+Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduction_trigger``, and one new history column, ``num_cells_with_superad_reduction``, expose what the ``use_superad_reduction`` throttle is doing per cell (which threshold fired and at what proximity to Eddington). The existing ``superad_reduction_factor`` profile column and ``max_superad_reduction_factor`` history column are unchanged. The new ``superad_reduction_trigger`` is an integer flag: 1 = Eddington proximity (``Lrad/Ledd > Gamma_limit``); 2 = density-inversion criterion (Joss et al. 1973, Paxton, Cantiello et al. 2013 eq. 17); 3 = both.
+
 .. _Bug Fixes main:
 
 Bug Fixes
@@ -44,6 +46,10 @@ The change in default Weinberg angle results in small numerical differences for 
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
+
+In ``set_superad_reduction`` (``star/private/turb_support.f90``) the density-inversion contribution to ``Gamma_term`` was being scaled by ``superad_reduction_Gamma_limit_scale`` instead of the intended ``superad_reduction_Gamma_inv_scale``, making the latter control silently inert. Restored to the as-published algorithm (Jermyn et al. 2023 eq. 64, ``alpha_2`` term). Existing test_suite cases that use ``superad_reduction`` all set ``Gamma_limit_scale = Gamma_inv_scale``, so they are bit-for-bit unaffected; the fix is observable only when the two scales are set to different values.
+
+The default value of ``superad_reduction_limit`` is changed from ``-1d0`` (uncapped) to ``100d0`` (logistic saturation at ``Gamma_factor ~= 100``). The cap was already documented as the recommended setting, but the shipped default disabled it. With the cap inactive, the raw ``1/sqrt(beta)`` boost in radiation-pressure-dominated cells can drive ``Gamma_factor`` arbitrarily large in a single Newton iteration. Existing test_suite cases that exercise ``superad_reduction`` all explicitly set this control to ``-1d0``, so they are bit-for-bit unaffected.
 
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
