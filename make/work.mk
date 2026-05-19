@@ -42,8 +42,12 @@ ifeq ($(NOCOMPILE),)
   include $(MAKE_DIR)/compile.mk
   include $(MAKE_DIR)/link-exec.mk
 
-  all: $(OBJ_OUT)
+  $(MODULE_NAME):
+	  ln -s $(OBJ_OUT) $(clean-comp $(MODULE_NAME))
+
+  all: $(OBJ_OUT) $(MODULE_NAME)
 endif
 
 clean:
 	@rm -rf $(BUILD_DIR_MODULE)
+	@rm -f $(MODULE_NAME)
