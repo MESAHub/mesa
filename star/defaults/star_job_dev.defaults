@@ -142,13 +142,28 @@
    implicit_diffusion_include_dsig_dxa = .false.
 
 
+      ! implicit_diffusion_use_brunt_finite_difference_value
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_use_brunt_finite_difference_value`` is true,
+      ! the implicit Brunt path uses the same finite two-composition EOS
+      ! pressure difference as the ordinary Brunt path for the stored Brunt
+      ! value.  The implicit derivatives still use the linearized face/path
+      ! EOS pressure-composition partials.  If false, the stored value also
+      ! uses the linearized EOS partial contraction.
+
+      ! ::
+
+   implicit_diffusion_use_brunt_finite_difference_value = .true.
+
+
       ! implicit_diffusion_use_brunt_gauss_path
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if ``implicit_diffusion_use_brunt_gauss_path`` is true, evaluate the
-      ! implicit Brunt pressure-composition contraction by a two-point Gauss
-      ! path average in composition. This costs two extra row-scoped face EOS
-      ! calls per face and is off by default.
+      ! implicit Brunt pressure-composition derivative coefficient by a
+      ! two-point Gauss path average in composition. This costs two extra
+      ! row-scoped face EOS calls per face and is off by default.
 
       ! ::
 

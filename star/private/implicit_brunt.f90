@@ -154,7 +154,8 @@
 
          integer :: j, species
          real(dp) :: alfa, beta, logRho_face, logT_face, Prad_face, Pgas_face, &
-            Peos_face, delta_lnP, dlnP_dm, Ppoint, dlnP_composition, delta_lnMbar
+            Peos_face, delta_lnP, dlnP_dm, Ppoint, dlnP_composition, &
+            dlnP_composition_val, delta_lnMbar, lnP1, lnP2
          real(dp) :: lambda, Pgas_path, Peos_path, chiX_path
          real(dp) :: delta_lnP_val, chiT_val, brunt_B_val, &
             ddelta_lnP_m1, ddelta_lnP_00, dchiT_m1, dchiT_00, &
@@ -165,7 +166,7 @@
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_eos_dlnd, d_eos_dlnT
          type(auto_diff_real_star_order1) :: &
-            brunt_B_ad, delta_lnP_ad, chiRho_ad, chiT_ad
+            brunt_B_ad, delta_lnP_ad, chiRho_ad, chiT_ad, dlnP_composition_ad
          logical :: used_hydro_delta_lnP
          real(dp), parameter :: gauss_offset = 0.28867513459481288225d0
          real(dp), parameter :: gauss_weight = 0.5d0
@@ -194,7 +195,15 @@
          end if
 
          dlnP_composition = 0d0
+         dlnP_composition_val = 0d0
          chiX_face(1:species) = 0d0
+         if (s% job% implicit_diffusion_use_brunt_finite_difference_value) then
+            call eval_lnPeos(s% xa(1:species,k), lnP1)
+            if (ierr /= 0) return
+            call eval_lnPeos(s% xa(1:species,k-1), lnP2)
+            if (ierr /= 0) return
+            dlnP_composition_val = lnP1 - lnP2
+         end if
 
          if (s% job% implicit_diffusion_use_brunt_gauss_path) then
             lambda = 0.5d0 - gauss_offset
@@ -281,7 +290,11 @@
 
          chiT_ad = get_ChiT_face(s,k)
          chiT_ad% val = res(i_chiT)
-         brunt_B_ad = dlnP_composition/(delta_lnP_ad*chiT_ad)
+         if (.not. s% job% implicit_diffusion_use_brunt_finite_difference_value) &
+            dlnP_composition_val = dlnP_composition
+         dlnP_composition_ad = dlnP_composition
+         dlnP_composition_ad% val = dlnP_composition_val
+         brunt_B_ad = dlnP_composition_ad/(delta_lnP_ad*chiT_ad)
 
          if (s% use_mass_corrections) then
             chiRho_ad = get_ChiRho_face(s,k)
@@ -344,6 +357,27 @@
                write(*,2) 'res(i_chiT)', k, res(i_chiT)
             end if
          end if
+
+         contains
+
+         subroutine eval_lnPeos(xa, lnPeos)
+            real(dp), intent(in) :: xa(:)
+            real(dp), intent(out) :: lnPeos
+
+            call basic_composition_info( &
+               species, s% chem_id, xa, X_tmp, Y_tmp, Z_tmp, &
+               abar_tmp, zbar_tmp, z2bar_tmp, z53bar_tmp, ye_tmp, &
+               mass_correction_tmp, sumx_tmp)
+            ! Match the ordinary Brunt value from the finite pressure
+            ! difference while keeping the implicit derivatives linearized.
+            call get_eos_brunt_dxa_with_moments( &
+               s, 0, xa, rho_face, logRho_face, T_face, logT_face, .false., &
+               X_tmp, Z_tmp, abar_tmp, zbar_tmp, z2bar_tmp, z53bar_tmp, ye_tmp, &
+               mass_correction_tmp, sumx_tmp, &
+               res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, ierr)
+            if (ierr /= 0) return
+            lnPeos = log(Prad_face + exp(res(i_lnPgas)))
+         end subroutine eval_lnPeos
 
       end subroutine get_implicit_brunt_B
 

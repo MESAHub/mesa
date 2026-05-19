@@ -413,7 +413,7 @@ contains
          if (gradL_composition_term% val < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, &
-                              gradL_composition_term% val, &
+                              gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
             if (ierr /= 0) then

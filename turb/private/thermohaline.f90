@@ -27,7 +27,7 @@ module thermohaline
    implicit none
 
    private
-   public :: get_D_thermohaline
+   public :: get_D_thermohaline, get_D_thermohaline_ad
 
 contains
 
@@ -59,6 +59,7 @@ contains
       integer, intent(out) :: ierr
       real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
       include 'formats'
+      ierr = 0
       dgrad = max(1d-40, grada - gradr)  ! positive since Schwarzschild stable
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho)  ! thermal conductivity
       if (thermohaline_option == 'Kippenhahn') then
@@ -90,6 +91,51 @@ contains
       end if
       D_thrm = thermohaline_coeff*D_thrm
    end subroutine get_D_thermohaline
+
+   subroutine get_D_thermohaline_ad(thermohaline_option, &
+                                    grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+                                    iso, XH1, thermohaline_coeff, D_thrm, ierr)
+      character(len=*), intent(in) :: thermohaline_option
+      type(auto_diff_real_star_order1), intent(in) :: &
+         grada, gradr, T, opacity, rho, Cp, gradL_composition_term
+      real(dp), intent(in) :: XH1, thermohaline_coeff
+      integer, intent(in) :: iso
+      type(auto_diff_real_star_order1), intent(out) :: D_thrm
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
+      include 'formats'
+      ierr = 0
+      dgrad = max(1d-40, grada - gradr)  ! positive since Schwarzschild stable
+      K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho)  ! thermal conductivity
+      if (thermohaline_option == 'Kippenhahn') then
+         ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
+         D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
+      else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. &
+               thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+         call get_diff_coeffs_ad(K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
+         R0 = (gradr - grada)/gradL_composition_term
+         Pr = nu/K_T
+         tau = K_mu/K_T
+         r_th = (R0 - 1d0)/(1d0/tau - 1d0)
+         if (r_th% val >= 1d0) then  ! stable if R0 >= 1/tau
+            D_thrm = 0d0
+         else if (Pr% val < 0d0) then
+            ! Bad results from get_diff_coeffs will just result in NaNs from thermohaline options, so skip
+            D_thrm = 0d0
+         else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11') then
+            ! Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
+            ! also see Denissenkov. ApJ 723:563-579, 2010.
+            D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th, 1.1d0)  ! eqn 24
+         else  ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+            D_thrm = K_mu*(Numu_ad(R0, r_th, pr, tau) - 1d0)
+         end if
+      else
+         D_thrm = 0
+         ierr = -1
+         write (*, *) 'unknown for MLT thermohaline_option'//trim(thermohaline_option)
+      end if
+      D_thrm = thermohaline_coeff*D_thrm
+   end subroutine get_D_thermohaline_ad
 
    subroutine get_diff_coeffs(K_therm, Cp, rho, T, opacity, iso, XH1, kt, kmu, vis)
       use chem_def, only: chem_isos
@@ -147,14 +193,120 @@ contains
 
    end subroutine get_diff_coeffs
 
+   subroutine get_diff_coeffs_ad(K_therm, Cp, rho, T, opacity, iso, XH1, kt, kmu, vis)
+      use chem_def, only: chem_isos
+      type(auto_diff_real_star_order1), intent(in) :: K_therm, Cp, rho, T, opacity
+      integer, intent(in) :: iso
+      real(dp), intent(in) :: XH1
+      type(auto_diff_real_star_order1), intent(out) :: kt, kmu, vis
+      type(auto_diff_real_star_order1) :: loglambdah, loglambdacx, loglambdacy, ccx, ccy, nu_mol, nu_rad
+      real(dp) :: Bcoeff, chemA, chemZ, acx, acy
+      real(dp), parameter :: sqrt5 = sqrt(5d0)
+      kt = K_therm/(Cp*rho)  ! thermal diffusivity (assumes radiatively dominated)
+
+      ! Log Lambda for pure H (equation 10 from Proffitt Michaud 93)
+      loglambdah = -19.26d0 - 0.5d0*log(rho) + 1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1 + XH1))
+      nu_rad = 4d0*crad*pow4(T)/(15d0*clight*opacity*pow2(rho))  ! radiative viscosity
+      nu_mol = 0.406d0*sqrt(amu)*pow(boltzm*T, 2.5d0)/(pow4(qe)*loglambdah*rho)
+      ! From Spitzer "Physics of Fully Ionized Gases equation 5-54
+      ! Assumes pure H. Still trying to work out what it would be for a mixture.
+      vis = nu_mol + nu_rad  ! total viscosity
+
+      ! The following is from Proffitt & Michaud, 1993.
+      ! Their constant B (equation 15)
+      Bcoeff = (15.d0/16.d0)*sqrt(2.d0*amu/(5*pi))*pow(boltzm, 2.5d0)/pow4(qe)
+      ! Extract what species drives the thermohaline concvection
+      chemA = chem_isos%Z_plus_N(iso)
+      chemZ = chem_isos%Z(iso)
+
+      if (chemZ > 2) then
+         ! This is if the driving chemical is NOT He.
+         ! Log Lambda for H-dominant chem mixture (equation 10)
+         loglambdacx = loglambdah - log(chemz)
+         ! Log Lambda for He-dominant chem mixture (equation 10)
+         loglambdacy = loglambdah - log(2.d0*chemz)
+         ! Calculation of C_ij coeffs (equation 12)
+         ccx = log(exp(1.2d0*loglambdacx) + 1.0d0)/1.2d0
+         ccy = log(exp(1.2d0*loglambdacy) + 1.0d0)/1.2d0
+         ! Reduced masses (I had to guess, from Bahcall & Loeb 1990), with H and He
+         acx = (1.d0*chemA)/(1.d0 + chemA)
+         acy = 4*chemA/(4.d0 + chemA)
+         ! My formula (see notes) based on Proffitt and Michaud 1993
+         kmu = 2*Bcoeff*pow(T, 2.5d0)/(sqrt5*rho*chemZ*chemZ)/ &
+               (XH1*sqrt(acx)*ccx + (1 - XH1)*sqrt(acy)*ccy)
+
+      else
+         ! Log Lambda for H-He mixture (equation 10)
+         loglambdah = -19.26d0 - log(2d0) - 0.5d0*log(rho) + &
+                      1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1 + XH1))
+         ! Calculation of C_ij coeffs (equation 12)
+         ccy = log(exp(1.2d0*loglambdah) + 1d0)/1.2d0
+         ! My formula (see notes) based on Proffitt and Michaud 1993
+         kmu = (Bcoeff*pow(T, 2.5d0)/(rho*ccy))*(3 + XH1)/((1 + XH1)*(3 + 5*XH1)*(0.7d0 + 0.3d0*XH1))
+
+      end if
+
+   end subroutine get_diff_coeffs_ad
+
    real(dp) function numu(R0, r_th, prandtl, diffratio)
       !Function calculates Nu_mu from input parameters, following Brown et al. 2013.
       !Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting.
 
       real(dp), intent(in) :: R0, r_th, prandtl, diffratio
-      real(dp) :: maxl2, maxl, lambdamax
+      real(dp) :: maxl2, lambdamax
+
+      call get_brown_l2_lambda(R0, r_th, prandtl, diffratio, maxl2, lambdamax)
+
+      !Calculate Nu_mu using Formula (33) from Brown et al, with C = 7.
+      numu = 1.d0 + 49.d0*lambdamax*lambdamax/(diffratio*maxl2*(lambdamax + diffratio*maxl2))
+
+   end function numu
+
+   function numu_ad(R0, r_th, prandtl, diffratio) result(numu_res)
+      ! Differentiates the Brown et al. Newton fit by implicit differentiation.
+
+      type(auto_diff_real_star_order1), intent(in) :: R0, r_th, prandtl, diffratio
+      type(auto_diff_real_star_order1) :: numu_res
+      type(auto_diff_real_star_order1) :: maxl, lambdamax, f1, f2
+      real(dp) :: maxl2, lambdamax_val, j(2,2), f_real(2), det, rhs1, rhs2
+      integer :: i
+      logical :: used_NR_solution
+
+      call get_brown_l2_lambda( &
+         R0%val, r_th%val, prandtl%val, diffratio%val, maxl2, lambdamax_val, used_NR_solution)
+      maxl = sqrt(max(0d0, maxl2))
+      lambdamax = lambdamax_val
+
+      if (used_NR_solution .and. maxl%val > 0d0) then
+         call thermohaline_rhs((/ maxl%val, lambdamax%val /), f_real, j, &
+            prandtl%val, diffratio%val, R0%val)
+         det = j(1,1)*j(2,2) - j(1,2)*j(2,1)
+         if (det /= 0d0 .and. .not. is_bad(det)) then
+            call thermohaline_rhs_ad(maxl, lambdamax, f1, f2, prandtl, diffratio, R0)
+            do i = 1, size(R0%d1Array)
+               rhs1 = -f1%d1Array(i)
+               rhs2 = -f2%d1Array(i)
+               maxl%d1Array(i) = (rhs1*j(2,2) - j(1,2)*rhs2)/det
+               lambdamax%d1Array(i) = (j(1,1)*rhs2 - rhs1*j(2,1))/det
+            end do
+         end if
+      end if
+
+      ! Formula (33) from Brown et al, with C = 7.
+      numu_res = 1.d0 + 49.d0*lambdamax*lambdamax/ &
+         (diffratio*pow2(maxl)*(lambdamax + diffratio*pow2(maxl)))
+
+   end function numu_ad
+
+   subroutine get_brown_l2_lambda(R0, r_th, prandtl, diffratio, maxl2, lambdamax, used_NR_solution)
+      real(dp), intent(in) :: R0, r_th, prandtl, diffratio
+      real(dp), intent(out) :: maxl2, lambdamax
+      logical, intent(out), optional :: used_NR_solution
+      real(dp) :: maxl
       real(dp) :: myvars(2)
       integer :: ierr, iter, max_iters
+
+      if (present(used_NR_solution)) used_NR_solution = .false.
 
       ! Initialize guess using estimates from Brown et al. 2013
       call analytical_estimate_th(maxl, lambdamax, r_th, prandtl, diffratio)
@@ -190,13 +342,11 @@ contains
          !Plug solution into "l^2" and lambda.
          maxl2 = myvars(1)*myvars(1)
          lambdamax = myvars(2)
+         if (present(used_NR_solution)) used_NR_solution = .true.
          !write(*,*) prandtl,diffratio,r_th,maxl2,lambdamax
       end if
 
-      !Calculate Nu_mu using Formula (33) from Brown et al, with C = 7.
-      numu = 1.d0 + 49.d0*lambdamax*lambdamax/(diffratio*maxl2*(lambdamax + diffratio*maxl2))
-
-   end function numu
+   end subroutine get_brown_l2_lambda
 
    subroutine thermohaline_rhs(myx, myf, myj, prandtl, diffratio, R0)
       ! This routine is needed for the NR solver.
@@ -237,6 +387,30 @@ contains
       myj(2, 2) = 2*b_2*myx(2) + b_1
 
    end subroutine thermohaline_rhs
+
+   subroutine thermohaline_rhs_ad(maxl, lambdamax, f1, f2, prandtl, diffratio, R0)
+      ! AD version of the Brown et al. equations with fixed l and lambda values.
+
+      type(auto_diff_real_star_order1), intent(in) :: maxl, lambdamax, prandtl, diffratio, R0
+      type(auto_diff_real_star_order1), intent(out) :: f1, f2
+      type(auto_diff_real_star_order1) :: a_2, a_1, a_0, b_2, b_1, b_0, myterm
+      type(auto_diff_real_star_order1) :: maxl2, maxl3, maxl4
+
+      b_2 = 1d0 + prandtl + diffratio
+      maxl2 = maxl*maxl
+      maxl3 = maxl2*maxl
+      maxl4 = maxl3*maxl
+      a_2 = maxl2*b_2
+      myterm = diffratio*prandtl + prandtl + diffratio
+      b_1 = 2*maxl2*myterm
+      a_1 = maxl4*myterm + prandtl*(1.0d0 - (1d0/R0))
+      b_0 = 3.d0*maxl4*diffratio*prandtl + prandtl*(diffratio - (1d0/R0))
+      a_0 = maxl4*maxl2*diffratio*prandtl + maxl2*prandtl*(diffratio - (1d0/R0))
+
+      f1 = ((lambdamax + a_2)*lambdamax + a_1)*lambdamax + a_0
+      f2 = b_2*lambdamax*lambdamax + b_1*lambdamax + b_0
+
+   end subroutine thermohaline_rhs_ad
 
    subroutine analytical_estimate_th(maxl, lambdamax, r_th, prandtl, diffratio)
       ! Inputs analytical estimates for l and lambda from Brown et al. 2013.

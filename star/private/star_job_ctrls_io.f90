@@ -318,6 +318,7 @@
          implicit_diffusion_flag, &
          implicit_diffusion_include_dsig_structure, &
          implicit_diffusion_include_dsig_dxa, &
+         implicit_diffusion_use_brunt_finite_difference_value, &
          implicit_diffusion_use_brunt_gauss_path, &
 
          change_u_flag, &
@@ -899,6 +900,8 @@
             implicit_diffusion_include_dsig_structure
          s% job% implicit_diffusion_include_dsig_dxa = &
             implicit_diffusion_include_dsig_dxa
+         s% job% implicit_diffusion_use_brunt_finite_difference_value = &
+            implicit_diffusion_use_brunt_finite_difference_value
          s% job% implicit_diffusion_use_brunt_gauss_path = &
             implicit_diffusion_use_brunt_gauss_path
          if (s% job% implicit_diffusion_flag .and. &
@@ -1451,6 +1454,8 @@
             s% job% implicit_diffusion_include_dsig_structure
          implicit_diffusion_include_dsig_dxa = &
             s% job% implicit_diffusion_include_dsig_dxa
+         implicit_diffusion_use_brunt_finite_difference_value = &
+            s% job% implicit_diffusion_use_brunt_finite_difference_value
          implicit_diffusion_use_brunt_gauss_path = &
             s% job% implicit_diffusion_use_brunt_gauss_path
 

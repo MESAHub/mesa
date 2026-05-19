@@ -379,23 +379,39 @@ blended potential.
 
 The implicit Brunt path lives in `star/private/implicit_brunt.f90`.
 
-With `implicit_diffusion_flag` and `use_Ledoux_criterion`, it computes the
-composition term from face EOS pressure-composition partials instead of from
-the old two-composition finite difference.
+With `implicit_diffusion_flag` and `use_Ledoux_criterion`, the stored Brunt
+value defaults to the same two-composition finite pressure difference as the
+ordinary Brunt path.  This keeps the sign seen by thermohaline activation on
+the same value definition with and without implicit diffusion.  Setting
+`implicit_diffusion_use_brunt_finite_difference_value = .false.` restores the
+earlier stored value from the linearized EOS-partial contraction.  The implicit
+Jacobian uses a linearized pressure-composition coefficient from face EOS
+partials in both modes.
 
-Schematically, the pressure-composition contribution is
+Schematically, the stored pressure-composition contribution is
 
 \[
-\sum_i
-\left.
-\frac{\partial\ln P_{\rm gas}}{\partial X_i}
-\right|_{\rho,T}
-\Delta X_i.
+\Delta\ln P_X^{\rm val}
+=
+\ln P_{\rm eos}(\rho_f,T_f,X_k)
+-
+\ln P_{\rm eos}(\rho_f,T_f,X_{k-1}).
 \]
 
+The AD derivative carrier is the linearized contraction
+\[
+\sum_i \chi_{X_i,f}\Delta X_i,
+\qquad
+\chi_{X_i,f}
+=
+\left.
+\frac{\partial\ln P_{\rm eos}}{\partial X_i}
+\right|_{\rho_f,T_f,X_f}.
+\]
 The face EOS pressure-composition coefficient is treated as a current-iterate
-coefficient.  Second derivatives of EOS composition partials are intentionally
-not part of this implementation slice.
+coefficient.  The optional Gauss path changes this derivative coefficient,
+not the stored Brunt value.  Second derivatives of EOS composition partials are
+intentionally not part of this implementation slice.
 
 When `use_Ledoux_criterion = .false.`, the implicit Brunt face EOS path is
 skipped and the composition term is kept zero.  This is both physically
@@ -416,14 +432,17 @@ semi-implicit coefficient held fixed through Newton iterations.
 
 Implicit component:
 
-- MLT/TDC convective mixing in cells whose post-cleanup `mixing_type` from the
-  last full `set_mixing_info` pass is convective;
-- semiconvection in cells whose post-cleanup `mixing_type` from the last full
-  `set_mixing_info` pass is semiconvective.
+- MLT/TDC convective mixing;
+- semiconvection;
+- thermohaline.
+
+For a full `set_mixing_info` pass, the promoted set is selected from the
+post-cleanup `mixing_type`.  For a solver iteration, the promoted set is
+selected from current `mlt_mixing_type` after `set_mlt_vars`; matching promoted
+`mixing_type` display flags are updated in the same path.
 
 Explicit or semi-implicit component:
 
-- thermohaline;
 - overshoot;
 - rotation;
 - minimum mixing;
@@ -432,9 +451,9 @@ Explicit or semi-implicit component:
 
 The isotope residual uses the usual fixed-coefficient implicit diffusion form.
 During a full `set_mixing_info` pass, `set_Dmix_components(s,.true.)` refreshes
-both pieces directly: promoted MLT/TDC cells use `mlt_D_ad` in
+both pieces directly: promoted MLT/TDC/thermohaline cells use `mlt_D_ad` in
 `Dmix_implicit`, and `Dmix_explicit` stores the non-implicit part of the current
-ordinary MESA coefficient.  If the MESA total is smaller than the local MLT/TDC
+ordinary MESA coefficient.  If the MESA total is smaller than the promoted local
 value, the promoted AD coefficient is scaled down so both stored components
 remain non-negative. The total coefficient is then rebuilt as
 `D_mix = Dmix_implicit%val + Dmix_explicit`, matching the full-pass MESA total.
@@ -442,21 +461,40 @@ remain non-negative. The total coefficient is then rebuilt as
 During Newton iterations, `set_Dmix_components(s,.false.)` keeps
 `Dmix_explicit` from the last full `set_mixing_info` pass fixed and refreshes
 only `Dmix_implicit`.  The promoted coefficient value and derivatives come
-from current `mlt_D_ad`, but the set of implicit zones follows the
-post-cleanup `mixing_type` from the last full mixing-info pass.  This prevents
-the solver refresh from re-opening zones that full MESA cleanup converted to
-minimum, overshoot, rotation, or no mixing.  The tradeoff is that a zone that
-becomes formally convective during a Newton iteration waits until the next full
-`set_mixing_info` pass before it can enter the implicit component.  The solver
-refreshes scalar `sig(:)` values every implicit Newton iteration; nonlinear
-coefficient Jacobian terms are gated:
+from current `mlt_D_ad`, and the solver-iteration promoted set follows current
+`mlt_mixing_type` for convection, semiconvection, and thermohaline.  The same
+path updates matching promoted `mixing_type` display flags, clears stale
+promoted flags when the current promoted coefficient is inactive, and refreshes
+`D_mix_non_rotation`.  Nonlocal full-pass edits such as overshoot, minimum
+mixing, user zeroing, and boundary cleanup remain in `Dmix_explicit` unless
+separately promoted.  The solver refreshes scalar `sig(:)` values every
+implicit Newton iteration; nonlinear coefficient Jacobian terms are gated:
 
 The sigma value always comes from total `D_mix`.  The optional sigma
 derivatives are built from `Dmix_implicit`, so the Jacobian only differentiates
 the promoted implicit component.
 
+For thermohaline, `turb:set_thermohaline` now passes the scalar AD Ledoux
+composition term into `thermohaline:get_D_thermohaline_ad`.  Kippenhahn and
+Traxler are evaluated in AD arithmetic.  Brown et al. keeps the real Newton
+solve for the fitted `(l,\lambda)` values and differentiates the converged fit
+by solving
+\[
+  J_{F,(l,\lambda)}
+  \begin{bmatrix}\partial l\\\partial \lambda\end{bmatrix}
+  =
+  -
+  \begin{bmatrix}\partial F_1\\\partial F_2\end{bmatrix}_{(l,\lambda)\ {\rm fixed}},
+\]
+then applies those derivatives to
+\[
+  \mathrm{Nu}_\mu =
+  1 + \frac{49\lambda^2}{\tau l^2(\lambda+\tau l^2)} .
+\]
+
 | Control | Default | Meaning |
 |---|---:|---|
+| `implicit_diffusion_use_brunt_finite_difference_value` | true | use ordinary finite two-composition pressure difference for the stored implicit Brunt value |
 | `implicit_diffusion_include_dsig_structure` | false | include structure derivatives of sigma |
 | `implicit_diffusion_include_dsig_dxa` | false | include high-gain cross-species sigma derivatives |
 
