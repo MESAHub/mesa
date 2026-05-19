@@ -1,0 +1,16 @@
+&star_job
+new_omega_div_omega_crit = 0.0d0
+/ ! end of star_job namelist
+&controls
+initial_mass = initmass !1.5d1
+
+! Added by Jared to increase hot, cool, and total wind by differebt scaling factors
+
+x_ctrl(10) = 1 ! cool wind scaling factor
+x_ctrl(11) = 1 ! hot wind scaling factor
+x_ctrl(12) = brottwindscale ! total wind scaling factor
+
+x_logical_ctrl(13) = .false. ! If true, shut off wind when total_mass_h1 < x_ctrl(13)*Msun
+x_ctrl(13) = -1 ! 0.01, 0.1, 1 ! Shut off wind when total_mass_h1 < x_ctrl(13)*Msun
+
+/ ! end of controls namelist

@@ -1,0 +1,55 @@
+&star_job
+
+
+! messages and info
+echo_at_start                                   = 'MESA model has begun running'
+echo_at_end                                     = 'MESA model has finished running'
+show_retry_counts_when_terminate                = .true.
+
+show_log_description_at_start                   = .false.
+show_timestep_limit_counts_when_terminate       = .true.
+save_model_when_terminate                       = .true.
+save_model_filename                             = 'model.dat'
+
+! initial model: we do not generate a pre_ms model here.
+load_saved_model                                = .false.
+
+! change initial Z but don't relax.
+change_initial_Z                                = .true.
+new_Z                                           = 0.0142d0
+
+! network
+change_net                                      = .true.
+change_initial_net                              = .true.
+new_net_name                                    = 'approx21_cr60_plus_co56.net' ! "approx21_plus_co56.net" ! "mesa_128.net" ! 'mesa_206.net'
+!dump_missing_metals_into_heaviest              = .true.
+
+! we want to use weaklib all the time, so we toggle at lowT.
+T9_weaklib_full_off                             = 0.0001d0
+T9_weaklib_full_on                              = 0.00011d0
+
+change_v_flag                                   = .true.
+new_v_flag                                      = .true.
+
+set_initial_age                                 = .true.
+initial_age                                     = 0
+
+set_initial_model_number                        = .true.
+initial_model_number                            = 0
+
+! rotation
+! change_rotation_flag                          = .true.
+! change_initial_rotation_flag                  = .true.
+! new_rotation_flag                             = .true.
+
+! set_omega_div_omega_crit                      = .true.
+! set_initial_omega_div_omega_crit              = .true.
+! new_omega_div_omega_crit                      = 0
+
+show_retry_counts_when_terminate                = .true.
+show_timestep_limit_counts_when_terminate       = .true.
+
+pgstar_flag                                     = .true.
+save_pgstar_files_when_terminate                = .true.
+
+/ ! end of star_job namelist
