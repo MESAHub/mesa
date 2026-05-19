@@ -51,6 +51,40 @@ module star_pgstar
          integer, intent(out) :: ierr
       end subroutine pgstar_decorator_interface
 
+      ! Example function to add squares and some text to the abundance plot
+      !      subroutine Abundance_pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+      !         use star_def
+      !         use const_def, only: dp
+      !         use pgstar_colors
+      !         integer, intent(in) :: id
+      !         !Not dp
+      !         real,intent(in) :: xmin, xmax, ymin, ymax
+      !         real :: xcenter,ycenter,dx,dy,a
+      !         integer, intent(out) :: ierr
+      !         integer :: i
+      !         type (star_info), pointer :: s
+
+      !         ierr = 0
+      !         call star_ptr(id, s, ierr)
+      !         if (ierr /= 0) return
+
+      !         dx=(xmax-xmin)
+      !         dy=(ymax-ymin)
+
+      !         xcenter=xmin+dx*0.5
+      !         ycenter=ymin+dy*0.5
+
+      !         call pgsci(clr_Coral)
+
+      !         do i=1,4
+      !            a=(i/10.0)
+      !            call pgline(5, (/xcenter-a*dx,xcenter-a*dx,xcenter+a*dx,xcenter+a*dx,xcenter-a*dx/),&
+      !                           (/ycenter-a*dy,ycenter+a*dy,ycenter+a*dy,ycenter-a*dy,ycenter-a*dy/))
+      !         end do
+
+      !         call pgptxt(xcenter,ycenter, 0.0, 1.0, 'Some added text on this plot')
+
+      !      end subroutine Abundance_pgstar_decorator
    end interface
 
    type pgstar_win_file_data
