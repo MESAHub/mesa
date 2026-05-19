@@ -402,7 +402,10 @@
       integer, parameter :: h_gradT_excess_max_lambda = h_gradT_excess_min_beta + 1
       integer, parameter :: h_gradT_excess_alpha = h_gradT_excess_max_lambda + 1
 
-      integer, parameter :: h_log_Ledd = h_gradT_excess_alpha + 1
+      integer, parameter :: h_max_superad_reduction_factor = h_gradT_excess_alpha + 1
+      integer, parameter :: h_num_cells_with_superad_reduction = h_max_superad_reduction_factor + 1
+
+      integer, parameter :: h_log_Ledd = h_num_cells_with_superad_reduction + 1
       integer, parameter :: h_compactness = h_log_Ledd + 1
       integer, parameter :: h_compactness_parameter = h_compactness + 1
       integer, parameter :: h_mu4 = h_compactness_parameter + 1
@@ -914,6 +917,9 @@
          history_column_name(h_gradT_excess_alpha) = 'gradT_excess_alpha'
          history_column_name(h_gradT_excess_min_beta) = 'gradT_excess_min_beta'
          history_column_name(h_gradT_excess_max_lambda) = 'gradT_excess_max_lambda'
+
+         history_column_name(h_max_superad_reduction_factor) = 'max_superad_reduction_factor'
+         history_column_name(h_num_cells_with_superad_reduction) = 'num_cells_with_superad_reduction'
 
          history_column_name(h_gamma1_min) = 'gamma1_min'
          history_column_name(h_logT_max) = 'logT_max'

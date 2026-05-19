@@ -1993,6 +1993,22 @@ contains
          case(h_gradT_excess_max_lambda)
             val = s% gradT_excess_max_lambda
 
+         case(h_max_superad_reduction_factor)
+            val = 1d0
+            if (s% use_superad_reduction) then
+               do k = 1, nz
+                  if (s% superad_reduction_factor(k) > val) val = s% superad_reduction_factor(k)
+               end do
+            end if
+         case(h_num_cells_with_superad_reduction)
+            int_val = 0
+            if (s% use_superad_reduction) then
+               do k = 1, nz
+                  if (s% superad_reduction_factor(k) > 1d0) int_val = int_val + 1
+               end do
+            end if
+            is_int_val = .true.
+
          case(h_max_L_rad_div_Ledd)
             do k = 1, nz
                tmp = get_Lrad_div_Ledd(s, k)
