@@ -2681,11 +2681,8 @@
    ! overshooting
    ! ____________
 
-      ! There are two schemes implemented in MESA to treat overshooting:
-      ! a step overshoot scheme and an exponential scheme.
-
-      ! Parameters for exponential diffusive overshoot are described in the paper by Falk Herwig,
-      ! "The evolution of AGB stars with convective overshoot", A&A, 360, 952-968 (2000).
+      ! There are three schemes implemented in MESA to treat overshooting:
+      ! a step overshoot, an exponential scheme, and the combination of both.
 
       ! Overshooting depends on the classification of the convective zone and can be different at the top and the bottom of the zone.
 
@@ -2699,7 +2696,7 @@
 
       ! ::
 
-    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``other``
+    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``step+exponential``, ``other``
     overshoot_zone_type(:) = '' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
     overshoot_zone_loc(:) = '' ! ``core``, ``shell``, ``any``
     overshoot_bdy_loc(:) = '' ! ``bottom``, ``top``, ``any``
@@ -2711,11 +2708,12 @@
       ! ::
 
     overshoot_f(:) = 0d0
+    overshoot_f2(:) = 0d0
     overshoot_f0(:) = 0d0
 
       ! The switch from convective mixing to overshooting happens at a distance f0*Hp into the convection zone
       ! from the estimated location where ``grad_ad = grad_rad``, where Hp is the pressure scale height at that location.
-      ! A value <= 0 for f0 is a mistake -- you are required to set f0 as well as f.
+      ! A value <= 0 for f0 is a mistake -- you are required to set f0 as well as f (and f2 if using step+exponential).
       ! take a look at the following from an email concerning this:
       ! Overshooting works by taking the diffusion mixing coefficient at the edge
       ! of the convection zone and extending it beyond the zone. But -- and here's the issue --
@@ -2735,6 +2733,13 @@
       ! where D_ob is the convective diffusivity at the bottom (top) of the step overshoot region for outward (inward) overshooting.
       ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
       ! ``star_data/public/star_data_def.inc`` (currently 16)
+
+      ! For exponential overshoot: Parameters for exponential diffusive overshoot are described in the paper by Falk Herwig,
+      ! "The evolution of AGB stars with convective overshoot", A&A, 360, 952-968 (2000).
+
+      ! If you use the 'step+exponential', the step is placed first, after which the exponential is placed. Note that the
+      ! parameterizations for both parts is still evaluated at the convective boundary (as described above), the exponential part
+      ! is just displaced by the extent of the step part.
 
       ! ::
 
@@ -2760,7 +2765,6 @@
       ! ::
 
     overshoot_mass_full_off(:) = 0d0
-
 
       ! overshoot_D_min
       ! ~~~~~~~~~~~~~~~
