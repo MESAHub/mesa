@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=40
+#SBATCH --mail-user=jgoldberg@flatironinstitute.org
+#SBATCH --mail-type=ALL
+#SBATCH -p cca
+#SBATCH -t 7-00:00:00 
+
+module load disBatch
+module load slurm 
+
+
+# source mesasdk and initialize MESA 15140
+#export MESASDK_ROOT=/mnt/home/jgoldberg/ceph/mesasdks/mesasdk-22.6.1/ # or your path to your MESASDK 
+#source $MESASDK_ROOT/bin/mesasdk_init.sh 
+
+# Set up your MESA environment variables 
+source ~/ceph/MESA/bashrcs/.bashrc-r24081
+export OMP_NUM_THREADS=40
+#export MESA_DIR=/mnt/home/jgoldberg/ceph/MESA/mesa-r23.05.1/
+
+# Clean and recompile MESA before running
+#./clean && ./mk 
+
+# Now, run many 
+./rn_many
