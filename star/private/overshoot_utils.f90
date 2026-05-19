@@ -216,13 +216,10 @@ contains
        if (s%overshoot_alpha > 0d0) then
           if (s%overshoot_alpha*Hp > dr) Hp = dr/s%overshoot_alpha
        else
-          if (s%alpha_mlt(k)*Hp > dr) Hp = dr/s%mixing_length_alpha
+          if (s%alpha_mlt(k)*Hp > dr) Hp = dr/s%alpha_mlt(k)
        end if
 
     end if
-
-    return
-
   end subroutine eval_conv_bdy_Hp
 
 
