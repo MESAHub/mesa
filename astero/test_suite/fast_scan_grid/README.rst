@@ -4,6 +4,8 @@
 fast_scan_grid
 **************
 
+.. tags:: astero, optimization, grid-search, synthetic-data, chi-squared, low-mass
+
 Runs first few steps of a grid search for some synthetic data.
 This test exists only to increase test coverage of the routines
 involved in a grid search (some of which is used by other

@@ -4,6 +4,8 @@
 7M_prems_to_AGB
 ***************
 
+.. tags:: star, intermediate-mass, low-metallicity, pre-main-sequence, agb, blue-loop, cepheid, instability-strip, core-helium-burning
+
 This test case checks that the evolution of a 7 |Msun|, metal-poor Z = 0.001, model reaches the AGB.
 
 This test case has two parts. Click to see a larger view of a plot.

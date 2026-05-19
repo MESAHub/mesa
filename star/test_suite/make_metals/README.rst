@@ -4,6 +4,8 @@
 make_metals
 ***********
 
+.. tags:: star, zero-metallicity, nucleosynthesis, triple-alpha, intermediate-mass, core-helium-burning
+
 This test case demonstrates the creation and evolution of 3 Msun model whose initial metallicity is Z = 0.
 
 This test case has 1 part. Click to see a larger version of a plot.
