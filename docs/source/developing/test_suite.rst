@@ -213,6 +213,20 @@ The description should be one sentence broadly describing what the
 case does and then one optional sentence about anything interesting
 illustrated by the case (e.g., other_hooks).
 
+Inventory helper
+^^^^^^^^^^^^^^^^
+
+The ``scripts/test_suite_inventory.py`` helper reports mismatches
+between active tests, test directories, test case ``README.rst`` files,
+rendered documentation links, and documentation tags.
+
+.. code-block:: sh
+
+  python3 scripts/test_suite_inventory.py
+
+This can be useful before opening a pull request that adds or migrates
+test suite documentation.
+
 MESA Test Hub
 -------------
 

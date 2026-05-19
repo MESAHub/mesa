@@ -4,6 +4,8 @@
 rsp_Cepheid
 ***********
 
+.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, cepheid, classical-cepheid
+
 This test case checks the non-linear pulsation evolution of a 4.165 |Msun|, Teff = 6050 K, L = 1438.8 Lsun, Z = 0.007 metallicity model - a classical Cepheid variable similar to CEP-227 shown in |Pilecki2013|.
 
 This test case has 1 part. Click to see a larger version of a plot.

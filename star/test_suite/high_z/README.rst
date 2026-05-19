@@ -4,6 +4,8 @@
 high_z
 ******
 
+.. tags:: star, high-metallicity, intermediate-mass, pre-main-sequence, core-helium-burning
+
 This test case checks the capability of evolving high metallicity models through core helium depletion with a 7 |Msun|, Z=0.07 metallicity model.
 
 This test case has 2 parts. Click to see a larger version of a plot.

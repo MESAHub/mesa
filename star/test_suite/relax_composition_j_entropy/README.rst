@@ -5,6 +5,8 @@
 relax_composition_j_entropy
 ***************************
 
+.. tags:: star, relaxation, composition, angular-momentum, entropy, rotation, core-helium-burning
+
 This test calls the routines that relax the composition, angular
 momentum and energy of a model to given target values.
 
