@@ -116,7 +116,7 @@
 
 
 ! solver controls
-  convergence_ignore_equL_residuals = .true.
+  convergence_ignore_equL_residuals = .false.
 
 
 ! output controls

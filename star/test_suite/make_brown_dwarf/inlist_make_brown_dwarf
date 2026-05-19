@@ -33,7 +33,7 @@
 &controls
 
    mlt_make_surface_no_mixing = .false.
-   convergence_ignore_equL_residuals = .true.
+   convergence_ignore_equL_residuals = .false.
    make_gradr_sticky_in_solver_iters = .true.
    use_gold2_tolerances = .true.
 

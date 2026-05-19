@@ -65,7 +65,7 @@
    hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
    warning_limit_for_max_residual = 1d99
-   convergence_ignore_equL_residuals = .true.
+   convergence_ignore_equL_residuals = .false.
 
 
    mass_change_full_on_dt = 1d-6 ! (seconds)

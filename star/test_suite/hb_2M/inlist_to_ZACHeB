@@ -37,7 +37,7 @@
       use_gold2_tolerances = .true.
 
       energy_eqn_option = 'dedt'
-      convergence_ignore_equL_residuals = .true. ! needed during flash
+      convergence_ignore_equL_residuals = .false. ! needed during flash
      
       initial_mass = 2
       initial_z = 0.02d0

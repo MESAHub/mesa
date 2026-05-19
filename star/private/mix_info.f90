@@ -1652,7 +1652,6 @@
             if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% D_DSI_factor) okay = .false.
             if (am_nu_SH_factor >= 0 .and. am_nu_SH_factor /= s% D_SH_factor) okay = .false.
             if (am_nu_SSI_factor >= 0 .and. am_nu_SSI_factor /= s% D_SSI_factor) okay = .false.
-            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% D_DSI_factor) okay = .false.
             if (am_nu_ES_factor >= 0 .and. am_nu_ES_factor /= s% D_ES_factor) okay = .false.
             if (am_nu_GSF_factor >= 0 .and. am_nu_GSF_factor /= s% D_GSF_factor) okay = .false.
             if (am_nu_ST_factor >= 0 .and. am_nu_ST_factor /= s% D_ST_factor) okay = .false.
