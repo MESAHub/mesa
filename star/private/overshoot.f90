@@ -25,6 +25,7 @@ module overshoot
   use overshoot_utils
   use overshoot_exp
   use overshoot_step
+  use overshoot_step_exp
 
   implicit none
 
@@ -170,6 +171,8 @@ contains
           ! using the appropriate scheme-dependent routine
 
           select case (s%overshoot_scheme(j))
+          case ('step+exponential')
+             call eval_overshoot_step_exp(s, i, j, k_a, k_b, D, vc, ierr)
           case ('exponential')
              call eval_overshoot_exp(s, i, j, k_a, k_b, D, vc, ierr)
           case ('step')

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2026  The MESA Team
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU Lesser General Public License
@@ -17,7 +17,7 @@
 !
 ! ***********************************************************************
 
-module overshoot_step
+module overshoot_step_exp
 
   use star_private_def
   use overshoot_utils
@@ -25,11 +25,11 @@ module overshoot_step
   implicit none
 
   private
-  public :: eval_overshoot_step
+  public :: eval_overshoot_step_exp
 
 contains
 
-  subroutine eval_overshoot_step (s, i, j, k_a, k_b, D, vc, ierr)
+  subroutine eval_overshoot_step_exp (s, i, j, k_a, k_b, D, vc, ierr)
 
     type(star_info), pointer :: s
     integer, intent(in)      :: i
@@ -40,7 +40,7 @@ contains
     real(dp), intent(out)    :: vc(:)
     integer, intent(out)     :: ierr
 
-    real(dp) :: f
+    real(dp) :: f, f2
     real(dp) :: f0
     real(dp) :: D0
     real(dp) :: Delta0
@@ -60,19 +60,20 @@ contains
     ! Evaluate the overshoot diffusion coefficient D(k_a:k_b) and
     ! mixing velocity vc(k_a:k_b) at the i'th convective boundary,
     ! using the j'th set of overshoot parameters. The overshoot
-    ! follows a simple step scheme
+    ! follows a simple step scheme, plus an exponential drop off on top of that
 
     ierr = 0
 
     ! Extract parameters
-    f = s% overshoot_f(j)
     f0 = s% overshoot_f0(j)
+    f = s% overshoot_f(j)  ! step distance
+    f2 = s% overshoot_f2(j)  ! exponential distance (on top of the step)
 
     D0 = s% overshoot_D0(j)
     Delta0 = s% overshoot_Delta0(j)
 
-    if (f <= 0._dp .OR. f0 <= 0._dp) then
-       write(*,*) 'ERROR: for step overshooting, must set f and f0 > 0'
+    if (f <= 0._dp .OR. f0 <= 0._dp .OR. f2 <= 0._dp) then
+       write(*,*) 'ERROR: for step+exp overshooting, must set f, f2 and f0 > 0'
        write(*,*) 'see description of overshooting in star/defaults/control.defaults'
        ierr = -1
        return
@@ -100,7 +101,10 @@ contains
     call eval_over_bdy_params(s, i, f0, k_ob, r_ob, D_ob, vc_ob, ierr)
     if (ierr /= 0) return
 
+    ! Loop over cell faces, adding overshoot until D <= overshoot_D_min
+
     outward = s% top_conv_bdy(i)
+
     if (outward) then
        k_a = k_ob
        k_b = 1
@@ -111,32 +115,34 @@ contains
        dk = 1
     end if
 
-    ! Loop over cell faces, adding overshoot until D <= overshoot_D_min
     face_loop : do k = k_a, k_b, dk
 
+       ! Evaluate the step factor
+
        r = s% r(k)
+
        if (outward) then
           dr = r - r_ob
        else
           dr = r_ob - r
        end if
 
-       ! Evaluate the overshoot factor
        if (dr < f*Hp_cb) then
           factor = 1._dp
        else
-          factor = 0._dp
+          factor = exp(-2._dp*(dr - f*Hp_cb)/(f2*Hp_cb))  ! displace the exp by the step length
        end if
 
        ! Store the diffusion coefficient and velocity
+
        D(k) = (D0 + Delta0*D_ob)*factor
        if(D_ob /= 0d0) then
           vc(k) = (D0/D_ob + Delta0)*vc_ob*factor
        else
           vc(k) = 0d0
        end if
-       
        ! Check for early overshoot completion
+
        if (D(k) < s% overshoot_D_min) then
           k_b = k
           exit face_loop
@@ -144,6 +150,8 @@ contains
 
     end do face_loop
 
-  end subroutine eval_overshoot_step
+    ierr = 0
 
-end module overshoot_step
+  end subroutine eval_overshoot_step_exp
+
+end module overshoot_step_exp
