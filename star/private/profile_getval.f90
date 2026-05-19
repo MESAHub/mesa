@@ -499,6 +499,11 @@
 
             case (p_superad_reduction_factor)
                val = s% superad_reduction_factor(k)
+            case (p_superad_reduction_Lrad_div_Ledd)
+               val = s% superad_reduction_Lrad_div_Ledd(k)
+            case (p_superad_reduction_trigger)
+               int_val = s% superad_reduction_trigger(k)
+               int_flag = .true.
             case (p_gradT_excess_effect)
                val = s% gradT_excess_effect(k)
             case (p_diff_grads)

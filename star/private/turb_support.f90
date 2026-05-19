@@ -287,7 +287,11 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
-      if (k /= 0) s% superad_reduction_factor(k) = 1d0
+      if (k /= 0) then
+         s% superad_reduction_factor(k) = 1d0
+         s% superad_reduction_Lrad_div_Ledd(k) = 0d0
+         s% superad_reduction_trigger(k) = 0
+      end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -465,6 +469,11 @@ contains
          Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
          Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
 
+         if (k /= 0) then
+            s% superad_reduction_Lrad_div_Ledd(k) = Lrad_div_Ledd% val
+            s% superad_reduction_trigger(k) = 0
+         end if
+
          Gamma_factor = 1d0
          if (gradT > gradL) then
             if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
@@ -483,6 +492,7 @@ contains
                !   Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                !end if
                if (Lrad_div_Ledd > Gamma_limit) then
+                  if (k /= 0) s% superad_reduction_trigger(k) = s% superad_reduction_trigger(k) + 1
                   alfa0 = Lrad_div_Ledd/Gamma_limit-1d0
                   if (alfa0 < 1d0) then
                      Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
@@ -492,6 +502,7 @@ contains
                   !Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
                end if
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
+                  if (k /= 0) s% superad_reduction_trigger(k) = s% superad_reduction_trigger(k) + 2
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
                   if (alfa0 < 1d0) then
                      Gamma_term = Gamma_term + scale_value2*(0.5d0*alfa0*alfa0)

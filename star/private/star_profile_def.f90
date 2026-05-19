@@ -72,7 +72,9 @@
       integer, parameter :: p_vel_km_per_s = p_v_kms + 1
       integer, parameter :: p_log_abs_v = p_vel_km_per_s + 1
       integer, parameter :: p_superad_reduction_factor = p_log_abs_v + 1
-      integer, parameter :: p_gradT_excess_effect = p_superad_reduction_factor + 1
+      integer, parameter :: p_superad_reduction_Lrad_div_Ledd = p_superad_reduction_factor + 1
+      integer, parameter :: p_superad_reduction_trigger = p_superad_reduction_Lrad_div_Ledd + 1
+      integer, parameter :: p_gradT_excess_effect = p_superad_reduction_trigger + 1
       integer, parameter :: p_log_diff_grads = p_gradT_excess_effect + 1
       integer, parameter :: p_diff_grads = p_log_diff_grads + 1
 
@@ -773,6 +775,8 @@
          profile_column_name(p_diff_grads) = 'diff_grads'
          profile_column_name(p_gradT_excess_effect) = 'gradT_excess_effect'
          profile_column_name(p_superad_reduction_factor) = 'superad_reduction_factor'
+         profile_column_name(p_superad_reduction_Lrad_div_Ledd) = 'superad_reduction_Lrad_div_Ledd'
+         profile_column_name(p_superad_reduction_trigger) = 'superad_reduction_trigger'
 
          profile_column_name(p_v) = 'v'
          profile_column_name(p_velocity) = 'velocity'
