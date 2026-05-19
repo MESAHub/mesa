@@ -511,6 +511,8 @@
    !dvc_dt_TDC_div_g ! dimensionless ratio of convective velocity to g
 
    !superad_reduction_factor ! gamma_factor from superad_reduction
+   !superad_reduction_Lrad_div_Ledd ! local Lrad/Ledd used by superad_reduction (0 if inactive)
+   !superad_reduction_trigger ! 0=untouched, 1=Eddington, 2=density-inversion, 3=both
    !conv_vel_div_mlt_vc ! conv_vel from any convection model (including RSP) / mlt_vc, for comparison 
 
    !log_Lconv

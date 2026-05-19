@@ -935,6 +935,10 @@
       !max_L_rad_div_Ledd
       !max_L_rad_div_Ledd_div_phi_Joss
 
+   !## superad_reduction
+      !max_superad_reduction_factor ! peak Gamma_factor over the star (1 = no reduction)
+      !num_cells_with_superad_reduction ! count of cells where Gamma_factor > 1
+
 
    !## RTI
       !rti_regions <num>

@@ -776,6 +776,10 @@
             if (failed('gradT_excess_effect')) exit
             call do1(s% superad_reduction_factor, c% superad_reduction_factor)
             if (failed('superad_reduction_factor')) exit
+            call do1(s% superad_reduction_Lrad_div_Ledd, c% superad_reduction_Lrad_div_Ledd)
+            if (failed('superad_reduction_Lrad_div_Ledd')) exit
+            call do1_integer(s% superad_reduction_trigger, c% superad_reduction_trigger)
+            if (failed('superad_reduction_trigger')) exit
 
             call do1(s% domega_dlnR, c% domega_dlnR)
             if (failed('domega_dlnR')) exit

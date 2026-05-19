@@ -355,6 +355,19 @@
       real(dp), pointer :: superad_reduction_factor(:) ! only set when use_superad_reduction = .true.
          ! reports effect of superad_reduction.  value = 1d0 for no effect.
 
+      real(dp), pointer :: superad_reduction_Lrad_div_Ledd(:)
+         ! only set when use_superad_reduction = .true.
+         ! reports Lrad/Ledd = (4 a T^4 / 3 P) * gradT, computed from the
+         ! first-pass (unthrottled) gradT inside set_superad_reduction.
+         ! Diagnostic only; not used by the solver.
+
+      integer, pointer :: superad_reduction_trigger(:)
+         ! only set when use_superad_reduction = .true.
+         ! 0 = throttle inactive in this cell.
+         ! 1 = activated by Eddington threshold (Lrad/Ledd > Gamma_limit).
+         ! 2 = activated by density-inversion threshold only.
+         ! 3 = both triggers active.
+
       ! mixing length alpha for MLT (can be set by user and can vary within model)
       real(dp), pointer :: alpha_mlt(:)
 
