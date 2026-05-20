@@ -84,8 +84,8 @@ contains
       real :: a1, a2, e, x1max, x2max, xmax
       integer, pointer :: ipar(:) ! (lipar)
       real(dp), pointer :: rpar(:) ! (lrpar)
-      real(dp), dimension(num_points) :: cosp
-      real(dp) :: q, q_in, this_psi, xl1, psi_RL
+      real(dp), dimension(num_points) :: cost, sint
+      real(dp) :: q, q_in, this_psi, xl1, psi_RL, left_bracket, right_bracket, first_guess
       
       include 'formats'
 
@@ -99,24 +99,27 @@ contains
       call show_title_pgbinary(b, title)
       call pgunsa
 
-      a1 = 1 / (1 + b% m(1) / b% m(2))
-      a2 = 1 / (1 + b% m(2) / b% m(1))
+      q = b% m(2) / b% m(1)
+      q_in = 1d0 / q  ! flip q for other star
+      a1 = 1 / (1 + q_in)
+      a2 = 1 / (1 + q)
       e = b% eccentricity
 
       !$OMP PARALLEL DO PRIVATE(i) SCHEDULE(dynamic,2)
       do i = 1, num_points
          thetas(i) = (i - 0.5) * pi / num_points
-         cosp(i) = cos(thetas(i))
-         r1s(i) = a1 * (1 - e**2) / (1 + e * cos(thetas(i)))
+         cost(i) = cos(thetas(i))
+         sint(i) = sin(thetas(i))
+         r1s(i) = a1 * (1 - e**2) / (1 + e * cost(i))
          r2s(i) = a2 / a1 * r1s(i)
 
-         x1s(i) = -r1s(i) * cos(thetas(i))  ! minus to flip orbit
+         x1s(i) = -r1s(i) * cost(i)  ! minus to flip orbit to left side
          x1s(2 * num_points - i + 1) = x1s(i)
-         y1s(i) = -r1s(i) * sin(thetas(i))
+         y1s(i) = -r1s(i) * sint(i)
          y1s(2 * num_points - i + 1) = -y1s(i)  ! flip y for other side of orbit
-         x2s(i) = r2s(i) * cos(thetas(i))
+         x2s(i) = r2s(i) * cost(i)
          x2s(2 * num_points - i + 1) = x2s(i)
-         y2s(i) = r2s(i) * sin(thetas(i))
+         y2s(i) = r2s(i) * sint(i)
          y2s(2 * num_points - i + 1) = -y2s(i)
       end do
       !$OMP END PARALLEL DO
@@ -129,8 +132,11 @@ contains
       x2max = maxval(abs(x2s))
       xmax = max(x1max, x2max)
 
-      q = b% m(2) / b% m(1)
-      q_in = 1d0 / q  ! flip q for other star
+      left_bracket = 1d-3
+      right_bracket = 1d0 - 1d-3
+      first_guess = 1d-2
+
+
       allocate(rpar(3))
 
       if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
@@ -138,20 +144,22 @@ contains
          xl1 = xl1_fit(q)
          rpar(1) = psi_RL
          rpar(3) = q
+
          do i = 1, num_points
-            rpar(2) = cosp(i)
-            rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-               1d-3, 1d0 - 1d-3, & ! left, right bracket
-               roche(1d-3, cosp(i), q) - psi_RL, roche(1d0 - 1d-3, cosp(i), q) - psi_RL, & ! f(left, right bracket)
-               25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
+            rpar(2) = cost(i)
+            rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
+               left_bracket, right_bracket, & ! left, right bracket
+               roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
+               25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
                0, rpar, 0, ipar, & ! func_params
                ierr)
-            x1s_RL(i) = rs(i) * cosp(i)
-            y1s_RL(i) = rs(i) * sin(thetas(i))
+            x1s_RL(i) = rs(i) * cost(i)
+            y1s_RL(i) = rs(i) * sint(i)
             x1s_RL(i) = x1s_RL(i) - a1 * (1 - e)  ! displace xs
             x1s_RL(2 * num_points - i + 1) = x1s_RL(i)  ! fill out lower lobe
             y1s_RL(2 * num_points - i + 1) = -y1s_RL(i) ! flip y for lower lobe
          end do
+
          x1s_RL(2 * num_points + 1) = x1s_RL(1)  ! close contour
          y1s_RL(2 * num_points + 1) = y1s_RL(1)
 
@@ -159,16 +167,17 @@ contains
          xl1 = xl1_fit(q_in)
          rpar(1) = psi_RL
          rpar(3) = q_in
+
          do i = 1, num_points
-            rpar(2) = cosp(i)
-            rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-               1d-3, 1d0 - 1d-3, & ! left, right bracket
-               roche(1d-3, cosp(i), q) - psi_RL, roche(1d0 - 1d-3, cosp(i), q) - psi_RL, & ! f(left, right bracket)
-               25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
+            rpar(2) = cost(i)
+            rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
+               left_bracket, right_bracket, & ! left, right bracket
+               roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
+               25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
                0, rpar, 0, ipar, & ! func_params
                ierr)
-            x2s_RL(i) = rs(i) * cosp(i)
-            y2s_RL(i) = rs(i) * sin(thetas(i))
+            x2s_RL(i) = rs(i) * cost(i)
+            y2s_RL(i) = rs(i) * sint(i)
             x2s_RL(i) = -(x2s_RL(i) - a2 * (1 - e))  ! displace xs
             x2s_RL(2 * num_points - i + 1) = x2s_RL(i)  ! fill out lower lobe
             y2s_RL(2 * num_points - i + 1) = -y2s_RL(i) ! flip y for lower lobe
@@ -186,15 +195,15 @@ contains
             rpar(1) = this_psi
             rpar(3) = q
             do i=1, num_points
-               rpar(2) = cosp(i)
-               rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-                  1d-3, 1d0 - 1d-3, & ! left, right bracket
-                  roche(1d-3, cosp(i), q) - this_psi, roche(1d0 - 1d-3, cosp(i), q) - this_psi, & ! f(left, right bracket)
-                  25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
+               rpar(2) = cost(i)
+               rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
+                  left_bracket, right_bracket, & ! left, right bracket
+                  roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
+                  25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
                   0, rpar, 0, ipar, & ! func_params
                   ierr)
-               x1s_star(i) = rs(i) * cosp(i)
-               y1s_star(i) = rs(i) * sin(thetas(i))
+               x1s_star(i) = rs(i) * cost(i)
+               y1s_star(i) = rs(i) * sint(i)
             end do
 
             imax = 1  ! find highest i at which x was badly rooted
@@ -226,28 +235,28 @@ contains
          xmax = max(x1max, xmax)
 
          if (b% point_mass_i /= 2) then
-            this_psi = Psi_fit(b% r(2) / b% separation, q)
+            this_psi = Psi_fit(b% r(2) / b% separation, q_in)
             rpar(1) = this_psi
             rpar(3) = q_in
             do i = 1, num_points
-               rpar(2) = cosp(i)
-               rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-                  1d-3, 1d0 - 1d-3, & ! left, right bracket
-                  roche(1d-3, cosp(i), q) - this_psi, roche(1d0 - 1d-3, cosp(i), q) - this_psi, & ! f(left, right bracket)
-                  25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
+               rpar(2) = cost(i)
+               rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
+                  left_bracket, right_bracket, & ! left, right bracket
+                  roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
+                  25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
                   0, rpar, 0, ipar, & ! func_params
                   ierr)
-               x2s_star(i) = rs(i) * cosp(i)
-               y2s_star(i) = rs(i) * sin(thetas(i))
+               x2s_star(i) = rs(i) * cost(i)
+               y2s_star(i) = rs(i) * sint(i)
             end do
 
             imax = 1
-            do i = 1, num_points  ! find highest i at whihc x was badly rooted
+            do i = 1, num_points  ! find highest i at which x was badly rooted
                if (x2s_star(i) >= xl1) then
                   imax = i
                end if
             end do
-
+!
             do i = 1, num_points
                if (i <= imax .and. x2s_star(i) > xl1) then
                   x2s_star(i) = xl1  ! fix bad xs
@@ -324,7 +333,7 @@ contains
       end if
       if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
          call pgsave
-         call pgslw(int(2.0 * b% pg% pgbinary_lw / 3.0))
+         call pgslw(int(1.0 * b% pg% pgbinary_lw / 3.0))
          call pgline(2 * num_points + 1, x1s_RL, y1s_RL)
          call pgline(2 * num_points + 1, x2s_RL, y2s_RL)
          call pgunsa
