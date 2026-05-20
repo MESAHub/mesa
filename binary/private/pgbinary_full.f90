@@ -778,7 +778,7 @@ contains
 
       integer :: i
       integer(8) :: time0, time1, clock_rate
-      logical :: pause, fexists
+      logical :: pause_now, fexists
 
       include 'formats'
 
@@ -798,10 +798,10 @@ contains
       ! update pgstar data if stars present
       if (b% have_star_1) call update_pgstar_history_file(b% s1, ierr)
       if (b% have_star_2) call update_pgstar_history_file(b% s2, ierr)
-      pause = b% pg% pause
-      if ((.not. pause) .and. b% pg% pause_interval > 0) &
-         pause = (mod(b% model_number, b% pg% pause_interval) == 0)
-      if (pause) then
+      pause_now = b% pg% pause_pgbinary
+      if ((.not. pause_now) .and. b% pg% pause_interval > 0) &
+         pause_now = (mod(b% model_number, b% pg% pause_interval) == 0)
+      if (pause_now) then
          write(*, *)
          write(*, *) 'model_number', b% model_number
          write(*, *) 'pgbinary: paused -- hit RETURN to continue'

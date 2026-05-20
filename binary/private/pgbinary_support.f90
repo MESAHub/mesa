@@ -86,6 +86,7 @@ contains
    subroutine init_pgbinary(ierr)
       use pgstar_support, only : init_pgstar
       integer, intent(out) :: ierr
+      type (binary_info) :: b
 
       call init_pgstar(ierr)
 
@@ -93,9 +94,6 @@ contains
          write(*, *) 'failed to init pgstar, required for pgbinary'
          return
       end if
-
-      b% pg% star_1_color = clr_Goldenrod
-      b% pg% star_2_color = clr_LightSkyBlue
 
       have_initialized_pgbinary = .true.
    end subroutine init_pgbinary

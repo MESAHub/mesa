@@ -26,14 +26,14 @@
    pgbinary_interval = 1
 
 
-      ! pause_flag
-      ! ~~~~~~~~~~
+      ! pause_pgbinary
+      ! ~~~~~~~~~~~~~~
 
       ! if true, then after refresh windows, wait for user to hit RETURN
 
       ! ::
 
-   pause_flag = .false.
+   pause_pgbinary = .false.
 
 
       ! pause_interval
@@ -3752,13 +3752,13 @@ Star_History_track9_file_aspect_ratio = -1
    Orbit_ybot = 0.1
    Orbit_ytop = 0.9
    Orbit_title = 'Orbit'
-   Orbit_txt_scale_factor = 1.0
+   Orbit_txt_scale = 1.0
 
       ! show the star sizes
 
       ! ::
 
-   Orbit show_RL = .true.
+   Orbit_show_RL = .true.
    Orbit_show_stars = .true.
 
       ! file output

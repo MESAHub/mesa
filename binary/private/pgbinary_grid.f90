@@ -528,7 +528,7 @@ contains
          case ('orbit')
             call do_orbit_plot(&
                b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Orbit_title, &
-               Grid_txt_scale_factor(i) * b% pg% Orbit_txt_scale_factor, ierr)
+               Grid_txt_scale_factor(i) * b% pg% Orbit_txt_scale, ierr)
          case default
             ! check for "other" plot
             found_it = .false.

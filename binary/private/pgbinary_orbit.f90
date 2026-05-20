@@ -41,7 +41,7 @@ contains
       call do_Orbit_plot(b, id, device_id, &
          b% pg% Orbit_xleft, b% pg% Orbit_xright, &
          b% pg% Orbit_ybot, b% pg% Orbit_ytop, .false., &
-         b% pg% Orbit_title, b% pg% Orbit_txt_scale_factor, ierr)
+         b% pg% Orbit_title, b% pg% Orbit_txt_scale, ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Orbit_plot
@@ -353,7 +353,7 @@ contains
          ! dimensionless volume equivalent radius (== r / separation of the model), with limit at 5%
          real(dp), intent(in) :: r_eq, qq
          real(dp) :: r_here
-         if (req <= 0.05) then
+         if (r_eq <= 0.05) then
             r_here = 0.05
          else
             r_here = r_eq
