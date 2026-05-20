@@ -135,7 +135,7 @@ contains
        else
           vc(k) = 0d0
        end if
-       
+
        ! Check for early overshoot completion
        if (D(k) < s% overshoot_D_min) then
           k_b = k
