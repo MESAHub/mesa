@@ -221,6 +221,8 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
+      real(dp) :: vc_old_local
+      type(auto_diff_real_star_order1) :: tau_conv, f_turnover
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       logical ::  test_partials, using_TDC, have_Y_face_guess
@@ -519,6 +521,20 @@ contains
                      lambda_limit = 2d0/(reduction_limit-1d0)
                      exp_limit = exp(-lambda_limit*(Gamma_factor-1d0))
                      Gamma_factor = 2d0*(reduction_limit-1d0)*(1d0/(1d0+exp_limit)-0.5d0)+1d0
+                  end if
+                  ! Convective-turnover-time limiter: smoothly suppress the throttle
+                  ! when dt < tau_conv = scale_height / mlt_vc_old. Uses the
+                  ! previous-step converged vc (real(dp), no autoDiff partials)
+                  ! and the step's dt, both frozen as parameters w.r.t. the
+                  ! inner Newton solve. f_turnover -> 1 as dt/tau_conv -> infty
+                  ! (current behavior); f_turnover -> 0 as dt/tau_conv -> 0
+                  ! (throttle off). Opt-in via superad_reduction_use_turnover_limit.
+                  if (s% superad_reduction_use_turnover_limit .and. &
+                      Gamma_factor > 1d0 .and. k > 0) then
+                     vc_old_local = max(s% mlt_vc_old(k), 1d-30)
+                     tau_conv = scale_height / vc_old_local
+                     f_turnover = 1d0 - exp(-s% dt / tau_conv)
+                     Gamma_factor = 1d0 + f_turnover * (Gamma_factor - 1d0)
                   end if
                end if
             end if

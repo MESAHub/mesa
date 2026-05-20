@@ -32,6 +32,8 @@ MESA no longer stops when reactions for which special rates are set are not in t
 
 Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduction_trigger``, and one new history column, ``num_cells_with_superad_reduction``, expose what the ``use_superad_reduction`` throttle is doing per cell (which threshold fired and at what proximity to Eddington). The existing ``superad_reduction_factor`` profile column and ``max_superad_reduction_factor`` history column are unchanged. The new ``superad_reduction_trigger`` is an integer flag: 1 = Eddington proximity (``Lrad/Ledd > Gamma_limit``); 2 = density-inversion criterion (Joss et al. 1973, Paxton, Cantiello et al. 2013 eq. 17); 3 = both.
 
+Opt-in convective-turnover-time limiter for ``use_superad_reduction``: when the new control ``superad_reduction_use_turnover_limit`` is set to ``.true.``, the throttle excess ``(Gamma_factor - 1)`` is multiplied by ``f_tau = 1 - exp(-dt / tau_conv)``, where ``tau_conv = scale_height(k) / mlt_vc_old(k)`` is the local convective turnover time built from the previous-step converged convective velocity. The limiter recovers the current behavior when ``dt >> tau_conv`` and smoothly suppresses the throttle when ``dt << tau_conv`` (where the implicit-step throttle would be acting faster than convection itself can respond). Default ``.false.``; bit-for-bit unchanged on every shipped test_suite case.
+
 .. _Bug Fixes main:
 
 Bug Fixes

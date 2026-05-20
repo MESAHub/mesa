@@ -2742,6 +2742,41 @@
       superad_reduction_limit = 100d0
 
 
+      ! superad_reduction_use_turnover_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Optional convective-turnover-time limiter for the throttle.
+      ! When ``.true.``, multiplies the throttle excess
+      ! ``(Gamma_factor - 1)`` by
+      !
+      ! ``f_tau = 1 - exp(-dt / tau_conv)``
+      !
+      ! where ``tau_conv = scale_height(k) / mlt_vc_old(k)`` is the
+      ! local convective turnover time computed from the previous
+      ! step's converged convective velocity. This reflects the
+      ! physical constraint that convection cannot redistribute the
+      ! radiative input on timescales shorter than its own turnover
+      ! time --- so when the global time step ``dt`` is much shorter
+      ! than ``tau_conv`` the throttle should not act at full strength.
+      !
+      ! - ``dt >> tau_conv``: ``f_tau -> 1``, current behavior recovered.
+      ! - ``dt << tau_conv``: ``f_tau -> 0``, throttle smoothly off.
+      !
+      ! ``mlt_vc_old`` is used (rather than the current iterate) so
+      ! that ``tau_conv`` is a frozen parameter w.r.t. the inner
+      ! Newton solve: the auto-diff Jacobian remains clean. When the
+      ! cell was radiative in the previous step
+      ! (``mlt_vc_old = 0``), ``f_tau -> 0`` and the throttle is off
+      ! for this step.
+      !
+      ! Default ``.false.``: the limiter block is skipped and the
+      ! routine behaves exactly as it does without this control.
+
+      ! ::
+
+      superad_reduction_use_turnover_limit = .false.
+
+
    ! overshooting
    ! ____________
 
