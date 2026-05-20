@@ -94,6 +94,9 @@ contains
          return
       end if
 
+      b% pg% star_1_color = clr_Goldenrod
+      b% pg% star_2_color = clr_LightSkyBlue
+
       have_initialized_pgbinary = .true.
    end subroutine init_pgbinary
 
@@ -239,7 +242,7 @@ contains
    end subroutine open_device
 
 
-   integer function count_binary_hist_points(b, step_min, step_max) result(numpts)
+   integer function count_hist_points(b, step_min, step_max) result(numpts)
       type (binary_info), pointer :: b
       integer, intent(in) :: step_min, step_max
       type (pgbinary_hist_node), pointer :: pg
@@ -252,7 +255,7 @@ contains
          if (pg% step <= step_max .or. step_max <= 0) numpts = numpts + 1
          pg => pg% next
       end do
-   end function count_binary_hist_points
+   end function count_hist_points
 
 
    logical function get1_hist_yvec(b, step_min, step_max, n, name, vec)
@@ -317,7 +320,7 @@ contains
    end subroutine set_hist_points_steps
 
 
-   integer function get_binary_hist_index(b, spec) result(index)
+   integer function get_hist_index(b, spec) result(index)
       type (binary_info), pointer :: b
       integer, intent(in) :: spec
       integer :: i, num
@@ -330,10 +333,10 @@ contains
          end if
       end do
       index = -1
-   end function get_binary_hist_index
+   end function get_hist_index
 
 
-   subroutine get_binary_hist_points(&
+   subroutine get_hist_points(&
       b, step_min, step_max, numpts, index, vec)
       type (binary_info), pointer :: b
       integer, intent(in) :: step_min, step_max, numpts, index
@@ -360,7 +363,7 @@ contains
          end if
          pg => pg% next
       end do
-   end subroutine get_binary_hist_points
+   end subroutine get_hist_points
 
 
    subroutine show_annotations(b, show_annotation1, show_annotation2, show_annotation3)
