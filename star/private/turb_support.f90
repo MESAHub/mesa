@@ -529,8 +529,12 @@ contains
                   ! inner Newton solve. f_turnover -> 1 as dt/tau_conv -> infty
                   ! (current behavior); f_turnover -> 0 as dt/tau_conv -> 0
                   ! (throttle off). Opt-in via superad_reduction_use_turnover_limit.
+                  ! Skip until previous-step mlt_vc has been populated, otherwise
+                  ! s% mlt_vc_old is unassociated and dereferencing it segfaults.
                   if (s% superad_reduction_use_turnover_limit .and. &
-                      Gamma_factor > 1d0 .and. k > 0) then
+                      Gamma_factor > 1d0 .and. k > 0 .and. &
+                      s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
+                      s% dt > 0d0) then
                      vc_old_local = max(s% mlt_vc_old(k), 1d-30)
                      tau_conv = scale_height / vc_old_local
                      f_turnover = 1d0 - exp(-s% dt / tau_conv)
