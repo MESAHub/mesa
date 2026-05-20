@@ -221,7 +221,7 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      real(dp) :: vc_old_local
+      real(dp) :: vc_old_local, vc_old_floor
       type(auto_diff_real_star_order1) :: tau_conv, f_turnover
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
@@ -535,7 +535,13 @@ contains
                       Gamma_factor > 1d0 .and. k > 0 .and. &
                       s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
                       s% dt > 0d0) then
-                     vc_old_local = max(s% mlt_vc_old(k), 1d-30)
+                     ! Optional floor on mlt_vc_old at a fraction of the local
+                     ! face sound speed. Prevents tau_conv from blowing up in
+                     ! slow-convection iron-bump cells where f_turnover would
+                     ! otherwise drop to ~0 and leave the throttle off.
+                     vc_old_floor = s% superad_reduction_turnover_vc_floor_frac &
+                                    * s% csound_face(k)
+                     vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
                      tau_conv = scale_height / vc_old_local
                      f_turnover = 1d0 - exp(-s% dt / tau_conv)
                      Gamma_factor = 1d0 + f_turnover * (Gamma_factor - 1d0)

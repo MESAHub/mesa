@@ -2776,6 +2776,38 @@
 
       superad_reduction_use_turnover_limit = .false.
 
+      ! superad_reduction_turnover_vc_floor_frac
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Fractional floor on mlt_vc_old, expressed as a fraction of the
+      ! local face sound speed csound_face(k), used only when
+      ! superad_reduction_use_turnover_limit = .true.
+      !
+      ! The turnover-time limiter uses
+      !   tau_conv(k) = scale_height(k) / mlt_vc_old(k)
+      ! to gauge whether convection has had time to respond to a step.
+      ! Slow-convection cells (e.g., the surface iron-bump zone) have
+      ! tiny mlt_vc_old, hence huge tau_conv, hence f_tau -> 0 and the
+      ! throttle is suppressed there even when the rest of the star is
+      ! evolving normally. That can leave radiation-pressure inversions
+      ! unsmoothed and make the Newton solve hard.
+      !
+      ! Setting this control to a small positive value floors
+      ! mlt_vc_old at frac * csound_face(k) before computing tau_conv.
+      ! Physical interpretation: even in nominally radiative cells
+      ! perturbations cannot propagate slower than ~ acoustic speed, so
+      ! tau_conv cannot meaningfully exceed scale_height / (frac * cs).
+      ! Numerically this prevents f_tau from dropping arbitrarily close
+      ! to zero in the slow-convection cells most prone to retries.
+      !
+      ! Default 0d0 disables the floor (current behavior). Reasonable
+      ! starting value: 1d-3 (cap tau_conv at ~ scale_height / (1e-3 cs)
+      ! = ~ 1000 sound-crossing times of the scale height).
+
+      ! ::
+
+      superad_reduction_turnover_vc_floor_frac = 0d0
+
 
    ! overshooting
    ! ____________
