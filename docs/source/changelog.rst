@@ -34,6 +34,8 @@ Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduc
 
 Opt-in convective-turnover-time limiter for ``use_superad_reduction``: when the new control ``superad_reduction_use_turnover_limit`` is set to ``.true.``, the throttle excess ``(Gamma_factor - 1)`` is multiplied by ``f_tau = 1 - exp(-dt / tau_conv)``, where ``tau_conv = scale_height(k) / mlt_vc_old(k)`` is the local convective turnover time built from the previous-step converged convective velocity. The limiter recovers the current behavior when ``dt >> tau_conv`` and smoothly suppresses the throttle when ``dt << tau_conv`` (where the implicit-step throttle would be acting faster than convection itself can respond). Default ``.false.``; bit-for-bit unchanged on every shipped test_suite case.
 
+Companion control to the turnover-time limiter: ``superad_reduction_turnover_vc_floor_frac`` (real, default ``0d0``). When set to a small positive value, floors ``mlt_vc_old(k)`` at ``frac * csound_face(k)`` before computing ``tau_conv``. This prevents ``f_tau`` from collapsing to ~0 in slow-convection iron-bump cells where the bare limiter would fully suppress the throttle and re-expose the radiation-pressure inversions to the Newton solver. With ``frac = 1d-3`` the floor restores baseline-quality numerics through the post-He burning crunch (60 M_sun benchmark: 15 retries through fe_core_infall, matching the limiter-off baseline's 14 retries; the bare limiter accumulates ~780 retries in the same window). Default ``0d0`` disables the floor and recovers the bare-limiter behavior exactly.
+
 .. _Bug Fixes main:
 
 Bug Fixes
