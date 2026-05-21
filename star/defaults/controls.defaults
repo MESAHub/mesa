@@ -2659,8 +2659,8 @@
       ! Implicit alternative to ``okay_to_reduce_gradT_excess`` (MLT++).
       ! When ``.true.``, throttles the radiative gradient ``gradr`` in
       ! convective cells that either (a) carry a radiative luminosity
-      ! approaching the Eddington limit, or (b) sit in the density-
-      ! inversion regime (Joss--Salpeter--Ostriker). MLT/TDC is then
+      ! approaching the Eddington limit, or (b) sit in the
+      ! density-inversion regime (Joss--Salpeter--Ostriker). MLT/TDC is then
       ! re-solved on the throttled ``gradr``, so the final ``gradT`` is
       ! self-consistent with MLT for the reduced radiative input.
       ! Acts on the *input* to MLT, not the output --- unlike MLT++.
