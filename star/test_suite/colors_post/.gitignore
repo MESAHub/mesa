@@ -1,0 +1,14 @@
+# build products
+build/
+make/*.o
+make/*.mod
+colors_post_proc
+
+# runtime/output products
+LOGS/
+post_proc_output.data
+.mesa_temp_cache/
+
+# misc
+*.o
+*.mod
