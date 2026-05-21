@@ -58,6 +58,20 @@
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
 
+            ! Smooth-relaxation limiter for use_superad_reduction needs
+            ! the previous step's converged Gamma_factor. Mirror the
+            ! mlt_vc -> mlt_vc_old pattern. Always call copy_to_old here
+            ! (regardless of use_superad_reduction) so the _old array gets
+            ! allocated on the first step and check_sizes does not trip on a
+            ! null pointer downstream. The have_superad_reduction_factor flag
+            ! gates whether the limiter actually consumes the snapshot.
+            if (associated(s% superad_reduction_factor)) then
+               call copy_to_old(s% superad_reduction_factor, &
+                                s% superad_reduction_factor_old, ierr)
+               if (ierr /= 0) return
+               if (s% use_superad_reduction) s% have_superad_reduction_factor = .true.
+            end if
+
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
             if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)

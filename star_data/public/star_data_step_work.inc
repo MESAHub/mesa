@@ -570,7 +570,14 @@
 
          real(dp), pointer, dimension(:,:) :: xh_old, xa_old
          real(dp), pointer, dimension(:) :: &
-            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old
+            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old, &
+            superad_reduction_factor_old
+            ! superad_reduction_factor_old: previous step's converged
+            ! Gamma_factor (= 1 when no throttle was active). Used by the
+            ! turnover-time limiter to relax Gamma_factor smoothly toward
+            ! the new instantaneous target rather than snapping it back to 1
+            ! when dt collapses below tau_conv (which would cause an
+            ! unphysical HRD jump). Companion to mlt_vc_old.
          real(dp) :: time_old, dt_old, mstar_old, xmstar_old, mstar_dot_old, &
             M_center_old, v_center_old, R_center_old, L_center_old
          integer :: nz_old, model_number_old
@@ -906,7 +913,11 @@
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
-            okay_to_set_mlt_vc, have_mlt_vc
+            okay_to_set_mlt_vc, have_mlt_vc, &
+            have_superad_reduction_factor   ! true once a step has set
+                                            ! superad_reduction_factor and we've
+                                            ! copied it into _old (consumed by
+                                            ! the smooth-relaxation limiter)
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

@@ -221,7 +221,7 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      real(dp) :: vc_old_local, vc_old_floor
+      real(dp) :: vc_old_local, vc_old_floor, Gamma_factor_old_local
       type(auto_diff_real_star_order1) :: tau_conv, f_turnover
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
@@ -522,29 +522,54 @@ contains
                      exp_limit = exp(-lambda_limit*(Gamma_factor-1d0))
                      Gamma_factor = 2d0*(reduction_limit-1d0)*(1d0/(1d0+exp_limit)-0.5d0)+1d0
                   end if
-                  ! Convective-turnover-time limiter: smoothly suppress the throttle
-                  ! when dt < tau_conv = scale_height / mlt_vc_old. Uses the
-                  ! previous-step converged vc (real(dp), no autoDiff partials)
-                  ! and the step's dt, both frozen as parameters w.r.t. the
-                  ! inner Newton solve. f_turnover -> 1 as dt/tau_conv -> infty
-                  ! (current behavior); f_turnover -> 0 as dt/tau_conv -> 0
-                  ! (throttle off). Opt-in via superad_reduction_use_turnover_limit.
-                  ! Skip until previous-step mlt_vc has been populated, otherwise
-                  ! s% mlt_vc_old is unassociated and dereferencing it segfaults.
+                  ! Convective-turnover-time limiter: relax Gamma_factor toward
+                  ! its instantaneous (unlimited) value over the local
+                  ! turnover time tau_conv = scale_height / mlt_vc_old. The
+                  ! "starting point" of the relaxation is the previous step's
+                  ! converged Gamma_factor (s% superad_reduction_factor_old(k)),
+                  ! not 1. This is the physically correct first-order ODE
+                  !
+                  !    d Gamma_fac / dt = (Gamma_fac_inst - Gamma_fac) / tau_conv
+                  !
+                  ! discretized as
+                  !
+                  !    Gamma_fac_new = Gamma_fac_old
+                  !                  + f_turnover * (Gamma_fac_inst - Gamma_fac_old)
+                  !
+                  ! When dt >> tau_conv, f_turnover -> 1 and we get the
+                  ! instantaneous value (current behavior). When dt << tau_conv,
+                  ! f_turnover -> 0 and Gamma_fac stays at its previous-step
+                  ! value -- convection had no time to adapt, so neither
+                  ! tightening nor releasing the throttle is allowed. The
+                  ! previous formula relaxed toward 1 (no throttle) in the
+                  ! second limit, which is unphysical -- convection cannot
+                  ! abruptly "release" the throttle either, and that produced
+                  ! HRD jumps when dt suddenly collapsed in late phases.
+                  !
+                  ! Skip the relaxation until the previous-step mlt_vc and
+                  ! Gamma_factor_old have both been populated.
                   if (s% superad_reduction_use_turnover_limit .and. &
                       Gamma_factor > 1d0 .and. k > 0 .and. &
                       s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
+                      s% have_superad_reduction_factor .and. &
+                      associated(s% superad_reduction_factor_old) .and. &
                       s% dt > 0d0) then
                      ! Optional floor on mlt_vc_old at a fraction of the local
-                     ! face sound speed. Prevents tau_conv from blowing up in
-                     ! slow-convection iron-bump cells where f_turnover would
-                     ! otherwise drop to ~0 and leave the throttle off.
+                     ! face sound speed. See controls.defaults docstring for
+                     ! the physical motivation (MLT is unreliable in
+                     ! radiation-pressure-dominated layers; perturbations
+                     ! still propagate at >= c_s).
                      vc_old_floor = s% superad_reduction_turnover_vc_floor_frac &
                                     * s% csound_face(k)
                      vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
                      tau_conv = scale_height / vc_old_local
                      f_turnover = 1d0 - exp(-s% dt / tau_conv)
-                     Gamma_factor = 1d0 + f_turnover * (Gamma_factor - 1d0)
+                     ! Anchor the relaxation at the previous step's value.
+                     ! Clamp to >= 1 (= no-throttle floor) so we never start
+                     ! relaxing from a non-physical sub-1 anchor.
+                     Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
+                     Gamma_factor = Gamma_factor_old_local + &
+                                    f_turnover * (Gamma_factor - Gamma_factor_old_local)
                   end if
                end if
             end if
