@@ -383,6 +383,8 @@
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
          if (failed('mlt_vc_old')) return
+         call do1D(s, s% superad_reduction_factor_old, nz, action, ierr)
+         if (failed('superad_reduction_factor_old')) return
          call do1D(s, s% omega_old, nz, action, ierr)
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
