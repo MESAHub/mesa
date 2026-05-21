@@ -18,13 +18,19 @@
    ! display on-screen plots
    pgstar_flag = .true.
 
+implicit_diffusion_flag = .false.
+implicit_diffusion_include_dsig_dxa = .true.
+implicit_diffusion_use_brunt_gauss_path = .false.
+implicit_diffusion_include_dsig_structure = .true.
+
+first_model_for_timing = 400
+steps_before_start_timing = -1
 / ! end of star_job namelist
 
 
 &eos
 
-   ! eos options
-   ! see eos/defaults/eos.defaults
+mass_fraction_limit_for_Skye = 1d-16
 
 / ! end of eos namelist
 
@@ -40,22 +46,47 @@
 
 
 &controls
+max_model_number = 500
+
+report_solver_progress = .true.
+include_eos_composition_partials = .false.
+use_ledoux_criterion = .true.
+make_gradr_sticky_in_solver_iters = .true.
+
+
+! essential to lower dq for implicit diffusion, need for convective boundaries
+min_dq_for_xa_convective = 1d-12
+min_dq_for_xa = 1d-12
+
+
+    dX_limit_species(1) = 'h1'
+    dX_limit_species(2) = 'he4'
+
+
+      overshoot_scheme(1) = 'none'
+      overshoot_zone_type(1) = 'any'
+      overshoot_zone_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'any'
+      overshoot_f(1) = 0.005 ! for M>10
+      !overshoot_f(1) = 0.21 ! For M<10 
+      overshoot_f0(1) = 0.001
+
 
    ! see star/defaults/controls.defaults
 
    ! starting specifications
-   initial_mass = 15 ! in Msun units
+   initial_mass = 2.5 ! in Msun units
    initial_z = 0.02
 
    ! when to stop
 
    ! stop when the star nears ZAMS (Lnuc/L > 0.99)
    Lnuc_div_L_zams_limit = 0.99d0
-   stop_near_zams = .true.
+   stop_near_zams = .false.
 
    ! stop when the center mass fraction of h1 drops below this limit
-   xa_central_lower_limit_species(1) = 'h1'
-   xa_central_lower_limit(1) = 1d-3
+   !xa_central_lower_limit_species(1) = 'he4'
+   !xa_central_lower_limit(1) = 1d-4
 
    ! wind
 

@@ -44,10 +44,10 @@
    !## age
 
       star_age ! elapsed simulated time in years since the start of the run
-      !star_age_sec ! elapsed simulated time in seconds since the start of the run
-      !star_age_min ! elapsed simulated time in minutes since the start of the run
-      !star_age_hr ! elapsed simulated time in hours since the start of the run
-      !star_age_day ! elapsed simulated time in days since the start of the run
+      star_age_sec ! elapsed simulated time in seconds since the start of the run
+      star_age_min ! elapsed simulated time in minutes since the start of the run
+      star_age_hr ! elapsed simulated time in hours since the start of the run
+      star_age_day ! elapsed simulated time in days since the start of the run
       !day ! elapsed simulated time in days since the start of the run
 
       !log_star_age
@@ -55,12 +55,12 @@
 
    !## timestep
 
-      !time_step ! timestep in years since previous model
-      !time_step_sec ! timestep in seconds since previous model
-      !time_step_days
+      time_step ! timestep in years since previous model
+      time_step_sec ! timestep in seconds since previous model
+      time_step_days
       log_dt ! log10 time_step in years
-      !log_dt_sec ! log10 time_step in seconds
-      !log_dt_days ! log10 time_step in days
+      log_dt_sec ! log10 time_step in seconds
+      log_dt_days ! log10 time_step in days
 
    !## mass
 
@@ -248,9 +248,9 @@
       !log_extra_L ! log10 extra_L
 
    !## neutrino losses
-      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
-      !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
-      !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
+      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
+      log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
 
       !mass_loc_of_max_eps_nuc ! (in Msun units)
       !mass_ext_to_max_eps_nuc ! (in Msun units)
@@ -340,8 +340,7 @@
 
       ! you might want to get a more complete list of burning regions by using the following
 
-      burning_regions 30
-      mixing_regions 30
+      !burning_regions <integer>
          ! the <integer> is the number of regions to report
          ! there will be 2*<integer> columns for this in the log file, 2 for each region.
          ! the first column for a region gives int(sign(val)*log10(max(1,abs(val))))
@@ -463,7 +462,7 @@
 !# conditions at or near the surface of the model
 
    !## conditions at the photosphere
-      !effective_T
+      effective_T
       !Teff
       log_Teff ! log10 effective temperature
          ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
@@ -497,11 +496,11 @@
 
    !## conditions at or near the surface of the model (outer edge of outer cell)
 
-      !luminosity ! luminosity in Lsun units
+      luminosity ! luminosity in Lsun units
       !luminosity_ergs_s ! luminosity in cgs units
       log_L ! log10 luminosity in Lsun units
       !log_L_ergs_s ! log10 luminosity in cgs units
-      !radius ! Rsun
+      radius ! Rsun
       log_R ! log10 radius in Rsun units
       !radius_cm
       !log_R_cm
@@ -509,8 +508,8 @@
       log_g ! log10 gravity
       !gravity
       !log_Ledd
-      !log_L_div_Ledd ! log10(L/Leddington)
-      !lum_div_Ledd
+      log_L_div_Ledd ! log10(L/Leddington)
+      lum_div_Ledd
       !log_surf_optical_depth
       !surface_optical_depth
 
@@ -525,7 +524,7 @@
           ! old name was surface_entropy
 
       !v_surf ! (cm/s)
-      !v_surf_km_s ! (km/s)
+      v_surf_km_s ! (km/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       !v_div_csound_max ! max value of velocity divided by sound speed at face
       !v_div_vesc
@@ -578,15 +577,15 @@
 
       log_center_T ! temperature
       log_center_Rho ! density
-      log_center_P ! pressure
+      !log_center_P ! pressure
 
       ! shorter names for above
       log_cntr_P
       log_cntr_Rho
       log_cntr_T
 
-      !center_T ! temperature
-      !center_Rho ! density
+      center_T ! temperature
+      center_Rho ! density
       !center_P ! pressure
 
       !center_degeneracy ! the electron chemical potential in units of k*T
@@ -692,7 +691,7 @@
       total_mass he4
       ! etc.
 
-      ! individiul log10  mass totals for entire star (in Msun units)
+      ! individual log10  mass totals for entire star (in Msun units)
       !log_total_mass h1
       !log_total_mass he4
       ! etc.
@@ -703,7 +702,7 @@
       
    !## info at location of max temperature
    !max_T
-   !log_max_T
+   log_max_T
 
 
 !----------------------------------------------------------------------------------------------
@@ -763,8 +762,8 @@
 
 !# energy information
 
-      !total_energy ! at end of step
-      !log_total_energy ! log(abs(total_energy))
+      total_energy ! at end of step
+      log_total_energy ! log(abs(total_energy))
       !total_energy_after_adjust_mass ! after mass adjustments
 
       ! shorter versions of above
@@ -802,7 +801,7 @@
       !tot_Et
       !log_tot_Et
 
-      !total_energy_foe
+      total_energy_foe
 
       !tot_IE_div_IE_plus_KE
       !total_IE_div_IE_plus_KE
@@ -885,7 +884,7 @@
    !## eos
       !logQ_max ! logQ = logRho - 2*logT + 12
       !logQ_min
-      !gamma1_min
+      gamma1_min
 
    !## core mixing
       !mass_semiconv_core
@@ -1016,7 +1015,7 @@
    !## solver iterations
 
       num_iters ! same as num_solver_iterations
-      !num_solver_iterations ! iterations at this step
+      num_solver_iterations ! iterations at this step
       !total_num_solver_iterations ! total iterations during the run
       !avg_num_solver_iters
 
@@ -1065,3 +1064,7 @@
 
    !## timing
       !elapsed_time ! time since start of run (seconds)
+
+   !## Extras
+      burning_regions 80
+      mixing_regions 40

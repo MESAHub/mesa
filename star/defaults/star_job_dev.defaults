@@ -150,11 +150,14 @@
       ! pressure difference as the ordinary Brunt path for the stored Brunt
       ! value.  The implicit derivatives still use the linearized face/path
       ! EOS pressure-composition partials.  If false, the stored value also
-      ! uses the linearized EOS partial contraction.
+      ! uses the linearized EOS partial contraction.  It is false by default
+      ! while the EOS-partial Brunt value is being tested.  In the MESA II
+      ! notation, false uses an Eq. (6)-style standard Ledoux partial sum,
+      ! while true uses the Eq. (8)-style New Ledoux finite difference.
 
       ! ::
 
-   implicit_diffusion_use_brunt_finite_difference_value = .true.
+   implicit_diffusion_use_brunt_finite_difference_value = .false.
 
 
       ! implicit_diffusion_use_brunt_gauss_path

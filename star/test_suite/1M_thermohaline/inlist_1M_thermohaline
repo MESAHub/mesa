@@ -37,6 +37,15 @@
       pgstar_flag = .true.
 
 
+implicit_diffusion_flag = .true.
+implicit_diffusion_include_dsig_dxa = .true.
+implicit_diffusion_use_brunt_gauss_path = .false.
+implicit_diffusion_include_dsig_structure = .true.
+
+implicit_diffusion_use_brunt_finite_difference_value = .true.
+! In the MESA II notation, false uses an Eq. (6)-style standard Ledoux partial sum,
+! while true uses the Eq. (8)-style New Ledoux finite difference.
+
 / ! end of star_job namelist
 
 &eos
@@ -53,6 +62,15 @@
 
 &controls
          
+include_eos_composition_partials = .true.
+! essential to lower dq for implicit diffusion, need for convective boundaries
+!min_dq_for_xa_convective = 1d-12
+!min_dq_for_xa = 1d-12
+
+convergence_ignore_equL_residuals = .true.
+tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
+
+
          he_core_mass_limit = 0.24d0
 
          num_trace_history_values = 3
@@ -128,8 +146,8 @@
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.
       !fill_arrays_with_NaNs = .true.
@@ -201,7 +219,7 @@
       Grid3_win_flag = .true.
          
          
-         Grid3_win_width = 12
+         Grid3_win_width = 10
          Grid3_win_aspect_ratio = 0.7 ! aspect_ratio = height/width
          
          Grid3_xleft = 0.10 ! fraction of full window width for margin on left
@@ -274,8 +292,8 @@
          Grid3_plot_name(4) = 'Kipp'
          
          Kipp_show_mass_boundaries = .false.
-         Kipp_mass_max = 0.28 ! (Msun units) negative means use default
-         Kipp_mass_min = 0.22 ! (Msun units) negative means use default
+         Kipp_mass_max = 0.5 ! (Msun units) negative means use default
+         !Kipp_mass_min = 0.22 ! (Msun units) negative means use default
 
          Kipp_show_luminosities = .false.
          Kipp_lgL_max = 2d0 ! only used if /= -101d0; (L in Lsun units)
@@ -293,11 +311,11 @@
          Grid3_txt_scale_factor(4) = 0.7 ! multiply txt_scale for subplot by this
 
          ! file output
-         Grid3_file_flag = .false.
+         Grid3_file_flag = .true.
          Grid3_file_dir = 'png'
          Grid3_file_prefix = 'grid3_'
-         Grid3_file_interval = 5 ! output when mod(model_number,Grid3_file_interval)==0
-         Grid3_file_width = -1 ! (inches) negative means use same value as for window
+         Grid3_file_interval = 1 ! output when mod(model_number,Grid3_file_interval)==0
+         Grid3_file_width = 27 ! (inches) negative means use same value as for window
          Grid3_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
@@ -305,7 +323,7 @@
          !Grid3_file_flag = .true.
          Grid3_file_dir = 'png'
          Grid3_file_prefix = 'Mixing_'
-         Grid3_file_interval = 2 ! output when mod(model_number,Grid3_file_interval)==0
+         Grid3_file_interval = 1 ! output when mod(model_number,Grid3_file_interval)==0
 
 
 

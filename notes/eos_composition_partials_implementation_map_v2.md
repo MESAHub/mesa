@@ -380,15 +380,31 @@ blended potential.
 The implicit Brunt path lives in `star/private/implicit_brunt.f90`.
 
 With `implicit_diffusion_flag` and `use_Ledoux_criterion`, the stored Brunt
-value defaults to the same two-composition finite pressure difference as the
-ordinary Brunt path.  This keeps the sign seen by thermohaline activation on
-the same value definition with and without implicit diffusion.  Setting
-`implicit_diffusion_use_brunt_finite_difference_value = .false.` restores the
-earlier stored value from the linearized EOS-partial contraction.  The implicit
+value defaults to the linearized EOS-partial contraction.  Setting
+`implicit_diffusion_use_brunt_finite_difference_value = .true.` switches the
+stored value to the same two-composition finite pressure difference as the
+ordinary Brunt path, which keeps the sign seen by thermohaline activation on
+the same value definition with and without implicit diffusion.  The implicit
 Jacobian uses a linearized pressure-composition coefficient from face EOS
 partials in both modes.
 
-Schematically, the stored pressure-composition contribution is
+In MESA II (Paxton et al. 2013, arXiv:1301.0319), this is the distinction
+between the standard Ledoux sum in Eq. (6) and the MESA "New Ledoux" finite
+composition difference in Eq. (8).  Eq. (5) is the \(N^2\) form that consumes
+the Ledoux \(B\) term, and Eq. (7) gives the formal directional-derivative
+bridge between the two value definitions.
+
+Schematically, the default stored pressure-composition contribution is the
+linearized contraction
+
+\[
+\Delta\ln P_X^{\rm val}
+=
+\sum_i \chi_{X_i,f}\left(X_{i,k}-X_{i,k-1}\right).
+\]
+
+When `implicit_diffusion_use_brunt_finite_difference_value = .true.`, the
+stored pressure-composition contribution is instead
 
 \[
 \Delta\ln P_X^{\rm val}
@@ -398,7 +414,7 @@ Schematically, the stored pressure-composition contribution is
 \ln P_{\rm eos}(\rho_f,T_f,X_{k-1}).
 \]
 
-The AD derivative carrier is the linearized contraction
+The AD derivative carrier remains the linearized contraction
 \[
 \sum_i \chi_{X_i,f}\Delta X_i,
 \qquad
@@ -494,7 +510,7 @@ then applies those derivatives to
 
 | Control | Default | Meaning |
 |---|---:|---|
-| `implicit_diffusion_use_brunt_finite_difference_value` | true | use ordinary finite two-composition pressure difference for the stored implicit Brunt value |
+| `implicit_diffusion_use_brunt_finite_difference_value` | false | when true, use the ordinary finite two-composition pressure difference for the stored implicit Brunt value |
 | `implicit_diffusion_include_dsig_structure` | false | include structure derivatives of sigma |
 | `implicit_diffusion_include_dsig_dxa` | false | include high-gain cross-species sigma derivatives |
 

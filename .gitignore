@@ -33,6 +33,7 @@ vgcore.*
 ## Documentation
 /dox/
 docs/source/_tags
+notes/old_mesa_eos_info/svn_scvh_commits/
 
 ## Executables
 *.x

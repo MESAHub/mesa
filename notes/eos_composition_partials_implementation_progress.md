@@ -81,17 +81,23 @@ while making the raw \texttt{lnE} and \texttt{lnP} columns match the
 composition coordinates used by the star equations.
 The production cell path now uses a row-scoped cheaper wrapper that asks the
 EOS only for \texttt{lnPgas} and \texttt{lnE} composition rows.  The
-implicit Brunt path defaults to the same finite two-composition pressure
-difference as the ordinary Brunt path for the stored value.  The dev
+implicit Brunt path defaults to the linearized EOS-partial contraction for the
+stored value.  The dev
 \texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value} star_job
-control can instead make the stored value use the linearized EOS-partial
-contraction.  In both modes, one face EOS partial call supplies the linearized
-derivative coefficient.  The two-point Gauss composition-path average is
+control can instead make the stored value use the same finite
+two-composition pressure difference as the ordinary Brunt path.  In both
+modes, one face EOS partial call supplies the linearized derivative
+coefficient.  The two-point Gauss composition-path average is
 available behind the dev
 \texttt{implicit\_diffusion\_use\_brunt\_gauss\_path} star_job control and
 changes that derivative coefficient, not the stored Brunt value.  The Brunt
 wrapper only requests \texttt{chiT,chiRho} composition rows when the optional
 \texttt{d\_sigma/dX} Jacobian block is enabled.
+In the MESA II notation (Paxton et al. 2013, arXiv:1301.0319), the default
+stored-value branch is the Eq. (6) standard Ledoux sum evaluated with EOS
+composition partials, while the finite-difference toggle uses the Eq. (8) New
+Ledoux value.  Eq. (5) shows where \(B\) enters \(N^2\), and Eq. (7) is the
+formal directional derivative connecting the two forms.
 The cell-centered star EOS composition-partial call now reuses the composition
 moments already computed by \texttt{micro:do\_eos\_for\_cell}.  The new
 \texttt{eosDT\_get\_dxa\_rows\_with\_moments} wrapper builds the raw moment
@@ -138,7 +144,7 @@ source review, whitespace checks, line scans, and call-chain scans only.
 | Skye/eosDT compile cleanup | Previous compile clean; latest edits static-only | Fixed the Skye `%val` function-result selector issue. EOS compiled on the later install passes before the latest Skye Coulomb speed refactors. The latest speed edits have only had static checks because MESA compile/model runs are user-owned. |
 | Skye derivative validation | First plotter pass complete | `eos/plotter/composition_partials` compares full `d_dxa` rows with constrained Ridders finite differences. Skye-dominated sweeps are broadly consistent for the rows needed by implicit Brunt; remaining large failures are in the cool HELM/FreeEOS part of the default EOS path, not in the Skye-dominated points. No MESA model/test-suite run is approved in this checkpoint. |
 | Pure PC internal composition partials | Deferred | Not easy; needs PC-local derivatives through `MELANGE9` and PC mixing/phase algebra. Blend-alpha derivatives around PC are already wired where available. |
-| Complete Brunt EOS-composition form | Implemented, needs validation | The implicit Brunt value defaults to the ordinary two-composition finite pressure difference, so the thermohaline on/off test sees the same Brunt sign as the non-implicit path. Setting `implicit_diffusion_use_brunt_finite_difference_value = .false.` restores the previous linearized EOS-partial-sum stored value. The derivative coefficient still comes from EOS pressure-composition partials at the face by default. A two-point Gauss path average of those partials through the composition jump is available as `implicit_diffusion_use_brunt_gauss_path = .true.` and is off by default. `chiX_face` is treated as a current-iterate coefficient; second EOS composition derivatives are intentionally out of scope. |
+| Complete Brunt EOS-composition form | Implemented, needs validation | The implicit Brunt value defaults to the linearized EOS-partial-sum stored value. Setting `implicit_diffusion_use_brunt_finite_difference_value = .true.` switches the stored value to the ordinary two-composition finite pressure difference, so the thermohaline on/off test sees the same Brunt sign as the non-implicit path. The derivative coefficient still comes from EOS pressure-composition partials at the face by default. A two-point Gauss path average of those partials through the composition jump is available as `implicit_diffusion_use_brunt_gauss_path = .true.` and is off by default. `chiX_face` is treated as a current-iterate coefficient; second EOS composition derivatives are intentionally out of scope. |
 | Implicit transport components | Implemented for current policy | `Dmix_implicit` accepts local `mlt_D_ad` for the promoted local transport types `convective_mixing`, `semiconvective_mixing`, and `thermohaline_mixing`. Full mixing-info passes use the post-cleanup `mixing_type`; Newton iterations use the current `mlt_mixing_type` from `set_mlt_vars` for the same promoted set and update matching promoted `s% mixing_type` display flags. Cells not promoted to the implicit component keep the normal MESA coefficient in `Dmix_explicit`, which is held fixed through Newton iterations. `set_vars_for_solver` rebuilds diffusion sigmas every implicit solver iteration; the nonlinear `d_sigma` controls only decide whether the extra coefficient-derivative Jacobian blocks are filled and used. |
 | Implicit-Dmix residual conservation/sign checks | Static sign check complete | The implemented lower/upper face signs match `set_dxdt_mix`: `dxdt_mix=(fluxp1-flux00)/dm`, with `flux=-sigma*dX`. Runtime validation still needed. |
 | Production cleanup | Started | Normal-path `get_convection_sigmas` no longer zeros species-sized implicit Jacobian arrays unless `implicit_diffusion_flag` is true, and `set_Dmix_components` is only called on the dev implicit path. The dev flag now rejects `use_other_brunt`, `use_other_brunt_smoothing`, and `use_other_mlt_results`, which would otherwise bypass the internal Brunt/MLT derivative path. The implicit face-EOS Brunt path is now skipped when `use_Ledoux_criterion` is false, and `implicit_brunt` reuses scratch storage per OpenMP worker instead of allocating per face. Further review still needed. |
@@ -150,7 +156,7 @@ source review, whitespace checks, line scans, and call-chain scans only.
 | Skye electron composition partials | Started | Extended HELM electron helper to return the free-energy derivative with respect to `Ye`; Skye maps it through `dYe/dxa` and fills `i_eta`. The helper now fills the full third-order `F_dye` object using the explicit `F_e=Y_e f(T,Y_e\rho)` chain rule; fourth density derivatives of the quintic HELM basis were added so the `rho,rho,rho` slot is also analytic. | Update when remaining electron scalar derivatives, if any, are audited against finite differences. |
 | Skye Coulomb/phase composition partials | Implemented; speed-refactored for hydro rows | Added the Skye-local `skye_composition_ad` companion type and wired an analytic companion path through `nonideal_corrections_dxa`. The path covers liquid/solid OCP terms, screening terms, liquid and solid mixing corrections, electron exchange-correlation, mixing entropy, Skye's Gamma-limit extrapolation, and the phase softmin. The production hydro-row path now uses basis derivatives in `Ye`, `abar`, and active Skye number fractions, reuses the base hard-branch Coulomb AD result for off-transition `dYe`/`dabar`, and reuses cached OCP leaf values for batched `dYA`. Phase-transition cells and phase/latent rows still use the full companion evaluation. | Update after compile-level review and focused derivative checks across liquid, solid, extrapolated, and phase-transition states. |
 | eosDT blend composition partials | Started | `Do_Blend` still carries selector composition derivative plumbing for diagnostics, but composition rows are currently blended at fixed EOS selector weights. This avoids adding `dalpha/dxa*(res_1-res_2)` terms from numerical EOS transition functions to the physical composition Jacobian. PC Gamma-limit, OPAL/SCVH high-Z HELM reduction, and the full Skye polygon still have alpha derivative code available, but those selector derivatives are not used in production composition rows while the fixed-weight blend policy is active. | Update if selector composition derivatives are re-enabled or replaced by a potential-level blend. |
-| Complete Brunt EOS-composition form | Implemented, needs validation | Added an implicit Brunt path in `star/private/implicit_brunt.f90`. Under `implicit_diffusion_flag` and `use_Ledoux_criterion`, `hydro_vars:set_hydro_vars` calls this path even during solver iterations. By default, the stored Brunt value is the finite pressure difference between the two neighboring cell compositions, matching the ordinary Brunt sign used by thermohaline activation; `implicit_diffusion_use_brunt_finite_difference_value = .false.` restores the linearized EOS-partial-sum stored value. The implicit derivative coefficient comes from face EOS composition partials, or from the optional two-point Gauss path average. When Ledoux is off, the path keeps `gradL_composition_term_ad(:)` explicitly zero and skips the expensive face EOS calls. This is the complete EOS-composition form, not a reduced mean-molecular-weight derivative. Added AD storage `brunt_B_ad(:)` and `gradL_composition_term_ad(:)`. Added species-indexed `d_brunt_B_dxa_m1(:,:)` and `d_brunt_B_dxa_00(:,:)`; these include the pressure-partial contraction, the cell-pressure denominator, face `chi_T`/`chiRho` terms, and the direct mass-correction derivative when `implicit_diffusion_include_dsig_dxa` is enabled. The face EOS wrapper now accepts the already computed face/path composition moments, so it avoids a second moment pass inside eosDT. The shared `set_grads` smoothing step is now skipped only for the implicit Ledoux path, so implicit Brunt remains unsmoothed while non-Ledoux runs keep the normal Brunt path. The face EOS pressure-composition coefficient is intentionally treated as a current-iterate coefficient; this avoids requiring second composition derivatives of EOS partials. | Update when face-coefficient treatment changes or if second EOS composition derivatives become an explicit goal. |
+| Complete Brunt EOS-composition form | Implemented, needs validation | Added an implicit Brunt path in `star/private/implicit_brunt.f90`. Under `implicit_diffusion_flag` and `use_Ledoux_criterion`, `hydro_vars:set_hydro_vars` calls this path even during solver iterations. By default, the stored Brunt value is the linearized EOS-partial-sum value; `implicit_diffusion_use_brunt_finite_difference_value = .true.` switches the stored value to the finite pressure difference between the two neighboring cell compositions, matching the ordinary Brunt sign used by thermohaline activation. The implicit derivative coefficient comes from face EOS composition partials, or from the optional two-point Gauss path average. When Ledoux is off, the path keeps `gradL_composition_term_ad(:)` explicitly zero and skips the expensive face EOS calls. This is the complete EOS-composition form, not a reduced mean-molecular-weight derivative. Added AD storage `brunt_B_ad(:)` and `gradL_composition_term_ad(:)`. Added species-indexed `d_brunt_B_dxa_m1(:,:)` and `d_brunt_B_dxa_00(:,:)`; these include the pressure-partial contraction, the cell-pressure denominator, face `chi_T`/`chiRho` terms, and the direct mass-correction derivative when `implicit_diffusion_include_dsig_dxa` is enabled. The face EOS wrapper now accepts the already computed face/path composition moments, so it avoids a second moment pass inside eosDT. The shared `set_grads` smoothing step is now skipped only for the implicit Ledoux path, so implicit Brunt remains unsmoothed while non-Ledoux runs keep the normal Brunt path. The face EOS pressure-composition coefficient is intentionally treated as a current-iterate coefficient; this avoids requiring second composition derivatives of EOS partials. | Update when face-coefficient treatment changes or if second EOS composition derivatives become an explicit goal. |
 | Coupled diffusion residual contribution | Started | Existing isotope residual is still the only species equation. Added the implicit-Dmix Jacobian contribution inside `star/private/hydro_chem_eqns.f90`: the rate remains `dxdt_mix`, while the fixed-coefficient composition solve is implicit whenever `implicit_diffusion_flag` is true. The nonlinear structure partials from `sig_implicit_ad(:)` are now gated by `implicit_diffusion_include_dsig_structure`, default false. The high-gain cross-species terms from `d_sig_dxa_m1(:,:)` and `d_sig_dxa_00(:,:)` are gated by `implicit_diffusion_include_dsig_dxa` and `use_Ledoux_criterion`, also default false while the convective-boundary coupling is validated. The upper face uses `shift_p1`, following the standard MESA AD stencil convention. Static sign review matches `set_dxdt_mix`. | Update when runtime validation is added or when microscopic diffusion is moved into this residual. |
 | Nuclear network composition partials | Audited for current concern | `basic.net` does not use the hardwired `approx21` implementation. It enters the generic `net_derivs:get_derivs` path and exports `d_dxdt_nuc_dx` through the molar-abundance chain rule. The hardwired `net_approx21` path is only enabled by net files containing an `approx21(...)` directive. One separate generic-net caveat remains: screened rates are differentiated with respect to `T` and `rho`, but their composition dependence through screening/mean composition is treated as fixed in `d_dxdt_nuc_dx`. That is a long-standing approximate Newton Jacobian and could produce finite-difference disagreement in screened regimes, but it is not an approx21 issue for `basic.net`. | Add a targeted local `dxdt_nuc(he4)` finite-difference diagnostic if the He4 equation remains suspicious after the implicit-Dmix refresh is tested. |
 | `Dmix_explicit` / `Dmix_implicit` split | Current policy implemented; needs runtime validation | `Dmix_implicit(:)` is `auto_diff_real_star_order1`; `Dmix_explicit(:)` is the semi-implicit coefficient held fixed through Newton iterations. `turb_support:do1_mlt_eval` returns `D_ad`, and `turb_info:do1_mlt_2` stores it in `s% mlt_D_ad(k)`. `implicit_Dmix:set_Dmix_components` puts that local `mlt_D_ad` into `Dmix_implicit` for promoted local transport. Full passes use the post-cleanup `mixing_type` to split the ordinary MESA total into `Dmix_implicit` and the non-implicit remainder in `Dmix_explicit`. Solver iterations use current `mlt_mixing_type` for the promoted set, refresh only `Dmix_implicit`, keep `Dmix_explicit` fixed from the last full mixing-info pass, update promoted `s% mixing_type` flags, and refresh `D_mix_non_rotation`. The total is always rebuilt as `D_mix = Dmix_implicit%val + Dmix_explicit`. `solver_support:set_vars_for_solver` calls `mix_info:get_convection_sigmas` every implicit solver iteration so the residual uses the current total coefficient. Structure partials from `sig_implicit_ad` are filled/used only when `implicit_diffusion_include_dsig_structure` is true, and `d_sig_dxa_m1/00` are filled/used only when `implicit_diffusion_include_dsig_dxa` is true. The dev control check rejects `use_other_mlt_results` because that hook receives the Brunt composition term as a plain value and cannot currently provide the new `dDmix/dB` coupling. | Update when separate controls are added for promoted transport terms, post-processing contributions are tracked separately, or the custom MLT hook becomes composition-AD aware. |
@@ -713,15 +719,14 @@ For Ledoux runs, `implicit_brunt` still intentionally asks the EOS for face
 composition partials. The local cleanup is that `xa_face`, `xa_path`,
 `chiX_face`, and `d_eos_dxa` are allocated once per OpenMP worker and reused
 across the worker's face loop. With
-`implicit_diffusion_use_brunt_finite_difference_value = .true.`, the stored
-Brunt value uses two row-scoped finite-pressure EOS calls plus the face
-partial call for derivatives,
+`implicit_diffusion_use_brunt_finite_difference_value = .false.`, the stored
+value uses the face/path partial contraction and the default derivative path
+costs one row-scoped face EOS call,
 $$
-  N_{\rm EOS}^{\rm face} \simeq 3N_{\rm face}.
+  N_{\rm EOS}^{\rm face} \simeq N_{\rm face}.
 $$
-Setting `implicit_diffusion_use_brunt_finite_difference_value = .false.`
-uses the face/path partial contraction for the stored value too, so the
-default derivative path costs one row-scoped face EOS call.  If
+Setting `implicit_diffusion_use_brunt_finite_difference_value = .true.`
+adds two row-scoped finite-pressure EOS calls for the stored value.  If
 `implicit_diffusion_use_brunt_gauss_path = .true.`, the derivative coefficient
 adds two row-scoped path-sample calls that request only `i_lnPgas`.
 
@@ -860,6 +865,7 @@ stable nonlinear coefficient Jacobian for the implicit coefficient.
 
 | Date | Change | Files | Verification |
 |---|---|---|---|
+| 2026-05-21 | Flipped `implicit_diffusion_use_brunt_finite_difference_value` to default false. The dev default now tests the EOS-partial-sum implicit Brunt value; setting the control true remains the compatibility mode that uses the ordinary finite two-composition pressure difference for the stored value. Added MESA II equation-number references for the standard Ledoux sum and New Ledoux finite-difference forms. | `star/defaults/star_job_dev.defaults`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static checks only. No MESA compile or model run. |
 | 2026-05-19 | Added dev star_job control `implicit_diffusion_use_brunt_finite_difference_value`, default true. The true branch keeps the implicit Brunt stored value on the ordinary finite two-composition pressure difference while retaining linearized EOS-partial derivatives; setting it false restores the earlier stored value from the face/path EOS-partial contraction. This makes the thermohaline diagnostic toggle explicit instead of tying the value definition permanently to `implicit_diffusion_flag`. | `star/defaults/star_job_dev.defaults`; `star_data/private/star_job_controls_dev.inc`; `star/private/star_job_ctrls_io.f90`; `star/private/implicit_brunt.f90`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static checks only. No MESA compile or model run. |
 | 2026-05-19 | Matched the implicit Brunt stored value to the ordinary MESA finite pressure difference while keeping the implicit derivative coefficient on the face/path EOS pressure-composition partial. This addresses the `1M_thermohaline` flag-on/flag-off diagnostic: with the earlier face-linearized stored value, the implicit Ledoux path could remove the negative `gradL_composition_term` pocket that gates thermohaline activation, so PGSTAR correctly showed no thermohaline in the accepted implicit profile rather than only hiding it. The value/sign used by `turb_support:set_thermohaline` now follows the ordinary Brunt definition; the Jacobian still uses the linearized `chiX_face`/optional-Gauss coefficient and intentionally omits second EOS composition derivatives. | `star/private/implicit_brunt.f90`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static source review only. No MESA compile or model run. |
 | 2026-05-19 | Updated the solver-iteration implicit-Dmix gate and display flags. `set_Dmix_components(s,.false.)` now uses current `mlt_mixing_type` for the promoted local bucket, so convective, semiconvective, and thermohaline transport all refresh through current `mlt_D_ad` during Newton iterations. The same path updates matching promoted `s% mixing_type` flags, clears stale promoted flags when the current promoted coefficient is inactive, preserves `Dmix_explicit` from the last full mixing-info pass, and refreshes `D_mix_non_rotation`. This supersedes the earlier conservative full-pass gate and stale-PGSTAR audit. | `star/private/implicit_Dmix.f90`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static checks only. No MESA compile or model run. |
@@ -983,6 +989,10 @@ HELM electron derivative slots needed by the Skye full-row pack.
 \begin{newimplbox}
 \textbf{New dev-path implicit Brunt value and derivatives.}
 
+In the MESA II equation numbering, the linearized EOS partial sum is the
+Eq. (6)-style standard Ledoux \(B\), while the finite pressure difference is
+the Eq. (8)-style New Ledoux value implemented by ordinary MESA.
+
 For a face between cells \(k\) and \(k-1\), the new implicit branch forms a
 face composition
 \[
@@ -991,7 +1001,9 @@ face composition
   \alpha = \frac{dq_{k-1}}{dq_{k-1}+dq_k}.
 \]
 
-By default the stored Brunt value is kept on the ordinary
+The stored Brunt value defaults to the linearized partial contraction below.
+If \texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value} is
+true, the stored Brunt value is instead kept on the ordinary
 finite-pressure-difference definition:
 \[
   \Delta\ln P_X^{\rm val}
@@ -1000,9 +1012,7 @@ finite-pressure-difference definition:
   -
   \ln P(\rho_f,T_f,x_{k-1}).
 \]
-This preserves the Brunt sign used by the thermohaline criterion.  If
-\texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value = .false.},
-the stored value instead uses the linearized partial contraction below.  The
+This preserves the Brunt sign used by the thermohaline criterion.  The
 linearized derivative coefficient is always evaluated from the EOS partial at
 the face composition:
 \[
@@ -1054,13 +1064,15 @@ The implicit Brunt composition term currently used by star is
        {\chi_{T,f}\left(\ln P_{k-1}-\ln P_k\right)}.
 \]
 
-The old one-point linearized value
+By default,
 \[
-  \sum_j \chi_{X_j,f}\left(x_{j,k}-x_{j,k-1}\right)
+  \Delta\ln P_X^{\rm val}
+  =
+  \sum_j \chi_{X_j,f}\left(x_{j,k}-x_{j,k-1}\right).
 \]
-is still used as the derivative carrier in the AD object, but its stored
-value is overwritten by \(\Delta\ln P_X^{\rm val}\) before the pressure and
-\(\chi_T\) denominator are applied.  In
+If \texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value} is
+true, only the stored value is overwritten by the finite-pressure difference
+before the pressure and \(\chi_T\) denominator are applied.  In
 \texttt{star/private/implicit\_brunt.f90}, the derivative coefficient is named
 \texttt{chiX\_face}; it is kept fixed in the current Jacobian so this slice
 does not require second EOS composition derivatives.
@@ -2107,6 +2119,12 @@ finite pressure difference.  After
 \begin{starbox}
 \textbf{Implicit Brunt value and linearized derivatives.}
 
+MESA II (Paxton et al. 2013, arXiv:1301.0319) labels the standard Ledoux
+partial-derivative sum as Eq. (6), the formal directional derivative as
+Eq. (7), and MESA's finite two-composition "New Ledoux" implementation as
+Eq. (8).  The control below chooses the stored value between Eq. (6)-style
+linearized EOS partials and Eq. (8)-style finite differences.
+
 The complete EOS-composition derivative form is
 
 \[
@@ -2116,9 +2134,10 @@ B_{\rm comp}
 \sum_j \chi_{X_j}\frac{dX_j}{d\ln P}.
 \]
 
-For the implicit diffusion path, the stored value defaults to the ordinary
-MESA finite-pressure-difference definition.  This is the value used by the
-thermohaline on/off condition:
+For the implicit diffusion path, the stored value defaults to the linearized
+EOS-partial contraction.  Setting
+\texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value = .true.}
+instead uses the ordinary MESA finite-pressure-difference definition:
 
 \[
   \Delta\ln P_X^{\rm val}
@@ -2128,11 +2147,8 @@ thermohaline on/off condition:
   \ln P_{\rm eos}(\rho_f,T_f,X_{k-1}).
 \]
 
-Setting
-\texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value = .false.}
-restores the previous behavior in which the stored value is the linearized
-EOS-partial contraction.  The EOS partial used as the derivative coefficient
-is returned by the EOS at the face state:
+The EOS partial used as the derivative coefficient is returned by the EOS at
+the face state:
 
 \[
 g_{j,f}
@@ -2174,10 +2190,13 @@ In the optional Gauss path,
 \right|_{\rho_f,T_f,X(\lambda_\pm)},
 \]
 
-The AD object carries this linearized derivative but overwrites its value with
-\(\Delta\ln P_X^{\rm val}\).  Thus the implicit Brunt value matches ordinary
-Brunt, while the Jacobian still uses EOS composition partials and does not
-require finite-differencing the EOS during Newton derivative assembly.
+The default AD object carries this linearized derivative and value.  If
+\texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value} is true,
+the AD object keeps the same linearized derivative but overwrites its value
+with \(\Delta\ln P_X^{\rm val}\).  Thus the true branch matches ordinary
+Brunt for the stored value, while the Jacobian still uses EOS composition
+partials and does not require finite-differencing the EOS during Newton
+derivative assembly.
 
 \[
 \chi_T
@@ -2535,12 +2554,14 @@ Since both adjacent cells are normalized,
   \sum_j (X_{j,k}-X_{j,k-1}) = 0,
 \]
 this all-species derivative sum is algebraically equivalent to any
-\(N_{\rm spec}-1\) sink-species basis.  By default, the stored implicit Brunt
-value itself uses the ordinary finite pressure difference
-\(\ln P_{\rm eos}(\rho_f,T_f,X_k)-\ln P_{\rm eos}(\rho_f,T_f,X_{k-1})\);
-when \texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value} is
-false, it uses the same all-species linearized contraction as the derivative
-carrier.
+\(N_{\rm spec}-1\) sink-species basis.  In the MESA II equation numbering,
+this all-species linearized contraction is the Eq. (6)-style standard Ledoux
+partial sum, and the ordinary MESA finite pressure difference is the
+Eq. (8)-style New Ledoux value.  By default, the stored implicit Brunt value
+uses the same all-species linearized contraction as the derivative carrier.
+When \texttt{implicit\_diffusion\_use\_brunt\_finite\_difference\_value} is
+true, the stored value instead uses the ordinary finite pressure difference
+\(\ln P_{\rm eos}(\rho_f,T_f,X_k)-\ln P_{\rm eos}(\rho_f,T_f,X_{k-1})\).
 No special sink is needed inside \texttt{star/private/implicit\_brunt.f90};
 the sink only appears in finite-difference tests and in star's solver-partial
 diagnostic projection.
