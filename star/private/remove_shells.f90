@@ -1234,6 +1234,7 @@
          ! save have_mlt_vc and set to false (to load ZAMS model)
          save_have_mlt_vc = s% have_mlt_vc
          s% have_mlt_vc = .false.
+         s% have_superad_reduction_factor = .false.
 
          !save composition and entropy profiles
          xa(:,:) = s% xa(:,k_remove:s% nz)
