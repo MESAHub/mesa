@@ -319,7 +319,6 @@
          s% need_to_setvars = .true.  ! always start fresh
          s% okay_to_set_mixing_info = .true.  ! set false by element diffusion
          s% okay_to_set_mlt_vc = .false.  ! don't change mlt_vc until have set mlt_vc_old
-         s% okay_to_set_superad_reduction_factor = .false.  ! mirror for superad_reduction_factor
 
          if (s% timestep_hold > s% model_number + 10000) then
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -699,7 +698,6 @@
                s% have_mlt_vc = .true.
             end if
             s% okay_to_set_mlt_vc = .false.
-            s% okay_to_set_superad_reduction_factor = .false.
          end if
 
          if (.not. okay_energy_conservation()) return
@@ -1888,6 +1886,21 @@
                if (failed('set_start_of_step_info ierr')) return
                prepare_for_new_step = do_mesh(s)  ! sets s% need_to_setvars = .true. if changes anything
                if (prepare_for_new_step /= keep_going) return
+            end if
+         end if
+
+         ! Snapshot s%superad_reduction_factor into _old here -- AFTER mesh
+         ! adjust has remapped it onto the new mesh, but BEFORE
+         ! set_vars_if_needed below would overwrite it with the new step's
+         ! first-pass value. Used by the smooth-relaxation turnover-time
+         ! limiter as the Gamma_factor_old anchor.
+         if (s% use_superad_reduction .and. .not. s% RSP_flag) then
+            if (associated(s% superad_reduction_factor) .and. &
+                associated(s% superad_reduction_factor_old)) then
+               do k = 1, s% nz
+                  s% superad_reduction_factor_old(k) = s% superad_reduction_factor(k)
+               end do
+               s% have_superad_reduction_factor = .true.
             end if
          end if
 
