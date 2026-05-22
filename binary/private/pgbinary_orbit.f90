@@ -85,7 +85,8 @@ contains
       integer, pointer :: ipar(:) ! (lipar)
       real(dp), pointer :: rpar(:) ! (lrpar)
       real(dp), dimension(num_points) :: cost, sint
-      real(dp) :: q, q_in, this_psi, xl1, psi_RL, left_bracket, right_bracket, first_guess
+      real(dp) :: q, q_in, this_psi, xl1, psi_RL, left_bracket, right_bracket, first_guess, ar
+      real(dp), parameter :: min_ar = 1d-1
       
       include 'formats'
 
@@ -140,7 +141,8 @@ contains
       allocate(rpar(3))
 
       if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
-         psi_RL = Psi_fit(b% rl(1) / b% separation, q)
+         ar = b% rl(1) / b% separation
+         psi_RL = Psi_fit(ar, q)
          xl1 = xl1_fit(q)
          rpar(1) = psi_RL
          rpar(3) = q
@@ -191,17 +193,22 @@ contains
 
       if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          if (b% point_mass_i /= 1) then
-            this_psi = Psi_fit(b% r(1) / b% separation, q)
+            ar = b% r(1) / b% separation
+            this_psi = Psi_fit(ar, q)
             rpar(1) = this_psi
             rpar(3) = q
             do i=1, num_points
                rpar(2) = cost(i)
-               rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
-                  left_bracket, right_bracket, & ! left, right bracket
-                  roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
-                  25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
-                  0, rpar, 0, ipar, & ! func_params
-                  ierr)
+               if (this_psi < -1d0 / min_ar) then
+                  rs(i) = min_ar
+               else
+                  rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
+                     left_bracket, right_bracket, & ! left, right bracket
+                     roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
+                     25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
+                     0, rpar, 0, ipar, & ! func_params
+                     ierr)
+               end if
                x1s_star(i) = rs(i) * cost(i)
                y1s_star(i) = rs(i) * sint(i)
             end do
@@ -235,17 +242,22 @@ contains
          xmax = max(x1max, xmax)
 
          if (b% point_mass_i /= 2) then
-            this_psi = Psi_fit(b% r(2) / b% separation, q_in)
+            ar = b% r(2) / b% separation
+            this_psi = Psi_fit(ar, q_in)
             rpar(1) = this_psi
             rpar(3) = q_in
             do i = 1, num_points
                rpar(2) = cost(i)
-               rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
-                  left_bracket, right_bracket, & ! left, right bracket
-                  roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
-                  25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
-                  0, rpar, 0, ipar, & ! func_params
-                  ierr)
+               if (this_psi < - 1d0 / min_ar) then
+                  rs(i) = min_ar
+               else
+                  rs(i) = safe_root_with_guess(f_roche, first_guess, 1d-3, &  ! function, guess, dx for bracket
+                     left_bracket, right_bracket, & ! left, right bracket
+                     roche(left_bracket, cost(i), q) - psi_RL, roche(right_bracket, cost(i), q) - psi_RL, & ! f(left, right bracket)
+                     25, 50, 1d-5, 1d-6, & ! i_next, imax, x_tol, y_tol
+                     0, rpar, 0, ipar, & ! func_params
+                     ierr)
+               end if
                x2s_star(i) = rs(i) * cost(i)
                y2s_star(i) = rs(i) * sint(i)
             end do
@@ -256,7 +268,7 @@ contains
                   imax = i
                end if
             end do
-!
+
             do i = 1, num_points
                if (i <= imax .and. x2s_star(i) > xl1) then
                   x2s_star(i) = xl1  ! fix bad xs
