@@ -1403,6 +1403,8 @@
             if (failed('prev_mesh_omega')) exit
             call do1(s% prev_mesh_mlt_vc, c% prev_mesh_mlt_vc)
             if (failed('prev_mesh_mlt_vc')) exit
+            call do1(s% prev_mesh_superad_reduction_factor, c% prev_mesh_superad_reduction_factor)
+            if (failed('prev_mesh_superad_reduction_factor')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
             ! These are needed for time-smoothing of ST mixing

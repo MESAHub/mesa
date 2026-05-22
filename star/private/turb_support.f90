@@ -522,59 +522,58 @@ contains
                      exp_limit = exp(-lambda_limit*(Gamma_factor-1d0))
                      Gamma_factor = 2d0*(reduction_limit-1d0)*(1d0/(1d0+exp_limit)-0.5d0)+1d0
                   end if
-                  ! Convective-turnover-time limiter: relax Gamma_factor toward
-                  ! its instantaneous (unlimited) value over the local
-                  ! turnover time tau_conv = scale_height / mlt_vc_old. The
-                  ! "starting point" of the relaxation is the previous step's
-                  ! converged Gamma_factor (s% superad_reduction_factor_old(k)),
-                  ! not 1. This is the physically correct first-order ODE
-                  !
-                  !    d Gamma_fac / dt = (Gamma_fac_inst - Gamma_fac) / tau_conv
-                  !
-                  ! discretized as
-                  !
-                  !    Gamma_fac_new = Gamma_fac_old
-                  !                  + f_turnover * (Gamma_fac_inst - Gamma_fac_old)
-                  !
-                  ! When dt >> tau_conv, f_turnover -> 1 and we get the
-                  ! instantaneous value (current behavior). When dt << tau_conv,
-                  ! f_turnover -> 0 and Gamma_fac stays at its previous-step
-                  ! value -- convection had no time to adapt, so neither
-                  ! tightening nor releasing the throttle is allowed. The
-                  ! previous formula relaxed toward 1 (no throttle) in the
-                  ! second limit, which is unphysical -- convection cannot
-                  ! abruptly "release" the throttle either, and that produced
-                  ! HRD jumps when dt suddenly collapsed in late phases.
-                  !
-                  ! Skip the relaxation until the previous-step mlt_vc and
-                  ! Gamma_factor_old have both been populated.
-                  if (s% superad_reduction_use_turnover_limit .and. &
-                      Gamma_factor > 1d0 .and. k > 0 .and. &
-                      s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
-                      s% have_superad_reduction_factor .and. &
-                      associated(s% superad_reduction_factor_old) .and. &
-                      s% dt > 0d0) then
-                     ! Optional floor on mlt_vc_old at a fraction of the local
-                     ! face sound speed. See controls.defaults docstring for
-                     ! the physical motivation (MLT is unreliable in
-                     ! radiation-pressure-dominated layers; perturbations
-                     ! still propagate at >= c_s).
-                     vc_old_floor = s% superad_reduction_turnover_vc_floor_frac &
-                                    * s% csound_face(k)
-                     vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
-                     tau_conv = scale_height / vc_old_local
-                     f_turnover = 1d0 - exp(-s% dt / tau_conv)
-                     ! Anchor the relaxation at the previous step's value.
-                     ! Clamp to >= 1 (= no-throttle floor) so we never start
-                     ! relaxing from a non-physical sub-1 anchor.
-                     Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
-                     Gamma_factor = Gamma_factor_old_local + &
-                                    f_turnover * (Gamma_factor - Gamma_factor_old_local)
-                  end if
                end if
             end if
          end if
-         if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
+
+         ! Convective-turnover-time limiter (placed OUTSIDE the
+         ! Gamma_term>0d0 block so it also handles the case where the
+         ! instantaneous Gamma_factor is 1 but the previous step's value
+         ! was > 1 -- i.e., we must relax the throttle DOWN, not snap it
+         ! to 1 in a single step). Relaxes Gamma_factor toward its
+         ! instantaneous (capped) value over the local turnover time
+         ! tau_conv = scale_height / mlt_vc_old, anchored at the
+         ! previous-step's converged Gamma_factor:
+         !
+         !    d Gamma_fac / dt = (Gamma_fac_inst - Gamma_fac) / tau_conv
+         !    Gamma_fac_new = Gamma_fac_old + f_turnover * (Gamma_fac_inst - Gamma_fac_old)
+         !
+         ! dt >> tau_conv: f_turnover -> 1, Gamma_fac -> Gamma_fac_inst (no smoothing).
+         ! dt << tau_conv: f_turnover -> 0, Gamma_fac -> Gamma_fac_old (convection
+         !   had no time to adapt, throttle held at previous-step value
+         !   independently of whether the new step needs more or less throttling).
+         !
+         ! Skip until the previous-step mlt_vc and Gamma_factor_old have both
+         ! been populated. Fires only when there is throttling to track --
+         ! either an instantaneous Gamma_factor>1 OR a non-trivial old value
+         ! that has to relax back to 1.
+         if (s% superad_reduction_use_turnover_limit .and. k > 0 .and. &
+             s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
+             s% have_superad_reduction_factor .and. &
+             associated(s% superad_reduction_factor_old) .and. &
+             s% dt > 0d0) then
+            ! Clamp at >= 1 so we never relax from a non-physical sub-1 anchor.
+            Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
+            if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
+               ! Optional floor on mlt_vc_old at a fraction of the local face
+               ! sound speed; see controls.defaults for the physical motivation.
+               vc_old_floor = s% superad_reduction_turnover_vc_floor_frac &
+                              * s% csound_face(k)
+               vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
+               tau_conv = scale_height / vc_old_local
+               f_turnover = 1d0 - exp(-s% dt / tau_conv)
+               Gamma_factor = Gamma_factor_old_local + &
+                              f_turnover * (Gamma_factor - Gamma_factor_old_local)
+            end if
+         end if
+
+         ! Only commit to s% superad_reduction_factor when allowed; otherwise
+         ! the start-of-step set_vars_if_needed path would overwrite the
+         ! previous step's converged value before new_generation has snapshotted
+         ! it into s% superad_reduction_factor_old. Mirror of okay_to_set_mlt_vc.
+         if (k /= 0 .and. s% okay_to_set_superad_reduction_factor) then
+            s% superad_reduction_factor(k) = Gamma_factor% val
+         end if
          if (Gamma_factor > 1d0) then
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
             gradr_scaled = grad_scale*gradr

@@ -207,6 +207,7 @@
                s% mlt_vc(k) = s% mlt_vc_old(k)
             end do
             s% okay_to_set_mlt_vc = .true.
+            s% okay_to_set_superad_reduction_factor = .true.
 
             call set_qs(s, s% nz, s% q, s% dq, ierr)
             if (ierr /= 0) then

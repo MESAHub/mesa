@@ -333,7 +333,8 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc, &
+         prev_mesh_superad_reduction_factor
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
       real(dp), pointer, dimension(:) :: prev_mesh_D_ST_start, prev_mesh_nu_ST_start
@@ -914,10 +915,17 @@
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
             okay_to_set_mlt_vc, have_mlt_vc, &
-            have_superad_reduction_factor   ! true once a step has set
+            have_superad_reduction_factor, &
+                                            ! true once a step has set
                                             ! superad_reduction_factor and we've
                                             ! copied it into _old (consumed by
                                             ! the smooth-relaxation limiter)
+            okay_to_set_superad_reduction_factor
+                                            ! mirror of okay_to_set_mlt_vc:
+                                            ! protects s%superad_reduction_factor
+                                            ! from being written between the
+                                            ! previous step's success and
+                                            ! new_generation's snapshot
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass
