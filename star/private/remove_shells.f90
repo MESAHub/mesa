@@ -1236,7 +1236,6 @@
          save_have_mlt_vc = s% have_mlt_vc
          s% have_mlt_vc = .false.
          s% have_superad_reduction_factor = .false.
-         s% okay_to_set_superad_reduction_factor = .false.
 
          !save composition and entropy profiles
          xa(:,:) = s% xa(:,k_remove:s% nz)

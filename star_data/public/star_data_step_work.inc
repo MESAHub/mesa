@@ -915,17 +915,11 @@
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
             okay_to_set_mlt_vc, have_mlt_vc, &
-            have_superad_reduction_factor, &
+            have_superad_reduction_factor
                                             ! true once a step has set
                                             ! superad_reduction_factor and we've
                                             ! copied it into _old (consumed by
                                             ! the smooth-relaxation limiter)
-            okay_to_set_superad_reduction_factor
-                                            ! mirror of okay_to_set_mlt_vc:
-                                            ! protects s%superad_reduction_factor
-                                            ! from being written between the
-                                            ! previous step's success and
-                                            ! new_generation's snapshot
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

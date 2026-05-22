@@ -567,13 +567,7 @@ contains
             end if
          end if
 
-         ! Only commit to s% superad_reduction_factor when allowed; otherwise
-         ! the start-of-step set_vars_if_needed path would overwrite the
-         ! previous step's converged value before new_generation has snapshotted
-         ! it into s% superad_reduction_factor_old. Mirror of okay_to_set_mlt_vc.
-         if (k /= 0 .and. s% okay_to_set_superad_reduction_factor) then
-            s% superad_reduction_factor(k) = Gamma_factor% val
-         end if
+         if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
             gradr_scaled = grad_scale*gradr
