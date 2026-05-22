@@ -319,6 +319,7 @@
          s% need_to_setvars = .true.  ! always start fresh
          s% okay_to_set_mixing_info = .true.  ! set false by element diffusion
          s% okay_to_set_mlt_vc = .false.  ! don't change mlt_vc until have set mlt_vc_old
+         s% okay_to_set_superad_reduction_factor = .false.  ! mirror for superad_reduction_factor
 
          if (s% timestep_hold > s% model_number + 10000) then
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -698,6 +699,7 @@
                s% have_mlt_vc = .true.
             end if
             s% okay_to_set_mlt_vc = .false.
+            s% okay_to_set_superad_reduction_factor = .false.
          end if
 
          if (.not. okay_energy_conservation()) return
@@ -1864,6 +1866,7 @@
                s% prev_mesh_omega(k) = s% omega(k)
                s% prev_mesh_dq(k) = s% dq(k)
                s% prev_mesh_mlt_vc(k) = s% mlt_vc(k)
+               s% prev_mesh_superad_reduction_factor(k) = s% superad_reduction_factor(k)
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
@@ -2198,6 +2201,7 @@
                   s% omega_old(k) = s% prev_mesh_omega(k)
                   s% j_rot_old(k) = s% prev_mesh_j_rot(k)
                   s% mlt_vc_old(k) = s% prev_mesh_mlt_vc(k)
+                  s% superad_reduction_factor_old(k) = s% prev_mesh_superad_reduction_factor(k)
                end do
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
                if (ierr /= 0) then

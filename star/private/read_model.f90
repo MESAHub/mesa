@@ -157,6 +157,7 @@
          if (.not. s% have_mlt_vc) then
             s% okay_to_set_mlt_vc = .true.
          end if
+         s% okay_to_set_superad_reduction_factor = .true.
 
          s% doing_finish_load_model = .true.
          call set_vars(s, s% dt, ierr)
