@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-rm -f restart_photo
-make run
-
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-
-echo 'finished'
