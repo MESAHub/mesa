@@ -2682,7 +2682,10 @@
    ! ____________
 
       ! There are three schemes implemented in MESA to treat overshooting:
-      ! a step overshoot, an exponential scheme, and the combination of both.
+      ! a step overshoot scheme, an exponential scheme, and a step+exponential scheme.
+
+      ! Parameters for exponential diffusive overshoot are described in the paper by Falk Herwig,
+      ! "The evolution of AGB stars with convective overshoot", A&A, 360, 952-968 (2000).
 
       ! Overshooting depends on the classification of the convective zone and can be different at the top and the bottom of the zone.
 
@@ -2734,20 +2737,18 @@
       ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
       ! ``star_data/public/star_data_def.inc`` (currently 16)
 
-      ! For exponential overshoot: Parameters for exponential diffusive overshoot are described in the paper by Falk Herwig,
-      ! "The evolution of AGB stars with convective overshoot", A&A, 360, 952-968 (2000).
+      ! If you use the 'step+exponential' scheme, the step is placed first and the
+      ! exponential component follows it. The parameterizations for both parts are
+      ! still evaluated at the convective boundary (as described above); the
+      ! exponential part is displaced by the extent of the step part.
+      ! This approach is motivated by:
+      ! Michielsen et al. 2021 (`A&A 650, A175 <https://doi.org/10.1051/0004-6361/202039926>`_)
+      ! Anders et al. 2022a (`ApJ 926, 169 <https://doi.org/10.3847/1538-4357/ac408d>`_)
+      ! Anders et al. 2022b (`ApJL 928, L10 <https://doi.org/10.3847/2041-8213/ac5cb5>`_)
+      ! Johnston et al. 2024 (`ApJ 964, 170 <https://doi.org/10.3847/1538-4357/ad2343>`_)
 
-      ! If you use the 'step+exponential', the step is placed first, after which the exponential is placed. Note that the
-      ! parameterizations for both parts is still evaluated at the convective boundary (as described above), the exponential part
-      ! is just displaced by the extent of the step part.
-      ! This approach is motivated by works from
-      ! Michielsen, M., C. Aerts, and D. M. Bowman. “Probing the Temperature Gradient in the Core Boundary Layer of Stars with Gravito-Inertial Modes. The Case of KIC 7760680.” Astronomy & Astrophysics 650 (June 2021): A175. https://doi.org/10.1051/0004-6361/202039926.
-      ! Anders, Evan H., Adam S. Jermyn, Daniel Lecoanet, et al. “Schwarzschild and Ledoux Are Equivalent on Evolutionary Timescales.” The Astrophysical Journal Letters 928, no. 1 (2022): L10. https://doi.org/10.3847/2041-8213/ac5cb5.
-      ! Anders, Evan H., Adam S. Jermyn, Daniel Lecoanet, and Benjamin P. Brown. “Stellar Convective Penetration: Parameterized Theory and Dynamical Simulations.” The Astrophysical Journal 926, no. 2 (2022): 169. https://doi.org/10.3847/1538-4357/ac408d.
-      ! Johnston, Cole, Mathias Michielsen, Evan H. Anders, et al. “Modelling Time-Dependent Convective Penetration in 1D Stellar Evolution.” The Astrophysical Journal 964 (April 2024): 170. https://doi.org/10.3847/1538-4357/ad2343.
-
-      ! The step overshoot part models convective entrainment, where the a convective
-      ! zone "eats up" a ledoux stable region (typically above a convective core).
+      ! The step overshoot part models convective entrainment, where a convective
+      ! zone "eats up" a Ledoux-stable region (typically above a convective core).
       ! The exponential overshoot part then models actual overshooting where inertia
       ! carries material beyond the Schwarzschild boundary.
       ! Note however that no temperature gradients are modified, MESA's implementation of overshoot
@@ -2777,6 +2778,7 @@
       ! ::
 
     overshoot_mass_full_off(:) = 0d0
+
 
       ! overshoot_D_min
       ! ~~~~~~~~~~~~~~~

@@ -62,27 +62,16 @@ contains
     ! using the j'th set of overshoot parameters. The overshoot
     ! follows a simple step scheme, plus an exponential drop off on top of that.
 
-    ! This approach is motivated by works from
-    ! Michielsen, M., C. Aerts, and D. M. Bowman. “Probing the Temperature Gradient in the Core Boundary Layer of Stars with Gravito-Inertial Modes. The Case of KIC 7760680.” Astronomy & Astrophysics 650 (June 2021): A175. https://doi.org/10.1051/0004-6361/202039926.
-    ! Anders, Evan H., Adam S. Jermyn, Daniel Lecoanet, et al. “Schwarzschild and Ledoux Are Equivalent on Evolutionary Timescales.” The Astrophysical Journal Letters 928, no. 1 (2022): L10. https://doi.org/10.3847/2041-8213/ac5cb5.
-    ! Anders, Evan H., Adam S. Jermyn, Daniel Lecoanet, and Benjamin P. Brown. “Stellar Convective Penetration: Parameterized Theory and Dynamical Simulations.” The Astrophysical Journal 926, no. 2 (2022): 169. https://doi.org/10.3847/1538-4357/ac408d.
-    ! Johnston, Cole, Mathias Michielsen, Evan H. Anders, et al. “Modelling Time-Dependent Convective Penetration in 1D Stellar Evolution.” The Astrophysical Journal 964 (April 2024): 170. https://doi.org/10.3847/1538-4357/ad2343.
-
-    ! The step overshoot part models convective entrainment, where the a convective
-    ! zone "eats up" a ledoux stable region (typically above a convective core).
-    ! The exponential overshoot part then models actual overshooting where inertia
-    ! carries material beyond the Schwarzschild boundary.
-
     ierr = 0
 
-
     ! Extract parameters
-    f0 = s% overshoot_f0(j)
-    f = s% overshoot_f(j)  ! step distance
-    f2 = s% overshoot_f2(j)  ! exponential distance (on top of the step)
 
-    D0 = s% overshoot_D0(j)
-    Delta0 = s% overshoot_Delta0(j)
+    f0 = s%overshoot_f0(j)
+    f = s%overshoot_f(j)  ! step distance
+    f2 = s%overshoot_f2(j)  ! exponential distance (on top of the step)
+
+    D0 = s%overshoot_D0(j)
+    Delta0 = s%overshoot_Delta0(j)
 
     if (f <= 0._dp .OR. f0 <= 0._dp .OR. f2 <= 0._dp) then
        write(*,*) 'ERROR: for step+exp overshooting, must set f, f2 and f0 > 0'
@@ -92,10 +81,11 @@ contains
     end if
 
     ! Apply mass limits
-    if (s% star_mass < s% overshoot_mass_full_on(j)) then
-       if (s% star_mass > s% overshoot_mass_full_off(j)) then
-          w = (s% star_mass - s% overshoot_mass_full_off(j)) / &
-              (s% overshoot_mass_full_on(j) - s% overshoot_mass_full_off(j))
+
+    if (s%star_mass < s%overshoot_mass_full_on(j)) then
+       if (s%star_mass > s%overshoot_mass_full_off(j)) then
+          w = (s%star_mass - s%overshoot_mass_full_off(j)) / &
+              (s%overshoot_mass_full_on(j) - s%overshoot_mass_full_off(j))
           factor = 0.5_dp*(1._dp - cospi(w))
           f = f*factor
           f0 = f0*factor
@@ -106,16 +96,18 @@ contains
     end if
 
     ! Evaluate convective boundary (_cb) parameters
+
     call eval_conv_bdy_Hp(s, i, Hp_cb, ierr)
     if (ierr /= 0) return
 
     ! Evaluate overshoot boundary (_ob) parameters
+
     call eval_over_bdy_params(s, i, f0, k_ob, r_ob, D_ob, vc_ob, ierr)
     if (ierr /= 0) return
 
     ! Loop over cell faces, adding overshoot until D <= overshoot_D_min
 
-    outward = s% top_conv_bdy(i)
+    outward = s%top_conv_bdy(i)
 
     if (outward) then
        k_a = k_ob
@@ -123,15 +115,15 @@ contains
        dk = -1
     else
        k_a = k_ob+1
-       k_b = s% nz
+       k_b = s%nz
        dk = 1
     end if
 
     face_loop : do k = k_a, k_b, dk
 
-       ! Evaluate the step factor
+       ! Evaluate the step+exponential factor
 
-       r = s% r(k)
+       r = s%r(k)
 
        if (outward) then
           dr = r - r_ob
@@ -155,7 +147,7 @@ contains
        end if
        ! Check for early overshoot completion
 
-       if (D(k) < s% overshoot_D_min) then
+       if (D(k) < s%overshoot_D_min) then
           k_b = k
           exit face_loop
        end if
@@ -163,6 +155,8 @@ contains
     end do face_loop
 
     ierr = 0
+
+    return
 
   end subroutine eval_overshoot_step_exp
 

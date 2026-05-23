@@ -28,7 +28,8 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
-Convective overshooting now includes a ``step+exponential`` prescription.
+Diffusive overshooting (overmixing) prescriptions now support a
+``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
 
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 

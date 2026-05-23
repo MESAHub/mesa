@@ -220,6 +220,9 @@ contains
        end if
 
     end if
+
+    return
+
   end subroutine eval_conv_bdy_Hp
 
 
