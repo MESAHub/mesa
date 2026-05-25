@@ -35,6 +35,8 @@ extra_controls_inlist_name(1) = 'inlist_both'
 x_logical_ctrl(1)             = .true.
 
 log_directory                 = 'LOGS1'
+max_model_number = 1
+
 
 / ! end of controls namelist
 

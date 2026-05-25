@@ -3,8 +3,15 @@
 &star_job
       show_log_description_at_start = .false.
 
-      create_pre_main_sequence_model = .true.
-      pre_ms_relax_to_start_radiative_core = .true.
+      !create_pre_main_sequence_model = .true.
+      !pre_ms_relax_to_start_radiative_core = .true.
+      load_saved_model = .false.
+      !load_model_filename = ''
+
+       relax_initial_Y = .true.
+       new_Y = 0.2703d0
+       relax_initial_Z = .true.
+       new_Z = 1.42d-2
 
       change_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
@@ -27,7 +34,6 @@
       pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
-      new_Z = 1.42d-2
       initial_zfracs = 6 ! set to asplund 2009 abundance fractions
 
       save_model_when_terminate = .true.
@@ -38,7 +44,7 @@
 
 &eos
       use_Skye = .true.
-      mass_fraction_limit_for_Skye = 1d-10
+     ! mass_fraction_limit_for_Skye = 1d-10
 
 / ! end of eos namelist
 
@@ -56,8 +62,8 @@
 
 ! initial model
       initial_mass = 60
-      initial_z = 1.42d-2 ! solar
-      initial_y = 0.2703d0 ! from asplund et al. 2009, solar.
+      !initial_z = 1.42d-2 ! solar
+      !initial_y = 0.2703d0 ! from asplund et al. 2009, solar.
 
 ! stopping
       xa_central_lower_limit_species(1) = 'he4'
@@ -84,7 +90,7 @@
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed' 
-      Pextra_factor = 1 
+      Pextra_factor = 2 
 
 ! mlt
       mixing_length_alpha = 1.5
