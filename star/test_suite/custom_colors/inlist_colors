@@ -163,6 +163,18 @@
       Grid8_plot_colspan(4) = 1
       Grid8_plot_rowspan(4) = 1
 
+
+      ! --- GRID 8 FILE EXPORT CONTROLS ---
+      Grid8_file_flag = .true.          ! Enable saving this window to files
+      Grid8_file_dir = 'plots'              ! "." tells MESA to save directly into your working directory
+      Grid8_file_prefix = 'dashboard_'  ! Filenames will be dashboard_000001.png, dashboard_000002.png, etc.
+      Grid8_file_interval = 1           ! Save an image on EVERY single step (set to 5 or 10 to save disk space)
+
+      ! PNG sizing overrides (-1 defaults to your window display dimensions)
+      Grid8_file_width = -1
+      Grid8_file_aspect_ratio = -1
+
+
       ! --- INDIVIDUAL PANEL CONFIGURATIONS ---
 
       Color_Magnitude1_num_panels = 1
