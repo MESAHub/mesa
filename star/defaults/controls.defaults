@@ -2738,7 +2738,9 @@
       ! ``star_data/public/star_data_def.inc`` (currently 16)
 
       ! If you use the 'step+exponential' scheme, the step is placed first and the
-      ! exponential component follows it. The parameterizations for both parts are
+      ! exponential component follows it. In this scheme, ``overshoot_f`` sets
+      ! the width of the step part and ``overshoot_f2`` sets the length scale of
+      ! the additional exponential tail. The parameterizations for both parts are
       ! still evaluated at the convective boundary (as described above); the
       ! exponential part is displaced by the extent of the step part.
       ! This approach is motivated by:
