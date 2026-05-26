@@ -14,6 +14,8 @@ except ImportError:
     do_tqdm = False
 
 
+# Reuse the live viewer so formatting/logic stays identical
+
 OUT = "history.mp4"
 FPS = 24
 DPI = 150
@@ -21,18 +23,16 @@ DPI = 150
 # Build once from the user's checker and pull arrays
 checker = HistoryChecker(history_file="../LOGS/history.data", refresh_interval=0.1)
 checker.update_data()  # read md + compute columns/colors
-checker.setup_plot()   # set labels, axes styling, grids — called ONCE
+checker.setup_plot()  # set labels, axes styling, grids
 
 age = np.asarray(checker.Star_Age, float)
 Teff = np.asarray(checker.Teff, float)
 Log_L = np.asarray(checker.Log_L, float)
 hr_x = np.asarray(checker.hr_color, float)
 hr_y = np.asarray(checker.hr_mag, float)
-color_index = np.asarray(checker.color_index, float)
 phase_colors = (
     np.asarray(checker.phase_colors, object) if len(checker.phase_colors) else None
 )
-has_phases = phase_colors is not None and len(phase_colors) == age.size
 filters = list(checker.filter_columns)
 fig, axes = checker.fig, checker.axes
 
@@ -54,23 +54,14 @@ Teff_lo, Teff_hi = pad(np.nanmin(Teff), np.nanmax(Teff))
 LogL_lo, LogL_hi = pad(np.nanmin(Log_L), np.nanmax(Log_L))
 hrx_lo, hrx_hi = pad(np.nanmin(hr_x), np.nanmax(hr_x))
 hry_lo, hry_hi = pad(np.nanmin(hr_y), np.nanmax(hr_y))
-ci_lo, ci_hi = pad(np.nanmin(color_index), np.nanmax(color_index))
+ci_lo, ci_hi = pad(np.nanmin(checker.color_index), np.nanmax(checker.color_index))
 
-# Preload all magnitude series + their assigned colors from the live viewer.
-# Apply the same physical mask as update_plot so duplicate/non-physical columns
-# (e.g. from unused atmosphere grids) are silently skipped.
+# Preload all magnitude series + their assigned colors from the live viewer
 mag_series = []
-seen_filters = set()
 for i, f in enumerate(filters):
-    if f in seen_filters:
-        continue
     y = np.asarray(getattr(checker.md, f), float)
     if y.size != age.size:
         continue
-    mask = np.isfinite(y) & np.isfinite(age) & (y < 90.0) & (y > -50.0)
-    if not np.any(mask):
-        continue
-    seen_filters.add(f)
     color = checker.filter_colors[i] if i < len(checker.filter_colors) else "black"
     mag_series.append((f, y, color))
 
@@ -80,87 +71,120 @@ if mag_series:
 else:
     mag_lo, mag_hi = 0.0, 1.0
 
-# ── Create all artists ONCE with empty data ───────────────────────────────────
-# Top-left: CMD/HR
-hr_line,   = axes[0, 0].plot([], [], marker=",", linestyle="-", color="k", alpha=0.2)
-hr_sc      = axes[0, 0].scatter([], [], s=15, alpha=0.9, edgecolors="none")
-axes[0, 0].set_xlim(hrx_lo, hrx_hi)
-axes[0, 0].set_ylim(hry_hi, hry_lo)  # invert mags
-
-# Top-right: Teff vs Log L
-teff_line, = axes[0, 1].plot([], [], marker=",", linestyle="-", color="k", alpha=0.2)
-teff_sc    = axes[0, 1].scatter([], [], s=15, alpha=0.9, edgecolors="none")
-axes[0, 1].set_xlim(Teff_hi, Teff_lo)  # Teff inverted x
-axes[0, 1].set_ylim(LogL_lo, LogL_hi)
-
-# Bottom-left: Age vs color index
-ci_line,   = axes[1, 0].plot([], [], marker=",", linestyle="-", color="k", alpha=0.2)
-ci_sc      = axes[1, 0].scatter([], [], s=15, alpha=1.0, edgecolors="none")
-axes[1, 0].set_xlim(age_lo, age_hi)
-axes[1, 0].set_ylim(ci_lo, ci_hi)
-
-# Bottom-right: Age vs filter mags — one Line2D per filter, created once
-mag_lines = []
-for label, series, color in mag_series:
-    ln, = axes[1, 1].plot([], [], marker="o", linestyle="-", markersize=3,
-                           alpha=0.8, label=label, color=color)
-    mag_lines.append((ln, series))
-axes[1, 1].set_xlim(age_lo, age_hi)
-axes[1, 1].set_ylim(mag_hi, mag_lo)  # invert mags
-if mag_series:
-    axes[1, 1].legend()
-
-# Phase legend is the same every frame — build it once outside the loop
-if getattr(checker, "has_phase", False):
-    legend_elements = checker.create_phase_legend()
-    if len(legend_elements) > 0:
-        n_phases = len(legend_elements)
-        fig.legend(
-            handles=legend_elements,
-            loc="upper center",
-            bbox_to_anchor=(0.5, 0.53),
-            ncol=max(1, (n_phases + 1) // 1),
-            title_fontsize=10,
-            fontsize=10,
-            frameon=True,
-            fancybox=True,
-            shadow=True,
-        )
-
-plt.subplots_adjust(top=0.92)
-
-# ── Render frames ─────────────────────────────────────────────────────────────
 writer = FFMpegWriter(fps=FPS, codec="libx264", extra_args=["-pix_fmt", "yuv420p"])
 
 with writer.saving(fig, OUT, dpi=DPI):
     N = age.size
-    iterator = tqdm(range(N)) if do_tqdm else range(N)
+
+    if do_tqdm:
+        iterator = tqdm(range(N))
+    else:
+        iterator = range(N)
 
     for i in iterator:
         sl = slice(0, i + 1)
 
-        # Top-left: CMD/HR
-        hr_line.set_data(hr_x[sl], hr_y[sl])
-        hr_sc.set_offsets(np.c_[hr_x[sl], hr_y[sl]])
-        if has_phases:
-            hr_sc.set_facecolors(phase_colors[sl])
+        # Clear and re-apply the exact same formatting
+        for ax in axes.flatten():
+            ax.cla()
+        checker.setup_plot()
 
-        # Top-right: Teff vs Log L
-        teff_line.set_data(Teff[sl], Log_L[sl])
-        teff_sc.set_offsets(np.c_[Teff[sl], Log_L[sl]])
-        if has_phases:
-            teff_sc.set_facecolors(phase_colors[sl])
+        # Colors for this frame (phase legend if available; else colormap colors are already in phase_colors)
+        C = (
+            phase_colors[sl]
+            if phase_colors is not None and len(phase_colors) == N
+            else None
+        )
 
-        # Bottom-left: Age vs color index
-        ci_line.set_data(age[sl], color_index[sl])
-        ci_sc.set_offsets(np.c_[age[sl], color_index[sl]])
-        if has_phases:
-            ci_sc.set_facecolors(phase_colors[sl])
+        # === Top-left: CMD/HR (color vs mag) ===
+        axes[0, 0].plot(
+            hr_x[sl], hr_y[sl], marker=",", linestyle="-", color="k", alpha=0.2
+        )
+        if C is not None:
+            axes[0, 0].scatter(
+                hr_x[sl], hr_y[sl], c=C, s=15, alpha=0.9, edgecolors="none"
+            )
+        else:
+            axes[0, 0].scatter(hr_x[sl], hr_y[sl], s=15, alpha=0.9, edgecolors="none")
+        axes[0, 0].set_xlim(hrx_lo, hrx_hi)
+        axes[0, 0].set_ylim(hry_hi, hry_lo)  # invert mags
 
-        # Bottom-right: Age vs filter mags
-        for ln, series in mag_lines:
-            ln.set_data(age[sl], series[sl])
+        # === Top-right: Teff vs Log L ===
+        axes[0, 1].plot(
+            Teff[sl], Log_L[sl], marker=",", linestyle="-", color="k", alpha=0.2
+        )
+        if C is not None:
+            axes[0, 1].scatter(
+                Teff[sl], Log_L[sl], c=C, s=15, alpha=0.9, edgecolors="none"
+            )
+        else:
+            axes[0, 1].scatter(Teff[sl], Log_L[sl], s=15, alpha=0.9, edgecolors="none")
+        axes[0, 1].set_xlim(Teff_hi, Teff_lo)  # Teff inverted x
+        axes[0, 1].set_ylim(LogL_lo, LogL_hi)
 
+        # === Bottom-left: Age vs color index ===
+        axes[1, 0].plot(
+            age[sl],
+            checker.color_index[sl],
+            marker=",",
+            linestyle="-",
+            color="k",
+            alpha=0.2,
+        )
+        if C is not None:
+            axes[1, 0].scatter(
+                age[sl],
+                checker.color_index[sl],
+                c=C,
+                s=15,
+                alpha=1.0,
+                edgecolors="none",
+            )
+        else:
+            axes[1, 0].scatter(
+                age[sl], checker.color_index[sl], s=15, alpha=1.0, edgecolors="none"
+            )
+        axes[1, 0].set_xlim(age_lo, age_hi)
+        axes[1, 0].set_ylim(ci_lo, ci_hi)
+
+        # === Bottom-right: Age vs all filter mags (full chain) ===
+        for label, series, color in mag_series:
+            axes[1, 1].plot(
+                age[sl],
+                series[sl],
+                marker="o",
+                linestyle="-",
+                markersize=3,
+                alpha=0.8,
+                label=label,
+                color=color,
+            )
+        axes[1, 1].set_xlim(age_lo, age_hi)
+        axes[1, 1].set_ylim(mag_hi, mag_lo)  # invert mags
+        if mag_series:
+            axes[1, 1].legend()
+
+        # Phase legend exactly like the live viewer (only when real phases are present)
+        if getattr(checker, "has_phase", False):
+            legend_elements = checker.create_phase_legend()
+            if len(legend_elements) > 0:
+                # keep the filter legend on bottom-right and add a centered phase legend
+                axes[1, 1].legend()
+                n_phases = len(legend_elements)
+                ncol = max(1, (n_phases + 1) // 1)
+                fig.legend(
+                    handles=legend_elements,
+                    loc="upper center",
+                    bbox_to_anchor=(0.5, 0.53),
+                    ncol=ncol,
+                    title_fontsize=10,
+                    fontsize=10,
+                    frameon=True,
+                    fancybox=True,
+                    shadow=True,
+                )
+
+        plt.subplots_adjust(top=0.92)
         writer.grab_frame()
 
 print(f"Wrote {age.size} frames -> {OUT}")

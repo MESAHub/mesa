@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-./mk && ./colors_post_proc
+make run

@@ -11,7 +11,7 @@ program colors_post_proc
    implicit none
 
    ! --- post_proc controls ---
-   character(len=512) :: history_file, output_file, mesa_dir_in, inlist_file
+   character(len=512) :: history_file, output_file, mesa_dir_in
    real(dp)           :: log_ZX_solar
 
    ! --- colors handle ---
@@ -33,19 +33,14 @@ program colors_post_proc
    call const_init(trim(mesa_dir_in), ierr)
    if (ierr /= 0) error stop 'const_init failed'
 
-   ! 2. find the inlist file, then read &post_proc namelist
-   call find_inlist_file(inlist_file, ierr)
-   if (ierr /= 0) error stop 'could not determine inlist file'
-
-   write(*,'(2a)') 'using inlist file: ', trim(inlist_file)
-
-   call read_post_proc_controls(trim(inlist_file), history_file, output_file, log_ZX_solar)
+   ! 2. read &post_proc namelist
+   call read_post_proc_controls('inlist', history_file, output_file, log_ZX_solar)
 
    ! 3. initialise colors module
    call colors_init(.true., '', ierr)
    if (ierr /= 0) error stop 'colors_init failed'
 
-   handle = alloc_colors_handle_using_inlist(trim(inlist_file), ierr)
+   handle = alloc_colors_handle_using_inlist('inlist', ierr)
    if (ierr /= 0) error stop 'alloc_colors_handle_using_inlist failed'
 
    call get_colors_ptr(handle, rq, ierr)
@@ -86,56 +81,6 @@ program colors_post_proc
 contains
 
    ! ---------------------------------------------------------------------------
-   subroutine find_inlist_file(inlist_file, ierr)
-      character(len=*), intent(out) :: inlist_file
-      integer,          intent(out) :: ierr
-
-      character(len=512), parameter :: candidates(*) = [ character(len=512) :: &
-         'inlist', &
-         'inlist_colors', &
-         'inlist_color', &
-         'inlist_post', &
-         'inlist_post_proc' &
-      ]
-
-      integer :: i, n_found
-      logical :: exists
-
-      ierr = 0
-      inlist_file = ''
-      n_found = 0
-
-      do i = 1, size(candidates)
-         inquire(file=trim(candidates(i)), exist=exists)
-         if (exists) then
-            n_found = n_found + 1
-            if (len_trim(inlist_file) == 0) inlist_file = trim(candidates(i))
-         end if
-      end do
-
-      if (n_found == 0) then
-         write(*,*) 'error: no inlist file found'
-         write(*,*) 'looked for: inlist, inlist_colors, inlist_color, inlist_post, inlist_post_proc'
-         ierr = -1
-         return
-      end if
-
-      if (n_found > 1) then
-         write(*,*) 'error: multiple possible inlist files found'
-         write(*,*) 'please keep only one, or create a symlink named inlist'
-         do i = 1, size(candidates)
-            inquire(file=trim(candidates(i)), exist=exists)
-            if (exists) write(*,'(2a)') '  found: ', trim(candidates(i))
-         end do
-         ierr = -1
-         return
-      end if
-
-   end subroutine find_inlist_file
-
-
-
-   ! ---------------------------------------------------------------------------
    subroutine read_post_proc_controls(filename, history_file, output_file, log_ZX_solar)
       character(len=*), intent(in)  :: filename
       character(len=*), intent(out) :: history_file, output_file
@@ -146,7 +91,7 @@ contains
       namelist /post_proc/ history_file, output_file, log_ZX_solar
 
       history_file  = 'LOGS/history.data'
-      output_file   = 'post_proc_output.data'
+      output_file   = 'LOGS/post_proc_output.data'
       ! Default: GS98 solar reference (Z_sun=0.0188, X_sun=0.7379)
       ! log10(0.0188/0.7379) = -1.594
       ! This matches the Kurucz2003all atmosphere grid shipped with MESA.
