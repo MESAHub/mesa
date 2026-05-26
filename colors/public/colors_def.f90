@@ -118,7 +118,11 @@ module colors_def
       integer, allocatable :: sed_mcache_keys(:)          ! (sed_mem_cache_cap)
       real(dp), allocatable :: sed_mcache_data(:, :)       ! (n_lambda, sed_mem_cache_cap)
 
+      logical :: pgstar_sed_valid = .false.
+      real(dp), allocatable :: current_sed_wavelengths(:)
+      real(dp), allocatable :: current_sed_fluxes(:)
    end type Colors_General_Info
+
 
    ! Global filter name list (shared across handles)
    integer :: num_color_filters
