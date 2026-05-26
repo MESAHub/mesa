@@ -567,6 +567,10 @@ contains
          do_Color_Magnitude4_plot, do_Color_Magnitude5_plot, do_Color_Magnitude6_plot, &
          do_Color_Magnitude7_plot, do_Color_Magnitude8_plot, do_Color_Magnitude9_plot
 
+      use pgstar_sed, only: &
+         do_SED_Plot1, do_SED_Plot2, do_SED_Plot3, do_SED_Plot4, do_SED_Plot5, &
+         do_SED_Plot6, do_SED_Plot7, do_SED_Plot8, do_SED_Plot9         
+
       type (star_info), pointer :: s
       logical, intent(in) :: subplot
       integer, intent(in) :: id, device_id, &
@@ -863,6 +867,35 @@ contains
             call do_Color_Magnitude9_plot(&
                s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Color_Magnitude9_title, &
                Grid_txt_scale_factor(i) * s% pg% Color_Magnitude9_txt_scale, ierr)
+
+         case ('sed1')
+            call do_SED_Plot1(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED1_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED1_txt_scale, ierr)
+         case ('sed2')
+            call do_SED_Plot2(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED2_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED2_txt_scale, ierr)
+         case ('sed3')
+            call do_SED_Plot3(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED3_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED3_txt_scale, ierr)
+         case ('sed4')
+            call do_SED_Plot4(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED4_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED4_txt_scale, ierr)
+         case ('sed5')
+            call do_SED_Plot5(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED5_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED5_txt_scale, ierr)
+         case ('sed6')
+            call do_SED_Plot6(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED6_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED6_txt_scale, ierr)
+         case ('sed7')
+            call do_SED_Plot7(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED7_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED7_txt_scale, ierr)
+         case ('sed8')
+            call do_SED_Plot8(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED8_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED8_txt_scale, ierr)
+         case ('sed9')
+            call do_SED_Plot9(s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% SED9_title, &
+               Grid_txt_scale_factor(i) * s% pg% SED9_txt_scale, ierr)
+
          case ('history_track1')
             call do_History_Track1_plot(&
                s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% History_Track1_title, &

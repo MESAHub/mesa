@@ -2,7 +2,7 @@
 ! This inlist evolves a star from pre-main sequence through multiple evolutionary phases
 ! Uses the custom colors module to calculate synthetic magnitudes in multiple filters
 
-! Niall Miller (2025)
+! Niall Miller (2026)
 
 ! =============================================================================
 ! STAR_JOB NAMELIST - Controls model creation and global job settings
@@ -120,38 +120,85 @@
 /
 
 
-
-! =============================================================================
-! PGSTAR NAMELIST - Real-time plotting settings
-! =============================================================================
-
 &pgstar
-  pgstar_interval = 10
+      file_white_on_black_flag = .true.
+      pgstar_interval = 1
 
-  ! G band light curve
-  History_Track2_win_flag = .true.
-  History_Track2_xname = 'star_age'
-  History_Track2_yname = 'V'
-  History_Track2_title = 'V Light Curve'
-  History_Track2_xaxis_label = 'Age (yr)'
-  History_Track2_yaxis_label = 'V mag'
+      ! Set up Grid 8 as a 2x2 dashboard layout
+      Grid8_win_flag = .true.
+      Grid8_win_width = 14
+      Grid8_win_aspect_ratio = 0.75  ! Safely scales height relative to width (height / width)
+      Grid8_num_cols = 2
+      Grid8_num_rows = 2
+      Grid8_num_plots = 4
 
-  History_Track3_win_flag = .true.
-  History_Track3_xname = 'R'
-  History_Track3_yname = 'B'
-  History_Track3_title = 'B-R'
-  History_Track3_xaxis_label = 'R mag'
-  History_Track3_yaxis_label = 'B mag'
-  History_Track3_reverse_yaxis = .true.
+      ! Define panel names matching your working dispatcher setup
+      Grid8_plot_name(1) = 'Color_Magnitude1'
+      Grid8_plot_name(2) = 'Color_Magnitude2'
+      Grid8_plot_name(3) = 'sed1'
+      Grid8_plot_name(4) = 'sed2'
+
+      ! --- POSITIONING MATRIX (2x2 Grid) ---
+      ! Top-Left: Color-Magnitude Diagram (CMD)
+      Grid8_plot_row(1) = 1
+      Grid8_plot_col(1) = 1
+      Grid8_plot_colspan(1) = 1
+      Grid8_plot_rowspan(1) = 1
+
+      ! Top-Right: Hertzsprung-Russell Diagram (HRD)
+      Grid8_plot_row(2) = 1
+      Grid8_plot_col(2) = 2
+      Grid8_plot_colspan(2) = 1
+      Grid8_plot_rowspan(2) = 1
+
+      ! Bottom-Left: Custom Native SED Panel
+      Grid8_plot_row(3) = 2
+      Grid8_plot_col(3) = 1
+      Grid8_plot_colspan(3) = 1
+      Grid8_plot_rowspan(3) = 1
+
+      ! Bottom-Right: Kippenhahn Diagram
+      Grid8_plot_row(4) = 2
+      Grid8_plot_col(4) = 2
+      Grid8_plot_colspan(4) = 1
+      Grid8_plot_rowspan(4) = 1
+
+      ! --- INDIVIDUAL PANEL CONFIGURATIONS ---
+
+      Color_Magnitude1_num_panels = 1
+      Color_Magnitude1_xaxis1_name = 'B - V'
+      Color_Magnitude1_yaxis1_name = 'V'
+      Color_Magnitude1_xaxis_reversed = .true.
+      Color_Magnitude1_yaxis_reversed = .true.
+      Color_Magnitude1_title = 'Stellar CMD (V vs B-V)'
+      Color_Magnitude1_txt_scale = 0.8
+
+      ! 2. color-color
+
+      Color_Magnitude2_num_panels = 1
+      Color_Magnitude2_xaxis1_name = 'B - R'
+      Color_Magnitude2_yaxis1_name = 'U - I'
+      Color_Magnitude2_xaxis_reversed = .true.
+      Color_Magnitude2_yaxis_reversed = .true.
+      Color_Magnitude2_title = 'Color-Color (U-I vs B-R)'
+      Color_Magnitude2_txt_scale = 0.8
 
 
-  History_Track4_win_flag = .true.
-  History_Track4_xname = 'U'
-  History_Track4_yname = 'I'
-  History_Track4_title = 'U-I'
-  History_Track4_xaxis_label = 'U mag'
-  History_Track4_yaxis_label = 'I mag'
-  History_Track4_reverse_yaxis = .true.
+      ! 3. Your Custom SED Panel Settings
+      SED1_title = 'Live Synthetic Stellar SED'
+      SED1_txt_scale = 0.8
+      SED1_lambda_min = 100.0
+      SED1_lambda_max = 10000.0
+      SED1_flux_min = -101.0d0
+      SED1_flux_max = -101.0d0
 
+      ! 4. Your Custom SED Panel Settings
+      SED2_title = 'Live Synthetic Stellar SED'
+      SED2_txt_scale = 0.8
+      SED2_lambda_min = 100.0
+      SED2_lambda_max = 100000.0
+      SED2_flux_min = -101.0d0
+      SED2_flux_max = -101.0d0
 
 /
+

@@ -2133,3 +2133,35 @@
             trho_use_decorator, &
             tmaxrho_use_decorator, &
             trho_profile_use_decorator
+
+      logical :: SED1_win_flag, SED2_win_flag, SED3_win_flag, &
+         SED4_win_flag, SED5_win_flag, SED6_win_flag, &
+         SED7_win_flag, SED8_win_flag, SED9_win_flag
+
+      logical :: SED1_file_flag, SED2_file_flag, SED3_file_flag, &
+         SED4_file_flag, SED5_file_flag, SED6_file_flag, &
+         SED7_file_flag, SED8_file_flag, SED9_file_flag
+
+      character (len=strlen) :: SED1_title, SED2_title, SED3_title, &
+         SED4_title, SED5_title, SED6_title, &
+         SED7_title, SED8_title, SED9_title
+
+      real :: SED1_txt_scale, SED2_txt_scale, SED3_txt_scale, &
+         SED4_txt_scale, SED5_txt_scale, SED6_txt_scale, &
+         SED7_txt_scale, SED8_txt_scale, SED9_txt_scale
+
+      real :: SED1_lambda_min, SED2_lambda_min, SED3_lambda_min, &
+         SED4_lambda_min, SED5_lambda_min, SED6_lambda_min, &
+         SED7_lambda_min, SED8_lambda_min, SED9_lambda_min
+
+      real :: SED1_lambda_max, SED2_lambda_max, SED3_lambda_max, &
+         SED4_lambda_max, SED5_lambda_max, SED6_lambda_max, &
+         SED7_lambda_max, SED8_lambda_max, SED9_lambda_max
+
+      real :: SED1_flux_min, SED2_flux_min, SED3_flux_min, &
+         SED4_flux_min, SED5_flux_min, SED6_flux_min, &
+         SED7_flux_min, SED8_flux_min, SED9_flux_min
+
+      real :: SED1_flux_max, SED2_flux_max, SED3_flux_max, &
+         SED4_flux_max, SED5_flux_max, SED6_flux_max, &
+         SED7_flux_max, SED8_flux_max, SED9_flux_max

@@ -6371,6 +6371,16 @@
     Color_magnitude9_file_width = -1
     Color_magnitude9_file_aspect_ratio = -1
 
+
+    SED1_title = 'SED Plot 1'
+    SED1_lambda_min = 3000.0d0
+    SED1_lambda_max = 12000.0d0
+    SED1_flux_min = -101.0d0
+    SED1_flux_max = -101.0d0
+    SED1_txt_scale = 1.0d0
+
+
+
 ! Text Summary
 ! ============
 

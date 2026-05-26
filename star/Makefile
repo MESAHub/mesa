@@ -199,6 +199,7 @@ SRCS += \
    private/pgstar_summary_history.f90 \
    private/pgstar_summary.f90 \
    private/pgstar_color_magnitude.f90 \
+   private/pgstar_sed.f90 \
    private/pgstar_profile_panels.f90 \
    private/pgstar_grid.f90 \
    private/pgstar_network.f90 \
@@ -232,6 +233,7 @@ MODULES := star_lib.mod \
 ifeq ($(WITH_PGSTAR),yes)
 MODULES += pgstar_abundance.mod \
            pgstar_color_magnitude.mod \
+           pgstar_sed.mod \
            pgstar_colors.mod \
            pgstar_ctrls_io.mod \
            pgstar_decorator.mod \

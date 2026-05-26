@@ -2536,6 +2536,36 @@
             Color_Magnitude9_use_decorator, &
 
 
+
+
+            SED1_win_flag, SED2_win_flag, SED3_win_flag, &
+            SED4_win_flag, SED5_win_flag, SED6_win_flag, &
+            SED7_win_flag, SED8_win_flag, SED9_win_flag, &
+            SED1_file_flag, SED2_file_flag, SED3_file_flag, &
+            SED4_file_flag, SED5_file_flag, SED6_file_flag, &
+            SED7_file_flag, SED8_file_flag, SED9_file_flag, &
+            SED1_title, SED2_title, SED3_title, &
+            SED4_title, SED5_title, SED6_title, &
+            SED7_title, SED8_title, SED9_title, &
+            SED1_txt_scale, SED2_txt_scale, SED3_txt_scale, &
+            SED4_txt_scale, SED5_txt_scale, SED6_txt_scale, &
+            SED7_txt_scale, SED8_txt_scale, SED9_txt_scale, &
+            SED1_lambda_min, SED2_lambda_min, SED3_lambda_min, &
+            SED4_lambda_min, SED5_lambda_min, SED6_lambda_min, &
+            SED7_lambda_min, SED8_lambda_min, SED9_lambda_min, &
+            SED1_lambda_max, SED2_lambda_max, SED3_lambda_max, &
+            SED4_lambda_max, SED5_lambda_max, SED6_lambda_max, &
+            SED7_lambda_max, SED8_lambda_max, SED9_lambda_max, &
+            SED1_flux_min, SED2_flux_min, SED3_flux_min, &
+            SED4_flux_min, SED5_flux_min, SED6_flux_min, &
+            SED7_flux_min, SED8_flux_min, SED9_flux_min, &
+            SED1_flux_max, SED2_flux_max, SED3_flux_max, &
+            SED4_flux_max, SED5_flux_max, SED6_flux_max, &
+            SED7_flux_max, SED8_flux_max, SED9_flux_max, &
+
+
+
+
             Mode_Prop_win_flag, &
             Mode_Prop_file_flag, &
             Mode_Prop_file_interval, &
@@ -6236,6 +6266,41 @@
 
          s% pg% read_extra_pgstar_inlist = read_extra_pgstar_inlist
          s% pg% extra_pgstar_inlist_name = extra_pgstar_inlist_name
+
+      s% pg% SED1_win_flag = SED1_win_flag; s% pg% SED2_win_flag = SED2_win_flag; s% pg% SED3_win_flag = SED3_win_flag
+      s% pg% SED4_win_flag = SED4_win_flag; s% pg% SED5_win_flag = SED5_win_flag; s% pg% SED6_win_flag = SED6_win_flag
+      s% pg% SED7_win_flag = SED7_win_flag; s% pg% SED8_win_flag = SED8_win_flag; s% pg% SED9_win_flag = SED9_win_flag
+
+      s% pg% SED1_file_flag = SED1_file_flag; s% pg% SED2_file_flag = SED2_file_flag; s% pg% SED3_file_flag = SED3_file_flag
+      s% pg% SED4_file_flag = SED4_file_flag; s% pg% SED5_file_flag = SED5_file_flag; s% pg% SED6_file_flag = SED6_file_flag
+      s% pg% SED7_file_flag = SED7_file_flag; s% pg% SED8_file_flag = SED8_file_flag; s% pg% SED9_file_flag = SED9_file_flag
+
+      s% pg% SED1_title = SED1_title; s% pg% SED2_title = SED2_title; s% pg% SED3_title = SED3_title
+      s% pg% SED4_title = SED4_title; s% pg% SED5_title = SED5_title; s% pg% SED6_title = SED6_title
+      s% pg% SED7_title = SED7_title; s% pg% SED8_title = SED8_title; s% pg% SED9_title = SED9_title
+
+      s% pg% SED1_txt_scale = SED1_txt_scale; s% pg% SED2_txt_scale = SED2_txt_scale; s% pg% SED3_txt_scale = SED3_txt_scale
+      s% pg% SED4_txt_scale = SED4_txt_scale; s% pg% SED5_txt_scale = SED5_txt_scale; s% pg% SED6_txt_scale = SED6_txt_scale
+      s% pg% SED7_txt_scale = SED7_txt_scale; s% pg% SED8_txt_scale = SED8_txt_scale; s% pg% SED9_txt_scale = SED9_txt_scale
+
+      s% pg% SED1_lambda_min = SED1_lambda_min; s% pg% SED2_lambda_min = SED2_lambda_min; s% pg% SED3_lambda_min = SED3_lambda_min
+      s% pg% SED4_lambda_min = SED4_lambda_min; s% pg% SED5_lambda_min = SED5_lambda_min; s% pg% SED6_lambda_min = SED6_lambda_min
+      s% pg% SED7_lambda_min = SED7_lambda_min; s% pg% SED8_lambda_min = SED8_lambda_min; s% pg% SED9_lambda_min = SED9_lambda_min
+
+      s% pg% SED1_lambda_max = SED1_lambda_max; s% pg% SED2_lambda_max = SED2_lambda_max; s% pg% SED3_lambda_max = SED3_lambda_max
+      s% pg% SED4_lambda_max = SED4_lambda_max; s% pg% SED5_lambda_max = SED5_lambda_max; s% pg% SED6_lambda_max = SED6_lambda_max
+      s% pg% SED7_lambda_max = SED7_lambda_max; s% pg% SED8_lambda_max = SED8_lambda_max; s% pg% SED9_lambda_max = SED9_lambda_max
+
+      s% pg% SED1_flux_min = SED1_flux_min; s% pg% SED2_flux_min = SED2_flux_min; s% pg% SED3_flux_min = SED3_flux_min
+      s% pg% SED4_flux_min = SED4_flux_min; s% pg% SED5_flux_min = SED5_flux_min; s% pg% SED6_flux_min = SED6_flux_min
+      s% pg% SED7_flux_min = SED7_flux_min; s% pg% SED8_flux_min = SED8_flux_min; s% pg% SED9_flux_min = SED9_flux_min
+
+      s% pg% SED1_flux_max = SED1_flux_max; s% pg% SED2_flux_max = SED2_flux_max; s% pg% SED3_flux_max = SED3_flux_max
+      s% pg% SED4_flux_max = SED4_flux_max; s% pg% SED5_flux_max = SED5_flux_max; s% pg% SED6_flux_max = SED6_flux_max
+      s% pg% SED7_flux_max = SED7_flux_max; s% pg% SED8_flux_max = SED8_flux_max; s% pg% SED9_flux_max = SED9_flux_max
+
+
+
 
       end subroutine store_pgstar_controls
 
