@@ -442,7 +442,7 @@
             if (P_theta /= 1d0) then
                Ppoint = P_theta*Ppoint + (1d0 - P_theta)*s% mlt_tdc_P_face_start(k)
             end if
-            if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
+            if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
                .and. s% mlt_Pturb_factor > 0d0) then
                ! Keep the lagged convective velocity, but form the pressure term from the same
                ! face density used by the reconstructed face thermodynamic quantities.
