@@ -38,6 +38,10 @@ MESA no longer stops when reactions for which special rates are set are not in t
 Bug Fixes
 ---------
 
+Fixed a small bug where diffusive overshooting (overmixing) routines did not
+respect changes to the mixing length set by ``other_alpha_mlt``, and used the
+``mixing_length_alpha`` instead. See `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
+
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
