@@ -69,7 +69,6 @@ contains
          s% pg% SED9_lambda_min, s% pg% SED9_lambda_max, s% pg% SED9_flux_min, s% pg% SED9_flux_max, ierr)
    end subroutine do_SED_Plot9
 
-   ! Core plotting engine implementing your filter transmission plotting natively in MESA
    subroutine render_sed_core(s, id, device_id, vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
                               w_min, w_max, f_min, f_max, ierr)
       use colors_def, only: Colors_General_Info
@@ -117,11 +116,26 @@ contains
 
       wave_min = merge(3000.0e0, w_min, w_min == -101.0e0)
       wave_max = merge(12000.0e0, w_max, w_max == -101.0e0)
+      
       flux_min = f_min
       flux_max = f_max
 
-      if (flux_min == -101.0e0) flux_min = minval(y_flux) - 0.2e0
-      if (flux_max == -101.0e0) flux_max = maxval(y_flux) + 0.2e0
+      ! SAFE MASKING: Ignore the -50.0 padding bounds when auto-scaling limits
+      if (flux_min == -101.0e0) then
+         if (any(y_flux > -49.0e0)) then
+            flux_min = minval(y_flux, mask=(y_flux > -49.0e0)) - 0.2e0
+         else
+            flux_min = -20.0e0
+         end if
+      end if
+
+      if (flux_max == -101.0e0) then
+         if (any(y_flux > -49.0e0)) then
+            flux_max = maxval(y_flux, mask=(y_flux > -49.0e0)) + 0.2e0
+         else
+            flux_max = -10.0e0
+         end if
+      end if
 
       call pgsvp(vp_xleft, vp_xright, vp_ybot, vp_ytop)
       call pgswin(wave_min, wave_max, flux_min, flux_max)
@@ -137,13 +151,13 @@ contains
       call show_xaxis_label_pgstar(s, 'Wavelength (\A)')
       call show_left_yaxis_label_pgstar(s, 'log Flux (erg s\u-1\d cm\u-2\d \A\u-1\d)')
 
-      ! Main baseline continuous stellar spectrum energy distribution curve
+      ! Render base continuous spectrum spectrum
       call pgsci(clr_Foreground)
       call pgslw(s% pg% pgstar_lw)
       call pgline(n_lam, x_wave, y_flux)
       call pgslw(1)
 
-      ! Overlay filter curves convolved with step data into top 25% window vertical range to mirror python plot layout
+      ! Overlay filter curves bounded nicely into the top 20% vertical region
       if (cs% filters_loaded) then
          do i = 1, size(cs% filters)
             if (.not. allocated(cs% filters(i)% wavelengths)) cycle
@@ -152,14 +166,14 @@ contains
             allocate(filter_x(k), filter_y(k))
             
             filter_x = real(cs% filters(i)% wavelengths)
-            filter_y = flux_max - ((1.0e0 - real(cs% filters(i)% transmission)) * (flux_max - flux_min) * 0.25e0)
+            filter_y = flux_max - ((1.0e0 - real(cs% filters(i)% transmission)) * (flux_max - flux_min) * 0.20e0)
             
             call pgsci(clr_Cyan + mod(i, 4)) 
-            call pgsls(2) ! Dashed line profile representation
+            call pgsls(2) 
             call pgline(k, filter_x, filter_y)
             
             call pgsch(txt_scale * 0.7e0)
-            call pgptxt(filter_x(k/2), flux_max - 0.05e0 * (flux_max - flux_min), 0.0e0, 0.5e0, trim(cs% filters(i)% name))
+            call pgptxt(filter_x(k/2), flux_max - 0.04e0 * (flux_max - flux_min), 0.0e0, 0.5e0, trim(cs% filters(i)% name))
             call pgsch(txt_scale)
             
             deallocate(filter_x, filter_y)
