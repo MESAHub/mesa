@@ -23,4 +23,4 @@ RUN curl -L http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesas
     tar xzf - -C /opt/
 ENV MESASDK_ROOT=/opt/mesasdk-26.3.2
 RUN bash $MESASDK_ROOT/bin/mesasdk_init.sh
-RUN gem install mesa_test -v 1.1.11
+RUN gem install mesa_test -v 1.2.0
