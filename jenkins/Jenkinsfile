@@ -3,7 +3,7 @@ properties([
   buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
 ])
 
-def parallel_tests = 6;
+def parallel_tests = 5;
 def cores_per_test = 8;
 
 buildPod(context: 'jenkins', cpus: parallel_tests*cores_per_test, memory: '128Gi') {
@@ -11,8 +11,7 @@ buildPod(context: 'jenkins', cpus: parallel_tests*cores_per_test, memory: '128Gi
     "MESA_DIR=$WORKSPACE",
     "HOME=$WORKSPACE",
     "NTESTS=$parallel_tests",
-    "NPROCS=$cores_per_test", // this is only used by build?
-    "OMP_NUM_THREADS=$cores_per_test" // this is used by tests?
+    "OMP_NUM_THREADS=$cores_per_test"
   ]) {
     stage('setup') {
       withCredentials([
