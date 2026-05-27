@@ -211,6 +211,4 @@
       SED2_lambda_max = 100000.0
       SED2_flux_min = -101.0d0
       SED2_flux_max = -101.0d0
-
 /
-
