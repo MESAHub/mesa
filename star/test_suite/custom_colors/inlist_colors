@@ -201,14 +201,17 @@
       SED1_txt_scale = 0.8
       SED1_lambda_min = 100.0
       SED1_lambda_max = 10000.0
-      SED1_flux_min = -101.0d0
-      SED1_flux_max = -101.0d0
+      SED1_flux_min = -15.0d0
+      SED1_flux_max = 0.0d0
+      SED1_filter_scale = 1.0
 
       ! 4. Your Custom SED Panel Settings
       SED2_title = 'Live Synthetic Stellar SED'
       SED2_txt_scale = 0.8
       SED2_lambda_min = 100.0
-      SED2_lambda_max = 100000.0
-      SED2_flux_min = -101.0d0
+      SED2_lambda_max = 30000.0
+      SED2_flux_min = -10.0d0
       SED2_flux_max = -101.0d0
+      SED2_filter_scale = 0.5
+
 /

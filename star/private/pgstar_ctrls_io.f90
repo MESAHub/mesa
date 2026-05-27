@@ -2562,7 +2562,11 @@
             SED1_flux_max, SED2_flux_max, SED3_flux_max, &
             SED4_flux_max, SED5_flux_max, SED6_flux_max, &
             SED7_flux_max, SED8_flux_max, SED9_flux_max, &
-
+            SED1_filter_scale, SED2_filter_scale, & 
+            SED3_filter_scale, SED6_filter_scale, &
+            SED4_filter_scale, SED5_filter_scale, & 
+            SED7_filter_scale, SED8_filter_scale, & 
+            SED9_filter_scale, &
 
 
 
@@ -6299,6 +6303,11 @@
       s% pg% SED4_flux_max = SED4_flux_max; s% pg% SED5_flux_max = SED5_flux_max; s% pg% SED6_flux_max = SED6_flux_max
       s% pg% SED7_flux_max = SED7_flux_max; s% pg% SED8_flux_max = SED8_flux_max; s% pg% SED9_flux_max = SED9_flux_max
 
+      s% pg% SED1_filter_scale = SED1_filter_scale; s% pg% SED2_filter_scale = SED2_filter_scale
+      s% pg% SED4_filter_scale = SED4_filter_scale; s% pg% SED5_filter_scale = SED5_filter_scale
+      s% pg% SED6_filter_scale = SED6_filter_scale; s% pg% SED9_filter_scale = SED9_filter_scale
+      s% pg% SED7_filter_scale = SED7_filter_scale; s% pg% SED8_filter_scale = SED8_filter_scale
+      s% pg% SED3_filter_scale = SED3_filter_scale
 
 
 

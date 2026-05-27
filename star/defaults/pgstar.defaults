@@ -6378,7 +6378,7 @@
     SED1_flux_min = -101.0d0
     SED1_flux_max = -101.0d0
     SED1_txt_scale = 1.0d0
-
+    SED1_filter_scale = 0.5
 
 
 ! Text Summary

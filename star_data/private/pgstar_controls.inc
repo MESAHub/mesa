@@ -2165,3 +2165,9 @@
       real :: SED1_flux_max, SED2_flux_max, SED3_flux_max, &
          SED4_flux_max, SED5_flux_max, SED6_flux_max, &
          SED7_flux_max, SED8_flux_max, SED9_flux_max
+
+      real :: SED1_filter_scale, SED2_filter_scale, & 
+              SED3_filter_scale, SED6_filter_scale, &
+              SED4_filter_scale, SED5_filter_scale, & 
+              SED7_filter_scale, SED8_filter_scale, &
+              SED9_filter_scale         
