@@ -42,7 +42,7 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 
 - Reserve accommodation. Hotel room blocks can be booked for discounted rates. Some universities are willing to provide discounted bulk accommodation through their own facilities (e.g. dorms), as was the case at Santa Barbara.
 
-- Open the application for students. A template for this is available from Meridith Joyce, Earl Bellinger, or Eoin Farrell (MESA-dev). A Google form is a good way to provide the application. Be aware that summer schools have been oversubscribed by more than a factor of 2 in recent years, and be prepared to rank applications in a systematic way. We aim for 50-50 gender representation among students and have a track record of achieving 35%-45% participation from women and gender minorities, on average.
+- Open the application for students. A template for this is available from Meridith Joyce, Earl Bellinger, or Jared Goldberg (MESA-dev). A Google form is a good way to provide the application. Be aware that summer schools have been oversubscribed by more than a factor of 2 in recent years, and be prepared to rank applications in a systematic way. We aim for 50-50 gender representation among students and have a track record of achieving 35%-45% participation from women and gender minorities, on average. Achieving a well-balanced popluation of applicants can be aided by distributing the application through targeted channels in addition to a broad call to the mesa-users community. 
 
 
 6 months out (February)
