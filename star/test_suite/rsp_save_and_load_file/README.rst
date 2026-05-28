@@ -4,7 +4,7 @@
 rsp_save_and_load_file
 **********************
 
-.. tags:: star, rsp, radial-pulsation, cepheid, save-load
+.. tags:: star, rsp, radial-pulsation, cepheid, save-load, colors
 
 This test case checks that RSP models can be saved and loaded to produce the same results as test case :ref:`rsp_Cepheid`.
 

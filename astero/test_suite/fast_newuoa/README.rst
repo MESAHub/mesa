@@ -4,7 +4,7 @@
 fast_newuoa
 ***********
 
-.. tags:: astero, optimization, newuoa, synthetic-data, chi-squared, custom-variables, solar-calibration, low-mass
+.. tags:: astero, optimization, newuoa, synthetic-data, chi-squared, custom-variables, solar-calibration, low-mass, element-diffusion
 
 Runs first few steps of a NEWUOA optimisation for some synthetic data.
 This test exists only to increase test coverage of the routines

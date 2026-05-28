@@ -4,7 +4,7 @@
 magnetic_braking
 ****************
 
-.. tags:: star, rotation, angular-momentum, magnetic-field, magnetic-braking, mass-loss, massive-star
+.. tags:: star, rotation, angular-momentum, magnetic-field, magnetic-braking, mass-loss, stellar-winds, massive-star
 
 This test case involves the calculation of the spin down caused by a
 large-scale magnetic field in a massive star model. The model has an

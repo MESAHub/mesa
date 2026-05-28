@@ -4,7 +4,7 @@
 rsp_Delta_Scuti
 ***************
 
-.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, delta-scuti, map-output
+.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, delta-scuti, map-output, colors
 
 This test case checks the non-linear pulsation evolution of a 2 |Msun|, Teff = 6900 K, L = 30 Lsun, Z = 0.02 metallicity -
 a double-mode delta Scuti variable leaving the main-sequence phase originally contributed by Alfred Gautschy.

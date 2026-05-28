@@ -4,7 +4,7 @@
 gyre_in_mesa_wd
 ***************
 
-.. tags:: star, gyre, asteroseismology, g-mode, nonradial-pulsation, white-dwarf
+.. tags:: star, gyre, asteroseismology, g-mode, nonradial-pulsation, white-dwarf, carbon-oxygen-white-dwarf
 
 This test case checks the implementation of GYRE in MESA for a cooling 0.85 Msun white dwarf model.
 

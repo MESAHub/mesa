@@ -4,7 +4,7 @@
 rsp_BEP
 *******
 
-.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, bep
+.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, bep, colors
 
 This test case checks the non-linear pulsation evolution of a 0.26 |Msun|, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar
 the one shown in |Smolec2013|.

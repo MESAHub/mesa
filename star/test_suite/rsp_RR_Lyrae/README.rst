@@ -4,7 +4,7 @@
 rsp_RR_Lyrae
 ************
 
-.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, rr-lyrae
+.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, rr-lyrae, colors
 
 This test case checks the non-linear pulsation evolution of a 0.65 |Msun|, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity -
 a long-period RR Lyrae model contributed by Radek Smolec.
