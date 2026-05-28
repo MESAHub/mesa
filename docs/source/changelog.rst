@@ -35,6 +35,8 @@ MESA no longer stops when reactions for which special rates are set are not in t
 Bug Fixes
 ---------
 
+Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
