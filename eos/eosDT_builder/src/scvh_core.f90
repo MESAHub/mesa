@@ -32,8 +32,6 @@ module scvh_core
    integer, parameter :: NlogPs = 99, NlogTs = 63
    double precision, parameter :: dlogP = 0.20d0
    double precision, parameter :: logP_min = -0.60d0
-   ! Analytic continuation below the processed SCVH edge.
-   double precision, parameter :: logP_tail_min = -6.00d0
    double precision, parameter :: logP_max = 19d0
    double precision, parameter :: dlogT = 0.08d0
    double precision, parameter :: logT_min = 2.10d0
@@ -52,8 +50,6 @@ module scvh_core
 
    type(scvh_info), target ::compv1_h_si, compv2_h_si, denlog_h_si, slog_h_si, ulog_h_si, &
                               compv1_he_si, compv2_he_si, denlog_he_si, slog_he_si, ulog_he_si
-
-   double precision :: slog_edge_h(NlogTs), slog_edge_he(NlogTs)
 
 contains
 
@@ -125,10 +121,6 @@ contains
                               num_h_pts, NlogPs, NlogTs, compv1_h_si, compv2_h_si, denlog_h_si, slog_h_si, ulog_h_si)
       call read_file_for_scvh(data_dir, 'scvh/he_tab.asc.data', &
                               num_he_pts, NlogPs, NlogTs, compv1_he_si, compv2_he_si, denlog_he_si, slog_he_si, ulog_he_si)
-
-      ! Save the restored entropy edge before padding the rectangular spline table.
-      slog_edge_h(:) = slog_h_si%Z(1, :)
-      slog_edge_he(:) = slog_he_si%Z(1, :)
 
       if (.false.) then
          call write_file_for_scvh(data_dir, 'scvh/h_tab.new.data', &
@@ -411,8 +403,7 @@ contains
       end if
 
       if (logP < logP_min) then
-         ! Below the processed edge, use an edge-matched ideal-gas tail.
-         call interp_vals_lowP_tail(only_densities)
+         info = -1
          return
       end if
 
@@ -532,184 +523,6 @@ contains
 
    contains
 
-      subroutine interp_vals_lowP_tail(only_densities_arg)
-         logical, intent(in) :: only_densities_arg
-
-         call tail_species(num_h_pts, compv1_h_si, compv2_h_si, denlog_h_si, slog_h_si, ulog_h_si, slog_edge_h, &
-                           den_h, ener_h, entr_h, dddt_cp_h, dddpress_ct_h, dsdt_cp_h, dsdpress_ct_h, &
-                           xnh2, dxnh2_dlogT, dxnh2_dlogP, xnh, dxnh_dlogT, dxnh_dlogP)
-         if (info /= 0) return
-
-         call tail_species(num_he_pts, compv1_he_si, compv2_he_si, denlog_he_si, slog_he_si, ulog_he_si, slog_edge_he, &
-                           den_he, ener_he, entr_he, dddt_cp_he, dddpress_ct_he, dsdt_cp_he, dsdpress_ct_he, &
-                           xnhe, dxnhe_dlogT, dxnhe_dlogP, xnhep, dxnhep_dlogT, dxnhep_dlogP)
-         if (info /= 0) return
-
-         if (only_densities_arg) return
-
-         call limit_pair(xnh2, dxnh2_dlogP, dxnh2_dlogT, xnh, dxnh_dlogP, dxnh_dlogT)
-         call limit_pair(xnhe, dxnhe_dlogP, dxnhe_dlogT, xnhep, dxnhep_dlogP, dxnhep_dlogT)
-
-      end subroutine interp_vals_lowP_tail
-
-      subroutine tail_species(n, comp1_si, comp2_si, denlog_si, slog_si, ulog_si, slog_edge, &
-                              den, ener, entr, dddt_cp, dddpress_ct, dsdt_cp, dsdpress_ct, &
-                              x1, dx1_dlogT, dx1_dlogP, x2, dx2_dlogT, dx2_dlogP)
-         integer, intent(in) :: n
-         type(scvh_info) :: comp1_si, comp2_si, denlog_si, slog_si, ulog_si
-         double precision, intent(in) :: slog_edge(NlogTs)
-         double precision, intent(out) :: den, ener, entr, dddt_cp, dddpress_ct, dsdt_cp, dsdpress_ct, &
-            x1, dx1_dlogT, dx1_dlogP, x2, dx2_dlogT, dx2_dlogP
-
-         double precision :: logden0, dlogden0_dlogP, dlogden0_dlogT, logden, dlogden_dlogP, dlogden_dlogT, &
-            logs0, dlogs0_dlogP, dlogs0_dlogT, logs, dlogs_dlogP, dlogs_dlogT, &
-            logu0, dlogu0_dlogP, dlogu0_dlogT, logu, dlogu_dlogP, dlogu_dlogT, &
-            x10, dx10_dlogP, dx10_dlogT, x20, dx20_dlogP, dx20_dlogT, &
-            logP_decay, S0, S, Rgas, dRgas_dlogT, dS_dlogT, ideal_logs, ideal_dlogs_dlogP, ideal_dlogs_dlogT
-
-         ! Anchor the tail to the restored processed table at logP_min.
-         call edge_value(n, denlog_si, logden0, dlogden0_dlogP, dlogden0_dlogT)
-         if (info /= 0) return
-
-         logP_decay = max(logP_tail_min, logP_min - dlogP)
-
-         call edge_value(n, comp1_si, x10, dx10_dlogP, dx10_dlogT)
-         if (info /= 0) return
-         call edge_value(n, comp2_si, x20, dx20_dlogP, dx20_dlogT)
-         if (info /= 0) return
-         call edge_value(n, ulog_si, logu0, dlogu0_dlogP, dlogu0_dlogT)
-         if (info /= 0) return
-         call edge_value(n, slog_si, logs0, dlogs0_dlogP, dlogs0_dlogT)
-         if (info /= 0) return
-         dlogs0_dlogT = edge_dlogT(slog_si, slog_edge)
-
-         call tail_value(dx10_dlogP, x10, 0d0, dx10_dlogT, 0d0, logP_decay, x1, dx1_dlogP, dx1_dlogT)
-         call tail_value(dx20_dlogP, x20, 0d0, dx20_dlogT, 0d0, logP_decay, x2, dx2_dlogP, dx2_dlogT)
-
-         call tail_value(dlogden0_dlogP, logden0 + logP - logP_min, &
-                         1d0, -1d0, 1d0, logP_decay, logden, dlogden_dlogP, dlogden_dlogT)
-
-         call tail_value(dlogu0_dlogP, logu0, 0d0, dlogu0_dlogT, 0d0, logP_decay, &
-                         logu, dlogu_dlogP, dlogu_dlogT)
-
-         S0 = 10d0**logs0
-         Rgas = 10d0**(logP_min - logden0 - logT)
-         S = S0 + Rgas*log(10d0)*(logP_min - logP)
-         dRgas_dlogT = 0d0
-         dS_dlogT = log(10d0)*S0*dlogs0_dlogT + dRgas_dlogT*log(10d0)*(logP_min - logP)
-         ideal_logs = log10(S)
-         ideal_dlogs_dlogP = -Rgas/S
-         ideal_dlogs_dlogT = dS_dlogT/(log(10d0)*S)
-
-         call tail_value(dlogs0_dlogP, ideal_logs, ideal_dlogs_dlogP, ideal_dlogs_dlogT, &
-                         -Rgas/S0, logP_decay, logs, dlogs_dlogP, dlogs_dlogT)
-
-         den = 10d0**logden
-         dddpress_ct = dlogden_dlogP
-         dddt_cp = dlogden_dlogT
-
-         ener = 10d0**logu
-         entr = 10d0**logs
-         dsdpress_ct = dlogs_dlogP
-         dsdt_cp = dlogs_dlogT
-
-      end subroutine tail_species
-
-      subroutine edge_value(n, si, val, dval_dlogP, dval_dlogT)
-         integer, intent(in) :: n
-         type(scvh_info) :: si
-         double precision, intent(out) :: val, dval_dlogP, dval_dlogT
-
-         XI(1) = logP_min
-         val = interp_value(n, si)
-         if (info /= 0) return
-         dval_dlogP = d_dlogP
-         dval_dlogT = d_dlogT
-
-      end subroutine edge_value
-
-      double precision function edge_dlogT(si, edge)
-         type(scvh_info) :: si
-         double precision, intent(in) :: edge(NlogTs)
-         integer :: j
-         double precision :: v0, v1
-
-         j = locate_logT(logT)
-         if (j < 1) j = 1
-         if (j >= NlogTs) j = NlogTs - 1
-
-         v0 = edge(j)
-         v1 = edge(j + 1)
-         if (v0 == 0d0 .or. v1 == 0d0) then
-            v0 = si%Z(1, j)
-            v1 = si%Z(1, j + 1)
-         end if
-         edge_dlogT = (v1 - v0)/(logTs(j + 1) - logTs(j))
-
-      end function edge_dlogT
-
-      subroutine tail_value(edge_dlogP, ideal_val, ideal_dlogP, ideal_dlogT, &
-                            ideal_edge_dlogP, logP_decay, val, dval_dlogP, dval_dlogT)
-         double precision, intent(in) :: edge_dlogP, ideal_val, ideal_dlogP, ideal_dlogT, ideal_edge_dlogP, logP_decay
-         double precision, intent(out) :: val, dval_dlogP, dval_dlogT
-         double precision :: L, x, g, dg_dx, M
-
-         if (logP <= logP_decay) then
-            val = ideal_val
-            dval_dlogP = ideal_dlogP
-            dval_dlogT = ideal_dlogT
-            return
-         end if
-
-         L = logP_min - logP_decay
-         x = (logP - logP_decay)/L
-         ! C1 correction: zero value at both ends, zero slope at the
-         ! ideal end, and unit slope at the SCVH edge.
-         g = x**3 - x**2
-         dg_dx = 3d0*x**2 - 2d0*x
-         M = (edge_dlogP - ideal_edge_dlogP)*L
-
-         val = ideal_val + M*g
-         dval_dlogP = ideal_dlogP + M*dg_dx/L
-         dval_dlogT = ideal_dlogT
-
-      end subroutine tail_value
-
-      subroutine limit_pair(x1, dx1_dlogP, dx1_dlogT, x2, dx2_dlogP, dx2_dlogT)
-         double precision, intent(inout) :: x1, dx1_dlogP, dx1_dlogT, x2, dx2_dlogP, dx2_dlogT
-
-         call limit_fraction(x1, dx1_dlogP, dx1_dlogT)
-         call limit_fraction(x2, dx2_dlogP, dx2_dlogT)
-
-         if (x1 + x2 > 1d0) then
-            if (x1 > x2) then
-               x1 = 1d0 - x2
-               dx1_dlogP = -dx2_dlogP
-               dx1_dlogT = -dx2_dlogT
-            else
-               x2 = 1d0 - x1
-               dx2_dlogP = -dx1_dlogP
-               dx2_dlogT = -dx1_dlogT
-            end if
-         end if
-
-      end subroutine limit_pair
-
-      subroutine limit_fraction(x, dx_dlogP, dx_dlogT)
-         double precision, intent(inout) :: x, dx_dlogP, dx_dlogT
-
-         if (x > 1d0) then
-            x = 1d0
-            dx_dlogP = 0d0
-            dx_dlogT = 0d0
-         else if (x < 0d0) then
-            x = 0d0
-            dx_dlogP = 0d0
-            dx_dlogT = 0d0
-         end if
-
-      end subroutine limit_fraction
-
       double precision function interp_value(n, si)
          use interp_2d_lib_db, only: interp_mkbicub_db, interp_evbicub_db
          use num_lib
@@ -801,7 +614,7 @@ contains
 
       double precision :: logP, inv_Rho, inv_T, inv_P, small_value, Rho_min
       parameter(small_value=1.0d-16)
-      parameter(Rho_min=1.0d-15)
+      parameter(Rho_min=1.0d-10)
 
 !..for hydrogen
       double precision :: den_h, ener_h, entr_h, dddt_cp_h, dddpress_ct_h, &
@@ -846,7 +659,6 @@ contains
          si0t, si1t, si2t, si0mt, si1mt, si2mt, si0p, si1p, si2p, si0mp, si1mp, si2mp, logRho_test, &
          logP_guess, epslogP, epslogRho, x1, x3, y1, y3, dfdlogP, &
          z, fi_h(36), fi_he(36), w0t, w1t, w2t, w0mt, w1mt, w2mt, w0p, w1p, w2p, w0mp, w1mp, w2mp
-
       include 'formats'
       info = 0
       ipar => ipar_array
@@ -1216,7 +1028,7 @@ contains
          dxnhe_dlogP, xnhep, dxnhep_dlogT, dxnhep_dlogP, xmassh1, xmasshe4
       logical :: only_densities, search_for_SCVH
       include 'formats'
-      if (logP < logP_tail_min .or. logP > logP_max) then
+      if (logP < logP_min .or. logP > logP_max) then
          ierr = -1
          if (dbg) write (*, *)
          if (dbg) write (*, 1) 'logP guess out of bounds', logP

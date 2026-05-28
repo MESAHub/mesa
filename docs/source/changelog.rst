@@ -53,10 +53,20 @@ Fixed a bug in the FreeEOS table builder where MESA fallback rows could write
 base-10 logarithms. This could create discontinuities and noisy EOS partial
 derivatives.
 
-The regenerated eosDT tables now also include an analytic low-pressure SCVH
-tail matched to the SCVH table edge where OPAL/SCVH previously hit table edge
-limits and fell back to HELM. The SCVH region has been extended toward
-:math:`\log_{10}\rho \simeq -14.9`.
+At the low-density OPAL/SCVH edge, MESA now blends the OPAL/SCVH component to
+the ideal EOS over :math:`-10 \leq \log_{10}\rho \leq -8` in the low-T
+OPAL/SCVH region where MESA was previously falling back to HELM.
+
+Fixed the OPAL/SCVH blend between ``Z = 0.035`` and ``Z = 0.04``. This blend
+was not working properly, so the EOS was not actually blending in Z over that
+interval. For more details, see
+:ref:`the known bugs entry <freeeos_fallback_log_units_bug>` and
+`gh-997 <https://github.com/MESAHub/mesa/pull/997>`_.
+
+.. figure:: changelog_plots/eos_regions_x070_z002_compare.png
+   :alt: EOS regions in mesa-r26.4.1 and this release for X = 0.7, Z = 0.02
+
+   EOS regions for a solar-like composition in mesa-r26.4.1 and this release.
 
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
