@@ -183,12 +183,31 @@
 }
 
 .mesa-tag-count {
-    background: var(--pst-color-on-surface, #f6f8fa);
-    border: 1px solid var(--pst-color-border, #d0d7de);
+    background: #e8f1ff;
+    border: 1px solid #8fb8ed;
     border-radius: 999px;
-    color: var(--pst-color-text-muted, #586069);
+    color: #1f4f82;
     flex: 0 0 auto;
     font-size: 0.78rem;
+    font-weight: 700;
     padding: 0.15rem 0.5rem;
     white-space: nowrap;
+}
+
+.mesa-tag-card:hover .mesa-tag-count {
+    background: #dbeafe;
+    border-color: var(--pst-color-primary, #2f81f7);
+    color: #0f4c81;
+}
+
+html[data-theme="dark"] .mesa-tag-count {
+    background: rgba(96, 165, 250, 0.18);
+    border-color: rgba(147, 197, 253, 0.65);
+    color: #bfdbfe;
+}
+
+html[data-theme="dark"] .mesa-tag-card:hover .mesa-tag-count {
+    background: rgba(96, 165, 250, 0.26);
+    border-color: #93c5fd;
+    color: #dbeafe;
 }
