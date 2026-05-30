@@ -39,6 +39,9 @@
 
 &controls
 
+! For test_suite testing
+max_model_number = 6000
+
 ! Initial model controls
      initial_mass = 12.0
      initial_z = 0.02

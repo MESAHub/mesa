@@ -13,6 +13,17 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _overshoot_other_alpha_mlt_bug:
+
+Diffusive overshooting: ``other_alpha_mlt`` ignored
+---------------------------------------------------
+
+Diffusive overshooting (overmixing) routines did not respect changes to the
+mixing length set by ``other_alpha_mlt``, and used the ``mixing_length_alpha``
+instead.
+
+This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
+
 .. _report_max_infall_inside_fe_core_bug:
 
 Controls: ``report_max_infall_inside_fe_core`` is ignored

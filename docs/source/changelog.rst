@@ -28,12 +28,19 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
+Diffusive overshooting (overmixing) prescriptions now support a
+``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
+
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
+Fixed a small bug where diffusive overshooting (overmixing) routines did not
+respect changes to the mixing length set by ``other_alpha_mlt``, and used the
+``mixing_length_alpha`` instead. See `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 

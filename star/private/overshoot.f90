@@ -172,7 +172,7 @@ contains
           select case (s%overshoot_scheme(j))
           case ('exponential')
              call eval_overshoot_exp(s, i, j, k_a, k_b, D, vc, ierr)
-          case ('step')
+          case ('step', 'step+exponential')
              call eval_overshoot_step(s, i, j, k_a, k_b, D, vc, ierr)
           case ('other')
              call s% other_overshooting_scheme(s% id, i, j, k_a, k_b, D, vc, ierr)
