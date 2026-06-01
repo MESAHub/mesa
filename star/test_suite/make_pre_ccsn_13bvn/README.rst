@@ -29,7 +29,7 @@ This test case has five parts.
 
 * Part 5 (``inlist_to_post_si_burn``) evolves the model until log_center_T = 9.60d0, after Si-core burning.
 
-* Part 6 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall). 
+* Part 6 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall).
 
 
 Last-Updated: 01June2026 by EbF
