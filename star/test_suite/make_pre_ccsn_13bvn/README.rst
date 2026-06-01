@@ -32,4 +32,4 @@ This test case has five parts.
 * Part 6 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall). 
 
 
-Last-Updated: 24Dec2023 by EbF
+Last-Updated: 01June2026 by EbF
