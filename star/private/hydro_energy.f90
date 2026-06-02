@@ -217,7 +217,7 @@
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
             use hydro_rsp2, only: compute_Eq_cell
             use tdc_hydro, only: compute_tdc_Eq_div_w_face
-            real(dp) :: alfa, beta, drag_rate
+            real(dp) :: alfa, beta
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
@@ -285,9 +285,8 @@
                     (s% drag_coefficient > 0) .and. &
                     s% use_drag_energy .and. &
                     s% dynamic_timescale_start(k) > 0d0) then
-                  drag_rate = s% drag_coefficient/max(s% dt, s% dynamic_timescale_start(k))
                   v_00 = wrap_v_00(s,k)
-                  drag_force = drag_rate*v_00
+                  drag_force = s% drag_coefficient*v_00/max(s% dt, s% dynamic_timescale_start(k))
                   drag_energy = 0.5d0*v_00*drag_force
                   s% FdotV_drag_energy(k) = drag_energy%val
                ! drag energy for outer half-cell.   the 0.5d0 is for dm/2
@@ -296,9 +295,8 @@
                     (s% drag_coefficient > 0) .and. &
                     s% use_drag_energy .and. &
                     s% dynamic_timescale_start(k+1) > 0d0) then
-                  drag_rate = s% drag_coefficient/max(s% dt, s% dynamic_timescale_start(k+1))
                   v_p1 = wrap_v_p1(s,k)
-                  drag_force = drag_rate*v_p1
+                  drag_force = s% drag_coefficient*v_p1/max(s% dt, s% dynamic_timescale_start(k+1))
                   drag_energy = drag_energy + 0.5d0*v_p1*drag_force
                   s% FdotV_drag_energy(k) = drag_energy%val
                ! drag energy for inner half-cell.   the 0.5d0 is for dm/2

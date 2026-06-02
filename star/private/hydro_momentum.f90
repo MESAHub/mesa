@@ -382,7 +382,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: extra_ad, v_00, &
             drag
-         real(dp) :: accel, d_accel_dv, drag_rate
+         real(dp) :: accel, d_accel_dv
          logical :: test_partials, local_v_flag
 
          include 'formats'
@@ -421,14 +421,11 @@
             accel_ad%val = accel
             accel_ad%d1Array(i_v_00) = d_accel_dv
 
-            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
+            if (s% q(k) > s% min_q_for_drag .and. &
+                  s% drag_coefficient > 0 .and. &
+                  s% dynamic_timescale_start(k) > 0d0) then
                v_00 = wrap_v_00(s,k)
-               if (s% dynamic_timescale_start(k) > 0d0) then
-                  drag_rate = s% drag_coefficient/max(s% dt, s% dynamic_timescale_start(k))
-               else
-                  drag_rate = 0d0
-               end if
-               drag = -drag_rate*v_00
+               drag = -s% drag_coefficient*v_00/max(s% dt, s% dynamic_timescale_start(k))
                s% dvdt_drag(k) = drag%val
             end if
 
