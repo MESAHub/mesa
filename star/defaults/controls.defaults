@@ -2746,11 +2746,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Optional convective-turnover-time limiter for the throttle.
-      ! When ``.true.``, multiplies the throttle excess
-      ! ``(Gamma_factor - 1)`` by
-      !
-      ! ``f_tau = 1 - exp(-dt / tau_conv)``
-      !
+      ! When ``.true.``, relaxes the throttle using a fraction
+      ! ``f_tau`` set by ``superad_reduction_turnover_limit_function``,
       ! where ``tau_conv = scale_height(k) / mlt_vc_old(k)`` is the
       ! local convective turnover time computed from the previous
       ! step's converged convective velocity. This reflects the
@@ -2775,6 +2772,19 @@
       ! ::
 
       superad_reduction_use_turnover_limit = .false.
+
+      ! superad_reduction_turnover_limit_function
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Functional form for the turnover-time relaxation fraction. Allowed
+      ! values are:
+      !
+      ! - ``'exponential'``: ``f_tau = 1 - exp(-dt/tau_conv)``
+      ! - ``'linear'``: ``f_tau = min(dt/tau_conv, 1)``
+
+      ! ::
+
+      superad_reduction_turnover_limit_function = 'exponential'
 
       ! superad_reduction_turnover_vc_floor_frac
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
