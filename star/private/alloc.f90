@@ -1220,6 +1220,8 @@
             if (failed('L_start')) exit
             call do1(s% r_start, c% r_start)
             if (failed('r_start')) exit
+            call do1(s% dynamic_timescale_start, c% dynamic_timescale_start)
+            if (failed('dynamic_timescale_start')) exit
             call do1(s% rmid_start, c% rmid_start)
             if (failed('rmid_start')) exit
             call do1(s% omega_start, c% omega_start)

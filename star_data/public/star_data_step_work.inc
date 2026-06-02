@@ -828,6 +828,7 @@
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: L_start(:) ! (nz)
          real(dp), pointer :: r_start(:) ! (nz)
+         real(dp), pointer :: dynamic_timescale_start(:) ! local face dynamical timescale at start of step (nz)
          real(dp), pointer :: rmid_start(:) ! (nz)
          real(dp), pointer :: rho_start(:) ! (nz)
          real(dp), pointer :: omega_start(:) ! (nz)
