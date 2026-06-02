@@ -28,6 +28,8 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
+MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverview>` using metadata from test case ``README.rst`` files. The gallery groups test cases by module, physics, numerical method, workflow, and stellar object or phase. This change makes it easier to understand the purpose of each test case, and can help users more easily find a useful starting point for a MESA project. Details on the implementation can be found in :ref:`developing/test_suite:Gallery tags`.
+
 Diffusive overshooting (overmixing) prescriptions now support a
 ``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
 
@@ -99,7 +101,7 @@ TDC
 -  ``TDC_hydro_nz_outer`` : Analogous to ``RSP_nz_outer``
 -  ``TDC_hydro_T_anchor`` : Analogous to ``RSP_T_anchor``
 -  ``TDC_hydro_dq_1_factor`` : Analogous to ``RSP_dq_1_factor``
--  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantites are computed from simple averages or mass weighted averaging.
+-  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantities are computed from simple averages or mass weighted averaging.
 -  ``remesh_for_TDC_pulsations_log_core_zoning`` : This option allows log zoning in the interior as opposed to a power law ( similar to ``RSP``).
 
 A new optional boundary condition ``use_RSP_L_eqn_outer_BC`` is available.
