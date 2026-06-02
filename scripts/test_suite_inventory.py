@@ -116,17 +116,21 @@ def gather_inventory(root: Path) -> dict[str, object]:
     ]
     active_missing_docs = [case for case in active_tests if case.name not in doc_names]
     active_missing_tags = [
-        case
-        for case in active_tests
-        if case.label not in tags_by_case
+        case for case in active_tests if case.label not in tags_by_case
     ]
     inactive_dirs = [case for case in test_dirs if case.name not in active_names]
     documented_inactive = sorted(doc_names - active_names, key=str.lower)
     readmes_without_docs = [
-        case for case in test_dirs if readmes[case].exists() and case.name not in doc_names
+        case
+        for case in test_dirs
+        if readmes[case].exists() and case.name not in doc_names
     ]
     broken_docs = sorted(
-        [path.name for path in docs_pages.values() if path.is_symlink() and not path.exists()],
+        [
+            path.name
+            for path in docs_pages.values()
+            if path.is_symlink() and not path.exists()
+        ],
         key=str.lower,
     )
 

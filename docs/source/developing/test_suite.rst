@@ -259,7 +259,7 @@ rendered documentation links, and documentation tags.
 
 .. code-block:: sh
 
-  python3 scripts/test_suite_inventory.py
+  python scripts/test_suite_inventory.py
 
 This can be useful before opening a pull request that adds or migrates
 test suite documentation.
