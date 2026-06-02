@@ -307,6 +307,7 @@
             superad_reduction_diff_grads_limit, &
             superad_reduction_limit
          logical :: superad_reduction_use_turnover_limit
+         character(len=strlen) :: superad_reduction_turnover_limit_function
          real(dp) :: superad_reduction_turnover_vc_floor_frac
 
       ! mixing parameters
