@@ -561,7 +561,12 @@ contains
                               * s% csound_face(k)
                vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
                tau_conv = scale_height / vc_old_local
-               f_turnover = 1d0 - exp(-s% dt / tau_conv)
+               select case (trim(s% superad_reduction_turnover_limit_function))
+               case ('linear')
+                  f_turnover = min(s% dt / tau_conv, 1d0)
+               case default
+                  f_turnover = 1d0 - exp(-s% dt / tau_conv)
+               end select
                Gamma_factor = Gamma_factor_old_local + &
                               f_turnover * (Gamma_factor - Gamma_factor_old_local)
             end if
