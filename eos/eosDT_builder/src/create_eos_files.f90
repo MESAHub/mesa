@@ -179,7 +179,7 @@ contains
                call do_stop('failed in helm_opal_scvh')
             end if
 
-            write (io_unit, '(f4.2,3(1x,f10.5),7(1x,1pe13.5),1x,0pf9.5,1x,f12.5,3(1x,1pe13.5),2(1x,0pf12.5))') &
+            write (io_unit, '(f4.2,3(1x,f10.5),7(1x,1pe13.5),1x,0pf9.5,1x,0pf10.5,3(1x,0pf12.5),2(1x,0pf11.5))') &
                logT, logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, mu, &
                log10(max(1d-99, free_e)), gamma1, gamma3, grad_ad, eta, HELM_fraction
          end do
