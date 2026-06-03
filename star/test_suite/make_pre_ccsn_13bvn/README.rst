@@ -4,6 +4,8 @@
 make_pre_ccsn_13bvn
 *******************
 
+.. tags:: star, massive-star, pre-main-sequence, full-evolution, core-collapse, stripped-envelope, envelope-stripping, pre-supernova
+
 This test suite evolves a solar metalicity 12 |MSun| model from the pre-ms to helium depletion, strips the hydrogen envelope, and then evolves to core collapse.
 This test suite is made to be similar (almost identical) to the 13BVN model from MESA IV. (This is a sensitive test_suite)
 

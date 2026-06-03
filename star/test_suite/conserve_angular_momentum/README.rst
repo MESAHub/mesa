@@ -4,6 +4,8 @@
 conserve_angular_momentum
 *************************
 
+.. tags:: star, rotation, angular-momentum, conservation, low-mass, core-helium-burning
+
 This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 |Msun|, Z=0.02 metallicity, model.
 
 This test case has 2 parts. Click to see a larger view of a plot.

@@ -1,0 +1,1 @@
+../../../star/test_suite/high_rot_darkening/README.rst

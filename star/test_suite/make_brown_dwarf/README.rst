@@ -4,6 +4,8 @@
 make_brown_dwarf
 ****************
 
+.. tags:: star, brown-dwarf, planetary-mass-object, low-metallicity, create-initial-model, brown-dwarf-cooling
+
 This test case checks the creation of a 1.05 Mjup, Z=1e-4 metallicity model and its subsequent evolution for 20 billion years.
 
 This test case has 1 part. Click to see a larger version of a plot.

@@ -4,6 +4,8 @@
 make_co_wd
 **********
 
+.. tags:: star, white-dwarf, carbon-oxygen-white-dwarf, agb, core-helium-burning, ifmr, element-diffusion, white-dwarf-cooling
+
 This test builds a carbon-oxygen white dwarf starting from a specified
 pre main-sequence mass. It does this by running through a series of
 inlists for different stages of evolution. By default, the first two
@@ -65,4 +67,3 @@ This step turns on diffusion in the young proto-WD model to allow the
 model to settle into a stratified envelope structure with a pure
 hydrogen atmosphere. This final step ends when the white dwarf has
 cooled down to reach a luminosity of 1 |Lsun|.
-

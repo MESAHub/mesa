@@ -4,6 +4,8 @@
 wd_aic
 ******
 
+.. tags:: star, compact-remnant, white-dwarf, oxygen-neon-white-dwarf, accretion, electron-capture, accretion-induced-collapse
+
 This test case evolves an accreting ONeMg WD up to the point of
 thermal runaway in the core (see |Schwab2015|).
 

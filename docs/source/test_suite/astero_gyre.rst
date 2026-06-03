@@ -1,0 +1,1 @@
+../../../astero/test_suite/astero_gyre/README.rst

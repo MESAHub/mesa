@@ -4,6 +4,8 @@
 T_tau_gradr
 ***********
 
+.. tags:: star, atm, atmosphere, t-tau-relation, radiative-gradient, surface-boundary-condition
+
 .. |Ttau| replace:: :math:`T(\tau)`
 .. |tau| replace:: :math:`\tau`
 

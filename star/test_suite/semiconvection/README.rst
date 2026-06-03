@@ -4,6 +4,8 @@
 semiconvection
 **************
 
+.. tags:: star, semiconvection, predictive-mixing, ledoux-criterion, convective-boundary-mixing, low-mass
+
 This test case checks placement of the convective and semiconvective boundaries when using the Ledoux criterion and predictive mixing,
 see |MESA V|. The test vehicle is with a 1.5 |Msun|, Z=0.02 metallicity, model.
 

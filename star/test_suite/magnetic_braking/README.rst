@@ -4,6 +4,8 @@
 magnetic_braking
 ****************
 
+.. tags:: star, rotation, angular-momentum, magnetic-field, magnetic-braking, mass-loss, stellar-winds, massive-star
+
 This test case involves the calculation of the spin down caused by a
 large-scale magnetic field in a massive star model. The model has an
 initial mass of 15\ :math:`M_\odot` and equatorial
@@ -131,4 +133,3 @@ example their Fig.3).
 .. image:: ../../../star/test_suite/magnetic_braking/docs/vsurf.jpg
    :alt: image
    :width: 100%
-
