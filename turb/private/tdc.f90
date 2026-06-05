@@ -84,6 +84,13 @@ contains
       end if
 
       if (info%report) then
+         write(*,'(A)')
+         write(*,*) 'TDC get_TDC_solution'
+         write(*,*) 'scale', scale
+         write(*,*) 'Zlb, Zub', Zlb%val, Zub%val
+         write(*,*) 'Q(Y=0)', Q0%val
+         write(*,*) 'Af(Y=0)', Af%val
+         write(*,*) 'Y_is_positive', Y_is_positive
          open(unit=4,file='out.data')
          do iter=1,1000
             Z0 = (Zlb + (Zub-Zlb)*(iter-1)/1000)
@@ -91,6 +98,7 @@ contains
             call compute_Q(info, Y, Q, Af)
             write(4,*) Y%val, Q%val
          end do
+         close(4)
          write(*,*) 'Wrote Q(Y) to out.data'
       end if
 
@@ -263,6 +271,12 @@ contains
       upper_bound_Z = Zub
 
       call try_seeded_positive_Y_bracket(info, Y_is_positive, Zlb, Zub, lower_bound_Z, upper_bound_Z, Y_face_guess)
+      if (info%report) then
+         write(*,*) 'TDC bracket_plus_Newton_search'
+         write(*,*) 'Y_is_positive', Y_is_positive
+         write(*,*) 'Y_face_guess', Y_face_guess
+         write(*,*) 'initial lower_bound_Z, upper_bound_Z', lower_bound_Z%val, upper_bound_Z%val
+      end if
 
       ! Perform bisection search.
       call Q_bisection_search(info, Y_is_positive, lower_bound_Z, upper_bound_Z, Z, ierr)
@@ -286,6 +300,10 @@ contains
          Y = set_Y(Y_is_positive, Z)
          call compute_Q(info, Y, Q, Af)
          if (is_bad(Q%val)) then
+            if (info%report) then
+               write(*,*) 'bad Q in TDC Newton'
+               write(*,*) 'iter Z Y Q Af scale', iter, Z%val, Y%val, Q%val, Af%val, scale
+            end if
             ierr = 1
             exit
          end if
@@ -310,6 +328,10 @@ contains
          end if
 
          if (is_bad(dQdZ%val) .or. abs(dQdZ%val) < 1d-99) then
+            if (info%report) then
+               write(*,*) 'bad dQdZ in TDC Newton'
+               write(*,*) 'iter Z Y Q dQdZ Af scale', iter, Z%val, Y%val, Q%val, dQdZ%val, Af%val, scale
+            end if
             ierr = 1
             exit
          end if

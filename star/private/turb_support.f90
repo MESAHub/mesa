@@ -218,14 +218,17 @@ contains
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
+      integer, parameter :: TDC_debug_k_lo = 227, TDC_debug_k_hi = 229
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC, have_Y_face_guess
-      logical, parameter :: report = .false.
+      logical ::  test_partials, using_TDC, have_Y_face_guess, report, adjust_mass_zone
       include 'formats'
+
+      report = s% report_ierr .and. MLT_option == 'TDC' .and. k >= TDC_debug_k_lo .and. k <= TDC_debug_k_hi
+      adjust_mass_zone = abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass
 
       ! check if this particular k can be done with TDC
       using_TDC = .false.
@@ -334,6 +337,8 @@ contains
             Y_face_guess = 0d0
          end if
 
+         if (report) call report_TDC_call('call set_TDC')
+
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
@@ -356,6 +361,7 @@ contains
          if (s% use_superad_reduction) then
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
+               if (report) call report_TDC_call('call set_TDC with superad_reduction')
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
@@ -455,6 +461,44 @@ contains
 
 
       contains
+
+      subroutine report_TDC_call(label)
+         character (len=*), intent(in) :: label
+
+         write(*,'(A)')
+         write(*,'(A)') 'TDC debug: ' // trim(label)
+         write(*,'(A,3(1X,I8))') 'model solver_iter k', s% model_number, s% solver_iter, k
+         write(*,'(A,1X,I8,3(1X,L1))') 'nz doing_solver_iterations okay_to_set_mlt_vc using_TDC', &
+            s% nz, s% doing_solver_iterations, s% okay_to_set_mlt_vc, using_TDC
+         write(*,'(A,6(1X,L1))') 'TDC logicals include_mlt_corr eturb_energy ' // &
+            'explicit_alpha_M fallback seeded_guess adjust_mass_zone', &
+            s% include_mlt_corr_to_TDC, s% TDC_include_eturb_in_energy_equation, &
+            s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, s% TDC_adjust_mass_fallback_to_mlt, &
+            have_Y_face_guess, adjust_mass_zone
+         write(*,'(A,6(1X,ES24.16))') 'TDC alphas D R Pt C S M', &
+            s% TDC_alpha_D, s% TDC_alpha_R, s% TDC_alpha_Pt, s% TDC_alpha_C, s% TDC_alpha_S, s% TDC_alpha_M
+         write(*,'(A,4(1X,ES24.16))') 'dt scale max_conv_vel conv_vel_start', &
+            s% dt, scale, max_conv_vel, conv_vel_start
+         write(*,'(A,4(1X,ES24.16))') 'Y_face_guess Eq_div_w dV grav', &
+            Y_face_guess, Eq_div_w%val, dV%val, grav%val
+         write(*,'(A,5(1X,ES24.16))') 'L m r gradr grada', &
+            L%val, m, r%val, gradr%val, grada%val
+         write(*,'(A,5(1X,ES24.16))') 'gradL gradL_composition scale_height mixing_length_alpha opacity', &
+            gradL%val, gradL_composition_term, scale_height%val, mixing_length_alpha, opacity%val
+         write(*,'(A,5(1X,ES24.16))') 'P Ptot Pr beta Pg', &
+            P%val, Ptot%val, Pr%val, beta%val, Pg%val
+         write(*,'(A,6(1X,ES24.16))') 'T rho Cp chiT chiRho energy', &
+            T%val, rho%val, Cp%val, chiT%val, chiRho%val, energy%val
+         write(*,'(A,2(1X,I8),2(1X,ES24.16))') 'k_const_mass nz mstar_dot max_conv_vel_div_csound', &
+            s% k_const_mass, s% nz, s% mstar_dot, s% max_conv_vel_div_csound
+         if (k > 0 .and. k <= s% nz) then
+            write(*,'(A,6(1X,ES24.16))') 'cell q dq mlt_vc mlt_vc_old Y_face csound_face', &
+               s% q(k), s% dq(k), s% mlt_vc(k), s% mlt_vc_old(k), s% Y_face(k), s% csound_face(k)
+            write(*,'(A,6(1X,ES24.16))') 'cell start lnT lnRho L L_start gradr gradT', &
+               s% lnT_start(k), s% lnd_start(k), s% L(k), s% L_start(k), s% gradr(k), s% gradT(k)
+         end if
+         write(*,'(A)')
+      end subroutine report_TDC_call
 
       subroutine set_superad_reduction()
          Gamma_limit = s% superad_reduction_Gamma_limit

@@ -128,6 +128,14 @@ contains
       Y = set_Y(Y_is_positive, upper_bound_Z)
       call compute_Q(info, Y, Q_ub, Af)
 
+      if (info%report) then
+         write(*,*) 'TDC Q_bisection_search'
+         write(*,*) 'lower_bound_Z, upper_bound_Z', lower_bound_Z%val, upper_bound_Z%val
+         write(*,*) 'Q(Lower Z)', Q_lb%val
+         write(*,*) 'Q(Upper Z)', Q_ub%val
+         write(*,*) 'Y_is_positive', Y_is_positive
+      end if
+
       ! Check to make sure that the lower and upper bounds on Z actually bracket
       ! a solution to Q(Y(Z)) = 0.
       if (Q_lb * Q_ub > 0d0) then
@@ -157,6 +165,7 @@ contains
          Y = set_Y(Y_is_positive, Z)
 
          call compute_Q(info, Y, Q, Af)
+         if (info%report) write(*,*) 'Q_bisection iter Z Y Q Af', iter, Z%val, Y%val, Q%val, Af%val
 
          if (Q > 0d0 .and. Q_ub > 0d0) then
             upper_bound_Z = Z
@@ -350,6 +359,11 @@ contains
 
       Y = set_Y(.false., upper_bound_Z)
       call compute_Q(info, Y, Q, Af)
+      if (info%report) then
+         write(*,*) 'TDC Af_bisection_search'
+         write(*,*) 'lower_bound_Z, upper_bound_Z', lower_bound_Z%val, upper_bound_Z%val
+         write(*,*) 'Af(upper_bound_Z)', Af%val
+      end if
       if (Af > 0) then  ! d(Af)/dZ < 0, so if Af(upper_bound_Z) > 0 there's no solution in this interval.
          ierr = 1
          return
@@ -357,6 +371,7 @@ contains
 
       Y = set_Y(.false., lower_bound_Z)
       call compute_Q(info, Y, Q, Af)
+      if (info%report) write(*,*) 'Af(lower_bound_Z)', Af%val
       if (Af == 0) then
          ! We want to find Z such that Af(Z) is just barely above zero.
          ! We do this by finding Z such that Af(Z) == 0, then backing off to slightly smaller Z.
@@ -372,6 +387,7 @@ contains
          Y = set_Y(.false., Z)
 
          call compute_Q(info, Y, Q, Af)
+         if (info%report) write(*,*) 'Af_bisection iter Z Y Af Q', iter, Z%val, Y%val, Af%val, Q%val
 
          ! Y < 0 so increasing Y means decreasing Z.
          ! d(Af)/dY > 0 so d(Af)/dZ < 0.

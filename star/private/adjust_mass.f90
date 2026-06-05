@@ -427,6 +427,16 @@
             return
          end if
 
+         call set_TDC_mlt_vc_adjust_mass( &
+            s, nz, k_const_mass, rxm_old, rxm_new, mmax, old_cell_mass, new_cell_mass, &
+            oldval, newval, ierr)
+         if (ierr /= 0) then
+            s% retry_message = 'set_TDC_mlt_vc_adjust_mass failed in adjust mass'
+            if (s% report_ierr) write(*,*) s% retry_message
+            call dealloc
+            return
+         end if
+
          if (s% rotation_flag) then
             ! update j_rot if have extra angular momentum change
             call set_omega_adjust_mass( &
@@ -872,6 +882,194 @@
 !$OMP END PARALLEL DO
 
       end subroutine set_xa
+
+
+      subroutine set_TDC_mlt_vc_adjust_mass( &
+            s, nz, k_const_mass, old_cell_xbdy, new_cell_xbdy, mmax, &
+            old_cell_mass, new_cell_mass, old_eturb, new_eturb, ierr)
+         ! mlt_vc is face-centered.  Remap the start-of-step cell-centered
+         ! turbulent energy used by hydro_energy, then reconstruct the adjusted
+         ! face velocities.
+         type (star_info), pointer :: s
+         integer, intent(in) :: nz, k_const_mass
+         real(dp), intent(in) :: mmax
+         real(dp), dimension(:), intent(in) :: old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass
+         real(dp), dimension(:) :: old_eturb, new_eturb
+         integer, intent(out) :: ierr
+
+         integer :: k, k_hi
+         real(dp) :: fixed_eturb, fixed_face_vc2, target_eturb, variable_eturb, vc2_scale
+
+         ierr = 0
+         if (s% MLT_option /= 'TDC') return
+         if (.not. s% have_mlt_vc) return
+
+         k_hi = min(k_const_mass-1, nz)
+         if (k_hi < 1) return
+
+         do k = 1, nz
+            if (k < nz) then
+               old_eturb(k) = 0.75d0*(pow2(s% mlt_vc_old(k)) + pow2(s% mlt_vc_old(k+1)))
+            else
+               old_eturb(k) = 0.75d0*pow2(s% mlt_vc_old(k))
+            end if
+            new_eturb(k) = old_eturb(k)
+         end do
+
+         do k = 1, k_hi
+            call set1_TDC_eturb_adjust_mass( &
+               s, k, nz, old_eturb, old_cell_xbdy, new_cell_xbdy, mmax, &
+               old_cell_mass, new_cell_mass, new_eturb(k), ierr)
+            if (ierr /= 0) return
+         end do
+
+         ! Reconstruct a smooth face-centered vc^2 shape from the remapped cell
+         ! energies, then rescale it to conserve the total adjusted-region eturb.
+         target_eturb = 0d0
+         do k = 1, k_hi
+            target_eturb = target_eturb + new_cell_mass(k)*new_eturb(k)
+         end do
+
+         do k = 1, k_hi
+            if (k == 1) then
+               old_eturb(k) = max(0d0, new_eturb(k)/1.5d0)
+            else
+               old_eturb(k) = max(0d0, (new_eturb(k-1) + new_eturb(k))/3d0)
+            end if
+         end do
+
+         fixed_eturb = 0d0
+         fixed_face_vc2 = 0d0
+         if (k_hi < nz) then
+            fixed_face_vc2 = pow2(s% mlt_vc_old(k_hi+1))
+            fixed_eturb = 0.75d0*new_cell_mass(k_hi)*fixed_face_vc2
+         end if
+
+         variable_eturb = 0d0
+         do k = 1, k_hi
+            variable_eturb = variable_eturb + 0.75d0*new_cell_mass(k)*old_eturb(k)
+            if (k < k_hi) variable_eturb = variable_eturb + 0.75d0*new_cell_mass(k)*old_eturb(k+1)
+         end do
+
+         if (target_eturb > fixed_eturb .and. variable_eturb > 0d0) then
+            vc2_scale = (target_eturb - fixed_eturb)/variable_eturb
+         else
+            vc2_scale = 0d0
+         end if
+
+         do k = 1, k_hi
+            s% mlt_vc_old(k) = sqrt(max(0d0, vc2_scale*old_eturb(k)))
+            s% mlt_vc(k) = s% mlt_vc_old(k)
+         end do
+
+      end subroutine set_TDC_mlt_vc_adjust_mass
+
+
+      subroutine set1_TDC_eturb_adjust_mass(s, k, nz, old_eturb, &
+            old_cell_xbdy, new_cell_xbdy, mmax, old_cell_mass, new_cell_mass, new_eturb, ierr)
+         use num_lib, only: binary_search
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nz
+         real(dp), intent(in) :: mmax
+         real(dp), intent(in) :: old_eturb(:)
+         real(dp), dimension(:), intent(in) :: &
+            old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass
+         real(dp), intent(out) :: new_eturb
+         integer, intent(out) :: ierr
+
+         real(dp) :: eturb_sum, xm_inner, xm0, xm1, new_cell_dm, dm_sum, dm, xm_outer
+         integer :: kk, k_outer
+
+         ierr = 0
+         new_eturb = 0d0
+
+         xm_outer = new_cell_xbdy(k)
+         if (k == nz) then
+            new_cell_dm = mmax - xm_outer - s% M_center
+         else
+            new_cell_dm = new_cell_mass(k)
+         end if
+         if (new_cell_dm <= 0d0) then
+            ierr = -1
+            return
+         end if
+         xm_inner = xm_outer + new_cell_dm
+
+         eturb_sum = 0d0
+         dm_sum = 0d0
+
+         if (xm_outer < old_cell_xbdy(1)) then
+            if (xm_inner <= old_cell_xbdy(1)) return  ! newly accreted material has no old eturb
+            dm = min(new_cell_dm, old_cell_xbdy(1) - xm_outer)
+            dm_sum = dm
+            xm_outer = old_cell_xbdy(1)
+            k_outer = 1
+         else
+            if (xm_outer >= old_cell_xbdy(nz)) then
+               k_outer = nz
+            else
+               k_outer = binary_search(nz, old_cell_xbdy, 0, xm_outer)
+               if (k_outer <= 0 .or. k_outer > nz) then
+                  ierr = -1
+                  return
+               end if
+            end if
+         end if
+
+         do kk = k_outer, nz
+            xm0 = old_cell_xbdy(kk)
+            if (xm0 >= xm_inner) then
+               if (dm_sum < new_cell_dm .and. kk > 1) then
+                  dm = new_cell_dm - dm_sum
+                  dm_sum = new_cell_dm
+                  eturb_sum = eturb_sum + old_eturb(kk-1)*dm
+               end if
+               exit
+            end if
+
+            if (kk == nz) then
+               xm1 = mmax - s% M_center
+            else
+               xm1 = old_cell_xbdy(kk+1)
+            end if
+            if (xm1 < xm_outer) then
+               ierr = -1
+               return
+            end if
+
+            if (xm0 >= xm_outer .and. xm1 <= xm_inner) then
+               dm = old_cell_mass(kk)
+               dm_sum = dm_sum + dm
+               if (dm_sum > new_cell_dm) then
+                  dm = dm - (dm_sum - new_cell_dm)
+                  dm_sum = new_cell_dm
+               end if
+            else if (xm0 <= xm_outer .and. xm1 >= xm_inner) then
+               dm = new_cell_dm - dm_sum
+               dm_sum = new_cell_dm
+            else
+               if (xm_inner <= xm1) then
+                  dm = new_cell_dm - dm_sum
+                  dm_sum = new_cell_dm
+               else
+                  dm = max(0d0, xm1 - xm_outer)
+                  if (dm_sum + dm > new_cell_dm) dm = new_cell_dm - dm_sum
+                  dm_sum = dm_sum + dm
+               end if
+            end if
+
+            if (dm <= 0d0) then
+               ierr = -1
+               return
+            end if
+
+            eturb_sum = eturb_sum + old_eturb(kk)*dm
+            if (dm_sum >= new_cell_dm) exit
+         end do
+
+         new_eturb = max(0d0, eturb_sum/new_cell_dm)
+
+      end subroutine set1_TDC_eturb_adjust_mass
 
 
       subroutine set1_xa(s, k, nz, species, xa_old, xaccrete, &
