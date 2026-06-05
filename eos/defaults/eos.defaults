@@ -101,8 +101,8 @@
       logRho_max_FreeEOS_hi = 10.1d0
       logRho_max_FreeEOS_lo = 10.0d0
 
-      logT_min_FreeEOS_hi = 3.1d0
-      logT_min_FreeEOS_lo = 3.0d0
+      logT_min_FreeEOS_hi = 3.12d0
+      logT_min_FreeEOS_lo = 3.02d0
       logT_max_FreeEOS_hi = 8.2d0 ! FreeEOS tabulations go up to here
       logT_max_FreeEOS_lo = 8.1d0
 

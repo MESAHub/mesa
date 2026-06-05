@@ -24,6 +24,33 @@ instead.
 
 This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
+.. _freeeos_fallback_log_units_bug:
+
+EOS: FreeEOS fallback rows and OPAL/SCVH blends
+-----------------------------------------------
+
+Fixed an issue in the FreeEOS table builder where fallback rows marked by
+``MESA = 1`` could write the MESA EOS values ``lnPgas``, ``lnE``, and ``lnS``
+into table columns that are read as base-10 logarithms. This could create
+discontinuities in the FreeEOS support table and noisy EOS partial derivatives,
+including near the low-density ``logT = 3.0 - 3.1`` FreeEOS boundary.
+
+This also exposed a low-density OPAL/SCVH edge where MESA was falling back to
+HELM. The fix updates this region so OPAL/SCVH blends to the ideal EOS at low
+density instead.
+
+Another OPAL/SCVH blend issue affected the high-Z transition between
+``Z = 0.035`` and ``Z = 0.04``. In practice these regions were not being
+blended in Z: OPAL/SCVH remained fully active below ``Z = 0.04`` wherever it
+could be used, then switched discontinuously to the HELM/ideal layer at
+``Z = 0.04``. This happened because the Z ramp multiplied the existing fallback
+fraction, which was zero in pure OPAL/SCVH regions. The fix fades OPAL/SCVH
+into the HELM/ideal layer across this Z interval.
+
+This is fixed after ``r26.4.1``. See
+`gh-921 <https://github.com/MESAHub/mesa/issues/921>`_. Users who need the
+patch directly can refer to `gh-997 <https://github.com/MESAHub/mesa/pull/997>`_.
+
 .. _report_max_infall_inside_fe_core_bug:
 
 Controls: ``report_max_infall_inside_fe_core`` is ignored
