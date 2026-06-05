@@ -6,6 +6,7 @@ program eos_plotter
    use chem_lib
    use const_def, only: crad, ln10
    use const_lib, only: const_init
+   use const_def
    use math_lib
    use num_lib, only : dfridr
    use utils_lib, only: set_nan
