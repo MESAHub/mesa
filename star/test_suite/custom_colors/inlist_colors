@@ -120,98 +120,160 @@
 /
 
 
+
 &pgstar
-      file_white_on_black_flag = .true.
-      pgstar_interval = 1
+  ! Live pgstar dashboard for the synthetic photometry / colors-module run.
+  ! Designed for the uploaded blue-loop inlist_run using GAIA colors:
+  !   G, Gbp, Grp, LOGS/SED, HR, Kipp, and History_Track panels.
 
-      ! Set up Grid 8 as a 2x2 dashboard layout
-      Grid8_win_flag = .true.
-      Grid8_win_width = 14
-      Grid8_win_aspect_ratio = 0.75  ! Safely scales height relative to width (height / width)
-      Grid8_num_cols = 2
-      Grid8_num_rows = 2
-      Grid8_num_plots = 4
+  file_white_on_black_flag = .false.
+  pgstar_interval = 1
 
-      ! Define panel names matching your working dispatcher setup
-      Grid8_plot_name(1) = 'Color_Magnitude1'
-      Grid8_plot_name(2) = 'Color_Magnitude2'
-      Grid8_plot_name(3) = 'sed1'
-      Grid8_plot_name(4) = 'sed2'
+  ! Keep the standard component windows off; render HR/Kipp inside Grid8.
+  HR_win_flag = .false.
+  Kipp_win_flag = .false.
 
-      ! --- POSITIONING MATRIX (2x2 Grid) ---
-      ! Top-Left: Color-Magnitude Diagram (CMD)
-      Grid8_plot_row(1) = 1
-      Grid8_plot_col(1) = 1
-      Grid8_plot_colspan(1) = 1
-      Grid8_plot_rowspan(1) = 1
+  ! ---------------------------------------------------------------------------
+  ! Individual panel definitions
+  ! ---------------------------------------------------------------------------
 
-      ! Top-Right: Hertzsprung-Russell Diagram (HRD)
-      Grid8_plot_row(2) = 1
-      Grid8_plot_col(2) = 2
-      Grid8_plot_colspan(2) = 1
-      Grid8_plot_rowspan(2) = 1
+  ! Physics context: where the star is moving in Teff-L space.
+  HR_title = 'HR diagram'
+  HR_logL_margin = 0.1
+  HR_logT_margin = 0.1
+  HR_dlogT_min = -1
+  HR_dlogL_min = -1
 
-      ! Bottom-Left: Custom Native SED Panel
-      Grid8_plot_row(3) = 2
-      Grid8_plot_col(3) = 1
-      Grid8_plot_colspan(3) = 1
-      Grid8_plot_rowspan(3) = 1
+  ! Colors module output: Johnson CMD.
+  Color_Magnitude1_num_panels = 1
+  Color_Magnitude1_xaxis1_name = 'B - R'
+  Color_Magnitude1_yaxis1_name = 'V'
+  Color_Magnitude1_xaxis_reversed = .false.
+  Color_Magnitude1_yaxis_reversed = .true.
+  Color_Magnitude1_title = 'Johnson CMD: V vs B-R'
+  Color_Magnitude1_txt_scale = 0.75
 
-      ! Bottom-Right: Kippenhahn Diagram
-      Grid8_plot_row(4) = 2
-      Grid8_plot_col(4) = 2
-      Grid8_plot_colspan(4) = 1
-      Grid8_plot_rowspan(4) = 1
+  ! Colors module output: Johnson color-color plane.
+  Color_Magnitude2_num_panels = 1
+  Color_Magnitude2_xaxis1_name = 'B - V'
+  Color_Magnitude2_yaxis1_name = 'V - R'
+  Color_Magnitude2_xaxis_reversed = .false.
+  Color_Magnitude2_yaxis_reversed = .false.
+  Color_Magnitude2_title = 'Johnson colour-colour'
+  Color_Magnitude2_txt_scale = 0.75
 
+  ! Colors module output: live synthetic SED and filter response overlay.
+  SED1_title = 'Live synthetic SED + filters'
+  SED1_txt_scale = 0.75
+  SED1_lambda_min = 100.0
+  SED1_lambda_max = 10000.0
+  SED1_flux_min = -15.0d0
+  SED1_flux_max = 0.0d0
+  SED1_filter_scale = 1.0
 
-      ! --- GRID 8 FILE EXPORT CONTROLS ---
-      Grid8_file_flag = .true.          ! Enable saving this window to files
-      Grid8_file_dir = 'plots'              ! "." tells MESA to save directly into your working directory
-      Grid8_file_prefix = 'dashboard_'  ! Filenames will be dashboard_000001.png, dashboard_000002.png, etc.
-      Grid8_file_interval = 1           ! Save an image on EVERY single step (set to 5 or 10 to save disk space)
+  ! Complementary physics: interior structure during the blue loop.
+  Kipp_title = 'Interior structure'
+  Kipp_mass_min = 0
+  Kipp_show_mass_boundaries = .true.
+  Kipp_show_mixing = .true.
+  Kipp_max_width = -1
 
-      ! PNG sizing overrides (-1 defaults to your window display dimensions)
-      Grid8_file_width = -1
-      Grid8_file_aspect_ratio = -1
+  ! Colors module output as a time series.
+  History_Track1_title = 'Johnson V magnitude'
+  History_Track1_xname = 'star_age'
+  History_Track1_yname = 'V'
+  History_Track1_xaxis_label = 'Age (yr)'
+  History_Track1_yaxis_label = 'M_V'
+  History_Track1_reverse_xaxis = .false.
 
+  ! ---------------------------------------------------------------------------
+  ! Grid8 dashboard layout: 3 columns x 2 rows
+  ! ---------------------------------------------------------------------------
+  Grid8_win_flag = .true.
+  Grid8_win_width = 18
+  Grid8_win_aspect_ratio = 0.62
 
-      ! --- INDIVIDUAL PANEL CONFIGURATIONS ---
+  Grid8_file_flag = .true.
+  Grid8_file_dir = 'plots'
+  Grid8_file_prefix = 'colors_dashboard_'
+  Grid8_file_interval = 5
+  Grid8_file_width = 18
+  Grid8_file_aspect_ratio = 0.62
 
-      Color_Magnitude1_num_panels = 1
-      Color_Magnitude1_xaxis1_name = 'B - V'
-      Color_Magnitude1_yaxis1_name = 'V'
-      Color_Magnitude1_xaxis_reversed = .true.
-      Color_Magnitude1_yaxis_reversed = .true.
-      Color_Magnitude1_title = 'Stellar CMD (V vs B-V)'
-      Color_Magnitude1_txt_scale = 0.8
+  Grid8_num_cols = 3
+  Grid8_num_rows = 2
+  Grid8_num_plots = 6
 
-      ! 2. color-color
+  ! Top left: the direct colors-module product.
+  Grid8_plot_name(1) = 'sed1'
+  Grid8_plot_row(1) = 1
+  Grid8_plot_col(1) = 1
+  Grid8_plot_rowspan(1) = 1
+  Grid8_plot_colspan(1) = 1
+  Grid8_plot_pad_left(1) = 0.06
+  Grid8_plot_pad_right(1) = 0.03
+  Grid8_plot_pad_top(1) = 0.05
+  Grid8_plot_pad_bot(1) = 0.08
+  Grid8_txt_scale_factor(1) = 0.75
 
-      Color_Magnitude2_num_panels = 1
-      Color_Magnitude2_xaxis1_name = 'B - R'
-      Color_Magnitude2_yaxis1_name = 'U - I'
-      Color_Magnitude2_xaxis_reversed = .true.
-      Color_Magnitude2_yaxis_reversed = .true.
-      Color_Magnitude2_title = 'Color-Color (U-I vs B-R)'
-      Color_Magnitude2_txt_scale = 0.8
+  ! Top centre: observational CMD track.
+  Grid8_plot_name(2) = 'Color_Magnitude1'
+  Grid8_plot_row(2) = 1
+  Grid8_plot_col(2) = 2
+  Grid8_plot_rowspan(2) = 1
+  Grid8_plot_colspan(2) = 1
+  Grid8_plot_pad_left(2) = 0.06
+  Grid8_plot_pad_right(2) = 0.03
+  Grid8_plot_pad_top(2) = 0.05
+  Grid8_plot_pad_bot(2) = 0.08
+  Grid8_txt_scale_factor(2) = 0.75
 
+  ! Top right: observational color-color track.
+  Grid8_plot_name(3) = 'Color_Magnitude2'
+  Grid8_plot_row(3) = 1
+  Grid8_plot_col(3) = 3
+  Grid8_plot_rowspan(3) = 1
+  Grid8_plot_colspan(3) = 1
+  Grid8_plot_pad_left(3) = 0.06
+  Grid8_plot_pad_right(3) = 0.03
+  Grid8_plot_pad_top(3) = 0.05
+  Grid8_plot_pad_bot(3) = 0.08
+  Grid8_txt_scale_factor(3) = 0.75
 
-      ! 3. Your Custom SED Panel Settings
-      SED1_title = 'Live Synthetic Stellar SED'
-      SED1_txt_scale = 0.8
-      SED1_lambda_min = 100.0
-      SED1_lambda_max = 10000.0
-      SED1_flux_min = -15.0d0
-      SED1_flux_max = 0.0d0
-      SED1_filter_scale = 1.0
+  ! Bottom left: physical evolution corresponding to the photometry.
+  Grid8_plot_name(4) = 'HR'
+  Grid8_plot_row(4) = 2
+  Grid8_plot_col(4) = 1
+  Grid8_plot_rowspan(4) = 1
+  Grid8_plot_colspan(4) = 1
+  Grid8_plot_pad_left(4) = 0.06
+  Grid8_plot_pad_right(4) = 0.03
+  Grid8_plot_pad_top(4) = 0.05
+  Grid8_plot_pad_bot(4) = 0.08
+  Grid8_txt_scale_factor(4) = 0.75
 
-      ! 4. Your Custom SED Panel Settings
-      SED2_title = 'Live Synthetic Stellar SED'
-      SED2_txt_scale = 0.8
-      SED2_lambda_min = 100.0
-      SED2_lambda_max = 30000.0
-      SED2_flux_min = -10.0d0
-      SED2_flux_max = -101.0d0
-      SED2_filter_scale = 0.5
+  ! Bottom centre: stellar structure / mixing context.
+  Grid8_plot_name(5) = 'Kipp'
+  Grid8_plot_row(5) = 2
+  Grid8_plot_col(5) = 2
+  Grid8_plot_rowspan(5) = 1
+  Grid8_plot_colspan(5) = 1
+  Grid8_plot_pad_left(5) = 0.06
+  Grid8_plot_pad_right(5) = 0.03
+  Grid8_plot_pad_top(5) = 0.05
+  Grid8_plot_pad_bot(5) = 0.08
+  Grid8_txt_scale_factor(5) = 0.75
 
-/
+  ! Bottom right: one-band synthetic magnitude through time.
+  Grid8_plot_name(6) = 'History_Track1'
+  Grid8_plot_row(6) = 2
+  Grid8_plot_col(6) = 3
+  Grid8_plot_rowspan(6) = 1
+  Grid8_plot_colspan(6) = 1
+  Grid8_plot_pad_left(6) = 0.06
+  Grid8_plot_pad_right(6) = 0.03
+  Grid8_plot_pad_top(6) = 0.05
+  Grid8_plot_pad_bot(6) = 0.08
+  Grid8_txt_scale_factor(6) = 0.75
+
+/ ! end of pgstar namelist
