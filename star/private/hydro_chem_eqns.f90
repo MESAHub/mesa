@@ -54,13 +54,15 @@
          use rates_def, only: i_rate
          use star_utils, only: em1, e00, ep1
          use auto_diff_support
+         use implicit_Dmix, only: implicit_Dmix_debug_selected_cell
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
 
          !integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, j, i, jj, ii, species
+         integer :: nz, j, i, jj, ii, species, debug_max_i_var, debug_max_loc, &
+            debug_dxa_max_jj, debug_dxa_max_loc
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
             dq, dm, dequ, dxdt_nuc, dxdt_mix, max_abs_residual, &
@@ -68,7 +70,9 @@
             d_dxdt_mix_dx00, d_dxdt_mix_dxm1, d_dxdt_mix_dxp1, &
             sum_dx_burning, sum_dx_mixing, residual, &
             dxdt_factor, eqn_scale, &
-            dequ_dlnd, dequ_dlnT, dx00, dxp1
+            dequ_dlnd, dequ_dlnT, dx00, dxp1, debug_max_dequ_abs, &
+            debug_max_dequ_val, debug_dxa_max_abs, debug_dxa_max_val
+         character (len=16) :: debug_max_var
          type(auto_diff_real_star_order1) :: &
             sig00_ad, sigp1_ad
          logical :: test_partials, doing_op_split_burn
@@ -216,10 +220,14 @@
                      dxp1 = 0d0
                      if (do_implicit_dsig_structure) sigp1_ad = 0d0
                   end if
-                  if (do_implicit_dsig_structure) &
+                  if (do_implicit_dsig_structure) then
+                     call debug_sig_ad_partials( &
+                        dx00/(dm*eqn_scale), -dxp1/(dm*eqn_scale))
                      call save_sig_ad_partials( &
                         dx00/(dm*eqn_scale), -dxp1/(dm*eqn_scale))
+                  end if
                   if (do_implicit_dsig_dxa) then
+                     call debug_sig_dxa_partials
                      do jj=1,species
                         ii = s% nvar_hydro+jj
                         if (k > 1) then
@@ -271,6 +279,179 @@
                return
             end if
          end subroutine check_dequ
+
+
+         subroutine debug_sig_ad_partials(sig00_factor, sigp1_factor)
+            real(dp), intent(in) :: sig00_factor, sigp1_factor
+
+            real(dp) :: sig00_d1_max, sigp1_d1_max, xa_m1, xa_p1
+
+            if (.not. implicit_Dmix_debug_selected_cell(s, k)) return
+
+            sig00_d1_max = maxval(abs(sig00_ad%d1Array))
+            sigp1_d1_max = maxval(abs(sigp1_ad%d1Array))
+            debug_max_dequ_abs = 0d0
+            debug_max_dequ_val = 0d0
+            debug_max_i_var = 0
+            debug_max_loc = 0
+            debug_max_var = 'none'
+
+            call debug_sig_ad_var('lnd', s% i_lnd, i_lnd_m1, i_lnd_00, i_lnd_p1, &
+               sig00_factor, sigp1_factor)
+            call debug_sig_ad_var('lnT', s% i_lnT, i_lnT_m1, i_lnT_00, i_lnT_p1, &
+               sig00_factor, sigp1_factor)
+            call debug_sig_ad_var('lnR', s% i_lnR, i_lnR_m1, i_lnR_00, i_lnR_p1, &
+               sig00_factor, sigp1_factor)
+            if (s% i_v /= 0) call debug_sig_ad_var( &
+               'v', s% i_v, i_v_m1, i_v_00, i_v_p1, sig00_factor, sigp1_factor)
+            if (s% i_u /= 0) call debug_sig_ad_var( &
+               'u', s% i_u, i_v_m1, i_v_00, i_v_p1, sig00_factor, sigp1_factor)
+            if (s% i_lum /= 0) call debug_sig_ad_var( &
+               'lum', s% i_lum, i_L_m1, i_L_00, i_L_p1, sig00_factor, sigp1_factor)
+            if (s% i_w /= 0) call debug_sig_ad_var( &
+               'w', s% i_w, i_w_m1, i_w_00, i_w_p1, sig00_factor, sigp1_factor)
+            if (s% i_Hp /= 0) call debug_sig_ad_var( &
+               'Hp', s% i_Hp, i_Hp_m1, i_Hp_00, i_Hp_p1, sig00_factor, sigp1_factor)
+            if (s% i_w_div_wc /= 0) call debug_sig_ad_var( &
+               'w_div_wc', s% i_w_div_wc, i_w_div_wc_m1, i_w_div_wc_00, &
+               i_w_div_wc_p1, sig00_factor, sigp1_factor)
+            if (s% i_j_rot /= 0) call debug_sig_ad_var( &
+               'j_rot', s% i_j_rot, i_jrot_m1, i_jrot_00, i_jrot_p1, &
+               sig00_factor, sigp1_factor)
+
+            if (debug_max_dequ_abs == 0d0) return
+
+            xa_m1 = -99d0
+            xa_p1 = -99d0
+            if (k > 1) xa_m1 = s% xa(j,k-1)
+            if (k < nz) xa_p1 = s% xa(j,k+1)
+
+!$OMP critical (implicit_Dmix_debug_chem)
+            write(*,*) 'implicit_Dmix debug chem dsig_struct model', &
+               s% model_number, ' iter', s% solver_iter, &
+               ' k', k, ' j', j, &
+               ' isotope', trim(chem_isos% name(s% chem_id(j))), &
+               ' mix_type', s% mixing_type(k), &
+               ' mlt_type', s% mlt_mixing_type(k)
+            write(*,*) '   residual', residual, ' eqn_scale', eqn_scale, &
+               ' dxdt_actual', dxdt_actual, ' dxdt_mix', dxdt_mix, &
+               ' dxdt_nuc', dxdt_nuc, &
+               ' xa_m1', xa_m1, ' xa_00', s% xa(j,k), &
+               ' xa_p1', xa_p1, ' xa_start_00', s% xa_start(j,k)
+            write(*,*) '   dx00', dx00, ' dxp1', dxp1, ' dm', dm, &
+               ' sig00_factor', sig00_factor, &
+               ' sigp1_factor', sigp1_factor, &
+               ' sig00_val', sig00_ad%val, ' sigp1_val', sigp1_ad%val
+            write(*,*) '   sig00_d1_max', sig00_d1_max, &
+               ' sigp1_d1_max', sigp1_d1_max, &
+               ' max_dsig_struct_dequ', debug_max_dequ_val, &
+               ' max_abs_dsig_struct_dequ', debug_max_dequ_abs, &
+               ' max_var', trim(debug_max_var), &
+               ' max_i_var', debug_max_i_var, &
+               ' max_loc', debug_max_loc
+!$OMP end critical (implicit_Dmix_debug_chem)
+         end subroutine debug_sig_ad_partials
+
+
+         subroutine debug_sig_dxa_partials
+            integer :: jj
+            real(dp) :: dequ_m1, dequ_00, dequ_p1
+
+            if (.not. implicit_Dmix_debug_selected_cell(s, k)) return
+
+            debug_dxa_max_abs = 0d0
+            debug_dxa_max_val = 0d0
+            debug_dxa_max_jj = 0
+            debug_dxa_max_loc = 0
+
+            do jj=1,species
+               if (k > 1) then
+                  dequ_m1 = s% d_sig_dxa_m1(jj,k)*dx00/(dm*eqn_scale)
+                  call debug_sig_dxa_candidate(jj, -1, dequ_m1)
+               end if
+               dequ_00 = 0d0
+               if (k > 1) dequ_00 = dequ_00 + &
+                  s% d_sig_dxa_00(jj,k)*dx00/dm
+               if (k < nz) dequ_00 = dequ_00 - &
+                  s% d_sig_dxa_m1(jj,k+1)*dxp1/dm
+               dequ_00 = dequ_00/eqn_scale
+               call debug_sig_dxa_candidate(jj, 0, dequ_00)
+               if (k < nz) then
+                  dequ_p1 = -s% d_sig_dxa_00(jj,k+1)*dxp1/(dm*eqn_scale)
+                  call debug_sig_dxa_candidate(jj, 1, dequ_p1)
+               end if
+            end do
+
+            if (debug_dxa_max_abs == 0d0) return
+
+!$OMP critical (implicit_Dmix_debug_chem)
+            write(*,*) 'implicit_Dmix debug chem dsig_dxa model', &
+               s% model_number, ' iter', s% solver_iter, &
+               ' k', k, ' j', j, &
+               ' isotope', trim(chem_isos% name(s% chem_id(j))), &
+               ' mix_type', s% mixing_type(k), &
+               ' mlt_type', s% mlt_mixing_type(k)
+            write(*,*) '   residual', residual, ' eqn_scale', eqn_scale, &
+               ' dxdt_actual', dxdt_actual, ' dxdt_mix', dxdt_mix, &
+               ' dxdt_nuc', dxdt_nuc, &
+               ' dx00', dx00, ' dxp1', dxp1, ' dm', dm
+            write(*,*) '   max_dsig_dxa_dequ', debug_dxa_max_val, &
+               ' max_abs_dsig_dxa_dequ', debug_dxa_max_abs, &
+               ' max_jj', debug_dxa_max_jj, &
+               ' max_partial_isotope', &
+               trim(chem_isos% name(s% chem_id(debug_dxa_max_jj))), &
+               ' max_loc', debug_dxa_max_loc
+!$OMP end critical (implicit_Dmix_debug_chem)
+         end subroutine debug_sig_dxa_partials
+
+
+         subroutine debug_sig_dxa_candidate(jj_in, loc, dequ)
+            integer, intent(in) :: jj_in, loc
+            real(dp), intent(in) :: dequ
+
+            if (abs(dequ) <= debug_dxa_max_abs) return
+            debug_dxa_max_abs = abs(dequ)
+            debug_dxa_max_val = dequ
+            debug_dxa_max_jj = jj_in
+            debug_dxa_max_loc = loc
+         end subroutine debug_sig_dxa_candidate
+
+
+         subroutine debug_sig_ad_var(var_name, i_var, i_m1, i_00, i_p1, &
+               sig00_factor, sigp1_factor)
+            character (len=*), intent(in) :: var_name
+            integer, intent(in) :: i_var, i_m1, i_00, i_p1
+            real(dp), intent(in) :: sig00_factor, sigp1_factor
+
+            real(dp) :: d_m1, d_00, d_p1
+
+            if (i_var == 0) return
+
+            d_m1 = sig00_factor*sig00_ad%d1Array(i_m1) + &
+               sigp1_factor*sigp1_ad%d1Array(i_m1)
+            d_00 = sig00_factor*sig00_ad%d1Array(i_00) + &
+               sigp1_factor*sigp1_ad%d1Array(i_00)
+            d_p1 = sig00_factor*sig00_ad%d1Array(i_p1) + &
+               sigp1_factor*sigp1_ad%d1Array(i_p1)
+
+            call debug_sig_ad_candidate(var_name, i_var, -1, d_m1)
+            call debug_sig_ad_candidate(var_name, i_var, 0, d_00)
+            call debug_sig_ad_candidate(var_name, i_var, 1, d_p1)
+         end subroutine debug_sig_ad_var
+
+
+         subroutine debug_sig_ad_candidate(var_name, i_var, loc, dequ)
+            character (len=*), intent(in) :: var_name
+            integer, intent(in) :: i_var, loc
+            real(dp), intent(in) :: dequ
+
+            if (abs(dequ) <= debug_max_dequ_abs) return
+            debug_max_dequ_abs = abs(dequ)
+            debug_max_dequ_val = dequ
+            debug_max_i_var = i_var
+            debug_max_loc = loc
+            debug_max_var = var_name
+         end subroutine debug_sig_ad_candidate
 
 
          subroutine save_sig_ad_partials(sig00_factor, sigp1_factor)

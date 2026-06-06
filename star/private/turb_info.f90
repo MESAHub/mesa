@@ -25,6 +25,7 @@
       use num_lib
       use utils_lib
       use auto_diff_support
+      use implicit_Dmix, only: implicit_Dmix_debug_mlt
 
       implicit none
 
@@ -241,6 +242,10 @@
          end if
 
          call store_results
+         call implicit_Dmix_debug_mlt(s, 'after do1_mlt_eval store_results', k, &
+            s% mlt_mixing_type(k), s% mlt_D(k), gradL_composition_term_ad%val, &
+            gradr_ad%val, grada_face_ad%val, s% gradT(k), s% Y_face(k), &
+            s% mlt_vc(k))
 
          if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
             f = s% mlt_gradT_fraction

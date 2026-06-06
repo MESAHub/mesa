@@ -521,6 +521,9 @@
    !log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
    !log_D_mix_non_rotation
    !log_D_mix_rotation
+   !log_Dmix_implicit ! implicit part of D_mix in units of cm^2/second
+   !log_Dmix_explicit ! explicit part of D_mix in units of cm^2/second
+   !Dmix_implicit_dB ! derivative of Dmix_implicit with respect to implicit Brunt B
 
    !log_D_conv ! D_mix for regions where mix_type = convective_mixing
    !log_D_leftover ! D_mix for regions where mix_type = leftover_convective_mixing

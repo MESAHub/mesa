@@ -23,7 +23,7 @@
       !drag_coefficient = 1d0
       !min_q_for_drag = 0.8d0
 
-      set_min_D_mix = .true.
+      set_min_D_mix = .false.
       min_D_mix = 1d-2 
 
       log_max_temp_upper_limit = 9.600d0
@@ -76,11 +76,15 @@ TRho_logT_max = 10d0
 
 
 !pause_flag = .true.
-Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 5 ! 
-Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
+!Profile_Panels3_xmin = 0 ! -101d0
+!Profile_Panels3_xmax = 5 !
+!Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
-TRho_Profile_xmin = -12d0
-TRho_Profile_ymin = 3.0d0
+TRho_Profile_xmin = 0d0
+TRho_Profile_xmax = 6.5d0
+
+TRho_Profile_ymin = 6.0d0
+TRho_Profile_ymax = 9.0d0
+
 
 / ! end of pgstar namelist

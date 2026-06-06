@@ -13,7 +13,7 @@
       change_v_flag = .true.
       new_v_flag = .true.
 
-      new_rotation_flag = .true.
+      new_rotation_flag = .false.
       change_rotation_flag = .false.  ! rotation off until near zams
       new_surface_rotation_v = 10
       num_steps_to_relax_rotation = 20
@@ -37,14 +37,17 @@
       pgstar_flag = .true.
 
 
-implicit_diffusion_flag = .true.
+implicit_diffusion_flag = .false.
 implicit_diffusion_include_dsig_dxa = .true.
 implicit_diffusion_use_brunt_gauss_path = .false.
-implicit_diffusion_include_dsig_structure = .true.
+implicit_diffusion_include_dsig_structure = .false.
 
-implicit_diffusion_use_brunt_finite_difference_value = .true.
+implicit_diffusion_use_brunt_finite_difference_value = .false.
 ! In the MESA II notation, false uses an Eq. (6)-style standard Ledoux partial sum,
 ! while true uses the Eq. (8)-style New Ledoux finite difference.
+
+implicit_diffusion_debug_thermohaline = .false.
+implicit_diffusion_debug_thermohaline_k = 0
 
 / ! end of star_job namelist
 
@@ -62,14 +65,17 @@ implicit_diffusion_use_brunt_finite_difference_value = .true.
 
 &controls
          
-include_eos_composition_partials = .true.
+include_eos_composition_partials = .false.
 ! essential to lower dq for implicit diffusion, need for convective boundaries
 !min_dq_for_xa_convective = 1d-12
 !min_dq_for_xa = 1d-12
 
 convergence_ignore_equL_residuals = .true.
-tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
+!tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
 
+
+num_cells_for_smooth_gradL_composition_term = 0
+num_cells_for_smooth_brunt_B = 0
 
          he_core_mass_limit = 0.24d0
 
@@ -134,7 +140,7 @@ tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
 
          photo_digits = 4
          photo_interval = 50
-         profile_interval = 100
+         profile_interval = 10
          history_interval = 10
          terminal_interval = 10
          write_header_frequency = 10
@@ -147,7 +153,7 @@ tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
 ! FOR DEBUGGING
 
       report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_ierr = .false. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.
       !fill_arrays_with_NaNs = .true.
@@ -234,8 +240,8 @@ tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
          
          Grid3_plot_name(1) = 'Mixing'
 
-         Mixing_xmin = 0.22 ! only used if /= -101d0
-         Mixing_xmax = 0.28 ! only used if /= -101d0
+         Mixing_xmin = 0.2 ! only used if /= -101d0
+         Mixing_xmax = 0.3 ! only used if /= -101d0
          
          Mixing_ymin = -101d0 ! only used if /= -101d0
          Mixing_ymax = -101d0 ! only used if /= -101d0        
@@ -292,7 +298,7 @@ tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
          Grid3_plot_name(4) = 'Kipp'
          
          Kipp_show_mass_boundaries = .false.
-         Kipp_mass_max = 0.5 ! (Msun units) negative means use default
+         Kipp_mass_max = 0.3 ! (Msun units) negative means use default
          !Kipp_mass_min = 0.22 ! (Msun units) negative means use default
 
          Kipp_show_luminosities = .false.
@@ -332,7 +338,7 @@ tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
   Abundance_win_flag = .true.
 
  ! window properties
- Abundance_win_width = 14
+ Abundance_win_width = 10
  Abundance_win_aspect_ratio = 0.75
  Abundance_title = ''
 
@@ -375,4 +381,55 @@ tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
  Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
 
       
+
+!------------------------------------------------------------------------------------
+
+Profile_Panels1_win_flag = .true.
+Profile_Panels1_file_flag = .true.
+    Profile_Panels1_file_dir = 'png'
+    Profile_Panels1_file_prefix = 'profile_panels1_'
+    Profile_Panels1_file_interval = 10
+    Profile_Panels1_file_width = -1
+    Profile_Panels1_file_aspect_ratio = -1
+
+Profile_Panels1_title = ''
+
+Profile_Panels1_txt_scale = 0.7
+Profile_Panels1_num_panels = 4
+
+Profile_Panels1_yaxis_name(1) = 'conv_vel'
+!Profile_Panels1_dymin(1) = 0.14
+Profile_Panels1_other_yaxis_name(1) = 'lum_conv'!'lum_conv'
+!Profile_Panels1_other_dymin(1) = 0.14
+
+Profile_Panels1_yaxis_name(2) = 'logT'
+Profile_Panels1_other_yaxis_name(2) = 'mlt_Y_face'!
+Profile_Panels1_other_yaxis_log(2) = .false.
+
+Profile_Panels1_other_ymin(2) = -1d-4
+Profile_Panels1_other_ymax(2) = 1d-5
+
+Profile_Panels1_yaxis_name(3) = 'gradL'!
+Profile_Panels1_other_yaxis_name(3) = 'brunt_B' !'conv_vel'!'lum_div_Ledd'!'grada'
+Profile_Panels1_same_yaxis_range(3) = .false.
+Profile_Panels1_other_dymin(3) = -101d0!0.08
+!Profile_Panels1_yaxis_log(3) = .false.
+Profile_Panels1_other_ymin(3) = -1d-4
+Profile_Panels1_other_ymax(3) = 1d-5
+
+Profile_Panels1_yaxis_name(4) = 'log_opacity'
+Profile_Panels1_ymin(4) = -101d0
+Profile_Panels1_dymin(4) = 0.14
+Profile_Panels1_other_yaxis_name(4) = 'gradr'
+Profile_Panels1_other_dymin(4) = 0.14
+
+! x-axis limits and properties
+Profile_Panels1_xaxis_name = 'mass'
+Profile_Panels1_xmin = 0.2!-101d0
+Profile_Panels1_xmax = 0.3d0 !-101d0!9d0 !-101d0 !8.1
+Profile_Panels1_xaxis_reversed = .false.
+
+!Profile_Panels1_show_grid = .true.
+Profile_Panels1_show_mix_regions_on_xaxis = .true.
+
 / ! end of pgstar namelist

@@ -26,6 +26,7 @@ use utils_lib
 use auto_diff_support
 use star_utils
 use turb
+use implicit_Dmix, only: implicit_Dmix_debug_thermohaline
 
 implicit none
 
@@ -410,6 +411,9 @@ contains
 
       ! If we're not convecting, try thermohaline and semiconvection.
       if (mixing_type == no_mixing) then
+         call implicit_Dmix_debug_thermohaline(s, 'before thermohaline/semiconvection gate', &
+            k, mixing_type, D%val, gradL_composition_term%val, gradr%val, &
+            grada%val, gradL%val, gradT%val, Y_face%val, conv_vel%val)
          if (gradL_composition_term% val < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, &
@@ -431,6 +435,9 @@ contains
                return
             end if
          end if
+         call implicit_Dmix_debug_thermohaline(s, 'after thermohaline/semiconvection gate', &
+            k, mixing_type, D%val, gradL_composition_term%val, gradr%val, &
+            grada%val, gradL%val, gradT%val, Y_face%val, conv_vel%val)
       end if
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.

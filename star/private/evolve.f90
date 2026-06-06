@@ -2292,6 +2292,7 @@
          use history, only: write_history_info
          use utils_lib, only: free_iounit, number_iounits_allocated
          use alloc, only: size_work_arrays
+         use implicit_Dmix, only: implicit_Dmix_debug_summary
 
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -2361,6 +2362,7 @@
          end if
 
          call check(3)
+         call implicit_Dmix_debug_summary(s, 'accepted step')
 
          s% screening_mode_value = -1  ! force a new lookup for next step
          s% doing_first_model_of_run = .false.

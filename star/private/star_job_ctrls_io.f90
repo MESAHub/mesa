@@ -320,6 +320,10 @@
          implicit_diffusion_include_dsig_dxa, &
          implicit_diffusion_use_brunt_finite_difference_value, &
          implicit_diffusion_use_brunt_gauss_path, &
+         implicit_diffusion_debug_thermohaline, &
+         implicit_diffusion_debug_thermohaline_k, &
+         implicit_diffusion_debug_thermohaline_k_min, &
+         implicit_diffusion_debug_thermohaline_k_max, &
 
          change_u_flag, &
          change_initial_u_flag, &
@@ -904,6 +908,14 @@
             implicit_diffusion_use_brunt_finite_difference_value
          s% job% implicit_diffusion_use_brunt_gauss_path = &
             implicit_diffusion_use_brunt_gauss_path
+         s% job% implicit_diffusion_debug_thermohaline = &
+            implicit_diffusion_debug_thermohaline
+         s% job% implicit_diffusion_debug_thermohaline_k = &
+            implicit_diffusion_debug_thermohaline_k
+         s% job% implicit_diffusion_debug_thermohaline_k_min = &
+            implicit_diffusion_debug_thermohaline_k_min
+         s% job% implicit_diffusion_debug_thermohaline_k_max = &
+            implicit_diffusion_debug_thermohaline_k_max
          if (s% job% implicit_diffusion_flag .and. &
                s% job% implicit_diffusion_include_dsig_dxa) &
             s% include_eos_composition_partials = .true.
@@ -1458,6 +1470,14 @@
             s% job% implicit_diffusion_use_brunt_finite_difference_value
          implicit_diffusion_use_brunt_gauss_path = &
             s% job% implicit_diffusion_use_brunt_gauss_path
+         implicit_diffusion_debug_thermohaline = &
+            s% job% implicit_diffusion_debug_thermohaline
+         implicit_diffusion_debug_thermohaline_k = &
+            s% job% implicit_diffusion_debug_thermohaline_k
+         implicit_diffusion_debug_thermohaline_k_min = &
+            s% job% implicit_diffusion_debug_thermohaline_k_min
+         implicit_diffusion_debug_thermohaline_k_max = &
+            s% job% implicit_diffusion_debug_thermohaline_k_max
 
          change_u_flag = s% job% change_u_flag
          change_initial_u_flag = s% job% change_initial_u_flag

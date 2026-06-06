@@ -10,7 +10,11 @@
       logical :: implicit_diffusion_flag, implicit_diffusion_include_dsig_structure, &
          implicit_diffusion_include_dsig_dxa, &
          implicit_diffusion_use_brunt_finite_difference_value, &
-         implicit_diffusion_use_brunt_gauss_path
+         implicit_diffusion_use_brunt_gauss_path, &
+         implicit_diffusion_debug_thermohaline
+      integer :: implicit_diffusion_debug_thermohaline_k, &
+         implicit_diffusion_debug_thermohaline_k_min, &
+         implicit_diffusion_debug_thermohaline_k_max
 
       logical :: remove_surface_do_entropy, remove_surface_do_jrot, &
          remove_surface_turn_off_energy_sources_and_sinks, &

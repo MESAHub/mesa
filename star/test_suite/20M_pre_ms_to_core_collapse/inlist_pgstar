@@ -149,18 +149,18 @@ Profile_Panels3_yaxis_name(5) = 'logT'
 Profile_Panels3_other_yaxis_name(5) = 'burn_num_iters'
 
 ! x-axis limits and properties
-Profile_Panels3_xaxis_name = 'mass'
-Profile_Panels3_xmin = 0.0
-Profile_Panels3_xmax = -101d0 ! 2.2
-Profile_Panels3_xaxis_reversed = .false.
+!Profile_Panels3_xaxis_name = 'mass'
+!Profile_Panels3_xmin = 0.0
+!Profile_Panels3_xmax = -101d0 ! 2.2
+!Profile_Panels3_xaxis_reversed = .false.
 
 
 Profile_Panels3_txt_scale = 0.7
 
-!Profile_Panels3_xaxis_name = 'zone'
-!Profile_Panels3_xmin = 800
-!Profile_Panels3_xmax = 1100
-!Profile_Panels3_xaxis_reversed = .true.
+Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xmin = 0
+Profile_Panels3_xmax = 1100
+Profile_Panels3_xaxis_reversed = .true.
 
 !Profile_Panels3_show_grid = .true.
 Profile_Panels3_show_mix_regions_on_xaxis = .true.
@@ -200,9 +200,9 @@ Profile_Panels1_other_yaxis_name(4) = 'gradr'
 Profile_Panels1_other_dymin(1) = 0.14
 
 ! x-axis limits and properties
-Profile_Panels1_xaxis_name = 'logtau'
+Profile_Panels1_xaxis_name = 'zone'
 Profile_Panels1_xmin = -101d0
-Profile_Panels1_xmax = 8.1
+Profile_Panels1_xmax = -101d0 !8.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'
@@ -254,9 +254,9 @@ show_TRho_Profile_text_info = .false.
          
 show_TRho_Profile_mass_locs = .false.
 show_TRho_accretion_mesh_borders = .false.
-show_TRho_Profile_kap_regions = .false.
+show_TRho_Profile_kap_regions = .true.
 show_TRho_Profile_gamma1_4_3rd = .true.
-show_TRho_Profile_eos_regions = .false.
+show_TRho_Profile_eos_regions = .true.
 show_TRho_Profile_degeneracy_line = .true.
 show_TRho_Profile_Pgas_Prad_line = .true.
 show_TRho_Profile_burn_lines = .true.

@@ -41,8 +41,27 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       ! pgstar is recommended for diagnosing issues and understanding the evolution
-      pgstar_flag = .false.
+      pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
+
+
+implicit_diffusion_flag = .true.
+implicit_diffusion_include_dsig_dxa = .true.
+implicit_diffusion_use_brunt_gauss_path = .false.
+implicit_diffusion_include_dsig_structure = .false.
+
+! implicit diffusion coefficient/Jacobian diagnostics.
+! Set implicit_diffusion_debug_thermohaline = .true. to enable.
+! If implicit_diffusion_debug_thermohaline_k > 0, only that cell is printed.
+! If implicit_diffusion_debug_thermohaline_k = 0, the k_min/k_max range is used.
+implicit_diffusion_debug_thermohaline = .false.
+implicit_diffusion_debug_thermohaline_k = 0
+implicit_diffusion_debug_thermohaline_k_min = 450
+implicit_diffusion_debug_thermohaline_k_max = 750
+
+implicit_diffusion_use_brunt_finite_difference_value = .false.
+! In the MESA II notation, false uses an Eq. (6)-style standard Ledoux partial sum,
+! while true uses the Eq. (8)-style New Ledoux finite difference.
 
 / ! end of star_job namelist
 
@@ -61,6 +80,16 @@
 / ! end of kap namelist
 
 &controls
+trace_solver_damping = .true.
+
+include_eos_composition_partials = .true.
+! essential to lower dq for implicit diffusion, need for convective boundaries
+!min_dq_for_xa_convective = 1d-12
+!min_dq_for_xa = 1d-12
+
+
+num_cells_for_smooth_gradL_composition_term = 0
+num_cells_for_smooth_brunt_B = 0
 
 ! wind
       ! Dutch scaling factor set in inlist_mass_Z_wind_rotation      
@@ -95,7 +124,7 @@
 
 ! mlt
       mixing_length_alpha = 1.5
-      MLT_option = 'TDC'
+      MLT_option = 'Cox'
 
       ! If you would like to be bold, try radiative damping, although it
       ! is a departure from the mlt limit of 'TDC'
@@ -109,11 +138,11 @@
       x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
 
 
-      use_Ledoux_criterion = .true.
+      use_Ledoux_criterion = .false.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       thermohaline_option = 'Kippenhahn'
 
-      alpha_semiconvection = 1d-2
+      alpha_semiconvection = 0d0 !1d-2
       thermohaline_coeff = 0
 
       mlt_make_surface_no_mixing = .true.
@@ -144,7 +173,7 @@
 
 
   ! we use step overshooting in H core
-      overshoot_scheme(1) = 'step'
+      overshoot_scheme(1) = 'none'
       overshoot_zone_type(1) = 'burn_H'
       overshoot_zone_loc(1) = 'core'
       overshoot_bdy_loc(1) = 'top'
@@ -153,7 +182,7 @@
       overshoot_f0(1) = 0.01
 
   ! exponential in the H core
-      overshoot_scheme(2) = 'exponential'
+      overshoot_scheme(2) = 'none'
       overshoot_zone_type(2) = 'burn_He'
       overshoot_zone_loc(2) = 'core'
       overshoot_bdy_loc(2) = 'top'
@@ -171,7 +200,7 @@
    ! a small amount of overshooting on top of any other convective core
    ! avoid spurious numerical behavior
    ! perfect amount for degenerate flames
-      overshoot_scheme(4) = 'exponential'
+      overshoot_scheme(4) = 'none'
       overshoot_zone_type(4) = 'any'
       overshoot_zone_loc(4) = 'any'
       overshoot_bdy_loc(4) = 'any'
@@ -298,23 +327,23 @@
 ! solver
 
       ! damped newton and structure only
-       scale_max_correction = 0.1d0
-       ignore_species_in_max_correction = .true.
+       !scale_max_correction = 0.1d0
+       ignore_species_in_max_correction = .false.
 
       ! might help to turn off gold2 in 8-10 Msun degenerate cores
       ! for O-Ne flames.
-      use_gold2_tolerances = .true. 
-      gold2_tol_max_residual2 = 5d-7
-      gold2_tol_max_residual3 = 5d-4
+      !use_gold2_tolerances = .true.
+      !gold2_tol_max_residual2 = 5d-7
+      !gold2_tol_max_residual3 = 5d-4
 
 
       use_gold_tolerances = .true.
-      gold_tol_max_residual2 = 5d-4
+      !gold_tol_max_residual2 = 5d-4
       !gold_tol_max_residual3 = 1d-4 ! Default in controls is 1d-5
       tol_correction_high_T_limit = 1d9 ! Switch to lower tol at high temp for large Mass
       solver_iters_timestep_limit = 20
       gold_solver_iters_timestep_limit = 20
-      iter_for_resid_tol2 = 10
+      !iter_for_resid_tol2 = 10
 
       max_abs_rel_run_E_err = 1d-2
 
@@ -333,10 +362,6 @@
       when_to_stop_rtol = 1d-3
       when_to_stop_atol = 1d-3
 
-      sig_min_factor_for_high_Tcenter = 0.01
-      Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-      Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-     
       ! Can be helpful to decrease op_split_burn_min_T 
       ! 4d9 has been well tested with the approx21 network
       ! lower to 2.5d9 or worst case 1d9 for large networks to help with
@@ -355,13 +380,14 @@
 
        photo_interval         = 200 !1000
        photo_digits           = 8
-       profile_interval       = 100 
+       profile_interval       = 1
        max_num_profile_models = 400000
        history_interval       = 1
        write_header_frequency = 10
        terminal_interval      = 10
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_bad_negative_xa = .true.
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
 

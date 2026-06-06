@@ -33,6 +33,7 @@
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
+      use implicit_Dmix, only: implicit_Dmix_debug_profile
 
       implicit none
 
@@ -1300,6 +1301,7 @@
                else
                   val = -99
                end if
+               call implicit_Dmix_debug_profile(s, 'log_D_thrm', k, val)
 
             case (p_log_D_minimum)
                if (s% mixing_type(k) == minimum_mixing) then
@@ -1360,10 +1362,21 @@
 
             case (p_log_D_mix_non_rotation)
                val = safe_log10(s% D_mix_non_rotation(k))
+               call implicit_Dmix_debug_profile(s, 'log_D_mix_non_rotation', k, val)
             case (p_log_D_mix_rotation)
                val = safe_log10(s% D_mix(k) - s% D_mix_non_rotation(k))
             case (p_log_D_mix)
                val = safe_log10(s% D_mix(k))
+               call implicit_Dmix_debug_profile(s, 'log_D_mix', k, val)
+            case (p_log_Dmix_implicit)
+               val = safe_log10(s% Dmix_implicit(k)%val)
+               call implicit_Dmix_debug_profile(s, 'log_Dmix_implicit', k, val)
+            case (p_log_Dmix_explicit)
+               val = safe_log10(s% Dmix_explicit(k))
+               call implicit_Dmix_debug_profile(s, 'log_Dmix_explicit', k, val)
+            case (p_Dmix_implicit_dB)
+               val = s% Dmix_implicit(k)%d1Array(i_xtra2_00)
+               call implicit_Dmix_debug_profile(s, 'Dmix_implicit_dB', k, val)
             case (p_log_sig_mix)
                val = safe_log10(s% sig(k))
             case (p_log_sig_raw_mix)

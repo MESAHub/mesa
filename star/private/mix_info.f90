@@ -54,7 +54,7 @@
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
          use auto_diff_support, only: get_RSP2_conv_velocity
-         use implicit_Dmix, only: set_Dmix_components
+         use implicit_Dmix, only: set_Dmix_components, implicit_Dmix_debug_summary
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -379,6 +379,7 @@
             ! Full mixing-info pass: split current MESA D_mix into
             ! Dmix_implicit and Dmix_explicit, then rebuild total D_mix.
             call set_Dmix_components(s, .true.)
+            call implicit_Dmix_debug_summary(s, 'set_mixing_info final')
          end if
 
          call check('final')
@@ -1390,6 +1391,8 @@
       subroutine get_convection_sigmas(s, dt, ierr)
          use auto_diff_support
          use star_utils, only: get_rho_face
+         use implicit_Dmix, only: implicit_Dmix_debug_sigma, &
+            implicit_Dmix_debug_sigma_limiter
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
@@ -1400,7 +1403,7 @@
          real(dp) :: siglim, xmstar, dq00, dqm1, cdcterm, dmavg, rho_face, &
             cdc, max_sig, D, xm1, x00, dm, dX, X, cushion, limit, &
             Tc, full_off, full_on, qbot, qtop, f1, f, alfa
-         real(dp) :: dD_dB, dsig_factor
+         real(dp) :: dD_dB, dsig_factor, sig_before
          real(dp), dimension(:), pointer :: sig
          type(auto_diff_real_star_order1) :: rho_face_ad, r_ad, f_ad
          logical :: do_implicit_diffusion, do_implicit_dsig_structure, do_implicit_dsig_dxa
@@ -1464,7 +1467,12 @@
                   dsig_factor*s% d_brunt_B_dxa_m1(1:species,k)
                s% d_sig_dxa_00(1:species,k) = &
                   dsig_factor*s% d_brunt_B_dxa_00(1:species,k)
+            else
+               dD_dB = 0d0
+               dsig_factor = 0d0
             end if
+            call implicit_Dmix_debug_sigma(s, k, sig(k), dD_dB, dsig_factor, &
+               do_implicit_dsig_structure, do_implicit_dsig_dxa)
             if (is_bad_num(sig(k))) then
                if (s% stop_for_bad_nums) then
                   write(*,2) 'sig(k)', k, sig(k)
@@ -1476,10 +1484,17 @@
 
          ! can get numerical problems unless limit sig
          max_sig = maxval(sig(1:nz))
-         if (max_sig < 1) return
+         if (max_sig < 1) then
+            if (s% job% implicit_diffusion_debug_thermohaline) &
+               write(*,*) 'implicit_Dmix debug sigma limiter skip model', &
+                  s% model_number, ' iter', s% solver_iter, &
+                  ' reason max_sig_lt_1 max_sig', max_sig
+            return
+         end if
          do k = 1, nz
             s% sig_raw(k) = sig(k)
             if (sig(k) == 0) cycle
+            sig_before = sig(k)
             if (k > 1) then
                siglim = sig_term_limit*xmstar*min(s% dq(k),s% dq(k-1))/dt
             else
@@ -1495,6 +1510,15 @@
                   s% d_sig_dxa_m1(1:species,k) = 0d0
                   s% d_sig_dxa_00(1:species,k) = 0d0
                end if
+               call implicit_Dmix_debug_sigma_limiter(s, 'after sig_term_limit', &
+                  k, sig_before, sig(k), siglim, -99d0, .true., 'zeroed', &
+                  do_implicit_dsig_structure, do_implicit_dsig_dxa, &
+                  0, -99d0, -99d0, -99d0, -99d0)
+            else
+               call implicit_Dmix_debug_sigma_limiter(s, 'after sig_term_limit', &
+                  k, sig_before, sig(k), siglim, -99d0, .false., 'none', &
+                  do_implicit_dsig_structure, do_implicit_dsig_dxa, &
+                  0, -99d0, -99d0, -99d0, -99d0)
             end if
          end do
 
@@ -1502,7 +1526,13 @@
          cushion = 10d0
          Tc = s% T(s% nz)
          full_off = s% Tcenter_max_for_sig_min_factor_full_off
-         if (Tc <= full_off) return
+         if (Tc <= full_off) then
+            if (s% job% implicit_diffusion_debug_thermohaline) &
+               write(*,*) 'implicit_Dmix debug sigma limiter skip model', &
+                  s% model_number, ' iter', s% solver_iter, &
+                  ' reason highT_full_off Tc', Tc, ' full_off', full_off
+            return
+         end if
          full_on = s% Tcenter_min_for_sig_min_factor_full_on
          limit = s% sig_min_factor_for_high_Tcenter
          if (Tc < full_on) then
@@ -1510,7 +1540,14 @@
             ! limit is full on for alfa = 1 and limit is 1 for alfa = 0
             limit = limit*alfa + (1d0 - alfa)
          end if
-         if (limit >= 1d0 .or. s% num_mix_regions == 0) return
+         if (limit >= 1d0 .or. s% num_mix_regions == 0) then
+            if (s% job% implicit_diffusion_debug_thermohaline) &
+               write(*,*) 'implicit_Dmix debug sigma limiter skip model', &
+                  s% model_number, ' iter', s% solver_iter, &
+                  ' reason highT_inactive limit', limit, &
+                  ' num_mix_regions', s% num_mix_regions
+            return
+         end if
          ! boundaries are in order from center to surface
          ! no bottom boundary at loc=nz included if center is mixed
          ! however, do include top boundary at loc=1 if surface is mixed
@@ -1573,15 +1610,36 @@
          subroutine do1(k, max_lim, delta_m_to_bdy)
             integer, intent(in) :: k
             real(dp), intent(in) :: max_lim, delta_m_to_bdy
-            real(dp) :: lim, max_delta_m_to_bdy
+            integer :: jlim
+            real(dp) :: lim, max_delta_m_to_bdy, sig_before_limiter, &
+               siglim_candidate, Xlim, dXlim, dmlim
             include 'formats'
             siglim = sig(k)
             if (siglim == 0d0) return
             ! okay to increase limit up to max_lim
             max_delta_m_to_bdy = s% max_delta_m_to_bdy_for_sig_min_factor
-            if (delta_m_to_bdy >= max_delta_m_to_bdy) return  ! no change in sig
+            if (delta_m_to_bdy >= max_delta_m_to_bdy) then
+               call implicit_Dmix_debug_sigma_limiter(s, &
+                  'after highT_sig_min_factor', k, sig(k), sig(k), siglim, &
+                  -99d0, .false., 'delta_m_skip', &
+                  do_implicit_dsig_structure, do_implicit_dsig_dxa, &
+                  0, -99d0, -99d0, -99d0, delta_m_to_bdy)
+               return  ! no change in sig
+            end if
             lim = limit + (max_lim - limit)*delta_m_to_bdy/max_delta_m_to_bdy
-            if (lim >= 1d0) return
+            if (lim >= 1d0) then
+               call implicit_Dmix_debug_sigma_limiter(s, &
+                  'after highT_sig_min_factor', k, sig(k), sig(k), siglim, &
+                  lim, .false., 'lim_ge_1', &
+                  do_implicit_dsig_structure, do_implicit_dsig_dxa, &
+                  0, -99d0, -99d0, -99d0, delta_m_to_bdy)
+               return
+            end if
+            sig_before_limiter = sig(k)
+            jlim = 0
+            Xlim = -99d0
+            dXlim = -99d0
+            dmlim = -99d0
             do j=1,species
                xm1 = s% xa(j,k-1)
                x00 = s% xa(j,k)
@@ -1597,7 +1655,12 @@
                end if
                if (X < 1d-5) cycle
                if (cushion*dt*dX*siglim > dm*X) then
-                  siglim = dm*X/(dt*dX*cushion)
+                  siglim_candidate = dm*X/(dt*dX*cushion)
+                  siglim = siglim_candidate
+                  jlim = j
+                  Xlim = X
+                  dXlim = dX
+                  dmlim = dm
                end if
             end do
             if (siglim > lim*sig(k)) then
@@ -1610,6 +1673,11 @@
                   s% d_sig_dxa_m1(1:species,k) = 0d0
                   s% d_sig_dxa_00(1:species,k) = 0d0
                end if
+               call implicit_Dmix_debug_sigma_limiter(s, &
+                  'after highT_sig_min_factor', k, sig_before_limiter, sig(k), &
+                  siglim, lim, .true., 'zeroed', &
+                  do_implicit_dsig_structure, do_implicit_dsig_dxa, &
+                  jlim, Xlim, dXlim, dmlim, delta_m_to_bdy)
             else
                sig(k) = lim*sig(k)
                if (do_implicit_dsig_structure) then
@@ -1622,6 +1690,11 @@
                   s% d_sig_dxa_00(1:species,k) = &
                      lim*s% d_sig_dxa_00(1:species,k)
                end if
+               call implicit_Dmix_debug_sigma_limiter(s, &
+                  'after highT_sig_min_factor', k, sig_before_limiter, sig(k), &
+                  siglim, lim, .true., 'scaled', &
+                  do_implicit_dsig_structure, do_implicit_dsig_dxa, &
+                  jlim, Xlim, dXlim, dmlim, delta_m_to_bdy)
             end if
          end subroutine do1
 

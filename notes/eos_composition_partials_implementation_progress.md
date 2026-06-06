@@ -145,7 +145,7 @@ source review, whitespace checks, line scans, and call-chain scans only.
 | Skye derivative validation | First plotter pass complete | `eos/plotter/composition_partials` compares full `d_dxa` rows with constrained Ridders finite differences. Skye-dominated sweeps are broadly consistent for the rows needed by implicit Brunt; remaining large failures are in the cool HELM/FreeEOS part of the default EOS path, not in the Skye-dominated points. No MESA model/test-suite run is approved in this checkpoint. |
 | Pure PC internal composition partials | Deferred | Not easy; needs PC-local derivatives through `MELANGE9` and PC mixing/phase algebra. Blend-alpha derivatives around PC are already wired where available. |
 | Complete Brunt EOS-composition form | Implemented, needs validation | The implicit Brunt value defaults to the linearized EOS-partial-sum stored value. Setting `implicit_diffusion_use_brunt_finite_difference_value = .true.` switches the stored value to the ordinary two-composition finite pressure difference, so the thermohaline on/off test sees the same Brunt sign as the non-implicit path. The derivative coefficient still comes from EOS pressure-composition partials at the face by default. A two-point Gauss path average of those partials through the composition jump is available as `implicit_diffusion_use_brunt_gauss_path = .true.` and is off by default. `chiX_face` is treated as a current-iterate coefficient; second EOS composition derivatives are intentionally out of scope. |
-| Implicit transport components | Implemented for current policy | `Dmix_implicit` accepts local `mlt_D_ad` for the promoted local transport types `convective_mixing`, `semiconvective_mixing`, and `thermohaline_mixing`. Full mixing-info passes use the post-cleanup `mixing_type`; Newton iterations use the current `mlt_mixing_type` from `set_mlt_vars` for the same promoted set and update matching promoted `s% mixing_type` display flags. Cells not promoted to the implicit component keep the normal MESA coefficient in `Dmix_explicit`, which is held fixed through Newton iterations. `set_vars_for_solver` rebuilds diffusion sigmas every implicit solver iteration; the nonlinear `d_sigma` controls only decide whether the extra coefficient-derivative Jacobian blocks are filled and used. |
+| Implicit transport components | Implemented for current policy | `Dmix_implicit` accepts local `mlt_D_ad` for the promoted local transport types `convective_mixing`, `semiconvective_mixing`, and `thermohaline_mixing`. Full mixing-info passes use the post-cleanup `mixing_type` to define the promoted transport topology. Newton iterations use current `mlt_mixing_type` for local promoted transport, refresh the promoted coefficient value/derivatives, and update matching promoted `s% mixing_type` flags. Cells not promoted to the implicit component keep the normal MESA coefficient in `Dmix_explicit`, which is held fixed through Newton iterations. `set_vars_for_solver` rebuilds diffusion sigmas every implicit solver iteration; the nonlinear `d_sigma` controls only decide whether the extra coefficient-derivative Jacobian blocks are filled and used. |
 | Implicit-Dmix residual conservation/sign checks | Static sign check complete | The implemented lower/upper face signs match `set_dxdt_mix`: `dxdt_mix=(fluxp1-flux00)/dm`, with `flux=-sigma*dX`. Runtime validation still needed. |
 | Production cleanup | Started | Normal-path `get_convection_sigmas` no longer zeros species-sized implicit Jacobian arrays unless `implicit_diffusion_flag` is true, and `set_Dmix_components` is only called on the dev implicit path. The dev flag now rejects `use_other_brunt`, `use_other_brunt_smoothing`, and `use_other_mlt_results`, which would otherwise bypass the internal Brunt/MLT derivative path. The implicit face-EOS Brunt path is now skipped when `use_Ledoux_criterion` is false, and `implicit_brunt` reuses scratch storage per OpenMP worker instead of allocating per face. Further review still needed. |
 
@@ -159,7 +159,7 @@ source review, whitespace checks, line scans, and call-chain scans only.
 | Complete Brunt EOS-composition form | Implemented, needs validation | Added an implicit Brunt path in `star/private/implicit_brunt.f90`. Under `implicit_diffusion_flag` and `use_Ledoux_criterion`, `hydro_vars:set_hydro_vars` calls this path even during solver iterations. By default, the stored Brunt value is the linearized EOS-partial-sum value; `implicit_diffusion_use_brunt_finite_difference_value = .true.` switches the stored value to the finite pressure difference between the two neighboring cell compositions, matching the ordinary Brunt sign used by thermohaline activation. The implicit derivative coefficient comes from face EOS composition partials, or from the optional two-point Gauss path average. When Ledoux is off, the path keeps `gradL_composition_term_ad(:)` explicitly zero and skips the expensive face EOS calls. This is the complete EOS-composition form, not a reduced mean-molecular-weight derivative. Added AD storage `brunt_B_ad(:)` and `gradL_composition_term_ad(:)`. Added species-indexed `d_brunt_B_dxa_m1(:,:)` and `d_brunt_B_dxa_00(:,:)`; these include the pressure-partial contraction, the cell-pressure denominator, face `chi_T`/`chiRho` terms, and the direct mass-correction derivative when `implicit_diffusion_include_dsig_dxa` is enabled. The face EOS wrapper now accepts the already computed face/path composition moments, so it avoids a second moment pass inside eosDT. The shared `set_grads` smoothing step is now skipped only for the implicit Ledoux path, so implicit Brunt remains unsmoothed while non-Ledoux runs keep the normal Brunt path. The face EOS pressure-composition coefficient is intentionally treated as a current-iterate coefficient; this avoids requiring second composition derivatives of EOS partials. | Update when face-coefficient treatment changes or if second EOS composition derivatives become an explicit goal. |
 | Coupled diffusion residual contribution | Started | Existing isotope residual is still the only species equation. Added the implicit-Dmix Jacobian contribution inside `star/private/hydro_chem_eqns.f90`: the rate remains `dxdt_mix`, while the fixed-coefficient composition solve is implicit whenever `implicit_diffusion_flag` is true. The nonlinear structure partials from `sig_implicit_ad(:)` are now gated by `implicit_diffusion_include_dsig_structure`, default false. The high-gain cross-species terms from `d_sig_dxa_m1(:,:)` and `d_sig_dxa_00(:,:)` are gated by `implicit_diffusion_include_dsig_dxa` and `use_Ledoux_criterion`, also default false while the convective-boundary coupling is validated. The upper face uses `shift_p1`, following the standard MESA AD stencil convention. Static sign review matches `set_dxdt_mix`. | Update when runtime validation is added or when microscopic diffusion is moved into this residual. |
 | Nuclear network composition partials | Audited for current concern | `basic.net` does not use the hardwired `approx21` implementation. It enters the generic `net_derivs:get_derivs` path and exports `d_dxdt_nuc_dx` through the molar-abundance chain rule. The hardwired `net_approx21` path is only enabled by net files containing an `approx21(...)` directive. One separate generic-net caveat remains: screened rates are differentiated with respect to `T` and `rho`, but their composition dependence through screening/mean composition is treated as fixed in `d_dxdt_nuc_dx`. That is a long-standing approximate Newton Jacobian and could produce finite-difference disagreement in screened regimes, but it is not an approx21 issue for `basic.net`. | Add a targeted local `dxdt_nuc(he4)` finite-difference diagnostic if the He4 equation remains suspicious after the implicit-Dmix refresh is tested. |
-| `Dmix_explicit` / `Dmix_implicit` split | Current policy implemented; needs runtime validation | `Dmix_implicit(:)` is `auto_diff_real_star_order1`; `Dmix_explicit(:)` is the semi-implicit coefficient held fixed through Newton iterations. `turb_support:do1_mlt_eval` returns `D_ad`, and `turb_info:do1_mlt_2` stores it in `s% mlt_D_ad(k)`. `implicit_Dmix:set_Dmix_components` puts that local `mlt_D_ad` into `Dmix_implicit` for promoted local transport. Full passes use the post-cleanup `mixing_type` to split the ordinary MESA total into `Dmix_implicit` and the non-implicit remainder in `Dmix_explicit`. Solver iterations use current `mlt_mixing_type` for the promoted set, refresh only `Dmix_implicit`, keep `Dmix_explicit` fixed from the last full mixing-info pass, update promoted `s% mixing_type` flags, and refresh `D_mix_non_rotation`. The total is always rebuilt as `D_mix = Dmix_implicit%val + Dmix_explicit`. `solver_support:set_vars_for_solver` calls `mix_info:get_convection_sigmas` every implicit solver iteration so the residual uses the current total coefficient. Structure partials from `sig_implicit_ad` are filled/used only when `implicit_diffusion_include_dsig_structure` is true, and `d_sig_dxa_m1/00` are filled/used only when `implicit_diffusion_include_dsig_dxa` is true. The dev control check rejects `use_other_mlt_results` because that hook receives the Brunt composition term as a plain value and cannot currently provide the new `dDmix/dB` coupling. | Update when separate controls are added for promoted transport terms, post-processing contributions are tracked separately, or the custom MLT hook becomes composition-AD aware. |
+| `Dmix_explicit` / `Dmix_implicit` split | Current policy implemented; needs runtime validation | `Dmix_implicit(:)` is `auto_diff_real_star_order1`; `Dmix_explicit(:)` is the semi-implicit coefficient held fixed through Newton iterations. `turb_support:do1_mlt_eval` returns `D_ad`, and `turb_info:do1_mlt_2` stores it in `s% mlt_D_ad(k)`. Full passes use post-cleanup `mixing_type` to split the ordinary MESA total into `Dmix_implicit` and the non-implicit remainder in `Dmix_explicit`. Solver iterations use current `mlt_mixing_type` for the promoted local bucket, refresh only `Dmix_implicit`, keep `Dmix_explicit` fixed from the last full mixing-info pass, update matching promoted `s% mixing_type` flags, and refresh `D_mix_non_rotation`. The total is always rebuilt as `D_mix = Dmix_implicit%val + Dmix_explicit`. `solver_support:set_vars_for_solver` calls `mix_info:get_convection_sigmas` every implicit solver iteration so the residual uses the current total coefficient. Structure partials from `sig_implicit_ad` are filled/used only when `implicit_diffusion_include_dsig_structure` is true, and `d_sig_dxa_m1/00` are filled/used only when `implicit_diffusion_include_dsig_dxa` is true. The dev control check rejects `use_other_mlt_results` because that hook receives the Brunt composition term as a plain value and cannot currently provide the new `dDmix/dB` coupling. | Update when separate controls are added for promoted transport terms, post-processing contributions are tracked separately, or the custom MLT hook becomes composition-AD aware. |
 | Internal full-`d_dxa` EOS path | Implemented for current production/diagnostic split | Added `eosDT_get_full_dxa` and star-side `get_eos_full_dxa` for diagnostics/plotter use, plus `eosDT_get_dxa_rows`, `eosDT_get_dxa_rows_with_moments`, `get_eos_star_dxa`, `get_eos_brunt_dxa`, and `get_eos_brunt_dxa_with_moments` for production row-scoped requests. `micro:do_eos_for_cell` now uses the moment-aware cheaper star wrapper when `include_eos_composition_partials` is true, so the star solve gets only `lnPgas` and `lnE` rows and does not recompute the composition moments it already stored in `s% X`, `s% abar`, `s% zbar`, `s% ye`, and related arrays. The implicit Brunt face wrapper now reuses the face/path moments computed in `implicit_brunt`. Under that flag `s% d_eos_dxa` is still allocated with all `num_eos_basic_results` rows for stable indexing; otherwise it remains the legacy two-row storage. The full/row request is threaded through `Get_eosDT_Results` into the component EOS interface so expensive Skye companion derivatives, ideal full-row packing, eosDT blend-alpha composition terms, and composition-moment helper calls are paid for only on requested rows. Timing counters now split dxa cost into moment, blend, check, component, table, and Skye ideal/Coulomb/pack work. `Get_eosDT_Results` carries one set of raw moment derivative columns through the blend/component stack, so Skye, ideal, HELM, and Skye/PC alpha partials can reuse them. HELM maps its `abar,zbar` derivatives through composition and now has the analytic `mu` derivative. CMS maps its table-X derivative and zeros inactive phase/fraction `d_dxa` rows. FreeEOS and OPAL/SCVH now keep the native table `X,Z` derivative pair until one shared helper expands it into the constrained isotope-column gauge. Pure PC still explicitly returns zero internal composition derivatives, except for blend-alpha terms supplied by eosDT outside the PC component. Adding pure-PC internal composition derivatives is deferred because it requires a PC-local composition derivative path through `MELANGE9`/mixing/phase algebra, not just a moment-chain wrapper. | Update when the HELM/FreeEOS derived-row audit, row-sized internal scratch cleanup, or pure-PC path is addressed. |
 | EOS composition-partial controls | Started | Added dev `include_eos_composition_partials` `&controls` flag. Flag off means current EOS wrapper behavior, not suppressing existing partials. `implicit_diffusion_flag` no longer forces this flag by itself; the hydro EOS partials are forced on only when `implicit_diffusion_include_dsig_dxa` is also true, because that optional Jacobian block is the part that consumes EOS composition rows. The finite-difference `fix_d_eos_dxa_partials` fallback is skipped on the dev full-partial path. The validation plotter deliberately uses a default EOS handle, so the first pass tests the default eosDT selection and records the EOS fractions instead of tuning a special EOS-control setup. | Update when EOS call paths start using component-level analytic partials or when component-forced validation is added. |
 | Verification | Prior compile/plotter pass complete; latest speedups static-only | `./install` completed successfully after the HELM `mu` derivative fix, before the latest Skye Coulomb speed refactors. The EOS plotter writes the 1D finite-difference CSV, a 2D contour CSV, 14 contour pages as both PDF and PNG, and a combined report at `figures/all_composition_partial_contours.pdf`. The latest timing-driven Skye speedups have only had static checks here; user timing runs show the expected EOS-speed reduction. Brunt/Dmix runtime validation is still pending. | Update after the next approved compile/install, Brunt/diffusion numeric validation, or HELM/FreeEOS derived-row audit. |
@@ -197,21 +197,10 @@ $$
 For a full `mix_info:set_mixing_info` pass,
 `mixing_type_imp` is the post-cleanup `s% mixing_type(k)` left by the ordinary
 MESA mixing cleanup and post-processing edits.  During a solver iteration,
-`mixing_type_imp` is the current `s% mlt_mixing_type(k)` returned by
-`set_mlt_vars`.  Thus all promoted local implicit transport types currently
-move together: convection, semiconvection, and thermohaline all follow the
-current local MLT/TDC state inside Newton iterations, while `Dmix_explicit`
-continues to carry the non-promoted full-pass contribution.
-
-The solver-iteration flag update is intentionally limited to this promoted
-local bucket.  If current `mlt_mixing_type` is promoted and the current
-`mlt_D_ad` value is positive, `s% mixing_type(k)` is updated to that promoted
-flag so PGSTAR and profile columns see the active implicit coefficient.  If an
-old promoted flag no longer has an active promoted coefficient, the stale
-promoted flag is cleared to the current local non-promoted flag, or to
-`rotation_mixing` when the stored rotation coefficient dominates the remaining
-explicit total.  Nonlocal flags such as overshoot, minimum mixing, user hooks,
-and boundary/gap cleanup remain owned by the full `set_mixing_info` pass.
+`mixing_type_imp` is the current `s% mlt_mixing_type(k)` recomputed by
+`set_mlt_vars`.  This keeps the local MLT/TDC, semiconvection, and
+thermohaline coefficient implicit during Newton while leaving the
+non-promoted component fixed in `Dmix_explicit`.
 
 `implicit_Dmix:set_Dmix_components` has two explicit call modes:
 
@@ -228,9 +217,9 @@ and boundary/gap cleanup remain owned by the full `set_mixing_info` pass.
 - `set_Dmix_components(s,.false.)` is used inside solver iterations after
   `set_mlt_vars`, because the full `set_mixing_info` pass is skipped there. It
   refreshes only the value and derivatives of `Dmix_implicit` for the current
-  promoted local `mlt_mixing_type`; `Dmix_explicit` remains the value from the
-  last full mixing-info pass. The routine then rebuilds total `D_mix`, updates
-  the matching promoted `s% mixing_type` display flags, and refreshes
+  local `s% mlt_mixing_type`; `Dmix_explicit` remains the value from the last
+  full mixing-info pass. The routine then rebuilds total `D_mix`, updates the
+  matching promoted `s% mixing_type` flag, and refreshes
   `D_mix_non_rotation`.
 
 `mix_info:get_convection_sigmas` then rebuilds
@@ -269,54 +258,33 @@ Current call order:
   `hydro_vars:set_hydro_vars` with the full mixing-info pass skipped. For
   implicit diffusion plus Ledoux, `do_implicit_brunt_B` is still called so
   current MLT/TDC sees the current Brunt composition term. After
-  `set_mlt_vars`, `set_Dmix_components(s,.false.)` refreshes current promoted
-  `Dmix_implicit`, updates the matching promoted display flags, and leaves
+  `set_mlt_vars`, `set_Dmix_components(s,.false.)` refreshes `Dmix_implicit`
+  from current local `mlt_mixing_type` for promoted transport and leaves
   `Dmix_explicit` fixed from the last full pass.
 - `solver_support:set_vars_for_solver` then calls
 `mix_info:get_convection_sigmas`, so `sig(:)` uses the current total
 coefficient while its optional derivative blocks come only from
 `Dmix_implicit`.
 
-PGSTAR and profile promoted-mixing flags:
+PGSTAR, profiles, and solver-iteration flags:
 
 - `turb_info:do1_mlt_2` stores the current local turbulence result in
   `s% mlt_mixing_type(k)` and `s% mlt_D_ad(k)`.
-- A full `mix_info:set_mixing_info` pass copies
-  \[
-    \texttt{s\%mixing\_type(k)}
-    \leftarrow
-    \texttt{s\%mlt\_mixing\_type(k)}
-  \]
-  before applying MESA's cleanup and post-processing edits.  After those edits,
-  `set_Dmix_components(s,.true.)` splits the final full-pass coefficient but
-  does not change `s% mixing_type`.
+- A full `mix_info:set_mixing_info` pass copies the local result into
+  `s% mixing_type(k)` before applying MESA's cleanup and post-processing edits.
+  After those edits, `set_Dmix_components(s,.true.)` splits the final
+  full-pass coefficient but does not change `s% mixing_type`.
 - During solver iterations, `set_mixing_info` is skipped.  The current
-  `s% mlt_mixing_type(k)` can change.  The solver-iteration
-  `set_Dmix_components(s,.false.)` path now uses that current local flag for
-  all promoted implicit transport types and updates matching promoted
-  `s% mixing_type(k)` flags.  This applies equally to
-  `convective_mixing`, `semiconvective_mixing`, and `thermohaline_mixing`.
-- The solver-iteration path does not try to rerun or reproduce the nonlocal
-  full-pass cleanup.  Overshoot, minimum mixing, user zeroing, gap cleanup,
-  predictive mixing, and other post-processing flags remain full-pass state
-  unless they are represented by a current local `mlt_mixing_type` or by a
-  rotation-dominant explicit coefficient after a promoted flag is cleared.
-- PGSTAR's x-axis mixing bars use `pgstar_support:show_mixing_section`, which
-  scans `s% mixing_type(k)`.  The Mixing_Ds thermohaline curve and
-  `profile_getval:p_log_D_thrm` also require
-  `s% mixing_type(k) == thermohaline_mixing`.
+  `s% mlt_mixing_type(k)` can change, and `set_Dmix_components(s,.false.)`
+  updates `s% mixing_type(k)` for the promoted implicit bucket so diagnostic
+  output follows the current implicit local coefficient.  Full nonlocal
+  cleanup and post-processing of mixing regions still wait for the next full
+  `set_mixing_info` pass.
 
-Before this flag update, PGSTAR could miss thermohaline during an implicit
-solver iteration even when the current local turbulence solve had
-`s% mlt_mixing_type(k) == thermohaline_mixing`, because PGSTAR reads
-`s% mixing_type(k)` and that array was still the last full-pass cleaned state.
-The same lag applied to convective and semiconvective promoted transport.
-The current policy updates the promoted local flags together with the promoted
-implicit coefficient so PGSTAR/profile state and `Dmix_implicit` are consistent
-for the implicit bucket.  A remaining difference between explicit and implicit
-runs can still be physical/numerical: adding thermohaline to the nonlinear
-coefficient changes the accepted structure, and nonlocal cleanup flags still
-come only from full `set_mixing_info` passes.
+The rejected fixed-topology trial would have kept solver-iteration
+`s% mixing_type(k)` lagged to the last full pass.  The user test showed the
+same failure pattern, and that policy made the local convective coefficient
+less implicit, so it has been reverted.
 
 Full-pass mixing cleanup caveat:
 
@@ -335,11 +303,10 @@ Full-pass mixing cleanup caveat:
   implicit component.
 - During Newton iterations the full `set_mixing_info` cleanup sequence is
   skipped.  The solver refresh recomputes MLT/TDC and then calls
-  `set_Dmix_components(s,.false.)`; after the 2026-05-19 correction, this
-  refresh uses current `mlt_mixing_type` and current `mlt_D_ad` for the
-  promoted local bucket.  This choice affects the residual during Newton
-  through the rebuilt `D_mix` and `sig(:)`; it is not just a final post-step
-  cleanup or display edit.
+  `set_Dmix_components(s,.false.)`; after the 2026-05-25 revert, this refresh
+  again uses the current local `mlt_mixing_type` as the promoted-bucket gate.
+  This choice affects the residual during Newton through the rebuilt `D_mix`
+  and `sig(:)`; it is not just a final post-step cleanup or display edit.
 
 Raw-current-MLT zone-selection caveat:
 
@@ -357,14 +324,17 @@ Raw-current-MLT zone-selection caveat:
 
 The 2026-05-17 conservative gate closed this turn-on path by holding the
 solver-iteration implicit-zone set to the last full-pass `mixing_type`.  The
-2026-05-19 update reverses that part: it lets the promoted local implicit
-coefficient follow the current turbulence solve for convection, semiconvection,
-and thermohaline.  That is the more consistent nonlinear coefficient treatment
-and makes PGSTAR/profile flags match the active promoted coefficient, but it
-does mean the promoted local on/off decision can change inside Newton without
-rerunning the full nonlocal cleanup.  If runtime validation shows boundary
-instability, the likely next design is a separate forced-exclusion mask or
-restricted solver-iteration cleanup pass, not a return to stale display flags.
+2026-05-19 update let the promoted local implicit coefficient follow the
+current turbulence solve for convection, semiconvection, and thermohaline, and
+updated display flags in the same path.  A 2026-05-25 trial returned the
+solver-iteration topology gate to the last full-pass `mixing_type`, motivated
+by output where a rejected Newton trial opened zones 616--677 as high-`sigma`
+convective diffusion even though the accepted full-pass profile had no mixing
+past zone 617.  The user rerun showed that this fixed-topology trial did not
+fix the failure and made the convective coefficient less implicit, so the
+current policy is restored to the current-`mlt_mixing_type` promoted-bucket
+gate.  The remaining problem is therefore deeper than only transient
+solver-iteration promotion of new faces.
 
 Could solver iterations rerun the start-of-step mixing checks?  In principle
 yes, but the full `set_mixing_info` pass is not just a local cleanup of current
@@ -379,21 +349,13 @@ solver-iteration check pass that mirrors only the local no-mixing/minimum/zero
 edits needed to keep `Dmix_implicit` consistent, while leaving nonlocal
 boundary construction and post-processing for the full `set_mixing_info` pass.
 
-2026-05-19 correction to the design direction: using the last full-pass
-`mixing_type` as the solver-iteration gate is too conservative because it can
-lag both ways.  If a full pass pruned a zone to `no_mixing`, current MLT/TDC
-cannot turn the implicit coefficient on during Newton; if a full pass allowed
-implicit convection, current controls or state changes may not turn it off
-until the next full pass.  MESA also uses `no_mixing` for two different things:
-"MLT currently found no mixing" and "a control or cleanup forced zero mixing."
-The cleaner policy is therefore to make the solver-iteration implicit
-coefficient follow current `mlt_mixing_type` and current `mlt_D_ad` directly,
-while using a separate, explicit predicate only for true forced exclusions.
-Start-of-step cleanup such as tiny/singleton/pruned convective regions should
-not by itself prevent `Dmix_implicit` from becoming nonzero later in the same
-Newton solve.  The matching promoted `s% mixing_type` flag is updated in the
-same solver-iteration path so the display and profile columns follow the
-active promoted implicit coefficient.
+2026-05-25 update to the design direction: the fixed-topology hypothesis was
+tested and rejected.  The output still shows a free-boundary-like failure
+signature at the convective/composition boundary, but simply preventing
+solver-iteration promotion is not the physical correction.  The next useful
+target is the actual convective coefficient residual/Jacobian behavior near
+the burning boundary, especially whether the implicit sigma value and
+structure tangent are consistent with the MLT/TDC equations being solved.
 
 The high-temperature core-collapse test on 2026-05-17 shows the same pattern:
 large isotope corrections and retries occur on five-zone `mix type` stencils
@@ -858,13 +820,222 @@ promoted-coefficient structure derivative of `sigma`.  The latter is off by
 default because near transport boundaries the promoted local coefficient can
 switch or change by many orders of magnitude, so the nominally more complete
 Newton Jacobian can be less robust than a Picard update of the coefficient.
-This control is diagnostic and not a final fix.  The production goal remains a
-stable nonlinear coefficient Jacobian for the implicit coefficient.
+The attempted mixing-type-boundary gate on the nonlinear `d_sigma` Jacobian was
+removed after the `20M_pre_ms_to_core_collapse` retry tests did not remove the
+negative-`n14` failures.  Later tests showed that enabling the nonlinear
+coefficient Jacobian through either
+`implicit_diffusion_include_dsig_structure` or
+`implicit_diffusion_include_dsig_dxa` can trigger the same retry pattern.  That
+does not look like two independent physics failures.  It points to the shared
+promoted coefficient tangent:
+$$
+\sigma_k =
+\frac{{\tt mix\_factor}\,D_k\,(4\pi r_k^2\rho_{{\rm face},k})^2}
+     {dm_{{\rm avg},k}},
+\qquad
+D_k = D_{{\rm implicit},k} + D_{{\rm explicit},k}.
+$$
+The residual value uses the current total `D_mix`, but the extra Newton terms
+linearize only the promoted implicit part.  The structure path differentiates
+`Dmix_implicit` and the face geometry through `sig_implicit_ad`; the composition
+path differentiates the same `Dmix_implicit` through
+`Dmix_implicit%d1Array(i_xtra2_00) = \partial D/\partial B` and the implicit
+Brunt rows `d_brunt_B_dxa_m1/00`.  Both paths therefore share the same
+thresholded MLT/TDC/thermohaline coefficient, while `mixing_type` itself remains
+an integer branch and is not differentiated.
+
+A follow-up 20M test with semiconvection, thermohaline, and overshoot disabled
+still showed the same failure when only convection was contributing to the
+implicit bucket.  That narrows the active coefficient to the convective MLT
+branch stored in `mlt_D_ad` and then copied to `Dmix_implicit` by
+`implicit_Dmix:set_Dmix_components`.  For the ordinary non-TDC MLT path, the
+relevant local gate is the MLT condition
+$$
+\nabla_{\rm rad} > \nabla_L
+      = \nabla_{\rm ad} + B ,
+$$
+not the thermohaline or semiconvective gates.  This statement does not apply
+literally to the TDC path.  In `turb_support:Get_results`, `MLT_option = 'TDC'`
+calls `turb:set_TDC` before the direct `gradr > gradL` MLT branch.  TDC carries
+the start-of-step convective velocity through `conv_vel_start`, and
+`tdc:get_TDC_solution` can return a positive final velocity even when the
+instantaneous stratification is formally stable.  The final TDC diffusion
+coefficient is still stored in the same `mlt_D_ad` array,
+$$
+D_{\rm TDC} =
+\frac{\alpha_{\rm MLT} H_P\,v_{\rm conv}}{3},
+$$
+and `mixing_type` is set to convective when `v_{\rm conv} > 0`.
+
+Therefore the current failure is best treated more generally as a convective
+coefficient-Jacobian problem, not specifically as a static
+`\nabla_{\rm rad} > \nabla_L` gate problem.  With
+`implicit_diffusion_include_dsig_structure`, the chemistry rows receive the
+MLT/TDC coefficient tangent with respect to local structure variables.  With
+`implicit_diffusion_include_dsig_dxa` and Ledoux convection, they receive the
+same coefficient tangent through `\partial D/\partial B` and
+`\partial B/\partial X_j`.  The value of the convective diffusion coefficient
+can be well defined, while the local Newton tangent can be a poor linear model
+of the time-dependent convective coefficient near a velocity/branch transition.
+
+A further test with `use_Ledoux_criterion = .false.` still showed the failure.
+In the current implementation that disables the `dsig_dxa` chemistry block,
+because both `hydro_chem_eqns` and `mix_info:get_convection_sigmas` require
+`use_Ledoux_criterion` before using `d_brunt_B_dxa_m1/00`.  Therefore the
+remaining active nonlinear coefficient Jacobian is the structure path,
+`sig_implicit_ad`.  This removes the EOS composition partials, Brunt
+composition rows, thermohaline, semiconvection, and overshoot from the immediate
+failure mechanism.  The minimal suspect is now
+$$
+\partial_y \sigma_k =
+\partial_y\left[
+\frac{{\tt mix\_factor}\,D_{{\rm conv},k}\,
+      (4\pi r_k^2\rho_{{\rm face},k})^2}{dm_{{\rm avg},k}}
+\right],
+$$
+where `y` is a structure variable in the local AD stencil.  The debug output now
+prints both `Dimp_d1_max` and `dsig_struct_max` so a run can distinguish a large
+MLT/TDC coefficient tangent from a large geometric face factor.
+The debug selector also has an optional inclusive cell range:
+`implicit_diffusion_debug_thermohaline_k_min/max`.  The single-cell selector
+`implicit_diffusion_debug_thermohaline_k` takes precedence; if it is zero and
+either range bound is positive, only cells in that range are reported.  This is
+intended for cases where the failing cell is not yet known and a full-star debug
+dump would be too noisy.
+
+This is different from ordinary thermodynamically implicit MLT/TDC.  MLT/TDC
+has long been evaluated on the current Newton structure variables so that the
+thermal and structure equations see the current convective response.  In the
+ordinary chemistry solve, however, the diffusion coefficient entering
+`dxdt_mix` is effectively a lagged coefficient for the composition block.  The
+Jacobian then contains the fixed-coefficient diffusion operator,
+$$
+\frac{\partial}{\partial X_{j,k'}}
+\left[
+ \frac{\sigma_k (X_{j,k-1}-X_{j,k})
+      -\sigma_{k+1}(X_{j,k}-X_{j,k+1})}{dm_k}
+\right],
+$$
+with `sigma` held fixed.  That operator has the usual local diffusive stencil.
+When `dsig_structure` or `dsig_dxa` is enabled, the chemistry rows also receive
+terms proportional to abundance jumps times `\partial\sigma/\partial y`,
+$$
+\frac{(X_{j,k-1}-X_{j,k})\,\partial_y\sigma_k
+      -(X_{j,k}-X_{j,k+1})\,\partial_y\sigma_{k+1}}{dm_k}.
+$$
+These terms are not a positive diffusion operator.  Near a convective boundary
+they can be large, sign-indefinite, and branch sensitive because
+`\sigma(D_{\rm conv})` can change rapidly when the instantaneous MLT branch
+turns on/off or when the TDC velocity solution changes branch, approaches zero,
+or hits a limiter.  Thus making `D` implicit in the chemistry Jacobian is a
+stronger and less smooth coupling than the existing thermodynamic implicitness
+of MLT/TDC.
+
+The composition-aware limiter in `mix_info:get_convection_sigmas` enforces a
+donor-side estimate
+$$
+10\,\Delta t\,\sigma\,\Delta X \lesssim \Delta m\,X .
+$$
+The current diagnostic patch preserves the original signed `dX` logic in this
+routine and only reports which isotope would control the limiter.  The current
+`20M` bad cells are local `logT \simeq 8.1--8.4` while the accepted models have
+`lg_Tcntr \simeq 9.04`.  The existing activation gate uses center temperature,
+not the local bad-cell temperature, and `Tcenter_max_for_sig_min_factor_full_off
+= 2.8d9` leaves the limiter inactive there unless the control logic is changed
+or the gate is lowered as a test.
+
+Lowering only the center-temperature gate did not remove the retry pattern in
+the 20M test.  A follow-up inlist diagnostic set
+`sig_min_factor_for_high_Tcenter = 0d0` and lowered the center-temperature gate
+so the existing face-local estimate could run without the 1% floor; this also
+did not change the crash behavior and the diagnostic controls were removed from
+the 20M inlist.  Thus this should not be pursued as an inlist-level fix.  The
+limiter audit remains useful because the failing shell contains trace species
+next to very large `sigma`, but the stronger current suspect is the nonlinear
+coefficient tangent inserted by the two `dsig` options.
+
+A subsequent `solver_support:Bdomain` trial tested whether the solver
+correction floor (`corr_coeff_limit`) was hiding the trace-species domain
+violation.  In that trial, the negative-abundance damping checked proposed
+negative corrections even when the current trial abundance was
+`old_xa <= 1d-90`, and implicit diffusion could reduce the correction below the
+usual floor.  The `20M` run showed the opposite failure mode: `n14` at zone 610
+in model 1546 drove the damping candidate from about `0.13` to `9d-19` and then
+to zero, after which Newton repeated `coeff 0.0000` iterations with essentially
+unchanged residuals.  Thus the old floor was preventing a zero-step stall, and
+dropping it is not the right fix.  The Bdomain trial was reverted.
+
+A follow-up profile audit of accepted models in zones 550--700 verifies that the
+problem shell contains trace or zero `n14` at high-`sigma` faces.  In
+`profile1`, for example, `n14` falls from about `4.2d-5` at zones 600--605 to
+`4.2d-9`, `3.6d-12`, and zero across zones 606--612, while
+`log_sig_mix` is about 30--31 where it is reported.  Profiles 1--12 all show
+high-`sigma` faces with `n14 < 1d-5` near zones 607--616.  This verifies the
+trace-abundance part of the diagnosis.  It does not by itself prove the exact
+Newton correction-vector path; that part is inferred from the retry output
+showing `bad negative xa ... n14` at the same zones after correction damping.
+
+The 20M inlist has been changed between diagnostic runs, so the file contents
+alone should not be used as proof of which `dsig` controls were active in a
+given `output.txt`.  Conditional behavior is as follows.  If both
+`implicit_diffusion_include_dsig_structure` and
+`implicit_diffusion_include_dsig_dxa` are false, the chemistry Jacobian still has
+the ordinary implicit diffusion partials with respect to the same species in
+cells `k-1,k,k+1`, but it does not include derivatives of the diffusion
+coefficient itself.  Even in that mode, solver iterations refresh the value of
+`Dmix_implicit` from current `mlt_D_ad` and rebuild `sigma`; the chemistry
+Jacobian then treats that refreshed coefficient as fixed.  This is a Picard
+linearization of a nonlinear coefficient, not a strictly frozen-coefficient
+linear diffusion solve.  Near the burning boundary, the accepted profiles show
+trace `n14` adjacent to very large `log_sig_mix` values on alternating faces
+(`log_sig_mix \simeq 30--31` around zones 600--611 in `profile1`).  That makes
+the leading suspects the solver-iteration coefficient/mixing-type refresh and
+the face-local `sigma` limiter's applicability to trace isotopes; whether
+long-range TDC/MLT Jacobian coupling is involved must be judged from the actual
+runtime control values for that run.
+
+When `implicit_diffusion_include_dsig_structure` is true, the inserted
+coefficient-derivative stencil remains nearest-neighbor in the chemistry block:
+row `k` uses face `k` and face `k+1`; face `k` supplies AD slots for cells
+`k-1,k`, while `shift_p1` maps face `k+1` into cells `k,k+1`.  Thus the intended
+Jacobian structure is still block-tridiagonal.  The nonlinear coefficient may be
+poorly conditioned at a convective boundary, but it is not directly coupling a
+chemistry row to distant cells.
+
+For runs with either `implicit_diffusion_include_dsig_structure` or
+`implicit_diffusion_include_dsig_dxa` true, the coefficient Jacobian is active
+and can be the immediate source of a crash.  The added chemistry-row term has
+the form
+$$
+\frac{\partial}{\partial y}
+\left[
+ \frac{\sigma_k (X_{j,k-1}-X_{j,k})
+      -\sigma_{k+1}(X_{j,k}-X_{j,k+1})}{dm_k}
+\right]
+=
+\frac{(X_{j,k-1}-X_{j,k})\,\partial_y\sigma_k
+      -(X_{j,k}-X_{j,k+1})\,\partial_y\sigma_{k+1}}{dm_k}.
+$$
+Here `y` is either a structure variable from `dsig_structure` or any species
+abundance in the neighboring cell block from `dsig_dxa`.  This does not
+differentiate the integer `mixing_type`; however, the coefficient being
+linearized is still selected by thresholded MLT/TDC/thermohaline branches, and
+near a convective boundary `dD/dB` can be large or poorly representative of the
+finite branch change.  A crash that appears when either `dsig` control is true
+should therefore be treated as a shared coefficient-Jacobian consistency or
+conditioning problem, not as the fixed-coefficient diffusion operator alone.
 
 # Implementation Log
 
 | Date | Change | Files | Verification |
 |---|---|---|---|
+| 2026-05-25 | Added range controls for the implicit-Dmix debug output, so diagnostics can be limited to a window of cells when the failing zone is not yet known. Added the controls to the 20M `inlist_common` with debug off and a visible 450--750 window ready to enable. | `star_data/private/star_job_controls_dev.inc`; `star/defaults/star_job_dev.defaults`; `star/private/star_job_ctrls_io.f90`; `star/private/implicit_Dmix.f90`; `star/test_suite/20M_pre_ms_to_core_collapse/inlist_common`; `notes/eos_composition_partials_implementation_progress.md` | Static source edit only. No MESA compile or model run. |
+| 2026-05-25 | Tested and reverted the solver-iteration fixed-topology hypothesis. The current 20M debug output still shows zones 616--677 entering high-sigma convective diffusion across a steep He/C/O boundary, with `n14` as the trace-abundance tripwire and `equ_he4` at zone 635 as the main residual. Holding the implicit bucket to the last full-pass `mixing_type` did not fix the failure and made the convective coefficient less implicit, so `set_Dmix_components(s,.false.)` is restored to the current `mlt_mixing_type` promoted-bucket policy. | `star/private/implicit_Dmix.f90`; `notes/eos_composition_partials_implementation_progress.md` | User model-run result plus static source edit only. No MESA compile or model run by Codex. |
+| 2026-05-25 | Corrected the convective-coefficient diagnosis to distinguish ordinary MLT from TDC. The direct `gradr > gradL` gate applies to the non-TDC MLT branch, while TDC can retain positive convective velocity from the start-of-step state even for locally stable instantaneous stratification. The suspect is therefore the promoted MLT/TDC coefficient tangent, not specifically a static Schwarzschild/Ledoux boundary. | `notes/eos_composition_partials_implementation_progress.md` | Static documentation edit only. No MESA compile or model run. |
+| 2026-05-25 | Documented why thermodynamically implicit MLT/TDC is not equivalent to an implicit chemical diffusion coefficient. The old chemistry block sees a fixed-coefficient diffusion operator, while the new `dsig` terms add sign-indefinite coefficient-tangent terms proportional to abundance jumps. | `notes/eos_composition_partials_implementation_progress.md` | Static documentation edit only. No MESA compile or model run. |
+| 2026-05-25 | Added the 20M observation that disabling semiconvection, thermohaline, and overshoot still leaves the failure when only convection is active, and that the failure remains with `use_Ledoux_criterion = .false.`. This narrows the leading suspect to the convective MLT structure tangent (`mlt_D_ad` promoted through `Dmix_implicit`) and not to thermohaline, semiconvection, overshoot, or the Ledoux `dB/dX` path. Added extra gated debug output for the maximum `Dmix_implicit` AD tangent and inserted `d_sigma` structure/composition tangents. | `star/private/implicit_Dmix.f90`; `notes/eos_composition_partials_implementation_progress.md` | Static source edit only. No MESA compile or model run. |
+| 2026-05-25 | Tested and reverted a `Bdomain` negative-abundance damping change. The test output showed `n14` at zone 610 driving the damping candidate to zero in model 1546, producing repeated `coeff 0.0000` Newton iterations instead of a recovery. This ruled out dropping the `corr_coeff_limit` floor as a viable fix for the 20M trace-`n14` failure. | `star/private/solver_support.f90`; `notes/eos_composition_partials_implementation_progress.md`; `star/test_suite/20M_pre_ms_to_core_collapse/output.txt` | User model-run output review; source reverted; no MESA compile or model run by Codex. |
+| 2026-05-25 | Backed out the attempted mixing-type-boundary gate on the nonlinear `sigma` Jacobian after the 20M retry output showed the same negative-`n14` pattern. Preserved the original signed `dX` logic in the existing composition-aware `sigma` limiter and added diagnostics to report which isotope controls the limiter when it is active. The current 20M retry point still needs a separate decision about activating this limiter earlier or making it local, because the bad cells are local `logT \simeq 8.1--8.4` but the existing gate is based on center temperature and is off at `lg_Tcntr \simeq 9.04`. | `star/private/implicit_Dmix.f90`; `star/private/mix_info.f90`; `notes/eos_composition_partials_implementation_progress.md` | Static source edit only. No MESA compile or model run. |
 | 2026-05-21 | Flipped `implicit_diffusion_use_brunt_finite_difference_value` to default false. The dev default now tests the EOS-partial-sum implicit Brunt value; setting the control true remains the compatibility mode that uses the ordinary finite two-composition pressure difference for the stored value. Added MESA II equation-number references for the standard Ledoux sum and New Ledoux finite-difference forms. | `star/defaults/star_job_dev.defaults`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static checks only. No MESA compile or model run. |
 | 2026-05-19 | Added dev star_job control `implicit_diffusion_use_brunt_finite_difference_value`, default true. The true branch keeps the implicit Brunt stored value on the ordinary finite two-composition pressure difference while retaining linearized EOS-partial derivatives; setting it false restores the earlier stored value from the face/path EOS-partial contraction. This makes the thermohaline diagnostic toggle explicit instead of tying the value definition permanently to `implicit_diffusion_flag`. | `star/defaults/star_job_dev.defaults`; `star_data/private/star_job_controls_dev.inc`; `star/private/star_job_ctrls_io.f90`; `star/private/implicit_brunt.f90`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static checks only. No MESA compile or model run. |
 | 2026-05-19 | Matched the implicit Brunt stored value to the ordinary MESA finite pressure difference while keeping the implicit derivative coefficient on the face/path EOS pressure-composition partial. This addresses the `1M_thermohaline` flag-on/flag-off diagnostic: with the earlier face-linearized stored value, the implicit Ledoux path could remove the negative `gradL_composition_term` pocket that gates thermohaline activation, so PGSTAR correctly showed no thermohaline in the accepted implicit profile rather than only hiding it. The value/sign used by `turb_support:set_thermohaline` now follows the ordinary Brunt definition; the Jacobian still uses the linearized `chiX_face`/optional-Gauss coefficient and intentionally omits second EOS composition derivatives. | `star/private/implicit_brunt.f90`; `notes/eos_composition_partials_implementation_progress.md`; `notes/eos_composition_partials_implementation_map_v2.md` | Static source review only. No MESA compile or model run. |
@@ -2729,3 +2900,205 @@ EOS tests.
 7. Current policy is wired: MLT/TDC convective regions, semiconvection, and
    thermohaline enter `Dmix_implicit`; rotation and other non-promoted
    transport remain in `Dmix_explicit` unless separately promoted.
+
+# 20M implicit-diffusion output/log comparison, 2026-05-25
+
+Compared
+`star/test_suite/20M_pre_ms_to_core_collapse/output.txt` with the fresh
+`LOGS` profiles from the same run.  `profiles.index` contains accepted models
+1546--1552 (`profile1.data`--`profile7.data`).  The output tail contains
+additional model-1553 Newton/debug output, but the run was interrupted before
+`profiles.index` recorded that profile.
+
+The active controls for this run were:
+
+```
+implicit_diffusion_flag = .true.
+implicit_diffusion_include_dsig_dxa = .true.
+implicit_diffusion_include_dsig_structure = .true.
+implicit_diffusion_use_brunt_gauss_path = .false.
+MLT_option = 'Cox'
+use_Ledoux_criterion = .false.
+alpha_semiconvection = 0d0
+overshoot_scheme(:) = 'none'
+```
+
+Because `use_Ledoux_criterion = .false.`, the composition derivative path is
+not active even though the control is true:
+
+```
+do_implicit_dsig_dxa =
+   implicit_diffusion_flag .and. use_Ledoux_criterion .and.
+   implicit_diffusion_include_dsig_dxa
+```
+
+The output confirms this directly in the debug lines:
+`do_structure T  do_dxa F`.  Therefore this run isolates the promoted
+structure derivative of the convective mixing coefficient, not the Brunt
+composition derivative.
+
+Bad-negative-abundance blocks by accepted model:
+
+| model | profile | bad blocks | main zones | logT range | main species |
+| --- | ---: | ---: | --- | --- | --- |
+| 1546 | 1 | 1 | 616--677 | 8.41424--8.41462 | `n14` |
+| 1547 | 2 | 7 | 446, 613--617, 901 | 7.665--8.932 | `c12`, `n14` |
+| 1548 | 3 | 2 | 454, 628 | 7.789--8.415 | `n14` |
+| 1549 | 4 | 12 | 446--447, 648--663, 912 | 7.665--8.925 | `c12`, `he4`, `si28`, `n14` |
+| 1550 | 5 | 11 | 446--969 | 7.665--9.033 | `n14`, `c12`, `si28` |
+| 1551 | 6 | 23 | 929--980 | 8.935--9.033 | `c12`, `ne20` |
+| 1552 | 7 | 3 | 926--974 | 8.935--9.033 | `mg24`, `si28`, `c12` |
+
+The first rejected trial is not a single-cell problem.  In model 1546 it
+drives `n14` to about \(-1.34\times10^{-4}\) across zones 616--677 at
+\(\log T\simeq8.414\).  The corresponding solver line is:
+
+```
+1546 3 coeff 0.0401 avg resid 0.294E+02
+max resid equ_he4 635 0.50353E+05
+max corr ne20 900 0.11550E+02
+```
+
+The accepted profiles show that the model can recover after retries, but the
+same physical shell is repeatedly close to a diffusion/topology failure.  The
+current run reached accepted profiles through model 1552 before the user
+interrupted the later small-timestep Newton sequence.
+
+Important interpretation detail: `solver_support.f90` reports the final
+`s% sig(k)` after the sigma limiters, whereas
+`implicit_Dmix_debug_sigma` is currently called in `mix_info.f90` before the
+`sig_term_limit` limiter.  Thus the debug `sig_implicit_val` can be much
+larger than the `bad negative xa` sigma.  For example, in the first rejected
+model 1546 trial, zone 644 has pre-limit
+\(\sigma\simeq1.66\times10^{35}\), while the bad-negative report prints the
+limited value \(\sigma\simeq1.25\times10^{32}\).  Other bad zones, such as
+616--625 and 660, were not reduced by that limiter.
+
+Accepted profile comparison for the model-1546 shell:
+
+| zone | bad-trial `n14` | bad-trial `sig` | accepted `log_D_mix` | accepted `log_sig_mix` | accepted `mix_type` |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 616 | \(-1.34\times10^{-4}\) | \(3.19\times10^{31}\) | 13.626 | 31.348 | 1 |
+| 617 | \(-1.34\times10^{-4}\) | \(4.62\times10^{31}\) | 13.594 | 31.492 | 1 |
+| 630 | \(-1.34\times10^{-4}\) | \(3.38\times10^{33}\) | -99 | -99 | 0 |
+| 660 | \(-1.34\times10^{-4}\) | \(4.28\times10^{33}\) | -99 | -99 | 0 |
+| 677 | \(-1.34\times10^{-4}\) | \(6.26\times10^{30}\) | -99 | -99 | 0 |
+
+So the output/log comparison says the accepted structure is not simply sitting
+in a permanently mixed state at every bad zone.  The rejected Newton trial can
+turn on a large implicit convective sigma over the shell and use that in the
+chemistry solve; after rejection and retry, the accepted profile has the
+promoted convective topology only through zone 617, with zones 618--680
+unmixed.
+
+Current conclusion from this run: with Ledoux, thermohaline, semiconvection,
+and overshoot effectively removed, the instability is still present.  The
+problem is therefore not the EOS Brunt composition derivative and not the
+thermohaline path.  The remaining active new coupling is the structure
+linearization of the convective sigma in the chemistry residual/Jacobian:
+
+```
+hydro_chem_eqns.f90:
+   sig00_ad = s% sig_implicit_ad(k)
+   sigp1_ad = shift_p1(s% sig_implicit_ad(k+1))
+   call save_sig_ad_partials(...)
+```
+
+The fixed-topology response to this comparison was tested and reverted.
+`implicit_Dmix:set_Dmix_components(s,.false.)` is restored to the more implicit
+current-`mlt_mixing_type` promoted-bucket policy.  Since the same failure
+persists, the 20M problem is not solved by lagging the material-diffusion
+topology; the deeper issue is in the implicit convective coefficient value or
+Jacobian being applied at the burning-boundary shell.
+
+## Added Sigma Limiter And Chemistry Jacobian Diagnostics
+
+This pass adds the missing post-limiter output, gated by the existing controls
+
+```
+implicit_diffusion_debug_thermohaline
+implicit_diffusion_debug_thermohaline_k
+implicit_diffusion_debug_thermohaline_k_min
+implicit_diffusion_debug_thermohaline_k_max
+```
+
+The controls are intentionally reused so the next run can restrict output to
+the same problem shell, e.g. zones 450--750 in
+`star/test_suite/20M_pre_ms_to_core_collapse/inlist_common`.
+
+New output labels:
+
+| label | location | purpose |
+| --- | --- | --- |
+| `implicit_Dmix debug sigma` | `star/private/mix_info.f90:get_convection_sigmas` | pre-limiter sigma, implicit sigma value, and derivative maxima |
+| `implicit_Dmix debug sigma limiter after sig_term_limit` | `star/private/mix_info.f90:get_convection_sigmas` | post `sig_term_limit` value; reports whether the limiter clipped sigma and zeroed derivatives |
+| `implicit_Dmix debug sigma limiter after highT_sig_min_factor` | `star/private/mix_info.f90:get_convection_sigmas:do1` | post high-\(T_c\) trace-abundance limiter value; reports `scaled`, `zeroed`, or a skip reason |
+| `implicit_Dmix debug sigma limiter skip` | `star/private/mix_info.f90:get_convection_sigmas` | explains early exits from the limiter path |
+| `implicit_Dmix debug chem dsig_struct` | `star/private/hydro_chem_eqns.f90:do1_chem_eqns` | reports the largest nonzero structure-Jacobian contribution from `sig_implicit_ad` for selected cells/species |
+| `implicit_Dmix debug chem dsig_dxa` | `star/private/hydro_chem_eqns.f90:do1_chem_eqns` | reports the largest nonzero composition-Jacobian contribution from `d_sig_dxa_m1`/`d_sig_dxa_00` |
+
+For each selected face the limiter diagnostic reports `sig_raw`,
+`sig_before`, `sig_after`, `siglim`, `lim`, `sig_ratio`,
+`sig_implicit_val`, `Dmix_implicit`, `Dmix_explicit`, `D_mix`,
+`Dimp_d1_max`, `dsig_struct_max`, `dsig_dxa_m1_max`,
+`dsig_dxa_00_max`, `dt`, `logT`, face/cell masses, the limiter species
+`jlim`, and the local minimum abundances on both sides of the face.  The
+high-\(T_c\) limiter diagnostic preserves the original signed `dX` logic; it
+only adds output about which isotope controlled the limiting.
+
+The chemistry diagnostic is emitted immediately before
+`save_sig_ad_partials`.  It prints the local composition residual, `eqn_scale`,
+`dxdt_actual`, `dxdt_mix`, `dxdt_nuc`, neighbor abundances, `dx00`, `dxp1`,
+`sig00_val`, `sigp1_val`, `sig00_d1_max`, `sigp1_d1_max`, and the largest
+single matrix contribution from the implicit sigma structure derivative:
+
+\[
+   \Delta J_{\rm max}
+      = \max_{v,\ell}
+        \left|
+        f_{00}\frac{\partial \sigma_k}{\partial y_{v,\ell}}
+        + f_{+1}\frac{\partial \sigma_{k+1}}{\partial y_{v,\ell}}
+        \right|,
+\]
+
+where
+
+\[
+   f_{00} = \frac{x_{j,k-1}-x_{j,k}}{\Delta m_k\,{\tt eqn\_scale}},
+   \qquad
+   f_{+1} = -\frac{x_{j,k}-x_{j,k+1}}{\Delta m_k\,{\tt eqn\_scale}} .
+\]
+
+The reported `max_var` and `max_loc` identify which structure variable and
+neighbor block \((-1,0,+1)\) gives this largest contribution.  The
+`dsig_dxa` diagnostic similarly reports the largest composition partial,
+including `max_partial_isotope` and `max_loc`, using the same terms inserted
+into the chemistry matrix:
+
+\[
+   \Delta J_{-1,j'} =
+      \frac{\partial \sigma_k}{\partial x_{j',k-1}}
+      \frac{x_{j,k-1}-x_{j,k}}{\Delta m_k\,{\tt eqn\_scale}},
+\]
+
+\[
+   \Delta J_{0,j'} =
+      \left[
+      \frac{\partial \sigma_k}{\partial x_{j',k}}
+      \left(x_{j,k-1}-x_{j,k}\right)
+      -
+      \frac{\partial \sigma_{k+1}}{\partial x_{j',k}}
+      \left(x_{j,k}-x_{j,k+1}\right)
+      \right]
+      \frac{1}{\Delta m_k\,{\tt eqn\_scale}},
+\]
+
+\[
+   \Delta J_{+1,j'} =
+      -\frac{\partial \sigma_{k+1}}{\partial x_{j',k+1}}
+      \frac{x_{j,k}-x_{j,k+1}}{\Delta m_k\,{\tt eqn\_scale}} .
+\]
+
+This should show whether the crashing Newton step is being driven by a
+post-limiter sigma value, by a derivative that survived a limiter, or by a
+particular structure or composition partial in the chemistry Jacobian.

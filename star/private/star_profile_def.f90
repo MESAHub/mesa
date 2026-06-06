@@ -459,7 +459,10 @@
       integer, parameter :: p_log_D_mix_rotation = p_log_D_omega + 1
       integer, parameter :: p_log_D_mix_non_rotation = p_log_D_mix_rotation + 1
       integer, parameter :: p_log_D_mix = p_log_D_mix_non_rotation + 1
-      integer, parameter :: p_conv_vel = p_log_D_mix + 1
+      integer, parameter :: p_log_Dmix_implicit = p_log_D_mix + 1
+      integer, parameter :: p_log_Dmix_explicit = p_log_Dmix_implicit + 1
+      integer, parameter :: p_Dmix_implicit_dB = p_log_Dmix_explicit + 1
+      integer, parameter :: p_conv_vel = p_Dmix_implicit_dB + 1
       integer, parameter :: p_dt_times_conv_vel_div_mixing_length = p_conv_vel + 1
       integer, parameter :: p_log_dt_times_conv_vel_div_mixing_length = p_dt_times_conv_vel_div_mixing_length + 1
 
@@ -1150,6 +1153,9 @@
          profile_column_name(p_log_D_mix_non_rotation) = 'log_D_mix_non_rotation'
          profile_column_name(p_log_D_mix_rotation) = 'log_D_mix_rotation'
          profile_column_name(p_log_D_omega) = 'log_D_omega'
+         profile_column_name(p_log_Dmix_implicit) = 'log_Dmix_implicit'
+         profile_column_name(p_log_Dmix_explicit) = 'log_Dmix_explicit'
+         profile_column_name(p_Dmix_implicit_dB) = 'Dmix_implicit_dB'
 
          profile_column_name(p_log_lambda_RTI_div_Hrho) = 'log_lambda_RTI_div_Hrho'
          profile_column_name(p_lambda_RTI) = 'lambda_RTI'

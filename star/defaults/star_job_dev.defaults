@@ -173,6 +173,51 @@
    implicit_diffusion_use_brunt_gauss_path = .false.
 
 
+      ! implicit_diffusion_debug_thermohaline
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_debug_thermohaline`` is true, write diagnostic
+      ! output for the thermohaline path through MLT/TDC, the implicit-Dmix
+      ! split, sigma construction, profile-column access, and the accepted-step
+      ! summary. This is off by default.
+
+      ! ::
+
+   implicit_diffusion_debug_thermohaline = .false.
+
+
+      ! implicit_diffusion_debug_thermohaline_k
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! cell selector for ``implicit_diffusion_debug_thermohaline``.  If zero,
+      ! only cells with thermohaline labels, negative Ledoux composition term,
+      ! nonzero implicit Dmix, nonzero MLT D, or nonzero D_mix are reported.  If
+      ! positive, only that cell is reported.  If negative, all cells are
+      ! reported.
+
+      ! ::
+
+   implicit_diffusion_debug_thermohaline_k = 0
+
+
+      ! implicit_diffusion_debug_thermohaline_k_min
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! implicit_diffusion_debug_thermohaline_k_max
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! optional inclusive cell range for
+      ! ``implicit_diffusion_debug_thermohaline``. These are used only when
+      ! ``implicit_diffusion_debug_thermohaline_k`` is zero. If either bound is
+      ! positive, diagnostics are written for cells in the requested range.
+      ! A non-positive lower bound defaults to 1; a non-positive upper bound
+      ! defaults to nz.
+
+      ! ::
+
+   implicit_diffusion_debug_thermohaline_k_min = 0
+   implicit_diffusion_debug_thermohaline_k_max = 0
+
+
       ! load_saved_photo
       ! ~~~~~~~~~~~~~~~~
       ! saved_photo_name
