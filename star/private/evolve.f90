@@ -1864,6 +1864,7 @@
                s% prev_mesh_omega(k) = s% omega(k)
                s% prev_mesh_dq(k) = s% dq(k)
                s% prev_mesh_mlt_vc(k) = s% mlt_vc(k)
+               s% prev_mesh_superad_reduction_factor(k) = s% superad_reduction_factor(k)
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
@@ -1885,6 +1886,21 @@
                if (failed('set_start_of_step_info ierr')) return
                prepare_for_new_step = do_mesh(s)  ! sets s% need_to_setvars = .true. if changes anything
                if (prepare_for_new_step /= keep_going) return
+            end if
+         end if
+
+         ! Snapshot s%superad_reduction_factor into _old here -- AFTER mesh
+         ! adjust has remapped it onto the new mesh, but BEFORE
+         ! set_vars_if_needed below would overwrite it with the new step's
+         ! first-pass value. Used by the smooth-relaxation turnover-time
+         ! limiter as the Gamma_factor_old anchor.
+         if (s% use_superad_reduction .and. .not. s% RSP_flag) then
+            if (associated(s% superad_reduction_factor) .and. &
+                associated(s% superad_reduction_factor_old)) then
+               do k = 1, s% nz
+                  s% superad_reduction_factor_old(k) = s% superad_reduction_factor(k)
+               end do
+               s% have_superad_reduction_factor = .true.
             end if
          end if
 
@@ -2198,6 +2214,7 @@
                   s% omega_old(k) = s% prev_mesh_omega(k)
                   s% j_rot_old(k) = s% prev_mesh_j_rot(k)
                   s% mlt_vc_old(k) = s% prev_mesh_mlt_vc(k)
+                  s% superad_reduction_factor_old(k) = s% prev_mesh_superad_reduction_factor(k)
                end do
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
                if (ierr /= 0) then

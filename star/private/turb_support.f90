@@ -221,6 +221,8 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
+      real(dp) :: vc_old_local, vc_old_floor, Gamma_factor_old_local
+      type(auto_diff_real_star_order1) :: tau_conv, f_turnover
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       logical ::  test_partials, using_TDC, have_Y_face_guess
@@ -287,7 +289,11 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
-      if (k /= 0) s% superad_reduction_factor(k) = 1d0
+      if (k /= 0) then
+         s% superad_reduction_factor(k) = 1d0
+         s% superad_reduction_Lrad_div_Ledd(k) = 0d0
+         s% superad_reduction_trigger(k) = 0
+      end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -465,6 +471,11 @@ contains
          Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
          Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
 
+         if (k /= 0) then
+            s% superad_reduction_Lrad_div_Ledd(k) = Lrad_div_Ledd% val
+            s% superad_reduction_trigger(k) = 0
+         end if
+
          Gamma_factor = 1d0
          if (gradT > gradL) then
             if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
@@ -483,6 +494,7 @@ contains
                !   Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                !end if
                if (Lrad_div_Ledd > Gamma_limit) then
+                  if (k /= 0) s% superad_reduction_trigger(k) = s% superad_reduction_trigger(k) + 1
                   alfa0 = Lrad_div_Ledd/Gamma_limit-1d0
                   if (alfa0 < 1d0) then
                      Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
@@ -492,11 +504,12 @@ contains
                   !Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
                end if
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
+                  if (k /= 0) s% superad_reduction_trigger(k) = s% superad_reduction_trigger(k) + 2
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
                   if (alfa0 < 1d0) then
-                     Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
+                     Gamma_term = Gamma_term + scale_value2*(0.5d0*alfa0*alfa0)
                   else
-                     Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
+                     Gamma_term = Gamma_term + scale_value2*(alfa0-0.5d0)
                   end if
                   !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
@@ -512,6 +525,53 @@ contains
                end if
             end if
          end if
+
+         ! Convective-turnover-time limiter (placed OUTSIDE the
+         ! Gamma_term>0d0 block so it also handles the case where the
+         ! instantaneous Gamma_factor is 1 but the previous step's value
+         ! was > 1 -- i.e., we must relax the throttle DOWN, not snap it
+         ! to 1 in a single step). Relaxes Gamma_factor toward its
+         ! instantaneous (capped) value over the local turnover time
+         ! tau_conv = scale_height / mlt_vc_old, anchored at the
+         ! previous-step's converged Gamma_factor:
+         !
+         !    d Gamma_fac / dt = (Gamma_fac_inst - Gamma_fac) / tau_conv
+         !    Gamma_fac_new = Gamma_fac_old + f_turnover * (Gamma_fac_inst - Gamma_fac_old)
+         !
+         ! dt >> tau_conv: f_turnover -> 1, Gamma_fac -> Gamma_fac_inst (no smoothing).
+         ! dt << tau_conv: f_turnover -> 0, Gamma_fac -> Gamma_fac_old (convection
+         !   had no time to adapt, throttle held at previous-step value
+         !   independently of whether the new step needs more or less throttling).
+         !
+         ! Skip until the previous-step mlt_vc and Gamma_factor_old have both
+         ! been populated. Fires only when there is throttling to track --
+         ! either an instantaneous Gamma_factor>1 OR a non-trivial old value
+         ! that has to relax back to 1.
+         if (s% superad_reduction_use_turnover_limit .and. k > 0 .and. &
+             s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
+             s% have_superad_reduction_factor .and. &
+             associated(s% superad_reduction_factor_old) .and. &
+             s% dt > 0d0) then
+            ! Clamp at >= 1 so we never relax from a non-physical sub-1 anchor.
+            Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
+            if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
+               ! Optional floor on mlt_vc_old at a fraction of the local face
+               ! sound speed; see controls.defaults for the physical motivation.
+               vc_old_floor = s% superad_reduction_turnover_vc_floor_frac &
+                              * s% csound_face(k)
+               vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
+               tau_conv = scale_height / vc_old_local
+               select case (trim(s% superad_reduction_turnover_limit_function))
+               case ('linear')
+                  f_turnover = min(s% dt / tau_conv, 1d0)
+               case default
+                  f_turnover = 1d0 - exp(-s% dt / tau_conv)
+               end select
+               Gamma_factor = Gamma_factor_old_local + &
+                              f_turnover * (Gamma_factor - Gamma_factor_old_local)
+            end if
+         end if
+
          if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr

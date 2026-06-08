@@ -333,7 +333,8 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc, &
+         prev_mesh_superad_reduction_factor
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
       real(dp), pointer, dimension(:) :: prev_mesh_D_ST_start, prev_mesh_nu_ST_start
@@ -354,6 +355,19 @@
 
       real(dp), pointer :: superad_reduction_factor(:) ! only set when use_superad_reduction = .true.
          ! reports effect of superad_reduction.  value = 1d0 for no effect.
+
+      real(dp), pointer :: superad_reduction_Lrad_div_Ledd(:)
+         ! only set when use_superad_reduction = .true.
+         ! reports Lrad/Ledd = (4 a T^4 / 3 P) * gradT, computed from the
+         ! first-pass (unthrottled) gradT inside set_superad_reduction.
+         ! Diagnostic only; not used by the solver.
+
+      integer, pointer :: superad_reduction_trigger(:)
+         ! only set when use_superad_reduction = .true.
+         ! 0 = throttle inactive in this cell.
+         ! 1 = activated by Eddington threshold (Lrad/Ledd > Gamma_limit).
+         ! 2 = activated by density-inversion threshold only.
+         ! 3 = both triggers active.
 
       ! mixing length alpha for MLT (can be set by user and can vary within model)
       real(dp), pointer :: alpha_mlt(:)
@@ -557,7 +571,14 @@
 
          real(dp), pointer, dimension(:,:) :: xh_old, xa_old
          real(dp), pointer, dimension(:) :: &
-            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old
+            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old, &
+            superad_reduction_factor_old
+            ! superad_reduction_factor_old: previous step's converged
+            ! Gamma_factor (= 1 when no throttle was active). Used by the
+            ! turnover-time limiter to relax Gamma_factor smoothly toward
+            ! the new instantaneous target rather than snapping it back to 1
+            ! when dt collapses below tau_conv (which would cause an
+            ! unphysical HRD jump). Companion to mlt_vc_old.
          real(dp) :: time_old, dt_old, mstar_old, xmstar_old, mstar_dot_old, &
             M_center_old, v_center_old, R_center_old, L_center_old
          integer :: nz_old, model_number_old
@@ -893,7 +914,12 @@
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
-            okay_to_set_mlt_vc, have_mlt_vc
+            okay_to_set_mlt_vc, have_mlt_vc, &
+            have_superad_reduction_factor
+                                            ! true once a step has set
+                                            ! superad_reduction_factor and we've
+                                            ! copied it into _old (consumed by
+                                            ! the smooth-relaxation limiter)
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

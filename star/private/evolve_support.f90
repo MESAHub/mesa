@@ -58,6 +58,18 @@
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
 
+            ! Always ensure superad_reduction_factor_old is allocated, even
+            ! when use_superad_reduction is .false., so check_sizes does not
+            ! trip on a null pointer. The actual snapshot used by the
+            ! smooth-relaxation limiter is done in evolve.f90 between the
+            ! mesh adjust and set_vars_if_needed (and the
+            ! have_superad_reduction_factor flag is set there).
+            if (associated(s% superad_reduction_factor)) then
+               call copy_to_old(s% superad_reduction_factor, &
+                                s% superad_reduction_factor_old, ierr)
+               if (ierr /= 0) return
+            end if
+
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
             if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)

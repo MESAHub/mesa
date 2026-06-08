@@ -48,6 +48,7 @@
             j_rot_old, i_rot_old, omega_old, D_omega_old, &
             mlt_vc_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
+            superad_reduction_factor_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
          use chem_lib, only: basic_composition_info
          use interp_1d_def
@@ -62,7 +63,8 @@
             lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
-            j_rot_old, omega_old, D_omega_old, D_mix_old
+            j_rot_old, omega_old, D_omega_old, D_mix_old, &
+            superad_reduction_factor_old
          type(auto_diff_real_star_order1), dimension(:), pointer :: i_rot_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
@@ -246,6 +248,16 @@
             s, nz, nz_old, nzlo, nzhi, s% mlt_vc, mlt_vc_old, &
             0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
          if (failed('mlt_cv')) return
+
+         ! Remap the previous-step superadiabatic-reduction factor onto the
+         ! new mesh so the smooth-relaxation limiter reads the correct local
+         ! Gamma_factor_old(k) after mesh adjustments. Neutral fill = 1d0
+         ! (no throttle) for cells that have no overlap with the old mesh.
+         call do_interp_pt_val( &
+            s, nz, nz_old, nzlo, nzhi, &
+            s% superad_reduction_factor, superad_reduction_factor_old, &
+            1d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
+         if (failed('superad_reduction_factor')) return
 
          call do_interp_pt_val( &
             s, nz, nz_old, nzlo, nzhi, s% D_mix, D_mix_old, &
@@ -556,6 +568,7 @@
             mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
+            superad_reduction_factor_old, &
             xh, xa, ierr)
          use auto_diff_support
          type (star_info), pointer :: s
@@ -564,7 +577,8 @@
             j_rot_old, omega_old, &
             D_omega_old, am_nu_rot_old, mlt_vc_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
-            D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
+            D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
+            superad_reduction_factor_old
          type(auto_diff_real_star_order1), dimension(:), pointer :: i_rot_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
@@ -595,6 +609,7 @@
          call prune1(s% lnT, lnT_old, skip)
          call prune1(s% D_mix, D_mix_old, skip)
          call prune1(s% mlt_vc, mlt_vc_old, skip)
+         call prune1(s% superad_reduction_factor, superad_reduction_factor_old, skip)
 
          if (s% rotation_flag) then
             call prune1(s% j_rot, j_rot_old, skip)

@@ -1111,6 +1111,7 @@
             prv% mlt_vc, prv% lnT, &
             prv% dPdr_dRhodr_info, prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
             prv% D_SSI, prv% D_ES, prv% D_GSF, prv% D_mix, &
+            prv% superad_reduction_factor, &
             s% xh, s% xa, ierr)
          if (ierr /= 0) then
             return
@@ -1234,6 +1235,7 @@
          ! save have_mlt_vc and set to false (to load ZAMS model)
          save_have_mlt_vc = s% have_mlt_vc
          s% have_mlt_vc = .false.
+         s% have_superad_reduction_factor = .false.
 
          !save composition and entropy profiles
          xa(:,:) = s% xa(:,k_remove:s% nz)

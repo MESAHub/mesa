@@ -2655,27 +2655,168 @@
 
       ! use_superad_reduction
       ! ~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_inv_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_diff_grads_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Implicit alternative to ``okay_to_reduce_gradT_excess``
+      ! Implicit alternative to ``okay_to_reduce_gradT_excess`` (MLT++).
+      ! When ``.true.``, throttles the radiative gradient ``gradr`` in
+      ! convective cells that either (a) carry a radiative luminosity
+      ! approaching the Eddington limit, or (b) sit in the
+      ! density-inversion regime (Joss--Salpeter--Ostriker). MLT/TDC is then
+      ! re-solved on the throttled ``gradr``, so the final ``gradT`` is
+      ! self-consistent with MLT for the reduced radiative input.
+      ! Acts on the *input* to MLT, not the output --- unlike MLT++.
 
       ! ::
 
       use_superad_reduction = .false.
+
+
+      ! superad_reduction_Gamma_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Radiative-Eddington trigger threshold:
+      ! ``Lrad/Ledd = (4 a T^4 / 3 P) * gradT``.
+      ! When this ratio exceeds ``Gamma_limit`` in a convective cell,
+      ! the Eddington-proximity contribution to the throttle activates.
+
+      ! ::
+
       superad_reduction_Gamma_limit = 0.5d0
+
+
+      ! superad_reduction_Gamma_limit_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Sensitivity of the throttle to ``Lrad/Ledd`` excess above
+      ! ``Gamma_limit``. The Eddington contribution to ``Gamma_factor``
+      ! grows quadratically (then linearly) with the fractional excess;
+      ! ``Gamma_limit_scale`` is the proportionality constant. Larger
+      ! values produce stronger throttling for a given excess.
+
+      ! ::
+
       superad_reduction_Gamma_limit_scale = 5d0
+
+
+      ! superad_reduction_Gamma_inv_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Sensitivity of the throttle to the density-inversion criterion
+      ! ``Lrad/Ledd > 4(1-beta)/(4-3 beta)``, where ``beta = Pgas/Ptot``.
+      ! Analogous to ``Gamma_limit_scale`` but for the inversion term.
+      ! Tune independently when inversion proximity dominates over
+      ! Eddington proximity (or vice versa).
+
+      ! ::
+
       superad_reduction_Gamma_inv_scale = 5d0
+
+
+      ! superad_reduction_diff_grads_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Superadiabaticity floor below which the throttle is silenced.
+      ! When ``gradT - gradL < diff_grads_limit``, the cell is treated
+      ! as essentially adiabatic and the throttle contribution drops
+      ! smoothly to zero (quintic smoothstep). Prevents the throttle
+      ! from amplifying numerical noise in nearly-adiabatic cells.
+
+      ! ::
+
       superad_reduction_diff_grads_limit = 1d-3
-      superad_reduction_limit = -1d0
+
+
+      ! superad_reduction_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Upper saturation cap on the throttle multiplier ``Gamma_factor``.
+      ! The raw ``Gamma_factor`` includes a ``1/sqrt(beta)`` boost that
+      ! can blow up in radiation-dominated cells; this control imposes
+      ! a logistic squash so ``Gamma_factor -> reduction_limit`` as the
+      ! raw value diverges. Set ``-1d0`` to disable the cap (legacy
+      ! behavior); finite values guard against the second MLT call
+      ! seeing ``gradr_scaled`` jumping all the way to ``gradL`` in a
+      ! single Newton iteration.
+
+      ! ::
+
+      superad_reduction_limit = 100d0
+
+
+      ! superad_reduction_use_turnover_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Optional convective-turnover-time limiter for the throttle.
+      ! When ``.true.``, relaxes the throttle using a fraction
+      ! ``f_tau`` set by ``superad_reduction_turnover_limit_function``,
+      ! where ``tau_conv = scale_height(k) / mlt_vc_old(k)`` is the
+      ! local convective turnover time computed from the previous
+      ! step's converged convective velocity. This reflects the
+      ! physical constraint that convection cannot redistribute the
+      ! radiative input on timescales shorter than its own turnover
+      ! time --- so when the global time step ``dt`` is much shorter
+      ! than ``tau_conv`` the throttle should not act at full strength.
+      !
+      ! - ``dt >> tau_conv``: ``f_tau -> 1``, current behavior recovered.
+      ! - ``dt << tau_conv``: ``f_tau -> 0``, throttle smoothly off.
+      !
+      ! ``mlt_vc_old`` is used (rather than the current iterate) so
+      ! that ``tau_conv`` is a frozen parameter w.r.t. the inner
+      ! Newton solve: the auto-diff Jacobian remains clean. When the
+      ! cell was radiative in the previous step
+      ! (``mlt_vc_old = 0``), ``f_tau -> 0`` and the throttle is off
+      ! for this step.
+      !
+      ! Default ``.false.``: the limiter block is skipped and the
+      ! routine behaves exactly as it does without this control.
+
+      ! ::
+
+      superad_reduction_use_turnover_limit = .false.
+
+      ! superad_reduction_turnover_limit_function
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Functional form for the turnover-time relaxation fraction. Allowed
+      ! values are:
+      !
+      ! - ``'exponential'``: ``f_tau = 1 - exp(-dt/tau_conv)``
+      ! - ``'linear'``: ``f_tau = min(dt/tau_conv, 1)``
+
+      ! ::
+
+      superad_reduction_turnover_limit_function = 'exponential'
+
+      ! superad_reduction_turnover_vc_floor_frac
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Fractional floor on mlt_vc_old, expressed as a fraction of the
+      ! local face sound speed csound_face(k), used only when
+      ! superad_reduction_use_turnover_limit = .true.
+      !
+      ! The turnover-time limiter uses
+      !   tau_conv(k) = scale_height(k) / mlt_vc_old(k)
+      ! to gauge whether convection has had time to respond to a step.
+      ! Slow-convection cells (e.g., the surface iron-bump zone) have
+      ! tiny mlt_vc_old, hence huge tau_conv, hence f_tau -> 0 and the
+      ! throttle is suppressed there even when the rest of the star is
+      ! evolving normally. That can leave radiation-pressure inversions
+      ! unsmoothed and make the Newton solve hard.
+      !
+      ! Setting this control to a small positive value floors
+      ! mlt_vc_old at frac * csound_face(k) before computing tau_conv.
+      ! Physical interpretation: even in nominally radiative cells
+      ! perturbations cannot propagate slower than ~ acoustic speed, so
+      ! tau_conv cannot meaningfully exceed scale_height / (frac * cs).
+      ! Numerically this prevents f_tau from dropping arbitrarily close
+      ! to zero in the slow-convection cells most prone to retries.
+      !
+      ! Default 0d0 disables the floor (current behavior). Reasonable
+      ! starting value: 1d-3 (cap tau_conv at ~ scale_height / (1e-3 cs)
+      ! = ~ 1000 sound-crossing times of the scale height).
+
+      ! ::
+
+      superad_reduction_turnover_vc_floor_frac = 0d0
 
 
    ! overshooting

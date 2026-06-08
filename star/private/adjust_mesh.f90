@@ -410,6 +410,7 @@
             prv% j_rot, prv% i_rot, prv% omega, prv% D_omega, &
             prv% mlt_vc, prv% lnT, prv% w, specific_PE, specific_KE, &
             prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, prv% D_mix, &
+            prv% superad_reduction_factor, &
             cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then
             s% retry_message = 'do_mesh_adjust failed in mesh_adjust'
@@ -429,6 +430,7 @@
             s% prev_mesh_omega(k) = prv% prev_mesh_omega(k)
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
             s% prev_mesh_mlt_vc(k) = prv% prev_mesh_mlt_vc(k)
+            s% prev_mesh_superad_reduction_factor(k) = prv% prev_mesh_superad_reduction_factor(k)
          end do
 
          ! restore ST info (for time smoothing)
