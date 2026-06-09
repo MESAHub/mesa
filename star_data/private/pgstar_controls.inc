@@ -2060,7 +2060,7 @@
          prev_Max_eq_resid_win_width, prev_Max_eq_resid_win_ratio, &
          Max_eq_resid_file_width, Max_eq_resid_file_aspect_ratio, &
          prev_Max_eq_resid_file_width, prev_Max_eq_resid_file_ratio, &
-         Max_eq_resid_txt_scale_factor
+         Max_eq_resid_txt_scale
       character (len=strlen) :: Max_eq_resid_title
       integer :: Max_eq_resid_max_width
       
@@ -2076,17 +2076,11 @@
          prev_Kipp_residuals_win_width, prev_Kipp_residuals_win_ratio, &
          Kipp_residuals_file_width, Kipp_residuals_file_aspect_ratio, &
          prev_Kipp_residuals_file_width, prev_Kipp_residuals_file_ratio
-      character (len=strlen) :: Kipp_residuals_title, &
-         Kipp_residuals_plot_name(max_num_pgstar_grid_plots)
+      character (len=strlen) :: Kipp_residuals_title
       real, dimension(max_num_pgstar_grid_plots) :: &
          Kipp_residuals_txt_scale_factor, &
          Kipp_residuals_plot_pad_left, Kipp_residuals_plot_pad_right, &
          Kipp_residuals_plot_pad_top, Kipp_residuals_plot_pad_bot
-      integer :: &
-         Kipp_residuals_num_cols, Kipp_residuals_num_rows, Kipp_residuals_num_plots
-      integer, dimension(max_num_pgstar_grid_plots) :: &
-         Kipp_residuals_plot_row, Kipp_residuals_plot_rowspan, &
-         Kipp_residuals_plot_col, Kipp_residuals_plot_colspan
 
 
       integer :: annotation1_ci, annotation1_lw, annotation1_cf
