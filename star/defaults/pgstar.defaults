@@ -7828,7 +7828,7 @@
    Max_eq_resid_xright = 0.85
    Max_eq_resid_ybot = 0.15
    Max_eq_resid_ytop = 0.85
-   Max_eq_resid_txt_scale_factor = 1
+   Max_eq_resid_txt_scale = 1
    Max_eq_resid_title = 'Max equation residuals'
    Max_eq_resid_max_width = -1
 

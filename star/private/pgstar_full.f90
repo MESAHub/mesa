@@ -161,6 +161,8 @@ contains
          Color_Magnitude1_plot, Color_Magnitude2_plot, Color_Magnitude3_plot, &
          Color_Magnitude4_plot, Color_Magnitude5_plot, Color_Magnitude6_plot, &
          Color_Magnitude7_plot, Color_Magnitude8_plot, Color_Magnitude9_plot
+      use pgstar_equation_residuals, only: &
+         Max_eq_resid_plot
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
@@ -1275,6 +1277,20 @@ contains
       p% file_width = s% pg% max_eq_resid_file_width
       p% file_aspect_ratio = s% pg% max_eq_resid_file_aspect_ratio      
       
+!      p => s% pg% pgstar_win_file_ptr(i_Kipp_residuals)
+!      p% plot => Kipp_residuals_plot
+!      p% id = i_Kipp_residuals_plot
+!      p% name = 'Max residual per equation across mesh points'
+!      p% win_flag = s% pg% Kipp_residuals_win_flag
+!      p% win_width = s% pg% Kipp_residuals_win_width
+!      p% win_aspect_ratio = s% pg% Kipp_residuals_win_aspect_ratio
+!      p% file_flag = s% pg% Kipp_residuals_file_flag
+!      p% file_dir = s% pg% Kipp_residuals_file_dir
+!      p% file_prefix = s% pg% Kipp_residuals_file_prefix
+!      p% file_interval = s% pg% Kipp_residuals_file_interval
+!      p% file_width = s% pg% Kipp_residuals_file_width
+!      p% file_aspect_ratio = s% pg% Kipp_residuals_file_aspect_ratio
+
       do i = 1, max_num_Other_plots
          p => s% pg% pgstar_win_file_ptr(i_Other + i - 1)
          p% win_flag = .false.

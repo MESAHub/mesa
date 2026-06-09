@@ -3035,7 +3035,7 @@
             Max_eq_resid_xright, &
             Max_eq_resid_ybot, &
             Max_eq_resid_ytop, &
-            Max_eq_resid_txt_scale_factor, &
+            Max_eq_resid_txt_scale, &
             Max_eq_resid_title, &
             Max_eq_resid_max_width, &
 
@@ -6230,7 +6230,7 @@
          s% pg% Max_eq_resid_xright = Max_eq_resid_xright
          s% pg% Max_eq_resid_ybot = Max_eq_resid_ybot
          s% pg% Max_eq_resid_ytop = Max_eq_resid_ytop
-         s% pg% Max_eq_resid_txt_scale_factor = Max_eq_resid_txt_scale_factor
+         s% pg% Max_eq_resid_txt_scale = Max_eq_resid_txt_scale
          s% pg% Max_eq_resid_title = Max_eq_resid_title
          s% pg% Max_eq_resid_max_width = Max_eq_resid_max_width
 
