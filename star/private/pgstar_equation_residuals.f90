@@ -95,17 +95,13 @@ contains
       if (max_width < 0) then
          n = s% model_number - init_model
       else
-         if (s% model_number < max_width) then
-            n = s% model_number - init_model
-         else
-            n = max_width
-         end if
+         n = min(s% model_number - init_model, max_width)
       end if
 
       if (.not. allocated(resid_hist_model)) then
          resid_hist_nvar = s% nvar_hydro
          if (max_width < 0) then
-            initial_width = 10
+            initial_width = 100
          else
             initial_width = max_width
          end if
@@ -118,18 +114,15 @@ contains
             return
          end if
 
-         do i_eq = 1, resid_hist_nvar
+         do i_eq = 1, resid_hist_nvar  ! set names
             resid_equ_names(i_eq) = trim(s% nameofequ(i_eq))
          end do
-
-      else if (s% model_number - init_model >= size(resid_hist_model)) then
-         if (max_width < 0) then
-            ! grow the arrays
-            call realloc_resid_hist(2*size(resid_hist_model))
-         end if
+      else if (s% model_number - init_model >= size(resid_hist_model) .and. max_width < 0) then
+         call realloc_resid_hist(2*size(resid_hist_model))  ! grow the arrays
       end if
 
-      if (max_width > 1 .and. s% model_number > max_width) then  ! displace values back one step
+      ! roll if using a max width and you go over the limit
+      if (max_width > 1 .and. s% model_number - init_model > max_width) then
          resid_hist_model(1:n-1) = resid_hist_model(2:n)
          resid_hist_vals(:,1:n-1) = resid_hist_vals(:,2:n)
       end if

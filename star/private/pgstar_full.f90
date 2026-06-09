@@ -163,6 +163,8 @@ contains
          Color_Magnitude7_plot, Color_Magnitude8_plot, Color_Magnitude9_plot
       use pgstar_equation_residuals, only: &
          Max_eq_resid_plot
+      use pgstar_kipp_residuals, only: &
+         Kipp_residuals_plot
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
@@ -1266,7 +1268,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_max_eq_resid)
       p% plot => Max_eq_resid_plot
       p% id = i_max_eq_resid
-      p% name = 'Max residual per equation across mesh points'
+      p% name = 'Max_eq_resid'
       p% win_flag = s% pg% max_eq_resid_win_flag
       p% win_width = s% pg% max_eq_resid_win_width
       p% win_aspect_ratio = s% pg% max_eq_resid_win_aspect_ratio
@@ -1277,19 +1279,19 @@ contains
       p% file_width = s% pg% max_eq_resid_file_width
       p% file_aspect_ratio = s% pg% max_eq_resid_file_aspect_ratio      
       
-!      p => s% pg% pgstar_win_file_ptr(i_Kipp_residuals)
-!      p% plot => Kipp_residuals_plot
-!      p% id = i_Kipp_residuals_plot
-!      p% name = 'Max residual per equation across mesh points'
-!      p% win_flag = s% pg% Kipp_residuals_win_flag
-!      p% win_width = s% pg% Kipp_residuals_win_width
-!      p% win_aspect_ratio = s% pg% Kipp_residuals_win_aspect_ratio
-!      p% file_flag = s% pg% Kipp_residuals_file_flag
-!      p% file_dir = s% pg% Kipp_residuals_file_dir
-!      p% file_prefix = s% pg% Kipp_residuals_file_prefix
-!      p% file_interval = s% pg% Kipp_residuals_file_interval
-!      p% file_width = s% pg% Kipp_residuals_file_width
-!      p% file_aspect_ratio = s% pg% Kipp_residuals_file_aspect_ratio
+      p => s% pg% pgstar_win_file_ptr(i_Kipp_residuals)
+      p% plot => Kipp_residuals_plot
+      p% id = i_Kipp_residuals
+      p% name = 'Kipp_resid'
+      p% win_flag = s% pg% Kipp_residuals_win_flag
+      p% win_width = s% pg% Kipp_residuals_win_width
+      p% win_aspect_ratio = s% pg% Kipp_residuals_win_aspect_ratio
+      p% file_flag = s% pg% Kipp_residuals_file_flag
+      p% file_dir = s% pg% Kipp_residuals_file_dir
+      p% file_prefix = s% pg% Kipp_residuals_file_prefix
+      p% file_interval = s% pg% Kipp_residuals_file_interval
+      p% file_width = s% pg% Kipp_residuals_file_width
+      p% file_aspect_ratio = s% pg% Kipp_residuals_file_aspect_ratio
 
       do i = 1, max_num_Other_plots
          p => s% pg% pgstar_win_file_ptr(i_Other + i - 1)
@@ -1373,8 +1375,8 @@ contains
       use utils_lib
       use chem_def
       use net_def
-      use net_lib, only : get_net_reaction_table
-      use const_def, only : Msun, Rsun
+      use net_lib, only: get_net_reaction_table
+      use const_def, only: Msun, Rsun
 
       type (star_info), pointer :: s
       logical :: must_write_files_in
@@ -1442,7 +1444,7 @@ contains
       do i = 1, num_pgstar_plots
          p => s% pg% pgstar_win_file_ptr(i)
 
-         if(show_plot_now) then
+         if (show_plot_now) then
             ! call to check_window opens device
             call check_window(s, p, ierr)
             if (failed('check_window')) return
@@ -1598,7 +1600,7 @@ contains
 
 
    subroutine update_pgstar_data(s, ierr)
-      use star_utils, only : eval_csound
+      use star_utils, only: eval_csound
 
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -1625,7 +1627,7 @@ contains
    contains
 
       subroutine get_hist_values(num, ierr)
-         use history, only : do_get_data_for_history_columns
+         use history, only: do_get_data_for_history_columns
          integer, intent(in) :: num
          integer, intent(out) :: ierr
          integer :: i

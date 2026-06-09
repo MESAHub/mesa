@@ -2066,7 +2066,7 @@
       
       logical :: Kipp_residuals_win_flag, Kipp_residuals_file_flag
       logical :: do_Kipp_residuals_win, do_Kipp_residuals_file
-      integer :: Kipp_residuals_file_interval, Kipp_residuals_step_max
+      integer :: Kipp_residuals_file_interval
       integer :: id_Kipp_residuals_win, id_Kipp_residuals_file
       character (len=strlen) :: Kipp_residuals_file_dir, Kipp_residuals_file_prefix
       real :: &
@@ -2076,11 +2076,9 @@
          prev_Kipp_residuals_win_width, prev_Kipp_residuals_win_ratio, &
          Kipp_residuals_file_width, Kipp_residuals_file_aspect_ratio, &
          prev_Kipp_residuals_file_width, prev_Kipp_residuals_file_ratio
-      character (len=strlen) :: Kipp_residuals_title
-      real, dimension(max_num_pgstar_grid_plots) :: &
-         Kipp_residuals_txt_scale_factor, &
-         Kipp_residuals_plot_pad_left, Kipp_residuals_plot_pad_right, &
-         Kipp_residuals_plot_pad_top, Kipp_residuals_plot_pad_bot
+      character (len=strlen) :: Kipp_residuals_title, Kipp_residuals_yaxis_name
+      real :: Kipp_residuals_txt_scale
+      integer :: Kipp_residuals_max_width
 
 
       integer :: annotation1_ci, annotation1_lw, annotation1_cf
