@@ -568,6 +568,8 @@ contains
          do_Color_Magnitude7_plot, do_Color_Magnitude8_plot, do_Color_Magnitude9_plot
       use pgstar_equation_residuals, only : &
          do_Max_eq_resid_plot
+      use pgstar_kipp_residuals, only : &
+         do_Kipp_residuals_plot
 
       type (star_info), pointer :: s
       logical, intent(in) :: subplot
@@ -953,6 +955,11 @@ contains
             call do_Max_eq_resid_plot(&
                s, id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Max_eq_resid_title, &
                Grid_txt_scale_factor(i) * s% pg% Max_eq_resid_txt_scale, s% pg% Max_eq_resid_max_width, ierr)
+         case ('kipp_residuals')
+            call do_Kipp_residuals_plot(&
+               s, id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Kipp_residuals_title, &
+               Grid_txt_scale_factor(i) * s% pg% Kipp_residuals_txt_scale, &
+               s% pg% Kipp_residuals_max_width, s% pg% Kipp_residuals_yaxis_name, ierr)
          case default
             ! check for "other" plot
             found_it = .false.

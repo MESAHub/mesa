@@ -27,6 +27,13 @@ module pgstar_kipp_residuals
 
    implicit none
 
+   real, parameter, dimension(9) :: &
+            l = (/ 0.00, 0.12, 0.25, 0.38, 0.50, 0.62, 0.75, 0.88, 1.00 /), &
+            r = (/ 0.00, 0.05, 0.15, 0.32, 0.55, 0.78, 0.93, 0.99, 1.00 /), &
+            g = (/ 0.00, 0.02, 0.04, 0.06, 0.10, 0.18, 0.32, 0.58, 0.95 /), &
+            b = (/ 0.00, 0.08, 0.18, 0.32, 0.36, 0.28, 0.16, 0.08, 0.80 /)
+   real, parameter :: contra = 1.0, bright = 0.5
+
 contains
 
    ! Kippenhahn-style log10(max(|res|)) across all equations for a
@@ -76,6 +83,10 @@ contains
       real, allocatable, dimension(:, :), save :: nr_resid_buf, nr_ycoord_buf
       integer, allocatable, dimension(:), save :: nr_model_buf, nr_zone_buf
 
+      ! colorbar color mapping info
+      real, allocatable, save :: r_save(:), g_save(:), b_save(:)
+      integer, save :: n_colors, c_low, c_high
+
       real, allocatable :: tmp_resid_buf(:, :), tmp_ycoord_buf(:, :)
       integer, allocatable :: tmp_model_buf(:), tmp_zone_buf(:)
 
@@ -97,7 +108,6 @@ contains
 
          init_model = s% model_number - 1
       else if (s% nz > 0.95 * size(nr_resid_buf, 2)) then
-         write(*, *) "reallocating due to nz"
          ! check if remeshing has increased nz beyond 95% of the
          ! current array size
          x_size = size(nr_resid_buf, 1)
@@ -124,7 +134,6 @@ contains
 
       ! resize n_model dimension
       if (n > size(nr_resid_buf, 1)) then
-         write(*, *) "reallocating due to model_number"
          x_size = size(nr_resid_buf, 1)
          y_size = size(nr_resid_buf, 2)
 
@@ -186,6 +195,7 @@ contains
       call pgsvp(win_xleft, win_xright, win_ybot, win_ytop)
       call pgrect(0.0, 1.0, 0.0, 1.0)   ! pseudo erase
       call Kipp_residuals_render(ierr, id)
+
       call pgunsa
 
       contains
@@ -200,32 +210,21 @@ contains
          integer :: nx, ny, i, j, k, nz_i
          logical :: y_reverse
 
-         ! ----------------------------------------- colorbar definition
-         real :: bright, contra
-         real, dimension(9) :: l, r, g, b
 
-         l = (/ &
-            0.00, 0.12, 0.25, 0.38, 0.50, &
-            0.62, 0.75, 0.88, 1.00 /)
+         if (.not. allocated(r_save)) then
+            call pgqcir(c_low, c_high)
+            n_colors = c_high - c_low + 1
+            allocate(r_save(n_colors), g_save(n_colors), b_save(n_colors))
 
-         r = (/ &
-            0.00, 0.05, 0.15, 0.32, 0.55, &
-            0.78, 0.93, 0.99, 1.00 /)
+            ! save existing color table
+            do i = 1, n_colors
+               call pgqcr(c_low + i - 1, r_save(i), g_save(i), b_save(i))
+            end do
+         end if
 
-         g = (/ &
-            0.00, 0.02, 0.04, 0.06, 0.10, &
-            0.18, 0.32, 0.58, 0.95 /)
-
-         b = (/ &
-            0.00, 0.08, 0.18, 0.32, 0.36, &
-            0.28, 0.16, 0.08, 0.80 /)
-
-         contra = 1.0
-         bright = 0.5
-
+         call pgqcir(c_low, c_high)
          call pgscir(16,255)
          call pgctab(l, r, g, b, 9, contra, bright)
-         ! ----------------------------------------- end colorbar
 
          nx = n
          ny = nr_n_cells
@@ -327,7 +326,6 @@ contains
 
          ! --- main panel ---
          ! y-axis: mlo at bottom (centre), mhi at top (surface)
-         call pgsvp(0.10, 0.82, 0.12, 0.92)
          if (.not. y_reverse) then
             call pgswin(xlo, xhi, clo - 0.5*dcoord, chi + 0.5*dcoord)
          else
@@ -359,9 +357,16 @@ contains
          end select
 
          ! --- color wedge ---
-         call pgsvp(0.84, 0.90, 0.12, 0.92)
+         call pgsvp(win_xright + 0.01 * (win_xright - win_xleft), win_xright + 0.03 * (win_xright - win_xleft), &
+            win_ybot, win_ytop)
          call pgswin(0.0, 1.0, bg, fg)
          call pgwedg('RI', 0.0, 4.0, bg, fg, 'log10(max(|res|))')
+
+         ! reset color range
+         call pgscir(c_low, c_high)
+         do i = 1, n_colors
+            call pgscr(c_low + i - 1, r_save(i), g_save(i), b_save(i))
+         end do
 
          deallocate(img, coord_grid)
 
