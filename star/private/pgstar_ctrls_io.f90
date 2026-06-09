@@ -3023,6 +3023,21 @@
             Grid9_file_width, &
             Grid9_file_aspect_ratio, &
 
+            Max_eq_resid_win_flag, &
+            Max_eq_resid_win_width, &
+            Max_eq_resid_win_aspect_ratio, &
+            Max_eq_resid_file_flag, &
+            Max_eq_resid_file_width, &
+            Max_eq_resid_file_aspect_ratio, &
+            Max_eq_resid_file_dir, &
+            Max_eq_resid_file_prefix, &
+            Max_eq_resid_xleft, &
+            Max_eq_resid_xright, &
+            Max_eq_resid_ybot, &
+            Max_eq_resid_ytop, &
+            Max_eq_resid_txt_scale_factor, &
+            Max_eq_resid_title, &
+            Max_eq_resid_max_width, &
 
             annotation1_ci, &
             annotation1_ch, &
@@ -6202,6 +6217,22 @@
          s% pg% Grid9_file_interval = Grid9_file_interval
          s% pg% Grid9_file_width = Grid9_file_width
          s% pg% Grid9_file_aspect_ratio = Grid9_file_aspect_ratio
+
+         s% pg% Max_eq_resid_win_flag = Max_eq_resid_win_flag
+         s% pg% Max_eq_resid_win_width = Max_eq_resid_win_width
+         s% pg% Max_eq_resid_win_aspect_ratio = Max_eq_resid_win_aspect_ratio
+         s% pg% Max_eq_resid_file_flag = Max_eq_resid_file_flag
+         s% pg% Max_eq_resid_file_width = Max_eq_resid_file_width
+         s% pg% Max_eq_resid_file_aspect_ratio = Max_eq_resid_file_aspect_ratio
+         s% pg% Max_eq_resid_file_dir = Max_eq_resid_file_dir
+         s% pg% Max_eq_resid_file_prefix = Max_eq_resid_file_prefix
+         s% pg% Max_eq_resid_xleft = Max_eq_resid_xleft
+         s% pg% Max_eq_resid_xright = Max_eq_resid_xright
+         s% pg% Max_eq_resid_ybot = Max_eq_resid_ybot
+         s% pg% Max_eq_resid_ytop = Max_eq_resid_ytop
+         s% pg% Max_eq_resid_txt_scale_factor = Max_eq_resid_txt_scale_factor
+         s% pg% Max_eq_resid_title = Max_eq_resid_title
+         s% pg% Max_eq_resid_max_width = Max_eq_resid_max_width
 
 
          s% pg% annotation1_ci = annotation1_ci

@@ -202,6 +202,7 @@ SRCS += \
    private/pgstar_profile_panels.f90 \
    private/pgstar_grid.f90 \
    private/pgstar_network.f90 \
+   private/pgstar_equation_residuals.f90 \
    other/sample_pgstar_plot.f90 \
    private/pgstar_full.f90
 EXTERNAL_DEPENDS_ON := pgplot
@@ -251,6 +252,7 @@ MODULES += pgstar_abundance.mod \
            pgstar_l_teff.mod \
            pgstar_l_v.mod \
            pgstar_mixing_ds.mod \
+           pgstar_equation_residuals.mod \
            pgstar_mode_prop.mod \
            pgstar_network.mod \
            pgstar_power.mod \
