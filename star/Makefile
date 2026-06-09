@@ -203,6 +203,7 @@ SRCS += \
    private/pgstar_grid.f90 \
    private/pgstar_network.f90 \
    private/pgstar_equation_residuals.f90 \
+   private/pgstar_kipp_residuals.f90 \
    other/sample_pgstar_plot.f90 \
    private/pgstar_full.f90
 EXTERNAL_DEPENDS_ON := pgplot
@@ -238,11 +239,13 @@ MODULES += pgstar_abundance.mod \
            pgstar_decorator.mod \
            pgstar_dpg_dnu.mod \
            pgstar_dynamo.mod \
+		   pgstar_equation_residuals.mod \
            pgstar_grid.mod \
            pgstar_history_panels.mod \
            pgstar_hist_track.mod \
            pgstar_hr.mod \
            pgstar_kipp.mod \
+           pgstar_kipp_residuals.mod \
            pgstar_logg_logt.mod \
            pgstar_logg_teff.mod \
            pgstar_logl_r.mod \
@@ -252,7 +255,6 @@ MODULES += pgstar_abundance.mod \
            pgstar_l_teff.mod \
            pgstar_l_v.mod \
            pgstar_mixing_ds.mod \
-           pgstar_equation_residuals.mod \
            pgstar_mode_prop.mod \
            pgstar_network.mod \
            pgstar_power.mod \
