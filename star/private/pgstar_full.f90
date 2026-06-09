@@ -1261,6 +1261,20 @@ contains
       p% file_width = s% pg% Grid9_file_width
       p% file_aspect_ratio = s% pg% Grid9_file_aspect_ratio
 
+      p => s% pg% pgstar_win_file_ptr(i_max_eq_resid)
+      p% plot => Max_eq_resid_plot
+      p% id = i_max_eq_resid
+      p% name = 'Max residual per equation across mesh points'
+      p% win_flag = s% pg% max_eq_resid_win_flag
+      p% win_width = s% pg% max_eq_resid_win_width
+      p% win_aspect_ratio = s% pg% max_eq_resid_win_aspect_ratio
+      p% file_flag = s% pg% max_eq_resid_file_flag
+      p% file_dir = s% pg% max_eq_resid_file_dir
+      p% file_prefix = s% pg% max_eq_resid_file_prefix
+      p% file_interval = s% pg% max_eq_resid_file_interval
+      p% file_width = s% pg% max_eq_resid_file_width
+      p% file_aspect_ratio = s% pg% max_eq_resid_file_aspect_ratio      
+      
       do i = 1, max_num_Other_plots
          p => s% pg% pgstar_win_file_ptr(i_Other + i - 1)
          p% win_flag = .false.

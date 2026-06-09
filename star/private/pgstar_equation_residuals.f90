@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2026  The MESA Team
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU Lesser General Public License
@@ -20,29 +20,68 @@
 
 module pgstar_equation_residuals
 
+   use star_private_def
+   use const_def, only: dp
+   use pgstar_support
    use star_pgstar
-
 
    implicit none
 
 contains
 
-   subroutine equ_resid_plot(id, device_id, ierr)
+   subroutine Max_eq_resid_plot(id, device_id, ierr)
 
       integer, intent(in)  :: id
       integer, intent(in)  :: device_id
       integer, intent(out) :: ierr
 
-      type(star_info), pointer :: s
+      type (star_info), pointer :: s
 
-      integer :: i_eq
-      integer :: n, last_model_plotted
+      ierr = 0
+      call get_star_ptr(id, s, ierr)
+      if (ierr /= 0) return
 
+      call pgslct(device_id)
+      call pgbbuf()
+      call pgeras()
+
+      call do_Max_eq_resid_plot(s, id, &
+         s% pg% Max_eq_resid_xleft, s% pg% Max_eq_resid_xright, &
+         s% pg% Max_eq_resid_ybot, s% pg% Max_eq_resid_ytop, .false., &
+         s% pg% Max_eq_resid_title, s% pg% Max_eq_resid_txt_scale_factor, &
+         s% pg% Max_eq_resid_max_width, ierr)
+      if (ierr /= 0) return
+
+      call pgebuf()
+
+   end subroutine Max_eq_resid_plot
+
+
+
+   ! history of residuals for each structure equation
+   subroutine do_Max_eq_resid_plot(s, id, &
+         win_xleft, win_xright, win_ybot, win_ytop, subplot, title, txt_scale, &
+         max_width, ierr)
+
+      integer, intent(in) :: id, max_width
+      logical, intent(in) :: subplot
+      real, intent(in) :: &
+         win_xleft, win_xright, win_ybot, win_ytop, txt_scale
+      character (len=*), intent(in) :: title
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+
+      integer :: i_eq, initial_width
+      integer :: n
+      integer, save :: resid_hist_nvar
+      integer, save :: init_model
       real :: xmin, xmax
       real :: ymin, ymax
 
-      real, dimension(max_resid_hist) :: xvec
-      real, dimension(max_resid_hist) :: yvec
+      ! use save, we set these once, and they are reused in later calls of this function
+      real, allocatable, dimension(:), save :: xvec, yvec, resid_hist_model
+      real, allocatable, dimension(:, :), save :: resid_hist_vals
+      character(len=strlen), allocatable, dimension(:), save :: resid_equ_names
 
       ierr = 0
 
@@ -50,39 +89,60 @@ contains
       if (ierr /= 0) return
 
       if (.not. allocated(resid_hist_model)) then
-         resid_hist_nvar = s%nvar_hydro
-         allocate(resid_hist_model(max_resid_hist))
-         allocate(resid_hist_vals(resid_hist_nvar, max_resid_hist))
-         allocate(resid_equ_names(resid_hist_nvar))
-
-         do i_eq = 1, resid_hist_nvar
-            resid_equ_names(i_eq) = trim(s%nameofequ(i_eq))
-         end do
-
-         n_resid_hist = 0
+         init_model = s% model_number - 1
       end if
 
-      if (s%model_number /= last_model_plotted) then
-         last_model_plotted = s%model_number
-         if (n_resid_hist < max_resid_hist) then
-            n_resid_hist = n_resid_hist + 1
+      if (max_width < 0) then
+         n = s% model_number - init_model
+      else
+         if (s% model_number < max_width) then
+            n = s% model_number - init_model
          else
-            resid_hist_model(1:max_resid_hist-1) = resid_hist_model(2:max_resid_hist)
-            resid_hist_vals(:,1:max_resid_hist-1) = resid_hist_vals(:,2:max_resid_hist)
+            n = max_width
+         end if
+      end if
+
+      if (.not. allocated(resid_hist_model)) then
+         resid_hist_nvar = s% nvar_hydro
+         if (max_width < 0) then
+            initial_width = 10
+         else
+            initial_width = max_width
+         end if
+         allocate(resid_hist_model(initial_width))
+         allocate(resid_hist_vals(resid_hist_nvar, initial_width))
+         allocate(resid_equ_names(resid_hist_nvar))
+         allocate(xvec(initial_width), yvec(initial_width), stat=ierr)
+         if (ierr /= 0) then
+            write(*,*) 'allocate failed for PGSTAR'
+            return
          end if
 
-         resid_hist_model(n_resid_hist) = s%model_number
-
          do i_eq = 1, resid_hist_nvar
-            resid_hist_vals(i_eq,n_resid_hist) = &
-               real(max(1d-40, &
-               maxval(abs(s%equ(i_eq,1:s%nz)))))
+            resid_equ_names(i_eq) = trim(s% nameofequ(i_eq))
          end do
 
+
+
+      else if (s% model_number - init_model >= size(resid_hist_model)) then
+         if (max_width < 0) then
+            ! grow the arrays
+            call realloc_resid_hist(2*size(resid_hist_model))
+         end if
       end if
 
-      n = n_resid_hist
-      if (n < 2) return ! nothing to plot yet
+      if (max_width > 1 .and. s% model_number > max_width) then  ! displace values back one step
+         resid_hist_model(1:n-1) = resid_hist_model(2:n)
+         resid_hist_vals(:,1:n-1) = resid_hist_vals(:,2:n)
+      end if
+
+      resid_hist_model(n) = s% model_number
+
+      ! get the max resid values for this step
+      do i_eq = 1, resid_hist_nvar
+         resid_hist_vals(i_eq, n) = &
+            real(max(1d-40, maxval(abs(s% equ(i_eq, 1:s% nz)))))
+      end do
 
       xvec(1:n) = real(resid_hist_model(1:n))
 
@@ -91,33 +151,33 @@ contains
 
       if (xmin >= xmax) xmax = xmin + 1.0
 
-      ymin = minval(resid_hist_vals(:,1:n))
-      ymax = maxval(resid_hist_vals(:,1:n))
+      ymin = minval(resid_hist_vals(:, 1:n))
+      ymax = maxval(resid_hist_vals(:, 1:n))
       ymin = max(ymin, 1e-20)
       ymax = max(ymax, 10.0*ymin)
 
-      call pgslct(device_id)
+!      call pgslct(device_id)
       call pgsave
-      call pgeras
-      call pgsvp(0.12, 0.88, 0.12, 0.88)
+      call pgeras()
+      call pgsvp(win_xleft, win_xright, win_ybot, win_ytop)
       call pgswin(xmin, xmax, log10(ymin), log10(ymax))
       call pgscf(1)
       call pgsch(1.0)
       call pgsci(1)
       call pgbox('BCNST',0.0,0,'BCNST',0.0,0)
       call pgmtxt('B',2.5,0.5,0.5,'Model Number')
-      call pgmtxt('L',3.0,0.5,0.5, 'log10(max |residual|)')
+      call pgmtxt('L',3.0,0.5,0.5,'log10(max |residual|)')
       call pgmtxt('T',1.0,0.5,0.5,'Maximum structural equation residuals')
 
       ! draw lines
       do i_eq = 1, resid_hist_nvar
-         yvec(1:n) = log10(resid_hist_vals(i_eq,1:n))
-         call pgsci(mod(i_eq-1,13)+2)
-         call pgline(n, xvec, yvec)
+         yvec(1:n) = log10(resid_hist_vals(i_eq, 1:n))
+         call pgsci(mod(i_eq-1,13) + 2)
+         call pgline(n, xvec(1:n), yvec(1:n))
       end do
 
       ! legend
-      call pgsch(0.65)
+      call pgsch(0.75)
 
       do i_eq = 1, resid_hist_nvar
          call pgsci(mod(i_eq-1,13)+2)
@@ -131,37 +191,28 @@ contains
       call pgsci(1)
       call pgunsa
 
-   end subroutine equ_resid_plot
+      contains
 
+      subroutine realloc_resid_hist(new_size)
+         integer, intent(in) :: new_size
+         real, allocatable :: tmp_model(:)
+         real, allocatable :: tmp_vals(:,:)
 
+         call move_alloc(resid_hist_model, tmp_model)
+         call move_alloc(resid_hist_vals,  tmp_vals)
 
-   ! history of residuals for each structure equation
-   subroutine do_equ_resid_plot(id, ierr)
-      integer, intent(in)  :: id
-      integer, intent(out) :: ierr
+         allocate(resid_hist_model(new_size))
+         allocate(resid_hist_vals(resid_hist_nvar, new_size))
 
-      type(pgstar_win_file_data), pointer :: p
-      type(star_info), pointer :: s
+         deallocate(xvec, yvec)
+         allocate(xvec(new_size), yvec(new_size))
 
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
+         resid_hist_model(1:n) = tmp_model(1:n)
+         resid_hist_vals(:,1:n) = tmp_vals(:,1:n)
 
-      p => s%pg%pgstar_win_file_ptr(i_Other)
-      p%plot              => equ_resid_plot
-      p%id                =  i_Other
-      p%name              = 'Max Residual per equation across mesh points'
-      p%win_flag          = .true.
-      p%win_width         =  12.0
-      p%win_aspect_ratio  =  0.6
-      p%file_flag         = .true.
-      p%file_dir          = 'png'         ! folder where to save files
-      p%file_prefix       = 'eq_resid_'
-      p%file_interval     =  5
-      p%file_width        = -1.0
-      p%file_aspect_ratio = -1.0
+         deallocate(tmp_model, tmp_vals)
+      end subroutine
 
-   end subroutine do_equ_resid_plot
-
+   end subroutine do_Max_eq_resid_plot
 
 end module pgstar_equation_residuals
