@@ -7814,6 +7814,35 @@
     Grid9_file_width = -1
     Grid9_file_aspect_ratio = -1
 
+
+      ! Max_eq_resid
+      ! ------------
+
+      ! ::
+
+   Max_eq_resid_win_flag = .false.
+   Max_eq_resid_win_width = 7
+   Max_eq_resid_win_aspect_ratio = 5d-1
+
+   Max_eq_resid_xleft = 0.15
+   Max_eq_resid_xright = 0.85
+   Max_eq_resid_ybot = 0.15
+   Max_eq_resid_ytop = 0.85
+   Max_eq_resid_txt_scale_factor = 1
+   Max_eq_resid_title = 'Max equation residuals'
+   Max_eq_resid_max_width = -1
+
+      ! **File output**
+
+      ! ::
+
+   Max_eq_resid_file_flag = .false.
+   Max_eq_resid_file_dir = 'png'
+   Max_eq_resid_file_prefix = 'max_eq_resid_'
+   Max_eq_resid_file_width = -1
+   Max_eq_resid_file_aspect_ratio = -1
+
+
 ! Annotation
 ! ==========
 

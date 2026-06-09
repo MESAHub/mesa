@@ -3023,6 +3023,22 @@
             Grid9_file_width, &
             Grid9_file_aspect_ratio, &
 
+            Max_eq_resid_win_flag, &
+            Max_eq_resid_win_width, &
+            Max_eq_resid_win_aspect_ratio, &
+            Max_eq_resid_file_flag, &
+            Max_eq_resid_file_width, &
+            Max_eq_resid_file_aspect_ratio, &
+            Max_eq_resid_file_dir, &
+            Max_eq_resid_file_prefix, &
+            Max_eq_resid_xleft, &
+            Max_eq_resid_xright, &
+            Max_eq_resid_ybot, &
+            Max_eq_resid_ytop, &
+            Max_eq_resid_txt_scale_factor, &
+            Max_eq_resid_title, &
+            Max_eq_resid_max_width, &
+
             annotation1_ci, &
             annotation1_ch, &
             annotation1_lw, &
@@ -3054,19 +3070,7 @@
             annotation3_fjust, &
 
             read_extra_pgstar_inlist, &
-            extra_pgstar_inlist_name, &
-
-            Kipp_residuals_win_flag, &
-            Kipp_residuals_file_flag, &
-            Kipp_residuals_win_width, &
-            Kipp_residuals_win_aspect_ratio, &
-            Kipp_residuals_file_width, &
-            Kipp_residuals_file_aspect_ratio, &
-            Kipp_residuals_min, &
-            Kipp_residuals_max, &
-            Kipp_residuals_file_dir, &
-            Kipp_residuals_file_prefix, &
-            Kipp_residuals_file_interval
+            extra_pgstar_inlist_name
 
       contains
 
@@ -6214,6 +6218,22 @@
          s% pg% Grid9_file_width = Grid9_file_width
          s% pg% Grid9_file_aspect_ratio = Grid9_file_aspect_ratio
 
+         s% pg% Max_eq_resid_win_flag = Max_eq_resid_win_flag
+         s% pg% Max_eq_resid_win_width = Max_eq_resid_win_width
+         s% pg% Max_eq_resid_win_aspect_ratio = Max_eq_resid_win_aspect_ratio
+         s% pg% Max_eq_resid_file_flag = Max_eq_resid_file_flag
+         s% pg% Max_eq_resid_file_width = Max_eq_resid_file_width
+         s% pg% Max_eq_resid_file_aspect_ratio = Max_eq_resid_file_aspect_ratio
+         s% pg% Max_eq_resid_file_dir = Max_eq_resid_file_dir
+         s% pg% Max_eq_resid_file_prefix = Max_eq_resid_file_prefix
+         s% pg% Max_eq_resid_xleft = Max_eq_resid_xleft
+         s% pg% Max_eq_resid_xright = Max_eq_resid_xright
+         s% pg% Max_eq_resid_ybot = Max_eq_resid_ybot
+         s% pg% Max_eq_resid_ytop = Max_eq_resid_ytop
+         s% pg% Max_eq_resid_txt_scale_factor = Max_eq_resid_txt_scale_factor
+         s% pg% Max_eq_resid_title = Max_eq_resid_title
+         s% pg% Max_eq_resid_max_width = Max_eq_resid_max_width
+
 
          s% pg% annotation1_ci = annotation1_ci
          s% pg% annotation1_ch = annotation1_ch
@@ -6248,17 +6268,6 @@
          s% pg% read_extra_pgstar_inlist = read_extra_pgstar_inlist
          s% pg% extra_pgstar_inlist_name = extra_pgstar_inlist_name
 
-         s% pg% Kipp_residuals_win_flag = Kipp_residuals_win_flag
-         s% pg% Kipp_residuals_win_width = Kipp_residuals_win_width
-         s% pg% Kipp_residuals_win_aspect_ratio = Kipp_residuals_win_aspect_ratio
-
-         s% pg% Kipp_residuals_file_flag = Kipp_residuals_file_flag
-         s% pg% Kipp_residuals_file_dir = Kipp_residuals_file_dir
-         s% pg% Kipp_residuals_file_prefix = Kipp_residuals_file_prefix
-         s% pg% Kipp_residuals_file_interval = Kipp_residuals_file_interval
-         s% pg% Kipp_residuals_file_width = Kipp_residuals_file_width
-         s% pg% Kipp_residuals_file_aspect_ratio = Kipp_residuals_file_aspect_ratio
-
       end subroutine store_pgstar_controls
 
 
@@ -6284,7 +6293,7 @@
 
          Profile_Panels1_yaxis_name(:) = ''
          Profile_Panels1_other_yaxis_name(:) = ''
-        Profile_Panels2_yaxis_name(:) = ''
+         Profile_Panels2_yaxis_name(:) = ''
          Profile_Panels2_other_yaxis_name(:) = ''
          Profile_Panels3_yaxis_name(:) = ''
          Profile_Panels3_other_yaxis_name(:) = ''
@@ -6708,14 +6717,6 @@
          Grid9_plot_rowspan(:) = 0
          Grid9_plot_col(:) = 0
          Grid9_plot_colspan(:) = 0
-
-         Kipp_residuals_file_flag = .false.
-         Kipp_residuals_win_flag = .false.
-         Kipp_residuals_file_dir = ''
-         Kipp_residuals_file_prefix = 'kipp_residuals_'
-         Kipp_residuals_file_interval = 10
-         Kipp_residuals_file_width = 12
-         Kipp_residuals_file_aspect_ratio = 0.6
 
          include 'pgstar.defaults'
 
