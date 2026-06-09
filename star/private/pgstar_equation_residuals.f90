@@ -48,7 +48,7 @@ contains
       call do_Max_eq_resid_plot(s, id, &
          s% pg% Max_eq_resid_xleft, s% pg% Max_eq_resid_xright, &
          s% pg% Max_eq_resid_ybot, s% pg% Max_eq_resid_ytop, .false., &
-         s% pg% Max_eq_resid_title, s% pg% Max_eq_resid_txt_scale_factor, &
+         s% pg% Max_eq_resid_title, s% pg% Max_eq_resid_txt_scale, &
          s% pg% Max_eq_resid_max_width, ierr)
       if (ierr /= 0) return
 
@@ -122,8 +122,6 @@ contains
             resid_equ_names(i_eq) = trim(s% nameofequ(i_eq))
          end do
 
-
-
       else if (s% model_number - init_model >= size(resid_hist_model)) then
          if (max_width < 0) then
             ! grow the arrays
@@ -156,18 +154,18 @@ contains
       ymin = max(ymin, 1e-20)
       ymax = max(ymax, 10.0*ymin)
 
-!      call pgslct(device_id)
       call pgsave
-      call pgeras()
+      call pgsci(0)                       ! color index 0 = background
       call pgsvp(win_xleft, win_xright, win_ybot, win_ytop)
+      call pgrect(0.0, 1.0, 0.0, 1.0)   ! pseudo erase
       call pgswin(xmin, xmax, log10(ymin), log10(ymax))
+      call pgsch(txt_scale)
       call pgscf(1)
-      call pgsch(1.0)
       call pgsci(1)
       call pgbox('BCNST',0.0,0,'BCNST',0.0,0)
       call pgmtxt('B',2.5,0.5,0.5,'Model Number')
       call pgmtxt('L',3.0,0.5,0.5,'log10(max |residual|)')
-      call pgmtxt('T',1.0,0.5,0.5,'Maximum structural equation residuals')
+      call pgmtxt('T',1.0,0.5,0.5, title)
 
       ! draw lines
       do i_eq = 1, resid_hist_nvar
@@ -177,13 +175,13 @@ contains
       end do
 
       ! legend
-      call pgsch(0.75)
+      call pgsch(0.75 * txt_scale)
 
       do i_eq = 1, resid_hist_nvar
          call pgsci(mod(i_eq-1,13)+2)
          call pgptxt( &
-            xmin + (0.55 + 0.06*real(i_eq-1))*(xmax-xmin), &
-            log10(ymax) - 0.03*(log10(ymax)-log10(ymin)), &
+            xmax + 0.03, &
+            log10(ymax) - (0.03 + 0.06*real(i_eq-1))*(log10(ymax)-log10(ymin)), &
             0.0, 0.0, &
             trim(resid_equ_names(i_eq)))
       end do
