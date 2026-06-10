@@ -162,6 +162,7 @@ contains
          nr_model_buf(1:max_width-1) = nr_model_buf(2:max_width)
          nr_resid_buf(1:max_width-1, :) = nr_resid_buf(2:max_width, :)
          nr_ycoord_buf(1:max_width-1, :) = nr_ycoord_buf(2:max_width, :)
+         nr_zone_buf(1:max_width-1) = nr_zone_buf(2:max_width)
       end if
 
       nr_model_buf(n) = s% model_number
@@ -174,7 +175,6 @@ contains
          case ('mass')
             nr_ycoord_buf(n, k) = real(s% m(k)/Msun)
          case ('logR')
-            ! cell-centered radius in log10(R/Rsun)
             if (k < s%nz) then
                nr_ycoord_buf(n, k) = real(safe_log10(0.5d0 * (s% r(k) + s% r(k+1)) / Rsun))
             else
@@ -209,7 +209,6 @@ contains
          real :: clo, chi, dcoord, coord_j, frac
          integer :: nx, ny, i, j, k, nz_i
          logical :: y_reverse
-
 
          if (.not. allocated(r_save)) then
             call pgqcir(c_low, c_high)
@@ -266,7 +265,6 @@ contains
          end select
 
          dcoord = (chi - clo) / real(ny - 1)
-
          do j = 1, ny
             if (.not. y_reverse) then
                coord_grid(j) = clo + real(j - 1) * dcoord
@@ -310,7 +308,7 @@ contains
          ! world_y(j) = tr(4) + tr(6)*j
          ! j=1  -> mhi  =>  tr(4) = mhi - tr(6) = mhi + dm
          ! j=ny -> mlo  =>  confirms tr(6) = -dm
-         tr(1) = xlo
+         tr(1) = xlo - 0.5
          tr(2) = (xhi - xlo) / real(nx)
          tr(3) = 0.0
          tr(4) = chi + dcoord
