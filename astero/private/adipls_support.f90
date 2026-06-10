@@ -28,18 +28,18 @@
       implicit none
 
       ! args for adipls
-      integer, save :: i_paramset, ierr_param, i_inout, nn
-      real(dp), save, pointer :: x(:) => null()  ! (nn)
-      real(dp), save, pointer :: aa(:,:) => null()  ! (iaa_arg,nn)
-      real(dp), save :: data(8)
+      integer :: i_paramset, ierr_param, i_inout, nn
+      real(dp), pointer :: x(:) => null()  ! (nn)
+      real(dp), pointer :: aa(:,:) => null()  ! (iaa_arg,nn)
+      real(dp) :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
-      integer, save :: iounit_dev_null = -1
-      integer, save :: nn_redist  ! set from redistrb.c input file
+      integer :: iounit_dev_null = -1
+      integer :: nn_redist  ! set from redistrb.c input file
 
-      real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
-      integer, save :: nn_arg
-      real(dp), save :: data_arg(8)
+      real(dp), pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
+      integer :: nn_arg
+      real(dp) :: data_arg(8)
 
       logical, parameter :: ADIPLS_IS_ENABLED = .true.
 

@@ -36,7 +36,7 @@ module micro
 
   logical, parameter :: dbg = .false.
   logical :: initialize_kap_grid = .true.
-  real(dp), public, save :: fk_pcg_old(17)
+  real(dp), public :: fk_pcg_old(17)
 
 contains
 

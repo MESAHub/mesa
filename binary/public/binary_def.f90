@@ -252,9 +252,7 @@
 
       logical :: have_initialized_binary_handles = .false.
       integer, parameter :: max_binary_handles = 10  ! this can be increased as necessary
-      type (binary_info), target, save :: binary_handles(max_binary_handles)
-         ! gfortran seems to require "save" here.  at least it did once upon a time.
-
+      type (binary_info), target :: binary_handles(max_binary_handles)
 
       contains
 

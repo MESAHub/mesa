@@ -38,6 +38,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_design",
     "sphinx_tags",
+    "mesa_tags",
     "sphinxemoji.sphinxemoji",
 ]
 
@@ -115,13 +116,24 @@ html_theme_options = {
 
 # sphinx_tags options
 tags_create_tags = True
-tags_overview_title = "Test Problem tags"
-tags_page_title = "Tags"
-tags_page_header = "Test problems with this tag"
+tags_overview_title = "Test Suite Gallery"
+tags_page_title = "Test Suite Gallery"
+tags_page_header = "Test suite cases with this tag"
 tags_create_badges = True
 tags_badge_colors = {
-    "star": "primary",
-    "binary": "primary",
+    "star": "module-star",
+    "binary": "module-binary",
+    "astero": "module-astero",
+    "adipls": "module-adipls",
+    "atm": "module-atm",
+    "colors": "module-colors",
+    "eos": "module-eos",
+    "gyre": "module-gyre",
+    "kap": "module-kap",
+    "net": "module-net",
+    "rates": "module-rates",
+    "rsp": "module-rsp",
+    "stella": "module-stella",
     "high-mass": "secondary",
     "low-mass": "secondary",
 }

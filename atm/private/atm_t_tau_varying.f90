@@ -704,6 +704,7 @@ contains
       real(dp) :: atm_structure_sgl(num_results_for_build_atm)
 
       ierr = 0
+      irtrn = 0
 
       ! Evaluate structure data
 

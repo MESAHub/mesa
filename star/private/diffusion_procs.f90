@@ -34,7 +34,7 @@
       public :: setup_struct_info
 
       integer, parameter :: ngp = 2
-      real(dp), public, save :: fk_gam_old(ngp,17)
+      real(dp), public :: fk_gam_old(ngp,17)
       logical :: initialize_gamma_grid = .true.
 
       contains

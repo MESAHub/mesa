@@ -4,6 +4,8 @@
 starspots
 ******************
 
+.. tags:: star, magnetic-field, starspots, surface-boundary-condition, low-mass
+
 This test suite case evolves a 0.9 |Msun|, solar metallicity (Z=0.02) model
 to an age of 24.63 Gyr using MESA's implementation of the
 YREC (Yale Rotating Evolution Code) SPOTS formalism introduced by
@@ -30,10 +32,10 @@ Detailed discussion of this functionality can be found in
 
 A plot of the HR diagram for the problem is included below:
 
-.. image:: ../../../star/test_suite/starspots/docs/hr_starspots_001497.svg
+.. image:: ../../../star/test_suite/starspots/docs/hr_starspots_001496.svg
    :width: 100%
 
 
 Last-Updated: 09Aug2024 by Meridith Joyce
 
-Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 656 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 1028 seconds using 8 threads.

@@ -61,15 +61,15 @@ module op_def
                                               22.9898, 24.305, 26.9815, 28.086, 32.06, 39.948, &
                                               40.08, 51.996, 54.9380, 55.847, 58.71]
 
-   integer, save :: ite1, ite2, ite3, jne3, ntotp, nc, nf
-   integer, dimension(91), save :: jn1, jn2
-   integer, dimension(17), save :: int
-   real, save :: umin, umax
-   real, dimension(17, 91, 25), save :: epatom, oplnck
-   integer, dimension(17, 91, 25), save :: ne1p, ne2p, np, kp1, kp2, kp3, npp
-   real, dimension(-1:28, 28, 91, 25), save :: fionp
-   real, allocatable, dimension(:), save :: yy2, yx
-   integer, allocatable, dimension(:), save :: nx
+   integer :: ite1, ite2, ite3, jne3, ntotp, nc, nf
+   integer, dimension(91) :: jn1, jn2
+   integer, dimension(17) :: int
+   real :: umin, umax
+   real, dimension(17, 91, 25) :: epatom, oplnck
+   integer, dimension(17, 91, 25) :: ne1p, ne2p, np, kp1, kp2, kp3, npp
+   real, dimension(-1:28, 28, 91, 25) :: fionp
+   real, allocatable, dimension(:) :: yy2, yx
+   integer, allocatable, dimension(:) :: nx
 
    integer, parameter :: op_cache_version = 1
 

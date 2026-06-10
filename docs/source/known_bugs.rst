@@ -10,6 +10,54 @@ we will also list workarounds, but for some bugs the only option will be to upda
 a newer version of MESA. Note this list is NOT comprehensive; users should check this first if they have an
 issue, but it may not be complete.
 
+r26.4.1
+=======
+
+.. _overshoot_other_alpha_mlt_bug:
+
+Diffusive overshooting: ``other_alpha_mlt`` ignored
+---------------------------------------------------
+
+Diffusive overshooting (overmixing) routines did not respect changes to the
+mixing length set by ``other_alpha_mlt``, and used the ``mixing_length_alpha``
+instead.
+
+This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
+
+.. _report_max_infall_inside_fe_core_bug:
+
+Controls: ``report_max_infall_inside_fe_core`` is ignored
+---------------------------------------------------------
+
+The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
+
+r25.12.1
+========
+
+.. _colors_zbase_bug:
+
+Colors: atmosphere metallicity selected from ``Zbase``
+------------------------------------------------------
+
+In ``r25.12.1``, the new colors module could select atmosphere metallicity from ``Zbase`` instead
+of the current photospheric ``[M/H]`` from ``Z/X``. This could return solar-metallicity colors and
+SEDs for non-solar models, especially for metal-poor stars.
+
+This is fixed in ``r26.4.1``. Update to ``r26.4.1`` or newer.
+
+See `gh-938 <https://github.com/MESAHub/mesa/issues/938>`_.
+
+.. _reverse_rate_mass_exponent_bug:
+
+Rates: incorrect mass exponent in reverse detailed balance
+----------------------------------------------------------
+
+Versions ``r24.08.1`` and ``r25.12.1`` could use an incorrect exponent on the reactant/product mass ratio when computing reverse rates from detailed balance in ``rates/private/reaclib_support.f90``. The mass ratio should always enter as ``(m_in/m_out)^(3/2)``. This is most relevant at higher temperatures in excess of ``2 GK`` during advanced burning stages, when reverse detailed-balance rates become important.
+
+This affects reactions with ``Ni-No`` not equal to 1, including common ``Ni-No = 0`` cases and photodisintegration cases. In practice, common ``2 <-> 2`` exchange reactions and ``3 <-> 1`` reverse rates are affected. Standard ``2 <-> 1`` capture and photo pairs are not changed by this specific exponent bug.
+
+This is fixed in ``r26.4.1``. Update to ``r26.4.1`` or newer. Users who need the patch directly can also refer to `gh-975 <https://github.com/MESAHub/mesa/pull/975>`_. See also `gh-974 <https://github.com/MESAHub/mesa/issues/974>`_.
+
 r23.05.1
 ========
 
@@ -181,5 +229,3 @@ r12778
 
 r12115
 ======
-
-

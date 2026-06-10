@@ -28,16 +28,16 @@
 
       implicit none
 
-      integer , pointer, public, save :: izz(:),ite(:),jne(:)
-      real(dp), pointer, public, save :: sig(:,:,:)
-      real(dp), pointer, public, save :: epatom(:,:),amamu(:),eumesh(:,:,:)
-      real(dp), pointer, public, save :: lkap_ross_pcg(:)
+      integer , pointer, public :: izz(:),ite(:),jne(:)
+      real(dp), pointer, public :: sig(:,:,:)
+      real(dp), pointer, public :: epatom(:,:),amamu(:),eumesh(:,:,:)
+      real(dp), pointer, public :: lkap_ross_pcg(:)
       integer, public, parameter :: ngp = 2
-      real(dp), public, save :: lgamm_pcg(ngp,17,1648), lkap_face_pcg(ngp,1648), logT_pcg(ngp,1648), logRho_pcg(ngp,1648)
+      real(dp), public :: lgamm_pcg(ngp,17,1648), lkap_face_pcg(ngp,1648), logT_pcg(ngp,1648), logRho_pcg(ngp,1648)
       integer, parameter :: nzm = 3000
-      real(dp), public, save :: fk_old(nzm,17), fk_old_grad(nzm,17)
-      real(dp), public, save ::logT_grid_old(nzm,4,4), logRho_grid_old(nzm,4,4), fk_pcg(17), fk_grad_pcg(ngp,17)
-      real(dp), public, save :: lkap_grid_old(nzm,4,4), logT_cntr_old(nzm), logRho_cntr_old(nzm)
+      real(dp), public :: fk_old(nzm,17), fk_old_grad(nzm,17)
+      real(dp), public ::logT_grid_old(nzm,4,4), logRho_grid_old(nzm,4,4), fk_pcg(17), fk_grad_pcg(ngp,17)
+      real(dp), public :: lkap_grid_old(nzm,4,4), logT_cntr_old(nzm), logRho_cntr_old(nzm)
       logical :: initialize_fk_old = .true.
       contains  ! the procedure interface for the library
       ! client programs should only call these routines.

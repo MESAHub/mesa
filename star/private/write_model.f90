@@ -150,9 +150,6 @@
          if (s% tau_factor /= 1) then
             write(iounit, 1) 'tau_factor', s% tau_factor
          end if
-         if (s% Tsurf_factor /= 1) then
-            write(iounit, 1) 'Tsurf_factor', s% Tsurf_factor
-         end if
          if (s% opacity_factor /= 1) then
             write(iounit, 1) 'opacity_factor', s% opacity_factor
          end if

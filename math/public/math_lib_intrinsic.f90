@@ -20,6 +20,7 @@
 module math_lib
 
   use const_def, only: dp, pi
+  use utils_lib, only: is_inf, is_nan
 
   use math_io
   use math_pown
@@ -86,7 +87,7 @@ module math_lib
      module procedure atanpi_
   end interface atanpi
 
-  real(dp), save :: ln10_m
+  real(dp) :: ln10_m
 
   private
 

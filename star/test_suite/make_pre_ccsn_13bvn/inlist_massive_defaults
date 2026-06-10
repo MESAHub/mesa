@@ -24,6 +24,8 @@
 / ! end of star_job namelist
 
 &eos
+  mass_fraction_limit_for_Skye  = 1d-16
+
 / ! end of eos namelist
 
 &kap
@@ -38,6 +40,9 @@
 
 
 &controls
+
+! For test_suite testing
+max_model_number = 8000
 
 ! Initial model controls
      initial_mass = 12.0
@@ -100,11 +105,6 @@
 ! Let's decouple burning and mixing in zones above 4.2d9, or else
 ! you might run into convergence issues near cc without better numerical resolution, see MESA VI
 
-     ! To get the star to cc.
-     op_split_burn = .true.
-     op_split_burn_min_T = 4.2d9
-     op_split_burn_eps = 1d-5 !1d-7
-     op_split_burn_odescal = 1d-5 !1d-8
 
      ! high center T limit to avoid negative mass fractions
      sig_min_factor_for_high_Tcenter = 0.01
@@ -142,13 +142,17 @@
 ! solver controls
       ! Can't handle large residuals at this low of numerical resolution, so we need help.
       use_gold_tolerances = .true.
-      use_gold2_tolerances = .true.
+      use_gold2_tolerances = .false.
       convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true. ! impossible without this.
       mlt_make_surface_no_mixing = .true.
       energy_eqn_option = 'dedt'
       include_composition_in_eps_grav = .true.
       !min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
+      gold_tol_residual_norm3 = 1d-5
+      gold_tol_max_residual3 = 1d-3
+      ignore_species_in_max_correction                = .false.
+      fix_d_eos_dxa_partials                          = .false.
 
 
 ! mesh resolution section

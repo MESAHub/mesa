@@ -18,8 +18,6 @@
       change_rotation_flag = .false.  ! rotation off until near zams
       num_steps_to_relax_rotation = 50
 
-      pgstar_flag = .false.
-
 / ! end of star_job namelist
 
 

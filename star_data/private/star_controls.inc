@@ -258,6 +258,14 @@
          real(dp) :: TDC_alpha_D   ! ~ RSP2_alfad
          real(dp) :: TDC_alpha_R  ! ~ RSP2_alfar
          real(dp) :: TDC_alpha_Pt  ! RSP2_alfap
+         real(dp) :: TDC_alpha_M
+         real(dp) :: TDC_alpha_C
+         real(dp) :: TDC_alpha_S
+         logical :: TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+         logical :: include_mlt_corr_to_TDC
+         logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
+         real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
+         real(dp) :: TDC_num_outermost_cells_forced_nonturbulent
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag
@@ -327,6 +335,7 @@
          logical        :: do_premix_heating ! include eps_pre_mix in energy equation
 
          real(dp)       :: overshoot_f(NUM_OVERSHOOT_PARAM_SETS)
+         real(dp)       :: overshoot_f2(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_f0(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_D0(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_Delta0(NUM_OVERSHOOT_PARAM_SETS)
@@ -421,8 +430,7 @@
          real(dp) :: fixed_vsurf
          logical :: use_fixed_Psurf_outer_BC
          real(dp) :: fixed_Psurf
-
-         real(dp) :: Tsurf_factor
+         logical :: use_RSP_L_eqn_outer_BC
 
       ! create atmosphere
 
@@ -696,6 +704,11 @@
 
          logical :: split_merge_amr_avoid_repeated_remesh
 
+         logical :: remesh_for_TDC_pulsations_log_core_zoning
+         logical :: TDC_hydro_use_mass_interp_face_values
+         integer :: TDC_hydro_nz, TDC_hydro_nz_outer
+         real(dp) :: TDC_hydro_T_anchor, TDC_hydro_dq_1_factor
+         
       ! nuclear reaction parameters
 
          character (len=strlen) :: screening_mode, default_net_name

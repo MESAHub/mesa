@@ -26,11 +26,11 @@ module atm_utils
 
   integer, parameter :: E2_NPAIRS = 571
 
-  real(dp), target, save  :: E2_x(E2_NPAIRS)
-  real(dp), save          :: E2_pairs(2*E2_NPAIRS)
-  real(dp), target, save  :: E2_f_ary(4*E2_NPAIRS)
-  real(dp), pointer, save :: E2_f1(:), E2_f(:,:)
-  logical, save           :: have_E2_interpolant = .false.
+  real(dp), target  :: E2_x(E2_NPAIRS)
+  real(dp)          :: E2_pairs(2*E2_NPAIRS)
+  real(dp), target  :: E2_f_ary(4*E2_NPAIRS)
+  real(dp), pointer :: E2_f1(:), E2_f(:,:)
+  logical           :: have_E2_interpolant = .false.
 
   private
   public :: init

@@ -472,7 +472,6 @@
          use other_photo_read, only: default_other_photo_read
          use other_set_pgstar_controls, only: default_other_set_pgstar_controls
          use other_kap
-         use pgstar_decorator
          use star_utils, only: init_random
 
          type (star_info), pointer :: s
@@ -508,7 +507,6 @@
          s% model_number_for_last_retry = 0
          s% dt_limit_ratio = 0
          s% force_tau_factor = 0
-         s% force_Tsurf_factor = 0
          s% force_opacity_factor = 0
 
          s% generations = 0

@@ -114,7 +114,7 @@
          real(dp), dimension(:,:), pointer :: dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), soln=>null()
          real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
             row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
-            save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null()
+            save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null(), band1=>null()
          real(dp), dimension(:,:), pointer :: rhs=>null()
          integer, dimension(:), pointer :: ipiv1=>null()
          real(dp), dimension(:,:), pointer :: ddx=>null(), xder=>null()
@@ -137,7 +137,8 @@
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
          integer :: nz, iter, max_tries, tiny_corr_cnt, i, &
             force_iter_value, iter_for_resid_tol2, iter_for_resid_tol3, &
-            max_corr_k, max_corr_j, max_resid_k, max_resid_j
+            max_corr_k, max_corr_j, max_resid_k, max_resid_j, &
+            band_kl, band_ku, band_ldab, band_diag
          integer(i8) :: time0
          character (len=strlen) :: err_msg
          logical :: first_try, dbg_msg, passed_tol_tests, &
@@ -151,6 +152,7 @@
          real(dp), pointer, dimension(:) :: equ1=>null()
          real(dp), pointer, dimension(:,:) :: equ=>null()  ! (nvar,nz)
          real(dp), pointer, dimension(:,:) :: AF=>null()  ! (ldAF,neq)
+         real(dp), pointer, dimension(:,:) :: band=>null()  ! (band_ldab,neq)
          real(dp), pointer, dimension(:,:,:) :: ublk=>null(), dblk=>null(), lblk=>null()  ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF=>null(), dblkF=>null(), ublkF=>null()  ! (nvar,nvar,nz)
 
@@ -1022,8 +1024,17 @@
                !$OMP END PARALLEL DO SIMD
             end if
 
-            call factor_mtx(ierr)
-            if (ierr == 0) call solve_mtx(ierr)
+            select case (trim(s% hydro_matrix_solver))
+            case ('bcyclic')
+               call factor_bcyclic_mtx(ierr)
+               if (ierr == 0) call solve_bcyclic_mtx(ierr)
+            case ('banded')
+               call solve_banded_mtx(ierr)
+            case default
+               write(*,*) 'bad value for hydro_matrix_solver: ' // &
+                  trim(s% hydro_matrix_solver)
+               ierr = -1
+            end select
 
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD
@@ -1046,24 +1057,105 @@
          end function solve_equ
 
 
-         subroutine factor_mtx(ierr)
+         subroutine factor_bcyclic_mtx(ierr)
             use star_bcyclic, only: bcyclic_factor
             integer, intent(out) :: ierr
             call bcyclic_factor( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, row_scale_factors1, col_scale_factors1, &
                equed1, iter, ierr)
-         end subroutine factor_mtx
+         end subroutine factor_bcyclic_mtx
 
 
-         subroutine solve_mtx(ierr)
+         subroutine solve_bcyclic_mtx(ierr)
             use star_bcyclic, only: bcyclic_solve
             integer, intent(out) :: ierr
             call bcyclic_solve( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
                iter, ierr)
-         end subroutine solve_mtx
+         end subroutine solve_bcyclic_mtx
+
+
+         subroutine solve_banded_mtx(ierr)
+            integer, intent(out) :: ierr
+            integer :: info, k, i_equ, i_var, irow, jcol, row0, col0, iband
+
+            ierr = 0
+            if (.not. associated(band)) then
+               write(*,*) 'band storage is not allocated for hydro_matrix_solver=banded'
+               ierr = -1
+               return
+            end if
+
+            band(1:band_ldab,1:neq) = 0d0
+            soln1(1:neq) = B1(1:neq)
+
+            do k = 1, nz
+               row0 = nvar*(k-1)
+               do i_equ = 1, nvar
+                  irow = row0 + i_equ
+
+                  do i_var = 1, nvar
+                     jcol = row0 + i_var
+                     iband = band_diag + irow - jcol
+                     if (iband < 1 .or. iband > band_ldab) then
+                        write(*,*) 'hydro banded matrix entry outside band', &
+                           irow, jcol, iband, band_ldab
+                        ierr = -1
+                        return
+                     end if
+                     band(iband,jcol) = dblk(i_equ,i_var,k)
+                  end do
+
+                  if (k > 1) then
+                     col0 = nvar*(k-2)
+                     do i_var = 1, nvar
+                        jcol = col0 + i_var
+                        iband = band_diag + irow - jcol
+                        if (iband < 1 .or. iband > band_ldab) then
+                           write(*,*) 'hydro banded matrix entry outside band', &
+                              irow, jcol, iband, band_ldab
+                           ierr = -1
+                           return
+                        end if
+                        band(iband,jcol) = lblk(i_equ,i_var,k)
+                     end do
+                  end if
+
+                  if (k < nz) then
+                     col0 = nvar*k
+                     do i_var = 1, nvar
+                        jcol = col0 + i_var
+                        iband = band_diag + irow - jcol
+                        if (iband < 1 .or. iband > band_ldab) then
+                           write(*,*) 'hydro banded matrix entry outside band', &
+                              irow, jcol, iband, band_ldab
+                           ierr = -1
+                           return
+                        end if
+                        band(iband,jcol) = ublk(i_equ,i_var,k)
+                     end do
+                  end if
+               end do
+            end do
+
+            call DGBTRF(neq, neq, band_kl, band_ku, band, band_ldab, ipiv1, info)
+            if (info /= 0) then
+               write(*,*) 'hydro banded DGBTRF failed', info
+               ierr = info
+               return
+            end if
+
+            call DGBTRS('N', neq, band_kl, band_ku, 1, band, band_ldab, &
+               ipiv1, soln1, neq, info)
+            if (info /= 0) then
+               write(*,*) 'hydro banded DGBTRS failed', info
+               ierr = info
+               return
+            end if
+
+         end subroutine solve_banded_mtx
 
 
          subroutine test_cell_partials(s, k, save_dx, save_equ, ierr)
@@ -1826,6 +1918,15 @@
             allocate(save_dblk1(1:nvar*neq))
             allocate(save_lblk1(1:nvar*neq))
 
+            band_kl = 2*nvar
+            band_ku = 2*nvar
+            band_ldab = 2*band_kl + band_ku + 1
+            band_diag = band_kl + band_ku + 1
+            if (trim(s% hydro_matrix_solver) == 'banded') then
+               allocate(band1(1:band_ldab*neq))
+               band(1:band_ldab,1:neq) => band1(1:band_ldab*neq)
+            end if
+
             if (s% fill_arrays_with_NaNs) then
                call fill_with_NaNs(dxsave1)
                call fill_with_NaNs(ddxsave1)
@@ -1839,6 +1940,7 @@
                call fill_with_NaNs(save_ublk1)
                call fill_with_NaNs(save_dblk1)
                call fill_with_NaNs(save_lblk1)
+               if (associated(band1)) call fill_with_NaNs(band1)
             end if
 
             dxsave(1:nvar,1:nz) => dxsave1(1:neq)
@@ -1890,6 +1992,7 @@
             if(associated(save_ublk1)) deallocate(save_ublk1)
             if(associated(save_dblk1)) deallocate(save_dblk1)
             if(associated(save_lblk1)) deallocate(save_lblk1)
+            if(associated(band1)) deallocate(band1)
             if(associated(ipiv1)) deallocate(ipiv1)
 
             if(associated(ublk1)) deallocate(ublk1)
@@ -1902,8 +2005,8 @@
 
             nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
                      soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
-                     col_scale_factors1, save_ublk1, save_dblk1, save_lblk1,&
-                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1)
+                     col_scale_factors1, save_ublk1, save_dblk1, save_lblk1, band1,&
+                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1, band)
 
          end subroutine cleanup
 

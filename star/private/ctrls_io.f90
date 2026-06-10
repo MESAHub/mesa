@@ -108,7 +108,7 @@
     TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
     TDC_alpha_C, TDC_alpha_S, &
     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
-    TDC_use_density_form_for_eddy_viscosity, &
+    TDC_use_density_form_for_eddy_viscosity, TDC_adjust_mass_fallback_to_mlt, &
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
     include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, TDC_include_eturb_in_energy_equation, &
@@ -147,7 +147,7 @@
     predictive_bdy_q_min, predictive_bdy_q_max, T_mix_limit, RSP_report_undercorrections, &
     do_conv_premix, conv_premix_avoid_increase, conv_premix_time_factor, &
     conv_premix_fix_pgas, conv_premix_dump_snapshots, do_premix_heating, &
-    overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
+    overshoot_f, overshoot_f2, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, dq_D_mix_zero_at_H_C_crossover, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, max_conv_vel_div_csound, &
@@ -361,11 +361,13 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     max_logT_for_include_P_and_L_in_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
+    use_TDC_Y_face_seeded_newton, &
+    hydro_matrix_solver, &
     remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
-    retry_for_v_above_clight, &
+    report_max_infall_inside_fe_core, retry_for_v_above_clight, &
 
     ! hydro solver
     use_gold2_tolerances, gold2_solver_iters_timestep_limit, steps_before_use_gold2_tolerances, &
@@ -501,7 +503,7 @@
     atm_irradiated_kap_v, atm_irradiated_kap_v_div_kap_th, atm_irradiated_P_surf, &
     atm_irradiated_max_iters, &
 
-    use_compression_outer_BC, use_momentum_outer_BC, Tsurf_factor, use_zero_Pgas_outer_BC, &
+    use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, &
     fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
 
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
@@ -1123,6 +1125,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% do_premix_heating = do_premix_heating
 
  s% overshoot_f = overshoot_f
+ s% overshoot_f2 = overshoot_f2
  s% overshoot_f0 = overshoot_f0
  s% overshoot_D0 = overshoot_D0
  s% overshoot_Delta0 = overshoot_Delta0
@@ -1292,7 +1295,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% use_compression_outer_BC = use_compression_outer_BC
  s% use_momentum_outer_BC = use_momentum_outer_BC
- s% Tsurf_factor = Tsurf_factor
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
@@ -2092,6 +2094,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_alpha_S = TDC_alpha_S
  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
+ s% TDC_adjust_mass_fallback_to_mlt = TDC_adjust_mass_fallback_to_mlt
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
@@ -2101,6 +2104,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
+ s% use_TDC_Y_face_seeded_newton = use_TDC_Y_face_seeded_newton
+ s% hydro_matrix_solver = hydro_matrix_solver
  s% TDC_hydro_use_mass_interp_face_values = TDC_hydro_use_mass_interp_face_values
  s% TDC_hydro_nz = TDC_hydro_nz
  s% TDC_hydro_nz_outer = TDC_hydro_nz_outer
@@ -2844,6 +2849,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  do_premix_heating = s% do_premix_heating
 
  overshoot_f = s% overshoot_f
+ overshoot_f2 = s% overshoot_f2
  overshoot_f0 = s% overshoot_f0
  overshoot_D0 = s% overshoot_D0
  overshoot_Delta0 = s% overshoot_Delta0
@@ -3012,7 +3018,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  use_compression_outer_BC = s% use_compression_outer_BC
  use_momentum_outer_BC = s% use_momentum_outer_BC
- Tsurf_factor = s% Tsurf_factor
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
@@ -3803,6 +3808,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alpha_S = s% TDC_alpha_S
  TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
  TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
+ TDC_adjust_mass_fallback_to_mlt = s% TDC_adjust_mass_fallback_to_mlt
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
@@ -3812,6 +3818,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
+ use_TDC_Y_face_seeded_newton = s% use_TDC_Y_face_seeded_newton
+ hydro_matrix_solver = s% hydro_matrix_solver
  TDC_hydro_use_mass_interp_face_values = s% TDC_hydro_use_mass_interp_face_values
  TDC_hydro_nz = s% TDC_hydro_nz
  TDC_hydro_nz_outer = s% TDC_hydro_nz_outer

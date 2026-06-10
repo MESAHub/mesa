@@ -4,6 +4,8 @@
 wd_diffusion
 ************
 
+.. tags:: star, element-diffusion, white-dwarf, carbon-oxygen-white-dwarf, white-dwarf-cooling
+
 This test case the checks element diffusion in a 0.6 Msun carbon-oxygen white dwarf.
 
 This test case has 1 part. Click to see a larger version of a plot.

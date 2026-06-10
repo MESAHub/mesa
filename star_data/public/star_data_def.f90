@@ -107,8 +107,7 @@ module star_data_def
 
    logical :: have_initialized_star_handles = .false.
    integer, parameter :: max_star_handles = 10  ! this can be increased as necessary
-   type(star_info), target, save :: star_handles(max_star_handles)
-   ! gfortran seems to require "save" here.  at least it did once upon a time.
+   type(star_info), target :: star_handles(max_star_handles)
 
 contains
 

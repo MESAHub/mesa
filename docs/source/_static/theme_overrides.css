@@ -8,3 +8,206 @@
     max-width: 100%;
     overflow: visible;
 }
+
+/* Test-suite module badge palette */
+.sd-bg-module-star {
+    background-color: #2563eb !important;
+}
+
+.sd-bg-text-module-star {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-binary {
+    background-color: #dc2626 !important;
+}
+
+.sd-bg-text-module-binary {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-astero {
+    background-color: #7c3aed !important;
+}
+
+.sd-bg-text-module-astero {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-adipls {
+    background-color: #0f766e !important;
+}
+
+.sd-bg-text-module-adipls {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-atm {
+    background-color: #0284c7 !important;
+}
+
+.sd-bg-text-module-atm {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-colors {
+    background-color: #c026d3 !important;
+}
+
+.sd-bg-text-module-colors {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-eos {
+    background-color: #d97706 !important;
+}
+
+.sd-bg-text-module-eos {
+    color: #111827 !important;
+}
+
+.sd-bg-module-gyre {
+    background-color: #16a34a !important;
+}
+
+.sd-bg-text-module-gyre {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-kap {
+    background-color: #be123c !important;
+}
+
+.sd-bg-text-module-kap {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-net {
+    background-color: #475569 !important;
+}
+
+.sd-bg-text-module-net {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-rates {
+    background-color: #0891b2 !important;
+}
+
+.sd-bg-text-module-rates {
+    color: #ffffff !important;
+}
+
+.sd-bg-module-rsp {
+    background-color: #ea580c !important;
+}
+
+.sd-bg-text-module-rsp {
+    color: #111827 !important;
+}
+
+.sd-bg-module-stella {
+    background-color: #65a30d !important;
+}
+
+.sd-bg-text-module-stella {
+    color: #ffffff !important;
+}
+
+/* Test suite gallery */
+.mesa-tag-toolbar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.mesa-tag-toolbar-label {
+    color: var(--pst-color-text-muted, #586069);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-right: 0.15rem;
+}
+
+.mesa-tag-sort {
+    background: var(--pst-color-surface, #ffffff);
+    border: 1px solid var(--pst-color-border, #d0d7de);
+    border-radius: 8px;
+    color: var(--pst-color-text-base, #24292f);
+    cursor: pointer;
+    font: inherit;
+    padding: 0.4rem 0.7rem;
+}
+
+.mesa-tag-sort:hover,
+.mesa-tag-sort.is-active {
+    border-color: var(--pst-color-primary, #2f81f7);
+    color: var(--pst-color-primary, #2f81f7);
+}
+
+.mesa-tag-sort.is-active {
+    box-shadow: inset 0 0 0 1px var(--pst-color-primary, #2f81f7);
+}
+
+.mesa-tag-grid {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    margin: 0.75rem 0 2rem;
+}
+
+.mesa-tag-card {
+    align-items: center;
+    background: var(--pst-color-surface, #ffffff);
+    border: 1px solid var(--pst-color-border, #d0d7de);
+    border-radius: 8px;
+    color: var(--pst-color-text-base, #24292f);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    min-height: 3rem;
+    padding: 0.65rem 0.75rem;
+    text-decoration: none;
+}
+
+.mesa-tag-card:hover {
+    border-color: var(--pst-color-primary, #2f81f7);
+    color: var(--pst-color-primary, #2f81f7);
+    text-decoration: none;
+}
+
+.mesa-tag-name {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.mesa-tag-count {
+    background: #e8f1ff;
+    border: 1px solid #8fb8ed;
+    border-radius: 999px;
+    color: #1f4f82;
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    white-space: nowrap;
+}
+
+.mesa-tag-card:hover .mesa-tag-count {
+    background: #dbeafe;
+    border-color: var(--pst-color-primary, #2f81f7);
+    color: #0f4c81;
+}
+
+html[data-theme="dark"] .mesa-tag-count {
+    background: rgba(96, 165, 250, 0.18);
+    border-color: rgba(147, 197, 253, 0.65);
+    color: #bfdbfe;
+}
+
+html[data-theme="dark"] .mesa-tag-card:hover .mesa-tag-count {
+    background: rgba(96, 165, 250, 0.26);
+    border-color: #93c5fd;
+    color: #dbeafe;
+}

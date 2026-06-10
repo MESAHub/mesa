@@ -15,6 +15,7 @@
 
 &eos
 
+mass_fraction_limit_for_Skye = 1d-16
 
 / ! end of eos namelist
 
@@ -47,7 +48,7 @@
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_extra'
 
-!   pgstar_flag = .true.
+   !pgstar_flag = .true.
    save_pgstar_files_when_terminate = .true.
 
    num_special_rate_factors = 2
@@ -86,15 +87,15 @@
    relax_use_gold_tolerances = .false.
    use_gold_tolerances = .true.
    use_gold2_tolerances = .false.
-   maxT_for_gold_tolerances = 5d9 ! this is to ease core-collapse (~logT=9.7)
-   gold_iter_for_resid_tol2 = 5
-   gold_iter_for_resid_tol3 = 5
+   !maxT_for_gold_tolerances = 5d9 ! this is to ease core-collapse (~logT=9.7)
+   !gold_iter_for_resid_tol2 = 5
+   !gold_iter_for_resid_tol3 = 5
    gold_tol_residual_norm3 = 1d-6
    gold_tol_max_residual3 = 1d-3
    gold_solver_iters_timestep_limit = 20
    solver_iters_timestep_limit = 50
    ignore_too_large_correction = .true.
-   scale_max_correction = 0.1d0
+   !scale_max_correction = 0.1d0
    corr_coeff_limit = 0.2d0
    ignore_min_corr_coeff_for_scale_max_correction = .true.
    ignore_species_in_max_correction = .true.
@@ -132,10 +133,14 @@
    thermohaline_coeff = 0d0
    num_cells_for_smooth_gradL_composition_term = 0
    max_conv_vel_div_csound = 1d0
+   max_conv_vel_div_csound_maxq = 1d0
+
+   ! The control below is useful when running with burning + convection during pulses.
+   make_gradr_sticky_in_solver_iters = .true.
 
    max_abs_du_div_cs_for_convection = 0.03d0
    max_v_div_cs_for_convection = 1d1
-   max_v_for_convection = 5d3
+   max_v_for_convection = 1d4
 
    ! overshoot controls
    ! we only include a bit of exponential overshooting to smooth things out
@@ -186,16 +191,22 @@
 
    ! mesh controls
    okay_to_remesh = .true.
-   max_dq = 1d-3 ! RECOMMENDED 1d-3
+   max_dq = 5d-3  ! RECOMMENDED 1d-3
    mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
+
+   ! Relax mesh on the surface for pre-hydro evolution
+   min_surface_cell_dq = 1d-8
+   max_num_merge_surface_cells = 5
+   max_surface_cell_dq = 1d0
 
    !! this one is turned on in run_star_extras
    !use_split_merge_amr = .true.
-   split_merge_amr_log_zoning = .true.
-   split_merge_amr_nz_baseline = 6000 ! RECOMMENDED 6000
+   split_merge_amr_log_zoning = .false.
+   split_merge_amr_logtau_zoning = .true.
+   split_merge_amr_nz_baseline = 2000 ! RECOMMENDED 6000 for logR zoning
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
-   split_merge_amr_max_iters = 50
+   split_merge_amr_max_iters = 1000
    split_merge_amr_okay_to_split_nz = .false.
 
    !prevent surface from going crazy during remesh and when hydro turns on
@@ -293,7 +304,7 @@
                            ! before the outer layers are removed
                            ! (num_steps_before_relax)
 
-   x_ctrl(10) = 5d2 ! With Riemann hydro, limit the timestep to this (in seconds) before the onset of a pulse.
+   x_ctrl(10) = 1d4 ! With Riemann hydro, limit the timestep to this (in seconds) before the onset of a pulse.
                     ! prevents surface cells from going wild
                     ! (max_dt_before_pulse)
                     ! RECOMMENDED 1d4
