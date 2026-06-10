@@ -373,5 +373,5 @@ contains
    end subroutine do_Kipp_residuals_plot
 
 
-   
+
 end module pgstar_kipp_residuals

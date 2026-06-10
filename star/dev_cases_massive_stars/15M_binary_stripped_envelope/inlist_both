@@ -13,6 +13,9 @@ echo_at_start                                   = 'MESA model has begun running'
 echo_at_end                                     = 'MESA model has finished running'
 show_retry_counts_when_terminate                = .true.
 
+
+
+
 show_log_description_at_start                   = .false.
 show_timestep_limit_counts_when_terminate       = .true.
 save_model_when_terminate                       = .false.
@@ -26,17 +29,24 @@ change_initial_Z                                = .true.
 new_Z                                           = 0.02d0
 
 ! network
-change_net                                      = .true.
-change_initial_net                              = .true.
-new_net_name                                    = 'approx21_cr60_plus_co56.net' ! "approx21_plus_co56.net" ! "mesa_128.net" ! 'mesa_206.net'
+! change_net                                      = .true.
+! change_initial_net                              = .true.
+! new_net_name                                    = "approx21_plus_co56.net" ! 'mesa_206.net' ! 'approx21_cr60_plus_co56.net' !  ! "mesa_128.net" ! 'mesa_206.net'
 !dump_missing_metals_into_heaviest              = .true.
+
+
+
+! show_net_species_info = .true.
+
 
 ! we want to use weaklib all the time, so we toggle at lowT.
 T9_weaklib_full_off                             = 0.0001d0
 T9_weaklib_full_on                              = 0.00011d0
 
 change_v_flag                                   = .true.
-new_v_flag                                      = .true.
+change_initial_v_flag                           = .true.
+new_v_flag                                      = .false.
+center_ye_limit_for_v_flag                      = 0.1d0  ! prevent hydro turning on
 
 set_initial_age                                 = .true.
 initial_age                                     = 0
@@ -64,6 +74,8 @@ save_pgstar_files_when_terminate                = .true.
 
 &eos
 
+mass_fraction_limit_for_Skye                    = 1d-16
+
 / ! end of eos namelist
 
 
@@ -80,6 +92,9 @@ Zbase                                           = 0.02
 /
 
 &controls
+
+fix_d_eos_dxa_partials = .false.
+
 
 ! set approx22 fake factor to reproduce Ye ~ 0.43-0.44 at CC.
 fe56ec_fake_factor                              = 1d-4
@@ -286,23 +301,16 @@ min_D_mix                                       =1d-2
 
 ! solver controls
 energy_eqn_option                               = 'dedt'
-use_gold2_tolerances                            = .true.
-gold2_tol_max_residual2                         = 5d-7
-gold2_tol_max_residual3                         = 5d-4
 
 ! gold solver
 use_gold_tolerances                             = .true.
-gold_tol_max_residual2                          = 5d-4
-!gold_tol_max_residual3                         = 1d-4 ! Default in controls is 1d-5
 tol_correction_high_T_limit                     = 1d9 ! Switch to lower tol at high temp for large Mass
 solver_iters_timestep_limit                     = 20
 gold_solver_iters_timestep_limit                = 20
-iter_for_resid_tol2                             = 10
 
 convergence_ignore_equL_residuals               = .true.
 make_gradr_sticky_in_solver_iters               = .true.
 xa_scale                                        = 1d-5
-iter_for_resid_tol2                             = 10
 
 ! output
 photo_interval                                  = -1 ! photos are saved from inlist_binary
