@@ -311,9 +311,9 @@ contains
          tr(1) = xlo - 0.5
          tr(2) = (xhi - xlo) / real(nx)
          tr(3) = 0.0
-         tr(4) = chi + dcoord
+         tr(4) = clo - dcoord
          tr(5) = 0.0
-         tr(6) = -dcoord
+         tr(6) = dcoord
 
          ! color scale
          fg = resid_hi
