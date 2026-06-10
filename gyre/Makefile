@@ -45,7 +45,7 @@ endif
 
 BUILD_DIR_GYRE_BUILD := $(BUILD_DIR_MODULE)/src
 
-$(BUILD_DIR_GYRE_BUILD): gyre-9.1.tar.gz | $(BUILD_DIR_GYRE_BUILD)/. $(BUILD_DIR_MODULE)/include/.
+$(BUILD_DIR_GYRE_BUILD): gyre-9.1.1.tar.gz | $(BUILD_DIR_GYRE_BUILD)/. $(BUILD_DIR_MODULE)/include/.
 	tar --strip-components=1 -xf $< -C $(BUILD_DIR_GYRE_BUILD)
 
 $(BUILD_DIR_GYRE_BUILD)/build-complete: $(BUILD_DIR_GYRE_BUILD)
