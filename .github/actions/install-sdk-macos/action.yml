@@ -28,7 +28,6 @@ runs:
       if: ${{ (steps.cache.outputs.cache-hit != 'true') }}
       run: |
         declare -A version
-        version[26.3.2]="https://zenodo.org/records/19210744"
         version[26.6.1]="https://zenodo.org/records/20598224"
 
         curl -O ${version[${{inputs.sdk}}]}/files/mesasdk-aarch64-macos-${{inputs.sdk}}.pkg
