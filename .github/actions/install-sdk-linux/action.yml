@@ -30,7 +30,7 @@ runs:
       if: ${{ (steps.cache.outputs.cache-hit != 'true') }}
       run: |
         declare -A version
-        version[26.3.2]="https://zenodo.org/records/19210930"
+        version[26.6.1]="https://zenodo.org/records/20598423"
 
         curl -O ${version[${{inputs.sdk}}]}/files/mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
 
