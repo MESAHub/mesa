@@ -2972,7 +2972,7 @@
    Orbit_ybot = 0.1
    Orbit_ytop = 0.9
    Orbit_title = 'Orbit'
-   Orbit_txt_scale_factor = 1.0
+   Orbit_txt_scale = 1.0
 
       ! show the star sizes
 
