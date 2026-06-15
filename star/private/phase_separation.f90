@@ -565,6 +565,7 @@
              ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
         dx1_=fval(1)  ! delta_x1 from 2d interpolation
 
+        deallocate(x1_l, x2_l, deltax1_sob_f1)
         deallocate(bcxmin, bcxmax, bcymin, bcymax)
       end subroutine tab_interp_medin_cumming_dx1
 
@@ -664,6 +665,7 @@
              ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
         dx2_=fval(1)  ! delta_x2 from 2d interpolation
 
+        deallocate(x1_l, x2_l, deltax1_sob_f1)
         deallocate(bcxmin, bcxmax, bcymin, bcymax)
       end subroutine tab_interp_medin_cumming_dx2
 
