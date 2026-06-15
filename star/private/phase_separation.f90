@@ -21,6 +21,7 @@
 
       use star_private_def
       use const_def
+      use forum_m, only: hdf5io_t, OPEN_FILE_RO
 
       implicit none
 
@@ -473,47 +474,68 @@
         use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
         use utils_lib, only: mesa_error, mkdir, is_bad
         implicit none
-        integer, parameter :: num_x1 = 998, num_x2 = 998
-        integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
-        real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
-        real(dp) :: bcymin(num_x2), bcymax(num_x2)
+        integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,ict(6),ierr,i,j,k
+        integer :: num_x1, num_x2
+        real(dp), allocatable :: bcxmin(:), bcxmax(:)
+        real(dp), allocatable :: bcymin(:), bcymax(:)
         real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
         real(dp), pointer :: deltax1_sob_f(:,:,:)
-        real(dp) :: deltax1,x1l,x2l
+        real(dp), allocatable :: delta_grid(:,:)
         real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
         character (len=*), intent(in) :: components
+        character(len=256) :: filename
         real(dp) :: fval(6)         ! output data
         real(dp), intent(out) :: dx1_
         integer :: ier
+        type(hdf5io_t) :: hi
 
         ict = 0
         ict(1) = 1
-        iounit=999
         ! setup interpolation table for x1 x2 dx1
         if (components=='CONe') then
-           open(unit=iounit, file='CONe_deltaC.dat', action='read',status='old')
+           filename = 'CONe_deltaC.h5'
         else if  (components=='NeOMg') then
-           open(unit=iounit, file='NeOMg_deltaMg.dat', action='read',status='old')
+           filename = 'NeOMg_deltaMg.h5'
         else if  (components=='ONeNa') then
-           open(unit=iounit, file='ONeNa_deltaNa.dat', action='read',status='old')
+           filename = 'ONeNa_deltaNa.h5'
         else if  (components=='COMg') then
-           open(unit=iounit, file='COMg_deltaC.dat', action='read',status='old')
+           filename = 'COMg_deltaC.h5'
         end if
+
+        ! Open HDF5 file
+        hi = hdf5io_t(filename, OPEN_FILE_RO)
+
+        ! Read grid dimensions
+        call hi%read_attr('num_x1', num_x1)
+        call hi%read_attr('num_x2', num_x2)
+
+        ! Allocate arrays
         allocate(x1_l(num_x1), x2_l(num_x2), &
              deltax1_sob_f1(4*num_x1*num_x2))
+        allocate(delta_grid(num_x1, num_x2))
+        allocate(bcxmin(num_x1), bcxmax(num_x1))
+        allocate(bcymin(num_x2), bcymax(num_x2))
+
         deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
              deltax1_sob_f1(1:4*num_x1*num_x2)
+
+        ! Read data from HDF5
+        call hi%read_dset('x1', x1_l)
+        call hi%read_dset('x2', x2_l)
+        call hi%read_dset('delta', delta_grid)
+
+        ! Copy delta data to interpolation array
         do j=1,num_x1
            do i=1,num_x2
-              read(iounit,*) x1l, x2l, deltax1
-              x1_l(j)=x1l
-              if (j == 1) then
-                 x2_l(i) =x2l
-              end if
-              deltax1_sob_f(1,j,i) = deltax1
+              deltax1_sob_f(1,j,i) = delta_grid(j,i)
            end do
         end do
-        close(iounit)
+
+        ! Close HDF5 file
+        call hi%final()
+
+        deallocate(delta_grid)
+
         ! just use "not a knot" bc's at edges of tables
         ibcxmin = 0; bcxmin(1:num_x1) = 0
         ibcxmax = 0; bcxmax(1:num_x1) = 0
@@ -542,55 +564,77 @@
              x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
              ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
         dx1_=fval(1)  ! delta_x1 from 2d interpolation
+
+        deallocate(bcxmin, bcxmax, bcymin, bcymax)
       end subroutine tab_interp_medin_cumming_dx1
 
 
       subroutine tab_interp_medin_cumming_dx2(x1_,x2_,components,dx2_)
-        !use utils_lib
         use interp_2D_lib_db, only: interp_mkbicub_db, interp_evbicub_db
         use utils_lib, only: mesa_error, mkdir, is_bad
         implicit none
-        integer, parameter :: num_x1 = 998, num_x2 = 998
-        integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,iounit,ict(6),ierr,i,j,k
-        real(dp) :: bcxmin(num_x1), bcxmax(num_x1)
-        real(dp) :: bcymin(num_x2), bcymax(num_x2)
+        integer :: ilinx,iliny,ibcxmin,ibcxmax,ibcymin,ibcymax,ict(6),ierr,i,j,k
+        integer :: num_x1, num_x2
+        real(dp), allocatable :: bcxmin(:), bcxmax(:)
+        real(dp), allocatable :: bcymin(:), bcymax(:)
         real(dp), pointer, dimension(:) :: x1_l, x2_l, deltax1_sob_f1
         real(dp), pointer :: deltax1_sob_f(:,:,:)
-        real(dp) :: deltax1,x1l,x2l
+        real(dp), allocatable :: delta_grid(:,:)
         real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
         character (len=*), intent(in) :: components
+        character(len=256) :: filename
         real(dp) :: fval(6)         ! output data
         real(dp), intent(out) :: dx2_
         integer :: ier
+        type(hdf5io_t) :: hi
 
         ict = 0
         ict(1) = 1
-        iounit=998
         ! setup interpolation table for tau sob eta
         if (components=='CONe') then
-           open(unit=iounit, file='CONe_deltaO.dat', action='read',status='old')
+           filename = 'CONe_deltaO.h5'
         else if  (components=='NeOMg') then
-           open(unit=iounit, file='NeOMg_deltaO.dat', action='read',status='old')
+           filename = 'NeOMg_deltaO.h5'
         else if  (components=='ONeNa') then
-           open(unit=iounit, file='ONeNa_deltaO.dat', action='read',status='old')
+           filename = 'ONeNa_deltaO.h5'
         else if  (components=='COMg') then
-           open(unit=iounit, file='COMg_deltaMg.dat', action='read',status='old')
+           filename = 'COMg_deltaMg.h5'
         end if
+
+        ! Open HDF5 file
+        hi = hdf5io_t(filename, OPEN_FILE_RO)
+
+        ! Read grid dimensions
+        call hi%read_attr('num_x1', num_x1)
+        call hi%read_attr('num_x2', num_x2)
+
+        ! Allocate arrays
         allocate(x1_l(num_x1), x2_l(num_x2), &
              deltax1_sob_f1(4*num_x1*num_x2))
+        allocate(delta_grid(num_x1, num_x2))
+        allocate(bcxmin(num_x1), bcxmax(num_x1))
+        allocate(bcymin(num_x2), bcymax(num_x2))
+
         deltax1_sob_f(1:4,1:num_x1,1:num_x2) => &
              deltax1_sob_f1(1:4*num_x1*num_x2)
+
+        ! Read data from HDF5
+        call hi%read_dset('x1', x1_l)
+        call hi%read_dset('x2', x2_l)
+        call hi%read_dset('delta', delta_grid)
+
+        ! Copy delta data to interpolation array
         do j=1,num_x1
            do i=1,num_x2
-              read(iounit,*) x1l, x2l, deltax1
-              x1_l(j)=x1l
-              if (j == 1) then
-                 x2_l(i) =x2l
-              end if
-              deltax1_sob_f(1,j,i) = deltax1
+              deltax1_sob_f(1,j,i) = delta_grid(j,i)
            end do
         end do
-        close(iounit)
+
+        ! Close HDF5 file
+        call hi%final()
+
+        deallocate(delta_grid)
+
         ! just use "not a knot" bc's at edges of tables
         ibcxmin = 0; bcxmin(1:num_x1) = 0
         ibcxmax = 0; bcxmax(1:num_x1) = 0
@@ -619,6 +663,8 @@
              x1_, x2_, x1_l, num_x1, x2_l, num_x2, &
              ilinx, iliny, deltax1_sob_f1, num_x1, ict, fval, ier)
         dx2_=fval(1)  ! delta_x2 from 2d interpolation
+
+        deallocate(bcxmin, bcxmax, bcymin, bcymax)
       end subroutine tab_interp_medin_cumming_dx2
 
 
