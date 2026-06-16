@@ -44,6 +44,10 @@ The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ r
 Bug Fixes
 ---------
 
+Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
+which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
+MESA when the KH timescale was recalculated on restart.
+
 Fixed a small bug where diffusive overshooting (overmixing) routines did not
 respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 ``mixing_length_alpha`` instead. See `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
