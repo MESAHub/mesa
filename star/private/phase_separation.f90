@@ -483,7 +483,7 @@
         real(dp), allocatable :: delta_grid(:,:)
         real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
         character (len=*), intent(in) :: components
-        character(len=256) :: filename
+        character(len=256) :: filename, phase_sep_data_dir
         real(dp) :: fval(6)         ! output data
         real(dp), intent(out) :: dx1_
         integer :: ier
@@ -491,15 +491,18 @@
 
         ict = 0
         ict(1) = 1
+
+        phase_sep_data_dir = trim(mesa_data_dir) // '/star_data/phase_separation'
+
         ! setup interpolation table for x1 x2 dx1
         if (components=='CONe') then
-           filename = 'CONe_deltaC.h5'
+           filename = trim(phase_sep_data_dir) // '/CONe_deltaC.h5'
         else if  (components=='NeOMg') then
-           filename = 'NeOMg_deltaMg.h5'
+           filename = trim(phase_sep_data_dir) // '/NeOMg_deltaMg.h5'
         else if  (components=='ONeNa') then
-           filename = 'ONeNa_deltaNa.h5'
+           filename = trim(phase_sep_data_dir) // '/ONeNa_deltaNa.h5'
         else if  (components=='COMg') then
-           filename = 'COMg_deltaC.h5'
+           filename = trim(phase_sep_data_dir) // '/COMg_deltaC.h5'
         end if
 
         ! Open HDF5 file
@@ -583,7 +586,7 @@
         real(dp), allocatable :: delta_grid(:,:)
         real(dp), intent(in) :: x1_,x2_        ! target of this interpolation
         character (len=*), intent(in) :: components
-        character(len=256) :: filename
+        character(len=256) :: filename, phase_sep_data_dir
         real(dp) :: fval(6)         ! output data
         real(dp), intent(out) :: dx2_
         integer :: ier
@@ -591,15 +594,18 @@
 
         ict = 0
         ict(1) = 1
+
+        phase_sep_data_dir = trim(mesa_data_dir) // '/star_data/phase_separation'
+
         ! setup interpolation table for tau sob eta
         if (components=='CONe') then
-           filename = 'CONe_deltaO.h5'
+           filename = trim(phase_sep_data_dir) // '/CONe_deltaO.h5'
         else if  (components=='NeOMg') then
-           filename = 'NeOMg_deltaO.h5'
+           filename = trim(phase_sep_data_dir) // '/NeOMg_deltaO.h5'
         else if  (components=='ONeNa') then
-           filename = 'ONeNa_deltaO.h5'
+           filename = trim(phase_sep_data_dir) // '/ONeNa_deltaO.h5'
         else if  (components=='COMg') then
-           filename = 'COMg_deltaMg.h5'
+           filename = trim(phase_sep_data_dir) // '/COMg_deltaMg.h5'
         end if
 
         ! Open HDF5 file
