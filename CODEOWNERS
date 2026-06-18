@@ -24,7 +24,7 @@ linters/
 turb/ @Debraheem
 make/ @VincentVanlaer
 math/ @rhdtownsend
-mtx/ @mjoyceGR
+mtx/ @Debraheem
 net/ @fxt44 @Debraheem
 neu/ @fxt44 @Debraheem
 num/
@@ -37,6 +37,10 @@ utils/ @rhdtownsend @warrickball
 ### Star ###
 
 star/private/rsp_*.f90 @rsmolec
+star/private/hydro_rsp2*.f90 @Debraheem
+star/private/tdc_hydro*.f90 @Debraheem
+star/private/turb_info.f90 @Debraheem
+star/private/turb_support.f90 @Debraheem
 star/private/phase_separation.f90 @evbauer
 
 ### Test suite cases ###
@@ -47,8 +51,8 @@ star/test_suite/15M_dynamo @fxt44
 star/test_suite/1.5M_with_diffusion @annethoul
 star/test_suite/16M_conv_premix @annethoul
 star/test_suite/16M_predictive_mix @annethoul
-star/test_suite/1M_pre_ms_to_wd @annethoul @mjoyceGR
-star/test_suite/1M_thermohaline @mjoyceGR
+star/test_suite/1M_pre_ms_to_wd @annethoul
+star/test_suite/1M_thermohaline
 star/test_suite/5M_cepheid_blue_loop @annethoul @rsmolec
 star/test_suite/7M_prems_to_AGB @annethoul
 star/test_suite/accreted_material_j @orlox
@@ -111,7 +115,7 @@ star/test_suite/rsp_RR_Lyrae @rsmolec
 star/test_suite/rsp_save_and_load_file @rsmolec
 star/test_suite/rsp_Type_II_Cepheid @rsmolec
 star/test_suite/semiconvection @annethoul
-star/test_suite/simplex_solar_calibration @mjoyceGR
+star/test_suite/simplex_solar_calibration
 star/test_suite/test_case_template @fxt44
 star/test_suite/test_memory
 star/test_suite/timing
@@ -135,7 +139,7 @@ star/test_suite/ppisn @Debraheem
 star/test_suite/pisn
 
 binary/test_suite/double_bh @orlox
-binary/test_suite/evolve_both_stars @orlox @mjoyceGR
+binary/test_suite/evolve_both_stars @orlox
 binary/test_suite/jdot_gr_check @orlox
 binary/test_suite/jdot_ls_check @orlox
 binary/test_suite/jdot_ml_check @orlox

@@ -1128,7 +1128,7 @@ gshfdxsec.o:       gshfdxsec.f
 hydxsecl.o:        hydxsecl.f
 hydxsecn.o:        hydxsecn.f
 hypho.o:           hypho.f
-kinds.o         :  kinds.F
+kinds.o         :  kinds.F90
 lineexpab_cor.o:   lineexpab_cor.trf
 lineexpVRegem.o:   lineexpVRegem.trf
 lnblnk.o:          lnblnk.f

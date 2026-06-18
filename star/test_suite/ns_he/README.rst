@@ -4,6 +4,8 @@
 ns_he
 *****
 
+.. tags:: star, compact-remnant, neutron-star, neutron-star-envelope, accretion, helium-burning, helium-flash, thermonuclear-runaway
+
 This test case shows an example of a helium flash within a neutron star envelope.
 
 This test case has 1 part. Click to see a larger version of a plot.

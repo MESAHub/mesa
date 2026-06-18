@@ -1348,40 +1348,6 @@
     relax_opacity_factor = .false.
     relax_initial_opacity_factor = .false.
 
-
-      ! relax_to_this_Tsurf_factor
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! dlogTsurf_factor
-      ! ~~~~~~~~~~~~~~~~
-      ! relax_Tsurf_factor
-      ! ~~~~~~~~~~~~~~~~~~
-      ! relax_initial_Tsurf_factor
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    relax_to_this_Tsurf_factor = -1
-    dlogTsurf_factor = 0.1d0
-    relax_Tsurf_factor = .false.
-    relax_initial_Tsurf_factor = .false.
-
-
-      ! set_to_this_Tsurf_factor
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! set_Tsurf_factor
-      ! ~~~~~~~~~~~~~~~~
-      ! set_initial_Tsurf_factor
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! As for ``relax_to_this_Tsurf_factor``, but changes ``Tsurf_factor`` without reconverging.
-
-      ! ::
-
-    set_to_this_Tsurf_factor = -1
-    set_Tsurf_factor = .false.
-    set_initial_Tsurf_factor = .false.
-
-
       ! relax_mass_change
       ! ~~~~~~~~~~~~~~~~~
       ! relax_initial_mass_change

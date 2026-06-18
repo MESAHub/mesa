@@ -4,11 +4,13 @@
 wd_nova_burst
 *************
 
+.. tags:: star, white-dwarf, oxygen-neon-white-dwarf, accretion, nova, hydrogen-burning, shell-burning, thermonuclear-runaway
+
 This test case checks the evolution of a nova outburst for one cycle.
 
 This test case has 2 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_setup``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt carbon-oxygen white dwarf from the :ref:`make_o_ne_wd` test suite, sets the topical depth to 30, evolves for a few steps to an age of 1e7 year and terminates.
+* Part 1 (``inlist_setup``) loads ``1.1M_lgTc_7.7.mod``, a prebuilt oxygen-neon white dwarf from the :ref:`make_o_ne_wd` test suite, sets the topical depth to 30, evolves for a few steps to an age of 1e7 year and terminates.
 
 * Part 2 (``inlist_wd_nova_burst``) continues the evolution with the accretion of a hydrogen-helium mixture at a rate of 1e-9 Msun/yr. Eventually hydrogen burning in the accerted envelope causes the luminosity to exceed 1e4 Lsun and an alert is written to the terminate via the ``run_star_extras.f90``:
 
@@ -48,4 +50,4 @@ The Python script used to create the figures above:
 
 Last-Updated: 07Aug2024 (MESA 0b40398b) by wmwolf.
 
-Last-Run: 22Dec2025 (MESA fede5937) by pmocz on C916PXT6XW in 586 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 1036 seconds using 8 threads.

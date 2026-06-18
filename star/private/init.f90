@@ -507,7 +507,6 @@
          s% model_number_for_last_retry = 0
          s% dt_limit_ratio = 0
          s% force_tau_factor = 0
-         s% force_Tsurf_factor = 0
          s% force_opacity_factor = 0
 
          s% generations = 0

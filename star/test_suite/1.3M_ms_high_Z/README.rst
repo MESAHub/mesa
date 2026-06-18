@@ -4,6 +4,8 @@
 1.3M_ms_high_Z
 **************
 
+.. tags:: star, high-metallicity, low-mass, pre-main-sequence, main-sequence, core-hydrogen-burning
+
 The test checks the evolution of metal-rich low-mass stars by evolving
 a 1.3 |Msun|, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
 
@@ -47,4 +49,4 @@ The Python script used to create the figures above:
 
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
 
-Last-Run: 22Dec2025 (MESA fede5937) by pmocz on C916PXT6XW in 252 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 268 seconds using 8 threads.

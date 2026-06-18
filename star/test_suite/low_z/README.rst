@@ -4,6 +4,8 @@
 low_z
 *****
 
+.. tags:: star, kap, low-metallicity, low-mass, pre-main-sequence, main-sequence, opacity, custom-opacity
+
 This test case checks the evolutions of a 0.8 |Msun|, Z=1e-4 metallicity model from the pre-main sequence to core hydrogen depletion.
 
 This test case has 2 parts. Click to see a larger version of a plot.

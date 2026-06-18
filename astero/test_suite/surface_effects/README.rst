@@ -4,6 +4,8 @@
 surface_effects
 ***************
 
+.. tags:: astero, asteroseismology, surface-corrections, frequency-matching, solar-model, helioseismology, adipls
+
 Tests the implementation of the various surface effect corrections
 available in MESA using the output model from
 ``simplex_solar_calibration``.  First, it adds a surface effect

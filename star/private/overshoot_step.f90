@@ -40,7 +40,7 @@ contains
     real(dp), intent(out)    :: vc(:)
     integer, intent(out)     :: ierr
 
-    real(dp) :: f
+    real(dp) :: f, f2
     real(dp) :: f0
     real(dp) :: D0
     real(dp) :: Delta0
@@ -60,19 +60,28 @@ contains
     ! Evaluate the overshoot diffusion coefficient D(k_a:k_b) and
     ! mixing velocity vc(k_a:k_b) at the i'th convective boundary,
     ! using the j'th set of overshoot parameters. The overshoot
-    ! follows a simple step scheme
+    ! follows a simple step scheme, with an optional exponential tail.
 
     ierr = 0
 
     ! Extract parameters
 
     f = s%overshoot_f(j)
+    f2 = 0._dp
     f0 = s%overshoot_f0(j)
 
     D0 = s%overshoot_D0(j)
     Delta0 = s%overshoot_Delta0(j)
 
-    if (f <= 0._dp .OR. f0 <= 0._dp) then
+    if (s%overshoot_scheme(j) == 'step+exponential') then
+       f2 = s%overshoot_f2(j)
+       if (f <= 0._dp .OR. f0 <= 0._dp .OR. f2 <= 0._dp) then
+          write(*,*) 'ERROR: for step+exp overshooting, must set f, f2 and f0 > 0'
+          write(*,*) 'see description of overshooting in star/defaults/control.defaults'
+          ierr = -1
+          return
+       end if
+    else if (f <= 0._dp .OR. f0 <= 0._dp) then
        write(*,*) 'ERROR: for step overshooting, must set f and f0 > 0'
        write(*,*) 'see description of overshooting in star/defaults/control.defaults'
        ierr = -1
@@ -120,8 +129,6 @@ contains
 
     face_loop : do k = k_a, k_b, dk
 
-       ! Evaluate the step factor
-
        r = s%r(k)
 
        if (outward) then
@@ -132,6 +139,8 @@ contains
 
        if (dr < f*Hp_cb) then
           factor = 1._dp
+       else if (f2 > 0._dp) then
+          factor = exp(-2._dp*(dr - f*Hp_cb)/(f2*Hp_cb))
        else
           factor = 0._dp
        end if
@@ -144,6 +153,7 @@ contains
        else
           vc(k) = 0d0
        end if
+
        ! Check for early overshoot completion
 
        if (D(k) < s%overshoot_D_min) then

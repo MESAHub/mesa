@@ -4,6 +4,8 @@
 rsp_BLAP
 ********
 
+.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, blap, colors
+
 This test case checks the non-linear pulsation evolution of a 0.36 |Msun|, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model -
 a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
 

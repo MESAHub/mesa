@@ -16,8 +16,6 @@
       !relax_initial_mass_to_remove_H_env = .true.
       !lg_max_abs_mdot = -2
 
-      !pgstar_flag = .false.
-
 / ! end of star_job namelist
 
 &eos

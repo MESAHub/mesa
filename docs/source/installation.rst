@@ -22,10 +22,6 @@ The minimum system requirements for MESA are:
 Most laptop or desktop computers built in the last three years will
 satisfy these requirements.
 
-Ensure you have Python (3.5 or newer) installed on your system
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) to be installed.
-
 Install the MESA SDK
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -41,7 +37,7 @@ the details of setting it up.
 
    The MESA SDK itself has a few dependencies you may need
    to install manually, including `binutils`, `make`,
-   `Perl`, `X11`, `Z` and `C` shell on Linux and `Xcode`,
+   `Perl`, `Python`, `X11`, `Z` and `C` shell on Linux and `Xcode`,
    `Xcode command line tools` and `Xquartz` on Mac. See "prerequisites"
    section on the `MESA SDK website
    <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__

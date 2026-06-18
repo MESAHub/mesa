@@ -4,6 +4,8 @@
 make_zams
 *********
 
+.. tags:: star, zams, create-initial-model, pre-main-sequence, intermediate-mass
+
 This test case shows an example of creating a 4 |Msun|, Z = 0.01 metallicity, pre-main sequence model and evolving it to the zero age main sequence.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -24,4 +26,4 @@ pgstar commands used for the plot above:
 
 Last-Updated: 20Jun2021 (MESA e2acbc2) by fxt.
 
-Last-Run: 22Dec2025 (MESA fede5937) by pmocz on C916PXT6XW in 48 seconds using 8 threads.
+Last-Run: 12Apr2026 (MESA c79eae5c5) by vincentva on procyon in 65 seconds using 8 threads.

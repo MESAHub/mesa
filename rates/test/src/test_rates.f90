@@ -272,6 +272,125 @@ contains
 
    end subroutine do_test_rate_table
 
+   subroutine do_test_reverse_coefficients
+      use chem_def, only: nuclide_data
+      use const_def, only: pi, kB=>boltzm, NA=>avo, hbar
+
+      integer, parameter :: nchecks = 6
+
+      integer :: i
+      integer, dimension(nchecks) :: chapters, inverse_exps
+      type(nuclide_data), pointer :: nuclides
+      real(dp) :: fac
+
+      include 'formats'
+
+      ! Check representative reverse rates with Ni-No > 0, = 0, and < 0.
+      ! Include both 1 -> 1 and 2 -> 2 cases for Ni-No = 0.
+      ! For each case, use the first non-weak reaclib reaction with the requested
+      ! chapter and inverse_exp. The printed handle shows which reaction was used.
+      ! If this test network does not include a representative for one case,
+      ! print a skip line and continue.
+      ! The mass ratio always carries a fixed 3/2 power. Ni-No enters through fac and inverse_exp.
+      chapters = [r_one_one, r_three_one, r_two_one, r_two_two, r_one_two, r_one_three]
+      inverse_exps = [0, 2, 1, 0, -1, -2]
+
+      nuclides => reaclib_rates% nuclides
+      if (.not.associated(nuclides)) call mesa_error(__FILE__, __LINE__)
+
+      fac = pow(1d9*kB/(2d0*pi*hbar*hbar*NA),1.5d0)/NA
+
+      write (*, '(A)')
+      write (*, *) 'do_test_reverse_coefficients'
+      write (*, *) 'inverse_coefficients(1) = log[(m_in/m_out)^(3/2)*(g_in/g_out)*fac^(Ni-No)]'
+      write (*, '(a32, 2x, a3, 2x, a3, 2x, a5, 2x, a26, 2x, a)') &
+         'rate', 'Ni', 'No', 'Ni-No', 'inverse_coefficients(1)', 'note'
+
+      do i = 1, nchecks
+         call check1(chapters(i), inverse_exps(i))
+      end do
+
+      write (*, *) 'done'
+      write (*, '(A)')
+
+   contains
+
+      subroutine check1(chapter, expected_inverse_exp)
+         integer, intent(in) :: chapter, expected_inverse_exp
+
+         integer :: ierr, i, j, lo, hi
+         integer :: Ni, No, Nt, inverse_exp
+         integer, dimension(max_species_per_reaction) :: ps
+         character(len=max_id_length) :: handle
+         real(dp), dimension(max_species_per_reaction) :: g, mass
+         real(dp) :: tmp, expected_log_coeff, stored_log_coeff, tol
+
+         include 'formats'
+
+         ! Select the first non-weak reaclib reaction in this chapter with the
+         ! requested inverse_exp. This keeps the test independent of branch-specific
+         ! reaction handles while still checking one representative for each Ni, No case.
+         lo = 0
+         do i = 1, reaclib_rates% nreactions
+            if (reaclib_rates% chapter(i) /= chapter) cycle
+            if (reaclib_rates% reaction_flag(i) == 'w' .or. reaclib_rates% reaction_flag(i) == 'e') cycle
+            if (reaclib_rates% inverse_exp(i) /= expected_inverse_exp) cycle
+            lo = i
+            exit
+         end do
+
+         if (lo <= 0) then
+            Ni = Nin(chapter)
+            No = Nout(chapter)
+            write (*, '(a32, 2x, i3, 2x, i3, 2x, i5, 2x, a26, 2x, a)') &
+               '(none)', Ni, No, expected_inverse_exp, '', 'skipped'
+            return
+         end if
+
+         handle = trim(reaclib_rates% reaction_handle(lo))
+         call reaclib_indices_for_reaction(handle, reaclib_rates, lo, hi, ierr)
+         if (ierr /= 0 .or. lo <= 0 .or. hi < lo) then
+            write (*, *) 'failed to find reaction '//trim(handle)
+            call mesa_error(__FILE__, __LINE__)
+         end if
+
+         Ni = Nin(reaclib_rates% chapter(lo))
+         No = Nout(reaclib_rates% chapter(lo))
+         Nt = Ni + No
+         inverse_exp = Ni - No
+
+         ps(1:Nt) = reaclib_rates% pspecies(1:Nt, lo)
+         g(1:Nt) = 2d0*nuclides% spin(ps(1:Nt)) + 1d0
+         mass(1:Nt) = nuclides% W(ps(1:Nt))
+
+         tmp = product(mass(1:Ni))/product(mass(Ni+1:Nt))
+         expected_log_coeff = log(pow(tmp, 1.5d0)*(product(g(1:Ni))/product(g(Ni+1:Nt))))
+         if (inverse_exp /= 0) expected_log_coeff = expected_log_coeff + dble(inverse_exp)*log(fac)
+
+         tol = 1d-12*max(1d0, abs(expected_log_coeff))
+
+         do j = lo, hi
+            if (reaclib_rates% inverse_exp(j) /= inverse_exp) then
+               write (*, *) 'bad inverse_exp for '//trim(handle)
+               call mesa_error(__FILE__, __LINE__)
+            end if
+
+            stored_log_coeff = reaclib_rates% inverse_coefficients(1, j)
+            if (abs(stored_log_coeff - expected_log_coeff) > tol) then
+               write (*, *) 'bad inverse coefficient for '//trim(handle)
+               write (*, 1) 'stored', stored_log_coeff
+               write (*, 1) 'expected', expected_log_coeff
+               call mesa_error(__FILE__, __LINE__)
+            end if
+         end do
+
+         write (*, '(a32, 2x, i3, 2x, i3, 2x, i5, 2x, 1pe26.16, 2x, a)') &
+            trim(handle), Ni, No, inverse_exp, expected_log_coeff, ''
+
+      end subroutine check1
+
+   end subroutine do_test_reverse_coefficients
+
    subroutine do_test2_FL_epsnuc_3alf
       real(dp) :: T  ! temperature
       real(dp) :: Rho  ! density
@@ -331,6 +450,7 @@ program test_rates
    call do_test_rates()
    call do_test_FL_epsnuc_3alf()
    call do_test_rate_table
+   call do_test_reverse_coefficients()
 
    call teardown
 

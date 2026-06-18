@@ -335,6 +335,7 @@
          logical        :: do_premix_heating ! include eps_pre_mix in energy equation
 
          real(dp)       :: overshoot_f(NUM_OVERSHOOT_PARAM_SETS)
+         real(dp)       :: overshoot_f2(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_f0(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_D0(NUM_OVERSHOOT_PARAM_SETS)
          real(dp)       :: overshoot_Delta0(NUM_OVERSHOOT_PARAM_SETS)
@@ -430,8 +431,6 @@
          logical :: use_fixed_Psurf_outer_BC
          real(dp) :: fixed_Psurf
          logical :: use_RSP_L_eqn_outer_BC
-
-         real(dp) :: Tsurf_factor
 
       ! create atmosphere
 

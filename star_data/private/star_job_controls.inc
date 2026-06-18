@@ -165,11 +165,6 @@
       logical :: adjust_tau_factor_to_surf_density
       real(dp) :: base_for_adjust_tau_factor_to_surf_density
 
-      logical :: relax_Tsurf_factor, relax_initial_Tsurf_factor
-      logical :: set_Tsurf_factor, set_initial_Tsurf_factor
-      real(dp) :: relax_to_this_Tsurf_factor, set_to_this_Tsurf_factor
-      real(dp) :: dlogTsurf_factor
-
       logical :: relax_irradiation, relax_initial_irradiation
       logical :: set_irradiation, set_initial_irradiation
       integer :: relax_irradiation_min_steps
@@ -365,4 +360,3 @@
       ! When to run cleanup to deallocate unneeded data
       logical :: report_garbage_collection
       integer :: num_steps_for_garbage_collection
-
