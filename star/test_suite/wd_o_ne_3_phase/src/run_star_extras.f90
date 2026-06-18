@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!   Copyright (C) 2010  The MESA Team
 !
 !   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU Lesser General Public License
@@ -22,9 +22,14 @@
       use star_def
       use const_def
       use math_lib
+
       implicit none
-      ! these routines are called by the standard run_star check_model
+
+      include 'test_suite_extras_def.inc'
+
       contains
+
+      include 'test_suite_extras.inc'
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -33,11 +38,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         ! this is the place to set any procedure pointers you want to change
-         ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
-         ! the extras functions in this file will not be called
-         ! unless you set their function pointers as done below.
-         ! otherwise we use a null_ version which does nothing (except warn).
          s% extras_startup => extras_startup
          s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
@@ -75,80 +75,13 @@
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
-         use chem_def
-         use eos_def
          integer, intent(in) :: id
-         integer :: ierr, k, i_accr, iXC, iXO, iXne20, iXNe22, iXNa, iXMg, iXHe
+         integer :: ierr
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_check_model = keep_going
-         if (.false. .and. s% star_mass_h1 < 0.35d0) then
-            ! stop when star hydrogen mass drops to specified level
-            extras_check_model = terminate
-            write(*, *) 'have reached desired hydrogen mass'
-            return
-         end if
-         ! if you want to check multiple conditions, it can be useful
-         ! to set a different termination code depending on which
-         ! condition was triggered.  MESA provides 9 customizeable
-         ! termination codes, named t_xtra1 .. t_xtra9.  You can
-         ! customize the messages that will be printed upon exit by
-         ! setting the corresponding termination_code_str value.
-         ! termination_code_str(t_xtra1) = 'my termination condition'
-         ! by default, indicate where (in the code) MESA terminated
-         if (extras_check_model == terminate) s% termination_code = t_extras_check_model
-         ! Set iX to the index of o16 and iY to ne20
-         iXC = -1
-         iXO = -1
-         iXNe20 = -1
-         iXNe22 = -1
-         iXNa = -1
-         iXMg = -1
-         iXHe = -1
-         do k = 1,s% species
-             if (chem_isos% name(s% chem_id(k)) == 'c12') then
-                iXC = k
-             end if
-             if (chem_isos% name(s% chem_id(k)) == 'o16') then
-                iXO = k
-             end if
-             if (chem_isos% name(s% chem_id(k)) == 'ne20') then
-                iXNe20 = k
-             end if
-             if (chem_isos% name(s% chem_id(k)) == 'ne22') then
-                iXNe22 = k
-             end if
-             if (chem_isos% name(s% chem_id(k)) == 'na23') then
-                iXNa = k
-             end if
-             if (chem_isos% name(s% chem_id(k)) == 'mg24') then
-                iXMg = k
-             end if
-             if (chem_isos% name(s% chem_id(k)) == 'he4') then
-                iXHe = k
-             end if
-         end do
-         if (iXC == -1 .or. iXO == -1 .or. iXNe20 == -1 .or. iXNe22 == -1 .or. iXNa == -1 .or. iXMg == -1 .or. iXHe == -1) then
-            write (*,*) 'Could not find elements specified!!'
-         end if
-         ! Find the base of the oxygen layer
-         !do k = 1, s% nz
-          !  if (s% xa(iX, k) .le. 0.1) then
-                !write(*,*) log10(s% rho(k)), s% xa(iX, k), s% gam(k), s% chiRho(k), s% chiT(k), s% d_eos_dxa(i_lnPgas,iX,k), s% d_eos_dxa(i_lnPgas,iY,k)
-           !     exit
-            !end if
-         !end do
-         ! terminate the model when the base density reaches a particular value
-         if (.false.) then
-         write(*,*) 'base density=', log10(s% rho(s% nz))
-         if (s% rho(s% nz) > 1d10) then
-            extras_check_model = terminate
-            termination_code_str(t_xtra1) = 'base density'
-            s% termination_code = t_xtra1
-         end if
-         end if
       end function extras_check_model
 
       integer function how_many_extra_history_columns(id)
@@ -216,8 +149,8 @@
          integer, intent(out) :: ierr
          real(dp), allocatable, dimension(:,:) :: d_dxa
          integer :: k
-         real(dp) :: P1, S1, my_chiT, eps, chiX_C12, chiX_O16, chiX_Ne20, chiX_Ne22, chiX_Na23, chiX_Mg24,chiX_He4, bs_C12, bs_O16, bs_Ne20, bs_Ne22, bs_Na23, bs_Mg24, bs_He4, mu1  !!!
-         !real(dp) :: chimu_c12,chimu_o16,chimu_ne20,chimu_mg24
+         real(dp) :: P1, S1, my_chiT, eps, chiX_C12, chiX_O16, chiX_Ne20, chiX_Ne22, chiX_Na23, chiX_Mg24,chiX_He4, &
+              bs_C12, bs_O16, bs_Ne20, bs_Ne22, bs_Na23, bs_Mg24, bs_He4, mu1
          real(dp) :: plnxc_plnye, plnxo_plnye, plnxne20_plnye, plnxne22_plnye, plnxmg_plnye, ln_ye
          type (star_info), pointer :: s
          ierr = 0
@@ -363,7 +296,11 @@
             vals(k,12) = bs_Na23
             vals(k,13) = bs_Mg24
             vals(k,14) = bs_He4
-          end do
+         end do
+
+         deallocate(d_dxa)
+         deallocate(xa1_c12, xa1_o16, xa1_ne20, xa1_ne22, xa1_na23, xa1_mg24, xa1_he4)
+         
       end subroutine data_for_extra_profile_columns
 
       integer function how_many_extra_history_header_items(id)
@@ -443,5 +380,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine extras_after_evolve
-      end module run_star_extras
 
+
+      end module run_star_extras
