@@ -10,7 +10,6 @@ required_termination_code_string = 'power_nuc_burn_lower_limit'
 change_initial_net = .true.
 new_net_name = 'sagb_NeNa_MgAl.net' ! use co_burn_plus.net for Ne/O/Mg core
 pgstar_flag = .true.
-!steps_to_take_before_terminate = 1
 
 / ! end of star_job namelist
 &eos
@@ -113,47 +112,16 @@ star_species_mass_min_limit_iso = 'he4'
 
 &pgstar
 
-  ! show HR diagram
-  ! this plots the history of L,Teff over many timesteps
-    HR_win_flag = .true.
+  !Grid2_win_flag = .true.
+  Grid2_win_width = 16
 
-  ! set static plot bounds
-    HR_logT_min = 3.5
-    HR_logT_max = 4.6
-    HR_logL_min = 2.0
-    HR_logL_max = 6.0
-
-  ! set window size (aspect_ratio = height/width)
-    HR_win_width = 6
-    HR_win_aspect_ratio = 1.0
-
-
-  ! show temperature/density profile
-  ! this plots the internal structure at single timestep
-    TRho_Profile_win_flag = .true.
+  !Grid2_file_flag = .true.
+  Grid2_file_width = 16
 
   ! add legend explaining colors
     show_TRho_Profile_legend = .true.
-
   ! display numerical info about the star
     show_TRho_Profile_text_info = .true.
-
-  ! set window size (aspect_ratio = height/width)
-    TRho_Profile_win_width = 8
-    TRho_Profile_win_aspect_ratio = 0.75
-         Abundance_win_flag = .true.
-         Abundance_xaxis_name = 'logxm'
-         Abundance_xaxis_reversed = .true.
-         Abundance_xmin = -4
-         Abundance_xmax = 0.5
-         Abundance_log_mass_frac_min = -4
-         Abundance_log_mass_frac_max = -0.0
-          
-         Mixing_win_flag = .true.
-         Mixing_win_width = 6
-         Mixing_win_aspect_ratio = 0.75
-         
-
 
 / ! end of pgstar namelist
 

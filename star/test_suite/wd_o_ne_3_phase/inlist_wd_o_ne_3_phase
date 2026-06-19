@@ -178,17 +178,13 @@
 
 &pgstar
 
-
         !Grid2_win_flag = .true.
-        Grid2_win_width = 20
+        Grid2_win_width = 16
 
-        !Grid2_file_flag = .true.
-        Grid2_file_width = 30
-        !Grid2_file_interval = 10000
+        Grid2_file_flag = .true.
+        Grid2_file_width = 16
+        Grid2_file_interval = 10000
  
-         !Abundance_file_flag = .true.
-     
-
          !TRho_Profile_win_flag = .true.
          show_TRho_Profile_kap_regions = .false.
          show_TRho_Profile_eos_regions = .true.
