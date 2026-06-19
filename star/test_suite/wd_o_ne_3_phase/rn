@@ -13,11 +13,11 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
    cp standard_wd1_10_mi8_3_ONeNa.mod wd1_10_mi8_3_ONeNa.mod
 else
-   do_one inlist_create_wd wd1_10_mi8_3_ONeNa.mod
+   do_one inlist_create_wd_header wd1_10_mi8_3_ONeNa.mod
    cp wd1_10_mi8_3_ONeNa.mod standard_wd1_10_mi8_3_ONeNa.mod
 fi
 
-do_one inlist_wd_o_ne_3_phase final.mod
+do_one inlist_wd_o_ne_3_phase_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
