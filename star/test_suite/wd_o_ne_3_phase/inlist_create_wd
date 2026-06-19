@@ -5,6 +5,7 @@
 show_log_description_at_start = .false.
 save_model_when_terminate = .true.
 save_model_filename = 'wd1_10_mi8_3_ONeNa.mod' 
+required_termination_code_string = 'power_nuc_burn_lower_limit'
 
 change_initial_net = .true.
 new_net_name = 'sagb_NeNa_MgAl.net' ! use co_burn_plus.net for Ne/O/Mg core
@@ -26,12 +27,15 @@ use_Type2_opacities = .true.
 
 &controls
 
+! Limit max model number as part of test suite
+max_model_number = 2500
+
 initial_mass = 8.3!
 initial_z = 0.02d0
 
 ! terminal output
-photo_interval = 50
-profile_interval = 500
+photo_interval = 100
+profile_interval = 1000
 history_interval = 100
 terminal_interval = 10
 write_header_frequency = 10
