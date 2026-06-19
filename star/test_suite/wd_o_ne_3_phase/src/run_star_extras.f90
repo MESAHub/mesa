@@ -61,7 +61,20 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
+
+
+      subroutine extras_after_evolve(id, ierr)
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         real(dp) :: dt
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call test_suite_after_evolve(s, ierr)
+      end subroutine extras_after_evolve
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
@@ -300,7 +313,7 @@
 
          deallocate(d_dxa)
          deallocate(xa1_c12, xa1_o16, xa1_ne20, xa1_ne22, xa1_na23, xa1_mg24, xa1_he4)
-         
+
       end subroutine data_for_extra_profile_columns
 
       integer function how_many_extra_history_header_items(id)
@@ -371,15 +384,5 @@
          ! by default, indicate where (in the code) MESA terminated
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
       end function extras_finish_step
-
-      subroutine extras_after_evolve(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-      end subroutine extras_after_evolve
-
 
       end module run_star_extras
