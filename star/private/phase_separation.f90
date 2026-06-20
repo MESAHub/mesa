@@ -48,11 +48,17 @@
             call separate_mix_and_heat(s, dt, 'ONe', ierr)
          else if(s% phase_separation_option == '3c') then
             call separate_mix_and_heat(s, dt, '3c', ierr)
-            call smooth_eps_phase_sep(s, dt, ierr)
          else
             write(*,*) 'invalid phase_separation_option'
             stop
          end if
+
+         if(s% smooth_phase_separation_heating) then
+            ! Redistribute energy associated with phase separation evenly through inner half of star.
+            ! This can help with small timesteps where there may be too much localized heating.
+            call smooth_eps_phase_sep(s, dt, ierr)
+         end if
+
       end subroutine do_phase_separation
 
       subroutine separate_mix_and_heat(s, dt, components, ierr)

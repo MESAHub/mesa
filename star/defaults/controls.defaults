@@ -7566,6 +7566,17 @@
 
     do_phase_separation_heating = .true.
 
+      ! smooth_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, redistribute all heating associated with phase
+      ! separation evenly throughout the inner half of the white dwarf
+      ! (prevents unphysical localized spikes at small time steps)
+
+      ! ::
+
+    smooth_phase_separation_heating = .true.
+
       ! phase_separation_mixing_use_brunt
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -101,6 +101,7 @@
       
       do_phase_separation = .true.
       do_phase_separation_heating = .true.
+      smooth_phase_separation_heating = .true.
       phase_separation_mixing_use_brunt = .true.
       phase_separation_option = '3c'
 
