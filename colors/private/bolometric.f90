@@ -72,19 +72,25 @@ contains
       call calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
    end subroutine calculate_bolometric
 
+
    subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
+      real(dp), dimension(:), intent(in) :: wavelengths, fluxes
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux
+      real(dp), allocatable :: clean_fluxes(:)
       integer :: i
 
-      ! zero out any invalid flux/wavelength values
-      do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0d0 .or. fluxes(i) < 0.0d0) then
-            fluxes(i) = 0.0d0
+      allocate(clean_fluxes(size(fluxes)))
+      clean_fluxes = fluxes
+
+      do i = 1, size(wavelengths)
+         if (wavelengths(i) <= 0.0d0 .or. clean_fluxes(i) < 0.0d0) then
+            clean_fluxes(i) = 0.0d0
          end if
       end do
 
-      call simpson_integration(wavelengths, fluxes, bolometric_flux)
+      call simpson_integration(wavelengths, clean_fluxes, bolometric_flux)
+
+      deallocate(clean_fluxes)
 
       if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."
