@@ -182,6 +182,7 @@ contains
       real(dp), intent(out) :: result_flux(n_lambda)
 
       integer :: i_x, i_y, i_z
+      integer :: ix_max, iy_max, iz_max
       real(dp) :: t_x, t_y, t_z
       real(dp) :: dx, dy, dz
       real(dp) :: val, df_dx, df_dy, df_dz
@@ -195,14 +196,35 @@ contains
       ny = size(y_grid)
       nz = size(z_grid)
 
-      ! Find containing cell (done once for all wavelengths)
+      ! Find containing cell (done once for all wavelengths).  Singleton axes
+      ! are valid degenerate dimensions, not an out-of-grid condition.
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
-      ! If outside grid, use nearest point for all wavelengths
-      if (i_x < 1 .or. i_x >= nx .or. &
-          i_y < 1 .or. i_y >= ny .or. &
-          i_z < 1 .or. i_z >= nz) then
+      ix_max = 1
+      iy_max = 1
+      iz_max = 1
+
+      if (nx == 1) then
+         i_x = 1
+         t_x = 0.0_dp
+         ix_max = 0
+      end if
+      if (ny == 1) then
+         i_y = 1
+         t_y = 0.0_dp
+         iy_max = 0
+      end if
+      if (nz == 1) then
+         i_z = 1
+         t_z = 0.0_dp
+         iz_max = 0
+      end if
+
+      ! If outside a non-degenerate grid dimension, use nearest point for all wavelengths.
+      if ((nx > 1 .and. (i_x < 1 .or. i_x >= nx)) .or. &
+          (ny > 1 .and. (i_y < 1 .or. i_y >= ny)) .or. &
+          (nz > 1 .and. (i_z < 1 .or. i_z >= nz))) then
 
          call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                  i_x, i_y, i_z)
@@ -212,10 +234,22 @@ contains
          return
       end if
 
-      ! Grid cell spacing
-      dx = x_grid(i_x + 1) - x_grid(i_x)
-      dy = y_grid(i_y + 1) - y_grid(i_y)
-      dz = z_grid(i_z + 1) - z_grid(i_z)
+      ! Grid cell spacing.  Degenerate axes have zero derivative contribution.
+      if (nx > 1) then
+         dx = x_grid(i_x + 1) - x_grid(i_x)
+      else
+         dx = 0.0_dp
+      end if
+      if (ny > 1) then
+         dy = y_grid(i_y + 1) - y_grid(i_y)
+      else
+         dy = 0.0_dp
+      end if
+      if (nz > 1) then
+         dz = z_grid(i_z + 1) - z_grid(i_z)
+      else
+         dz = 0.0_dp
+      end if
 
       ! Precompute Hermite basis functions (same for all wavelengths)
       h_x  = [h00(t_x), h01(t_x)]
@@ -225,16 +259,15 @@ contains
       h_z  = [h00(t_z), h01(t_z)]
       hz_d = [h10(t_z), h11(t_z)]
 
-
-      ! stencil loop — weights are invariant over lambda, so lambda is innermost
+      ! stencil loop -- weights are invariant over lambda, so lambda is innermost
       result_flux = 0.0_dp
-      do iz = 0, 1
+      do iz = 0, iz_max
          wz  = h_z(iz + 1)
          wzd = hz_d(iz + 1)
-         do iy = 0, 1
+         do iy = 0, iy_max
             wy  = h_y(iy + 1)
             wyd = hy_d(iy + 1)
-            do ix = 0, 1
+            do ix = 0, ix_max
                wx  = h_x(ix + 1)
                wxd = hx_d(ix + 1)
                do lam = 1, n_lambda
@@ -311,6 +344,7 @@ contains
       real(dp) :: f_interp
 
       integer :: i_x, i_y, i_z, ix, iy, iz
+      integer :: ix_max, iy_max, iz_max
       integer :: nx, ny, nz
       real(dp) :: t_x, t_y, t_z, dx, dy, dz, f_sum
       real(dp) :: dx_values(2, 2, 2), dy_values(2, 2, 2), dz_values(2, 2, 2)
@@ -325,22 +359,54 @@ contains
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
-      if (i_x < 1 .or. i_x >= nx .or. &
-          i_y < 1 .or. i_y >= ny .or. &
-          i_z < 1 .or. i_z >= nz) then
+      ix_max = 1
+      iy_max = 1
+      iz_max = 1
+
+      if (nx == 1) then
+         i_x = 1
+         t_x = 0.0_dp
+         ix_max = 0
+      end if
+      if (ny == 1) then
+         i_y = 1
+         t_y = 0.0_dp
+         iy_max = 0
+      end if
+      if (nz == 1) then
+         i_z = 1
+         t_z = 0.0_dp
+         iz_max = 0
+      end if
+
+      if ((nx > 1 .and. (i_x < 1 .or. i_x >= nx)) .or. &
+          (ny > 1 .and. (i_y < 1 .or. i_y >= ny)) .or. &
+          (nz > 1 .and. (i_z < 1 .or. i_z >= nz))) then
          call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                  i_x, i_y, i_z)
          f_interp = f_values(i_x, i_y, i_z)
          return
       end if
 
-      dx = x_grid(i_x + 1) - x_grid(i_x)
-      dy = y_grid(i_y + 1) - y_grid(i_y)
-      dz = z_grid(i_z + 1) - z_grid(i_z)
+      if (nx > 1) then
+         dx = x_grid(i_x + 1) - x_grid(i_x)
+      else
+         dx = 0.0_dp
+      end if
+      if (ny > 1) then
+         dy = y_grid(i_y + 1) - y_grid(i_y)
+      else
+         dy = 0.0_dp
+      end if
+      if (nz > 1) then
+         dz = z_grid(i_z + 1) - z_grid(i_z)
+      else
+         dz = 0.0_dp
+      end if
 
-      do iz = 0, 1
-         do iy = 0, 1
-            do ix = 0, 1
+      do iz = 0, iz_max
+         do iy = 0, iy_max
+            do ix = 0, ix_max
                values(ix+1, iy+1, iz+1) = f_values(i_x+ix, i_y+iy, i_z+iz)
                call compute_derivatives_at_point(f_values, i_x+ix, i_y+iy, i_z+iz, &
                                                  nx, ny, nz, x_grid, y_grid, z_grid, &
@@ -359,9 +425,9 @@ contains
       hz_d = [h10(t_z), h11(t_z)]
 
       f_sum = 0.0_dp
-      do iz = 1, 2
-         do iy = 1, 2
-            do ix = 1, 2
+      do iz = 1, iz_max + 1
+         do iy = 1, iy_max + 1
+            do ix = 1, ix_max + 1
                f_sum = f_sum + h_x(ix)*h_y(iy)*h_z(iz)  * values(ix, iy, iz)
                f_sum = f_sum + hx_d(ix)*h_y(iy)*h_z(iz) * dx * dx_values(ix, iy, iz)
                f_sum = f_sum + h_x(ix)*hy_d(iy)*h_z(iz) * dy * dy_values(ix, iy, iz)
