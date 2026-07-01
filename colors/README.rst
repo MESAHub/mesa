@@ -232,3 +232,15 @@ A browsable mirror of the processed SED_Tools output is available at
 `https://nillmill.ddns.net/sed_tools/ <https://nillmill.ddns.net/sed_tools/>`_,
 providing a live view of all available atmosphere grids and filter facilities
 along with file counts, disk usage, and metadata.
+
+
+Interpolation and filter-support caveats
+----------------------------------------
+
+Colors computes synthetic photometry by interpolating atmosphere spectra in stellar-parameter space and by interpolating filter transmission curves onto the SED wavelength grid. These interpolation steps are numerical operations and should not be interpreted as a substitute for atmosphere-model validation.
+
+Filter transmission is assumed to be zero outside the wavelength interval explicitly tabulated by the filter file. Users should therefore provide filter curves that cover the full intended passband and should not rely on interpolation or extrapolation beyond the supplied filter table. The same compact-support rule is applied to both model-star filter convolution and Vega zero-point calculations.
+
+Atmosphere-grid interpolation is only as reliable as the grid coverage and smoothness allow. Grids with singleton axes, such as a single metallicity value, are supported as degenerate dimensions, but the interpolation is then effectively lower-dimensional along that axis. Users should monitor `Interp_rad`, inspect diagnostic SED output when available, and treat results near or outside atmosphere-grid boundaries with caution.
+
+The bounded Hermite interpolator is designed to retain smooth cubic interpolation where it behaves well, while falling back to multilinear interpolation when the Hermite result becomes nonphysical or inconsistent with the local grid-cell flux scale. This is a numerical safeguard, not an uncertainty model. Sharp spectral features, sparse atmosphere grids, hot/blue SEDs, and high-surface-gravity models should still be checked carefully against diagnostic SEDs and expected broadband behavior.
