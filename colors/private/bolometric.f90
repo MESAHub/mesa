@@ -23,6 +23,7 @@ module bolometric
    use colors_def, only: Colors_General_Info
    use colors_utils, only: simpson_integration
    use hermite_interp, only: construct_sed_hermite
+   use hermite_interp_bounded, only: construct_sed_hermite_bounded
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
 
@@ -44,7 +45,7 @@ contains
 
       character(len=32) :: interpolation_method
 
-      interpolation_method = 'Hermite'   ! or 'Linear' / 'KNN' later
+      interpolation_method = 'Hermite_bounded'   ! or 'Linear' / 'KNN' / 'Hermite'
 
       ! how far (teff, log_g, metallicity) is from the nearest grid point
       interpolation_radius = compute_interp_radius(teff, log_g, metallicity, &
@@ -63,9 +64,14 @@ contains
          call construct_sed_knn(rq, teff, log_g, metallicity, R, d, &
                                 sed_filepath, wavelengths, fluxes)
 
+      case ('Hermite_bounded', 'hermite_bounded', 'HERMITE_BOUNDED')
+         call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
+                                sed_filepath, wavelengths, fluxes)
+
+
       case default
-         ! fallback: hermite
-         call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
+         ! fallback: bounded hermite (switches to linear in regions where hermite overshoots.)
+         call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
                                     sed_filepath, wavelengths, fluxes)
       end select
 
