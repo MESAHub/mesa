@@ -7547,6 +7547,9 @@
       !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
       !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
+      ! + ``'3c'`` : three-component phase separation option dynamically selects dominant three components out
+      !   of C/O/Ne/Na/Mg and applies three-component PS procedure based on
+      !   `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_.
 
       ! ::
 
@@ -7562,6 +7565,17 @@
       ! ::
 
     do_phase_separation_heating = .true.
+
+      ! smooth_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, redistribute all heating associated with phase
+      ! separation evenly throughout the inner half of the white dwarf
+      ! (prevents unphysical localized spikes at small time steps)
+
+      ! ::
+
+    smooth_phase_separation_heating = .true.
 
       ! phase_separation_mixing_use_brunt
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
