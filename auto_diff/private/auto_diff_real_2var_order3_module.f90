@@ -805,22 +805,24 @@ module auto_diff_real_2var_order3_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
       q0 = Heaviside(x%val)
       q1 = q0*x%val
       q2 = sqrt(q1)
-      q3 = 0.5_dp*q2*powm1(x%val)
-      q4 = 2.0_dp*x%val
+      q3 = 0.5_dp*q2*powm1(x_safe)
+      q4 = 2.0_dp*x_safe
       q5 = q4*x%d2val1
       q6 = pow2(x%d1val1)
-      q7 = pow2(x%val)
+      q7 = pow2(x_safe)
       q8 = 0.25_dp*q2*powm1(q7)
       q9 = q4*x%d2val2
       q10 = pow2(x%d1val2)
-      q11 = x%d1val1*x%val
+      q11 = x%d1val1*x_safe
       q12 = 4.0_dp*q7
-      q13 = 0.125_dp*q2*powm1(pow3(x%val))
+      q13 = 0.125_dp*q2*powm1(pow3(x_safe))
       q14 = 4.0_dp*x%d1val1_d1val2
-      q15 = x%d1val2*x%val
+      q15 = x%d1val2*x_safe
       unary%val = q2
       unary%d1val1 = q3*x%d1val1
       unary%d1val2 = q3*x%d1val2
@@ -829,7 +831,7 @@ module auto_diff_real_2var_order3_module
       unary%d2val2 = q8*(-q10 + q9)
       unary%d3val1 = q13*(-6.0_dp*q11*x%d2val1 + 3.0_dp*pow3(x%d1val1) + q12*x%d3val1)
       unary%d2val1_d1val2 = 0.125_dp*(3.0_dp*q6*x%d1val2 - q11*q14 + q12*x%d2val1_d1val2 - q5*x%d1val2) &
-                            * pow3(sqrt(q1))*powm1(q0)*powm1(pow4(x%val))
+                            * pow3(sqrt(q1))*powm1(q0)*powm1(pow4(x_safe))
       unary%d1val1_d2val2 = q13*(3.0_dp*q10*x%d1val1 + q12*x%d1val1_d2val2 - q14*q15 - q9*x%d1val1)
       unary%d3val2 = q13*(-6.0_dp*q15*x%d2val2 + 3.0_dp*pow3(x%d1val2) + q12*x%d3val2)
    end function safe_sqrt_self
@@ -1054,15 +1056,17 @@ module auto_diff_real_2var_order3_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
-      q0 = powm1(x%val)
-      q1 = pow2(x%val)
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
+      q0 = powm1(x_safe)
+      q1 = pow2(x_safe)
       q2 = powm1(q1)
-      q3 = x%d2val1*x%val
+      q3 = x%d2val1*x_safe
       q4 = pow2(x%d1val1)
-      q5 = x%d1val1_d1val2*x%val
-      q6 = x%d2val2*x%val
+      q5 = x%d1val1_d1val2*x_safe
+      q6 = x%d2val2*x_safe
       q7 = pow2(x%d1val2)
-      q8 = powm1(pow3(x%val))
+      q8 = powm1(pow3(x_safe))
       q9 = 2.0_dp*x%d1val2
       unary%val = safe_log(x%val)
       unary%d1val1 = q0*x%d1val1
@@ -1127,16 +1131,18 @@ module auto_diff_real_2var_order3_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
       q0 = powm1(ln10)
-      q1 = q0*powm1(x%val)
-      q2 = x%d2val1*x%val
+      q1 = q0*powm1(x_safe)
+      q2 = x%d2val1*x_safe
       q3 = pow2(x%d1val1)
-      q4 = pow2(x%val)
+      q4 = pow2(x_safe)
       q5 = q0*powm1(q4)
-      q6 = x%d1val1_d1val2*x%val
-      q7 = x%d2val2*x%val
+      q6 = x%d1val1_d1val2*x_safe
+      q7 = x%d2val2*x_safe
       q8 = pow2(x%d1val2)
-      q9 = q0*powm1(pow3(x%val))
+      q9 = q0*powm1(pow3(x_safe))
       q10 = 2.0_dp*x%d1val2
       unary%val = q0*safe_log(x%val)
       unary%d1val1 = q1*x%d1val1

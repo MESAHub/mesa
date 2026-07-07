@@ -644,7 +644,7 @@ module auto_diff_real_1var_order1_module
       real(dp) :: q0
       q0 = sqrt(x%val*Heaviside(x%val))
       unary%val = q0
-      unary%d1val1 = 0.5_dp*q0*x%d1val1*powm1(x%val)
+      unary%d1val1 = 0.5_dp*q0*x%d1val1*powm1(max(x%val, 1.E-99_dp))
    end function safe_sqrt_self
 
    function unary_minus_self(x) result(unary)
@@ -704,7 +704,7 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = safe_log(x%val)
-      unary%d1val1 = x%d1val1*powm1(x%val)
+      unary%d1val1 = x%d1val1*powm1(max(x%val, 1.E-99_dp))
    end function safe_log_self
 
    function log10_self(x) result(unary)
@@ -722,7 +722,7 @@ module auto_diff_real_1var_order1_module
       real(dp) :: q0
       q0 = powm1(ln10)
       unary%val = q0*safe_log(x%val)
-      unary%d1val1 = q0*x%d1val1*powm1(x%val)
+      unary%d1val1 = q0*x%d1val1*powm1(max(x%val, 1.E-99_dp))
    end function safe_log10_self
 
    function log2_self(x) result(unary)
