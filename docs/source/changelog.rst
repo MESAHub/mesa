@@ -58,6 +58,12 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
+Other Changes
+-------------
+
+`mesa/binary` now no longer copies the binary history columns into the star history by default. Set `append_to_star_history = .true.` to reenable this feature. All binary history data is still saved to `history_name` defined in section `&binary_controls`.
+
+
 Changes in r26.4.1
 ===================
 

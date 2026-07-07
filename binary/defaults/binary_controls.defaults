@@ -88,11 +88,13 @@
 
 ! If true, then the columns from the ``binary_history`` are also included
 ! in each of the stars history files.
-! NOTE: if .false., then pgstar cannot access binary data
+! NOTE: this is a legacy setting whose primary purpose was to allow a binary
+! column to be plotted in a `pgstar` window (since `pgbinary` didn't exist
+! initially). Now all binary columns can be plotted directly in a `pgbinary` window.
 
 ! ::
 
-   append_to_star_history = .true.
+   append_to_star_history = .false.
 
 
 ! log_directory
