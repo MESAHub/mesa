@@ -283,18 +283,20 @@
             if (k /= s% nz) then
                if ((s% q(k) > s% min_q_for_drag) .and. &
                     (s% drag_coefficient > 0) .and. &
-                    s% use_drag_energy) then
+                    s% use_drag_energy .and. &
+                    s% dynamic_timescale_start(k) > 0d0) then
                   v_00 = wrap_v_00(s,k)
-                  drag_force = s% drag_coefficient*v_00/s% dt
+                  drag_force = s% drag_coefficient*v_00/max(s% dt, s% dynamic_timescale_start(k))
                   drag_energy = 0.5d0*v_00*drag_force
                   s% FdotV_drag_energy(k) = drag_energy%val
                ! drag energy for outer half-cell.   the 0.5d0 is for dm/2
                end if
                if ((s% q(k+1) > s% min_q_for_drag) .and. &
                     (s% drag_coefficient > 0) .and. &
-                    s% use_drag_energy) then
+                    s% use_drag_energy .and. &
+                    s% dynamic_timescale_start(k+1) > 0d0) then
                   v_p1 = wrap_v_p1(s,k)
-                  drag_force = s% drag_coefficient*v_p1/s% dt
+                  drag_force = s% drag_coefficient*v_p1/max(s% dt, s% dynamic_timescale_start(k+1))
                   drag_energy = drag_energy + 0.5d0*v_p1*drag_force
                   s% FdotV_drag_energy(k) = drag_energy%val
                ! drag energy for inner half-cell.   the 0.5d0 is for dm/2
