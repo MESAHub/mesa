@@ -26,6 +26,7 @@ module tdc_hydro
    use auto_diff_support
    use accurate_sum_auto_diff_star_order1
    use star_utils
+   use mlt_tdc_face_support, only: get_face_scale_height_ad
 
    implicit none
 
@@ -55,10 +56,17 @@ contains
          return
       end if
 
-      !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+      !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
-         ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-         if (s%Hp_face(k) <= 0) then
+         if (s%use_face_values_eos_and_kap_mlt_tdc) then
+            x = get_TDC_Hp_face(s, k, op_err)
+            if (op_err /= 0) then
+               !$OMP ATOMIC WRITE
+               ierr = op_err
+            else if (s%Hp_face(k) <= 0d0) then
+               s%Hp_face(k) = x%val
+            end if
+         else if (s%Hp_face(k) <= 0d0) then
             ! this scale height for face is already calculated in TDC
             s%Hp_face(k) = get_scale_height_face_val(s, k) ! because this is called before s% scale_height(k) is updated in mlt_vars.
          end if
@@ -68,18 +76,27 @@ contains
          if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 1', s%model_number
          return
       end if
-      !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+      !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
          x = compute_Chi_div_w_face(s, k, op_err) ! Sets Chi_face
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          x = compute_tdc_Eq_div_w_face(s, k, op_err) ! Sets Eq_face
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          if (s% v_flag) then
             x = compute_tdc_Uq_face(s, k, op_err)
          else if (s% u_flag) then
             x = compute_tdc_Uq_dm_cell(s, k, op_err)
          end if
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
       end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) then
@@ -104,14 +121,33 @@ contains
    end subroutine get_TDC_alfa_beta_face_weights
 
 
-   function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm , different than rsp2
+   function get_TDC_Hp_face(s, k, ierr) result(Hp_face)
       type(star_info), pointer :: s
       integer, intent(in) :: k
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: Hp_face
+
+      ierr = 0
+      if (s%use_face_values_eos_and_kap_mlt_tdc) then
+         call get_face_scale_height_ad(s, k, Hp_face, ierr)
+      else
+         Hp_face = get_scale_height_face(s, k)
+      end if
+   end function get_TDC_Hp_face
+
+
+   function wrap_Hp_cell(s, k, ierr) result(Hp_cell)  ! cm , different than rsp2
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: Hp1, Hp0, Hp_cell
-      Hp0 = get_scale_height_face(s,k)
+      ierr = 0
+      Hp0 = get_TDC_Hp_face(s, k, ierr)
+      if (ierr /= 0) return
       Hp1 = 0d0
       if (k+1 < s%nz) then
-         Hp1 = shift_p1(get_scale_height_face(s,k+1))
+         Hp1 = shift_p1(get_TDC_Hp_face(s, k+1, ierr))
+         if (ierr /= 0) return
       end if
       Hp_cell = 0.5d0*(Hp0 + Hp1)
       !0.5d0*(wrap_Hp_00(s, k) + wrap_Hp_p1(s, k))
@@ -127,7 +163,8 @@ contains
       include 'formats'
       ierr = 0
 
-      Hp_cell = wrap_Hp_cell(s, k)
+      Hp_cell = wrap_Hp_cell(s, k, ierr)
+      if (ierr /= 0) return
       return ! below is skipped, for now.
 
       d_00 = wrap_d_00(s, k)
@@ -256,7 +293,7 @@ contains
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
    else
-      Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
+      Hp_face = get_TDC_Hp_face(s, k, ierr)
       if (ierr /= 0) return
       if (s%TDC_use_density_form_for_eddy_viscosity) then
          ! new density derivative form
@@ -370,8 +407,8 @@ contains
       else
          r_00 = wrap_opt_time_center_r_00(s, k)
 
-         ! which do we adopt?
-         Chi_00 = compute_Chi_cell(s, k, ierr)  ! s% Chi_ad(k) XXX
+         Chi_00 = compute_Chi_cell(s, k, ierr)
+         if (ierr /= 0) return
 
          if (k > 1) then
             Chi_m1 = shift_m1(compute_Chi_cell(s, k-1, ierr))

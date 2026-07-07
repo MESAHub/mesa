@@ -234,6 +234,25 @@
     use_TDC_enthalpy_flux_limiter = .false.
 
 
+      ! use_face_values_eos_and_kap_mlt_tdc
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! MESA interpolates primitive solver variables such as T, rho, L, and
+      ! composition, together with constructed quantities such as opacity,
+      ! pressure, and other EOS results, onto cell faces for use in MLT and
+      ! TDC. If use_face_values_eos_and_kap_mlt_tdc = .true., this option
+      ! instead reconstructs only the primitive face variables and then makes
+      ! additional EOS and opacity calls to obtain the thermodynamic quantities
+      ! corresponding to that face state. Despite the cost of the extra EOS and
+      ! opacity work, this can improve accuracy on coarse meshes, especially in
+      ! unresolved opacity bumps in pulsating envelopes, and is a potential
+      ! candidate for becoming the default mode, pending further testing.
+
+      ! ::
+
+    use_face_values_eos_and_kap_mlt_tdc = .false.
+
+
       ! include_mlt_Pturb_in_thermodynamic_gradients
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -252,6 +271,7 @@
       ! If doing velocity time_centering, include time centering in mlt. Depending on the time
       ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
       ! for P, L, and r in geff, gradr, grada, and mlt.
+      ! Currently not supported together with ``use_face_values_eos_and_kap_mlt_tdc``.
 
       ! ::
 
