@@ -272,3 +272,94 @@
       ! ::
 
     use_hydro_merge_limits_in_mesh_plan = .false.
+
+
+      ! split_merge_amr_use_metric_zoning_for_u_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, and ``use_split_merge_amr`` and ``u_flag`` are true, use the
+      ! weighted split/merge metric controls below instead of the standard
+      ! single-coordinate split/merge zoning controls.  This is ignored for
+      ! ``v_flag``.
+
+      ! ::
+
+    split_merge_amr_use_metric_zoning_for_u_flag = .false.
+
+
+      ! split_merge_amr_metric_logR_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Weight for the normalized log radius contribution in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_logR_weight = 1d0
+
+
+      ! split_merge_amr_metric_logtau_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Weight for the normalized log optical-depth contribution in the
+      ! ``u_flag`` split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_logtau_weight = 1d0
+
+
+      ! split_merge_amr_metric_logT_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Weight for the normalized cell-centered log temperature contribution
+      ! in the ``u_flag`` split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_logT_weight = 0d0
+
+
+      ! split_merge_amr_metric_min_delta_lnR
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Floor for the log radius normalization range in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_min_delta_lnR = 1d-9
+
+
+      ! split_merge_amr_metric_min_delta_lntau
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Floor for the log optical-depth normalization range in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_min_delta_lntau = 1d-9
+
+
+      ! split_merge_amr_metric_min_delta_lnT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Floor for the log temperature normalization range in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_min_delta_lnT = 1d-12
+
+
+      ! split_merge_amr_metric_merge_guard_ratio
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If positive, inhibit a merge candidate when any individual weighted
+      ! metric component exceeds this factor times the metric target size.
+      ! Negative values disable this guard.
+
+      ! ::
+
+    split_merge_amr_metric_merge_guard_ratio = -1d0

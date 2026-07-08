@@ -250,9 +250,12 @@
             oversize_ratio, undersize_ratio, abs_du_div_cs, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
-            target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope
+            target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
+            metric_logR_weight, metric_logtau_weight, metric_logT_weight, &
+            metric_weight_sum, metric_delta_lnR, metric_delta_lntau, metric_delta_lnT, &
+            metric_component_max
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
-            du_div_cs_limit_flag
+            du_div_cs_limit_flag, metric_zoning, metric_merge_guard
          integer :: nz, nz_baseline, k, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
 
@@ -290,7 +293,49 @@
             nullify(v,r_for_v)
          end if
 
-         if (hydrid_zoning) then
+         metric_logR_weight = max(0d0, s% split_merge_amr_metric_logR_weight)
+         metric_logtau_weight = max(0d0, s% split_merge_amr_metric_logtau_weight)
+         metric_logT_weight = max(0d0, s% split_merge_amr_metric_logT_weight)
+         metric_weight_sum = metric_logR_weight + metric_logtau_weight + metric_logT_weight
+         metric_zoning = s% split_merge_amr_use_metric_zoning_for_u_flag .and. &
+            s% u_flag .and. metric_weight_sum > 0d0
+
+         if (metric_zoning) then
+            metric_delta_lnR = 1d0
+            if (metric_logR_weight > 0d0) then
+               metric_delta_lnR = 0d0
+               do k = 1, nz
+                  metric_delta_lnR = metric_delta_lnR + metric_dlnR(k)
+               end do
+               metric_delta_lnR = max(metric_delta_lnR, &
+                  max(tiny(1d0), s% split_merge_amr_metric_min_delta_lnR))
+            end if
+
+            metric_delta_lntau = 1d0
+            if (metric_logtau_weight > 0d0) then
+               metric_delta_lntau = 0d0
+               do k = 1, nz
+                  metric_delta_lntau = metric_delta_lntau + metric_dlntau(k)
+               end do
+               metric_delta_lntau = max(metric_delta_lntau, &
+                  max(tiny(1d0), s% split_merge_amr_metric_min_delta_lntau))
+            end if
+
+            metric_delta_lnT = 1d0
+            if (metric_logT_weight > 0d0) then
+               metric_delta_lnT = 0d0
+               do k = 1, nz
+                  metric_delta_lnT = metric_delta_lnT + metric_dlnT(k)
+               end do
+               metric_delta_lnT = max(metric_delta_lnT, &
+                  max(tiny(1d0), s% split_merge_amr_metric_min_delta_lnT))
+            end if
+
+            inner_dx_baseline = metric_weight_sum/dble(max(1,nz_baseline))
+            outer_dx_baseline = inner_dx_baseline
+            xmin = 0d0
+            xmax = metric_weight_sum
+         else if (hydrid_zoning) then
             target_dr_core = (r_core_cm - s% R_center)/nz_r_core
             target_dlnR_envelope = &
                (s% lnR(1) - log(max(1d0,r_core_cm)))/(nz_baseline - nz_r_core)
@@ -325,7 +370,10 @@
 
             xL = xR
             dx_baseline = inner_dx_baseline
-            if (hydrid_zoning) then
+            metric_component_max = 0d0
+            if (metric_zoning) then
+               call metric_dx(k, dx_actual, metric_component_max)
+            else if (hydrid_zoning) then
                if (s% r(k) < r_core_cm) then
                   xR = s% r(k)
                   if (k == nz) then
@@ -372,8 +420,10 @@
             if (s% split_merge_amr_avoid_repeated_remesh .and. &
                   (s% split_merge_amr_avoid_repeated_remesh .and. &
                      s% amr_split_merge_has_undergone_remesh(k))) cycle
-            dx_actual = xR - xL
-            if (logtau_zoning) dx_actual = -dx_actual  ! make dx_actual > 0
+            if (.not. metric_zoning) then
+               dx_actual = xR - xL
+               if (logtau_zoning) dx_actual = -dx_actual  ! make dx_actual > 0
+            end if
 
 
             if (s% split_amr_ignore_core_cells .and. &
@@ -407,16 +457,89 @@
                undersize_ratio = dq_min/s% dq(k)
             end if
 
-            if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
-               call check_merge_limits
-            else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
-               TooSmall = undersize_ratio; iTooSmall = k
+            metric_merge_guard = metric_zoning .and. &
+               s% split_merge_amr_metric_merge_guard_ratio > 0d0 .and. &
+               metric_component_max > &
+                  s% split_merge_amr_metric_merge_guard_ratio*dx_baseline
+
+            if (.not. metric_merge_guard) then
+               if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
+                  call check_merge_limits
+               else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
+                  TooSmall = undersize_ratio; iTooSmall = k
+               end if
             end if
 
          end do
 
 
          contains
+
+         real(dp) function metric_dlnR(j)
+            integer, intent(in) :: j
+            real(dp) :: x_inner, x_outer
+
+            if (j == nz) then
+               x_inner = log(max(1d0, s% R_center))
+            else
+               x_inner = log(s% r(j+1))
+            end if
+            x_outer = log(s% r(j))
+            metric_dlnR = abs(x_outer - x_inner)
+         end function metric_dlnR
+
+
+         real(dp) function metric_dlntau(j)
+            integer, intent(in) :: j
+            real(dp) :: x_inner, x_outer
+
+            if (j == nz) then
+               x_inner = log(tau_center)
+            else
+               x_inner = log(s% tau(j+1))
+            end if
+            x_outer = log(s% tau(j))
+            metric_dlntau = abs(x_inner - x_outer)
+         end function metric_dlntau
+
+
+         real(dp) function metric_dlnT(j)
+            integer, intent(in) :: j
+
+            metric_dlnT = 0d0
+            if (j > 1) metric_dlnT = metric_dlnT + &
+               0.5d0*abs(s% lnT(j) - s% lnT(j-1))
+            if (j < nz) metric_dlnT = metric_dlnT + &
+               0.5d0*abs(s% lnT(j+1) - s% lnT(j))
+         end function metric_dlnT
+
+
+         subroutine metric_dx(j, dx, component_max)
+            integer, intent(in) :: j
+            real(dp), intent(out) :: dx, component_max
+            real(dp) :: component
+
+            dx = 0d0
+            component_max = 0d0
+
+            if (metric_logR_weight > 0d0) then
+               component = metric_logR_weight*metric_dlnR(j)/metric_delta_lnR
+               dx = dx + component
+               component_max = max(component_max, component)
+            end if
+
+            if (metric_logtau_weight > 0d0) then
+               component = metric_logtau_weight*metric_dlntau(j)/metric_delta_lntau
+               dx = dx + component
+               component_max = max(component_max, component)
+            end if
+
+            if (metric_logT_weight > 0d0) then
+               component = metric_logT_weight*metric_dlnT(j)/metric_delta_lnT
+               dx = dx + component
+               component_max = max(component_max, component)
+            end if
+         end subroutine metric_dx
 
          subroutine check_merge_limits
             ! Pablo's additions to modify when merge

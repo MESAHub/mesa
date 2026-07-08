@@ -9,6 +9,14 @@
          logical :: use_TDC_enthalpy_flux_limiter
          logical :: include_mlt_in_velocity_time_centering
          logical :: use_hydro_merge_limits_in_mesh_plan
+         logical :: split_merge_amr_use_metric_zoning_for_u_flag
+         real(dp) :: split_merge_amr_metric_logR_weight, &
+            split_merge_amr_metric_logtau_weight, &
+            split_merge_amr_metric_logT_weight, &
+            split_merge_amr_metric_min_delta_lnR, &
+            split_merge_amr_metric_min_delta_lntau, &
+            split_merge_amr_metric_min_delta_lnT, &
+            split_merge_amr_metric_merge_guard_ratio
 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap
