@@ -79,7 +79,7 @@
          integer :: j, k, k_old, k_new, nz, new_capacity, iounit, species, &
             max_k_old_for_split, min_k_old_for_split
          real(dp) :: D_mix_cutoff, next_xq, next_dq, max_dq_cntr, &
-            dq_sum, min_dq, min_dq_for_xa, min_dq_for_logT
+            min_dq, min_dq_for_xa, min_dq_for_logT
 
          logical, parameter :: write_plan_debug = .false.
 
@@ -604,7 +604,7 @@
 
             logical :: dbg, force_merge_with_one_more, du_div_cs_limit_flag
             real(dp) :: maxval_delta_xa, next_dq_max, beta_limit, &
-               remaining_dq_old, min_dr, abs_du_div_cs
+               remaining_dq_old, min_dr, abs_du_div_cs, xq_sum
             integer :: kk, k_old_init, k_old_next, k_old_next_max, j00, jm1, i, max_merge
 
             include 'formats'
@@ -615,6 +615,7 @@
             k_old = 1
             k_new = 1
             xq_new(1) = 0
+            xq_sum = 0d0
             min_dr = s% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
             abs_du_div_cs = 0d0
 
@@ -911,7 +912,7 @@
                   return
                end if
 
-               dq_sum = sum(dq_new(1:k_new))
+               xq_sum = xq_sum + dq_new(k_new)
 
                k_new = k_new + 1
                if (max_allowed_nz > 0 .and. k_new > max_allowed_nz) then
@@ -921,17 +922,17 @@
                end if
 
                xq_new(k_new) = next_xq
-               if (abs(xq_new(k_new) - dq_sum) > 1d-6) then
+               if (abs(xq_new(k_new) - xq_sum) > 1d-6) then
                   write(*,'(A)')
                   write(*,*) 'k_new', k_new
-                  write(*,1) 'xq_new(k_new) - dq_sum', xq_new(k_new) - dq_sum
+                  write(*,1) 'xq_new(k_new) - xq_sum', xq_new(k_new) - xq_sum
                   write(*,1) 'xq_new(k_new)', xq_new(k_new)
-                  write(*,1) 'dq_sum', dq_sum
-                  write(*,*) 'pick_new_points: abs(xq_new(k_new) - dq_sum) > 1d-6'
+                  write(*,1) 'xq_sum', xq_sum
+                  write(*,*) 'pick_new_points: abs(xq_new(k_new) - xq_sum) > 1d-6'
                   ierr = -1
                   return
                end if
-               !write(*,2) 'xq_new(k_new) - dq_sum', k_new, xq_new(k_new) - dq_sum
+               !write(*,2) 'xq_new(k_new) - xq_sum', k_new, xq_new(k_new) - xq_sum
 
                ! increment k_old if necessary
                do while (k_old < nz_old)
