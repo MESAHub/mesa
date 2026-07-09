@@ -100,15 +100,29 @@
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix, eps_phase_separation
          ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
          if (eps_grav_form) then  ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
-            esum_ad = - dL_dm_ad + sources_ad + &
-               others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad + eps_grav_ad
+            esum_ad = -dL_dm_ad
+            esum_ad = esum_ad + sources_ad
+            esum_ad = esum_ad + others_ad
+            esum_ad = esum_ad - d_turbulent_energy_dt_ad
+            esum_ad = esum_ad - dwork_dm_ad
+            esum_ad = esum_ad + eps_grav_ad
          else if (s% using_velocity_time_centering .and. &
                 s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
-            esum_ad = - dL_dm_ad + sources_ad + &
-               others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - de_dt_ad
+            esum_ad = -dL_dm_ad
+            esum_ad = esum_ad + sources_ad
+            esum_ad = esum_ad + others_ad
+            esum_ad = esum_ad - d_turbulent_energy_dt_ad
+            esum_ad = esum_ad - dwork_dm_ad
+            esum_ad = esum_ad - de_dt_ad
          else
-            esum_ad = - dL_dm_ad + sources_ad + &
-               others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - dke_dt_ad - dpe_dt_ad - de_dt_ad
+            esum_ad = -dL_dm_ad
+            esum_ad = esum_ad + sources_ad
+            esum_ad = esum_ad + others_ad
+            esum_ad = esum_ad - d_turbulent_energy_dt_ad
+            esum_ad = esum_ad - dwork_dm_ad
+            esum_ad = esum_ad - dke_dt_ad
+            esum_ad = esum_ad - dpe_dt_ad
+            esum_ad = esum_ad - de_dt_ad
          end if
          resid_ad = esum_ad  ! convert back to auto_diff_real_star_order1
          s% ergs_error(k) = -dm*dt*resid_ad%val  ! save ergs_error before scaling
@@ -222,6 +236,7 @@
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
                v_00, v_p1, drag_force, drag_energy
+            type(accurate_auto_diff_real_star_order1) :: sources_sum_ad
             include 'formats'
             ierr = 0
 
@@ -301,7 +316,13 @@
                end if
             end if
 
-            sources_ad = eps_nuc_ad - non_nuc_neu_ad + extra_heat_ad + Eq_ad + RTI_diffusion_ad + drag_energy
+            sources_sum_ad = eps_nuc_ad
+            sources_sum_ad = sources_sum_ad - non_nuc_neu_ad
+            sources_sum_ad = sources_sum_ad + extra_heat_ad
+            sources_sum_ad = sources_sum_ad + Eq_ad
+            sources_sum_ad = sources_sum_ad + RTI_diffusion_ad
+            sources_sum_ad = sources_sum_ad + drag_energy
+            sources_ad = sources_sum_ad
 
             sources_ad%val = sources_ad%val + s% irradiation_heat(k)
 
@@ -560,7 +581,6 @@
 
       subroutine eval_dwork(s, k, skip_P, dwork_ad, dwork, &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
-         use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s
@@ -630,6 +650,7 @@
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
             PtrbR_ad, PtrbL_ad, PvscL_ad, PvscR_ad, Ptrb_div_etrb, PL_ad, PR_ad, &
             Peos_ad, Ptrb_ad, Pvsc_ad, extra_P
+         type(accurate_auto_diff_real_star_order1) :: P_face_sum_ad
          logical :: test_partials
          integer :: j
          include 'formats'
@@ -759,7 +780,12 @@
             if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
                mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
 
-            P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
+            P_face_sum_ad = Peos_ad
+            P_face_sum_ad = P_face_sum_ad + Pvsc_ad
+            P_face_sum_ad = P_face_sum_ad + Ptrb_ad
+            P_face_sum_ad = P_face_sum_ad + mlt_Pturb_ad
+            P_face_sum_ad = P_face_sum_ad + extra_P
+            P_face_ad = P_face_sum_ad
 
          end if
 
@@ -823,7 +849,6 @@
 
       subroutine eval_simple_PdV_work( &
             s, k, skip_P, dwork_ad, dwork, d_dwork_dxa00, ierr)
-         use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s

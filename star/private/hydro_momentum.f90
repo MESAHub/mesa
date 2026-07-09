@@ -138,8 +138,11 @@
          RTI_terms_dm_div_A_ad = RTI_terms_ad*dm_div_A_ad
 
          ! sum terms in residual_sum_ad using accurate_auto_diff_real_star_order1
-         residual_sum_ad = &
-            other_dm_div_A_ad + grav_dm_div_A_ad - dPtot_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
+         residual_sum_ad = other_dm_div_A_ad
+         residual_sum_ad = residual_sum_ad + grav_dm_div_A_ad
+         residual_sum_ad = residual_sum_ad - dPtot_ad
+         residual_sum_ad = residual_sum_ad - d_mlt_Pturb_ad
+         residual_sum_ad = residual_sum_ad + RTI_terms_dm_div_A_ad
 
          resid1_ad = residual_sum_ad  ! convert back to auto_diff_real_star_order1
          resid_ad = resid1_ad*iPtotavg_ad  ! scaling
@@ -382,6 +385,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: extra_ad, v_00, &
             drag
+         type(accurate_auto_diff_real_star_order1) :: other_sum_ad
          real(dp) :: accel, d_accel_dv
          logical :: test_partials, local_v_flag
 
@@ -437,7 +441,11 @@
 
          end if  ! v_flag
 
-         other_ad = extra_ad - accel_ad + drag + Uq_ad
+         other_sum_ad = extra_ad
+         other_sum_ad = other_sum_ad - accel_ad
+         other_sum_ad = other_sum_ad + drag
+         other_sum_ad = other_sum_ad + Uq_ad
+         other_ad = other_sum_ad
          other = other_ad%val
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -458,7 +466,6 @@
             dPtot_ad, dPtot, d_dPtot_dxam1, d_dPtot_dxa00, &
             iPtotavg_ad, iPtotavg, d_iPtotavg_dxam1, d_iPtotavg_dxa00, ierr)
          use star_utils, only: calc_Ptot_ad_tw
-         use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
