@@ -24,7 +24,6 @@ module tdc_hydro
    use utils_lib, only: is_bad
    use auto_diff
    use auto_diff_support
-   use accurate_sum_auto_diff_star_order1
    use star_utils
 
    implicit none

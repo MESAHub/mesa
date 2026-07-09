@@ -131,8 +131,12 @@
             if (ierr /= 0) return
          end if
 
-         sum_ad = flux_in_ad - flux_out_ad + &
-            geometry_source_ad + gravity_source_ad + diffusion_source_ad + Uq_cell
+         sum_ad = flux_in_ad
+         sum_ad = sum_ad - flux_out_ad
+         sum_ad = sum_ad + geometry_source_ad
+         sum_ad = sum_ad + gravity_source_ad
+         sum_ad = sum_ad + diffusion_source_ad
+         sum_ad = sum_ad + Uq_cell
          dudt_expected_ad = sum_ad
          dudt_expected_ad = dudt_expected_ad/dm
 
