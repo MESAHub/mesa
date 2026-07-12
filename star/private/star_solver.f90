@@ -111,9 +111,10 @@
 
          ! info saved in work arrays
 
-         real(dp), dimension(:,:), pointer :: dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), soln=>null()
+         real(dp), dimension(:,:), pointer :: &
+            dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), merit_residual=>null(), soln=>null()
          real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
-            row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
+            merit_residual1=>null(), row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
             save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null(), band1=>null()
          real(dp), dimension(:,:), pointer :: rhs=>null()
          integer, dimension(:), pointer :: ipiv1=>null()
@@ -422,9 +423,11 @@
                end if
 
                if (min_corr_coeff < 1d0) then
-                  ! compute gradient of f = equ<dot>jacobian
+                  ! compute gradient of f = weighted_equ<dot>jacobian
                   ! NOTE: NOT jacobian<dot>equ
-                  call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
+                  call set_merit_residual(nvar, nz, merit_residual)
+                  call block_multiply_xa( &
+                     nvar, nz, lblk1, dblk1, ublk1, merit_residual1, grad_f1)
 
                   slope = eval_slope(nvar, nz, grad_f, soln)
                   if (is_bad_num(slope) .or. slope > 0d0) then  ! a very bad sign
@@ -1909,6 +1912,7 @@
             allocate(B1(1:neq))
             allocate(soln1(1:neq))
             allocate(grad_f1(1:neq))
+            allocate(merit_residual1(1:neq))
             allocate(rhs(1:nvar,1:nz))
             allocate(xder(1:nvar,1:nz))
             allocate(ddx(1:nvar,1:nz))
@@ -1931,6 +1935,7 @@
                call fill_with_NaNs(dxsave1)
                call fill_with_NaNs(ddxsave1)
                call fill_with_NaNs(B1)
+               call fill_with_NaNs(merit_residual1)
                call fill_with_NaNs(soln1)
                call fill_with_NaNs_2D(rhs)
                call fill_with_NaNs_2D(xder)
@@ -1948,6 +1953,7 @@
             B(1:nvar,1:nz) => B1(1:neq)
             soln(1:nvar,1:nz) => soln1(1:neq)
             grad_f(1:nvar,1:nz) => grad_f1(1:neq)
+            merit_residual(1:nvar,1:nz) => merit_residual1(1:neq)
 
             allocate(ipiv1(1:neq))
 
@@ -1984,6 +1990,7 @@
             if(associated(B1)) deallocate(B1)
             if(associated(soln1)) deallocate(soln1)
             if(associated(grad_f1)) deallocate(grad_f1)
+            if(associated(merit_residual1)) deallocate(merit_residual1)
             if(associated(rhs)) deallocate(rhs)
             if(associated(xder)) deallocate(xder)
             if(associated(ddx)) deallocate(ddx)
@@ -2004,11 +2011,30 @@
 
 
             nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
-                     soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
+                     soln1, grad_f1, merit_residual1, merit_residual, rhs, xder, ddx, row_scale_factors1,&
                      col_scale_factors1, save_ublk1, save_dblk1, save_lblk1, band1,&
                      B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1, band)
 
          end subroutine cleanup
+
+
+         subroutine set_merit_residual(nvar, nz, merit_residual)
+            integer, intent(in) :: nvar, nz
+            real(dp), intent(out) :: merit_residual(:,:)
+            integer :: i, k
+            real(dp) :: weight
+
+            do k = 1, nz
+               do i = 1, nvar
+                  if (is_solver_residual_active(s, i)) then
+                     weight = s% residual_weight(i,k)
+                     merit_residual(i,k) = weight*weight*equ(i,k)
+                  else
+                     merit_residual(i,k) = 0d0
+                  end if
+               end do
+            end do
+         end subroutine set_merit_residual
 
 
          real(dp) function eval_slope(nvar, nz, grad_f, B)
@@ -2031,7 +2057,8 @@
             eval_f = 0
             do k = 1, nz
                do i = 1, nvar
-                  q = equ(i,k)
+                  if (.not. is_solver_residual_active(s, i)) cycle
+                  q = s% residual_weight(i,k)*equ(i,k)
                   eval_f = eval_f + q*q
                end do
             end do

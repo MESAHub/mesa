@@ -30,6 +30,7 @@
       public :: force_another_iteration
       public :: eval_equations
       public :: set_xscale_info
+      public :: is_solver_residual_active
       public :: sizequ
       public :: sizeB
       public :: inspectb
@@ -182,13 +183,23 @@
       end subroutine eval_equations
 
 
+      logical function is_solver_residual_active(s, j)
+         type (star_info), pointer :: s
+         integer, intent(in) :: j
+
+         is_solver_residual_active = &
+            .not. (s% convergence_ignore_equL_residuals .and. j == s% i_equL) .and. &
+            .not. (s% convergence_ignore_alpha_RTI_residuals .and. j == s% i_dalpha_RTI_dt)
+      end function is_solver_residual_active
+
+
       subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)  ! equ = residuals
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, skip_eqn1, skip_eqn2, skip_eqn3
+         integer :: j, k, num_terms, nz
          real(dp) :: sumequ, absq
 
          logical :: dbg
@@ -204,85 +215,30 @@
 
          dbg = s% solver_check_everything
 
-         nvar_hydro = min(nvar, s% nvar_hydro)
-         nvar_chem = s% nvar_chem
-
          nz = s% nz
-         n = nz
          num_terms = 0
          sumequ = 0
-         skip_eqn1 = 0
-         skip_eqn2 = 0
-         skip_eqn3 = 0
-         if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
-         if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
-         if (s% do_burn .or. s% do_mix) then
-            num_terms = num_terms + nvar*nz
-            if (skip_eqn1 > 0) num_terms = num_terms - nz
-            if (skip_eqn2 > 0) num_terms = num_terms - nz
-            if (skip_eqn3 > 0) num_terms = num_terms - nz
-            do k = 1, nz
-               do j = 1, nvar
-                  if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
-                  if (is_bad(s% equ(j,k)) .or. is_bad(s% residual_weight(j,k))) then
-                     ierr = 1
-                     return
-                  end if
-                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                  sumequ = sumequ + absq
-                  if (absq > equ_max) then
-                     equ_max = absq
-                     j_max = j
-                     k_max = k
-                  end if
-               end do
+         do k = 1, nz
+            do j = 1, nvar
+               if (.not. is_solver_residual_active(s, j)) cycle
+               if (is_bad(s% equ(j,k)) .or. is_bad(s% residual_weight(j,k))) then
+                  ierr = 1
+                  return
+               end if
+               num_terms = num_terms + 1
+               absq = abs(s% equ(j,k)*s% residual_weight(j,k))
+               sumequ = sumequ + absq
+               if (absq > equ_max) then
+                  equ_max = absq
+                  j_max = j
+                  k_max = k
+               end if
             end do
-         else
-            if (skip_eqn1 == 0 .and. skip_eqn2 == 0) then
-               num_terms = num_terms + nvar_hydro*nz
-            else if (skip_eqn1 > 0 .and. skip_eqn2 > 0) then
-               num_terms = num_terms + (nvar_hydro-2)*nz
-            else
-               num_terms = num_terms + (nvar_hydro-1)*nz
-            end if
-            do k = 1, nz
-               do j = 1, nvar_hydro
-                  if (j == skip_eqn1 .or. j == skip_eqn2) cycle
-                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                  sumequ = sumequ + absq
-                  if (is_bad(sumequ)) then
-                     if (dbg) then
-                        write(*,3) trim(s% nameofequ(j)) // ' sumequ', j, k, sumequ
-                        call mesa_error(__FILE__,__LINE__,'sizeq 1')
-                     end if
-                     ierr = -1
-                     if (s% report_ierr) &
-                        write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
-                           j, k, s% equ(j,k)*s% residual_weight(j,k)
-                     if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'sizeq 2')
-                     return
-                  end if
-                  if (absq > equ_max) then
-                     equ_max = absq
-                     j_max = j
-                     k_max = k
-                  end if
-               end do
-            end do
-         end if
-         if (s% do_burn .or. s% do_mix) then
-            num_terms = num_terms + nvar_chem*nz
-            do k = 1, nz
-               do j = nvar_hydro+1, nvar
-                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                  sumequ = sumequ + absq
-                  if (absq > equ_max) then
-                     equ_max = absq
-                     j_max = j
-                     k_max = k
-                  end if
-               end do
-            end do
+         end do
+
+         if (num_terms == 0) then
+            ierr = -1
+            return
          end if
 
          equ_norm = sumequ/num_terms
