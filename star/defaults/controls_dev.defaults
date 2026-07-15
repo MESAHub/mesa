@@ -24,6 +24,16 @@
 
       use_TDC_Y_face_seeded_newton = .false.
 
+      ! solver_damping_on_retry
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, enable the global correction coefficient limit immediately
+      ! on retries. If false, retries use the same correction coefficients as
+      ! the original timestep.
+      !
+      ! ::
+
+      solver_damping_on_retry = .true.
+
       ! Hydro matrix solver options
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! hydro_matrix_solver selects the mesa-star hydro matrix solve.
