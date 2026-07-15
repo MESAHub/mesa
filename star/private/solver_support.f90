@@ -1094,7 +1094,6 @@
             if (do_lnT) then
 
                s% lnT(k) = x(i_lnT)
-               s% T(k) = exp(s% lnT(k))
                s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                if (abs(s% lnT(k) - s% lnT_start(k)) > &
                        ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
@@ -1129,7 +1128,11 @@
                   ierr = -1
                   return
                end if
-               s% T(k) = exp(s% lnT(k))
+               if (s% solver_use_T_reference) then
+                  s% T(k) = s% solver_T_reference(k)*exp(s% solver_dx(i_lnT,k))
+               else
+                  s% T(k) = exp(s% lnT(k))
+               end if
                if (is_bad_num(s% T(k))) then
                   s% retry_message = 'bad num for T'
                   if (s% stop_for_bad_nums) then

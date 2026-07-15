@@ -9149,6 +9149,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! ignore_species_in_max_correction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! line_search_max_residual_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! solver_use_T_reference
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! num_times_solver_reuse_mtx
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -9165,6 +9169,20 @@
     tiny_corr_factor = 2
     ignore_min_corr_coeff_for_scale_max_correction = .false.
     ignore_species_in_max_correction = .false.
+
+      ! Add a smooth maximum-residual term to the line-search merit function:
+      ! 0.5*line_search_max_residual_weight*N*sqrt(sum(q_i**4)), where
+      ! q_i is an active weighted residual and N is the number of such residuals.
+      ! A value of zero gives the usual weighted least-squares merit function.
+
+    line_search_max_residual_weight = 0d0
+
+      ! During solver iterations, calculate the trial temperature from the
+      ! temperature at the start of the solver call and the logarithmic
+      ! temperature correction. This avoids losing small corrections when
+      ! adding them to the absolute value of lnT.
+
+    solver_use_T_reference = .false.
     num_times_solver_reuse_mtx = 0
 
 

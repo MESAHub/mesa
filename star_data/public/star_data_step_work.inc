@@ -809,6 +809,7 @@
          real(dp), pointer :: xh_start(:,:) ! (nvar_hydro,nz)
          real(dp), pointer :: xa_start(:,:) ! (species,nz)
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)
+         real(dp), pointer :: solver_T_reference(:) ! (nz)
          real(dp), pointer :: lnd_start(:) ! (nz)
          real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: Peos_face_start(:) ! (nz)

@@ -34,6 +34,15 @@
 
       integer, parameter :: species_21 = 21, species_co56 = 22
 
+      integer, parameter :: num_reduced_flows = 7, &
+         i_fe52_fe54_n = 1, &
+         i_fe54_fe56_n = 2, &
+         i_fe54_fe56_ap = 3, &
+         i_fe54_ni56 = 4, &
+         i_fe52_fe54 = 5, &
+         i_fe52_ni56 = 6, &
+         i_he4_breakup = 7
+
 
       integer :: iso_cid(species_co56)  ! these are corresponding chem ids for the isos
          ! e.g., iso_cid(ife52) is = the iso number for fe52 as defined in mesa/chem
@@ -923,11 +932,296 @@
          end subroutine approx21_special_reactions
 
 
+         ! Keep reduced forward and reverse flows paired through cancellation.
+         pure subroutine eval_approx21_reduced_flows( &
+               y, rate, temp, reduced_dydt, reduced_dfdy, &
+               drate, reduced_drate, flows_out, fe56_aux1_out, fe56_aux2_out)
+            real(qp), intent(in) :: y(:), rate(:), temp
+            real(qp), intent(out) :: reduced_dydt(size(y))
+            real(qp), intent(out), optional :: reduced_dfdy(size(y),size(y))
+            real(qp), intent(in), optional :: drate(:)
+            real(qp), intent(out), optional :: reduced_drate(size(y))
+            real(qp), intent(out), optional :: flows_out(num_reduced_flows)
+            real(qp), intent(out), optional :: fe56_aux1_out, fe56_aux2_out
+
+            integer :: j
+            real(qp) :: denom, denom_drate, denom_dyneut, denom_dyprot
+            real(qp) :: numer, numer_drate
+            real(qp) :: flows(num_reduced_flows)
+            real(qp) :: dflows_dy(num_reduced_flows,size(y))
+            real(qp) :: dflows_drate(num_reduced_flows)
+            real(qp) :: forward_product, reverse_product
+            real(qp), parameter :: tiny_denom = 1d-50
+
+            reduced_dydt = 0d0
+            flows = 0d0
+            dflows_dy = 0d0
+            dflows_drate = 0d0
+            if (present(reduced_dfdy)) reduced_dfdy = 0d0
+            if (present(reduced_drate)) reduced_drate = 0d0
+            if (present(flows_out)) flows_out = 0d0
+            if (present(fe56_aux1_out)) fe56_aux1_out = 0d0
+            if (present(fe56_aux2_out)) fe56_aux2_out = 0d0
+
+            if (.not. (temp > 1.5d9)) return
+
+            ! fe52(n,g)fe53(n,g)fe54
+            denom = rate(ir53gn) + y(ineut)*rate(ir53ng)
+            if (denom > tiny_denom) then
+               reverse_product = rate(ir54gn)*rate(ir53gn)
+               forward_product = rate(ir52ng)*rate(ir53ng)
+               numer = y(ife54)*reverse_product - &
+                  y(ife52)*y(ineut)*y(ineut)*forward_product
+               flows(i_fe52_fe54_n) = numer/denom
+               dflows_dy(i_fe52_fe54_n,ife52) = &
+                  -y(ineut)*y(ineut)*forward_product/denom
+               dflows_dy(i_fe52_fe54_n,ife54) = reverse_product/denom
+               dflows_dy(i_fe52_fe54_n,ineut) = ( &
+                  -2d0*y(ife52)*y(ineut)*forward_product - &
+                  flows(i_fe52_fe54_n)*rate(ir53ng))/denom
+               if (present(drate)) then
+                  denom_drate = drate(ir53gn) + y(ineut)*drate(ir53ng)
+                  numer_drate = y(ife54)*( &
+                     drate(ir54gn)*rate(ir53gn) + rate(ir54gn)*drate(ir53gn)) - &
+                     y(ife52)*y(ineut)*y(ineut)*( &
+                     drate(ir52ng)*rate(ir53ng) + rate(ir52ng)*drate(ir53ng))
+                  dflows_drate(i_fe52_fe54_n) = (numer_drate - &
+                     flows(i_fe52_fe54_n)*denom_drate)/denom
+               end if
+            end if
+
+            ! fe54(n,g)fe55(n,g)fe56
+            denom = rate(ir55gn) + y(ineut)*rate(ir55ng)
+            if (denom > tiny_denom) then
+               reverse_product = rate(ir56gn)*rate(ir55gn)
+               forward_product = rate(ir54ng)*rate(ir55ng)
+               numer = y(ife56)*reverse_product - &
+                  y(ife54)*y(ineut)*y(ineut)*forward_product
+               flows(i_fe54_fe56_n) = numer/denom
+               dflows_dy(i_fe54_fe56_n,ife54) = &
+                  -y(ineut)*y(ineut)*forward_product/denom
+               dflows_dy(i_fe54_fe56_n,ife56) = reverse_product/denom
+               dflows_dy(i_fe54_fe56_n,ineut) = ( &
+                  -2d0*y(ife54)*y(ineut)*forward_product - &
+                  flows(i_fe54_fe56_n)*rate(ir55ng))/denom
+               if (present(fe56_aux1_out)) fe56_aux1_out = reverse_product/denom
+               if (present(fe56_aux2_out)) fe56_aux2_out = forward_product/denom
+               if (present(drate)) then
+                  denom_drate = drate(ir55gn) + y(ineut)*drate(ir55ng)
+                  numer_drate = y(ife56)*( &
+                     drate(ir56gn)*rate(ir55gn) + rate(ir56gn)*drate(ir55gn)) - &
+                     y(ife54)*y(ineut)*y(ineut)*( &
+                     drate(ir54ng)*rate(ir55ng) + rate(ir54ng)*drate(ir55ng))
+                  dflows_drate(i_fe54_fe56_n) = (numer_drate - &
+                     flows(i_fe54_fe56_n)*denom_drate)/denom
+               end if
+            end if
+
+            ! fe54(a,p)co57(g,p)fe56
+            denom = rate(irco57gp) + y(iprot)*rate(irco57pa)
+            if (denom > tiny_denom) then
+               reverse_product = rate(irfe56pg)*rate(irco57pa)
+               forward_product = rate(irfe54ap)*rate(irco57gp)
+               numer = y(ife56)*y(iprot)*y(iprot)*reverse_product - &
+                  y(ife54)*y(ihe4)*forward_product
+               flows(i_fe54_fe56_ap) = numer/denom
+               dflows_dy(i_fe54_fe56_ap,ihe4) = -y(ife54)*forward_product/denom
+               dflows_dy(i_fe54_fe56_ap,ife54) = -y(ihe4)*forward_product/denom
+               dflows_dy(i_fe54_fe56_ap,ife56) = &
+                  y(iprot)*y(iprot)*reverse_product/denom
+               dflows_dy(i_fe54_fe56_ap,iprot) = ( &
+                  2d0*y(ife56)*y(iprot)*reverse_product - &
+                  flows(i_fe54_fe56_ap)*rate(irco57pa))/denom
+               if (present(drate)) then
+                  denom_drate = drate(irco57gp) + y(iprot)*drate(irco57pa)
+                  numer_drate = y(ife56)*y(iprot)*y(iprot)*( &
+                     drate(irfe56pg)*rate(irco57pa) + &
+                     rate(irfe56pg)*drate(irco57pa)) - &
+                     y(ife54)*y(ihe4)*( &
+                     drate(irfe54ap)*rate(irco57gp) + &
+                     rate(irfe54ap)*drate(irco57gp))
+                  dflows_drate(i_fe54_fe56_ap) = (numer_drate - &
+                     flows(i_fe54_fe56_ap)*denom_drate)/denom
+               end if
+            end if
+
+            ! Links through the eliminated co55 intermediate.
+            denom = rate(ircogp) + y(iprot)*(rate(ircopg) + rate(ircopa))
+            if (denom > tiny_denom) then
+               denom_dyprot = rate(ircopg) + rate(ircopa)
+
+               reverse_product = rate(irnigp)*rate(ircogp)
+               forward_product = rate(irfepg)*rate(ircopg)
+               numer = y(ini56)*reverse_product - &
+                  y(ife54)*y(iprot)*y(iprot)*forward_product
+               flows(i_fe54_ni56) = numer/denom
+               dflows_dy(i_fe54_ni56,ife54) = &
+                  -y(iprot)*y(iprot)*forward_product/denom
+               dflows_dy(i_fe54_ni56,ini56) = reverse_product/denom
+               dflows_dy(i_fe54_ni56,iprot) = ( &
+                  -2d0*y(ife54)*y(iprot)*forward_product - &
+                  flows(i_fe54_ni56)*denom_dyprot)/denom
+
+               reverse_product = rate(irfepg)*rate(ircopa)
+               forward_product = rate(irfeap)*rate(ircogp)
+               numer = y(ife54)*y(iprot)*y(iprot)*reverse_product - &
+                  y(ife52)*y(ihe4)*forward_product
+               flows(i_fe52_fe54) = numer/denom
+               dflows_dy(i_fe52_fe54,ihe4) = -y(ife52)*forward_product/denom
+               dflows_dy(i_fe52_fe54,ife52) = -y(ihe4)*forward_product/denom
+               dflows_dy(i_fe52_fe54,ife54) = &
+                  y(iprot)*y(iprot)*reverse_product/denom
+               dflows_dy(i_fe52_fe54,iprot) = ( &
+                  2d0*y(ife54)*y(iprot)*reverse_product - &
+                  flows(i_fe52_fe54)*denom_dyprot)/denom
+
+               reverse_product = rate(irnigp)*rate(ircopa)
+               forward_product = rate(irfeap)*rate(ircopg)
+               numer = y(ini56)*y(iprot)*reverse_product - &
+                  y(ife52)*y(ihe4)*y(iprot)*forward_product
+               flows(i_fe52_ni56) = numer/denom
+               dflows_dy(i_fe52_ni56,ihe4) = &
+                  -y(ife52)*y(iprot)*forward_product/denom
+               dflows_dy(i_fe52_ni56,ife52) = &
+                  -y(ihe4)*y(iprot)*forward_product/denom
+               dflows_dy(i_fe52_ni56,ini56) = y(iprot)*reverse_product/denom
+               dflows_dy(i_fe52_ni56,iprot) = ( &
+                  y(ini56)*reverse_product - y(ife52)*y(ihe4)*forward_product - &
+                  flows(i_fe52_ni56)*denom_dyprot)/denom
+
+               if (present(drate)) then
+                  denom_drate = drate(ircogp) + &
+                     y(iprot)*(drate(ircopg) + drate(ircopa))
+
+                  numer_drate = y(ini56)*( &
+                     drate(irnigp)*rate(ircogp) + rate(irnigp)*drate(ircogp)) - &
+                     y(ife54)*y(iprot)*y(iprot)*( &
+                     drate(irfepg)*rate(ircopg) + rate(irfepg)*drate(ircopg))
+                  dflows_drate(i_fe54_ni56) = (numer_drate - &
+                     flows(i_fe54_ni56)*denom_drate)/denom
+
+                  numer_drate = y(ife54)*y(iprot)*y(iprot)*( &
+                     drate(irfepg)*rate(ircopa) + rate(irfepg)*drate(ircopa)) - &
+                     y(ife52)*y(ihe4)*( &
+                     drate(irfeap)*rate(ircogp) + rate(irfeap)*drate(ircogp))
+                  dflows_drate(i_fe52_fe54) = (numer_drate - &
+                     flows(i_fe52_fe54)*denom_drate)/denom
+
+                  numer_drate = y(ini56)*y(iprot)*( &
+                     drate(irnigp)*rate(ircopa) + rate(irnigp)*drate(ircopa)) - &
+                     y(ife52)*y(ihe4)*y(iprot)*( &
+                     drate(irfeap)*rate(ircopg) + rate(irfeap)*drate(ircopg))
+                  dflows_drate(i_fe52_ni56) = (numer_drate - &
+                     flows(i_fe52_ni56)*denom_drate)/denom
+               end if
+            end if
+
+            ! he4 photodisintegration and light-particle reconstruction.
+            denom = rate(irhegp)*rate(irdgn) + &
+               y(ineut)*rate(irheng)*rate(irdgn) + &
+               y(ineut)*y(iprot)*rate(irheng)*rate(irdpg)
+            if (denom > tiny_denom) then
+               reverse_product = rate(irhegn)*rate(irhegp)*rate(irdgn)
+               forward_product = rate(irheng)*rate(irdpg)*rate(irhng)
+               numer = y(ihe4)*reverse_product - &
+                  y(ineut)*y(ineut)*y(iprot)*y(iprot)*forward_product
+               flows(i_he4_breakup) = numer/denom
+               denom_dyneut = rate(irheng)*rate(irdgn) + &
+                  y(iprot)*rate(irheng)*rate(irdpg)
+               denom_dyprot = y(ineut)*rate(irheng)*rate(irdpg)
+               dflows_dy(i_he4_breakup,ihe4) = reverse_product/denom
+               dflows_dy(i_he4_breakup,ineut) = ( &
+                  -2d0*y(ineut)*y(iprot)*y(iprot)*forward_product - &
+                  flows(i_he4_breakup)*denom_dyneut)/denom
+               dflows_dy(i_he4_breakup,iprot) = ( &
+                  -2d0*y(ineut)*y(ineut)*y(iprot)*forward_product - &
+                  flows(i_he4_breakup)*denom_dyprot)/denom
+               if (present(drate)) then
+                  denom_drate = &
+                     drate(irhegp)*rate(irdgn) + rate(irhegp)*drate(irdgn) + &
+                     y(ineut)*( &
+                     drate(irheng)*rate(irdgn) + rate(irheng)*drate(irdgn)) + &
+                     y(ineut)*y(iprot)*( &
+                     drate(irheng)*rate(irdpg) + rate(irheng)*drate(irdpg))
+                  numer_drate = y(ihe4)*( &
+                     drate(irhegn)*rate(irhegp)*rate(irdgn) + &
+                     rate(irhegn)*drate(irhegp)*rate(irdgn) + &
+                     rate(irhegn)*rate(irhegp)*drate(irdgn)) - &
+                     y(ineut)*y(ineut)*y(iprot)*y(iprot)*( &
+                     drate(irheng)*rate(irdpg)*rate(irhng) + &
+                     rate(irheng)*drate(irdpg)*rate(irhng) + &
+                     rate(irheng)*rate(irdpg)*drate(irhng))
+                  dflows_drate(i_he4_breakup) = (numer_drate - &
+                     flows(i_he4_breakup)*denom_drate)/denom
+               end if
+            end if
+
+            reduced_dydt(ihe4) = flows(i_fe52_fe54) + flows(i_fe52_ni56) - &
+               flows(i_he4_breakup) + flows(i_fe54_fe56_ap)
+            reduced_dydt(ife52) = flows(i_fe52_fe54_n) + &
+               flows(i_fe52_fe54) + flows(i_fe52_ni56)
+            reduced_dydt(ife54) = -flows(i_fe52_fe54_n) + &
+               flows(i_fe54_fe56_n) + flows(i_fe54_fe56_ap) + &
+               flows(i_fe54_ni56) - flows(i_fe52_fe54)
+            reduced_dydt(ife56) = -flows(i_fe54_fe56_n) - flows(i_fe54_fe56_ap)
+            reduced_dydt(ini56) = -flows(i_fe54_ni56) - flows(i_fe52_ni56)
+            reduced_dydt(ineut) = 2d0*( &
+               flows(i_fe52_fe54_n) + flows(i_fe54_fe56_n) + flows(i_he4_breakup))
+            reduced_dydt(iprot) = 2d0*( &
+               flows(i_fe54_ni56) - flows(i_fe52_fe54) + &
+               flows(i_he4_breakup) - flows(i_fe54_fe56_ap))
+
+            if (present(reduced_dfdy)) then
+               do j = 1, size(y)
+                  reduced_dfdy(ihe4,j) = dflows_dy(i_fe52_fe54,j) + &
+                     dflows_dy(i_fe52_ni56,j) - dflows_dy(i_he4_breakup,j) + &
+                     dflows_dy(i_fe54_fe56_ap,j)
+                  reduced_dfdy(ife52,j) = dflows_dy(i_fe52_fe54_n,j) + &
+                     dflows_dy(i_fe52_fe54,j) + dflows_dy(i_fe52_ni56,j)
+                  reduced_dfdy(ife54,j) = -dflows_dy(i_fe52_fe54_n,j) + &
+                     dflows_dy(i_fe54_fe56_n,j) + dflows_dy(i_fe54_fe56_ap,j) + &
+                     dflows_dy(i_fe54_ni56,j) - dflows_dy(i_fe52_fe54,j)
+                  reduced_dfdy(ife56,j) = -dflows_dy(i_fe54_fe56_n,j) - &
+                     dflows_dy(i_fe54_fe56_ap,j)
+                  reduced_dfdy(ini56,j) = -dflows_dy(i_fe54_ni56,j) - &
+                     dflows_dy(i_fe52_ni56,j)
+                  reduced_dfdy(ineut,j) = 2d0*(dflows_dy(i_fe52_fe54_n,j) + &
+                     dflows_dy(i_fe54_fe56_n,j) + dflows_dy(i_he4_breakup,j))
+                  reduced_dfdy(iprot,j) = 2d0*(dflows_dy(i_fe54_ni56,j) - &
+                     dflows_dy(i_fe52_fe54,j) + dflows_dy(i_he4_breakup,j) - &
+                     dflows_dy(i_fe54_fe56_ap,j))
+               end do
+            end if
+
+            if (present(reduced_drate)) then
+               reduced_drate(ihe4) = dflows_drate(i_fe52_fe54) + &
+                  dflows_drate(i_fe52_ni56) - dflows_drate(i_he4_breakup) + &
+                  dflows_drate(i_fe54_fe56_ap)
+               reduced_drate(ife52) = dflows_drate(i_fe52_fe54_n) + &
+                  dflows_drate(i_fe52_fe54) + dflows_drate(i_fe52_ni56)
+               reduced_drate(ife54) = -dflows_drate(i_fe52_fe54_n) + &
+                  dflows_drate(i_fe54_fe56_n) + dflows_drate(i_fe54_fe56_ap) + &
+                  dflows_drate(i_fe54_ni56) - dflows_drate(i_fe52_fe54)
+               reduced_drate(ife56) = -dflows_drate(i_fe54_fe56_n) - &
+                  dflows_drate(i_fe54_fe56_ap)
+               reduced_drate(ini56) = -dflows_drate(i_fe54_ni56) - &
+                  dflows_drate(i_fe52_ni56)
+               reduced_drate(ineut) = 2d0*(dflows_drate(i_fe52_fe54_n) + &
+                  dflows_drate(i_fe54_fe56_n) + dflows_drate(i_he4_breakup))
+               reduced_drate(iprot) = 2d0*(dflows_drate(i_fe54_ni56) - &
+                  dflows_drate(i_fe52_fe54) + dflows_drate(i_he4_breakup) - &
+                  dflows_drate(i_fe54_fe56_ap))
+            end if
+
+            if (present(flows_out)) flows_out = flows
+         end subroutine eval_approx21_reduced_flows
+
+
          subroutine approx21_dydt( &
-            y, rate, ratdum, dydt, deriva, &
+            y_in, rate_in, ratdum_in, dydt, deriva, &
             fe56ec_fake_factor_in, min_T, fe56ec_n_neut, temp, den, plus_co56, ierr)
          logical, intent(in) :: deriva  ! false for dydt, true for partials wrt T, Rho
-         real(dp), dimension(:), intent(in) :: y, rate, ratdum
+         real(dp), dimension(:), intent(in) :: y_in, rate_in, ratdum_in
          integer, intent(in) :: fe56ec_n_neut
          real(dp), dimension(:), intent(out) :: dydt
          real(dp), intent(in) :: fe56ec_fake_factor_in, temp, den
@@ -941,12 +1235,18 @@
          real(qp) :: a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,&
             a11,a12,a13,a14,a15,a16,a17,a18,a19,a20
          real(qp) :: qray(species(plus_co56))
+         real(qp) :: y(size(y_in)), rate(size(rate_in)), ratdum(size(ratdum_in))
+         real(qp) :: reduced_dydt(species(plus_co56)), reduced_drate(species(plus_co56))
 
          logical :: okay
 
          include 'formats'
 
          ierr = 0
+
+         y = real(y_in,kind=qp)
+         rate = real(rate_in,kind=qp)
+         ratdum = real(ratdum_in,kind=qp)
 
          ! Turn on special fe56ec rate above some temperature
          fe56ec_fake_factor = 0d0
@@ -956,6 +1256,15 @@
 
          dydt(1:species(plus_co56)) = 0.0d0
          qray(1:species(plus_co56)) = 0.0_qp
+
+         if (deriva) then
+            call eval_approx21_reduced_flows( &
+               y, ratdum, real(temp,kind=qp), reduced_dydt, &
+               drate=rate, reduced_drate=reduced_drate)
+         else
+            call eval_approx21_reduced_flows( &
+               y, ratdum, real(temp,kind=qp), reduced_dydt)
+         end if
 
    ! hydrogen reactions
          a1 = -1.5d0 * y(ih1) * y(ih1) * rate(irpp)
@@ -1085,20 +1394,6 @@
 
          qray(ihe4) = qray(ihe4) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
          end if
-
-
-   ! photodisintegration reactions
-         a1 =  y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
-         a2 = -y(ife52) * y(ihe4) * rate(ir6f54)
-         a3 = -y(ife52) * y(ihe4) * y(iprot) * rate(ir7f54)
-         a4 =  y(ini56) * y(iprot) * rate(ir8f54)
-         a5 = -y(ihe4) * rate(iralf1)
-         a6 =  y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2)
-         a7 =  y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
-         a8 = -y(ife54) * y(ihe4) * rate(irfe56_aux4)
-
-         qray(ihe4) =  qray(ihe4) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
-
 
    ! ppchain
          a1 = 0.5d0 * y(ihe3) * y(ihe3) * rate(ir33)
@@ -1431,32 +1726,6 @@
          qray(ife52) =  qray(ife52) + a1 + a2 + a3 + a4
          end if
 
-         a1 =  y(ife54) * rate(ir1f54)
-         a2 = -y(ife52) * y(ineut) * y(ineut) * rate(ir2f54)
-         a3 =  y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
-         a4 = -y(ife52) * y(ihe4) * rate(ir6f54)
-         a5 = -y(ife52) * y(ihe4) * y(iprot) * rate(ir7f54)
-         a6 =  y(ini56) * y(iprot) * rate(ir8f54)
-
-         qray(ife52) =  qray(ife52) + a1 + a2 + a3 + a4 + a5 + a6
-
-
-   ! fe54 reactions
-         a1  = -y(ife54) * rate(ir1f54)
-         a2  =  y(ife52) * y(ineut) * y(ineut) * rate(ir2f54)
-         a3  = -y(ife54) * y(iprot) * y(iprot) * rate(ir3f54)
-         a4  =  y(ini56) * rate(ir4f54)
-         a5  = -y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
-         a6  =  y(ife52) * y(ihe4) * rate(ir6f54)
-         a7  =  y(ife56) * rate(irfe56_aux1)
-         a8  = -y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)
-         a9  =  y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
-         a10 = -y(ife54) * y(ihe4) * rate(irfe56_aux4)
-
-         qray(ife54) =  qray(ife54) + &
-            a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10
-
-
    ! fe56 reactions
          if (plus_co56) then
             a1 =  y(ico56) * rate(irco56ec)
@@ -1464,12 +1733,8 @@
             a1 =  y(ini56) * rate(irn56ec)
          end if
          a2 = -y(ife56) * fe56ec_fake_factor * rate(irn56ec)
-         a3 = -y(ife56) * rate(irfe56_aux1)
-         a4 =  y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)
-         a5 = -y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
-         a6 =  y(ife54) * y(ihe4) * rate(irfe56_aux4)
 
-         qray(ife56) =  qray(ife56) + a1 + a2 + a3 + a4 + a5 + a6
+         qray(ife56) =  qray(ife56) + a1 + a2
 
          if (plus_co56) then
       ! co56 reactions
@@ -1486,47 +1751,31 @@
 
          qray(ini56) =  qray(ini56) + a1 + a2 + a3
 
-         a1 =  y(ife54) * y(iprot) * y(iprot) * rate(ir3f54)
-         a2 = -y(ini56) * rate(ir4f54)
-         a3 =  y(ife52) * y(ihe4)* y(iprot) * rate(ir7f54)
-         a4 = -y(ini56) * y(iprot) * rate(ir8f54)
-
-         qray(ini56) =  qray(ini56) + a1 + a2 + a3 + a4
-
    ! neutrons
-         a1 =  2.0d0 * y(ife54) * rate(ir1f54)
-         a2 = -2.0d0 * y(ife52) * y(ineut) * y(ineut) * rate(ir2f54)
-         a3 =  2.0d0 * y(ihe4) * rate(iralf1)
-         a4 = -2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2)
          a5 =  y(iprot) * rate(irpen)
          a6 = -y(ineut) * rate(irnep)
-         a7 =  2.0d0 * y(ife56) * rate(irfe56_aux1)
-         a8 = -2.0d0 * y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)
          a9 = -fe56ec_n_neut * y(ife56) * fe56ec_fake_factor * rate(irn56ec)
 
-         qray(ineut) =  qray(ineut) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9
+         qray(ineut) =  qray(ineut) + a5 + a6 + a9
 
    ! photodisintegration protons
-         a1  = -2.0d0 * y(ife54) * y(iprot) * y(iprot) * rate(ir3f54)
-         a2  =  2.0d0 * y(ini56) * rate(ir4f54)
-         a3  = -2.0d0 * y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
-         a4  =  2.0d0 * y(ife52) * y(ihe4) * rate(ir6f54)
-         a5  =  2.0d0 * y(ihe4) * rate(iralf1)
-         a6  = -2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2)
          a7  = -y(iprot) * rate(irpen)
          a8  =  y(ineut) * rate(irnep)
-         a9  = -2.0d0 * y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
-         a10 =  2.0d0 * y(ife54) * y(ihe4) * rate(irfe56_aux4)
 
-         qray(iprot) =  qray(iprot) + &
-            a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10
+         qray(iprot) = qray(iprot) + a7 + a8
+
+         if (deriva) then
+            qray = qray + reduced_drate
+         else
+            qray = qray + reduced_dydt
+         end if
 
    ! now set the real(dp) return argument dydt
          okay = .true.
          do i=1,species(plus_co56)
             dydt(i) = qray(i)
             if (is_bad(dydt(i))) then
-               write(*,*) 'dydt(i)', i, dydt(i), y(i)
+               write(*,*) 'dydt(i)', i, dydt(i), y_in(i)
                okay = .false.
             end if
          end do
@@ -1536,7 +1785,7 @@
             write(*,*) 'log10(rho) = ',safe_log10(den)
 
             do i=1,num_reactions(plus_co56)
-               write(*,*) trim(ratnam(i)), i, rate(i)
+               write(*,*) trim(ratnam(i)), i, rate_in(i)
             end do
             call mesa_error(__FILE__,__LINE__,'approx21_dydt')
          end if
@@ -2045,11 +2294,19 @@
          real(dp) :: abar,zbar,ye,taud,taut, b1, &
                snuda,snudz,enuc,velx,posx,zz
          real(dp) :: fe56ec_fake_factor
+         real(qp) :: y_qp(size(y)), rate_qp(size(ratdum))
+         real(qp) :: reduced_dydt_qp(size(y)), reduced_dfdy_qp(size(y),size(y))
 
          ierr = 0
 
          ! Turn on special fe56ec rate above some temperature
          fe56ec_fake_factor=eval_fe56ec_fake_factor(fe56ec_fake_factor_in,min_T,btemp)
+
+         y_qp = real(y,kind=qp)
+         rate_qp = real(ratdum,kind=qp)
+         call eval_approx21_reduced_flows( &
+            y_qp, rate_qp, real(btemp,kind=qp), reduced_dydt_qp, &
+            reduced_dfdy=reduced_dfdy_qp)
 
          ! NOTE: use of quad precision for dfdy doesn't make a difference.
 
@@ -2121,13 +2378,6 @@
                            - y(icr48) * ratdum(ircrap) * (1.0d0-ratdum(irx1))
 
          dfdy(ihe4,ihe4)  = dfdy(ihe4,ihe4) &
-                           - y(ife52) * ratdum(ir6f54) &
-                           - y(ife52) * y(iprot) * ratdum(ir7f54) &
-                           - ratdum(iralf1) &
-                           - y(ife54) * ratdum(irfe56_aux4)
-
-
-         dfdy(ihe4,ihe4)  = dfdy(ihe4,ihe4) &
                         + y(ihe3) * ratdum(irhe3ag) &
                         + y(ihe3) * y(ihe4) * dratdumdy1(irhe3ag) &
                         - y(in14) * ratdum(irnag) * 1.5d0
@@ -2189,38 +2439,11 @@
 
          dfdy(ihe4,ife52) =   ratdum(irfega) &
                            - y(ihe4) * ratdum(irfeag) &
-                           + ratdum(irx1) * ratdum(irfegp) &
-                           - y(ihe4) * ratdum(ir6f54) &
-                           - y(ihe4) * y(iprot) * ratdum(ir7f54)
+                           + ratdum(irx1) * ratdum(irfegp)
 
-         dfdy(ihe4,ife54) =   y(iprot) * y(iprot) * ratdum(ir5f54) &
-                           - y(ihe4) * ratdum(irfe56_aux4)
-
-         dfdy(ihe4,ife56) =   y(iprot) * y(iprot) * ratdum(irfe56_aux3)
-
-         dfdy(ihe4,ini56) =   ratdum(irniga) &
-                           + y(iprot) * ratdum(ir8f54)
-
-
-         dfdy(ihe4,ineut) = -y(ihe4) * dratdumdy1(iralf1) &
-                        + 2.0d0 * y(ineut) * y(iprot)*y(iprot) * ratdum(iralf2) &
-                        + y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy1(iralf2)
+         dfdy(ihe4,ini56) = ratdum(irniga)
 
          include 'formats'
-
-         dfdy(ihe4,iprot) =   2.0d0 * y(ife54) * y(iprot) * ratdum(ir5f54) &
-                           + y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir5f54) &
-                           - y(ihe4) * y(ife52) * dratdumdy1(ir6f54) &
-                           - y(ife52) * y(ihe4) * ratdum(ir7f54) &
-                           - y(ife52) * y(ihe4) * y(iprot) * dratdumdy1(ir7f54) &
-                           + y(ini56) * ratdum(ir8f54) &
-                           + y(ini56) * y(iprot) * dratdumdy1(ir8f54) &
-                           - y(ihe4) * dratdumdy2(iralf1) &
-                           + 2.0d0 * y(ineut)*y(ineut) * y(iprot) * ratdum(iralf2) &
-                           + y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy2(iralf2) &
-                           + 2.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
-                           + y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
-                           - y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
 
 
 
@@ -2453,109 +2676,25 @@
    ! fe52 jacobian elements
          dfdy(ife52,ihe4)  = y(icr48) * ratdum(ircrag) &
                         - y(ife52) * ratdum(irfeag) &
-                        + y(icr48) * ratdum(ircrap) * (1.0d0-ratdum(irx1)) &
-                        - y(ife52) * ratdum(ir6f54) &
-                        - y(ife52) * y(iprot) * ratdum(ir7f54)
+                        + y(icr48) * ratdum(ircrap) * (1.0d0-ratdum(irx1))
 
          dfdy(ife52,icr48) = y(ihe4) * ratdum(ircrag) &
                         + y(ihe4) * ratdum(ircrap) * (1.0d0-ratdum(irx1))
 
          dfdy(ife52,ife52) = - y(ihe4) * ratdum(irfeag) &
                            - ratdum(irfega) &
-                           - ratdum(irx1) * ratdum(irfegp) &
-                           - y(ineut) * y(ineut) * ratdum(ir2f54) &
-                           - y(ihe4) * ratdum(ir6f54) &
-                           - y(ihe4) * y(iprot) * ratdum(ir7f54)
+                           - ratdum(irx1) * ratdum(irfegp)
 
-         dfdy(ife52,ife54) = ratdum(ir1f54) + &
-                           y(iprot) * y(iprot) * ratdum(ir5f54)
-
-         dfdy(ife52,ini56) = ratdum(irniga) &
-                        + y(iprot) * ratdum(ir8f54)
-
-         dfdy(ife52,ineut) = &
-                           y(ife54) * dratdumdy1(ir1f54) &
-                           - 2.0d0 * y(ife52) * y(ineut) * ratdum(ir2f54) &
-                           - y(ife52) * y(ineut) * y(ineut) * dratdumdy1(ir2f54)
-
-         dfdy(ife52,iprot) = 2.0d0 * y(ife54) * y(iprot) * ratdum(ir5f54) &
-                        + y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir5f54) &
-                        - y(ihe4) * y(ife52) * dratdumdy1(ir6f54) &
-                        - y(ife52) * y(ihe4) * ratdum(ir7f54) &
-                        - y(ife52) * y(ihe4) * y(iprot) * dratdumdy1(ir7f54) &
-                        + y(ini56) * ratdum(ir8f54) &
-                        + y(ini56) * y(iprot) * dratdumdy1(ir8f54)
-
-
-   ! fe54 jacobian elements
-         dfdy(ife54,ihe4)  = y(ife52) * ratdum(ir6f54) &
-                           - y(ife54) * ratdum(irfe56_aux4)
-
-         dfdy(ife54,ife52) = &
-                              y(ineut) * y(ineut) * ratdum(ir2f54) + &
-                              y(ihe4) * ratdum(ir6f54)
-
-         dfdy(ife54,ife54) = &
-                           - ratdum(ir1f54) &
-                           - y(ineut) * y(ineut) * ratdum(irfe56_aux2) &
-                           - y(iprot) * y(iprot) * ratdum(ir3f54) &
-                           - y(iprot) * y(iprot) * ratdum(ir5f54) &
-                           - y(ihe4) * ratdum(irfe56_aux4)
-
-         dfdy(ife54,ife56) = &
-                           ratdum(irfe56_aux1) + &
-                           y(iprot) * y(iprot) * ratdum(irfe56_aux3)
-
-         dfdy(ife54,ini56) = ratdum(ir4f54)
-
-         dfdy(ife54,ineut) = &
-                           - y(ife54) * dratdumdy1(ir1f54) &
-                           + 2.0d0 * y(ife52) * y(ineut) * ratdum(ir2f54) &
-                           + y(ife52) * y(ineut) * y(ineut) * dratdumdy1(ir2f54) &
-                           + y(ife56) * dratdumdy1(irfe56_aux1) &
-                           - 2.0d0 * y(ife54) * y(ineut) * ratdum(irfe56_aux2) &
-                           - y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2)
-
-         dfdy(ife54,iprot) = -2.0d0 * y(ife54) * y(iprot) * ratdum(ir3f54) &
-                           - y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir3f54) &
-                           + y(ini56) * dratdumdy1(ir4f54) &
-                           - 2.0d0 * y(ife54) * y(iprot) * ratdum(ir5f54) &
-                           - y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir5f54) &
-                           + y(ihe4) * y(ife52) * dratdumdy1(ir6f54) &
-                           + 2.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
-                           + y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
-                           - y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
-
+         dfdy(ife52,ini56) = ratdum(irniga)
 
    ! fe56 jacobian elements
-
-         dfdy(ife56,ihe4)  = y(ife54) * ratdum(irfe56_aux4)
-
-
-         dfdy(ife56,ife54) = &
-                           y(ineut) * y(ineut) * ratdum(irfe56_aux2) + &
-                           y(ihe4) * ratdum(irfe56_aux4)
-
-         dfdy(ife56,ife56)  = - fe56ec_fake_factor * ratdum(irn56ec) &
-                              - ratdum(irfe56_aux1) &
-                              - y(iprot) * y(iprot) * ratdum(irfe56_aux3)
+         dfdy(ife56,ife56) = -fe56ec_fake_factor * ratdum(irn56ec)
 
          if (plus_co56) then
             dfdy(ife56,ico56)  = ratdum(irco56ec)
          else
             dfdy(ife56,ini56)  = ratdum(irn56ec)
          end if
-
-
-         dfdy(ife56,ineut) =  &
-                           -y(ife56) * dratdumdy1(irfe56_aux1) &
-                           + 2.0d0 * y(ife54) * y(ineut) * ratdum(irfe56_aux2) &
-                           + y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2)
-
-
-         dfdy(ife56,iprot) = -2.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
-                           - y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
-                           + y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
 
          if (plus_co56) then
    ! co56 jacobian elements
@@ -2565,89 +2704,26 @@
 
 
    ! ni56 jacobian elements
-         dfdy(ini56,ihe4)  = y(ife52) * ratdum(irfeag) &
-                        + y(ife52) * y(iprot) * ratdum(ir7f54)
+         dfdy(ini56,ihe4) = y(ife52) * ratdum(irfeag)
 
-         dfdy(ini56,ife52) = y(ihe4) * ratdum(irfeag) &
-                        + y(ihe4)* y(iprot) * ratdum(ir7f54)
-
-         dfdy(ini56,ife54) = y(iprot) * y(iprot) * ratdum(ir3f54)
+         dfdy(ini56,ife52) = y(ihe4) * ratdum(irfeag)
 
          dfdy(ini56,ini56) = -ratdum(irniga) &
-                           - ratdum(ir4f54) &
-                           - y(iprot) * ratdum(ir8f54) &
                            - ratdum(irn56ec)
 
-         dfdy(ini56,iprot) = 2.0d0 * y(ife54) * y(iprot) * ratdum(ir3f54) &
-                        + y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir3f54) &
-                        - y(ini56) * dratdumdy1(ir4f54) &
-                        + y(ife52) * y(ihe4)* ratdum(ir7f54) &
-                        + y(ife52) * y(ihe4)* y(iprot) * dratdumdy1(ir7f54) &
-                        - y(ini56) * ratdum(ir8f54) &
-                        - y(ini56) * y(iprot) * dratdumdy1(ir8f54)
-
-
    ! photodisintegration neutrons jacobian elements
-         dfdy(ineut,ihe4)  = 2.0d0 * ratdum(iralf1)
-
-         dfdy(ineut,ife52) = -2.0d0 * y(ineut) * y(ineut) * ratdum(ir2f54)
-
-         dfdy(ineut,ife54) =  2.0d0 * ratdum(ir1f54) &
-                           - 2.0d0 * y(ineut) * y(ineut) * ratdum(irfe56_aux2)
-
-         dfdy(ineut,ife56) = 2.0d0 * ratdum(irfe56_aux1) &
-                           - fe56ec_n_neut * fe56ec_fake_factor * ratdum(irn56ec)
-
-         dfdy(ineut,ineut) = &
-                           2.0d0 * y(ife54) * dratdumdy1(ir1f54) &
-                           - 4.0d0 * y(ife52) * y(ineut) * ratdum(ir2f54) &
-                           - 2.0d0 * y(ife52) * y(ineut) * y(ineut) * dratdumdy1(ir2f54) &
-                           + 2.0d0 * y(ihe4) * dratdumdy1(iralf1) &
-                           - 4.0d0 * y(ineut) * y(iprot)*y(iprot) * ratdum(iralf2) &
-                           - 2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy1(iralf2) &
-                           - ratdum(irnep) &
-                           + 2.0d0 * y(ife56) * dratdumdy1(irfe56_aux1) &
-                           - 4.0d0 * y(ife54) * y(ineut) * ratdum(irfe56_aux2) &
-                           - 2.0d0 * y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2)
-
-         dfdy(ineut,iprot) = 2.0d0 * y(ihe4) * dratdumdy2(iralf1) &
-                        - 4.0d0 * y(ineut)*y(ineut) * y(iprot) * ratdum(iralf2) &
-                        - 2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy2(iralf2) &
-                        + ratdum(irpen)
+         dfdy(ineut,ife56) = &
+            -fe56ec_n_neut * fe56ec_fake_factor * ratdum(irn56ec)
+         dfdy(ineut,ineut) = -ratdum(irnep)
+         dfdy(ineut,iprot) = ratdum(irpen)
 
    ! photodisintegration protons jacobian elements
-         dfdy(iprot,ihe4)  = 2.0d0 * y(ife52) * ratdum(ir6f54) &
-                           + 2.0d0 * ratdum(iralf1) &
-                           + 2.0d0 * y(ife54) * ratdum(irfe56_aux4)
+         dfdy(iprot,ineut) = ratdum(irnep)
+         dfdy(iprot,iprot) = -ratdum(irpen)
 
-         dfdy(iprot,ife52) = 2.0d0 * y(ihe4) * ratdum(ir6f54)
-
-         dfdy(iprot,ife54) = -2.0d0 * y(iprot) * y(iprot) * ratdum(ir3f54) &
-                           - 2.0d0 * y(iprot) * y(iprot) * ratdum(ir5f54) &
-                           + 2.0d0 * y(ihe4) * ratdum(irfe56_aux4)
-
-         dfdy(iprot,ife56) = -2.0d0 * y(iprot) * y(iprot) * ratdum(irfe56_aux3)
-
-         dfdy(iprot,ini56) = 2.0d0 * ratdum(ir4f54)
-
-         dfdy(iprot,ineut) = 2.0d0 * y(ihe4) * dratdumdy1(iralf1) &
-                        - 4.0d0 * y(ineut) * y(iprot)*y(iprot) * ratdum(iralf2) &
-                        - 2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy1(iralf2) &
-                        + ratdum(irnep)
-
-         dfdy(iprot,iprot) = -4.0d0 * y(ife54) * y(iprot) * ratdum(ir3f54) &
-                           - 2.0d0 * y(ife54) * y(iprot)*y(iprot)*dratdumdy1(ir3f54) &
-                           + 2.0d0 * y(ini56) * dratdumdy1(ir4f54) &
-                           - 4.0d0 * y(ife54) * y(iprot) * ratdum(ir5f54) &
-                           - 2.0d0 * y(ife54) * y(iprot)*y(iprot)*dratdumdy1(ir5f54) &
-                           + 2.0d0 * y(ihe4) * y(ife52) * dratdumdy1(ir6f54) &
-                           + 2.0d0 * y(ihe4) * dratdumdy2(iralf1) &
-                           - 4.0d0 * y(ineut)*y(ineut) * y(iprot) * ratdum(iralf2) &
-                           - 2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy2(iralf2) &
-                           - ratdum(irpen) &
-                           - 4.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
-                           - 2.0d0 * y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
-                           + 2.0d0 * y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
+         dfdy(1:species(plus_co56),1:species(plus_co56)) = &
+            dfdy(1:species(plus_co56),1:species(plus_co56)) + &
+            real(reduced_dfdy_qp,kind=dp)
 
          end subroutine approx21_dfdy
 

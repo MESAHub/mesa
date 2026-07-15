@@ -769,18 +769,18 @@
 
       subroutine eval_using_rate_tables( &
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
-            ye, logtemp, btemp, bden, raw_rate_factor, logttab, &
+            ye, logtemp, btemp, bden, raw_rate_factor, ttab, logttab, &
             rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
          use rates_support, only : do_get_raw_rates
          integer, intent(in) :: num_reactions, reaction_id(:), nT8s
          real(dp), intent(in) ::  &
             ye, logtemp, btemp, bden, raw_rate_factor(:),  &
-            rattab(:,:), logttab(:)
+            rattab(:,:), ttab(:), logttab(:)
          real(dp), pointer :: rattab_f1(:)
          real(dp), intent(out), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
          integer, intent(out) :: ierr
          call do_get_raw_rates(num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
-               ye, logtemp, btemp, bden, raw_rate_factor, logttab, &
+               ye, logtemp, btemp, bden, raw_rate_factor, ttab, logttab, &
                rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
       end subroutine eval_using_rate_tables
 

@@ -18,7 +18,7 @@
 ! ***********************************************************************
 
       module rates_support
-      use const_def, only: dp, use_mesa_temp_cache, missing_value, ln10
+      use const_def, only: dp, qp, use_mesa_temp_cache, missing_value, ln10
       use math_lib
       use rates_def
       use utils_lib, only: mv, switch_str, mesa_error
@@ -32,12 +32,12 @@
 
       subroutine do_get_raw_rates( &
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
-            ye, logtemp_in, btemp, bden, raw_rate_factor, logttab, &
+            ye, logtemp_in, btemp, bden, raw_rate_factor, ttab, logttab, &
             rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
          integer, intent(in) :: num_reactions, reaction_id(:), nT8s
          real(dp), intent(in) ::  &
             ye, logtemp_in, btemp, bden, raw_rate_factor(:),  &
-            rattab(:,:), logttab(:)
+            rattab(:,:), ttab(:), logttab(:)
          real(dp), pointer, intent(in) :: rattab_f1(:)
          real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
          integer, intent(out) :: ierr
@@ -155,7 +155,13 @@
             do while (logtemp > logttab(k+1) .and. k+1 < nrattab)
                k = k+1
             end do
-            dt = logtemp - logttab(k)
+            if (logtemp_in >= max_safe_logT_for_rates) then
+               dt = logtemp - logttab(k)
+            else
+               ! Preserve local changes lost by subtracting absolute logarithms.
+               dt = real(log(real(btemp,kind=qp)/real(ttab(k),kind=qp))/ &
+                  real(ln10,kind=qp),kind=dp)
+            end if
 
             do i = r1,r2
 
@@ -703,4 +709,3 @@
 
 
       end module rates_support
-
