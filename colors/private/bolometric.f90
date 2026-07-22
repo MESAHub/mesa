@@ -23,13 +23,14 @@ module bolometric
    use colors_def, only: Colors_General_Info
    use colors_utils, only: simpson_integration
    use hermite_interp, only: construct_sed_hermite
+   use hermite_interp_bounded, only: construct_sed_hermite_bounded
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
 
    implicit none
 
    private
-   public :: calculate_bolometric
+   public :: calculate_bolometric, calculate_bolometric_phot
 
 contains
 
@@ -44,7 +45,7 @@ contains
 
       character(len=32) :: interpolation_method
 
-      interpolation_method = 'Hermite'   ! or 'Linear' / 'KNN' later
+      interpolation_method = 'Hermite_bounded'   ! or 'Linear' / 'KNN' / 'Hermite'
 
       ! how far (teff, log_g, metallicity) is from the nearest grid point
       interpolation_radius = compute_interp_radius(teff, log_g, metallicity, &
@@ -63,28 +64,39 @@ contains
          call construct_sed_knn(rq, teff, log_g, metallicity, R, d, &
                                 sed_filepath, wavelengths, fluxes)
 
+      case ('Hermite_bounded', 'hermite_bounded', 'HERMITE_BOUNDED')
+         call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
+                                sed_filepath, wavelengths, fluxes)
+
+
       case default
-         ! fallback: hermite
-         call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
+         ! fallback: bounded hermite (switches to linear in regions where hermite overshoots.)
+         call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
                                     sed_filepath, wavelengths, fluxes)
       end select
 
       call calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
    end subroutine calculate_bolometric
 
+
    subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
+      real(dp), dimension(:), intent(in) :: wavelengths, fluxes
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux
+      real(dp), allocatable :: clean_fluxes(:)
       integer :: i
 
-      ! zero out any invalid flux/wavelength values
-      do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0d0 .or. fluxes(i) < 0.0d0) then
-            fluxes(i) = 0.0d0
+      allocate(clean_fluxes(size(fluxes)))
+      clean_fluxes = fluxes
+
+      do i = 1, size(wavelengths)
+         if (wavelengths(i) <= 0.0d0 .or. clean_fluxes(i) < 0.0d0) then
+            clean_fluxes(i) = 0.0d0
          end if
       end do
 
-      call simpson_integration(wavelengths, fluxes, bolometric_flux)
+      call simpson_integration(wavelengths, clean_fluxes, bolometric_flux)
+
+      deallocate(clean_fluxes)
 
       if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."

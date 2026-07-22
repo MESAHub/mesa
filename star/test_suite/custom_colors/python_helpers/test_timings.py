@@ -13,13 +13,11 @@ set of publication-quality plots saved to ``test_results/timing/``.
 Configurations tested
 ---------------------
   baseline          – use_colors = .false.  (pure MESA, no photometry)
-  colors_minimal    – use_colors = .true.   (Vega, no CSV, no Newton)
+  colors_minimal    – use_colors = .true.   (Vega, no CSV)
   colors_AB         – mag_system = 'AB'
   colors_ST         – mag_system = 'ST'
   colors_csv        – + make_csv = .true.
   colors_csv_permod – + make_csv + sed_per_model = .true.
-  colors_newton     – + colors_per_newton_step = .true.
-  colors_full       – make_csv + sed_per_model + newton_step (everything on)
 
 Run from the custom_colors test suite directory:
     python3 python_helpers/timing_benchmark.py
@@ -64,10 +62,10 @@ if not MESA_DIR:
 # Number of converged timesteps each run must complete before timing stops.
 # 60 steps gives ~30–90 s per config on a modern workstation, which is long
 # enough to average out startup noise while keeping the full suite tractable.
-N_STEPS = 1000
+N_STEPS = 500
 
 # Wall-clock timeout per run (seconds).  Must be >> expected run time.
-RUN_TIMEOUT = 600
+RUN_TIMEOUT = 900
 
 # Where plots and the CSV summary are written.
 OUT_DIR = Path("test_results/timing")
@@ -93,13 +91,12 @@ CONFIGS = [
     ),
     (
         "colors_minimal",
-        "Colors on – Vega, no CSV, no Newton",
+        "Colors on – Vega, no CSV",
         {
             "use_colors": ".true.",
             "mag_system": "'Vega'",
             "make_csv": ".false.",
             "sed_per_model": ".false.",
-            "colors_per_newton_step": ".false.",
         },
     ),
     (
@@ -110,7 +107,6 @@ CONFIGS = [
             "mag_system": "'AB'",
             "make_csv": ".false.",
             "sed_per_model": ".false.",
-            "colors_per_newton_step": ".false.",
         },
     ),
     (
@@ -121,7 +117,6 @@ CONFIGS = [
             "mag_system": "'ST'",
             "make_csv": ".false.",
             "sed_per_model": ".false.",
-            "colors_per_newton_step": ".false.",
         },
     ),
     (
@@ -132,7 +127,6 @@ CONFIGS = [
             "mag_system": "'Vega'",
             "make_csv": ".true.",
             "sed_per_model": ".false.",
-            "colors_per_newton_step": ".false.",
         },
     ),
     (
@@ -143,29 +137,6 @@ CONFIGS = [
             "mag_system": "'Vega'",
             "make_csv": ".true.",
             "sed_per_model": ".true.",
-            "colors_per_newton_step": ".false.",
-        },
-    ),
-    (
-        "colors_newton",
-        "Colors on – Vega + colors_per_newton_step",
-        {
-            "use_colors": ".true.",
-            "mag_system": "'Vega'",
-            "make_csv": ".false.",
-            "sed_per_model": ".false.",
-            "colors_per_newton_step": ".true.",
-        },
-    ),
-    (
-        "colors_full",
-        "Colors on – all options enabled",
-        {
-            "use_colors": ".true.",
-            "mag_system": "'Vega'",
-            "make_csv": ".true.",
-            "sed_per_model": ".true.",
-            "colors_per_newton_step": ".true.",
         },
     ),
 ]
@@ -178,8 +149,6 @@ PALETTE = [
     "#c44e52",  # ST        – red
     "#8172b2",  # csv       – purple
     "#937860",  # csv+per   – brown
-    "#da8bc3",  # newton    – pink
-    "#8c8c8c",  # full      – grey
 ]
 
 # =============================================================================
@@ -626,88 +595,59 @@ def plot_s_per_step(results: list[dict], out: Path):
 
 
 def plot_feature_breakdown(results: list[dict], out: Path):
-    """Grouped bar chart decomposing the effect of each feature flag."""
+    """Bar chart: per-step overhead of each configuration vs no-colors baseline."""
     valid = _valid(results)
     bline = next((r for r in valid if r["label"] == "baseline"), None)
-    minimal = next((r for r in valid if r["label"] == "colors_minimal"), None)
-
-    if bline is None or minimal is None:
-        print("  [plot_feature_breakdown]  missing baseline or minimal – skipping")
+    if bline is None:
+        print("  [plot_feature_breakdown]  baseline missing – skipping")
         return
 
-    # Feature contributions relative to minimal-colors (all flags off)
-    def delta(label):
-        r = next((x for x in valid if x["label"] == label), None)
+    # All deltas relative to the no-colors baseline; floor at 0.
+    order = [
+        ("colors_minimal",    "Vega",                    "#dd8452"),
+        ("colors_AB",         "AB",                      "#55a868"),
+        ("colors_ST",         "ST",                      "#c44e52"),
+        ("colors_csv",        "Vega\n+ CSV",              "#8172b2"),
+        ("colors_csv_permod", "Vega + CSV\n+ per model", "#937860"),
+    ]
+
+    labels, values, clrs = [], [], []
+    for cfg_label, display_label, colour in order:
+        r = next((x for x in valid if x["label"] == cfg_label), None)
         if r is None:
-            return None
-        return r["s_per_step"] - minimal["s_per_step"]
+            continue
+        delta = max(0.0, r["s_per_step"] - bline["s_per_step"])
+        labels.append(display_label)
+        values.append(delta)
+        clrs.append(colour)
 
-    features = {
-        "colors\n(vs baseline)": minimal["s_per_step"] - bline["s_per_step"],
-        "make_csv": delta("colors_csv"),
-        "sed_per_model\n(on top of csv)": (
-            (
-                next(
-                    (
-                        x["s_per_step"]
-                        for x in valid
-                        if x["label"] == "colors_csv_permod"
-                    ),
-                    None,
-                )
-                or 0
-            )
-            - (
-                next(
-                    (x["s_per_step"] for x in valid if x["label"] == "colors_csv"), None
-                )
-                or 0
-            )
-        ),
-        "AB system": delta("colors_AB"),
-        "ST system": delta("colors_ST"),
-        "newton_step": delta("colors_newton"),
-    }
+    if not values:
+        print("  [plot_feature_breakdown]  no data – skipping")
+        return
 
-    labels = [k for k, v in features.items() if v is not None]
-    values = [v for v in features.values() if v is not None]
-    clrs = ["#c44e52" if v > 0 else "#55a868" for v in values]
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    bars = ax.bar(labels, values, color=clrs, edgecolor="white", linewidth=0.8, zorder=3)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    bars = ax.bar(
-        labels, values, color=clrs, edgecolor="white", linewidth=0.8, zorder=3
-    )
-
+    y_pad = max(values) * 0.18
     for bar, v in zip(bars, values):
-        va = "bottom" if v >= 0 else "top"
-        yoffs = max(abs(x) for x in values) * 0.02
         ax.text(
             bar.get_x() + bar.get_width() / 2,
-            v + (yoffs if v >= 0 else -yoffs),
-            f"{v:+.4f} s",
+            v + max(values) * 0.02,
+            f"{v:.4f} s",
             ha="center",
-            va=va,
-            fontsize=8,
+            va="bottom",
+            fontsize=9.5,
             fontweight="bold",
         )
 
-    ax.axhline(0, color="black", linewidth=0.8)
-    ax.set_ylabel("Δ seconds per step vs colors_minimal", fontsize=11)
-    ax.set_title(
-        "Incremental cost of individual features\n(positive = slower, negative = faster than colors_minimal)",
-        fontsize=12,
-        fontweight="bold",
-    )
-    positive_patch = mpatches.Patch(color="#c44e52", label="Added cost")
-    negative_patch = mpatches.Patch(color="#55a868", label="Reduced cost / faster")
-    ax.legend(handles=[positive_patch, negative_patch], fontsize=9)
-    y_pad = max(abs(v) for v in values) * 0.20
-    ax.set_ylim(min(values) - y_pad, max(values) + y_pad)
+    ax.set_ylabel(r"$\Delta$ s\,step$^{-1}$ vs no-colors baseline", fontsize=11)
+    ax.set_ylim(0, max(values) + y_pad)
     ax.yaxis.grid(True, alpha=0.35, zorder=0)
     ax.set_axisbelow(True)
+    ax.tick_params(axis="x", labelsize=9)
     fig.tight_layout()
 
-    fpath = out / "timing_feature_breakdown.png"
+    fpath = out / "timing_feature_breakdown.pdf"
     fig.savefig(fpath, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"  [plot]  {fpath}")

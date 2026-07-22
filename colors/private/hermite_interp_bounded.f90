@@ -6,7 +6,7 @@
 ! Hermite interpolation module for spectral energy distributions (SEDs)
 ! ***********************************************************************
 
-module hermite_interp
+module hermite_interp_bounded
    use const_def, only: dp
    use colors_def, only: Colors_General_Info
    use colors_utils, only: dilute_flux, find_containing_cell, &
@@ -14,7 +14,7 @@ module hermite_interp
    implicit none
 
    private
-   public :: construct_sed_hermite, hermite_tensor_interp3d
+   public :: construct_sed_hermite_bounded, hermite_tensor_interp3d
 
 contains
 
@@ -24,7 +24,7 @@ contains
    !   cube_loaded = .true.  -> use the preloaded 4-D cube on the handle
    !   cube_loaded = .false. -> load individual SED files via the lookup table
    !---------------------------------------------------------------------------
-   subroutine construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
+   subroutine construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
                                     stellar_model_dir, wavelengths, fluxes)
       type(Colors_General_Info), intent(inout) :: rq
       real(dp), intent(in) :: teff, log_g, metallicity, R, d
@@ -61,7 +61,7 @@ contains
       allocate(fluxes(n_lambda))
       call dilute_flux(interp_flux, R, d, fluxes)
 
-   end subroutine construct_sed_hermite
+   end subroutine construct_sed_hermite_bounded
 
    !---------------------------------------------------------------------------
    ! Fallback: Build a local sub-cube from individual SED files with enough
@@ -191,6 +191,17 @@ contains
       real(dp) :: h_x(2), h_y(2), h_z(2)
       real(dp) :: hx_d(2), hy_d(2), hz_d(2)
       real(dp) :: wx, wy, wz, wxd, wyd, wzd
+      real(dp) :: l_x(0:1), l_y(0:1), l_z(0:1)
+      real(dp) :: lin_val, corner_val, corner_wt
+      real(dp) :: f_min, f_max, lower_bound, upper_bound, local_range
+      real(dp) :: sum_h, sum_l, ratio
+      real(dp), dimension(:), allocatable :: linear_flux
+      real(dp), parameter :: tiny_value = 1.0d-300
+      ! Allow modest local cubic overshoot. The catastrophic WD failure is
+      ! caught by the whole-SED flux-ratio check below, not by a hair-trigger
+      ! per-wavelength clamp.
+      real(dp), parameter :: local_overshoot_tol = 5.0d-1
+      real(dp), parameter :: integrated_flux_tol = 5.0d-2
 
       nx = size(x_grid)
       ny = size(y_grid)
@@ -259,8 +270,26 @@ contains
       h_z  = [h00(t_z), h01(t_z)]
       hz_d = [h10(t_z), h11(t_z)]
 
+      ! Linear weights for the same containing cell. These are used as a
+      ! positivity/local-bounds limiter for the Hermite candidate below.
+      l_x = 0.0_dp; l_y = 0.0_dp; l_z = 0.0_dp
+      l_x(0) = 1.0_dp - t_x; l_x(1) = t_x
+      l_y(0) = 1.0_dp - t_y; l_y(1) = t_y
+      l_z(0) = 1.0_dp - t_z; l_z(1) = t_z
+      if (ix_max == 0) then
+         l_x(0) = 1.0_dp; l_x(1) = 0.0_dp
+      end if
+      if (iy_max == 0) then
+         l_y(0) = 1.0_dp; l_y(1) = 0.0_dp
+      end if
+      if (iz_max == 0) then
+         l_z(0) = 1.0_dp; l_z(1) = 0.0_dp
+      end if
+
       ! stencil loop -- weights are invariant over lambda, so lambda is innermost
       result_flux = 0.0_dp
+      allocate(linear_flux(n_lambda))
+      linear_flux = 0.0_dp
       do iz = 0, iz_max
          wz  = h_z(iz + 1)
          wzd = hz_d(iz + 1)
@@ -286,6 +315,62 @@ contains
             end do
          end do
       end do
+
+      ! Build the multilinear SED for the same cell.  Use it as a safety
+      ! reference, not as the default answer.  A strict per-wavelength min/max
+      ! clamp makes this routine collapse back to linear interpolation and keeps
+      ! the linear grid-cell kinks.  Instead, only reject clearly bad wavelength
+      ! bins here, then sanity-check the integrated SED below.
+      do lam = 1, n_lambda
+         lin_val = 0.0_dp
+         f_min = huge(1.0_dp)
+         f_max = -huge(1.0_dp)
+
+         do iz = 0, iz_max
+            do iy = 0, iy_max
+               do ix = 0, ix_max
+                  corner_val = f_values_4d(i_x + ix, i_y + iy, i_z + iz, lam)
+                  corner_wt = l_x(ix)*l_y(iy)*l_z(iz)
+                  lin_val = lin_val + corner_wt*corner_val
+                  f_min = min(f_min, corner_val)
+                  f_max = max(f_max, corner_val)
+               end do
+            end do
+         end do
+
+         linear_flux(lam) = max(tiny_value, lin_val)
+
+         local_range = max(f_max - f_min, max(abs(f_min), abs(f_max), tiny_value))
+         lower_bound = f_min - local_overshoot_tol*local_range
+         upper_bound = f_max + local_overshoot_tol*local_range
+
+         if (result_flux(lam) /= result_flux(lam) .or. &
+             result_flux(lam) <= tiny_value .or. &
+             result_flux(lam) < lower_bound .or. &
+             result_flux(lam) > upper_bound) then
+            result_flux(lam) = linear_flux(lam)
+         end if
+
+         result_flux(lam) = max(tiny_value, result_flux(lam))
+      end do
+
+      ! Whole-SED sanity check.  The Koester WD failure can remain inside the
+      ! local per-wavelength envelope while still biasing the continuum enough
+      ! to destroy the bolometric flux.  If Hermite and multilinear disagree in
+      ! total surface flux by more than a few percent, use the safe multilinear
+      ! SED for this timestep.
+      sum_h = sum(result_flux)
+      sum_l = sum(linear_flux)
+      if (sum_h > tiny_value .and. sum_l > tiny_value) then
+         ratio = sum_h/sum_l
+         if (abs(ratio - 1.0_dp) > integrated_flux_tol) then
+            result_flux = linear_flux
+         end if
+      else
+         result_flux = linear_flux
+      end if
+
+      deallocate(linear_flux)
 
    end subroutine hermite_interp_vector
 
@@ -351,6 +436,11 @@ contains
       real(dp) :: values(2, 2, 2)
       real(dp) :: h_x(2), h_y(2), h_z(2)
       real(dp) :: hx_d(2), hy_d(2), hz_d(2)
+      real(dp) :: l_x(0:1), l_y(0:1), l_z(0:1)
+      real(dp) :: lin_sum, corner_val, corner_wt
+      real(dp) :: f_min, f_max, lower_bound, upper_bound
+      real(dp), parameter :: tiny_value = 1.0d-300
+      real(dp), parameter :: bound_tol = 1.0d-10
 
       nx = size(x_grid)
       ny = size(y_grid)
@@ -424,6 +514,20 @@ contains
       h_z  = [h00(t_z), h01(t_z)]
       hz_d = [h10(t_z), h11(t_z)]
 
+      l_x = 0.0_dp; l_y = 0.0_dp; l_z = 0.0_dp
+      l_x(0) = 1.0_dp - t_x; l_x(1) = t_x
+      l_y(0) = 1.0_dp - t_y; l_y(1) = t_y
+      l_z(0) = 1.0_dp - t_z; l_z(1) = t_z
+      if (ix_max == 0) then
+         l_x(0) = 1.0_dp; l_x(1) = 0.0_dp
+      end if
+      if (iy_max == 0) then
+         l_y(0) = 1.0_dp; l_y(1) = 0.0_dp
+      end if
+      if (iz_max == 0) then
+         l_z(0) = 1.0_dp; l_z(1) = 0.0_dp
+      end if
+
       f_sum = 0.0_dp
       do iz = 1, iz_max + 1
          do iy = 1, iy_max + 1
@@ -436,7 +540,33 @@ contains
          end do
       end do
 
-      f_interp = f_sum
+      lin_sum = 0.0_dp
+      f_min = huge(1.0_dp)
+      f_max = -huge(1.0_dp)
+      do iz = 0, iz_max
+         do iy = 0, iy_max
+            do ix = 0, ix_max
+               corner_val = f_values(i_x + ix, i_y + iy, i_z + iz)
+               corner_wt = l_x(ix)*l_y(iy)*l_z(iz)
+               lin_sum = lin_sum + corner_wt*corner_val
+               f_min = min(f_min, corner_val)
+               f_max = max(f_max, corner_val)
+            end do
+         end do
+      end do
+
+      lower_bound = f_min - bound_tol*max(abs(f_min), abs(f_max), tiny_value)
+      upper_bound = f_max + bound_tol*max(abs(f_min), abs(f_max), tiny_value)
+
+      if (f_sum /= f_sum .or. &
+          f_sum <= tiny_value .or. &
+          f_sum < lower_bound .or. &
+          f_sum > upper_bound) then
+         f_interp = lin_sum
+      else
+         f_interp = f_sum
+      end if
+      f_interp = max(tiny_value, f_interp)
    end function hermite_tensor_interp3d
 
 
@@ -506,4 +636,4 @@ contains
       h = t**3 - t**2
    end function h11
 
-end module hermite_interp
+end module hermite_interp_bounded

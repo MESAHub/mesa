@@ -231,4 +231,16 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                            Flux_expected    4.6117772754238E-05
                              Flux_abserr    4.2337099051924E-08
                              Flux_relerr    9.1802132938073E-04
+
+# Group4  focused_regression_tests
+
+PASS filter_compact_support
+PASS synthetic_filter_support
+PASS vega_filter_support
+PASS singleton_axis
+PASS boundary_clamp_low
+PASS boundary_clamp_high
+PASS bounded_hermite_fallback
+PASS bolometric_input_unchanged
+PASS bolometric_sanitized_flux
  test_colors: passed

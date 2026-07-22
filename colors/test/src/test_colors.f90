@@ -47,6 +47,11 @@ program test_colors
    use const_def,  only: dp, rsun, boltz_sigma
    use utils_lib,  only: mesa_error
    use colors_utils, only: resolve_path
+   use synthetic, only: calculate_synthetic, compute_vega_zero_point, &
+                        zero_filter_outside_support
+   use linear_interp, only: trilinear_interp
+   use hermite_interp_bounded, only: hermite_tensor_interp3d
+   use bolometric, only: calculate_bolometric_phot
 
    implicit none
 
@@ -283,6 +288,19 @@ program test_colors
    end do
 
    ! -----------------------------------------------------------------------
+   ! group 4: focused interpolation and integration regression tests
+   ! -----------------------------------------------------------------------
+
+   call write_section_header('# Group4  focused_regression_tests')
+   call check_filter_compact_support()
+   call check_synthetic_filter_support()
+   call check_vega_filter_support()
+   call check_singleton_axis()
+   call check_boundary_clamping()
+   call check_bounded_hermite_fallback()
+   call check_bolometric_non_destructive()
+
+   ! -----------------------------------------------------------------------
    ! cleanup
    ! -----------------------------------------------------------------------
 
@@ -337,4 +355,150 @@ contains
          stop 1
       end if
    end subroutine check_bolometric_coverage
+
+   subroutine check_filter_compact_support()
+      real(dp) :: target_wave(5), filter_wave(3), response(5), expected(5)
+
+      target_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      filter_wave = [2.0_dp, 3.0_dp, 4.0_dp]
+      response = [0.5_dp, 0.5_dp, -0.25_dp, 0.5_dp, 0.5_dp]
+      expected = [0.0_dp, 0.5_dp, 0.0_dp, 0.5_dp, 0.0_dp]
+
+      call zero_filter_outside_support(target_wave, filter_wave, response)
+      call assert_array_close('filter_compact_support', response, expected, 0.0_dp)
+   end subroutine check_filter_compact_support
+
+   subroutine check_synthetic_filter_support()
+      real(dp) :: target_wave(5), filter_wave(3), flux(5), transmission(3)
+      real(dp) :: magnitude, expected_magnitude
+      integer :: local_ierr
+
+      target_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      filter_wave = [2.0_dp, 3.0_dp, 4.0_dp]
+      flux = [100.0_dp, 2.0_dp, 2.0_dp, 2.0_dp, 100.0_dp]
+      transmission = 1.0_dp
+
+      magnitude = calculate_synthetic( &
+         0.0_dp, 0.0_dp, 0.0_dp, local_ierr, target_wave, flux, &
+         filter_wave, transmission, 1.0_dp, 'test.dat', .false., .false., '.', 0)
+      if (local_ierr /= 0) then
+         write(*,'(a, i0)') 'FAIL synthetic_filter_support ierr=', local_ierr
+         stop 1
+      end if
+
+      ! Only the three in-band samples contribute, all with flux two.  If
+      ! transmission leaks onto the bright out-of-band samples, this differs
+      ! substantially from -2.5 log10(2).
+      expected_magnitude = -2.5_dp*log10(2.0_dp)
+      call assert_close('synthetic_filter_support', magnitude, &
+                        expected_magnitude, 1.0d-14)
+   end subroutine check_synthetic_filter_support
+
+   subroutine check_vega_filter_support()
+      real(dp) :: vega_wave(5), filter_wave(3), vega_flux(5), transmission(3)
+      real(dp) :: zero_point
+
+      vega_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      filter_wave = [2.0_dp, 3.0_dp, 4.0_dp]
+      vega_flux = [100.0_dp, 2.0_dp, 2.0_dp, 2.0_dp, 100.0_dp]
+      transmission = 1.0_dp
+
+      zero_point = compute_vega_zero_point(vega_wave, vega_flux, &
+                                            filter_wave, transmission)
+      call assert_close('vega_filter_support', zero_point, 2.0_dp, 1.0d-14)
+   end subroutine check_vega_filter_support
+
+   subroutine check_singleton_axis()
+      real(dp) :: x_grid(1), y_grid(2), z_grid(2), values(1,2,2), actual
+
+      x_grid = [0.0_dp]
+      y_grid = [0.0_dp, 1.0_dp]
+      z_grid = [0.0_dp, 1.0_dp]
+      values(1,1,1) = 10.0_dp
+      values(1,2,1) = 12.0_dp
+      values(1,1,2) = 14.0_dp
+      values(1,2,2) = 16.0_dp
+
+      actual = trilinear_interp(0.0_dp, 0.25_dp, 0.5_dp, &
+                                x_grid, y_grid, z_grid, values)
+      call assert_close('singleton_axis', actual, 12.5_dp, 1.0d-14)
+   end subroutine check_singleton_axis
+
+   subroutine check_boundary_clamping()
+      real(dp) :: grid(2), values(2,2,2), below, above
+      integer :: ix, iy, iz
+
+      grid = [0.0_dp, 1.0_dp]
+      do iz = 1, 2
+         do iy = 1, 2
+            do ix = 1, 2
+               values(ix,iy,iz) = real(ix - 1, dp) &
+                                  + 2.0_dp*real(iy - 1, dp) &
+                                  + 4.0_dp*real(iz - 1, dp)
+            end do
+         end do
+      end do
+
+      below = trilinear_interp(-1.0_dp, 0.25_dp, 0.5_dp, &
+                               grid, grid, grid, values)
+      above = trilinear_interp(2.0_dp, 0.25_dp, 0.5_dp, &
+                               grid, grid, grid, values)
+      call assert_close('boundary_clamp_low', below, 2.5_dp, 1.0d-14)
+      call assert_close('boundary_clamp_high', above, 3.5_dp, 1.0d-14)
+   end subroutine check_boundary_clamping
+
+   subroutine check_bounded_hermite_fallback()
+      real(dp) :: x_grid(3), singleton(1), values(3,1,1), actual
+
+      x_grid = [0.0_dp, 1.0_dp, 2.0_dp]
+      singleton = [0.0_dp]
+      values(:,1,1) = [1.0_dp, 1.0_dp, 100.0_dp]
+
+      ! The derivative inferred from the third point drives the unbounded
+      ! Hermite value below zero in the first cell.  Bounded Hermite must use
+      ! the multilinear value, which is exactly one throughout that cell.
+      actual = hermite_tensor_interp3d(0.5_dp, 0.0_dp, 0.0_dp, &
+                                       x_grid, singleton, singleton, values)
+      call assert_close('bounded_hermite_fallback', actual, 1.0_dp, 1.0d-14)
+   end subroutine check_bounded_hermite_fallback
+
+   subroutine check_bolometric_non_destructive()
+      real(dp) :: local_wavelengths(3), local_fluxes(3), original_fluxes(3)
+      real(dp) :: local_mag, local_bol_flux
+
+      local_wavelengths = [1.0_dp, 2.0_dp, 3.0_dp]
+      local_fluxes = [-1.0_dp, 2.0_dp, 3.0_dp]
+      original_fluxes = local_fluxes
+
+      call calculate_bolometric_phot(local_wavelengths, local_fluxes, &
+                                      local_mag, local_bol_flux)
+      call assert_array_close('bolometric_input_unchanged', local_fluxes, &
+                              original_fluxes, 0.0_dp)
+      call assert_close('bolometric_sanitized_flux', local_bol_flux, &
+                        11.0_dp/3.0_dp, 1.0d-14)
+   end subroutine check_bolometric_non_destructive
+
+   subroutine assert_close(label, actual, expected, tolerance)
+      character(len=*), intent(in) :: label
+      real(dp), intent(in) :: actual, expected, tolerance
+
+      if (abs(actual - expected) > tolerance) then
+         write(*,'(a, a, 2(a, 1pe23.13))') 'FAIL ', trim(label), &
+            ' actual=', actual, ' expected=', expected
+         stop 1
+      end if
+      write(*,'(a, a)') 'PASS ', trim(label)
+   end subroutine assert_close
+
+   subroutine assert_array_close(label, actual, expected, tolerance)
+      character(len=*), intent(in) :: label
+      real(dp), intent(in) :: actual(:), expected(:), tolerance
+
+      if (size(actual) /= size(expected) .or. &
+          any(abs(actual - expected) > tolerance)) then
+         write(*,'(a, a)') 'FAIL ', trim(label)
+         stop 1
+      end if
+      write(*,'(a, a)') 'PASS ', trim(label)
+   end subroutine assert_array_close
 end program test_colors
