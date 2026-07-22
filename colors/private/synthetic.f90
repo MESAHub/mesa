@@ -29,6 +29,7 @@ module synthetic
    private
    public :: calculate_synthetic
    public :: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
+   public :: zero_filter_outside_support
 
 contains
 

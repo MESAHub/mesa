@@ -30,7 +30,7 @@ module bolometric
    implicit none
 
    private
-   public :: calculate_bolometric
+   public :: calculate_bolometric, calculate_bolometric_phot
 
 contains
 

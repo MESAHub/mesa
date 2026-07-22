@@ -44,6 +44,26 @@ The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ r
 Bug Fixes
 ---------
 
+Colors
+~~~~~~
+
+- Filter transmission is now forced to zero outside the wavelength range
+  tabulated by the filter file, for both synthetic photometry and Vega
+  zero-point calculations.  This prevents interpolation backends from leaking
+  extrapolated transmission outside a passband.
+- Bolometric integration no longer modifies the interpolated SED while
+  sanitizing invalid flux samples.
+- Hermite and multilinear atmosphere interpolation now support singleton grid
+  axes as degenerate dimensions and handle grid boundaries without invalid
+  indexing or extrapolation.
+- Bounded Hermite interpolation is now the default.  It falls back to
+  multilinear interpolation when the Hermite SED is nonphysical or
+  sufficiently inconsistent with the local multilinear result.
+- The colors documentation now describes the fundamental limitation of
+  interpolating across an SED transition that is narrower than the atmosphere-
+  grid spacing.  Neither the multilinear fallback nor ``Interp_rad`` can detect
+  or correct an unresolved physical transition.
+
 Fixed a small bug where diffusive overshooting (overmixing) routines did not
 respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 ``mixing_length_alpha`` instead. See `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.

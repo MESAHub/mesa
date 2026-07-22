@@ -58,6 +58,15 @@ How does the MESA colors module work?
 
 3.  The fluxes are converted into magnitudes using the user-selected magnitude system (AB, ST, or Vega).
 
+.. warning::
+
+   The atmosphere grid must resolve rapid SED changes with T_eff, log g, and
+   metallicity.  If a transition is narrower than the grid spacing, both
+   Hermite and multilinear interpolation can produce a numerically valid but
+   physically inaccurate intermediate SED.  ``Interp_rad`` measures distance
+   to the nearest grid point and does not detect this failure mode.  See
+   :ref:`colors_interpolation_limitations` for details and validation guidance.
+
 ----
 
 Inlist Options & Parameters

@@ -15,7 +15,7 @@ The outputs are:
 
 * **Mag_bol** — bolometric magnitude, derived directly from the stellar luminosity
 * **Flux_bol** — bolometric flux at the specified distance
-* **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (diagnostic for interpolation quality)
+* **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (a grid-proximity diagnostic, not an interpolation-error estimate)
 * **One column per filter** — synthetic magnitude in every filter listed in the instrument index file, named by the filter filename (``*.dat`` suffix stripped)
 
 This is fundamentally different from the pre-existing bolometric correction (BC) interface in MESA. The old BC approach interpolates a table of pre-computed magnitude offsets. The colors module instead constructs a full SED at the stellar parameters and performs the photometry in full—there is no intermediate bolometric correction step. The old BC interface functions (``get_bc_by_name``, ``get_abs_mag_by_id``, etc.) are retained as stubs in ``colors_lib.f90`` that return ``-99.9`` solely to satisfy the MESA interface; they are not called by the colors module itself.
@@ -45,7 +45,7 @@ At each history output step, ``data_for_colors_history_columns`` is called with 
 
 The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. Two paths exist:
 
-* **Flux cube path** (preferred): hermite tensor interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
+* **Flux cube path** (preferred): bounded Hermite tensor interpolation across the full pre-loaded 4D array. The Hermite result is checked against a multilinear result from the same grid cell, with multilinear interpolation used as a numerical fallback. All lookups are in-memory array accesses.
 * **Stencil fallback path** (low-RAM): an extended neighbourhood of SED files around the current grid cell is loaded on demand. Individual SED files are served from a bounded memory cache (256-slot circular buffer, ``sed_mem_cache_cap`` in ``colors_def.f90``) to avoid redundant disk reads. The stencil is invalidated and reloaded whenever the star moves into a new grid cell.
 
 **Step 2 — Distance dilution**
@@ -96,8 +96,11 @@ Source files
    │   ├── bolometric.f90       — bolometric magnitude and flux calculation
    │   ├── synthetic.f90        — per-filter convolution and magnitude calculation,
    │   │                          SED CSV output (make_csv / sed_per_model)
-   │   ├── hermite_interp.f90   — hermite tensor interpolation (cube path)
-   │   ├── linear_interp.f90    — trilinear interpolation (cube path fallback)
+   │   ├── hermite_interp.f90   — unbounded Hermite tensor interpolation
+   │   ├── hermite_interp_bounded.f90
+   │   │                        — default bounded Hermite interpolation with
+   │   │                          multilinear fallback
+   │   ├── linear_interp.f90    — multilinear interpolation
    │   ├── knn_interp.f90       — k-nearest-neighbour interpolation
    │   ├── colors_utils.f90     — I/O (SED, filter, lookup table, flux cube),
    │   │                          numerical integration, flux dilution,
@@ -237,10 +240,46 @@ along with file counts, disk usage, and metadata.
 Interpolation and filter-support caveats
 ----------------------------------------
 
-Colors computes synthetic photometry by interpolating atmosphere spectra in stellar-parameter space and by interpolating filter transmission curves onto the SED wavelength grid. These interpolation steps are numerical operations and should not be interpreted as a substitute for atmosphere-model validation.
+Colors computes synthetic photometry by interpolating atmosphere spectra in
+stellar-parameter space and by interpolating filter transmission curves onto
+the SED wavelength grid. These interpolation steps are numerical operations
+and should not be interpreted as a substitute for atmosphere-model validation.
 
-Filter transmission is assumed to be zero outside the wavelength interval explicitly tabulated by the filter file. Users should therefore provide filter curves that cover the full intended passband and should not rely on interpolation or extrapolation beyond the supplied filter table. The same compact-support rule is applied to both model-star filter convolution and Vega zero-point calculations.
+Filter transmission is assumed to be zero outside the wavelength interval
+explicitly tabulated by the filter file. Users should therefore provide filter
+curves that cover the full intended passband and should not rely on
+interpolation or extrapolation beyond the supplied filter table. The same
+compact-support rule is applied to both model-star filter convolution and Vega
+zero-point calculations.
 
-Atmosphere-grid interpolation is only as reliable as the grid coverage and smoothness allow. Grids with singleton axes, such as a single metallicity value, are supported as degenerate dimensions, but the interpolation is then effectively lower-dimensional along that axis. Users should monitor `Interp_rad`, inspect diagnostic SED output when available, and treat results near or outside atmosphere-grid boundaries with caution.
+Atmosphere-grid interpolation is only as reliable as the grid coverage and
+smoothness allow. Grids with singleton axes, such as a single metallicity
+value, are supported as degenerate dimensions, but the interpolation is then
+effectively lower-dimensional along that axis. Users should monitor
+``Interp_rad``, inspect diagnostic SED output when available, and treat results
+near or outside atmosphere-grid boundaries with caution.
 
-The bounded Hermite interpolator is designed to retain smooth cubic interpolation where it behaves well, while falling back to multilinear interpolation when the Hermite result becomes nonphysical or inconsistent with the local grid-cell flux scale. This is a numerical safeguard, not an uncertainty model. Sharp spectral features, sparse atmosphere grids, hot/blue SEDs, and high-surface-gravity models should still be checked carefully against diagnostic SEDs and expected broadband behavior.
+The bounded Hermite interpolator is designed to retain smooth cubic
+interpolation where it behaves well, while falling back to multilinear
+interpolation when the Hermite result becomes nonphysical or inconsistent with
+the local grid-cell flux scale. This is a numerical safeguard, not an
+uncertainty model.
+
+There is a fundamental limitation when the SED changes rapidly over an interval
+in T_eff, log g, or metallicity that is narrower than the atmosphere-grid
+spacing. Neither Hermite nor multilinear interpolation can reconstruct a
+transition that is not resolved by the tabulated models. Hermite interpolation
+may overshoot near a steep change; the bounded variant can then fall back to
+multilinear interpolation, but a multilinear mixture of the cell-corner SEDs
+can still be physically inaccurate even though it is positive and remains
+within their pointwise range. ``Interp_rad`` measures proximity to grid points,
+not the local SED gradient, so it does not by itself identify this failure
+mode.
+
+Atmosphere grids should therefore sample rapid spectral transitions finely
+enough for the intended application. Results in regions with sharp spectral
+changes, sparse grid coverage, hot or blue SEDs, or high-surface-gravity models
+should be checked against the original atmosphere models and diagnostic SEDs.
+If the transition is unresolved, switching interpolation methods is not a
+reliable remedy; a more finely sampled atmosphere grid or an application-
+specific physical treatment is required.
