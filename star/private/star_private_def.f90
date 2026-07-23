@@ -521,14 +521,20 @@
             write(*,'(A)')
          end if
 
+         if (nacre_factor_in /= -1d0 .and. nacre_factor_in <= 0d0) then
+            write(*,*) 'ERROR: nacre_factor must be greater than zero'
+            ierr = -1
+            return
+         end if
+
          if (nacre_factor_in > 0 .and. nacre_factor_in /= nacre_factor) then
-            nacre_factor= nacre_factor_in
+            nacre_factor = nacre_factor_in
             write(*,'(A)')
             write(*,'(A)')
             write(*,'(A)')
             write(*,'(A)')
             write(*,1) 'change nacre_factor', nacre_factor
-            write(*,1) 'must clear data/rates_data/cache of old nacre rates'
+            write(*,1) 'must clear rates cache of old n14pg rates'
             write(*,'(A)')
             write(*,'(A)')
             write(*,'(A)')

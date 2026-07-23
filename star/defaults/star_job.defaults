@@ -2587,7 +2587,12 @@
 
       ! nacre_factor
       ! ~~~~~~~~~~~~~~~~~~~
-      ! default is 1d0. This is set this to scale the S factor of a given Nacre Rate. Default is n14pg.
+      ! dimensionless factor for the low-energy nonresonant contribution to
+      ! the NACRE n14(p,gamma)o15 rate. The default -1 leaves the factor at 1d0;
+      ! any explicitly supplied factor must be greater than zero.
+      !
+      ! For S114(0) = 1.68 +/- 0.14 keV b relative to 3.2 keV b, the central
+      ! factor is 1.68/3.2 and the 1 sigma bounds are (1.68 +/- 0.14)/3.2.
 
       nacre_factor = -1
 
