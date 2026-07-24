@@ -103,10 +103,10 @@ contains
          f2 = y(i + 2)
 
          ! Simpson's rule: (h/3) * (f0 + 4f1 + f2)
-         sum = sum + (h1 + h2)/6.0_dp * ( &
-            f0*(2.0_dp*h1 - h2)/h1 + &
-            f1*(h1 + h2)**2/(h1*h2) + &
-            f2*(2.0_dp*h2 - h1)/h2)
+         sum = sum + (h1 + h2)/6.0_dp*( &
+               f0*(2.0_dp*h1 - h2)/h1 + &
+               f1*(h1 + h2)**2/(h1*h2) + &
+               f2*(2.0_dp*h2 - h1)/h2)
 
       end do
 
@@ -300,7 +300,7 @@ contains
             if (len_trim(token) == 0 .or. token == '""') then
                out_logg(i) = -999.0_dp
             else
-               read(token, *, iostat=ios) out_logg(i)
+               read (token, *, iostat=ios) out_logg(i)
                if (ios /= 0) out_logg(i) = -999.0_dp
             end if
          else
@@ -312,7 +312,7 @@ contains
             if (len_trim(token) == 0 .or. token == '""') then
                out_meta(i) = 0.0_dp
             else
-               read(token, *, iostat=ios) out_meta(i)
+               read (token, *, iostat=ios) out_meta(i)
                if (ios /= 0) out_meta(i) = 0.0_dp
             end if
          else
@@ -324,7 +324,7 @@ contains
             if (len_trim(token) == 0 .or. token == '""') then
                out_teff(i) = 0.0_dp
             else
-               read(token, *, iostat=ios) out_teff(i)
+               read (token, *, iostat=ios) out_teff(i)
                if (ios /= 0) out_teff(i) = 0.0_dp
             end if
          else
@@ -400,9 +400,6 @@ contains
 
    end subroutine load_lookup_table
 
-
-
-
    subroutine load_sed(directory, index, wavelengths, flux)
       character(len=*), intent(in) :: directory
       integer, intent(in) :: index
@@ -411,7 +408,6 @@ contains
       character(len=512) :: line
       integer :: unit, n_rows, status, i, header_lines
       real(dp) :: temp_wavelength, temp_flux
-
 
       header_lines = 0
       open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
@@ -605,8 +601,8 @@ contains
          header_bytes = 4_int64*int(storage_size(n_teff)/8, int64)
          real_bytes = int(storage_size(1.0_dp)/8, int64)
          expected_bytes = header_bytes + real_bytes*( &
-            int(n_teff, int64) + int(n_logg, int64) + int(n_meta, int64) + int(n_lambda, int64) + &
-            int(n_teff, int64)*int(n_logg, int64)*int(n_meta, int64)*int(n_lambda, int64))
+                          int(n_teff, int64) + int(n_logg, int64) + int(n_meta, int64) + int(n_lambda, int64) + &
+                          int(n_teff, int64)*int(n_logg, int64)*int(n_meta, int64)*int(n_lambda, int64))
          if (file_bytes /= expected_bytes) then
             write (*, '(a,i0,a,i0,a)') &
                'colors: flux_cube.bin size mismatch (', file_bytes, &
@@ -1004,8 +1000,6 @@ contains
          rq%fallback_wavelengths_set = .true.
       end if
 
-
-
       ! store flux in the cache
       n_lam = size(flux)
       if (rq%sed_mcache_nlam == 0) then
@@ -1056,7 +1050,6 @@ contains
 
       if (allocated(sed_wave)) deallocate (sed_wave)
    end subroutine load_sed_cached
-
 
    ! simple 1D linear interpolation (np.interp-like): clamps to endpoints
    subroutine interp_linear_internal(x_out, x_in, y_in, y_out)

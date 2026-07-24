@@ -81,7 +81,9 @@ def parse_inlist_value(inlist_file: str | Path, name: str) -> float | None:
     return None
 
 
-def read_lookup_table(lookup_file: str | Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def read_lookup_table(
+    lookup_file: str | Path,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Read real atmosphere grid nodes from lookup_table.csv."""
     lookup_file = Path(lookup_file)
     if not lookup_file.exists():
@@ -167,7 +169,9 @@ def get_mesa_column(md, name: str) -> np.ndarray:
         raise KeyError(f"Could not read history column {name!r}") from exc
 
 
-def first_existing_column(md, candidates: Iterable[str]) -> tuple[str, np.ndarray] | None:
+def first_existing_column(
+    md, candidates: Iterable[str]
+) -> tuple[str, np.ndarray] | None:
     for name in candidates:
         if has_mesa_column(md, name):
             return name, get_mesa_column(md, name)
@@ -215,7 +219,9 @@ def get_metallicity_track(
         name, values = direct
         return values, f"history column {name}"
 
-    zcol = first_existing_column(md, ("initial_z", "Initial_z", "surface_z", "Surface_z", "Z"))
+    zcol = first_existing_column(
+        md, ("initial_z", "Initial_z", "surface_z", "Surface_z", "Z")
+    )
     if zcol is not None:
         name, zvals = zcol
         if convert_initial_z_to_feh:
@@ -317,7 +323,9 @@ def make_colors_grid_movie(
     log_teff_axis: bool = False,
 ):
     history_file = Path(history_file)
-    lookup_file = Path(str(lookup_file).replace("$MESA_DIR", str(Path.home() / "MESA/mesa")))
+    lookup_file = Path(
+        str(lookup_file).replace("$MESA_DIR", str(Path.home() / "MESA/mesa"))
+    )
     if "$MESA_DIR" in str(lookup_file):
         import os
 
@@ -377,7 +385,9 @@ def make_colors_grid_movie(
     if len(teff) == 0:
         raise ValueError("No finite history points available for plotting.")
 
-    nearest = normalized_nearest_indices(teff, logg, meta, grid_teff, grid_logg, grid_meta)
+    nearest = normalized_nearest_indices(
+        teff, logg, meta, grid_teff, grid_logg, grid_meta
+    )
 
     if log_teff_axis:
         x_grid = np.log10(grid_teff)
@@ -407,7 +417,7 @@ def make_colors_grid_movie(
         label="real atmosphere SED nodes",
     )
 
-    full_path, = ax_grid.plot(
+    (full_path,) = ax_grid.plot(
         x_path,
         logg,
         meta,
@@ -416,10 +426,10 @@ def make_colors_grid_movie(
         label="stellar path",
     )
 
-    prog_path, = ax_grid.plot([], [], [], lw=2.2, label="path so far")
+    (prog_path,) = ax_grid.plot([], [], [], lw=2.2, label="path so far")
     current_grid = ax_grid.scatter([], [], [], marker="o", s=65, depthshade=True)
     nearest_grid = ax_grid.scatter([], [], [], marker="s", s=75, depthshade=True)
-    radius_line, = ax_grid.plot([], [], [], lw=1.8, ls="--", alpha=0.9)
+    (radius_line,) = ax_grid.plot([], [], [], lw=1.8, ls="--", alpha=0.9)
 
     ax_grid.set_xlabel(x_label)
     ax_grid.set_ylabel(r"$\log g$")
@@ -438,7 +448,7 @@ def make_colors_grid_movie(
         s=9,
         alpha=0.85,
     )
-    cmd_path, = ax_cmd.plot(hr_color, hr_mag, lw=0.8, alpha=0.25)
+    (cmd_path,) = ax_cmd.plot(hr_color, hr_mag, lw=0.8, alpha=0.25)
     cmd_current = ax_cmd.scatter(
         [],
         [],
@@ -464,7 +474,6 @@ def make_colors_grid_movie(
         va="bottom",
         fontsize=9,
     )
-
 
     fig.subplots_adjust(left=0.08, right=0.92, bottom=0.08, top=0.94, hspace=0.22)
 

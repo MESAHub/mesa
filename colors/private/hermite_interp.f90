@@ -10,7 +10,7 @@ module hermite_interp
    use const_def, only: dp
    use colors_def, only: Colors_General_Info
    use colors_utils, only: dilute_flux, find_containing_cell, &
-                          find_nearest_point, find_bracket_index, load_stencil
+                           find_nearest_point, find_bracket_index, load_stencil
    implicit none
 
    private
@@ -47,9 +47,9 @@ contains
          ! allocation or 3-D slice extraction needed.
          allocate (interp_flux(n_lambda))
          call hermite_interp_vector(teff, log_g, metallicity, &
-                                     rq%cube_teff_grid, rq%cube_logg_grid, &
-                                     rq%cube_meta_grid, &
-                                     rq%cube_flux, n_lambda, interp_flux)
+                                    rq%cube_teff_grid, rq%cube_logg_grid, &
+                                    rq%cube_meta_grid, &
+                                    rq%cube_flux, n_lambda, interp_flux)
       else
          ! ---- Fallback path: load individual SED files from lookup table ----
          call construct_sed_from_files(rq, teff, log_g, metallicity, &
@@ -58,7 +58,7 @@ contains
       end if
 
       ! Apply distance dilution to get observed flux
-      allocate(fluxes(n_lambda))
+      allocate (fluxes(n_lambda))
       call dilute_flux(interp_flux, R, d, fluxes)
 
    end subroutine construct_sed_hermite
@@ -69,7 +69,7 @@ contains
    ! wavelengths in a single pass.
    !---------------------------------------------------------------------------
    subroutine construct_sed_from_files(rq, teff, log_g, metallicity, &
-                                        stellar_model_dir, interp_flux, wavelengths)
+                                       stellar_model_dir, interp_flux, wavelengths)
       use colors_utils, only: resolve_path, build_grid_to_lu_map
       type(Colors_General_Info), intent(inout) :: rq
       real(dp), intent(in) :: teff, log_g, metallicity
@@ -112,21 +112,21 @@ contains
          if (nt < 2) then
             lo_t = 1; hi_t = 1
          else
-            lo_t = max(1,  i_t - 1)
+            lo_t = max(1, i_t - 1)
             hi_t = min(nt, i_t + 2)
          end if
 
          if (ng < 2) then
             lo_g = 1; hi_g = 1
          else
-            lo_g = max(1,  i_g - 1)
+            lo_g = max(1, i_g - 1)
             hi_g = min(ng, i_g + 2)
          end if
 
          if (nm < 2) then
             lo_m = 1; hi_m = 1
          else
-            lo_m = max(1,  i_m - 1)
+            lo_m = max(1, i_m - 1)
             hi_m = min(nm, i_m + 2)
          end if
 
@@ -134,9 +134,9 @@ contains
          call load_stencil(rq, resolved_dir, lo_t, hi_t, lo_g, hi_g, lo_m, hi_m)
 
          ! Store subgrid arrays on the handle
-         if (allocated(rq%stencil_teff)) deallocate(rq%stencil_teff)
-         if (allocated(rq%stencil_logg)) deallocate(rq%stencil_logg)
-         if (allocated(rq%stencil_meta)) deallocate(rq%stencil_meta)
+         if (allocated(rq%stencil_teff)) deallocate (rq%stencil_teff)
+         if (allocated(rq%stencil_logg)) deallocate (rq%stencil_logg)
+         if (allocated(rq%stencil_meta)) deallocate (rq%stencil_meta)
 
          allocate (rq%stencil_teff(hi_t - lo_t + 1))
          allocate (rq%stencil_logg(hi_g - lo_g + 1))
@@ -159,8 +159,8 @@ contains
       ! Interpolate all wavelengths using precomputed stencil
       allocate (interp_flux(n_lambda))
       call hermite_interp_vector(teff, log_g, metallicity, &
-                                  rq%stencil_teff, rq%stencil_logg, rq%stencil_meta, &
-                                  rq%stencil_fluxes, n_lambda, interp_flux)
+                                 rq%stencil_teff, rq%stencil_logg, rq%stencil_meta, &
+                                 rq%stencil_fluxes, n_lambda, interp_flux)
 
    end subroutine construct_sed_from_files
 
@@ -173,11 +173,11 @@ contains
    ! binary searches and basis-function evaluations.
    !---------------------------------------------------------------------------
    subroutine hermite_interp_vector(x_val, y_val, z_val, &
-                                     x_grid, y_grid, z_grid, &
-                                     f_values_4d, n_lambda, result_flux)
+                                    x_grid, y_grid, z_grid, &
+                                    f_values_4d, n_lambda, result_flux)
       real(dp), intent(in) :: x_val, y_val, z_val
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      real(dp), intent(in) :: f_values_4d(:,:,:,:)   ! (nx, ny, nz, n_lambda)
+      real(dp), intent(in) :: f_values_4d(:, :, :, :)   ! (nx, ny, nz, n_lambda)
       integer, intent(in) :: n_lambda
       real(dp), intent(out) :: result_flux(n_lambda)
 
@@ -252,23 +252,23 @@ contains
       end if
 
       ! Precompute Hermite basis functions (same for all wavelengths)
-      h_x  = [h00(t_x), h01(t_x)]
+      h_x = [h00(t_x), h01(t_x)]
       hx_d = [h10(t_x), h11(t_x)]
-      h_y  = [h00(t_y), h01(t_y)]
+      h_y = [h00(t_y), h01(t_y)]
       hy_d = [h10(t_y), h11(t_y)]
-      h_z  = [h00(t_z), h01(t_z)]
+      h_z = [h00(t_z), h01(t_z)]
       hz_d = [h10(t_z), h11(t_z)]
 
       ! stencil loop -- weights are invariant over lambda, so lambda is innermost
       result_flux = 0.0_dp
       do iz = 0, iz_max
-         wz  = h_z(iz + 1)
+         wz = h_z(iz + 1)
          wzd = hz_d(iz + 1)
          do iy = 0, iy_max
-            wy  = h_y(iy + 1)
+            wy = h_y(iy + 1)
             wyd = hy_d(iy + 1)
             do ix = 0, ix_max
-               wx  = h_x(ix + 1)
+               wx = h_x(ix + 1)
                wxd = hx_d(ix + 1)
                do lam = 1, n_lambda
                   val = f_values_4d(i_x + ix, i_y + iy, i_z + iz, lam)
@@ -278,10 +278,10 @@ contains
                      nx, ny, nz, x_grid, y_grid, z_grid, df_dx, df_dy, df_dz)
 
                   result_flux(lam) = result_flux(lam) &
-                        + wx*wy*wz     * val &
-                        + wxd*wy*wz    * dx * df_dx &
-                        + wx*wyd*wz    * dy * df_dy &
-                        + wx*wy*wzd    * dz * df_dz
+                                     + wx*wy*wz*val &
+                                     + wxd*wy*wz*dx*df_dx &
+                                     + wx*wyd*wz*dy*df_dy &
+                                     + wx*wy*wzd*dz*df_dz
                end do
             end do
          end do
@@ -294,8 +294,8 @@ contains
    ! avoiding the need to extract a 3-D slice first.
    !---------------------------------------------------------------------------
    subroutine compute_derivatives_at_point_4d(f4d, i, j, k, lam, nx, ny, nz, &
-                                               x_grid, y_grid, z_grid, df_dx, df_dy, df_dz)
-      real(dp), intent(in) :: f4d(:,:,:,:)
+                                              x_grid, y_grid, z_grid, df_dx, df_dy, df_dz)
+      real(dp), intent(in) :: f4d(:, :, :, :)
       integer, intent(in) :: i, j, k, lam, nx, ny, nz
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
       real(dp), intent(out) :: df_dx, df_dy, df_dz
@@ -304,37 +304,36 @@ contains
       if (nx == 1) then
          df_dx = 0.0_dp
       else if (i > 1 .and. i < nx) then
-         df_dx = (f4d(i+1,j,k,lam) - f4d(i-1,j,k,lam)) / (x_grid(i+1) - x_grid(i-1))
+         df_dx = (f4d(i + 1, j, k, lam) - f4d(i - 1, j, k, lam))/(x_grid(i + 1) - x_grid(i - 1))
       else if (i == 1) then
-         df_dx = (f4d(i+1,j,k,lam) - f4d(i,j,k,lam)) / (x_grid(i+1) - x_grid(i))
+         df_dx = (f4d(i + 1, j, k, lam) - f4d(i, j, k, lam))/(x_grid(i + 1) - x_grid(i))
       else
-         df_dx = (f4d(i,j,k,lam) - f4d(i-1,j,k,lam)) / (x_grid(i) - x_grid(i-1))
+         df_dx = (f4d(i, j, k, lam) - f4d(i - 1, j, k, lam))/(x_grid(i) - x_grid(i - 1))
       end if
 
       ! y derivative
       if (ny == 1) then
          df_dy = 0.0_dp
       else if (j > 1 .and. j < ny) then
-         df_dy = (f4d(i,j+1,k,lam) - f4d(i,j-1,k,lam)) / (y_grid(j+1) - y_grid(j-1))
+         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j - 1, k, lam))/(y_grid(j + 1) - y_grid(j - 1))
       else if (j == 1) then
-         df_dy = (f4d(i,j+1,k,lam) - f4d(i,j,k,lam)) / (y_grid(j+1) - y_grid(j))
+         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j, k, lam))/(y_grid(j + 1) - y_grid(j))
       else
-         df_dy = (f4d(i,j,k,lam) - f4d(i,j-1,k,lam)) / (y_grid(j) - y_grid(j-1))
+         df_dy = (f4d(i, j, k, lam) - f4d(i, j - 1, k, lam))/(y_grid(j) - y_grid(j - 1))
       end if
 
       ! z derivative
       if (nz == 1) then
          df_dz = 0.0_dp
       else if (k > 1 .and. k < nz) then
-         df_dz = (f4d(i,j,k+1,lam) - f4d(i,j,k-1,lam)) / (z_grid(k+1) - z_grid(k-1))
+         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k - 1, lam))/(z_grid(k + 1) - z_grid(k - 1))
       else if (k == 1) then
-         df_dz = (f4d(i,j,k+1,lam) - f4d(i,j,k,lam)) / (z_grid(k+1) - z_grid(k))
+         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k, lam))/(z_grid(k + 1) - z_grid(k))
       else
-         df_dz = (f4d(i,j,k,lam) - f4d(i,j,k-1,lam)) / (z_grid(k) - z_grid(k-1))
+         df_dz = (f4d(i, j, k, lam) - f4d(i, j, k - 1, lam))/(z_grid(k) - z_grid(k - 1))
       end if
 
    end subroutine compute_derivatives_at_point_4d
-
 
    function hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
                                     z_grid, f_values) result(f_interp)
@@ -407,38 +406,37 @@ contains
       do iz = 0, iz_max
          do iy = 0, iy_max
             do ix = 0, ix_max
-               values(ix+1, iy+1, iz+1) = f_values(i_x+ix, i_y+iy, i_z+iz)
-               call compute_derivatives_at_point(f_values, i_x+ix, i_y+iy, i_z+iz, &
+               values(ix + 1, iy + 1, iz + 1) = f_values(i_x + ix, i_y + iy, i_z + iz)
+               call compute_derivatives_at_point(f_values, i_x + ix, i_y + iy, i_z + iz, &
                                                  nx, ny, nz, x_grid, y_grid, z_grid, &
-                                                 dx_values(ix+1, iy+1, iz+1), &
-                                                 dy_values(ix+1, iy+1, iz+1), &
-                                                 dz_values(ix+1, iy+1, iz+1))
+                                                 dx_values(ix + 1, iy + 1, iz + 1), &
+                                                 dy_values(ix + 1, iy + 1, iz + 1), &
+                                                 dz_values(ix + 1, iy + 1, iz + 1))
             end do
          end do
       end do
 
-      h_x  = [h00(t_x), h01(t_x)]
+      h_x = [h00(t_x), h01(t_x)]
       hx_d = [h10(t_x), h11(t_x)]
-      h_y  = [h00(t_y), h01(t_y)]
+      h_y = [h00(t_y), h01(t_y)]
       hy_d = [h10(t_y), h11(t_y)]
-      h_z  = [h00(t_z), h01(t_z)]
+      h_z = [h00(t_z), h01(t_z)]
       hz_d = [h10(t_z), h11(t_z)]
 
       f_sum = 0.0_dp
       do iz = 1, iz_max + 1
          do iy = 1, iy_max + 1
             do ix = 1, ix_max + 1
-               f_sum = f_sum + h_x(ix)*h_y(iy)*h_z(iz)  * values(ix, iy, iz)
-               f_sum = f_sum + hx_d(ix)*h_y(iy)*h_z(iz) * dx * dx_values(ix, iy, iz)
-               f_sum = f_sum + h_x(ix)*hy_d(iy)*h_z(iz) * dy * dy_values(ix, iy, iz)
-               f_sum = f_sum + h_x(ix)*h_y(iy)*hz_d(iz) * dz * dz_values(ix, iy, iz)
+               f_sum = f_sum + h_x(ix)*h_y(iy)*h_z(iz)*values(ix, iy, iz)
+               f_sum = f_sum + hx_d(ix)*h_y(iy)*h_z(iz)*dx*dx_values(ix, iy, iz)
+               f_sum = f_sum + h_x(ix)*hy_d(iy)*h_z(iz)*dy*dy_values(ix, iy, iz)
+               f_sum = f_sum + h_x(ix)*h_y(iy)*hz_d(iz)*dz*dz_values(ix, iy, iz)
             end do
          end do
       end do
 
       f_interp = f_sum
    end function hermite_tensor_interp3d
-
 
    subroutine compute_derivatives_at_point(f, i, j, k, nx, ny, nz, &
                                            x_grid, y_grid, z_grid, &
@@ -451,31 +449,31 @@ contains
       if (nx == 1) then
          df_dx = 0.0_dp
       else if (i > 1 .and. i < nx) then
-         df_dx = (f(i+1,j,k) - f(i-1,j,k)) / (x_grid(i+1) - x_grid(i-1))
+         df_dx = (f(i + 1, j, k) - f(i - 1, j, k))/(x_grid(i + 1) - x_grid(i - 1))
       else if (i == 1) then
-         df_dx = (f(i+1,j,k) - f(i,j,k))   / (x_grid(i+1) - x_grid(i))
+         df_dx = (f(i + 1, j, k) - f(i, j, k))/(x_grid(i + 1) - x_grid(i))
       else
-         df_dx = (f(i,j,k)   - f(i-1,j,k)) / (x_grid(i)   - x_grid(i-1))
+         df_dx = (f(i, j, k) - f(i - 1, j, k))/(x_grid(i) - x_grid(i - 1))
       end if
 
       if (ny == 1) then
          df_dy = 0.0_dp
       else if (j > 1 .and. j < ny) then
-         df_dy = (f(i,j+1,k) - f(i,j-1,k)) / (y_grid(j+1) - y_grid(j-1))
+         df_dy = (f(i, j + 1, k) - f(i, j - 1, k))/(y_grid(j + 1) - y_grid(j - 1))
       else if (j == 1) then
-         df_dy = (f(i,j+1,k) - f(i,j,k))   / (y_grid(j+1) - y_grid(j))
+         df_dy = (f(i, j + 1, k) - f(i, j, k))/(y_grid(j + 1) - y_grid(j))
       else
-         df_dy = (f(i,j,k)   - f(i,j-1,k)) / (y_grid(j)   - y_grid(j-1))
+         df_dy = (f(i, j, k) - f(i, j - 1, k))/(y_grid(j) - y_grid(j - 1))
       end if
 
       if (nz == 1) then
          df_dz = 0.0_dp
       else if (k > 1 .and. k < nz) then
-         df_dz = (f(i,j,k+1) - f(i,j,k-1)) / (z_grid(k+1) - z_grid(k-1))
+         df_dz = (f(i, j, k + 1) - f(i, j, k - 1))/(z_grid(k + 1) - z_grid(k - 1))
       else if (k == 1) then
-         df_dz = (f(i,j,k+1) - f(i,j,k))   / (z_grid(k+1) - z_grid(k))
+         df_dz = (f(i, j, k + 1) - f(i, j, k))/(z_grid(k + 1) - z_grid(k))
       else
-         df_dz = (f(i,j,k)   - f(i,j,k-1)) / (z_grid(k)   - z_grid(k-1))
+         df_dz = (f(i, j, k) - f(i, j, k - 1))/(z_grid(k) - z_grid(k - 1))
       end if
    end subroutine compute_derivatives_at_point
 

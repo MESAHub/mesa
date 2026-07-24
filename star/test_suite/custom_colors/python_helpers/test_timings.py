@@ -41,7 +41,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 # =============================================================================
 # SETUP – run from the work directory regardless of where the script lives
@@ -604,10 +603,10 @@ def plot_feature_breakdown(results: list[dict], out: Path):
 
     # All deltas relative to the no-colors baseline; floor at 0.
     order = [
-        ("colors_minimal",    "Vega",                    "#dd8452"),
-        ("colors_AB",         "AB",                      "#55a868"),
-        ("colors_ST",         "ST",                      "#c44e52"),
-        ("colors_csv",        "Vega\n+ CSV",              "#8172b2"),
+        ("colors_minimal", "Vega", "#dd8452"),
+        ("colors_AB", "AB", "#55a868"),
+        ("colors_ST", "ST", "#c44e52"),
+        ("colors_csv", "Vega\n+ CSV", "#8172b2"),
         ("colors_csv_permod", "Vega + CSV\n+ per model", "#937860"),
     ]
 
@@ -626,7 +625,9 @@ def plot_feature_breakdown(results: list[dict], out: Path):
         return
 
     fig, ax = plt.subplots(figsize=(9, 4.5))
-    bars = ax.bar(labels, values, color=clrs, edgecolor="white", linewidth=0.8, zorder=3)
+    bars = ax.bar(
+        labels, values, color=clrs, edgecolor="white", linewidth=0.8, zorder=3
+    )
 
     y_pad = max(values) * 0.18
     for bar, v in zip(bars, values):

@@ -66,18 +66,16 @@ contains
 
       case ('Hermite_bounded', 'hermite_bounded', 'HERMITE_BOUNDED')
          call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
-                                sed_filepath, wavelengths, fluxes)
-
+                                            sed_filepath, wavelengths, fluxes)
 
       case default
          ! fallback: bounded hermite (switches to linear in regions where hermite overshoots.)
          call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
-                                    sed_filepath, wavelengths, fluxes)
+                                            sed_filepath, wavelengths, fluxes)
       end select
 
       call calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
    end subroutine calculate_bolometric
-
 
    subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
       real(dp), dimension(:), intent(in) :: wavelengths, fluxes
@@ -85,7 +83,7 @@ contains
       real(dp), allocatable :: clean_fluxes(:)
       integer :: i
 
-      allocate(clean_fluxes(size(fluxes)))
+      allocate (clean_fluxes(size(fluxes)))
       clean_fluxes = fluxes
 
       do i = 1, size(wavelengths)
@@ -96,7 +94,7 @@ contains
 
       call simpson_integration(wavelengths, clean_fluxes, bolometric_flux)
 
-      deallocate(clean_fluxes)
+      deallocate (clean_fluxes)
 
       if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."
