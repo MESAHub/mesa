@@ -60,7 +60,7 @@ Colors
   multilinear interpolation when the Hermite SED is nonphysical or
   sufficiently inconsistent with the local multilinear result.
 - The colors documentation now describes the fundamental limitation of
-  interpolating across an SED transition that is narrower than the atmosphere-
+  interpolating across an SED transition that is narrower than the atmosphere
   grid spacing.  Neither the multilinear fallback nor ``Interp_rad`` can detect
   or correct an unresolved physical transition.
 

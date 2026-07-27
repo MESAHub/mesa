@@ -281,5 +281,5 @@ enough for the intended application. Results in regions with sharp spectral
 changes, sparse grid coverage, hot or blue SEDs, or high-surface-gravity models
 should be checked against the original atmosphere models and diagnostic SEDs.
 If the transition is unresolved, switching interpolation methods is not a
-reliable remedy; a more finely sampled atmosphere grid or an application-
+reliable remedy; a more finely sampled atmosphere grid or an application
 specific physical treatment is required.
