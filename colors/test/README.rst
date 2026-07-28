@@ -6,6 +6,10 @@ exercises the MESA colors module without requiring a full stellar evolution run.
 The test uses the Kurucz2003 atmosphere grid, the Johnson filter set, and the
 Vega photometric system.
 
+In addition to the atmosphere-grid reference output, focused synthetic tests
+cover compact filter support, singleton interpolation axes, grid-boundary
+clamping, bounded-Hermite fallback, and non-destructive bolometric integration.
+
 
 Running
 -------
@@ -66,4 +70,3 @@ Run from ``colors/test/``::
 Requires matplotlib and numpy.  If ``$MESA_DIR`` is set, the Johnson filter
 curves are loaded from the colors data directory and overlaid on the SED panel;
 otherwise the SED is plotted alone.
-

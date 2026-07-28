@@ -29,6 +29,7 @@ module synthetic
    private
    public :: calculate_synthetic
    public :: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
+   public :: zero_filter_outside_support
 
 contains
 
@@ -62,6 +63,7 @@ contains
       allocate (filter_on_sed_grid(size(wavelengths)))
 
       call interpolate_array(filter_wavelengths, filter_trans, wavelengths, filter_on_sed_grid)
+      call zero_filter_outside_support(wavelengths, filter_wavelengths, filter_on_sed_grid)
 
       convolved_flux = fluxes*filter_on_sed_grid
 
@@ -122,6 +124,28 @@ contains
       deallocate (convolved_flux, filter_on_sed_grid)
    end function calculate_synthetic
 
+   ! Ensure an interpolated filter response has compact support.
+   ! Some interpolation backends extrapolate beyond the tabulated filter range.
+   ! For photometric passbands, transmission outside the supplied passband must be zero.
+   subroutine zero_filter_outside_support(target_wave, filt_wave, filt_on_target)
+      real(dp), dimension(:), intent(in) :: target_wave, filt_wave
+      real(dp), dimension(:), intent(inout) :: filt_on_target
+
+      real(dp) :: fmin, fmax
+      integer :: i
+
+      fmin = minval(filt_wave)
+      fmax = maxval(filt_wave)
+
+      do i = 1, size(target_wave)
+         if (target_wave(i) < fmin .or. target_wave(i) > fmax) then
+            filt_on_target(i) = 0.0_dp
+         else if (filt_on_target(i) < 0.0_dp) then
+            filt_on_target(i) = 0.0_dp
+         end if
+      end do
+   end subroutine zero_filter_outside_support
+
    ! photon-counting synthetic flux (numerator and denominator weighted by lambda)
    subroutine calculate_synthetic_flux(wavelengths, convolved_flux, filter_on_sed_grid, synthetic_flux)
       real(dp), dimension(:), intent(in) :: wavelengths, convolved_flux, filter_on_sed_grid
@@ -153,6 +177,7 @@ contains
       allocate (conv_flux(size(vega_wave)))
 
       call interpolate_array(filt_wave, filt_trans, vega_wave, filt_on_vega_grid)
+      call zero_filter_outside_support(vega_wave, filt_wave, filt_on_vega_grid)
 
       conv_flux = vega_flux*filt_on_vega_grid
 

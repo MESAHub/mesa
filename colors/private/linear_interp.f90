@@ -181,83 +181,38 @@ contains
       real(dp), intent(out) :: result_flux(n_lambda)
 
       integer :: i_x, i_y, i_z, lam
-      real(dp) :: t_x, t_y, t_z
       integer :: nx, ny, nz
-      real(dp) :: c000, c001, c010, c011, c100, c101, c110, c111
-      real(dp) :: c00, c01, c10, c11, c0, c1
-      real(dp) :: lin_result, log_result
-      real(dp), parameter :: tiny_value = 1.0e-10_dp
+      integer :: ix_max, iy_max, iz_max
+      integer :: ox, oy, oz
+      real(dp) :: t_x, t_y, t_z
+      real(dp) :: w_x(0:1), w_y(0:1), w_z(0:1)
+      real(dp) :: accum, weight
+      real(dp), parameter :: tiny_value = 1.0d-300
 
       nx = size(x_grid)
       ny = size(y_grid)
       nz = size(z_grid)
 
-      ! locate the cell once
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
-      ! boundary safety check
-      if (i_x < 1) i_x = 1
-      if (i_y < 1) i_y = 1
-      if (i_z < 1) i_z = 1
-      if (i_x >= nx) i_x = max(1, nx - 1)
-      if (i_y >= ny) i_y = max(1, ny - 1)
-      if (i_z >= nz) i_z = max(1, nz - 1)
+      call setup_axis(nx, x_val, x_grid, i_x, t_x, ix_max, w_x)
+      call setup_axis(ny, y_val, y_grid, i_y, t_y, iy_max, w_y)
+      call setup_axis(nz, z_val, z_grid, i_z, t_z, iz_max, w_z)
 
-      ! clamp interpolation parameters to [0,1]
-      t_x = max(0.0_dp, min(1.0_dp, t_x))
-      t_y = max(0.0_dp, min(1.0_dp, t_y))
-      t_z = max(0.0_dp, min(1.0_dp, t_z))
-
-      ! loop over wavelengths with the same cell location
       do lam = 1, n_lambda
-         ! get the 8 corners of the cube with safety floor
-         c000 = max(tiny_value, f_values_4d(i_x, i_y, i_z, lam))
-         c001 = max(tiny_value, f_values_4d(i_x, i_y, i_z + 1, lam))
-         c010 = max(tiny_value, f_values_4d(i_x, i_y + 1, i_z, lam))
-         c011 = max(tiny_value, f_values_4d(i_x, i_y + 1, i_z + 1, lam))
-         c100 = max(tiny_value, f_values_4d(i_x + 1, i_y, i_z, lam))
-         c101 = max(tiny_value, f_values_4d(i_x + 1, i_y, i_z + 1, lam))
-         c110 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z, lam))
-         c111 = max(tiny_value, f_values_4d(i_x + 1, i_y + 1, i_z + 1, lam))
+         accum = 0.0_dp
 
-         ! standard linear interpolation first (safer)
-         c00 = c000*(1.0_dp - t_x) + c100*t_x
-         c01 = c001*(1.0_dp - t_x) + c101*t_x
-         c10 = c010*(1.0_dp - t_x) + c110*t_x
-         c11 = c011*(1.0_dp - t_x) + c111*t_x
+         do oz = 0, iz_max
+            do oy = 0, iy_max
+               do ox = 0, ix_max
+                  weight = w_x(ox)*w_y(oy)*w_z(oz)
+                  accum = accum + weight*f_values_4d(i_x + ox, i_y + oy, i_z + oz, lam)
+               end do
+            end do
+         end do
 
-         c0 = c00*(1.0_dp - t_y) + c10*t_y
-         c1 = c01*(1.0_dp - t_y) + c11*t_y
-
-         lin_result = c0*(1.0_dp - t_z) + c1*t_z
-
-         ! if valid, try log-space interpolation (smoother for flux)
-         if (lin_result > tiny_value) then
-            c00 = log(c000)*(1.0_dp - t_x) + log(c100)*t_x
-            c01 = log(c001)*(1.0_dp - t_x) + log(c101)*t_x
-            c10 = log(c010)*(1.0_dp - t_x) + log(c110)*t_x
-            c11 = log(c011)*(1.0_dp - t_x) + log(c111)*t_x
-
-            c0 = c00*(1.0_dp - t_y) + c10*t_y
-            c1 = c01*(1.0_dp - t_y) + c11*t_y
-
-            log_result = c0*(1.0_dp - t_z) + c1*t_z
-
-            ! only use log-space result if valid
-            if (log_result == log_result) then  ! NaN check
-               lin_result = exp(log_result)
-            end if
-         end if
-
-         ! final sanity check -- fall back to nearest neighbour
-         if (lin_result /= lin_result .or. lin_result <= 0.0_dp) then
-            call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                    i_x, i_y, i_z)
-            lin_result = max(tiny_value, f_values_4d(i_x, i_y, i_z, lam))
-         end if
-
-         result_flux(lam) = lin_result
+         result_flux(lam) = max(tiny_value, accum)
       end do
 
    end subroutine trilinear_interp_vector
@@ -269,74 +224,75 @@ contains
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
       real(dp), intent(in) :: f_values(:, :, :)
       real(dp) :: f_interp
-      real(dp) :: log_result
-      integer :: i_x, i_y, i_z
-      real(dp) :: t_x, t_y, t_z
-      real(dp) :: c000, c001, c010, c011, c100, c101, c110, c111
-      real(dp) :: c00, c01, c10, c11, c0, c1
-      real(dp), parameter :: tiny_value = 1.0e-10_dp
 
-      ! find containing cell and parameter values using binary search
+      integer :: i_x, i_y, i_z
+      integer :: nx, ny, nz
+      integer :: ix_max, iy_max, iz_max
+      integer :: ox, oy, oz
+      real(dp) :: t_x, t_y, t_z
+      real(dp) :: w_x(0:1), w_y(0:1), w_z(0:1)
+      real(dp) :: accum, weight
+      real(dp), parameter :: tiny_value = 1.0d-300
+
+      nx = size(x_grid)
+      ny = size(y_grid)
+      nz = size(z_grid)
+
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
-      ! boundary safety check
-      if (i_x < lbound(x_grid, 1)) i_x = lbound(x_grid, 1)
-      if (i_y < lbound(y_grid, 1)) i_y = lbound(y_grid, 1)
-      if (i_z < lbound(z_grid, 1)) i_z = lbound(z_grid, 1)
-      if (i_x >= ubound(x_grid, 1)) i_x = ubound(x_grid, 1) - 1
-      if (i_y >= ubound(y_grid, 1)) i_y = ubound(y_grid, 1) - 1
-      if (i_z >= ubound(z_grid, 1)) i_z = ubound(z_grid, 1) - 1
+      call setup_axis(nx, x_val, x_grid, i_x, t_x, ix_max, w_x)
+      call setup_axis(ny, y_val, y_grid, i_y, t_y, iy_max, w_y)
+      call setup_axis(nz, z_val, z_grid, i_z, t_z, iz_max, w_z)
 
-      ! clamp interpolation parameters to [0,1]
-      t_x = max(0.0_dp, MIN(1.0_dp, t_x))
-      t_y = max(0.0_dp, MIN(1.0_dp, t_y))
-      t_z = max(0.0_dp, MIN(1.0_dp, t_z))
+      accum = 0.0_dp
 
-      ! get the corners of the cube with safety checks
-      c000 = max(tiny_value, f_values(i_x, i_y, i_z))
-      c001 = max(tiny_value, f_values(i_x, i_y, i_z + 1))
-      c010 = max(tiny_value, f_values(i_x, i_y + 1, i_z))
-      c011 = max(tiny_value, f_values(i_x, i_y + 1, i_z + 1))
-      c100 = max(tiny_value, f_values(i_x + 1, i_y, i_z))
-      c101 = max(tiny_value, f_values(i_x + 1, i_y, i_z + 1))
-      c110 = max(tiny_value, f_values(i_x + 1, i_y + 1, i_z))
-      c111 = max(tiny_value, f_values(i_x + 1, i_y + 1, i_z + 1))
+      do oz = 0, iz_max
+         do oy = 0, iy_max
+            do ox = 0, ix_max
+               weight = w_x(ox)*w_y(oy)*w_z(oz)
+               accum = accum + weight*f_values(i_x + ox, i_y + oy, i_z + oz)
+            end do
+         end do
+      end do
 
-      ! try standard linear interpolation first (safer)
-      c00 = c000*(1.0_dp - t_x) + c100*t_x
-      c01 = c001*(1.0_dp - t_x) + c101*t_x
-      c10 = c010*(1.0_dp - t_x) + c110*t_x
-      c11 = c011*(1.0_dp - t_x) + c111*t_x
+      f_interp = max(tiny_value, accum)
 
-      c0 = c00*(1.0_dp - t_y) + c10*t_y
-      c1 = c01*(1.0_dp - t_y) + c11*t_y
-
-      f_interp = c0*(1.0_dp - t_z) + c1*t_z
-
-      ! if valid, try log-space interpolation (smoother for flux)
-      if (f_interp > tiny_value) then
-         c00 = log(c000)*(1.0_dp - t_x) + log(c100)*t_x
-         c01 = log(c001)*(1.0_dp - t_x) + log(c101)*t_x
-         c10 = log(c010)*(1.0_dp - t_x) + log(c110)*t_x
-         c11 = log(c011)*(1.0_dp - t_x) + log(c111)*t_x
-
-         c0 = c00*(1.0_dp - t_y) + c10*t_y
-         c1 = c01*(1.0_dp - t_y) + c11*t_y
-
-         log_result = c0*(1.0_dp - t_z) + c1*t_z
-
-         ! only use the log-space result if it's valid
-         if (log_result == log_result) then  ! NaN check
-            f_interp = EXP(log_result)
-         end if
-      end if
-
-      ! final sanity check
-      if (f_interp /= f_interp .or. f_interp <= 0.0_dp) then
-         call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, i_x, i_y, i_z)
-         f_interp = max(tiny_value, f_values(i_x, i_y, i_z))
-      end if
    end function trilinear_interp
+
+   subroutine setup_axis(n, x_val, grid, i, t, i_max, w)
+      integer, intent(in) :: n
+      real(dp), intent(in) :: x_val
+      real(dp), intent(in) :: grid(:)
+      integer, intent(inout) :: i
+      real(dp), intent(inout) :: t
+      integer, intent(out) :: i_max
+      real(dp), intent(out) :: w(0:1)
+
+      if (n <= 1) then
+         i = 1
+         t = 0.0_dp
+         i_max = 0
+         w(0) = 1.0_dp
+         w(1) = 0.0_dp
+         return
+      end if
+
+      if (x_val <= grid(1)) then
+         i = 1
+         t = 0.0_dp
+      else if (x_val >= grid(n)) then
+         i = n - 1
+         t = 1.0_dp
+      else
+         if (i < 1) i = 1
+         if (i >= n) i = n - 1
+         t = max(0.0_dp, min(1.0_dp, t))
+      end if
+
+      i_max = 1
+      w(0) = 1.0_dp - t
+      w(1) = t
+   end subroutine setup_axis
 
 end module linear_interp

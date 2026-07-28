@@ -36,17 +36,22 @@
 
 program test_colors
 
-   use const_lib,  only: const_init
-   use math_lib,   only: math_init
+   use const_lib, only: const_init
+   use math_lib, only: math_init
    use colors_lib, only: &
       colors_init, colors_shutdown, &
       alloc_colors_handle_using_inlist, free_colors_handle, colors_ptr, &
       colors_setup_tables, colors_setup_hooks, how_many_colors_history_columns, &
       data_for_colors_history_columns, calculate_bolometric
    use colors_def, only: Colors_General_Info
-   use const_def,  only: dp, rsun, boltz_sigma
-   use utils_lib,  only: mesa_error
+   use const_def, only: dp, rsun, boltz_sigma
+   use utils_lib, only: mesa_error
    use colors_utils, only: resolve_path
+   use synthetic, only: calculate_synthetic, compute_vega_zero_point, &
+                        zero_filter_outside_support
+   use linear_interp, only: trilinear_interp
+   use hermite_interp_bounded, only: hermite_tensor_interp3d
+   use bolometric, only: calculate_bolometric_phot
 
    implicit none
 
@@ -56,13 +61,13 @@ program test_colors
 
    integer, parameter :: n_cases = 3
 
-   real(dp), parameter :: test_teff(n_cases) = [5778d0,   15000d0,  4000d0  ]
-   real(dp), parameter :: test_logg(n_cases) = [4.44d0,   4.0d0,    2.0d0   ]
-   real(dp), parameter :: test_meta(n_cases) = [0.0d0,    0.0d0,    0.0d0   ]
-   real(dp), parameter :: test_R(n_cases)    = [rsun,     5d0*rsun, 20d0*rsun]
+   real(dp), parameter :: test_teff(n_cases) = [5778d0, 15000d0, 4000d0]
+   real(dp), parameter :: test_logg(n_cases) = [4.44d0, 4.0d0, 2.0d0]
+   real(dp), parameter :: test_meta(n_cases) = [0.0d0, 0.0d0, 0.0d0]
+   real(dp), parameter :: test_R(n_cases) = [rsun, 5d0*rsun, 20d0*rsun]
 
    character(len=12), parameter :: labels(n_cases) = &
-      ['solar       ', 'hot_ms      ', 'cool_giant  ']
+                                   ['solar       ', 'hot_ms      ', 'cool_giant  ']
 
    ! -----------------------------------------------------------------------
    ! group 2a: fixed Teff=5778, fixed log g=4.44, varying [M/H]
@@ -121,7 +126,7 @@ program test_colors
    my_mesa_dir = '../..'
    call const_init(my_mesa_dir, ierr)
    if (ierr /= 0) then
-      write(*,*) 'const_init failed'
+      write (*, *) 'const_init failed'
       call mesa_error(__FILE__, __LINE__)
    end if
 
@@ -129,7 +134,7 @@ program test_colors
 
    call colors_init(.false., '', ierr)
    if (ierr /= 0) then
-      write(*,*) 'colors_init failed, ierr =', ierr
+      write (*, *) 'colors_init failed, ierr =', ierr
       stop 1
    end if
 
@@ -139,13 +144,13 @@ program test_colors
 
    handle = alloc_colors_handle_using_inlist('', ierr)
    if (ierr /= 0) then
-      write(*,*) 'alloc_colors_handle_using_inlist failed, ierr =', ierr
+      write (*, *) 'alloc_colors_handle_using_inlist failed, ierr =', ierr
       stop 1
    end if
 
    call colors_ptr(handle, cs, ierr)
    if (ierr /= 0) then
-      write(*,*) 'colors_ptr failed, ierr =', ierr
+      write (*, *) 'colors_ptr failed, ierr =', ierr
       stop 1
    end if
 
@@ -156,24 +161,24 @@ program test_colors
    cs%mag_system = 'Vega'
    call colors_setup_tables(handle, ierr)
    if (ierr /= 0) then
-      write(*,*) 'colors_setup_tables failed, ierr =', ierr
+      write (*, *) 'colors_setup_tables failed, ierr =', ierr
       stop 1
    end if
 
    ! probably unecessary since this is empty right now.
    call colors_setup_hooks(handle, ierr)
    if (ierr /= 0) then
-      write(*,*) 'colors_setup_hooks failed, ierr =', ierr
+      write (*, *) 'colors_setup_hooks failed, ierr =', ierr
       stop 1
    end if
 
    n_cols = how_many_colors_history_columns(handle)
    if (n_cols == 0) then
-      write(*,*) 'how_many_colors_history_columns returned 0'
+      write (*, *) 'how_many_colors_history_columns returned 0'
       stop 1
    end if
 
-   allocate(col_names(n_cols), col_vals(n_cols))
+   allocate (col_names(n_cols), col_vals(n_cols))
    model_num = 0
 
    ! -----------------------------------------------------------------------
@@ -187,12 +192,12 @@ program test_colors
          test_teff(j), test_logg(j), test_R(j), test_meta(j), model_num, &
          handle, n_cols, col_names, col_vals, ierr)
       if (ierr /= 0) then
-         write(*,*) 'data_for_colors_history_columns failed, group1 case', j, ', ierr =', ierr
+         write (*, *) 'data_for_colors_history_columns failed, group1 case', j, ', ierr =', ierr
          stop 1
       end if
-      write(*,'(a, a)') '# case: ', trim(adjustl(labels(j)))
+      write (*, '(a, a)') '# case: ', trim(adjustl(labels(j)))
       do k = 1, n_cols
-         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
+         write (*, '(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -207,12 +212,12 @@ program test_colors
          5778d0, 4.44d0, rsun, sweep_meta(j), model_num, &
          handle, n_cols, col_names, col_vals, ierr)
       if (ierr /= 0) then
-         write(*,*) 'data_for_colors_history_columns failed, group2a case', j, ', ierr =', ierr
+         write (*, *) 'data_for_colors_history_columns failed, group2a case', j, ', ierr =', ierr
          stop 1
       end if
-      write(*,'(a, f6.2)') '# MH= ', sweep_meta(j)
+      write (*, '(a, f6.2)') '# MH= ', sweep_meta(j)
       do k = 1, n_cols
-         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
+         write (*, '(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -227,12 +232,12 @@ program test_colors
          5778d0, sweep_logg(j), rsun, 0.0d0, model_num, &
          handle, n_cols, col_names, col_vals, ierr)
       if (ierr /= 0) then
-         write(*,*) 'data_for_colors_history_columns failed, group2b case', j, ', ierr =', ierr
+         write (*, *) 'data_for_colors_history_columns failed, group2b case', j, ', ierr =', ierr
          stop 1
       end if
-      write(*,'(a, f6.2)') '# logg= ', sweep_logg(j)
+      write (*, '(a, f6.2)') '# logg= ', sweep_logg(j)
       do k = 1, n_cols
-         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
+         write (*, '(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -247,12 +252,12 @@ program test_colors
          sweep_teff(j), 4.0d0, rsun, 0.0d0, model_num, &
          handle, n_cols, col_names, col_vals, ierr)
       if (ierr /= 0) then
-         write(*,*) 'data_for_colors_history_columns failed, group2c case', j, ', ierr =', ierr
+         write (*, *) 'data_for_colors_history_columns failed, group2c case', j, ', ierr =', ierr
          stop 1
       end if
-      write(*,'(a, f10.1)') '# Teff= ', sweep_teff(j)
+      write (*, '(a, f10.1)') '# Teff= ', sweep_teff(j)
       do k = 1, n_cols
-         write(*,'(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
+         write (*, '(a40, 1pe23.13)') trim(col_names(k)), col_vals(k)
       end do
    end do
 
@@ -263,46 +268,59 @@ program test_colors
    ! -----------------------------------------------------------------------
 
    call write_section_header('# Group3  SED sample + wavelength_coverage_sanity')
-   write(*,'(a)') '# SED sample  case=solar  Teff=5778  logg=4.44  FeH=0.0  columns=wavelength_AA  flux_erg_s_cm2_AA'
+   write (*, '(a)') '# SED sample  case=solar  Teff=5778  logg=4.44  FeH=0.0  columns=wavelength_AA  flux_erg_s_cm2_AA'
    call calculate_bolometric( &
       cs, test_teff(1), test_logg(1), test_meta(1), test_R(1), d_10pc, &
       bol_mag, bol_flux, wavelengths, fluxes, sed_filepath, interp_rad)
 
    n_wav = size(wavelengths)
-   stride = max(1, n_wav / n_sed_samples)
+   stride = max(1, n_wav/n_sed_samples)
 
    do i = 1, n_wav, stride
-      write(*,'(1pe23.13, 1x, 1pe23.13)') wavelengths(i), fluxes(i)
+      write (*, '(1pe23.13, 1x, 1pe23.13)') wavelengths(i), fluxes(i)
    end do
 
-   write(*,'(a)') ''
-   write(*,'(a, 1pe10.2)') '# wavelength_coverage_sanity  logg=4.0  FeH=0.0  rel_tol=', bol_flux_rel_tol
+   write (*, '(a)') ''
+   write (*, '(a, 1pe10.2)') '# wavelength_coverage_sanity  logg=4.0  FeH=0.0  rel_tol=', bol_flux_rel_tol
    do j = 1, n_teff
       call check_bolometric_coverage( &
          cs, sed_filepath, 'Teff', sweep_teff(j), 4.0d0, 0.0d0, rsun, bol_flux_rel_tol)
    end do
 
    ! -----------------------------------------------------------------------
+   ! group 4: focused interpolation and integration regression tests
+   ! -----------------------------------------------------------------------
+
+   call write_section_header('# Group4  focused_regression_tests')
+   call check_filter_compact_support()
+   call check_synthetic_filter_support()
+   call check_vega_filter_support()
+   call check_singleton_axis()
+   call check_boundary_clamping()
+   call check_bounded_hermite_fallback()
+   call check_bolometric_non_destructive()
+
+   ! -----------------------------------------------------------------------
    ! cleanup
    ! -----------------------------------------------------------------------
 
-   deallocate(col_names, col_vals)
-   if (allocated(wavelengths)) deallocate(wavelengths)
-   if (allocated(fluxes))      deallocate(fluxes)
+   deallocate (col_names, col_vals)
+   if (allocated(wavelengths)) deallocate (wavelengths)
+   if (allocated(fluxes)) deallocate (fluxes)
 
    call free_colors_handle(handle)
    call colors_shutdown()
 
-   write(*,*) 'test_colors: passed'
+   write (*, *) 'test_colors: passed'
 
 contains
 
    subroutine write_section_header(title)
       character(len=*), intent(in) :: title
 
-      write(*,'(a)') ''
-      write(*,'(a)') trim(title)
-      write(*,'(a)') ''
+      write (*, '(a)') ''
+      write (*, '(a)') trim(title)
+      write (*, '(a)') ''
    end subroutine write_section_header
 
    subroutine check_bolometric_coverage(rq, sed_path, label, teff, log_g, metallicity, radius, rel_tol)
@@ -322,19 +340,165 @@ contains
       abs_err = abs(local_flux - expected_flux)
       rel_err = abs(local_flux - expected_flux)/expected_flux
 
-      write(*,'(a, a, a, f10.1)') '# case: ', trim(label), '=', teff
-      write(*,'(a40, 1pe23.13)') 'Wav_min_AA', minval(local_wavelengths)
-      write(*,'(a40, 1pe23.13)') 'Wav_max_AA', maxval(local_wavelengths)
-      write(*,'(a40, 1pe23.13)') 'Flux_actual', local_flux
-      write(*,'(a40, 1pe23.13)') 'Flux_expected', expected_flux
-      write(*,'(a40, 1pe23.13)') 'Flux_abserr', abs_err
-      write(*,'(a40, 1pe23.13)') 'Flux_relerr', rel_err
+      write (*, '(a, a, a, f10.1)') '# case: ', trim(label), '=', teff
+      write (*, '(a40, 1pe23.13)') 'Wav_min_AA', minval(local_wavelengths)
+      write (*, '(a40, 1pe23.13)') 'Wav_max_AA', maxval(local_wavelengths)
+      write (*, '(a40, 1pe23.13)') 'Flux_actual', local_flux
+      write (*, '(a40, 1pe23.13)') 'Flux_expected', expected_flux
+      write (*, '(a40, 1pe23.13)') 'Flux_abserr', abs_err
+      write (*, '(a40, 1pe23.13)') 'Flux_relerr', rel_err
 
       if (rel_err > rel_tol) then
-         write(*,'(a, a, a, 1pe11.3, a, 1pe11.3)') &
+         write (*, '(a, a, a, 1pe11.3, a, 1pe11.3)') &
             'wavelength coverage sanity check failed for ', trim(label), &
             ': rel_err=', rel_err, ' > rel_tol=', rel_tol
          stop 1
       end if
    end subroutine check_bolometric_coverage
+
+   subroutine check_filter_compact_support()
+      real(dp) :: target_wave(5), filter_wave(3), response(5), expected(5)
+
+      target_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      filter_wave = [2.0_dp, 3.0_dp, 4.0_dp]
+      response = [0.5_dp, 0.5_dp, -0.25_dp, 0.5_dp, 0.5_dp]
+      expected = [0.0_dp, 0.5_dp, 0.0_dp, 0.5_dp, 0.0_dp]
+
+      call zero_filter_outside_support(target_wave, filter_wave, response)
+      call assert_array_close('filter_compact_support', response, expected, 0.0_dp)
+   end subroutine check_filter_compact_support
+
+   subroutine check_synthetic_filter_support()
+      real(dp) :: target_wave(5), filter_wave(3), flux(5), transmission(3)
+      real(dp) :: magnitude, expected_magnitude
+      integer :: local_ierr
+
+      target_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      filter_wave = [2.0_dp, 3.0_dp, 4.0_dp]
+      flux = [100.0_dp, 2.0_dp, 2.0_dp, 2.0_dp, 100.0_dp]
+      transmission = 1.0_dp
+
+      magnitude = calculate_synthetic( &
+                  0.0_dp, 0.0_dp, 0.0_dp, local_ierr, target_wave, flux, &
+                  filter_wave, transmission, 1.0_dp, 'test.dat', .false., .false., '.', 0)
+      if (local_ierr /= 0) then
+         write (*, '(a, i0)') 'FAIL synthetic_filter_support ierr=', local_ierr
+         stop 1
+      end if
+
+      ! Only the three in-band samples contribute, all with flux two.  If
+      ! transmission leaks onto the bright out-of-band samples, this differs
+      ! substantially from -2.5 log10(2).
+      expected_magnitude = -2.5_dp*log10(2.0_dp)
+      call assert_close('synthetic_filter_support', magnitude, &
+                        expected_magnitude, 1.0d-14)
+   end subroutine check_synthetic_filter_support
+
+   subroutine check_vega_filter_support()
+      real(dp) :: vega_wave(5), filter_wave(3), vega_flux(5), transmission(3)
+      real(dp) :: zero_point
+
+      vega_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      filter_wave = [2.0_dp, 3.0_dp, 4.0_dp]
+      vega_flux = [100.0_dp, 2.0_dp, 2.0_dp, 2.0_dp, 100.0_dp]
+      transmission = 1.0_dp
+
+      zero_point = compute_vega_zero_point(vega_wave, vega_flux, &
+                                           filter_wave, transmission)
+      call assert_close('vega_filter_support', zero_point, 2.0_dp, 1.0d-14)
+   end subroutine check_vega_filter_support
+
+   subroutine check_singleton_axis()
+      real(dp) :: x_grid(1), y_grid(2), z_grid(2), values(1, 2, 2), actual
+
+      x_grid = [0.0_dp]
+      y_grid = [0.0_dp, 1.0_dp]
+      z_grid = [0.0_dp, 1.0_dp]
+      values(1, 1, 1) = 10.0_dp
+      values(1, 2, 1) = 12.0_dp
+      values(1, 1, 2) = 14.0_dp
+      values(1, 2, 2) = 16.0_dp
+
+      actual = trilinear_interp(0.0_dp, 0.25_dp, 0.5_dp, &
+                                x_grid, y_grid, z_grid, values)
+      call assert_close('singleton_axis', actual, 12.5_dp, 1.0d-14)
+   end subroutine check_singleton_axis
+
+   subroutine check_boundary_clamping()
+      real(dp) :: grid(2), values(2, 2, 2), below, above
+      integer :: ix, iy, iz
+
+      grid = [0.0_dp, 1.0_dp]
+      do iz = 1, 2
+         do iy = 1, 2
+            do ix = 1, 2
+               values(ix, iy, iz) = real(ix - 1, dp) &
+                                    + 2.0_dp*real(iy - 1, dp) &
+                                    + 4.0_dp*real(iz - 1, dp)
+            end do
+         end do
+      end do
+
+      below = trilinear_interp(-1.0_dp, 0.25_dp, 0.5_dp, &
+                               grid, grid, grid, values)
+      above = trilinear_interp(2.0_dp, 0.25_dp, 0.5_dp, &
+                               grid, grid, grid, values)
+      call assert_close('boundary_clamp_low', below, 2.5_dp, 1.0d-14)
+      call assert_close('boundary_clamp_high', above, 3.5_dp, 1.0d-14)
+   end subroutine check_boundary_clamping
+
+   subroutine check_bounded_hermite_fallback()
+      real(dp) :: x_grid(3), singleton(1), values(3, 1, 1), actual
+
+      x_grid = [0.0_dp, 1.0_dp, 2.0_dp]
+      singleton = [0.0_dp]
+      values(:, 1, 1) = [1.0_dp, 1.0_dp, 100.0_dp]
+
+      ! The derivative inferred from the third point drives the unbounded
+      ! Hermite value below zero in the first cell.  Bounded Hermite must use
+      ! the multilinear value, which is exactly one throughout that cell.
+      actual = hermite_tensor_interp3d(0.5_dp, 0.0_dp, 0.0_dp, &
+                                       x_grid, singleton, singleton, values)
+      call assert_close('bounded_hermite_fallback', actual, 1.0_dp, 1.0d-14)
+   end subroutine check_bounded_hermite_fallback
+
+   subroutine check_bolometric_non_destructive()
+      real(dp) :: local_wavelengths(3), local_fluxes(3), original_fluxes(3)
+      real(dp) :: local_mag, local_bol_flux
+
+      local_wavelengths = [1.0_dp, 2.0_dp, 3.0_dp]
+      local_fluxes = [-1.0_dp, 2.0_dp, 3.0_dp]
+      original_fluxes = local_fluxes
+
+      call calculate_bolometric_phot(local_wavelengths, local_fluxes, &
+                                     local_mag, local_bol_flux)
+      call assert_array_close('bolometric_input_unchanged', local_fluxes, &
+                              original_fluxes, 0.0_dp)
+      call assert_close('bolometric_sanitized_flux', local_bol_flux, &
+                        11.0_dp/3.0_dp, 1.0d-14)
+   end subroutine check_bolometric_non_destructive
+
+   subroutine assert_close(label, actual, expected, tolerance)
+      character(len=*), intent(in) :: label
+      real(dp), intent(in) :: actual, expected, tolerance
+
+      if (abs(actual - expected) > tolerance) then
+         write (*, '(a, a, 2(a, 1pe23.13))') 'FAIL ', trim(label), &
+            ' actual=', actual, ' expected=', expected
+         stop 1
+      end if
+      write (*, '(a, a)') 'PASS ', trim(label)
+   end subroutine assert_close
+
+   subroutine assert_array_close(label, actual, expected, tolerance)
+      character(len=*), intent(in) :: label
+      real(dp), intent(in) :: actual(:), expected(:), tolerance
+
+      if (size(actual) /= size(expected) .or. &
+          any(abs(actual - expected) > tolerance)) then
+         write (*, '(a, a)') 'FAIL ', trim(label)
+         stop 1
+      end if
+      write (*, '(a, a)') 'PASS ', trim(label)
+   end subroutine assert_array_close
 end program test_colors
