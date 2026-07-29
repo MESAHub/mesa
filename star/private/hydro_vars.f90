@@ -564,7 +564,7 @@
 
          if (.not. skip_mlt .and. .not. s% RSP_flag) then
 
-            s% have_mlt_tdc_face_state(1:s%nz) = .false.
+            s% reconstructed_face_state_valid(1:s%nz) = .false.
 
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) then

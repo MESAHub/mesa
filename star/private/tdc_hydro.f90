@@ -26,7 +26,7 @@ module tdc_hydro
    use auto_diff_support
    use accurate_sum_auto_diff_star_order1
    use star_utils
-   use mlt_tdc_face_support, only: get_face_scale_height_ad
+   use reconstructed_face_support, only: get_reconstructed_scale_height_ad
 
    implicit none
 
@@ -58,7 +58,7 @@ contains
 
       !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
-         if (s%use_face_values_eos_and_kap_mlt_tdc) then
+         if (s%use_face_reconstruction) then
             x = get_TDC_Hp_face(s, k, op_err)
             if (op_err /= 0) then
                !$OMP ATOMIC WRITE
@@ -128,8 +128,8 @@ contains
       type(auto_diff_real_star_order1) :: Hp_face
 
       ierr = 0
-      if (s%use_face_values_eos_and_kap_mlt_tdc) then
-         call get_face_scale_height_ad(s, k, Hp_face, ierr)
+      if (s%use_face_reconstruction) then
+         call get_reconstructed_scale_height_ad(s, k, Hp_face, ierr)
       else
          Hp_face = get_scale_height_face(s, k)
       end if

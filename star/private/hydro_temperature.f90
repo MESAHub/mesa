@@ -21,7 +21,7 @@
 
       use star_private_def
       use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
-      use mlt_tdc_face_support, only: get_face_eos_kap_ad
+      use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -90,11 +90,11 @@
             Lrad_ad = L_ad
          end if
 
-         if (s% use_face_values_eos_and_kap_mlt_tdc) then
-            if (s% have_mlt_tdc_face_state(k)) then
-               kap_face = s% mlt_tdc_opacity_face_ad(k)
+         if (s% use_face_reconstruction) then
+            if (s% reconstructed_face_state_valid(k)) then
+               kap_face = s% reconstructed_opacity_face_ad(k)
             else
-               call get_face_eos_kap_ad( &
+               call get_reconstructed_face_eos_kap_ad( &
                   s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, kap_face, ierr)
                if (ierr /= 0) return
             end if
@@ -429,18 +429,18 @@
             P_theta = 1d0
          end if
 
-         if (s% use_face_values_eos_and_kap_mlt_tdc) then
-            if (s% have_mlt_tdc_face_state(k)) then
-               rho_face = s% mlt_tdc_rho_face_ad(k)
-               Ppoint = s% mlt_tdc_P_face_ad(k)
+         if (s% use_face_reconstruction) then
+            if (s% reconstructed_face_state_valid(k)) then
+               rho_face = s% reconstructed_rho_face_ad(k)
+               Ppoint = s% reconstructed_P_face_ad(k)
             else
-               call get_face_eos_kap_ad( &
+               call get_reconstructed_face_eos_kap_ad( &
                   s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
                if (ierr /= 0) return
                Ppoint = P_face
             end if
             if (P_theta /= 1d0) then
-               Ppoint = P_theta*Ppoint + (1d0 - P_theta)*s% mlt_tdc_P_face_start(k)
+               Ppoint = P_theta*Ppoint + (1d0 - P_theta)*s% reconstructed_P_face_start(k)
             end if
             if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
                .and. s% mlt_Pturb_factor > 0d0) then

@@ -1256,7 +1256,7 @@ contains
       integer, intent(out) :: ierr
 
       integer :: k, i, min_k, k2
-      real(dp) :: Ledd, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, deltam
+      real(dp) :: Ledd, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, deltam, csound_face
       real(dp), pointer :: v(:)
       logical :: v_flag
 
@@ -2726,8 +2726,14 @@ contains
          case(h_max_conv_vel_div_csound)
             val = 0
             do k = 2, nz
-               if (s% q(k) > s% max_conv_vel_div_csound_maxq .or. s% csound(k) == 0) cycle
-               if (s% conv_vel(k) / s% csound(k) > val) val = s% conv_vel(k) / s% csound_face(k)
+               if (s% q(k) > s% max_conv_vel_div_csound_maxq) cycle
+               if (s% use_face_reconstruction) then
+                  if (.not. s% reconstructed_face_state_valid(k)) cycle
+                  csound_face = s% reconstructed_csound_face(k)
+               else
+                  csound_face = s% csound_face(k)
+               end if
+               if (csound_face > 0d0) val = max(val, s% conv_vel(k)/csound_face)
             end do
 
          case(h_min_t_eddy)

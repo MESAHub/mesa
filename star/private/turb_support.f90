@@ -110,7 +110,7 @@ contains
 
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
-         T_in, P_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
+         T_in, P_in, energy_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
@@ -120,7 +120,7 @@ contains
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
       type(auto_diff_real_star_order1), intent(in) :: &
-         T_in, P_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
+         T_in, P_in, energy_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
          gradr_in, grada, scale_height
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
@@ -155,8 +155,8 @@ contains
              L_theta = 1d0
           end if
           L = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
-          if (s% use_face_values_eos_and_kap_mlt_tdc) then
-             P = P_theta*P + (1d0-P_theta)*s% mlt_tdc_P_face_start(k)
+          if (s% use_face_reconstruction) then
+             P = P_theta*P + (1d0-P_theta)*s% reconstructed_P_face_start(k)
           else
              P = P_theta*P + (1d0-P_theta)*s% Peos_face_start(k)
           end if
@@ -176,7 +176,7 @@ contains
       chiRho = chiRho_in
       chiT = chiT_in
       Cp = Cp_in
-      energy = get_e_face(s,k)
+      energy = energy_in
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
 
@@ -251,7 +251,7 @@ contains
 
       ! Wrap Pturb into P
       if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients .and. k > 0) then
-         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho/3d0
          Ptot = P + mlt_Pturb
       else
          Ptot = P
@@ -277,7 +277,11 @@ contains
       ! maximum convection velocity.
       if (k > 0) then
          if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
-             max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
+            if (s% use_face_reconstruction) then
+               max_conv_vel = s% reconstructed_csound_face(k)*s% max_conv_vel_div_csound
+            else
+               max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
+            end if
          else
             max_conv_vel = 1d99
          end if

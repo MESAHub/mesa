@@ -279,7 +279,7 @@
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          integer :: j, nz, ionization_k, klo, khi, i, ii, ierr
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor
-         logical :: rsp_or_w, face_cache_active
+         logical :: rsp_or_w, reconstructed_face_state_active
          include 'formats'
 
          if (s% rotation_flag) then
@@ -304,7 +304,7 @@
 
          int_flag = .false.
          rsp_or_w = s% RSP_flag .or. s% RSP2_flag
-         face_cache_active = s% use_face_values_eos_and_kap_mlt_tdc
+         reconstructed_face_state_active = s% use_face_reconstruction
 
          if (c > extra_offset) then
             i = c - extra_offset
@@ -1920,26 +1920,26 @@
                if (rsp_or_w) val = s% Lt(k)
             case(p_Lt_div_L)
                if (rsp_or_w) val = s% Lt(k)/s% L(k)
-            case(p_mlt_tdc_T_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_T_face_ad(k)% val
-            case(p_mlt_tdc_rho_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_rho_face_ad(k)% val
-            case(p_mlt_tdc_P_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_P_face_ad(k)% val
-            case(p_mlt_tdc_Cp_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_Cp_face_ad(k)% val
-            case(p_mlt_tdc_ChiRho_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_ChiRho_face_ad(k)% val
-            case(p_mlt_tdc_ChiT_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_ChiT_face_ad(k)% val
-            case(p_mlt_tdc_grada_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_grada_face_ad(k)% val
-            case(p_mlt_tdc_opacity_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_opacity_face_ad(k)% val
-            case(p_mlt_tdc_scale_height_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_scale_height_face_ad(k)% val
-            case(p_mlt_tdc_gradr_face)
-               if (face_cache_active .and. s% have_mlt_tdc_face_state(k)) val = s% mlt_tdc_gradr_face_ad(k)% val
+            case(p_reconstructed_T_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_T_face_ad(k)% val
+            case(p_reconstructed_rho_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_rho_face_ad(k)% val
+            case(p_reconstructed_P_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_P_face_ad(k)% val
+            case(p_reconstructed_Cp_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_Cp_face_ad(k)% val
+            case(p_reconstructed_ChiRho_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_ChiRho_face_ad(k)% val
+            case(p_reconstructed_ChiT_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_ChiT_face_ad(k)% val
+            case(p_reconstructed_grada_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_grada_face_ad(k)% val
+            case(p_reconstructed_opacity_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_opacity_face_ad(k)% val
+            case(p_reconstructed_scale_height_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_scale_height_face_ad(k)% val
+            case(p_reconstructed_gradr_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_gradr_face_ad(k)% val
 
 
             case(p_rsp_Et)

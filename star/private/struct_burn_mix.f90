@@ -268,7 +268,7 @@
       subroutine save_start_values(s, ierr)
          use hydro_rsp2, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category, get_Peos_face_val
-         use mlt_tdc_face_support, only: get_face_eos_kap_ad
+         use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, j
@@ -301,17 +301,17 @@
             s% lnPeos_start(k) = s% lnPeos(k)
             s% Peos_start(k) = s% Peos(k)
             s% Peos_face_start(k) = get_Peos_face_val(s,k)
-            if (s% use_face_values_eos_and_kap_mlt_tdc) then
-               if (s% have_mlt_tdc_face_state(k)) then
-                  s% mlt_tdc_P_face_start(k) = s% mlt_tdc_P_face_ad(k)%val
+            if (s% use_face_reconstruction) then
+               if (s% reconstructed_face_state_valid(k)) then
+                  s% reconstructed_P_face_start(k) = s% reconstructed_P_face_ad(k)%val
                else
-                  call get_face_eos_kap_ad( &
+                  call get_reconstructed_face_eos_kap_ad( &
                      s, k, T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, ChiRho_face_ad, ChiT_face_ad, grada_face_ad, opacity_face_ad, ierr)
                   if (ierr /= 0) return
-                  s% mlt_tdc_P_face_start(k) = P_face_ad%val
+                  s% reconstructed_P_face_start(k) = P_face_ad%val
                end if
             else
-               s% mlt_tdc_P_face_start(k) = s% Peos_face_start(k)
+               s% reconstructed_P_face_start(k) = s% Peos_face_start(k)
             end if
             s% lnPgas_start(k) = s% lnPgas(k)
             s% energy_start(k) = s% energy(k)
