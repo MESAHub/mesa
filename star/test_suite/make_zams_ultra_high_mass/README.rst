@@ -4,6 +4,8 @@
 make_zams_ultra_high_mass
 *************************
 
+.. tags:: star, zams, prebuilt-model, relax-initial-mass, very-massive-star, low-metallicity
+
 This test case shows an example of creating a 250 |Msun|, Z = 1e-4 metallicity, model close to the main sequence.
 
 This test case has 1 part. Click to see a larger version of a plot.

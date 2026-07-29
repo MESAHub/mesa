@@ -1,0 +1,1 @@
+../../../astero/test_suite/astero_adipls/README.rst

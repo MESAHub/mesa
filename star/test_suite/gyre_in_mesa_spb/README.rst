@@ -4,6 +4,8 @@
 gyre_in_mesa_spb
 ****************
 
+.. tags:: star, gyre, asteroseismology, g-mode, nonradial-pulsation, spb, intermediate-mass, main-sequence
+
 This test case checks the implementation of GYRE in MESA for a 5 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; a slowly pulsating B-type star (SPB) stellar model.
 
 This test case has 2 parts.

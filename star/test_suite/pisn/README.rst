@@ -4,6 +4,8 @@
 pisn
 ****
 
+.. tags:: star, very-massive-star, pair-instability, pair-instability-supernova, supernova, carbon-burning, oxygen-burning, explosive-burning
+
 This test case evolves an initially 200 |Msun| star from ZAMS until it undergoes a pair instability supernovae (PISN)
 
 

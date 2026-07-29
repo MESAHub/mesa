@@ -7,7 +7,7 @@ inputs:
   sdk:
     description: 'The version of the MESA SDK to install'
     required: false
-    default: '26.3.2'
+    default: '26.6.1'
 
 
 

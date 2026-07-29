@@ -4,6 +4,8 @@
 extended_convective_penetration
 *******************************
 
+.. tags:: star, convective-boundary-mixing, convective-penetration, overshooting, convective-core, intermediate-mass, main-sequence
+
 This test case checks the implementation of the extended convective penetration prescription for core boundary mixing.
 
 This test case has 2 parts. Click to see a larger view of a plot.

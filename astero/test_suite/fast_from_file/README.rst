@@ -4,6 +4,8 @@
 fast_from_file
 **************
 
+.. tags:: astero, optimization, file-input, from-file-search, synthetic-data, chi-squared, custom-parameters, semiconvection, thermohaline, low-mass, element-diffusion, gravitational-settling
+
 Runs first few steps of the ``'from_file'`` search, which reads input
 values from a data file and computes |chi^2| for each, based on some
 synthetic data.  This test exists only to increase test coverage of

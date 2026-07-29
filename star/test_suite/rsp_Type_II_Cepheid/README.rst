@@ -4,6 +4,8 @@
 rsp_Type_II_Cepheid
 *******************
 
+.. tags:: star, rsp, radial-pulsation, nonlinear-pulsation, type-ii-cepheid, bl-her, chaotic-pulsation, colors
+
 This test case checks the non-linear pulsation evolution of a 0.55 |Msun|, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model -
 type-II Cepheid of BL Her type based on |Smolec14|.
 

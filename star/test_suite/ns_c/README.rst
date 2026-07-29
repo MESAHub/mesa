@@ -4,6 +4,8 @@
 ns_c
 ****
 
+.. tags:: star, compact-remnant, neutron-star, neutron-star-envelope, accretion, carbon-burning, carbon-flash, thermonuclear-runaway
+
 This test case shows an example of a carbon flash within a neutron star envelope.
 
 This test case has 1 part. Click to see a larger version of a plot.

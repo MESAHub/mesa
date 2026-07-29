@@ -4,6 +4,8 @@
 15M_dynamo
 **********
 
+.. tags:: star, rotation, angular-momentum, magnetic-field, dynamo, spruit-tayler-dynamo, massive-star, core-helium-burning
+
 The test checks the functionality of rotation in a 15 |Msun|, Z=0.02 metallicity model.
 
 

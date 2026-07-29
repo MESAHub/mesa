@@ -4,6 +4,8 @@
 hot_cool_wind
 *************
 
+.. tags:: star, mass-loss, stellar-winds, hot-wind, cool-wind, intermediate-mass, core-helium-burning
+
 This test case checks the cool wind, hot wind capability by evolving a 7 |Msun|, Z=0.02 metallicity model from the zero-age main sequence to core helium depletion.
 
 This test case has 1 parts. Click to see a larger version of a plot.

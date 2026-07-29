@@ -4,6 +4,8 @@
 custom_rates
 ************
 
+.. tags:: star, net, rates, custom-rates, nuclear-network, white-dwarf, helium-white-dwarf, accretion
+
 This test suite case checks the use of custom nuclear reaction rates in an accreting 0.3 |Msun| helium white dwarf model.
 
 This test case has 5 parts. Click to see a larger view of a plot.

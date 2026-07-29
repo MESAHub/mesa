@@ -4,6 +4,8 @@
 star_plus_point_mass_explicit_mdot
 **********************************
 
+.. tags:: binary, mass-transfer, explicit-mdot, roche-lobe-overflow, point-mass, eddington, intermediate-mass, main-sequence
+
 This test case checks the evolution of one star plus a point mass, including mass transfer to the point mass, using an explicit calculation for the mass transfer rate.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -126,4 +128,3 @@ pgstar commands used for the plots above:
 
 
 Last-Updated: 10Jul2021 (MESA 094ff71) by fxt.
-

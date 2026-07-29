@@ -4,6 +4,8 @@
 timing
 ******
 
+.. tags:: star, timing, performance, counters, low-mass, main-sequence
+
 This test checks the counter and timing routines with a 1.5 |Msun|, Z=0.02 metallicity model.
 
 This test case has 2 part2.
