@@ -1002,7 +1002,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s, c, prv
          type (star_info), target :: copy_info
-         real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P, T_black_body
+         real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P
          integer :: k, k_old, nz, nz_old, skip
 
          logical, parameter :: dbg = .false., restart = .false.
@@ -1121,14 +1121,6 @@
          if (dbg) write(*,2) 's% dm(nz)/Msun', nz, s% dm(nz)/Msun
          if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
 
-         if (Lmid > 0d0) then
-            T_black_body = pow(Lmid/(pi4*rmid*rmid*boltz_sigma), 0.25d0)
-            s% Tsurf_factor = T/T_black_body
-         else
-            s% Tsurf_factor = 1d0
-         end if
-         s% force_Tsurf_factor = s% Tsurf_factor
-
          if (s% use_momentum_outer_bc) then
             s% tau_factor = tau_factor_new
             s% force_tau_factor = s% tau_factor
@@ -1143,8 +1135,7 @@
             return
          end if
 
-         if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
-            s% tau_factor, s% Tsurf_factor
+         if (dbg) write(*,1) 'do_remove_surface tau_factor', s% tau_factor
 
          if (dbg) call mesa_error(__FILE__,__LINE__,'do_remove_surface')
 

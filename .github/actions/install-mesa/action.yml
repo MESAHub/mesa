@@ -7,7 +7,7 @@ inputs:
   sdk:
     description: 'The version of the MESA SDK to install'
     required: false
-    default: '26.3.2'
+    default: '26.6.1'
 
 
 
@@ -38,7 +38,7 @@ runs:
       id: lfs-cache
       with:
         path: .git/lfs
-        key: ${{ runner.os }}-${{ hashFiles('.lfs-assets-id') }}-v1
+        key: lfs-${{ hashFiles('.lfs-assets-id') }}-v1
 
     - name: Git LFS Pull
       run: git lfs pull

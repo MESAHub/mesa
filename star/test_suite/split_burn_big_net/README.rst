@@ -4,6 +4,8 @@
 split_burn_big_net
 ******************
 
+.. tags:: star, net, massive-star, split-burn, nuclear-network, silicon-burning, big-net, burner-substeps
+
 This test suite example checks the use of MESA's split burn capabilities in a 25 |Msun| star, during silicon burning
 
 Physical checks

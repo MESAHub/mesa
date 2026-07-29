@@ -4,6 +4,8 @@
 wd_stable_h_burn
 ****************
 
+.. tags:: star, white-dwarf, carbon-oxygen-white-dwarf, accretion, hydrogen-burning, stable-hydrogen-burning, shell-burning
+
 This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 This test case has 1 parts. Click to see a larger version of a plot.

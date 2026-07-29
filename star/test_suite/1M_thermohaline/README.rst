@@ -4,6 +4,8 @@
 1M_thermohaline
 ***************
 
+.. tags:: star, thermohaline, rotation, low-mass
+
 The test checks thermohaline mixing in a rotating, 1 |Msun|, Z=0.02 metallicity model.
 
 

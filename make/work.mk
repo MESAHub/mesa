@@ -39,6 +39,8 @@ ifeq ($(NOCOMPILE),)
     $(error Unknown or unset COMPILER)
   endif
 
+  ALL_DEPS += $(foreach dir,$(patsubst mesa-%,%,$(INTERNAL_DEPENDS_ON)),$(subst %,$(dir),$(BUILD_DIR_)/%/lib/pkgconfig/mesa-%.pc))
+
   include $(MAKE_DIR)/compile.mk
   include $(MAKE_DIR)/link-exec.mk
 

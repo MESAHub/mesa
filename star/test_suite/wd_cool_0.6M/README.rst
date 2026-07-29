@@ -4,6 +4,8 @@
 wd_cool_0.6M
 ************
 
+.. tags:: star, white-dwarf, carbon-oxygen-white-dwarf, element-diffusion, white-dwarf-cooling
+
 This test case the checks the evolution of a cooling, element diffusing 0.6 Msun white dwarf.
 
 This test case has 1 part. Click to see a larger version of a plot.

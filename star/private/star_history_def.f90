@@ -37,8 +37,7 @@
       integer, parameter :: h_time_step = h_log_abs_mdot + 1
       integer, parameter :: h_e_thermal = h_time_step + 1
       integer, parameter :: h_species = h_e_thermal + 1
-      integer, parameter :: h_Tsurf_factor = h_species + 1
-      integer, parameter :: h_tau_factor = h_Tsurf_factor + 1
+      integer, parameter :: h_tau_factor = h_species + 1
       integer, parameter :: h_log_tau_center = h_tau_factor + 1
       integer, parameter :: h_tau_surface = h_log_tau_center + 1
       integer, parameter :: h_num_zones = h_tau_surface + 1
@@ -703,7 +702,6 @@
          history_column_name(h_time_step_sec) = 'time_step_sec'
          history_column_name(h_e_thermal) = 'e_thermal'
          history_column_name(h_num_zones) = 'num_zones'
-         history_column_name(h_Tsurf_factor) = 'Tsurf_factor'
          history_column_name(h_log_tau_center) = 'log_tau_center'
          history_column_name(h_tau_factor) = 'tau_factor'
          history_column_name(h_tau_surface) = 'tau_surface'

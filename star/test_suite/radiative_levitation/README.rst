@@ -4,6 +4,8 @@
 radiative_levitation
 ********************
 
+.. tags:: star, kap, element-diffusion, radiative-levitation, op-mono, hot-subdwarf
+
 This test case exercises radiative levitation and the OP mono opacities in the outer layers of a 0.466 |Msun|, Z=0.02 metallicity, B-type subdwarf (sdB) model.
 
 This test case has 1 part. Click to see a larger version of a plot.

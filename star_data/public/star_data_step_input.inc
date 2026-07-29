@@ -161,7 +161,7 @@
          real(dp) :: Teff, dt_limit_ratio
          real(dp) :: cumulative_energy_error, cumulative_extra_heating
          real(dp) :: total_energy_initial, tau_factor, tau_base
-         real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
+         real(dp) :: force_tau_factor, force_opacity_factor
          real(dp) :: revised_max_yr_dt, astero_revised_max_yr_dt
          real(dp) :: gradT_excess_alpha_old
          real(dp) :: crystal_core_boundary_mass
@@ -204,5 +204,4 @@
 
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
-
 

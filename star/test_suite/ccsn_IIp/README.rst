@@ -4,6 +4,8 @@
 ccsn_IIp
 ********
 
+.. tags:: star, core-collapse, supernova, type-iip-supernova, hydrodynamics, rayleigh-taylor-mixing, stella
+
 This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsequent use in STELLA.
 
 This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click to see a larger view of a plot.

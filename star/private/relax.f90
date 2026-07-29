@@ -48,7 +48,6 @@
       public :: do_relax_y
       public :: do_relax_tau_factor
       public :: do_relax_opacity_factor
-      public :: do_relax_tsurf_factor
       public :: do_relax_uniform_omega
       public :: do_relax_irradiation
       public :: do_relax_mass_change
@@ -1614,131 +1613,6 @@
          s% max_timestep = secyer*s% time_step
 
       end function relax_opacity_factor_check_model
-
-
-      subroutine do_relax_Tsurf_factor(id, new_Tsurf_factor, dlogTsurf_factor, ierr)
-         integer, intent(in) :: id
-         real(dp), intent(in) :: new_Tsurf_factor, dlogTsurf_factor
-         integer, intent(out) :: ierr
-         integer, parameter ::  lipar=1, lrpar=2
-         integer :: max_model_number
-         real(dp) :: Tsurf_factor
-         type (star_info), pointer :: s
-         integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:)
-         real(dp), target :: rpar_ary(lrpar)
-         real(dp), pointer :: rpar(:)
-         rpar => rpar_ary
-         ipar => ipar_ary
-         include 'formats'
-         ierr = 0
-         if (new_Tsurf_factor <= 0) then
-            ierr = -1
-            write(*,*) 'invalid new_Tsurf_factor', new_Tsurf_factor
-            return
-         end if
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         Tsurf_factor = s% Tsurf_factor
-         if (abs(new_Tsurf_factor - Tsurf_factor) <= 1d-6) then
-            s% Tsurf_factor = new_Tsurf_factor
-            return
-         end if
-         write(*,'(A)')
-         write(*,1) 'current Tsurf_factor', Tsurf_factor
-         write(*,1) 'relax to new Tsurf_factor', new_Tsurf_factor
-         write(*,'(A)')
-         write(*,1) 'dlogTsurf_factor', dlogTsurf_factor
-         write(*,'(A)')
-         rpar(1) = new_Tsurf_factor
-         rpar(2) = dlogTsurf_factor
-         max_model_number = s% max_model_number
-         s% max_model_number = -1111
-         call do_internal_evolve( &
-               id, before_evolve_relax_Tsurf_factor, &
-               relax_Tsurf_factor_adjust_model, relax_Tsurf_factor_check_model, &
-               null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         s% max_model_number = max_model_number
-         if (ierr /= 0) then
-            write(*,'(A)')
-            write(*,1) 'ERROR: failed doing relax Tsurf_factor', new_Tsurf_factor
-            write(*,'(A)')
-            call mesa_error(__FILE__,__LINE__,'do_relax_Tsurf_factor')
-         end if
-
-         if (new_Tsurf_factor == 1d0) then
-            s% force_Tsurf_factor = 0d0
-         else
-            s% force_Tsurf_factor = s% Tsurf_factor
-         end if
-
-         call error_check('relax tsurf factor',ierr)
-
-      end subroutine do_relax_Tsurf_factor
-
-
-      subroutine before_evolve_relax_Tsurf_factor(s, id, lipar, ipar, lrpar, rpar, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
-         integer, intent(out) :: ierr
-         ierr = 0
-         call turn_off_winds(s)
-         s% max_model_number = -111
-      end subroutine before_evolve_relax_Tsurf_factor
-
-      integer function relax_Tsurf_factor_adjust_model(s, id, lipar, ipar, lrpar, rpar)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
-         relax_Tsurf_factor_adjust_model = keep_going
-      end function relax_Tsurf_factor_adjust_model
-
-      integer function relax_Tsurf_factor_check_model(s, id, lipar, ipar, lrpar, rpar)
-         use do_one_utils, only:do_bare_bones_check_model
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
-         real(dp) :: new_Tsurf_factor, dlogTsurf_factor, current_Tsurf_factor, next
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         relax_Tsurf_factor_check_model = do_bare_bones_check_model(id)
-         if (relax_Tsurf_factor_check_model /= keep_going) return
-
-         new_Tsurf_factor = rpar(1)
-         dlogTsurf_factor = rpar(2)
-         current_Tsurf_factor = s% Tsurf_factor
-
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-            write(*,1) 'Tsurf_factor target current', new_Tsurf_factor, current_Tsurf_factor
-
-         if (abs(current_Tsurf_factor-new_Tsurf_factor) < 1d-15) then
-            s% Tsurf_factor = new_Tsurf_factor
-            s% termination_code = t_relax_finished_okay
-            relax_Tsurf_factor_check_model = terminate
-            return
-         end if
-
-         if (new_Tsurf_factor < current_Tsurf_factor) then
-            next = exp10(safe_log10(current_Tsurf_factor) - dlogTsurf_factor)
-            if (next < new_Tsurf_factor) next = new_Tsurf_factor
-         else
-            next = exp10(safe_log10(current_Tsurf_factor) + dlogTsurf_factor)
-            if (next > new_Tsurf_factor) next = new_Tsurf_factor
-         end if
-
-         if (dbg) write(*,1) 'next Tsurf_factor', next, log10(next)
-
-         s% Tsurf_factor = next
-         s% max_timestep = secyer*s% time_step
-
-      end function relax_Tsurf_factor_check_model
-
 
       subroutine do_relax_irradiation(id, &
             min_steps, new_irrad_flux, new_irrad_col_depth, relax_irradiation_max_yrs_dt, ierr)
