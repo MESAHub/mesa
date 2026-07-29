@@ -1110,7 +1110,7 @@
    ! cno cycles
          a1 = y(io16) * y(ih1) * rate(iropg)
 
-         qray(ihe4) =  qray(ihe4) + a1 + a2
+         qray(ihe4) =  qray(ihe4) + a1
 
          if (.not. deriva) then
             a1 = y(in14) * y(ih1) * rate(ifa) * rate(irnpg)

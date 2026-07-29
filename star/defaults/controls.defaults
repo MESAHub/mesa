@@ -2681,8 +2681,8 @@
    ! overshooting
    ! ____________
 
-      ! There are two schemes implemented in MESA to treat overshooting:
-      ! a step overshoot scheme and an exponential scheme.
+      ! There are three schemes implemented in MESA to treat overshooting:
+      ! a step overshoot scheme, an exponential scheme, and a step+exponential scheme.
 
       ! Parameters for exponential diffusive overshoot are described in the paper by Falk Herwig,
       ! "The evolution of AGB stars with convective overshoot", A&A, 360, 952-968 (2000).
@@ -2699,7 +2699,7 @@
 
       ! ::
 
-    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``other``
+    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``step+exponential``, ``other``
     overshoot_zone_type(:) = '' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
     overshoot_zone_loc(:) = '' ! ``core``, ``shell``, ``any``
     overshoot_bdy_loc(:) = '' ! ``bottom``, ``top``, ``any``
@@ -2711,11 +2711,12 @@
       ! ::
 
     overshoot_f(:) = 0d0
+    overshoot_f2(:) = 0d0
     overshoot_f0(:) = 0d0
 
       ! The switch from convective mixing to overshooting happens at a distance f0*Hp into the convection zone
       ! from the estimated location where ``grad_ad = grad_rad``, where Hp is the pressure scale height at that location.
-      ! A value <= 0 for f0 is a mistake -- you are required to set f0 as well as f.
+      ! A value <= 0 for f0 is a mistake -- you are required to set f0 as well as f (and f2 if using step+exponential).
       ! take a look at the following from an email concerning this:
       ! Overshooting works by taking the diffusion mixing coefficient at the edge
       ! of the convection zone and extending it beyond the zone. But -- and here's the issue --
@@ -2735,6 +2736,25 @@
       ! where D_ob is the convective diffusivity at the bottom (top) of the step overshoot region for outward (inward) overshooting.
       ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
       ! ``star_data/public/star_data_def.inc`` (currently 16)
+
+      ! If you use the 'step+exponential' scheme, the step is placed first and the
+      ! exponential component follows it. In this scheme, ``overshoot_f`` sets
+      ! the width of the step part and ``overshoot_f2`` sets the length scale of
+      ! the additional exponential tail. The parameterizations for both parts are
+      ! still evaluated at the convective boundary (as described above); the
+      ! exponential part is displaced by the extent of the step part.
+      ! This approach is motivated by:
+      ! Michielsen et al. 2021 (`A&A 650, A175 <https://doi.org/10.1051/0004-6361/202039926>`_)
+      ! Anders et al. 2022a (`ApJ 926, 169 <https://doi.org/10.3847/1538-4357/ac408d>`_)
+      ! Anders et al. 2022b (`ApJL 928, L10 <https://doi.org/10.3847/2041-8213/ac5cb5>`_)
+      ! Johnston et al. 2024 (`ApJ 964, 170 <https://doi.org/10.3847/1538-4357/ad2343>`_)
+
+      ! The step overshoot part models convective entrainment, where a convective
+      ! zone "eats up" a Ledoux-stable region (typically above a convective core).
+      ! The exponential overshoot part then models actual overshooting where inertia
+      ! carries material beyond the Schwarzschild boundary.
+      ! Note however that no temperature gradients are modified, MESA's implementation of overshoot
+      ! only extends mixing regions (through the diffusion coefficients, ``D_mix``)
 
       ! ::
 

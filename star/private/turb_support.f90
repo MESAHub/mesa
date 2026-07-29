@@ -40,7 +40,8 @@ contains
    !!
    !! Currently we only know we have to fall back to MLT in cells that get touched
    !! by adjust_mass, because there the convection speeds at the start of the
-   !! step can be badly out of whack.
+   !! step can be badly out of whack. This can be disabled with TDC_adjust_mass_fallback_to_mlt
+   !! to let those cells use TDC.
    !!
    !! @param s star pointer
    !! @param k face index
@@ -50,7 +51,7 @@ contains
       integer, intent(in) :: k
 
       fallback = .false.
-      if (abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
+      if (s% TDC_adjust_mass_fallback_to_mlt .and. abs(s%mstar_dot) > 1d-99 .and. k < s% k_const_mass) then
          fallback = .true.
       end if
    end function check_if_must_fall_back_to_MLT
@@ -216,13 +217,13 @@ contains
       integer, intent(out) :: ierr
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
-      real(dp) :: conv_vel_start, scale, max_conv_vel
+      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC
+      logical ::  test_partials, using_TDC, have_Y_face_guess
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -325,13 +326,22 @@ contains
             scale = max(abs(s% L_start(k)), 1d-3*maxval(s% L_start(1:s% nz)))
          end if
 
+         have_Y_face_guess = s% use_TDC_Y_face_seeded_newton .and. s% doing_solver_iterations
+         if (have_Y_face_guess) then
+            Y_face_guess = s% Y_face(k)
+         else
+            ! Non-positive Y_face_guess values are ignored by the TDC seeded bracket.
+            Y_face_guess = 0d0
+         end if
+
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
-            s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
+            s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
+            Y_face_guess, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -352,7 +362,8 @@ contains
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
                   scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
-                  s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, ierr)
+                  s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
+                  Y_face_guess, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

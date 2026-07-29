@@ -1,7 +1,10 @@
          
          logical :: compare_TDC_to_MLT 
+         logical :: use_TDC_Y_face_seeded_newton
+         character(32) :: hydro_matrix_solver
 
          logical :: TDC_use_density_form_for_eddy_viscosity
+         logical :: TDC_adjust_mass_fallback_to_mlt
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
          logical :: use_TDC_enthalpy_flux_limiter
          logical :: include_mlt_in_velocity_time_centering

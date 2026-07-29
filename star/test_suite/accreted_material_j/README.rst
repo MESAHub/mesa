@@ -4,6 +4,8 @@
 accreted_material_j
 *******************
 
+.. tags:: star, accretion, angular-momentum, rotation, massive-star
+
 This test suite example checks the accretion of material and angular momentum onto a 20 |Msun| model.
 
 

@@ -31,6 +31,7 @@
       x_integer_ctrl(1) = 4 ! inlist_part
 
 ! prevent development of radial pulses during advanced burning
+      use_drag_energy = .false.
       drag_coefficient = 1d0
       min_q_for_drag = 0.8d0
 

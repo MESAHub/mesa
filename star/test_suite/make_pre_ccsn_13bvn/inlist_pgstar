@@ -1,6 +1,6 @@
 &pgstar
 
-pgstar_interval = 1
+pgstar_interval = 20
 file_digits = 8
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.

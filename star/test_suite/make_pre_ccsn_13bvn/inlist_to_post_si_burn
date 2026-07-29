@@ -27,22 +27,11 @@
 
 ! adjust overshoot, to prevent He shell convection from propagating inward in test case.
      overshoot_scheme(1) = 'none'
-     overshoot_zone_type(1) = 'burn_He'
-     overshoot_zone_loc(1) = 'shell'
-     overshoot_bdy_loc(1) = 'bottom'
-
-
-     overshoot_scheme(2) = 'exponential'
-     overshoot_zone_type(2) = 'any'
-     overshoot_zone_loc(2) = 'any'
-     overshoot_bdy_loc(2) = 'any'
-     overshoot_f(2) = 0.01
-     overshoot_f0(2) = 0.004
-
-     min_overshoot_q = 0d0
+     overshoot_scheme(2) = 'none'
 
 
 ! prevent development of radial pulses during advanced burning
+      use_drag_energy = .false.
       drag_coefficient = 1d0
       min_q_for_drag = 0.8d0
 
