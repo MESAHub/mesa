@@ -4,6 +4,8 @@
 16M_predictive_mix
 ******************
 
+.. tags:: star, predictive-mixing, convective-core, massive-star, main-sequence
+
 This test suite example re-creates the 16-solar mass main-sequence
 evolution with the inclusion of predictive mixing (using the Ledoux
 criterion), as detailed in Section 2 of the MESA IV instrument paper

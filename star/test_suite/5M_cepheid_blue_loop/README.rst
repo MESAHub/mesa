@@ -4,6 +4,8 @@
 5M_cepheid_blue_loop
 ********************
 
+.. tags:: star, cepheid, blue-loop, instability-strip, core-helium-burning, intermediate-mass
+
 This test case checks that the evolution of a 5 |Msun|, metal-poor Z=0.008, helium-enriched Y=0.256 model
 executes a blue-loop in the HR diagram and crosses the classical Cepheid instability strip boundaries three times.
 

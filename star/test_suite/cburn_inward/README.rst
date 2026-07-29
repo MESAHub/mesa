@@ -4,6 +4,8 @@
 cburn_inward
 ************
 
+.. tags:: star, carbon-burning, carbon-flame, off-center-burning, inward-flame, intermediate-mass
+
 This test suite example checks the inward propagation of a carbon burning front in a 7.5 |Msun| model.
 
 Physical checks

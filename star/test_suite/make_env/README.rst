@@ -4,6 +4,8 @@
 make_env
 ********
 
+.. tags:: star, compact-remnant, neutron-star, neutron-star-envelope, iron-envelope, stability
+
 This test case checks the creation and stability of a pure iron neutron star envelope.
 
 This test case has 1 part. Click to see a larger version of a plot.

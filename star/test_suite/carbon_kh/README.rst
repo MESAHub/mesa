@@ -4,6 +4,8 @@
 carbon_kh
 *********
 
+.. tags:: star, eos, carbon-composition, kelvin-helmholtz-contraction, equation-of-state, energy-conservation
+
 This test case evolves an initially low-density, 1.3 |Msun| stellar
 model with a pure carbon composition as it Kelvin-Helmholtz contracts.
 

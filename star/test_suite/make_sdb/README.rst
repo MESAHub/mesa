@@ -4,6 +4,8 @@
 make_sdb
 ********
 
+.. tags:: star, hot-subdwarf, helium-star, envelope-stripping, common-envelope
+
 This test case shows an example of making a 0.4 |Msun|, Z=0.02 metallicity, helium model - a B-type subdwarf (sdB) star.
 
 This test case has 1 part. Click to see a larger version of a plot.
