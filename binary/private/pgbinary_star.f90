@@ -52,7 +52,7 @@ contains
       integer, intent(in) :: id, device_id
       real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
       logical, intent(in) :: subplot
-      character (len = *), intent(inout) :: title
+      character (len = *), intent(in) :: title
       character (len = *), intent(in) :: plot_name
       integer, intent(out) :: ierr
       call do_star_plot(b, id, device_id, &
@@ -84,7 +84,7 @@ contains
       integer, intent(in) :: id, device_id
       real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
       logical, intent(in) :: subplot
-      character (len = *), intent(inout) :: title
+      character (len = *), intent(in) :: title
       character (len = *), intent(in) :: plot_name
       integer, intent(out) :: ierr
       call do_star_plot(b, id, device_id, &
@@ -153,10 +153,10 @@ contains
       integer, intent(in) :: id, device_id, star_number
       real, intent(in) :: xleft, xright, ybot, ytop, txt_scale_factor
       character (len = *), intent(in) :: star_plot_name
-      character(len=*), intent(inout) :: title
+      character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
 
-      character (len = strlen) :: status, mass
+      character (len = strlen) :: plot_title, status, mass
       real :: current_scale
       logical, parameter :: star_subplot = .true.
 
@@ -164,12 +164,13 @@ contains
 
       call pgsave
       call pgsvp(xleft, xright, ybot, ytop)  ! set viewport
+      plot_title = trim(title)
       if (.not. subplot) then  ! do title stuff
          call show_model_number_pgbinary(b)
          call show_age_pgbinary(b)
       end if
       if (b% pg% show_mtrans_status) then
-         if (title /= '') title = trim(title) // ":"
+         if (plot_title /= '') plot_title = trim(plot_title) // ":"
          status = ' Detached'
          if (b% mtransfer_rate /= 0d0) then
             if (b% d_i == star_number) then
@@ -178,11 +179,9 @@ contains
                status = ' Accretor'
             end if
          end if
-         title = trim(title) // status
-      else
-         title = trim(title)
+         plot_title = trim(plot_title) // status
       end if
-      call show_grid_title_pgbinary(b, title)
+      call show_grid_title_pgbinary(b, plot_title)
       call pgunsa
 
       ierr = 0
