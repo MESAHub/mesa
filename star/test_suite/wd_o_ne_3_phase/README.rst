@@ -1,8 +1,8 @@
 .. _wd_o_ne_3_phase:
 
-************
+***************
 wd_o_ne_3_phase
-************
+***************
 
 .. tags:: star, white-dwarf, oxygen-neon-white-dwarf, phase-separation, crystallization
 
@@ -16,11 +16,15 @@ Throughout the white dwarf cooling phase, phase separation occurs as a result of
 
 Example of the cooling before crystallization:
 
-.. image:: ../../../star/test_suite/wd_o_ne_3_phase/docs/Grid2000200.png
+.. figure:: ../../../star/test_suite/wd_o_ne_3_phase/docs/Grid2000200.png
+
+
 
 Example with a portion of the core crystallized:
 
-.. image:: ../../../star/test_suite/wd_o_ne_3_phase/docs/Grid2000450.png
+.. figure:: ../../../star/test_suite/wd_o_ne_3_phase/docs/Grid2000450.png
+
+
 
 pgstar commands used for the plots above:
 
