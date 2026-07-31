@@ -44,6 +44,8 @@ The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ r
 Bug Fixes
 ---------
 
+Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
 Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
 which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
 MESA when the KH timescale was recalculated on restart.
