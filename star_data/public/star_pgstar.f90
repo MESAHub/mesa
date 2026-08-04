@@ -175,7 +175,11 @@ module star_pgstar
    integer, parameter :: i_Grid7 = i_Grid6 + 1
    integer, parameter :: i_Grid8 = i_Grid7 + 1
    integer, parameter :: i_Grid9 = i_Grid8 + 1
-   integer, parameter :: i_Other = i_Grid9 + 1
+
+   integer, parameter :: i_Max_eq_resid = i_Grid9 + 1
+   integer, parameter :: i_Kipp_residuals = i_Max_eq_resid + 1
+
+   integer, parameter :: i_Other = i_Kipp_residuals + 1
 
    integer, parameter :: num_pgstar_plots = i_Other + max_num_Other_plots
 
