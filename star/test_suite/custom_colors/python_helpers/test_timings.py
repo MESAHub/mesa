@@ -29,6 +29,7 @@ Requirements
   - MESA_DIR environment variable must be set
 """
 
+import argparse
 import os
 import re
 import shutil
@@ -41,6 +42,10 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+# ApJ requires embedded Type 42 (TrueType) fonts, not Type 3 bitmaps.
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
 
 # =============================================================================
 # SETUP – run from the work directory regardless of where the script lives
@@ -59,9 +64,15 @@ if not MESA_DIR:
 # =============================================================================
 
 # Number of converged timesteps each run must complete before timing stops.
-# 60 steps gives ~30–90 s per config on a modern workstation, which is long
-# enough to average out startup noise while keeping the full suite tractable.
-N_STEPS = 500
+# This value is quoted in the paper (Appendix F, Table 3, Figure 15), so if it
+# changes here it must change there too.  Larger N also dilutes the one-time
+# initialisation cost that is folded into s_per_step (see run_config).
+N_STEPS = 300
+
+# How many times each configuration is repeated.  The reported value is the
+# median across repeats; the spread is recorded so the paper can quote it.
+# n=1 gives no way to tell a real difference from run-to-run noise.
+REPEATS = 3
 
 # Wall-clock timeout per run (seconds).  Must be >> expected run time.
 RUN_TIMEOUT = 900
@@ -279,6 +290,39 @@ def _count_steps(output: str) -> int:
     return max(int(m) for m in matches)
 
 
+def run_config_repeated(label: str, params: dict, repeats: int) -> dict:
+    """Run one configuration `repeats` times; report the median s_per_step."""
+    runs = []
+    for i in range(1, repeats + 1):
+        if repeats > 1:
+            print(f"           repeat {i}/{repeats}")
+        runs.append(run_config(label, params))
+
+    good = [r["s_per_step"] for r in runs if r["success"] and r["s_per_step"]]
+
+    agg = dict(runs[-1])
+    agg["repeats"] = repeats
+    agg["s_per_step_all"] = good
+
+    if good:
+        good_sorted = sorted(good)
+        mid = len(good_sorted) // 2
+        if len(good_sorted) % 2:
+            agg["s_per_step"] = good_sorted[mid]
+        else:
+            agg["s_per_step"] = 0.5 * (good_sorted[mid - 1] + good_sorted[mid])
+        agg["s_per_step_min"] = good_sorted[0]
+        agg["s_per_step_max"] = good_sorted[-1]
+        agg["success"] = True
+    else:
+        agg["s_per_step"] = None
+        agg["s_per_step_min"] = None
+        agg["s_per_step_max"] = None
+        agg["success"] = False
+
+    return agg
+
+
 def run_config(label: str, params: dict) -> dict:
     """Patch inlists, run MESA, return timing metadata."""
     bak_colors = _backup(INLIST_COLORS)
@@ -358,6 +402,7 @@ def print_header():
     print(f"  Work dir   : {_WORK_DIR}")
     print(f"  MESA_DIR   : {MESA_DIR}")
     print(f"  Steps/run  : {N_STEPS}")
+    print(f"  Repeats    : {REPEATS}")
     print(f"  Timeout    : {RUN_TIMEOUT} s")
     print(f"  Configs    : {len(CONFIGS)}")
     print()
@@ -641,7 +686,7 @@ def plot_feature_breakdown(results: list[dict], out: Path):
             fontweight="bold",
         )
 
-    ax.set_ylabel(r"$\Delta$ s\,step$^{-1}$ vs no-colors baseline", fontsize=11)
+    ax.set_ylabel(r"$\Delta$ s step$^{-1}$ vs module-disabled baseline", fontsize=11)
     ax.set_ylim(0, max(values) + y_pad)
     ax.yaxis.grid(True, alpha=0.35, zorder=0)
     ax.set_axisbelow(True)
@@ -654,15 +699,72 @@ def plot_feature_breakdown(results: list[dict], out: Path):
     print(f"  [plot]  {fpath}")
 
 
+def save_latex_table(results: list[dict], out: Path):
+    """Write the Appendix F table as a LaTeX fragment.
+
+    Figure 15 and the manuscript table are both generated from this single set
+    of results, so the two cannot drift apart.  Paste the contents of
+    timing_table.tex into the deluxetable body in the manuscript.
+    """
+    valid = _valid(results)
+    bline = next((r for r in valid if r["label"] == "baseline"), None)
+    if bline is None:
+        print("  [latex]  baseline missing – skipping table")
+        return
+
+    rows = [
+        ("colors_minimal", "Vega, no CSV"),
+        ("colors_AB", "AB, no CSV"),
+        ("colors_ST", "ST, no CSV"),
+        ("colors_csv", "Vega + CSV"),
+        ("colors_csv_permod", "Vega + CSV + per model"),
+    ]
+
+    lines = ["Module disabled & \\nodata & \\nodata \\\\"]
+    for cfg_label, display in rows:
+        r = next((x for x in valid if x["label"] == cfg_label), None)
+        if r is None:
+            continue
+        delta = r["s_per_step"] - bline["s_per_step"]
+        pct = 100.0 * delta / bline["s_per_step"]
+
+        d_str = "$<0.001$" if abs(delta) < 5e-4 else f"$+{delta:.3f}$"
+        p_str = "$<1\\%$" if abs(pct) < 1.0 else f"$\\sim{pct:.0f}\\%$"
+
+        lines.append(f"{display} & {d_str} & {p_str} \\\\")
+
+    fpath = out / "timing_table.tex"
+    fpath.write_text("\n".join(lines) + "\n")
+    print(f"  [latex] {fpath}")
+    print()
+    print("  ---- paste into Table 3 ----")
+    for line in lines:
+        print("  " + line)
+    print("  ----------------------------")
+    lo, hi = bline.get("s_per_step_min"), bline.get("s_per_step_max")
+    spread = f" (range {lo:.4f}-{hi:.4f})" if lo is not None and hi is not None else ""
+    print(f"  baseline = {bline['s_per_step']:.4f} s/step{spread}"
+          f" over {bline['steps']} steps x {bline.get('repeats', 1)} repeats")
+    print()
+
+
 def save_csv(results: list[dict], out: Path):
     fpath = out / "timing_results.csv"
     with open(fpath, "w") as fh:
-        fh.write("label,description,wall_s,steps,s_per_step,success,timeout\n")
+        fh.write(
+            "label,description,wall_s,steps,s_per_step,"
+            "s_per_step_min,s_per_step_max,repeats,success,timeout\n"
+        )
         for r, (_, desc, _) in zip(results, CONFIGS):
             wall = f"{r['wall_s']:.3f}" if r["wall_s"] is not None else ""
             sps = f"{r['s_per_step']:.5f}" if r["s_per_step"] is not None else ""
+            lo = r.get("s_per_step_min")
+            hi = r.get("s_per_step_max")
+            lo_s = f"{lo:.5f}" if lo is not None else ""
+            hi_s = f"{hi:.5f}" if hi is not None else ""
             fh.write(
                 f"{r['label']},{desc},{wall},{r['steps']},{sps},"
+                f"{lo_s},{hi_s},{r.get('repeats', 1)},"
                 f"{r['success']},{r['timeout']}\n"
             )
     print(f"  [csv]   {fpath}")
@@ -674,6 +776,13 @@ def save_csv(results: list[dict], out: Path):
 
 
 def main():
+    global REPEATS
+    ap = argparse.ArgumentParser(description="MESA colors timing benchmark")
+    ap.add_argument("--repeats", type=int, default=REPEATS,
+                    help=f"runs per configuration (default {REPEATS})")
+    args = ap.parse_args()
+    REPEATS = max(1, args.repeats)
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     print_header()
 
@@ -682,7 +791,7 @@ def main():
 
     for idx, (label, desc, params) in enumerate(CONFIGS, start=1):
         print_running(idx, label, desc)
-        r = run_config(label, params)
+        r = run_config_repeated(label, params, REPEATS)
         results.append(r)
         print_run_result(r, baseline_sps)
         if label == "baseline" and r["s_per_step"] is not None:
@@ -697,6 +806,7 @@ def main():
     plot_s_per_step(results, OUT_DIR)
     plot_feature_breakdown(results, OUT_DIR)
     save_csv(results, OUT_DIR)
+    save_latex_table(results, OUT_DIR)
 
     n_pass = sum(1 for r in results if r["success"])
     n_fail = len(results) - n_pass
