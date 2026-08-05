@@ -49,6 +49,8 @@ Thus, modifying the value of the Weinberg angle resulted in changes to neutrino 
 This was the case in all previous MESA versions, and was found and fixed by user Garv Chauhan, see `gh-998 https://github.com/MESAHub/mesa/pull/998`_. Plasma neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate.
 The change in default Weinberg angle results in small numerical differences for stars where plasma neutrino cooling is significant.
 
+Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
 Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
 which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
 MESA when the KH timescale was recalculated on restart.
@@ -62,6 +64,12 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
+
+Other Changes
+-------------
+
+`mesa/binary` now no longer copies the binary history columns into the star history by default. Set `append_to_star_history = .true.` to reenable this feature. All binary history data is still saved to `history_name` defined in section `&binary_controls`.
+
 
 Changes in r26.4.1
 ===================
