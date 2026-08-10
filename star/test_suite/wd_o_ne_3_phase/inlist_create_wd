@@ -46,8 +46,8 @@ dX_nuc_drop_limit = 1d-2
 mesh_delta_coeff = 2.5
 okay_to_reduce_gradT_excess = .true.
 
-! Stop when not more nuclear burning
-power_nuc_burn_lower_limit = 1d-8
+! Stop when no more nuclear burning
+power_nuc_burn_lower_limit = 1d-5
 
 ! convection
 mixing_length_alpha = 2
