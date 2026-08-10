@@ -105,16 +105,16 @@
             ! the angular momentum in order to initialize the model. This flag is here
             ! to account for the loading of old saved models.
             if (s% have_j_rot) then
-               !if (restart) then
+               if (restart) then
                   ! only need to compute irot, w_div_w_crit_roche is stored in photos
-               !   call set_i_rot_from_omega_and_j_rot(s)
-               !else
+                  call set_i_rot_from_omega_and_j_rot(s)
+               else
                   ! need to set w_div_w_crit_roche as well
-               call use_xh_to_update_i_rot(s)
-               do k=1, s% nz
-                  s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
-               end do
-               !end if
+                  call use_xh_to_update_i_rot(s)
+                  do k=1, s% nz
+                     s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
+                  end do
+               end if
             else
                ! need to recompute irot and jrot
                call use_xh_to_update_i_rot_and_j_rot(s)
