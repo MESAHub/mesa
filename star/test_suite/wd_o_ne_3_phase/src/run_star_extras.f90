@@ -78,13 +78,29 @@
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
-         integer :: ierr
+         integer :: ierr, part_number
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_start_step = 0
-      end function extras_start_step
+
+         part_number = s% x_integer_ctrl(1)
+
+         if(part_number == 2 .and. s% star_mass_he4 > 1d-4) then
+            ! stop accretion after sufficient he4 added to WD atmosphere
+            s% mass_change = 0d0
+         end if
+
+         if(part_number == 2 .and. s% L_surf < 0.1d0) then ! L < 0.1 Lsun
+            ! Turn off Ledoux/Thermohaline at late times when
+            ! dense EOS causes problems in He/C/O mixture (Skye problem)
+            s% use_Ledoux_criterion = .false.
+         else
+            s% use_Ledoux_criterion = .true.
+         end if
+
+       end function extras_start_step
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)

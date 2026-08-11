@@ -29,7 +29,7 @@ use_Type2_opacities = .true.
 ! Limit max model number as part of test suite
 max_model_number = 2500
 
-initial_mass = 8.3!
+initial_mass = 8.3
 initial_z = 0.02d0
 
 ! terminal output
@@ -53,7 +53,7 @@ power_nuc_burn_lower_limit = 1d-5
 mixing_length_alpha = 2
 use_Ledoux_criterion = .true.
 alpha_semiconvection = 0.01
-thermohaline_coeff = 3!
+thermohaline_coeff = 3
 
 ! diffusion
 do_element_diffusion = .true.
@@ -72,8 +72,8 @@ hot_wind_full_on_T = 1d6
 cool_wind_RGB_scheme = 'Reimers'
 cool_wind_AGB_scheme = 'Blocker'
 RGB_to_AGB_wind_switch = 1d-4
-Reimers_scaling_factor = 0.5!0.1d0 !decrease if too much
-Blocker_scaling_factor = 50d0!10d0
+Reimers_scaling_factor = 0.5 !0.1d0 !decrease if too much
+Blocker_scaling_factor = 50d0 !10d0
 
 ! stop if almost not He
 star_species_mass_min_limit = 1d-20 ! Msun
@@ -84,21 +84,21 @@ star_species_mass_min_limit_iso = 'he4'
       overshoot_scheme(1) = 'exponential'
       overshoot_zone_type(1) = 'nonburn'
       overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'top'!'any'!
+      overshoot_bdy_loc(1) = 'top' !'any'!
       overshoot_f(1) = 0.01
       overshoot_f0(1) = 0.005
 
       overshoot_scheme(2) = 'exponential'
       overshoot_zone_type(2) = 'burn_H'
       overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'top'!'any' !'top'
+      overshoot_bdy_loc(2) = 'top' !'any' !'top'
       overshoot_f(2) = 0.01
       overshoot_f0(2) = 0.005
 
       overshoot_scheme(3) = 'exponential'
       overshoot_zone_type(3) = 'burn_He'
       overshoot_zone_loc(3) = 'any'
-      overshoot_bdy_loc(3) = 'top'!'any'!'top'
+      overshoot_bdy_loc(3) = 'top' !'any'!'top'
       overshoot_f(3) = 0.01
       overshoot_f0(3) = 0.005
       

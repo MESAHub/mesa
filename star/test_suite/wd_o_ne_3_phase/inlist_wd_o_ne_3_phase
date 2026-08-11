@@ -27,10 +27,10 @@
 
 
 &eos
-	  use_Skye = .true.
+        use_Skye = .true.
         use_PC = .false.
           
-          ! For more accurate C/O phase diagram
+        ! For more accurate C/O phase diagram
         Skye_solid_mixing_rule = "Ogata"
 
 / ! end of eos namelist
@@ -49,6 +49,9 @@
 
 &controls
 
+! part number for run_star_extras
+      x_integer_ctrl(1) = 2
+
 ! When to stop
       log_center_temp_lower_limit = 6.3d0 ! Massive WD is very crystallized by this point
 
@@ -65,17 +68,13 @@
       do_element_diffusion = .true.
       diffusion_use_full_net = .true.
 
-      ! uncomment to add a He atmosphere
-
-      ! accrete_same_as_surface = .true.
-      ! accrete_given_mass_fractions = .true.
-      ! num_accretion_species = 1
-      ! accretion_species_xa(1) = 1.0
-      ! accretion_species_id(1) = 'he4'
-      ! mass_change = 1d-8
-
-      !star_species_mass_max_limit = 1d-4 ! Msun
-      !star_species_mass_max_limit_iso = 'he4'
+      ! add some extra He for atmosphere
+      accrete_same_as_surface = .false.
+      accrete_given_mass_fractions = .true.
+      num_accretion_species = 1
+      accretion_species_xa(1) = 1.0
+      accretion_species_id(1) = 'he4'
+      mass_change = 1d-8 ! turned off in run_star_extras after total_mass_he4 > 1d-4
 
 ! solver    
       
@@ -118,9 +117,10 @@
 
 ! mlt
 
+      ! Ledoux and thermohaline are turned off in run_star_extras when L < 0.1 Lsun
       use_Ledoux_criterion = .true.
 
-      thermohaline_coeff = 3 !1000 for a smoother profile before the onset of crystallization
+      thermohaline_coeff = 300 ! for a smoother profile before the onset of crystallization
       thermohaline_option = 'Kippenhahn'  
 
       MLT_option = 'ML2'
