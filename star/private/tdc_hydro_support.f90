@@ -67,6 +67,10 @@ contains
       call set_xm_old2
       call find_xm_anchor2
       call set_xm_new2
+      if (ierr /= 0) then
+         deallocate(work1)
+         return
+      end if
       call interpolate1_face_val2(s%i_lnR, log(max(1d0, s%r_center)))
       call check_new_lnR2
       call interpolate1_face_val2(s%i_lum, s%L_center)
@@ -74,9 +78,8 @@ contains
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
       do j = 1, s%species
-         call interpolate1_xa2(j)
+         call remap1_xa2(j)
       end do
-      call rescale_xa2
       call revise_lnT_for_QHSE2(P_surf, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_RSP2 failed in revise_lnT_for_QHSE')
       do k = 1, nz
@@ -193,6 +196,7 @@ contains
          integer :: iter
          include 'formats'
          nz_outer = s%TDC_hydro_nz_outer
+         n_inner = nz - nz_outer
          dq_1_factor = s%TDC_hydro_dq_1_factor
          dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
          xm(1) = 0d0
@@ -203,18 +207,21 @@ contains
             s%dm(k - 1) = dxm_outer
          end do
 
-         if (.not. s%remesh_for_TDC_pulsations_log_core_zoning) then
+         if (s%remesh_for_TDC_pulsations_use_T_gradient) then
+            call set_T_gradient_core_zoning(nz_outer, n_inner)
+            if (ierr /= 0) return
+
+         else if (.not. s%remesh_for_TDC_pulsations_log_core_zoning) then
             ! do rsp style core zoning with a power law on dq
 
             ! solve for a smooth ramp factor H via bisection
-            n_inner = nz - nz_outer
             rem_mass = s%xmstar - xm(nz_outer + 1)
             base_dm = dxm_outer !first dm equals outer spacing
 
             ! define function f(H) = base_dm*(sum_{j=1..n_inner-1}H^j) - rem_mass
 
-            H_low = 1.001! Heuristics
-            H_high = 1.40! Heuristics
+            H_low = 1.001d0  ! heuristics
+            H_high = 1.40d0  ! heuristics
             ! compute f at bounds
             f_low = base_dm*((H_low*(1d0 - H_low**(n_inner - 1))/(1d0 - H_low))) - rem_mass
             f_high = base_dm*((H_high*(1d0 - H_high**(n_inner - 1))/(1d0 - H_high))) - rem_mass
@@ -260,10 +267,10 @@ contains
             end do
             s%dm(nz) = s%xmstar - xm(nz)
 
-            ! — enforce the last boundary at total mass
+            ! enforce the last boundary at total mass
             xm(nz + 1) = s%xmstar
 
-            ! — recompute cell masses
+            ! recompute cell masses
             do k = nz_outer + 1, nz
                s%dm(k) = xm(k + 1) - xm(k)
             end do
@@ -282,7 +289,7 @@ contains
             s%dq(k) = s%dm(k)/s%xmstar
             s%q(k) = s%q(k - 1) - s%dq(k - 1)
          end do
-         call set_dm_bar(s, s%nz, s%dm, s%dm_bar)
+         call set_dm_bar(s, nz, s%dm, s%dm_bar)
          return
 
          do k = 2, nz
@@ -291,6 +298,180 @@ contains
          write (*, 1) 'm_center', s%m_center/msun
          call mesa_error(__FILE__, __LINE__, 'set_xm_new')
       end subroutine set_xm_new2
+
+      subroutine set_T_gradient_core_zoning(nz_outer, n_inner)
+         integer, intent(in) :: nz_outer, n_inner
+         integer :: i, j, k_old, k_new, npts
+         real(dp) :: current_lnT, dlnT_total, fraction, inner_lnT, &
+            previous_lnT, remaining_mass, target
+         real(dp), allocatable :: monitor_xm(:), monitor_value(:)
+
+         remaining_mass = s%xmstar - xm_anchor
+         allocate(monitor_xm(nz_old + 2), monitor_value(nz_old + 2))
+
+         npts = 1
+         monitor_xm(npts) = xm_anchor
+         monitor_value(npts) = log(s%TDC_hydro_T_anchor)
+         do k_old = 1, nz_old
+            if (xm_mid_old(k_old) <= xm_anchor) cycle
+            npts = npts + 1
+            monitor_xm(npts) = xm_mid_old(k_old)
+            monitor_value(npts) = s%xh(s%i_lnT, k_old)
+         end do
+
+         inner_lnT = s%xh(s%i_lnT, nz_old)
+         if (nz_old > 1) then
+            ! Extend the final cell-center gradient to the inner boundary for the monitor.
+            inner_lnT = inner_lnT + &
+               (s%xmstar - xm_mid_old(nz_old))* &
+               (s%xh(s%i_lnT, nz_old) - s%xh(s%i_lnT, nz_old - 1))/ &
+               (xm_mid_old(nz_old) - xm_mid_old(nz_old - 1))
+         end if
+         npts = npts + 1
+         monitor_xm(npts) = s%xmstar
+         monitor_value(npts) = inner_lnT
+
+         dlnT_total = 0d0
+         do i = 2, npts
+            dlnT_total = dlnT_total + abs(monitor_value(i) - monitor_value(i - 1))
+         end do
+
+         previous_lnT = monitor_value(1)
+         monitor_value(1) = 0d0
+         do i = 2, npts
+            current_lnT = monitor_value(i)
+            if (dlnT_total > 0d0) then
+               ! Give mass and temperature variation equal weight.
+               monitor_value(i) = monitor_value(i - 1) + &
+                  0.5d0*(monitor_xm(i) - monitor_xm(i - 1))/remaining_mass + &
+                  0.5d0*abs(current_lnT - previous_lnT)/dlnT_total
+            else
+               monitor_value(i) = monitor_value(i - 1) + &
+                  (monitor_xm(i) - monitor_xm(i - 1))/remaining_mass
+            end if
+            previous_lnT = current_lnT
+         end do
+         monitor_value(npts) = 1d0
+
+         j = 2
+         do k_new = nz_outer + 2, nz
+            target = real(k_new - nz_outer - 1, dp)/real(n_inner, dp)
+            do while (j < npts .and. monitor_value(j) < target)
+               j = j + 1
+            end do
+            fraction = (target - monitor_value(j - 1))/ &
+               (monitor_value(j) - monitor_value(j - 1))
+            xm(k_new) = monitor_xm(j - 1) + &
+               fraction*(monitor_xm(j) - monitor_xm(j - 1))
+         end do
+         xm(nz + 1) = s%xmstar
+         do k_new = nz_outer + 1, nz
+            s%dm(k_new) = xm(k_new + 1) - xm(k_new)
+         end do
+         call regularize_T_gradient_core_zoning(nz_outer, n_inner)
+
+         deallocate(monitor_xm, monitor_value)
+      end subroutine set_T_gradient_core_zoning
+
+      subroutine regularize_T_gradient_core_zoning(nz_outer, n_inner)
+         integer, intent(in) :: nz_outer, n_inner
+         integer :: i, iter, k
+         real(dp) :: center_dm_limit, current_sum, delta, outer_dm_cap, &
+            ratio, scale, scale_high, scale_low, scale_mid
+         real(dp), allocatable :: dm_cap(:), weight(:)
+         logical :: changed
+         include 'formats'
+
+         ratio = max(2.5d0, s%mesh_max_allowed_ratio)
+         allocate(dm_cap(n_inner), weight(n_inner))
+         weight = s%dm(nz_outer + 1:nz)
+
+         ! Smooth the monitor mesh without changing the enclosed mass.
+         do iter = 1, 1000
+            changed = .false.
+            do i = 2, n_inner
+               if (weight(i) > ratio*(1d0 + 1d-12)*weight(i - 1)) then
+                  delta = (weight(i) - ratio*weight(i - 1))/(1d0 + ratio)
+                  weight(i) = weight(i) - delta
+                  weight(i - 1) = weight(i - 1) + delta
+                  changed = .true.
+               else if (weight(i - 1) > ratio*(1d0 + 1d-12)*weight(i)) then
+                  delta = (weight(i - 1) - ratio*weight(i))/(1d0 + ratio)
+                  weight(i - 1) = weight(i - 1) - delta
+                  weight(i) = weight(i) + delta
+                  changed = .true.
+               end if
+            end do
+            if (.not. changed) exit
+         end do
+
+         center_dm_limit = s%max_center_cell_dq*s%xmstar
+         if (center_dm_limit <= 0d0) center_dm_limit = s%xmstar - xm_anchor
+         dm_cap(n_inner) = min(center_dm_limit, s%xmstar - xm_anchor)
+         do i = n_inner - 1, 1, -1
+            dm_cap(i) = min(s%xmstar - xm_anchor, ratio*dm_cap(i + 1))
+         end do
+
+         outer_dm_cap = ratio*s%dm(nz_outer)
+         do i = 1, n_inner
+            dm_cap(i) = min(dm_cap(i), outer_dm_cap)
+            outer_dm_cap = min(s%xmstar - xm_anchor, ratio*outer_dm_cap)
+         end do
+
+         if (sum(dm_cap) < s%xmstar - xm_anchor) then
+            write(*,1) 'TDC mesh constraints require more cells', &
+               sum(dm_cap)/(s%xmstar - xm_anchor)
+            ierr = -1
+            deallocate(dm_cap, weight)
+            return
+         end if
+
+         scale_low = 0d0
+         scale_high = 1d0
+         do iter = 1, 100
+            if (sum(min(scale_high*weight, dm_cap)) >= s%xmstar - xm_anchor) exit
+            scale_high = 2d0*scale_high
+         end do
+         if (iter > 100) then
+            write(*,*) 'failed to construct TDC temperature-gradient mesh'
+            ierr = -1
+            deallocate(dm_cap, weight)
+            return
+         end if
+         do iter = 1, 100
+            scale_mid = 0.5d0*(scale_low + scale_high)
+            if (sum(min(scale_mid*weight, dm_cap)) < s%xmstar - xm_anchor) then
+               scale_low = scale_mid
+            else
+               scale_high = scale_mid
+            end if
+         end do
+
+         weight = min(scale_high*weight, dm_cap)
+         current_sum = sum(weight)
+         scale = (s%xmstar - xm_anchor)/current_sum
+         weight = scale*weight
+
+         do i = 1, n_inner
+            k = nz_outer + i
+            s%dm(k) = weight(i)
+            xm(k + 1) = xm(k) + s%dm(k)
+         end do
+         xm(nz + 1) = s%xmstar
+         s%dm(nz) = xm(nz + 1) - xm(nz)
+
+         do k = nz_outer + 1, nz
+            if (s%dm(k) > ratio*(1d0 + 1d-10)*s%dm(k - 1) .or. &
+                  s%dm(k - 1) > ratio*(1d0 + 1d-10)*s%dm(k)) then
+               write(*,2) 'bad adjacent cell mass ratio in TDC mesh', &
+                  k, s%dm(k)/s%dm(k - 1), ratio
+               ierr = -1
+               exit
+            end if
+         end do
+
+         deallocate(dm_cap, weight)
+      end subroutine regularize_T_gradient_core_zoning
 
       subroutine interpolate1_face_val2(i, cntr_val)
          integer, intent(in) :: i
@@ -357,28 +538,29 @@ contains
          end do
       end subroutine interpolate1_cell_val2
 
-      subroutine interpolate1_xa2(j)
+      subroutine remap1_xa2(j)
          integer, intent(in) :: j
-         do k = 1, nz_old
-            v_old(k) = s%xa(j, k)
-         end do
-         call interpolate_vector_pm( &
-            nz_old, xm_mid_old, nz, xm_mid, v_old, v_new, work1, 'remesh_for_RSP2', ierr)
-         do k = 1, nz
-            s%xa(j, k) = v_new(k)
-         end do
-      end subroutine interpolate1_xa2
+         integer :: k_old, k_scan, k_new
+         real(dp) :: overlap, species_mass
 
-      subroutine rescale_xa2
-         integer :: k, j
-         real(dp) :: sum_xa
-         do k = 1, nz
-            sum_xa = sum(s%xa(1:s%species, k))
-            do j = 1, s%species
-               s%xa(j, k) = s%xa(j, k)/sum_xa
+         v_old(1:nz_old) = s%xa(j, 1:nz_old)
+         k_old = 1
+         do k_new = 1, nz
+            do while (k_old < nz_old .and. xm_old(k_old + 1) <= xm(k_new))
+               k_old = k_old + 1
             end do
+            species_mass = 0d0
+            k_scan = k_old
+            do while (k_scan <= nz_old .and. xm_old(k_scan) < xm(k_new + 1))
+               ! A mass-overlap average conserves the total mass of each species.
+               overlap = min(xm(k_new + 1), xm_old(k_scan + 1)) - &
+                  max(xm(k_new), xm_old(k_scan))
+               if (overlap > 0d0) species_mass = species_mass + overlap*v_old(k_scan)
+               k_scan = k_scan + 1
+            end do
+            s%xa(j, k_new) = species_mass/s%dm(k_new)
          end do
-      end subroutine rescale_xa2
+      end subroutine remap1_xa2
 
       subroutine revise_lnT_for_QHSE2(P_surf, ierr)
          use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results

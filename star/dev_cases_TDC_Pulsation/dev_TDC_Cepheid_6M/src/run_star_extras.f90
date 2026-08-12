@@ -44,7 +44,7 @@ module run_star_extras
    ! values specified on inlist_common, inlist_pulses
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
-   logical :: in_inlist_pulses, remesh_for_envelope_model, turn_off_remesh
+   logical :: in_inlist_pulses, turn_off_remesh
    integer :: kick_model_number, timestep_drop_model_number, turn_off_remesh_model_number
    integer :: initial_model_number
    real(dp) :: max_dt_before_pulse, max_dt_during_pulse
@@ -87,7 +87,6 @@ contains
       in_inlist_pulses = s%x_logical_ctrl(22)
       max_dt_before_pulse = s%x_ctrl(17)
       max_dt_during_pulse = s%x_ctrl(18)
-      remesh_for_envelope_model = s%x_logical_ctrl(23)
       turn_off_remesh = s%x_logical_ctrl(24)
       kick_model_number = s%x_ctrl(11)
       timestep_drop_model_number = s%x_ctrl(13)
@@ -378,10 +377,6 @@ contains
       end if
       !initial_model_number = 0 ! since we are setting model # to 0 in inlist_pulses
 
-      ! for rsp style mesh
-      if (.not. restart .and. in_inlist_pulses .and. remesh_for_envelope_model) then
-         call remesh_for_TDC_pulsation(id, ierr)
-      end if
    end subroutine extras_startup
 
    subroutine extras_after_evolve(id, ierr)
@@ -594,4 +589,3 @@ contains
    end subroutine photo_read
 
 end module run_star_extras
-

@@ -112,7 +112,9 @@ TDC
 -  ``TDC_num_innermost_cells_forced_nonturbulent`` : An optional control for forcing central zones to be radiative.
 -  ``TDC_num_outermost_cells_forced_nonturbulent`` : An optional control for forcing surface zones to be radiative.
 
-``star`` now contains optional controls allowing one to remesh an envelope model similar to ``RSP``, by calling the public ``remesh_for_TDC_pulsation`` function contained within ``$MESA_DIR/star/public/star_lib.f90`` :
+``star`` now contains optional controls allowing one to remesh an envelope model similar to ``RSP``.
+Set ``remesh_for_TDC_pulsations_when_load`` in ``controls`` to remesh a loaded model, or call
+the public ``remesh_for_TDC_pulsation`` function in ``$MESA_DIR/star/public/star_lib.f90``:
 
 -  ``TDC_hydro_nz`` : Analogous to ``RSP_nz``
 -  ``TDC_hydro_nz_outer`` : Analogous to ``RSP_nz_outer``
@@ -120,6 +122,8 @@ TDC
 -  ``TDC_hydro_dq_1_factor`` : Analogous to ``RSP_dq_1_factor``
 -  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantities are computed from simple averages or mass weighted averaging.
 -  ``remesh_for_TDC_pulsations_log_core_zoning`` : This option allows log zoning in the interior as opposed to a power law ( similar to ``RSP``).
+-  ``remesh_for_TDC_pulsations_use_T_gradient`` : This option adds interior mesh resolution
+   near sharp temperature gradients while retaining mass-based zoning.
 
 A new optional boundary condition ``use_RSP_L_eqn_outer_BC`` is available.
 

@@ -295,8 +295,6 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, i, k, nz
-         logical, parameter :: dbg = .false.
 
          include 'formats'
 
@@ -304,18 +302,13 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-
-         nz = s% nz
-
-         nvar_hydro_old = s% nvar_hydro
-
-         write(*,*) 'doing automatic RSP style remesh for TDC Pulsations'
+         write(*,*) 'doing automatic remesh for TDC pulsations'
          call remesh_for_TDC_pulsations(s,ierr)
          if (ierr /= 0) return
-         call set_qs(s, nz, s% q, s% dq, ierr)
+         call set_qs(s, s% nz, s% q, s% dq, ierr)
          if (ierr /= 0) return
          call set_m_and_dm(s)
-         call set_dm_bar(s, nz, s% dm, s% dm_bar)
+         call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
          call set_vars(s, s% dt, ierr)  ! redo after remesh_for_RSP2
          if (ierr /= 0) return
 

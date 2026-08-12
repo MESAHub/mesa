@@ -704,7 +704,9 @@
 
          logical :: split_merge_amr_avoid_repeated_remesh
 
-         logical :: remesh_for_TDC_pulsations_log_core_zoning
+         logical :: remesh_for_TDC_pulsations_when_load, &
+            remesh_for_TDC_pulsations_log_core_zoning, &
+            remesh_for_TDC_pulsations_use_T_gradient
          logical :: TDC_hydro_use_mass_interp_face_values
          integer :: TDC_hydro_nz, TDC_hydro_nz_outer
          real(dp) :: TDC_hydro_T_anchor, TDC_hydro_dq_1_factor

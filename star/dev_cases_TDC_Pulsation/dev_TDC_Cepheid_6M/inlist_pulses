@@ -65,8 +65,8 @@ cubic_interpolation_in_Z = .false.
    x_ctrl(10) = 0.3 ! min_period_div_target
 
 
-   ! new rsp style meshing, thanks to Bill P.
-   x_logical_ctrl(23) = .true. ! .true. = Remesh for TDC
+   ! TDC pulsation mesh
+   remesh_for_TDC_pulsations_when_load = .true.
    TDC_hydro_use_mass_interp_face_values = .true.
    TDC_hydro_nz = 150 
    TDC_hydro_nz_outer = 40 
