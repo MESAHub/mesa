@@ -250,7 +250,7 @@
 
       ! ::
 
-    use_face_reconstruction = .true.
+    use_face_reconstruction = .false.
 
 
       ! include_mlt_Pturb_in_thermodynamic_gradients
