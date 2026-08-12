@@ -20,7 +20,8 @@
       module struct_burn_mix
 
       use star_private_def
-      use const_def, only: dp, i8, ln10, secyer, lsun
+      use const_def, only: dp, i8, ln10, pi, secyer, lsun
+      use math_lib, only: pow3
       use utils_lib, only: is_bad
 
       implicit none
@@ -328,6 +329,12 @@
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% opacity_start(k) = s% opacity(k)
             s% m_grav_start(k) = s% m_grav(k)
+            if (s% r_start(k) > 0d0 .and. s% m_grav_start(k) > 0d0 .and. s% cgrav(k) > 0d0) then
+               s% dynamic_timescale_start(k) = &
+                  2d0*pi*sqrt(pow3(s% r_start(k))/(s% cgrav(k)*s% m_grav_start(k)))
+            else
+               s% dynamic_timescale_start(k) = 0d0
+            end if
          end do
 
          if (s% RSP2_flag) then
@@ -1210,5 +1217,4 @@
 
 
       end module struct_burn_mix
-
 

@@ -1567,6 +1567,7 @@
          do k=1,s% nz
             s% T_start(k) = -1d99
             s% r_start(k) = -1d99
+            s% dynamic_timescale_start(k) = -1d99
             s% rmid_start(k) = -1d99
             s% v_start(k) = -1d99
             s% u_start(k) = -1d99

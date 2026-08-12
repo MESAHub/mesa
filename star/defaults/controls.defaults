@@ -8496,7 +8496,10 @@
 
       ! only when v_flag = .true.. Adjusts both v and energy transfer from kinetic to thermal.
       ! only for v(k) when q(k) > min_q_for_drag.
-      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
+      ! drag_coefficient sets the drag rate relative to the local face
+      ! dynamical timescale at the start of the step. The effective implicit
+      ! per-step damping strength is
+      ! ``drag_coefficient*dt/max(dt,t_dyn_face)``.
       ! useful for preventing the development radial pulsations during advanced
       ! burning in massive stars and AGB stars.
 
