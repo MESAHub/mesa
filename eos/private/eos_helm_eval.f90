@@ -24,6 +24,7 @@
       use math_lib
       use eospc_eval
       use helm
+      use eos_timing, only: eos_timing_start, eos_timing_record_component
 
       implicit none
 
@@ -37,8 +38,11 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+            dye_dxa_in, dmc_dxa_in)
          use chem_lib, only: composition_info
+         use eos_composition_partials, only: want_eos_dxa_row
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -50,29 +54,43 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
          type (EoS_General_Info), pointer :: rq
          real(dp), dimension(nv) :: d_dabar, d_dzbar
          real(dp) :: helm_res(num_helm_results)
 
          real(dp) :: xh, xhe, zz, abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, sumx
          real(dp), dimension(species) :: dabar_dx, dzbar_dx, dmc_dx
-         integer :: i
+         integer :: i, row
+         integer :: time0, clock_rate
 
          rq => eos_handles(handle)
+         if (include_composition_partials) call eos_timing_start(time0, clock_rate)
          call Get_HELMEOS_Results( &
             rq, Z, abar, zbar, Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
             helm_res, skip, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            if (include_composition_partials) call eos_timing_record_component( &
+               i_eos_HELM, time0, clock_rate)
+            return
+         end if
 
-         ! need this call to get dabar_dx, dzbar_dx
-         ! might want to pass these in eventually
-         call composition_info( &
-            species, chem_id, xa, xh, xhe, zz, &
-            abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, &
-            sumx, dabar_dx, dzbar_dx, dmc_dx)
+         if (present(dabar_dxa_in) .and. present(dzbar_dxa_in)) then
+            dabar_dx = dabar_dxa_in
+            dzbar_dx = dzbar_dxa_in
+         else
+            call composition_info( &
+               species, chem_id, xa, xh, xhe, zz, &
+               abar_ci, zbar_ci, z2bar_ci, z53bar_ci, ye_ci, mass_correction, &
+               sumx, dabar_dx, dzbar_dx, dmc_dx)
+         end if
 
          ! zero these for now
          d_dabar(i_phase:i_latent_ddlnRho) = 0d0
@@ -80,9 +98,27 @@
          d_dabar(i_frac:i_frac+num_eos_frac_results-1) = 0d0
          d_dzbar(i_frac:i_frac+num_eos_frac_results-1) = 0d0
 
-         do i=1, species
-            d_dxa(:,i) = d_dabar(:)*dabar_dx(i) + d_dzbar(:)*dzbar_dx(i)
-         end do
+         if (present(dxa_rows)) then
+            do row = 1, size(dxa_rows)
+               if (dxa_rows(row) < 1 .or. dxa_rows(row) > nv) cycle
+               d_dxa(dxa_rows(row),:) = 0d0
+            end do
+            do i=1, species
+               do row = 1, size(dxa_rows)
+                  if (dxa_rows(row) < 1 .or. dxa_rows(row) > nv) cycle
+                  d_dxa(dxa_rows(row),i) = &
+                     d_dabar(dxa_rows(row))*dabar_dx(i) + d_dzbar(dxa_rows(row))*dzbar_dx(i)
+               end do
+            end do
+         else
+            d_dxa(:,:) = 0d0
+            do i=1, species
+               do row = 1, nv
+                  if (want_eos_dxa_row(row, dxa_rows)) &
+                     d_dxa(row,i) = d_dabar(row)*dabar_dx(i) + d_dzbar(row)*dzbar_dx(i)
+               end do
+            end do
+         end if
 
          ! zero phase information
          res(i_phase:i_latent_ddlnRho) = 0d0
@@ -96,6 +132,8 @@
 
          ! mark this one
          res(i_frac_HELM) = 1.0d0
+         if (include_composition_partials) call eos_timing_record_component( &
+            i_eos_HELM, time0, clock_rate)
 
       end subroutine get_helm_for_eosdt
 
@@ -282,7 +320,7 @@
          d_dabar_c_TRho(i_dE_dRho) = helm_res(h_deda)
          d_dabar_c_TRho(i_dS_dT) = helm_res(h_dsta)
          d_dabar_c_TRho(i_dS_dRho) = helm_res(h_dsda)
-         d_dabar_c_TRho(i_mu) = 0
+         d_dabar_c_TRho(i_mu) = 1d0/(1d0 + zbar)
          d_dabar_c_TRho(i_lnfree_e) = (helm_res(h_dxnea)/(avo*Rho))/free_e
          d_dabar_c_TRho(i_gamma1) = helm_res(h_dgam1da)
          d_dabar_c_TRho(i_gamma3) = helm_res(h_dgam3da)
@@ -300,7 +338,7 @@
          d_dzbar_c_TRho(i_dE_dRho) = helm_res(h_dedz)
          d_dzbar_c_TRho(i_dS_dT) = helm_res(h_dstz)
          d_dzbar_c_TRho(i_dS_dRho) = helm_res(h_dsdz)
-         d_dzbar_c_TRho(i_mu) = 0
+         d_dzbar_c_TRho(i_mu) = -mu/(1d0 + zbar)
          d_dzbar_c_TRho(i_lnfree_e) = (helm_res(h_dxnez)/(avo*Rho))/free_e
          d_dzbar_c_TRho(i_gamma1) = helm_res(h_dgam1dz)
          d_dzbar_c_TRho(i_gamma3) = helm_res(h_dgam3dz)

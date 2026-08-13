@@ -25,6 +25,7 @@ module eoscms_eval
    use utils_lib, only: is_bad, mesa_error
    use math_lib
    use interp_2d_lib_db
+   use eos_timing, only: eos_timing_start, eos_timing_record_component
 
    implicit none
 
@@ -153,8 +154,11 @@ contains
       species, chem_id, net_iso, xa, &
       rho, logRho, T, logT, remaining_fraction, &
       res, d_dlnd, d_dlnT, d_dxa, &
-      skip, ierr)
+      include_composition_partials, skip, ierr, dxa_rows, &
+      dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+      dye_dxa_in, dmc_dxa_in)
       use chem_def, only: chem_isos
+      use eos_composition_partials, only: want_eos_dxa_row
       use interp_1d_lib, only: interp_4pt_pm
       integer, intent(in) :: handle
       logical, intent(in) :: dbg
@@ -166,16 +170,23 @@ contains
       real(dp), intent(inout), dimension(nv) :: &
          res, d_dlnd, d_dlnT
       real(dp), intent(inout), dimension(nv, species) :: d_dxa
+      logical, intent(in) :: include_composition_partials
       logical, intent(out) :: skip
       integer, intent(out) :: ierr
-      integer :: iX, i
+      integer, intent(in), optional :: dxa_rows(:)
+      real(dp), intent(in), optional :: &
+         dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+         dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
+      integer :: iX, i, row
       type (EoS_General_Info), pointer :: rq
       real(dp) :: res1(nv), res2(nv), res3(nv), res4(nv)
       real(dp) :: dres1_dlnT(nv), dres2_dlnT(nv), dres3_dlnT(nv), dres4_dlnT(nv)
       real(dp) :: dres1_dlnRho(nv), dres2_dlnRho(nv), dres3_dlnRho(nv), dres4_dlnRho(nv)
       real(dp) :: d_dX(nv)
       real(dp) :: alfa, beta, dbeta_dX, dalfa_dX, xx(4), y(4), a(3), dX
+      integer :: time0, clock_rate
       rq => eos_handles(handle)
+      if (include_composition_partials) call eos_timing_start(time0, clock_rate)
 
       if(rq% CMS_use_fixed_composition)then  !do fixed composition (one table only)
 
@@ -261,16 +272,33 @@ contains
          end if
 
          ! composition derivatives
-         do i=1,species
-            select case(chem_isos% Z(chem_id(i)))  ! charge
-            case (1)  ! X
-               d_dxa(:,i) = d_dX
-            case (2)  ! Y
-               d_dxa(:,i) = 0
-            case default  ! Z
-               d_dxa(:,i) = 0
-            end select
-         end do
+         if (present(dxa_rows)) then
+            do row = 1, size(dxa_rows)
+               if (dxa_rows(row) < 1 .or. dxa_rows(row) > nv) cycle
+               d_dxa(dxa_rows(row),:) = 0d0
+            end do
+            do i=1,species
+               if (chem_isos% Z(chem_id(i)) /= 1) cycle
+               do row = 1, size(dxa_rows)
+                  if (dxa_rows(row) < 1 .or. dxa_rows(row) > nv) cycle
+                  d_dxa(dxa_rows(row),i) = d_dX(dxa_rows(row))
+               end do
+            end do
+         else
+            d_dxa(:,:) = 0d0
+            do i=1,species
+               select case(chem_isos% Z(chem_id(i)))  ! charge
+               case (1)  ! X
+                  do row = 1, nv
+                     if (want_eos_dxa_row(row, dxa_rows)) d_dxa(row,i) = d_dX(row)
+                  end do
+               case (2)  ! Y
+                  d_dxa(:,i) = 0
+               case default  ! Z
+                  d_dxa(:,i) = 0
+               end select
+            end do
+         end if
 
       end if
 
@@ -287,14 +315,18 @@ contains
       res(i_phase:i_latent_ddlnRho) = 0d0
       d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
       d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
+      d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
 
       ! zero all components
       res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
       d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
       d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+      d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
       ! mark this one
       res(i_frac_CMS) = 1.0d0
+      if (include_composition_partials) call eos_timing_record_component( &
+         i_eos_CMS, time0, clock_rate)
 
    end subroutine get_CMS_for_eosdt
 

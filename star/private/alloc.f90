@@ -464,6 +464,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action
+         integer :: num_eos_dxa_results
          type (star_info), pointer :: c
          character (len=128) :: null_str
 
@@ -478,6 +479,8 @@
          nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nvar_chem = s% nvar_chem
+         num_eos_dxa_results = num_eos_d_dxa_results
+         if (s% include_eos_composition_partials) num_eos_dxa_results = num_eos_basic_results
 
          c => s
          action = action_in
@@ -719,7 +722,7 @@
             if (failed('d_eos_dlnd')) exit
             call do2(s% d_eos_dlnT, c% d_eos_dlnT, num_eos_basic_results, 'd_eos_dlnT')
             if (failed('d_eos_dlnT')) exit
-            call do3(s% d_eos_dxa, c% d_eos_dxa, num_eos_d_dxa_results, species)
+            call do3(s% d_eos_dxa, c% d_eos_dxa, num_eos_dxa_results, species)
             if (failed('d_eos_dxa')) exit
 
             call do1(s% chiRho_for_partials, c% chiRho_for_partials)

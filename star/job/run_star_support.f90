@@ -539,6 +539,7 @@
          end if
 
          if (s% doing_timing) then
+            call eos_set_dxa_timing_enabled(.true.)
             call system_clock(s% job% time0_extra,s% job% clock_rate)
             s% job% check_time_start = eval_total_times(s% id, ierr)
          end if
@@ -1137,6 +1138,8 @@
       subroutine show_times(id, s)
          use utils_lib, only: utils_OMP_GET_MAX_THREADS
          use num_lib, only: qsort
+         use eos_def, only: num_eos_frac_results, i_eos_HELM, i_eos_OPAL_SCVH, &
+            i_eos_FreeEOS, i_eos_PC, i_eos_Skye, i_eos_CMS, i_eos_ideal
 
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -1148,6 +1151,16 @@
          integer, pointer :: index(:)
          integer :: ierr, omp_num_threads, item_num, num_items, i, j
          real(dp) :: total, tmp
+         real(dp) :: eos_component_time(num_eos_frac_results)
+         real(dp) :: eos_table_eval_time(num_eos_frac_results)
+         real(dp) :: eos_table_expand_time(num_eos_frac_results)
+         real(dp) :: skye_dxa_time(3)
+         real(dp) :: eos_moments_time, eos_blend_time, eos_check_time
+         integer :: eos_component_count(num_eos_frac_results)
+         integer :: eos_table_eval_count(num_eos_frac_results)
+         integer :: eos_table_expand_count(num_eos_frac_results)
+         integer :: skye_dxa_count(3)
+         integer :: eos_moments_count, eos_blend_count, eos_check_count
          include 'formats'
          ierr = 0
          omp_num_threads = utils_OMP_GET_MAX_THREADS()
@@ -1162,6 +1175,67 @@
             s% total_num_solver_iterations
          write(*,'(a50,i18)') 'timing_num_get_eos_calls', &
             s% timing_num_get_eos_calls
+         write(*,'(a50,i18)') 'timing_num_get_eos_dxa_calls', &
+            s% timing_num_get_eos_dxa_calls
+         write(*,'(a50,i18)') 'timing_num_get_eos_dxa_skye_calls', &
+            s% timing_num_get_eos_dxa_skye_calls
+         if (s% timing_num_get_eos_dxa_calls > 0) &
+            write(*,'(a50,1pe18.6)') 'timing_avg_get_eos_dxa_frac_Skye', &
+               s% timing_sum_get_eos_dxa_frac_Skye/dble(s% timing_num_get_eos_dxa_calls)
+         write(*,'(a50,1pe18.6)') 'thread_time_eos_dxa', s% time_eos_dxa
+         if (omp_num_threads > 0) &
+            write(*,'(a50,1pe18.6)') 'thread_time_eos_dxa/threads', &
+               s% time_eos_dxa/dble(omp_num_threads)
+         call eos_get_dxa_timing( &
+            eos_component_time, eos_component_count, &
+            eos_table_eval_time, eos_table_eval_count, &
+            eos_table_expand_time, eos_table_expand_count, &
+            skye_dxa_time, skye_dxa_count, eos_moments_time, eos_moments_count, &
+            eos_blend_time, eos_blend_count, eos_check_time, eos_check_count)
+         if (s% time_eos_dxa > 0d0) then
+            write(*,'(A)')
+            write(*,'(a50,a18,a12)') 'eos dxa timing breakdown', 'thread seconds', 'calls'
+            call write_eos_dxa_time('thread_eos_dxa_moments', eos_moments_time, eos_moments_count)
+            call write_eos_dxa_time('thread_eos_dxa_blend', eos_blend_time, eos_blend_count)
+            call write_eos_dxa_time('thread_eos_dxa_check', eos_check_time, eos_check_count)
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_HELM', eos_component_time(i_eos_HELM), &
+               eos_component_count(i_eos_HELM))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_OPAL_SCVH', eos_component_time(i_eos_OPAL_SCVH), &
+               eos_component_count(i_eos_OPAL_SCVH))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_FreeEOS', eos_component_time(i_eos_FreeEOS), &
+               eos_component_count(i_eos_FreeEOS))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_PC', eos_component_time(i_eos_PC), &
+               eos_component_count(i_eos_PC))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_Skye', eos_component_time(i_eos_Skye), &
+               eos_component_count(i_eos_Skye))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_CMS', eos_component_time(i_eos_CMS), &
+               eos_component_count(i_eos_CMS))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_ideal', eos_component_time(i_eos_ideal), &
+               eos_component_count(i_eos_ideal))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_FreeEOS_table', eos_table_eval_time(i_eos_FreeEOS), &
+               eos_table_eval_count(i_eos_FreeEOS))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_FreeEOS_XZ', eos_table_expand_time(i_eos_FreeEOS), &
+               eos_table_expand_count(i_eos_FreeEOS))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_OPAL_table', eos_table_eval_time(i_eos_OPAL_SCVH), &
+               eos_table_eval_count(i_eos_OPAL_SCVH))
+            call write_eos_dxa_time( &
+               'thread_eos_dxa_OPAL_XZ', eos_table_expand_time(i_eos_OPAL_SCVH), &
+               eos_table_expand_count(i_eos_OPAL_SCVH))
+            call write_eos_dxa_time('thread_skye_dxa_ideal', skye_dxa_time(1), skye_dxa_count(1))
+            call write_eos_dxa_time('thread_skye_dxa_coul', skye_dxa_time(2), skye_dxa_count(2))
+            call write_eos_dxa_time('thread_skye_dxa_pack', skye_dxa_time(3), skye_dxa_count(3))
+            write(*,'(A)')
+         end if
          write(*,'(a50,i18)') 'timing_num_solve_eos_calls', &
             s% timing_num_solve_eos_calls
          write(*,'(a50,i18)') 'timing_num_get_kap_calls', &
@@ -1230,6 +1304,15 @@
             item_values(item_num) = value
             total = total + value
          end subroutine save1
+
+
+         subroutine write_eos_dxa_time(name, value, count)
+            character (len=*), intent(in) :: name
+            real(dp), intent(in) :: value
+            integer, intent(in) :: count
+            if (value <= 0d0 .and. count == 0) return
+            write(*,'(a50,1pe18.6,i12)') name, value, count
+         end subroutine write_eos_dxa_time
 
 
       end subroutine show_times

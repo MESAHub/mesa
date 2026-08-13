@@ -250,9 +250,49 @@ contains
 
     if (dbg) write(*,*) 'do_eos call foreach_cell', nzlo, nzhi
 
+    if (s% include_eos_composition_partials) then
+       call ensure_full_eos_dxa(s, ierr)
+       if (ierr /= 0) return
+    end if
+
     call foreach_cell(s,nzlo,nzhi,use_omp,do_eos_for_cell,ierr)
 
   end subroutine do_eos
+
+
+  subroutine ensure_full_eos_dxa(s, ierr)
+
+    use eos_def, only: num_eos_basic_results
+
+    type (star_info), pointer :: s
+    integer, intent(out) :: ierr
+
+    integer :: old_rows, rows_to_copy, nz_alloc
+    real(dp), allocatable :: old_d_eos_dxa(:,:,:)
+
+    ierr = 0
+    if (associated(s% d_eos_dxa)) then
+       if (size(s% d_eos_dxa, dim=1) >= num_eos_basic_results) return
+       old_rows = size(s% d_eos_dxa, dim=1)
+       nz_alloc = size(s% d_eos_dxa, dim=3)
+       allocate(old_d_eos_dxa(old_rows,s% species,nz_alloc), stat=ierr)
+       if (ierr /= 0) return
+       old_d_eos_dxa = s% d_eos_dxa
+       deallocate(s% d_eos_dxa)
+    else
+       old_rows = 0
+       nz_alloc = max(s% nz, s% prev_mesh_nz) + nz_alloc_extra
+    end if
+
+    allocate(s% d_eos_dxa(num_eos_basic_results,s% species,nz_alloc), stat=ierr)
+    if (ierr /= 0) return
+    s% d_eos_dxa = 0d0
+    if (old_rows > 0) then
+       rows_to_copy = min(old_rows, num_eos_basic_results)
+       s% d_eos_dxa(1:rows_to_copy,:,:) = old_d_eos_dxa(1:rows_to_copy,:,:)
+    end if
+
+  end subroutine ensure_full_eos_dxa
 
 
   subroutine set_eos_with_mask (s,nzlo,nzhi,mask,ierr)
@@ -268,6 +308,11 @@ contains
     ierr = 0
 
     if (dbg) write(*,*) 'set_eos_with_mask'
+
+    if (s% include_eos_composition_partials) then
+       call ensure_full_eos_dxa(s, ierr)
+       if (ierr /= 0) return
+    end if
 
     !$OMP PARALLEL DO PRIVATE(ierr) SCHEDULE(dynamic,2)
     do k = nzlo, nzhi
@@ -354,11 +399,27 @@ contains
           s% solver_iter == s% solver_test_partials_iter_number )
     end if
 
-    call get_eos( &
-         s, k, s% xa(:,k), &
-         s% rho(k), logRho, s% T(k), logT, &
-         res, s% d_eos_dlnd(:,k), s% d_eos_dlnT(:,k), &
-         s% d_eos_dxa(:,:,k), ierr)
+    if (s% include_eos_composition_partials) then
+       if (size(s% d_eos_dxa,dim=1) < num_eos_basic_results) then
+          s% retry_message = 'd_eos_dxa not allocated for full eos composition partials'
+          ierr = -1
+          return
+       end if
+       ! cheaper wrapper: the star solve needs only lnPgas and lnE dxa rows.
+       call get_eos_star_dxa( &
+            s, k, s% xa(:,k), &
+            s% rho(k), logRho, s% T(k), logT, &
+            s% X(k), s% Z(k), s% abar(k), s% zbar(k), &
+            s% z2bar(k), s% z53bar(k), s% ye(k), s% mass_correction(k), sumx, &
+            res, s% d_eos_dlnd(:,k), s% d_eos_dlnT(:,k), &
+            s% d_eos_dxa(:,:,k), ierr)
+    else
+       call get_eos( &
+            s, k, s% xa(:,k), &
+            s% rho(k), logRho, s% T(k), logT, &
+            res, s% d_eos_dlnd(:,k), s% d_eos_dlnT(:,k), &
+            s% d_eos_dxa(:,:,k), ierr)
+    end if
     if (ierr /= 0) then
        if (s% report_ierr) then
           write(*, *) s% retry_message
@@ -422,7 +483,7 @@ contains
     type (star_info), pointer :: s
     integer, intent(in) :: k
     real(dp), intent(in), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
-    real(dp), intent(in) :: d_dxa(num_eos_d_dxa_results,s% species)
+    real(dp), intent(in) :: d_dxa(:,:)
     integer, intent(out) :: ierr
 
     integer :: i, j
@@ -441,6 +502,32 @@ contains
              write(*,2) trim(eosDT_result_names(i)), k, res(i)
              write(*,2) 'd_dlnd ' // trim(eosDT_result_names(i)), k, d_dlnd(i)
              write(*,2) 'd_dlnT ' // trim(eosDT_result_names(i)), k, d_dlnT(i)
+             write(*,'(A)')
+             call write_eos_call_info(s,k)
+             !$OMP end critical (micro_crit0)
+          end if
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
+          return
+       end if
+    end do
+
+    ! Catch bad composition rows before they enter the hydro Jacobian.
+    do j=1, s% species
+       if (is_bad(d_dxa(i_lnPgas,j) + d_dxa(i_lnE,j))) then
+          ierr = -1
+          s% retry_message = 'bad eos composition partial'
+          if (s% report_ierr) then
+             !$OMP critical (micro_crit0)
+             write(*,2) 'bad d_dxa lnPgas ' // trim(s% nameofequ(j+s% nvar_hydro)), &
+                k, d_dxa(i_lnPgas,j)
+             write(*,2) 'bad d_dxa lnE ' // trim(s% nameofequ(j+s% nvar_hydro)), &
+                k, d_dxa(i_lnE,j)
+             write(*,2) 'eos_frac_OPAL_SCVH', k, res(i_frac_OPAL_SCVH)
+             write(*,2) 'eos_frac_HELM', k, res(i_frac_HELM)
+             write(*,2) 'eos_frac_Skye', k, res(i_frac_Skye)
+             write(*,2) 'eos_frac_PC', k, res(i_frac_PC)
+             write(*,2) 'eos_frac_FreeEOS', k, res(i_frac_FreeEOS)
+             write(*,2) 'eos_frac_CMS', k, res(i_frac_CMS)
              write(*,'(A)')
              call write_eos_call_info(s,k)
              !$OMP end critical (micro_crit0)

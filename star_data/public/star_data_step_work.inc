@@ -1195,6 +1195,9 @@
             time_set_mixing_info, &
             time_total
             ! change total_times function in star_utils if change this list
+         real(dp) :: time_eos_dxa  ! subset of time_eos
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
+         integer :: timing_num_get_eos_dxa_calls, timing_num_get_eos_dxa_skye_calls
+         real(dp) :: timing_sum_get_eos_dxa_frac_Skye
 
          real(dp), dimension(:,:),pointer :: raw_rate, screened_rate, eps_neu_rate, eps_nuc_rate !(num_reactions, nz)

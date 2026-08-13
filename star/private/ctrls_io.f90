@@ -149,7 +149,7 @@
     predictive_bdy_q_min, predictive_bdy_q_max, T_mix_limit, RSP_report_undercorrections, &
     do_conv_premix, conv_premix_avoid_increase, conv_premix_time_factor, &
     conv_premix_fix_pgas, conv_premix_dump_snapshots, do_premix_heating, &
-    overshoot_f, overshoot_f2, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
+    overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, dq_D_mix_zero_at_H_C_crossover, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, max_conv_vel_div_csound, &
@@ -350,7 +350,8 @@
     max_logT_for_opacity_factor_on, max_logT_for_opacity_factor_off, &
     non_nuc_neu_factor, &
     use_time_centered_eps_grav, &
-    use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
+    use_mass_corrections, include_eos_composition_partials, &
+    use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, &
     include_composition_in_eps_grav, no_dedt_form_during_relax, &
     max_abs_rel_change_surf_lnS, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
@@ -1089,7 +1090,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% do_premix_heating = do_premix_heating
 
  s% overshoot_f = overshoot_f
- s% overshoot_f2 = overshoot_f2
  s% overshoot_f0 = overshoot_f0
  s% overshoot_D0 = overshoot_D0
  s% overshoot_Delta0 = overshoot_Delta0
@@ -1824,6 +1824,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
  s% dedt_eqn_r_scale = dedt_eqn_r_scale
  s% use_mass_corrections = use_mass_corrections
+ s% include_eos_composition_partials = include_eos_composition_partials
  s% use_gravity_rotation_correction = use_gravity_rotation_correction
  s% eps_grav_factor = eps_grav_factor
  s% eps_mdot_factor = eps_mdot_factor
@@ -2814,7 +2815,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  do_premix_heating = s% do_premix_heating
 
  overshoot_f = s% overshoot_f
- overshoot_f2 = s% overshoot_f2
  overshoot_f0 = s% overshoot_f0
  overshoot_D0 = s% overshoot_D0
  overshoot_Delta0 = s% overshoot_Delta0
@@ -3540,6 +3540,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
  dedt_eqn_r_scale = s% dedt_eqn_r_scale
  use_mass_corrections = s% use_mass_corrections
+ include_eos_composition_partials = s% include_eos_composition_partials
  use_gravity_rotation_correction = s% use_gravity_rotation_correction
  eps_grav_factor = s% eps_grav_factor
  eps_mdot_factor = s% eps_mdot_factor

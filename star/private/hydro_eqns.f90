@@ -128,7 +128,7 @@
          do k = nzlo, nzhi
             op_err = 0
             ! hack for composition partials
-            if (s% fix_d_eos_dxa_partials) then
+            if (s% fix_d_eos_dxa_partials .and. .not. s% include_eos_composition_partials) then
                call fix_d_eos_dxa_partials(s, k, op_err)
                if (op_err /= 0) then
                   if (s% report_ierr) write(*,2) 'ierr from fix_d_eos_dxa_partials', k

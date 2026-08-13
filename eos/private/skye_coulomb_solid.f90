@@ -21,6 +21,7 @@ module skye_coulomb_solid
    use math_lib
    use math_def
    use auto_diff
+   use skye_composition_ad
    use const_def, only: dp, pi, fine, eulernum
 
    implicit none
@@ -60,6 +61,25 @@ module skye_coulomb_solid
       F = F * exp(-(B1 / A1) * TPT2)  ! suppress.factor of classical anharmonicity
       F = F - B1 * TPT2 / GAMI  ! Quantum correction
    end function ocp_solid_anharmonic_free_energy
+
+
+   function ocp_solid_anharmonic_free_energy_dxa(GAMI,TPT) result(F)
+      type(skye_composition_ad_real), intent(in) :: GAMI,TPT
+      type(skye_composition_ad_real) :: F
+
+      real(dp), parameter :: A1 = 10.9d0
+      real(dp), parameter :: A2 = 247d0
+      real(dp), parameter :: A3 = 1.765d5
+      real(dp), parameter :: B1 = 0.12d0
+
+      type(skye_composition_ad_real) :: TPT2
+
+      TPT2=TPT*TPT
+
+      F = -(A1 / GAMI + A2 / (2d0 * pow2(GAMI)) + A3 / (3d0 * pow3(GAMI)))
+      F = F * exp(-(B1 / A1) * TPT2)
+      F = F - B1 * TPT2 / GAMI
+   end function ocp_solid_anharmonic_free_energy_dxa
 
    !> Computes the harmonic non-ideal free energy of a
    !! one-component plasma in the solid phase using fits due to
@@ -144,6 +164,71 @@ module skye_coulomb_solid
 
    end function ocp_solid_harmonic_free_energy
 
+
+   function ocp_solid_harmonic_free_energy_dxa(GAMI,TPT_in) result(F)
+      ! Inputs
+      type(skye_composition_ad_real), intent(in) :: GAMI,TPT_in
+
+      ! Intermediates
+      type(skye_composition_ad_real) :: TPT, UP, DN, EA, EB, EG, E0
+      type(skye_composition_ad_real) :: Fth, U0
+
+      ! Output
+      type(skye_composition_ad_real) :: F
+
+      real(dp), parameter :: CM = .895929256d0
+      real(dp), parameter :: EPS=1d-5
+
+      real(dp), parameter :: CLM=-2.49389d0
+      real(dp), parameter :: U1=0.5113875d0
+      real(dp), parameter :: ALPHA=0.265764d0
+      real(dp), parameter :: BETA=0.334547d0
+      real(dp), parameter :: GAMMA=0.932446d0
+      real(dp), parameter :: A1=0.1839d0
+      real(dp), parameter :: A2=0.593586d0
+      real(dp), parameter :: A3=0.0054814d0
+      real(dp), parameter :: A4=5.01813d-4
+      real(dp), parameter :: A6=3.9247d-7
+      real(dp), parameter :: A8=5.8356d-11
+      real(dp), parameter :: B0=261.66d0
+      real(dp), parameter :: B2=7.07997d0
+      real(dp), parameter :: B4=0.0409484d0
+      real(dp), parameter :: B5=0.000397355d0
+      real(dp), parameter :: B6=5.11148d-5
+      real(dp), parameter :: B7=2.19749d-6
+      real(dp), parameter :: C9=0.004757014d0
+      real(dp), parameter :: C11=0.0047770935d0
+      real(dp), parameter :: B9=A6*C9
+      real(dp), parameter :: B11=A8*C11
+
+
+      TPT = TPT_in
+
+      if (TPT > 1d0/EPS) then
+         F=-1d0 / (C11*TPT*TPT*TPT)
+      else if (TPT < EPS) then
+         F=3d0*log(TPT)+CLM-1.5d0*U1*TPT+TPT*TPT/24.d0
+      else
+         UP=1d0+TPT*(A1+TPT*(A2+TPT*(A3+TPT*(A4+TPT*TPT*(A6+TPT*TPT*A8)))))
+         DN=B0+TPT*TPT*(B2+TPT*TPT*(B4+TPT*(B5+TPT*(B6+ &
+            TPT*(B7+TPT*TPT*(B9+TPT*TPT*B11))))))
+
+         EA=exp(-ALPHA*TPT)
+         EB=exp(-BETA*TPT)
+         EG=exp(-GAMMA*TPT)
+
+         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN
+      end if
+
+      U0=-CM*GAMI
+      E0=1.5d0*U1*TPT
+      Fth=F+E0
+      F=U0+Fth
+
+      F = F -3d0 * log(TPT) + 1.5d0*log(GAMI) + 1.323515d0
+
+   end function ocp_solid_harmonic_free_energy_dxa
+
    !> Calculates an exponential with cutoffs to prevent over/underflow.
    !!
    !! @param x Input to take the exponential of.
@@ -153,6 +238,12 @@ module skye_coulomb_solid
       ex = exp(max(-1d2,min(1d2,x)))
    end function safe_exp
 
+
+   type(skye_composition_ad_real) function safe_exp_dxa(x) result(ex)
+      type(skye_composition_ad_real), intent(in) :: x
+      ex = exp(max(-1d2,min(1d2,x)))
+   end function safe_exp_dxa
+
    !> Calculates a tanh with cutoffs to prevent over/underflow.
    !!
    !! @param x Input to take the exponential of.
@@ -161,6 +252,12 @@ module skye_coulomb_solid
       type(auto_diff_real_2var_order3), intent(in) :: x
       th = tanh(max(-1d2,min(1d2,x)))
    end function safe_tanh
+
+
+   type(skye_composition_ad_real) function safe_tanh_dxa(x) result(th)
+      type(skye_composition_ad_real), intent(in) :: x
+      th = tanh(max(-1d2,min(1d2,x)))
+   end function safe_tanh_dxa
 
    !> Calculates the electron-ion screening corrections to the free energy
    !! of a one-component plasma in the solid phase using the fits of Potekhin & Chabrier 2013.
@@ -213,6 +310,50 @@ module skye_coulomb_solid
 
    end function ocp_solid_screening_free_energy_correction
 
+
+   function ocp_solid_screening_free_energy_correction_dxa(Z, mi, ge, rs) result(F)
+         use skye_coulomb_liquid, only: me_in_amu, ocp_liquid_screening_free_energy_correction_dxa
+         real(dp), intent(in) :: Z, mi
+         type(skye_composition_ad_real), intent(in) :: ge, rs
+
+         real(dp) :: s, b1, b2, b3, b4, COTPT
+         real(dp), parameter :: aTF = 0.00352d0
+
+         type(skye_composition_ad_real) :: TPT, f_inf, A, Q, xr, supp
+         type(skye_composition_ad_real) :: g, alpha, Fliq, gr, switch, F
+
+         s = 1d0 / (1d0 + 1d-2 * pre_z(int(Z))% logz_3_2 + 0.097d0 / pre_z(int(Z))% z2)
+         b1 = 1d0 - 1.1866d0 * pre_z(int(Z))% zm0p267 + 0.27d0 / Z
+         b2 = 1d0 + (2.25d0 * pre_z(int(Z))% zm1_3) * &
+              (1d0 + 0.684d0 * pre_z(int(Z))% z5 + 0.222d0 * pre_z(int(Z))% z6) / &
+              (1d0 + 0.222d0 * pre_z(int(Z))% z6)
+         b3 = 41.5d0 / (1d0 + pre_z(int(Z))% logz)
+         b4 = 0.395d0 * pre_z(int(Z))% logz + 0.347d0 * pre_z(int(Z))% zm3_2
+
+         g = ge * pre_z(int(Z))% z5_3
+
+         COTPT = sqrt(3d0 * me_in_amu / mi) / pre_z(int(Z))% z7_6
+         TPT = g * COTPT / sqrt(RS)
+         supp = safe_exp_dxa(-pow2(0.205d0 * TPT))
+         Q = sqrt((pow2(0.205d0 * TPT) + log(1d0 + supp)) / &
+              log(eulernum - (eulernum - 2d0) * supp))
+
+         xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
+         A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
+         f_inf = aTF * pre_z(int(Z))% z2_3 * b1 * sqrt(1d0 + b2 / pow2(xr))
+
+         F = -f_inf * g * (1d0 + A * pow(Q / g, s))
+
+         gr = sqrt(1d0 + pow2(xr))
+         alpha = 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0) * (rs / ge) * gr
+
+         Fliq = ocp_liquid_screening_free_energy_correction_dxa(Z, mi, ge, rs)
+
+         switch = pow3(safe_tanh_dxa(2d0*alpha))
+         F = switch * Fliq + (1d0 - switch) * F
+
+   end function ocp_solid_screening_free_energy_correction_dxa
+
    !> Computes the correction deltaG to the linear mixing rule for a two-component Coulomb solid mixture.
    !! From Shuji Ogata, Hiroshi Iyetomi, and Setsuo Ichimaru 1993
    !!
@@ -238,6 +379,26 @@ module skye_coulomb_solid
 
    end function deltaG_Ogata93
 
+
+   function deltaG_Ogata93_dxa(x2, Rz) result(dG)
+      ! Inputs
+      type(skye_composition_ad_real), intent(in) :: x2
+      real(dp), intent(in) :: Rz
+
+      ! Intermediates
+      real(dp) :: CR
+
+      ! Output
+      type(skye_composition_ad_real) :: dG
+
+      CR = 0.05d0 * pow2(Rz - 1d0) / &
+         ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
+      dG = CR / (1 + &
+           (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) &
+           * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
+
+   end function deltaG_Ogata93_dxa
+
    !> Computes the correction deltaG to the linear mixing rule for a two-component Coulomb solid mixture.
    !! Originally from PhysRevE.79.016411 (Equation of state of classical Coulomb plasma mixtures)
    !! by Potekhin, Alexander Y. and Chabrier, Gilles and Rogers, Forrest J.
@@ -257,6 +418,24 @@ module skye_coulomb_solid
       dG = 0.012d0 * ((x*(1d0-x)) / (x2*(1d0-x2))) * (1d0 - 1d0/pow2(Rz)) * (1d0 - x2 + x2 * pow(Rz,5d0/3d0))
 
    end function deltaG_PC13
+
+
+   function deltaG_PC13_dxa(x2, Rz) result(dG)
+      ! Inputs
+      type(skye_composition_ad_real), intent(in) :: x2
+      real(dp), intent(in) :: Rz
+
+      ! Intermediates
+      type(skye_composition_ad_real) :: x
+
+      ! Output
+      type(skye_composition_ad_real) :: dG
+
+      x = x2 / Rz + (1d0 - 1d0 / Rz) * pow(x2, Rz)
+      dG = 0.012d0 * ((x*(1d0-x)) / (x2*(1d0-x2))) * &
+         (1d0 - 1d0/pow2(Rz)) * (1d0 - x2 + x2 * pow(Rz,5d0/3d0))
+
+   end function deltaG_PC13_dxa
 
    !> Calculates the correction to the linear mixing rule for a Coulomb solid mixture
    !! by extending a two-component deltaG prescription to the multi-component case, using the
@@ -343,6 +522,83 @@ module skye_coulomb_solid
          end do
       end do
    end function solid_mixing_rule_correction
+
+
+   function solid_mixing_rule_correction_dxa( &
+         Skye_solid_mixing_rule, n, AY, dAY, AZion, GAME) result(F)
+      ! Inputs
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
+      integer, intent(in) :: n
+      real(dp), intent(in) :: AZion(:), AY(:), dAY(:)
+      type(skye_composition_ad_real), intent(in) :: GAME
+
+      ! Intermediates
+      integer :: i,j, num_unique_charges
+      real(dp) :: unique_charges(n)
+      type(skye_composition_ad_real) :: charge_abundances(n)
+      type(auto_diff_real_2var_order3) :: AY_ad, dAY_ad
+      logical :: found
+      integer :: found_index
+      real(dp) :: RZ
+      type(skye_composition_ad_real) :: aj, dG, GAMI
+
+      ! Output
+      type(skye_composition_ad_real) :: F
+
+      ! Parameters
+      real(dp), parameter :: C = 0.012d0
+      real(dp), parameter :: eps = 1d-40
+
+      ! Identify and group unique charges
+      num_unique_charges = 0
+      do i=1,n
+         found = .false.
+
+         do j=1,num_unique_charges
+            if (unique_charges(j) == AZion(i)) then
+               found = .true.
+               found_index = j
+               exit
+            end if
+         end do
+
+         AY_ad = AY(i)
+         dAY_ad = dAY(i)
+         if (.not. found) then
+            num_unique_charges = num_unique_charges + 1
+            unique_charges(num_unique_charges) = AZion(i)
+            charge_abundances(num_unique_charges) = make_skye_composition_ad(AY_ad, dAY_ad)
+         else
+            charge_abundances(found_index) = charge_abundances(found_index) + &
+               make_skye_composition_ad(AY_ad, dAY_ad)
+         end if
+      end do
+
+      F = 0d0
+      do i=1,num_unique_charges
+         if (unique_charges(i) == 0d0) cycle
+         do j=1,num_unique_charges
+            if (unique_charges(j) == 0d0) cycle
+
+            if (unique_charges(j) < unique_charges(i)) cycle
+
+            RZ = unique_charges(j)/unique_charges(i)
+
+            aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))
+            if (Skye_solid_mixing_rule == 'Ogata') then
+               dG = deltaG_Ogata93_dxa(aj, RZ)
+            else if (Skye_solid_mixing_rule == 'PC') then
+               dG = deltaG_PC13_dxa(aj, RZ)
+            else
+               write(*,*) 'Error: Invalid choice for Skye_solid_mixing_rule.'
+               stop
+            end if
+
+            GAMI=pow(unique_charges(i),5d0/3d0)*GAME
+            F = F +  GAMI * (charge_abundances(i) * charge_abundances(j) * dG)
+         end do
+      end do
+   end function solid_mixing_rule_correction_dxa
 
 
 end module skye_coulomb_solid

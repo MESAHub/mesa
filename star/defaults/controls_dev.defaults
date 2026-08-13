@@ -170,6 +170,19 @@
     use_mass_corrections = .false.
 
 
+      ! include_eos_composition_partials
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, use analytic EOS composition partials for the hydro
+      ! Jacobian.  This is a development option while the composition
+      ! derivatives are being tested.  When using Skye, this requires
+      ! ``mass_fraction_limit_for_Skye = 1d-16``.
+
+      ! ::
+
+    include_eos_composition_partials = .false.
+
+
       ! phase_separation_no_diffusion
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

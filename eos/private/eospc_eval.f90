@@ -23,6 +23,7 @@
       use const_def, only: dp, qe, qp, avo, crad, ln10, arg_not_provided, amu, kerg, one_third, four_thirds_pi
       use utils_lib, only: is_bad, mesa_error
       use math_lib
+      use eos_timing, only: eos_timing_start, eos_timing_record_component
 
       implicit none
 
@@ -31,15 +32,17 @@
       subroutine Get_PC_alfa( &
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-            ierr)
-         use const_def, only: dp
+            ierr, d_alfa_dabar, d_alfa_dzbar)
+         use const_def, only: dp, ln10, one_third
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: logRho, logT, Z, abar, zbar
          real(dp), intent(out) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
          integer, intent(out) :: ierr
+         real(dp), intent(out), optional :: d_alfa_dabar, d_alfa_dzbar
          real(dp) :: logGe0, logGe, logGe_lo, logGe_hi, &
             A, B, dA_dlnT, dA_dlnRho, dB_dlnT, dB_dlnRho, dlogGe_dlogT, dlogGe_dlogRho, &
-            logT_lo, logT_hi, logRho_lo, logRho_hi
+            logT_lo, logT_hi, logRho_lo, logRho_hi, &
+            dlogGe0_dabar, dlogGe0_dzbar, denom
 
          include 'formats'
 
@@ -47,6 +50,8 @@
 
          d_alfa_dlogT = 0d0
          d_alfa_dlogRho = 0d0
+         if (present(d_alfa_dabar)) d_alfa_dabar = 0d0
+         if (present(d_alfa_dzbar)) d_alfa_dzbar = 0d0
 
          logRho_lo = rq% logRho2_PC_limit  ! don't use PC for logRho < this
          logRho_hi = rq% logRho1_PC_limit  ! okay for pure PC for logRho > this
@@ -57,6 +62,12 @@
             ! where Ge0 = (qe**2)*(four_thirds_pi*avo*zbar/abar)**one_third/kerg
             logGe0 = log10( &
                  qe*qe*pow(four_thirds_pi*avo*zbar/abar, one_third)/kerg)
+            dlogGe0_dabar = 0d0
+            dlogGe0_dzbar = 0d0
+            if (abar > 0d0 .and. zbar > 0d0) then
+               dlogGe0_dabar = -one_third/(ln10*abar)
+               dlogGe0_dzbar = one_third/(ln10*zbar)
+            end if
             logGe = logGe0 + logRho/3 - logT
             logGe_lo = rq% log_Gamma_e_all_HELM  ! HELM for logGe <= this
             logGe_hi = rq% log_Gamma_e_all_PC  ! PC for logGe >= this
@@ -72,8 +83,19 @@
                dlogGe_dlogRho = 1d0/3d0
                d_alfa_dlogT = -dlogGe_dlogT/(logGe_hi - logGe_lo)
                d_alfa_dlogRho = -dlogGe_dlogRho/(logGe_hi - logGe_lo)
+               if (present(d_alfa_dabar)) &
+                  d_alfa_dabar = -dlogGe0_dabar/(logGe_hi - logGe_lo)
+               if (present(d_alfa_dzbar)) &
+                  d_alfa_dzbar = -dlogGe0_dzbar/(logGe_hi - logGe_lo)
             else  ! blend in logRho
-               if (logT >= logT_lo) logRho_lo = (logT_lo + logGe_lo - logGe0)*3
+               if (logT >= logT_lo) then
+                  logRho_lo = (logT_lo + logGe_lo - logGe0)*3
+                  denom = logRho_hi - logRho_lo
+                  if (present(d_alfa_dabar)) &
+                     d_alfa_dabar = -3d0*(logRho_hi - logRho)*dlogGe0_dabar/pow2(denom)
+                  if (present(d_alfa_dzbar)) &
+                     d_alfa_dzbar = -3d0*(logRho_hi - logRho)*dlogGe0_dzbar/pow2(denom)
+               end if
                alfa = (logRho_hi - logRho)/(logRho_hi - logRho_lo)
                d_alfa_dlogRho = -1d0/(logRho_hi - logRho_lo)
             end if
@@ -101,7 +123,9 @@
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            include_composition_partials, skip, ierr, dxa_rows, &
+            dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
+            dye_dxa_in, dmc_dxa_in)
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -113,10 +137,17 @@
          real(dp), intent(inout), dimension(nv) :: &
             res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
+         logical, intent(in) :: include_composition_partials
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
+         real(dp), intent(in), optional :: &
+            dabar_dxa_in(:), dzbar_dxa_in(:), dz2bar_dxa_in(:), &
+            dz53bar_dxa_in(:), dye_dxa_in(:), dmc_dxa_in(:)
          type (EoS_General_Info), pointer :: rq
+         integer :: time0, clock_rate
          rq => eos_handles(handle)
+         if (include_composition_partials) call eos_timing_start(time0, clock_rate)
          call Get_PC_Results(rq, &
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
@@ -136,6 +167,8 @@
 
          ! mark this one
          res(i_frac_PC) = 1.0d0
+         if (include_composition_partials) call eos_timing_record_component( &
+            i_eos_PC, time0, clock_rate)
 
       end subroutine get_PC_for_eosdt
 
