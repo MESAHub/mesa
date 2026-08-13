@@ -81,7 +81,7 @@
 
          end interface
 
-         logical :: continue_evolve_loop
+         logical :: continue_evolve_loop, stop_after_star_LNA
          type (star_info), pointer :: s
          character (len=strlen) :: restart_filename
 
@@ -99,13 +99,13 @@
          call start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
             id, restart, restart_filename, pgstar_ok, dbg, &
-            extras_controls, ierr, inlist_fname_arg)
+            extras_controls, ierr, inlist_fname_arg, stop_after_star_LNA)
          if (failed('do_before_evolve_loop',ierr)) return
 
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
 
-         continue_evolve_loop = .true.
+         continue_evolve_loop = .not. stop_after_star_LNA
 
          if (dbg) write(*,*) 'start evolve_loop'
          evolve_loop: do while(continue_evolve_loop)  ! evolve one step per loop
@@ -124,7 +124,7 @@
       subroutine start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
             id, restart, restart_filename, pgstar_ok, dbg, &
-            extras_controls, ierr, inlist_fname_arg)
+            extras_controls, ierr, inlist_fname_arg, stop_after_star_LNA)
 
          logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
          integer, intent(inout) :: id  ! input if not do_alloc_star
@@ -132,6 +132,7 @@
          logical, intent(in) :: pgstar_ok, dbg
          character (len=*) :: restart_filename, inlist_fname_arg
          optional inlist_fname_arg
+         logical, intent(out), optional :: stop_after_star_LNA
          integer, intent(out) :: ierr
 
          interface
@@ -146,6 +147,7 @@
 
          type (star_info), pointer :: s
          character (len=strlen) :: inlist_fname
+         logical :: stop_after_startup_LNA
 
          include 'formats'
 
@@ -158,8 +160,9 @@
               do_alloc_star, okay_to_restart, restart, pgstar_ok, &
               null_binary_controls, extras_controls, &
               id_from_read_star_job, inlist_fname, restart_filename, &
-              dbg, 0, id, ierr)
+              dbg, 0, id, ierr, stop_after_startup_LNA)
          if (failed('do_before_evolve_loop',ierr)) return
+         if (present(stop_after_star_LNA)) stop_after_star_LNA = stop_after_startup_LNA
 
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
@@ -178,7 +181,7 @@
          logical, intent(in) :: dbg
          integer, intent(out) :: ierr
 
-         logical :: first_try
+         logical :: first_try, stop_after_star_LNA
          integer :: id
          integer :: result, model_number
 
@@ -193,6 +196,13 @@
 
          result = s% extras_start_step(id)
          if (result /= keep_going) then
+            continue_evolve_loop = .false.
+            return
+         end if
+
+         call maybe_do_star_LNA(id, s, .false., stop_after_star_LNA, ierr)
+         if (failed('star_do_LNA',ierr)) return
+         if (stop_after_star_LNA) then
             continue_evolve_loop = .false.
             return
          end if
@@ -321,7 +331,7 @@
               do_alloc_star, okay_to_restart, restart, pgstar_ok, &
               binary_controls, extras_controls, &
               id_from_read_star_job, inlist_fname, restart_filename, &
-              dbg, binary_id, id, ierr)
+              dbg, binary_id, id, ierr, stop_after_star_LNA)
          use utils_lib, only: utils_OMP_SET_NUM_THREADS
          logical, intent(in) :: do_alloc_star, okay_to_restart, pgstar_ok
          logical :: restart
@@ -341,12 +351,16 @@
          character (len=*) :: inlist_fname, restart_filename
          character (len=512) :: temp_fname
          logical, intent(in) :: dbg
+         logical, intent(out), optional :: stop_after_star_LNA
          integer, intent(in) :: binary_id
          integer, intent(out) :: id, ierr
 
          type (star_info), pointer :: s
+         logical :: stop_after_startup_LNA
 
          include 'formats'
+
+         if (present(stop_after_star_LNA)) stop_after_star_LNA = .false.
 
          if (do_alloc_star) then
             if (id_from_read_star_job /= 0) then
@@ -480,6 +494,17 @@
          call s% extras_startup(id, restart, ierr)
          if (failed('extras_startup',ierr)) return
 
+         if (.not. present(stop_after_star_LNA) .and. s% star_LNA_flag .and. &
+               s% star_LNA_model_number < 0 .and. s% star_LNA_stop_after_run) then
+            write(*,'(a)') 'star_LNA_stop_after_run is not supported by this star driver.'
+            ierr = -1
+            return
+         end if
+
+         call maybe_do_star_LNA(id, s, .true., stop_after_startup_LNA, ierr)
+         if (failed('star_do_LNA',ierr)) return
+         if (present(stop_after_star_LNA)) stop_after_star_LNA = stop_after_startup_LNA
+
          if (s% job% profile_starting_model .and. .not. restart) then
             call star_set_vars(id, 0d0, ierr)
             if (failed('star_set_vars',ierr)) return
@@ -504,6 +529,34 @@
          end if
 
       end subroutine do_before_evolve_loop
+
+
+      subroutine maybe_do_star_LNA(id, s, during_startup, stop_after_star_LNA, ierr)
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         logical, intent(in) :: during_startup
+         logical, intent(out) :: stop_after_star_LNA
+         integer, intent(out) :: ierr
+
+         ierr = 0
+         stop_after_star_LNA = .false.
+
+         if (.not. s% star_LNA_flag) return
+
+         if (during_startup) then
+            if (s% star_LNA_model_number >= 0) return
+         else
+            if (s% star_LNA_model_number < 0) return
+            if (s% model_number /= s% star_LNA_model_number) return
+         end if
+
+         call star_do_LNA(id, ierr)
+         if (ierr /= 0) return
+
+         stop_after_star_LNA = s% star_LNA_stop_after_run
+         s% star_LNA_flag = .false.
+         if (stop_after_star_LNA) write(*,'(a)') 'star_LNA: stopping after successful analysis.'
+      end subroutine maybe_do_star_LNA
 
 
       subroutine before_step_loop(id, ierr)

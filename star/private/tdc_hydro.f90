@@ -32,7 +32,8 @@ module tdc_hydro
    private
    public :: &
       compute_tdc_Uq_face, compute_tdc_Eq_div_w_face, &
-      get_TDC_alfa_beta_face_weights, set_viscosity_vars_TDC, compute_tdc_Uq_dm_cell
+      get_TDC_alfa_beta_face_weights, set_viscosity_vars_TDC, compute_tdc_Uq_dm_cell, &
+      compute_Chi_cell
 
 contains
 

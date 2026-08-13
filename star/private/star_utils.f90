@@ -3331,19 +3331,19 @@
          ierr = 0
          if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+               k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*etrb*rho
+         Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*rho
          Ptrb = Ptrb_div_etrb*etrb  ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% RSP2_alfap*get_etrb_start(s,k)*s% rho_start(k)
+            Ptrb_start = s% RSP2_alfap*x_ALFAP*get_etrb_start(s,k)*s% rho_start(k)
             Ptrb = s% P_theta_for_velocity_time_centering*Ptrb + &
                (1d0 - s% P_theta_for_velocity_time_centering)*Ptrb_start
          end if

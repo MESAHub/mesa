@@ -32,6 +32,7 @@
       public :: do1_alt_dlnT_dm_eqn
       public :: do1_gradT_eqn
       public :: do1_dlnT_dm_eqn
+      public :: eval_dlnPdm_qhse
 
       contains
 

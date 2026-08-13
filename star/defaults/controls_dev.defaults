@@ -131,6 +131,316 @@
     RSP2_map_history_filename = 'map_history.data'
 
 
+! star LNA controls
+! =================
+
+      ! These controls are for the mesa-star radial linear nonadiabatic analysis
+      ! prototype in star/private/star_LNA.f90. The current implementation is
+      ! intended for static face-velocity envelope operators and dense test
+      ! problems. Hydro v_flag may be inactive because the LNA introduces its
+      ! own linear velocity perturbation.
+      ! It intentionally does not support u_flag hydrodynamics, rotation, RTI,
+      ! mass corrections, user other_* hooks, velocity drag,
+      ! use_compression_outer_BC, or the dPrad/dm temperature-gradient form.
+      ! TDC_use_density_form_for_eddy_viscosity is not supported by this LNA
+      ! path; LNA uses its local static velocity-form helper.
+      ! Those paths fail early in check_star_LNA_model for now.
+      !
+      ! star_LNA_flag
+      ! ~~~~~~~~~~~~~
+      ! If true, run the analysis once. The analysis writes diagnostics to
+      ! log_directory and can optionally set the starting velocity field.
+      !
+      ! star_LNA_model_number
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! If < 0, run during startup after the model has been loaded and
+      ! extras_startup has returned. If >= 0, run once when model_number equals
+      ! this value, after extras_start_step and before that timestep is evolved.
+      ! Use 200 to mirror the delayed GYRE/RSP kick point in the Cepheid dev
+      ! cases.
+      !
+      ! star_LNA_stop_after_run
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, stop the normal star driver before evolution after a successful
+      ! LNA solve. This gives a load-model, analyze, and exit workflow when
+      ! combined with star_LNA_model_number < 0. Leave this false for
+      ! velocity-kick runs that should continue into nonlinear evolution.
+      ! The binary driver does not provide this stop workflow and reports an
+      ! error if it is requested for startup analysis.
+      !
+      ! star_LNA_num_modes
+      ! ~~~~~~~~~~~~~~~~~~
+      ! Number of selected positive-frequency modes to write. The dense solve
+      ! eliminates algebraic density/luminosity/Hp rows, solves the reduced
+      ! dynamic-variable eigenproblem, then applies the frequency and RSP LINA
+      ! growth selections used to choose the printed modes. This does not
+      ! reduce the dense eigensolve size; the solver still computes the full
+      ! reduced eigensystem before selecting modes.
+      !
+      ! star_LNA_min_mode_frequency_uHz
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Minimum cyclic frequency, in microHz, for modes selected into
+      ! period_growth/eigenfunction/work output. Raw finite positive-frequency
+      ! modes are still written to *_raw_modes.data.
+      !
+      ! This is mainly to keep slow thermal/quasi-static roots from being
+      ! mistaken for the first acoustic modes in non-TDC frozen-flux runs. A
+      ! value of 1d-3 microHz only removes periods longer than about 11574 days,
+      ! so solar p modes and ordinary Cepheid radial modes are unaffected. Set
+      ! to 0d0 to disable this frequency floor.
+      !
+      ! star_LNA_min_first_mode_eta, star_LNA_min_mode_eta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Legacy-named lower filters for selected modes. The filtered quantity is
+      ! logKE_per_cycle = 4*pi*sigma_real/sigma_imag. These filters reject
+      ! strongly damped roots while retaining near-neutral acoustic modes with
+      ! logKE_per_cycle near zero.
+      !
+      ! star_LNA_max_abs_mode_eta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Optional symmetric logKE_per_cycle guard for selected modes. If > 0,
+      ! skip roots with abs(logKE_per_cycle) above this value. This catches
+      ! pathological thermal roots with enormous growth or decay per period; it
+      ! does not affect raw-mode output. Set to 0d0 to disable the guard.
+      !
+      ! star_LNA_output_file_prefix
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! File stem for star_LNA output filenames. If empty, use 'star_LNA'. This
+      ! is a file prefix, not a path. Leading/trailing / or \ characters are
+      ! ignored; internal path separators are converted to underscores so path
+      ! handling stays in star_LNA_output_directory.
+      ! Use distinct file prefixes for multiple LNA calls; files with the same
+      ! directory and prefix are replaced.
+      !
+      ! star_LNA_output_directory
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Directory for files written by star_LNA. If empty, use log_directory.
+      ! The chosen directory is created if needed, like normal MESA log output.
+      ! The path is <directory>/<prefix>_*.data relative to the run directory;
+      ! e.g. if log_directory = 'LOGS_pulsation', star_LNA_output_directory = '',
+      ! and file_prefix = 'star_LNA', files are written as
+      ! LOGS_pulsation/star_LNA_*.data. Set this to '.' to write in the run
+      ! directory, or to a separate directory such as 'LOGS_LNA'.
+      ! <prefix>_matrix_summary.data, <prefix>_row_structure.data,
+      ! <prefix>_rsp2_term_audit.data or <prefix>_tdc_face_audit.data when
+      ! applicable, <prefix>_period_growth.data, <prefix>_raw_modes.data,
+      ! <prefix>_eigenfunction_<mode>.data, and <prefix>_work_<mode>.data.
+      !
+      ! star_LNA_write_matrix_summary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_matrix_summary.data with static-background
+      ! residual diagnostics for the assembled rows.
+      !
+      ! star_LNA_write_period_growth
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_period_growth.data with the selected mode list.
+      ! This also writes <prefix>_raw_modes.data with the finite positive
+      ! eigenvalues before the RSP-style growth selection. These are written
+      ! after the dense eigensolve succeeds.
+      ! The output column is logKE_per_cycle = 4*pi*sigma_real/sigma_imag, the
+      ! RSP LINA log kinetic-energy convention. For nonlinear comparisons use
+      ! ke_fractional_growth_per_period = exp(logKE_per_cycle)-1,
+      ! grekm_growth_per_period = 2*tanh(logKE_per_cycle/2), or
+      ! amplitude_fractional_growth_per_period = exp(logKE_per_cycle/2)-1.
+      !
+      ! star_LNA_write_eigenfunctions
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_eigenfunction_<mode>.data for each selected
+      ! mode. Turn this off when only periods/growth rates or a kick are needed.
+      !
+      ! star_LNA_write_work_integrals
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_work_<mode>.data for each selected mode. This is
+      ! the star_LNA equivalent of RSP LINA_work*.data, but controlled
+      ! explicitly instead of always being written. No eigenfunction/work files
+      ! are written if no modes pass selection or if the eigensolve has not
+      ! completed. Pressure and turbulent-pressure terms use the same closure as
+      ! the operator. Eddy-viscous and luminosity-work columns remain diagnostic
+      ! until their signs and normalization are validated against RSP/RSP2.
+      !
+      ! star_LNA_set_initial_velocity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, use one or two selected modes as a velocity kick after the LNA
+      ! solve. The kick updates v, xh(i_v,:), xh_start(i_v,:), and v_start. For
+      ! RSP/RSP2 models, the period selected by star_LNA_mode_for_period is also
+      ! copied into rsp_period/RSP2_period.
+      ! This requires hydro v_flag because the kick is applied to the velocity
+      ! variable used by the next hydro solve. The LNA solve itself can still run
+      ! without v_flag.
+      ! This is incompatible with use_fixed_vsurf_outer_BC because that BC
+      ! constrains the LNA surface velocity and makes the requested
+      ! surface-velocity scaling ill-defined.
+      !
+      ! star_LNA_kick_vsurf_km_per_sec
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Surface velocity amplitude for the optional kick, in km/s. Each selected
+      ! eigenfunction is converted to an RSP-style real velocity profile from
+      ! the displacement eigenfunction, normalized to positive unit surface
+      ! displacement. The final sum is scaled so v(1) =
+      ! 1d5*star_LNA_kick_vsurf_km_per_sec in cgs units.
+      ! star_LNA prints max |v| and max |v|/cs after applying the kick; a large
+      ! interior/surface amplitude ratio usually means the selected mode is not
+      ! a useful hydro kick for that model.
+      !
+      ! star_LNA_mode_for_period
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Zero-based selected-mode index, matching the RSP convention. 0 means the
+      ! first mode in <prefix>_period_growth.data, not the reduced LAPACK eigen
+      ! index.
+      ! This chooses the period copied into rsp_period/RSP2_period.
+      !
+      ! star_LNA_kick_mode_1, star_LNA_kick_mode_2, star_LNA_kick_mode_3
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! One-based mode numbers from <prefix>_period_growth.data for the optional
+      ! velocity kick. star_LNA_kick_mode_1 must be >= 1; 0 disables the second
+      ! or third component. Set star_LNA_num_modes at least as large as the
+      ! largest active kick mode requested.
+      !
+      ! star_LNA_kick_fraction_1, star_LNA_kick_fraction_2,
+      ! star_LNA_kick_fraction_3
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Relative weights for the kick components. The active weights are
+      ! normalized by their sum, so fractions 1,0,0 and 0.7,0.2,0.1 both
+      ! produce the requested surface velocity amplitude with different mode
+      ! content.
+      !
+      ! star_LNA_solver
+      ! ~~~~~~~~~~~~~~~
+      ! Eigensolver selector. Only 'dense' is currently implemented. The dense
+      ! path uses LAPACK DGGEV on the reduced generalized eigenproblem and is
+      ! intended for small/debug models. Large zone counts can be slow because
+      ! the solve computes all eigenvalues/eigenvectors before selecting modes.
+      !
+      ! star_LNA_include_tdc
+      ! ~~~~~~~~~~~~~~~~~~~~
+      ! If true and MLT_option == 'TDC', include the currently supported TDC
+      ! algebraic perturbations, including the convective-luminosity helper and
+      ! TDC eddy-viscosity terms. If false, TDC-specific perturbations are
+      ! suppressed even when the background model uses TDC.
+      !
+      ! star_LNA_include_rsp2
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! If true and RSP2_flag is active, include the RSP2 variable set and
+      ! luminosity decomposition. RSP2 models currently require this to be true.
+      !
+      ! star_LNA_perturb_convective_flux
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, perturb convective luminosity where the active TDC/RSP2 branch
+      ! supplies an auto-diff expression. If false, the convective luminosity
+      ! contribution is held fixed in the active branch rows and diagnostics.
+      ! This is a local "fixed Lconv" switch; by itself it does not choose the
+      ! non-RSP2 frozen-flux luminosity row.
+      !
+      ! star_LNA_perturb_turbulent_pressure
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, include turbulent-pressure perturbations in the LNA pressure
+      ! terms where supported. For RSP2 this uses Ptrb = alpha_p*(2/3)*rho*w^2.
+      !
+      ! star_LNA_perturb_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, include the supported eddy-viscous momentum/heating
+      ! perturbations and write the eddy-viscous work diagnostic. For TDC,
+      ! ``TDC_alpha_M`` controls whether the eddy-viscous term is present.
+      ! The TDC density-form eddy-viscosity branch is not supported in LNA and
+      ! is ignored.
+      !
+      ! star_LNA_perturb_turbulent_energy
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, include turbulent-energy perturbations where supported. RSP2
+      ! models currently require this because w and Hp are part of the RSP2 LNA
+      ! variable set.
+      !
+      ! star_LNA_convection_treatment
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Convection perturbation mode. Allowed values are 'perturbed', 'frozen',
+      ! 'frozen_flux', and 'mlt_static'.
+      !
+      ! 'perturbed' uses the active TDC/RSP2 perturbation path. For TDC this
+      ! adds the internal LNA-only convective-velocity variable and solves the
+      ! local TDC luminosity/velocity closure.
+      !
+      ! 'frozen' is the historical broad diagnostic mode. For non-RSP2 TDC
+      ! models it disables the TDC perturbation path, so the luminosity slot
+      ! falls back to the surface-temperature row at the surface and the static
+      ! temperature-gradient row in the interior. This is not a clean
+      ! frozen-convective-flux approximation.
+      !
+      ! 'frozen_flux' is the non-RSP2 frozen-convective-flux approximation:
+      ! neglect the convective-luminosity perturbation.
+      ! Interior luminosity rows use Lrad_ad + Lconv0 - L = 0, so the
+      ! equilibrium convective luminosity is retained while delta Lconv = 0.
+      !
+      ! No internal TDC w variable is added in frozen_flux mode. RSP2 models
+      ! currently reject this value rather than silently applying only part of
+      ! the approximation.
+      !
+      ! 'mlt_static' is for non-TDC, non-RSP2 MLT backgrounds. The interior
+      ! luminosity slot uses the MESA temperature-gradient relation with the
+      ! background MLT derivatives. There is no dynamic convective-velocity
+      ! eigenfunction in this treatment.
+      !
+      ! ::
+
+    star_LNA_flag = .false.
+    star_LNA_model_number = -1
+    star_LNA_stop_after_run = .false.
+    star_LNA_num_modes = 3
+    star_LNA_min_mode_frequency_uHz = 1d-3
+    star_LNA_min_first_mode_eta = -3d0
+    star_LNA_min_mode_eta = -5d0
+    star_LNA_max_abs_mode_eta = 10d0
+    star_LNA_output_directory = ''
+    star_LNA_output_file_prefix = ''
+    star_LNA_write_matrix_summary = .true.
+    star_LNA_write_period_growth = .true.
+    star_LNA_write_eigenfunctions = .true.
+    star_LNA_write_work_integrals = .true.
+    star_LNA_set_initial_velocity = .false.
+    star_LNA_kick_vsurf_km_per_sec = 1d0
+    star_LNA_mode_for_period = 0
+    star_LNA_kick_mode_1 = 1
+    star_LNA_kick_mode_2 = 0
+    star_LNA_kick_mode_3 = 0
+    star_LNA_kick_fraction_1 = 1d0
+    star_LNA_kick_fraction_2 = 0d0
+    star_LNA_kick_fraction_3 = 0d0
+    star_LNA_solver = 'dense'
+    star_LNA_include_tdc = .true.
+    star_LNA_include_rsp2 = .true.
+    star_LNA_perturb_convective_flux = .true.
+    star_LNA_perturb_turbulent_pressure = .true.
+    star_LNA_perturb_eddy_viscosity = .true.
+    star_LNA_perturb_turbulent_energy = .true.
+    star_LNA_convection_treatment = 'perturbed'
+
+
+! GYRE TDC LNA export controls
+! ============================
+
+      ! gyre_write_tdc_lna_background
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write the experimental schema-130 TDC LNA background block
+      ! when exporting GYRE-format pulse data. This is a MESA-side data export
+      ! only; it does not run GYRE, solve for mode perturbations, or write
+      ! mode-dependent complex TDC coefficients.
+      !
+      ! Appended schema-130 columns are real background/closure ingredients:
+      ! L_conv0, A0_tdc, D_conv_h, Hp_face, alpha_MLT_face, Cp_face,
+      ! chiT_face, chiRho_face, gradL_face, gradT_face, TDC_alpha_C/S/D/R/Pt/M,
+      ! include_mlt_corr_to_TDC, mlt_Pturb_factor, and mlt_Pturb0_face.
+      ! D_conv_h is the
+      ! effective entropy diffusivity inferred from the radial TDC convective
+      ! luminosity. mlt_Pturb0_face is the MESA/Kuhfuss isotropic turbulent
+      ! pressure amplitude mlt_Pturb_factor*rho_face*mlt_vc^2/3.
+      !
+      ! Requires gyre_data_schema = 130 and MLT_option = 'TDC'. GYRE must be
+      ! updated separately before it can read this experimental schema.
+      !
+      ! ::
+
+    gyre_write_tdc_lna_background = .false.
+
+
 ! mass corrections
 ! ================
 
@@ -206,6 +516,9 @@
 
       ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
       ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
+      ! star_LNA does not implement this density-form branch. It ignores this
+      ! flag and uses its own velocity-form static Chi helper; TDC_alpha_M
+      ! controls whether the TDC eddy-viscous LNA term is present.
 
     TDC_use_density_form_for_eddy_viscosity = .false.
 
@@ -228,6 +541,8 @@
 
       ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC
       ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
+      ! star_LNA ignores this hydro limiter and always linearizes the
+      ! unsaturated TDC relation.
 
       ! ::
 

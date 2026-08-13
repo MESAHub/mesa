@@ -29,6 +29,7 @@ module turb
    public :: set_thermohaline
    public :: set_mlt
    public :: set_tdc
+   public :: set_TDC_LNA
    public :: set_semiconvection
 
    contains
@@ -213,6 +214,119 @@ module turb
          mixing_type = no_mixing
       end if
    end subroutine set_TDC
+
+   subroutine set_TDC_LNA( &
+            mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, &
+            cgrav, m, chiT, chiRho, L_total, gradT_actual, r, P, T, rho, Cp, opacity, &
+            scale_height, gradL, grada, A, Eq_div_w, grav, include_mlt_corr_to_TDC, &
+            TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, &
+            luminosity_resid, velocity_rhs, velocity_inertia, L_rad, L_conv, ierr)
+      real(dp), intent(in) :: mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
+      real(dp), intent(in) :: cgrav, m, TDC_alpha_C, TDC_alpha_S
+      type(auto_diff_real_star_order1), intent(in) :: &
+         chiT, chiRho, L_total, gradT_actual, r, P, T, rho, Cp, opacity, &
+         scale_height, gradL, grada, A, Eq_div_w, grav, energy
+      logical, intent(in) :: include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
+      type(auto_diff_real_star_order1), intent(out) :: &
+         luminosity_resid, velocity_rhs, velocity_inertia, L_rad, L_conv
+      integer, intent(out) :: ierr
+      integer :: mixing_type
+      real(dp), parameter :: alpha_c = 0.5d0*sqrt_2_div_3
+      real(dp), parameter :: x_ALFAS = 0.5d0*sqrt_2_div_3
+      real(dp), parameter :: x_CEDE = (8d0/3d0)*sqrt_2_div_3
+      real(dp), parameter :: x_ALFAP = 2d0/3d0
+      real(dp), parameter :: x_GAMMAR = 2d0*sqrt(3d0)
+      type(auto_diff_real_star_order1) :: L0, Lambda, Gamma, gradT_mlt, &
+         Y_mlt, conv_vel_mlt, D_mlt, gradr, Y, Y_env, h, scale, X, FL, &
+         S0, D0, gammar_div_alfa, DR0, xi0, xi1, xi2
+
+      ierr = 0
+      luminosity_resid = 0d0
+      velocity_rhs = 0d0
+      velocity_inertia = 0d0
+      L_rad = 0d0
+      L_conv = 0d0
+
+      L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity)
+      if (mixing_length_alpha <= 0d0) then
+         L_rad = L0*gradT_actual
+         L_conv = 0d0
+         luminosity_resid = L_rad - L_total
+         return
+      end if
+
+      gradr = L_total/L0
+      Lambda = mixing_length_alpha*scale_height
+
+      call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
+         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+         gradr, grada, gradL, &
+         Gamma, gradT_mlt, Y_mlt, conv_vel_mlt, D_mlt, mixing_type, 1d99, ierr)
+      if (ierr /= 0) return
+
+      Y = gradT_actual - gradL
+      if (Y > 0d0 .and. include_mlt_corr_to_TDC) then
+         Y_env = Y*Gamma/(1d0 + Gamma)
+      else
+         Y_env = Y
+      end if
+
+      if (Y_env > 0d0 .and. use_TDC_enthalpy_flux_limiter) then
+         h = energy + P/rho
+         X = Cp*T/h*mixing_length_alpha*TDC_alpha_S*x_ALFAS*Y_env/sqrt_2_div_3
+         FL = TDC_LNA_flux_limiter_function(X)
+         if (abs(X%val) >= 0.95d0) then
+            scale = FL/X
+         else
+            scale = 1d0
+         end if
+      else
+         scale = 1d0
+      end if
+
+      S0 = TDC_alpha_S*x_ALFAS*mixing_length_alpha*Cp*T/scale_height*grada
+      if (use_TDC_enthalpy_flux_limiter) then
+         S0 = S0*(scale*Y_env) + Eq_div_w
+      else
+         S0 = S0*Y_env + Eq_div_w
+      end if
+
+      D0 = TDC_alpha_D*x_CEDE/(mixing_length_alpha*scale_height)
+      gammar_div_alfa = TDC_alpha_R*x_GAMMAR/(mixing_length_alpha*scale_height)
+      DR0 = 4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(T)/(pow2(rho)*Cp*opacity)
+
+      xi0 = S0
+      xi1 = -DR0
+      xi2 = -D0
+
+      L_rad = L0*gradT_actual
+      L_conv = TDC_alpha_C*mixing_length_alpha*alpha_c*rho*T*Cp*4d0*pi*pow2(r)*A*Y_env
+      luminosity_resid = L_rad + L_conv - L_total
+      velocity_rhs = xi0 + A*xi1 + pow2(A)*xi2
+      velocity_inertia = 2d0*A
+      if (TDC_alpha_Pt /= 0d0) &
+         velocity_inertia = velocity_inertia + &
+            A%val*TDC_alpha_Pt*x_ALFAP*rho%val/rho
+   end subroutine set_TDC_LNA
+
+
+   type(auto_diff_real_star_order1) function TDC_LNA_flux_limiter_function(X) result(FL)
+      type(auto_diff_real_star_order1), intent(in) :: X
+      real(dp), parameter :: X0 = 0.95d0
+      real(dp), parameter :: X1 = 1d0
+      type(auto_diff_real_star_order1) :: s, p
+
+      if (X%val < X0) then
+         FL = X
+      else if (X%val >= X1) then
+         FL = 1d0
+      else
+         s = (X - X0)/(X1 - X0)
+         p = pow3(s)*(10d0 + s*(-15d0 + 6d0*s))
+         FL = X + (1d0 - X)*p
+      end if
+   end function TDC_LNA_flux_limiter_function
+
 
    !> Calculates the outputs of semiconvective mixing theory.
    !!
