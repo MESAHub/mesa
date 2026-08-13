@@ -778,10 +778,7 @@
             if (failed('gradT_excess_effect')) exit
             call do1(s% superad_reduction_factor, c% superad_reduction_factor)
             if (failed('superad_reduction_factor')) exit
-            call do1(s% superad_reduction_Lrad_div_Ledd, c% superad_reduction_Lrad_div_Ledd)
-            if (failed('superad_reduction_Lrad_div_Ledd')) exit
-            call do1_integer(s% superad_reduction_trigger, c% superad_reduction_trigger)
-            if (failed('superad_reduction_trigger')) exit
+            if (action == do_allocate) s% superad_reduction_factor = 1d0
 
             call do1(s% domega_dlnR, c% domega_dlnR)
             if (failed('domega_dlnR')) exit
@@ -1169,6 +1166,9 @@
             if (failed('unsmoothed_brunt_B')) exit
             call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
             if (failed('smoothed_brunt_B')) exit
+            call do1(s% tau_conv_start, c% tau_conv_start)
+            if (failed('tau_conv_start')) exit
+            if (action == do_allocate) s% tau_conv_start = 0d0
 
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit

@@ -228,11 +228,10 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      real(dp) :: vc_old_local, vc_old_floor, Gamma_factor_old_local, eta_old
-      type(auto_diff_real_star_order1) :: tau_conv, f_turnover, eta_inst
-      type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
+      real(dp) :: f_turnover, Gamma_factor_old_local, eta_old
+      type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC, have_Y_face_guess
+      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -300,11 +299,15 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
-      if (k /= 0) then
+      hold_superad_reduction_factor = .false.
+      if (k > 0) &
+         hold_superad_reduction_factor = &
+            s% use_superad_reduction .and. &
+            s% superad_reduction_use_turnover_limit .and. &
+            s% have_superad_reduction_factor .and. &
+            (.not. s% okay_to_set_superad_reduction_factor .or. s% doing_finish_load_model)
+      if (k /= 0 .and. .not. hold_superad_reduction_factor) &
          s% superad_reduction_factor(k) = 1d0
-         s% superad_reduction_Lrad_div_Ledd(k) = 0d0
-         s% superad_reduction_trigger(k) = 0
-      end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -482,11 +485,6 @@ contains
          Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
          Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
 
-         if (k /= 0) then
-            s% superad_reduction_Lrad_div_Ledd(k) = Lrad_div_Ledd% val
-            s% superad_reduction_trigger(k) = 0
-         end if
-
          Gamma_factor = 1d0
          if (gradT > gradL) then
             if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
@@ -505,7 +503,6 @@ contains
                !   Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                !end if
                if (Lrad_div_Ledd > Gamma_limit) then
-                  if (k /= 0) s% superad_reduction_trigger(k) = s% superad_reduction_trigger(k) + 1
                   alfa0 = Lrad_div_Ledd/Gamma_limit-1d0
                   if (alfa0 < 1d0) then
                      Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
@@ -515,7 +512,6 @@ contains
                   !Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
                end if
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
-                  if (k /= 0) s% superad_reduction_trigger(k) = s% superad_reduction_trigger(k) + 2
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
                   if (alfa0 < 1d0) then
                      Gamma_term = Gamma_term + scale_value2*(0.5d0*alfa0*alfa0)
@@ -537,55 +533,26 @@ contains
             end if
          end if
 
-         ! Convective-turnover-time limiter. Convection can only readjust the
-         ! throttle over a turnover time tau_conv = scale_height / mlt_vc_old, so
-         ! each step we move a fraction f_turnover of the way from the
-         ! previous-step throttle toward the instantaneous one. f_turnover is
-         ! linear (min(dt/tau,1)) or exponential (1 - exp(-dt/tau)) per the
-         ! superad_reduction_turnover_limit_function control; both give
-         !    dt >> tau_conv -> f=1 -> instantaneous value (no smoothing)
-         !    dt << tau_conv -> f=0 -> previous-step value (held).
-         !
-         ! We relax the *applied* throttle eta = 1/Gamma_factor, NOT Gamma_factor
-         ! itself. eta in (0,1] is what actually scales the gradient,
-         !    gradr_scaled = gradL + eta*(gradr - gradL),
-         ! so the suppression is linear in eta. Relaxing Gamma_factor directly
-         ! would overshoot, since eta = 1/Gamma is strongly convex: e.g.
-         ! Gamma_old=1, Gamma_inst=100, f=0.1 gives eta=0.092 -- ~91% of the
-         ! reduction applied instead of the intended ~10%.
-         !
-         !    eta_new = eta_old + f_turnover*(eta_inst - eta_old),  Gamma = 1/eta_new
-         !
-         ! Sits outside the Gamma_term>0 block so it also relaxes the throttle
-         ! DOWN (instantaneous 1, old > 1). Needs previous-step mlt_vc and
-         ! Gamma_factor populated.
-         if (s% superad_reduction_use_turnover_limit .and. k > 0 .and. &
-             s% have_mlt_vc .and. associated(s% mlt_vc_old) .and. &
-             s% have_superad_reduction_factor .and. &
-             associated(s% superad_reduction_factor_old) .and. &
-             s% dt > 0d0) then
-            ! Anchor on the previous-step throttle, clamped to Gamma >= 1
-            ! (eta_old <= 1) so we never relax from a non-physical eta > 1.
-            Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
-            if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
-               ! Optional floor on mlt_vc_old at a fraction of the local face
-               ! sound speed; see controls.defaults for the physical motivation.
-               vc_old_floor = s% superad_reduction_turnover_vc_floor_frac &
-                              * s% csound_face(k)
-               vc_old_local = max(s% mlt_vc_old(k), vc_old_floor, 1d-30)
-               tau_conv = scale_height / vc_old_local
-               select case (trim(s% superad_reduction_turnover_limit_function))
-               case ('linear')
-                  f_turnover = min(s% dt / tau_conv, 1d0)
-               case default
-                  f_turnover = 1d0 - exp(-s% dt / tau_conv)
-               end select
-               ! Interpolate the applied throttle eta = 1/Gamma_factor, then
-               ! invert. eta_new is a convex combination of values in (0,1], so
-               ! Gamma_factor >= 1 is preserved.
-               eta_old  = 1d0 / Gamma_factor_old_local      ! in (0,1]
-               eta_inst = 1d0 / Gamma_factor                ! current iterate
-               Gamma_factor = 1d0 / (eta_old + f_turnover * (eta_inst - eta_old))
+         if (hold_superad_reduction_factor) then
+            ! Start-of-step setup must not advance the stored response.
+            Gamma_factor = max(s% superad_reduction_factor(k), 1d0)
+         else if (s% superad_reduction_use_turnover_limit .and. k > 0) then
+            if (s% dt > 0d0 .and. s% tau_conv_start(k) > 0d0 .and. &
+                  s% have_superad_reduction_factor) then
+               if (associated(s% superad_reduction_factor_old)) then
+                  Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
+                  if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
+                     select case (trim(s% superad_reduction_turnover_limit_function))
+                     case ('linear')
+                        f_turnover = min(s% dt/s% tau_conv_start(k), 1d0)
+                     case ('exponential')
+                        f_turnover = -expm1(-s% dt/s% tau_conv_start(k))
+                     end select
+                     eta_old = 1d0/Gamma_factor_old_local
+                     eta_inst = 1d0/Gamma_factor
+                     Gamma_factor = 1d0/(eta_old + f_turnover*(eta_inst - eta_old))
+                  end if
+               end if
             end if
          end if
 
