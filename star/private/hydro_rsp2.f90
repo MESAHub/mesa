@@ -678,8 +678,13 @@
       function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Hp_cell
-         Hp_cell = 0.5d0*(wrap_Hp_00(s,k) + wrap_Hp_p1(s,k))
+         type(auto_diff_real_star_order1) :: Hp_cell, grav_cell
+
+         grav_cell = 0.5d0*s% cgrav(k)*s% m_grav(k)/pow2(wrap_r_00(s,k))
+         if (k < s% nz) &
+            grav_cell = grav_cell + &
+               0.5d0*s% cgrav(k+1)*s% m_grav(k+1)/pow2(wrap_r_p1(s,k))
+         Hp_cell = wrap_Peos_00(s,k)/(wrap_d_00(s,k)*grav_cell)
       end function wrap_Hp_cell
 
 
@@ -688,29 +693,10 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
-         type(auto_diff_real_star_order1) :: d_00, Peos_00, rmid
-         real(dp) :: mmid, cgrav_mid
          include 'formats'
          ierr = 0
 
          Hp_cell = wrap_Hp_cell(s, k)
-         return
-
-         d_00 = wrap_d_00(s, k)
-         Peos_00 = wrap_Peos_00(s, k)
-         if (k < s% nz) then
-            rmid = 0.5d0*(wrap_r_00(s,k) + wrap_r_p1(s,k))
-            mmid = 0.5d0*(s% m(k) + s% m(k+1))
-            cgrav_mid = 0.5d0*(s% cgrav(k) + s% cgrav(k+1))
-         else
-            rmid = 0.5d0*(wrap_r_00(s,k) + s% r_center)
-            mmid = 0.5d0*(s% m(k) + s% m_center)
-            cgrav_mid = s% cgrav(k)
-         end if
-         Hp_cell = pow2(rmid)*Peos_00/(d_00*cgrav_mid*mmid)
-         if (s% alt_scale_height_flag) then
-            call mesa_error(__FILE__,__LINE__,'Hp_cell_for_Chi: cannot use alt_scale_height_flag')
-         end if
       end function Hp_cell_for_Chi
 
 
@@ -1197,14 +1183,15 @@
          use micro, only: do_eos_for_cell
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: PII_div_Hp, QQ, SOURCE, Hp_cell, DAMP, POM, POM2, DAMPR, del, soln
+         real(dp) :: PII_div_Hp, QQ, SOURCE, grav_cell, Hp_cell, DAMP, POM, POM2, DAMPR, del, soln
          !type(auto_diff_real_star_order1) :: x
          integer :: k
          include 'formats'
          ierr = 0
          if (s% mixing_length_alpha == 0d0) return
 
-         !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
+         !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,grav_cell,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) &
+         !$OMP SCHEDULE(dynamic,2)
          do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
                s% nz - max(1,int(s% nz/s% RSP2_nz_div_IBOTOM))
 
@@ -1214,7 +1201,10 @@
             QQ = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k))
             SOURCE = PII_div_Hp*s% T(k)*s% Peos(k)*QQ/s% Cp(k)
 
-            Hp_cell = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
+            grav_cell = 0.5d0*( &
+               s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)) + &
+               s% cgrav(k+1)*s% m_grav(k+1)/pow2(s% r(k+1)))
+            Hp_cell = s% Peos(k)/(s% rho(k)*grav_cell)
             DAMP = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell
 
             POM = 4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR/s% mixing_length_alpha)

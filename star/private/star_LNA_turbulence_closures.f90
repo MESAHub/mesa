@@ -29,7 +29,7 @@
          wrap_chiT_00, wrap_d_00, wrap_d_m1, wrap_etrb_00, wrap_Hp_00, &
          wrap_Hp_p1, wrap_kap_00, wrap_L_00, wrap_lnPeos_00, &
          wrap_lnPeos_m1, wrap_lnT_00, wrap_lnT_m1, wrap_Peos_00, &
-         wrap_Peos_m1, wrap_r_00, wrap_T_00, wrap_T_m1, wrap_v_00, &
+         wrap_Peos_m1, wrap_r_00, wrap_r_p1, wrap_T_00, wrap_T_m1, wrap_v_00, &
          wrap_v_p1, wrap_w_00, wrap_w_m1
       use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
       use reconstructed_face_support, only: get_reconstructed_face_state_ad
@@ -839,9 +839,13 @@
       function rsp2_Hp_cell_for_star_LNA(s, k) result(Hp_cell_ad)
          type(star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Hp_cell_ad
+         type(auto_diff_real_star_order1) :: Hp_cell_ad, grav_cell_ad
 
-         Hp_cell_ad = 0.5d0*(wrap_Hp_00(s, k) + wrap_Hp_p1(s, k))
+         grav_cell_ad = 0.5d0*s% cgrav(k)*s% m_grav(k)/pow2(wrap_r_00(s, k))
+         if (k < s% nz) &
+            grav_cell_ad = grav_cell_ad + &
+               0.5d0*s% cgrav(k+1)*s% m_grav(k+1)/pow2(wrap_r_p1(s, k))
+         Hp_cell_ad = wrap_Peos_00(s, k)/(wrap_d_00(s, k)*grav_cell_ad)
       end function rsp2_Hp_cell_for_star_LNA
 
 
@@ -1126,9 +1130,13 @@
       real(dp) function Hp_cell_for_rsp2_chi_for_star_LNA(s, k) result(Hp_cell)
          type(star_info), pointer :: s
          integer, intent(in) :: k
+         real(dp) :: grav_cell
 
-         Hp_cell = 0.5d0*s% Hp_face(k)
-         if (k < s% nz) Hp_cell = Hp_cell + 0.5d0*s% Hp_face(k + 1)
+         grav_cell = 0.5d0*s% cgrav(k)*s% m_grav(k)/pow2(s% r(k))
+         if (k < s% nz) &
+            grav_cell = grav_cell + &
+               0.5d0*s% cgrav(k+1)*s% m_grav(k+1)/pow2(s% r(k+1))
+         Hp_cell = s% Peos(k)/(s% rho(k)*grav_cell)
       end function Hp_cell_for_rsp2_chi_for_star_LNA
 
 
