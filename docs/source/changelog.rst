@@ -118,12 +118,15 @@ the public ``remesh_for_TDC_pulsation`` function in ``$MESA_DIR/star/public/star
 
 -  ``TDC_hydro_nz`` : Analogous to ``RSP_nz``
 -  ``TDC_hydro_nz_outer`` : Analogous to ``RSP_nz_outer``
+-  ``TDC_hydro_nz_inner`` : The optional number of zones that decrease
+   geometrically in mass toward the inner boundary.
+-  ``TDC_hydro_nz_T_gradient`` : The optional number of zones added to
+   resolve temperature gradients below the anchor while retaining the
+   selected mass-based core zoning.
 -  ``TDC_hydro_T_anchor`` : Analogous to ``RSP_T_anchor``
 -  ``TDC_hydro_dq_1_factor`` : Analogous to ``RSP_dq_1_factor``
 -  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantities are computed from simple averages or mass weighted averaging.
 -  ``remesh_for_TDC_pulsations_log_core_zoning`` : This option allows log zoning in the interior as opposed to a power law ( similar to ``RSP``).
--  ``remesh_for_TDC_pulsations_use_T_gradient`` : This option adds interior mesh resolution
-   near sharp temperature gradients while retaining mass-based zoning.
 
 A new optional boundary condition ``use_RSP_L_eqn_outer_BC`` is available.
 

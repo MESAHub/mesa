@@ -705,12 +705,12 @@
          logical :: split_merge_amr_avoid_repeated_remesh
 
          logical :: remesh_for_TDC_pulsations_when_load, &
-            remesh_for_TDC_pulsations_log_core_zoning, &
-            remesh_for_TDC_pulsations_use_T_gradient
+            remesh_for_TDC_pulsations_log_core_zoning
          logical :: TDC_hydro_use_mass_interp_face_values
-         integer :: TDC_hydro_nz, TDC_hydro_nz_outer
+         integer :: TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_nz_inner, &
+            TDC_hydro_nz_T_gradient
          real(dp) :: TDC_hydro_T_anchor, TDC_hydro_dq_1_factor
-         
+
       ! nuclear reaction parameters
 
          character (len=strlen) :: screening_mode, default_net_name

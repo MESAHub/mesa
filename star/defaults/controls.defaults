@@ -6527,6 +6527,10 @@
       ! ~~~~~~~~~~~~
       ! TDC_hydro_nz_outer
       ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_inner
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_T_gradient
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_T_anchor
       ! ~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_dq_1_factor
@@ -6537,28 +6541,26 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remesh_for_TDC_pulsations_use_T_gradient
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
       ! If ``remesh_for_TDC_pulsations_log_core_zoning`` is true, the model is rezoned below
       ! ``TDC_hydro_T_anchor`` with logarithmic spacing in mass. If false, each cell increases
       ! in mass inward following a power law, similar to the RSP static model builder.
-
-      ! If ``remesh_for_TDC_pulsations_use_T_gradient`` is true, it takes precedence over
-      ! ``remesh_for_TDC_pulsations_log_core_zoning``. The interior mesh is then spaced using
-      ! equal contributions from enclosed mass and the variation in ``logT``. This retains
-      ! mass resolution where the temperature is smooth and adds cells near sharp temperature
-      ! gradients, including those near the inner boundary. The resulting mesh observes
-      ! ``mesh_max_allowed_ratio`` and ``max_center_cell_dq``.
-
-      ! The interior monitor is
-      ! ``d xi = 0.5 d m/M_inner + 0.5 |d lnT|/sum(|d lnT|)``.
 
       ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
       ! ``TDC_hydro_T_anchor``. The selected core zoning is used between the anchor and the inner boundary condition.
       ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
       ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
       ! The ``TDC_hydro_dq_1_factor`` sets the dq of the surface cell to this multiple of the cell beneath it, k = 2.
+
+      ! For power-law core zoning, ``TDC_hydro_nz_inner`` reserves this many zones next to the inner boundary.
+      ! Their cell masses decrease geometrically inward to ``max_center_cell_dq``. Set this to zero to use a
+      ! single inward-increasing power law. Increase ``TDC_hydro_nz`` by the same amount to add inner zones
+      ! without removing zones from the middle of an existing mesh. This control has no effect with logarithmic
+      ! core zoning.
+
+      ! ``TDC_hydro_nz_T_gradient`` adds this many zones below ``TDC_hydro_T_anchor`` according to the variation
+      ! in ``logT``. These zones enhance the selected mass-based core zoning rather than replacing it. Increase
+      ! ``TDC_hydro_nz`` by the same amount to retain all zones in the underlying mass grid. Set this to zero to
+      ! leave the mass grid unchanged.
 
       ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
       ! mass weighted averaging.
@@ -6573,11 +6575,12 @@
 
     remesh_for_TDC_pulsations_when_load = .false.
     remesh_for_TDC_pulsations_log_core_zoning = .false.
-    remesh_for_TDC_pulsations_use_T_gradient = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 
     TDC_hydro_nz = 150
     TDC_hydro_nz_outer = 40
+    TDC_hydro_nz_inner = 0
+    TDC_hydro_nz_T_gradient = 0
     TDC_hydro_T_anchor = 11d3
     TDC_hydro_dq_1_factor = 2d0
 

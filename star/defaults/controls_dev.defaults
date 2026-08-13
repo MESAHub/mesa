@@ -201,15 +201,6 @@
 ! ===
 
 
-      ! TDC_use_density_form_for_eddy_viscosity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``u_flag = .true.`` or ``TDC_use_density_form_for_eddy_viscosity = .true.``, use density
-      ! derivative from newton solver to form d(v/r)/dr, used to compute Eq and Uq.
-
-    TDC_use_density_form_for_eddy_viscosity = .false.
-
-
       ! TDC_adjust_mass_fallback_to_mlt
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
