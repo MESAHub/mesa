@@ -672,7 +672,8 @@
             end if
 
             skip_global_corr_coeff_limit = (first_try .or. &
-                (.not. s% solver_damping_on_retry .and. s% retry_cnt > 0) .or. &
+                (.not. s% doing_relax .and. .not. s% solver_damping_on_retry .and. &
+                 s% retry_cnt > 0) .or. &
                 s% model_number_for_last_retry /= s% model_number)  ! last alternative is for redo's
 
             s% doing_struct_burn_mix = .true.

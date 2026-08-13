@@ -24,7 +24,7 @@
       use const_def, only: dp, i8
       use num_def
       use mtx_def
-      use mtx_lib, only: block_dble_mv, block_multiply_xa
+      use mtx_lib, only: block_multiply_xa
       use utils_lib, only: is_bad
       use solver_support
 
@@ -115,7 +115,7 @@
          real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
             row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
             save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null(), band1=>null()
-         real(dp), dimension(:,:), pointer :: rhs=>null(), jac_times_step=>null()
+         real(dp), dimension(:,:), pointer :: rhs=>null()
          integer, dimension(:), pointer :: ipiv1=>null()
          real(dp), dimension(:,:), pointer :: ddx=>null(), xder=>null()
 
@@ -351,14 +351,6 @@
                   exit iter_loop
                end if
 
-               if (s% solver_inspect_soln_flag) then
-                  rhs(1:nvar,1:nz) = equ(1:nvar,1:nz)
-                  call block_dble_mv( &
-                     nvar, nz, lblk, dblk, ublk, soln, grad_f)
-                  call report_linear_solve_residual( &
-                     nvar, nz, rhs, grad_f)
-               end if
-
                call inspectB(s, nvar, soln, ierr)
                if (ierr /= 0) then
                   call oops('inspectB returned ierr')
@@ -429,11 +421,6 @@
                   exit iter_loop
                end if
 
-               if (s% solver_inspect_soln_flag) then
-                  call block_dble_mv( &
-                     nvar, nz, lblk, dblk, ublk, soln, jac_times_step)
-               end if
-
                if (min_corr_coeff < 1d0) then
                   ! compute gradient of f = equ<dot>jacobian
                   ! NOTE: NOT jacobian<dot>equ
@@ -463,11 +450,6 @@
                   exit iter_loop
                end if
                s% solver_adjust_iter = 0
-
-               if (s% solver_inspect_soln_flag) then
-                  call report_linearization_defect( &
-                     nvar, nz, rhs, jac_times_step, equ, coeff)
-               end if
 
                ! coeff is factor by which adjust_correction rescaled the correction vector
                if (coeff > s% tiny_corr_factor*min_corr_coeff .or. min_corr_coeff >= 1d0) then
@@ -1928,7 +1910,6 @@
             allocate(soln1(1:neq))
             allocate(grad_f1(1:neq))
             allocate(rhs(1:nvar,1:nz))
-            allocate(jac_times_step(1:nvar,1:nz))
             allocate(xder(1:nvar,1:nz))
             allocate(ddx(1:nvar,1:nz))
             allocate(row_scale_factors1(1:neq))
@@ -1952,7 +1933,6 @@
                call fill_with_NaNs(B1)
                call fill_with_NaNs(soln1)
                call fill_with_NaNs_2D(rhs)
-               call fill_with_NaNs_2D(jac_times_step)
                call fill_with_NaNs_2D(xder)
                call fill_with_NaNs_2D(ddx)
                call fill_with_NaNs(row_scale_factors1)
@@ -2005,7 +1985,6 @@
             if(associated(soln1)) deallocate(soln1)
             if(associated(grad_f1)) deallocate(grad_f1)
             if(associated(rhs)) deallocate(rhs)
-            if(associated(jac_times_step)) deallocate(jac_times_step)
             if(associated(xder)) deallocate(xder)
             if(associated(ddx)) deallocate(ddx)
             if(associated(row_scale_factors1)) deallocate(row_scale_factors1)
@@ -2025,108 +2004,11 @@
 
 
             nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
-                     soln1, grad_f1, rhs, jac_times_step, &
-                     xder, ddx, row_scale_factors1,&
+                     soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
                      col_scale_factors1, save_ublk1, save_dblk1, save_lblk1, band1,&
                      B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1, band)
 
          end subroutine cleanup
-
-
-         subroutine report_linear_solve_residual(nvar, nz, fold, jac_times_step)
-            integer, intent(in) :: nvar, nz
-            real(dp), intent(in) :: fold(:,:), jac_times_step(:,:)
-            integer :: i, k, j_max, k_max, num_terms
-            real(dp) :: abs_resid, max_fold, max_resid, resid_norm, weight
-
-            num_terms = 0
-            resid_norm = 0d0
-            max_fold = 0d0
-            max_resid = 0d0
-            j_max = 0
-            k_max = 0
-            do k = 1, nz
-               do i = 1, nvar
-                  weight = s% residual_weight(i,k)
-                  num_terms = num_terms + 1
-                  max_fold = max(max_fold, abs(weight*fold(i,k)))
-                  abs_resid = abs(weight*(fold(i,k) + jac_times_step(i,k)))
-                  resid_norm = resid_norm + abs_resid
-                  if (abs_resid > max_resid) then
-                     max_resid = abs_resid
-                     j_max = i
-                     k_max = k
-                  end if
-               end do
-            end do
-            if (num_terms == 0) return
-            resid_norm = resid_norm/dble(num_terms)
-            write(*,'(a,2i8,3(1x,es14.6))') &
-               'solver inspect linear residual: model, iter, avg, max, max/old', &
-               s% model_number, s% solver_iter, resid_norm, max_resid, &
-               max_resid/max(max_fold,tiny(max_fold))
-            if (j_max > 0) write(*,'(a,2i8,2x,a,1x,i8,1x,es14.6)') &
-               'solver inspect linear max: model, iter, equation, zone, value', &
-               s% model_number, s% solver_iter, trim(s% nameofequ(j_max)), k_max, max_resid
-         end subroutine report_linear_solve_residual
-
-
-         subroutine report_linearization_defect( &
-               nvar, nz, fold, jac_times_step, fnew, coeff)
-            integer, intent(in) :: nvar, nz
-            real(dp), intent(in) :: fold(:,:), jac_times_step(:,:), fnew(:,:), coeff
-            integer :: i, j, k, j_max, k_max, num_terms
-            real(dp) :: abs_defect, defect_norm, max_defect, max_fold, max_weight, &
-               raw_sum_xa, raw_xa, weight
-
-            num_terms = 0
-            defect_norm = 0d0
-            max_defect = 0d0
-            max_fold = 0d0
-            max_weight = 0d0
-            j_max = 0
-            k_max = 0
-            do k = 1, nz
-               do i = 1, nvar
-                  weight = s% residual_weight(i,k)
-                  num_terms = num_terms + 1
-                  max_fold = max(max_fold, abs(weight*fold(i,k)))
-                  abs_defect = abs(weight*( &
-                     fnew(i,k) - fold(i,k) - coeff*jac_times_step(i,k)))
-                  defect_norm = defect_norm + abs_defect
-                  if (abs_defect > max_defect) then
-                     max_defect = abs_defect
-                     max_weight = weight
-                     j_max = i
-                     k_max = k
-                  end if
-               end do
-            end do
-            if (num_terms == 0) return
-            defect_norm = defect_norm/dble(num_terms)
-            write(*,'(a,2i8,4(1x,es14.6))') &
-               'solver inspect linearization defect: model, iter, coeff, avg, max, max/old', &
-               s% model_number, s% solver_iter, coeff, defect_norm, max_defect, &
-               max_defect/max(max_fold,tiny(max_fold))
-            if (j_max > 0) write(*,'(a,2i8,2x,a,1x,i8,1x,es14.6)') &
-               'solver inspect defect max: model, iter, equation, zone, value', &
-               s% model_number, s% solver_iter, trim(s% nameofequ(j_max)), k_max, max_defect
-            if (j_max > 0) write(*,'(a,2i8,3(1x,es14.6))') &
-               'solver inspect defect values: model, iter, old, predicted, new', &
-               s% model_number, s% solver_iter, max_weight*fold(j_max,k_max), &
-               max_weight*(fold(j_max,k_max) + coeff*jac_times_step(j_max,k_max)), &
-               max_weight*fnew(j_max,k_max)
-            if (j_max > s% nvar_hydro) then
-               j = j_max - s% nvar_hydro
-               raw_xa = s% xa_start(j,k_max) + s% solver_dx(j_max,k_max)
-               raw_sum_xa = sum(s% xa_start(:,k_max)) + &
-                  sum(s% solver_dx(s% nvar_hydro+1:nvar,k_max))
-               write(*,'(a,2i8,4(1x,es14.6))') &
-                  'solver inspect defect composition: model, zone, raw X, used X, raw sumX, used sumX', &
-                  s% model_number, k_max, raw_xa, s% xa(j,k_max), &
-                  raw_sum_xa, sum(s% xa(:,k_max))
-            end if
-         end subroutine report_linearization_defect
 
 
          real(dp) function eval_slope(nvar, nz, grad_f, B)

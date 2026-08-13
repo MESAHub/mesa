@@ -935,14 +935,12 @@
          ! Keep reduced forward and reverse flows paired through cancellation.
          pure subroutine eval_approx21_reduced_flows( &
                y, rate, temp, reduced_dydt, reduced_dfdy, &
-               drate, reduced_drate, flows_out, fe56_aux1_out, fe56_aux2_out)
+               drate, reduced_drate)
             real(qp), intent(in) :: y(:), rate(:), temp
             real(qp), intent(out) :: reduced_dydt(size(y))
             real(qp), intent(out), optional :: reduced_dfdy(size(y),size(y))
             real(qp), intent(in), optional :: drate(:)
             real(qp), intent(out), optional :: reduced_drate(size(y))
-            real(qp), intent(out), optional :: flows_out(num_reduced_flows)
-            real(qp), intent(out), optional :: fe56_aux1_out, fe56_aux2_out
 
             integer :: j
             real(qp) :: denom, denom_drate, denom_dyneut, denom_dyprot
@@ -959,9 +957,6 @@
             dflows_drate = 0d0
             if (present(reduced_dfdy)) reduced_dfdy = 0d0
             if (present(reduced_drate)) reduced_drate = 0d0
-            if (present(flows_out)) flows_out = 0d0
-            if (present(fe56_aux1_out)) fe56_aux1_out = 0d0
-            if (present(fe56_aux2_out)) fe56_aux2_out = 0d0
 
             if (.not. (temp > 1.5d9)) return
 
@@ -1004,8 +999,6 @@
                dflows_dy(i_fe54_fe56_n,ineut) = ( &
                   -2d0*y(ife54)*y(ineut)*forward_product - &
                   flows(i_fe54_fe56_n)*rate(ir55ng))/denom
-               if (present(fe56_aux1_out)) fe56_aux1_out = reverse_product/denom
-               if (present(fe56_aux2_out)) fe56_aux2_out = forward_product/denom
                if (present(drate)) then
                   denom_drate = drate(ir55gn) + y(ineut)*drate(ir55ng)
                   numer_drate = y(ife56)*( &
@@ -1212,8 +1205,6 @@
                   dflows_drate(i_fe52_fe54) + dflows_drate(i_he4_breakup) - &
                   dflows_drate(i_fe54_fe56_ap))
             end if
-
-            if (present(flows_out)) flows_out = flows
          end subroutine eval_approx21_reduced_flows
 
 
