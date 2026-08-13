@@ -158,6 +158,9 @@ SRCS := \
    private/timestep.f90 \
    private/tdc_hydro.f90 \
    private/tdc_hydro_support.f90 \
+   private/star_LNA_turbulence_closures.f90 \
+   private/star_LNA_support.f90 \
+   private/star_LNA.f90 \
    private/turb_info.f90 \
    private/turb_support.f90 \
    private/winds.f90 \

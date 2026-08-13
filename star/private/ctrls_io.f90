@@ -440,7 +440,22 @@
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
     RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
-    RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, max_X_for_conv_timescale, min_X_for_conv_timescale, &
+    RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, &
+    star_LNA_flag, star_LNA_model_number, star_LNA_stop_after_run, star_LNA_num_modes, &
+    star_LNA_min_mode_frequency_uHz, &
+    star_LNA_min_first_mode_eta, star_LNA_min_mode_eta, &
+    star_LNA_max_abs_mode_eta, &
+    star_LNA_output_directory, star_LNA_output_file_prefix, &
+    star_LNA_write_matrix_summary, star_LNA_write_period_growth, &
+    star_LNA_write_eigenfunctions, star_LNA_write_work_integrals, &
+    star_LNA_set_initial_velocity, star_LNA_kick_vsurf_km_per_sec, &
+    star_LNA_mode_for_period, star_LNA_kick_mode_1, star_LNA_kick_mode_2, star_LNA_kick_mode_3, &
+    star_LNA_kick_fraction_1, star_LNA_kick_fraction_2, star_LNA_kick_fraction_3, star_LNA_solver, &
+    star_LNA_include_tdc, star_LNA_include_rsp2, star_LNA_perturb_convective_flux, &
+    star_LNA_perturb_turbulent_pressure, star_LNA_perturb_eddy_viscosity, &
+    star_LNA_perturb_turbulent_energy, star_LNA_convection_treatment, &
+    gyre_write_tdc_lna_background, &
+    max_X_for_conv_timescale, min_X_for_conv_timescale, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
 
 
@@ -2185,6 +2200,40 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_source_seed = RSP2_source_seed
  s% RSP2_w_fix_if_neg = RSP2_w_fix_if_neg
 
+ s% star_LNA_flag = star_LNA_flag
+ s% star_LNA_model_number = star_LNA_model_number
+ s% star_LNA_stop_after_run = star_LNA_stop_after_run
+ s% star_LNA_num_modes = star_LNA_num_modes
+ s% star_LNA_min_mode_frequency_uHz = star_LNA_min_mode_frequency_uHz
+ s% star_LNA_min_first_mode_eta = star_LNA_min_first_mode_eta
+ s% star_LNA_min_mode_eta = star_LNA_min_mode_eta
+ s% star_LNA_max_abs_mode_eta = star_LNA_max_abs_mode_eta
+ s% star_LNA_output_directory = star_LNA_output_directory
+ s% star_LNA_output_file_prefix = star_LNA_output_file_prefix
+ s% star_LNA_write_matrix_summary = star_LNA_write_matrix_summary
+ s% star_LNA_write_period_growth = star_LNA_write_period_growth
+ s% star_LNA_write_eigenfunctions = star_LNA_write_eigenfunctions
+ s% star_LNA_write_work_integrals = star_LNA_write_work_integrals
+ s% star_LNA_set_initial_velocity = star_LNA_set_initial_velocity
+ s% star_LNA_kick_vsurf_km_per_sec = star_LNA_kick_vsurf_km_per_sec
+ s% star_LNA_mode_for_period = star_LNA_mode_for_period
+ s% star_LNA_kick_mode_1 = star_LNA_kick_mode_1
+ s% star_LNA_kick_mode_2 = star_LNA_kick_mode_2
+ s% star_LNA_kick_mode_3 = star_LNA_kick_mode_3
+ s% star_LNA_kick_fraction_1 = star_LNA_kick_fraction_1
+ s% star_LNA_kick_fraction_2 = star_LNA_kick_fraction_2
+ s% star_LNA_kick_fraction_3 = star_LNA_kick_fraction_3
+ s% star_LNA_solver = star_LNA_solver
+ s% star_LNA_include_tdc = star_LNA_include_tdc
+ s% star_LNA_include_rsp2 = star_LNA_include_rsp2
+ s% star_LNA_perturb_convective_flux = star_LNA_perturb_convective_flux
+ s% star_LNA_perturb_turbulent_pressure = star_LNA_perturb_turbulent_pressure
+ s% star_LNA_perturb_eddy_viscosity = star_LNA_perturb_eddy_viscosity
+ s% star_LNA_perturb_turbulent_energy = star_LNA_perturb_turbulent_energy
+ s% star_LNA_convection_treatment = star_LNA_convection_treatment
+
+ s% gyre_write_tdc_lna_background = gyre_write_tdc_lna_background
+
  s% max_X_for_conv_timescale = max_X_for_conv_timescale
  s% min_X_for_conv_timescale = min_X_for_conv_timescale
  s% max_q_for_conv_timescale = max_q_for_conv_timescale
@@ -3917,6 +3966,40 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_w_min_for_damping = s% RSP2_w_min_for_damping
  RSP2_source_seed = s% RSP2_source_seed
  RSP2_w_fix_if_neg = s% RSP2_w_fix_if_neg
+
+ star_LNA_flag = s% star_LNA_flag
+ star_LNA_model_number = s% star_LNA_model_number
+ star_LNA_stop_after_run = s% star_LNA_stop_after_run
+ star_LNA_num_modes = s% star_LNA_num_modes
+ star_LNA_min_mode_frequency_uHz = s% star_LNA_min_mode_frequency_uHz
+ star_LNA_min_first_mode_eta = s% star_LNA_min_first_mode_eta
+ star_LNA_min_mode_eta = s% star_LNA_min_mode_eta
+ star_LNA_max_abs_mode_eta = s% star_LNA_max_abs_mode_eta
+ star_LNA_output_directory = s% star_LNA_output_directory
+ star_LNA_output_file_prefix = s% star_LNA_output_file_prefix
+ star_LNA_write_matrix_summary = s% star_LNA_write_matrix_summary
+ star_LNA_write_period_growth = s% star_LNA_write_period_growth
+ star_LNA_write_eigenfunctions = s% star_LNA_write_eigenfunctions
+ star_LNA_write_work_integrals = s% star_LNA_write_work_integrals
+ star_LNA_set_initial_velocity = s% star_LNA_set_initial_velocity
+ star_LNA_kick_vsurf_km_per_sec = s% star_LNA_kick_vsurf_km_per_sec
+ star_LNA_mode_for_period = s% star_LNA_mode_for_period
+ star_LNA_kick_mode_1 = s% star_LNA_kick_mode_1
+ star_LNA_kick_mode_2 = s% star_LNA_kick_mode_2
+ star_LNA_kick_mode_3 = s% star_LNA_kick_mode_3
+ star_LNA_kick_fraction_1 = s% star_LNA_kick_fraction_1
+ star_LNA_kick_fraction_2 = s% star_LNA_kick_fraction_2
+ star_LNA_kick_fraction_3 = s% star_LNA_kick_fraction_3
+ star_LNA_solver = s% star_LNA_solver
+ star_LNA_include_tdc = s% star_LNA_include_tdc
+ star_LNA_include_rsp2 = s% star_LNA_include_rsp2
+ star_LNA_perturb_convective_flux = s% star_LNA_perturb_convective_flux
+ star_LNA_perturb_turbulent_pressure = s% star_LNA_perturb_turbulent_pressure
+ star_LNA_perturb_eddy_viscosity = s% star_LNA_perturb_eddy_viscosity
+ star_LNA_perturb_turbulent_energy = s% star_LNA_perturb_turbulent_energy
+ star_LNA_convection_treatment = s% star_LNA_convection_treatment
+
+ gyre_write_tdc_lna_background = s% gyre_write_tdc_lna_background
 
  max_X_for_conv_timescale = s% max_X_for_conv_timescale
  min_X_for_conv_timescale = s% min_X_for_conv_timescale
