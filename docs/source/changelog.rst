@@ -39,6 +39,12 @@ GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since t
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
+Additional controls are available for TDC envelope remeshing:
+
+- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
+
 .. _Bug Fixes main:
 
 Bug Fixes
@@ -112,17 +118,10 @@ TDC
 -  ``TDC_num_innermost_cells_forced_nonturbulent`` : An optional control for forcing central zones to be radiative.
 -  ``TDC_num_outermost_cells_forced_nonturbulent`` : An optional control for forcing surface zones to be radiative.
 
-``star`` now contains optional controls allowing one to remesh an envelope model similar to ``RSP``.
-Set ``remesh_for_TDC_pulsations_when_load`` in ``controls`` to remesh a loaded model, or call
-the public ``remesh_for_TDC_pulsation`` function in ``$MESA_DIR/star/public/star_lib.f90``:
+``star`` now contains optional controls allowing one to remesh an envelope model similar to ``RSP``, by calling the public ``remesh_for_TDC_pulsation`` function contained within ``$MESA_DIR/star/public/star_lib.f90`` :
 
 -  ``TDC_hydro_nz`` : Analogous to ``RSP_nz``
 -  ``TDC_hydro_nz_outer`` : Analogous to ``RSP_nz_outer``
--  ``TDC_hydro_nz_inner`` : The optional number of zones that decrease
-   geometrically in mass toward the inner boundary.
--  ``TDC_hydro_nz_T_gradient`` : The optional number of zones added to
-   resolve temperature gradients below the anchor while retaining the
-   selected mass-based core zoning.
 -  ``TDC_hydro_T_anchor`` : Analogous to ``RSP_T_anchor``
 -  ``TDC_hydro_dq_1_factor`` : Analogous to ``RSP_dq_1_factor``
 -  ``TDC_hydro_use_mass_interp_face_values`` : This option determines whether face quantities are computed from simple averages or mass weighted averaging.

@@ -20,7 +20,7 @@
 module tdc_hydro_support
 
    use star_private_def
-   use const_def, only: dp, ln10, pi, lsun, rsun, msun
+   use const_def, only: dp, ln10, pi, lsun, rsun
    use utils_lib, only: is_bad
    use auto_diff
    use auto_diff_support
@@ -43,6 +43,7 @@ contains
       !  TDC_hydro_dq_1_factor = 2d0
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
+      use hydro_vars, only: set_cgrav
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
       integer :: k, j, nz_old, nz
@@ -96,7 +97,7 @@ contains
       if (s%rotation_flag) call remap_rotation2(old_J, old_abs_J)
       s%nz = nz
       call update_composition_info2
-      call update_cgrav2
+      call set_cgrav(s, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in set_cgrav')
       call revise_lnT_for_QHSE2(P_surf, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in revise_lnT_for_QHSE')
@@ -105,7 +106,6 @@ contains
       write (*, 1) 'new old L_surf/Lsun', s%xh(s%i_lum, 1)/Lsun, old_L1/Lsun
       write (*, 1) 'new old R_surf/Rsun', exp(s%xh(s%i_lnR, 1))/Rsun, old_r1/Rsun
       write (*, '(A)')
-      !call mesa_error(__FILE__,__LINE__,'remesh_for_TDC')
 
    contains
 
@@ -193,7 +193,6 @@ contains
             Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          logical, parameter :: skip_partials = .true.
-         include 'formats'
          ierr = 0
          call set_phot_info(s)  ! sets s% Teff
          Teff = s%Teff
@@ -204,14 +203,6 @@ contains
          if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'get_P_surf failed in get_atm_PT')
          P_surf = exp(lnP_surf)
          T_surf = exp(lnT_surf)
-         return
-
-         write (*, 1) 'get_PT_surf P_surf', P_surf
-         write (*, 1) 'get_PT_surf T_surf', T_surf
-         write (*, 1) 'get_PT_surf Teff', Teff
-         write (*, 1) 'get_PT_surf opacity(1)', s%opacity(1)
-         write (*, 1)
-         !call mesa_error(__FILE__,__LINE__,'get_PT_surf')
       end subroutine get_PT_surf2
 
       subroutine set_xm_old2
@@ -327,9 +318,9 @@ contains
                   return
                end if
                f_low = double_ramp_mass2( &
-                  H_low, base_dm, center_dm, n_middle, nz_inner, H_inner, peak_dm) - rem_mass
+                  H_low, base_dm, center_dm, n_middle, nz_inner) - rem_mass
                f_high = double_ramp_mass2( &
-                  H_high, base_dm, center_dm, n_middle, nz_inner, H_inner, peak_dm) - rem_mass
+                  H_high, base_dm, center_dm, n_middle, nz_inner) - rem_mass
                if (f_low*f_high > 0d0) then
                   write(*,2) 'failed to bracket TDC core zoning ramp', &
                      n_middle, f_low, f_high
@@ -339,7 +330,7 @@ contains
                do iter = 1, 1000
                   H_mid = 0.5d0*(H_low + H_high)
                   f_mid = double_ramp_mass2( &
-                     H_mid, base_dm, center_dm, n_middle, nz_inner, H_inner, peak_dm) - rem_mass
+                     H_mid, base_dm, center_dm, n_middle, nz_inner) - rem_mass
                   if (abs(f_mid) < 1d-12*rem_mass) exit
                   if (f_low*f_mid <= 0d0) then
                      H_high = H_mid
@@ -441,13 +432,6 @@ contains
             s%q(k) = s%q(k - 1) - s%dq(k - 1)
          end do
          call set_dm_bar(s, nz, s%dm, s%dm_bar)
-         return
-
-         do k = 2, nz
-            write (*, 2) 'dm(k)/dm(k-1) m(k)', k, s%dm(k)/s%dm(k - 1), s%m(k)/Msun
-         end do
-         write (*, 1) 'm_center', s%m_center/msun
-         call mesa_error(__FILE__, __LINE__, 'set_xm_new')
       end subroutine set_xm_new2
 
       real(dp) function geometric_sum2(H, n) result(sum_H)
@@ -462,10 +446,10 @@ contains
       end function geometric_sum2
 
       real(dp) function double_ramp_mass2( &
-            H, base_dm, center_dm, n_middle, n_inner, H_inner, peak_dm) result(total_mass)
+            H, base_dm, center_dm, n_middle, n_inner) result(total_mass)
          real(dp), intent(in) :: H, base_dm, center_dm
          integer, intent(in) :: n_middle, n_inner
-         real(dp), intent(out) :: H_inner, peak_dm
+         real(dp) :: H_inner, peak_dm
 
          peak_dm = base_dm*pow(H, real(n_middle - 1, dp))
          H_inner = pow(peak_dm/center_dm, 1d0/real(n_inner, dp))
@@ -782,11 +766,6 @@ contains
          end do
       end subroutine update_composition_info2
 
-      subroutine update_cgrav2
-         use hydro_vars, only: set_cgrav
-         call set_cgrav(s, ierr)
-      end subroutine update_cgrav2
-
       subroutine set_rotation_seed2
          use hydro_rotation, only: w_div_w_roche_jrot
 
@@ -823,7 +802,6 @@ contains
             s%lnR(k) = s%xh(s%i_lnR, k)
             s%r(k) = exp(s%lnR(k))
          end do
-         !write(*,1) 'before revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
          do k = 1, nz
             if (k < nz) then
                dm_face = s%dm_bar(k)
@@ -859,8 +837,6 @@ contains
             end if
             s%lnT(k) = logT*ln10
             s%xh(s%i_lnT, k) = s%lnT(k)
-            !write(*,2) 'logP dlogT logT logT_guess logRho', k, &
-            !   logP, logT - logT_guess, logT, logT_guess, logRho
             P_m1 = P_00
 
             if (k == 1) then  ! get opacity and recheck surf BCs
@@ -884,12 +860,9 @@ contains
                write (*, 1) 'new old T_surf', new_T_surf, T_surf
                write (*, 1) 'new old P_surf', new_P_surf, P_surf
                write (*, 1) 'new old kap(1)', kap, old_kap
-               !call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
             end if
 
          end do
-         !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
-         !stop
       end subroutine revise_lnT_for_QHSE2
 
    end subroutine remesh_for_TDC_pulsations
