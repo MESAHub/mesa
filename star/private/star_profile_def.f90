@@ -599,7 +599,18 @@
       integer, parameter :: p_Lt = p_Lc_div_L + 1
       integer, parameter :: p_Lt_div_L = p_Lt + 1
 
-      integer, parameter :: p_rsp_log_erad = p_Lt_div_L + 1
+      integer, parameter :: p_reconstructed_T_face = p_Lt_div_L + 1
+      integer, parameter :: p_reconstructed_rho_face = p_reconstructed_T_face + 1
+      integer, parameter :: p_reconstructed_P_face = p_reconstructed_rho_face + 1
+      integer, parameter :: p_reconstructed_Cp_face = p_reconstructed_P_face + 1
+      integer, parameter :: p_reconstructed_ChiRho_face = p_reconstructed_Cp_face + 1
+      integer, parameter :: p_reconstructed_ChiT_face = p_reconstructed_ChiRho_face + 1
+      integer, parameter :: p_reconstructed_grada_face = p_reconstructed_ChiT_face + 1
+      integer, parameter :: p_reconstructed_opacity_face = p_reconstructed_grada_face + 1
+      integer, parameter :: p_reconstructed_scale_height_face = p_reconstructed_opacity_face + 1
+      integer, parameter :: p_reconstructed_gradr_face = p_reconstructed_scale_height_face + 1
+
+      integer, parameter :: p_rsp_log_erad = p_reconstructed_gradr_face + 1
       integer, parameter :: p_rsp_erad = p_rsp_log_erad + 1
       integer, parameter :: p_rsp_logEt = p_rsp_erad + 1
       integer, parameter :: p_rsp_Et = p_rsp_logEt + 1
@@ -1277,6 +1288,16 @@
          profile_column_name(p_Lc_div_L) = 'Lc_div_L'
          profile_column_name(p_Lt) = 'Lt'
          profile_column_name(p_Lt_div_L) = 'Lt_div_L'
+         profile_column_name(p_reconstructed_T_face) = 'reconstructed_T_face'
+         profile_column_name(p_reconstructed_rho_face) = 'reconstructed_rho_face'
+         profile_column_name(p_reconstructed_P_face) = 'reconstructed_P_face'
+         profile_column_name(p_reconstructed_Cp_face) = 'reconstructed_Cp_face'
+         profile_column_name(p_reconstructed_ChiRho_face) = 'reconstructed_ChiRho_face'
+         profile_column_name(p_reconstructed_ChiT_face) = 'reconstructed_ChiT_face'
+         profile_column_name(p_reconstructed_grada_face) = 'reconstructed_grada_face'
+         profile_column_name(p_reconstructed_opacity_face) = 'reconstructed_opacity_face'
+         profile_column_name(p_reconstructed_scale_height_face) = 'reconstructed_scale_height_face'
+         profile_column_name(p_reconstructed_gradr_face) = 'reconstructed_gradr_face'
 
          profile_column_name(p_rsp_Et) = 'rsp_Et'
          profile_column_name(p_rsp_logEt) = 'rsp_logEt'
