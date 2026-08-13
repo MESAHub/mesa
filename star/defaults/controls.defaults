@@ -6565,8 +6565,8 @@
       ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
       ! mass weighted averaging.
 
-      ! The power-law and logarithmic mass schemes work well for most Cepheid envelopes, but are not designed
-      ! for AGB stars with deep convective envelopes.
+      ! Use ``TDC_hydro_nz_inner`` and ``TDC_hydro_nz_T_gradient`` to resolve the inner boundary
+      ! and steep temperature gradients in AGB envelopes with deep convective regions.
 
       ! If ``remesh_for_TDC_pulsations_when_load`` is true, a model loaded from a ``.mod`` file
       ! is remeshed before the first step. This is not applied to photo restarts.
