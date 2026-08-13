@@ -572,7 +572,7 @@
          T_m1 = wrap_T_m1(s, k)
          call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          Cp_face = alfa*Cp_00 + beta*Cp_m1  ! ergs g^-1 K^-1
-         T_face = alfa*Cp_00 + beta*Cp_m1
+         T_face = alfa*T_00 + beta*T_m1
          rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
          Peos_face = alfa*wrap_Peos_00(s,k) + beta*wrap_Peos_m1(s,k)
          e_face = alfa*wrap_e_00(s,k) + beta*wrap_e_m1(s,k)
@@ -585,7 +585,7 @@
             ! X = G/F
             X = (Cp_face*T_face/h_face)*ALFAS_ALFA* Y_face / sqrt_2_div_3
             FL = flux_limiter_function(X)
-            ! Avoid 0/0 or tiny/tiny; for X ≈ 0, FL ≈ X so scale ~ 1 anyway.
+            ! Avoid 0/0 or tiny/tiny; for X near 0, FL near X so scale ~ 1 anyway.
             if (abs(X%val) >= 0.95d0) then
                scale = FL / X
             else
@@ -623,7 +623,7 @@
         else if (X%val >= X1) then
            FL = 1.0_dp
 
-        ! Region 2: smooth C² transition between the two
+        ! Region 2: smooth C2 transition between the two
         else
            ! Normalized coordinate in [0,1]
            s = (X - X0) / (X1 - X0)
@@ -927,7 +927,7 @@
          POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00)
             ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
             ! K^3 / (cm^-4 erg K^-1) = K^4 cm^4 erg^-1
-         Dr = get_etrb(s,k)*POM*POM2/pow2(Hp_cell)
+         Dr = pow2(w_00)*POM*POM2/pow2(Hp_cell)
          ! (erg cm^-2 K^-4 s^-1) (K^4 cm^4 erg^-1) cm^2 s^-2 cm^-2
          ! cm^2 s^-3 = erg g^-1 s^-1
          s% DAMPR(k) = Dr%val
@@ -1206,7 +1206,7 @@
 
          !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
          do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
-               s% nz - max(1,int(s% nz/s% RSP_nz_div_IBOTOM))
+               s% nz - max(1,int(s% nz/s% RSP2_nz_div_IBOTOM))
 
             if (s% w(k) > s% RSP2_w_min_for_damping) cycle
 
