@@ -9173,7 +9173,7 @@
       ! temperature correction. This avoids losing small corrections when
       ! adding them to the absolute value of lnT.
 
-    solver_use_T_reference = .false.
+    solver_use_T_reference = .true.
     num_times_solver_reuse_mtx = 0
 
 
