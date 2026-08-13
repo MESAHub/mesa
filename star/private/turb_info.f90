@@ -57,10 +57,9 @@
          if (present(set_tau_conv)) set_tau = set_tau_conv
          set_tau = set_tau .and. s% superad_reduction_use_turnover_limit
          use_mlt_vc_tau_surface = .false.
-         if (set_tau .and. s% superad_reduction_use_mlt_vc_for_tau_conv .and. &
-               s% have_mlt_vc .and. nzlo == 1) then
+         if (set_tau .and. s% have_mlt_vc .and. nzlo == 1) then
             if (associated(s% mlt_vc)) &
-               use_mlt_vc_tau_surface = s% mlt_vc(1) > min_mlt_vc_for_tau_conv
+               use_mlt_vc_tau_surface = s% mlt_vc(1) > 0d0
          end if
          if (s% doing_timing) call start_time(s, time0, total)
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
@@ -155,10 +154,11 @@
             tau_conv = s% tau_conv_start(k)
             if (s% use_face_reconstruction .and. k > 1) &
                tau_conv = conv_time_scale(s,k)
-            if (s% superad_reduction_use_mlt_vc_for_tau_conv .and. s% have_mlt_vc) then
+            if (s% have_mlt_vc) then
                if (associated(s% mlt_vc)) then
-                  if (s% mlt_vc(k) > min_mlt_vc_for_tau_conv) &
-                     tau_conv = scale_height_ad% val/s% mlt_vc(k)
+                  if (s% mlt_vc(k) > 0d0) &
+                     tau_conv = scale_height_ad% val/ &
+                        max(s% mlt_vc(k), min_mlt_vc_for_tau_conv)
                end if
             end if
             s% tau_conv_start(k) = tau_conv
