@@ -306,8 +306,7 @@
             superad_reduction_Gamma_inv_scale, &
             superad_reduction_diff_grads_limit, &
             superad_reduction_limit
-         logical :: superad_reduction_use_turnover_limit, &
-            superad_reduction_use_mlt_vc_for_tau_conv
+         logical :: superad_reduction_use_turnover_limit
          character(len=strlen) :: superad_reduction_turnover_limit_function
 
       ! mixing parameters

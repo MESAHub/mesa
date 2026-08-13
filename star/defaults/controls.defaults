@@ -2731,10 +2731,12 @@
       ! Relaxes the applied reduction from its previous accepted value toward
       ! the instantaneous value over the local response time. The response
       ! fraction is set by ``superad_reduction_turnover_limit_function``.
-      ! ``tau_conv`` is set from the Brunt frequency at the start of the step
-      ! and held fixed during solver iterations. The limiter acts on
-      ! ``1/Gamma_factor``, which multiplies ``gradr-gradL``, and uses the same
-      ! interpolated or reconstructed face state as MLT or TDC.
+      ! In zones with a lagged convective velocity, ``tau_conv`` is
+      ! ``scale_height/max(mlt_vc,1d-10 cm/s)``. Other zones use the Brunt
+      ! frequency. The timescale is set at the start of the step and held fixed
+      ! during solver iterations. The limiter acts on ``1/Gamma_factor``, which
+      ! multiplies ``gradr-gradL``, and uses the same interpolated or
+      ! reconstructed face state as MLT or TDC.
 
       ! ::
 
@@ -2750,19 +2752,6 @@
       ! ::
 
       superad_reduction_turnover_limit_function = 'linear'
-
-      ! superad_reduction_use_mlt_vc_for_tau_conv
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``superad_reduction_use_turnover_limit`` and this control are both
-      ! ``.true.``, uses ``tau_conv = scale_height/mlt_vc`` where the
-      ! lagged convective velocity from the start of the step exceeds
-      ! ``1d-10 cm/s``. Other zones use the Brunt timescale.
-
-      ! ::
-
-      superad_reduction_use_mlt_vc_for_tau_conv = .false.
-
 
    ! overshooting
    ! ____________
