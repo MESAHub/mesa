@@ -216,6 +216,8 @@ module turb
       end if
    end subroutine set_TDC
 
+   !> Returns the luminosity residual and convective velocity equation for the
+   !! static TDC linearization. Here A = conv_vel/sqrt(2/3).
    subroutine set_TDC_LNA( &
             mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, &
             cgrav, m, chiT, chiRho, L_total, gradT_actual, r, P, T, rho, Cp, opacity, &
