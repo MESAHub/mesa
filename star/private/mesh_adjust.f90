@@ -249,10 +249,6 @@
             0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
          if (failed('mlt_cv')) return
 
-         ! Remap the previous-step superadiabatic-reduction factor onto the
-         ! new mesh so the smooth-relaxation limiter reads the correct local
-         ! Gamma_factor_old(k) after mesh adjustments. Neutral fill = 1d0
-         ! (no throttle) for cells that have no overlap with the old mesh.
          call do_interp_pt_val( &
             s, nz, nz_old, nzlo, nzhi, &
             s% superad_reduction_factor, superad_reduction_factor_old, &

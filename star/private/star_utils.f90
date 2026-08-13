@@ -3709,18 +3709,26 @@
          end if
          k = max(2,k_in)
          brunt_B = s% brunt_B(k)
-         call get_face_weights(s, k, alfa, beta)
-         rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
-         Peos_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
-         chiT_face = alfa*s% chiT(k) + beta*s% chiT(k-1)
-         chiRho_face = alfa*s% chiRho(k) + beta*s% chiRho(k-1)
+         if (s% use_face_reconstruction .and. s% reconstructed_face_state_valid(k)) then
+            rho_face = s% reconstructed_rho_face_ad(k)% val
+            Peos_face = s% reconstructed_P_face_ad(k)% val
+            chiT_face = s% reconstructed_ChiT_face_ad(k)% val
+            chiRho_face = s% reconstructed_ChiRho_face_ad(k)% val
+            grada_face = s% reconstructed_grada_face_ad(k)% val
+         else
+            call get_face_weights(s, k, alfa, beta)
+            rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
+            Peos_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
+            chiT_face = alfa*s% chiT(k) + beta*s% chiT(k-1)
+            chiRho_face = alfa*s% chiRho(k) + beta*s% chiRho(k-1)
+            grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
+         end if
          f = pow2(s% grav(k))*rho_face/Peos_face*chiT_face/chiRho_face
          dlnP = s% lnPeos(k-1) - s% lnPeos(k)
          dlnT = s% lnT(k-1) - s% lnT(k)
-         grada_face = alfa*s% grada(k) + beta*s% grada(k-1)
          gradT_actual = safe_div_val(s, dlnT, dlnP)  ! mlt has not been called yet when doing this
          brunt_N2 = f*(brunt_B - (gradT_actual - grada_face))
-         if(abs(brunt_B) > 0d0) then
+         if (abs(brunt_N2) > 0d0) then
             tau_conv = 1d0/sqrt(abs(brunt_N2))
          else
             tau_conv = 0d0
@@ -3732,15 +3740,21 @@
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: tau_conv
+         logical :: set_tau_conv
          include 'formats'
          s% min_conv_time_scale = 1d99
          s% max_conv_time_scale = 0d0
+         set_tau_conv = s% superad_reduction_use_turnover_limit
          do k=1,s%nz
+            if (set_tau_conv) then
+               tau_conv = conv_time_scale(s,k)
+               s% tau_conv_start(k) = tau_conv
+            end if
             if (s% X(k) > s% max_X_for_conv_timescale) cycle
             if (s% X(k) < s% min_X_for_conv_timescale) cycle
             if (s% q(k) > s% max_q_for_conv_timescale) cycle
             if (s% q(k) < s% min_q_for_conv_timescale) exit
-            tau_conv = conv_time_scale(s,k)
+            if (.not. set_tau_conv) tau_conv = conv_time_scale(s,k)
             if (tau_conv < s% min_conv_time_scale) &
                s% min_conv_time_scale = tau_conv
             if (tau_conv > s% max_conv_time_scale) &
