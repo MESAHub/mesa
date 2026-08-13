@@ -1,5 +1,5 @@
          
-         logical :: compare_TDC_to_MLT 
+         logical :: compare_TDC_to_MLT
          logical :: use_TDC_Y_face_seeded_newton
          character(32) :: hydro_matrix_solver
 
@@ -48,6 +48,35 @@
          character(256) :: RSP2_work_filename, RSP2_map_columns_filename, &
             RSP2_map_filename, RSP2_map_history_filename
          logical :: RSP2_write_map
+
+         logical :: star_LNA_flag
+         integer :: star_LNA_model_number
+         logical :: star_LNA_stop_after_run
+         integer :: star_LNA_num_modes
+         real(dp) :: star_LNA_min_mode_frequency_uHz
+         real(dp) :: star_LNA_min_first_mode_eta
+         real(dp) :: star_LNA_min_mode_eta
+         real(dp) :: star_LNA_max_abs_mode_eta
+         character(256) :: star_LNA_output_directory
+         character(256) :: star_LNA_output_file_prefix
+         logical :: star_LNA_write_matrix_summary
+         logical :: star_LNA_write_period_growth
+         logical :: star_LNA_write_eigenfunctions
+         logical :: star_LNA_write_work_integrals
+         logical :: star_LNA_set_initial_velocity
+         real(dp) :: star_LNA_kick_vsurf_km_per_sec
+         integer :: star_LNA_mode_for_period
+         integer :: star_LNA_kick_mode_1, star_LNA_kick_mode_2, star_LNA_kick_mode_3
+         real(dp) :: star_LNA_kick_fraction_1, star_LNA_kick_fraction_2, star_LNA_kick_fraction_3
+         character(32) :: star_LNA_solver
+         logical :: star_LNA_include_tdc, star_LNA_include_rsp2
+         logical :: star_LNA_perturb_convective_flux
+         logical :: star_LNA_perturb_turbulent_pressure
+         logical :: star_LNA_perturb_eddy_viscosity
+         logical :: star_LNA_perturb_turbulent_energy
+         character(32) :: star_LNA_convection_treatment
+
+         logical :: gyre_write_tdc_lna_background
 
 
 

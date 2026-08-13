@@ -3172,6 +3172,18 @@
       end subroutine star_do1_rsp_build
 
 
+      subroutine star_do_LNA(id, ierr)
+         use star_lna, only: do_star_LNA
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type(star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call do_star_LNA(s, ierr)
+      end subroutine star_do_LNA
+
+
       subroutine rsp_do1_eos_and_kap(s,k,ierr)
          use rsp_step, only : do1_eos_and_kap
          type (star_info), pointer :: s
