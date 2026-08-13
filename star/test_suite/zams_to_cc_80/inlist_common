@@ -120,23 +120,18 @@
 
 
 
-! superadiabatic convection routines, it's a choice:
-! typically only necessary at higher metallicities 1/5 solar +
+! superadiabatic reduction
 
-      ! superadiabatic reduction, implicit, new
-      use_superad_reduction = .false.
+      use_superad_reduction = .true.
       superad_reduction_Gamma_limit = 0.5d0 !default is 0.5d0
       superad_reduction_Gamma_limit_scale = 5d0
       superad_reduction_Gamma_inv_scale = 5d0
       superad_reduction_diff_grads_limit = 1d-2 ! default is 1d-3
       superad_reduction_limit = -1d0
+      superad_reduction_use_turnover_limit = .true.
+      superad_reduction_turnover_limit_function = 'linear'
 
-
-      ! MLT ++, explicit, well tested
-      okay_to_reduce_gradT_excess = .true.
-      gradT_excess_f1 = 1d-4
-      gradT_excess_f2 = 1d-2
-      !gradT_excess_lambda1 = -1d0 ! full on
+      okay_to_reduce_gradT_excess = .false.
 
 ! mixing
       D_omega_mixing_rate = 1d0
