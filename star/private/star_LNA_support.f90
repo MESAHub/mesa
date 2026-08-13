@@ -127,9 +127,7 @@
 
       contains
 
-      ! -----------
       ! Model setup checks.
-      ! -----------
       subroutine check_star_LNA_model(s, ierr)
          type(star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -141,67 +139,67 @@
          if (ierr /= 0) return
 
          if (s% u_flag) then
-            write(*,'(a)') 'star_LNA does not yet support u_flag perturbations.'
+            write(*,'(a)') 'star_LNA does not support u_flag perturbations.'
             ierr = -1
             return
          end if
 
          if (s% rotation_flag) then
-            write(*,'(a)') 'star_LNA does not yet support rotation perturbations.'
+            write(*,'(a)') 'star_LNA does not support rotation perturbations.'
             ierr = -1
             return
          end if
 
          if (s% RTI_flag) then
-            write(*,'(a)') 'star_LNA does not yet support RTI perturbations.'
+            write(*,'(a)') 'star_LNA does not support RTI perturbations.'
             ierr = -1
             return
          end if
 
          if (s% use_mass_corrections) then
-            write(*,'(a)') 'star_LNA does not yet support mass corrections.'
+            write(*,'(a)') 'star_LNA does not support mass corrections.'
             ierr = -1
             return
          end if
 
          if (s% use_other_momentum .or. s% use_other_momentum_implicit) then
-            write(*,'(a)') 'star_LNA does not yet support other_momentum hooks.'
+            write(*,'(a)') 'star_LNA does not support other_momentum hooks.'
             ierr = -1
             return
          end if
 
          if (s% use_other_pressure) then
-            write(*,'(a)') 'star_LNA does not yet support other_pressure hooks.'
+            write(*,'(a)') 'star_LNA does not support other_pressure hooks.'
             ierr = -1
             return
          end if
 
          if (s% use_compression_outer_BC) then
-            write(*,'(a)') 'star_LNA does not yet support compression outer BC.'
+            write(*,'(a)') 'star_LNA does not support the compression outer BC.'
             ierr = -1
             return
          end if
 
          if (s% use_other_surface_PT) then
-            write(*,'(a)') 'star_LNA does not yet support other_surface_PT hooks.'
+            write(*,'(a)') 'star_LNA does not support other_surface_PT hooks.'
             ierr = -1
             return
          end if
 
          if (s% drag_coefficient > 0d0) then
-            write(*,'(a)') 'star_LNA does not yet support velocity drag.'
+            write(*,'(a)') 'star_LNA does not support velocity drag.'
             ierr = -1
             return
          end if
 
          if (s% eps_grav_form_for_energy_eqn) then
-            write(*,'(a)') 'star_LNA currently requires the dE/dt energy-equation form.'
+            write(*,'(a)') 'star_LNA requires the dE/dt energy equation form.'
             ierr = -1
             return
          end if
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
-            write(*,'(a)') 'star_LNA does not yet support the dPrad/dm temperature-gradient form.'
+            write(*,'(a)') 'star_LNA does not support the dPrad/dm temperature gradient form.'
             ierr = -1
             return
          end if
@@ -237,7 +235,7 @@
                write(*,'(a)') &
                   'star_LNA_set_initial_velocity is incompatible with use_fixed_vsurf_outer_BC.'
                write(*,'(a)') &
-                  'The fixed-vsurf BC constrains the LNA surface velocity, so the requested scaling is ill-defined.'
+                  'The fixed surface velocity BC constrains the LNA surface velocity, so the requested scaling is undefined.'
                ierr = -1
                return
             end if
@@ -305,7 +303,7 @@
          end if
 
          if (trim(s% star_LNA_solver) /= 'dense') then
-            write(*,'(a)') 'star_LNA currently only accepts star_LNA_solver = ''dense''.'
+            write(*,'(a)') 'star_LNA_solver must be ''dense''.'
             ierr = -1
             return
          end if
@@ -323,13 +321,13 @@
          if (trim(s% star_LNA_convection_treatment) == 'mlt_static' .and. &
                (s% RSP2_flag .or. s% MLT_option == 'TDC')) then
             write(*,'(a)') &
-               'star_LNA mlt_static requires a non-TDC, non-RSP2 MLT background.'
+               'star_LNA mlt_static requires an MLT background without TDC or RSP2.'
             ierr = -1
             return
          end if
 
          if (s% RSP2_flag .and. frozen_flux_lna_selected(s)) then
-            write(*,'(a)') 'star_LNA frozen_flux currently supports non-RSP2 models only.'
+            write(*,'(a)') 'star_LNA frozen_flux supports only models without RSP2.'
             ierr = -1
             return
          end if
@@ -342,7 +340,7 @@
 
          if (s% RSP2_flag .and. .not. s% star_LNA_perturb_turbulent_energy) then
             write(*,'(a)') &
-               'RSP2 star_LNA currently requires star_LNA_perturb_turbulent_energy = .true.'
+               'RSP2 models require star_LNA_perturb_turbulent_energy = .true.'
             ierr = -1
             return
          end if
@@ -357,15 +355,13 @@
          ierr = 0
 
          if (s% mstar_dot /= 0d0) then
-            write(*,'(a)') 'star_LNA currently requires a zero mass-change rate.'
+            write(*,'(a)') 'star_LNA requires mstar_dot = 0.'
             ierr = -1
             return
          end if
       end subroutine check_static_star_LNA_background
 
-      ! -----------
       ! Problem setup and dense matrix allocation.
-      ! -----------
       subroutine setup_star_LNA_problem(s, problem, ierr)
          type(star_info), pointer :: s
          type(star_LNA_problem), intent(out) :: problem
@@ -537,16 +533,14 @@
          mtx%B = 0d0
       end subroutine allocate_star_LNA_matrix
 
-      ! -----------
       ! Matrix row assembly.
-      ! -----------
       !
       ! The generalized problem is
       !
       !   A*x = sigma*B*x
       !
       ! Algebraic rows write only A. Dynamic rows put the static RHS
-      ! perturbation in A and the time-derivative inertia in B.
+      ! perturbation in A and the time derivative inertia in B.
 
       ! Equation:
       !   rho_k*DeltaV_k = dm_k
@@ -569,7 +563,7 @@
          do k = 1, map%nz
             row = matrix_index(map, k, lna_var_lnd)
             if (row <= 0) then
-               write(*,'(a,i0)') 'star_LNA missing density-row variable at k = ', k
+               write(*,'(a,i0)') 'star_LNA density row is missing a variable at k = ', k
                ierr = -1
                return
             end if
@@ -599,7 +593,7 @@
 
          if (cell_volume_ad%val <= 0d0) then
             write(*,'(a,i0,1pe14.6)') &
-               'star_LNA found non-positive cell volume at k = ', k, cell_volume_ad%val
+               'star_LNA found nonpositive cell volume at k = ', k, cell_volume_ad%val
             ierr = -1
             return
          end if
@@ -615,7 +609,7 @@
       ! Matrix:
       !   A(row,:) receives the AD partials of v_k/r_k.
       !   B(row,lnR_k) = 1.
-      !   Force-zero velocity cells use the algebraic row delta v_k = 0.
+      !   Cells with constrained velocity use the algebraic row delta v_k = 0.
       subroutine assemble_radius_rows(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -630,7 +624,7 @@
             col_lnR = matrix_index(map, k, lna_var_lnR)
             col_v = matrix_index(map, k, lna_var_v)
             if (row <= 0 .or. col_lnR <= 0 .or. col_v <= 0) then
-               write(*,'(a,i0)') 'star_LNA missing radius-row variable at k = ', k
+               write(*,'(a,i0)') 'star_LNA radius row is missing a variable at k = ', k
                ierr = -1
                return
             end if
@@ -639,7 +633,7 @@
                mtx%A(row, col_v) = 1d0
             else
                if (s% r(k) <= 0d0) then
-                  write(*,'(a,i0)') 'star_LNA found non-positive radius at k = ', k
+                  write(*,'(a,i0)') 'star_LNA found nonpositive radius at k = ', k
                   ierr = -1
                   return
                end if
@@ -663,7 +657,7 @@
       ! Matrix:
       !   A(row,:) receives the AD partials of RHS_k.
       !   B(row,v_k) = 1.
-      !   The surface row may instead impose a pressure or fixed-velocity BC.
+      !   The surface row may instead impose a pressure or fixed velocity BC.
       subroutine assemble_momentum_rows(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -677,7 +671,7 @@
             row = matrix_index(map, k, lna_var_v)
             col_v = matrix_index(map, k, lna_var_v)
             if (row <= 0 .or. col_v <= 0) then
-               write(*,'(a,i0)') 'star_LNA missing momentum-row variable at k = ', k
+               write(*,'(a,i0)') 'star_LNA momentum row is missing a variable at k = ', k
                ierr = -1
                return
             end if
@@ -939,8 +933,8 @@
       ! Linearized form:
       !   delta[-dL/dm + sources - dwork/dm] = sigma*delta e_eff
       !
-      ! For the active MESA dedt total-energy form before the P*d(1/rho)
-      ! time-centered branch, e_eff includes internal, turbulent, kinetic, and
+      ! For the active MESA dedt total energy form before the P*d(1/rho)
+      ! time centering branch, e_eff includes internal, turbulent, kinetic, and
       ! potential specific energy.  Around a static background the kinetic
       ! derivative vanishes, but keeping the MESA helper here preserves the
       ! correct linearization if the background has small nonzero velocities.
@@ -960,7 +954,7 @@
          do k = 1, map%nz
             row = matrix_index(map, k, lna_var_lnT)
             if (row <= 0) then
-               write(*,'(a,i0)') 'star_LNA missing energy-row variable at k = ', k
+               write(*,'(a,i0)') 'star_LNA energy row is missing a variable at k = ', k
                ierr = -1
                return
             end if
@@ -1040,10 +1034,10 @@
       end subroutine energy_sources_for_star_LNA
 
 
-      ! Static pressure-work row:
+      ! Static pressure work row:
       !   dwork/dm = [P*A*v]_k - [P*A*v]_{k+1}
       !
-      ! For the intended static LNA background, v0 = 0, so the first-order row is
+      ! For a static LNA background, v0 = 0, so the first order row is
       !   delta(dwork/dm) = [P0*delta(A*v)]_k - [P0*delta(A*v)]_{k+1}.
       ! This intentionally does not include delta(P)*A*v0 terms.
       subroutine dwork_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
@@ -1134,8 +1128,8 @@
       !   RSP2:              Lr + Lc + Lt - L = 0
       !   TDC:               Lrad + Lconv - L = 0
       !   Frozen flux:       Lrad + Lconv0 - L = 0
-      !   Surface non-RSP:   surface temperature boundary
-      !   Static non-TDC:    temperature-gradient relation
+      !   Surface without RSP: surface temperature boundary
+      !   Static without TDC:  temperature gradient relation
       subroutine assemble_luminosity_rows(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -1148,7 +1142,7 @@
          do k = 1, map%nz
             row = matrix_index(map, k, lna_var_L)
             if (row <= 0) then
-               write(*,'(a,i0)') 'star_LNA missing luminosity-row variable at k = ', k
+               write(*,'(a,i0)') 'star_LNA luminosity row is missing a variable at k = ', k
                ierr = -1
                return
             end if
@@ -1347,14 +1341,14 @@
       end subroutine assemble_rsp2_turbulent_rows
 
 
-      ! RSP2 turbulent-energy row:
+      ! RSP2 turbulent energy row:
       !   d etrb_k/dt = COUPL_k - dLt_k/dm - Ptrb_k*dVdt_k/dm
       !
-      ! Static-background linearized form:
+      ! Static background linearized form:
       !   delta[COUPL - dLt/dm - Ptrb0*dVdt/dm] = sigma*delta etrb.
       ! The nonlinear hydro residual has an Eq term, but Eq is quadratic in the
-      ! velocity-gradient perturbation and is omitted from the static LNA.
-      ! Forced non-turbulent cells use delta w = 0.
+      ! velocity gradient perturbation and is omitted from the static LNA.
+      ! Forced nonturbulent cells use delta w = 0.
       subroutine assemble_rsp2_w_row(s, map, mtx, k, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -1368,7 +1362,7 @@
          row = matrix_index(map, k, lna_var_w)
          col_w = matrix_index(map, k, lna_var_w)
          if (row <= 0 .or. col_w <= 0) then
-            write(*,'(a,i0)') 'star_LNA missing RSP2 w-row variable at k = ', k
+            write(*,'(a,i0)') 'star_LNA missing RSP2 w row variable at k = ', k
             ierr = -1
             return
          end if
@@ -1390,7 +1384,7 @@
       end subroutine assemble_rsp2_w_row
 
 
-      ! RSP2 algebraic pressure-scale-height row:
+      ! RSP2 algebraic pressure scale height row:
       !   Hp_expected_k - Hp_k = 0
       !
       ! Matrix:
@@ -1409,7 +1403,7 @@
          ierr = 0
          row = matrix_index(map, k, lna_var_Hp)
          if (row <= 0) then
-            write(*,'(a,i0)') 'star_LNA missing RSP2 Hp-row variable at k = ', k
+            write(*,'(a,i0)') 'star_LNA RSP2 Hp row is missing a variable at k = ', k
             ierr = -1
             return
          end if
@@ -1440,12 +1434,12 @@
       end subroutine assemble_tdc_turbulent_rows
 
 
-      ! TDC internal-w row:
+      ! TDC internal w row:
       !   velocity_rhs(A,rho,T,...) = sigma*velocity_inertia(A,rho,...)
       !
       ! with A = conv_vel/sqrt(2/3). The TDC terms are returned by
       ! turb:set_TDC_LNA and are internal to the LNA; this does not add a normal
-      ! MESA-star TDC state variable. Forced non-turbulent faces use delta w = 0.
+      ! MESA/star TDC state variable. Forced nonturbulent faces use delta w = 0.
       subroutine assemble_tdc_w_row(s, map, mtx, k, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -1460,7 +1454,7 @@
          row = matrix_index(map, k, lna_var_w)
          col_w = matrix_index(map, k, lna_var_w)
          if (row <= 0 .or. col_w <= 0) then
-            write(*,'(a,i0)') 'star_LNA missing TDC w-row variable at k = ', k
+            write(*,'(a,i0)') 'star_LNA missing TDC w row variable at k = ', k
             ierr = -1
             return
          end if
@@ -1479,9 +1473,7 @@
          if (ierr /= 0) return
       end subroutine assemble_tdc_w_row
 
-      ! -----------
-      ! Auto-diff to matrix plumbing.
-      ! -----------
+      ! Automatic differentiation to matrix plumbing.
       subroutine add_ad_partials_to_A(map, mtx, row, k, scale, ad, ierr)
          type(star_LNA_var_map), intent(in) :: map
          type(star_LNA_matrix), intent(inout) :: mtx
@@ -1523,7 +1515,7 @@
 
             call ad_index_to_star_LNA_var(k, iad, kk, var_id)
             if (var_id == 0) then
-               write(*,'(3a)') 'star_LNA does not yet map auto-diff variable ', &
+               write(*,'(3a)') 'star_LNA does not map automatic differentiation variable ', &
                   trim(auto_diff_star_d1_names(iad)), ' into the LNA matrix.'
                ierr = -1
                return
@@ -1533,7 +1525,7 @@
             col = matrix_index(map, kk, var_id)
             if (col <= 0) then
                write(*,'(3a)') 'star_LNA active equation has unsupported variable ', &
-                  trim(var_name(var_id)), ' in its auto-diff partials.'
+                  trim(var_name(var_id)), ' in its automatic differentiation partials.'
                ierr = -1
                return
             end if
@@ -1594,9 +1586,7 @@
          end select
       end subroutine ad_index_to_star_LNA_var
 
-      ! -----------
       ! Dense generalized eigensolver and algebraic elimination.
-      ! -----------
       subroutine solve_dense_star_LNA(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -1779,7 +1769,7 @@
             return
          end if
          if (any(mtx%B(alg_idx, :) /= 0d0)) then
-            write(*,'(a)') 'star_LNA: algebraic rows contain time-derivative terms.'
+            write(*,'(a)') 'star_LNA: algebraic rows contain time derivative terms.'
             ierr = -1
             deallocate(Ared, Bred, alg_from_dyn)
             return
@@ -1899,9 +1889,7 @@
          end do
       end subroutine unscale_star_LNA_full_eigenvectors
 
-      ! -----------
       ! Mode selection, period/growth output, eigenfunctions, and kicks.
-      ! -----------
       subroutine select_star_LNA_modes(s, alphar, alphai, beta, mode_indices, num_modes, ierr)
          type(star_info), pointer :: s
          real(dp), intent(in) :: alphar(:), alphai(:), beta(:)
@@ -2014,11 +2002,11 @@
          open(newunit=io, file=trim(filename), action='write', status='replace', iostat=ierr)
          if (ierr /= 0) return
 
-         write(io,'(a)') '# star_LNA raw finite positive-frequency eigenvalues'
-         write(io,'(a)') '# sorted by increasing sigma_imag before acoustic-branch selection'
+         write(io,'(a)') '# star_LNA raw finite positive frequency eigenvalues'
+         write(io,'(a)') '# sorted by increasing sigma_imag before acoustic branch selection'
          write(io,'(a,1x,i0)') '# nvar_total', map%nvar_total
          write(io,'(a,1x,i0)') '# nvar_dynamic', size(alphar)
-         write(io,'(a)') '# eigen indices refer to the reduced dynamic-variable eigenproblem'
+         write(io,'(a)') '# eigen indices refer to the reduced dynamic variable eigenproblem'
          write(io,'(a)') &
             '# raw_rank reduced_eigen_index sigma_real sigma_imag ' // &
             'period_days pulsation_constant_Q_days W_rad_per_sec logKE_per_cycle beta ' // &
@@ -2123,15 +2111,15 @@
             s% star_LNA_kick_fraction_3
          write(io,'(a,1x,1pe24.16)') '# star_LNA_kick_vsurf_km_per_sec', &
             s% star_LNA_kick_vsurf_km_per_sec
-         write(io,'(a)') '# mode and star_LNA_kick_mode_* are one-based; control_mode_index is zero-based'
+         write(io,'(a)') '# mode and star_LNA_kick_mode_* start at one; control_mode_index starts at zero'
          write(io,'(a)') &
-            '# logKE_per_cycle = 4*pi*sigma_real/sigma_imag, the RSP LINA log-KE convention'
+            '# logKE_per_cycle = 4*pi*sigma_real/sigma_imag, the RSP LINA logarithmic kinetic energy convention'
          write(io,'(a)') &
             '# ke_fractional_growth_per_period is exp(logKE_per_cycle)-1; ' // &
             'grekm_growth_per_period is 2*tanh(logKE_per_cycle/2)'
          write(io,'(a)') &
             '# amplitude_fractional_growth_per_period is exp(logKE_per_cycle/2)-1'
-         write(io,'(a)') '# eigen indices refer to the reduced dynamic-variable eigenproblem'
+         write(io,'(a)') '# eigen indices refer to the reduced dynamic variable eigenproblem'
          write(io,'(a)') &
             '# pulsation_constant_Q_days follows RSP LINA: P_days*sqrt((M/Msun)*(Rsun/R)^3)'
          write(io,'(a)') &
@@ -2523,7 +2511,7 @@
          write(io,'(a,1x,i0)') '# control_mode_index', mode - 1
          write(io,'(a,1x,l1)') '# selected_for_initial_velocity', &
             selected_for_star_LNA_initial_velocity(s, mode)
-         write(io,'(a)') '# eigen_index refers to the reduced dynamic-variable eigenproblem'
+         write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
          write(io,'(a,1x,i0)') '# eigen_index', eigen_index
          write(io,'(a,1x,1pe24.16)') '# sigma_real', sigma_re
          write(io,'(a,1x,1pe24.16)') '# sigma_imag', sigma_im
@@ -2538,7 +2526,8 @@
          write(io,'(a,1x,i0)') '# star_LNA_kick_mode_3', s% star_LNA_kick_mode_3
          write(io,'(a,1x,1pe24.16)') '# star_LNA_kick_fraction_3', &
             s% star_LNA_kick_fraction_3
-         write(io,'(a)') '# normalized so surface delta_lnR = 1 when possible'
+         write(io,'(a)') &
+            '# normalized by surface delta_lnR; uses the largest component if abs(surface delta_lnR) <= 1d-99'
          write(io,'(a)') &
             '# k q m r re_lnd im_lnd re_lnR im_lnR re_v im_v ' // &
             're_lnT im_lnT re_L im_L re_w im_w re_Hp im_Hp ' // &
@@ -2575,7 +2564,7 @@
       end subroutine write_one_star_LNA_eigenfunction
 
 
-      ! Diagnostic work-output convention:
+      ! Diagnostic work output convention:
       !   d(1/rho) = -dlnrho/rho
       !   W_P = -pi*dm*Im(conjg(delta P)*delta(1/rho))
       !   W_L = -pi*dm*Im(conjg(delta lnT)*delta(dL/dm))/omega
@@ -2613,12 +2602,12 @@
          work_norm = kinetic_energy
          if (work_norm <= 0d0) work_norm = 1d0
 
-         write(io,'(a)') '# star_LNA diagnostic work terms'
+         write(io,'(a)') '# star_LNA work terms'
          write(io,'(a,1x,i0)') '# mode', mode
          write(io,'(a,1x,i0)') '# control_mode_index', mode - 1
          write(io,'(a,1x,l1)') '# selected_for_initial_velocity', &
             selected_for_star_LNA_initial_velocity(s, mode)
-         write(io,'(a)') '# eigen_index refers to the reduced dynamic-variable eigenproblem'
+         write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
          write(io,'(a,1x,i0)') '# eigen_index', eigen_index
          write(io,'(a,1x,1pe24.16)') '# sigma_real', sigma_re
          write(io,'(a,1x,1pe24.16)') '# sigma_imag', sigma_im
@@ -2640,9 +2629,9 @@
          write(io,'(a)') &
             '# pressure_work and turb_pressure_work use the operator pressure closure'
          write(io,'(a)') &
-            '# eddy_visc_work and luminosity-work columns are unvalidated diagnostics'
+            '# eddy_visc_work and luminosity work have not been compared with RSP/RSP2 output'
          write(io,'(a)') &
-            '# total_work is their diagnostic sum and is not an eigenvalue-growth identity'
+            '# total_work is the sum of the six work columns; it is not constrained by sigma_real'
          write(io,'(a)') &
             '# k logT r_div_R pressure_work turb_pressure_work eddy_visc_work ' // &
             'rad_lum_work conv_lum_work turb_lum_work total_work ' // &
@@ -3034,9 +3023,7 @@
          frequency_uHz = abs(sigma_im)/(2d0*pi)*1d6
       end function frequency_uHz_for_star_LNA
 
-      ! -----------
-      ! Matrix and row-audit diagnostics.
-      ! -----------
+      ! Matrix and row audit diagnostics.
       subroutine write_star_LNA_matrix_summary(s, problem, ierr)
          type(star_info), pointer :: s
          type(star_LNA_problem), intent(in) :: problem
@@ -3103,7 +3090,7 @@
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_rsp2_Hp_row_resid', diag
          write(io,'(a)') &
-            '# dense solve row/column-scales A and B before algebraic elimination'
+            '# dense solve row/column scales A and B before algebraic elimination'
          write(io,'(a)') '# eigenvalues still solve the original A*x = sigma*B*x problem'
          close(io)
 
@@ -3145,7 +3132,7 @@
          if (ierr /= 0) return
 
          write(io,'(a)') '# star_LNA row structure'
-         write(io,'(a)') '# row and column indices are one-based full-matrix indices'
+         write(io,'(a)') '# row and column indices start at one and refer to the full matrix'
          write(io,'(a)') &
             '# row zone row_var equation nnz_A nnz_B max_abs_A max_abs_B ' // &
             'dom_A_col dom_A_zone dom_A_var dom_B_col dom_B_zone dom_B_var'
@@ -3226,7 +3213,7 @@
          open(newunit=io, file=trim(filename), action='write', status='replace', iostat=ierr)
          if (ierr /= 0) return
 
-         write(io,'(a)') '# star_LNA TDC face-state audit'
+         write(io,'(a)') '# star_LNA TDC face state audit'
          write(io,'(a)') '# k=1 is the surface; all thermodynamic quantities are at face k'
          write(io,'(a)') &
             '# k use_face_reconstruction zero_w active_T active_rho active_P active_Cp ' // &
@@ -3532,9 +3519,7 @@
          end do
       end subroutine max_abs_rsp2_Hp_row_resid_for_star_LNA
 
-      ! -----------
-      ! Small indexing, reporting, and public-helper utilities.
-      ! -----------
+      ! Small indexing, reporting, and public helper utilities.
       subroutine star_LNA_output_filename(s, suffix, filename)
          type(star_info), pointer :: s
          character(len=*), intent(in) :: suffix
@@ -3729,26 +3714,26 @@
             write(*,'(a)') 'star_LNA: TDC perturbations disabled by star_LNA_include_tdc.'
          else if (trim(s% star_LNA_convection_treatment) == 'mlt_static') then
             write(*,'(a)') &
-               'star_LNA: static MLT temperature-gradient rows; no convective-velocity variable.'
+               'star_LNA: static MLT temperature gradient rows; no convective velocity variable.'
          else
-            write(*,'(a)') 'star_LNA: no dynamic-convection variable selected.'
+            write(*,'(a)') 'star_LNA: no dynamic convection variable selected.'
          end if
          if (.not. s% v_flag) &
             write(*,'(a)') &
-               'star_LNA: hydro v_flag is inactive; LNA uses its own face-velocity perturbation.'
+               'star_LNA: hydro v_flag is inactive; LNA uses its own face velocity perturbation.'
          if (s% MLT_option == 'TDC' .and. s% TDC_use_density_form_for_eddy_viscosity) &
             write(*,'(a)') &
-               'star_LNA: hydro TDC density-form eddy-viscosity flag is active; LNA ignores it.'
+               'star_LNA: hydro TDC density form eddy viscosity flag is active; LNA ignores it.'
          if (s% use_TDC_enthalpy_flux_limiter .and. &
                (s% RSP2_flag .or. tdc_lna_active(s))) &
             write(*,'(a)') &
-               'star_LNA: hydro enthalpy-flux limiter is active; LNA ignores it.'
+               'star_LNA: hydro enthalpy flux limiter is active; LNA ignores it.'
          if (s% using_velocity_time_centering) &
             write(*,'(a)') &
-               'star_LNA: hydro velocity time-centering is active; LNA uses the continuous non-time-centered operator.'
+               'star_LNA: hydro velocity time centering is active; LNA uses continuous equations without time centering.'
          if (s% use_Pvsc_art_visc) &
             write(*,'(a)') &
-               'star_LNA: hydro artificial-viscosity pressure is active; LNA ignores it like RSP LINA.'
+               'star_LNA: hydro artificial viscosity pressure is active; LNA ignores it like RSP LINA.'
       end subroutine report_star_LNA_setup
 
 
