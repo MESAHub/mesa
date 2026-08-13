@@ -30,7 +30,6 @@
       public :: force_another_iteration
       public :: eval_equations
       public :: set_xscale_info
-      public :: is_solver_residual_active
       public :: sizequ
       public :: sizeB
       public :: inspectb
@@ -182,24 +181,13 @@
 
       end subroutine eval_equations
 
-
-      logical function is_solver_residual_active(s, j)
-         type (star_info), pointer :: s
-         integer, intent(in) :: j
-
-         is_solver_residual_active = &
-            .not. (s% convergence_ignore_equL_residuals .and. j == s% i_equL) .and. &
-            .not. (s% convergence_ignore_alpha_RTI_residuals .and. j == s% i_dalpha_RTI_dt)
-      end function is_solver_residual_active
-
-
       subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)  ! equ = residuals
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, nz
+         integer :: j, k, num_terms, nz, skip_eqn1, skip_eqn2
          real(dp) :: sumequ, absq
 
          logical :: dbg
@@ -218,9 +206,13 @@
          nz = s% nz
          num_terms = 0
          sumequ = 0
+         skip_eqn1 = 0
+         skip_eqn2 = 0
+         if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
+         if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
          do k = 1, nz
             do j = 1, nvar
-               if (.not. is_solver_residual_active(s, j)) cycle
+               if (j == skip_eqn1 .or. j == skip_eqn2) cycle
                if (is_bad(s% equ(j,k)) .or. is_bad(s% residual_weight(j,k))) then
                   ierr = 1
                   return

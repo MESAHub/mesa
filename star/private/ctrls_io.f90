@@ -403,7 +403,7 @@
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
     scale_max_correction, ignore_min_corr_coeff_for_scale_max_correction, &
     ignore_too_large_correction, ignore_species_in_max_correction, &
-    line_search_max_residual_weight, solver_use_T_reference, &
+    solver_use_T_reference, &
     corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, RSP2_use_mass_interp_face_values, &
     corr_coeff_limit, tiny_corr_factor, solver_test_partials_call_number, solver_test_partials_iter_number, &
     max_tries1, solver_max_tries_before_reject, max_tries_for_retry, max_tries_after_5_retries, solver_test_partials_sink_name, &
@@ -2018,7 +2018,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% ignore_min_corr_coeff_for_scale_max_correction = ignore_min_corr_coeff_for_scale_max_correction
  s% ignore_too_large_correction = ignore_too_large_correction
  s% ignore_species_in_max_correction = ignore_species_in_max_correction
- s% line_search_max_residual_weight = line_search_max_residual_weight
  s% solver_use_T_reference = solver_use_T_reference
 
  s% corr_norm_jump_limit = corr_norm_jump_limit
@@ -3735,7 +3734,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ignore_min_corr_coeff_for_scale_max_correction = s% ignore_min_corr_coeff_for_scale_max_correction
  ignore_too_large_correction = s% ignore_too_large_correction
  ignore_species_in_max_correction = s% ignore_species_in_max_correction
- line_search_max_residual_weight = s% line_search_max_residual_weight
  solver_use_T_reference = s% solver_use_T_reference
 
  corr_norm_jump_limit = s% corr_norm_jump_limit

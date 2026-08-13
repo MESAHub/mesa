@@ -111,10 +111,9 @@
 
          ! info saved in work arrays
 
-         real(dp), dimension(:,:), pointer :: &
-            dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), merit_residual=>null(), soln=>null()
+         real(dp), dimension(:,:), pointer :: dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), soln=>null()
          real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
-            merit_residual1=>null(), row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
+            row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), &
             save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null(), band1=>null()
          real(dp), dimension(:,:), pointer :: rhs=>null(), jac_times_step=>null()
          integer, dimension(:), pointer :: ipiv1=>null()
@@ -436,11 +435,9 @@
                end if
 
                if (min_corr_coeff < 1d0) then
-                  ! compute gradient of f = weighted_equ<dot>jacobian
+                  ! compute gradient of f = equ<dot>jacobian
                   ! NOTE: NOT jacobian<dot>equ
-                  call set_merit_residual(nvar, nz, merit_residual)
-                  call block_multiply_xa( &
-                     nvar, nz, lblk1, dblk1, ublk1, merit_residual1, grad_f1)
+                  call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
 
                   slope = eval_slope(nvar, nz, grad_f, soln)
                   if (is_bad_num(slope) .or. slope > 0d0) then  ! a very bad sign
@@ -1930,7 +1927,6 @@
             allocate(B1(1:neq))
             allocate(soln1(1:neq))
             allocate(grad_f1(1:neq))
-            allocate(merit_residual1(1:neq))
             allocate(rhs(1:nvar,1:nz))
             allocate(jac_times_step(1:nvar,1:nz))
             allocate(xder(1:nvar,1:nz))
@@ -1954,7 +1950,6 @@
                call fill_with_NaNs(dxsave1)
                call fill_with_NaNs(ddxsave1)
                call fill_with_NaNs(B1)
-               call fill_with_NaNs(merit_residual1)
                call fill_with_NaNs(soln1)
                call fill_with_NaNs_2D(rhs)
                call fill_with_NaNs_2D(jac_times_step)
@@ -1973,7 +1968,6 @@
             B(1:nvar,1:nz) => B1(1:neq)
             soln(1:nvar,1:nz) => soln1(1:neq)
             grad_f(1:nvar,1:nz) => grad_f1(1:neq)
-            merit_residual(1:nvar,1:nz) => merit_residual1(1:neq)
 
             allocate(ipiv1(1:neq))
 
@@ -2010,7 +2004,6 @@
             if(associated(B1)) deallocate(B1)
             if(associated(soln1)) deallocate(soln1)
             if(associated(grad_f1)) deallocate(grad_f1)
-            if(associated(merit_residual1)) deallocate(merit_residual1)
             if(associated(rhs)) deallocate(rhs)
             if(associated(jac_times_step)) deallocate(jac_times_step)
             if(associated(xder)) deallocate(xder)
@@ -2032,45 +2025,12 @@
 
 
             nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
-                     soln1, grad_f1, merit_residual1, merit_residual, rhs, jac_times_step, &
+                     soln1, grad_f1, rhs, jac_times_step, &
                      xder, ddx, row_scale_factors1,&
                      col_scale_factors1, save_ublk1, save_dblk1, save_lblk1, band1,&
                      B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1, band)
 
          end subroutine cleanup
-
-
-         subroutine set_merit_residual(nvar, nz, merit_residual)
-            integer, intent(in) :: nvar, nz
-            real(dp), intent(out) :: merit_residual(:,:)
-            integer :: i, k, num_terms
-            real(dp) :: fac, max_weight, q, q_scale, q_scaled, &
-               sqrt_scaled_sum4, sum_q2, weight
-
-            max_weight = max(0d0, s% line_search_max_residual_weight)
-            q_scale = 0d0
-            if (max_weight > 0d0) then
-               call get_merit_info( &
-                  nvar, nz, equ, num_terms, sum_q2, q_scale, sqrt_scaled_sum4)
-            end if
-
-            do k = 1, nz
-               do i = 1, nvar
-                  if (is_solver_residual_active(s, i)) then
-                     weight = s% residual_weight(i,k)
-                     fac = 1d0
-                     if (max_weight > 0d0 .and. q_scale > 0d0) then
-                        q = weight*equ(i,k)
-                        q_scaled = q/q_scale
-                        fac = fac + max_weight*dble(num_terms)*q_scaled*q_scaled/sqrt_scaled_sum4
-                     end if
-                     merit_residual(i,k) = weight*weight*equ(i,k)*fac
-                  else
-                     merit_residual(i,k) = 0d0
-                  end if
-               end do
-            end do
-         end subroutine set_merit_residual
 
 
          subroutine report_linear_solve_residual(nvar, nz, fold, jac_times_step)
@@ -2087,7 +2047,6 @@
             k_max = 0
             do k = 1, nz
                do i = 1, nvar
-                  if (.not. is_solver_residual_active(s, i)) cycle
                   weight = s% residual_weight(i,k)
                   num_terms = num_terms + 1
                   max_fold = max(max_fold, abs(weight*fold(i,k)))
@@ -2129,7 +2088,6 @@
             k_max = 0
             do k = 1, nz
                do i = 1, nvar
-                  if (.not. is_solver_residual_active(s, i)) cycle
                   weight = s% residual_weight(i,k)
                   num_terms = num_terms + 1
                   max_fold = max(max_fold, abs(weight*fold(i,k)))
@@ -2182,68 +2140,20 @@
          end function eval_slope
 
 
-         subroutine get_merit_info( &
-               nvar, nz, equ, num_terms, sum_q2, q_scale, sqrt_scaled_sum4)
-            integer, intent(in) :: nvar, nz
-            real(dp), intent(in), dimension(:,:) :: equ
-            integer, intent(out) :: num_terms
-            real(dp), intent(out) :: sum_q2, q_scale, sqrt_scaled_sum4
-            integer :: i, k
-            real(dp) :: q, q_scaled2
-
-            num_terms = 0
-            sum_q2 = 0d0
-            q_scale = 0d0
-            do k = 1, nz
-               do i = 1, nvar
-                  if (.not. is_solver_residual_active(s, i)) cycle
-                  q = s% residual_weight(i,k)*equ(i,k)
-                  num_terms = num_terms + 1
-                  sum_q2 = sum_q2 + q*q
-                  q_scale = max(q_scale, abs(q))
-               end do
-            end do
-
-            sqrt_scaled_sum4 = 0d0
-            if (q_scale == 0d0) return
-            do k = 1, nz
-               do i = 1, nvar
-                  if (.not. is_solver_residual_active(s, i)) cycle
-                  q = s% residual_weight(i,k)*equ(i,k)
-                  q_scaled2 = q/q_scale
-                  q_scaled2 = q_scaled2*q_scaled2
-                  sqrt_scaled_sum4 = sqrt_scaled_sum4 + q_scaled2*q_scaled2
-               end do
-            end do
-            sqrt_scaled_sum4 = sqrt(sqrt_scaled_sum4)
-         end subroutine get_merit_info
-
-
          real(dp) function eval_f(nvar, nz, equ)
             integer, intent(in) :: nvar, nz
             real(dp), intent(in), dimension(:,:) :: equ
-            integer :: i, k, num_terms
-            real(dp) :: max_weight, q, q_scale, sqrt_scaled_sum4, sum_q2
+            integer :: k, i
+            real(dp) :: q
             include 'formats'
-
-            max_weight = max(0d0, s% line_search_max_residual_weight)
-            if (max_weight == 0d0) then
-               eval_f = 0d0
-               do k = 1, nz
-                  do i = 1, nvar
-                     if (.not. is_solver_residual_active(s, i)) cycle
-                     q = s% residual_weight(i,k)*equ(i,k)
-                     eval_f = eval_f + q*q
-                  end do
+            eval_f = 0
+            do k = 1, nz
+               do i = 1, nvar
+                  q = equ(i,k)
+                  eval_f = eval_f + q*q
                end do
-               eval_f = 0.5d0*eval_f
-               return
-            end if
-
-            call get_merit_info( &
-               nvar, nz, equ, num_terms, sum_q2, q_scale, sqrt_scaled_sum4)
-            eval_f = 0.5d0*(sum_q2 + &
-               max_weight*dble(num_terms)*q_scale*q_scale*sqrt_scaled_sum4)
+            end do
+            eval_f = eval_f/2
          end function eval_f
 
       end subroutine do_solver
