@@ -26,9 +26,7 @@
 
       private
       public :: get_eos_composition_partials
-      public :: get_active_number_fraction_partials
-      public :: get_active_number_fraction_partial
-      public :: want_eos_dxa_row
+      public :: want_eos_dxa_row, want_eos_dxa_range
 
       contains
 
@@ -51,6 +49,26 @@
          end do
 
       end function want_eos_dxa_row
+
+      logical function want_eos_dxa_range(first_row, last_row, dxa_rows)
+
+         integer, intent(in) :: first_row, last_row
+         integer, intent(in), optional :: dxa_rows(:)
+
+         integer :: i
+
+         want_eos_dxa_range = .true.
+         if (.not. present(dxa_rows)) return
+
+         want_eos_dxa_range = .false.
+         do i = 1, size(dxa_rows)
+            if (dxa_rows(i) >= first_row .and. dxa_rows(i) <= last_row) then
+               want_eos_dxa_range = .true.
+               return
+            end if
+         end do
+
+      end function want_eos_dxa_range
 
       subroutine get_eos_composition_partials( &
             species, chem_id, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, &
@@ -93,55 +111,5 @@
          end do
 
       end subroutine get_eos_composition_partials
-
-
-      subroutine get_active_number_fraction_partials( &
-            species, relevant_species, lookup, aion, ya, active_ytot, dya_dxa)
-
-         integer, intent(in) :: species, relevant_species
-         integer, intent(in) :: lookup(species)
-         real(dp), intent(in) :: aion(relevant_species), ya(relevant_species)
-         real(dp), intent(in) :: active_ytot
-         real(dp), intent(out) :: dya_dxa(relevant_species,species)
-
-         integer :: i, j, i_active
-
-         dya_dxa = 0d0
-         if (active_ytot <= 0d0) return
-
-         do j = 1, species
-            i_active = lookup(j)
-            if (i_active <= 0) cycle
-            do i = 1, relevant_species
-               dya_dxa(i,j) = -ya(i)/(active_ytot*aion(i_active))
-               if (i == i_active) &
-                  dya_dxa(i,j) = dya_dxa(i,j) + 1d0/(aion(i)*active_ytot)
-            end do
-         end do
-
-      end subroutine get_active_number_fraction_partials
-
-
-      subroutine get_active_number_fraction_partial( &
-            relevant_species, i_active, aion, ya, active_ytot, dya_dxa)
-
-         integer, intent(in) :: relevant_species, i_active
-         real(dp), intent(in) :: aion(relevant_species), ya(relevant_species)
-         real(dp), intent(in) :: active_ytot
-         real(dp), intent(out) :: dya_dxa(relevant_species)
-
-         integer :: i
-
-         dya_dxa = 0d0
-         if (active_ytot <= 0d0 .or. i_active <= 0) return
-
-         do i = 1, relevant_species
-            dya_dxa(i) = -ya(i)/(active_ytot*aion(i_active))
-            if (i == i_active) &
-               dya_dxa(i) = dya_dxa(i) + 1d0/(aion(i)*active_ytot)
-         end do
-
-      end subroutine get_active_number_fraction_partial
-
 
       end module eos_composition_partials

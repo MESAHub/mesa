@@ -31,6 +31,7 @@
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
       use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
       use ideal, only: get_ideal_for_eosdt
+      use eos_composition_partials, only: want_eos_dxa_range
 
       implicit none
 
@@ -268,7 +269,15 @@
             logRho >= rq% logRho_lo .and. logRho <= rq% logRho_hi .and. &
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
             Z >= rq% Z_lo .and. Z <= rq% Z_hi
-         d_dxa(:,:) = 0d0
+         if (present(dxa_rows)) then
+            do irow = 1, size(dxa_rows)
+               row = dxa_rows(irow)
+               if (row < 1 .or. row > size(d_dxa, dim=1)) cycle
+               d_dxa(row,:) = 0d0
+            end do
+         else
+            d_dxa = 0d0
+         end if
 
          if (do_composition_partials) then
             call eos_timing_start(time0, clock_rate)
@@ -398,7 +407,8 @@
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
+         if (want_eos_dxa_range(i_frac, i_frac+num_eos_frac_results-1, dxa_rows)) &
+            d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          skip = .false.
 
@@ -1201,13 +1211,15 @@
          res(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
-         d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
+         if (want_eos_dxa_range(i_phase, i_latent_ddlnRho, dxa_rows)) &
+            d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
 
          ! zero all components
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
+         if (want_eos_dxa_range(i_frac, i_frac+num_eos_frac_results-1, dxa_rows)) &
+            d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          ! mark this one
          res(i_frac_OPAL_SCVH) = 1.0d0
@@ -1255,13 +1267,15 @@
          res(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
          d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
-         d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
+         if (want_eos_dxa_range(i_phase, i_latent_ddlnRho, dxa_rows)) &
+            d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
 
          ! zero all components
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
+         if (want_eos_dxa_range(i_frac, i_frac+num_eos_frac_results-1, dxa_rows)) &
+            d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          ! mark this one
          res(i_frac_FreeEOS) = 1.0d0

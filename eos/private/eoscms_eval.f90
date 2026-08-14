@@ -158,7 +158,7 @@ contains
       dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
       dye_dxa_in, dmc_dxa_in)
       use chem_def, only: chem_isos
-      use eos_composition_partials, only: want_eos_dxa_row
+      use eos_composition_partials, only: want_eos_dxa_row, want_eos_dxa_range
       use interp_1d_lib, only: interp_4pt_pm
       integer, intent(in) :: handle
       logical, intent(in) :: dbg
@@ -206,7 +206,14 @@ contains
          end if
 
          ! composition derivatives; here composition is constant so no change
-         d_dxa = 0
+         if (present(dxa_rows)) then
+            do row = 1, size(dxa_rows)
+               if (dxa_rows(row) < 1 .or. dxa_rows(row) > nv) cycle
+               d_dxa(dxa_rows(row),:) = 0d0
+            end do
+         else
+            d_dxa = 0d0
+         end if
 
 
       else  !do full composition
@@ -315,13 +322,15 @@ contains
       res(i_phase:i_latent_ddlnRho) = 0d0
       d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
       d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
-      d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
+      if (want_eos_dxa_range(i_phase, i_latent_ddlnRho, dxa_rows)) &
+         d_dxa(i_phase:i_latent_ddlnRho,:) = 0d0
 
       ! zero all components
       res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
       d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
       d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-      d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
+      if (want_eos_dxa_range(i_frac, i_frac+num_eos_frac_results-1, dxa_rows)) &
+         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
       ! mark this one
       res(i_frac_CMS) = 1.0d0

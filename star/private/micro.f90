@@ -250,49 +250,9 @@ contains
 
     if (dbg) write(*,*) 'do_eos call foreach_cell', nzlo, nzhi
 
-    if (s% include_eos_composition_partials) then
-       call ensure_full_eos_dxa(s, ierr)
-       if (ierr /= 0) return
-    end if
-
     call foreach_cell(s,nzlo,nzhi,use_omp,do_eos_for_cell,ierr)
 
   end subroutine do_eos
-
-
-  subroutine ensure_full_eos_dxa(s, ierr)
-
-    use eos_def, only: num_eos_basic_results
-
-    type (star_info), pointer :: s
-    integer, intent(out) :: ierr
-
-    integer :: old_rows, rows_to_copy, nz_alloc
-    real(dp), allocatable :: old_d_eos_dxa(:,:,:)
-
-    ierr = 0
-    if (associated(s% d_eos_dxa)) then
-       if (size(s% d_eos_dxa, dim=1) >= num_eos_basic_results) return
-       old_rows = size(s% d_eos_dxa, dim=1)
-       nz_alloc = size(s% d_eos_dxa, dim=3)
-       allocate(old_d_eos_dxa(old_rows,s% species,nz_alloc), stat=ierr)
-       if (ierr /= 0) return
-       old_d_eos_dxa = s% d_eos_dxa
-       deallocate(s% d_eos_dxa)
-    else
-       old_rows = 0
-       nz_alloc = max(s% nz, s% prev_mesh_nz) + nz_alloc_extra
-    end if
-
-    allocate(s% d_eos_dxa(num_eos_basic_results,s% species,nz_alloc), stat=ierr)
-    if (ierr /= 0) return
-    s% d_eos_dxa = 0d0
-    if (old_rows > 0) then
-       rows_to_copy = min(old_rows, num_eos_basic_results)
-       s% d_eos_dxa(1:rows_to_copy,:,:) = old_d_eos_dxa(1:rows_to_copy,:,:)
-    end if
-
-  end subroutine ensure_full_eos_dxa
 
 
   subroutine set_eos_with_mask (s,nzlo,nzhi,mask,ierr)
@@ -308,11 +268,6 @@ contains
     ierr = 0
 
     if (dbg) write(*,*) 'set_eos_with_mask'
-
-    if (s% include_eos_composition_partials) then
-       call ensure_full_eos_dxa(s, ierr)
-       if (ierr /= 0) return
-    end if
 
     !$OMP PARALLEL DO PRIVATE(ierr) SCHEDULE(dynamic,2)
     do k = nzlo, nzhi
@@ -349,6 +304,7 @@ contains
 
     real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
     real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
+    real(dp), dimension(num_eos_basic_results,s% species) :: full_d_dxa
     real(dp) :: sumx, logRho, logT, logPgas
     integer, pointer :: net_iso(:)
     integer :: species
@@ -400,19 +356,16 @@ contains
     end if
 
     if (s% include_eos_composition_partials) then
-       if (size(s% d_eos_dxa,dim=1) < num_eos_basic_results) then
-          s% retry_message = 'd_eos_dxa not allocated for full eos composition partials'
-          ierr = -1
-          return
-       end if
-       ! cheaper wrapper: the star solve needs only lnPgas and lnE dxa rows.
+       ! EOS components use full-row scratch; star stores only the hydro rows.
        call get_eos_star_dxa( &
             s, k, s% xa(:,k), &
             s% rho(k), logRho, s% T(k), logT, &
             s% X(k), s% Z(k), s% abar(k), s% zbar(k), &
             s% z2bar(k), s% z53bar(k), s% ye(k), s% mass_correction(k), sumx, &
             res, s% d_eos_dlnd(:,k), s% d_eos_dlnT(:,k), &
-            s% d_eos_dxa(:,:,k), ierr)
+            full_d_dxa, ierr)
+       if (ierr == 0) &
+          s% d_eos_dxa(:,:,k) = full_d_dxa(1:num_eos_d_dxa_results,:)
     else
        call get_eos( &
             s, k, s% xa(:,k), &

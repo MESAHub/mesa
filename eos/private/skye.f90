@@ -347,6 +347,7 @@ module skye
             include_composition_partials, skip, ierr, dxa_rows, &
             dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
             dye_dxa_in, dmc_dxa_in)
+         use eos_composition_partials, only: want_eos_dxa_range
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -384,7 +385,8 @@ module skye
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
          d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-         d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
+         if (want_eos_dxa_range(i_frac, i_frac+num_eos_frac_results-1, dxa_rows)) &
+            d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
          ! mark this one
          res(i_frac_Skye) = 1.0d0
@@ -485,15 +487,13 @@ module skye
          use chem_def, only: chem_isos
          use chem_lib, only: basic_composition_info
          use ion_offset, only: compute_ion_offset, compute_ion_offset_partials
-         use eos_composition_partials, only: &
-            get_eos_composition_partials, get_active_number_fraction_partial, &
-            want_eos_dxa_row
+         use eos_composition_partials, only: get_eos_composition_partials, want_eos_dxa_row
          use skye_ideal
          use skye_coulomb
          use skye_thermodynamics
          use auto_diff
 
-         integer :: i, j, row
+         integer :: i, j, row, i_active
          integer, intent(in) :: species
          integer, pointer :: chem_id(:)
          real(dp), intent(in) :: xa(:)
@@ -526,13 +526,17 @@ module skye
          type(auto_diff_real_2var_order3) :: F_ele, F_ele_dye, etaele_dye
          type(auto_diff_real_2var_order3) :: F_coul_dxa, dxnefer_dxa
          type(auto_diff_real_2var_order3) :: F_coul_dye, F_coul_dabar, F_coul_dya(species)
+         type(auto_diff_real_2var_order3) :: F_coul_dya_mean
          type(auto_diff_real_2var_order3) :: F_coul_ocp(species)
          type(auto_diff_real_2var_order3) :: phase_x, latent_ddlnT_x, latent_ddlnRho_x
          type(auto_diff_real_2var_order3) :: phase_dye, phase_dabar, phase_dya(species)
+         type(auto_diff_real_2var_order3) :: phase_dya_mean
          type(auto_diff_real_2var_order3) :: latent_ddlnT_dye, latent_ddlnT_dabar
          type(auto_diff_real_2var_order3) :: latent_ddlnT_dya(species)
+         type(auto_diff_real_2var_order3) :: latent_ddlnT_dya_mean
          type(auto_diff_real_2var_order3) :: latent_ddlnRho_dye, latent_ddlnRho_dabar
          type(auto_diff_real_2var_order3) :: latent_ddlnRho_dya(species)
+         type(auto_diff_real_2var_order3) :: latent_ddlnRho_dya_mean
          type(auto_diff_real_2var_order3) :: F_ideal_ion_dxa(species), F_gas_dxa(species)
          type(auto_diff_real_2var_order3) :: &
             phase_dxa(species), latent_ddlnT_dxa(species), latent_ddlnRho_dxa(species)
@@ -760,9 +764,21 @@ module skye
                   phase_ocp=F_coul_ocp(1:relevant_species))
             end if
 
+            ! Contract the normalized number-fraction basis in linear work.
+            F_coul_dya_mean = 0d0
+            if (need_phase_dxa) phase_dya_mean = 0d0
+            if (need_latent_ddlnT_dxa) latent_ddlnT_dya_mean = 0d0
+            if (need_latent_ddlnRho_dxa) latent_ddlnRho_dya_mean = 0d0
+            do i = 1, relevant_species
+               F_coul_dya_mean = F_coul_dya_mean + ya(i)*F_coul_dya(i)
+               if (need_phase_dxa) phase_dya_mean = phase_dya_mean + ya(i)*phase_dya(i)
+               if (need_latent_ddlnT_dxa) &
+                  latent_ddlnT_dya_mean = latent_ddlnT_dya_mean + ya(i)*latent_ddlnT_dya(i)
+               if (need_latent_ddlnRho_dxa) &
+                  latent_ddlnRho_dya_mean = latent_ddlnRho_dya_mean + ya(i)*latent_ddlnRho_dya(i)
+            end do
+
             do j = 1, species
-               call get_active_number_fraction_partial( &
-                  relevant_species, lookup(j), A, ya, active_ytot, dya_dxa_j(1:relevant_species))
                ! Preserve exact zero coefficients in the basis expansion.
                F_coul_dxa = 0d0
                if (dye_dxa(j) /= 0d0) F_coul_dxa = F_coul_dxa + dye_dxa(j)*F_coul_dye
@@ -786,15 +802,21 @@ module skye
                   if (dabar_dxa(j) /= 0d0) &
                      latent_ddlnRho_x = latent_ddlnRho_x + dabar_dxa(j)*latent_ddlnRho_dabar
                end if
-               do i = 1, relevant_species
-                  if (dya_dxa_j(i) == 0d0) cycle
-                  F_coul_dxa = F_coul_dxa + dya_dxa_j(i)*F_coul_dya(i)
-                  if (need_phase_dxa) phase_x = phase_x + dya_dxa_j(i)*phase_dya(i)
+               i_active = lookup(j)
+               if (i_active > 0 .and. active_ytot > 0d0) then
+                  F_coul_dxa = F_coul_dxa + &
+                     (F_coul_dya(i_active) - F_coul_dya_mean)/(A(i_active)*active_ytot)
+                  if (need_phase_dxa) phase_x = phase_x + &
+                     (phase_dya(i_active) - phase_dya_mean)/(A(i_active)*active_ytot)
                   if (need_latent_ddlnT_dxa) &
-                     latent_ddlnT_x = latent_ddlnT_x + dya_dxa_j(i)*latent_ddlnT_dya(i)
+                     latent_ddlnT_x = latent_ddlnT_x + &
+                        (latent_ddlnT_dya(i_active) - latent_ddlnT_dya_mean)/ &
+                        (A(i_active)*active_ytot)
                   if (need_latent_ddlnRho_dxa) &
-                     latent_ddlnRho_x = latent_ddlnRho_x + dya_dxa_j(i)*latent_ddlnRho_dya(i)
-               end do
+                     latent_ddlnRho_x = latent_ddlnRho_x + &
+                        (latent_ddlnRho_dya(i_active) - latent_ddlnRho_dya_mean)/ &
+                        (A(i_active)*active_ytot)
+               end if
                F_gas_dxa(j) = F_ideal_ion_dxa(j) + F_coul_dxa
                if (dye_dxa(j) /= 0d0) F_gas_dxa(j) = F_gas_dxa(j) + dye_dxa(j)*F_ele_dye
                if (need_phase_dxa) phase_dxa(j) = phase_x

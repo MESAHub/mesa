@@ -152,7 +152,7 @@
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, &
-            res, d_dlnd, d_dlnT, d_dxa, ierr)
+            res, d_dlnd, d_dlnT, d_dxa, ierr, dxa_rows)
          skip = .false.
 
          ! zero latent heat information
@@ -177,7 +177,7 @@
             rq, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             Rho, logRho, T, logT, &
-            res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, ierr)
+            res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, ierr, dxa_rows)
          use pc_eos
          use chem_def, only: chem_isos
          type (EoS_General_Info), pointer :: rq
@@ -191,10 +191,11 @@
          real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (nv)
          real(dp), intent(inout) :: d_dxa(:,:)  ! (nv, species)
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: dxa_rows(:)
 
          real(dp) :: start_crystal, full_crystal
          real(dp), dimension(species) :: AY, AZion, ACMI
-         integer :: i, j
+         integer :: i, j, row
 
          include 'formats'
 
@@ -217,7 +218,14 @@
          if (ierr /= 0) return
 
          ! composition derivatives not provided
-         d_dxa = 0
+         if (present(dxa_rows)) then
+            do row = 1, size(dxa_rows)
+               if (dxa_rows(row) < 1 .or. dxa_rows(row) > size(d_dxa, dim=1)) cycle
+               d_dxa(dxa_rows(row),:) = 0d0
+            end do
+         else
+            d_dxa = 0d0
+         end if
 
          if (is_bad(res(i_lnS))) then
             ierr = -1

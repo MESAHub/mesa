@@ -54,6 +54,7 @@ module ideal
          include_composition_partials, skip, ierr, dxa_rows, &
          dabar_dxa_in, dzbar_dxa_in, dz2bar_dxa_in, dz53bar_dxa_in, &
          dye_dxa_in, dmc_dxa_in)
+   use eos_composition_partials, only: want_eos_dxa_range
    integer, intent(in) :: handle
    logical, intent(in) :: dbg
    real(dp), intent(in) :: &
@@ -87,7 +88,8 @@ module ideal
    res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
    d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
    d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-   d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
+   if (want_eos_dxa_range(i_frac, i_frac+num_eos_frac_results-1, dxa_rows)) &
+      d_dxa(i_frac:i_frac+num_eos_frac_results-1,:) = 0.0d0
 
    ! mark this one
    res(i_frac_ideal) = 1.0d0

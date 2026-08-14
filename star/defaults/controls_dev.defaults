@@ -175,8 +175,9 @@
 
       ! If true, use analytic EOS composition partials for the hydro
       ! Jacobian.  This is a development option while the composition
-      ! derivatives are being tested.  When using Skye, this requires
-      ! ``mass_fraction_limit_for_Skye = 1d-16``.
+      ! derivatives are being tested.  When using Skye, a small
+      ! ``mass_fraction_limit_for_Skye`` includes trace species in the
+      ! composition partials.
 
       ! ::
 

@@ -75,8 +75,6 @@ module skye_ideal
          temp, den, abar, species, relevant_species, lookup, weights, aion, ya, active_ytot, &
          dabar_dxa, F_ideal_ion_dxa)
 
-      use eos_composition_partials, only: get_active_number_fraction_partial
-
       type(auto_diff_real_2var_order3), intent(in) :: temp, den
       integer, intent(in) :: species, relevant_species
       integer, intent(in) :: lookup(species)
@@ -84,9 +82,8 @@ module skye_ideal
       real(dp), intent(in) :: ya(relevant_species), active_ytot, dabar_dxa(species)
       type(auto_diff_real_2var_order3), intent(out) :: F_ideal_ion_dxa(species)
 
-      integer :: i, j
-      real(dp) :: dya_dxa_j(relevant_species)
-      type(auto_diff_real_2var_order3) :: kt, n, nj, nQ, nQj, Phi, dPhi
+      integer :: i, j, i_active
+      type(auto_diff_real_2var_order3) :: kt, n, nj, nQ, nQj, Phi, dPhi, mean_log_nj_over_nQj
       type(auto_diff_real_2var_order3) :: ln_nj_over_nQj(relevant_species)
 
       kt = kerg * temp
@@ -94,22 +91,21 @@ module skye_ideal
       nQ = pow(kt, 1.5d0) / sifac
 
       Phi = 0d0
+      mean_log_nj_over_nQj = 0d0
       do i = 1, relevant_species
          nj = ya(i) * n
          nQj = nQ * pow(weights(i), 1.5d0)
          ln_nj_over_nQj(i) = log(nj/nQj)
          Phi = Phi + ya(i) * (ln_nj_over_nQj(i) - 1d0)
+         mean_log_nj_over_nQj = mean_log_nj_over_nQj + ya(i)*ln_nj_over_nQj(i)
       end do
 
       do j = 1, species
-         F_ideal_ion_dxa(j) = 0d0
          dPhi = -dabar_dxa(j)/abar
-         if (lookup(j) > 0 .and. active_ytot > 0d0) then
-            call get_active_number_fraction_partial( &
-               relevant_species, lookup(j), aion, ya, active_ytot, dya_dxa_j)
-            do i = 1, relevant_species
-               dPhi = dPhi + dya_dxa_j(i)*ln_nj_over_nQj(i)
-            end do
+         i_active = lookup(j)
+         if (i_active > 0 .and. active_ytot > 0d0) then
+            dPhi = dPhi + (ln_nj_over_nQj(i_active) - mean_log_nj_over_nQj)/ &
+               (aion(i_active)*active_ytot)
          end if
          F_ideal_ion_dxa(j) = kt/amu*(dPhi/abar - Phi*dabar_dxa(j)/pow2(abar))
       end do
