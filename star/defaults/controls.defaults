@@ -2153,6 +2153,21 @@
     mixing_length_alpha = 2
 
 
+      ! weak_gravity_mixing_length_beta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If positive, limit the MLT and TDC mixing length using
+      ! ``1/Lambda = 1/(mixing_length_alpha*Hp) + 1/(beta*r)``,
+      ! where ``beta`` is ``weak_gravity_mixing_length_beta`` and ``Hp`` is
+      ! the usual ``P/(rho*g)`` pressure scale height. This option ignores
+      ! ``alt_scale_height_flag`` when constructing the MLT and TDC mixing
+      ! length. Non-positive values preserve the existing behavior.
+
+      ! ::
+
+    weak_gravity_mixing_length_beta = 0d0
+
+
       ! remove_small_D_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
@@ -2264,8 +2279,8 @@
 
       ! If false, then stick to the usual definition -- P/(g*rho).
       ! If true, use min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho.
-      ! Note that the 'TDC' ``MLT_option`` does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
-      ! even if that flag is set.
+      ! A positive ``weak_gravity_mixing_length_beta`` overrides this option
+      ! when constructing the MLT and TDC mixing length.
 
       ! ::
 
@@ -7585,6 +7600,18 @@
 
 ! eos controls
 ! ============
+
+      ! min_logRho_for_eos
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! Calls to the EOS with ``log10(rho)`` below this value return an
+      ! error.  Values below -30 are not supported because high-order
+      ! density derivatives can overflow at sufficiently low density.
+
+      ! ::
+
+    min_logRho_for_eos = -30d0
+
 
       ! fix_d_eos_dxa_partials
       ! ~~~~~~~~~~~~~~~~~~~~~~

@@ -25,7 +25,8 @@ module tdc_hydro
    use auto_diff
    use auto_diff_support
    use star_utils
-   use reconstructed_face_support, only: get_reconstructed_scale_height_ad
+   use reconstructed_face_support, only: &
+      get_reconstructed_scale_height_ad, get_reconstructed_hse_scale_height_ad
 
    implicit none
 
@@ -135,53 +136,42 @@ contains
    end function get_TDC_Hp_face
 
 
-   function wrap_Hp_cell(s, k, ierr) result(Hp_cell)  ! cm , different than rsp2
+   function get_TDC_mixing_length_face(s, k, ierr) result(Lambda_face)
       type(star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Hp1, Hp0, Hp_cell
+      type(auto_diff_real_star_order1) :: Lambda_face, Hp_face
+
       ierr = 0
-      Hp0 = get_TDC_Hp_face(s, k, ierr)
-      if (ierr /= 0) return
-      Hp1 = 0d0
-      if (k+1 < s%nz) then
-         Hp1 = shift_p1(get_TDC_Hp_face(s, k+1, ierr))
+      if (s% weak_gravity_mixing_length_beta > 0d0) then
+         call get_reconstructed_hse_scale_height_ad(s, k, Hp_face, ierr)
+         if (ierr /= 0) return
+      else
+         Hp_face = get_TDC_Hp_face(s, k, ierr)
          if (ierr /= 0) return
       end if
-      Hp_cell = 0.5d0*(Hp0 + Hp1)
-      !0.5d0*(wrap_Hp_00(s, k) + wrap_Hp_p1(s, k))
-   end function wrap_Hp_cell
+      Lambda_face = get_mlt_mixing_length( &
+         s, Hp_face, wrap_r_00(s,k), s%mixing_length_alpha)
+   end function get_TDC_mixing_length_face
 
-   function Hp_cell_for_Chi(s, k, ierr) result(Hp_cell)  ! cm
+
+   function get_TDC_mixing_length_cell(s, k, ierr) result(Lambda_cell)
       type(star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Hp_cell
-      type(auto_diff_real_star_order1) :: d_00, Peos_00, rmid
-      real(dp) :: mmid, cgrav_mid
-      include 'formats'
+      type(auto_diff_real_star_order1) :: Lambda0, Lambda1, Lambda_cell
+
       ierr = 0
-
-      Hp_cell = wrap_Hp_cell(s, k, ierr)
+      Lambda0 = get_TDC_mixing_length_face(s, k, ierr)
       if (ierr /= 0) return
-      return ! below is skipped, for now.
+      Lambda1 = 0d0
+      if (k+1 < s%nz) then
+         Lambda1 = shift_p1(get_TDC_mixing_length_face(s, k+1, ierr))
+         if (ierr /= 0) return
+      end if
+      Lambda_cell = 0.5d0*(Lambda0 + Lambda1)
+   end function get_TDC_mixing_length_cell
 
-      d_00 = wrap_d_00(s, k)
-      Peos_00 = wrap_Peos_00(s, k)
-      if (k < s%nz) then
-         rmid = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
-         mmid = 0.5d0*(s%m(k) + s%m(k + 1))
-         cgrav_mid = 0.5d0*(s%cgrav(k) + s%cgrav(k + 1))
-      else
-         rmid = 0.5d0*(wrap_r_00(s, k) + s%r_center)
-         mmid = 0.5d0*(s%m(k) + s%m_center)
-         cgrav_mid = s%cgrav(k)
-      end if
-      Hp_cell = pow2(rmid)*Peos_00/(d_00*cgrav_mid*mmid)
-      if (s%alt_scale_height_flag) then
-         call mesa_error(__FILE__, __LINE__, 'Hp_cell_for_Chi: cannot use alt_scale_height_flag')
-      end if
-   end function Hp_cell_for_Chi
 
    ! this function is only called internally in TDC_Uq_face, and for v_flag only.
    function compute_Chi_cell(s, k, ierr) result(Chi_cell) ! does not update s% Chi or Chi_ad
@@ -191,8 +181,8 @@ contains
       type(auto_diff_real_star_order1) :: Chi_cell
       integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: &
-         rho2, r6_cell, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
-      real(dp) :: f, ALFAM_ALFA
+         rho2, r6_cell, d_v_div_r, Lambda_cell, w_00, d_00, r_00, r_p1
+      real(dp) :: f, ALFAM
       logical :: dbg
       include 'formats'
       ierr = 0
@@ -200,17 +190,17 @@ contains
 
       ! check where we are getting alfam from.
       if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
-         ALFAM_ALFA = s%TDC_alpha_M*s%mixing_length_alpha
+         ALFAM = s%TDC_alpha_M
       else ! this is for safety, but probably is never called.
-         ALFAM_ALFA = 0d0
+         ALFAM = 0d0
       end if
 
-      if (ALFAM_ALFA == 0d0 .or. &
+      if (ALFAM == 0d0 .or. &
           k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
           k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Chi_cell = 0d0
       else
-         Hp_cell = Hp_cell_for_Chi(s, k, ierr)
+         Lambda_cell = get_TDC_mixing_length_cell(s, k, ierr)
          if (ierr /= 0) return
          if (s%TDC_use_density_form_for_eddy_viscosity) then
             ! new density derivative term
@@ -237,12 +227,12 @@ contains
             end if
          end if
          d_00 = wrap_d_00(s, k)
-         f = (16d0/3d0)*pi*ALFAM_ALFA/s%dm(k)
+         f = (16d0/3d0)*pi*ALFAM/s%dm(k)
          rho2 = pow2(d_00)
          r_00 = wrap_r_00(s, k)
          r_p1 = wrap_r_p1(s, k)
          r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
-         Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
+         Chi_cell = f*rho2*r6_cell*d_v_div_r*Lambda_cell*w_00
          ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
          !       = g cm^2 s^-2
          !       = erg
@@ -253,8 +243,8 @@ contains
       !s%Chi_ad(k) = Chi_cell
 
       if (dbg .and. k == -100) then
-         write (*, *) ' s% ALFAM_ALFA', ALFAM_ALFA
-         write (*, *) 'Hp_cell', Hp_cell%val
+         write (*, *) ' s% ALFAM', ALFAM
+         write (*, *) 'Lambda_cell', Lambda_cell%val
          write (*, *) 'd_v_div_r', d_v_div_r%val
          write (*, *) ' f', f
          write (*, *) 'w_00', w_00%val
@@ -274,8 +264,8 @@ contains
    type(auto_diff_real_star_order1) :: Chi_face
    integer, intent(out) :: ierr
    type(auto_diff_real_star_order1) :: &
-   rho2, r6_face, d_v_div_r, Hp_face, w_00, d_00, r_00, r_p1
-   real(dp) :: f, ALFAM_ALFA, dmbar
+   rho2, r6_face, d_v_div_r, Lambda_face, w_00, d_00, r_00, r_p1
+   real(dp) :: f, ALFAM, dmbar
    logical :: dbg
    include 'formats'
    ierr = 0
@@ -283,16 +273,16 @@ contains
 
    ! check where we are getting alfam from.
    if (s%MLT_option == 'TDC' .and. .not. s%RSP2_flag) then
-      ALFAM_ALFA = s%TDC_alpha_M*s%mixing_length_alpha
+      ALFAM = s%TDC_alpha_M
    else ! this is for safety, but probably is never called.
-      ALFAM_ALFA = 0d0
+      ALFAM = 0d0
    end if
 
-   if (ALFAM_ALFA == 0d0 .or. &
+   if (ALFAM == 0d0 .or. &
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
    else
-      Hp_face = get_TDC_Hp_face(s, k, ierr)
+      Lambda_face = get_TDC_mixing_length_face(s, k, ierr)
       if (ierr /= 0) return
       if (s%TDC_use_density_form_for_eddy_viscosity) then
          ! new density derivative form
@@ -308,12 +298,12 @@ contains
          dmbar = 0.5d0*s% dm(k)
       end if
       d_00 = get_rho_face(s, k)
-      f = (16d0/3d0)*pi*ALFAM_ALFA/dmbar
+      f = (16d0/3d0)*pi*ALFAM/dmbar
       rho2 = pow2(d_00)
       r_00 = wrap_r_00(s, k)
       !r_p1 = wrap_r_p1(s, k)
       r6_face = pow6(r_00) !0.5d0*(pow6(r_00) + pow6(r_p1))
-      Chi_face = f*rho2*r6_face*d_v_div_r*Hp_face!*w_00
+      Chi_face = f*rho2*r6_face*d_v_div_r*Lambda_face!*w_00
       ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm * [s/cm] ! [1/w_00] = [s/cm]
       !       = g cm^2 s^-2 * [s/cm]
       !       = erg ! * [s / cm] - > [erg] * [s/cm]
@@ -331,8 +321,8 @@ contains
       s%Chi_ad(k) = Chi_face*w_00
 
       if (dbg .and. k == -100) then
-      write (*, *) ' s% ALFAM_ALFA', ALFAM_ALFA
-      write (*, *) 'Hp_face', Hp_face%val
+      write (*, *) ' s% ALFAM', ALFAM
+      write (*, *) 'Lambda_face', Lambda_face%val
       write (*, *) 'd_v_div_r', d_v_div_r%val
       write (*, *) ' f', f
       write (*, *) 'w_00', w_00%val

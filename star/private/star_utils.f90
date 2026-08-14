@@ -96,6 +96,7 @@
       public :: get_grada_face
       public :: get_gradr_face
       public :: get_scale_height_face
+      public :: get_mlt_mixing_length
       public :: get_tau
       public :: after_c_burn
       public :: get_shock_info
@@ -4016,6 +4017,29 @@
             end if
          end if
       end function get_scale_height_face
+
+
+      function get_mlt_mixing_length(s, pressure_scale_height, r, mixing_length_alpha) result(Lambda)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1), intent(in) :: pressure_scale_height, r
+         real(dp), intent(in) :: mixing_length_alpha
+         type(auto_diff_real_star_order1) :: Lambda, Lambda0, radial_length
+
+         Lambda0 = mixing_length_alpha*pressure_scale_height
+         if (s% weak_gravity_mixing_length_beta <= 0d0) then
+            Lambda = Lambda0
+            return
+         end if
+
+         radial_length = s% weak_gravity_mixing_length_beta*r
+         if (Lambda0 <= 0d0 .or. radial_length <= 0d0) then
+            Lambda = 0d0
+         else if (Lambda0 <= radial_length) then
+            Lambda = Lambda0/(1d0 + Lambda0/radial_length)
+         else
+            Lambda = radial_length/(1d0 + radial_length/Lambda0)
+         end if
+      end function get_mlt_mixing_length
 
 
       real(dp) function get_scale_height_face_val(s,k) result(scale_height)

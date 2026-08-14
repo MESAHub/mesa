@@ -678,12 +678,11 @@
          integer, intent(out) :: ierr
          integer :: i, ip, i0, im, q, nz
          real(dp) :: &
-            v, &
+            v, momentum, delta_KE, &
             dm, dm_i, dm_ip, star_PE0, star_PE1, &
             cell_ie, cell_etrb, &
             Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
             Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
-            KE, &
             j_rot_new, j_rot_p1_new, J_old, &
             dmbar_old, dmbar_p1_old, dmbar_p2_old, &
             dmbar_new, dmbar_p1_new
@@ -767,17 +766,19 @@
             s% xa(q,i) = (dm_i*s% xa(q,i) + dm_ip*s% xa(q,ip))/dm
          end do
 
-         KE = KE_i + KE_ip
+         cell_ie = IE_i + IE_ip
          if (s% u_flag) then
-            v = sqrt(KE/(0.5d0*dm))
-            if (s% u(i) < 0d0) v = -v
+            ! Preserve momentum and put unresolved velocity variance into internal energy.
+            momentum = dm_i*s% u(i) + dm_ip*s% u(ip)
+            v = momentum/dm
+            delta_KE = 0.5d0*dm_i*dm_ip*pow2(s% u(i) - s% u(ip))/dm
             s% u(i) = v
+            cell_ie = cell_ie + delta_KE
          else if (s% v_flag) then
             ! there's no good solution for this.
             ! so just leave s% v(i) unchanged.
          end if
 
-         cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
 
          if (s% RSP2_flag) then
@@ -993,12 +994,13 @@
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old, &
             rho_RR, rho_iR, rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, &
-            v, v2, energy, v2_R, energy_R, rho_R, v2_C, energy_C, rho_C, v2_L, energy_L, rho_L, &
-            dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v2, &
+            v, energy, v2_R, energy_R, rho_R, energy_C, rho_C, v2_L, energy_L, rho_L, &
+            dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
-            j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
+            j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old, &
+            u_R, u_L, delta_u, delta_KE, delta_KE_div_dm
          logical :: done, use_new_grad_rho
          include 'formats'
 
@@ -1073,10 +1075,8 @@
 
          if (s% u_flag) then
             v = s% u(i)
-            v2 = v*v
          else  ! not used
-            v = 0
-            v2 = 0
+            v = 0d0
          end if
 
          energy = s% energy(i)
@@ -1144,16 +1144,9 @@
 
          if (s% u_flag) then
             v_R = s% u(iR)
-            v2_R = v_R*v_R
             v_C = s% u(iC)
-            v2_C = v_C*v_C
             v_L = s% u(iL)
-            v2_L = v_L*v_L
-            if ((v_L - v_C)*(v_C - v_R) <= 0) then  ! not strictly monotonic velocities
-               grad_v2 = 0d0
-            else
-               grad_v2 = get1_grad(v2_L, v2_C, v2_R, dLeft, dCntr, dRght)
-            end if
+            grad_v = get1_grad(v_L, v_C, v_R, dLeft, dCntr, dRght)
          else if (s% v_flag) then
             if (iL == s% nz) then
                v_L = s% v_center
@@ -1290,6 +1283,7 @@
             dML = rho_L*dVL
             dMR = dM - dML  ! should = rhoR*dVR
          end if
+         dMR = dm - dML
 
          energy_R = energy + grad_energy*dr/4
          energy_L = (dm*energy - dmR*energy_R)/dmL
@@ -1313,18 +1307,21 @@
          end if
 
          if (s% u_flag) then
-            v2_R = v2 + grad_v2*dr/4
-            v2_L = (dm*v2 - dmR*v2_R)/dmL
-            if (v2_R < 0d0 .or. v2_L < 0d0) then
-               v2_R = v2
-               v2_L = v2
+            ! Preserve momentum and take the resolved velocity variance from internal energy.
+            delta_u = 0.5d0*grad_v*dr
+            u_R = v + dML*delta_u/dm
+            u_L = v - dMR*delta_u/dm
+            delta_KE = 0.5d0*dMR*dML*pow2(delta_u)/dm
+            delta_KE_div_dm = delta_KE/dm
+            if (delta_KE_div_dm >= min(s% energy(i), s% energy(ip))) then
+               u_R = v
+               u_L = v
+               delta_KE_div_dm = 0d0
             end if
-            s% u(i) = sqrt(v2_R)
-            s% u(ip) = sqrt(v2_L)
-            if (v < 0d0) then
-               s% u(i) = -s% u(i)
-               s% u(ip) = -s% u(ip)
-            end if
+            s% u(i) = u_R
+            s% u(ip) = u_L
+            s% energy(i) = s% energy(i) - delta_KE_div_dm
+            s% energy(ip) = s% energy(ip) - delta_KE_div_dm
          else if (s% v_flag) then  ! just make a rough approximation.
             s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
          end if

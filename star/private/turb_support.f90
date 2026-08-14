@@ -113,7 +113,7 @@ contains
          s, k, MLT_option, gradL_composition_term, &
          T_in, P_in, energy_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
          gradr_in, grada, scale_height, mixing_length_alpha, &
-         mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
+         mixing_type, gradT, Y_face, mlt_vc, D, Gamma, mixing_length, ierr)
       use chem_def, only: ih1
       use const_def, only: ln10
       use starspots, only: starspot_tweak_gradr
@@ -126,7 +126,7 @@ contains
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
-         gradT, Y_face, mlt_vc, D, Gamma
+         gradT, Y_face, mlt_vc, D, Gamma, mixing_length
       integer, intent(out) :: ierr
 
       real(dp) :: cgrav, m, XH1, P_theta, L_theta
@@ -182,6 +182,7 @@ contains
       XH1 = s% xa(s% net_iso(ih1),k)
 
       if (s% use_other_mlt_results) then
+         mixing_length = mixing_length_alpha*scale_height
          call s% other_mlt_results(s% id, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
@@ -197,7 +198,7 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
+            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr, mixing_length)
       end if
 
    end subroutine do1_mlt_eval
@@ -207,7 +208,7 @@ contains
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
-         mixing_type, gradT, Y_face, conv_vel, D, Gamma, energy, ierr)
+         mixing_type, gradT, Y_face, conv_vel, D, Gamma, energy, ierr, mixing_length)
       use star_utils
       use tdc_hydro, only: compute_tdc_Eq_div_w_face
       type (star_info), pointer :: s
@@ -222,8 +223,10 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1), intent(out), optional :: mixing_length
 
-      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: &
+         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, beta
       real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
 
       ! these are used by use_superad_reduction
@@ -261,13 +264,30 @@ contains
       Pr = crad*pow4(T)/3d0
       Pg = Ptot - Pr
       beta = Pg / Ptot
-      Lambda = mixing_length_alpha*scale_height
+      legacy_Lambda = mixing_length_alpha*scale_height
 
       if (k == 0) then
          grav = cgrav*m/pow2(r)
       else
          grav = cgrav*m/pow2(r) !try replacing with wrap_geff_face(s,k)
       end if
+
+      if (s% weak_gravity_mixing_length_beta > 0d0) then
+         if (P > 0d0 .and. grav > 0d0 .and. rho > 0d0) then
+            Hp_for_mlt = P/(rho*grav)
+            Lambda = get_mlt_mixing_length(s, Hp_for_mlt, r, mixing_length_alpha)
+            mixing_length_alpha_ad = Lambda/Hp_for_mlt
+         else
+            Hp_for_mlt = 0d0
+            Lambda = 0d0
+            mixing_length_alpha_ad = 0d0
+         end if
+      else
+         Hp_for_mlt = scale_height
+         Lambda = legacy_Lambda
+         mixing_length_alpha_ad = mixing_length_alpha
+      end if
+      if (present(mixing_length)) mixing_length = Lambda
 
       if (s% use_Ledoux_criterion) then
          gradL = grada + gradL_composition_term  ! Ledoux temperature gradient
@@ -346,10 +366,10 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
+            conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
+            Hp_for_mlt, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
             s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
             Y_face_guess, ierr)
@@ -368,10 +388,10 @@ contains
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
                call set_TDC(&
-                  conv_vel_start, mixing_length_alpha, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
+                  conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
+                  Hp_for_mlt, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
                   s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
                   Y_face_guess, ierr)
@@ -385,7 +405,7 @@ contains
 
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
-         call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
+         call set_MLT(MLT_option, mixing_length_alpha_ad, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, Ptot, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
@@ -403,7 +423,7 @@ contains
          if (s% use_superad_reduction) then
             call set_superad_reduction
             if (Gamma_factor > 1d0) then
-               call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
+               call set_MLT(MLT_option, mixing_length_alpha_ad, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                               chiT, chiRho, Cp, grav, Lambda, rho, Ptot, T, opacity, &
                               gradr_scaled, grada, gradL, &
                               Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
@@ -420,7 +440,9 @@ contains
       if (mixing_type == no_mixing) then
          if (gradL_composition_term < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+            if (present(mixing_length)) mixing_length = legacy_Lambda
+            call set_thermohaline(s%thermohaline_option, legacy_Lambda, grada, gradr, T, opacity, rho, Cp, &
+                              gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
             if (ierr /= 0) then
@@ -429,7 +451,8 @@ contains
             end if
          else if (gradr > grada) then
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
-            call set_semiconvection(L, Lambda, m, T, Ptot, Pr, beta, opacity, rho, alpha_semiconvection, &
+            if (present(mixing_length)) mixing_length = legacy_Lambda
+            call set_semiconvection(L, legacy_Lambda, m, T, Ptot, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                     gradL_composition_term, &
                                     gradT, Y_face, conv_vel, D, mixing_type, ierr)

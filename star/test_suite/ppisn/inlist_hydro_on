@@ -24,7 +24,9 @@
    restore_mesh_on_retry = .true.
    num_steps_to_hold_mesh_after_retry = 5
 
-   MLT_option = "none"
+   MLT_option = "TDC"
+   include_mlt_corr_to_TDC = .false.
+   TDC_alpha_M = 0.25d0
    
 
 / ! end of controls namelist

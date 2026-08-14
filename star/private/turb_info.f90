@@ -22,7 +22,7 @@
 
       use star_private_def
       use const_def, only: dp, i8, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
-      use reconstructed_face_support, only: get_reconstructed_face_state_ad
+      use reconstructed_face_support, only: get_reconstructed_face_state_ad, get_reconstructed_hse_scale_height_ad
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -93,7 +93,7 @@
          type(auto_diff_real_star_order1) :: &
             T_face_ad, P_face_ad, energy_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             grada_face_ad, scale_height_ad, gradr_ad, &
-            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad
+            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, mixing_length_ad, hse_scale_height_ad
          include 'formats'
 
          ierr = 0
@@ -128,6 +128,15 @@
             s, k, T_face_ad, rho_face_ad, P_face_ad, energy_face_ad, Cp_face_ad, chiRho_face_ad, chiT_face_ad, &
             grada_face_ad, opacity_face_ad, scale_height_ad, gradr_ad, ierr)
          if (ierr /= 0) return
+
+         if (s% weak_gravity_mixing_length_beta > 0d0) then
+            call get_reconstructed_hse_scale_height_ad(s, k, hse_scale_height_ad, ierr)
+            if (ierr /= 0) return
+            mixing_length_ad = get_mlt_mixing_length( &
+               s, hse_scale_height_ad, wrap_r_00(s,k), mixing_length_alpha)
+         else
+            mixing_length_ad = mixing_length_alpha*scale_height_ad
+         end if
 
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
@@ -232,7 +241,7 @@
          call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
             T_face_ad, P_face_ad, energy_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
-            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, mixing_length_ad, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) then
                write(*,*) 'ierr in do1_mlt_eval for k', k
@@ -290,7 +299,7 @@
             s% scale_height_ad(k) = scale_height_ad
             s% scale_height(k) = scale_height_ad%val
 
-            s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
+            s% Lambda_ad(k) = mixing_length_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
 
          end subroutine store_results
@@ -331,7 +340,7 @@
             s% scale_height_ad(k) = scale_height_ad
             s% scale_height(k) = scale_height_ad%val
 
-            s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
+            s% Lambda_ad(k) = mixing_length_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
 
             s% L_conv(k) = 0d0
@@ -572,7 +581,7 @@
 
          subroutine end_of_convective_region()
             integer :: kk, op_err
-            real(dp) :: Hp
+            real(dp) :: mixing_length
             logical :: end_dbg
             9 format(a40, 3i7, 99(1pd26.16))
             include 'formats'
@@ -581,8 +590,12 @@
             top_r = s% r(k)
             top_Hp = s% scale_height(k)
             dr = top_r - bot_r
-            Hp = (bot_Hp + top_Hp)/2
-            if (dr < s% alpha_mlt(k)*min(top_Hp, bot_Hp) .and. &
+            if (s% weak_gravity_mixing_length_beta > 0d0) then
+               mixing_length = min(s% mlt_mixing_length(k), s% mlt_mixing_length(k_bot))
+            else
+               mixing_length = s% alpha_mlt(k)*min(top_Hp, bot_Hp)
+            end if
+            if (dr < mixing_length .and. &
                   s% redo_conv_for_dr_lt_mixing_length) then
 !$OMP PARALLEL DO PRIVATE(kk,op_err) SCHEDULE(dynamic,2)
                do kk = k, k_bot
@@ -600,13 +613,24 @@
             real(dp), intent(in) :: dr
             integer, intent(out) :: ierr
             logical :: make_gradr_sticky_in_solver_iters
+            real(dp) :: mixing_length_alpha, radial_length
+            type(auto_diff_real_star_order1) :: hse_scale_height
             include 'formats'
             ierr = 0
             if (dr >= s% mlt_mixing_length(k)) return
             ! if convection zone is smaller than mixing length
             ! redo MLT with reduced alpha so mixing_length = dr
+            if (s% weak_gravity_mixing_length_beta > 0d0) then
+               call get_reconstructed_hse_scale_height_ad(s, k, hse_scale_height, ierr)
+               if (ierr /= 0) return
+               radial_length = s% weak_gravity_mixing_length_beta*s% r(k)
+               if (hse_scale_height%val <= 0d0 .or. radial_length <= dr) return
+               mixing_length_alpha = dr*radial_length/(hse_scale_height%val*(radial_length - dr))
+            else
+               mixing_length_alpha = dr/s% scale_height(k)
+            end if
             call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, ierr, &
-               mixing_length_alpha_in = dr/s% scale_height(k))
+               mixing_length_alpha_in = mixing_length_alpha)
          end subroutine redo1_mlt
 
       end subroutine check_for_redo_MLT

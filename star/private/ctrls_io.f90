@@ -140,7 +140,8 @@
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
-    max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
+    max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, &
+    weak_gravity_mixing_length_beta, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
     max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
@@ -334,7 +335,7 @@
     phase_separation_no_diffusion, &
 
     ! eos controls
-    fix_d_eos_dxa_partials, &
+    min_logRho_for_eos, fix_d_eos_dxa_partials, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -655,6 +656,12 @@
        write(*,'(a)') 'WARNING: split/merge AMR metric zoning has no positive weights.'
        write(*,'(a)') 'Falling back to the legacy split/merge AMR zoning controls.'
        have_warned_about_zero_split_merge_amr_metric_weights = .true.
+    end if
+
+    if (s% min_logRho_for_eos < -30d0) then
+       write(*,'(a)') 'min_logRho_for_eos must be at least -30'
+       ierr = -1
+       return
     end if
 
     if (.not. (trim(s% energy_eqn_option) == 'dedt' .or. trim(s% energy_eqn_option) == 'eps_grav')) then
@@ -1064,6 +1071,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% thermohaline_coeff = thermohaline_coeff
  s% thermohaline_option = thermohaline_option
  s% mixing_length_alpha = mixing_length_alpha
+ s% weak_gravity_mixing_length_beta = weak_gravity_mixing_length_beta
  s% remove_small_D_limit = remove_small_D_limit
  s% alt_scale_height_flag = alt_scale_height_flag
  s% Henyey_MLT_y_param = Henyey_MLT_y_param
@@ -1800,6 +1808,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% phase_separation_no_diffusion = phase_separation_no_diffusion
 
  ! eos controls
+ s% min_logRho_for_eos = min_logRho_for_eos
  s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
 
  ! opacity controls
@@ -2795,6 +2804,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  thermohaline_coeff = s% thermohaline_coeff
  thermohaline_option = s% thermohaline_option
  mixing_length_alpha = s% mixing_length_alpha
+ weak_gravity_mixing_length_beta = s% weak_gravity_mixing_length_beta
  remove_small_D_limit = s% remove_small_D_limit
  alt_scale_height_flag = s% alt_scale_height_flag
  Henyey_MLT_y_param = s% Henyey_MLT_y_param
@@ -3523,6 +3533,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
+ min_logRho_for_eos = s% min_logRho_for_eos
  fix_d_eos_dxa_partials = s% fix_d_eos_dxa_partials
 
  ! opacity controls

@@ -30,6 +30,7 @@ module reconstructed_face_support
   public :: get_reconstructed_face_state_ad
   public :: get_reconstructed_face_eos_kap_ad
   public :: get_reconstructed_scale_height_ad
+  public :: get_reconstructed_hse_scale_height_ad
 
 contains
 
@@ -388,6 +389,39 @@ contains
     if (ierr /= 0) return
     scale_height_face = s%reconstructed_scale_height_face_ad(k)
   end subroutine get_reconstructed_scale_height_ad
+
+
+  subroutine get_reconstructed_hse_scale_height_ad(s, k, scale_height_face, ierr)
+    use auto_diff_support, only: wrap_r_00
+    use star_utils, only: get_Peos_face, get_rho_face
+
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    type(auto_diff_real_star_order1), intent(out) :: scale_height_face
+    integer, intent(out) :: ierr
+
+    real(dp) :: G
+    type(auto_diff_real_star_order1) :: P_face, rho_face, grav
+
+    ierr = 0
+    if (s%use_face_reconstruction) then
+       call ensure_reconstructed_face_state_ad(s, k, ierr)
+       if (ierr /= 0) return
+       P_face = s%reconstructed_P_face_ad(k)
+       rho_face = s%reconstructed_rho_face_ad(k)
+    else
+       P_face = get_Peos_face(s, k)
+       rho_face = get_rho_face(s, k)
+    end if
+
+    G = s%cgrav(k)
+    if (G <= 0d0 .or. s%m_grav(k) <= 0d0 .or. rho_face <= 0d0) then
+       scale_height_face = 0d0
+       return
+    end if
+    grav = G*s%m_grav(k)/pow2(wrap_r_00(s,k))
+    scale_height_face = P_face/(grav*rho_face)
+  end subroutine get_reconstructed_hse_scale_height_ad
 
 
   subroutine set_scale_height_from_face_state(s, k, P_face, rho_face, scale_height_face)

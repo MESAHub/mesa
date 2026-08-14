@@ -60,7 +60,7 @@
 
          integer :: nz, k, max_conv_bdy, max_mix_bdy, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: rho_face, f, Tmax, min_conv_vel_for_convective_mixing_type, &
-            region_bottom_q, region_top_q, L_val
+            region_bottom_q, region_top_q, L_val, mixing_length
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: RSP2_or_RSP
@@ -362,9 +362,13 @@
          ! as last thing, update conv_vel from D_mix and mixing length.
          ! this updates the effective conv vel for rotation and overshooting effects
          do k=2,nz
-            if (s% alpha_mlt(k)*s% scale_height(k) > 0) then
-               s% conv_vel(k) = &
-                  3d0*s% D_mix(k)/(s% alpha_mlt(k)*s% scale_height(k))
+            if (s% weak_gravity_mixing_length_beta > 0d0 .and. .not. RSP2_or_RSP) then
+               mixing_length = s% mlt_mixing_length(k)
+            else
+               mixing_length = s% alpha_mlt(k)*s% scale_height(k)
+            end if
+            if (mixing_length > 0d0) then
+               s% conv_vel(k) = 3d0*s% D_mix(k)/mixing_length
             else
                s% conv_vel(k) = 0
             end if
@@ -1017,9 +1021,17 @@
                if (s% cdc(k-1) /= 0 .and. s% cdc(k+1) /= 0) then
                   s% cdc(k) = (s% cdc(k-1) + s% cdc(k+1))/2
                   s% D_mix(k) = s% cdc(k)/pow2(pi4*s% r(k)*s% r(k)*s% rho(k))
-                  lambda = s% alpha_mlt(k)* &
-                     (s% scale_height(k-1) + s% scale_height(k+1))/2
-                  s% conv_vel(k) = 3*s% D_mix(k)/lambda
+                  if (s% weak_gravity_mixing_length_beta > 0d0) then
+                     lambda = (s% mlt_mixing_length(k-1) + s% mlt_mixing_length(k+1))/2
+                  else
+                     lambda = s% alpha_mlt(k)* &
+                        (s% scale_height(k-1) + s% scale_height(k+1))/2
+                  end if
+                  if (lambda > 0d0) then
+                     s% conv_vel(k) = 3d0*s% D_mix(k)/lambda
+                  else
+                     s% conv_vel(k) = 0d0
+                  end if
                   s% mixing_type(k) = max(s% mixing_type(k-1), s% mixing_type(k+1))
                if (dbg) write(*,3) 'remove radiative singleton', k, nz
                end if

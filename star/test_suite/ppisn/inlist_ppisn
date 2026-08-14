@@ -41,14 +41,14 @@ mass_fraction_limit_for_Skye = 1d-16
    new_cumulative_energy_error = 0d0
 
    change_rotation_flag = .true.
-   new_rotation_flag = .true.
+   new_rotation_flag = .false.
    change_w_div_wc_flag = .true.
-   new_w_div_wc_flag = .true.
+   new_w_div_wc_flag = .false.
 
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_extra'
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
    save_pgstar_files_when_terminate = .true.
 
    num_special_rate_factors = 2
@@ -66,7 +66,7 @@ mass_fraction_limit_for_Skye = 1d-16
 &controls
 
    fill_arrays_with_nans = .false.
-   report_solver_progress = .false.
+   report_solver_progress = .true.
    max_resid_jump_limit = 1d99
 
    okay_to_remove_mixing_singleton = .false.
@@ -129,6 +129,7 @@ mass_fraction_limit_for_Skye = 1d-16
    ! convection controls
    use_ledoux_criterion = .true.
    mixing_length_alpha = 2d0
+   weak_gravity_mixing_length_beta = 0.1d0
    alpha_semiconvection = 1d0
    thermohaline_coeff = 0d0
    num_cells_for_smooth_gradL_composition_term = 0
@@ -137,6 +138,7 @@ mass_fraction_limit_for_Skye = 1d-16
 
    ! The control below is useful when running with burning + convection during pulses.
    make_gradr_sticky_in_solver_iters = .true.
+   convergence_ignore_equL_residuals = .true.
 
    max_abs_du_div_cs_for_convection = 0.03d0
    max_v_div_cs_for_convection = 1d1
@@ -191,8 +193,8 @@ mass_fraction_limit_for_Skye = 1d-16
 
    ! mesh controls
    okay_to_remesh = .true.
-   max_dq = 5d-3  ! RECOMMENDED 1d-3
-   mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
+   !max_dq = 5d-3  ! RECOMMENDED 1d-3
+   mesh_delta_coeff = 1d0 ! RECOMMENDED 0.8d0
 
    ! Relax mesh on the surface for pre-hydro evolution
    min_surface_cell_dq = 1d-8

@@ -360,7 +360,7 @@
 
       ! NOTE: the following values are from the most recent call on mlt
          ! values for these at start of step have "_start" at end of name
-         real(dp), pointer :: mlt_mixing_length(:) ! mixing_length_alpha*scale_height as computed by mlt
+         real(dp), pointer :: mlt_mixing_length(:) ! mixing length from mlt (cm)
          integer, pointer :: mlt_mixing_type(:) ! as defined in mesa/const. before overshooting has been added.
          real(dp), pointer :: mlt_D(:) ! mlt diffusion coeff. (cm^2/sec)
          real(dp), pointer :: mlt_Gamma(:) ! local mlt convection efficiency.
