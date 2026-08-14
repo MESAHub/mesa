@@ -14,7 +14,7 @@
    Grid2_win_flag = .true.
    !Grid2_win_flag = .false.
 
-   Grid2_win_width = 15
+   Grid2_win_width = 12
    Grid2_win_aspect_ratio = 0.65 ! aspect_ratio = height/width
 
    Grid2_plot_name(4) = 'Mixing'
