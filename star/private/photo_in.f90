@@ -134,8 +134,13 @@
          read(iounit, iostat=ierr) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
             s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz), s% conv_vel(1:nz), &
+            s% superad_reduction_factor(1:nz), &
             s% D_ST_start(1:nz), s% nu_ST_start(1:nz), &  ! needed for ST time smoothing
             s% have_ST_start_info
+         if (failed('superad_reduction_factor')) return
+         s% superad_reduction_factor_old(1:nz) = s% superad_reduction_factor(1:nz)
+         s% have_superad_reduction_factor = .true.
+         s% okay_to_set_superad_reduction_factor = .false.
 
          call read_part_number(iounit)
          if (failed('rsp_num_periods')) return

@@ -228,9 +228,10 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
+      real(dp) :: f_turnover, Gamma_factor_old_local, eta_old
+      type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC, have_Y_face_guess
+      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -298,7 +299,15 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
-      if (k /= 0) s% superad_reduction_factor(k) = 1d0
+      hold_superad_reduction_factor = .false.
+      if (k > 0) &
+         hold_superad_reduction_factor = &
+            s% use_superad_reduction .and. &
+            s% superad_reduction_use_turnover_limit .and. &
+            s% have_superad_reduction_factor .and. &
+            (.not. s% okay_to_set_superad_reduction_factor .or. s% doing_finish_load_model)
+      if (k /= 0 .and. .not. hold_superad_reduction_factor) &
+         s% superad_reduction_factor(k) = 1d0
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -505,9 +514,9 @@ contains
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
                   if (alfa0 < 1d0) then
-                     Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
+                     Gamma_term = Gamma_term + scale_value2*(0.5d0*alfa0*alfa0)
                   else
-                     Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
+                     Gamma_term = Gamma_term + scale_value2*(alfa0-0.5d0)
                   end if
                   !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
@@ -523,6 +532,30 @@ contains
                end if
             end if
          end if
+
+         if (hold_superad_reduction_factor) then
+            ! Start-of-step setup must not advance the stored response.
+            Gamma_factor = max(s% superad_reduction_factor(k), 1d0)
+         else if (s% superad_reduction_use_turnover_limit .and. k > 0) then
+            if (s% dt > 0d0 .and. s% tau_conv_start(k) > 0d0 .and. &
+                  s% have_superad_reduction_factor) then
+               if (associated(s% superad_reduction_factor_old)) then
+                  Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
+                  if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
+                     select case (trim(s% superad_reduction_turnover_limit_function))
+                     case ('linear')
+                        f_turnover = min(s% dt/s% tau_conv_start(k), 1d0)
+                     case ('exponential')
+                        f_turnover = -expm1(-s% dt/s% tau_conv_start(k))
+                     end select
+                     eta_old = 1d0/Gamma_factor_old_local
+                     eta_inst = 1d0/Gamma_factor
+                     Gamma_factor = 1d0/(eta_old + f_turnover*(eta_inst - eta_old))
+                  end if
+               end if
+            end if
+         end if
+
          if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
