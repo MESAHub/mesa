@@ -54,9 +54,6 @@
          if (s% rotation_flag) old_J = total_angular_momentum(s)
 
          call amr(s,ierr)
-         if (ierr == 0 .and. &
-               any(s% amr_split_merge_has_undergone_remesh(1:s% nz))) &
-            call remap_mlt_vc(s, ierr)
          if (ierr /= 0) then
             s% retry_message = 'remesh_split_merge failed'
             if (s% report_ierr) write(*, *) s% retry_message
@@ -80,94 +77,6 @@
          end if
 
       end function remesh_split_merge
-
-
-      subroutine remap_mlt_vc(s, ierr)
-         use interp_1d_def, only: pm_work_size
-         use interp_1d_lib, only: interpolate_vector_pm
-         type (star_info), pointer :: s
-         integer, intent(out) :: ierr
-         real(dp), allocatable :: xq_old(:), xq_new(:), &
-            mlt_vc_old(:), mlt_vc_new(:)
-         real(dp), pointer :: work(:)
-         integer :: k, nz, nz_old
-
-         ierr = 0
-         nullify(work)
-         nz = s% nz
-         nz_old = s% prev_mesh_nz
-         if (nz < 1 .or. nz_old < 1) then
-            ierr = -1
-            return
-         end if
-
-         allocate(xq_old(nz_old+1), xq_new(nz), &
-            mlt_vc_old(nz_old+1), mlt_vc_new(nz), &
-            work((nz_old+1)*pm_work_size), stat=ierr)
-         if (ierr /= 0) then
-            call cleanup
-            return
-         end if
-
-         xq_old(1) = 0d0
-         do k = 2, nz_old
-            if (s% prev_mesh_dq(k-1) <= 0d0) then
-               ierr = -1
-               call cleanup
-               return
-            end if
-            xq_old(k) = xq_old(k-1) + s% prev_mesh_dq(k-1)
-         end do
-         xq_old(nz_old+1) = 1d0
-         if (xq_old(nz_old) >= 1d0) then
-            ierr = -1
-            call cleanup
-            return
-         end if
-
-         xq_new(1) = 0d0
-         do k = 2, nz
-            if (s% dq(k-1) <= 0d0) then
-               ierr = -1
-               call cleanup
-               return
-            end if
-            xq_new(k) = xq_new(k-1) + s% dq(k-1)
-         end do
-         if (xq_new(nz) >= 1d0 .or. s% dq(nz) <= 0d0) then
-            ierr = -1
-            call cleanup
-            return
-         end if
-
-         mlt_vc_old(1:nz_old) = s% prev_mesh_mlt_vc(1:nz_old)
-         mlt_vc_old(nz_old+1) = 0d0
-         call interpolate_vector_pm( &
-            nz_old+1, xq_old, nz, xq_new, &
-            mlt_vc_old, mlt_vc_new, work, &
-            'adjust_mesh_split_merge remap_mlt_vc', ierr)
-         if (ierr /= 0) then
-            call cleanup
-            return
-         end if
-
-         do k = 1, nz
-            s% mlt_vc(k) = max(0d0, mlt_vc_new(k))
-         end do
-
-         call cleanup
-
-         contains
-
-         subroutine cleanup
-            if (allocated(xq_old)) deallocate(xq_old)
-            if (allocated(xq_new)) deallocate(xq_new)
-            if (allocated(mlt_vc_old)) deallocate(mlt_vc_old)
-            if (allocated(mlt_vc_new)) deallocate(mlt_vc_new)
-            if (associated(work)) deallocate(work)
-         end subroutine cleanup
-
-      end subroutine remap_mlt_vc
 
 
       subroutine amr(s,ierr)
@@ -1433,8 +1342,8 @@
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
 
-         ! Set a provisional value for later operations in this AMR call.
-         ! remap_mlt_vc sets the final face values from the pre-AMR mesh.
+         ! mlt_vc is face-based, so a split creates a new interior face value here.
+         ! Interpolate using the same left/right orientation as tau(ip).
          s% mlt_vc(ip) = mlt_vcR + (mlt_vcL - mlt_vcR)*dMR/dM
 
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
