@@ -201,9 +201,9 @@ mass_fraction_limit_for_Skye = 1d-16
 
    !! this one is turned on in run_star_extras
    !use_split_merge_amr = .true.
-   split_merge_amr_log_zoning = .false.
-   split_merge_amr_logtau_zoning = .true.
-   split_merge_amr_nz_baseline = 2000 ! RECOMMENDED 6000 for logR zoning
+   !split_merge_amr_log_zoning = .false.
+   !split_merge_amr_logtau_zoning = .true.
+   split_merge_amr_nz_baseline = 800 ! RECOMMENDED 6000 for logR zoning
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
    split_merge_amr_max_iters = 1000

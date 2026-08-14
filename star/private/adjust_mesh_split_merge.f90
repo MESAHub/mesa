@@ -251,12 +251,14 @@
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
-            metric_logR_weight, metric_logtau_weight, metric_logT_weight, &
-            metric_weight_sum, metric_delta_lnR, metric_delta_lntau, metric_delta_lnT, &
-            metric_component_max
+            metric_logR_weight, metric_logtau_weight, metric_weight_sum, &
+            metric_delta_lnR, metric_delta_lntau, &
+            guarded_undersize_ratio
+         real(dp) :: cell_metric(2), pair_metric(2), guarded_pair_metric(2)
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
             du_div_cs_limit_flag, metric_zoning, metric_merge_guard
-         integer :: nz, nz_baseline, k, nz_r_core
+         integer :: nz, nz_baseline, k, nz_r_core, i_merge, ip_merge, &
+            num_metric_guard_rejections, guarded_i_merge, guarded_ip_merge
          real(dp), pointer :: v(:), r_for_v(:)
 
          include 'formats'
@@ -295,8 +297,7 @@
 
          metric_logR_weight = max(0d0, s% split_merge_amr_metric_logR_weight)
          metric_logtau_weight = max(0d0, s% split_merge_amr_metric_logtau_weight)
-         metric_logT_weight = max(0d0, s% split_merge_amr_metric_logT_weight)
-         metric_weight_sum = metric_logR_weight + metric_logtau_weight + metric_logT_weight
+         metric_weight_sum = metric_logR_weight + metric_logtau_weight
          metric_zoning = s% split_merge_amr_use_metric_zoning_for_u_flag .and. &
             s% u_flag .and. metric_weight_sum > 0d0
 
@@ -319,16 +320,6 @@
                end do
                metric_delta_lntau = max(metric_delta_lntau, &
                   max(tiny(1d0), s% split_merge_amr_metric_min_delta_lntau))
-            end if
-
-            metric_delta_lnT = 1d0
-            if (metric_logT_weight > 0d0) then
-               metric_delta_lnT = 0d0
-               do k = 1, nz
-                  metric_delta_lnT = metric_delta_lnT + metric_dlnT(k)
-               end do
-               metric_delta_lnT = max(metric_delta_lnT, &
-                  max(tiny(1d0), s% split_merge_amr_metric_min_delta_lnT))
             end if
 
             inner_dx_baseline = metric_weight_sum/dble(max(1,nz_baseline))
@@ -365,14 +356,19 @@
          TooSmall = 0d0
          iTooBig = -1
          iTooSmall = -1
+         guarded_undersize_ratio = 0d0
+         guarded_pair_metric = 0d0
+         num_metric_guard_rejections = 0
+         guarded_i_merge = -1
+         guarded_ip_merge = -1
          xR = xmin  ! start at center
          do k = nz, 1, -1
 
             xL = xR
             dx_baseline = inner_dx_baseline
-            metric_component_max = 0d0
             if (metric_zoning) then
-               call metric_dx(k, dx_actual, metric_component_max)
+               call metric_cell(k, cell_metric)
+               dx_actual = sum(cell_metric)
             else if (hydrid_zoning) then
                if (s% r(k) < r_core_cm) then
                   xR = s% r(k)
@@ -457,10 +453,23 @@
                undersize_ratio = dq_min/s% dq(k)
             end if
 
-            metric_merge_guard = metric_zoning .and. &
-               s% split_merge_amr_metric_merge_guard_ratio > 0d0 .and. &
-               metric_component_max > &
+            metric_merge_guard = .false.
+            if (metric_zoning .and. s% split_merge_amr_metric_merge_guard_ratio > 0d0) then
+               call metric_merge_pair(k, i_merge, ip_merge, pair_metric)
+               metric_merge_guard = maxval(pair_metric) > &
                   s% split_merge_amr_metric_merge_guard_ratio*dx_baseline
+               if (metric_merge_guard .and. &
+                     undersize_ratio > s% split_merge_amr_MaxShort .and. &
+                     s% dq(k) < dq_max/5d0) then
+                  num_metric_guard_rejections = num_metric_guard_rejections + 1
+                  if (undersize_ratio > guarded_undersize_ratio) then
+                     guarded_undersize_ratio = undersize_ratio
+                     guarded_i_merge = i_merge
+                     guarded_ip_merge = ip_merge
+                     guarded_pair_metric = pair_metric
+                  end if
+               end if
+            end if
 
             if (.not. metric_merge_guard) then
                if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
@@ -471,6 +480,8 @@
             end if
 
          end do
+
+         if (s% trace_split_merge_amr .and. metric_zoning) call trace_metric_zoning
 
 
          contains
@@ -503,43 +514,68 @@
          end function metric_dlntau
 
 
-         real(dp) function metric_dlnT(j)
+         subroutine metric_cell(j, component)
             integer, intent(in) :: j
+            real(dp), intent(out) :: component(2)
 
-            metric_dlnT = 0d0
-            if (j > 1) metric_dlnT = metric_dlnT + &
-               0.5d0*abs(s% lnT(j) - s% lnT(j-1))
-            if (j < nz) metric_dlnT = metric_dlnT + &
-               0.5d0*abs(s% lnT(j+1) - s% lnT(j))
-         end function metric_dlnT
-
-
-         subroutine metric_dx(j, dx, component_max)
-            integer, intent(in) :: j
-            real(dp), intent(out) :: dx, component_max
-            real(dp) :: component
-
-            dx = 0d0
-            component_max = 0d0
+            component = 0d0
 
             if (metric_logR_weight > 0d0) then
-               component = metric_logR_weight*metric_dlnR(j)/metric_delta_lnR
-               dx = dx + component
-               component_max = max(component_max, component)
+               component(1) = metric_logR_weight*metric_dlnR(j)/metric_delta_lnR
             end if
 
             if (metric_logtau_weight > 0d0) then
-               component = metric_logtau_weight*metric_dlntau(j)/metric_delta_lntau
-               dx = dx + component
-               component_max = max(component_max, component)
+               component(2) = metric_logtau_weight*metric_dlntau(j)/metric_delta_lntau
+            end if
+         end subroutine metric_cell
+
+
+         subroutine metric_merge_pair(j, i, ip, component)
+            integer, intent(in) :: j
+            integer, intent(out) :: i, ip
+            real(dp), intent(out) :: component(2)
+            real(dp) :: neighbor_component(2)
+
+            call select_merge_pair(s, j, i, ip)
+            call metric_cell(i, component)
+            call metric_cell(ip, neighbor_component)
+            component = component + neighbor_component
+         end subroutine metric_merge_pair
+
+
+         subroutine trace_metric_zoning
+            real(dp) :: component(2)
+            integer :: i, ip
+
+            write(*,'(a,2(1x,es14.6))') 'split_merge metric weights logR logtau', &
+               metric_logR_weight, metric_logtau_weight
+            write(*,'(a,2(1x,es14.6))') 'split_merge metric ranges dlnR dlntau', &
+               metric_delta_lnR, metric_delta_lntau
+            write(*,'(a,1x,es14.6)') 'split_merge metric target', inner_dx_baseline
+
+            if (iTooBig > 0) then
+               call metric_cell(iTooBig, component)
+               write(*,'(a,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+                  'split_merge metric split cell ', iTooBig, ' components', component, &
+                  ' total', sum(component), ' ratio', TooBig
             end if
 
-            if (metric_logT_weight > 0d0) then
-               component = metric_logT_weight*metric_dlnT(j)/metric_delta_lnT
-               dx = dx + component
-               component_max = max(component_max, component)
+            if (iTooSmall > 0) then
+               call metric_merge_pair(iTooSmall, i, ip, component)
+               write(*,'(a,i8,a,i8,1x,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+                  'split_merge metric merge cell ', iTooSmall, ' pair ', i, ip, &
+                  ' components', component, ' total', sum(component), ' ratio', TooSmall
             end if
-         end subroutine metric_dx
+
+            if (num_metric_guard_rejections > 0) then
+               write(*,'(a,i8,a,i8,1x,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+                  'split_merge metric guard rejected ', num_metric_guard_rejections, &
+                  ' strongest pair ', guarded_i_merge, guarded_ip_merge, &
+                  ' components', guarded_pair_metric, &
+                  ' limit', s% split_merge_amr_metric_merge_guard_ratio*inner_dx_baseline, &
+                  ' ratio', guarded_undersize_ratio
+            end if
+         end subroutine trace_metric_zoning
 
          subroutine check_merge_limits
             ! Pablo's additions to modify when merge
@@ -603,6 +639,36 @@
       end subroutine biggest_smallest
 
 
+      subroutine select_merge_pair(s, i_merge, i, ip)
+         type (star_info), pointer :: s
+         integer, intent(in) :: i_merge
+         integer, intent(out) :: i, ip
+         integer :: qi_max, qim_max
+         real(dp) :: drR, drL
+
+         i = i_merge
+         if (i > 1 .and. i < s% nz) then
+            ! don't merge across change in most abundance species
+            qi_max = maxloc(s% xa(1:s% species,i), dim=1)
+            qim_max = maxloc(s% xa(1:s% species,i-1), dim=1)
+            if (qi_max == qim_max) then  ! merge with smaller neighbor
+               if (i+1 == s% nz) then
+                  drL = s% r(s% nz) - s% R_center
+               else
+                  drL = s% r(i) - s% r(i+1)
+               end if
+               drR = s% r(i-1) - s% r(i)
+               if (drR < drL) i = i-1
+            ! else i-1 has different most abundant species,
+               ! so don't consider merging with it
+            end if
+         end if
+
+         if (i == s% nz) i = i-1
+         ip = i+1
+      end subroutine select_merge_pair
+
+
       subroutine do_merge(s, i_merge, species, new_xa, ierr)
          use mesh_adjust, only: set_lnT_for_energy
          use star_utils, only: set_rmid
@@ -610,10 +676,9 @@
          integer, intent(in) :: i_merge, species
          real(dp), intent(inout) :: new_xa(species)
          integer, intent(out) :: ierr
-         logical :: merge_center
-         integer :: i, ip, i0, im, q, nz, qi_max, qim_max
+         integer :: i, ip, i0, im, q, nz
          real(dp) :: &
-            drR, drL, v, &
+            v, &
             dm, dm_i, dm_ip, star_PE0, star_PE1, &
             cell_ie, cell_etrb, &
             Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
@@ -629,29 +694,8 @@
          star_PE0 = get_star_PE(s)
          nz = s% nz
 
-         i = i_merge
-
          s% num_hydro_merges = s% num_hydro_merges+1
-         if (i > 1 .and. i < s% nz) then
-            ! don't merge across change in most abundance species
-            qi_max = maxloc(s% xa(1:species,i), dim=1)
-            qim_max = maxloc(s% xa(1:species,i-1), dim=1)
-            if (qi_max == qim_max) then  ! merge with smaller neighbor
-               if (i+1 == nz) then
-                  drL = s% r(nz) - s% R_center
-               else
-                  drL = s% r(i) - s% r(i+1)
-               end if
-               drR = s% r(i-1) - s% r(i)
-               if (drR < drL) i = i-1
-            ! else i-1 has different most abundant species,
-               ! so don't consider merging with it
-            end if
-         end if
-
-         merge_center = (i == nz)
-         if (merge_center) i = i-1
-         ip = i+1
+         call select_merge_pair(s, i_merge, i, ip)
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
                (s% amr_split_merge_has_undergone_remesh(i) .or. &
                   s% amr_split_merge_has_undergone_remesh(ip))) then
