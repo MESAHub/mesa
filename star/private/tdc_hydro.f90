@@ -278,8 +278,9 @@ contains
       ALFAM = 0d0
    end if
 
-   if (ALFAM == 0d0 .or. &
+   if (ALFAM == 0d0 .or. (s% u_flag .and. k == 1) .or. &
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+      ! The outer boundary is stress free for cell-centered u hydro.
       Chi_face = 0d0
    else
       Lambda_face = get_TDC_mixing_length_face(s, k, ierr)

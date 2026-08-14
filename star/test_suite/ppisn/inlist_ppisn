@@ -66,6 +66,7 @@ mass_fraction_limit_for_Skye = 1d-16
 &controls
 
    fill_arrays_with_nans = .false.
+   min_logRho_for_eos = -30d0
    report_solver_progress = .true.
    max_resid_jump_limit = 1d99
 
@@ -109,7 +110,7 @@ mass_fraction_limit_for_Skye = 1d-16
    max_model_number = 10000 ! RECOMMENDED -1
 
    relax_max_number_retries = 1000
-   max_number_retries = 500 ! RECOMMENDED 5000
+   max_number_retries = 5000 ! RECOMMENDED 5000
 
    ! in principle this is the only thing that needs changing
    ! it is set in inlist_extra
@@ -140,9 +141,9 @@ mass_fraction_limit_for_Skye = 1d-16
    make_gradr_sticky_in_solver_iters = .true.
    convergence_ignore_equL_residuals = .true.
 
-   max_abs_du_div_cs_for_convection = 0.03d0
-   max_v_div_cs_for_convection = 1d1
-   max_v_for_convection = 1d4
+   max_abs_du_div_cs_for_convection = 100d0 !0.03d0
+   max_v_div_cs_for_convection = 1d10
+   max_v_for_convection = 1d5!1d4
 
    ! overshoot controls
    ! we only include a bit of exponential overshooting to smooth things out
@@ -212,7 +213,7 @@ mass_fraction_limit_for_Skye = 1d-16
    split_merge_amr_okay_to_split_nz = .false.
 
    !prevent surface from going crazy during remesh and when hydro turns on
-   merge_amr_ignore_surface_cells = .true.
+   merge_amr_ignore_surface_cells = .false.
    merge_amr_k_for_ignore_surface_cells = 2
 
    merge_amr_max_abs_du_div_cs = 0.05d0
@@ -299,8 +300,8 @@ mass_fraction_limit_for_Skye = 1d-16
                     ! The additional conditions are as follows
    x_ctrl(6) = 20d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
    x_ctrl(7) = 0.5d0 ! the ratio of the (absolute) velocity to the sound speed must be below this (max_machn_for_relax)
-   x_ctrl(8) = 11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
-   x_ctrl(9) = 10d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
+   x_ctrl(8) = 9d0 !11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
+   x_ctrl(9) = 9d0 !10d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
 
    x_integer_ctrl(1) = 100 ! conditions for relax must be satisfied for this number of consecutive steps
                            ! before the outer layers are removed
@@ -318,19 +319,40 @@ mass_fraction_limit_for_Skye = 1d-16
                        ! (delta_lgLnuc_limit)
                        ! RECOMMENDED 0.025d0
 
-   x_ctrl(13) = 10d0 ! Ignore the L_nuc limit of x_ctrl(18) if L_photo exceeds this value, otherwise step to step
+   x_ctrl(13) = 10d0 ! Ignore the L_nuc limit of x_ctrl(12) if L_photo exceeds this value, otherwise step to step
                      ! variations can lead to tiny timesteps
                      ! When we reach this value we switch the timestep limit for lgLnuc to lgLphot instead
                      ! (max_Lphoto_for_lgLnuc_limit)
 
-   x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(18) is not used for L_photo either
+   x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(12) is not used for L_photo either
 
    x_ctrl(15) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and logT_center falls below this.
                       ! (logT_for_v_flag)
    x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)
 
-   x_ctrl(17) = 2d4 ! km/s : if surface exceeds 20,000 km/s, cap vsurf with fixed velocity BC. 
+   x_ctrl(17) = 2d4 ! km/s : if surface exceeds 20,000 km/s, cap vsurf with fixed velocity BC.
+                     ! Ignored by smooth surface-ejecta removal.
+
+   x_integer_ctrl(2) = 2 ! Surface ejecta removal: 0 disabled, 1 direct, 2 smooth.
+                         ! (surface_ejecta_removal_mode)
+   x_ctrl(18) = 1d4 ! Minimum radius in Rsun for removal.
+                    ! (surface_ejecta_radius_limit)
+   x_ctrl(19) = 4d0 ! Minimum outward velocity divided by escape velocity.
+                    ! (surface_ejecta_v_div_vesc_limit)
+   x_ctrl(20) = 1d1 ! Smooth-removal inverse timescale in yr^-1.
+                    ! (surface_ejecta_removal_factor)
+   x_ctrl(21) = 0d0 ! Maximum local escape velocity in km/s for removal.
+                    ! A positive value replaces the radius criterion.
+                    ! (surface_ejecta_escape_velocity_limit)
+
+   x_logical_ctrl(3) = .true. ! Temporarily use the retained-zone temperature
+                              ! while rebuilding after direct removal.
+                              ! (direct_removal_use_fixed_Tsurf)
+
+   ! Use MESA's standard mass-loss energy accounting for smooth removal.
+   eps_mdot_factor = 0d0
+   eps_mdot_leak_frac_factor = 0d0
 
    x_logical_ctrl(1) = .true.! If true, terminate after evolving 100d after first relax
                               ! meant for use in the test_suite

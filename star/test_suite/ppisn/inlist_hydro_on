@@ -10,6 +10,7 @@
    !use_ODE_var_eqn_pairing = .true.
    use_dPrad_dm_form_of_T_gradient_eqn = .true.
    use_momentum_outer_BC = .true.
+   floor_momentum_outer_BC_at_Prad = .true.
 
    use_split_merge_amr = .true.
    split_merge_amr_use_metric_zoning_for_u_flag = .true.
@@ -17,6 +18,7 @@
    split_merge_amr_metric_logtau_weight = 1d0
    split_merge_amr_metric_merge_guard_ratio = 1.25d0
 
+   min_surface_cell_dq = 1d-14
    split_merge_amr_dq_min = 1d-16
 
    max_mdot_redo_cnt = 0
@@ -26,8 +28,13 @@
 
    MLT_option = "TDC"
    include_mlt_corr_to_TDC = .false.
-   TDC_alpha_M = 0.25d0
-   
+   TDC_alpha_M = 2d0 !0.25d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+
+  ! for v flag
+    use_Pvsc_art_visc = .true.
+    Pvsc_cq = 4.0d0
+    Pvsc_zsh = 0.1d0
 
 / ! end of controls namelist
 

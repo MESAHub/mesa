@@ -4678,6 +4678,20 @@
     use_momentum_outer_BC = .false.
 
 
+      ! floor_momentum_outer_BC_at_Prad
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! When using ``use_momentum_outer_BC``, require the pressure applied to
+      ! the momentum equation to be at least the radiation pressure at the
+      ! atmospheric boundary temperature. This preserves the atmospheric
+      ! pressure when its implied gas pressure is nonnegative and otherwise
+      ! uses zero gas pressure. Ignored for other outer boundary conditions.
+
+      ! ::
+
+    floor_momentum_outer_BC_at_Prad = .false.
+
+
       ! use_zero_Pgas_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -6025,7 +6039,8 @@
       ! min_surface_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Largest allowed dq at surface.
+      ! Largest and smallest allowed dq at the surface.
+      ! ``min_surface_cell_dq`` also applies to split/merge AMR.
 
       ! ::
 

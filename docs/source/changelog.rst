@@ -56,6 +56,14 @@ Fixed a small bug where diffusive overshooting (overmixing) routines did not
 respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 ``mixing_length_alpha`` instead. See `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
+Fixed the TDC eddy-viscosity boundary condition for cell-centered Riemann
+hydrodynamics. The outer boundary now has zero turbulent stress while the
+surface cell retains the force from its inner turbulent face.
+
+Added an optional floor on the atmospheric pressure used by the momentum
+outer boundary. The floor prevents a hydrostatic atmosphere from supplying
+less than the radiation pressure at its boundary temperature.
+
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).

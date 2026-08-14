@@ -511,7 +511,8 @@
     atm_irradiated_kap_v, atm_irradiated_kap_v_div_kap_th, atm_irradiated_P_surf, &
     atm_irradiated_max_iters, &
 
-    use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, &
+    use_compression_outer_BC, use_momentum_outer_BC, floor_momentum_outer_BC_at_Prad, &
+    use_zero_Pgas_outer_BC, &
     fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
 
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
@@ -1281,6 +1282,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% use_compression_outer_BC = use_compression_outer_BC
  s% use_momentum_outer_BC = use_momentum_outer_BC
+ s% floor_momentum_outer_BC_at_Prad = floor_momentum_outer_BC_at_Prad
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
@@ -3013,6 +3015,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  use_compression_outer_BC = s% use_compression_outer_BC
  use_momentum_outer_BC = s% use_momentum_outer_BC
+ floor_momentum_outer_BC_at_Prad = s% floor_momentum_outer_BC_at_Prad
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC

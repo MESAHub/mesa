@@ -182,12 +182,12 @@
    !Profile_Panels1_other_dymin(2) = 0.5
 
 
-   Profile_Panels1_yaxis_name(3) = 'logRho'
+   Profile_Panels1_yaxis_name(3) = 'v_div_cs'
    Profile_Panels1_ymax(3) = -101d0
    Profile_Panels1_ymin(3) = -2
    Profile_Panels1_dymin(3) = 0.1
 
-   Profile_Panels1_other_yaxis_name(3) = 'spin_parameter' ! 'mass'
+   Profile_Panels1_other_yaxis_name(3) = 'log_dq'!'spin_parameter' ! 'mass'
    Profile_Panels1_other_ymax(3) = 2!5d0
    Profile_Panels1_other_ymin(3) = -101d0!-2d0
    !Profile_Panels1_other_dymin(3) = 0.15

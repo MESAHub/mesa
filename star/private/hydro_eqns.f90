@@ -20,7 +20,7 @@
       module hydro_eqns
 
       use star_private_def
-      use const_def, only: dp, pi, ln10, two_thirds
+      use const_def, only: dp, pi, ln10, two_thirds, crad
       use star_utils, only: em1, e00, ep1
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -730,7 +730,7 @@
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
-            P_bc_ad, T_bc_ad, lnP_bc_ad, lnT_bc_ad, resid_ad
+            P_bc_ad, T_bc_ad, lnP_bc_ad, lnT_bc_ad, Prad_bc_ad, resid_ad
          integer :: i_P_eqn
          logical :: offset_T_to_cell_center, offset_P_to_cell_center, &
             need_P_surf, need_T_surf, test_partials
@@ -790,6 +790,14 @@
 
          if (need_P_surf) then
             if (s% use_momentum_outer_BC) then
+               if (s% floor_momentum_outer_BC_at_Prad) then
+                  ! Do not let the atmosphere imply negative gas pressure.
+                  Prad_bc_ad = (crad/3d0)*pow4(T_bc_ad)
+                  if (P_bc_ad%val < Prad_bc_ad%val) then
+                     P_bc_ad = Prad_bc_ad
+                     s% P_surf = P_bc_ad%val
+                  end if
+               end if
                call set_momentum_BC(ierr)
             else
                call set_Psurf_BC(ierr)

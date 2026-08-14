@@ -100,6 +100,8 @@
          k = nz_old
          tau_center = s% tau(k) + &
             s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
+         call enforce_surface_dq_min
+         if (ierr /= 0) return
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
             if (mod(iter,2) == 0) then
@@ -128,7 +130,7 @@
                   s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_merge', iTooSmall, s% dq(iTooSmall)
-            call do_merge(s, iTooSmall, species, new_xa, ierr)
+            call do_merge(s, iTooSmall, species, new_xa, .false., ierr)
             if (ierr /= 0) return
             num_merge = num_merge + 1
             if (s% trace_split_merge_amr) then
@@ -151,6 +153,8 @@
                !write(*,*)
             end if
          end do
+         call enforce_surface_dq_min
+         if (ierr /= 0) return
          s% mesh_call_number = s% mesh_call_number + 1
          nz = s% nz
          s% q(nz) = s% dq(nz)
@@ -176,6 +180,17 @@
 
          contains
 
+         subroutine enforce_surface_dq_min
+            include 'formats'
+            do while (s% nz > 1 .and. s% dq(1) < s% min_surface_cell_dq)
+               if (s% trace_split_merge_amr) &
+                  write(*,2) 'surface dq merge', 1, s% dq(1)
+               call do_merge(s, 1, species, new_xa, .true., ierr)
+               if (ierr /= 0) return
+               num_merge = num_merge + 1
+            end do
+         end subroutine enforce_surface_dq_min
+
          subroutine split1  ! ratio of desired/actual is too large
             include 'formats'
             if (s% trace_split_merge_amr) then
@@ -184,7 +199,7 @@
                   TooSmall, MaxTooSmall, s% dq(iTooSmall)
                call report_energies(s,'before merge TooSmall')
             end if
-            call do_merge(s, iTooSmall, species, new_xa, ierr)
+            call do_merge(s, iTooSmall, species, new_xa, .false., ierr)
             if (ierr /= 0) return
             num_merge = num_merge + 1
             if (s% trace_split_merge_amr) then
@@ -248,7 +263,7 @@
          integer, intent(out) :: iTooBig, iTooSmall
          real(dp) :: &
             oversize_ratio, undersize_ratio, abs_du_div_cs, &
-            xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
+            xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
             metric_logR_weight, metric_logtau_weight, metric_weight_sum, &
@@ -366,6 +381,8 @@
 
             xL = xR
             dx_baseline = inner_dx_baseline
+            dq_min_k = dq_min
+            if (k == 1) dq_min_k = max(dq_min_k, s% min_surface_cell_dq)
             if (metric_zoning) then
                call metric_cell(k, cell_metric)
                dx_actual = sum(cell_metric)
@@ -429,7 +446,7 @@
 
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
-            if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
+            if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min_k) then
                if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
                   if (k > 1 .or. s% split_merge_amr_okay_to_split_1) then
                      TooBig = oversize_ratio; iTooBig = k
@@ -448,9 +465,9 @@
                   s%lnT(k)/ln10>= s% merge_amr_logT_for_ignore_core_cells) cycle
 
             if (abs(dx_actual)>0d0) then
-               undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))
+               undersize_ratio = max(dx_baseline/dx_actual, dq_min_k/s% dq(k))
             else
-               undersize_ratio = dq_min/s% dq(k)
+               undersize_ratio = dq_min_k/s% dq(k)
             end if
 
             metric_merge_guard = .false.
@@ -669,12 +686,13 @@
       end subroutine select_merge_pair
 
 
-      subroutine do_merge(s, i_merge, species, new_xa, ierr)
+      subroutine do_merge(s, i_merge, species, new_xa, bypass_repeated_remesh, ierr)
          use mesh_adjust, only: set_lnT_for_energy
          use star_utils, only: set_rmid
          type (star_info), pointer :: s
          integer, intent(in) :: i_merge, species
          real(dp), intent(inout) :: new_xa(species)
+         logical, intent(in) :: bypass_repeated_remesh
          integer, intent(out) :: ierr
          integer :: i, ip, i0, im, q, nz
          real(dp) :: &
@@ -695,7 +713,8 @@
 
          s% num_hydro_merges = s% num_hydro_merges+1
          call select_merge_pair(s, i_merge, i, ip)
-         if (s% split_merge_amr_avoid_repeated_remesh .and. &
+         if (.not. bypass_repeated_remesh .and. &
+               s% split_merge_amr_avoid_repeated_remesh .and. &
                (s% amr_split_merge_has_undergone_remesh(i) .or. &
                   s% amr_split_merge_has_undergone_remesh(ip))) then
             s% amr_split_merge_has_undergone_remesh(i) = .true.

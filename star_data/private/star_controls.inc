@@ -425,6 +425,7 @@
 
          logical :: use_compression_outer_BC
          logical :: use_momentum_outer_BC
+         logical :: floor_momentum_outer_BC_at_Prad
          logical :: use_zero_Pgas_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          real(dp) :: fixed_vsurf
