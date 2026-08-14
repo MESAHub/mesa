@@ -46,6 +46,8 @@ Bug Fixes
 
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
 
+The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
+
 Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
 which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
 MESA when the KH timescale was recalculated on restart.

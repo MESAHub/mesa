@@ -2401,8 +2401,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Calculate scale height by averaging P/rho onto faces together instead
-      ! of of wrapping P and rho separately by default. Both forms assume HSE.
+      ! of wrapping P and rho separately by default. Both forms assume HSE.
       ! Not compatible with alt_scale_height_flag.
+      ! This control has no effect when
+      ! ``use_face_reconstruction = .true.``; in that case MESA
+      ! uses P and rho from the same reconstructed face state.
 
       ! ::
 

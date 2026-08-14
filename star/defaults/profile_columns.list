@@ -740,6 +740,17 @@
    !Uq
    !Y_face
 
+   !reconstructed_T_face
+   !reconstructed_rho_face
+   !reconstructed_P_face
+   !reconstructed_Cp_face
+   !reconstructed_ChiRho_face
+   !reconstructed_ChiT_face
+   !reconstructed_grada_face
+   !reconstructed_opacity_face
+   !reconstructed_scale_height_face
+   !reconstructed_gradr_face
+
 !# RTI
 
    !RTI_du_diffusion_kick

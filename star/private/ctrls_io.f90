@@ -111,7 +111,9 @@
     TDC_use_density_form_for_eddy_viscosity, TDC_adjust_mass_fallback_to_mlt, &
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
-    include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, TDC_include_eturb_in_energy_equation, &
+    include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, &
+    use_face_reconstruction, &
+    TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
     TDC_hydro_use_mass_interp_face_values, TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_T_anchor, TDC_hydro_dq_1_factor, &
 
@@ -617,18 +619,20 @@
 
 
  subroutine read_controls(id, filename, ierr)
+ use utils_namelist, only: read_namelist, missing_namelist_error
  use star_private_def
- use utils_lib
  character(*), intent(in) :: filename
  integer, intent(in) :: id
  integer, intent(out) :: ierr
 
  type (star_info), pointer :: s
- ierr = 0
  call get_star_ptr(id, s, ierr)
  if (ierr /= 0) return
 
- call read_controls_file(s, filename, 1, ierr)
+ call read_namelist(filename, read_controls_file, "controls", ierr, missing_namelist_error)
+ if (ierr /= 0) return
+
+ call store_controls(s)
  call check_controls(s, ierr)
 
  end subroutine read_controls
@@ -652,67 +656,32 @@
  end subroutine check_controls
 
 
- recursive subroutine read_controls_file(s, filename, level, ierr)
- use star_private_def
- use utils_lib
- character(*), intent(in) :: filename
- type (star_info), pointer :: s
- integer, intent(in) :: level
- integer, intent(out) :: ierr
- logical, dimension(max_extra_inlists) :: read_extra
- character (len=strlen), dimension(max_extra_inlists) :: extra
- integer :: unit, i
+ subroutine read_controls_file(unit, iostat, iomsg, extra_inlists, extra_inlists_mask)
+    use const_def, only: strlen
+    use utils_namelist, only: max_extra_inlists
 
- ierr = 0
+    integer, intent(in) :: unit
+    integer, intent(out) :: iostat
+    character(len=strlen), intent(out) :: iomsg
+    character(len=strlen), dimension(max_extra_inlists), intent(out) :: extra_inlists
+    logical, dimension(max_extra_inlists), intent(out) :: extra_inlists_mask
 
- if (level >= 10) then
- write(*,*) 'ERROR: too many levels of nested extra controls inlist files'
- ierr = -1
- return
- end if
+    integer :: i
 
- if (len_trim(filename) > 0) then
-    open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-    if (ierr /= 0) then
-       write(*, *) 'Failed to open control namelist file ', trim(filename)
+    read_extra_controls_inlist(:) = .false.
+
+    read(unit, nml=controls, iostat=iostat, iomsg=iomsg)
+
+    if (iostat /= 0) then
        return
     end if
-    read(unit, nml=controls, iostat=ierr)
-    close(unit)
-    if (ierr /= 0) then
-       write(*, *)
-       write(*, *)
-       write(*, *)
-       write(*, *)
-       write(*, '(a)') 'Failed while trying to read control namelist file: ' // trim(filename)
-       write(*, '(a)') 'Perhaps the following runtime error message will help you find the problem.'
-       write(*, *)
-       open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-       read(unit, nml=controls)
-       close(unit)
-       return
-    end if
- end if
 
- call store_controls(s, ierr)
-
- ! recursive calls to read other inlists
- do i=1, max_extra_inlists
-    read_extra(i) = read_extra_controls_inlist(i)
-    read_extra_controls_inlist(i) = .false.
-    extra(i) = extra_controls_inlist_name(i)
-    extra_controls_inlist_name(i) = 'undefined'
-
-    if (read_extra(i)) then
-       write(*,*) 'read ' // trim(extra(i))
-       call read_controls_file(s, extra(i), level+1, ierr)
-       if (ierr /= 0) return
-    end if
- end do
-
+    do i=1, max_extra_inlists
+       extra_inlists(i) = extra_controls_inlist_name(i)
+       extra_inlists_mask(i) = read_extra_controls_inlist(i)
+    end do
 
  end subroutine read_controls_file
-
 
  subroutine set_default_controls
 
@@ -767,14 +736,9 @@
  end subroutine set_default_controls
 
 
- subroutine store_controls(s, ierr)
+ subroutine store_controls(s)
  use star_private_def
- use chem_def  ! categories
- use utils_lib, only: mkdir
  type (star_info), pointer :: s
- integer, intent(out) :: ierr
-
- ierr = 0
 
  ! where to start
  s% initial_mass = initial_mass
@@ -2102,6 +2066,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
  s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
  s% use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
+ s% use_face_reconstruction = use_face_reconstruction
  s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
@@ -3817,6 +3782,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
  include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
  use_TDC_enthalpy_flux_limiter = s% use_TDC_enthalpy_flux_limiter
+ use_face_reconstruction = s% use_face_reconstruction
  TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering
@@ -4275,7 +4241,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       read(tmp, nml=controls)
 
       ! Add to star
-      call store_controls(s, ierr)
+      call store_controls(s)
       if(ierr/=0) return
 
    end subroutine set_control

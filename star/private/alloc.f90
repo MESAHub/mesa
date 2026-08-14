@@ -1086,6 +1086,34 @@
             if (failed('mlt_D_ad')) exit
             call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
             if (failed('mlt_Gamma_ad')) exit
+            call do1_logical(s% reconstructed_face_state_valid, c% reconstructed_face_state_valid)
+            if (failed('reconstructed_face_state_valid')) exit
+            ! cache entries are invalid until first use
+            if (action == do_allocate) s% reconstructed_face_state_valid = .false.
+            call do1_ad(s% reconstructed_T_face_ad, c% reconstructed_T_face_ad)
+            if (failed('reconstructed_T_face_ad')) exit
+            call do1_ad(s% reconstructed_rho_face_ad, c% reconstructed_rho_face_ad)
+            if (failed('reconstructed_rho_face_ad')) exit
+            call do1_ad(s% reconstructed_P_face_ad, c% reconstructed_P_face_ad)
+            if (failed('reconstructed_P_face_ad')) exit
+            call do1_ad(s% reconstructed_energy_face_ad, c% reconstructed_energy_face_ad)
+            if (failed('reconstructed_energy_face_ad')) exit
+            call do1_ad(s% reconstructed_Cp_face_ad, c% reconstructed_Cp_face_ad)
+            if (failed('reconstructed_Cp_face_ad')) exit
+            call do1_ad(s% reconstructed_ChiRho_face_ad, c% reconstructed_ChiRho_face_ad)
+            if (failed('reconstructed_ChiRho_face_ad')) exit
+            call do1_ad(s% reconstructed_ChiT_face_ad, c% reconstructed_ChiT_face_ad)
+            if (failed('reconstructed_ChiT_face_ad')) exit
+            call do1_ad(s% reconstructed_grada_face_ad, c% reconstructed_grada_face_ad)
+            if (failed('reconstructed_grada_face_ad')) exit
+            call do1_ad(s% reconstructed_opacity_face_ad, c% reconstructed_opacity_face_ad)
+            if (failed('reconstructed_opacity_face_ad')) exit
+            call do1_ad(s% reconstructed_scale_height_face_ad, c% reconstructed_scale_height_face_ad)
+            if (failed('reconstructed_scale_height_face_ad')) exit
+            call do1_ad(s% reconstructed_gradr_face_ad, c% reconstructed_gradr_face_ad)
+            if (failed('reconstructed_gradr_face_ad')) exit
+            call do1(s% reconstructed_csound_face, c% reconstructed_csound_face)
+            if (failed('reconstructed_csound_face')) exit
 
             call do1_ad(s% PII_ad, c% PII_ad)
             if (failed('PII_ad')) exit
@@ -1198,6 +1226,8 @@
             if (failed('Peos_start')) exit
             call do1(s% Peos_face_start, c% Peos_face_start)
             if (failed('Peos_face_start')) exit
+            call do1(s% reconstructed_P_face_start, c% reconstructed_P_face_start)
+            if (failed('reconstructed_P_face_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
             call do1(s% energy_start, c% energy_start)

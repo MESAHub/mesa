@@ -786,6 +786,10 @@ contains
     k_a = k_top_mz + 1
     k_b = k_bot_mz
 
+    ! Rebuild the face state for the trial mixed composition.
+    if (s% use_face_reconstruction) &
+       s% reconstructed_face_state_valid(k_a:k_b) = .false.
+
     eval_face_loop: do k = k_a, k_b
 
        ! Update the face density
@@ -811,6 +815,10 @@ contains
     end do eval_face_loop
 
     ! Restore EOS and MLT data
+
+    ! Discard the trial face state before restoring the cells.
+    if (s% use_face_reconstruction) &
+       s% reconstructed_face_state_valid(k_a:k_b) = .false.
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
     restore_cell_loop : do k = k_top_mz, k_bot_mz
