@@ -7570,8 +7570,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, redistribute all heating associated with phase
-      ! separation evenly throughout the inner half of the white dwarf
-      ! (prevents unphysical localized spikes at small time steps)
+      ! separation evenly throughout the inner half of the white dwarf.
+      ! This is a somewhat arbitrary choice to broadly distribute the
+      ! correct amount of net heating through the WD interior where
+      ! heat conduction is efficent anyway, preventing unphysical localized
+      ! heating spikes near the crystallization boundary at small time steps.
 
       ! ::
 

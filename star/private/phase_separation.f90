@@ -53,6 +53,8 @@
             stop
          end if
 
+         if(ierr/=0) return
+
          if(s% smooth_phase_separation_heating) then
             ! Redistribute energy associated with phase separation evenly through inner half of star.
             ! This can help with small timesteps where there may be too much localized heating.
