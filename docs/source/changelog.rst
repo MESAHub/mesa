@@ -39,6 +39,12 @@ GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since t
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
+Additional controls are available for TDC envelope remeshing:
+
+- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
+
 .. _Bug Fixes main:
 
 Bug Fixes
