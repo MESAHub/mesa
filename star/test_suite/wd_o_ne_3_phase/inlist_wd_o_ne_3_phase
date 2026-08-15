@@ -82,7 +82,7 @@
       max_corr_jump_limit = 1d7!!
       convergence_ignore_equL_residuals = .true.
       convergence_ignore_alpha_RTI_residuals = .true.
-      make_gradr_sticky_in_solver_iters = .true.
+      ! make_gradr_sticky_in_solver_iters = .true.
       hydro_mtx_min_allowed_logT = -10
       hydro_mtx_max_allowed_abs_dlogT = 99d0
       hydro_mtx_max_allowed_logT = 99d0
