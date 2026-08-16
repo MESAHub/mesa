@@ -544,7 +544,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
          HR_fname = '' ! file name for extra HR data
 
          ! Enables calling a subroutine to add extra information to a plot
-         ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
+         ! see `$MESA_DIR/star_data/public/star_pgstar.f90`
          HR_use_decorator = .false.
 
 
