@@ -13,13 +13,15 @@
 
    max_mdot_redo_cnt = 200
 
-   restore_mesh_on_retry = .false.
-
    MLT_option = "TDC"
 
-   max_num_merge_surface_cells = 5
-   max_surface_cell_dq = 1d0
-   min_surface_cell_dq = 1d-8
+   ! need to be unset together, rapid surface remesh can crash post relax model.
+
+   restore_mesh_on_retry = .true.
+  ! num_steps_to_hold_mesh_after_retry = 5
+  ! max_num_merge_surface_cells = 5
+  ! max_surface_cell_dq = 1d0
+  ! min_surface_cell_dq = 1d-8
 / ! end of controls namelist
 
 &pgstar

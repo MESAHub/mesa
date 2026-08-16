@@ -102,6 +102,8 @@
             s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          call enforce_surface_dq_min
          if (ierr /= 0) return
+         call enforce_dlnR_min
+         if (ierr /= 0) return
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
             if (mod(iter,2) == 0) then
@@ -191,6 +193,34 @@
             end do
          end subroutine enforce_surface_dq_min
 
+
+         subroutine enforce_dlnR_min
+            integer :: j, j_merge
+            real(dp) :: dlnR, min_dlnR
+            include 'formats'
+
+            if (.not. s% merge_if_dlnR_too_small .or. s% mesh_min_dlnR <= 0d0) return
+
+            do while (s% nz > 1)
+               j_merge = 0
+               min_dlnR = huge(1d0)
+               do j = 1, s% nz
+                  dlnR = cell_dlnR(s, j)
+                  if (dlnR < s% mesh_min_dlnR .and. dlnR < min_dlnR) then
+                     j_merge = j
+                     min_dlnR = dlnR
+                  end if
+               end do
+               if (j_merge == 0) exit
+               if (s% trace_split_merge_amr) &
+                  write(*,2) 'dlnR floor merge', j_merge, min_dlnR
+               call do_merge(s, j_merge, species, new_xa, .true., ierr)
+               if (ierr /= 0) return
+               num_merge = num_merge + 1
+            end do
+         end subroutine enforce_dlnR_min
+
+
          subroutine split1  ! ratio of desired/actual is too large
             include 'formats'
             if (s% trace_split_merge_amr) then
@@ -227,6 +257,45 @@
       end subroutine amr
 
 
+      real(dp) function cell_dlnR(s, k) result(dlnR)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: r_inner
+
+         if (k == s% nz) then
+            if (s% R_center <= 0d0) then
+               dlnR = huge(1d0)
+               return
+            end if
+            r_inner = s% R_center
+         else
+            r_inner = s% r(k+1)
+         end if
+         dlnR = log(s% r(k)) - log(r_inner)
+      end function cell_dlnR
+
+
+      logical function split_respects_dlnR_min(s, k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: r_inner, r_mid, dlnR_inner, dlnR_outer
+
+         split_respects_dlnR_min = .true.
+         if (s% mesh_min_dlnR <= 0d0) return
+         if (k == s% nz) then
+            if (s% R_center <= 0d0) return
+            r_inner = s% R_center
+         else
+            r_inner = s% r(k+1)
+         end if
+         r_mid = 0.5d0*(s% r(k) + r_inner)
+         dlnR_outer = log(s% r(k)) - log(r_mid)
+         dlnR_inner = log(r_mid) - log(r_inner)
+         split_respects_dlnR_min = &
+            min(dlnR_outer, dlnR_inner) >= 2d0*s% mesh_min_dlnR
+      end function split_respects_dlnR_min
+
+
       subroutine emergency_merge(s, iTooSmall)
          type (star_info), pointer :: s
          integer, intent(out) :: iTooSmall
@@ -244,14 +313,14 @@
       subroutine emergency_split(s, iTooBig)
          type (star_info), pointer :: s
          integer, intent(out) :: iTooBig
-         integer :: k_max_dq
+         integer :: k
          include 'formats'
-         k_max_dq = maxloc(s% dq(1:s% nz),dim=1)
-         if (s% dq(k_max_dq) > s% split_merge_amr_dq_max) then
-            iTooBig = k_max_dq
-         else
-            iTooBig = 0
-         end if
+         iTooBig = 0
+         do k = 1, s% nz
+            if (s% dq(k) <= s% split_merge_amr_dq_max) cycle
+            if (.not. split_respects_dlnR_min(s, k)) cycle
+            if (iTooBig == 0 .or. s% dq(k) > s% dq(iTooBig)) iTooBig = k
+         end do
       end subroutine emergency_split
 
 
@@ -446,7 +515,8 @@
 
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
-            if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min_k) then
+            if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min_k .and. &
+                  split_respects_dlnR_min(s, k)) then
                if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
                   if (k > 1 .or. s% split_merge_amr_okay_to_split_1) then
                      TooBig = oversize_ratio; iTooBig = k
@@ -473,7 +543,7 @@
             metric_merge_guard = .false.
             if (metric_zoning .and. s% split_merge_amr_metric_merge_guard_ratio > 0d0) then
                call metric_merge_pair(k, i_merge, ip_merge, pair_metric)
-               metric_merge_guard = maxval(pair_metric) > &
+               metric_merge_guard = sum(pair_metric) > &
                   s% split_merge_amr_metric_merge_guard_ratio*dx_baseline
                if (metric_merge_guard .and. &
                      undersize_ratio > s% split_merge_amr_MaxShort .and. &
@@ -1019,7 +1089,8 @@
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old, &
-            u_R, u_L, delta_u, delta_KE, delta_KE_div_dm
+            u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
+            min_stencil_energy, max_delta_KE_div_dm
          logical :: done, use_new_grad_rho
          include 'formats'
 
@@ -1124,6 +1195,7 @@
 
          energy_L = s% energy(iL)
          rho_L = s% dm(iL)/get_dV(s,iL)
+         min_stencil_energy = min(energy_R, energy_C, energy_L)
 
          ! get gradients before move cell contents
 
@@ -1328,15 +1400,22 @@
          if (s% u_flag) then
             ! Preserve momentum and take the resolved velocity variance from internal energy.
             delta_u = 0.5d0*grad_v*dr
-            u_R = v + dML*delta_u/dm
-            u_L = v - dMR*delta_u/dm
             delta_KE = 0.5d0*dMR*dML*pow2(delta_u)/dm
             delta_KE_div_dm = delta_KE/dm
-            if (delta_KE_div_dm >= min(s% energy(i), s% energy(ip))) then
-               u_R = v
-               u_L = v
-               delta_KE_div_dm = 0d0
+            ! Do not let the kinetic-energy correction create a new internal-energy minimum.
+            max_delta_KE_div_dm = max(0d0, &
+               min(s% energy(i), s% energy(ip)) - min_stencil_energy)
+            if (delta_KE_div_dm > max_delta_KE_div_dm) then
+               if (max_delta_KE_div_dm > 0d0) then
+                  delta_u = delta_u*sqrt(max_delta_KE_div_dm/delta_KE_div_dm)
+                  delta_KE_div_dm = max_delta_KE_div_dm
+               else
+                  delta_u = 0d0
+                  delta_KE_div_dm = 0d0
+               end if
             end if
+            u_R = v + dML*delta_u/dm
+            u_L = v - dMR*delta_u/dm
             s% u(i) = u_R
             s% u(ip) = u_L
             s% energy(i) = s% energy(i) - delta_KE_div_dm

@@ -63,6 +63,8 @@
       integer, parameter :: lx_have_reached_gamma_limit = 4
       ! lxtra(lx_he_zams) indicates if star has reached he zams
       integer, parameter :: lx_he_zams = 5
+      ! lxtra(lx_using_direct_removal_bcs) is true after direct surface removal
+      integer, parameter :: lx_using_direct_removal_bcs = 7
 
       ! xtra(x_time_start_pulse) contains the time at which a pulse starts
       integer, parameter :: x_time_start_pulse = 1
@@ -72,6 +74,10 @@
       integer, parameter :: x_gamma_int_bound = 3
       ! xtra(x_time_since_first_gamma_zero) contains time in seconds since first time gamma_integral=0
       integer, parameter :: x_time_since_first_gamma_zero = 4
+      ! Surface boundary state retained after direct surface removal
+      integer, parameter :: x_direct_removal_Tsurf = 5
+      integer, parameter :: x_direct_removal_tau_factor = 6
+      integer, parameter :: x_direct_removal_vsurf = 7
       ! xtra(x_star_age_at_relax) Stores s% star_age at the point the last relax was made
       integer, parameter :: x_star_age_at_relax = 8
 
@@ -94,7 +100,7 @@
       real(dp) :: q_for_relax_check, max_v_for_relax, max_machn_for_relax, &
          max_Lneu_for_relax, max_Lnuc_for_relax
       integer :: num_steps_before_relax, surface_ejecta_removal_mode
-      logical :: in_inlist_pulses, direct_removal_use_fixed_Tsurf
+      logical :: in_inlist_pulses
       real(dp) :: max_dt_before_pulse
       real(dp) :: vsurf_for_fixed_bc
       real(dp) :: surface_ejecta_radius_limit, surface_ejecta_v_div_vesc_limit
@@ -168,7 +174,6 @@
          surface_ejecta_v_div_vesc_limit = s% x_ctrl(19)
          surface_ejecta_removal_factor = s% x_ctrl(20)
          surface_ejecta_escape_velocity_limit = s% x_ctrl(21)
-         direct_removal_use_fixed_Tsurf = s% x_logical_ctrl(3)
          surface_ejecta_wind = 0d0
          surface_ejecta_wind_is_active = .false.
          use_other_adjust_mdot_for_winds = s% use_other_adjust_mdot
@@ -401,12 +406,53 @@
             specific_energy = 0.5d0*pow2(s% u(k)) + s% energy(k) - &
                s% cgrav(k)*s% m(k)/s% r(k)
             if (s% u(k) <= surface_ejecta_v_div_vesc_limit*v_esc .or. &
-                  s% u(k) <= s% csound(k) .or. specific_energy <= 0d0) exit
+                  specific_energy <= 0d0) exit
             k_keep = k+1
             removed_mass = removed_mass + s% dm(k)
             removed_energy = removed_energy + s% dm(k)*specific_energy
          end do
       end subroutine find_surface_ejecta
+
+      subroutine set_direct_removal_boundary(s)
+         type (star_info), pointer, intent(inout) :: s
+
+         if (surface_ejecta_removal_mode /= surface_ejecta_removal_direct .or. &
+               .not. s% lxtra(lx_using_direct_removal_bcs)) return
+
+         s% atm_option = 'fixed_Tsurf'
+         s% atm_fixed_Tsurf = s% xtra(x_direct_removal_Tsurf)
+         s% tau_factor = s% xtra(x_direct_removal_tau_factor)
+         s% force_tau_factor = s% tau_factor
+         if (s% u_flag) then
+            s% use_fixed_vsurf_outer_BC = .true.
+            ! Fixed velocity takes precedence; this keeps P and T at the cell face.
+            s% use_momentum_outer_BC = .true.
+            s% fixed_vsurf = min(s% xtra(x_direct_removal_vsurf), &
+               1d5*vsurf_for_fixed_bc)
+         end if
+      end subroutine set_direct_removal_boundary
+
+      subroutine clear_direct_removal_boundary(s)
+         type (star_info), pointer, intent(inout) :: s
+
+         if (.not. s% lxtra(lx_using_direct_removal_bcs)) return
+
+         ! The ejecta boundary is not appropriate for the hydrostatic remnant.
+         s% lxtra(lx_using_direct_removal_bcs) = .false.
+         call set_normal_atmosphere_boundary(s)
+      end subroutine clear_direct_removal_boundary
+
+      subroutine set_normal_atmosphere_boundary(s)
+         type (star_info), pointer, intent(inout) :: s
+
+         s% atm_option = 'T_tau'
+         s% atm_T_tau_relation = 'Eddington'
+         s% atm_T_tau_opacity = 'fixed'
+         s% tau_factor = 1d0
+         s% force_tau_factor = 1d0
+         s% use_fixed_vsurf_outer_BC = .false.
+         s% need_to_setvars = .true.
+      end subroutine set_normal_atmosphere_boundary
 
       subroutine set_surface_ejecta_wind(s)
          type (star_info), pointer, intent(in) :: s
@@ -604,10 +650,14 @@
             s% lxtra(lx_have_saved_gamma_prof) = .false.
             s% lxtra(lx_have_reached_gamma_limit) = .false.
             s% lxtra(lx_he_zams) = .false.
+            s% lxtra(lx_using_direct_removal_bcs) = .false.
             s% xtra(x_time_start_pulse) = -1d0
             s% xtra(x_dyn_time) = -1d0
             s% xtra(x_gamma_int_bound) = -1d0
             s% xtra(x_time_since_first_gamma_zero) = 0d0
+            s% xtra(x_direct_removal_Tsurf) = 0d0
+            s% xtra(x_direct_removal_tau_factor) = 0d0
+            s% xtra(x_direct_removal_vsurf) = 0d0
             s% ixtra(ix_steps_met_relax_cond) = 0
             s% ixtra(ix_num_relaxations) = 0
             s% ixtra(ix_steps_since_relax) = 0
@@ -635,6 +685,7 @@
                if (ierr /= 0) return
             end if
          end if
+         call set_direct_removal_boundary(s)
       end subroutine extras_startup
 
 
@@ -1151,6 +1202,7 @@
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
 
+               call clear_direct_removal_boundary(s)
                call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
 
                ! to avoid showing pgstar stuff during relax
@@ -1384,6 +1436,7 @@
             s% max_timestep = 1d99
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
+         call set_direct_removal_boundary(s)
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
@@ -1458,9 +1511,7 @@
          use run_star_support
          integer, intent(in) :: id
          integer :: ierr, k_keep
-         real(dp) :: max_vel_inside, removed_energy, removed_mass, saved_atm_fixed_Tsurf
-         logical :: saved_use_fixed_vsurf_outer_BC, saved_use_momentum_outer_BC
-         character (len=strlen) :: saved_atm_option
+         real(dp) :: fixed_Tsurf, fixed_vsurf, max_vel_inside, removed_energy, removed_mass
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
@@ -1485,27 +1536,31 @@
                write(*,*) 'Removing detached surface layers', &
                   k_keep, removed_mass/Msun, removed_energy
 
-               saved_atm_option = s% atm_option
-               saved_atm_fixed_Tsurf = s% atm_fixed_Tsurf
-               saved_use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
-               saved_use_momentum_outer_BC = s% use_momentum_outer_BC
-               if (direct_removal_use_fixed_Tsurf) then
-                  s% atm_option = 'fixed_Tsurf'
-                  s% atm_fixed_Tsurf = s% T(k_keep)
+               fixed_Tsurf = s% T(k_keep)
+               if (surface_ejecta_radius_limit > 0d0) then
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*standard_cgrav*s% m(k_keep)/ &
+                     (surface_ejecta_radius_limit*Rsun)))
+               else
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*s% cgrav(k_keep)*s% m(k_keep)/s% r(k_keep)))
                end if
+               s% atm_option = 'fixed_Tsurf'
+               s% atm_fixed_Tsurf = fixed_Tsurf
                s% use_fixed_vsurf_outer_BC = .false.
                s% use_momentum_outer_BC = .true.
                call star_remove_surface_at_cell_k(s% id, k_keep, ierr)
-               s% atm_option = saved_atm_option
-               s% atm_fixed_Tsurf = saved_atm_fixed_Tsurf
-               s% use_fixed_vsurf_outer_BC = saved_use_fixed_vsurf_outer_BC
-               s% use_momentum_outer_BC = saved_use_momentum_outer_BC
-               s% need_to_setvars = .true.
                if (dbg) write(*,*) 'check ierr', ierr
                if (ierr /= 0) then
                   extras_finish_step = terminate
                   return
                end if
+               s% xtra(x_direct_removal_Tsurf) = fixed_Tsurf
+               s% xtra(x_direct_removal_tau_factor) = s% tau_factor
+               s% xtra(x_direct_removal_vsurf) = fixed_vsurf
+               s% lxtra(lx_using_direct_removal_bcs) = .true.
+               call set_direct_removal_boundary(s)
+               s% need_to_setvars = .true.
             end if
          end if
 

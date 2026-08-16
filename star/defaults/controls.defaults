@@ -5963,6 +5963,7 @@
       ! ~~~~~~~~~~~~~
 
       ! Limit on difference in lnR across cell for mesh refinement.
+      ! Applies to standard and split/merge AMR mesh refinement.
       ! Do not make this smaller than about 1d-14 or will fail with numerical problems.
 
       ! ::
@@ -5973,7 +5974,8 @@
       ! merge_if_dlnR_too_small
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true, mesh adjustment will force merge if difference in lnR across cell is too small.
+      ! If true, standard and split/merge AMR mesh adjustment will force merge
+      ! if difference in lnR across cell is too small.
 
       ! ::
 

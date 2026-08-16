@@ -354,9 +354,9 @@
       ! split_merge_amr_metric_merge_guard_ratio
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If positive, inhibit a merge candidate when any individual weighted
-      ! metric component for the resulting merged pair exceeds this factor
-      ! times the metric target size.  Negative values disable this guard.
+      ! If positive, inhibit a merge candidate when the summed weighted metric
+      ! for the resulting merged pair exceeds this factor times the metric
+      ! target size. Negative values disable this guard.
 
       ! ::
 

@@ -13,11 +13,11 @@
    floor_momentum_outer_BC_at_Prad = .true.
 
    use_split_merge_amr = .true.
-   split_merge_amr_use_metric_zoning_for_u_flag = .true.
-   split_merge_amr_metric_logR_weight = 1d0
-   split_merge_amr_metric_logtau_weight = 1d0
-   split_merge_amr_metric_merge_guard_ratio = 1.25d0
 
+   mesh_min_dlnR = 1d-9
+   merge_if_dlnR_too_small = .true.
+
+   ! applies to u and v flag
    min_surface_cell_dq = 1d-14
    split_merge_amr_dq_min = 1d-16
 
@@ -28,8 +28,9 @@
 
    MLT_option = "TDC"
    include_mlt_corr_to_TDC = .false.
-   TDC_alpha_M = 2d0 !0.25d0
+   TDC_alpha_M = 1d0
    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_include_eturb_in_energy_equation = .true.
 
   ! for v flag
     use_Pvsc_art_visc = .true.

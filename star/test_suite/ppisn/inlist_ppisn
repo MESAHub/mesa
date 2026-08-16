@@ -21,7 +21,9 @@ mass_fraction_limit_for_Skye = 1d-16
 
 &star_job
 
-   timescale_for_relax_composition = 1d5
+   ! Relax composition by model count rather than the initial timestep.
+   num_steps_to_relax_composition = 100
+   timescale_for_relax_composition = -1d0
 
    !change_initial_net = .true.
    !although not used, run_star_extras reads new_net_name during pulses
@@ -31,9 +33,13 @@ mass_fraction_limit_for_Skye = 1d-16
    initial_zfracs = 6
 
    ! this are options for the relaxation of the model in-between pulses
-   timescale_for_relax_entropy = 1d-15
-   max_dt_for_relax_entropy = 5d-17
+   timescale_for_relax_entropy = 1d-20
+   max_dt_for_relax_entropy = 5d-22
    num_timescales_for_relax_entropy = 30
+   relax_entropy_use_implicit_source = .true.
+   relax_entropy_use_normalized_source = .true.
+   relax_entropy_scale_max_correction = 0.1d0
+   relax_entropy_retry_hold = 5
    max_steps_to_relax_entropy = 10000
    relax_omega_max_yrs_dt = 1d-5
 
@@ -68,6 +74,8 @@ mass_fraction_limit_for_Skye = 1d-16
    fill_arrays_with_nans = .false.
    min_logRho_for_eos = -30d0
    report_solver_progress = .true.
+   report_ierr = .true.
+   trace_evolve = .true.
    max_resid_jump_limit = 1d99
 
    okay_to_remove_mixing_singleton = .false.
@@ -134,16 +142,16 @@ mass_fraction_limit_for_Skye = 1d-16
    alpha_semiconvection = 1d0
    thermohaline_coeff = 0d0
    num_cells_for_smooth_gradL_composition_term = 0
-   max_conv_vel_div_csound = 1d0
-   max_conv_vel_div_csound_maxq = 1d0
+   !max_conv_vel_div_csound = 1d0
+   !max_conv_vel_div_csound_maxq = 1d0
 
    ! The control below is useful when running with burning + convection during pulses.
    make_gradr_sticky_in_solver_iters = .true.
    convergence_ignore_equL_residuals = .true.
 
    max_abs_du_div_cs_for_convection = 100d0 !0.03d0
-   max_v_div_cs_for_convection = 1d10
-   max_v_for_convection = 1d5!1d4
+   max_v_div_cs_for_convection = 100d0 !10d0
+   max_v_for_convection = 1d5 !1d4
 
    ! overshoot controls
    ! we only include a bit of exponential overshooting to smooth things out
@@ -188,7 +196,19 @@ mass_fraction_limit_for_Skye = 1d-16
    delta_lg_star_mass_limit = 2d-3 ! RECOMMENDED 2d-3
    delta_lgRho_cntr_limit = 0.005d0 ! RECOMMENDED 0.0025d0
    delta_lgRho_cntr_hard_limit = 0.01d0 ! RECOMMENDED 0.005d0
-   dt_div_min_dr_div_cs_limit = 5d0 ! this value is adjusted in run_star_extras ! RECOMMENDED 3d0
+
+
+
+   ! have used these values to do run to saturation, but may not be necessary ~ Bill P.
+   !dt_div_min_dr_div_cs_limit = 1000d0! set less than 1d0 in high L/M stars.
+   !dt_div_min_dr_div_cs_hard_limit = 1d4! i don't like hard limits ~ EbF
+   !min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0d0
+   !min_q_for_dt_div_min_dr_div_cs_limit = 0d0
+   !max_q_for_dt_div_min_dr_div_cs_limit = 0.99d0
+   !min_k_for_dt_div_min_dr_div_cs_limit = 1
+   !min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0d0 !0.001d0
+
+
    min_timestep_limit = 1d-20 ! (seconds)
    relax_hard_limits_after_retry = .false.
 
@@ -198,22 +218,23 @@ mass_fraction_limit_for_Skye = 1d-16
    mesh_delta_coeff = 1d0 ! RECOMMENDED 0.8d0
 
    ! Relax mesh on the surface for pre-hydro evolution
-   min_surface_cell_dq = 1d-8
-   max_num_merge_surface_cells = 5
-   max_surface_cell_dq = 1d0
+   !min_surface_cell_dq = 1d-8
+   !max_num_merge_surface_cells = 5
+   !max_surface_cell_dq = 1d0
 
    !! this one is turned on in run_star_extras
-   !use_split_merge_amr = .true.
-   !split_merge_amr_log_zoning = .false.
-   !split_merge_amr_logtau_zoning = .true.
-   split_merge_amr_nz_baseline = 800 ! RECOMMENDED 6000 for logR zoning
+   split_merge_amr_use_metric_zoning_for_u_flag = .true.
+   split_merge_amr_metric_logR_weight = 1d0
+   split_merge_amr_metric_logtau_weight = 0.5d0
+   split_merge_amr_metric_merge_guard_ratio = 1.25d0
+   split_merge_amr_nz_baseline = 2000 ! RECOMMENDED 6000 for logR zoning
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
    split_merge_amr_max_iters = 1000
    split_merge_amr_okay_to_split_nz = .false.
 
    !prevent surface from going crazy during remesh and when hydro turns on
-   merge_amr_ignore_surface_cells = .false.
+   merge_amr_ignore_surface_cells = .true.
    merge_amr_k_for_ignore_surface_cells = 2
 
    merge_amr_max_abs_du_div_cs = 0.05d0
@@ -331,28 +352,25 @@ mass_fraction_limit_for_Skye = 1d-16
    x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)
 
-   x_ctrl(17) = 2d4 ! km/s : if surface exceeds 20,000 km/s, cap vsurf with fixed velocity BC.
+   x_ctrl(17) = 5d4 ! km/s : if surface exceeds 20,000 km/s, cap vsurf with fixed velocity BC.
                      ! Ignored by smooth surface-ejecta removal.
 
-   x_integer_ctrl(2) = 2 ! Surface ejecta removal: 0 disabled, 1 direct, 2 smooth.
+   x_integer_ctrl(2) = 1 ! Surface ejecta removal: 0 disabled, 1 direct, 2 smooth.
                          ! (surface_ejecta_removal_mode)
    x_ctrl(18) = 1d4 ! Minimum radius in Rsun for removal.
                     ! (surface_ejecta_radius_limit)
    x_ctrl(19) = 4d0 ! Minimum outward velocity divided by escape velocity.
                     ! (surface_ejecta_v_div_vesc_limit)
-   x_ctrl(20) = 1d1 ! Smooth-removal inverse timescale in yr^-1.
+   x_ctrl(20) = 1d2 ! Smooth-removal inverse timescale in yr^-1.
                     ! (surface_ejecta_removal_factor)
    x_ctrl(21) = 0d0 ! Maximum local escape velocity in km/s for removal.
                     ! A positive value replaces the radius criterion.
                     ! (surface_ejecta_escape_velocity_limit)
 
-   x_logical_ctrl(3) = .true. ! Temporarily use the retained-zone temperature
-                              ! while rebuilding after direct removal.
-                              ! (direct_removal_use_fixed_Tsurf)
-
    ! Use MESA's standard mass-loss energy accounting for smooth removal.
    eps_mdot_factor = 0d0
    eps_mdot_leak_frac_factor = 0d0
+   TDC_adjust_mass_fallback_to_mlt = .true.
 
    x_logical_ctrl(1) = .true.! If true, terminate after evolving 100d after first relax
                               ! meant for use in the test_suite

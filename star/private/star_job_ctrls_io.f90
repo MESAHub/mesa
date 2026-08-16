@@ -382,6 +382,10 @@
          timescale_for_relax_entropy, &
          max_dt_for_relax_entropy, &
          num_timescales_for_relax_entropy, &
+         relax_entropy_use_implicit_source, &
+         relax_entropy_use_normalized_source, &
+         relax_entropy_scale_max_correction, &
+         relax_entropy_retry_hold, &
          relax_entropy_filename, &
          get_entropy_for_relax_from_eos, &
          report_cell_for_xm, &
@@ -916,6 +920,10 @@
          s% job% timescale_for_relax_entropy = timescale_for_relax_entropy
          s% job% max_dt_for_relax_entropy = max_dt_for_relax_entropy
          s% job% num_timescales_for_relax_entropy = num_timescales_for_relax_entropy
+         s% job% relax_entropy_use_implicit_source = relax_entropy_use_implicit_source
+         s% job% relax_entropy_use_normalized_source = relax_entropy_use_normalized_source
+         s% job% relax_entropy_scale_max_correction = relax_entropy_scale_max_correction
+         s% job% relax_entropy_retry_hold = relax_entropy_retry_hold
          s% job% relax_entropy_filename = relax_entropy_filename
          s% job% get_entropy_for_relax_from_eos = get_entropy_for_relax_from_eos
          s% job% report_cell_for_xm = report_cell_for_xm
@@ -1454,6 +1462,10 @@
          timescale_for_relax_entropy = s% job% timescale_for_relax_entropy
          max_dt_for_relax_entropy = s% job% max_dt_for_relax_entropy
          num_timescales_for_relax_entropy = s% job% num_timescales_for_relax_entropy
+         relax_entropy_use_implicit_source = s% job% relax_entropy_use_implicit_source
+         relax_entropy_use_normalized_source = s% job% relax_entropy_use_normalized_source
+         relax_entropy_scale_max_correction = s% job% relax_entropy_scale_max_correction
+         relax_entropy_retry_hold = s% job% relax_entropy_retry_hold
          relax_entropy_filename = s% job% relax_entropy_filename
          get_entropy_for_relax_from_eos = s% job% get_entropy_for_relax_from_eos
          report_cell_for_xm = s% job% report_cell_for_xm

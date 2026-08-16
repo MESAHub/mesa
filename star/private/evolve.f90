@@ -532,6 +532,7 @@
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
             surf_omega_div_omega_crit_limit, dt
+         real(dp), allocatable :: velocity_remap_kinetic_energy(:)
 
          integer :: ph_k, mdot_action
          real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
@@ -558,6 +559,7 @@
          clock_rate = s% system_clock_rate
          trace = s% trace_evolve
          nz = s% nz
+         allocate(velocity_remap_kinetic_energy(nz))
 
          call setup_for_implicit_mdot_loop
 
@@ -587,13 +589,13 @@
 
             else
 
-               call do_adjust_mass(s, s% species, ierr)
+               call do_adjust_mass(s, s% species, velocity_remap_kinetic_energy, ierr)
                if (failed('do_adjust_mass')) return
                s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
                if (failed('set_vars_if_needed after do_adjust_mass')) return
 
-               call calculate_eps_mdot(s, dt, ierr)
+               call calculate_eps_mdot(s, dt, velocity_remap_kinetic_energy, ierr)
                if (failed('calculate_eps_mdot')) return
 
                if (s% mstar_dot /= 0d0) then
