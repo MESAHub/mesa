@@ -36,6 +36,12 @@
       include "test_suite_extras_def.inc"
 
       logical :: dbg = .false.
+      real(dp), parameter :: log_term_power = 5.626d0
+
+      integer, parameter :: surface_ejecta_removal_disabled = 0
+      integer, parameter :: surface_ejecta_removal_direct = 1
+      integer, parameter :: surface_ejecta_removal_smooth = 2
+
 
       logical :: pgstar_flag
       integer :: pgstar_interval, pgstar_file_interval
@@ -57,6 +63,8 @@
       integer, parameter :: lx_have_reached_gamma_limit = 4
       ! lxtra(lx_he_zams) indicates if star has reached he zams
       integer, parameter :: lx_he_zams = 5
+      ! lxtra(lx_using_direct_removal_bcs) is true after direct surface removal
+      integer, parameter :: lx_using_direct_removal_bcs = 7
 
       ! xtra(x_time_start_pulse) contains the time at which a pulse starts
       integer, parameter :: x_time_start_pulse = 1
@@ -66,6 +74,10 @@
       integer, parameter :: x_gamma_int_bound = 3
       ! xtra(x_time_since_first_gamma_zero) contains time in seconds since first time gamma_integral=0
       integer, parameter :: x_time_since_first_gamma_zero = 4
+      ! Surface boundary state retained after direct surface removal
+      integer, parameter :: x_direct_removal_Tsurf = 5
+      integer, parameter :: x_direct_removal_tau_factor = 6
+      integer, parameter :: x_direct_removal_vsurf = 7
       ! xtra(x_star_age_at_relax) Stores s% star_age at the point the last relax was made
       integer, parameter :: x_star_age_at_relax = 8
 
@@ -78,21 +90,6 @@
       ! ixtra(ix_steps_since_hydro_on) counts the number of steps since hydro was turned on
       integer, parameter :: ix_steps_since_hydro_on = 4
 
-
-      ! xtra(x_vsurf_at_remove_surface) Store velocity the first time remove_surface is used
-      ! after that point we fix the surface velocity to this
-      integer, parameter :: x_vsurf_at_remove_surface = 7
-
-      ! lxtra(lx_using_bb_bcs) indicates if black body BCs are being used
-      integer, parameter :: lx_using_bb_bcs = 7
-
-      ! xtra(x_tau_factor) stores tau_factor which is set by remove_surface
-      integer, parameter :: x_tau_factor = 6
-
-      ! xtra(x_Tsurf_for_atm) Surface T for fixed Tsurf atm option
-      ! this is used when layers at large radii are removed
-      integer, parameter :: x_Tsurf_for_atm = 5
-
       !!!!!!!!!!!!!!!!!!!!!!!!!
       ! These variables are loaded up from x_ctrl, x_integer_ctrl and x_logical_ctrl
       ! values specified on inlist_ppisn
@@ -102,18 +99,19 @@
       real(dp) :: max_v_for_pulse, q_for_dyn_ts, num_dyn_ts_for_relax
       real(dp) :: q_for_relax_check, max_v_for_relax, max_machn_for_relax, &
          max_Lneu_for_relax, max_Lnuc_for_relax
-      integer :: num_steps_before_relax
-      logical :: remove_extended_layers  !, in_inlist_pulses
+      integer :: num_steps_before_relax, surface_ejecta_removal_mode
       logical :: in_inlist_pulses
-      real(dp) :: max_dt_before_pulse
+      real(dp) :: max_dt_before_pulse, max_dt_during_pulse
+      real(dp) :: vsurf_for_fixed_bc
+      real(dp) :: surface_ejecta_radius_limit, surface_ejecta_v_div_vesc_limit
+      real(dp) :: surface_ejecta_escape_velocity_limit
+      real(dp) :: surface_ejecta_removal_factor, surface_ejecta_wind
+      logical :: surface_ejecta_wind_is_active, use_other_adjust_mdot_for_winds
       real(dp) :: max_Lneu_for_mass_loss
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
-      logical :: stop_100d_after_pulse
-
-      real(dp) :: max_dt_during_pulse
-      real(dp) :: vsurf_for_fixed_bc
+      logical :: stop_100d_after_pulse, use_RTI_during_hydro
 
       contains
 
@@ -163,6 +161,7 @@
          num_steps_before_relax = s% x_integer_ctrl(1)
          in_inlist_pulses = s% x_logical_ctrl(2)
          max_dt_before_pulse = s% x_ctrl(10)
+         max_dt_during_pulse = s% x_ctrl(22)
          max_Lneu_for_mass_loss = s% x_ctrl(11)
          delta_lgLnuc_limit = s% x_ctrl(12)
          max_Lphoto_for_lgLnuc_limit = s% x_ctrl(13)
@@ -170,9 +169,37 @@
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
          stop_100d_after_pulse = s% x_logical_ctrl(1)
-         remove_extended_layers = s% x_logical_ctrl(2)
-         max_dt_during_pulse = s% x_ctrl(18)
-         vsurf_for_fixed_bc = s% x_ctrl(19)
+         use_RTI_during_hydro = s% x_logical_ctrl(3)
+         vsurf_for_fixed_bc = s% x_ctrl(17)
+         surface_ejecta_removal_mode = s% x_integer_ctrl(2)
+         surface_ejecta_radius_limit = s% x_ctrl(18)
+         surface_ejecta_v_div_vesc_limit = s% x_ctrl(19)
+         surface_ejecta_removal_factor = s% x_ctrl(20)
+         surface_ejecta_escape_velocity_limit = s% x_ctrl(21)
+         surface_ejecta_wind = 0d0
+         surface_ejecta_wind_is_active = .false.
+         use_other_adjust_mdot_for_winds = s% use_other_adjust_mdot
+
+         if (surface_ejecta_removal_mode < surface_ejecta_removal_disabled .or. &
+               surface_ejecta_removal_mode > surface_ejecta_removal_smooth) then
+            write(*,*) 'invalid surface ejecta removal mode', surface_ejecta_removal_mode
+            ierr = -1
+            return
+         end if
+         if (surface_ejecta_removal_mode /= surface_ejecta_removal_disabled .and. &
+               (surface_ejecta_v_div_vesc_limit < 0d0 .or. &
+               (surface_ejecta_escape_velocity_limit <= 0d0 .and. &
+               surface_ejecta_radius_limit <= 0d0))) then
+            write(*,*) 'invalid surface ejecta removal controls'
+            ierr = -1
+            return
+         end if
+         if (surface_ejecta_removal_mode == surface_ejecta_removal_smooth .and. &
+               surface_ejecta_removal_factor < 0d0) then
+            write(*,*) 'invalid surface ejecta removal factor'
+            ierr = -1
+            return
+         end if
 
          ! we store the value given in inlist_ppisn and deactivate it at
          ! high T
@@ -203,6 +230,11 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         if (surface_ejecta_wind_is_active) then
+            w = surface_ejecta_wind
+            return
+         end if
 
          L1 = Lsurf
          M1 = Msurf
@@ -339,6 +371,11 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         if (surface_ejecta_wind_is_active) then
+            s% mstar_dot = -surface_ejecta_wind*Msun/secyer
+            s% explicit_mstar_dot = s% mstar_dot
+            return
+         end if
          if (s% generations > 2) then
             write(*,*) "check mdots", s% mstar_dot, s% mstar_dot_old
             if (abs(s% mstar_dot) > 1.05d0*abs(s% mstar_dot_old)) then
@@ -349,79 +386,168 @@
          end if
       end subroutine my_adjust_mdot
 
-      subroutine my_other_eval_fp_ft( &
-            id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+      subroutine find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
+         type (star_info), pointer, intent(in) :: s
+         integer, intent(out) :: k_keep
+         real(dp), intent(out) :: removed_mass, removed_energy
+         integer :: k
+         real(dp) :: specific_energy, v_esc
+
+         k_keep = 1
+         removed_mass = 0d0
+         removed_energy = 0d0
+         if (.not. s% u_flag) return
+
+         do k = 1, s% nz-1
+            v_esc = sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
+            if (surface_ejecta_escape_velocity_limit > 0d0) then
+               if (v_esc > surface_ejecta_escape_velocity_limit*1d5) exit
+            else if (s% r(k) <= surface_ejecta_radius_limit*Rsun) then
+               exit
+            end if
+            specific_energy = 0.5d0*pow2(s% u(k)) + s% energy(k) - &
+               s% cgrav(k)*s% m(k)/s% r(k)
+            if (s% u(k) <= surface_ejecta_v_div_vesc_limit*v_esc .or. &
+                  specific_energy <= 0d0) exit
+            k_keep = k+1
+            removed_mass = removed_mass + s% dm(k)
+            removed_energy = removed_energy + s% dm(k)*specific_energy
+         end do
+      end subroutine find_surface_ejecta
+
+      subroutine set_direct_removal_boundary(s)
+         type (star_info), pointer, intent(inout) :: s
+
+         if (surface_ejecta_removal_mode /= surface_ejecta_removal_direct .or. &
+               .not. s% lxtra(lx_using_direct_removal_bcs)) return
+
+         s% atm_option = 'fixed_Tsurf'
+         s% atm_fixed_Tsurf = s% xtra(x_direct_removal_Tsurf)
+         s% tau_factor = s% xtra(x_direct_removal_tau_factor)
+         s% force_tau_factor = s% tau_factor
+         if (s% u_flag) then
+            s% use_fixed_vsurf_outer_BC = .true.
+            ! Fixed velocity takes precedence; this keeps P and T at the cell face.
+            s% use_momentum_outer_BC = .true.
+            s% fixed_vsurf = min(s% xtra(x_direct_removal_vsurf), &
+               1d5*vsurf_for_fixed_bc)
+         end if
+      end subroutine set_direct_removal_boundary
+
+      subroutine clear_direct_removal_boundary(s)
+         type (star_info), pointer, intent(inout) :: s
+
+         if (.not. s% lxtra(lx_using_direct_removal_bcs)) return
+
+         ! The ejecta boundary is not appropriate for the hydrostatic remnant.
+         s% lxtra(lx_using_direct_removal_bcs) = .false.
+         call set_normal_atmosphere_boundary(s)
+      end subroutine clear_direct_removal_boundary
+
+      subroutine set_normal_atmosphere_boundary(s)
+         type (star_info), pointer, intent(inout) :: s
+
+         s% atm_option = 'T_tau'
+         s% atm_T_tau_relation = 'Eddington'
+         s% atm_T_tau_opacity = 'fixed'
+         s% tau_factor = 1d0
+         s% force_tau_factor = 1d0
+         s% use_fixed_vsurf_outer_BC = .false.
+         s% need_to_setvars = .true.
+      end subroutine set_normal_atmosphere_boundary
+
+      subroutine set_surface_ejecta_wind(s)
+         type (star_info), pointer, intent(in) :: s
+         integer :: k_keep
+         real(dp) :: max_removal_rate, removed_energy, removed_mass
+
+         surface_ejecta_wind = 0d0
+         surface_ejecta_wind_is_active = &
+            surface_ejecta_removal_mode == surface_ejecta_removal_smooth .and. s% u_flag
+         if (.not. surface_ejecta_wind_is_active) return
+
+         call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
+         if (k_keep == 1 .or. surface_ejecta_removal_factor == 0d0) return
+
+         surface_ejecta_wind = surface_ejecta_removal_factor*removed_mass/Msun
+         if (s% dt > 0d0) then
+            max_removal_rate = removed_mass/Msun/(s% dt/secyer)
+            surface_ejecta_wind = min(surface_ejecta_wind, max_removal_rate)
+         end if
+      end subroutine set_surface_ejecta_wind
+
+      subroutine my_other_eval_fp_ft(id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
-         integer, intent(in) :: id
-         integer, intent(in) :: nz
-         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)  ! (nz)
-         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)  ! (nz)
-         real(dp), intent(inout) :: r_polar(:), r_equatorial(:)  ! (nz)
+         integer, intent(in) :: id, k
+         real(dp), intent(in) :: aw, r, rho, xm
+         type(auto_diff_real_star_order1), intent(out) :: fp, ft
+         real(dp), intent(inout) :: r_polar, r_equatorial
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         integer :: j
          real(dp) :: alpha
 
-         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
-            fp_temp, ft_temp
+         type(auto_diff_real_1var_order1) :: A_omega, fp_numerator, ft_numerator, &
+            w, w2, w3, w4, w5, w6, w_log_term, fp_temp, ft_temp
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, fp_temp, ft_temp, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
-            do j=1, s% nz
-               !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
-               !by this point in the code, w_div_w_crit_roche is set
-               w = s% w_div_w_crit_roche(j)
-               w%d1val1 = 1d0
+         !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
+         w = aw
+         w% d1val1 = 1d0
 
-               w2 = pow2(w)
-               w4 = pow4(w)
-               w6 = pow6(w)
-               lg_one_sub_w4 = log(1d0-w4)
-               A_omega = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-               fp_numerator = (1d0-two_thirds*w2-0.06837d0*w4-0.2495d0*w6)
-               ft_numerator = (1d0+0.2185d0*w4-0.1109d0*w6)
-               !fits for fp, ft
-               fp_temp = fp_numerator/A_omega
-               ft_temp = ft_numerator/A_omega
-               !re and rp can be derived analytically from w_div_wcrit
-               r_equatorial(j) = r(j)*(1d0+w2% val/6d0-0.0002507d0*w4% val+0.06075d0*w6% val)
-               r_polar(j) = r_equatorial(j)/(1d0+0.5d0*w2% val)
-               ! Be sure they are consistent with r_Phi
-               r_equatorial(j) = max(r_equatorial(j),r(j))
-               r_polar(j) = min(r_polar(j),r(j))
+         w2 = pow2(w)
+         w4 = pow4(w)
+         w6 = pow6(w)
+         w_log_term = log(1d0 - pow(w, log_term_power))
+         ! cannot use real function below because these are auto_diff variables
+         A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
 
-               fp(j) = 0d0
-               ft(j) = 0d0
-               fp(j)% val = fp_temp% val
-               ft(j)% val = ft_temp% val
-               if (s% w_div_wc_flag) then
-                  fp(j)% d1Array(i_w_div_wc_00) = fp_temp% d1val1
-                  ft(j)% d1Array(i_w_div_wc_00) = ft_temp% d1val1
-               end if
-            end do
-!$OMP END PARALLEL DO
+         ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
+         fp_temp = (1d0 - two_thirds * w2 - 0.2133d0 * w4 - 0.1068d0 * w6) / A_omega
+         ft_temp = (1d0 - 0.07955d0 * w4 - 0.2322d0 * w6) / A_omega
+
+         ! re and rp can be derived analytically from w_div_wcrit
+         r_equatorial = r * re_from_rpsi_factor(w2% val, w4% val, w6% val)
+         r_polar = r_equatorial / (1d0 + 0.5d0 * w2% val)
+
+         ! Be sure they are consistent with r_Psi
+         r_equatorial = max(r_equatorial, r)
+         r_polar = min(r_polar, r)
+
+         fp = 0d0
+         ft = 0d0
+         fp% val = fp_temp% val
+         ft% val = ft_temp% val
+         if (s% w_div_wc_flag) then
+            fp% d1Array(i_w_div_wc_00) = fp_temp% d1val1
+            ft% d1Array(i_w_div_wc_00) = ft_temp% d1val1
+         end if
 
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
-            do j=1, s% nz
-               if (s% q(j) > 0.999d0) then
-                  fp(j) = 1d0
-                  ft(j) = 1d0
-               else if (s% q(j) > 0.998d0) then
-                  alpha = (1d0-(s% q(j)-0.998d0)/(0.001))
-                  fp(j) = fp(j)*alpha + 1d0*(1-alpha)
-                  ft(j) = ft(j)*alpha + 1d0*(1-alpha)
-               end if
-            end do
+            if (s% q(k) > 0.999d0) then
+               fp = 1d0
+               ft = 1d0
+            else if (s% q(k) > 0.998d0) then
+               alpha = (1d0 - (s% q(k) - 0.998d0) / 1d-3)
+               fp = fp * alpha + 1d0 * (1 - alpha)
+               ft = ft * alpha + 1d0 * (1 - alpha)
+            end if
          end if
 
       end subroutine my_other_eval_fp_ft
 
+      real(dp) function re_from_rpsi_factor(o2, o4, o6)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         ! Fabry+2022, Eq. A.3
+         re_from_rpsi_factor = 1d0 + one_sixth * o2 - 0.005124d0 * o4 + 0.06562d0 * o6
+      end function re_from_rpsi_factor
 
       subroutine my_other_kap_get( &
             id, k, handle, species, chem_id, net_iso, xa, &
@@ -526,31 +652,34 @@
             s% lxtra(lx_have_saved_gamma_prof) = .false.
             s% lxtra(lx_have_reached_gamma_limit) = .false.
             s% lxtra(lx_he_zams) = .false.
+            s% lxtra(lx_using_direct_removal_bcs) = .false.
             s% xtra(x_time_start_pulse) = -1d0
             s% xtra(x_dyn_time) = -1d0
             s% xtra(x_gamma_int_bound) = -1d0
             s% xtra(x_time_since_first_gamma_zero) = 0d0
+            s% xtra(x_direct_removal_Tsurf) = 0d0
+            s% xtra(x_direct_removal_tau_factor) = 0d0
+            s% xtra(x_direct_removal_vsurf) = 0d0
             s% ixtra(ix_steps_met_relax_cond) = 0
             s% ixtra(ix_num_relaxations) = 0
             s% ixtra(ix_steps_since_relax) = 0
             s% ixtra(ix_steps_since_hydro_on) = 0
             s% xtra(x_star_age_at_relax) = -1d0
-
-            s% xtra(x_vsurf_at_remove_surface) = 0d0
-            s% lxtra(lx_using_bb_bcs) = .false.
-            s% xtra(x_tau_factor) = 0d0
-            s% xtra(x_Tsurf_for_atm) = 0d0
-
-
             ! to avoid showing pgstar stuff during initial model creation
             s% pg% pgstar_interval = 100000000
             s% pg% Grid2_file_interval = 100000000
+            call star_set_RTI_flag(id, .false., ierr)
+            if (dbg) write(*,*) "check ierr", ierr
+            if (ierr /= 0) return
          else  ! it is a restart
             if (s% lxtra(lx_hydro_on)) then
                call star_read_controls(id, 'inlist_hydro_on', ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
                call star_set_u_flag(id, .true., ierr)
+               if (dbg) write(*,*) "check ierr", ierr
+               if (ierr /= 0) return
+               call star_set_RTI_flag(id, use_RTI_during_hydro, ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
             else if (s% lxtra(lx_hydro_has_been_on)) then
@@ -563,7 +692,13 @@
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
             end if
+            if (.not. s% lxtra(lx_hydro_on)) then
+               call star_set_RTI_flag(id, .false., ierr)
+               if (dbg) write(*,*) "check ierr", ierr
+               if (ierr /= 0) return
+            end if
          end if
+         call set_direct_removal_boundary(s)
       end subroutine extras_startup
 
 
@@ -718,6 +853,8 @@
             end do
             if (k==0) then
                k=1
+            else if (k < s% nz) then
+               k = k+1
             end if
          else
             k=1
@@ -745,12 +882,13 @@
          end do
          ! get energies
          if (k>1) then
-            do k0 = 1, k
+            do k0 = 1, k-1
                vals(h_U_ejecta) = vals(h_U_ejecta) + s% dm(k0)*s% energy(k0)
                if (s% u_flag) then
                   vals(h_T_ejecta) = vals(h_T_ejecta) + 0.5d0*s% dm(k0)*s% u(k0)*s% u(k0)
                end if
-               vals(h_Omega_ejecta) = vals(h_Omega_ejecta) - s% dm_bar(k0)*s% cgrav(k0)*s% m(k0)/s% r(k0)
+               vals(h_Omega_ejecta) = vals(h_Omega_ejecta) - &
+                  s% dm(k0)*s% cgrav(k0)*s% m(k0)/s% r(k0)
             end do
          end if
 
@@ -808,8 +946,7 @@
                vals(k,2) = s% u(k)/vals(k,1)
                vals(k,3) = -s% cgrav(k)*s% m(k)/s% r(k)
                vals(k,4) = 0.5d0*s% u(k)*s% u(k)
-               vals(k,5) = two_thirds*avo*kerg*s% T(k)/(2*s% mu(k)*s% rho(k)) &
-                           + crad*pow4(s% T(k))/s% rho(k)
+               vals(k,5) = s% energy(k)
                vals(k,6) = vals(k,3) + vals(k,4) + vals(k,5)
                vals(k,7) = s% mlt_vc(k)
                if (s% rotation_flag) then
@@ -840,7 +977,7 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         integer :: k, k0, k1, num_pts, species, model_number, num_trace_history_values
+         integer :: k, k0, k1, k_keep, num_pts, species, model_number, num_trace_history_values
          real(dp) :: v_esc, time, gamma1_integral, integral_norm, tdyn, &
             max_center_cell_dq, avg_v_div_vesc, energy_removed_layers, dt_next, dt, &
             max_years_for_timestep, omega_crit, &
@@ -853,6 +990,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         surface_ejecta_wind = 0d0
+         surface_ejecta_wind_is_active = .false.
 
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
@@ -860,10 +999,12 @@
          ! be sure power info is stored
          call star_set_power_info(s)
 
-         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
+         ! sets initial rotation profile at helium ZAMS, when rotation is turned on in inlist_pulses
+         if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams) .and. &
+            s% job% change_rotation_flag .and. s% job% new_rotation_flag) then
             lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
             if (lburn_div_lsurf > 0d0) then
-               if((abs(log10(lburn_div_lsurf))) < 0.1 .and. &
+               if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
@@ -895,16 +1036,15 @@
             s% pg% Grid2_file_interval = pgstar_file_interval
          end if
          just_did_relax = .false.
-         if (s% u_flag) then  ! get point where v<vesc
+         k_keep = 0
+         if (s% u_flag) then  ! get the first retained cell below the ejecta
             do k = s% nz-1, 1, -1
                v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
                if (s% u(k) > v_esc) then
+                  k_keep = k+1
                   exit
                end if
             end do
-            if (k>0 .and. k < s% nz) k = k+1
-         else
-            k = 0
          end if
 
          ! s% xtra(x_gamma_int_bound) stores the gamma integral
@@ -915,12 +1055,12 @@
          ! can be adjusted below if nearing breakout
          s% profile_interval = 100
 
-         if (s% u_flag .and. k > 0 .and. s% xtra(x_time_start_pulse) > 0d0) then
+         if (s% u_flag .and. k_keep > 0 .and. s% xtra(x_time_start_pulse) > 0d0) then
 
             ! check energy and average escape velocity of outer layers
             avg_v_div_vesc = 0d0
             energy_removed_layers = 0d0
-            do k0 = 1, k
+            do k0 = 1, k_keep-1
                avg_v_div_vesc = avg_v_div_vesc + s% dm(k0)*s% u(k0)/sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
                energy_removed_layers = energy_removed_layers + &
                   0.5d0*s% dm(k0)*s% u(k0)*s% u(k0) - s% dm(k0)*s% cgrav(k0)*s% m(k0)/s% r(k0) &
@@ -931,32 +1071,34 @@
             ! total specific energy.
             if (energy_removed_layers > 0d0) then  ! possible to eject material
                if(mod(s%model_number, s%terminal_interval) == 0) then
-                  write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
+                  write(*,*) "k, q, energy_removed_layers before adjustment is", &
+                     k_keep, s% q(k_keep), energy_removed_layers
                end if
-               do k0 = k+1, s% nz
+               do k0 = k_keep, s% nz-1
                   denergy = &
                      0.5d0*s% u(k0)*s% u(k0) - s% cgrav(k0)*s% m(k0)/s% r(k0) &
                         +s% energy(k0)
                   if (denergy < 0d0) then
-                     k = k0-1
                      exit
                   else
                      energy_removed_layers = energy_removed_layers+denergy*s% dm(k0)
                      avg_v_div_vesc = avg_v_div_vesc + &
                         s% dm(k0)*s% u(k0)/sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
+                     k_keep = k0+1
                   end if
                end do
                if(mod(s%model_number, s%terminal_interval) == 0) then
-                  write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
+                  write(*,*) "k, q, energy_removed_layers after adjustment is", &
+                     k_keep, s% q(k_keep), energy_removed_layers
                end if
             end if
 
-            avg_v_div_vesc = avg_v_div_vesc/(s% m(1) - s% m(k))
+            avg_v_div_vesc = avg_v_div_vesc/(s% m(1) - s% m(k_keep))
 
             ! compute gamma integral in what will remain of the star
             integral_norm = 0d0
             gamma1_integral = 0d0
-            do k0=k,s% nz
+            do k0=k_keep,s% nz
                integral_norm = integral_norm + (s% Pgas(k0)+s% Prad(k0))*s% dm(k0)/s% rho(k0)
                gamma1_integral = gamma1_integral + &
                   (s% gamma1(k0)-4.d0/3.d0)*(s% Pgas(k0)+s% Prad(k0))*s% dm(k0)/s% rho(k0)
@@ -982,24 +1124,24 @@
 
             ! To relax the star after a pulse, we check for a series of conditions that
             ! must apply in layers below q=q_for_relax_check
-            do k0 = k, s% nz
-               if (s% q(k0) < q_for_relax_check*s% q(k)) then
+            do k0 = k_keep, s% nz
+               if (s% q(k0) < q_for_relax_check*s% q(k_keep)) then
                   exit
                end if
             end do
 
             if(mod(s%model_number, s%terminal_interval) == 0) then
-               write(*,*) 'Layers above q=', s% q(k), 'will be removed'
+               write(*,*) 'Layers above q=', s% q(k_keep), 'will be removed'
                write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
                write(*,*) 'check time left', &
                   s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax - s% time
-               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1e5
+               write(*,*) 'max vel inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)))/1d5
                write(*,*) 'max c/cs inside fraction of cutoff', maxval(abs(s% u(k0:s% nz)/s% csound(k0:s% nz)))
                write(*,*) 'average v/vesc outside cutoff', avg_v_div_vesc
-               write(*,*) 'Kinetic plus potential energy outside cutoff', energy_removed_layers
-               write(*,*) 'mass inside cutoff', k, s% m(k)/Msun
+               write(*,*) 'Total energy outside cutoff', energy_removed_layers
+               write(*,*) 'mass inside cutoff', k_keep, s% m(k_keep)/Msun
                write(*,*) 'relax counter', s% ixtra(ix_steps_met_relax_cond)
-               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1e5)
+               write(*,*) 'log max v [km/s]=', safe_log10(maxval(s% u(1:s% nz))/1d5)
             end if
             ! If enough time has passed after a pulse, then turn off Riemann hydro
             ! also, wait for the inner q_for_relax_check of what would remain of the star to be below a threshold
@@ -1007,8 +1149,8 @@
             ! Verify also that the conditions to turn on Riemann hydro are not still satisfied
             ! For details on all these options check inlist_project
 
-            ! ignore if s% q(k) < 1d-3, in that case it's very likely a PISN
-            if (s% q(k) > 1d-3) then
+            ! ignore if s% q(k_keep) < 1d-3, in that case it's very likely a PISN
+            if (s% q(k_keep) > 1d-3) then
                if (s% lxtra(lx_hydro_on) .and. s% xtra(x_time_start_pulse) > 0d0 &
                   .and. s% time > s% xtra(x_time_start_pulse) + s% xtra(x_dyn_time)*num_dyn_ts_for_relax &
                   .and. maxval(abs(s% u(k0:s% nz)))/1d5 < max_v_for_relax &
@@ -1025,7 +1167,7 @@
                ! escape velocity reached within a tiny fraction of the
                ! core. Before marking as PISN verify if any cell above
                ! this is below the escape velocity
-               do k0 = k, 1, -1
+               do k0 = k_keep, 1, -1
                   v_esc = sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
                   if (s% u(k0) < v_esc) then
                      write(*,*) "Likely PISN", s% q(k0), s% u(k0)/v_esc
@@ -1042,7 +1184,7 @@
                   return
                end if
             end if
-            if(s% ixtra(ix_steps_met_relax_cond) >= num_steps_before_relax .and. s% q(k) > 1d-3) then
+            if(s% ixtra(ix_steps_met_relax_cond) >= num_steps_before_relax .and. s% q(k_keep) > 1d-3) then
                write(*,*) "Relaxing model to lower mass!"
                s% ixtra(ix_num_relaxations) = s% ixtra(ix_num_relaxations) + 1
                s% xtra(x_star_age_at_relax) = s% star_age
@@ -1058,7 +1200,7 @@
 
                s% ixtra(ix_steps_since_relax) = 0
 
-               write(*,*) "removing cells", k, s% m(k)/Msun
+               write(*,*) "removing cells", k_keep, s% m(k_keep)/Msun
 
                max_center_cell_dq = s% max_center_cell_dq
                s% max_center_cell_dq = s% dq(s% nz)
@@ -1069,10 +1211,15 @@
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
 
+               call star_set_RTI_flag(id, .false., ierr)
+               if (dbg) write(*,*) "check ierr", ierr
+               if (ierr /= 0) return
+
                call star_set_u_flag(id, .false., ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
 
+               call clear_direct_removal_boundary(s)
                call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
 
                ! to avoid showing pgstar stuff during relax
@@ -1088,7 +1235,7 @@
                s% use_other_before_struct_burn_mix = .false.
                s% timestep_hold = 0
 
-               call star_relax_to_star_cut(s% id, k, .true., .true., .true., ierr)
+               call star_relax_to_star_cut(s% id, k_keep, .true., .true., .true., ierr)
                if (ierr /= 0) then
                   write(*,*) "error when removing mass through star_relax_to_star_cut", ierr
                   stop
@@ -1187,6 +1334,9 @@
             call star_set_u_flag(id, .true., ierr)
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
+            call star_set_RTI_flag(id, use_RTI_during_hydro, ierr)
+            if (dbg) write(*,*) "check ierr", ierr
+            if (ierr /= 0) return
             s% lxtra(lx_hydro_on) = .true.
             s% lxtra(lx_hydro_has_been_on) = .true.
             s% xtra(x_time_start_pulse) = -1
@@ -1226,16 +1376,14 @@
                tdyn = 1d0/sqrt(s% m(k)/(4d0/3d0*pi*pow3(s% r(k)))*standard_cgrav)
                s% xtra(x_time_start_pulse) = s% time
                s% xtra(x_dyn_time) = tdyn
-               write(*,*) "reached high velocities", maxval(abs(s% xh(s% i_u, k0:s% nz)))/1e5, &
+               write(*,*) "reached high velocities", maxval(abs(s% xh(s% i_u, k0:s% nz)))/1d5, &
                   "stopping in at least", num_dyn_ts_for_relax*tdyn, "seconds"
             end if
          end if
 
-         !After a relax, wait for ten days before turning on v_flag
-         !this avoids the surface post-relax from going crazy
          if((logT_for_v_flag < log10(s% T(s% nz)) .or. logLneu_for_v_flag < safe_log10(s% power_neutrinos)) &
                .and. .not. s% u_flag .and. .not. s% v_flag) then
-               write(*,*) "log10 central T has lowered below logT_for_v_flag, turn on v_flag"
+               write(*,*) "central conditions require v_flag; turn on v_flag"
                call star_set_v_flag(id, .true., ierr)
                s% dt_next = min(1d2, s% dt_next)
                s% dt = min(1d2, s% dt)
@@ -1245,6 +1393,7 @@
 
          !Always call this at the end to ensure we are using the correct
          !inlists
+         call set_surface_ejecta_wind(s)
          call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
 
          extras_start_step = keep_going
@@ -1256,7 +1405,7 @@
          integer, intent(in) :: id
          real(dp), intent(in) :: dt
          integer, intent(out) :: res  ! keep_going, redo, retry, terminate
-         real(dp) :: power_photo, v_esc
+         real(dp) :: power_photo
          integer :: ierr, k
          type (star_info), pointer :: s
          include 'formats'
@@ -1269,100 +1418,41 @@
          if(s% u_flag) then
             call star_read_controls(id, 'inlist_hydro_on', ierr)
             if (s% xtra(x_time_start_pulse) > 0d0) then
-               !s% v_drag = 2d4 !s% u(1)
-               !s% v_drag_factor = 1d0
-               !s% v_drag = 2d9
-               !s% v_drag_factor = 1d0
-               s% D_mix_rotation_min_tau_full_off = 1d0
-               s% D_mix_rotation_min_tau_full_on = 10d0
-               write(*,*) 'u_flag is on, pulse has begun'
-               if (.not. s% lxtra(lx_using_bb_bcs)) then
+               if (max_dt_during_pulse > 0d0) then
                   s% max_timestep = max_dt_during_pulse
                else
                   s% max_timestep = 1d99
                end if
-               s% max_q_for_convection_with_hydro_on = 1d0  !0.999d0
-               do k = s% nz, 1, -1
-                  v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-                  if (s% u(k) > 4*v_esc) then  ! 4 in farmer inlist
-                     exit
-                  end if
-               end do
-               if (k > 1) then
-                 s% max_q_for_convection_with_hydro_on = s% q(k)
-                 !if (s% tau(k)> 10d0) then
-                 !s% D_mix_rotation_min_tau_full_off = s% tau(k)
-                 !end if
-               end if
             else
-               write (*,*) 'u_flag is on, Pulse has not begun.'
                s% max_timestep = max_dt_before_pulse
-               !!this prevents surface from going mad right when hydro is turned on
-               !right after a relax
-               !s% v_drag = 0d0
-               !s% v_drag_factor = 1d0
-               !s% max_timestep = 1d99
-               s% max_q_for_convection_with_hydro_on = 0.999d0
             end if
 
-            do k=1, s% nz
-               s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
-               s% u(k) = s% xh(s% i_u,k)
-            end do
-
-            ! use fixed_vsurf if surface v remains too high
-            if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
-               s% use_fixed_vsurf_outer_BC = .true.
-               s% use_momentum_outer_BC = .false.
-               s% fixed_vsurf = vsurf_for_fixed_bc*1d5
+            if (surface_ejecta_removal_mode == surface_ejecta_removal_smooth) then
+               s% use_fixed_vsurf_outer_BC = .false.
+               s% use_momentum_outer_BC = .true.
             else
-               if (s% lxtra(lx_using_bb_bcs)) then
+               ! Limit velocities before applying the fixed surface condition.
+               do k=1, s% nz
+                  s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
+                  s% u(k) = s% xh(s% i_u,k)
+               end do
+
+               ! use fixed_vsurf if surface v remains too high
+               if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
                   s% use_fixed_vsurf_outer_BC = .true.
                   s% use_momentum_outer_BC = .false.
-                  s% fixed_vsurf = s% xtra(x_vsurf_at_remove_surface)
+                  s% fixed_vsurf = 1d5*vsurf_for_fixed_bc
                else
                   s% use_fixed_vsurf_outer_BC = .false.
                   s% use_momentum_outer_BC = .true.
                end if
             end if
 
-            if (maxval(abs(s% xh(s% i_u,:s% nz)))<2d7) then
-               s% dt_div_min_dr_div_cs_limit = 2d1
-            else
-               s% dt_div_min_dr_div_cs_limit = dt_div_min_dr_div_cs_limit
-            end if
-
-         else
+         else ! not using hydro (u_flag = .false.)
             s% max_timestep = 1d99
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
-         !ensure we are using the proper BCs and options every time before struct_burn_mix
-         if (s% lxtra(lx_using_bb_bcs)) then
-            !s% use_atm_PT_at_center_of_surface_cell = .true.
-            s% use_momentum_outer_BC = .true.  ! offset_P_to_center_cell = .false.
-            !s% offset_P_to_center_cell = .false.
-            s% atm_option = "fixed_Tsurf"
-            s% atm_fixed_Tsurf = s% xtra(x_Tsurf_for_atm)
-            s% tau_factor = s% xtra(x_tau_factor)
-            s% force_tau_factor = s% xtra(x_tau_factor)
-            s% delta_lgL_limit = -1d0
-            s% delta_lgL_limit_L_min = 1d99
-            s% delta_lgL_limit_L_min = 1d99
-         else
-            !s% use_atm_PT_at_center_of_surface_cell = .false.
-            s% use_momentum_outer_BC = .false.  ! offset_P_to_center_cell = .true.
-            !s% offset_P_to_center_cell = .true.
-            s% atm_option = 'T_tau'
-            s% atm_T_tau_relation = 'Eddington'
-            s% atm_T_tau_opacity = 'fixed'
-            s% tau_factor = 1d0
-            !s% Pextra_factor = 1d0
-            s% force_tau_factor = 1d0
-            s% delta_lgL_limit = 0.25d0
-            s% delta_lgL_limit_L_min = 1d99  !-100
-            s% delta_lgL_limit_L_min = 1d99  !-100
-         end if
-
+         call set_direct_removal_boundary(s)
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
@@ -1390,27 +1480,31 @@
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
                s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
-               s% delta_lgL_power_photo_hard_limit = 10d0*delta_lgLnuc_limit
+               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
             else
                s% delta_lgL_power_photo_limit = -1d0
                s% delta_lgL_power_photo_hard_limit = -1d0
             end if
          end if
-         if (s% use_fixed_vsurf_outer_BC) then
-            write(*,*) "Using fixed_vsurf", s% fixed_vsurf/1e5
-         end if
+
          !ignore winds if neutrino luminosity is too high or for a few steps after
          !a relax
-         if(s% ixtra(ix_steps_since_relax) < 50 &
+         if (surface_ejecta_removal_mode == surface_ejecta_removal_smooth .and. s% u_flag) then
+            s% use_other_wind = .true.
+            s% use_other_adjust_mdot = .true.
+            s% was_in_implicit_wind_limit = .false.
+         else if(s% ixtra(ix_steps_since_relax) < 50 &
                .or. safe_log10(s% power_neutrinos) > max_Lneu_for_mass_loss &
                .or. s% u_flag) then
             s% use_other_wind = .false.
+            s% use_other_adjust_mdot = use_other_adjust_mdot_for_winds
             s% was_in_implicit_wind_limit = .false.
          else
             s% use_other_wind = .true.
+            s% use_other_adjust_mdot = use_other_adjust_mdot_for_winds
          end if
 
-         if (maxval(s% T(1:s% nz)) > 9.8) then
+         if (maxval(s% T(1:s% nz)) > 9.8d0) then
             s% delta_lgRho_cntr_hard_limit = -1d0
          else
             s% delta_lgRho_cntr_hard_limit = delta_lgRho_cntr_hard_limit
@@ -1432,8 +1526,8 @@
       integer function extras_finish_step(id)
          use run_star_support
          integer, intent(in) :: id
-         integer :: ierr,k
-         real(dp) :: max_vel_inside
+         integer :: ierr, k_keep
+         real(dp) :: fixed_Tsurf, fixed_vsurf, max_vel_inside, removed_energy, removed_mass
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
@@ -1442,40 +1536,48 @@
 
          extras_finish_step = keep_going
 
+         if (s% use_fixed_vsurf_outer_BC .and. mod(s% model_number,10) == 0) then
+            write(*,*) "Using fixed_vsurf", s% fixed_vsurf/1e5
+         end if
+
          !count time since first collapse
          if (s% lxtra(lx_have_reached_gamma_limit)) then
             s% xtra(x_time_since_first_gamma_zero) = &
                s% xtra(x_time_since_first_gamma_zero) + s% dt
          end if
 
+         if (surface_ejecta_removal_mode == surface_ejecta_removal_direct .and. s% u_flag) then
+            call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
+            if (k_keep > 1) then
+               write(*,*) 'Removing detached surface layers', &
+                  k_keep, removed_mass/Msun, removed_energy
 
-         ! if (s% conv_vel_flag) then
-         !    do k=1, s% nz
-         !       if (s% conv_vel(k) < 1d-5 .and. s% mlt_vc(k) <= 0d0) then
-         !          s% xh(s% i_ln_cvpv0, k) = 0d0
-         !          s% conv_vel(k) = 0d0
-         !       end if
-         !    end do
-         ! end if
-
-         if (remove_extended_layers .and. s% u_flag &
-            .and. s% log_surface_radius > 4.0d0) then
-            do k = 1, s% nz
-               if (log10(s% r(k)/Rsun) < 4.0d0) then
-                  exit
+               fixed_Tsurf = s% T(k_keep)
+               if (surface_ejecta_radius_limit > 0d0) then
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*standard_cgrav*s% m(k_keep)/ &
+                     (surface_ejecta_radius_limit*Rsun)))
+               else
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*s% cgrav(k_keep)*s% m(k_keep)/s% r(k_keep)))
                end if
-            end do
-            s% atm_option = "fixed_Tsurf"
-            s% atm_fixed_Tsurf = s% T(k)
-            s% xtra(x_Tsurf_for_atm) = s% T(k)
-            s% xtra(x_vsurf_at_remove_surface) = max(s% u(k),2*sqrt(2d0*standard_cgrav*s% m(k)/(pow(10d0,4.0d0)*Rsun)))
-            s% lxtra(lx_using_bb_bcs) = .true.
-
-            write(*,*) "Removing surface layers", k, s% m(k)/Msun
-            call star_remove_surface_at_cell_k(s% id, k, ierr)
-            if (dbg) write(*,*) "check ierr", ierr
-            if (ierr /= 0) return
-            s% xtra(x_tau_factor) = s% tau_factor
+               s% atm_option = 'fixed_Tsurf'
+               s% atm_fixed_Tsurf = fixed_Tsurf
+               s% use_fixed_vsurf_outer_BC = .false.
+               s% use_momentum_outer_BC = .true.
+               call star_remove_surface_at_cell_k(s% id, k_keep, ierr)
+               if (dbg) write(*,*) 'check ierr', ierr
+               if (ierr /= 0) then
+                  extras_finish_step = terminate
+                  return
+               end if
+               s% xtra(x_direct_removal_Tsurf) = fixed_Tsurf
+               s% xtra(x_direct_removal_tau_factor) = s% tau_factor
+               s% xtra(x_direct_removal_vsurf) = fixed_vsurf
+               s% lxtra(lx_using_direct_removal_bcs) = .true.
+               call set_direct_removal_boundary(s)
+               s% need_to_setvars = .true.
+            end if
          end if
 
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1

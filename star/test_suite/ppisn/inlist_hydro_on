@@ -28,9 +28,24 @@
 
    MLT_option = "TDC"
    include_mlt_corr_to_TDC = .false.
-   TDC_alpha_M = 1d0
+   TDC_alpha_M = 2d0
    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
    TDC_include_eturb_in_energy_equation = .true.
+
+   ! RTI is enabled with Riemann hydro in run_star_extras.
+   RTI_A = 1d-3
+   RTI_B = 2.5d0
+   RTI_C = 0.2d0
+   RTI_D = 3d0
+   RTI_max_alpha = 0.5d0
+   alpha_RTI_src_min_v_div_cs = 1d0
+   RTI_log_max_boost = 0d0
+
+   ! Limit chemical diffusion at strong Riemann shocks without disabling TDC.
+   Riemann_shock_D_mix_reduction_on = 0.01d0
+   Riemann_shock_D_mix_reduction_full_on = 0.05d0
+   max_abs_du_div_cs_for_convection = 1d99
+   max_v_div_cs_for_convection = 1d99
 
   ! for v flag
     use_Pvsc_art_visc = .true.

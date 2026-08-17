@@ -21,7 +21,8 @@
 
       use star_private_def
       use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
-      use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
+      use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad, &
+         get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -43,14 +44,15 @@
       ! L_rad_start = (-d_P_rad/dm_bar*clight*area^2/<opacity_face>)_start
       subroutine do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)
          use eos_def
-         use star_utils, only: save_eqn_residual_info, get_face_weights
+         use star_utils, only: save_eqn_residual_info, get_T_face, get_Peos_face, get_kap_face
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
 
-         real(dp) :: alfa, beta, scale, dm_bar
+         real(dp) :: scale, dm_bar
          type(auto_diff_real_star_order1) :: L_ad, r_00, area, area2, Lrad_ad, &
-            kap_00, kap_m1, kap_face, d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
+            opacity_face, kap_face, L0_ad, gradr_factor, &
+            d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
             P_rad_m1, P_rad_00, d_P_rad_actual_ad, resid
          type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face
          type(auto_diff_real_star_order1) :: flxR, flxLambda
@@ -74,35 +76,36 @@
 
          dbg = .false.
 
-         call get_face_weights(s, k, alfa, beta)
-
          scale = s% energy_start(k)*s% rho_start(k)
          dm_bar = s% dm_bar(k)
          L_ad = wrap_L_00(s,k)
          r_00 = wrap_r_00(s,k)
          area = pi4*pow2(r_00); area2 = pow2(area)
 
+         if (s% use_face_reconstruction) then
+            call get_reconstructed_face_eos_kap_ad( &
+               s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
+            if (ierr /= 0) return
+         else
+            T_face = get_T_face(s, k)
+            P_face = get_Peos_face(s, k)
+            opacity_face = get_kap_face(s, k)
+         end if
+
+         gradr_factor = get_effective_gradr_factor_ad(s, k)
+         ! RTI can replace the final chemical-mixing label while MLT remains active.
          if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
-               .and. s% mixing_type(k) == convective_mixing .and. s% gradr(k) > 0d0 &
-               .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5) then
-            Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k)  ! C&G 14.109
+               .and. s% mlt_mixing_type(k) == convective_mixing &
+               .and. abs(gradr_factor%val) > 1d-20) then
+            ! Evaluate L/gradr analytically so the split is finite at zero luminosity.
+            L0_ad = get_Lrad_per_gradT_face_ad( &
+               s, k, T_face, P_face, opacity_face, gradr_factor)
+            Lrad_ad = L0_ad*s% gradT_ad(k)  ! C&G 14.109
          else
             Lrad_ad = L_ad
          end if
 
-         if (s% use_face_reconstruction) then
-            if (s% reconstructed_face_state_valid(k)) then
-               kap_face = s% reconstructed_opacity_face_ad(k)
-            else
-               call get_reconstructed_face_eos_kap_ad( &
-                  s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, kap_face, ierr)
-               if (ierr /= 0) return
-            end if
-         else
-            kap_00 = wrap_kap_00(s,k)
-            kap_m1 = wrap_kap_m1(s,k)
-            kap_face = alfa*kap_00 + beta*kap_m1
-         end if
+         kap_face = opacity_face
          if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) &
             kap_face = s% min_kap_for_dPrad_dm_eqn
 
@@ -112,8 +115,6 @@
          ! calculate actual d_P_rad in current model
          T_m1 = wrap_T_m1(s,k); T4_m1 = pow4(T_m1)
          T_00 = wrap_T_00(s,k); T4_00 = pow4(T_00)
-
-         !d_P_rad_expected = d_P_rad_expected*s% gradr_factor(k) !TODO(Pablo): check this
 
          P_rad_m1 = (crad/3._dp)*T4_m1
          P_rad_00 = (crad/3._dp)*T4_00

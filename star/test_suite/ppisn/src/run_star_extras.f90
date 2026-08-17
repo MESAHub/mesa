@@ -101,7 +101,7 @@
          max_Lneu_for_relax, max_Lnuc_for_relax
       integer :: num_steps_before_relax, surface_ejecta_removal_mode
       logical :: in_inlist_pulses
-      real(dp) :: max_dt_before_pulse
+      real(dp) :: max_dt_before_pulse, max_dt_during_pulse
       real(dp) :: vsurf_for_fixed_bc
       real(dp) :: surface_ejecta_radius_limit, surface_ejecta_v_div_vesc_limit
       real(dp) :: surface_ejecta_escape_velocity_limit
@@ -111,7 +111,7 @@
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
-      logical :: stop_100d_after_pulse
+      logical :: stop_100d_after_pulse, use_RTI_during_hydro
 
       contains
 
@@ -161,6 +161,7 @@
          num_steps_before_relax = s% x_integer_ctrl(1)
          in_inlist_pulses = s% x_logical_ctrl(2)
          max_dt_before_pulse = s% x_ctrl(10)
+         max_dt_during_pulse = s% x_ctrl(22)
          max_Lneu_for_mass_loss = s% x_ctrl(11)
          delta_lgLnuc_limit = s% x_ctrl(12)
          max_Lphoto_for_lgLnuc_limit = s% x_ctrl(13)
@@ -168,6 +169,7 @@
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
          stop_100d_after_pulse = s% x_logical_ctrl(1)
+         use_RTI_during_hydro = s% x_logical_ctrl(3)
          vsurf_for_fixed_bc = s% x_ctrl(17)
          surface_ejecta_removal_mode = s% x_integer_ctrl(2)
          surface_ejecta_radius_limit = s% x_ctrl(18)
@@ -666,12 +668,18 @@
             ! to avoid showing pgstar stuff during initial model creation
             s% pg% pgstar_interval = 100000000
             s% pg% Grid2_file_interval = 100000000
+            call star_set_RTI_flag(id, .false., ierr)
+            if (dbg) write(*,*) "check ierr", ierr
+            if (ierr /= 0) return
          else  ! it is a restart
             if (s% lxtra(lx_hydro_on)) then
                call star_read_controls(id, 'inlist_hydro_on', ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
                call star_set_u_flag(id, .true., ierr)
+               if (dbg) write(*,*) "check ierr", ierr
+               if (ierr /= 0) return
+               call star_set_RTI_flag(id, use_RTI_during_hydro, ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
             else if (s% lxtra(lx_hydro_has_been_on)) then
@@ -681,6 +689,11 @@
             end if
             if (s% lxtra(lx_hydro_has_been_on)) then
                call star_read_controls(id, 'inlist_after_first_pulse', ierr)
+               if (dbg) write(*,*) "check ierr", ierr
+               if (ierr /= 0) return
+            end if
+            if (.not. s% lxtra(lx_hydro_on)) then
+               call star_set_RTI_flag(id, .false., ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
             end if
@@ -1198,6 +1211,10 @@
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
 
+               call star_set_RTI_flag(id, .false., ierr)
+               if (dbg) write(*,*) "check ierr", ierr
+               if (ierr /= 0) return
+
                call star_set_u_flag(id, .false., ierr)
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
@@ -1317,6 +1334,9 @@
             call star_set_u_flag(id, .true., ierr)
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
+            call star_set_RTI_flag(id, use_RTI_during_hydro, ierr)
+            if (dbg) write(*,*) "check ierr", ierr
+            if (ierr /= 0) return
             s% lxtra(lx_hydro_on) = .true.
             s% lxtra(lx_hydro_has_been_on) = .true.
             s% xtra(x_time_start_pulse) = -1
@@ -1361,11 +1381,9 @@
             end if
          end if
 
-         !After a relax, wait for ten days before turning on v_flag
-         !this avoids the surface post-relax from going crazy
          if((logT_for_v_flag < log10(s% T(s% nz)) .or. logLneu_for_v_flag < safe_log10(s% power_neutrinos)) &
                .and. .not. s% u_flag .and. .not. s% v_flag) then
-               write(*,*) "log10 central T has lowered below logT_for_v_flag, turn on v_flag"
+               write(*,*) "central conditions require v_flag; turn on v_flag"
                call star_set_v_flag(id, .true., ierr)
                s% dt_next = min(1d2, s% dt_next)
                s% dt = min(1d2, s% dt)
@@ -1387,7 +1405,7 @@
          integer, intent(in) :: id
          real(dp), intent(in) :: dt
          integer, intent(out) :: res  ! keep_going, redo, retry, terminate
-         real(dp) :: power_photo, v_esc
+         real(dp) :: power_photo
          integer :: ierr, k
          type (star_info), pointer :: s
          include 'formats'
@@ -1400,13 +1418,11 @@
          if(s% u_flag) then
             call star_read_controls(id, 'inlist_hydro_on', ierr)
             if (s% xtra(x_time_start_pulse) > 0d0) then
-               s% max_timestep = 1d99
-               do k = s% nz, 1, -1
-                  v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-                  if (s% u(k) > 2*v_esc) then
-                     exit
-                  end if
-               end do
+               if (max_dt_during_pulse > 0d0) then
+                  s% max_timestep = max_dt_during_pulse
+               else
+                  s% max_timestep = 1d99
+               end if
             else
                s% max_timestep = max_dt_before_pulse
             end if
@@ -1415,7 +1431,7 @@
                s% use_fixed_vsurf_outer_BC = .false.
                s% use_momentum_outer_BC = .true.
             else
-               ! sweep and ensure speeds are below ~ 6.7% speed of light, 20,000 km/s.
+               ! Limit velocities before applying the fixed surface condition.
                do k=1, s% nz
                   s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
                   s% u(k) = s% xh(s% i_u,k)

@@ -60,6 +60,43 @@ Fixed the TDC eddy-viscosity boundary condition for cell-centered Riemann
 hydrodynamics. The outer boundary now has zero turbulent stress while the
 surface cell retains the force from its inner turbulent face.
 
+Fixed a radius-collocation inconsistency in TDC eddy viscosity for
+cell-centered Riemann hydrodynamics. The strain, viscous heating, and momentum
+force now use the same lagged cell-midpoint radius, preserving the tridiagonal
+velocity coupling and nonpositive discrete viscous momentum work.
+
+Fixed local eddy-viscous energy accounting when the ``dedt`` energy equation
+explicitly includes radial kinetic energy. TDC now includes the midpoint
+mechanical work from its cell-centered ``u_flag`` acceleration or its
+half-cell ``v_flag`` accelerations in addition to viscous heating. RSP2 uses
+the same ``v_flag`` correction. Energy equations that omit ``dKE/dt``,
+including the time-centered ``P d(1/rho)`` form used by pulsation models,
+continue to include viscous heating alone.
+
+Fixed RTI handling during model cuts and split/merge AMR. Relaxation to a
+stellar cut now restores an incoming ``RTI_flag``. Splitting a cell now
+preserves the mass-weighted ``alpha_RTI`` while keeping child values
+nonnegative and within the original stencil range. The optional behind-shock
+RTI ramp now also handles its zero default without division by zero and cannot
+produce a negative diffusion multiplier ahead of the shock.
+
+Fixed RTI momentum-diffusion energy accounting for cell-centered Riemann
+hydrodynamics. The total-energy equation now includes the matching midpoint
+mechanical work and interface dissipation. This preserves total energy while
+preventing RTI acceleration from drawing energy from an individual cell's
+internal energy.
+
+Fixed the radiative-luminosity split in the ``dPrad/dm`` temperature gradient
+equation when an actively convective face has negative ``gradr``.
+The equation now retains the counterflowing convective luminosity instead of
+treating the total luminosity as radiative, preventing one-cell temperature
+inversions in dynamic models. The equivalent ``L0*gradT`` form is evaluated
+directly from the face state, avoiding the removable ``L/gradr`` singularity
+when the luminosity and ``gradr`` pass through zero. The reported convective
+and radiative luminosities use the same pole-free split. The split now also
+uses the local MLT state rather than the dominant chemical-mixing label, so
+RTI mixing cannot incorrectly make an active convective face radiative.
+
 Added an optional floor on the atmospheric pressure used by the momentum
 outer boundary. The floor prevents a hydrostatic atmosphere from supplying
 less than the radiation pressure at its boundary temperature.

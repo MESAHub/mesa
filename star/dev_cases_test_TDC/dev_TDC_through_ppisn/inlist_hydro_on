@@ -7,13 +7,18 @@
 &controls
    use_other_wind = .false.
 
-   !use_ODE_var_eqn_pairing = .true.      
+   !use_ODE_var_eqn_pairing = .true.
    use_dPrad_dm_form_of_T_gradient_eqn = .true.
    use_momentum_outer_BC = .true.
-   
+   floor_momentum_outer_BC_at_Prad = .true.
+
    use_split_merge_amr = .true.
 
-   max_surface_cell_dq = 1d0
+   mesh_min_dlnR = 1d-9
+   merge_if_dlnR_too_small = .true.
+
+   ! applies to u and v flag
+   min_surface_cell_dq = 1d-14
    split_merge_amr_dq_min = 1d-16
 
    max_mdot_redo_cnt = 0
@@ -21,13 +26,31 @@
    restore_mesh_on_retry = .true.
    num_steps_to_hold_mesh_after_retry = 5
 
-   MLT_option = 'TDC'
+   MLT_option = "TDC"
+   include_mlt_corr_to_TDC = .false.
+   TDC_alpha_M = 2d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_include_eturb_in_energy_equation = .true.
 
+   ! RTI is enabled with Riemann hydro in run_star_extras.
+   RTI_A = 1d-3
+   RTI_B = 2.5d0
+   RTI_C = 0.2d0
+   RTI_D = 3d0
+   RTI_max_alpha = 0.5d0
+   alpha_RTI_src_min_v_div_cs = 1d0
+   RTI_log_max_boost = 0d0
 
-   !v_drag is set in run_star_extras
-   q_for_v_drag_full_off = 0.98d0
-   q_for_v_drag_full_on = 0.99d0
-   max_surface_cell_dq = 1d0
+   ! Limit chemical diffusion at strong Riemann shocks without disabling TDC.
+   Riemann_shock_D_mix_reduction_on = 0.01d0
+   Riemann_shock_D_mix_reduction_full_on = 0.05d0
+   max_abs_du_div_cs_for_convection = 1d99
+   max_v_div_cs_for_convection = 1d99
+
+  ! for v flag
+    use_Pvsc_art_visc = .true.
+    Pvsc_cq = 4.0d0
+    Pvsc_zsh = 0.1d0
 
 / ! end of controls namelist
 

@@ -423,7 +423,7 @@ contains
       type(star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Chi_00, Chi_p1, r_00, r_p1, w_00, w_p1, r_cell, Uq_cell
+      type(auto_diff_real_star_order1) :: Chi_00, Chi_p1, w_00, w_p1, r_cell, Uq_cell
       include 'formats'
       ierr = 0
       if (s%mixing_length_alpha == 0d0 .or. &
@@ -431,9 +431,8 @@ contains
           k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
          Uq_cell = 0d0
       else
-         r_00 = wrap_opt_time_center_r_00(s, k)
-         r_p1 = wrap_opt_time_center_r_p1(s, k)
-         r_cell = 0.5d0*(r_00+r_p1) ! not staggered unlike terms inside chi_div_w_face
+         ! Use the same lagged cell radius as the u/r strain.
+         r_cell = s% rmid_start(k)
 
          if (s% okay_to_set_mlt_vc .and. &
             s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
@@ -464,7 +463,7 @@ contains
 
          if (k == -56) then
             write (*, 3) 'TDC Uq chi_m1 chi_00 r', k, s%solver_iter, &
-               Uq_cell%val, Chi_p1%val, Chi_00%val, r_00%val
+               Uq_cell%val, Chi_p1%val, Chi_00%val, r_cell%val
          end if
 
       end if
@@ -624,9 +623,14 @@ contains
       if (s% v_flag) then
          r_00 = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
          r_m1 = 0.5d0*(wrap_r_00(s, k) + wrap_r_m1(s, k))
-      else if(s% u_flag) then ! stagger r for u_flag to retain tridiagonality.
-         r_00 = wrap_r_00(s, k)
-         r_m1 = wrap_r_m1(s, k)
+      else if(s% u_flag) then
+         ! Lag the cell-centered radius to retain tridiagonality.
+         r_00 = s% rmid_start(k)
+         if (k > 1) then
+            r_m1 = s% rmid_start(k-1)
+         else
+            r_m1 = 1d0
+         end if
       end if
 
       if (r_00%val == 0d0) r_00 = 1d0
@@ -664,9 +668,14 @@ contains
       if (s% v_flag) then
          r_00 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_p1(s, k))
          r_m1 = 0.5d0*(wrap_opt_time_center_r_00(s, k) + wrap_opt_time_center_r_m1(s, k))
-      else if(s% u_flag) then ! stagger r for u_flag to retain tridiagonality.
-         r_00 = wrap_opt_time_center_r_00(s, k)
-         r_m1 = wrap_opt_time_center_r_m1(s, k)
+      else if(s% u_flag) then
+         ! Lag the cell-centered radius to retain tridiagonality.
+         r_00 = s% rmid_start(k)
+         if (k > 1) then
+            r_m1 = s% rmid_start(k-1)
+         else
+            r_m1 = 1d0
+         end if
       end if
 
       if (r_00%val == 0d0) r_00 = 1d0

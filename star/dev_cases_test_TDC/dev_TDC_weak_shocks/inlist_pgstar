@@ -1,0 +1,122 @@
+&pgstar
+
+Grid1_win_flag = .true.
+
+!pause = .true.
+
+
+         pgstar_xaxis_label_scale = 1.0
+         pgstar_left_yaxis_label_scale = 1.0
+         pgstar_right_yaxis_label_scale = 1.0
+
+
+      Grid2_win_flag = .true.
+         !Grid2_title = '25 M\d\(2281)\u  Z=0.02  RSG'
+
+
+         Grid2_win_width = 7
+         Grid2_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+         Grid2_num_cols = 2 ! divide plotting region into this many equal width cols
+         Grid2_num_rows = 5 ! divide plotting region into this many equal height rows
+         Grid2_num_plots = 2 ! <= 10
+
+         Grid2_plot_name(1) = 'Profile_Panels1'
+         Grid2_plot_row(1) = 1 ! number from 1 at top
+         Grid2_plot_rowspan(1) = 3 ! plot spans this number of rows
+         Grid2_plot_col(1) =  1 ! number from 1 at left
+         Grid2_plot_colspan(1) = 2 ! plot spans this number of columns
+         Grid2_plot_pad_left(1) = -0.02 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(1) = 0.09 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(1) = -0.02 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(1) = -0.2 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(1) = 0.7 ! multiply txt_scale for subplot by this
+
+         Grid2_plot_name(2) = 'Text_Summary1'
+         Grid2_plot_row(2) = 5 ! number from 1 at top
+         Grid2_plot_rowspan(2) = 1 ! plot spans this number of rows
+         Grid2_plot_col(2) =  1 ! number from 1 at left
+         Grid2_plot_colspan(2) = 2 ! plot spans this number of columns
+         Grid2_plot_pad_left(2) = -0.08 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(2) = 0.0 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(2) = 0.1 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(2) = -0.04 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(2) = 0.2 ! multiply txt_scale for subplot by this
+
+   !   Grid2_file_flag = .true.
+         file_digits = 7
+         Grid2_file_dir = 'png'
+         Grid2_file_prefix = 'grid1'
+         Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
+
+
+
+      Profile_Panels1_win_flag = .false.
+         Profile_Panels1_title = ''
+
+         Profile_Panels1_xaxis_name = 'radius_cm'
+         !Profile_Panels1_xaxis_reversed = .false.
+         Profile_Panels1_xmin = 7.09615d8 ! -101D0
+         Profile_Panels1_xmax = -101D0
+         Profile_Panels1_show_mix_regions_on_xaxis = .true.
+
+         Profile_Panels1_num_panels = 4
+
+         Profile_Panels1_yaxis_name(1) = 'v_div_csound'
+         Profile_Panels1_ymax(1) = -101D0 ! 1
+         Profile_Panels1_ymin(1) = -101D0 ! -1
+         Profile_Panels1_other_yaxis_name(1) = 'vel_km_per_s'
+         Profile_Panels1_other_ymax(1) = -101D0 !  2e6
+         Profile_Panels1_other_ymin(1) = -101D0 ! -2e6
+
+         Profile_Panels1_yaxis_name(2) = 'entropy'
+         Profile_Panels1_other_yaxis_name(2) = 'opacity'
+
+         Profile_Panels1_yaxis_name(3) = 'logRho'
+         Profile_Panels1_ymax(3) = -101D0 ! 5.7
+         Profile_Panels1_ymin(3) = -101D0 ! 4.2
+         Profile_Panels1_other_yaxis_name(3) = 'rho_times_r3'
+         Profile_Panels1_other_ymax(3) = -101D0 ! 6.45
+         Profile_Panels1_other_ymin(3) = -101D0 ! 4
+
+         Profile_Panels1_yaxis_name(4) = 'logL'
+         Profile_Panels1_ymax(4) = -101D0 ! 3.7
+         Profile_Panels1_ymin(4) = -101D0 ! 3.1
+         Profile_Panels1_other_yaxis_name(4) = 'logP'
+         Profile_Panels1_other_ymax(4) = 21D0 ! 3.7
+         Profile_Panels1_other_ymin(4) = 0 ! -101D0 ! 3.1
+
+
+         Profile_Panels1_file_flag = .false.
+         Profile_Panels1_file_dir = 'png'
+         Profile_Panels1_file_prefix = 'profile_panels1_'
+         Profile_Panels1_file_interval = 1
+
+         Text_Summary1_num_rows = 4 ! <= 20
+         Text_Summary1_num_cols = 4 ! <= 20
+         Text_Summary1_name(:,:) = ''
+
+         Text_Summary1_name(1,1) = 'model_number'
+         Text_Summary1_name(2,1) = 'star_age_day'
+         Text_Summary1_name(3,1) = 'time_step_sec'
+         Text_Summary1_name(4,1) = 'surf_escape_v'
+         Text_Summary1_name(5,1) = ''
+
+         Text_Summary1_name(1,2) = 'v_surf_km_s'
+         Text_Summary1_name(2,2) = 'v_div_csound_surf'
+         Text_Summary1_name(3,2) = 'radius'
+         Text_Summary1_name(4,2) = 'log_R'
+         Text_Summary1_name(5,2) = ''
+
+         Text_Summary1_name(1,3) = 'effective_T'
+         Text_Summary1_name(2,3) = 'log_Teff'
+         Text_Summary1_name(3,3) = 'luminosity'
+         Text_Summary1_name(4,3) = 'log_L'
+         Text_Summary1_name(5,3) = ''
+
+         Text_Summary1_name(1,4) = 'star_mass'
+         Text_Summary1_name(2,4) = 'num_zones'
+         Text_Summary1_name(3,4) = 'num_retries'
+         Text_Summary1_name(4,4) = 'num_iters'
+         Text_Summary1_name(5,4) = ''
+
+/ ! end of pgstar namelist

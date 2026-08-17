@@ -8509,8 +8509,9 @@
       !|     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
       !|
       !|     if (use_dPrad_dm_form_of_T_gradient_eqn)
-      !|         if (gradT < gradr) then
-      !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
+      !|         if convection is active then
+      !|            use L_rad = L0*gradT (see, e.g., Cox&Giuli 14.109),
+      !|            where L0 = L/gradr is evaluated directly from the face state
       !|         else
       !|            use L_rad = L
       !|     if (use_flux_limiting_with_dPrad_dm_form)

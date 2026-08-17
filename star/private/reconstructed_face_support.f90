@@ -31,8 +31,36 @@ module reconstructed_face_support
   public :: get_reconstructed_face_eos_kap_ad
   public :: get_reconstructed_scale_height_ad
   public :: get_reconstructed_hse_scale_height_ad
+  public :: get_effective_gradr_factor_ad
+  public :: get_Lrad_per_gradT_face_ad
 
 contains
+
+  function get_effective_gradr_factor_ad(s, k) result(gradr_factor)
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    type(auto_diff_real_star_order1) :: gradr_factor
+
+    if (s%rotation_flag .and. s%mlt_use_rotation_correction) then
+       gradr_factor = s%ft_rot(k)/s%fp_rot(k)*s%gradr_factor(k)
+    else
+       gradr_factor = s%gradr_factor(k)
+    end if
+  end function get_effective_gradr_factor_ad
+
+
+  function get_Lrad_per_gradT_face_ad( &
+       s, k, T_face, P_face, opacity_face, gradr_factor) result(L0)
+    type(star_info), pointer :: s
+    integer, intent(in) :: k
+    type(auto_diff_real_star_order1), intent(in) :: &
+       T_face, P_face, opacity_face, gradr_factor
+    type(auto_diff_real_star_order1) :: L0, Pr_face
+
+    Pr_face = crad*pow4(T_face)/3d0
+    L0 = 4d0*pi4*clight*s%m_grav(k)*s%cgrav(k)*Pr_face/ &
+       (P_face*opacity_face*gradr_factor)
+  end function get_Lrad_per_gradT_face_ad
 
   ! Returns the MLT/TDC face thermodynamic state as
   ! auto_diff_real_star_order1 quantities, either from recomputed face

@@ -7,10 +7,13 @@
          logical :: TDC_adjust_mass_fallback_to_mlt
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
          logical :: use_TDC_enthalpy_flux_limiter
+         real(dp) :: Riemann_shock_D_mix_reduction_on, &
+            Riemann_shock_D_mix_reduction_full_on
          logical :: use_face_reconstruction
          logical :: include_mlt_in_velocity_time_centering
          logical :: use_hydro_merge_limits_in_mesh_plan
          logical :: split_merge_amr_use_metric_zoning_for_u_flag
+         logical :: split_merge_amr_reconstruct_pressure_for_u_flag
          real(dp) :: split_merge_amr_metric_logR_weight, &
             split_merge_amr_metric_logtau_weight, &
             split_merge_amr_metric_min_delta_lnR, &

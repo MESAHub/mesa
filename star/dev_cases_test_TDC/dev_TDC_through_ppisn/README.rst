@@ -4,8 +4,10 @@
 ppisn
 *****
 
-This test case evolves a very massive helium star from the He-ZAMS
-up to the ocurrence of a pulsational pair-instability event (see |Marchant2019|).
+.. tags:: star, very-massive-star, helium-star, pair-instability, pulsational-pair-instability
+
+This development case uses the ``ppisn`` test-suite setup but continues
+through successive pulsational pair-instability events (see |Marchant2019|).
 
 .. |Marchant2019| replace:: `Marchant et al. 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...882...36M/abstract>`__
 
@@ -18,4 +20,3 @@ The initial mass of the helium star is set in ``inlist_extra``
 In this case we use a :math:`72 M_\odot`
 
 Last-Updated: 2019-11-12 (mesa r12413) by Pablo Marchant
-

@@ -1363,12 +1363,18 @@
 
          s% generations = 1
 
-         ! restore v_flag and u_flag
+         ! restore v_flag, u_flag, and RTI_flag
          if (v_flag) then
             call set_v_flag(id, .true., ierr)
+            if (ierr /= 0) return
          end if
          if (u_flag) then
             call set_u_flag(id, .true., ierr)
+            if (ierr /= 0) return
+         end if
+         if (RTI_flag) then
+            call set_RTI_flag(id, .true., ierr)
+            if (ierr /= 0) return
          end if
 
          ! this avoids the history file from being rewritten

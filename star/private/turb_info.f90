@@ -22,7 +22,8 @@
 
       use star_private_def
       use const_def, only: dp, i8, ln10, pi4, no_mixing, convective_mixing, crystallized, phase_separation_mixing
-      use reconstructed_face_support, only: get_reconstructed_face_state_ad, get_reconstructed_hse_scale_height_ad
+      use reconstructed_face_support, only: get_reconstructed_face_state_ad, get_reconstructed_hse_scale_height_ad, &
+         get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad
       use num_lib
       use utils_lib
       use auto_diff_support
@@ -93,7 +94,7 @@
          type(auto_diff_real_star_order1) :: &
             T_face_ad, P_face_ad, energy_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             grada_face_ad, scale_height_ad, gradr_ad, &
-            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, mixing_length_ad, hse_scale_height_ad
+            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, mixing_length_ad, hse_scale_height_ad, L0_ad, Lrad_ad
          include 'formats'
 
          ierr = 0
@@ -138,11 +139,7 @@
             mixing_length_ad = mixing_length_alpha*scale_height_ad
          end if
 
-         if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
-            gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
-         else
-            gradr_factor = s% gradr_factor(k)
-         end if
+         gradr_factor = get_effective_gradr_factor_ad(s, k)
          if (is_bad_num(gradr_factor% val)) then
             ierr = -1
             return
@@ -258,10 +255,13 @@
          end if
          call adjust_gradT_fraction(s, k, f)
 
-         if (s% mlt_mixing_type(k) == no_mixing .or. abs(s% gradr(k)) < 1d-20) then
+         if (s% mlt_mixing_type(k) == no_mixing .or. abs(gradr_factor%val) <= 1d-20) then
             s% L_conv(k) = 0d0
          else
-            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k))  ! C&G 14.109
+            L0_ad = get_Lrad_per_gradT_face_ad( &
+               s, k, T_face_ad, P_face_ad, opacity_face_ad, gradr_factor)
+            Lrad_ad = L0_ad*s% gradT_ad(k)
+            s% L_conv(k) = s% L(k) - Lrad_ad%val  ! C&G 14.109
          end if
 
          contains

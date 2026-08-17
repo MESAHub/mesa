@@ -20,7 +20,7 @@
       module adjust_mesh_split_merge
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4, four_thirds_pi
+      use const_def, only: dp, ln10, pi4, four_thirds_pi, crad
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
       use auto_diff_support
@@ -1071,6 +1071,30 @@
       end subroutine split1_non_negative
 
 
+      subroutine split1_non_negative_mass_weighted( &
+            val, grad, dr, dm, dmR, dmL, min_val, max_val, new_valL, new_valR)
+         real(dp), intent(in) :: val, grad, dr, dm, dmR, dmL, min_val, max_val
+         real(dp), intent(out) :: new_valL, new_valR
+         real(dp) :: delta_val, f
+
+         new_valR = val
+         new_valL = val
+         if (val <= 0d0 .or. grad == 0d0) return
+
+         delta_val = 0.5d0*grad*dr
+         new_valR = val + dmL*delta_val/dm
+         new_valL = val - dmR*delta_val/dm
+         f = 1d0
+         if (new_valR < min_val) f = min(f, (val - min_val)/(val - new_valR))
+         if (new_valR > max_val) f = min(f, (max_val - val)/(new_valR - val))
+         if (new_valL < min_val) f = min(f, (val - min_val)/(val - new_valL))
+         if (new_valL > max_val) f = min(f, (max_val - val)/(new_valL - val))
+         delta_val = max(0d0, f)*delta_val
+         new_valR = val + dmL*delta_val/dm
+         new_valL = val - dmR*delta_val/dm
+      end subroutine split1_non_negative_mass_weighted
+
+
       subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
          use alloc, only: reallocate_star_info_arrays
          use star_utils, only: set_rmid, store_r_in_xh
@@ -1086,12 +1110,14 @@
             v, energy, v2_R, energy_R, rho_R, energy_C, rho_C, v2_L, energy_L, rho_L, &
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
-            grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
+            grad_alpha, min_alpha, max_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old, &
             u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
-            min_stencil_energy, max_delta_KE_div_dm
-         logical :: done, use_new_grad_rho
+            min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
+            pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
+            min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT
+         logical :: done, use_new_grad_rho, pressure_reconstructed
          include 'formats'
 
          ierr = 0
@@ -1196,6 +1222,15 @@
          energy_L = s% energy(iL)
          rho_L = s% dm(iL)/get_dV(s,iL)
          min_stencil_energy = min(energy_R, energy_C, energy_L)
+         max_stencil_energy = max(energy_R, energy_C, energy_L)
+
+         pressure_R = s% Peos(iR)
+         pressure_C = s% Peos(iC)
+         pressure_L = s% Peos(iL)
+         min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
+         max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
+         min_stencil_lnT = min(s% lnT(iR), s% lnT(iC), s% lnT(iL))
+         max_stencil_lnT = max(s% lnT(iR), s% lnT(iC), s% lnT(iL))
 
          ! get gradients before move cell contents
 
@@ -1222,9 +1257,16 @@
          end if
 
          grad_energy = get1_grad(energy_L, energy_C, energy_R, dLeft, dCntr, dRght)
+         grad_pressure = get1_grad(pressure_L, pressure_C, pressure_R, dLeft, dCntr, dRght)
+         pressure_difference_target = -0.5d0*grad_pressure*dr_old
 
-         if (s% RTI_flag) grad_alpha = get1_grad( &
-            s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
+         if (s% RTI_flag) then
+            grad_alpha = get1_grad( &
+               s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
+            min_alpha = max(0d0, min( &
+               s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR)))
+            max_alpha = max(s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR))
+         end if
 
          if (s% RSP2_flag) then
             etrb_R = pow2(s% w(iR))
@@ -1428,9 +1470,10 @@
             if (i == 1) then
                s% alpha_RTI(ip) = s% alpha_RTI(i)
             else
-               call split1_non_negative( &
+               ! Preserve the mass-weighted RTI scalar when child densities differ.
+               call split1_non_negative_mass_weighted( &
                   s% alpha_RTI(i), grad_alpha, &
-                  dr, dV, dVR, dVL, new_alphaL, new_alphaR)
+                  dr, dm, dMR, dML, min_alpha, max_alpha, new_alphaL, new_alphaR)
                s% alpha_RTI(i) = new_alphaR
                s% alpha_RTI(ip) = new_alphaL
             end if
@@ -1576,7 +1619,194 @@
          star_PE1 = get_star_PE(s)
          call revise_star_radius(s, star_PE0, star_PE1)
 
+         pressure_reconstructed = .false.
+         if (s% u_flag .and. s% split_merge_amr_reconstruct_pressure_for_u_flag) then
+            call reconstruct_split_pressure( &
+               s, i, ip, pressure_difference_target, &
+               min_stencil_energy, max_stencil_energy, &
+               min_stencil_pressure, max_stencil_pressure, &
+               min_stencil_lnT, max_stencil_lnT, pressure_reconstructed)
+         end if
+         if (pressure_reconstructed) then
+            call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
+            if (ierr /= 0) return
+            call update_xh_eos_and_kap(s,ip,species,new_xa,ierr)
+            if (ierr /= 0) return
+         end if
+
       end subroutine do_split
+
+
+      subroutine reconstruct_split_pressure( &
+            s, i, ip, pressure_difference_target, &
+            min_stencil_energy, max_stencil_energy, &
+            min_stencil_pressure, max_stencil_pressure, &
+            min_stencil_lnT, max_stencil_lnT, accepted)
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
+         use eos_support, only: solve_eos_given_DE
+         type (star_info), pointer :: s
+         integer, intent(in) :: i, ip
+         real(dp), intent(in) :: pressure_difference_target, &
+            min_stencil_energy, max_stencil_energy, &
+            min_stencil_pressure, max_stencil_pressure, &
+            min_stencil_lnT, max_stencil_lnT
+         logical, intent(out) :: accepted
+
+         integer :: iter
+         real(dp) :: dm_outer, dm_inner, mass_ratio, total_internal_energy, &
+            energy_outer0, energy_inner0, energy_min, energy_max, energy_tol, &
+            delta_lo, delta_hi, delta_mid, f0, f_lo, f_hi, f_mid, &
+            pressure_outer, pressure_inner, lnT_outer, lnT_inner, &
+            pressure_scale, pressure_tol, extremum_pressure_tol, lnT_tol
+         logical :: valid0, valid_lo, valid_hi, valid_mid
+         include 'formats'
+
+         accepted = .false.
+         dm_outer = s% dm(i)
+         dm_inner = s% dm(ip)
+         if (dm_outer <= 0d0 .or. dm_inner <= 0d0) return
+
+         energy_outer0 = s% energy(i)
+         energy_inner0 = s% energy(ip)
+         energy_min = max(tiny(1d0), min_stencil_energy)
+         energy_max = max_stencil_energy
+         if (energy_max <= energy_min) return
+
+         energy_tol = 1d-12*energy_max
+         if (energy_outer0 < energy_min - energy_tol .or. &
+               energy_outer0 > energy_max + energy_tol .or. &
+               energy_inner0 < energy_min - energy_tol .or. &
+               energy_inner0 > energy_max + energy_tol) return
+
+         mass_ratio = dm_outer/dm_inner
+         delta_lo = max(energy_min - energy_outer0, &
+            (energy_inner0 - energy_max)/mass_ratio)
+         delta_hi = min(energy_max - energy_outer0, &
+            (energy_inner0 - energy_min)/mass_ratio)
+         if (delta_lo >= delta_hi) return
+
+         total_internal_energy = &
+            dm_outer*energy_outer0 + dm_inner*energy_inner0
+         call eval_pair(0d0, f0, pressure_outer, pressure_inner, &
+            lnT_outer, lnT_inner, valid0)
+         if (.not. valid0) return
+
+         pressure_scale = max(1d0, abs(pressure_outer), abs(pressure_inner), &
+            abs(pressure_difference_target))
+         pressure_tol = 1d-10*pressure_scale
+         if (abs(f0) <= pressure_tol) return
+
+         call eval_pair(delta_lo, f_lo, pressure_outer, pressure_inner, &
+            lnT_outer, lnT_inner, valid_lo)
+         call eval_pair(delta_hi, f_hi, pressure_outer, pressure_inner, &
+            lnT_outer, lnT_inner, valid_hi)
+         if (.not. valid_lo .or. .not. valid_hi) return
+         if (.not. brackets_root(f_lo, f_hi)) return
+
+         do iter = 1, 80
+            delta_mid = 0.5d0*(delta_lo + delta_hi)
+            call eval_pair(delta_mid, f_mid, pressure_outer, pressure_inner, &
+               lnT_outer, lnT_inner, valid_mid)
+            if (.not. valid_mid) return
+            if (abs(f_mid) <= pressure_tol) exit
+            if (brackets_root(f_lo, f_mid)) then
+               delta_hi = delta_mid
+               f_hi = f_mid
+            else
+               delta_lo = delta_mid
+               f_lo = f_mid
+            end if
+         end do
+         if (abs(f_mid) > pressure_tol) return
+
+         extremum_pressure_tol = 1d-10*max(1d0, &
+            abs(min_stencil_pressure), abs(max_stencil_pressure))
+         if (pressure_outer < min_stencil_pressure - extremum_pressure_tol .or. &
+               pressure_outer > max_stencil_pressure + extremum_pressure_tol .or. &
+               pressure_inner < min_stencil_pressure - extremum_pressure_tol .or. &
+               pressure_inner > max_stencil_pressure + extremum_pressure_tol) return
+
+         lnT_tol = 1d-10*max(1d0, abs(min_stencil_lnT), abs(max_stencil_lnT))
+         if (lnT_outer < min_stencil_lnT - lnT_tol .or. &
+               lnT_outer > max_stencil_lnT + lnT_tol .or. &
+               lnT_inner < min_stencil_lnT - lnT_tol .or. &
+               lnT_inner > max_stencil_lnT + lnT_tol) return
+
+         s% energy(i) = energy_outer0 + delta_mid
+         s% energy(ip) = &
+            (total_internal_energy - dm_outer*s% energy(i))/dm_inner
+         accepted = .true.
+
+         if (s% trace_split_merge_amr) then
+            write(*,'(a,i8,3(1x,es14.6))') &
+               'split pressure reconstruction', i, f0, f_mid, delta_mid
+         end if
+
+         contains
+
+         subroutine eval_pair( &
+               delta, mismatch, P_outer, P_inner, lnT_out, lnT_in, valid)
+            real(dp), intent(in) :: delta
+            real(dp), intent(out) :: mismatch, P_outer, P_inner, lnT_out, lnT_in
+            logical, intent(out) :: valid
+            real(dp) :: energy_outer, energy_inner, rho_outer, rho_inner
+            integer :: eos_ierr
+
+            valid = .false.
+            energy_outer = energy_outer0 + delta
+            energy_inner = &
+               (total_internal_energy - dm_outer*energy_outer)/dm_inner
+            if (energy_outer < energy_min .or. energy_outer > energy_max .or. &
+                  energy_inner < energy_min .or. energy_inner > energy_max) return
+
+            rho_outer = dm_outer/get_dV(s,i)
+            rho_inner = dm_inner/get_dV(s,ip)
+            call eval_pressure( &
+               i, rho_outer, energy_outer, s% lnT(i), P_outer, lnT_out, eos_ierr)
+            if (eos_ierr /= 0) return
+            call eval_pressure( &
+               ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
+            if (eos_ierr /= 0) return
+
+            mismatch = P_inner - P_outer - pressure_difference_target
+            valid = .not. is_bad(mismatch + P_outer + P_inner + lnT_out + lnT_in)
+         end subroutine eval_pair
+
+
+         subroutine eval_pressure(k, rho, energy, lnT_guess, pressure, lnT, eos_ierr)
+            integer, intent(in) :: k
+            real(dp), intent(in) :: rho, energy, lnT_guess
+            real(dp), intent(out) :: pressure, lnT
+            integer, intent(out) :: eos_ierr
+            real(dp) :: logT, T, &
+               res(num_eos_basic_results), &
+               d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
+               d_dxa(num_eos_d_dxa_results, s% species)
+
+            eos_ierr = 0
+            if (rho <= 0d0 .or. energy <= 0d0) then
+               eos_ierr = -1
+               return
+            end if
+            call solve_eos_given_DE( &
+               s, k, s% xa(:,k), log10(rho), log10(energy), lnT_guess/ln10, &
+               1d-11, 1d-11, logT, res, d_dlnd, d_dlnT, d_dxa, eos_ierr)
+            if (eos_ierr /= 0) return
+
+            lnT = logT*ln10
+            T = exp(lnT)
+            pressure = exp(res(i_lnPgas)) + crad*pow4(T)/3d0
+            if (pressure <= 0d0 .or. is_bad(pressure + lnT)) eos_ierr = -1
+         end subroutine eval_pressure
+
+
+         logical function brackets_root(fa, fb)
+            real(dp), intent(in) :: fa, fb
+            brackets_root = (fa <= 0d0 .and. fb >= 0d0) .or. &
+               (fa >= 0d0 .and. fb <= 0d0)
+         end function brackets_root
+
+      end subroutine reconstruct_split_pressure
 
 
       subroutine update_xh_eos_and_kap(s,i,species,new_xa,ierr)

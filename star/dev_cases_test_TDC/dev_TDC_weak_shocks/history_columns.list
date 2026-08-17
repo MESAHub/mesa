@@ -75,7 +75,7 @@
 
    !## mass change
 
-      star_mdot ! d(star_mass)/dt (in msolar per year)
+      !star_mdot ! d(star_mass)/dt (in msolar per year)
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
@@ -235,11 +235,13 @@
       !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
       !power_photo
       !power_z_burn
-      !log_power_nuc_burn ! total thermal power from all burning, excluding photodisintegrations
+      log_power_nuc_burn ! total thermal power from all burning, including photodisintegrations
+      power_nuc_burn ! total thermal power from all burning, including photodisintegrations
       log_LH ! log10 power_h_burn
       log_LHe ! log10 power_he_burn
       log_LZ ! log10 total burning power including LC, but excluding LH and LHe and photodisintegrations
-      log_Lnuc ! log(LH + LHe + LZ)
+      log_Lnuc ! log(LH + LHe + LZ) ! does not include photodisintegration
+      Lnuc ! (LH + LHe + LZ) ! does not include photodisintegration
       !log_Lnuc_ergs_s
       !log_Lnuc_sub_log_L
       !lnuc_photo
@@ -248,7 +250,7 @@
       !log_extra_L ! log10 extra_L
 
    !## neutrino losses
-      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
       !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
       !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
 
@@ -282,20 +284,20 @@
       !photo
       !pnhe4
       !other
-   
+
    !## information about individual reactions
-   
-          ! adds columns for all of the reactions that are in the current net 
+
+          ! adds columns for all of the reactions that are in the current net
       ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for their rates
       !add_raw_rates      ! raw reaction rates,       reactions/second
       !add_screened_rates ! screened reaction rates reactions/second
       !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
       !add_eps_neu_rates  ! Neutrino losses             erg/s
-   
+
           ! individual reactions (as many as desired)
-          ! use list_net_reactions = .true. in star_job to list all reactions in the current net 
+          ! use list_net_reactions = .true. in star_job to list all reactions in the current net
           ! reactions/second
-      !raw_rate r_h1_h1_ec_h2 
+      !raw_rate r_h1_h1_ec_h2
       !raw_rate r_h1_h1_wk_h2
 
 
@@ -352,7 +354,7 @@
          ! since we start at the center, the bottom of the 1st region is q=0 and top of last is q=1.
 
          ! the columns in the log file will have names like 'burn_type_1' and 'burn_qtop_1'
-         
+
       !burn_relr_regions <integer>
          ! same as above, but locations given as r/rstar instead of m/mstar.
          ! the columns in the log file will have names like 'burn_relr_type_1' and 'burn_relr_top_1'
@@ -367,7 +369,7 @@
 
    !## helium core
       he_core_mass
-      he_core_radius
+      !he_core_radius
       !he_core_lgT
       !he_core_lgRho
       !he_core_L
@@ -379,7 +381,7 @@
    !## CO core
       co_core_mass
       !CO_core
-      co_core_radius
+      !co_core_radius
       !co_core_lgT
       !co_core_lgRho
       !co_core_L
@@ -506,7 +508,7 @@
       !log_R_cm
 
       log_g ! log10 gravity
-      gravity
+      !gravity
       !log_Ledd
       !log_L_div_Ledd ! log10(L/Leddington)
       !lum_div_Ledd
@@ -523,7 +525,7 @@
       !surface_cell_entropy ! in units of kerg per baryon
           ! old name was surface_entropy
 
-      v_surf ! (cm/s)
+      !v_surf ! (cm/s)
       !v_surf_km_s ! (km/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       !v_div_csound_max ! max value of velocity divided by sound speed at face
@@ -549,9 +551,9 @@
       ! gravity darkening in rotating stars. Based on the model of Espinosa Lara & Rieutord (2011)
       ! 'polar' refers to the line of sight being directed along the rotation axis of the star
       ! 'equatorial' refers to the line of sight coincident with the stellar equator
-      !grav_dark_L_polar !Lsun 
+      !grav_dark_L_polar !Lsun
       !grav_dark_Teff_polar !K
-      !grav_dark_L_equatorial !Lsun 
+      !grav_dark_L_equatorial !Lsun
       !grav_dark_Teff_equatorial !K
 
       !surf_escape_v ! cm/s
@@ -577,7 +579,7 @@
 
       log_center_T ! temperature
       log_center_Rho ! density
-      log_center_P ! pressure
+      !log_center_P ! pressure
 
       ! shorter names for above
       log_cntr_P
@@ -691,7 +693,7 @@
       total_mass he4
       ! etc.
 
-      ! individiul log10  mass totals for entire star (in Msun units)
+      ! individual log10  mass totals for entire star (in Msun units)
       !log_total_mass h1
       !log_total_mass he4
       ! etc.
@@ -699,7 +701,7 @@
 !----------------------------------------------------------------------------------------------
 
 !# info at specific locations
-      
+
    !## info at location of max temperature
    !max_T
    !log_max_T
@@ -714,12 +716,12 @@
       ! returns values at location of max velocity
       !shock_mass ! baryonic (Msun)
       !shock_mass_gm ! baryonic (grams)
-      shock_q
-      shock_radius ! (Rsun)
+      !shock_q
+      !shock_radius ! (Rsun)
       !shock_radius_cm ! (cm)
       !shock_velocity
       !shock_csound
-      shock_v_div_cs
+      !shock_v_div_cs
       !shock_lgT
       !shock_lgRho
       !shock_lgP
@@ -847,7 +849,7 @@
  !# rotation
 
       !total_angular_momentum
-      log_total_angular_momentum
+      !log_total_angular_momentum
       !i_rot_total ! moment of inertia
 
       !total_rotational_kinetic_energy
@@ -1003,7 +1005,7 @@
    !rsp_DeltaR ! R_max - R_min difference in the max and min radius (Rsun)
    !rsp_GREKM ! fractional growth of the kinetic energy per pulsation period ("nonlinear growth rate") - see equation 5 in MESA5
    !rsp_num_periods ! Count of the number of pulsation cycles completed
-   !rsp_period_in_days ! Running period, ie., period between two consecutive values of R_max (days) 
+   !rsp_period_in_days ! Running period, ie., period between two consecutive values of R_max (days)
    !rsp_phase ! Running pulsation phase for a cycle
 
 !----------------------------------------------------------------------------------------------
@@ -1064,8 +1066,3 @@
 
    !## timing
       !elapsed_time ! time since start of run (seconds)
-
-   !## Extras
-      burning_regions 40
-      mixing_regions 40
-      mix_relr_regions 40
