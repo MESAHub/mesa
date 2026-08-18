@@ -37,7 +37,7 @@ SRCS_CHECK = test/src/test_eos.f90 \
              test/src/eos_support.f90 \
              test/src/test_eos_blend.f90 \
              test/src/test_eos_support.f90
-INTERNAL_DEPENDS_ON := const math utils chem num auto_diff interp_1d interp_2d
+INTERNAL_DEPENDS_ON := const math utils chem num auto_diff interp_1d interp_2d forum
 EXTERNAL_DEPENDS_ON :=
 BINTYPE := lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
@@ -65,9 +65,9 @@ install-cms:
 	fi
 
 install-dt:
-	if [ ! -r ../data/eosDT_data ]; then \
+	if [ ! -r ../data/eosDT_data/extract-completed ]; then \
 		tar -xJf eosDT_data.tar.xz -C ../data; \
-		xz --decompress --keep --stdout helm_table.dat.xz > ../data/eosDT_data/helm_table.dat; \
+                touch ../data/eosDT_data/extract-completed; \
 	fi
 
 install-pc:

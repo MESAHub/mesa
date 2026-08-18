@@ -68,7 +68,7 @@ contains
          stop 1
       end if
 
-      call read_helm_table(eos_ht, data_dir, cache_dir, temp_cache_dir, use_cache, ierr) ! initialize helm
+      call read_helm_table(eos_ht, data_dir, ierr) ! initialize helm
       if (ierr /= 0) then
          write (*, *) 'read helm table failed'
          stop 1

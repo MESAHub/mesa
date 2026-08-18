@@ -61,8 +61,7 @@
          call alloc_helm_table(eos_ht, imax, jmax, ierr)
          if (ierr /= 0) return
 
-         call read_helm_table(eos_ht, &
-            eosDT_data_dir, eosDT_cache_dir, eosDT_temp_cache_dir, use_cache_for_eos, ierr)
+         call read_helm_table(eos_ht, eosDT_data_dir, ierr)
          if (ierr /= 0) return
 
          call eos_def_init
