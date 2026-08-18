@@ -58,9 +58,7 @@
             if(use_mesa_temp_cache) call mkdir(eosDT_temp_cache_dir)
          end if
 
-         call alloc_helm_table(eos_ht, imax, jmax, ierr)
-         if (ierr /= 0) return
-
+         call alloc_helm_table(eos_ht, imax, jmax)
          call read_helm_table(eos_ht, eosDT_data_dir, ierr)
          if (ierr /= 0) return
 

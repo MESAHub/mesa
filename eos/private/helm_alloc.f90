@@ -26,84 +26,65 @@
 
       contains
 
-      subroutine alloc_helm_table(h, imax, jmax, ierr)
+      subroutine alloc_helm_table(h, imax, jmax)
          ! This routine allocates a Helm_Table and places pointer to it in h.
          ! It also allocates the arrays in the Helm_Table record.
 
          use eos_def
 
-         type (Helm_Table), pointer :: h
+         type (Helm_Table), allocatable, intent(out) :: h
          integer, intent(in) :: imax, jmax
-         integer, intent(out) :: ierr  ! 0 means AOK.
 
-         ierr = 0
+         allocate(h)
 
-         allocate(h,stat=ierr)
-         if (ierr /= 0) return
-
+         h% with_coulomb_corrections = .true.
          h% imax = imax
          h% jmax = jmax
-         h% with_coulomb_corrections = .true.
 
-         call alloc_1d_array(h% d, imax)
-         call alloc_1d_array(h% t, jmax)
+         allocate(h% d(imax))
+         allocate(h% t(jmax))
 
          !..for the helmholtz free energy tables
-         call alloc_2d_array(h% f, imax, jmax)
-         call alloc_2d_array(h% fd, imax, jmax)
-         call alloc_2d_array(h% ft, imax, jmax)
-         call alloc_2d_array(h% fdd, imax, jmax)
-         call alloc_2d_array(h% ftt, imax, jmax)
-         call alloc_2d_array(h% fdt, imax, jmax)
-         call alloc_2d_array(h% fddt, imax, jmax)
-         call alloc_2d_array(h% fdtt, imax, jmax)
-         call alloc_2d_array(h% fddtt, imax, jmax)
+         allocate(h% f(imax, jmax))
+         allocate(h% fd(imax, jmax))
+         allocate(h% ft(imax, jmax))
+         allocate(h% fdd(imax, jmax))
+         allocate(h% ftt(imax, jmax))
+         allocate(h% fdt(imax, jmax))
+         allocate(h% fddt(imax, jmax))
+         allocate(h% fdtt(imax, jmax))
+         allocate(h% fddtt(imax, jmax))
 
          !..for the pressure derivative with density tables
-         call alloc_2d_array(h% dpdf, imax, jmax)
-         call alloc_2d_array(h% dpdfd, imax, jmax)
-         call alloc_2d_array(h% dpdft, imax, jmax)
-         call alloc_2d_array(h% dpdfdt, imax, jmax)
+         allocate(h% dpdf(imax, jmax))
+         allocate(h% dpdfd(imax, jmax))
+         allocate(h% dpdft(imax, jmax))
+         allocate(h% dpdfdt(imax, jmax))
 
          !..for chemical potential tables
-         call alloc_2d_array(h% ef, imax, jmax)
-         call alloc_2d_array(h% efd, imax, jmax)
-         call alloc_2d_array(h% eft, imax, jmax)
-         call alloc_2d_array(h% efdt, imax, jmax)
+         allocate(h% ef(imax, jmax))
+         allocate(h% efd(imax, jmax))
+         allocate(h% eft(imax, jmax))
+         allocate(h% efdt(imax, jmax))
 
          !..for the number density tables
-         call alloc_2d_array(h% xf, imax, jmax)
-         call alloc_2d_array(h% xfd, imax, jmax)
-         call alloc_2d_array(h% xft, imax, jmax)
-         call alloc_2d_array(h% xfdt, imax, jmax)
+         allocate(h% xf(imax, jmax))
+         allocate(h% xfd(imax, jmax))
+         allocate(h% xft(imax, jmax))
+         allocate(h% xfdt(imax, jmax))
 
          !..for storing the differences
-         call alloc_1d_array(h% dt_sav, jmax)
-         call alloc_1d_array(h% dt2_sav, jmax)
-         call alloc_1d_array(h% dti_sav, jmax)
-         call alloc_1d_array(h% dt2i_sav, jmax)
-         call alloc_1d_array(h% dt3i_sav, jmax)
+         allocate(h% dt_sav(jmax - 1))
+         allocate(h% dt2_sav(jmax - 1))
+         allocate(h% dti_sav(jmax - 1))
+         allocate(h% dt2i_sav(jmax - 1))
+         allocate(h% dt3i_sav(jmax - 1))
 
-         call alloc_1d_array(h% dd_sav, imax)
-         call alloc_1d_array(h% dd2_sav, imax)
-         call alloc_1d_array(h% ddi_sav, imax)
-         call alloc_1d_array(h% dd2i_sav, imax)
-         call alloc_1d_array(h% dd3i_sav, imax)
-
-         contains
-
-         subroutine alloc_1d_array(ptr,sz)
-            real(dp), dimension(:), pointer :: ptr
-            integer, intent(in) :: sz
-            allocate(ptr(sz),stat=ierr)
-         end subroutine alloc_1d_array
-
-         subroutine alloc_2d_array(ptr,sz1,sz2)
-            real(dp), dimension(:,:), pointer :: ptr
-            integer, intent(in) :: sz1,sz2
-            allocate(ptr(sz1,sz2),stat=ierr)
-         end subroutine alloc_2d_array
-
+         allocate(h% dd_sav(imax - 1))
+         allocate(h% dd2_sav(imax - 1))
+         allocate(h% ddi_sav(imax - 1))
+         allocate(h% dd2i_sav(imax - 1))
+         allocate(h% dd3i_sav(imax - 1))
 
       end subroutine alloc_helm_table
 
@@ -114,7 +95,7 @@
       use utils_lib, only: mv, switch_str
 
 
-      type (Helm_Table), pointer :: h
+      type (Helm_Table), intent(inout) :: h
       character(*), intent(IN) :: data_dir
       integer, intent(out) :: ierr
 
@@ -196,71 +177,5 @@
        h% dd3i_sav(:) = h% dd2i_sav * h% ddi_sav
 
       end subroutine read_helm_table
-
-
-      subroutine free_helm_table(h)
-         use eos_def
-
-         type (Helm_Table), pointer :: h
-
-         call do_free(h% d)
-         call do_free(h% t)
-
-         call do_free2(h% f)
-         call do_free2(h% fd)
-         call do_free2(h% ft)
-         call do_free2(h% fdd)
-         call do_free2(h% ftt)
-         call do_free2(h% fdt)
-         call do_free2(h% fddt)
-         call do_free2(h% fdtt)
-         call do_free2(h% fddtt)
-
-         !..for the pressure derivative with density tables
-         call do_free2(h% dpdf)
-         call do_free2(h% dpdfd)
-         call do_free2(h% dpdft)
-         call do_free2(h% dpdfdt)
-
-         !..for chemical potential tables
-         call do_free2(h% ef)
-         call do_free2(h% efd)
-         call do_free2(h% eft)
-         call do_free2(h% efdt)
-
-         !..for the number density tables
-         call do_free2(h% xf)
-         call do_free2(h% xfd)
-         call do_free2(h% xft)
-         call do_free2(h% xfdt)
-
-         !..for storing the differences
-         call do_free(h% dt_sav)
-         call do_free(h% dt2_sav)
-         call do_free(h% dti_sav)
-         call do_free(h% dt2i_sav)
-         call do_free(h% dt3i_sav)
-         call do_free(h% dd_sav)
-         call do_free(h% dd2_sav)
-         call do_free(h% ddi_sav)
-         call do_free(h% dd2i_sav)
-         call do_free(h% dd3i_sav)
-
-         deallocate(h)
-         nullify(h)
-
-         contains
-
-         subroutine do_free(array_ptr)
-            real(dp), pointer :: array_ptr(:)
-            if (associated(array_ptr)) deallocate(array_ptr)
-         end subroutine do_free
-
-         subroutine do_free2(array_ptr)
-            real(dp), pointer :: array_ptr(:,:)
-            if (associated(array_ptr)) deallocate(array_ptr)
-         end subroutine do_free2
-
-      end subroutine free_helm_table
 
       end module helm_alloc
