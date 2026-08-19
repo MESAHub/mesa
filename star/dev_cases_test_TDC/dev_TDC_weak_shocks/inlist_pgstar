@@ -78,7 +78,7 @@ Grid1_win_flag = .true.
          Profile_Panels1_other_ymax(3) = -101D0 ! 6.45
          Profile_Panels1_other_ymin(3) = -101D0 ! 4
 
-         Profile_Panels1_yaxis_name(4) = 'logL'
+         Profile_Panels1_yaxis_name(4) = 'conv_vel'
          Profile_Panels1_ymax(4) = -101D0 ! 3.7
          Profile_Panels1_ymin(4) = -101D0 ! 3.1
          Profile_Panels1_other_yaxis_name(4) = 'logP'

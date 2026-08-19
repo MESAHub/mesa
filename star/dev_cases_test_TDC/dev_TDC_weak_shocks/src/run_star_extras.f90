@@ -33,7 +33,7 @@
       integer :: time0, time1, clock_rate, num_breakouts
       logical :: currently_in_breakout
 
-      real(dp) :: injection_eps, injection_L, run_total_e
+      real(dp) :: injection_eps, injection_L, run_total_e, fixed_surface_L
 
 
       contains
@@ -56,6 +56,7 @@
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns
          s% other_energy => energy_dep
+         s% other_surface_PT => fixed_L_surface_PT
       end subroutine extras_controls
 
 
@@ -111,6 +112,7 @@
          injection_L = 0d0
          if (.not. restart) then
             run_total_e = 0d0
+            fixed_surface_L = s% L(1)
             num_breakouts = 0
             currently_in_breakout = .false.
             call alloc_extra_info(s)
@@ -128,6 +130,7 @@
 
       subroutine switch_BCs(s)
          type (star_info), pointer :: s
+         s% use_other_surface_PT = .true.
          if (s% x_logical_ctrl(2)) then
             s% use_compression_outer_BC = .false.
             s% use_momentum_outer_BC = .false.
@@ -138,6 +141,42 @@
             s% use_fixed_vsurf_outer_BC = .false.
          end if
       end subroutine switch_BCs
+
+
+      subroutine fixed_L_surface_PT(id, &
+            skip_partials, &
+            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+            lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
+         integer, intent(in) :: id
+         logical, intent(in) :: skip_partials
+         real(dp), intent(out) :: &
+            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+            lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         if (fixed_surface_L <= 0d0 .or. s% r(1) <= 0d0) then
+            if (s% report_ierr) write(*,*) 'invalid fixed-L surface state'
+            ierr = -1
+            return
+         end if
+
+         ! Hold L fixed while the black-body temperature follows the surface radius.
+         lnT_surf = 0.25d0*log(fixed_surface_L/(pi4*boltz_sigma*pow2(s% r(1))))
+         dlnT_dL = 0d0
+         dlnT_dlnR = -0.5d0
+         dlnT_dlnM = 0d0
+         dlnT_dlnkap = 0d0
+
+         lnP_surf = s% lnPeos(1)
+         dlnP_dL = 0d0
+         dlnP_dlnR = 0d0
+         dlnP_dlnM = 0d0
+         dlnP_dlnkap = 0d0
+      end subroutine fixed_L_surface_PT
 
 
       subroutine extras_after_evolve(id, ierr)
@@ -377,7 +416,10 @@
          extras_start_step = terminate
          call star_remove_surface_at_cell_k(s% id, k1, ierr)
          if (ierr /= 0) return
-         if (s% x_logical_ctrl(1)) call switch_BCs(s)
+         if (s% x_logical_ctrl(1)) then
+            fixed_surface_L = s% L(1)
+            call switch_BCs(s)
+         end if
          extras_start_step = keep_going
       end function extras_start_step
 
@@ -473,6 +515,7 @@
          i = 0
          ! call move_dbl
          call move_dbl(run_total_e)
+         call move_dbl(fixed_surface_L)
 
          num_dbls = i
 

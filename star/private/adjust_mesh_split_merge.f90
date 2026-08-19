@@ -43,7 +43,7 @@
          include 'formats'
 
          if (s% RSP2_flag) then
-            call mesa_error(__FILE__,__LINE__,'need to add mlt_vc and Hp_face to remesh_split_merge')
+            call mesa_error(__FILE__,__LINE__,'split/merge AMR does not support RSP2')
          end if
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
@@ -326,6 +326,7 @@
 
       subroutine biggest_smallest( &
             s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
+         use star_utils, only: eval_hydro_csound
          type (star_info), pointer :: s
          real(dp), intent(in) :: tau_center
          real(dp), intent(out) :: TooBig, TooSmall
@@ -381,6 +382,19 @@
 
          metric_logR_weight = max(0d0, s% split_merge_amr_metric_logR_weight)
          metric_logtau_weight = max(0d0, s% split_merge_amr_metric_logtau_weight)
+         ! A logarithmic coordinate requires positive optical-depth boundaries.
+         if (metric_logtau_weight > 0d0) then
+            if (tau_center <= 0d0 .or. is_bad(tau_center)) then
+               metric_logtau_weight = 0d0
+            else
+               do k = 1, nz
+                  if (s% tau(k) <= 0d0 .or. is_bad(s% tau(k))) then
+                     metric_logtau_weight = 0d0
+                     exit
+                  end if
+               end do
+            end if
+         end if
          metric_weight_sum = metric_logR_weight + metric_logtau_weight
          metric_zoning = s% split_merge_amr_use_metric_zoning_for_u_flag .and. &
             s% u_flag .and. metric_weight_sum > 0d0
@@ -689,12 +703,12 @@
 
             if (du_div_cs_limit_flag .and. associated(v)) then
                if (k == 1) then
-                  abs_du_div_cs = abs(v(k) - v(k+1))/s% csound(k)
+                  abs_du_div_cs = abs(v(k) - v(k+1))/eval_hydro_csound(s,k)
                else if (k == nz) then
-                  abs_du_div_cs = abs(v(nz-1) - v(nz))/s% csound(nz)
+                  abs_du_div_cs = abs(v(nz-1) - v(nz))/eval_hydro_csound(s,nz)
                else
                   abs_du_div_cs = max(abs(v(k) - v(k+1)), &
-                            abs(v(k) - v(k-1)))/s% csound(k)
+                            abs(v(k) - v(k-1)))/eval_hydro_csound(s,k)
                end if
             else
                abs_du_div_cs = 0d0
@@ -1224,9 +1238,9 @@
          min_stencil_energy = min(energy_R, energy_C, energy_L)
          max_stencil_energy = max(energy_R, energy_C, energy_L)
 
-         pressure_R = s% Peos(iR)
-         pressure_C = s% Peos(iC)
-         pressure_L = s% Peos(iL)
+         pressure_R = s% Peos(iR) + get_split_mlt_Pturb(s, iR, s% lnT(iR))
+         pressure_C = s% Peos(iC) + get_split_mlt_Pturb(s, iC, s% lnT(iC))
+         pressure_L = s% Peos(iL) + get_split_mlt_Pturb(s, iL, s% lnT(iL))
          min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
          max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
          min_stencil_lnT = min(s% lnT(iR), s% lnT(iC), s% lnT(iL))
@@ -1768,6 +1782,9 @@
                ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
             if (eos_ierr /= 0) return
 
+            P_outer = P_outer + get_split_mlt_Pturb(s, i, lnT_out)
+            P_inner = P_inner + get_split_mlt_Pturb(s, ip, lnT_in)
+
             mismatch = P_inner - P_outer - pressure_difference_target
             valid = .not. is_bad(mismatch + P_outer + P_inner + lnT_out + lnT_in)
          end subroutine eval_pair
@@ -1807,6 +1824,33 @@
          end function brackets_root
 
       end subroutine reconstruct_split_pressure
+
+
+      real(dp) function get_split_mlt_Pturb(s, k, lnT) result(Pturb)
+         use star_utils, only: get_face_weights
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: lnT
+         real(dp) :: alfa, beta, rho_00, rho_m1, rho_face, theta
+
+         Pturb = 0d0
+         if (s% mlt_Pturb_factor <= 0d0 .or. k <= 1) return
+
+         rho_00 = s% dm(k)/get_dV(s,k)
+         rho_m1 = s% dm(k-1)/get_dV(s,k-1)
+         call get_face_weights(s, k, alfa, beta)
+         rho_face = alfa*rho_00 + beta*rho_m1
+
+         if (s% using_velocity_time_centering .and. &
+               s% include_P_in_velocity_time_centering .and. &
+               lnT/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+            theta = s% P_theta_for_velocity_time_centering
+            rho_face = theta*rho_face + (1d0 - theta)*0.5d0*(rho_00 + rho_m1)
+         end if
+
+         ! This remapped face velocity becomes mlt_vc_old for the next solve.
+         Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc(k))*rho_face/3d0
+      end function get_split_mlt_Pturb
 
 
       subroutine update_xh_eos_and_kap(s,i,species,new_xa,ierr)

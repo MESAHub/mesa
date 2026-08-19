@@ -227,7 +227,7 @@ contains
 
       type(auto_diff_real_star_order1) :: &
          Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, beta
-      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
+      real(dp) :: conv_vel_start, hydro_csound_face, scale, max_conv_vel, Y_face_guess
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -299,10 +299,15 @@ contains
       if (k > 0) then
          if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
             if (s% use_face_reconstruction) then
-               max_conv_vel = s% reconstructed_csound_face(k)*s% max_conv_vel_div_csound
+               hydro_csound_face = s% reconstructed_csound_face(k)
             else
-               max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
+               hydro_csound_face = s% csound_face(k)
             end if
+            if (s% use_trapped_radiation_inertia .and. (s% u_flag .or. s% v_flag)) then
+               hydro_csound_face = hydro_csound_face/ &
+                  sqrt(radiation_inertia_factor(s, T%val, rho%val))
+            end if
+            max_conv_vel = hydro_csound_face*s% max_conv_vel_div_csound
          else
             max_conv_vel = 1d99
          end if

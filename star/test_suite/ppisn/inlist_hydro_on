@@ -11,6 +11,7 @@
    use_dPrad_dm_form_of_T_gradient_eqn = .true.
    use_momentum_outer_BC = .true.
    floor_momentum_outer_BC_at_Prad = .true.
+   use_trapped_radiation_inertia = .false.
 
    use_split_merge_amr = .true.
 

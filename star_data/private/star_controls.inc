@@ -847,6 +847,7 @@
             use_dPrad_dm_form_of_T_gradient_eqn, &
             use_flux_limiting_with_dPrad_dm_form, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
+            constant_L, &
             no_dedt_form_during_relax, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
@@ -875,6 +876,7 @@
          logical :: retry_for_v_above_clight
 
          logical :: include_composition_in_eps_grav
+         logical :: use_trapped_radiation_inertia
          real(dp) :: velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, &
             velocity_tau_lower_bound, velocity_q_upper_bound
          real(dp) :: Gamma_lnS_eps_grav_full_on, Gamma_lnS_eps_grav_full_off

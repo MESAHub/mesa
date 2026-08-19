@@ -183,7 +183,7 @@
                vel => s% v
             end if
             do i=k-1,1,-1
-               cs = s% csound(i)
+               cs = eval_hydro_csound(s,i)
                if (vel(i+1) >= cs .and. vel(i) < cs) then
                   call set_no_mixing('below_shock')
                   return
@@ -191,7 +191,9 @@
             end do
          end if
 
-         if (s% csound_start(k) > 0d0 .and. (s% u_flag .or. s% v_flag)) then
+         cs = s% csound_start(k)
+         if (s% u_flag .or. s% v_flag) cs = eval_hydro_csound_start(s,k)
+         if (cs > 0d0 .and. (s% u_flag .or. s% v_flag)) then
             no_mix = .false.
             if (s% u_flag) then
                vel => s% u_start
@@ -204,14 +206,14 @@
             else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
                no_mix = .true.
             else if ((abs(vel(k))) >= &
-                  s% csound_start(k)*s% max_v_div_cs_for_convection) then
+                  cs*s% max_v_div_cs_for_convection) then
                no_mix = .true.
             else if (s% u_flag) then
                if (k == 1) then
                   abs_du_div_cs = 1d99
                else if (k < nz) then
                   abs_du_div_cs = max(abs(vel(k) - vel(k+1)), &
-                      abs(vel(k) - vel(k-1))) / s% csound_start(k)
+                      abs(vel(k) - vel(k-1))) / cs
                end if
                if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
                   no_mix = .true.

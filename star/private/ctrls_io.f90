@@ -363,7 +363,7 @@
     max_abs_rel_change_surf_lnS, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_flux_limiting_with_dPrad_dm_form, &
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, dedt_eqn_r_scale, &
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, constant_L, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
@@ -375,6 +375,7 @@
     hydro_matrix_solver, &
     remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
+    use_trapped_radiation_inertia, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     report_max_infall_inside_fe_core, retry_for_v_above_clight, &
@@ -1879,6 +1880,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_dPrad_dm_form_of_T_gradient_eqn = use_dPrad_dm_form_of_T_gradient_eqn
  s% use_flux_limiting_with_dPrad_dm_form = use_flux_limiting_with_dPrad_dm_form
  s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+ s% constant_L = constant_L
  s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
  s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
@@ -1916,6 +1918,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
  s% velocity_tau_lower_bound = velocity_tau_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
+ s% use_trapped_radiation_inertia = use_trapped_radiation_inertia
  s% report_max_infall_inside_fe_core = report_max_infall_inside_fe_core
  s% retry_for_v_above_clight = retry_for_v_above_clight
 
@@ -3607,6 +3610,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  use_dPrad_dm_form_of_T_gradient_eqn = s% use_dPrad_dm_form_of_T_gradient_eqn
  use_flux_limiting_with_dPrad_dm_form = s% use_flux_limiting_with_dPrad_dm_form
  use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+ constant_L = s% constant_L
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
@@ -3643,6 +3647,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
  velocity_tau_lower_bound = s% velocity_tau_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
+ use_trapped_radiation_inertia = s% use_trapped_radiation_inertia
  report_max_infall_inside_fe_core = s% report_max_infall_inside_fe_core
  retry_for_v_above_clight = s% retry_for_v_above_clight
 

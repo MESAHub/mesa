@@ -71,7 +71,7 @@
       split_merge_amr_log_zoning = .false.
       split_merge_amr_nz_baseline = 2000
       split_merge_amr_MaxLong = 1.1d0
-      split_merge_amr_MaxShort = 1.1d0
+      split_merge_amr_MaxShort = 2.5d0
       split_merge_amr_max_iters = 50
       !trace_split_merge_amr = .true.
 

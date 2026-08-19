@@ -33,6 +33,7 @@
       public :: do1_alt_dlnT_dm_eqn
       public :: do1_gradT_eqn
       public :: do1_dlnT_dm_eqn
+      public :: do1_constant_L_eqn
 
       contains
 
@@ -266,6 +267,11 @@
          i_equL = s% i_equL
          if (i_equL == 0) return
 
+         if (s% constant_L) then
+            call do1_constant_L_eqn(s, k, nvar, ierr)
+            return
+         end if
+
          if (k ==1 .and. s% use_RSP_L_eqn_outer_BC) then
             call set_RSP_Lsurf_BC(s, nvar, ierr)
             return
@@ -325,6 +331,24 @@
             s, k, nvar, i_equL, resid, 'do1_dlnT_dm_eqn', ierr)
 
       end subroutine do1_dlnT_dm_eqn
+
+
+      subroutine do1_constant_L_eqn(s, k, nvar, ierr)
+         use star_utils, only: save_eqn_residual_info
+         type(star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: resid
+         real(dp) :: scale
+
+         ierr = 0
+         scale = max(1d0, abs(s% L_center), abs(s% L_start(k)))
+         if (k < s% nz) scale = max(scale, abs(s% L_start(k + 1)))
+         resid = (wrap_L_00(s, k) - wrap_L_p1(s, k))/scale
+         s% equ(s% i_equL, k) = resid%val
+         call save_eqn_residual_info( &
+            s, k, nvar, s% i_equL, resid, 'do1_constant_L_eqn', ierr)
+      end subroutine do1_constant_L_eqn
 
 
 

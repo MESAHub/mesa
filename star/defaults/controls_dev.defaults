@@ -399,6 +399,8 @@
       ! ``u_flag`` split to preserve the limited pre-split pressure gradient.
       ! The correction preserves total child internal energy and falls back to
       ! the standard conservative split when no bounded EOS solution exists.
+      ! The pressure target includes MLT turbulent pressure. Split/merge AMR
+      ! does not currently support RSP2.
 
       ! ::
 

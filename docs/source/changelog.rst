@@ -39,10 +39,46 @@ GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since t
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
+Added the optional ``use_trapped_radiation_inertia`` control for ``u_flag``
+and ``v_flag`` hydrodynamics. It includes the leading inertia of equilibrium
+radiation advected with the gas through
+``1 + 4*Prad/(rho*c^2)`` in the primitive acceleration equation. The HLLC
+states, hydro characteristic speeds, TDC and RTI velocity scales, timestep
+limits, and shock diagnostics use the corresponding effective acoustic
+inertia while the stored EOS sound speed remains unchanged. TDC uses the
+corrected speed only when its existing convective-velocity limit is enabled.
+This is a tightly-coupled, low-velocity correction and does not evolve
+independent radiation momentum.
+
+Restored the default-off ``constant_L`` control for idealized hydrodynamic
+tests. It replaces the temperature-gradient equation with
+``L(k) = L(k+1)``, using ``L_center`` at the innermost boundary, and applies
+the same relation at the surface instead of a temperature boundary condition.
+The surface-luminosity timestep limit is disabled because luminosity is
+prescribed by this equation. The momentum boundary condition remains
+independently selectable. Explicit momentum boundaries do not evaluate unused
+atmospheric pressure-temperature data.
+
+The optional pressure-child reconstruction for cell-centered split/merge AMR
+now includes MLT turbulent pressure in its bounded pressure target. The
+conservative energy transfer continues to modify only the EOS pressure; the
+turbulent contribution is evaluated from its remapped face state. Split/merge
+AMR does not currently support RSP2.
+
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
+Fixed the post-hydrodynamic convergence check to honor
+``hydro_mtx_min_allowed_logT``. Previously it imposed a separate hard-coded
+``logT = 1`` floor after the Newton solve, so lowering the documented matrix
+limit could not permit colder models.
+
+Fixed the luminosity correction weight when the luminosity is zero or inward.
+Its scale now has a 1 erg/s floor and uses the magnitude of the starting
+surface luminosity, preventing division by zero and cancellation between
+oppositely signed luminosities.
 
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
 
@@ -85,6 +121,19 @@ hydrodynamics. The total-energy equation now includes the matching midpoint
 mechanical work and interface dissipation. This preserves total energy while
 preventing RTI acceleration from drawing energy from an individual cell's
 internal energy.
+
+Fixed nonpositive surface optical depths after removing surface cells from a
+dynamic model. Surface removal now retains the existing optical depth when
+the hydrostatic pressure estimate is nonphysical. Split/merge metric zoning
+also disables its logarithmic optical-depth component when the optical-depth
+coordinate is not positive, preventing invalid logarithms from driving
+unbounded mesh refinement.
+
+Fixed the photospheric luminosity when the photosphere lies inside the model.
+The luminosity interpolated at the photospheric optical depth is no longer
+replaced by the surface luminosity. ``photosphere_L`` and ``Teff`` therefore
+use the same photospheric radius and luminosity, while ``log_L`` continues to
+report the surface luminosity.
 
 Fixed the radiative-luminosity split in the ``dPrad/dm`` temperature gradient
 equation when an actively convective face has negative ``gradr``.

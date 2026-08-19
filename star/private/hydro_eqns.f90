@@ -21,7 +21,7 @@
 
       use star_private_def
       use const_def, only: dp, pi, ln10, two_thirds, crad
-      use star_utils, only: em1, e00, ep1
+      use star_utils, only: em1, e00, ep1, eval_hydro_csound_start
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -723,6 +723,7 @@
 
          use star_utils, only: save_eqn_residual_info
          use eos_lib, only: Radiation_Pressure
+         use hydro_temperature, only: do1_constant_L_eqn
 
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
@@ -772,7 +773,7 @@
 
          need_T_surf = .false.
          if ((.not. do_equL) .or. &
-               (s% RSP2_flag) .or. (s% use_RSP_L_eqn_outer_BC)) then
+               s% constant_L .or. (s% RSP2_flag) .or. (s% use_RSP_L_eqn_outer_BC)) then
             ! no Tsurf BC
          else
             need_T_surf = .true.
@@ -785,8 +786,11 @@
          if (s% use_other_surface_PT .or. s% RSP2_flag .or. s% use_RSP_L_eqn_outer_BC) &
             offset_T_to_cell_center = .false.
 
-         call get_PT_bc_ad(ierr)
-         if (ierr /= 0) return
+         ! Constant-L tests with an explicit momentum BC need no atmospheric P-T data.
+         if (.not. s% constant_L .or. need_P_surf) then
+            call get_PT_bc_ad(ierr)
+            if (ierr /= 0) return
+         end if
 
          if (need_P_surf) then
             if (s% use_momentum_outer_BC) then
@@ -805,7 +809,10 @@
             if (ierr /= 0) return
          end if
 
-         if (need_T_surf) then
+         if (do_equL .and. s% constant_L) then
+            call do1_constant_L_eqn(s, 1, nvar, ierr)
+            if (ierr /= 0) return
+         else if (need_T_surf) then
             call set_Tsurf_BC(ierr)
             if (ierr /= 0) return
          end if
@@ -1122,7 +1129,7 @@
                write(*,*) 'set_fixed_vsurf_outer_BC requires u_flag or v_flag true'
                return
             end if
-            resid_ad = (vsurf - s% fixed_vsurf)/s% csound_start(1)
+            resid_ad = (vsurf - s% fixed_vsurf)/eval_hydro_csound_start(s,1)
             s% equ(i_P_eqn,1) = resid_ad%val
             call save_eqn_residual_info( &
                s, 1, nvar, i_P_eqn, resid_ad, 'set_fixed_vsurf_outer_BC', ierr)

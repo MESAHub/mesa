@@ -409,7 +409,7 @@
 
                if (s% report_max_infall_inside_fe_core) then  ! report peak infall velocity inside fe_core (not necessarily the maximum, since infall tends to start outside in)
                   if (mass_sum > s% fe_core_infall_mass*msun) then ! prevents toggling when k == nz
-                     s% fe_core_infall = - minval(s%v(k_fe:nz))
+                     s% fe_core_infall = -minval(velocity(k_fe:nz))
                   end if
                else !(default in r24.03.1 prior) report max infall velocity anywhere
                   if(mass_sum > s% fe_core_infall_mass*msun) then
