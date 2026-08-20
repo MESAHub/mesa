@@ -33,12 +33,6 @@
          character(*), intent(IN) :: eosDT_cache_dir_in
          logical, intent(in) :: use_cache
          integer, intent(OUT) :: ierr  ! 0 means AOK.
-         !integer, parameter :: imax = 261, jmax = 101
-            ! dimensions of small version of helm table
-         !integer, parameter :: imax = 1081, jmax = 401
-            ! dimensions of medium version of helm table; 40 points per decade
-         integer, parameter :: imax = 2701, jmax = 1001
-            ! dimensions of large version of helm table; 100 points per decade
          ! helm table lives in eosDT_data
          character (len=256) :: eosDT_data_dir
          ierr = 0
@@ -58,11 +52,7 @@
             if(use_mesa_temp_cache) call mkdir(eosDT_temp_cache_dir)
          end if
 
-         call alloc_helm_table(eos_ht, imax, jmax, ierr)
-         if (ierr /= 0) return
-
-         call read_helm_table(eos_ht, &
-            eosDT_data_dir, eosDT_cache_dir, eosDT_temp_cache_dir, use_cache_for_eos, ierr)
+         call read_helm_table(eos_ht, eosDT_data_dir, ierr)
          if (ierr /= 0) return
 
          call eos_def_init

@@ -23,7 +23,6 @@ module helm_opal_scvh_driver
    implicit none
 
    character(len=256) :: data_dir
-   integer, parameter :: imax = 261, jmax = 101  ! dimensions of our version of helm table
 
 contains
 
@@ -62,13 +61,7 @@ contains
       call eos_def_init
 
       ierr = 0
-      call alloc_helm_table(eos_ht, imax, jmax, ierr)
-      if (ierr /= 0) then
-         write (*, *) 'alloc helm table failed'
-         stop 1
-      end if
-
-      call read_helm_table(eos_ht, data_dir, cache_dir, temp_cache_dir, use_cache, ierr) ! initialize helm
+      call read_helm_table(eos_ht, data_dir, ierr) ! initialize helm
       if (ierr /= 0) then
          write (*, *) 'read helm table failed'
          stop 1
