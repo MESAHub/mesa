@@ -987,6 +987,7 @@
          logical :: ignore_min_corr_coeff_for_scale_max_correction
          logical :: ignore_too_large_correction
          logical :: ignore_species_in_max_correction
+         logical :: solver_use_T_reference
          real(dp) :: corr_norm_jump_limit
          real(dp) :: max_corr_jump_limit
          real(dp) :: resid_norm_jump_limit

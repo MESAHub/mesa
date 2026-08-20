@@ -350,6 +350,7 @@
          end if
 
          do k=1,s% nz
+            s% solver_T_reference(k) = s% T(k)
             do j=1,s% nvar_hydro
                s% xh_start(j,k) = s% xh(j,k)
             end do

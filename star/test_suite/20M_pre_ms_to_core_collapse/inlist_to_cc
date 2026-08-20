@@ -21,9 +21,6 @@
 
 &controls
 
-! to avoid a host of retries we relax our limits on split_burn
-! for speed/stability in test_suite, at reduced time resolution.
-op_split_burn_min_T = 1d9
 
 ! prevent development of radial pulses during advanced burning
       !drag_coefficient = 1d0
@@ -56,11 +53,7 @@ ignore_too_large_correction = .true. ! for conv_vel's
 ! mixing
 
 ! timesteps
-      limit_for_rel_error_in_energy_conservation = 1d-3
-      hard_limit_for_rel_error_in_energy_conservation = 1d-2
-
       delta_XSi_cntr_limit = 0.0025
-
 
 ! mesh
 
