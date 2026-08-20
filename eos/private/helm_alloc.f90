@@ -89,31 +89,38 @@
       end subroutine alloc_helm_table
 
 
-      subroutine read_helm_table(h, data_dir, ierr)
-      use eos_def
-      use forum_m, only: hdf5io_t, OPEN_FILE_RO
-      use utils_lib, only: mv, switch_str
-
-
-      type (Helm_Table), intent(inout) :: h
-      character(*), intent(IN) :: data_dir
-      integer, intent(out) :: ierr
 
 !..this routine reads the helmholtz eos file, and
 !..must be called once before the helmeos routine is invoked.
+      subroutine read_helm_table(h, data_dir, ierr)
+      use eos_def
+      use forum_m, only: hdf5io_t, OPEN_FILE_RO
+      use hdf5, only: HSIZE_T
+      use utils_lib, only: mv, switch_str
 
-!..declare local variables
+      type (Helm_Table), allocatable, intent(out) :: h
+      character(*), intent(IN) :: data_dir
+      integer, intent(out) :: ierr
+
       character (len=256) :: filename
-      integer          :: i
+      integer :: i
+      integer(HSIZE_T), dimension(:), allocatable :: table_shape
       type(hdf5io_t) :: hi
 
        ierr = 0
 
-!..read the normal helmholtz free energy table
-       h% logtlo   = 3.0d0
-       h% logthi   = 13.0d0
-       h% logdlo   = -12.0d0
-       h% logdhi   = 15.0d0
+       write(filename,'(2a)') trim(data_dir), '/helm-table.hdf5'
+
+       hi = hdf5io_t(filename, OPEN_FILE_RO)
+
+       table_shape = hi% dset_shape("f")
+
+       call alloc_helm_table(h, int(table_shape(1)), int(table_shape(2)))
+
+       call hi% read_attr("logT_low", h% logtlo)
+       call hi% read_attr("logT_high", h% logthi)
+       call hi% read_attr("logRho_low", h% logdlo)
+       call hi% read_attr("logRho_high", h% logdhi)
 
        h% templo = exp10(h% logtlo)
        h% temphi = exp10(h% logthi)
@@ -124,10 +131,6 @@
        h% logtstpi = 1.0d0/h% logtstp
        h% logdstp  = (h% logdhi - h% logdlo)/real(h% imax-1,kind=dp)
        h% logdstpi = 1.0d0/h% logdstp
-
-       write(filename,'(2a)') trim(data_dir), '/helm-table.hdf5'
-
-       hi = hdf5io_t(filename, OPEN_FILE_RO)
 
        call hi% read_dset('f', h% f)
        call hi% read_dset('fd', h% fd)

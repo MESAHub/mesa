@@ -38,7 +38,7 @@ SRCS_CHECK = test/src/test_eos.f90 \
              test/src/test_eos_blend.f90 \
              test/src/test_eos_support.f90
 INTERNAL_DEPENDS_ON := const math utils chem num auto_diff interp_1d interp_2d forum
-EXTERNAL_DEPENDS_ON :=
+EXTERNAL_DEPENDS_ON := hdf5
 BINTYPE := lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
 
