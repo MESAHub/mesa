@@ -289,8 +289,12 @@ contains
             m_div_h = min_m_div_h
          end if
 
-         call data_for_colors_history_columns(s%T(1), log10(s%grav(1)), s%R(1), m_div_h, &
-            s% model_number, s% colors_handle, num_colors_cols, colors_col_names, colors_col_vals, ierr)
+
+
+         call data_for_colors_history_columns(s% Teff, s% photosphere_logg, s% photosphere_r * Rsun, &
+            m_div_h, s% model_number, s% colors_handle, &
+            num_colors_cols, colors_col_names, colors_col_vals, ierr)
+         
          if (ierr /= 0) then
             call dealloc
             return

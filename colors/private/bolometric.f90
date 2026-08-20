@@ -32,6 +32,17 @@ module bolometric
    private
    public :: calculate_bolometric, calculate_bolometric_phot
 
+
+
+   ! IAU 2015 Resolution B2 zero-point for the bolometric magnitude scale:
+   ! the irradiance corresponding to M_bol = 0. Defined so that a source with
+   ! L = L_sun observed from 10 pc has M_bol = 4.74. This is a fixed constant
+   ! and is unrelated to the Vega/AB/ST conventions in synthetic.f90, which
+   ! apply to bandpass magnitudes only.
+   real(dp), parameter :: f_bol_zero_point = 2.518d-5   ! erg s^-1 cm^-2
+
+
+
 contains
 
    ! rq carries cached lookup table data and the preloaded flux cube (if available)
@@ -109,11 +120,15 @@ contains
 
    real(dp) function flux_to_magnitude(flux)
       real(dp), intent(in) :: flux
+      logical, save :: warned = .false.
       if (flux <= 0.0d0) then
-         print *, "Error: Flux must be positive to calculate magnitude."
+         if (.not. warned) then
+            print *, "colors: non-positive bolometric flux; Mag_bol set to 99"
+            warned = .true.
+         end if
          flux_to_magnitude = 99.0d0
       else
-         flux_to_magnitude = -2.5d0*log10(flux)
+         flux_to_magnitude = -2.5d0*log10(flux/f_bol_zero_point)
       end if
    end function flux_to_magnitude
 
