@@ -3,7 +3,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group1  system=Vega  grid=Kurucz2003  filters=Johnson
 
 # case: solar
-                                 Mag_bol    1.6233783742415E+01
+                                 Mag_bol    4.7364230568448E+00
                                 Flux_bol    3.2098630468165E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4328315088495E+00
@@ -14,7 +14,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.5342928137757E+00
                                        V    4.7769811346940E+00
 # case: hot_ms
-                                 Mag_bol    8.5957683261478E+00
+                                 Mag_bol   -2.9015923594226E+00
                                 Flux_bol    3.6449591844963E-04
                               Interp_rad    0.0000000000000E+00
                                        B   -1.8453872060965E+00
@@ -25,7 +25,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U   -2.5493640964120E+00
                                        V   -1.7077286035359E+00
 # case: cool_giant
-                                 Mag_bol    1.1326046768001E+01
+                                 Mag_bol   -1.7131391756963E-01
                                 Flux_bol    2.9483653105575E-05
                               Interp_rad    0.0000000000000E+00
                                        B    2.1835469363630E+00
@@ -39,7 +39,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group2a  vary_MH  Teff=5778  logg=4.44
 
 # MH=  -2.00
-                                 Mag_bol    1.6233121880603E+01
+                                 Mag_bol    4.7357611950321E+00
                                 Flux_bol    3.2118203670543E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4155699684922E+00
@@ -50,7 +50,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.1227256937938E+00
                                        V    4.8915514395591E+00
 # MH=  -1.00
-                                 Mag_bol    1.6234071206333E+01
+                                 Mag_bol    4.7367105207629E+00
                                 Flux_bol    3.2090133029621E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4129001639500E+00
@@ -61,7 +61,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.2577215874254E+00
                                        V    4.8394911534358E+00
 # MH=   0.00
-                                 Mag_bol    1.6233783742415E+01
+                                 Mag_bol    4.7364230568448E+00
                                 Flux_bol    3.2098630468165E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4328315088495E+00
@@ -72,7 +72,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.5342928137757E+00
                                        V    4.7769811346940E+00
 # MH=   0.50
-                                 Mag_bol    1.6234073995658E+01
+                                 Mag_bol    4.7367133100871E+00
                                 Flux_bol    3.2090050588168E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4709583044458E+00
@@ -86,7 +86,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group2b  vary_logg  Teff=5778  MH=0.0
 
 # logg=   1.00
-                                 Mag_bol    1.6233777481775E+01
+                                 Mag_bol    4.7364167962049E+00
                                 Flux_bol    3.2098815557824E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.3645167572931E+00
@@ -97,7 +97,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.8874283229464E+00
                                        V    4.7180779330260E+00
 # logg=   2.50
-                                 Mag_bol    1.6233688922092E+01
+                                 Mag_bol    4.7363282365221E+00
                                 Flux_bol    3.2101433852074E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.3921064688310E+00
@@ -108,7 +108,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.6695916672821E+00
                                        V    4.7516224781321E+00
 # logg=   4.00
-                                 Mag_bol    1.6233750920162E+01
+                                 Mag_bol    4.7363902345917E+00
                                 Flux_bol    3.2099600837665E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.4245311240969E+00
@@ -119,7 +119,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.5460781049756E+00
                                        V    4.7740932524300E+00
 # logg=   5.00
-                                 Mag_bol    1.6233837927675E+01
+                                 Mag_bol    4.7364772421050E+00
                                 Flux_bol    3.2097028578831E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.4419095524136E+00
@@ -133,7 +133,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group2c  vary_Teff  logg=4.0  MH=0.0
 
 # Teff=     3500.0
-                                 Mag_bol    1.8411335119795E+01
+                                 Mag_bol    6.9139744342241E+00
                                 Flux_bol    4.3198229964375E-08
                               Interp_rad    0.0000000000000E+00
                                        B    1.0036329716496E+01
@@ -144,7 +144,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    1.1095018314829E+01
                                        V    8.8377137013872E+00
 # Teff=     6000.0
-                                 Mag_bol    1.6069995716096E+01
+                                 Mag_bol    4.5726350305252E+00
                                 Flux_bol    3.7325163050257E-07
                               Interp_rad    0.0000000000000E+00
                                        B    5.1670419609711E+00
@@ -155,7 +155,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.2180945995774E+00
                                        V    4.5848107914209E+00
 # Teff=    10000.0
-                                 Mag_bol    1.3851150550189E+01
+                                 Mag_bol    2.3537898646187E+00
                                 Flux_bol    2.8809769255562E-06
                               Interp_rad    0.0000000000000E+00
                                        B    2.5700839979881E+00
@@ -166,7 +166,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    2.4829162763772E+00
                                        V    2.6004126821216E+00
 # Teff=    20000.0
-                                 Mag_bol    1.0839332915758E+01
+                                 Mag_bol   -6.5802776981201E-01
                                 Flux_bol    4.6160109853289E-05
                               Interp_rad    0.0000000000000E+00
                                        B    1.0828563761601E+00
