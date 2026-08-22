@@ -37,11 +37,6 @@
       public :: foreach_cell
       public :: write_eos_call_info
       public :: eval_csound
-      public :: radiation_inertia_factor
-      public :: radiation_inertia_factor_ad
-      public :: radiation_inertia_factor_v_face_ad
-      public :: eval_hydro_csound
-      public :: eval_hydro_csound_start
       public :: eval_current_abundance
       public :: eval_current_z
       public :: eval_ledd
@@ -388,67 +383,6 @@
          end if
          cs = sqrt(cs2)
       end function eval_csound
-
-
-      real(dp) function radiation_inertia_factor(s, T, rho) result(factor)
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: T, rho
-         factor = 1d0
-         if (.not. s% use_trapped_radiation_inertia) return
-         factor = factor + 4d0*crad*pow4(T)/(3d0*rho*pow2(clight))
-      end function radiation_inertia_factor
-
-
-      function radiation_inertia_factor_ad(s, T, rho) result(factor)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1), intent(in) :: T, rho
-         type(auto_diff_real_star_order1) :: factor
-         factor = 1d0
-         if (.not. s% use_trapped_radiation_inertia) return
-         factor = factor + 4d0*crad*pow4(T)/(3d0*rho*pow2(clight))
-      end function radiation_inertia_factor_ad
-
-
-      function radiation_inertia_factor_v_face_ad(s, k) result(factor)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: factor, factor_00, factor_m1
-         real(dp) :: dm_00, dm_m1
-
-         factor_00 = radiation_inertia_factor_ad(s, wrap_T_00(s,k), wrap_d_00(s,k))
-         if (k == 1) then
-            factor = factor_00
-            return
-         end if
-
-         factor_m1 = radiation_inertia_factor_ad(s, wrap_T_m1(s,k), wrap_d_m1(s,k))
-         dm_00 = s% dm(k)
-         dm_m1 = s% dm(k-1)
-         if (s% use_mass_corrections) then
-            dm_00 = dm_00*s% mass_correction(k)
-            dm_m1 = dm_m1*s% mass_correction(k-1)
-         end if
-         factor = (dm_00*factor_00 + dm_m1*factor_m1)/(dm_00 + dm_m1)
-      end function radiation_inertia_factor_v_face_ad
-
-
-      real(dp) function eval_hydro_csound(s, k) result(cs)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         cs = s% csound(k)
-         if (.not. (s% u_flag .or. s% v_flag)) return
-         cs = s% csound(k)/sqrt(radiation_inertia_factor(s, s% T(k), s% rho(k)))
-      end function eval_hydro_csound
-
-
-      real(dp) function eval_hydro_csound_start(s, k) result(cs)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         cs = s% csound_start(k)
-         if (.not. (s% u_flag .or. s% v_flag)) return
-         cs = s% csound_start(k)/ &
-            sqrt(radiation_inertia_factor(s, s% T_start(k), s% rho_start(k)))
-      end function eval_hydro_csound_start
 
 
       subroutine set_m_grav_and_grav(s)  ! using mass_corrections
@@ -1335,7 +1269,7 @@
       subroutine set_abs_du_div_cs(s)
          type (star_info), pointer :: s
 
-         integer :: i, j, k, nz
+         integer :: k, nz, j
          real(dp) :: abs_du, cs
          include 'formats'
          nz = s% nz
@@ -1343,10 +1277,7 @@
          if (s% v_flag) then
             do k=2,nz
                abs_du = abs(s% v_start(k) - s% v_start(k-1))
-               cs = 0d0
-               do i = max(1,k-5), min(nz,k+5)
-                  cs = max(cs, eval_hydro_csound(s,i))
-               end do
+               cs = maxval(s% csound(max(1,k-5):min(nz,k+5)))
                s% abs_du_plus_cs(k) = abs_du + cs
                s% abs_du_div_cs(k) = abs_du/cs
             end do
@@ -1363,23 +1294,20 @@
                abs_du = &
                   max(abs(s% u_start(k) - s% u_start(k+1)), &
                       abs(s% u_start(k) - s% u_start(k-1)))
-               cs = 0d0
-               do i = max(1,k-5), min(nz,k+5)
-                  cs = max(cs, eval_hydro_csound(s,i))
-               end do
+               cs = maxval(s% csound(max(1,k-5):min(nz,k+5)))
                s% abs_du_plus_cs(k) = abs_du + cs
                s% abs_du_div_cs(k) = abs_du/cs
             end do
             k = nz
             s% abs_du_plus_cs(k) = &
-               abs(s% u_start(k) - s% u_start(k-1)) + eval_hydro_csound_start(s,k)
+               abs(s% u_start(k) - s% u_start(k-1)) + s% csound_start(k)
             s% abs_du_div_cs(k) = &
-               abs(s% u_start(k) - s% u_start(k-1))/eval_hydro_csound_start(s,k)
+               abs(s% u_start(k) - s% u_start(k-1))/s% csound_start(k)
             k = 2
             s% abs_du_plus_cs(k) = &
-               abs(s% u_start(k) - s% u_start(k+1)) + eval_hydro_csound_start(s,k)
+               abs(s% u_start(k) - s% u_start(k+1)) + s% csound_start(k)
             s% abs_du_div_cs(k) = &
-               abs(s% u_start(k) - s% u_start(k+1))/eval_hydro_csound_start(s,k)
+               abs(s% u_start(k) - s% u_start(k+1))/s% csound_start(k)
             k = 1
             s% abs_du_plus_cs(k) = s% abs_du_plus_cs(k+1)
             s% abs_du_div_cs(k) = s% abs_du_div_cs(k+1)
@@ -1429,14 +1357,14 @@
 
          nz = s% nz
          shock_radius = -1
-         v_div_cs_00 = v(1)/eval_hydro_csound(s,1)
+         v_div_cs_00 = v(1)/s% csound(1)
          do k = 2,nz-1
             v_div_cs_m1 = v_div_cs_00
-            v_div_cs_00 = v(k)/eval_hydro_csound(s,k)
+            v_div_cs_00 = v(k)/s% csound(k)
             v_div_cs_max = max(v_div_cs_00, v_div_cs_m1)
             v_div_cs_min = min(v_div_cs_00, v_div_cs_m1)
             if (v_div_cs_max >= 1d0 .and. v_div_cs_min < 1d0) then
-               if (v(k+1) > eval_hydro_csound(s,k+1)) then  ! skip single point glitches
+               if (v(k+1) > s% csound(k+1)) then  ! skip single point glitches
                   shock_radius = &
                      find0(s% r(k), v_div_cs_00-1d0, s% r(k-1), v_div_cs_m1-1d0)
                   if (shock_radius <= 0d0) then
@@ -1446,7 +1374,7 @@
                end if
             end if
             if (v_div_cs_min <= -1d0 .and. v_div_cs_max > -1d0) then
-               if (v(k+1) < -eval_hydro_csound(s,k+1)) then  ! skip single point glitches
+               if (v(k+1) < -s% csound(k+1)) then  ! skip single point glitches
                   shock_radius = &
                      find0(s% r(k), v_div_cs_00+1d0, s% r(k-1), v_div_cs_m1+1d0)
                   if (shock_radius <= 0d0) then
@@ -1547,7 +1475,7 @@
             shock_q = s% q(k)
             shock_velocity = v(k)
          end if
-         shock_csound = eval_hydro_csound(s,k)
+         shock_csound = s% csound(k)
          shock_lgT = s% lnT(k)/ln10
          shock_lgRho = s% lnd(k)/ln10
          shock_lgP = s% lnPeos(k)/ln10
@@ -1562,8 +1490,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: min_k
          integer :: k, nz, k_min
-         real(dp) :: cs, dr, dt, min_q, max_q, min_abs_u_div_cs, min_abs_du_div_cs, &
-            r00, rp1, dr_div_cs, remnant_mass
+         real(dp) :: dr, dt, min_q, max_q, min_abs_u_div_cs, min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
          include 'formats'
          nz = s% nz
          min_k = nz
@@ -1585,12 +1512,11 @@
                if (s% m(k) > remnant_mass) cycle
                if (s% q(k) > max_q) cycle
                if (s% q(k) < min_q) exit
-               cs = eval_hydro_csound(s,k)
-               if (abs(s% v_start(k))/cs < min_abs_u_div_cs) cycle
+               if (abs(s% v_start(k))/s% csound(k) < min_abs_u_div_cs) cycle
                if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
                r00 = s% r(k)
                rp1 = s% r(k+1)
-               dr_div_cs = (r00 - rp1)/cs
+               dr_div_cs = (r00 - rp1)/s% csound(k)
                if (dr_div_cs < min_dr_div_cs) then
                   min_dr_div_cs = dr_div_cs
                   min_k = k
@@ -1604,7 +1530,7 @@
             if (s% m(k) > remnant_mass) cycle
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
-            if (abs(s% u_start(k))/eval_hydro_csound(s,k) < min_abs_u_div_cs) cycle
+            if (abs(s% u_start(k))/s% csound(k) < min_abs_u_div_cs) cycle
             if (s% abs_du_div_cs(k) < min_abs_du_div_cs) cycle
             dr = s% r(k) - s% r(k+1)
             dt = dr/s% abs_du_plus_cs(k)
@@ -4100,12 +4026,13 @@
          type(auto_diff_real_star_order1) :: Lambda, Lambda0, radial_length
 
          Lambda0 = mixing_length_alpha*pressure_scale_height
-         if (s% weak_gravity_mixing_length_beta <= 0d0) then
+         if (s% harmonic_dissipation_length_beta <= 0d0) then
             Lambda = Lambda0
             return
          end if
 
-         radial_length = s% weak_gravity_mixing_length_beta*r
+         ! Wuchterl & Feuchtinger (1998), Eq. (17).
+         radial_length = s% harmonic_dissipation_length_beta*r
          if (Lambda0 <= 0d0 .or. radial_length <= 0d0) then
             Lambda = 0d0
          else if (Lambda0 <= radial_length) then

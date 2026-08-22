@@ -130,7 +130,7 @@
             grada_face_ad, opacity_face_ad, scale_height_ad, gradr_ad, ierr)
          if (ierr /= 0) return
 
-         if (s% weak_gravity_mixing_length_beta > 0d0) then
+         if (s% harmonic_dissipation_length_beta > 0d0) then
             call get_reconstructed_hse_scale_height_ad(s, k, hse_scale_height_ad, ierr)
             if (ierr /= 0) return
             mixing_length_ad = get_mlt_mixing_length( &
@@ -183,7 +183,7 @@
                vel => s% v
             end if
             do i=k-1,1,-1
-               cs = eval_hydro_csound(s,i)
+               cs = s% csound(i)
                if (vel(i+1) >= cs .and. vel(i) < cs) then
                   call set_no_mixing('below_shock')
                   return
@@ -191,9 +191,7 @@
             end do
          end if
 
-         cs = s% csound_start(k)
-         if (s% u_flag .or. s% v_flag) cs = eval_hydro_csound_start(s,k)
-         if (cs > 0d0 .and. (s% u_flag .or. s% v_flag)) then
+         if (s% csound_start(k) > 0d0 .and. (s% u_flag .or. s% v_flag)) then
             no_mix = .false.
             if (s% u_flag) then
                vel => s% u_start
@@ -206,14 +204,14 @@
             else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
                no_mix = .true.
             else if ((abs(vel(k))) >= &
-                  cs*s% max_v_div_cs_for_convection) then
+                  s% csound_start(k)*s% max_v_div_cs_for_convection) then
                no_mix = .true.
             else if (s% u_flag) then
                if (k == 1) then
                   abs_du_div_cs = 1d99
                else if (k < nz) then
                   abs_du_div_cs = max(abs(vel(k) - vel(k+1)), &
-                      abs(vel(k) - vel(k-1))) / cs
+                      abs(vel(k) - vel(k-1))) / s% csound_start(k)
                end if
                if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
                   no_mix = .true.
@@ -592,7 +590,7 @@
             top_r = s% r(k)
             top_Hp = s% scale_height(k)
             dr = top_r - bot_r
-            if (s% weak_gravity_mixing_length_beta > 0d0) then
+            if (s% harmonic_dissipation_length_beta > 0d0) then
                mixing_length = min(s% mlt_mixing_length(k), s% mlt_mixing_length(k_bot))
             else
                mixing_length = s% alpha_mlt(k)*min(top_Hp, bot_Hp)
@@ -622,10 +620,10 @@
             if (dr >= s% mlt_mixing_length(k)) return
             ! if convection zone is smaller than mixing length
             ! redo MLT with reduced alpha so mixing_length = dr
-            if (s% weak_gravity_mixing_length_beta > 0d0) then
+            if (s% harmonic_dissipation_length_beta > 0d0) then
                call get_reconstructed_hse_scale_height_ad(s, k, hse_scale_height, ierr)
                if (ierr /= 0) return
-               radial_length = s% weak_gravity_mixing_length_beta*s% r(k)
+               radial_length = s% harmonic_dissipation_length_beta*s% r(k)
                if (hse_scale_height%val <= 0d0 .or. radial_length <= dr) return
                mixing_length_alpha = dr*radial_length/(hse_scale_height%val*(radial_length - dr))
             else

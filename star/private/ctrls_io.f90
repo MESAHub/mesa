@@ -142,7 +142,7 @@
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, &
-    weak_gravity_mixing_length_beta, remove_small_D_limit, &
+    harmonic_dissipation_length_beta, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
     max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
@@ -375,7 +375,6 @@
     hydro_matrix_solver, &
     remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
-    use_trapped_radiation_inertia, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     report_max_infall_inside_fe_core, retry_for_v_above_clight, &
@@ -1084,7 +1083,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% thermohaline_coeff = thermohaline_coeff
  s% thermohaline_option = thermohaline_option
  s% mixing_length_alpha = mixing_length_alpha
- s% weak_gravity_mixing_length_beta = weak_gravity_mixing_length_beta
+ s% harmonic_dissipation_length_beta = harmonic_dissipation_length_beta
  s% remove_small_D_limit = remove_small_D_limit
  s% alt_scale_height_flag = alt_scale_height_flag
  s% Henyey_MLT_y_param = Henyey_MLT_y_param
@@ -1918,7 +1917,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
  s% velocity_tau_lower_bound = velocity_tau_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
- s% use_trapped_radiation_inertia = use_trapped_radiation_inertia
  s% report_max_infall_inside_fe_core = report_max_infall_inside_fe_core
  s% retry_for_v_above_clight = retry_for_v_above_clight
 
@@ -2823,7 +2821,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  thermohaline_coeff = s% thermohaline_coeff
  thermohaline_option = s% thermohaline_option
  mixing_length_alpha = s% mixing_length_alpha
- weak_gravity_mixing_length_beta = s% weak_gravity_mixing_length_beta
+ harmonic_dissipation_length_beta = s% harmonic_dissipation_length_beta
  remove_small_D_limit = s% remove_small_D_limit
  alt_scale_height_flag = s% alt_scale_height_flag
  Henyey_MLT_y_param = s% Henyey_MLT_y_param
@@ -3647,7 +3645,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
  velocity_tau_lower_bound = s% velocity_tau_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
- use_trapped_radiation_inertia = s% use_trapped_radiation_inertia
  report_max_infall_inside_fe_core = s% report_max_infall_inside_fe_core
  retry_for_v_above_clight = s% retry_for_v_above_clight
 

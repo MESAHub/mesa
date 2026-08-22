@@ -251,7 +251,7 @@
          real(dp) :: thermohaline_coeff
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
-         real(dp) :: mixing_length_alpha, weak_gravity_mixing_length_beta, remove_small_D_limit
+         real(dp) :: mixing_length_alpha, harmonic_dissipation_length_beta, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
          integer :: steps_before_use_TDC
@@ -876,7 +876,6 @@
          logical :: retry_for_v_above_clight
 
          logical :: include_composition_in_eps_grav
-         logical :: use_trapped_radiation_inertia
          real(dp) :: velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, &
             velocity_tau_lower_bound, velocity_q_upper_bound
          real(dp) :: Gamma_lnS_eps_grav_full_on, Gamma_lnS_eps_grav_full_off

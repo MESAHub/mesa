@@ -2153,19 +2153,31 @@
     mixing_length_alpha = 2
 
 
-      ! weak_gravity_mixing_length_beta
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! harmonic_dissipation_length_beta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If positive, limit the MLT and TDC mixing length using
-      ! ``1/Lambda = 1/(mixing_length_alpha*Hp) + 1/(beta*r)``,
-      ! where ``beta`` is ``weak_gravity_mixing_length_beta`` and ``Hp`` is
-      ! the usual ``P/(rho*g)`` pressure scale height. This option ignores
-      ! ``alt_scale_height_flag`` when constructing the MLT and TDC mixing
-      ! length. Non-positive values preserve the existing behavior.
+
+      ! .. math::
+
+      !    \frac{1}{\Lambda}
+      !    =
+      !    \frac{1}{\alpha_{\rm MLT} H_P}
+      !    +
+      !    \frac{1}{\mathtt{harmonic\_dissipation\_length\_beta}\,r}.
+
+      ! The control is the dimensionless :math:`\beta_r` in Eq. (17) of
+      ! `Wuchterl & Feuchtinger (1998)`_; :math:`\beta_r r` is the radial
+      ! limiting length. Here :math:`H_P=P/(\rho g)` is the usual pressure
+      ! scale height. This option ignores ``alt_scale_height_flag`` when
+      ! constructing the MLT and TDC mixing length. Non-positive values
+      ! preserve the existing behavior.
+
+      ! .. _Wuchterl & Feuchtinger (1998): https://ui.adsabs.harvard.edu/abs/1998A%26A...340..419W
 
       ! ::
 
-    weak_gravity_mixing_length_beta = 0d0
+    harmonic_dissipation_length_beta = 0d0
 
 
       ! remove_small_D_limit
@@ -2279,7 +2291,7 @@
 
       ! If false, then stick to the usual definition -- P/(g*rho).
       ! If true, use min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho.
-      ! A positive ``weak_gravity_mixing_length_beta`` overrides this option
+      ! A positive ``harmonic_dissipation_length_beta`` overrides this option
       ! when constructing the MLT and TDC mixing length.
 
       ! ::
@@ -8222,20 +8234,6 @@
       ! ::
 
     max_dt_yrs_for_velocity_logT_lower_bound = 1d99
-
-
-      ! use_trapped_radiation_inertia
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, include the inertia of equilibrium radiation advected with
-      ! the material in ``u_flag`` and ``v_flag`` momentum equations, Riemann
-      ! wave speeds, and the TDC convective velocity limit.  The correction is
-      ! ``1 + 4*Prad/(rho*c^2)`` and does not evolve radiation momentum
-      ! independently.
-
-      ! ::
-
-    use_trapped_radiation_inertia = .false.
 
 
       ! use_gravity_rotation_correction

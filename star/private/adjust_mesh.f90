@@ -229,12 +229,12 @@
          end if
 
          do k=1,nz-1
-            do_not_split(k) = s% lnR(k) - s% lnR(k+1) < 2*s% mesh_min_dlnR
-            if (.not. do_not_split(k)) do_not_split(k) = &
-               s% r(k) - s% r(k+1) < 2*s% mesh_min_dr_div_cs*eval_hydro_csound(s,k)
+            do_not_split(k) = &
+               (s% lnR(k) - s% lnR(k+1) < 2*s% mesh_min_dlnR) .or. &
+               (s% r(k) - s% r(k+1) < 2*s% mesh_min_dr_div_cs*s% csound(k))
          end do
          do_not_split(nz) = &
-            (s% r(nz) - s% R_center < 2*s% mesh_min_dr_div_cs*eval_hydro_csound(s,nz))
+            (s% r(nz) - s% R_center < 2*s% mesh_min_dr_div_cs*s% csound(nz))
 
          if (dbg_remesh) write(*,*) 'call do_mesh_plan'
 

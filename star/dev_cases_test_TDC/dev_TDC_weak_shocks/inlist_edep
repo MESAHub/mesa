@@ -104,7 +104,7 @@
       okay_to_reduce_gradT_excess = .false.
       make_gradr_sticky_in_solver_iters = .true.
       convergence_ignore_equL_residuals = .true.
-
+      use_TDC_enthalpy_flux_limiter = .true.
 
      max_abs_du_div_cs_for_convection = 1d99 !0.03d0
      max_v_div_cs_for_convection = 1d99

@@ -39,17 +39,6 @@ GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since t
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
-Added the optional ``use_trapped_radiation_inertia`` control for ``u_flag``
-and ``v_flag`` hydrodynamics. It includes the leading inertia of equilibrium
-radiation advected with the gas through
-``1 + 4*Prad/(rho*c^2)`` in the primitive acceleration equation. The HLLC
-states, hydro characteristic speeds, TDC and RTI velocity scales, timestep
-limits, and shock diagnostics use the corresponding effective acoustic
-inertia while the stored EOS sound speed remains unchanged. TDC uses the
-corrected speed only when its existing convective-velocity limit is enabled.
-This is a tightly-coupled, low-velocity correction and does not evolve
-independent radiation momentum.
-
 Restored the default-off ``constant_L`` control for idealized hydrodynamic
 tests. It replaces the temperature-gradient equation with
 ``L(k) = L(k+1)``, using ``L_center`` at the innermost boundary, and applies

@@ -73,8 +73,7 @@
       subroutine do1_dudt_eqn( &
             s, k, P_surf_ad, nvar, ierr)
          use accurate_sum_auto_diff_star_order1
-         use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info, &
-            radiation_inertia_factor_ad, eval_hydro_csound_start
+         use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
          use tdc_hydro, only: compute_tdc_Uq_dm_cell
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -86,7 +85,7 @@
             flux_in_ad, flux_out_ad, diffusion_source_ad, &
             geometry_source_ad, gravity_source_ad, &
             area_00, area_p1, inv_R2_00, inv_R2_p1, &
-            dudt_expected_ad, dudt_actual_ad, radiation_inertia_ad, resid_ad, &
+            dudt_expected_ad, dudt_actual_ad, resid_ad, &
             Uq_cell
          type(accurate_auto_diff_real_star_order1) :: sum_ad
          real(dp) :: dt, dm, ie_plus_ke, scal, residual
@@ -166,16 +165,12 @@
 
          ! make residual units be relative difference in energy
          ie_plus_ke = s% energy_start(k) + 0.5d0*s% u_start(k)*s% u_start(k)
-         scal = dt*max(abs(s% u_start(k)),eval_hydro_csound_start(s,k))/ie_plus_ke
+         scal = dt*max(abs(s% u_start(k)),s% csound_start(k))/ie_plus_ke
          if (k == 1) scal = scal*1d-2
 
          dudt_actual_ad = 0d0
          dudt_actual_ad%val = s% dxh_u(k)/dt
          dudt_actual_ad%d1Array(i_v_00) = 1d0/dt
-         radiation_inertia_ad = radiation_inertia_factor_ad( &
-            s, wrap_T_00(s,k), wrap_d_00(s,k))
-         ! Include the inertia of equilibrium radiation advected with the cell.
-         dudt_actual_ad = radiation_inertia_ad*dudt_actual_ad
 
          resid_ad = scal*(dudt_expected_ad - dudt_actual_ad)
          residual = resid_ad%val
@@ -346,7 +341,7 @@
       subroutine get_Riemann_shock_diagnostics( &
             s, k, compression, pressure_jump, shock_strength, D_mix_factor, ierr)
          use math_lib, only: pow3
-         use star_utils, only: calc_Ptot_ad_tw, radiation_inertia_factor_ad
+         use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: &
@@ -355,10 +350,10 @@
 
          type(auto_diff_real_star_order1) :: &
             r_ad, area_ad, PL_ad, PR_ad, G_ad, dPdm_grav_ad, &
-            rhoIL_ad, rhoIR_ad, csL_ad, csR_ad
+            csL_ad, csR_ad
          real(dp), dimension(s% species) :: d_Ptot_dxa
          real(dp) :: cs_face, P_face, P_min, onset, full_on, reduction, x
-         real(dp) :: delta_m, uL, uR, rhoIL, rhoIR, Sl, Sr, Ss
+         real(dp) :: delta_m, uL, uR, rhoL, rhoR, Sl, Sr, Ss
          real(dp) :: numerator, denominator, P_face_L, P_face_R
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
 
@@ -378,16 +373,14 @@
          PR_ad = shift_m1(PR_ad)
 
          if (PL_ad%val <= 0d0 .or. PR_ad%val <= 0d0) return
-         rhoIL_ad = wrap_d_00(s,k)*radiation_inertia_factor_ad( &
-            s, wrap_T_00(s,k), wrap_d_00(s,k))
-         rhoIR_ad = wrap_d_m1(s,k)*radiation_inertia_factor_ad( &
-            s, wrap_T_m1(s,k), wrap_d_m1(s,k))
-         csL_ad = sqrt(wrap_gamma1_00(s,k)*PL_ad/rhoIL_ad)
-         csR_ad = sqrt(wrap_gamma1_m1(s,k)*PR_ad/rhoIR_ad)
+         csL_ad = sqrt(wrap_gamma1_00(s,k)*PL_ad/wrap_d_00(s,k))
+         csR_ad = sqrt(wrap_gamma1_m1(s,k)*PR_ad/wrap_d_m1(s,k))
          cs_face = 0.5d0*(csL_ad%val + csR_ad%val)
          if (cs_face <= 0d0 .or. is_bad(cs_face)) return
          uL = s% u(k)
          uR = s% u(k-1)
+         rhoL = s% rho(k)
+         rhoR = s% rho(k-1)
          Sl = min(uL - csL_ad%val, uR - csR_ad%val)
          Sr = max(uR + csR_ad%val, uL + csL_ad%val)
 
@@ -403,16 +396,14 @@
 
          if (PL_ad%val <= 0d0 .or. PR_ad%val <= 0d0) return
 
-         rhoIL = rhoIL_ad%val
-         rhoIR = rhoIR_ad%val
-         numerator = uR*rhoIR*(Sr-uR) + uL*rhoIL*(uL-Sl) + &
+         numerator = uR*rhoR*(Sr-uR) + uL*rhoL*(uL-Sl) + &
             (PL_ad%val - PR_ad%val)
-         denominator = rhoIR*(Sr-uR) + rhoIL*(uL-Sl)
+         denominator = rhoR*(Sr-uR) + rhoL*(uL-Sl)
          if (denominator == 0d0 .or. is_bad(denominator)) return
          Ss = numerator/denominator
 
-         P_face_L = rhoIL*(uL-Sl)*(uL-Ss) + PL_ad%val
-         P_face_R = rhoIR*(uR-Sr)*(uR-Ss) + PR_ad%val
+         P_face_L = rhoL*(uL-Sl)*(uL-Ss) + PL_ad%val
+         P_face_R = rhoR*(uR-Sr)*(uR-Ss) + PR_ad%val
          P_face = 0.5d0*(P_face_L + P_face_R)
          if (P_face <= 0d0 .or. is_bad(P_face)) return
 
@@ -434,7 +425,7 @@
 
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
-         use star_utils, only: calc_Ptot_ad_tw, get_face_weights, radiation_inertia_factor_ad
+         use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -443,7 +434,7 @@
 
          type(auto_diff_real_star_order1) :: &
             r_ad, A_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
-            gamma1L_ad, gamma1R_ad, rhoIL_ad, rhoIR_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
+            gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
          real(dp), dimension(s% species) :: d_Ptot_dxa  ! skip this
@@ -483,12 +474,8 @@
          gamma1L_ad = wrap_gamma1_00(s,k)
          gamma1R_ad = wrap_gamma1_m1(s,k)
 
-         rhoIL_ad = rhoL_ad*radiation_inertia_factor_ad( &
-            s, wrap_T_00(s,k), rhoL_ad)
-         rhoIR_ad = rhoR_ad*radiation_inertia_factor_ad( &
-            s, wrap_T_m1(s,k), rhoR_ad)
-         csL_ad = sqrt(gamma1L_ad*PL_ad/rhoIL_ad)
-         csR_ad = sqrt(gamma1R_ad*PR_ad/rhoIR_ad)
+         csL_ad = sqrt(gamma1L_ad*PL_ad/rhoL_ad)
+         csR_ad = sqrt(gamma1R_ad*PR_ad/rhoR_ad)
 
          ! change PR and PL for gravity
          call get_G(s, k, G_ad)
@@ -523,9 +510,8 @@
          end if
 
          ! contact velocity (eqn 2.20)
-         numerator_ad = uR_ad*rhoIR_ad*(Sr_ad - uR_ad) + &
-            uL_ad*rhoIL_ad*(uL_ad - Sl_ad) + (PL_ad - PR_ad)
-         denominator_ad = rhoIR_ad*(Sr_ad - uR_ad) + rhoIL_ad*(uL_ad - Sl_ad)
+         numerator_ad = uR_ad*rhoR_ad*(Sr_ad - uR_ad) + uL_ad*rhoL_ad*(uL_ad - Sl_ad) + (PL_ad - PR_ad)
+         denominator_ad = rhoR_ad*(Sr_ad - uR_ad) + rhoL_ad*(uL_ad - Sl_ad)
 
          if (denominator_ad%val == 0d0 .or. is_bad(denominator_ad%val)) then
             ierr = -1
@@ -541,8 +527,8 @@
          s% d_uface_domega(k) = s% u_face_ad(k)%d1Array(i_L_00)
 
          ! contact pressure (eqn 2.19)
-         P_face_L_ad = rhoIL_ad*(uL_ad-Sl_ad)*(uL_ad-Ss_ad) + PL_ad
-         P_face_R_ad = rhoIR_ad*(uR_ad-Sr_ad)*(uR_ad-Ss_ad) + PR_ad
+         P_face_L_ad = rhoL_ad*(uL_ad-Sl_ad)*(uL_ad-Ss_ad) + PL_ad
+         P_face_R_ad = rhoR_ad*(uR_ad-Sr_ad)*(uR_ad-Ss_ad) + PR_ad
 
          s% P_face_ad(k) = 0.5d0*(P_face_L_ad + P_face_R_ad)  ! these are ideally equal
 

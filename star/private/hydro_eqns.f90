@@ -21,7 +21,7 @@
 
       use star_private_def
       use const_def, only: dp, pi, ln10, two_thirds, crad
-      use star_utils, only: em1, e00, ep1, eval_hydro_csound_start
+      use star_utils, only: em1, e00, ep1
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
@@ -1129,7 +1129,7 @@
                write(*,*) 'set_fixed_vsurf_outer_BC requires u_flag or v_flag true'
                return
             end if
-            resid_ad = (vsurf - s% fixed_vsurf)/eval_hydro_csound_start(s,1)
+            resid_ad = (vsurf - s% fixed_vsurf)/s% csound_start(1)
             s% equ(i_P_eqn,1) = resid_ad%val
             call save_eqn_residual_info( &
                s, 1, nvar, i_P_eqn, resid_ad, 'set_fixed_vsurf_outer_BC', ierr)

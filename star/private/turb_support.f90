@@ -227,7 +227,7 @@ contains
 
       type(auto_diff_real_star_order1) :: &
          Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, beta
-      real(dp) :: conv_vel_start, hydro_csound_face, scale, max_conv_vel, Y_face_guess
+      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -272,7 +272,7 @@ contains
          grav = cgrav*m/pow2(r) !try replacing with wrap_geff_face(s,k)
       end if
 
-      if (s% weak_gravity_mixing_length_beta > 0d0) then
+      if (s% harmonic_dissipation_length_beta > 0d0) then
          if (P > 0d0 .and. grav > 0d0 .and. rho > 0d0) then
             Hp_for_mlt = P/(rho*grav)
             Lambda = get_mlt_mixing_length(s, Hp_for_mlt, r, mixing_length_alpha)
@@ -299,15 +299,10 @@ contains
       if (k > 0) then
          if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
             if (s% use_face_reconstruction) then
-               hydro_csound_face = s% reconstructed_csound_face(k)
+               max_conv_vel = s% reconstructed_csound_face(k)*s% max_conv_vel_div_csound
             else
-               hydro_csound_face = s% csound_face(k)
+               max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
             end if
-            if (s% use_trapped_radiation_inertia .and. (s% u_flag .or. s% v_flag)) then
-               hydro_csound_face = hydro_csound_face/ &
-                  sqrt(radiation_inertia_factor(s, T%val, rho%val))
-            end if
-            max_conv_vel = hydro_csound_face*s% max_conv_vel_div_csound
          else
             max_conv_vel = 1d99
          end if

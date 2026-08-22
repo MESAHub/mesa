@@ -362,7 +362,7 @@
          ! as last thing, update conv_vel from D_mix and mixing length.
          ! this updates the effective conv vel for rotation and overshooting effects
          do k=2,nz
-            if (s% weak_gravity_mixing_length_beta > 0d0 .and. .not. RSP2_or_RSP) then
+            if (s% harmonic_dissipation_length_beta > 0d0 .and. .not. RSP2_or_RSP) then
                mixing_length = s% mlt_mixing_length(k)
             else
                mixing_length = s% alpha_mlt(k)*s% scale_height(k)
@@ -1053,7 +1053,7 @@
                if (s% cdc(k-1) /= 0 .and. s% cdc(k+1) /= 0) then
                   s% cdc(k) = (s% cdc(k-1) + s% cdc(k+1))/2
                   s% D_mix(k) = s% cdc(k)/pow2(pi4*s% r(k)*s% r(k)*s% rho(k))
-                  if (s% weak_gravity_mixing_length_beta > 0d0) then
+                  if (s% harmonic_dissipation_length_beta > 0d0) then
                      lambda = (s% mlt_mixing_length(k-1) + s% mlt_mixing_length(k+1))/2
                   else
                      lambda = s% alpha_mlt(k)* &
@@ -2002,9 +2002,7 @@
 
       subroutine set_RTI_mixing_info(s, ierr)
          use chem_def, only: ih1
-         use auto_diff
-         use star_utils, only: get_shock_info, eval_hydro_csound, get_T_face, get_rho_face, &
-            radiation_inertia_factor
+         use star_utils, only: get_shock_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: &
@@ -2012,7 +2010,6 @@
             min_dm, alfa, cs, r, shock_mass_start, &
             log_max_boost, m_full_boost, m_no_boost, max_boost, &
             dm_for_center_eta_nondecreasing, min_eta
-         type(auto_diff_real_star_order1) :: T_face_ad, rho_face_ad
          integer :: k, nz, i_h1
          include 'formats'
          ierr = 0
@@ -2037,7 +2034,7 @@
             else
                v = s% v(k)
             end if
-            if (v > eval_hydro_csound(s,k)) then
+            if (v > s% csound(k)) then
                if (k > 1) shock_mass_start = s% m(k)  ! skip this after breakout
                exit
             end if
@@ -2074,12 +2071,6 @@
                   (s% dq(k-1)*s% alpha_RTI(k) + s% dq(k)*s% alpha_RTI(k-1))/ &
                      (s% dq(k-1) + s% dq(k))
                cs = s% csound_face(k)
-               if (s% use_trapped_radiation_inertia .and. (s% u_flag .or. s% v_flag)) then
-                  T_face_ad = get_T_face(s,k)
-                  rho_face_ad = get_rho_face(s,k)
-                  cs = cs/sqrt(radiation_inertia_factor( &
-                     s, T_face_ad%val, rho_face_ad%val))
-               end if
                r = s% r(k)
                s% eta_RTI(k) = C*alpha_face*cs*r
 
@@ -2102,8 +2093,7 @@
 
             end if
 
-            s% etamid_RTI(k) = max(min_eta, &
-               C*s% alpha_RTI(k)*eval_hydro_csound(s,k)*s% rmid(k))
+            s% etamid_RTI(k) = max(min_eta, C*s% alpha_RTI(k)*s% csound(k)*s% rmid(k))
             s% boost_for_eta_RTI(k) = C/s% RTI_C
 
             if (is_bad(s% etamid_RTI(k))) then
@@ -2181,10 +2171,9 @@
 
 
       subroutine set_dPdr_dRhodr_info(s, ierr)
-         use star_utils, only: eval_hydro_csound
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: rho, r00, alfa00, beta00, cs, &
+         real(dp) :: rho, r00, alfa00, beta00, &
             dr_m1, dr_00, c, d, am1, a00, ap1, v, rmid
          real(dp), allocatable, dimension(:) :: dPdr, drhodr, P_face, rho_face
          integer :: k, nz
@@ -2218,10 +2207,9 @@
             else
                v = s% v(k)
             end if
-            cs = eval_hydro_csound(s,k)
             if (k == nz .or. k == 1 .or.  &
                   (s% alpha_RTI_start(k) == 0d0 .and. &
-                     v/cs < s% alpha_RTI_src_min_v_div_cs)) then
+                     v/s% csound(k) < s% alpha_RTI_src_min_v_div_cs)) then
                drhodr(k) = 0d0
                dPdr(k) = 0d0
             else if (do_slope_limiting) then

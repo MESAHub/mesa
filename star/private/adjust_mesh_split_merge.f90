@@ -326,7 +326,6 @@
 
       subroutine biggest_smallest( &
             s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
-         use star_utils, only: eval_hydro_csound
          type (star_info), pointer :: s
          real(dp), intent(in) :: tau_center
          real(dp), intent(out) :: TooBig, TooSmall
@@ -703,12 +702,12 @@
 
             if (du_div_cs_limit_flag .and. associated(v)) then
                if (k == 1) then
-                  abs_du_div_cs = abs(v(k) - v(k+1))/eval_hydro_csound(s,k)
+                  abs_du_div_cs = abs(v(k) - v(k+1))/s% csound(k)
                else if (k == nz) then
-                  abs_du_div_cs = abs(v(nz-1) - v(nz))/eval_hydro_csound(s,nz)
+                  abs_du_div_cs = abs(v(nz-1) - v(nz))/s% csound(nz)
                else
                   abs_du_div_cs = max(abs(v(k) - v(k+1)), &
-                            abs(v(k) - v(k-1)))/eval_hydro_csound(s,k)
+                            abs(v(k) - v(k-1)))/s% csound(k)
                end if
             else
                abs_du_div_cs = 0d0

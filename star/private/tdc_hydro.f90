@@ -143,7 +143,7 @@ contains
       type(auto_diff_real_star_order1) :: Lambda_face, Hp_face
 
       ierr = 0
-      if (s% weak_gravity_mixing_length_beta > 0d0) then
+      if (s% harmonic_dissipation_length_beta > 0d0) then
          call get_reconstructed_hse_scale_height_ad(s, k, Hp_face, ierr)
          if (ierr /= 0) return
       else

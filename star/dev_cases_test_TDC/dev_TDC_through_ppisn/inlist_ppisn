@@ -138,7 +138,7 @@ mass_fraction_limit_for_Skye = 1d-16
    ! convection controls
    use_ledoux_criterion = .true.
    mixing_length_alpha = 2d0
-   weak_gravity_mixing_length_beta = 0.1d0
+   harmonic_dissipation_length_beta = 0.1d0
    alpha_semiconvection = 1d0
    thermohaline_coeff = 0d0
    num_cells_for_smooth_gradL_composition_term = 0

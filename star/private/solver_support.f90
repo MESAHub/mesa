@@ -314,7 +314,6 @@
 
 
       subroutine sizeB(s, nvar, B, max_correction, correction_norm, max_zone, max_var, ierr)
-         use star_utils, only: eval_hydro_csound_start
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: B  ! (nvar, nz)
@@ -355,12 +354,12 @@
          if (s% u_flag .and. s% include_u_in_correction_limits) then
             skip2 = 0
             do k=1,nz
-               s% correction_weight(s% i_u,k) = 1d0/(frac*eval_hydro_csound_start(s,k) + abs(s% u(k)))
+               s% correction_weight(s% i_u,k) = 1d0/(frac*s% csound_start(k) + abs(s% u(k)))
             end do
          else if (s% v_flag .and. s% include_v_in_correction_limits) then
             skip2 = 0
             do k=1,nz
-               s% correction_weight(s% i_v,k) = 1d0/(frac*eval_hydro_csound_start(s,k) + abs(s% v(k)))
+               s% correction_weight(s% i_v,k) = 1d0/(frac*s% csound_start(k) + abs(s% v(k)))
             end do
          else if (s% u_flag) then
             skip2 = s% i_u

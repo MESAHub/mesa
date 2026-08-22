@@ -23,7 +23,7 @@
       use const_def, only: dp, ln10, secyer
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
-      use star_utils, only: em1, e00, ep1, eval_hydro_csound_start
+      use star_utils, only: em1, e00, ep1
 
       implicit none
 
@@ -373,7 +373,6 @@
       ! other = s% extra_grav(k) - s% dv_dt(k)
       subroutine expected_non_HSE_term( &
             s, k, other_ad, other, accel_ad, Uq_ad, ierr)
-         use star_utils, only: radiation_inertia_factor_v_face_ad
          use hydro_rsp2, only: compute_Uq_face
          use tdc_hydro, only: compute_tdc_Uq_face
          use accurate_sum_auto_diff_star_order1
@@ -425,8 +424,6 @@
             end if
             accel_ad%val = accel
             accel_ad%d1Array(i_v_00) = d_accel_dv
-            ! Use the radiation inertia averaged over the velocity dual cell.
-            accel_ad = radiation_inertia_factor_v_face_ad(s, k)*accel_ad
 
             if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
                v_00 = wrap_v_00(s,k)
@@ -578,7 +575,7 @@
             else
                v00 = wrap_v_00(s,k)
             end if
-            resid_ad = v00/eval_hydro_csound_start(s,k)
+            resid_ad = v00/s% csound_start(k)
             call save_eqn_residual_info( &
                s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)
             return

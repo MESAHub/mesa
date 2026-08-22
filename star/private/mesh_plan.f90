@@ -45,7 +45,6 @@
             nz_new, xq_new, dq_new, which_gval, comes_from, ierr)
          ! return keep_going, or terminate
          use mesh_functions, only: max_allowed_gvals
-         use star_utils, only: eval_hydro_csound
          ! inputs
          type (star_info), pointer :: s
          integer, intent(in) :: nz_old, max_allowed_nz, max_num_subcells, &
@@ -499,7 +498,7 @@
                rR = s% r(k_old)
                rL = s% r(k_old+1)
                dr_old = rR - rL
-               min_dr = eval_hydro_csound(s,k_old)*s% mesh_min_dr_div_cs
+               min_dr = s% csound(k_old)*s% mesh_min_dr_div_cs
                if (dr_old*dq_new/dq_old(k_old) < 2*min_dr) then
                   return  ! sound crossing time would be too small
                end if
@@ -758,13 +757,11 @@
 
                               if (du_div_cs_limit_flag .and. associated(s% v)) then
                                   if (kk-1 == 1) then
-                                     abs_du_div_cs = abs(s% v(1) - s% v(2)) / eval_hydro_csound(s,1)
+                                     abs_du_div_cs = abs(s% v(1) - s% v(2)) / s% csound(1)
                                   else if (kk == nz_old) then
-                                     abs_du_div_cs = abs(s% v(nz_old-1) - s% v(nz_old)) / &
-                                        eval_hydro_csound(s,nz_old)
+                                     abs_du_div_cs = abs(s% v(nz_old-1) - s% v(nz_old)) / s% csound(nz_old)
                                   else
-                                     abs_du_div_cs = abs(s% v(kk-1) - s% v(kk)) / &
-                                        eval_hydro_csound(s,kk-1)
+                                     abs_du_div_cs = abs(s% v(kk-1) - s% v(kk)) / s% csound(kk-1)
                                   end if
                               else
                                   abs_du_div_cs = 0.0_dp
@@ -842,18 +839,17 @@
                      end if
 
                      if ((.not. force_merge_with_one_more) .and. s% merge_if_dr_div_cs_too_small) then
-                        min_dr = s% mesh_min_dr_div_cs*eval_hydro_csound(s,k_old)
                         if (xq_new(k_new) <= xq_old(k_old) .and. &
-                            s% r(k_old) - s% r(k_old_next) < min_dr) then
+                            s% r(k_old) - s% r(k_old_next) < s% mesh_min_dr_div_cs*s% csound(k_old)) then
                            force_merge_with_one_more = .true.
                         else if (k_old_next == nz_old) then
-                           min_dr = s% mesh_min_dr_div_cs*eval_hydro_csound(s,k_old_next)
-                           force_merge_with_one_more = (s% r(k_old_next) - s% R_center) < min_dr
+                           force_merge_with_one_more = (s% r(k_old_next) - s% R_center) < &
+                                       s% mesh_min_dr_div_cs*s% csound(k_old_next)
                            if (force_merge_with_one_more .and. dbg) &
                               write(*,3) 'do merge for k_old_next == nz_old', k_old, k_old_next, &
                                  s% r(k_old) - s% R_center, &
-                                 min_dr, &
-                                 s% mesh_min_dr_div_cs, eval_hydro_csound(s,k_old_next)
+                                 s% mesh_min_dr_div_cs*s% csound(k_old_next), &
+                                 s% mesh_min_dr_div_cs, s% csound(k_old_next)
                         end if
                      end if
 

@@ -31,7 +31,7 @@
       contains
 
       subroutine do1_dalpha_RTI_dt_eqn(s, k, nvar, ierr)
-         use star_utils, only: em1, e00, ep1, eval_hydro_csound_start
+         use star_utils, only: em1, e00, ep1
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -112,7 +112,7 @@
          if (a_00 <= 0d0 .or. s% RTI_D <= 0d0) then
             source_minus = 0d0
          else
-            cs = eval_hydro_csound_start(s,k)
+            cs = s% csound_start(k)
             if (k < nz) then
                rmid = 0.5d0*(s% r_start(k) + s% r_start(k+1))
             else
