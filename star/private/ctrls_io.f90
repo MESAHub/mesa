@@ -140,6 +140,7 @@
    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
+    superad_reduction_use_turnover_limit, superad_reduction_turnover_limit_function, &
     make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, &
     harmonic_dissipation_length_beta, remove_small_D_limit, &
@@ -685,6 +686,16 @@
        return
     end if
 
+    if (.not. (trim(s% superad_reduction_turnover_limit_function) == 'linear' .or. &
+          trim(s% superad_reduction_turnover_limit_function) == 'exponential')) then
+       write(*,'(A)')
+       write(*,*) "Invalid choice for superad_reduction_turnover_limit_function"
+       write(*,*) "Available options are 'linear' or 'exponential'"
+       write(*,'(A)')
+       ierr = -1
+       return
+    end if
+
  end subroutine check_controls
 
 
@@ -1075,6 +1086,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% superad_reduction_gamma_inv_scale = superad_reduction_gamma_inv_scale
  s% superad_reduction_diff_grads_limit = superad_reduction_diff_grads_limit
  s% superad_reduction_limit = superad_reduction_limit
+ s% superad_reduction_use_turnover_limit = superad_reduction_use_turnover_limit
+ s% superad_reduction_turnover_limit_function = superad_reduction_turnover_limit_function
 
  s% max_logT_for_mlt = max_logT_for_mlt
  s% mlt_make_surface_no_mixing = mlt_make_surface_no_mixing
@@ -2813,6 +2826,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  superad_reduction_gamma_inv_scale = s% superad_reduction_gamma_inv_scale
  superad_reduction_diff_grads_limit = s% superad_reduction_diff_grads_limit
  superad_reduction_limit = s% superad_reduction_limit
+ superad_reduction_use_turnover_limit = s% superad_reduction_use_turnover_limit
+ superad_reduction_turnover_limit_function = s% superad_reduction_turnover_limit_function
 
  max_logT_for_mlt = s% max_logT_for_mlt
  mlt_make_surface_no_mixing = s% mlt_make_surface_no_mixing

@@ -54,6 +54,19 @@ conservative energy transfer continues to modify only the EOS pressure; the
 turbulent contribution is evaluated from its remapped face state. Split/merge
 AMR does not currently support RSP2.
 
+The new control ``superad_reduction_use_turnover_limit`` relaxes the applied
+superadiabatic reduction from its previous accepted value toward the
+instantaneous value. ``superad_reduction_turnover_limit_function`` selects
+either the exponential response ``1-exp(-dt/tau_conv)`` or the linear response
+``min(dt/tau_conv,1)``. The limiter acts on the applied reduction
+``1/Gamma_factor``. Zones with a lagged convective velocity use
+``scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt frequency.
+The timescale is set at the start of the step and held fixed during solver
+iterations. With ``use_face_reconstruction``, this calculation uses the
+reconstructed face thermodynamic state. The scale height is the interpolated
+or reconstructed face value used by MLT and TDC. The previous reduction is
+preserved across retries, remeshing, and photo restarts.
+
 .. _Bug Fixes main:
 
 Bug Fixes
@@ -142,6 +155,8 @@ less than the radiation pressure at its boundary temperature.
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
+
+In ``set_superad_reduction`` (``star/private/turb_support.f90``), the density inversion contribution to ``Gamma_term`` used ``superad_reduction_Gamma_limit_scale`` instead of ``superad_reduction_Gamma_inv_scale``. This made the latter control inactive. The published algorithm is restored (Jermyn et al. 2023, equation 64, ``alpha_2`` term). Existing test suite cases set the two scales to the same value and are bit-for-bit unaffected. The fix changes results only when the scales differ.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 

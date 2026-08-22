@@ -927,6 +927,7 @@
             s% lnT(im) = s% lnT(i0)
             s% D_mix(im) = s% D_mix(i0)
             s% mlt_vc(im) = s% mlt_vc(i0)
+            s% superad_reduction_factor(im) = s% superad_reduction_factor(i0)
             s% csound(im) = s% csound(i0)
             s% tau(im) = s% tau(i0)
             s% opacity(im) = s% opacity(i0)
@@ -1129,7 +1130,8 @@
             u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
             min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
             pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
-            min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT
+            min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT, &
+            superad_reduction_factorL, superad_reduction_factorR
          logical :: done, use_new_grad_rho, pressure_reconstructed
          include 'formats'
 
@@ -1166,13 +1168,16 @@
 
          rR = s% r(i)
          mlt_vcR = s% mlt_vc(i)
+         superad_reduction_factorR = s% superad_reduction_factor(i)
          if (i == nz) then
             rL = s% R_center
             mlt_vcL = 0d0
+            superad_reduction_factorL = 1d0
             tauL = tau_center
          else
             rL = s% r(ip)
             mlt_vcL = s% mlt_vc(ip)
+            superad_reduction_factorL = s% superad_reduction_factor(ip)
             tauL = s% tau(ip)
          end if
 
@@ -1344,6 +1349,7 @@
                s% lnT(jp) = s% lnT(j)
                s% D_mix(jp) = s% D_mix(j)
                s% mlt_vc(jp) = s% mlt_vc(j)
+               s% superad_reduction_factor(jp) = s% superad_reduction_factor(j)
                s% csound(jp) = s% csound(j)
                s% tau(jp) = s% tau(j)
                s% opacity(jp) = s% opacity(j)
@@ -1493,9 +1499,11 @@
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
 
-         ! mlt_vc is face-based, so a split creates a new interior face value here.
+         ! These are face-based, so a split creates new interior face values here.
          ! Interpolate using the same left/right orientation as tau(ip).
          s% mlt_vc(ip) = mlt_vcR + (mlt_vcL - mlt_vcR)*dMR/dM
+         s% superad_reduction_factor(ip) = superad_reduction_factorR + &
+            (superad_reduction_factorL - superad_reduction_factorR)*dMR/dM
 
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then

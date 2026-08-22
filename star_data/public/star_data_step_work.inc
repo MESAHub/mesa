@@ -333,7 +333,8 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc, &
+         prev_mesh_superad_reduction_factor
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
       real(dp), pointer, dimension(:) :: prev_mesh_D_ST_start, prev_mesh_nu_ST_start
@@ -507,6 +508,7 @@
          ! this is the Brassard et al B := -(chiY/chiT)*(dlnY/dlnP)
       real(dp), pointer :: unsmoothed_brunt_B(:) ! pre-smoothing
       real(dp), pointer :: smoothed_brunt_B(:) ! with smoothing applied for gradL
+      real(dp), pointer :: tau_conv_start(:) ! seconds; fixed during solver iterations
 
 
       ! asteroseismology info
@@ -564,7 +566,9 @@
 
          real(dp), pointer, dimension(:,:) :: xh_old, xa_old
          real(dp), pointer, dimension(:) :: &
-            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old
+            dq_old, q_old, j_rot_old, omega_old, mlt_vc_old, &
+            superad_reduction_factor_old
+            ! previous accepted Gamma_factor for the turnover limiter
          real(dp) :: time_old, dt_old, mstar_old, xmstar_old, mstar_dot_old, &
             M_center_old, v_center_old, R_center_old, L_center_old
          integer :: nz_old, model_number_old
@@ -901,7 +905,9 @@
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
-            okay_to_set_mlt_vc, have_mlt_vc
+            okay_to_set_mlt_vc, have_mlt_vc, &
+            okay_to_set_superad_reduction_factor, have_superad_reduction_factor
+            ! current factor is frozen until it has been copied to the old state
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

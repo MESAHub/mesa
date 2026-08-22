@@ -2685,28 +2685,100 @@
 
       ! use_superad_reduction
       ! ~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_inv_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_diff_grads_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Implicit alternative to ``okay_to_reduce_gradT_excess``
+      ! Implicit alternative to ``okay_to_reduce_gradT_excess``. MLT or TDC
+      ! is repeated with ``gradr`` moved toward ``gradL`` in cells near the
+      ! Eddington or density-inversion limits. The two contributions are
+      ! evaluated separately and added to ``Gamma_factor``, with
+      ! ``gradr_scaled = gradL + (gradr-gradL)/Gamma_factor``.
 
       ! ::
 
       use_superad_reduction = .false.
+
+
+      ! superad_reduction_Gamma_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Threshold in ``Lrad/Ledd`` for the Eddington contribution.
+
+      ! ::
+
       superad_reduction_Gamma_limit = 0.5d0
+
+
+      ! superad_reduction_Gamma_limit_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Scale factor for the Eddington contribution. Set to zero to disable
+      ! this contribution.
+
+      ! ::
+
       superad_reduction_Gamma_limit_scale = 5d0
+
+
+      ! superad_reduction_Gamma_inv_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Scale factor for the density-inversion contribution, which activates
+      ! when ``Lrad/Ledd > 4*(1-beta)/(4-3*beta)``. Set to zero to disable
+      ! this contribution.
+
+      ! ::
+
       superad_reduction_Gamma_inv_scale = 5d0
+
+
+      ! superad_reduction_diff_grads_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Smoothly turns off the reduction as ``gradT - gradL`` approaches
+      ! this value.
+
+      ! ::
+
       superad_reduction_diff_grads_limit = 1d-3
+
+
+      ! superad_reduction_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Upper limit for ``Gamma_factor``. A value less than or equal to one
+      ! disables the limit.
+
+      ! ::
+
       superad_reduction_limit = -1d0
 
+
+      ! superad_reduction_use_turnover_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Relaxes the applied reduction from its previous accepted value toward
+      ! the instantaneous value over the local response time. The response
+      ! fraction is set by ``superad_reduction_turnover_limit_function``.
+      ! In zones with a lagged convective velocity, ``tau_conv`` is
+      ! ``scale_height/max(mlt_vc,1d-10 cm/s)``. Other zones use the Brunt
+      ! frequency. The timescale is set at the start of the step and held fixed
+      ! during solver iterations. The limiter acts on ``1/Gamma_factor``, which
+      ! multiplies ``gradr-gradL``, and uses the same interpolated or
+      ! reconstructed face state as MLT or TDC.
+
+      ! ::
+
+      superad_reduction_use_turnover_limit = .false.
+
+      ! superad_reduction_turnover_limit_function
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Sets the response fraction used by the turnover limiter. The
+      ! ``'exponential'`` option uses ``1-exp(-dt/tau_conv)`` and the
+      ! ``'linear'`` option uses ``min(dt/tau_conv,1)``.
+
+      ! ::
+
+      superad_reduction_turnover_limit_function = 'linear'
 
    ! overshooting
    ! ____________

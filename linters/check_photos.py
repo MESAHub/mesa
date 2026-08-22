@@ -54,6 +54,9 @@ known_false_positives = {
     "net_iso",
     "model_profile_filename",
     "include_binary_history_in_log_file",
+    "superad_reduction_factor_old",  # Initialized from superad_reduction_factor
+    "have_superad_reduction_factor",  # Set when superad_reduction_factor is read
+    "okay_to_set_superad_reduction_factor",  # Reset during photo loading
     "i_dj_rot_dt",  # Shadows s% i_j_rot
     "i_equ_w_div_wc",  # Shadows s% i_w_div_wc
     "have_j_rot",  # Set from s% rotation_flag
