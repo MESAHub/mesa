@@ -103,6 +103,13 @@ cell-centered Riemann hydrodynamics. The strain, viscous heating, and momentum
 force now use the same lagged cell-midpoint radius, preserving the tridiagonal
 velocity coupling and nonpositive discrete viscous momentum work.
 
+Fixed an ambiguity between the generic transport velocity ``conv_vel`` and
+the MLT/TDC turbulent velocity ``mlt_vc``. ``do1_mlt_eval`` now copies
+``conv_vel`` into ``mlt_vc`` only for ``convective_mixing``. This preserves
+semiconvective and thermohaline diffusion coefficients while preventing their
+diffusion-equivalent velocities from entering turbulent energy, turbulent
+pressure, or TDC momentum terms.
+
 Fixed local eddy-viscous energy accounting when the ``dedt`` energy equation
 explicitly includes radial kinetic energy. TDC now includes the midpoint
 mechanical work from its cell-centered ``u_flag`` acceleration or its

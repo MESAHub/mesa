@@ -115,7 +115,7 @@ contains
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, mixing_length, ierr)
       use chem_def, only: ih1
-      use const_def, only: ln10
+      use const_def, only: ln10, convective_mixing
       use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -132,7 +132,7 @@ contains
       real(dp) :: cgrav, m, XH1, P_theta, L_theta
       integer :: iso
       type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, &
-         chiRho, chiT, Cp, rho_start, energy
+         chiRho, chiT, Cp, rho_start, energy, conv_vel
       include 'formats'
       ierr = 0
 
@@ -187,7 +187,7 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, energy, ierr)
       else
          ! starspot YREC routine
          if (s% do_starspots) then
@@ -198,7 +198,15 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr, mixing_length)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, energy, ierr, mixing_length)
+      end if
+      if (ierr /= 0) return
+
+      ! Do not use diffusion velocities as MLT/TDC turbulent velocity.
+      if (mixing_type == convective_mixing) then
+         mlt_vc = conv_vel
+      else
+         mlt_vc = 0d0
       end if
 
    end subroutine do1_mlt_eval
