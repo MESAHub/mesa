@@ -1,637 +1,153 @@
 ! ***********************************************************************
+!
 !   Copyright (C) 2026  Niall Miller & The MESA Team
-! ***********************************************************************
-
-! ***********************************************************************
-! Hermite interpolation module for spectral energy distributions (SEDs)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU Lesser General Public License
+!   as published by the Free Software Foundation,
+!   either version 3 of the License, or (at your option) any later version.
+!
 ! ***********************************************************************
 
 module hermite_interp_bounded
    use const_def, only: dp
    use colors_def, only: Colors_General_Info
-   use colors_utils, only: dilute_flux, find_containing_cell, &
-                           find_nearest_point, find_bracket_index, load_stencil
+   use colors_utils, only: simpson_integration
+   use hermite_interp, only: construct_sed_hermite
+   use linear_interp, only: construct_sed_linear
+   use utils_lib, only: is_inf, is_nan, mesa_error
+
    implicit none
 
    private
-   public :: construct_sed_hermite_bounded, hermite_tensor_interp3d
+   public :: construct_sed_hermite_bounded
+
+   ! Accept negligible Hermite undershoot when both its integrated magnitude
+   ! and its peak amplitude are below 0.1% of the positive SED.
+   real(dp), parameter :: negative_flux_fraction_tol = 1.0d-3
 
 contains
 
-   !---------------------------------------------------------------------------
-   ! Main entry point: Construct a SED using Hermite tensor interpolation.
-   ! Data loading strategy is determined by rq%cube_loaded (set at init):
-   !   cube_loaded = .true.  -> use the preloaded 4-D cube on the handle
-   !   cube_loaded = .false. -> load individual SED files via the lookup table
-   !---------------------------------------------------------------------------
    subroutine construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
                                             stellar_model_dir, wavelengths, fluxes)
       type(Colors_General_Info), intent(inout) :: rq
       real(dp), intent(in) :: teff, log_g, metallicity, R, d
       character(len=*), intent(in) :: stellar_model_dir
-      real(dp), dimension(:), allocatable, intent(out) :: wavelengths, fluxes
+      real(dp), allocatable, intent(out) :: wavelengths(:), fluxes(:)
 
-      integer :: n_lambda
-      real(dp), dimension(:), allocatable :: interp_flux
+      real(dp), allocatable :: interp_wave(:), interp_flux(:)
+      real(dp) :: integrated_flux
+      logical :: interp_ok
 
-      if (rq%cube_loaded) then
-         ! ---- Fast path: use preloaded cube from handle ----
-         n_lambda = size(rq%cube_wavelengths)
+      call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
+                                 stellar_model_dir, interp_wave, interp_flux)
 
-         ! Copy wavelengths to output
-         allocate (wavelengths(n_lambda))
-         wavelengths = rq%cube_wavelengths
+      ! Accept Hermite whenever it is finite and physically usable.  Negligible
+      ! negative undershoots are projected onto the physical flux bound.
+      interp_ok = valid_sed(interp_wave, interp_flux, .false.)
+      if (interp_ok) call repair_negative_flux(interp_wave, interp_flux, interp_ok)
 
-         ! Vectorised interpolation over all wavelengths in one pass —
-         ! cell location is computed once and reused, no per-wavelength
-         ! allocation or 3-D slice extraction needed.
-         allocate (interp_flux(n_lambda))
-         call hermite_interp_vector(teff, log_g, metallicity, &
-                                    rq%cube_teff_grid, rq%cube_logg_grid, &
-                                    rq%cube_meta_grid, &
-                                    rq%cube_flux, n_lambda, interp_flux)
-      else
-         ! ---- Fallback path: load individual SED files from lookup table ----
-         call construct_sed_from_files(rq, teff, log_g, metallicity, &
-                                       stellar_model_dir, interp_flux, wavelengths)
-         n_lambda = size(wavelengths)
+      if (interp_ok) then
+         call simpson_integration(interp_wave, interp_flux, integrated_flux)
+         interp_ok = .not. is_nan(integrated_flux) .and. &
+                     .not. is_inf(integrated_flux) .and. integrated_flux > 0.0_dp
       end if
 
-      ! Apply distance dilution to get observed flux
-      allocate (fluxes(n_lambda))
-      call dilute_flux(interp_flux, R, d, fluxes)
+      if (interp_ok) then
+         call move_alloc(interp_wave, wavelengths)
+         call move_alloc(interp_flux, fluxes)
+         return
+      end if
 
+      ! Hermite was unusable.  Fall back to the positivity-preserving linear
+      ! interpolant so a Colors failure does not terminate the MESA run.
+      call construct_sed_linear(rq, teff, log_g, metallicity, R, d, &
+                                stellar_model_dir, interp_wave, interp_flux)
+
+      interp_ok = valid_sed(interp_wave, interp_flux, .true.)
+      if (interp_ok) then
+         call simpson_integration(interp_wave, interp_flux, integrated_flux)
+         interp_ok = .not. is_nan(integrated_flux) .and. &
+                     .not. is_inf(integrated_flux) .and. integrated_flux > 0.0_dp
+      end if
+
+      if (.not. interp_ok) then
+         write (*, *) 'colors: Hermite and linear interpolation returned invalid SEDs'
+         call mesa_error(__FILE__, __LINE__)
+      end if
+
+      call move_alloc(interp_wave, wavelengths)
+      call move_alloc(interp_flux, fluxes)
    end subroutine construct_sed_hermite_bounded
 
-   !---------------------------------------------------------------------------
-   ! Fallback: Build a local sub-cube from individual SED files with enough
-   ! context for Hermite derivative computation, then interpolate all
-   ! wavelengths in a single pass.
-   !---------------------------------------------------------------------------
-   subroutine construct_sed_from_files(rq, teff, log_g, metallicity, &
-                                       stellar_model_dir, interp_flux, wavelengths)
-      use colors_utils, only: resolve_path, build_grid_to_lu_map
-      type(Colors_General_Info), intent(inout) :: rq
-      real(dp), intent(in) :: teff, log_g, metallicity
-      character(len=*), intent(in) :: stellar_model_dir
-      real(dp), dimension(:), allocatable, intent(out) :: interp_flux, wavelengths
+   subroutine repair_negative_flux(wavelengths, fluxes, repair_ok)
+      real(dp), intent(in) :: wavelengths(:)
+      real(dp), intent(inout) :: fluxes(:)
+      logical, intent(out) :: repair_ok
 
-      integer :: i_t, i_g, i_m   ! bracketing indices in unique grids
-      integer :: lo_t, hi_t, lo_g, hi_g, lo_m, hi_m   ! stencil bounds
-      integer :: nt, ng, nm, n_lambda
-      character(len=512) :: resolved_dir
-      logical :: need_reload
+      real(dp), allocatable :: flux_part(:)
+      real(dp) :: negative_integral, positive_integral
+      real(dp) :: negative_peak, positive_peak
+      integer :: n
 
-      resolved_dir = trim(resolve_path(stellar_model_dir))
+      repair_ok = .false.
+      n = size(fluxes)
 
-      ! Ensure the grid-to-lu mapping exists (built once, then reused)
-      if (.not. rq%grid_map_built) call build_grid_to_lu_map(rq)
+      if (n < 2 .or. size(wavelengths) /= n) return
 
-      ! Find bracketing cell in the unique grids
-      call find_bracket_index(rq%u_teff, teff, i_t)
-      call find_bracket_index(rq%u_logg, log_g, i_g)
-      call find_bracket_index(rq%u_meta, metallicity, i_m)
-
-      ! Check if the stencil cache is still valid for this cell
-      need_reload = .true.
-      if (rq%stencil_valid .and. &
-          i_t == rq%stencil_i_t .and. &
-          i_g == rq%stencil_i_g .and. &
-          i_m == rq%stencil_i_m) then
-         need_reload = .false.
-      end if
-
-      if (need_reload) then
-         ! Determine the extended stencil bounds:
-         ! For each axis, include one point before and after the cell
-         ! when available, so that centred differences match the cube.
-         nt = size(rq%u_teff)
-         ng = size(rq%u_logg)
-         nm = size(rq%u_meta)
-
-         if (nt < 2) then
-            lo_t = 1; hi_t = 1
-         else
-            lo_t = max(1, i_t - 1)
-            hi_t = min(nt, i_t + 2)
-         end if
-
-         if (ng < 2) then
-            lo_g = 1; hi_g = 1
-         else
-            lo_g = max(1, i_g - 1)
-            hi_g = min(ng, i_g + 2)
-         end if
-
-         if (nm < 2) then
-            lo_m = 1; hi_m = 1
-         else
-            lo_m = max(1, i_m - 1)
-            hi_m = min(nm, i_m + 2)
-         end if
-
-         ! Load SEDs for every stencil point (using memory cache)
-         call load_stencil(rq, resolved_dir, lo_t, hi_t, lo_g, hi_g, lo_m, hi_m)
-
-         ! Store subgrid arrays on the handle
-         if (allocated(rq%stencil_teff)) deallocate (rq%stencil_teff)
-         if (allocated(rq%stencil_logg)) deallocate (rq%stencil_logg)
-         if (allocated(rq%stencil_meta)) deallocate (rq%stencil_meta)
-
-         allocate (rq%stencil_teff(hi_t - lo_t + 1))
-         allocate (rq%stencil_logg(hi_g - lo_g + 1))
-         allocate (rq%stencil_meta(hi_m - lo_m + 1))
-         rq%stencil_teff = rq%u_teff(lo_t:hi_t)
-         rq%stencil_logg = rq%u_logg(lo_g:hi_g)
-         rq%stencil_meta = rq%u_meta(lo_m:hi_m)
-
-         rq%stencil_i_t = i_t
-         rq%stencil_i_g = i_g
-         rq%stencil_i_m = i_m
-         rq%stencil_valid = .true.
-      end if
-
-      ! Copy wavelengths to output
-      n_lambda = size(rq%stencil_wavelengths)
-      allocate (wavelengths(n_lambda))
-      wavelengths = rq%stencil_wavelengths
-
-      ! Interpolate all wavelengths using precomputed stencil
-      allocate (interp_flux(n_lambda))
-      call hermite_interp_vector(teff, log_g, metallicity, &
-                                 rq%stencil_teff, rq%stencil_logg, rq%stencil_meta, &
-                                 rq%stencil_fluxes, n_lambda, interp_flux)
-
-   end subroutine construct_sed_from_files
-
-   !---------------------------------------------------------------------------
-   ! Vectorised Hermite interpolation over all wavelengths.
-   !
-   ! The cell location (i_x, i_y, i_z, t_x, t_y, t_z) depends only on
-   ! (teff, logg, meta) and the sub-grids — not on wavelength.  Computing
-   ! it once and reusing across all n_lambda samples eliminates redundant
-   ! binary searches and basis-function evaluations.
-   !---------------------------------------------------------------------------
-   subroutine hermite_interp_vector(x_val, y_val, z_val, &
-                                    x_grid, y_grid, z_grid, &
-                                    f_values_4d, n_lambda, result_flux)
-      real(dp), intent(in) :: x_val, y_val, z_val
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      real(dp), intent(in) :: f_values_4d(:, :, :, :)   ! (nx, ny, nz, n_lambda)
-      integer, intent(in) :: n_lambda
-      real(dp), intent(out) :: result_flux(n_lambda)
-
-      integer :: i_x, i_y, i_z
-      integer :: ix_max, iy_max, iz_max
-      real(dp) :: t_x, t_y, t_z
-      real(dp) :: dx, dy, dz
-      real(dp) :: val, df_dx, df_dy, df_dz
-      integer :: nx, ny, nz
-      integer :: ix, iy, iz, lam
-      real(dp) :: h_x(2), h_y(2), h_z(2)
-      real(dp) :: hx_d(2), hy_d(2), hz_d(2)
-      real(dp) :: wx, wy, wz, wxd, wyd, wzd
-      real(dp) :: l_x(0:1), l_y(0:1), l_z(0:1)
-      real(dp) :: lin_val, corner_val, corner_wt
-      real(dp) :: f_min, f_max, lower_bound, upper_bound, local_range
-      real(dp) :: sum_h, sum_l, ratio
-      real(dp), dimension(:), allocatable :: linear_flux
-      real(dp), parameter :: tiny_value = 1.0d-300
-      ! Allow modest local cubic overshoot. The catastrophic WD failure is
-      ! caught by the whole-SED flux-ratio check below, not by a hair-trigger
-      ! per-wavelength clamp.
-      real(dp), parameter :: local_overshoot_tol = 5.0d-1
-      real(dp), parameter :: integrated_flux_tol = 5.0d-2
-
-      nx = size(x_grid)
-      ny = size(y_grid)
-      nz = size(z_grid)
-
-      ! Find containing cell (done once for all wavelengths).  Singleton axes
-      ! are valid degenerate dimensions, not an out-of-grid condition.
-      call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                i_x, i_y, i_z, t_x, t_y, t_z)
-
-      ix_max = 1
-      iy_max = 1
-      iz_max = 1
-
-      if (nx == 1) then
-         i_x = 1
-         t_x = 0.0_dp
-         ix_max = 0
-      end if
-      if (ny == 1) then
-         i_y = 1
-         t_y = 0.0_dp
-         iy_max = 0
-      end if
-      if (nz == 1) then
-         i_z = 1
-         t_z = 0.0_dp
-         iz_max = 0
-      end if
-
-      ! If outside a non-degenerate grid dimension, use nearest point for all wavelengths.
-      if ((nx > 1 .and. (i_x < 1 .or. i_x >= nx)) .or. &
-          (ny > 1 .and. (i_y < 1 .or. i_y >= ny)) .or. &
-          (nz > 1 .and. (i_z < 1 .or. i_z >= nz))) then
-
-         call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                 i_x, i_y, i_z)
-         do lam = 1, n_lambda
-            result_flux(lam) = f_values_4d(i_x, i_y, i_z, lam)
-         end do
+      ! Nothing needs repairing.  Zero flux is already physically safe.
+      if (.not. any(fluxes < 0.0_dp)) then
+         repair_ok = any(fluxes > 0.0_dp)
          return
       end if
 
-      ! Grid cell spacing.  Degenerate axes have zero derivative contribution.
-      if (nx > 1) then
-         dx = x_grid(i_x + 1) - x_grid(i_x)
-      else
-         dx = 0.0_dp
-      end if
-      if (ny > 1) then
-         dy = y_grid(i_y + 1) - y_grid(i_y)
-      else
-         dy = 0.0_dp
-      end if
-      if (nz > 1) then
-         dz = z_grid(i_z + 1) - z_grid(i_z)
-      else
-         dz = 0.0_dp
-      end if
+      ! A useful SED must retain a positive interior.
+      if (.not. any(fluxes > 0.0_dp)) return
 
-      ! Precompute Hermite basis functions (same for all wavelengths)
-      h_x = [h00(t_x), h01(t_x)]
-      hx_d = [h10(t_x), h11(t_x)]
-      h_y = [h00(t_y), h01(t_y)]
-      hy_d = [h10(t_y), h11(t_y)]
-      h_z = [h00(t_z), h01(t_z)]
-      hz_d = [h10(t_z), h11(t_z)]
+      allocate (flux_part(n))
 
-      ! Linear weights for the same containing cell. These are used as a
-      ! positivity/local-bounds limiter for the Hermite candidate below.
-      l_x = 0.0_dp; l_y = 0.0_dp; l_z = 0.0_dp
-      l_x(0) = 1.0_dp - t_x; l_x(1) = t_x
-      l_y(0) = 1.0_dp - t_y; l_y(1) = t_y
-      l_z(0) = 1.0_dp - t_z; l_z(1) = t_z
-      if (ix_max == 0) then
-         l_x(0) = 1.0_dp; l_x(1) = 0.0_dp
-      end if
-      if (iy_max == 0) then
-         l_y(0) = 1.0_dp; l_y(1) = 0.0_dp
-      end if
-      if (iz_max == 0) then
-         l_z(0) = 1.0_dp; l_z(1) = 0.0_dp
-      end if
+      flux_part = max(0.0_dp, -fluxes)
+      call simpson_integration(wavelengths, flux_part, negative_integral)
+      negative_peak = maxval(flux_part)
 
-      ! stencil loop -- weights are invariant over lambda, so lambda is innermost
-      result_flux = 0.0_dp
-      allocate (linear_flux(n_lambda))
-      linear_flux = 0.0_dp
-      do iz = 0, iz_max
-         wz = h_z(iz + 1)
-         wzd = hz_d(iz + 1)
-         do iy = 0, iy_max
-            wy = h_y(iy + 1)
-            wyd = hy_d(iy + 1)
-            do ix = 0, ix_max
-               wx = h_x(ix + 1)
-               wxd = hx_d(ix + 1)
-               do lam = 1, n_lambda
-                  val = f_values_4d(i_x + ix, i_y + iy, i_z + iz, lam)
+      flux_part = max(0.0_dp, fluxes)
+      call simpson_integration(wavelengths, flux_part, positive_integral)
+      positive_peak = maxval(flux_part)
 
-                  call compute_derivatives_at_point_4d( &
-                     f_values_4d, i_x + ix, i_y + iy, i_z + iz, lam, &
-                     nx, ny, nz, x_grid, y_grid, z_grid, df_dx, df_dy, df_dz)
+      deallocate (flux_part)
 
-                  result_flux(lam) = result_flux(lam) &
-                                     + wx*wy*wz*val &
-                                     + wxd*wy*wz*dx*df_dx &
-                                     + wx*wyd*wz*dy*df_dy &
-                                     + wx*wy*wzd*dz*df_dz
-               end do
-            end do
-         end do
-      end do
+      if (is_nan(negative_integral) .or. is_inf(negative_integral)) return
+      if (is_nan(positive_integral) .or. is_inf(positive_integral)) return
+      if (is_nan(negative_peak) .or. is_inf(negative_peak)) return
+      if (is_nan(positive_peak) .or. is_inf(positive_peak)) return
+      if (positive_integral <= 0.0_dp .or. positive_peak <= 0.0_dp) return
 
-      ! Build the multilinear SED for the same cell.  Use it as a safety
-      ! reference, not as the default answer.  A strict per-wavelength min/max
-      ! clamp makes this routine collapse back to linear interpolation and keeps
-      ! the linear grid-cell kinks.  Instead, only reject clearly bad wavelength
-      ! bins here, then sanity-check the integrated SED below.
-      do lam = 1, n_lambda
-         lin_val = 0.0_dp
-         f_min = huge(1.0_dp)
-         f_max = -huge(1.0_dp)
+      if (negative_integral/positive_integral > negative_flux_fraction_tol) return
+      if (negative_peak/positive_peak > negative_flux_fraction_tol) return
 
-         do iz = 0, iz_max
-            do iy = 0, iy_max
-               do ix = 0, ix_max
-                  corner_val = f_values_4d(i_x + ix, i_y + iy, i_z + iz, lam)
-                  corner_wt = l_x(ix)*l_y(iy)*l_z(iz)
-                  lin_val = lin_val + corner_wt*corner_val
-                  f_min = min(f_min, corner_val)
-                  f_max = max(f_max, corner_val)
-               end do
-            end do
-         end do
+      ! The undershoot is negligible; project only the unphysical samples onto
+      ! the physical constraint f_lambda >= 0.
+      where (fluxes < 0.0_dp) fluxes = 0.0_dp
 
-         linear_flux(lam) = max(tiny_value, lin_val)
+      repair_ok = all(fluxes >= 0.0_dp) .and. any(fluxes > 0.0_dp)
+   end subroutine repair_negative_flux
 
-         local_range = max(f_max - f_min, max(abs(f_min), abs(f_max), tiny_value))
-         lower_bound = f_min - local_overshoot_tol*local_range
-         upper_bound = f_max + local_overshoot_tol*local_range
+   logical function valid_sed(wavelengths, fluxes, require_positive_flux)
+      real(dp), intent(in) :: wavelengths(:), fluxes(:)
+      logical, intent(in) :: require_positive_flux
 
-         if (result_flux(lam) /= result_flux(lam) .or. &
-             result_flux(lam) <= tiny_value .or. &
-             result_flux(lam) < lower_bound .or. &
-             result_flux(lam) > upper_bound) then
-            result_flux(lam) = linear_flux(lam)
-         end if
+      valid_sed = size(wavelengths) >= 2 .and. size(wavelengths) == size(fluxes)
+      if (.not. valid_sed) return
 
-         result_flux(lam) = max(tiny_value, result_flux(lam))
-      end do
+      valid_sed = .not. any(is_nan(wavelengths)) .and. .not. any(is_inf(wavelengths)) .and. &
+                  .not. any(is_nan(fluxes)) .and. .not. any(is_inf(fluxes))
+      if (.not. valid_sed) return
 
-      ! Whole-SED sanity check.  The Koester WD failure can remain inside the
-      ! local per-wavelength envelope while still biasing the continuum enough
-      ! to destroy the bolometric flux.  If Hermite and multilinear disagree in
-      ! total surface flux by more than a few percent, use the safe multilinear
-      ! SED for this timestep.
-      sum_h = sum(result_flux)
-      sum_l = sum(linear_flux)
-      if (sum_h > tiny_value .and. sum_l > tiny_value) then
-         ratio = sum_h/sum_l
-         if (abs(ratio - 1.0_dp) > integrated_flux_tol) then
-            result_flux = linear_flux
-         end if
-      else
-         result_flux = linear_flux
-      end if
+      valid_sed = all(wavelengths > 0.0_dp) .and. &
+                  all(wavelengths(2:) > wavelengths(:size(wavelengths) - 1))
+      if (.not. valid_sed) return
 
-      deallocate (linear_flux)
-
-   end subroutine hermite_interp_vector
-
-   !---------------------------------------------------------------------------
-   ! Compute derivatives directly from the 4-D array at a given wavelength,
-   ! avoiding the need to extract a 3-D slice first.
-   !---------------------------------------------------------------------------
-   subroutine compute_derivatives_at_point_4d(f4d, i, j, k, lam, nx, ny, nz, &
-                                              x_grid, y_grid, z_grid, df_dx, df_dy, df_dz)
-      real(dp), intent(in) :: f4d(:, :, :, :)
-      integer, intent(in) :: i, j, k, lam, nx, ny, nz
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      real(dp), intent(out) :: df_dx, df_dy, df_dz
-
-      ! x derivative
-      if (nx == 1) then
-         df_dx = 0.0_dp
-      else if (i > 1 .and. i < nx) then
-         df_dx = (f4d(i + 1, j, k, lam) - f4d(i - 1, j, k, lam))/(x_grid(i + 1) - x_grid(i - 1))
-      else if (i == 1) then
-         df_dx = (f4d(i + 1, j, k, lam) - f4d(i, j, k, lam))/(x_grid(i + 1) - x_grid(i))
-      else
-         df_dx = (f4d(i, j, k, lam) - f4d(i - 1, j, k, lam))/(x_grid(i) - x_grid(i - 1))
-      end if
-
-      ! y derivative
-      if (ny == 1) then
-         df_dy = 0.0_dp
-      else if (j > 1 .and. j < ny) then
-         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j - 1, k, lam))/(y_grid(j + 1) - y_grid(j - 1))
-      else if (j == 1) then
-         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j, k, lam))/(y_grid(j + 1) - y_grid(j))
-      else
-         df_dy = (f4d(i, j, k, lam) - f4d(i, j - 1, k, lam))/(y_grid(j) - y_grid(j - 1))
-      end if
-
-      ! z derivative
-      if (nz == 1) then
-         df_dz = 0.0_dp
-      else if (k > 1 .and. k < nz) then
-         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k - 1, lam))/(z_grid(k + 1) - z_grid(k - 1))
-      else if (k == 1) then
-         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k, lam))/(z_grid(k + 1) - z_grid(k))
-      else
-         df_dz = (f4d(i, j, k, lam) - f4d(i, j, k - 1, lam))/(z_grid(k) - z_grid(k - 1))
-      end if
-
-   end subroutine compute_derivatives_at_point_4d
-
-   function hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
-                                    z_grid, f_values) result(f_interp)
-      real(dp), intent(in) :: x_val, y_val, z_val
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      real(dp), intent(in) :: f_values(:, :, :)
-      real(dp) :: f_interp
-
-      integer :: i_x, i_y, i_z, ix, iy, iz
-      integer :: ix_max, iy_max, iz_max
-      integer :: nx, ny, nz
-      real(dp) :: t_x, t_y, t_z, dx, dy, dz, f_sum
-      real(dp) :: dx_values(2, 2, 2), dy_values(2, 2, 2), dz_values(2, 2, 2)
-      real(dp) :: values(2, 2, 2)
-      real(dp) :: h_x(2), h_y(2), h_z(2)
-      real(dp) :: hx_d(2), hy_d(2), hz_d(2)
-      real(dp) :: l_x(0:1), l_y(0:1), l_z(0:1)
-      real(dp) :: lin_sum, corner_val, corner_wt
-      real(dp) :: f_min, f_max, lower_bound, upper_bound
-      real(dp), parameter :: tiny_value = 1.0d-300
-      real(dp), parameter :: bound_tol = 1.0d-10
-
-      nx = size(x_grid)
-      ny = size(y_grid)
-      nz = size(z_grid)
-
-      call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                i_x, i_y, i_z, t_x, t_y, t_z)
-
-      ix_max = 1
-      iy_max = 1
-      iz_max = 1
-
-      if (nx == 1) then
-         i_x = 1
-         t_x = 0.0_dp
-         ix_max = 0
-      end if
-      if (ny == 1) then
-         i_y = 1
-         t_y = 0.0_dp
-         iy_max = 0
-      end if
-      if (nz == 1) then
-         i_z = 1
-         t_z = 0.0_dp
-         iz_max = 0
-      end if
-
-      if ((nx > 1 .and. (i_x < 1 .or. i_x >= nx)) .or. &
-          (ny > 1 .and. (i_y < 1 .or. i_y >= ny)) .or. &
-          (nz > 1 .and. (i_z < 1 .or. i_z >= nz))) then
-         call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
-                                 i_x, i_y, i_z)
-         f_interp = f_values(i_x, i_y, i_z)
-         return
-      end if
-
-      if (nx > 1) then
-         dx = x_grid(i_x + 1) - x_grid(i_x)
-      else
-         dx = 0.0_dp
-      end if
-      if (ny > 1) then
-         dy = y_grid(i_y + 1) - y_grid(i_y)
-      else
-         dy = 0.0_dp
-      end if
-      if (nz > 1) then
-         dz = z_grid(i_z + 1) - z_grid(i_z)
-      else
-         dz = 0.0_dp
-      end if
-
-      do iz = 0, iz_max
-         do iy = 0, iy_max
-            do ix = 0, ix_max
-               values(ix + 1, iy + 1, iz + 1) = f_values(i_x + ix, i_y + iy, i_z + iz)
-               call compute_derivatives_at_point(f_values, i_x + ix, i_y + iy, i_z + iz, &
-                                                 nx, ny, nz, x_grid, y_grid, z_grid, &
-                                                 dx_values(ix + 1, iy + 1, iz + 1), &
-                                                 dy_values(ix + 1, iy + 1, iz + 1), &
-                                                 dz_values(ix + 1, iy + 1, iz + 1))
-            end do
-         end do
-      end do
-
-      h_x = [h00(t_x), h01(t_x)]
-      hx_d = [h10(t_x), h11(t_x)]
-      h_y = [h00(t_y), h01(t_y)]
-      hy_d = [h10(t_y), h11(t_y)]
-      h_z = [h00(t_z), h01(t_z)]
-      hz_d = [h10(t_z), h11(t_z)]
-
-      l_x = 0.0_dp; l_y = 0.0_dp; l_z = 0.0_dp
-      l_x(0) = 1.0_dp - t_x; l_x(1) = t_x
-      l_y(0) = 1.0_dp - t_y; l_y(1) = t_y
-      l_z(0) = 1.0_dp - t_z; l_z(1) = t_z
-      if (ix_max == 0) then
-         l_x(0) = 1.0_dp; l_x(1) = 0.0_dp
-      end if
-      if (iy_max == 0) then
-         l_y(0) = 1.0_dp; l_y(1) = 0.0_dp
-      end if
-      if (iz_max == 0) then
-         l_z(0) = 1.0_dp; l_z(1) = 0.0_dp
-      end if
-
-      f_sum = 0.0_dp
-      do iz = 1, iz_max + 1
-         do iy = 1, iy_max + 1
-            do ix = 1, ix_max + 1
-               f_sum = f_sum + h_x(ix)*h_y(iy)*h_z(iz)*values(ix, iy, iz)
-               f_sum = f_sum + hx_d(ix)*h_y(iy)*h_z(iz)*dx*dx_values(ix, iy, iz)
-               f_sum = f_sum + h_x(ix)*hy_d(iy)*h_z(iz)*dy*dy_values(ix, iy, iz)
-               f_sum = f_sum + h_x(ix)*h_y(iy)*hz_d(iz)*dz*dz_values(ix, iy, iz)
-            end do
-         end do
-      end do
-
-      lin_sum = 0.0_dp
-      f_min = huge(1.0_dp)
-      f_max = -huge(1.0_dp)
-      do iz = 0, iz_max
-         do iy = 0, iy_max
-            do ix = 0, ix_max
-               corner_val = f_values(i_x + ix, i_y + iy, i_z + iz)
-               corner_wt = l_x(ix)*l_y(iy)*l_z(iz)
-               lin_sum = lin_sum + corner_wt*corner_val
-               f_min = min(f_min, corner_val)
-               f_max = max(f_max, corner_val)
-            end do
-         end do
-      end do
-
-      lower_bound = f_min - bound_tol*max(abs(f_min), abs(f_max), tiny_value)
-      upper_bound = f_max + bound_tol*max(abs(f_min), abs(f_max), tiny_value)
-
-      if (f_sum /= f_sum .or. &
-          f_sum <= tiny_value .or. &
-          f_sum < lower_bound .or. &
-          f_sum > upper_bound) then
-         f_interp = lin_sum
-      else
-         f_interp = f_sum
-      end if
-      f_interp = max(tiny_value, f_interp)
-   end function hermite_tensor_interp3d
-
-   subroutine compute_derivatives_at_point(f, i, j, k, nx, ny, nz, &
-                                           x_grid, y_grid, z_grid, &
-                                           df_dx, df_dy, df_dz)
-      real(dp), intent(in) :: f(:, :, :)
-      integer, intent(in) :: i, j, k, nx, ny, nz
-      real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
-      real(dp), intent(out) :: df_dx, df_dy, df_dz
-
-      if (nx == 1) then
-         df_dx = 0.0_dp
-      else if (i > 1 .and. i < nx) then
-         df_dx = (f(i + 1, j, k) - f(i - 1, j, k))/(x_grid(i + 1) - x_grid(i - 1))
-      else if (i == 1) then
-         df_dx = (f(i + 1, j, k) - f(i, j, k))/(x_grid(i + 1) - x_grid(i))
-      else
-         df_dx = (f(i, j, k) - f(i - 1, j, k))/(x_grid(i) - x_grid(i - 1))
-      end if
-
-      if (ny == 1) then
-         df_dy = 0.0_dp
-      else if (j > 1 .and. j < ny) then
-         df_dy = (f(i, j + 1, k) - f(i, j - 1, k))/(y_grid(j + 1) - y_grid(j - 1))
-      else if (j == 1) then
-         df_dy = (f(i, j + 1, k) - f(i, j, k))/(y_grid(j + 1) - y_grid(j))
-      else
-         df_dy = (f(i, j, k) - f(i, j - 1, k))/(y_grid(j) - y_grid(j - 1))
-      end if
-
-      if (nz == 1) then
-         df_dz = 0.0_dp
-      else if (k > 1 .and. k < nz) then
-         df_dz = (f(i, j, k + 1) - f(i, j, k - 1))/(z_grid(k + 1) - z_grid(k - 1))
-      else if (k == 1) then
-         df_dz = (f(i, j, k + 1) - f(i, j, k))/(z_grid(k + 1) - z_grid(k))
-      else
-         df_dz = (f(i, j, k) - f(i, j, k - 1))/(z_grid(k) - z_grid(k - 1))
-      end if
-   end subroutine compute_derivatives_at_point
-
-   !---------------------------------------------------------------------------
-   ! Hermite basis functions
-   !---------------------------------------------------------------------------
-   function h00(t) result(h)
-      real(dp), intent(in) :: t
-      real(dp) :: h
-      h = 2.0_dp*t**3 - 3.0_dp*t**2 + 1.0_dp
-   end function h00
-
-   function h10(t) result(h)
-      real(dp), intent(in) :: t
-      real(dp) :: h
-      h = t**3 - 2.0_dp*t**2 + t
-   end function h10
-
-   function h01(t) result(h)
-      real(dp), intent(in) :: t
-      real(dp) :: h
-      h = -2.0_dp*t**3 + 3.0_dp*t**2
-   end function h01
-
-   function h11(t) result(h)
-      real(dp), intent(in) :: t
-      real(dp) :: h
-      h = t**3 - t**2
-   end function h11
+      if (require_positive_flux) valid_sed = all(fluxes > 0.0_dp)
+   end function valid_sed
 
 end module hermite_interp_bounded

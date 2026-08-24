@@ -37,20 +37,21 @@
 program test_colors
 
    use const_lib, only: const_init
-   use math_lib, only: math_init
+   use math_lib, only: math_init, pow2, pow4
    use colors_lib, only: &
       colors_init, colors_shutdown, &
       alloc_colors_handle_using_inlist, free_colors_handle, colors_ptr, &
       colors_setup_tables, colors_setup_hooks, how_many_colors_history_columns, &
       data_for_colors_history_columns, calculate_bolometric
    use colors_def, only: Colors_General_Info
-   use const_def, only: dp, rsun, boltz_sigma
+   use const_def, only: dp, pi, pc, rsun, Lsun, mbolsun, boltz_sigma
    use utils_lib, only: mesa_error
    use colors_utils, only: resolve_path
    use synthetic, only: calculate_synthetic, compute_vega_zero_point, &
                         zero_filter_outside_support
    use linear_interp, only: trilinear_interp
-   use hermite_interp_bounded, only: hermite_tensor_interp3d
+   use hermite_interp, only: hermite_tensor_interp3d
+   use hermite_interp_bounded, only: construct_sed_hermite_bounded
    use bolometric, only: calculate_bolometric_phot
 
    implicit none
@@ -97,8 +98,8 @@ program test_colors
    ! shared
    ! -----------------------------------------------------------------------
 
-   ! 10 parsecs in cm -> absolute magnitudes
-   real(dp), parameter :: d_10pc = 3.0857d19
+   ! 10 parsecs -> absolute magnitudes
+   real(dp), parameter :: d_10pc = 10.0_dp*pc
 
    ! number of sampled SED points printed for the SED comparison
    integer, parameter :: n_sed_samples = 20
@@ -154,9 +155,7 @@ program test_colors
       stop 1
    end if
 
-   ! enable photometry and explicitly load colors data, since the default
-   ! namelist leaves use_colors = .false. and skips setup at handle.
-   ! To do : This could be replaced by reading from an inlist instead in the future.
+   ! Enable photometry and explicitly load the default Colors data.
    cs%use_colors = .true.
    cs%mag_system = 'Vega'
    call colors_setup_tables(handle, ierr)
@@ -165,7 +164,7 @@ program test_colors
       stop 1
    end if
 
-   ! probably unecessary since this is empty right now.
+   ! Follow the normal Colors handle-initialization sequence.
    call colors_setup_hooks(handle, ierr)
    if (ierr /= 0) then
       write (*, *) 'colors_setup_hooks failed, ierr =', ierr
@@ -297,8 +296,12 @@ program test_colors
    call check_vega_filter_support()
    call check_singleton_axis()
    call check_boundary_clamping()
+   call check_linear_nearest_fallback()
+   call check_nonuniform_hermite_derivatives()
+   call check_bounded_hermite_small_negative()
    call check_bounded_hermite_fallback()
    call check_bolometric_non_destructive()
+   call check_bolometric_zero_point()
 
    ! -----------------------------------------------------------------------
    ! cleanup
@@ -336,7 +339,7 @@ contains
          rq, teff, log_g, metallicity, radius, d_10pc, &
          local_mag, local_flux, local_wavelengths, local_fluxes, sed_path, local_interp_rad)
 
-      expected_flux = boltz_sigma*teff**4*(radius/d_10pc)**2
+      expected_flux = boltz_sigma*pow4(teff)*pow2(radius/d_10pc)
       abs_err = abs(local_flux - expected_flux)
       rel_err = abs(local_flux - expected_flux)/expected_flux
 
@@ -447,19 +450,98 @@ contains
       call assert_close('boundary_clamp_high', above, 3.5_dp, 1.0d-14)
    end subroutine check_boundary_clamping
 
-   subroutine check_bounded_hermite_fallback()
-      real(dp) :: x_grid(3), singleton(1), values(3, 1, 1), actual
+   subroutine check_linear_nearest_fallback()
+      real(dp) :: grid(2), singleton(1), values(2, 1, 1), actual
 
-      x_grid = [0.0_dp, 1.0_dp, 2.0_dp]
+      grid = [0.0_dp, 1.0_dp]
       singleton = [0.0_dp]
-      values(:, 1, 1) = [1.0_dp, 1.0_dp, 100.0_dp]
+      values(:, 1, 1) = [1.0_dp, -10.0_dp]
+
+      actual = trilinear_interp(0.25_dp, 0.0_dp, 0.0_dp, &
+                                grid, singleton, singleton, values)
+      call assert_close('linear_nearest_fallback', actual, 1.0_dp, 1.0d-14)
+   end subroutine check_linear_nearest_fallback
+
+   subroutine check_nonuniform_hermite_derivatives()
+      type(Colors_General_Info) :: bounded_cs
+      real(dp) :: x_grid(4), singleton(1), values(4, 1, 1), actual
+      real(dp), allocatable :: actual_wave(:), actual_flux(:)
+      integer :: lam
+
+      x_grid = [0.0_dp, 1.0_dp, 3.0_dp, 6.0_dp]
+      singleton = [0.0_dp]
+      values(:, 1, 1) = 100.0_dp + x_grid*x_grid
+
+      ! A three-point derivative on a nonuniform grid must reproduce this
+      ! quadratic exactly.  The old two-point chord slope gives 102.4375.
+      actual = hermite_tensor_interp3d(1.5_dp, 0.0_dp, 0.0_dp, &
+                                       x_grid, singleton, singleton, values)
+      call assert_close('nonuniform_hermite_3d', actual, 102.25_dp, 1.0d-12)
+
+      ! Repeat through the vectorized 4-D path used to construct production
+      ! SEDs, so both derivative implementations are covered.
+      bounded_cs%cube_loaded = .true.
+      bounded_cs%cube_teff_grid = x_grid
+      bounded_cs%cube_logg_grid = singleton
+      bounded_cs%cube_meta_grid = singleton
+      bounded_cs%cube_wavelengths = [1.0_dp, 2.0_dp, 4.0_dp]
+      allocate (bounded_cs%cube_flux(4, 1, 1, 3))
+      do lam = 1, 3
+         bounded_cs%cube_flux(:, 1, 1, lam) = values(:, 1, 1)
+      end do
+
+      call construct_sed_hermite_bounded(bounded_cs, 1.5_dp, 0.0_dp, 0.0_dp, &
+                                         1.0_dp, 1.0_dp, '', actual_wave, actual_flux)
+      call assert_array_close('nonuniform_hermite_4d', actual_flux, &
+                              [102.25_dp, 102.25_dp, 102.25_dp], 1.0d-12)
+   end subroutine check_nonuniform_hermite_derivatives
+
+   subroutine check_bounded_hermite_small_negative()
+      type(Colors_General_Info) :: bounded_cs
+      real(dp), allocatable :: actual_wave(:), actual_flux(:)
+
+      bounded_cs%cube_loaded = .true.
+      bounded_cs%cube_teff_grid = [0.0_dp, 1.0_dp, 2.0_dp]
+      bounded_cs%cube_logg_grid = [0.0_dp]
+      bounded_cs%cube_meta_grid = [0.0_dp]
+      bounded_cs%cube_wavelengths = [1.0_dp, 2.0_dp, 4.0_dp]
+      allocate (bounded_cs%cube_flux(3, 1, 1, 3))
+
+      ! The middle wavelength has a Hermite value of approximately -1e-6 at
+      ! Teff=0.5, negligible relative to the two positive samples.  It should
+      ! be projected to zero without replacing the SED by the linear result.
+      bounded_cs%cube_flux(:, 1, 1, 1) = 100.0_dp
+      bounded_cs%cube_flux(:, 1, 1, 2) = [1.0_dp, 1.0_dp, 17.000016_dp]
+      bounded_cs%cube_flux(:, 1, 1, 3) = 100.0_dp
+
+      call construct_sed_hermite_bounded(bounded_cs, 0.5_dp, 0.0_dp, 0.0_dp, &
+                                         1.0_dp, 1.0_dp, '', actual_wave, actual_flux)
+      call assert_array_close('bounded_hermite_small_negative', actual_flux, &
+                              [100.0_dp, 0.0_dp, 100.0_dp], 1.0d-12)
+   end subroutine check_bounded_hermite_small_negative
+
+   subroutine check_bounded_hermite_fallback()
+      type(Colors_General_Info) :: bounded_cs
+      real(dp), allocatable :: actual_wave(:), actual_flux(:)
+      integer :: lam
+
+      bounded_cs%cube_loaded = .true.
+      bounded_cs%cube_teff_grid = [0.0_dp, 1.0_dp, 2.0_dp]
+      bounded_cs%cube_logg_grid = [0.0_dp]
+      bounded_cs%cube_meta_grid = [0.0_dp]
+      bounded_cs%cube_wavelengths = [1.0_dp, 2.0_dp, 4.0_dp]
+      allocate (bounded_cs%cube_flux(3, 1, 1, 3))
+      do lam = 1, 3
+         bounded_cs%cube_flux(:, 1, 1, lam) = [1.0_dp, 1.0_dp, 100.0_dp]
+      end do
 
       ! The derivative inferred from the third point drives the unbounded
-      ! Hermite value below zero in the first cell.  Bounded Hermite must use
-      ! the multilinear value, which is exactly one throughout that cell.
-      actual = hermite_tensor_interp3d(0.5_dp, 0.0_dp, 0.0_dp, &
-                                       x_grid, singleton, singleton, values)
-      call assert_close('bounded_hermite_fallback', actual, 1.0_dp, 1.0d-14)
+      ! Hermite SED below zero in the first cell. Exercise the production SED
+      ! constructor and verify that it returns the multilinear SED.
+      call construct_sed_hermite_bounded(bounded_cs, 0.5_dp, 0.0_dp, 0.0_dp, &
+                                         1.0_dp, 1.0_dp, '', actual_wave, actual_flux)
+      call assert_array_close('bounded_hermite_fallback', actual_flux, &
+                              [1.0_dp, 1.0_dp, 1.0_dp], 1.0d-14)
    end subroutine check_bounded_hermite_fallback
 
    subroutine check_bolometric_non_destructive()
@@ -478,6 +560,19 @@ contains
                         11.0_dp/3.0_dp, 1.0d-14)
    end subroutine check_bolometric_non_destructive
 
+   subroutine check_bolometric_zero_point()
+      real(dp) :: local_wavelengths(3), local_fluxes(3)
+      real(dp) :: solar_flux, local_mag, local_bol_flux
+
+      solar_flux = Lsun/(4.0_dp*pi*pow2(10.0_dp*pc))
+      local_wavelengths = [1.0_dp, 2.0_dp, 3.0_dp]
+      local_fluxes = solar_flux/2.0_dp
+
+      call calculate_bolometric_phot(local_wavelengths, local_fluxes, &
+                                     local_mag, local_bol_flux)
+      call assert_close('bolometric_solar_zero_point', local_mag, mbolsun, 1.0d-12)
+   end subroutine check_bolometric_zero_point
+
    subroutine assert_close(label, actual, expected, tolerance)
       character(len=*), intent(in) :: label
       real(dp), intent(in) :: actual, expected, tolerance
@@ -485,7 +580,7 @@ contains
       if (abs(actual - expected) > tolerance) then
          write (*, '(a, a, 2(a, 1pe23.13))') 'FAIL ', trim(label), &
             ' actual=', actual, ' expected=', expected
-         stop 1
+         call mesa_error(__FILE__, __LINE__)
       end if
       write (*, '(a, a)') 'PASS ', trim(label)
    end subroutine assert_close
@@ -494,10 +589,18 @@ contains
       character(len=*), intent(in) :: label
       real(dp), intent(in) :: actual(:), expected(:), tolerance
 
-      if (size(actual) /= size(expected) .or. &
-          any(abs(actual - expected) > tolerance)) then
+      ! Fortran does not require short-circuit evaluation of .or., so check
+      ! conformance before performing the array expression.
+      if (size(actual) /= size(expected)) then
+         write (*, '(a, a, 2(a, i0))') 'FAIL ', trim(label), &
+            ' actual_size=', size(actual), ' expected_size=', size(expected)
+         call mesa_error(__FILE__, __LINE__)
+         return
+      end if
+
+      if (any(abs(actual - expected) > tolerance)) then
          write (*, '(a, a)') 'FAIL ', trim(label)
-         stop 1
+         call mesa_error(__FILE__, __LINE__)
       end if
       write (*, '(a, a)') 'PASS ', trim(label)
    end subroutine assert_array_close

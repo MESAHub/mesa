@@ -289,51 +289,68 @@ contains
 
    end subroutine hermite_interp_vector
 
-   !---------------------------------------------------------------------------
-   ! Compute derivatives directly from the 4-D array at a given wavelength,
-   ! avoiding the need to extract a 3-D slice first.
-   !---------------------------------------------------------------------------
+
    subroutine compute_derivatives_at_point_4d(f4d, i, j, k, lam, nx, ny, nz, &
                                               x_grid, y_grid, z_grid, df_dx, df_dy, df_dz)
       real(dp), intent(in) :: f4d(:, :, :, :)
       integer, intent(in) :: i, j, k, lam, nx, ny, nz
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
       real(dp), intent(out) :: df_dx, df_dy, df_dz
+      real(dp) :: h_minus, h_plus, d_minus, d_plus
 
       ! x derivative
       if (nx == 1) then
          df_dx = 0.0_dp
       else if (i > 1 .and. i < nx) then
-         df_dx = (f4d(i + 1, j, k, lam) - f4d(i - 1, j, k, lam))/(x_grid(i + 1) - x_grid(i - 1))
+         h_minus = x_grid(i) - x_grid(i - 1)
+         h_plus = x_grid(i + 1) - x_grid(i)
+         d_minus = (f4d(i, j, k, lam) - f4d(i - 1, j, k, lam))/h_minus
+         d_plus = (f4d(i + 1, j, k, lam) - f4d(i, j, k, lam))/h_plus
+         df_dx = (h_plus*d_minus + h_minus*d_plus)/(h_minus + h_plus)
       else if (i == 1) then
-         df_dx = (f4d(i + 1, j, k, lam) - f4d(i, j, k, lam))/(x_grid(i + 1) - x_grid(i))
+         df_dx = (f4d(i + 1, j, k, lam) - f4d(i, j, k, lam))/ &
+                 (x_grid(i + 1) - x_grid(i))
       else
-         df_dx = (f4d(i, j, k, lam) - f4d(i - 1, j, k, lam))/(x_grid(i) - x_grid(i - 1))
+         df_dx = (f4d(i, j, k, lam) - f4d(i - 1, j, k, lam))/ &
+                 (x_grid(i) - x_grid(i - 1))
       end if
 
       ! y derivative
       if (ny == 1) then
          df_dy = 0.0_dp
       else if (j > 1 .and. j < ny) then
-         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j - 1, k, lam))/(y_grid(j + 1) - y_grid(j - 1))
+         h_minus = y_grid(j) - y_grid(j - 1)
+         h_plus = y_grid(j + 1) - y_grid(j)
+         d_minus = (f4d(i, j, k, lam) - f4d(i, j - 1, k, lam))/h_minus
+         d_plus = (f4d(i, j + 1, k, lam) - f4d(i, j, k, lam))/h_plus
+         df_dy = (h_plus*d_minus + h_minus*d_plus)/(h_minus + h_plus)
       else if (j == 1) then
-         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j, k, lam))/(y_grid(j + 1) - y_grid(j))
+         df_dy = (f4d(i, j + 1, k, lam) - f4d(i, j, k, lam))/ &
+                 (y_grid(j + 1) - y_grid(j))
       else
-         df_dy = (f4d(i, j, k, lam) - f4d(i, j - 1, k, lam))/(y_grid(j) - y_grid(j - 1))
+         df_dy = (f4d(i, j, k, lam) - f4d(i, j - 1, k, lam))/ &
+                 (y_grid(j) - y_grid(j - 1))
       end if
 
       ! z derivative
       if (nz == 1) then
          df_dz = 0.0_dp
       else if (k > 1 .and. k < nz) then
-         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k - 1, lam))/(z_grid(k + 1) - z_grid(k - 1))
+         h_minus = z_grid(k) - z_grid(k - 1)
+         h_plus = z_grid(k + 1) - z_grid(k)
+         d_minus = (f4d(i, j, k, lam) - f4d(i, j, k - 1, lam))/h_minus
+         d_plus = (f4d(i, j, k + 1, lam) - f4d(i, j, k, lam))/h_plus
+         df_dz = (h_plus*d_minus + h_minus*d_plus)/(h_minus + h_plus)
       else if (k == 1) then
-         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k, lam))/(z_grid(k + 1) - z_grid(k))
+         df_dz = (f4d(i, j, k + 1, lam) - f4d(i, j, k, lam))/ &
+                 (z_grid(k + 1) - z_grid(k))
       else
-         df_dz = (f4d(i, j, k, lam) - f4d(i, j, k - 1, lam))/(z_grid(k) - z_grid(k - 1))
+         df_dz = (f4d(i, j, k, lam) - f4d(i, j, k - 1, lam))/ &
+                 (z_grid(k) - z_grid(k - 1))
       end if
 
    end subroutine compute_derivatives_at_point_4d
+
 
    function hermite_tensor_interp3d(x_val, y_val, z_val, x_grid, y_grid, &
                                     z_grid, f_values) result(f_interp)
@@ -437,7 +454,7 @@ contains
 
       f_interp = f_sum
    end function hermite_tensor_interp3d
-
+   
    subroutine compute_derivatives_at_point(f, i, j, k, nx, ny, nz, &
                                            x_grid, y_grid, z_grid, &
                                            df_dx, df_dy, df_dz)
@@ -445,36 +462,56 @@ contains
       integer, intent(in) :: i, j, k, nx, ny, nz
       real(dp), intent(in) :: x_grid(:), y_grid(:), z_grid(:)
       real(dp), intent(out) :: df_dx, df_dy, df_dz
+      real(dp) :: h_minus, h_plus, d_minus, d_plus
 
       if (nx == 1) then
          df_dx = 0.0_dp
       else if (i > 1 .and. i < nx) then
-         df_dx = (f(i + 1, j, k) - f(i - 1, j, k))/(x_grid(i + 1) - x_grid(i - 1))
+         h_minus = x_grid(i) - x_grid(i - 1)
+         h_plus = x_grid(i + 1) - x_grid(i)
+         d_minus = (f(i, j, k) - f(i - 1, j, k))/h_minus
+         d_plus = (f(i + 1, j, k) - f(i, j, k))/h_plus
+         df_dx = (h_plus*d_minus + h_minus*d_plus)/(h_minus + h_plus)
       else if (i == 1) then
-         df_dx = (f(i + 1, j, k) - f(i, j, k))/(x_grid(i + 1) - x_grid(i))
+         df_dx = (f(i + 1, j, k) - f(i, j, k))/ &
+                 (x_grid(i + 1) - x_grid(i))
       else
-         df_dx = (f(i, j, k) - f(i - 1, j, k))/(x_grid(i) - x_grid(i - 1))
+         df_dx = (f(i, j, k) - f(i - 1, j, k))/ &
+                 (x_grid(i) - x_grid(i - 1))
       end if
 
       if (ny == 1) then
          df_dy = 0.0_dp
       else if (j > 1 .and. j < ny) then
-         df_dy = (f(i, j + 1, k) - f(i, j - 1, k))/(y_grid(j + 1) - y_grid(j - 1))
+         h_minus = y_grid(j) - y_grid(j - 1)
+         h_plus = y_grid(j + 1) - y_grid(j)
+         d_minus = (f(i, j, k) - f(i, j - 1, k))/h_minus
+         d_plus = (f(i, j + 1, k) - f(i, j, k))/h_plus
+         df_dy = (h_plus*d_minus + h_minus*d_plus)/(h_minus + h_plus)
       else if (j == 1) then
-         df_dy = (f(i, j + 1, k) - f(i, j, k))/(y_grid(j + 1) - y_grid(j))
+         df_dy = (f(i, j + 1, k) - f(i, j, k))/ &
+                 (y_grid(j + 1) - y_grid(j))
       else
-         df_dy = (f(i, j, k) - f(i, j - 1, k))/(y_grid(j) - y_grid(j - 1))
+         df_dy = (f(i, j, k) - f(i, j - 1, k))/ &
+                 (y_grid(j) - y_grid(j - 1))
       end if
 
       if (nz == 1) then
          df_dz = 0.0_dp
       else if (k > 1 .and. k < nz) then
-         df_dz = (f(i, j, k + 1) - f(i, j, k - 1))/(z_grid(k + 1) - z_grid(k - 1))
+         h_minus = z_grid(k) - z_grid(k - 1)
+         h_plus = z_grid(k + 1) - z_grid(k)
+         d_minus = (f(i, j, k) - f(i, j, k - 1))/h_minus
+         d_plus = (f(i, j, k + 1) - f(i, j, k))/h_plus
+         df_dz = (h_plus*d_minus + h_minus*d_plus)/(h_minus + h_plus)
       else if (k == 1) then
-         df_dz = (f(i, j, k + 1) - f(i, j, k))/(z_grid(k + 1) - z_grid(k))
+         df_dz = (f(i, j, k + 1) - f(i, j, k))/ &
+                 (z_grid(k + 1) - z_grid(k))
       else
-         df_dz = (f(i, j, k) - f(i, j, k - 1))/(z_grid(k) - z_grid(k - 1))
+         df_dz = (f(i, j, k) - f(i, j, k - 1))/ &
+                 (z_grid(k) - z_grid(k - 1))
       end if
+
    end subroutine compute_derivatives_at_point
 
    !---------------------------------------------------------------------------

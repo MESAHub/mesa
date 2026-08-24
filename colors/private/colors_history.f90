@@ -92,7 +92,6 @@ contains
       end if
 
       d = cs%distance
-
       sed_filepath = trim(resolve_path(cs%stellar_atm))
       make_sed = cs%make_csv
 

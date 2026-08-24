@@ -3,7 +3,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group1  system=Vega  grid=Kurucz2003  filters=Johnson
 
 # case: solar
-                                 Mag_bol    4.7364230568448E+00
+                                 Mag_bol    4.7364361790112E+00
                                 Flux_bol    3.2098630468165E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4328315088495E+00
@@ -14,7 +14,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.5342928137757E+00
                                        V    4.7769811346940E+00
 # case: hot_ms
-                                 Mag_bol   -2.9015923594226E+00
+                                 Mag_bol   -2.9015792372561E+00
                                 Flux_bol    3.6449591844963E-04
                               Interp_rad    0.0000000000000E+00
                                        B   -1.8453872060965E+00
@@ -25,7 +25,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U   -2.5493640964120E+00
                                        V   -1.7077286035359E+00
 # case: cool_giant
-                                 Mag_bol   -1.7131391756963E-01
+                                 Mag_bol   -1.7130079540316E-01
                                 Flux_bol    2.9483653105575E-05
                               Interp_rad    0.0000000000000E+00
                                        B    2.1835469363630E+00
@@ -39,7 +39,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group2a  vary_MH  Teff=5778  logg=4.44
 
 # MH=  -2.00
-                                 Mag_bol    4.7357611950321E+00
+                                 Mag_bol    4.7357743171986E+00
                                 Flux_bol    3.2118203670543E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4155699684922E+00
@@ -50,7 +50,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.1227256937938E+00
                                        V    4.8915514395591E+00
 # MH=  -1.00
-                                 Mag_bol    4.7367105207629E+00
+                                 Mag_bol    4.7367236429294E+00
                                 Flux_bol    3.2090133029621E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4129001639500E+00
@@ -61,7 +61,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.2577215874254E+00
                                        V    4.8394911534358E+00
 # MH=   0.00
-                                 Mag_bol    4.7364230568448E+00
+                                 Mag_bol    4.7364361790112E+00
                                 Flux_bol    3.2098630468165E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4328315088495E+00
@@ -72,7 +72,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.5342928137757E+00
                                        V    4.7769811346940E+00
 # MH=   0.50
-                                 Mag_bol    4.7367133100871E+00
+                                 Mag_bol    4.7367264322536E+00
                                 Flux_bol    3.2090050588168E-07
                               Interp_rad    1.2015098221403E-02
                                        B    5.4709583044458E+00
@@ -86,7 +86,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group2b  vary_logg  Teff=5778  MH=0.0
 
 # logg=   1.00
-                                 Mag_bol    4.7364167962049E+00
+                                 Mag_bol    4.7364299183714E+00
                                 Flux_bol    3.2098815557824E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.3645167572931E+00
@@ -97,7 +97,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.8874283229464E+00
                                        V    4.7180779330260E+00
 # logg=   2.50
-                                 Mag_bol    4.7363282365221E+00
+                                 Mag_bol    4.7363413586886E+00
                                 Flux_bol    3.2101433852074E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.3921064688310E+00
@@ -108,7 +108,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.6695916672821E+00
                                        V    4.7516224781321E+00
 # logg=   4.00
-                                 Mag_bol    4.7363902345917E+00
+                                 Mag_bol    4.7364033567581E+00
                                 Flux_bol    3.2099600837665E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.4245311240969E+00
@@ -119,7 +119,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.5460781049756E+00
                                        V    4.7740932524300E+00
 # logg=   5.00
-                                 Mag_bol    4.7364772421050E+00
+                                 Mag_bol    4.7364903642715E+00
                                 Flux_bol    3.2097028578831E-07
                               Interp_rad    6.0215053763441E-04
                                        B    5.4419095524136E+00
@@ -133,7 +133,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group2c  vary_Teff  logg=4.0  MH=0.0
 
 # Teff=     3500.0
-                                 Mag_bol    6.9139744342241E+00
+                                 Mag_bol    6.9139875563906E+00
                                 Flux_bol    4.3198229964375E-08
                               Interp_rad    0.0000000000000E+00
                                        B    1.0036329716496E+01
@@ -144,7 +144,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    1.1095018314829E+01
                                        V    8.8377137013872E+00
 # Teff=     6000.0
-                                 Mag_bol    4.5726350305252E+00
+                                 Mag_bol    4.5726481526917E+00
                                 Flux_bol    3.7325163050257E-07
                               Interp_rad    0.0000000000000E+00
                                        B    5.1670419609711E+00
@@ -155,7 +155,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    5.2180945995774E+00
                                        V    4.5848107914209E+00
 # Teff=    10000.0
-                                 Mag_bol    2.3537898646187E+00
+                                 Mag_bol    2.3538029867852E+00
                                 Flux_bol    2.8809769255562E-06
                               Interp_rad    0.0000000000000E+00
                                        B    2.5700839979881E+00
@@ -166,7 +166,7 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
                                        U    2.4829162763772E+00
                                        V    2.6004126821216E+00
 # Teff=    20000.0
-                                 Mag_bol   -6.5802776981201E-01
+                                 Mag_bol   -6.5801464764554E-01
                                 Flux_bol    4.6160109853289E-05
                               Interp_rad    0.0000000000000E+00
                                        B    1.0828563761601E+00
@@ -180,57 +180,57 @@ colors: flux cube loaded (76 x 11 x 8 x 1199, 61.2 MB)
 # Group3  SED sample + wavelength_coverage_sanity
 
 # SED sample  case=solar  Teff=5778  logg=4.44  FeH=0.0  columns=wavelength_AA  flux_erg_s_cm2_AA
-    1.4720000000000E+02     2.1385116423739E-41
-    5.1200000000000E+02     1.2669686045439E-39
-    1.0950000000000E+03     5.5890114496366E-21
-    1.6650000000000E+03     1.3984854179012E-15
-    2.2350000000000E+03     2.2027299592265E-12
-    2.8150000000000E+03     5.2619396119207E-12
-    3.8900000000000E+03     2.6676232108131E-11
-    5.0700000000000E+03     4.7479893607680E-11
-    6.2500000000000E+03     3.7949934810183E-11
-    7.4300000000000E+03     2.9943284765423E-11
-    8.6100000000000E+03     2.2878420142827E-11
-    9.7900000000000E+03     1.7769276100082E-11
-    1.2425000000000E+04     1.0638798086088E-11
-    1.5375000000000E+04     6.5440892744616E-12
-    2.0650000000000E+04     2.4263712729167E-12
-    2.6550000000000E+04     9.5609055742312E-13
-    3.2900000000000E+04     4.2443985723283E-13
-    4.4700000000000E+04     1.2606836963661E-13
-    5.6500000000000E+04     5.2911476520239E-14
-    7.2600000000000E+04     2.0114488666486E-14
-    9.6200000000000E+04     6.6589153670475E-15
+    1.4720000000000E+02     2.1385427165316E-41
+    5.1200000000000E+02     1.2669870145358E-39
+    1.0950000000000E+03     5.5890926621115E-21
+    1.6650000000000E+03     1.3985057389298E-15
+    2.2350000000000E+03     2.2027619665239E-12
+    2.8150000000000E+03     5.2620160717996E-12
+    3.8900000000000E+03     2.6676619733537E-11
+    5.0700000000000E+03     4.7480583525692E-11
+    6.2500000000000E+03     3.7950486250837E-11
+    7.4300000000000E+03     2.9943719863523E-11
+    8.6100000000000E+03     2.2878752583213E-11
+    9.7900000000000E+03     1.7769534300822E-11
+    1.2425000000000E+04     1.0638952675702E-11
+    1.5375000000000E+04     6.5441843649246E-12
+    2.0650000000000E+04     2.4264065298880E-12
+    2.6550000000000E+04     9.5610445012688E-13
+    3.2900000000000E+04     4.2444602465824E-13
+    4.4700000000000E+04     1.2607020150337E-13
+    5.6500000000000E+04     5.2912245363172E-14
+    7.2600000000000E+04     2.0114780944900E-14
+    9.6200000000000E+04     6.6590121260185E-15
 
 # wavelength_coverage_sanity  logg=4.0  FeH=0.0  rel_tol=  5.00E-03
 # case: Teff=    3500.0
                               Wav_min_AA    1.4720000000000E+02
                               Wav_max_AA    1.6000000000000E+06
-                             Flux_actual    4.3198229964375E-08
-                           Flux_expected    4.3253426712080E-08
-                             Flux_abserr    5.5196747704715E-11
-                             Flux_relerr    1.2761242726995E-03
+                             Flux_actual    4.3198857666644E-08
+                           Flux_expected    4.3254055216398E-08
+                             Flux_abserr    5.5197549754290E-11
+                             Flux_relerr    1.2761242726986E-03
 # case: Teff=    6000.0
                               Wav_min_AA    1.4720000000000E+02
                               Wav_max_AA    1.6000000000000E+06
-                             Flux_actual    3.7325163050257E-07
-                           Flux_expected    3.7355395930932E-07
-                             Flux_abserr    3.0232880675309E-10
-                             Flux_relerr    8.0933101957231E-04
+                             Flux_actual    3.7325705412515E-07
+                           Flux_expected    3.7355938732496E-07
+                             Flux_abserr    3.0233319981482E-10
+                             Flux_relerr    8.0933101957312E-04
 # case: Teff=   10000.0
                               Wav_min_AA    1.4720000000000E+02
                               Wav_max_AA    1.6000000000000E+06
-                             Flux_actual    2.8809769255562E-06
-                           Flux_expected    2.8823607971398E-06
-                             Flux_abserr    1.3838715836804E-09
-                             Flux_relerr    4.8011740412706E-04
+                             Flux_actual    2.8810187882842E-06
+                           Flux_expected    2.8824026799766E-06
+                             Flux_abserr    1.3838916923603E-09
+                             Flux_relerr    4.8011740412743E-04
 # case: Teff=   20000.0
                               Wav_min_AA    1.4720000000000E+02
                               Wav_max_AA    1.6000000000000E+06
-                             Flux_actual    4.6160109853289E-05
-                           Flux_expected    4.6117772754238E-05
-                             Flux_abserr    4.2337099051924E-08
-                             Flux_relerr    9.1802132938073E-04
+                             Flux_actual    4.6160780593866E-05
+                           Flux_expected    4.6118442879625E-05
+                             Flux_abserr    4.2337714241355E-08
+                             Flux_relerr    9.1802132938143E-04
 
 # Group4  focused_regression_tests
 
@@ -240,7 +240,12 @@ PASS vega_filter_support
 PASS singleton_axis
 PASS boundary_clamp_low
 PASS boundary_clamp_high
+PASS linear_nearest_fallback
+PASS nonuniform_hermite_3d
+PASS nonuniform_hermite_4d
+PASS bounded_hermite_small_negative
 PASS bounded_hermite_fallback
 PASS bolometric_input_unchanged
 PASS bolometric_sanitized_flux
+PASS bolometric_solar_zero_point
  test_colors: passed

@@ -29,7 +29,7 @@ module linear_interp
    use colors_utils, only: dilute_flux, find_containing_cell, find_interval, &
                            find_nearest_point, find_bracket_index, &
                            load_sed_cached, load_stencil
-   use utils_lib, only: mesa_error
+   use utils_lib, only: is_inf, is_nan, mesa_error
    implicit none
 
    private
@@ -180,7 +180,7 @@ contains
       integer, intent(in) :: n_lambda
       real(dp), intent(out) :: result_flux(n_lambda)
 
-      integer :: i_x, i_y, i_z, lam
+      integer :: i_x, i_y, i_z, nearest_x, nearest_y, nearest_z, lam
       integer :: nx, ny, nz
       integer :: ix_max, iy_max, iz_max
       integer :: ox, oy, oz
@@ -192,6 +192,13 @@ contains
       nx = size(x_grid)
       ny = size(y_grid)
       nz = size(z_grid)
+
+      if (nx < 1 .or. ny < 1 .or. nz < 1 .or. n_lambda < 1 .or. &
+          size(f_values_4d, 1) /= nx .or. size(f_values_4d, 2) /= ny .or. &
+          size(f_values_4d, 3) /= nz .or. size(f_values_4d, 4) /= n_lambda) then
+         write (*, *) 'colors: invalid array sizes in trilinear_interp_vector'
+         call mesa_error(__FILE__, __LINE__)
+      end if
 
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
@@ -212,6 +219,16 @@ contains
             end do
          end do
 
+         if (is_nan(accum) .or. is_inf(accum) .or. accum <= 0.0_dp) then
+            call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                    nearest_x, nearest_y, nearest_z)
+            accum = f_values_4d(nearest_x, nearest_y, nearest_z, lam)
+         end if
+
+         if (is_nan(accum) .or. is_inf(accum) .or. accum < 0.0_dp) then
+            write (*, *) 'colors: linear and nearest-grid interpolation returned bad flux'
+            call mesa_error(__FILE__, __LINE__)
+         end if
          result_flux(lam) = max(tiny_value, accum)
       end do
 
@@ -238,6 +255,13 @@ contains
       ny = size(y_grid)
       nz = size(z_grid)
 
+      if (nx < 1 .or. ny < 1 .or. nz < 1 .or. &
+          size(f_values, 1) /= nx .or. size(f_values, 2) /= ny .or. &
+          size(f_values, 3) /= nz) then
+         write (*, *) 'colors: invalid array sizes in trilinear_interp'
+         call mesa_error(__FILE__, __LINE__)
+      end if
+
       call find_containing_cell(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
                                 i_x, i_y, i_z, t_x, t_y, t_z)
 
@@ -256,6 +280,16 @@ contains
          end do
       end do
 
+      if (is_nan(accum) .or. is_inf(accum) .or. accum <= 0.0_dp) then
+         call find_nearest_point(x_val, y_val, z_val, x_grid, y_grid, z_grid, &
+                                 i_x, i_y, i_z)
+         accum = f_values(i_x, i_y, i_z)
+      end if
+
+      if (is_nan(accum) .or. is_inf(accum) .or. accum < 0.0_dp) then
+         write (*, *) 'colors: linear and nearest-grid interpolation returned bad flux'
+         call mesa_error(__FILE__, __LINE__)
+      end if
       f_interp = max(tiny_value, accum)
 
    end function trilinear_interp
