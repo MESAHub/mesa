@@ -10,8 +10,8 @@ settings change. Topic notes retain the detailed derivations and audits.
 
 ## 1. Split/Merge AMR Metric Zoning
 
-Status: committed metric implementation, with the `MaxLong` merge-guard
-cleanup in the current worktree.
+Status: committed metric implementation, including the shared `MaxLong`
+split and prospective-merge limit.
 
 The branch adds opt-in metric zoning for split/merge AMR with cell-centered
 `u_flag` hydrodynamics. It combines normalized local `logR` and `logtau`
@@ -218,139 +218,68 @@ Primary files:
 - `star/private/tdc_hydro.f90`
 - `docs/source/changelog.rst`
 
-## 6. PPISN Test Configuration
+## 6. PPISN Configuration
 
-Status: committed through checkpoint `a7e53425c`, with the pressure-child
-reconstruction enabled in the current worktree for testing.
+Status: synchronized at branch checkpoint `b0d4e8bff`; static checks are
+complete, but the updated models have not been compiled or run.
 
-The committed PPISN configuration:
+The maintained pulse implementation is shared by the test-suite case and the
+two development cases in `star/dev_cases_test_TDC/ppisn_models`. Its current
+configuration is:
 
-1. Enables metric zoning during hydro with `logR` weight `1` and `logtau`
-   weight `0.5`.
-2. Uses `split_merge_amr_MaxLong = 1.25d0` for both the split threshold and
-   the prospective metric-merge guard.
-3. Uses `split_merge_amr_nz_baseline = 2000` and comments out the old exclusive
-   `logR`/`logtau` selection.
-4. Runs TDC during hydro with `include_mlt_corr_to_TDC = .false.` and committed
-   `TDC_alpha_M = 1d0`; the momentum equation uses explicit `mlt_vc`, and
-   turbulent energy is included in the energy equation.
-5. Enables `harmonic_dissipation_length_beta = 0.1d0`.
-6. Disables rotation after loading the starting model.
-7. Enables PGSTAR and solver-progress output.
-8. Sets `convergence_ignore_equL_residuals = .true.`.
-9. Uses `mesh_delta_coeff = 1d0` and removes the explicit `max_dq` setting.
-10. Uses the momentum outer boundary in the hydro-off phase and adds explicit
-    surface-cell mesh constraints there.
-11. Reduces the main PGSTAR window width from 15 to 12.
-12. Enables the default-off
-    `split_merge_amr_reconstruct_pressure_for_u_flag` development control.
-13. Sets `x_ctrl(22) = 1d4`, imposing a 10,000 s timestep ceiling while a
-    pulse is active. A nonpositive value disables only this ceiling.
-14. Restores the pre-remesh grid after a hydro-off retry and holds remeshing
-    for five accepted steps, preventing the same failed startup or post-relax
-    remesh from being attempted again on every model.
+1. Metric split/merge AMR uses `logR` weight `1`, `logtau` weight `0.5`,
+   `split_merge_amr_nz_baseline = 2000`, and
+   `split_merge_amr_MaxLong = 1.25d0`. The same `MaxLong` limit rejects a
+   prospective metric merge that would immediately require splitting; the
+   separate merge-guard control has been removed.
+2. Direct ejecta removal is the only enabled removal algorithm. A contiguous
+   surface layer must lie beyond `1d4 Rsun`, have
+   `u > 4*vesc`, and have positive total specific energy. `k_keep` is the first
+   retained cell, so ejecta sums and cuts consistently use `1:k_keep-1`.
+3. Direct removal stores `T(k_keep)`, the updated `tau_factor`, and
+   `max[u(k_keep),2*vesc(R_limit)]` as restart state. The velocity is capped by
+   `x_ctrl(17) = 5d4 km/s`. The temporary boundary is cleared before the final
+   `star_relax_to_star_cut` reconstruction.
+4. Riemann-hydro timesteps are limited to `1d4 s` both before and during an
+   active pulse. After the first Riemann phase, the hydro-off `v_flag` path is
+   capped at `0.5 yr` directly in `run_star_extras`; the obsolete
+   `inlist_after_first_pulse` has been removed.
+5. `restore_mesh_on_retry = .false.` in both phase inlists. The separate
+   `split_merge_amr_avoid_repeated_remesh = .true.` setting prevents one cell
+   from being remeshed repeatedly within a single AMR pass; it does not restore
+   the pre-remesh grid after a retry.
+6. TDC uses `mixing_length_alpha = 2`, `include_mlt_corr_to_TDC = .false.`,
+   `TDC_alpha_M = 0`, explicit `mlt_vc` in the momentum equation, turbulent
+   energy in the energy equation, and `harmonic_dissipation_length_beta = 1`.
+   The shock-convection threshold is
+   `max_abs_du_div_cs_for_convection = 0.03d0`.
+7. Superadiabatic reduction and its turnover limiter are selected globally in
+   `inlist_ppisn`; `superad_reduction_max_logT = 7d0` disables the reduction
+   at and above a start-of-step temperature of `1d7 K`.
+8. RTI remains selectable with `x_logical_ctrl(3)`, but the test and both pulse
+   development cases currently set it to `.false.`.
+9. The case-local opacity hook corrects only the ideal-EOS contribution to
+   `lnfree_e` above `logT = 3.7` and smoothly continues the opacity below the
+   table edge at `logT = 2.7001`, joining the ordinary table by `2.8001`.
+10. The shared inlist keeps outer-2%-by-mass drag available while `v_flag` is
+    active and uses artificial viscosity in both phases. Both phase inlists
+    enable the radiation-pressure floor for the momentum boundary and select
+    the `dPrad/dm` temperature-gradient equation.
 
-Checkpointed PPISN experiments:
-
-1. Set `TDC_alpha_M = 2d0` instead of the committed `0.25d0`.
-2. Set `TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.`.
-3. Set `max_abs_du_div_cs_for_convection` and
-   `max_v_div_cs_for_convection` to `1d99` in `inlist_hydro_on`, avoiding the
-   full TDC shutdown at shock faces during this experiment.
-4. Replace the PGSTAR profile panel `logRho` with `v_div_cs`.
-5. Set `min_logRho_for_eos = -30d0` explicitly.
-6. The current worktree selects direct surface-ejecta removal with
-   `R_limit = 1d4 Rsun` and `f_esc = 4`.
-
-Checkpointed PPISN source changes:
-
-1. Add a test-suite-only surface-ejecta removal mode with shared local
-   criteria. Starting at the surface, a contiguous cell is eligible only when
-
-```text
-extent_i = r_i > R_limit,                                       x_ctrl(21) <= 0,
-         = sqrt(2*G_i*m_i/r_i) <= vesc_limit,                   x_ctrl(21) > 0,
-u_i > f_esc*sqrt(2*G_i*m_i/r_i),
-e_tot,i = 0.5*u_i^2 + energy_i - G_i*m_i/r_i > 0.
-```
-
-   The first cell that fails any criterion is `k_keep`. The mode is selected
-   by `x_integer_ctrl(2)`: 0 disables removal, 1 directly prunes the eligible
-   cells, and 2 removes their mass smoothly through MESA's mass-adjustment
-   path. `x_ctrl(21)` is the optional maximum local escape velocity in `km/s`;
-   when positive it replaces only the `x_ctrl(18)` radius gate. The test inlist
-   currently selects direct removal.
-2. Direct removal uses the retained cell's temperature for `fixed_Tsurf` and
-   latches a fixed surface velocity following the development-case rule
-
-```text
-fixed_vsurf = max(u(k_keep), 2*vesc(R_limit)).
-```
-
-   The fixed velocity remains subject to the existing 20,000 km/s emergency
-   cap. Both `use_fixed_vsurf_outer_BC` and `use_momentum_outer_BC` remain true
-   after removal. Fixed velocity takes precedence in the surface momentum
-   equation, while the momentum flag keeps the surface pressure and
-   temperature attached at the cell face by setting the center offsets to
-   zero. It also lets `do_remove_surface` evaluate `tau_eff` at the first
-   retained cell and set
-
-```text
-tau_factor_new = tau_factor_old*tau_eff(k_keep)/tau_old(1).
-```
-
-   The resulting temperature, velocity, and `tau_factor` are stored in
-   `xtra(5:7)`, with `lxtra(7)` recording that the boundary is active. They are
-   reapplied after inlist reads and photo restarts while hydrodynamics remains
-   active. The emergency velocity and optical-depth state is cleared before
-   the final hydrostatic reconstruction.
-3. Smooth removal always disables `fixed_vsurf` and uses the momentum outer
-   boundary. For eligible mass `M_ej`, its positive mass-loss rate is
-
-```text
-Mdot = min(f_remove*M_ej, M_ej/dt),
-```
-
-   where `x_ctrl(20) = f_remove` is an inverse timescale in `yr^-1`. The
-   post-wind `other_adjust_mdot` hook applies this rate even above MESA's
-   ordinary high-central-temperature wind cutoff. The current PPISN experiment
-   sets `eps_mdot_factor = 1` and `eps_mdot_leak_frac_factor = 0`.
-4. Define `k_keep` consistently as the first retained cell. Ejecta sums cover
-   `1:k_keep-1`, retained diagnostics cover `k_keep:nz`, and
-   `star_relax_to_star_cut` receives `k_keep`.
-5. Use the EOS internal energy `s%energy` in both the ejecta energy accounting
-   and the `specific_thermal_e` profile column. For every direct or relaxed
-   cut, the reported total removed energy is
-
-```text
-sum_{i=1}^{k_keep-1} dm_i*(0.5*u_i^2 + s%energy(i) - cgrav_i*m_i/r_i).
-```
-
-6. Keep the emergency direct-removal cut distinct from the final unbound-ejecta
-   cut. Immediately before `star_relax_to_star_cut`, deactivate its boundary
-   latch, restore `tau_factor = 1`, disable fixed velocity, and restore the
-   normal `T_tau` Eddington, fixed-opacity atmosphere. The final cut is not
-   delayed. Temporary `fixed_Tsurf` experiments were rejected because they
-   destabilized either composition or entropy relaxation.
-7. Stage composition over `num_steps_to_relax_composition = 100` by selecting
-   the existing negative-timescale mode. The PPISN case also sets
-   `scale_max_correction = 0.1d0`; the MESA default is unchanged.
-
-The development case `star/dev_cases_test_TDC/dev_TDC_through_ppisn` is the
-same setup extended for multiple pulses. Its source, saved starting model,
-physics inlists, mesh, TDC/RTI settings, coupled burning, boundaries, and
-diagnostics match the test case. It differs only by setting
-`max_model_number = -1`, disabling the 100-day post-relaxation stop, removing
-the test-only required termination, and reducing profile/history output to
-intervals of 50/10 models.
+The single-star development case and the binary-product pulse case are open
+ended (`max_model_number = -1`) and do not install test-suite helpers. The
+test retains `max_model_number = 15000`, the required termination code, and
+the stop 100 days after the first pulse relaxation.
 
 Primary files:
 
+- `star/test_suite/ppisn/inlist_ppisn`
 - `star/test_suite/ppisn/inlist_hydro_on`
 - `star/test_suite/ppisn/inlist_hydro_off`
-- `star/test_suite/ppisn/inlist_ppisn`
-- `star/test_suite/ppisn/inlist_pgstar`
 - `star/test_suite/ppisn/src/run_star_extras.f90`
+- `star/dev_cases_test_TDC/ppisn_models/dev_TDC_single_star_ppisn`
+- `star/dev_cases_test_TDC/ppisn_models/dev_TDC_ppisn_from_binary`
+- `star/dev_cases_test_TDC/ppisn_models/binary_ppisn_progenitor`
 
 ## 7. Split/Merge AMR Surface Mass Floor
 
@@ -1073,8 +1002,9 @@ changes after checkpoint `16433fecd`:
    thermal collapse. It removed `1.795 Msun`, then stopped under the previous
    sound-speed gate because the surface Mach number fell to `0.974` even though
    `u/vesc = 6.49`. The sound-speed gate has now been removed, and the PPISN
-   inlist instead requires `r > 1d3 Rsun`, `u > vesc`, and positive specific
-   total energy.
+   inlist instead requires `r > 1d4 Rsun`, `u > 4*vesc`, and positive specific
+   total energy. Smooth removal was subsequently deleted; the maintained cases
+   use direct removal only.
 10. A subsequent direct-removal run shows repeated small cuts rather than one
     clean truncation. From models 4288 through 4363, `star_mass` falls from
     about `51.631 Msun` to `50.505 Msun` while `star_mdot` remains zero and
@@ -1201,16 +1131,17 @@ changes after checkpoint `16433fecd`:
     were removed after they did not prevent the cooling failure. The original
     Davis acoustic bounds remain. `git diff --check`, targeted `fortitude`,
     and `sphinx-lint` pass; no installation was performed after the removal.
-33. The development PPISN case was replaced with the current test-suite setup
-    and retains only multi-pulse endpoint and output-cadence overrides. The two
-    copies of `run_star_extras.f90` and `standard_he_dep.mod` are byte-identical,
-    and directory comparison finds no other tracked configuration differences.
-    Targeted `fortitude` and `git diff --check` pass. No compilation or model
-    run was performed for this synchronization.
-34. Both PPISN hydro-off inlists now hold remeshing for five accepted steps
-    after restoring the pre-remesh grid on retry. The inlists remain
-    byte-identical and `git diff --check` passes. No compilation or model run
-    was performed for this inlist-only change.
+33. The old development PPISN directory was replaced by isolated-star,
+    binary-product pulse, and binary-progenitor cases. The two pulse
+    development sources are byte-identical; the test copy differs only in
+    test-suite bookkeeping and its 100-day success stop. Targeted `fortitude`
+    and `git diff --check` pass. No compilation or model run was performed for
+    this synchronization.
+34. The retained hydro-on and hydro-off inlists explicitly set
+    `restore_mesh_on_retry = .false.`. The earlier five-step mesh-restoration
+    experiment was removed; `split_merge_amr_avoid_repeated_remesh` remains a
+    separate within-pass AMR safeguard. The three phase inlists are
+    byte-identical and `git diff --check` passes.
 35. For the surface-removal optical-depth guard and invalid-`logtau` AMR
     fallback, `git diff --check`, targeted `fortitude`, and `sphinx-lint`
     pass. Applying the fallback to model 4073 disables `logtau` as expected
@@ -1666,11 +1597,13 @@ Status: implemented in the current worktree; static checks pass, but the case
 has not been compiled or run.
 
 The single-star development case is now the source of truth for the PPISN
-test-suite physics, controls, and extras. The test-suite and development
-copies of `src/run_star_extras.f90`, `inlist_hydro_on`, and
-`inlist_hydro_off` are byte-identical. The obsolete
-`inlist_after_first_pulse` was removed because the post-pulse `v_flag`
-timestep cap is applied directly by `run_star_extras`.
+test-suite physics and controls. The two development copies of
+`src/run_star_extras.f90` are byte-identical, and all three pulse cases use
+byte-identical `inlist_hydro_on` and `inlist_hydro_off` files. The test extras
+differs only by retaining `test_suite_extras`, the 100-day success stop, and
+the associated test flag. The obsolete `inlist_after_first_pulse` was removed
+because the post-pulse `v_flag` timestep cap is applied directly by
+`run_star_extras`.
 
 The test-suite case retains only these test-specific controls:
 
@@ -1746,6 +1679,8 @@ Setting both network names keeps direct network changes and automatic
 advanced-network selection consistent. All five TDC configurations include
 turbulent energy in the energy equation. The binary progenitor intentionally
 retains `thermohaline_coeff = 1d0`; the pulse models retain zero.
+Both progenitor stars start with `rotation_flag = .false.`, and tidal
+synchronization is disabled consistently with `do_tidal_sync = .false.`.
 
 The three PPISN dev run scripts now select their top-level inlists explicitly
 with `MESA_INLIST` and no longer source `star/test_suite/test_suite_helpers`.

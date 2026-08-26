@@ -11,7 +11,7 @@ save_model_filename = 'MASS2accretor_final.mod'
 
 change_rotation_flag = .false.
 change_initial_rotation_flag = .true.
-new_rotation_flag = .true.
+new_rotation_flag = .false.
 new_omega_div_omega_crit = 0
 set_initial_omega_div_omega_crit = .true.
 set_omega_div_omega_crit = .false.
