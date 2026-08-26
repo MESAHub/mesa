@@ -34,7 +34,6 @@ recent complete set of binary and stellar photos with the same inlist.
 The model uses TDC with turbulent energy in the energy equation,
 ``approx21_cr60_plus_co56.net``, the deBoer
 :math:`{}^{12}\mathrm{C}(\alpha,\gamma){}^{16}\mathrm{O}` rate, and
-``mass_fraction_limit_for_Skye = 1d-5``. Both stellar inlists write profiles
-every 200 models.
+``mass_fraction_limit_for_Skye = 1d-5``.
 
 Last-Updated: 2026-08 by EbF

@@ -32,7 +32,6 @@ the same pulse inlist.
 ``inlist_ppisn`` contains the persistent pulse physics.
 ``run_star_extras`` switches between ``inlist_hydro_on`` and
 ``inlist_hydro_off`` and removes unbound surface ejecta directly. The model
-continues through successive pulses without the test suite's 100-day success
-termination or model-number limit. Profiles are written every 200 models.
+continues through successive pulses.
 
 Last-Updated: 2026-08 by EbF

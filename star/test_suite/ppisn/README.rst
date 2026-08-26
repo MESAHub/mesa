@@ -15,8 +15,7 @@ pulsational pair-instability pulse and verifies the post-pulse relaxation
 Run sequence
 ============
 
-Running ``./rn`` performs two parts through the standard test-suite
-``do_one`` helper:
+Running ``./rn`` performs two parts:
 
 1. ``inlist_to_he_dep_header`` creates the helium-star model and evolves it
    until the central helium mass fraction falls below :math:`10^{-3}`. It
@@ -26,16 +25,15 @@ Running ``./rn`` performs two parts through the standard test-suite
    relaxes the bound remnant.
 
 Setting ``MESA_SKIP_OPTIONAL`` skips the first part and copies
-``standard_he_dep.mod`` to ``he_dep.mod``. The test succeeds 100 days after
-the first post-pulse relaxation, requires the corresponding termination
-code, and limits the calculation to 15000 models.
+``standard_he_dep.mod`` to ``he_dep.mod``. The second part stops 100 days
+after the first post-pulse relaxation.
 
 Configuration
 =============
 
 ``inlist_ppisn`` contains the shared pulse physics. ``inlist_hydro_on`` and
 ``inlist_hydro_off`` are loaded by ``run_star_extras`` when the model enters
-and leaves Riemann hydrodynamics. Profiles are written every 200 models.
+and leaves Riemann hydrodynamics.
 
 The pulse calculation uses TDC with turbulent energy in the energy equation,
 ``approx21_cr60_plus_co56.net``, the deBoer

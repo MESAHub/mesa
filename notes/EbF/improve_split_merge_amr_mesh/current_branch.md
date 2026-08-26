@@ -1765,7 +1765,9 @@ roles, `MESA_INLIST` run and restart paths, model handoffs, and termination
 differences. Their update metadata is `2026-08 by EbF`. In particular, the
 documentation records the isolated-star mass as `72.5 Msun`, identifies
 `MASS2accretor_final.mod` as the binary-derived pulse input, and documents the
-binary progenitor directory that previously had no README.
+binary progenitor directory that previously had no README. The README text
+focuses on the physical calculation and model handoffs rather than TestHub
+details or output cadence.
 
 Its helium-burning core also uses the PPISN exponential-overshoot parameters,
 

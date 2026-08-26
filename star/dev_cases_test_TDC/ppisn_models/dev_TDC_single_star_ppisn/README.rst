@@ -8,9 +8,7 @@ dev_TDC_single_star_ppisn
 
 This development case evolves an isolated :math:`72.5\,M_\odot` helium star
 from the pre-main sequence through helium depletion and then follows
-successive pulsational pair-instability events (see |Marchant2019|). Unlike
-the test-suite case, it has neither the 100-day success termination nor a
-test-specific model-number limit.
+successive pulsational pair-instability events (see |Marchant2019|).
 
 .. |Marchant2019| replace:: `Marchant et al. 2019 <https://ui.adsabs.harvard.edu/abs/2019ApJ...882...36M/abstract>`__
 
@@ -35,8 +33,7 @@ Configuration
 
 ``inlist_ppisn`` contains the persistent pulse physics. ``run_star_extras``
 loads ``inlist_hydro_on`` and ``inlist_hydro_off`` as the model enters and
-leaves Riemann hydrodynamics, and removes unbound surface ejecta directly.
-Profiles are written every 200 models. This directory is a standalone
-development model and does not use TestHub or the test-suite helper scripts.
+leaves Riemann hydrodynamics, removes unbound surface ejecta directly, and
+continues through successive pulses.
 
 Last-Updated: 2026-08 by EbF
