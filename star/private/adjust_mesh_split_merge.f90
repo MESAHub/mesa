@@ -465,7 +465,7 @@
             dx_baseline = inner_dx_baseline
             dq_min_k = dq_min
             if (k == 1) dq_min_k = max(dq_min_k, s% min_surface_cell_dq)
-            if (metric_zoning) then
+            if (metric_zoning .and. s% split_merge_amr_MaxLong > 0d0) then
                call metric_cell(k, cell_metric)
                dx_actual = sum(cell_metric)
             else if (hydrid_zoning) then
@@ -554,10 +554,11 @@
             end if
 
             metric_merge_guard = .false.
-            if (metric_zoning .and. s% split_merge_amr_metric_merge_guard_ratio > 0d0) then
+            ! Do not merge a pair that the split criterion would immediately reject.
+            if (metric_zoning) then
                call metric_merge_pair(k, i_merge, ip_merge, pair_metric)
                metric_merge_guard = sum(pair_metric) > &
-                  s% split_merge_amr_metric_merge_guard_ratio*dx_baseline
+                  s% split_merge_amr_MaxLong*dx_baseline
                if (metric_merge_guard .and. &
                      undersize_ratio > s% split_merge_amr_MaxShort .and. &
                      s% dq(k) < dq_max/5d0) then
@@ -672,7 +673,7 @@
                   'split_merge metric guard rejected ', num_metric_guard_rejections, &
                   ' strongest pair ', guarded_i_merge, guarded_ip_merge, &
                   ' components', guarded_pair_metric, &
-                  ' limit', s% split_merge_amr_metric_merge_guard_ratio*inner_dx_baseline, &
+                  ' limit', s% split_merge_amr_MaxLong*inner_dx_baseline, &
                   ' ratio', guarded_undersize_ratio
             end if
          end subroutine trace_metric_zoning

@@ -54,6 +54,12 @@ conservative energy transfer continues to modify only the EOS pressure; the
 turbulent contribution is evaluated from its remapped face state. Split/merge
 AMR does not currently support RSP2.
 
+Metric zoning for split/merge AMR now uses ``split_merge_amr_MaxLong`` both
+to split an existing oversized cell and to reject a proposed merge whose
+summed metric would exceed the same limit. This removes the redundant metric
+merge-guard control and keeps the prospective merge and subsequent split
+criteria consistent.
+
 The new control ``superad_reduction_use_turnover_limit`` relaxes the applied
 superadiabatic reduction from its previous accepted value toward the
 instantaneous value. ``superad_reduction_turnover_limit_function`` selects
@@ -66,6 +72,12 @@ iterations. With ``use_face_reconstruction``, this calculation uses the
 reconstructed face thermodynamic state. The scale height is the interpolated
 or reconstructed face value used by MLT and TDC. The previous reduction is
 preserved across retries, remeshing, and photo restarts.
+
+For ``k > 0``, ``superad_reduction_max_logT`` restricts the reduction to
+faces whose start-of-step temperature is below the selected ``logT``. Its
+default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. Using the
+start-of-step temperature holds the selection fixed during solver iterations.
+The ``k=0`` model-construction path is unchanged.
 
 .. _Bug Fixes main:
 
@@ -164,6 +176,13 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
 
 In ``set_superad_reduction`` (``star/private/turb_support.f90``), the density inversion contribution to ``Gamma_term`` used ``superad_reduction_Gamma_limit_scale`` instead of ``superad_reduction_Gamma_inv_scale``. This made the latter control inactive. The published algorithm is restored (Jermyn et al. 2023, equation 64, ``alpha_2`` term). Existing test suite cases set the two scales to the same value and are bit-for-bit unaffected. The fix changes results only when the scales differ.
+
+Photo restarts now preserve the stored superadiabatic turnover-limiter state
+while ``finish_load_model`` rebuilds derived quantities. Previously, the
+stored reduction could be reset before ``extras_startup`` restored controls
+that are selected dynamically by ``run_star_extras``. Runs that leave
+superadiabatic reduction disabled still reset the factor on the first
+evolution step.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 

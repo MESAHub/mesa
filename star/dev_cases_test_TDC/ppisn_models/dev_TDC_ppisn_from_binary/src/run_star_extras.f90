@@ -33,14 +33,11 @@
 
       implicit none
 
-      include "test_suite_extras_def.inc"
-
       logical :: dbg = .false.
       real(dp), parameter :: log_term_power = 5.626d0
 
       integer, parameter :: surface_ejecta_removal_disabled = 0
       integer, parameter :: surface_ejecta_removal_direct = 1
-      integer, parameter :: surface_ejecta_removal_smooth = 2
 
 
       logical :: pgstar_flag
@@ -105,18 +102,14 @@
       real(dp) :: vsurf_for_fixed_bc
       real(dp) :: surface_ejecta_radius_limit, surface_ejecta_v_div_vesc_limit
       real(dp) :: surface_ejecta_escape_velocity_limit
-      real(dp) :: surface_ejecta_removal_factor, surface_ejecta_wind
-      logical :: surface_ejecta_wind_is_active, use_other_adjust_mdot_for_winds
+      logical :: use_other_adjust_mdot_for_winds
       real(dp) :: max_Lneu_for_mass_loss
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
-      logical :: stop_100d_after_pulse, use_RTI_during_hydro
+      logical :: use_RTI_during_hydro
 
       contains
-
-      include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -168,20 +161,16 @@
          max_Lphoto_for_lgLnuc_limit2 = s% x_ctrl(14)
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
-         stop_100d_after_pulse = s% x_logical_ctrl(1)
          use_RTI_during_hydro = s% x_logical_ctrl(3)
          vsurf_for_fixed_bc = s% x_ctrl(17)
          surface_ejecta_removal_mode = s% x_integer_ctrl(2)
          surface_ejecta_radius_limit = s% x_ctrl(18)
          surface_ejecta_v_div_vesc_limit = s% x_ctrl(19)
-         surface_ejecta_removal_factor = s% x_ctrl(20)
          surface_ejecta_escape_velocity_limit = s% x_ctrl(21)
-         surface_ejecta_wind = 0d0
-         surface_ejecta_wind_is_active = .false.
          use_other_adjust_mdot_for_winds = s% use_other_adjust_mdot
 
          if (surface_ejecta_removal_mode < surface_ejecta_removal_disabled .or. &
-               surface_ejecta_removal_mode > surface_ejecta_removal_smooth) then
+               surface_ejecta_removal_mode > surface_ejecta_removal_direct) then
             write(*,*) 'invalid surface ejecta removal mode', surface_ejecta_removal_mode
             ierr = -1
             return
@@ -194,13 +183,6 @@
             ierr = -1
             return
          end if
-         if (surface_ejecta_removal_mode == surface_ejecta_removal_smooth .and. &
-               surface_ejecta_removal_factor < 0d0) then
-            write(*,*) 'invalid surface ejecta removal factor'
-            ierr = -1
-            return
-         end if
-
          ! we store the value given in inlist_ppisn and deactivate it at
          ! high T
          delta_lgRho_cntr_hard_limit = s% delta_lgRho_cntr_hard_limit
@@ -230,11 +212,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         if (surface_ejecta_wind_is_active) then
-            w = surface_ejecta_wind
-            return
-         end if
 
          L1 = Lsurf
          M1 = Msurf
@@ -367,15 +344,9 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         real(dp) :: Lrad_div_Ledd
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (surface_ejecta_wind_is_active) then
-            s% mstar_dot = -surface_ejecta_wind*Msun/secyer
-            s% explicit_mstar_dot = s% mstar_dot
-            return
-         end if
          if (s% generations > 2) then
             write(*,*) "check mdots", s% mstar_dot, s% mstar_dot_old
             if (abs(s% mstar_dot) > 1.05d0*abs(s% mstar_dot_old)) then
@@ -439,7 +410,7 @@
 
          if (.not. s% lxtra(lx_using_direct_removal_bcs)) return
 
-         ! The ejecta boundary is not appropriate for the hydrostatic remnant.
+         ! The ejecta boundary is not appropriate for the post-pulse v_flag phase.
          s% lxtra(lx_using_direct_removal_bcs) = .false.
          call set_normal_atmosphere_boundary(s)
       end subroutine clear_direct_removal_boundary
@@ -455,26 +426,6 @@
          s% use_fixed_vsurf_outer_BC = .false.
          s% need_to_setvars = .true.
       end subroutine set_normal_atmosphere_boundary
-
-      subroutine set_surface_ejecta_wind(s)
-         type (star_info), pointer, intent(in) :: s
-         integer :: k_keep
-         real(dp) :: max_removal_rate, removed_energy, removed_mass
-
-         surface_ejecta_wind = 0d0
-         surface_ejecta_wind_is_active = &
-            surface_ejecta_removal_mode == surface_ejecta_removal_smooth .and. s% u_flag
-         if (.not. surface_ejecta_wind_is_active) return
-
-         call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
-         if (k_keep == 1 .or. surface_ejecta_removal_factor == 0d0) return
-
-         surface_ejecta_wind = surface_ejecta_removal_factor*removed_mass/Msun
-         if (s% dt > 0d0) then
-            max_removal_rate = removed_mass/Msun/(s% dt/secyer)
-            surface_ejecta_wind = min(surface_ejecta_wind, max_removal_rate)
-         end if
-      end subroutine set_surface_ejecta_wind
 
       subroutine my_other_eval_fp_ft(id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
@@ -558,6 +509,13 @@
 
          use kap_def, only: num_kap_fracs
          use kap_lib
+         use chem_lib, only: basic_composition_info
+         use eos_def, only: i_frac_ideal
+
+         real(dp), parameter :: kap_logT_floor = 2.7001d0
+         real(dp), parameter :: kap_logT_blend_width = 0.1d0
+         real(dp), parameter :: kap_logT_blend_top = &
+            kap_logT_floor + kap_logT_blend_width
 
          ! INPUT
          integer, intent(in) :: id  ! star id if available; 0 otherwise
@@ -589,17 +547,48 @@
 
          type (star_info), pointer :: s
          real(dp) :: velocity
-         real(dp) :: radius, logR
-         real(dp) :: logT_alt, inv_diff
-         real(dp) :: log_kap, alpha
+         real(dp) :: radius
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: frac_ideal, lnfree_e_ideal, delta_lnfree_e_ideal
+         real(dp) :: lnfree_e_for_kap
+         real(dp) :: d_lnfree_e_for_kap_dlnRho, d_lnfree_e_for_kap_dlnT
+         real(dp) :: kap_at_floor, dln_kap_at_floor_dlnRho
+         real(dp) :: ln_kap, ln_kap_at_floor
+         real(dp) :: blend, dblend_dlnT, blend_coordinate
+         real(dp) :: kap_fracs_at_floor(num_kap_fracs)
+         real(dp) :: dln_kap_dxa_at_floor(size(dln_kap_dxa))
 
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
+         kap_fracs = 0
          kap = 0; dln_kap_dlnRho = 0; dln_kap_dlnT = 0; dln_kap_dxa = 0
          velocity = 0
          radius = 0
+
+         lnfree_e_for_kap = lnfree_e
+         d_lnfree_e_for_kap_dlnRho = d_lnfree_e_dlnRho
+         d_lnfree_e_for_kap_dlnT = d_lnfree_e_dlnT
+
+         if (k >= 1 .and. k <= s% nz .and. &
+               log10_T > 3.7d0 .and. s% eos_frac_ideal(k) > 0d0) then
+            call basic_composition_info( &
+               species, chem_id, xa, X, Y, Z, abar, zbar, z2bar, z53bar, &
+               ye, mass_correction, sumx)
+            if (ye > 0d0) then
+               frac_ideal = s% eos_frac_ideal(k)
+               lnfree_e_ideal = log(1d-20/avo) - ln10*log10_rho
+               delta_lnfree_e_ideal = log(ye) - lnfree_e_ideal
+
+               ! Replace only the ideal EOS contribution to lnfree_e.
+               lnfree_e_for_kap = lnfree_e + frac_ideal*delta_lnfree_e_ideal
+               d_lnfree_e_for_kap_dlnRho = d_lnfree_e_dlnRho + &
+                  s% d_eos_dlnd(i_frac_ideal,k)*delta_lnfree_e_ideal + frac_ideal
+               d_lnfree_e_for_kap_dlnT = d_lnfree_e_dlnT + &
+                  s% d_eos_dlnT(i_frac_ideal,k)*delta_lnfree_e_ideal
+            end if
+         end if
 
          !if (k==1 .and. s% u_flag .and. .not. is_nan(s% lnR_start(1))) then !very surface cell can go mad, things are more stable if we fix opacity
          !   if (s% xh_start(s% i_u,1)>sqrt(2*s% cgrav(1)*s% m(1)/exp(s% lnR_start(1)))) then
@@ -618,21 +607,62 @@
                dln_kap_dlnRho = 0d0
                dln_kap_dlnT = 0d0
                return
-            else
-               call kap_get( &
-                  s% kap_handle, species, chem_id, net_iso, xa, &
-                  log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                  eta, d_eta_dlnRho, d_eta_dlnT, &
-                  kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
             end if
-         else
-            call kap_get( &
-               s% kap_handle, species, chem_id, net_iso, xa, &
-               log10_rho, log10_T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-               eta, d_eta_dlnRho, d_eta_dlnT, &
-               kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
          end if
 
+         if (log10_T < kap_logT_blend_top) then
+            ! Continue the opacity from the lowest valid table temperature.
+            call kap_get( &
+               handle, species, chem_id, net_iso, xa, &
+               log10_rho, kap_logT_floor, lnfree_e_for_kap, &
+               d_lnfree_e_for_kap_dlnRho, d_lnfree_e_for_kap_dlnT, &
+               eta, d_eta_dlnRho, d_eta_dlnT, &
+               kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+            if (ierr /= 0) return
+
+            if (log10_T <= kap_logT_floor) then
+               dln_kap_dlnT = 0d0
+               return
+            end if
+
+            kap_at_floor = kap
+            dln_kap_at_floor_dlnRho = dln_kap_dlnRho
+            kap_fracs_at_floor = kap_fracs
+            dln_kap_dxa_at_floor = dln_kap_dxa
+
+            call kap_get( &
+               handle, species, chem_id, net_iso, xa, &
+               log10_rho, log10_T, lnfree_e_for_kap, &
+               d_lnfree_e_for_kap_dlnRho, d_lnfree_e_for_kap_dlnT, &
+               eta, d_eta_dlnRho, d_eta_dlnT, &
+               kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+            if (ierr /= 0) return
+
+            blend_coordinate = &
+               (log10_T - kap_logT_floor)/kap_logT_blend_width
+            blend = pow2(blend_coordinate)*(3d0 - 2d0*blend_coordinate)
+            dblend_dlnT = 6d0*blend_coordinate*(1d0 - blend_coordinate)/ &
+               (ln10*kap_logT_blend_width)
+
+            ln_kap_at_floor = log(kap_at_floor)
+            ln_kap = log(kap)
+            dln_kap_dlnRho = (1d0 - blend)*dln_kap_at_floor_dlnRho + &
+               blend*dln_kap_dlnRho
+            dln_kap_dlnT = blend*dln_kap_dlnT + &
+               dblend_dlnT*(ln_kap - ln_kap_at_floor)
+            dln_kap_dxa = (1d0 - blend)*dln_kap_dxa_at_floor + &
+               blend*dln_kap_dxa
+            kap_fracs = (1d0 - blend)*kap_fracs_at_floor + blend*kap_fracs
+            kap = exp((1d0 - blend)*ln_kap_at_floor + blend*ln_kap)
+            return
+         end if
+
+         call kap_get( &
+            handle, species, chem_id, net_iso, xa, &
+            log10_rho, log10_T, lnfree_e_for_kap, &
+            d_lnfree_e_for_kap_dlnRho, d_lnfree_e_for_kap_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
 
       end subroutine my_other_kap_get
 
@@ -645,7 +675,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
             s% lxtra(lx_hydro_on) = .false.
             s% lxtra(lx_hydro_has_been_on) = .false.
@@ -687,11 +716,6 @@
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
             end if
-            if (s% lxtra(lx_hydro_has_been_on)) then
-               call star_read_controls(id, 'inlist_after_first_pulse', ierr)
-               if (dbg) write(*,*) "check ierr", ierr
-               if (ierr /= 0) return
-            end if
             if (.not. s% lxtra(lx_hydro_on)) then
                call star_set_RTI_flag(id, .false., ierr)
                if (dbg) write(*,*) "check ierr", ierr
@@ -705,13 +729,7 @@
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         real(dp) :: dt
-         character (len=strlen) :: test
          ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
 
 
@@ -990,8 +1008,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         surface_ejecta_wind = 0d0
-         surface_ejecta_wind_is_active = .false.
 
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
@@ -1021,7 +1037,7 @@
 
          ! Ignore energy checks before first time hydro is turned on
          ! otherwise need small steps during core helium burning and it
-         ! slows down the test_suite
+         ! slows down the run
          if (.not. s% lxtra(lx_hydro_has_been_on)) then
             s% cumulative_energy_error = 0d0
             s% cumulative_extra_heating = 0d0
@@ -1308,9 +1324,6 @@
             call star_read_controls(id, 'inlist_hydro_on', ierr)
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
-            call star_read_controls(id, 'inlist_after_first_pulse', ierr)
-            if (dbg) write(*,*) "check ierr", ierr
-            if (ierr /= 0) return
             s% dt_next = min(1d2,s% dt_next)
             s% dt = min(1d2,s% dt)
 
@@ -1393,7 +1406,6 @@
 
          !Always call this at the end to ensure we are using the correct
          !inlists
-         call set_surface_ejecta_wind(s)
          call my_before_struct_burn_mix(s% id, s% dt, extras_start_step)
 
          extras_start_step = keep_going
@@ -1427,29 +1439,29 @@
                s% max_timestep = max_dt_before_pulse
             end if
 
-            if (surface_ejecta_removal_mode == surface_ejecta_removal_smooth) then
+            ! Limit velocities before applying the fixed surface condition.
+            do k=1, s% nz
+               s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
+               s% u(k) = s% xh(s% i_u,k)
+            end do
+
+            ! use fixed_vsurf if surface v remains too high
+            if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
+               s% use_fixed_vsurf_outer_BC = .true.
+               s% use_momentum_outer_BC = .false.
+               s% fixed_vsurf = 1d5*vsurf_for_fixed_bc
+            else
                s% use_fixed_vsurf_outer_BC = .false.
                s% use_momentum_outer_BC = .true.
-            else
-               ! Limit velocities before applying the fixed surface condition.
-               do k=1, s% nz
-                  s% xh(s% i_u,k) = min(s% xh(s% i_u,k), 1d5*vsurf_for_fixed_bc)
-                  s% u(k) = s% xh(s% i_u,k)
-               end do
-
-               ! use fixed_vsurf if surface v remains too high
-               if (s% xh(s% i_u,1) >= 1d5*vsurf_for_fixed_bc) then
-                  s% use_fixed_vsurf_outer_BC = .true.
-                  s% use_momentum_outer_BC = .false.
-                  s% fixed_vsurf = 1d5*vsurf_for_fixed_bc
-               else
-                  s% use_fixed_vsurf_outer_BC = .false.
-                  s% use_momentum_outer_BC = .true.
-               end if
             end if
 
-         else ! not using hydro (u_flag = .false.)
-            s% max_timestep = 1d99
+         else ! not using Riemann hydro (u_flag = .false.)
+            if (s% lxtra(lx_hydro_has_been_on)) then
+               ! Limit v_flag timesteps after the first u_flag phase to 0.5 yr.
+               s% max_timestep = 0.5d0*secyer
+            else
+               s% max_timestep = 1d99
+            end if
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
          call set_direct_removal_boundary(s)
@@ -1489,11 +1501,7 @@
 
          !ignore winds if neutrino luminosity is too high or for a few steps after
          !a relax
-         if (surface_ejecta_removal_mode == surface_ejecta_removal_smooth .and. s% u_flag) then
-            s% use_other_wind = .true.
-            s% use_other_adjust_mdot = .true.
-            s% was_in_implicit_wind_limit = .false.
-         else if(s% ixtra(ix_steps_since_relax) < 50 &
+         if(s% ixtra(ix_steps_since_relax) < 50 &
                .or. safe_log10(s% power_neutrinos) > max_Lneu_for_mass_loss &
                .or. s% u_flag) then
             s% use_other_wind = .false.
@@ -1582,15 +1590,6 @@
 
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1
          s% ixtra(ix_steps_since_hydro_on) = s% ixtra(ix_steps_since_hydro_on) + 1
-
-         if (s% ixtra(ix_num_relaxations) == 1 .and. stop_100d_after_pulse &
-               .and. s% star_age - s% xtra(x_star_age_at_relax) > 100d0/dayyer) then
-            !for the test_suite, terminate at the onset of the second pulse
-            extras_finish_step = terminate
-            s% termination_code = t_xtra1
-            termination_code_str(t_xtra1) = "Successful test: evolved 100 days past first relax"
-            return
-         end if
 
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
 

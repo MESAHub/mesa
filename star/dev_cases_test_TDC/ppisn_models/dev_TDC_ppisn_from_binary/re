@@ -28,4 +28,4 @@ then
     exit 1
 fi
 
-make run
+MESA_INLIST=inlist_pulses_header make run

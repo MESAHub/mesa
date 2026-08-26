@@ -17,8 +17,7 @@
          real(dp) :: split_merge_amr_metric_logR_weight, &
             split_merge_amr_metric_logtau_weight, &
             split_merge_amr_metric_min_delta_lnR, &
-            split_merge_amr_metric_min_delta_lntau, &
-            split_merge_amr_metric_merge_guard_ratio
+            split_merge_amr_metric_min_delta_lntau
 
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap

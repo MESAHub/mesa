@@ -2697,6 +2697,18 @@
       use_superad_reduction = .false.
 
 
+      ! superad_reduction_max_logT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! For k > 0, apply superadiabatic reduction only where the start-of-step
+      ! ``logT`` is less than this limit. The start-of-step value keeps the
+      ! selection fixed during solver iterations.
+
+      ! ::
+
+      superad_reduction_max_logT = 7d0
+
+
       ! superad_reduction_Gamma_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -6732,6 +6744,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! split cell if ratio of actual/desired size is > split_merge_amr_MaxLong; ignore if <= 0
+      ! for metric zoning, also reject a proposed merge if the summed metric of
+      ! the resulting cell exceeds split_merge_amr_MaxLong times the target size.
       ! merge cell if ratio of desired/actual size is > split_merge_amr_MaxShort; ignore if <= 0
       ! be careful to avoid inconsistent limits such as when a required split triggers a required merge.
       ! to be safe, make sure product of limits > 2.

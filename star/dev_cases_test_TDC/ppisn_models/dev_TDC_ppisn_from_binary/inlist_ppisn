@@ -6,16 +6,13 @@
    kap_blend_logT_lower_bdy = 4.0d0
 
    ! We use 10% solar, with the definition of Asplund+ 2009
-   ! Zbase defined in inlist_extra
+   Zbase = 0.00146d0
    use_Type2_opacities = .true.
-
-   read_extra_kap_inlist(1) = .true.
-   extra_kap_inlist_name(1) = 'inlist_extra'
 /
 
 &eos
 
-mass_fraction_limit_for_Skye = 1d-16
+mass_fraction_limit_for_Skye = 1d-5
 
 / ! end of eos namelist
 
@@ -27,10 +24,8 @@ mass_fraction_limit_for_Skye = 1d-16
 
    !change_initial_net = .true.
    !although not used, run_star_extras reads new_net_name during pulses
-   new_net_name = "approx21_plus_co56.net"
-   adv_net = "approx21_plus_co56.net"
-
-   initial_zfracs = 6
+   new_net_name = "approx21_cr60_plus_co56.net"
+   adv_net = "approx21_cr60_plus_co56.net"
 
    ! this are options for the relaxation of the model in-between pulses
    timescale_for_relax_entropy = 1d-20
@@ -50,21 +45,19 @@ mass_fraction_limit_for_Skye = 1d-16
    new_rotation_flag = .false.
    change_w_div_wc_flag = .true.
    new_w_div_wc_flag = .false.
-
-   read_extra_star_job_inlist(1) = .true.
-   extra_star_job_inlist_name(1) = 'inlist_extra'
+   new_omega_div_omega_crit = 0d0
 
    pgstar_flag = .true.
    save_pgstar_files_when_terminate = .true.
 
-   num_special_rate_factors = 2
+   num_special_rate_factors = 1
    reaction_for_special_factor(1) = 'r_c12_ag_o16'
    special_rate_factor(1) = 1
    filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
-   reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
-   special_rate_factor(2) = 1
-   filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
+   ! reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+   ! special_rate_factor(2) = 1
+   ! filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
 
 / !end of star_job namelist
 
@@ -100,10 +93,10 @@ mass_fraction_limit_for_Skye = 1d-16
    maxT_for_gold_tolerances = 6d9
    gold_tol_residual_norm3 = 1d-5
    gold_tol_max_residual3 = 1d-3
-   !ignore_too_large_correction = .true.
+   ignore_too_large_correction = .true.
    !scale_max_correction = 0.1d0
    corr_coeff_limit = 0.2d0
-   ignore_min_corr_coeff_for_scale_max_correction = .false.
+   ignore_min_corr_coeff_for_scale_max_correction = .true.
    ignore_species_in_max_correction = .false.
 
    limit_for_rel_error_in_energy_conservation = 1d10 !1d-2
@@ -120,25 +113,26 @@ mass_fraction_limit_for_Skye = 1d-16
    relax_max_number_retries = 1000
    max_number_retries = 5000 ! RECOMMENDED 5000
 
-   ! in principle this is the only thing that needs changing
-   ! it is set in inlist_extra
-   !initial_mass = 72
-   read_extra_controls_inlist(1) = .true.
-   extra_controls_inlist_name(1)= 'inlist_extra'
-
    ! our wind implementation follows Brott+ 2011
    use_other_wind = .true.
 
    ! when using hydro, we reduce the rotational corrections near the surface
    use_other_eval_fp_ft = .false.
 
-   ! During hydro we use es scaterring opacity on the very outermost cell
+   ! Correct the ideal-EOS contribution to lnfree_e, floor opacity below
+   ! logT=2.7001 with blending to 2.8001, and use electron-scattering opacity
+   ! for an escaping Riemann-hydro surface cell.
    use_other_kap = .true.
 
    ! convection controls
    use_ledoux_criterion = .true.
    mixing_length_alpha = 2d0
-   harmonic_dissipation_length_beta = 0.1d0
+   MLT_option = "TDC"
+   include_mlt_corr_to_TDC = .false.
+   TDC_alpha_M = 0d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_include_eturb_in_energy_equation = .true.
+   harmonic_dissipation_length_beta = 1d0
    alpha_semiconvection = 1d0
    thermohaline_coeff = 0d0
    num_cells_for_smooth_gradL_composition_term = 0
@@ -149,9 +143,17 @@ mass_fraction_limit_for_Skye = 1d-16
    make_gradr_sticky_in_solver_iters = .true.
    convergence_ignore_equL_residuals = .true.
 
-   max_abs_du_div_cs_for_convection = 100d0 !0.03d0
+   max_abs_du_div_cs_for_convection = 0.03d0
    max_v_div_cs_for_convection = 10d0
-   max_v_for_convection = 1d5 !1d4
+   max_v_for_convection = 1d5 ! v should never hit this anyway, see x_ctrl(17) below.
+
+   use_superad_reduction = .true.
+   superad_reduction_max_logT = 7d0
+   superad_reduction_diff_grads_limit = 1d-4
+   superad_reduction_use_turnover_limit = .true.
+   superad_reduction_Gamma_limit = 0.5d0
+   superad_reduction_Gamma_limit_scale = 5d0
+   superad_reduction_Gamma_inv_scale = 5d0
 
    ! overshoot controls
    ! we only include a bit of exponential overshooting to smooth things out
@@ -227,7 +229,6 @@ mass_fraction_limit_for_Skye = 1d-16
    split_merge_amr_reconstruct_pressure_for_u_flag = .true.
    split_merge_amr_metric_logR_weight = 1d0
    split_merge_amr_metric_logtau_weight = 0.5d0
-   split_merge_amr_metric_merge_guard_ratio = 1.25d0
    split_merge_amr_nz_baseline = 2000 ! RECOMMENDED 6000 for logR zoning
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
@@ -294,7 +295,7 @@ mass_fraction_limit_for_Skye = 1d-16
    ! in order for Riemann hydro to be turned on, the following two conditions need to be met
    x_ctrl(1) = 0.01d0 ! the integrated gamma1 must be smaller than this (min_gamma_sub_43_for_hydro)
 
-   ! parameters controlling switch between hydrostatic and Riemann hydro
+   ! parameters controlling the switch between v_flag and Riemann hydro
    ! after the pulse starts, we estimate the dynamical timescale of the star
    ! (excluding some of the outer layers), and model the dynamical evolution
    ! for at least a fixed number of these timescales before turning off hydro
@@ -348,22 +349,19 @@ mass_fraction_limit_for_Skye = 1d-16
 
    x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(12) is not used for L_photo either
 
-   x_ctrl(15) = 9d0 ! After first pulse, turn on v_flag if Riemann hydro is off and logT_center exceeds this.
+   x_ctrl(15) = 5d0 ! After first pulse, turn on v_flag if Riemann hydro is off and logT_center exceeds this.
                       ! (logT_for_v_flag)
    x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)
 
    x_ctrl(17) = 5d4 ! km/s: cap the emergency fixed surface velocity.
-                     ! Ignored by smooth surface-ejecta removal.
 
-   x_integer_ctrl(2) = 1 ! Surface ejecta removal: 0 disabled, 1 direct, 2 smooth.
+   x_integer_ctrl(2) = 1 ! Surface ejecta removal: 0 disabled, 1 direct.
                          ! (surface_ejecta_removal_mode)
-   x_ctrl(18) = 2d4 ! Minimum radius in Rsun for removal.
+   x_ctrl(18) = 1d4 ! Minimum radius in Rsun for removal.
                     ! (surface_ejecta_radius_limit)
    x_ctrl(19) = 4d0 ! Minimum outward velocity divided by escape velocity.
                     ! (surface_ejecta_v_div_vesc_limit)
-   x_ctrl(20) = 1d2 ! Smooth-removal inverse timescale in yr^-1.
-                    ! (surface_ejecta_removal_factor)
    x_ctrl(21) = 0d0 ! Maximum local escape velocity in km/s for removal.
                     ! A positive value replaces the radius criterion.
                     ! (surface_ejecta_escape_velocity_limit)
@@ -372,20 +370,24 @@ mass_fraction_limit_for_Skye = 1d-16
                     ! A nonpositive value disables this limit.
                     ! (max_dt_during_pulse)
 
-   ! Use MESA's standard mass-loss energy accounting for smooth removal.
-   eps_mdot_factor = 0d0
-   eps_mdot_leak_frac_factor = 0d0
-   TDC_adjust_mass_fallback_to_mlt = .true.
+   TDC_adjust_mass_fallback_to_mlt = .true. ! layers touched by adjust mass use mlt.
 
    x_logical_ctrl(1) = .false.! If true, terminate after evolving 100d after first relax
                               ! (stop_100d_after_pulse)
 
-   x_logical_ctrl(3) = .true. ! Enable RTI during Riemann-hydro phases.
+   x_logical_ctrl(3) = .false. ! Enable RTI during Riemann-hydro phases.
                               ! (use_RTI_during_hydro)
+   ! for v flag
+   ! Dampen velocities in the outer 2% by mass while v_flag is on.
+   min_q_for_drag = 0.98d0
+   drag_coefficient = 1d0
 
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 4.0d0
+   Pvsc_zsh = 0.1d0
 
    photo_interval = 50
-   profile_interval = 50
+   profile_interval = 200
    history_interval = 10
    terminal_interval = 10
 
