@@ -159,7 +159,7 @@ contains
        return
     end if
 
-if ((b% s1% center_h1 < 1.0d-4) .and. (b% s1% x_logical_ctrl(1) .eqv. .true.) .and. (b% s1% center_he4 < 1d-3)) then
+if ((b% s1% center_h1 < 1.0d-4) .and. (b% s1% x_logical_ctrl(1) .eqv. .true.) .and. (b% s1% center_he4 < 1d-6)) then
 
     call do_saves_for_binary(b, ierr)
 
