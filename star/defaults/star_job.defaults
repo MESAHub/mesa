@@ -1098,6 +1098,14 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! num_timescales_for_relax_entropy
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! relax_entropy_use_implicit_source
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! relax_entropy_use_normalized_source
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! relax_entropy_scale_max_correction
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! relax_entropy_retry_hold
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_entropy_filename
       ! ~~~~~~~~~~~~~~~~~~~~~~
       ! get_entropy_for_relax_from_eos
@@ -1115,6 +1123,23 @@
       ! ``timescale_for_relax_entropy``. To circumvent convection we limit the acceleration of convective velocities
       ! using ``min_T_for_acceleration_limited_conv_velocity = 0`` (see controls.defaults), and the timescale
       ! for relaxation should be very short (less than a second).
+
+      ! If ``relax_entropy_use_implicit_source`` is true, the local density and temperature derivatives of the
+      ! entropy relaxation heating are included in the structure Jacobian. The heating and target profile are
+      ! unchanged.
+
+      ! If ``relax_entropy_use_normalized_source`` is true, use
+
+      ! ::
+
+      !     s% extra_heat(k) = T(k)*(desired_entropy(k) - entropy(k))/(timescale_for_relax_entropy*secyer)
+
+      ! so that ``timescale_for_relax_entropy`` is the local entropy e-folding time in the absence of other
+      ! energy sources. This source can be used with either the explicit or implicit energy hook.
+
+      ! A positive ``relax_entropy_scale_max_correction`` temporarily replaces ``scale_max_correction`` during
+      ! entropy relaxation. A nonnegative ``relax_entropy_retry_hold`` similarly replaces ``retry_hold``. Both
+      ! controls are restored after relaxation.
 
       ! ``relax_entropy_filename`` holds the desired entropy profile information
       ! file format for relax entropy
@@ -1165,6 +1190,10 @@
     timescale_for_relax_entropy = 1d-9
     max_dt_for_relax_entropy = 1d-9
     num_timescales_for_relax_entropy = 100
+    relax_entropy_use_implicit_source = .false.
+    relax_entropy_use_normalized_source = .false.
+    relax_entropy_scale_max_correction = 0d0
+    relax_entropy_retry_hold = -1
     relax_entropy_filename = ''
     get_entropy_for_relax_from_eos = ''
 
