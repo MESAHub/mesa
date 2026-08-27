@@ -301,6 +301,7 @@
 
          logical :: use_superad_reduction
          real(dp) :: &
+            superad_reduction_max_logT, &
             superad_reduction_Gamma_limit, &
             superad_reduction_Gamma_limit_scale, &
             superad_reduction_Gamma_inv_scale, &

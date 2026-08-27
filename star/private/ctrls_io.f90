@@ -136,7 +136,8 @@
    gradT_excess_beta1, gradT_excess_lambda2, gradT_excess_beta2, &
    gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
-    use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
+    use_superad_reduction, superad_reduction_max_logT, &
+    superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     superad_reduction_use_turnover_limit, superad_reduction_turnover_limit_function, &
     make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
@@ -1048,6 +1049,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% dq_D_mix_zero_at_H_C_crossover = dq_D_mix_zero_at_H_C_crossover
 
  s% use_superad_reduction = use_superad_reduction
+ s% superad_reduction_max_logT = superad_reduction_max_logT
  s% superad_reduction_gamma_limit = superad_reduction_gamma_limit
  s% superad_reduction_gamma_limit_scale = superad_reduction_gamma_limit_scale
  s% superad_reduction_gamma_inv_scale = superad_reduction_gamma_inv_scale
@@ -2775,6 +2777,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  dq_D_mix_zero_at_H_C_crossover = s% dq_D_mix_zero_at_H_C_crossover
 
  use_superad_reduction = s% use_superad_reduction
+ superad_reduction_max_logT = s% superad_reduction_max_logT
  superad_reduction_gamma_limit = s% superad_reduction_gamma_limit
  superad_reduction_gamma_limit_scale = s% superad_reduction_gamma_limit_scale
  superad_reduction_gamma_inv_scale = s% superad_reduction_gamma_inv_scale
