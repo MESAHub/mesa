@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+mkdir -p mods
+
+do_one inlist_start mods/start.mod LOGS_start
+do_one inlist_remove_core mods/removed_core.mod LOGS_remove_core
+do_one inlist_prepare mods/ready_to_inject.mod LOGS_prepare
+do_one inlist_edep mods/ready_to_finish_1d46_v0.mod LOGS_edep
+do_one inlist_finish mods/final.mod LOGS_finish
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'
