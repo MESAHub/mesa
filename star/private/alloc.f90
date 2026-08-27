@@ -383,6 +383,8 @@
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
          if (failed('mlt_vc_old')) return
+         call do1D(s, s% superad_reduction_factor_old, nz, action, ierr)
+         if (failed('superad_reduction_factor_old')) return
          call do1D(s, s% omega_old, nz, action, ierr)
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
@@ -776,6 +778,7 @@
             if (failed('gradT_excess_effect')) exit
             call do1(s% superad_reduction_factor, c% superad_reduction_factor)
             if (failed('superad_reduction_factor')) exit
+            if (action == do_allocate) s% superad_reduction_factor = 1d0
 
             call do1(s% domega_dlnR, c% domega_dlnR)
             if (failed('domega_dlnR')) exit
@@ -1163,6 +1166,9 @@
             if (failed('unsmoothed_brunt_B')) exit
             call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
             if (failed('smoothed_brunt_B')) exit
+            call do1(s% tau_conv_start, c% tau_conv_start)
+            if (failed('tau_conv_start')) exit
+            if (action == do_allocate) s% tau_conv_start = 0d0
 
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
@@ -1427,6 +1433,8 @@
             if (failed('prev_mesh_omega')) exit
             call do1(s% prev_mesh_mlt_vc, c% prev_mesh_mlt_vc)
             if (failed('prev_mesh_mlt_vc')) exit
+            call do1(s% prev_mesh_superad_reduction_factor, c% prev_mesh_superad_reduction_factor)
+            if (failed('prev_mesh_superad_reduction_factor')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
             ! These are needed for time-smoothing of ST mixing
