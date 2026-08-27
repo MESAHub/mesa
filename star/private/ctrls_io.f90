@@ -144,7 +144,8 @@
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     superad_reduction_use_turnover_limit, superad_reduction_turnover_limit_function, &
     make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
-    max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
+    max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, &
+    harmonic_dissipation_length_beta, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
     max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
@@ -1083,6 +1084,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% thermohaline_coeff = thermohaline_coeff
  s% thermohaline_option = thermohaline_option
  s% mixing_length_alpha = mixing_length_alpha
+ s% harmonic_dissipation_length_beta = harmonic_dissipation_length_beta
  s% remove_small_D_limit = remove_small_D_limit
  s% alt_scale_height_flag = alt_scale_height_flag
  s% Henyey_MLT_y_param = Henyey_MLT_y_param
@@ -2820,6 +2822,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  thermohaline_coeff = s% thermohaline_coeff
  thermohaline_option = s% thermohaline_option
  mixing_length_alpha = s% mixing_length_alpha
+ harmonic_dissipation_length_beta = s% harmonic_dissipation_length_beta
  remove_small_D_limit = s% remove_small_D_limit
  alt_scale_height_flag = s% alt_scale_height_flag
  Henyey_MLT_y_param = s% Henyey_MLT_y_param
