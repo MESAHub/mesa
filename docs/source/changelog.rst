@@ -33,6 +33,8 @@ MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverv
 Diffusive overshooting (overmixing) prescriptions now support a
 ``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
 
+White dwarf phase separation now includes an option to use three-component phase diagrams, automatically selected according to the dominant three elements in the crystallizing layer, based on the work of `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_. See documentation at :ref:`reference/controls:phase_separation_option` and new test case exercising this capability in an ultramassive white dwarf :doc:`test_suite/wd_o_ne_3_phase`.
+
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
 GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since the previous release (8.1) included in MESA can be seen `here <https://github.com/rhdtownsend/gyre/releases>`__.
@@ -78,6 +80,12 @@ faces whose start-of-step temperature is below the selected ``logT``. Its
 default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. Using the
 start-of-step temperature holds the selection fixed during solver iterations.
 The ``k=0`` model-construction path is unchanged.
+
+Additional controls are available for TDC envelope remeshing:
+
+- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
 .. _Bug Fixes main:
 

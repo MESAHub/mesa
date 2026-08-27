@@ -202,12 +202,7 @@ contains
       else
          Lambda_cell = get_TDC_mixing_length_cell(s, k, ierr)
          if (ierr /= 0) return
-         if (s%TDC_use_density_form_for_eddy_viscosity) then
-            ! new density derivative term
-            d_v_div_r = compute_rho_form_of_d_v_div_r(s, k, ierr)
-         else
-            d_v_div_r = compute_d_v_div_r(s, k, ierr)
-         end if
+         d_v_div_r = compute_d_v_div_r(s, k, ierr)
          if (ierr /= 0) return
 
          ! don't need to check if mlt_vc > 0 here.
@@ -285,12 +280,7 @@ contains
    else
       Lambda_face = get_TDC_mixing_length_face(s, k, ierr)
       if (ierr /= 0) return
-      if (s%TDC_use_density_form_for_eddy_viscosity) then
-         ! new density derivative form
-         d_v_div_r = compute_rho_form_of_d_v_div_r_face(s, k, ierr)
-      else
-         d_v_div_r = compute_d_v_div_r_face(s, k, ierr)
-      end if
+      d_v_div_r = compute_d_v_div_r_face(s, k, ierr)
       if (ierr /= 0) return
 
       if (k >= 2) then
@@ -352,12 +342,7 @@ contains
       Chi_face = compute_Chi_div_w_face(s,k,ierr)
       if (ierr /= 0) return
 
-      if (s%TDC_use_density_form_for_eddy_viscosity) then
-         ! new density derivative term
-         d_v_div_r = compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr)
-      else
-         d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
-      end if
+      d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
 
       if (k >= 2) then
          dmbar = 0.5d0*(s% dm(k) + s% dm(k-1))
@@ -513,93 +498,6 @@ contains
       if (r_p1%val == 0d0) r_p1 = 1d0
       d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center
-
-   function compute_rho_form_of_d_v_div_r(s, k, ierr) result(d_v_div_r) ! used in Chi_cell
-      type(star_info), pointer :: s
-      integer, intent(in)  :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r, v_00, v_p1
-      type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
-      real(dp) :: dm_cell
-      ierr = 0
-
-      r_cell = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
-      rho_cell = wrap_d_00(s, k)
-      if (s% u_flag) then
-         v_cell = wrap_u_00(s,k)
-      else ! v flag
-         v_cell = 0.5d0*(wrap_v_00(s, k) + wrap_v_p1(s, k))
-      end if
-      v_00 = wrap_opt_time_center_v_00(s, k)
-      v_p1 = wrap_opt_time_center_v_p1(s, k)
-      dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
-      dm_cell = s%dm(k)                     ! cell mass
-
-      ! density form
-      d_v_div_r = -dm_cell/(4d0*pi*rho_cell)*(dlnrho_dt/pow3(r_cell) + 3d0*v_cell/pow4(r_cell))
-
-      ! dm_cell*(1/r * du/dm - U/4/pi/rho/r^4), more sensitive to geometry
-      !d_v_div_r = ((v_00 - v_p1) - dm_cell*v_cell/(4d0*pi*rho_cell*pow3(r_cell)))/r_cell
-
-   end function compute_rho_form_of_d_v_div_r
-
-   function compute_rho_form_of_d_v_div_r_face(s, k, ierr) result(d_v_div_r)
-      type(star_info), pointer :: s
-      integer, intent(in)  :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
-      type(auto_diff_real_star_order1) :: r_face, rho_face, v_face, dlnrho_dt
-      real(dp) :: dm_bar, alfa, beta
-      ierr = 0
-
-      r_face = wrap_r_00(s, k)
-      rho_face = get_rho_face(s, k)
-      v_face = wrap_v_00(s, k)   ! face-centered velocity
-      if (k >= 2) then
-         dm_bar = 0.5d0*(s% dm(k) + s% dm(k-1))
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
-         dlnrho_dt = (alfa*wrap_dxh_lnd(s, k) + beta*shift_m1(wrap_dxh_lnd(s, k-1)))/s%dt    ! (∂/∂t)lnρ
-      else
-         dm_bar = 0.5d0*s% dm(k)
-         dlnrho_dt = 0.5d0*wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
-      end if
-
-      ! density form
-      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
-
-      ! dm_bar*(1/r * du/dm - U/4/pi/rho/r^4), more sensitive to geometry
-      !d_v_div_r = ((wrap_u_m1(s,k) - wrap_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
-
-   end function compute_rho_form_of_d_v_div_r_face
-
-   function compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
-      type(star_info), pointer :: s
-      integer, intent(in)  :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
-      type(auto_diff_real_star_order1) :: r_face, rho_face, v_face, dlnrho_dt
-      real(dp) :: dm_bar, alfa, beta
-      ierr = 0
-
-      r_face = wrap_opt_time_center_r_00(s, k)
-      rho_face = get_rho_face(s, k)
-      v_face = wrap_opt_time_center_v_00(s, k)   ! face-centered velocity
-      if (k >= 2) then
-         dm_bar = 0.5d0*(s% dm(k) + s% dm(k-1))
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
-         dlnrho_dt = (alfa*wrap_dxh_lnd(s, k) + beta*shift_m1(wrap_dxh_lnd(s, k-1)))/s%dt    ! (∂/∂t)lnρ
-      else
-         dm_bar = 0.5d0*s% dm(k)
-         dlnrho_dt = 0.5d0*wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
-      end if
-
-      ! density form
-      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
-
-      ! dm_bar*(1/r * du/dm - U/4/pi/rho/r^4), more sensitive to geometry
-      !d_v_div_r = ((wrap_opt_time_center_u_m1(s,k) - wrap_opt_time_center_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
-
-   end function compute_rho_form_of_d_v_div_r_face_opt_time_center
 
    function compute_d_v_div_r_face(s, k, ierr) result(d_v_div_r)  ! s^-1
       type(star_info), pointer :: s

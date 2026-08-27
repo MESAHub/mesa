@@ -109,7 +109,7 @@
     TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
     TDC_alpha_C, TDC_alpha_S, &
     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
-    TDC_use_density_form_for_eddy_viscosity, TDC_adjust_mass_fallback_to_mlt, &
+    TDC_adjust_mass_fallback_to_mlt, &
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
     include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, &
@@ -117,7 +117,9 @@
     use_face_reconstruction, &
     TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
-    TDC_hydro_use_mass_interp_face_values, TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_T_anchor, TDC_hydro_dq_1_factor, &
+    TDC_hydro_use_mass_interp_face_values, TDC_hydro_nz, TDC_hydro_nz_outer, TDC_hydro_nz_inner, &
+    TDC_hydro_nz_T_gradient, &
+    TDC_hydro_T_anchor, TDC_hydro_dq_1_factor, &
 
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -334,6 +336,7 @@
     do_phase_separation, &
     phase_separation_option, &
     do_phase_separation_heating, &
+    smooth_phase_separation_heating, &
     phase_separation_mixing_use_brunt, &
     phase_separation_no_diffusion, &
 
@@ -374,7 +377,8 @@
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     use_TDC_Y_face_seeded_newton, &
     hydro_matrix_solver, &
-    remesh_for_TDC_pulsations_log_core_zoning, velocity_logT_lower_bound, &
+    remesh_for_TDC_pulsations_when_load, remesh_for_TDC_pulsations_log_core_zoning, &
+    velocity_logT_lower_bound, &
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
@@ -1831,6 +1835,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% do_phase_separation = do_phase_separation
  s% phase_separation_option = phase_separation_option
  s% do_phase_separation_heating = do_phase_separation_heating
+ s% smooth_phase_separation_heating = smooth_phase_separation_heating
  s% phase_separation_mixing_use_brunt = phase_separation_mixing_use_brunt
  s% phase_separation_no_diffusion = phase_separation_no_diffusion
 
@@ -2114,7 +2119,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_alpha_C = TDC_alpha_C
  s% TDC_alpha_S = TDC_alpha_S
  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
- s% TDC_use_density_form_for_eddy_viscosity = TDC_use_density_form_for_eddy_viscosity
  s% TDC_adjust_mass_fallback_to_mlt = TDC_adjust_mass_fallback_to_mlt
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
@@ -2133,9 +2137,12 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_hydro_use_mass_interp_face_values = TDC_hydro_use_mass_interp_face_values
  s% TDC_hydro_nz = TDC_hydro_nz
  s% TDC_hydro_nz_outer = TDC_hydro_nz_outer
+ s% TDC_hydro_nz_inner = TDC_hydro_nz_inner
+ s% TDC_hydro_nz_T_gradient = TDC_hydro_nz_T_gradient
  s% TDC_hydro_T_anchor = TDC_hydro_T_anchor
  s% TDC_hydro_dq_1_factor = TDC_hydro_dq_1_factor
 
+ s% remesh_for_TDC_pulsations_when_load = remesh_for_TDC_pulsations_when_load
  s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
 
  s% RSP2_alfap = RSP2_alfap
@@ -3507,6 +3514,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  do_phase_separation = s% do_phase_separation
  phase_separation_option = s% phase_separation_option
  do_phase_separation_heating = s% do_phase_separation_heating
+ smooth_phase_separation_heating = s% smooth_phase_separation_heating
  phase_separation_mixing_use_brunt = s% phase_separation_mixing_use_brunt
  phase_separation_no_diffusion = s% phase_separation_no_diffusion
 
@@ -3844,7 +3852,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alpha_C = s% TDC_alpha_C
  TDC_alpha_S = s% TDC_alpha_S
  TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
- TDC_use_density_form_for_eddy_viscosity = s% TDC_use_density_form_for_eddy_viscosity
  TDC_adjust_mass_fallback_to_mlt = s% TDC_adjust_mass_fallback_to_mlt
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
@@ -3863,9 +3870,12 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_hydro_use_mass_interp_face_values = s% TDC_hydro_use_mass_interp_face_values
  TDC_hydro_nz = s% TDC_hydro_nz
  TDC_hydro_nz_outer = s% TDC_hydro_nz_outer
+ TDC_hydro_nz_inner = s% TDC_hydro_nz_inner
+ TDC_hydro_nz_T_gradient = s% TDC_hydro_nz_T_gradient
  TDC_hydro_T_anchor = s% TDC_hydro_T_anchor
  TDC_hydro_dq_1_factor = s% TDC_hydro_dq_1_factor
 
+ remesh_for_TDC_pulsations_when_load = s% remesh_for_TDC_pulsations_when_load
  remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning
 
  RSP2_alfap= s% RSP2_alfap
