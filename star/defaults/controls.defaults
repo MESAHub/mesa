@@ -6611,37 +6611,60 @@
       ! ~~~~~~~~~~~~
       ! TDC_hydro_nz_outer
       ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_inner
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_T_gradient
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_T_anchor
       ! ~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_dq_1_factor
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_use_mass_interp_face_values
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remesh_for_TDC_pulsations_when_load
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If calling the public ``remesh_for_TDC_pulsations`` function, the model will be rezoned below ``TDC_hydro_T_anchor`` with logarithmic
-      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
-      ! that each zone increases in mass inward following a power law, similar to RSP's static model builder.
+      ! If ``remesh_for_TDC_pulsations_log_core_zoning`` is true, the model is rezoned below
+      ! ``TDC_hydro_T_anchor`` with logarithmic spacing in mass. If false, each cell increases
+      ! in mass inward following a power law, similar to the RSP static model builder.
 
       ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
-      ! ``TDC_hydro_T_anchor``, and increasing spacing in mass between the anchor and the inner boundary condition.
+      ! ``TDC_hydro_T_anchor``. The selected core zoning is used between the anchor and the inner boundary condition.
       ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
       ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
       ! The ``TDC_hydro_dq_1_factor`` sets the dq of the surface cell to this multiple of the cell beneath it, k = 2.
 
+      ! For power-law core zoning, ``TDC_hydro_nz_inner`` reserves this many zones next to the inner boundary.
+      ! Their cell masses decrease geometrically inward to ``max_center_cell_dq``. Set this to zero to use a
+      ! single inward-increasing power law. Increase ``TDC_hydro_nz`` by the same amount to add inner zones
+      ! without removing zones from the middle of an existing mesh. This control has no effect with logarithmic
+      ! core zoning.
+
+      ! ``TDC_hydro_nz_T_gradient`` adds this many zones below ``TDC_hydro_T_anchor`` according to the variation
+      ! in ``logT``. These zones enhance the selected mass-based core zoning rather than replacing it. Increase
+      ! ``TDC_hydro_nz`` by the same amount to retain all zones in the underlying mass grid. Set this to zero to
+      ! leave the mass grid unchanged.
+
       ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
       ! mass weighted averaging.
 
-      ! This remeshing scheme works well for most Cepheid envelopes, but it is not designed for AGB stars with deep convective envelopes.
+      ! Use ``TDC_hydro_nz_inner`` and ``TDC_hydro_nz_T_gradient`` to resolve the inner boundary
+      ! and steep temperature gradients in AGB envelopes with deep convective regions.
+
+      ! If ``remesh_for_TDC_pulsations_when_load`` is true, a model loaded from a ``.mod`` file
+      ! is remeshed before the first step. This is not applied to photo restarts.
 
       ! ::
 
+    remesh_for_TDC_pulsations_when_load = .false.
     remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 
     TDC_hydro_nz = 150
     TDC_hydro_nz_outer = 40
+    TDC_hydro_nz_inner = 0
+    TDC_hydro_nz_T_gradient = 0
     TDC_hydro_T_anchor = 11d3
     TDC_hydro_dq_1_factor = 2d0
 
@@ -7634,6 +7657,9 @@
       !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
       !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
+      ! + ``'3c'`` : three-component phase separation option dynamically selects dominant three components out
+      !   of C/O/Ne/Na/Mg and applies three-component PS procedure based on
+      !   `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_.
 
       ! ::
 
@@ -7649,6 +7675,20 @@
       ! ::
 
     do_phase_separation_heating = .true.
+
+      ! smooth_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, redistribute all heating associated with phase
+      ! separation evenly throughout the inner half of the white dwarf.
+      ! This is a somewhat arbitrary choice to broadly distribute the
+      ! correct amount of net heating through the WD interior where
+      ! heat conduction is efficent anyway, preventing unphysical localized
+      ! heating spikes near the crystallization boundary at small time steps.
+
+      ! ::
+
+    smooth_phase_separation_heating = .true.
 
       ! phase_separation_mixing_use_brunt
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

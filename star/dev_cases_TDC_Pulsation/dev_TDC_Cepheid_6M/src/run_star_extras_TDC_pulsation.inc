@@ -80,6 +80,7 @@
       
       integer function TDC_pulsation_extras_finish_step(id)
          use chem_def
+         use utils_lib, only: is_bad
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr, gyre_interval, test_period
@@ -104,8 +105,17 @@
          
          doing_pulses = s% x_logical_ctrl(7)
          if (.not. doing_pulses) return
-         target_period = s% x_ctrl(7)
-         if (target_period <= 0d0) return
+         if (period > 0d0 .and. num_periods > 1) then
+            target_period = period/(24d0*3600d0)
+         else if (s% x_ctrl(7) > 0d0) then
+            target_period = s% x_ctrl(7)
+         else
+            target_period = 0d0
+            if (.not. is_bad(s% dynamic_timescale) .and. s% dynamic_timescale > 0d0) &
+               target_period = s% dynamic_timescale/(24d0*3600d0)
+         end if
+         if (target_period <= 0d0 .or. .not. (s% v_flag .or. s% u_flag) .or. &
+             s% model_number <= s% x_ctrl(11)) return
          if (.not. get_period_info()) return
          
          test_period = s% x_integer_ctrl(7)
@@ -301,7 +311,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         TDC_pulsation_how_many_extra_history_columns = 11
+         TDC_pulsation_how_many_extra_history_columns = 12
       end function TDC_pulsation_how_many_extra_history_columns
       
       
@@ -326,6 +336,7 @@
          names(i) = 'delta_logTeff'; vals(i) = period_delta_logTeff; i=i+1
          names(i) = 'delta_logL'; vals(i) = period_delta_logL; i=i+1
          names(i) = 'delta_Mag'; vals(i) = period_delta_Mag; i=i+1
+         names(i) = 'KE_growth'; vals(i) = KE_growth; i = i+1
          names(i) = 'KE_growth_avg'; vals(i) = KE_growth_avg; i = i+1
 
       end subroutine TDC_pulsation_data_for_extra_history_columns
@@ -379,5 +390,4 @@
       
       
       include 'gyre_in_mesa_extras_set_velocities.inc'
-
 

@@ -33,6 +33,8 @@ MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverv
 Diffusive overshooting (overmixing) prescriptions now support a
 ``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
 
+White dwarf phase separation now includes an option to use three-component phase diagrams, automatically selected according to the dominant three elements in the crystallizing layer, based on the work of `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_. See documentation at :ref:`reference/controls:phase_separation_option` and new test case exercising this capability in an ultramassive white dwarf :doc:`test_suite/wd_o_ne_3_phase`.
+
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
 GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since the previous release (8.1) included in MESA can be seen `here <https://github.com/rhdtownsend/gyre/releases>`__.
@@ -40,6 +42,12 @@ GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since t
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
 The new control ``superad_reduction_use_turnover_limit`` relaxes the applied superadiabatic reduction from its previous accepted value toward the instantaneous value. ``superad_reduction_turnover_limit_function`` selects either the exponential response ``1-exp(-dt/tau_conv)`` or the linear response ``min(dt/tau_conv,1)``. The limiter acts on the applied reduction ``1/Gamma_factor``. Zones with a lagged convective velocity use ``scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt frequency. The timescale is set at the start of the step and held fixed during solver iterations. With ``use_face_reconstruction``, this calculation uses the reconstructed face thermodynamic state. The scale height is the interpolated or reconstructed face value used by MLT and TDC. The previous reduction is preserved across retries, remeshing, and photo restarts. For ``k > 0``, ``superad_reduction_max_logT`` restricts the reduction to faces whose start-of-step temperature is below the selected ``logT``. Its default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. The ``k=0`` model-construction path is unchanged.
+
+Additional controls are available for TDC envelope remeshing:
+
+- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
 .. _Bug Fixes main:
 
