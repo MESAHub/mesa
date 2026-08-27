@@ -20,7 +20,7 @@
 module turb_support
 
 use star_private_def
-use const_def, only: dp, crad, no_mixing
+use const_def, only: dp, crad, ln10, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -300,12 +300,13 @@ contains
       D = 0d0
       Gamma = 0d0
       hold_superad_reduction_factor = .false.
-      if (k > 0) &
+      ! Preserve stored photo state while finish_load_model rebuilds derived quantities.
+      if (k > 0 .and. s% have_superad_reduction_factor) &
          hold_superad_reduction_factor = &
-            s% use_superad_reduction .and. &
-            s% superad_reduction_use_turnover_limit .and. &
-            s% have_superad_reduction_factor .and. &
-            (.not. s% okay_to_set_superad_reduction_factor .or. s% doing_finish_load_model)
+            s% doing_finish_load_model .or. &
+            (s% use_superad_reduction .and. &
+             s% superad_reduction_use_turnover_limit .and. &
+             .not. s% okay_to_set_superad_reduction_factor)
       if (k /= 0 .and. .not. hold_superad_reduction_factor) &
          s% superad_reduction_factor(k) = 1d0
 
@@ -477,6 +478,11 @@ contains
       contains
 
       subroutine set_superad_reduction()
+         Gamma_factor = 1d0
+         if (k > 0) then
+            if (s% lnT_start(k)/ln10 >= s% superad_reduction_max_logT) return
+         end if
+
          Gamma_limit = s% superad_reduction_Gamma_limit
          scale_value1 = s% superad_reduction_Gamma_limit_scale
          scale_value2 = s% superad_reduction_Gamma_inv_scale
@@ -485,7 +491,6 @@ contains
          Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
          Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
 
-         Gamma_factor = 1d0
          if (gradT > gradL) then
             if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
                alfa0 = (gradT-gradL)/diff_grads_limit

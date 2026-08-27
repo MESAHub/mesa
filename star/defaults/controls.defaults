@@ -2670,6 +2670,18 @@
       use_superad_reduction = .false.
 
 
+      ! superad_reduction_max_logT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! For k > 0, apply superadiabatic reduction only where the start-of-step
+      ! ``logT`` is less than this limit. The start-of-step value keeps the
+      ! selection fixed during solver iterations.
+
+      ! ::
+
+      superad_reduction_max_logT = 7d0
+
+
       ! superad_reduction_Gamma_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
