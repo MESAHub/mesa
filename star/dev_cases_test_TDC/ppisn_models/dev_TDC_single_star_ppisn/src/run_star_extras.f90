@@ -33,8 +33,6 @@
 
       implicit none
 
-      include "test_suite_extras_def.inc"
-
       logical :: dbg = .false.
       real(dp), parameter :: log_term_power = 5.626d0
 
@@ -109,12 +107,9 @@
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
-      logical :: stop_100d_after_pulse, use_RTI_during_hydro
+      logical :: use_RTI_during_hydro
 
       contains
-
-      include "test_suite_extras.inc"
-
 
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -166,7 +161,6 @@
          max_Lphoto_for_lgLnuc_limit2 = s% x_ctrl(14)
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
-         stop_100d_after_pulse = s% x_logical_ctrl(1)
          use_RTI_during_hydro = s% x_logical_ctrl(3)
          vsurf_for_fixed_bc = s% x_ctrl(17)
          surface_ejecta_removal_mode = s% x_integer_ctrl(2)
@@ -681,7 +675,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
             s% lxtra(lx_hydro_on) = .false.
             s% lxtra(lx_hydro_has_been_on) = .false.
@@ -736,13 +729,7 @@
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         real(dp) :: dt
-         character (len=strlen) :: test
          ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
 
 
@@ -1050,7 +1037,7 @@
 
          ! Ignore energy checks before first time hydro is turned on
          ! otherwise need small steps during core helium burning and it
-         ! slows down the test_suite
+         ! slows down the run
          if (.not. s% lxtra(lx_hydro_has_been_on)) then
             s% cumulative_energy_error = 0d0
             s% cumulative_extra_heating = 0d0
@@ -1603,15 +1590,6 @@
 
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1
          s% ixtra(ix_steps_since_hydro_on) = s% ixtra(ix_steps_since_hydro_on) + 1
-
-         if (s% ixtra(ix_num_relaxations) == 1 .and. stop_100d_after_pulse &
-               .and. s% star_age - s% xtra(x_star_age_at_relax) > 100d0/dayyer) then
-            !for the test_suite, terminate at the onset of the second pulse
-            extras_finish_step = terminate
-            s% termination_code = t_xtra1
-            termination_code_str(t_xtra1) = "Successful test: evolved 100 days past first relax"
-            return
-         end if
 
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
 
