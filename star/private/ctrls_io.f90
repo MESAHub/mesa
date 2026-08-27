@@ -340,7 +340,7 @@
     phase_separation_no_diffusion, &
 
     ! eos controls
-    fix_d_eos_dxa_partials, &
+    min_logRho_for_eos, fix_d_eos_dxa_partials, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -366,7 +366,7 @@
     max_abs_rel_change_surf_lnS, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_flux_limiting_with_dPrad_dm_form, &
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, dedt_eqn_r_scale, &
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, constant_L, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
@@ -517,7 +517,8 @@
     atm_irradiated_kap_v, atm_irradiated_kap_v_div_kap_th, atm_irradiated_P_surf, &
     atm_irradiated_max_iters, &
 
-    use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, &
+    use_compression_outer_BC, use_momentum_outer_BC, floor_momentum_outer_BC_at_Prad, &
+    use_zero_Pgas_outer_BC, &
     fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
 
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
@@ -662,6 +663,12 @@
        write(*,'(a)') 'WARNING: split/merge AMR metric zoning has no positive weights.'
        write(*,'(a)') 'Falling back to the legacy split/merge AMR zoning controls.'
        have_warned_about_zero_split_merge_amr_metric_weights = .true.
+    end if
+
+    if (s% min_logRho_for_eos < -30d0) then
+       write(*,'(a)') 'min_logRho_for_eos must be at least -30'
+       ierr = -1
+       return
     end if
 
     if (.not. (trim(s% energy_eqn_option) == 'dedt' .or. trim(s% energy_eqn_option) == 'eps_grav')) then
@@ -1294,6 +1301,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% use_compression_outer_BC = use_compression_outer_BC
  s% use_momentum_outer_BC = use_momentum_outer_BC
+ s% floor_momentum_outer_BC_at_Prad = floor_momentum_outer_BC_at_Prad
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
@@ -1822,6 +1830,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% phase_separation_no_diffusion = phase_separation_no_diffusion
 
  ! eos controls
+ s% min_logRho_for_eos = min_logRho_for_eos
  s% fix_d_eos_dxa_partials = fix_d_eos_dxa_partials
 
  ! opacity controls
@@ -1878,6 +1887,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_dPrad_dm_form_of_T_gradient_eqn = use_dPrad_dm_form_of_T_gradient_eqn
  s% use_flux_limiting_with_dPrad_dm_form = use_flux_limiting_with_dPrad_dm_form
  s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+ s% constant_L = constant_L
  s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
  s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
@@ -3031,6 +3041,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  use_compression_outer_BC = s% use_compression_outer_BC
  use_momentum_outer_BC = s% use_momentum_outer_BC
+ floor_momentum_outer_BC_at_Prad = s% floor_momentum_outer_BC_at_Prad
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
@@ -3552,6 +3563,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_isolve_solver = s% diffusion_isolve_solver
 
  ! eos controls
+ min_logRho_for_eos = s% min_logRho_for_eos
  fix_d_eos_dxa_partials = s% fix_d_eos_dxa_partials
 
  ! opacity controls
@@ -3607,6 +3619,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  use_dPrad_dm_form_of_T_gradient_eqn = s% use_dPrad_dm_form_of_T_gradient_eqn
  use_flux_limiting_with_dPrad_dm_form = s% use_flux_limiting_with_dPrad_dm_form
  use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+ constant_L = s% constant_L
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering

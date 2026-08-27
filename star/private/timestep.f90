@@ -1967,7 +1967,8 @@
          check_delta_lgL = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% L_surf < s% delta_lgL_limit_L_min .or. s% L_surf_old <= 0d0) then
+         if (s% L_surf < s% delta_lgL_limit_L_min .or. &
+               s% L_surf_old <= 0d0 .or. s% constant_L) then
             dlgL = 0
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
@@ -2428,5 +2429,4 @@
 
 
       end module timestep
-
 

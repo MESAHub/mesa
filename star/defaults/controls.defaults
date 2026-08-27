@@ -4774,6 +4774,20 @@
     use_momentum_outer_BC = .false.
 
 
+      ! floor_momentum_outer_BC_at_Prad
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! When using ``use_momentum_outer_BC``, require the pressure applied to
+      ! the momentum equation to be at least the radiation pressure at the
+      ! atmospheric boundary temperature. This preserves the atmospheric
+      ! pressure when its implied gas pressure is nonnegative and otherwise
+      ! uses zero gas pressure. Ignored for other outer boundary conditions.
+
+      ! ::
+
+    floor_momentum_outer_BC_at_Prad = .false.
+
+
       ! use_zero_Pgas_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -7742,6 +7756,18 @@
 ! eos controls
 ! ============
 
+      ! min_logRho_for_eos
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! Calls to the EOS with ``log10(rho)`` below this value return an
+      ! error.  Values below -30 are not supported because high-order
+      ! density derivatives can overflow at sufficiently low density.
+
+      ! ::
+
+    min_logRho_for_eos = -30d0
+
+
       ! fix_d_eos_dxa_partials
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8621,8 +8647,9 @@
       !|     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
       !|
       !|     if (use_dPrad_dm_form_of_T_gradient_eqn)
-      !|         if (gradT < gradr) then
-      !|            use L_rad = L*gradT/gradr (see, e.g., Cox&Giuli 14.109)
+      !|         if convection is active then
+      !|            use L_rad = L0*gradT (see, e.g., Cox&Giuli 14.109),
+      !|            where L0 = L/gradr is evaluated directly from the face state
       !|         else
       !|            use L_rad = L
       !|     if (use_flux_limiting_with_dPrad_dm_form)
@@ -8641,6 +8668,20 @@
     min_kap_for_dPrad_dm_eqn = 1d-4
     use_flux_limiting_with_dPrad_dm_form = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+
+
+      ! constant_L
+      ! ~~~~~~~~~~
+
+      ! If true, replace the temperature-gradient equation by ``L(k) = L(k+1)``,
+      ! with ``L(nz) = L_center``. At the surface, use ``L(1) = L(2)`` instead
+      ! of the temperature boundary condition. This option is intended for
+      ! hydrodynamic comparison tests that do not solve a radiative
+      ! temperature gradient.
+
+      ! ::
+
+    constant_L = .false.
 
 
 ! Hydrodynamic drag
