@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+export MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+check_one

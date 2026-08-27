@@ -1,0 +1,163 @@
+
+&star_job
+  show_log_description_at_start = .false.
+
+  save_model_when_terminate = .true.
+  save_model_filename = 'mods/ready_to_inject.mod'
+
+  load_saved_model = .true.
+  load_model_filename = 'mods/removed_core.mod'
+
+   change_initial_u_flag = .true.
+   change_initial_v_flag = .true.
+   new_v_flag = .false.
+   new_u_flag = .true.
+
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 1d-6
+
+   set_initial_age = .true.
+   initial_age = 0
+
+   pgstar_flag = .true.
+
+   set_initial_cumulative_energy_error = .true.
+   set_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
+/ ! end of star_job namelist
+
+&kap
+  use_Type2_opacities = .true.
+  Zbase = 0.02d0
+
+/ ! end of kap namelist
+
+&controls
+  ! initial conditions (ignored for a loaded model)
+  initial_mass = 0.8
+  initial_z = 0.02
+
+    max_model_number = 100000
+
+      max_timestep = 1d-2
+      max_age_in_seconds  = 100. !Allow the model to settle down
+      velocity_logT_lower_bound = 0
+      calculate_Brunt_N2 = .false.
+
+! equation controls
+      energy_eqn_option = 'dedt'
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+
+      !use_compression_outer_BC = .true.
+      use_momentum_outer_BC = .true.
+
+      mix_factor = 0d0
+      dxdt_nuc_factor = 0d0
+      non_nuc_neu_factor = 0d0
+      eps_nuc_factor = 0d0
+
+
+! mixing controls
+      mixing_length_alpha = 1.9
+      MLT_option = 'TDC'
+      thermohaline_coeff = 0
+      okay_to_reduce_gradT_excess = .false.
+
+! mesh controls
+      !okay_to_remesh = .false.
+      okay_to_remesh = .true.
+      use_split_merge_amr = .true.
+      split_merge_amr_log_zoning = .false.
+      split_merge_amr_nz_baseline = 2000
+      split_merge_amr_MaxLong = 1.1d0
+      split_merge_amr_MaxShort = 2.5d0
+      split_merge_amr_max_iters = 50
+      !trace_split_merge_amr = .true.
+
+
+! timestep controls
+      varcontrol_target = 1d-3
+
+      delta_lgL_limit = 0.05d0
+      delta_lgTeff_limit = 0.05d0
+
+      limit_for_rel_error_in_energy_conservation = 3d-10
+      hard_limit_for_rel_error_in_energy_conservation = 3d-7
+
+! solver controls
+
+      solver_iters_timestep_limit = 10
+      solver_max_tries_before_reject = 11
+      iter_for_resid_tol2 = 10
+
+      tol_residual_norm1 = 1d-9
+      tol_max_residual1 = 1d-6
+
+      tiny_corr_coeff_limit = 999999
+      solver_itermin_until_reduce_min_corr_coeff = 999999
+      max_resid_jump_limit = 1d99
+
+
+
+! output controls
+
+      he_core_boundary_h1_fraction = 0.5
+      co_core_boundary_he4_fraction = 0.5
+      one_core_boundary_he4_c12_fraction = 0.5
+      fe_core_boundary_si28_fraction = 0.5
+
+      max_num_profile_models = 1000
+      terminal_show_age_units = 'seconds'
+
+      num_trace_history_values = 0
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      !photo_interval = 1
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+
+
+
+/ ! end of controls namelist
+
+&pgstar
+  read_extra_pgstar_inlist(1) = .true.
+  extra_pgstar_inlist_name(1) = 'inlist_pgstar'
+
+  Abundance_xaxis_name = 'logxm'
+  Abundance_xaxis_reversed = .true.
+  Abundance_xmin = -8
+  Abundance_xmax = -3
+
+  Summary_Burn_xaxis_name = 'logxm'
+  Summary_Burn_xaxis_reversed = .true.
+  Summary_Burn_xmin = -8
+  Summary_Burn_xmax = -3
+
+  !Grid2_win_flag = .true.
+  Grid2_file_flag = .true.
+  Grid2_file_dir = 'png'
+  Grid2_file_prefix = 'stabilizing_'
+  Grid2_file_interval = 1
+
+  !Grid8_win_flag = .true.
+  Grid8_win_width = 7
+
+  Grid8_file_flag = .false.
+  Grid8_file_dir = 'png'
+  Grid8_file_prefix = '1.00Msun_Tc_3e7_mdot_1.00e-09_Z0.00_grid8_'
+  Grid8_file_interval = 1
+  Grid8_file_width = -1
+  Grid8_file_aspect_ratio = -1
+
+
+  Profile_Panels3_win_flag = .false.
+  Profile_Panels3_file_flag = .true.
+  Profile_Panels3_file_dir = 'png/apm'
+  Profile_Panels3_file_prefix = 'apm_'
+  Profile_Panels3_file_interval = 1
+
+/ ! end of pgstar namelist

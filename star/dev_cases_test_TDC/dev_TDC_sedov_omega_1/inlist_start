@@ -1,0 +1,36 @@
+&star_job
+   show_log_description_at_start = .false.
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+   constant_L = .true.
+   include_L_in_correction_limits = .false.
+   hydro_mtx_min_allowed_logT = -99d0
+   MLT_option = 'none'
+   mix_factor = 0d0
+   dxdt_nuc_factor = 0d0
+   non_nuc_neu_factor = 0d0
+   eps_nuc_factor = 0d0
+
+   x_logical_ctrl(1) = .true. ! build the starting model
+   x_ctrl(1) = 1.464276d0 ! injected energy for omega = 1
+   x_ctrl(2) = 0.006d0 ! injection radius
+   x_ctrl(3) = 0.005d0 ! inner radius
+   x_ctrl(4) = 1.2d0 ! outer radius
+   x_ctrl(5) = 1d0 ! density normalization
+   x_ctrl(6) = 1d-6 ! pressure floor
+   x_ctrl(7) = 1d0 ! density exponent omega
+   x_ctrl(8) = 1.739133d6 ! central pressure
+   x_ctrl(9) = 1d-5 ! central density smoothing radius
+
+/ ! end of controls namelist
+
+&pgstar
+/ ! end of pgstar namelist
