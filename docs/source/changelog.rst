@@ -90,6 +90,19 @@ the same ``v_flag`` correction. Energy equations that omit ``dKE/dt``,
 including the time-centered ``P d(1/rho)`` form used by pulsation models,
 continue to include viscous heating alone.
 
+Fixed RTI handling during model cuts and split/merge AMR. Relaxation to a
+stellar cut now restores an incoming ``RTI_flag``. Splitting a cell now
+preserves the mass-weighted ``alpha_RTI`` while keeping child values
+nonnegative and within the original stencil range. The optional behind-shock
+RTI ramp now also handles its zero default without division by zero and cannot
+produce a negative diffusion multiplier ahead of the shock.
+
+Fixed RTI momentum-diffusion energy accounting for cell-centered Riemann
+hydrodynamics. The total-energy equation now includes the matching midpoint
+mechanical work and interface dissipation. This preserves total energy while
+preventing RTI acceleration from drawing energy from an individual cell's
+internal energy.
+
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
 
 The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.

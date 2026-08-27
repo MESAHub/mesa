@@ -234,14 +234,15 @@
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
             use hydro_rsp2, only: compute_Eq_cell, compute_Uq_face
+            use hydro_riemann, only: get_RTI_momentum_diffusion
             use tdc_hydro, only: &
                compute_tdc_Eq_div_w_face, compute_tdc_Uq_face, compute_tdc_Uq_dm_cell
             real(dp) :: alfa, beta
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, viscous_work_ad, &
-               Uq_00, Uq_p1, RTI_diffusion_ad, &
-               v_00, v_p1, drag_force, drag_energy
+               Uq_00, Uq_p1, RTI_diffusion_ad, RTI_momentum_energy_ad, &
+               RTI_force_ad, RTI_dissipation_ad, v_00, v_p1, drag_force, drag_energy
             type(accurate_auto_diff_real_star_order1) :: sources_sum_ad
             real(dp) :: kinetic_mass_factor
             logical :: have_v_viscous_work
@@ -342,6 +343,17 @@
             end if
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
+            RTI_momentum_energy_ad = 0d0
+            if (s% u_flag) then
+               call get_RTI_momentum_diffusion(s, k, RTI_force_ad, RTI_dissipation_ad)
+               RTI_momentum_energy_ad = RTI_dissipation_ad/dm
+               if (include_dke_dt) then
+                  v_00 = 0.5d0*(wrap_u_00(s,k) + s% u_start(k))
+                  ! Keep RTI momentum diffusion from drawing energy from an accelerated cell.
+                  RTI_momentum_energy_ad = RTI_momentum_energy_ad + v_00*RTI_force_ad/dm
+               end if
+            end if
+
             drag_energy = 0d0
             s% FdotV_drag_energy(k) = 0
             if (k /= s% nz) then
@@ -371,6 +383,7 @@
             sources_sum_ad = sources_sum_ad + Eq_ad
             sources_sum_ad = sources_sum_ad + viscous_work_ad
             sources_sum_ad = sources_sum_ad + RTI_diffusion_ad
+            sources_sum_ad = sources_sum_ad + RTI_momentum_energy_ad
             sources_sum_ad = sources_sum_ad + drag_energy
             sources_ad = sources_sum_ad
 
