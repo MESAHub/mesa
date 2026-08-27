@@ -6,6 +6,7 @@
 
       change_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
+      adv_net = 'approx21_cr60_plus_co56.net'
       dump_missing_metals_into_heaviest = .false.
       
       ! Example ccsn network for properly capturing the energy generation rate during all stages
@@ -49,6 +50,7 @@
 &eos      
       use_Skye = .true.
       use_PC = .false.
+      mass_fraction_limit_for_Skye = 1d-5
 / ! end of eos namelist
 
 &kap      
@@ -96,6 +98,7 @@
 ! mlt
       mixing_length_alpha = 1.5
       MLT_option = 'TDC'
+      TDC_include_eturb_in_energy_equation = .true.
 
       ! If you would like to be bold, try radiative damping, although it
       ! is a departure from the mlt limit of 'TDC'
