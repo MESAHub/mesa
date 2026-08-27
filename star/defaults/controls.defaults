@@ -6018,6 +6018,7 @@
       ! ~~~~~~~~~~~~~
 
       ! Limit on difference in lnR across cell for mesh refinement.
+      ! Applies to standard and split/merge AMR mesh refinement.
       ! Do not make this smaller than about 1d-14 or will fail with numerical problems.
 
       ! ::
@@ -6028,7 +6029,8 @@
       ! merge_if_dlnR_too_small
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true, mesh adjustment will force merge if difference in lnR across cell is too small.
+      ! If true, standard and split/merge AMR mesh adjustment will force merge
+      ! if difference in lnR across cell is too small.
 
       ! ::
 
@@ -6094,7 +6096,8 @@
       ! min_surface_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Largest allowed dq at surface.
+      ! Largest and smallest allowed dq at the surface.
+      ! ``min_surface_cell_dq`` also applies to split/merge AMR.
 
       ! ::
 
@@ -6723,7 +6726,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! split cell if ratio of actual/desired size is > split_merge_amr_MaxLong; ignore if <= 0
-      ! merge cell if ratio of desired/actual size is < split_merge_amr_MaxShort; ignore if <= 0
+      ! for metric zoning, also reject a proposed merge if the summed metric of
+      ! the resulting cell exceeds split_merge_amr_MaxLong times the target size.
+      ! merge cell if ratio of desired/actual size is > split_merge_amr_MaxShort; ignore if <= 0
       ! be careful to avoid inconsistent limits such as when a required split triggers a required merge.
       ! to be safe, make sure product of limits > 2.
 
