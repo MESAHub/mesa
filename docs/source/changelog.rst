@@ -66,6 +66,30 @@ AMR does not currently support RSP2.
 Bug Fixes
 ---------
 
+Fixed the TDC eddy-viscosity boundary condition for cell-centered Riemann
+hydrodynamics. The outer boundary now has zero turbulent stress while the
+surface cell retains the force from its inner turbulent face.
+
+Fixed a radius-collocation inconsistency in TDC eddy viscosity for
+cell-centered Riemann hydrodynamics. The strain, viscous heating, and momentum
+force now use the same lagged cell-midpoint radius, preserving the tridiagonal
+velocity coupling and nonpositive discrete viscous momentum work.
+
+Fixed an ambiguity between the generic transport velocity ``conv_vel`` and
+the MLT/TDC turbulent velocity ``mlt_vc``. ``do1_mlt_eval`` now copies
+``conv_vel`` into ``mlt_vc`` only for ``convective_mixing``. This preserves
+semiconvective and thermohaline diffusion coefficients while preventing their
+diffusion-equivalent velocities from entering turbulent energy, turbulent
+pressure, or TDC momentum terms.
+
+Fixed local eddy-viscous energy accounting when the ``dedt`` energy equation
+explicitly includes radial kinetic energy. TDC now includes the midpoint
+mechanical work from its cell-centered ``u_flag`` acceleration or its
+half-cell ``v_flag`` accelerations in addition to viscous heating. RSP2 uses
+the same ``v_flag`` correction. Energy equations that omit ``dKE/dt``,
+including the time-centered ``P d(1/rho)`` form used by pulsation models,
+continue to include viscous heating alone.
+
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
 
 The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.

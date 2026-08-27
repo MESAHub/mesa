@@ -43,7 +43,8 @@ public :: compute_Q
    !! do not depend on Y.
    !!
    !! @param report Write debug output if true, not if false.
-   !! @param mixing_length_alpha Mixing length parameter
+   !! @param mixing_length_alpha Effective mixing length parameter Lambda/Hp
+   !! @param Lambda Mixing length
    !! @param TDC_alpha_D TDC turbulent damping parameter
    !! @param TDC_alpha_R TDC radiative damping parameter
    !! @param TDC_alpha_Pt TDC coefficient on P_turb*dV/dt. Physically should probably be 1.
@@ -63,9 +64,9 @@ public :: compute_Q
    !! @param Gamma Gamma is the MLT Gamma efficiency parameter, which we evaluate in steady state from MLT.
    type tdc_info
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
-      real(dp) :: mixing_length_alpha, TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
+      real(dp) :: TDC_alpha_C, TDC_alpha_S, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, e
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h
+      type(auto_diff_real_star_order1) :: mixing_length_alpha, Lambda, T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w, P, h
    end type tdc_info
 
 contains
@@ -534,7 +535,8 @@ contains
       scale = 1d0
       if (Y > 0d0 .and. info%use_TDC_enthalpy_flux_limiter) then
          ! X = G/F
-         X = convert(info%Cp*info%T/info%h)*info%mixing_length_alpha * info%TDC_alpha_S * x_ALFAS * Y / sqrt_2_div_3
+         X = convert(info%Cp*info%T/info%h*info%mixing_length_alpha) * &
+            info%TDC_alpha_S * x_ALFAS * Y / sqrt_2_div_3
          FL = flux_limiter_function(X)
          ! Avoid 0/0 or tiny/tiny; for X ≈ 0, FL ≈ X so scale ~ 1 anyway.
          if (abs(X%val) >= 0.95d0) then
@@ -551,8 +553,8 @@ contains
          S0 = S0*Y + convert(info%Eq_div_w)
       end if
 
-      D0 = convert(info%TDC_alpha_D*x_CEDE/(info%mixing_length_alpha*info%Hp))
-      gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
+      D0 = convert(info%TDC_alpha_D*x_CEDE/info%Lambda)
+      gammar_div_alfa = info%TDC_alpha_R*x_GAMMAR/info%Lambda
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))
       Pt0 = info%TDC_alpha_Pt*x_ALFAP*info%rho
       dVdt = info%dV/info%dt
