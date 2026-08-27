@@ -737,6 +737,10 @@
    !PII_face
    !Ptrb
    !Pvsc
+   !Riemann_shock_compression ! max(0, (u_inner-u_outer)/cs_face)
+   !Riemann_shock_pressure_jump ! max(0, P_face/min(P_inner,P_outer) - 1)
+   !Riemann_shock_strength ! minimum of compression and pressure jump
+   !Riemann_shock_D_mix_factor ! factor applied to final chemical D_mix
    !Uq
    !Y_face
 
