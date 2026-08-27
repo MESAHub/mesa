@@ -283,3 +283,75 @@
       ! ::
 
     use_hydro_merge_limits_in_mesh_plan = .false.
+
+
+      ! split_merge_amr_use_metric_zoning_for_u_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, and ``use_split_merge_amr`` and ``u_flag`` are true, use the
+      ! weighted split/merge metric controls below instead of the standard
+      ! single-coordinate split/merge zoning controls.  This is ignored for
+      ! ``v_flag``.
+
+      ! ::
+
+    split_merge_amr_use_metric_zoning_for_u_flag = .false.
+
+
+      ! split_merge_amr_metric_logR_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Weight for the normalized log radius contribution in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_logR_weight = 1d0
+
+
+      ! split_merge_amr_metric_logtau_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Weight for the normalized log optical-depth contribution in the
+      ! ``u_flag`` split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_logtau_weight = 1d0
+
+
+      ! split_merge_amr_metric_min_delta_lnR
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Floor for the log radius normalization range in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_min_delta_lnR = 1d-9
+
+
+      ! split_merge_amr_metric_min_delta_lntau
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Floor for the log optical-depth normalization range in the ``u_flag``
+      ! split/merge metric.
+
+      ! ::
+
+    split_merge_amr_metric_min_delta_lntau = 1d-9
+
+
+      ! split_merge_amr_reconstruct_pressure_for_u_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, redistribute internal energy between the children of an
+      ! ``u_flag`` split to preserve the limited pre-split pressure gradient.
+      ! The correction preserves total child internal energy and falls back to
+      ! the standard conservative split when no bounded EOS solution exists.
+      ! The pressure target includes MLT turbulent pressure. Split/merge AMR
+      ! does not currently support RSP2.
+
+      ! ::
+
+    split_merge_amr_reconstruct_pressure_for_u_flag = .false.

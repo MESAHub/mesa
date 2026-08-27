@@ -49,6 +49,18 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+Metric zoning for split/merge AMR now uses ``split_merge_amr_MaxLong`` both
+to split an existing oversized cell and to reject a proposed merge whose
+summed metric would exceed the same limit. This removes the redundant metric
+merge-guard control and keeps the prospective merge and subsequent split
+criteria consistent.
+
+The optional pressure-child reconstruction for cell-centered split/merge AMR
+now includes MLT turbulent pressure in its bounded pressure target. The
+conservative energy transfer continues to modify only the EOS pressure; the
+turbulent contribution is evaluated from its remapped face state. Split/merge
+AMR does not currently support RSP2.
+
 .. _Bug Fixes main:
 
 Bug Fixes
