@@ -1,0 +1,38 @@
+# matplotlib style sheet for MESA Instrument Papers
+
+lines.markersize : 8
+lines.linewidth : 1.5
+axes.linewidth : 2.0
+text.usetex : True
+font.size : 24
+font.family : sans
+font.serif : Computer Modern Roman
+axes.titlesize : large
+axes.labelsize : large
+legend.fontsize : 18
+legend.frameon : False
+figure.dpi : 500
+
+xtick.minor.visible : True
+ytick.minor.visible : True
+
+savefig.bbox : tight
+savefig.pad_inches : 0.15
+savefig.dpi : 300
+savefig.format : pdf
+
+xtick.direction : in
+xtick.top : True
+ytick.direction : in
+ytick.right : True
+
+axes.formatter.use_mathtext : True
+
+xtick.major.size : 14
+xtick.minor.size : 12
+xtick.major.width : 1.75
+xtick.minor.width : 1.5
+ytick.major.size : 14
+ytick.minor.size : 10
+ytick.major.width : 1.75
+ytick.minor.width : 1.5

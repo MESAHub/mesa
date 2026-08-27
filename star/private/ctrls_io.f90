@@ -113,6 +113,7 @@
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
     include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, &
+    Riemann_shock_D_mix_reduction_on, Riemann_shock_D_mix_reduction_full_on, &
     use_face_reconstruction, &
     TDC_include_eturb_in_energy_equation, &
     use_rsp_form_of_scale_height, include_mlt_in_velocity_time_centering, &
@@ -667,6 +668,15 @@
 
     if (s% min_logRho_for_eos < -30d0) then
        write(*,'(a)') 'min_logRho_for_eos must be at least -30'
+       ierr = -1
+       return
+    end if
+
+    if (s% Riemann_shock_D_mix_reduction_full_on > 0d0 .and. &
+          (s% Riemann_shock_D_mix_reduction_on < 0d0 .or. &
+           s% Riemann_shock_D_mix_reduction_on >= &
+              s% Riemann_shock_D_mix_reduction_full_on)) then
+       write(*,'(a)') 'Riemann shock D_mix reduction requires 0 <= onset < full_on'
        ierr = -1
        return
     end if
@@ -2115,6 +2125,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
  s% include_mlt_corr_to_TDC = include_mlt_corr_to_TDC
  s% use_TDC_enthalpy_flux_limiter = use_TDC_enthalpy_flux_limiter
+ s% Riemann_shock_D_mix_reduction_on = Riemann_shock_D_mix_reduction_on
+ s% Riemann_shock_D_mix_reduction_full_on = Riemann_shock_D_mix_reduction_full_on
  s% use_face_reconstruction = use_face_reconstruction
  s% TDC_include_eturb_in_energy_equation = TDC_include_eturb_in_energy_equation
  s% use_rsp_form_of_scale_height = use_rsp_form_of_scale_height
@@ -3846,6 +3858,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
  include_mlt_corr_to_TDC = s% include_mlt_corr_to_TDC
  use_TDC_enthalpy_flux_limiter = s% use_TDC_enthalpy_flux_limiter
+ Riemann_shock_D_mix_reduction_on = s% Riemann_shock_D_mix_reduction_on
+ Riemann_shock_D_mix_reduction_full_on = s% Riemann_shock_D_mix_reduction_full_on
  use_face_reconstruction = s% use_face_reconstruction
  TDC_include_eturb_in_energy_equation = s% TDC_include_eturb_in_energy_equation
  use_rsp_form_of_scale_height = s% use_rsp_form_of_scale_height

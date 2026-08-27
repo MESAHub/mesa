@@ -70,6 +70,12 @@ conservative energy transfer continues to modify only the EOS pressure; the
 turbulent contribution is evaluated from its remapped face state. Split/merge
 AMR does not currently support RSP2.
 
+Cell-centered Riemann hydrodynamics can now reduce chemical diffusion across
+resolved shocks using the default-off ``Riemann_shock_D_mix_reduction_on`` and
+``Riemann_shock_D_mix_reduction_full_on`` controls. Corresponding compression,
+pressure-jump, shock-strength, and diffusion-factor profile columns are
+available for diagnostics.
+
 .. _Bug Fixes main:
 
 Bug Fixes
