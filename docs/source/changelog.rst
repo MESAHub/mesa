@@ -51,6 +51,15 @@ Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduc
 
 The new control ``superad_reduction_use_turnover_limit`` relaxes the applied superadiabatic reduction from its previous accepted value toward the instantaneous value. ``superad_reduction_turnover_limit_function`` selects either the exponential response ``1-exp(-dt/tau_conv)`` or the linear response ``min(dt/tau_conv,1)``. The limiter acts on the applied reduction ``1/Gamma_factor``. Zones with a lagged convective velocity use ``scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt frequency. The timescale is set at the start of the step and held fixed during solver iterations. With ``use_face_reconstruction``, this calculation uses the reconstructed face thermodynamic state. The scale height is the interpolated or reconstructed face value used by MLT and TDC. The previous reduction is preserved across retries, remeshing, and photo restarts. For ``k > 0``, ``superad_reduction_max_logT`` restricts the reduction to faces whose start-of-step temperature is below the selected ``logT``. Its default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. The ``k=0`` model-construction path is unchanged.
 
+Restored the default-off ``constant_L`` control for idealized hydrodynamic
+tests. It replaces the temperature-gradient equation with
+``L(k) = L(k+1)``, using ``L_center`` at the innermost boundary, and applies
+the same relation at the surface instead of a temperature boundary condition.
+The surface-luminosity timestep limit is disabled because luminosity is
+prescribed by this equation. The momentum boundary condition remains
+independently selectable. Explicit momentum boundaries do not evaluate unused
+atmospheric pressure-temperature data.
+
 Metric zoning for split/merge AMR now uses ``split_merge_amr_MaxLong`` both
 to split an existing oversized cell and to reject a proposed merge whose
 summed metric would exceed the same limit. This removes the redundant metric
@@ -114,6 +123,37 @@ hydrodynamics. The total-energy equation now includes the matching midpoint
 mechanical work and interface dissipation. This preserves total energy while
 preventing RTI acceleration from drawing energy from an individual cell's
 internal energy.
+
+Fixed the post-hydrodynamic convergence check to honor
+``hydro_mtx_min_allowed_logT``. Previously it imposed a separate hard-coded
+``logT = 1`` floor after the Newton solve, so lowering the documented matrix
+limit could not permit colder models.
+
+Fixed the luminosity correction weight when the luminosity is zero or inward.
+Its scale now has a 1 erg/s floor and uses the magnitude of the starting
+surface luminosity, preventing division by zero and cancellation between
+oppositely signed luminosities.
+
+Fixed the photospheric luminosity when the photosphere lies inside the model.
+The luminosity interpolated at the photospheric optical depth is no longer
+replaced by the surface luminosity. ``photosphere_L`` and ``Teff`` therefore
+use the same photospheric radius and luminosity, while ``log_L`` continues to
+report the surface luminosity.
+
+Fixed the radiative-luminosity split in the ``dPrad/dm`` temperature gradient
+equation when an actively convective face has negative ``gradr``.
+The equation now retains the counterflowing convective luminosity instead of
+treating the total luminosity as radiative, preventing one-cell temperature
+inversions in dynamic models. The equivalent ``L0*gradT`` form is evaluated
+directly from the face state, avoiding the removable ``L/gradr`` singularity
+when the luminosity and ``gradr`` pass through zero. The reported convective
+and radiative luminosities use the same pole-free split. The split now also
+uses the local MLT state rather than the dominant chemical-mixing label, so
+RTI mixing cannot incorrectly make an active convective face radiative.
+
+Added an optional floor on the atmospheric pressure used by the momentum
+outer boundary. The floor prevents a hydrostatic atmosphere from supplying
+less than the radiation pressure at its boundary temperature.
 
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
 

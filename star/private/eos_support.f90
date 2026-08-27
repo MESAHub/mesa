@@ -36,7 +36,6 @@ module eos_support
   public :: solve_eos_given_PgasT_auto
 
   integer, parameter :: MAX_ITER_FOR_SOLVE = 100
-
 contains
 
   ! Get eos results data given density & temperature
@@ -67,9 +66,8 @@ contains
     if (s% doing_timing) &
        s% timing_num_get_eos_calls = s% timing_num_get_eos_calls + 1
 
-    if(logRho < -25) then
-      ! Provide some hard lower limit on what we would even try to evalue the eos at
-      ! Going to low causes FPE's when we try to evaluate certain derivatives that need (rho**power)
+    if (logRho < s% min_logRho_for_eos) then
+      ! Avoid FPEs in high-order density derivatives at extremely low density.
       s% retry_message = 'eos evaluated at too low a density'
       ierr = -1
       return
