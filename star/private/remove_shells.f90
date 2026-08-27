@@ -1041,7 +1041,10 @@
          if (skip < 1 .or. skip >= nz_old) return
 
          tau_surf_new = tau_eff(s,1+skip)
-         tau_factor_new = s% tau_factor*tau_surf_new/s% tau(1)
+         tau_factor_new = s% tau_factor
+         ! Keep the existing optical depth when no positive HSE atmosphere exists.
+         if (tau_surf_new > 0d0 .and. .not. is_bad(tau_surf_new)) &
+            tau_factor_new = tau_surf_new/s% tau_base
 
          if (dbg) write(*,1) 'tau_surf_old', s% tau(1)
          if (dbg) write(*,1) 'tau_factor_old', s% tau_factor
@@ -1122,7 +1125,8 @@
          if (dbg) write(*,2) 's% dm(nz)/Msun', nz, s% dm(nz)/Msun
          if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
 
-         if (s% use_momentum_outer_bc) then
+         if (s% use_momentum_outer_bc .and. &
+               tau_factor_new > 0d0 .and. .not. is_bad(tau_factor_new)) then
             s% tau_factor = tau_factor_new
             s% force_tau_factor = s% tau_factor
          end if
