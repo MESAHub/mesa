@@ -74,7 +74,7 @@
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
          integer :: nz, i_dlnE_dt, i_lum, i_v
-         logical :: test_partials, doing_op_split_burn, eps_grav_form
+         logical :: test_partials, doing_op_split_burn, eps_grav_form, include_dke_dt
 
          include 'formats'
 
@@ -85,6 +85,10 @@
          call init
 
          call setup_eps_grav(ierr); if (ierr /= 0) return  ! do this first - it sets eps_grav_form
+         ! Only total-energy forms need work from momentum sources.
+         include_dke_dt = .not. eps_grav_form .and. &
+            .not. (s% using_velocity_time_centering .and. &
+               s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity)
          call setup_de_dt_and_friends(ierr); if (ierr /= 0) return
          call setup_dwork_dm(ierr); if (ierr /= 0) return
          call setup_dL_dm(ierr); if (ierr /= 0) return
@@ -229,14 +233,18 @@
 
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            use hydro_rsp2, only: compute_Eq_cell
-            use tdc_hydro, only: compute_tdc_Eq_div_w_face
+            use hydro_rsp2, only: compute_Eq_cell, compute_Uq_face
+            use tdc_hydro, only: &
+               compute_tdc_Eq_div_w_face, compute_tdc_Uq_face, compute_tdc_Uq_dm_cell
             real(dp) :: alfa, beta
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
+               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, viscous_work_ad, &
+               Uq_00, Uq_p1, RTI_diffusion_ad, &
                v_00, v_p1, drag_force, drag_energy
             type(accurate_auto_diff_real_star_order1) :: sources_sum_ad
+            real(dp) :: kinetic_mass_factor
+            logical :: have_v_viscous_work
             include 'formats'
             ierr = 0
 
@@ -277,9 +285,22 @@
                others_ad%val = others_ad%val + s% eps_phase_separation(k)
 
             Eq_ad = 0d0
+            viscous_work_ad = 0d0
+            Uq_00 = 0d0
+            Uq_p1 = 0d0
+            have_v_viscous_work = .false.
             if (s% RSP2_flag) then
                Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
+               if (include_dke_dt .and. s% v_flag) then
+                  Uq_00 = compute_Uq_face(s, k, ierr)
+                  if (ierr /= 0) return
+                  if (k < s% nz) then
+                     Uq_p1 = shift_p1(compute_Uq_face(s, k+1, ierr))
+                     if (ierr /= 0) return
+                  end if
+                  have_v_viscous_work = .true.
+               end if
             else if (s% TDC_alpha_M >0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation .and. (s% v_flag .or. s% u_flag)) then
                 if (k < s% nz) then
@@ -289,10 +310,38 @@
                      Eq_ad = 0.5d0*compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k)/sqrt_2_div_3
                 end if
                 if (ierr /= 0) return
+                if (include_dke_dt) then
+                   if (s% u_flag) then
+                      Uq_00 = compute_tdc_Uq_dm_cell(s, k, ierr)/s% dm(k)
+                      if (ierr /= 0) return
+                      v_00 = 0.5d0*(wrap_u_00(s,k) + s% u_start(k))
+                      viscous_work_ad = v_00*Uq_00
+                   else if (s% v_flag) then
+                      Uq_00 = compute_tdc_Uq_face(s, k, ierr)
+                      if (ierr /= 0) return
+                      if (k < s% nz) then
+                         Uq_p1 = shift_p1(compute_tdc_Uq_face(s, k+1, ierr))
+                         if (ierr /= 0) return
+                      end if
+                      have_v_viscous_work = .true.
+                   end if
+                end if
+            end if
+
+            if (have_v_viscous_work) then
+               v_00 = 0.5d0*(wrap_v_00(s,k) + s% v_start(k))
+               v_p1 = 0d0
+               if (k < s% nz) &
+                  v_p1 = 0.5d0*(wrap_v_p1(s,k) + s% v_start(k+1))
+               kinetic_mass_factor = 1d0
+               if (s% use_mass_corrections) &
+                  kinetic_mass_factor = s% mass_correction(k)
+               ! Match the half-cell kinetic-energy quadrature.
+               viscous_work_ad = 0.5d0*kinetic_mass_factor* &
+                  (v_00*Uq_00 + v_p1*Uq_p1)
             end if
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
-
             drag_energy = 0d0
             s% FdotV_drag_energy(k) = 0
             if (k /= s% nz) then
@@ -320,6 +369,7 @@
             sources_sum_ad = sources_sum_ad - non_nuc_neu_ad
             sources_sum_ad = sources_sum_ad + extra_heat_ad
             sources_sum_ad = sources_sum_ad + Eq_ad
+            sources_sum_ad = sources_sum_ad + viscous_work_ad
             sources_sum_ad = sources_sum_ad + RTI_diffusion_ad
             sources_sum_ad = sources_sum_ad + drag_energy
             sources_ad = sources_sum_ad

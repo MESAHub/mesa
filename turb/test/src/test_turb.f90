@@ -25,9 +25,10 @@ contains
    end subroutine header
 
    subroutine check_efficient_MLT_scaling()
-      type(auto_diff_real_star_order1) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
+      type(auto_diff_real_star_order1) :: &
+         mixing_length_alpha, chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=3) :: MLT_option
-      real(dp) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
+      real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
       type(auto_diff_real_star_order1) :: Gamma, gradT, Y_face, conv_vel, conv_vel2, D, r, L
       integer :: mixing_type, ierr
 
@@ -80,10 +81,11 @@ contains
    end subroutine check_efficient_MLT_scaling
 
    subroutine compare_TDC_and_Cox_MLT()
-      real(dp) :: mixing_length_alpha, conv_vel_start, &
+      real(dp) :: conv_vel_start, &
          TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, L_start, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1) :: &
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
+         mixing_length_alpha, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, &
+         scale_height, gradL, grav, Lambda
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma, Eq_div_w, energy
       real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
 
@@ -147,7 +149,7 @@ contains
       write (*, 1) 'gradR - gradA', gradr%val - grada%val
 
       call set_TDC( &
-         conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
+         conv_vel_start, mixing_length_alpha, Lambda, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
          scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
          Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
@@ -166,10 +168,10 @@ contains
    end subroutine compare_TDC_and_Cox_MLT
 
    subroutine check_TDC()
-      real(dp) :: mixing_length_alpha, conv_vel_start
+      real(dp) :: conv_vel_start
       real(dp) :: TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, scale, max_conv_vel, L_start, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1) :: &
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
+         mixing_length_alpha, Lambda, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Eq_div_w, grav, energy
       integer :: mixing_type, ierr, tdc_num_iters
       logical :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
@@ -202,6 +204,7 @@ contains
       Cp = 6628075118.4606590d0
       opacity = 9.0750171231469945d-2
       scale_height = 2638686602.0063782d0
+      Lambda = mixing_length_alpha*scale_height
       gradL = 0.25207587267343501d0
       grada = 0.25204697256872738d0
       report = .false.
@@ -221,7 +224,7 @@ contains
       do j = 0, 30
          dt = 500d0*pow(1.02d0, j)
          call set_TDC( &
-            conv_vel_start, mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
+            conv_vel_start, mixing_length_alpha, Lambda, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, &
             Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, &
