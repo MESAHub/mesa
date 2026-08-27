@@ -1,0 +1,170 @@
+! these cols are the output for POSYDON + my own
+!acoustic_cutoff
+add_surface_abundances
+!add_total_mass
+!ar_alpha
+!c_alpha
+!ca_alpha
+!cr_alpha
+!fe_co_ni
+!mg_alpha
+!n_alpha
+!na_alpha
+!ne_alpha
+!o_alpha
+burn_relr_regions 20
+!s_alpha
+!si_alpha
+!ti_alpha
+burning_regions 20
+!c12_c12
+!c12_o16
+!co_core_L
+!co_core_k
+!co_core_lgRho
+!co_core_lgT
+co_core_mass
+!co_core_omega
+!co_core_radius
+!co_core_v
+center c12
+!center ca40
+center h1
+center he3
+center he4
+center n14
+center ne20
+center o16
+!center s32
+!center si28
+!center ti44
+center_abar
+!center_degeneracy
+center_entropy
+center_gamma
+center_mu
+center_omega
+center_ye
+center_zbar
+cno
+compactness_parameter
+conv_mx1_bot
+conv_mx1_bot_r
+conv_mx1_top
+conv_mx1_top_r
+conv_mx2_bot
+conv_mx2_bot_r
+conv_mx2_top
+conv_mx2_top_r
+!delta_Pg
+!delta_nu
+dynamic_timescale
+!e_thermal
+envelope_mass
+!fe_core_mass
+he_core_mass
+he_core_radius
+kh_timescale
+log_L
+log_LH
+log_LHe
+log_LZ
+log_L_div_Ledd
+log_Ledd
+log_Lneu
+log_Lneu_nonnuc
+log_Lneu_nuc
+log_Lnuc
+log_R
+!log_R_cm
+log_Teff
+log_abs_Lgrav
+log_abs_mdot
+log_center_P
+log_center_Rho
+log_center_T
+log_cntr_P
+log_cntr_Rho
+log_cntr_T
+log_dt
+log_g
+log_surf_optical_depth
+!log_total_angular_momentum
+log_xmstar
+mass_conv_core
+max_conv_vel_div_csound
+max_entropy
+max_gradT_div_grada
+mdot_timescale
+min_Pgas_div_P
+mix_relr_regions 20
+mixing_regions 20
+model_number
+!neutron_rich_core_mass
+nu_max
+nuc_timescale
+num_iters
+num_retries
+num_zones
+!o16_o16
+!other
+photo
+photosphere_L
+photosphere_cell_k
+photosphere_log_r
+photosphere_opacity
+photosphere_r
+photosphere_v_div_cs
+pnhe4
+pp
+radius
+rotational_mdot_boost
+!shock_k
+!shock_mass
+!shock_radius
+!shock_v_div_cs
+!shock_velocity
+!species
+star_age
+!star_age_sec
+star_mass
+star_mdot
+surf_avg_Lrad_div_Ledd
+!surf_avg_j_rot
+surf_avg_omega
+surf_avg_omega_crit
+surf_avg_omega_div_omega_crit
+surf_avg_v_crit
+surf_avg_v_div_v_crit
+surf_avg_v_rot
+!surf_c12_minus_o16
+surf_escape_v
+surf_r_equatorial_div_r
+surf_r_equatorial_div_r_polar
+surf_r_polar_div_r
+surface c12
+!surface ca40
+surface h1
+surface he3
+surface he4
+surface n14
+surface ne20
+surface o16
+!surface s32
+!surface si28
+!surface ti44
+!total_energy
+!total_eps_grav
+!total_gravitational_energy
+!total_internal_energy
+total_mass h1
+total_mass he4
+!total_radial_kinetic_energy
+!total_rotational_kinetic_energy
+!tri_alpha
+v_div_csound_max
+v_div_csound_surf
+v_surf
+v_wind_Km_per_s
+!i_rot_total
+!rotational_mdot_boost

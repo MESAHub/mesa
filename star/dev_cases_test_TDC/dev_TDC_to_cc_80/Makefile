@@ -1,1 +1,0 @@
-include $(MESA_DIR)/star/work/Makefile

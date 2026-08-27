@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+
+rm -f .restart
+
+MESA_INLIST=inlist_binary make run
