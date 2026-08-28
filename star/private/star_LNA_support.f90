@@ -47,7 +47,7 @@
          wrap_lnT_00, wrap_lnT_m1, wrap_r_00, wrap_r_p1, wrap_r_m1, &
          wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_v_m1
       use hydro_vars, only: set_Teff_info_for_eqns
-      use hydro_riemann, only: eval_Riemann_dudt_rhs
+      use hydro_riemann, only: do_uface_and_Pface, eval_Riemann_dudt_rhs
       use hydro_rsp2, only: Hp_face_for_rsp2_eqn
       use reconstructed_face_support, only: &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad, &
@@ -243,10 +243,11 @@
          end if
 
          if (s% star_LNA_set_initial_velocity) then
-            if (.not. s% v_flag) then
-               write(*,'(a)') 'star_LNA_set_initial_velocity requires v_flag = .true.'
+            if (.not. (s% v_flag .or. s% u_flag)) then
                write(*,'(a)') &
-                  'The LNA solve can run without hydro v_flag, but the velocity kick must be a hydro variable.'
+                  'star_LNA_set_initial_velocity requires v_flag or u_flag hydrodynamics.'
+               write(*,'(a)') &
+                  'The LNA solve can run without hydrodynamics, but the velocity kick requires a hydro variable.'
                ierr = -1
                return
             end if
@@ -406,10 +407,24 @@
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(out) :: map
          integer, intent(out) :: ierr
-         integer :: iv
+         integer :: iv, k
 
          ierr = 0
          map%nz = s% nz
+         if (s% star_LNA_T_inner > 0d0) then
+            map%nz = 0
+            do k = 1, s% nz
+               if (s% T(k) > s% star_LNA_T_inner) exit
+               map%nz = k
+            end do
+            if (map%nz < 2) then
+               write(*,'(a,1pe14.6)') &
+                  'star_LNA_T_inner leaves fewer than two active zones: ', &
+                  s% star_LNA_T_inner
+               ierr = -1
+               return
+            end if
+         end if
          map%nvar_per_zone = 5
          if (s% RSP2_flag) then
             map%nvar_per_zone = map%nvar_per_zone + 2
@@ -1206,7 +1221,7 @@
             end if
 
             if (use_rsp_lsurf_row_for_star_LNA(s, k)) then
-               call rsp_lsurf_resid_for_star_LNA(s, luminosity_resid_ad)
+               call rsp_lsurf_resid_for_star_LNA(s, map%nz, luminosity_resid_ad)
             else if (s% RSP2_flag) then
                call rsp2_luminosity_resid_for_star_LNA(s, k, luminosity_resid_ad)
             else if (tdc_lna_active(s) .and. k > 1) then
@@ -1239,8 +1254,9 @@
       end function use_rsp_lsurf_row_for_star_LNA
 
 
-      subroutine rsp_lsurf_resid_for_star_LNA(s, luminosity_resid_ad)
+      subroutine rsp_lsurf_resid_for_star_LNA(s, nz, luminosity_resid_ad)
          type(star_info), pointer :: s
+         integer, intent(in) :: nz
          type(auto_diff_real_star_order1), intent(out) :: luminosity_resid_ad
          type(auto_diff_real_star_order1) :: L1_ad, r1_ad, area_ad, rhs_ad, T_surf_ad
          real(dp) :: scale
@@ -1251,7 +1267,7 @@
          area_ad = 4d0*pi*r1_ad*r1_ad
          rhs_ad = s% RSP2_Lsurf_factor*area_ad*clight*(crad*pow4(T_surf_ad))
 
-         scale = maxval(s% L_start(1:s% nz))
+         scale = maxval(s% L_start(1:nz))
          luminosity_resid_ad = (L1_ad - rhs_ad)/scale
       end subroutine rsp_lsurf_resid_for_star_LNA
 
@@ -1653,6 +1669,7 @@
                ierr = -1
                return
             end if
+            ! State below an envelope cut supplies background values only.
             if (kk < 1 .or. kk > map%nz) cycle
 
             col = matrix_index(map, kk, var_id)
@@ -2138,6 +2155,9 @@
 
          write(io,'(a)') '# star_LNA raw finite positive frequency eigenvalues'
          write(io,'(a)') '# sorted by increasing sigma_imag before acoustic branch selection'
+         write(io,'(a,1x,i0)') '# nz', map%nz
+         write(io,'(a,1x,i0)') '# model_nz', s% nz
+         write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,i0)') '# nvar_total', map%nvar_total
          write(io,'(a,1x,i0)') '# nvar_dynamic', size(alphar)
          write(io,'(a)') '# eigen indices refer to the reduced dynamic variable eigenproblem'
@@ -2216,6 +2236,9 @@
 
          write(io,'(a)') '# star_LNA mode summary'
          write(io,'(a)') '# reduced generalized eigenproblem: A*x = sigma*B*x'
+         write(io,'(a,1x,i0)') '# nz', map%nz
+         write(io,'(a,1x,i0)') '# model_nz', s% nz
+         write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,i0)') '# nvar_total', map%nvar_total
          write(io,'(a,1x,i0)') '# nvar_dynamic', size(alphar)
          write(io,'(a,1x,1pe24.16)') '# star_LNA_min_mode_frequency_uHz', &
@@ -2443,13 +2466,14 @@
          integer, intent(in) :: mode_indices(:), mode
          complex(dp), intent(inout) :: kick_eigenvector(:)
          integer, intent(out) :: ierr
-         integer :: idx, k, col_v, op_err
+         integer :: idx, k, col_velocity, op_err, velocity_var
          real(dp) :: dR_amp, phase_angle, sign
          complex(dp) :: surf_dlnR, surf_dR, rel_dlnR, dlnR
          complex(dp), allocatable :: eigenvector(:)
 
          ierr = 0
          if (fraction == 0d0) return
+         velocity_var = velocity_var_for_star_LNA(map)
 
          allocate(eigenvector(map%nvar_total), stat=ierr)
          if (ierr /= 0) return
@@ -2479,8 +2503,9 @@
             phase_angle = atan2(aimag(rel_dlnR), dble(rel_dlnR))
             sign = 1d0
             if (abs(phase_angle) > 0.5d0*pi) sign = -1d0
-            col_v = matrix_index(map, k, lna_var_v)
-            kick_eigenvector(col_v) = kick_eigenvector(col_v) + fraction*sign*dR_amp
+            col_velocity = matrix_index(map, k, velocity_var)
+            kick_eigenvector(col_velocity) = &
+               kick_eigenvector(col_velocity) + fraction*sign*dR_amp
          end do
          deallocate(eigenvector)
       end subroutine add_star_LNA_kick_component
@@ -2491,14 +2516,14 @@
          type(star_LNA_var_map), intent(in) :: map
          complex(dp), intent(in) :: eigenvector(:)
          integer, intent(out) :: ierr
-         integer :: k
-         integer :: max_k, max_v_div_cs_k
-         real(dp) :: kick_cms, surf_amp, max_abs_v, max_v_div_cs, v_div_cs
+         integer :: k, max_k, max_v_div_cs_k, velocity_var
+         real(dp) :: kick_cms, surf_amp, max_abs_v, max_v_div_cs, v_div_cs, velocity
          complex(dp) :: surf_v, phase, dv
 
          ierr = 0
          kick_cms = 1d5*s% star_LNA_kick_vsurf_km_per_sec
-         surf_v = star_LNA_eigen_component(map, eigenvector, 1, lna_var_v)
+         velocity_var = velocity_var_for_star_LNA(map)
+         surf_v = star_LNA_eigen_component(map, eigenvector, 1, velocity_var)
          surf_amp = abs(surf_v)
          if (surf_amp <= 1d-99) then
             write(*,'(a)') &
@@ -2508,40 +2533,71 @@
          end if
 
          phase = surf_v/surf_amp
-         s% v_center = 0d0
+         if (s% v_flag) s% v_center = 0d0
          max_k = 1
          max_v_div_cs_k = 1
          max_abs_v = 0d0
          max_v_div_cs = 0d0
-         do k = 1, map%nz
-            dv = star_LNA_eigen_component(map, eigenvector, k, lna_var_v)/phase
-            s% v(k) = kick_cms*dble(dv)/surf_amp
-            if (is_bad(s% v(k))) then
+         do k = 1, s% nz
+            if (k <= map%nz) then
+               dv = star_LNA_eigen_component(map, eigenvector, k, velocity_var)/phase
+               velocity = kick_cms*dble(dv)/surf_amp
+            else
+               velocity = 0d0
+            end if
+            if (is_bad(velocity)) then
                write(*,'(a,i0)') 'star_LNA kick produced a bad velocity at k = ', k
                ierr = -1
                return
             end if
-            if (abs(s% v(k)) > max_abs_v) then
-               max_abs_v = abs(s% v(k))
+
+            if (s% u_flag) then
+               s% u(k) = velocity
+               if (s% i_u > 0) then
+                  s% xh(s% i_u, k) = velocity
+                  s% xh_start(s% i_u, k) = velocity
+               end if
+               s% u_start(k) = velocity
+               s% dxh_u(k) = 0d0
+            else
+               s% v(k) = velocity
+               if (s% i_v > 0) then
+                  s% xh(s% i_v, k) = velocity
+                  s% xh_start(s% i_v, k) = velocity
+               end if
+               s% v_start(k) = velocity
+               s% dxh_v(k) = 0d0
+            end if
+
+            if (abs(velocity) > max_abs_v) then
+               max_abs_v = abs(velocity)
                max_k = k
             end if
             if (s% csound(k) > 0d0) then
-               v_div_cs = abs(s% v(k))/s% csound(k)
+               v_div_cs = abs(velocity)/s% csound(k)
                if (v_div_cs > max_v_div_cs) then
                   max_v_div_cs = v_div_cs
                   max_v_div_cs_k = k
                end if
             end if
-            if (s% i_v > 0) then
-               s% xh(s% i_v, k) = s% v(k)
-               s% xh_start(s% i_v, k) = s% v(k)
-            end if
-            s% v_start(k) = s% v(k)
-            s% dxh_v(k) = 0d0
          end do
+
+         if (s% u_flag) then
+            call do_uface_and_Pface( &
+               s, ierr, use_time_centering=.false.)
+            if (ierr /= 0) return
+            s% u_face_start(1:s% nz) = s% u_face_val(1:s% nz)
+            s% P_face_start(1:s% nz) = s% P_face_ad(1:s% nz)% val
+         end if
+
+         if (map%nz < s% nz) &
+            write(*,'(a,i0,a,i0)') &
+               'star_LNA: set velocity to zero below the envelope in zones ', &
+               map%nz + 1, ' through ', s% nz
+
          write(*,'(a,1pe14.6,a,i0,a,1pe14.6,a,i0)') &
-            'star_LNA: kick max |v| = ', max_abs_v/1d5, ' km/s at k = ', max_k, &
-            ', max |v|/cs = ', max_v_div_cs, ' at k = ', max_v_div_cs_k
+            'star_LNA: kick max |velocity| = ', max_abs_v/1d5, ' km/s at k = ', max_k, &
+            ', max |velocity|/cs = ', max_v_div_cs, ' at k = ', max_v_div_cs_k
          if (abs(kick_cms) > 0d0 .and. max_abs_v > 10d0*abs(kick_cms)) then
             write(*,'(a,1pe14.6)') &
                'star_LNA warning: interior kick amplitude exceeds 10 times the requested surface kick; ratio = ', &
@@ -2644,6 +2700,9 @@
          write(io,'(a)') '# star_LNA eigenfunction'
          write(io,'(a,1x,i0)') '# mode', mode
          write(io,'(a,1x,i0)') '# control_mode_index', mode - 1
+         write(io,'(a,1x,i0)') '# nz', map%nz
+         write(io,'(a,1x,i0)') '# model_nz', s% nz
+         write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,l1)') '# selected_for_initial_velocity', &
             selected_for_star_LNA_initial_velocity(s, mode)
          write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
@@ -2742,6 +2801,9 @@
          write(io,'(a)') '# star_LNA work terms'
          write(io,'(a,1x,i0)') '# mode', mode
          write(io,'(a,1x,i0)') '# control_mode_index', mode - 1
+         write(io,'(a,1x,i0)') '# nz', map%nz
+         write(io,'(a,1x,i0)') '# model_nz', s% nz
+         write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,l1)') '# selected_for_initial_velocity', &
             selected_for_star_LNA_initial_velocity(s, mode)
          write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
@@ -3192,6 +3254,8 @@
 
          write(io,'(a)') '# star_LNA matrix summary'
          write(io,'(a,1x,i0)') 'nz', problem% map% nz
+         write(io,'(a,1x,i0)') 'model_nz', s% nz
+         write(io,'(a,1x,1pe24.16)') 'star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,i0)') 'nvar_per_zone', problem% map% nvar_per_zone
          write(io,'(a,1x,i0)') 'nvar_total', problem% map% nvar_total
          write(io,'(a,1x,i0)') 'nnz_A', count(problem% mtx% A /= 0d0)
@@ -3203,40 +3267,42 @@
          write(io,'(a,1x,1pe24.16)') 'max_raw_row_norm_AB', max_row_norm
          write(io,'(a,1x,1pe24.16)') 'min_nonzero_raw_col_norm_AB', min_col_norm
          write(io,'(a,1x,1pe24.16)') 'max_raw_col_norm_AB', max_col_norm
-         write(io,'(a,1x,1pe24.16)') 'max_abs_v_div_csound', max_star_LNA_v_div_csound(s)
          write(io,'(a,1x,1pe24.16)') &
-            'max_abs_density_mass_resid', max_abs_density_mass_resid_for_star_LNA(s)
-         call max_abs_momentum_row_resid_for_star_LNA(s, diag, ierr)
+            'max_abs_v_div_csound', max_star_LNA_v_div_csound(s, problem% map)
+         write(io,'(a,1x,1pe24.16)') &
+            'max_abs_density_mass_resid', &
+            max_abs_density_mass_resid_for_star_LNA(s, problem% map)
+         call max_abs_momentum_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_momentum_row_resid', diag
-         call max_abs_energy_row_resid_for_star_LNA(s, diag, ierr)
+         call max_abs_energy_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_energy_row_resid', diag
-         call max_abs_luminosity_row_resid_for_star_LNA(s, diag, ierr)
+         call max_abs_luminosity_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_luminosity_row_resid', diag
-         call max_abs_rsp2_w_row_resid_for_star_LNA(s, diag, ierr)
+         call max_abs_rsp2_w_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_rsp2_w_row_resid', diag
-         call max_abs_tdc_w_row_resid_for_star_LNA(s, diag, ierr)
+         call max_abs_tdc_w_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_tdc_w_row_resid', diag
-         call max_abs_rsp2_Hp_row_resid_for_star_LNA(s, diag, ierr)
+         call max_abs_rsp2_Hp_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
@@ -3249,9 +3315,9 @@
 
          call write_star_LNA_row_structure(s, problem, ierr)
          if (ierr /= 0) return
-         if (s% RSP2_flag) call write_star_LNA_rsp2_term_audit(s, ierr)
+         if (s% RSP2_flag) call write_star_LNA_rsp2_term_audit(s, problem% map, ierr)
          if (ierr /= 0) return
-         if (tdc_lna_active(s)) call write_star_LNA_tdc_face_audit(s, ierr)
+         if (tdc_lna_active(s)) call write_star_LNA_tdc_face_audit(s, problem% map, ierr)
       end subroutine write_star_LNA_matrix_summary
 
 
@@ -3308,8 +3374,9 @@
       end subroutine write_star_LNA_row_structure
 
 
-      subroutine write_star_LNA_rsp2_term_audit(s, ierr)
+      subroutine write_star_LNA_rsp2_term_audit(s, map, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          integer, intent(out) :: ierr
          integer :: io, k
          character(len=512) :: filename
@@ -3328,7 +3395,7 @@
             '# k forced_non_turbulent PII_face L_conv L_turb source dissipation ' // &
             'radiative_damping Ptrb_div_etrb Ptrb_dVdt_div_dm dLt_div_dm rhs inertia'
 
-         do k = 1, s% nz
+         do k = 1, map%nz
             call rsp2_terms_for_star_LNA_audit(s, k, PII_ad, Lc_ad, Lt_ad, &
                source_ad, damping_ad, rad_damping_ad, Ptrb_div_etrb_ad, &
                dwork_dm_ad, dLt_dm_ad, rhs_ad, inertia_ad, ierr)
@@ -3347,8 +3414,9 @@
       end subroutine write_star_LNA_rsp2_term_audit
 
 
-      subroutine write_star_LNA_tdc_face_audit(s, ierr)
+      subroutine write_star_LNA_tdc_face_audit(s, map, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          integer, intent(out) :: ierr
          integer :: io, k
          character(len=512) :: filename
@@ -3374,7 +3442,7 @@
             'stored_Cp stored_kap stored_Hp stored_grada stored_gradr mlt_vc gradT ' // &
             'background_Lconv closure_Lrad closure_Lconv luminosity_resid velocity_rhs inertia'
 
-         do k = 1, s% nz
+         do k = 1, map%nz
             call tdc_face_state_for_star_LNA(s, k, &
                T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, Cp_face_ad, &
                chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
@@ -3499,14 +3567,15 @@
       end subroutine matrix_norm_range_for_star_LNA
 
 
-      real(dp) function max_abs_density_mass_resid_for_star_LNA(s) result(max_resid)
+      real(dp) function max_abs_density_mass_resid_for_star_LNA(s, map) result(max_resid)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          integer :: k, ierr
          real(dp) :: ratio
          type(auto_diff_real_star_order1) :: cell_volume_ad
 
          max_resid = 0d0
-         do k = 1, s% nz
+         do k = 1, map%nz
             call cell_volume_for_star_LNA(s, k, cell_volume_ad, ierr)
             if (ierr /= 0 .or. cell_volume_ad%val <= 0d0 .or. s% dm(k) <= 0d0) then
                max_resid = huge(1d0)
@@ -3522,8 +3591,9 @@
       end function max_abs_density_mass_resid_for_star_LNA
 
 
-      subroutine max_abs_momentum_row_resid_for_star_LNA(s, max_resid, ierr)
+      subroutine max_abs_momentum_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
@@ -3531,7 +3601,7 @@
 
          ierr = 0
          max_resid = 0d0
-         do k = 1, s% nz
+         do k = 1, map%nz
             if (k == 1) then
                if (s% use_fixed_vsurf_outer_BC) then
                   if (s% u_flag) then
@@ -3558,8 +3628,9 @@
       end subroutine max_abs_momentum_row_resid_for_star_LNA
 
 
-      subroutine max_abs_energy_row_resid_for_star_LNA(s, max_resid, ierr)
+      subroutine max_abs_energy_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
@@ -3567,7 +3638,7 @@
 
          ierr = 0
          max_resid = 0d0
-         do k = 1, s% nz
+         do k = 1, map%nz
             call energy_rhs_for_star_LNA(s, k, resid_ad, ierr)
             if (ierr /= 0) return
             max_resid = max(max_resid, abs(resid_ad%val))
@@ -3575,8 +3646,9 @@
       end subroutine max_abs_energy_row_resid_for_star_LNA
 
 
-      subroutine max_abs_luminosity_row_resid_for_star_LNA(s, max_resid, ierr)
+      subroutine max_abs_luminosity_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
@@ -3584,20 +3656,20 @@
 
          ierr = 0
          max_resid = 0d0
-         do k = 1, s% nz
+         do k = 1, map%nz
             if (use_rsp_lsurf_row_for_star_LNA(s, k)) then
-               call rsp_lsurf_resid_for_star_LNA(s, resid_ad)
+               call rsp_lsurf_resid_for_star_LNA(s, map%nz, resid_ad)
             else if (s% RSP2_flag) then
                call rsp2_luminosity_resid_for_star_LNA(s, k, resid_ad)
-               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:s% nz))))
+               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:map%nz))))
             else if (tdc_lna_active(s) .and. k > 1) then
                call tdc_luminosity_resid_for_star_LNA(s, k, resid_ad, ierr)
                if (ierr /= 0) return
-               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:s% nz))))
+               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:map%nz))))
             else if (frozen_flux_lna_active(s) .and. k > 1) then
                call frozen_flux_luminosity_resid_for_star_LNA(s, k, resid_ad, ierr)
                if (ierr /= 0) return
-               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:s% nz))))
+               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:map%nz))))
             else if (k == 1) then
                call surface_temperature_resid_for_star_LNA(s, resid_ad, ierr)
                if (ierr /= 0) return
@@ -3610,8 +3682,9 @@
       end subroutine max_abs_luminosity_row_resid_for_star_LNA
 
 
-      subroutine max_abs_rsp2_w_row_resid_for_star_LNA(s, max_resid, ierr)
+      subroutine max_abs_rsp2_w_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
@@ -3620,7 +3693,7 @@
          ierr = 0
          max_resid = 0d0
          if (.not. s% RSP2_flag) return
-         do k = 1, s% nz
+         do k = 1, map%nz
             if (rsp2_forces_non_turbulent_cell(s, k)) then
                resid_ad = s% w(k)/max(1d0, s% csound(k))
             else
@@ -3632,8 +3705,9 @@
       end subroutine max_abs_rsp2_w_row_resid_for_star_LNA
 
 
-      subroutine max_abs_tdc_w_row_resid_for_star_LNA(s, max_resid, ierr)
+      subroutine max_abs_tdc_w_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
@@ -3643,7 +3717,7 @@
          ierr = 0
          max_resid = 0d0
          if (.not. tdc_lna_active(s)) return
-         do k = 1, s% nz
+         do k = 1, map%nz
             if (tdc_zero_w_for_star_LNA(s, k)) then
                resid_ad = s% mlt_vc(k)/sqrt_2_div_3
             else
@@ -3656,8 +3730,9 @@
       end subroutine max_abs_tdc_w_row_resid_for_star_LNA
 
 
-      subroutine max_abs_rsp2_Hp_row_resid_for_star_LNA(s, max_resid, ierr)
+      subroutine max_abs_rsp2_Hp_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
@@ -3667,7 +3742,7 @@
          ierr = 0
          max_resid = 0d0
          if (.not. s% RSP2_flag) return
-         do k = 1, s% nz
+         do k = 1, map%nz
             Hp_expected_ad = Hp_face_for_rsp2_eqn(s, k, ierr)
             if (ierr /= 0) return
             scale = 1d0/max(1d0, abs(Hp_expected_ad%val), abs(s% Hp_face(k)))
@@ -3825,15 +3900,16 @@
       end function force_zero_velocity_for_star_LNA
 
 
-      real(dp) function max_star_LNA_v_div_csound(s) result(max_v_div_csound)
+      real(dp) function max_star_LNA_v_div_csound(s, map) result(max_v_div_csound)
          type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
 
          if (s% u_flag) then
             max_v_div_csound = maxval( &
-               abs(s% u(1:s% nz))/max(1d-99, abs(s% csound(1:s% nz))))
+               abs(s% u(1:map%nz))/max(1d-99, abs(s% csound(1:map%nz))))
          else
             max_v_div_csound = maxval( &
-               abs(s% v(1:s% nz))/max(1d-99, abs(s% csound_face(1:s% nz))))
+               abs(s% v(1:map%nz))/max(1d-99, abs(s% csound_face(1:map%nz))))
          end if
       end function max_star_LNA_v_div_csound
 
@@ -3845,7 +3921,18 @@
          character(len=512) :: output_directory
          character(len=512) :: file_prefix
 
-         write(*,'(a,i0)') 'star_LNA: nz = ', map%nz
+         write(*,'(a,i0,a,i0)') 'star_LNA: active zones = ', map%nz, ' of ', s% nz
+         if (s% star_LNA_T_inner > 0d0) then
+            write(*,'(a,1pe12.4,a)') &
+               'star_LNA: inner temperature limit = ', s% star_LNA_T_inner, ' K'
+            if (map%nz < s% nz) then
+               write(*,'(a,i0,a,2(1pe12.4,1x),a)') &
+                  'star_LNA: inner boundary after k = ', map%nz, &
+                  ', bracketing temperatures = ', s% T(map%nz), s% T(map%nz + 1), 'K'
+            else
+               write(*,'(a)') 'star_LNA: inner temperature limit includes the complete model.'
+            end if
+         end if
          write(*,'(a,i0)') 'star_LNA: variables per zone = ', map%nvar_per_zone
          write(*,'(a,i0)') 'star_LNA: total perturbation variables = ', map%nvar_total
          write(*,'(a,i0)') 'star_LNA: requested modes = ', s% star_LNA_num_modes
@@ -3903,6 +3990,12 @@
                (s% RSP2_flag .or. tdc_lna_active(s))) &
             write(*,'(a)') &
                'star_LNA: hydro enthalpy flux limiter is active; LNA ignores it.'
+         if (.not. s% RSP2_flag .and. s% MLT_option == 'TDC' .and. &
+               s% star_LNA_include_tdc .and. &
+               s% star_LNA_perturb_eddy_viscosity .and. s% TDC_alpha_M > 0d0 .and. &
+               s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) &
+            write(*,'(a)') &
+               'star_LNA: using current mlt_vc; the nonlinear explicit alpha_M split is not part of the LNA.'
          if (s% using_velocity_time_centering) &
             write(*,'(a)') &
                'star_LNA: hydro velocity time centering is active; LNA uses continuous equations without time centering.'

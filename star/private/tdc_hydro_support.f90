@@ -88,6 +88,21 @@ contains
       call check_new_lnR2
       call interpolate1_face_val2(s%i_lum, s%L_center)
       if (s%i_v /= 0) call interpolate1_face_val2(s%i_v, s%v_center)
+      if (s%have_mlt_vc) then
+         ! Preserve the lagged TDC state on the new face grid.
+         v_old(1:nz_old) = s%mlt_vc(1:nz_old)
+         if (s%r_center == 0d0) then
+            v_old(nz_old + 1) = 0d0
+         else
+            ! A truncated envelope has no center symmetry condition.
+            v_old(nz_old + 1) = s%mlt_vc(nz_old)
+         end if
+         call interpolate_vector_pm( &
+            nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, &
+            'remesh_for_TDC mlt_vc', ierr)
+         if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'TDC remesh mlt_vc interpolation failed')
+         s%mlt_vc(1:nz) = v_new(1:nz)
+      end if
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
       if (s%i_u /= 0) call interpolate1_cell_val2(s%i_u)

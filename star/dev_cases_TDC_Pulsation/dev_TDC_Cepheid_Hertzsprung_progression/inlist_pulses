@@ -84,7 +84,7 @@ Zbase = 0.006d0 ! LMC metallicity used by the Friday Cepheid models
 
 ! Meshing
    ! option 1
-   remesh_for_TDC_pulsations_when_load = .true.
+   steps_before_remesh_for_TDC_pulsations = 0
    TDC_hydro_use_mass_interp_face_values = .false.
    TDC_hydro_nz = 220
    TDC_hydro_nz_outer = 80

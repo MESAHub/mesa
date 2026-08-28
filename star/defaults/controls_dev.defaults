@@ -168,6 +168,13 @@
       ! The binary driver does not provide this stop workflow and reports an
       ! error if it is requested for startup analysis.
       !
+      ! star_LNA_T_inner
+      ! ~~~~~~~~~~~~~~~~
+      ! If positive, restrict the LNA to the contiguous surface envelope with
+      ! cell temperatures no greater than ``star_LNA_T_inner`` in K. Perturbations
+      ! below the selected inner boundary are zero. A nonpositive value uses
+      ! the complete model.
+      !
       ! star_LNA_num_modes
       ! ~~~~~~~~~~~~~~~~~~
       ! Number of selected positive frequency modes to write. The dense solve
@@ -262,12 +269,13 @@
       ! star_LNA_set_initial_velocity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! If true, use as many as three selected modes as a velocity kick after the LNA
-      ! solve. The kick updates v, xh(i_v,:), xh_start(i_v,:), and v_start. For
-      ! RSP/RSP2 models, the period selected by star_LNA_mode_for_period is also
-      ! copied into rsp_period/RSP2_period.
-      ! This requires hydro v_flag because the kick is applied to the velocity
-      ! variable used by the next hydro solve. The LNA solve itself can still run
-      ! without v_flag.
+      ! solve. The kick updates the active v or u hydrodynamic variable and its
+      ! current and start-of-step solver state. For u_flag, the corresponding
+      ! Riemann face state is also rebuilt. For RSP/RSP2 models, the period
+      ! selected by star_LNA_mode_for_period is copied into rsp_period/RSP2_period.
+      ! This requires v_flag or u_flag. The LNA solve itself can still run without
+      ! a hydrodynamic velocity variable. If ``star_LNA_T_inner`` restricts the
+      ! domain, the kick sets the velocity below the selected envelope to zero.
       ! This is incompatible with use_fixed_vsurf_outer_BC because that BC
       ! constrains the LNA surface velocity and makes the requested
       ! surface velocity scaling undefined.
@@ -277,11 +285,11 @@
       ! Surface velocity amplitude for the optional kick, in km/s. Each selected
       ! eigenfunction is converted to an RSP real velocity profile from
       ! the displacement eigenfunction, normalized to positive unit surface
-      ! displacement. The final sum is scaled so v(1) =
-      ! 1d5*star_LNA_kick_vsurf_km_per_sec in cgs units.
-      ! star_LNA prints max |v| and max |v|/cs after applying the kick; a large
-      ! interior/surface amplitude ratio identifies a mode whose interior
-      ! velocity is much larger than its requested surface amplitude.
+      ! displacement. The final sum is scaled so the active surface velocity is
+      ! 1d5*star_LNA_kick_vsurf_km_per_sec in cgs units. star_LNA prints the
+      ! maximum velocity and velocity/csound after applying the kick; a large
+      ! interior/surface amplitude ratio identifies a mode whose interior velocity
+      ! is much larger than its requested surface amplitude.
       !
       ! star_LNA_mode_for_period
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -386,6 +394,7 @@
     star_LNA_flag = .false.
     star_LNA_model_number = -1
     star_LNA_stop_after_run = .false.
+    star_LNA_T_inner = 0d0
     star_LNA_num_modes = 3
     star_LNA_min_mode_frequency_uHz = 1d-3
     star_LNA_min_first_mode_eta = -3d0
