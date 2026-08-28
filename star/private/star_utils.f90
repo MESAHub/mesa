@@ -3315,7 +3315,8 @@
       end subroutine get1_lpp
 
 
-      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, Ptrb_div_etrb, ierr)
+      subroutine calc_Ptrb_ad_tw( &
+            s, k, Ptrb, Ptrb_div_etrb, ierr, allow_time_centering)
          ! note: Ptrb_div_etrb is not time weighted
          ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
@@ -3324,12 +3325,16 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: Ptrb, Ptrb_div_etrb
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: allow_time_centering
          type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Ptrb_start
          real(dp), parameter :: x_ALFAP = 2.d0/3.d0
-         logical :: time_center, test_partials
+         logical :: do_time_centering, time_center, test_partials
          include 'formats'
          ierr = 0
+         do_time_centering = .true.
+         if (present(allow_time_centering)) &
+            do_time_centering = allow_time_centering
          if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
                k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
@@ -3341,7 +3346,7 @@
          etrb = wrap_etrb_00(s,k)
          Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*rho
          Ptrb = Ptrb_div_etrb*etrb  ! cm^2 s^-2 g cm^-3 = erg cm^-3
-         time_center = (s% using_velocity_time_centering .and. &
+         time_center = (do_time_centering .and. s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
             Ptrb_start = s% RSP2_alfap*x_ALFAP*get_etrb_start(s,k)*s% rho_start(k)
@@ -3368,9 +3373,11 @@
       end subroutine calc_Ptrb_ad_tw
 
 
-      ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad with time weighting
+      ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad.
+      ! Nonlinear hydro time weighting is enabled by default.
       subroutine calc_Ptot_ad_tw( &
-            s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
+            s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr, &
+            allow_time_centering)
          use auto_diff_support
           type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3378,17 +3385,21 @@
          type(auto_diff_real_star_order1), intent(out) :: Ptot_ad
          real(dp), dimension(s% species), intent(out) :: d_Ptot_dxa
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: allow_time_centering
          integer :: j
          real(dp) :: mlt_Pturb_start, alfa, beta
          type(auto_diff_real_star_order1) :: &
             Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
-         logical :: time_center
+         logical :: do_time_centering, time_center
          include 'formats'
 
          ierr = 0
+         do_time_centering = .true.
+         if (present(allow_time_centering)) &
+            do_time_centering = allow_time_centering
          d_Ptot_dxa = 0d0
 
-         time_center = (s% using_velocity_time_centering .and. &
+         time_center = (do_time_centering .and. s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering .and. &
                   s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering)
          if (time_center) then
@@ -3417,7 +3428,8 @@
 
          Ptrb_ad = 0d0
          if (s% RSP2_flag) then
-            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr)
+            call calc_Ptrb_ad_tw( &
+               s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr, do_time_centering)
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
          end if

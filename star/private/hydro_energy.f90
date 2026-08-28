@@ -30,7 +30,6 @@
 
       private
       public :: do1_energy_eqn
-      public :: eval_dwork
 
       contains
 

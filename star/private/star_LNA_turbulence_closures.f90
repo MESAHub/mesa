@@ -29,11 +29,11 @@
          wrap_chiT_00, wrap_d_00, wrap_d_m1, wrap_etrb_00, wrap_Hp_00, &
          wrap_Hp_p1, wrap_kap_00, wrap_L_00, wrap_lnPeos_00, &
          wrap_lnPeos_m1, wrap_lnT_00, wrap_lnT_m1, wrap_Peos_00, &
-         wrap_Peos_m1, wrap_r_00, wrap_T_00, wrap_T_m1, wrap_v_00, &
+         wrap_Peos_m1, wrap_r_00, wrap_r_p1, wrap_T_00, wrap_T_m1, wrap_v_00, &
          wrap_v_p1, wrap_w_00, wrap_w_m1
       use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
       use reconstructed_face_support, only: get_reconstructed_face_state_ad
-      use star_utils, only: get_rho_face_val
+      use star_utils, only: get_mlt_mixing_length, get_rho_face_val
       use turb, only: set_TDC_LNA
 
       implicit none
@@ -54,6 +54,7 @@
       public :: Ptot_for_star_LNA
       public :: d_mlt_Pturb_face_for_star_LNA
       public :: Uq_face_for_star_LNA
+      public :: Uq_cell_for_star_LNA
       public :: static_face_pressure_for_star_LNA
       public :: turbulent_viscous_heating_for_star_LNA
       public :: turbulent_energy_inertia_for_star_LNA
@@ -426,6 +427,34 @@
       end subroutine tdc_face_state_for_star_LNA
 
 
+      subroutine tdc_mixing_length_for_star_LNA(s, r_ad, Peos_ad, rho_ad, grav_ad, &
+            scale_height_ad, Hp_for_mlt_ad, mixing_length_alpha_ad, Lambda_ad)
+         type(star_info), pointer :: s
+         type(auto_diff_real_star_order1), intent(in) :: &
+            r_ad, Peos_ad, rho_ad, grav_ad, scale_height_ad
+         type(auto_diff_real_star_order1), intent(out) :: &
+            Hp_for_mlt_ad, mixing_length_alpha_ad, Lambda_ad
+
+         if (s% harmonic_dissipation_length_beta > 0d0) then
+            if (Peos_ad > 0d0 .and. grav_ad > 0d0 .and. rho_ad > 0d0) then
+               Hp_for_mlt_ad = Peos_ad/(rho_ad*grav_ad)
+               Lambda_ad = get_mlt_mixing_length( &
+                  s, Hp_for_mlt_ad, r_ad, s% mixing_length_alpha)
+               mixing_length_alpha_ad = Lambda_ad/Hp_for_mlt_ad
+            else
+               Hp_for_mlt_ad = 0d0
+               mixing_length_alpha_ad = 0d0
+               Lambda_ad = 0d0
+            end if
+         else
+            Hp_for_mlt_ad = scale_height_ad
+            mixing_length_alpha_ad = s% mixing_length_alpha
+            Lambda_ad = get_mlt_mixing_length( &
+               s, Hp_for_mlt_ad, r_ad, s% mixing_length_alpha)
+         end if
+      end subroutine tdc_mixing_length_for_star_LNA
+
+
       subroutine tdc_luminosity_resid_for_star_LNA(s, k, luminosity_resid_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
@@ -462,7 +491,8 @@
          type(auto_diff_real_star_order1) :: A_ad, Eq_div_w_ad, gradT_actual_ad, &
             r_ad, grav_ad, T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, &
             Cp_face_ad, chiRho_face_ad, chiT_face_ad, grada_face_ad, &
-            opacity_face_ad, scale_height_face_ad, gradr_face_ad
+            opacity_face_ad, scale_height_face_ad, gradr_face_ad, Hp_for_mlt_ad, &
+            mixing_length_alpha_ad, Lambda_ad
 
          ierr = 0
          if (s% mixing_length_alpha <= 0d0) then
@@ -488,15 +518,18 @@
 
          r_ad = wrap_r_00(s, k)
          grav_ad = s% cgrav(k)*s% m_grav(k)/pow2(r_ad)
+         call tdc_mixing_length_for_star_LNA(s, r_ad, Peos_face_ad, &
+            rho_face_ad, grav_ad, scale_height_face_ad, Hp_for_mlt_ad, &
+            mixing_length_alpha_ad, Lambda_ad)
          ! LNA uses the unsaturated TDC relation; do not linearize through the
          ! nonlinear enthalpy-flux limiter.
          call set_TDC_LNA( &
-            s% mixing_length_alpha, s% TDC_alpha_D, s% TDC_alpha_R, &
+            mixing_length_alpha_ad, Lambda_ad, s% TDC_alpha_D, s% TDC_alpha_R, &
             s% TDC_alpha_Pt, s% cgrav(k), s% m_grav(k), &
             chiT_face_ad, chiRho_face_ad, wrap_L_00(s, k), &
             gradT_actual_ad, r_ad, Peos_face_ad, T_face_ad, &
             rho_face_ad, Cp_face_ad, opacity_face_ad, &
-            scale_height_face_ad, s% gradL_ad(k), grada_face_ad, &
+            Hp_for_mlt_ad, s% gradL_ad(k), grada_face_ad, &
             A_ad, Eq_div_w_ad, grav_ad, s% include_mlt_corr_to_TDC, &
             s% TDC_alpha_C, s% TDC_alpha_S, .false., &
             energy_face_ad, luminosity_resid_ad, velocity_rhs_ad, &
@@ -944,6 +977,38 @@
       end subroutine Uq_face_for_star_LNA
 
 
+      subroutine Uq_cell_for_star_LNA(s, k, Uq_ad, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: Uq_ad
+         integer, intent(out) :: ierr
+         real(dp) :: r_cell
+         type(auto_diff_real_star_order1) :: Chi_00, Chi_p1
+
+         ierr = 0
+         Uq_ad = 0d0
+         if (.not. s% star_LNA_perturb_eddy_viscosity) return
+
+         call static_eddy_Chi_cell_for_star_LNA(s, k, Chi_00, ierr)
+         if (ierr /= 0) return
+         if (k < s% nz) then
+            call static_eddy_Chi_cell_for_star_LNA(s, k + 1, Chi_p1, ierr)
+            if (ierr /= 0) return
+            Chi_p1 = shift_p1(Chi_p1)
+         else
+            Chi_p1 = 0d0
+         end if
+
+         r_cell = s% rmid(k)
+         if (r_cell <= 0d0) then
+            write(*,'(a,i0)') 'star_LNA found nonpositive cell radius for u momentum at k = ', k
+            ierr = -1
+            return
+         end if
+         Uq_ad = 4d0*pi*(Chi_00 - Chi_p1)/(r_cell*s% dm(k))
+      end subroutine Uq_cell_for_star_LNA
+
+
       subroutine static_eddy_Uq_face_for_star_LNA(s, k, Uq_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
@@ -1057,28 +1122,27 @@
          type(star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         real(dp) :: alfam_alpha, Hp_cell
+         real(dp) :: Lambda_cell
 
          ierr = 0
          chi_coeff = 0d0
-         alfam_alpha = s% TDC_alpha_M*s% mixing_length_alpha
-         if (alfam_alpha == 0d0 .or. tdc_forces_non_turbulent_cell(s, k)) return
+         if (s% TDC_alpha_M == 0d0 .or. tdc_forces_non_turbulent_cell(s, k)) return
 
-         call Hp_cell_for_tdc_chi_for_star_LNA(s, k, Hp_cell, ierr)
+         call Lambda_cell_for_tdc_chi_for_star_LNA(s, k, Lambda_cell, ierr)
          if (ierr /= 0) return
-         chi_coeff = chi_geometry_coefficient_for_star_LNA(s, k, alfam_alpha, &
-            Hp_cell, tdc_w_for_star_LNA(s, k))
+         chi_coeff = chi_geometry_coefficient_for_star_LNA(s, k, s% TDC_alpha_M, &
+            Lambda_cell, tdc_w_for_star_LNA(s, k))
       end function tdc_chi_coefficient_for_star_LNA
 
 
       real(dp) function chi_geometry_coefficient_for_star_LNA( &
-            s, k, alfam_alpha, Hp_cell, w_cell) result(chi_coeff)
+            s, k, alfam, length_cell, w_cell) result(chi_coeff)
          type(star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: alfam_alpha, Hp_cell, w_cell
+         real(dp), intent(in) :: alfam, length_cell, w_cell
          real(dp) :: r00, rp1, r6_cell
 
-         if (w_cell <= 0d0 .or. Hp_cell <= 0d0) then
+         if (w_cell <= 0d0 .or. length_cell <= 0d0) then
             chi_coeff = 0d0
             return
          end if
@@ -1090,8 +1154,8 @@
             rp1 = s% r_center
          end if
          r6_cell = 0.5d0*(r00**6 + rp1**6)
-         chi_coeff = (16d0/3d0)*pi*alfam_alpha*s% rho(k)*s% rho(k)* &
-            r6_cell*Hp_cell*w_cell/s% dm(k)
+         chi_coeff = (16d0/3d0)*pi*alfam*s% rho(k)*s% rho(k)* &
+            r6_cell*length_cell*w_cell/s% dm(k)
       end function chi_geometry_coefficient_for_star_LNA
 
 
@@ -1108,15 +1172,16 @@
       end function Hp_cell_for_rsp2_chi_for_star_LNA
 
 
-      subroutine Hp_cell_for_tdc_chi_for_star_LNA(s, k, Hp_cell, ierr)
+      subroutine Lambda_cell_for_tdc_chi_for_star_LNA(s, k, Lambda_cell, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(out) :: Hp_cell
+         real(dp), intent(out) :: Lambda_cell
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, Cp_face_ad, &
             chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
-            scale_height_face_ad, gradr_face_ad
+            scale_height_face_ad, gradr_face_ad, r_ad, grav_ad, Hp_for_mlt_ad, &
+            mixing_length_alpha_ad, Lambda_ad
 
          ierr = 0
          call tdc_face_state_for_star_LNA(s, k, &
@@ -1124,7 +1189,12 @@
             chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
             scale_height_face_ad, gradr_face_ad, ierr)
          if (ierr /= 0) return
-         Hp_cell = 0.5d0*scale_height_face_ad% val
+         r_ad = wrap_r_00(s, k)
+         grav_ad = s% cgrav(k)*s% m_grav(k)/pow2(r_ad)
+         call tdc_mixing_length_for_star_LNA(s, r_ad, Peos_face_ad, &
+            rho_face_ad, grav_ad, scale_height_face_ad, Hp_for_mlt_ad, &
+            mixing_length_alpha_ad, Lambda_ad)
+         Lambda_cell = 0.5d0*Lambda_ad% val
 
          if (k + 1 < s% nz) then
             call tdc_face_state_for_star_LNA(s, k + 1, &
@@ -1132,9 +1202,14 @@
                chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
                scale_height_face_ad, gradr_face_ad, ierr)
             if (ierr /= 0) return
-            Hp_cell = Hp_cell + 0.5d0*scale_height_face_ad% val
+            r_ad = wrap_r_00(s, k + 1)
+            grav_ad = s% cgrav(k + 1)*s% m_grav(k + 1)/pow2(r_ad)
+            call tdc_mixing_length_for_star_LNA(s, r_ad, Peos_face_ad, &
+               rho_face_ad, grav_ad, scale_height_face_ad, Hp_for_mlt_ad, &
+               mixing_length_alpha_ad, Lambda_ad)
+            Lambda_cell = Lambda_cell + 0.5d0*Lambda_ad% val
          end if
-      end subroutine Hp_cell_for_tdc_chi_for_star_LNA
+      end subroutine Lambda_cell_for_tdc_chi_for_star_LNA
 
 
       real(dp) function tdc_w_for_star_LNA(s, k) result(w_cell)

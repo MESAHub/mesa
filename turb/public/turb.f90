@@ -219,15 +219,15 @@ module turb
    !> Returns the luminosity residual and convective velocity equation for the
    !! static TDC linearization. Here A = conv_vel/sqrt(2/3).
    subroutine set_TDC_LNA( &
-            mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, &
+            mixing_length_alpha, Lambda, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, &
             cgrav, m, chiT, chiRho, L_total, gradT_actual, r, P, T, rho, Cp, opacity, &
             scale_height, gradL, grada, A, Eq_div_w, grav, include_mlt_corr_to_TDC, &
             TDC_alpha_C, TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, &
             luminosity_resid, velocity_rhs, velocity_inertia, L_rad, L_conv, ierr)
-      real(dp), intent(in) :: mixing_length_alpha, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
+      real(dp), intent(in) :: TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
       real(dp), intent(in) :: cgrav, m, TDC_alpha_C, TDC_alpha_S
       type(auto_diff_real_star_order1), intent(in) :: &
-         chiT, chiRho, L_total, gradT_actual, r, P, T, rho, Cp, opacity, &
+         mixing_length_alpha, Lambda, chiT, chiRho, L_total, gradT_actual, r, P, T, rho, Cp, opacity, &
          scale_height, gradL, grada, A, Eq_div_w, grav, energy
       logical, intent(in) :: include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       type(auto_diff_real_star_order1), intent(out) :: &
@@ -239,7 +239,7 @@ module turb
       real(dp), parameter :: x_CEDE = (8d0/3d0)*sqrt_2_div_3
       real(dp), parameter :: x_ALFAP = 2d0/3d0
       real(dp), parameter :: x_GAMMAR = 2d0*sqrt(3d0)
-      type(auto_diff_real_star_order1) :: L0, Lambda, Gamma, gradT_mlt, &
+      type(auto_diff_real_star_order1) :: L0, Gamma, gradT_mlt, &
          Y_mlt, conv_vel_mlt, D_mlt, gradr, Y, Y_env, h, scale, X, FL, &
          S0, D0, gammar_div_alfa, DR0, xi0, xi1, xi2
 
@@ -251,7 +251,7 @@ module turb
       L_conv = 0d0
 
       L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity)
-      if (mixing_length_alpha <= 0d0) then
+      if (mixing_length_alpha <= 0d0 .or. Lambda <= 0d0) then
          L_rad = L0*gradT_actual
          L_conv = 0d0
          luminosity_resid = L_rad - L_total
@@ -259,7 +259,6 @@ module turb
       end if
 
       gradr = L_total/L0
-      Lambda = mixing_length_alpha*scale_height
 
       call set_MLT('Cox', mixing_length_alpha, 0d0, 0d0, &
          chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
@@ -294,8 +293,8 @@ module turb
          S0 = S0*Y_env + Eq_div_w
       end if
 
-      D0 = TDC_alpha_D*x_CEDE/(mixing_length_alpha*scale_height)
-      gammar_div_alfa = TDC_alpha_R*x_GAMMAR/(mixing_length_alpha*scale_height)
+      D0 = TDC_alpha_D*x_CEDE/Lambda
+      gammar_div_alfa = TDC_alpha_R*x_GAMMAR/Lambda
       DR0 = 4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(T)/(pow2(rho)*Cp*opacity)
 
       xi0 = S0

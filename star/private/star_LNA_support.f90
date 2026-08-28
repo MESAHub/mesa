@@ -35,8 +35,9 @@
          tdc_luminosity_terms_for_star_LNA, tdc_relation_for_star_LNA, &
          tdc_zero_w_for_star_LNA, static_face_pressure_for_star_LNA, &
          turbulent_energy_inertia_for_star_LNA, turbulent_viscous_heating_for_star_LNA, &
-         Uq_face_for_star_LNA
-      use const_def, only: clight, crad, dp, ln10, Msun, pi, Rsun, secyer, sqrt_2_div_3
+         Uq_cell_for_star_LNA, Uq_face_for_star_LNA
+      use const_def, only: &
+         clight, convective_mixing, crad, dp, ln10, Msun, pi, Rsun, secyer, sqrt_2_div_3
       use eos_lib, only: Radiation_Pressure
       use math_lib, only: pow2, pow4
       use auto_diff
@@ -46,7 +47,11 @@
          wrap_lnT_00, wrap_lnT_m1, wrap_r_00, wrap_r_p1, wrap_r_m1, &
          wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_v_m1
       use hydro_vars, only: set_Teff_info_for_eqns
+      use hydro_riemann, only: eval_Riemann_dudt_rhs
       use hydro_rsp2, only: Hp_face_for_rsp2_eqn
+      use reconstructed_face_support, only: &
+         get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad, &
+         get_reconstructed_face_eos_kap_ad
       use star_utils, only: get_Cp_face, get_dke_dt_dpe_dt, get_grada_face, &
          get_gradr_face, get_kap_face, get_Peos_face, get_rho_face, &
          get_scale_height_face, get_T_face
@@ -138,8 +143,23 @@
          call check_static_star_LNA_background(s, ierr)
          if (ierr /= 0) return
 
-         if (s% u_flag) then
-            write(*,'(a)') 'star_LNA does not support u_flag perturbations.'
+         ! The Riemann face state includes every active turbulent pressure.
+         if (s% u_flag .and. .not. s% star_LNA_perturb_turbulent_pressure .and. &
+               ((s% RSP2_flag .and. s% RSP2_alfap /= 0d0 .and. &
+                  s% mixing_length_alpha /= 0d0) .or. &
+               s% mlt_Pturb_factor > 0d0)) then
+            write(*,'(a)') &
+               'u_flag star_LNA requires turbulent pressure perturbations for this background.'
+            ierr = -1
+            return
+         end if
+
+         ! RSP2 places Uq in u_face rather than the cell momentum source.
+         if (s% u_flag .and. s% RSP2_flag .and. &
+               s% star_LNA_perturb_eddy_viscosity .and. &
+               s% RSP2_alfam*s% mixing_length_alpha /= 0d0) then
+            write(*,'(a)') &
+               'star_LNA does not support RSP2 eddy viscosity with u_flag.'
             ierr = -1
             return
          end if
@@ -186,7 +206,7 @@
             return
          end if
 
-         if (s% drag_coefficient > 0d0) then
+         if (s% drag_coefficient > 0d0 .or. s% v_drag_factor > 0d0) then
             write(*,'(a)') 'star_LNA does not support velocity drag.'
             ierr = -1
             return
@@ -198,8 +218,8 @@
             return
          end if
 
-         if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
-            write(*,'(a)') 'star_LNA does not support the dPrad/dm temperature gradient form.'
+         if (s% constant_L) then
+            write(*,'(a)') 'star_LNA does not support constant_L.'
             ierr = -1
             return
          end if
@@ -469,7 +489,7 @@
             else
                eq_id = lna_eq_radius
             end if
-         case (lna_var_v)
+         case (lna_var_v, lna_var_u)
             if (k > 1) then
                eq_id = lna_eq_momentum
             else if (s% use_fixed_vsurf_outer_BC) then
@@ -601,36 +621,37 @@
 
 
       ! Equation:
-      !   d lnR_k/dt = v_k/r_k
+      !   d lnR_k/dt = v_face,k/r_k
       !
       ! Linearized form:
-      !   delta(v_k/r_k) = sigma*delta lnR_k
+      !   delta(v_face,k/r_k) = sigma*delta lnR_k
       !
       ! Matrix:
-      !   A(row,:) receives the AD partials of v_k/r_k.
+      !   A(row,:) receives the AD partials of v_face,k/r_k.
       !   B(row,lnR_k) = 1.
-      !   Cells with constrained velocity use the algebraic row delta v_k = 0.
+      !   Cells with constrained velocity use the algebraic row delta velocity_k = 0.
       subroutine assemble_radius_rows(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(out) :: ierr
-         integer :: k, row, col_lnR, col_v
+         integer :: k, row, col_lnR, col_velocity, velocity_var
          type(auto_diff_real_star_order1) :: dlnR_dt
 
          ierr = 0
+         velocity_var = velocity_var_for_star_LNA(map)
          do k = 1, map%nz
             row = matrix_index(map, k, lna_var_lnR)
             col_lnR = matrix_index(map, k, lna_var_lnR)
-            col_v = matrix_index(map, k, lna_var_v)
-            if (row <= 0 .or. col_lnR <= 0 .or. col_v <= 0) then
+            col_velocity = matrix_index(map, k, velocity_var)
+            if (row <= 0 .or. col_lnR <= 0 .or. col_velocity <= 0) then
                write(*,'(a,i0)') 'star_LNA radius row is missing a variable at k = ', k
                ierr = -1
                return
             end if
 
             if (force_zero_velocity_for_star_LNA(s, k)) then
-               mtx%A(row, col_v) = 1d0
+               mtx%A(row, col_velocity) = 1d0
             else
                if (s% r(k) <= 0d0) then
                   write(*,'(a,i0)') 'star_LNA found nonpositive radius at k = ', k
@@ -647,46 +668,48 @@
       end subroutine assemble_radius_rows
 
 
-      ! Equation:
+      ! Face velocity equation:
       !   dv_k/dt = grav_k + Uq_k
       !             - (DeltaPtot_k + DeltaPmlt_turb_k)/(dm_face_k/A_k)
+      ! With u_flag, use the cell-centered Riemann momentum equation instead.
       !
       ! Linearized form:
-      !   delta(RHS_k) = sigma*delta v_k
+      !   delta(RHS_k) = sigma*delta velocity_k
       !
       ! Matrix:
       !   A(row,:) receives the AD partials of RHS_k.
-      !   B(row,v_k) = 1.
+      !   B(row,velocity_k) = 1.
       !   The surface row may instead impose a pressure or fixed velocity BC.
       subroutine assemble_momentum_rows(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(out) :: ierr
-         integer :: k, row, col_v
-         type(auto_diff_real_star_order1) :: dv_dt_rhs_ad
+         integer :: k, row, col_velocity, velocity_var
+         type(auto_diff_real_star_order1) :: velocity_rhs_ad
 
          ierr = 0
+         velocity_var = velocity_var_for_star_LNA(map)
          do k = 1, map%nz
-            row = matrix_index(map, k, lna_var_v)
-            col_v = matrix_index(map, k, lna_var_v)
-            if (row <= 0 .or. col_v <= 0) then
+            row = matrix_index(map, k, velocity_var)
+            col_velocity = matrix_index(map, k, velocity_var)
+            if (row <= 0 .or. col_velocity <= 0) then
                write(*,'(a,i0)') 'star_LNA momentum row is missing a variable at k = ', k
                ierr = -1
                return
             end if
 
             if (k == 1) then
-               call assemble_surface_velocity_row(s, map, mtx, row, col_v, ierr)
+               call assemble_surface_velocity_row(s, map, mtx, row, col_velocity, ierr)
                if (ierr /= 0) return
                cycle
             end if
 
-            call momentum_rhs_for_star_LNA(s, k, dv_dt_rhs_ad, ierr)
+            call momentum_rhs_for_star_LNA(s, k, velocity_rhs_ad, ierr)
             if (ierr /= 0) return
-            call add_ad_partials_to_A(map, mtx, row, k, 1d0, dv_dt_rhs_ad, ierr)
+            call add_ad_partials_to_A(map, mtx, row, k, 1d0, velocity_rhs_ad, ierr)
             if (ierr /= 0) return
-            mtx%B(row, col_v) = 1d0
+            mtx%B(row, col_velocity) = 1d0
          end do
       end subroutine assemble_momentum_rows
 
@@ -695,18 +718,19 @@
       !   DeltaPtot_1 = P_bc - Ptot_1.
       ! If the active outer BC is not a momentum row, star_LNA imposes the
       ! algebraic pressure boundary delta(lnP_bc - lnPeos_1) = 0.
-      subroutine assemble_surface_velocity_row(s, map, mtx, row, col_v, ierr)
+      subroutine assemble_surface_velocity_row(s, map, mtx, row, col_velocity, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          type(star_LNA_matrix), intent(inout) :: mtx
-         integer, intent(in) :: row, col_v
+         integer, intent(in) :: row, col_velocity
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: P_bc_ad, lnP_bc_ad, resid_ad, dv_dt_rhs_ad
+         type(auto_diff_real_star_order1) :: &
+            P_bc_ad, lnP_bc_ad, resid_ad, velocity_rhs_ad
 
          ierr = 0
 
          if (s% use_fixed_vsurf_outer_BC) then
-            mtx%A(row, col_v) = 1d0
+            mtx%A(row, col_velocity) = 1d0
             return
          end if
 
@@ -714,11 +738,11 @@
          if (ierr /= 0) return
 
          if (use_surface_momentum_row_for_star_LNA(s)) then
-            call surface_momentum_rhs_for_star_LNA(s, P_bc_ad, dv_dt_rhs_ad, ierr)
+            call surface_momentum_rhs_for_star_LNA(s, P_bc_ad, velocity_rhs_ad, ierr)
             if (ierr /= 0) return
-            call add_ad_partials_to_A(map, mtx, row, 1, 1d0, dv_dt_rhs_ad, ierr)
+            call add_ad_partials_to_A(map, mtx, row, 1, 1d0, velocity_rhs_ad, ierr)
             if (ierr /= 0) return
-            mtx%B(row, col_v) = 1d0
+            mtx%B(row, col_velocity) = 1d0
          else
             resid_ad = lnP_bc_ad - wrap_lnPeos_00(s, 1)
             call add_ad_partials_to_A(map, mtx, row, 1, 1d0, resid_ad, ierr)
@@ -735,18 +759,31 @@
       end function use_surface_momentum_row_for_star_LNA
 
 
-      ! Interior momentum RHS in acceleration units.  This is the continuous
-      ! LNA analogue of hydro_momentum.get1_momentum_eqn after solving that
-      ! residual for dv/dt and dropping unsupported hooks.
-      subroutine momentum_rhs_for_star_LNA(s, k, dv_dt_rhs_ad, ierr)
+      ! Interior momentum RHS in acceleration units. The face-velocity path
+      ! follows hydro_momentum.get1_momentum_eqn; u_flag reuses
+      ! hydro_riemann.eval_Riemann_dudt_rhs.
+      subroutine momentum_rhs_for_star_LNA(s, k, velocity_rhs_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: dv_dt_rhs_ad
+         type(auto_diff_real_star_order1), intent(out) :: velocity_rhs_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: grav_ad, area_ad, dm_div_A_ad, &
-            dPtot_ad, d_mlt_Pturb_ad, Uq_ad
+            dPtot_ad, d_mlt_Pturb_ad, Uq_ad, P_surf_ad
 
          ierr = 0
+
+         if (s% u_flag) then
+            P_surf_ad = 0d0
+            ! Omit finite-step centering and add the static LNA Uq below.
+            call eval_Riemann_dudt_rhs( &
+               s, k, P_surf_ad, use_time_centering=.false., &
+               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr)
+            if (ierr /= 0) return
+            call Uq_cell_for_star_LNA(s, k, Uq_ad, ierr)
+            if (ierr /= 0) return
+            velocity_rhs_ad = velocity_rhs_ad + Uq_ad
+            return
+         end if
 
          call star_LNA_HSE_grav_term(s, k, grav_ad, area_ad, ierr)
          if (ierr /= 0) return
@@ -759,19 +796,31 @@
          call Uq_face_for_star_LNA(s, k, Uq_ad, ierr)
          if (ierr /= 0) return
 
-         dv_dt_rhs_ad = grav_ad + Uq_ad - (dPtot_ad + d_mlt_Pturb_ad)/dm_div_A_ad
+         velocity_rhs_ad = grav_ad + Uq_ad - &
+            (dPtot_ad + d_mlt_Pturb_ad)/dm_div_A_ad
       end subroutine momentum_rhs_for_star_LNA
 
 
-      subroutine surface_momentum_rhs_for_star_LNA(s, P_bc_ad, dv_dt_rhs_ad, ierr)
+      subroutine surface_momentum_rhs_for_star_LNA(s, P_bc_ad, velocity_rhs_ad, ierr)
          type(star_info), pointer :: s
          type(auto_diff_real_star_order1), intent(in) :: P_bc_ad
-         type(auto_diff_real_star_order1), intent(out) :: dv_dt_rhs_ad
+         type(auto_diff_real_star_order1), intent(out) :: velocity_rhs_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: grav_ad, area_ad, dm_div_A_ad, &
             Ptot00_ad, dPtot_ad, d_mlt_Pturb_ad, Uq_ad
 
          ierr = 0
+         if (s% u_flag) then
+            call eval_Riemann_dudt_rhs( &
+               s, 1, P_bc_ad, use_time_centering=.false., &
+               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr)
+            if (ierr /= 0) return
+            call Uq_cell_for_star_LNA(s, 1, Uq_ad, ierr)
+            if (ierr /= 0) return
+            velocity_rhs_ad = velocity_rhs_ad + Uq_ad
+            return
+         end if
+
          call star_LNA_HSE_grav_term(s, 1, grav_ad, area_ad, ierr)
          if (ierr /= 0) return
          dm_div_A_ad = star_LNA_dm_face(s, 1)/area_ad
@@ -784,7 +833,8 @@
          call Uq_face_for_star_LNA(s, 1, Uq_ad, ierr)
          if (ierr /= 0) return
 
-         dv_dt_rhs_ad = grav_ad + Uq_ad - (dPtot_ad + d_mlt_Pturb_ad)/dm_div_A_ad
+         velocity_rhs_ad = grav_ad + Uq_ad - &
+            (dPtot_ad + d_mlt_Pturb_ad)/dm_div_A_ad
       end subroutine surface_momentum_rhs_for_star_LNA
 
 
@@ -1048,11 +1098,19 @@
          real(dp) :: P_out, P_in
 
          ierr = 0
-         call static_face_pressure_for_star_LNA(s, k, P_out, ierr)
-         if (ierr /= 0) return
-         if (k < s% nz) then
-            call static_face_pressure_for_star_LNA(s, k + 1, P_in, ierr)
+         if (s% u_flag) then
+            P_out = s% P_face_ad(k)%val
+         else
+            call static_face_pressure_for_star_LNA(s, k, P_out, ierr)
             if (ierr /= 0) return
+         end if
+         if (k < s% nz) then
+            if (s% u_flag) then
+               P_in = s% P_face_ad(k + 1)%val
+            else
+               call static_face_pressure_for_star_LNA(s, k + 1, P_in, ierr)
+               if (ierr /= 0) return
+            end if
             dwork_dm_ad = 4d0*pi*( &
                P_out*s% r(k)*s% r(k)*wrap_v_00(s, k) - &
                P_in*s% r(k + 1)*s% r(k + 1)*wrap_v_p1(s, k))/s% dm(k)
@@ -1227,6 +1285,11 @@
             return
          end if
 
+         if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
+            call dPrad_dm_resid_for_star_LNA(s, k, luminosity_resid_ad, ierr)
+            return
+         end if
+
          call star_LNA_eval_dlnPdm_qhse(s, k, dlnPdm_ad, Ppoint_ad, ierr)
          if (ierr /= 0) return
 
@@ -1243,6 +1306,76 @@
 
          luminosity_resid_ad = delm*dlnTdm_ad - lnTdiff_ad
       end subroutine temperature_gradient_resid_for_star_LNA
+
+
+      subroutine dPrad_dm_resid_for_star_LNA(s, k, luminosity_resid_ad, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: luminosity_resid_ad
+         integer, intent(out) :: ierr
+         real(dp) :: dm_bar, scale
+         type(auto_diff_real_star_order1) :: L_ad, r_ad, area_ad, Lrad_ad, &
+            opacity_face_ad, kap_face_ad, L0_ad, gradr_factor_ad, &
+            T_m1_ad, T_00_ad, T4_m1_ad, T4_00_ad, &
+            d_P_rad_expected_ad, d_P_rad_actual_ad, &
+            T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, &
+            ChiRho_face_ad, ChiT_face_ad, grada_face_ad, &
+            flxR_ad, flxLambda_ad
+
+         ierr = 0
+         dm_bar = s% dm_bar(k)
+         scale = s% energy_start(k)*s% rho_start(k)
+         L_ad = wrap_L_00(s, k)
+         r_ad = wrap_r_00(s, k)
+         area_ad = 4d0*pi*pow2(r_ad)
+
+         if (s% use_face_reconstruction) then
+            call get_reconstructed_face_eos_kap_ad( &
+               s, k, T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, &
+               ChiRho_face_ad, ChiT_face_ad, grada_face_ad, opacity_face_ad, ierr)
+            if (ierr /= 0) return
+         else
+            T_face_ad = get_T_face(s, k)
+            P_face_ad = get_Peos_face(s, k)
+            opacity_face_ad = get_kap_face(s, k)
+         end if
+
+         ! Match hydro_temperature.do1_alt_dlnT_dm_eqn in convective cells.
+         gradr_factor_ad = get_effective_gradr_factor_ad(s, k)
+         if (s% lnT(k)/ln10 <= s% max_logT_for_mlt .and. &
+               s% mlt_mixing_type(k) == convective_mixing .and. &
+               abs(gradr_factor_ad%val) > 1d-20) then
+            L0_ad = get_Lrad_per_gradT_face_ad( &
+               s, k, T_face_ad, P_face_ad, opacity_face_ad, gradr_factor_ad)
+            Lrad_ad = L0_ad*s% gradT_ad(k)
+         else
+            Lrad_ad = L_ad
+         end if
+
+         kap_face_ad = opacity_face_ad
+         if (kap_face_ad%val < s% min_kap_for_dPrad_dm_eqn) &
+            kap_face_ad = s% min_kap_for_dPrad_dm_eqn
+
+         d_P_rad_expected_ad = &
+            -dm_bar*kap_face_ad*Lrad_ad/(clight*pow2(area_ad))
+
+         T_m1_ad = wrap_T_m1(s, k)
+         T_00_ad = wrap_T_00(s, k)
+         T4_m1_ad = pow4(T_m1_ad)
+         T4_00_ad = pow4(T_00_ad)
+         d_P_rad_actual_ad = (crad/3d0)*(T4_m1_ad - T4_00_ad)
+
+         if (s% use_flux_limiting_with_dPrad_dm_form) then
+            flxR_ad = area_ad*abs(T4_m1_ad - T4_00_ad)/dm_bar/ &
+               (kap_face_ad*0.5d0*(T4_m1_ad + T4_00_ad))
+            flxLambda_ad = (6d0 + 3d0*flxR_ad)/ &
+               (6d0 + (3d0 + flxR_ad)*flxR_ad)
+            d_P_rad_expected_ad = d_P_rad_expected_ad/flxLambda_ad
+         end if
+
+         luminosity_resid_ad = &
+            (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale
+      end subroutine dPrad_dm_resid_for_star_LNA
 
 
       subroutine surface_lnT_bc_for_star_LNA(s, lnT_bc_ad, ierr)
@@ -1513,7 +1646,7 @@
             coeff = scale*ad%d1Array(iad)
             if (coeff == 0d0) cycle
 
-            call ad_index_to_star_LNA_var(k, iad, kk, var_id)
+            call ad_index_to_star_LNA_var(map, k, iad, kk, var_id)
             if (var_id == 0) then
                write(*,'(3a)') 'star_LNA does not map automatic differentiation variable ', &
                   trim(auto_diff_star_d1_names(iad)), ' into the LNA matrix.'
@@ -1534,7 +1667,8 @@
       end subroutine add_ad_partials_to_matrix
 
 
-      subroutine ad_index_to_star_LNA_var(k, iad, kk, var_id)
+      subroutine ad_index_to_star_LNA_var(map, k, iad, kk, var_id)
+         type(star_LNA_var_map), intent(in) :: map
          integer, intent(in) :: k, iad
          integer, intent(out) :: kk, var_id
 
@@ -1566,11 +1700,11 @@
          case (i_lnR_p1)
             kk = k + 1; var_id = lna_var_lnR
          case (i_v_m1)
-            kk = k - 1; var_id = lna_var_v
+            kk = k - 1; var_id = velocity_var_for_star_LNA(map)
          case (i_v_00)
-            kk = k; var_id = lna_var_v
+            kk = k; var_id = velocity_var_for_star_LNA(map)
          case (i_v_p1)
-            kk = k + 1; var_id = lna_var_v
+            kk = k + 1; var_id = velocity_var_for_star_LNA(map)
          case (i_L_m1)
             kk = k - 1; var_id = lna_var_L
          case (i_L_00)
@@ -2494,12 +2628,13 @@
          real(dp), intent(in) :: sigma_re, sigma_im
          complex(dp), intent(in) :: eigenvector(:)
          integer, intent(out) :: ierr
-         integer :: io, k
+         integer :: io, k, velocity_var
          character(len=512) :: filename
          character(len=16) :: mode_string
          complex(dp) :: lnd, lnR, v, lnT, L, w, Hp, dLr, dLc, dLt, dL_div_L0
 
          ierr = 0
+         velocity_var = velocity_var_for_star_LNA(map)
          write(mode_string,'(i0)') mode
          call star_LNA_output_filename( &
             s, '_eigenfunction_' // trim(mode_string) // '.data', filename)
@@ -2513,6 +2648,8 @@
             selected_for_star_LNA_initial_velocity(s, mode)
          write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
          write(io,'(a,1x,i0)') '# eigen_index', eigen_index
+         write(io,'(a,1x,a)') '# velocity_variable', &
+            trim(var_name(velocity_var))
          write(io,'(a,1x,1pe24.16)') '# sigma_real', sigma_re
          write(io,'(a,1x,1pe24.16)') '# sigma_imag', sigma_im
          write(io,'(a,1x,1pe24.16)') '# star_LNA_kick_vsurf_km_per_sec', &
@@ -2538,7 +2675,7 @@
          do k = 1, map%nz
             lnd = star_LNA_eigen_component(map, eigenvector, k, lna_var_lnd)
             lnR = star_LNA_eigen_component(map, eigenvector, k, lna_var_lnR)
-            v = star_LNA_eigen_component(map, eigenvector, k, lna_var_v)
+            v = star_LNA_eigen_component(map, eigenvector, k, velocity_var)
             lnT = star_LNA_eigen_component(map, eigenvector, k, lna_var_lnT)
             L = star_LNA_eigen_component(map, eigenvector, k, lna_var_L)
             w = star_LNA_eigen_component(map, eigenvector, k, lna_var_w)
@@ -2725,13 +2862,20 @@
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          complex(dp), intent(in) :: eigenvector(:)
-         integer :: k
+         integer :: k, velocity_var
+         real(dp) :: dm_velocity
          complex(dp) :: dv
 
          kinetic_energy = 0d0
+         velocity_var = velocity_var_for_star_LNA(map)
          do k = 1, map%nz
-            dv = star_LNA_eigen_component(map, eigenvector, k, lna_var_v)
-            kinetic_energy = kinetic_energy + 0.5d0*s% dm_bar(k)*pow2(abs(dv))
+            dv = star_LNA_eigen_component(map, eigenvector, k, velocity_var)
+            if (velocity_var == lna_var_u) then
+               dm_velocity = s% dm(k)
+            else
+               dm_velocity = s% dm_bar(k)
+            end if
+            kinetic_energy = kinetic_energy + 0.5d0*dm_velocity*pow2(abs(dv))
          end do
       end function kinetic_energy_for_star_LNA_work
 
@@ -2774,7 +2918,8 @@
          if (ierr /= 0) return
          if (chi_coeff <= 0d0) return
 
-         d_v_div_r = delta_d_v_div_r_for_star_LNA(s, map, k, eigenvector)
+         call delta_d_v_div_r_for_star_LNA(s, map, k, eigenvector, d_v_div_r, ierr)
+         if (ierr /= 0) return
          eddy_work = -4d0*pi*pi*chi_coeff*abs(d_v_div_r)*abs(d_v_div_r)/abs(sigma_im)
       end function eddy_viscous_work_for_star_LNA
 
@@ -2793,17 +2938,25 @@
       end function frozen_flux_lna_selected
 
 
-      complex(dp) function delta_d_v_div_r_for_star_LNA( &
-            s, map, k, eigenvector) result(d_v_div_r)
+      subroutine delta_d_v_div_r_for_star_LNA( &
+            s, map, k, eigenvector, d_v_div_r, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          integer, intent(in) :: k
          complex(dp), intent(in) :: eigenvector(:)
+         complex(dp), intent(out) :: d_v_div_r
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: v00_ad, vp1_ad
          complex(dp) :: v00, vp1
          real(dp) :: rp1
 
-         v00 = star_LNA_eigen_component(map, eigenvector, k, lna_var_v)
-         vp1 = star_LNA_eigen_component(map, eigenvector, k + 1, lna_var_v)
+         ierr = 0
+         v00_ad = wrap_v_00(s, k)
+         vp1_ad = wrap_v_p1(s, k)
+         call star_LNA_perturbation_from_ad(map, k, v00_ad, eigenvector, v00, ierr)
+         if (ierr /= 0) return
+         call star_LNA_perturbation_from_ad(map, k, vp1_ad, eigenvector, vp1, ierr)
+         if (ierr /= 0) return
          if (k < s% nz) then
             rp1 = s% r(k + 1)
          else
@@ -2812,7 +2965,7 @@
          if (rp1 == 0d0) rp1 = 1d0
 
          d_v_div_r = v00/s% r(k) - vp1/rp1
-      end function delta_d_v_div_r_for_star_LNA
+      end subroutine delta_d_v_div_r_for_star_LNA
 
 
       real(dp) function luminosity_work_for_star_LNA(s, k, sigma_im, dlnT, dL_dm) &
@@ -2872,7 +3025,7 @@
          do iad = 1, auto_diff_star_num_vars
             coeff = ad%d1Array(iad)
             if (coeff == 0d0) cycle
-            call ad_index_to_star_LNA_var(k, iad, kk, var_id)
+            call ad_index_to_star_LNA_var(map, k, iad, kk, var_id)
             if (var_id == 0) then
                ierr = -1
                return
@@ -3381,7 +3534,11 @@
          do k = 1, s% nz
             if (k == 1) then
                if (s% use_fixed_vsurf_outer_BC) then
-                  resid_ad = s% v(1)
+                  if (s% u_flag) then
+                     resid_ad = s% u(1)
+                  else
+                     resid_ad = s% v(1)
+                  end if
                else
                   call surface_P_bc_for_star_LNA(s, P_bc_ad, lnP_bc_ad, ierr)
                   if (ierr /= 0) return
@@ -3646,6 +3803,17 @@
       end function var_slot
 
 
+      integer function velocity_var_for_star_LNA(map) result(var_id)
+         type(star_LNA_var_map), intent(in) :: map
+
+         if (var_slot(map, lna_var_u) > 0) then
+            var_id = lna_var_u
+         else
+            var_id = lna_var_v
+         end if
+      end function velocity_var_for_star_LNA
+
+
       logical function force_zero_velocity_for_star_LNA(s, k) result(force_zero_v)
          type(star_info), pointer :: s
          integer, intent(in) :: k
@@ -3660,7 +3828,13 @@
       real(dp) function max_star_LNA_v_div_csound(s) result(max_v_div_csound)
          type(star_info), pointer :: s
 
-         max_v_div_csound = maxval(abs(s% v(1:s% nz))/max(1d-99, abs(s% csound_face(1:s% nz))))
+         if (s% u_flag) then
+            max_v_div_csound = maxval( &
+               abs(s% u(1:s% nz))/max(1d-99, abs(s% csound(1:s% nz))))
+         else
+            max_v_div_csound = maxval( &
+               abs(s% v(1:s% nz))/max(1d-99, abs(s% csound_face(1:s% nz))))
+         end if
       end function max_star_LNA_v_div_csound
 
 
@@ -3718,12 +3892,13 @@
          else
             write(*,'(a)') 'star_LNA: no dynamic convection variable selected.'
          end if
-         if (.not. s% v_flag) &
+         if (s% u_flag) then
+            write(*,'(a)') &
+               'star_LNA: using cell velocity u and the Riemann face reconstruction.'
+         else if (.not. s% v_flag) then
             write(*,'(a)') &
                'star_LNA: hydro v_flag is inactive; LNA uses its own face velocity perturbation.'
-         if (s% MLT_option == 'TDC' .and. s% TDC_use_density_form_for_eddy_viscosity) &
-            write(*,'(a)') &
-               'star_LNA: hydro TDC density form eddy viscosity flag is active; LNA ignores it.'
+         end if
          if (s% use_TDC_enthalpy_flux_limiter .and. &
                (s% RSP2_flag .or. tdc_lna_active(s))) &
             write(*,'(a)') &

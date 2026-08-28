@@ -129,6 +129,10 @@ contains
           ierr = -1
           return
        end if
+       if (s%harmonic_dissipation_length_beta > 0d0) then
+          write(*,'(a)') 'WARNING: GYRE schema 130 does not support the harmonic TDC mixing length.'
+          write(*,'(a)') 'GYRE will use Lambda = mixing_length_alpha*Hp_face from the exported data.'
+       end if
     end if
 
     ! Set up segment indices
@@ -527,6 +531,7 @@ contains
       Cp_face = eval_face(s%dq, s%Cp, k, k_a, k_b)
       Y_face = s%gradT(k) - s%gradL(k)
 
+      ! Schema 130 exports the legacy Lambda = mixing_length_alpha*Hp_face.
       point_data(i_tdc_hp_face,j) = Hp_face
       point_data(i_tdc_alpha_mlt_face,j) = s%mixing_length_alpha
       point_data(i_tdc_cp_face,j) = Cp_face
