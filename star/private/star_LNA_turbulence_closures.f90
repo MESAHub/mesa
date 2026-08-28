@@ -1216,20 +1216,12 @@
          type(star_info), pointer :: s
          integer, intent(in) :: k
 
+         ! The explicit alpha_M option is a nonlinear timestep split.
+         ! The static LNA uses the current equilibrium convective velocity.
          if (k < s% nz) then
-            if (s% okay_to_set_mlt_vc .and. &
-                  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-               w_cell = 0.5d0*(s% mlt_vc_old(k) + s% mlt_vc_old(k + 1))/sqrt_2_div_3
-            else
-               w_cell = 0.5d0*(s% mlt_vc(k) + s% mlt_vc(k + 1))/sqrt_2_div_3
-            end if
+            w_cell = 0.5d0*(s% mlt_vc(k) + s% mlt_vc(k + 1))/sqrt_2_div_3
          else
-            if (s% okay_to_set_mlt_vc .and. &
-                  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-               w_cell = 0.5d0*s% mlt_vc_old(k)/sqrt_2_div_3
-            else
-               w_cell = 0.5d0*s% mlt_vc(k)/sqrt_2_div_3
-            end if
+            w_cell = 0.5d0*s% mlt_vc(k)/sqrt_2_div_3
          end if
       end function tdc_w_for_star_LNA
 

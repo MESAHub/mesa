@@ -66,7 +66,7 @@ cubic_interpolation_in_Z = .false.
 
 
    ! TDC pulsation mesh
-   remesh_for_TDC_pulsations_when_load = .true.
+   steps_before_remesh_for_TDC_pulsations = 0
    TDC_hydro_use_mass_interp_face_values = .true.
    TDC_hydro_nz = 190
    TDC_hydro_nz_outer = 40 

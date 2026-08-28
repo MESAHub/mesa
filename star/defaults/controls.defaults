@@ -2390,9 +2390,12 @@
       ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, mlt_vc_old (the start of step value)
-      ! is used in place of the current solver iterate mlt_vc_ad inside the hydro momentum equation. This option can
-      ! provide greater numerical stability in extremely dynamic models.
+      ! If ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``,
+      ! ``mlt_vc_old`` (the start-of-step value) is used in place of the current
+      ! solver iterate ``mlt_vc_ad`` inside the nonlinear hydro momentum equation.
+      ! This can improve numerical stability in extremely dynamic models. The
+      ! operator split does not alter ``star_LNA``, which uses the current
+      ! ``mlt_vc`` for the static background.
 
       ! ::
 
@@ -6665,8 +6668,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_use_mass_interp_face_values
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remesh_for_TDC_pulsations_when_load
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! steps_before_remesh_for_TDC_pulsations
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! If ``remesh_for_TDC_pulsations_log_core_zoning`` is true, the model is rezoned below
@@ -6696,12 +6699,14 @@
       ! Use ``TDC_hydro_nz_inner`` and ``TDC_hydro_nz_T_gradient`` to resolve the inner boundary
       ! and steep temperature gradients in AGB envelopes with deep convective regions.
 
-      ! If ``remesh_for_TDC_pulsations_when_load`` is true, a model loaded from a ``.mod`` file
-      ! is remeshed before the first step. This is not applied to photo restarts.
+      ! ``steps_before_remesh_for_TDC_pulsations`` controls a one-time remesh of a model loaded
+      ! from a ``.mod`` file. A negative value disables the remesh. Zero remeshes the model before
+      ! the first step. A positive value remeshes after that many accepted steps. A photo restart
+      ! before the selected step retains the pending remesh; a restart after it does not repeat it.
 
       ! ::
 
-    remesh_for_TDC_pulsations_when_load = .false.
+    steps_before_remesh_for_TDC_pulsations = -1
     remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 

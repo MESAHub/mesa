@@ -478,7 +478,7 @@
          call do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          if (failed('do_star_job_controls_after',ierr)) return
 
-         if (s% remesh_for_TDC_pulsations_when_load .and. &
+         if (s% steps_before_remesh_for_TDC_pulsations == 0 .and. &
                s% job% load_saved_model .and. .not. restart) then
             call remesh_for_TDC_pulsation(id, ierr)
             if (failed('remesh_for_TDC_pulsation',ierr)) return
