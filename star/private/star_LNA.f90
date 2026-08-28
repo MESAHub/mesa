@@ -22,6 +22,7 @@
       use star_private_def
       use auto_diff
       use hydro_vars, only: set_vars_if_needed
+      use hydro_riemann, only: do_uface_and_Pface
       use star_lna_support, only: &
          star_LNA_problem, check_star_LNA_model, setup_star_LNA_problem, &
          report_star_LNA_setup, &
@@ -53,6 +54,13 @@
          call check_star_LNA_model(s, ierr)
          if (ierr /= 0) return
 
+         if (s% u_flag) then
+            ! Use the continuous Riemann face state without the RSP2 Uq shift.
+            call do_uface_and_Pface( &
+               s, ierr, include_rsp2_Uq=.false., use_time_centering=.false.)
+            if (ierr /= 0) return
+         end if
+
          call setup_star_LNA_problem(s, problem, ierr)
          if (ierr /= 0) return
 
@@ -78,11 +86,11 @@
          call assemble_density_rows(s, problem% map, problem% mtx, ierr)
          if (ierr /= 0) return
 
-         ! d lnR_k/dt = v_k/r_k.
+         ! d lnR_k/dt = v_face,k/r_k.
          call assemble_radius_rows(s, problem% map, problem% mtx, ierr)
          if (ierr /= 0) return
 
-         ! dv_k/dt = momentum RHS from pressure, gravity, and turbulent stresses.
+         ! d velocity_k/dt = pressure, gravity, and turbulent-stress acceleration.
          call assemble_momentum_rows(s, problem% map, problem% mtx, ierr)
          if (ierr /= 0) return
 
