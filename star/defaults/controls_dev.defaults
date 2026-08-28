@@ -136,14 +136,14 @@
 
       ! These controls configure the MESA/star radial linear nonadiabatic
       ! analysis in star/private/star_LNA.f90. The implementation assembles a
-      ! static face velocity envelope operator and solves a dense generalized
-      ! eigenproblem. Hydro v_flag may be inactive because the LNA introduces
-      ! its own linear velocity perturbation.
-      ! The analysis rejects u_flag hydrodynamics, rotation, RTI, mass
-      ! corrections, user other_* hooks, velocity drag,
-      ! use_compression_outer_BC, or the dPrad/dm temperature gradient form.
-      ! TDC_use_density_form_for_eddy_viscosity is not supported by this LNA
-      ! path; LNA uses its local static velocity form helper.
+      ! static radial envelope operator and solves a dense generalized
+      ! eigenproblem. The velocity variable is face-centered v for the standard
+      ! momentum equation and cell-centered u for u_flag hydrodynamics. Hydro
+      ! v_flag may be inactive because the LNA supplies its own face velocity
+      ! perturbation. The analysis supports the standard and dPrad/dm
+      ! temperature gradient forms.
+      ! The analysis rejects rotation, RTI, mass corrections, user other_*
+      ! hooks, velocity drag, use_compression_outer_BC, or constant_L.
       ! check_star_LNA_model rejects these paths before matrix assembly.
       !
       ! star_LNA_flag
@@ -336,14 +336,15 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! If true, include turbulent pressure perturbations in the LNA pressure
       ! terms where supported. For RSP2 this uses Ptrb = alpha_p*(2/3)*rho*w^2.
+      ! A u_flag background with active RSP2 or MLT turbulent pressure requires
+      ! this option because the Riemann pressure reconstruction includes it.
       !
       ! star_LNA_perturb_eddy_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! If true, include the supported eddy viscosity momentum/heating
       ! perturbations and write the eddy viscosity work diagnostic. For TDC,
       ! ``TDC_alpha_M`` controls whether the eddy viscosity term is present.
-      ! The TDC density form eddy viscosity branch is not supported in LNA and
-      ! is ignored.
+      ! RSP2 eddy viscosity is not yet supported together with ``u_flag``.
       !
       ! star_LNA_perturb_turbulent_energy
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -436,6 +437,11 @@
       !
       ! Requires gyre_data_schema = 130 and MLT_option = 'TDC'. GYRE must be
       ! updated separately before it can read this experimental schema.
+      ! Schema 130 does not represent the harmonic TDC mixing length. If
+      ! harmonic_dissipation_length_beta > 0, MESA writes a warning and
+      ! exports the legacy mixing_length_alpha and Hp_face values. GYRE will
+      ! therefore use Lambda = mixing_length_alpha*Hp_face rather than the
+      ! harmonic length used by MESA.
       !
       ! ::
 
