@@ -1817,17 +1817,19 @@
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
+         use set_flags, only: set_TDC_to_RSP2_mesh
 
          type (star_info), pointer :: s
 
          integer :: ierr, k
          real(dp) :: force_timestep_min, force_timestep
-         logical :: trace
+         logical :: trace, did_TDC_remesh
 
          include 'formats'
 
          ierr = 0
          trace = s% trace_evolve
+         did_TDC_remesh = .false.
 
          prepare_for_new_step = keep_going
 
@@ -1860,6 +1862,16 @@
             if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
          end if
 
+         ! Remesh before saving prev_mesh so retries retain the TDC mesh.
+         if (s% steps_before_remesh_for_TDC_pulsations > 0 .and. &
+               s% job% load_saved_model .and. &
+               s% model_number == s% init_model_number + &
+                  s% steps_before_remesh_for_TDC_pulsations) then
+            call set_TDC_to_RSP2_mesh(s% id, ierr)
+            if (failed('set_TDC_to_RSP2_mesh ierr')) return
+            did_TDC_remesh = .true.
+         end if
+
          if (.not. s% RSP_flag) then  ! store mesh info for following step eps_mdot
             do k=1, s% nz
                s% prev_mesh_xa(:,k) = s% xa(:,k)
@@ -1884,7 +1896,7 @@
             end if
          end if
 
-         if (s% okay_to_remesh) then
+         if (s% okay_to_remesh .and. .not. did_TDC_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)
                if (failed('set_start_of_step_info ierr')) return

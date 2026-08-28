@@ -52,6 +52,7 @@
          logical :: star_LNA_flag
          integer :: star_LNA_model_number
          logical :: star_LNA_stop_after_run
+         real(dp) :: star_LNA_T_inner
          integer :: star_LNA_num_modes
          real(dp) :: star_LNA_min_mode_frequency_uHz
          real(dp) :: star_LNA_min_first_mode_eta

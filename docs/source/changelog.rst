@@ -45,7 +45,9 @@ The new control ``superad_reduction_use_turnover_limit`` relaxes the applied sup
 
 Additional controls are available for TDC envelope remeshing:
 
-- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``steps_before_remesh_for_TDC_pulsations`` selects when a loaded ``.mod`` model is remeshed.
+  Negative values disable the remesh, zero remeshes before the first step, and positive values
+  remesh once after the requested number of accepted steps.
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 

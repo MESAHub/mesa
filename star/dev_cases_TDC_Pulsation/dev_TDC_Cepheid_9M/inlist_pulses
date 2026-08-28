@@ -104,7 +104,7 @@ Zbase = 0.004d0
 
 
    ! new rsp style meshing, thanks to Bill P.
-   remesh_for_TDC_pulsations_when_load = .false.
+   steps_before_remesh_for_TDC_pulsations = -1
    TDC_hydro_use_mass_interp_face_values = .false.
    TDC_hydro_nz = 150 
    TDC_hydro_nz_outer = 40 

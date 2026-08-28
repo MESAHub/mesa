@@ -377,7 +377,7 @@
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     use_TDC_Y_face_seeded_newton, &
     hydro_matrix_solver, &
-    remesh_for_TDC_pulsations_when_load, remesh_for_TDC_pulsations_log_core_zoning, &
+    steps_before_remesh_for_TDC_pulsations, remesh_for_TDC_pulsations_log_core_zoning, &
     velocity_logT_lower_bound, &
     max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
@@ -441,7 +441,8 @@
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
     RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
     RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, &
-    star_LNA_flag, star_LNA_model_number, star_LNA_stop_after_run, star_LNA_num_modes, &
+    star_LNA_flag, star_LNA_model_number, star_LNA_stop_after_run, star_LNA_T_inner, &
+    star_LNA_num_modes, &
     star_LNA_min_mode_frequency_uHz, &
     star_LNA_min_first_mode_eta, star_LNA_min_mode_eta, &
     star_LNA_max_abs_mode_eta, &
@@ -2157,7 +2158,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_hydro_T_anchor = TDC_hydro_T_anchor
  s% TDC_hydro_dq_1_factor = TDC_hydro_dq_1_factor
 
- s% remesh_for_TDC_pulsations_when_load = remesh_for_TDC_pulsations_when_load
+ s% steps_before_remesh_for_TDC_pulsations = steps_before_remesh_for_TDC_pulsations
  s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
 
  s% RSP2_alfap = RSP2_alfap
@@ -2203,6 +2204,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% star_LNA_flag = star_LNA_flag
  s% star_LNA_model_number = star_LNA_model_number
  s% star_LNA_stop_after_run = star_LNA_stop_after_run
+ s% star_LNA_T_inner = star_LNA_T_inner
  s% star_LNA_num_modes = star_LNA_num_modes
  s% star_LNA_min_mode_frequency_uHz = star_LNA_min_mode_frequency_uHz
  s% star_LNA_min_first_mode_eta = star_LNA_min_first_mode_eta
@@ -3924,7 +3926,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_hydro_T_anchor = s% TDC_hydro_T_anchor
  TDC_hydro_dq_1_factor = s% TDC_hydro_dq_1_factor
 
- remesh_for_TDC_pulsations_when_load = s% remesh_for_TDC_pulsations_when_load
+ steps_before_remesh_for_TDC_pulsations = s% steps_before_remesh_for_TDC_pulsations
  remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning
 
  RSP2_alfap= s% RSP2_alfap
@@ -3970,6 +3972,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  star_LNA_flag = s% star_LNA_flag
  star_LNA_model_number = s% star_LNA_model_number
  star_LNA_stop_after_run = s% star_LNA_stop_after_run
+ star_LNA_T_inner = s% star_LNA_T_inner
  star_LNA_num_modes = s% star_LNA_num_modes
  star_LNA_min_mode_frequency_uHz = s% star_LNA_min_mode_frequency_uHz
  star_LNA_min_first_mode_eta = s% star_LNA_min_first_mode_eta
