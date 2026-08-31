@@ -1,11 +1,14 @@
 
 &controls ! for parts using rsp2
 
+! pulsation remesh
+   TDC_hydro_nz = 150
+   TDC_hydro_nz_outer = 40
+   TDC_hydro_T_anchor = 11d3
+   TDC_hydro_dq_1_factor = 2d0
+   remesh_for_TDC_pulsations_log_core_zoning = .true.
+
 ! RSP2
-   RSP2_nz = 150
-   RSP2_nz_outer = 40
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
    RSP2_use_L_eqn_at_surface = .false.
    RSP2_assume_HSE = .true.
    
@@ -45,7 +48,7 @@
 
 ! solver
    steps_before_use_velocity_time_centering = 0
-   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   use_P_d_1_div_rho_form_of_work = .true.
    
    include_P_in_velocity_time_centering = .true.
    P_theta_for_velocity_time_centering = 0.5d0

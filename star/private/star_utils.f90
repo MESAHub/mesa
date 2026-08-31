@@ -109,6 +109,7 @@
       public :: set_conv_time_scales
       public :: superad_history_integral, compact_superad_history, advance_superad_history, set_superad_reduction_cache
       public :: commit_superad_history
+      public :: initialize_superad_reduction_history
       public :: set_rv_info
       public :: smooth
       public :: safe_div_val
@@ -3985,6 +3986,24 @@
                s% superad_reduction_history_du(1:nh,k), s% superad_reduction_history_eta_du(1:nh,k), 1d0-fraction)
          end do
       end subroutine set_superad_reduction_cache
+
+
+      subroutine initialize_superad_reduction_history(s, ierr)
+         type(star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         ierr = 0
+         call realloc_double2(s% superad_reduction_history_du, &
+            max_superad_reduction_history, size(s% superad_reduction_factor), ierr)
+         if (ierr /= 0) return
+         call realloc_double2(s% superad_reduction_history_eta_du, &
+            max_superad_reduction_history, size(s% superad_reduction_factor), ierr)
+         if (ierr /= 0) return
+         s% num_superad_reduction_history = 1
+         s% superad_reduction_history_du(1,1:s% nz) = 1d0
+         s% superad_reduction_history_eta_du(1,1:s% nz) = &
+            1d0/max(s% superad_reduction_factor(1:s% nz),1d0)
+      end subroutine initialize_superad_reduction_history
 
 
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)

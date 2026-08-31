@@ -248,7 +248,7 @@
                end if
             end if
             if (do_equL) then
-               if (s% RSP2_flag .and. (k > 1 .or. s% RSP2_use_L_eqn_at_surface)) then
+               if (s% RSP2_flag .and. k == 1 .and. s% RSP2_use_L_eqn_at_surface) then
                   call do1_rsp2_L_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_L_eqn', k
@@ -772,8 +772,9 @@
          if (ierr /= 0) return
 
          need_T_surf = .false.
-         if ((.not. do_equL) .or. &
-               s% constant_L .or. (s% RSP2_flag) .or. (s% use_RSP_L_eqn_outer_BC)) then
+         if ((.not. do_equL) .or. s% constant_L .or. &
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface) .or. &
+               s% use_RSP_L_eqn_outer_BC) then
             ! no Tsurf BC
          else
             need_T_surf = .true.
@@ -783,7 +784,9 @@
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
 
          offset_T_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% RSP2_flag .or. s% use_RSP_L_eqn_outer_BC) &
+         if (s% use_other_surface_PT .or. &
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface) .or. &
+               s% use_RSP_L_eqn_outer_BC) &
             offset_T_to_cell_center = .false.
 
          ! Constant-L tests with an explicit momentum BC need no atmospheric P-T data.
@@ -809,7 +812,8 @@
             if (ierr /= 0) return
          end if
 
-         if (do_equL .and. s% constant_L) then
+         if (do_equL .and. s% constant_L .and. &
+               .not. (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then
             call do1_constant_L_eqn(s, 1, nvar, ierr)
             if (ierr /= 0) return
          else if (need_T_surf) then
@@ -1017,25 +1021,15 @@
          subroutine set_Tsurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
-            type(auto_diff_real_star_order1) :: &
-               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected, scale
+            type(auto_diff_real_star_order1) :: lnT1_ad, scale
             real(dp) :: residual
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
-            if (s% RSP2_flag) then  ! interpolate lnT by mass, To do: check what happens when we do this with mlt?
-               T4_p1 = pow4(wrap_T_p1(s,1))
-               T4_surf = pow4(T_bc_ad)
-               dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
-               T4_00_expected = T4_surf - 0.5d0*s% dm(1)*dT4_dm
-               T4_00_actual = pow4(wrap_T_00(s,1))
-               resid_ad = T4_00_expected/T4_00_actual - 1d0
-            else
-               lnT1_ad = wrap_lnT_00(s,1)
-               scale = max(1d0,lnT1_ad)
-               resid_ad = (lnT_bc_ad - lnT1_ad)/scale
-            end if
+            lnT1_ad = wrap_lnT_00(s,1)
+            scale = max(1d0,lnT1_ad)
+            resid_ad = (lnT_bc_ad - lnT1_ad)/scale
             residual = resid_ad%val
             s% equ(s% i_equL, 1) = residual
             if (is_bad(residual)) then

@@ -289,7 +289,6 @@
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils
-         use utils_lib, only: realloc_double2
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
@@ -328,17 +327,9 @@
          if (.not. use_turnover_limit) then
             s% num_superad_reduction_history = 0
          else if (s% num_superad_reduction_history == 0) then
-            call realloc_double2(s% superad_reduction_history_du, &
-               max_superad_reduction_history, size(s% superad_reduction_factor), ierr)
-            if (failed('realloc superad_reduction_history_du')) return
-            call realloc_double2(s% superad_reduction_history_eta_du, &
-               max_superad_reduction_history, size(s% superad_reduction_factor), ierr)
-            if (failed('realloc superad_reduction_history_eta_du')) return
             ! Initialize the history from the current eta before the first remesh.
-            s% num_superad_reduction_history = 1
-            s% superad_reduction_history_du(1,1:s% nz) = 1d0
-            s% superad_reduction_history_eta_du(1,1:s% nz) = &
-               1d0/max(s% superad_reduction_factor(1:s% nz),1d0)
+            call initialize_superad_reduction_history(s, ierr)
+            if (failed('initialize_superad_reduction_history')) return
          end if
          if (s% num_superad_reduction_history == max_superad_reduction_history) then
             ! Compress before snapshots so retries reuse the same accepted history.
@@ -1885,7 +1876,7 @@
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
          use utils_lib, only: realloc_double2
-         use set_flags, only: set_TDC_to_RSP2_mesh
+         use set_flags, only: set_pulsation_envelope_mesh
 
          type (star_info), pointer :: s
 
@@ -1935,8 +1926,8 @@
                s% job% load_saved_model .and. &
                s% model_number == s% init_model_number + &
                   s% steps_before_remesh_for_TDC_pulsations) then
-            call set_TDC_to_RSP2_mesh(s% id, ierr)
-            if (failed('set_TDC_to_RSP2_mesh ierr')) return
+            call set_pulsation_envelope_mesh(s% id, ierr)
+            if (failed('set_pulsation_envelope_mesh ierr')) return
             did_TDC_remesh = .true.
          end if
 

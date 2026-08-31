@@ -909,6 +909,7 @@
 
       ! misc other stuff
 
+         logical :: hold_pulsation_background = .false.
          logical :: doing_finish_load_model, doing_load_restart_photo, doing_relax, doing_struct_burn_mix, &
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &

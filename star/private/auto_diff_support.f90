@@ -406,8 +406,13 @@
          if (k == 1) then
             cv = 0d0
          else
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            beta = 1d0 - alfa
+            if (s% RSP2_use_mass_interp_face_values) then
+               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+               beta = 1d0 - alfa
+            else
+               alfa = 0.5d0
+               beta = 0.5d0
+            end if
             cv = sqrt_2_div_3*(alfa*s% w(k) + beta*s% w(k-1))
          end if
       end function get_RSP2_conv_velocity

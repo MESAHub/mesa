@@ -155,7 +155,7 @@ Zbase = 0.006d0 ! LMC metallicity used by the Friday Cepheid models
 
 ! velocity time centering for v_flag only.
    steps_before_use_velocity_time_centering = 300 ! no v centering when commented
-   use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   use_P_d_1_div_rho_form_of_work = .true.
 
    include_P_in_velocity_time_centering = .true. ! set to false for u_flag
    P_theta_for_velocity_time_centering = 0.5d0

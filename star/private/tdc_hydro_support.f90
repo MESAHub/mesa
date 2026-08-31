@@ -34,6 +34,7 @@ module tdc_hydro_support
 contains
 
    subroutine remesh_for_TDC_pulsations(s, ierr)
+      ! The same envelope mesh is used for TDC and RSP2 pulsations.
       ! uses these controls
       !  TDC_hydro_nz = 190
       !  TDC_hydro_nz_outer = 40
@@ -43,6 +44,7 @@ contains
       !  TDC_hydro_dq_1_factor = 2d0
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
+      use hydro_rsp2, only: Hp_face_for_rsp2_val
       use hydro_vars, only: set_cgrav
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -57,6 +59,10 @@ contains
       nz = s%TDC_hydro_nz
       call validate_controls2
       if (ierr /= 0) return
+      if (any(is_bad(s%superad_reduction_factor(1:nz_old)))) then
+         ierr = -1
+         return
+      end if
       call setvars2(ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in setvars')
       old_J = 0d0
@@ -103,9 +109,11 @@ contains
          if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'TDC remesh mlt_vc interpolation failed')
          s%mlt_vc(1:nz) = v_new(1:nz)
       end if
+      call interpolate_superad_reduction2
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
       if (s%i_u /= 0) call interpolate1_cell_val2(s%i_u)
+      if (s%RSP2_flag) call interpolate1_cell_val2(s%i_w)
       do j = 1, s%species
          call remap1_xa2(j)
       end do
@@ -116,8 +124,24 @@ contains
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in set_cgrav')
       call revise_lnT_for_QHSE2(P_surf, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in revise_lnT_for_QHSE')
+      if (s%RSP2_flag) then
+         do k = 1, nz
+            s%Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
+            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed to set RSP2 Hp')
+            s%xh(s%i_Hp, k) = s%Hp_face(k)
+         end do
+      end if
       if (s%rotation_flag) call set_rotation_seed2
       deallocate (work1)
+      ! Adopt the remapped enhancement without carrying history from the old mesh.
+      s%num_superad_reduction_history = 0
+      s%superad_reduction_pending = .false.
+      if (s%use_superad_reduction .and. s%superad_reduction_use_turnover_limit .and. .not. s%RSP_flag) then
+         call initialize_superad_reduction_history(s, ierr)
+         if (ierr /= 0) return
+      end if
+      s%have_superad_reduction_factor = .true.
+      s%okay_to_set_superad_reduction_factor = .false.
       write (*, 1) 'new old L_surf/Lsun', s%xh(s%i_lum, 1)/Lsun, old_L1/Lsun
       write (*, 1) 'new old R_surf/Rsun', exp(s%xh(s%i_lnR, 1))/Rsun, old_r1/Rsun
       write (*, '(A)')
@@ -128,8 +152,8 @@ contains
          integer :: nz_base
          include 'formats'
          nz_base = nz - s%TDC_hydro_nz_T_gradient
-         if (s%RSP_flag .or. s%RSP2_flag) then
-            write(*,'(A)') 'TDC remesh cannot be applied after enabling RSP or RSP2'
+         if (s%RSP_flag) then
+            write(*,'(A)') 'TDC remesh cannot be applied after enabling RSP'
             ierr = -1
          else if (nz > nz_old) then
             write(*,3) 'TDC remesh cannot increase the number of zones', nz, nz_old
@@ -624,6 +648,17 @@ contains
             s%xh(i, k) = v_new(k)
          end do
       end subroutine interpolate1_face_val2
+
+      subroutine interpolate_superad_reduction2
+         ! Interpolate the applied eta, including the neutral inner boundary.
+         v_old(1:nz_old) = 1d0/max(1d0, s%superad_reduction_factor(1:nz_old))
+         v_old(nz_old + 1) = 1d0
+         call interpolate_vector_pm( &
+            nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, &
+            'remesh_for_TDC superad_reduction', ierr)
+         if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'TDC remesh superad reduction interpolation failed')
+         s%superad_reduction_factor(1:nz) = 1d0/max(tiny(1d0), min(1d0, v_new(1:nz)))
+      end subroutine interpolate_superad_reduction2
 
       subroutine check_new_lnR2
          include 'formats'
