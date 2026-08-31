@@ -367,7 +367,7 @@
             s% total_radial_kinetic_energy_start, &
             s% total_rotational_kinetic_energy_start, &
             s% total_turbulent_energy_start, &
-            s% total_energy_start)
+            s% total_energy_start, use_TDC_mlt_vc_old=.true.)
 
       end subroutine save_start_values
 

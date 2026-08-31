@@ -434,10 +434,11 @@
                s% total_radial_kinetic_energy_old, &
                s% total_rotational_kinetic_energy_old, &
                s% total_turbulent_energy_old, &
-               s% total_energy_old)
+               s% total_energy_old, use_TDC_mlt_vc_old=.true.)
          end if
 
-         s% surface_cell_specific_total_energy_old = cell_specific_total_energy(s,1)
+         s% surface_cell_specific_total_energy_old = &
+            cell_specific_total_energy(s, 1, use_TDC_mlt_vc_old=.true.)
 
          if (.not. s% have_initial_energy_integrals) then
             s% total_internal_energy_initial = &
