@@ -2395,11 +2395,35 @@
       end function eval_deltaM_total_from_profile
 
 
-      real(dp) function cell_specific_total_energy(s, k) result(cell_total)
+      real(dp) function tdc_cell_specific_turbulent_energy( &
+            s, k, use_mlt_vc_old) result(cell_turbulent_energy)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, TDC_eturb_cell
+         logical, intent(in) :: use_mlt_vc_old
+
+         if (use_mlt_vc_old) then
+            cell_turbulent_energy = 0.75d0*pow2(s% mlt_vc_old(k))
+            if (k < s% nz) cell_turbulent_energy = cell_turbulent_energy + &
+               0.75d0*pow2(s% mlt_vc_old(k+1))
+         else
+            cell_turbulent_energy = 0.75d0*pow2(s% mlt_vc(k))
+            if (k < s% nz) cell_turbulent_energy = cell_turbulent_energy + &
+               0.75d0*pow2(s% mlt_vc(k+1))
+         end if
+      end function tdc_cell_specific_turbulent_energy
+
+
+      real(dp) function cell_specific_total_energy( &
+            s, k, use_TDC_mlt_vc_old) result(cell_total)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
+         real(dp) :: d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         logical :: use_old_mlt_vc
          include 'formats'
+         use_old_mlt_vc = .false.
+         if (present(use_TDC_mlt_vc_old)) &
+            use_old_mlt_vc = use_TDC_mlt_vc_old
          cell_total = s% energy(k)
          if (s% v_flag .or. s% u_flag) &
             cell_total = cell_total + cell_specific_KE(s,k,d_dv00,d_dvp1)
@@ -2409,10 +2433,8 @@
          if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
          if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
                s%TDC_include_eturb_in_energy_equation) then
-            TDC_eturb_cell = 0.75d0*pow2(s%mlt_vc(k))
-            if (k < s%nz) TDC_eturb_cell = TDC_eturb_cell + &
-               0.75d0*pow2(s%mlt_vc(k+1))
-            cell_total = cell_total + TDC_eturb_cell
+            cell_total = cell_total + &
+               tdc_cell_specific_turbulent_energy(s, k, use_old_mlt_vc)
          end if
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
@@ -2449,7 +2471,7 @@
             total_energy_profile, &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
-            total_turbulent_energy, sum_total)
+            total_turbulent_energy, sum_total, use_TDC_mlt_vc_old)
          type (star_info), pointer :: s
          integer, intent(in) :: klo, khi  ! sum from klo to khi
          real(dp), intent(in) :: deltaM
@@ -2459,10 +2481,16 @@
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
          integer :: k
          real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, &
-            d_dlnR00, d_dlnRp1, TDC_eturb_cell
+            d_dlnR00, d_dlnRp1
+         logical :: use_old_mlt_vc
          include 'formats'
+
+         use_old_mlt_vc = .false.
+         if (present(use_TDC_mlt_vc_old)) &
+            use_old_mlt_vc = use_TDC_mlt_vc_old
 
          total_internal_energy = 0d0
          total_gravitational_energy = 0d0
@@ -2501,14 +2529,9 @@
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             else if ( s% MLT_option == 'TDC' .and. &
-               s% TDC_include_eturb_in_energy_equation) then ! needs corrected s% mlt_vc(k) >= 0 causes failures.
-               if (k < s% nz) then
-                  TDC_eturb_cell = 0.75d0*(pow2(s% mlt_vc(k)) + &
-                     pow2(s% mlt_vc(k+1)))
-               else ! k == s% nz
-                  TDC_eturb_cell = 0.75d0*pow2(s% mlt_vc(k))
-               end if
-               cell1 = dm*TDC_eturb_cell
+                  s% TDC_include_eturb_in_energy_equation) then
+               cell1 = dm*tdc_cell_specific_turbulent_energy( &
+                  s, k, use_old_mlt_vc)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2536,8 +2559,7 @@
          real(dp), intent(out), dimension(:) :: total_energy_profile
 
          integer :: k
-         real(dp) :: dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, &
-            TDC_eturb_cell
+         real(dp) :: dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
          include 'formats'
 
          do k=1, s%nz
@@ -2562,10 +2584,8 @@
             end if
             if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
                   s%TDC_include_eturb_in_energy_equation) then
-               TDC_eturb_cell = 0.75d0*pow2(s%mlt_vc(k))
-               if (k < s%nz) TDC_eturb_cell = TDC_eturb_cell + &
-                  0.75d0*pow2(s%mlt_vc(k+1))
-               cell_total = cell_total + dm*TDC_eturb_cell
+               cell_total = cell_total + &
+                  dm*tdc_cell_specific_turbulent_energy(s, k, .false.)
             end if
             if (s% rsp_flag) then
                cell1 = dm*s% RSP_Et(k)
@@ -2599,12 +2619,13 @@
       subroutine eval_total_energy_integrals(s, &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
-            total_turbulent_energy, sum_total)
+            total_turbulent_energy, sum_total, use_TDC_mlt_vc_old)
          type (star_info), pointer :: s
          real(dp), intent(out) :: &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
          real(dp), allocatable, dimension(:) :: total_energy_profile
          allocate(total_energy_profile(1:s% nz))
          call eval_deltaM_total_energy_integrals( &
@@ -2612,7 +2633,7 @@
             total_energy_profile, &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
-            total_turbulent_energy, sum_total)
+            total_turbulent_energy, sum_total, use_TDC_mlt_vc_old)
       end subroutine eval_total_energy_integrals
 
 
