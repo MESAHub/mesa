@@ -288,7 +288,14 @@ contains
 
       nz = s%nz
       if (use_time_centering) then
-         u_inner = wrap_opt_time_center_u_00(s, nz)
+         if (s% using_velocity_time_centering .or. &
+               .not. s% use_P_d_1_div_rho_form_of_work) then
+            ! Match the exact finite-step kinetic-energy work, which uses
+            ! (u + u_start)/2 even when optional velocity time centering is off.
+            u_inner = 0.5d0*(wrap_u_00(s, nz) + s%u_start(nz))
+         else
+            u_inner = wrap_u_00(s, nz)
+         end if
       else
          u_inner = wrap_u_00(s, nz)
       end if
@@ -662,8 +669,15 @@ contains
          v_00 = 0.5d0 *(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_p1(s, k))
          v_m1 = 0.5d0*(wrap_opt_time_center_v_00(s, k) + wrap_opt_time_center_v_m1(s, k))
      else if(s% u_flag) then
-         v_00 = wrap_opt_time_center_u_00(s,k)
-         v_m1 = wrap_opt_time_center_u_m1(s,k)
+         v_00 = wrap_u_00(s,k)
+         v_m1 = wrap_u_m1(s,k)
+         if (s% using_velocity_time_centering .or. &
+               .not. s% use_P_d_1_div_rho_form_of_work) then
+            ! Match the exact finite-step kinetic-energy work, which uses
+            ! (u + u_start)/2 even when optional velocity time centering is off.
+            v_00 = 0.5d0*(v_00 + s%u_start(k))
+            if (k > 1) v_m1 = 0.5d0*(v_m1 + s%u_start(k-1))
+         end if
       end if
 
       if (s% v_flag) then
