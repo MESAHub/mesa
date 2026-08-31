@@ -13,6 +13,26 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _duplicate_n14ag_rate_bug:
+
+Net: duplicate ``n14(a,g)f18(e+nu)o18`` reaction
+------------------------------------------------
+
+The ``cno_extras_o18_to_mg26.net`` and ``pp_cno_extras_o18_ne22.net``
+networks included both the explicit ``r_n14_ag_f18`` and ``r_f18_wk_o18``
+reactions and the approximate ``rn14ag_to_o18`` reaction. This double counted
+the ``n14(a,g)f18(e+nu)o18`` flow. The
+``cno_extras_o18_to_mg26_plus_fe56.net`` network was also affected because it
+includes ``cno_extras_o18_to_mg26.net``.
+
+This affects released MESA versions from ``r15140`` through ``r26.4.1`` and is
+fixed in the main branch after ``r26.4.1``. As a workaround, remove the
+approximate reaction after the hot CNO and ``o18`` extensions have been added::
+
+   remove_reaction(rn14ag_to_o18)
+
+See `gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
+
 .. _plasmon_weinberg_angle_bug:
 
 Neu: plasmon neutrino cooling used a hardcoded Weinberg angle
