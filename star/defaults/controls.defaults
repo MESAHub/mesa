@@ -2393,13 +2393,29 @@
       ! If ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``,
       ! ``mlt_vc_old`` (the start-of-step value) is used in place of the current
       ! solver iterate ``mlt_vc_ad`` inside the nonlinear hydro momentum equation.
-      ! This can improve numerical stability in extremely dynamic models. The
-      ! operator split does not alter ``star_LNA``, which uses the current
-      ! ``mlt_vc`` for the static background.
+      ! This can improve numerical stability in extremely dynamic models.
+      ! It does not alter ``star_LNA`` and can cause a slight mismatch with
+      ! nonlinear growth rates.
 
       ! ::
 
      TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
+
+
+      ! TDC_include_inner_boundary_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, ``u_flag`` TDC hydrodynamics includes the eddy-viscous stress
+      ! between the innermost cell and a prescribed excised boundary with
+      ! ``R_center > 0``. The corresponding ``Eq`` heating is included when
+      ! ``TDC_include_eturb_in_energy_equation`` is true. ``star_LNA`` includes
+      ! the first-order boundary stress when
+      ! ``star_LNA_perturb_eddy_viscosity`` is true. The ``v_flag``
+      ! innermost-cell stress already uses ``R_center`` and ``v_center``.
+
+      ! ::
+
+     TDC_include_inner_boundary_eddy_viscosity = .false.
 
 
       ! include_mlt_corr_to_TDC
@@ -2416,11 +2432,11 @@
       ! TDC_include_eturb_in_energy_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! While ``TDC`` is already implicitly coupled to the total energy equation, this
-      ! controls feedsback the turbulent energy into the total energy equation by
-      ! calculating and incorporating det/dt from TDC as a source term in
-      ! the total energy equation, along with the eddy viscous heating Eq. This comes
-      ! at the cost of numerical stability on long timescales, be warned.
+      ! If true, include the TDC turbulent-energy time derivative and the
+      ! eddy-viscous turbulent-energy source ``Eq`` in the energy equation.
+      ! For ``v_flag``, the corresponding ``v*Uq`` work is omitted when
+      ! ``use_P_d_1_div_rho_form_of_work`` is false because its second-neighbor
+      ! derivatives would widen the block-tridiagonal hydro stencil.
 
       ! ::
 
@@ -6703,6 +6719,8 @@
       ! from a ``.mod`` file. A negative value disables the remesh. Zero remeshes the model before
       ! the first step. A positive value remeshes after that many accepted steps. A photo restart
       ! before the selected step retains the pending remesh; a restart after it does not repeat it.
+      ! The same remesher supports TDC and RSP2. For RSP2 it remaps the
+      ! cell-centered turbulent velocity and reconstructs the pressure scale height.
 
       ! ::
 
@@ -6862,11 +6880,38 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_dq_max
       ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_max_center_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_center_dq_ratio
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If ``split_merge_amr_max_center_cell_dq`` is positive, limit the
+      ! innermost cell to this ``dq`` and increase the maximum allowed ``dq``
+      ! geometrically outward by ``split_merge_amr_center_dq_ratio``. The
+      ! resulting limit for cell ``k`` is
+      ! ``min(split_merge_amr_dq_max, split_merge_amr_max_center_cell_dq *
+      ! split_merge_amr_center_dq_ratio**(nz-k))``. The ratio must exceed one.
+      ! A nonpositive center-cell limit disables this additional zoning.
 
       ! ::
 
     split_merge_amr_dq_min = 1d-14
     split_merge_amr_dq_max = 1d0
+    split_merge_amr_max_center_cell_dq = -1d0
+    split_merge_amr_center_dq_ratio = 1.2d0
+
+
+      ! split_merge_amr_keep_R_center_fixed
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true and ``R_center`` is positive, keep ``R_center`` fixed during
+      ! the split/merge AMR gravitational-potential-energy correction. The
+      ! other radii are rescaled about ``R_center`` with a scale factor chosen
+      ! to restore the gravitational potential energy before the remesh.
+
+      ! ::
+
+    split_merge_amr_keep_R_center_fixed = .false.
 
 
       ! split_merge_amr_r_core_cm
@@ -8593,8 +8638,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_P_d_1_div_rho_form_of_work
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! P_theta_for_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
@@ -8613,6 +8658,11 @@
       ! Above ``max_logT_for_include_P_and_L_in_velocity_time_centering``, P and L are not time centered
       ! to aid in damping spurious modes in the core.
 
+      ! If ``use_P_d_1_div_rho_form_of_work`` is true, use the internal-energy
+      ! form with local ``P d(1/rho)`` work. This choice is independent of
+      ! velocity time centering and omits explicit kinetic- and potential-energy
+      ! time derivatives from the energy equation.
+
       ! ::
 
     steps_before_use_velocity_time_centering = -1
@@ -8620,7 +8670,7 @@
     P_theta_for_velocity_time_centering = 0.5d0
     include_L_in_velocity_time_centering = .false.
     L_theta_for_velocity_time_centering = 0.5d0
-    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
+    use_P_d_1_div_rho_form_of_work = .false.
     max_logT_for_include_P_and_L_in_velocity_time_centering = 1d99
 
       ! use_dPrad_dm_form_of_T_gradient_eqn

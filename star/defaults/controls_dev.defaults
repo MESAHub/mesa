@@ -50,8 +50,12 @@
       !     + for P and L in energy equation
       !     + for area when multiplied by P
       !
-      ! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
-      ! RSP2_use_Stellingwerf_Lr as in RSP
+      ! If RSP2_use_L_eqn_at_surface is true,
+      ! Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4.
+      ! If false, use the normal atmosphere temperature boundary condition
+      ! unless use_RSP_L_eqn_outer_BC or constant_L selects another boundary.
+      ! RSP2_use_mass_interp_face_values selects mass-weighted interpolation
+      ! from cell centers to RSP2 faces. Face-to-cell averages remain centered.
       !
 
       ! ::
@@ -70,23 +74,22 @@
     RSP2_report_adjust_w = .false.
     RSP2_use_L_eqn_at_surface = .true.
     RSP2_assume_HSE = .true.
-    RSP2_use_RSP_eqn_for_Y_face = .true.
-    RSP2_use_mass_interp_face_values = .false.
+    RSP2_use_mass_interp_face_values = .true.
+    ! Retained for inlist compatibility. The algebraic-gradient formulation
+    ! uses Lr = Krad*gradT.
     RSP2_use_Stellingwerf_Lr = .true.
 
     RSP2_num_outermost_cells_forced_nonturbulent = 0
     RSP2_num_innermost_cells_forced_nonturbulent = 0
 
    RSP2_w_fix_if_neg = 5d-5
-   RSP2_w_min_for_damping = 1d2
    RSP2_source_seed = 0d0
 
+   ! Use the TDC_hydro_* controls for the common TDC and RSP2 remesher.
+   ! This legacy trigger remeshes immediately when RSP2 is enabled and the
+   ! requested number of zones differs from the current model. Set it false
+   ! to use steps_before_remesh_for_TDC_pulsations instead.
    RSP2_remesh_when_load = .true.
-
-   RSP2_nz = 150
-   RSP2_nz_outer = 40
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
 
    RSP2_nz_div_IBOTOM = 30d0
 
@@ -209,6 +212,14 @@
       ! skip roots with abs(logKE_per_cycle) above this value. This catches
       ! pathological thermal roots with enormous growth or decay per period; it
       ! does not affect raw mode output. Set to 0d0 to disable the guard.
+      !
+      ! star_LNA_max_eigenvector_residual
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Maximum componentwise backward error accepted for a selected mode. The
+      ! residual is evaluated against the original full generalized eigenproblem
+      ! after reconstructing and unscaling the eigenvector. Candidate modes with
+      ! an initial residual no larger than 1d-1 are refined against the full
+      ! block-banded pencil before this limit is applied. This must be > 0.
       !
       ! star_LNA_output_file_prefix
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -400,6 +411,7 @@
     star_LNA_min_first_mode_eta = -3d0
     star_LNA_min_mode_eta = -5d0
     star_LNA_max_abs_mode_eta = 10d0
+    star_LNA_max_eigenvector_residual = 1d-3
     star_LNA_output_directory = ''
     star_LNA_output_file_prefix = ''
     star_LNA_write_matrix_summary = .true.
@@ -540,13 +552,31 @@
     TDC_adjust_mass_fallback_to_mlt = .true.
 
 
+      ! TDC_use_dynamical_gradL
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If TDC_use_dynamical_gradL = .true., multiply the neutral gradient
+      ! gradL by the ratio of the actual and QHSE pressure gradients in the
+      ! TDC and RSP2 luminosity closures. This gives
+      ! Y = gradT - f*gradL, where f = (dP/dm)/(dP/dm)_QHSE.
+      !
+      ! This option is not fully supported with the Ledoux criterion. In the
+      ! uncommon get_brunt_B fallback that already uses the QHSE pressure
+      ! interval, the composition term is multiplied by f a second time.
+
+      ! ::
+
+    TDC_use_dynamical_gradL = .false.
+
+
       ! use_TDC_enthalpy_flux_limiter
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC
       ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
-      ! star_LNA ignores this hydro limiter and always linearizes the
-      ! unsaturated TDC relation.
+      ! RSP2 includes the limiter in its algebraic temperature-gradient closure.
+      ! star_LNA linearizes the limited RSP2 relation. It ignores this limiter
+      ! for TDC and linearizes the unsaturated TDC relation.
 
       ! ::
 

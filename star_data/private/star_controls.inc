@@ -261,7 +261,8 @@
          real(dp) :: TDC_alpha_M
          real(dp) :: TDC_alpha_C
          real(dp) :: TDC_alpha_S
-         logical :: TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+         logical :: TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
+            TDC_include_inner_boundary_eddy_viscosity
          logical :: include_mlt_corr_to_TDC
          logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
          real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
@@ -690,12 +691,14 @@
             split_merge_amr_logtau_zoning, &
             split_merge_amr_okay_to_split_nz, &
             split_merge_amr_okay_to_split_1, &
-            merge_amr_inhibit_at_jumps
+            merge_amr_inhibit_at_jumps, &
+            split_merge_amr_keep_R_center_fixed
          integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters, &
             split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
+            split_merge_amr_max_center_cell_dq, split_merge_amr_center_dq_ratio, &
             split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff, &
             merge_amr_logT_for_ignore_core_cells, split_amr_logT_for_ignore_core_cells
 
@@ -855,7 +858,7 @@
             no_dedt_form_during_relax, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
-            use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
+            use_P_d_1_div_rho_form_of_work, &
             use_time_centered_eps_grav
          real(dp) :: P_theta_for_velocity_time_centering, &
             L_theta_for_velocity_time_centering, max_logT_for_include_P_and_L_in_velocity_time_centering

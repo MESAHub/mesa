@@ -2398,7 +2398,7 @@
       real(dp) function cell_specific_total_energy(s, k) result(cell_total)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: d_dv00,d_dvp1,d_dlnR00,d_dlnRp1
+         real(dp) :: d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, TDC_eturb_cell
          include 'formats'
          cell_total = s% energy(k)
          if (s% v_flag .or. s% u_flag) &
@@ -2407,6 +2407,13 @@
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
          if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
+         if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
+               s%TDC_include_eturb_in_energy_equation) then
+            TDC_eturb_cell = 0.75d0*pow2(s%mlt_vc(k))
+            if (k < s%nz) TDC_eturb_cell = TDC_eturb_cell + &
+               0.75d0*pow2(s%mlt_vc(k+1))
+            cell_total = cell_total + TDC_eturb_cell
+         end if
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
 
@@ -2453,7 +2460,8 @@
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
          integer :: k
-         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, alfa, beta,TDC_eturb_cell
+         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, &
+            d_dlnR00, d_dlnRp1, TDC_eturb_cell
          include 'formats'
 
          total_internal_energy = 0d0
@@ -2528,7 +2536,8 @@
          real(dp), intent(out), dimension(:) :: total_energy_profile
 
          integer :: k
-         real(dp) :: dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         real(dp) :: dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, &
+            TDC_eturb_cell
          include 'formats'
 
          do k=1, s%nz
@@ -2550,6 +2559,13 @@
             if (s% RSP2_flag) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
+            end if
+            if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
+                  s%TDC_include_eturb_in_energy_equation) then
+               TDC_eturb_cell = 0.75d0*pow2(s%mlt_vc(k))
+               if (k < s%nz) TDC_eturb_cell = TDC_eturb_cell + &
+                  0.75d0*pow2(s%mlt_vc(k+1))
+               cell_total = cell_total + dm*TDC_eturb_cell
             end if
             if (s% rsp_flag) then
                cell1 = dm*s% RSP_Et(k)

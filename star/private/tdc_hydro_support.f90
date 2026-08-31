@@ -34,6 +34,7 @@ module tdc_hydro_support
 contains
 
    subroutine remesh_for_TDC_pulsations(s, ierr)
+      ! The same envelope mesh is used for TDC and RSP2 pulsations.
       ! uses these controls
       !  TDC_hydro_nz = 190
       !  TDC_hydro_nz_outer = 40
@@ -43,6 +44,7 @@ contains
       !  TDC_hydro_dq_1_factor = 2d0
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
+      use hydro_rsp2, only: Hp_face_for_rsp2_val
       use hydro_vars, only: set_cgrav
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -106,6 +108,7 @@ contains
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
       if (s%i_u /= 0) call interpolate1_cell_val2(s%i_u)
+      if (s%RSP2_flag) call interpolate1_cell_val2(s%i_w)
       do j = 1, s%species
          call remap1_xa2(j)
       end do
@@ -116,6 +119,13 @@ contains
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in set_cgrav')
       call revise_lnT_for_QHSE2(P_surf, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in revise_lnT_for_QHSE')
+      if (s%RSP2_flag) then
+         do k = 1, nz
+            s%Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
+            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed to set RSP2 Hp')
+            s%xh(s%i_Hp, k) = s%Hp_face(k)
+         end do
+      end if
       if (s%rotation_flag) call set_rotation_seed2
       deallocate (work1)
       write (*, 1) 'new old L_surf/Lsun', s%xh(s%i_lum, 1)/Lsun, old_L1/Lsun
@@ -128,8 +138,8 @@ contains
          integer :: nz_base
          include 'formats'
          nz_base = nz - s%TDC_hydro_nz_T_gradient
-         if (s%RSP_flag .or. s%RSP2_flag) then
-            write(*,'(A)') 'TDC remesh cannot be applied after enabling RSP or RSP2'
+         if (s%RSP_flag) then
+            write(*,'(A)') 'TDC remesh cannot be applied after enabling RSP'
             ierr = -1
          else if (nz > nz_old) then
             write(*,3) 'TDC remesh cannot increase the number of zones', nz, nz_old

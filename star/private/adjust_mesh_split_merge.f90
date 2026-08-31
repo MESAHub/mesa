@@ -296,6 +296,21 @@
       end function split_respects_dlnR_min
 
 
+      real(dp) function center_dq_limit(s, k, nz) result(dq_limit)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nz
+         real(dp) :: log_center_limit
+
+         dq_limit = s% split_merge_amr_dq_max
+         if (s% split_merge_amr_max_center_cell_dq <= 0d0) return
+
+         if (s% split_merge_amr_max_center_cell_dq >= dq_limit) return
+         log_center_limit = log(s% split_merge_amr_max_center_cell_dq) + &
+            real(nz-k, dp)*log(s% split_merge_amr_center_dq_ratio)
+         if (log_center_limit < log(dq_limit)) dq_limit = exp(log_center_limit)
+      end function center_dq_limit
+
+
       subroutine emergency_merge(s, iTooSmall)
          type (star_info), pointer :: s
          integer, intent(out) :: iTooSmall
@@ -314,12 +329,19 @@
          type (star_info), pointer :: s
          integer, intent(out) :: iTooBig
          integer :: k
+         real(dp) :: dq_limit, oversize_ratio, max_oversize_ratio
          include 'formats'
          iTooBig = 0
+         max_oversize_ratio = 0d0
          do k = 1, s% nz
-            if (s% dq(k) <= s% split_merge_amr_dq_max) cycle
+            dq_limit = center_dq_limit(s, k, s% nz)
+            if (s% dq(k) <= dq_limit) cycle
             if (.not. split_respects_dlnR_min(s, k)) cycle
-            if (iTooBig == 0 .or. s% dq(k) > s% dq(iTooBig)) iTooBig = k
+            oversize_ratio = s% dq(k)/dq_limit
+            if (oversize_ratio > max_oversize_ratio) then
+               max_oversize_ratio = oversize_ratio
+               iTooBig = k
+            end if
          end do
       end subroutine emergency_split
 
@@ -332,7 +354,7 @@
          integer, intent(out) :: iTooBig, iTooSmall
          real(dp) :: &
             oversize_ratio, undersize_ratio, abs_du_div_cs, &
-            xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dx_baseline, &
+            xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dq_max_k, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
             metric_logR_weight, metric_logtau_weight, metric_weight_sum, &
@@ -340,7 +362,7 @@
             guarded_undersize_ratio
          real(dp) :: cell_metric(2), pair_metric(2), guarded_pair_metric(2)
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
-            du_div_cs_limit_flag, metric_zoning, metric_merge_guard
+            du_div_cs_limit_flag, metric_zoning, metric_merge_guard, center_dq_merge_guard
          integer :: nz, nz_baseline, k, nz_r_core, i_merge, ip_merge, &
             num_metric_guard_rejections, guarded_i_merge, guarded_ip_merge
          real(dp), pointer :: v(:), r_for_v(:)
@@ -464,6 +486,7 @@
             xL = xR
             dx_baseline = inner_dx_baseline
             dq_min_k = dq_min
+            dq_max_k = center_dq_limit(s, k, nz)
             if (k == 1) dq_min_k = max(dq_min_k, s% min_surface_cell_dq)
             if (metric_zoning .and. s% split_merge_amr_MaxLong > 0d0) then
                call metric_cell(k, cell_metric)
@@ -528,6 +551,8 @@
 
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
+            if (s% split_merge_amr_max_center_cell_dq > 0d0) &
+               oversize_ratio = max(oversize_ratio, s% dq(k)/dq_max_k)
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min_k .and. &
                   split_respects_dlnR_min(s, k)) then
                if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
@@ -553,6 +578,13 @@
                undersize_ratio = dq_min_k/s% dq(k)
             end if
 
+            center_dq_merge_guard = .false.
+            if (s% split_merge_amr_max_center_cell_dq > 0d0) then
+               call select_merge_pair(s, k, i_merge, ip_merge)
+               center_dq_merge_guard = s% dq(i_merge) + s% dq(ip_merge) > &
+                  center_dq_limit(s, i_merge, nz-1)
+            end if
+
             metric_merge_guard = .false.
             ! Do not merge a pair that the split criterion would immediately reject.
             if (metric_zoning) then
@@ -572,7 +604,7 @@
                end if
             end if
 
-            if (.not. metric_merge_guard) then
+            if (.not. metric_merge_guard .and. .not. center_dq_merge_guard) then
                if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
                   call check_merge_limits
                else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
@@ -963,31 +995,116 @@
          if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
 
          star_PE1 = get_star_PE(s)
-         call revise_star_radius(s, star_PE0, star_PE1)
+         call revise_star_radius(s, star_PE0, star_PE1, ierr)
+         if (ierr /= 0) return
 
       end subroutine do_merge
 
 
-      subroutine revise_star_radius(s, star_PE0, star_PE1)
+      subroutine revise_star_radius(s, star_PE0, star_PE1, ierr)
          use star_utils, only: store_r_in_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
+         integer, intent(out) :: ierr
          integer :: k
          real(dp) :: frac
+         logical :: keep_R_center_fixed
          include 'formats'
+         ierr = 0
          if (star_PE1 == 0d0 .or. star_PE0 == star_PE1) return
-         frac = star_PE1/star_PE0
+         keep_R_center_fixed = &
+            s% split_merge_amr_keep_R_center_fixed .and. s% R_center > 0d0
+         if (keep_R_center_fixed) then
+            call get_fixed_R_center_radius_scale(s, star_PE0, star_PE1, frac, ierr)
+            if (ierr /= 0) return
+         else
+            frac = star_PE1/star_PE0
+         end if
          if (s% model_number == -6918) write(*,1) 'frac', frac
          if (s% model_number == -6918) write(*,1) 'star_PE0', star_PE0
          if (s% model_number == -6918) write(*,1) 'star_PE1', star_PE1
          do k=1,s% nz
-            s% r(k) = s% r(k)*frac
+            if (keep_R_center_fixed) then
+               s% r(k) = s% R_center + frac*(s% r(k) - s% R_center)
+            else
+               s% r(k) = s% r(k)*frac
+            end if
             if (s% model_number == -6918) write(*,2) 's% r(k)', k, s% r(k)
             call store_r_in_xh(s, k, s% r(k))
             s% lnR(k) = get_lnR_from_xh(s,k)
          end do
-         s% r_center = frac*s% r_center
+         if (.not. keep_R_center_fixed) s% r_center = frac*s% r_center
       end subroutine revise_star_radius
+
+
+      subroutine get_fixed_R_center_radius_scale(s, target_PE, current_PE, frac, ierr)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: target_PE, current_PE
+         real(dp), intent(out) :: frac
+         integer, intent(out) :: ierr
+         integer :: iter
+         real(dp) :: frac_lo, frac_hi, PE_lo, PE_hi, PE_mid
+
+         ierr = 0
+         frac = 1d0
+         frac_lo = 0d0
+         PE_lo = get_star_PE_at_fixed_R_center_scale(s, frac_lo)
+         if (target_PE >= 0d0 .or. PE_lo >= target_PE) then
+            if (s% report_ierr) write(*,*) &
+               'failed to bracket fixed R_center split/merge AMR PE correction'
+            ierr = -1
+            return
+         end if
+
+         frac_hi = 1d0
+         PE_hi = current_PE
+         do iter = 1, 100
+            if (PE_hi >= target_PE) exit
+            frac_hi = 2d0*frac_hi
+            PE_hi = get_star_PE_at_fixed_R_center_scale(s, frac_hi)
+         end do
+         if (PE_hi < target_PE) then
+            if (s% report_ierr) write(*,*) &
+               'failed to bracket fixed R_center split/merge AMR PE correction'
+            ierr = -1
+            return
+         end if
+
+         do iter = 1, 100
+            frac = 0.5d0*(frac_lo + frac_hi)
+            PE_mid = get_star_PE_at_fixed_R_center_scale(s, frac)
+            if (abs(PE_mid - target_PE) <= 1d-14*abs(target_PE)) return
+            if (PE_mid < target_PE) then
+               frac_lo = frac
+            else
+               frac_hi = frac
+            end if
+         end do
+         frac = 0.5d0*(frac_lo + frac_hi)
+      end subroutine get_fixed_R_center_radius_scale
+
+
+      real(dp) function get_star_PE_at_fixed_R_center_scale(s, frac) result(totPE)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: frac
+         integer :: k
+         real(dp) :: PE, rL, rC, dm, mC
+
+         totPE = 0d0
+         do k=1,s% nz
+            if (k == s% nz) then
+               rL = s% R_center
+            else
+               rL = s% r(k+1)
+            end if
+            rC = 0.5d0*(rL + s% r(k))
+            rC = s% R_center + frac*(rC - s% R_center)
+            dm = s% dm(k)
+            mC = s% m(k) - 0.5d0*dm
+            PE = -s% cgrav(k)*mC*dm/rC
+            totPE = totPE + PE
+         end do
+      end function get_star_PE_at_fixed_R_center_scale
 
 
       real(dp) function get_star_PE(s) result(totPE)
@@ -1639,7 +1756,8 @@
          if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          star_PE1 = get_star_PE(s)
-         call revise_star_radius(s, star_PE0, star_PE1)
+         call revise_star_radius(s, star_PE0, star_PE1, ierr)
+         if (ierr /= 0) return
 
          pressure_reconstructed = .false.
          if (s% u_flag .and. s% split_merge_amr_reconstruct_pressure_for_u_flag) then

@@ -91,7 +91,6 @@ SRCS := \
    private/hydro_riemann.f90 \
    private/hydro_rotation.f90 \
    private/hydro_rsp2.f90 \
-   private/hydro_rsp2_support.f90 \
    private/hydro_temperature.f90 \
    private/hydro_vars.f90 \
    private/init.f90 \

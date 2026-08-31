@@ -1817,7 +1817,7 @@
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
-         use set_flags, only: set_TDC_to_RSP2_mesh
+         use set_flags, only: set_pulsation_envelope_mesh
 
          type (star_info), pointer :: s
 
@@ -1867,8 +1867,8 @@
                s% job% load_saved_model .and. &
                s% model_number == s% init_model_number + &
                   s% steps_before_remesh_for_TDC_pulsations) then
-            call set_TDC_to_RSP2_mesh(s% id, ierr)
-            if (failed('set_TDC_to_RSP2_mesh ierr')) return
+            call set_pulsation_envelope_mesh(s% id, ierr)
+            if (failed('set_pulsation_envelope_mesh ierr')) return
             did_TDC_remesh = .true.
          end if
 

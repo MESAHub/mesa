@@ -95,7 +95,9 @@
 
          gradr_factor = get_effective_gradr_factor_ad(s, k)
          ! RTI can replace the final chemical-mixing label while MLT remains active.
-         if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
+         if (s% RSP2_flag) then
+            Lrad_ad = s% Lr_ad(k)
+         else if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
                .and. s% mlt_mixing_type(k) == convective_mixing &
                .and. abs(gradr_factor%val) > 1d-20) then
             ! Evaluate L/gradr analytically so the split is finite at zero luminosity.

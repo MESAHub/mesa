@@ -103,13 +103,13 @@ semiconvective and thermohaline diffusion coefficients while preventing their
 diffusion-equivalent velocities from entering turbulent energy, turbulent
 pressure, or TDC momentum terms.
 
-Fixed local eddy-viscous energy accounting when the ``dedt`` energy equation
-explicitly includes radial kinetic energy. TDC now includes the midpoint
-mechanical work from its cell-centered ``u_flag`` acceleration or its
-half-cell ``v_flag`` accelerations in addition to viscous heating. RSP2 uses
-the same ``v_flag`` correction. Energy equations that omit ``dKE/dt``,
-including the time-centered ``P d(1/rho)`` form used by pulsation models,
-continue to include viscous heating alone.
+RSP2 now includes midpoint eddy-viscous mechanical work when the ``dedt``
+energy equation explicitly includes radial kinetic energy. TDC does not
+include this ``v*Uq`` term because its half-cell work requires second-neighbor
+derivatives which are not carried by the hydro matrix. The
+``use_P_d_1_div_rho_form_of_work`` option omits explicit kinetic- and
+potential-energy time derivatives and therefore does not require this work
+term.
 
 Fixed RTI handling during model cuts and split/merge AMR. Relaxation to a
 stellar cut now restores an incoming ``RTI_flag``. Splitting a cell now

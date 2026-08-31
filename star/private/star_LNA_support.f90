@@ -21,11 +21,11 @@
 
       use star_private_def
       use star_lna_turbulence_closures, only: &
-         chi_coefficient_for_star_LNA, d_mlt_Pturb_face_for_star_LNA, &
+         d_mlt_Pturb_face_for_star_LNA, &
          frozen_flux_luminosity_resid_for_star_LNA, Ptot_for_star_LNA, &
          pressure_components_for_star_LNA, &
          rsp2_forces_non_turbulent_cell, &
-         rsp2_luminosity_resid_for_star_LNA, rsp2_luminosity_terms_for_star_LNA, &
+         rsp2_luminosity_terms_for_star_LNA, &
          rsp2_terms_for_star_LNA_audit, &
          rsp2_turbulent_energy_inertia_for_star_LNA, rsp2_turbulent_energy_rhs_for_star_LNA, &
          star_LNA_eval_dlnPdm_qhse, star_LNA_HSE_grav_term, &
@@ -45,7 +45,7 @@
          shift_m1, wrap, wrap_d_00, wrap_Hp_00, wrap_L_00, wrap_L_p1, &
          wrap_lnd_00, wrap_lnPeos_00, wrap_lnPeos_m1, wrap_Peos_00, &
          wrap_lnT_00, wrap_lnT_m1, wrap_r_00, wrap_r_p1, wrap_r_m1, &
-         wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_v_m1
+         wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1
       use hydro_vars, only: set_Teff_info_for_eqns
       use hydro_riemann, only: do_uface_and_Pface, eval_Riemann_dudt_rhs
       use hydro_rsp2, only: Hp_face_for_rsp2_eqn
@@ -96,7 +96,6 @@
       integer, parameter :: lna_eq_surface_fixed_velocity = 7
       integer, parameter :: lna_eq_energy = 8
       integer, parameter :: lna_eq_luminosity_rsp_surface = 9
-      integer, parameter :: lna_eq_luminosity_rsp2 = 10
       integer, parameter :: lna_eq_luminosity_tdc = 11
       integer, parameter :: lna_eq_luminosity_frozen_flux = 12
       integer, parameter :: lna_eq_surface_temperature = 13
@@ -108,6 +107,10 @@
       integer, parameter :: lna_eq_tdc_zero_w = 19
       integer, parameter :: lna_eq_mlt_static_temperature_gradient = 20
       integer, parameter :: num_lna_equations = lna_eq_mlt_static_temperature_gradient
+
+      integer, parameter :: star_LNA_max_refinement_iterations = 4
+      ! Newton refinement is local; do not move roots with order-unity defects.
+      real(dp), parameter :: star_LNA_max_initial_refinement_residual = 1d-1
 
       character(len=1), parameter :: star_LNA_backslash = achar(92)
 
@@ -242,6 +245,13 @@
             return
          end if
 
+         if (s% star_LNA_max_eigenvector_residual <= 0d0 .or. &
+               is_bad(s% star_LNA_max_eigenvector_residual)) then
+            write(*,'(a)') 'star_LNA_max_eigenvector_residual must be > 0.'
+            ierr = -1
+            return
+         end if
+
          if (s% star_LNA_set_initial_velocity) then
             if (.not. (s% v_flag .or. s% u_flag)) then
                write(*,'(a)') &
@@ -347,8 +357,9 @@
             return
          end if
 
-         if (s% RSP2_flag .and. frozen_flux_lna_selected(s)) then
-            write(*,'(a)') 'star_LNA frozen_flux supports only models without RSP2.'
+         if (s% RSP2_flag .and. &
+               trim(s% star_LNA_convection_treatment) /= 'perturbed') then
+            write(*,'(a)') 'RSP2 star_LNA requires perturbed convection.'
             ierr = -1
             return
          end if
@@ -519,8 +530,6 @@
          case (lna_var_L)
             if (use_rsp_lsurf_row_for_star_LNA(s, k)) then
                eq_id = lna_eq_luminosity_rsp_surface
-            else if (s% RSP2_flag) then
-               eq_id = lna_eq_luminosity_rsp2
             else if (tdc_lna_active(s) .and. k > 1) then
                eq_id = lna_eq_luminosity_tdc
             else if (frozen_flux_lna_active(s) .and. k > 1) then
@@ -1099,20 +1108,40 @@
       end subroutine energy_sources_for_star_LNA
 
 
-      ! Static pressure work row:
-      !   dwork/dm = [P*A*v]_k - [P*A*v]_{k+1}
-      !
-      ! For a static LNA background, v0 = 0, so the first order row is
-      !   delta(dwork/dm) = [P0*delta(A*v)]_k - [P0*delta(A*v)]_{k+1}.
-      ! This intentionally does not include delta(P)*A*v0 terms.
+      ! Static pressure work row. The simple branch uses
+      !   P_k*([A*v]_k - [A*v]_{k+1})/dm_k.
+      ! The total-energy branch uses
+      !   ([P*A*v]_k - [P*A*v]_{k+1})/dm_k.
+      ! Terms proportional to delta(P)*A*v0 vanish on the static background.
       subroutine dwork_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: dwork_dm_ad
          integer, intent(out) :: ierr
-         real(dp) :: P_out, P_in
+         real(dp) :: P_cell, P_out, P_in
+         type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad
 
          ierr = 0
+         if (s% use_P_d_1_div_rho_form_of_work) then
+            call Ptot_for_star_LNA(s, k, P_cell_ad, ierr)
+            if (ierr /= 0) return
+            P_cell = P_cell_ad%val
+            if (s% mlt_Pturb_factor > 0d0 .and. k > 1 .and. s% mlt_vc_old(k) > 0d0) then
+               rho_face_ad = get_rho_face(s, k)
+               P_cell = P_cell + &
+                  s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face_ad%val/3d0
+            end if
+            if (k < s% nz) then
+               dwork_dm_ad = 4d0*pi*P_cell*( &
+                  s% r(k)*s% r(k)*wrap_v_00(s, k) - &
+                  s% r(k + 1)*s% r(k + 1)*wrap_v_p1(s, k))/s% dm(k)
+            else
+               dwork_dm_ad = &
+                  4d0*pi*P_cell*s% r(k)*s% r(k)*wrap_v_00(s, k)/s% dm(k)
+            end if
+            return
+         end if
+
          if (s% u_flag) then
             P_out = s% P_face_ad(k)%val
          else
@@ -1172,8 +1201,7 @@
          ierr = 0
          inertia_ad = 0d0
          if (trim(s% energy_eqn_option) /= 'dedt') return
-         if (s% using_velocity_time_centering .and. &
-               s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) return
+         if (s% use_P_d_1_div_rho_form_of_work) return
 
          call get_dke_dt_dpe_dt(s, k, 1d0, &
             dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
@@ -1197,12 +1225,14 @@
 
       ! Luminosity/temperature slot. The variable in this slot is L, but the
       ! equation depends on the active physics:
-      !   RSP surface:       L_1 - Lsurf(T_1,r_1) = 0
-      !   RSP2:              Lr + Lc + Lt - L = 0
+      !   RSP/RSP2 surface:  L_1 - Lsurf(T_1,r_1) = 0
+      !   RSP2 interior:     dm_bar*dlnPdm_QHSE*gradT - dlnT = 0
       !   TDC:               Lrad + Lconv - L = 0
       !   Frozen flux:       Lrad + Lconv0 - L = 0
       !   Surface without RSP: surface temperature boundary
-      !   Static without TDC:  temperature gradient relation
+      !   Static without TDC:  dm_bar*dlnPdm_QHSE*gradT - dlnT = 0
+      ! The interior temperature row is
+      !   dm_bar*(dlnP/dm)_QHSE*gradT - (lnT(k-1) - lnT(k)) = 0.
       subroutine assemble_luminosity_rows(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -1222,8 +1252,6 @@
 
             if (use_rsp_lsurf_row_for_star_LNA(s, k)) then
                call rsp_lsurf_resid_for_star_LNA(s, map%nz, luminosity_resid_ad)
-            else if (s% RSP2_flag) then
-               call rsp2_luminosity_resid_for_star_LNA(s, k, luminosity_resid_ad)
             else if (tdc_lna_active(s) .and. k > 1) then
                call tdc_luminosity_resid_for_star_LNA(s, k, luminosity_resid_ad, ierr)
                if (ierr /= 0) return
@@ -1248,9 +1276,8 @@
          type(star_info), pointer :: s
          integer, intent(in) :: k
 
-         use_rsp_lsurf_row = k == 1 .and. s% use_RSP_L_eqn_outer_BC
-         if (use_rsp_lsurf_row .and. s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface) &
-            use_rsp_lsurf_row = .false.
+         use_rsp_lsurf_row = k == 1 .and. (s% use_RSP_L_eqn_outer_BC .or. &
+            (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface))
       end function use_rsp_lsurf_row_for_star_LNA
 
 
@@ -1356,9 +1383,11 @@
             opacity_face_ad = get_kap_face(s, k)
          end if
 
-         ! Match hydro_temperature.do1_alt_dlnT_dm_eqn in convective cells.
+         ! Match hydro_temperature.do1_alt_dlnT_dm_eqn.
          gradr_factor_ad = get_effective_gradr_factor_ad(s, k)
-         if (s% lnT(k)/ln10 <= s% max_logT_for_mlt .and. &
+         if (s% RSP2_flag) then
+            Lrad_ad = s% Lr_ad(k)
+         else if (s% lnT(k)/ln10 <= s% max_logT_for_mlt .and. &
                s% mlt_mixing_type(k) == convective_mixing .and. &
                abs(gradr_factor_ad%val) > 1d-20) then
             L0_ad = get_Lrad_per_gradT_face_ad( &
@@ -1737,7 +1766,7 @@
          end select
       end subroutine ad_index_to_star_LNA_var
 
-      ! Dense generalized eigensolver and algebraic elimination.
+      ! Dense eigensolver after elimination of algebraic variables.
       subroutine solve_dense_star_LNA(s, map, mtx, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
@@ -1746,29 +1775,47 @@
          type(star_LNA_matrix) :: scaled_mtx
          integer :: info, lwork, ndyn, nalg
          integer, allocatable :: dyn_idx(:), alg_idx(:)
+         real(dp) :: time_scale
          real(dp), allocatable :: Ared(:,:), Bred(:,:), alg_from_dyn(:,:), &
             Awork(:,:), Bwork(:,:), alphar(:), alphai(:), beta(:), &
-            vl(:,:), vr_red(:,:), work(:), full_col_scale(:)
+            vl(:,:), vr_red(:,:), vr_full(:,:), work(:), full_col_scale(:), &
+            reduced_col_scale(:)
 
          ierr = 0
+         time_scale = s% dynamic_timescale
+         if (time_scale <= 0d0 .or. is_bad(time_scale)) then
+            write(*,'(a)') 'star_LNA: invalid dynamical timescale for dense solve.'
+            ierr = -1
+            return
+         end if
+
          call scale_star_LNA_matrix_for_solver(mtx, scaled_mtx, full_col_scale, ierr)
          if (ierr /= 0) return
          call build_reduced_star_LNA_problem( &
             map, scaled_mtx, Ared, Bred, alg_from_dyn, dyn_idx, alg_idx, ndyn, nalg, ierr)
-         call free_star_LNA_matrix(scaled_mtx)
          if (ierr /= 0) then
+            call free_star_LNA_matrix(scaled_mtx)
             deallocate(full_col_scale)
             return
          end if
-         write(*,'(a,i0,a,i0)') 'star_LNA: reduced dynamic variables = ', &
+         write(*,'(a,i0,a,i0)') 'star_LNA: dynamic variables = ', &
             ndyn, ', algebraic variables eliminated = ', nalg
 
-         allocate( &
-            Awork(ndyn, ndyn), Bwork(ndyn, ndyn), &
-            alphar(ndyn), alphai(ndyn), beta(ndyn), &
-            vl(ndyn, ndyn), vr_red(ndyn, ndyn), stat=ierr)
+         Bred = Bred/time_scale
+         call scale_star_LNA_pencil(Ared, Bred, reduced_col_scale, ierr)
          if (ierr /= 0) then
+            call free_star_LNA_matrix(scaled_mtx)
             deallocate(full_col_scale)
+            deallocate(Ared, Bred, alg_from_dyn, dyn_idx, alg_idx)
+            return
+         end if
+
+         allocate( &
+            Awork(ndyn, ndyn), Bwork(ndyn, ndyn), alphar(ndyn), alphai(ndyn), &
+            beta(ndyn), vl(1, 1), vr_red(ndyn, ndyn), stat=ierr)
+         if (ierr /= 0) then
+            call free_star_LNA_matrix(scaled_mtx)
+            deallocate(full_col_scale, reduced_col_scale)
             deallocate(Ared, Bred, alg_from_dyn, dyn_idx, alg_idx)
             return
          end if
@@ -1776,8 +1823,9 @@
          lwork = max(1, 8*ndyn)
          allocate(work(lwork), stat=ierr)
          if (ierr /= 0) then
+            call free_star_LNA_matrix(scaled_mtx)
             deallocate(Awork, Bwork, alphar, alphai, beta, vl, vr_red)
-            deallocate(full_col_scale)
+            deallocate(full_col_scale, reduced_col_scale)
             deallocate(Ared, Bred, alg_from_dyn, dyn_idx, alg_idx)
             return
          end if
@@ -1786,58 +1834,73 @@
          Bwork = Bred
          call DGGEV( &
             'N', 'V', ndyn, Awork, ndyn, Bwork, ndyn, &
-            alphar, alphai, beta, vl, ndyn, vr_red, ndyn, work, lwork, info)
+            alphar, alphai, beta, vl, 1, vr_red, ndyn, work, lwork, info)
          if (info /= 0) then
             write(*,'(a,i0)') 'star_LNA: LAPACK/DGGEV failed with info = ', info
             ierr = -1
-         else
-            call finish_dense_star_LNA_solution( &
-               s, map, alphar, alphai, beta, vr_red, dyn_idx, alg_idx, &
-               alg_from_dyn, full_col_scale, ierr)
          end if
 
+         if (ierr == 0) then
+            alphar = alphar/time_scale
+            alphai = alphai/time_scale
+            call unscale_star_LNA_reduced_eigenvectors(vr_red, reduced_col_scale)
+            call reconstruct_star_LNA_eigenvectors( &
+               map, dyn_idx, alg_idx, alg_from_dyn, vr_red, vr_full, ierr)
+         end if
+         if (ierr == 0) then
+            call finish_dense_star_LNA_solution( &
+               s, map, alphar, alphai, beta, vr_full, mtx%A, mtx%B, &
+               scaled_mtx%A, scaled_mtx%B, full_col_scale, ndyn, ierr)
+         end if
+
+         call free_star_LNA_matrix(scaled_mtx)
          deallocate(Awork, Bwork, alphar, alphai, beta, vl, vr_red, work)
-         deallocate(full_col_scale)
+         deallocate(full_col_scale, reduced_col_scale)
          deallocate(Ared, Bred, alg_from_dyn, dyn_idx, alg_idx)
+         if (allocated(vr_full)) deallocate(vr_full)
       end subroutine solve_dense_star_LNA
 
 
       subroutine finish_dense_star_LNA_solution( &
-            s, map, alphar, alphai, beta, vr_red, dyn_idx, alg_idx, &
-            alg_from_dyn, full_col_scale, ierr)
+            s, map, alphar, alphai, beta, vr, A, B, A_scaled, B_scaled, &
+            full_col_scale, nvar_dynamic, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
-         real(dp), intent(in) :: alphar(:), alphai(:), beta(:), vr_red(:,:)
-         real(dp), intent(in) :: alg_from_dyn(:,:), full_col_scale(:)
-         integer, intent(in) :: dyn_idx(:), alg_idx(:)
+         real(dp), intent(inout) :: alphar(:), alphai(:), beta(:), vr(:,:)
+         real(dp), intent(in) :: A(:,:), B(:,:), A_scaled(:,:), B_scaled(:,:), &
+            full_col_scale(:)
+         integer, intent(in) :: nvar_dynamic
          integer, intent(out) :: ierr
          integer :: num_modes
          integer, allocatable :: mode_indices(:)
-         real(dp), allocatable :: vr_full(:,:)
+         real(dp), allocatable :: mode_residuals(:)
 
          ierr = 0
-         call reconstruct_star_LNA_eigenvectors( &
-            map, dyn_idx, alg_idx, alg_from_dyn, vr_red, vr_full, ierr)
-         if (ierr == 0) call unscale_star_LNA_full_eigenvectors(vr_full, full_col_scale)
+         if (s% star_LNA_write_period_growth) &
+            call write_star_LNA_raw_modes( &
+               s, map, alphar, alphai, beta, nvar_dynamic, ierr)
          if (ierr == 0) &
-            call select_star_LNA_modes(s, alphar, alphai, beta, mode_indices, num_modes, ierr)
-         if (ierr == 0 .and. s% star_LNA_write_period_growth) &
-            call write_star_LNA_raw_modes(s, map, alphar, alphai, beta, ierr)
+            call select_star_LNA_modes( &
+               s, map, alphar, alphai, beta, A, B, A_scaled, B_scaled, &
+               full_col_scale, vr, &
+               mode_indices, mode_residuals, num_modes, ierr)
+         if (ierr == 0) call unscale_star_LNA_full_eigenvectors(vr, full_col_scale)
          if (ierr == 0) call print_star_LNA_period_growth( &
-            s, alphar, alphai, beta, mode_indices, num_modes)
+            s, alphar, alphai, beta, mode_indices, mode_residuals, num_modes)
          if (ierr == 0 .and. s% star_LNA_write_period_growth) &
             call write_star_LNA_period_growth( &
-               s, map, alphar, alphai, beta, mode_indices, num_modes, ierr)
+               s, map, alphar, alphai, beta, nvar_dynamic, &
+               mode_indices, mode_residuals, num_modes, ierr)
          if (ierr == 0 .and. &
                (s% star_LNA_write_eigenfunctions .or. s% star_LNA_write_work_integrals)) &
             call write_star_LNA_eigenfunctions( &
-               s, map, alphar, alphai, beta, vr_full, mode_indices, num_modes, ierr)
+               s, map, alphar, alphai, beta, vr, mode_indices, num_modes, ierr)
          if (ierr == 0 .and. s% star_LNA_set_initial_velocity) &
             call set_star_LNA_initial_velocity( &
-               s, map, alphar, alphai, beta, vr_full, mode_indices, num_modes, ierr)
+               s, map, alphar, alphai, beta, vr, mode_indices, num_modes, ierr)
 
          if (allocated(mode_indices)) deallocate(mode_indices)
-         if (allocated(vr_full)) deallocate(vr_full)
+         if (allocated(mode_residuals)) deallocate(mode_residuals)
       end subroutine finish_dense_star_LNA_solution
 
 
@@ -1879,6 +1942,42 @@
       end subroutine scale_star_LNA_matrix_for_solver
 
 
+      subroutine scale_star_LNA_pencil(A, B, col_scale, ierr)
+         real(dp), intent(inout) :: A(:,:), B(:,:)
+         real(dp), allocatable, intent(out) :: col_scale(:)
+         integer, intent(out) :: ierr
+         integer :: i, iteration, j
+         real(dp) :: matrix_norm, scale
+
+         ierr = 0
+         allocate(col_scale(size(A, 2)), stat=ierr)
+         if (ierr /= 0) return
+         col_scale = 1d0
+
+         ! Alternate row and column scaling because elimination changes both norms.
+         do iteration = 1, 8
+            do i = 1, size(A, 1)
+               matrix_norm = max(maxval(abs(A(i, :))), maxval(abs(B(i, :))))
+               if (matrix_norm > tiny(1d0)) then
+                  scale = 1d0/matrix_norm
+                  A(i, :) = scale*A(i, :)
+                  B(i, :) = scale*B(i, :)
+               end if
+            end do
+
+            do j = 1, size(A, 2)
+               matrix_norm = max(maxval(abs(A(:, j))), maxval(abs(B(:, j))))
+               if (matrix_norm > tiny(1d0)) then
+                  scale = 1d0/matrix_norm
+                  col_scale(j) = scale*col_scale(j)
+                  A(:, j) = scale*A(:, j)
+                  B(:, j) = scale*B(:, j)
+               end if
+            end do
+         end do
+      end subroutine scale_star_LNA_pencil
+
+
       ! Algebraic elimination:
       !   Aaa*x_alg + Aad*x_dyn = 0
       !   x_alg = -inv(Aaa)*Aad*x_dyn
@@ -1897,13 +1996,15 @@
          integer, intent(out) :: ndyn, nalg
          integer, intent(out) :: ierr
          integer :: info
-         integer, allocatable :: ipiv(:)
-         real(dp), allocatable :: Aaa(:,:), A_ad(:,:), A_da(:,:), B_da(:,:)
+         character :: equed
+         integer, allocatable :: ipiv(:), iwork(:)
+         real(dp) :: rcond
+         real(dp), allocatable :: Aaa(:,:), Aaa_fact(:,:), A_ad(:,:), A_da(:,:), B_da(:,:), &
+            row_scale(:), col_scale(:), ferr(:), berr(:), work(:)
 
          ierr = 0
-         call partition_star_LNA_indices(map, dyn_idx, alg_idx, ndyn, nalg, ierr)
+         call partition_star_LNA_indices(map, mtx, dyn_idx, alg_idx, ndyn, nalg, ierr)
          if (ierr /= 0) return
-
          if (ndyn < 1) then
             write(*,'(a)') 'star_LNA: no dynamic variables remain after algebraic partition.'
             ierr = -1
@@ -1928,33 +2029,55 @@
 
          allocate( &
             Aaa(nalg, nalg), A_ad(nalg, ndyn), A_da(ndyn, nalg), B_da(ndyn, nalg), &
-            ipiv(nalg), stat=ierr)
+            Aaa_fact(nalg, nalg), row_scale(nalg), col_scale(nalg), &
+            ferr(ndyn), berr(ndyn), work(4*nalg), ipiv(nalg), iwork(nalg), stat=ierr)
          if (ierr /= 0) return
 
          Aaa = mtx%A(alg_idx, alg_idx)
          A_ad = mtx%A(alg_idx, dyn_idx)
          A_da = mtx%A(dyn_idx, alg_idx)
          B_da = mtx%B(dyn_idx, alg_idx)
-         alg_from_dyn = A_ad
+         alg_from_dyn = 0d0
 
-         call DGESV(nalg, ndyn, Aaa, nalg, ipiv, alg_from_dyn, nalg, info)
-         if (info /= 0) then
+         ! Refine the algebraic solve before forming the Schur complement.
+         call DGESVX( &
+            'E', 'N', nalg, ndyn, Aaa, nalg, Aaa_fact, nalg, ipiv, &
+            equed, row_scale, col_scale, A_ad, nalg, alg_from_dyn, nalg, &
+            rcond, ferr, berr, work, iwork, info)
+         if (info > 0 .and. info <= nalg) then
             write(*,'(a,i0)') &
-               'star_LNA: LAPACK/DGESV failed while eliminating algebraic rows, info = ', info
+               'star_LNA: LAPACK/DGESVX found a singular algebraic block, info = ', info
             ierr = -1
-            deallocate(Aaa, A_ad, A_da, B_da, ipiv)
+            deallocate( &
+               Aaa, Aaa_fact, A_ad, A_da, B_da, row_scale, col_scale, &
+               ferr, berr, work, ipiv, iwork)
+            return
+         else if (info == nalg + 1) then
+            write(*,'(a,1pe12.4)') &
+               'star_LNA: algebraic block is ill-conditioned; rcond = ', rcond
+         else if (info /= 0) then
+            write(*,'(a,i0)') &
+               'star_LNA: LAPACK/DGESVX failed while eliminating algebraic rows, info = ', info
+            ierr = -1
+            deallocate( &
+               Aaa, Aaa_fact, A_ad, A_da, B_da, row_scale, col_scale, &
+               ferr, berr, work, ipiv, iwork)
             return
          end if
 
          Ared = Ared - matmul(A_da, alg_from_dyn)
          if (any(B_da /= 0d0)) Bred = Bred - matmul(B_da, alg_from_dyn)
 
-         deallocate(Aaa, A_ad, A_da, B_da, ipiv)
+         deallocate( &
+            Aaa, Aaa_fact, A_ad, A_da, B_da, row_scale, col_scale, &
+            ferr, berr, work, ipiv, iwork)
       end subroutine build_reduced_star_LNA_problem
 
 
-      subroutine partition_star_LNA_indices(map, dyn_idx, alg_idx, ndyn, nalg, ierr)
+      subroutine partition_star_LNA_indices( &
+            map, mtx, dyn_idx, alg_idx, ndyn, nalg, ierr)
          type(star_LNA_var_map), intent(in) :: map
+         type(star_LNA_matrix), intent(in) :: mtx
          integer, allocatable, intent(out) :: dyn_idx(:), alg_idx(:)
          integer, intent(out) :: ndyn, nalg
          integer, intent(out) :: ierr
@@ -1966,7 +2089,9 @@
          do k = 1, map%nz
             do slot = 1, map%nvar_per_zone
                var_id = map%var_id(slot)
-               if (star_LNA_var_is_dynamic(var_id)) then
+               idx = (k - 1)*map%nvar_per_zone + slot
+               if (star_LNA_var_is_dynamic(var_id) .and. &
+                     any(mtx%B(idx, :) /= 0d0)) then
                   ndyn = ndyn + 1
                else
                   nalg = nalg + 1
@@ -1983,7 +2108,9 @@
             do slot = 1, map%nvar_per_zone
                var_id = map%var_id(slot)
                idx = (k - 1)*map%nvar_per_zone + slot
-               if (star_LNA_var_is_dynamic(var_id)) then
+               ! A zero time-derivative row is an algebraic constraint.
+               if (star_LNA_var_is_dynamic(var_id) .and. &
+                     any(mtx%B(idx, :) /= 0d0)) then
                   ndyn = ndyn + 1
                   dyn_idx(ndyn) = idx
                else
@@ -1993,18 +2120,6 @@
             end do
          end do
       end subroutine partition_star_LNA_indices
-
-
-      logical function star_LNA_var_is_dynamic(var_id) result(is_dynamic)
-         integer, intent(in) :: var_id
-
-         select case (var_id)
-         case (lna_var_lnR, lna_var_v, lna_var_u, lna_var_lnT, lna_var_w)
-            is_dynamic = .true.
-         case default
-            is_dynamic = .false.
-         end select
-      end function star_LNA_var_is_dynamic
 
 
       subroutine reconstruct_star_LNA_eigenvectors( &
@@ -2030,6 +2145,17 @@
       end subroutine reconstruct_star_LNA_eigenvectors
 
 
+      subroutine unscale_star_LNA_reduced_eigenvectors(vr_red, col_scale)
+         real(dp), intent(inout) :: vr_red(:,:)
+         real(dp), intent(in) :: col_scale(:)
+         integer :: i
+
+         do i = 1, size(vr_red, 1)
+            vr_red(i, :) = col_scale(i)*vr_red(i, :)
+         end do
+      end subroutine unscale_star_LNA_reduced_eigenvectors
+
+
       subroutine unscale_star_LNA_full_eigenvectors(vr_full, full_col_scale)
          real(dp), intent(inout) :: vr_full(:,:)
          real(dp), intent(in) :: full_col_scale(:)
@@ -2040,29 +2166,75 @@
          end do
       end subroutine unscale_star_LNA_full_eigenvectors
 
+      logical function star_LNA_var_is_dynamic(var_id) result(is_dynamic)
+         integer, intent(in) :: var_id
+
+         select case (var_id)
+         case (lna_var_lnR, lna_var_v, lna_var_u, lna_var_lnT, lna_var_w)
+            is_dynamic = .true.
+         case default
+            is_dynamic = .false.
+         end select
+      end function star_LNA_var_is_dynamic
+
+
       ! Mode selection, period/growth output, eigenfunctions, and kicks.
-      subroutine select_star_LNA_modes(s, alphar, alphai, beta, mode_indices, num_modes, ierr)
+      subroutine select_star_LNA_modes( &
+            s, map, alphar, alphai, beta, A, B, A_scaled, B_scaled, &
+            full_col_scale, vr, &
+            mode_indices, mode_residuals, num_modes, ierr)
          type(star_info), pointer :: s
-         real(dp), intent(in) :: alphar(:), alphai(:), beta(:)
+         type(star_LNA_var_map), intent(in) :: map
+         real(dp), intent(inout) :: alphar(:), alphai(:), beta(:), vr(:,:)
+         real(dp), intent(in) :: A(:,:), B(:,:), A_scaled(:,:), B_scaled(:,:), &
+            full_col_scale(:)
          integer, allocatable, intent(out) :: mode_indices(:)
+         real(dp), allocatable, intent(out) :: mode_residuals(:)
          integer, intent(out) :: num_modes
          integer, intent(out) :: ierr
-         integer :: best, j, op_err
-         real(dp) :: sigma_re, sigma_im, omega, best_omega, frequency_uHz, logKE_per_cycle
-         logical :: found_first_mode
+         integer :: best, j, kl, ku, op_err, rejected_residuals, &
+            eigenvector_residual_row, first_rejected_index, first_rejected_row, &
+            first_rejected_k, first_rejected_slot, refinement_attempts, &
+            refined_eigenpairs, converged_eigenpairs, refinement_iterations, &
+            refinement_iterations_total, initial_residual_row
+         real(dp) :: sigma_re, sigma_im, omega, best_omega, frequency_uHz, &
+            logKE_per_cycle, eigenvector_residual, initial_residual, &
+            min_rejected_residual, max_rejected_residual, &
+            first_rejected_residual, first_rejected_period_days
+         complex(dp) :: sigma, initial_sigma
+         complex(dp), allocatable :: scaled_eigenvector(:), initial_eigenvector(:), &
+            full_eigenvector(:)
+         logical :: found_first_mode, refinement_improved
          logical, allocatable :: used(:)
 
          ierr = 0
          num_modes = 0
-         allocate(mode_indices(min(s% star_LNA_num_modes, size(alphar))), stat=ierr)
+         rejected_residuals = 0
+         min_rejected_residual = huge(1d0)
+         max_rejected_residual = 0d0
+         first_rejected_index = 0
+         first_rejected_row = 0
+         first_rejected_residual = 0d0
+         refinement_attempts = 0
+         refined_eigenpairs = 0
+         converged_eigenpairs = 0
+         refinement_iterations_total = 0
+         allocate( &
+            mode_indices(min(s% star_LNA_num_modes, size(alphar))), &
+            mode_residuals(min(s% star_LNA_num_modes, size(alphar))), stat=ierr)
          if (ierr /= 0) return
 
-         allocate(used(size(alphar)), stat=ierr)
+         allocate( &
+            used(size(alphar)), scaled_eigenvector(size(A, 1)), &
+            initial_eigenvector(size(A, 1)), full_eigenvector(size(A, 1)), stat=ierr)
          if (ierr /= 0) then
             deallocate(mode_indices)
+            deallocate(mode_residuals)
             return
          end if
+         call star_LNA_matrix_bandwidth(A_scaled, B_scaled, kl, ku)
          used = .false.
+         mode_residuals = 0d0
          found_first_mode = .false.
          do
             if (num_modes >= size(mode_indices)) exit
@@ -2091,6 +2263,93 @@
             logKE_per_cycle = rsp_logKE_per_cycle_for_star_LNA(sigma_re, sigma_im)
             if (s% star_LNA_max_abs_mode_eta > 0d0 .and. &
                   abs(logKE_per_cycle) > s% star_LNA_max_abs_mode_eta) cycle
+
+            call load_star_LNA_eigenvector( &
+               vr, best, alphai(best), scaled_eigenvector, op_err)
+            if (op_err /= 0) cycle
+            sigma = cmplx(sigma_re, sigma_im, kind=dp)
+            full_eigenvector = full_col_scale*scaled_eigenvector
+            call star_LNA_eigenvector_residual_from_vector( &
+               A, B, kl, ku, sigma, full_eigenvector, eigenvector_residual, &
+               eigenvector_residual_row, op_err)
+            initial_residual = eigenvector_residual
+            initial_residual_row = eigenvector_residual_row
+
+            if (op_err == 0 .and. &
+                  eigenvector_residual > s% star_LNA_max_eigenvector_residual .and. &
+                  eigenvector_residual <= star_LNA_max_initial_refinement_residual) then
+               refinement_attempts = refinement_attempts + 1
+               initial_sigma = sigma
+               initial_eigenvector = scaled_eigenvector
+               call refine_star_LNA_eigenpair( &
+                  A_scaled, B_scaled, kl, ku, s% star_LNA_max_eigenvector_residual, &
+                  sigma, scaled_eigenvector, refinement_iterations, &
+                  refinement_improved, op_err)
+               if (op_err /= 0) then
+                  deallocate(used, scaled_eigenvector, initial_eigenvector, full_eigenvector)
+                  deallocate(mode_indices, mode_residuals)
+                  ierr = op_err
+                  return
+               end if
+               refinement_iterations_total = refinement_iterations_total + refinement_iterations
+               if (refinement_improved) then
+                  sigma_re = real(sigma, kind=dp)
+                  sigma_im = aimag(sigma)
+                  full_eigenvector = full_col_scale*scaled_eigenvector
+                  call star_LNA_eigenvector_residual_from_vector( &
+                     A, B, kl, ku, sigma, full_eigenvector, eigenvector_residual, &
+                     eigenvector_residual_row, op_err)
+                  if (op_err == 0 .and. eigenvector_residual < initial_residual) then
+                     refined_eigenpairs = refined_eigenpairs + 1
+                     if (eigenvector_residual <= s% star_LNA_max_eigenvector_residual) &
+                        converged_eigenpairs = converged_eigenpairs + 1
+                     call store_star_LNA_eigenpair( &
+                        alphar, alphai, beta, vr, best, sigma, scaled_eigenvector, op_err)
+                     if (op_err /= 0) then
+                        deallocate( &
+                           used, scaled_eigenvector, initial_eigenvector, full_eigenvector)
+                        deallocate(mode_indices, mode_residuals)
+                        ierr = op_err
+                        return
+                     end if
+                  else
+                     sigma = initial_sigma
+                     scaled_eigenvector = initial_eigenvector
+                     sigma_re = real(sigma, kind=dp)
+                     sigma_im = aimag(sigma)
+                     eigenvector_residual = initial_residual
+                     eigenvector_residual_row = initial_residual_row
+                     op_err = 0
+                  end if
+               end if
+            end if
+
+            if (op_err == 0) then
+               frequency_uHz = frequency_uHz_for_star_LNA(sigma_im)
+               logKE_per_cycle = rsp_logKE_per_cycle_for_star_LNA(sigma_re, sigma_im)
+               if (sigma_im <= 1d-99 .or. &
+                     frequency_uHz < s% star_LNA_min_mode_frequency_uHz) cycle
+               if (s% star_LNA_max_abs_mode_eta > 0d0 .and. &
+                     abs(logKE_per_cycle) > s% star_LNA_max_abs_mode_eta) cycle
+            end if
+            if (op_err /= 0 .or. &
+                  eigenvector_residual > s% star_LNA_max_eigenvector_residual) then
+               rejected_residuals = rejected_residuals + 1
+               if (op_err == 0) then
+                  min_rejected_residual = min(min_rejected_residual, eigenvector_residual)
+                  max_rejected_residual = max(max_rejected_residual, eigenvector_residual)
+                  if (first_rejected_index == 0 .and. &
+                        ((.not. found_first_mode .and. &
+                           logKE_per_cycle > s% star_LNA_min_first_mode_eta) .or. &
+                         (found_first_mode .and. &
+                           logKE_per_cycle >= s% star_LNA_min_mode_eta))) then
+                     first_rejected_index = best
+                     first_rejected_row = eigenvector_residual_row
+                     first_rejected_residual = eigenvector_residual
+                  end if
+               end if
+               cycle
+            end if
             if (.not. found_first_mode) then
                if (logKE_per_cycle <= s% star_LNA_min_first_mode_eta) cycle
                found_first_mode = .true.
@@ -2099,15 +2358,54 @@
 
             num_modes = num_modes + 1
             mode_indices(num_modes) = best
+            mode_residuals(num_modes) = eigenvector_residual
          end do
 
-         deallocate(used)
+         if (refinement_attempts > 0) &
+            write(*,'(a,i0,a,i0,a,i0,a,i0,a,1pe12.4)') &
+               'star_LNA: eigenvector refinement attempts = ', refinement_attempts, &
+               ', improved eigenpairs = ', refined_eigenpairs, &
+               ', converged eigenpairs = ', converged_eigenpairs, &
+               ', iterations = ', refinement_iterations_total, &
+               ', target = ', s% star_LNA_max_eigenvector_residual
+         if (refinement_attempts > 0) &
+            write(*,'(a,i0,a,i0)') &
+               'star_LNA: full-pencil lower bandwidth = ', kl, ', upper bandwidth = ', ku
+         if (rejected_residuals > 0) then
+            write(*,'(a,i0,a,1pe12.4)') &
+               'star_LNA: rejected roots with large eigenvector residual = ', &
+               rejected_residuals, ', limit = ', s% star_LNA_max_eigenvector_residual
+            if (min_rejected_residual < huge(1d0)) &
+               write(*,'(a,2(1pe12.4,1x))') &
+                  'star_LNA: rejected eigenvector residual range = ', &
+                  min_rejected_residual, max_rejected_residual
+         end if
+         if (first_rejected_index > 0) then
+            call finite_sigma_from_star_LNA_eigenvalue( &
+               alphar(first_rejected_index), alphai(first_rejected_index), &
+               beta(first_rejected_index), sigma_re, sigma_im, op_err)
+            if (op_err == 0) then
+               first_rejected_period_days = period_sec_for_star_LNA(sigma_im)/86400d0
+               call matrix_index_to_zone_slot( &
+                  map, first_rejected_row, first_rejected_k, first_rejected_slot)
+               write(*,'(a,1pe12.4,a,1pe12.4)') &
+                  'star_LNA: first residual-rejected candidate period_days = ', &
+                  first_rejected_period_days, ', residual = ', first_rejected_residual
+               write(*,'(a,i0,a,i0,a,a)') &
+                  'star_LNA: largest residual for that candidate is row ', &
+                  first_rejected_row, ', k = ', first_rejected_k, &
+                  ', row variable = ', trim(var_name_from_slot(map, first_rejected_slot))
+            end if
+         end if
+         deallocate(used, scaled_eigenvector, initial_eigenvector, full_eigenvector)
       end subroutine select_star_LNA_modes
 
 
-      subroutine print_star_LNA_period_growth(s, alphar, alphai, beta, mode_indices, num_modes)
+      subroutine print_star_LNA_period_growth( &
+            s, alphar, alphai, beta, mode_indices, mode_residuals, num_modes)
          type(star_info), pointer :: s
          real(dp), intent(in) :: alphar(:), alphai(:), beta(:)
+         real(dp), intent(in) :: mode_residuals(:)
          integer, intent(in) :: mode_indices(:), num_modes
          integer :: mode, idx, op_err
          real(dp) :: sigma_re, sigma_im, period_days, logKE_per_cycle
@@ -2115,7 +2413,7 @@
 
          write(*,'(a)') 'star_LNA modes:'
          write(*,'(a)') &
-            ' mode     P(days)      logKE/cyc      KE frac        GREKM       amp frac'
+            ' mode     P(days)      logKE/cyc      KE frac        GREKM       amp frac      residual'
          if (num_modes < 1) then
             write(*,'(a)') 'star_LNA: no modes passed the frequency/logKE_per_cycle selection.'
             return
@@ -2130,16 +2428,19 @@
             ke_growth_per_period = ke_fractional_growth_per_period_for_star_LNA(sigma_re, sigma_im)
             grekm_growth_per_period = rsp_grekm_growth_per_period_for_star_LNA(sigma_re, sigma_im)
             amp_growth_per_period = amp_fractional_growth_per_period_for_star_LNA(sigma_re, sigma_im)
-            write(*,'(1x,i5,5(1x,1pe13.5))') mode - 1, period_days, logKE_per_cycle, &
-               ke_growth_per_period, grekm_growth_per_period, amp_growth_per_period
+            write(*,'(1x,i5,6(1x,1pe13.5))') mode - 1, period_days, logKE_per_cycle, &
+               ke_growth_per_period, grekm_growth_per_period, amp_growth_per_period, &
+               mode_residuals(mode)
          end do
       end subroutine print_star_LNA_period_growth
 
 
-      subroutine write_star_LNA_raw_modes(s, map, alphar, alphai, beta, ierr)
+      subroutine write_star_LNA_raw_modes( &
+            s, map, alphar, alphai, beta, nvar_dynamic, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(in) :: alphar(:), alphai(:), beta(:)
+         integer, intent(in) :: nvar_dynamic
          integer, intent(out) :: ierr
          integer :: io, raw_rank, best, j, op_err
          real(dp) :: sigma_re, sigma_im, omega, best_omega
@@ -2155,14 +2456,15 @@
 
          write(io,'(a)') '# star_LNA raw finite positive frequency eigenvalues'
          write(io,'(a)') '# sorted by increasing sigma_imag before acoustic branch selection'
+         write(io,'(a)') '# values are written before full-pencil eigenpair refinement'
          write(io,'(a,1x,i0)') '# nz', map%nz
          write(io,'(a,1x,i0)') '# model_nz', s% nz
          write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,i0)') '# nvar_total', map%nvar_total
-         write(io,'(a,1x,i0)') '# nvar_dynamic', size(alphar)
-         write(io,'(a)') '# eigen indices refer to the reduced dynamic variable eigenproblem'
+         write(io,'(a,1x,i0)') '# nvar_dynamic', nvar_dynamic
+         write(io,'(a)') '# eigen indices refer to the reduced generalized eigenproblem'
          write(io,'(a)') &
-            '# raw_rank reduced_eigen_index sigma_real sigma_imag ' // &
+            '# raw_rank eigen_index sigma_real sigma_imag ' // &
             'period_days pulsation_constant_Q_days W_rad_per_sec logKE_per_cycle beta ' // &
             'ke_fractional_growth_per_period grekm_growth_per_period ' // &
             'amplitude_fractional_growth_per_period'
@@ -2217,11 +2519,12 @@
 
 
       subroutine write_star_LNA_period_growth(s, map, alphar, alphai, beta, &
-            mode_indices, num_modes, ierr)
+            nvar_dynamic, mode_indices, mode_residuals, num_modes, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(in) :: alphar(:), alphai(:), beta(:)
-         integer, intent(in) :: mode_indices(:), num_modes
+         real(dp), intent(in) :: mode_residuals(:)
+         integer, intent(in) :: nvar_dynamic, mode_indices(:), num_modes
          integer, intent(out) :: ierr
          integer :: io, mode, idx, op_err, selected
          real(dp) :: sigma_re, sigma_im, omega, period_sec, period_days, &
@@ -2235,12 +2538,12 @@
          if (ierr /= 0) return
 
          write(io,'(a)') '# star_LNA mode summary'
-         write(io,'(a)') '# reduced generalized eigenproblem: A*x = sigma*B*x'
+         write(io,'(a)') '# algebraically reduced generalized eigenproblem: A*x = sigma*B*x'
          write(io,'(a,1x,i0)') '# nz', map%nz
          write(io,'(a,1x,i0)') '# model_nz', s% nz
          write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,i0)') '# nvar_total', map%nvar_total
-         write(io,'(a,1x,i0)') '# nvar_dynamic', size(alphar)
+         write(io,'(a,1x,i0)') '# nvar_dynamic', nvar_dynamic
          write(io,'(a,1x,1pe24.16)') '# star_LNA_min_mode_frequency_uHz', &
             s% star_LNA_min_mode_frequency_uHz
          write(io,'(a,1x,1pe24.16)') '# star_LNA_min_first_mode_eta', &
@@ -2249,6 +2552,8 @@
             s% star_LNA_min_mode_eta
          write(io,'(a,1x,1pe24.16)') '# star_LNA_max_abs_mode_eta', &
             s% star_LNA_max_abs_mode_eta
+         write(io,'(a,1x,1pe24.16)') '# star_LNA_max_eigenvector_residual', &
+            s% star_LNA_max_eigenvector_residual
          write(io,'(a)') '# legacy *_eta controls filter logKE_per_cycle'
          write(io,'(a,1x,l1)') '# star_LNA_set_initial_velocity', &
             s% star_LNA_set_initial_velocity
@@ -2276,15 +2581,17 @@
             'grekm_growth_per_period is 2*tanh(logKE_per_cycle/2)'
          write(io,'(a)') &
             '# amplitude_fractional_growth_per_period is exp(logKE_per_cycle/2)-1'
-         write(io,'(a)') '# eigen indices refer to the reduced dynamic variable eigenproblem'
+         write(io,'(a)') '# eigen indices refer to the reduced generalized eigenproblem'
+         write(io,'(a)') &
+            '# max_eigenvector_residual is evaluated after full-pencil refinement'
          write(io,'(a)') &
             '# pulsation_constant_Q_days follows RSP LINA: P_days*sqrt((M/Msun)*(Rsun/R)^3)'
          write(io,'(a)') &
-            '# mode control_mode_index selected_for_initial_velocity reduced_eigen_index ' // &
+            '# mode control_mode_index selected_for_initial_velocity eigen_index ' // &
             'sigma_real sigma_imag period_days pulsation_constant_Q_days W_rad_per_sec ' // &
             'logKE_per_cycle beta ' // &
             'ke_fractional_growth_per_period grekm_growth_per_period ' // &
-            'amplitude_fractional_growth_per_period'
+            'amplitude_fractional_growth_per_period max_eigenvector_residual'
 
          do mode = 1, num_modes
             idx = mode_indices(mode)
@@ -2300,10 +2607,11 @@
             grekm_growth_per_period = rsp_grekm_growth_per_period_for_star_LNA(sigma_re, sigma_im)
             amp_growth_per_period = amp_fractional_growth_per_period_for_star_LNA(sigma_re, sigma_im)
             selected = merge(1, 0, selected_for_star_LNA_initial_velocity(s, mode))
-            write(io,'(4(i0,1x),10(1pe24.16,1x))') &
+            write(io,'(4(i0,1x),11(1pe24.16,1x))') &
                mode, mode - 1, selected, idx, &
                sigma_re, sigma_im, period_days, pulsation_Q_days, omega, logKE_per_cycle, beta(idx), &
-               ke_growth_per_period, grekm_growth_per_period, amp_growth_per_period
+               ke_growth_per_period, grekm_growth_per_period, amp_growth_per_period, &
+               mode_residuals(mode)
          end do
 
          close(io)
@@ -2390,7 +2698,7 @@
 
          active_fraction_sum = s% star_LNA_kick_fraction_1
          call add_star_LNA_kick_component( &
-            s, map, alphai, vr, mode_indices, s% star_LNA_kick_mode_1, &
+            map, alphai, vr, mode_indices, s% star_LNA_kick_mode_1, &
             s% star_LNA_kick_fraction_1, kick_eigenvector, ierr)
          if (ierr /= 0) then
             deallocate(kick_eigenvector)
@@ -2400,7 +2708,7 @@
          if (s% star_LNA_kick_mode_2 > 0 .and. s% star_LNA_kick_fraction_2 > 0d0) then
             active_fraction_sum = active_fraction_sum + s% star_LNA_kick_fraction_2
             call add_star_LNA_kick_component( &
-               s, map, alphai, vr, mode_indices, s% star_LNA_kick_mode_2, &
+               map, alphai, vr, mode_indices, s% star_LNA_kick_mode_2, &
                s% star_LNA_kick_fraction_2, kick_eigenvector, ierr)
             if (ierr /= 0) then
                deallocate(kick_eigenvector)
@@ -2411,7 +2719,7 @@
          if (s% star_LNA_kick_mode_3 > 0 .and. s% star_LNA_kick_fraction_3 > 0d0) then
             active_fraction_sum = active_fraction_sum + s% star_LNA_kick_fraction_3
             call add_star_LNA_kick_component( &
-               s, map, alphai, vr, mode_indices, s% star_LNA_kick_mode_3, &
+               map, alphai, vr, mode_indices, s% star_LNA_kick_mode_3, &
                s% star_LNA_kick_fraction_3, kick_eigenvector, ierr)
             if (ierr /= 0) then
                deallocate(kick_eigenvector)
@@ -2459,16 +2767,15 @@
 
 
       subroutine add_star_LNA_kick_component( &
-            s, map, alphai, vr, mode_indices, mode, fraction, kick_eigenvector, ierr)
-         type(star_info), pointer :: s
+            map, alphai, vr, mode_indices, mode, fraction, kick_eigenvector, ierr)
          type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(in) :: alphai(:), vr(:,:), fraction
          integer, intent(in) :: mode_indices(:), mode
          complex(dp), intent(inout) :: kick_eigenvector(:)
          integer, intent(out) :: ierr
          integer :: idx, k, col_velocity, op_err, velocity_var
-         real(dp) :: dR_amp, phase_angle, sign
-         complex(dp) :: surf_dlnR, surf_dR, rel_dlnR, dlnR
+         real(dp) :: surf_amp
+         complex(dp) :: phase, velocity, surf_velocity
          complex(dp), allocatable :: eigenvector(:)
 
          ierr = 0
@@ -2486,26 +2793,22 @@
             return
          end if
 
-         surf_dlnR = star_LNA_eigen_component(map, eigenvector, 1, lna_var_lnR)
-         surf_dR = s% r(1)*surf_dlnR
-         if (abs(surf_dR) <= 1d-99) then
+         surf_velocity = star_LNA_eigen_component(map, eigenvector, 1, velocity_var)
+         surf_amp = abs(surf_velocity)
+         if (surf_amp <= 1d-99) then
             write(*,'(a,i0)') &
-               'star_LNA selected kick mode has zero surface displacement amplitude: ', mode
+               'star_LNA selected kick mode has zero surface velocity amplitude: ', mode
             ierr = -1
             deallocate(eigenvector)
             return
          end if
 
+         phase = surf_velocity/surf_amp
          do k = 1, map%nz
-            dlnR = star_LNA_eigen_component(map, eigenvector, k, lna_var_lnR)
-            rel_dlnR = dlnR/surf_dlnR
-            dR_amp = abs(s% r(k)*dlnR)/abs(surf_dR)
-            phase_angle = atan2(aimag(rel_dlnR), dble(rel_dlnR))
-            sign = 1d0
-            if (abs(phase_angle) > 0.5d0*pi) sign = -1d0
+            velocity = star_LNA_eigen_component(map, eigenvector, k, velocity_var)
             col_velocity = matrix_index(map, k, velocity_var)
             kick_eigenvector(col_velocity) = &
-               kick_eigenvector(col_velocity) + fraction*sign*dR_amp
+               kick_eigenvector(col_velocity) + fraction*velocity/(phase*surf_amp)
          end do
          deallocate(eigenvector)
       end subroutine add_star_LNA_kick_component
@@ -2648,6 +2951,203 @@
       end subroutine load_star_LNA_eigenvector
 
 
+      subroutine store_star_LNA_eigenpair( &
+            alphar, alphai, beta, vr, idx, sigma, eigenvector, ierr)
+         real(dp), intent(inout) :: alphar(:), alphai(:), beta(:), vr(:,:)
+         integer, intent(in) :: idx
+         complex(dp), intent(in) :: sigma, eigenvector(:)
+         integer, intent(out) :: ierr
+
+         ierr = 0
+         if (alphai(idx) <= 0d0 .or. idx >= size(alphai) .or. aimag(sigma) <= 0d0) then
+            ierr = -1
+            return
+         end if
+
+         alphar(idx:idx + 1) = real(sigma, kind=dp)
+         alphai(idx) = aimag(sigma)
+         alphai(idx + 1) = -aimag(sigma)
+         beta(idx:idx + 1) = 1d0
+         vr(:, idx) = real(eigenvector, kind=dp)
+         vr(:, idx + 1) = aimag(eigenvector)
+      end subroutine store_star_LNA_eigenpair
+
+
+      subroutine star_LNA_matrix_bandwidth(A, B, kl, ku)
+         real(dp), intent(in) :: A(:,:), B(:,:)
+         integer, intent(out) :: kl, ku
+         integer :: i, j
+
+         kl = 0
+         ku = 0
+         do j = 1, size(A, 2)
+            do i = 1, size(A, 1)
+               if (A(i, j) == 0d0 .and. B(i, j) == 0d0) cycle
+               kl = max(kl, i - j)
+               ku = max(ku, j - i)
+            end do
+         end do
+      end subroutine star_LNA_matrix_bandwidth
+
+
+      subroutine star_LNA_eigenvector_residual_from_vector( &
+            A, B, kl, ku, sigma, eigenvector, max_residual, max_residual_row, ierr, Ax, Bx)
+         real(dp), intent(in) :: A(:,:), B(:,:)
+         integer, intent(in) :: kl, ku
+         complex(dp), intent(in) :: sigma, eigenvector(:)
+         real(dp), intent(out) :: max_residual
+         integer, intent(out) :: max_residual_row
+         integer, intent(out) :: ierr
+         complex(dp), intent(out), optional :: Ax(:), Bx(:)
+         integer :: i, j, i_first, i_last
+         real(dp) :: residual
+         real(dp) :: row_scale(size(A, 1))
+         complex(dp) :: Ax_local(size(A, 1)), Bx_local(size(A, 1))
+
+         ierr = 0
+         max_residual = huge(1d0)
+         max_residual_row = 0
+         Ax_local = (0d0, 0d0)
+         Bx_local = (0d0, 0d0)
+         row_scale = 0d0
+         do j = 1, size(A, 2)
+            i_first = max(1, j - ku)
+            i_last = min(size(A, 1), j + kl)
+            do i = i_first, i_last
+               Ax_local(i) = Ax_local(i) + A(i, j)*eigenvector(j)
+               Bx_local(i) = Bx_local(i) + B(i, j)*eigenvector(j)
+               row_scale(i) = row_scale(i) + &
+                  (abs(A(i, j)) + abs(sigma)*abs(B(i, j)))*abs(eigenvector(j))
+            end do
+         end do
+         if (maxval(row_scale) <= tiny(1d0) .or. is_bad(maxval(row_scale))) then
+            ierr = -1
+            return
+         end if
+
+         max_residual = 0d0
+         do i = 1, size(A, 1)
+            if (row_scale(i) <= tiny(1d0)) cycle
+            residual = abs(Ax_local(i) - sigma*Bx_local(i))/row_scale(i)
+            if (residual > max_residual) then
+               max_residual = residual
+               max_residual_row = i
+            end if
+         end do
+         if (is_bad(max_residual)) ierr = -1
+         if (present(Ax)) Ax = Ax_local
+         if (present(Bx)) Bx = Bx_local
+      end subroutine star_LNA_eigenvector_residual_from_vector
+
+
+      ! Refine A*x = sigma*B*x while fixing one eigenvector component.
+      ! Each Newton step solves
+      !   (A - sigma*B)*dx - B*x*dsigma = -(A - sigma*B)*x.
+      subroutine refine_star_LNA_eigenpair( &
+            A, B, kl, ku, target, sigma, eigenvector, iterations, improved, ierr)
+         real(dp), intent(in) :: A(:,:), B(:,:), target
+         integer, intent(in) :: kl, ku
+         complex(dp), intent(inout) :: sigma, eigenvector(:)
+         integer, intent(out) :: iterations
+         logical, intent(out) :: improved
+         integer, intent(out) :: ierr
+         integer :: i, j, i_first, i_last, ldab, lapack_info, line_search, n, norm_idx
+         integer, allocatable :: ipiv(:)
+         real(dp) :: best_residual, current_residual, initial_residual, step, trial_residual
+         complex(dp) :: current_sigma, delta_sigma, best_sigma, trial_sigma
+         complex(dp), allocatable :: AB(:,:), Ax(:), Bx(:), correction(:), &
+            current_vector(:), best_vector(:), rhs(:,:), trial_vector(:)
+         integer :: residual_row
+
+         ierr = 0
+         iterations = 0
+         improved = .false.
+         n = size(A, 1)
+         ldab = 2*kl + ku + 1
+         allocate( &
+            AB(ldab, n), Ax(n), Bx(n), correction(n), current_vector(n), &
+            best_vector(n), rhs(n, 2), trial_vector(n), ipiv(n), stat=ierr)
+         if (ierr /= 0) return
+
+         current_sigma = sigma
+         current_vector = eigenvector
+         call star_LNA_eigenvector_residual_from_vector( &
+            A, B, kl, ku, current_sigma, current_vector, current_residual, &
+            residual_row, ierr, Ax, Bx)
+         if (ierr /= 0) then
+            ierr = 0
+            deallocate(AB, Ax, Bx, correction, current_vector, best_vector, rhs, trial_vector, ipiv)
+            return
+         end if
+         best_residual = current_residual
+         initial_residual = current_residual
+         best_sigma = current_sigma
+         best_vector = current_vector
+
+         do while (iterations < star_LNA_max_refinement_iterations .and. &
+               best_residual > target)
+            norm_idx = maxloc(abs(current_vector), dim=1)
+            if (abs(current_vector(norm_idx)) <= tiny(1d0)) exit
+            current_vector = current_vector/current_vector(norm_idx)
+            call star_LNA_eigenvector_residual_from_vector( &
+               A, B, kl, ku, current_sigma, current_vector, current_residual, &
+               residual_row, ierr, Ax, Bx)
+            if (ierr /= 0) then
+               ierr = 0
+               exit
+            end if
+
+            AB = (0d0, 0d0)
+            do j = 1, n
+               i_first = max(1, j - ku)
+               i_last = min(n, j + kl)
+               do i = i_first, i_last
+                  AB(kl + ku + 1 + i - j, j) = &
+                     cmplx(A(i, j), 0d0, kind=dp) - current_sigma*B(i, j)
+               end do
+            end do
+            rhs(:, 1) = -(Ax - current_sigma*Bx)
+            rhs(:, 2) = Bx
+            call ZGBTRF(n, n, kl, ku, AB, ldab, ipiv, lapack_info)
+            if (lapack_info /= 0) exit
+            call ZGBTRS('N', n, kl, ku, 2, AB, ldab, ipiv, rhs, n, lapack_info)
+            if (lapack_info /= 0 .or. abs(rhs(norm_idx, 2)) <= tiny(1d0)) exit
+
+            delta_sigma = -rhs(norm_idx, 1)/rhs(norm_idx, 2)
+            correction = rhs(:, 1) + delta_sigma*rhs(:, 2)
+            step = 1d0
+            do line_search = 1, 4
+               trial_sigma = current_sigma + step*delta_sigma
+               trial_vector = current_vector + step*correction
+               call star_LNA_eigenvector_residual_from_vector( &
+                  A, B, kl, ku, trial_sigma, trial_vector, trial_residual, &
+                  residual_row, ierr)
+               if (ierr == 0 .and. trial_residual < current_residual) exit
+               ierr = 0
+               step = 0.5d0*step
+            end do
+            if (trial_residual >= current_residual) exit
+
+            iterations = iterations + 1
+            current_sigma = trial_sigma
+            current_vector = trial_vector
+            current_residual = trial_residual
+            if (current_residual < best_residual) then
+               best_residual = current_residual
+               best_sigma = current_sigma
+               best_vector = current_vector
+            end if
+         end do
+
+         improved = best_residual < initial_residual
+         if (improved) then
+            sigma = best_sigma
+            eigenvector = best_vector
+         end if
+         deallocate(AB, Ax, Bx, correction, current_vector, best_vector, rhs, trial_vector, ipiv)
+      end subroutine refine_star_LNA_eigenpair
+
+
       subroutine normalize_star_LNA_eigenvector(map, eigenvector)
          type(star_LNA_var_map), intent(in) :: map
          complex(dp), intent(inout) :: eigenvector(:)
@@ -2705,7 +3205,7 @@
          write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,l1)') '# selected_for_initial_velocity', &
             selected_for_star_LNA_initial_velocity(s, mode)
-         write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
+         write(io,'(a)') '# eigen_index refers to the reduced generalized eigenproblem'
          write(io,'(a,1x,i0)') '# eigen_index', eigen_index
          write(io,'(a,1x,a)') '# velocity_variable', &
             trim(var_name(velocity_var))
@@ -2806,7 +3306,7 @@
          write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
          write(io,'(a,1x,l1)') '# selected_for_initial_velocity', &
             selected_for_star_LNA_initial_velocity(s, mode)
-         write(io,'(a)') '# eigen_index refers to the reduced dynamic variable eigenproblem'
+         write(io,'(a)') '# eigen_index refers to the reduced generalized eigenproblem'
          write(io,'(a,1x,i0)') '# eigen_index', eigen_index
          write(io,'(a,1x,1pe24.16)') '# sigma_real', sigma_re
          write(io,'(a,1x,1pe24.16)') '# sigma_imag', sigma_im
@@ -2935,7 +3435,7 @@
             if (velocity_var == lna_var_u) then
                dm_velocity = s% dm(k)
             else
-               dm_velocity = s% dm_bar(k)
+               dm_velocity = star_LNA_dm_face(s, k)
             end if
             kinetic_energy = kinetic_energy + 0.5d0*dm_velocity*pow2(abs(dv))
          end do
@@ -2968,21 +3468,45 @@
          real(dp), intent(in) :: sigma_im
          complex(dp), intent(in) :: eigenvector(:)
          integer, intent(out) :: ierr
-         real(dp) :: chi_coeff
-         complex(dp) :: d_v_div_r
+         integer :: velocity_var
+         real(dp) :: cycle_factor
+         complex(dp) :: velocity_00, velocity_p1, Uq_00, Uq_p1
+         type(auto_diff_real_star_order1) :: Uq_ad
 
          ierr = 0
          eddy_work = 0d0
          if (.not. s% star_LNA_perturb_eddy_viscosity) return
          if (abs(sigma_im) <= 1d-99) return
 
-         chi_coeff = chi_coefficient_for_star_LNA(s, k, ierr)
+         velocity_var = velocity_var_for_star_LNA(map)
+         velocity_00 = star_LNA_eigen_component(map, eigenvector, k, velocity_var)
+         if (s%u_flag) then
+            call Uq_cell_for_star_LNA(s, k, Uq_ad, ierr)
+         else
+            call Uq_face_for_star_LNA(s, k, Uq_ad, ierr)
+         end if
          if (ierr /= 0) return
-         if (chi_coeff <= 0d0) return
+         call star_LNA_perturbation_from_ad(map, k, Uq_ad, eigenvector, Uq_00, ierr)
+         if (ierr /= 0) return
 
-         call delta_d_v_div_r_for_star_LNA(s, map, k, eigenvector, d_v_div_r, ierr)
-         if (ierr /= 0) return
-         eddy_work = -4d0*pi*pi*chi_coeff*abs(d_v_div_r)*abs(d_v_div_r)/abs(sigma_im)
+         cycle_factor = pi*s%dm(k)/abs(sigma_im)
+         if (s%u_flag) then
+            eddy_work = cycle_factor*real(conjg(velocity_00)*Uq_00)
+         else
+            velocity_p1 = (0d0, 0d0)
+            Uq_p1 = (0d0, 0d0)
+            if (k < map%nz) then
+               velocity_p1 = star_LNA_eigen_component( &
+                  map, eigenvector, k+1, velocity_var)
+               call Uq_face_for_star_LNA(s, k+1, Uq_ad, ierr)
+               if (ierr /= 0) return
+               call star_LNA_perturbation_from_ad( &
+                  map, k+1, Uq_ad, eigenvector, Uq_p1, ierr)
+               if (ierr /= 0) return
+            end if
+            eddy_work = 0.5d0*cycle_factor*real( &
+               conjg(velocity_00)*Uq_00 + conjg(velocity_p1)*Uq_p1)
+         end if
       end function eddy_viscous_work_for_star_LNA
 
 
@@ -2998,37 +3522,6 @@
 
          selected = trim(s% star_LNA_convection_treatment) == 'frozen_flux'
       end function frozen_flux_lna_selected
-
-
-      subroutine delta_d_v_div_r_for_star_LNA( &
-            s, map, k, eigenvector, d_v_div_r, ierr)
-         type(star_info), pointer :: s
-         type(star_LNA_var_map), intent(in) :: map
-         integer, intent(in) :: k
-         complex(dp), intent(in) :: eigenvector(:)
-         complex(dp), intent(out) :: d_v_div_r
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: v00_ad, vp1_ad
-         complex(dp) :: v00, vp1
-         real(dp) :: rp1
-
-         ierr = 0
-         v00_ad = wrap_v_00(s, k)
-         vp1_ad = wrap_v_p1(s, k)
-         call star_LNA_perturbation_from_ad(map, k, v00_ad, eigenvector, v00, ierr)
-         if (ierr /= 0) return
-         call star_LNA_perturbation_from_ad(map, k, vp1_ad, eigenvector, vp1, ierr)
-         if (ierr /= 0) return
-         if (k < s% nz) then
-            rp1 = s% r(k + 1)
-         else
-            rp1 = s% r_center
-         end if
-         if (rp1 == 0d0) rp1 = 1d0
-
-         d_v_div_r = v00/s% r(k) - vp1/rp1
-      end subroutine delta_d_v_div_r_for_star_LNA
-
 
       real(dp) function luminosity_work_for_star_LNA(s, k, sigma_im, dlnT, dL_dm) &
             result(lum_work)
@@ -3308,8 +3801,9 @@
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_rsp2_Hp_row_resid', diag
+         write(io,'(a)') '# full pencil is scaled before algebraic elimination'
          write(io,'(a)') &
-            '# dense solve row/column scales A and B before algebraic elimination'
+            '# reduced pencil is timescale normalized and equilibrated before DGGEV'
          write(io,'(a)') '# eigenvalues still solve the original A*x = sigma*B*x problem'
          close(io)
 
@@ -3659,9 +4153,6 @@
          do k = 1, map%nz
             if (use_rsp_lsurf_row_for_star_LNA(s, k)) then
                call rsp_lsurf_resid_for_star_LNA(s, map%nz, resid_ad)
-            else if (s% RSP2_flag) then
-               call rsp2_luminosity_resid_for_star_LNA(s, k, resid_ad)
-               resid_ad = resid_ad/max(1d0, maxval(abs(s% L(1:map%nz))))
             else if (tdc_lna_active(s) .and. k > 1) then
                call tdc_luminosity_resid_for_star_LNA(s, k, resid_ad, ierr)
                if (ierr /= 0) return
@@ -3948,6 +4439,12 @@
          else
             write(*,'(a)') 'star_LNA: selected mode max abs logKE_per_cycle filter disabled'
          end if
+         write(*,'(a,1pe12.4)') 'star_LNA: max eigenvector residual = ', &
+            s% star_LNA_max_eigenvector_residual
+         write(*,'(a,i0,a,1pe12.4)') 'star_LNA: full-pencil refinement uses up to ', &
+            star_LNA_max_refinement_iterations, &
+            ' iterations for initial residuals <= ', &
+            star_LNA_max_initial_refinement_residual
          call resolve_star_LNA_output_directory(s, output_directory)
          call resolve_star_LNA_output_file_prefix(s, file_prefix)
          write(*,'(a,a)') 'star_LNA: output directory = ', trim(output_directory)
@@ -3986,10 +4483,9 @@
             write(*,'(a)') &
                'star_LNA: hydro v_flag is inactive; LNA uses its own face velocity perturbation.'
          end if
-         if (s% use_TDC_enthalpy_flux_limiter .and. &
-               (s% RSP2_flag .or. tdc_lna_active(s))) &
+         if (s% use_TDC_enthalpy_flux_limiter .and. tdc_lna_active(s)) &
             write(*,'(a)') &
-               'star_LNA: hydro enthalpy flux limiter is active; LNA ignores it.'
+               'star_LNA: TDC enthalpy flux limiter is active; LNA ignores it.'
          if (.not. s% RSP2_flag .and. s% MLT_option == 'TDC' .and. &
                s% star_LNA_include_tdc .and. &
                s% star_LNA_perturb_eddy_viscosity .and. s% TDC_alpha_M > 0d0 .and. &
@@ -4055,8 +4551,6 @@
             name = 'energy'
          case (lna_eq_luminosity_rsp_surface)
             name = 'luminosity_rsp_surface'
-         case (lna_eq_luminosity_rsp2)
-            name = 'luminosity_rsp2'
          case (lna_eq_luminosity_tdc)
             name = 'luminosity_tdc'
          case (lna_eq_luminosity_frozen_flux)
